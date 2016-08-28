@@ -3,10 +3,12 @@
 #include "tiio_gif.h"
 #include "trasterimage.h"
 #include "timageinfo.h"
+#include "toonz/preferences.h"
 #include <QStringList>
 #include <QPainter>
 #include <QProcess>
 #include <QDir>
+#include "toonzqt/dvdialog.h"
 
 //===========================================================
 //
@@ -42,6 +44,8 @@ TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
   if (!m_properties) m_properties = new Tiio::GifWriterProperties();
   std::string scale = m_properties->getProperty("Scale")->getValueAsString();
   m_scale           = QString::fromStdString(scale).toInt();
+  std::string padding = m_properties->getProperty("Image Padding for Trimmed Images")->getValueAsString();
+  m_padding = QString::fromStdString(padding).toInt();
   TBoolProperty *looping =
       (TBoolProperty *)m_properties->getProperty("Looping");
   m_looping = looping->getValue();
@@ -54,6 +58,10 @@ TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
   TBoolProperty *transparent =
 	  (TBoolProperty *)m_properties->getProperty("Transparent");
   m_transparent = transparent->getValue();
+  TBoolProperty *dithered =
+	  (TBoolProperty *)m_properties->getProperty("Dither Semi-Transparent Areas");
+  m_dithered = dithered->getValue();
+
   ffmpegWriter = new Ffmpeg();
   ffmpegWriter->setPath(m_path);
   m_frameCount = 0;
@@ -63,32 +71,44 @@ TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
 //-----------------------------------------------------------
 
 TLevelWriterGif::~TLevelWriterGif() {
+	if (!checkImageMagick() && m_transparent) {
+		QString msg(QObject::tr("ImageMagick is not configured correctly in  "
+			"preferences. \nThe file will be processed without transparency."));
+		DVGui::warning(msg);
+		m_transparent = false;
+	}
 	if (m_trim) {
-		m_lx = m_right - m_left;
-		m_ly = m_bottom - m_top;
+		m_lx = m_right - m_left + 1 + (m_padding * 2);
+		m_ly = m_bottom - m_top + 1 + (m_padding * 2);
 		int resizedWidth = m_lx * m_scale / 100;
 		int resizedHeight = m_ly * m_scale / 100;
 		int i = 1;
 		for (QImage *image : m_images) {
+			// get only the trimmed area
+			//QImage copy = QImage(m_lx, m_ly, QImage::Format_ARGB32);
+			//copy.fill(qRgba(0, 0, 0, 0));
 			QImage copy = image->copy(m_left, m_top, m_lx, m_ly);
-			QImage newCopy = copy;
+			// make a copy in order to be able to do non-transparent and padding
+			QImage newCopy = QImage(m_lx, m_ly, QImage::Format_ARGB32);
 			if (!m_transparent) {
 				newCopy.fill(qRgba(255, 255, 255, 255));
-				QPainter painter;
-				painter.begin(&newCopy);
-				painter.drawImage(0,0,copy);
-				painter.end();
 			}
-			if (m_scale != 100) {
+			else {
+				newCopy.fill(qRgba(0, 0, 0, 0));
+			}
+			QPainter painter;
+			painter.begin(&newCopy);
+			painter.drawImage(m_padding,m_padding,copy);
+			painter.end();
+			
+			// do the scaling here if imagemagick is doing the work
+			if (m_scale != 100 && m_transparent) {
 				int width = (newCopy.width() * m_scale) / 100;
 				int height = (newCopy.height() * m_scale) / 100;
 				newCopy = newCopy.scaled(width, height);
 			}
-			int w = copy.width();
-			int h = copy.height();
-			//m_imagesResized.push_back(copy);
 			QString tempPath = m_path.getQString() + "tempOut" +
-				QString::number(i) + "." + "png";
+				QString::number(i).rightJustified(4, '0') + "." + "png";
 			newCopy.save(tempPath, "PNG", -1);
 			ffmpegWriter->addToCleanUp(tempPath);
 			i++;
@@ -97,12 +117,28 @@ TLevelWriterGif::~TLevelWriterGif() {
 		m_images.clear();
 	}
 	int fr = m_frameRate;
+	// use ImageMagick for Transparent Images
 	if (m_transparent) {
 		QStringList imargs;
-		//imargs << "-delay";
-		//imargs << "8";
-		//imargs << QString::number(qRound(100 / m_frameRate));
-		imargs << m_path.getQString() + "tempOut%d.png[1-" + QString::number(m_frameCount) + "]";
+		imargs << "-dispose";
+		imargs << "previous";
+		imargs << "-delay";
+		imargs << QString::number(qRound(100 / m_frameRate));
+		if (m_looping) {
+			imargs << "-loop";
+			imargs << "0";
+		}
+		else {
+			imargs << "-loop";
+			imargs << "1";
+		}
+		if (m_dithered) {
+			imargs << "-channel";
+			imargs << "A";
+			imargs << "-ordered-dither";
+			imargs << "o8x8";
+		}
+		imargs << m_path.getQString() + "tempOut*.png";
 		imargs << m_path.getQString();
 		QString path = QDir::currentPath() + "/convert";
 #if defined(_WIN32)
@@ -197,6 +233,38 @@ void TLevelWriterGif::setFrameRate(double fps) {
 }
 
 void TLevelWriterGif::saveSoundTrack(TSoundTrack *st) { return; }
+
+bool TLevelWriterGif::checkImageMagick() {
+	// check the user defined path in preferences first
+	QString path = Preferences::instance()->getImageMagickPath() + "/convert";
+#if defined(_WIN32)
+	path = path + ".exe";
+#endif
+	if (TSystem::doesExistFileOrLevel(TFilePath(path))) return true;
+
+	// check the FFmpeg directory next
+	path = Preferences::instance()->getFfmpegPath() + "/convert";
+#if defined(_WIN32)
+	path = path + ".exe";
+#endif
+	if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+		Preferences::instance()->setImageMagickPath(Preferences::instance()->getFfmpegPath().toStdString());
+		return true;
+	}
+
+	// check the OpenToonz root directory next
+	path = QDir::currentPath() + "/convert";
+#if defined(_WIN32)
+	path = path + ".exe";
+#endif
+	if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+		Preferences::instance()->setImageMagickPath(QDir::currentPath().toStdString());
+		return true;
+	}
+
+	// give up
+	return false;
+}
 
 //-----------------------------------------------------------
 
@@ -372,12 +440,16 @@ Tiio::GifWriterProperties::GifWriterProperties()
     , m_looping("Looping", true)
     , m_palette("Generate Palette", true)
 	, m_trim("Trim Unused Space", false)
-	, m_transparent("Transparent", false) {
+	, m_padding("Image Padding for Trimmed Images", 0, 100, 0)
+	, m_transparent("Transparent", false) 
+	, m_dithered("Dither Semi-Transparent Areas", false) {
   bind(m_scale);
   bind(m_looping);
   bind(m_palette);
   bind(m_trim);
+  bind(m_padding);
   bind(m_transparent);
+  bind(m_dithered);
 }
 
 // Tiio::Reader* Tiio::makeGifReader(){ return nullptr; }

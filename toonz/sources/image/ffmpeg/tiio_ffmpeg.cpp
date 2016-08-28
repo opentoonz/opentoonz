@@ -6,6 +6,7 @@
 #include <QProcess>
 #include <QDir>
 #include <QtGui/QImage>
+#include <QPainter>
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 
@@ -99,7 +100,7 @@ void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
 void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   QString tempPath = m_path.getQString() + "tempOut" +
-                     QString::number(frameIndex) + "." + m_intermediateFormat;
+                     QString::number(frameIndex).rightJustified(4, '0') + "." + m_intermediateFormat;
   std::string saveStatus = "";
   TRasterImageP tempImage(img);
   TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
@@ -123,19 +124,31 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   QByteArray ba      = m_intermediateFormat.toUpper().toLatin1();
   const char *format = ba.data();
 
-  QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
-  qi->save(tempPath, format, -1);
+  QImage qi = QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
+  if (m_path.getType() == "gif") {
+	  // will only get here for non-transparent gif images - need to fill transparency
+	  QImage nonTranspImage = QImage(m_lx, m_ly, QImage::Format_ARGB32);
+	  nonTranspImage.fill(qRgba(255, 255, 255, 255));
+	  QPainter painter;
+	  painter.begin(&nonTranspImage);
+	  painter.drawImage(0, 0, qi);
+	  painter.end();
+	  nonTranspImage.save(tempPath, format, -1);
+  }
+  else {
+	  qi.save(tempPath, format, -1);
+  }
   free(buffer);
   m_cleanUpList.push_back(tempPath);
   m_frameCount++;
-  delete qi;
+  //delete qi;
   delete image;
 }
 
 void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
                        bool includesInPath, bool includesOutPath,
                        bool overWriteFiles) {
-  QString tempName = "tempOut%d." + m_intermediateFormat;
+  QString tempName = "tempOut%04d." + m_intermediateFormat;
   tempName         = m_path.getQString() + tempName;
 
   QStringList args;

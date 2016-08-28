@@ -385,6 +385,8 @@ public:
 
   void setFfmpegPath(std::string path);
   QString getFfmpegPath() const { return m_ffmpegPath; }
+  void setImageMagickPath(std::string path);
+  QString getImageMagickPath() const { return m_imageMagickPath; }
   void setPrecompute(bool enabled);
   bool getPrecompute() { return m_precompute; }
   void setFfmpegTimeout(int seconds);
@@ -428,7 +430,7 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits, m_ffmpegPath;
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_imageMagickPath;
   ;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
