@@ -100,7 +100,8 @@ void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
 void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   QString tempPath = m_path.getQString() + "tempOut" +
-                     QString::number(frameIndex).rightJustified(4, '0') + "." + m_intermediateFormat;
+                     QString::number(frameIndex).rightJustified(4, '0') + "." +
+                     m_intermediateFormat;
   std::string saveStatus = "";
   TRasterImageP tempImage(img);
   TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
@@ -126,22 +127,21 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
 
   QImage qi = QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
   if (m_path.getType() == "gif") {
-	  // will only get here for non-transparent gif images - need to fill transparency
-	  QImage nonTranspImage = QImage(m_lx, m_ly, QImage::Format_ARGB32);
-	  nonTranspImage.fill(qRgba(255, 255, 255, 255));
-	  QPainter painter;
-	  painter.begin(&nonTranspImage);
-	  painter.drawImage(0, 0, qi);
-	  painter.end();
-	  nonTranspImage.save(tempPath, format, -1);
-  }
-  else {
-	  qi.save(tempPath, format, -1);
+    // will only get here for non-transparent gif images - need to fill
+    // transparency
+    QImage nonTranspImage = QImage(m_lx, m_ly, QImage::Format_ARGB32);
+    nonTranspImage.fill(qRgba(255, 255, 255, 255));
+    QPainter painter;
+    painter.begin(&nonTranspImage);
+    painter.drawImage(0, 0, qi);
+    painter.end();
+    nonTranspImage.save(tempPath, format, -1);
+  } else {
+    qi.save(tempPath, format, -1);
   }
   free(buffer);
   m_cleanUpList.push_back(tempPath);
   m_frameCount++;
-  //delete qi;
   delete image;
 }
 

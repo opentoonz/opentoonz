@@ -177,12 +177,13 @@ void FormatSettingsPopup::buildPropertyCheckBox(int index,
       new DVGui::PropertyCheckBox(tr(prop->getName().c_str()), this, prop);
   m_widgets[prop->getName()] = v;
   if (prop->getName() == "Generate Palette") {
-	  QLabel *label = new QLabel(tr("Only available for non-transparent gifs:"), this);
-	  int row = m_mainLayout->rowCount();
-	  m_mainLayout->addWidget(label, row, 0);
-	  m_mainLayout->addWidget(v, row, 1);
+    QLabel *label =
+        new QLabel(tr("Only available for non-transparent gifs:"), this);
+    int row = m_mainLayout->rowCount();
+    m_mainLayout->addWidget(label, row, 0);
+    m_mainLayout->addWidget(v, row, 1);
   } else
-  m_mainLayout->addWidget(v, m_mainLayout->rowCount(), 1);
+    m_mainLayout->addWidget(v, m_mainLayout->rowCount(), 1);
 
   v->setChecked(prop->getValue());
 }

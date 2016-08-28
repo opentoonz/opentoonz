@@ -868,8 +868,8 @@ void PreferencesPopup::onFfmpegPathChanged() {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onImageMagickPathChanged() {
-	QString text = m_imageMagickPathFileField->getPath();
-	m_pref->setImageMagickPath(text.toStdString());
+  QString text = m_imageMagickPathFileField->getPath();
+  m_pref->setImageMagickPath(text.toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -1012,8 +1012,8 @@ PreferencesPopup::PreferencesPopup()
 
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
-  m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
-  m_ffmpegTimeout     = new DVGui::IntLineEdit(this, 30, 1);
+  m_ffmpegPathFileFld        = new DVGui::FileField(this, QString(""));
+  m_ffmpegTimeout            = new DVGui::IntLineEdit(this, 30, 1);
   m_imageMagickPathFileField = new DVGui::FileField(this, QString(""));
 
   //--- Drawing ------------------------------
@@ -1590,18 +1590,19 @@ PreferencesPopup::PreferencesPopup()
         ioGridLay->addWidget(new QLabel(tr("FFmpeg Path: ")), 0, 0,
                              Qt::AlignRight);
         ioGridLay->addWidget(m_ffmpegPathFileFld, 0, 1, 1, 3);
-		ioGridLay->addWidget(new QLabel(" "), 1, 0);
-		ioGridLay->addWidget(
-			new QLabel(tr("To export a transparent gif, ImageMagick "
-				"must be present.")),
-			2, 0, 1, 4); 
-		ioGridLay->addWidget(new QLabel(tr("Please provide the path where "
-			"ImageMagick is located on your computer.")),
-			3, 0, 1, 4);
-		ioGridLay->addWidget(new QLabel(tr("ImageMagick Path: ")), 4, 0,
-			Qt::AlignRight);
-		ioGridLay->addWidget(m_imageMagickPathFileField, 4, 1, 1, 3);
-		ioGridLay->addWidget(new QLabel(" "), 5, 0);
+        ioGridLay->addWidget(new QLabel(" "), 1, 0);
+        ioGridLay->addWidget(
+            new QLabel(tr("To export a transparent gif, ImageMagick "
+                          "must be present.")),
+            2, 0, 1, 4);
+        ioGridLay->addWidget(
+            new QLabel(tr("Please provide the path where "
+                          "ImageMagick is located on your computer.")),
+            3, 0, 1, 4);
+        ioGridLay->addWidget(new QLabel(tr("ImageMagick Path: ")), 4, 0,
+                             Qt::AlignRight);
+        ioGridLay->addWidget(m_imageMagickPathFileField, 4, 1, 1, 3);
+        ioGridLay->addWidget(new QLabel(" "), 5, 0);
         ioGridLay->addWidget(
             new QLabel(tr("Number of seconds to wait for external programs "
                           "to finish processing the output:")),
@@ -1971,7 +1972,7 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_ffmpegTimeout, SIGNAL(editingFinished()), this,
                        SLOT(onFfmpegTimeoutChanged()));
   ret = ret && connect(m_imageMagickPathFileField, SIGNAL(pathChanged()), this,
-	  SLOT(onImageMagickPathChanged()));
+                       SLOT(onImageMagickPathChanged()));
 
   //--- Drawing ----------------------
   ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this,

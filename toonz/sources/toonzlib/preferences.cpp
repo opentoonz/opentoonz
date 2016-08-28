@@ -1206,9 +1206,9 @@ void Preferences::setFfmpegPath(std::string path) {
 //-----------------------------------------------------------------
 
 void Preferences::setImageMagickPath(std::string path) {
-	m_imageMagickPath = QString::fromStdString(path);
-	std::string strPath = m_imageMagickPath.toStdString();
-	m_settings->setValue("imageMagickPath", m_imageMagickPath);
+  m_imageMagickPath   = QString::fromStdString(path);
+  std::string strPath = m_imageMagickPath.toStdString();
+  m_settings->setValue("imageMagickPath", m_imageMagickPath);
 }
 
 //-----------------------------------------------------------------
