@@ -135,10 +135,18 @@ TLevelWriterGif::~TLevelWriterGif() {
       imargs << "1";
     }
     if (m_dithered) {
-      imargs << "-channel";
-      imargs << "A";
-      imargs << "-ordered-dither";
-      imargs << "o8x8";
+      if (!checkDithering()) {
+        QString msg(QObject::tr(
+            "thresholds.xml is not present in the ImageMagick folder.  "
+            "\nThe file will be processed without dithering."));
+        DVGui::warning(msg);
+        m_dithered = false;
+      } else {
+        imargs << "-channel";
+        imargs << "A";
+        imargs << "-ordered-dither";
+        imargs << "o8x8";
+      }
     }
     imargs << m_path.getQString() + "tempOut*.png";
     imargs << m_path.getQString();
@@ -147,8 +155,11 @@ TLevelWriterGif::~TLevelWriterGif() {
     path = path + ".exe";
 #endif
     QProcess imageMagick;
+    QString currPath = QDir::currentPath();
+    QDir::setCurrent(m_thresholdsPath);
     imageMagick.start(path, imargs);
     imageMagick.waitForFinished(30000);
+    QDir::setCurrent(currPath);
     QString results = imageMagick.readAllStandardError();
     results += imageMagick.readAllStandardOutput();
     int exitCode = imageMagick.exitCode();
@@ -232,7 +243,11 @@ void TLevelWriterGif::setFrameRate(double fps) {
   ffmpegWriter->setFrameRate(fps);
 }
 
+//-----------------------------------------------------------
+
 void TLevelWriterGif::saveSoundTrack(TSoundTrack *st) { return; }
+
+//-----------------------------------------------------------
 
 bool TLevelWriterGif::checkImageMagick() {
   // check the user defined path in preferences first
@@ -240,7 +255,10 @@ bool TLevelWriterGif::checkImageMagick() {
 #if defined(_WIN32)
   path = path + ".exe";
 #endif
-  if (TSystem::doesExistFileOrLevel(TFilePath(path))) return true;
+  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+    m_thresholdsPath = Preferences::instance()->getImageMagickPath();
+    return true;
+  }
 
   // check the FFmpeg directory next
   path = Preferences::instance()->getFfmpegPath() + "/convert";
@@ -250,6 +268,7 @@ bool TLevelWriterGif::checkImageMagick() {
   if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
     Preferences::instance()->setImageMagickPath(
         Preferences::instance()->getFfmpegPath().toStdString());
+    m_thresholdsPath = Preferences::instance()->getFfmpegPath();
     return true;
   }
 
@@ -261,6 +280,21 @@ bool TLevelWriterGif::checkImageMagick() {
   if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
     Preferences::instance()->setImageMagickPath(
         QDir::currentPath().toStdString());
+    m_thresholdsPath = QDir::currentPath();
+    return true;
+  }
+
+  // give up
+  return false;
+}
+
+//-----------------------------------------------------------
+
+bool TLevelWriterGif::checkDithering() {
+  // check the user defined path in preferences first
+  QString path =
+      Preferences::instance()->getImageMagickPath() + "/thresholds.xml";
+  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
     return true;
   }
 

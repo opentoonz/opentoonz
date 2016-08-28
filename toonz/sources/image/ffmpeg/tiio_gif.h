@@ -49,6 +49,8 @@ private:
   // std::vector<QImage> m_imagesResized;
   bool m_firstPass = true;
   bool checkImageMagick();
+  bool checkDithering();
+  QString m_thresholdsPath;
 };
 
 //===========================================================
