@@ -311,4 +311,5 @@
 
 #define MI_About "MI_About"
 #define MI_PencilTest "MI_PencilTest"
+#define MI_AudioRecording "MI_AudioRecording"
 #endif

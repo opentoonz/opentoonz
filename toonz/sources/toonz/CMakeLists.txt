@@ -1,10 +1,11 @@
-set(VERSION 1.1)
+﻿set(VERSION 1.1)
 
 set(MOC_HEADERS
     addfilmstripframespopup.h
     adjustlevelspopup.h
     adjustthicknesspopup.h
     antialiaspopup.h
+    audiorecordingpopup.h
     batches.h
     batchserversviewer.h
     binarizepopup.h
@@ -298,6 +299,7 @@ set(SOURCES
     historypane.cpp
     cleanupsettingspane.cpp
     penciltestpopup.cpp
+    audiorecordingpopup.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp
