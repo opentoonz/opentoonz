@@ -79,6 +79,8 @@ AudioRecordingPopup::AudioRecordingPopup()
 
   layout()->setSizeConstraint(QLayout::SetNoConstraint);
 
+
+
   
 }
 
