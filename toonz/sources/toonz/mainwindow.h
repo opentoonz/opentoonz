@@ -67,8 +67,11 @@ class MainWindow final : public QMainWindow {
   Q_OBJECT
 
   bool m_saveSettingsOnQuit;
+  bool m_resetting;
+  bool m_resetDone;
   int m_oldRoomIndex;
   QString m_currentRoomsChoice;
+  QString m_argumentLayoutFileName;
   UpdateChecker *m_updateChecker;
 
   TopBar *m_topBar;
@@ -142,6 +145,7 @@ private:
   Room *createXsheetRoom();
   Room *createBatchesRoom();
   Room *createBrowserRoom();
+  Room *createBasicsRoom();
 
   QAction *createAction(const char *id, const QString &name,
                         const QString &defaultShortcut,
