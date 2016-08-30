@@ -1614,7 +1614,7 @@ bool IoCmd::saveAll() {
 
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
-  bool untitled = scene->isUntitled();
+  bool untitled     = scene->isUntitled();
   SceneResources resources(scene, 0);
   resources.save(scene->getScenePath());
   resources.updatePaths();
