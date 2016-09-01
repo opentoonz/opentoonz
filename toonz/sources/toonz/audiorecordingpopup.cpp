@@ -161,7 +161,8 @@ void AudioRecordingPopup::stopRecording()
 	filePaths.push_back(TFilePath(m_file));
 
 	if (filePaths.empty()) return;
-
+	TFilePath path = TApp::instance()->getCurrentScene()->getScene()->getDefaultLevelPath(TXshLevelType::SND_XSHLEVEL);
+	std::string strPath = path.getQString().toStdString();
 	IoCmd::LoadResourceArguments args;
 	args.resourceDatas.assign(filePaths.begin(), filePaths.end());
 
