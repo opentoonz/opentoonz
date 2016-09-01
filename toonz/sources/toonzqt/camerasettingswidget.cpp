@@ -206,7 +206,7 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   m_fspChk = new QPushButton("");
 
   m_useLevelSettingsBtn = new QPushButton(tr("Use Current Level Settings"));
-  
+
   m_presetListOm    = new QComboBox();
   m_addPresetBtn    = new QPushButton(tr("Add"));
   m_removePresetBtn = new QPushButton(tr("Remove"));
