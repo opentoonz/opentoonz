@@ -7,6 +7,11 @@
 #include "toonzqt/lineedit.h"
 
 #include <QFrame>
+#include <QAudioInput>
+#include <QFile>
+#include <QDebug>
+#include <QTimer>
+#include <QObject>
 
 // forward decl.
 
@@ -19,6 +24,8 @@ class QVideoFrame;
 class QTimer;
 class QIntValidator;
 class QRegExpValidator;
+class QAudioRecorder;
+class QFile;
 
 namespace DVGui {
 class FileField;
@@ -27,7 +34,7 @@ class IntField;
 
 
 //=============================================================================
-// PencilTestPopup
+// AudioRecordingPopup
 //-----------------------------------------------------------------------------
 
 class AudioRecordingPopup : public DVGui::Dialog {
@@ -35,11 +42,13 @@ class AudioRecordingPopup : public DVGui::Dialog {
 
   //QCamera* m_currentCamera;
   QString m_deviceName;
-
+  DVGui::FileField *m_savePath;
+  QPushButton *m_startRecordingButton, *m_stopRecordingButton, *m_refreshDevicesButtong;
+  QComboBox *m_deviceListCB;
   //QCameraImageCapture* m_cameraImageCapture;
   QString m_cacheSoundPath;
-
-
+  QAudioRecorder *audioRecorder;
+  QString m_file;
 public:
 	AudioRecordingPopup();
   ~AudioRecordingPopup();
@@ -47,10 +56,18 @@ public:
 protected:
   void showEvent(QShowEvent* event);
   void hideEvent(QHideEvent* event);
-  void keyPressEvent(QKeyEvent* event);
+  //void keyPressEvent(QKeyEvent* event);
 
 protected slots:
 
+
+	
+private slots:
+	void startRecording();
+	void stopRecording();
+private:
+	QFile outputFile; // class member.
+	QAudioInput *audioInput; // class member.
 };
 
 #endif

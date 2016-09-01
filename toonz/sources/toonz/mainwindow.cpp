@@ -1740,7 +1740,7 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
-  createMenuXsheetAction(MI_AudioRecording, tr("Record Audio"), "");
+  createMenuXsheetAction(MI_AudioRecording, tr("Record Audio"), "Alt+A");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
   createMenuCellsAction(MI_Swing, tr("&Swing"), "");
   createMenuCellsAction(MI_Random, tr("&Random"), "");
