@@ -201,12 +201,12 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
     m_unitLabel->setText(Preferences::instance()->getCameraUnits());
   m_dpiLabel = new QLabel(tr("DPI"));
   m_resLabel = new QLabel(tr("Pixels"));
-  m_xLabel   = new QLabel(tr("X"));
+  m_xLabel   = new QLabel(tr("x"));
 
   m_fspChk = new QPushButton("");
 
   m_useLevelSettingsBtn = new QPushButton(tr("Use Current Level Settings"));
-  m_useLevelSettingsBtn->setFixedSize(200, 20);
+  
   m_presetListOm    = new QComboBox();
   m_addPresetBtn    = new QPushButton(tr("Add"));
   m_removePresetBtn = new QPushButton(tr("Remove"));
@@ -243,7 +243,7 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   m_xDpiFld->setRange(1, numeric_limits<double>::infinity());
   m_yDpiFld->setRange(1, numeric_limits<double>::infinity());
 
-  m_fspChk->setFixedSize(50, 20);
+  m_fspChk->setFixedSize(20, 20);
   m_fspChk->setCheckable(true);
   m_fspChk->setChecked(true);
 
@@ -252,15 +252,14 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   m_addPresetBtn->setObjectName("PushButton_NoPadding");
   m_removePresetBtn->setObjectName("PushButton_NoPadding");
 
-  m_inchPrev->setFixedSize(21, 21);
-  m_dotPrev->setFixedSize(21, 21);
-  m_inchPrev->setObjectName("CameraSettingsRadioButton");
-  m_dotPrev->setObjectName("CameraSettingsRadioButton");
+  m_inchPrev->setFixedSize(11, 21);
+  m_dotPrev->setFixedSize(11, 21);
+  m_inchPrev->setObjectName("CameraSettingsRadioButton_Small");
+  m_dotPrev->setObjectName("CameraSettingsRadioButton_Small");
 
   m_xPrev->setObjectName("CameraSettingsRadioButton");
   m_yPrev->setObjectName("CameraSettingsRadioButton");
-  m_arPrev->setFixedSize(50, 18);
-  m_arPrev->setObjectName("CameraSettingsRadioButtonWide");
+  m_arPrev->setObjectName("CameraSettingsRadioButton");
 
   // radio buttons groups
   QButtonGroup *group;
@@ -279,7 +278,6 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   QVBoxLayout *mainLay = new QVBoxLayout();
   mainLay->setSpacing(3);
   mainLay->setMargin(3);
-  mainLay->setAlignment(Qt::AlignCenter);
   {
     QGridLayout *gridLay = new QGridLayout();
     gridLay->setHorizontalSpacing(2);
@@ -291,11 +289,11 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
       gridLay->addWidget(m_inchPrev, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
       gridLay->addWidget(m_unitLabel, 1, 1, Qt::AlignRight | Qt::AlignVCenter);
       gridLay->addWidget(m_lxFld, 1, 2);
-      gridLay->addWidget(new QLabel("X"), 1, 3, Qt::AlignCenter);
+      gridLay->addWidget(new QLabel("x"), 1, 3, Qt::AlignCenter);
       gridLay->addWidget(m_lyFld, 1, 4);
 
-      gridLay->addWidget(m_arPrev, 2, 3, Qt::AlignCenter);
-      //gridLay->addWidget(new QLabel("A/R"), 2, 3, Qt::AlignCenter);
+      gridLay->addWidget(m_arPrev, 2, 2, Qt::AlignRight | Qt::AlignVCenter);
+      gridLay->addWidget(new QLabel("A/R"), 2, 3, Qt::AlignCenter);
       gridLay->addWidget(m_arFld, 2, 4);
 
       gridLay->addWidget(m_dotPrev, 3, 0, Qt::AlignRight | Qt::AlignVCenter);
@@ -308,7 +306,6 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
       gridLay->addWidget(m_xDpiFld, 4, 2);
       gridLay->addWidget(m_fspChk, 4, 3, Qt::AlignCenter);
       gridLay->addWidget(m_yDpiFld, 4, 4);
-	  //gridLay->addWidget(m_useLevelSettingsBtn, 5, 0, 0, 6, Qt::AlignCenter);
     }
     gridLay->setColumnStretch(0, 0);
     gridLay->setColumnStretch(1, 0);
@@ -317,7 +314,7 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
     gridLay->setColumnStretch(4, 1);
     mainLay->addLayout(gridLay);
 
-    mainLay->addWidget(m_useLevelSettingsBtn, 0, Qt::AlignCenter);
+    mainLay->addWidget(m_useLevelSettingsBtn);
 
     QHBoxLayout *resListLay = new QHBoxLayout();
     resListLay->setSpacing(3);
