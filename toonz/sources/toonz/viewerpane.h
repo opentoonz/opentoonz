@@ -37,9 +37,9 @@ class SceneViewerPanel final : public TPanel, public FlipConsoleOwner {
   TPanelTitleBarButton *m_previewButton;
   TPanelTitleBarButton *m_subcameraPreviewButton;
   bool m_onionSkinActive = false;
-  bool m_playSound = true;
-  bool m_hasSoundtrack = false;
-  bool m_playing = false;
+  bool m_playSound       = true;
+  bool m_hasSoundtrack   = false;
+  bool m_playing         = false;
   double m_fps;
   double m_samplesPerFrame;
   bool m_first = true;
@@ -55,6 +55,7 @@ public:
 
   void onDrawFrame(int frame,
                    const ImagePainter::VisualSettings &settings) override;
+
 protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
