@@ -1338,6 +1338,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
   addMenuItem(windowsMenu, MI_OpenHistoryPanel);
+  addMenuItem(windowsMenu, MI_AudioRecording);
   windowsMenu->addSeparator();
   addMenuItem(windowsMenu, MI_ResetRoomLayout);
 

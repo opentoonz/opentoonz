@@ -1740,7 +1740,7 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
-  createMenuXsheetAction(MI_AudioRecording, tr("Record Audio"), "Alt+A");
+
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
   createMenuCellsAction(MI_Swing, tr("&Swing"), "");
   createMenuCellsAction(MI_Random, tr("&Random"), "");
@@ -1909,7 +1909,7 @@ void MainWindow::defineActions() {
 
   createMenuWindowsAction(MI_OpenComboViewer, tr("&ComboViewer"), "");
   createMenuWindowsAction(MI_OpenHistoryPanel, tr("&History"), "");
-
+  createMenuWindowsAction(MI_AudioRecording, tr("Record Audio"), "Alt+A");
   createMenuWindowsAction(MI_ResetRoomLayout, tr("&Reset to Default Rooms"),
                           "");
   createMenuWindowsAction(MI_MaximizePanel, tr("Toggle Maximize Panel"), "`");

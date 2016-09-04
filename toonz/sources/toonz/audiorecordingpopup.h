@@ -4,40 +4,24 @@
 #define AUDIORECORDINGPOPUP_H
 
 #include "toonzqt/dvdialog.h"
-#include "toonzqt/lineedit.h"
-
-#include <QFrame>
+#include "tsystem.h"
 #include <QAudioInput>
-#include <QFile>
-#include <QDebug>
-#include <QTimer>
 #include <QObject>
 #include <QLabel>
+#include <QMediaPlayer>
 
 // forward decl.
-
 class QComboBox;
-class QLineEdit;
-class QSlider;
 class QCheckBox;
 class QPushButton;
-class QVideoFrame;
-class QTimer;
-class QIntValidator;
-class QRegExpValidator;
 class QAudioRecorder;
-class QFile;
 class QLabel;
 class AudioLevelsDisplay;
+class FlipConsole;
 class QAudioProbe;
 class QAudioBuffer;
 class QMediaPlayer;
-
-namespace DVGui {
-class FileField;
-class IntField;
-}
-
+class QElapsedTimer;
 
 //=============================================================================
 // AudioRecordingPopup
@@ -46,59 +30,66 @@ class IntField;
 class AudioRecordingPopup : public DVGui::Dialog {
   Q_OBJECT
 
-  //QCamera* m_currentCamera;
-  QString m_deviceName, m_tempPath;
-  DVGui::FileField *m_savePath;
-  QPushButton *m_startRecordingButton, *m_stopRecordingButton, *m_refreshDevicesButton,
-	  *m_okButton, *m_cancelButton, *m_insertButton, *m_playButton;
+  QString m_deviceName;
+  QPushButton
+      *m_recordButton,  // *m_refreshDevicesButton, -refresh not working for now
+      *m_playButton,
+      *m_saveButton;
   QComboBox *m_deviceListCB;
-  //QCameraImageCapture* m_cameraImageCapture;
-  QString m_cacheSoundPath;
-  QAudioRecorder *audioRecorder;
-  QString m_file;
-  QLabel *m_duration;
+  QAudioRecorder *m_audioRecorder;
+  QLabel *m_duration, *m_playDuration;
+  QCheckBox *m_playXSheetCB;
+  int m_currentFrame;
   AudioLevelsDisplay *m_audioLevelsDisplay;
   QAudioProbe *m_probe;
-  QMediaPlayer *player;
+  QMediaPlayer *m_player;
+  TFilePath m_filePath;
+  FlipConsole *m_console;
+  QElapsedTimer *m_timer;
+  QMap<qint64, double> m_recordedLevels;
+  qint64 m_oldElapsed;
+  bool m_isPlaying, m_syncPlayback;
+
 public:
-	AudioRecordingPopup();
+  AudioRecordingPopup();
   ~AudioRecordingPopup();
 
 protected:
-  void showEvent(QShowEvent* event);
-  void hideEvent(QHideEvent* event);
-  //void keyPressEvent(QKeyEvent* event);
+  void showEvent(QShowEvent *event);
+  void hideEvent(QHideEvent *event);
+  void makePaths();
+  void resetEverything();
 
-protected slots:
-
-
-	
 private slots:
-	void startRecording();
-	void stopRecording();
-	void updateDuration(qint64 duration);
-	void onOkButtonPressed();
-	void onCancelButtonPressed();
-	void onPlayButtonPressed();
-	void processBuffer(const QAudioBuffer& buffer);
-	
-private:
-	QFile outputFile; // class member.
-	QAudioInput *audioInput; // class member.
+  void onRecordButtonPressed();
+  void updateRecordDuration(qint64 duration);
+  void updatePlaybackDuration(qint64 duration);
+  void onPlayButtonPressed();
+  void onSaveButtonPressed();
+  void processBuffer(const QAudioBuffer &buffer);
+  void onPlayStateChanged(bool playing);
+  void onPlayXSheetCBChanged(int status);
+  void onMediaStateChanged(QMediaPlayer::State state);
+  void onInputDeviceChanged();
+  // void onRefreshButtonPressed();
 };
 
-class AudioLevelsDisplay : public QWidget {
-	Q_OBJECT
-public:
-	explicit AudioLevelsDisplay(QWidget *parent = 0);
+//=============================================================================
+// AudioLevelsDisplay
+//-----------------------------------------------------------------------------
 
-	// Using [0; 1.0] range
-	void setLevel(qreal level);
+class AudioLevelsDisplay : public QWidget {
+  Q_OBJECT
+public:
+  explicit AudioLevelsDisplay(QWidget *parent = 0);
+
+  // Using [0; 1.0] range
+  void setLevel(qreal level);
 
 protected:
-	void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event);
 
 private:
-	qreal m_level;
+  qreal m_level;
 };
 #endif
