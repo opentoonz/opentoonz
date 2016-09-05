@@ -41,6 +41,7 @@ class SceneViewerPanel final : public TPanel, public FlipConsoleOwner {
   bool m_hasSoundtrack   = false;
   bool m_playing         = false;
   double m_fps;
+  int m_viewerFps;
   double m_samplesPerFrame;
   bool m_first = true;
   TSoundTrack *m_sound;
