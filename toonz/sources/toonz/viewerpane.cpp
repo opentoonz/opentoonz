@@ -619,7 +619,7 @@ void SceneViewerPanel::onFrameTypeChanged() {
 }
 
 void SceneViewerPanel::playAudioFrame(int frame) {
-	if (m_first) {
+  if (m_first) {
     m_first = false;
     m_fps   = TApp::instance()
                 ->getCurrentScene()
@@ -633,8 +633,10 @@ void SceneViewerPanel::playAudioFrame(int frame) {
   m_viewerFps = m_flipConsole->getCurrentFps();
   double s0 = frame * m_samplesPerFrame, s1 = s0 + m_samplesPerFrame;
 
-  // make the sound stop if the viewerfps is higher so the next sound can play on time.
-  if (m_fps < m_viewerFps) TApp::instance()->getCurrentXsheet()->getXsheet()->stopScrub();
+  // make the sound stop if the viewerfps is higher so the next sound can play
+  // on time.
+  if (m_fps < m_viewerFps)
+    TApp::instance()->getCurrentXsheet()->getXsheet()->stopScrub();
   TApp::instance()->getCurrentXsheet()->getXsheet()->play(m_sound, s0, s1,
                                                           false);
 }
