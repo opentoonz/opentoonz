@@ -9,6 +9,7 @@
 #include "camerasettingspopup.h"
 #include "iocommand.h"
 #include "toutputproperties.h"
+#include "toonzqt/flipconsole.h"
 // TnzTools includes
 #include "tools/toolhandle.h"
 
@@ -90,8 +91,8 @@ StartupPopup::StartupPopup()
   m_fpsFld      = new DoubleLineEdit(0, 66.76);
 
   //QPushButton *okBtn     = new QPushButton(tr("OK"), this);
-  QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  QPushButton *applyBtn  = new QPushButton(tr("Apply"), this);
+  QPushButton *cancelBtn = new QPushButton(tr("Close"), this);
+  QPushButton *applyBtn  = new QPushButton(tr("Create Scene"), this);
 
   // Exclude all character which cannot fit in a filepath (Win).
   // Dots are also prohibited since they are internally managed by Toonz.
@@ -226,6 +227,7 @@ void StartupPopup::onApplyButton() {
 	TApp::instance()->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->setFrameRate(fps);
 	TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera()->setSize(size);
 	IoCmd::saveScene();
+	FlipConsole::getCurrent()->setFrameRate((int)fps);
     m_nameFld->setFocus();
 	hide();
 }
@@ -239,6 +241,7 @@ void StartupPopup::onRecentSceneClicked(int index) {
 		RecentFiles::instance()->getFilePath(index, RecentFiles::Scene);
 	IoCmd::loadScene(TFilePath(path.toStdWString()), false);
 	RecentFiles::instance()->moveFilePath(index, 0, RecentFiles::Scene);
+	RecentFiles::instance()->refreshRecentFilesMenu(RecentFiles::Scene);
 	hide();
 }
 
