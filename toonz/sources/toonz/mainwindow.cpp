@@ -12,6 +12,7 @@
 #include "iocommand.h"
 #include "tapp.h"
 #include "comboviewerpane.h"
+#include "startuppopup.h"
 
 // TnzTools includes
 #include "tools/toolcommandids.h"
@@ -1275,6 +1276,8 @@ void MainWindow::onMenuCheckboxChanged() {
 void MainWindow::showEvent(QShowEvent *event) {
   getCurrentRoom()->layout()->setEnabled(true);  // See main function in
                                                  // main.cpp
+  StartupPopup *startupPopup = new StartupPopup();
+  startupPopup->show();
 }
 extern const char *applicationName;
 extern const char *applicationVersion;
@@ -1917,7 +1920,7 @@ void MainWindow::defineActions() {
                           tr("Toggle Main Window's Full Screen Mode"),
                           "Ctrl+`");
   createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
-
+  createMenuWindowsAction(MI_StartupPopup, tr("&Startup Popup..."), "");
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
   createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "//", false,

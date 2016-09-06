@@ -212,6 +212,7 @@ signals:
 };
 
 class RecentFiles {
+	friend class StartupPopup;
   QList<QString> m_recentScenes;
   QList<QString> m_recentLevels;
   QList<QString> m_recentFlipbookImages;
