@@ -264,6 +264,7 @@
         <file>Resources/standard.png</file>
         <file>Resources/standard_on.png</file>
         <file>Resources/standard_over.png</file>
+        <file>Resources/startup.png</file>
         <file>Resources/start_off.png</file>
         <file>Resources/start_on.png</file>
         <file>Resources/stop_off.png</file>

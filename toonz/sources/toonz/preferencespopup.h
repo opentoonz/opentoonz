@@ -99,6 +99,7 @@ private slots:
   void onSaveUnpaintedInCleanupChanged(int index);
   void onMinimizeSaveboxAfterEditing(int index);
   void onAutoSaveChanged(int index);
+  void onStartupPopupChanged(int index);
   void onDefaultViewerChanged(int index);
   void onBlankCountChanged();
   void onBlankColorChanged(const TPixel32 &, bool isDragging);

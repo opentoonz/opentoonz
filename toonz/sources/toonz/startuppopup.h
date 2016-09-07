@@ -9,6 +9,7 @@
 #include "toonzqt/filefield.h"
 #include <QPushButton>
 #include <QLabel>
+#include <QCheckBox>
 
 // forward declaration
 class QLabel;
@@ -37,9 +38,12 @@ class StartupPopup final : public DVGui::Dialog {
   DVGui::MeasuredDoubleLineEdit *m_heightFld;
   DVGui::DoubleLineEdit *m_fpsFld;
   QList<QString> names;
-  CameraSettingsPopup *m_cameraSettings;
-  QPushButton m_createSceneButton;
-  QPushButton m_dontShowAgainButton;
+  QCheckBox *m_dontShowAgainCB;
+  QCheckBox *m_usePixelsCB;
+  //CameraSettingsPopup *m_cameraSettings;
+  //QPushButton m_createSceneButton;
+  //QPushButton m_dontShowAgainButton;
+  
 
 public:
 	StartupPopup();
@@ -57,7 +61,9 @@ public slots:
   //void onLevelTypeChanged(const QString &text);
   //void onCreateSceneButtonClicked();
   void onRecentSceneClicked(int index);
-  void onApplyButton();
+  void onCreateButton();
+  void onUsePixelsChanged(int index);
+  void onDontShowAgainChanged(int index);
 };
 
 

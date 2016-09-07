@@ -310,6 +310,5 @@
 #define MI_PreviewFx "MI_PreviewFx"
 
 #define MI_About "MI_About"
-#define MI_StartupPopup "MI_StartupPopup"
 #define MI_PencilTest "MI_PencilTest"
 #endif

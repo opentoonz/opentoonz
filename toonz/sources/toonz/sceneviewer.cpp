@@ -10,7 +10,6 @@
 #include "viewerdraw.h"
 #include "menubarcommandids.h"
 #include "ruler.h"
-#include "toutputproperties.h"
 
 // TnzTools includes
 #include "tools/cursors.h"
@@ -56,7 +55,6 @@
 #include "toonz/toonzimageutils.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/preferences.h"
-
 #include "subcameramanager.h"
 
 // TnzCore includes
@@ -844,8 +842,6 @@ void SceneViewer::showEvent(QShowEvent *) {
   }
   if (m_shownOnce == false) {
     fitToCamera();
-	double fps = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate();
-	FlipConsole::getCurrent()->setFrameRate((int)fps);
     m_shownOnce = true;
   }
 }

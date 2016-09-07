@@ -255,6 +255,7 @@ Preferences::Preferences()
     , m_fitToFlipbookEnabled(false)
     , m_previewAlwaysOpenNewFlipEnabled(false)
     , m_autosaveEnabled(false)
+	, m_startupPopupEnabled(true)
     , m_defaultViewerEnabled(false)
     , m_saveUnpaintedInCleanup(true)
     , m_askForOverrideRender(true)
@@ -322,6 +323,7 @@ Preferences::Preferences()
   getValue(*m_settings, "sceneNumberingEnabled", m_sceneNumberingEnabled);
   getValue(*m_settings, "animationSheetEnabled", m_animationSheetEnabled);
   getValue(*m_settings, "autosaveEnabled", m_autosaveEnabled);
+  getValue(*m_settings, "startupPopupEnabled", m_startupPopupEnabled);
   getValue(*m_settings, "defaultViewerEnabled", m_defaultViewerEnabled);
   getValue(*m_settings, "rasterOptimizedMemory", m_rasterOptimizedMemory);
   getValue(*m_settings, "saveUnpaintedInCleanup", m_saveUnpaintedInCleanup);
@@ -635,6 +637,13 @@ void Preferences::enableAutosave(bool on) {
     emit stopAutoSave();
   else
     emit startAutoSave();
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableStartupPopup(bool on) {
+	m_startupPopupEnabled = on;
+	m_settings->setValue("startupPopupEnabled", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
