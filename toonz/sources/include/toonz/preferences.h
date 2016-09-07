@@ -456,10 +456,10 @@ private:
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_defaultViewerEnabled, m_pixelsOnly;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
-	  m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
-	  m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
-	  m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly,
-	  m_startupPopupEnabled;
+      m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
+      m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
+      m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly,
+      m_startupPopupEnabled;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
   bool m_onionSkinDuringPlayback;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,

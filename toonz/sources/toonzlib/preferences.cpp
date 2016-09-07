@@ -255,7 +255,7 @@ Preferences::Preferences()
     , m_fitToFlipbookEnabled(false)
     , m_previewAlwaysOpenNewFlipEnabled(false)
     , m_autosaveEnabled(false)
-	, m_startupPopupEnabled(true)
+    , m_startupPopupEnabled(true)
     , m_defaultViewerEnabled(false)
     , m_saveUnpaintedInCleanup(true)
     , m_askForOverrideRender(true)
@@ -642,8 +642,8 @@ void Preferences::enableAutosave(bool on) {
 //-----------------------------------------------------------------
 
 void Preferences::enableStartupPopup(bool on) {
-	m_startupPopupEnabled = on;
-	m_settings->setValue("startupPopupEnabled", on ? "1" : "0");
+  m_startupPopupEnabled = on;
+  m_settings->setValue("startupPopupEnabled", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

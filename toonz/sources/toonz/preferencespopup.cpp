@@ -534,7 +534,7 @@ void PreferencesPopup::onAutoSaveChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onStartupPopupChanged(int index) {
-	m_pref->enableStartupPopup(index == Qt::Checked);
+  m_pref->enableStartupPopup(index == Qt::Checked);
 }
 
 //-----------------------------------------------------------------------------
@@ -905,8 +905,9 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *minimizeRasterMemoryCB =
       new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
   CheckBox *autoSaveCB = new CheckBox(tr("Save Automatically Every Minutes"));
-  CheckBox *startupPopupCB = new CheckBox(tr("Show Startup Window when OpenToonz Starts"));
-  m_minuteFld          = new DVGui::IntLineEdit(this, 15, 1, 60);
+  CheckBox *startupPopupCB =
+      new CheckBox(tr("Show Startup Window when OpenToonz Starts"));
+  m_minuteFld = new DVGui::IntLineEdit(this, 15, 1, 60);
   CheckBox *replaceAfterSaveLevelAsCB =
       new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
 
@@ -1350,8 +1351,8 @@ PreferencesPopup::PreferencesPopup()
         saveAutoLay->addStretch(1);
       }
       generalFrameLay->addLayout(saveAutoLay, 0);
-	  generalFrameLay->addWidget(startupPopupCB, 0,
-		  Qt::AlignLeft | Qt::AlignVCenter);
+      generalFrameLay->addWidget(startupPopupCB, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
       // Unit, CameraUnit
       QGridLayout *unitLay = new QGridLayout();
       unitLay->setMargin(0);
