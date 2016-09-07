@@ -27,12 +27,20 @@ class StartupPopup final : public DVGui::Dialog {
   QLabel *m_widthLabel;
   QLabel *m_heightLabel;
   QLabel *m_fpsLabel;
+  QLabel *m_resLabel;
+  QLabel *m_resTextLabel;
   DVGui::MeasuredDoubleLineEdit *m_widthFld;
   DVGui::MeasuredDoubleLineEdit *m_heightFld;
   DVGui::DoubleLineEdit *m_fpsFld;
   QList<QString> names;
-  QCheckBox *m_dontShowAgainCB;
+  QList<TFilePath> m_projectPaths;
+  QCheckBox *m_showAtStartCB;
   QCheckBox *m_usePixelsCB;
+  QComboBox *m_projectsCB;
+  QPushButton *m_loadOtherSceneButton;
+  QPushButton *m_newProjectButton;
+  int m_dpi;
+  bool m_updating = false;
 
 public:
   StartupPopup();
@@ -44,7 +52,13 @@ public slots:
   void onRecentSceneClicked(int index);
   void onCreateButton();
   void onUsePixelsChanged(int index);
-  void onDontShowAgainChanged(int index);
+  void onShowAtStartChanged(int index);
+  void updateProjectCB();
+  void onProjectChanged(int index);
+  void onNewProjectButtonPressed();
+  void onLoadSceneButtonPressed();
+  void onSceneChanged();
+  void updateResolution();
 };
 
 class StartupLabel : public QLabel {
