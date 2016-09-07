@@ -3,55 +3,34 @@
 #include "startuppopup.h"
 
 // Tnz6 includes
-#include "menubarcommandids.h"
 #include "mainwindow.h"
 #include "tapp.h"
-#include "camerasettingspopup.h"
 #include "iocommand.h"
 #include "toutputproperties.h"
 #include "toonzqt/flipconsole.h"
-// TnzTools includes
-#include "tools/toolhandle.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/doublefield.h"
-#include "historytypes.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
 #include "toonz/txsheet.h"
-#include "toonz/txshcell.h"
-#include "toonz/txshsimplelevel.h"
-#include "toonz/txshleveltypes.h"
-#include "toonz/levelset.h"
 #include "toonz/levelproperties.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/tcamera.h"
-#include "toonz/tframehandle.h"
-#include "toonz/tcolumnhandle.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/txsheethandle.h"
-#include "toonz/tpalettehandle.h"
 #include "toonz/preferences.h"
-#include "toonz/palettecontroller.h"
 #include "toonz/tproject.h"
-#include "toonz/namebuilder.h"
 
 // TnzCore includes
 #include "tsystem.h"
-#include "tpalette.h"
-#include "tvectorimage.h"
-#include "trasterimage.h"
-#include "ttoonzimage.h"
-#include "timagecache.h"
-#include "tundo.h"
 #include "filebrowsermodel.h"
 
 // Qt includes
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
 #include <QMainWindow>

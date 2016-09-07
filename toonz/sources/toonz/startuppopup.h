@@ -14,8 +14,6 @@
 // forward declaration
 class QLabel;
 class QComboBox;
-class CameraSettingsPopup;
-// class DVGui::MeasuredDoubleLineEdit;
 
 //=============================================================================
 // LevelCreatePopup
