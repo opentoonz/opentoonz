@@ -161,7 +161,7 @@ void TBinarizer::process(const TRaster32P &ras) {
         // cerco il massimo
         while (i > 0 && histo[i - 1] > histo[i]) i--;
         int i1 = i;
-        // presuppongo che il picco del BG sia simmetrico: i0-i1 == i1-i2
+        // presuppongo che il picco del BG sia symmetrico: i0-i1 == i1-i2
         int i2      = 2 * i1 - i0;
         bgThreshold = i2 - 1;
       }

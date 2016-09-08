@@ -367,7 +367,7 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
 
     // Following lines are used to solve a problem that occurs with some
     // graphics cards!
-    // It seems that the glReadPixels() function is very slow if the lx lenght
+    // It seems that the glReadPixels() function is very slow if the lx length
     // isn't a multiple of 8!
     TDimension backgroundDim(lx, ly);
     backgroundDim.lx = (lx & 0x7) == 0 ? lx : lx + 8 - (lx & 0x7);

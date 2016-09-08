@@ -189,7 +189,7 @@
         <translation>el ancho del video debe ser múltiplo de %1</translation>
     </message>
     <message>
-        <source>video lenght must be a multiple of %1</source>
+        <source>video length must be a multiple of %1</source>
         <translation>la altura del video debe ser múltiplo de %1</translation>
     </message>
     <message>
