@@ -83,6 +83,7 @@ StartupPopup::StartupPopup()
   int namesCount = names.count();
   QVector<StartupLabel *> recentNamesLabels =
       QVector<StartupLabel *>(names.count());
+<<<<<<< HEAD
   m_nameFld         = new LineEdit(this);
   m_pathFld         = new FileField(0);
   m_widthLabel      = new QLabel(tr("Width:"));
@@ -104,8 +105,27 @@ StartupPopup::StartupPopup()
       new QCheckBox(tr("Use pixels as the default unit in OpenToonz."), this);
   //QPushButton *closeButton  = new QPushButton(tr("Close"), this);
   QPushButton *createButton = new QPushButton(tr("Create New Scene"), this);
+=======
+  m_nameFld      = new LineEdit(this);
+  m_pathFld      = new FileField(0);
+  m_widthLabel   = new QLabel(tr("Width:"));
+  m_widthFld     = new DVGui::MeasuredDoubleLineEdit(0);
+  m_heightLabel  = new QLabel(tr("Height:"));
+  m_heightFld    = new DVGui::MeasuredDoubleLineEdit(0);
+  m_resLabel     = new QLabel(this);
+  m_resTextLabel = new QLabel(tr("Resolution:"), this);
+  m_fpsLabel     = new QLabel(tr("Frame Rate:"));
+  m_fpsFld       = new DoubleLineEdit(0, 66.76);
+  m_showAtStartCB =
+      new QCheckBox(tr("Show this window when OpenToonz starts."), this);
+  m_usePixelsCB =
+      new QCheckBox(tr("Use pixels as the default unit in OpenToonz."), this);
+  QPushButton *closeButton      = new QPushButton(tr("Close"), this);
+  QPushButton *createButton     = new QPushButton(tr("Create New Scene"), this);
+>>>>>>> origin/startup_popup
   QPushButton *newProjectButton = new QPushButton(tr("New Project"), this);
-  QPushButton *loadOtherSceneButton = new QPushButton(tr("Load Other Scene"), this);
+  QPushButton *loadOtherSceneButton =
+      new QPushButton(tr("Load Other Scene"), this);
   m_projectsCB = new QComboBox(this);
   // Exclude all character which cannot fit in a filepath (Win).
   // Dots are also prohibited since they are internally managed by Toonz.
@@ -137,6 +157,7 @@ StartupPopup::StartupPopup()
     guiLay->setMargin(10);
     guiLay->setVerticalSpacing(10);
     guiLay->setHorizontalSpacing(5);
+<<<<<<< HEAD
 	{
 		// Name
 		guiLay->addWidget(label, 0, 0, 1, 6, Qt::AlignCenter);
@@ -179,6 +200,41 @@ StartupPopup::StartupPopup()
       guiLay->addWidget(createButton, 9, 1, 1, 3, Qt::AlignLeft);
 	  guiLay->addWidget(new QLabel(" ", this), 10, 0, 1, 1, Qt::AlignLeft);
 
+=======
+    {
+      // Name
+      guiLay->addWidget(label, 0, 0, 1, 6, Qt::AlignCenter);
+      guiLay->addWidget(new QLabel(tr("Project:")), 1, 0,
+                        Qt::AlignRight | Qt::AlignVCenter);
+      guiLay->addWidget(m_projectsCB, 1, 1, 1, 2, Qt::AlignLeft);
+      guiLay->addWidget(newProjectButton, 1, 3, Qt::AlignRight);
+      guiLay->addWidget(new QLabel(tr("Scene Name:")), 2, 0,
+                        Qt::AlignRight | Qt::AlignVCenter);
+      guiLay->addWidget(m_nameFld, 2, 1, 1, 3);
+
+      // Save In
+      guiLay->addWidget(new QLabel(tr("Save In:")), 3, 0,
+                        Qt::AlignRight | Qt::AlignVCenter);
+      guiLay->addWidget(m_pathFld, 3, 1, 1, 3);
+
+      // Width - Height
+      guiLay->addWidget(m_fpsLabel, 4, 0, Qt::AlignRight | Qt::AlignVCenter);
+      guiLay->addWidget(m_fpsFld, 4, 1, 1, 3);
+      guiLay->addWidget(m_widthLabel, 5, 0, Qt::AlignRight | Qt::AlignVCenter);
+      guiLay->addWidget(m_widthFld, 5, 1);
+      guiLay->addWidget(m_heightLabel, 5, 2, Qt::AlignRight | Qt::AlignVCenter);
+      guiLay->addWidget(m_heightFld, 5, 3);
+      guiLay->addWidget(m_resTextLabel, 6, 0, 1, 1, Qt::AlignRight);
+      guiLay->addWidget(m_resLabel, 6, 1, 1, 3, Qt::AlignLeft);
+      guiLay->addWidget(m_usePixelsCB, 7, 1, 1, 3, Qt::AlignLeft);
+      guiLay->addWidget(createButton, 8, 1, 1, 3, Qt::AlignLeft);
+      guiLay->addWidget(new QLabel(" ", this), 9, 0, 1, 1, Qt::AlignLeft);
+      // guiLay->addWidget(new QLabel(" ", this), 10, 0, 1, 1, Qt::AlignLeft);
+      // put the don't show again checkbox at the bottom left
+      // guiLay->addWidget(m_showAtStartCB,
+      //                  names.count() < 11 ? 11 : names.count() + 2, 0, 1, 4,
+      //                  Qt::AlignLeft);
+>>>>>>> origin/startup_popup
 
       // Recent Scene List
       guiLay->addWidget(new QLabel(" ", this), 4, 0, 1, 1, Qt::AlignLeft);
@@ -190,15 +246,15 @@ StartupPopup::StartupPopup()
       } else {
         int i = 0;
         for (QString name : names) {
-			QString justName = QString::fromStdString(TFilePath(name).getName());
-            recentNamesLabels[i] =
-            new StartupLabel(justName, this, i);
-            guiLay->addWidget(recentNamesLabels[i], i + 2, 5, 1, 1,
+          QString justName = QString::fromStdString(TFilePath(name).getName());
+          recentNamesLabels[i] = new StartupLabel(justName, this, i);
+          guiLay->addWidget(recentNamesLabels[i], i + 2, 5, 1, 1,
                             Qt::AlignLeft);
           i++;
         }
       }
-	  guiLay->addWidget(loadOtherSceneButton, names.count() + 2, 5, 1, 1, Qt::AlignLeft);
+      guiLay->addWidget(loadOtherSceneButton, names.count() + 2, 5, 1, 1,
+                        Qt::AlignLeft);
     }
     guiLay->setColumnStretch(0, 0);
     guiLay->setColumnStretch(1, 0);
@@ -206,7 +262,7 @@ StartupPopup::StartupPopup()
     guiLay->setColumnStretch(3, 0);
     guiLay->setColumnStretch(4, 1);
     guiLay->setColumnMinimumWidth(4, 20);
-	guiLay->setColumnMinimumWidth(5, 200);
+    guiLay->setColumnMinimumWidth(5, 200);
 
     m_topLayout->addLayout(guiLay, 1);
   }
@@ -214,34 +270,49 @@ StartupPopup::StartupPopup()
   m_buttonLayout->setMargin(0);
   m_buttonLayout->setSpacing(30);
   {
+<<<<<<< HEAD
     
 	  m_buttonLayout->addWidget(m_showAtStartCB, Qt::AlignLeft);
 	  m_buttonLayout->addStretch(1);
     //m_buttonLayout->addWidget(closeButton, 0);
     //m_buttonLayout->addStretch(1);
+=======
+    m_buttonLayout->addWidget(m_showAtStartCB, Qt::AlignLeft);
+    m_buttonLayout->addStretch(1);
+    m_buttonLayout->addWidget(closeButton, 0);
+    // m_buttonLayout->addStretch(1);
+>>>>>>> origin/startup_popup
   }
 
   updateProjectCB();
-  TApp *app = TApp::instance();
+  TApp *app                 = TApp::instance();
   TSceneHandle *sceneHandle = app->getCurrentScene();
 
   //---- signal-slot connections
   bool ret = true;
-  ret = ret &&connect(sceneHandle, SIGNAL(sceneChanged()), this,
-	  SLOT(onSceneChanged()));
+  ret      = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this,
+                       SLOT(onSceneChanged()));
   ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
-	  SLOT(onSceneChanged()));
-  ret = ret && connect(newProjectButton, SIGNAL(clicked()), this, SLOT(onNewProjectButtonPressed()));
-  ret = ret && connect(loadOtherSceneButton, SIGNAL(clicked()), this, SLOT(onLoadSceneButtonPressed()));
+                       SLOT(onSceneChanged()));
+  ret = ret && connect(newProjectButton, SIGNAL(clicked()), this,
+                       SLOT(onNewProjectButtonPressed()));
+  ret = ret && connect(loadOtherSceneButton, SIGNAL(clicked()), this,
+                       SLOT(onLoadSceneButtonPressed()));
   ret = ret && connect(m_projectsCB, SIGNAL(currentIndexChanged(int)),
+<<<<<<< HEAD
 	  SLOT(onProjectChanged(int)));
   //ret = ret && connect(closeButton, SIGNAL(clicked()), this, SLOT(reject()));
+=======
+                       SLOT(onProjectChanged(int)));
+  ret = ret && connect(closeButton, SIGNAL(clicked()), this, SLOT(reject()));
+>>>>>>> origin/startup_popup
   ret = ret &&
         connect(createButton, SIGNAL(clicked()), this, SLOT(onCreateButton()));
   ret = ret && connect(m_usePixelsCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onUsePixelsChanged(int)));
   ret = ret && connect(m_showAtStartCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onShowAtStartChanged(int)));
+<<<<<<< HEAD
   ret = ret && connect(m_widthFld, SIGNAL(valueChanged()), this, SLOT(updateResolution()));
   ret = ret && connect(m_heightFld, SIGNAL(valueChanged()), this, SLOT(updateResolution()));
   ret = ret && connect(m_dpiFld, SIGNAL(editingFinished()), this, SLOT(onDpiChanged()));
@@ -251,6 +322,12 @@ StartupPopup::StartupPopup()
   
   ret = ret &&
 	 connect(m_removePresetBtn, SIGNAL(clicked()), SLOT(removePreset()));
+=======
+  ret = ret && connect(m_widthFld, SIGNAL(valueChanged()), this,
+                       SLOT(updateResolution()));
+  ret = ret && connect(m_heightFld, SIGNAL(valueChanged()), this,
+                       SLOT(updateResolution()));
+>>>>>>> origin/startup_popup
   for (int i = 0; i < recentNamesLabels.count(); i++) {
     ret = ret && connect(recentNamesLabels[i], SIGNAL(wasClicked(int)), this,
                          SLOT(onRecentSceneClicked(int)));
@@ -267,20 +344,21 @@ void StartupPopup::showEvent(QShowEvent *) {
   update();
   m_nameFld->setFocus();
   m_pathFld->setPath(TApp::instance()
-	  ->getCurrentScene()
-	  ->getScene()
-	  ->getProject()
-	  ->getScenesPath().getQString());
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getProject()
+                         ->getScenesPath()
+                         .getQString());
   TDimensionD cameraSize = TApp::instance()
                                ->getCurrentScene()
                                ->getScene()
                                ->getCurrentCamera()
                                ->getSize();
   TDimension cameraRes = TApp::instance()
-	  ->getCurrentScene()
-	  ->getScene()
-	  ->getCurrentCamera()
-	  ->getRes();
+                             ->getCurrentScene()
+                             ->getScene()
+                             ->getCurrentCamera()
+                             ->getRes();
   double fps = TApp::instance()
                    ->getCurrentScene()
                    ->getScene()
@@ -290,13 +368,13 @@ void StartupPopup::showEvent(QShowEvent *) {
   if (Preferences::instance()->getCameraUnits() == "pixel") {
     m_widthFld->setDecimals(0);
     m_heightFld->setDecimals(0);
-	m_resLabel->hide();
-	m_resTextLabel->hide();
+    m_resLabel->hide();
+    m_resTextLabel->hide();
   } else {
     m_widthFld->setDecimals(4);
     m_heightFld->setDecimals(4);
-	m_resLabel->show();
-	m_resTextLabel->show();
+    m_resLabel->show();
+    m_resTextLabel->show();
   }
   m_widthFld->setValue(cameraSize.lx);
   m_heightFld->setValue(cameraSize.ly);
@@ -304,8 +382,13 @@ void StartupPopup::showEvent(QShowEvent *) {
 
   m_dpi = cameraRes.lx / cameraSize.lx;
 
+<<<<<<< HEAD
   m_resLabel->setText(QString::number(cameraSize.lx * m_dpi) + " X " + QString::number(cameraSize.ly * m_dpi));
   loadPresetList();
+=======
+  m_resLabel->setText(QString::number(cameraSize.lx * m_dpi) + " X " +
+                      QString::number(cameraSize.ly * m_dpi));
+>>>>>>> origin/startup_popup
 }
 
 //-----------------------------------------------------------------------------
@@ -337,17 +420,19 @@ void StartupPopup::onCreateButton() {
     m_fpsFld->setFocus();
     return;
   }
-  if (TSystem::doesExistFileOrLevel(TFilePath(m_pathFld->getPath()) +
-	  TFilePath(m_nameFld->text().trimmed().toStdWString() + L".tnz"))) {
-	  QString question;
-	  question = QObject::tr("The file name already exists."
-		  "\nDo you want to overwrite it?");
-	  int ret = DVGui::MsgBox(question, QObject::tr("Yes"),
-		  QObject::tr("No"), 0);
-	  if (ret == 0 || ret == 2) {
-		  // no (or closed message box window)
-		  return;;
-	  }
+  if (TSystem::doesExistFileOrLevel(
+          TFilePath(m_pathFld->getPath()) +
+          TFilePath(m_nameFld->text().trimmed().toStdWString() + L".tnz"))) {
+    QString question;
+    question = QObject::tr(
+        "The file name already exists."
+        "\nDo you want to overwrite it?");
+    int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"), 0);
+    if (ret == 0 || ret == 2) {
+      // no (or closed message box window)
+      return;
+      ;
+    }
   }
   TApp::instance()->getCurrentScene()->getScene()->setScenePath(
       TFilePath(m_pathFld->getPath()) +
@@ -372,61 +457,63 @@ void StartupPopup::onCreateButton() {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::updateProjectCB() {
-	m_updating = true;
-	m_projectPaths.clear();
-	m_projectsCB->clear();
+  m_updating = true;
+  m_projectPaths.clear();
+  m_projectsCB->clear();
 
-	TFilePath sandboxFp = TProjectManager::instance()->getSandboxProjectFolder() +
-		"sandbox_otprj.xml";
-	m_projectPaths.push_back(sandboxFp);
-	m_projectsCB->addItem("sandbox");
+  TFilePath sandboxFp = TProjectManager::instance()->getSandboxProjectFolder() +
+                        "sandbox_otprj.xml";
+  m_projectPaths.push_back(sandboxFp);
+  m_projectsCB->addItem("sandbox");
 
-	std::vector<TFilePath> prjRoots;
-	TProjectManager::instance()->getProjectRoots(prjRoots);
-	for (int i = 0; i < prjRoots.size(); i++) {
-		TFilePathSet fps;
-		TSystem::readDirectory_Dir_ReadExe(fps, prjRoots[i]);
+  std::vector<TFilePath> prjRoots;
+  TProjectManager::instance()->getProjectRoots(prjRoots);
+  for (int i = 0; i < prjRoots.size(); i++) {
+    TFilePathSet fps;
+    TSystem::readDirectory_Dir_ReadExe(fps, prjRoots[i]);
 
-		TFilePathSet::iterator it;
-		for (it = fps.begin(); it != fps.end(); ++it) {
-			TFilePath fp(*it);
-			if (TProjectManager::instance()->isProject(fp)) {
-				m_projectPaths.push_back(
-					TProjectManager::instance()->projectFolderToProjectPath(fp));
-				m_projectsCB->addItem(QString::fromStdString(fp.getName()));
-			}
-		}
-	}
-	int i;
-	for (i = 0; i < m_projectPaths.size(); i++) {
-		if (TProjectManager::instance()->getCurrentProjectPath() ==
-			m_projectPaths[i]) {
-			m_projectsCB->setCurrentIndex(i);
-			break;
-		}
-	}
-	m_pathFld->setPath(TApp::instance()
-		->getCurrentScene()
-		->getScene()
-		->getProject()
-		->getScenesPath().getQString());
-	m_updating = false;
+    TFilePathSet::iterator it;
+    for (it = fps.begin(); it != fps.end(); ++it) {
+      TFilePath fp(*it);
+      if (TProjectManager::instance()->isProject(fp)) {
+        m_projectPaths.push_back(
+            TProjectManager::instance()->projectFolderToProjectPath(fp));
+        m_projectsCB->addItem(QString::fromStdString(fp.getName()));
+      }
+    }
+  }
+  int i;
+  for (i = 0; i < m_projectPaths.size(); i++) {
+    if (TProjectManager::instance()->getCurrentProjectPath() ==
+        m_projectPaths[i]) {
+      m_projectsCB->setCurrentIndex(i);
+      break;
+    }
+  }
+  m_pathFld->setPath(TApp::instance()
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getProject()
+                         ->getScenesPath()
+                         .getQString());
+  m_updating = false;
 }
 
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onProjectChanged(int index) {
-	if (m_updating) return;
-	TFilePath projectFp = m_projectPaths[index];
+  if (m_updating) return;
+  TFilePath projectFp = m_projectPaths[index];
 
-	TProjectManager::instance()->setCurrentProjectPath(projectFp);
-	
-	IoCmd::newScene();
-	m_pathFld->setPath(TApp::instance()
-		->getCurrentScene()
-		->getScene()
-		->getProject()
-		->getScenesPath().getQString());
+  TProjectManager::instance()->setCurrentProjectPath(projectFp);
+
+  IoCmd::newScene();
+  m_pathFld->setPath(TApp::instance()
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getProject()
+                         ->getScenesPath()
+                         .getQString());
 }
 
 //-----------------------------------------------------------------------------
@@ -677,16 +764,17 @@ QString StartupPopup::aspectRatioValueToString(double value, int width,
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onNewProjectButtonPressed() {
-	CommandManager::instance()->execute(MI_NewProject);
+  CommandManager::instance()->execute(MI_NewProject);
 }
 
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onSceneChanged() {
-	if (!TApp::instance()->getCurrentScene()->getScene()->isUntitled()) { hide(); }
-	else {
-		updateProjectCB();
-	}
+  if (!TApp::instance()->getCurrentScene()->getScene()->isUntitled()) {
+    hide();
+  } else {
+    updateProjectCB();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -699,7 +787,7 @@ void StartupPopup::onDpiChanged() {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onLoadSceneButtonPressed() {
-	CommandManager::instance()->execute(MI_LoadScene);
+  CommandManager::instance()->execute(MI_LoadScene);
 }
 
 //-----------------------------------------------------------------------------
@@ -722,19 +810,26 @@ void StartupPopup::onUsePixelsChanged(int index) {
   double height     = m_heightFld->getValue();
   if (index <= 0) {
     pref->setPixelsOnly(false);
-	m_widthFld->setDecimals(4);
-	m_heightFld->setDecimals(4);
-	m_resLabel->show();
-	m_resTextLabel->show();
+    m_widthFld->setDecimals(4);
+    m_heightFld->setDecimals(4);
+    m_resLabel->show();
+    m_resTextLabel->show();
   } else {
     Preferences::instance()->setPixelsOnly(true);
     pref->setUnits("pixel");
     pref->setCameraUnits("pixel");
+<<<<<<< HEAD
 	m_widthFld->setDecimals(0);
 	m_heightFld->setDecimals(0);
 	m_resLabel->hide();
 	m_resTextLabel->hide();
 	m_dpiFld->setValue(Stage::standardDpi);
+=======
+    m_widthFld->setDecimals(0);
+    m_heightFld->setDecimals(0);
+    m_resLabel->hide();
+    m_resTextLabel->hide();
+>>>>>>> origin/startup_popup
   }
   m_widthFld->setMeasure("camera.lx");
   m_heightFld->setMeasure("camera.ly");
@@ -751,6 +846,7 @@ void StartupPopup::onShowAtStartChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::updateResolution() {
+<<<<<<< HEAD
 	if (Preferences::instance()->getPixelsOnly()) {
 		if (m_dpiFld->getValue() != Stage::standardDpi) {
 			m_dpiFld->setValue(Stage::standardDpi);
@@ -760,6 +856,10 @@ void StartupPopup::updateResolution() {
 	else {
 		m_resLabel->setText(QString::number(m_widthFld->getValue() * m_dpi) + " X " + QString::number(m_heightFld->getValue() * m_dpi));
 	}
+=======
+  m_resLabel->setText(QString::number(m_widthFld->getValue() * m_dpi) + " X " +
+                      QString::number(m_heightFld->getValue() * m_dpi));
+>>>>>>> origin/startup_popup
 }
 
 //-----------------------------------------------------------------------------

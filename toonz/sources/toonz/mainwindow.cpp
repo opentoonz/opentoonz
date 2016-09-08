@@ -1277,8 +1277,8 @@ void MainWindow::showEvent(QShowEvent *event) {
   getCurrentRoom()->layout()->setEnabled(true);  // See main function in
                                                  // main.cpp
   if (Preferences::instance()->isStartupPopupEnabled()) {
-	  StartupPopup *startupPopup = new StartupPopup();
-	  startupPopup->show();
+    StartupPopup *startupPopup = new StartupPopup();
+    startupPopup->show();
   }
 }
 extern const char *applicationName;
