@@ -66,6 +66,8 @@ AudioRecordingPopup::AudioRecordingPopup()
   m_recordButton = new QPushButton(tr("Record"));
   m_playButton   = new QPushButton(tr("Play"));
   m_saveButton   = new QPushButton(tr("Save and Insert"));
+  m_pausePlaybackButton = new QPushButton(tr("Pause"));
+  m_pauseRecordingButton = new QPushButton(tr("Pause"));
   // m_refreshDevicesButton = new QPushButton(tr("Refresh"));
   m_duration           = new QLabel("00:00");
   m_playDuration       = new QLabel("00:00");
@@ -102,11 +104,15 @@ AudioRecordingPopup::AudioRecordingPopup()
       recordGridLay->addWidget(new QLabel(tr(" ")), 1, 0, Qt::AlignCenter);
       recordGridLay->addWidget(m_audioLevelsDisplay, 2, 0, 1, 4,
                                Qt::AlignCenter);
-      recordGridLay->addWidget(m_recordButton, 3, 0, 1, 2,
+      recordGridLay->addWidget(m_recordButton, 3, 0, 1, 1,
                                Qt::AlignRight | Qt::AlignVCenter);
+	  recordGridLay->addWidget(m_pauseRecordingButton, 3, 1, 1, 1,
+		  Qt::AlignRight | Qt::AlignVCenter);
       recordGridLay->addWidget(m_duration, 3, 2, Qt::AlignLeft);
-      recordGridLay->addWidget(m_playButton, 4, 0, 1, 2,
+      recordGridLay->addWidget(m_playButton, 4, 0, 1, 1,
                                Qt::AlignRight | Qt::AlignVCenter);
+	  recordGridLay->addWidget(m_pausePlaybackButton, 4, 1, 1, 1,
+		  Qt::AlignRight | Qt::AlignVCenter);
       recordGridLay->addWidget(m_playDuration, 4, 2, Qt::AlignLeft);
       recordGridLay->addWidget(new QLabel(tr(" ")), 5, 0, Qt::AlignCenter);
       recordGridLay->addWidget(m_saveButton, 6, 0, 1, 4,
@@ -148,6 +154,8 @@ AudioRecordingPopup::AudioRecordingPopup()
   connect(m_recordButton, SIGNAL(clicked()), this,
           SLOT(onRecordButtonPressed()));
   connect(m_playButton, SIGNAL(clicked()), this, SLOT(onPlayButtonPressed()));
+  connect(m_pauseRecordingButton, SIGNAL(clicked()), this, SLOT(onPauseRecordingButtonPressed()));
+  connect(m_pausePlaybackButton, SIGNAL(clicked()), this, SLOT(onPausePlaybackButtonPressed()));
   connect(m_audioRecorder, SIGNAL(durationChanged(qint64)), this,
           SLOT(updateRecordDuration(qint64)));
   connect(m_console, SIGNAL(playStateChanged(bool)), this,
@@ -278,6 +286,31 @@ void AudioRecordingPopup::onPlayButtonPressed() {
   } else {
     m_player->stop();
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void AudioRecordingPopup::onPauseRecordingButtonPressed() {
+	if (m_audioRecorder->state() == QAudioRecorder::RecordingState) {
+		m_audioRecorder->pause();
+		m_pauseRecordingButton->setText("Resume");
+	} else if (m_audioRecorder->state() == QAudioRecorder::PausedState) {
+		m_audioRecorder->record();
+		m_pauseRecordingButton->setText("Pause");
+	}	
+}
+
+//-----------------------------------------------------------------------------
+
+void AudioRecordingPopup::onPausePlaybackButtonPressed() {
+	if (m_player->state() == QMediaPlayer::PlayingState) {
+		m_player->pause();
+		m_pausePlaybackButton->setText("Resume");
+	}
+	else if (m_player->state() == QMediaPlayer::PausedState) {
+		m_player->play();
+		m_pausePlaybackButton->setText("Pause");
+	}
 }
 
 //-----------------------------------------------------------------------------

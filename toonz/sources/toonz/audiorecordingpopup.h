@@ -34,7 +34,9 @@ class AudioRecordingPopup : public DVGui::Dialog {
   QPushButton
       *m_recordButton,  // *m_refreshDevicesButton, -refresh not working for now
       *m_playButton,
-      *m_saveButton;
+      *m_saveButton,
+	  *m_pauseRecordingButton,
+	  *m_pausePlaybackButton;
   QComboBox *m_deviceListCB;
   QAudioRecorder *m_audioRecorder;
   QLabel *m_duration, *m_playDuration;
@@ -66,6 +68,8 @@ private slots:
   void updatePlaybackDuration(qint64 duration);
   void onPlayButtonPressed();
   void onSaveButtonPressed();
+  void onPauseRecordingButtonPressed();
+  void onPausePlaybackButtonPressed();
   void processBuffer(const QAudioBuffer &buffer);
   void onPlayStateChanged(bool playing);
   void onPlayXSheetCBChanged(int status);
