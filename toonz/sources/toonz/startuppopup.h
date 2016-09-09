@@ -56,12 +56,11 @@ protected:
   void showEvent(QShowEvent *) override;
   void loadPresetList();
   void savePresetList();
-  QString aspectRatioValueToString(double value, int width = 0,
-	  int height = 0);
+  QString aspectRatioValueToString(double value, int width = 0, int height = 0);
   double aspectRatioStringToValue(const QString &s);
   bool parsePresetString(const QString &str, QString &name, int &xres,
-	  int &yres, double &fx, double &fy, QString &xoffset,
-	  QString &yoffset, double &ar, bool forCleanup = false);
+                         int &yres, double &fx, double &fy, QString &xoffset,
+                         QString &yoffset, double &ar, bool forCleanup = false);
 
 public slots:
   void onRecentSceneClicked(int index);
