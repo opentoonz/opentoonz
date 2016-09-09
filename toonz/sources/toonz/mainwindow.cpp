@@ -368,7 +368,7 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent,
   m_currentRoomsChoice = Preferences::instance()->getCurrentRoomChoice();
   defineActions();
   TApp::instance()->getCurrentScene()->setDirtyFlag(false);
-
+  m_argumentLayoutFileName = argumentLayoutFileName;
   // La menuBar altro non è che una toolbar
   // in cui posso inserire quanti custom widget voglio.
   m_topBar = new TopBar(this);
@@ -1083,13 +1083,106 @@ void MainWindow::autofillToggle() {
 
 void MainWindow::resetRoomsLayout() {
   if (!m_saveSettingsOnQuit) return;
+  QString question;
+  question = QObject::tr(
+      "This will remove custom rooms."
+      "\nContinue?");
 
+  int ret =
+      DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
+  if (ret == 0 || ret == 2) {
+    // cancel (or closed message box window)
+    return;
+  } else if (ret == 1) {
+    m_resetting = true;
+  }
+
+  // if the default set, enable a partial rebuild without having to restart
+  // the browswer room and farm room cause crashes if rebuilt while OT is
+  // running
+  if (Preferences::instance()->getCurrentRoomChoice() == "Default") {
+    // get the tabbar and menu bar
+    QTabBar *roomTabWidget         = m_topBar->getRoomTabWidget();
+    StackedMenuBar *stackedMenuBar = m_topBar->getStackedMenuBar();
+
+    // set to room 0 to start
+    m_oldRoomIndex = 0;
+    roomTabWidget->setCurrentIndex(0);
+    m_stackedWidget->setCurrentIndex(0);
+    QWidget *currWidget = m_stackedWidget->currentWidget();
+
+    // delete all rooms but the first one
+    int numRooms = getRoomCount();
+    for (int i = numRooms - 1; i > 0; i--) {
+      m_topBar->getRoomTabWidget()->removeTab(i);
+      deleteRoom(i);
+    }
+
+    // delete the personalized folder
+    m_topBar->getRoomTabWidget()->removeTab(0);
+    TFilePath layoutDir = ToonzFolder::getMyRoomsDir();
+    if (layoutDir != TFilePath()) {
+      if (TSystem::doesExistFileOrLevel(layoutDir)) {
+        TSystem::rmDirTree(layoutDir);
+      }
+    }
+
+    // trying to remove the basics room by delete causes problems
+    Room *basics     = getRoom(0);
+    QObjectList list = basics->dockLayout()->children();
+    for (QObject *object : list) {
+      basics->dockLayout()->removeWidget((QWidget *)object);
+    }
+
+    // reload the rooms from the template files
+    std::vector<Room *> rooms;
+    std::vector<TFilePath> roomPaths;
+
+    if (readRoomList(roomPaths, m_argumentLayoutFileName)) {
+      if (!m_argumentLayoutFileName.isEmpty()) {
+        int pos = (m_argumentLayoutFileName.indexOf("_layout") == -1)
+                      ? m_argumentLayoutFileName.indexOf(".txt")
+                      : m_argumentLayoutFileName.indexOf("_layout");
+        m_layoutName = m_argumentLayoutFileName.left(pos);
+      }
+    }
+
+    int i;
+    // dont get rooms 7 and 8 (cause crashes)
+    for (i = 0; i < (int)roomPaths.size() - 2; i++) {
+      TFilePath roomPath = roomPaths[i];
+      if (TFileStatus(roomPath).doesExist()) {
+        Room *room = new Room(this);
+        room->load(roomPath);
+        m_stackedWidget->addWidget(room);
+        roomTabWidget->addTab(room->getName());
+        std::string mbFileName = roomPath.getName() + "_menubar.xml";
+        stackedMenuBar->loadAndAddMenubar(
+            ToonzFolder::getRoomsFile(mbFileName));
+        rooms.push_back(room);
+      }
+    }
+    // remove the first basics room
+    m_oldRoomIndex = 0;
+    roomTabWidget->setCurrentIndex(0);
+    m_stackedWidget->setCurrentIndex(0);
+    // m_stackedWidget->removeWidget(currWidget);
+
+    DVGui::warning(
+        QObject::tr("The Browser and Farm room will be available upon restart."
+                    "\nPlease restart before customizing any rooms."));
+    m_saveSettingsOnQuit = false;
+    m_resetting          = false;
+    m_resetDone          = true;
+    return;
+  }
   m_saveSettingsOnQuit = false;
 
   TFilePath layoutDir = ToonzFolder::getMyRoomsDir();
   if (layoutDir != TFilePath()) {
-    // TSystem::deleteFile(layoutDir);
-    TSystem::rmDirTree(layoutDir);
+    if (TSystem::doesExistFileOrLevel(layoutDir)) {
+      TSystem::rmDirTree(layoutDir);
+    }
   }
   /*if (layoutDir != TFilePath()) {
           try {
@@ -1106,8 +1199,8 @@ void MainWindow::resetRoomsLayout() {
           }
   }*/
 
-  DVGui::info(
-      QObject::tr("The rooms will be reset the next time you run Toonz."));
+  DVGui::warning(
+      QObject::tr("The rooms will be reset the next time you run OpenToonz."));
 }
 
 void MainWindow::maximizePanel() {
@@ -1128,6 +1221,7 @@ void MainWindow::fullScreenWindow() {
 //-----------------------------------------------------------------------------
 
 void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
+  if (m_resetting == true) return;
   Room *oldRoom            = getRoom(m_oldRoomIndex);
   Room *newRoom            = getRoom(newRoomIndex);
   QList<TPanel *> paneList = oldRoom->findChildren<TPanel *>();
@@ -1178,6 +1272,7 @@ void MainWindow::insertNewRoom() {
 //-----------------------------------------------------------------------------
 
 void MainWindow::deleteRoom(int index) {
+  if (m_resetDone) return;
   Room *room = getRoom(index);
 
   TFilePath fp = room->getPath();
