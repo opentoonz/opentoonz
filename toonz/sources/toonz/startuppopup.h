@@ -31,7 +31,7 @@ class StartupPopup final : public DVGui::Dialog {
   QLabel *m_resLabel;
   QLabel *m_resTextLabel;
   QLabel *m_dpiLabel;
-  DVGui::IntLineEdit *m_dpiFld;
+  DVGui::DoubleLineEdit *m_dpiFld;
   DVGui::MeasuredDoubleLineEdit *m_widthFld;
   DVGui::MeasuredDoubleLineEdit *m_heightFld;
   DVGui::DoubleLineEdit *m_fpsFld;
@@ -45,7 +45,7 @@ class StartupPopup final : public DVGui::Dialog {
   QComboBox *m_presetCombo;
   QPushButton *m_addPresetBtn, *m_removePresetBtn;
   CameraSettingsWidget *m_cameraSettingsWidget;
-  int m_dpi;
+  int m_dpi, m_xRes, m_yRes;
   bool m_updating = false;
   QString m_presetListFile;
 

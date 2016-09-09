@@ -1922,6 +1922,7 @@ void MainWindow::defineActions() {
                           tr("Toggle Main Window's Full Screen Mode"),
                           "Ctrl+`");
   createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
+  createMenuWindowsAction(MI_StartupPopup, tr("&Startup Popup..."), "");
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
   createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "//", false,
