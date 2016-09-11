@@ -41,6 +41,7 @@
 #include <QDesktopWidget>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QFrame>
 
 using namespace std;
 using namespace DVGui;
@@ -82,32 +83,44 @@ StartupPopup::StartupPopup()
   int namesCount = names.count();
   QVector<StartupLabel *> recentNamesLabels =
       QVector<StartupLabel *>(names.count());
+  m_newSceneFrame = new QFrame(this);
+  m_recentSceneFrame = new QFrame(this);
+  QFrame* verticalSpacer = new QFrame();
+  verticalSpacer->setFrameStyle(QFrame::VLine);
+  verticalSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  verticalSpacer->setFixedWidth(1);
   m_nameFld              = new LineEdit(this);
   m_pathFld              = new FileField(0);
-  m_widthLabel           = new QLabel(tr("Width:"));
+  m_projectLabel = new QLabel(tr("Project:"), this);
+  m_sceneNameLabel = new QLabel(tr("Scene Name:"));
+  m_widthLabel           = new QLabel(tr("Width:"), this);
   m_widthFld             = new DVGui::MeasuredDoubleLineEdit(0);
-  m_heightLabel          = new QLabel(tr("Height:"));
+  m_heightLabel          = new QLabel(tr("Height:"), this);
   m_heightFld            = new DVGui::MeasuredDoubleLineEdit(0);
-  m_dpiLabel             = new QLabel(tr("DPI:"));
+  m_dpiLabel             = new QLabel(tr("DPI:"), this);
   m_dpiFld               = new DoubleLineEdit(0, 120);
-  m_resLabel             = new QLabel(this);
+  m_resXLabel = new QLabel(tr("X"), this);
+  m_resXFld = new DVGui::DoubleLineEdit(this);
+  m_resYFld = new DVGui::DoubleLineEdit(this);
   m_resTextLabel         = new QLabel(tr("Resolution:"), this);
-  m_fpsLabel             = new QLabel(tr("Frame Rate:"));
+  m_fpsLabel             = new QLabel(tr("Frame Rate:"), this);
   m_fpsFld               = new DoubleLineEdit(0, 24.0);
   m_cameraSettingsWidget = new CameraSettingsWidget(false);
-  m_presetCombo          = new QComboBox();
-  m_addPresetBtn         = new QPushButton(tr("Add"));
-  m_removePresetBtn      = new QPushButton(tr("Remove"));
+  m_presetCombo          = new QComboBox(this);
+  m_unitsCB = new QComboBox(this);
+  m_addPresetBtn         = new QPushButton(tr("Add"), this);
+  m_removePresetBtn      = new QPushButton(tr("Remove"), this);
   m_showAtStartCB =
-      new QCheckBox(tr("Show this window when OpenToonz starts."), this);
-  m_usePixelsCB =
-      new QCheckBox(tr("Use pixels as the default unit in OpenToonz."), this);
-  QPushButton *closeButton      = new QPushButton(tr("Close"), this);
+      new QCheckBox(tr("Show this at startup."), this);
   QPushButton *createButton     = new QPushButton(tr("Create New Scene"), this);
   QPushButton *newProjectButton = new QPushButton(tr("New Project"), this);
   QPushButton *loadOtherSceneButton =
-      new QPushButton(tr("Load Other Scene"), this);
+      new QPushButton(tr("Open Another Scene"), this);
   m_projectsCB = new QComboBox(this);
+  QStringList type;
+  type << tr("pixel") << tr("cm") << tr("mm") << tr("inch") << tr("field");
+  m_unitsCB->addItems(type);
+  
   // Exclude all character which cannot fit in a filepath (Win).
   // Dots are also prohibited since they are internally managed by Toonz.
   QRegExp rx("[^\\\\/:?*.\"<>|]+");
@@ -120,108 +133,128 @@ StartupPopup::StartupPopup()
   m_heightFld->setRange(0.1, (std::numeric_limits<double>::max)());
   m_fpsFld->setRange(1.0, (std::numeric_limits<double>::max)());
   m_dpiFld->setRange(1.0, (std::numeric_limits<double>::max)());
-  m_usePixelsCB->setChecked(Preferences::instance()->getPixelsOnly());
+  m_resXFld->setRange(0.1, (std::numeric_limits<double>::max)());
+  m_resYFld->setRange(0.1, (std::numeric_limits<double>::max)());
   m_showAtStartCB->setChecked(Preferences::instance()->isStartupPopupEnabled());
   m_showAtStartCB->setStyleSheet("QCheckBox{ background-color: none; }");
-  m_dpiFld->setMinimumWidth(100);
-  m_dpiFld->setMaximumWidth(400);
   m_addPresetBtn->setStyleSheet(
       "QPushButton { padding-left: 4px; padding-right: 4px;}");
   m_removePresetBtn->setStyleSheet(
       "QPushButton { padding-left: 4px; padding-right: 4px;}");
   QLabel *label = new QLabel();
   label->setPixmap(QPixmap(":Resources/startup.png"));
+  label->setObjectName("StartupLogo");
+  m_recentSceneFrame->setObjectName("StartupRecentSceneFrame");
+  m_newSceneFrame->setObjectName("StartupNewSceneFrame");
+  verticalSpacer->setObjectName("StartupVSeparator");
+  
   //--- layout
   m_topLayout->setMargin(0);
   m_topLayout->setSpacing(0);
   {
     QGridLayout *guiLay = new QGridLayout();
-    guiLay->setMargin(10);
-    guiLay->setVerticalSpacing(10);
-    guiLay->setHorizontalSpacing(5);
-    {
-      // Name
-      guiLay->addWidget(label, 0, 0, 1, 6, Qt::AlignCenter);
-      guiLay->addWidget(new QLabel(tr("Project:")), 1, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_projectsCB, 1, 1, 1, 2, Qt::AlignLeft);
-      guiLay->addWidget(newProjectButton, 1, 3, Qt::AlignRight);
-      guiLay->addWidget(new QLabel(tr("Scene Name:")), 2, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_nameFld, 2, 1, 1, 3);
+	QHBoxLayout *projectLay = new QHBoxLayout();
+	QGridLayout *newSceneLay = new QGridLayout();
+	QGridLayout *recentSceneLay = new QGridLayout();
+	guiLay->setMargin(10);
+	guiLay->setVerticalSpacing(10);
+	guiLay->setHorizontalSpacing(10);
 
-      // Save In
-      guiLay->addWidget(new QLabel(tr("Save In:")), 3, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_pathFld, 3, 1, 1, 3);
-      guiLay->addWidget(new QLabel(tr("Preset:")), 4, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      QHBoxLayout *resListLay = new QHBoxLayout();
-      resListLay->setSpacing(3);
-      resListLay->setMargin(1);
-      {
-        resListLay->addWidget(m_presetCombo, 1);
-        resListLay->addWidget(m_addPresetBtn, 0);
-        resListLay->addWidget(m_removePresetBtn, 0);
-      }
-      guiLay->addLayout(resListLay, 4, 1, 1, 3, Qt::AlignLeft);
-      // Width - Height
+	guiLay->addWidget(label, 0, 0, 1, 2, Qt::AlignLeft);
 
-      guiLay->addWidget(m_fpsLabel, 5, 0, Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_fpsFld, 5, 1, 1, 1);
-      guiLay->addWidget(m_dpiLabel, 5, 2, Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_dpiFld, 5, 3, 1, 1);
-      guiLay->addWidget(m_widthLabel, 6, 0, Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_widthFld, 6, 1);
-      guiLay->addWidget(m_heightLabel, 6, 2, Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_heightFld, 6, 3);
-      guiLay->addWidget(m_resTextLabel, 7, 0, 1, 1, Qt::AlignRight);
-      guiLay->addWidget(m_resLabel, 7, 1, 1, 1, Qt::AlignLeft);
-      guiLay->addWidget(m_usePixelsCB, 8, 1, 1, 3, Qt::AlignLeft);
-      guiLay->addWidget(createButton, 9, 1, 1, 3, Qt::AlignLeft);
-      guiLay->addWidget(new QLabel(" ", this), 10, 0, 1, 1, Qt::AlignLeft);
+	newSceneLay->setMargin(6);
+	newSceneLay->setVerticalSpacing(6);
+	newSceneLay->setHorizontalSpacing(6);
+	{
+		// Project
+		newSceneLay->addWidget(m_projectLabel, 0, 0,
+			Qt::AlignRight | Qt::AlignVCenter);
+		projectLay->setSpacing(3);
+		projectLay->setMargin(1);
+		{
+			projectLay->addWidget(m_projectsCB, 1);
+			projectLay->addWidget(newProjectButton, 0);
+		}
+		newSceneLay->addLayout(projectLay, 0, 1, 1, 3, Qt::AlignLeft);
+		newSceneLay->addWidget(new QLabel(tr(" ")), 1, 0, Qt::AlignLeft);
+		// Scene Name
+		newSceneLay->addWidget(m_sceneNameLabel, 2, 0,
+			Qt::AlignRight | Qt::AlignVCenter);
+		newSceneLay->addWidget(m_nameFld, 2, 1, 1, 3);
 
+		// Save In
+		newSceneLay->addWidget(new QLabel(tr("Save In:")), 3, 0,
+			Qt::AlignRight | Qt::AlignVCenter);
+		newSceneLay->addWidget(m_pathFld, 3, 1, 1, 3);
+		newSceneLay->addWidget(new QLabel(tr("Camera Size:")), 4, 0,
+			Qt::AlignRight | Qt::AlignVCenter);
+		QHBoxLayout *resListLay = new QHBoxLayout();
+		resListLay->setSpacing(3);
+		resListLay->setMargin(1);
+		{
+			resListLay->addWidget(m_presetCombo, 1);
+			resListLay->addWidget(m_addPresetBtn, 0);
+			resListLay->addWidget(m_removePresetBtn, 0);
+		}
+		newSceneLay->addLayout(resListLay, 4, 1, 1, 3, Qt::AlignLeft);
+		
+		// Width - Height		
+		newSceneLay->addWidget(m_widthLabel, 5, 0, Qt::AlignRight | Qt::AlignVCenter);
+		newSceneLay->addWidget(m_widthFld, 5, 1);
+		newSceneLay->addWidget(m_heightLabel, 5, 2, Qt::AlignRight | Qt::AlignVCenter);
+		newSceneLay->addWidget(m_heightFld, 5, 3);
+		
+		newSceneLay->addWidget(m_resTextLabel, 6, 0, 1, 1, Qt::AlignRight);
+		newSceneLay->addWidget(m_resXFld, 6, 1);
+		newSceneLay->addWidget(m_resXLabel, 6, 2, 1, 1, Qt::AlignCenter);
+		newSceneLay->addWidget(m_resYFld, 6, 3);
+		newSceneLay->addWidget(new QLabel(tr("Units:")), 7, 0, Qt::AlignRight | Qt::AlignVCenter);
+		newSceneLay->addWidget(m_unitsCB, 7, 1, 1, 1);
+		newSceneLay->addWidget(m_dpiLabel, 7, 2, Qt::AlignRight | Qt::AlignVCenter);
+		newSceneLay->addWidget(m_dpiFld, 7, 3, 1, 1);
+		newSceneLay->addWidget(m_fpsLabel, 8, 0, Qt::AlignRight | Qt::AlignVCenter);
+		newSceneLay->addWidget(m_fpsFld, 8, 1, 1, 1);
+		newSceneLay->addWidget(createButton, 9, 1, 1, 3, Qt::AlignLeft);
+	}
+	m_newSceneFrame->setLayout(newSceneLay);
+	guiLay->addWidget(m_newSceneFrame, 1, 0, 4, 1, Qt::AlignLeft);
+
+	guiLay->addWidget(verticalSpacer, 1, 1, 4, 1);
+	
+	recentSceneLay->setMargin(6);
+	recentSceneLay->setVerticalSpacing(6);
+	recentSceneLay->setHorizontalSpacing(6);
+	{
       // Recent Scene List
-      guiLay->addWidget(new QLabel(" ", this), 4, 0, 1, 1, Qt::AlignLeft);
-      guiLay->addWidget(new QLabel(tr("Open Recent Scene: "), this), 1, 5, 1, 1,
+	  recentSceneLay->addWidget(new QLabel(tr("Recent Scenes: "), this), 0, 0, 1, 1,
                         Qt::AlignLeft);
       if (names.count() <= 0) {
-        guiLay->addWidget(new QLabel(tr("No Recent Scenes"), this), 2, 5, 1, 1,
-                          Qt::AlignLeft);
+		  recentSceneLay->addWidget(new QLabel(tr("No Recent Scenes"), this), 1, 0, 1, 1,
+                          Qt::AlignTop);
       } else {
         int i = 0;
         for (QString name : names) {
           if (i > 6) break;
           QString justName = QString::fromStdString(TFilePath(name).getName());
           recentNamesLabels[i] = new StartupLabel(justName, this, i);
-          guiLay->addWidget(recentNamesLabels[i], i + 2, 5, 1, 1,
-                            Qt::AlignLeft);
+		  recentSceneLay->addWidget(recentNamesLabels[i], i + 2, 0, 1, 1,
+                            Qt::AlignTop);
           i++;
         }
       }
-      guiLay->addWidget(loadOtherSceneButton, 9, 5, 1, 1, Qt::AlignLeft);
+	  m_recentSceneFrame->setLayout(recentSceneLay);
+	  guiLay->addWidget(m_recentSceneFrame, 1, 2, 3, 1, Qt::AlignTop);
+	  guiLay->addWidget(loadOtherSceneButton, 4, 2, 1, 1, Qt::AlignRight);
     }
-    guiLay->setColumnStretch(0, 0);
-    guiLay->setColumnStretch(1, 0);
-    guiLay->setColumnStretch(2, 0);
-    guiLay->setColumnStretch(3, 0);
-    guiLay->setColumnStretch(4, 1);
-    guiLay->setColumnMinimumWidth(4, 20);
-    guiLay->setColumnMinimumWidth(5, 200);
-
-    m_topLayout->addLayout(guiLay, 1);
+    m_topLayout->addLayout(guiLay, 0);
   }
 
   m_buttonLayout->setMargin(0);
-  m_buttonLayout->setSpacing(30);
+  m_buttonLayout->setSpacing(10);
   {
     m_buttonLayout->addWidget(m_showAtStartCB, Qt::AlignLeft);
-    m_buttonLayout->addStretch(1);
-    m_buttonLayout->addWidget(closeButton, 0);
-    // m_buttonLayout->addStretch(1);
   }
 
-  updateProjectCB();
   TApp *app                 = TApp::instance();
   TSceneHandle *sceneHandle = app->getCurrentScene();
 
@@ -237,23 +270,25 @@ StartupPopup::StartupPopup()
                        SLOT(onLoadSceneButtonPressed()));
   ret = ret && connect(m_projectsCB, SIGNAL(currentIndexChanged(int)),
                        SLOT(onProjectChanged(int)));
-  ret = ret && connect(closeButton, SIGNAL(clicked()), this, SLOT(reject()));
   ret = ret &&
         connect(createButton, SIGNAL(clicked()), this, SLOT(onCreateButton()));
-  ret = ret && connect(m_usePixelsCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onUsePixelsChanged(int)));
   ret = ret && connect(m_showAtStartCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onShowAtStartChanged(int)));
   ret = ret && connect(m_widthFld, SIGNAL(valueChanged()), this,
                        SLOT(updateResolution()));
   ret = ret && connect(m_heightFld, SIGNAL(valueChanged()), this,
                        SLOT(updateResolution()));
+  ret = ret && connect(m_resXFld, SIGNAL(valueChanged()), this,
+	  SLOT(updateSize()));
+  ret = ret && connect(m_resYFld, SIGNAL(valueChanged()), this,
+	  SLOT(updateSize()));
   ret = ret && connect(m_dpiFld, SIGNAL(editingFinished()), this,
                        SLOT(onDpiChanged()));
   ret = ret && connect(m_presetCombo, SIGNAL(activated(const QString &)),
                        SLOT(onPresetSelected(const QString &)));
   ret = ret && connect(m_addPresetBtn, SIGNAL(clicked()), SLOT(addPreset()));
-
+  ret = ret && connect(m_unitsCB, SIGNAL(currentIndexChanged(int)),
+	  SLOT(onCameraUnitChanged(int)));
   ret = ret &&
         connect(m_removePresetBtn, SIGNAL(clicked()), SLOT(removePreset()));
   for (int i = 0; i < recentNamesLabels.count() && i < 7; i++) {
@@ -261,15 +296,13 @@ StartupPopup::StartupPopup()
                          SLOT(onRecentSceneClicked(int)));
   }
   assert(ret);
-
-  this->move(QApplication::desktop()->screen()->rect().center() -
-             this->rect().center());
 }
 
 //-----------------------------------------------------------------------------
 
 void StartupPopup::showEvent(QShowEvent *) {
-  update();
+	loadPresetList();
+	updateProjectCB();
   m_nameFld->setFocus();
   m_pathFld->setPath(TApp::instance()
                          ->getCurrentScene()
@@ -293,27 +326,43 @@ void StartupPopup::showEvent(QShowEvent *) {
                    ->getProperties()
                    ->getOutputProperties()
                    ->getFrameRate();
+  m_widthFld->setValue(cameraSize.lx);
+  m_heightFld->setValue(cameraSize.ly);
   if (Preferences::instance()->getCameraUnits() == "pixel") {
     m_widthFld->setDecimals(0);
     m_heightFld->setDecimals(0);
-    m_resLabel->hide();
     m_resTextLabel->hide();
+	m_resXFld->hide();
+	m_resYFld->hide();
+	m_resXLabel->hide();
+	m_dpiFld->hide();
+	m_dpiLabel->hide();
   } else {
     m_widthFld->setDecimals(4);
     m_heightFld->setDecimals(4);
-    m_resLabel->show();
+	m_resXFld->show();
+	m_resYFld->show();
+	m_resXLabel->show();
     m_resTextLabel->show();
+	m_dpiFld->show();
+	m_dpiLabel->show();
   }
-  m_widthFld->setValue(cameraSize.lx);
-  m_heightFld->setValue(cameraSize.ly);
-  m_fpsFld->setValue(fps);
 
+  m_fpsFld->setValue(fps);
+  m_unitsCB->setCurrentText(Preferences::instance()->getCameraUnits());
   m_dpi  = cameraRes.lx / cameraSize.lx;
   m_xRes = cameraRes.lx;
   m_yRes = cameraRes.ly;
-  m_resLabel->setText(QString::number(m_xRes) + " X " +
-                      QString::number(m_yRes));
-  loadPresetList();
+  m_resXFld->setValue(m_xRes);
+  m_resYFld->setValue(m_yRes);
+  m_resXFld->setDecimals(0);
+  m_resYFld->setDecimals(0);
+
+  m_recentSceneFrame->setFixedWidth(200);
+  m_buttonFrame->setFixedHeight(30);
+  m_newSceneFrame->setMinimumWidth(480);
+  this->move(QApplication::desktop()->screen()->rect().center() -
+	  this->rect().center());
 }
 
 //-----------------------------------------------------------------------------
@@ -551,16 +600,15 @@ void StartupPopup::onPresetSelected(const QString &str) {
     // m_dpiFld->setValue(m_xRes / m_widthFld->getValue());
 
     // here is the system that preserves dpi
-    m_widthFld->setValue(xres / m_dpi);
-    m_heightFld->setValue(yres / m_dpi);
-    //_heightFld->setValue(yres / m_dpi);
+    m_widthFld->setValue((double)xres / (double)m_dpi);
+    m_heightFld->setValue((double)yres / (double)m_dpi);
     if (Preferences::instance()->getPixelsOnly()) {
-      m_widthFld->setValue(xres / Stage::standardDpi);
-      m_heightFld->setValue(yres / Stage::standardDpi);
+      m_widthFld->setValue((double)xres / Stage::standardDpi);
+      m_heightFld->setValue((double)yres / Stage::standardDpi);
       m_dpiFld->setValue(Stage::standardDpi);
     }
-    m_resLabel->setText(QString::number(m_xRes) + " X " +
-                        QString::number(m_yRes));
+	m_resXFld->setValue(m_xRes);
+	m_resYFld->setValue(m_yRes);
   } else {
     QMessageBox::warning(
         this, tr("Bad camera preset"),
@@ -688,8 +736,15 @@ void StartupPopup::onSceneChanged() {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onDpiChanged() {
-  m_dpi = m_dpiFld->getValue();
-  updateResolution();
+	if (Preferences::instance()->getPixelsOnly()) {
+		m_dpi = Stage::standardDpi;
+		m_dpiFld->setValue(Stage::standardDpi);
+		updateResolution();
+	}
+	else {
+		m_dpi = m_dpiFld->getValue();
+		updateResolution();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -712,28 +767,40 @@ void StartupPopup::onRecentSceneClicked(int index) {
 
 //-----------------------------------------------------------------------------
 
-void StartupPopup::onUsePixelsChanged(int index) {
-  Preferences *pref = Preferences::instance();
+void StartupPopup::onCameraUnitChanged(int index) {
+	Preferences *pref = Preferences::instance();
+	QStringList type;
+	type << tr("pixel") << tr("cm") << tr("mm") << tr("inch") << tr("field");
+  
   double width      = m_widthFld->getValue();
   double height     = m_heightFld->getValue();
-  if (index <= 0) {
+  if (index != 0) {
     pref->setPixelsOnly(false);
+	pref->setCameraUnits(type[index].toStdString());
     m_widthFld->setDecimals(4);
     m_heightFld->setDecimals(4);
-    m_resLabel->show();
     m_resTextLabel->show();
+	m_resXFld->show();
+	m_resYFld->show();
+	m_resXLabel->show();
+	m_dpiFld->show();
+	m_dpiLabel->show();
     m_widthFld->setMeasure("camera.lx");
     m_heightFld->setMeasure("camera.ly");
     m_widthFld->setValue(width);
     m_heightFld->setValue(height);
   } else {
-    Preferences::instance()->setPixelsOnly(true);
+    pref->setPixelsOnly(true);
     pref->setUnits("pixel");
     pref->setCameraUnits("pixel");
     m_widthFld->setDecimals(0);
     m_heightFld->setDecimals(0);
-    m_resLabel->hide();
     m_resTextLabel->hide();
+	m_resXFld->hide();
+	m_resYFld->hide();
+	m_resXLabel->hide();
+	m_dpiFld->hide();
+	m_dpiLabel->hide();
     m_dpiFld->setValue(Stage::standardDpi);
     m_widthFld->setMeasure("camera.lx");
     m_heightFld->setMeasure("camera.ly");
@@ -757,15 +824,34 @@ void StartupPopup::updateResolution() {
     }
     m_xRes = m_widthFld->getValue() * Stage::standardDpi;
     m_yRes = m_heightFld->getValue() * Stage::standardDpi;
-    m_resLabel->setText(QString::number(m_xRes) + " X " +
-                        QString::number(m_yRes));
+	m_resXFld->setValue(m_xRes);
+	m_resYFld->setValue(m_yRes);
   } else {
     m_xRes = m_widthFld->getValue() * m_dpi;
     m_yRes = m_heightFld->getValue() * m_dpi;
-    m_resLabel->setText(QString::number(m_xRes) + " X " +
-                        QString::number(m_yRes));
+	m_resXFld->setValue(m_xRes);
+	m_resYFld->setValue(m_yRes);
   }
   m_presetCombo->setCurrentIndex(0);
+}
+
+//-----------------------------------------------------------------------------
+
+void StartupPopup::updateSize() {
+	m_xRes = m_resXFld->getValue();
+	m_yRes = m_resYFld->getValue();
+	if (Preferences::instance()->getPixelsOnly()) {
+		if (m_dpiFld->getValue() != Stage::standardDpi) {
+			m_dpiFld->setValue(Stage::standardDpi);
+		}
+		m_widthFld->setValue(m_xRes / Stage::standardDpi);
+		m_heightFld->setValue(m_yRes / Stage::standardDpi);
+	}
+	else {
+		m_widthFld->setValue(m_xRes / m_dpi);
+		m_heightFld->setValue(m_yRes / m_dpi);
+	}
+	m_presetCombo->setCurrentIndex(0);
 }
 
 //-----------------------------------------------------------------------------

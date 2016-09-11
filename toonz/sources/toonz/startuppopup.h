@@ -28,18 +28,22 @@ class StartupPopup final : public DVGui::Dialog {
   QLabel *m_widthLabel;
   QLabel *m_heightLabel;
   QLabel *m_fpsLabel;
-  QLabel *m_resLabel;
+  QLabel *m_resXLabel;
   QLabel *m_resTextLabel;
   QLabel *m_dpiLabel;
+  QLabel *m_projectLabel;
+  QLabel *m_sceneNameLabel;
   DVGui::DoubleLineEdit *m_dpiFld;
   DVGui::MeasuredDoubleLineEdit *m_widthFld;
   DVGui::MeasuredDoubleLineEdit *m_heightFld;
   DVGui::DoubleLineEdit *m_fpsFld;
+  DVGui::DoubleLineEdit *m_resXFld;
+  DVGui::DoubleLineEdit *m_resYFld;
   QList<QString> names;
   QList<TFilePath> m_projectPaths;
   QCheckBox *m_showAtStartCB;
-  QCheckBox *m_usePixelsCB;
   QComboBox *m_projectsCB;
+  QComboBox *m_unitsCB;
   QPushButton *m_loadOtherSceneButton;
   QPushButton *m_newProjectButton;
   QComboBox *m_presetCombo;
@@ -48,6 +52,8 @@ class StartupPopup final : public DVGui::Dialog {
   int m_dpi, m_xRes, m_yRes;
   bool m_updating = false;
   QString m_presetListFile;
+  QFrame *m_newSceneFrame;
+  QFrame *m_recentSceneFrame;
 
 public:
   StartupPopup();
@@ -65,7 +71,6 @@ protected:
 public slots:
   void onRecentSceneClicked(int index);
   void onCreateButton();
-  void onUsePixelsChanged(int index);
   void onShowAtStartChanged(int index);
   void updateProjectCB();
   void onProjectChanged(int index);
@@ -73,10 +78,12 @@ public slots:
   void onLoadSceneButtonPressed();
   void onSceneChanged();
   void updateResolution();
+  void updateSize();
   void onDpiChanged();
   void addPreset();
   void removePreset();
   void onPresetSelected(const QString &str);
+  void onCameraUnitChanged(int index);
 };
 
 class StartupLabel : public QLabel {

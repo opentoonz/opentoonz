@@ -67,6 +67,7 @@ class MainWindow final : public QMainWindow {
   Q_OBJECT
 
   bool m_saveSettingsOnQuit;
+  bool m_startupPopupShown = false;
   int m_oldRoomIndex;
   QString m_currentRoomsChoice;
   UpdateChecker *m_updateChecker;
