@@ -32,8 +32,10 @@ class AudioRecordingPopup : public DVGui::Dialog {
 
   QString m_deviceName;
   QPushButton
-      *m_recordButton,  // *m_refreshDevicesButton, -refresh not working for now
-      *m_playButton,
+	  *m_recordButton,  // *m_refreshDevicesButton, -refresh not working for now
+	  *m_playButton,
+	  *m_pauseRecordingButton,
+      *m_pausePlaybackButton,
       *m_saveButton;
   QComboBox *m_deviceListCB;
   QAudioRecorder *m_audioRecorder;
@@ -48,6 +50,9 @@ class AudioRecordingPopup : public DVGui::Dialog {
   QElapsedTimer *m_timer;
   QMap<qint64, double> m_recordedLevels;
   qint64 m_oldElapsed;
+  qint64 m_startPause = 0;
+  qint64 m_endPause = 0;
+  qint64 m_pausedTime = 0;
   bool m_isPlaying, m_syncPlayback;
 
 public:
@@ -66,6 +71,8 @@ private slots:
   void updatePlaybackDuration(qint64 duration);
   void onPlayButtonPressed();
   void onSaveButtonPressed();
+  void onPauseRecordingButtonPressed();
+  void onPausePlaybackButtonPressed();
   void processBuffer(const QAudioBuffer &buffer);
   void onPlayStateChanged(bool playing);
   void onPlayXSheetCBChanged(int status);
