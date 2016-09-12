@@ -764,9 +764,12 @@ DvDirTreeView {
 /*---------------------------------------------------------------------------*/
 /* Cleanup Settings, LoadLevel, PsdSettingsPopup, FxSettingsPopup, RenameAsToonzPopup */
 /*---------------------------------------------------------------------------*/
-#CleanupSettingsFrame,
+#CleanupSettingsFrame, 
 #LoadLevelFrame,
-#SolidLineFrame {
+#SolidLineFrame,
+#StartupProjectBox,
+#StartupNewSceneBox, 
+#StartupRecentSceneBox {
   border: 1px solid #e6e6e6;
 }
 #TitleTxtLabel {

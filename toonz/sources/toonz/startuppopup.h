@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QCheckBox>
+#include <QGroupBox>
 
 // forward declaration
 class QLabel;
@@ -31,7 +32,6 @@ class StartupPopup final : public DVGui::Dialog {
   QLabel *m_resXLabel;
   QLabel *m_resTextLabel;
   QLabel *m_dpiLabel;
-  QLabel *m_projectLabel;
   QLabel *m_sceneNameLabel;
   DVGui::DoubleLineEdit *m_dpiFld;
   DVGui::MeasuredDoubleLineEdit *m_widthFld;
@@ -52,8 +52,9 @@ class StartupPopup final : public DVGui::Dialog {
   int m_dpi, m_xRes, m_yRes;
   bool m_updating = false;
   QString m_presetListFile;
-  QFrame *m_newSceneFrame;
-  QFrame *m_recentSceneFrame;
+  QGroupBox *m_projectBox;
+  QGroupBox *m_sceneBox;
+  QGroupBox *m_recentBox;
 
 public:
   StartupPopup();
