@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QLabel>
 #include <QMediaPlayer>
+#include <QIcon>
 
 // forward decl.
 class QComboBox;
@@ -53,7 +54,11 @@ class AudioRecordingPopup : public DVGui::Dialog {
   qint64 m_startPause = 0;
   qint64 m_endPause = 0;
   qint64 m_pausedTime = 0;
-  bool m_isPlaying, m_syncPlayback;
+  QIcon m_playIcon;
+  QIcon m_pauseIcon;
+  QIcon m_recordIcon;
+  QIcon m_stopIcon;
+  bool m_isPlaying, m_syncPlayback, m_stoppedAtEnd;
 
 public:
   AudioRecordingPopup();
