@@ -84,8 +84,6 @@ StartupPopup::StartupPopup()
   int namesCount = names.count();
   QVector<StartupLabel *> recentNamesLabels =
       QVector<StartupLabel *>(names.count());
-  // m_newSceneFrame        = new QFrame(this);
-  // m_recentSceneFrame     = new QFrame(this);
   m_projectBox = new QGroupBox(tr("Choose Project"), this);
   m_sceneBox   = new QGroupBox(tr("Create a New Scene"), this);
   m_recentBox  = new QGroupBox(tr("Open Scene"), this);
