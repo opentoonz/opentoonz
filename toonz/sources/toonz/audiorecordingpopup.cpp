@@ -28,7 +28,6 @@
 #include "tpixelutils.h"
 #include "iocommand.h"
 
-
 // Qt includes
 #include <QMainWindow>
 #include <QAudio>
@@ -60,14 +59,14 @@ AudioRecordingPopup::AudioRecordingPopup()
     : Dialog(TApp::instance()->getMainWindow(), false, true, "AudioRecording") {
   setWindowTitle(tr("Audio Recording"));
 
-  m_isPlaying    = false;
-  m_syncPlayback = true;
-  m_currentFrame = 0;
-  m_recordButton = new QPushButton(this);
-  m_playButton   = new QPushButton(this);
-  m_saveButton   = new QPushButton(tr("Save and Insert"));
+  m_isPlaying            = false;
+  m_syncPlayback         = true;
+  m_currentFrame         = 0;
+  m_recordButton         = new QPushButton(this);
+  m_playButton           = new QPushButton(this);
+  m_saveButton           = new QPushButton(tr("Save and Insert"));
   m_pauseRecordingButton = new QPushButton(this);
-  m_pausePlaybackButton = new QPushButton(this);
+  m_pausePlaybackButton  = new QPushButton(this);
   // m_refreshDevicesButton = new QPushButton(tr("Refresh"));
   m_duration           = new QLabel("00:00");
   m_playDuration       = new QLabel("00:00");
@@ -81,15 +80,15 @@ AudioRecordingPopup::AudioRecordingPopup()
   m_player             = new QMediaPlayer(this);
   m_console            = FlipConsole::getCurrent();
   m_audioRecorder      = new QAudioRecorder;
-  
+
   m_recordButton->setMaximumWidth(25);
   m_playButton->setMaximumWidth(25);
   m_pauseRecordingButton->setMaximumWidth(25);
   m_pausePlaybackButton->setMaximumWidth(25);
 
-  QString playDisabled = QString(":Resources/play_disabled.png");
-  QString pauseDisabled = QString(":Resources/pause_disabled.png");
-  QString stopDisabled = QString(":Resources/stop_disabled.png");
+  QString playDisabled   = QString(":Resources/play_disabled.png");
+  QString pauseDisabled  = QString(":Resources/pause_disabled.png");
+  QString stopDisabled   = QString(":Resources/stop_disabled.png");
   QString recordDisabled = QString(":Resources/record_disabled.png");
 
   m_pauseIcon = createQIconPNG("pause");
@@ -127,28 +126,28 @@ AudioRecordingPopup::AudioRecordingPopup()
       recordGridLay->addWidget(new QLabel(tr(" ")), 1, 0, Qt::AlignCenter);
       recordGridLay->addWidget(m_audioLevelsDisplay, 2, 0, 1, 4,
                                Qt::AlignCenter);
-	  QHBoxLayout *recordLay = new QHBoxLayout(this);
-	  recordLay->setSpacing(4);
-	  recordLay->setContentsMargins(0, 0, 0, 0);
-	  {
-		  recordLay->addStretch();
-		  recordLay->addWidget(m_recordButton);
-		  recordLay->addWidget(m_pauseRecordingButton);
-		  recordLay->addWidget(m_duration);
-		  recordLay->addStretch();
-	  }
-	  recordGridLay->addLayout(recordLay, 3, 0, 1, 4, Qt::AlignCenter);
-	  QHBoxLayout *playLay = new QHBoxLayout(this);
-	  playLay->setSpacing(4);
-	  playLay->setContentsMargins(0, 0, 0, 0);
-	  {
-		  playLay->addStretch();
-		  playLay->addWidget(m_playButton);
-		  playLay->addWidget(m_pausePlaybackButton);
-		  playLay->addWidget(m_playDuration);
-		  playLay->addStretch();
-	  }
-	  recordGridLay->addLayout(playLay, 4, 0, 1, 4, Qt::AlignCenter);
+      QHBoxLayout *recordLay = new QHBoxLayout(this);
+      recordLay->setSpacing(4);
+      recordLay->setContentsMargins(0, 0, 0, 0);
+      {
+        recordLay->addStretch();
+        recordLay->addWidget(m_recordButton);
+        recordLay->addWidget(m_pauseRecordingButton);
+        recordLay->addWidget(m_duration);
+        recordLay->addStretch();
+      }
+      recordGridLay->addLayout(recordLay, 3, 0, 1, 4, Qt::AlignCenter);
+      QHBoxLayout *playLay = new QHBoxLayout(this);
+      playLay->setSpacing(4);
+      playLay->setContentsMargins(0, 0, 0, 0);
+      {
+        playLay->addStretch();
+        playLay->addWidget(m_playButton);
+        playLay->addWidget(m_pausePlaybackButton);
+        playLay->addWidget(m_playDuration);
+        playLay->addStretch();
+      }
+      recordGridLay->addLayout(playLay, 4, 0, 1, 4, Qt::AlignCenter);
       recordGridLay->addWidget(new QLabel(tr(" ")), 5, 0, Qt::AlignCenter);
       recordGridLay->addWidget(m_saveButton, 6, 0, 1, 4,
                                Qt::AlignCenter | Qt::AlignVCenter);
@@ -189,8 +188,10 @@ AudioRecordingPopup::AudioRecordingPopup()
   connect(m_recordButton, SIGNAL(clicked()), this,
           SLOT(onRecordButtonPressed()));
   connect(m_playButton, SIGNAL(clicked()), this, SLOT(onPlayButtonPressed()));
-  connect(m_pauseRecordingButton, SIGNAL(clicked()), this, SLOT(onPauseRecordingButtonPressed()));
-  connect(m_pausePlaybackButton, SIGNAL(clicked()), this, SLOT(onPausePlaybackButtonPressed()));
+  connect(m_pauseRecordingButton, SIGNAL(clicked()), this,
+          SLOT(onPauseRecordingButtonPressed()));
+  connect(m_pausePlaybackButton, SIGNAL(clicked()), this,
+          SLOT(onPausePlaybackButtonPressed()));
   connect(m_audioRecorder, SIGNAL(durationChanged(qint64)), this,
           SLOT(updateRecordDuration(qint64)));
   connect(m_console, SIGNAL(playStateChanged(bool)), this,
@@ -236,14 +237,14 @@ void AudioRecordingPopup::onRecordButtonPressed() {
     m_recordButton->setIcon(m_stopIcon);
     m_saveButton->setDisabled(true);
     m_playButton->setDisabled(true);
-	m_pausePlaybackButton->setDisabled(true);
-	m_pauseRecordingButton->setEnabled(true);
+    m_pausePlaybackButton->setDisabled(true);
+    m_pauseRecordingButton->setEnabled(true);
     m_recordedLevels.clear();
-    m_oldElapsed = 0;
-	m_pausedTime = 0;
-	m_startPause = 0;
-	m_endPause = 0;
-	m_stoppedAtEnd = false;
+    m_oldElapsed   = 0;
+    m_pausedTime   = 0;
+    m_startPause   = 0;
+    m_endPause     = 0;
+    m_stoppedAtEnd = false;
     m_playDuration->setText("00:00");
     m_timer->restart();
     m_audioRecorder->record();
@@ -260,8 +261,8 @@ void AudioRecordingPopup::onRecordButtonPressed() {
     m_recordButton->setIcon(m_recordIcon);
     m_saveButton->setEnabled(true);
     m_playButton->setEnabled(true);
-	m_pauseRecordingButton->setDisabled(true);
-	m_pauseRecordingButton->setIcon(m_pauseIcon);
+    m_pauseRecordingButton->setDisabled(true);
+    m_pauseRecordingButton->setIcon(m_pauseIcon);
     if (m_syncPlayback) {
       if (m_isPlaying) {
         m_console->pressButton(FlipConsole::ePause);
@@ -315,13 +316,13 @@ void AudioRecordingPopup::onPlayButtonPressed() {
             SLOT(updatePlaybackDuration(qint64)));
     connect(m_player, SIGNAL(stateChanged(QMediaPlayer::State)), this,
             SLOT(onMediaStateChanged(QMediaPlayer::State)));
-	m_playButton->setIcon(m_stopIcon);
-	m_recordButton->setDisabled(true);
-	m_saveButton->setDisabled(true);
-	m_pausePlaybackButton->setEnabled(true);
-	m_stoppedAtEnd = false;
-	m_player->play();
-	    // this sometimes sets to one frame off, so + 1.
+    m_playButton->setIcon(m_stopIcon);
+    m_recordButton->setDisabled(true);
+    m_saveButton->setDisabled(true);
+    m_pausePlaybackButton->setEnabled(true);
+    m_stoppedAtEnd = false;
+    m_player->play();
+    // this sometimes sets to one frame off, so + 1.
     m_currentFrame = TApp::instance()->getCurrentFrame()->getFrame() + 1;
     if (m_syncPlayback && !m_isPlaying) {
       m_console->pressButton(FlipConsole::ePlay);
@@ -329,60 +330,57 @@ void AudioRecordingPopup::onPlayButtonPressed() {
     }
   } else {
     m_player->stop();
-	m_playButton->setIcon(m_playIcon);
-	m_pausePlaybackButton->setDisabled(true);
-	m_pausePlaybackButton->setIcon(m_pauseIcon);
+    m_playButton->setIcon(m_playIcon);
+    m_pausePlaybackButton->setDisabled(true);
+    m_pausePlaybackButton->setIcon(m_pauseIcon);
   }
 }
 
 //-----------------------------------------------------------------------------
 
 void AudioRecordingPopup::onPauseRecordingButtonPressed() {
-	if (m_audioRecorder->state() == QAudioRecorder::StoppedState) {
-		return;
-	}
-	else if (m_audioRecorder->state() == QAudioRecorder::PausedState) {
-		m_endPause = m_timer->elapsed();
-		m_pausedTime += m_endPause - m_startPause;
-		m_audioRecorder->record();
-		m_pauseRecordingButton->setIcon(m_pauseIcon);
-			if (m_syncPlayback && !m_isPlaying && !m_stoppedAtEnd) {
-			m_console->pressButton(FlipConsole::ePlay);
-			m_isPlaying = true;
-		}
-	}
-	else {
-		m_audioRecorder->pause();
-		m_pauseRecordingButton->setIcon(m_recordIcon);
-		m_startPause = m_timer->elapsed();
-		if (m_syncPlayback && m_isPlaying) {
-			m_isPlaying = false;
-			m_console->pressButton(FlipConsole::ePause);
-		}
-	}
+  if (m_audioRecorder->state() == QAudioRecorder::StoppedState) {
+    return;
+  } else if (m_audioRecorder->state() == QAudioRecorder::PausedState) {
+    m_endPause = m_timer->elapsed();
+    m_pausedTime += m_endPause - m_startPause;
+    m_audioRecorder->record();
+    m_pauseRecordingButton->setIcon(m_pauseIcon);
+    if (m_syncPlayback && !m_isPlaying && !m_stoppedAtEnd) {
+      m_console->pressButton(FlipConsole::ePlay);
+      m_isPlaying = true;
+    }
+  } else {
+    m_audioRecorder->pause();
+    m_pauseRecordingButton->setIcon(m_recordIcon);
+    m_startPause = m_timer->elapsed();
+    if (m_syncPlayback && m_isPlaying) {
+      m_isPlaying = false;
+      m_console->pressButton(FlipConsole::ePause);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void AudioRecordingPopup::onPausePlaybackButtonPressed() {
-	if (m_player->state() == QMediaPlayer::StoppedState) {
-		return;
-	} else if (m_player->state() == QMediaPlayer::PausedState) {
-		m_player->play();
-		m_pausePlaybackButton->setIcon(m_pauseIcon);
-		if (m_syncPlayback && !m_isPlaying && !m_stoppedAtEnd) {
-			m_console->pressButton(FlipConsole::ePlay);
-			m_isPlaying = true;
-		}
-	}
-	else {
-		m_player->pause();
-		m_pausePlaybackButton->setIcon(m_playIcon);
-		if (m_syncPlayback && m_isPlaying) {
-			m_isPlaying = false;
-			m_console->pressButton(FlipConsole::ePause);
-		}
-	}
+  if (m_player->state() == QMediaPlayer::StoppedState) {
+    return;
+  } else if (m_player->state() == QMediaPlayer::PausedState) {
+    m_player->play();
+    m_pausePlaybackButton->setIcon(m_pauseIcon);
+    if (m_syncPlayback && !m_isPlaying && !m_stoppedAtEnd) {
+      m_console->pressButton(FlipConsole::ePlay);
+      m_isPlaying = true;
+    }
+  } else {
+    m_player->pause();
+    m_pausePlaybackButton->setIcon(m_playIcon);
+    if (m_syncPlayback && m_isPlaying) {
+      m_isPlaying = false;
+      m_console->pressButton(FlipConsole::ePause);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -399,8 +397,8 @@ void AudioRecordingPopup::onMediaStateChanged(QMediaPlayer::State state) {
       TApp::instance()->getCurrentFrame()->setCurrentFrame(m_currentFrame);
     }
     m_playButton->setIcon(m_playIcon);
-	m_pausePlaybackButton->setIcon(m_pauseIcon);
-	m_pausePlaybackButton->setDisabled(true);
+    m_pausePlaybackButton->setIcon(m_pauseIcon);
+    m_pausePlaybackButton->setDisabled(true);
     m_recordButton->setEnabled(true);
     m_saveButton->setEnabled(true);
     m_isPlaying = false;
@@ -514,8 +512,7 @@ void AudioRecordingPopup::processBuffer(const QAudioBuffer &buffer) {
 
 void AudioRecordingPopup::onPlayStateChanged(bool playing) {
   // m_isPlaying = playing;
-	if (!playing && m_isPlaying)
-	m_stoppedAtEnd = true;
+  if (!playing && m_isPlaying) m_stoppedAtEnd = true;
 }
 
 //-----------------------------------------------------------------------------

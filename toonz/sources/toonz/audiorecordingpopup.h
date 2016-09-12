@@ -33,11 +33,9 @@ class AudioRecordingPopup : public DVGui::Dialog {
 
   QString m_deviceName;
   QPushButton
-	  *m_recordButton,  // *m_refreshDevicesButton, -refresh not working for now
-	  *m_playButton,
-	  *m_pauseRecordingButton,
-      *m_pausePlaybackButton,
-      *m_saveButton;
+      *m_recordButton,  // *m_refreshDevicesButton, -refresh not working for now
+      *m_playButton,
+      *m_pauseRecordingButton, *m_pausePlaybackButton, *m_saveButton;
   QComboBox *m_deviceListCB;
   QAudioRecorder *m_audioRecorder;
   QLabel *m_duration, *m_playDuration;
@@ -52,7 +50,7 @@ class AudioRecordingPopup : public DVGui::Dialog {
   QMap<qint64, double> m_recordedLevels;
   qint64 m_oldElapsed;
   qint64 m_startPause = 0;
-  qint64 m_endPause = 0;
+  qint64 m_endPause   = 0;
   qint64 m_pausedTime = 0;
   QIcon m_playIcon;
   QIcon m_pauseIcon;
