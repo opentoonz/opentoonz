@@ -84,11 +84,11 @@ StartupPopup::StartupPopup()
   int namesCount = names.count();
   QVector<StartupLabel *> recentNamesLabels =
       QVector<StartupLabel *>(names.count());
-  //m_newSceneFrame        = new QFrame(this);
-  //m_recentSceneFrame     = new QFrame(this);
+  // m_newSceneFrame        = new QFrame(this);
+  // m_recentSceneFrame     = new QFrame(this);
   m_projectBox = new QGroupBox(tr("Choose Project"), this);
-  m_sceneBox = new QGroupBox(tr("Create a New Scene"), this);
-  m_recentBox = new QGroupBox(tr("Open Scene"), this);
+  m_sceneBox   = new QGroupBox(tr("Create a New Scene"), this);
+  m_recentBox  = new QGroupBox(tr("Open Scene"), this);
   m_projectBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   m_nameFld                 = new LineEdit(this);
   m_pathFld                 = new FileField(0);
@@ -167,15 +167,14 @@ StartupPopup::StartupPopup()
 
     guiLay->addWidget(label, 0, 0, 1, 2, Qt::AlignLeft);
 
-	projectLay->setSpacing(8);
-	projectLay->setMargin(8);
-	{
-		projectLay->addWidget(m_projectsCB, 1);
-		projectLay->addWidget(newProjectButton, 0);
-	}
-	m_projectBox->setLayout(projectLay);
-	guiLay->addWidget(m_projectBox, 1, 0, 1, 1, Qt::AlignCenter);
-
+    projectLay->setSpacing(8);
+    projectLay->setMargin(8);
+    {
+      projectLay->addWidget(m_projectsCB, 1);
+      projectLay->addWidget(newProjectButton, 0);
+    }
+    m_projectBox->setLayout(projectLay);
+    guiLay->addWidget(m_projectBox, 1, 0, 1, 1, Qt::AlignCenter);
 
     newSceneLay->setMargin(8);
     newSceneLay->setVerticalSpacing(8);
@@ -225,7 +224,7 @@ StartupPopup::StartupPopup()
       newSceneLay->addWidget(m_fpsFld, 6, 1, 1, 1);
       newSceneLay->addWidget(createButton, 7, 1, 1, 3, Qt::AlignLeft);
     }
-	m_sceneBox->setLayout(newSceneLay);
+    m_sceneBox->setLayout(newSceneLay);
     guiLay->addWidget(m_sceneBox, 2, 0, 4, 1, Qt::AlignLeft);
 
     recentSceneLay->setMargin(8);
@@ -247,7 +246,7 @@ StartupPopup::StartupPopup()
           i++;
         }
       }
-	  m_recentBox->setLayout(recentSceneLay);
+      m_recentBox->setLayout(recentSceneLay);
       guiLay->addWidget(m_recentBox, 1, 1, 4, 1, Qt::AlignTop);
       guiLay->addWidget(loadOtherSceneButton, 5, 1, 1, 1, Qt::AlignRight);
     }
@@ -361,12 +360,12 @@ void StartupPopup::showEvent(QShowEvent *) {
   m_resXFld->setDecimals(0);
   m_resYFld->setDecimals(0);
 
-  int boxWidth = m_sceneBox->width();
+  int boxWidth  = m_sceneBox->width();
   int boxHeight = m_sceneBox->height();
   m_sceneBox->setFixedWidth(boxWidth);
   m_projectBox->setFixedWidth(boxWidth);
   m_recentBox->setMinimumHeight(boxHeight);
-  
+
   this->move(QApplication::desktop()->screen()->rect().center() -
              this->rect().center());
 }
