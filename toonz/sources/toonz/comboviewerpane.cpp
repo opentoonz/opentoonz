@@ -501,7 +501,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   m_previewButton = new TPanelTitleBarButton(
       titleBar, ":Resources/viewpreview.png", ":Resources/viewpreview_over.png",
       ":Resources/viewpreview_on.png");
-  x += 6 + iconWidth; 
+  x += 6 + iconWidth;
   titleBar->add(QPoint(x, 0), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
   ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)),
@@ -511,7 +511,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
       new TPanelTitleBarButton(titleBar, ":Resources/subcamera_preview.png",
                                ":Resources/subcamera_preview_over.png",
                                ":Resources/subcamera_preview_on.png");
-  x += 2 +27;  // width of viewpreview.png =28pixels
+  x += 2 + 27;  // width of viewpreview.png =28pixels
 
   titleBar->add(QPoint(x, 0), m_subcameraPreviewButton);
   m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));

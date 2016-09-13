@@ -357,16 +357,15 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                        SLOT(setReferenceMode(int)));
 
   button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
-	  ":Resources/freeze_over.png",
-	  ":Resources/freeze_on.png");
+                                    ":Resources/freeze_over.png",
+                                    ":Resources/freeze_on.png");
   button->setToolTip(tr("Freeze"));
   x += 6 + iconWidth;
   titleBar->add(QPoint(x, 0), button);
   ret = ret && connect(button, SIGNAL(toggled(bool)), m_sceneViewer,
-	  SLOT(freeze(bool)));
+                       SLOT(freeze(bool)));
   ret = ret && connect(m_sceneViewer, SIGNAL(freezeStateChanged(bool)), button,
-	  SLOT(setPressed(bool)));
-
+                       SLOT(setPressed(bool)));
 
   m_previewButton = new TPanelTitleBarButton(
       titleBar, ":Resources/viewpreview.png", ":Resources/viewpreview_over.png",
@@ -381,7 +380,7 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
       new TPanelTitleBarButton(titleBar, ":Resources/subcamera_preview.png",
                                ":Resources/subcamera_preview_over.png",
                                ":Resources/subcamera_preview_on.png");
-  x += 2 + 27; // viewerpreview size
+  x += 2 + 27;  // viewerpreview size
   titleBar->add(QPoint(x, 0), m_subcameraPreviewButton);
   m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));
   ret = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
