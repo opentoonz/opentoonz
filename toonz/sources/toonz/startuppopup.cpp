@@ -158,7 +158,7 @@ StartupPopup::StartupPopup()
     QGridLayout *guiLay         = new QGridLayout();
     QHBoxLayout *projectLay     = new QHBoxLayout();
     QGridLayout *newSceneLay    = new QGridLayout();
-    QGridLayout *recentSceneLay = new QGridLayout();
+    QVBoxLayout *recentSceneLay = new QVBoxLayout();
     guiLay->setMargin(10);
     guiLay->setVerticalSpacing(10);
     guiLay->setHorizontalSpacing(10);
@@ -226,23 +226,23 @@ StartupPopup::StartupPopup()
     guiLay->addWidget(m_sceneBox, 2, 0, 4, 1, Qt::AlignLeft);
 
     recentSceneLay->setMargin(8);
-    recentSceneLay->setVerticalSpacing(8);
-    recentSceneLay->setHorizontalSpacing(8);
+    recentSceneLay->setSpacing(8);
+    //recentSceneLay->setHorizontalSpacing(8);
     {
       // Recent Scene List
       if (names.count() <= 0) {
         recentSceneLay->addWidget(new QLabel(tr("No Recent Scenes"), this), 1,
-                                  0, 1, 1, Qt::AlignTop);
+                                  Qt::AlignTop);
       } else {
         int i = 0;
         for (QString name : names) {
           if (i > 6) break;
           QString justName = QString::fromStdString(TFilePath(name).getName());
           recentNamesLabels[i] = new StartupLabel(justName, this, i);
-          recentSceneLay->addWidget(recentNamesLabels[i], i, 0, 1, 1,
-                                    Qt::AlignTop);
+          recentSceneLay->addWidget(recentNamesLabels[i], i, Qt::AlignTop);
           i++;
         }
+		recentSceneLay->addStretch();
       }
       m_recentBox->setLayout(recentSceneLay);
       guiLay->addWidget(m_recentBox, 1, 1, 4, 1, Qt::AlignTop);
