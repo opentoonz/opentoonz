@@ -227,7 +227,6 @@ StartupPopup::StartupPopup()
 
     recentSceneLay->setMargin(8);
     recentSceneLay->setSpacing(8);
-	recentSceneLay->setAlignment(Qt::AlignTop);
     {
       // Recent Scene List
       if (names.count() <= 0) {
