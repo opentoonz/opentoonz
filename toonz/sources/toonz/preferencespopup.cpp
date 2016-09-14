@@ -1153,20 +1153,20 @@ PreferencesPopup::PreferencesPopup()
   m_customProjectRootFileField->setPath(m_pref->getCustomProjectRoot());
   
   int projectPaths = m_pref->getProjectRoot();
-  int documents = (projectPaths / 1000) % 10;
+  int stuff = (projectPaths / 1000) % 10;
   int desktop = (projectPaths / 100) % 10;
-  int stuff = (projectPaths / 10) % 10;
+  int documents = (projectPaths / 10) % 10;
   int custom = projectPaths % 10;
   m_projectRootDocuments->setChecked(documents);
   m_projectRootDesktop->setChecked(desktop);
   m_projectRootStuff->setChecked(stuff);
   m_projectRootCustom->setChecked(custom);
+  m_projectRootStuff->hide();
   if (!custom) {
 	  m_customProjectRootFileField->hide();
 	  m_customProjectRootLabel->hide();
 	  m_projectRootDirections->hide();
   }
-  m_projectRootDocuments->hide();
   //--- Interface ------------------------------
   QStringList styleSheetList;
   for (int i = 0; i < m_pref->getStyleSheetCount(); i++) {
@@ -1431,9 +1431,9 @@ PreferencesPopup::PreferencesPopup()
 		  projectRootLay->addWidget(new QLabel(" "), 0, 0);
 		  projectRootLay->addWidget(new QLabel(tr("Additional Project Locations:"), this), 1, 0,
 			  Qt::AlignRight | Qt::AlignVCenter);
-		  projectRootLay->addWidget(m_projectRootDocuments, 2, 0);
-		  projectRootLay->addWidget(m_projectRootDesktop, 3, 0);
-		  projectRootLay->addWidget(m_projectRootStuff, 4, 0);
+		  projectRootLay->addWidget(m_projectRootStuff, 2, 0);
+		  projectRootLay->addWidget(m_projectRootDocuments, 3, 0);
+		  projectRootLay->addWidget(m_projectRootDesktop, 4, 0);
 		  projectRootLay->addWidget(m_projectRootCustom, 5, 0);
 		  projectRootLay->addWidget(m_customProjectRootLabel, 6, 0,
 			  Qt::AlignRight | Qt::AlignVCenter);
