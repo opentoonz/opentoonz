@@ -20,14 +20,16 @@ using namespace TEnv;
 //-------------------------------------------------------------------
 namespace {
 TFilePath getMyDocumentsPath() {
-  QString documentsPath = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation)[0];
+  QString documentsPath =
+      QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation)[0];
   return TFilePath(documentsPath);
 }
 
 // Desktop Path
 TFilePath getDesktopPath() {
-	QString desktopPath = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation)[0];
-	return TFilePath(desktopPath);
+  QString desktopPath =
+      QStandardPaths::standardLocations(QStandardPaths::DesktopLocation)[0];
+  return TFilePath(desktopPath);
 }
 }
 //-------------------------------------------------------------------
