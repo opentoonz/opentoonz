@@ -977,17 +977,17 @@ void Preferences::setPixelsOnly(bool state) {
 //-----------------------------------------------------------------
 
 void Preferences::setProjectRoot(int index) {
-	//storing the index of the selection instead of the text
-	//to make translation work
-	m_projectRoot = index;
-	m_settings->setValue("projectRoot", m_projectRoot);
+  // storing the index of the selection instead of the text
+  // to make translation work
+  m_projectRoot = index;
+  m_settings->setValue("projectRoot", m_projectRoot);
 }
 
 //-----------------------------------------------------------------
 
 void Preferences::setCustomProjectRoot(std::wstring customProjectRoot) {
-	m_customProjectRoot = QString::fromStdWString(customProjectRoot);
-	m_settings->setValue("customProjectRoot", m_customProjectRoot);
+  m_customProjectRoot = QString::fromStdWString(customProjectRoot);
+  m_settings->setValue("customProjectRoot", m_customProjectRoot);
 }
 
 //-----------------------------------------------------------------

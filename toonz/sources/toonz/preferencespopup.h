@@ -69,8 +69,8 @@ private:
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
       *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
-	  *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
-    *m_onionSkinDuringPlayback;
+      *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
+      *m_onionSkinDuringPlayback;
 
   DVGui::FileField *m_customProjectRootFileField;
 

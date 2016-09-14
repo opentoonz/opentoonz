@@ -7,7 +7,6 @@
 #include "tconvert.h"
 #include "toonz/preferences.h"
 
-
 #ifdef _WIN32
 #include <shlobj.h>
 #include <Winnetwk.h>
@@ -20,47 +19,46 @@ using namespace TEnv;
 
 //-------------------------------------------------------------------
 
-
 TFilePath getMyDocumentsPath() {
 #ifdef _WIN32
-	WCHAR szPath[MAX_PATH];
-	if (SHGetSpecialFolderPathW(NULL, szPath, CSIDL_PERSONAL, 0)) {
-		return TFilePath(szPath);
-	}
-	return TFilePath();
+  WCHAR szPath[MAX_PATH];
+  if (SHGetSpecialFolderPathW(NULL, szPath, CSIDL_PERSONAL, 0)) {
+    return TFilePath(szPath);
+  }
+  return TFilePath();
 #elif defined MACOSX
-	NSArray *foundref = NSSearchPathForDirectoriesInDomains(
-		NSDocumentDirectory, NSUserDomainMask, YES);
-	if (!foundref) return TFilePath();
-	int c = [foundref count];
-	assert(c == 1);
-	NSString *documentsDirectory = [foundref objectAtIndex : 0];
-	return TFilePath((const char *)[documentsDirectory
-	cStringUsingEncoding : NSASCIIStringEncoding]);
+  NSArray *foundref = NSSearchPathForDirectoriesInDomains(
+      NSDocumentDirectory, NSUserDomainMask, YES);
+  if (!foundref) return TFilePath();
+  int c = [foundref count];
+  assert(c == 1);
+  NSString *documentsDirectory = [foundref objectAtIndex:0];
+  return TFilePath((const char *)[documentsDirectory
+      cStringUsingEncoding:NSASCIIStringEncoding]);
 #else
-	return TFilePath();
+  return TFilePath();
 #endif
 }
 
 // Desktop Path
 TFilePath getDesktopPath() {
 #ifdef _WIN32
-	WCHAR szPath[MAX_PATH];
-	if (SHGetSpecialFolderPathW(NULL, szPath, CSIDL_DESKTOP, 0)) {
-		return TFilePath(szPath);
-	}
-	return TFilePath();
+  WCHAR szPath[MAX_PATH];
+  if (SHGetSpecialFolderPathW(NULL, szPath, CSIDL_DESKTOP, 0)) {
+    return TFilePath(szPath);
+  }
+  return TFilePath();
 #elif defined MACOSX
-	NSArray *foundref = NSSearchPathForDirectoriesInDomains(
-		NSDesktopDirectory, NSUserDomainMask, YES);
-	if (!foundref) return TFilePath();
-	int c = [foundref count];
-	assert(c == 1);
-	NSString *desktopDirectory = [foundref objectAtIndex : 0];
-	return TFilePath((const char *)[desktopDirectory
-	cStringUsingEncoding : NSASCIIStringEncoding]);
+  NSArray *foundref = NSSearchPathForDirectoriesInDomains(
+      NSDesktopDirectory, NSUserDomainMask, YES);
+  if (!foundref) return TFilePath();
+  int c = [foundref count];
+  assert(c == 1);
+  NSString *desktopDirectory = [foundref objectAtIndex:0];
+  return TFilePath((const char *)[desktopDirectory
+      cStringUsingEncoding:NSASCIIStringEncoding]);
 #else
-	return TFilePath();
+  return TFilePath();
 #endif
 }
 
@@ -71,48 +69,49 @@ TFilePath ToonzFolder::getModulesDir() {
 }
 
 TFilePathSet ToonzFolder::getProjectsFolders() {
-	int location = Preferences::instance()->getProjectRoot();
-	QString path = Preferences::instance()->getCustomProjectRoot();
-	TFilePathSet fps;
-	int projectPaths = Preferences::instance()->getProjectRoot();
-	int stuff = (projectPaths / 1000) % 10;
-	int desktop = (projectPaths / 100) % 10;
-	int documents = (projectPaths / 10) % 10;
-	int custom = projectPaths % 10;
+  int location = Preferences::instance()->getProjectRoot();
+  QString path = Preferences::instance()->getCustomProjectRoot();
+  TFilePathSet fps;
+  int projectPaths = Preferences::instance()->getProjectRoot();
+  int stuff        = (projectPaths / 1000) % 10;
+  int desktop      = (projectPaths / 100) % 10;
+  int documents    = (projectPaths / 10) % 10;
+  int custom       = projectPaths % 10;
 
-	//make sure at least something is there
-	if (!desktop && !stuff && !custom) documents = 1;
-	//fps = getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
-	TFilePathSet tempFps = getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
-	if (stuff) {
-		for (TFilePath tempPath : tempFps) {
-			if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
-				fps.push_back(TFilePath(tempPath));
-			}
-		}
-		if (tempFps.size() == 0) fps.push_back(TEnv::getStuffDir() + "Projects");
-	}
-	if (documents) {
-		fps.push_back(getMyDocumentsPath() + "OpenToonz");
-		if (!TSystem::doesExistFileOrLevel(getMyDocumentsPath() + "OpenToonz")) {
-			TSystem::mkDir(getMyDocumentsPath() + "OpenToonz");
-		}
-	}
-	if (desktop) {
-		fps.push_back(getDesktopPath() + "OpenToonz");
-		if (!TSystem::doesExistFileOrLevel(getDesktopPath() + "OpenToonz")) {
-			TSystem::mkDir(getDesktopPath() + "OpenToonz");
-		}
-	}
-	if (custom) {
-		QStringList paths = path.split("**");
-		for (QString tempPath : paths) {
-			if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
-				fps.push_back(TFilePath(tempPath));
-			}
-		}		
-	}
-	return fps;
+  // make sure at least something is there
+  if (!desktop && !stuff && !custom) documents = 1;
+  // fps = getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
+  TFilePathSet tempFps =
+      getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
+  if (stuff) {
+    for (TFilePath tempPath : tempFps) {
+      if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
+        fps.push_back(TFilePath(tempPath));
+      }
+    }
+    if (tempFps.size() == 0) fps.push_back(TEnv::getStuffDir() + "Projects");
+  }
+  if (documents) {
+    fps.push_back(getMyDocumentsPath() + "OpenToonz");
+    if (!TSystem::doesExistFileOrLevel(getMyDocumentsPath() + "OpenToonz")) {
+      TSystem::mkDir(getMyDocumentsPath() + "OpenToonz");
+    }
+  }
+  if (desktop) {
+    fps.push_back(getDesktopPath() + "OpenToonz");
+    if (!TSystem::doesExistFileOrLevel(getDesktopPath() + "OpenToonz")) {
+      TSystem::mkDir(getDesktopPath() + "OpenToonz");
+    }
+  }
+  if (custom) {
+    QStringList paths = path.split("**");
+    for (QString tempPath : paths) {
+      if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
+        fps.push_back(TFilePath(tempPath));
+      }
+    }
+  }
+  return fps;
 }
 
 TFilePath ToonzFolder::getFirstProjectsFolder() {

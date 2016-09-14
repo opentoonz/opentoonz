@@ -279,30 +279,30 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onProjectRootChanged() {
-	int documents = m_projectRootDocuments->isChecked() ? 1 : 0;
-	int desktop = m_projectRootDesktop->isChecked() ? 1 : 0;
-	int stuff = m_projectRootStuff->isChecked() ? 1 : 0;
-	int custom = m_projectRootCustom->isChecked() ? 1 : 0;
-	
-	QString projects = QString::number(documents) + QString::number(desktop) + QString::number(stuff) + QString::number(custom);
-	m_pref->setProjectRoot(projects.toInt());
-	if (custom) {
-		m_customProjectRootFileField->show();
-		m_customProjectRootLabel->show();
-		m_projectRootDirections->show();
-	}
-	else {
-		m_customProjectRootFileField->hide();
-		m_customProjectRootLabel->hide();
-		m_projectRootDirections->hide();
-	}
+  int documents = m_projectRootDocuments->isChecked() ? 1 : 0;
+  int desktop   = m_projectRootDesktop->isChecked() ? 1 : 0;
+  int stuff     = m_projectRootStuff->isChecked() ? 1 : 0;
+  int custom    = m_projectRootCustom->isChecked() ? 1 : 0;
+
+  QString projects = QString::number(documents) + QString::number(desktop) +
+                     QString::number(stuff) + QString::number(custom);
+  m_pref->setProjectRoot(projects.toInt());
+  if (custom) {
+    m_customProjectRootFileField->show();
+    m_customProjectRootLabel->show();
+    m_projectRootDirections->show();
+  } else {
+    m_customProjectRootFileField->hide();
+    m_customProjectRootLabel->hide();
+    m_projectRootDirections->hide();
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onCustomProjectRootChanged() {
-	QString text = m_customProjectRootFileField->getPath();
-	m_pref->setCustomProjectRoot(text.toStdWString());
+  QString text = m_customProjectRootFileField->getPath();
+  m_pref->setCustomProjectRoot(text.toStdWString());
 }
 
 //-----------------------------------------------------------------------------
@@ -941,12 +941,13 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *sceneNumberingCB = new CheckBox(tr("Show Info in Rendered Frames"));
 
   m_projectRootDocuments = new CheckBox(tr("My Documents/OpenToonz*"), this);
-  m_projectRootDesktop = new CheckBox(tr("Desktop/OpenToonz*"), this);
-  m_projectRootStuff = new CheckBox(tr("Stuff Folder*"), this);
-  m_projectRootCustom = new CheckBox(tr("Custom*"), this);
+  m_projectRootDesktop   = new CheckBox(tr("Desktop/OpenToonz*"), this);
+  m_projectRootStuff     = new CheckBox(tr("Stuff Folder*"), this);
+  m_projectRootCustom    = new CheckBox(tr("Custom*"), this);
   m_customProjectRootFileField = new DVGui::FileField(this, QString(""));
-  m_customProjectRootLabel = new QLabel(tr("Custom Project Path(s): "));
-  m_projectRootDirections = new QLabel(tr("Advanced: Multiple paths can be separated by ** (No Spaces)"));
+  m_customProjectRootLabel     = new QLabel(tr("Custom Project Path(s): "));
+  m_projectRootDirections      = new QLabel(
+      tr("Advanced: Multiple paths can be separated by ** (No Spaces)"));
 
   QLabel *note_general =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
@@ -1151,21 +1152,21 @@ PreferencesPopup::PreferencesPopup()
   sceneNumberingCB->setChecked(m_pref->isSceneNumberingEnabled());
 
   m_customProjectRootFileField->setPath(m_pref->getCustomProjectRoot());
-  
+
   int projectPaths = m_pref->getProjectRoot();
-  int stuff = (projectPaths / 1000) % 10;
-  int desktop = (projectPaths / 100) % 10;
-  int documents = (projectPaths / 10) % 10;
-  int custom = projectPaths % 10;
+  int stuff        = (projectPaths / 1000) % 10;
+  int desktop      = (projectPaths / 100) % 10;
+  int documents    = (projectPaths / 10) % 10;
+  int custom       = projectPaths % 10;
   m_projectRootDocuments->setChecked(documents);
   m_projectRootDesktop->setChecked(desktop);
   m_projectRootStuff->setChecked(stuff);
   m_projectRootCustom->setChecked(custom);
   m_projectRootStuff->hide();
   if (!custom) {
-	  m_customProjectRootFileField->hide();
-	  m_customProjectRootLabel->hide();
-	  m_projectRootDirections->hide();
+    m_customProjectRootFileField->hide();
+    m_customProjectRootLabel->hide();
+    m_projectRootDirections->hide();
   }
   //--- Interface ------------------------------
   QStringList styleSheetList;
@@ -1423,24 +1424,25 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(sceneNumberingCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-	  QGridLayout *projectRootLay = new QGridLayout();
-	  projectRootLay->setMargin(0);
-	  projectRootLay->setHorizontalSpacing(5);
-	  projectRootLay->setVerticalSpacing(10);
-	  {
-		  projectRootLay->addWidget(new QLabel(" "), 0, 0);
-		  projectRootLay->addWidget(new QLabel(tr("Additional Project Locations:"), this), 1, 0,
-			  Qt::AlignRight | Qt::AlignVCenter);
-		  projectRootLay->addWidget(m_projectRootStuff, 2, 0);
-		  projectRootLay->addWidget(m_projectRootDocuments, 3, 0);
-		  projectRootLay->addWidget(m_projectRootDesktop, 4, 0);
-		  projectRootLay->addWidget(m_projectRootCustom, 5, 0);
-		  projectRootLay->addWidget(m_customProjectRootLabel, 6, 0,
-			  Qt::AlignRight | Qt::AlignVCenter);
-		  projectRootLay->addWidget(m_customProjectRootFileField, 6, 1, 1, 3);
-		  projectRootLay->addWidget(m_projectRootDirections, 7, 0, 1, 4);
-	  }
-	  generalFrameLay->addLayout(projectRootLay, 0);
+      QGridLayout *projectRootLay = new QGridLayout();
+      projectRootLay->setMargin(0);
+      projectRootLay->setHorizontalSpacing(5);
+      projectRootLay->setVerticalSpacing(10);
+      {
+        projectRootLay->addWidget(new QLabel(" "), 0, 0);
+        projectRootLay->addWidget(
+            new QLabel(tr("Additional Project Locations:"), this), 1, 0,
+            Qt::AlignRight | Qt::AlignVCenter);
+        projectRootLay->addWidget(m_projectRootStuff, 2, 0);
+        projectRootLay->addWidget(m_projectRootDocuments, 3, 0);
+        projectRootLay->addWidget(m_projectRootDesktop, 4, 0);
+        projectRootLay->addWidget(m_projectRootCustom, 5, 0);
+        projectRootLay->addWidget(m_customProjectRootLabel, 6, 0,
+                                  Qt::AlignRight | Qt::AlignVCenter);
+        projectRootLay->addWidget(m_customProjectRootFileField, 6, 1, 1, 3);
+        projectRootLay->addWidget(m_projectRootDirections, 7, 0, 1, 4);
+      }
+      generalFrameLay->addLayout(projectRootLay, 0);
       generalFrameLay->addStretch(1);
 
       generalFrameLay->addWidget(note_general, 0);
@@ -1920,16 +1922,16 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onSceneNumberingChanged(int)));
   ret = ret && connect(m_chunkSizeFld, SIGNAL(editingFinished()), this,
                        SLOT(onChunkSizeChanged()));
-  ret = ret && connect(m_customProjectRootFileField, SIGNAL(pathChanged()), this,
-					   SLOT(onCustomProjectRootChanged()));
+  ret = ret && connect(m_customProjectRootFileField, SIGNAL(pathChanged()),
+                       this, SLOT(onCustomProjectRootChanged()));
   ret = ret && connect(m_projectRootDocuments, SIGNAL(stateChanged(int)),
-	  SLOT(onProjectRootChanged()));
+                       SLOT(onProjectRootChanged()));
   ret = ret && connect(m_projectRootDesktop, SIGNAL(stateChanged(int)),
-	  SLOT(onProjectRootChanged()));
+                       SLOT(onProjectRootChanged()));
   ret = ret && connect(m_projectRootStuff, SIGNAL(stateChanged(int)),
-	  SLOT(onProjectRootChanged()));
+                       SLOT(onProjectRootChanged()));
   ret = ret && connect(m_projectRootCustom, SIGNAL(stateChanged(int)),
-	  SLOT(onProjectRootChanged()));
+                       SLOT(onProjectRootChanged()));
   //--- Interface ----------------------
   ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)),
                        SLOT(onStyleSheetTypeChanged(int)));

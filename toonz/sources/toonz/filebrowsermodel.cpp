@@ -212,7 +212,8 @@ DvDirModelFileFolderNode *DvDirModelFileFolderNode::createNode(
     DvDirModelNode *parent, const TFilePath &path) {
   DvDirModelFileFolderNode *node;
   // check the project nodes under the Poject Root Node
-  if (//QString::fromStdWString(parent->getName()).startsWith("Project root") &&
+  if (  // QString::fromStdWString(parent->getName()).startsWith("Project root")
+        // &&
       TProjectManager::instance()->isProject(path))
     node = new DvDirModelProjectNode(parent, path);
   else {
