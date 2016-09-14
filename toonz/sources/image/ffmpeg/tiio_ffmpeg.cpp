@@ -98,7 +98,8 @@ void Ffmpeg::setFrameRate(double fps) { m_frameRate = fps; }
 
 void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
-void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex, bool keepTransparency) {
+void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex,
+                                     bool keepTransparency) {
   QString tempPath = m_path.getQString() + "tempOut" +
                      QString::number(frameIndex).rightJustified(4, '0') + "." +
                      m_intermediateFormat;
