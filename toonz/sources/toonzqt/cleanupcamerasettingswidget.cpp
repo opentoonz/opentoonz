@@ -95,7 +95,7 @@ void CleanupCameraSettingsWidget::setFields(
   if (Preferences::instance()->getPixelsOnly()) {
     TDimension res = cleanupParameters->m_camera.getRes();
     cleanupParameters->m_camera.setSize(
-        TDimensionD(res.lx / Stage::inch, res.ly / Stage::inch));
+        TDimensionD(res.lx / Stage::standardDpi, res.ly / Stage::standardDpi));
   }
   m_cameraWidget->setFields(&cleanupParameters->m_camera);
   m_offsX->setValue(cleanupParameters->m_offx);

@@ -433,7 +433,7 @@ TFx *RasterFxPluginHost::clone(bool recursive) const {
     }
   }
 
-  printf("recursive:%d params:%d\n", recursive, params_.size());
+  printf("recursive:%d params:%d\n", (int)recursive, (int)params_.size());
   // clone params before TFx::clone().
   /* ui_pages_, param_views_ は pi に移ったが createParam
    * の呼び出しだけはしておかないと Fx Settings 構築時に assert failed になる */
@@ -628,7 +628,7 @@ ParamView *RasterFxPluginHost::createParamView() {
  * 通常一度だけ呼ばれ使い回される.  */
 void RasterFxPluginHost::build(ParamsPageSet *pages) {
   printf(">>>> RasterFxPluginHost::build: ui_pages:%d\n",
-         pi_->ui_pages_.size());
+         (int)pi_->ui_pages_.size());
   for (std::size_t i = 0, size = pi_->ui_pages_.size(); i < size; ++i) {
     pi_->ui_pages_[i]->build(this, pages);
   }
@@ -959,7 +959,7 @@ static inline bool check(const plugin_probe_t *begin,
   int idx = 0;
   if (!is_compatible<plugin_probe_t, 1, 0>(*begin)) {
 #if defined(VERBOSE)
-    printf("sanity check(): first interface version is unknown\n", idx);
+    printf("sanity check(): first interface version is unknown\n");
 #endif
     return false;
   }

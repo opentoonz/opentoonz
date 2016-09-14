@@ -107,7 +107,7 @@ class Disk {
     }
   }
 
-  // Illumina otto pixel simmetrici per ottenere la circonferenza del disco.
+  // Illumina otto pixel symmetrici per ottenere la circonferenza del disco.
   // Per ogni pixel illumina anche i vicini per gestire l'antialias.
   void makeAntiAliasedDiskBorder(const TRasterCM32P &ras, const TPoint &centre,
                                  const TPoint &point,

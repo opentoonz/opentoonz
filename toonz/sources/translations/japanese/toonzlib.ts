@@ -19,7 +19,7 @@
         <translation>ビデオ幅は %1 の倍数でなければなりません</translation>
     </message>
     <message>
-        <source>video lenght must be a multiple of %1</source>
+        <source>video length must be a multiple of %1</source>
         <translation>ビデオの長さは %1 の倍数でなければなりません</translation>
     </message>
     <message>

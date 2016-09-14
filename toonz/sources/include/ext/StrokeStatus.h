@@ -33,7 +33,7 @@ class DVAPI StrokeStatus : public CompositeStatus {
   // parameter of selected stroke
   double w_;
 
-  // lenght of selected stroke
+  // length of selected stroke
   double strokeLength_;
 
 public:

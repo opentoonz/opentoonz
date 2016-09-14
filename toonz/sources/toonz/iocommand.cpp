@@ -1257,8 +1257,8 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
 void IoCmd::newScene() {
   RenderingSuspender suspender;
   TApp *app        = TApp::instance();
-  double cameraDpi = 53.33333;  // used to be 64, consider changing to 120 or
-                                // 160
+  double cameraDpi = 120;  // used to be 64 and 53.33333
+
   if (!saveSceneIfNeeded(QApplication::tr("New Scene"))) return;
 
   IconGenerator::instance()->clearRequests();
@@ -1614,7 +1614,7 @@ bool IoCmd::saveAll() {
 
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
-
+  bool untitled     = scene->isUntitled();
   SceneResources resources(scene, 0);
   resources.save(scene->getScenePath());
   resources.updatePaths();
@@ -1622,7 +1622,7 @@ bool IoCmd::saveAll() {
   // for update title bar
   app->getCurrentLevel()->notifyLevelTitleChange();
   app->getCurrentPalette()->notifyPaletteTitleChanged();
-
+  if (untitled) scene->setUntitled();
   return result;
 }
 
@@ -1860,6 +1860,35 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
       scene->decodeFilePath(scene->getScenePath()));
   QAction *act = CommandManager::instance()->getAction(MI_RevertScene);
   if (act) act->setEnabled(exist);
+
+  // check if the output dpi is incompatible with pixels only mode
+  if (Preferences::instance()->getPixelsOnly()) {
+    TPointD dpi = scene->getCurrentCamera()->getDpi();
+    if (!areAlmostEqual(dpi.x, Stage::standardDpi) ||
+        !areAlmostEqual(dpi.y, Stage::standardDpi)) {
+      QString question = QObject::tr(
+          "This scene is incompatible with pixels only mode of the current "
+          "OpenToonz version.\nWhat would you like to do?");
+      QString turnOffPixelAnswer = QObject::tr("Turn off pixels only mode");
+      QString resizeSceneAnswer =
+          QObject::tr("Keep pixels only mode on and resize the scene");
+      int ret =
+          DVGui::MsgBox(question, turnOffPixelAnswer, resizeSceneAnswer, 0);
+      if (ret == 0) {
+      }                     // do nothing
+      else if (ret == 1) {  // Turn off pixels only mode
+        Preferences::instance()->setPixelsOnly(false);
+        app->getCurrentScene()->notifyPixelUnitSelected(false);
+      } else {  // ret = 2 : Resize the scene
+        TDimensionD camSize = scene->getCurrentCamera()->getSize();
+        TDimension camRes(camSize.lx * Stage::standardDpi,
+                          camSize.ly * Stage::standardDpi);
+        scene->getCurrentCamera()->setRes(camRes);
+        app->getCurrentScene()->setDirtyFlag(true);
+        app->getCurrentXsheet()->notifyXsheetChanged();
+      }
+    }
+  }
 
   printf("%s:%s loadScene() completed :\n", __FILE__, __FUNCTION__);
   return true;

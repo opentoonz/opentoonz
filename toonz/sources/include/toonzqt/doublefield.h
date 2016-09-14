@@ -184,9 +184,9 @@ public:
                   validator minimum and maximum value. */
   void getRange(double &minValue, double &maxValue) override;
 
-  /*! Set lenght of field value decimal part to \b decimals. */
+  /*! Set length of field value decimal part to \b decimals. */
   void setDecimals(int decimals);
-  /*! Return lenght of field value decimal part. */
+  /*! Return length of field value decimal part. */
   int getDecimals() override;
 };
 

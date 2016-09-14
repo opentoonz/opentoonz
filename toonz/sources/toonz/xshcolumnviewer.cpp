@@ -824,7 +824,11 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {
   }
 
   QColor pastelizer(m_viewer->getColumnHeadPastelizer());
-  p.fillRect(rect, (isSelected) ? ColorSelection : pastelizer);
+  pastelizer.setAlpha(50);
+
+  QColor colorSelection(m_viewer->getSelectedColumnHead());
+  colorSelection.setAlpha(170);
+  p.fillRect(rect, (isSelected) ? colorSelection : pastelizer);
 
   int prevViewImgHeight = RowHeight - 5;
   int prevViewImgWidth  = prevViewImgHeight * 5 / 4;
@@ -881,7 +885,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {
   QRect rr(rect.x() + 8, RowHeight * 2 + 3, rect.width() - 7, m_tabBox.y() - 3);
 
   // suddivisioni slider
-  p.setPen(Qt::black);
+  p.setPen(m_viewer->getTextColor());
   int xa = rr.x() + 7, ya = rr.y() + 4;
   int y = ya;
   for (int i = 0; i <= 20; i++, y += 3)

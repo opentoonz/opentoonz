@@ -69,7 +69,8 @@ private:
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
       *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
-	  *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff;
+	  *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
+    *m_onionSkinDuringPlayback;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -84,6 +85,7 @@ private slots:
   void onPixelsOnlyChanged(int index);
   void onProjectRootChanged();
   void onCustomProjectRootChanged();
+  void onPixelUnitExternallySelected(bool on);
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
   void onRoomChoiceChanged(int index);
@@ -146,6 +148,7 @@ private slots:
   void onColumnIconChange(const QString &);
   void onReplaceAfterSaveLevelAsChanged(int index);
   void onOnionSkinVisibilityChanged(int);
+  void onOnionSkinDuringPlaybackChanged(int);
   void onActualPixelOnSceneModeChanged(int);
   void onMultiLayerStylePickerChanged(int);
   void onLevelNameOnEachMarkerChanged(int);

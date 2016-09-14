@@ -743,6 +743,8 @@ bool RowArea::event(QEvent *event) {
       QToolTip::showText(mapToGlobal(m_pos), m_tooltip);
     else
       QToolTip::hideText();
+  } else if (event->type() == QEvent::Leave) {
+    m_showOnionToSet = None;
   }
   return QWidget::event(event);
 }

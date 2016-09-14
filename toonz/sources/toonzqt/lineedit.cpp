@@ -34,6 +34,7 @@ void LineEdit::focusInEvent(QFocusEvent *event) {
 void LineEdit::keyPressEvent(QKeyEvent *event) {
   if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
     m_isReturnPressed = true;
+    emit returnPressedNow();
     clearFocus();
     return;
   } else {

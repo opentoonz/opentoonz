@@ -43,7 +43,7 @@ namespace Stage {
 //=============================================================================
 
 DVVAR extern const double inch;
-DVVAR extern const double vectorDpi;
+DVVAR extern const double standardDpi;
 
 class Visitor;
 struct VisitArgs;
