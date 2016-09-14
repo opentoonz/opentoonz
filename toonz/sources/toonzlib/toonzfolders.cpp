@@ -6,7 +6,7 @@
 //#include "appmainshell.h"
 #include "tconvert.h"
 #include "toonz/preferences.h"
-
+#include <QStandardPaths>
 #ifdef _WIN32
 #include <shlobj.h>
 #include <Winnetwk.h>
@@ -20,46 +20,14 @@ using namespace TEnv;
 //-------------------------------------------------------------------
 namespace {
 TFilePath getMyDocumentsPath() {
-#ifdef _WIN32
-  WCHAR szPath[MAX_PATH];
-  if (SHGetSpecialFolderPathW(NULL, szPath, CSIDL_PERSONAL, 0)) {
-    return TFilePath(szPath);
-  }
-  return TFilePath();
-#elif defined MACOSX
-  NSArray *foundref = NSSearchPathForDirectoriesInDomains(
-      NSDocumentDirectory, NSUserDomainMask, YES);
-  if (!foundref) return TFilePath();
-  int c = [foundref count];
-  assert(c == 1);
-  NSString *documentsDirectory = [foundref objectAtIndex:0];
-  return TFilePath((const char *)[documentsDirectory
-      cStringUsingEncoding:NSASCIIStringEncoding]);
-#else
-  return TFilePath();
-#endif
+  QString documentsPath = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation)[0];
+  return TFilePath(documentsPath);
 }
 
 // Desktop Path
 TFilePath getDesktopPath() {
-#ifdef _WIN32
-  WCHAR szPath[MAX_PATH];
-  if (SHGetSpecialFolderPathW(NULL, szPath, CSIDL_DESKTOP, 0)) {
-    return TFilePath(szPath);
-  }
-  return TFilePath();
-#elif defined MACOSX
-  NSArray *foundref = NSSearchPathForDirectoriesInDomains(
-      NSDesktopDirectory, NSUserDomainMask, YES);
-  if (!foundref) return TFilePath();
-  int c = [foundref count];
-  assert(c == 1);
-  NSString *desktopDirectory = [foundref objectAtIndex:0];
-  return TFilePath((const char *)[desktopDirectory
-      cStringUsingEncoding:NSASCIIStringEncoding]);
-#else
-  return TFilePath();
-#endif
+	QString desktopPath = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation)[0];
+	return TFilePath(desktopPath);
 }
 }
 //-------------------------------------------------------------------
