@@ -227,6 +227,7 @@ StartupPopup::StartupPopup()
 
     recentSceneLay->setMargin(8);
     recentSceneLay->setSpacing(8);
+	recentSceneLay->setAlignment(Qt::AlignTop);
     {
       // Recent Scene List
       if (names.count() <= 0) {
@@ -241,7 +242,7 @@ StartupPopup::StartupPopup()
           recentSceneLay->addWidget(recentNamesLabels[i], i, Qt::AlignTop);
           i++;
         }
-        recentSceneLay->addStretch();
+        recentSceneLay->addStretch(100);
       }
       m_recentBox->setLayout(recentSceneLay);
       guiLay->addWidget(m_recentBox, 1, 1, 4, 1, Qt::AlignTop);
