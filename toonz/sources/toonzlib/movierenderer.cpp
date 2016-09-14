@@ -209,7 +209,8 @@ void MovieRenderer::Imp::prepareForStart() {
 
       if (TSystem::doesExistFileOrLevel(fp)) {
         bool remove = false;
-
+		std::string type = fp.getType();
+		bool usesFfmpeg = type == "gif" || type == "mp4" || type == "web";
         // In case the raster specifics are different from those of a currently
         // existing movie, erase it
         try {
@@ -217,7 +218,7 @@ void MovieRenderer::Imp::prepareForStart() {
           lr->loadInfo();
 
           const TImageInfo *info = lr->getImageInfo();
-          if (!info || info->m_lx != imageSize.lx || info->m_ly != imageSize.ly)
+          if (!info || info->m_lx != imageSize.lx || info->m_ly != imageSize.ly || usesFfmpeg)
             TSystem::removeFileOrLevel(fp);  // nothrow
         } catch (...) {
           // Same if the level could not be read/opened
