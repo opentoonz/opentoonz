@@ -18,7 +18,7 @@ class Ffmpeg {
 public:
   Ffmpeg();
   ~Ffmpeg();
-  void createIntermediateImage(const TImageP &image, int frameIndex);
+  void createIntermediateImage(const TImageP &image, int frameIndex, bool keepTransparency = true);
   void runFfmpeg(QStringList preIArgs, QStringList postIArgs,
                  bool includesInPath, bool includesOutPath,
                  bool overWriteFiles);

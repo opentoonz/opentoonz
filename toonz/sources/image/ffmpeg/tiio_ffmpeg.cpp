@@ -98,7 +98,7 @@ void Ffmpeg::setFrameRate(double fps) { m_frameRate = fps; }
 
 void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
-void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
+void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex, bool keepTransparency) {
   QString tempPath = m_path.getQString() + "tempOut" +
                      QString::number(frameIndex).rightJustified(4, '0') + "." +
                      m_intermediateFormat;
@@ -126,9 +126,9 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   const char *format = ba.data();
 
   QImage qi = QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
-  if (m_path.getType() == "gif") {
-    // will only get here for non-transparent gif images - need to fill
-    // transparency
+  // ffmpeg renders transparent gif areas as black
+  if (!keepTransparency) {
+    // will only get here for non-trimmed gif images
     QImage nonTranspImage = QImage(m_lx, m_ly, QImage::Format_ARGB32);
     nonTranspImage.fill(qRgba(255, 255, 255, 255));
     QPainter painter;

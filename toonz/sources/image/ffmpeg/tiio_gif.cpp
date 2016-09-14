@@ -370,7 +370,7 @@ void TLevelWriterGif::save(const TImageP &img, int frameIndex) {
       if (b > m_bottom) m_bottom = b;
     }
   } else {
-    ffmpegWriter->createIntermediateImage(img, frameIndex);
+    ffmpegWriter->createIntermediateImage(img, frameIndex, m_transparent);
   }
   m_frameCount++;
 }
