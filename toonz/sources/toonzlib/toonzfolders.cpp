@@ -3,17 +3,9 @@
 #include "toonz/toonzfolders.h"
 #include "tsystem.h"
 #include "tenv.h"
-//#include "appmainshell.h"
 #include "tconvert.h"
 #include "toonz/preferences.h"
 #include <QStandardPaths>
-#ifdef _WIN32
-#include <shlobj.h>
-#include <Winnetwk.h>
-#endif
-#ifdef MACOSX
-#include <Cocoa/Cocoa.h>
-#endif
 
 using namespace TEnv;
 
