@@ -287,7 +287,7 @@ Preferences::Preferences()
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
-    , m_projectRoot(1000)
+    , m_projectRoot(0x08)
     , m_customProjectRoot("")
     , m_precompute(true)
     , m_ffmpegTimeout(30) {

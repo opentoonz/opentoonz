@@ -45,6 +45,7 @@
 #include <QMainWindow>
 #include <QStringList>
 #include <QListWidget>
+#include <QGroupBox>
 
 using namespace DVGui;
 
@@ -279,15 +280,13 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onProjectRootChanged() {
-  int documents = m_projectRootDocuments->isChecked() ? 1 : 0;
-  int desktop   = m_projectRootDesktop->isChecked() ? 1 : 0;
-  int stuff     = m_projectRootStuff->isChecked() ? 1 : 0;
-  int custom    = m_projectRootCustom->isChecked() ? 1 : 0;
-
-  QString projects = QString::number(documents) + QString::number(desktop) +
-                     QString::number(stuff) + QString::number(custom);
-  m_pref->setProjectRoot(projects.toInt());
-  if (custom) {
+  int index = 0;
+  if (m_projectRootStuff->isChecked()) index |= 0x08;
+  if (m_projectRootDocuments->isChecked()) index |= 0x04;
+  if (m_projectRootDesktop->isChecked()) index |= 0x02;
+  if (m_projectRootCustom->isChecked()) index |= 0x01;
+  m_pref->setProjectRoot(index);
+  if (index & 0x01) {
     m_customProjectRootFileField->show();
     m_customProjectRootLabel->show();
     m_projectRootDirections->show();
@@ -1154,16 +1153,13 @@ PreferencesPopup::PreferencesPopup()
   m_customProjectRootFileField->setPath(m_pref->getCustomProjectRoot());
 
   int projectPaths = m_pref->getProjectRoot();
-  int stuff        = (projectPaths / 1000) % 10;
-  int desktop      = (projectPaths / 100) % 10;
-  int documents    = (projectPaths / 10) % 10;
-  int custom       = projectPaths % 10;
-  m_projectRootDocuments->setChecked(documents);
-  m_projectRootDesktop->setChecked(desktop);
-  m_projectRootStuff->setChecked(stuff);
-  m_projectRootCustom->setChecked(custom);
+  m_projectRootStuff->setChecked(projectPaths & 0x08);
+  m_projectRootDocuments->setChecked(projectPaths & 0x04);
+  m_projectRootDesktop->setChecked(projectPaths & 0x02);
+  m_projectRootCustom->setChecked(projectPaths & 0x01);
+
   m_projectRootStuff->hide();
-  if (!custom) {
+  if (!(projectPaths & 0x01)) {
     m_customProjectRootFileField->hide();
     m_customProjectRootLabel->hide();
     m_projectRootDirections->hide();
@@ -1424,25 +1420,24 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(sceneNumberingCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      QGroupBox *projectGroupBox =
+          new QGroupBox(tr("Additional Project Locations"), this);
       QGridLayout *projectRootLay = new QGridLayout();
-      projectRootLay->setMargin(0);
+      projectRootLay->setMargin(10);
       projectRootLay->setHorizontalSpacing(5);
       projectRootLay->setVerticalSpacing(10);
       {
-        projectRootLay->addWidget(new QLabel(" "), 0, 0);
-        projectRootLay->addWidget(
-            new QLabel(tr("Additional Project Locations:"), this), 1, 0,
-            Qt::AlignRight | Qt::AlignVCenter);
-        projectRootLay->addWidget(m_projectRootStuff, 2, 0);
-        projectRootLay->addWidget(m_projectRootDocuments, 3, 0);
-        projectRootLay->addWidget(m_projectRootDesktop, 4, 0);
-        projectRootLay->addWidget(m_projectRootCustom, 5, 0);
-        projectRootLay->addWidget(m_customProjectRootLabel, 6, 0,
+        projectRootLay->addWidget(m_projectRootStuff, 0, 0);
+        projectRootLay->addWidget(m_projectRootDocuments, 1, 0);
+        projectRootLay->addWidget(m_projectRootDesktop, 2, 0);
+        projectRootLay->addWidget(m_projectRootCustom, 3, 0);
+        projectRootLay->addWidget(m_customProjectRootLabel, 4, 0,
                                   Qt::AlignRight | Qt::AlignVCenter);
-        projectRootLay->addWidget(m_customProjectRootFileField, 6, 1, 1, 3);
-        projectRootLay->addWidget(m_projectRootDirections, 7, 0, 1, 4);
+        projectRootLay->addWidget(m_customProjectRootFileField, 4, 1, 1, 3);
+        projectRootLay->addWidget(m_projectRootDirections, 5, 0, 1, 4);
       }
-      generalFrameLay->addLayout(projectRootLay, 0);
+      projectGroupBox->setLayout(projectRootLay);
+      generalFrameLay->addWidget(projectGroupBox, 0);
       generalFrameLay->addStretch(1);
 
       generalFrameLay->addWidget(note_general, 0);

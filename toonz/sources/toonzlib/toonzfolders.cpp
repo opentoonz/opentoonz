@@ -35,14 +35,13 @@ TFilePathSet ToonzFolder::getProjectsFolders() {
   QString path = Preferences::instance()->getCustomProjectRoot();
   TFilePathSet fps;
   int projectPaths = Preferences::instance()->getProjectRoot();
-  int stuff        = (projectPaths / 1000) % 10;
-  int desktop      = (projectPaths / 100) % 10;
-  int documents    = (projectPaths / 10) % 10;
-  int custom       = projectPaths % 10;
+  bool stuff       = projectPaths & 0x08;
+  bool documents   = projectPaths & 0x04;
+  bool desktop     = projectPaths & 0x02;
+  bool custom      = projectPaths & 0x01;
 
   // make sure at least something is there
-  if (!desktop && !stuff && !custom) documents = 1;
-  // fps = getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
+  if (!desktop && !custom && !documents) stuff = 1;
   TFilePathSet tempFps =
       getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
   if (stuff) {
