@@ -337,12 +337,12 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack) {
   if (sndtrack->getBitPerSample() == 8 && sndtrack->isSampleSigned())
     throw TException("The format (8 bit signed) is incompatible with WAV file");
 
-  TINT32 soundDataLenght =
+  TINT32 soundDataLength =
       (TINT32)(sndtrack->getSampleCount() * (sndtrack->getBitPerSample() / 8) *
                sndtrack->getChannelCount() /*sndtrack->getSampleSize()*/);
 
   TINT32 RIFFChunkLength =
-      TFMTChunk::LENGTH + TWAVChunk::HDR_LENGTH + soundDataLenght;
+      TFMTChunk::LENGTH + TWAVChunk::HDR_LENGTH + soundDataLength;
 
   TFileStatus fs(m_path);
   if (fs.doesExist() && !fs.isWritable())
@@ -363,9 +363,9 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack) {
                               fmtChunk.m_chans;  // sndtrack->getSampleSize();
   fmtChunk.m_bitPerSample = sndtrack->getBitPerSample();
 
-  TDATAChunk dataChunk(soundDataLenght);
+  TDATAChunk dataChunk(soundDataLength);
 
-  std::unique_ptr<UCHAR[]> waveData(new UCHAR[soundDataLenght]);
+  std::unique_ptr<UCHAR[]> waveData(new UCHAR[soundDataLength]);
 
   if (!TNZ_LITTLE_ENDIAN) RIFFChunkLength = swapTINT32(RIFFChunkLength);
 
@@ -373,7 +373,7 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack) {
 #if (!TNZ_LITTLE_ENDIAN)
   {
     if (fmtChunk.m_bitPerSample == 8)
-      memcpy((void *)waveData, (void *)sndtrack->getRawData(), soundDataLenght);
+      memcpy((void *)waveData, (void *)sndtrack->getRawData(), soundDataLength);
     else if (fmtChunk.m_bitPerSample == 16) {
       swapAndCopySamples((short *)sndtrack->getRawData(), (short *)waveData,
                          sndtrack->getSampleCount() * fmtChunk.m_chans);
@@ -391,7 +391,7 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack) {
   {
     if (fmtChunk.m_bitPerSample != 24)
       memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(),
-             soundDataLenght);
+             soundDataLength);
     else {  // togliere quarto byte
       UCHAR *begin = (UCHAR *)sndtrack->getRawData();
       for (int i = 0; i < (int)sndtrack->getSampleCount() * fmtChunk.m_chans;

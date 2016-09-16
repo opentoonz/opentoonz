@@ -556,7 +556,7 @@ struct TStroke::Imp {
   BYTE m_flag;
 
   //! This flag checks if changes occurs and if it is neccessary to update
-  //! lenght.
+  //! length.
   bool m_isValidLength;
 
   //! This flag checks if changes occurs and if it is neccessary to update
@@ -570,7 +570,7 @@ struct TStroke::Imp {
   TRectD m_bBox;
 
   //! This vector contains length computed for  each control point of stroke.
-  DoubleArray m_partialLenghtArray;
+  DoubleArray m_partialLengthArray;
 
   //! This vector contains parameter computed for each control point of stroke.
   DoubleArray m_parameterValueAtControlPoint;
@@ -659,7 +659,7 @@ false ->  ok
   bool retrieveChunkAndItsParamameter(double w, int &chunk, double &t);
 
   /*!
-From lenght s retrieves chunk and its parameter ( t in [0,1] ).
+From length s retrieves chunk and its parameter ( t in [0,1] ).
 Return
 true  ->  error (parameter w out of range, etc)
 false ->  ok
@@ -793,7 +793,7 @@ void TStroke::Imp::swapGeometry(Imp &other) throw() {
   std::swap(m_isOutlineValid, other.m_isOutlineValid);
   std::swap(m_areDisabledComputeOfCaches, other.m_areDisabledComputeOfCaches);
   std::swap(m_bBox, other.m_bBox);
-  std::swap(m_partialLenghtArray, other.m_partialLenghtArray);
+  std::swap(m_partialLengthArray, other.m_partialLengthArray);
   std::swap(m_parameterValueAtControlPoint,
             other.m_parameterValueAtControlPoint);
   std::swap(m_centerLineArray, other.m_centerLineArray);
@@ -820,10 +820,10 @@ void TStroke::Imp::computeCacheVector() {
     if (getChunkCount() > 0)  // se ci sono cionchi
     {
       // (re)inizializzo un vettore
-      m_partialLenghtArray.resize(getControlPointCount(),
+      m_partialLengthArray.resize(getControlPointCount(),
                                   (std::numeric_limits<double>::max)());
 
-      m_partialLenghtArray[0] = 0.0;
+      m_partialLengthArray[0] = 0.0;
 
       double length = 0.0;
       int j         = 0;
@@ -835,15 +835,15 @@ void TStroke::Imp::computeCacheVector() {
         assert(j <= getControlPointCount());
         tq = getChunk(i);
         lengthEvaluator.setQuad(*tq);
-        m_partialLenghtArray[j++] = length;
-        m_partialLenghtArray[j++] = length + lengthEvaluator.getLengthAt(0.5);
+        m_partialLengthArray[j++] = length;
+        m_partialLengthArray[j++] = length + lengthEvaluator.getLengthAt(0.5);
         length += lengthEvaluator.getLengthAt(1.0);
       }
 
-      m_partialLenghtArray[j++] = length;
+      m_partialLengthArray[j++] = length;
       assert(j == getControlPointCount());
       // assert( m_parameterValueAtControlPoint.size() ==
-      // m_partialLenghtArray.size() );
+      // m_partialLengthArray.size() );
     }
     m_isValidLength = true;
   }
@@ -932,18 +932,18 @@ bool TStroke::Imp::retrieveChunkAndItsParamameterAtLength(double s, int &chunk,
   vector<double>::iterator first;
 
   // cerco nella cache la posizione che compete alla lunghezza s
-  first = std::upper_bound(m_partialLenghtArray.begin(),
-                           m_partialLenghtArray.end(), s);
+  first = std::upper_bound(m_partialLengthArray.begin(),
+                           m_partialLengthArray.end(), s);
 
   // se s e' interna al vettore di cache
-  if (first != m_partialLenghtArray.end()) {
+  if (first != m_partialLengthArray.end()) {
     // individuo il punto di controllo della stroke...
-    int controlPointOffset = distance(m_partialLenghtArray.begin(), first);
+    int controlPointOffset = distance(m_partialLengthArray.begin(), first);
 
     // ...e da questo il cionco relativo.
     chunk = retrieveChunkFromControlPointIndex(controlPointOffset);
 
-    if (first != m_partialLenghtArray.begin() && s == *(first - 1)) {
+    if (first != m_partialLengthArray.begin() && s == *(first - 1)) {
       controlPointOffset--;
       if (controlPointOffset & 1) {
         const DoublePair &p = retrieveParametersFromChunk(chunk);
@@ -956,9 +956,9 @@ bool TStroke::Imp::retrieveChunkAndItsParamameterAtLength(double s, int &chunk,
     }
 
     // fisso un offset per l'algoritmo di bisezione
-    double offset = (first == m_partialLenghtArray.begin())
+    double offset = (first == m_partialLengthArray.begin())
                         ? s
-                        : s - m_partialLenghtArray[chunk * 2];
+                        : s - m_partialLengthArray[chunk * 2];
 
     // cerco il parametro minimo a meno di una tolleranza epsilon
 
@@ -974,7 +974,7 @@ bool TStroke::Imp::retrieveChunkAndItsParamameterAtLength(double s, int &chunk,
     // se l'algoritmo di ricerca ha fallito fissa il valore ad uno dei due
     // estremi
     if (t == -1) {
-      if (s <= m_partialLenghtArray[controlPointOffset]) t = 0.0;
+      if (s <= m_partialLengthArray[controlPointOffset]) t = 0.0;
       t                                                    = 1.0;
     }
 
@@ -984,7 +984,7 @@ bool TStroke::Imp::retrieveChunkAndItsParamameterAtLength(double s, int &chunk,
   if (s <= 0.0) {
     chunk = 0;
     t     = 0.0;
-  } else if (s >= m_partialLenghtArray.back()) {
+  } else if (s >= m_partialLengthArray.back()) {
     chunk = getChunkCount() - 1;
     t     = 1.0;
   }
@@ -1156,8 +1156,8 @@ void TStroke::Imp::print(ostream &os) {
 
   os << "m_bBox:" << m_bBox << endl;
 
-  os << "m_partialLenghtArray";
-  printContainer(os, m_partialLenghtArray);
+  os << "m_partialLengthArray";
+  printContainer(os, m_partialLengthArray);
   os << endl;
 
   os << "m_parameterValueAtControlPoint";
@@ -1242,9 +1242,9 @@ TStroke::TStroke(const TStroke &other)
   //   other.m_imp->m_centerLineArray.end(),
   //   TThickQuadraticArrayInsertIterator(m_imp->m_centerLineArray));
 
-  copy(other.m_imp->m_partialLenghtArray.begin(),
-       other.m_imp->m_partialLenghtArray.end(),
-       back_inserter<DoubleArray>(m_imp->m_partialLenghtArray));
+  copy(other.m_imp->m_partialLengthArray.begin(),
+       other.m_imp->m_partialLengthArray.end(),
+       back_inserter<DoubleArray>(m_imp->m_partialLengthArray));
   copy(other.m_imp->m_parameterValueAtControlPoint.begin(),
        other.m_imp->m_parameterValueAtControlPoint.end(),
        back_inserter<DoubleArray>(m_imp->m_parameterValueAtControlPoint));
@@ -1507,7 +1507,7 @@ void TStroke::reshape(const TThickPoint pos[], int count) {
 double TStroke::getApproximateLength(double w0, double w1, double error) const {
   m_imp->computeCacheVector();
 
-  assert((int)m_imp->m_partialLenghtArray.size() == getControlPointCount());
+  assert((int)m_imp->m_partialLengthArray.size() == getControlPointCount());
 
   if (w0 == w1) return 0.0;
 
@@ -1529,7 +1529,7 @@ double TStroke::getApproximateLength(double w0, double w1, double error) const {
         *first < w1 + TConsts::epsilon) {
       int offset =
           distance(m_imp->m_parameterValueAtControlPoint.begin(), first);
-      return m_imp->m_partialLenghtArray[offset];
+      return m_imp->m_partialLengthArray[offset];
     }
   }
 
@@ -1594,11 +1594,11 @@ double TStroke::getLength(double w0, double w1) const {
 double TStroke::getLength(int chunk, double t) const {
   // Compute length caches
   m_imp->computeCacheVector();
-  assert((int)m_imp->m_partialLenghtArray.size() == getControlPointCount());
+  assert((int)m_imp->m_partialLengthArray.size() == getControlPointCount());
 
   if (t == 1.0) ++chunk, t = 0.0;
 
-  double s = m_imp->m_partialLenghtArray[chunk << 1];
+  double s = m_imp->m_partialLengthArray[chunk << 1];
   if (t > 0.0) s += getChunk(chunk)->getLength(t);
 
   return s;
@@ -2184,11 +2184,11 @@ TPointD TStroke::getSpeedAtLength(double s) const {
 double TStroke::getLengthAtControlPoint(int n) const {
   m_imp->computeCacheVector();
 
-  if (n >= getControlPointCount()) return m_imp->m_partialLenghtArray.back();
+  if (n >= getControlPointCount()) return m_imp->m_partialLengthArray.back();
 
-  if (n <= 0) return m_imp->m_partialLenghtArray.front();
+  if (n <= 0) return m_imp->m_partialLengthArray.front();
 
-  return m_imp->m_partialLenghtArray[n];
+  return m_imp->m_partialLengthArray[n];
 }
 
 //-----------------------------------------------------------------------------

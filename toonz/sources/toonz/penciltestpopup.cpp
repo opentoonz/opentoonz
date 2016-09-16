@@ -33,6 +33,7 @@
 // TnzCore includes
 #include "tsystem.h"
 #include "tpixelutils.h"
+#include "tenv.h"
 
 #include <algorithm>
 
@@ -66,6 +67,9 @@
 #include <QRegExpValidator>
 
 using namespace DVGui;
+
+// Connected camera
+TEnv::StringVar CamCapCameraName("CamCapCameraName", "");
 
 namespace {
 
@@ -363,7 +367,7 @@ void MyViewFinder::paintEvent(QPaintEvent* event) {
   }
 }
 
-void MyViewFinder::resizeEvent(QResizeEvent* event) {
+void MyViewFinder::updateSize() {
   if (!m_camera) return;
   QSize cameraReso = m_camera->viewfinderSettings().resolution();
   double cameraAR  = (double)cameraReso.width() / (double)cameraReso.height();
@@ -380,6 +384,8 @@ void MyViewFinder::resizeEvent(QResizeEvent* event) {
     m_imageRect.moveTo((width() - m_imageRect.width()) / 2, 0);
   }
 }
+
+void MyViewFinder::resizeEvent(QResizeEvent* event) { updateSize(); }
 
 //=============================================================================
 
@@ -449,10 +455,34 @@ void FrameNumberLineEdit::focusOutEvent(QFocusEvent*) {}
 
 //=============================================================================
 
+LevelNameLineEdit::LevelNameLineEdit(QWidget* parent)
+    : QLineEdit(parent), m_textOnFocusIn("") {
+  // Exclude all character which cannot fit in a filepath (Win).
+  // Dots are also prohibited since they are internally managed by Toonz.
+  QRegExp rx("[^\\\\/:?*.\"<>|]+");
+  setValidator(new QRegExpValidator(rx, this));
+  setObjectName("LargeSizedText");
+
+  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+}
+
+void LevelNameLineEdit::focusInEvent(QFocusEvent* e) {
+  m_textOnFocusIn = text();
+}
+
+void LevelNameLineEdit::onEditingFinished() {
+  // if the content is not changed, do nothing.
+  if (text() == m_textOnFocusIn) return;
+
+  emit levelNameEdited();
+}
+
+//=============================================================================
+
 PencilTestPopup::PencilTestPopup()
     : Dialog(TApp::instance()->getMainWindow(), false, false, "PencilTest")
-    , m_currentCamera(0)
-    , m_cameraImageCapture(0)
+    , m_currentCamera(NULL)
+    , m_cameraImageCapture(NULL)
     , m_captureWhiteBGCue(false)
     , m_captureCue(false) {
   setWindowTitle(tr("Camera Capture"));
@@ -479,7 +509,7 @@ PencilTestPopup::PencilTestPopup()
   m_resolutionCombo                 = new QComboBox(this);
 
   QGroupBox* fileFrame = new QGroupBox(tr("File"), this);
-  m_levelNameEdit      = new QLineEdit(this);
+  m_levelNameEdit      = new LevelNameLineEdit(this);
   // set the start frame 10 if the option in preferences
   // "Show ABC Appendix to the Frame Number in Xsheet Cell" is active.
   // (frame 10 is displayed as "1" with this option)
@@ -524,11 +554,6 @@ PencilTestPopup::PencilTestPopup()
   m_fileTypeCombo->setCurrentIndex(0);
 
   fileFrame->setObjectName("CleanupSettingsFrame");
-  // Exclude all character which cannot fit in a filepath (Win).
-  // Dots are also prohibited since they are internally managed by Toonz.
-  QRegExp rx("[^\\\\/:?*.\"<>|]+");
-  m_levelNameEdit->setValidator(new QRegExpValidator(rx, this));
-  m_levelNameEdit->setObjectName("LargeSizedText");
   m_frameNumberEdit->setObjectName("LargeSizedText");
   nextLevelButton->setFixedSize(24, 24);
   nextLevelButton->setArrowType(Qt::RightArrow);
@@ -739,6 +764,8 @@ PencilTestPopup::PencilTestPopup()
                        this, SLOT(onResolutionComboActivated(const QString&)));
   ret = ret && connect(m_fileFormatOptionButton, SIGNAL(pressed()), this,
                        SLOT(onFileFormatOptionButtonPressed()));
+  ret = ret && connect(m_levelNameEdit, SIGNAL(levelNameEdited()), this,
+                       SLOT(onLevelNameEdited()));
   ret = ret &&
         connect(nextLevelButton, SIGNAL(pressed()), this, SLOT(onNextName()));
   ret = ret && connect(m_colorTypeCombo, SIGNAL(currentIndexChanged(int)), this,
@@ -764,14 +791,27 @@ PencilTestPopup::PencilTestPopup()
   assert(ret);
 
   refreshCameraList();
+
+  int startupCamIndex = m_cameraListCombo->findText(
+      QString::fromStdString(CamCapCameraName.getValue()));
+  if (startupCamIndex > 0) {
+    m_cameraListCombo->setCurrentIndex(startupCamIndex);
+    onCameraListComboActivated(startupCamIndex);
+  }
+
   onNextName();
 }
 
 //-----------------------------------------------------------------------------
 
 PencilTestPopup::~PencilTestPopup() {
-  if (m_currentCamera && m_currentCamera->state() == QCamera::ActiveState)
-    m_currentCamera->stop();
+  if (m_currentCamera) {
+    if (m_currentCamera->state() == QCamera::ActiveState)
+      m_currentCamera->stop();
+    if (m_currentCamera->state() == QCamera::LoadedState)
+      m_currentCamera->unload();
+    delete m_currentCamera;
+  }
   // remove the cache image, if it exists
   TFilePath fp(m_cacheImagePath);
   if (TFileStatus(fp).doesExist()) TSystem::deleteFile(fp);
@@ -790,27 +830,48 @@ void PencilTestPopup::refreshCameraList() {
   }
 
   int maxTextLength = 0;
-  int defaultIndex;
+  // add non-connected state as default
+  m_cameraListCombo->addItem(tr("- Select camera -"));
   for (int c = 0; c < cameras.size(); c++) {
     QString camDesc = cameras.at(c).description();
     m_cameraListCombo->addItem(camDesc);
     maxTextLength = std::max(maxTextLength, fontMetrics().width(camDesc));
-    if (cameras.at(c).deviceName() == QCameraInfo::defaultCamera().deviceName())
-      defaultIndex = c;
   }
   m_cameraListCombo->setMaximumWidth(maxTextLength + 25);
   m_cameraListCombo->setEnabled(true);
-  m_cameraListCombo->setCurrentIndex(defaultIndex);
-
-  onCameraListComboActivated(defaultIndex);
+  m_cameraListCombo->setCurrentIndex(0);
 }
 
 //-----------------------------------------------------------------------------
 
-void PencilTestPopup::onCameraListComboActivated(int index) {
+void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
   QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-  if (cameras.size() != m_cameraListCombo->count()) return;
+  if (cameras.size() != m_cameraListCombo->count() - 1) return;
 
+  // if selected the non-connected state, then disconnect the current camera
+  if (comboIndex == 0) {
+    m_cameraViewfinder->setCamera(NULL);
+    if (m_cameraImageCapture) {
+      disconnect(m_cameraImageCapture,
+                 SIGNAL(imageCaptured(int, const QImage&)), this,
+                 SLOT(onImageCaptured(int, const QImage&)));
+      delete m_cameraImageCapture;
+      m_cameraImageCapture = NULL;
+    }
+    if (m_currentCamera) {
+      if (m_currentCamera->state() == QCamera::ActiveState)
+        m_currentCamera->stop();
+      if (m_currentCamera->state() == QCamera::LoadedState)
+        m_currentCamera->unload();
+    }
+    m_deviceName = QString();
+    m_cameraViewfinder->setImage(QImage());
+    // update env
+    CamCapCameraName = "";
+    return;
+  }
+
+  int index = comboIndex - 1;
   // in case the camera is not changed (just click the combobox)
   if (cameras.at(index).deviceName() == m_deviceName) return;
 
@@ -850,11 +911,13 @@ void PencilTestPopup::onCameraListComboActivated(int index) {
     settings.setResolution(sizes.last());
     m_currentCamera->setViewfinderSettings(settings);
     QImageEncoderSettings imageEncoderSettings;
-    imageEncoderSettings.setCodec("PNG");
+    imageEncoderSettings.setCodec("image/jpeg");
+    imageEncoderSettings.setQuality(QMultimedia::NormalQuality);
     imageEncoderSettings.setResolution(sizes.last());
     m_cameraImageCapture->setEncodingSettings(imageEncoderSettings);
   }
   m_cameraViewfinder->setCamera(m_currentCamera);
+  m_cameraViewfinder->updateSize();
 
   // deleting old camera
   if (oldCamera) {
@@ -864,6 +927,9 @@ void PencilTestPopup::onCameraListComboActivated(int index) {
   // start new camera
   m_currentCamera->start();
   m_cameraViewfinder->setImage(QImage());
+
+  // update env
+  CamCapCameraName = m_cameraListCombo->itemText(comboIndex).toStdString();
 }
 
 //-----------------------------------------------------------------------------
@@ -886,6 +952,7 @@ void PencilTestPopup::onResolutionComboActivated(const QString& itemText) {
   imageEncoderSettings.setQuality(QMultimedia::NormalQuality);
   imageEncoderSettings.setResolution(newResolution);
   m_cameraImageCapture->setEncodingSettings(imageEncoderSettings);
+  m_cameraViewfinder->updateSize();
 
   // reset white bg
   m_whiteBGImg = QImage();
@@ -905,6 +972,17 @@ void PencilTestPopup::onFileFormatOptionButtonPressed() {
   TOutputProperties* prop = scene->getProperties()->getPreviewProperties();
   std::string ext         = m_fileTypeCombo->currentText().toStdString();
   openFormatSettingsPopup(this, ext, prop->getFileFormatProperties(ext));
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onLevelNameEdited() {
+  // set the start frame 10 if the option in preferences
+  // "Show ABC Appendix to the Frame Number in Xsheet Cell" is active.
+  // (frame 10 is displayed as "1" with this option)
+  int startFrame =
+      Preferences::instance()->isShowFrameNumberWithLettersEnabled() ? 10 : 1;
+  m_frameNumberEdit->setValue(startFrame);
 }
 
 //-----------------------------------------------------------------------------
@@ -956,6 +1034,7 @@ void PencilTestPopup::onColorTypeComboChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onImageCaptured(int id, const QImage& image) {
+  if (!m_cameraViewfinder) return;
   // capture the white BG
   if (m_captureWhiteBGCue) {
     m_whiteBGImg        = image.copy();
@@ -1018,6 +1097,14 @@ void PencilTestPopup::showEvent(QShowEvent* event) {
   // then release the shortcut key temporary while the popup opens
   QAction* action = CommandManager::instance()->getActionFromShortcut("Return");
   if (action) action->setShortcut(QKeySequence(""));
+
+  // reload camera
+  if (m_currentCamera) {
+    if (m_currentCamera->state() == QCamera::UnloadedState)
+      m_currentCamera->load();
+    if (m_currentCamera->state() == QCamera::LoadedState)
+      m_currentCamera->start();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1033,6 +1120,14 @@ void PencilTestPopup::hideEvent(QHideEvent* event) {
   if (m_timerCB->isChecked() && m_captureButton->isChecked()) {
     m_captureButton->setChecked(false);
     onCaptureButtonClicked(false);
+  }
+
+  // release camera
+  if (m_currentCamera) {
+    if (m_currentCamera->state() == QCamera::ActiveState)
+      m_currentCamera->stop();
+    if (m_currentCamera->state() == QCamera::LoadedState)
+      m_currentCamera->unload();
   }
 }
 
@@ -1213,7 +1308,7 @@ bool PencilTestPopup::importImage(QImage& image) {
   /* if the level does not exist in the scene cast */
   else {
     /* if the file does exist, load it first */
-    if (TFileStatus(actualLevelFp).doesExist()) {
+    if (TSystem::doesExistFileOrLevel(actualLevelFp)) {
       level = scene->loadLevel(actualLevelFp);
       if (!level) {
         error(tr("Failed to load %1.").arg(toQString(actualLevelFp)));
@@ -1229,6 +1324,15 @@ bool PencilTestPopup::importImage(QImage& image) {
             "The captured image size does not match with the existing level."));
         return false;
       }
+
+      /* confirm overwrite */
+      QString question =
+          tr("File %1 does exist.\nDo you want to overwrite it?")
+              .arg(toQString(actualLevelFp.withFrame(frameNumber)));
+      int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
+                              QObject::tr("Cancel"));
+      if (ret == 0 || ret == 2) return false;
+
     }
     /* if the file does not exist, then create a new level */
     else {
@@ -1267,29 +1371,28 @@ bool PencilTestPopup::importImage(QImage& image) {
   int col = app->getCurrentColumn()->getColumnIndex();
 
   /* try to find the vacant cell */
-  int tmpRow            = row;
-  bool isFoundEmptyCell = false;
+  int tmpRow = row;
   while (1) {
-    if (xsh->getCell(tmpRow, col).isEmpty()) {
-      isFoundEmptyCell = true;
+    /* if the same cell is already in the column, then just replace the content
+     * and do not set a new cell */
+    if (xsh->getCell(tmpRow, col) == TXshCell(sl, fid)) break;
+    /* in case setting the same level as the the current column */
+    else if (xsh->getCell(tmpRow, col).isEmpty()) {
+      xsh->setCell(tmpRow, col, TXshCell(sl, fid));
       break;
     }
-    if (xsh->getCell(tmpRow, col).m_level->getSimpleLevel() != sl) break;
+    /* in case the level is different from the current column, then insert a new
+       column */
+    else if (xsh->getCell(tmpRow, col).m_level->getSimpleLevel() != sl) {
+      col += 1;
+      xsh->insertColumn(col);
+      xsh->setCell(row, col, TXshCell(sl, fid));
+      app->getCurrentColumn()->setColumnIndex(col);
+      break;
+    }
     tmpRow++;
   }
 
-  /* in case setting the same level as the the current column */
-  if (isFoundEmptyCell) {
-    xsh->setCell(tmpRow, col, TXshCell(sl, fid));
-  }
-  /* in case the level is different from the current column, then insert a new
-     column */
-  else {
-    col += 1;
-    xsh->insertColumn(col);
-    xsh->setCell(row, col, TXshCell(sl, fid));
-    app->getCurrentColumn()->setColumnIndex(col);
-  }
   /* notify */
   app->getCurrentScene()->notifySceneChanged();
   app->getCurrentScene()->notifyCastChange();

@@ -112,7 +112,7 @@ void AviCodecRestrictions::getRestrictions(const std::wstring &codecName,
   // Loop until we can find a width, height, and depth that works!
   int i;
 
-  // check the x lenght
+  // check the x length
   bi.bmiHeader.biBitCount = bpp;
   for (i = 3; i >= 0; i--) {
     bi.bmiHeader.biWidth = lx + (1 << i);
@@ -125,7 +125,7 @@ void AviCodecRestrictions::getRestrictions(const std::wstring &codecName,
     restrictions = QObject::tr("video width must be a multiple of %1")
                        .arg(QString::number(1 << (i + 1)));
 
-  // check the y lenght
+  // check the y length
   bi.bmiHeader.biWidth = 640;
   for (i = 3; i >= 0; i--) {
     bi.bmiHeader.biHeight = ly + (1 << i);
@@ -136,7 +136,7 @@ void AviCodecRestrictions::getRestrictions(const std::wstring &codecName,
   }
   if (i >= 0)
     restrictions = restrictions + "\n" +
-                   QObject::tr("video lenght must be a multiple of %1")
+                   QObject::tr("video length must be a multiple of %1")
                        .arg(QString::number(1 << (i + 1)));
 
   ICClose(hic);

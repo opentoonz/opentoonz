@@ -289,6 +289,8 @@ Preferences::Preferences()
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
+    , m_projectRoot(0x08)
+    , m_customProjectRoot("")
     , m_precompute(true)
     , m_ffmpegTimeout(30) {
   TCamera camera;
@@ -396,6 +398,9 @@ Preferences::Preferences()
   units = m_settings->value("oldCameraUnits", m_cameraUnits).toString();
   m_oldCameraUnits = units;
   // end for pixels only
+
+  getValue(*m_settings, "projectRoot", m_projectRoot);
+  m_customProjectRoot = m_settings->value("customProjectRoot").toString();
 
   units                    = m_settings->value("linearUnits").toString();
   if (units != "") m_units = units;
@@ -986,6 +991,22 @@ void Preferences::setPixelsOnly(bool state) {
   } else {
     resetOldUnits();
   }
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setProjectRoot(int index) {
+  // storing the index of the selection instead of the text
+  // to make translation work
+  m_projectRoot = index;
+  m_settings->setValue("projectRoot", m_projectRoot);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setCustomProjectRoot(std::wstring customProjectRoot) {
+  m_customProjectRoot = QString::fromStdWString(customProjectRoot);
+  m_settings->setValue("customProjectRoot", m_customProjectRoot);
 }
 
 //-----------------------------------------------------------------

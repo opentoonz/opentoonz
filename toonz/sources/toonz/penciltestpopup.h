@@ -61,6 +61,8 @@ public:
     repaint();
   }
 
+  void updateSize();
+
 protected:
   void paintEvent(QPaintEvent* event);
   void resizeEvent(QResizeEvent* event);
@@ -100,6 +102,25 @@ protected:
 };
 
 //=============================================================================
+
+class LevelNameLineEdit : public QLineEdit {
+  Q_OBJECT
+  QString m_textOnFocusIn;
+
+public:
+  LevelNameLineEdit(QWidget* parent = 0);
+
+protected:
+  void focusInEvent(QFocusEvent* e);
+
+protected slots:
+  void onEditingFinished();
+
+signals:
+  void levelNameEdited();
+};
+
+//=============================================================================
 // PencilTestPopup
 //-----------------------------------------------------------------------------
 
@@ -113,7 +134,7 @@ class PencilTestPopup : public DVGui::Dialog {
 
   QComboBox *m_cameraListCombo, *m_resolutionCombo, *m_fileTypeCombo,
       *m_colorTypeCombo;
-  QLineEdit* m_levelNameEdit;
+  LevelNameLineEdit* m_levelNameEdit;
   QCheckBox *m_upsideDownCB, *m_onionSkinCB, *m_saveOnCaptureCB, *m_timerCB;
   QPushButton *m_fileFormatOptionButton, *m_captureWhiteBGButton,
       *m_captureButton;
@@ -150,6 +171,7 @@ protected slots:
   void onCameraListComboActivated(int index);
   void onResolutionComboActivated(const QString&);
   void onFileFormatOptionButtonPressed();
+  void onLevelNameEdited();
   void onNextName();
   void onColorTypeComboChanged(int index);
   void onImageCaptured(int, const QImage&);

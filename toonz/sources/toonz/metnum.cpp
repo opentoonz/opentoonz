@@ -158,7 +158,7 @@ int MetNum::Approx(int n, int m, double **x, double y[], double c[]) {
 
   /* prepara la matrice dei coefficienti */
   for (i = 0; i < m; i++)
-    for (j = 0; j <= i; j++) /* la matrice  simmetrica */
+    for (j = 0; j <= i; j++) /* la matrice  symmetrica */
     {
       A[i][j] = 0;
       for (k = 0; k < n; k++) A[i][j] += x[i][k] * x[j][k];
@@ -184,7 +184,7 @@ int MetNum::Approx(int n, int m, double **x, double y[], double c[]) {
 /*---------------------------  Cholesky  ---------------------------------*/
 /*  SCOPO                                                                 */
 /*Esegue la fattorizzazione di Cholesky ( A = L*t(L) ) di una matrice     */
-/*simmetrica definita positiva.                                           */
+/*symmetrica definita positiva.                                           */
 /*                                                                        */
 /*   SPECIFICHE                                                           */
 /* int Cholesky(int n, double **A)                                         */
@@ -202,7 +202,7 @@ int MetNum::Approx(int n, int m, double **x, double y[], double c[]) {
 /* precisamente pu essere:                                               */
 /*             0          nessun errore                                   */
 /*            -1          n<1                                             */
-/*             k>0        la matrice non  simmetrica def. positiva;      */
+/*             k>0        la matrice non  symmetrica def. positiva;      */
 /*                        la riga k non  accettabile                     */
 /*------------------------------------------------------------------------*/
 int MetNum::Cholesky(int n, double **A) {

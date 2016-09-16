@@ -19,7 +19,7 @@
         <translation>视频宽度必须是 %1 的倍数</translation>
     </message>
     <message>
-        <source>video lenght must be a multiple of %1</source>
+        <source>video length must be a multiple of %1</source>
         <translation>视频长度必须是 %1 的倍数</translation>
     </message>
     <message>
