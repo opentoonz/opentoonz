@@ -26,12 +26,12 @@ typedef float KEYER_FLOAT;
 
 class ClusterStatistic {
 public:
-  KEYER_FLOAT sumComponents[3];  // vettore 3x1
+  KEYER_FLOAT sumComponents[3];  // vector 3x1
   unsigned int elemsCount;
-  KEYER_FLOAT matrixR[9];  // matrice 3x3 = somma(x * trasposta(x))
-                           // dove x sono i pixel del cluster
+  KEYER_FLOAT matrixR[9];  // matrix 3x3 = sum(x * transposed(x))
+                           // where x are the pixels in the cluster
 
-  KEYER_FLOAT covariance[9];  // matrice di covarianza
+  KEYER_FLOAT covariance[9];  // covariance matrix
   TPoint sumCoords;
 
 #ifdef WITH_ALPHA_IN_STATISTICS
@@ -178,13 +178,13 @@ void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
     KEYER_FLOAT tmpEigenValue;
 
     Cluster *cluster = *it;
-    // calcola la matrice di covarianza
+    // Calculates the covariance matrix.
     const KEYER_FLOAT *clusterCovariance = cluster->statistic.covariance;
     assert(!ISNAN(clusterCovariance[0]));
 
-    // calcola gli autovalori della matrice di covarianza della statistica
-    // del cluster (siccome la matrice e' simmetrica gli autovalori
-    // sono tutti reali)
+    // Calculate the eigenvalues ​​of the covariance matrix of the cluster
+    // statistics
+    // (because the array is symmetrical the eigenvalues are all real)
     KEYER_FLOAT eigenValues[3];
     tmpMulteplicity = calcCovarianceEigenValues(clusterCovariance, eigenValues);
     assert(tmpMulteplicity > 0);
@@ -192,7 +192,7 @@ void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
     tmpEigenValue = std::max({eigenValues[0], eigenValues[1], eigenValues[2]});
     cluster->eigenValue = tmpEigenValue;
 
-    // eventuale aggiornamento del cluster da cercare
+    // Check if there are any cluster updates to search for.
     if (itFound == clusters.end()) {
       itFound       = it;
       maxEigenValue = tmpEigenValue;
@@ -212,7 +212,7 @@ void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
     itRet      = itFound;
     eigenValue = maxEigenValue;
 
-    // calcola l'autovettore relativo a maxEigenValue
+    // Calculates the eigenvector related to 'maxEigenValue'
     Cluster *clusterFound = *itFound;
 
     assert(multeplicity > 0);
@@ -328,7 +328,7 @@ void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
       assert(false && "impossibile!!");
     }
 
-    // normalizzazione dell'autovettore calcolato
+    // Normalization of calculated eigenvector.
     /*
 KEYER_FLOAT eigenVectorMagnitude = sqrt(eigenVector[0]*eigenVector[0] +
                              eigenVector[1]*eigenVector[1] +
@@ -460,18 +460,19 @@ static void clusterize(ClusterContainer &clusters, int clustersCount) {
   unsigned int clustersSize = clusters.size();
   assert(clustersSize >= 1);
 
-  // faccio in modo che in clusters ci siano solo e sempre le foglie
-  // dell'albero calcolato secondo l'algoritmo TSE descritto da Orchard-Bouman
+  // Ensure the clusters are always leaves.
+  // Tree calculated using the algorithm described by Orchard TSE - Bouman.
   // (c.f.r. "Color Quantization of Images" - M.Orchard, C. Bouman)
 
-  // numero di iterazioni, numero di cluster = numero di iterazioni + 1
+  // number of iterations , the number of clusters = number of iterations + 1
   int m = clustersCount - 1;
   int i = 0;
   for (; i < m; ++i) {
-    // sceglie la foglia dell'albero dei cluster (ovvero il cluster nel
-    // ClusterContainer "clusters") che ha il maggiore autovalore, ovvero
-    // il cluster che ha maggiore varainza rispetto all'asse opportuno
-    // (che poi e' l'autovettore corrispondente all'autovalore piu' grande)
+    // Choose the cluster leaf of the tree (the cluster in
+    // ClusterContainer "clusters") that has the highest eigenvalue, ie
+    // The cluster that has higher variance axis
+    // (which is the eigenvector corresponding to the largest eigenvalue).
+
     KEYER_FLOAT eigenValue     = 0.0;
     KEYER_FLOAT eigenVector[3] = {0.0, 0.0, 0.0};
     ClusterContainer::iterator itChoosedCluster;
@@ -483,24 +484,24 @@ static void clusterize(ClusterContainer &clusters, int clustersCount) {
 
 #if 0
 
-    // se il cluster che si e' scelto per la suddivisione contiene un solo
-    // elemento vuol dire che non c'e' piu' niente da suddividere e si esce
-    // dal ciclo.
-    // Questo succede quando si sono chiesti piu' clusters di quanti elementi
-    // ci sono nel cluster iniziale.
+    // If the cluster chosen for the subdivision contains single
+    // element means that there's nothing left to divide up and exit
+    // the loop.
+    // This happens when checking how many more clusters of elements
+    // there are in the initial cluste.
     if(choosedCluster->statistic.elemsCount == 1)
       break;
 
 #else
 
-    // un cluster che ha un solo elemento non ha molto senso di esistere,
-    // credo crei problemi anche nel calcolo della matrice di covarianza,
-    // quindi mi fermo quando il cluster contiene meno di 4 elementi
+    // A cluster that has only one element doesn't make much sense to exist,
+    // It also creates problems in the computation of the covariance matrix.
+    // Stop when the cluster contains less than 4 elements.
     if (choosedCluster->statistic.elemsCount == 3) break;
 
 #endif
 
-    // suddivide il cluster scelto in altri due cluster
+    // Subdivides the cluster chosen in two other clusters.
     Cluster *subcluster1 = new Cluster();
     Cluster *subcluster2 = new Cluster();
     split(subcluster1, subcluster2, eigenVector, choosedCluster);
@@ -509,10 +510,10 @@ static void clusterize(ClusterContainer &clusters, int clustersCount) {
     if ((subcluster1->data.size() == 0) || (subcluster2->data.size() == 0))
       break;
 
-    // calcola la nuova statistica per subcluster1
+    // Calculates the new report for 'subcluster1'.
     subcluster1->computeStatistics();
 
-    // calcola la nuova statistica per subcluster2
+    // Calculates the new statistic for 'subcluster2'.
     int j = 0;
     for (; j < 3; ++j) {
       subcluster2->statistic.sumComponents[j] =
@@ -542,10 +543,10 @@ static void clusterize(ClusterContainer &clusters, int clustersCount) {
 
     subcluster2->computeCovariance();
 
-    // aggiorna in modo opportuno il ClusterContainer "clusters", cancellando
-    // il cluster scelto e inserendo i due appena creati.
-    // Facendo cosi' il ClusterContainer "cluster" contiene solo e sempre
-    // le foglie dell'albero creato dall'algoritmo TSE.
+    // Update the appropriate ClusterContainer "clusters", by deleting
+    // the cluster chosen and inserting the two newly created.
+    // So ClusterContainer "cluster" only ever has
+    // the leaves created by the algorithm TSE.
 
     Cluster *cluster = *itChoosedCluster;
     assert(cluster);
@@ -603,7 +604,7 @@ void Cluster::computeCovariance() {
     statistic.covariance[i] = statistic.matrixR[i] - sumComponentsMatrix[i] / n;
     assert(!ISNAN(statistic.matrixR[i]));
     // assert(statistic.covariance[i] >= 0.0);
-    // instabilita' numerica ???
+    // numerical instability???
     if (statistic.covariance[i] < 0.0) statistic.covariance[i] = 0.0;
   }
 }
@@ -625,7 +626,7 @@ void Cluster::insert(ClusterElem *elem) {
 //------------------------------------------------------------------------------
 
 void Cluster::computeStatistics() {
-  // inizializza a zero la statistica del cluster
+  // Initializes the cluster statistics.
   statistic.elemsCount = 0;
 
   statistic.sumCoords = TPoint(0, 0);
@@ -635,7 +636,7 @@ void Cluster::computeStatistics() {
 
   for (i = 0; i < 9; ++i) statistic.matrixR[i] = 0.0;
 
-  // calcola la statistica del cluster
+  // Compute cluster statistics.
   ClusterElemContainer::const_iterator it = data.begin();
   for (; it != data.end(); ++it) {
     const ClusterElem *elem = *it;
@@ -657,17 +658,17 @@ void Cluster::computeStatistics() {
 
 #endif
 
-    // prima riga della matrice R
+    // The first row of the matrix R
     statistic.matrixR[0] += r * r;
     statistic.matrixR[1] += r * g;
     statistic.matrixR[2] += r * b;
 
-    // seconda riga della matrice R
+    // Second row of the matrix R
     statistic.matrixR[3] += r * g;
     statistic.matrixR[4] += g * g;
     statistic.matrixR[5] += g * b;
 
-    // terza riga della matrice R
+    // The third row of the matrix R
     statistic.matrixR[6] += r * b;
     statistic.matrixR[7] += b * g;
     statistic.matrixR[8] += b * b;

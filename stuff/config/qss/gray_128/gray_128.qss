@@ -701,6 +701,11 @@ XsheetViewer {
   qproperty-MeshColumnColor: #c882ff;
   qproperty-MeshColumnBorderColor: #694687;
   qproperty-SelectedMeshColumnColor: #d8b4f5;
+  qproperty-SoundColumnColor: #b3c187;
+  qproperty-SoundColumnBorderColor: #637856;
+  qproperty-SelectedSoundColumnColor: #d7d7b4;
+  qproperty-SoundColumnHlColor: #f5ffe6;
+  qproperty-SoundColumnTrackColor: #5a642d;
   qproperty-ColumnHeadPastelizer: #ffffff;
   qproperty-SelectedColumnHead: #bed2f0;
   qproperty-LightLightBGColor: #fafafa;

@@ -37,7 +37,7 @@ class Potential;
    */
 class DVAPI StrokeParametricDeformer final : public TStrokeDeformation {
 public:
-  StrokeParametricDeformer(double actionLenght, double startParameter,
+  StrokeParametricDeformer(double actionLength, double startParameter,
                            TStroke *s, Potential *);
 
   ~StrokeParametricDeformer();
@@ -112,11 +112,11 @@ private:
   // parameter where is applicated action
   double startParameter_;
 
-  // like startParameter_ but recover lenght
-  double startLenght_;
+  // like startParameter_ but recover length
+  double startLength_;
 
   // how many traits move
-  double actionLenght_;
+  double actionLength_;
 
   // deformation shape
   Potential *pot_;

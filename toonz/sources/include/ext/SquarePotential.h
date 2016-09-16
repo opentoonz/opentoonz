@@ -49,7 +49,7 @@ private:
   double par_;
   double actionLength_;   // lunghezza dell'azione
   double strokeLength_;   // lunghezza stroke
-  double lenghtAtParam_;  // lunghezza nel pto di movimento
+  double lengthAtParam_;  // lunghezza nel pto di movimento
   double leftFactor_;     // fattore di shape x la curva a sinistra
   double rightFactor_;    // fattore di shape x la curva a dx
 };

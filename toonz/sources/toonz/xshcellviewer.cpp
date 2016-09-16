@@ -923,22 +923,34 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   bool isSelected                   = cellSelection->isCellSelected(row, col) ||
                     columnSelection->isColumnSelected(col);
 
+  // get cell colors
+  QColor cellColor, sideColor;
+  int levelType;
+  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
+                                 isSelected);
+
   // sfondo celle
   QRect backgroundRect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
-  p.fillRect(backgroundRect, QBrush((isSelected) ? SelectedSoundColumnColor
-                                                 : SoundColumnColor));
-  if (isLastRow) {
-    QPainterPath path(QPointF(x, y));
-    path.lineTo(QPointF(x + 6, y));
-    path.lineTo(QPointF(x + 6, y + 2));
-    path.lineTo(QPointF(x, y + RowHeight - 2));
-    p.fillPath(path, QBrush(SoundColumnBorderColor));
-  } else
-    p.fillRect(QRect(x, y, 6, RowHeight), QBrush(SoundColumnBorderColor));
+  p.fillRect(backgroundRect, cellColor);
+  p.fillRect(QRect(x, y, 7, RowHeight), QBrush(sideColor));
 
-  int x1    = rect.x() + 5;
+  // draw dot line if the column is locked
+  if (soundColumn->isLocked()) {
+    p.setPen(QPen(cellColor, 2, Qt::DotLine));
+    p.drawLine(x + 3, y, x + 3, y + RowHeight);
+  }
+  // draw "end of the level"
+  if (isLastRow) {
+    QPainterPath path(QPointF(x, y + RowHeight));
+    path.lineTo(QPointF(x + 7, y + RowHeight));
+    path.lineTo(QPointF(x + 7, y + RowHeight - 7));
+    path.lineTo(QPointF(x, y + RowHeight));
+    p.fillPath(path, QBrush(cellColor));
+  }
+
+  int x1    = rect.x() + 6;
   int x2    = rect.x() + rect.width();
-  int x1Bis = x2 - 6;
+  int x1Bis = x2 - 7;
 
   int offset  = row - cell.getFrameId().getNumber();
   int y0      = rect.y();
@@ -975,22 +987,22 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
     if (i != y0 || !isFirstRow) {
       // trattini a destra della colonna
       if (i % 2) {
-        p.setPen((isSelected) ? SelectedSoundColumnColor : SoundColumnColor);
+        p.setPen(cellColor);
         p.drawLine(x1, i, x1Bis, i);
       } else {
-        p.setPen(SoundColumnTrackColor);
+        p.setPen(m_viewer->getSoundColumnTrackColor());
         p.drawLine(x1Bis + 1, i, x2, i);
       }
     }
 
     if (scrub && i % 2) {
-      p.setPen(SoundColumnHlColor);
+      p.setPen(m_viewer->getSoundColumnHlColor());
       p.drawLine(x1Bis + 1, i, x2, i);
     }
 
     if (i != y0) {
       // "traccia audio" al centro della colonna
-      p.setPen(SoundColumnTrackColor);
+      p.setPen(m_viewer->getSoundColumnTrackColor());
       p.drawLine(lastMin, i, min, i);
       p.drawLine(lastMax, i, max, i);
     }

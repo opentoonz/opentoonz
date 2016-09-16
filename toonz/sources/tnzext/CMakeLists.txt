@@ -12,8 +12,8 @@ set(HEADERS
     ../include/ext/StrokeDeformation.h
     ../include/ext/StrokeDeformationImpl.h
     ../include/ext/LinearPotential.h
-    ../include/ext/NotSimmetricBezierPotential.h
-    ../include/ext/NotSimmetricExpPotential.h
+    ../include/ext/NotSymmetricBezierPotential.h
+    ../include/ext/NotSymmetricExpPotential.h
     ../include/ext/Potential.h
     ../include/ext/SquarePotential.h
     DeformationSelector.h
@@ -45,8 +45,8 @@ set(SOURCES
     StrokeParametricDeformer.cpp
     Types.cpp
     LinearPotential.cpp
-    NotSimmetricBezierPotential.cpp
-    NotSimmetricExpPotential.cpp
+    NotSymmetricBezierPotential.cpp
+    NotSymmetricExpPotential.cpp
     Potential.cpp
     SquarePotential.cpp
     CornerDeformation.cpp

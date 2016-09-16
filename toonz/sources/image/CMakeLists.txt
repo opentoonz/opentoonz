@@ -69,7 +69,7 @@ if(WIN32)
         mov/tiio_movW.cpp
         3gp/tiio_3gpW.cpp
     )
-else()
+elseif(APPLE)
     set(HEADERS ${HEADERS}
         mov/tiio_movM.h
         3gp/tiio_3gpM.h
