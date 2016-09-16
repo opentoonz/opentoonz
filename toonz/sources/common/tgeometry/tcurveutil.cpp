@@ -8,14 +8,14 @@
 //=============================================================================
 
 /*
-Questa funzione ritorna un vettore di
-coppie di double (DoublePair) che individua i parametri
-dei punti d'intersezione.
+This function returns a vector of
+pairs of double (DoublePair) which identifies the parameters
+of the points of intersection.
 
-  L'intero restituito indica il numero d'intersezioni che
-  sono state individuate (per due segmenti una).
+  The integer returned is the number of intersections which
+  have been identified (for two segments).
 
-    Se i segmenti sono paralleli il parametro viene posto a -1.
+    If the segments are parallel to the parameter it is set to -1.
 */
 
 int intersect(const TSegment &first, const TSegment &second,
@@ -97,9 +97,9 @@ int intersect(const TPointD &p1, const TPointD &p2, const TPointD &p3,
       return 1;
     }
 
-    // controllo che i segmenti non siano sulla stessa retta
+    // Check that the segments are not on the same line.
     if (!cross(p2 - p1, p4 - p1)) {
-      // calcolo delle combinazioni baricentriche
+      // Calculation of Barycentric combinations.
       double distp2p1 = norm2(p2 - p1);
       double distp3p4 = norm2(p3 - p4);
 
@@ -110,7 +110,7 @@ int intersect(const TPointD &p1, const TPointD &p2, const TPointD &p3,
 
       int intersection = 0;
 
-      // calcolo delle prime due soluzioni
+      // Calculation of the first two solutions.
       double vol1;
 
       if (distp3p4) {
@@ -118,7 +118,7 @@ int intersect(const TPointD &p1, const TPointD &p2, const TPointD &p3,
 
         vol1 = (p1 - p3) * normalize(p4 - p3);
 
-        if (vol1 >= 0 && vol1 <= distp3p4)  // combinazione baricentrica valida
+        if (vol1 >= 0 && vol1 <= distp3p4)  // Barycentric combinations valid
         {
           intersections.push_back(DoublePair(0.0, vol1 / distp3p4));
           ++intersection;
@@ -171,7 +171,7 @@ int intersect(const TQuadratic &c0, const TQuadratic &c1,
               std::vector<DoublePair> &intersections, bool checksegments) {
   int ret;
 
-  // funziona male, a volte toppa le intersezioni...
+  // Works baddly, sometimes patch intersections...
   if (checksegments) {
     ret = intersectCloseControlPoints(c0, c1, intersections);
     if (ret != -2) return ret;
@@ -281,12 +281,14 @@ int intersect(const TQuadratic &c0, const TQuadratic &c1,
 }
 
 //=============================================================================
-// questa funzione verifica se il punto di controllo p1 e' molto vicino a p0 o a
-// p2:
-// in tal caso, si approssima la quadratica al segmento p0-p2.
-// se p1 e' vicino a p0, la relazione che lega il t del segmento al t della
-// quadratica originaria e' tq = sqrt(ts),
-// se p1 e' vicino a p2, invece e' tq = 1-sqrt(1-ts).
+// This function checks whether the control point
+// p1 is very close to p0 or p2.
+// In this case, we are approximated to the quadratic p0-p2 segment.
+// If p1 is near p0, the relationship between the original and the quadratic
+// segment:
+//     tq = sqrt(ts),
+// If p1 is near p2, instead it's:
+//     tq = 1-sqrt(1-ts).
 
 int intersectCloseControlPoints(const TQuadratic &c0, const TQuadratic &c1,
                                 std::vector<DoublePair> &intersections) {
@@ -304,7 +306,7 @@ int intersectCloseControlPoints(const TQuadratic &c0, const TQuadratic &c1,
   double val1           = std::max(dist3, dist4) / std::min(dist3, dist4);
 
   if (val0 > 1000000 &&
-      val1 > 1000000)  // entrambe c0 e c1  approssimate a segmenti
+      val1 > 1000000)  // both c0 and c1 approximated by segments
   {
     TSegment s0 = TSegment(c0.getP0(), c0.getP2());
     TSegment s1 = TSegment(c1.getP0(), c1.getP2());
@@ -319,7 +321,7 @@ int intersectCloseControlPoints(const TQuadratic &c0, const TQuadratic &c1,
                                     : 1 - sqrt(1 - intersections[i].second);
     }
     // return ret;
-  } else if (val0 > 1000000)  // solo c0 approssimata  a segmento
+  } else if (val0 > 1000000)  // c0 only approximated segment
   {
     TSegment s0 = TSegment(c0.getP0(), c0.getP2());
     ret         = intersect(s0, c1, intersections);
@@ -329,7 +331,7 @@ int intersectCloseControlPoints(const TQuadratic &c0, const TQuadratic &c1,
                                    ? sqrt(intersections[i].first)
                                    : 1 - sqrt(1 - intersections[i].first);
     // return ret;
-  } else if (val1 > 1000000)  // solo c1 approssimata  a segmento
+  } else if (val1 > 1000000)  // only c1 approximated segment
   {
     TSegment s1 = TSegment(c1.getP0(), c1.getP2());
     ret         = intersect(c0, s1, intersections);
@@ -363,7 +365,7 @@ int intersect(const TQuadratic &q, const TSegment &s,
               std::vector<DoublePair> &intersections, bool firstIsQuad) {
   int solutionNumber = 0;
 
-  // nota la retta a*x+b*y+c = 0 andiamo alla ricerca delle soluzioni
+  // Note the line `a*x+b*y+c = 0` we search for solutions
   //  di a*x(t)+b*y(t)+c=0 in [0,1]
   double a = s.getP0().y - s.getP1().y, b = s.getP1().x - s.getP0().x,
          c = -(a * s.getP0().x + b * s.getP0().y);
@@ -383,7 +385,7 @@ int intersect(const TQuadratic &q, const TSegment &s,
   }
 
   if (q.getP2() - q.getP1() ==
-      q.getP1() - q.getP0()) {  // pure il secondo e' unsegmento....
+      q.getP1() - q.getP0()) {  // the second is a segment....
     if (firstIsQuad)
       return intersect(TSegment(q.getP0(), q.getP2()), s, intersections);
     else
@@ -439,8 +441,8 @@ bool isCloseToSegment(const TPointD &point, const TSegment &segment,
                       double distance) {
   TPointD a      = segment.getP0();
   TPointD b      = segment.getP1();
-  double lenght2 = tdistance2(a, b);
-  if (lenght2 < tdistance2(a, point) || lenght2 < tdistance2(point, b))
+  double length2 = tdistance2(a, b);
+  if (length2 < tdistance2(a, point) || length2 < tdistance2(point, b))
     return false;
   if (a.x == b.x) return fabs(point.x - a.x) <= distance;
   if (a.y == b.y) return fabs(point.y - a.y) <= distance;

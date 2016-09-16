@@ -36,6 +36,7 @@ class SceneViewerPanel final : public TPanel, public FlipConsoleOwner {
   TPanelTitleBarButtonSet *m_referenceModeBs;
   TPanelTitleBarButton *m_previewButton;
   TPanelTitleBarButton *m_subcameraPreviewButton;
+  bool m_onionSkinActive = false;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -71,7 +72,7 @@ protected slots:
   void onFrameSwitched();
   void onSceneSwitched();
   void onFrameTypeChanged();
-
+  void onPlayingStatusChanged(bool playing);
   void enableFullPreview(bool enabled);
   void enableSubCameraPreview(bool enabled);
 };

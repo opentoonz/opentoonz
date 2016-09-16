@@ -180,6 +180,8 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
   ret = ret &&
         connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
                 TApp::instance()->getCurrentFrame(), SLOT(setPlaying(bool)));
+  ret = ret && connect(m_flipConsole, SIGNAL(playStateChanged(bool)), this,
+                       SLOT(onPlayingStatusChanged(bool)));
   ret = ret &&
         connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
                 m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
@@ -570,6 +572,28 @@ void ComboViewerPanel::onXshLevelSwitched(TXshLevel *) {
   // scene).
   // For such case, update the frame range of the console here.
   if (TApp::instance()->getCurrentFrame()->isEditingLevel()) updateFrameRange();
+}
+
+//-----------------------------------------------------------------------------
+
+void ComboViewerPanel::onPlayingStatusChanged(bool playing) {
+  if (Preferences::instance()->getOnionSkinDuringPlayback()) return;
+  OnionSkinMask osm =
+      TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+  if (playing) {
+    m_onionSkinActive = osm.isEnabled();
+    if (m_onionSkinActive) {
+      osm.enable(false);
+      TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+      TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+    }
+  } else {
+    if (m_onionSkinActive) {
+      osm.enable(true);
+      TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+      TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

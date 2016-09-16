@@ -244,7 +244,8 @@ void CameraSettingsPopup::updateFields() {
   TCamera *camera = cameraObject->getCamera();
   if (Preferences::instance()->getPixelsOnly()) {
     TDimension res = camera->getRes();
-    camera->setSize(TDimensionD(res.lx / Stage::inch, res.ly / Stage::inch));
+    camera->setSize(
+        TDimensionD(res.lx / Stage::standardDpi, res.ly / Stage::standardDpi));
   }
   if (camera) m_cameraSettingsWidget->setFields(camera);
 }

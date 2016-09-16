@@ -661,12 +661,13 @@ void LevelSettingsPopup::onNameChanged() {
     error("The name " + text +
           " you entered for the level is not valid.\n Please enter a different "
           "name.");
+    m_nameFld->setFocus();
     return;
   }
 
   /*-- Level名に変更がない場合 --*/
   if (level->getName() == text.toStdWString()) {
-    warning("Level name unchanged.");
+    // warning("Level name unchanged.");
     return;
   }
 
@@ -677,6 +678,7 @@ void LevelSettingsPopup::onNameChanged() {
     error("The name " + text +
           " you entered for the level is already used.\nPlease enter a "
           "different name.");
+    m_nameFld->setFocus();
     return;
   }
 

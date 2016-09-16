@@ -110,6 +110,12 @@ public:
     return m_replaceAfterSaveLevelAs;
   }
 
+  void setProjectRoot(int index);
+  int getProjectRoot() { return m_projectRoot; }
+
+  void setCustomProjectRoot(std::wstring path);
+  QString getCustomProjectRoot() { return m_customProjectRoot; }
+
   // Interface  tab
 
   void setCurrentLanguage(int currentLanguage);
@@ -360,7 +366,8 @@ public:
     frontOnionColor = m_frontOnionColor, backOnionColor = m_backOnionColor,
     inksOnly = m_inksOnly;
   }
-
+  bool getOnionSkinDuringPlayback() { return m_onionSkinDuringPlayback; }
+  void setOnionSkinDuringPlayback(bool on);
   // Transparency Check  tab
 
   void setTranspCheckData(const TPixel &bg, const TPixel &ink,
@@ -427,8 +434,7 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits, m_ffmpegPath;
-  ;
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_customProjectRoot;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
@@ -441,7 +447,7 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-
+  int m_projectRoot;
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
@@ -457,7 +463,7 @@ private:
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
       m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
-
+  bool m_onionSkinDuringPlayback;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,

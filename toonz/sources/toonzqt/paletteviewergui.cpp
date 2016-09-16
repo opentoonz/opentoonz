@@ -487,8 +487,8 @@ void PageViewer::drawColorName(QPainter &p, QRect &nameRect, TColorStyle *style,
     QFont font                   = p.font();
     int fontSize                 = font.pointSize();
     if (fontSize == -1) fontSize = font.pixelSize();
-    int lenght                   = index.length() * fontSize;
-    int w                        = (lenght > 11) ? (lenght) : 11;
+    int length                   = index.length() * fontSize;
+    int w                        = (length > 11) ? (length) : 11;
     int h                        = 11;
     int x0                       = nameRect.right() - w + 1;
     int y0                       = nameRect.top() - h - 1;

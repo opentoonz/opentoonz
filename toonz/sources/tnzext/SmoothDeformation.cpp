@@ -7,7 +7,7 @@
 #include "ext/StrokeDeformation.h"
 //#include "ext/SquarePotential.h"
 //#include "ext/StrokeParametricDeformer.h"
-#include "ext/NotSimmetricBezierPotential.h"
+#include "ext/NotSymmetricBezierPotential.h"
 #include "ext/ContextStatus.h"
 #include "ext/Designer.h"
 //#include "ext/TriParam.h"
@@ -31,7 +31,7 @@ REGISTER(SmoothDeformation, 1);
 //-----------------------------------------------------------------------------
 
 SmoothDeformation::SmoothDeformation() {
-  setPotential(new NotSimmetricBezierPotential);
+  setPotential(new NotSymmetricBezierPotential);
   shortcutKey_ = ContextStatus::ALT;
 }
 

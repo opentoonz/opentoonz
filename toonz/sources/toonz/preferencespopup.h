@@ -58,7 +58,7 @@ private:
 
   DVGui::DoubleLineEdit *m_defLevelDpi;
 
-  QLabel *m_dpiLabel;
+  QLabel *m_dpiLabel, *m_customProjectRootLabel, *m_projectRootDirections;
 
   DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx,
       *m_iconSizeLy, *m_viewShrink, *m_viewStep, *m_blanksCount,
@@ -68,7 +68,11 @@ private:
   QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
-      *m_onionSkinVisibility, *m_pixelsOnlyCB;
+      *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
+      *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
+      *m_onionSkinDuringPlayback;
+
+  DVGui::FileField *m_customProjectRootFileField;
 
   DVGui::FileField *m_ffmpegPathFileFld;
 
@@ -79,6 +83,9 @@ private:
 private slots:
 
   void onPixelsOnlyChanged(int index);
+  void onProjectRootChanged();
+  void onCustomProjectRootChanged();
+  void onPixelUnitExternallySelected(bool on);
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
   void onRoomChoiceChanged(int index);
@@ -141,6 +148,7 @@ private slots:
   void onColumnIconChange(const QString &);
   void onReplaceAfterSaveLevelAsChanged(int index);
   void onOnionSkinVisibilityChanged(int);
+  void onOnionSkinDuringPlaybackChanged(int);
   void onActualPixelOnSceneModeChanged(int);
   void onMultiLayerStylePickerChanged(int);
   void onLevelNameOnEachMarkerChanged(int);
