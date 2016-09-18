@@ -112,6 +112,13 @@ public:
 
   void enableStartupPopup(bool on);
   bool isStartupPopupEnabled() { return m_startupPopupEnabled; }
+
+  void setProjectRoot(int index);
+  int getProjectRoot() { return m_projectRoot; }
+
+  void setCustomProjectRoot(std::wstring path);
+  QString getCustomProjectRoot() { return m_customProjectRoot; }
+
   // Interface  tab
 
   void setCurrentLanguage(int currentLanguage);
@@ -430,8 +437,7 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits, m_ffmpegPath;
-  ;
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_customProjectRoot;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
@@ -444,7 +450,7 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-
+  int m_projectRoot;
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
