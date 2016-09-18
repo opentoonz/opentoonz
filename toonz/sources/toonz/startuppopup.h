@@ -16,6 +16,7 @@
 // forward declaration
 class QLabel;
 class QComboBox;
+class StartupLabel;
 
 //=============================================================================
 // LevelCreatePopup
@@ -39,7 +40,7 @@ class StartupPopup final : public DVGui::Dialog {
   DVGui::DoubleLineEdit *m_fpsFld;
   DVGui::DoubleLineEdit *m_resXFld;
   DVGui::DoubleLineEdit *m_resYFld;
-  QList<QString> names;
+  QList<QString> m_sceneNames;
   QList<TFilePath> m_projectPaths;
   QCheckBox *m_showAtStartCB;
   QComboBox *m_projectsCB;
@@ -55,6 +56,8 @@ class StartupPopup final : public DVGui::Dialog {
   QGroupBox *m_projectBox;
   QGroupBox *m_sceneBox;
   QGroupBox *m_recentBox;
+  QVBoxLayout *m_recentSceneLay;
+  QVector<StartupLabel *> m_recentNamesLabels;
 
 public:
   StartupPopup();

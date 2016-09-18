@@ -80,10 +80,7 @@ QString removeZeros(QString srcStr) {
 StartupPopup::StartupPopup()
     : Dialog(TApp::instance()->getMainWindow(), true, true, "StartupPopup") {
   setWindowTitle(tr("OpenToonz Startup"));
-  names = RecentFiles::instance()->getFilesNameList(RecentFiles::Scene);
-  int namesCount = names.count();
-  QVector<StartupLabel *> recentNamesLabels =
-      QVector<StartupLabel *>(names.count());
+
   m_projectBox = new QGroupBox(tr("Choose Project"), this);
   m_sceneBox   = new QGroupBox(tr("Create a New Scene"), this);
   m_recentBox  = new QGroupBox(tr("Open Scene"), this);
@@ -155,10 +152,10 @@ StartupPopup::StartupPopup()
   m_topLayout->setMargin(0);
   m_topLayout->setSpacing(0);
   {
-    QGridLayout *guiLay         = new QGridLayout();
-    QHBoxLayout *projectLay     = new QHBoxLayout();
-    QGridLayout *newSceneLay    = new QGridLayout();
-    QVBoxLayout *recentSceneLay = new QVBoxLayout();
+    QGridLayout *guiLay      = new QGridLayout();
+    QHBoxLayout *projectLay  = new QHBoxLayout();
+    QGridLayout *newSceneLay = new QGridLayout();
+    m_recentSceneLay         = new QVBoxLayout();
     guiLay->setMargin(10);
     guiLay->setVerticalSpacing(10);
     guiLay->setHorizontalSpacing(10);
@@ -225,25 +222,11 @@ StartupPopup::StartupPopup()
     m_sceneBox->setLayout(newSceneLay);
     guiLay->addWidget(m_sceneBox, 2, 0, 4, 1, Qt::AlignLeft);
 
-    recentSceneLay->setMargin(8);
-    recentSceneLay->setSpacing(8);
+    m_recentSceneLay->setMargin(8);
+    m_recentSceneLay->setSpacing(8);
     {
       // Recent Scene List
-      if (names.count() <= 0) {
-        recentSceneLay->addWidget(new QLabel(tr("No Recent Scenes"), this), 1,
-                                  Qt::AlignTop);
-      } else {
-        int i = 0;
-        for (QString name : names) {
-          if (i > 6) break;
-          QString justName = QString::fromStdString(TFilePath(name).getName());
-          recentNamesLabels[i] = new StartupLabel(justName, this, i);
-          recentSceneLay->addWidget(recentNamesLabels[i], i, Qt::AlignTop);
-          i++;
-        }
-        recentSceneLay->addStretch(100);
-      }
-      m_recentBox->setLayout(recentSceneLay);
+      m_recentBox->setLayout(m_recentSceneLay);
       guiLay->addWidget(m_recentBox, 1, 1, 4, 1, Qt::AlignTop);
       guiLay->addWidget(loadOtherSceneButton, 5, 1, 1, 1, Qt::AlignRight);
     }
@@ -290,10 +273,7 @@ StartupPopup::StartupPopup()
                        SLOT(onCameraUnitChanged(int)));
   ret = ret &&
         connect(m_removePresetBtn, SIGNAL(clicked()), SLOT(removePreset()));
-  for (int i = 0; i < recentNamesLabels.count() && i < 7; i++) {
-    ret = ret && connect(recentNamesLabels[i], SIGNAL(wasClicked(int)), this,
-                         SLOT(onRecentSceneClicked(int)));
-  }
+
   assert(ret);
 }
 
@@ -363,6 +343,42 @@ void StartupPopup::showEvent(QShowEvent *) {
   m_projectBox->setFixedWidth(boxWidth);
   m_recentBox->setMinimumHeight(boxHeight);
 
+  // update recent scenes
+  // clear items if they exist first
+
+  if (m_recentSceneLay->count() > 0) {
+    QLayoutItem *child;
+    while (m_recentSceneLay->count() != 0) {
+      child = m_recentSceneLay->takeAt(0);
+      delete child;
+    }
+  }
+
+  m_sceneNames = RecentFiles::instance()->getFilesNameList(RecentFiles::Scene);
+  m_recentNamesLabels = QVector<StartupLabel *>(m_sceneNames.count());
+
+  if (m_sceneNames.count() <= 0) {
+    m_recentSceneLay->addWidget(new QLabel(tr("No Recent Scenes"), this), 1,
+                                Qt::AlignTop);
+  } else {
+    int i = 0;
+    for (QString name : m_sceneNames) {
+      if (i > 9) break;  // box can hold 10 scenes
+      QString justName = QString::fromStdString(TFilePath(name).getName());
+      m_recentNamesLabels[i] = new StartupLabel(justName, this, i);
+      m_recentSceneLay->addWidget(m_recentNamesLabels[i], i, Qt::AlignTop);
+      i++;
+    }
+    m_recentSceneLay->addStretch(100);
+  }
+
+  bool ret = true;
+  for (int i = 0; i < m_recentNamesLabels.count() && i < 7; i++) {
+    ret = ret && connect(m_recentNamesLabels[i], SIGNAL(wasClicked(int)), this,
+                         SLOT(onRecentSceneClicked(int)));
+  }
+  assert(ret);
+  // center window
   this->move(QApplication::desktop()->screen()->rect().center() -
              this->rect().center());
 }
