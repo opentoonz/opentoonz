@@ -426,6 +426,7 @@ void StartupPopup::onCreateButton() {
       ;
     }
   }
+  CommandManager::instance()->execute(MI_NewScene);
   TApp::instance()->getCurrentScene()->getScene()->setScenePath(
       TFilePath(m_pathFld->getPath()) +
       TFilePath(m_nameFld->text().trimmed().toStdWString()));
