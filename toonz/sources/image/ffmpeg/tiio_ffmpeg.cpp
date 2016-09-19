@@ -6,6 +6,7 @@
 #include <QProcess>
 #include <QDir>
 #include <QtGui/QImage>
+#include <QRegExp>
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 
@@ -217,8 +218,7 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *st) {
 bool Ffmpeg::checkFilesExist() {
   QString ffmpegCachePath = getFfmpegCache().getQString();
   QString tempPath        = ffmpegCachePath + "//" +
-                     QString::fromStdString(m_path.getName()) +
-                     QString::fromStdString(m_path.getType()) + "In0001." +
+	  m_path.getQString().remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]"))) + "In0001." +
                      m_intermediateFormat;
   if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
     return true;
@@ -229,8 +229,7 @@ bool Ffmpeg::checkFilesExist() {
 ffmpegFileInfo Ffmpeg::getInfo() {
   QString ffmpegCachePath = getFfmpegCache().getQString();
   QString tempPath        = ffmpegCachePath + "//" +
-                     QString::fromStdString(m_path.getName()) +
-                     QString::fromStdString(m_path.getType()) + ".txt";
+	  m_path.getQString().remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]"))) + ".txt";
   if (QFile::exists(tempPath)) {
     QFile infoText(tempPath);
     infoText.open(QIODevice::ReadOnly);
@@ -264,8 +263,7 @@ ffmpegFileInfo Ffmpeg::getInfo() {
 TRasterImageP Ffmpeg::getImage(int frameIndex) {
   QString ffmpegCachePath = getFfmpegCache().getQString();
   QString tempPath        = ffmpegCachePath + "//" +
-                     QString::fromStdString(m_path.getName()) +
-                     QString::fromStdString(m_path.getType());
+  m_path.getQString().remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
   std::string tmpPath = tempPath.toStdString();
   // QString tempPath= m_path.getQString();
   QString number   = QString("%1").arg(frameIndex, 4, 10, QChar('0'));
@@ -356,8 +354,7 @@ int Ffmpeg::getFrameCount() {
 void Ffmpeg::getFramesFromMovie(int frame) {
   QString ffmpegCachePath = getFfmpegCache().getQString();
   QString tempPath        = ffmpegCachePath + "//" +
-                     QString::fromStdString(m_path.getName()) +
-                     QString::fromStdString(m_path.getType());
+	  m_path.getQString().remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
   std::string tmpPath = tempPath.toStdString();
   QString tempName    = "In%04d." + m_intermediateFormat;
   tempName            = tempPath + tempName;
