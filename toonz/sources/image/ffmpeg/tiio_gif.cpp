@@ -3,6 +3,7 @@
 #include "tiio_gif.h"
 #include "trasterimage.h"
 #include "timageinfo.h"
+#include "toonz/stage.h"
 #include <QStringList>
 
 //===========================================================
@@ -151,8 +152,9 @@ class TImageReaderGif final : public TImageReader {
 public:
   int m_frameIndex;
 
-  TImageReaderGif(const TFilePath &path, int index, TLevelReaderGif *lra)
-      : TImageReader(path), m_lra(lra), m_frameIndex(index) {
+  TImageReaderGif(const TFilePath &path, int index, TLevelReaderGif *lra,
+                  TImageInfo *info)
+      : TImageReader(path), m_lra(lra), m_frameIndex(index), m_info(info) {
     m_lra->addRef();
   }
   ~TImageReaderGif() { m_lra->release(); }
@@ -160,9 +162,11 @@ public:
   TImageP load() override { return m_lra->load(m_frameIndex); }
   TDimension getSize() const { return m_lra->getSize(); }
   TRect getBBox() const { return TRect(); }
+  const TImageInfo *getImageInfo() const override { return m_info; }
 
 private:
   TLevelReaderGif *m_lra;
+  TImageInfo *m_info;
 
   // not implemented
   TImageReaderGif(const TImageReaderGif &);
@@ -198,6 +202,8 @@ TLevelReaderGif::TLevelReaderGif(const TFilePath &path)
   m_info->m_ly             = m_ly;
   m_info->m_bitsPerSample  = 8;
   m_info->m_samplePerPixel = 4;
+  m_info->m_dpix           = Stage::standardDpi;
+  m_info->m_dpiy           = Stage::standardDpi;
 }
 //-----------------------------------------------------------
 
@@ -220,9 +226,8 @@ TImageReaderP TLevelReaderGif::getFrameReader(TFrameId fid) {
   // if (IOError != 0)
   //	throw TImageException(m_path, buildAVIExceptionString(IOError));
   if (fid.getLetter() != 0) return TImageReaderP(0);
-  int index = fid.getNumber();
-
-  TImageReaderGif *irm = new TImageReaderGif(m_path, index, this);
+  int index            = fid.getNumber();
+  TImageReaderGif *irm = new TImageReaderGif(m_path, index, this, m_info);
   return TImageReaderP(irm);
 }
 
