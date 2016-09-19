@@ -98,8 +98,9 @@ void Ffmpeg::setFrameRate(double fps) { m_frameRate = fps; }
 void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
 void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
+  m_frameCount++;
   QString tempPath = m_path.getQString() + "tempOut" +
-                     QString::number(frameIndex) + "." + m_intermediateFormat;
+                     QString::number(m_frameCount) + "." + m_intermediateFormat;
   std::string saveStatus = "";
   TRasterImageP tempImage(img);
   TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
@@ -127,7 +128,7 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   qi->save(tempPath, format, -1);
   free(buffer);
   m_cleanUpList.push_back(tempPath);
-  m_frameCount++;
+
   delete qi;
   delete image;
 }
