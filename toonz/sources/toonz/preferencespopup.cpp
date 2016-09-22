@@ -951,7 +951,7 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Default Viewer for Movie Formats"), this);
   CheckBox *minimizeRasterMemoryCB =
       new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
-  m_autoSaveCB      = new CheckBox(tr("Save Automatically Every Minutes"));
+  m_autoSaveCB      = new CheckBox(tr("Save Automatically"));
   m_autoSaveSceneCB = new CheckBox(tr("Automatically Save the Scene File"));
   m_autoSaveOtherFilesCB =
       new CheckBox(tr("Automatically Save Non-Scene Files"));
@@ -1416,24 +1416,28 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(minimizeRasterMemoryCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-      QHBoxLayout *saveAutoLay = new QHBoxLayout();
-      saveAutoLay->setMargin(0);
-      saveAutoLay->setSpacing(15);
-      {
-        saveAutoLay->addWidget(m_autoSaveCB, 0);
-        saveAutoLay->addWidget(m_minuteFld, 0);
-        saveAutoLay->addStretch(1);
-      }
-      generalFrameLay->addLayout(saveAutoLay, 0);
+      QGroupBox *autoSaveGroup = new QGroupBox(tr("Autosave Options"), this);
       QVBoxLayout *autoSaveOptionsLay = new QVBoxLayout();
-      autoSaveOptionsLay->setContentsMargins(30, 0, 0, 20);
+      autoSaveOptionsLay->setMargin(10);
       {
+        autoSaveOptionsLay->addWidget(m_autoSaveCB, 0);
+        QHBoxLayout *saveAutoLay = new QHBoxLayout();
+        saveAutoLay->setMargin(0);
+        saveAutoLay->setSpacing(5);
+        {
+          saveAutoLay->addWidget(new QLabel(tr("Interval(Minutes): "), this));
+          saveAutoLay->addWidget(m_minuteFld, 0);
+          saveAutoLay->addStretch(1);
+        }
+        autoSaveOptionsLay->addLayout(saveAutoLay, 0);
+
         autoSaveOptionsLay->addWidget(m_autoSaveSceneCB, 0,
                                       Qt::AlignLeft | Qt::AlignVCenter);
         autoSaveOptionsLay->addWidget(m_autoSaveOtherFilesCB, 0,
                                       Qt::AlignLeft | Qt::AlignVCenter);
       }
-      generalFrameLay->addLayout(autoSaveOptionsLay);
+      autoSaveGroup->setLayout(autoSaveOptionsLay);
+      generalFrameLay->addWidget(autoSaveGroup);
       // Unit, CameraUnit
       QGridLayout *unitLay = new QGridLayout();
       unitLay->setMargin(0);
