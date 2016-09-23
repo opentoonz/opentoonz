@@ -554,12 +554,12 @@ void PreferencesPopup::onDefaultViewerChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onAutoSaveChanged(int index) {
-  m_minuteFld->setEnabled(index == Qt::Checked);
-  m_autoSaveSceneCB->setEnabled(index == Qt::Checked);
-  m_autoSaveOtherFilesCB->setEnabled(index == Qt::Checked);
-  m_pref->enableAutosave(index == Qt::Checked);
-  if (index == Qt::Checked && !m_autoSaveSceneCB->isChecked() &&
+void PreferencesPopup::onAutoSaveChanged(bool on) {
+  m_minuteFld->setEnabled(on);
+  m_autoSaveSceneCB->setEnabled(on);
+  m_autoSaveOtherFilesCB->setEnabled(on);
+  m_pref->enableAutosave(on);
+  if (on && !m_autoSaveSceneCB->isChecked() &&
       !m_autoSaveOtherFilesCB->isChecked()) {
     m_autoSaveSceneCB->setChecked(true);
     m_autoSaveOtherFilesCB->setChecked(true);
@@ -571,7 +571,7 @@ void PreferencesPopup::onAutoSaveChanged(int index) {
 void PreferencesPopup::onAutoSaveSceneChanged(int index) {
   m_pref->enableAutosaveScene(index == Qt::Checked);
   if (!m_autoSaveOtherFilesCB->isChecked() && index == Qt::Unchecked) {
-    m_autoSaveCB->setChecked(false);
+    m_autoSaveGroup->setChecked(false);
   }
 }
 
@@ -580,7 +580,7 @@ void PreferencesPopup::onAutoSaveSceneChanged(int index) {
 void PreferencesPopup::onAutoSaveOtherFilesChanged(int index) {
   m_pref->enableAutosaveOtherFiles(index == Qt::Checked);
   if (!m_autoSaveSceneCB->isChecked() && index == Qt::Unchecked) {
-    m_autoSaveCB->setChecked(false);
+    m_autoSaveGroup->setChecked(false);
   }
 }
 
@@ -951,7 +951,8 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Default Viewer for Movie Formats"), this);
   CheckBox *minimizeRasterMemoryCB =
       new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
-  m_autoSaveCB      = new CheckBox(tr("Save Automatically"));
+  m_autoSaveGroup = new QGroupBox(tr("Save Automatically"), this);
+  m_autoSaveGroup->setCheckable(true);
   m_autoSaveSceneCB = new CheckBox(tr("Automatically Save the Scene File"));
   m_autoSaveOtherFilesCB =
       new CheckBox(tr("Automatically Save Non-Scene Files"));
@@ -1165,7 +1166,7 @@ PreferencesPopup::PreferencesPopup()
   //--- General ------------------------------
   useDefaultViewerCB->setChecked(m_pref->isDefaultViewerEnabled());
   minimizeRasterMemoryCB->setChecked(m_pref->isRasterOptimizedMemory());
-  m_autoSaveCB->setChecked(m_pref->isAutosaveEnabled());
+  m_autoSaveGroup->setChecked(m_pref->isAutosaveEnabled());
   m_autoSaveSceneCB->setChecked(m_pref->isAutosaveSceneEnabled());
   m_autoSaveSceneCB->setEnabled(m_pref->isAutosaveEnabled());
   m_autoSaveOtherFilesCB->setChecked(m_pref->isAutosaveOtherFilesEnabled());
@@ -1416,11 +1417,10 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(minimizeRasterMemoryCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-      QGroupBox *autoSaveGroup = new QGroupBox(tr("Autosave Options"), this);
+
       QVBoxLayout *autoSaveOptionsLay = new QVBoxLayout();
       autoSaveOptionsLay->setMargin(10);
       {
-        autoSaveOptionsLay->addWidget(m_autoSaveCB, 0);
         QHBoxLayout *saveAutoLay = new QHBoxLayout();
         saveAutoLay->setMargin(0);
         saveAutoLay->setSpacing(5);
@@ -1436,8 +1436,8 @@ PreferencesPopup::PreferencesPopup()
         autoSaveOptionsLay->addWidget(m_autoSaveOtherFilesCB, 0,
                                       Qt::AlignLeft | Qt::AlignVCenter);
       }
-      autoSaveGroup->setLayout(autoSaveOptionsLay);
-      generalFrameLay->addWidget(autoSaveGroup);
+      m_autoSaveGroup->setLayout(autoSaveOptionsLay);
+      generalFrameLay->addWidget(m_autoSaveGroup);
       // Unit, CameraUnit
       QGridLayout *unitLay = new QGridLayout();
       unitLay->setMargin(0);
@@ -1947,8 +1947,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefaultViewerChanged(int)));
   ret = ret && connect(minimizeRasterMemoryCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onRasterOptimizedMemoryChanged(int)));
-  ret = ret && connect(m_autoSaveCB, SIGNAL(stateChanged(int)),
-                       SLOT(onAutoSaveChanged(int)));
+  ret = ret && connect(m_autoSaveGroup, SIGNAL(toggled(bool)),
+                       SLOT(onAutoSaveChanged(bool)));
   ret = ret && connect(m_autoSaveSceneCB, SIGNAL(stateChanged(int)),
                        SLOT(onAutoSaveSceneChanged(int)));
   ret = ret && connect(m_autoSaveOtherFilesCB, SIGNAL(stateChanged(int)),
