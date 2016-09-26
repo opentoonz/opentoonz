@@ -555,9 +555,6 @@ void PreferencesPopup::onDefaultViewerChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onAutoSaveChanged(bool on) {
-  m_minuteFld->setEnabled(on);
-  m_autoSaveSceneCB->setEnabled(on);
-  m_autoSaveOtherFilesCB->setEnabled(on);
   m_pref->enableAutosave(on);
   if (on && !m_autoSaveSceneCB->isChecked() &&
       !m_autoSaveOtherFilesCB->isChecked()) {
@@ -1168,11 +1165,8 @@ PreferencesPopup::PreferencesPopup()
   minimizeRasterMemoryCB->setChecked(m_pref->isRasterOptimizedMemory());
   m_autoSaveGroup->setChecked(m_pref->isAutosaveEnabled());
   m_autoSaveSceneCB->setChecked(m_pref->isAutosaveSceneEnabled());
-  m_autoSaveSceneCB->setEnabled(m_pref->isAutosaveEnabled());
   m_autoSaveOtherFilesCB->setChecked(m_pref->isAutosaveOtherFilesEnabled());
-  m_autoSaveOtherFilesCB->setEnabled(m_pref->isAutosaveEnabled());
   m_minuteFld->setValue(m_pref->getAutosavePeriod());
-  m_minuteFld->setEnabled(m_pref->isAutosaveEnabled());
   replaceAfterSaveLevelAsCB->setChecked(
       m_pref->isReplaceAfterSaveLevelAsEnabled());
 
