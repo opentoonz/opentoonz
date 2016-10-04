@@ -2,9 +2,9 @@
   <menu title="File">
     <command>MI_NewScene</command>
     <command>MI_LoadScene</command>
+    <command>MI_SaveAll</command>
     <command>MI_SaveScene</command>
     <command>MI_SaveSceneAs</command>
-    <command>MI_SaveAll</command>
     <command>MI_OpenRecentScene</command>
     <command>MI_RevertScene</command>
     <separator/>
@@ -13,6 +13,7 @@
     <separator/>
     <command>MI_NewLevel</command>
     <command>MI_LoadLevel</command>
+    <command>MI_SaveAllLevels</command>
     <command>MI_SaveLevel</command>
     <command>MI_SaveLevelAs</command>
     <command>MI_ExportLevel</command>
@@ -138,6 +139,15 @@
     <command>MI_RemoveSceneFrame</command>
     <command>MI_InsertGlobalKeyframe</command>
     <command>MI_RemoveGlobalKeyframe</command>
+    <separator/>
+    <command>MI_NextFrame</command>
+    <command>MI_PrevFrame</command>
+    <command>MI_FirstFrame</command>
+    <command>MI_LastFrame</command>
+    <command>MI_NextDrawing</command>
+    <command>MI_PrevDrawing</command>
+    <command>MI_NextStep</command>
+    <command>MI_PrevStep</command>
   </menu>
   <menu title="Cells">
     <command>MI_Reverse</command>
@@ -158,8 +168,11 @@
     <command>MI_Rollup</command>
     <command>MI_Rolldown</command>
     <command>MI_TimeStretch</command>
+    <separator/>
     <command>MI_DrawingSubForward</command>
     <command>MI_DrawingSubBackward</command>
+    <command>MI_DrawingSubGroupForward</command>
+    <command>MI_DrawingSubGroupBackward</command>
     <separator/>
     <command>MI_Autorenumber</command>
     <command>MI_Duplicate</command>

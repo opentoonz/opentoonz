@@ -599,15 +599,20 @@ void RenameCellField::renameCell() {
     // rinomino in 2. Quindi devo prima verificare
     // che la cella corrente non sia vuota
 
-    TXshCell cell = xsheet->getCell(m_row, m_col);
-    if (cell.isEmpty() && m_row > 0) {
-      cell = xsheet->getCell(m_row - 1, m_col);
+    TXshCell cell;
+    int tmpRow = m_row;
+    while (1) {
+      cell = xsheet->getCell(tmpRow, m_col);
+      if (!cell.isEmpty() || tmpRow == 0) break;
+      tmpRow--;
     }
     xl = cell.m_level.getPointer();
     if (!xl || (xl->getType() == OVL_XSHLEVEL &&
                 xl->getPath().getFrame() == TFrameId::NO_FRAME))
       return;
-    if (fid == TFrameId::NO_FRAME) fid = cell.m_frameId;
+    // if the next upper cell is empty, then make this cell empty too
+    if (fid == TFrameId::NO_FRAME)
+      fid = (m_row - tmpRow <= 1) ? cell.m_frameId : TFrameId(0);
   } else {
     ToonzScene *scene   = m_viewer->getXsheet()->getScene();
     TLevelSet *levelSet = scene->getLevelSet();
@@ -625,29 +630,37 @@ void RenameCellField::renameCell() {
     }
   }
   if (!xl) return;
+
+  TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+      TApp::instance()->getCurrentSelection()->getSelection());
+  if (!cellSelection) return;
+
   TXshCell cell(xl, fid);
 
-  // register undo only if the cell is modified
-  if (cell == xsheet->getCell(m_row, m_col)) return;
-
-  RenameCellUndo *undo =
-      new RenameCellUndo(m_row, m_col, xsheet->getCell(m_row, m_col), cell);
-  xsheet->setCell(m_row, m_col, cell);
-  TUndoManager::manager()->add(undo);
-  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-  TApp *app = TApp::instance();
-  if (m_row == app->getCurrentFrame()->getFrame()) {
-    app->getCurrentTool()->onImageChanged(
-        (TImage::Type)app->getCurrentImageType());
-    xsheet->getStageObjectTree()->invalidateAll();
-  }
+  if (fid.getNumber() == 0) {
+    TCellSelection::Range range = cellSelection->getSelectedCells();
+    cellSelection->deleteCells();
+    // revert cell selection
+    cellSelection->selectCells(range.m_r0, range.m_c0, range.m_r1, range.m_c1);
+  } else
+    cellSelection->renameCells(cell);
 }
 
 //-----------------------------------------------------------------------------
 
 void RenameCellField::onReturnPressed() {
   renameCell();
-  showInRowCol(m_row + 1, m_col);
+
+  // move the cell selection
+  TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+      TApp::instance()->getCurrentSelection()->getSelection());
+  if (!cellSelection) return;
+  TCellSelection::Range range = cellSelection->getSelectedCells();
+  int offset                  = range.m_r1 - range.m_r0 + 1;
+  cellSelection->selectCells(range.m_r0 + offset, range.m_c0,
+                             range.m_r1 + offset, range.m_c1);
+  TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  showInRowCol(m_row + offset, m_col);
 }
 
 //-----------------------------------------------------------------------------
@@ -661,14 +674,30 @@ void RenameCellField::focusOutEvent(QFocusEvent *e) {
 //-----------------------------------------------------------------------------
 
 void RenameCellField::keyPressEvent(QKeyEvent *event) {
+  // move the cell selection
+  TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+      TApp::instance()->getCurrentSelection()->getSelection());
+  if (!cellSelection) {
+    QLineEdit::keyPressEvent(event);
+    return;
+  }
+  TCellSelection::Range range = cellSelection->getSelectedCells();
+  int offset                  = range.m_r1 - range.m_r0 + 1;
+
   if (event->key() == Qt::Key_Up && m_row > 0) {
     renameCell();
-    showInRowCol(m_row - 1, m_col);
+    cellSelection->selectCells(range.m_r0 - offset, range.m_c0,
+                               range.m_r1 - offset, range.m_c1);
+    showInRowCol(m_row - offset, m_col);
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
   } else if (event->key() == Qt::Key_Down) {
     renameCell();
-    showInRowCol(m_row + 1, m_col);
-  }
-  QLineEdit::keyPressEvent(event);
+    cellSelection->selectCells(range.m_r0 + offset, range.m_c0,
+                               range.m_r1 + offset, range.m_c1);
+    showInRowCol(m_row + offset, m_col);
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  } else
+    QLineEdit::keyPressEvent(event);
 }
 
 //=============================================================================
@@ -894,22 +923,34 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   bool isSelected                   = cellSelection->isCellSelected(row, col) ||
                     columnSelection->isColumnSelected(col);
 
+  // get cell colors
+  QColor cellColor, sideColor;
+  int levelType;
+  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
+                                 isSelected);
+
   // sfondo celle
   QRect backgroundRect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
-  p.fillRect(backgroundRect, QBrush((isSelected) ? SelectedSoundColumnColor
-                                                 : SoundColumnColor));
-  if (isLastRow) {
-    QPainterPath path(QPointF(x, y));
-    path.lineTo(QPointF(x + 6, y));
-    path.lineTo(QPointF(x + 6, y + 2));
-    path.lineTo(QPointF(x, y + RowHeight - 2));
-    p.fillPath(path, QBrush(SoundColumnBorderColor));
-  } else
-    p.fillRect(QRect(x, y, 6, RowHeight), QBrush(SoundColumnBorderColor));
+  p.fillRect(backgroundRect, cellColor);
+  p.fillRect(QRect(x, y, 7, RowHeight), QBrush(sideColor));
 
-  int x1    = rect.x() + 5;
+  // draw dot line if the column is locked
+  if (soundColumn->isLocked()) {
+    p.setPen(QPen(cellColor, 2, Qt::DotLine));
+    p.drawLine(x + 3, y, x + 3, y + RowHeight);
+  }
+  // draw "end of the level"
+  if (isLastRow) {
+    QPainterPath path(QPointF(x, y + RowHeight));
+    path.lineTo(QPointF(x + 7, y + RowHeight));
+    path.lineTo(QPointF(x + 7, y + RowHeight - 7));
+    path.lineTo(QPointF(x, y + RowHeight));
+    p.fillPath(path, QBrush(cellColor));
+  }
+
+  int x1    = rect.x() + 6;
   int x2    = rect.x() + rect.width();
-  int x1Bis = x2 - 6;
+  int x1Bis = x2 - 7;
 
   int offset  = row - cell.getFrameId().getNumber();
   int y0      = rect.y();
@@ -946,22 +987,22 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
     if (i != y0 || !isFirstRow) {
       // trattini a destra della colonna
       if (i % 2) {
-        p.setPen((isSelected) ? SelectedSoundColumnColor : SoundColumnColor);
+        p.setPen(cellColor);
         p.drawLine(x1, i, x1Bis, i);
       } else {
-        p.setPen(SoundColumnTrackColor);
+        p.setPen(m_viewer->getSoundColumnTrackColor());
         p.drawLine(x1Bis + 1, i, x2, i);
       }
     }
 
     if (scrub && i % 2) {
-      p.setPen(SoundColumnHlColor);
+      p.setPen(m_viewer->getSoundColumnHlColor());
       p.drawLine(x1Bis + 1, i, x2, i);
     }
 
     if (i != y0) {
       // "traccia audio" al centro della colonna
-      p.setPen(SoundColumnTrackColor);
+      p.setPen(m_viewer->getSoundColumnTrackColor());
       p.drawLine(lastMin, i, min, i);
       p.drawLine(lastMax, i, max, i);
     }

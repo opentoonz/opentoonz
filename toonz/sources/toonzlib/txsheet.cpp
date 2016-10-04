@@ -1567,3 +1567,14 @@ TRectD TXsheet::getBBox(int r) const {
 
   return bbox;
 }
+
+//-----------------------------------------------------------------------
+
+bool TXsheet::isRectEmpty(int r0, int c0, int r1, int c1) const {
+  for (int r = r0; r <= r1; r++) {
+    for (int c = c0; c <= c1; c++) {
+      if (!getCell(r, c).isEmpty()) return false;
+    }
+  }
+  return true;
+}

@@ -136,7 +136,7 @@ void TSystem::outputDebug(string s) {
   cerr << s << endl;
 #endif
 #else
-  qDebug(s.c_str());
+  qDebug("%s", s.c_str());
 #endif
 }
 

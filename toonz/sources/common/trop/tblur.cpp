@@ -799,7 +799,7 @@ void doBlurRgb(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx,
     r1->lock();
     fbuffer = (BlurPixel<P> *)r1->getRawData();  // new CASM_FPIXEL [llx *ly];
     row1    = new T[llx + 2 * brad];
-    col1    = new BlurPixel<P>[lly + 2 * brad];
+    col1    = new BlurPixel<P>[ lly + 2 * brad ];
     col2    = new T[lly];
   }
 

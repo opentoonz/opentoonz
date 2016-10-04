@@ -50,7 +50,7 @@ struct NSVGimage {
 
 #define NSVG_PI 3.14159265358979323846264338327f
 #define NSVG_KAPPA90                                                           \
-  0.5522847493f  // Lenght proportional to radius of a cubic bezier handle for
+  0.5522847493f  // Length proportional to radius of a cubic bezier handle for
                  // 90deg arcs.
 
 #ifdef _MSC_VER

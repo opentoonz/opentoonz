@@ -399,6 +399,26 @@ void Ffmpeg::getFramesFromMovie(int frame) {
   }
 }
 
+int Ffmpeg::getGifFrameCount() {
+  int frame               = 1;
+  QString ffmpegCachePath = getFfmpegCache().getQString();
+  QString tempPath        = ffmpegCachePath + "//" +
+                     QString::fromStdString(m_path.getName()) +
+                     QString::fromStdString(m_path.getType());
+  std::string tmpPath = tempPath.toStdString();
+  QString tempName    = "In%04d." + m_intermediateFormat;
+  tempName            = tempPath + tempName;
+  QString tempStart;
+  tempStart = "In0001." + m_intermediateFormat;
+  tempStart = tempPath + tempStart;
+  while (TSystem::doesExistFileOrLevel(TFilePath(tempStart))) {
+    frame++;
+    QString number = QString("%1").arg(frame, 4, 10, QChar('0'));
+    tempStart      = tempPath + "In" + number + "." + m_intermediateFormat;
+  }
+  return frame - 1;
+}
+
 void Ffmpeg::addToCleanUp(QString path) {
   if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
     m_cleanUpList.push_back(path);

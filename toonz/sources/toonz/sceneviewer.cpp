@@ -1864,8 +1864,12 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
 /*! a factor for getting pixel-based zoom ratio
 */
 double SceneViewer::getDpiFactor() {
+  // When the current unit is "pixels", always use a standard dpi
+  if (Preferences::instance()->getPixelsOnly()) {
+    return Stage::inch / Stage::standardDpi;
+  }
   // When preview mode, use a camera DPI
-  if (isPreviewEnabled()) {
+  else if (isPreviewEnabled()) {
     return Stage::inch /
            TApp::instance()
                ->getCurrentScene()

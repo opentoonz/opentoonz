@@ -1579,6 +1579,7 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_NewLevel, tr("&New Level..."), "Alt+N");
   createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
   createMenuFileAction(MI_SaveLevel, tr("&Save Level"), "");
+  createMenuFileAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
   createMenuFileAction(MI_SaveLevelAs, tr("&Save Level As..."), "");
   createMenuFileAction(MI_ExportLevel, tr("&Export Level..."), "");
   createMenuFileAction(MI_ConvertFileWithInput, tr("&Convert File..."), "");
@@ -1639,7 +1640,11 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_PasteNames, tr("Paste Name"), "");
   createRightClickMenuAction(MI_GetColorFromStudioPalette,
                              tr("Get Color from Studio Palette"), "");
-  createMenuEditAction(MI_Clear, tr("&Delete"), "Del");
+  createRightClickMenuAction(MI_ToggleLinkToStudioPalette,
+                             tr("Toggle Link to Studio Palette"), "");
+  createRightClickMenuAction(MI_RemoveReferenceToStudioPalette,
+                             tr("Remove Reference to Studio Palette"), "");
+  createMenuEditAction(MI_Clear, tr("&Delete"), "Delete");
   createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
   createMenuEditAction(MI_Group, tr("&Group"), "Ctrl+G");
   createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "Ctrl+Shift+G");
@@ -2074,7 +2079,7 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_PreserveThickness",
                           tr("Preserve Thickness"), "");
   createToolOptionsAction("A_ToolOption_PressureSensitivity",
-                          tr("Pressure sensitivity"), "Shift+P");
+                          tr("Pressure Sensitivity"), "Shift+P");
   createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "F8");
   createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "F7");
   createToolOptionsAction("A_ToolOption_Smooth", tr("Smooth"), "");

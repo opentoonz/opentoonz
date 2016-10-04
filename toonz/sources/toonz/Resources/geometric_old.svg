@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 10.0, SVG Export Plug-In . SVG Version: 3.0.0 Build 76)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" [
+	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
+	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
+	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
+	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
+	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
+	<!ENTITY ns_svg "http://www.w3.org/2000/svg">
+	<!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
+]>
+<svg 
+	 xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" i:viewOrigin="387 312" i:rulerOrigin="0 0" i:pageBounds="0 600 800 0"
+	 xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+	 width="26" height="26.184" viewBox="0 0 26 26.184" overflow="visible" enable-background="new 0 0 26 26.184"
+	 xml:space="preserve">
+	<metadata>
+		<variableSets  xmlns="&ns_vars;">
+			<variableSet  varSetName="binding1" locked="none">
+				<variables></variables>
+				<v:sampleDataSets  xmlns="&ns_custom;" xmlns:v="&ns_vars;"></v:sampleDataSets>
+			</variableSet>
+		</variableSets>
+		<sfw  xmlns="&ns_sfw;">
+			<slices></slices>
+			<sliceSourceBounds  y="285.816" x="387" width="26" height="26.184" bottomLeftOrigin="true"></sliceSourceBounds>
+		</sfw>
+	</metadata>
+	<g id="Layer_1" i:layer="yes" i:dimmedPercent="50" i:rgbTrio="#4F008000FFFF">
+		<path i:knockout="Off" fill="none" d="M26,26H0V0h26V26z"/>
+		<path i:knockout="Off" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" d="M19.251,6.934
+			c0,1.28-1.037,2.318-2.316,2.318s-2.318-1.038-2.318-2.318c0-1.279,1.039-2.317,2.318-2.317S19.251,5.655,19.251,6.934z"/>
+		<path i:knockout="Off" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" d="M16.972,9.046
+			l-5.388,14.25"/>
+		<path i:knockout="Off" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" d="M16.972,9.046
+			l5.389,14.25"/>
+		<path i:knockout="Off" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" d="M19.55,11.911
+			l2.811,11.385"/>
+		<path i:knockout="Off" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" d="M14.311,12.356
+			L11.5,23.74"/>
+		<path i:knockout="Off" fill="#999999" stroke="#000000" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" d="
+			M21.518,16.74c-0.907,2.747-1.431,0.541-1.431,0.541l-2.707-7.161c0,0,0.463-0.791,1.431-0.542S22.425,13.992,21.518,16.74z"/>
+		<path i:knockout="Off" fill="#999999" stroke="#000000" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" d="
+			M17.833,4.594h-1.799V0.622h1.799V4.594z"/>
+		<path i:knockout="Off" fill="#E6E6E6" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" d="M14.637,22.992
+			l-3.55,2.691L0.609,11.828l3.55-2.692L14.637,22.992z"/>
+		<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" d="
+			M4.584,13.598l2.127-1.616"/>
+		<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" d="
+			M6.494,16.124l2.13-1.615"/>
+		<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" d="
+			M8.404,18.649l2.13-1.614"/>
+		<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" d="
+			M10.315,21.176l2.129-1.615"/>
+		<path i:knockout="Off" fill="#999999" stroke="#000000" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" d="
+			M12.427,16.74c0.906,2.747,1.431,0.541,1.431,0.541l2.707-7.161c0,0-0.463-0.791-1.431-0.542
+			C14.165,9.828,11.52,13.992,12.427,16.74z"/>
+	</g>
+</svg>

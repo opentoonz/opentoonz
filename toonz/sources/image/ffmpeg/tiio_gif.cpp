@@ -190,7 +190,7 @@ TLevelReaderGif::TLevelReaderGif(const TFilePath &path)
   m_ly                    = m_size.ly;
 
   ffmpegReader->getFramesFromMovie();
-
+  m_frameCount = ffmpegReader->getGifFrameCount();
   // set values
   m_info                   = new TImageInfo();
   m_info->m_frameRate      = fps;

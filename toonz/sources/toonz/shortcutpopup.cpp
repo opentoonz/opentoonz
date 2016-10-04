@@ -559,7 +559,6 @@ void ShortcutPopup::showDialog(QString text) {
     m_dialogLabel = new QLabel("", this);
     m_dialog      = new DVGui::Dialog(this, false, false);
     m_dialog->setWindowTitle(tr("OpenToonz - Setting Shortcuts"));
-    // dialog->setLabelWidth(0);
     m_dialog->setModal(false);
 
     m_dialog->setTopMargin(10);
@@ -608,9 +607,8 @@ void ShortcutPopup::onExportButton(TFilePath fp) {
 //-----------------------------------------------------------------------------
 
 void ShortcutPopup::onDeletePreset() {
-  if (m_presetChoiceCB->currentIndex() <= 4) {
-    // QString info = "Included presets cannot be deleted.";
-    // int ret = DVGui::MsgBox(info, QObject::tr("OK"), 0);
+	// change this to 4 once RETAS shortcuts are updated
+  if (m_presetChoiceCB->currentIndex() <= 3) {
     DVGui::MsgBox(DVGui::CRITICAL, tr("Included presets cannot be deleted."));
     return;
   }
@@ -641,7 +639,6 @@ void ShortcutPopup::onDeletePreset() {
 void ShortcutPopup::importPreset() {
   m_loadShortcutsPopup = new GenericLoadFilePopup("Load Shortcuts File");
   m_loadShortcutsPopup->addFilterType("ini");
-  // m_loadShortcutsPopup->exec();
   TFilePath shortcutPath = m_loadShortcutsPopup->getPath();
   if (shortcutPath == TFilePath()) {
     m_presetChoiceCB->setCurrentIndex(0);
@@ -716,7 +713,7 @@ QStringList ShortcutPopup::buildPresets() {
   QStringList presets;
   presets << ""
           << "OpenToonz"
-          << "RETAS PaintMan"
+          //<< "RETAS PaintMan"
           << "Toon Boom Harmony"
           << "Adobe Animate(Flash)";
   TFilePath presetDir =

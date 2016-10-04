@@ -3,20 +3,75 @@
 #include "toonz/toonzfolders.h"
 #include "tsystem.h"
 #include "tenv.h"
-//#include "appmainshell.h"
 #include "tconvert.h"
 #include "toonz/preferences.h"
+#include <QStandardPaths>
 
 using namespace TEnv;
+
+//-------------------------------------------------------------------
+namespace {
+TFilePath getMyDocumentsPath() {
+  QString documentsPath =
+      QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation)[0];
+  return TFilePath(documentsPath);
+}
+
+// Desktop Path
+TFilePath getDesktopPath() {
+  QString desktopPath =
+      QStandardPaths::standardLocations(QStandardPaths::DesktopLocation)[0];
+  return TFilePath(desktopPath);
+}
+}
+//-------------------------------------------------------------------
 
 TFilePath ToonzFolder::getModulesDir() {
   return getProfileFolder() + "layouts";
 }
 
 TFilePathSet ToonzFolder::getProjectsFolders() {
-  TFilePathSet fps =
+  int location = Preferences::instance()->getProjectRoot();
+  QString path = Preferences::instance()->getCustomProjectRoot();
+  TFilePathSet fps;
+  int projectPaths = Preferences::instance()->getProjectRoot();
+  bool stuff       = projectPaths & 0x08;
+  bool documents   = projectPaths & 0x04;
+  bool desktop     = projectPaths & 0x02;
+  bool custom      = projectPaths & 0x01;
+
+  // make sure at least something is there
+  if (!desktop && !custom && !documents) stuff = 1;
+  TFilePathSet tempFps =
       getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
-  if (fps.empty()) fps.push_back(TEnv::getStuffDir() + "Projects");
+  if (stuff) {
+    for (TFilePath tempPath : tempFps) {
+      if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
+        fps.push_back(TFilePath(tempPath));
+      }
+    }
+    if (tempFps.size() == 0) fps.push_back(TEnv::getStuffDir() + "Projects");
+  }
+  if (documents) {
+    fps.push_back(getMyDocumentsPath() + "OpenToonz");
+    if (!TSystem::doesExistFileOrLevel(getMyDocumentsPath() + "OpenToonz")) {
+      TSystem::mkDir(getMyDocumentsPath() + "OpenToonz");
+    }
+  }
+  if (desktop) {
+    fps.push_back(getDesktopPath() + "OpenToonz");
+    if (!TSystem::doesExistFileOrLevel(getDesktopPath() + "OpenToonz")) {
+      TSystem::mkDir(getDesktopPath() + "OpenToonz");
+    }
+  }
+  if (custom) {
+    QStringList paths = path.split("**");
+    for (QString tempPath : paths) {
+      if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
+        fps.push_back(TFilePath(tempPath));
+      }
+    }
+  }
   return fps;
 }
 
