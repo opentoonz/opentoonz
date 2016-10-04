@@ -607,7 +607,7 @@ void ShortcutPopup::onExportButton(TFilePath fp) {
 //-----------------------------------------------------------------------------
 
 void ShortcutPopup::onDeletePreset() {
-	// change this to 4 once RETAS shortcuts are updated
+  // change this to 4 once RETAS shortcuts are updated
   if (m_presetChoiceCB->currentIndex() <= 3) {
     DVGui::MsgBox(DVGui::CRITICAL, tr("Included presets cannot be deleted."));
     return;
@@ -649,7 +649,7 @@ void ShortcutPopup::importPreset() {
   TFilePath presetDir =
       ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
   if (!TSystem::doesExistFileOrLevel(presetDir)) {
-      TSystem::mkDir(presetDir);
+    TSystem::mkDir(presetDir);
   }
   QString name        = shortcutPath.withoutParentDir().getQString();
   std::string strName = name.toStdString();

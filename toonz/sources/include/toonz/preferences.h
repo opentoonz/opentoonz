@@ -445,7 +445,8 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset, m_customProjectRoot;
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
+      m_customProjectRoot;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
