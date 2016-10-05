@@ -2236,7 +2236,7 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene) 
+      (fileType == Scene)
           ? m_recentScenes
           : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
   int i;
