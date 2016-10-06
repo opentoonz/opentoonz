@@ -520,7 +520,7 @@ void ShortcutPopup::setPresetShortcuts(TFilePath fp) {
         action, preset.value(id).toString().toStdString(), false);
   }
   preset.endGroup();
-  m_sViewer->shortcutChanged();
+  emit m_sViewer->shortcutChanged();
   m_dialog->hide();
   buildPresets();
   setCurrentPresetPref(QString::fromStdString(fp.getName()));
@@ -592,8 +592,10 @@ void ShortcutPopup::onExportButton(TFilePath fp) {
       std::string id = CommandManager::instance()->getIdFromAction(action);
       std::string shortcut =
           CommandManager::instance()->getShortcutFromAction(action);
-      shortcutString = shortcutString + QString::fromStdString(id) + "=" +
-                       QString::fromStdString(shortcut) + "\n";
+      if (shortcut != "") {
+        shortcutString = shortcutString + QString::fromStdString(id) + "=" +
+                         QString::fromStdString(shortcut) + "\n";
+      }
     }
   }
   QFile file(fp.getQString());
@@ -669,6 +671,8 @@ void ShortcutPopup::onLoadPreset() {
   QString preset = m_presetChoiceCB->currentText();
   TFilePath presetDir =
       ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
+  TFilePath defaultPresetDir =
+      ToonzFolder::getProfileFolder() + TFilePath("layouts/shortcuts");
   if (preset == "") return;
   if (preset == "Load from file...") {
     importPreset();
@@ -679,22 +683,22 @@ void ShortcutPopup::onLoadPreset() {
   showDialog("Setting Shortcuts");
   if (preset == "OpenToonz") {
     clearAllShortcuts(false);
-    TFilePath fp = TEnv::getConfigDir() + TFilePath("defopentoonz.ini");
+    TFilePath fp = defaultPresetDir + TFilePath("defopentoonz.ini");
     setPresetShortcuts(fp);
     return;
   } else if (preset == "Toon Boom Harmony") {
     clearAllShortcuts(false);
-    TFilePath fp = TEnv::getConfigDir() + TFilePath("otharmony.ini");
+    TFilePath fp = defaultPresetDir + TFilePath("otharmony.ini");
     setPresetShortcuts(fp);
     return;
   } else if (preset == "Adobe Animate(Flash)") {
     clearAllShortcuts(false);
-    TFilePath fp = TEnv::getConfigDir() + TFilePath("otadobe.ini");
+    TFilePath fp = defaultPresetDir + TFilePath("otadobe.ini");
     setPresetShortcuts(fp);
     return;
   } else if (preset == "RETAS PaintMan") {
     clearAllShortcuts(false);
-    TFilePath fp = TEnv::getConfigDir() + TFilePath("otretas.ini");
+    TFilePath fp = defaultPresetDir + TFilePath("otretas.ini");
     setPresetShortcuts(fp);
     return;
   } else if (TSystem::doesExistFileOrLevel(presetDir +

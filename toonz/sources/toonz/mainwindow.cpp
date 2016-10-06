@@ -2139,8 +2139,7 @@ void MainWindow::defineActions() {
                           tr("Column Pick Mode"), "");
   createToolOptionsAction("A_ToolOption_AutoSelect:Pegbar",
                           tr("Pegbar Pick Mode"), "");
-  createToolOptionsAction("A_ToolOption_PickScreen", tr("Pick Screen"),
-                          "Shift+\\");
+  createToolOptionsAction("A_ToolOption_PickScreen", tr("Pick Screen"), "");
   createToolOptionsAction("A_ToolOption_Meshify", tr("Create Mesh"), "");
 
   /*-- FillAreas, FillLinesにキー1つで切り替えるためのコマンド --*/
