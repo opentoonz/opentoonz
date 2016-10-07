@@ -45,6 +45,7 @@
 #include <QMainWindow>
 #include <QStringList>
 #include <QListWidget>
+#include <QGroupBox>
 
 using namespace DVGui;
 
@@ -274,6 +275,33 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
     m_defLevelHeight->setDecimals(4);
     m_defLevelWidth->setDecimals(4);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onProjectRootChanged() {
+  int index = 0;
+  if (m_projectRootStuff->isChecked()) index |= 0x08;
+  if (m_projectRootDocuments->isChecked()) index |= 0x04;
+  if (m_projectRootDesktop->isChecked()) index |= 0x02;
+  if (m_projectRootCustom->isChecked()) index |= 0x01;
+  m_pref->setProjectRoot(index);
+  if (index & 0x01) {
+    m_customProjectRootFileField->show();
+    m_customProjectRootLabel->show();
+    m_projectRootDirections->show();
+  } else {
+    m_customProjectRootFileField->hide();
+    m_customProjectRootLabel->hide();
+    m_projectRootDirections->hide();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onCustomProjectRootChanged() {
+  QString text = m_customProjectRootFileField->getPath();
+  m_pref->setCustomProjectRoot(text.toStdWString());
 }
 
 //-----------------------------------------------------------------------------
@@ -526,9 +554,31 @@ void PreferencesPopup::onDefaultViewerChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onAutoSaveChanged(int index) {
-  m_minuteFld->setEnabled(index == Qt::Checked);
-  m_pref->enableAutosave(index == Qt::Checked);
+void PreferencesPopup::onAutoSaveChanged(bool on) {
+  m_pref->enableAutosave(on);
+  if (on && !m_autoSaveSceneCB->isChecked() &&
+      !m_autoSaveOtherFilesCB->isChecked()) {
+    m_autoSaveSceneCB->setChecked(true);
+    m_autoSaveOtherFilesCB->setChecked(true);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveSceneChanged(int index) {
+  m_pref->enableAutosaveScene(index == Qt::Checked);
+  if (!m_autoSaveOtherFilesCB->isChecked() && index == Qt::Unchecked) {
+    m_autoSaveGroup->setChecked(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveOtherFilesChanged(int index) {
+  m_pref->enableAutosaveOtherFiles(index == Qt::Checked);
+  if (!m_autoSaveSceneCB->isChecked() && index == Qt::Unchecked) {
+    m_autoSaveGroup->setChecked(false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -898,8 +948,12 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Default Viewer for Movie Formats"), this);
   CheckBox *minimizeRasterMemoryCB =
       new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
-  CheckBox *autoSaveCB = new CheckBox(tr("Save Automatically Every Minutes"));
-  m_minuteFld          = new DVGui::IntLineEdit(this, 15, 1, 60);
+  m_autoSaveGroup = new QGroupBox(tr("Save Automatically"), this);
+  m_autoSaveGroup->setCheckable(true);
+  m_autoSaveSceneCB = new CheckBox(tr("Automatically Save the Scene File"));
+  m_autoSaveOtherFilesCB =
+      new CheckBox(tr("Automatically Save Non-Scene Files"));
+  m_minuteFld = new DVGui::IntLineEdit(this, 15, 1, 60);
   CheckBox *replaceAfterSaveLevelAsCB =
       new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
 
@@ -910,6 +964,15 @@ PreferencesPopup::PreferencesPopup()
   m_chunkSizeFld =
       new DVGui::IntLineEdit(this, m_pref->getDefaultTaskChunkSize(), 1, 2000);
   CheckBox *sceneNumberingCB = new CheckBox(tr("Show Info in Rendered Frames"));
+
+  m_projectRootDocuments = new CheckBox(tr("My Documents/OpenToonz*"), this);
+  m_projectRootDesktop   = new CheckBox(tr("Desktop/OpenToonz*"), this);
+  m_projectRootStuff     = new CheckBox(tr("Stuff Folder*"), this);
+  m_projectRootCustom    = new CheckBox(tr("Custom*"), this);
+  m_customProjectRootFileField = new DVGui::FileField(this, QString(""));
+  m_customProjectRootLabel     = new QLabel(tr("Custom Project Path(s): "));
+  m_projectRootDirections      = new QLabel(
+      tr("Advanced: Multiple paths can be separated by ** (No Spaces)"));
 
   QLabel *note_general =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
@@ -1100,9 +1163,10 @@ PreferencesPopup::PreferencesPopup()
   //--- General ------------------------------
   useDefaultViewerCB->setChecked(m_pref->isDefaultViewerEnabled());
   minimizeRasterMemoryCB->setChecked(m_pref->isRasterOptimizedMemory());
-  autoSaveCB->setChecked(m_pref->isAutosaveEnabled());
+  m_autoSaveGroup->setChecked(m_pref->isAutosaveEnabled());
+  m_autoSaveSceneCB->setChecked(m_pref->isAutosaveSceneEnabled());
+  m_autoSaveOtherFilesCB->setChecked(m_pref->isAutosaveOtherFilesEnabled());
   m_minuteFld->setValue(m_pref->getAutosavePeriod());
-  m_minuteFld->setEnabled(m_pref->isAutosaveEnabled());
   replaceAfterSaveLevelAsCB->setChecked(
       m_pref->isReplaceAfterSaveLevelAsEnabled());
 
@@ -1113,6 +1177,20 @@ PreferencesPopup::PreferencesPopup()
   m_levelsBackup->setChecked(m_pref->isLevelsBackupEnabled());
   sceneNumberingCB->setChecked(m_pref->isSceneNumberingEnabled());
 
+  m_customProjectRootFileField->setPath(m_pref->getCustomProjectRoot());
+
+  int projectPaths = m_pref->getProjectRoot();
+  m_projectRootStuff->setChecked(projectPaths & 0x08);
+  m_projectRootDocuments->setChecked(projectPaths & 0x04);
+  m_projectRootDesktop->setChecked(projectPaths & 0x02);
+  m_projectRootCustom->setChecked(projectPaths & 0x01);
+
+  m_projectRootStuff->hide();
+  if (!(projectPaths & 0x01)) {
+    m_customProjectRootFileField->hide();
+    m_customProjectRootLabel->hide();
+    m_projectRootDirections->hide();
+  }
   //--- Interface ------------------------------
   QStringList styleSheetList;
   for (int i = 0; i < m_pref->getStyleSheetCount(); i++) {
@@ -1333,16 +1411,27 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(minimizeRasterMemoryCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-      QHBoxLayout *saveAutoLay = new QHBoxLayout();
-      saveAutoLay->setMargin(0);
-      saveAutoLay->setSpacing(15);
-      {
-        saveAutoLay->addWidget(autoSaveCB, 0);
-        saveAutoLay->addWidget(m_minuteFld, 0);
-        saveAutoLay->addStretch(1);
-      }
-      generalFrameLay->addLayout(saveAutoLay, 0);
 
+      QVBoxLayout *autoSaveOptionsLay = new QVBoxLayout();
+      autoSaveOptionsLay->setMargin(10);
+      {
+        QHBoxLayout *saveAutoLay = new QHBoxLayout();
+        saveAutoLay->setMargin(0);
+        saveAutoLay->setSpacing(5);
+        {
+          saveAutoLay->addWidget(new QLabel(tr("Interval(Minutes): "), this));
+          saveAutoLay->addWidget(m_minuteFld, 0);
+          saveAutoLay->addStretch(1);
+        }
+        autoSaveOptionsLay->addLayout(saveAutoLay, 0);
+
+        autoSaveOptionsLay->addWidget(m_autoSaveSceneCB, 0,
+                                      Qt::AlignLeft | Qt::AlignVCenter);
+        autoSaveOptionsLay->addWidget(m_autoSaveOtherFilesCB, 0,
+                                      Qt::AlignLeft | Qt::AlignVCenter);
+      }
+      m_autoSaveGroup->setLayout(autoSaveOptionsLay);
+      generalFrameLay->addWidget(m_autoSaveGroup);
       // Unit, CameraUnit
       QGridLayout *unitLay = new QGridLayout();
       unitLay->setMargin(0);
@@ -1369,6 +1458,24 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(sceneNumberingCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      QGroupBox *projectGroupBox =
+          new QGroupBox(tr("Additional Project Locations"), this);
+      QGridLayout *projectRootLay = new QGridLayout();
+      projectRootLay->setMargin(10);
+      projectRootLay->setHorizontalSpacing(5);
+      projectRootLay->setVerticalSpacing(10);
+      {
+        projectRootLay->addWidget(m_projectRootStuff, 0, 0);
+        projectRootLay->addWidget(m_projectRootDocuments, 1, 0);
+        projectRootLay->addWidget(m_projectRootDesktop, 2, 0);
+        projectRootLay->addWidget(m_projectRootCustom, 3, 0);
+        projectRootLay->addWidget(m_customProjectRootLabel, 4, 0,
+                                  Qt::AlignRight | Qt::AlignVCenter);
+        projectRootLay->addWidget(m_customProjectRootFileField, 4, 1, 1, 3);
+        projectRootLay->addWidget(m_projectRootDirections, 5, 0, 1, 4);
+      }
+      projectGroupBox->setLayout(projectRootLay);
+      generalFrameLay->addWidget(projectGroupBox, 0);
       generalFrameLay->addStretch(1);
 
       generalFrameLay->addWidget(note_general, 0);
@@ -1834,8 +1941,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefaultViewerChanged(int)));
   ret = ret && connect(minimizeRasterMemoryCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onRasterOptimizedMemoryChanged(int)));
-  ret = ret && connect(autoSaveCB, SIGNAL(stateChanged(int)),
-                       SLOT(onAutoSaveChanged(int)));
+  ret = ret && connect(m_autoSaveGroup, SIGNAL(toggled(bool)),
+                       SLOT(onAutoSaveChanged(bool)));
+  ret = ret && connect(m_autoSaveSceneCB, SIGNAL(stateChanged(int)),
+                       SLOT(onAutoSaveSceneChanged(int)));
+  ret = ret && connect(m_autoSaveOtherFilesCB, SIGNAL(stateChanged(int)),
+                       SLOT(onAutoSaveOtherFilesChanged(int)));
   ret = ret && connect(m_minuteFld, SIGNAL(editingFinished()),
                        SLOT(onMinuteChanged()));
   ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
@@ -1848,7 +1959,16 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onSceneNumberingChanged(int)));
   ret = ret && connect(m_chunkSizeFld, SIGNAL(editingFinished()), this,
                        SLOT(onChunkSizeChanged()));
-
+  ret = ret && connect(m_customProjectRootFileField, SIGNAL(pathChanged()),
+                       this, SLOT(onCustomProjectRootChanged()));
+  ret = ret && connect(m_projectRootDocuments, SIGNAL(stateChanged(int)),
+                       SLOT(onProjectRootChanged()));
+  ret = ret && connect(m_projectRootDesktop, SIGNAL(stateChanged(int)),
+                       SLOT(onProjectRootChanged()));
+  ret = ret && connect(m_projectRootStuff, SIGNAL(stateChanged(int)),
+                       SLOT(onProjectRootChanged()));
+  ret = ret && connect(m_projectRootCustom, SIGNAL(stateChanged(int)),
+                       SLOT(onProjectRootChanged()));
   //--- Interface ----------------------
   ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)),
                        SLOT(onStyleSheetTypeChanged(int)));

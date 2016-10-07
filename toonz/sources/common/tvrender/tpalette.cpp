@@ -15,6 +15,7 @@
 #include "tpalette.h"
 
 #include <memory>
+#include <sstream>
 
 PERSIST_IDENTIFIER(TPalette, "palette")
 
@@ -29,6 +30,21 @@ DEFINE_CLASS_CODE(TPalette, 30)
 namespace {
 
 const int maxStyleIndex = 32765;
+
+const std::string pointToString(const TPoint &point) {
+  return std::to_string(point.x) + "," + std::to_string(point.y);
+}
+
+// splitting string with ','
+const TPoint stringToPoint(const std::string &string) {
+  std::string buffer;
+  std::stringstream ss(string);
+  std::getline(ss, buffer, ',');  // getting the first part of string
+  int x = std::stoi(buffer);
+  std::getline(ss, buffer);  // getting the second part of string
+  int y = std::stoi(buffer);
+  return TPoint(x, y);
+}
 
 }  // namespace
 
@@ -563,10 +579,17 @@ void TPalette::saveData(TOStream &os) {
   os.openChild("styles");
   {
     for (int i = 0; i < getStyleCount(); ++i) {
-      os.openChild("style");
+      TColorStyleP style = m_styles[i].second;
+      if (style->getPickedPosition() == TPoint())
+        os.openChild("style");
+      else {
+        std::map<std::string, std::string> attr;
+        attr["pickedpos"] = pointToString(style->getPickedPosition());
+        os.openChild("style", attr);
+      }
       {
         StyleWriter w(os, i);
-        m_styles[i].second->save(w);
+        style->save(w);
       }
       os.closeChild();
     }
@@ -679,6 +702,10 @@ void TPalette::loadData(TIStream &is) {
         {
           StyleReader r(is, version);
           TColorStyle *cs = TColorStyle::load(r);
+
+          std::string pickedPosStr;
+          if (is.getTagParam("pickedpos", pickedPosStr))
+            cs->setPickedPosition(stringToPoint(pickedPosStr));
 
           addStyle(cs);
         }
@@ -1087,4 +1114,16 @@ void TPalette::setShortcutValue(int key, int styleId) {
       }
     m_shortcuts[key] = styleId;
   }
+}
+
+//-------------------------------------------------------------------
+// Returns true if there is at least one style with picked pos value
+//-------------------------------------------------------------------
+
+bool TPalette::hasPickedPosStyle() {
+  for (int i = 0; i < getStyleCount(); ++i) {
+    TColorStyleP style = m_styles[i].second;
+    if (style->getPickedPosition() != TPoint()) return true;
+  }
+  return false;
 }

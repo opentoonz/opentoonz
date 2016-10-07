@@ -497,6 +497,7 @@ void StudioPaletteTreeViewer::onCurrentItemChanged(QTreeWidgetItem *current,
   m_currentPalette = StudioPalette::instance()->getPalette(newPath, false);
   m_studioPaletteHandle->setPalette(m_currentPalette.getPointer());
   m_studioPaletteHandle->notifyPaletteSwitched();
+  StudioPaletteCmd::updateAllLinkedStyles(m_levelPaletteHandle, m_xsheetHandle);
 }
 
 //-----------------------------------------------------------------------------

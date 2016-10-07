@@ -374,11 +374,11 @@ if(WIN32)
     endif()
 endif()
 
-if(WIN32)
+if(WIN32)	
     target_link_libraries(OpenToonz_${VERSION}
         Qt5::WinMain Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
         Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia
-        ${GL_LIB} ${GLUT_LIB}
+        ${GL_LIB} ${GLUT_LIB} strmiids
         tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm
     )
 elseif(APPLE)
