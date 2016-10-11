@@ -16,6 +16,7 @@
 #define MI_SaveScene "MI_SaveScene"
 #define MI_SaveSceneAs "MI_SaveSceneAs"
 #define MI_SaveAll "MI_SaveAll"
+#define MI_SaveAllLevels "MI_SaveAllLevels"
 #define MI_RevertScene "MI_RevertScene"
 #define MI_LoadSubSceneFile "MI_LoadSubSceneFile"
 

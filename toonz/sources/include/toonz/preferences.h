@@ -99,6 +99,14 @@ public:
   void setAutosavePeriod(int minutes);
   int getAutosavePeriod() const { return m_autosavePeriod; }  // minutes
 
+  void enableAutosaveScene(bool on);
+  bool isAutosaveSceneEnabled() const { return m_autosaveSceneEnabled; }
+
+  void enableAutosaveOtherFiles(bool on);
+  bool isAutosaveOtherFilesEnabled() const {
+    return m_autosaveOtherFilesEnabled;
+  }
+
   void enableLevelsBackup(bool enabled);
   bool isLevelsBackupEnabled() const { return m_levelsBackupEnabled; }
 
@@ -410,6 +418,9 @@ public:
   int getTextureSize() const { return m_textureSize; }
   bool useDrawPixel() { return m_textureSize == 0; }
 
+  void setShortcutPreset(std::string preset);
+  QString getShortcutPreset() { return m_shortcutPreset; }
+
   int getShmMax() const {
     return m_shmmax;
   }  //! \sa The \p sysctl unix command.
@@ -437,7 +448,8 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_customProjectRoot;
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
+      m_customProjectRoot;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
@@ -460,6 +472,7 @@ private:
       m_generatedMovieViewEnabled, m_xsheetAutopanEnabled,
       m_ignoreAlphaonColumn1Enabled, m_previewAlwaysOpenNewFlipEnabled,
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
+      m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
       m_defaultViewerEnabled, m_pixelsOnly;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,

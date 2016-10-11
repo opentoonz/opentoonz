@@ -554,9 +554,31 @@ void PreferencesPopup::onDefaultViewerChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onAutoSaveChanged(int index) {
-  m_minuteFld->setEnabled(index == Qt::Checked);
-  m_pref->enableAutosave(index == Qt::Checked);
+void PreferencesPopup::onAutoSaveChanged(bool on) {
+  m_pref->enableAutosave(on);
+  if (on && !m_autoSaveSceneCB->isChecked() &&
+      !m_autoSaveOtherFilesCB->isChecked()) {
+    m_autoSaveSceneCB->setChecked(true);
+    m_autoSaveOtherFilesCB->setChecked(true);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveSceneChanged(int index) {
+  m_pref->enableAutosaveScene(index == Qt::Checked);
+  if (!m_autoSaveOtherFilesCB->isChecked() && index == Qt::Unchecked) {
+    m_autoSaveGroup->setChecked(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveOtherFilesChanged(int index) {
+  m_pref->enableAutosaveOtherFiles(index == Qt::Checked);
+  if (!m_autoSaveSceneCB->isChecked() && index == Qt::Unchecked) {
+    m_autoSaveGroup->setChecked(false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -932,7 +954,11 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Default Viewer for Movie Formats"), this);
   CheckBox *minimizeRasterMemoryCB =
       new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
-  CheckBox *autoSaveCB = new CheckBox(tr("Save Automatically Every Minutes"));
+  m_autoSaveGroup = new QGroupBox(tr("Save Automatically"), this);
+  m_autoSaveGroup->setCheckable(true);
+  m_autoSaveSceneCB = new CheckBox(tr("Automatically Save the Scene File"));
+  m_autoSaveOtherFilesCB =
+      new CheckBox(tr("Automatically Save Non-Scene Files"));
   CheckBox *startupPopupCB =
       new CheckBox(tr("Show Startup Window when OpenToonz Starts"));
   m_minuteFld = new DVGui::IntLineEdit(this, 15, 1, 60);
@@ -1145,9 +1171,10 @@ PreferencesPopup::PreferencesPopup()
   //--- General ------------------------------
   useDefaultViewerCB->setChecked(m_pref->isDefaultViewerEnabled());
   minimizeRasterMemoryCB->setChecked(m_pref->isRasterOptimizedMemory());
-  autoSaveCB->setChecked(m_pref->isAutosaveEnabled());
+  m_autoSaveGroup->setChecked(m_pref->isAutosaveEnabled());
+  m_autoSaveSceneCB->setChecked(m_pref->isAutosaveSceneEnabled());
+  m_autoSaveOtherFilesCB->setChecked(m_pref->isAutosaveOtherFilesEnabled());
   m_minuteFld->setValue(m_pref->getAutosavePeriod());
-  m_minuteFld->setEnabled(m_pref->isAutosaveEnabled());
   startupPopupCB->setChecked(m_pref->isStartupPopupEnabled());
   replaceAfterSaveLevelAsCB->setChecked(
       m_pref->isReplaceAfterSaveLevelAsEnabled());
@@ -1393,15 +1420,27 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(minimizeRasterMemoryCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-      QHBoxLayout *saveAutoLay = new QHBoxLayout();
-      saveAutoLay->setMargin(0);
-      saveAutoLay->setSpacing(15);
+
+      QVBoxLayout *autoSaveOptionsLay = new QVBoxLayout();
+      autoSaveOptionsLay->setMargin(10);
       {
-        saveAutoLay->addWidget(autoSaveCB, 0);
-        saveAutoLay->addWidget(m_minuteFld, 0);
-        saveAutoLay->addStretch(1);
+        QHBoxLayout *saveAutoLay = new QHBoxLayout();
+        saveAutoLay->setMargin(0);
+        saveAutoLay->setSpacing(5);
+        {
+          saveAutoLay->addWidget(new QLabel(tr("Interval(Minutes): "), this));
+          saveAutoLay->addWidget(m_minuteFld, 0);
+          saveAutoLay->addStretch(1);
+        }
+        autoSaveOptionsLay->addLayout(saveAutoLay, 0);
+
+        autoSaveOptionsLay->addWidget(m_autoSaveSceneCB, 0,
+                                      Qt::AlignLeft | Qt::AlignVCenter);
+        autoSaveOptionsLay->addWidget(m_autoSaveOtherFilesCB, 0,
+                                      Qt::AlignLeft | Qt::AlignVCenter);
       }
-      generalFrameLay->addLayout(saveAutoLay, 0);
+      m_autoSaveGroup->setLayout(autoSaveOptionsLay);
+      generalFrameLay->addWidget(m_autoSaveGroup);
       generalFrameLay->addWidget(startupPopupCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
       // Unit, CameraUnit
@@ -1913,8 +1952,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefaultViewerChanged(int)));
   ret = ret && connect(minimizeRasterMemoryCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onRasterOptimizedMemoryChanged(int)));
-  ret = ret && connect(autoSaveCB, SIGNAL(stateChanged(int)),
-                       SLOT(onAutoSaveChanged(int)));
+  ret = ret && connect(m_autoSaveGroup, SIGNAL(toggled(bool)),
+                       SLOT(onAutoSaveChanged(bool)));
+  ret = ret && connect(m_autoSaveSceneCB, SIGNAL(stateChanged(int)),
+                       SLOT(onAutoSaveSceneChanged(int)));
+  ret = ret && connect(m_autoSaveOtherFilesCB, SIGNAL(stateChanged(int)),
+                       SLOT(onAutoSaveOtherFilesChanged(int)));
   ret = ret && connect(m_minuteFld, SIGNAL(editingFinished()),
                        SLOT(onMinuteChanged()));
   ret = ret && connect(startupPopupCB, SIGNAL(stateChanged(int)),

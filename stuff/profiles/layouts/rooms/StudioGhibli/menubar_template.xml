@@ -13,6 +13,7 @@
     <separator/>
     <command>MI_NewLevel</command>
     <command>MI_LoadLevel</command>
+    <command>MI_SaveAllLevels</command>
     <command>MI_SaveLevel</command>
     <command>MI_SaveLevelAs</command>
     <command>MI_ExportLevel</command>

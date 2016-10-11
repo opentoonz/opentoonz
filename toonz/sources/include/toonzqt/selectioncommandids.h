@@ -12,6 +12,8 @@
 #define MI_PasteColors "MI_PasteColors"
 #define MI_PasteNames "MI_PasteNames"
 #define MI_GetColorFromStudioPalette "MI_GetColorFromStudioPalette"
+#define MI_ToggleLinkToStudioPalette "MI_ToggleLinkToStudioPalette"
+#define MI_RemoveReferenceToStudioPalette "MI_RemoveReferenceToStudioPalette"
 #define MI_Clear "MI_Clear"
 #define MI_SelectAll "MI_SelectAll"
 #define MI_InvertSelection "MI_InvertSelection"

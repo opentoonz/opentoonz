@@ -24,6 +24,7 @@
 class QLineEdit;
 class QPushButton;
 class QLabel;
+class QGroupBox;
 
 //==============================================================
 
@@ -70,11 +71,13 @@ private:
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
       *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
-      *m_onionSkinDuringPlayback;
+      *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB;
 
   DVGui::FileField *m_customProjectRootFileField;
 
   DVGui::FileField *m_ffmpegPathFileFld;
+
+  QGroupBox *m_autoSaveGroup;
 
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
@@ -104,7 +107,9 @@ private slots:
   void onRasterOptimizedMemoryChanged(int index);
   void onSaveUnpaintedInCleanupChanged(int index);
   void onMinimizeSaveboxAfterEditing(int index);
-  void onAutoSaveChanged(int index);
+  void onAutoSaveChanged(bool on);
+  void onAutoSaveSceneChanged(int index);
+  void onAutoSaveOtherFilesChanged(int index);
   void onStartupPopupChanged(int index);
   void onDefaultViewerChanged(int index);
   void onBlankCountChanged();

@@ -21,6 +21,7 @@ class QVideoFrame;
 class QTimer;
 class QIntValidator;
 class QRegExpValidator;
+class QPushButton;
 
 namespace DVGui {
 class FileField;
@@ -147,6 +148,9 @@ class PencilTestPopup : public DVGui::Dialog {
 
   QImage m_whiteBGImg;
 
+  // used only for Windows
+  QPushButton* m_captureFilterSettingsBtn;
+
   int m_timerId;
   QString m_cacheImagePath;
   bool m_captureWhiteBGCue;
@@ -183,6 +187,7 @@ protected slots:
   void onCountDown();
 
   void onCaptureButtonClicked(bool);
+  void onCaptureFilterSettingsBtnPressed();
 };
 
 #endif

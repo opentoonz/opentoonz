@@ -65,6 +65,11 @@
 #include <QTimer>
 #include <QIntValidator>
 #include <QRegExpValidator>
+#include <QPushButton>
+
+#ifdef _WIN32
+#include <dshow.h>
+#endif
 
 using namespace DVGui;
 
@@ -304,6 +309,90 @@ int letterToNum(QChar appendix) {
   else
     return 0;
 }
+
+#ifdef _WIN32
+void openCaptureFilterSettings(const QWidget* parent,
+                               const QString& cameraName) {
+  HRESULT hr;
+
+  ICreateDevEnum* createDevEnum = NULL;
+  IEnumMoniker* enumMoniker     = NULL;
+  IMoniker* moniker             = NULL;
+
+  IBaseFilter* deviceFilter;
+
+  ISpecifyPropertyPages* specifyPropertyPages;
+  CAUUID cauuid;
+  // set parent's window handle in order to make the dialog modal
+  HWND ghwndApp = (HWND)(parent->winId());
+
+  // initialize COM
+  CoInitialize(NULL);
+
+  // get device list
+  CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER,
+                   IID_ICreateDevEnum, (PVOID*)&createDevEnum);
+
+  // create EnumMoniker
+  createDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory,
+                                       &enumMoniker, 0);
+  if (enumMoniker == NULL) {
+    // if no connected devices found
+    return;
+  }
+
+  // reset EnumMoniker
+  enumMoniker->Reset();
+
+  // find target camera
+  ULONG fetched      = 0;
+  bool isCameraFound = false;
+  while (hr = enumMoniker->Next(1, &moniker, &fetched), hr == S_OK) {
+    // get friendly name (= device name) of the camera
+    IPropertyBag* pPropertyBag;
+    moniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPropertyBag);
+    VARIANT var;
+    var.vt = VT_BSTR;
+    VariantInit(&var);
+
+    pPropertyBag->Read(L"FriendlyName", &var, 0);
+
+    QString deviceName = QString::fromWCharArray(var.bstrVal);
+
+    VariantClear(&var);
+
+    if (deviceName == cameraName) {
+      // bind monkier to the filter
+      moniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&deviceFilter);
+
+      // release moniker etc.
+      moniker->Release();
+      enumMoniker->Release();
+      createDevEnum->Release();
+
+      isCameraFound = true;
+      break;
+    }
+  }
+
+  // if no matching camera found
+  if (!isCameraFound) return;
+
+  // open capture filter popup
+  hr = deviceFilter->QueryInterface(IID_ISpecifyPropertyPages,
+                                    (void**)&specifyPropertyPages);
+  if (hr == S_OK) {
+    hr = specifyPropertyPages->GetPages(&cauuid);
+
+    hr = OleCreatePropertyFrame(ghwndApp, 30, 30, NULL, 1,
+                                (IUnknown**)&deviceFilter, cauuid.cElems,
+                                (GUID*)cauuid.pElems, 0, 0, NULL);
+
+    CoTaskMemFree(cauuid.pElems);
+    specifyPropertyPages->Release();
+  }
+}
+#endif
 
 }  // namespace
 
@@ -547,6 +636,12 @@ PencilTestPopup::PencilTestPopup()
 
   m_captureButton          = new QPushButton(tr("Capture\n[Return key]"), this);
   QPushButton* closeButton = new QPushButton(tr("Close"), this);
+
+#ifdef _WIN32
+  m_captureFilterSettingsBtn = new QPushButton(this);
+#else
+  m_captureFilterSettingsBtn = 0;
+#endif
   //----
 
   m_resolutionCombo->setMaximumWidth(fontMetrics().width("0000 x 0000") + 25);
@@ -598,6 +693,14 @@ PencilTestPopup::PencilTestPopup()
   m_captureButton->setIcon(style.standardIcon(QStyle::SP_DialogOkButton));
   m_captureButton->setIconSize(QSize(30, 30));
 
+  if (m_captureFilterSettingsBtn) {
+    m_captureFilterSettingsBtn->setObjectName("GearButton");
+    m_captureFilterSettingsBtn->setFixedSize(23, 23);
+    m_captureFilterSettingsBtn->setIconSize(QSize(15, 15));
+    m_captureFilterSettingsBtn->setToolTip(
+        tr("Video Capture Filter Settings..."));
+  }
+
   //---- layout ----
   QHBoxLayout* mainLay = new QHBoxLayout();
   mainLay->setMargin(0);
@@ -617,6 +720,12 @@ PencilTestPopup::PencilTestPopup()
         camLay->addSpacing(10);
         camLay->addWidget(new QLabel(tr("Resolution:"), this), 0);
         camLay->addWidget(m_resolutionCombo, 1);
+
+        if (m_captureFilterSettingsBtn) {
+          camLay->addSpacing(10);
+          camLay->addWidget(m_captureFilterSettingsBtn);
+        }
+
         camLay->addStretch(0);
       }
       leftLay->addLayout(camLay, 0);
@@ -788,6 +897,9 @@ PencilTestPopup::PencilTestPopup()
   ret = ret && connect(closeButton, SIGNAL(clicked()), this, SLOT(reject()));
   ret = ret && connect(m_captureButton, SIGNAL(clicked(bool)), this,
                        SLOT(onCaptureButtonClicked(bool)));
+  if (m_captureFilterSettingsBtn)
+    ret = ret && connect(m_captureFilterSettingsBtn, SIGNAL(pressed()), this,
+                         SLOT(onCaptureFilterSettingsBtnPressed()));
   assert(ret);
 
   refreshCameraList();
@@ -1399,6 +1511,22 @@ bool PencilTestPopup::importImage(QImage& image) {
   app->getCurrentXsheet()->notifyXsheetChanged();
 
   return true;
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onCaptureFilterSettingsBtnPressed() {
+  if (!m_currentCamera || m_deviceName.isNull()) return;
+
+  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  for (int c = 0; c < cameras.size(); c++) {
+    if (cameras.at(c).deviceName() == m_deviceName) {
+#ifdef _WIN32
+      openCaptureFilterSettings(this, cameras.at(c).description());
+#endif
+      return;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
