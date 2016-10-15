@@ -766,10 +766,7 @@ DvDirTreeView {
 /*---------------------------------------------------------------------------*/
 #CleanupSettingsFrame, 
 #LoadLevelFrame,
-#SolidLineFrame,
-#StartupProjectBox,
-#StartupNewSceneBox, 
-#StartupRecentSceneBox {
+#SolidLineFrame {
   border: 1px solid #e6e6e6;
 }
 #TitleTxtLabel {
