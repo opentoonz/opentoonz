@@ -3060,9 +3060,13 @@ void StyleEditor::onStyleSwitched() {
         QString::fromStdWString(L" Palette : " + palette->getPaletteName());
 
     // style name
-    statusText += QString::fromStdWString(L" | Style#");
+    statusText += QString::fromStdWString(L" | #");
     statusText += QString::number(styleIndex);
     statusText += QString::fromStdWString(L" : " + m_editedStyle->getName());
+    TPoint pickedPos = m_editedStyle->getPickedPosition();
+    if (pickedPos != TPoint())
+      statusText +=
+          QString(" (Picked from %1,%2)").arg(pickedPos.x).arg(pickedPos.y);
 
     m_statusLabel->setText(statusText);
   } else

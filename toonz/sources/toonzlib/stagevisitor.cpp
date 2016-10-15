@@ -602,6 +602,9 @@ void RasterPainter::flushRasterImages() {
   glDisable(GL_DITHER);
   glDisable(GL_LOGIC_OP);
 
+/* disable, since these features are never enabled, and cause OpenGL to assert
+ * on systems that don't support them: see #591 */
+#if 0
 #ifdef GL_EXT_convolution
   glDisable(GL_CONVOLUTION_1D_EXT);
   glDisable(GL_CONVOLUTION_2D_EXT);
@@ -611,6 +614,7 @@ void RasterPainter::flushRasterImages() {
 #ifdef GL_EXT_histogram
   glDisable(GL_HISTOGRAM_EXT);
   glDisable(GL_MINMAX_EXT);
+#endif
 #endif
 
 #ifdef GL_EXT_texture3D

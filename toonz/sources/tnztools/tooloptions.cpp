@@ -2182,6 +2182,17 @@ StylePickerToolOptionsBox::StylePickerToolOptionsBox(
   m_layout->addWidget(m_currentStyleLabel, 0);
   m_layout->addStretch(1);
 
+  // retrieve the "organize palette" checkbox from the layout and insert
+  // into rightmost of the tool option bar
+  ToolOptionCheckbox *organizePaletteCB =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Organize Palette"));
+  m_layout->removeWidget(organizePaletteCB);
+  m_layout->addWidget(new ToolOptionsBarSeparator(this), 0);
+  m_layout->addWidget(organizePaletteCB);
+  organizePaletteCB->setToolTip(
+      tr("With this option being activated, the picked style will be\nmoved to "
+         "the end of the first page of the palette."));
+
   if (m_realTimePickMode) {
     connect(m_realTimePickMode, SIGNAL(toggled(bool)), m_currentStyleLabel,
             SLOT(setVisible(bool)));

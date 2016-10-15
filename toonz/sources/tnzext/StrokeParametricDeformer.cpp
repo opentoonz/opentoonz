@@ -5,8 +5,8 @@
  */
 
 #include "ext/StrokeParametricDeformer.h"
-#include "ext/NotSimmetricExpPotential.h"
-//#include "ext/NotSimmetricBezierPotential.h"
+#include "ext/NotSymmetricExpPotential.h"
+//#include "ext/NotSymmetricBezierPotential.h"
 //#include "ext/SquarePotential.h"
 
 #include <sstream>
@@ -18,9 +18,9 @@ using namespace std;
 //-----------------------------------------------------------------------------
 
 ToonzExt::StrokeParametricDeformer::StrokeParametricDeformer(
-    double actionLenght, double startParameter, TStroke *s, Potential *pot)
+    double actionLength, double startParameter, TStroke *s, Potential *pot)
     : startParameter_(startParameter)
-    , actionLenght_(actionLenght)
+    , actionLength_(actionLength)
     , vx_(1.0)
     , vy_(1.0)
     , pot_(0) {
@@ -37,28 +37,28 @@ ToonzExt::StrokeParametricDeformer::StrokeParametricDeformer(
   // double
   //  max_length = s->getLength();
 
-  //  if( actionLenght == -1 )
+  //  if( actionLength == -1 )
   //  {
   //    assert(false && "Rispristina la vecchia gestione");
-  //    actionLenght_ = 2.0 * max_length;
+  //    actionLength_ = 2.0 * max_length;
   //  }
   //  else
   //  {
-  assert(0.0 <= actionLenght_);
-  // && actionLenght_ <= max_length );
+  assert(0.0 <= actionLength_);
+  // && actionLength_ <= max_length );
 
-  if (0.0 > actionLenght_) actionLenght_ = 0.0;
-  // else if ( actionLenght_ > max_length )
-  //  actionLenght_ = max_length;
+  if (0.0 > actionLength_) actionLength_ = 0.0;
+  // else if ( actionLength_ > max_length )
+  //  actionLength_ = max_length;
   //}
 
   pot_ = pot;
   if (!pot_)
     throw std::invalid_argument("Not Possible to have a ref of Potential!!!");
 
-  pot_->setParameters(ref_copy_, startParameter_, actionLenght_);
+  pot_->setParameters(ref_copy_, startParameter_, actionLength_);
   assert(pot_);
-  startLenght_ = startParameter_;
+  startLength_ = startParameter_;
 }
 
 //-----------------------------------------------------------------------------
@@ -157,13 +157,13 @@ double ToonzExt::StrokeParametricDeformer::getMaxDiff() const { return diff_; }
 
 void ToonzExt::StrokeParametricDeformer::getRange(double &from, double &to) {
   double x     = ref_copy_->getLength(startParameter_);
-  double delta = x - actionLenght_ * 0.5;
+  double delta = x - actionLength_ * 0.5;
   if (delta > 0)
     from = ref_copy_->getParameterAtLength(delta);
   else
     from = 0.0;
 
-  delta = x + actionLenght_ * 0.5;
+  delta = x + actionLength_ * 0.5;
   if (delta < ref_copy_->getLength())
     to = ref_copy_->getParameterAtLength(delta);
   else

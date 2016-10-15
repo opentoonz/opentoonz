@@ -189,7 +189,7 @@
         <translation>la larghezza del video deve essere un multiplo di %1</translation>
     </message>
     <message>
-        <source>video lenght must be a multiple of %1</source>
+        <source>video length must be a multiple of %1</source>
         <translation>l&apos;altezza del video deve essere un multiplo di %1</translation>
     </message>
     <message>

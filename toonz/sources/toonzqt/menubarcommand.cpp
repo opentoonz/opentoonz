@@ -279,7 +279,8 @@ int CommandManager::getKeyFromId(const char *id) {
 
 //---------------------------------------------------------
 
-void CommandManager::setShortcut(QAction *action, std::string shortcutString) {
+void CommandManager::setShortcut(QAction *action, std::string shortcutString,
+                                 bool keepDefault) {
   QString shortcut = QString::fromStdString(shortcutString);
 
   std::string oldShortcutString = action->shortcut().toString().toStdString();
@@ -296,7 +297,7 @@ void CommandManager::setShortcut(QAction *action, std::string shortcutString) {
 
   if (node->m_type == ZoomCommandType && ks.count() > 1) {
     DVGui::warning(
-        QObject::tr("It is not possible to assing a shortcut with modifiers to "
+        QObject::tr("It is not possible to assign a shortcut with modifiers to "
                     "the visualization commands."));
     return;
   }
@@ -328,7 +329,9 @@ void CommandManager::setShortcut(QAction *action, std::string shortcutString) {
   settings.beginGroup("shortcuts");
   settings.setValue(QString::fromStdString(node->m_id),
                     QString::fromStdString(shortcutString));
-  if (oldActionId != "") settings.remove(oldActionId);
+  if (keepDefault) {
+    if (oldActionId != "") settings.remove(oldActionId);
+  }
   settings.endGroup();
 }
 

@@ -1108,5 +1108,8 @@ QDialog #dialogButtonFrame {
 #LargeSizedText {
   font-size: 17px;
 }
+#GearButton {
+  qproperty-icon: url("imgs/gear.png");
+}
 
 //# sourceMappingURL=gray_128_mac.qss.map

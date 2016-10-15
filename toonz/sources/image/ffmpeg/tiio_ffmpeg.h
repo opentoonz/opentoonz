@@ -41,6 +41,7 @@ public:
   TFilePath getFfmpegCache();
   ffmpegFileInfo getInfo();
   void disablePrecompute();
+  int getGifFrameCount();
 
 private:
   QString m_intermediateFormat, m_ffmpegPath, m_audioPath, m_audioFormat;

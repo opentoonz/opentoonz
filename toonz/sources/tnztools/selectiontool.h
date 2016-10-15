@@ -182,7 +182,7 @@ public:
 
   void addTransformUndo() override = 0;
 
-  int getSimmetricPointIndex(int index) const;
+  int getSymmetricPointIndex(int index) const;
   /*! Return before point \b index between possible point index
    * {0,4,1,5,2,6,3,7}, include middle point. */
   int getBeforePointIndex(int index) const;
@@ -287,7 +287,7 @@ straight line for
   TPointD getNewCenter(int index, const FourPoints bbox,
                        const TPointD scaleValue);
   /*! Scale \b bbox \b index point in pos and if \b m_scaleInCenter is true
-scale in \b center \b bbox simmetric point;
+scale in \b center \b bbox symmetric point;
 compute scaleValue. */
   FourPoints bboxScaleInCenter(int index, const FourPoints &oldBbox,
                                const TPointD newPos, TPointD &scaleValue,

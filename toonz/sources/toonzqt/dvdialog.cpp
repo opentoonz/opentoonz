@@ -729,6 +729,23 @@ void Dialog::addButtonBarWidget(QWidget *first, QWidget *second,
   }
 }
 
+//-----------------------------------------------------------------------------
+/*! Add four widget to the button part of dialog.
+*/
+void Dialog::addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third,
+                                QWidget *fourth) {
+  first->setMinimumSize(65, 25);
+  second->setMinimumSize(65, 25);
+  third->setMinimumSize(65, 25);
+  assert(m_hasButton);
+  if (m_hasButton) {
+    m_buttonLayout->addWidget(first);
+    m_buttonLayout->addWidget(second);
+    m_buttonLayout->addWidget(third);
+    m_buttonLayout->addWidget(fourth);
+  }
+}
+
 //=============================================================================
 
 RadioButtonDialog::RadioButtonDialog(const QString &labelText,
@@ -1051,6 +1068,65 @@ int DVGui::MsgBox(const QString &text, const QString &button1Text,
   if (defaultButtonIndex == 2) button3->setDefault(true);
   dialog.addButtonBarWidget(button3);
   buttonGroup->addButton(button3, 3);
+
+  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog,
+                   SLOT(done(int)));
+  dialog.raise();
+  return dialog.exec();
+}
+
+//-----------------------------------------------------------------------------
+
+int DVGui::MsgBox(const QString &text, const QString &button1Text,
+                  const QString &button2Text, const QString &button3Text,
+                  const QString &button4Text, int defaultButtonIndex,
+                  QWidget *parent) {
+  Dialog dialog(parent, true);
+  dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
+  dialog.setAlignment(Qt::AlignLeft);
+  QString msgBoxTitle = getMsgBoxTitle(QUESTION);
+  dialog.setWindowTitle(msgBoxTitle);
+
+  QLabel *mainTextLabel = new QLabel(text, &dialog);
+  QPixmap iconPixmap    = getMsgBoxPixmap(QUESTION);
+  if (!iconPixmap.isNull()) {
+    QLabel *iconLabel = new QLabel(&dialog);
+    iconLabel->setPixmap(iconPixmap);
+
+    QHBoxLayout *mainLayout = new QHBoxLayout;
+    mainLayout->addWidget(iconLabel);
+    mainLayout->addSpacing(16);
+    mainLayout->addWidget(mainTextLabel);
+    dialog.addLayout(mainLayout);
+  } else
+    dialog.addWidget(mainTextLabel);
+
+  // ButtonGroup: is used only to retrieve the clicked button
+  QButtonGroup *buttonGroup = new QButtonGroup(&dialog);
+
+  QPushButton *button1 = new QPushButton(button1Text, &dialog);
+  button1->setDefault(false);
+  if (defaultButtonIndex == 0) button1->setDefault(true);
+  dialog.addButtonBarWidget(button1);
+  buttonGroup->addButton(button1, 1);
+
+  QPushButton *button2 = new QPushButton(button2Text, &dialog);
+  button2->setDefault(false);
+  if (defaultButtonIndex == 1) button2->setDefault(true);
+  dialog.addButtonBarWidget(button2);
+  buttonGroup->addButton(button2, 2);
+
+  QPushButton *button3 = new QPushButton(button3Text, &dialog);
+  button3->setDefault(false);
+  if (defaultButtonIndex == 2) button3->setDefault(true);
+  dialog.addButtonBarWidget(button3);
+  buttonGroup->addButton(button3, 3);
+
+  QPushButton *button4 = new QPushButton(button4Text, &dialog);
+  button4->setDefault(false);
+  if (defaultButtonIndex == 3) button4->setDefault(true);
+  dialog.addButtonBarWidget(button4);
+  buttonGroup->addButton(button4, 4);
 
   QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog,
                    SLOT(done(int)));
