@@ -86,20 +86,20 @@ StartupPopup::StartupPopup()
   m_recentBox  = new QGroupBox(tr("Open Scene"), this);
   m_projectBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   m_nameFld                 = new LineEdit(this);
-  m_pathFld                 = new FileField(0);
+  m_pathFld                 = new FileField(this);
   m_sceneNameLabel          = new QLabel(tr("Scene Name:"));
   m_widthLabel              = new QLabel(tr("Width:"), this);
-  m_widthFld                = new DVGui::MeasuredDoubleLineEdit(0);
+  m_widthFld                = new MeasuredDoubleLineEdit(this);
   m_heightLabel             = new QLabel(tr("Height:"), this);
-  m_heightFld               = new DVGui::MeasuredDoubleLineEdit(0);
+  m_heightFld               = new MeasuredDoubleLineEdit(this);
   m_dpiLabel                = new QLabel(tr("DPI:"), this);
-  m_dpiFld                  = new DoubleLineEdit(0, 120);
+  m_dpiFld                  = new DoubleLineEdit(this, 120);
   m_resXLabel               = new QLabel(tr("X"), this);
-  m_resXFld                 = new DVGui::DoubleLineEdit(this);
-  m_resYFld                 = new DVGui::DoubleLineEdit(this);
+  m_resXFld                 = new DoubleLineEdit(this);
+  m_resYFld                 = new DoubleLineEdit(this);
   m_resTextLabel            = new QLabel(tr("Resolution:"), this);
   m_fpsLabel                = new QLabel(tr("Frame Rate:"), this);
-  m_fpsFld                  = new DoubleLineEdit(0, 24.0);
+  m_fpsFld                  = new DoubleLineEdit(this, 24.0);
   m_cameraSettingsWidget    = new CameraSettingsWidget(false);
   m_presetCombo             = new QComboBox(this);
   m_unitsCB                 = new QComboBox(this);
@@ -137,10 +137,9 @@ StartupPopup::StartupPopup()
       "QPushButton { padding-left: 4px; padding-right: 4px;}");
   QLabel *label = new QLabel();
   label->setPixmap(QPixmap(":Resources/startup.png"));
-  label->setObjectName("StartupLogo");
-  m_projectBox->setObjectName("StartupProjectBox");
-  m_sceneBox->setObjectName("StartupNewSceneBox");
-  m_recentBox->setObjectName("StartupRecentSceneBox");
+  m_projectBox->setObjectName("SolidLineFrame");
+  m_sceneBox->setObjectName("SolidLineFrame");
+  m_recentBox->setObjectName("SolidLineFrame");
   m_projectBox->setContentsMargins(10, 10, 10, 10);
   m_sceneBox->setContentsMargins(10, 10, 10, 10);
   m_recentBox->setContentsMargins(10, 10, 10, 10);
@@ -336,6 +335,7 @@ void StartupPopup::showEvent(QShowEvent *) {
   m_resYFld->setValue(m_yRes);
   m_resXFld->setDecimals(0);
   m_resYFld->setDecimals(0);
+  m_dpiFld->setValue(m_dpi);
 
   int boxWidth  = m_sceneBox->width();
   int boxHeight = m_sceneBox->height();
@@ -862,11 +862,11 @@ void StartupPopup::updateSize() {
     if (m_dpiFld->getValue() != Stage::standardDpi) {
       m_dpiFld->setValue(Stage::standardDpi);
     }
-    m_widthFld->setValue(m_xRes / Stage::standardDpi);
-    m_heightFld->setValue(m_yRes / Stage::standardDpi);
+    m_widthFld->setValue((double)m_xRes / Stage::standardDpi);
+    m_heightFld->setValue((double)m_yRes / Stage::standardDpi);
   } else {
-    m_widthFld->setValue(m_xRes / m_dpi);
-    m_heightFld->setValue(m_yRes / m_dpi);
+    m_widthFld->setValue((double)m_xRes / m_dpi);
+    m_heightFld->setValue((double)m_yRes / m_dpi);
   }
   m_presetCombo->setCurrentIndex(0);
 }

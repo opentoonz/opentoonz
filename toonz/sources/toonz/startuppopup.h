@@ -50,7 +50,8 @@ class StartupPopup final : public DVGui::Dialog {
   QComboBox *m_presetCombo;
   QPushButton *m_addPresetBtn, *m_removePresetBtn;
   CameraSettingsWidget *m_cameraSettingsWidget;
-  int m_dpi, m_xRes, m_yRes;
+  double m_dpi;
+  int m_xRes, m_yRes;
   bool m_updating = false;
   QString m_presetListFile;
   QGroupBox *m_projectBox;
