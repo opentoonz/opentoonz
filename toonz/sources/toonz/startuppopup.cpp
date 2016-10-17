@@ -272,7 +272,8 @@ StartupPopup::StartupPopup()
                        SLOT(onCameraUnitChanged(int)));
   ret = ret &&
         connect(m_removePresetBtn, SIGNAL(clicked()), SLOT(removePreset()));
-
+  ret = ret && connect(m_nameFld, SIGNAL(returnPressedNow()), createButton,
+                       SLOT(animateClick()));
   assert(ret);
 }
 
@@ -512,6 +513,30 @@ void StartupPopup::onProjectChanged(int index) {
                          ->getProject()
                          ->getScenesPath()
                          .getQString());
+  m_fpsFld->setValue(TApp::instance()
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getProperties()
+                         ->getOutputProperties()
+                         ->getFrameRate());
+  TDimension res = TApp::instance()
+                       ->getCurrentScene()
+                       ->getScene()
+                       ->getCurrentCamera()
+                       ->getRes();
+  m_xRes = res.lx;
+  m_yRes = res.ly;
+  m_resXFld->setValue(m_xRes);
+  m_resYFld->setValue(m_yRes);
+  TDimensionD size = TApp::instance()
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getCurrentCamera()
+                         ->getSize();
+  m_widthFld->setValue(size.lx);
+  m_heightFld->setValue(size.ly);
+  m_dpi = m_xRes / size.lx;
+  m_dpiFld->setValue(m_dpi);
 }
 
 //-----------------------------------------------------------------------------
