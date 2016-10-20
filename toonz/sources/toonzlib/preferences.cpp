@@ -1260,9 +1260,9 @@ void Preferences::setFfmpegPath(std::string path) {
 //-----------------------------------------------------------------
 
 void Preferences::setFastRenderPath(std::string path) {
-    m_fastRenderPath = QString::fromStdString(path);
-    std::string strPath = m_ffmpegPath.toStdString();
-    m_settings->setValue("fastRenderPath", m_fastRenderPath);
+  m_fastRenderPath    = QString::fromStdString(path);
+  std::string strPath = m_ffmpegPath.toStdString();
+  m_settings->setValue("fastRenderPath", m_fastRenderPath);
 }
 
 //-----------------------------------------------------------------

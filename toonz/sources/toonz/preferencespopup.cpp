@@ -924,8 +924,8 @@ void PreferencesPopup::onFfmpegPathChanged() {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onFastRenderPathChanged() {
-    QString text = m_fastRenderPathFileField->getPath();
-    m_pref->setFastRenderPath(text.toStdString());
+  QString text = m_fastRenderPathFileField->getPath();
+  m_pref->setFastRenderPath(text.toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -1083,9 +1083,9 @@ PreferencesPopup::PreferencesPopup()
 
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
-  m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
+  m_ffmpegPathFileFld       = new DVGui::FileField(this, QString(""));
   m_fastRenderPathFileField = new DVGui::FileField(this, QString(""));
-  m_ffmpegTimeout     = new DVGui::IntLineEdit(this, 30, 1);
+  m_ffmpegTimeout           = new DVGui::IntLineEdit(this, 30, 1);
 
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
@@ -1726,7 +1726,7 @@ PreferencesPopup::PreferencesPopup()
                           "exports from Fast Render(MP4) to go.")),
             6, 0, 1, 4);
         ioGridLay->addWidget(new QLabel(tr("Quick Render Path: ")), 7, 0,
-            Qt::AlignRight);
+                             Qt::AlignRight);
         ioGridLay->addWidget(m_fastRenderPathFileField, 7, 1, 1, 3);
       }
       ioLay->addLayout(ioGridLay);
