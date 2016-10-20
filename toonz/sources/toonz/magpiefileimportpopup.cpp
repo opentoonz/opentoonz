@@ -124,7 +124,7 @@ MagpieFileImportPopup::MagpieFileImportPopup()
          FlipConsole::eRed | FlipConsole::eGreen | FlipConsole::eBlue |
          FlipConsole::eMatte | FlipConsole::eDefineSubCamera |
          FlipConsole::eDefineLoadBox | FlipConsole::eUseLoadBox |
-         FlipConsole::eFilledRaster));
+         FlipConsole::eFilledRaster | FlipConsole::eLocator));
   m_flipbook = new FlipBook(this, tr("Import Magpie File"), buttonMask);
   m_flipbook->setFixedHeight(250);
   frameLayout->addWidget(m_flipbook);

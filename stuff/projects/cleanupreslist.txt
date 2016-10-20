@@ -1,3 +1,11 @@
+UHD 4K, 3840x2160, 16/9
+
+HD 1080, 1920x1080, 16/9
+
+HD 720, 1280x720, 16/9
+
+HD 480, 853x480, 16/9
+
 PAL analog, 768x576, 4/3
 
 PAL digital, 720x576, 4/3
@@ -9,12 +17,6 @@ NTSC digital, 720x486, 4/3
 NTSC analog, 648x486, 4/3
 
 NTSC 16/9, 864x486, 16/9
-
-HD 1080, 1920x1080, 16/9
-
-HD 720, 1280x720, 16/9
-
-HD 480, 853x480, 16/9
 
 Academy Full Frame1 1K, 914x666, 1.37
 
@@ -88,4 +90,6 @@ Anamorphic Un-squeezed 2K, 1828x778, 2.35
 
 Anamorphic Un-squeezed 4K, 3656x1556, 2.35
 
+DCI 2K, 2048x1080, 256/135
 
+DCI 4K, 4096x2160, 256/135

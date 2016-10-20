@@ -566,6 +566,18 @@ TPalette *Convert2Tlv::buildPalette() {
       page->addStyle(stylesToBeAddedToPage.at(s));
   }
 
+  /*
+    If the palette path is empty, an initial palette with four colors are set in
+    the palette here.
+    ( see Convert2Tlv::init() ) So here I make the latter three styles in the
+    initial palette to set
+    "AutoPaint" options.
+  */
+  if (m_palettePath.isEmpty()) {
+    assert(m_palette->getStyleCount() >= 5);
+    for (int id = 2; id <= 4; id++) m_palette->getStyle(id)->setFlags(1);
+  }
+
   if (!m_appendDefaultPalette) return m_palette;
 
   /*-- Adding styles in the default palette to the result palette, starts here
@@ -810,11 +822,17 @@ bool Convert2Tlv::init(std::string &errorMessage) {
 
   m_it = m_level1->begin();
 
-  /*- 既定のパレットを作る。黒、赤、青、緑の順 -*/
-  m_colorMap[TPixel::Black] = ++m_lastIndex;
-  m_colorMap[TPixel::Red]   = ++m_lastIndex;
-  m_colorMap[TPixel::Blue]  = ++m_lastIndex;
-  m_colorMap[TPixel::Green] = ++m_lastIndex;
+  /*-
+  If the palette is empty, make an initial palette with black, red, blue and
+  green styles.
+  For the latter three styles the "autopaint" option should be set.
+  -*/
+  if (m_lastIndex == 0) {
+    m_colorMap[TPixel::Black] = ++m_lastIndex;
+    m_colorMap[TPixel::Red]   = ++m_lastIndex;
+    m_colorMap[TPixel::Blue]  = ++m_lastIndex;
+    m_colorMap[TPixel::Green] = ++m_lastIndex;
+  }
 
   return true;
 }

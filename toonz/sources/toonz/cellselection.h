@@ -8,6 +8,7 @@
 #include <set>
 
 class TimeStretchPopup;
+class TXshCell;
 
 //=============================================================================
 // TCellSelection
@@ -97,6 +98,8 @@ public:
   void reframe2Cells() { reframeCells(2); }
   void reframe3Cells() { reframeCells(3); }
   void reframe4Cells() { reframeCells(4); }
+
+  void renameCells(TXshCell &cell);
 };
 
 #endif  // TCELLSELECTION_H

@@ -95,9 +95,11 @@ public:
   void toggleKeyframe(int frame);
 
   // remove link from the studio palette (if linked)
-  bool removeLink();
+  void removeLink();
   // get back the style from the studio palette (if linked)
   void getBackOriginalStyle();
+  // return true if there is at least one linked style in the selection
+  bool hasLinkedStyle();
 };
 
 #endif  // STYLESELECTION_INCLUDED

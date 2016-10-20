@@ -1,4 +1,8 @@
 #!/bin/bash
+pushd toonz/sources
+clang-format --version
+git ls-files | egrep \\.\(c\|cpp\|h\|hpp\)$ | xargs clang-format -i && git diff --exit-code || exit 1
+popd
 pushd thirdparty/tiff-4.0.3
 ./configure && make
 popd

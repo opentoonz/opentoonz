@@ -27,6 +27,7 @@
 #include <QMap>
 #include <QApplication>
 #include <QFile>
+#include <qdrawutil.h>
 #include <assert.h>
 
 extern TEnv::StringVar EnvSafeAreaName;
@@ -341,40 +342,30 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
   QPainter painter(this);
   QRect rect = this->rect();
 
-  QColor titleColor;
-  QColor brushColor;
+  bool isPanelActive;
 
   TPanel *dw = qobject_cast<TPanel *>(parentWidget());
   Q_ASSERT(dw != 0);
+  // docked panel
   if (!dw->isFloating()) {
-    if (dw->widgetInThisPanelIsFocused()) {
-      brushColor = QColor(64, 64, 64);
-      titleColor = QColor(Qt::white);
-    } else {
-      brushColor = QColor(100, 100, 100);
-      titleColor = QColor(192, 192, 192);
-    }
-  } else if (isActiveWindow()) {
-    brushColor = QColor(96, 96, 96);
-    titleColor = QColor(Qt::white);
-  } else {
-    brushColor = QColor(128, 128, 128);
-    titleColor = QColor(192, 192, 192);
+    isPanelActive = dw->widgetInThisPanelIsFocused();
+    qDrawBorderPixmap(&painter, rect, QMargins(3, 3, 3, 3),
+                      (isPanelActive) ? m_activeBorderPm : m_borderPm);
   }
-  painter.setBrush(brushColor);
-  painter.setPen(Qt::black);
-  painter.drawRect(rect.adjusted(0, 0, -1, -1));
-
-  painter.setPen(titleColor);
-  painter.drawLine(rect.topLeft(), rect.bottomLeft());
-  painter.drawLine(rect.topLeft(), rect.topRight());
+  // floating panel
+  else {
+    isPanelActive = isActiveWindow();
+    qDrawBorderPixmap(
+        &painter, rect, QMargins(3, 3, 3, 3),
+        (isPanelActive) ? m_floatActiveBorderPm : m_floatBorderPm);
+  }
 
   if (dw->getOrientation() == TDockWidget::vertical) {
     QString titleText = painter.fontMetrics().elidedText(
         dw->windowTitle(), Qt::ElideRight, rect.width() - 50);
 
     painter.setBrush(Qt::NoBrush);
-    painter.setPen(titleColor);
+    painter.setPen(isPanelActive ? m_activeTitleColor : m_titleColor);
     painter.drawText(QPointF(10, 15), titleText);
   }
 

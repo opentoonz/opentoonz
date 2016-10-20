@@ -63,13 +63,6 @@ Rename the following files:
   - `$opentoonz/thirdparty/libpng-1.6.21/scripts/pnglibconf.h.prebuilt` to `$opentoonz/thirdparty/libpng-1.6.21/pnglibconf.h`
     - Note that the destination is a different folder for the last file.
 
-Add a guard for snprintf at tif_config.h(50):
-```
-+#if _MSC_VER < 1900
-#define snprintf _snprintf
-+#endif
-```
-
 ## Building
 1. Open `$opentoonz/toonz/build/OpenToonz.sln` and change to `Release`
 2. The output will be in `$opentoonz/toonz/build/Release`

@@ -14,6 +14,7 @@
 #include "tools/toolcommandids.h"
 #include "tools/tool.h"
 #include "tools/toolhandle.h"
+#include "../tnztools/stylepickertool.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -84,7 +85,7 @@ ColorModelViewer::ColorModelViewer(QWidget *parent)
                       FlipConsole::eCompare | FlipConsole::eCustomize |
                       FlipConsole::eSave | FlipConsole::eFilledRaster |
                       FlipConsole::eDefineLoadBox | FlipConsole::eUseLoadBox |
-                      FlipConsole::eDefineSubCamera)),
+                      FlipConsole::eDefineSubCamera | FlipConsole::eLocator)),
                eDontKeepFilesOpened, true)
     , m_mode(0)
     , m_currentRefImgPath(TFilePath()) {
@@ -222,10 +223,27 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
   connect(loadCurrentFrame, SIGNAL(triggered()), SLOT(loadCurrentFrame()));
   menu.addAction(loadCurrentFrame);
 
+  if (!m_imageViewer->getImage()) {
+    menu.exec(event->globalPos());
+    return;
+  }
+
   QAction *removeColorModel =
       new QAction(QString(tr("Remove Color Model")), this);
   connect(removeColorModel, SIGNAL(triggered()), SLOT(removeColorModel()));
   menu.addAction(removeColorModel);
+
+  /* If there is at least one style with "picked pos" parameter, then enable
+   * repick command */
+  TRasterImageP ri = m_imageViewer->getImage();
+  if (ri && currentPalette->hasPickedPosStyle()) {
+    menu.addSeparator();
+    QAction *repickFromColorModelAct = new QAction(
+        QString(tr("Update Colors by Using Picked Positions")), this);
+    connect(repickFromColorModelAct, SIGNAL(triggered()),
+            SLOT(repickFromColorModel()));
+    menu.addAction(repickFromColorModelAct);
+  }
 
   menu.addSeparator();
 
@@ -306,6 +324,19 @@ void ColorModelViewer::pick(const QPoint &p) {
     if (styleSelection) styleSelection->selectNone();
   }
 
+  /*
+    if the Style Picker tool is current and "organize palette" is activated,
+    then move the picked style to the first page of the palette.
+  */
+  TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+  if (tool->getName() == "T_StylePicker") {
+    StylePickerTool *spTool = dynamic_cast<StylePickerTool *>(tool);
+    if (spTool && spTool->isOrganizePaletteActive()) {
+      TPoint point = picker.getRasterPoint(pos);
+      PaletteCmd::organizePaletteStyle(ph, styleIndex, point);
+    }
+  }
+
   ph->setStyleIndex(styleIndex);
 }
 
@@ -356,8 +387,16 @@ void ColorModelViewer::showEvent(QShowEvent *e) {
 //-----------------------------------------------------------------------------
 /*- ツールのTypeに合わせてPickのタイプも変え、カーソルも切り替える -*/
 void ColorModelViewer::changePickType() {
-  TPropertyGroup *propGroup =
-      TApp::instance()->getCurrentTool()->getTool()->getProperties(0);
+  TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+  if (tool->getName() == T_StylePicker) {
+    StylePickerTool *stylePickerTool = dynamic_cast<StylePickerTool *>(tool);
+    if (stylePickerTool->isOrganizePaletteActive()) {
+      setToolCursor(m_imageViewer, ToolCursor::PickerCursorOrganize);
+      return;
+    }
+  }
+
+  TPropertyGroup *propGroup = tool->getProperties(0);
   /*- Propertyの無いツールの場合 -*/
   if (!propGroup) {
     m_mode = 2;
@@ -571,6 +610,17 @@ void ColorModelViewer::onRefImageNotFound() {
   DVGui::info(
       tr("It is not possible to retrieve the color model set for the current "
          "level."));
+}
+
+//-----------------------------------------------------------------------------
+
+void ColorModelViewer::repickFromColorModel() {
+  TImageP img = m_imageViewer->getImage();
+  if (!img) return;
+  TPaletteHandle *ph =
+      TApp::instance()->getPaletteController()->getCurrentLevelPalette();
+
+  PaletteCmd::pickColorByUsingPickedPosition(ph, img);
 }
 
 //=============================================================================

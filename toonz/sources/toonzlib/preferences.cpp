@@ -255,6 +255,9 @@ Preferences::Preferences()
     , m_fitToFlipbookEnabled(false)
     , m_previewAlwaysOpenNewFlipEnabled(false)
     , m_autosaveEnabled(false)
+    , m_autosaveSceneEnabled(true)
+    , m_autosaveOtherFilesEnabled(true)
+    , m_startupPopupEnabled(true)
     , m_defaultViewerEnabled(false)
     , m_saveUnpaintedInCleanup(true)
     , m_askForOverrideRender(true)
@@ -283,12 +286,16 @@ Preferences::Preferences()
     , m_columnIconLoadingPolicy((int)LoadAtOnce)
     , m_moveCurrentFrameByClickCellArea(true)
     , m_onionSkinEnabled(true)
+    , m_onionSkinDuringPlayback(false)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
+    , m_projectRoot(0x08)
+    , m_customProjectRoot("")
     , m_precompute(true)
     , m_fastRenderPath("desktop")
-    , m_ffmpegTimeout(30) {
+    , m_ffmpegTimeout(30)
+    , m_shortcutPreset("defopentoonz") {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -322,6 +329,10 @@ Preferences::Preferences()
   getValue(*m_settings, "sceneNumberingEnabled", m_sceneNumberingEnabled);
   getValue(*m_settings, "animationSheetEnabled", m_animationSheetEnabled);
   getValue(*m_settings, "autosaveEnabled", m_autosaveEnabled);
+  getValue(*m_settings, "autosaveSceneEnabled", m_autosaveSceneEnabled);
+  getValue(*m_settings, "autosaveOtherFilesEnabled",
+           m_autosaveOtherFilesEnabled);
+  getValue(*m_settings, "startupPopupEnabled", m_startupPopupEnabled);
   getValue(*m_settings, "defaultViewerEnabled", m_defaultViewerEnabled);
   getValue(*m_settings, "rasterOptimizedMemory", m_rasterOptimizedMemory);
   getValue(*m_settings, "saveUnpaintedInCleanup", m_saveUnpaintedInCleanup);
@@ -391,6 +402,9 @@ Preferences::Preferences()
   units = m_settings->value("oldCameraUnits", m_cameraUnits).toString();
   m_oldCameraUnits = units;
   // end for pixels only
+
+  getValue(*m_settings, "projectRoot", m_projectRoot);
+  m_customProjectRoot = m_settings->value("customProjectRoot").toString();
 
   units                    = m_settings->value("linearUnits").toString();
   if (units != "") m_units = units;
@@ -536,6 +550,7 @@ Preferences::Preferences()
   getValue(*m_settings, "moveCurrentFrameByClickCellArea",
            m_moveCurrentFrameByClickCellArea);
   getValue(*m_settings, "onionSkinEnabled", m_onionSkinEnabled);
+  getValue(*m_settings, "onionSkinDuringPlayback", m_onionSkinDuringPlayback);
   getValue(*m_settings, "multiLayerStylePickerEnabled",
            m_multiLayerStylePickerEnabled);
   getValue(*m_settings, "paletteTypeOnLoadRasterImageAsColorModel",
@@ -549,6 +564,9 @@ Preferences::Preferences()
   if (fastRenderPath != "") m_fastRenderPath = fastRenderPath;
   setFastRenderPath(m_fastRenderPath.toStdString());
   getValue(*m_settings, "ffmpegTimeout", m_ffmpegTimeout);
+  QString shortcutPreset = m_settings->value("shortcutPreset").toString();
+  if (shortcutPreset != "") m_shortcutPreset = shortcutPreset;
+  setShortcutPreset(m_shortcutPreset.toStdString());
 }
 
 //-----------------------------------------------------------------
@@ -637,6 +655,27 @@ void Preferences::enableAutosave(bool on) {
     emit stopAutoSave();
   else
     emit startAutoSave();
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableAutosaveScene(bool on) {
+  m_autosaveSceneEnabled = on;
+  m_settings->setValue("autosaveSceneEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableAutosaveOtherFiles(bool on) {
+  m_autosaveOtherFilesEnabled = on;
+  m_settings->setValue("autosaveOtherFilesEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableStartupPopup(bool on) {
+  m_startupPopupEnabled = on;
+  m_settings->setValue("startupPopupEnabled", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
@@ -902,6 +941,13 @@ void Preferences::enableOnionSkin(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setOnionSkinDuringPlayback(bool on) {
+  m_onionSkinDuringPlayback = on;
+  m_settings->setValue("onionSkinDuringPlayback", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::setShow0ThickLines(bool on) {
   m_show0ThickLines = on;
   m_settings->setValue(s_show0ThickLines, s_bool[on]);
@@ -962,6 +1008,22 @@ void Preferences::setPixelsOnly(bool state) {
   } else {
     resetOldUnits();
   }
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setProjectRoot(int index) {
+  // storing the index of the selection instead of the text
+  // to make translation work
+  m_projectRoot = index;
+  m_settings->setValue("projectRoot", m_projectRoot);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setCustomProjectRoot(std::wstring customProjectRoot) {
+  m_customProjectRoot = QString::fromStdWString(customProjectRoot);
+  m_settings->setValue("customProjectRoot", m_customProjectRoot);
 }
 
 //-----------------------------------------------------------------
@@ -1201,6 +1263,13 @@ void Preferences::setFastRenderPath(std::string path) {
     m_fastRenderPath = QString::fromStdString(path);
     std::string strPath = m_ffmpegPath.toStdString();
     m_settings->setValue("fastRenderPath", m_fastRenderPath);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setShortcutPreset(std::string preset) {
+  m_shortcutPreset = QString::fromStdString(preset);
+  m_settings->setValue("shortcutPreset", m_shortcutPreset);
 }
 
 //-----------------------------------------------------------------
