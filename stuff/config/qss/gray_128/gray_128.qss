@@ -670,6 +670,8 @@ XsheetViewer {
   qproperty-BGColor: #a4a4a4;
   qproperty-LightLineColor: #929092;
   qproperty-MarkerLineColor: #00fff6;
+  qproperty-VerticalLineColor: #000000;
+  qproperty-VerticalLineHeadColor: #000000;
   qproperty-PreviewFrameTextColor: #0000ff;
   qproperty-CurrentRowBgColor: #d2d2d2;
   qproperty-EmptyColumnHeadColor: #c8c8c8;

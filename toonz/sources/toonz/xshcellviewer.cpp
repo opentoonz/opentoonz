@@ -830,10 +830,8 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
     x1 = m_viewer->columnToX(col + 1);
 
     // draw vertical lines
-    p.setPen(Qt::black);
+    p.setPen(m_viewer->getVerticalLineColor());
     if (x > 0) p.drawLine(x, y0, x, y1);
-    p.setPen(Qt::white);
-    if (x > 1) p.drawLine(x - 1, y0, x - 1, y1);
 
     for (row = r0; row <= r1; row++) {
       // draw horizontal lines
@@ -1605,7 +1603,7 @@ void CellArea::paintEvent(QPaintEvent *event) {
   int col    = m_viewer->getCurrentColumn();
   int x      = m_viewer->columnToX(col);
   int y      = m_viewer->rowToY(row);
-  QRect rect = QRect(x + 1, y + 1, ColumnWidth - 3, RowHeight - 2);
+  QRect rect = QRect(x + 1, y + 1, ColumnWidth - 2, RowHeight - 2);
   p.setPen(Qt::black);
   p.setBrush(Qt::NoBrush);
   p.drawRect(rect);

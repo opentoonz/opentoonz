@@ -642,10 +642,8 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   if (isEmpty || col < 0) {
     p.fillRect(rect, m_viewer->getEmptyColumnHeadColor());
 
-    p.setPen(Qt::black);
+    p.setPen(m_viewer->getVerticalLineHeadColor());
     p.drawLine(x0, y0, x0, y1);
-    p.setPen(Qt::white);
-    p.drawLine(x1, y0, x1, y1);
   } else {
     QColor columnColor, sideColor;
     if (usage == Reference) {
@@ -804,10 +802,8 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {
   // base color
   if (isEmpty || col < 0) {
     p.fillRect(rect, EmptyColumnHeadColor);
-    p.setPen(Qt::black);
+    p.setPen(m_viewer->getVerticalLineHeadColor());
     p.drawLine(x0, y0, x0, y1);
-    p.setPen(Qt::white);
-    p.drawLine(x1, y0, x1, y1);
   } else {
     QColor columnColor, sideColor;
 
@@ -985,10 +981,8 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {
   // fill base color
   if (isEmpty || col < 0) {
     p.fillRect(rect, EmptyColumnHeadColor);
-    p.setPen(Qt::black);
+    p.setPen(m_viewer->getVerticalLineHeadColor());
     p.drawLine(x0, y0, x0, y1);
-    p.setPen(Qt::white);
-    p.drawLine(x1, y0, x1, y1);
   } else {
     QColor columnColor, sideColor;
     if (usage == Reference) {
