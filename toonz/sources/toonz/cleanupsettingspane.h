@@ -18,6 +18,7 @@ class QComboBox;
 class QLabel;
 class QCheckBox;
 class CleanupPaletteViewer;
+class QGroupBox;
 
 namespace DVGui {
 
@@ -47,6 +48,9 @@ public:
   CleanupCameraSettingsWidget *m_cameraWidget;
 
 private:
+  //----Autocenter
+  QGroupBox *m_autocenterBox;
+  QComboBox *m_pegHolesOm, *m_fieldGuideOm;
   //----Rotate & Flip
   QComboBox *m_rotateOm;
   QCheckBox *m_flipX;

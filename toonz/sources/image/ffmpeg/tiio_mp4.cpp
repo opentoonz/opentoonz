@@ -4,6 +4,7 @@
 #include "trasterimage.h"
 #include "timageinfo.h"
 #include "tsound.h"
+#include "toonz/stage.h"
 #include <QStringList>
 
 //===========================================================
@@ -129,8 +130,9 @@ class TImageReaderMp4 final : public TImageReader {
 public:
   int m_frameIndex;
 
-  TImageReaderMp4(const TFilePath &path, int index, TLevelReaderMp4 *lra)
-      : TImageReader(path), m_lra(lra), m_frameIndex(index) {
+  TImageReaderMp4(const TFilePath &path, int index, TLevelReaderMp4 *lra,
+                  TImageInfo *info)
+      : TImageReader(path), m_lra(lra), m_frameIndex(index), m_info(info) {
     m_lra->addRef();
   }
   ~TImageReaderMp4() { m_lra->release(); }
@@ -138,9 +140,11 @@ public:
   TImageP load() override { return m_lra->load(m_frameIndex); }
   TDimension getSize() const { return m_lra->getSize(); }
   TRect getBBox() const { return TRect(); }
+  const TImageInfo *getImageInfo() const override { return m_info; }
 
 private:
   TLevelReaderMp4 *m_lra;
+  TImageInfo *m_info;
 
   // not implemented
   TImageReaderMp4(const TImageReaderMp4 &);
@@ -173,6 +177,8 @@ TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path) : TLevelReader(path) {
   m_info->m_ly             = m_ly;
   m_info->m_bitsPerSample  = 8;
   m_info->m_samplePerPixel = 4;
+  m_info->m_dpix           = Stage::standardDpi;
+  m_info->m_dpiy           = Stage::standardDpi;
 }
 //-----------------------------------------------------------
 
@@ -197,7 +203,7 @@ TImageReaderP TLevelReaderMp4::getFrameReader(TFrameId fid) {
   if (fid.getLetter() != 0) return TImageReaderP(0);
   int index = fid.getNumber();
 
-  TImageReaderMp4 *irm = new TImageReaderMp4(m_path, index, this);
+  TImageReaderMp4 *irm = new TImageReaderMp4(m_path, index, this, m_info);
   return TImageReaderP(irm);
 }
 

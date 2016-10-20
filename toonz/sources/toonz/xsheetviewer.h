@@ -287,6 +287,17 @@ class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
                  setMeshColumnBorderColor)
   Q_PROPERTY(QColor SelectedMeshColumnColor READ getSelectedMeshColumnColor
                  WRITE setSelectedMeshColumnColor)
+  // Sound column
+  QColor m_soundColumnColor;
+  QColor m_soundColumnBorderColor;
+  QColor m_selectedSoundColumnColor;
+  QColor m_soundColumnHlColor;
+  QColor m_soundColumnTrackColor;
+  Q_PROPERTY(QColor SoundColumnColor MEMBER m_soundColumnColor)
+  Q_PROPERTY(QColor SoundColumnBorderColor MEMBER m_soundColumnBorderColor)
+  Q_PROPERTY(QColor SelectedSoundColumnColor MEMBER m_selectedSoundColumnColor)
+  Q_PROPERTY(QColor SoundColumnHlColor MEMBER m_soundColumnHlColor)
+  Q_PROPERTY(QColor SoundColumnTrackColor MEMBER m_soundColumnTrackColor)
 
   // for making the column head lighter (255,255,255,50);
   QColor m_columnHeadPastelizer;
@@ -612,6 +623,9 @@ public:
   QColor getSelectedMeshColumnColor() const {
     return m_selectedMeshColumnColor;
   }
+  // Sound column
+  QColor getSoundColumnHlColor() const { return m_soundColumnHlColor; }
+  QColor getSoundColumnTrackColor() const { return m_soundColumnTrackColor; }
 
   void setColumnHeadPastelizer(const QColor &color) {
     m_columnHeadPastelizer = color;

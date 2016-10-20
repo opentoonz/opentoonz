@@ -91,7 +91,7 @@ void notify(LEVEL level, const QString &msg) {
 
 #else
   std::string str = msg.toStdString();
-  syslog(Level2XPriority(level), str.c_str());
+  syslog(Level2XPriority(level), "%s", str.c_str());
 #endif
 }
 

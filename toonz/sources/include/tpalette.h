@@ -417,6 +417,9 @@ between RGBA color components.
     m_isLocked = lock;
   }
 
+  bool hasPickedPosStyle();  // Returns true if there is at least one style with
+                             // picked pos value
+
 public:
   // Deprecated functions
 

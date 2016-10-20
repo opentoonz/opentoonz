@@ -54,7 +54,7 @@ private:
       par_,            //! Parameter of selection.
       actionLength_,   //! Action length, how many units to move.
       strokeLength_,   //! Stroke Length.
-      lenghtAtParam_,  //! Length at <code>par_</code>
+      lengthAtParam_,  //! Length at <code>par_</code>
       leftFactor_,     //! How many units to move on the left of curve.
       rightFactor_;    //! How many units to move on the right of curve.
 };

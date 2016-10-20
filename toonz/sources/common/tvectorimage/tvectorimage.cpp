@@ -940,8 +940,8 @@ void transferColors(const std::list<TEdge *> &oldList,
 #if 0 
 list<TEdge*>::const_iterator it1;
 #endif
-  double totLenght;
-  if (isStrokeChanged) totLenght = newList.front()->m_s->getLength();
+  double totLength;
+  if (isStrokeChanged) totLength = newList.front()->m_s->getLength();
   for (it = newList.begin(); it != newList.end(); ++it) {
     int newStyle = -1;  // ErrorStyle;
 // unused variable
@@ -955,8 +955,8 @@ list<TEdge*>::const_iterator it1;
     if ((*it)->m_w0 > (*it)->m_w1) {
       reversed = !isFlipped;
       if (isStrokeChanged) {
-        l0 = (*it)->m_s->getLength((*it)->m_w1) / totLenght;
-        l1 = (*it)->m_s->getLength((*it)->m_w0) / totLenght;
+        l0 = (*it)->m_s->getLength((*it)->m_w1) / totLength;
+        l1 = (*it)->m_s->getLength((*it)->m_w0) / totLength;
       } else {
         l0 = (*it)->m_w1;
         l1 = (*it)->m_w0;
@@ -964,8 +964,8 @@ list<TEdge*>::const_iterator it1;
     } else {
       reversed = isFlipped;
       if (isStrokeChanged) {
-        l0 = (*it)->m_s->getLength((*it)->m_w0) / totLenght;
-        l1 = (*it)->m_s->getLength((*it)->m_w1) / totLenght;
+        l0 = (*it)->m_s->getLength((*it)->m_w0) / totLength;
+        l1 = (*it)->m_s->getLength((*it)->m_w1) / totLength;
       } else {
         l0 = (*it)->m_w0;
         l1 = (*it)->m_w1;
@@ -986,12 +986,12 @@ list<TEdge*>::const_iterator it1;
         continue;
       double _l0, _l1;
       if (isStrokeChanged) {
-        double totLenght1 = (*it1)->m_s->getLength();
+        double totLength1 = (*it1)->m_s->getLength();
 
         _l0 = (*it1)->m_s->getLength(std::min((*it1)->m_w0, (*it1)->m_w1)) /
-              totLenght1;
+              totLength1;
         _l1 = (*it1)->m_s->getLength(std::max((*it1)->m_w0, (*it1)->m_w1)) /
-              totLenght1;
+              totLength1;
       } else {
         _l0 = std::min((*it1)->m_w0, (*it1)->m_w1);
         _l1 = std::max((*it1)->m_w0, (*it1)->m_w1);
@@ -1634,14 +1634,14 @@ void TVectorImage::getUsedStyles(std::set<int> &styles) const {
 
 inline double recomputeW1(double oldW, const TStroke &oldStroke,
                           const TStroke &newStroke, double startW) {
-  double oldLenght = oldStroke.getLength();
-  double newLenght = newStroke.getLength();
+  double oldLength = oldStroke.getLength();
+  double newLength = newStroke.getLength();
 
   assert(startW <= oldW);
-  assert(newLenght < oldLenght);
+  assert(newLength < oldLength);
 
   double s = oldStroke.getLength(startW, oldW);
-  assert(s <= newLenght || areAlmostEqual(s, newLenght, 1e-5));
+  assert(s <= newLength || areAlmostEqual(s, newLength, 1e-5));
 
   return newStroke.getParameterAtLength(s);
 }
@@ -1657,13 +1657,13 @@ inline double recomputeW2(double oldW, const TStroke &oldStroke,
 
 inline double recomputeW(double oldW, const TStroke &oldStroke,
                          const TStroke &newStroke, bool isAtBegin) {
-  double oldLenght = oldStroke.getLength();
-  double newLenght = newStroke.getLength();
+  double oldLength = oldStroke.getLength();
+  double newLength = newStroke.getLength();
 
-  assert(newLenght < oldLenght);
+  assert(newLength < oldLength);
   double s =
-      oldStroke.getLength(oldW) - ((isAtBegin) ? 0 : oldLenght - newLenght);
-  assert(s <= newLenght || areAlmostEqual(s, newLenght, 1e-5));
+      oldStroke.getLength(oldW) - ((isAtBegin) ? 0 : oldLength - newLength);
+  assert(s <= newLength || areAlmostEqual(s, newLength, 1e-5));
 
   return newStroke.getParameterAtLength(s);
 }
@@ -1946,12 +1946,12 @@ static void computeEdgeList(TStroke *newS, const std::list<TEdge *> &edgeList1,
 
   if (!edgeList1.empty()) {
     TStroke *s1    = edgeList1.front()->m_s;
-    double lenght1 = s1->getLength();
+    double length1 = s1->getLength();
     ;
 
     for (it = edgeList1.begin(); it != edgeList1.end(); ++it) {
       double l0 = s1->getLength((*it)->m_w0), l1 = s1->getLength((*it)->m_w1);
-      if (join1AtBegin) l0 = lenght1 - l0, l1 = lenght1 - l1;
+      if (join1AtBegin) l0 = length1 - l0, l1 = length1 - l1;
 
       TEdge *e         = new TEdge();
       e->m_toBeDeleted = true;
@@ -1967,10 +1967,10 @@ static void computeEdgeList(TStroke *newS, const std::list<TEdge *> &edgeList1,
   if (!edgeList2.empty()) {
     TStroke *s2    = edgeList2.front()->m_s;
     double offset  = newS->getLength(newS->getW(s2->getPoint(0.0)));
-    double lenght2 = s2->getLength();
+    double length2 = s2->getLength();
     for (it = edgeList2.begin(); it != edgeList2.end(); ++it) {
       double l0 = s2->getLength((*it)->m_w0), l1 = s2->getLength((*it)->m_w1);
-      if (!join2AtBegin) l0 = lenght2 - l0, l1 = lenght2 - l1;
+      if (!join2AtBegin) l0 = length2 - l0, l1 = length2 - l1;
 
       TEdge *e         = new TEdge();
       e->m_toBeDeleted = true;

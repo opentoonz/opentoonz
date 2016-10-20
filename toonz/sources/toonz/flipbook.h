@@ -179,7 +179,8 @@ public:
   FlipBook(QWidget *parent = 0, QString viewerTitle = QString(),
            UINT flipConsoleButtonMask = FlipConsole::cFullConsole &
                                         (~(FlipConsole::eFilledRaster |
-                                           FlipConsole::eDefineSubCamera)),
+                                           FlipConsole::eDefineSubCamera |
+                                           FlipConsole::eLocator)),
            UCHAR flags = 0, bool isColorModel = false);
   ~FlipBook();
   void setLevel(const TFilePath &path, TPalette *palette = 0, int from = -1,

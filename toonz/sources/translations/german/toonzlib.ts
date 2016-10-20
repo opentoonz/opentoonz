@@ -19,7 +19,7 @@
         <translation>Video-Breite muss ein mehrfaches von %1 sein</translation>
     </message>
     <message>
-        <source>video lenght must be a multiple of %1</source>
+        <source>video length must be a multiple of %1</source>
         <translation>Video-Länge muss ein mehrfaches von %1 sein</translation>
     </message>
     <message>
