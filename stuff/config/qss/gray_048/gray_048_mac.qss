@@ -355,19 +355,13 @@ QSlider::handle:horizontal {
 QGroupBox {
   border: 1px solid #e6e6e6;
   margin: 6px 0 0 0;
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding: 5px 3px;
 }
 QGroupBox::title {
   subcontrol-origin: margin;
   left: 15px;
-  margin-top: -2px;
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-top: 0px;
-  padding-bottom: 0px;
+  margin: -2px 0 0 0;
+  padding: 0 3px;
 }
 QSplitter::handle {
   background-color: #707070;

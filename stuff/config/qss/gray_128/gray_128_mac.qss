@@ -126,19 +126,13 @@ QCheckBox:disabled {
 QGroupBox {
   border: 1px solid;
   margin: 6px 0 0 0;
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding: 5px 3px;
 }
 QGroupBox::title {
   subcontrol-origin: margin;
   left: 15px;
   margin-top: -2px;
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-top: 0px;
-  padding-bottom: 0px;
+  padding: 0 3px;
 }
 /* ------ Toonz Classes Difinitions ------ */
 /* ------ TPanel ------ */
