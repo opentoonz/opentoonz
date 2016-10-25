@@ -1,12 +1,3 @@
-/* LESS Definitions */
-/*Image URL*/
-/*Text Color*/
-/*Used in Dialog border*/
-/*Color for Selected Item*/
-/*Color for title texts*/
-/* color adjustable by delta */
-/*set padding*/
-/*set margin*/
 /* ------ Qt Widgets Common Difinitions ------ */
 QWidget {
   color: #e6e6e6;
@@ -85,7 +76,7 @@ QMenu {
 }
 QMenu::item:selected {
   background: #80a0dc;
-  color: black;
+  color: #000;
 }
 QMenu::item:disabled {
   background-color: #3d3d3d;
@@ -101,12 +92,9 @@ QMenu::separator {
   border-top-color: #000000;
   border-right-color: #3f3f3f;
   border-bottom-color: #525252;
-  margin-left: 5px;
-  margin-right: 5px;
-  margin-top: 2px;
-  margin-bottom: 2px;
   border-width: 1px;
-  height: 0px;
+  height: 0;
+  margin: 2px 5px;
 }
 QToolBar {
   background-color: #303030;
@@ -1234,35 +1222,28 @@ PopupButton::menu-indicator:disabled {
 }
 /*------ Topbar and Menubar of the MainWindow ------*/
 #TopBar {
-  height: 22px;
   background-color: #232323;
-  margin: 0px;
-  border: 0px;
-  padding: 0px;
+  border: 0;
+  height: 22px;
+  margin: 0;
+  padding: 0;
 }
 #TopBarTabContainer {
-  background-color: #303030;
-  margin: 0px;
-  border: 0px;
-  padding: 0px;
+  background-color: #232323;
+  border: 0;
+  margin: 0;
+  padding: 0;
 }
 #TopBarTab {
-  border-image: url("../gray_072/imgs/topbar_bg.png") 0 0 0 0 stretch stretch;
-  /*background: qlineargradient(x1: 0,y1: 0, x2: 1, y2: 0, stop: 0 #a0a0a0, stop: 0.5 #404040);*/
-  border: 0px;
-  padding: 0px;
+  background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #232323, stop: 0.5 #131313);
+  border: 0;
+  padding: 0;
 }
 #TopBarTab::tab {
-  margin-left: 5px;
-  margin-right: 5px;
-  margin-top: 1px;
-  margin-bottom: 1px;
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 1px;
-  padding-bottom: 1px;
   background-color: #3d3d3d;
-  border: 1px solid white;
+  border: 1px solid #fff;
+  margin: 1px 5px;
+  padding: 1px 8px;
 }
 #TopBarTab::tab:selected {
   background-color: #5a8c78;
@@ -1378,5 +1359,3 @@ QDialog #dialogButtonFrame {
 #StartupLabel:hover {
   background-color: #4a4a4a;
 }
-
-//# sourceMappingURL=gray_048.qss.map
