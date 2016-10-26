@@ -442,6 +442,12 @@ void SceneViewerPanel::onXshLevelSwitched(TXshLevel *) { changeWindowTitle(); }
 //-----------------------------------------------------------------------------
 
 void SceneViewerPanel::onPlayingStatusChanged(bool playing) {
+  if (playing) {
+    m_playing = true;
+  } else {
+    m_playing = false;
+    m_first   = true;
+  }
   if (Preferences::instance()->getOnionSkinDuringPlayback()) return;
   OnionSkinMask osm =
       TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
@@ -452,15 +458,12 @@ void SceneViewerPanel::onPlayingStatusChanged(bool playing) {
       TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
       TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
     }
-    m_playing = true;
   } else {
     if (m_onionSkinActive) {
       osm.enable(true);
       TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
       TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
     }
-    m_playing = false;
-    m_first   = true;
   }
 }
 
@@ -549,7 +552,6 @@ void SceneViewerPanel::onSceneChanged() {
   updateFrameRange();
   updateFrameMarkers();
   changeWindowTitle();
-
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   assert(scene);
@@ -559,6 +561,7 @@ void SceneViewerPanel::onSceneChanged() {
   int frameIndex = TApp::instance()->getCurrentFrame()->getFrameIndex();
   if (m_keyFrameButton->getCurrentFrame() != frameIndex)
     m_keyFrameButton->setCurrentFrame(frameIndex);
+  hasSoundtrack();
 }
 
 //-----------------------------------------------------------------------------
@@ -642,6 +645,11 @@ void SceneViewerPanel::playAudioFrame(int frame) {
 }
 
 bool SceneViewerPanel::hasSoundtrack() {
+  if (m_sound != NULL) {
+    m_sound         = NULL;
+    m_hasSoundtrack = false;
+    m_first         = true;
+  }
   TXsheetHandle *xsheetHandle    = TApp::instance()->getCurrentXsheet();
   TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
   m_sound                        = xsheetHandle->getXsheet()->makeSound(prop);

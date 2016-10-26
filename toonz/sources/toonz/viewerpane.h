@@ -43,8 +43,8 @@ class SceneViewerPanel final : public TPanel, public FlipConsoleOwner {
   double m_fps;
   int m_viewerFps;
   double m_samplesPerFrame;
-  bool m_first = true;
-  TSoundTrack *m_sound;
+  bool m_first         = true;
+  TSoundTrack *m_sound = NULL;
 
 public:
 #if QT_VERSION >= 0x050500
