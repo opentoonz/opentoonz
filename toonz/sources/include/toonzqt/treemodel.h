@@ -130,6 +130,7 @@ public slots:
 
 protected:
   void setRootItem(Item *rootItem);
+  void setRootItem_NoFree(Item *rootItem);
   Item *getRootItem() const { return m_rootItem; }
 
 private:

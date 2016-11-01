@@ -1215,7 +1215,10 @@ void FunctionTreeModel::resetAll() {
   beginResetModel();
 #endif
   m_activeChannels.clear();
-  setRootItem(0);
+
+  TreeModel::Item *root_item = getRootItem();
+  setRootItem_NoFree(NULL);
+
   m_stageObjects = 0;
   m_fxs          = 0;
 #if QT_VERSION < 0x050000
@@ -1225,6 +1228,10 @@ void FunctionTreeModel::resetAll() {
   beginRefresh();
   refreshActiveChannels();
   endRefresh();
+
+  // postpone until after refresh,
+  // since its members are used for reference.
+  delete root_item;
 
   m_currentChannel = 0;
 
