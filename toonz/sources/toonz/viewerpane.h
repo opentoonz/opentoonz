@@ -37,6 +37,14 @@ class SceneViewerPanel final : public TPanel, public FlipConsoleOwner {
   TPanelTitleBarButton *m_previewButton;
   TPanelTitleBarButton *m_subcameraPreviewButton;
   bool m_onionSkinActive = false;
+  bool m_playSound       = true;
+  bool m_hasSoundtrack   = false;
+  bool m_playing         = false;
+  double m_fps;
+  int m_viewerFps;
+  double m_samplesPerFrame;
+  bool m_first         = true;
+  TSoundTrack *m_sound = NULL;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -58,6 +66,8 @@ protected:
   void createPlayToolBar();
   void addColorMaskButton(QWidget *parent, const char *iconSVGName, int id);
   void enableFlipConsoleForCamerastand(bool on);
+  void playAudioFrame(int frame);
+  bool hasSoundtrack();
 
 public slots:
 
@@ -66,6 +76,7 @@ public slots:
   void onXshLevelSwitched(TXshLevel *);
   void updateFrameRange();
   void updateFrameMarkers();
+  void onButtonPressed(FlipConsole::EGadget button);
 
 protected slots:
 

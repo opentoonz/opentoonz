@@ -583,6 +583,12 @@ void PreferencesPopup::onAutoSaveOtherFilesChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onStartupPopupChanged(int index) {
+  m_pref->enableStartupPopup(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onKeyframeTypeChanged(int index) {
   m_pref->setKeyframeType(index + 2);
 }
@@ -953,6 +959,8 @@ PreferencesPopup::PreferencesPopup()
   m_autoSaveSceneCB = new CheckBox(tr("Automatically Save the Scene File"));
   m_autoSaveOtherFilesCB =
       new CheckBox(tr("Automatically Save Non-Scene Files"));
+  CheckBox *startupPopupCB =
+      new CheckBox(tr("Show Startup Window when OpenToonz Starts"));
   m_minuteFld = new DVGui::IntLineEdit(this, 15, 1, 60);
   CheckBox *replaceAfterSaveLevelAsCB =
       new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
@@ -1167,6 +1175,7 @@ PreferencesPopup::PreferencesPopup()
   m_autoSaveSceneCB->setChecked(m_pref->isAutosaveSceneEnabled());
   m_autoSaveOtherFilesCB->setChecked(m_pref->isAutosaveOtherFilesEnabled());
   m_minuteFld->setValue(m_pref->getAutosavePeriod());
+  startupPopupCB->setChecked(m_pref->isStartupPopupEnabled());
   replaceAfterSaveLevelAsCB->setChecked(
       m_pref->isReplaceAfterSaveLevelAsEnabled());
 
@@ -1432,6 +1441,8 @@ PreferencesPopup::PreferencesPopup()
       }
       m_autoSaveGroup->setLayout(autoSaveOptionsLay);
       generalFrameLay->addWidget(m_autoSaveGroup);
+      generalFrameLay->addWidget(startupPopupCB, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
       // Unit, CameraUnit
       QGridLayout *unitLay = new QGridLayout();
       unitLay->setMargin(0);
@@ -1949,6 +1960,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onAutoSaveOtherFilesChanged(int)));
   ret = ret && connect(m_minuteFld, SIGNAL(editingFinished()),
                        SLOT(onMinuteChanged()));
+  ret = ret && connect(startupPopupCB, SIGNAL(stateChanged(int)),
+                       SLOT(onStartupPopupChanged(int)));
   ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
                        SLOT(onDragCellsBehaviourChanged(int)));
   ret = ret && connect(m_undoMemorySize, SIGNAL(editingFinished()),

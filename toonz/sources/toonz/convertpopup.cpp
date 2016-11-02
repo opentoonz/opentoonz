@@ -55,6 +55,8 @@ TEnv::IntVar ConvertPopupRemoveDot("ConvertPopupRemoveDot", 1);
 TEnv::IntVar ConvertPopupSaveToNopaint("ConvertPopupSaveToNopaint", 1);
 TEnv::IntVar ConvertPopupAppendDefaultPalette(
     "ConvertPopupAppendDefaultPalette", 0);
+TEnv::IntVar ConvertPopupRemoveUnusedStyles("ConvertPopupRemoveUnusedStyles",
+                                            0);
 
 //=============================================================================
 // convertPopup
@@ -200,7 +202,8 @@ void ConvertPopup::Converter::convertLevel(
       // no AA source (retas)
       TPaletteP palette = popup->readUserProvidedPalette();
       ImageUtils::convertNaa2Tlv(sourceFileFullPath, dstFileFullPath, from, to,
-                                 m_parent->m_notifier, palette.getPointer());
+                                 m_parent->m_notifier, palette.getPointer(),
+                                 m_parent->m_removeUnusedStyles->isChecked());
     } else {
       convertLevelWithConvert2Tlv(sourceFileFullPath);
     }
@@ -441,6 +444,7 @@ ConvertPopup::ConvertPopup(bool specifyInput)
   m_removeDotBeforeFrameNumber->setChecked(ConvertPopupRemoveDot != 0);
   m_saveBackupToNopaint->setChecked(ConvertPopupSaveToNopaint != 0);
   m_appendDefaultPalette->setChecked(ConvertPopupAppendDefaultPalette != 0);
+  m_removeUnusedStyles->setChecked(ConvertPopupRemoveUnusedStyles != 0);
 
   //--- signal-slot connections
   qRegisterMetaType<TFilePath>("TFilePath");
@@ -469,6 +473,9 @@ ConvertPopup::ConvertPopup(bool specifyInput)
   if (specifyInput)
     ret = ret && connect(m_convertFileFld, SIGNAL(pathChanged()), this,
                          SLOT(onFileInChanged()));
+
+  // update unable/enable of checkboxes
+  onTlvModeSelected(m_tlvMode->currentText());
 
   assert(ret);
 }
@@ -522,7 +529,7 @@ QFrame *ConvertPopup::createTlvSettings() {
   m_tlvMode              = new QComboBox();
   m_unpaintedFolderLabel = new QLabel(tr("Unpainted File Folder:"));
   m_unpaintedFolder =
-      new DVGui::FileField(0, QString(tr("Same as Painted")), true);
+      new DVGui::FileField(0, QString(tr("Same as Painted")), true, true);
   m_suffixLabel     = new QLabel(tr(" Unpainted File Suffix:"));
   m_unpaintedSuffix = new DVGui::LineEdit("_np");
   m_applyAutoclose  = new QCheckBox(tr("Apply Autoclose"));
@@ -531,8 +538,12 @@ QFrame *ConvertPopup::createTlvSettings() {
   m_appendDefaultPalette = new QCheckBox(tr("Append Default Palette"));
   m_antialias            = new QComboBox();
   m_antialiasIntensity   = new DVGui::IntLineEdit(0, 50, 0, 100);
-  m_palettePath = new DVGui::FileField(0, QString(CreateNewPalette), true);
-  m_tolerance   = new DVGui::IntLineEdit(0, 0, 0, 255);
+  m_palettePath =
+      new DVGui::FileField(0, QString(CreateNewPalette), true, true);
+  m_tolerance = new DVGui::IntLineEdit(0, 0, 0, 255);
+
+  m_removeUnusedStyles =
+      new QCheckBox(tr("Remove Unused Styles from Input Palette"));
 
   m_unpaintedFolder->setFileMode(QFileDialog::DirectoryOnly);
   m_unpaintedSuffix->setMaximumWidth(40);
@@ -585,8 +596,9 @@ QFrame *ConvertPopup::createTlvSettings() {
                        Qt::AlignRight | Qt::AlignVCenter);
     gridLay->addWidget(m_tolerance, 4, 3);
 
-    gridLay->addWidget(m_appendDefaultPalette, 5, 1, 1, 3);
-    gridLay->addWidget(m_saveBackupToNopaint, 6, 1, 1, 3);
+    gridLay->addWidget(m_removeUnusedStyles, 5, 1, 1, 3);
+    gridLay->addWidget(m_appendDefaultPalette, 6, 1, 1, 3);
+    gridLay->addWidget(m_saveBackupToNopaint, 7, 1, 1, 3);
   }
   gridLay->setColumnStretch(0, 0);
   gridLay->setColumnStretch(1, 1);
@@ -597,6 +609,9 @@ QFrame *ConvertPopup::createTlvSettings() {
   bool ret = true;
   ret      = ret && connect(m_antialias, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onAntialiasSelected(int)));
+  ret = ret && connect(m_palettePath, SIGNAL(pathChanged()), this,
+                       SLOT(onPalettePathChanged()));
+
   assert(ret);
 
   frame->setVisible(false);
@@ -652,8 +667,13 @@ void ConvertPopup::onTlvModeSelected(const QString &tlvMode) {
   m_suffixLabel->setEnabled(usesTwoImages);
   m_unpaintedSuffix->setEnabled(usesTwoImages);
   m_antialias->setEnabled(TlvMode_PaintedFromNonAA != tlvMode);
-  m_palettePath->setEnabled(TlvMode_PaintedFromNonAA != tlvMode);
+  // m_palettePath->setEnabled(TlvMode_PaintedFromNonAA != tlvMode);
   m_tolerance->setEnabled(TlvMode_PaintedFromNonAA != tlvMode);
+  m_appendDefaultPalette->setEnabled(TlvMode_PaintedFromNonAA != tlvMode);
+
+  m_removeUnusedStyles->setEnabled(TlvMode_PaintedFromNonAA == tlvMode &&
+                                   m_palettePath->getPath() !=
+                                       CreateNewPalette);
 
   m_saveBackupToNopaint->setEnabled(TlvMode_Unpainted == tlvMode);
 }
@@ -1057,6 +1077,7 @@ void ConvertPopup::apply() {
   ConvertPopupSaveToNopaint = m_saveBackupToNopaint->isChecked() ? 1 : 0;
   ConvertPopupAppendDefaultPalette =
       m_appendDefaultPalette->isChecked() ? 1 : 0;
+  ConvertPopupRemoveUnusedStyles = m_removeUnusedStyles->isChecked() ? 1 : 0;
 
   // parameters are ok: close the dialog first
   close();
@@ -1170,6 +1191,14 @@ void ConvertPopup::onFormatChanged(const QString &ext) {
     m_removeDotBeforeFrameNumber->setEnabled(true);
     if (ext == QString("tga")) m_removeDotBeforeFrameNumber->setChecked(true);
   }
+}
+
+//-------------------------------------------------------------------
+
+void ConvertPopup::onPalettePathChanged() {
+  m_removeUnusedStyles->setEnabled(
+      m_tlvMode->currentText() == TlvMode_PaintedFromNonAA &&
+      m_palettePath->getPath() != CreateNewPalette);
 }
 
 //-------------------------------------------------------------------

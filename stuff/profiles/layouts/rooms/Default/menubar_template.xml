@@ -235,6 +235,7 @@
     <command>MI_ResetRoomLayout</command>
   </menu>
   <menu title="Help">
+    <command>MI_StartupPopup</command>
     <command>MI_About</command>
   </menu>
 </menubar>

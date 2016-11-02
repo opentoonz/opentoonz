@@ -1050,6 +1050,8 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
 
   resetDropItem();
 
+  if (newPath.isEmpty()) return;
+
   const QMimeData *mimeData      = event->mimeData();
   const PaletteData *paletteData = dynamic_cast<const PaletteData *>(mimeData);
   if (paletteData) {

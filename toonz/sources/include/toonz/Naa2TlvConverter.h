@@ -146,7 +146,8 @@ public:
       return -1;
   }
 
-  TToonzImageP makeTlv(bool transparentSyntheticInks);
+  TToonzImageP makeTlv(bool transparentSyntheticInks,
+                       bool removeUnusedStyles = false);
 
   TVectorImageP vectorize(const TToonzImageP &ti);
   TVectorImageP vectorize(const TRaster32P &ras);

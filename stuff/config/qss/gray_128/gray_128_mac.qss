@@ -1111,5 +1111,11 @@ QDialog #dialogButtonFrame {
 #GearButton {
   qproperty-icon: url("imgs/gear.png");
 }
+#StartupLabel {
+  padding: 3px;
+}
+#StartupLabel:hover {
+  background-color: #9a9a9a;
+}
 
 //# sourceMappingURL=gray_128_mac.qss.map

@@ -214,7 +214,8 @@ public:
     eFilledRaster    = 0x4000000,  // Used only in LineTest
     eDefineLoadBox   = 0x8000000,
     eUseLoadBox      = 0x10000000,
-    eEnd             = 0x20000000
+    eLocator         = 0x20000000,
+    eEnd             = 0x40000000
   };
 
   static const UINT cFullConsole = eEnd - 1;
@@ -249,6 +250,7 @@ public:
   void enableButton(UINT button, bool enable, bool doShowHide = true);
   void showCurrentFrame();
   int getCurrentFrame() const { return m_currentFrame; }
+  int getCurrentFps() const { return m_fps; }
   void setChecked(UINT button, bool state);
   bool isChecked(UINT button) const;
   void setCurrentFrame(int frame, bool forceResetting = false);

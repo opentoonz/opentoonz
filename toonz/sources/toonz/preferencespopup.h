@@ -110,6 +110,7 @@ private slots:
   void onAutoSaveChanged(bool on);
   void onAutoSaveSceneChanged(int index);
   void onAutoSaveOtherFilesChanged(int index);
+  void onStartupPopupChanged(int index);
   void onDefaultViewerChanged(int index);
   void onBlankCountChanged();
   void onBlankColorChanged(const TPixel32 &, bool isDragging);
