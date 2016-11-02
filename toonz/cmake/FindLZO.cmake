@@ -9,12 +9,14 @@ find_path(
         lzo/2.03/include/lzo
 )
 
+# List dynamic library 'so' first
+# since static has issues on some systems, see: #866
 find_library(
     LZO_LIBRARY
     NAMES
+        liblzo2.so
         liblzo2.a
         lzo2_64.lib
-        liblzo2.so
     HINTS
         ${THIRDPARTY_LIBS_HINTS}
     PATH_SUFFIXES
