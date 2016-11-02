@@ -107,9 +107,13 @@ Features from the modified libtiff and needed currently, so this isn't a simple 
 
 ```
 $ cd opentoonz/thirdparty/tiff-4.0.3
-$ CFLAGS="-fPIC" ./configure && make
+$ ./configure --with-pic
+$ make -j4
 $ cd -
 ```
+If you receive linking errors mentioning `jbg_` functions while building OpenToonz itself,
+try appending `--disable-jbig` to the configure command above and make clean build. (see
+https://github.com/opentoonz/opentoonz/issues/851)
 
 ### Compiling the actual application
 
