@@ -251,6 +251,7 @@ void AudioRecordingPopup::onRecordButtonPressed() {
     // this sometimes sets to one frame off, so + 1.
     m_currentFrame = TApp::instance()->getCurrentFrame()->getFrame() + 1;
     if (m_syncPlayback && !m_isPlaying) {
+      m_console->setCurrentFrame(m_currentFrame);
       m_console->pressButton(FlipConsole::ePlay);
       m_isPlaying = true;
     }
@@ -323,8 +324,10 @@ void AudioRecordingPopup::onPlayButtonPressed() {
     m_stoppedAtEnd = false;
     m_player->play();
     // this sometimes sets to one frame off, so + 1.
-    m_currentFrame = TApp::instance()->getCurrentFrame()->getFrame() + 1;
+    // m_currentFrame = TApp::instance()->getCurrentFrame()->getFrame() + 1;
     if (m_syncPlayback && !m_isPlaying) {
+      TApp::instance()->getCurrentFrame()->setCurrentFrame(m_currentFrame);
+      m_console->setCurrentFrame(m_currentFrame);
       m_console->pressButton(FlipConsole::ePlay);
       m_isPlaying = true;
     }
@@ -453,6 +456,10 @@ void AudioRecordingPopup::onSaveButtonPressed() {
   filePaths.push_back(m_filePath);
 
   if (filePaths.empty()) return;
+  if (m_syncPlayback) {
+    TApp::instance()->getCurrentFrame()->setCurrentFrame(m_currentFrame);
+    m_console->setCurrentFrame(m_currentFrame);
+  }
   IoCmd::LoadResourceArguments args;
   args.resourceDatas.assign(filePaths.begin(), filePaths.end());
   IoCmd::loadResources(args);
