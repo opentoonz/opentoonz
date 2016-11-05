@@ -1,10 +1,10 @@
 
-/* LESS Definitions */
+// LESS Definitions
 
-/*Image URL*/
+// Image URL
 @image_url: "../gray_072/imgs";
 
-/*Text Color*/
+// Text Color
 @m_baseTxtColor: rgb(230,230,230);
 @m_disabledTxtColor: rgb(128,128,128);
 
@@ -14,24 +14,24 @@
 @m_base_darkH: 	rgb(12,12,12);
 @m_base_darkV: 	rgb(0,0,0);
 
-/*Used in Dialog border*/
+// Used in Dialog Border
 @m_dialog_border_color:	rgb(0,0,0);
 
-/*Color for Selected Item*/
+// Color for Selected Item
 @m_selectedBG:	rgb(128,160,220);
 
-/*Color for title texts*/
+// Color for Title Text
 @m_titleTxtColor: lighten(@m_selectedBG, 10%);
 
-/* color adjustable by delta */
-.baseBG(@dark: 0%){
+// Color Adjustable by Delta
+.baseBG(@dark: 0%) {
 	background-color: darken(@m_baseBG, @dark);
 }
-.baseBG(light, @light: 0%){
+.baseBG(light, @light: 0%) {
 	background-color: lighten(@m_baseBG, @light);
 }
 
-.base_inset(@dark: 0%){
+.base_inset(@dark: 0%) {
 	.baseBG(@dark);
 	border-style: inset;
 	border-left-color: 	darken(@m_base_darkH, @dark);
@@ -39,7 +39,7 @@
 	border-right-color: 	darken(@m_base_lightH, @dark);
 	border-bottom-color: 	darken(@m_base_lightV, @dark);
 }
-.base_inset(light, @light: 0%){
+.base_inset(light, @light: 0%) {
 	.baseBG(light, @light);
 	border-style: inset;
 	border-left-color: 	lighten(@m_base_darkH, @light);
@@ -48,7 +48,7 @@
 	border-bottom-color: 	lighten(@m_base_lightV, @light);
 }
 
-.base_outset(@dark: 0%){
+.base_outset(@dark: 0%) {
 	.baseBG(@dark);
 	border-style: outset;
 	border-left-color: 	darken(@m_base_lightH, @dark);
@@ -56,7 +56,7 @@
 	border-right-color: 	darken(@m_base_darkH, @dark);
 	border-bottom-color: 	darken(@m_base_darkV, @dark);
 }
-.base_outset(light, @light: 0%){
+.base_outset(light, @light: 0%) {
 	.baseBG(light, @light);
 	border-style: outset;
 	border-left-color: 	lighten(@m_base_lightH, @light);
@@ -65,14 +65,14 @@
 	border-bottom-color: 	lighten(@m_base_darkV, @light);
 }
 
-/*set padding*/
-.set_padding(@hPad: 0px, @vPad: 0px){
+// Set Padding
+.set_padding(@hPad: 0px, @vPad: 0px) {
    	padding-left: 	@hPad;
    	padding-right: 	@hPad;
    	padding-top: 	@vPad;
    	padding-bottom: @vPad;	
 }
-/*set margin*/
+// Set Margin
 .set_margin(@hMgn: 0px, @vMgn: 0px) {
    	margin-left: 	@hMgn;
    	margin-right: 	@hMgn;
@@ -143,38 +143,38 @@ QStatusBar {
 		.set_padding( 3px, 1px );
 	}
 }
-QMenuBar
-{
+
+QMenuBar {
 	.baseBG(5%);
-	&::item:selected{
+	
+	&::item:selected {
 		.base_inset(5%);
 		border-width: 1px;
 	}
 }
 
-QMenu
-{
+QMenu {
 	.baseBG(5%);
 	
 	&::item {
-		&:selected{
+		&:selected {
 			background: @m_selectedBG;
-			color: black;
+			color: #000;
 		}
-		&:disabled{
+		&:disabled {
 			.baseBG(light, 5%);
 			color: @m_disabledTxtColor;
 		}
-		&:disabled:selected{
+		&:disabled:selected {
 			background: rgb(108,118,128);
 		}
 	}
 	
 	&::separator {
 		.base_inset(10%);
-		.set_margin(5px,2px);
 		border-width: 1px;
-		height: 0px;
+		height: 0;
+		margin: 2px 5px;
 	}
 }
 
@@ -1231,28 +1231,29 @@ PopupButton {
 /*------ Topbar and Menubar of the MainWindow ------*/
 
 #TopBar {
-	height: 22px;
 	.baseBG(5%);
-	margin: 0px;
-	border: 0px;
-	padding: 0px;
+	border: 0;
+	height: 22px;
+	margin: 0;
+	padding: 0;
 }
 #TopBarTabContainer {
-	.baseBG;
-	margin: 0px;
-	border: 0px;
-	padding: 0px;
+	.baseBG(5%);
+	border: 0;
+	margin: 0;
+	padding: 0;
 }
 #TopBarTab {
-    border-image: url("@{image_url}/topbar_bg.png") 0 0 0 0 stretch stretch;
-	/*background: qlineargradient(x1: 0,y1: 0, x2: 1, y2: 0, stop: 0 #a0a0a0, stop: 0.5 #404040);*/
-	border: 0px;
-	padding: 0px;
+	background: ~"qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #232323, stop: 0.5 #131313)";
+	border: 0;
+	padding: 0;
+	
 	&::tab {
-		.set_margin(5px, 1px);
-		.set_padding(8px, 1px);
-	    .baseBG( light, 5% );
-	    border: 1px solid white; 
+		.baseBG(light, 5%);
+		border: 1px solid #fff; 
+		margin: 1px 5px;
+		padding: 1px 8px;
+	    
 		&:selected {
 		    background-color: rgb(90,140,120);
 		}

@@ -1,6 +1,7 @@
-/* LESS Definitions */
 
-/*Image URL*/
+// LESS Definitions
+
+// Image URL
 @image_url: "imgs";
 
 @m_baseBG: 	rgb(128,128,128);
@@ -9,15 +10,15 @@
 @m_base_darkH: 	rgb(64,64,64);
 @m_base_darkV: 	rgb(64,64,64);
 
-/* color adjustable by delta */
-.baseBG(@dark: 0%){
+// Color Adjustable by Delta
+.baseBG(@dark: 0%) {
 	background-color: darken(@m_baseBG, @dark);
 }
-.baseBG(light, @light: 0%){
+.baseBG(light, @light: 0%) {
 	background-color: lighten(@m_baseBG, @light);
 }
 
-.base_inset(@dark: 0%){
+.base_inset(@dark: 0%) {
 	.baseBG(@dark);
 	border-style: inset;
 	border-left-color: 	darken(@m_base_darkH, @dark);
@@ -25,7 +26,7 @@
 	border-right-color: 	darken(@m_base_lightH, @dark);
 	border-bottom-color: 	darken(@m_base_lightV, @dark);
 }
-.base_inset(light, @light: 0%){
+.base_inset(light, @light: 0%) {
 	.baseBG(light, @light);
 	border-style: inset;
 	border-left-color: 	lighten(@m_base_darkH, @light);
@@ -34,7 +35,7 @@
 	border-bottom-color: 	lighten(@m_base_lightV, @light);
 }
 
-.base_outset(@dark: 0%){
+.base_outset(@dark: 0%) {
 	.baseBG(@dark);
 	border-style: outset;
 	border-left-color: 	darken(@m_base_lightH, @dark);
@@ -42,7 +43,7 @@
 	border-right-color: 	darken(@m_base_darkH, @dark);
 	border-bottom-color: 	darken(@m_base_darkV, @dark);
 }
-.base_outset(light, @light: 0%){
+.base_outset(light, @light: 0%) {
 	.baseBG(light, @light);
 	border-style: outset;
 	border-left-color: 	lighten(@m_base_lightH, @light);
@@ -51,14 +52,14 @@
 	border-bottom-color: 	lighten(@m_base_darkV, @light);
 }
 
-/*set padding*/
+// Set Padding
 .set_padding(@hPad: 0px, @vPad: 0px){
    	padding-left: 	@hPad;
    	padding-right: 	@hPad;
    	padding-top: 	@vPad;
    	padding-bottom: @vPad;	
 }
-/*set margin*/
+// Set Margin
 .set_margin(@hMgn: 0px, @vMgn: 0px) {
    	margin-left: 	@hMgn;
    	margin-right: 	@hMgn;
@@ -113,19 +114,18 @@ QStatusBar {
 		.set_padding( 3px, 1px );
 	}
 }
-QMenuBar
-{
-	background: rgb(160,160,160);
-	color: black;
+
+QMenuBar {
+	.baseBG(light, 8%);
+	color: #000;
 }
 
-QMenu
-{
+QMenu {
 	background: rgb(160,160,160);
-	&::item:selected
-	{
+	
+	&::item:selected {
 		background: rgb(0,0,128);
-		color: white;	
+		color: #fff;	
 	}
 }
 
@@ -1064,36 +1064,40 @@ PopupButton {
 /*------ Topbar and Menubar of the MainWindow ------*/
 
 #TopBar {
-	height: 22px;
 	background-color: rgb(192,192,192);
-	margin: 0px;
-	border: 0px;
-	padding: 0px;
+	border: 0;
+	height: 22px;
+	margin: 0;
+	padding: 0;
 }
+
 #TopBarTabContainer {
-	background: rgb(160,160,160);
-	margin: 0px;
-	border: 0px;
-	padding: 0px;
+	.baseBG(light, 8%);
+	border: 0;
+	margin: 0;
+	padding: 0;
 }
+
 #TopBarTab {
-    border-image: url("@{image_url}/topbar_bg.png") 0 0 0 0 stretch stretch;
-	/*background: qlineargradient(x1: 0,y1: 0, x2: 1, y2: 0, stop: 0 #a0a0a0, stop: 0.5 #404040);*/
-	border: 0px;
-	padding: 0px;
+	background: ~"qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #949494, stop: 0.5 #5a5a5a)";
+	border: 0;
+	padding: 0;
+	
 	&::tab {
-		.set_margin(5px, 1px);
-		.set_padding(8px, 1px);
-		border: 1px solid black; 
-		background-color: rgb(160,160,160);
+		background: rgb(160,160,160);
+		border: 1px solid #000; 
+		margin: 1px 5px;
+		padding: 1px 8px;
+		
 		&:selected {
-			background-color: rgb(205,220,192);
+			background: rgb(205,220,192);
 		}
 		&:hover {
-			background-color: rgb(192,192,192);
+			background: rgb(192,192,192);
 		}
 	}
 }
+
 #StackedMenuBar
 {
 	background: rgb(160,160,160);
