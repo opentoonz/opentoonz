@@ -307,6 +307,11 @@ public:
     return m_multiLayerStylePickerEnabled;
   }
 
+  void enableUseNumpadForSwitchingStyles(bool on);
+  bool isUseNumpadForSwitchingStylesEnabled() const {
+    return m_useNumpadForSwitchingStyles;
+  }
+
   // Xsheet  tab
 
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
@@ -516,6 +521,8 @@ private:
   std::string m_layerNameEncoding = "SJIS";  // Fixed to SJIS for now. You can
                                              // add interface if you wanna
                                              // change encoding.
+  // whether to use numpad and tab key shortcut for selecting styles
+  bool m_useNumpadForSwitchingStyles;
 
 private:
   Preferences();

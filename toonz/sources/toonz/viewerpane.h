@@ -3,7 +3,7 @@
 #ifndef VIEWER_PANE_INCLUDED
 #define VIEWER_PANE_INCLUDED
 
-#include "pane.h"
+#include "styleshortcutswitchablepanel.h"
 #include "sceneviewer.h"
 #include "toonzqt/intfield.h"
 #include "toonzqt/keyframenavigator.h"
@@ -25,7 +25,8 @@ class Ruler;
 
 class FlipConsole;
 class TXshLevel;
-class SceneViewerPanel final : public TPanel, public FlipConsoleOwner {
+class SceneViewerPanel final : public StyleShortcutSwitchablePanel,
+                               public FlipConsoleOwner {
   Q_OBJECT
 
   friend class SceneViewer;
@@ -86,6 +87,7 @@ protected slots:
   void onPlayingStatusChanged(bool playing);
   void enableFullPreview(bool enabled);
   void enableSubCameraPreview(bool enabled);
+  void onPreferenceChanged(const QString &prefName) override;
 };
 
 #endif

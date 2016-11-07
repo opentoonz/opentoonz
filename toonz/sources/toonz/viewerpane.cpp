@@ -77,7 +77,7 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WindowFlags flags)
 #else
 SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 #endif
-    : TPanel(parent) {
+    : StyleShortcutSwitchablePanel(parent) {
   QFrame *hbox = new QFrame(this);
   hbox->setFrameStyle(QFrame::StyledPanel);
   hbox->setObjectName("ViewerPanel");
@@ -94,6 +94,7 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
       new ImageUtils::FullScreenWidget(viewer);
 
   fsWidget->setWidget(m_sceneViewer = new SceneViewer(fsWidget));
+  m_sceneViewer->setIsStyleShortcutSwitchable();
 
   bool ret = true;
   ret      = ret && connect(m_sceneViewer, SIGNAL(onZoomChanged()),
@@ -225,7 +226,8 @@ SceneViewerPanel::~SceneViewerPanel() {}
 
 //-----------------------------------------------------------------------------
 
-void SceneViewerPanel::showEvent(QShowEvent *) {
+void SceneViewerPanel::showEvent(QShowEvent *event) {
+  StyleShortcutSwitchablePanel::showEvent(event);
   TApp *app                    = TApp::instance();
   TFrameHandle *frameHandle    = app->getCurrentFrame();
   TSceneHandle *sceneHandle    = app->getCurrentScene();
@@ -264,10 +266,6 @@ void SceneViewerPanel::showEvent(QShowEvent *) {
   ret = ret && connect(app->getCurrentTool(), SIGNAL(toolSwitched()),
                        m_sceneViewer, SLOT(onToolSwitched()));
 
-  ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-                       SLOT(onPreferenceChanged()));
-  m_flipConsole->onPreferenceChanged();
-
   assert(ret);
 
   // Aggiorno FPS al valore definito nel viewer corrente.
@@ -277,7 +275,8 @@ void SceneViewerPanel::showEvent(QShowEvent *) {
 
 //-----------------------------------------------------------------------------
 
-void SceneViewerPanel::hideEvent(QHideEvent *) {
+void SceneViewerPanel::hideEvent(QHideEvent *event) {
+  StyleShortcutSwitchablePanel::hideEvent(event);
   TApp *app                    = TApp::instance();
   TFrameHandle *frameHandle    = app->getCurrentFrame();
   TSceneHandle *sceneHandle    = app->getCurrentScene();
@@ -309,9 +308,6 @@ void SceneViewerPanel::hideEvent(QHideEvent *) {
 
   disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
              SLOT(onToolSwitched()));
-
-  disconnect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-             SLOT(onPreferenceChanged()));
 
   m_flipConsole->setActive(false);
 }
@@ -657,6 +653,20 @@ void SceneViewerPanel::onFrameTypeChanged() {
   updateFrameRange();
   updateFrameMarkers();
 }
+
+//-----------------------------------------------------------------------------
+
+void SceneViewerPanel::onPreferenceChanged(const QString &prefName) {
+  // if no name specified (on StyleShortcutSelectivePanel::showEvent),
+  // then process all updates
+  if (prefName == "BlankCount" || prefName == "BlankColor" ||
+      prefName.isEmpty())
+    m_flipConsole->onPreferenceChanged();
+
+  StyleShortcutSwitchablePanel::onPreferenceChanged(prefName);
+}
+
+//-----------------------------------------------------------------------------
 
 void SceneViewerPanel::playAudioFrame(int frame) {
   if (m_first) {

@@ -1689,7 +1689,7 @@ void MainWindow::defineActions() {
                         MenuScanCleanupCommandType);
   CameraTestCheck::instance()->setToggle(toggle);
 
-  createToggle(MI_OpacityCheck, tr("&Opacity Check"), "1", false,
+  createToggle(MI_OpacityCheck, tr("&Opacity Check"), "Alt+1", false,
                MenuScanCleanupCommandType);
 
   createMenuScanCleanupAction(MI_Cleanup, tr("&Cleanup"), "");
@@ -2047,8 +2047,8 @@ void MainWindow::defineActions() {
 
   createViewerAction(V_ZoomIn, tr("Zoom In"), "+");
   createViewerAction(V_ZoomOut, tr("Zoom Out"), "-");
-  createViewerAction(V_ZoomReset, tr("Reset View"), "0");
-  createViewerAction(V_ZoomFit, tr("Fit to Window"), "9");
+  createViewerAction(V_ZoomReset, tr("Reset View"), "Alt+0");
+  createViewerAction(V_ZoomFit, tr("Fit to Window"), "Alt+9");
   createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
   createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"),
                      "Alt+F");

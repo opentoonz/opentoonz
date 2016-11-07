@@ -142,7 +142,8 @@ set(MOC_HEADERS
     historypane.h
     cleanupsettingspane.h
     penciltestpopup.h
-    locatorpopup.h
+	locatorpopup.h
+	styleshortcutswitchablepanel.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -304,6 +305,7 @@ set(SOURCES
     penciltestpopup.cpp
     audiorecordingpopup.cpp
     locatorpopup.cpp
+	styleshortcutswitchablepanel.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp

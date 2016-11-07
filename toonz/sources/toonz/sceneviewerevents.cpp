@@ -16,6 +16,10 @@
 #include "comboviewerpane.h"
 #include "locatorpopup.h"
 
+// TnzQt includes
+#include "toonzqt/tselectionhandle.h"
+#include "toonzqt/styleselection.h"
+
 // TnzTools includes
 #include "tools/cursors.h"
 #include "tools/toolhandle.h"
@@ -767,6 +771,19 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (!tool->isEnabled()) return;
 
   tool->setViewer(this);
+
+  // If this object is child of Viewer or ComboViewer
+  // (m_isStyleShortcutSelective = true),
+  // then consider about shortcut for the current style selection.
+  if (m_isStyleShortcutSwitchable &&
+      Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+      (!isTextToolActive) && (event->modifiers() == Qt::NoModifier ||
+                              event->modifiers() == Qt::KeypadModifier) &&
+      ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
+       key == Qt::Key_Backtab)) {
+    event->ignore();
+    return;
+  }
 
   if (key == Qt::Key_Shift)
     modifiers |= Qt::SHIFT;
