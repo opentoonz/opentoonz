@@ -305,7 +305,7 @@ set(SOURCES
     penciltestpopup.cpp
     audiorecordingpopup.cpp
     locatorpopup.cpp
-	styleshortcutswitchablepanel.cpp
+    styleshortcutswitchablepanel.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp
