@@ -2351,6 +2351,7 @@ un po' di codice... */
 
       m_panels[tool] = panel;
       layout()->addWidget(panel);
+      emit newPanelCreated();
     } else {
       // il panel c'e' gia'.
       panel = it->second;

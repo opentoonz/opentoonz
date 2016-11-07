@@ -3,7 +3,7 @@
 #ifndef COMBOVIEWER_PANE_INCLUDED
 #define COMBOVIEWER_PANE_INCLUDED
 
-#include "pane.h"
+#include "styleshortcutswitchablepanel.h"
 #include "sceneviewer.h"
 #include "toonzqt/intfield.h"
 #include "toonzqt/keyframenavigator.h"
@@ -37,7 +37,8 @@ enum CV_Parts {
 };
 //-----------------------------------------------------------------------------
 
-class ComboViewerPanel final : public TPanel, public FlipConsoleOwner {
+class ComboViewerPanel final : public StyleShortcutSwitchablePanel,
+                               public FlipConsoleOwner {
   Q_OBJECT
 
   SceneViewer *m_sceneViewer;
@@ -118,6 +119,8 @@ protected slots:
   void onSceneSwitched();
   void enableFullPreview(bool enabled);
   void enableSubCameraPreview(bool enabled);
+
+  void onPreferenceChanged(const QString &prefName) override;
 };
 
 #endif

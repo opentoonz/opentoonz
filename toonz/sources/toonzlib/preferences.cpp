@@ -23,6 +23,7 @@
 // Qt includes
 #include <QSettings>
 #include <QStringList>
+#include <QAction>
 
 // boost includes
 #include <boost/bind.hpp>
@@ -295,7 +296,8 @@ Preferences::Preferences()
     , m_precompute(true)
     , m_fastRenderPath("desktop")
     , m_ffmpegTimeout(30)
-    , m_shortcutPreset("defopentoonz") {
+    , m_shortcutPreset("defopentoonz")
+    , m_useNumpadForSwitchingStyles(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -567,6 +569,8 @@ Preferences::Preferences()
   QString shortcutPreset = m_settings->value("shortcutPreset").toString();
   if (shortcutPreset != "") m_shortcutPreset = shortcutPreset;
   setShortcutPreset(m_shortcutPreset.toStdString());
+  getValue(*m_settings, "useNumpadForSwitchingStyles",
+           m_useNumpadForSwitchingStyles);
 }
 
 //-----------------------------------------------------------------
@@ -1331,4 +1335,11 @@ int Preferences::matchLevelFormat(const TFilePath &fp) const {
                    boost::bind(&LevelFormat::matches, _1, boost::cref(fp)));
 
   return (lft != m_levelFormats.end()) ? lft - m_levelFormats.begin() : -1;
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
+  m_useNumpadForSwitchingStyles = on;
+  m_settings->setValue("useNumpadForSwitchingStyles", on ? "1" : "0");
 }

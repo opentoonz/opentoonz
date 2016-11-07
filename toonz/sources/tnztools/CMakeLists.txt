@@ -11,7 +11,7 @@ set(MOC_HEADERS
     ../include/tools/screenpicker.h
     rgbpickertool.h
     rulertool.h
-	stylepickertool.h
+    stylepickertool.h
 )
 
 set(HEADERS ${MOC_HEADERS}

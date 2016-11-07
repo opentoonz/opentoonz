@@ -1005,7 +1005,8 @@ int Naa2TlvConverter::measureThickness(int x0, int y0) {
 
 //-----------------------------------------------------------------------------
 
-TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks) {
+TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks,
+                                       bool removeUnusedStyles) {
   if (!m_valid || m_colors.empty() || m_regions.empty() || !m_regionRas)
     return TToonzImageP();
   int lx                = m_regionRas->getLx();
@@ -1025,8 +1026,9 @@ TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks) {
       if (cs->getMainColor() != color) cs = 0;
     }
     if (cs == 0) {
-      styleId = palette->getPage(0)->addStyle(color);
-      cs      = palette->getStyle(styleId);
+      styleId = palette->addStyle(color);
+      palette->getPage(0)->addStyle(styleId);
+      cs = palette->getStyle(styleId);
     }
     styleIds.append(styleId);
   }
@@ -1034,6 +1036,21 @@ TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks) {
 
   // int synteticInkStyleId = palette->getPage(0)->addStyle(TPixel32(0,0,0,0));
   // styleIds.append(synteticInkStyleId);
+
+  // Remove unused styles from input palette
+  if (removeUnusedStyles) {
+    for (int p = palette->getPageCount() - 1; p >= 0; p--) {
+      TPalette::Page *page = palette->getPage(p);
+      for (int s = page->getStyleCount() - 1; s >= 0; s--) {
+        int styleId = page->getStyleId(s);
+        if (styleId == -1) continue;
+        // check if the style is used or not
+        if (!styleIds.contains(styleId)) page->removeStyle(s);
+      }
+      // erase empty page
+      if (page->getStyleCount() == 0) palette->erasePage(p);
+    }
+  }
 
   for (int y = 0; y < ly; y++) {
     unsigned short *workScanLine = m_regionRas->pixels(y);

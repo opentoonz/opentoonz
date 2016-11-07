@@ -591,6 +591,18 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       QRect nameRect = getColorNameRect(i);
       drawColorName(p, nameRect, style, styleIndex);
 
+      // if numpad shortcut is activated, draw shortcut scope
+      if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+          m_viewType == LEVEL_PALETTE &&
+          palette->getStyleShortcut(styleIndex) >= 0) {
+        p.setPen(QPen(QColor(0, 0, 0, 128), 2));
+        p.drawLine(nameRect.topLeft() + QPoint(2, 1),
+                   nameRect.bottomLeft() + QPoint(2, 0));
+        p.setPen(QPen(QColor(255, 255, 255, 128), 2));
+        p.drawLine(nameRect.topLeft() + QPoint(4, 1),
+                   nameRect.bottomLeft() + QPoint(4, 0));
+      }
+
       // selezione
       if (m_styleSelection->isSelected(m_page->getIndex(), i)) {
         p.setPen(Qt::white);
@@ -626,10 +638,37 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       TColorStyle *style = m_page->getStyle(i);
       int styleIndex     = m_page->getStyleId(i);
 
+      // if numpad shortcut is activated, draw shortcut scope
+      if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+          m_viewType == LEVEL_PALETTE &&
+          palette->getStyleShortcut(styleIndex) >= 0) {
+        QRect itemRect = getItemRect(i);
+        // paint dark
+        p.setPen(Qt::NoPen);
+        p.setBrush(QColor(0, 0, 0, 64));
+        p.drawRect(itemRect);
+        // check the neighbours and draw light lines
+        p.setPen(QPen(QColor(255, 255, 255, 128), 2));
+        // top
+        if (!hasShortcut(i - m_chipPerRow))
+          p.drawLine(itemRect.topLeft(), itemRect.topRight() - QPoint(1, 0));
+        // left
+        if (i % m_chipPerRow == 0 || !hasShortcut(i - 1))
+          p.drawLine(itemRect.topLeft() + QPoint(0, 1), itemRect.bottomLeft());
+        // bottom
+        if (!hasShortcut(i + m_chipPerRow))
+          p.drawLine(itemRect.bottomLeft() + QPoint(1, 0),
+                     itemRect.bottomRight());
+        // right
+        if ((i + 1) % m_chipPerRow == 0 || !hasShortcut(i + 1))
+          p.drawLine(itemRect.topRight(),
+                     itemRect.bottomRight() - QPoint(0, 1));
+      }
+
       // draw white frame if the style is selected or current
       if (m_styleSelection->isSelected(m_page->getIndex(), i) ||
           currentStyleIndex == styleIndex) {
-        QRect itemRect = getItemRect(i).adjusted(-1, -2, 1, 2);
+        QRect itemRect = getItemRect(i).adjusted(0, -1, 0, 1);
         p.setPen(Qt::NoPen);
         p.setBrush(Qt::white);
         p.drawRoundRect(itemRect, 7, 25);
@@ -793,6 +832,22 @@ void PageViewer::paintEvent(QPaintEvent *e) {
         p.drawEllipse(markPos, 3, 3);
         p.drawLine(markPos - QPoint(5, 0), markPos + QPoint(5, 0));
         p.drawLine(markPos - QPoint(0, 5), markPos + QPoint(0, 5));
+      }
+
+      // if numpad shortcut is activated, draw shortcut number on top
+      if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+          m_viewType == LEVEL_PALETTE &&
+          palette->getStyleShortcut(styleIndex) >= 0 &&
+          m_viewMode != SmallChips) {
+        int key      = palette->getStyleShortcut(styleIndex);
+        int shortcut = key - Qt::Key_0;
+        QRect ssRect(chipRect.center().x() - 8, chipRect.top() - 11, 16, 20);
+        p.setBrush(Qt::gray);
+        p.drawChord(ssRect, 0, -180 * 16);
+        tmpFont.setPointSize(6);
+        p.setFont(tmpFont);
+        p.drawText(ssRect.adjusted(0, 10, 0, 0), Qt::AlignCenter,
+                   QString().setNum(shortcut));
       }
 
       // revert font set
@@ -1370,6 +1425,15 @@ void PageViewer::onStyleRenamed() {
   std::wstring newName = m_renameTextField->text().toStdWString();
   assert(getPaletteHandle());
   PaletteCmd::renamePaletteStyle(getPaletteHandle(), newName);
+}
+
+//-----------------------------------------------------------------------------
+
+bool PageViewer::hasShortcut(int indexInPage) {
+  if (!m_page) return false;
+  if (indexInPage < 0 || indexInPage >= m_page->getStyleCount()) return false;
+  int styleIndex = m_page->getStyleId(indexInPage);
+  return (m_page->getPalette()->getStyleShortcut(styleIndex) >= 0);
 }
 
 //=============================================================================

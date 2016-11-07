@@ -298,13 +298,15 @@ void TProject::setFolder(string name) { setFolder(name, TFilePath(name)); }
 //-------------------------------------------------------------------
 /*! Returns the path of the folder named with \b name.\n
         Returns TFilePath() if there isn't a folder named with \b name.
-        \note The returned path could be a relative path.
+        \note The returned path could be a relative path if \b absolute is
+   false.
 */
-TFilePath TProject::getFolder(string name) const {
+TFilePath TProject::getFolder(string name, bool absolute) const {
   std::map<std::string, TFilePath>::const_iterator it;
   it = m_folders.find(name);
   if (it != m_folders.end())
-    return it->second;
+    return (absolute) ? makeAbsolute(getProjectFolder(), it->second)
+                      : it->second;
   else
     return TFilePath();
 }

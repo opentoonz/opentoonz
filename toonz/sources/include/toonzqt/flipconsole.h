@@ -250,6 +250,7 @@ public:
   void enableButton(UINT button, bool enable, bool doShowHide = true);
   void showCurrentFrame();
   int getCurrentFrame() const { return m_currentFrame; }
+  int getCurrentFps() const { return m_fps; }
   void setChecked(UINT button, bool state);
   bool isChecked(UINT button) const;
   void setCurrentFrame(int frame, bool forceResetting = false);
