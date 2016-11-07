@@ -841,11 +841,13 @@ ParamsPage {
   background-color: #000080;
 }
 /* Customize QScrollBar  vertical*/
+QScrollBar,
 #XsheetScrollBar {
   background-color: #4a4a4a;
   border: 1px solid black;
   /* buttons */
 }
+QScrollBar:vertical,
 #XsheetScrollBar:vertical {
   width: 18px;
   margin-left: 0px;
@@ -853,6 +855,7 @@ ParamsPage {
   margin-top: 20px;
   margin-bottom: 20px;
 }
+QScrollBar:horizontal,
 #XsheetScrollBar:horizontal {
   height: 18px;
   margin-left: 20px;
@@ -860,59 +863,75 @@ ParamsPage {
   margin-top: 0px;
   margin-bottom: 0px;
 }
+QScrollBar::handle,
 #XsheetScrollBar::handle {
   border-width: 4;
   image-position: center center;
 }
+QScrollBar::handle:vertical,
 #XsheetScrollBar::handle:vertical {
   border-image: url("../gray_072/imgs/sb_g_vhandle.png") 4;
   image: url("../gray_072/imgs/sb_g_vline.png");
   min-height: 40px;
 }
+QScrollBar::handle:horizontal,
 #XsheetScrollBar::handle:horizontal {
   border-image: url("../gray_072/imgs/sb_g_hhandle.png") 4;
   image: url("../gray_072/imgs/sb_g_hline.png");
   min-width: 40px;
 }
+QScrollBar::add-line,
 #XsheetScrollBar::add-line {
   subcontrol-origin: margin;
 }
+QScrollBar::add-line:vertical,
 #XsheetScrollBar::add-line:vertical {
   image: url("../gray_072/imgs/sb_g_downarrow.png");
   height: 20px;
   subcontrol-position: bottom;
 }
+QScrollBar::add-line:vertical:pressed,
 #XsheetScrollBar::add-line:vertical:pressed {
   image: url("../gray_072/imgs/sb_g_downarrow_pressed.png");
 }
+QScrollBar::add-line:horizontal,
 #XsheetScrollBar::add-line:horizontal {
   image: url("../gray_072/imgs/sb_g_rarrow.png");
   width: 20px;
   subcontrol-position: right;
 }
+QScrollBar::add-line:horizontal:pressed,
 #XsheetScrollBar::add-line:horizontal:pressed {
   image: url("../gray_072/imgs/sb_g_rarrow_pressed.png");
 }
+QScrollBar::sub-line,
 #XsheetScrollBar::sub-line {
   subcontrol-origin: margin;
 }
+QScrollBar::sub-line:vertical,
 #XsheetScrollBar::sub-line:vertical {
   image: url("../gray_072/imgs/sb_g_uparrow.png");
   height: 20px;
   subcontrol-position: top;
 }
+QScrollBar::sub-line:vertical:pressed,
 #XsheetScrollBar::sub-line:vertical:pressed {
   image: url("../gray_072/imgs/sb_g_uparrow_pressed.png");
 }
+QScrollBar::sub-line:horizontal,
 #XsheetScrollBar::sub-line:horizontal {
   image: url("../gray_072/imgs/sb_g_larrow.png");
   width: 20px;
   subcontrol-position: left;
 }
+QScrollBar::sub-line:horizontal:pressed,
 #XsheetScrollBar::sub-line:horizontal:pressed {
   image: url("../gray_072/imgs/sb_g_larrow_pressed.png");
 }
-#XsheetScrollBar::add-page {
+QScrollBar::add-page,
+#XsheetScrollBar::add-page,
+QScrollBar::sub-page,
+#XsheetScrollBar::sub-page {
   background: none;
 }
 #noteTextEdit {
