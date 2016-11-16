@@ -74,7 +74,8 @@ TLevelWriterGif::~TLevelWriterGif() {
   QString filters = "scale=" + QString::number(outLx) + ":-1:flags=lanczos";
   QString paletteFilters = filters + " [x]; [x][1:v] paletteuse";
   if (m_palette) {
-    palette = m_path.getQString() + "palette.png";
+    palette = ffmpegWriter->getFfmpegCache().getQString() + "//" +
+              QString::fromStdString(m_path.getName()) + "palette.png";
     palettePreIArgs << "-v";
     palettePreIArgs << "warning";
 

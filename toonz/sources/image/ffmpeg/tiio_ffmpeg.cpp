@@ -100,7 +100,8 @@ void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
 void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   m_frameCount++;
-  QString tempPath = m_path.getQString() + "tempOut" +
+  QString tempPath = getFfmpegCache().getQString() + "//" +
+                     QString::fromStdString(m_path.getName()) + "tempOut" +
                      QString::number(m_frameCount) + "." + m_intermediateFormat;
   std::string saveStatus = "";
   TRasterImageP tempImage(img);
@@ -137,8 +138,9 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
 void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
                        bool includesInPath, bool includesOutPath,
                        bool overWriteFiles) {
-  QString tempName = "tempOut%d." + m_intermediateFormat;
-  tempName         = m_path.getQString() + tempName;
+  QString tempName = "//" + QString::fromStdString(m_path.getName()) +
+                     "tempOut%d." + m_intermediateFormat;
+  tempName = getFfmpegCache().getQString() + tempName;
 
   QStringList args;
   args = args + preIArgs;
@@ -189,7 +191,8 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *st) {
   int bufSize         = st->getSampleCount() * st->getSampleSize();
   const UCHAR *buffer = st->getRawData();
 
-  m_audioPath   = m_path.getQString() + "tempOut.raw";
+  m_audioPath = getFfmpegCache().getQString() + "//" +
+                QString::fromStdString(m_path.getName()) + "tempOut.raw";
   m_audioFormat = "s" + QString::number(m_bitsPerSample);
   if (m_bitsPerSample > 8) m_audioFormat = m_audioFormat + "le";
   std::string strPath                    = m_audioPath.toStdString();
