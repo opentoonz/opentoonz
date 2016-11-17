@@ -111,8 +111,10 @@ void DVAPI convertNaa2Tlv(
     FrameTaskNotifier
         *frameNotifier,  //!< Observer class for frame success notifications.
     TPalette *palette =
-        0);  //!< Special conversion function from an antialiased level to tlv.
-             //!  \sa  Function ImageUtils::convert().
+        0,  //!< Special conversion function from an antialiased level to tlv.
+            //!  \sa  Function ImageUtils::convert().
+    bool removeUnusedStyles =
+        false);  //! Remove unused styles from input palette.
 
 double DVAPI getQuantizedZoomFactor(double zf, bool forward);
 

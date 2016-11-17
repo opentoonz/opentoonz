@@ -52,7 +52,11 @@ public:
   }
   void notifyNameSceneChange() { emit nameSceneChanged(); }
 
-  void notifyPreferenceChanged() { emit preferenceChanged(); }
+  void notifyPreferenceChanged(const QString &prefName) {
+    emit preferenceChanged(prefName);
+  }
+
+  void notifyPixelUnitSelected(bool on) { emit pixelUnitSelected(on); }
 
   void setDirtyFlag(bool dirtyFlag) {
     if (m_dirtyFlag == dirtyFlag) return;
@@ -74,7 +78,8 @@ signals:
   void castChanged();
   void castFolderAdded(const TFilePath &path);
   void nameSceneChanged();
-  void preferenceChanged();
+  void preferenceChanged(const QString &prefName);
+  void pixelUnitSelected(bool on);
 };
 
 #endif  // TSCENEHANDLE_H

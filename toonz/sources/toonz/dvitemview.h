@@ -127,8 +127,8 @@ class ItemViewPlayWidget final : public QWidget {
     bool getCurrentFrame();
     /*! Return true if current frame index is less than fids size. */
     bool isFrameIndexInRange();
-    bool setCurrentFrameIndexFromXValue(int xValue, int lenght);
-    double currentFrameIndexToXValue(int lenght);
+    bool setCurrentFrameIndexFromXValue(int xValue, int length);
+    double currentFrameIndexToXValue(int length);
     QPixmap getCurrentPixmap();
   };
 
@@ -144,8 +144,8 @@ public:
 
   void setIsPlaying(DvItemListModel *model, int index);
   void setIsPlayingCurrentFrameIndex(DvItemListModel *model, int index,
-                                     int xValue, int lenght);
-  int getCurrentFramePosition(int lenght);
+                                     int xValue, int length);
+  int getCurrentFramePosition(int length);
 
   bool isIndexPlaying(int index) { return m_currentItemIndex == index; }
   bool isPlaying() { return m_currentItemIndex != -1; }

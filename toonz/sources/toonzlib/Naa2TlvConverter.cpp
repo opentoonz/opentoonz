@@ -331,8 +331,7 @@ void Naa2TlvConverter::computeLinks() {
 
 //-----------------------------------------------------------------------------
 
-// find background regions :
-// (almost) white, touching image border
+// find background regions : (almost) white
 //
 void Naa2TlvConverter::findBackgroundRegions() {
   if (!m_regionRas || m_regions.empty()) return;
@@ -358,11 +357,8 @@ void Naa2TlvConverter::findBackgroundRegions() {
   }
 
   for (int i = 0; i < m_regions.count(); i++) {
-    RegionInfo &region = m_regions[i];
-    if (region.colorIndex == bgColorIndex && region.links.contains(-1)) {
-      region.type = RegionInfo::Background;
-      ;
-    }
+    RegionInfo &region                                 = m_regions[i];
+    if (region.colorIndex == bgColorIndex) region.type = RegionInfo::Background;
   }
 }
 
@@ -1005,7 +1001,8 @@ int Naa2TlvConverter::measureThickness(int x0, int y0) {
 
 //-----------------------------------------------------------------------------
 
-TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks) {
+TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks,
+                                       QList<int> &usedStyleIds) {
   if (!m_valid || m_colors.empty() || m_regions.empty() || !m_regionRas)
     return TToonzImageP();
   int lx                = m_regionRas->getLx();
@@ -1025,10 +1022,12 @@ TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks) {
       if (cs->getMainColor() != color) cs = 0;
     }
     if (cs == 0) {
-      styleId = palette->getPage(0)->addStyle(color);
-      cs      = palette->getStyle(styleId);
+      styleId = palette->addStyle(color);
+      palette->getPage(0)->addStyle(styleId);
+      cs = palette->getStyle(styleId);
     }
     styleIds.append(styleId);
+    if (!usedStyleIds.contains(styleId)) usedStyleIds.append(styleId);
   }
   styleIds.append(0);  // syntetic ink
 
@@ -1097,4 +1096,22 @@ TVectorImageP Naa2TlvConverter::vectorize(const TToonzImageP &ti) {
   TVectorImageP vi = vc.vectorize(img, conf, palette);
   vi->setPalette(palette);
   return vi;
+}
+
+//-----------------------------------------------------------------------------
+
+void Naa2TlvConverter::removeUnusedStyles(const QList<int> &styleIds) {
+  // Remove unused styles from input palette
+  if (!m_palette) return;
+  for (int p = m_palette->getPageCount() - 1; p >= 0; p--) {
+    TPalette::Page *page = m_palette->getPage(p);
+    for (int s = page->getStyleCount() - 1; s >= 0; s--) {
+      int styleId = page->getStyleId(s);
+      if (styleId == -1) continue;
+      // check if the style is used or not
+      if (!styleIds.contains(styleId)) page->removeStyle(s);
+    }
+    // erase empty page
+    if (page->getStyleCount() == 0) m_palette->erasePage(p);
+  }
 }

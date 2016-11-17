@@ -632,7 +632,8 @@ void convert(const TFilePath &source, const TFilePath &dest,
 
 void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
                     const TFrameId &from, const TFrameId &to,
-                    FrameTaskNotifier *frameNotifier, TPalette *palette) {
+                    FrameTaskNotifier *frameNotifier, TPalette *palette,
+                    bool removeUnusedStyles) {
   std::string dstExt = dest.getType(), srcExt = source.getType();
 
   // Load source level structure
@@ -650,6 +651,8 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
 
   Naa2TlvConverter converter;
   converter.setPalette(palette);
+
+  QList<int> usedStyleIds({0});
 
   int f, fCount = int(frames.size());
   for (f = 0; f != fCount; ++f) {
@@ -672,7 +675,7 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
       converter.process(raster);
 
       if (TToonzImageP dstImg =
-              converter.makeTlv(false))  // Opaque synthetic inks
+              converter.makeTlv(false, usedStyleIds))  // Opaque synthetic inks
       {
         if (converter.getPalette() == 0)
           converter.setPalette(dstImg->getPalette());
@@ -692,6 +695,8 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
 
     frameNotifier->notifyFrameCompleted(100 * (f + 1) / frames.size());
   }
+
+  if (removeUnusedStyles) converter.removeUnusedStyles(usedStyleIds);
 }
 
 //=============================================================================

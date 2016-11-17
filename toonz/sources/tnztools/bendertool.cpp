@@ -21,7 +21,7 @@ namespace {
 const UINT MAX_SAMPLE = 2;
 const int MY_ERROR    = -1;
 
-const double c_LenghtOfBenderRegion = 10.0;
+const double c_LengthOfBenderRegion = 10.0;
 
 const int IS_BEGIN = 0;
 const int IS_END   = 1;

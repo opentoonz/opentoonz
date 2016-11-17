@@ -205,8 +205,8 @@ TRaster32P convertToIcon(TVectorImageP vimage, int frame,
 
   TOfflineGL *glContext = IconGenerator::instance()->getOfflineGLContext();
 
-  // l'immagine e' contenuta dentro imageBox (aggiungo un piccolo margine anche
-  // per evitare problemi con immagini vuote)
+  // The image and contained within Imagebox
+  // (add a small margin also to prevent problems with empty images)
   TRectD imageBox;
   {
     QMutexLocker sl(vimage->getMutex());
@@ -214,15 +214,15 @@ TRaster32P convertToIcon(TVectorImageP vimage, int frame,
   }
   TPointD imageCenter = (imageBox.getP00() + imageBox.getP11()) * 0.5;
 
-  // calcolo una matrice di trasformazione che sposti l'immagine dentro l'icona.
-  // il fattore di scala e' scelto in modo che l'immagine sia interamente
-  // contenuta nell'icona (con un margine di 'margin' pixel)
+  // Calculate a transformation matrix that moves the image inside the icon.
+  // The scale factor is chosen so that the image is entirely
+  // contained in the icon (with a margin of 'margin' pixels)
   const int margin = 10;
   double scx       = (iconSize.lx - margin) / imageBox.getLx();
   double scy       = (iconSize.ly - margin) / imageBox.getLy();
   double sc        = std::min(scx, scy);
-  // aggiungo la traslazione: il punto centrale dell'immagine va nel punto
-  // centrale della pixmap
+  // Add the translation: the center point of the image is at the point
+  // middle of the pixmap.
   TPointD iconCenter(iconSize.lx * 0.5, iconSize.ly * 0.5);
   TAffine aff = TScale(sc).place(imageCenter, iconCenter);
 
@@ -238,7 +238,7 @@ TRaster32P convertToIcon(TVectorImageP vimage, int frame,
       rd.m_inkCheckEnabled ? settings.m_inkIndex : settings.m_paintIndex;
   rd.m_isIcon = true;
 
-  // disegno l'immagine
+  // Draw the image.
   glContext->makeCurrent();
   glContext->clear(rd.m_blackBgEnabled ? TPixel::Black : TPixel32::White);
   glContext->draw(vimage, rd);
@@ -277,8 +277,8 @@ TRaster32P convertToIcon(TToonzImageP timage, int frame,
   else
     iconLy = tround((double(ly) * iconSize.lx) / lx);
 
-  TDimension iconSize2 = TDimension(
-      iconLx, iconLy);  // dimensione dell'icona con aspectRatio esatto
+  // icon size with correct aspect ratio
+  TDimension iconSize2 = TDimension(iconLx, iconLy);
 
   TRaster32P icon(iconSize2);
   icon->clear();
@@ -353,27 +353,27 @@ TRaster32P convertToIcon(TMeshImageP mi, int frame, const TDimension &iconSize,
 
   TOfflineGL *glContext = IconGenerator::instance()->getOfflineGLContext();
 
-  // l'immagine e' contenuta dentro imageBox (aggiungo un piccolo margine anche
-  // per evitare problemi con immagini vuote)
+  // The image and contained within Imagebox
+  // (add a small margin also to prevent problems with empty images)
   TRectD imageBox;
   imageBox = mi->getBBox().enlarge(.1);
 
   TPointD imageCenter(0.5 * (imageBox.getP00() + imageBox.getP11()));
 
-  // calcolo una matrice di trasformazione che sposti l'immagine dentro l'icona.
-  // il fattore di scala e' scelto in modo che l'immagine sia interamente
-  // contenuta nell'icona (con un margine di 'margin' pixel)
+  // Calculate a transformation matrix that moves the image inside the icon.
+  // The scale factor is chosen so that the image is entirely
+  // contained in the icon (with a margin of 'margin' pixels)
   const int margin = 10;
   double scx       = (iconSize.lx - margin) / imageBox.getLx();
   double scy       = (iconSize.ly - margin) / imageBox.getLy();
   double sc        = std::min(scx, scy);
 
-  // aggiungo la traslazione: il punto centrale dell'immagine va nel punto
-  // centrale della pixmap
+  // Add the translation: the center point of the image is at the point
+  // middle of the pixmap.
   TPointD iconCenter(iconSize.lx * 0.5, iconSize.ly * 0.5);
   TAffine aff = TScale(sc).place(imageCenter, iconCenter);
 
-  // disegno l'immagine
+  // Draw the image.
   glContext->makeCurrent();
   glContext->clear(settings.m_blackBgCheck ? TPixel::Black : TPixel32::White);
 

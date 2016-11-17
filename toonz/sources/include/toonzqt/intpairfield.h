@@ -41,7 +41,7 @@ namespace DVGui {
                 the slider and the other pair [lebel,text field].
                 Object size width is not fixed, while height is equal to
    DVGui::WidgetHeight, 20;
-                labels width depend from its text lenght, text fields has fixed
+                labels width depend from its text length, text fields has fixed
    size, while
                 slider width change in according with widget size.
 

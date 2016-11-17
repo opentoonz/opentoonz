@@ -1,10 +1,10 @@
 # How to contribute
 
-This document describes some points about contribution process for OpenToonz.
+This document describes some points about the contribution process for OpenToonz.
 
 ## Pull-requests
 
-OpenToonz organization loves any kinds of your contributions, such as fixing typos and code refactroing.
+The OpenToonz organization loves any kind of your contributions, such as fixing typos and code refactoring.
 If you fixed or added something useful to the OpenToonz, please send pull-requests to us.
 We review the request, then we accept it, or add comments for rework, or decline it.
 
@@ -34,25 +34,25 @@ We review the request, then we accept it, or add comments for rework, or decline
 
 If you found bugs, please report details about them using [issues](https://github.com/opentoonz/opentoonz/issues).
 Then we will try to reproduce the bugs and fix them.
-Unfortunately, sometimes bugs can be only reproduced in your your environment,
+Unfortunately, bugs can sometimes only be reproduced in your own environment,
 so we cannot reproduce them. We believe you can fix the bug and send us the fix.
 
 ## Features
 
 If you had an idea about a new feature, please implement it and send a pull-request to us.
 Even if you cannot implement the feature, you can open a topic in [issues](https://github.com/opentoonz/opentoonz/issues).
-It enables us to discuss about implementaions of the feature there.
+It enables us to discuss about implementations of the feature there.
 
 ## Translations
 
 Translation source (`.ts`) files for OpenToonz GUI are located in `toonz/sources/translations`.
 If you create new `.ts` files for your language or polish existing ones,
-please send us those modifications as pull-requests. 
-[Qt Linguist](http://doc.qt.io/qt-5.6/linguist-translators.html) is usefull for translating them.
+please send us those modifications as pull-requests.
+[Qt Linguist](http://doc.qt.io/qt-5.6/linguist-translators.html) is useful for translating them.
 
 Please send us Qt message (`.qm`) files with `.ts` files if you can make the following modifications.
 
 OpenToonz uses `.qm` files generated from `.ts` files.
 You can generate `.qm` files by using [Qt Linguist](http://doc.qt.io/qt-5.6/linguist-translators.html).
 Please locate generated `.qm` files in `stuff/config/loc`.
-It enables OpenToonz installer to install them into the `stuff` directory.
+It enables the OpenToonz installer to install them into the `stuff` directory.

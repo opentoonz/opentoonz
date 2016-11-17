@@ -591,79 +591,79 @@ ParamsPage {
   background-color: #000080;
 }
 /* Customize QScrollBar  vertical*/
-#XsheetScrollBar {
-  background-color: #a0a0a0;
+QScrollBar {
   border: 1px solid black;
   /* buttons */
 }
-#XsheetScrollBar:vertical {
-  width: 18px;
+QScrollBar:vertical {
+  width: 16px;
   margin-left: 0px;
   margin-right: 0px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 16px;
+  margin-bottom: 16px;
 }
-#XsheetScrollBar:horizontal {
-  height: 18px;
-  margin-left: 20px;
-  margin-right: 20px;
+QScrollBar:horizontal {
+  height: 16px;
+  margin-left: 16px;
+  margin-right: 16px;
   margin-top: 0px;
   margin-bottom: 0px;
 }
-#XsheetScrollBar::handle {
-  border-width: 4;
+QScrollBar::handle {
+  border-width: 3;
   image-position: center center;
 }
-#XsheetScrollBar::handle:vertical {
-  border-image: url("imgs/sb_g_vhandle.png") 4;
+QScrollBar::handle:vertical {
+  border-image: url("imgs/sb_g_vhandle.png") 3;
   image: url("imgs/sb_g_vline.png");
   min-height: 40px;
 }
-#XsheetScrollBar::handle:horizontal {
-  border-image: url("imgs/sb_g_hhandle.png") 4;
+QScrollBar::handle:horizontal {
+  border-image: url("imgs/sb_g_hhandle.png") 3;
   image: url("imgs/sb_g_hline.png");
   min-width: 40px;
 }
-#XsheetScrollBar::add-line {
+QScrollBar::add-line {
   subcontrol-origin: margin;
 }
-#XsheetScrollBar::add-line:vertical {
+QScrollBar::add-line:vertical {
   image: url("imgs/sb_g_downarrow.png");
-  height: 20px;
+  height: 16px;
   subcontrol-position: bottom;
 }
-#XsheetScrollBar::add-line:vertical:pressed {
+QScrollBar::add-line:vertical:pressed {
   image: url("imgs/sb_g_downarrow_pressed.png");
 }
-#XsheetScrollBar::add-line:horizontal {
+QScrollBar::add-line:horizontal {
   image: url("imgs/sb_g_rarrow.png");
-  width: 20px;
+  width: 16px;
   subcontrol-position: right;
 }
-#XsheetScrollBar::add-line:horizontal:pressed {
+QScrollBar::add-line:horizontal:pressed {
   image: url("imgs/sb_g_rarrow_pressed.png");
 }
-#XsheetScrollBar::sub-line {
+QScrollBar::sub-line {
   subcontrol-origin: margin;
 }
-#XsheetScrollBar::sub-line:vertical {
+QScrollBar::sub-line:vertical {
   image: url("imgs/sb_g_uparrow.png");
-  height: 20px;
+  height: 16px;
   subcontrol-position: top;
 }
-#XsheetScrollBar::sub-line:vertical:pressed {
+QScrollBar::sub-line:vertical:pressed {
   image: url("imgs/sb_g_uparrow_pressed.png");
 }
-#XsheetScrollBar::sub-line:horizontal {
+QScrollBar::sub-line:horizontal {
   image: url("imgs/sb_g_larrow.png");
-  width: 20px;
+  width: 16px;
   subcontrol-position: left;
 }
-#XsheetScrollBar::sub-line:horizontal:pressed {
+QScrollBar::sub-line:horizontal:pressed {
   image: url("imgs/sb_g_larrow_pressed.png");
 }
-#XsheetScrollBar::add-page {
-  background: none;
+QScrollBar::add-page,
+QScrollBar::sub-page {
+  background-color: #a0a0a0;
 }
 XsheetViewer {
   qproperty-TextColor: black;
@@ -701,6 +701,11 @@ XsheetViewer {
   qproperty-MeshColumnColor: #c882ff;
   qproperty-MeshColumnBorderColor: #694687;
   qproperty-SelectedMeshColumnColor: #d8b4f5;
+  qproperty-SoundColumnColor: #b3c187;
+  qproperty-SoundColumnBorderColor: #637856;
+  qproperty-SelectedSoundColumnColor: #d7d7b4;
+  qproperty-SoundColumnHlColor: #f5ffe6;
+  qproperty-SoundColumnTrackColor: #5a642d;
   qproperty-ColumnHeadPastelizer: #ffffff;
   qproperty-SelectedColumnHead: #bed2f0;
   qproperty-LightLightBGColor: #fafafa;
@@ -1102,6 +1107,50 @@ QDialog #dialogButtonFrame {
 }
 #LargeSizedText {
   font-size: 17px;
+}
+#GearButton {
+  qproperty-icon: url("imgs/gear.png");
+}
+#StartupLabel {
+  padding: 3px;
+}
+#StartupLabel:hover {
+  background-color: #9a9a9a;
+}
+#WordButton {
+  font-size: 12px;
+  color: black;
+  background-color: #c0c0c0;
+  border-style: outset;
+  border-left-color: white;
+  border-top-color: white;
+  border-right-color: black;
+  border-bottom-color: black;
+  border-width: 1px;
+  border-radius: 1px;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+#WordButton:pressed {
+  background-color: #faffa2;
+  border-style: inset;
+  border-left-color: black;
+  border-top-color: black;
+  border-right-color: white;
+  border-bottom-color: white;
+}
+#WordButton:hover {
+  background-color: #faffa2;
+}
+#WordButton:hover:pressed {
+  background-color: #faffa2;
+  border-style: inset;
+  border-left-color: black;
+  border-top-color: black;
+  border-right-color: white;
+  border-bottom-color: white;
 }
 
 //# sourceMappingURL=gray_128_mac.qss.map

@@ -39,10 +39,10 @@ PointPair computeTexParameters(const TPointD &p1, const TPointD &p2,
   TPointD v = (newP.first + newP.second) * 0.5 - (p2 + p1) * 0.5;
 
   // compute length of opposite segment
-  double lenghtNextP1NextP2 = tdistance(newP.first, newP.second);
+  double lengthNextP1NextP2 = tdistance(newP.first, newP.second);
 
   // compute parameter texture offset starting from 0.5
-  double texParameterOffset = lenghtNextP1NextP2 / size.lx * 0.5;
+  double texParameterOffset = lengthNextP1NextP2 / size.lx * 0.5;
 
   // fix value for s
   tex.first.x  = 0.5 - texParameterOffset;

@@ -71,6 +71,7 @@ protected:
 //---------------------------------------------------------------
 
 class DVAPI CameraSettingsWidget final : public QFrame {
+  friend class StartupPopup;
   Q_OBJECT
 
   bool m_forCleanup;

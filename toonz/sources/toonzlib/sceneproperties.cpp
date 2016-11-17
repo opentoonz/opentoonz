@@ -80,8 +80,6 @@ void TSceneProperties::assign(const TSceneProperties *sprop) {
     for (int i     = 0; i < (int)m_cameras.size(); i++)
       m_cameras[i] = new TCamera(*m_cameras[i]);
   }
-  *m_outputProp           = *sprop->m_outputProp;
-  *m_previewProp          = *sprop->m_previewProp;
   m_bgColor               = sprop->m_bgColor;
   m_markerDistance        = sprop->m_markerDistance;
   m_markerOffset          = sprop->m_markerOffset;

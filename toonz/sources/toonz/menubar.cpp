@@ -1077,6 +1077,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_NewLevel);
   addMenuItem(fileMenu, MI_LoadLevel);
+  addMenuItem(fileMenu, MI_SaveAllLevels);
   addMenuItem(fileMenu, MI_SaveLevel);
   addMenuItem(fileMenu, MI_SaveLevelAs);
   addMenuItem(fileMenu, MI_ExportLevel);
@@ -1098,6 +1099,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_OutputSettings);
   addMenuItem(fileMenu, MI_Render);
+  addMenuItem(fileMenu, MI_FastRender);
   //  addMenuItem(fileMenu, MI_SavePreviewedFrames);
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_PrintXsheet);
@@ -1232,6 +1234,15 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(xsheetMenu, MI_RemoveSceneFrame);
   addMenuItem(xsheetMenu, MI_InsertGlobalKeyframe);
   addMenuItem(xsheetMenu, MI_RemoveGlobalKeyframe);
+  xsheetMenu->addSeparator();
+  addMenuItem(xsheetMenu, MI_NextFrame);
+  addMenuItem(xsheetMenu, MI_PrevFrame);
+  addMenuItem(xsheetMenu, MI_FirstFrame);
+  addMenuItem(xsheetMenu, MI_LastFrame);
+  addMenuItem(xsheetMenu, MI_NextDrawing);
+  addMenuItem(xsheetMenu, MI_PrevDrawing);
+  addMenuItem(xsheetMenu, MI_NextStep);
+  addMenuItem(xsheetMenu, MI_PrevStep);
 
   // Menu' CELLS
   QMenu *cellsMenu = addMenu(tr("Cells"), fullMenuBar);
@@ -1253,8 +1264,11 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(cellsMenu, MI_Rollup);
   addMenuItem(cellsMenu, MI_Rolldown);
   addMenuItem(cellsMenu, MI_TimeStretch);
-  addMenuItem(xsheetMenu, MI_DrawingSubForward);
-  addMenuItem(xsheetMenu, MI_DrawingSubBackward);
+  cellsMenu->addSeparator();
+  addMenuItem(cellsMenu, MI_DrawingSubForward);
+  addMenuItem(cellsMenu, MI_DrawingSubBackward);
+  addMenuItem(cellsMenu, MI_DrawingSubGroupForward);
+  addMenuItem(cellsMenu, MI_DrawingSubGroupBackward);
   cellsMenu->addSeparator();
   addMenuItem(cellsMenu, MI_Autorenumber);
   addMenuItem(cellsMenu, MI_Duplicate);
@@ -1331,6 +1345,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
 
   //---Help Menu
   QMenu *helpMenu = addMenu(tr("Help"), fullMenuBar);
+  addMenuItem(helpMenu, MI_StartupPopup);
   addMenuItem(helpMenu, MI_About);
 
   return fullMenuBar;

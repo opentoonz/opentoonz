@@ -501,7 +501,11 @@ void StudioPaletteCmd::loadIntoCurrentPalette(TPaletteHandle *paletteHandle,
   // keep the color model path unchanged
   TFilePath oldRefImagePath = current->getRefImgPath();
 
+  std::wstring oldGlobalName = current->getGlobalName();
   current->assign(palette, true);
+  // keep global name unchanged
+  current->setGlobalName(oldGlobalName);
+
   current->setDirtyFlag(true);
 
   current->setRefImgPath(oldRefImagePath);
