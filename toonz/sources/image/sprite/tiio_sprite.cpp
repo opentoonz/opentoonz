@@ -86,6 +86,9 @@ TLevelWriterSprite::~TLevelWriterSprite() {
     }
     m_imagesResized.push_back(copy);
   }
+  for (QImage *image : m_images) {
+    delete image;
+  }
   m_images.clear();
   int horizDim          = 1;
   int vertDim           = 1;
@@ -213,8 +216,6 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
   const char *format           = ba.data();
 
   QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
-  m_images.push_back(qi);
-  delete image;
 
   int l = qi->width(), r = 0, t = qi->height(), b = 0;
   for (int y = 0; y < qi->height(); ++y) {
@@ -247,6 +248,13 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
     if (t < m_top) m_top       = t;
     if (b > m_bottom) m_bottom = b;
   }
+  QImage *newQi = new QImage(m_lx, m_ly, QImage::Format_ARGB32);
+  QPainter painter(newQi);
+  painter.drawImage(QPoint(0, 0), *qi);
+  m_images.push_back(newQi);
+  delete image;
+  delete qi;
+  free(buffer);
 }
 
 Tiio::SpriteWriterProperties::SpriteWriterProperties()
