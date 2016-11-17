@@ -406,8 +406,8 @@ int Ffmpeg::getGifFrameCount() {
   int frame               = 1;
   QString ffmpegCachePath = getFfmpegCache().getQString();
   QString tempPath        = ffmpegCachePath + "//" +
-                     QString::fromStdString(m_path.getName()) +
-                     QString::fromStdString(m_path.getType());
+                     m_path.getQString().remove(QRegExp(QString::fromUtf8(
+                         "[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
   std::string tmpPath = tempPath.toStdString();
   QString tempName    = "In%04d." + m_intermediateFormat;
   tempName            = tempPath + tempName;
