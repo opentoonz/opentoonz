@@ -128,7 +128,7 @@ TNZAPI TBOOL tm_append_raster(TNZMOVIE movie, MY_RASTER r);
 
 /**************************************************************
 Append a .wav(NT) or .aiff(IRIX) audio file to the movie.
-The lenght of the resulting movie is forced to be equal to the video track,
+The length of the resulting movie is forced to be equal to the video track,
 so any overflowing audio is truncated. For this reason, is adviced to add
 the audio when the video part has been completely added.
 The position can be a negative value too;

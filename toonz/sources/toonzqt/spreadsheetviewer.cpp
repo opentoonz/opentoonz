@@ -413,8 +413,8 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
   m_cellScrollArea->setObjectName("ScrollArea");
   m_cellScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_cellScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  m_cellScrollArea->horizontalScrollBar()->setObjectName("XsheetScrollBar");
-  m_cellScrollArea->verticalScrollBar()->setObjectName("XsheetScrollBar");
+  // m_cellScrollArea->horizontalScrollBar()->setObjectName("XsheetScrollBar");
+  // m_cellScrollArea->verticalScrollBar()->setObjectName("XsheetScrollBar");
   m_cellScrollArea->setFocusPolicy(Qt::NoFocus);
 
   m_columnScrollArea->setSizePolicy(
@@ -435,14 +435,15 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
     layout->addWidget(m_rowScrollArea, 1, 0);
     layout->addWidget(m_cellScrollArea, 1, 1, 2, 2);
 
+    int scrollBarWidth = 16;
     // upper-right
     QWidget *w = new QWidget(this);
-    w->setFixedSize(QSize(20, m_rowHeight * 3 + 60 - 63));
+    w->setFixedSize(QSize(scrollBarWidth, m_rowHeight * 3 + 60 - 63));
     layout->addWidget(w, 0, 2);
 
     // lower-left
     w = new QWidget(this);
-    w->setFixedSize(QSize(30, 20));
+    w->setFixedSize(QSize(30, scrollBarWidth));
     layout->addWidget(w, 2, 0);
 
     layout->setColumnStretch(0, 0);

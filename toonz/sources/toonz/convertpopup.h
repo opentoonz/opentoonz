@@ -87,6 +87,7 @@ public slots:
   void onLevelConverted(const TFilePath &fullPath);
 
   void onFormatChanged(const QString &);
+  void onPalettePathChanged();
 
 protected:
   Convert2Tlv *makeTlvConverter(const TFilePath &sourceFilePath);
@@ -104,7 +105,7 @@ private:
   DVGui::ColorField *m_bgColorField;
   QFrame *m_tlvFrame;
   QCheckBox *m_applyAutoclose, *m_removeDotBeforeFrameNumber,
-      *m_saveBackupToNopaint, *m_appendDefaultPalette;
+      *m_saveBackupToNopaint, *m_appendDefaultPalette, *m_removeUnusedStyles;
   DVGui::CheckBox *m_skip;
   QComboBox *m_antialias, *m_tlvMode, *m_fileFormat;
   QLabel *m_bgColorLabel, *m_suffixLabel, *m_unpaintedFolderLabel,

@@ -1184,11 +1184,14 @@ void FunctionTreeModel::onChange(const TParamChange &tpc) {
 
     struct Func final : public TFunctorInvoker::BaseFunctor {
       FunctionTreeModel *m_obj;
-      const TParamChange *m_tpc;
+      // Use a copy of 'TParamChange' since callers declare
+      // and free this value on the stack,
+      // so we can't ensure its valid later on when the notifier executes.
+      const TParamChange m_tpc;
 
       Func(FunctionTreeModel *obj, const TParamChange *tpc)
-          : m_obj(obj), m_tpc(tpc) {}
-      void operator()() override { m_obj->onParamChange(m_tpc->m_dragging); }
+          : m_obj(obj), m_tpc(*tpc) {}
+      void operator()() override { m_obj->onParamChange(m_tpc.m_dragging); }
     };
 
     QMetaObject::invokeMethod(TFunctorInvoker::instance(), "invoke",

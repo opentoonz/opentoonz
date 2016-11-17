@@ -10,6 +10,7 @@
 #include "viewerdraw.h"
 #include "menubarcommandids.h"
 #include "ruler.h"
+#include "locatorpopup.h"
 
 // TnzTools includes
 #include "tools/cursors.h"
@@ -501,9 +502,9 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
     , m_sideRasterPos()
     , m_topRasterPos()
     , m_toolDisableReason("")
-    , m_editPreviewSubCamera(false) {
-  assert(parent);
-
+    , m_editPreviewSubCamera(false)
+    , m_locator(NULL)
+    , m_isLocator(false) {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
   // Enables multiple key input.
@@ -880,6 +881,9 @@ void SceneViewer::hideEvent(QHideEvent *) {
 
   ToolHandle *toolHandle = app->getCurrentTool();
   if (toolHandle) toolHandle->disconnect(this);
+
+  // hide locator
+  if (m_locator && m_locator->isVisible()) m_locator->hide();
 }
 
 //-----------------------------------------------------------------------------
@@ -967,7 +971,7 @@ void SceneViewer::drawBuildVars() {
   }
 
   TTool *tool = app->getCurrentTool()->getTool();
-  if (tool) tool->setViewer(this);
+  if (tool && !m_isLocator) tool->setViewer(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -1100,7 +1104,7 @@ void SceneViewer::drawCameraStand() {
   // Show white background when level editing mode.
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (m_drawEditingLevel && tool && tool->isEnabled()) {
-    tool->setViewer(this);
+    if (!m_isLocator) tool->setViewer(this);
     glPushMatrix();
     if (m_referenceMode == CAMERA3D_REFERENCE) {
       mult3DMatrix();
@@ -1358,6 +1362,13 @@ void SceneViewer::drawOverlay() {
     // use
     // another glContext
     if (tool->getName() == "T_RGBPicker") tool->onImageChanged();
+
+    // draw cross at the center of the locator window
+    if (m_isLocator) {
+      glColor3d(1.0, 0.0, 0.0);
+      tglDrawSegment(TPointD(-4, 0), TPointD(5, 0));
+      tglDrawSegment(TPointD(0, -4), TPointD(0, 5));
+    }
   }
 }
 

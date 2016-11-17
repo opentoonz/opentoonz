@@ -1292,6 +1292,7 @@ TXshSimpleLevel *CloneLevelUndo::cloneLevel(
     assert(palette);
 
     dstSl->setPalette(palette->clone());
+    dstSl->getPalette()->setDirtyFlag(true);
   }
 
   // The level clone shell was created. Now, clone the associated frames found
@@ -1305,6 +1306,8 @@ TXshSimpleLevel *CloneLevelUndo::cloneLevel(
 
     dstSl->setFrame(*ft, img->cloneImage());
   }
+
+  dstSl->setDirtyFlag(true);
 
   return dstSl;
 }

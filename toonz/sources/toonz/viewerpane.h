@@ -3,7 +3,7 @@
 #ifndef VIEWER_PANE_INCLUDED
 #define VIEWER_PANE_INCLUDED
 
-#include "pane.h"
+#include "styleshortcutswitchablepanel.h"
 #include "sceneviewer.h"
 #include "toonzqt/intfield.h"
 #include "toonzqt/keyframenavigator.h"
@@ -25,7 +25,8 @@ class Ruler;
 
 class FlipConsole;
 class TXshLevel;
-class SceneViewerPanel final : public TPanel, public FlipConsoleOwner {
+class SceneViewerPanel final : public StyleShortcutSwitchablePanel,
+                               public FlipConsoleOwner {
   Q_OBJECT
 
   friend class SceneViewer;
@@ -37,6 +38,14 @@ class SceneViewerPanel final : public TPanel, public FlipConsoleOwner {
   TPanelTitleBarButton *m_previewButton;
   TPanelTitleBarButton *m_subcameraPreviewButton;
   bool m_onionSkinActive = false;
+  bool m_playSound       = true;
+  bool m_hasSoundtrack   = false;
+  bool m_playing         = false;
+  double m_fps;
+  int m_viewerFps;
+  double m_samplesPerFrame;
+  bool m_first         = true;
+  TSoundTrack *m_sound = NULL;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -58,6 +67,8 @@ protected:
   void createPlayToolBar();
   void addColorMaskButton(QWidget *parent, const char *iconSVGName, int id);
   void enableFlipConsoleForCamerastand(bool on);
+  void playAudioFrame(int frame);
+  bool hasSoundtrack();
 
 public slots:
 
@@ -66,6 +77,7 @@ public slots:
   void onXshLevelSwitched(TXshLevel *);
   void updateFrameRange();
   void updateFrameMarkers();
+  void onButtonPressed(FlipConsole::EGadget button);
 
 protected slots:
 
@@ -75,6 +87,7 @@ protected slots:
   void onPlayingStatusChanged(bool playing);
   void enableFullPreview(bool enabled);
   void enableSubCameraPreview(bool enabled);
+  void onPreferenceChanged(const QString &prefName) override;
 };
 
 #endif

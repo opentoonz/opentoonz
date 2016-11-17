@@ -375,7 +375,7 @@ DragSelectionTool::DeformTool::DeformTool(SelectionTool *tool)
 
 //-----------------------------------------------------------------------------
 
-int DragSelectionTool::DeformTool::getSimmetricPointIndex(int index) const {
+int DragSelectionTool::DeformTool::getSymmetricPointIndex(int index) const {
   if (index == 0 || index == 4 || index == 1 || index == 5) return index + 2;
   return index - 2;
 }
@@ -648,14 +648,14 @@ TPointD DragSelectionTool::Scale::computeScaleValue(int movedIndex,
     else
       return TPointD(scale2.x, scale1.y);
   }
-  int simmetricIndex = m_deformTool->getSimmetricPointIndex(movedIndex);
-  TPointD s          = m_startBboxs[0].getPoint(simmetricIndex);
+  int symmetricIndex = m_deformTool->getSymmetricPointIndex(movedIndex);
+  TPointD s          = m_startBboxs[0].getPoint(symmetricIndex);
   TPointD center     = m_scaleInCenter ? m_startCenter : s;
   TPointD nearP =
       m_startBboxs[0].getPoint(m_deformTool->getBeforePointIndex(movedIndex));
   TPointD pc   = getIntersectionPoint(nearP, p, p, s, center);
   TPointD newp = newBbox.getPoint(movedIndex);
-  TPointD news = newBbox.getPoint(simmetricIndex);
+  TPointD news = newBbox.getPoint(symmetricIndex);
   TPointD newNearP =
       newBbox.getPoint(m_deformTool->getBeforePointIndex(movedIndex));
   TPointD newpc = getIntersectionPoint(newNearP, newp, newp, news, center);
@@ -690,8 +690,8 @@ TPointD DragSelectionTool::Scale::getScaledPoint(int index,
                                                  const TPointD scaleValue,
                                                  const TPointD center) {
   TPointD p          = oldBbox.getPoint(index);
-  int simmetricIndex = m_deformTool->getSimmetricPointIndex(index);
-  TPointD s          = oldBbox.getPoint(simmetricIndex);
+  int symmetricIndex = m_deformTool->getSymmetricPointIndex(index);
+  TPointD s          = oldBbox.getPoint(symmetricIndex);
   if (index < 4) {
     int beforeIndex = m_deformTool->getBeforePointIndex(index);
     int nextIndex   = m_deformTool->getNextPointIndex(index);
@@ -704,7 +704,7 @@ TPointD DragSelectionTool::Scale::getScaledPoint(int index,
   }
   TPointD nearP = oldBbox.getPoint(m_deformTool->getBeforePointIndex(index));
   TPointD nearS =
-      oldBbox.getPoint(m_deformTool->getBeforePointIndex(simmetricIndex));
+      oldBbox.getPoint(m_deformTool->getBeforePointIndex(symmetricIndex));
   TPointD pc = getIntersectionPoint(nearP, p, p, s, center);
   TPointD sc = getIntersectionPoint(nearS, s, p, s, center);
   if (center == pc) return pc;
@@ -735,11 +735,11 @@ TPointD DragSelectionTool::Scale::getNewCenter(int index, const FourPoints bbox,
   FourPoints xBbox = bboxScale(xIndex, bbox, m_startCenter);
   TPointD xCenter  = getScaledPoint(
       xIndex, xBbox, scaleValue,
-      xBbox.getPoint(m_deformTool->getSimmetricPointIndex(xIndex)));
+      xBbox.getPoint(m_deformTool->getSymmetricPointIndex(xIndex)));
   FourPoints yBbox = bboxScale(yIndex, bbox, m_startCenter);
   TPointD yCenter  = getScaledPoint(
       yIndex, yBbox, scaleValue,
-      yBbox.getPoint(m_deformTool->getSimmetricPointIndex(yIndex)));
+      yBbox.getPoint(m_deformTool->getSymmetricPointIndex(yIndex)));
   TPointD in = getIntersectionPoint(bbox.getP00(), bbox.getP10(), bbox.getP10(),
                                     bbox.getP11(), xCenter);
   return getIntersectionPoint(in, xCenter, bbox.getP00(), bbox.getP10(),
@@ -758,19 +758,19 @@ FourPoints DragSelectionTool::Scale::bboxScaleInCenter(
   FourPoints bbox                     = bboxScale(index, oldBbox, newPos);
   if (recomputeScaleValue) scaleValue = computeScaleValue(index, bbox);
   if (!m_scaleInCenter) return bbox;
-  int simmetricIndex = m_deformTool->getSimmetricPointIndex(index);
+  int symmetricIndex = m_deformTool->getSymmetricPointIndex(index);
   // Gestisco il caso particolare in cui uno dei fattori di scalatura e' -100% e
   // center e' al centro della bbox
-  if (bbox.getPoint(index) == oldBbox.getPoint(simmetricIndex)) {
-    bbox.setPoint(simmetricIndex, oldBbox.getPoint(index));
-    bbox.setPoint(m_deformTool->getNextPointIndex(simmetricIndex),
+  if (bbox.getPoint(index) == oldBbox.getPoint(symmetricIndex)) {
+    bbox.setPoint(symmetricIndex, oldBbox.getPoint(index));
+    bbox.setPoint(m_deformTool->getNextPointIndex(symmetricIndex),
                   oldBbox.getPoint(m_deformTool->getBeforePointIndex(index)));
-    bbox.setPoint(m_deformTool->getBeforePointIndex(simmetricIndex),
+    bbox.setPoint(m_deformTool->getBeforePointIndex(symmetricIndex),
                   oldBbox.getPoint(m_deformTool->getNextPointIndex(index)));
   } else
     bbox =
-        bboxScale(simmetricIndex, bbox,
-                  getScaledPoint(simmetricIndex, oldBbox, scaleValue, center));
+        bboxScale(symmetricIndex, bbox,
+                  getScaledPoint(symmetricIndex, oldBbox, scaleValue, center));
   return bbox;
 }
 
@@ -806,9 +806,9 @@ void DragSelectionTool::Scale::leftButtonDrag(const TPointD &pos,
       delta = pos - m_deformTool->getCurPos();
     else
       delta            = pos - m_deformTool->getStartPos();
-    int simmetricIndex = m_deformTool->getSimmetricPointIndex(selectedIndex);
-    TPointD simmetricPoint = tool->getBBox().getPoint(simmetricIndex);
-    TPointD v              = normalize(point - simmetricPoint);
+    int symmetricIndex = m_deformTool->getSymmetricPointIndex(selectedIndex);
+    TPointD symmetricPoint = tool->getBBox().getPoint(symmetricIndex);
+    TPointD v              = normalize(point - symmetricPoint);
     delta                  = v * (v * delta);
     newPos                 = point + delta;
   }

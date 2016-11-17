@@ -146,11 +146,13 @@ public:
       return -1;
   }
 
-  TToonzImageP makeTlv(bool transparentSyntheticInks);
+  TToonzImageP makeTlv(bool transparentSyntheticInks, QList<int> &usedStyleIds);
 
   TVectorImageP vectorize(const TToonzImageP &ti);
   TVectorImageP vectorize(const TRaster32P &ras);
   TVectorImageP vectorize();
+
+  void removeUnusedStyles(const QList<int> &styleIds);
 };
 
 #endif

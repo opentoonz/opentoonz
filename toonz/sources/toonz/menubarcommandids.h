@@ -16,6 +16,7 @@
 #define MI_SaveScene "MI_SaveScene"
 #define MI_SaveSceneAs "MI_SaveSceneAs"
 #define MI_SaveAll "MI_SaveAll"
+#define MI_SaveAllLevels "MI_SaveAllLevels"
 #define MI_RevertScene "MI_RevertScene"
 #define MI_LoadSubSceneFile "MI_LoadSubSceneFile"
 
@@ -40,6 +41,7 @@
 #define MI_OutputSettings "MI_OutputSettings"
 #define MI_PreviewSettings "MI_PreviewSettings"
 #define MI_Render "MI_Render"
+#define MI_FastRender "MI_FastRender"
 #define MI_Preview "MI_Preview"
 #define MI_RegeneratePreview "MI_RegeneratePreview"
 #define MI_RegenerateFramePr "MI_RegenerateFramePr"
@@ -310,5 +312,6 @@
 #define MI_PreviewFx "MI_PreviewFx"
 
 #define MI_About "MI_About"
+#define MI_StartupPopup "MI_StartupPopup"
 #define MI_PencilTest "MI_PencilTest"
 #endif
