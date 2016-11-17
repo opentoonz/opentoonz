@@ -218,10 +218,8 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *st) {
 
 bool Ffmpeg::checkFilesExist() {
   QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempPath        = ffmpegCachePath + "//" +
-                     m_path.getQString().remove(QRegExp(QString::fromUtf8(
-                         "[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]"))) +
-                     "In0001." + m_intermediateFormat;
+  QString tempPath = ffmpegCachePath + "//" + cleanPathSymbols() + "In0001." +
+                     m_intermediateFormat;
   if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
     return true;
   } else
@@ -230,10 +228,7 @@ bool Ffmpeg::checkFilesExist() {
 
 ffmpegFileInfo Ffmpeg::getInfo() {
   QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempPath        = ffmpegCachePath + "//" +
-                     m_path.getQString().remove(QRegExp(QString::fromUtf8(
-                         "[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]"))) +
-                     ".txt";
+  QString tempPath = ffmpegCachePath + "//" + cleanPathSymbols() + ".txt";
   if (QFile::exists(tempPath)) {
     QFile infoText(tempPath);
     infoText.open(QIODevice::ReadOnly);
@@ -266,10 +261,8 @@ ffmpegFileInfo Ffmpeg::getInfo() {
 }
 TRasterImageP Ffmpeg::getImage(int frameIndex) {
   QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempPath        = ffmpegCachePath + "//" +
-                     m_path.getQString().remove(QRegExp(QString::fromUtf8(
-                         "[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
-  std::string tmpPath = tempPath.toStdString();
+  QString tempPath        = ffmpegCachePath + "//" + cleanPathSymbols();
+  std::string tmpPath     = tempPath.toStdString();
   // QString tempPath= m_path.getQString();
   QString number   = QString("%1").arg(frameIndex, 4, 10, QChar('0'));
   QString tempName = "In" + number + ".png";
@@ -358,12 +351,10 @@ int Ffmpeg::getFrameCount() {
 
 void Ffmpeg::getFramesFromMovie(int frame) {
   QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempPath        = ffmpegCachePath + "//" +
-                     m_path.getQString().remove(QRegExp(QString::fromUtf8(
-                         "[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
-  std::string tmpPath = tempPath.toStdString();
-  QString tempName    = "In%04d." + m_intermediateFormat;
-  tempName            = tempPath + tempName;
+  QString tempPath        = ffmpegCachePath + "//" + cleanPathSymbols();
+  std::string tmpPath     = tempPath.toStdString();
+  QString tempName        = "In%04d." + m_intermediateFormat;
+  tempName                = tempPath + tempName;
   QString tempStart;
   if (frame == -1) {
     tempStart = "In0001." + m_intermediateFormat;
@@ -402,15 +393,18 @@ void Ffmpeg::getFramesFromMovie(int frame) {
   }
 }
 
+QString Ffmpeg::cleanPathSymbols() {
+  return m_path.getQString().remove(QRegExp(
+      QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
+}
+
 int Ffmpeg::getGifFrameCount() {
   int frame               = 1;
   QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempPath        = ffmpegCachePath + "//" +
-                     m_path.getQString().remove(QRegExp(QString::fromUtf8(
-                         "[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
-  std::string tmpPath = tempPath.toStdString();
-  QString tempName    = "In%04d." + m_intermediateFormat;
-  tempName            = tempPath + tempName;
+  QString tempPath        = ffmpegCachePath + "//" + cleanPathSymbols();
+  std::string tmpPath     = tempPath.toStdString();
+  QString tempName        = "In%04d." + m_intermediateFormat;
+  tempName                = tempPath + tempName;
   QString tempStart;
   tempStart = "In0001." + m_intermediateFormat;
   tempStart = tempPath + tempStart;

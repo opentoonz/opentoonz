@@ -53,6 +53,7 @@ private:
   QVector<QString> m_cleanUpList;
   QStringList m_audioArgs;
   TUINT32 m_sampleRate;
+  QString cleanPathSymbols();
 };
 
 #endif
