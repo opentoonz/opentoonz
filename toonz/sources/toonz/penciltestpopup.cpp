@@ -1349,6 +1349,11 @@ void PencilTestPopup::onLoadImageButtonPressed() {
     QImage qi2(qi.size(), QImage::Format_ARGB32);
     qi2.fill(QColor(Qt::white).rgb());
     QPainter painter(&qi2);
+    if (m_upsideDownCB->isChecked()) {
+      painter.translate(m_lx / 2, m_ly / 2);
+      painter.rotate(180);
+      painter.translate(-m_lx / 2, -m_ly / 2);
+    }
     painter.drawImage(0, 0, qi);
     m_cameraViewfinder->setPreviousImage(qi2);
     m_onionSkinCB->setChecked(true);
