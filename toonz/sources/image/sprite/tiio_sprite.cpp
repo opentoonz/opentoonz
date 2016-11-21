@@ -249,6 +249,7 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
     if (b > m_bottom) m_bottom = b;
   }
   QImage *newQi = new QImage(m_lx, m_ly, QImage::Format_ARGB32);
+  newQi->fill(qRgba(0, 0, 0, 0));
   QPainter painter(newQi);
   painter.drawImage(QPoint(0, 0), *qi);
   m_images.push_back(newQi);
