@@ -89,11 +89,11 @@ public:
     if (m_data->imp) {
       if (m_data->m_doNotify == false) return;
       m_data->m_doNotify = false;
-      if (m_data->imp->m_isPlaying) m_data->imp->doStopDevice();
       std::set<TSoundOutputDeviceListener *>::iterator it =
           m_data->imp->m_listeners.begin();
       for (; it != m_data->imp->m_listeners.end(); ++it)
         (*it)->onPlayCompleted();
+      if (m_data->imp->m_isPlaying) m_data->imp->doStopDevice();
     }
   }
 };
@@ -134,6 +134,8 @@ static void sdl_fill_audio(void *udata, Uint8 *stream, int len) {
 
   /* Mix as much data as possible */
   len = (len > audio_len ? audio_len : len);
+
+  SDL_memset(stream, 0, len);  // Mix with silence
   SDL_MixAudio(stream, (Uint8 *)myData->entireFileBuffer + myData->byteOffset,
                len, _this->m_volume);
   myData->byteOffset += len;
@@ -267,21 +269,8 @@ void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1,
   myData->fileByteCount    = (s1 - s0) * st->getSampleSize();
   myData->entireFileBuffer = new char[myData->fileByteCount];
 
-#if defined(i386)
-  // XXX: let's see if that's needed for SDL
-  if (st->getBitPerSample() == 16) {
-    int i;
-    USHORT *dst = (USHORT *)(myData->entireFileBuffer);
-    USHORT *src = (USHORT *)(st->getRawData() + s0 * st->getSampleSize());
-
-    for (i = 0; i < myData->fileByteCount / 2; i++) *dst++ = swapUshort(*src++);
-  } else
-    memcpy(myData->entireFileBuffer,
-           st->getRawData() + s0 * st->getSampleSize(), myData->fileByteCount);
-#else
   memcpy(myData->entireFileBuffer, st->getRawData() + s0 * st->getSampleSize(),
          myData->fileByteCount);
-#endif
 
   //	myData->maxPacketSize = fileASBD.mFramesPerPacket *
   // fileASBD.mBytesPerFrame;
