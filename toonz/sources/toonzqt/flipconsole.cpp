@@ -1234,16 +1234,19 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
   if (m_gadgetsMask & eRed || m_gadgetsMask & eGRed)
     m_colorFilterSep = m_playToolBar->addSeparator();
 
-  // Sound & Histogram
-  if (m_gadgetsMask & eSound || m_gadgetsMask & eHisto) {
+  // Sound & Histogram & Locator
+  if (m_gadgetsMask & eSound || m_gadgetsMask & eHisto ||
+      m_gadgetsMask & eLocator) {
     if (m_gadgetsMask & eSound) {
       createButton(eSound, "sound", tr("&Soundtrack "), true);
       m_soundSep = m_playToolBar->addSeparator();
     }
-    if (m_gadgetsMask & eHisto) {
+    if (m_gadgetsMask & eHisto)
       createButton(eHisto, "histograms", tr("&Histogram"), false);
+    if (m_gadgetsMask & eLocator)
+      createButton(eLocator, "locator", tr("&Locator"), false);
+    if (m_gadgetsMask & eHisto || m_gadgetsMask & eLocator)
       m_histoSep = m_playToolBar->addSeparator();
-    }
   }
 
   if (m_gadgetsMask & eFilledRaster) {
@@ -1572,6 +1575,7 @@ void FlipConsole::doButtonPressed(UINT button) {
   case eHisto:
   case eSaveImg:
   case eSave:
+  case eLocator:
     // nothing to do
     return;
 

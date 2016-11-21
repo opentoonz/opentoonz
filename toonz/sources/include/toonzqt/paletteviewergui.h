@@ -199,11 +199,7 @@ protected:
   void zoomInChip();
   void zoomOutChip();
 
-protected slots:
-
-  void toggleLink();
-  void eraseToggleLink();
-  void removeLink();
+  bool hasShortcut(int indexInPage);
 
 private:
   DVGui::LineEdit *m_renameTextField;

@@ -1,4 +1,4 @@
-#include "ext/NotSimmetricBezierPotential.h"
+#include "ext/NotSymmetricBezierPotential.h"
 #include "tstroke.h"
 
 #include <tmathutil.h>
@@ -40,11 +40,11 @@ public:
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::NotSimmetricBezierPotential::~NotSimmetricBezierPotential() {}
+ToonzExt::NotSymmetricBezierPotential::~NotSymmetricBezierPotential() {}
 
 //-----------------------------------------------------------------------------
 
-void ToonzExt::NotSimmetricBezierPotential::setParameters_(const TStroke *ref,
+void ToonzExt::NotSymmetricBezierPotential::setParameters_(const TStroke *ref,
                                                            double w,
                                                            double al) {
   assert(ref);
@@ -53,19 +53,19 @@ void ToonzExt::NotSimmetricBezierPotential::setParameters_(const TStroke *ref,
   actionLength_ = al;
 
   strokeLength_  = ref->getLength();
-  lenghtAtParam_ = ref->getLength(par_);
+  lengthAtParam_ = ref->getLength(par_);
 
   // lunghezza dal pto di click all'inizio della curva
-  leftFactor_ = min(lenghtAtParam_,
-                    actionLength_ * 0.5);  // lenghtAtParam_ / strokeLength_;
+  leftFactor_ = min(lengthAtParam_,
+                    actionLength_ * 0.5);  // lengthAtParam_ / strokeLength_;
 
   // lunghezza dal pto di click alla fine
-  rightFactor_ = min(strokeLength_ - lenghtAtParam_, actionLength_ * 0.5);
+  rightFactor_ = min(strokeLength_ - lengthAtParam_, actionLength_ * 0.5);
 }
 
 //-----------------------------------------------------------------------------
 
-double ToonzExt::NotSimmetricBezierPotential::value_(double value2test) const {
+double ToonzExt::NotSymmetricBezierPotential::value_(double value2test) const {
   assert(0.0 <= value2test && value2test <= 1.0);
   return this->compute_value(value2test);
 }
@@ -73,18 +73,18 @@ double ToonzExt::NotSimmetricBezierPotential::value_(double value2test) const {
 //-----------------------------------------------------------------------------
 
 // normalization of parameter in range interval
-double ToonzExt::NotSimmetricBezierPotential::compute_shape(
+double ToonzExt::NotSymmetricBezierPotential::compute_shape(
     double value2test) const {
   double x                       = ref_->getLength(value2test);
   double shape                   = this->actionLength_ * 0.5;
   if (isAlmostZero(shape)) shape = 1.0;
-  x                              = (x - lenghtAtParam_) / shape;
+  x                              = (x - lengthAtParam_) / shape;
   return x;
 }
 
 //-----------------------------------------------------------------------------
 
-double ToonzExt::NotSimmetricBezierPotential::compute_value(
+double ToonzExt::NotSymmetricBezierPotential::compute_value(
     double value2test) const {
   myBlendFunc me;
 
@@ -97,14 +97,14 @@ double ToonzExt::NotSimmetricBezierPotential::compute_value(
   double x   = 0.0;
   double res = 0.0;
 
-  // lenght  at parameter
+  // length  at parameter
   x = ref_->getLength(value2test);
 
   const double tolerance = 0.0;  // need to be pixel based
 
   // if is an extreme
-  if (max(lenghtAtParam_, 0.0) < tolerance ||
-      max(strokeLength_ - lenghtAtParam_, 0.0) < tolerance) {
+  if (max(lengthAtParam_, 0.0) < tolerance ||
+      max(strokeLength_ - lengthAtParam_, 0.0) < tolerance) {
     double tmp_al = actionLength_ * 0.5;
 
     // compute correct parameter considering offset
@@ -124,20 +124,20 @@ double ToonzExt::NotSimmetricBezierPotential::compute_value(
     res = sq(x);
   } else  // when is not an extreme
   {
-    double lenght_at_value2test = ref_->getLength(value2test);
+    double length_at_value2test = ref_->getLength(value2test);
 
     const double min_level = 0.01;
     // if check a parameter over click point
-    if (lenght_at_value2test >= lenghtAtParam_) {
+    if (length_at_value2test >= lengthAtParam_) {
       // check if extreme can be moved from this parameter configuration
       double tmp_x   = this->compute_shape(1.0);
       double tmp_res = me(tmp_x);
       if (tmp_res > min_level) {
         // please note that in this case
-        //  lenghtAtParam_ + rightFactor_ == strokeLength_
+        //  lengthAtParam_ + rightFactor_ == strokeLength_
         // (by ctor).
         if (rightFactor_ != 0.0)
-          x = (lenght_at_value2test - lenghtAtParam_) / rightFactor_;
+          x = (length_at_value2test - lengthAtParam_) / rightFactor_;
         else
           x = 0.0;
 
@@ -146,7 +146,7 @@ double ToonzExt::NotSimmetricBezierPotential::compute_value(
         if (areAlmostEqual(x, 1.0)) x = 1.0;
 
         double how_many_of_shape =
-            (strokeLength_ - lenghtAtParam_) / (actionLength_ * 0.5);
+            (strokeLength_ - lengthAtParam_) / (actionLength_ * 0.5);
         assert(0.0 <= how_many_of_shape && how_many_of_shape <= 1.0);
 
         myBlendFunc bf(how_many_of_shape);
@@ -158,13 +158,13 @@ double ToonzExt::NotSimmetricBezierPotential::compute_value(
       double tmp_x   = this->compute_shape(0.0);
       double tmp_res = me(tmp_x);
       if (tmp_res > min_level) {
-        double x = lenght_at_value2test / leftFactor_;
+        double x = length_at_value2test / leftFactor_;
         assert(0.0 <= x && x <= 1.0);
 
         // then movement use another shape
         double diff = x - 1.0;
 
-        double how_many_of_shape = lenghtAtParam_ / (actionLength_ * 0.5);
+        double how_many_of_shape = lengthAtParam_ / (actionLength_ * 0.5);
         assert(0.0 <= how_many_of_shape && how_many_of_shape <= 1.0);
 
         myBlendFunc bf(how_many_of_shape);
@@ -181,8 +181,8 @@ double ToonzExt::NotSimmetricBezierPotential::compute_value(
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::Potential *ToonzExt::NotSimmetricBezierPotential::clone() {
-  return new NotSimmetricBezierPotential;
+ToonzExt::Potential *ToonzExt::NotSymmetricBezierPotential::clone() {
+  return new NotSymmetricBezierPotential;
 }
 
 //-----------------------------------------------------------------------------

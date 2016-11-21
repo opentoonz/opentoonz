@@ -841,7 +841,7 @@ TPointD DragSelectionTool::VectorScaleTool::transform(int index,
       FourPoints oldBbox = startBboxs[i];
       TPointD frameCenter =
           scaleInCenter ? center
-                        : oldBbox.getPoint(getSimmetricPointIndex(index));
+                        : oldBbox.getPoint(getSymmetricPointIndex(index));
       TPointD newp =
           m_scale->getScaledPoint(index, oldBbox, scaleValue, frameCenter);
       FourPoints newBbox = m_scale->bboxScaleInCenter(

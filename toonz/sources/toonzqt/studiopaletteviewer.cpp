@@ -497,6 +497,7 @@ void StudioPaletteTreeViewer::onCurrentItemChanged(QTreeWidgetItem *current,
   m_currentPalette = StudioPalette::instance()->getPalette(newPath, false);
   m_studioPaletteHandle->setPalette(m_currentPalette.getPointer());
   m_studioPaletteHandle->notifyPaletteSwitched();
+  StudioPaletteCmd::updateAllLinkedStyles(m_levelPaletteHandle, m_xsheetHandle);
 }
 
 //-----------------------------------------------------------------------------
@@ -1048,6 +1049,8 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
   TFilePath newPath = getItemPath(m_dropItem);
 
   resetDropItem();
+
+  if (newPath.isEmpty()) return;
 
   const QMimeData *mimeData      = event->mimeData();
   const PaletteData *paletteData = dynamic_cast<const PaletteData *>(mimeData);

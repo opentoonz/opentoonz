@@ -74,6 +74,7 @@ libtiff_la_SOURCES = \
 	tif_fax3sm.c \
 	tif_flush.c \
 	tif_getimage.c \
+	tif_getimage_64.c \
 	tif_jbig.c \
 	tif_jpeg.c \
 	tif_jpeg_12.c \

@@ -5,7 +5,8 @@
 
 #include <QDialog>
 #include <QTreeWidget>
-
+#include <QComboBox>
+#include "filebrowserpopup.h"
 #include "toonzqt/dvdialog.h"
 
 // forward declaration
@@ -92,13 +93,40 @@ class ShortcutPopup final : public DVGui::Dialog {
   QPushButton *m_removeBtn;
   ShortcutViewer *m_sViewer;
   ShortcutTree *m_list;
+  QComboBox *m_presetChoiceCB;
+  DVGui::Dialog *m_dialog;
+  GenericLoadFilePopup *m_loadShortcutsPopup;
+  GenericSaveFilePopup *m_saveShortcutsPopup;
+  QPushButton *m_exportButton;
+  QPushButton *m_deletePresetButton;
+  QPushButton *m_savePresetButton;
+  QPushButton *m_loadPresetButton;
+  QPushButton *m_clearAllShortcutsButton;
+  QLabel *m_dialogLabel;
 
 public:
   ShortcutPopup();
   ~ShortcutPopup();
 
+private:
+  void setPresetShortcuts(TFilePath fp);
+  void showDialog(QString text);
+  bool showConfirmDialog();
+  bool showOverwriteDialog(QString name);
+  void importPreset();
+  QStringList buildPresets();
+  void showEvent(QShowEvent *se) override;
+  void setCurrentPresetPref(QString preset);
+  void getCurrentPresetPref();
+
 protected slots:
+  void clearAllShortcuts(bool warning = true);
   void onSearchTextChanged(const QString &text);
+  void onPresetChanged(int index);
+  void onExportButton(TFilePath fp = TFilePath());
+  void onDeletePreset();
+  void onSavePreset();
+  void onLoadPreset();
 };
 
 #endif  //  SHORTCUTPOPUP_H

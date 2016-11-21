@@ -58,10 +58,11 @@ void DVAPI MsgBoxInPopup(MsgType type, const QString &text);
 
 // ATTENZIONE: Valore di ritorno
 // 0 = l'utente ha chiuso la finestra (dovrebbe corrispondere ad un cancel o ad
-// un NO)
-// 1 = primo bottone da sx premuto
-// 2 = secondo bottone da sx premuto
-// 3 = terzo bottone da sx premuto
+// un NO) - closed window
+// 1 = primo bottone da sx premuto - first button selected
+// 2 = secondo bottone da sx premuto - second button
+// 3 = terzo bottone da sx premuto - third button
+// 4 = fourth button
 
 int DVAPI MsgBox(MsgType type, const QString &text,
                  const std::vector<QString> &buttons,
@@ -76,6 +77,12 @@ int DVAPI MsgBox(const QString &text, const QString &button1,
 int DVAPI MsgBox(const QString &text, const QString &button1,
                  const QString &button2, const QString &button3,
                  int defaultButtonIndex = 0, QWidget *parent = 0);
+
+// QUESTION: four botton user defined
+int DVAPI MsgBox(const QString &text, const QString &button1,
+                 const QString &button2, const QString &button3,
+                 const QString &button4, int defaultButtonIndex = 0,
+                 QWidget *parent = 0);
 
 Dialog DVAPI *createMsgBox(MsgType type, const QString &text,
                            const QStringList &buttons, int defaultButtonIndex,
@@ -229,6 +236,8 @@ public:
   void addButtonBarWidget(QWidget *widget);
   void addButtonBarWidget(QWidget *first, QWidget *second);
   void addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third);
+  void addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third,
+                          QWidget *fourth);
 
   void hideEvent(QHideEvent *event) override;
 

@@ -15,6 +15,7 @@
 #include "tpalette.h"
 
 #include <memory>
+#include <sstream>
 
 PERSIST_IDENTIFIER(TPalette, "palette")
 
@@ -29,6 +30,21 @@ DEFINE_CLASS_CODE(TPalette, 30)
 namespace {
 
 const int maxStyleIndex = 32765;
+
+const std::string pointToString(const TPoint &point) {
+  return std::to_string(point.x) + "," + std::to_string(point.y);
+}
+
+// splitting string with ','
+const TPoint stringToPoint(const std::string &string) {
+  std::string buffer;
+  std::stringstream ss(string);
+  std::getline(ss, buffer, ',');  // getting the first part of string
+  int x = std::stoi(buffer);
+  std::getline(ss, buffer);  // getting the second part of string
+  int y = std::stoi(buffer);
+  return TPoint(x, y);
+}
 
 }  // namespace
 
@@ -168,7 +184,8 @@ TPalette::TPalette()
     , m_dirtyFlag(false)
     , m_mutex(QMutex::Recursive)
     , m_isLocked(false)
-    , m_askOverwriteFlag(false) {
+    , m_askOverwriteFlag(false)
+    , m_shortcutScopeIndex(0) {
   QString tempName(QObject::tr("colors"));
   std::wstring pageName = tempName.toStdWString();
   Page *page            = addPage(pageName);
@@ -563,10 +580,17 @@ void TPalette::saveData(TOStream &os) {
   os.openChild("styles");
   {
     for (int i = 0; i < getStyleCount(); ++i) {
-      os.openChild("style");
+      TColorStyleP style = m_styles[i].second;
+      if (style->getPickedPosition() == TPoint())
+        os.openChild("style");
+      else {
+        std::map<std::string, std::string> attr;
+        attr["pickedpos"] = pointToString(style->getPickedPosition());
+        os.openChild("style", attr);
+      }
       {
         StyleWriter w(os, i);
-        m_styles[i].second->save(w);
+        style->save(w);
       }
       os.closeChild();
     }
@@ -679,6 +703,10 @@ void TPalette::loadData(TIStream &is) {
         {
           StyleReader r(is, version);
           TColorStyle *cs = TColorStyle::load(r);
+
+          std::string pickedPosStr;
+          if (is.getTagParam("pickedpos", pickedPosStr))
+            cs->setPickedPosition(stringToPoint(pickedPosStr));
 
           addStyle(cs);
         }
@@ -851,9 +879,10 @@ void TPalette::assign(const TPalette *src, bool isFromStudioPalette) {
       j->second                       = j->second->clone();
     m_styleAnimationTable[cit->first] = cit->second;
   }
-  m_globalName   = src->getGlobalName();
-  m_shortcuts    = src->m_shortcuts;
-  m_currentFrame = src->m_currentFrame;
+  m_globalName         = src->getGlobalName();
+  m_shortcuts          = src->m_shortcuts;
+  m_currentFrame       = src->m_currentFrame;
+  m_shortcutScopeIndex = src->m_shortcutScopeIndex;
   // setDirtyFlag(true);
 }
 
@@ -1053,22 +1082,26 @@ void TPalette::clearKeyframe(int styleId, int frame) {
 //-------------------------------------------------------------------
 
 int TPalette::getShortcutValue(int key) const {
-  assert('0' <= key && key <= '9');
-  std::map<int, int>::const_iterator it;
-  it = m_shortcuts.find(key);
-  if (it == m_shortcuts.end()) return -1;
-  int styleId = it->second;
-  return 0 <= styleId && styleId < getStyleCount() ? styleId : -1;
+  assert(Qt::Key_0 <= key && key <= Qt::Key_9);
+
+  int shortcutIndex = (key == Qt::Key_0) ? 9 : key - Qt::Key_1;
+  int indexInPage   = m_shortcutScopeIndex * 10 + shortcutIndex;
+  // shortcut is available only in the first page
+  return getPage(0)->getStyleId(indexInPage);
 }
 
 //-------------------------------------------------------------------
 
 int TPalette::getStyleShortcut(int styleId) const {
   assert(0 <= styleId && styleId < getStyleCount());
-  std::map<int, int>::const_iterator it;
-  for (it = m_shortcuts.begin(); it != m_shortcuts.end(); ++it)
-    if (it->second == styleId) return it->first;
-  return -1;
+
+  Page *page = getStylePage(styleId);
+  // shortcut is available only in the first page
+  if (!page || page->getIndex() != 0) return -1;
+  int indexInPage   = page->search(styleId);
+  int shortcutIndex = indexInPage - m_shortcutScopeIndex * 10;
+  if (shortcutIndex < 0 || shortcutIndex > 9) return -1;
+  return (shortcutIndex == 9) ? Qt::Key_0 : Qt::Key_1 + shortcutIndex;
 }
 
 //-------------------------------------------------------------------
@@ -1086,5 +1119,33 @@ void TPalette::setShortcutValue(int key, int styleId) {
         break;
       }
     m_shortcuts[key] = styleId;
+  }
+}
+
+//-------------------------------------------------------------------
+// Returns true if there is at least one style with picked pos value
+//-------------------------------------------------------------------
+
+bool TPalette::hasPickedPosStyle() {
+  for (int i = 0; i < getStyleCount(); ++i) {
+    TColorStyleP style = m_styles[i].second;
+    if (style->getPickedPosition() != TPoint()) return true;
+  }
+  return false;
+}
+
+//-------------------------------------------------------------------
+
+void TPalette::nextShortcutScope(bool invert) {
+  if (invert) {
+    if (m_shortcutScopeIndex > 0)
+      m_shortcutScopeIndex -= 1;
+    else
+      m_shortcutScopeIndex = getPage(0)->getStyleCount() / 10;
+  } else {
+    if ((m_shortcutScopeIndex + 1) * 10 < getPage(0)->getStyleCount())
+      m_shortcutScopeIndex += 1;
+    else
+      m_shortcutScopeIndex = 0;
   }
 }

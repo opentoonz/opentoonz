@@ -647,7 +647,9 @@ public slots:
   void onToolChanged();
   void onStageObjectChange();
 
-  // signals:
+signals:
+  // used in ComboViewer to handle Tab focus
+  void newPanelCreated();
 
   //  void toolOptionChange();
 };

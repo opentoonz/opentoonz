@@ -16,13 +16,13 @@ void ToonzExt::LinearPotential::setParameters_(const TStroke *ref, double par,
   actionLength_ = al;
 
   strokeLength_  = ref->getLength();
-  lenghtAtParam_ = ref->getLength(par);
+  lengthAtParam_ = ref->getLength(par);
 
   // lunghezza dal pto di click all'inizio della curva
-  leftFactor_ = lenghtAtParam_;
+  leftFactor_ = lengthAtParam_;
 
   // lunghezza dal pto di click alla fine
-  rightFactor_ = strokeLength_ - lenghtAtParam_;
+  rightFactor_ = strokeLength_ - lengthAtParam_;
 
   // considero come intervallo di mapping [-range,range].
   //  4 ha come valore c.a. 10exp-6
@@ -48,7 +48,7 @@ double ToonzExt::LinearPotential::compute_shape(double value2test) const {
   double x                       = ref_->getLength(value2test);
   double shape                   = this->actionLength_ * 0.5;
   if (isAlmostZero(shape)) shape = 1.0;
-  x                              = ((x - lenghtAtParam_) * range_) / shape;
+  x                              = ((x - lengthAtParam_) * range_) / shape;
   return x;
 }
 
@@ -63,7 +63,7 @@ double ToonzExt::LinearPotential::compute_value(double value2test) const {
   double x   = 0.0;
   double res = 0.0;
 
-  // lenght  at parameter
+  // length  at parameter
   x = ref_->getLength(value2test);
 
   double tmp_al = actionLength_ * 0.5;
@@ -83,10 +83,10 @@ double ToonzExt::LinearPotential::compute_value(double value2test) const {
   else if (rightFactor_ == 0.0)
     x = (x - (strokeLength_ - tmp_al)) / tmp_al;
   else {
-    if (x <= lenghtAtParam_ && ((lenghtAtParam_ - x) <= leftFactor_))
-      x = (x - (lenghtAtParam_ - leftFactor_)) / leftFactor_;
-    else if (x > lenghtAtParam_ && ((x - lenghtAtParam_) < rightFactor_))
-      x = (rightFactor_ - (x - lenghtAtParam_)) / rightFactor_;
+    if (x <= lengthAtParam_ && ((lengthAtParam_ - x) <= leftFactor_))
+      x = (x - (lengthAtParam_ - leftFactor_)) / leftFactor_;
+    else if (x > lengthAtParam_ && ((x - lengthAtParam_) < rightFactor_))
+      x = (rightFactor_ - (x - lengthAtParam_)) / rightFactor_;
     else
       x = -1;
   }

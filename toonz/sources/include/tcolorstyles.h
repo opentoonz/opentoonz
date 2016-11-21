@@ -118,6 +118,9 @@ private:
                                 // This flag will be set when the
   //!  style is edited from the original one.
 
+  TPoint m_pickedPosition;  // picked position from color model by using style
+                            // picker tool with "organize palette" option.
+
 protected:
   TRaster32P m_icon;  //!< Icon shown on TPalette viewers.
   bool m_validIcon;   //!< Icon's validity status.
@@ -211,6 +214,9 @@ The \a global name contains information about palette id.
   void setFlags(unsigned int flags) {
     m_flags = flags;
   }  //!< Returns color attributes.
+
+  void setPickedPosition(const TPoint &pos) { m_pickedPosition = pos; }
+  TPoint getPickedPosition() const { return m_pickedPosition; }
 
   // Color-related functions
 

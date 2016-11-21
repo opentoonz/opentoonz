@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QGroupBox>
 
 #include "cleanupsettingspane.h"
 
@@ -80,6 +81,10 @@ void CleanupSaveInField::browseDirectory() {
 
 CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
     : QFrame(parent), m_attached(false) {
+  // Autocenter
+  m_autocenterBox = new QGroupBox(tr("Autocenter"), this);
+  m_pegHolesOm    = new QComboBox(this);
+  m_fieldGuideOm  = new QComboBox(this);
   // Rotate&Flip
   QFrame *rotFlipFrame = new QFrame(this);
   m_rotateOm           = new QComboBox(this);
@@ -102,6 +107,19 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
   QPushButton *saveBtn  = new QPushButton(tr("Save"));
   QPushButton *loadBtn  = new QPushButton(tr("Load"));
   QPushButton *resetBtn = new QPushButton(tr("Reset"));
+
+  // Autocenter
+  m_autocenterBox->setCheckable(true);
+  QStringList pegbarHoles;
+  pegbarHoles << "Bottom"
+              << "Top"
+              << "Left"
+              << "Right";
+  m_pegHolesOm->addItems(pegbarHoles);
+  std::vector<std::string> fdgNames;
+  CleanupParameters::getFdgNames(fdgNames);
+  for (int i = 0; i < (int)fdgNames.size(); i++)
+    m_fieldGuideOm->addItem(QString(fdgNames[i].c_str()));
 
   // Rotate&Flip
   rotFlipFrame->setObjectName("CleanupSettingsFrame");
@@ -137,6 +155,23 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
   mainLay->setSpacing(2);
   mainLay->setMargin(5);
   {
+    // Autocenter
+    QGridLayout *autocenterLay = new QGridLayout();
+    autocenterLay->setMargin(5);
+    autocenterLay->setSpacing(3);
+    {
+      autocenterLay->addWidget(new QLabel(tr("Pegbar Holes")), 0, 0,
+                               Qt::AlignRight | Qt::AlignVCenter);
+      autocenterLay->addWidget(m_pegHolesOm, 0, 1);
+      autocenterLay->addWidget(new QLabel(tr("Field Guide")), 1, 0,
+                               Qt::AlignRight | Qt::AlignVCenter);
+      autocenterLay->addWidget(m_fieldGuideOm, 1, 1);
+    }
+    autocenterLay->setColumnStretch(0, 0);
+    autocenterLay->setColumnStretch(1, 1);
+    m_autocenterBox->setLayout(autocenterLay);
+    mainLay->addWidget(m_autocenterBox, 0);
+
     // Rotate&Flip
     QGridLayout *rotFlipLay = new QGridLayout();
     rotFlipLay->setMargin(5);
@@ -226,7 +261,14 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 
   //-----signal-slot connections
   bool ret = true;
-  ret      = ret && connect(m_rotateOm, SIGNAL(activated(int)),
+  ret      = ret && connect(m_autocenterBox, SIGNAL(toggled(bool)),
+                       SLOT(onGenericSettingsChange()));
+  ret = ret && connect(m_pegHolesOm, SIGNAL(activated(int)),
+                       SLOT(onGenericSettingsChange()));
+  ret = ret && connect(m_fieldGuideOm, SIGNAL(activated(int)),
+                       SLOT(onGenericSettingsChange()));
+
+  ret = ret && connect(m_rotateOm, SIGNAL(activated(int)),
                        SLOT(onGenericSettingsChange()));
   ret = ret && connect(m_flipX, SIGNAL(stateChanged(int)),
                        SLOT(onGenericSettingsChange()));
@@ -336,6 +378,15 @@ void CleanupSettingsPane::updateGui(bool needsPostProcess) {
 
 void CleanupSettingsPane::updateGui(CleanupParameters *params,
                                     CleanupParameters *oldParams) {
+  m_autocenterBox->setChecked(params->m_autocenterType ==
+                              CleanupTypes::AUTOCENTER_FDG);
+  m_pegHolesOm->setCurrentIndex(params->m_pegSide - 1);
+
+  QString fieldName = QString::fromStdString(params->getFdgName());
+  int index = (fieldName.isEmpty()) ? 0 : m_fieldGuideOm->findText(fieldName);
+  assert(index != -1);
+  m_fieldGuideOm->setCurrentIndex(index);
+
   m_rotateOm->setCurrentIndex(params->m_rotate / 90);
   m_flipX->setChecked(params->m_flipx);
   m_flipY->setChecked(params->m_flipy);
@@ -461,6 +512,13 @@ void CleanupSettingsPane::onRestoreSceneSettings() {
 void CleanupSettingsPane::onGenericSettingsChange() {
   CleanupSettingsModel *model = CleanupSettingsModel::instance();
   CleanupParameters *params   = model->getCurrentParameters();
+
+  params->m_autocenterType = m_autocenterBox->isChecked()
+                                 ? CleanupTypes::AUTOCENTER_FDG
+                                 : CleanupTypes::AUTOCENTER_NONE;
+  params->m_pegSide =
+      (CleanupTypes::PEGS_SIDE)(m_pegHolesOm->currentIndex() + 1);
+  params->setFdgByName(m_fieldGuideOm->currentText().toStdString());
 
   params->m_rotate = m_rotateOm->currentIndex() * 90;
   params->m_flipx  = m_flipX->isChecked();

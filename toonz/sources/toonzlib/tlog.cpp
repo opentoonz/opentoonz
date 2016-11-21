@@ -92,7 +92,7 @@ void notify(LEVEL level, const std::string &msg) {
   DeregisterEventSource(handle);
 
 #else
-  syslog(Level2XPriority(level), msg.c_str());
+  syslog(Level2XPriority(level), "%s", msg.c_str());
 #endif
 }
 

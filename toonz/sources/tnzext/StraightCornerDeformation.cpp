@@ -7,7 +7,7 @@
 #include "ext/StrokeDeformation.h"
 #include "ext/LinearPotential.h"
 //#include "ext/StrokeParametricDeformer.h"
-//#include "ext/NotSimmetricBezierPotential.h"
+//#include "ext/NotSymmetricBezierPotential.h"
 #include "ext/ContextStatus.h"
 #include "ext/Designer.h"
 //#include "ext/TriParam.h"

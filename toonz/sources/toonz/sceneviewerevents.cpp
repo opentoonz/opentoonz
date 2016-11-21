@@ -14,6 +14,11 @@
 #include "onionskinmaskgui.h"
 #include "ruler.h"
 #include "comboviewerpane.h"
+#include "locatorpopup.h"
+
+// TnzQt includes
+#include "toonzqt/tselectionhandle.h"
+#include "toonzqt/styleselection.h"
 
 // TnzTools includes
 #include "tools/cursors.h"
@@ -179,6 +184,14 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
   case FlipConsole::eDefineSubCamera:
     m_editPreviewSubCamera = !m_editPreviewSubCamera;
     update();
+    break;
+
+  // open locator. Create one for the first time
+  case FlipConsole::eLocator:
+    if (!m_locator) m_locator = new LocatorPopup(this);
+    m_locator->show();
+    m_locator->raise();
+    m_locator->activateWindow();
     break;
   }
 }
@@ -347,7 +360,12 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
     TMouseEvent toonzEvent;
     initToonzEvent(toonzEvent, event, height(), m_pressure, m_tabletEvent,
                    false);
-    TPointD pos = tool->getMatrix().inv() * winToWorld(curPos);
+    TPointD worldPos = winToWorld(curPos);
+    TPointD pos      = tool->getMatrix().inv() * worldPos;
+
+    if (m_locator) {
+      m_locator->onChangeViewAff(worldPos);
+    }
 
     TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
     if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
@@ -375,6 +393,7 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
       // panning
       panQt(curPos - m_pos);
     m_pos = curPos;
+
     return;
   }
 }
@@ -753,6 +772,19 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
 
   tool->setViewer(this);
 
+  // If this object is child of Viewer or ComboViewer
+  // (m_isStyleShortcutSelective = true),
+  // then consider about shortcut for the current style selection.
+  if (m_isStyleShortcutSwitchable &&
+      Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+      (!isTextToolActive) && (event->modifiers() == Qt::NoModifier ||
+                              event->modifiers() == Qt::KeypadModifier) &&
+      ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
+       key == Qt::Key_Backtab)) {
+    event->ignore();
+    return;
+  }
+
   if (key == Qt::Key_Shift)
     modifiers |= Qt::SHIFT;
   else if (key == Qt::Key_Control)
@@ -973,6 +1005,7 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e) {
 #endif
 
   if (m_freezedStatus != NO_FREEZED) return;
+  if (m_isLocator) return;
 
   TPoint winPos(e->pos().x(), height() - e->pos().y());
   std::vector<int> columnIndices;

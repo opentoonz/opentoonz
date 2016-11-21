@@ -33,6 +33,7 @@
 class Ruler;
 class QMenu;
 class SceneViewer;
+class LocatorPopup;
 
 namespace ImageUtils {
 class FullScreenWidget;
@@ -135,6 +136,10 @@ class SceneViewer final : public QGLWidget,
     TOP_3D,
   } m_current3DDevice;
 
+  LocatorPopup *m_locator;
+  bool m_isLocator;
+  bool m_isStyleShortcutSwitchable;
+
   // iwsw commented out temporarily
   // Ghibli3DLutUtil * m_ghibli3DLutUtil;
 public:
@@ -229,6 +234,9 @@ public:
   TRectD getGeometry() const override;
 
   void setFocus(Qt::FocusReason reason) { QWidget::setFocus(reason); };
+
+  void setIsLocator() { m_isLocator = true; }
+  void setIsStyleShortcutSwitchable() { m_isStyleShortcutSwitchable = true; }
 
 public:
   // SceneViewer's gadget public functions

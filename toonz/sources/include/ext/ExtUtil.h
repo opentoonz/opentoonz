@@ -106,13 +106,13 @@ DVAPI bool findNearestCorners(const TStroke *stroke, double w, Interval &out,
    * @brief Rotate the control point at even position [0,2,4,...] in a
    * new position along the close path of a selfLoop stroke.
    *
-   * The new position is: @b atLenght.
+   * The new position is: @b atLength.
    * @return 0 if some problem occurs, else the new stroke.
    * @todo Some refactoring required, code duplication.
    */
 DVAPI TStroke *rotateControlPoint(const TStroke *stroke,
                                   const ToonzExt::EvenInt &even,
-                                  double atLenght);
+                                  double atLength);
 
 /**
    * Retrieve all parameters where stroke has a minimum.
