@@ -35,8 +35,8 @@ TSceneProperties::TSceneProperties()
     , m_markerOffset(0)
     , m_fullcolorSubsampling(1)
     , m_tlvSubsampling(1)
-    , m_fieldGuideSize(12)
-    , m_fieldGuideAspectRatio(1.38) {
+    , m_fieldGuideSize(36)
+	, m_fieldGuideAspectRatio(1.77778) {
   // Default color
   m_notesColor.push_back(TPixel32(255, 235, 140));
   m_notesColor.push_back(TPixel32(255, 160, 120));
