@@ -41,6 +41,7 @@
 #define MI_OutputSettings "MI_OutputSettings"
 #define MI_PreviewSettings "MI_PreviewSettings"
 #define MI_Render "MI_Render"
+#define MI_FastRender "MI_FastRender"
 #define MI_Preview "MI_Preview"
 #define MI_SoundTrack "MI_SoundTrack"
 #define MI_RegeneratePreview "MI_RegeneratePreview"
@@ -314,4 +315,5 @@
 #define MI_About "MI_About"
 #define MI_StartupPopup "MI_StartupPopup"
 #define MI_PencilTest "MI_PencilTest"
+#define MI_AudioRecording "MI_AudioRecording"
 #endif

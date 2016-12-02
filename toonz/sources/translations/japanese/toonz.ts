@@ -726,6 +726,18 @@ What do you want to do?</source>
         <source>Cleanup Settings: %1</source>
         <translation>トレース設定: %1</translation>
     </message>
+    <message>
+        <source>Autocenter</source>
+        <translation>自動位置合わせ</translation>
+    </message>
+    <message>
+        <source>Pegbar Holes</source>
+        <translation>タップ穴の位置</translation>
+    </message>
+    <message>
+        <source>Field Guide</source>
+        <translation>フィールドガイド</translation>
+    </message>
 </context>
 <context>
     <name>CleanupTab</name>
@@ -805,6 +817,10 @@ What do you want to do?</source>
     <message>
         <source>Fit to Window</source>
         <translation>ウィンドウに全体を表示</translation>
+    </message>
+    <message>
+        <source>Update Colors by Using Picked Positions</source>
+        <translation>サンプル位置を用いて色を更新する</translation>
     </message>
 </context>
 <context>
@@ -1131,6 +1147,10 @@ before color designing.</source>
         <translation>このオプションがONのとき、デフォルトパレット ($TOONZSTUDIOPALETTE\cleanup_default.tpl)
 のスタイルが変換後のパレットに追加されます。色見本を作成する際に、スタイルを新規作成する
 手間を省くことができます。</translation>
+    </message>
+    <message>
+        <source>Remove Unused Styles from Input Palette</source>
+        <translation>入力パレットから使用されていない色を消去する</translation>
     </message>
 </context>
 <context>
@@ -1467,11 +1487,11 @@ before color designing.</source>
     </message>
     <message>
         <source>Width:</source>
-        <translation>幅：</translation>
+        <translation type="vanished">幅：</translation>
     </message>
     <message>
         <source>Height:</source>
-        <translation>高さ：</translation>
+        <translation type="vanished">高さ：</translation>
     </message>
     <message>
         <source>H Resolution:</source>
@@ -2300,6 +2320,10 @@ Do you want to create it?</source>
         <source>Resolution:</source>
         <translation>ピクセルサイズ：</translation>
     </message>
+    <message>
+        <source>Resolution</source>
+        <translation>ピクセルサイズ</translation>
+    </message>
 </context>
 <context>
     <name>LineTestCapturePane</name>
@@ -2678,6 +2702,13 @@ Do you want to create it?</source>
     <message>
         <source> you can load only TNZ or CLN files for cleanup task.</source>
         <translation>トレースタスクにはTNZまたはCLNファイルのみ使用できます。</translation>
+    </message>
+</context>
+<context>
+    <name>LocatorPopup</name>
+    <message>
+        <source>Locator</source>
+        <translation>ロケーター</translation>
     </message>
 </context>
 <context>
@@ -4410,44 +4441,44 @@ Do you want to create it?</source>
         <translation type="vanished">ラインテスト (&amp;P)...</translation>
     </message>
     <message>
-        <source>Drawing Substitution Forward</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Drawing Substitution Backward</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Similar Drawing Substitution Forward</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Similar Drawing Substitution Backward</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;Camera Capture...</source>
         <translation>カメラから取り込む (&amp;C)...</translation>
     </message>
     <message>
         <source>Toggle Maximize Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>パネルを最大化</translation>
     </message>
     <message>
         <source>Toggle Main Window&apos;s Full Screen Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>全画面モード切り替え</translation>
     </message>
     <message>
         <source>Onion Skin Toggle</source>
-        <translation type="unfinished">オニオンスキン表示/非表示</translation>
+        <translation>オニオンスキン表示/非表示</translation>
     </message>
     <message>
         <source>Zero Thick Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>太さ０の線</translation>
     </message>
     <message>
-        <source>Pressure sensitivity</source>
-        <translation type="unfinished"></translation>
+        <source>&amp;Save All Levels</source>
+        <translation>全てのレベルを保存 (&amp;S)</translation>
+    </message>
+    <message>
+        <source>Pressure Sensitivity</source>
+        <translation>圧力感知</translation>
+    </message>
+    <message>
+        <source>Toggle Link to Studio Palette</source>
+        <translation>スタジオパレットとの同期を切り替え</translation>
+    </message>
+    <message>
+        <source>Remove Reference to Studio Palette</source>
+        <translation>スタジオパレットへの参照を削除</translation>
+    </message>
+    <message>
+        <source>&amp;Startup Popup...</source>
+        <translation>スタートアップウィンドウ(&amp;S) ...</translation>
     </message>
 </context>
 <context>
@@ -4703,7 +4734,7 @@ What do you want to do?</source>
     <name>MyViewFinder</name>
     <message>
         <source>Camera is not available</source>
-        <translation type="unfinished"></translation>
+        <translation>使用できるカメラがありません</translation>
     </message>
 </context>
 <context>
@@ -4754,7 +4785,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation>複数レンダリング：</translation>
+        <translation type="vanished">複数レンダリング：</translation>
     </message>
     <message>
         <source>Do stereoscopy</source>
@@ -5091,7 +5122,7 @@ Do you want to overwrite it?</source>
     <name>PencilTestPopup</name>
     <message>
         <source>Pencil Test</source>
-        <translation>ラインテスト</translation>
+        <translation type="vanished">ラインテスト</translation>
     </message>
     <message>
         <source>Refresh</source>
@@ -5259,6 +5290,18 @@ Do you want to overwrite it?</source>
         <translation>取り込み停止
 [Return キー]</translation>
     </message>
+    <message>
+        <source>Camera Capture</source>
+        <translation>カメラから取り込む</translation>
+    </message>
+    <message>
+        <source>- Select camera -</source>
+        <translation>- カメラを選択してください -</translation>
+    </message>
+    <message>
+        <source>Video Capture Filter Settings...</source>
+        <translation>ビデオキャプチャ設定 ...</translation>
+    </message>
 </context>
 <context>
     <name>PltGizmoPopup</name>
@@ -5355,7 +5398,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Save Automatically Every Minutes</source>
-        <translation>分間隔で自動保存</translation>
+        <translation type="vanished">分間隔で自動保存</translation>
     </message>
     <message>
         <source>Backup Animation Levels when Saving</source>
@@ -5597,7 +5640,6 @@ Do you want to overwrite it?</source>
         <source>Raster Level</source>
         <translation></translation>
     </message>
-
     <message>
         <source>Autocreation:</source>
         <translation>自動作成:</translation>
@@ -5669,7 +5711,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>pixel</source>
-        <translation type="vanished">pixel</translation>
+        <translation>pixel</translation>
     </message>
     <message>
         <source>Minimize Raster Memory Fragmentation *</source>
@@ -5861,7 +5903,111 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Rooms *:</source>
+        <translation type="vanished">ワークスペースレイアウト *：</translation>
+    </message>
+    <message>
+        <source>Save Automatically</source>
+        <translation>自動保存を行う</translation>
+    </message>
+    <message>
+        <source>Automatically Save the Scene File</source>
+        <translation>シーンファイルを自動保存</translation>
+    </message>
+    <message>
+        <source>Automatically Save Non-Scene Files</source>
+        <translation>シーン以外のファイルを自動保存</translation>
+    </message>
+    <message>
+        <source>My Documents/OpenToonz*</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Desktop/OpenToonz*</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Stuff Folder*</source>
+        <translation>Stuffフォルダ</translation>
+    </message>
+    <message>
+        <source>Custom*</source>
+        <translation>カスタム</translation>
+    </message>
+    <message>
+        <source>Custom Project Path(s): </source>
+        <translation>追加する Project Root パス：</translation>
+    </message>
+    <message>
+        <source>Advanced: Multiple paths can be separated by ** (No Spaces)</source>
+        <translation>高度な設定： 複数のパスを**で区切って指定できます（スペースなし）</translation>
+    </message>
+    <message>
+        <source>All imported images will use the same DPI</source>
+        <translation>読み込まれた全てのレベルは同じDPIを用います</translation>
+    </message>
+    <message>
+        <source>Import/Export</source>
+        <translation>インポート/エクスポート</translation>
+    </message>
+    <message>
+        <source>Show Onion Skin During Playback</source>
+        <translation>再生中にオニオンスキンを表示する</translation>
+    </message>
+    <message>
+        <source>Interval(Minutes): </source>
+        <translation>間隔(分)：</translation>
+    </message>
+    <message>
+        <source>Additional Project Locations</source>
+        <translation>Project Rootの追加</translation>
+    </message>
+    <message>
+        <source>Pixels Only:</source>
+        <translation>ピクセル単位を用いる：</translation>
+    </message>
+    <message>
+        <source>Rooms*:</source>
         <translation>ワークスペースレイアウト *：</translation>
+    </message>
+    <message>
+        <source>OpenToonz can use FFmpeg for additional file formats.</source>
+        <translation>OpenToonzは、FFmpegを用いて入出力可能なファイル形式を追加することができます。</translation>
+    </message>
+    <message>
+        <source>FFmpeg is not bundled with OpenToonz</source>
+        <translation>FFmpegはOpenToonzパッケージには含まれていません</translation>
+    </message>
+    <message>
+        <source>NOTE: This is an experimental feature.</source>
+        <translation>注意：本機能は試験的に導入しています。</translation>
+    </message>
+    <message>
+        <source>Please SAVE YOUR WORK before exporting in MP4, WEBM, or GIF format.</source>
+        <translation>MP4/WEBM/GIF形式で出力する前に、データのバックアップを保存しておくことをお勧めします。</translation>
+    </message>
+    <message>
+        <source>Please provide the path where FFmpeg is located on your computer.</source>
+        <translation>FFmpegの実行ファイルの保存パスを入力してください。</translation>
+    </message>
+    <message>
+        <source>FFmpeg Path: </source>
+        <translation>FFmpegのパス：</translation>
+    </message>
+    <message>
+        <source>Number of seconds to wait for FFmpeg to complete processing the output:</source>
+        <translation>FFmpegと通信して出力計算を完了するまでの待機時間(秒)：</translation>
+    </message>
+    <message>
+        <source>Note: FFmpeg begins working once all images have been processed.</source>
+        <translation>※ FFmpegは全てのフレームの計算が終了してから動作を開始します。</translation>
+    </message>
+    <message>
+        <source>FFmpeg Timeout:</source>
+        <translation>FFmpegのタイムアウト時間：</translation>
+    </message>
+    <message>
+        <source>Show Startup Window when OpenToonz Starts</source>
+        <translation>OpenToonzの起動時にスタートアップウィンドウを表示する</translation>
     </message>
 </context>
 <context>
@@ -6490,7 +6636,7 @@ Are you sure you want to revert to previous version?</source>
     <message>
         <source>%1: the current scene has been modified.
 Do you want to save your changes?</source>
-        <translation>%1 ： 現在のシーンは変更されました。
+        <translation type="vanished">%1 ： 現在のシーンは変更されました。
 変更を保存しますか？</translation>
     </message>
     <message>
@@ -7095,19 +7241,19 @@ Are you sure ?</source>
         <source> Following file(s) are modified.
 
 </source>
-        <translation>以下のファイルは変更されました。
+        <translation type="vanished">以下のファイルは変更されました。
 
 </translation>
     </message>
     <message>
         <source>
 Are you sure to </source>
-        <translation>
+        <translation type="vanished">
 それでも </translation>
     </message>
     <message>
         <source> anyway ?</source>
-        <translation> してよろしいですか？</translation>
+        <translation type="vanished"> してよろしいですか？</translation>
     </message>
     <message>
         <source>OK</source>
@@ -7465,15 +7611,84 @@ Are you sure to </source>
     </message>
     <message>
         <source>Change current drawing %1</source>
-        <translation type="unfinished"></translation>
+        <translation>選択コマの動画番号を送る %1</translation>
     </message>
     <message>
         <source>Hide Zero Thickness Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>太さ０の線を隠す</translation>
     </message>
     <message>
         <source>Show Zero Thickness Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>太さ０の線を表示</translation>
+    </message>
+    <message>
+        <source>%1: the current scene has been modified.
+What would you like to do?</source>
+        <translation>%1 ： 現在のシーンは変更されました。
+どうしますか？</translation>
+    </message>
+    <message>
+        <source>Save All</source>
+        <translation>シーンとレベルを全て保存</translation>
+    </message>
+    <message>
+        <source>Save Scene Only</source>
+        <translation>シーンのみを保存</translation>
+    </message>
+    <message>
+        <source>Discard Changes</source>
+        <translation>変更を破棄</translation>
+    </message>
+    <message>
+        <source> The following file(s) have been modified.
+
+</source>
+        <translation>以下のファイルは変更されました。
+
+</translation>
+    </message>
+    <message>
+        <source>
+What would you like to do? </source>
+        <translation>
+どうしますか？</translation>
+    </message>
+    <message>
+        <source>Save Changes</source>
+        <translation>変更を保存</translation>
+    </message>
+    <message>
+        <source> Anyway</source>
+        <translation>する</translation>
+    </message>
+    <message>
+        <source>This scene is incompatible with pixels only mode of the current OpenToonz version.
+What would you like to do?</source>
+        <translation>現在のバージョンでは、このシーンはピクセル単位モードに対応していません。
+どうしますか？</translation>
+    </message>
+    <message>
+        <source>Turn off pixels only mode</source>
+        <translation>ピクセル単位モードを解除する</translation>
+    </message>
+    <message>
+        <source>Keep pixels only mode on and resize the scene</source>
+        <translation>ピクセル単位モードを維持し、シーンのカメラサイズを変更する</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;カスタム&gt;</translation>
+    </message>
+    <message>
+        <source>The file name already exists.
+Do you want to overwrite it?</source>
+        <translation>ファイル名は、既に存在します。
+上書きしてもよろしいですか？</translation>
+    </message>
+    <message>
+        <source>Deleting &quot;%1&quot;.
+Are you sure?</source>
+        <translation>%1 を削除します。よろしいですか？</translation>
     </message>
 </context>
 <context>
@@ -7541,6 +7756,13 @@ The audio file will not be included in the rendered clip.</source>
                            The output result may differ from what you expect. What do you want to do?</source>
         <translation>シーン %1 はシーン %2 と異なるピクセルサイズに設定されています。
 期待するものと異なる結果が出力されるかもしれません。どうしますか？</translation>
+    </message>
+</context>
+<context>
+    <name>RenderListener</name>
+    <message>
+        <source>Finalizing render, please wait.</source>
+        <translation>ファイナライズ中です。お待ちください。</translation>
     </message>
 </context>
 <context>
@@ -8694,7 +8916,7 @@ Please commit or revert changes first.</source>
         <source>Regenerate Frame Preview</source>
         <translation>プレビューを再計算（現在のフレームのみ）</translation>
     </message>
-   <message>
+    <message>
         <source>Select </source>
         <translation></translation>
     </message>
@@ -8777,6 +8999,14 @@ Please commit or revert changes first.</source>
         <source>  ::  Zoom : </source>
         <translation>：：ズーム：</translation>
     </message>
+    <message>
+        <source>Safe Area (Right Click to Select)</source>
+        <translation>セーフエリア （右クリックで選択）</translation>
+    </message>
+    <message>
+        <source>Field Guide</source>
+        <translation>フィールドガイド</translation>
+    </message>
 </context>
 <context>
     <name>ShortcutPopup</name>
@@ -8790,7 +9020,67 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Couldn&apos;t find any matching command.</source>
-        <translation type="unfinished"></translation>
+        <translation>コマンドが見つかりませんでした。</translation>
+    </message>
+    <message>
+        <source>Export Current Shortcuts</source>
+        <translation>現在の設定をエクスポート</translation>
+    </message>
+    <message>
+        <source>Delete Current Preset</source>
+        <translation>現在のプリセットを削除</translation>
+    </message>
+    <message>
+        <source>Save Current Shortcuts as New Preset</source>
+        <translation>現在の設定をプリセットに保存</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>適用</translation>
+    </message>
+    <message>
+        <source>Use selected preset as shortcuts</source>
+        <translation>選択されたプリセットを用いる</translation>
+    </message>
+    <message>
+        <source>Clear All Shortcuts</source>
+        <translation>全てのショートカット設定を消去</translation>
+    </message>
+    <message>
+        <source>This will erase ALL shortcuts. Continue?</source>
+        <translation>全てのショートカットを消去します。続行しますか？</translation>
+    </message>
+    <message>
+        <source>This will overwrite all current shortcuts. Continue?</source>
+        <translation>現在の全てのショートカット設定が上書きされます。続行しますか？</translation>
+    </message>
+    <message>
+        <source>A file named </source>
+        <translation>ファイル</translation>
+    </message>
+    <message>
+        <source> already exists.  Do you want to replace it?</source>
+        <translation>は、既に存在します。置き換えてもよろしいですか？</translation>
+    </message>
+    <message>
+        <source>OpenToonz - Setting Shortcuts</source>
+        <translation>ショートカットの設定</translation>
+    </message>
+    <message>
+        <source>Included presets cannot be deleted.</source>
+        <translation>既定のプリセットは消去できません。</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete the preset: </source>
+        <translation>以下のプリセットを削除してよろしいですか：</translation>
+    </message>
+    <message>
+        <source>?</source>
+        <translation>？</translation>
+    </message>
+    <message>
+        <source>Load from file...</source>
+        <translation>ファイルから読み込む...</translation>
     </message>
 </context>
 <context>
@@ -8862,6 +9152,10 @@ Please commit or revert changes first.</source>
     <message>
         <source>Misc</source>
         <translation>その他</translation>
+    </message>
+    <message>
+        <source>Playback</source>
+        <translation>再生</translation>
     </message>
 </context>
 <context>
@@ -9001,6 +9295,159 @@ Assign to &apos;%3&apos;?</source>
     </message>
 </context>
 <context>
+    <name>StartupPopup</name>
+    <message>
+        <source>OpenToonz Startup</source>
+        <translation>OpenToonz スタートアップ</translation>
+    </message>
+    <message>
+        <source>Choose Project</source>
+        <translation>プロジェクトを選択</translation>
+    </message>
+    <message>
+        <source>Create a New Scene</source>
+        <translation>新規シーンを作成</translation>
+    </message>
+    <message>
+        <source>Open Scene</source>
+        <translation>シーンを開く</translation>
+    </message>
+    <message>
+        <source>Scene Name:</source>
+        <translation>シーン名：</translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation>幅：</translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation>高さ：</translation>
+    </message>
+    <message>
+        <source>DPI:</source>
+        <translation>DPI：</translation>
+    </message>
+    <message>
+        <source>X</source>
+        <translation>X</translation>
+    </message>
+    <message>
+        <source>Resolution:</source>
+        <translation>ピクセルサイズ：</translation>
+    </message>
+    <message>
+        <source>Frame Rate:</source>
+        <translation>フレームレート:</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>追加</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>消去</translation>
+    </message>
+    <message>
+        <source>Show this at startup</source>
+        <translation>起動時にこのウィンドウを表示する</translation>
+    </message>
+    <message>
+        <source>Create Scene</source>
+        <translation>シーンを作成</translation>
+    </message>
+    <message>
+        <source>New Project...</source>
+        <translation>新規プロジェクト...</translation>
+    </message>
+    <message>
+        <source>Open Another Scene...</source>
+        <translation>その他のシーンを開く...</translation>
+    </message>
+    <message>
+        <source>pixel</source>
+        <translation>pixel</translation>
+    </message>
+    <message>
+        <source>cm</source>
+        <translation>cm</translation>
+    </message>
+    <message>
+        <source>mm</source>
+        <translation>mm</translation>
+    </message>
+    <message>
+        <source>inch</source>
+        <translation>inch</translation>
+    </message>
+    <message>
+        <source>field</source>
+        <translation>フィールド</translation>
+    </message>
+    <message>
+        <source>Save In:</source>
+        <translation>保存先の指定：</translation>
+    </message>
+    <message>
+        <source>Camera Size:</source>
+        <translation>カメラサイズ：</translation>
+    </message>
+    <message>
+        <source>Units:</source>
+        <translation>単位：</translation>
+    </message>
+    <message>
+        <source>No Recent Scenes</source>
+        <translation>最近開いたシーンがありません</translation>
+    </message>
+    <message>
+        <source>The name cannot be empty.</source>
+        <translation>シーン名が空です。</translation>
+    </message>
+    <message>
+        <source>The chosen file path is not valid.</source>
+        <translation>選択されたファイルパスは無効です。</translation>
+    </message>
+    <message>
+        <source>The width must be 1 or more.</source>
+        <translation>幅は1以上でなくてはいけません。</translation>
+    </message>
+    <message>
+        <source>The height must be 1 or more.</source>
+        <translation>高さは1以上でなくてはいけません。</translation>
+    </message>
+    <message>
+        <source>The frame rate must be 1 or more.</source>
+        <translation>フレームレートは1以上でなくてはいけません。</translation>
+    </message>
+    <message>
+        <source>Preset name</source>
+        <translation>プリセット名</translation>
+    </message>
+    <message>
+        <source>Enter the name for %1</source>
+        <translation>%1の名前を入力してください</translation>
+    </message>
+    <message>
+        <source>Error : Preset Name is Invalid</source>
+        <translation>エラー：プリセット名が無効です</translation>
+    </message>
+    <message>
+        <source>The preset name must not use &apos;,&apos;(comma).</source>
+        <translation>プリセット名には &apos;,&apos;（カンマ）を使用できません。</translation>
+    </message>
+    <message>
+        <source>Bad camera preset</source>
+        <translation>カメラプリセット名が不正です</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; doesn&apos;t seem to be a well formed camera preset. 
+Possibly the preset file has been corrupted</source>
+        <translation>&apos;%1&apos;はカメラプリセットの書式として正しくないようです。
+プリセットファイルが破損している可能性があります</translation>
+    </message>
+</context>
+<context>
     <name>SubSheetBar</name>
     <message>
         <source>Sub-scene controls: 
@@ -9044,6 +9491,10 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>It is not possible to save automatically an untitled scene.</source>
+        <translation type="vanished">名称未設定のシーンを自動保存できません。</translation>
+    </message>
+    <message>
+        <source>It is not possible to automatically save an untitled scene.</source>
         <translation>名称未設定のシーンを自動保存できません。</translation>
     </message>
 </context>
@@ -9831,7 +10282,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Pinned Center : Col%1%2</source>
-        <translation type="unfinished"></translation>
+        <translation>固定ピン ： Col%1%2</translation>
     </message>
 </context>
 <context>

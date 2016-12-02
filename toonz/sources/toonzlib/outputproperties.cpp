@@ -97,7 +97,7 @@ TOutputProperties &TOutputProperties::operator=(const TOutputProperties &src) {
 
   std::map<std::string, TPropertyGroup *>::const_iterator sft,
       sfEnd = src.m_formatProperties.end();
-  for (sft = src.m_formatProperties.end(); sft != sfEnd; ++sft)
+  for (sft = src.m_formatProperties.begin(); sft != sfEnd; ++sft)
     m_formatProperties[sft->first] = sft->second->clone();
 
   return *this;

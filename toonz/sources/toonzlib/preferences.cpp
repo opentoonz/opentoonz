@@ -23,6 +23,7 @@
 // Qt includes
 #include <QSettings>
 #include <QStringList>
+#include <QAction>
 
 // boost includes
 #include <boost/bind.hpp>
@@ -293,8 +294,10 @@ Preferences::Preferences()
     , m_projectRoot(0x08)
     , m_customProjectRoot("")
     , m_precompute(true)
+    , m_fastRenderPath("desktop")
     , m_ffmpegTimeout(30)
-    , m_shortcutPreset("defopentoonz") {
+    , m_shortcutPreset("defopentoonz")
+    , m_useNumpadForSwitchingStyles(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -559,10 +562,15 @@ Preferences::Preferences()
   QString ffmpegPath = m_settings->value("ffmpegPath").toString();
   if (ffmpegPath != "") m_ffmpegPath = ffmpegPath;
   setFfmpegPath(m_ffmpegPath.toStdString());
+  QString fastRenderPath = m_settings->value("fastRenderPath").toString();
+  if (fastRenderPath != "") m_fastRenderPath = fastRenderPath;
+  setFastRenderPath(m_fastRenderPath.toStdString());
   getValue(*m_settings, "ffmpegTimeout", m_ffmpegTimeout);
   QString shortcutPreset = m_settings->value("shortcutPreset").toString();
   if (shortcutPreset != "") m_shortcutPreset = shortcutPreset;
   setShortcutPreset(m_shortcutPreset.toStdString());
+  getValue(*m_settings, "useNumpadForSwitchingStyles",
+           m_useNumpadForSwitchingStyles);
 }
 
 //-----------------------------------------------------------------
@@ -1255,6 +1263,14 @@ void Preferences::setFfmpegPath(std::string path) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setFastRenderPath(std::string path) {
+  m_fastRenderPath    = QString::fromStdString(path);
+  std::string strPath = m_ffmpegPath.toStdString();
+  m_settings->setValue("fastRenderPath", m_fastRenderPath);
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::setShortcutPreset(std::string preset) {
   m_shortcutPreset = QString::fromStdString(preset);
   m_settings->setValue("shortcutPreset", m_shortcutPreset);
@@ -1319,4 +1335,11 @@ int Preferences::matchLevelFormat(const TFilePath &fp) const {
                    boost::bind(&LevelFormat::matches, _1, boost::cref(fp)));
 
   return (lft != m_levelFormats.end()) ? lft - m_levelFormats.begin() : -1;
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
+  m_useNumpadForSwitchingStyles = on;
+  m_settings->setValue("useNumpadForSwitchingStyles", on ? "1" : "0");
 }

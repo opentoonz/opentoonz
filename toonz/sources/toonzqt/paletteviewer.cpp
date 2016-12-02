@@ -392,7 +392,7 @@ void PaletteViewer::createPaletteToolBar() {
   nameDisplayModeGroup->addAction(bothDisplayAct);
 
   viewMode->addAction(smallThumbAct);
-  viewModeGroup->addAction(mediumThumbAct);
+  viewMode->addAction(mediumThumbAct);
   viewMode->addAction(largeThumbAct);
   viewMode->addAction(listAct);
   viewMode->addSeparator();

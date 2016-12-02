@@ -1601,6 +1601,7 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_OutputSettings, tr("&Output Settings..."), "Ctrl+O");
   createMenuFileAction(MI_PreviewSettings, tr("&Preview Settings..."), "");
   createMenuFileAction(MI_Render, tr("&Render"), "Ctrl+Shift+R");
+  createMenuFileAction(MI_FastRender, tr("&Fast Render to MP4"), "Alt+R");
   createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
   createMenuFileAction(MI_SoundTrack, tr("&Export Soundtrack"), "Alt+S");
   createRightClickMenuAction(MI_SavePreviewedFrames,
@@ -1690,7 +1691,7 @@ void MainWindow::defineActions() {
                         MenuScanCleanupCommandType);
   CameraTestCheck::instance()->setToggle(toggle);
 
-  createToggle(MI_OpacityCheck, tr("&Opacity Check"), "1", false,
+  createToggle(MI_OpacityCheck, tr("&Opacity Check"), "Alt+1", false,
                MenuScanCleanupCommandType);
 
   createMenuScanCleanupAction(MI_Cleanup, tr("&Cleanup"), "");
@@ -1920,7 +1921,7 @@ void MainWindow::defineActions() {
 
   createMenuWindowsAction(MI_OpenComboViewer, tr("&ComboViewer"), "");
   createMenuWindowsAction(MI_OpenHistoryPanel, tr("&History"), "Ctrl+H");
-
+  createMenuWindowsAction(MI_AudioRecording, tr("Record Audio"), "Alt+A");
   createMenuWindowsAction(MI_ResetRoomLayout, tr("&Reset to Default Rooms"),
                           "");
   createMenuWindowsAction(MI_MaximizePanel, tr("Toggle Maximize Panel"), "`");
@@ -2048,8 +2049,8 @@ void MainWindow::defineActions() {
 
   createViewerAction(V_ZoomIn, tr("Zoom In"), "+");
   createViewerAction(V_ZoomOut, tr("Zoom Out"), "-");
-  createViewerAction(V_ZoomReset, tr("Reset View"), "0");
-  createViewerAction(V_ZoomFit, tr("Fit to Window"), "9");
+  createViewerAction(V_ZoomReset, tr("Reset View"), "Alt+0");
+  createViewerAction(V_ZoomFit, tr("Fit to Window"), "Alt+9");
   createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
   createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"),
                      "Alt+F");

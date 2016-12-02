@@ -498,6 +498,18 @@ Probablement le codec peut ne pas fonctionner correctement.</translation>
         <source>Move Center   %1  Frame %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>color model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Picked Position of Style#%1 in Palette%2 : %3,%4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Colors by Using Picked Positions in Palette %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Rasterizer</name>

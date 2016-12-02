@@ -39,11 +39,16 @@ private:
 TLevelWriterMp4::TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo)
     : TLevelWriter(path, winfo) {
   if (!m_properties) m_properties = new Tiio::Mp4WriterProperties();
-  std::string scale = m_properties->getProperty("Scale")->getValueAsString();
-  m_scale           = QString::fromStdString(scale).toInt();
-  std::string quality =
-      m_properties->getProperty("Quality")->getValueAsString();
-  m_vidQuality = QString::fromStdString(quality).toInt();
+  if (m_properties->getPropertyCount() == 0) {
+    m_scale      = 100;
+    m_vidQuality = 100;
+  } else {
+    std::string scale = m_properties->getProperty("Scale")->getValueAsString();
+    m_scale           = QString::fromStdString(scale).toInt();
+    std::string quality =
+        m_properties->getProperty("Quality")->getValueAsString();
+    m_vidQuality = QString::fromStdString(quality).toInt();
+  }
   ffmpegWriter = new Ffmpeg();
   ffmpegWriter->setPath(m_path);
   if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);

@@ -24,6 +24,7 @@ set(HEADERS
     ffmpeg/tiio_webm.h
     ffmpeg/tiio_mp4.h
     ffmpeg/tiio_ffmpeg.h
+    sprite/tiio_sprite.h
     mesh/tiio_mesh.h
 )
 
@@ -55,6 +56,7 @@ set(SOURCES
     ffmpeg/tiio_webm.cpp
     ffmpeg/tiio_mp4.cpp
     ffmpeg/tiio_ffmpeg.cpp
+    sprite/tiio_sprite.cpp
     mesh/tiio_mesh.cpp
 )
 

@@ -1113,7 +1113,7 @@ public:
       cellSelection->getSelectedCells(r0, c0, r1, c1);
       for (int c = c0; c <= c1; c++) {
         for (int r = r0; r <= r1; r++) {
-          TXshLevel *lv = xsh->getCell(r, c).getSimpleLevel();
+          TXshLevel *lv = xsh->getCell(r, c).m_level.getPointer();
           if (!lv) continue;
           std::vector<TXshLevel *>::iterator lvIt =
               find(selectedLevels.begin(), selectedLevels.end(), lv);

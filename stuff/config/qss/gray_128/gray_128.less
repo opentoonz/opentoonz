@@ -1,3 +1,4 @@
+// out: gray_128.qss
 /* LESS Definitions */
 
 /*Image URL*/
@@ -16,7 +17,12 @@
 .baseBG(light, @light: 0%){
 	background-color: lighten(@m_baseBG, @light);
 }
-
+.set_border_color(@lefttop, @rightbottom){
+	border-left-color: 	@lefttop;
+	border-top-color: 	@lefttop;
+	border-right-color: 	@rightbottom;
+	border-bottom-color: 	@rightbottom;
+}
 .base_inset(@dark: 0%){
 	.baseBG(@dark);
 	border-style: inset;
@@ -661,30 +667,29 @@ ParamsPage {
 	}
 }
 /* Customize QScrollBar  vertical*/
-#XsheetScrollBar {
-	background-color: rgb(160,160,160);
+QScrollBar {
 	border: 1px solid black;
 
 	&:vertical {
-		width: 18px;
-		.set_margin( 0px, 20px );
+		width: 16px;
+		.set_margin( 0px, 16px );
 	}
 	&:horizontal {
-		height: 18px;
-		.set_margin( 20px, 0px );
+		height: 16px;
+		.set_margin( 16px, 0px );
 	}
 
 	&::handle {
-		border-width: 4;
+		border-width: 3;
 		image-position: center center;
 		&:vertical {
-			border-image: url("@{image_url}/sb_g_vhandle.png")4;
+			border-image: url("@{image_url}/sb_g_vhandle.png")3;
 			image: url("@{image_url}/sb_g_vline.png");
 			min-height: 40px;
 		}
 		
 		&:horizontal {
-			border-image: url("@{image_url}/sb_g_hhandle.png")4;
+			border-image: url("@{image_url}/sb_g_hhandle.png")3;
 			image: url("@{image_url}/sb_g_hline.png");
 			min-width: 40px;
 		}
@@ -694,7 +699,7 @@ ParamsPage {
 		subcontrol-origin: margin;
 		&:vertical {
 			image: url("@{image_url}/sb_g_downarrow.png");
-			height: 20px;
+			height: 16px;
 			subcontrol-position: bottom;
 			&:pressed {
 				image: url("@{image_url}/sb_g_downarrow_pressed.png");
@@ -702,7 +707,7 @@ ParamsPage {
 		}
 		&:horizontal {
 			image: url("@{image_url}/sb_g_rarrow.png");
-			width: 20px;
+			width: 16px;
 			subcontrol-position: right;
 			&:pressed{
 				image: url("@{image_url}/sb_g_rarrow_pressed.png");
@@ -714,7 +719,7 @@ ParamsPage {
 		subcontrol-origin: margin;
 		&:vertical {
 			image: url("@{image_url}/sb_g_uparrow.png");
-			height: 20px;
+			height: 16px;
 			subcontrol-position: top;
 			&:pressed {
 				image: url("@{image_url}/sb_g_uparrow_pressed.png");
@@ -722,7 +727,7 @@ ParamsPage {
 		}
 		&:horizontal {
 			image: url("@{image_url}/sb_g_larrow.png");
-			width: 20px;
+			width: 16px;
 			subcontrol-position: left;
 			&:pressed{
 				image: url("@{image_url}/sb_g_larrow_pressed.png");
@@ -730,8 +735,8 @@ ParamsPage {
 		}
 	}
 
-	&::add-page {
-		background: none;
+	&::add-page, &::sub-page {
+	    background-color: rgb(160,160,160);
 	}
 }
 
@@ -1201,4 +1206,28 @@ QDialog #dialogButtonFrame {
 	&:hover {
 		.baseBG(light, 10%);
 	}    
+}
+
+#WordButton {
+    font-size: 12px;
+    color: black;
+	background-color: rgb(192, 192, 192);
+	border-style: outset;
+	.set_border_color(white,black);
+	border-width: 1px;
+ 	border-radius: 1px;
+   	.set_padding(3px, 3px);
+	&:pressed {
+	    background-color: rgb(250, 255, 162);
+	    border-style: inset;
+	    .set_border_color(black,white);
+	}
+	&:hover {
+	    background-color: rgb(250, 255, 162);
+		&:pressed {
+	        background-color: rgb(250, 255, 162);
+    	    border-style: inset;
+	        .set_border_color(black,white);
+	    }
+	}
 }

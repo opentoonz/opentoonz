@@ -184,8 +184,8 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_cellScrollArea->setWidget(m_cellArea);
   m_cellScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_cellScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  m_cellScrollArea->horizontalScrollBar()->setObjectName("XsheetScrollBar");
-  m_cellScrollArea->verticalScrollBar()->setObjectName("XsheetScrollBar");
+  // m_cellScrollArea->horizontalScrollBar()->setObjectName("XsheetScrollBar");
+  // m_cellScrollArea->verticalScrollBar()->setObjectName("XsheetScrollBar");
 
   m_columnArea       = new XsheetGUI::ColumnArea(this);
   m_columnScrollArea = new XsheetScrollArea(this);
@@ -694,13 +694,13 @@ void XsheetViewer::paintEvent(QPaintEvent*)
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::resizeEvent(QResizeEvent *event) {
-  int w = width();
-  int h = height();
-
+  int w              = width();
+  int h              = height();
+  int scrollBarWidth = 16;
   m_noteScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
   m_cellScrollArea->setGeometry(m_x0, m_y0, w - m_x0, h - m_y0);
-  m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - 20, m_y0 - 3);
-  m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - 20);
+  m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
+  m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - scrollBarWidth);
 
   //(Nuovo Layout Manager) Reintrodotto per il refresh automatico
   refreshContentSize(

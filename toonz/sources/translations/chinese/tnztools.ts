@@ -334,31 +334,31 @@
     </message>
     <message>
         <source>Lines</source>
-        <translation>线</translation>
+        <translation type="vanished">线</translation>
     </message>
     <message>
         <source>Areas</source>
-        <translation>区域</translation>
+        <translation type="vanished">区域</translation>
     </message>
     <message>
         <source>Lines &amp;&amp; Areas</source>
-        <translation>线和区域</translation>
+        <translation type="vanished">线和区域</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation>正常</translation>
+        <translation type="vanished">正常</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation>矩形</translation>
+        <translation type="vanished">矩形</translation>
     </message>
     <message>
         <source>Freehand</source>
-        <translation>手绘</translation>
+        <translation type="vanished">手绘</translation>
     </message>
     <message>
         <source>Polyline</source>
-        <translation>多边形</translation>
+        <translation type="vanished">多边形</translation>
     </message>
 </context>
 <context>
@@ -952,6 +952,29 @@ Do you want to proceed?</source>
     <message>
         <source>Reset Pinned Center</source>
         <translation>重置固定中心</translation>
+    </message>
+</context>
+<context>
+    <name>StylePickerTool</name>
+    <message>
+        <source>No current level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current level has no available palette.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette must have more than one palette to be organized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StylePickerToolOptionsBox</name>
+    <message>
+        <source>With this option being activated, the picked style will be
+moved to the end of the first page of the palette.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

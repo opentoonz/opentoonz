@@ -2130,9 +2130,9 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
   }
 
   if (isCellSelected) {
-    if (!soundCellsSelected) {
-      menu.addAction(cmdManager->getAction(MI_LevelSettings));
+    menu.addAction(cmdManager->getAction(MI_LevelSettings));
 
+    if (!soundCellsSelected) {
       //- force reframe
       QMenu *reframeSubMenu = new QMenu(tr("Reframe"), this);
       {

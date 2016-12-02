@@ -1099,6 +1099,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_OutputSettings);
   addMenuItem(fileMenu, MI_Render);
+  addMenuItem(fileMenu, MI_FastRender);
   addMenuItem(fileMenu, MI_SoundTrack);
   //  addMenuItem(fileMenu, MI_SavePreviewedFrames);
   fileMenu->addSeparator();
@@ -1340,6 +1341,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
   addMenuItem(windowsMenu, MI_OpenHistoryPanel);
+  addMenuItem(windowsMenu, MI_AudioRecording);
   windowsMenu->addSeparator();
   addMenuItem(windowsMenu, MI_ResetRoomLayout);
 

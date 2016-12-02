@@ -138,6 +138,10 @@
         <source>Pressure</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>
@@ -919,6 +923,29 @@ Procedere?</translation>
     <message>
         <source>Reset Pinned Center</source>
         <translation>Ripristina il centro bloccato</translation>
+    </message>
+</context>
+<context>
+    <name>StylePickerTool</name>
+    <message>
+        <source>No current level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current level has no available palette.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette must have more than one palette to be organized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StylePickerToolOptionsBox</name>
+    <message>
+        <source>With this option being activated, the picked style will be
+moved to the end of the first page of the palette.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

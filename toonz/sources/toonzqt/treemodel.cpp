@@ -310,6 +310,13 @@ void TreeModel::setRootItem(Item *rootItem) {
   if (m_rootItem) m_rootItem->setModel(this);
 }
 
+// postpone freeing, so existing items can be referenced while refreshing.
+void TreeModel::setRootItem_NoFree(Item *rootItem) {
+  if (rootItem == m_rootItem) return;
+  m_rootItem = rootItem;
+  if (m_rootItem) m_rootItem->setModel(this);
+}
+
 //---------------------------------------------------------------------------------------------------------------
 
 void TreeModel::setRowHidden(int row, const QModelIndex &parent, bool hide) {

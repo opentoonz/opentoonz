@@ -199,6 +199,8 @@ protected:
   void zoomInChip();
   void zoomOutChip();
 
+  bool hasShortcut(int indexInPage);
+
 private:
   DVGui::LineEdit *m_renameTextField;
   QPoint m_dragStartPosition;

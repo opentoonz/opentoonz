@@ -25,6 +25,7 @@
 #include <QPainter>
 #include <QRadioButton>
 #include <QThread>
+#include <QDesktopWidget>
 
 // boost includes
 #include <boost/algorithm/cxx11/any_of.hpp>
@@ -286,8 +287,16 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
   if (geo != QString()) {
     QStringList values = geo.split(" ");
     assert(values.size() == 4);
-    setGeometry(values.at(0).toInt(), std::max(30, values.at(1).toInt()),
-                values.at(2).toInt(), values.at(3).toInt());
+    // Ensure that the dialog is visible in the screen.
+    // The dialog opens with some offset to bottom-right direction
+    // if a flag Qt::WindowMaximizeButtonHint is set. (e.g. PencilTestPopup)
+    // Therefore, if the dialog is moved to the bottom-end of the screen,
+    // it will be got out of the screen on the next launch.
+    // The following position adjustment will also prevent such behavior.
+    QRect screen = QApplication::desktop()->screenGeometry();
+    int x        = std::min(values.at(0).toInt(), screen.width() - 50);
+    int y = std::min(std::max(30, values.at(1).toInt()), screen.height() - 90);
+    setGeometry(x, y, values.at(2).toInt(), values.at(3).toInt());
   }
 }
 

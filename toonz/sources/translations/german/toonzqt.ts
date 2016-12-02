@@ -133,6 +133,18 @@ Possibly the preset file has been corrupted</source>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>DPI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -306,7 +318,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::ProgressDialog</name>
     <message>
         <source>Toonz</source>
-        <translation>OpenToonz</translation>
+        <translation type="vanished">OpenToonz</translation>
+    </message>
+    <message>
+        <source>OpenToonz</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -575,6 +591,10 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>&amp;Display Areas as Filled</source>
         <translation>Flächen als gefüllt anzeigen (&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Locator</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1292,11 +1312,11 @@ Wählen Sie Effekt-Nodes und verwandte Links, die Sie einfügen möchten, bevor 
     </message>
     <message>
         <source>Update</source>
-        <translation>Aktualisieren</translation>
+        <translation type="vanished">Aktualisieren</translation>
     </message>
     <message>
         <source>Don&apos;t Update</source>
-        <translation>Nicht aktualisieren</translation>
+        <translation type="vanished">Nicht aktualisieren</translation>
     </message>
     <message>
         <source>     (Color Model: </source>
@@ -1315,7 +1335,7 @@ Wählen Sie Effekt-Nodes und verwandte Links, die Sie einfügen möchten, bevor 
     </message>
     <message>
         <source>Remove Links</source>
-        <translation>Links für Studio-Palette löschen</translation>
+        <translation type="vanished">Links für Studio-Palette löschen</translation>
     </message>
     <message>
         <source>New Style</source>
@@ -1324,6 +1344,10 @@ Wählen Sie Effekt-Nodes und verwandte Links, die Sie einfügen möchten, bevor 
     <message>
         <source>New Page</source>
         <translation>Neue Seite</translation>
+    </message>
+    <message>
+        <source>Name Editor</source>
+        <translation type="unfinished">Stil-Name-Editor</translation>
     </message>
 </context>
 <context>
@@ -1672,7 +1696,7 @@ Für mehr Informationen besuchen Sie die Seite %1:</translation>
     </message>
     <message>
         <source>It is not possible to assing a shortcut with modifiers to the visualization commands.</source>
-        <translation>Es kann kein Kürzel mit Modifizierungen zu den Visualisierungsbefehlen zugewiesen werden.</translation>
+        <translation type="vanished">Es kann kein Kürzel mit Modifizierungen zu den Visualisierungsbefehlen zugewiesen werden.</translation>
     </message>
     <message>
         <source>It is not possible to save the motion path.</source>
@@ -1751,7 +1775,7 @@ Sind Sie sicher?</translation>
     </message>
     <message>
         <source>Remove Link  in Palette : %1</source>
-        <translation>Link entfernen : Palette %1</translation>
+        <translation type="vanished">Link entfernen : Palette %1</translation>
     </message>
     <message>
         <source>Get Color from Studio Palette</source>
@@ -1860,7 +1884,15 @@ Sind Sie sicher?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OpenToonz 1.0</source>
+        <source>OpenToonz 1.1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Reference  in Palette : %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to assign a shortcut with modifiers to the visualization commands.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

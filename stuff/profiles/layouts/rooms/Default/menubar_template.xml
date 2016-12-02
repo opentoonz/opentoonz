@@ -34,6 +34,7 @@
     <separator/>
     <command>MI_OutputSettings</command>
     <command>MI_Render</command>
+    <command>MI_FastRender</command>
     <command>MI_SoundTrack</command>
     <separator/>
     <command>MI_PrintXsheet</command>
@@ -231,6 +232,7 @@
     <command>MI_OpenComboViewer</command>
     <command>MI_OpenXshView</command>
     <command>MI_OpenHistoryPanel</command>
+    <command>MI_AudioRecording</command>
     <separator/>
     <command>MI_ResetRoomLayout</command>
   </menu>

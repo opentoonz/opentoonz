@@ -359,7 +359,7 @@ void PreferencesPopup::onChunkSizeChanged() {
 void PreferencesPopup::onBlankCountChanged() {
   if (m_blanksCount && m_blankColor)
     m_pref->setBlankValues(m_blanksCount->getValue(), m_blankColor->getColor());
-  TApp::instance()->getCurrentScene()->notifyPreferenceChanged();
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("BlankCount");
 }
 
 //-----------------------------------------------------------------------------
@@ -378,7 +378,7 @@ void PreferencesPopup::onBlankColorChanged(const TPixel32 &, bool isDragging) {
 
   if (m_blanksCount && m_blankColor)
     m_pref->setBlankValues(m_blanksCount->getValue(), m_blankColor->getColor());
-  TApp::instance()->getCurrentScene()->notifyPreferenceChanged();
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("BlankColor");
 }
 
 //-----------------------------------------------------------------------------
@@ -923,8 +923,56 @@ void PreferencesPopup::onFfmpegPathChanged() {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onFastRenderPathChanged() {
+  QString text = m_fastRenderPathFileField->getPath();
+  m_pref->setFastRenderPath(text.toStdString());
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onFfmpegTimeoutChanged() {
   m_pref->setFfmpegTimeout(m_ffmpegTimeout->getValue());
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
+  if (checked) {
+    // check if there are any commands with numpadkey shortcuts
+    CommandManager *cm = CommandManager::instance();
+    QList<QAction *> actionsList;
+    for (int key = Qt::Key_0; key <= Qt::Key_9; key++) {
+      std::string str = QKeySequence(key).toString().toStdString();
+      QAction *action = cm->getActionFromShortcut(str);
+      if (action) actionsList.append(action);
+    }
+    QAction *tabAction = cm->getActionFromShortcut("Tab");
+    if (tabAction) actionsList.append(tabAction);
+    tabAction = cm->getActionFromShortcut("Shift+Tab");
+    if (tabAction) actionsList.append(tabAction);
+    // if there are actions using numpad shortcuts, notify to release them.
+    if (!actionsList.isEmpty()) {
+      QString msgStr =
+          tr("Numpad keys are assigned to the following commands.\nIs it OK to "
+             "release these shortcuts?");
+      for (int a = 0; a < actionsList.size(); a++) {
+        msgStr += "\n" + actionsList.at(a)->iconText() + "  (" +
+                  actionsList.at(a)->shortcut().toString() + ")";
+      }
+      int ret = DVGui::MsgBox(msgStr, tr("OK"), tr("Cancel"), 1);
+      if (ret == 2 || ret == 0) {  // canceled
+        m_useNumpadForSwitchingStyles->setChecked(false);
+        return;
+      } else {  // accepted, then release shortcuts
+        for (int a = 0; a < actionsList.size(); a++)
+          cm->setShortcut(actionsList[a], "");
+      }
+    }
+  }
+  m_pref->enableUseNumpadForSwitchingStyles(checked);
+  // emit signal to update Palette and Viewer
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "NumpadForSwitchingStyles");
 }
 
 //**********************************************************************************
@@ -1077,7 +1125,9 @@ PreferencesPopup::PreferencesPopup()
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
   m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
-  m_ffmpegTimeout     = new DVGui::IntLineEdit(this, 30, 1);
+  m_fastRenderPathFileField =
+      new DVGui::FileField(this, QString("desktop"), false, true);
+  m_ffmpegTimeout = new DVGui::IntLineEdit(this, 30, 1);
 
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
@@ -1097,6 +1147,8 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use the TLV Savebox to Limit Filling Operations"), this);
   CheckBox *minimizeSaveboxAfterEditingCB =
       new CheckBox(tr("Minimize Savebox after Editing"), this);
+  m_useNumpadForSwitchingStyles =
+      new CheckBox(tr("Use Numpad and Tab keys for Switching Styles"), this);
 
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
@@ -1299,6 +1351,8 @@ PreferencesPopup::PreferencesPopup()
   //--- Import/Export ------------------------------
   QString path = m_pref->getFfmpegPath();
   m_ffmpegPathFileFld->setPath(path);
+  path = m_pref->getFastRenderPath();
+  m_fastRenderPathFileField->setPath(path);
   m_ffmpegTimeout->setValue(m_pref->getFfmpegTimeout());
 
   //--- Drawing ------------------------------
@@ -1307,6 +1361,8 @@ PreferencesPopup::PreferencesPopup()
   minimizeSaveboxAfterEditingCB->setChecked(
       m_pref->isMinimizeSaveboxAfterEditing());
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
+  m_useNumpadForSwitchingStyles->setChecked(
+      m_pref->isUseNumpadForSwitchingStylesEnabled());
 
   QStringList scanLevelTypes;
   scanLevelTypes << "tif"
@@ -1710,6 +1766,14 @@ PreferencesPopup::PreferencesPopup()
         ioGridLay->addWidget(new QLabel(tr("FFmpeg Timeout:")), 4, 0,
                              Qt::AlignRight);
         ioGridLay->addWidget(m_ffmpegTimeout, 4, 1, 1, 3);
+        ioGridLay->addWidget(new QLabel(" "), 5, 0);
+        ioGridLay->addWidget(
+            new QLabel(tr("Please indicate where you would like "
+                          "exports from Fast Render(MP4) to go.")),
+            6, 0, 1, 4);
+        ioGridLay->addWidget(new QLabel(tr("Fast Render Path: ")), 7, 0,
+                             Qt::AlignRight);
+        ioGridLay->addWidget(m_fastRenderPathFileField, 7, 1, 1, 3);
       }
       ioLay->addLayout(ioGridLay);
       ioLay->addStretch(1);
@@ -1760,6 +1824,9 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(multiLayerStylePickerCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      drawingFrameLay->addWidget(m_useNumpadForSwitchingStyles, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
+
       drawingFrameLay->addStretch(1);
     }
     drawingBox->setLayout(drawingFrameLay);
@@ -2080,6 +2147,8 @@ PreferencesPopup::PreferencesPopup()
   //--- Import/Export ----------------------
   ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onFfmpegPathChanged()));
+  ret = ret && connect(m_fastRenderPathFileField, SIGNAL(pathChanged()), this,
+                       SLOT(onFastRenderPathChanged()));
   ret = ret && connect(m_ffmpegTimeout, SIGNAL(editingFinished()), this,
                        SLOT(onFfmpegTimeoutChanged()));
 
@@ -2105,6 +2174,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_defLevelDpi, SIGNAL(valueChanged()),
                        SLOT(onDefLevelParameterChanged()));
+  ret = ret && connect(m_useNumpadForSwitchingStyles, SIGNAL(clicked(bool)),
+                       SLOT(onUseNumpadForSwitchingStylesClicked(bool)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),

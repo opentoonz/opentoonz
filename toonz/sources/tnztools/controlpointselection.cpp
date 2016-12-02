@@ -873,7 +873,7 @@ void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex,
       m_controlPoints[beforeIndex].m_isCusp = true;
   } else if (!isSpeedOutLinear(beforeIndex) && !isSpeedInLinear(beforeIndex) &&
              !isCusp(beforeIndex)) {
-    t = 1 - abs(w - w0) / abs(w4 - w0);
+    t = 1 - fabs(w - w0) / fabs(w4 - w0);
     moveSingleControlPoint(beforeIndex, t * delta);
     t = 1 - t;
   }
@@ -887,7 +887,7 @@ void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex,
       m_controlPoints[nextIndex].m_isCusp = true;
   } else if (!isSpeedInLinear(nextIndex) && !isSpeedOutLinear(nextIndex) &&
              !isCusp(nextIndex)) {
-    s = 1 - abs(w4 - w) / abs(w4 - w0);
+    s = 1 - fabs(w4 - w) / fabs(w4 - w0);
     moveSingleControlPoint(nextIndex, s * delta);
     s = 1 - s;
   }

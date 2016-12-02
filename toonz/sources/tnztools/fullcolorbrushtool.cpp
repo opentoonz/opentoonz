@@ -184,20 +184,7 @@ void FullColorBrushTool::updateTranslation() {
 void FullColorBrushTool::onActivate() {
   if (!m_notifier) m_notifier = new FullColorBrushToolNotifier(this);
 
-  TTool::Application *app = getApplication();
-
-  if (app->getCurrentObject()->isSpline()) {
-    m_currentColor = TPixel32::Red;
-    return;
-  }
-
-  int styleIndex = app->getCurrentLevelStyleIndex();
-  TPalette *plt  = app->getCurrentPalette()->getPalette();
-  if (plt) {
-    int style               = app->getCurrentLevelStyleIndex();
-    TColorStyle *colorStyle = plt->getStyle(style);
-    m_currentColor          = colorStyle->getMainColor();
-  }
+  updateCurrentColor();
 
   if (m_firstTime) {
     m_firstTime = false;
@@ -270,6 +257,10 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos,
   if (!ri) ri      = (TRasterImageP)touchImage();
 
   if (!ri) return;
+
+  /* update color here since the current style might be switched with numpad
+   * shortcut keys */
+  updateCurrentColor();
 
   TRasterP ras   = ri->getRaster();
   TDimension dim = ras->getSize();
@@ -511,18 +502,8 @@ void FullColorBrushTool::onEnter() {
     m_minThick = 0;
     m_maxThick = 0;
   }
-  Application *app = getApplication();
-  if (app->getCurrentObject()->isSpline()) {
-    m_currentColor = TPixel32::Red;
-    return;
-  }
 
-  TPalette *plt = app->getCurrentPalette()->getPalette();
-  if (!plt) return;
-
-  int style               = app->getCurrentLevelStyleIndex();
-  TColorStyle *colorStyle = plt->getStyle(style);
-  m_currentColor          = colorStyle->getMainColor();
+  updateCurrentColor();
 }
 
 //----------------------------------------------------------------------------------------------------------
@@ -678,6 +659,22 @@ void FullColorBrushTool::removePreset() {
 
   // No parameter change, and set the preset value to custom
   m_preset.setValue(CUSTOM_WSTR);
+}
+
+//------------------------------------------------------------------
+
+void FullColorBrushTool::updateCurrentColor() {
+  TTool::Application *app = getApplication();
+  if (app->getCurrentObject()->isSpline()) {
+    m_currentColor = TPixel32::Red;
+    return;
+  }
+  TPalette *plt = app->getCurrentPalette()->getPalette();
+  if (!plt) return;
+
+  int style               = app->getCurrentLevelStyleIndex();
+  TColorStyle *colorStyle = plt->getStyle(style);
+  m_currentColor          = colorStyle->getMainColor();
 }
 
 //==========================================================================================================

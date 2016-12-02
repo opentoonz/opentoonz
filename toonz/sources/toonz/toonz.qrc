@@ -187,6 +187,7 @@
         <file>Resources/pan.png</file>
         <file>Resources/pause.png</file>
         <file>Resources/pause_click.png</file>
+        <file>Resources/pause_disabled.png</file>
         <file>Resources/pause_over.png</file>
         <file>Resources/pegging_top_arrow.png</file>
         <file>Resources/pegging_topright_arrow.png</file>
@@ -205,6 +206,7 @@
         <file>Resources/plastic_rollover.svg</file>
         <file>Resources/play.png</file>
         <file>Resources/play_click.png</file>
+        <file>Resources/play_disabled.png</file>
         <file>Resources/play_over.png</file>
         <file>Resources/preview_toggle.png</file>
         <file>Resources/previuos_folder.png</file>
@@ -216,6 +218,10 @@
         <file>Resources/pump.png</file>
         <file>Resources/pump.svg</file>
         <file>Resources/pump_rollover.svg</file>
+        <file>Resources/record.png</file>
+        <file>Resources/record_click.png</file>
+        <file>Resources/record_disabled.png</file>
+        <file>Resources/record_over.png</file>
         <file>Resources/render_failed.png</file>
         <file>Resources/render_done.png</file>
         <file>Resources/render_done_with_errors.png</file>
@@ -267,6 +273,10 @@
         <file>Resources/startup.png</file>
         <file>Resources/start_off.png</file>
         <file>Resources/start_on.png</file>
+        <file>Resources/stop.png</file>
+        <file>Resources/stop_click.png</file>
+        <file>Resources/stop_disabled.png</file>
+        <file>Resources/stop_over.png</file>
         <file>Resources/stop_off.png</file>
         <file>Resources/stop_on.png</file>
         <file>Resources/stroke_select.png</file>

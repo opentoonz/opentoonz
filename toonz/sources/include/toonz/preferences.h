@@ -307,6 +307,11 @@ public:
     return m_multiLayerStylePickerEnabled;
   }
 
+  void enableUseNumpadForSwitchingStyles(bool on);
+  bool isUseNumpadForSwitchingStylesEnabled() const {
+    return m_useNumpadForSwitchingStyles;
+  }
+
   // Xsheet  tab
 
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
@@ -406,7 +411,8 @@ public:
   bool getPrecompute() { return m_precompute; }
   void setFfmpegTimeout(int seconds);
   int getFfmpegTimeout() { return m_ffmpegTimeout; }
-
+  void setFastRenderPath(std::string path);
+  QString getFastRenderPath() const { return m_fastRenderPath; }
   // Uncategorized - internals
 
   void setAskForOverrideRender(bool on);
@@ -450,6 +456,7 @@ private:
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
       m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
       m_customProjectRoot;
+  QString m_fastRenderPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
@@ -516,6 +523,8 @@ private:
   std::string m_layerNameEncoding = "SJIS";  // Fixed to SJIS for now. You can
                                              // add interface if you wanna
                                              // change encoding.
+  // whether to use numpad and tab key shortcut for selecting styles
+  bool m_useNumpadForSwitchingStyles;
 
 private:
   Preferences();

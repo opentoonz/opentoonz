@@ -52,7 +52,9 @@ public:
   }
   void notifyNameSceneChange() { emit nameSceneChanged(); }
 
-  void notifyPreferenceChanged() { emit preferenceChanged(); }
+  void notifyPreferenceChanged(const QString &prefName) {
+    emit preferenceChanged(prefName);
+  }
 
   void notifyPixelUnitSelected(bool on) { emit pixelUnitSelected(on); }
 
@@ -76,7 +78,7 @@ signals:
   void castChanged();
   void castFolderAdded(const TFilePath &path);
   void nameSceneChanged();
-  void preferenceChanged();
+  void preferenceChanged(const QString &prefName);
   void pixelUnitSelected(bool on);
 };
 
