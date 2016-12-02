@@ -228,7 +228,7 @@ void SceneViewerPanel::showEvent(QShowEvent *) {
   TObjectHandle *objectHandle  = app->getCurrentObject();
   TXsheetHandle *xshHandle     = app->getCurrentXsheet();
 
-  updateFrameRange();
+  onSceneChanged();
 
   bool ret = true;
 

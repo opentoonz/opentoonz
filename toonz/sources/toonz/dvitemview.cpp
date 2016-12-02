@@ -456,9 +456,9 @@ bool ItemViewPlayWidget::PlayManager::isFrameIndexInRange() {
 //-----------------------------------------------------------------------------
 
 bool ItemViewPlayWidget::PlayManager::setCurrentFrameIndexFromXValue(
-    int xValue, int lenght) {
+    int xValue, int length) {
   if (m_fids.size() == 0) return false;
-  double d     = (double)lenght / (double)(m_fids.size() - 1);
+  double d     = (double)length / (double)(m_fids.size() - 1);
   int newIndex = tround((double)xValue / d);
   if (newIndex == m_currentFidIndex) return false;
   m_currentFidIndex = newIndex;
@@ -468,9 +468,9 @@ bool ItemViewPlayWidget::PlayManager::setCurrentFrameIndexFromXValue(
 
 //-----------------------------------------------------------------------------
 
-double ItemViewPlayWidget::PlayManager::currentFrameIndexToXValue(int lenght) {
+double ItemViewPlayWidget::PlayManager::currentFrameIndexToXValue(int length) {
   if (m_fids.size() == 0) return false;
-  double d = (double)lenght / (double)(m_fids.size() - 1);
+  double d = (double)length / (double)(m_fids.size() - 1);
   return d * m_currentFidIndex;
 }
 
@@ -536,23 +536,23 @@ void ItemViewPlayWidget::setIsPlaying(DvItemListModel *model, int index) {
 
 void ItemViewPlayWidget::setIsPlayingCurrentFrameIndex(DvItemListModel *model,
                                                        int index, int xValue,
-                                                       int lenght) {
+                                                       int length) {
   m_isSliderMode = true;
 
   if (m_currentItemIndex == -1) {
     m_currentItemIndex = index;
     m_playManager->setInfo(model, index);
   }
-  if (!m_playManager->setCurrentFrameIndexFromXValue(xValue, lenght)) return;
+  if (!m_playManager->setCurrentFrameIndexFromXValue(xValue, length)) return;
   stop();  // Devo fare stop prima di cambiare il frame corrente
   play();
 }
 
 //-----------------------------------------------------------------------------
 
-int ItemViewPlayWidget::getCurrentFramePosition(int lenght) {
+int ItemViewPlayWidget::getCurrentFramePosition(int length) {
   if (m_playManager->isFrameIndexInRange())
-    return m_playManager->currentFrameIndexToXValue(lenght);
+    return m_playManager->currentFrameIndexToXValue(length);
   return 0;
 }
 

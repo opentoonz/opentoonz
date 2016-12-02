@@ -33,7 +33,7 @@ $ rpm ...
 (it may include some useless packages)
 
 ```
-dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-devel lz4-devel libusb-devel lzo-devel libjpeg-turbo-devel GLEW libGLEW freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-base qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel blas blas-devel
+dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-devel lz4-devel lzma libusb-devel lzo-devel libjpeg-turbo-devel libGLEW glew-devel freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel qt5-qtmultimedia-devel blas blas-devel
 ```
 
 ### Installing required packages on ArchLinux
@@ -53,7 +53,7 @@ Notes:
 ### Installing required packages on openSUSE
 
 ```
-zypper in boost-devel git cmake gcc-c++ freeglut-devel freetype2-devel glew-devel libjpeg-devel liblz4-devel libqt5-linguist-devel libQt5OpenGL5 libqt5-qtbase-devel libqt5-qtscript-devel libqt5-qtsvg-devel lzo-devel libusb-devel openblas-devel SDL2-devel superlu-devel zlib-devel
+zypper in boost-devel cmake freeglut-devel freetype2-devel gcc-c++ glew-devel libQt5OpenGL-devel libSDL2-devel libjpeg-devel liblz4-devel libpng16-compat-devel libqt5-linguist-devel libqt5-qtbase-devel libqt5-qtmultimedia-devel libqt5-qtscript-devel libqt5-qtsvg-devel libtiff-devel libusb-devel lzo-devel openblas-devel pkgconfig sed superlu-devel zlib-devel
 ```
 
 ## Build instructions
@@ -157,4 +157,16 @@ $ sudo make install
 Then you can launch OpenToonz by running `/opt/opentoonz/bin/opentoonz`.
 
 You can change the installation path by modifying the `CMAKE_INSTALL_PREFIX` CMake variable.
+
+----
+
+# Linux Package Definitions
+
+It may be helpful to use existing packages as a reference when creating a package for your own distribution.
+
+- ArchLinux (AUR):
+  https://aur.archlinux.org/packages/opentoonz-git/
+
+- App-Image (Portable):
+  https://github.com/morevnaproject/morevna-builds
 

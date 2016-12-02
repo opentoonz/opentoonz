@@ -595,7 +595,7 @@ DvDirTreeView {
 /*---------------------------------------------------------------------------*/
 #CleanupSettingsFrame, 
 #LoadLevelFrame,
-#SolidLineFrame{
+#SolidLineFrame {
 	border: 1px solid rgb(20,20,20);
 }
 
@@ -781,6 +781,12 @@ XsheetViewer {
 	qproperty-MeshColumnColor: rgb(200,130,255);
 	qproperty-MeshColumnBorderColor: rgb(105,70,135);
 	qproperty-SelectedMeshColumnColor: rgb(216,180,245);
+	
+	qproperty-SoundColumnColor: rgb(179,193,135);
+	qproperty-SoundColumnBorderColor: rgb(99,120,86);
+	qproperty-SelectedSoundColumnColor: rgb(215,215,180);  
+	qproperty-SoundColumnHlColor: rgb(245,255,230);
+	qproperty-SoundColumnTrackColor: rgb(90,100,45);
 	
 	qproperty-ColumnHeadPastelizer: rgb(255,255,255);
 	qproperty-SelectedColumnHead: rgb(190,210,240);
@@ -1184,4 +1190,15 @@ QDialog #dialogButtonFrame {
 
 #LargeSizedText {
     font-size: 17px;
+}
+
+#GearButton {
+    qproperty-icon: url("@{image_url}/gear.png");
+}
+
+#StartupLabel {
+    padding: 3px;
+	&:hover {
+		.baseBG(light, 10%);
+	}    
 }

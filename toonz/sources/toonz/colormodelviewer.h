@@ -48,6 +48,7 @@ protected:
    * UseCurrentFrameのLevelに移動してきたときに、改めてCurrentFrameを格納しなおす
    * -*/
   void reloadCurrentFrame();
+
 protected slots:
   void showCurrentImage();
 
@@ -61,6 +62,8 @@ protected slots:
    * ツールのTypeに合わせてPickのタイプも変える。それにあわせカーソルも切り替える
    * -*/
   void changePickType();
+
+  void repickFromColorModel();
 
 signals:
   void refImageNotFound();

@@ -199,12 +199,6 @@ protected:
   void zoomInChip();
   void zoomOutChip();
 
-protected slots:
-
-  void toggleLink();
-  void eraseToggleLink();
-  void removeLink();
-
 private:
   DVGui::LineEdit *m_renameTextField;
   QPoint m_dragStartPosition;

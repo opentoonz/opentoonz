@@ -697,7 +697,7 @@ MeshifyPopup::MeshifyPopup()
   // Finally, acquire current selection
   onCellSwitched();
 
-  m_viewer->resize(0, 350);
+  m_viewer->resize(600, 350);
   resize(600, 700);
 }
 

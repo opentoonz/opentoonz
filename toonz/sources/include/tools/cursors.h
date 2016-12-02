@@ -66,6 +66,8 @@ enum {
   PickerCursorWhite,
   PickerCursorWhiteLine,
   PickerCursorWhiteArea,
+  PickerCursorOrganize,
+  PickerCursorWhiteOrganize,
 
   PickerRGB,
   PickerRGBWhite,

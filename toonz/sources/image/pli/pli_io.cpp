@@ -244,9 +244,9 @@ inline MyIfstream &MyIfstream::operator>>(TUINT32 &un) {
 
 inline MyIfstream &MyIfstream::operator>>(string &un) {
   string s = "";
-  USHORT lenght;
-  (*this) >> lenght;
-  for (UINT i = 0; i < lenght; i++) {
+  USHORT length;
+  (*this) >> length;
+  for (UINT i = 0; i < length; i++) {
     UCHAR ch;
     (*this) >> ch;
     s.append(1, ch);
@@ -530,7 +530,7 @@ ParsedPliImp::ParsedPliImp(const TFilePath &filename, bool readInfo)
     , m_precisionScale(REGION_COMPUTING_PRECISION)
     , m_creator("") {
   TUINT32 magic;
-  //  TUINT32 fileLenght;
+  //  TUINT32 fileLength;
   TagElem *tagElem;
   UCHAR maxThickness;
 
@@ -583,9 +583,9 @@ ParsedPliImp::ParsedPliImp(const TFilePath &filename, bool readInfo)
     m_iChan >> m_creator;
 
   if (m_majorVersionNumber < 5) {
-    TUINT32 fileLenght;
+    TUINT32 fileLength;
 
-    m_iChan >> fileLenght;
+    m_iChan >> fileLength;
     m_iChan >> m_framesNumber;
     m_iChan >> maxThickness;
     m_thickRatio = maxThickness / 255.0;
@@ -633,9 +633,9 @@ const TFrameId &ParsedPli::getFrameNumber(int index) {
 
 void ParsedPliImp::loadInfo(bool readPlt, TPalette *&palette,
                             TContentHistory *&history) {
-  TUINT32 fileLenght;
+  TUINT32 fileLength;
 
-  m_iChan >> fileLenght;
+  m_iChan >> fileLength;
   m_iChan >> m_framesNumber;
   if (!((m_majorVersionNumber == 5 && m_minorVersionNumber >= 7) ||
         (m_majorVersionNumber > 5))) {
@@ -1306,7 +1306,7 @@ PliTag *ParsedPliImp::readColorTag() {
 PliTag *ParsedPliImp::readStyleTag() {
   std::vector<TStyleParam> paramArray;
   TUINT32 bufOffs = 0;
-  int lenght      = m_tagLength;
+  int length      = m_tagLength;
   UINT i;
   USHORT id        = 0;
   USHORT pageIndex = 0;
@@ -1315,36 +1315,36 @@ PliTag *ParsedPliImp::readStyleTag() {
   m_currDinamicTypeBytesNum          = 2;
 
   readUShortData(id, bufOffs);
-  lenght -= 2;
+  length -= 2;
   if (m_majorVersionNumber > 5 ||
       (m_majorVersionNumber == 5 && m_minorVersionNumber >= 6)) {
     readUShortData(pageIndex, bufOffs);
-    lenght -= 2;
+    length -= 2;
   }
-  while (lenght > 0) {
+  while (length > 0) {
     TStyleParam param;
 
     param.m_type = (enum TStyleParam::Type)m_buf[bufOffs++];
-    lenght--;
+    length--;
     switch (param.m_type) {
     case TStyleParam::SP_BYTE:
       param.m_numericVal = m_buf[bufOffs++];
-      lenght--;
+      length--;
       break;
     case TStyleParam::SP_USHORT: {
       USHORT val;
       readUShortData(val, bufOffs);
       param.m_numericVal = val;
-      lenght -= 2;
+      length -= 2;
       break;
     }
     case TStyleParam::SP_INT:
     case TStyleParam::SP_DOUBLE:
       readFloatData(param.m_numericVal, bufOffs);
-      lenght -= 4;
+      length -= 4;
       break;
     case TStyleParam::SP_RASTER:
-      lenght -= readRasterData(param.m_r, bufOffs);
+      length -= readRasterData(param.m_r, bufOffs);
       break;
     case TStyleParam::SP_STRING: {
       USHORT strLen;
@@ -1354,7 +1354,7 @@ PliTag *ParsedPliImp::readStyleTag() {
       for (i = 0; i < strLen; i++) {
         param.m_string.append(1, m_buf[bufOffs++]);
       }
-      lenght -= strLen + sizeof(USHORT);
+      length -= strLen + sizeof(USHORT);
       break;
     }
     default:
@@ -2502,7 +2502,7 @@ bool ParsedPliImp::writePli(const TFilePath &filename) {
 
   *m_oChan << m_creator;
 
-  *m_oChan << (TUINT32)0;  // fileLenght;
+  *m_oChan << (TUINT32)0;  // fileLength;
   *m_oChan << m_framesNumber;
 
   UCHAR s, i, d;

@@ -1036,7 +1036,7 @@ DVAPI bool ToonzExt::cornersDetector(const TStroke *stroke, int minDegree,
 
   assert(0.0 <= minSin && minSin <= 1.0);
 
-  // first step remove chunks with null lenght
+  // first step remove chunks with null length
 
   const TThickQuadratic *quad1 = 0, *quad2 = 0;
 

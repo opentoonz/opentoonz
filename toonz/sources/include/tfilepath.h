@@ -177,7 +177,7 @@ If the path is "<alpha>:" a slash will be added*/
   TFilePath getParentDir() const;  // noSlash!;
 
   TFrameId getFrame() const;
-
+  bool isFfmpegType() const;
   bool isLevelName()
       const;  //{return getFrame() == TFrameId(TFrameId::EMPTY_FRAME);};
   bool isAbsolute() const;

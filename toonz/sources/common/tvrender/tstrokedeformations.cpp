@@ -95,7 +95,7 @@ double derivateOfWyvillPotential(double r, double R) {
   return inv_of_R * nine_inv * (68.0 * ratio3 - (24.0 * ratio5 + 66.0 * ratio));
 }
 
-const double c_maxLenghtOfGaussian = 3.0;
+const double c_maxLengthOfGaussian = 3.0;
 
 /*
   */
@@ -274,7 +274,7 @@ TStrokeParamDeformation::TStrokeParamDeformation(const TStroke *ref, double s,
 TThickPoint TStrokeParamDeformation::getDisplacementForControlPoint(
     const TStroke &stroke, UINT n) const {
   // potenziale exp^(-x^2) limitato tra
-  // [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
+  // [-c_maxLengthOfGaussian,c_maxLengthOfGaussian]
   double diff = stroke.getLengthAtControlPoint(n);
 
   diff = diff - m_startParameter;
@@ -283,7 +283,7 @@ TThickPoint TStrokeParamDeformation::getDisplacementForControlPoint(
     //  il termine (1.0/m_lengthOfDeformation) * 3 scala
     //  il punto in diff su un sistema di coordinate
     //  normalizzato, associato con la curva exp^(-x^2)
-    diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+    diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
 
     if (m_vect)
       return gaussianPotential(diff) * TThickPoint(*m_vect, 0);
@@ -299,7 +299,7 @@ TThickPoint TStrokeParamDeformation::getDisplacementForControlPoint(
 TThickPoint TStrokeParamDeformation::getDisplacementForControlPointLen(
     const TStroke &stroke, double cpLenDiff) const {
   // potenziale exp^(-x^2) limitato tra
-  // [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
+  // [-c_maxLengthOfGaussian,c_maxLengthOfGaussian]
   // double  diff =  stroke.getLengthAtControlPoint(n);
   // double  diff =  cpLen;
 
@@ -309,7 +309,7 @@ TThickPoint TStrokeParamDeformation::getDisplacementForControlPointLen(
     //  il termine (1.0/m_lengthOfDeformation) * 3 scala
     //  il punto in diff su un sistema di coordinate
     //  normalizzato, associato con la curva exp^(-x^2)
-    diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+    diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
 
     if (m_vect)
       return gaussianPotential(diff) * TThickPoint(*m_vect, 0);
@@ -327,7 +327,7 @@ TThickPoint TStrokeParamDeformation::getDisplacementForControlPointLen(
 TThickPoint TStrokeParamDeformation::getDisplacement(const TStroke &stroke,
                                                      double w) const {
   // potenziale exp^(-x^2) limitato tra
-  // [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
+  // [-c_maxLengthOfGaussian,c_maxLengthOfGaussian]
   double diff = stroke.getLength(w);
 
   diff = diff - m_startParameter;
@@ -336,7 +336,7 @@ TThickPoint TStrokeParamDeformation::getDisplacement(const TStroke &stroke,
     //  il termine (1.0/m_lengthOfDeformation) * 3 scala
     //  il punto in diff su un sistema di coordinate
     //  normalizzato, associato con la curva exp^(-x^2)
-    diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+    diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
 
     if (m_vect)
       return gaussianPotential(diff) * TThickPoint(*m_vect, 0);
@@ -354,7 +354,7 @@ TThickPoint TStrokeParamDeformation::getDisplacement(const TStroke &stroke,
 double TStrokeParamDeformation::getDelta(const TStroke &stroke,
                                          double w) const {
   // potenziale exp^(-x^2) limitato tra
-  // [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
+  // [-c_maxLengthOfGaussian,c_maxLengthOfGaussian]
   double diff = stroke.getLength(w);
 
   diff = diff - m_startParameter;
@@ -363,7 +363,7 @@ double TStrokeParamDeformation::getDelta(const TStroke &stroke,
     //  il termine (1.0/m_lengthOfDeformation) * 3 scala
     //  il punto in diff su un sistema di coordinate
     //  normalizzato, associato con la curva exp^(-x^2)
-    diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+    diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
 
     return derivateOfGaussianPotential(diff);
   }
@@ -430,7 +430,7 @@ double TStrokeBenderDeformation::getMaxDiff() const {
 TThickPoint TStrokeBenderDeformation::getDisplacementForControlPoint(
     const TStroke &s, UINT n) const {
   // potenziale exp^(-x^2) limitato tra
-  // [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
+  // [-c_maxLengthOfGaussian,c_maxLengthOfGaussian]
   double strokeLengthAtParameter = s.getLengthAtControlPoint(n);
   double diff                    = strokeLengthAtParameter - m_startLength;
 
@@ -438,11 +438,11 @@ TThickPoint TStrokeBenderDeformation::getDisplacementForControlPoint(
     double outVal = 0;
 
     if (fabs(diff) <= m_lengthOfDeformation && m_versus == INNER) {
-      diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+      diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
       outVal = gaussianPotential(diff);
     } else if (m_versus == OUTER) {
-      double valForGaussian = -c_maxLenghtOfGaussian +
-                              2 * c_maxLenghtOfGaussian /
+      double valForGaussian = -c_maxLengthOfGaussian +
+                              2 * c_maxLengthOfGaussian /
                                   m_lengthOfDeformation *
                                   strokeLengthAtParameter;
       outVal = 1.0 - gaussianPotential(valForGaussian);
@@ -472,7 +472,7 @@ TThickPoint TStrokeBenderDeformation::getDisplacementForControlPointLen(
 TThickPoint TStrokeBenderDeformation::getDisplacement(const TStroke &s,
                                                       double w) const {
   // potenziale exp^(-x^2) limitato tra
-  // [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
+  // [-c_maxLengthOfGaussian,c_maxLengthOfGaussian]
   double strokeLengthAtParameter = s.getLength(w);
   double diff                    = strokeLengthAtParameter - m_startLength;
 
@@ -481,11 +481,11 @@ TThickPoint TStrokeBenderDeformation::getDisplacement(const TStroke &s,
 
     if (fabs(diff) <= m_lengthOfDeformation)
       if (m_versus == INNER) {
-        diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+        diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
         outVal = gaussianPotential(diff);
       } else if (m_versus == OUTER) {
-        double valForGaussian = -c_maxLenghtOfGaussian +
-                                2 * c_maxLenghtOfGaussian /
+        double valForGaussian = -c_maxLengthOfGaussian +
+                                2 * c_maxLengthOfGaussian /
                                     m_lengthOfDeformation *
                                     strokeLengthAtParameter;
         outVal = 1.0 - gaussianPotential(valForGaussian);
@@ -507,10 +507,10 @@ TThickPoint TStrokeBenderDeformation::getDisplacement(const TStroke &s,
 //-----------------------------------------------------------------------------
 
 double TStrokeBenderDeformation::getDelta(const TStroke &s, double w) const {
-  double totalLenght = s.getLength();
+  double totalLength = s.getLength();
 
-  if (totalLenght != 0) {
-    double val = s.getLength(w) / totalLenght * (M_PI * 10.0);
+  if (totalLength != 0) {
+    double val = s.getLength(w) / totalLength * (M_PI * 10.0);
 
     return sin(val);
   }
@@ -564,11 +564,11 @@ vector<DoublePair>  vres;
 
 if(intersect( stroke, m_center, m_outerRadius, vres))
 {
-double totalLenght = stroke.getLength();
+double totalLength = stroke.getLength();
 
-if(totalLenght != 0)
+if(totalLength != 0)
 {
-double val =  stroke.getLength(s)/totalLenght * (M_PI * 11.0);
+double val =  stroke.getLength(s)/totalLength * (M_PI * 11.0);
 
 return sin(val);
 }
@@ -615,7 +615,7 @@ TStrokeThicknessDeformation::TStrokeThicknessDeformation(const TStroke *ref,
 TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPoint(
     const TStroke &stroke, UINT n) const {
   // potenziale exp^(-x^2) limitato tra
-  // [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
+  // [-c_maxLengthOfGaussian,c_maxLengthOfGaussian]
   double diff = stroke.getLengthAtControlPoint(n);
 
   diff = diff - m_startParameter;
@@ -625,7 +625,7 @@ TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPoint(
     //  il termine (1.0/m_lengthOfDeformation) * 3 scala
     //  il punto in diff su un sistema di coordinate
     //  normalizzato, associato con la curva exp^(-x^2)
-    diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+    diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
 
     TThickPoint delta;
 
@@ -651,7 +651,7 @@ TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPointLen(
     //  il termine (1.0/m_lengthOfDeformation) * 3 scala
     //  il punto in diff su un sistema di coordinate
     //  normalizzato, associato con la curva exp^(-x^2)
-    diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+    diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
 
     TThickPoint delta;
 
@@ -673,7 +673,7 @@ TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPointLen(
 TThickPoint TStrokeThicknessDeformation::getDisplacement(const TStroke &stroke,
                                                          double w) const {
   // potenziale exp^(-x^2) limitato tra
-  // [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
+  // [-c_maxLengthOfGaussian,c_maxLengthOfGaussian]
   double diff = stroke.getLength(w);
 
   diff = diff - m_startParameter;
@@ -683,7 +683,7 @@ TThickPoint TStrokeThicknessDeformation::getDisplacement(const TStroke &stroke,
     //  il termine (1.0/m_lengthOfDeformation) * 3 scala
     //  il punto in diff su un sistema di coordinate
     //  normalizzato, associato con la curva exp^(-x^2)
-    diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+    diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
 
     if (m_vect)
       return gaussianPotential(diff) * TThickPoint(*m_vect, 0);
@@ -701,7 +701,7 @@ TThickPoint TStrokeThicknessDeformation::getDisplacement(const TStroke &stroke,
 double TStrokeThicknessDeformation::getDelta(const TStroke &stroke,
                                              double w) const {
   // potenziale exp^(-x^2) limitato tra
-  // [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
+  // [-c_maxLengthOfGaussian,c_maxLengthOfGaussian]
   double diff = stroke.getLength(w);
 
   diff = diff - m_startParameter;
@@ -711,7 +711,7 @@ double TStrokeThicknessDeformation::getDelta(const TStroke &stroke,
     //  il termine (1.0/m_lengthOfDeformation) * 3 scala
     //  il punto in diff su un sistema di coordinate
     //  normalizzato, associato con la curva exp^(-x^2)
-    diff *= (1.0 / m_lengthOfDeformation) * c_maxLenghtOfGaussian;
+    diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
 
     return derivateOfGaussianPotential(diff);
   }

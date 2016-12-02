@@ -214,7 +214,8 @@ public:
     eFilledRaster    = 0x4000000,  // Used only in LineTest
     eDefineLoadBox   = 0x8000000,
     eUseLoadBox      = 0x10000000,
-    eEnd             = 0x20000000
+    eLocator         = 0x20000000,
+    eEnd             = 0x40000000
   };
 
   static const UINT cFullConsole = eEnd - 1;
