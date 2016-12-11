@@ -288,8 +288,19 @@ elseif(UNIX)
     find_package(GLEW)
 
     find_package(SuperLU REQUIRED)
-    set(SUPERLU_INCLUDE_DIR ${SUPERLU_INCLUDE_DIR}/superlu)
+    set(SUPERLU_INCLUDE_DIR ${SUPERLU_INCLUDE_DIR})
     set(SUPERLU_LIB ${SUPERLU_LIBRARY})
+    set(SUPERLU_NO_THIRDPARTY ${SUPERLU_NO_THIRDPARTY})
+    set(SUPERLU_VERSION ${SUPERLU_VERSION})
+    if (SUPERLU_NO_THIRDPARTY)
+        #If we are using system (from upstream) SuperLU we need version >= 5
+        if (${SUPERLU_VERSION} VERSION_LESS "5")
+            message("[VERSION CHECK] SuperLU version 5.0.0 or greater required. Update your SuperLU package, thanks.")
+            return()
+        endif()
+        add_definitions(-DSUPERLU_NO_THIRDPARTY)
+    endif()
+
 
     find_package(JPEG REQUIRED)
 
