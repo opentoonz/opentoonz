@@ -37,7 +37,11 @@ else()
     #Get the version of Superlu. We need >= 5.0.0
     if (SUPERLU_INCLUDE_DIR)
         file(STRINGS "${SUPERLU_INCLUDE_DIR}/slu_util.h" SUPERLU_VERSION REGEX "#define SUPERLU_MAJOR_VERSION.+[0-9]+")
-        string(REGEX MATCH "[0-9]+" SUPERLU_VERSION ${SUPERLU_VERSION})
+        if(SUPERLU_VERSION)
+            string(REGEX MATCH "[0-9]+" SUPERLU_VERSION ${SUPERLU_VERSION})
+        else()
+            set(SUPERLU_VERSION "0")
+        endif()
     endif()
 endif()
 
