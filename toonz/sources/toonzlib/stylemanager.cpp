@@ -228,6 +228,6 @@ void CustomStyleManager::loadItems() {
   }
 
   // For each (now new) file entry, generate a fetching task
-  for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++)
-    m_executor.addTask(new StyleLoaderTask(this, *it));
+  for (auto &&e : fps)
+    m_executor.addTask(new StyleLoaderTask(this, e));
 }

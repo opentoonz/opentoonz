@@ -536,9 +536,9 @@ void ThumbnailViewer::loadDirectory(const TFilePath &dirPath,
   fps = TSystem::packLevelNames(fps);
   fps.sort();
 
-  for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++) {
+  for (auto &&e : fps) {
     try {
-      TFilePath fp = *it;
+      TFilePath fp = e;
       if (fp.getType() == "bmp" && fp.getName().find("_icon") != string::npos)
         continue;
       if (std::find(fileTypes.begin(), fileTypes.end(), fp.getType()) ==
@@ -547,7 +547,7 @@ void ThumbnailViewer::loadDirectory(const TFilePath &dirPath,
       Thumbnail *item = FileThumbnail::create(m_iconBox.getSize(), fp);
       if (item) m_items.push_back(item);
     } catch (...) {
-      TMessage::error(toString(it->getWideString()) + ": can't read thumbnail");
+      TMessage::error(toString(e.getWideString()) + ": can't read thumbnail");
     }
   }
   updateContentSize();

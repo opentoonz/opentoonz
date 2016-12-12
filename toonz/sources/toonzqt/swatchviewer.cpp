@@ -859,18 +859,15 @@ void SwatchCacheManager::setFx(const TFxP &fx) {
   if (m_currEditedFxResult) m_currEditedFxResult->releaseLock();
   m_currEditedFxResult = TCacheResourceP();
 
-  std::set<TCacheResourceP>::iterator it;
-  for (it = m_swatchCacheContainer.begin(); it != m_swatchCacheContainer.end();
-       ++it)
-    (*it)->releaseLock();
+  for (auto &&e : m_swatchCacheContainer)
+    e->releaseLock();
   m_swatchCacheContainer.clear();
 
 #ifdef USE_SQLITE_HDPOOL
   TCacheResourcePool::instance()->releaseReferences("S");
 #else
-  for (it = m_genericCacheContainer.begin();
-       it != m_genericCacheContainer.end(); ++it)
-    (*it)->releaseLock();
+  for (auto &&e : m_genericCacheContainer)
+    e->releaseLock();
   m_genericCacheContainer.clear();
 #endif
 }
@@ -885,10 +882,8 @@ void SwatchCacheManager::clearSwatchResults() {
   if (m_currEditedFxResult) m_currEditedFxResult->releaseLock();
   m_currEditedFxResult = TCacheResourceP();
 
-  std::set<TCacheResourceP>::iterator it;
-  for (it = m_swatchCacheContainer.begin(); it != m_swatchCacheContainer.end();
-       ++it)
-    (*it)->releaseLock();
+  for (auto &&e : m_swatchCacheContainer)
+    e->releaseLock();
   m_swatchCacheContainer.clear();
 }
 

@@ -50,12 +50,9 @@ void copyStylesWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle,
   TPalette::Page *page = palette->getPage(pageIndex);
   assert(page);
   StyleData *data = new StyleData();
-  std::set<int>::iterator it;
-  for (it = styleIndicesInPage->begin(); it != styleIndicesInPage->end();
-       ++it) {
-    int indexInPage    = *it;
-    int styleId        = page->getStyleId(indexInPage);
-    TColorStyle *style = page->getStyle(indexInPage);
+  for (auto &&e : *styleIndicesInPage) {
+    int styleId        = page->getStyleId(e);
+    TColorStyle *style = page->getStyle(e);
     if (!style) continue;
     TColorStyle *newStyle = style->clone();
     data->addStyle(styleId, newStyle);
@@ -313,10 +310,8 @@ public:
     if (m_selection && m_palette.getPointer() == paletteHandle->getPalette()) {
       m_selection->selectNone();
       m_selection->select(m_pageIndex);
-      std::set<int>::iterator it;
-      for (it = styleIndicesInPage.begin(); it != styleIndicesInPage.end();
-           ++it)
-        m_selection->select(m_pageIndex, *it, true);
+      for (auto &&e : styleIndicesInPage)
+        m_selection->select(m_pageIndex, e, true);
       m_selection->makeCurrent();
     }
   }
@@ -371,10 +366,8 @@ public:
     if (m_selection && m_palette.getPointer() == paletteHandle->getPalette()) {
       m_selection->selectNone();
       m_selection->select(m_pageIndex);
-      std::set<int>::iterator it;
-      for (it = styleIndicesInPage.begin(); it != styleIndicesInPage.end();
-           ++it)
-        m_selection->select(m_pageIndex, *it, true);
+      for (auto &&e : styleIndicesInPage)
+        m_selection->select(m_pageIndex, e, true);
 
       m_selection->makeCurrent();
     }
@@ -444,10 +437,8 @@ public:
     if (m_selection && m_palette.getPointer() == paletteHandle->getPalette()) {
       m_selection->selectNone();
       m_selection->select(m_pageIndex);
-      std::set<int>::iterator it;
-      for (it = styleIndicesInPage.begin(); it != styleIndicesInPage.end();
-           ++it)
-        m_selection->select(m_pageIndex, *it, true);
+      for (auto &&e : styleIndicesInPage)
+        m_selection->select(m_pageIndex, e, true);
       m_selection->makeCurrent();
     }
 
@@ -597,17 +588,14 @@ void TStyleSelection::cutStyles() {
   if (palette->isLocked()) return;
 
   StyleData *data = new StyleData();
-  std::set<int>::iterator it;
   TPalette::Page *page = palette->getPage(m_pageIndex);
   std::vector<int> styleIds;
-  for (it = m_styleIndicesInPage.begin(); it != m_styleIndicesInPage.end();
-       ++it) {
-    int j       = *it;
-    int styleId = page->getStyleId(j);
+  for (auto &&e : m_styleIndicesInPage) {
+    int styleId = page->getStyleId(e);
     if (styleId < 0) continue;
-    TColorStyle *style = page->getStyle(j)->clone();
+    TColorStyle *style = page->getStyle(e)->clone();
     data->addStyle(styleId, style);
-    styleIds.push_back(page->getStyleId(*it));
+    styleIds.push_back(page->getStyleId(e));
   }
 
   std::unique_ptr<TUndo> undo(new CutStylesUndo(this, data, oldData));
@@ -667,17 +655,14 @@ void TStyleSelection::deleteStyles() {
   if (getStyleCount() == 0) return;
 
   StyleData *data = new StyleData();
-  std::set<int>::iterator it;
   TPalette::Page *page = palette->getPage(m_pageIndex);
   std::vector<int> styleIds;
-  for (it = m_styleIndicesInPage.begin(); it != m_styleIndicesInPage.end();
-       ++it) {
-    int j       = *it;
-    int styleId = page->getStyleId(j);
+  for (auto &&e :  m_styleIndicesInPage) {
+    int styleId = page->getStyleId(e);
     if (styleId < 0) continue;
-    TColorStyle *style = page->getStyle(j)->clone();
+    TColorStyle *style = page->getStyle(e)->clone();
     data->addStyle(styleId, style);
-    styleIds.push_back(page->getStyleId(*it));
+    styleIds.push_back(page->getStyleId(e));
   }
 
   TUndoScopedBlock undoBlock;
@@ -830,9 +815,8 @@ public:
 
   void addItemToInsert(const std::set<int> styleIndicesInPage) {
     TPalette::Page *page = getPalette()->getPage(m_pageIndex);
-    std::set<int>::const_iterator it;
-    for (it = styleIndicesInPage.begin(); it != styleIndicesInPage.end(); it++)
-      m_itemsInserted.push_back(new Item(*it, page->getStyle(*it)));
+    for (const auto & e : styleIndicesInPage)
+      m_itemsInserted.push_back(new Item(e, page->getStyle(e)));
   }
 
   void pasteValue(int styleId, const TColorStyle *newStyle) const {
@@ -977,10 +961,8 @@ public:
                                  indexInPage + 1, m_pageIndex,
                                  &styleIndicesInPage);
 
-      std::set<int>::iterator styleIt;
-      for (styleIt = styleIndicesInPage.begin();
-           styleIt != styleIndicesInPage.end(); ++styleIt)
-        m_selection->select(m_pageIndex, *styleIt, true);
+      for (auto &&e : styleIndicesInPage)
+        m_selection->select(m_pageIndex, e, true);
 
       delete newData;
     }
@@ -1161,10 +1143,8 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor) {
                                &styleIndicesInPage);
     undo->addItemToInsert(styleIndicesInPage);
 
-    std::set<int>::iterator styleIt;
-    for (styleIt = styleIndicesInPage.begin();
-         styleIt != styleIndicesInPage.end(); ++styleIt)
-      m_styleIndicesInPage.insert(*styleIt);
+    for (auto &&e : styleIndicesInPage)
+      m_styleIndicesInPage.insert(e);
 
     delete newData;
   }
@@ -1294,12 +1274,11 @@ void TStyleSelection::blendStyles() {
 
   std::vector<TColorStyle *> styles;
   std::vector<std::pair<int, TColorStyle *>> oldStyles;
-  for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
-       it != m_styleIndicesInPage.end(); ++it) {
-    TColorStyle *cs = page->getStyle(*it);
+  for (auto &&e : m_styleIndicesInPage) {
+    TColorStyle *cs = page->getStyle(e);
     assert(cs);
     styles.push_back(cs);
-    oldStyles.push_back(std::pair<int, TColorStyle *>(*it, cs->clone()));
+    oldStyles.push_back(std::pair<int, TColorStyle *>(e, cs->clone()));
   }
   assert(styles.size() >= 2);
 
@@ -1430,9 +1409,7 @@ void TStyleSelection::toggleLink() {
   UndoLinkToStudioPalette *undo =
       new UndoLinkToStudioPalette(m_paletteHandle, m_pageIndex);
 
-  for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
-       it != m_styleIndicesInPage.end(); ++it) {
-    int index       = *it;
+  for (auto &&index : m_styleIndicesInPage) {
     TColorStyle *cs = page->getStyle(index);
     assert(cs);
     std::wstring name  = cs->getGlobalName();
@@ -1445,7 +1422,7 @@ void TStyleSelection::toggleLink() {
     }
     undo->setColorStyle(index, oldCs, name);
 
-    if (*it ==
+    if (index ==
         palette->getPage(m_pageIndex)->search(m_paletteHandle->getStyleIndex()))
       currentStyleIsInSelection = true;
   }
@@ -1489,9 +1466,7 @@ void TStyleSelection::eraseToggleLink() {
   UndoLinkToStudioPalette *undo =
       new UndoLinkToStudioPalette(m_paletteHandle, m_pageIndex);
 
-  for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
-       it != m_styleIndicesInPage.end(); ++it) {
-    int index       = *it;
+  for (auto &&index : m_styleIndicesInPage) {
     TColorStyle *cs = page->getStyle(index);
     assert(cs);
     TColorStyle *oldCs = cs->clone();
@@ -1499,7 +1474,7 @@ void TStyleSelection::eraseToggleLink() {
     if (name != L"" && (name[0] == L'-' || name[0] == L'+'))
       cs->setGlobalName(L"");
     undo->setColorStyle(index, oldCs, L"");
-    if (*it ==
+    if (index ==
         palette->getPage(m_pageIndex)->search(m_paletteHandle->getStyleIndex()))
       currentStyleIsInSelection = true;
   }
@@ -1521,9 +1496,8 @@ void TStyleSelection::toggleKeyframe(int frame) {
   int n                = m_styleIndicesInPage.size();
   TPalette::Page *page = palette->getPage(m_pageIndex);
   assert(page);
-  for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
-       it != m_styleIndicesInPage.end(); ++it) {
-    int styleId = page->getStyleId(*it);
+  for (auto &&e : m_styleIndicesInPage) {
+    int styleId = page->getStyleId(e);
     palette->setKeyframe(styleId, frame);
   }
 }
@@ -1613,13 +1587,12 @@ void TStyleSelection::removeLink() {
 
   UndoRemoveLink *undo = new UndoRemoveLink(m_paletteHandle, m_pageIndex);
 
-  for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
-       it != m_styleIndicesInPage.end(); ++it) {
-    TColorStyle *cs = page->getStyle(*it);
+  for (auto &&e : m_styleIndicesInPage) {
+    TColorStyle *cs = page->getStyle(e);
     assert(cs);
 
     if (cs->getGlobalName() != L"" || cs->getOriginalName() != L"") {
-      undo->setColorStyle(*it, cs);
+      undo->setColorStyle(e, cs);
 
       cs->setGlobalName(L"");
       cs->setOriginalName(L"");
@@ -1662,9 +1635,8 @@ public:
     // non si puo' modificare il BG
     if (pageIndex == 0) indices.erase(0);
     styles.reserve(indices.size());
-    for (std::set<int>::iterator it = indices.begin(); it != indices.end();
-         ++it)
-      styles.push_back(page->getStyle(*it));
+    for (auto &&e : indices)
+      styles.push_back(page->getStyle(e));
   }
 
   int getSize() const override {
@@ -1734,9 +1706,8 @@ void TStyleSelection::getBackOriginalStyle() {
   TUndo *undo = new getBackOriginalStyleUndo(this);
 
   // for each selected style
-  for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
-       it != m_styleIndicesInPage.end(); ++it) {
-    TColorStyle *cs = page->getStyle(*it);
+  for (auto &&e : m_styleIndicesInPage) {
+    TColorStyle *cs = page->getStyle(e);
     assert(cs);
     std::wstring gname = cs->getGlobalName();
 
@@ -1779,7 +1750,7 @@ void TStyleSelection::getBackOriginalStyle() {
       // do not change the style name
       spStyle->setName(cs->getName());
 
-      palette->setStyle(page->getStyleId(*it), spStyle);
+      palette->setStyle(page->getStyleId(e), spStyle);
 
       somethingChanged = true;
     }
@@ -1808,9 +1779,8 @@ bool TStyleSelection::hasLinkedStyle() {
   assert(page);
 
   // for each selected style
-  for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
-       it != m_styleIndicesInPage.end(); ++it) {
-    TColorStyle *cs    = page->getStyle(*it);
+  for (auto &&e : m_styleIndicesInPage) {
+    TColorStyle *cs    = page->getStyle(e);
     std::wstring gname = cs->getGlobalName();
     // if the style has link, return true
     if (gname != L"" && (gname[0] == L'-' || gname[0] == L'+')) return true;

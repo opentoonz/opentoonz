@@ -2140,10 +2140,10 @@ void TextureStyleChooserPage::loadItems() {
   }
   if (fps.empty()) return;
   int count = 0;
-  for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++)
-    if (TFileType::getInfo(*it) == TFileType::RASTER_IMAGE) {
+  for (auto &&e : fps)
+    if (TFileType::getInfo(e) == TFileType::RASTER_IMAGE) {
       try {
-        loadTexture(*it);
+        loadTexture(e);
         ++count;
       } catch (...) {
       }

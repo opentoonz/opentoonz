@@ -522,9 +522,8 @@ public:
 
     std::set<TFrameId> frames = m_frames;
 
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
-      TImageP image    = m_level->getFrame(*it, true);
+    for (auto const &e : m_frames) {
+      TImageP image    = m_level->getFrame(e, true);
       TRasterImageP ri = image;
       TToonzImageP ti  = image;
       if (ti) {
@@ -552,7 +551,7 @@ public:
         TPoint pos = box.getP00();
         TRasterCM32P app = ras;
         TRop::over(ti->getRaster(), app, pos, affine);
-        ToolUtils::updateSaveBox(m_level, *it);
+        ToolUtils::updateSaveBox(m_level, e);
       } else if (ri) {
         TRasterP ras;
         double dpiX, dpiY;
@@ -665,13 +664,12 @@ public:
       // Faccio remove dei frame incollati
       removeFramesWithoutUndo(m_level, frames);
     } else {
-      std::set<TFrameId>::const_iterator it;
-      for (it = m_frames.begin(); it != m_frames.end(); it++) {
-        TVectorImageP img = m_level->getFrame(*it, true);
+      for (auto const &e : m_frames) {
+        TVectorImageP img = m_level->getFrame(e, true);
         assert(img);
         if (!img) continue;
         std::map<TFrameId, std::set<int>>::const_iterator mapIt =
-            m_indices.find(*it);
+            m_indices.find(e);
         if (mapIt == m_indices.end()) continue;
         std::set<int> imageIndices = mapIt->second;
         ;
@@ -706,9 +704,8 @@ public:
     }
 
     std::set<TFrameId> frames = m_frames;
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
-      TVectorImageP img = m_level->getFrame(*it, true);
+    for (auto const &e : m_frames) {
+      TVectorImageP img = m_level->getFrame(e, true);
       assert(img);
       if (!img) continue;
       std::set<int> app;
@@ -1265,9 +1262,8 @@ void FilmstripCmd::renumber(
   if (table.empty()) return;
 
   // table:src->dst; check that src is a fid of the level
-  std::vector<std::pair<TFrameId, TFrameId>>::const_iterator it;
-  for (it = table.begin(); it != table.end(); ++it) {
-    TFrameId srcFid = it->first;
+  for (auto const &e : table) {
+    TFrameId srcFid = e.first;
     if (!sl->isFid(srcFid)) {
       // todo: error messages
       return;
@@ -1279,12 +1275,13 @@ void FilmstripCmd::renumber(
   sl->getFids(fids);
   std::set<TFrameId> tmp;
   for (int i = 0; i < (int)fids.size(); i++) tmp.insert(fids[i]);
-  for (it = table.begin(); it != table.end(); ++it) tmp.erase(it->first);
+  for (auto const &e : table) tmp.erase(e.first);
 
   // fids contain the new numbering of all the level drawings
   // (note: fids can be not ordered)
   for (int i = 0; i < (int)fids.size(); i++) {
     TFrameId srcFid = fids[i];
+    std::vector<std::pair<TFrameId, TFrameId>>::const_iterator it;
     for (it = table.begin(); it != table.end() && it->first != srcFid; ++it) {
     }
     if (it != table.end()) {
@@ -1600,9 +1597,8 @@ void insertEmptyFilmstripFrames(const TXshSimpleLevelP &sl,
                                 const std::set<TFrameId> &frames) {
   if (!sl || frames.empty()) return;
   makeSpaceForFids(sl.getPointer(), frames);
-  std::set<TFrameId>::const_iterator it;
-  for (it = frames.begin(); it != frames.end(); ++it)
-    sl->setFrame(*it, sl->createEmptyFrame());
+  for (auto const &e : frames)
+    sl->setFrame(e, sl->createEmptyFrame());
   invalidateIcons(sl.getPointer(), frames);
   sl->setDirtyFlag(true);
   //  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -1622,9 +1618,8 @@ public:
                         std::vector<TFrameId> oldFrames)
       : m_level(level), m_frames(frames), m_oldFrames(oldFrames) {
     if (m_level->getType() == TZP_XSHLEVEL) {
-      std::set<TFrameId>::iterator it;
-      for (it = m_frames.begin(); it != m_frames.end(); it++) {
-        TToonzImageP img = m_level->getFrame(*it, true);
+      for (auto &&e : m_frames) {
+        TToonzImageP img = m_level->getFrame(e, true);
         // TImageCache::instance()->add("UndoInsertEmptyFrames"+QString::number((UINT)this),
         // img);
         TImageCache::instance()->add(

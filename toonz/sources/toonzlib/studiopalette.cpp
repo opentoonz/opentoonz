@@ -127,8 +127,7 @@ TFilePath searchPalette(TFilePath path, std::wstring paletteId) {
   } catch (...) {
   }
 
-  for (TFilePathSet::iterator i = q.begin(); i != q.end(); ++i) {
-    TFilePath fp = *i;
+  for (auto &&fp : q) {
     if (fp.getType() == "tpl") {
       std::wstring gname = readPaletteGlobalName(fp);
       if (gname == paletteId) return fp;
@@ -279,8 +278,8 @@ int StudioPalette::getChildren(std::vector<TFilePath> &fps,
     }
   }
 
-  for (TFilePathSet::iterator i = q.begin(); i != q.end(); ++i)
-    if (isFolder(*i) || isPalette(*i)) fps.push_back(*i);
+  for (auto &&e : q)
+    if (isFolder(e) || isPalette(e)) fps.push_back(e);
   //  fps.push_back(m_root+"butta.tpl");
   return fps.size();
 }
@@ -616,24 +615,21 @@ void StudioPalette::removeListener(Listener *listener) {
 //-------------------------------------------------------------------
 
 void StudioPalette::notifyTreeChange() {
-  for (std::vector<Listener *>::iterator it = m_listeners.begin();
-       it != m_listeners.end(); ++it)
-    (*it)->onStudioPaletteTreeChange();
+  for (auto &&e : m_listeners)
+    e->onStudioPaletteTreeChange();
 }
 
 //-------------------------------------------------------------------
 
 void StudioPalette::notifyMove(const TFilePath &dstPath,
                                const TFilePath &srcPath) {
-  for (std::vector<Listener *>::iterator it = m_listeners.begin();
-       it != m_listeners.end(); ++it)
-    (*it)->onStudioPaletteMove(dstPath, srcPath);
+  for (auto &&e : m_listeners)
+    e->onStudioPaletteMove(dstPath, srcPath);
 }
 
 //-------------------------------------------------------------------
 
 void StudioPalette::notifyPaletteChange(const TFilePath &palette) {
-  for (std::vector<Listener *>::iterator it = m_listeners.begin();
-       it != m_listeners.end(); ++it)
-    (*it)->onStudioPaletteChange(palette);
+  for (auto &&e : m_listeners)
+    e->onStudioPaletteChange(palette);
 }

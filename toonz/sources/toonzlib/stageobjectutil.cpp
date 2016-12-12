@@ -47,10 +47,8 @@ TStageObjectValues::TStageObjectValues(TStageObjectId id,
 
 void TStageObjectValues::add(TStageObject::Channel actionId) {
   bool isFound = false;
-  std::vector<Channel>::iterator it;
-  for (it = m_channels.begin(); it != m_channels.end(); ++it) {
-    TStageObjectValues::Channel ch = *it;
-    if (ch.m_actionId == actionId) {
+  for (auto &&e : m_channels) {
+    if (e.m_actionId == actionId) {
       isFound = true;
       break;
     }
@@ -65,12 +63,11 @@ void TStageObjectValues::updateValues() {
   if (m_objectId == TStageObjectId::NoneId)
     m_objectId = m_objectHandle->getObjectId();
   m_frame      = m_frameHandle->getFrame();
-  std::vector<Channel>::iterator it;
 
-  for (it = m_channels.begin(); it != m_channels.end(); ++it) {
+  for (auto &&e : m_channels) {
     TDoubleParam *param =
-        xsh->getStageObject(m_objectId)->getParam(it->m_actionId);
-    it->setValue(param->getValue(m_frame));
+        xsh->getStageObject(m_objectId)->getParam(e.m_actionId);
+    e.setValue(param->getValue(m_frame));
   }
 }
 
@@ -89,12 +86,11 @@ TStageObject *getAncestor(TStageObjectTree *tree, TStageObject *obj) {
 //-----------------------
 void TStageObjectValues::applyValues(bool undoEnabled) const {
   TXsheet *xsh = m_xsheetHandle->getXsheet();
-  std::vector<Channel>::const_iterator it;
-  for (it = m_channels.begin(); it != m_channels.end(); ++it) {
+  for (auto const &e : m_channels) {
     TStageObject *pegbar = xsh->getStageObject(m_objectId);
 
     TDoubleParam *param =
-        pegbar->getParam((TStageObject::Channel)it->m_actionId);
+        pegbar->getParam((TStageObject::Channel)e.m_actionId);
     if (!param->isKeyframe(m_frame)) {
       KeyframeSetter setter(param, -1,
                             undoEnabled);  // Deve essere registrato l'undo
@@ -103,7 +99,7 @@ void TStageObjectValues::applyValues(bool undoEnabled) const {
     int indexKeyframe = param->getClosestKeyframe(m_frame);
     KeyframeSetter setter(param, indexKeyframe,
                           false);  // Non deve essere registrato l'undo
-    setter.setValue(it->getValue());
+    setter.setValue(e.getValue());
   }
   //--- Permette l'undo per l'interpolazione con la cinematica inversa
   TStageObjectTree *tree = xsh->getStageObjectTree();

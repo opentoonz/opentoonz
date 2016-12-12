@@ -47,16 +47,15 @@ public:
       , m_objHandle(objHandle)
       , m_fxHandle(fxHandle)
       , m_pastedPos(pastedPos) {
-    std::vector<TStageObjectId>::const_iterator it;
-    for (it = m_pastedId.begin(); it != m_pastedId.end(); it++) {
-      if (it->isColumn()) {
+    for (auto const &e : m_pastedId) {
+      if (e.isColumn()) {
         TXsheet *xsh       = m_xshHandle->getXsheet();
-        TXshColumnP column = xsh->getColumn(it->getIndex());
+        TXshColumnP column = xsh->getColumn(e.getIndex());
         assert(column);
         TFx *columnFx = column->getFx();
         int i;
         for (i = 0; i < columnFx->getOutputConnectionCount(); i++)
-          m_columnFxConnections[*it].append(columnFx->getOutputConnection(i));
+          m_columnFxConnections[e].append(columnFx->getOutputConnection(i));
       }
     }
   }
