@@ -45,3 +45,4 @@ Older versions and unstable nightly build are also available at <https://github.
 ### Special Thanks
 
 This Open Source Program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome Italy
+a
