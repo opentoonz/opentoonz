@@ -528,7 +528,7 @@ void RenameCellField::showInRowCol(int row, int col) {
                         m_viewer->getFrameNumberWithLetters(fid.getNumber()));
     else {
       std::string frameNumber("");
-      if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
+      if (fid.getNumber() >= 0) frameNumber = std::to_string(fid.getNumber());
       if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
       setText((frameNumber.empty())
                   ? QString::fromStdWString(levelName)
@@ -637,13 +637,7 @@ void RenameCellField::renameCell() {
 
   TXshCell cell(xl, fid);
 
-  if (fid.getNumber() == 0) {
-    TCellSelection::Range range = cellSelection->getSelectedCells();
-    cellSelection->deleteCells();
-    // revert cell selection
-    cellSelection->selectCells(range.m_r0, range.m_c0, range.m_r1, range.m_c1);
-  } else
-    cellSelection->renameCells(cell);
+  cellSelection->renameCells(cell);
 }
 
 //-----------------------------------------------------------------------------
@@ -1175,7 +1169,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     else {
       std::string frameNumber("");
       // set number
-      if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
+      if (fid.getNumber() >= 0) frameNumber = std::to_string(fid.getNumber());
       // add letter
       if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
       p.drawText(nameRect, Qt::AlignRight, QString::fromStdString(frameNumber));

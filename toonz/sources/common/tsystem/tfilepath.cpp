@@ -633,7 +633,7 @@ TFrameId TFilePath::getFrame() const {
   char letter                  = '\0';
   if (iswalpha(str[k])) letter = str[k++] + ('a' - L'a');
 
-  if (number == 0 || k < i)  // || letter!='\0')
+  if (k < i)  // || letter!='\0')
     throw(::to_string(m_path) + ": malformed frame name.");
   return TFrameId(number, letter);
 }
