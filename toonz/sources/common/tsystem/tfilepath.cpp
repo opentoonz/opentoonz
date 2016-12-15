@@ -24,6 +24,9 @@ const char wauxslash = '\\';
 #include <cctype>
 #include <sstream>
 
+// QT
+#include <QObject>
+
 bool TFilePath::m_underscoreFormatAllowed = true;
 
 namespace {
@@ -634,7 +637,10 @@ TFrameId TFilePath::getFrame() const {
   if (iswalpha(str[k])) letter = str[k++] + ('a' - L'a');
 
   if (number == 0 || k < i)  // || letter!='\0')
-    throw(::to_string(m_path) + ": malformed frame name.");
+    throw TMalformedFrameException(
+        *this,
+        str + L": " + QObject::tr("Malformed frame name").toStdWString());
+
   return TFrameId(number, letter);
 }
 

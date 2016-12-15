@@ -599,6 +599,18 @@ void FileBrowser::refreshCurrentFolderItems() {
     m_multiFileItemMap.clear();
 
     for (it = all_files.begin(); it != all_files.end(); it++) {
+      TFrameId tFrameId;
+      try {
+        tFrameId = it->getFrame();
+      } catch (TMalformedFrameException tmfe) {
+        // Incorrect frame name sequence. Warning to the user in the message
+        // center.
+        DVGui::warning(QString::fromStdWString(
+            tmfe.getMessage() + L": " +
+            QObject::tr("Skipping frame.").toStdWString()));
+        continue;
+      }
+
       TFilePath levelName(it->getLevelName());
 
       if (levelName.isLevelName()) {
@@ -618,7 +630,7 @@ void FileBrowser::refreshCurrentFolderItems() {
         levelItem.m_fileSize += fileInfo.size();
 
         // store frameId
-        levelItem.m_frameIds.push_back(it->getFrame());
+        levelItem.m_frameIds.push_back(tFrameId);
 
         levelItem.m_frameCount++;
       }
