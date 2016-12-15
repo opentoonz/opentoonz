@@ -1196,7 +1196,7 @@ QString XsheetViewer::getFrameNumberWithLetters(int frame) {
   } else
     number = "0";
 
-  return number.append(letter);
+  return (QChar(letter).isNull()) ? number : number.append(letter);
 }
 //-----------------------------------------------------------------------------
 
