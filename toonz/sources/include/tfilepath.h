@@ -44,19 +44,19 @@ public:
     UNDERSCORE_NO_PAD
   };  // pippo_1.tif
 
-  TFrameId(int f = EMPTY_FRAME) : m_frame(f), m_letter(0){};
-  TFrameId(int f, char c) : m_frame(f), m_letter(c){};
+  TFrameId(int f = EMPTY_FRAME) : m_frame(f), m_letter(0) {}
+  TFrameId(int f, char c) : m_frame(f), m_letter(c) {}
 
   inline bool operator==(const TFrameId &f) const {
     return f.m_frame == m_frame && f.m_letter == m_letter;
-  };
+  }
   inline bool operator!=(const TFrameId &f) const {
     return (m_frame != f.m_frame || m_letter != f.m_letter);
-  };
+  }
   inline bool operator<(const TFrameId &f) const {
     return (m_frame < f.m_frame ||
             (m_frame == f.m_frame && m_letter < f.m_letter));
-  };
+  }
   inline bool operator>(const TFrameId &f) const { return f < *this; }
   inline bool operator>=(const TFrameId &f) const { return !operator<(f); }
   inline bool operator<=(const TFrameId &f) const { return !operator>(f); }
@@ -68,15 +68,15 @@ public:
     m_frame  = f.m_frame;
     m_letter = f.m_letter;
     return *this;
-  };
+  }
 
-  bool isEmptyFrame() const { return m_frame == EMPTY_FRAME; };
-  bool isNoFrame() const { return m_frame == NO_FRAME; };
+  bool isEmptyFrame() const { return m_frame == EMPTY_FRAME; }
+  bool isNoFrame() const { return m_frame == NO_FRAME; }
 
   // operator string() const;
   std::string expand(FrameFormat format = FOUR_ZEROS) const;
-  int getNumber() const { return m_frame; };
-  char getLetter() const { return m_letter; };
+  int getNumber() const { return m_frame; }
+  char getLetter() const { return m_letter; }
 };
 
 //-----------------------------------------------------------------------------
@@ -121,7 +121,7 @@ If the path is "<alpha>:" a slash will be added*/
   explicit TFilePath(const std::wstring &path);
   explicit TFilePath(const QString &path);
 
-  ~TFilePath(){};
+  ~TFilePath() {}
   TFilePath(const TFilePath &fp) : m_path(fp.m_path) {}
   TFilePath &operator=(const TFilePath &fp) {
     m_path = fp.m_path;
@@ -158,7 +158,7 @@ If the path is "<alpha>:" a slash will be added*/
       Returns "" if there is no filename extension.*/
   std::string getType() const {
     return getUndottedType();
-  };  // ritorna l'estensione SENZA PUNTO
+  }  // ritorna l'estensione SENZA PUNTO
   /*!Returns the base filename (no extension, no dots, no slash)*/
   std::string getName() const;       // noDot! noSlash!
   std::wstring getWideName() const;  // noDot! noSlash!
@@ -182,7 +182,7 @@ If the path is "<alpha>:" a slash will be added*/
       const;  //{return getFrame() == TFrameId(TFrameId::EMPTY_FRAME);};
   bool isAbsolute() const;
   bool isRoot() const;
-  bool isEmpty() const { return m_path == L""; };
+  bool isEmpty() const { return m_path == L""; }
 
   /*!Return a TFilePath with extension type.
 type is a string that indicate the filename extension(ex:. bmp or .bmp)*/
@@ -199,29 +199,29 @@ type is a string that indicate the filename extension(ex:. bmp or .bmp)*/
   TFilePath withFrame(const TFrameId &frame, TFrameId::FrameFormat format =
                                                  TFrameId::FOUR_ZEROS) const;
   /*!Return a TFilePath with a frame identified by an integer number "f".*/
-  TFilePath withFrame(int f) const { return withFrame(TFrameId(f)); };
+  TFilePath withFrame(int f) const { return withFrame(TFrameId(f)); }
   /*!Return a TFilePath with a frame identified by an integer and by a
    * character*/
   TFilePath withFrame(int f, char letter) const {
     return withFrame(TFrameId(f, letter));
-  };
+  }
 
   TFilePath withFrame() const {
     return withFrame(TFrameId(TFrameId::EMPTY_FRAME));
-  };
+  }
   TFilePath withNoFrame() const {
     return withFrame(TFrameId(TFrameId::NO_FRAME));
-  };  // pippo.tif
+  }  // pippo.tif
 
   TFilePath operator+(const TFilePath &fp) const;
   TFilePath &operator+=(const TFilePath &fp) /*{*this=*this+fp;return *this;}*/;
 
   inline TFilePath operator+(const std::string &s) const {
     return operator+(TFilePath(s));
-  };
+  }
   inline TFilePath &operator+=(const std::string &s) {
     return operator+=(TFilePath(s));
-  };
+  }
 
   TFilePath &operator+=(const std::wstring &s);
   TFilePath operator+(const std::wstring &s) const {
