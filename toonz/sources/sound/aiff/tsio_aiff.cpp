@@ -457,7 +457,9 @@ TSoundTrackWriterAiff::TSoundTrackWriterAiff(const TFilePath &fp)
 //------------------------------------------------------------------------------
 
 bool TSoundTrackWriterAiff::save(const TSoundTrackP &st) {
-  assert(st);
+  if (!st)
+    throw TException(L"Unable to save the soundtrack: " +
+                     m_path.getWideString());
 
   TSoundTrackP sndtrack;
   if (st->getBitPerSample() == 8 && !st->isSampleSigned())

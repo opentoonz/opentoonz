@@ -14,6 +14,8 @@
 #include "toonz/preferences.h"
 #include "tpalette.h"
 
+#include "tmsgcore.h"
+
 #include "tconvert.h"
 #include "tlogger.h"
 #include "tsystem.h"
@@ -429,7 +431,8 @@ void SceneSound::save() {
       TSystem::copyFile(actualFp, m_oldActualPath);
     }
   } catch (...) {
-    TLogger::error() << "Can't save " << actualFp;
+    DVGui::warning(QObject::tr("Can't save") +
+                   QString::fromStdWString(L": " + actualFp.getLevelNameW()));
   }
 }
 
