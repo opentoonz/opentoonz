@@ -5,6 +5,7 @@
 #include "tiio.h"
 #include "tcontenthistory.h"
 #include "tconvert.h"
+#include "tmsgcore.h"
 
 // STD includes
 #include <map>
@@ -118,8 +119,13 @@ TLevelP TLevelReader::loadInfo() {
       try {
         level->setFrame(it->getFrame(), TImageP());
         data.push_back(*it);
-      } catch (string msg) {
-        throw msg;
+      } catch (TMalformedFrameException tmfe) {
+        // skip frame named incorrectly warning to the user in the message
+        // center.
+        DVGui::warning(QString::fromStdWString(
+            tmfe.getMessage() + L": " +
+            QObject::tr("Skipping frame.").toStdWString()));
+        continue;
       }
     }
   }
