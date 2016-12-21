@@ -247,6 +247,7 @@ Preferences::Preferences()
     , m_defLevelType(0)
     , m_autocreationType(1)
     , m_autoExposeEnabled(true)
+    , m_sequenceCanStartWith0(false)
     , m_autoCreateEnabled(true)
     , m_subsceneFolderEnabled(true)
     , m_generatedMovieViewEnabled(true)
@@ -311,6 +312,7 @@ Preferences::Preferences()
       QString::fromStdWString(savePath.getWideString()), QSettings::IniFormat));
 
   getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
+  getValue(*m_settings, "sequenceCanStartWith0", m_sequenceCanStartWith0);
   getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
   getValue(*m_settings, "subsceneFolderEnabled", m_subsceneFolderEnabled);
   getValue(*m_settings, "generatedMovieViewEnabled",
@@ -591,6 +593,13 @@ Preferences *Preferences::instance() {
 void Preferences::enableAutoExpose(bool on) {
   m_autoExposeEnabled = on;
   m_settings->setValue("autoExposeEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableSequenceCanStartWith0(bool on) {
+  m_sequenceCanStartWith0 = on;
+  m_settings->setValue("sequenceCanStartWith0", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

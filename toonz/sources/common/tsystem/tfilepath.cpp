@@ -20,6 +20,7 @@ const char wauxslash = '\\';
 
 #include "tfilepath.h"
 #include "tconvert.h"
+#include "toonz/preferences.h"
 #include <cmath>
 #include <cctype>
 #include <sstream>
@@ -633,7 +634,9 @@ TFrameId TFilePath::getFrame() const {
   char letter                  = '\0';
   if (iswalpha(str[k])) letter = str[k++] + ('a' - L'a');
 
-  if (k < i)  // || letter!='\0')
+  // Check if user wants to start a sequence in 0
+  if ((!Preferences::instance()->isSequenceCanStartWith0() && number == 0) ||
+      k < i)  // || letter!='\0')
     throw(::to_string(m_path) + ": malformed frame name.");
   return TFrameId(number, letter);
 }

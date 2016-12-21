@@ -470,6 +470,12 @@ void PreferencesPopup::onSubsceneFolderChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onSequenceCanStartWith0Changed(int index) {
+  m_pref->enableSequenceCanStartWith0(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onViewGeneratedMovieChanged(int index) {
   m_pref->enableGeneratedMovieView(index == Qt::Checked);
 }
@@ -1162,6 +1168,8 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Ignore Alpha Channel on Levels in Column 1"), this);
   CheckBox *showKeyframesOnCellAreaCB =
       new CheckBox(tr("Show Keyframes on Cell Area"), this);
+  m_sequenceCanStartWith0CB =
+      new CheckBox(tr("A sequence can start with 0"), this);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1416,6 +1424,7 @@ PreferencesPopup::PreferencesPopup()
   ignoreAlphaonColumn1CB->setChecked(m_pref->isIgnoreAlphaonColumn1Enabled());
   showKeyframesOnCellAreaCB->setChecked(
       m_pref->isShowKeyframesOnXsheetCellAreaEnabled());
+  m_sequenceCanStartWith0CB->setChecked(m_pref->isSequenceCanStartWith0());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -1856,11 +1865,12 @@ PreferencesPopup::PreferencesPopup()
 
       xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 3, 0, 1, 2);
       xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
+      xsheetFrameLay->addWidget(m_sequenceCanStartWith0CB, 5, 0, 1, 2);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
     xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(5, 1);
+    xsheetFrameLay->setRowStretch(6, 1);
     xsheetBox->setLayout(xsheetFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
@@ -2188,6 +2198,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDragCellsBehaviourChanged(int)));
   ret = ret && connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onShowKeyframesOnCellAreaChanged(int)));
+  ret = ret && connect(m_sequenceCanStartWith0CB, SIGNAL(stateChanged(int)),
+                       this, SLOT(onSequenceCanStartWith0Changed(int)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

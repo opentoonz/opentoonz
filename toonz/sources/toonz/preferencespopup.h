@@ -74,6 +74,8 @@ private:
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles;
 
+  DVGui::CheckBox *m_sequenceCanStartWith0CB;
+
   DVGui::FileField *m_customProjectRootFileField;
 
   DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField;
@@ -99,6 +101,7 @@ private slots:
   void onViewValuesChanged();
   void onAutoExposeChanged(int index);
   void onSubsceneFolderChanged(int index);
+  void onSequenceCanStartWith0Changed(int index);
   void onViewGeneratedMovieChanged(int index);
   void onXsheetStepChanged();
   void onXsheetAutopanChanged(int index);

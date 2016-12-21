@@ -452,8 +452,13 @@ TImage *TTool::touchImage() {
     m_isLevelCreated = true;
 
     // create the drawing
-    TFrameId fid = animationSheetEnabled ? getNewFrameId(sl, row) : TFrameId(1);
-    TImageP img  = sl->createEmptyFrame();
+    // we check if user wants start sequences with 0
+    TFrameId fid =
+        animationSheetEnabled
+            ? getNewFrameId(sl, row)
+            : TFrameId(Preferences::instance()->isSequenceCanStartWith0() ? 0
+                                                                          : 1);
+    TImageP img      = sl->createEmptyFrame();
     m_isFrameCreated = true;
     sl->setFrame(fid, img);
     cell = TXshCell(sl, fid);

@@ -165,9 +165,11 @@ LevelCreatePopup::LevelCreatePopup()
     : Dialog(TApp::instance()->getMainWindow(), true, true, "LevelCreate") {
   setWindowTitle(tr("New Level"));
 
-  m_nameFld     = new LineEdit(this);
-  m_fromFld     = new DVGui::IntLineEdit(this);
-  m_toFld       = new DVGui::IntLineEdit(this);
+  m_nameFld = new LineEdit(this);
+  m_fromFld = new DVGui::IntLineEdit(
+      this, Preferences::instance()->isSequenceCanStartWith0() ? 0 : 1);
+  m_toFld = new DVGui::IntLineEdit(
+      this, Preferences::instance()->isSequenceCanStartWith0() ? 0 : 1);
   m_stepFld     = new DVGui::IntLineEdit(this);
   m_incFld      = new DVGui::IntLineEdit(this);
   m_levelTypeOm = new QComboBox();

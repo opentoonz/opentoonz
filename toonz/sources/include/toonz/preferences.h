@@ -234,6 +234,9 @@ public:
   void enableSubsceneFolder(bool on);
   bool isSubsceneFolderEnabled() const { return m_subsceneFolderEnabled; }
 
+  void enableSequenceCanStartWith0(bool on);
+  bool isSequenceCanStartWith0() const { return m_sequenceCanStartWith0; }
+
   int addLevelFormat(const LevelFormat &format);  //!< Inserts a new level
                                                   //! format.  \return  The
   //! associated format index.
@@ -475,12 +478,12 @@ private:
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
       m_shmmax, m_shmseg, m_shmall, m_shmmni;
 
-  bool m_autoExposeEnabled, m_autoCreateEnabled, m_subsceneFolderEnabled,
-      m_generatedMovieViewEnabled, m_xsheetAutopanEnabled,
-      m_ignoreAlphaonColumn1Enabled, m_previewAlwaysOpenNewFlipEnabled,
-      m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
-      m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
-      m_defaultViewerEnabled, m_pixelsOnly;
+  bool m_autoExposeEnabled, m_autoCreateEnabled, m_sequenceCanStartWith0,
+      m_subsceneFolderEnabled, m_generatedMovieViewEnabled,
+      m_xsheetAutopanEnabled, m_ignoreAlphaonColumn1Enabled,
+      m_previewAlwaysOpenNewFlipEnabled, m_rewindAfterPlaybackEnabled,
+      m_fitToFlipbookEnabled, m_autosaveEnabled, m_autosaveSceneEnabled,
+      m_autosaveOtherFilesEnabled, m_defaultViewerEnabled, m_pixelsOnly;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
