@@ -1049,6 +1049,16 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   TXshCell cell = xsh->getCell(row, col);
   TXshCell prevCell;
 
+  // If the user change the option to start a sequence with 0 to 1 in-live, we
+  // delete all cell and frame 0 of the actual Xsheet
+  if (!Preferences::instance()->isSequenceCanStartWith0() &&
+      cell.getFrameId().getNumber() == 0) {
+    cell.getSimpleLevel()->eraseFrame(TFrameId(0));
+    xsh->clearCells(row, col);
+    cell.getSimpleLevel()->setDirtyFlag(true);
+    return;
+  }
+
   TCellSelection *cellSelection     = m_viewer->getCellSelection();
   TColumnSelection *columnSelection = m_viewer->getColumnSelection();
   bool isSelected                   = cellSelection->isCellSelected(row, col) ||
