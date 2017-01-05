@@ -100,6 +100,7 @@ inline std::ostream &operator<<(std::ostream &out, const TFrameId &f) {
    constructor.*/
 class DVAPI TFilePath {
   static bool m_underscoreFormatAllowed;
+  static bool m_sequenceCanStartWith0;
   std::wstring m_path;
   void setPath(std::wstring path);
 
@@ -108,6 +109,10 @@ public:
    * pippo_0001.tif (represented  always as pippo..tif) */
   static void setUnderscoreFormatAllowed(bool state) {
     m_underscoreFormatAllowed = state;
+  }
+
+  static void setSequenceCanStartWith0(bool state) {
+    m_sequenceCanStartWith0 = state;
   }
 
   /*!This constructor creates a string removing redundances ('//', './',etc.)

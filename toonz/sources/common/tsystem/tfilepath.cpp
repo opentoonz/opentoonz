@@ -20,7 +20,6 @@ const char wauxslash = '\\';
 
 #include "tfilepath.h"
 #include "tconvert.h"
-#include "toonz/preferences.h"
 #include <cmath>
 #include <cctype>
 #include <sstream>
@@ -29,6 +28,7 @@ const char wauxslash = '\\';
 #include <QObject>
 
 bool TFilePath::m_underscoreFormatAllowed = true;
+bool TFilePath::m_sequenceCanStartWith0   = false;
 
 namespace {
 
@@ -638,8 +638,7 @@ TFrameId TFilePath::getFrame() const {
   if (iswalpha(str[k])) letter = str[k++] + ('a' - L'a');
 
   // Check if user wants to start a sequence in 0
-  if ((!Preferences::instance()->isSequenceCanStartWith0() && number == 0) ||
-      k < i)  // || letter!='\0')
+  if ((!m_sequenceCanStartWith0 && number == 0) || k < i)  // || letter!='\0')
     throw TMalformedFrameException(
         *this,
         str + L": " + QObject::tr("Malformed frame name").toStdWString());

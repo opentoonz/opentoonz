@@ -313,6 +313,7 @@ Preferences::Preferences()
 
   getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
   getValue(*m_settings, "sequenceCanStartWith0", m_sequenceCanStartWith0);
+  TFilePath::setSequenceCanStartWith0(m_sequenceCanStartWith0);
   getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
   getValue(*m_settings, "subsceneFolderEnabled", m_subsceneFolderEnabled);
   getValue(*m_settings, "generatedMovieViewEnabled",
@@ -600,6 +601,7 @@ void Preferences::enableAutoExpose(bool on) {
 void Preferences::enableSequenceCanStartWith0(bool on) {
   m_sequenceCanStartWith0 = on;
   m_settings->setValue("sequenceCanStartWith0", on ? "1" : "0");
+  TFilePath::setSequenceCanStartWith0(on);
 }
 
 //-----------------------------------------------------------------
