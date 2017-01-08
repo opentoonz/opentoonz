@@ -688,6 +688,11 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
   connect(setStartMarker, SIGNAL(triggered()), SLOT(onSetStartMarker()));
   QAction *setStopMarker = menu->addAction(tr("Set Stop Marker"));
   connect(setStopMarker, SIGNAL(triggered()), SLOT(onSetStopMarker()));
+
+  QAction *setAutoMarkers = menu->addAction(tr("Set Auto Markers"));
+  connect(setAutoMarkers, SIGNAL(triggered()), SLOT(onSetAutoMarkers()));
+  setAutoMarkers->setEnabled(canSetAutoMarkers());
+
   QAction *removeMarkers = menu->addAction(tr("Remove Markers"));
   connect(removeMarkers, SIGNAL(triggered()), SLOT(onRemoveMarkers()));
 
@@ -716,6 +721,32 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
   menu->addAction(cmdManager->getAction(MI_ResetShift));
 
   menu->exec(event->globalPos());
+}
+
+//-----------------------------------------------------------------------------
+// Checks if there is a cell non empty at current row and column to enable the
+// auto markers item-menu.
+bool RowArea::canSetAutoMarkers() {
+  TXshCell cell =
+      m_viewer->getXsheet()->getCell(m_row, m_viewer->getCurrentColumn());
+  return cell.isEmpty() ? false : true;
+}
+
+//-----------------------------------------------------------------------------
+int RowArea::getNonEmptyCell(int row, int column, Direction direction) {
+  int currentPos = row;
+  bool exit      = false;
+
+  while (!exit) {
+    TXshCell cell = m_viewer->getXsheet()->getCell(currentPos, column);
+    if (cell.isEmpty()) {
+      (direction == up) ? currentPos++ : currentPos--;
+      exit = true;
+    } else
+      (direction == up) ? currentPos-- : currentPos++;
+  }
+
+  return currentPos;
 }
 
 //-----------------------------------------------------------------------------
@@ -793,6 +824,20 @@ void RowArea::onPreviewThis() {
   int r0, r1, step;
   getPlayRange(r0, r1, step);
   setPlayRange(m_row, m_row, step);
+  update();
+}
+
+// Set the playing markers to the continuous block of the cell pointed by
+// current row and column
+void RowArea::onSetAutoMarkers() {
+  int currentColumn = m_viewer->getCurrentColumn();
+
+  int top    = getNonEmptyCell(m_row, currentColumn, Direction::up);
+  int bottom = getNonEmptyCell(m_row, currentColumn, Direction::down);
+
+  int r0, r1, step;
+  getPlayRange(r0, r1, step);
+  setPlayRange(top, bottom, step);
   update();
 }
 
