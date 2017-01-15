@@ -72,7 +72,7 @@ private:
       *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
-      *m_useNumpadForSwitchingStyles;
+      *m_useNumpadForSwitchingStyles, *m_showNewLevelButtons;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -170,6 +170,7 @@ private slots:
   void onFfmpegTimeoutChanged();
   void onFastRenderPathChanged();
   void onUseNumpadForSwitchingStylesClicked(bool);
+  void onShowNewLevelButtonsClicked(bool);
 };
 
 //**********************************************************************************

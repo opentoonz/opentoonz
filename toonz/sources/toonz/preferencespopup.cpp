@@ -975,6 +975,12 @@ void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
       "NumpadForSwitchingStyles");
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onShowNewLevelButtonsClicked(bool checked) {
+  m_pref->enableShowNewLevelButtons(checked);
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1149,6 +1155,10 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Minimize Savebox after Editing"), this);
   m_useNumpadForSwitchingStyles =
       new CheckBox(tr("Use Numpad and Tab keys for Switching Styles"), this);
+  m_showNewLevelButtons =
+      new CheckBox(tr("Show Buttons for Creating New Levels in the XSheet "
+                      "(Requires Restart)"),
+                   this);
 
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
@@ -1363,7 +1373,7 @@ PreferencesPopup::PreferencesPopup()
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
   m_useNumpadForSwitchingStyles->setChecked(
       m_pref->isUseNumpadForSwitchingStylesEnabled());
-
+  m_showNewLevelButtons->setChecked(m_pref->isShowNewLevelButtonsEnabled());
   QStringList scanLevelTypes;
   scanLevelTypes << "tif"
                  << "png";
@@ -1826,6 +1836,8 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(m_useNumpadForSwitchingStyles, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      drawingFrameLay->addWidget(m_showNewLevelButtons, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
 
       drawingFrameLay->addStretch(1);
     }
@@ -2176,6 +2188,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_useNumpadForSwitchingStyles, SIGNAL(clicked(bool)),
                        SLOT(onUseNumpadForSwitchingStylesClicked(bool)));
+  ret = ret && connect(m_showNewLevelButtons, SIGNAL(clicked(bool)),
+                       SLOT(onShowNewLevelButtonsClicked(bool)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),

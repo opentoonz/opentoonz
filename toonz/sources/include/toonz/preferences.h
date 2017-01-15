@@ -312,6 +312,8 @@ public:
     return m_useNumpadForSwitchingStyles;
   }
 
+  void enableShowNewLevelButtons(bool on);
+  bool isShowNewLevelButtonsEnabled() const { return m_showNewLevelButtons; }
   // Xsheet  tab
 
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
@@ -480,7 +482,7 @@ private:
       m_ignoreAlphaonColumn1Enabled, m_previewAlwaysOpenNewFlipEnabled,
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
-      m_defaultViewerEnabled, m_pixelsOnly;
+      m_defaultViewerEnabled, m_pixelsOnly, m_showNewLevelButtons;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,

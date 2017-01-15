@@ -297,7 +297,8 @@ Preferences::Preferences()
     , m_fastRenderPath("desktop")
     , m_ffmpegTimeout(30)
     , m_shortcutPreset("defopentoonz")
-    , m_useNumpadForSwitchingStyles(true) {
+    , m_useNumpadForSwitchingStyles(true)
+    , m_showNewLevelButtons(false) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -571,6 +572,7 @@ Preferences::Preferences()
   setShortcutPreset(m_shortcutPreset.toStdString());
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "showNewLevelButtons", m_showNewLevelButtons);
 }
 
 //-----------------------------------------------------------------
@@ -1342,4 +1344,11 @@ int Preferences::matchLevelFormat(const TFilePath &fp) const {
 void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
   m_useNumpadForSwitchingStyles = on;
   m_settings->setValue("useNumpadForSwitchingStyles", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableShowNewLevelButtons(bool on) {
+  m_showNewLevelButtons = on;
+  m_settings->setValue("showNewLevelButtons", on ? "1" : "0");
 }
