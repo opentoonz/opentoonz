@@ -434,7 +434,7 @@ ShortcutPopup::ShortcutPopup()
       presetLay->addWidget(m_savePresetButton, 0);
       presetLay->addWidget(m_deletePresetButton, 0);
     }
-	presetBox->setLayout(presetLay);
+    presetBox->setLayout(presetLay);
     m_topLayout->addWidget(presetBox, 0, Qt::AlignCenter);
     m_topLayout->addSpacing(10);
     QHBoxLayout *exportLay = new QHBoxLayout();
