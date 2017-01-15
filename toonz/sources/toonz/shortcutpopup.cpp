@@ -35,7 +35,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QTextStream>
-#include <QGroupbox>
+#include <QGroupBox>
 
 // STD includes
 #include <vector>
