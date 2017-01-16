@@ -126,7 +126,7 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 
   // FlipConsole
   int buttons = FlipConsole::cFullConsole;
-  buttons &= (~FlipConsole::eSound);
+  // buttons &= (~FlipConsole::eSound);
   buttons &= (~FlipConsole::eFilledRaster);
   buttons &= (~FlipConsole::eDefineLoadBox);
   buttons &= (~FlipConsole::eUseLoadBox);
@@ -162,7 +162,7 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
   m_flipConsole->enableButton(FlipConsole::eGRed, false, false);
   m_flipConsole->enableButton(FlipConsole::eGGreen, false, false);
   m_flipConsole->enableButton(FlipConsole::eGBlue, false, false);
-  m_flipConsole->enableButton(FlipConsole::eSound, false, true);
+  // m_flipConsole->enableButton(FlipConsole::eSound, false, false);
 
   m_flipConsole->setFrameRate(app->getCurrentScene()
                                   ->getScene()
@@ -174,6 +174,9 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
   bool ret = true;
 
   // When zoom changed, only if the viewer is active, change window title.
+  ret =
+      ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
+                     this, SLOT(onButtonPressed(FlipConsole::EGadget)));
   ret = connect(m_sceneViewer, SIGNAL(onZoomChanged()),
                 SLOT(changeWindowTitle()));
   ret = ret && connect(m_sceneViewer, SIGNAL(previewToggled()),
@@ -194,6 +197,9 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
                        SLOT(updateTabFocus()));
 
   assert(ret);
+
+  m_flipConsole->setChecked(FlipConsole::eSound, true);
+  m_playSound = m_flipConsole->isChecked(FlipConsole::eSound);
 
   // note: initializeTitleBar() refers to m_sceneViewer
   initializeTitleBar(getTitleBar());
@@ -580,6 +586,12 @@ void ComboViewerPanel::onXshLevelSwitched(TXshLevel *) {
 //-----------------------------------------------------------------------------
 
 void ComboViewerPanel::onPlayingStatusChanged(bool playing) {
+  if (playing) {
+    m_playing = true;
+  } else {
+    m_playing = false;
+    m_first   = true;
+  }
   if (Preferences::instance()->getOnionSkinDuringPlayback()) return;
   OnionSkinMask osm =
       TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
@@ -721,6 +733,7 @@ void ComboViewerPanel::onSceneChanged() {
   // update the key frames
   if (m_keyFrameButton && (m_keyFrameButton->getCurrentFrame() != frameIndex))
     m_keyFrameButton->setCurrentFrame(frameIndex);
+  hasSoundtrack();
 }
 
 //-----------------------------------------------------------------------------
@@ -742,6 +755,14 @@ void ComboViewerPanel::onFrameChanged() {
   m_flipConsole->setCurrentFrame(frameIndex + 1);
   if (m_keyFrameButton && (m_keyFrameButton->getCurrentFrame() != frameIndex))
     m_keyFrameButton->setCurrentFrame(frameIndex);
+
+  if (m_playing && m_playSound) {
+    if (m_first == true && hasSoundtrack()) {
+      playAudioFrame(frameIndex);
+    } else if (m_hasSoundtrack) {
+      playAudioFrame(frameIndex);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -792,4 +813,50 @@ void ComboViewerPanel::onPreferenceChanged(const QString &prefName) {
     m_flipConsole->onPreferenceChanged();
 
   StyleShortcutSwitchablePanel::onPreferenceChanged(prefName);
+}
+
+void ComboViewerPanel::playAudioFrame(int frame) {
+  if (m_first) {
+    m_first = false;
+    m_fps   = TApp::instance()
+                ->getCurrentScene()
+                ->getScene()
+                ->getProperties()
+                ->getOutputProperties()
+                ->getFrameRate();
+    m_samplesPerFrame = m_sound->getSampleRate() / abs(m_fps);
+  }
+  if (!m_sound) return;
+  m_viewerFps = m_flipConsole->getCurrentFps();
+  double s0 = frame * m_samplesPerFrame, s1 = s0 + m_samplesPerFrame;
+  // make the sound stop if the viewerfps is higher so the next sound can play
+  // on time.
+  if (m_fps < m_viewerFps)
+    TApp::instance()->getCurrentXsheet()->getXsheet()->stopScrub();
+  TApp::instance()->getCurrentXsheet()->getXsheet()->play(m_sound, s0, s1,
+                                                          false);
+}
+
+bool ComboViewerPanel::hasSoundtrack() {
+  if (m_sound != NULL) {
+    m_sound         = NULL;
+    m_hasSoundtrack = false;
+    m_first         = true;
+  }
+  TXsheetHandle *xsheetHandle    = TApp::instance()->getCurrentXsheet();
+  TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
+  m_sound                        = xsheetHandle->getXsheet()->makeSound(prop);
+  if (m_sound == NULL) {
+    m_hasSoundtrack = false;
+    return false;
+  } else {
+    m_hasSoundtrack = true;
+    return true;
+  }
+}
+
+void ComboViewerPanel::onButtonPressed(FlipConsole::EGadget button) {
+  if (button == FlipConsole::eSound) {
+    m_playSound = !m_playSound;
+  }
 }
