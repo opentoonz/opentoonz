@@ -1451,7 +1451,7 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
 
     /*- first, draw key segments -*/
     p.setPen(m_viewer->getTextColor());
-    int line_layerAxis = m_viewer->orientation ()->keyLine_layerAxis (layerAxis);
+    int line_layerAxis = layerAxis + m_viewer->orientation ()->dimension (PredefinedDimension::KEY_LINE);
     for (row = row0; row <= row1; row++) {
       int handleRow0, handleRow1;
       double ease0, ease1;

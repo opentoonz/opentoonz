@@ -12,6 +12,7 @@ class TopToBottomOrientation : public Orientation {
   const int CELL_WIDTH = 74;
   const int CELL_HEIGHT = 20;
   const int CELL_DRAG_WIDTH = 7;
+  const int KEY_LINE_INDENT = 8;
 
 public:
   TopToBottomOrientation ();
@@ -27,7 +28,6 @@ public:
 	virtual NumberRange layerSide (const QRect &area) const override;
 	virtual NumberRange frameSide (const QRect &area) const override;
 
-	virtual int keyLine_layerAxis (int layerAxis) const override;
 	virtual int keyPixOffset (const QPixmap &pixmap) const override;
   virtual QPainterPath endOfDragHandle () const override;
 
@@ -38,6 +38,7 @@ class LeftToRightOrientation : public Orientation {
   const int CELL_WIDTH = 47;
   const int CELL_HEIGHT = 47;
   const int CELL_DRAG_HEIGHT = 7;
+  const int KEY_LINE_INDENT = 5;
 
 public:
   LeftToRightOrientation ();
@@ -53,7 +54,6 @@ public:
 	virtual NumberRange layerSide (const QRect &area) const override;
 	virtual NumberRange frameSide (const QRect &area) const override;
 
-	virtual int keyLine_layerAxis (int layerAxis) const override;
 	virtual int keyPixOffset (const QPixmap &pixmap) const override;
   virtual QPainterPath endOfDragHandle () const override;
 
@@ -121,6 +121,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
 
   addDimension (PredefinedDimension::LAYER, CELL_WIDTH);
+  addDimension (PredefinedDimension::KEY_LINE, CELL_WIDTH - KEY_LINE_INDENT);
 }
 
 CellPosition TopToBottomOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
@@ -148,10 +149,6 @@ NumberRange TopToBottomOrientation::layerSide (const QRect &area) const {
 NumberRange TopToBottomOrientation::frameSide (const QRect &area) const {
 	return NumberRange (area.top (), area.bottom ());
 }
-int TopToBottomOrientation::keyLine_layerAxis (int layerAxis) const {
-	int x = layerAxis;
-	return x + CELL_WIDTH - 8;
-}
 int TopToBottomOrientation::keyPixOffset (const QPixmap &pixmap) const {
 	return (CELL_HEIGHT - pixmap.height ()) / 2;
 }
@@ -174,6 +171,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
 
   addDimension (PredefinedDimension::LAYER, CELL_HEIGHT);
+  addDimension (PredefinedDimension::KEY_LINE, /* CELL_HEIGHT - */ KEY_LINE_INDENT);
 }
 
 CellPosition LeftToRightOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
@@ -200,10 +198,6 @@ NumberRange LeftToRightOrientation::layerSide (const QRect &area) const {
 }
 NumberRange LeftToRightOrientation::frameSide (const QRect &area) const {
 	return NumberRange (area.left (), area.right ());
-}
-int LeftToRightOrientation::keyLine_layerAxis (int layerAxis) const {
-	int y = layerAxis;
-	return y + 5;
 }
 int LeftToRightOrientation::keyPixOffset (const QPixmap &pixmap) const {
 	return (CELL_WIDTH - pixmap.width ()) / 2;

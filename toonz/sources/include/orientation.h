@@ -40,7 +40,8 @@ enum class PredefinedLine {
   LOCKED //! dotted vertical line when cell is locked
 };
 enum class PredefinedDimension {
-  LAYER //! width of a layer column / height of layer row
+  LAYER, //! width of a layer column / height of layer row
+  KEY_LINE, //! offset of vertical / horizontal line connecting keyframe icons
 };
 
 class Orientation {
@@ -67,8 +68,6 @@ public:
 	QLine verticalLine (int layerAxis, const NumberRange &frameAxis) const;
 	QLine horizontalLine (int frameAxis, const NumberRange &layerAxis) const;
 
-	//! where the old vertical line was for key frames
-	virtual int keyLine_layerAxis (int layerAxis) const = 0;
 	//! positions key icon in the middle of cell by the frame axis
 	virtual int keyPixOffset (const QPixmap &pixmap) const = 0;
   virtual QPainterPath endOfDragHandle () const = 0;
