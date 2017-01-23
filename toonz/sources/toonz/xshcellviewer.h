@@ -10,6 +10,7 @@
 class XsheetViewer;
 class QMenu;
 class TXsheetHandle;
+class NumberRange;
 
 namespace XsheetGUI {
 
@@ -63,6 +64,8 @@ class CellArea final : public QWidget {
   RenameCellField *m_renameCell;
 
   void drawCells(QPainter &p, const QRect toBeUpdated);
+  void drawNonEmptyBackground (QPainter &p);
+  void drawFoldedColumns (QPainter &p, int layerAxis, const NumberRange &frameAxis);
   void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
   void drawSoundTextCell(QPainter &p, int row, int col);
   void drawSoundCell(QPainter &p, int row, int col);

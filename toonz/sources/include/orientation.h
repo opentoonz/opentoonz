@@ -32,7 +32,11 @@ class QPixmap;
 
 //! lists predefined rectangle sizes and positions (relative to top left corner of a cell)
 enum class PredefinedRect {
-  CELL //! size of a cell
+  CELL, //! size of a cell
+  CELL_DRAG_HANDLE //! area for dragging a cell
+};
+enum class PredefinedLine {
+  LOCKED //! dotted vertical line when cell is locked
 };
 enum class PredefinedDimension {
   LAYER //! width of a layer column / height of layer row
@@ -41,6 +45,7 @@ enum class PredefinedDimension {
 class Orientation {
 protected:
   map<PredefinedRect, QRect> _rects;
+  map<PredefinedLine, QLine> _lines;
   map<PredefinedDimension, int> _dimensions;
 
 public:
@@ -68,11 +73,15 @@ public:
 
 	virtual bool isVerticalTimeline () const = 0;
 
-  //! a predefined rectangular area
+  //! returns a predefined rectangle area
   virtual const QRect &rect (PredefinedRect which) const { return _rects.at (which); }
+  //! returns a predefined line
+  virtual const QLine &line (PredefinedLine which) const { return _lines.at (which); }
+  //! returns a predefined integer dimension
   virtual int dimension (PredefinedDimension which) const { return _dimensions.at (which); }
 protected:
   void addRect (PredefinedRect which, const QRect &rect);
+  void addLine (PredefinedLine which, const QLine &line);
   void addDimension (PredefinedDimension which, int dimension);
 };
 
@@ -83,8 +92,8 @@ public:
 	Orientations ();
 	~Orientations ();
 
-	const Orientation *topToBottom () const { return _topToBottom; }
-	const Orientation *leftToRight () const { return _leftToRight; }
+  const Orientation *topToBottom () const;
+  const Orientation *leftToRight () const;
 };
 
 extern Orientations orientations;

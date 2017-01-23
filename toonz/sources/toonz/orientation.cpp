@@ -9,6 +9,7 @@ Orientations orientations;
 class TopToBottomOrientation : public Orientation {
   const int CELL_WIDTH = 74;
   const int CELL_HEIGHT = 20;
+  const int CELL_DRAG_WIDTH = 7;
 
 public:
   TopToBottomOrientation ();
@@ -33,6 +34,7 @@ public:
 class LeftToRightOrientation : public Orientation {
   const int CELL_WIDTH = 47;
   const int CELL_HEIGHT = 47;
+  const int CELL_DRAG_HEIGHT = 7;
 
 public:
   LeftToRightOrientation ();
@@ -54,13 +56,24 @@ public:
 	virtual bool isVerticalTimeline () const override { return false; }
 };
 
-Orientations::Orientations () {
+Orientations::Orientations (): _topToBottom (nullptr), _leftToRight (nullptr) {
 	_topToBottom = new TopToBottomOrientation ();
 	_leftToRight = new LeftToRightOrientation ();
 }
 Orientations::~Orientations () {
 	delete _topToBottom; _topToBottom = nullptr;
 	delete _leftToRight; _leftToRight = nullptr;
+}
+
+const Orientation *Orientations::topToBottom () const {
+  if (!_topToBottom)
+    throw new QString ("!_topToBottom");
+  return _topToBottom;
+}
+const Orientation *Orientations::leftToRight () const {
+  if (!_leftToRight)
+    throw new QString ("!_leftToRight");
+  return _leftToRight;
 }
 
 /// -------------------------------------------------------------------------------
@@ -88,6 +101,9 @@ QLine Orientation::foldedRectangleLine (int layerAxis, const NumberRange &frameA
 void Orientation::addRect (PredefinedRect which, const QRect &rect) {
   _rects.insert (pair<PredefinedRect, QRect> (which, rect));
 }
+void Orientation::addLine (PredefinedLine which, const QLine &line) {
+  _lines.insert (pair<PredefinedLine, QLine> (which, line));
+}
 void Orientation::addDimension (PredefinedDimension which, int dimension) {
   _dimensions.insert (pair<PredefinedDimension, int> (which, dimension));
 }
@@ -96,9 +112,13 @@ void Orientation::addDimension (PredefinedDimension which, int dimension) {
 
 TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::CELL, QRect (0, 0, CELL_WIDTH, CELL_HEIGHT));
+  addRect (PredefinedRect::CELL_DRAG_HANDLE, QRect (0, 0, CELL_DRAG_WIDTH, CELL_HEIGHT));
+
+  addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
 
   addDimension (PredefinedDimension::LAYER, CELL_WIDTH);
 }
+
 CellPosition TopToBottomOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
 	int layer = fan->layerAxisToCol (xy.x ());
 	int frame = xy.y () / CELL_HEIGHT;
@@ -138,9 +158,13 @@ int TopToBottomOrientation::keyPixOffset (const QPixmap &pixmap) const {
 
 LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::CELL, QRect (0, 0, CELL_WIDTH, CELL_HEIGHT));
+  addRect (PredefinedRect::CELL_DRAG_HANDLE, QRect (0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
+
+  addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
 
   addDimension (PredefinedDimension::LAYER, CELL_HEIGHT);
 }
+
 CellPosition LeftToRightOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
 	int layer = fan->layerAxisToCol (xy.y ());
 	int frame = xy.x () / CELL_WIDTH;

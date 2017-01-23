@@ -16,6 +16,7 @@
 #include "cellkeyframeselection.h"
 #include "keyframedata.h"
 #include "columnselection.h"
+#include "orientation.h"
 
 // TnzTools includes
 #include "tools/cursormanager.h"
@@ -756,25 +757,12 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   c0 = visible.from ().layer ();
   c1 = visible.to ().layer ();
 
-  // Slightly bright background if row < xsh->getFrameCount()
-  int xshRowCount = xsh->getFrameCount();
+  drawNonEmptyBackground (p);
 
-  if (xshRowCount > 0) {
-    int filledCol;
-    for (filledCol = xsh->getColumnCount() - 1; filledCol >= 0; filledCol--) {
-      TXshColumn *currentColumn = xsh->getColumn(filledCol);
-      if (!currentColumn) continue;
-      if (currentColumn->isEmpty() == false) {
-				QPoint xy = m_viewer->positionToXY (CellPosition (xshRowCount, filledCol + 1));
-        p.fillRect(1, 0, xy.x (), xy.y (), QBrush(m_viewer->getNotEmptyColumnColor()));
-        break;
-      }
-    }
-  }
   int xS0, xS1, yS0, yS1;
 
   if (!cellSelection->isEmpty()) {
-	  QRect rect = m_viewer->rangeToXYRect (CellRange (CellPosition (rS0, cS0), CellPosition (rS1 + 1, cS1 + 1)));
+	QRect rect = m_viewer->rangeToXYRect (CellRange (CellPosition (rS0, cS0), CellPosition (rS1 + 1, cS1 + 1)));
     xS0 = rect.left (); xS1 = rect.right ();
     yS0 = rect.top (); yS1 = rect.bottom ();
     p.fillRect(rect, QBrush(m_viewer->getSelectedEmptyCellColor()));
@@ -800,19 +788,12 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   // for each layer
   m_soundLevelModifyRects.clear();
   for (col = c0; col <= c1; col++) {
-	  int layerAxis = m_viewer->columnToLayerAxis (col); // layer axis is x in vertical timeline
+    // x in vertical timeline / y in horizontal
+    int layerAxis = m_viewer->columnToLayerAxis (col);
 
     if (!columnFan->isActive(col)) { // folded column
-		  for (int i = 0; i < 3; i++) { // 3 white bars
-			  QRect whiteRect = m_viewer->orientation ()->foldedRectangle (layerAxis, frameSide, i);
-			  p.fillRect (whiteRect, QBrush (Qt::white));
-		  }
-		  p.setPen (m_viewer->getLightLineColor ());
-		  for (int i = 0; i < 3; i++) { // 3 dark lines
-			  QLine greyLine = m_viewer->orientation ()->foldedRectangleLine (layerAxis, frameSide, i);
-			  p.drawLine (greyLine);
-		  }
-		  continue;
+      drawFoldedColumns (p, layerAxis, frameSide);
+			continue;
     }
 
     TXshColumn *column     = xsh->getColumn(col);
@@ -845,17 +826,17 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
     // for each frame
     for (row = r0; row <= r1; row++) {
       // draw horizontal lines
-	    // hide top-most interval line
+	    // hide top-most marker line
 	    QColor color = ((row - offset) % distance == 0 && row != 0)
 		    ? m_viewer->getMarkerLineColor ()
 		    : m_viewer->getLightLineColor ();
 
       p.setPen(color);
       int frameAxis = m_viewer->rowToFrameAxis (row);
-	    QLine horizontalLine = m_viewer->orientation ()->horizontalLine (frameAxis, layerAxisRange);
+	  QLine horizontalLine = m_viewer->orientation ()->horizontalLine (frameAxis, layerAxisRange);
       p.drawLine(horizontalLine);
       if (!isColumn) continue;
-      // Disegno le celle a seconda del tipo di colonna
+      // Cells appearance depending on the type of column
       if (isSoundColumn)
         drawSoundCell(p, row, col);
       else if (isPaletteColumn)
@@ -902,6 +883,40 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   }
 }
 
+// slightly bright background for non-empty rectangular area
+void CellArea::drawNonEmptyBackground (QPainter &p) {
+  TXsheet *xsh = m_viewer->getXsheet ();
+
+  int totalFrames = xsh->getFrameCount ();
+  if (!totalFrames)
+    return;
+
+  int lastNonEmptyCol;
+  for (lastNonEmptyCol = xsh->getColumnCount () - 1; lastNonEmptyCol >= 0; lastNonEmptyCol--) {
+    TXshColumn *currentColumn = xsh->getColumn (lastNonEmptyCol);
+    if (!currentColumn) continue;
+    if (!currentColumn->isEmpty ())
+      break;
+  }
+  QPoint xy = m_viewer->positionToXY (CellPosition (totalFrames, lastNonEmptyCol + 1));
+  p.fillRect (1, 0, xy.x (), xy.y (), QBrush (m_viewer->getNotEmptyColumnColor ()));
+}
+
+void CellArea::drawFoldedColumns (QPainter &p, int layerAxis, const NumberRange &frameAxis) {
+  // 3 white bars
+  for (int i = 0; i < 3; i++) { 
+    QRect whiteRect = m_viewer->orientation ()->foldedRectangle (layerAxis, frameAxis, i);
+    p.fillRect (whiteRect, QBrush (Qt::white));
+  }
+
+  // 3 dark lines
+  p.setPen (m_viewer->getLightLineColor ());
+  for (int i = 0; i < 3; i++) { 
+    QLine darkLine = m_viewer->orientation ()->foldedRectangleLine (layerAxis, frameAxis, i);
+    p.drawLine (darkLine);
+  }
+}
+
 //-----------------------------------------------------------------------------
 
 void CellArea::drawSoundCell(QPainter &p, int row, int col) { // ORIENTATION?
@@ -910,7 +925,9 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) { // ORIENTATION?
   QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
   int x           = xy.x ();
   int y           = xy.y ();
-  QRect rect      = QRect(x + 1, y, ColumnWidth - 1, RowHeight);
+  QRect cellRect = m_viewer->orientation ()->rect (PredefinedRect::CELL)
+    .translated (xy);
+  QRect rect = cellRect.adjusted (1, 0, -1, 0);
   int maxNumFrame = soundColumn->getMaxFrame() + 1;
   int startFrame  = soundColumn->getFirstRow();
   TXshCell cell   = soundColumn->getCell(row);
@@ -937,17 +954,23 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) { // ORIENTATION?
                                  isSelected);
 
   // cells background
-  QRect backgroundRect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
+  QRect backgroundRect = cellRect.adjusted (1, 1, -1, -1);
   p.fillRect(backgroundRect, cellColor);
-  p.fillRect(QRect(x, y, 7, RowHeight), QBrush(sideColor));
+  QRect dragHandleRect = m_viewer->orientation ()->rect (PredefinedRect::CELL_DRAG_HANDLE)
+    .translated (xy);
+  p.fillRect(dragHandleRect, QBrush(sideColor));
 
   // draw dot line if the column is locked
   if (soundColumn->isLocked()) {
     p.setPen(QPen(cellColor, 2, Qt::DotLine));
-    p.drawLine(x + 3, y, x + 3, y + RowHeight);
+    QLine dottedLine = m_viewer->orientation ()->line (PredefinedLine::LOCKED)
+      .translated (xy);
+    p.drawLine(dottedLine);
   }
+
   // draw "end of the level"
   if (isLastRow) {
+    // int layerAxis = m_viewer.positionToXY...
     QPainterPath path(QPointF(x, y + RowHeight));
     path.lineTo(QPointF(x + 7, y + RowHeight));
     path.lineTo(QPointF(x + 7, y + RowHeight - 7));
@@ -1054,17 +1077,20 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   bool isSelected                   = cellSelection->isCellSelected(row, col) ||
                     columnSelection->isColumnSelected(col);
 
-  if (row > 0) prevCell = xsh->getCell(row - 1, col);
+  if (row > 0) prevCell = xsh->getCell(row - 1, col); // cell in previous frame
   // nothing to draw
   if (cell.isEmpty() && prevCell.isEmpty()) return;
   TXshCell nextCell;
-  nextCell = xsh->getCell(row + 1, col);
+  nextCell = xsh->getCell(row + 1, col); // cell in next frame
 
   QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
   int x      = xy.x ();
   int y      = xy.y ();
-  QRect rect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
-  if (cell.isEmpty()) {  // vuol dire che la precedente non e' vuota
+  QRect cellRect = m_viewer->orientation ()->rect (PredefinedRect::CELL)
+    .translated (xy);
+  QRect rect = cellRect.adjusted (1, 1, -1, -1);
+  if (cell.isEmpty()) {  // it means previous is not empty
+    // diagonal cross meaning end of level
     QColor levelEndColor = m_viewer->getTextColor();
     levelEndColor.setAlphaF(0.3);
     p.setPen(levelEndColor);
@@ -1622,7 +1648,7 @@ void CellArea::paintEvent(QPaintEvent *event) {
 
   if (getDragTool()) getDragTool()->drawCellsArea(p);
 
-  // focus cell
+  // focus cell border
   int row    = m_viewer->getCurrentRow();
   int col    = m_viewer->getCurrentColumn();
   QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
@@ -1665,7 +1691,7 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     assert(getDragTool() == 0);
 
-    TPoint pos(event->pos().x(), event->pos().y());
+  TPoint pos(event->pos().x(), event->pos().y());
 	CellPosition cellPosition = m_viewer->xyToPosition (event->pos ());
 	int row = cellPosition.frame ();
 	int col = cellPosition.layer ();
@@ -1679,7 +1705,7 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     for (i = notes->getCount() - 1; i >= 0; i--) {
       int r       = notes->getNoteRow(i);
       int c       = notes->getNoteCol(i);
-	  QPoint xy   = m_viewer->positionToXY (CellPosition (r, c));
+	    QPoint xy   = m_viewer->positionToXY (CellPosition (r, c));
       TPointD pos = notes->getNotePos(i) + TPointD(xy.x (), xy.y ());
       QRect rect(pos.x, pos.y, NoteWidth, NoteHeight);
       if (!rect.contains(event->pos())) continue;
@@ -1946,9 +1972,9 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   for (i = notes->getCount() - 1; i >= 0; i--) {
     int r       = notes->getNoteRow(i);
     int c       = notes->getNoteCol(i);
-	QPoint xy   = m_viewer->positionToXY (CellPosition (r, c));
+	  QPoint xy   = m_viewer->positionToXY (CellPosition (r, c));
     TPointD pos = notes->getNotePos(i) + TPointD(xy.x (), xy.y ());
-	QRect rect (pos.x, pos.y, NoteWidth, NoteHeight);
+	  QRect rect (pos.x, pos.y, NoteWidth, NoteHeight);
     if (!rect.contains(event->pos())) continue;
     m_viewer->setCurrentNoteIndex(i);
     m_viewer->getNotesWidget().at(i)->openNotePopup();
@@ -2002,7 +2028,7 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   for (i = notes->getCount() - 1; i >= 0; i--) {
     int r       = notes->getNoteRow(i);
     int c       = notes->getNoteCol(i);
-	QPoint xy = m_viewer->positionToXY (CellPosition (r, c));
+	  QPoint xy = m_viewer->positionToXY (CellPosition (r, c));
     TPointD pos = notes->getNotePos(i) + TPointD(xy.x (), xy.y ());
     QRect rect(pos.x, pos.y, NoteWidth, NoteHeight);
     if (!rect.contains(event->pos())) continue;
