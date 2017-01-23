@@ -2,6 +2,8 @@
 #include "toonz/columnfan.h"
 #include "xsheetviewer.h"
 
+#include <QPainterPath>
+
 using std::pair;
 
 Orientations orientations;
@@ -27,6 +29,7 @@ public:
 
 	virtual int keyLine_layerAxis (int layerAxis) const override;
 	virtual int keyPixOffset (const QPixmap &pixmap) const override;
+  virtual QPainterPath endOfDragHandle () const override;
 
 	virtual bool isVerticalTimeline () const override { return true;  }
 };
@@ -52,6 +55,7 @@ public:
 
 	virtual int keyLine_layerAxis (int layerAxis) const override;
 	virtual int keyPixOffset (const QPixmap &pixmap) const override;
+  virtual QPainterPath endOfDragHandle () const override;
 
 	virtual bool isVerticalTimeline () const override { return false; }
 };
@@ -151,6 +155,13 @@ int TopToBottomOrientation::keyLine_layerAxis (int layerAxis) const {
 int TopToBottomOrientation::keyPixOffset (const QPixmap &pixmap) const {
 	return (CELL_HEIGHT - pixmap.height ()) / 2;
 }
+QPainterPath TopToBottomOrientation::endOfDragHandle () const {
+  QPainterPath triangle (QPointF (0, CELL_HEIGHT));
+  triangle.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT));
+  triangle.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT - CELL_DRAG_WIDTH));
+  triangle.lineTo (QPointF (0, CELL_HEIGHT));
+  return triangle;
+}
 
 
 /// --------------------------------------------------------------------------------
@@ -196,4 +207,11 @@ int LeftToRightOrientation::keyLine_layerAxis (int layerAxis) const {
 }
 int LeftToRightOrientation::keyPixOffset (const QPixmap &pixmap) const {
 	return (CELL_WIDTH - pixmap.width ()) / 2;
+}
+QPainterPath LeftToRightOrientation::endOfDragHandle () const {
+  QPainterPath triangle (QPointF (CELL_WIDTH, 0));
+  triangle.lineTo (QPointF (CELL_WIDTH, CELL_DRAG_HEIGHT));
+  triangle.lineTo (QPointF (CELL_WIDTH - CELL_DRAG_HEIGHT, CELL_DRAG_HEIGHT));
+  triangle.lineTo (QPointF (CELL_WIDTH, 0));
+  return triangle;
 }

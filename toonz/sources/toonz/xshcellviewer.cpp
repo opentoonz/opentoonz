@@ -956,27 +956,10 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) { // ORIENTATION?
   // cells background
   QRect backgroundRect = cellRect.adjusted (1, 1, -1, -1);
   p.fillRect(backgroundRect, cellColor);
-  QRect dragHandleRect = m_viewer->orientation ()->rect (PredefinedRect::CELL_DRAG_HANDLE)
-    .translated (xy);
-  p.fillRect(dragHandleRect, QBrush(sideColor));
-
-  // draw dot line if the column is locked
-  if (soundColumn->isLocked()) {
-    p.setPen(QPen(cellColor, 2, Qt::DotLine));
-    QLine dottedLine = m_viewer->orientation ()->line (PredefinedLine::LOCKED)
-      .translated (xy);
-    p.drawLine(dottedLine);
-  }
-
-  // draw "end of the level"
-  if (isLastRow) {
-    // int layerAxis = m_viewer.positionToXY...
-    QPainterPath path(QPointF(x, y + RowHeight));
-    path.lineTo(QPointF(x + 7, y + RowHeight));
-    path.lineTo(QPointF(x + 7, y + RowHeight - 7));
-    path.lineTo(QPointF(x, y + RowHeight));
-    p.fillPath(path, QBrush(cellColor));
-  }
+  
+  drawDragHandle (p, xy, sideColor);
+  drawEndOfDragHandle (p, isLastRow, xy, cellColor);
+  drawLockedDottedLine (p, soundColumn->isLocked (), xy, cellColor);
 
   int x1    = rect.x() + 6;
   int x2    = rect.x() + rect.width();
@@ -1067,6 +1050,35 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) { // ORIENTATION?
 
 //-----------------------------------------------------------------------------
 
+// paint side bar
+void CellArea::drawDragHandle (QPainter &p, const QPoint &xy, const QColor &sideColor) const {
+  QRect dragHandleRect = m_viewer->orientation ()->rect (PredefinedRect::CELL_DRAG_HANDLE)
+    .translated (xy);
+  p.fillRect (dragHandleRect, QBrush (sideColor));
+}
+
+// cut off triangle at the end of drag handle
+void CellArea::drawEndOfDragHandle (QPainter &p, bool isEnd, const QPoint &xy, const QColor &cellColor) const {
+  if (!isEnd)
+    return;
+  QPainterPath triangle = m_viewer->orientation ()->endOfDragHandle ()
+    .translated (xy);
+  p.fillPath (triangle, QBrush (cellColor));
+}
+
+// draw dot line if the column is locked
+void CellArea::drawLockedDottedLine (QPainter &p, bool isLocked, const QPoint &xy, const QColor &cellColor) const {
+  if (!isLocked)
+    return;
+  p.setPen (QPen (cellColor, 2, Qt::DotLine));
+  QLine dottedLine = m_viewer->orientation ()->line (PredefinedLine::LOCKED)
+    .translated (xy);
+  p.drawLine (dottedLine);
+}
+
+
+//-----------------------------------------------------------------------------
+
 void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   TXsheet *xsh  = m_viewer->getXsheet();
   TXshCell cell = xsh->getCell(row, col);
@@ -1122,29 +1134,20 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 
   // paint cell
   p.fillRect(rect, QBrush(cellColor));
-  // paint side bar
-  p.fillRect(QRect(x, y, 7, RowHeight), QBrush(sideColor));
 
-  if (yetToCleanupCell)
+  drawDragHandle (p, xy, sideColor);
+
+  if (yetToCleanupCell) // ORIENTATION: what's this?
     p.fillRect(
         rect.adjusted(rect.width() / 2, 0, 0, 0),
         (isSelected) ? SelectedFullcolorColumnColor : FullcolorColumnColor);
 
-  // draw dot line if the column is locked
-  TXshColumn *column = xsh->getColumn(col);
-  if (column->isLocked()) {
-    p.setPen(QPen(cellColor, 2, Qt::DotLine));
-    p.drawLine(x + 3, y, x + 3, y + RowHeight);
-  }
-  // draw "end of the level"
-  if (nextCell.isEmpty() ||
-      cell.m_level.getPointer() != nextCell.m_level.getPointer()) {
-    QPainterPath path(QPointF(x, y + RowHeight));
-    path.lineTo(QPointF(x + 7, y + RowHeight));
-    path.lineTo(QPointF(x + 7, y + RowHeight - 7));
-    path.lineTo(QPointF(x, y + RowHeight));
-    p.fillPath(path, QBrush(cellColor));
-  }
+  bool isLastRow = nextCell.isEmpty () ||
+    cell.m_level.getPointer () != nextCell.m_level.getPointer ();
+  drawEndOfDragHandle (p, isLastRow, xy, cellColor);
+
+  drawLockedDottedLine (p, xsh->getColumn (col)->isLocked (), xy, cellColor);
+
 
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
@@ -1341,22 +1344,12 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   }
 
   p.fillRect(rect, QBrush(cellColor));
-  p.fillRect(QRect(x, y, 7, RowHeight), QBrush(sideColor));
 
-  TXshColumn *column = xsh->getColumn(col);
-  if (column->isLocked()) {
-    p.setPen(QPen(cellColor, 2, Qt::DotLine));
-    p.drawLine(x + 3, y, x + 3, y + RowHeight);
-  }
-
-  if (nextCell.isEmpty() ||
-      cell.m_level.getPointer() != nextCell.m_level.getPointer()) {
-    QPainterPath path(QPointF(x, y + RowHeight));
-    path.lineTo(QPointF(x + 7, y + RowHeight));
-    path.lineTo(QPointF(x + 7, y + RowHeight - 7));
-    path.lineTo(QPointF(x, y + RowHeight));
-    p.fillPath(path, QBrush(cellColor));
-  }
+  drawDragHandle (p, xy, sideColor);
+  bool isLastRow = nextCell.isEmpty () ||
+    cell.m_level.getPointer () != nextCell.m_level.getPointer ();
+  drawEndOfDragHandle (p, isLastRow, xy, cellColor);
+  drawLockedDottedLine (p, xsh->getColumn (col)->isLocked (), xy, cellColor);
 
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
@@ -1372,9 +1365,8 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   }
 
   if (sameLevel && prevCell.m_frameId == cell.m_frameId &&
-      !isAfterMarkers) {  // cella uguale a quella precedente (non sulla marker
-                          // line):
-                          // non scrivo nulla e disegno una linea verticale
+      !isAfterMarkers) {  // cell equal to previous one (not on marker line):
+                          // do not write anything and draw a vertical line
     QPen oldPen = p.pen();
     p.setPen(QPen(m_viewer->getTextColor(), 1));
     int x = rect.center().x();

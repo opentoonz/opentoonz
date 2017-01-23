@@ -29,6 +29,7 @@ public:
 
 class ColumnFan;
 class QPixmap;
+class QPainterPath;
 
 //! lists predefined rectangle sizes and positions (relative to top left corner of a cell)
 enum class PredefinedRect {
@@ -70,6 +71,7 @@ public:
 	virtual int keyLine_layerAxis (int layerAxis) const = 0;
 	//! positions key icon in the middle of cell by the frame axis
 	virtual int keyPixOffset (const QPixmap &pixmap) const = 0;
+  virtual QPainterPath endOfDragHandle () const = 0;
 
 	virtual bool isVerticalTimeline () const = 0;
 
