@@ -188,14 +188,16 @@ void GenericPanel::mousePressEvent(QMouseEvent *e) {
   else
     m_dragTool = createDragTool(e);
 
-  int row = getViewer()->yToRow(e->pos().y());
-  int col = getViewer()->xToColumn(e->pos().x());
+  CellPosition cellPosition = getViewer ()->xyToPosition (e->pos ());
+  int row = cellPosition.frame ();
+  int col = cellPosition.layer ();
   if (m_dragTool) m_dragTool->click(row, col, e);
 }
 
 void GenericPanel::mouseReleaseEvent(QMouseEvent *e) {
-  int row = getViewer()->yToRow(e->pos().y());
-  int col = getViewer()->xToColumn(e->pos().x());
+  CellPosition cellPosition = getViewer ()->xyToPosition (e->pos ());
+  int row = cellPosition.frame ();
+  int col = cellPosition.layer ();
   m_viewer->stopAutoPan();
   if (m_dragTool) {
     m_dragTool->release(row, col, e);
@@ -205,8 +207,9 @@ void GenericPanel::mouseReleaseEvent(QMouseEvent *e) {
 }
 
 void GenericPanel::mouseMoveEvent(QMouseEvent *e) {
-  int row = getViewer()->yToRow(e->pos().y());
-  int col = getViewer()->xToColumn(e->pos().x());
+  CellPosition cellPosition = getViewer ()->xyToPosition (e->pos ());
+  int row = cellPosition.frame ();
+  int col = cellPosition.layer ();
   if (e->buttons() != 0 && m_dragTool != 0) {
     if ((e->buttons() & Qt::LeftButton) != 0 &&
         !visibleRegion().contains(e->pos())) {
@@ -288,9 +291,10 @@ void RowPanel::paintEvent(QPaintEvent *e) {
   QRect toBeUpdated = e->rect();
   QPainter p(this);
 
-  // range di righe visibili
-  int r0 = getViewer()->yToRow(toBeUpdated.top());
-  int r1 = getViewer()->yToRow(toBeUpdated.bottom());
+  CellRange visible = getViewer ()->xyRectToRange (toBeUpdated);
+  // range of visible rows
+  int r0 = visible.from ().frame ();
+  int r1 = visible.to ().frame ();
 
   p.setClipRect(toBeUpdated);
   p.fillRect(toBeUpdated, QBrush(getViewer()->getLightLightBGColor()));
@@ -323,13 +327,15 @@ void CellPanel::paintEvent(QPaintEvent *e) {
   int y0 = toBeUpdated.top();
   int x1 = toBeUpdated.right(), y1 = toBeUpdated.bottom();
 
+  QRect alteredRect (QPoint (x0, y0), QPoint (x1, y1));
+  CellRange cellRange = getViewer ()->xyRectToRange (alteredRect);
   // visible rows range
-  int r0 = getViewer()->yToRow(y0);
-  int r1 = getViewer()->yToRow(y1);
+  int r0 = cellRange.from ().frame ();
+  int r1 = cellRange.to ().frame ();
 
   // visible columns range
-  int c0 = getViewer()->xToColumn(x0);
-  int c1 = getViewer()->xToColumn(x1);
+  int c0 = cellRange.from ().layer ();
+  int c1 = cellRange.to ().layer ();
 
   // cambia colore alle celle prima di rowCount()
   int rowCount = getViewer()->getRowCount();
@@ -389,6 +395,8 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
     , m_markRowDistance(6)
     , m_markRowOffset(0)
     , m_isComputingSize(false) {
+  // m_orientation = orientations.topToBottom ();
+
   setFocusPolicy(Qt::NoFocus);
 
   setFrameStyle(QFrame::StyledPanel);
@@ -582,21 +590,43 @@ void SpreadsheetViewer::setAutoPanSpeed(const QRect &widgetBounds,
   m_lastAutoPanPos = mousePos;
 }
 
-/*!Shift is a consequence of style sheet border.*/
-int SpreadsheetViewer::xToColumn(int x) const {
-  return (x + 1) / m_columnWidth;
+int SpreadsheetViewer::xToColumn (int x) const {
+	CellPosition pos = xyToPosition (QPoint (x, 0));
+	return pos.layer ();
+}
+int SpreadsheetViewer::yToRow (int y) const {
+	CellPosition pos = xyToPosition (QPoint (0, y));
+	return pos.frame ();
+}
+int SpreadsheetViewer::columnToX (int col) const {
+	QPoint xy = positionToXY (CellPosition (0, col));
+	return xy.x ();
+}
+int SpreadsheetViewer::rowToY (int row) const {
+	QPoint xy = positionToXY (CellPosition (row, 0));
+	return xy.y ();
 }
 
 /*!Shift is a consequence of style sheet border.*/
-int SpreadsheetViewer::columnToX(int col) const {
-  return (col * m_columnWidth) - 1;
+CellPosition SpreadsheetViewer::xyToPosition (const QPoint &point) const {
+	int row = (point.y () + 1) / m_rowHeight;
+	int col = (point.x () + 1) / m_columnWidth;
+	return CellPosition (row, col);
 }
 
 /*!Shift is a consequence of style sheet border.*/
-int SpreadsheetViewer::yToRow(int y) const { return (y + 1) / m_rowHeight; }
+QPoint SpreadsheetViewer::positionToXY (const CellPosition &pos) const {
+	int x = (pos.layer () * m_columnWidth) - 1;
+	int y = (pos.frame () * m_rowHeight) - 1;
+	return QPoint (x, y);
+}
 
-/*!Shift is a consequence of style sheet border.*/
-int SpreadsheetViewer::rowToY(int row) const { return (row * m_rowHeight) - 1; }
+CellRange SpreadsheetViewer::xyRectToRange (const QRect &rect) const {
+	CellPosition topLeft = xyToPosition (rect.topLeft ());
+	CellPosition bottomRight = xyToPosition (rect.bottomRight ());
+	return CellRange (topLeft, bottomRight);
+}
+
 
 bool SpreadsheetViewer::refreshContentSize(int scrollDx, int scrollDy) {
   QSize viewportSize = m_cellScrollArea->viewport()->size();

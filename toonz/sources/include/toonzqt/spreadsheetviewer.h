@@ -4,6 +4,8 @@
 #define SPREADSHEETVIEWER_H
 
 #include "tcommon.h"
+#include "cellposition.h"
+// #include "orientation.h"
 #include <QFrame>
 #include <QScrollArea>
 
@@ -269,6 +271,7 @@ class DVAPI SpreadsheetViewer : public QFrame,
   int m_markRowDistance, m_markRowOffset;
   // QRect m_selectedCells; // x=col, y=row
   bool m_isComputingSize;
+  // const Orientation *m_orientation;
 
 public:
   SpreadsheetViewer(QWidget *parent);
@@ -367,6 +370,13 @@ public:
   int yToRow(int y) const;
   int columnToX(int col) const;
   int rowToY(int row) const;
+
+  CellPosition xyToPosition (const QPoint &point) const;
+  QPoint positionToXY (const CellPosition &pos) const;
+
+  CellRange xyRectToRange (const QRect &rect) const;
+
+  // const Orientation *orientation () const { return m_orientation; }
 
   bool refreshContentSize(int scrollDx, int scrollDy);
 

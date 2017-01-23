@@ -334,7 +334,7 @@ bool KeyframeMoverTool::canMove(const TPoint &pos) {
   if (pos.x < 0) return false;
 
   int col      = pos.x;
-  int startCol = getViewer()->xToColumn(m_startPos.x);
+  int startCol = getViewer()->xyToPosition(m_startPos).layer ();
   if (col != startCol) return false;
 
   return true;
@@ -361,8 +361,9 @@ void KeyframeMoverTool::onClick(const QMouseEvent *event) {
   m_firstKeyframeMovement = true;
   m_selecting             = false;
   TXsheet *xsheet         = getViewer()->getXsheet();
-  int row                 = getViewer()->yToRow(event->pos().y());
-  int col                 = getViewer()->xToColumn(event->pos().x());
+  CellPosition cellPosition = getViewer ()->xyToPosition (event->pos ());
+  int row                 = cellPosition.frame ();
+  int col                 = cellPosition.layer ();
   m_firstRow              = row;
   m_firstCol              = col;
   bool isSelected         = getSelection()->isSelected(row, col);
@@ -392,8 +393,9 @@ void KeyframeMoverTool::onDrag(const QMouseEvent *e) {
   int x    = e->pos().x();
   int y    = e->pos().y();
   m_curPos = TPointD(x, y);
-  int row  = getViewer()->yToRow(y);
-  int col  = getViewer()->xToColumn(x);
+  CellPosition cellPosition = getViewer ()->xyToPosition (e->pos ());
+  int row = cellPosition.frame ();
+  int col = cellPosition.layer ();
   if (m_selecting)
     rectSelect(row, col);
   else {
@@ -417,7 +419,7 @@ void KeyframeMoverTool::onDrag(const QMouseEvent *e) {
 
 //-----------------------------------------------------------------------------
 
-void KeyframeMoverTool::onRelease(int row, int col) {
+void KeyframeMoverTool::onRelease(const CellPosition &pos) {
   if (m_selecting) {
     m_selecting = false;
     getViewer()->updateCells();

@@ -12,6 +12,7 @@
 #include "xshnoteviewer.h"
 #include "cellkeyframeselection.h"
 #include "toonzqt/spreadsheetviewer.h"
+#include "Orientation.h"
 
 #ifdef _WIN32
 #define XSHEET_FONT_SIZE 9
@@ -346,6 +347,8 @@ class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
 
   Qt::KeyboardModifiers m_qtModifiers;
 
+  const Orientation *m_orientation;
+
 public:
   enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
 
@@ -428,10 +431,23 @@ public:
     return m_autoPanSpeed.x() != 0 || m_autoPanSpeed.y() != 0;
   }
 
+  /*
   int xToColumn(int x) const;
   int yToRow(int y) const;
   int columnToX(int col) const;
-  int rowToY(int row) const;
+  int rowToY(int row) const; */
+  CellPosition xyToPosition (const QPoint &point) const;
+  CellPosition xyToPosition (const TPoint &point) const;
+  CellPosition xyToPosition (const TPointD &point) const;
+  QPoint positionToXY (const CellPosition &pos) const;
+
+  int columnToLayerAxis (int layer) const;
+  int rowToFrameAxis (int frame) const;
+
+  CellRange xyRectToRange (const QRect &rect) const;
+  QRect rangeToXYRect (const CellRange &range) const;
+
+  const Orientation *orientation () const { return m_orientation;  }
 
   void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
   void updateRows() { m_rowArea->update(m_rowArea->visibleRegion()); }

@@ -588,9 +588,9 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 
   // Retrieve reference coordinates
   int currentColumnIndex = m_viewer->getCurrentColumn();
-  int x                  = m_viewer->columnToX(col);
+  int layerAxis          = m_viewer->columnToLayerAxis(col);
 
-  QRect rect(x, 0, ColumnWidth, height());
+  QRect rect(layerAxis, 0, ColumnWidth, height()); // AREA
 
   TApp *app    = TApp::instance();
   TXsheet *xsh = m_viewer->getXsheet();
@@ -785,7 +785,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 }
 //-----------------------------------------------------------------------------
 
-void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {
+void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -793,7 +793,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {
   font.setPointSize(XSHEET_FONT_SIZE);
   p.setFont(font);
 
-  int x = m_viewer->columnToX(col);
+  int x = m_viewer->columnToLayerAxis (col);
 
   TXsheet *xsh = m_viewer->getXsheet();
   TXshSoundColumn *sc =
@@ -936,7 +936,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {
 
 //-----------------------------------------------------------------------------
 
-void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {
+void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) { // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
 
 #ifdef _WIN32
@@ -948,7 +948,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
   int currentColumnIndex = m_viewer->getCurrentColumn();
-  int x                  = m_viewer->columnToX(col);
+  int x                  = m_viewer->columnToLayerAxis (col);
 
   QRect rect(x, 0, ColumnWidth, height());
 
@@ -1070,7 +1070,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {
 
 //-----------------------------------------------------------------------------
 
-void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {
+void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) { // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -1078,7 +1078,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {
   font.setPointSize(XSHEET_FONT_SIZE);
   p.setFont(font);
 
-  int x = m_viewer->columnToX(col);
+  int x = m_viewer->columnToLayerAxis (col);
   QRect rect(x, 0, ColumnWidth, height());
 
   int x0, x1, y, y0, y1;
@@ -1227,15 +1227,16 @@ QPixmap ColumnArea::getColumnIcon(int columnIndex) {
 
 //-----------------------------------------------------------------------------
 
-void ColumnArea::paintEvent(QPaintEvent *event) {
+void ColumnArea::paintEvent(QPaintEvent *event) { // AREA
   QRect toBeUpdated = event->rect();
 
   QPainter p(this);
   p.setClipRect(toBeUpdated);
 
-  int c0, c1;  // range di righe visibili
-  c0 = m_viewer->xToColumn(toBeUpdated.left());
-  c1 = m_viewer->xToColumn(toBeUpdated.right());
+  CellRange cellRange = m_viewer->xyRectToRange (toBeUpdated);
+  int c0, c1;  // range of visible columns
+  c0 = cellRange.from ().layer ();
+  c1 = cellRange.to ().layer ();
 
   TXsheet *xsh         = m_viewer->getXsheet();
   ColumnFan *columnFan = xsh->getColumnFan();
@@ -1243,7 +1244,7 @@ void ColumnArea::paintEvent(QPaintEvent *event) {
   for (col = c0; col <= c1; col++) {
     // draw column fan (collapsed columns)
     if (!columnFan->isActive(col)) {
-      int x = m_viewer->columnToX(col);
+      int x = m_viewer->columnToLayerAxis (col);
       QRect rect(x, 0, 8, height());
       int x0 = rect.topLeft().x() + 1;
       int y  = 16;
@@ -1474,12 +1475,12 @@ void ColumnArea::openTransparencyPopup() {
 
 //----------------------------------------------------------------
 
-void ColumnArea::startTransparencyPopupTimer(QMouseEvent *e) {
+void ColumnArea::startTransparencyPopupTimer(QMouseEvent *e) { // AREA
   if (!m_columnTransparencyPopup)
     m_columnTransparencyPopup = new ColumnTransparencyPopup(
         this);  // Qt::ToolTip|Qt::MSWindowsFixedSizeDialogHint);//Qt::MSWindowsFixedSizeDialogHint|Qt::Tool);
 
-  int x = e->pos().x() - m_tabBox.left() - m_viewer->columnToX(m_col);
+  int x = e->pos().x() - m_tabBox.left() - m_viewer->columnToLayerAxis(m_col); // what is happening here?
   int y = e->pos().y() - m_tabBox.bottom();
   m_columnTransparencyPopup->move(e->globalPos().x() - x + 2,
                                   e->globalPos().y() - y + 1);
@@ -1507,7 +1508,8 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
   // both left and right click can change the selection
   if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton) {
     TXsheet *xsh = m_viewer->getXsheet();
-    m_col        = m_viewer->xToColumn(event->pos().x());
+	CellPosition cellPosition = m_viewer->xyToPosition (event->pos ());
+    m_col = cellPosition.layer ();
     // do nothing for the camera column
     if (m_col < 0)  // CAMERA
     {
@@ -1535,9 +1537,11 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     TApp::instance()->getCurrentObject()->setIsSpline(false);
 
     // get mouse position
-    int x = event->pos().x() - m_viewer->columnToX(m_col);
-    int y = event->pos().y();
-    QPoint mousePos(x, y);
+	QPoint mousePos = event->pos () - m_viewer->positionToXY (CellPosition (0, m_col));
+    //int x = event->pos().x() - m_viewer->columnToX(m_col);
+    //int y = event->pos().y();
+    //QPoint mousePos(x, y);
+	int x = mousePos.x (), y = mousePos.y ();
 
     if (!isEmpty && m_col >= 0) {
       // grabbing the left side of the column enables column move
@@ -1587,8 +1591,8 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
             if (s->isPlaying() && interval > 0)
               QTimer::singleShot(interval, this, SLOT(update()));
           }
-          int x0 = m_viewer->columnToX(m_col);
-          int x1 = m_viewer->columnToX(m_col + 1);
+          //int x0 = m_viewer->columnToX(m_col); // unused
+          //int x1 = m_viewer->columnToX(m_col + 1); // unused
           update();
         } else if (x >= 15 && x <= 25 && RowHeight * 2 + 4 < y &&
                    y < 8 * RowHeight + 4)
@@ -1647,12 +1651,14 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  int col            = m_viewer->xToColumn(pos.x());
+  int col            = m_viewer->xyToPosition(pos).layer ();
   if (col < -1) col  = 0;
   TXsheet *xsh       = m_viewer->getXsheet();
   TXshColumn *column = xsh->getColumn(col);
-  int x              = pos.x() - m_viewer->columnToX(col);
-  int y              = pos.y();
+  QPoint mouse = pos - m_viewer->positionToXY (CellPosition (0, col));
+  int x = mouse.x (), y = mouse.y (); // position of mouse within the cell
+  //int x              = pos.x() - m_viewer->columnToX(col);
+  //int y              = pos.y();
 
 #ifdef LINETEST
   // Controllo che il menu del motion Path sia chiuso.
@@ -1759,16 +1765,17 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
 
 void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
   QPoint pos = event->pos();
-  int col    = m_viewer->xToColumn(pos.x());
-  int x0     = m_viewer->columnToX(col);
+  CellPosition cellPosition = m_viewer->xyToPosition (pos);
+  int col    = cellPosition.layer ();
+  QPoint topLeft = m_viewer->positionToXY (cellPosition);
 
 #ifdef LINETEST
   // Camera column
   if (col == -1) return;
 #endif
 
-  if (!m_prevViewBox.translated(x0, 0)
-           .adjusted(0, 0, -ColumnWidth / 2, 0)
+  if (!m_prevViewBox.translated(topLeft)
+           .adjusted(0, 0, -ColumnWidth / 2, 0) // Only left half of the header. AREA
            .contains(pos)) {
     return;
   }
@@ -1776,7 +1783,7 @@ void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
   TXsheet *xsh = m_viewer->getXsheet();
   if (col >= 0 && xsh->isColumnEmpty(col)) return;
 
-  pos = QPoint(x0 + m_prevViewBox.x() - 10, m_prevViewBox.y() - 2);
+  pos = topLeft + QPoint(m_prevViewBox.x(), m_prevViewBox.y()) - QPoint (10, 2);
 
   m_renameColumnField->show(pos, col);
 }
@@ -1795,20 +1802,21 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
 #endif
   QPoint qPos = event->pos();
   TPoint pos(qPos.x(), qPos.y());
-  int row = m_viewer->yToRow(pos.y);
-  int col = m_viewer->xToColumn(pos.x);
+  CellPosition cellPosition = m_viewer->xyToPosition (event->pos ());
+  int row = cellPosition.frame ();
+  int col = cellPosition.layer ();
   if (col < 0)  // CAMERA
     return;
   m_viewer->setCurrentColumn(col);
   TXsheet *xsh = m_viewer->getXsheet();
-  int x0       = m_viewer->columnToX(col);
+  QPoint topLeft = m_viewer->positionToXY (cellPosition);
 
   QMenu menu(this);
   CommandManager *cmdManager = CommandManager::instance();
 
   //---- Preview
   if (!xsh->isColumnEmpty(col) &&
-      m_prevViewBox.translated(x0, 0).contains(qPos)) {
+      m_prevViewBox.translated(topLeft).contains(qPos)) {
     menu.setObjectName("xsheetColumnAreaMenu_Preview");
 
     menu.addAction(cmdManager->getAction("MI_EnableThisColumnOnly"));
@@ -1820,7 +1828,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
   }
   //---- Lock
   else if (!xsh->isColumnEmpty(col) &&
-           m_lockBox.translated(x0, 0).contains(qPos)) {
+           m_lockBox.translated(topLeft).contains(qPos)) {
     menu.setObjectName("xsheetColumnAreaMenu_Lock");
 
     menu.addAction(cmdManager->getAction("MI_LockThisColumnOnly"));
@@ -1832,7 +1840,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
   }
   //---- Camstand
   else if (!xsh->isColumnEmpty(col) &&
-           m_tableViewBox.translated(x0, 0).contains(qPos)) {
+           m_tableViewBox.translated(topLeft).contains(qPos)) {
     menu.setObjectName("xsheetColumnAreaMenu_Camstand");
 
     menu.addAction(cmdManager->getAction("MI_ActivateThisColumnOnly"));

@@ -10,7 +10,7 @@
 
 //=============================================================================
 
-const int colWidth = 74;
+const int colSize = 74; // width if vertical timeline, height if horizontal
 const int colSkip  = 9;
 
 //=============================================================================
@@ -21,24 +21,24 @@ ColumnFan::ColumnFan() : m_firstFreePos(0) {}
 //-----------------------------------------------------------------------------
 
 void ColumnFan::update() {
-  int lastPos     = -colWidth;
+  int lastPos     = -colSize;
   bool lastActive = true;
   int m           = m_columns.size();
   int i;
   for (i = 0; i < m; i++) {
     bool active = m_columns[i].m_active;
     if (lastActive)
-      lastPos += colWidth;
+      lastPos += colSize;
     else if (active)
       lastPos += colSkip;
     m_columns[i].m_pos = lastPos;
     lastActive         = active;
   }
-  m_firstFreePos = lastPos + (lastActive ? colWidth : colSkip);
+  m_firstFreePos = lastPos + (lastActive ? colSize : colSkip);
   m_table.clear();
   for (i = 0; i < m; i++)
     if (m_columns[i].m_active)
-      m_table[m_columns[i].m_pos + colWidth - 1] = i;
+      m_table[m_columns[i].m_pos + colSize - 1] = i;
     else if (i + 1 < m && m_columns[i + 1].m_active)
       m_table[m_columns[i + 1].m_pos - 1] = i;
     else if (i + 1 == m)
@@ -47,24 +47,24 @@ void ColumnFan::update() {
 
 //-----------------------------------------------------------------------------
 
-int ColumnFan::xToCol(int x) const {
-  if (x < m_firstFreePos) {
-    std::map<int, int>::const_iterator it = m_table.lower_bound(x);
+int ColumnFan::layerAxisToCol (int coord) const {
+  if (coord < m_firstFreePos) {
+    std::map<int, int>::const_iterator it = m_table.lower_bound(coord);
     if (it == m_table.end()) return -3;
     assert(it != m_table.end());
     return it->second;
   } else
-    return m_columns.size() + (x - m_firstFreePos) / colWidth;
+    return m_columns.size() + (coord - m_firstFreePos) / colSize;
 }
 
 //-----------------------------------------------------------------------------
 
-int ColumnFan::colToX(int col) const {
+int ColumnFan::colToLayerAxis (int col) const {
   int m = m_columns.size();
   if (col >= 0 && col < m)
     return m_columns[col].m_pos;
   else
-    return m_firstFreePos + (col - m) * colWidth;
+    return m_firstFreePos + (col - m) * colSize;
 }
 
 //-----------------------------------------------------------------------------

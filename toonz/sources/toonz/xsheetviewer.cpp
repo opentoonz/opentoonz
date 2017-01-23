@@ -162,7 +162,10 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea)) {
-  setFocusPolicy(Qt::StrongFocus);
+
+	m_orientation = orientations.topToBottom ();
+
+	setFocusPolicy(Qt::StrongFocus);
 
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("XsheetViewer");
@@ -444,7 +447,8 @@ bool XsheetViewer::refreshContentSize(int dx, int dy) {
   TXsheet *xsh    = getXsheet();
   int frameCount  = xsh ? xsh->getFrameCount() : 0;
   int columnCount = xsh ? xsh->getColumnCount() : 0;
-  QSize contentSize(columnToX(columnCount + 1), rowToY(frameCount + 1));
+  QPoint dimensions = positionToXY (CellPosition (frameCount + 1, columnCount + 1));
+  QSize contentSize(dimensions.x (), dimensions.y ());
 
   QSize actualSize(contentSize);
   int x = viewportSize.width() - offset.x();
@@ -486,23 +490,46 @@ void XsheetViewer::updateAreeSize() {
 
 //-----------------------------------------------------------------------------
 
-int XsheetViewer::xToColumn(int x) const {
-  return getXsheet()->getColumnFan()->xToCol(x);
+CellPosition XsheetViewer::xyToPosition (const QPoint &point) const {
+	return m_orientation->xyToPosition (point, getXsheet ()->getColumnFan ());
+}
+CellPosition XsheetViewer::xyToPosition (const TPoint &point) const {
+	return xyToPosition (QPoint (point.x, point.y));
+}
+CellPosition XsheetViewer::xyToPosition (const TPointD &point) const {
+	return xyToPosition (QPoint ((int) point.x, (int) point.y));
 }
 
 //-----------------------------------------------------------------------------
 
-int XsheetViewer::yToRow(int y) const { return y / XsheetGUI::RowHeight; }
+QPoint XsheetViewer::positionToXY (const CellPosition &pos) const {
+	return m_orientation->positionToXY (pos, getXsheet ()->getColumnFan ());
+}
 
-//-----------------------------------------------------------------------------
-
-int XsheetViewer::columnToX(int col) const {
-  return getXsheet()->getColumnFan()->colToX(col);
+int XsheetViewer::columnToLayerAxis (int layer) const {
+	return m_orientation->colToLayerAxis (layer, getXsheet ()->getColumnFan ());
+}
+int XsheetViewer::rowToFrameAxis (int frame) const {
+	return m_orientation->rowToFrameAxis (frame);
 }
 
 //-----------------------------------------------------------------------------
 
-int XsheetViewer::rowToY(int row) const { return row * XsheetGUI::RowHeight; }
+CellRange XsheetViewer::xyRectToRange (const QRect &rect) const {
+	CellPosition topLeft = xyToPosition (rect.topLeft ());
+	CellPosition bottomRight = xyToPosition (rect.bottomRight ());
+	return CellRange (topLeft, bottomRight);
+}
+
+//-----------------------------------------------------------------------------
+
+QRect XsheetViewer::rangeToXYRect (const CellRange &range) const {
+	QPoint from = positionToXY (range.from ());
+	QPoint to = positionToXY (range.to ());
+	QPoint topLeft = QPoint (min (from.x (), to.x ()), min (from.y (), to.y ()));
+	QPoint bottomRight = QPoint (max (from.x (), to.x ()), max (from.y (), to.y ()));
+	return QRect (topLeft, bottomRight);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -835,8 +862,8 @@ void XsheetViewer::enterEvent(QEvent *) { m_cellArea->onControlPressed(false); }
 */
 void XsheetViewer::scrollTo(int row, int col) {
   QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
-  QRect cellRect(columnToX(col), rowToY(row), XsheetGUI::ColumnWidth,
-                 XsheetGUI::RowHeight);
+  QPoint topLeft = positionToXY (CellPosition (row, col));
+  QRect cellRect(topLeft, QSize (XsheetGUI::ColumnWidth, XsheetGUI::RowHeight));
 
   int deltaX = 0;
   int deltaY = 0;
@@ -909,10 +936,13 @@ void XsheetViewer::onCurrentColumnSwitched() {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::scrollToColumn(int col) {
-  int x0 = columnToX(col);
-  int x1 = columnToX(col + 1);
+	int x0 = columnToLayerAxis (col);
+	int x1 = columnToLayerAxis (col + 1);
 
-  scrollToHorizontalRange(x0, x1);
+	if (orientation ()->isVerticalTimeline ())
+		scrollToHorizontalRange (x0, x1);
+	else
+		scrollToVerticalRange (x0, x1);
 }
 
 //-----------------------------------------------------------------------------
@@ -922,12 +952,12 @@ void XsheetViewer::scrollToHorizontalRange(int x0, int x1) {
   int visibleLeft   = visibleRect.left();
   int visibleRight  = visibleRect.right();
 
-  if (visibleLeft > x1) {  // Se sono fuori dalla regione visibile in alto
+  if (visibleLeft > x0) {  // If they are out of left visible region
     int deltaX = x0 - visibleLeft;
     scroll(QPoint(deltaX, 0));
     return;
   }
-  if (visibleRight < x1) {  // Se sono fuori dalla regione visibile in basso
+  if (visibleRight < x1) {  // If they are out of right visible region
     int deltaX = x1 + 2 - visibleRight;
     scroll(QPoint(deltaX, 0));
     return;
@@ -938,21 +968,26 @@ void XsheetViewer::scrollToHorizontalRange(int x0, int x1) {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::scrollToRow(int row) {
-  int y0 = rowToY(row);
-  int y1 = rowToY(row + 1);
+	int y0 = rowToFrameAxis (row);
+	int y1 = rowToFrameAxis (row + 1);
 
-  scrollToVerticalRange(y0, y1);
+	if (orientation ()->isVerticalTimeline ())
+		scrollToVerticalRange (y0, y1);
+	else
+		scrollToHorizontalRange (y0, y1);
 }
 
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::scrollToVerticalRange(int y0, int y1) {
-  QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
+	int yMin = min (y0, y1);
+	int yMax = max (y0, y1);
+	QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
   int visibleTop    = visibleRect.top();
   int visibleBottom = visibleRect.bottom();
 
-  if (visibleTop > y0) {  // Se sono fuori dalla regione visibile in alto
-    int deltaY = y0 - visibleTop;
+  if (visibleTop > yMin) {  // If they are out of top visible region
+    int deltaY = yMin - visibleTop;
     if (!TApp::instance()->getCurrentFrame()->isPlaying() ||
         Preferences::instance()->isXsheetAutopanEnabled()) {
       scroll(QPoint(0, deltaY));
@@ -960,8 +995,8 @@ void XsheetViewer::scrollToVerticalRange(int y0, int y1) {
     }
   }
 
-  if (visibleBottom < y1) {  // Se sono fuori dalla regione visibile in basso
-    int deltaY = y1 + 2 - visibleBottom;
+  if (visibleBottom < yMax) {  // If they are out of bottom visible region
+    int deltaY = yMax + 2 - visibleBottom;
     if (!TApp::instance()->getCurrentFrame()->isPlaying() ||
         Preferences::instance()->isXsheetAutopanEnabled()) {
       scroll(QPoint(0, deltaY));
@@ -1076,12 +1111,11 @@ void XsheetViewer::setCurrentNoteIndex(int currentNoteIndex) {
   int col            = notes->getNoteCol(currentNoteIndex);
   TPointD pos        = notes->getNotePos(currentNoteIndex);
 
-  int x0 = columnToX(col) + pos.x;
-  int x1 = x0 + XsheetGUI::NoteWidth;
-  scrollToHorizontalRange(x0, x1);
-  int y0 = rowToY(row) + pos.y;
-  int y1 = y0 + XsheetGUI::NoteHeight;
-  scrollToVerticalRange(y0, y1);
+  QPoint topLeft = positionToXY (CellPosition (row, col)) + QPoint (pos.x, pos.y); // actually xy
+  QSize size (XsheetGUI::NoteWidth, XsheetGUI::NoteHeight);
+  QRect noteRect (topLeft, size);
+  scrollToHorizontalRange(noteRect.left (), noteRect.right ());
+  scrollToVerticalRange(noteRect.top (), noteRect.bottom ());
 }
 
 //-----------------------------------------------------------------------------
