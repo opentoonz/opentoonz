@@ -1622,10 +1622,12 @@ void CellArea::paintEvent(QPaintEvent *event) {
 
   if (getDragTool()) getDragTool()->drawCellsArea(p);
 
+  // focus cell
   int row    = m_viewer->getCurrentRow();
   int col    = m_viewer->getCurrentColumn();
   QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
-  QRect rect = QRect(xy + QPoint (1, 1), QSize (ColumnWidth - 2, RowHeight - 2));
+  QRect rect = m_viewer->orientation ()->rect (PredefinedRect::CELL)
+    .translated (xy).adjusted (1, 1, -2, -2);
   p.setPen(Qt::black);
   p.setBrush(Qt::NoBrush);
   p.drawRect(rect);

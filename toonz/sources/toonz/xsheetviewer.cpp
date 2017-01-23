@@ -163,12 +163,13 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea)) {
 
-	m_orientation = orientations.topToBottom ();
-
 	setFocusPolicy(Qt::StrongFocus);
 
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("XsheetViewer");
+
+  m_orientation = orientations.leftToRight ();
+  getXsheet ()->getColumnFan ()->setSize (m_orientation->dimension (PredefinedDimension::LAYER));
 
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());

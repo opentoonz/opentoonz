@@ -9,36 +9,40 @@
 #include <assert.h>
 
 //=============================================================================
-
-const int colSize = 74; // width if vertical timeline, height if horizontal
-const int colSkip  = 9;
-
-//=============================================================================
 // ColumnFan
 
-ColumnFan::ColumnFan() : m_firstFreePos(0) {}
+ColumnFan::ColumnFan() : m_firstFreePos(0), m_unfolded (74), m_folded (9) {}
+
+
+//-----------------------------------------------------------------------------
+
+void ColumnFan::setSize (int unfolded) {
+  m_unfolded = unfolded;
+  // folded always 9
+  update ();
+}
 
 //-----------------------------------------------------------------------------
 
 void ColumnFan::update() {
-  int lastPos     = -colSize;
+  int lastPos     = -m_unfolded;
   bool lastActive = true;
   int m           = m_columns.size();
   int i;
   for (i = 0; i < m; i++) {
     bool active = m_columns[i].m_active;
     if (lastActive)
-      lastPos += colSize;
+      lastPos += m_unfolded;
     else if (active)
-      lastPos += colSkip;
+      lastPos += m_folded;
     m_columns[i].m_pos = lastPos;
     lastActive         = active;
   }
-  m_firstFreePos = lastPos + (lastActive ? colSize : colSkip);
+  m_firstFreePos = lastPos + (lastActive ? m_unfolded : m_folded);
   m_table.clear();
   for (i = 0; i < m; i++)
     if (m_columns[i].m_active)
-      m_table[m_columns[i].m_pos + colSize - 1] = i;
+      m_table[m_columns[i].m_pos + m_unfolded - 1] = i;
     else if (i + 1 < m && m_columns[i + 1].m_active)
       m_table[m_columns[i + 1].m_pos - 1] = i;
     else if (i + 1 == m)
@@ -54,7 +58,7 @@ int ColumnFan::layerAxisToCol (int coord) const {
     assert(it != m_table.end());
     return it->second;
   } else
-    return m_columns.size() + (coord - m_firstFreePos) / colSize;
+    return m_columns.size() + (coord - m_firstFreePos) / m_unfolded;
 }
 
 //-----------------------------------------------------------------------------
@@ -64,7 +68,7 @@ int ColumnFan::colToLayerAxis (int col) const {
   if (col >= 0 && col < m)
     return m_columns[col].m_pos;
   else
-    return m_firstFreePos + (col - m) * colSize;
+    return m_firstFreePos + (col - m) * m_unfolded;
 }
 
 //-----------------------------------------------------------------------------

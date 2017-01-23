@@ -40,6 +40,7 @@ class DVAPI ColumnFan {
   std::vector<Column> m_columns;
   std::map<int, int> m_table;
   int m_firstFreePos;
+  int m_unfolded, m_folded;
 
   /*!
 Called by activate() and deactivate() to update columns coordinates.
@@ -51,6 +52,9 @@ public:
 Constructs a ColumnFan with default value.
 */
   ColumnFan();
+
+  //! Adjust column sizes when switching orientation
+  void setSize (int unfolded);
 
   /*!
 Set column \b col not folded.
