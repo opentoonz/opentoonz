@@ -8,11 +8,16 @@ using std::pair;
 
 Orientations orientations;
 
+namespace {
+  const int KEY_ICON_WIDTH = 11;
+  const int KEY_ICON_HEIGHT = 13;
+  const int EASE_TRIANGLE_SIZE = 4;
+}
+
 class TopToBottomOrientation : public Orientation {
   const int CELL_WIDTH = 74;
   const int CELL_HEIGHT = 20;
   const int CELL_DRAG_WIDTH = 7;
-  const int KEY_LINE_INDENT = 8;
 
 public:
   TopToBottomOrientation ();
@@ -28,9 +33,6 @@ public:
 	virtual NumberRange layerSide (const QRect &area) const override;
 	virtual NumberRange frameSide (const QRect &area) const override;
 
-	virtual int keyPixOffset (const QPixmap &pixmap) const override;
-  virtual QPainterPath endOfDragHandle () const override;
-
 	virtual bool isVerticalTimeline () const override { return true;  }
 };
 
@@ -38,7 +40,6 @@ class LeftToRightOrientation : public Orientation {
   const int CELL_WIDTH = 47;
   const int CELL_HEIGHT = 47;
   const int CELL_DRAG_HEIGHT = 7;
-  const int KEY_LINE_INDENT = 5;
 
 public:
   LeftToRightOrientation ();
@@ -53,9 +54,6 @@ public:
 
 	virtual NumberRange layerSide (const QRect &area) const override;
 	virtual NumberRange frameSide (const QRect &area) const override;
-
-	virtual int keyPixOffset (const QPixmap &pixmap) const override;
-  virtual QPainterPath endOfDragHandle () const override;
 
 	virtual bool isVerticalTimeline () const override { return false; }
 };
@@ -111,17 +109,41 @@ void Orientation::addLine (PredefinedLine which, const QLine &line) {
 void Orientation::addDimension (PredefinedDimension which, int dimension) {
   _dimensions.insert (pair<PredefinedDimension, int> (which, dimension));
 }
+void Orientation::addPath (PredefinedPath which, const QPainterPath &path) {
+  _paths.insert (pair<PredefinedPath, QPainterPath> (which, path));
+}
 
 /// -------------------------------------------------------------------------------
 
 TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::CELL, QRect (0, 0, CELL_WIDTH, CELL_HEIGHT));
-  addRect (PredefinedRect::CELL_DRAG_HANDLE, QRect (0, 0, CELL_DRAG_WIDTH, CELL_HEIGHT));
+  addRect (PredefinedRect::DRAG_HANDLE_CORNER, QRect (0, 0, CELL_DRAG_WIDTH, CELL_HEIGHT));
+  QRect keyRect (CELL_WIDTH - KEY_ICON_WIDTH, (CELL_HEIGHT - KEY_ICON_HEIGHT) / 2, KEY_ICON_WIDTH, KEY_ICON_HEIGHT);
+  addRect (PredefinedRect::KEY_ICON, keyRect);
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
 
   addDimension (PredefinedDimension::LAYER, CELL_WIDTH);
-  addDimension (PredefinedDimension::KEY_LINE, CELL_WIDTH - KEY_LINE_INDENT);
+
+  QPainterPath corner (QPointF (0, CELL_HEIGHT));
+  corner.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT));
+  corner.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT - CELL_DRAG_WIDTH));
+  corner.lineTo (QPointF (0, CELL_HEIGHT));
+  addPath (PredefinedPath::DRAG_HANDLE_CORNER, corner);
+
+  QPainterPath fromTriangle (QPointF (0, EASE_TRIANGLE_SIZE / 2));
+  fromTriangle.lineTo (QPointF (EASE_TRIANGLE_SIZE, -EASE_TRIANGLE_SIZE / 2));
+  fromTriangle.lineTo (QPointF (-EASE_TRIANGLE_SIZE, -EASE_TRIANGLE_SIZE / 2));
+  fromTriangle.lineTo (QPointF (0, EASE_TRIANGLE_SIZE / 2));
+  fromTriangle.translate (keyRect.center ());
+  addPath (PredefinedPath::BEGIN_EASE_TRIANGLE, fromTriangle);
+
+  QPainterPath toTriangle (QPointF (0, -EASE_TRIANGLE_SIZE / 2));
+  toTriangle.lineTo (QPointF (EASE_TRIANGLE_SIZE, EASE_TRIANGLE_SIZE / 2));
+  toTriangle.lineTo (QPointF (-EASE_TRIANGLE_SIZE, EASE_TRIANGLE_SIZE / 2));
+  toTriangle.lineTo (QPointF (0, -EASE_TRIANGLE_SIZE / 2));
+  toTriangle.translate (keyRect.center ());
+  addPath (PredefinedPath::END_EASE_TRIANGLE, toTriangle);
 }
 
 CellPosition TopToBottomOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
@@ -149,16 +171,6 @@ NumberRange TopToBottomOrientation::layerSide (const QRect &area) const {
 NumberRange TopToBottomOrientation::frameSide (const QRect &area) const {
 	return NumberRange (area.top (), area.bottom ());
 }
-int TopToBottomOrientation::keyPixOffset (const QPixmap &pixmap) const {
-	return (CELL_HEIGHT - pixmap.height ()) / 2;
-}
-QPainterPath TopToBottomOrientation::endOfDragHandle () const {
-  QPainterPath triangle (QPointF (0, CELL_HEIGHT));
-  triangle.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT));
-  triangle.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT - CELL_DRAG_WIDTH));
-  triangle.lineTo (QPointF (0, CELL_HEIGHT));
-  return triangle;
-}
 
 
 /// --------------------------------------------------------------------------------
@@ -166,12 +178,33 @@ QPainterPath TopToBottomOrientation::endOfDragHandle () const {
 
 LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::CELL, QRect (0, 0, CELL_WIDTH, CELL_HEIGHT));
-  addRect (PredefinedRect::CELL_DRAG_HANDLE, QRect (0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
+  addRect (PredefinedRect::DRAG_HANDLE_CORNER, QRect (0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
+  QRect keyRect ((CELL_WIDTH - KEY_ICON_WIDTH) / 2, CELL_HEIGHT - KEY_ICON_HEIGHT, KEY_ICON_WIDTH, KEY_ICON_HEIGHT);
+  addRect (PredefinedRect::KEY_ICON, keyRect);
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
 
   addDimension (PredefinedDimension::LAYER, CELL_HEIGHT);
-  addDimension (PredefinedDimension::KEY_LINE, /* CELL_HEIGHT - */ KEY_LINE_INDENT);
+
+  QPainterPath corner (QPointF (CELL_WIDTH, 0));
+  corner.lineTo (QPointF (CELL_WIDTH, CELL_DRAG_HEIGHT));
+  corner.lineTo (QPointF (CELL_WIDTH - CELL_DRAG_HEIGHT, CELL_DRAG_HEIGHT));
+  corner.lineTo (QPointF (CELL_WIDTH, 0));
+  addPath (PredefinedPath::DRAG_HANDLE_CORNER, corner);
+
+  QPainterPath fromTriangle (QPointF (EASE_TRIANGLE_SIZE / 2, 0));
+  fromTriangle.lineTo (QPointF (-EASE_TRIANGLE_SIZE / 2, EASE_TRIANGLE_SIZE));
+  fromTriangle.lineTo (QPointF (-EASE_TRIANGLE_SIZE / 2, -EASE_TRIANGLE_SIZE));
+  fromTriangle.lineTo (QPointF (EASE_TRIANGLE_SIZE / 2, 0));
+  fromTriangle.translate (keyRect.center ());
+  addPath (PredefinedPath::BEGIN_EASE_TRIANGLE, fromTriangle);
+
+  QPainterPath toTriangle (QPointF (-EASE_TRIANGLE_SIZE / 2, 0));
+  toTriangle.lineTo (QPointF (EASE_TRIANGLE_SIZE / 2, EASE_TRIANGLE_SIZE));
+  toTriangle.lineTo (QPointF (EASE_TRIANGLE_SIZE / 2, -EASE_TRIANGLE_SIZE));
+  toTriangle.lineTo (QPointF (-EASE_TRIANGLE_SIZE / 2, 0));
+  toTriangle.translate (keyRect.center ());
+  addPath (PredefinedPath::END_EASE_TRIANGLE, toTriangle);
 }
 
 CellPosition LeftToRightOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
@@ -198,14 +231,4 @@ NumberRange LeftToRightOrientation::layerSide (const QRect &area) const {
 }
 NumberRange LeftToRightOrientation::frameSide (const QRect &area) const {
 	return NumberRange (area.left (), area.right ());
-}
-int LeftToRightOrientation::keyPixOffset (const QPixmap &pixmap) const {
-	return (CELL_WIDTH - pixmap.width ()) / 2;
-}
-QPainterPath LeftToRightOrientation::endOfDragHandle () const {
-  QPainterPath triangle (QPointF (CELL_WIDTH, 0));
-  triangle.lineTo (QPointF (CELL_WIDTH, CELL_DRAG_HEIGHT));
-  triangle.lineTo (QPointF (CELL_WIDTH - CELL_DRAG_HEIGHT, CELL_DRAG_HEIGHT));
-  triangle.lineTo (QPointF (CELL_WIDTH, 0));
-  return triangle;
 }

@@ -1052,7 +1052,7 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) { // ORIENTATION?
 
 // paint side bar
 void CellArea::drawDragHandle (QPainter &p, const QPoint &xy, const QColor &sideColor) const {
-  QRect dragHandleRect = m_viewer->orientation ()->rect (PredefinedRect::CELL_DRAG_HANDLE)
+  QRect dragHandleRect = m_viewer->orientation ()->rect (PredefinedRect::DRAG_HANDLE_CORNER)
     .translated (xy);
   p.fillRect (dragHandleRect, QBrush (sideColor));
 }
@@ -1061,9 +1061,9 @@ void CellArea::drawDragHandle (QPainter &p, const QPoint &xy, const QColor &side
 void CellArea::drawEndOfDragHandle (QPainter &p, bool isEnd, const QPoint &xy, const QColor &cellColor) const {
   if (!isEnd)
     return;
-  QPainterPath triangle = m_viewer->orientation ()->endOfDragHandle ()
+  QPainterPath corner = m_viewer->orientation ()->path (PredefinedPath::DRAG_HANDLE_CORNER)
     .translated (xy);
-  p.fillPath (triangle, QBrush (cellColor));
+  p.fillPath (corner, QBrush (cellColor));
 }
 
 // draw dot line if the column is locked
@@ -1421,7 +1421,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 
 //-----------------------------------------------------------------------------
 
-void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
+void CellArea::drawKeyframe (QPainter &p, const QRect toBeUpdated) {
   int r0, r1, c0, c1;  // range of visible rows and columns
   CellRange visible = m_viewer->xyRectToRange (toBeUpdated);
   r0 = visible.from ().frame ();
@@ -1429,120 +1429,127 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
   c0 = visible.from ().layer ();
   c1 = visible.to ().layer ();
 
-  static QPixmap selectedKey = QPixmap(":Resources/selected_key.bmp");
-  static QPixmap key         = QPixmap(":Resources/key.bmp");
-  int keyPixOffset           = m_viewer->orientation ()->keyPixOffset (key);
+  static QPixmap selectedKey = QPixmap (":Resources/selected_key.bmp");
+  static QPixmap key = QPixmap (":Resources/key.bmp");
+  const QRect &keyRect = m_viewer->orientation ()->rect (PredefinedRect::KEY_ICON);
 
-  TXsheet *xsh         = m_viewer->getXsheet();
-  ColumnFan *columnFan = xsh->getColumnFan();
+  TXsheet *xsh = m_viewer->getXsheet ();
+  ColumnFan *columnFan = xsh->getColumnFan ();
   int col;
   for (col = c0; col <= c1; col++) {
-    if (!columnFan->isActive(col)) continue;
-	int layerAxis = m_viewer->columnToLayerAxis (col);
-    TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
+    if (!columnFan->isActive (col)) continue;
+    int layerAxis = m_viewer->columnToLayerAxis (col);
+
+    TStageObject *pegbar = xsh->getStageObject (m_viewer->getObjectId (col));
     if (!pegbar) return;
+
     int row0, row1;
-    bool emptyKeyframe = !pegbar->getKeyframeRange(row0, row1);
+    bool emptyKeyframe = !pegbar->getKeyframeRange (row0, row1);
     if (emptyKeyframe) continue;
+
     bool emptyKeyframeRange = row0 >= row1;
     int row;
-    row0 = std::max(row0, r0);
-    row1 = std::min(row1, r1);
+    row0 = std::max (row0, r0);
+    row1 = std::min (row1, r1);
 
     /*- first, draw key segments -*/
-    p.setPen(m_viewer->getTextColor());
-    int line_layerAxis = layerAxis + m_viewer->orientation ()->dimension (PredefinedDimension::KEY_LINE);
+    p.setPen (m_viewer->getTextColor ());
+    int line_layerAxis = layerAxis + m_viewer->orientation ()->layerSide (keyRect).middle ();
     for (row = row0; row <= row1; row++) {
-      int handleRow0, handleRow1;
+      int segmentRow0, segmentRow1;
       double ease0, ease1;
-      if (pegbar->getKeyframeSpan(row, handleRow0, ease0, handleRow1, ease1)) {
-        int frameAxis0 = m_viewer->rowToFrameAxis(handleRow0 + 1) - keyPixOffset;
-        int frameAxis1 = m_viewer->rowToFrameAxis(handleRow1)     + keyPixOffset;
-		QLine keySegment = m_viewer->orientation ()->verticalLine (line_layerAxis, NumberRange (frameAxis0, frameAxis1));
-        p.drawLine(keySegment);
-        if (handleRow1 - handleRow0 > 4) { // only show if distance more than 4 frames
-          int rh0, rh1;
-          if (getEaseHandles(handleRow0, handleRow1, ease0, ease1, rh0, rh1)) {
-			const Orientation *o = m_viewer->orientation ();
-			int e0_frameAxis = m_viewer->rowToFrameAxis (rh0) + keyPixOffset;
-            drawArrow(p, o->frameLayerToXY (e0_frameAxis + 2, line_layerAxis - 4),
-                         o->frameLayerToXY (e0_frameAxis + 2, line_layerAxis + 4),
-				         o->frameLayerToXY (e0_frameAxis + 6, line_layerAxis),
-                      true, m_viewer->getLightLineColor(),
-                      m_viewer->getTextColor());
-            int e1_frameAxis = m_viewer->rowToFrameAxis (rh1 + 1) - keyPixOffset;
-            drawArrow(p, o->frameLayerToXY (e1_frameAxis - 2, line_layerAxis - 4),
-                         o->frameLayerToXY (e1_frameAxis - 2, line_layerAxis + 4),
-				         o->frameLayerToXY (e1_frameAxis - 6, line_layerAxis),
-                      true, m_viewer->getLightLineColor(),
-                      m_viewer->getTextColor());
+      if (pegbar->getKeyframeSpan (row, segmentRow0, ease0, segmentRow1, ease1)) {
+
+        drawKeyframeLine (p, col, NumberRange (segmentRow0, segmentRow1));
+
+        if (segmentRow1 - segmentRow0 > 4) { // only show if distance more than 4 frames
+          int handleRow0, handleRow1;
+          if (getEaseHandles (segmentRow0, segmentRow1, ease0, ease1, handleRow0, handleRow1)) {
+            m_viewer->drawPredefinedPath (p,
+              PredefinedPath::BEGIN_EASE_TRIANGLE, CellPosition (handleRow0, col),
+              m_viewer->getLightLineColor (), m_viewer->getTextColor ());
+
+            m_viewer->drawPredefinedPath (p,
+              PredefinedPath::END_EASE_TRIANGLE, CellPosition (handleRow1, col),
+              m_viewer->getLightLineColor (), m_viewer->getTextColor ());
           }
         }
         // skip to next segment
-        row = handleRow1 - 1;
-      } else if (pegbar->isKeyframe(row) && pegbar->isKeyframe(row + 1)) {
-        int frameAxis0 = m_viewer->rowToFrameAxis (row + 1);
-		QLine keySegment = m_viewer->orientation ()->verticalLine (line_layerAxis, NumberRange (frameAxis0 - keyPixOffset, frameAxis0 + keyPixOffset));
-        p.drawLine(keySegment);
+        row = segmentRow1 - 1;
+      }
+      else if (pegbar->isKeyframe (row) && pegbar->isKeyframe (row + 1)) {
+        // 2 keyframes in a row - connect with a short line
+        drawKeyframeLine (p, col, NumberRange (row, row + 1));
       }
     }
 
     /*- then draw keyframe pixmaps -*/
-	int icon_layerAxis = line_layerAxis - 5;
+    int icon_layerAxis = line_layerAxis - 5;
     for (row = row0; row <= row1; row++) {
-	  int frameAxis = m_viewer->rowToFrameAxis (row) + 1;
-      p.setPen(m_viewer->getTextColor());
-      if (pegbar->isKeyframe(row)) {
-		QPoint target = m_viewer->orientation ()->frameLayerToXY (frameAxis + keyPixOffset, icon_layerAxis);
-		if (m_viewer->getKeyframeSelection() &&
-            m_viewer->getKeyframeSelection()->isSelected(row, col)) {
+      p.setPen (m_viewer->getTextColor ());
+      if (pegbar->isKeyframe (row)) {
+        QPoint target = keyRect
+          .translated (m_viewer->positionToXY (CellPosition (row, col))).topLeft ();
+        if (m_viewer->getKeyframeSelection () &&
+          m_viewer->getKeyframeSelection ()->isSelected (row, col)) {
           // keyframe selected
-          p.drawPixmap(target, selectedKey);
-        } else {
+          p.drawPixmap (target, selectedKey);
+        }
+        else {
           // keyframe not selected
-          p.drawPixmap(target, key);
+          p.drawPixmap (target, key);
         }
       }
     }
 
-	int icon_frameAxis = m_viewer->rowToFrameAxis (row1 + 1);
+    int icon_frameAxis = m_viewer->rowToFrameAxis (row1 + 1);
     if (!emptyKeyframeRange && row0 <= row1 + 1) {
       // there's just a keyframe
       // drawing loop button
-      p.setBrush(Qt::white);
-      p.setPen(Qt::black);
-	  QPoint target = m_viewer->orientation ()->frameLayerToXY (icon_frameAxis, icon_layerAxis);
-      p.drawRect(QRect (target, QSize (10, 10)));
-      p.setBrush(Qt::NoBrush);
+      p.setBrush (Qt::white);
+      p.setPen (Qt::black);
+      QPoint target = m_viewer->orientation ()->frameLayerToXY (icon_frameAxis, icon_layerAxis);
+      p.drawRect (QRect (target, QSize (10, 10)));
+      p.setBrush (Qt::NoBrush);
       // drawing the bottom edge (rounded)
-      p.drawLine(target + QPoint (1, 10), target + QPoint (9, 10));
-      p.setPen(Qt::white);
-      p.drawLine(target + QPoint (3, 10), target + QPoint (7, 10));
-      p.setPen(Qt::black);
-      p.drawLine(target + QPoint (3, 11), target + QPoint (7, 11));
+      p.drawLine (target + QPoint (1, 10), target + QPoint (9, 10));
+      p.setPen (Qt::white);
+      p.drawLine (target + QPoint (3, 10), target + QPoint (7, 10));
+      p.setPen (Qt::black);
+      p.drawLine (target + QPoint (3, 11), target + QPoint (7, 11));
 
       // drawing the arrow
-      p.drawArc(QRect(target + QPoint (2, 3), QSize (6, 6)), 180 * 16, 270 * 16);
-      p.drawLine(target + QPoint (5, 2), target + QPoint (5, 5));
-      p.drawLine(target + QPoint (5, 2), target + QPoint (8, 2));
+      p.drawArc (QRect (target + QPoint (2, 3), QSize (6, 6)), 180 * 16, 270 * 16);
+      p.drawLine (target + QPoint (5, 2), target + QPoint (5, 5));
+      p.drawLine (target + QPoint (5, 2), target + QPoint (8, 2));
     }
-    if (pegbar->isCycleEnabled()) {
+    if (pegbar->isCycleEnabled ()) {
       // the row zigzag bellow the button
-	  const Orientation *o = m_viewer->orientation ();
-	  int ymax = m_viewer->rowToFrameAxis(r1 + 1);
-      int qy   = icon_frameAxis + 12;
-      int zig  = 2;
-      int qx   = icon_layerAxis + 5;
-	  p.setPen(m_viewer->getTextColor());
-      p.drawLine(o->frameLayerToXY (qy, qx), o->frameLayerToXY (qy + zig, qx - zig));
+      const Orientation *o = m_viewer->orientation ();
+      int ymax = m_viewer->rowToFrameAxis (r1 + 1);
+      int qy = icon_frameAxis + 12;
+      int zig = 2;
+      int qx = icon_layerAxis + 5;
+      p.setPen (m_viewer->getTextColor ());
+      p.drawLine (o->frameLayerToXY (qy, qx), o->frameLayerToXY (qy + zig, qx - zig));
       while (qy < ymax) {
-        p.drawLine(o->frameLayerToXY (qy + zig, qx - zig), o->frameLayerToXY (qy + 3 * zig, qx + zig));
-        p.drawLine(o->frameLayerToXY (qy + 3 * zig, qx + zig), o->frameLayerToXY (qy + 5 * zig, qx - zig));
+        p.drawLine (o->frameLayerToXY (qy + zig, qx - zig), o->frameLayerToXY (qy + 3 * zig, qx + zig));
+        p.drawLine (o->frameLayerToXY (qy + 3 * zig, qx + zig), o->frameLayerToXY (qy + 5 * zig, qx - zig));
         qy += 4 * zig;
       }
     }
   }
 }
+
+void CellArea::drawKeyframeLine (QPainter &p, int col, const NumberRange &rows) const {
+  const QRect &keyRect = m_viewer->orientation ()->rect (PredefinedRect::KEY_ICON);
+  QPoint begin = keyRect.center () + m_viewer->positionToXY (CellPosition (rows.from (), col));
+  QPoint end = keyRect.center () + m_viewer->positionToXY (CellPosition (rows.to (), col));
+
+  p.setPen (m_viewer->getTextColor ());
+  p.drawLine (QLine (begin, end));
+}
+
 //-----------------------------------------------------------------------------
 
 void CellArea::drawNotes(QPainter &p, const QRect toBeUpdated) {

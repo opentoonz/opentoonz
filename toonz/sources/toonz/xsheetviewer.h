@@ -13,6 +13,9 @@
 #include "cellkeyframeselection.h"
 #include "toonzqt/spreadsheetviewer.h"
 #include "Orientation.h"
+#include <boost/optional.hpp>
+
+using boost::optional;
 
 #ifdef _WIN32
 #define XSHEET_FONT_SIZE 9
@@ -431,11 +434,6 @@ public:
     return m_autoPanSpeed.x() != 0 || m_autoPanSpeed.y() != 0;
   }
 
-  /*
-  int xToColumn(int x) const;
-  int yToRow(int y) const;
-  int columnToX(int col) const;
-  int rowToY(int row) const; */
   CellPosition xyToPosition (const QPoint &point) const;
   CellPosition xyToPosition (const TPoint &point) const;
   CellPosition xyToPosition (const TPointD &point) const;
@@ -448,6 +446,9 @@ public:
   QRect rangeToXYRect (const CellRange &range) const;
 
   const Orientation *orientation () const { return m_orientation;  }
+
+  void drawPredefinedPath (QPainter &p, PredefinedPath which, const CellPosition &pos,
+    optional<QColor> fill, optional<QColor> outline) const;
 
   void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
   void updateRows() { m_rowArea->update(m_rowArea->visibleRegion()); }

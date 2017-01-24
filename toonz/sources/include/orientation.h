@@ -7,6 +7,7 @@
 #include <QPoint>
 #include <QLine>
 #include <QRect>
+#include <QPainterPath>
 #include <map>
 
 using std::map;
@@ -25,6 +26,7 @@ public:
 	int to () const { return _to; }
 
 	int length () const { return _to - _from;  }
+  int middle () const { return (_to + _from) / 2; }
 };
 
 class ColumnFan;
@@ -34,14 +36,19 @@ class QPainterPath;
 //! lists predefined rectangle sizes and positions (relative to top left corner of a cell)
 enum class PredefinedRect {
   CELL, //! size of a cell
-  CELL_DRAG_HANDLE //! area for dragging a cell
+  DRAG_HANDLE_CORNER, //! area for dragging a cell
+  KEY_ICON //! position of key icon
 };
 enum class PredefinedLine {
   LOCKED //! dotted vertical line when cell is locked
 };
 enum class PredefinedDimension {
-  LAYER, //! width of a layer column / height of layer row
-  KEY_LINE, //! offset of vertical / horizontal line connecting keyframe icons
+  LAYER //! width of a layer column / height of layer row
+};
+enum class PredefinedPath {
+  DRAG_HANDLE_CORNER, //! triangle corner at drag sidebar
+  BEGIN_EASE_TRIANGLE, //! triangle marking beginning of ease range
+  END_EASE_TRIANGLE //! triangle marking end of ease range
 };
 
 class Orientation {
@@ -49,6 +56,7 @@ protected:
   map<PredefinedRect, QRect> _rects;
   map<PredefinedLine, QLine> _lines;
   map<PredefinedDimension, int> _dimensions;
+  map<PredefinedPath, QPainterPath> _paths;
 
 public:
 	virtual CellPosition xyToPosition (const QPoint &xy, const ColumnFan *fan) const = 0;
@@ -68,22 +76,17 @@ public:
 	QLine verticalLine (int layerAxis, const NumberRange &frameAxis) const;
 	QLine horizontalLine (int frameAxis, const NumberRange &layerAxis) const;
 
-	//! positions key icon in the middle of cell by the frame axis
-	virtual int keyPixOffset (const QPixmap &pixmap) const = 0;
-  virtual QPainterPath endOfDragHandle () const = 0;
-
 	virtual bool isVerticalTimeline () const = 0;
 
-  //! returns a predefined rectangle area
   virtual const QRect &rect (PredefinedRect which) const { return _rects.at (which); }
-  //! returns a predefined line
   virtual const QLine &line (PredefinedLine which) const { return _lines.at (which); }
-  //! returns a predefined integer dimension
   virtual int dimension (PredefinedDimension which) const { return _dimensions.at (which); }
+  virtual const QPainterPath &path (PredefinedPath which) const { return _paths.at (which); }
 protected:
   void addRect (PredefinedRect which, const QRect &rect);
   void addLine (PredefinedLine which, const QLine &line);
   void addDimension (PredefinedDimension which, int dimension);
+  void addPath (PredefinedPath which, const QPainterPath &path);
 };
 
 class Orientations {

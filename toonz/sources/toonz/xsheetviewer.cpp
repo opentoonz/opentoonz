@@ -534,6 +534,20 @@ QRect XsheetViewer::rangeToXYRect (const CellRange &range) const {
 
 //-----------------------------------------------------------------------------
 
+void XsheetViewer::drawPredefinedPath (QPainter &p, PredefinedPath which, const CellPosition &pos,
+  optional<QColor> fill, optional<QColor> outline) const {
+  QPoint xy = positionToXY (pos);
+  QPainterPath path = orientation ()->path (which).translated (xy);
+  if (fill)
+    p.fillPath (path, QBrush (*fill));
+  if (outline) {
+    p.setPen (*outline);
+    p.drawPath (path);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 bool XsheetViewer::areCellsSelectedEmpty() {
   int r0, c0, r1, c1;
   getCellSelection()->getSelectedCells(r0, c0, r1, c1);
