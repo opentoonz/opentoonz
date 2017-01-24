@@ -64,8 +64,10 @@ class CellArea final : public QWidget {
   RenameCellField *m_renameCell;
 
   void drawCells(QPainter &p, const QRect toBeUpdated);
-  void drawNonEmptyBackground (QPainter &p);
-  void drawFoldedColumns (QPainter &p, int layerAxis, const NumberRange &frameAxis);
+  void drawNonEmptyBackground (QPainter &p) const;
+  void drawFoldedColumns (QPainter &p, int layerAxis, const NumberRange &frameAxis) const;
+  void drawSelectionBackground (QPainter &p) const;
+  void drawExtenderHandles (QPainter &p);
   
   void drawDragHandle (QPainter &p, const QPoint &xy, const QColor &sideColor) const;
   void drawEndOfDragHandle (QPainter &p, bool isEnd, const QPoint &xy, const QColor &cellColor) const;

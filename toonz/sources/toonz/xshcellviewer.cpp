@@ -758,11 +758,8 @@ void CellArea::drawCells (QPainter &p, const QRect toBeUpdated) {
   c1 = visible.to ().layer ();
 
   drawNonEmptyBackground (p);
-
-  if (!cellSelection->isEmpty ()) {
-    QRect selectionRect = m_viewer->rangeToXYRect (CellRange (CellPosition (rS0, cS0), CellPosition (rS1 + 1, cS1 + 1)));
-    p.fillRect (selectionRect, QBrush (m_viewer->getSelectedEmptyCellColor ()));
-  }
+  
+  drawSelectionBackground (p);
 
   // marker interval every 6 frames
   int distance, offset;
@@ -844,50 +841,11 @@ void CellArea::drawCells (QPainter &p, const QRect toBeUpdated) {
     }
   }
 
-  int xS0, xS1, yS0, yS1;
-  if (!cellSelection->isEmpty ()) {
-    QRect rect = m_viewer->rangeToXYRect (CellRange (CellPosition (rS0, cS0), CellPosition (rS1 + 1, cS1 + 1)));
-    xS0 = rect.left (); xS1 = rect.right ();
-    yS0 = rect.top (); yS1 = rect.bottom ();
-  }
-
-  // smart tab
-  // initialize the rectangles first
-  m_levelExtenderRect = QRect ();
-  m_upperLevelExtenderRect = QRect ();
-  int smartTabPosOffset =
-    (Preferences::instance ()->isShowKeyframesOnXsheetCellAreaEnabled ()) ? 31
-    : 20;
-  if (!cellSelection->isEmpty () && !m_viewer->areSoundCellsSelected ()) { // AREA
-    m_levelExtenderRect = QRect (xS1 - smartTabPosOffset, yS1 + 1, 19, 8);
-    p.setPen (Qt::black);
-    p.setBrush (SmartTabColor);
-    p.drawRoundRect (m_levelExtenderRect, 30, 75);
-    QColor color = ((rS1 + 1 - offset) % distance != 0)
-      ? m_viewer->getLightLineColor ()
-      : m_viewer->getMarkerLineColor ();
-    p.setPen (color);
-    p.drawLine (xS1 - smartTabPosOffset, yS1 + 1, xS1 - 1, yS1 + 1);
-
-    // upper-directional smart tab
-    if (isCtrlPressed && rS0 > 0 && !m_viewer->areCellsSelectedEmpty ()) {
-      m_upperLevelExtenderRect = QRect (xS1 - smartTabPosOffset, yS0 - 8, 19, 8);
-      p.setPen (Qt::black);
-      p.setBrush (SmartTabColor);
-      p.drawRoundRect (m_upperLevelExtenderRect, 30, 75);
-      QColor color = ((rS0 - offset) % distance != 0)
-        ? m_viewer->getLightLineColor ()
-        : m_viewer->getMarkerLineColor ();
-      p.setPen (color);
-      p.drawLine (xS1 - smartTabPosOffset, yS0, xS1 - 1, yS0);
-    }
-
-    p.setBrush (Qt::NoBrush);
-  }
+  drawExtenderHandles (p);
 }
 
 // slightly bright background for non-empty rectangular area
-void CellArea::drawNonEmptyBackground (QPainter &p) {
+void CellArea::drawNonEmptyBackground (QPainter &p) const {
   TXsheet *xsh = m_viewer->getXsheet ();
 
   int totalFrames = xsh->getFrameCount ();
@@ -905,7 +863,7 @@ void CellArea::drawNonEmptyBackground (QPainter &p) {
   p.fillRect (1, 0, xy.x (), xy.y (), QBrush (m_viewer->getNotEmptyColumnColor ()));
 }
 
-void CellArea::drawFoldedColumns (QPainter &p, int layerAxis, const NumberRange &frameAxis) {
+void CellArea::drawFoldedColumns (QPainter &p, int layerAxis, const NumberRange &frameAxis) const {
   // 3 white bars
   for (int i = 0; i < 3; i++) { 
     QRect whiteRect = m_viewer->orientation ()->foldedRectangle (layerAxis, frameAxis, i);
@@ -918,6 +876,72 @@ void CellArea::drawFoldedColumns (QPainter &p, int layerAxis, const NumberRange 
     QLine darkLine = m_viewer->orientation ()->foldedRectangleLine (layerAxis, frameAxis, i);
     p.drawLine (darkLine);
   }
+}
+
+void CellArea::drawSelectionBackground (QPainter &p) const {
+  // selected cells range
+  TCellSelection *cellSelection = m_viewer->getCellSelection ();
+  if (cellSelection->isEmpty ())
+    return;
+
+  int selRow0, selCol0, selRow1, selCol1;
+  cellSelection->getSelectedCells (selRow0, selCol0, selRow1, selCol1);
+  QRect selectionRect = m_viewer->rangeToXYRect (CellRange (
+    CellPosition (selRow0, selCol0), CellPosition (selRow1 + 1, selCol1 + 1)));
+  p.fillRect (selectionRect, QBrush (m_viewer->getSelectedEmptyCellColor ()));
+}
+
+void CellArea::drawExtenderHandles (QPainter &p) {
+  // selected cells range
+  TCellSelection *cellSelection = m_viewer->getCellSelection ();
+  if (cellSelection->isEmpty () || m_viewer->areSoundCellsSelected ())
+    return;
+
+  int selRow0, selCol0, selRow1, selCol1;
+  cellSelection->getSelectedCells (selRow0, selCol0, selRow1, selCol1);
+  QRect selected = m_viewer->rangeToXYRect (CellRange (
+    CellPosition (selRow0, selCol0), CellPosition (selRow1 + 1, selCol1 + 1)));
+  
+  int x0, y0, x1, y1;
+  x0 = selected.left (); x1 = selected.right ();
+  y0 = selected.top (); y1 = selected.bottom ();
+
+  // smart tab
+  m_levelExtenderRect = QRect ();
+  m_upperLevelExtenderRect = QRect ();
+  int smartTabPosOffset =
+    (Preferences::instance ()->isShowKeyframesOnXsheetCellAreaEnabled ()) ? 31 : 20; // AREA
+
+  int distance, offset;
+  TApp::instance ()->getCurrentScene ()->getScene ()->getProperties ()->getMarkers (
+    distance, offset);
+  if (distance == 0) distance = 6;
+
+  // bottom / right extender handle
+  m_levelExtenderRect = QRect (x1 - smartTabPosOffset, y1 + 1, 19, 8);
+  p.setPen (Qt::black);
+  p.setBrush (SmartTabColor);
+  p.drawRoundRect (m_levelExtenderRect, 30, 75);
+  QColor color = ((selRow1 + 1 - offset) % distance != 0)
+    ? m_viewer->getLightLineColor ()
+    : m_viewer->getMarkerLineColor ();
+  p.setPen (color);
+  p.drawLine (x1 - smartTabPosOffset, y1 + 1, x1 - 1, y1 + 1);
+
+  // up / left extender handle
+  if (isCtrlPressed && selRow0 > 0 && !m_viewer->areCellsSelectedEmpty ()) {
+    m_upperLevelExtenderRect = QRect (x1 - smartTabPosOffset, y0 - 8, 19, 8);
+    p.setPen (Qt::black);
+    p.setBrush (SmartTabColor);
+    p.drawRoundRect (m_upperLevelExtenderRect, 30, 75);
+    QColor color = ((selRow0 - offset) % distance != 0)
+      ? m_viewer->getLightLineColor ()
+      : m_viewer->getMarkerLineColor ();
+    p.setPen (color);
+    p.drawLine (x1 - smartTabPosOffset, y0, x1 - 1, y0);
+  }
+
+  p.setBrush (Qt::NoBrush);
 }
 
 //-----------------------------------------------------------------------------
