@@ -1856,7 +1856,8 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
         setDragTool(XsheetGUI::DragTool::makeLevelMoverTool(m_viewer));
     } else {
       m_viewer->getKeyframeSelection()->selectNone();
-      if (isSoundColumn && x > ColumnWidth - 6 && x < ColumnWidth) // rightmost 6 pixels
+      if (isSoundColumn && 
+        m_viewer->orientation ()->rect (PredefinedRect::PREVIEW_TRACK).contains (mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeSoundScrubTool(
             m_viewer, column->getSoundColumn()));
       else if (m_levelExtenderRect.contains(pos.x, pos.y))
