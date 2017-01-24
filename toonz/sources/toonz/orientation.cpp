@@ -18,6 +18,8 @@ class TopToBottomOrientation : public Orientation {
   const int CELL_WIDTH = 74;
   const int CELL_HEIGHT = 20;
   const int CELL_DRAG_WIDTH = 7;
+  const int EXTENDER_WIDTH = 20;
+  const int EXTENDER_HEIGHT = 8;
 
 public:
   TopToBottomOrientation ();
@@ -32,6 +34,7 @@ public:
 
 	virtual NumberRange layerSide (const QRect &area) const override;
 	virtual NumberRange frameSide (const QRect &area) const override;
+  virtual QPoint topRightCorner (const QRect &area) const override;
 
 	virtual bool isVerticalTimeline () const override { return true;  }
 };
@@ -40,6 +43,8 @@ class LeftToRightOrientation : public Orientation {
   const int CELL_WIDTH = 47;
   const int CELL_HEIGHT = 47;
   const int CELL_DRAG_HEIGHT = 7;
+  const int EXTENDER_WIDTH = 8;
+  const int EXTENDER_HEIGHT = 20;
 
 public:
   LeftToRightOrientation ();
@@ -54,6 +59,7 @@ public:
 
 	virtual NumberRange layerSide (const QRect &area) const override;
 	virtual NumberRange frameSide (const QRect &area) const override;
+  virtual QPoint topRightCorner (const QRect &area) const override;
 
 	virtual bool isVerticalTimeline () const override { return false; }
 };
@@ -112,6 +118,9 @@ void Orientation::addDimension (PredefinedDimension which, int dimension) {
 void Orientation::addPath (PredefinedPath which, const QPainterPath &path) {
   _paths.insert (pair<PredefinedPath, QPainterPath> (which, path));
 }
+void Orientation::addPoint (PredefinedPoint which, const QPoint &point) {
+  _points.insert (pair<PredefinedPoint, QPoint> (which, point));
+}
 
 /// -------------------------------------------------------------------------------
 
@@ -124,11 +133,14 @@ TopToBottomOrientation::TopToBottomOrientation () {
   QRect nameRect = cellRect.adjusted (7, 4, -6, 0);
   addRect (PredefinedRect::CELL_NAME, nameRect);
   addRect (PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect.adjusted (0, 0, -KEY_ICON_WIDTH, 0));
+  addRect (PredefinedRect::END_EXTENDER, QRect (-EXTENDER_WIDTH - KEY_ICON_WIDTH, 1, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+  addRect (PredefinedRect::BEGIN_EXTENDER, QRect (-EXTENDER_WIDTH - KEY_ICON_WIDTH, -EXTENDER_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
   addLine (PredefinedLine::CONTINUE_LEVEL, verticalLine (CELL_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::CONTINUE_LEVEL_WITH_NAME, verticalLine (CELL_WIDTH - 11, NumberRange (0, CELL_HEIGHT)));
+  addLine (PredefinedLine::EXTENDER_LINE, horizontalLine (0, NumberRange (-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0)));
 
   addDimension (PredefinedDimension::LAYER, CELL_WIDTH);
 
@@ -151,6 +163,9 @@ TopToBottomOrientation::TopToBottomOrientation () {
   toTriangle.lineTo (QPointF (0, -EASE_TRIANGLE_SIZE / 2));
   toTriangle.translate (keyRect.center ());
   addPath (PredefinedPath::END_EASE_TRIANGLE, toTriangle);
+
+  addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (KEY_ICON_WIDTH, 0));
+  addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (30, 75));
 }
 
 CellPosition TopToBottomOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
@@ -178,6 +193,9 @@ NumberRange TopToBottomOrientation::layerSide (const QRect &area) const {
 NumberRange TopToBottomOrientation::frameSide (const QRect &area) const {
 	return NumberRange (area.top (), area.bottom ());
 }
+QPoint TopToBottomOrientation::topRightCorner (const QRect &area) const {
+  return area.topRight ();
+}
 
 
 /// --------------------------------------------------------------------------------
@@ -192,11 +210,14 @@ LeftToRightOrientation::LeftToRightOrientation () {
   QRect nameRect = cellRect.adjusted (7, 4, -6, 0);
   addRect (PredefinedRect::CELL_NAME, nameRect);
   addRect (PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect.adjusted (0, 0, 0, -KEY_ICON_HEIGHT));
+  addRect (PredefinedRect::END_EXTENDER, QRect (1, -EXTENDER_HEIGHT - KEY_ICON_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+  addRect (PredefinedRect::BEGIN_EXTENDER, QRect (-EXTENDER_WIDTH, -EXTENDER_HEIGHT - KEY_ICON_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
   addLine (PredefinedLine::CONTINUE_LEVEL, verticalLine (CELL_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::CONTINUE_LEVEL_WITH_NAME, verticalLine (CELL_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
+  addLine (PredefinedLine::EXTENDER_LINE, horizontalLine (0, NumberRange (-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0)));
 
   addDimension (PredefinedDimension::LAYER, CELL_HEIGHT);
 
@@ -219,6 +240,9 @@ LeftToRightOrientation::LeftToRightOrientation () {
   toTriangle.lineTo (QPointF (-EASE_TRIANGLE_SIZE / 2, 0));
   toTriangle.translate (keyRect.center ());
   addPath (PredefinedPath::END_EASE_TRIANGLE, toTriangle);
+
+  addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (0, KEY_ICON_HEIGHT));
+  addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (75, 30));
 }
 
 CellPosition LeftToRightOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
@@ -245,4 +269,7 @@ NumberRange LeftToRightOrientation::layerSide (const QRect &area) const {
 }
 NumberRange LeftToRightOrientation::frameSide (const QRect &area) const {
 	return NumberRange (area.left (), area.right ());
+}
+QPoint LeftToRightOrientation::topRightCorner (const QRect &area) const {
+  return area.bottomLeft ();
 }

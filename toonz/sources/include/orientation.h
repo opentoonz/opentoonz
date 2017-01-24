@@ -38,14 +38,17 @@ enum class PredefinedRect {
   CELL, //! size of a cell
   DRAG_HANDLE_CORNER, //! area for dragging a cell
   KEY_ICON, //! position of key icon
-  CELL_NAME,
-  CELL_NAME_WITH_KEYFRAME
+  CELL_NAME, //! cell name box
+  CELL_NAME_WITH_KEYFRAME, //! cell name box when keyframe is displayed
+  END_EXTENDER, //! bottom / right extender
+  BEGIN_EXTENDER, //! top / left extender
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
   SEE_MARKER_THROUGH, //! horizontal marker visible through drag handle
   CONTINUE_LEVEL, //! level with the same name represented by vertical line
-  CONTINUE_LEVEL_WITH_NAME //! adjusted when level name is on each marker
+  CONTINUE_LEVEL_WITH_NAME, //! adjusted when level name is on each marker
+  EXTENDER_LINE //! see grid through extender handle
 };
 enum class PredefinedDimension {
   LAYER //! width of a layer column / height of layer row
@@ -55,6 +58,10 @@ enum class PredefinedPath {
   BEGIN_EASE_TRIANGLE, //! triangle marking beginning of ease range
   END_EASE_TRIANGLE //! triangle marking end of ease range
 };
+enum class PredefinedPoint {
+  KEY_HIDDEN, //! move extender handle that much if key icons are disabled
+  EXTENDER_XY_RADIUS //! x and y radius for rounded rectangle
+};
 
 class Orientation {
 protected:
@@ -62,6 +69,7 @@ protected:
   map<PredefinedLine, QLine> _lines;
   map<PredefinedDimension, int> _dimensions;
   map<PredefinedPath, QPainterPath> _paths;
+  map<PredefinedPoint, QPoint> _points;
 
 public:
 	virtual CellPosition xyToPosition (const QPoint &xy, const ColumnFan *fan) const = 0;
@@ -74,6 +82,8 @@ public:
 
 	virtual NumberRange layerSide (const QRect &area) const = 0;
 	virtual NumberRange frameSide (const QRect &area) const = 0;
+  //! top right corner in vertical layout. bottom left in horizontal
+  virtual QPoint topRightCorner (const QRect &area) const = 0;
 	virtual QRect foldedRectangle (int layerAxis, const NumberRange &frameAxis, int i) const;
 	virtual QLine foldedRectangleLine (int layerAxis, const NumberRange &frameAxis, int i) const;
 
@@ -83,15 +93,17 @@ public:
 
 	virtual bool isVerticalTimeline () const = 0;
 
-  virtual const QRect &rect (PredefinedRect which) const { return _rects.at (which); }
-  virtual const QLine &line (PredefinedLine which) const { return _lines.at (which); }
-  virtual int dimension (PredefinedDimension which) const { return _dimensions.at (which); }
-  virtual const QPainterPath &path (PredefinedPath which) const { return _paths.at (which); }
+  const QRect &rect (PredefinedRect which) const { return _rects.at (which); }
+  const QLine &line (PredefinedLine which) const { return _lines.at (which); }
+  int dimension (PredefinedDimension which) const { return _dimensions.at (which); }
+  const QPainterPath &path (PredefinedPath which) const { return _paths.at (which); }
+  const QPoint &point (PredefinedPoint which) const { return _points.at (which); }
 protected:
   void addRect (PredefinedRect which, const QRect &rect);
   void addLine (PredefinedLine which, const QLine &line);
   void addDimension (PredefinedDimension which, int dimension);
   void addPath (PredefinedPath which, const QPainterPath &path);
+  void addPoint (PredefinedPoint which, const QPoint &point);
 };
 
 class Orientations {

@@ -892,6 +892,9 @@ void CellArea::drawSelectionBackground (QPainter &p) const {
 }
 
 void CellArea::drawExtenderHandles (QPainter &p) {
+  m_levelExtenderRect = QRect ();
+  m_upperLevelExtenderRect = QRect ();
+
   // selected cells range
   TCellSelection *cellSelection = m_viewer->getCellSelection ();
   if (cellSelection->isEmpty () || m_viewer->areSoundCellsSelected ())
@@ -907,38 +910,43 @@ void CellArea::drawExtenderHandles (QPainter &p) {
   y0 = selected.top (); y1 = selected.bottom ();
 
   // smart tab
-  m_levelExtenderRect = QRect ();
-  m_upperLevelExtenderRect = QRect ();
-  int smartTabPosOffset =
-    (Preferences::instance ()->isShowKeyframesOnXsheetCellAreaEnabled ()) ? 31 : 20; // AREA
+  QPoint smartTabPosOffset = Preferences::instance ()->isShowKeyframesOnXsheetCellAreaEnabled ()
+    ? QPoint (0, 0) : m_viewer->orientation ()->point (PredefinedPoint::KEY_HIDDEN);
 
   int distance, offset;
   TApp::instance ()->getCurrentScene ()->getScene ()->getProperties ()->getMarkers (
     distance, offset);
   if (distance == 0) distance = 6;
 
+  QPoint xyRadius = m_viewer->orientation ()->point (PredefinedPoint::EXTENDER_XY_RADIUS);
+
   // bottom / right extender handle
-  m_levelExtenderRect = QRect (x1 - smartTabPosOffset, y1 + 1, 19, 8);
+  m_levelExtenderRect = m_viewer->orientation ()->rect (PredefinedRect::END_EXTENDER)
+    .translated (selected.bottomRight () + smartTabPosOffset);
   p.setPen (Qt::black);
   p.setBrush (SmartTabColor);
-  p.drawRoundRect (m_levelExtenderRect, 30, 75);
+  p.drawRoundRect (m_levelExtenderRect, xyRadius.x (), xyRadius.y ());
   QColor color = ((selRow1 + 1 - offset) % distance != 0)
     ? m_viewer->getLightLineColor ()
     : m_viewer->getMarkerLineColor ();
   p.setPen (color);
-  p.drawLine (x1 - smartTabPosOffset, y1 + 1, x1 - 1, y1 + 1);
+  QLine extenderLine = m_viewer->orientation ()->line (PredefinedLine::EXTENDER_LINE);
+  extenderLine.setP1 (extenderLine.p1 () + smartTabPosOffset);
+  p.drawLine (extenderLine.translated (selected.bottomRight ()));
 
   // up / left extender handle
   if (isCtrlPressed && selRow0 > 0 && !m_viewer->areCellsSelectedEmpty ()) {
-    m_upperLevelExtenderRect = QRect (x1 - smartTabPosOffset, y0 - 8, 19, 8);
+    QPoint properPoint = m_viewer->orientation ()->topRightCorner (selected);
+    m_upperLevelExtenderRect = m_viewer->orientation ()->rect (PredefinedRect::BEGIN_EXTENDER)
+      .translated (properPoint + smartTabPosOffset);
     p.setPen (Qt::black);
     p.setBrush (SmartTabColor);
-    p.drawRoundRect (m_upperLevelExtenderRect, 30, 75);
+    p.drawRoundRect (m_upperLevelExtenderRect, xyRadius.x (), xyRadius.y ());
     QColor color = ((selRow0 - offset) % distance != 0)
       ? m_viewer->getLightLineColor ()
       : m_viewer->getMarkerLineColor ();
     p.setPen (color);
-    p.drawLine (x1 - smartTabPosOffset, y0, x1 - 1, y0);
+    p.drawLine (extenderLine.translated (properPoint));
   }
 
   p.setBrush (Qt::NoBrush);

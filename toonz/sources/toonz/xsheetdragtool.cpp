@@ -711,7 +711,7 @@ public:
       bool found = false;
       for (int c = 0; c < m_colCount; c++) {
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (column && column->getSoundColumn()) continue;
+        if (!column || column->getSoundColumn()) continue;
         if (!column->isCellEmpty(emptyRow)) {
           emptyRow += 1;
           found = true;
@@ -732,7 +732,7 @@ public:
       // clear cells
       for (int c = 0; c < m_colCount; c++) {
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (column && column->getSoundColumn()) continue;
+        if (!column || column->getSoundColumn()) continue;
         xsh->clearCells(m_r0, m_c0 + c, dr);
       }
     }
@@ -740,7 +740,7 @@ public:
     else {
       for (int c = 0; c < m_colCount; c++) {
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (column && column->getSoundColumn()) continue;
+        if (!column || column->getSoundColumn()) continue;
         for (int r = r0; r <= m_r0 - 1; r++) {
           xsh->setCell(r, m_c0 + c, m_columns[c].generate(r));
         }
