@@ -954,7 +954,7 @@ void CellArea::drawExtenderHandles (QPainter &p) {
 
 //-----------------------------------------------------------------------------
 
-void CellArea::drawSoundCell(QPainter &p, int row, int col) { // ORIENTATION?
+void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   TXshSoundColumn *soundColumn =
       m_viewer->getXsheet()->getColumn(col)->getSoundColumn();
   QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
@@ -996,69 +996,75 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) { // ORIENTATION?
   drawEndOfDragHandle (p, isLastRow, xy, cellColor);
   drawLockedDottedLine (p, soundColumn->isLocked (), xy, cellColor);
 
-  int x1    = rect.x() + 6;
-  int x2    = rect.x() + rect.width();
-  int x1Bis = x2 - 7;
+  QRect trackRect = m_viewer->orientation ()->rect (PredefinedRect::SOUND_TRACK)
+    .translated (xy);
+  QRect previewRect = m_viewer->orientation ()->rect (PredefinedRect::PREVIEW_TRACK)
+    .translated (xy);
+  NumberRange trackBounds = m_viewer->orientation ()->layerSide (trackRect);
+  NumberRange previewBounds = m_viewer->orientation ()->layerSide (previewRect);
+  NumberRange trackAndPreview (trackBounds.from (), previewBounds.to ());
 
-  int offset  = row - cell.getFrameId().getNumber();
-  int y0      = rect.y();
-  int y1      = rect.bottomLeft().y();
-  int soundY0 = y0 - m_viewer->rowToFrameAxis (offset); // ORIENTATION
+  NumberRange timeBounds = m_viewer->orientation ()->frameSide (trackRect);
+  int offset  = row - cell.getFrameId().getNumber(); // rows since start of the clip
+  int begin   = timeBounds.from (); // time axis
+  int end     = timeBounds.to ();
+  int soundPixel  = begin - m_viewer->rowToFrameAxis (offset); // pixels since start of clip
 
-  int trackWidth = (x1Bis - x1) / 2;
+  int trackWidth = trackBounds.length ();
   int lastMin, lastMax;
   DoublePair minmax;
-  soundLevel->getValueAtPixel(soundY0, minmax);
+  soundLevel->getValueAtPixel(m_viewer->orientation (), soundPixel, minmax);
 
-  double pmin = minmax.first + trackWidth / 2.;
-  double pmax = minmax.second + trackWidth / 2.;
+  double pmin = minmax.first;
+  double pmax = minmax.second;
 
-  int delta = x1 + trackWidth / 2;
-  lastMin   = tcrop((int)pmin, 0, trackWidth / 2) + delta;
-  lastMax   = tcrop((int)pmax, trackWidth / 2, trackWidth - 1) + delta;
+  int center = trackBounds.middle ();
+  lastMin   = tcrop((int)pmin, -trackWidth / 2, 0) + center;
+  lastMax   = tcrop((int)pmax, 0, trackWidth / 2 - 1) + center;
 
   bool scrub = m_viewer->isScrubHighlighted(row, col);
 
   int i;
-  for (i = y0; i <= y1; i++) {
-    DoublePair minmax;
-    soundLevel->getValueAtPixel(soundY0, minmax);
-    soundY0++;
+  for (i = begin; i <= end; i++) {
+    soundLevel->getValueAtPixel(m_viewer->orientation (), soundPixel, minmax);
+    soundPixel++;
     int min, max;
-    double pmin = minmax.first + trackWidth / 2.;
-    double pmax = minmax.second + trackWidth / 2.;
+    pmin = minmax.first;
+    pmax = minmax.second;
 
-    int delta = x1 + trackWidth / 2;
-    min       = tcrop((int)pmin, 0, trackWidth / 2) + delta;
-    max       = tcrop((int)pmax, trackWidth / 2, trackWidth - 1) + delta;
-
-    if (i != y0 || !isFirstRow) {
-      // trattini a destra della colonna
-      if (i % 2) {
-        p.setPen(cellColor);
-        p.drawLine(x1, i, x1Bis, i);
-      } else {
-        p.setPen(m_viewer->getSoundColumnTrackColor());
-        p.drawLine(x1Bis + 1, i, x2, i);
-      }
-    }
+    center = trackBounds.middle ();
+    min   = tcrop((int)pmin, -trackWidth / 2, 0) + center;
+    max   = tcrop((int)pmax, 0, trackWidth / 2 - 1) + center;
 
     if (scrub && i % 2) {
-      p.setPen(m_viewer->getSoundColumnHlColor());
-      p.drawLine(x1Bis + 1, i, x2, i);
+      p.setPen (m_viewer->getSoundColumnHlColor ());
+      QLine stroke = m_viewer->orientation ()->horizontalLine (i, previewBounds);
+      p.drawLine (stroke);
+    }
+    else if (i != begin || !isFirstRow) {
+      // preview tool on the right side
+      if (i % 2)
+        p.setPen(cellColor);
+      else
+        p.setPen(m_viewer->getSoundColumnTrackColor());
+      QLine stroke = m_viewer->orientation ()->horizontalLine (i, previewBounds);
+      p.drawLine (stroke);
     }
 
-    if (i != y0) {
-      // "traccia audio" al centro della colonna
+    if (i != begin) {
+      // "audio track" in the middle of the column
       p.setPen(m_viewer->getSoundColumnTrackColor());
-      p.drawLine(lastMin, i, min, i);
-      p.drawLine(lastMax, i, max, i);
+      QLine minLine = m_viewer->orientation ()->horizontalLine (i, NumberRange (lastMin, min));
+      p.drawLine (minLine);
+      QLine maxLine = m_viewer->orientation ()->horizontalLine (i, NumberRange (lastMax, max));
+      p.drawLine (maxLine);
     }
 
     lastMin = min;
     lastMax = max;
   }
 
+  // yellow clipped border
   p.setPen(SoundColumnExtenderColor);
   int r0WithoutOff, r1WithoutOff;
   bool ret =
@@ -1066,19 +1072,23 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) { // ORIENTATION?
   assert(ret);
 
   if (isFirstRow) {
+    QRect modifierRect = m_viewer->orientation ()->rect (PredefinedRect::BEGIN_SOUND_EDIT)
+      .translated (xy);
     if (r0 != r0WithoutOff) {
-      p.drawLine(x1, y0 + 1, x2, y0 + 1);
-      p.drawLine(x1, y0 + 2, x2, y0 + 2);
+      p.fillRect (modifierRect, SoundColumnExtenderColor);
+      // p.drawLine (m_viewer->orientation ()->horizontalLine (begin + 1, trackAndPreview));
+      // p.drawLine (m_viewer->orientation ()->horizontalLine (begin + 2, trackAndPreview));
     }
-    QRect modifierRect(x1, y0 + 1, XsheetGUI::ColumnWidth, 2);
-    m_soundLevelModifyRects.append(modifierRect);
+    m_soundLevelModifyRects.append(modifierRect); // list of clipping rects
   }
   if (isLastRow) {
+    QRect modifierRect = m_viewer->orientation ()->rect (PredefinedRect::END_SOUND_EDIT)
+      .translated (xy);
     if (r1 != r1WithoutOff) {
-      p.drawLine(x, y1, x2, y1);
-      p.drawLine(x, y1 - 1, x2, y1 - 1);
+      p.fillRect (modifierRect, SoundColumnExtenderColor);
+      // p.drawLine (m_viewer->orientation ()->horizontalLine (end, trackAndPreview));
+      // p.drawLine (m_viewer->orientation ()->horizontalLine (end - 1, trackAndPreview));
     }
-    QRect modifierRect(x1, y1 - 1, XsheetGUI::ColumnWidth, 2);
     m_soundLevelModifyRects.append(modifierRect);
   }
 }

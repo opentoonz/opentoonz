@@ -3,13 +3,26 @@
 #ifndef ORIENTATION_INCLUDED
 #define ORIENTATION_INCLUDED
 
+#undef DVAPI
+#undef DVVAR
+#ifdef TOONZLIB_EXPORTS
+#define DVAPI DV_EXPORT_API
+#define DVVAR DV_EXPORT_VAR
+#else
+#define DVAPI DV_IMPORT_API
+#define DVVAR DV_IMPORT_VAR
+#endif
+
+#include "tcommon.h"
 #include "cellposition.h"
 #include <QPoint>
 #include <QLine>
 #include <QRect>
 #include <QPainterPath>
 #include <map>
+#include <vector>
 
+using std::vector;
 using std::map;
 
 // Defines timeline direction: top to bottom;  left to right; right to left.
@@ -43,7 +56,11 @@ enum class PredefinedRect {
   END_EXTENDER, //! bottom / right extender
   BEGIN_EXTENDER, //! top / left extender
   KEYFRAME_AREA, //! part of cell dedicated to key frames
-  DRAG_AREA //! draggable side bar
+  DRAG_AREA, //! draggable side bar
+  SOUND_TRACK, //! area dedicated to waveform display
+  PREVIEW_TRACK, //! sound preview area
+  BEGIN_SOUND_EDIT, //! top sound resize
+  END_SOUND_EDIT //! bottom sound resize
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
@@ -53,7 +70,9 @@ enum class PredefinedLine {
   EXTENDER_LINE //! see grid through extender handle
 };
 enum class PredefinedDimension {
-  LAYER //! width of a layer column / height of layer row
+  LAYER, //! width of a layer column / height of layer row
+  FRAME, //! height of frame row / width of frame column
+  INDEX //! index of this orientation in the array of all
 };
 enum class PredefinedPath {
   DRAG_HANDLE_CORNER, //! triangle corner at drag sidebar
@@ -65,7 +84,7 @@ enum class PredefinedPoint {
   EXTENDER_XY_RADIUS //! x and y radius for rounded rectangle
 };
 
-class Orientation {
+class DVAPI Orientation {
 protected:
   map<PredefinedRect, QRect> _rects;
   map<PredefinedLine, QLine> _lines;
@@ -108,17 +127,22 @@ protected:
   void addPoint (PredefinedPoint which, const QPoint &point);
 };
 
-class Orientations {
+class DVAPI Orientations {
 	const Orientation *_topToBottom, *_leftToRight;
+  vector<const Orientation *> _all;
 
 public:
 	Orientations ();
 	~Orientations ();
 
+  static const int COUNT = 2;
+
   const Orientation *topToBottom () const;
   const Orientation *leftToRight () const;
+
+  const vector<const Orientation *> &all () const { return _all;  }
 };
 
-extern Orientations orientations;
+extern DVVAR Orientations orientations;
 
 #endif

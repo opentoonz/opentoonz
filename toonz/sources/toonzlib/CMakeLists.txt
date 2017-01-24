@@ -152,6 +152,7 @@ set(MOC_HEADERS
     sandor_fxs/YOMBParam.h
     texturemanager.h
     imagebuilders.h
+	../include/orientation.h
 )
 
 set(HEADERS ${MOC_HEADERS})
@@ -310,6 +311,7 @@ set(SOURCES
     plasticdeformerfx.cpp
     txshmeshcolumn.cpp
     textureutils.cpp
+	orientation.cpp
 )
 
 if(WIN32)

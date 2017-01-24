@@ -19,6 +19,7 @@ set(MOC_HEADERS
     cellkeyframedata.h
     cellkeyframeselection.h
     cellselection.h
+	../include/cellposition.h
     cleanuppaletteviewer.h
     cleanuppopup.h
     cleanuppreview.h
@@ -77,6 +78,7 @@ set(MOC_HEADERS
     meshifypopup.h
     messagepanel.h
     moviegenerator.h
+	../include/orientation.h
     onionskinmaskgui.h
     outputsettingspopup.h
     overwritepopup.h
