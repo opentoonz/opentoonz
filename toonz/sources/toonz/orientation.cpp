@@ -116,12 +116,19 @@ void Orientation::addPath (PredefinedPath which, const QPainterPath &path) {
 /// -------------------------------------------------------------------------------
 
 TopToBottomOrientation::TopToBottomOrientation () {
-  addRect (PredefinedRect::CELL, QRect (0, 0, CELL_WIDTH, CELL_HEIGHT));
+  QRect cellRect (0, 0, CELL_WIDTH, CELL_HEIGHT);
+  addRect (PredefinedRect::CELL, cellRect);
   addRect (PredefinedRect::DRAG_HANDLE_CORNER, QRect (0, 0, CELL_DRAG_WIDTH, CELL_HEIGHT));
   QRect keyRect (CELL_WIDTH - KEY_ICON_WIDTH, (CELL_HEIGHT - KEY_ICON_HEIGHT) / 2, KEY_ICON_WIDTH, KEY_ICON_HEIGHT);
   addRect (PredefinedRect::KEY_ICON, keyRect);
+  QRect nameRect = cellRect.adjusted (7, 4, -6, 0);
+  addRect (PredefinedRect::CELL_NAME, nameRect);
+  addRect (PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect.adjusted (0, 0, -KEY_ICON_WIDTH, 0));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
+  addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
+  addLine (PredefinedLine::CONTINUE_LEVEL, verticalLine (CELL_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
+  addLine (PredefinedLine::CONTINUE_LEVEL_WITH_NAME, verticalLine (CELL_WIDTH - 11, NumberRange (0, CELL_HEIGHT)));
 
   addDimension (PredefinedDimension::LAYER, CELL_WIDTH);
 
@@ -177,12 +184,19 @@ NumberRange TopToBottomOrientation::frameSide (const QRect &area) const {
 
 
 LeftToRightOrientation::LeftToRightOrientation () {
-  addRect (PredefinedRect::CELL, QRect (0, 0, CELL_WIDTH, CELL_HEIGHT));
+  QRect cellRect (0, 0, CELL_WIDTH, CELL_HEIGHT);
+  addRect (PredefinedRect::CELL, cellRect);
   addRect (PredefinedRect::DRAG_HANDLE_CORNER, QRect (0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
   QRect keyRect ((CELL_WIDTH - KEY_ICON_WIDTH) / 2, CELL_HEIGHT - KEY_ICON_HEIGHT, KEY_ICON_WIDTH, KEY_ICON_HEIGHT);
   addRect (PredefinedRect::KEY_ICON, keyRect);
+  QRect nameRect = cellRect.adjusted (7, 4, -6, 0);
+  addRect (PredefinedRect::CELL_NAME, nameRect);
+  addRect (PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect.adjusted (0, 0, 0, -KEY_ICON_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
+  addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
+  addLine (PredefinedLine::CONTINUE_LEVEL, verticalLine (CELL_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
+  addLine (PredefinedLine::CONTINUE_LEVEL_WITH_NAME, verticalLine (CELL_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
 
   addDimension (PredefinedDimension::LAYER, CELL_HEIGHT);
 

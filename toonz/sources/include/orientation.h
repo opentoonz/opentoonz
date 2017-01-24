@@ -37,10 +37,15 @@ class QPainterPath;
 enum class PredefinedRect {
   CELL, //! size of a cell
   DRAG_HANDLE_CORNER, //! area for dragging a cell
-  KEY_ICON //! position of key icon
+  KEY_ICON, //! position of key icon
+  CELL_NAME,
+  CELL_NAME_WITH_KEYFRAME
 };
 enum class PredefinedLine {
-  LOCKED //! dotted vertical line when cell is locked
+  LOCKED, //! dotted vertical line when cell is locked
+  SEE_MARKER_THROUGH, //! horizontal marker visible through drag handle
+  CONTINUE_LEVEL, //! level with the same name represented by vertical line
+  CONTINUE_LEVEL_WITH_NAME //! adjusted when level name is on each marker
 };
 enum class PredefinedDimension {
   LAYER //! width of a layer column / height of layer row
