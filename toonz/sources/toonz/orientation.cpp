@@ -135,6 +135,8 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect.adjusted (0, 0, -KEY_ICON_WIDTH, 0));
   addRect (PredefinedRect::END_EXTENDER, QRect (-EXTENDER_WIDTH - KEY_ICON_WIDTH, 1, EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect (PredefinedRect::BEGIN_EXTENDER, QRect (-EXTENDER_WIDTH - KEY_ICON_WIDTH, -EXTENDER_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+  addRect (PredefinedRect::KEYFRAME_AREA, QRect (CELL_WIDTH - KEY_ICON_WIDTH, 0, KEY_ICON_WIDTH, CELL_HEIGHT));
+  addRect (PredefinedRect::DRAG_AREA, QRect (0, 0, CELL_DRAG_WIDTH, CELL_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -212,6 +214,8 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect.adjusted (0, 0, 0, -KEY_ICON_HEIGHT));
   addRect (PredefinedRect::END_EXTENDER, QRect (1, -EXTENDER_HEIGHT - KEY_ICON_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect (PredefinedRect::BEGIN_EXTENDER, QRect (-EXTENDER_WIDTH, -EXTENDER_HEIGHT - KEY_ICON_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+  addRect (PredefinedRect::KEYFRAME_AREA, QRect (0, CELL_HEIGHT - KEY_ICON_HEIGHT, CELL_WIDTH, KEY_ICON_HEIGHT));
+  addRect (PredefinedRect::DRAG_AREA, QRect (0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));

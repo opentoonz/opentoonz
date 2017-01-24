@@ -1731,8 +1731,8 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
 	int row = cellPosition.frame ();
 	int col = cellPosition.layer ();
 	QPoint cellTopLeft = m_viewer->positionToXY (CellPosition (row, col));
-    int x = pos.x - cellTopLeft.x (); // where in the cell click is
-	int y = pos.y - cellTopLeft.y ();
+  QPoint mouseInCell = event->pos () - cellTopLeft;
+  int x = mouseInCell.x (); // where in the cell click is
 
     // Check if a note is clicked
     TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
@@ -1781,13 +1781,12 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
 
     if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
+      // only if key frame area is active
       int k0, k1;
       bool isKeyFrameArea =
-          (pegbar && pegbar->getKeyframeRange(k0, k1) &&
-           (k1 > k0 || k0 == row) && k0 <= row && row <= k1 + 1 &&
-           ColumnWidth - 13 <= x && x <= ColumnWidth) // rightmost 13 pixels
-              ? true
-              : false;
+        (pegbar && pegbar->getKeyframeRange (k0, k1) &&
+        (k1 > k0 || k0 == row) && k0 <= row && row <= k1 + 1 &&
+        m_viewer->orientation ()->rect (PredefinedRect::KEYFRAME_AREA).contains (mouseInCell));
 
       if (isKeyFrameArea) {           // They are in the keyframe selection
         if (pegbar->isKeyframe(row))  // in the keyframe
@@ -1821,7 +1820,8 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       }
     }
 
-    if ((!xsh->getCell(row, col).isEmpty()) && x < 6) { // leftmost 6 pixels
+    if ((!xsh->getCell(row, col).isEmpty()) && 
+      m_viewer->orientation ()->rect (PredefinedRect::DRAG_AREA).contains (mouseInCell)) {
       TXshColumn *column = xsh->getColumn(col);
       if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
         int r0, r1;

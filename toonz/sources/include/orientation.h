@@ -42,6 +42,8 @@ enum class PredefinedRect {
   CELL_NAME_WITH_KEYFRAME, //! cell name box when keyframe is displayed
   END_EXTENDER, //! bottom / right extender
   BEGIN_EXTENDER, //! top / left extender
+  KEYFRAME_AREA, //! part of cell dedicated to key frames
+  DRAG_AREA //! draggable side bar
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
