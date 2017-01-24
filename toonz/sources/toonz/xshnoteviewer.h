@@ -22,6 +22,7 @@ class TColorStyle;
 class QToolButton;
 class QPushButton;
 class QComboBox;
+class Orientation;
 
 //-----------------------------------------------------------------------------
 
@@ -117,6 +118,8 @@ class NoteArea final : public QFrame {
   std::unique_ptr<NotePopup> m_newNotePopup;  // Popup used to create new note
   XsheetViewer *m_viewer;
 
+  QPushButton *m_flipOrientationButton;
+
   QToolButton *m_nextNoteButton;
   QToolButton *m_precNoteButton;
 
@@ -133,11 +136,13 @@ public:
   void updateButtons();
 
 protected slots:
+  void flipOrientation ();
   void toggleNewNote();
   void nextNote();
   void precNote();
 
   void onFrameDisplayStyleChanged(int id);
+  void onXsheetOrientationChanged (const Orientation *orientation);
 };
 
 }  // namespace XsheetGUI;

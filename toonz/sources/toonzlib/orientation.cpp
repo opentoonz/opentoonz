@@ -36,7 +36,10 @@ public:
 	virtual NumberRange frameSide (const QRect &area) const override;
   virtual QPoint topRightCorner (const QRect &area) const override;
 
-	virtual bool isVerticalTimeline () const override { return true;  }
+  virtual QString name () const override { return "Xsheet"; }
+  virtual const Orientation *next () const override { return orientations.leftToRight (); }
+
+  virtual bool isVerticalTimeline () const override { return true;  }
 };
 
 class LeftToRightOrientation : public Orientation {
@@ -62,7 +65,10 @@ public:
 	virtual NumberRange frameSide (const QRect &area) const override;
   virtual QPoint topRightCorner (const QRect &area) const override;
 
-	virtual bool isVerticalTimeline () const override { return false; }
+  virtual QString name () const override { return "Timeline"; }
+  virtual const Orientation *next () const override { return orientations.topToBottom (); }
+
+  virtual bool isVerticalTimeline () const override { return false; }
 };
 
 /// -------------------------------------------------------------------------------

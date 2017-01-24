@@ -14,6 +14,7 @@
 #include "toonz/txshnoteset.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/txsheethandle.h"
+#include "orientation.h"
 
 // Qt includes
 #include <QVariant>
@@ -454,12 +455,15 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("cornerWidget");
 
+  m_flipOrientationButton = new QPushButton (m_viewer->orientation ()->name (), this);
   QToolButton *toolButton  = new QToolButton(this);
   m_precNoteButton         = new QToolButton(this);
   m_nextNoteButton         = new QToolButton(this);
   m_frameDisplayStyleCombo = new QComboBox(this);
 
   //-----
+
+  m_flipOrientationButton->setObjectName ("flipOrientationButton");
 
   toolButton->setObjectName("ToolbarToolButton");
   toolButton->setFixedSize(44, 26);
@@ -497,7 +501,10 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   mainLay->setMargin(0);
   mainLay->setSpacing(5);
   {
+    mainLay->addWidget (m_flipOrientationButton, 0, Qt::AlignHCenter);
+
     mainLay->addStretch(1);
+
     mainLay->addWidget(toolButton, 0, Qt::AlignHCenter);
 
     QHBoxLayout *noteLay = new QHBoxLayout();
@@ -519,6 +526,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
   // signal-slot connections
   bool ret = true;
+  ret = ret && connect (m_flipOrientationButton, SIGNAL (clicked()), SLOT (flipOrientation()));
 
   ret = ret && connect(toolButton, SIGNAL(clicked()), SLOT(toggleNewNote()));
   ret = ret &&
@@ -526,9 +534,11 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   ret = ret &&
         connect(m_nextNoteButton, SIGNAL(clicked()), this, SLOT(nextNote()));
 
-  ret =
-      ret && connect(m_frameDisplayStyleCombo, SIGNAL(currentIndexChanged(int)),
+  ret = ret && connect(m_frameDisplayStyleCombo, SIGNAL(currentIndexChanged(int)),
                      this, SLOT(onFrameDisplayStyleChanged(int)));
+
+  ret = ret && connect (m_viewer, &XsheetViewer::orientationChanged,
+    this, &NoteArea::onXsheetOrientationChanged);
 
   updateButtons();
 
@@ -551,6 +561,16 @@ void NoteArea::updateButtons() {
     if (count > currentNoteIndex + 1) m_nextNoteButton->setEnabled(true);
     if (currentNoteIndex > 0) m_precNoteButton->setEnabled(true);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void NoteArea::flipOrientation () {
+  m_viewer->flipOrientation ();
+}
+
+void NoteArea::onXsheetOrientationChanged (const Orientation *newOrientation) {
+  m_flipOrientationButton->setText (newOrientation->name ());
 }
 
 //-----------------------------------------------------------------------------

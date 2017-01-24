@@ -169,7 +169,6 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   setObjectName("XsheetViewer");
 
   m_orientation = orientations.leftToRight ();
-  getXsheet ()->getColumnFan ()->setSize (m_orientation->dimension (PredefinedDimension::LAYER));
 
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());
@@ -218,6 +217,10 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
           SLOT(updateCellRowAree()));
   connect(m_cellScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
           SLOT(updateCellColumnAree()));
+
+  connect (this, &XsheetViewer::orientationChanged, this, &XsheetViewer::onOrientationChanged);
+
+  emit orientationChanged (m_orientation);
 }
 
 //-----------------------------------------------------------------------------
@@ -275,6 +278,18 @@ void XsheetViewer::dragToolLeave(QEvent *e) {
     delete getDragTool();
     m_dragTool = 0;
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::flipOrientation () {
+  m_orientation = m_orientation->next ();
+  emit orientationChanged (m_orientation);
+}
+
+void XsheetViewer::onOrientationChanged (const Orientation *newOrientation) {
+  getXsheet ()->getColumnFan ()->setSize (newOrientation->dimension (PredefinedDimension::LAYER));
+  update ();
 }
 
 //-----------------------------------------------------------------------------

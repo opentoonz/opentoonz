@@ -434,6 +434,10 @@ public:
     return m_autoPanSpeed.x() != 0 || m_autoPanSpeed.y() != 0;
   }
 
+  //-------
+  const Orientation *orientation () const { return m_orientation; }
+  void flipOrientation ();
+
   CellPosition xyToPosition (const QPoint &point) const;
   CellPosition xyToPosition (const TPoint &point) const;
   CellPosition xyToPosition (const TPointD &point) const;
@@ -445,10 +449,9 @@ public:
   CellRange xyRectToRange (const QRect &rect) const;
   QRect rangeToXYRect (const CellRange &range) const;
 
-  const Orientation *orientation () const { return m_orientation;  }
-
   void drawPredefinedPath (QPainter &p, PredefinedPath which, const CellPosition &pos,
     optional<QColor> fill, optional<QColor> outline) const;
+  //---------
 
   void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
   void updateRows() { m_rowArea->update(m_rowArea->visibleRegion()); }
@@ -695,6 +698,9 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
   void timerEvent(QTimerEvent *) override;
 
+signals:
+  void orientationChanged (const Orientation *newOrientation);
+
 public slots:
   void onSceneSwitched();
   void onXsheetChanged();
@@ -716,6 +722,8 @@ public slots:
   void changeWindowTitle();
 
   void resetXsheetNotes();
+
+  void onOrientationChanged (const Orientation *newOrientation);
 };
 
 #endif  // XSHEETVIEWER_H

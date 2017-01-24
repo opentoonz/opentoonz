@@ -114,6 +114,9 @@ public:
 
 	virtual bool isVerticalTimeline () const = 0;
 
+  virtual QString name () const = 0;
+  virtual const Orientation *next () const = 0;
+
   const QRect &rect (PredefinedRect which) const { return _rects.at (which); }
   const QLine &line (PredefinedLine which) const { return _lines.at (which); }
   int dimension (PredefinedDimension which) const { return _dimensions.at (which); }
