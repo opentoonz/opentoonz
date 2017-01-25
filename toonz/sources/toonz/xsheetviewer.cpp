@@ -50,6 +50,7 @@ namespace XsheetGUI {
 
 const int ColumnWidth = 74;
 const int RowHeight   = 20;
+const int SCROLLBAR_WIDTH = 16;
 
 }  // namespace XsheetGUI
 
@@ -301,8 +302,6 @@ void XsheetViewer::onOrientationChanged (const Orientation *newOrientation) {
 }
 
 void XsheetViewer::positionSections () {
-  int scrollBarWidth = 16;
-
   const Orientation *o = orientation ();
   QRect size = QRect (QPoint (0, 0), geometry ().size ());
   NumberRange allLayer = o->layerSide (size);
@@ -316,9 +315,9 @@ void XsheetViewer::positionSections () {
   m_noteScrollArea->setGeometry (o->frameLayerRect (headerFrame, headerLayer));
   m_cellScrollArea->setGeometry (o->frameLayerRect (bodyFrame, bodyLayer));
   m_columnScrollArea->setGeometry (o->frameLayerRect (
-    headerFrame, bodyLayer.adjusted (0, -scrollBarWidth)));
+    headerFrame, bodyLayer.adjusted (0, -XsheetGUI::SCROLLBAR_WIDTH)));
   m_rowScrollArea->setGeometry (o->frameLayerRect (
-    bodyFrame.adjusted (0, -scrollBarWidth), headerLayer));
+    bodyFrame.adjusted (0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
 }
 
 //-----------------------------------------------------------------------------
@@ -484,6 +483,7 @@ void XsheetViewer::timerEvent(QTimerEvent *) {
 
 //-----------------------------------------------------------------------------
 
+// adjust sizes after scrolling event
 bool XsheetViewer::refreshContentSize(int dx, int dy) {
   QSize viewportSize = m_cellScrollArea->viewport()->size();
   QPoint offset      = m_cellArea->pos();
@@ -520,22 +520,26 @@ bool XsheetViewer::refreshContentSize(int dx, int dy) {
 
 //-----------------------------------------------------------------------------
 
+// call when in doubt
 void XsheetViewer::updateAreeSize() {
-  int w = m_cellScrollArea->width() - 15;
-  int h = m_cellScrollArea->height() - 15;
+  const Orientation *o = orientation ();
+  QRect viewArea (QPoint (0, 0), m_cellScrollArea->geometry ()
+    .adjusted (0, 0, -XsheetGUI::SCROLLBAR_WIDTH, -XsheetGUI::SCROLLBAR_WIDTH).size ());
 
-  TXsheet *xsh        = getXsheet();
-  int frameCount      = xsh ? xsh->getFrameCount() : 0;
-  int hCounted        = (XsheetGUI::RowHeight) * (frameCount + 1);
-  if (h < hCounted) h = hCounted;
+  QPoint areaFilled (0, 0);
+  TXsheet *xsh = getXsheet ();
+  if (xsh)
+    areaFilled = positionToXY (CellPosition (xsh->getFrameCount () + 1, xsh->getColumnCount () + 1));
+  viewArea = viewArea & QRect (0, 0, areaFilled.x (), areaFilled.y ());
 
-  int columnCount     = xsh ? xsh->getColumnCount() : 0;
-  int wCounted        = (XsheetGUI::ColumnWidth) * (columnCount + 1);
-  if (w < wCounted) w = wCounted;
+  NumberRange allLayer = o->layerSide (viewArea);
+  NumberRange allFrame = o->frameSide (viewArea);
+  NumberRange headerLayer = o->range (PredefinedRange::HEADER_LAYER);
+  NumberRange headerFrame = o->range (PredefinedRange::HEADER_FRAME);
 
-  m_cellArea->setFixedSize(w, h);
-  m_rowArea->setFixedSize(m_x0, h);
-  m_columnArea->setFixedSize(w, m_y0);
+  m_cellArea->setFixedSize (viewArea.size ());
+  m_rowArea->setFixedSize (o->frameLayerRect (allFrame, headerLayer).size ());
+  m_columnArea->setFixedSize (o->frameLayerRect (headerFrame, allLayer).size ());
 }
 
 //-----------------------------------------------------------------------------
