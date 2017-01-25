@@ -22,6 +22,8 @@ class TopToBottomOrientation : public Orientation {
   const int EXTENDER_WIDTH = 20;
   const int EXTENDER_HEIGHT = 8;
   const int SOUND_PREVIEW_WIDTH = 7;
+  const int COLUMN_HEADER_HEIGHT = CELL_HEIGHT * 3 + 60;
+  const int ROW_HEADER_WIDTH = CELL_WIDTH;
 
 public:
   TopToBottomOrientation ();
@@ -51,6 +53,8 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_WIDTH = 8;
   const int EXTENDER_HEIGHT = 20;
   const int SOUND_PREVIEW_HEIGHT = 7;
+  const int COLUMN_HEADER_HEIGHT = CELL_HEIGHT;
+  const int ROW_HEADER_WIDTH = 200;
 
 public:
   LeftToRightOrientation ();
@@ -172,6 +176,8 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::PREVIEW_TRACK, QRect (CELL_WIDTH - SOUND_PREVIEW_WIDTH, 0, SOUND_PREVIEW_WIDTH, CELL_HEIGHT));
   addRect (PredefinedRect::BEGIN_SOUND_EDIT, QRect (CELL_DRAG_WIDTH, 0, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect (PredefinedRect::END_SOUND_EDIT, QRect (CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
+  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (ROW_HEADER_WIDTH, COLUMN_HEADER_HEIGHT)));
+  addRect (PredefinedRect::ROW_LABEL, QRect (CELL_WIDTH / 2, 1, CELL_WIDTH / 2, CELL_HEIGHT - 2));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -207,12 +213,8 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (KEY_ICON_WIDTH, 0));
   addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (30, 75));
 
-  int columnHeaderHeight = CELL_HEIGHT * 3 + 60;
-  int rowHeaderWidth = CELL_WIDTH;
-  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, rowHeaderWidth));
-  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, columnHeaderHeight));
-
-  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (rowHeaderWidth, columnHeaderHeight)));
+  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, ROW_HEADER_WIDTH));
+  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, COLUMN_HEADER_HEIGHT));
 }
 
 CellPosition TopToBottomOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
@@ -266,6 +268,8 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::PREVIEW_TRACK, QRect (0, CELL_HEIGHT - SOUND_PREVIEW_HEIGHT, CELL_WIDTH, SOUND_PREVIEW_HEIGHT));
   addRect (PredefinedRect::BEGIN_SOUND_EDIT, QRect (0, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect (PredefinedRect::END_SOUND_EDIT, QRect (CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
+  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (ROW_HEADER_WIDTH, COLUMN_HEADER_HEIGHT)));
+  addRect (PredefinedRect::ROW_LABEL, QRect (CELL_WIDTH / 2, 1, CELL_WIDTH / 2, CELL_HEIGHT - 2));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
@@ -301,12 +305,8 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (0, KEY_ICON_HEIGHT));
   addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (75, 30));
 
-  int columnHeaderHeight = CELL_HEIGHT;
-  int rowHeaderWidth = 200; // adjust as needed
-  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, columnHeaderHeight));
-  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, rowHeaderWidth));
-
-  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (rowHeaderWidth, columnHeaderHeight)));
+  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, COLUMN_HEADER_HEIGHT));
+  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, ROW_HEADER_WIDTH));
 }
 
 CellPosition LeftToRightOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {

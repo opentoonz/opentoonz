@@ -65,7 +65,8 @@ enum class PredefinedRect {
   PREVIEW_TRACK, //! sound preview area
   BEGIN_SOUND_EDIT, //! top sound resize
   END_SOUND_EDIT, //! bottom sound resize
-  NOTE_AREA //! size of top left note controls
+  NOTE_AREA, //! size of top left note controls
+  ROW_LABEL //! area for writing frame number
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked

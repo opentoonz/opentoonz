@@ -78,139 +78,143 @@ void RowArea::setDragTool(DragTool *dragTool) {
 
 //-----------------------------------------------------------------------------
 
-void RowArea::drawRows(QPainter &p, int r0, int r1) {
+void RowArea::drawRows (QPainter &p, int r0, int r1) {
   int playR0, playR1, step;
-  XsheetGUI::getPlayRange(playR0, playR1, step);
+  XsheetGUI::getPlayRange (playR0, playR1, step);
 
-  if (!XsheetGUI::isPlayRangeEnabled()) {
-    TXsheet *xsh = m_viewer->getXsheet();
-    playR1       = xsh->getFrameCount() - 1;
-    playR0       = 0;
+  if (!XsheetGUI::isPlayRangeEnabled ()) {
+    TXsheet *xsh = m_viewer->getXsheet ();
+    playR1 = xsh->getFrameCount () - 1;
+    playR0 = 0;
   }
 
 #ifdef _WIN32
-  static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Bold);
+  static QFont font ("Arial", XSHEET_FONT_SIZE, QFont::Bold);
 #else
-  static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font ("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
 #endif
-  p.setFont(font);
+  p.setFont (font);
 
   // marker interval
   int distance, offset;
-  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
-      distance, offset);
+  TApp::instance ()->getCurrentScene ()->getScene ()->getProperties ()->getMarkers (
+    distance, offset);
 
   // default value
   if (distance == 0) distance = 6;
 
-  QRect visibleRect = visibleRegion().boundingRect();
+  QRect visibleRect = visibleRegion ().boundingRect ();
 
-  int x0 = visibleRect.left();
-  int x1 = visibleRect.right();
-  int y0 = visibleRect.top();
-  int y1 = visibleRect.bottom();
+  int x0 = visibleRect.left ();
+  int x1 = visibleRect.right ();
+  int y0 = visibleRect.top ();
+  int y1 = visibleRect.bottom ();
   NumberRange layerSide = m_viewer->orientation ()->layerSide (visibleRect);
 
   for (int r = r0; r <= r1; r++) {
-	int frameAxis = m_viewer->rowToFrameAxis (r);
+    int frameAxis = m_viewer->rowToFrameAxis (r);
 
     //--- draw horizontal line
     QColor color = ((r - offset) % distance == 0 && r != 0)
-                       ? m_viewer->getMarkerLineColor ()
-                       : m_viewer->getLightLineColor ();
-    p.setPen(color);
-	QLine horizontalLine = m_viewer->orientation ()->horizontalLine (frameAxis, layerSide);
-    p.drawLine(horizontalLine);
+      ? m_viewer->getMarkerLineColor ()
+      : m_viewer->getLightLineColor ();
+    p.setPen (color);
+    QLine horizontalLine = m_viewer->orientation ()->horizontalLine (frameAxis, layerSide);
+    p.drawLine (horizontalLine);
 
     // draw frame text
     if (playR0 <= r && r <= playR1) {
-      p.setPen(((r - m_r0) % step == 0) ? m_viewer->getPreviewFrameTextColor()
-                                        : m_viewer->getTextColor());
+      p.setPen (((r - m_r0) % step == 0) ? m_viewer->getPreviewFrameTextColor ()
+        : m_viewer->getTextColor ());
     }
     // not in preview range
     else
-      p.setPen(m_viewer->getTextColor());
+      p.setPen (m_viewer->getTextColor ());
 
-	QPoint basePoint = m_viewer->orientation ()->frameLayerToXY (frameAxis, 0);
-	QRect baseRect = QRect (basePoint + QPoint (width () / 2, 1), QSize (width () / 2, RowHeight - 2));
-	// display time and/or frame number
-	switch (m_viewer->getFrameDisplayStyle()) {
+    QPoint basePoint = m_viewer->positionToXY (CellPosition (r, 0));
+    QRect labelRect = m_viewer->orientation ()->rect (PredefinedRect::ROW_LABEL)
+      .translated (basePoint);
+    // display time and/or frame number
+    switch (m_viewer->getFrameDisplayStyle ()) {
     case XsheetViewer::SecAndFrame: {
-      int frameRate = TApp::instance()
-                          ->getCurrentScene()
-                          ->getScene()
-                          ->getProperties()
-                          ->getOutputProperties()
-                          ->getFrameRate();
+      int frameRate = TApp::instance ()
+        ->getCurrentScene ()
+        ->getScene ()
+        ->getProperties ()
+        ->getOutputProperties ()
+        ->getFrameRate ();
       QString str;
       int koma = (r + 1) % frameRate;
       if (koma == 1) {
         int sec = (r + 1) / frameRate;
-        str     = QString("%1' %2\"")
-                  .arg(QString::number(sec).rightJustified(2, '0'))
-                  .arg(QString::number(koma).rightJustified(2, '0'));
-      } else {
+        str = QString ("%1' %2\"")
+          .arg (QString::number (sec).rightJustified (2, '0'))
+          .arg (QString::number (koma).rightJustified (2, '0'));
+      }
+      else {
         if (koma == 0) koma = frameRate;
-        str = QString("%1\"").arg(QString::number(koma).rightJustified(2, '0'));
+        str = QString ("%1\"").arg (QString::number (koma).rightJustified (2, '0'));
       }
 
-      p.drawText(baseRect.adjusted (-15, 0, 7, 0),
-                 Qt::AlignRight | Qt::AlignBottom, str);
+      p.drawText (labelRect.adjusted (-15, 0, 7, 0),
+        Qt::AlignRight | Qt::AlignBottom, str);
 
       break;
     }
 
     case XsheetViewer::Frame: {
-      QString number = QString::number(r + 1);
-      p.drawText(baseRect.adjusted (-2, 0, 0, 0),
-                 Qt::AlignHCenter | Qt::AlignBottom, number);
+      QString number = QString::number (r + 1);
+      p.drawText (labelRect.adjusted (-2, 0, 0, 0),
+        Qt::AlignHCenter | Qt::AlignBottom, number);
       break;
     }
 
-    // 6 second sheet (144frames per page)
+                              // 6 second sheet (144frames per page)
     case XsheetViewer::SixSecSheet: {
-      int frameRate = TApp::instance()
-                          ->getCurrentScene()
-                          ->getScene()
-                          ->getProperties()
-                          ->getOutputProperties()
-                          ->getFrameRate();
+      int frameRate = TApp::instance ()
+        ->getCurrentScene ()
+        ->getScene ()
+        ->getProperties ()
+        ->getOutputProperties ()
+        ->getFrameRate ();
       QString str;
       int koma = (r + 1) % (frameRate * 6);
       if ((r + 1) % frameRate == 1) {
         int page = (r + 1) / (frameRate * 6) + 1;
-        str      = QString("p%1  %2")
-                  .arg(QString::number(page))
-                  .arg(QString::number(koma).rightJustified(3, '0'));
-      } else {
-        if (koma == 0) koma = frameRate * 6;
-        str = QString("%1").arg(QString::number(koma).rightJustified(3, '0'));
+        str = QString ("p%1  %2")
+          .arg (QString::number (page))
+          .arg (QString::number (koma).rightJustified (3, '0'));
       }
-      p.drawText(baseRect.adjusted (-21, 0, 7, 0),
-                 Qt::AlignRight | Qt::AlignBottom, str);
+      else {
+        if (koma == 0) koma = frameRate * 6;
+        str = QString ("%1").arg (QString::number (koma).rightJustified (3, '0'));
+      }
+      p.drawText (labelRect.adjusted (-21, 0, 7, 0),
+        Qt::AlignRight | Qt::AlignBottom, str);
       break;
     }
-    // 3 second sheet (72frames per page)
+                                    // 3 second sheet (72frames per page)
     case XsheetViewer::ThreeSecSheet: {
-      int frameRate = TApp::instance()
-                          ->getCurrentScene()
-                          ->getScene()
-                          ->getProperties()
-                          ->getOutputProperties()
-                          ->getFrameRate();
+      int frameRate = TApp::instance ()
+        ->getCurrentScene ()
+        ->getScene ()
+        ->getProperties ()
+        ->getOutputProperties ()
+        ->getFrameRate ();
       QString str;
       int koma = (r + 1) % (frameRate * 3);
       if ((r + 1) % frameRate == 1) {
         int page = (r + 1) / (frameRate * 3) + 1;
-        str      = QString("p%1  %2")
-                  .arg(QString::number(page))
-                  .arg(QString::number(koma).rightJustified(2, '0'));
-      } else {
-        if (koma == 0) koma = frameRate * 3;
-        str = QString("%1").arg(QString::number(koma).rightJustified(2, '0'));
+        str = QString ("p%1  %2")
+          .arg (QString::number (page))
+          .arg (QString::number (koma).rightJustified (2, '0'));
       }
-      p.drawText(baseRect.adjusted (-21, 0, 7, 0),
-                 Qt::AlignRight | Qt::AlignBottom, str);
+      else {
+        if (koma == 0) koma = frameRate * 3;
+        str = QString ("%1").arg (QString::number (koma).rightJustified (2, '0'));
+      }
+      p.drawText (labelRect.adjusted (-21, 0, 7, 0),
+        Qt::AlignRight | Qt::AlignBottom, str);
       break;
     }
     }
@@ -219,34 +223,34 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
 
 //-----------------------------------------------------------------------------
 
-void RowArea::drawPlayRange(QPainter &p, int r0, int r1) {
-  bool playRangeEnabled = XsheetGUI::isPlayRangeEnabled();
+void RowArea::drawPlayRange (QPainter &p, int r0, int r1) {
+  bool playRangeEnabled = XsheetGUI::isPlayRangeEnabled ();
 
   // Update the play range internal fields
   if (playRangeEnabled) {
     int step;
-    XsheetGUI::getPlayRange(m_r0, m_r1, step);
+    XsheetGUI::getPlayRange (m_r0, m_r1, step);
   }
   // if the preview range is not set, then put markers at the first and the last
   // frames of the scene
   else {
-    TXsheet *xsh = m_viewer->getXsheet();
-    m_r1         = xsh->getFrameCount() - 1;
+    TXsheet *xsh = m_viewer->getXsheet ();
+    m_r1 = xsh->getFrameCount () - 1;
     if (m_r1 == -1) return;
     m_r0 = 0;
   }
 
-  QColor ArrowColor = (playRangeEnabled) ? QColor(255, 255, 255) : grey150;
-  p.setBrush(QBrush(ArrowColor));
+  QColor ArrowColor = (playRangeEnabled) ? QColor (255, 255, 255) : grey150;
+  p.setBrush (QBrush (ArrowColor));
 
   if (m_r0 > r0 - 1 && r1 + 1 > m_r0) {
-	QPoint base = m_viewer->positionToXY (CellPosition (m_r0, 0)) + QPoint (m_xa, 1);
-	drawArrow(p, base, base + QPoint (10, 0), base + QPoint (0, 10), true, ArrowColor);
+    QPoint base = m_viewer->positionToXY (CellPosition (m_r0, 0)) + QPoint (m_xa, 1);
+    drawArrow (p, base, base + QPoint (10, 0), base + QPoint (0, 10), true, ArrowColor);
   }
 
   if (m_r1 > r0 - 1 && r1 + 1 > m_r1) {
-	QPoint base = m_viewer->positionToXY (CellPosition (m_r1 + 1, 0)) + QPoint (m_xa, -12 + 1);
-    drawArrow(p, base, base + QPoint (10, 10), base + QPoint (0, 10), true, ArrowColor);
+    QPoint base = m_viewer->positionToXY (CellPosition (m_r1 + 1, 0)) + QPoint (m_xa, -12 + 1);
+    drawArrow (p, base, base + QPoint (10, 10), base + QPoint (0, 10), true, ArrowColor);
   }
 }
 
