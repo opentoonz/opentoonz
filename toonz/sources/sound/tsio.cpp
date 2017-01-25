@@ -21,6 +21,10 @@ void initSoundIo() {
   TSoundTrackWriter::define("aiff", TSoundTrackWriterAiff::create);
   TFileType::declare("aiff", TFileType::AUDIO_LEVEL);
 
+  TSoundTrackReader::define("aif", TSoundTrackReaderAiff::create);
+  TSoundTrackWriter::define("aif", TSoundTrackWriterAiff::create);
+  TFileType::declare("aif", TFileType::AUDIO_LEVEL);
+
   TSoundTrackReader::define("raw", TSoundTrackReaderRaw::create);
   TSoundTrackWriter::define("raw", TSoundTrackWriterRaw::create);
   TFileType::declare("raw", TFileType::AUDIO_LEVEL);

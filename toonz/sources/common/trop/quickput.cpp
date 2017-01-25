@@ -53,24 +53,20 @@ inline TPixel32 applyColorScale(const TPixel32 &color,
           color.r * colorScale.m / 255, color.g * colorScale.m / 255,
           color.b * colorScale.m / 255, color.m * colorScale.m / 255);
   }
-  int r = color.r + colorScale.r;
-  int g = color.g + colorScale.g;
-  int b = color.b + colorScale.b;
-
-  return premultiply(TPixel32(r > 255 ? 255 : r, g > 255 ? 255 : g,
-                              b > 255 ? 255 : b, color.m * colorScale.m / 255));
+  int r = 255 - (255 - color.r) * (255 - colorScale.r) / 255;
+  int g = 255 - (255 - color.g) * (255 - colorScale.g) / 255;
+  int b = 255 - (255 - color.b) * (255 - colorScale.b) / 255;
+  return premultiply(TPixel32(r, g, b, color.m * colorScale.m / 255));
 }
 
 //------------------------------------------------------------------------------
 
 inline TPixel32 applyColorScaleCMapped(const TPixel32 &color,
                                        const TPixel32 &colorScale) {
-  int r = color.r + colorScale.r;
-  int g = color.g + colorScale.g;
-  int b = color.b + colorScale.b;
-
-  return premultiply(TPixel32(r > 255 ? 255 : r, g > 255 ? 255 : g,
-                              b > 255 ? 255 : b, color.m * colorScale.m / 255));
+  int r = 255 - (255 - color.r) * (255 - colorScale.r) / 255;
+  int g = 255 - (255 - color.g) * (255 - colorScale.g) / 255;
+  int b = 255 - (255 - color.b) * (255 - colorScale.b) / 255;
+  return premultiply(TPixel32(r, g, b, color.m * colorScale.m / 255));
 }
 
 //------------------------------------------------------------------------------

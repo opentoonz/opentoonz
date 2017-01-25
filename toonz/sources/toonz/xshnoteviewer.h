@@ -122,9 +122,6 @@ class NoteArea final : public QFrame {
   QToolButton *m_precNoteButton;
 
   QComboBox *m_frameDisplayStyleCombo;
-  QPushButton *m_newVectorLevelButton;
-  QPushButton *m_newToonzRasterLevelButton;
-  QPushButton *m_newRasterLevelButton;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -140,9 +137,6 @@ protected slots:
   void toggleNewNote();
   void nextNote();
   void precNote();
-  void onNewVectorLevelButtonPressed();
-  void onNewToonzRasterLevelButtonPressed();
-  void onNewRasterLevelButtonPressed();
   void onFrameDisplayStyleChanged(int id);
 };
 

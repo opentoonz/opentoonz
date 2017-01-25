@@ -298,7 +298,10 @@ Preferences::Preferences()
     , m_ffmpegTimeout(30)
     , m_shortcutPreset("defopentoonz")
     , m_useNumpadForSwitchingStyles(true)
-    , m_showNewLevelButtons(false) {
+    , m_showNewLevelButtons(false)
+    , m_useArrowKeyToShiftCellSelection(false)
+    , m_inputCellsWithoutDoubleClickingEnabled(false) {
+
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -573,6 +576,10 @@ Preferences::Preferences()
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
   getValue(*m_settings, "showNewLevelButtons", m_showNewLevelButtons);
+  getValue(*m_settings, "useArrowKeyToShiftCellSelection",
+           m_useArrowKeyToShiftCellSelection);
+  getValue(*m_settings, "inputCellsWithoutDoubleClickingEnabled",
+           m_inputCellsWithoutDoubleClickingEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -1351,4 +1358,19 @@ void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
 void Preferences::enableShowNewLevelButtons(bool on) {
   m_showNewLevelButtons = on;
   m_settings->setValue("showNewLevelButtons", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableUseArrowKeyToShiftCellSelection(bool on) {
+  m_useArrowKeyToShiftCellSelection = on;
+  m_settings->setValue("useArrowKeyToShiftCellSelection", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableInputCellsWithoutDoubleClicking(bool on) {
+  m_inputCellsWithoutDoubleClickingEnabled = on;
+  m_settings->setValue("inputCellsWithoutDoubleClickingEnabled",
+                       on ? "1" : "0");
 }

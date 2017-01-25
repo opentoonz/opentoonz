@@ -171,6 +171,8 @@ private slots:
   void onFastRenderPathChanged();
   void onUseNumpadForSwitchingStylesClicked(bool);
   void onShowNewLevelButtonsClicked(bool);
+  void onUseArrowKeyToShiftCellSelectionClicked(int);
+  void onInputCellsWithoutDoubleClickingClicked(int);
 };
 
 //**********************************************************************************

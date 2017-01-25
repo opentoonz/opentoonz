@@ -58,6 +58,7 @@
 #include <QToolTip>
 #include <QTimer>
 #include <QLabel>
+#include <QComboBox>
 //=============================================================================
 
 namespace {
@@ -101,6 +102,14 @@ bool containsRasterLevel(TColumnSelection *selection) {
     }
   }
   return false;
+}
+
+const QIcon getColorChipIcon(const int id) {
+  static QList<QColor> colors = {Qt::red,        Qt::green,    Qt::blue,
+                                 Qt::darkYellow, Qt::darkCyan, Qt::darkMagenta};
+  QPixmap pixmap(12, 12);
+  pixmap.fill(colors.at(id - 1));
+  return QIcon(pixmap);
 }
 }
 
@@ -761,6 +770,16 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
         // notify that the column icon is already shown
         if (levelColumn) levelColumn->setIconVisible(true);
       }
+
+      // filter color
+      if (column->getFilterColorId() != 0) {
+        QRect filterColorRect(thumbnailRect.topRight().x() - 14,
+                              thumbnailRect.topRight().y(), 14, 14);
+        p.fillRect(filterColorRect, Qt::white);
+        p.drawPixmap(
+            filterColorRect.adjusted(2, 2, -2, -2),
+            getColorChipIcon(column->getFilterColorId()).pixmap(12, 12));
+      }
     }
   }
 }
@@ -1309,13 +1328,45 @@ m_value->setFixedWidth(30);
 static QFont font("Helvetica", 7, QFont::Normal);
 m_value->setFont(font);*/
 
-  QHBoxLayout *hlayout = new QHBoxLayout;
-  hlayout->setContentsMargins(0, 3, 0, 3);
-  hlayout->setSpacing(1);
-  hlayout->addWidget(m_slider);
-  hlayout->addWidget(m_value);
-  hlayout->addWidget(new QLabel("%"));
-  setLayout(hlayout);
+  m_filterColorCombo = new QComboBox(this);
+  m_filterColorCombo->addItem(tr("None"), 0);
+  m_filterColorCombo->addItem(getColorChipIcon(1), tr("Red"), 1);
+  m_filterColorCombo->addItem(getColorChipIcon(2), tr("Green"), 2);
+  m_filterColorCombo->addItem(getColorChipIcon(3), tr("Blue"), 3);
+  m_filterColorCombo->addItem(getColorChipIcon(4), tr("DarkYellow"), 4);
+  m_filterColorCombo->addItem(getColorChipIcon(5), tr("DarkCyan"), 5);
+  m_filterColorCombo->addItem(getColorChipIcon(6), tr("DarkMagenta"), 6);
+  // For now the color filter affects only for Raster and ToonzRaser levels.
+  // TODO: Make this property to affect vector levels as well.
+  m_filterColorCombo->setToolTip(
+      tr("N.B. Filter doesn't affect vector levels"));
+
+  QLabel *filterLabel = new QLabel(tr("Filter:"), this);
+  filterLabel->setToolTip(tr("N.B. Filter doesn't affect vector levels"));
+
+  QVBoxLayout *mainLayout = new QVBoxLayout();
+  mainLayout->setMargin(3);
+  mainLayout->setSpacing(3);
+  {
+    QHBoxLayout *hlayout = new QHBoxLayout;
+    // hlayout->setContentsMargins(0, 3, 0, 3);
+    hlayout->setMargin(0);
+    hlayout->setSpacing(1);
+    hlayout->addWidget(m_slider);
+    hlayout->addWidget(m_value);
+    hlayout->addWidget(new QLabel("%"));
+    mainLayout->addLayout(hlayout, 0);
+
+    QHBoxLayout *filterColorLay = new QHBoxLayout();
+    filterColorLay->setMargin(0);
+    filterColorLay->setSpacing(2);
+    {
+      filterColorLay->addWidget(filterLabel, 0);
+      filterColorLay->addWidget(m_filterColorCombo, 1);
+    }
+    mainLayout->addLayout(filterColorLay, 0);
+  }
+  setLayout(mainLayout);
 
   bool ret = connect(m_slider, SIGNAL(sliderReleased()), this,
                      SLOT(onSliderReleased()));
@@ -1325,6 +1376,9 @@ m_value->setFont(font);*/
                        SLOT(onSliderValueChanged(int)));
   ret = ret && connect(m_value, SIGNAL(textChanged(const QString &)), this,
                        SLOT(onValueChanged(const QString &)));
+
+  ret = ret && connect(m_filterColorCombo, SIGNAL(activated(int)), this,
+                       SLOT(onFilterColorChanged(int)));
   assert(ret);
 }
 
@@ -1366,6 +1420,15 @@ void ColumnTransparencyPopup::onValueChanged(const QString &str) {
 
 //----------------------------------------------------------------
 
+void ColumnTransparencyPopup::onFilterColorChanged(int id) {
+  m_column->setFilterColorId(id);
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  ((ColumnArea *)parent())->update();
+}
+
+//----------------------------------------------------------------
+
 void ColumnTransparencyPopup::setColumn(TXshColumn *column) {
   m_column = column;
   assert(m_column);
@@ -1375,6 +1438,8 @@ void ColumnTransparencyPopup::setColumn(TXshColumn *column) {
   m_value->setText(QString::number(val));
   connect(m_value, SIGNAL(textChanged(const QString &)), this,
           SLOT(onValueChanged(const QString &)));
+
+  m_filterColorCombo->setCurrentIndex(m_column->getFilterColorId());
 }
 
 /*void ColumnTransparencyPopup::mouseMoveEvent ( QMouseEvent * e )

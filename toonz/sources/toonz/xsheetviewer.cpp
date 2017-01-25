@@ -170,6 +170,14 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());
 
+  m_toolbarScrollArea = new XsheetScrollArea(this);
+  m_toolbarScrollArea->setFixedSize(m_x0 * 6, XsheetGUI::RowHeight);
+  m_toolbarScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_toolbarScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_toolbar = new XsheetGUI::Toolbar(this);
+  m_toolbar->setFixedSize(m_x0 * 6, XsheetGUI::RowHeight);
+  m_toolbarScrollArea->setWidget(m_toolbar);
+
   m_noteArea = new XsheetGUI::NoteArea(this);
   m_noteArea->setFixedSize(m_x0 + 1, m_y0 - 3);
   m_noteScrollArea = new XsheetScrollArea(this);
@@ -697,11 +705,21 @@ void XsheetViewer::resizeEvent(QResizeEvent *event) {
   int w              = width();
   int h              = height();
   int scrollBarWidth = 16;
-  m_noteScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
-  m_cellScrollArea->setGeometry(m_x0, m_y0, w - m_x0, h - m_y0);
-  m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
-  m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - scrollBarWidth);
 
+  if (Preferences::instance()->isShowNewLevelButtonsEnabled()) {
+	  m_toolbarScrollArea->setGeometry(3, 1, m_x0 * 6, m_y0 - 3);
+	  m_noteScrollArea->setGeometry(3, XsheetGUI::RowHeight + 1, m_x0 - 4, m_y0 - 3);
+	  m_cellScrollArea->setGeometry(m_x0, m_y0 + XsheetGUI::RowHeight, w - m_x0, h - m_y0 - XsheetGUI::RowHeight);
+	  m_columnScrollArea->setGeometry(m_x0, XsheetGUI::RowHeight + 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
+	  m_rowScrollArea->setGeometry(1, m_y0 + XsheetGUI::RowHeight, m_x0 - 1, h - m_y0 - scrollBarWidth - XsheetGUI::RowHeight);
+  }
+  else {
+	  m_toolbarScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
+	  m_noteScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
+	  m_cellScrollArea->setGeometry(m_x0, m_y0, w - m_x0, h - m_y0);
+	  m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
+	  m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - scrollBarWidth);
+  }
   //(Nuovo Layout Manager) Reintrodotto per il refresh automatico
   refreshContentSize(
       0,
@@ -777,12 +795,54 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
   int frameCount = getXsheet()->getFrameCount();
   int row = getCurrentRow(), col = getCurrentColumn();
 
+  int rowStride = 1;
+  TCellSelection *cellSel =
+      dynamic_cast<TCellSelection *>(TSelection::getCurrent());
+  // Use arrow keys to shift the cell selection. Ctrl + arrow keys to resize the
+  // selection range.
+  if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled() &&
+      cellSel && !cellSel->isEmpty()) {
+    int r0, c0, r1, c1;
+    cellSel->getSelectedCells(r0, c0, r1, c1);
+    rowStride = cellSel->getSelectedCells().getRowCount();
+    QPoint offset(0, 0);
+    switch (int key = event->key()) {
+    case Qt::Key_Up:
+      offset.setY(-1);
+      break;
+    case Qt::Key_Down:
+      offset.setY(1);
+      break;
+    case Qt::Key_Left:
+      offset.setX(-1);
+      break;
+    case Qt::Key_Right:
+      offset.setX(1);
+      break;
+    }
+    if (m_cellArea->isControlPressed()) {
+      if (r0 == r1 && offset.y() == -1) return;
+      if (c0 == c1 && offset.x() == -1) return;
+      cellSel->selectCells(r0, c0, r1 + offset.y(), c1 + offset.x());
+      updateCells();
+      TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+      return;
+    } else {
+      offset.setY(offset.y() * rowStride);
+      if (r0 + offset.y() < 0) offset.setY(-r0);
+      if (c0 + offset.x() < 0) return;
+      cellSel->selectCells(r0 + offset.y(), c0 + offset.x(), r1 + offset.y(),
+                           c1 + offset.x());
+      TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+    }
+  }
+
   switch (int key = event->key()) {
   case Qt::Key_Up:
-    setCurrentRow(std::max(row - 1, 0));
+    setCurrentRow(std::max(row - rowStride, 0));
     break;
   case Qt::Key_Down:
-    setCurrentRow(row + 1);
+    setCurrentRow(row + rowStride);
     break;
   case Qt::Key_Left:
     setCurrentColumn(std::max(col - 1, 0));
@@ -988,7 +1048,16 @@ void XsheetViewer::onSelectionSwitched(TSelection *oldSelection,
 /*! update display of the cell selection range in title bar
 */
 void XsheetViewer::onSelectionChanged(TSelection *selection) {
-  if ((TSelection *)getCellSelection() == selection) changeWindowTitle();
+  if ((TSelection *)getCellSelection() == selection) {
+    changeWindowTitle();
+    if (Preferences::instance()->isInputCellsWithoutDoubleClickingEnabled()) {
+      TCellSelection *cellSel = getCellSelection();
+      if (!cellSel->isEmpty())
+        m_cellArea->showRenameField(
+            cellSel->getSelectedCells().m_r0, cellSel->getSelectedCells().m_c0,
+            cellSel->getSelectedCells().getColCount() > 1);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

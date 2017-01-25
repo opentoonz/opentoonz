@@ -459,15 +459,6 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_precNoteButton         = new QToolButton(this);
   m_nextNoteButton         = new QToolButton(this);
   m_frameDisplayStyleCombo = new QComboBox(this);
-  m_newVectorLevelButton   = new QPushButton(tr("V"), this);
-  m_newVectorLevelButton->setToolTip("New Vector Level");
-  m_newVectorLevelButton->setFixedSize(18, 18);
-  m_newToonzRasterLevelButton = new QPushButton(tr("T"), this);
-  m_newToonzRasterLevelButton->setToolTip("New Toonz Raster Level");
-  m_newToonzRasterLevelButton->setFixedSize(18, 18);
-  m_newRasterLevelButton = new QPushButton(tr("R"), this);
-  m_newRasterLevelButton->setToolTip("New Raster Level");
-  m_newRasterLevelButton->setFixedSize(18, 18);
   //-----
 
   toolButton->setObjectName("ToolbarToolButton");
@@ -507,20 +498,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   mainLay->setSpacing(5);
   {
     mainLay->addStretch(1);
-    QHBoxLayout *newLevelLayout = new QHBoxLayout();
-    newLevelLayout->setSpacing(0);
-    newLevelLayout->setMargin(0);
-    {
-      newLevelLayout->addWidget(m_newVectorLevelButton, 0, Qt::AlignLeft);
-      newLevelLayout->addWidget(m_newToonzRasterLevelButton, 0, Qt::AlignLeft);
-      newLevelLayout->addWidget(m_newRasterLevelButton, 0, Qt::AlignLeft);
-    }
-    mainLay->addLayout(newLevelLayout, 0);
-    if (!Preferences::instance()->isShowNewLevelButtonsEnabled()) {
-      m_newVectorLevelButton->hide();
-      m_newToonzRasterLevelButton->hide();
-      m_newRasterLevelButton->hide();
-    }
+
     mainLay->addWidget(toolButton, 0, Qt::AlignHCenter);
 
     QHBoxLayout *noteLay = new QHBoxLayout();
@@ -542,12 +520,6 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
   // signal-slot connections
   bool ret = true;
-  ret      = ret && connect(m_newVectorLevelButton, SIGNAL(released()), this,
-                       SLOT(onNewVectorLevelButtonPressed()));
-  ret = ret && connect(m_newToonzRasterLevelButton, SIGNAL(released()), this,
-                       SLOT(onNewToonzRasterLevelButtonPressed()));
-  ret = ret && connect(m_newRasterLevelButton, SIGNAL(released()), this,
-                       SLOT(onNewRasterLevelButtonPressed()));
   ret = ret && connect(toolButton, SIGNAL(clicked()), SLOT(toggleNewNote()));
   ret = ret &&
         connect(m_precNoteButton, SIGNAL(clicked()), this, SLOT(precNote()));
@@ -592,34 +564,6 @@ void NoteArea::toggleNewNote() {
   } else {
     m_newNotePopup->show();
   }
-}
-
-//-----------------------------------------------------------------------------
-
-void NoteArea::onNewVectorLevelButtonPressed() {
-  int defaultLevelType = Preferences::instance()->getDefLevelDpi();
-  Preferences::instance()->setDefLevelType(PLI_XSHLEVEL);
-  CommandManager::instance()->execute("MI_NewLevel");
-  Preferences::instance()->setDefLevelType(defaultLevelType);
-}
-
-//-----------------------------------------------------------------------------
-
-void NoteArea::onNewToonzRasterLevelButtonPressed() {
-  int defaultLevelType = Preferences::instance()->getDefLevelDpi();
-  // Preferences::instance()->setOldDefLevelType(defaultLevelType);
-  Preferences::instance()->setDefLevelType(TZP_XSHLEVEL);
-  CommandManager::instance()->execute("MI_NewLevel");
-  Preferences::instance()->setDefLevelType(defaultLevelType);
-}
-
-//-----------------------------------------------------------------------------
-
-void NoteArea::onNewRasterLevelButtonPressed() {
-  int defaultLevelType = Preferences::instance()->getDefLevelDpi();
-  Preferences::instance()->setDefLevelType(OVL_XSHLEVEL);
-  CommandManager::instance()->execute("MI_NewLevel");
-  Preferences::instance()->setDefLevelType(defaultLevelType);
 }
 
 //-----------------------------------------------------------------------------

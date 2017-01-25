@@ -10,6 +10,7 @@
 #include "xshcolumnviewer.h"
 #include "xshrowviewer.h"
 #include "xshnoteviewer.h"
+#include "xshtoolbar.h"
 #include "cellkeyframeselection.h"
 #include "toonzqt/spreadsheetviewer.h"
 
@@ -318,11 +319,13 @@ class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
   XsheetScrollArea *m_columnScrollArea;
   XsheetScrollArea *m_rowScrollArea;
   XsheetScrollArea *m_noteScrollArea;
+  XsheetScrollArea *m_toolbarScrollArea;
 
   XsheetGUI::ColumnArea *m_columnArea;
   XsheetGUI::RowArea *m_rowArea;
   XsheetGUI::CellArea *m_cellArea;
   XsheetGUI::NoteArea *m_noteArea;
+  XsheetGUI::Toolbar *m_toolbar;
 
   int m_x0, m_y0;
   int m_timerId;
