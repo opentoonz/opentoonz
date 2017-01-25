@@ -199,19 +199,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_rowScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_rowScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-  connect(m_rowScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-          m_cellScrollArea->verticalScrollBar(), SLOT(setValue(int)));
-  connect(m_cellScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-          m_rowScrollArea->verticalScrollBar(), SLOT(setValue(int)));
-  connect(m_columnScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
-          m_cellScrollArea->horizontalScrollBar(), SLOT(setValue(int)));
-  connect(m_cellScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
-          m_columnScrollArea->horizontalScrollBar(), SLOT(setValue(int)));
-
-  connect(m_cellScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-          SLOT(updateCellRowAree()));
-  connect(m_cellScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
-          SLOT(updateCellColumnAree()));
+  connectScrollBars ();
 
   connect (this, &XsheetViewer::orientationChanged, this, &XsheetViewer::onOrientationChanged);
 
@@ -291,6 +279,10 @@ void XsheetViewer::flipOrientation () {
 void XsheetViewer::onOrientationChanged (const Orientation *newOrientation) {
   positionSections ();
   refreshContentSize (0, 0);
+
+  disconnectScrollBars ();
+  connectScrollBars ();
+
   update ();
 }
 
@@ -311,6 +303,40 @@ void XsheetViewer::positionSections () {
     headerFrame, bodyLayer.adjusted (0, -XsheetGUI::SCROLLBAR_WIDTH)));
   m_rowScrollArea->setGeometry (o->frameLayerRect (
     bodyFrame.adjusted (0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
+}
+
+void XsheetViewer::disconnectScrollBars () {
+  disconnect (m_rowScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
+  disconnect (m_columnScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
+  disconnect (m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
+
+  disconnect (m_rowScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
+  disconnect (m_columnScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
+  disconnect (m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
+}
+
+void XsheetViewer::connectScrollBars () {
+  const Orientation *o = orientation ();
+  bool isVertical = o->isVerticalTimeline ();
+  QWidget *scrolledVertically =
+    (isVertical ? m_rowScrollArea : m_columnScrollArea)->verticalScrollBar ();
+  QWidget *scrolledHorizontally =
+    (isVertical ? m_columnScrollArea : m_rowScrollArea)->horizontalScrollBar ();
+
+  connect (scrolledVertically, SIGNAL (valueChanged (int)),
+    m_cellScrollArea->verticalScrollBar (), SLOT (setValue (int)));
+  connect (m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
+    scrolledVertically, SLOT (setValue (int)));
+
+  connect (scrolledHorizontally, SIGNAL (valueChanged (int)),
+    m_cellScrollArea->horizontalScrollBar (), SLOT (setValue (int)));
+  connect (m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)),
+    scrolledHorizontally, SLOT (setValue (int)));
+
+  connect (m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
+    isVertical ? SLOT (updateCellRowAree ()) : SLOT (updateCellColumnAree ()));
+  connect (m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)),
+    isVertical ? SLOT (updateCellColumnAree ()) : SLOT (updateCellRowAree ()));
 }
 
 //-----------------------------------------------------------------------------

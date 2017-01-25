@@ -697,6 +697,9 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
   void timerEvent(QTimerEvent *) override;
 
+  void positionSections ();
+  void disconnectScrollBars ();
+  void connectScrollBars ();
 signals:
   void orientationChanged (const Orientation *newOrientation);
 
@@ -723,8 +726,6 @@ public slots:
   void resetXsheetNotes();
 
   void onOrientationChanged (const Orientation *newOrientation);
-private:
-  void positionSections ();
 };
 
 #endif  // XSHEETVIEWER_H
