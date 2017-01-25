@@ -3,6 +3,8 @@
 
 #include <QPainterPath>
 
+#include <QDebug>
+
 using std::pair;
 
 Orientations orientations;
@@ -43,8 +45,8 @@ public:
 };
 
 class LeftToRightOrientation : public Orientation {
-  const int CELL_WIDTH = 47;
-  const int CELL_HEIGHT = 47;
+  const int CELL_WIDTH = 50;
+  const int CELL_HEIGHT = 20;
   const int CELL_DRAG_HEIGHT = 7;
   const int EXTENDER_WIDTH = 8;
   const int EXTENDER_HEIGHT = 20;
@@ -73,6 +75,12 @@ public:
 
 /// -------------------------------------------------------------------------------
 
+NumberRange NumberRange::adjusted (int addFrom, int addTo) const {
+  return NumberRange (_from + addFrom, _to + addTo);
+}
+
+/// -------------------------------------------------------------------------------
+
 //const int Orientations::COUNT = 2;
 
 Orientations::Orientations (): _topToBottom (nullptr), _leftToRight (nullptr) {
@@ -89,12 +97,12 @@ Orientations::~Orientations () {
 
 const Orientation *Orientations::topToBottom () const {
   if (!_topToBottom)
-    throw new QString ("!_topToBottom");
+    throw std::exception ("!_topToBottom");
   return _topToBottom;
 }
 const Orientation *Orientations::leftToRight () const {
   if (!_leftToRight)
-    throw new QString ("!_leftToRight");
+    throw std::exception ("!_leftToRight");
   return _leftToRight;
 }
 
@@ -109,6 +117,11 @@ QLine Orientation::horizontalLine (int frameAxis, const NumberRange &layerAxis) 
 	QPoint first = frameLayerToXY (frameAxis, layerAxis.from ());
 	QPoint second = frameLayerToXY (frameAxis, layerAxis.to ());
 	return QLine (first, second);
+}
+QRect Orientation::frameLayerRect (const NumberRange &frameAxis, const NumberRange &layerAxis) const {
+  QPoint topLeft = frameLayerToXY (frameAxis.from (), layerAxis.from ());
+  QPoint bottomRight = frameLayerToXY (frameAxis.to (), layerAxis.to ());
+  return QRect (topLeft, bottomRight);
 }
 
 QRect Orientation::foldedRectangle (int layerAxis, const NumberRange &frameAxis, int i) const {
@@ -134,6 +147,9 @@ void Orientation::addPath (PredefinedPath which, const QPainterPath &path) {
 }
 void Orientation::addPoint (PredefinedPoint which, const QPoint &point) {
   _points.insert (pair<PredefinedPoint, QPoint> (which, point));
+}
+void Orientation::addRange (PredefinedRange which, const NumberRange &range) {
+  _ranges.insert (pair<PredefinedRange, NumberRange> (which, range));
 }
 
 /// -------------------------------------------------------------------------------
@@ -190,6 +206,13 @@ TopToBottomOrientation::TopToBottomOrientation () {
 
   addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (KEY_ICON_WIDTH, 0));
   addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (30, 75));
+
+  int columnHeaderHeight = CELL_HEIGHT * 3 + 60;
+  int rowHeaderWidth = CELL_WIDTH;
+  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, rowHeaderWidth));
+  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, columnHeaderHeight));
+
+  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (rowHeaderWidth, columnHeaderHeight)));
 }
 
 CellPosition TopToBottomOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
@@ -277,6 +300,13 @@ LeftToRightOrientation::LeftToRightOrientation () {
 
   addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (0, KEY_ICON_HEIGHT));
   addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (75, 30));
+
+  int columnHeaderHeight = CELL_HEIGHT;
+  int rowHeaderWidth = 200; // adjust as needed
+  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, columnHeaderHeight));
+  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, rowHeaderWidth));
+
+  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (rowHeaderWidth, columnHeaderHeight)));
 }
 
 CellPosition LeftToRightOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {

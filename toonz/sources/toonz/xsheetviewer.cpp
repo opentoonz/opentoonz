@@ -161,7 +161,8 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_isComputingSize(false)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
-    , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea)) {
+    , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
+    , m_orientation (nullptr) {
 
 	setFocusPolicy(Qt::StrongFocus);
 
@@ -220,7 +221,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
 
   connect (this, &XsheetViewer::orientationChanged, this, &XsheetViewer::onOrientationChanged);
 
-  emit orientationChanged (m_orientation);
+  emit orientationChanged (orientation ());
 }
 
 //-----------------------------------------------------------------------------
@@ -282,13 +283,42 @@ void XsheetViewer::dragToolLeave(QEvent *e) {
 
 //-----------------------------------------------------------------------------
 
+const Orientation *XsheetViewer::orientation () const {
+  if (!m_orientation)
+    throw std::exception ("!m_orientation");
+  return m_orientation;
+}
+
 void XsheetViewer::flipOrientation () {
-  m_orientation = m_orientation->next ();
-  emit orientationChanged (m_orientation);
+  m_orientation = orientation ()->next ();
+  emit orientationChanged (orientation ());
 }
 
 void XsheetViewer::onOrientationChanged (const Orientation *newOrientation) {
+  positionSections ();
+  refreshContentSize (0, 0);
   update ();
+}
+
+void XsheetViewer::positionSections () {
+  int scrollBarWidth = 16;
+
+  const Orientation *o = orientation ();
+  QRect size = QRect (QPoint (0, 0), geometry ().size ());
+  NumberRange allLayer = o->layerSide (size);
+  NumberRange allFrame = o->frameSide (size);
+
+  NumberRange headerLayer = o->range (PredefinedRange::HEADER_LAYER);
+  NumberRange headerFrame = o->range (PredefinedRange::HEADER_FRAME);
+  NumberRange bodyLayer (headerLayer.to (), allLayer.to ());
+  NumberRange bodyFrame (headerFrame.to (), allFrame.to ());
+
+  m_noteScrollArea->setGeometry (o->frameLayerRect (headerFrame, headerLayer));
+  m_cellScrollArea->setGeometry (o->frameLayerRect (bodyFrame, bodyLayer));
+  m_columnScrollArea->setGeometry (o->frameLayerRect (
+    headerFrame, bodyLayer.adjusted (0, -scrollBarWidth)));
+  m_rowScrollArea->setGeometry (o->frameLayerRect (
+    bodyFrame.adjusted (0, -scrollBarWidth), headerLayer));
 }
 
 //-----------------------------------------------------------------------------
@@ -457,27 +487,32 @@ void XsheetViewer::timerEvent(QTimerEvent *) {
 bool XsheetViewer::refreshContentSize(int dx, int dy) {
   QSize viewportSize = m_cellScrollArea->viewport()->size();
   QPoint offset      = m_cellArea->pos();
-  offset = QPoint(qMin(0, offset.x() - dx), qMin(0, offset.y() - dy));
+  offset = QPoint(qMin(0, offset.x() - dx), qMin(0, offset.y() - dy)); // what?
 
   TXsheet *xsh    = getXsheet();
   int frameCount  = xsh ? xsh->getFrameCount() : 0;
   int columnCount = xsh ? xsh->getColumnCount() : 0;
-  QPoint dimensions = positionToXY (CellPosition (frameCount + 1, columnCount + 1));
-  QSize contentSize(dimensions.x (), dimensions.y ());
+  QPoint contentSize = positionToXY (CellPosition (frameCount + 1, columnCount + 1));
 
-  QSize actualSize(contentSize);
-  int x = viewportSize.width() - offset.x();
+  QSize actualSize(contentSize.x (), contentSize.y ());
+  int x = viewportSize.width () - offset.x (); // wtf is going on
   int y = viewportSize.height() - offset.y();
   if (x > actualSize.width()) actualSize.setWidth(x);
   if (y > actualSize.height()) actualSize.setHeight(y);
 
   if (actualSize == m_cellArea->size())
-    return false;
+   return false;
   else {
+    const Orientation *o = orientation ();
+    NumberRange allLayer = o->layerSide (QRect (QPoint (0, 0), actualSize));
+    NumberRange allFrame = o->frameSide (QRect (QPoint (0, 0), actualSize));
+    NumberRange headerLayer = o->range (PredefinedRange::HEADER_LAYER);
+    NumberRange headerFrame = o->range (PredefinedRange::HEADER_FRAME);
+
     m_isComputingSize = true;
     m_cellArea->setFixedSize(actualSize);
-    m_rowArea->setFixedSize(m_x0, actualSize.height());
-    m_columnArea->setFixedSize(actualSize.width(), m_y0);
+    m_rowArea->setFixedSize(o->frameLayerRect (allFrame, headerLayer).size ());
+    m_columnArea->setFixedSize(o->frameLayerRect (headerFrame, allLayer).size ());
     m_isComputingSize = false;
     return true;
   }
@@ -506,7 +541,8 @@ void XsheetViewer::updateAreeSize() {
 //-----------------------------------------------------------------------------
 
 CellPosition XsheetViewer::xyToPosition (const QPoint &point) const {
-	return m_orientation->xyToPosition (point, getXsheet ()->getColumnFan (m_orientation));
+  const Orientation *o = orientation ();
+	return o->xyToPosition (point, getXsheet ()->getColumnFan (o));
 }
 CellPosition XsheetViewer::xyToPosition (const TPoint &point) const {
 	return xyToPosition (QPoint (point.x, point.y));
@@ -518,14 +554,16 @@ CellPosition XsheetViewer::xyToPosition (const TPointD &point) const {
 //-----------------------------------------------------------------------------
 
 QPoint XsheetViewer::positionToXY (const CellPosition &pos) const {
-	return m_orientation->positionToXY (pos, getXsheet ()->getColumnFan (m_orientation));
+  const Orientation *o = orientation ();
+  return o->positionToXY (pos, getXsheet ()->getColumnFan (o));
 }
 
 int XsheetViewer::columnToLayerAxis (int layer) const {
-	return m_orientation->colToLayerAxis (layer, getXsheet ()->getColumnFan (m_orientation));
+  const Orientation *o = orientation ();
+  return o->colToLayerAxis (layer, getXsheet ()->getColumnFan (o));
 }
 int XsheetViewer::rowToFrameAxis (int frame) const {
-	return m_orientation->rowToFrameAxis (frame);
+	return orientation ()->rowToFrameAxis (frame);
 }
 
 //-----------------------------------------------------------------------------
@@ -750,18 +788,12 @@ void XsheetViewer::paintEvent(QPaintEvent*)
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::resizeEvent(QResizeEvent *event) {
-  int w              = width();
-  int h              = height();
-  int scrollBarWidth = 16;
-  m_noteScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
-  m_cellScrollArea->setGeometry(m_x0, m_y0, w - m_x0, h - m_y0);
-  m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
-  m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - scrollBarWidth);
+  positionSections ();
 
-  //(Nuovo Layout Manager) Reintrodotto per il refresh automatico
+  //(New Layout Manager) introduced automatic refresh
   refreshContentSize(
       0,
-      0);  // Non updateAreeSize() perche' si deve tener conto degli scrollbar.
+      0);  // Don't updateAreeSize because you have to account scrollbars
   updateAllAree();
 }
 

@@ -435,7 +435,7 @@ public:
   }
 
   //-------
-  const Orientation *orientation () const { return m_orientation; }
+  const Orientation *orientation () const;
   void flipOrientation ();
 
   CellPosition xyToPosition (const QPoint &point) const;
@@ -724,6 +724,8 @@ public slots:
   void resetXsheetNotes();
 
   void onOrientationChanged (const Orientation *newOrientation);
+private:
+  void positionSections ();
 };
 
 #endif  // XSHEETVIEWER_H

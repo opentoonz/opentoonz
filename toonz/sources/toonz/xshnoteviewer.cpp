@@ -451,7 +451,10 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WindowFlags flags)
 #else
 NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-    : QFrame(parent), m_viewer(parent) {
+    : QFrame(parent), m_viewer(parent),
+    m_flipOrientationButton (nullptr), m_precNoteButton (nullptr),
+    m_nextNoteButton (nullptr), m_frameDisplayStyleCombo (nullptr) {
+
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("cornerWidget");
 

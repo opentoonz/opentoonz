@@ -30,8 +30,10 @@ using std::map;
 //                x        =   layer axis       =   column
 //                y        =   frame axis       =    row
 
-class NumberRange {
+class DVAPI NumberRange {
 	int _from, _to; // _from <= _to
+
+  NumberRange (): _from (0), _to (0) {}
 public:
 	NumberRange (int from, int to): _from (min (from, to)), _to (max (from, to)) { }
 
@@ -40,6 +42,8 @@ public:
 
 	int length () const { return _to - _from;  }
   int middle () const { return (_to + _from) / 2; }
+
+  NumberRange adjusted (int addFrom, int addTo) const;
 };
 
 class ColumnFan;
@@ -60,7 +64,8 @@ enum class PredefinedRect {
   SOUND_TRACK, //! area dedicated to waveform display
   PREVIEW_TRACK, //! sound preview area
   BEGIN_SOUND_EDIT, //! top sound resize
-  END_SOUND_EDIT //! bottom sound resize
+  END_SOUND_EDIT, //! bottom sound resize
+  NOTE_AREA //! size of top left note controls
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
@@ -84,6 +89,10 @@ enum class PredefinedPoint {
   KEY_HIDDEN, //! move extender handle that much if key icons are disabled
   EXTENDER_XY_RADIUS //! x and y radius for rounded rectangle
 };
+enum class PredefinedRange {
+  HEADER_FRAME, //! size of of column header height(v) / row header width(h)
+  HEADER_LAYER, //! size of row header width(v) / column header height(h)
+};
 
 class DVAPI Orientation {
 protected:
@@ -92,6 +101,7 @@ protected:
   map<PredefinedDimension, int> _dimensions;
   map<PredefinedPath, QPainterPath> _paths;
   map<PredefinedPoint, QPoint> _points;
+  map<PredefinedRange, NumberRange> _ranges;
 
 public:
 	virtual CellPosition xyToPosition (const QPoint &xy, const ColumnFan *fan) const = 0;
@@ -101,6 +111,7 @@ public:
 	virtual int rowToFrameAxis (int frame) const = 0;
 
 	virtual QPoint frameLayerToXY (int frameAxis, int layerAxis) const = 0;
+  QRect frameLayerRect (const NumberRange &frameAxis, const NumberRange &layerAxis) const;
 
 	virtual NumberRange layerSide (const QRect &area) const = 0;
 	virtual NumberRange frameSide (const QRect &area) const = 0;
@@ -123,12 +134,14 @@ public:
   int dimension (PredefinedDimension which) const { return _dimensions.at (which); }
   const QPainterPath &path (PredefinedPath which) const { return _paths.at (which); }
   const QPoint &point (PredefinedPoint which) const { return _points.at (which); }
+  const NumberRange &range (PredefinedRange which) const { return _ranges.at (which); }
 protected:
   void addRect (PredefinedRect which, const QRect &rect);
   void addLine (PredefinedLine which, const QLine &line);
   void addDimension (PredefinedDimension which, int dimension);
   void addPath (PredefinedPath which, const QPainterPath &path);
   void addPoint (PredefinedPoint which, const QPoint &point);
+  void addRange (PredefinedRange which, const NumberRange &range);
 };
 
 class DVAPI Orientations {
