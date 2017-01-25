@@ -1698,7 +1698,7 @@ void CellArea::paintEvent(QPaintEvent *event) {
   int col    = m_viewer->getCurrentColumn();
   QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
   QRect rect = m_viewer->orientation ()->rect (PredefinedRect::CELL)
-    .translated (xy).adjusted (1, 1, -2, -2);
+    .translated (xy).adjusted (1, 1, -1, -1);
   p.setPen(Qt::black);
   p.setBrush(Qt::NoBrush);
   p.drawRect(rect);
