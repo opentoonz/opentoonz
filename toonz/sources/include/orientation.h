@@ -117,8 +117,8 @@ public:
 	virtual NumberRange frameSide (const QRect &area) const = 0;
   //! top right corner in vertical layout. bottom left in horizontal
   virtual QPoint topRightCorner (const QRect &area) const = 0;
-	virtual QRect foldedRectangle (int layerAxis, const NumberRange &frameAxis, int i) const;
-	virtual QLine foldedRectangleLine (int layerAxis, const NumberRange &frameAxis, int i) const;
+	QRect foldedRectangle (int layerAxis, const NumberRange &frameAxis, int i) const;
+	QLine foldedRectangleLine (int layerAxis, const NumberRange &frameAxis, int i) const;
 
 	//! line was vertical in vertical timeline. adjust accordingly
 	QLine verticalLine (int layerAxis, const NumberRange &frameAxis) const;

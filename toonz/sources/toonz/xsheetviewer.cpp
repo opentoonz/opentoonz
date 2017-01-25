@@ -140,14 +140,6 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WindowFlags flags)
 XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
 #endif
     : QFrame(parent)
-    , m_x0(XsheetGUI::ColumnWidth + 1)
-#ifndef LINETEST
-    , m_y0(XsheetGUI::RowHeight * 3 +
-           60)  // Per tab il numero delle righe era 8 perche c'e' il linkBox
-#else
-    , m_y0(XsheetGUI::RowHeight * 8 +
-           5)  // Per tab il numero delle righe era 8 perche c'e' il linkBox
-#endif
     , m_timerId(0)
     , m_autoPanSpeed(0, 0)
     , m_dragTool(0)
@@ -175,10 +167,11 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());
 
+  QRect noteArea (0, 0, 75, 120);
   m_noteArea = new XsheetGUI::NoteArea(this);
-  m_noteArea->setFixedSize(m_x0 + 1, m_y0 - 3);
+  m_noteArea->setFixedSize(noteArea.size ());
   m_noteScrollArea = new XsheetScrollArea(this);
-  m_noteScrollArea->setFixedSize(m_x0 + 1, m_y0 - 3);
+  m_noteScrollArea->setFixedSize(noteArea.size ());
   m_noteScrollArea->setWidget(m_noteArea);
   m_noteScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_noteScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

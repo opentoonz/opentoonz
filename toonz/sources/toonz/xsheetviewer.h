@@ -328,7 +328,6 @@ class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
   XsheetGUI::CellArea *m_cellArea;
   XsheetGUI::NoteArea *m_noteArea;
 
-  int m_x0, m_y0;
   int m_timerId;
   QPoint m_autoPanSpeed;
   QPoint m_lastAutoPanPos;
