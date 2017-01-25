@@ -288,7 +288,6 @@ void XsheetViewer::flipOrientation () {
 }
 
 void XsheetViewer::onOrientationChanged (const Orientation *newOrientation) {
-  getXsheet ()->getColumnFan ()->setSize (newOrientation->dimension (PredefinedDimension::LAYER));
   update ();
 }
 
@@ -507,7 +506,7 @@ void XsheetViewer::updateAreeSize() {
 //-----------------------------------------------------------------------------
 
 CellPosition XsheetViewer::xyToPosition (const QPoint &point) const {
-	return m_orientation->xyToPosition (point, getXsheet ()->getColumnFan ());
+	return m_orientation->xyToPosition (point, getXsheet ()->getColumnFan (m_orientation));
 }
 CellPosition XsheetViewer::xyToPosition (const TPoint &point) const {
 	return xyToPosition (QPoint (point.x, point.y));
@@ -519,11 +518,11 @@ CellPosition XsheetViewer::xyToPosition (const TPointD &point) const {
 //-----------------------------------------------------------------------------
 
 QPoint XsheetViewer::positionToXY (const CellPosition &pos) const {
-	return m_orientation->positionToXY (pos, getXsheet ()->getColumnFan ());
+	return m_orientation->positionToXY (pos, getXsheet ()->getColumnFan (m_orientation));
 }
 
 int XsheetViewer::columnToLayerAxis (int layer) const {
-	return m_orientation->colToLayerAxis (layer, getXsheet ()->getColumnFan ());
+	return m_orientation->colToLayerAxis (layer, getXsheet ()->getColumnFan (m_orientation));
 }
 int XsheetViewer::rowToFrameAxis (int frame) const {
 	return m_orientation->rowToFrameAxis (frame);

@@ -1239,7 +1239,7 @@ void ColumnArea::paintEvent(QPaintEvent *event) { // AREA
   c1 = cellRange.to ().layer ();
 
   TXsheet *xsh         = m_viewer->getXsheet();
-  ColumnFan *columnFan = xsh->getColumnFan();
+  ColumnFan *columnFan = xsh->getColumnFan(m_viewer->orientation ());
   int col;
   for (col = c0; col <= c1; col++) {
     // draw column fan (collapsed columns)
@@ -1508,7 +1508,8 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
   // both left and right click can change the selection
   if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton) {
     TXsheet *xsh = m_viewer->getXsheet();
-	CellPosition cellPosition = m_viewer->xyToPosition (event->pos ());
+    ColumnFan *fan = xsh->getColumnFan (m_viewer->orientation ());
+	  CellPosition cellPosition = m_viewer->xyToPosition (event->pos ());
     m_col = cellPosition.layer ();
     // do nothing for the camera column
     if (m_col < 0)  // CAMERA
@@ -1517,14 +1518,15 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       m_viewer->getColumnSelection()->selectNone();
     }
     // when clicking the column fan
-    else if (m_col >= 0 && !xsh->getColumnFan()->isActive(m_col))  // column Fan
+    else if (m_col >= 0 && !fan->isActive(m_col))  // column Fan
     {
-      for (;;) {
-        xsh->getColumnFan()->activate(m_col);
-        TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-        m_col--;
-        if (m_col < 0 || xsh->getColumnFan()->isActive(m_col)) break;
+      for (auto o : orientations.all ()) {
+        fan = xsh->getColumnFan (o);
+        for (int i = m_col; i >= 0 && !fan->isActive (i); i--)
+          fan->activate (i);
       }
+
+      TApp::instance ()->getCurrentScene ()->setDirtyFlag (true);
       TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
       return;
     }

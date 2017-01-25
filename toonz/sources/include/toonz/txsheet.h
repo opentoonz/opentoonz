@@ -48,6 +48,7 @@ class ToonzScene;
 class TXshSoundColumn;
 class TXshNoteSet;
 class TFrameId;
+class Orientation;
 
 //=============================================================================
 
@@ -473,8 +474,9 @@ in TXsheetImp.
   FxDag *getFxDag() const;
   /*! Returns a pointer to object \b ColumnFan contained in \b TXsheetImp, this
           object allows the user to manage columns visualization in xsheet.
+          TXsheet maintains one column fan per each orientation.
   */
-  ColumnFan *getColumnFan() const;
+  ColumnFan *getColumnFan(const Orientation *o) const;
   /*! Returns a pointer to \b ToonzScene contained in \b TXsheetImp, that is the
      scene to
           which the xsheet refers.

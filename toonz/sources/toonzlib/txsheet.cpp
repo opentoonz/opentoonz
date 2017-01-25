@@ -31,6 +31,7 @@
 #include "toonz/stage.h"
 #include "toonz/textureutils.h"
 #include "xshhandlemanager.h"
+#include "orientation.h"
 
 #include "toonz/txsheet.h"
 
@@ -92,7 +93,7 @@ struct TXsheet::TXsheetImp {
   int m_viewColumn;
 
   TSoundTrackP m_mixedSound;
-  ColumnFan m_columnFan;
+  ColumnFan m_columnFans[Orientations::COUNT];
   XshHandleManager *m_handleManager;
   ToonzScene *m_scene;
 
@@ -105,7 +106,11 @@ public:
     return ++currentId;
   }
 
+  void copyFoldedState ();
+
 private:
+  void initColumnFans ();
+
   // not implemented
   TXsheetImp(const TXsheetImp &);
   TXsheetImp &operator=(const TXsheetImp &);
@@ -144,7 +149,10 @@ TXsheet::TXsheetImp::TXsheetImp()
     , m_soloColumn(-1)
     , m_viewColumn(-1)
     , m_mixedSound(0)
-    , m_scene(0) {}
+    , m_scene(0) {
+
+  initColumnFans ();
+}
 
 //-----------------------------------------------------------------------------
 
@@ -155,6 +163,20 @@ TXsheet::TXsheetImp::~TXsheetImp() {
   delete m_pegTree;
   delete m_fxDag;
   delete m_handleManager;
+}
+
+//-----------------------------------------------------------------------------
+
+void TXsheet::TXsheetImp::initColumnFans () {
+  for (auto o : orientations.all ()) {
+    int index = o->dimension (PredefinedDimension::INDEX);
+    m_columnFans[index].setDimension (o->dimension (PredefinedDimension::LAYER));
+  }
+}
+
+void TXsheet::TXsheetImp::copyFoldedState () {
+  for (int i = 1; i < Orientations::COUNT; i++)
+    m_columnFans[i].copyFoldedStateFrom (m_columnFans[0]);
 }
 
 //=============================================================================
@@ -1195,7 +1217,8 @@ void TXsheet::loadData(TIStream &is) {
       TFxSet fxSet;
       fxSet.loadData(is);
     } else if (tagName == "columnFan") {
-      m_imp->m_columnFan.loadData(is);
+      m_imp->m_columnFans[0].loadData(is);
+      m_imp->copyFoldedState ();
     } else if (tagName == "noteSet") {
       m_notes->loadData(is);
     } else {
@@ -1225,7 +1248,7 @@ void TXsheet::saveData(TOStream &os) {
   fxDag->saveData(os, getFirstFreeColumnIndex());
   os.closeChild();
 
-  ColumnFan *columnFan = getColumnFan();
+  ColumnFan *columnFan = getColumnFan(0); // all fans share folded state
   if (!columnFan->isEmpty()) {
     os.openChild("columnFan");
     columnFan->saveData(os);
@@ -1446,7 +1469,10 @@ FxDag *TXsheet::getFxDag() const { return m_imp->m_fxDag; }
 
 //-----------------------------------------------------------------------------
 
-ColumnFan *TXsheet::getColumnFan() const { return &m_imp->m_columnFan; }
+ColumnFan *TXsheet::getColumnFan(const Orientation *o) const {
+  int index = o->dimension (PredefinedDimension::INDEX);
+  return &m_imp->m_columnFans[index];
+}
 
 //-----------------------------------------------------------------------------
 

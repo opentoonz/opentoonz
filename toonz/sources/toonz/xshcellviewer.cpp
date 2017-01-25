@@ -741,7 +741,7 @@ void CellArea::setDragTool(DragTool *dragTool) {
 
 void CellArea::drawCells (QPainter &p, const QRect toBeUpdated) {
   TXsheet *xsh = m_viewer->getXsheet ();
-  ColumnFan *columnFan = xsh->getColumnFan ();
+  ColumnFan *columnFan = xsh->getColumnFan (m_viewer->orientation ());
 
   // selected cells range
   TCellSelection *cellSelection = m_viewer->getCellSelection ();
@@ -1480,7 +1480,7 @@ void CellArea::drawKeyframe (QPainter &p, const QRect toBeUpdated) {
   const QRect &keyRect = m_viewer->orientation ()->rect (PredefinedRect::KEY_ICON);
 
   TXsheet *xsh = m_viewer->getXsheet ();
-  ColumnFan *columnFan = xsh->getColumnFan ();
+  ColumnFan *columnFan = xsh->getColumnFan (m_viewer->orientation ());
   int col;
   for (col = c0; col <= c1; col++) {
     if (!columnFan->isActive (col)) continue;

@@ -54,7 +54,7 @@ Constructs a ColumnFan with default value.
   ColumnFan();
 
   //! Adjust column sizes when switching orientation
-  void setSize (int unfolded);
+  void setDimension (int unfolded);
 
   /*!
 Set column \b col not folded.
@@ -83,6 +83,8 @@ of column identified by \b col.
 \sa layerAxisToCol()
 */
   int colToLayerAxis(int col) const;
+
+  void copyFoldedStateFrom (const ColumnFan &from);
 
   bool isEmpty() const;
 
