@@ -72,7 +72,8 @@ enum class PredefinedLine {
 enum class PredefinedDimension {
   LAYER, //! width of a layer column / height of layer row
   FRAME, //! height of frame row / width of frame column
-  INDEX //! index of this orientation in the array of all
+  INDEX, //! index of this orientation in the array of all
+  SOUND_AMPLITUDE //! amplitude of sound track, in pixels
 };
 enum class PredefinedPath {
   DRAG_HANDLE_CORNER, //! triangle corner at drag sidebar

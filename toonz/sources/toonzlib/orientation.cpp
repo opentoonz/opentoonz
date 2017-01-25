@@ -151,7 +151,8 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::BEGIN_EXTENDER, QRect (-EXTENDER_WIDTH - KEY_ICON_WIDTH, -EXTENDER_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect (PredefinedRect::KEYFRAME_AREA, QRect (CELL_WIDTH - KEY_ICON_WIDTH, 0, KEY_ICON_WIDTH, CELL_HEIGHT));
   addRect (PredefinedRect::DRAG_AREA, QRect (0, 0, CELL_DRAG_WIDTH, CELL_HEIGHT));
-  addRect (PredefinedRect::SOUND_TRACK, QRect (CELL_DRAG_WIDTH, 0, CELL_WIDTH - CELL_DRAG_WIDTH - SOUND_PREVIEW_WIDTH, CELL_HEIGHT));
+  QRect soundRect (CELL_DRAG_WIDTH, 0, CELL_WIDTH - CELL_DRAG_WIDTH - SOUND_PREVIEW_WIDTH, CELL_HEIGHT);
+  addRect (PredefinedRect::SOUND_TRACK, soundRect);
   addRect (PredefinedRect::PREVIEW_TRACK, QRect (CELL_WIDTH - SOUND_PREVIEW_WIDTH, 0, SOUND_PREVIEW_WIDTH, CELL_HEIGHT));
   addRect (PredefinedRect::BEGIN_SOUND_EDIT, QRect (CELL_DRAG_WIDTH, 0, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect (PredefinedRect::END_SOUND_EDIT, QRect (CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
@@ -165,6 +166,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addDimension (PredefinedDimension::LAYER, CELL_WIDTH);
   addDimension (PredefinedDimension::FRAME, CELL_HEIGHT);
   addDimension (PredefinedDimension::INDEX, 0);
+  addDimension (PredefinedDimension::SOUND_AMPLITUDE, int (sqrt (CELL_HEIGHT * soundRect.width ()) / 2));
 
   QPainterPath corner (QPointF (0, CELL_HEIGHT));
   corner.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT));
@@ -236,7 +238,8 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::BEGIN_EXTENDER, QRect (-EXTENDER_WIDTH, -EXTENDER_HEIGHT - KEY_ICON_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect (PredefinedRect::KEYFRAME_AREA, QRect (0, CELL_HEIGHT - KEY_ICON_HEIGHT, CELL_WIDTH, KEY_ICON_HEIGHT));
   addRect (PredefinedRect::DRAG_AREA, QRect (0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
-  addRect (PredefinedRect::SOUND_TRACK, QRect (0, CELL_DRAG_HEIGHT, CELL_WIDTH, CELL_HEIGHT - CELL_DRAG_HEIGHT - SOUND_PREVIEW_HEIGHT));
+  QRect soundRect (0, CELL_DRAG_HEIGHT, CELL_WIDTH, CELL_HEIGHT - CELL_DRAG_HEIGHT - SOUND_PREVIEW_HEIGHT);
+  addRect (PredefinedRect::SOUND_TRACK, soundRect);
   addRect (PredefinedRect::PREVIEW_TRACK, QRect (0, CELL_HEIGHT - SOUND_PREVIEW_HEIGHT, CELL_WIDTH, SOUND_PREVIEW_HEIGHT));
   addRect (PredefinedRect::BEGIN_SOUND_EDIT, QRect (0, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect (PredefinedRect::END_SOUND_EDIT, QRect (CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
@@ -250,6 +253,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addDimension (PredefinedDimension::LAYER, CELL_HEIGHT);
   addDimension (PredefinedDimension::FRAME, CELL_WIDTH);
   addDimension (PredefinedDimension::INDEX, 1);
+  addDimension (PredefinedDimension::SOUND_AMPLITUDE, soundRect.height () / 2);
 
   QPainterPath corner (QPointF (CELL_WIDTH, 0));
   corner.lineTo (QPointF (CELL_WIDTH, CELL_DRAG_HEIGHT));

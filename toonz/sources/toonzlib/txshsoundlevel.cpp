@@ -178,7 +178,7 @@ void TXshSoundLevel::computeValuesFor (const Orientation *o) {
   if (absMaxPressure <= 0) return;
 
   // Adjusting using a fixed scaleFactor
-  int desiredAmplitude = o->layerSide (o->rect (PredefinedRect::SOUND_TRACK)).length () / 2;
+  int desiredAmplitude = o->dimension (PredefinedDimension::SOUND_AMPLITUDE);
   // results will be in range -desiredAmplitude .. +desiredAmplitude
   double weightA = desiredAmplitude / absMaxPressure;
 
