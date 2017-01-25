@@ -258,8 +258,9 @@ void RowArea::drawCurrentRowGadget(QPainter &p, int r0, int r1) {
   if (currentRow < r0 || r1 < currentRow) return;
 
   QPoint topLeft = m_viewer->positionToXY (CellPosition (currentRow, 0));
-  p.fillRect(QRect (topLeft + QPoint (1, 1), QSize (width() - 4, RowHeight - 1)),
-             m_viewer->getCurrentRowBgColor());
+  QRect header = m_viewer->orientation ()->rect (PredefinedRect::FRAME_HEADER)
+    .translated (topLeft).adjusted (1, 1, -2, -2);
+  p.fillRect(header, m_viewer->getCurrentRowBgColor());
 }
 
 //-----------------------------------------------------------------------------
