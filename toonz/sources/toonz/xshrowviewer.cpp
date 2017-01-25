@@ -132,8 +132,9 @@ void RowArea::drawRows (QPainter &p, int r0, int r1) {
       p.setPen (m_viewer->getTextColor ());
 
     QPoint basePoint = m_viewer->positionToXY (CellPosition (r, 0));
-    QRect labelRect = m_viewer->orientation ()->rect (PredefinedRect::ROW_LABEL)
+    QRect labelRect = m_viewer->orientation ()->rect (PredefinedRect::FRAME_LABEL)
       .translated (basePoint);
+    int align = m_viewer->orientation ()->dimension (PredefinedDimension::FRAME_LABEL_ALIGN);
     // display time and/or frame number
     switch (m_viewer->getFrameDisplayStyle ()) {
     case XsheetViewer::SecAndFrame: {
@@ -156,16 +157,14 @@ void RowArea::drawRows (QPainter &p, int r0, int r1) {
         str = QString ("%1\"").arg (QString::number (koma).rightJustified (2, '0'));
       }
 
-      p.drawText (labelRect.adjusted (-15, 0, 7, 0),
-        Qt::AlignRight | Qt::AlignBottom, str);
+      p.drawText (labelRect, align, str);
 
       break;
     }
 
     case XsheetViewer::Frame: {
       QString number = QString::number (r + 1);
-      p.drawText (labelRect.adjusted (-2, 0, 0, 0),
-        Qt::AlignHCenter | Qt::AlignBottom, number);
+      p.drawText (labelRect, align, number);
       break;
     }
 
@@ -181,7 +180,7 @@ void RowArea::drawRows (QPainter &p, int r0, int r1) {
       int koma = (r + 1) % (frameRate * 6);
       if ((r + 1) % frameRate == 1) {
         int page = (r + 1) / (frameRate * 6) + 1;
-        str = QString ("p%1  %2")
+        str = QString ("p%1 %2")
           .arg (QString::number (page))
           .arg (QString::number (koma).rightJustified (3, '0'));
       }
@@ -189,8 +188,7 @@ void RowArea::drawRows (QPainter &p, int r0, int r1) {
         if (koma == 0) koma = frameRate * 6;
         str = QString ("%1").arg (QString::number (koma).rightJustified (3, '0'));
       }
-      p.drawText (labelRect.adjusted (-21, 0, 7, 0),
-        Qt::AlignRight | Qt::AlignBottom, str);
+      p.drawText (labelRect, align, str);
       break;
     }
                                     // 3 second sheet (72frames per page)
@@ -205,7 +203,7 @@ void RowArea::drawRows (QPainter &p, int r0, int r1) {
       int koma = (r + 1) % (frameRate * 3);
       if ((r + 1) % frameRate == 1) {
         int page = (r + 1) / (frameRate * 3) + 1;
-        str = QString ("p%1  %2")
+        str = QString ("p%1 %2")
           .arg (QString::number (page))
           .arg (QString::number (koma).rightJustified (2, '0'));
       }
@@ -213,8 +211,7 @@ void RowArea::drawRows (QPainter &p, int r0, int r1) {
         if (koma == 0) koma = frameRate * 3;
         str = QString ("%1").arg (QString::number (koma).rightJustified (2, '0'));
       }
-      p.drawText (labelRect.adjusted (-21, 0, 7, 0),
-        Qt::AlignRight | Qt::AlignBottom, str);
+      p.drawText (labelRect, align, str);
       break;
     }
     }

@@ -53,7 +53,7 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_WIDTH = 8;
   const int EXTENDER_HEIGHT = 20;
   const int SOUND_PREVIEW_HEIGHT = 7;
-  const int COLUMN_HEADER_HEIGHT = CELL_HEIGHT;
+  const int COLUMN_HEADER_HEIGHT = 2 * CELL_HEIGHT;
   const int ROW_HEADER_WIDTH = 200;
 
 public:
@@ -177,7 +177,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::BEGIN_SOUND_EDIT, QRect (CELL_DRAG_WIDTH, 0, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect (PredefinedRect::END_SOUND_EDIT, QRect (CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (ROW_HEADER_WIDTH, COLUMN_HEADER_HEIGHT)));
-  addRect (PredefinedRect::ROW_LABEL, QRect (CELL_WIDTH / 2, 1, CELL_WIDTH / 2, CELL_HEIGHT - 2));
+  addRect (PredefinedRect::FRAME_LABEL, QRect (3, 1, CELL_WIDTH - 6, CELL_HEIGHT - 2));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -189,6 +189,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addDimension (PredefinedDimension::FRAME, CELL_HEIGHT);
   addDimension (PredefinedDimension::INDEX, 0);
   addDimension (PredefinedDimension::SOUND_AMPLITUDE, int (sqrt (CELL_HEIGHT * soundRect.width ()) / 2));
+  addDimension (PredefinedDimension::FRAME_LABEL_ALIGN, Qt::AlignRight | Qt::AlignVCenter);
 
   QPainterPath corner (QPointF (0, CELL_HEIGHT));
   corner.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT));
@@ -269,7 +270,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::BEGIN_SOUND_EDIT, QRect (0, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect (PredefinedRect::END_SOUND_EDIT, QRect (CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (ROW_HEADER_WIDTH, COLUMN_HEADER_HEIGHT)));
-  addRect (PredefinedRect::ROW_LABEL, QRect (CELL_WIDTH / 2, 1, CELL_WIDTH / 2, CELL_HEIGHT - 2));
+  addRect (PredefinedRect::FRAME_LABEL, QRect (CELL_WIDTH / 2, 1, CELL_WIDTH / 2 - 1, 2 * CELL_HEIGHT - 2));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
@@ -281,6 +282,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addDimension (PredefinedDimension::FRAME, CELL_WIDTH);
   addDimension (PredefinedDimension::INDEX, 1);
   addDimension (PredefinedDimension::SOUND_AMPLITUDE, soundRect.height () / 2);
+  addDimension (PredefinedDimension::FRAME_LABEL_ALIGN, Qt::AlignRight | Qt::AlignBottom | Qt::TextWordWrap);
 
   QPainterPath corner (QPointF (CELL_WIDTH, 0));
   corner.lineTo (QPointF (CELL_WIDTH, CELL_DRAG_HEIGHT));
