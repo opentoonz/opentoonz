@@ -68,7 +68,8 @@ enum class PredefinedRect {
   NOTE_AREA, //! size of top left note controls
   FRAME_LABEL, //! area for writing frame number
   FRAME_HEADER,
-  LAYER_HEADER
+  LAYER_HEADER,
+  PLAY_RANGE //! area for play range marker within frame header
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
@@ -87,7 +88,9 @@ enum class PredefinedDimension {
 enum class PredefinedPath {
   DRAG_HANDLE_CORNER, //! triangle corner at drag sidebar
   BEGIN_EASE_TRIANGLE, //! triangle marking beginning of ease range
-  END_EASE_TRIANGLE //! triangle marking end of ease range
+  END_EASE_TRIANGLE, //! triangle marking end of ease range
+  BEGIN_PLAY_RANGE, //! play range markers
+  END_PLAY_RANGE
 };
 enum class PredefinedPoint {
   KEY_HIDDEN, //! move extender handle that much if key icons are disabled

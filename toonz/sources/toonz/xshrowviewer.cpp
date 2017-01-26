@@ -240,15 +240,15 @@ void RowArea::drawPlayRange (QPainter &p, int r0, int r1) {
   QColor ArrowColor = (playRangeEnabled) ? QColor (255, 255, 255) : grey150;
   p.setBrush (QBrush (ArrowColor));
 
-  if (m_r0 > r0 - 1 && r1 + 1 > m_r0) {
-    QPoint base = m_viewer->positionToXY (CellPosition (m_r0, 0)) + QPoint (m_xa, 1);
-    drawArrow (p, base, base + QPoint (10, 0), base + QPoint (0, 10), true, ArrowColor);
-  }
+  if (m_r0 > r0 - 1 && r1 + 1 > m_r0)
+    m_viewer->drawPredefinedPath (p,
+      PredefinedPath::BEGIN_PLAY_RANGE, CellPosition (m_r0, 0),
+      ArrowColor, QColor (Qt::black));
 
-  if (m_r1 > r0 - 1 && r1 + 1 > m_r1) {
-    QPoint base = m_viewer->positionToXY (CellPosition (m_r1 + 1, 0)) + QPoint (m_xa, -12 + 1);
-    drawArrow (p, base, base + QPoint (10, 10), base + QPoint (0, 10), true, ArrowColor);
-  }
+  if (m_r1 > r0 - 1 && r1 + 1 > m_r1)
+    m_viewer->drawPredefinedPath (p,
+      PredefinedPath::END_PLAY_RANGE, CellPosition (m_r1, 0),
+      ArrowColor, QColor (Qt::black));
 }
 
 //-----------------------------------------------------------------------------

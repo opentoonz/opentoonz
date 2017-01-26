@@ -13,6 +13,7 @@ namespace {
   const int KEY_ICON_WIDTH = 11;
   const int KEY_ICON_HEIGHT = 13;
   const int EASE_TRIANGLE_SIZE = 4;
+  const int PLAY_MARKER_SIZE = 10;
 }
 
 class TopToBottomOrientation : public Orientation {
@@ -22,8 +23,9 @@ class TopToBottomOrientation : public Orientation {
   const int EXTENDER_WIDTH = 20;
   const int EXTENDER_HEIGHT = 8;
   const int SOUND_PREVIEW_WIDTH = 7;
-  const int COLUMN_HEADER_HEIGHT = CELL_HEIGHT * 3 + 60;
-  const int ROW_HEADER_WIDTH = CELL_WIDTH;
+  const int LAYER_HEADER_HEIGHT = CELL_HEIGHT * 3 + 60;
+  const int FRAME_HEADER_WIDTH = CELL_WIDTH;
+  const int PLAY_RANGE_X = FRAME_HEADER_WIDTH / 2 - PLAY_MARKER_SIZE;
 
 public:
   TopToBottomOrientation ();
@@ -53,8 +55,9 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_WIDTH = 8;
   const int EXTENDER_HEIGHT = 20;
   const int SOUND_PREVIEW_HEIGHT = 7;
-  const int COLUMN_HEADER_HEIGHT = 2 * CELL_HEIGHT;
-  const int ROW_HEADER_WIDTH = 200;
+  const int FRAME_HEADER_HEIGHT = 2 * CELL_HEIGHT;
+  const int LAYER_HEADER_WIDTH = 200;
+  const int PLAY_RANGE_Y = 0;
 
 public:
   LeftToRightOrientation ();
@@ -176,10 +179,10 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::PREVIEW_TRACK, QRect (CELL_WIDTH - SOUND_PREVIEW_WIDTH, 0, SOUND_PREVIEW_WIDTH, CELL_HEIGHT));
   addRect (PredefinedRect::BEGIN_SOUND_EDIT, QRect (CELL_DRAG_WIDTH, 0, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect (PredefinedRect::END_SOUND_EDIT, QRect (CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
-  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (ROW_HEADER_WIDTH, COLUMN_HEADER_HEIGHT)));
+  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (FRAME_HEADER_WIDTH, LAYER_HEADER_HEIGHT)));
   addRect (PredefinedRect::FRAME_LABEL, QRect (3, 1, CELL_WIDTH - 6, CELL_HEIGHT - 2));
-  addRect (PredefinedRect::FRAME_HEADER, QRect (0, 0, ROW_HEADER_WIDTH, CELL_HEIGHT));
-  addRect (PredefinedRect::LAYER_HEADER, QRect (0, 0, CELL_WIDTH, COLUMN_HEADER_HEIGHT));
+  addRect (PredefinedRect::FRAME_HEADER, QRect (0, 0, FRAME_HEADER_WIDTH, CELL_HEIGHT));
+  addRect (PredefinedRect::LAYER_HEADER, QRect (0, 0, CELL_WIDTH, LAYER_HEADER_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -213,11 +216,25 @@ TopToBottomOrientation::TopToBottomOrientation () {
   toTriangle.translate (keyRect.center ());
   addPath (PredefinedPath::END_EASE_TRIANGLE, toTriangle);
 
+  QPainterPath playFrom (QPointF (0, 0));
+  playFrom.lineTo (QPointF (PLAY_MARKER_SIZE, 0));
+  playFrom.lineTo (QPointF (0, PLAY_MARKER_SIZE));
+  playFrom.lineTo (QPointF (0, 0));
+  playFrom.translate (PLAY_RANGE_X, 1);
+  addPath (PredefinedPath::BEGIN_PLAY_RANGE, playFrom);
+
+  QPainterPath playTo (QPointF (0, 0));
+  playTo.lineTo (QPointF (PLAY_MARKER_SIZE, 0));
+  playTo.lineTo (QPointF (0, -PLAY_MARKER_SIZE));
+  playTo.lineTo (QPointF (0, 0));
+  playTo.translate (PLAY_RANGE_X, CELL_HEIGHT - 1);
+  addPath (PredefinedPath::END_PLAY_RANGE, playTo);
+
   addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (KEY_ICON_WIDTH, 0));
   addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (30, 75));
 
-  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, ROW_HEADER_WIDTH));
-  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, COLUMN_HEADER_HEIGHT));
+  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, FRAME_HEADER_WIDTH));
+  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, LAYER_HEADER_HEIGHT));
 }
 
 CellPosition TopToBottomOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
@@ -271,10 +288,10 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::PREVIEW_TRACK, QRect (0, CELL_HEIGHT - SOUND_PREVIEW_HEIGHT, CELL_WIDTH, SOUND_PREVIEW_HEIGHT));
   addRect (PredefinedRect::BEGIN_SOUND_EDIT, QRect (0, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect (PredefinedRect::END_SOUND_EDIT, QRect (CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
-  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (ROW_HEADER_WIDTH, COLUMN_HEADER_HEIGHT)));
+  addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (LAYER_HEADER_WIDTH, FRAME_HEADER_HEIGHT)));
   addRect (PredefinedRect::FRAME_LABEL, QRect (CELL_WIDTH / 2, 1, CELL_WIDTH / 2 - 1, 2 * CELL_HEIGHT - 2));
-  addRect (PredefinedRect::FRAME_HEADER, QRect (0, 0, CELL_WIDTH, COLUMN_HEADER_HEIGHT));
-  addRect (PredefinedRect::LAYER_HEADER, QRect (0, 0, ROW_HEADER_WIDTH, CELL_HEIGHT));
+  addRect (PredefinedRect::FRAME_HEADER, QRect (0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT));
+  addRect (PredefinedRect::LAYER_HEADER, QRect (0, 0, LAYER_HEADER_WIDTH, CELL_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
@@ -308,11 +325,25 @@ LeftToRightOrientation::LeftToRightOrientation () {
   toTriangle.translate (keyRect.center ());
   addPath (PredefinedPath::END_EASE_TRIANGLE, toTriangle);
 
+  QPainterPath playFrom (QPointF (0, 0));
+  playFrom.lineTo (QPointF (PLAY_MARKER_SIZE, 0));
+  playFrom.lineTo (QPointF (0, PLAY_MARKER_SIZE));
+  playFrom.lineTo (QPointF (0, 0));
+  playFrom.translate (1, PLAY_RANGE_Y);
+  addPath (PredefinedPath::BEGIN_PLAY_RANGE, playFrom);
+  
+  QPainterPath playTo (QPointF (0, 0));
+  playTo.lineTo (QPointF (-PLAY_MARKER_SIZE, 0));
+  playTo.lineTo (QPointF (0, PLAY_MARKER_SIZE));
+  playTo.lineTo (QPointF (0, 0));
+  playTo.translate (CELL_WIDTH - 1, PLAY_RANGE_Y);
+  addPath (PredefinedPath::END_PLAY_RANGE, playTo);
+
   addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (0, KEY_ICON_HEIGHT));
   addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (75, 30));
 
-  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, COLUMN_HEADER_HEIGHT));
-  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, ROW_HEADER_WIDTH));
+  addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, FRAME_HEADER_HEIGHT));
+  addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, LAYER_HEADER_WIDTH));
 }
 
 CellPosition LeftToRightOrientation::xyToPosition (const QPoint &xy, const ColumnFan *fan) const {
