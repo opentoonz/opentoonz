@@ -277,10 +277,11 @@ void XsheetViewer::flipOrientation () {
 }
 
 void XsheetViewer::onOrientationChanged (const Orientation *newOrientation) {
+  disconnectScrollBars ();
+
   positionSections ();
   refreshContentSize (0, 0);
 
-  disconnectScrollBars ();
   connectScrollBars ();
 
   update ();
@@ -306,16 +307,13 @@ void XsheetViewer::positionSections () {
 }
 
 void XsheetViewer::disconnectScrollBars () {
-  disconnect (m_rowScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
-  disconnect (m_columnScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
-  disconnect (m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
-
-  disconnect (m_rowScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
-  disconnect (m_columnScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
-  disconnect (m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)), 0, 0);
+  connectOrDisconnectScrollBars (false);
+}
+void XsheetViewer::connectScrollBars () {
+  connectOrDisconnectScrollBars (true);
 }
 
-void XsheetViewer::connectScrollBars () {
+void XsheetViewer::connectOrDisconnectScrollBars (bool toConnect) {
   const Orientation *o = orientation ();
   bool isVertical = o->isVerticalTimeline ();
   QWidget *scrolledVertically =
@@ -323,20 +321,38 @@ void XsheetViewer::connectScrollBars () {
   QWidget *scrolledHorizontally =
     (isVertical ? m_columnScrollArea : m_rowScrollArea)->horizontalScrollBar ();
 
-  connect (scrolledVertically, SIGNAL (valueChanged (int)),
+  connectOrDisconnect (toConnect,
+    scrolledVertically, SIGNAL (valueChanged (int)),
     m_cellScrollArea->verticalScrollBar (), SLOT (setValue (int)));
-  connect (m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
+  connectOrDisconnect (toConnect,
+    m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
     scrolledVertically, SLOT (setValue (int)));
 
-  connect (scrolledHorizontally, SIGNAL (valueChanged (int)),
+  connectOrDisconnect (toConnect,
+    scrolledHorizontally, SIGNAL (valueChanged (int)),
     m_cellScrollArea->horizontalScrollBar (), SLOT (setValue (int)));
-  connect (m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)),
+  connectOrDisconnect (toConnect,
+    m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)),
     scrolledHorizontally, SLOT (setValue (int)));
 
-  connect (m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
-    isVertical ? SLOT (updateCellRowAree ()) : SLOT (updateCellColumnAree ()));
-  connect (m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)),
-    isVertical ? SLOT (updateCellColumnAree ()) : SLOT (updateCellRowAree ()));
+  connectOrDisconnect (toConnect,
+    m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
+    this, isVertical ? SLOT (updateCellRowAree ()) : SLOT (updateCellColumnAree ()));
+  connectOrDisconnect (toConnect,
+    m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)),
+    this, isVertical ? SLOT (updateCellColumnAree ()) : SLOT (updateCellRowAree ()));
+
+  connectOrDisconnect (toConnect,
+    m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
+    this, SLOT(mydebug (int)));
+}
+
+void XsheetViewer::connectOrDisconnect (bool toConnect,
+  QWidget *sender, const char *signal, QWidget *receiver, const char *slot) {
+  if (toConnect)
+    connect (sender, signal, receiver, slot);
+  else
+    disconnect (sender, signal, receiver, slot);
 }
 
 //-----------------------------------------------------------------------------

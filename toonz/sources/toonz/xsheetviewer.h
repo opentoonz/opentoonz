@@ -700,6 +700,9 @@ protected:
   void positionSections ();
   void disconnectScrollBars ();
   void connectScrollBars ();
+  void connectOrDisconnectScrollBars (bool toConnect);
+  void connectOrDisconnect (bool toConnect,
+    QWidget *sender, const char *signal, QWidget *receiver, const char *slot);
 signals:
   void orientationChanged (const Orientation *newOrientation);
 
