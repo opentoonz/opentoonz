@@ -341,10 +341,6 @@ void XsheetViewer::connectOrDisconnectScrollBars (bool toConnect) {
   connectOrDisconnect (toConnect,
     m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)),
     this, isVertical ? SLOT (updateCellColumnAree ()) : SLOT (updateCellRowAree ()));
-
-  connectOrDisconnect (toConnect,
-    m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
-    this, SLOT(mydebug (int)));
 }
 
 void XsheetViewer::connectOrDisconnect (bool toConnect,

@@ -606,7 +606,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   if ((event->buttons() & Qt::LeftButton) != 0 &&
       !visibleRegion().contains(pos)) {
     QRect bounds = visibleRegion().boundingRect();
-    m_viewer->setAutoPanSpeed(bounds, QPoint(bounds.left(), pos.y()));
+    m_viewer->setAutoPanSpeed(bounds, pos);
   } else
     m_viewer->stopAutoPan();
 
