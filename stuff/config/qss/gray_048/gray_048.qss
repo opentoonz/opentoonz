@@ -837,6 +837,17 @@ ParamsPage {
 #xsheetColumnAreaMenu_Camstand:selected {
   background-color: #000080;
 }
+#XSheetToolbarToolButton {
+  background: #303030;
+}
+#XSheetToolbarToolButton {
+  padding: 0;
+}
+#XSheetToolbar {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
 /* Customize QScrollBar  vertical*/
 QScrollBar {
   border: 1px solid black;

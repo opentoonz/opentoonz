@@ -155,6 +155,15 @@
         <file>Resources/my_computer.png</file>
         <file>Resources/my_documents.png</file>
         <file>Resources/network.png</file>
+        <file>Resources/new_raster_level.png</file>
+        <file>Resources/new_raster_level_over.png</file>
+        <file>Resources/new_raster_level_click.png</file>
+        <file>Resources/new_toonz_raster_level.png</file>
+        <file>Resources/new_toonz_raster_level_click.png</file>
+        <file>Resources/new_toonz_raster_level_over.png</file>
+        <file>Resources/new_vector_level.png</file>
+        <file>Resources/new_vector_level_click.png</file>
+        <file>Resources/new_vector_level_over.png</file>
         <file>Resources/newmemo.png</file>
         <file>Resources/newmemo_disabled.png</file>
         <file>Resources/newpage.png</file>
@@ -227,6 +236,9 @@
         <file>Resources/render_done_with_errors.png</file>
         <file>Resources/render_computing.png</file>
         <file>Resources/render_suspended.png</file>
+        <file>Resources/repeat_icon.png</file>
+        <file>Resources/repeat_icon_click.png</file>
+        <file>Resources/repeat_icon_over.png</file>
         <file>Resources/resizeColumnNode.svg</file>
         <file>Resources/rightTitle_inactive.png</file>
         <file>Resources/rightTitle.png</file>

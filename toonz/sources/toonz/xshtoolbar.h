@@ -11,6 +11,7 @@
 #include "toonzqt/dvtextedit.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/keyframenavigator.h"
+#include "toonzqt/functiontoolbar.h"
 
 #include <QFrame>
 #include <QScrollArea>
@@ -38,14 +39,15 @@ class Toolbar final : public QFrame {
 
   XsheetViewer *m_viewer;
 
-  QPushButton *m_newVectorLevelButton;
-  QPushButton *m_newToonzRasterLevelButton;
-  QPushButton *m_newRasterLevelButton;
+  QToolButton *m_newVectorLevelButton;
+  QToolButton *m_newToonzRasterLevelButton;
+  QToolButton *m_newRasterLevelButton;
   QPushButton *m_reframe1sButton;
   QPushButton *m_reframe2sButton;
   QPushButton *m_reframe3sButton;
-  QPushButton *m_repeatButton;
+  QToolButton *m_repeatButton;
   ViewerKeyframeNavigator *m_keyFrameButton;
+  DVGui::ToolBar *m_toolbar;
 
 public:
 #if QT_VERSION >= 0x050500
