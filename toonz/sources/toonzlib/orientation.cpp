@@ -17,6 +17,8 @@ namespace {
   const int ONION_SIZE = 19;
   const int ONION_DOT_SIZE = 8;
   const int PINNED_SIZE = 10;
+  const int EYE_WIDTH = 24;
+  const int EYE_HEIGHT = 20;
 }
 
 class TopToBottomOrientation : public Orientation {
@@ -60,7 +62,7 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_HEIGHT = 20;
   const int SOUND_PREVIEW_HEIGHT = 7;
   const int FRAME_HEADER_HEIGHT = PLAY_MARKER_SIZE + (3 * ONION_DOT_SIZE + ONION_SIZE) / 2 + 2;
-  const int LAYER_HEADER_WIDTH = 200;
+  const int LAYER_HEADER_WIDTH = 240;
   const int PLAY_RANGE_Y = 0;
   const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = PLAY_MARKER_SIZE;
 
@@ -203,6 +205,13 @@ TopToBottomOrientation::TopToBottomOrientation () {
     ONION_X + ONION_DOT_SIZE, ONION_Y, ONION_DOT_SIZE, CELL_HEIGHT));
   addRect (PredefinedRect::PINNED_CENTER_KEY, QRect (
     (FRAME_HEADER_WIDTH - PINNED_SIZE) / 2, (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
+  addRect (PredefinedRect::RENAME_COLUMN, QRect (0, 6, CELL_WIDTH, CELL_HEIGHT - 3));
+  QRect eyeArea (10, 6, CELL_WIDTH - 12, CELL_HEIGHT - 3);
+  addRect (PredefinedRect::EYE_AREA, eyeArea);
+  QRect eye (eyeArea.right () - 18, 7, 18, 15);
+  addRect (PredefinedRect::EYE, eye);
+  addRect (PredefinedRect::PREVIEW_LAYER_AREA, eyeArea.translated (0, CELL_HEIGHT));
+  addRect (PredefinedRect::PREVIEW_LAYER, eye.translated (0, CELL_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -329,6 +338,12 @@ LeftToRightOrientation::LeftToRightOrientation () {
     ONION_X, ONION_Y + ONION_DOT_SIZE, CELL_WIDTH, ONION_DOT_SIZE));
   addRect (PredefinedRect::PINNED_CENTER_KEY, QRect (
     (CELL_WIDTH - PINNED_SIZE) / 2, (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
+  addRect (PredefinedRect::RENAME_COLUMN, QRect (5 * EYE_WIDTH, 0, LAYER_HEADER_WIDTH - 5 * EYE_WIDTH, CELL_HEIGHT));
+  QRect eye (0, 0, EYE_WIDTH, CELL_HEIGHT);
+  addRect (PredefinedRect::EYE_AREA, eye);
+  addRect (PredefinedRect::EYE, eye);
+  addRect (PredefinedRect::PREVIEW_LAYER_AREA, eye.translated (EYE_WIDTH, 0));
+  addRect (PredefinedRect::PREVIEW_LAYER, eye.translated (EYE_WIDTH, 0));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));

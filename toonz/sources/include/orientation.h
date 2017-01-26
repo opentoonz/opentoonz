@@ -76,7 +76,12 @@ enum class PredefinedRect {
   ONION_AREA, //! area where mouse events will alter onion
   ONION_FIXED_DOT_AREA,
   ONION_DOT_AREA,
-  PINNED_CENTER_KEY //! displays a small blue number
+  PINNED_CENTER_KEY, //! displays a small blue number
+  RENAME_COLUMN, //! area with layer name. clicking enables editing
+  EYE_AREA, //! clickable area larger than the eye, containing it
+  EYE, //! the eye itself
+  PREVIEW_LAYER_AREA, //! clickable area larger than preview icon, containing it
+  PREVIEW_LAYER
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked

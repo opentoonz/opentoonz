@@ -134,7 +134,7 @@ public:
     m_xsheetHandle = xsheetHandle;
   }
 
-  void show(QPoint pos, int col);
+  void show(const QRect &rect, int col);
 
 protected:
   void focusOutEvent(QFocusEvent *) override;
@@ -226,6 +226,11 @@ public:
   void drawSoundColumnHead(QPainter &p, int col);
   void drawPaletteColumnHead(QPainter &p, int col);
   void drawSoundTextColumnHead(QPainter &p, int col);
+
+  // sharing too many variables - time for function object
+  void drawEye (QPainter &p, int col); 
+  void drawPreviewToggle (QPainter &p, int col);
+  void drawLock (QPainter &p, int col);
 
   QPixmap getColumnIcon(int columnIndex);
 

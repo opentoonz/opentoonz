@@ -1,5 +1,4 @@
 
-
 #include "xshcolumnviewer.h"
 
 // Tnz6 includes
@@ -443,14 +442,15 @@ void ChangeObjectHandle::onTextChanged(const QString &text) {
 
 RenameColumnField::RenameColumnField(QWidget *parent, XsheetViewer *viewer)
     : QLineEdit(parent), m_col(-1) {
-  setFixedSize(XsheetGUI::ColumnWidth + 3, XsheetGUI::RowHeight + 4);
+  setFixedSize(20, 20);
   connect(this, SIGNAL(returnPressed()), SLOT(renameColumn()));
 }
 
 //-----------------------------------------------------------------------------
 
-void RenameColumnField::show(QPoint pos, int col) {
-  move(pos);
+void RenameColumnField::show(const QRect &rect, int col) {
+  move(rect.topLeft ());
+  setFixedSize (rect.size ());
   static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
   setFont(font);
   m_col = col;
@@ -520,8 +520,8 @@ ColumnArea::ColumnArea(XsheetViewer *parent, Qt::WFlags flags)
     , m_col(-1)
     , m_columnTransparencyPopup(0)
     , m_transparencyPopupTimer(0)
-    , m_prevViewBox(10, 6, ColumnWidth - 12, RowHeight - 3)
-    , m_tableViewBox(10, RowHeight + 6, ColumnWidth - 12, RowHeight - 3)
+    , m_prevViewBox(10, 6, ColumnWidth - 12, RowHeight - 3) // to delete
+    , m_tableViewBox(10, RowHeight + 6, ColumnWidth - 12, RowHeight - 3) // to delete
     , m_lockBox(9, RowHeight + 6, RowHeight - 4, RowHeight - 4)
     , m_isPanning(false) {
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
@@ -575,6 +575,7 @@ void ColumnArea::setDragTool(DragTool *dragTool) {
 
 void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   TColumnSelection *selection = m_viewer->getColumnSelection();
+  const Orientation *o = m_viewer->orientation ();
 
 // Preparing painter
 #ifdef _WIN32
@@ -590,7 +591,9 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   int currentColumnIndex = m_viewer->getCurrentColumn();
   int layerAxis          = m_viewer->columnToLayerAxis(col);
 
-  QRect rect(layerAxis, 0, ColumnWidth, height()); // AREA
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
+  QRect rect = o->rect (PredefinedRect::LAYER_HEADER)
+    .translated (orig);
 
   TApp *app    = TApp::instance();
   TXsheet *xsh = m_viewer->getXsheet();
@@ -606,9 +609,8 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   if (col < 0) name = std::string("Camera");
 
   // Retrieve column properties
-  bool isEmpty = false;
-  if (col >= 0)  // Verifico se la colonna e' vuota
-    isEmpty = xsh->isColumnEmpty(col);
+  // Check if the column is empty
+  bool isEmpty = col >= 0 && xsh->isColumnEmpty (col);
 
   bool isEditingSpline = app->getCurrentObject()->isSpline();
 
@@ -634,8 +636,6 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
 
   // Draw column
-  QPoint orig = rect.topLeft();
-
   QPoint columnNamePos = orig + QPoint(12, RowHeight);
   QPoint pegbarNamePos = orig + QPoint(12, RowHeight * 3 + 48);
   QPoint handleNamePos =
@@ -678,37 +678,14 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   p.fillRect(rect,
              (isSelected || isCameraSelected) ? colorSelection : pastelizer);
 
-  int prevViewImgHeight = RowHeight - 5;
-  int prevViewImgWidth  = prevViewImgHeight * 5 / 4;
+  drawEye (p, col);
 
-  QRect prevViewRect = m_prevViewBox.translated(orig);
-  QRect prevViewImgRect(prevViewRect.right() - prevViewImgWidth - 1, 7,
-                        prevViewImgWidth, prevViewImgHeight);
-  static QPixmap prevViewPix = QPixmap(":Resources/x_prev_eye.png");
-
-  QRect tableViewRect         = m_tableViewBox.translated(orig);
-  QRect tableViewImgRect      = prevViewImgRect.translated(0, RowHeight);
-  static QPixmap tableViewPix = QPixmap(":Resources/x_table_view.png");
-
-  static QPixmap tableTranspViewPix =
-      QPixmap(":Resources/x_table_view_transp.png");
+  drawPreviewToggle (p, col);
 
   QRect lockModeRect         = m_lockBox.translated(orig);
   static QPixmap lockModePix = QPixmap(":Resources/x_lock.png");
 
   if (col >= 0 && !isEmpty) {
-    // preview visible toggle
-    if (column->isPreviewVisible()) {
-      p.fillRect(prevViewRect, PreviewVisibleColor);
-      p.drawPixmap(prevViewImgRect, prevViewPix);
-    }
-    // camstand visible toggle
-    if (column->isCamstandVisible()) {
-      p.fillRect(tableViewRect, CamStandVisibleColor);
-      p.drawPixmap(tableViewImgRect, column->getOpacity() < 255
-                                         ? tableTranspViewPix
-                                         : tableViewPix);
-    }
 
     // lock button
     p.setPen(Qt::gray);
@@ -782,6 +759,55 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
       }
     }
   }
+}
+
+void ColumnArea::drawEye (QPainter &p, int col) {
+  const Orientation *o = m_viewer->orientation ();
+  TXsheet *xsh = m_viewer->getXsheet ();
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
+
+  bool isEmpty = col >= 0 && xsh->isColumnEmpty (col);
+  if (col < 0 || isEmpty)
+    return;
+  TXshColumn *column = xsh->getColumn (col);
+  if (!column->isPreviewVisible ())
+    return;
+
+  QRect prevViewRect = o->rect (PredefinedRect::EYE_AREA).translated (orig);
+  QRect eyeRect = o->rect (PredefinedRect::EYE).translated (orig);
+  static QPixmap prevViewPix = QPixmap (":Resources/x_prev_eye.png");
+
+  // preview visible toggle
+  p.fillRect (prevViewRect, PreviewVisibleColor);
+  p.drawPixmap (eyeRect, prevViewPix);
+}
+
+void ColumnArea::drawPreviewToggle (QPainter &p, int col) {
+  const Orientation *o = m_viewer->orientation ();
+  TXsheet *xsh = m_viewer->getXsheet ();
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
+
+  bool isEmpty = col >= 0 && xsh->isColumnEmpty (col);
+  if (col < 0 || isEmpty)
+    return;
+  TXshColumn *column = xsh->getColumn (col);
+  // camstand visible toggle
+  if (!column->isCamstandVisible ())
+    return;
+
+  QRect tableViewRect = o->rect (PredefinedRect::PREVIEW_LAYER_AREA).translated (orig);
+  QRect tableViewImgRect = o->rect (PredefinedRect::PREVIEW_LAYER).translated (orig);
+  static QPixmap tableViewPix = QPixmap (":Resources/x_table_view.png");
+  static QPixmap tableTranspViewPix = QPixmap (":Resources/x_table_view_transp.png");
+
+  p.fillRect (tableViewRect, CamStandVisibleColor);
+  p.drawPixmap (tableViewImgRect, column->getOpacity () < 255
+    ? tableTranspViewPix
+    : tableViewPix);
+}
+
+void ColumnArea::drawLock (QPainter &p, int col) {
+
 }
 //-----------------------------------------------------------------------------
 
@@ -868,6 +894,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
       p.fillRect(prevViewRect, PreviewVisibleColor);
       p.drawPixmap(prevViewImgRect, prevViewPix);
     }
+    // NOTE: no partial transparency
     // camstand visible toggle
     if (sc->isCamstandVisible()) {
       p.fillRect(tableViewRect, CamStandVisibleColor);
@@ -1785,9 +1812,10 @@ void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
   TXsheet *xsh = m_viewer->getXsheet();
   if (col >= 0 && xsh->isColumnEmpty(col)) return;
 
-  pos = topLeft + QPoint(m_prevViewBox.x(), m_prevViewBox.y()) - QPoint (10, 2);
+  QRect renameRect = m_viewer->orientation ()->rect (PredefinedRect::RENAME_COLUMN)
+    .translated (topLeft);
 
-  m_renameColumnField->show(pos, col);
+  m_renameColumnField->show(renameRect, col);
 }
 
 //-----------------------------------------------------------------------------
