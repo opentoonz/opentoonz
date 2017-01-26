@@ -505,6 +505,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
     int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
 
     int row = m_viewer->xyToPosition (pos).frame ();
+    QPoint topLeft = m_viewer->positionToXY (CellPosition (row, 0));
 
     int onionDotDiam = 8;
     if (Preferences::instance()->isOnionSkinEnabled() &&
@@ -535,7 +536,8 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
         setDragTool(
             XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
         frameAreaIsClicked = true;
-      } else if (m_xa <= pos.x && pos.x <= m_xa + 10 &&
+      } else if (m_viewer->orientation ()->rect (PredefinedRect::PLAY_RANGE)
+        .translated (topLeft).contains (event->pos ()) &&
                  (row == playR0 || row == playR1)) {
         if (!playRangeEnabled) XsheetGUI::setPlayRange(playR0, playR1, step);
         setDragTool(XsheetGUI::DragTool::makePlayRangeModifierTool(m_viewer));

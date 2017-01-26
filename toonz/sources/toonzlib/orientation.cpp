@@ -183,6 +183,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::FRAME_LABEL, QRect (3, 1, CELL_WIDTH - 6, CELL_HEIGHT - 2));
   addRect (PredefinedRect::FRAME_HEADER, QRect (0, 0, FRAME_HEADER_WIDTH, CELL_HEIGHT));
   addRect (PredefinedRect::LAYER_HEADER, QRect (0, 0, CELL_WIDTH, LAYER_HEADER_HEIGHT));
+  addRect (PredefinedRect::PLAY_RANGE, QRect (PLAY_RANGE_X, 0, PLAY_MARKER_SIZE, CELL_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -292,6 +293,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::FRAME_LABEL, QRect (CELL_WIDTH / 2, 1, CELL_WIDTH / 2 - 1, 2 * CELL_HEIGHT - 2));
   addRect (PredefinedRect::FRAME_HEADER, QRect (0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT));
   addRect (PredefinedRect::LAYER_HEADER, QRect (0, 0, LAYER_HEADER_WIDTH, CELL_HEIGHT));
+  addRect (PredefinedRect::PLAY_RANGE, QRect (0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
