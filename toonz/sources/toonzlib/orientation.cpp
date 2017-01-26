@@ -14,6 +14,8 @@ namespace {
   const int KEY_ICON_HEIGHT = 13;
   const int EASE_TRIANGLE_SIZE = 4;
   const int PLAY_MARKER_SIZE = 10;
+  const int ONION_SIZE = 19;
+  const int ONION_DOT_SIZE = 8;
 }
 
 class TopToBottomOrientation : public Orientation {
@@ -26,6 +28,7 @@ class TopToBottomOrientation : public Orientation {
   const int LAYER_HEADER_HEIGHT = CELL_HEIGHT * 3 + 60;
   const int FRAME_HEADER_WIDTH = CELL_WIDTH;
   const int PLAY_RANGE_X = FRAME_HEADER_WIDTH / 2 - PLAY_MARKER_SIZE;
+  const int ONION_X = 0, ONION_Y = 0;
 
 public:
   TopToBottomOrientation ();
@@ -55,9 +58,10 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_WIDTH = 8;
   const int EXTENDER_HEIGHT = 20;
   const int SOUND_PREVIEW_HEIGHT = 7;
-  const int FRAME_HEADER_HEIGHT = 2 * CELL_HEIGHT;
+  const int FRAME_HEADER_HEIGHT = PLAY_MARKER_SIZE + ONION_SIZE + 2;
   const int LAYER_HEADER_WIDTH = 200;
   const int PLAY_RANGE_Y = 0;
+  const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = PLAY_MARKER_SIZE;
 
 public:
   LeftToRightOrientation ();
@@ -184,6 +188,10 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::FRAME_HEADER, QRect (0, 0, FRAME_HEADER_WIDTH, CELL_HEIGHT));
   addRect (PredefinedRect::LAYER_HEADER, QRect (0, 0, CELL_WIDTH, LAYER_HEADER_HEIGHT));
   addRect (PredefinedRect::PLAY_RANGE, QRect (PLAY_RANGE_X, 0, PLAY_MARKER_SIZE, CELL_HEIGHT));
+  addRect (PredefinedRect::ONION, QRect (ONION_X, ONION_Y, ONION_SIZE, ONION_SIZE));
+  int adjustOnion = (ONION_SIZE - ONION_DOT_SIZE) / 2;
+  addRect (PredefinedRect::ONION_DOT, QRect (ONION_X + adjustOnion, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE));
+  addRect (PredefinedRect::ONION_DOT_FIXED, QRect (ONION_X, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -196,6 +204,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addDimension (PredefinedDimension::INDEX, 0);
   addDimension (PredefinedDimension::SOUND_AMPLITUDE, int (sqrt (CELL_HEIGHT * soundRect.width ()) / 2));
   addDimension (PredefinedDimension::FRAME_LABEL_ALIGN, Qt::AlignRight | Qt::AlignVCenter);
+  addDimension (PredefinedDimension::ONION_TURN, 0);
 
   QPainterPath corner (QPointF (0, CELL_HEIGHT));
   corner.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT));
@@ -290,10 +299,14 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::BEGIN_SOUND_EDIT, QRect (0, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect (PredefinedRect::END_SOUND_EDIT, QRect (CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect (PredefinedRect::NOTE_AREA, QRect (QPoint (0, 0), QSize (LAYER_HEADER_WIDTH, FRAME_HEADER_HEIGHT)));
-  addRect (PredefinedRect::FRAME_LABEL, QRect (CELL_WIDTH / 2, 1, CELL_WIDTH / 2 - 1, 2 * CELL_HEIGHT - 2));
+  addRect (PredefinedRect::FRAME_LABEL, QRect (CELL_WIDTH / 2, 1, CELL_WIDTH / 2 - 1, FRAME_HEADER_HEIGHT - 2));
   addRect (PredefinedRect::FRAME_HEADER, QRect (0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT));
   addRect (PredefinedRect::LAYER_HEADER, QRect (0, 0, LAYER_HEADER_WIDTH, CELL_HEIGHT));
   addRect (PredefinedRect::PLAY_RANGE, QRect (0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
+  addRect (PredefinedRect::ONION, QRect (ONION_X, ONION_Y, ONION_SIZE, ONION_SIZE));
+  int adjustOnion = (ONION_SIZE - ONION_DOT_SIZE) / 2;
+  addRect (PredefinedRect::ONION_DOT, QRect (ONION_X + adjustOnion, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE));
+  addRect (PredefinedRect::ONION_DOT_FIXED, QRect (ONION_X + adjustOnion, ONION_Y, ONION_DOT_SIZE, ONION_DOT_SIZE));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
@@ -306,6 +319,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addDimension (PredefinedDimension::INDEX, 1);
   addDimension (PredefinedDimension::SOUND_AMPLITUDE, soundRect.height () / 2);
   addDimension (PredefinedDimension::FRAME_LABEL_ALIGN, Qt::AlignRight | Qt::AlignBottom | Qt::TextWordWrap);
+  addDimension (PredefinedDimension::ONION_TURN, 90);
 
   QPainterPath corner (QPointF (CELL_WIDTH, 0));
   corner.lineTo (QPointF (CELL_WIDTH, CELL_DRAG_HEIGHT));

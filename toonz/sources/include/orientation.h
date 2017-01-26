@@ -69,7 +69,10 @@ enum class PredefinedRect {
   FRAME_LABEL, //! area for writing frame number
   FRAME_HEADER,
   LAYER_HEADER,
-  PLAY_RANGE //! area for play range marker within frame header
+  PLAY_RANGE, //! area for play range marker within frame header
+  ONION, //! onion handle placement
+  ONION_DOT, //! moveable dot placement
+  ONION_DOT_FIXED //! fixed dot placement
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
@@ -83,7 +86,8 @@ enum class PredefinedDimension {
   FRAME, //! height of frame row / width of frame column
   INDEX, //! index of this orientation in the array of all
   SOUND_AMPLITUDE, //! amplitude of sound track, in pixels
-  FRAME_LABEL_ALIGN //! alignment flag for frame number
+  FRAME_LABEL_ALIGN, //! alignment flag for frame number
+  ONION_TURN //! onion handle turn in degrees
 };
 enum class PredefinedPath {
   DRAG_HANDLE_CORNER, //! triangle corner at drag sidebar

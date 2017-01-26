@@ -277,13 +277,8 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   TPixel frontPixel, backPixel;
   bool inksOnly;
   Preferences::instance()->getOnionData(frontPixel, backPixel, inksOnly);
-  QColor frontColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b,
-                    128);
-  QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b, 128);
-
-  int onionDotDiam    = 8;
-  int onionHandleDiam = RowHeight - 1;
-  int onionDotYPos    = (RowHeight - onionDotDiam) / 2;
+  QColor frontColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b);
+  QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b);
 
   // If the onion skin is disabled, draw dash line instead.
   if (osMask.isEnabled())
@@ -295,15 +290,9 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     p.setPen(currentPen);
   }
 
-  // Draw onion skin extender handles.
-  QPoint handleTopLeft = m_viewer->positionToXY (CellPosition (currentRow, 0));
-  QRectF handleRect (handleTopLeft + QPoint (3, 1),
-	                 QSize (onionHandleDiam, onionHandleDiam));
-  int angle180 = 16 * 180;
-  p.setBrush(QBrush(backColor));
-  p.drawChord(handleRect, 0, angle180);
-  p.setBrush(QBrush(frontColor));
-  p.drawChord(handleRect, angle180, angle180);
+  QRect onionRect = m_viewer->orientation ()->rect (PredefinedRect::ONION);
+  int onionCenter_frame = m_viewer->orientation ()->frameSide (onionRect).middle ();
+  int onionCenter_layer = m_viewer->orientation ()->layerSide (onionRect).middle ();
 
   //-- draw movable onions
 
@@ -319,24 +308,37 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   p.setBrush(Qt::NoBrush);
   if (minMos < 0)  // previous frames
   {
-	int layerAxis = onionDotDiam * 1.5;
-	int fromFrameAxis = m_viewer->rowToFrameAxis (currentRow + minMos)
-		+ onionDotYPos + onionDotDiam;
-	int toFrameAxis = m_viewer->rowToFrameAxis (currentRow);
-	QLine verticalLine = m_viewer->orientation ()
-		->verticalLine (layerAxis, NumberRange (fromFrameAxis, toFrameAxis));
-    p.drawLine(verticalLine);
+    int layerAxis = onionCenter_layer;
+    int fromFrameAxis = m_viewer->rowToFrameAxis (currentRow + minMos)
+      + onionCenter_frame;
+    int toFrameAxis = m_viewer->rowToFrameAxis (currentRow)
+      + onionCenter_frame;
+    QLine verticalLine = m_viewer->orientation ()
+      ->verticalLine (layerAxis, NumberRange (fromFrameAxis, toFrameAxis));
+    p.drawLine (verticalLine);
   }
-  if (maxMos > 0)  // foward frames
+  if (maxMos > 0)  // forward frames
   {
-	int layerAxis = onionDotDiam * 1.5;
-	int fromFrameAxis = m_viewer->rowToFrameAxis (currentRow + 1);
-	int toFrameAxis = m_viewer->rowToFrameAxis (currentRow + maxMos)
-		+ onionDotYPos;
-	QLine verticalLine = m_viewer->orientation ()
-		->verticalLine (layerAxis, NumberRange (fromFrameAxis, toFrameAxis));
-    p.drawLine(verticalLine);
+    int layerAxis = onionCenter_layer;
+    int fromFrameAxis = m_viewer->rowToFrameAxis (currentRow)
+      + onionCenter_frame;
+    int toFrameAxis = m_viewer->rowToFrameAxis (currentRow + maxMos)
+      + onionCenter_frame;
+    QLine verticalLine = m_viewer->orientation ()
+      ->verticalLine (layerAxis, NumberRange (fromFrameAxis, toFrameAxis));
+    p.drawLine (verticalLine);
   }
+
+  // Draw onion skin main handle
+  QPoint handleTopLeft = m_viewer->positionToXY (CellPosition (currentRow, 0));
+  QRect handleRect = onionRect.translated (handleTopLeft);
+  int angle180 = 16 * 180;
+  int turn = m_viewer->orientation ()->dimension (PredefinedDimension::ONION_TURN)
+    * 16;
+  p.setBrush (QBrush (backColor));
+  p.drawChord (handleRect, turn, angle180);
+  p.setBrush (QBrush (frontColor));
+  p.drawChord (handleRect, turn + angle180, angle180);
 
   // draw onion skin dots
   p.setPen(Qt::red);
@@ -345,14 +347,15 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     int mos = osMask.getMos(i);
     // skip drawing if the frame is under the mouse cursor
     if (m_showOnionToSet == Mos && currentRow + mos == m_row) continue;
-    int frameAxis = m_viewer->rowToFrameAxis(currentRow + mos) + onionDotYPos;
 
     if (osMask.isEnabled())
       p.setBrush(mos < 0 ? backColor : frontColor);
     else
       p.setBrush(Qt::NoBrush);
-	QPoint topLeft = m_viewer->orientation ()->frameLayerToXY (frameAxis, onionDotDiam);
-    p.drawEllipse(QRect (topLeft, QSize (onionDotDiam, onionDotDiam)));
+    QPoint topLeft = m_viewer->positionToXY (CellPosition (currentRow + mos, 0));
+    QRect dotRect = m_viewer->orientation ()->rect (PredefinedRect::ONION_DOT)
+      .translated (topLeft);
+    p.drawEllipse(dotRect);
   }
 
   //-- draw fixed onions
@@ -361,24 +364,26 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     if (fos == currentRow) continue;
     // skip drawing if the frame is under the mouse cursor
     if (m_showOnionToSet == Fos && fos == m_row) continue;
-    int frameAxis = m_viewer->rowToFrameAxis(fos) + onionDotYPos;
 
     if (osMask.isEnabled())
-      p.setBrush(QBrush(QColor(0, 255, 255, 128)));
+      p.setBrush(QBrush(QColor(0, 255, 255)));
     else
       p.setBrush(Qt::NoBrush);
-	QPoint topLeft = m_viewer->orientation ()->frameLayerToXY (frameAxis, 0);
-    p.drawEllipse(QRect (topLeft, QSize (onionDotDiam, onionDotDiam)));
+    QPoint topLeft = m_viewer->positionToXY (CellPosition (fos, 0));
+    QRect dotRect = m_viewer->orientation ()->rect (PredefinedRect::ONION_DOT_FIXED)
+      .translated (topLeft);
+    p.drawEllipse(dotRect);
   }
 
-  //-- draw highlighted onion
+  //-- onion placement hint under mouse
   if (m_showOnionToSet != None) {
-    int frameAxis = m_viewer->rowToFrameAxis(m_row) + onionDotYPos;
-    int layerAxis = (m_showOnionToSet == Fos) ? 0 : onionDotDiam;
     p.setPen(QColor(255, 128, 0));
-    p.setBrush(QBrush(QColor(255, 255, 0, 200)));
-	QPoint topLeft = m_viewer->orientation ()->frameLayerToXY (frameAxis, layerAxis);
-    p.drawEllipse(QRect (topLeft, QSize (onionDotDiam, onionDotDiam)));
+    p.setBrush(QBrush(QColor(255, 255, 0)));
+    QPoint topLeft = m_viewer->positionToXY (CellPosition (m_row, 0));
+    QRect dotRect = m_viewer->orientation ()->rect (
+      m_showOnionToSet == Fos ? PredefinedRect::ONION_DOT_FIXED : PredefinedRect::ONION_DOT)
+      .translated (topLeft);
+    p.drawEllipse(dotRect);
   }
 }
 
