@@ -500,6 +500,8 @@ void RowArea::paintEvent(QPaintEvent *event) {
 //-----------------------------------------------------------------------------
 
 void RowArea::mousePressEvent(QMouseEvent *event) {
+  const Orientation *o = m_viewer->orientation ();
+
   m_viewer->setQtModifiers(event->modifiers());
   if (event->button() == Qt::LeftButton) {
     bool frameAreaIsClicked = false;
@@ -511,21 +513,27 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
 
     int row = m_viewer->xyToPosition (pos).frame ();
     QPoint topLeft = m_viewer->positionToXY (CellPosition (row, 0));
+    QPoint mouseInCell = event->pos () - topLeft;
 
-    int onionDotDiam = 8;
     if (Preferences::instance()->isOnionSkinEnabled() &&
-        ((row == currentFrame && pos.x < RowHeight + 2) ||
-         (pos.x < onionDotDiam * 2))) {
+        o->rect (PredefinedRect::ONION_AREA).contains (mouseInCell)) {
       if (row == currentFrame) {
         setDragTool(
             XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
         frameAreaIsClicked = true;
-      } else if (pos.x <= onionDotDiam)
+      } else if (o->rect (PredefinedRect::ONION_FIXED_DOT_AREA)
+            .contains (mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeKeyOnionSkinMaskModifierTool(
             m_viewer, true));
-      else
+      else if (o->rect (PredefinedRect::ONION_DOT_AREA)
+            .contains (mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeKeyOnionSkinMaskModifierTool(
             m_viewer, false));
+      else {
+        setDragTool (
+          XsheetGUI::DragTool::makeCurrentFrameModifierTool (m_viewer));
+        frameAreaIsClicked = true;
+      }
     } else {
       int playR0, playR1, step;
       XsheetGUI::getPlayRange(playR0, playR1, step);
@@ -541,8 +549,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
         setDragTool(
             XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
         frameAreaIsClicked = true;
-      } else if (m_viewer->orientation ()->rect (PredefinedRect::PLAY_RANGE)
-        .translated (topLeft).contains (event->pos ()) &&
+      } else if (o->rect (PredefinedRect::PLAY_RANGE).contains (mouseInCell) &&
                  (row == playR0 || row == playR1)) {
         if (!playRangeEnabled) XsheetGUI::setPlayRange(playR0, playR1, step);
         setDragTool(XsheetGUI::DragTool::makePlayRangeModifierTool(m_viewer));
@@ -581,6 +588,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void RowArea::mouseMoveEvent(QMouseEvent *event) {
+  const Orientation *o = m_viewer->orientation ();
   m_viewer->setQtModifiers(event->modifiers());
   QPoint pos = event->pos();
 
@@ -612,13 +620,14 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
 
   int currentRow = TApp::instance()->getCurrentFrame()->getFrame();
   int row        = m_viewer->xyToPosition (m_pos).frame ();
+  QPoint mouseInCell =
+    event->pos () - m_viewer->positionToXY (CellPosition (row, 0));
   if (row < 0) return;
-  // "decide" se mostrare la possibilita' di settare l'onion skin
-  if (Preferences::instance()->isOnionSkinEnabled()) {
-    int onionDotDiam = 8;
-    if (x <= onionDotDiam && row != currentRow)
+  // whether to show ability to set onion marks
+  if (Preferences::instance()->isOnionSkinEnabled() && row != currentRow) {
+    if (o->rect (PredefinedRect::ONION_FIXED_DOT_AREA).contains (mouseInCell))
       m_showOnionToSet = Fos;
-    else if (x <= onionDotDiam * 2 && row != currentRow)
+    else if (o->rect (PredefinedRect::ONION_DOT_AREA).contains (mouseInCell))
       m_showOnionToSet = Mos;
   }
 
@@ -650,22 +659,24 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
 
   update();
 
-  QPoint base0 = m_viewer->positionToXY (CellPosition (m_r0, 0)) + QPoint (m_xa, 1);
-  QPoint base1 = m_viewer->positionToXY (CellPosition (m_r1 + 1, 0)) + QPoint (m_xa, -12 + 1);
-  QPolygon startArrow, endArrow;
-  startArrow << base0 << base0 + QPoint(10,  0) << base0 + QPoint(0, 10);
-  endArrow   << base1 << base1 + QPoint(10, 10) << base1 + QPoint(0, 10);
+  QPoint base0 = m_viewer->positionToXY (CellPosition (m_r0, 0));
+  QPoint base1 = m_viewer->positionToXY (CellPosition (m_r1, 0));
+  QPainterPath startArrow = o->path (PredefinedPath::BEGIN_PLAY_RANGE)
+    .translated (base0);
+  QPainterPath endArrow = o->path (PredefinedPath::END_PLAY_RANGE)
+    .translated (base1);
 
-  if (startArrow.containsPoint(m_pos, Qt::OddEvenFill))
+  if (startArrow.contains(m_pos))
     m_tooltip = tr("Playback Start Marker");
-  else if (endArrow.containsPoint(m_pos, Qt::OddEvenFill))
+  else if (endArrow.contains(m_pos))
     m_tooltip = tr("Playback End Marker");
   else if (isOnPinnedCenterKey)
     m_tooltip = tr("Pinned Center : Col%1%2")
                     .arg(pinnedCenterColumnId + 1)
                     .arg((isRootBonePinned) ? " (Root)" : "");
   else if (row == currentRow) {
-    if (Preferences::instance()->isOnionSkinEnabled() && x < RowHeight + 2)
+    if (Preferences::instance()->isOnionSkinEnabled() && 
+        o->rect (PredefinedRect::ONION).contains (mouseInCell))
       m_tooltip = tr("Double Click to Toggle Onion Skin");
     else
       m_tooltip = tr("Curren Frame");

@@ -72,7 +72,10 @@ enum class PredefinedRect {
   PLAY_RANGE, //! area for play range marker within frame header
   ONION, //! onion handle placement
   ONION_DOT, //! moveable dot placement
-  ONION_DOT_FIXED //! fixed dot placement
+  ONION_DOT_FIXED, //! fixed dot placement
+  ONION_AREA, //! area where mouse events will alter onion
+  ONION_FIXED_DOT_AREA,
+  ONION_DOT_AREA
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
