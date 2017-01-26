@@ -81,7 +81,8 @@ enum class PredefinedRect {
   EYE_AREA, //! clickable area larger than the eye, containing it
   EYE, //! the eye itself
   PREVIEW_LAYER_AREA, //! clickable area larger than preview icon, containing it
-  PREVIEW_LAYER
+  PREVIEW_LAYER,
+  LOCK
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked

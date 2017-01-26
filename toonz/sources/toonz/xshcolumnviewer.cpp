@@ -522,7 +522,7 @@ ColumnArea::ColumnArea(XsheetViewer *parent, Qt::WFlags flags)
     , m_transparencyPopupTimer(0)
     , m_prevViewBox(10, 6, ColumnWidth - 12, RowHeight - 3) // to delete
     , m_tableViewBox(10, RowHeight + 6, ColumnWidth - 12, RowHeight - 3) // to delete
-    , m_lockBox(9, RowHeight + 6, RowHeight - 4, RowHeight - 4)
+    , m_lockBox(9, RowHeight + 6, RowHeight - 4, RowHeight - 4) // to delete
     , m_isPanning(false) {
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
 #ifndef LINETEST
@@ -622,8 +622,6 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
     if (column->isRendered() || column->getMeshColumn()) usage = Normal;
   }
 
-  bool isLocked = column != 0 && column->isLocked();
-
   // check if the column is current
   bool isCurrent = false;
   if (currentColumnId == TStageObjectId::CameraId(0))  // CAMERA
@@ -682,20 +680,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 
   drawPreviewToggle (p, col);
 
-  QRect lockModeRect         = m_lockBox.translated(orig);
-  static QPixmap lockModePix = QPixmap(":Resources/x_lock.png");
-
-  if (col >= 0 && !isEmpty) {
-
-    // lock button
-    p.setPen(Qt::gray);
-    p.setBrush(QColor(255, 255, 255, 128));
-    p.drawRect(lockModeRect);
-    lockModeRect.adjust(1, 1, -1, -1);
-    if (isLocked) {
-      p.drawPixmap(lockModeRect, lockModePix);
-    }
-  }
+  drawLock (p, col);
 
   // column number
   if (!isEmpty)
@@ -764,7 +749,6 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 void ColumnArea::drawEye (QPainter &p, int col) {
   const Orientation *o = m_viewer->orientation ();
   TXsheet *xsh = m_viewer->getXsheet ();
-  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
 
   bool isEmpty = col >= 0 && xsh->isColumnEmpty (col);
   if (col < 0 || isEmpty)
@@ -773,6 +757,7 @@ void ColumnArea::drawEye (QPainter &p, int col) {
   if (!column->isPreviewVisible ())
     return;
 
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
   QRect prevViewRect = o->rect (PredefinedRect::EYE_AREA).translated (orig);
   QRect eyeRect = o->rect (PredefinedRect::EYE).translated (orig);
   static QPixmap prevViewPix = QPixmap (":Resources/x_prev_eye.png");
@@ -785,7 +770,6 @@ void ColumnArea::drawEye (QPainter &p, int col) {
 void ColumnArea::drawPreviewToggle (QPainter &p, int col) {
   const Orientation *o = m_viewer->orientation ();
   TXsheet *xsh = m_viewer->getXsheet ();
-  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
 
   bool isEmpty = col >= 0 && xsh->isColumnEmpty (col);
   if (col < 0 || isEmpty)
@@ -795,6 +779,7 @@ void ColumnArea::drawPreviewToggle (QPainter &p, int col) {
   if (!column->isCamstandVisible ())
     return;
 
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
   QRect tableViewRect = o->rect (PredefinedRect::PREVIEW_LAYER_AREA).translated (orig);
   QRect tableViewImgRect = o->rect (PredefinedRect::PREVIEW_LAYER).translated (orig);
   static QPixmap tableViewPix = QPixmap (":Resources/x_table_view.png");
@@ -807,7 +792,26 @@ void ColumnArea::drawPreviewToggle (QPainter &p, int col) {
 }
 
 void ColumnArea::drawLock (QPainter &p, int col) {
+  const Orientation *o = m_viewer->orientation ();
+  TXsheet *xsh = m_viewer->getXsheet ();
 
+  bool isEmpty = col >= 0 && xsh->isColumnEmpty (col);
+  if (col < 0 || isEmpty)
+    return;
+  TXshColumn *column = xsh->getColumn (col);
+
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
+  QRect lockModeRect = o->rect (PredefinedRect::LOCK).translated (orig);
+  static QPixmap lockModePix = QPixmap (":Resources/x_lock.png");
+
+  // lock button
+  p.setPen (Qt::gray);
+  p.setBrush (QColor (255, 255, 255, 128));
+  p.drawRect (lockModeRect);
+  lockModeRect.adjust (1, 1, -1, -1);
+  bool isLocked = column && column->isLocked ();
+  if (isLocked)
+    p.drawPixmap (lockModeRect, lockModePix);
 }
 //-----------------------------------------------------------------------------
 
