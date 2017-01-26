@@ -46,7 +46,6 @@ RowArea::RowArea(XsheetViewer *parent, Qt::WFlags flags)
 #endif
     : QWidget(parent, flags)
     , m_viewer(parent)
-    , m_xa(ColumnWidth / 2 - 12)
     , m_row(-1)
     , m_showOnionToSet(None)
     , m_pos(-1, -1)
@@ -751,10 +750,11 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
 void RowArea::mouseDoubleClickEvent(QMouseEvent *event) {
   int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
   int row          = m_viewer->xyToPosition (event->pos()).frame ();
+  QPoint mouseInCell = event->pos () - m_viewer->positionToXY (CellPosition (row, 0));
   if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
       event->buttons() & Qt::LeftButton &&
       Preferences::instance()->isOnionSkinEnabled() && row == currentFrame &&
-      event->pos().x() < RowHeight + 2) {
+      m_viewer->orientation ()->rect (PredefinedRect::ONION).contains (mouseInCell)) {
     TOnionSkinMaskHandle *osmh = TApp::instance()->getCurrentOnionSkin();
     OnionSkinMask osm          = osmh->getOnionSkinMask();
     osm.enable(!osm.isEnabled());
