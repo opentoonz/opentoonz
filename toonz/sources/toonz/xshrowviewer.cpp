@@ -428,7 +428,7 @@ void RowArea::drawPinnedCenterKeys(QPainter &p, int r0, int r1) {
   int columnCount    = xsh->getColumnCount();
   int prev_pinnedCol = -2;
 
-  QRect keyRect(30, 5, 10, 10);
+  QRect keyRect = m_viewer->orientation ()->rect (PredefinedRect::PINNED_CENTER_KEY);
   p.setPen(Qt::black);
 
   r1 = (r1 < xsh->getFrameCount() - 1) ? xsh->getFrameCount() - 1 : r1;
@@ -442,21 +442,22 @@ void RowArea::drawPinnedCenterKeys(QPainter &p, int r0, int r1) {
     if (tmp_pinnedCol != prev_pinnedCol) {
       prev_pinnedCol = tmp_pinnedCol;
       if (r != r0 - 1) {
-        if (m_pos.x() >= 30 && m_pos.x() <= 40 && m_row == r)
+        QPoint mouseInCell = m_pos - m_viewer->positionToXY (CellPosition (r, 0));
+        if (keyRect.contains (mouseInCell))
           p.setBrush(QColor(30, 210, 255));
         else
           p.setBrush(QColor(0, 175, 255));
 
-		QPoint topLeft = m_viewer->positionToXY (CellPosition (r, 0));
-        QRect tmpKeyRect = keyRect.translated(topLeft);
-        p.drawRect(tmpKeyRect);
+		    QPoint topLeft = m_viewer->positionToXY (CellPosition (r, 0));
+        QRect adjusted = keyRect.translated (topLeft);
+        p.drawRect(adjusted);
 
         QFont font = p.font();
         font.setPixelSize(8);
         font.setBold(false);
         p.setFont(font);
         p.drawText(
-            tmpKeyRect, Qt::AlignCenter,
+            adjusted, Qt::AlignCenter,
             QString::number((tmp_pinnedCol == -1) ? ancestorId.getIndex() + 1
                                                   : tmp_pinnedCol + 1));
       }
@@ -636,7 +637,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   bool isRootBonePinned;
   int pinnedCenterColumnId = -1;
   if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton &&
-      x >= 30 && x <= 40) {
+      o->rect (PredefinedRect::PINNED_CENTER_KEY).contains (mouseInCell)) {
     int col      = m_viewer->getCurrentColumn();
     TXsheet *xsh = m_viewer->getXsheet();
     if (col >= 0 && xsh && !xsh->isColumnEmpty(col)) {

@@ -16,6 +16,7 @@ namespace {
   const int PLAY_MARKER_SIZE = 10;
   const int ONION_SIZE = 19;
   const int ONION_DOT_SIZE = 8;
+  const int PINNED_SIZE = 10;
 }
 
 class TopToBottomOrientation : public Orientation {
@@ -200,6 +201,8 @@ TopToBottomOrientation::TopToBottomOrientation () {
     ONION_X, ONION_Y, ONION_DOT_SIZE, CELL_HEIGHT));
   addRect (PredefinedRect::ONION_DOT_AREA, QRect (
     ONION_X + ONION_DOT_SIZE, ONION_Y, ONION_DOT_SIZE, CELL_HEIGHT));
+  addRect (PredefinedRect::PINNED_CENTER_KEY, QRect (
+    (FRAME_HEADER_WIDTH - PINNED_SIZE) / 2, (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -324,6 +327,8 @@ LeftToRightOrientation::LeftToRightOrientation () {
     ONION_X, ONION_Y, CELL_WIDTH, ONION_DOT_SIZE));
   addRect (PredefinedRect::ONION_DOT_AREA, QRect (
     ONION_X, ONION_Y + ONION_DOT_SIZE, CELL_WIDTH, ONION_DOT_SIZE));
+  addRect (PredefinedRect::PINNED_CENTER_KEY, QRect (
+    (CELL_WIDTH - PINNED_SIZE) / 2, (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));

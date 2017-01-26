@@ -75,7 +75,8 @@ enum class PredefinedRect {
   ONION_DOT_FIXED, //! fixed dot placement
   ONION_AREA, //! area where mouse events will alter onion
   ONION_FIXED_DOT_AREA,
-  ONION_DOT_AREA
+  ONION_DOT_AREA,
+  PINNED_CENTER_KEY //! displays a small blue number
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
