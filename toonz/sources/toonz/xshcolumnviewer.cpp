@@ -503,7 +503,7 @@ void RenameColumnField::focusOutEvent(QFocusEvent *e) {
 
 //-----------------------------------------------------------------------------
 
-ColumnArea::DrawHeader::DrawHeader (ColumnArea *nArea, QPainter &nP, int nCol)
+ColumnArea::DrawHeader ::DrawHeader (ColumnArea *nArea, QPainter &nP, int nCol)
   : area (nArea), p (nP), col (nCol) {
   m_viewer = area->m_viewer;
   o = m_viewer->orientation ();
@@ -526,7 +526,7 @@ ColumnArea::DrawHeader::DrawHeader (ColumnArea *nArea, QPainter &nP, int nCol)
 
 //-----------------------------------------------------------------------------
 
-void ColumnArea::DrawHeader::levelColors (QColor &columnColor, QColor &dragColor) const {
+void ColumnArea::DrawHeader ::levelColors (QColor &columnColor, QColor &dragColor) const {
   enum { Normal, Reference, Control } usage = Reference;
   if (column) {
     if (column->isControl ()) usage = Control;
@@ -540,10 +540,10 @@ void ColumnArea::DrawHeader::levelColors (QColor &columnColor, QColor &dragColor
   else
     m_viewer->getColumnColor (columnColor, dragColor, col, xsh);
 }
-void ColumnArea::DrawHeader::soundColors (QColor &columnColor, QColor &dragColor) const {
+void ColumnArea::DrawHeader ::soundColors (QColor &columnColor, QColor &dragColor) const {
   m_viewer->getColumnColor (columnColor, dragColor, col, xsh);
 }
-void ColumnArea::DrawHeader::paletteColors (QColor &columnColor, QColor &dragColor) const {
+void ColumnArea::DrawHeader ::paletteColors (QColor &columnColor, QColor &dragColor) const {
   enum { Normal, Reference, Control } usage = Reference;
   if (column) {  // Check if column is a mask
     if (column->isControl ()) usage = Control;
@@ -560,11 +560,10 @@ void ColumnArea::DrawHeader::paletteColors (QColor &columnColor, QColor &dragCol
   }
 }
 
-void ColumnArea::DrawHeader::drawBaseFill (const QColor &columnColor, const QColor &dragColor) const {
+void ColumnArea::DrawHeader ::drawBaseFill (const QColor &columnColor, const QColor &dragColor) const {
   // check if the column is reference
   bool isEditingSpline = app->getCurrentObject ()->isSpline ();
 
-  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
   QRect rect = o->rect (PredefinedRect::LAYER_HEADER)
     .translated (orig);
 
@@ -597,11 +596,13 @@ void ColumnArea::DrawHeader::drawBaseFill (const QColor &columnColor, const QCol
   QColor pastelizer (m_viewer->getColumnHeadPastelizer ());
   pastelizer.setAlpha (50);
 
+  QColor colorSelection (m_viewer->getSelectedColumnHead ());
+  colorSelection.setAlpha (170);
   p.fillRect (rect,
-    (isSelected || isCameraSelected) ? ColorSelection : pastelizer);
+    (isSelected || isCameraSelected) ? colorSelection : pastelizer);
 }
 
-void ColumnArea::DrawHeader::drawEye () const {
+void ColumnArea::DrawHeader ::drawEye () const {
   if (col < 0 || isEmpty)
     return;
   if (!column->isPreviewVisible ())
@@ -616,7 +617,7 @@ void ColumnArea::DrawHeader::drawEye () const {
   p.drawPixmap (eyeRect, prevViewPix);
 }
 
-void ColumnArea::DrawHeader::drawPreviewToggle (int opacity) const {
+void ColumnArea::DrawHeader ::drawPreviewToggle (int opacity) const {
   if (col < 0 || isEmpty)
     return;
   // camstand visible toggle
@@ -634,7 +635,7 @@ void ColumnArea::DrawHeader::drawPreviewToggle (int opacity) const {
     : tableViewPix);
 }
 
-void ColumnArea::DrawHeader::drawLock () const {
+void ColumnArea::DrawHeader ::drawLock () const {
   if (col < 0 || isEmpty)
     return;
 
@@ -649,6 +650,26 @@ void ColumnArea::DrawHeader::drawLock () const {
   bool isLocked = column && column->isLocked ();
   if (isLocked)
     p.drawPixmap (lockModeRect, lockModePix);
+}
+
+void ColumnArea::DrawHeader:: drawColumnName () const {
+  TStageObjectId columnId = m_viewer->getObjectId (col);
+  TStageObject *columnObject = xsh->getStageObject (columnId);
+
+  // Build column name
+  std::string name (columnObject->getName ());
+  if (col < 0) name = std::string ("Camera");
+
+  if (!isEmpty)
+    p.setPen((isCurrent) ? Qt::red : Qt::black);
+  else
+    p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
+                         : m_viewer->getTextColor());
+
+  QRect columnName = o->rect (PredefinedRect::COLUMN_NAME)
+    .translated (orig).adjusted (2, 0, -2, 0);
+  p.drawText(columnName, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
+    QString(name.c_str()));
 }
 
 //=============================================================================
@@ -733,7 +754,6 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 #else
   QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
 #endif
-
   p.setFont(font);
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
@@ -751,12 +771,6 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   TStageObjectId columnId        = m_viewer->getObjectId(col);
   TStageObjectId currentColumnId = app->getCurrentObject()->getObjectId();
   TStageObjectId parentId        = xsh->getStageObjectParent(columnId);
-  TStageObject *columnObject     = xsh->getStageObject(columnId);
-
-  // Build column name
-  std::string name(columnObject->getName());
-
-  if (col < 0) name = std::string("Camera");
 
   // Retrieve column properties
   // Check if the column is empty
@@ -777,29 +791,19 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
 
   // Draw column
-  QPoint columnNamePos = orig + QPoint(12, RowHeight);
   QPoint pegbarNamePos = orig + QPoint(12, RowHeight * 3 + 48);
   QPoint handleNamePos =
       orig +
       QPoint(ColumnWidth - 10 - p.fontMetrics().width('B'), RowHeight * 3 + 48);
 
   DrawHeader drawHeader (this, p, col);
-  
   QColor columnColor, dragColor;
   drawHeader.levelColors (columnColor, dragColor);
   drawHeader.drawBaseFill (columnColor, dragColor);
   drawHeader.drawEye ();
   drawHeader.drawPreviewToggle (column ? column->getOpacity () : 0);
   drawHeader.drawLock ();
-
-  // column number
-  if (!isEmpty)
-    p.setPen((isCurrent) ? Qt::red : Qt::black);
-  else
-    p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
-                         : m_viewer->getTextColor());
-
-  p.drawText(columnNamePos, QString(name.c_str()));
+  drawHeader.drawColumnName ();
 
   p.setPen(m_viewer->getTextColor());
 
@@ -861,10 +865,13 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
 
-  p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-  QFont font("Helvetica");
-  font.setPointSize(XSHEET_FONT_SIZE);
-  p.setFont(font);
+#ifdef _WIN32
+  QFont font ("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+#else
+  QFont font ("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+#endif
+  p.setFont (font);
+  p.setRenderHint (QPainter::SmoothPixmapTransform, true);
 
   int x = m_viewer->columnToLayerAxis (col);
 
@@ -894,10 +901,11 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   drawHeader.drawEye ();
   drawHeader.drawPreviewToggle (255);
   drawHeader.drawLock ();
+  drawHeader.drawColumnName ();
 
-  // column number
-  p.setPen((isCurrent) ? Qt::red : Qt::black);
-  p.drawText(columnNamePos, QString(std::to_string(col + 1).c_str()));
+  // column number - useful info
+  //p.setPen((isCurrent) ? Qt::red : Qt::black);
+  //p.drawText(columnNamePos, QString(std::to_string(col + 1).c_str()));
 
   // Icona sound
   if (sc->isPlaying()) {
@@ -910,7 +918,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
 
   QRect rr(rect.x() + 8, RowHeight * 2 + 3, rect.width() - 7, m_tabBox.y() - 3);
 
-  // suddivisioni slider
+  // slider subdivisions
   p.setPen(m_viewer->getTextColor());
   int xa = rr.x() + 7, ya = rr.y() + 4;
   int y = ya;
@@ -930,7 +938,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   p.drawLine(xa - 1, ya + 1, xa - 1, ya + ly - 1);
   p.drawLine(xa + 1, ya + 1, xa + 1, ya + ly - 1);
 
-  // cursore
+  // cursor
   QRect cursorRect;
   getVolumeCursorRect(cursorRect, sc->getVolume(), rr.topLeft());
 
@@ -958,50 +966,13 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) { // AREA
   p.setFont(font);
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
-  int currentColumnIndex = m_viewer->getCurrentColumn();
-  int x                  = m_viewer->columnToLayerAxis (col);
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, max (col, 0)));
 
-  QRect rect(x, 0, ColumnWidth, height());
-
-  TApp *app    = TApp::instance();
   TXsheet *xsh = m_viewer->getXsheet();
-
-  TStageObjectId columnId        = m_viewer->getObjectId(col);
-  TStageObjectId currentColumnId = app->getCurrentObject()->getObjectId();
-  TStageObjectId parentId        = xsh->getStageObjectParent(columnId);
-
-  std::string name = xsh->getStageObject(columnId)->getName();
 
   bool isEmpty = false;
   if (col >= 0)  // Verifico se la colonna e' vuota
     isEmpty            = xsh->isColumnEmpty(col);
-  bool isEditingSpline = app->getCurrentObject()->isSpline();
-
-  TXshColumn *column = col >= 0 ? xsh->getColumn(col) : 0;
-  enum { Normal, Reference, Control } usage = Reference;
-  if (column) {  // Verifico se la colonna e' una mask
-    if (column->isControl()) usage  = Control;
-    if (column->isRendered()) usage = Normal;
-  }
-
-  bool isLocked = column != 0 && column->isLocked();
-
-  bool isCurrent = false;
-  if (currentColumnId == TStageObjectId::CameraId(0))  // CAMERA
-    isCurrent = col == -1;
-  else
-    isCurrent = m_viewer->getCurrentColumn() == col;
-
-  bool isSelected =
-      m_viewer->getColumnSelection()->isColumnSelected(col) && !isEditingSpline;
-  bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
-
-  QPoint orig          = rect.topLeft();
-  QPoint columnNamePos = orig + QPoint(12, RowHeight);
-  QPoint pegbarNamePos = orig + QPoint(12, RowHeight * 3 + 48);
-  QPoint handleNamePos =
-      orig +
-      QPoint(ColumnWidth - 10 - p.fontMetrics().width('B'), RowHeight * 3 + 48);
 
   DrawHeader drawHeader (this, p, col);
   QColor columnColor, dragColor;
@@ -1009,11 +980,9 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) { // AREA
   drawHeader.drawBaseFill (columnColor, dragColor);
   drawHeader.drawEye ();
   drawHeader.drawLock ();
+  drawHeader.drawColumnName ();
 
-  // column number
-  p.setPen((isCurrent) ? Qt::red : Qt::black);
-  p.drawText(columnNamePos, QString(name.c_str()));
-
+  // pallete icon
   p.setPen(Qt::black);
   if (col >= 0 && !isEmpty) {
     static QPixmap paletteHeader(":Resources/palette_header.png");

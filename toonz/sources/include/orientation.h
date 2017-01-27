@@ -77,13 +77,14 @@ enum class PredefinedRect {
   ONION_FIXED_DOT_AREA,
   ONION_DOT_AREA,
   PINNED_CENTER_KEY, //! displays a small blue number
-  RENAME_COLUMN, //! area with layer name. clicking enables editing
+  RENAME_COLUMN, //! where column rename control appears after clicking
   EYE_AREA, //! clickable area larger than the eye, containing it
   EYE, //! the eye itself
   PREVIEW_LAYER_AREA, //! clickable area larger than preview icon, containing it
   PREVIEW_LAYER,
   LOCK,
-  DRAG_LAYER //! draggable area in layer header
+  DRAG_LAYER, //! draggable area in layer header
+  COLUMN_NAME //! where to display column name. clicking will rename
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked

@@ -243,6 +243,7 @@ class ColumnArea final : public QWidget {
     void drawEye () const;
     void drawPreviewToggle (int opacity) const;
     void drawLock () const;
+    void drawColumnName () const;
   };
 
 public:

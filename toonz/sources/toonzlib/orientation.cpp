@@ -214,6 +214,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::PREVIEW_LAYER, eye.translated (0, CELL_HEIGHT));
   addRect (PredefinedRect::LOCK, QRect (9, CELL_HEIGHT + 6, 16, 16));
   addRect (PredefinedRect::DRAG_LAYER, QRect (0, 0, CELL_DRAG_WIDTH, LAYER_HEADER_HEIGHT));
+  addRect (PredefinedRect::COLUMN_NAME, eyeArea);
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -340,7 +341,8 @@ LeftToRightOrientation::LeftToRightOrientation () {
     ONION_X, ONION_Y + ONION_DOT_SIZE, CELL_WIDTH, ONION_DOT_SIZE));
   addRect (PredefinedRect::PINNED_CENTER_KEY, QRect (
     (CELL_WIDTH - PINNED_SIZE) / 2, (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
-  addRect (PredefinedRect::RENAME_COLUMN, QRect (5 * EYE_WIDTH, 0, LAYER_HEADER_WIDTH - 5 * EYE_WIDTH, CELL_HEIGHT));
+  QRect columnName (5 * EYE_WIDTH, 0, LAYER_HEADER_WIDTH - 5 * EYE_WIDTH, CELL_HEIGHT);
+  addRect (PredefinedRect::RENAME_COLUMN, columnName);
   QRect eye (0, 0, EYE_WIDTH, CELL_HEIGHT);
   addRect (PredefinedRect::EYE_AREA, eye);
   addRect (PredefinedRect::EYE, eye);
@@ -348,6 +350,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::PREVIEW_LAYER, eye.translated (EYE_WIDTH, 0));
   addRect (PredefinedRect::LOCK, eye.translated (2 * EYE_WIDTH, 0));
   addRect (PredefinedRect::DRAG_LAYER, QRect (0, 0, LAYER_HEADER_WIDTH, CELL_DRAG_HEIGHT));
+  addRect (PredefinedRect::COLUMN_NAME, columnName);
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
