@@ -639,7 +639,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   drawHeader.levelColors (columnColor, dragColor);
   drawHeader.drawBaseFill (columnColor, dragColor);
   drawHeader.drawEye ();
-  drawHeader.drawPreviewToggle ();
+  drawHeader.drawPreviewToggle (column ? column->getOpacity () : 0);
   drawHeader.drawLock ();
 
   // column number
@@ -821,7 +821,7 @@ void ColumnArea::DrawHeader::drawEye () const {
   p.drawPixmap (eyeRect, prevViewPix);
 }
 
-void ColumnArea::DrawHeader::drawPreviewToggle () const {
+void ColumnArea::DrawHeader::drawPreviewToggle (int opacity) const {
   if (col < 0 || isEmpty)
     return;
   // camstand visible toggle
@@ -834,7 +834,7 @@ void ColumnArea::DrawHeader::drawPreviewToggle () const {
   static QPixmap tableTranspViewPix = QPixmap (":Resources/x_table_view_transp.png");
 
   p.fillRect (tableViewRect, CamStandVisibleColor);
-  p.drawPixmap (tableViewImgRect, column->getOpacity () < 255
+  p.drawPixmap (tableViewImgRect, opacity < 255
     ? tableTranspViewPix
     : tableViewPix);
 }
@@ -890,46 +890,9 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   QColor columnColor, dragColor;
   drawHeader.soundColors (columnColor, dragColor);
   drawHeader.drawBaseFill (columnColor, dragColor);
-
-  int prevViewImgHeight = RowHeight - 5;
-  int prevViewImgWidth  = prevViewImgHeight * 5 / 4;
-
-  QRect prevViewRect = m_prevViewBox.translated(orig);
-  QRect prevViewImgRect(prevViewRect.right() - prevViewImgWidth - 1, 7,
-                        prevViewImgWidth, prevViewImgHeight);
-  static QPixmap prevViewPix = QPixmap(":Resources/x_prev_eye.png");
-
-  QRect tableViewRect         = m_tableViewBox.translated(orig);
-  QRect tableViewImgRect      = prevViewImgRect.translated(0, RowHeight);
-  static QPixmap tableViewPix = QPixmap(":Resources/x_table_view.png");
-  static QPixmap tableTranspViewPix =
-      QPixmap(":Resources/x_table_view_transp.png");
-
-  QRect lockModeRect         = m_lockBox.translated(orig);
-  static QPixmap lockModePix = QPixmap(":Resources/x_lock.png");
-
-  if (col >= 0 && !isEmpty) {
-    // preview visible toggle
-    if (isActive) {
-      p.fillRect(prevViewRect, PreviewVisibleColor);
-      p.drawPixmap(prevViewImgRect, prevViewPix);
-    }
-    // NOTE: no partial transparency
-    // camstand visible toggle
-    if (sc->isCamstandVisible()) {
-      p.fillRect(tableViewRect, CamStandVisibleColor);
-      p.drawPixmap(tableViewImgRect, tableViewPix);
-    }
-
-    // lock button
-    p.setPen(Qt::gray);
-    p.setBrush(QColor(255, 255, 255, 128));
-    p.drawRect(lockModeRect);
-    lockModeRect.adjust(1, 1, -1, -1);
-    if (isLocked) {
-      p.drawPixmap(lockModeRect, lockModePix);
-    }
-  }
+  drawHeader.drawEye ();
+  drawHeader.drawPreviewToggle (255);
+  drawHeader.drawLock ();
 
   // column number
   p.setPen((isCurrent) ? Qt::red : Qt::black);
@@ -1043,34 +1006,8 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) { // AREA
   QColor columnColor, dragColor;
   drawHeader.paletteColors (columnColor, dragColor);
   drawHeader.drawBaseFill (columnColor, dragColor);
-
-  int prevViewImgHeight = RowHeight - 5;
-  int prevViewImgWidth  = prevViewImgHeight * 5 / 4;
-
-  QRect prevViewRect = m_prevViewBox.translated(orig);
-  QRect prevViewImgRect(prevViewRect.right() - prevViewImgWidth - 1, 7,
-                        prevViewImgWidth, prevViewImgHeight);
-  static QPixmap prevViewPix = QPixmap(":Resources/x_prev_eye.png");
-
-  QRect lockModeRect         = m_lockBox.translated(orig);
-  static QPixmap lockModePix = QPixmap(":Resources/x_lock.png");
-
-  if (col >= 0 && !isEmpty) {
-    // preiew visible toggle
-    if (column->isPreviewVisible()) {
-      p.fillRect(prevViewRect, PreviewVisibleColor);
-      p.drawPixmap(prevViewImgRect, prevViewPix);
-    }
-
-    // lock button
-    p.setPen(Qt::gray);
-    p.setBrush(QColor(255, 255, 255, 128));
-    p.drawRect(lockModeRect);
-    lockModeRect.adjust(1, 1, -1, -1);
-    if (isLocked) {
-      p.drawPixmap(lockModeRect, lockModePix);
-    }
-  }
+  drawHeader.drawEye ();
+  drawHeader.drawLock ();
 
   // column number
   p.setPen((isCurrent) ? Qt::red : Qt::black);
@@ -1108,7 +1045,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) { // AREA
 
   bool isEditingSpline = app->getCurrentObject()->isSpline();
 
-  // Verifico se la colonna e' lockata se e' quella corrente e se e' selezionata
+  // Check if column is locked and selected
   TXshColumn *column = col >= 0 ? xsh->getColumn(col) : 0;
   bool isLocked      = column != 0 && column->isLocked();
   bool isCurrent     = m_viewer->getCurrentColumn() == col;

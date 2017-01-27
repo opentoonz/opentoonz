@@ -241,7 +241,7 @@ class ColumnArea final : public QWidget {
 
     void drawBaseFill (const QColor &columnColor, const QColor &dragColor) const;
     void drawEye () const;
-    void drawPreviewToggle () const;
+    void drawPreviewToggle (int opacity) const;
     void drawLock () const;
   };
 
