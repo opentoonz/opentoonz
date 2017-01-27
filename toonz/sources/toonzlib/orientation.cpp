@@ -57,10 +57,10 @@ public:
 class LeftToRightOrientation : public Orientation {
   const int CELL_WIDTH = 50;
   const int CELL_HEIGHT = 20;
-  const int CELL_DRAG_HEIGHT = 7;
+  const int CELL_DRAG_HEIGHT = 6;
   const int EXTENDER_WIDTH = 8;
-  const int EXTENDER_HEIGHT = 20;
-  const int SOUND_PREVIEW_HEIGHT = 7;
+  const int EXTENDER_HEIGHT = 15;
+  const int SOUND_PREVIEW_HEIGHT = 6;
   const int FRAME_HEADER_HEIGHT = PLAY_MARKER_SIZE + (3 * ONION_DOT_SIZE + ONION_SIZE) / 2 + 2;
   const int LAYER_HEADER_WIDTH = 240;
   const int PLAY_RANGE_Y = 0;
@@ -213,6 +213,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::PREVIEW_LAYER_AREA, eyeArea.translated (0, CELL_HEIGHT));
   addRect (PredefinedRect::PREVIEW_LAYER, eye.translated (0, CELL_HEIGHT));
   addRect (PredefinedRect::LOCK, QRect (9, CELL_HEIGHT + 6, 16, 16));
+  addRect (PredefinedRect::DRAG_LAYER, QRect (0, 0, CELL_DRAG_WIDTH, LAYER_HEADER_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -346,6 +347,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::PREVIEW_LAYER_AREA, eye.translated (EYE_WIDTH, 0));
   addRect (PredefinedRect::PREVIEW_LAYER, eye.translated (EYE_WIDTH, 0));
   addRect (PredefinedRect::LOCK, eye.translated (2 * EYE_WIDTH, 0));
+  addRect (PredefinedRect::DRAG_LAYER, QRect (0, 0, LAYER_HEADER_WIDTH, CELL_DRAG_HEIGHT));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));

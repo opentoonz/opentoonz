@@ -82,7 +82,8 @@ enum class PredefinedRect {
   EYE, //! the eye itself
   PREVIEW_LAYER_AREA, //! clickable area larger than preview icon, containing it
   PREVIEW_LAYER,
-  LOCK
+  LOCK,
+  DRAG_LAYER //! draggable area in layer header
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked

@@ -228,6 +228,7 @@ public:
   void drawSoundTextColumnHead(QPainter &p, int col);
 
   // sharing too many variables - time for function object
+  void drawBaseFill (QPainter &p, int col);
   void drawEye (QPainter &p, int col); 
   void drawPreviewToggle (QPainter &p, int col);
   void drawLock (QPainter &p, int col);

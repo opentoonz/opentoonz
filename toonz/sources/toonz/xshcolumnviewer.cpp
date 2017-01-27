@@ -611,16 +611,9 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   // Retrieve column properties
   // Check if the column is empty
   bool isEmpty = col >= 0 && xsh->isColumnEmpty (col);
+  TXshColumn *column = col >= 0 ? xsh->getColumn (col) : 0;
 
   bool isEditingSpline = app->getCurrentObject()->isSpline();
-
-  // check if the column is reference
-  TXshColumn *column = col >= 0 ? xsh->getColumn(col) : 0;
-  enum { Normal, Reference, Control } usage = Reference;
-  if (column) {
-    if (column->isControl()) usage                             = Control;
-    if (column->isRendered() || column->getMeshColumn()) usage = Normal;
-  }
 
   // check if the column is current
   bool isCurrent = false;
@@ -640,41 +633,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
       orig +
       QPoint(ColumnWidth - 10 - p.fontMetrics().width('B'), RowHeight * 3 + 48);
 
-  int x0 = rect.x();
-  int x1 = x0 + rect.width() - 1;
-  int y0 = rect.y();
-  int y1 = y0 + rect.height() - 1;
-
-  // fill base color
-  if (isEmpty || col < 0) {
-    p.fillRect(rect, m_viewer->getEmptyColumnHeadColor());
-
-    p.setPen(m_viewer->getVerticalLineHeadColor());
-    p.drawLine(x0, y0, x0, y1);
-  } else {
-    QColor columnColor, sideColor;
-    if (usage == Reference) {
-      columnColor = m_viewer->getReferenceColumnColor();
-      sideColor   = m_viewer->getReferenceColumnBorderColor();
-    } else
-      m_viewer->getColumnColor(columnColor, sideColor, col, xsh);
-    p.fillRect(rect, sideColor);
-    p.fillRect(rect.adjusted(7, 3, 0, 0), columnColor);
-
-    // column handle
-    QRect sideBar(x0, y0, 7, rect.height() - 5);
-    if (sideBar.contains(m_pos)) {
-      p.fillRect(sideBar, Qt::yellow);
-    }
-  }
-
-  QColor pastelizer(m_viewer->getColumnHeadPastelizer());
-  pastelizer.setAlpha(50);
-
-  QColor colorSelection(m_viewer->getSelectedColumnHead());
-  colorSelection.setAlpha(170);
-  p.fillRect(rect,
-             (isSelected || isCameraSelected) ? colorSelection : pastelizer);
+  drawBaseFill (p, col);
 
   drawEye (p, col);
 
@@ -744,6 +703,78 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
       }
     }
   }
+}
+
+void ColumnArea::drawBaseFill (QPainter &p, int col) {
+  const Orientation *o = m_viewer->orientation ();
+  TApp *app = TApp::instance ();
+  TXsheet *xsh = m_viewer->getXsheet ();
+  bool isEmpty = col >= 0 && xsh->isColumnEmpty (col);
+
+  // check if the column is reference
+  TXshColumn *column = col >= 0 ? xsh->getColumn (col) : 0;
+  bool isEditingSpline = app->getCurrentObject ()->isSpline ();
+
+  enum { Normal, Reference, Control } usage = Reference;
+  if (column) {
+    if (column->isControl ()) usage = Control;
+    if (column->isRendered () || column->getMeshColumn ()) usage = Normal;
+  }
+
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
+  QRect rect = o->rect (PredefinedRect::LAYER_HEADER)
+    .translated (orig);
+
+  int x0 = rect.left ();
+  int x1 = rect.right ();
+  int y0 = rect.top ();
+  int y1 = rect.bottom ();
+
+  // fill base color
+  if (isEmpty || col < 0) {
+    p.fillRect (rect, m_viewer->getEmptyColumnHeadColor ());
+
+    p.setPen (m_viewer->getVerticalLineHeadColor ());
+    p.drawLine (x0, y0, x0, y1);
+  }
+  else {
+    QColor columnColor, sideColor;
+    if (usage == Reference) {
+      columnColor = m_viewer->getReferenceColumnColor ();
+      sideColor = m_viewer->getReferenceColumnBorderColor ();
+    }
+    else
+      m_viewer->getColumnColor (columnColor, sideColor, col, xsh);
+    p.fillRect (rect, sideColor);
+    p.fillRect (rect.adjusted (7, 3, 0, 0), columnColor);
+
+    // column handle
+    QRect sideBar = o->rect (PredefinedRect::DRAG_LAYER).translated (x0, y0);
+    if (sideBar.contains (m_pos))
+      p.fillRect (sideBar, Qt::yellow);
+  }
+
+  TStageObjectId currentColumnId = app->getCurrentObject ()->getObjectId ();
+
+  // check if the column is current
+  bool isCurrent = false;
+  if (currentColumnId == TStageObjectId::CameraId (0))  // CAMERA
+    isCurrent = col == -1;
+  else
+    isCurrent = m_viewer->getCurrentColumn () == col;
+
+  bool isSelected =
+    m_viewer->getColumnSelection ()->isColumnSelected (col) && !isEditingSpline;
+  bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
+
+  // highlight selection
+  QColor pastelizer (m_viewer->getColumnHeadPastelizer ());
+  pastelizer.setAlpha (50);
+
+  QColor colorSelection (m_viewer->getSelectedColumnHead ());
+  colorSelection.setAlpha (170);
+  p.fillRect (rect,
+    (isSelected || isCameraSelected) ? colorSelection : pastelizer);
 }
 
 void ColumnArea::drawEye (QPainter &p, int col) {

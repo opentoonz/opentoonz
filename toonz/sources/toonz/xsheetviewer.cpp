@@ -1045,6 +1045,8 @@ void XsheetViewer::scrollToColumn(int col) {
 
 void XsheetViewer::scrollToHorizontalRange(int x0, int x1) {
   QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
+  if (visibleRect.isEmpty ())
+    return;
   int visibleLeft   = visibleRect.left();
   int visibleRight  = visibleRect.right();
 
@@ -1079,6 +1081,8 @@ void XsheetViewer::scrollToVerticalRange(int y0, int y1) {
 	int yMin = min (y0, y1);
 	int yMax = max (y0, y1);
 	QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
+  if (visibleRect.isEmpty ())
+    return;
   int visibleTop    = visibleRect.top();
   int visibleBottom = visibleRect.bottom();
 
