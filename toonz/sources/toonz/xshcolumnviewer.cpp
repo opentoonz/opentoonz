@@ -524,6 +524,17 @@ ColumnArea::DrawHeader ::DrawHeader (ColumnArea *nArea, QPainter &nP, int nCol)
   orig = m_viewer->positionToXY (CellPosition (0, max (col, 0)));
 }
 
+void ColumnArea::DrawHeader ::prepare () const {
+  // Preparing painter
+#ifdef _WIN32
+  QFont font ("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+#else
+  QFont font ("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+#endif
+  p.setFont (font);
+  p.setRenderHint (QPainter::SmoothPixmapTransform, true);
+}
+
 //-----------------------------------------------------------------------------
 
 void ColumnArea::DrawHeader ::levelColors (QColor &columnColor, QColor &dragColor) const {
@@ -748,15 +759,6 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   TColumnSelection *selection = m_viewer->getColumnSelection();
   const Orientation *o = m_viewer->orientation ();
 
-// Preparing painter
-#ifdef _WIN32
-  QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
-#else
-  QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
-#endif
-  p.setFont(font);
-  p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-
   // Retrieve reference coordinates
   int currentColumnIndex = m_viewer->getCurrentColumn();
   int layerAxis          = m_viewer->columnToLayerAxis(col);
@@ -797,6 +799,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
       QPoint(ColumnWidth - 10 - p.fontMetrics().width('B'), RowHeight * 3 + 48);
 
   DrawHeader drawHeader (this, p, col);
+  drawHeader.prepare ();
   QColor columnColor, dragColor;
   drawHeader.levelColors (columnColor, dragColor);
   drawHeader.drawBaseFill (columnColor, dragColor);
@@ -865,36 +868,22 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
 
-#ifdef _WIN32
-  QFont font ("Arial", XSHEET_FONT_SIZE, QFont::Normal);
-#else
-  QFont font ("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
-#endif
-  p.setFont (font);
-  p.setRenderHint (QPainter::SmoothPixmapTransform, true);
-
   int x = m_viewer->columnToLayerAxis (col);
 
   TXsheet *xsh = m_viewer->getXsheet();
   TXshSoundColumn *sc =
       xsh->getColumn(col) ? xsh->getColumn(col)->getSoundColumn() : 0;
 
-  QRect rect(x, 0, ColumnWidth, height());
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
+  QRect rect = m_viewer->orientation ()->rect (PredefinedRect::LAYER_HEADER)
+    .translated (orig);
 
-  QPoint orig          = rect.topLeft();
   QPoint columnNamePos = orig + QPoint(12, RowHeight);
 
-  bool isEmpty    = xsh->isColumnEmpty(col);
   bool isCurrent  = m_viewer->getCurrentColumn() == col;
-  bool isSelected = m_viewer->getColumnSelection()->isColumnSelected(col);
-  bool isPrecSelected =
-      col > 0 ? m_viewer->getColumnSelection()->isColumnSelected(col - 1)
-              : false;
-  bool isActive                = sc && sc->isPreviewVisible();
-  bool isLocked                = sc && sc->isLocked();
-  bool isLeftBorderHighlighted = isSelected || isPrecSelected;
 
   DrawHeader drawHeader (this, p, col);
+  drawHeader.prepare ();
   QColor columnColor, dragColor;
   drawHeader.soundColors (columnColor, dragColor);
   drawHeader.drawBaseFill (columnColor, dragColor);
@@ -958,14 +947,6 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
 void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) { // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
 
-#ifdef _WIN32
-  QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
-#else
-  QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
-#endif
-  p.setFont(font);
-  p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-
   QPoint orig = m_viewer->positionToXY (CellPosition (0, max (col, 0)));
 
   TXsheet *xsh = m_viewer->getXsheet();
@@ -975,6 +956,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) { // AREA
     isEmpty            = xsh->isColumnEmpty(col);
 
   DrawHeader drawHeader (this, p, col);
+  drawHeader.prepare ();
   QColor columnColor, dragColor;
   drawHeader.paletteColors (columnColor, dragColor);
   drawHeader.drawBaseFill (columnColor, dragColor);
@@ -996,11 +978,6 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) { // AREA
 
 void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) { // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
-
-  p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-  QFont font("Helvetica");
-  font.setPointSize(XSHEET_FONT_SIZE);
-  p.setFont(font);
 
   int x = m_viewer->columnToLayerAxis (col);
   QRect rect(x, 0, ColumnWidth, height());
@@ -1026,6 +1003,9 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) { // AREA
   x0          = rect.x() + 1;
   x1          = orig.x() + m_tabBox.x() + m_tabBox.width();
   y           = orig.y() + m_tabBox.height();
+
+  DrawHeader drawHeader (this, p, col);
+  drawHeader.prepare ();
 
   static QPixmap header(":Resources/magpie.png");
   int iconW = header.width();

@@ -235,6 +235,8 @@ class ColumnArea final : public QWidget {
 
     DrawHeader (ColumnArea *area, QPainter &p, int col);
 
+    void prepare () const;
+
     void levelColors (QColor &columnColor, QColor &dragColor) const;
     void soundColors (QColor &columnColor, QColor &dragColor) const;
     void paletteColors (QColor &columnColor, QColor &dragColor) const;
