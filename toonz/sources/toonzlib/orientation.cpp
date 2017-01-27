@@ -217,7 +217,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::COLUMN_NAME, eyeArea);
   addRect (PredefinedRect::COLUMN_NUMBER, QRect (0, 0, -1, -1)); // don't display
 
-  addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
+  addLine (PredefinedLine::LOCKED, verticalLine ((CELL_DRAG_WIDTH + 1) / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
   addLine (PredefinedLine::CONTINUE_LEVEL, verticalLine (CELL_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::CONTINUE_LEVEL_WITH_NAME, verticalLine (CELL_WIDTH - 11, NumberRange (0, CELL_HEIGHT)));

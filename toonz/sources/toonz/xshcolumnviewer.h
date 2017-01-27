@@ -193,9 +193,6 @@ class ColumnArea final : public QWidget {
   QRect m_tabBox;
   QRect m_nameBox;
   QRect m_linkBox;
-  QRect m_prevViewBox;
-  QRect m_tableViewBox;
-  QRect m_lockBox;
 
   bool m_isPanning;
 
