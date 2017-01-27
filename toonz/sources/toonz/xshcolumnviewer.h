@@ -7,6 +7,7 @@
 #include <QListWidget>
 #include <QLineEdit>
 #include <QPoint>
+#include <QColor>
 
 // forward declaration
 class XsheetViewer;
@@ -234,8 +235,11 @@ class ColumnArea final : public QWidget {
 
     DrawHeader (ColumnArea *area, QPainter &p, int col);
 
-    // sharing too many variables - time for function object
-    void drawBaseFill () const;
+    void levelColors (QColor &columnColor, QColor &dragColor) const;
+    void soundColors (QColor &columnColor, QColor &dragColor) const;
+    void paletteColors (QColor &columnColor, QColor &dragColor) const;
+
+    void drawBaseFill (const QColor &columnColor, const QColor &dragColor) const;
     void drawEye () const;
     void drawPreviewToggle () const;
     void drawLock () const;

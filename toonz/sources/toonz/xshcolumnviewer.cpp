@@ -635,7 +635,9 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 
   DrawHeader drawHeader (this, p, col);
   
-  drawHeader.drawBaseFill ();
+  QColor columnColor, dragColor;
+  drawHeader.levelColors (columnColor, dragColor);
+  drawHeader.drawBaseFill (columnColor, dragColor);
   drawHeader.drawEye ();
   drawHeader.drawPreviewToggle ();
   drawHeader.drawLock ();
@@ -704,6 +706,8 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   }
 }
 
+//-----------------------------------------------------------------------------
+
 ColumnArea::DrawHeader::DrawHeader (ColumnArea *nArea, QPainter &nP, int nCol)
   : area (nArea), p (nP), col (nCol) {
   m_viewer = area->m_viewer;
@@ -725,16 +729,45 @@ ColumnArea::DrawHeader::DrawHeader (ColumnArea *nArea, QPainter &nP, int nCol)
   orig = m_viewer->positionToXY (CellPosition (0, max (col, 0)));
 }
 
-void ColumnArea::DrawHeader::drawBaseFill () const {
+//-----------------------------------------------------------------------------
 
-  // check if the column is reference
-  bool isEditingSpline = app->getCurrentObject ()->isSpline ();
-
+void ColumnArea::DrawHeader::levelColors (QColor &columnColor, QColor &dragColor) const {
   enum { Normal, Reference, Control } usage = Reference;
   if (column) {
     if (column->isControl ()) usage = Control;
     if (column->isRendered () || column->getMeshColumn ()) usage = Normal;
   }
+
+  if (usage == Reference) {
+    columnColor = m_viewer->getReferenceColumnColor ();
+    dragColor = m_viewer->getReferenceColumnBorderColor ();
+  }
+  else
+    m_viewer->getColumnColor (columnColor, dragColor, col, xsh);
+}
+void ColumnArea::DrawHeader::soundColors (QColor &columnColor, QColor &dragColor) const {
+  m_viewer->getColumnColor (columnColor, dragColor, col, xsh);
+}
+void ColumnArea::DrawHeader::paletteColors (QColor &columnColor, QColor &dragColor) const {
+  enum { Normal, Reference, Control } usage = Reference;
+  if (column) {  // Check if column is a mask
+    if (column->isControl ()) usage = Control;
+    if (column->isRendered ()) usage = Normal;
+  }
+
+  if (usage == Reference) {
+    columnColor = m_viewer->getReferenceColumnColor ();
+    dragColor = m_viewer->getReferenceColumnBorderColor ();
+  }
+  else {
+    columnColor = m_viewer->getPaletteColumnColor ();
+    dragColor = m_viewer->getPaletteColumnBorderColor ();
+  }
+}
+
+void ColumnArea::DrawHeader::drawBaseFill (const QColor &columnColor, const QColor &dragColor) const {
+  // check if the column is reference
+  bool isEditingSpline = app->getCurrentObject ()->isSpline ();
 
   QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
   QRect rect = o->rect (PredefinedRect::LAYER_HEADER)
@@ -750,39 +783,27 @@ void ColumnArea::DrawHeader::drawBaseFill () const {
     p.fillRect (rect, m_viewer->getEmptyColumnHeadColor ());
 
     p.setPen (m_viewer->getVerticalLineHeadColor ());
-    p.drawLine (x0, y0, x0, y1);
+    QLine vertical = o->verticalLine (m_viewer->columnToLayerAxis (col), o->frameSide (rect));
+    p.drawLine (vertical);
   }
   else {
-    QColor columnColor, sideColor;
-    if (usage == Reference) {
-      columnColor = m_viewer->getReferenceColumnColor ();
-      sideColor = m_viewer->getReferenceColumnBorderColor ();
-    }
-    else
-      m_viewer->getColumnColor (columnColor, sideColor, col, xsh);
-    p.fillRect (rect, sideColor);
-    p.fillRect (rect.adjusted (7, 3, 0, 0), columnColor);
+    p.fillRect (rect, columnColor);
 
     // column handle
     QRect sideBar = o->rect (PredefinedRect::DRAG_LAYER).translated (x0, y0);
-    if (sideBar.contains (area->m_pos))
-      p.fillRect (sideBar, Qt::yellow);
+    p.fillRect (sideBar, sideBar.contains (area->m_pos) ? Qt::yellow : dragColor);
   }
 
-  TStageObjectId currentColumnId = app->getCurrentObject ()->getObjectId ();
-
+  // highlight selection
   bool isSelected =
     m_viewer->getColumnSelection ()->isColumnSelected (col) && !isEditingSpline;
   bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
 
-  // highlight selection
   QColor pastelizer (m_viewer->getColumnHeadPastelizer ());
   pastelizer.setAlpha (50);
 
-  QColor colorSelection (m_viewer->getSelectedColumnHead ());
-  colorSelection.setAlpha (170);
   p.fillRect (rect,
-    (isSelected || isCameraSelected) ? colorSelection : pastelizer);
+    (isSelected || isCameraSelected) ? ColorSelection : pastelizer);
 }
 
 void ColumnArea::DrawHeader::drawEye () const {
@@ -865,36 +886,10 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   bool isLocked                = sc && sc->isLocked();
   bool isLeftBorderHighlighted = isSelected || isPrecSelected;
 
-  int x0 = rect.x();
-  int x1 = x0 + rect.width() - 1;
-  int y0 = rect.y();
-  int y1 = y0 + rect.height() - 1;
-  // base color
-  if (isEmpty || col < 0) {
-    p.fillRect(rect, EmptyColumnHeadColor);
-    p.setPen(m_viewer->getVerticalLineHeadColor());
-    p.drawLine(x0, y0, x0, y1);
-  } else {
-    QColor columnColor, sideColor;
-
-    m_viewer->getColumnColor(columnColor, sideColor, col, xsh);
-
-    p.fillRect(rect, sideColor);
-    p.fillRect(rect.adjusted(7, 3, 0, 0), columnColor);
-
-    // column handle
-    QRect sideBar(x0, y0, 7, rect.height() - 5);
-    if (sideBar.contains(m_pos)) {
-      p.fillRect(sideBar, Qt::yellow);
-    }
-  }
-
-  QColor pastelizer(m_viewer->getColumnHeadPastelizer());
-  pastelizer.setAlpha(50);
-
-  QColor colorSelection(m_viewer->getSelectedColumnHead());
-  colorSelection.setAlpha(170);
-  p.fillRect(rect, (isSelected) ? colorSelection : pastelizer);
+  DrawHeader drawHeader (this, p, col);
+  QColor columnColor, dragColor;
+  drawHeader.soundColors (columnColor, dragColor);
+  drawHeader.drawBaseFill (columnColor, dragColor);
 
   int prevViewImgHeight = RowHeight - 5;
   int prevViewImgWidth  = prevViewImgHeight * 5 / 4;
@@ -1044,40 +1039,10 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) { // AREA
       orig +
       QPoint(ColumnWidth - 10 - p.fontMetrics().width('B'), RowHeight * 3 + 48);
 
-  int x0 = rect.x();
-  int x1 = x0 + rect.width() - 1;
-  int y0 = rect.y();
-  int y1 = y0 + rect.height() - 1;
-
-  // fill base color
-  if (isEmpty || col < 0) {
-    p.fillRect(rect, EmptyColumnHeadColor);
-    p.setPen(m_viewer->getVerticalLineHeadColor());
-    p.drawLine(x0, y0, x0, y1);
-  } else {
-    QColor columnColor, sideColor;
-    if (usage == Reference) {
-      columnColor = m_viewer->getReferenceColumnColor();
-      sideColor   = m_viewer->getReferenceColumnBorderColor();
-    } else {
-      columnColor = m_viewer->getPaletteColumnColor();
-      sideColor   = m_viewer->getPaletteColumnBorderColor();
-    }
-    p.fillRect(rect, sideColor);
-    p.fillRect(rect.adjusted(7, 3, 0, 0), columnColor);
-
-    // column handle
-    QRect sideBar(x0, y0, 7, rect.height() - 5);
-    if (sideBar.contains(m_pos)) {
-      p.fillRect(sideBar, Qt::yellow);
-    }
-  }
-
-  QColor pastelizer(m_viewer->getColumnHeadPastelizer());
-  pastelizer.setAlpha(50);
-
-  p.fillRect(rect,
-             (isSelected || isCameraSelected) ? ColorSelection : pastelizer);
+  DrawHeader drawHeader (this, p, col);
+  QColor columnColor, dragColor;
+  drawHeader.paletteColors (columnColor, dragColor);
+  drawHeader.drawBaseFill (columnColor, dragColor);
 
   int prevViewImgHeight = RowHeight - 5;
   int prevViewImgWidth  = prevViewImgHeight * 5 / 4;
