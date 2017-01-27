@@ -663,7 +663,20 @@ void ColumnArea::DrawHeader ::drawLock () const {
     p.drawPixmap (lockModeRect, lockModePix);
 }
 
-void ColumnArea::DrawHeader:: drawColumnName () const {
+void ColumnArea::DrawHeader ::drawColumnNumber () const {
+  if (col < 0 || isEmpty)
+    return;
+
+  p.setPen((isCurrent) ? Qt::red : m_viewer->getTextColor ());
+  QRect pos = o->rect (PredefinedRect::COLUMN_NUMBER)
+    .translated (orig);
+  if (pos.isEmpty ())
+    return;
+  p.drawText (pos, Qt::AlignCenter | Qt::TextSingleLine,
+    QString::number (col + 1));
+}
+
+void ColumnArea::DrawHeader ::drawColumnName () const {
   TStageObjectId columnId = m_viewer->getObjectId (col);
   TStageObject *columnObject = xsh->getStageObject (columnId);
 
@@ -806,6 +819,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   drawHeader.drawEye ();
   drawHeader.drawPreviewToggle (column ? column->getOpacity () : 0);
   drawHeader.drawLock ();
+  drawHeader.drawColumnNumber ();
   drawHeader.drawColumnName ();
 
   p.setPen(m_viewer->getTextColor());
@@ -890,11 +904,8 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   drawHeader.drawEye ();
   drawHeader.drawPreviewToggle (255);
   drawHeader.drawLock ();
+  drawHeader.drawColumnNumber ();
   drawHeader.drawColumnName ();
-
-  // column number - useful info
-  //p.setPen((isCurrent) ? Qt::red : Qt::black);
-  //p.drawText(columnNamePos, QString(std::to_string(col + 1).c_str()));
 
   // Icona sound
   if (sc->isPlaying()) {
@@ -962,6 +973,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) { // AREA
   drawHeader.drawBaseFill (columnColor, dragColor);
   drawHeader.drawEye ();
   drawHeader.drawLock ();
+  drawHeader.drawColumnNumber ();
   drawHeader.drawColumnName ();
 
   // pallete icon
