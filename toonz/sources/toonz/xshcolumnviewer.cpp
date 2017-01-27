@@ -501,6 +501,156 @@ void RenameColumnField::focusOutEvent(QFocusEvent *e) {
   QLineEdit::focusOutEvent(e);
 }
 
+//-----------------------------------------------------------------------------
+
+ColumnArea::DrawHeader::DrawHeader (ColumnArea *nArea, QPainter &nP, int nCol)
+  : area (nArea), p (nP), col (nCol) {
+  m_viewer = area->m_viewer;
+  o = m_viewer->orientation ();
+  app = TApp::instance ();
+  xsh = m_viewer->getXsheet ();
+  column = col >= 0 ? xsh->getColumn (col) : 0;
+  isEmpty = col >= 0 && xsh->isColumnEmpty (col);
+
+  TStageObjectId currentColumnId = app->getCurrentObject ()->getObjectId ();
+
+  // check if the column is current
+  isCurrent = false;
+  if (currentColumnId == TStageObjectId::CameraId (0))  // CAMERA
+    isCurrent = col == -1;
+  else
+    isCurrent = m_viewer->getCurrentColumn () == col;
+
+  orig = m_viewer->positionToXY (CellPosition (0, max (col, 0)));
+}
+
+//-----------------------------------------------------------------------------
+
+void ColumnArea::DrawHeader::levelColors (QColor &columnColor, QColor &dragColor) const {
+  enum { Normal, Reference, Control } usage = Reference;
+  if (column) {
+    if (column->isControl ()) usage = Control;
+    if (column->isRendered () || column->getMeshColumn ()) usage = Normal;
+  }
+
+  if (usage == Reference) {
+    columnColor = m_viewer->getReferenceColumnColor ();
+    dragColor = m_viewer->getReferenceColumnBorderColor ();
+  }
+  else
+    m_viewer->getColumnColor (columnColor, dragColor, col, xsh);
+}
+void ColumnArea::DrawHeader::soundColors (QColor &columnColor, QColor &dragColor) const {
+  m_viewer->getColumnColor (columnColor, dragColor, col, xsh);
+}
+void ColumnArea::DrawHeader::paletteColors (QColor &columnColor, QColor &dragColor) const {
+  enum { Normal, Reference, Control } usage = Reference;
+  if (column) {  // Check if column is a mask
+    if (column->isControl ()) usage = Control;
+    if (column->isRendered ()) usage = Normal;
+  }
+
+  if (usage == Reference) {
+    columnColor = m_viewer->getReferenceColumnColor ();
+    dragColor = m_viewer->getReferenceColumnBorderColor ();
+  }
+  else {
+    columnColor = m_viewer->getPaletteColumnColor ();
+    dragColor = m_viewer->getPaletteColumnBorderColor ();
+  }
+}
+
+void ColumnArea::DrawHeader::drawBaseFill (const QColor &columnColor, const QColor &dragColor) const {
+  // check if the column is reference
+  bool isEditingSpline = app->getCurrentObject ()->isSpline ();
+
+  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
+  QRect rect = o->rect (PredefinedRect::LAYER_HEADER)
+    .translated (orig);
+
+  int x0 = rect.left ();
+  int x1 = rect.right ();
+  int y0 = rect.top ();
+  int y1 = rect.bottom ();
+
+  // fill base color
+  if (isEmpty || col < 0) {
+    p.fillRect (rect, m_viewer->getEmptyColumnHeadColor ());
+
+    p.setPen (m_viewer->getVerticalLineHeadColor ());
+    QLine vertical = o->verticalLine (m_viewer->columnToLayerAxis (col), o->frameSide (rect));
+    p.drawLine (vertical);
+  }
+  else {
+    p.fillRect (rect, columnColor);
+
+    // column handle
+    QRect sideBar = o->rect (PredefinedRect::DRAG_LAYER).translated (x0, y0);
+    p.fillRect (sideBar, sideBar.contains (area->m_pos) ? Qt::yellow : dragColor);
+  }
+
+  // highlight selection
+  bool isSelected =
+    m_viewer->getColumnSelection ()->isColumnSelected (col) && !isEditingSpline;
+  bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
+
+  QColor pastelizer (m_viewer->getColumnHeadPastelizer ());
+  pastelizer.setAlpha (50);
+
+  p.fillRect (rect,
+    (isSelected || isCameraSelected) ? ColorSelection : pastelizer);
+}
+
+void ColumnArea::DrawHeader::drawEye () const {
+  if (col < 0 || isEmpty)
+    return;
+  if (!column->isPreviewVisible ())
+    return;
+
+  QRect prevViewRect = o->rect (PredefinedRect::EYE_AREA).translated (orig);
+  QRect eyeRect = o->rect (PredefinedRect::EYE).translated (orig);
+  static QPixmap prevViewPix = QPixmap (":Resources/x_prev_eye.png");
+
+  // preview visible toggle
+  p.fillRect (prevViewRect, PreviewVisibleColor);
+  p.drawPixmap (eyeRect, prevViewPix);
+}
+
+void ColumnArea::DrawHeader::drawPreviewToggle (int opacity) const {
+  if (col < 0 || isEmpty)
+    return;
+  // camstand visible toggle
+  if (!column->isCamstandVisible ())
+    return;
+
+  QRect tableViewRect = o->rect (PredefinedRect::PREVIEW_LAYER_AREA).translated (orig);
+  QRect tableViewImgRect = o->rect (PredefinedRect::PREVIEW_LAYER).translated (orig);
+  static QPixmap tableViewPix = QPixmap (":Resources/x_table_view.png");
+  static QPixmap tableTranspViewPix = QPixmap (":Resources/x_table_view_transp.png");
+
+  p.fillRect (tableViewRect, CamStandVisibleColor);
+  p.drawPixmap (tableViewImgRect, opacity < 255
+    ? tableTranspViewPix
+    : tableViewPix);
+}
+
+void ColumnArea::DrawHeader::drawLock () const {
+  if (col < 0 || isEmpty)
+    return;
+
+  QRect lockModeRect = o->rect (PredefinedRect::LOCK).translated (orig);
+  static QPixmap lockModePix = QPixmap (":Resources/x_lock.png");
+
+  // lock button
+  p.setPen (Qt::gray);
+  p.setBrush (QColor (255, 255, 255, 128));
+  p.drawRect (lockModeRect);
+  lockModeRect.adjust (1, 1, -1, -1);
+  bool isLocked = column && column->isLocked ();
+  if (isLocked)
+    p.drawPixmap (lockModeRect, lockModePix);
+}
+
 //=============================================================================
 // ColumnArea
 //-----------------------------------------------------------------------------
@@ -706,155 +856,6 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   }
 }
 
-//-----------------------------------------------------------------------------
-
-ColumnArea::DrawHeader::DrawHeader (ColumnArea *nArea, QPainter &nP, int nCol)
-  : area (nArea), p (nP), col (nCol) {
-  m_viewer = area->m_viewer;
-  o = m_viewer->orientation ();
-  app = TApp::instance ();
-  xsh = m_viewer->getXsheet ();
-  column = col >= 0 ? xsh->getColumn (col) : 0;
-  isEmpty = col >= 0 && xsh->isColumnEmpty (col);
-
-  TStageObjectId currentColumnId = app->getCurrentObject ()->getObjectId ();
-
-  // check if the column is current
-  isCurrent = false;
-  if (currentColumnId == TStageObjectId::CameraId (0))  // CAMERA
-    isCurrent = col == -1;
-  else
-    isCurrent = m_viewer->getCurrentColumn () == col;
-
-  orig = m_viewer->positionToXY (CellPosition (0, max (col, 0)));
-}
-
-//-----------------------------------------------------------------------------
-
-void ColumnArea::DrawHeader::levelColors (QColor &columnColor, QColor &dragColor) const {
-  enum { Normal, Reference, Control } usage = Reference;
-  if (column) {
-    if (column->isControl ()) usage = Control;
-    if (column->isRendered () || column->getMeshColumn ()) usage = Normal;
-  }
-
-  if (usage == Reference) {
-    columnColor = m_viewer->getReferenceColumnColor ();
-    dragColor = m_viewer->getReferenceColumnBorderColor ();
-  }
-  else
-    m_viewer->getColumnColor (columnColor, dragColor, col, xsh);
-}
-void ColumnArea::DrawHeader::soundColors (QColor &columnColor, QColor &dragColor) const {
-  m_viewer->getColumnColor (columnColor, dragColor, col, xsh);
-}
-void ColumnArea::DrawHeader::paletteColors (QColor &columnColor, QColor &dragColor) const {
-  enum { Normal, Reference, Control } usage = Reference;
-  if (column) {  // Check if column is a mask
-    if (column->isControl ()) usage = Control;
-    if (column->isRendered ()) usage = Normal;
-  }
-
-  if (usage == Reference) {
-    columnColor = m_viewer->getReferenceColumnColor ();
-    dragColor = m_viewer->getReferenceColumnBorderColor ();
-  }
-  else {
-    columnColor = m_viewer->getPaletteColumnColor ();
-    dragColor = m_viewer->getPaletteColumnBorderColor ();
-  }
-}
-
-void ColumnArea::DrawHeader::drawBaseFill (const QColor &columnColor, const QColor &dragColor) const {
-  // check if the column is reference
-  bool isEditingSpline = app->getCurrentObject ()->isSpline ();
-
-  QPoint orig = m_viewer->positionToXY (CellPosition (0, col));
-  QRect rect = o->rect (PredefinedRect::LAYER_HEADER)
-    .translated (orig);
-
-  int x0 = rect.left ();
-  int x1 = rect.right ();
-  int y0 = rect.top ();
-  int y1 = rect.bottom ();
-
-  // fill base color
-  if (isEmpty || col < 0) {
-    p.fillRect (rect, m_viewer->getEmptyColumnHeadColor ());
-
-    p.setPen (m_viewer->getVerticalLineHeadColor ());
-    QLine vertical = o->verticalLine (m_viewer->columnToLayerAxis (col), o->frameSide (rect));
-    p.drawLine (vertical);
-  }
-  else {
-    p.fillRect (rect, columnColor);
-
-    // column handle
-    QRect sideBar = o->rect (PredefinedRect::DRAG_LAYER).translated (x0, y0);
-    p.fillRect (sideBar, sideBar.contains (area->m_pos) ? Qt::yellow : dragColor);
-  }
-
-  // highlight selection
-  bool isSelected =
-    m_viewer->getColumnSelection ()->isColumnSelected (col) && !isEditingSpline;
-  bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
-
-  QColor pastelizer (m_viewer->getColumnHeadPastelizer ());
-  pastelizer.setAlpha (50);
-
-  p.fillRect (rect,
-    (isSelected || isCameraSelected) ? ColorSelection : pastelizer);
-}
-
-void ColumnArea::DrawHeader::drawEye () const {
-  if (col < 0 || isEmpty)
-    return;
-  if (!column->isPreviewVisible ())
-    return;
-
-  QRect prevViewRect = o->rect (PredefinedRect::EYE_AREA).translated (orig);
-  QRect eyeRect = o->rect (PredefinedRect::EYE).translated (orig);
-  static QPixmap prevViewPix = QPixmap (":Resources/x_prev_eye.png");
-
-  // preview visible toggle
-  p.fillRect (prevViewRect, PreviewVisibleColor);
-  p.drawPixmap (eyeRect, prevViewPix);
-}
-
-void ColumnArea::DrawHeader::drawPreviewToggle (int opacity) const {
-  if (col < 0 || isEmpty)
-    return;
-  // camstand visible toggle
-  if (!column->isCamstandVisible ())
-    return;
-
-  QRect tableViewRect = o->rect (PredefinedRect::PREVIEW_LAYER_AREA).translated (orig);
-  QRect tableViewImgRect = o->rect (PredefinedRect::PREVIEW_LAYER).translated (orig);
-  static QPixmap tableViewPix = QPixmap (":Resources/x_table_view.png");
-  static QPixmap tableTranspViewPix = QPixmap (":Resources/x_table_view_transp.png");
-
-  p.fillRect (tableViewRect, CamStandVisibleColor);
-  p.drawPixmap (tableViewImgRect, opacity < 255
-    ? tableTranspViewPix
-    : tableViewPix);
-}
-
-void ColumnArea::DrawHeader::drawLock () const {
-  if (col < 0 || isEmpty)
-    return;
-
-  QRect lockModeRect = o->rect (PredefinedRect::LOCK).translated (orig);
-  static QPixmap lockModePix = QPixmap (":Resources/x_lock.png");
-
-  // lock button
-  p.setPen (Qt::gray);
-  p.setBrush (QColor (255, 255, 255, 128));
-  p.drawRect (lockModeRect);
-  lockModeRect.adjust (1, 1, -1, -1);
-  bool isLocked = column && column->isLocked ();
-  if (isLocked)
-    p.drawPixmap (lockModeRect, lockModePix);
-}
 //-----------------------------------------------------------------------------
 
 void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
