@@ -830,17 +830,28 @@ ParamsPage {
 		background-color: rgb(0,0,128);	
 	}
 }
-#XSheetToolbarToolButton {
+#XSheetToolbarLevelButton {
 	background: @m_baseBG;
+	padding-left: 2; 
+	padding-right: 2;
+	margin-left: 2;
+	margin-right: 2;
 }
 
-#XSheetToolbarToolButton {
-	padding: 0;
+#XSheetToolbarButton {
+	padding-left: 3; 
+	padding-right: 3;
+	margin-left: 2;
+	margin-right: 2;
 }
 #XSheetToolbar {
 	margin: 0;
 	padding: 0;
 	border: 0;
+		&::separator:horizontal {
+		margin-right: 7;
+		margin-left: 5;
+	}
 }
 
 /* Customize QScrollBar  vertical*/

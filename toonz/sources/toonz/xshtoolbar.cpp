@@ -56,105 +56,100 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
     : QFrame(parent), m_viewer(parent) {
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("cornerWidget");
-  m_toolbar = new DVGui::ToolBar();
-  m_toolbar->setFixedHeight(20);
+  m_toolbar = new QToolBar();
+  m_toolbar->setFixedHeight(30);
   m_toolbar->setObjectName("XSheetToolbar");
-  m_newVectorLevelButton   = new QToolButton(this);
-  m_newVectorLevelButton->setFixedSize(20, 20);
+
+  m_newVectorLevelButton   = new QPushButton(this);
+  //m_newVectorLevelButton->setFixedSize(25, 25);
   m_newVectorLevelButton->setIconSize(QSize(18, 18));
   QIcon newVectorIcon = createQIconPNG("new_vector_level");
   m_newVectorLevelButton->setIcon(newVectorIcon);
-  m_newVectorLevelButton->setObjectName("XSheetToolbarToolButton");
+  m_newVectorLevelButton->setObjectName("XSheetToolbarLevelButton");
   m_newVectorLevelButton->setToolTip(tr("New Vector Level"));
-  //m_newVectorLevelButton->setFixedSize(18, 18);
-  m_newToonzRasterLevelButton = new QToolButton(this);
-  m_newToonzRasterLevelButton->setFixedSize(20, 20);
+
+  m_newToonzRasterLevelButton = new QPushButton(this);
+  //m_newToonzRasterLevelButton->setFixedSize(25, 25);
   m_newToonzRasterLevelButton->setIconSize(QSize(18, 18));
   QIcon newToonzRasterIcon = createQIconPNG("new_toonz_raster_level");
   m_newToonzRasterLevelButton->setIcon(newToonzRasterIcon);
-  m_newToonzRasterLevelButton->setObjectName("XSheetToolbarToolButton");
+  m_newToonzRasterLevelButton->setObjectName("XSheetToolbarLevelButton");
   m_newToonzRasterLevelButton->setToolTip(tr("New Toonz Raster Level"));
-  //m_newToonzRasterLevelButton->setFixedSize(18, 18);
-  m_newRasterLevelButton = new QToolButton(this);
-  m_newRasterLevelButton->setFixedSize(20, 20);
+  
+  m_newRasterLevelButton = new QPushButton(this);
+  //m_newRasterLevelButton->setFixedSize(25, 25);
   m_newRasterLevelButton->setIconSize(QSize(18, 18));
   QIcon newRasterIcon = createQIconPNG("new_raster_level");
   m_newRasterLevelButton->setIcon(newRasterIcon);
-  m_newRasterLevelButton->setObjectName("XSheetToolbarToolButton");
+  m_newRasterLevelButton->setObjectName("XSheetToolbarLevelButton");
   m_newRasterLevelButton->setToolTip(tr("New Raster Level"));
-  //m_newRasterLevelButton->setFixedSize(18, 18);
+  
   m_reframe1sButton = new QPushButton(tr("1's"), this);
   m_reframe1sButton->setToolTip(tr("Reframe on 1's"));
-  //m_reframe1sButton->setFixedSize(26, 18);
-  m_reframe1sButton->setFixedHeight(20);
+  m_reframe1sButton->setFixedHeight(25);
   m_reframe1sButton->setObjectName("XSheetToolbarButton");
+
   m_reframe2sButton = new QPushButton(tr("2's"), this);
   m_reframe2sButton->setToolTip(tr("Reframe on 2's"));
-  //m_reframe2sButton->setFixedSize(26, 18);
-  m_reframe2sButton->setFixedHeight(20);
+  m_reframe2sButton->setFixedHeight(25);
   m_reframe2sButton->setObjectName("XSheetToolbarButton");
+
   m_reframe3sButton = new QPushButton(tr("3's"), this);
   m_reframe3sButton->setToolTip(tr("Reframe on 3's"));
-  //m_reframe3sButton->setFixedSize(26, 18);
-  m_reframe3sButton->setFixedHeight(20);
+  m_reframe3sButton->setFixedHeight(25);
   m_reframe3sButton->setObjectName("XSheetToolbarButton");
  
-  
-  //m_repeatButton = new QPushButton(tr("Repeat"), this);
-  m_repeatButton = new QToolButton(this);
-  m_repeatButton->setFixedSize(20, 20);
+  m_repeatButton = new QPushButton(this);
+  m_repeatButton->setMinimumWidth(26);
   m_repeatButton->setIconSize(QSize(18, 18));
   QIcon repeatIcon = createQIconPNG("repeat_icon");
   m_repeatButton->setIcon(repeatIcon);
-  m_repeatButton->setObjectName("XSheetToolbarToolButton");
+  m_repeatButton->setObjectName("XSheetToolbarButton");
   m_repeatButton->setToolTip(tr("Repeat Selection"));
-  //m_repeatButton->setFixedSize(18, 18);
+
 
   TApp *app = TApp::instance();
   m_keyFrameButton = new ViewerKeyframeNavigator(this, app->getCurrentFrame());
   m_keyFrameButton->setObjectHandle(app->getCurrentObject());
   m_keyFrameButton->setXsheetHandle(app->getCurrentXsheet());
 
-  //QLabel *newLevelLabel = new QLabel(tr("New: "));
-  //QLabel *reframeLabel = new QLabel(tr("Reframe: "));
-  // layout
   QVBoxLayout *mainLay = new QVBoxLayout();
   mainLay->setMargin(0);
   mainLay->setSpacing(5);
   {
     mainLay->addStretch(1);
-    QHBoxLayout *newLevelLayout = new QHBoxLayout();
-    newLevelLayout->setSpacing(2);
-    newLevelLayout->setMargin(0);
+    QHBoxLayout *toolbarLayout = new QHBoxLayout();
+	toolbarLayout->setSpacing(2);
+	toolbarLayout->setMargin(0);
     {
 	  //newLevelLayout->addWidget(newLevelLabel, 0, Qt::AlignLeft);
 		m_toolbar->addWidget(m_newVectorLevelButton);
 		m_toolbar->addWidget(m_newToonzRasterLevelButton);
 		m_toolbar->addWidget(m_newRasterLevelButton);
 		m_toolbar->addSeparator();
-		newLevelLayout->addWidget(m_toolbar, 0, Qt::AlignLeft);
-	  newLevelLayout->addSpacing(10);
-	  //newLevelLayout->addWidget(reframeLabel, 0, Qt::AlignLeft);
-	  newLevelLayout->addWidget(m_reframe1sButton, 0, Qt::AlignLeft);
-	  newLevelLayout->addWidget(m_reframe2sButton, 0, Qt::AlignLeft);
-	  newLevelLayout->addWidget(m_reframe3sButton, 0, Qt::AlignLeft);
-	  newLevelLayout->addSpacing(10);
-	  newLevelLayout->addWidget(m_repeatButton, 0, Qt::AlignLeft);
-	  newLevelLayout->addSpacing(10);
-	  newLevelLayout->addWidget(m_keyFrameButton, 0, Qt::AlignLeft);
-	  newLevelLayout->addStretch(0);
+		m_toolbar->addWidget(m_reframe1sButton);
+		m_toolbar->addWidget(m_reframe2sButton);
+		m_toolbar->addWidget(m_reframe3sButton);
+		m_toolbar->addSeparator();
+		m_toolbar->addWidget(m_repeatButton);
+		m_toolbar->addSeparator();
+		m_toolbar->addWidget(m_keyFrameButton);
+		toolbarLayout->addWidget(m_toolbar);
+
+	  toolbarLayout->addStretch(0);
     }
-    mainLay->addLayout(newLevelLayout, 0);
-    if (!Preferences::instance()->isShowNewLevelButtonsEnabled()) {
-      m_newVectorLevelButton->hide();
-      m_newToonzRasterLevelButton->hide();
-      m_newRasterLevelButton->hide();
+    mainLay->addLayout(toolbarLayout, 0);
+    if (!Preferences::instance()->isShowXSheetToolbarEnabled()) {
+      //m_newVectorLevelButton->hide();
+      //m_newToonzRasterLevelButton->hide();
+      //m_newRasterLevelButton->hide();
 	  //newLevelLabel->hide();
 	  //reframeLabel->hide();
-	  m_reframe1sButton->hide();
-	  m_reframe2sButton->hide();
-	  m_reframe3sButton->hide();
-	  m_repeatButton->hide();
+	  //m_reframe1sButton->hide();
+	  //m_reframe2sButton->hide();
+	  //m_reframe3sButton->hide();
+	  //m_repeatButton->hide();
+	  m_toolbar->hide();
     }
 
     mainLay->addStretch(1);

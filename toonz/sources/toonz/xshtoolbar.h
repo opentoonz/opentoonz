@@ -15,6 +15,7 @@
 
 #include <QFrame>
 #include <QScrollArea>
+#include <QToolBar>
 
 //-----------------------------------------------------------------------------
 
@@ -39,15 +40,15 @@ class Toolbar final : public QFrame {
 
   XsheetViewer *m_viewer;
 
-  QToolButton *m_newVectorLevelButton;
-  QToolButton *m_newToonzRasterLevelButton;
-  QToolButton *m_newRasterLevelButton;
+  QPushButton *m_newVectorLevelButton;
+  QPushButton *m_newToonzRasterLevelButton;
+  QPushButton *m_newRasterLevelButton;
   QPushButton *m_reframe1sButton;
   QPushButton *m_reframe2sButton;
   QPushButton *m_reframe3sButton;
-  QToolButton *m_repeatButton;
+  QPushButton *m_repeatButton;
   ViewerKeyframeNavigator *m_keyFrameButton;
-  DVGui::ToolBar *m_toolbar;
+  QToolBar *m_toolbar;
 
 public:
 #if QT_VERSION >= 0x050500

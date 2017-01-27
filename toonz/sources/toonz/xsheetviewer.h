@@ -327,7 +327,7 @@ class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
   XsheetGUI::NoteArea *m_noteArea;
   XsheetGUI::Toolbar *m_toolbar;
 
-  int m_x0, m_y0;
+  int m_x0, m_y0, m_toolbarHeight;
   int m_timerId;
   QPoint m_autoPanSpeed;
   QPoint m_lastAutoPanPos;
@@ -439,7 +439,7 @@ public:
   void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
   void updateRows() { m_rowArea->update(m_rowArea->visibleRegion()); }
   void updateColumns() { m_columnArea->update(m_columnArea->visibleRegion()); }
-
+  void updatePanelsSizes();
   bool refreshContentSize(int scrollDx, int scrollDy);
 
   void updateAreeSize();

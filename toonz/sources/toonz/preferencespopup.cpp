@@ -19,6 +19,7 @@
 #include "toonzqt/filefield.h"
 
 // TnzLib includes
+#include "toonz/txsheethandle.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txshleveltypes.h"
@@ -977,8 +978,9 @@ void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onShowNewLevelButtonsClicked(bool checked) {
-  m_pref->enableShowNewLevelButtons(checked);
+void PreferencesPopup::onShowXSheetToolbarClicked(bool checked) {
+  m_pref->enableShowXSheetToolbar(checked);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -1167,10 +1169,6 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Minimize Savebox after Editing"), this);
   m_useNumpadForSwitchingStyles =
       new CheckBox(tr("Use Numpad and Tab keys for Switching Styles"), this);
-  m_showNewLevelButtons =
-      new CheckBox(tr("Show Buttons for Creating New Levels in the XSheet "
-                      "(Requires Restart)"),
-                   this);
 
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
@@ -1188,6 +1186,10 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Arrow Key to Shift Cell Selection"), this);
   CheckBox *inputCellsWithoutDoubleClickingCB =
       new CheckBox(tr("Enable to Input Cells without Double Clicking"), this);
+  m_showXSheetToolbar =
+	  new CheckBox(tr("Show Toolbar in the XSheet "
+		  "(Requires Restart)"),
+		  this);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1389,7 +1391,7 @@ PreferencesPopup::PreferencesPopup()
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
   m_useNumpadForSwitchingStyles->setChecked(
       m_pref->isUseNumpadForSwitchingStylesEnabled());
-  m_showNewLevelButtons->setChecked(m_pref->isShowNewLevelButtonsEnabled());
+  
   QStringList scanLevelTypes;
   scanLevelTypes << "tif"
                  << "png";
@@ -1446,6 +1448,7 @@ PreferencesPopup::PreferencesPopup()
       m_pref->isUseArrowKeyToShiftCellSelectionEnabled());
   inputCellsWithoutDoubleClickingCB->setChecked(
       m_pref->isInputCellsWithoutDoubleClickingEnabled());
+  m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -1856,9 +1859,6 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(m_useNumpadForSwitchingStyles, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-      drawingFrameLay->addWidget(m_showNewLevelButtons, 0,
-                                 Qt::AlignLeft | Qt::AlignVCenter);
-
       drawingFrameLay->addStretch(1);
     }
     drawingBox->setLayout(drawingFrameLay);
@@ -1890,6 +1890,8 @@ PreferencesPopup::PreferencesPopup()
       xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
       xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 5, 0, 1, 2);
       xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 6, 0, 1, 2);
+	  xsheetFrameLay->addWidget(m_showXSheetToolbar, 7,
+		  Qt::AlignLeft | Qt::AlignVCenter);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
@@ -2210,8 +2212,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_useNumpadForSwitchingStyles, SIGNAL(clicked(bool)),
                        SLOT(onUseNumpadForSwitchingStylesClicked(bool)));
-  ret = ret && connect(m_showNewLevelButtons, SIGNAL(clicked(bool)),
-                       SLOT(onShowNewLevelButtonsClicked(bool)));
+  ret = ret && connect(m_showXSheetToolbar, SIGNAL(clicked(bool)),
+                       SLOT(onShowXSheetToolbarClicked(bool)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),

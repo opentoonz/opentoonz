@@ -525,7 +525,6 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
         connect(m_precNoteButton, SIGNAL(clicked()), this, SLOT(precNote()));
   ret = ret &&
         connect(m_nextNoteButton, SIGNAL(clicked()), this, SLOT(nextNote()));
-
   ret =
       ret && connect(m_frameDisplayStyleCombo, SIGNAL(currentIndexChanged(int)),
                      this, SLOT(onFrameDisplayStyleChanged(int)));

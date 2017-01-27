@@ -161,6 +161,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_isComputingSize(false)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
+	, m_toolbarHeight(30)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea)) {
   setFocusPolicy(Qt::StrongFocus);
 
@@ -171,11 +172,11 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
       TApp::instance()->getCurrentXsheet());
 
   m_toolbarScrollArea = new XsheetScrollArea(this);
-  m_toolbarScrollArea->setFixedSize(m_x0 * 6, XsheetGUI::RowHeight);
+  m_toolbarScrollArea->setFixedSize(m_x0 * 6, m_toolbarHeight);
   m_toolbarScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbarScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbar = new XsheetGUI::Toolbar(this);
-  m_toolbar->setFixedSize(m_x0 * 6, XsheetGUI::RowHeight);
+  m_toolbar->setFixedSize(m_x0 * 6, m_toolbarHeight);
   m_toolbarScrollArea->setWidget(m_toolbar);
 
   m_noteArea = new XsheetGUI::NoteArea(this);
@@ -701,29 +702,34 @@ void XsheetViewer::paintEvent(QPaintEvent*)
 
 //-----------------------------------------------------------------------------
 
-void XsheetViewer::resizeEvent(QResizeEvent *event) {
-  int w              = width();
-  int h              = height();
-  int scrollBarWidth = 16;
+void XsheetViewer::updatePanelsSizes() {
+	int w = width();
+	int h = height();
+	int scrollBarWidth = 16;
+	if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
+		m_toolbarScrollArea->setGeometry(1, 1, m_x0 * 6, m_y0 - 3);
+		m_noteScrollArea->setGeometry(3, m_toolbarHeight + 1, m_x0 - 4, m_y0 - 3);
+		m_cellScrollArea->setGeometry(m_x0, m_y0 + m_toolbarHeight, w - m_x0, h - m_y0 - m_toolbarHeight);
+		m_columnScrollArea->setGeometry(m_x0, m_toolbarHeight + 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
+		m_rowScrollArea->setGeometry(1, m_y0 + m_toolbarHeight, m_x0 - 1, h - m_y0 - scrollBarWidth - m_toolbarHeight);
+	}
+	else {
+		m_toolbarScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
+		m_noteScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
+		m_cellScrollArea->setGeometry(m_x0, m_y0, w - m_x0, h - m_y0);
+		m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
+		m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - scrollBarWidth);
+	}
+}
 
-  if (Preferences::instance()->isShowNewLevelButtonsEnabled()) {
-	  m_toolbarScrollArea->setGeometry(3, 1, m_x0 * 6, m_y0 - 3);
-	  m_noteScrollArea->setGeometry(3, XsheetGUI::RowHeight + 1, m_x0 - 4, m_y0 - 3);
-	  m_cellScrollArea->setGeometry(m_x0, m_y0 + XsheetGUI::RowHeight, w - m_x0, h - m_y0 - XsheetGUI::RowHeight);
-	  m_columnScrollArea->setGeometry(m_x0, XsheetGUI::RowHeight + 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
-	  m_rowScrollArea->setGeometry(1, m_y0 + XsheetGUI::RowHeight, m_x0 - 1, h - m_y0 - scrollBarWidth - XsheetGUI::RowHeight);
-  }
-  else {
-	  m_toolbarScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
-	  m_noteScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
-	  m_cellScrollArea->setGeometry(m_x0, m_y0, w - m_x0, h - m_y0);
-	  m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
-	  m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - scrollBarWidth);
-  }
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::resizeEvent(QResizeEvent *event) {
+  updatePanelsSizes();
   //(Nuovo Layout Manager) Reintrodotto per il refresh automatico
   refreshContentSize(
-      0,
-      0);  // Non updateAreeSize() perche' si deve tener conto degli scrollbar.
+	  0,
+	  0);  // Non updateAreeSize() perche' si deve tener conto degli scrollbar.
   updateAllAree();
 }
 
@@ -929,6 +935,7 @@ void XsheetViewer::onSceneSwitched() {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::onXsheetChanged() {
+	updatePanelsSizes();
   refreshContentSize(0, 0);
   updateAllAree();
 }
