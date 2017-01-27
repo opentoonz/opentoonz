@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QLineEdit>
+#include <QPoint>
 
 // forward declaration
 class XsheetViewer;
@@ -14,6 +15,9 @@ class TXsheetHandle;
 class TStageObjectId;
 class TXshColumn;
 class QComboBox;
+class Orientation;
+class TApp;
+class TXsheet;
 
 //=============================================================================
 namespace XsheetGUI {
@@ -173,7 +177,7 @@ protected slots:
   void onFilterColorChanged(int id);
 };
 
-//! La classe si occupa della visualizzazione dell'area che gestisce le colonne.
+//! The class in charge of the region showing layer headers
 class ColumnArea final : public QWidget {
   Q_OBJECT
 
@@ -214,6 +218,29 @@ class ColumnArea final : public QWidget {
   void setDragTool(DragTool *dragTool);
   void startTransparencyPopupTimer(QMouseEvent *e);
 
+  // extracted all variables of drawSomething methods
+  class DrawHeader {
+  public:
+    ColumnArea *area;
+    QPainter &p;
+    int col;
+    XsheetViewer *m_viewer;
+    const Orientation *o;
+    TApp *app;
+    TXsheet *xsh;
+    bool isEmpty, isCurrent;
+    TXshColumn *column;
+    QPoint orig;
+
+    DrawHeader (ColumnArea *area, QPainter &p, int col);
+
+    // sharing too many variables - time for function object
+    void drawBaseFill () const;
+    void drawEye () const;
+    void drawPreviewToggle () const;
+    void drawLock () const;
+  };
+
 public:
 #if QT_VERSION >= 0x050500
   ColumnArea(XsheetViewer *parent, Qt::WindowFlags flags = 0);
@@ -226,12 +253,6 @@ public:
   void drawSoundColumnHead(QPainter &p, int col);
   void drawPaletteColumnHead(QPainter &p, int col);
   void drawSoundTextColumnHead(QPainter &p, int col);
-
-  // sharing too many variables - time for function object
-  void drawBaseFill (QPainter &p, int col);
-  void drawEye (QPainter &p, int col); 
-  void drawPreviewToggle (QPainter &p, int col);
-  void drawLock (QPainter &p, int col);
 
   QPixmap getColumnIcon(int columnIndex);
 
