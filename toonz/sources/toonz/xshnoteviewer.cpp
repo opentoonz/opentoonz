@@ -12,7 +12,6 @@
 // TnzLib includes
 #include "toonz/toonzscene.h"
 #include "toonz/txshnoteset.h"
-#include "toonz/preferences.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/txsheethandle.h"
 
@@ -520,11 +519,13 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
   // signal-slot connections
   bool ret = true;
+
   ret = ret && connect(toolButton, SIGNAL(clicked()), SLOT(toggleNewNote()));
   ret = ret &&
         connect(m_precNoteButton, SIGNAL(clicked()), this, SLOT(precNote()));
   ret = ret &&
         connect(m_nextNoteButton, SIGNAL(clicked()), this, SLOT(nextNote()));
+
   ret =
       ret && connect(m_frameDisplayStyleCombo, SIGNAL(currentIndexChanged(int)),
                      this, SLOT(onFrameDisplayStyleChanged(int)));

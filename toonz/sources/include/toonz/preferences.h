@@ -312,8 +312,6 @@ public:
     return m_useNumpadForSwitchingStyles;
   }
 
-  void enableShowXSheetToolbar(bool on);
-  bool isShowXSheetToolbarEnabled() const { return m_showXSheetToolbar; }
   // Xsheet  tab
 
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
@@ -351,6 +349,12 @@ public:
   bool isInputCellsWithoutDoubleClickingEnabled() const {
     return m_inputCellsWithoutDoubleClickingEnabled;
   }
+
+  void enableShowXSheetToolbar(bool on);
+  bool isShowXSheetToolbarEnabled() const { return m_showXSheetToolbar; }
+
+  void enableExpandFunctionHeader(bool on);
+  bool isExpandFunctionHeaderEnabled() const { return m_expandFunctionHeader; }
 
   // Animation  tab
 
@@ -492,7 +496,8 @@ private:
       m_ignoreAlphaonColumn1Enabled, m_previewAlwaysOpenNewFlipEnabled,
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
-      m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar;
+      m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar,
+      m_expandFunctionHeader;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,

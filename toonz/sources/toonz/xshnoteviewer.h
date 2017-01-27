@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "toonz/txsheet.h"
-#include "toonz/txshleveltypes.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/dvtextedit.h"
 #include "toonzqt/colorfield.h"
@@ -137,6 +136,7 @@ protected slots:
   void toggleNewNote();
   void nextNote();
   void precNote();
+
   void onFrameDisplayStyleChanged(int id);
 };
 

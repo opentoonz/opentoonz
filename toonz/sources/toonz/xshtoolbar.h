@@ -7,25 +7,16 @@
 
 #include "toonz/txsheet.h"
 #include "toonz/txshleveltypes.h"
-#include "toonzqt/dvdialog.h"
-#include "toonzqt/dvtextedit.h"
-#include "toonzqt/colorfield.h"
 #include "toonzqt/keyframenavigator.h"
-#include "toonzqt/functiontoolbar.h"
 
 #include <QFrame>
-#include <QScrollArea>
 #include <QToolBar>
 
 //-----------------------------------------------------------------------------
 
 // forward declaration
 class XsheetViewer;
-class QTextEdit;
-class TColorStyle;
-class QToolButton;
 class QPushButton;
-class QComboBox;
 
 //-----------------------------------------------------------------------------
 
@@ -56,6 +47,8 @@ public:
 #else
   Toolbar(XsheetViewer *parent = 0, Qt::WFlags flags = 0);
 #endif
+  static void toggleXSheetToolbar();
+  void showToolbar(bool show);
 
 protected slots:
   void onNewVectorLevelButtonPressed();

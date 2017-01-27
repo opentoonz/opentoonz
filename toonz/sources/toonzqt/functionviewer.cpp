@@ -114,12 +114,13 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
   m_leftLayout->setMargin(0);
   m_leftLayout->setSpacing(0);
   {
-	  m_leftLayout->addWidget(m_toolbar);
-	if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
-		m_leftLayout->addSpacing(66);
-	}
-    else m_leftLayout->addSpacing(36);
-	m_leftLayout->addWidget(m_numericalColumns);
+    m_leftLayout->addWidget(m_toolbar);
+    if (Preferences::instance()->isShowXSheetToolbarEnabled() &&
+        Preferences::instance()->isExpandFunctionHeaderEnabled()) {
+      m_leftLayout->addSpacing(66);
+    } else
+      m_leftLayout->addSpacing(36);
+    m_leftLayout->addWidget(m_numericalColumns);
   }
   leftPanel->setLayout(m_leftLayout);
 
@@ -329,9 +330,8 @@ void FunctionViewer::setXsheetHandle(TXsheetHandle *xshHandle) {
     TXsheet *xsh = m_xshHandle->getXsheet();
     m_functionGraph->getModel()->refreshData(xsh);
 
-    bool ret =
-        connect(m_xshHandle, SIGNAL(xsheetChanged()), this, SLOT(refreshModel()));
-	connect(m_xshHandle, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
+    bool ret = connect(m_xshHandle, SIGNAL(xsheetChanged()), this,
+                       SLOT(refreshModel()));
     assert(ret);
   }
 }
@@ -477,10 +477,6 @@ void FunctionViewer::onXsheetChanged() {
   TXsheet *xsh = m_xshHandle->getXsheet();
   int rowCount = xsh->getFrameCount();
   m_numericalColumns->setRowCount(rowCount);
-  if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
-	  m_leftLayout->setSpacing(66);
-  }
-  else m_leftLayout->setSpacing(36);
 }
 
 //-----------------------------------------------------------------------------

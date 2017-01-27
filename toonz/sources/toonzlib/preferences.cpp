@@ -299,9 +299,9 @@ Preferences::Preferences()
     , m_shortcutPreset("defopentoonz")
     , m_useNumpadForSwitchingStyles(true)
     , m_showXSheetToolbar(false)
+    , m_expandFunctionHeader(false)
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false) {
-
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -576,6 +576,7 @@ Preferences::Preferences()
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
+  getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
            m_useArrowKeyToShiftCellSelection);
   getValue(*m_settings, "inputCellsWithoutDoubleClickingEnabled",
@@ -1358,6 +1359,13 @@ void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
 void Preferences::enableShowXSheetToolbar(bool on) {
   m_showXSheetToolbar = on;
   m_settings->setValue("showXSheetToolbar", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableExpandFunctionHeader(bool on) {
+  m_expandFunctionHeader = on;
+  m_settings->setValue("expandFunctionHeader", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
