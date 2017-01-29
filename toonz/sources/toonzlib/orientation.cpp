@@ -2,8 +2,7 @@
 #include "toonz/columnfan.h"
 
 #include <QPainterPath>
-
-#include <QDebug>
+#include <QBoxLayout>
 
 using std::pair;
 
@@ -240,6 +239,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::VOLUME_TRACK, QRect (soundTopLeft, QSize (3, trackLen)));
   addRect (PredefinedRect::VOLUME_AREA, QRect (CELL_DRAG_WIDTH, CELL_HEIGHT * 2 + 4, 29 - CELL_DRAG_WIDTH, trackLen));
 
+
   addLine (PredefinedLine::LOCKED, verticalLine ((CELL_DRAG_WIDTH + 1) / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
   addLine (PredefinedLine::CONTINUE_LEVEL, verticalLine (CELL_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
@@ -253,6 +253,9 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addDimension (PredefinedDimension::SOUND_AMPLITUDE, int (sqrt (CELL_HEIGHT * soundRect.width ()) / 2));
   addDimension (PredefinedDimension::FRAME_LABEL_ALIGN, Qt::AlignRight | Qt::AlignVCenter);
   addDimension (PredefinedDimension::ONION_TURN, 0);
+  addDimension (PredefinedDimension::QBOXLAYOUT_DIRECTION, QBoxLayout::Direction::TopToBottom);
+  addDimension (PredefinedDimension::CENTER_ALIGN, Qt::AlignHCenter);
+
 
   QPainterPath corner (QPointF (0, CELL_HEIGHT));
   corner.lineTo (QPointF (CELL_DRAG_WIDTH, CELL_HEIGHT));
@@ -409,11 +412,13 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::VOLUME_TRACK, QRect (soundTopLeft, QSize (trackLen, 3)));
   addRect (PredefinedRect::VOLUME_AREA, QRect (columnName.topLeft (), QSize (trackLen, columnName.height ())));
 
+
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
   addLine (PredefinedLine::CONTINUE_LEVEL, verticalLine (CELL_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::CONTINUE_LEVEL_WITH_NAME, verticalLine (CELL_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::EXTENDER_LINE, horizontalLine (0, NumberRange (-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0)));
+
 
   addDimension (PredefinedDimension::LAYER, CELL_HEIGHT);
   addDimension (PredefinedDimension::FRAME, CELL_WIDTH);
@@ -421,6 +426,9 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addDimension (PredefinedDimension::SOUND_AMPLITUDE, soundRect.height () / 2);
   addDimension (PredefinedDimension::FRAME_LABEL_ALIGN, Qt::AlignRight | Qt::AlignBottom | Qt::TextWordWrap);
   addDimension (PredefinedDimension::ONION_TURN, 90);
+  addDimension (PredefinedDimension::QBOXLAYOUT_DIRECTION, QBoxLayout::Direction::LeftToRight);
+  addDimension (PredefinedDimension::CENTER_ALIGN, Qt::AlignVCenter);
+
 
   QPainterPath corner (QPointF (CELL_WIDTH, 0));
   corner.lineTo (QPointF (CELL_WIDTH, CELL_DRAG_HEIGHT));

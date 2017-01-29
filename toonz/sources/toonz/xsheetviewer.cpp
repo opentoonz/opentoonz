@@ -169,9 +169,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
 
   QRect noteArea (0, 0, 75, 120);
   m_noteArea = new XsheetGUI::NoteArea(this);
-  m_noteArea->setFixedSize(noteArea.size ());
   m_noteScrollArea = new XsheetScrollArea(this);
-  m_noteScrollArea->setFixedSize(noteArea.size ());
   m_noteScrollArea->setWidget(m_noteArea);
   m_noteScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_noteScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -182,8 +180,6 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_cellScrollArea->setWidget(m_cellArea);
   m_cellScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_cellScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  // m_cellScrollArea->horizontalScrollBar()->setObjectName("XsheetScrollBar");
-  // m_cellScrollArea->verticalScrollBar()->setObjectName("XsheetScrollBar");
 
   m_columnArea       = new XsheetGUI::ColumnArea(this);
   m_columnScrollArea = new XsheetScrollArea(this);
@@ -541,6 +537,7 @@ bool XsheetViewer::refreshContentSize(int dx, int dy) {
     NumberRange headerFrame = o->range (PredefinedRange::HEADER_FRAME);
 
     m_isComputingSize = true;
+    m_noteArea->setFixedSize (o->rect (PredefinedRect::NOTE_AREA).size ());
     m_cellArea->setFixedSize(actualSize);
     m_rowArea->setFixedSize(o->frameLayerRect (allFrame, headerLayer).size ());
     m_columnArea->setFixedSize(o->frameLayerRect (headerFrame, allLayer).size ());

@@ -120,6 +120,7 @@ class NoteArea final : public QFrame {
 
   QPushButton *m_flipOrientationButton;
 
+  QToolButton *m_noteButton;
   QToolButton *m_nextNoteButton;
   QToolButton *m_precNoteButton;
 
@@ -143,6 +144,10 @@ protected slots:
 
   void onFrameDisplayStyleChanged(int id);
   void onXsheetOrientationChanged (const Orientation *orientation);
+
+protected:
+  void removeLayout ();
+  void createLayout ();
 };
 
 }  // namespace XsheetGUI;

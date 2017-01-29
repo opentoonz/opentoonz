@@ -105,7 +105,9 @@ enum class PredefinedDimension {
   INDEX, //! index of this orientation in the array of all
   SOUND_AMPLITUDE, //! amplitude of sound track, in pixels
   FRAME_LABEL_ALIGN, //! alignment flag for frame number
-  ONION_TURN //! onion handle turn in degrees
+  ONION_TURN, //! onion handle turn in degrees
+  QBOXLAYOUT_DIRECTION, //! direction of QBoxLayout
+  CENTER_ALIGN, //! horizontal / vertical align
 };
 enum class PredefinedPath {
   DRAG_HANDLE_CORNER, //! triangle corner at drag sidebar
