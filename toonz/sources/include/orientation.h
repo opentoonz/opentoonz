@@ -86,8 +86,8 @@ enum class PredefinedRect {
   PREVIEW_LAYER,
   LOCK,
   DRAG_LAYER, //! draggable area in layer header
-  COLUMN_NAME, //! where to display column name. clicking will rename
-  COLUMN_NUMBER,
+  LAYER_NAME, //! where to display column name. clicking will rename
+  LAYER_NUMBER,
   SOUND_ICON,
   VOLUME_TRACK, //! area where track is displayed
   VOLUME_AREA //! active area for volume control 

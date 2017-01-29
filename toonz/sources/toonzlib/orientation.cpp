@@ -16,8 +16,6 @@ namespace {
   const int ONION_SIZE = 19;
   const int ONION_DOT_SIZE = 8;
   const int PINNED_SIZE = 10;
-  const int EYE_WIDTH = 24;
-  const int EYE_HEIGHT = 20;
 }
 
 class TopToBottomOrientation : public Orientation {
@@ -65,10 +63,15 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_WIDTH = 8;
   const int EXTENDER_HEIGHT = 15;
   const int SOUND_PREVIEW_HEIGHT = 6;
-  const int FRAME_HEADER_HEIGHT = PLAY_MARKER_SIZE + (3 * ONION_DOT_SIZE + ONION_SIZE) / 2 + 2;
-  const int LAYER_HEADER_WIDTH = 240;
+  const int FRAME_HEADER_HEIGHT = 50; // increased from PLAY_MARKER_SIZE + (3 * ONION_DOT_SIZE + ONION_SIZE) / 2 + 2;
+  const int LAYER_HEADER_WIDTH = 530;
   const int PLAY_RANGE_Y = 0;
   const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = PLAY_MARKER_SIZE;
+  const int ICON_WIDTH = 21;
+  const int ICON_OFFSET = ICON_WIDTH + 1;
+  const int ICONS_WIDTH = ICON_OFFSET * 4;
+  const int LAYER_NUMBER_WIDTH = 90;
+  const int LAYER_NAME_WIDTH = 175;
 
 public:
   LeftToRightOrientation ();
@@ -234,8 +237,8 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::PREVIEW_LAYER, eye.translated (0, CELL_HEIGHT));
   addRect (PredefinedRect::LOCK, QRect (9, CELL_HEIGHT + 6, 16, 16));
   addRect (PredefinedRect::DRAG_LAYER, QRect (0, 0, CELL_DRAG_WIDTH, LAYER_HEADER_HEIGHT));
-  addRect (PredefinedRect::COLUMN_NAME, eyeArea);
-  addRect (PredefinedRect::COLUMN_NUMBER, QRect (0, 0, -1, -1)); // don't display
+  addRect (PredefinedRect::LAYER_NAME, eyeArea);
+  addRect (PredefinedRect::LAYER_NUMBER, QRect (0, 0, -1, -1)); // don't display
   addRect (PredefinedRect::SOUND_ICON, QRect (29, 3 * CELL_HEIGHT + 4, 40, 30));
 
   QPoint soundTopLeft (20, CELL_HEIGHT * 2 + 7);
@@ -413,18 +416,18 @@ LeftToRightOrientation::LeftToRightOrientation () {
     ONION_X, ONION_Y + ONION_DOT_SIZE, CELL_WIDTH, ONION_DOT_SIZE));
   addRect (PredefinedRect::PINNED_CENTER_KEY, QRect (
     (CELL_WIDTH - PINNED_SIZE) / 2, (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
-  QRect columnName (5 * EYE_WIDTH, 0, LAYER_HEADER_WIDTH - 5 * EYE_WIDTH, CELL_HEIGHT);
+  QRect columnName (ICONS_WIDTH + LAYER_NUMBER_WIDTH, 0, LAYER_NAME_WIDTH, CELL_HEIGHT);
   addRect (PredefinedRect::RENAME_COLUMN, columnName);
-  QRect eye (0, 0, EYE_WIDTH, CELL_HEIGHT);
+  QRect eye (0, 0, ICON_WIDTH, CELL_HEIGHT);
   addRect (PredefinedRect::EYE_AREA, eye);
   addRect (PredefinedRect::EYE, eye);
-  addRect (PredefinedRect::PREVIEW_LAYER_AREA, eye.translated (2 * EYE_WIDTH, 0));
-  addRect (PredefinedRect::PREVIEW_LAYER, eye.translated (2 * EYE_WIDTH, 0));
-  addRect (PredefinedRect::LOCK, eye.translated (3 * EYE_WIDTH, 0));
+  addRect (PredefinedRect::PREVIEW_LAYER_AREA, eye.translated (2 * ICON_OFFSET, 0));
+  addRect (PredefinedRect::PREVIEW_LAYER, eye.translated (2 * ICON_OFFSET, 0));
+  addRect (PredefinedRect::LOCK, eye.translated (3 * ICON_OFFSET, 0));
   addRect (PredefinedRect::DRAG_LAYER, QRect (0, 0, LAYER_HEADER_WIDTH, CELL_DRAG_HEIGHT));
-  addRect (PredefinedRect::COLUMN_NAME, columnName);
-  addRect (PredefinedRect::COLUMN_NUMBER, eye.translated (4 * EYE_WIDTH, 0));
-  addRect (PredefinedRect::SOUND_ICON, eye.translated (EYE_WIDTH, 0));
+  addRect (PredefinedRect::LAYER_NAME, columnName);
+  addRect (PredefinedRect::LAYER_NUMBER, QRect (ICONS_WIDTH, 0, LAYER_NUMBER_WIDTH, CELL_HEIGHT));
+  addRect (PredefinedRect::SOUND_ICON, eye.translated (ICON_OFFSET, 0));
 
   QPoint soundTopLeft (columnName.left (), columnName.bottom () - 8);
   int trackLen = 60;

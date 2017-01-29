@@ -668,7 +668,7 @@ void ColumnArea::DrawHeader ::drawColumnNumber () const {
     return;
 
   p.setPen(m_viewer->getTextColor ());
-  QRect pos = o->rect (PredefinedRect::COLUMN_NUMBER)
+  QRect pos = o->rect (PredefinedRect::LAYER_NUMBER)
     .translated (orig);
   if (pos.isEmpty ())
     return;
@@ -693,7 +693,7 @@ void ColumnArea::DrawHeader ::drawColumnName () const {
     p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
                          : m_viewer->getTextColor());
 
-  QRect columnName = o->rect (PredefinedRect::COLUMN_NAME)
+  QRect columnName = o->rect (PredefinedRect::LAYER_NAME)
     .translated (orig).adjusted (2, 0, -2, 0);
   p.drawText(columnName, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
     QString(name.c_str()));
@@ -1693,7 +1693,7 @@ void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
   if (col == -1) return;
 #endif
 
-  if (!o->rect (PredefinedRect::COLUMN_NAME).contains(mouseInCell))
+  if (!o->rect (PredefinedRect::LAYER_NAME).contains(mouseInCell))
     return;
 
   TXsheet *xsh = m_viewer->getXsheet();
