@@ -48,6 +48,7 @@ protected:
   void updatePath();
   void nextName();
   void showEvent(QShowEvent *) override;
+  bool levelExists(std::wstring levelName);
 
 public slots:
   void onLevelTypeChanged(const QString &text);
