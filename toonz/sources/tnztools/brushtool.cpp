@@ -46,7 +46,7 @@ using namespace ToolUtils;
 TEnv::DoubleVar VectorBrushMinSize("InknpaintVectorBrushMinSize", 1);
 TEnv::DoubleVar VectorBrushMaxSize("InknpaintVectorBrushMaxSize", 5);
 TEnv::IntVar VectorCapStyle("InknpaintVectorCapStyle", 1);
-TEnv::IntVar VectorJoinStyle("InknpaintVectorJoinStyle", 0);
+TEnv::IntVar VectorJoinStyle("InknpaintVectorJoinStyle", 1);
 TEnv::IntVar VectorMiterValue("InknpaintVectorMiterValue", 4);
 TEnv::DoubleVar RasterBrushMinSize("InknpaintRasterBrushMinSize", 1);
 TEnv::DoubleVar RasterBrushMaxSize("InknpaintRasterBrushMaxSize", 5);
