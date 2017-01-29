@@ -216,6 +216,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::DRAG_LAYER, QRect (0, 0, CELL_DRAG_WIDTH, LAYER_HEADER_HEIGHT));
   addRect (PredefinedRect::COLUMN_NAME, eyeArea);
   addRect (PredefinedRect::COLUMN_NUMBER, QRect (0, 0, -1, -1)); // don't display
+  addRect (PredefinedRect::SOUND_ICON, QRect (29, 3 * CELL_HEIGHT + 4, 40, 30));
 
   addLine (PredefinedLine::LOCKED, verticalLine ((CELL_DRAG_WIDTH + 1) / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -353,6 +354,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::DRAG_LAYER, QRect (0, 0, LAYER_HEADER_WIDTH, CELL_DRAG_HEIGHT));
   addRect (PredefinedRect::COLUMN_NAME, columnName);
   addRect (PredefinedRect::COLUMN_NUMBER, eye.translated (4 * EYE_WIDTH, 0));
+  addRect (PredefinedRect::SOUND_ICON, eye.translated (EYE_WIDTH, 0));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));

@@ -218,7 +218,6 @@ class ColumnArea final : public QWidget {
 
   // extracted all variables of drawSomething methods
   class DrawHeader {
-  public:
     ColumnArea *area;
     QPainter &p;
     int col;
@@ -229,6 +228,7 @@ class ColumnArea final : public QWidget {
     bool isEmpty, isCurrent;
     TXshColumn *column;
     QPoint orig;
+  public:
 
     DrawHeader (ColumnArea *area, QPainter &p, int col);
 
@@ -244,6 +244,8 @@ class ColumnArea final : public QWidget {
     void drawLock () const;
     void drawColumnNumber () const;
     void drawColumnName () const;
+
+    void drawSoundIcon (bool isPlaying) const;
   };
 
 public:

@@ -667,7 +667,7 @@ void ColumnArea::DrawHeader ::drawColumnNumber () const {
   if (col < 0 || isEmpty)
     return;
 
-  p.setPen((isCurrent) ? Qt::red : m_viewer->getTextColor ());
+  p.setPen(m_viewer->getTextColor ());
   QRect pos = o->rect (PredefinedRect::COLUMN_NUMBER)
     .translated (orig);
   if (pos.isEmpty ())
@@ -694,6 +694,15 @@ void ColumnArea::DrawHeader ::drawColumnName () const {
     .translated (orig).adjusted (2, 0, -2, 0);
   p.drawText(columnName, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
     QString(name.c_str()));
+}
+
+void ColumnArea::DrawHeader ::drawSoundIcon (bool isPlaying) const {
+  static QPixmap soundActiveIcon = QPixmap (":Resources/sound_header_on.png");
+  static QPixmap soundIcon = QPixmap (":Resources/sound_header_off.png");
+
+  QRect rect = m_viewer->orientation ()->rect (PredefinedRect::SOUND_ICON)
+    .translated (orig);
+  p.drawPixmap (rect, isPlaying ? soundActiveIcon : soundIcon);
 }
 
 //=============================================================================
@@ -904,14 +913,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   drawHeader.drawColumnNumber ();
   drawHeader.drawColumnName ();
 
-  // Icona sound
-  if (sc->isPlaying()) {
-    static QPixmap soundActiveIcon = QPixmap(":Resources/sound_header_on.png");
-    p.drawPixmap(x + 29, 3 * RowHeight + 4, 40, 30, soundActiveIcon);
-  } else {
-    static QPixmap soundIcon = QPixmap(":Resources/sound_header_off.png");
-    p.drawPixmap(x + 29, 3 * RowHeight + 4, 40, 30, soundIcon);
-  }
+  drawHeader.drawSoundIcon (sc->isPlaying ());
 
   QRect rr(rect.x() + 8, RowHeight * 2 + 3, rect.width() - 7, m_tabBox.y() - 3);
 
@@ -1488,7 +1490,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
 
       // sound column
       else if (column && column->getSoundColumn()) {
-        if (x > 29 && 3 * RowHeight + 5 <= y && y < 3 * RowHeight + 33) {
+        if (o->rect (PredefinedRect::SOUND_ICON).contains (mouseInCell)) {
           TXshSoundColumn *s = column->getSoundColumn();
           if (s) {
             if (s->isPlaying())
@@ -1507,8 +1509,6 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
             if (s->isPlaying() && interval > 0)
               QTimer::singleShot(interval, this, SLOT(update()));
           }
-          //int x0 = m_viewer->columnToX(m_col); // unused
-          //int x1 = m_viewer->columnToX(m_col + 1); // unused
           update();
         } else if (x >= 15 && x <= 25 && RowHeight * 2 + 4 < y &&
                    y < 8 * RowHeight + 4)

@@ -85,7 +85,8 @@ enum class PredefinedRect {
   LOCK,
   DRAG_LAYER, //! draggable area in layer header
   COLUMN_NAME, //! where to display column name. clicking will rename
-  COLUMN_NUMBER
+  COLUMN_NUMBER,
+  SOUND_ICON,
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
