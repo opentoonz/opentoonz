@@ -22,6 +22,16 @@ public:
 	int layer () const { return _layer; }
 
 	CellPosition &operator = (const CellPosition &that) = default;
+  
+  operator bool () const { return _frame || _layer; }
+  
+  CellPosition operator + (const CellPosition &add) {
+    return CellPosition (_frame + add._frame, _layer + add._layer);
+  }
+  void ensureValid () {
+    if (_frame < 0) _frame = 0;
+    if (_layer < 0) _layer = 0;
+  }
 };
 
 // A square range identified by two corners

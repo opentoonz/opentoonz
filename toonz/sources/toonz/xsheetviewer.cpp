@@ -895,21 +895,17 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
   if (changeFrameSkippingHolds(event)) return;
 
   int frameCount = getXsheet()->getFrameCount();
-  int row = getCurrentRow(), col = getCurrentColumn();
+  CellPosition now (getCurrentRow (), getCurrentColumn ());
+  CellPosition shift = orientation ()->arrowShift (event->key ());
+  if (shift) {
+    now = now + shift;
+    now.ensureValid ();
+    setCurrentRow (now.frame ());
+    setCurrentColumn (now.layer ());
+    return;
+  }
 
   switch (int key = event->key()) {
-  case Qt::Key_Up:
-    setCurrentRow(std::max(row - 1, 0));
-    break;
-  case Qt::Key_Down:
-    setCurrentRow(row + 1);
-    break;
-  case Qt::Key_Left:
-    setCurrentColumn(std::max(col - 1, 0));
-    break;
-  case Qt::Key_Right:
-    setCurrentColumn(col + 1);
-    break;
   case Qt::Key_Control:
     // display the upper-directional smart tab only when the ctrl key is pressed
     m_cellArea->onControlPressed(true);

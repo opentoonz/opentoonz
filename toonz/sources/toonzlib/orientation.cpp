@@ -49,6 +49,8 @@ public:
 	virtual NumberRange frameSide (const QRect &area) const override;
   virtual QPoint topRightCorner (const QRect &area) const override;
 
+  virtual CellPosition arrowShift (int direction) const override;
+
   virtual QString name () const override { return "Xsheet"; }
   virtual const Orientation *next () const override { return orientations.leftToRight (); }
 
@@ -84,6 +86,8 @@ public:
 	virtual NumberRange layerSide (const QRect &area) const override;
 	virtual NumberRange frameSide (const QRect &area) const override;
   virtual QPoint topRightCorner (const QRect &area) const override;
+
+  virtual CellPosition arrowShift (int direction) const override;
 
   virtual QString name () const override { return "Timeline"; }
   virtual const Orientation *next () const override { return orientations.topToBottom (); }
@@ -352,6 +356,21 @@ QPoint TopToBottomOrientation::topRightCorner (const QRect &area) const {
   return area.topRight ();
 }
 
+CellPosition TopToBottomOrientation::arrowShift (int direction) const {
+  switch (direction) {
+  case Qt::Key_Up:
+    return CellPosition (-1, 0);
+  case Qt::Key_Down:
+    return CellPosition (1, 0);
+  case Qt::Key_Left:
+    return CellPosition (0, -1);
+  case Qt::Key_Right:
+    return CellPosition (0, 1);
+  default:
+    return CellPosition (0, 0);
+  }
+}
+
 
 /// --------------------------------------------------------------------------------
 
@@ -523,4 +542,18 @@ NumberRange LeftToRightOrientation::frameSide (const QRect &area) const {
 }
 QPoint LeftToRightOrientation::topRightCorner (const QRect &area) const {
   return area.bottomLeft ();
+}
+CellPosition LeftToRightOrientation::arrowShift (int direction) const {
+  switch (direction) {
+  case Qt::Key_Up:
+    return CellPosition (0, -1);
+  case Qt::Key_Down:
+    return CellPosition (0, 1);
+  case Qt::Key_Left:
+    return CellPosition (-1, 0);
+  case Qt::Key_Right:
+    return CellPosition (1, 0);
+  default:
+    return CellPosition (0, 0);
+  }
 }

@@ -467,6 +467,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   //-----
 
   m_flipOrientationButton->setObjectName ("flipOrientationButton");
+  m_flipOrientationButton->setFocusPolicy (Qt::FocusPolicy::NoFocus);
 
   m_noteButton->setObjectName("ToolbarToolButton");
   m_noteButton->setFixedSize(44, 26);

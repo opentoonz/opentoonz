@@ -156,6 +156,8 @@ public:
 	QRect foldedRectangle (int layerAxis, const NumberRange &frameAxis, int i) const;
 	QLine foldedRectangleLine (int layerAxis, const NumberRange &frameAxis, int i) const;
 
+  virtual CellPosition arrowShift (int direction) const = 0;
+
 	//! line was vertical in vertical timeline. adjust accordingly
 	QLine verticalLine (int layerAxis, const NumberRange &frameAxis) const;
 	QLine horizontalLine (int frameAxis, const NumberRange &layerAxis) const;
