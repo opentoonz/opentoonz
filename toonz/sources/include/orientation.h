@@ -42,6 +42,7 @@ public:
 
 	int length () const { return _to - _from;  }
   int middle () const { return (_to + _from) / 2; }
+  int weight (double toWeight) const;
 
   NumberRange adjusted (int addFrom, int addTo) const;
 };
@@ -87,6 +88,8 @@ enum class PredefinedRect {
   COLUMN_NAME, //! where to display column name. clicking will rename
   COLUMN_NUMBER,
   SOUND_ICON,
+  VOLUME_TRACK //! area where track is displayed
+  // VOLUME_AREA //! active area for mouse in sound column header
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked
@@ -108,11 +111,14 @@ enum class PredefinedPath {
   BEGIN_EASE_TRIANGLE, //! triangle marking beginning of ease range
   END_EASE_TRIANGLE, //! triangle marking end of ease range
   BEGIN_PLAY_RANGE, //! play range markers
-  END_PLAY_RANGE
+  END_PLAY_RANGE,
+  VOLUME_SLIDER_TRACK, //! slider track
+  VOLUME_SLIDER_HEAD //! slider head
 };
 enum class PredefinedPoint {
   KEY_HIDDEN, //! move extender handle that much if key icons are disabled
-  EXTENDER_XY_RADIUS //! x and y radius for rounded rectangle
+  EXTENDER_XY_RADIUS, //! x and y radius for rounded rectangle
+  VOLUME_DIVISIONS_TOP_LEFT //! where to draw volume slider
 };
 enum class PredefinedRange {
   HEADER_FRAME, //! size of of column header height(v) / row header width(h)
@@ -140,6 +146,8 @@ public:
 
 	virtual NumberRange layerSide (const QRect &area) const = 0;
 	virtual NumberRange frameSide (const QRect &area) const = 0;
+  virtual int layerAxis (const QPoint &xy) const = 0;
+  virtual int frameAxis (const QPoint &xy) const = 0;
   //! top right corner in vertical layout. bottom left in horizontal
   virtual QPoint topRightCorner (const QRect &area) const = 0;
 	QRect foldedRectangle (int layerAxis, const NumberRange &frameAxis, int i) const;
@@ -150,6 +158,7 @@ public:
 	QLine horizontalLine (int frameAxis, const NumberRange &layerAxis) const;
 
 	virtual bool isVerticalTimeline () const = 0;
+  virtual bool flipVolume () const = 0;
 
   virtual QString name () const = 0;
   virtual const Orientation *next () const = 0;

@@ -677,6 +677,9 @@ void ColumnArea::DrawHeader ::drawColumnNumber () const {
 }
 
 void ColumnArea::DrawHeader ::drawColumnName () const {
+  if (column && column->getSoundColumn () && !o->isVerticalTimeline ()) // covered by volume
+    return;
+
   TStageObjectId columnId = m_viewer->getObjectId (col);
   TStageObject *columnObject = xsh->getStageObject (columnId);
 
@@ -703,6 +706,41 @@ void ColumnArea::DrawHeader ::drawSoundIcon (bool isPlaying) const {
   QRect rect = m_viewer->orientation ()->rect (PredefinedRect::SOUND_ICON)
     .translated (orig);
   p.drawPixmap (rect, isPlaying ? soundActiveIcon : soundIcon);
+}
+
+void ColumnArea::DrawHeader ::drawVolumeControl (double volume) const {
+  // slider subdivisions
+  p.setPen (m_viewer->getTextColor ());
+  QPoint divisionsTopLeft = o->point (PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT)
+    + orig;
+  int layerAxis = o->layerAxis (divisionsTopLeft);
+  int frameAxis = o->frameAxis (divisionsTopLeft);
+  for (int i = 0; i <= 20; i++, frameAxis += 3)
+    if ((i % 10) == 0)
+      p.drawLine (o->horizontalLine (frameAxis, NumberRange (layerAxis - 3, layerAxis)));
+    else if (i & 1)
+      p.drawLine (o->horizontalLine (frameAxis, NumberRange (layerAxis, layerAxis)));
+    else
+      p.drawLine (o->horizontalLine (frameAxis, NumberRange (layerAxis - 2, layerAxis)));
+
+  // slider track
+  QPainterPath track = o->path (PredefinedPath::VOLUME_SLIDER_TRACK)
+    .translated (orig);
+  p.drawPath (track);
+
+  // cursor
+  QRect trackRect = o->rect (PredefinedRect::VOLUME_TRACK).translated (orig);
+  if (o->flipVolume ())
+    volume = 1 - volume;
+
+  layerAxis = o->layerSide (trackRect).middle ();
+  frameAxis = o->frameSide (trackRect).weight (volume);
+  QPoint cursor = o->frameLayerToXY (frameAxis, layerAxis);
+  QPainterPath head = o->path (PredefinedPath::VOLUME_SLIDER_HEAD)
+    .translated (cursor);
+  p.fillPath (head, QBrush (Qt::white));
+  p.setPen (m_viewer->getLightLineColor ());
+  p.drawPath (head);
 }
 
 //=============================================================================
@@ -914,42 +952,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) { // AREA
   drawHeader.drawColumnName ();
 
   drawHeader.drawSoundIcon (sc->isPlaying ());
-
-  QRect rr(rect.x() + 8, RowHeight * 2 + 3, rect.width() - 7, m_tabBox.y() - 3);
-
-  // slider subdivisions
-  p.setPen(m_viewer->getTextColor());
-  int xa = rr.x() + 7, ya = rr.y() + 4;
-  int y = ya;
-  for (int i = 0; i <= 20; i++, y += 3)
-    if ((i % 10) == 0)
-      p.drawLine(xa - 3, y, xa, y);
-    else if (i & 1)
-      p.drawLine(xa, y, xa, y);
-    else
-      p.drawLine(xa - 2, y, xa, y);
-
-  // slider
-  int ly = 60;
-  xa += 5;
-  p.drawPoint(xa, ya);
-  p.drawPoint(xa, ya + ly);
-  p.drawLine(xa - 1, ya + 1, xa - 1, ya + ly - 1);
-  p.drawLine(xa + 1, ya + 1, xa + 1, ya + ly - 1);
-
-  // cursor
-  QRect cursorRect;
-  getVolumeCursorRect(cursorRect, sc->getVolume(), rr.topLeft());
-
-  std::vector<QPointF> pts;
-  x = cursorRect.x();
-  y = cursorRect.y() + 4;
-  pts.push_back(QPointF(x, y));
-  pts.push_back(QPointF(x + 4.0, y + 4.0));
-  pts.push_back(QPointF(x + 8.0, y + 4.0));
-  pts.push_back(QPointF(x + 8.0, y - 4.0));
-  pts.push_back(QPointF(x + 4.0, y - 4.0));
-  drawPolygon(p, pts, true, m_viewer->getLightLineColor());
+  drawHeader.drawVolumeControl (sc->getVolume ());
 }
 
 //-----------------------------------------------------------------------------

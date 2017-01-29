@@ -43,6 +43,8 @@ public:
 	virtual int rowToFrameAxis (int frame) const override;
 
 	virtual QPoint frameLayerToXY (int frameAxis, int layerAxis) const override;
+  virtual int layerAxis (const QPoint &xy) const override;
+  virtual int frameAxis (const QPoint &xy) const override;
 
 	virtual NumberRange layerSide (const QRect &area) const override;
 	virtual NumberRange frameSide (const QRect &area) const override;
@@ -52,6 +54,7 @@ public:
   virtual const Orientation *next () const override { return orientations.leftToRight (); }
 
   virtual bool isVerticalTimeline () const override { return true;  }
+  virtual bool flipVolume () const override { return true;  }
 };
 
 class LeftToRightOrientation : public Orientation {
@@ -76,6 +79,8 @@ public:
 	virtual int rowToFrameAxis (int frame) const override;
 
 	virtual QPoint frameLayerToXY (int frameAxis, int layerAxis) const override;
+  virtual int layerAxis (const QPoint &xy) const override;
+  virtual int frameAxis (const QPoint &xy) const override;
 
 	virtual NumberRange layerSide (const QRect &area) const override;
 	virtual NumberRange frameSide (const QRect &area) const override;
@@ -85,9 +90,14 @@ public:
   virtual const Orientation *next () const override { return orientations.topToBottom (); }
 
   virtual bool isVerticalTimeline () const override { return false; }
+  virtual bool flipVolume () const override { return false; }
 };
 
 /// -------------------------------------------------------------------------------
+
+int NumberRange::weight (double toWeight) const { // weight ranging 0..1
+  return _from + (_to - _from) * toWeight;
+}
 
 NumberRange NumberRange::adjusted (int addFrom, int addTo) const {
   return NumberRange (_from + addFrom, _to + addTo);
@@ -218,11 +228,17 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::COLUMN_NUMBER, QRect (0, 0, -1, -1)); // don't display
   addRect (PredefinedRect::SOUND_ICON, QRect (29, 3 * CELL_HEIGHT + 4, 40, 30));
 
+  QPoint soundTopLeft (20, CELL_HEIGHT * 2 + 7);
+  int trackLen = 60;
+  addRect (PredefinedRect::VOLUME_TRACK, QRect (soundTopLeft, QSize (3, trackLen)));
+  // addRect (PredefinedRect::VOLUME_AREA, QRect (8, CELL_HEIGHT * 2 + 3, CELL_WIDTH - 7, m_tabBox.y () - 3));
+
   addLine (PredefinedLine::LOCKED, verticalLine ((CELL_DRAG_WIDTH + 1) / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
   addLine (PredefinedLine::CONTINUE_LEVEL, verticalLine (CELL_WIDTH / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::CONTINUE_LEVEL_WITH_NAME, verticalLine (CELL_WIDTH - 11, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::EXTENDER_LINE, horizontalLine (0, NumberRange (-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0)));
+
 
   addDimension (PredefinedDimension::LAYER, CELL_WIDTH);
   addDimension (PredefinedDimension::FRAME, CELL_HEIGHT);
@@ -265,8 +281,27 @@ TopToBottomOrientation::TopToBottomOrientation () {
   playTo.translate (PLAY_RANGE_X, CELL_HEIGHT - 1);
   addPath (PredefinedPath::END_PLAY_RANGE, playTo);
 
+  QPainterPath track (QPointF (0, 0));
+  track.lineTo (QPointF (1, 1));
+  track.lineTo (QPointF (1, trackLen - 1));
+  track.lineTo (QPointF (0, trackLen));
+  track.lineTo (QPointF (-1, trackLen - 1));
+  track.lineTo (QPointF (-1, 1));
+  track.lineTo (QPointF (0, 0));
+  track.translate (soundTopLeft);
+  addPath (PredefinedPath::VOLUME_SLIDER_TRACK, track);
+
+  QPainterPath head (QPointF (0, 0));
+  head.lineTo (QPointF (4, 4));
+  head.lineTo (QPointF (8, 4));
+  head.lineTo (QPointF (8, -4));
+  head.lineTo (QPointF (4, -4));
+  head.lineTo (QPointF (0, 0));
+  addPath (PredefinedPath::VOLUME_SLIDER_HEAD, head);
+
   addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (KEY_ICON_WIDTH, 0));
   addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (30, 75));
+  addPoint (PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT, soundTopLeft - QPoint (5, 0));
 
   addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, FRAME_HEADER_WIDTH));
   addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, LAYER_HEADER_HEIGHT));
@@ -290,6 +325,12 @@ int TopToBottomOrientation::rowToFrameAxis (int frame) const {
 }
 QPoint TopToBottomOrientation::frameLayerToXY (int frameAxis, int layerAxis) const {
 	return QPoint (layerAxis, frameAxis);
+}
+int TopToBottomOrientation::layerAxis (const QPoint &xy) const {
+  return xy.x ();
+}
+int TopToBottomOrientation::frameAxis (const QPoint &xy) const {
+  return xy.y ();
 }
 NumberRange TopToBottomOrientation::layerSide (const QRect &area) const {
 	return NumberRange (area.left (), area.right ());
@@ -356,6 +397,10 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::COLUMN_NUMBER, eye.translated (4 * EYE_WIDTH, 0));
   addRect (PredefinedRect::SOUND_ICON, eye.translated (EYE_WIDTH, 0));
 
+  QPoint soundTopLeft (columnName.left (), columnName.bottom () - 8);
+  int trackLen = 60;
+  addRect (PredefinedRect::VOLUME_TRACK, QRect (soundTopLeft, QSize (trackLen, 3)));
+
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));
   addLine (PredefinedLine::CONTINUE_LEVEL, verticalLine (CELL_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
@@ -403,8 +448,27 @@ LeftToRightOrientation::LeftToRightOrientation () {
   playTo.translate (CELL_WIDTH - 1, PLAY_RANGE_Y);
   addPath (PredefinedPath::END_PLAY_RANGE, playTo);
 
+  QPainterPath track (QPointF (0, 0));
+  track.lineTo (QPointF (1, 1));
+  track.lineTo (QPointF (trackLen - 1, 1));
+  track.lineTo (QPointF (trackLen, 0));
+  track.lineTo (QPointF (trackLen - 1, -1));
+  track.lineTo (QPointF (1, -1));
+  track.lineTo (QPointF (0, 0));
+  track.translate (soundTopLeft);
+  addPath (PredefinedPath::VOLUME_SLIDER_TRACK, track);
+
+  QPainterPath head (QPointF (0, 0));
+  head.lineTo (QPointF (4, -4));
+  head.lineTo (QPointF (4, -8));
+  head.lineTo (QPointF (-4, -8));
+  head.lineTo (QPointF (-4, -4));
+  head.lineTo (QPointF (0, 0));
+  addPath (PredefinedPath::VOLUME_SLIDER_HEAD, head);
+
   addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (0, KEY_ICON_HEIGHT));
   addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (75, 30));
+  addPoint (PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT, soundTopLeft + QPoint (0, 5));
 
   addRange (PredefinedRange::HEADER_LAYER, NumberRange (0, FRAME_HEADER_HEIGHT));
   addRange (PredefinedRange::HEADER_FRAME, NumberRange (0, LAYER_HEADER_WIDTH));
@@ -428,6 +492,12 @@ int LeftToRightOrientation::rowToFrameAxis (int frame) const {
 }
 QPoint LeftToRightOrientation::frameLayerToXY (int frameAxis, int layerAxis) const {
 	return QPoint (frameAxis, layerAxis);
+}
+int LeftToRightOrientation::layerAxis (const QPoint &xy) const {
+  return xy.y ();
+}
+int LeftToRightOrientation::frameAxis (const QPoint &xy) const {
+  return xy.x ();
 }
 NumberRange LeftToRightOrientation::layerSide (const QRect &area) const {
 	return NumberRange (area.top (), area.bottom ());
