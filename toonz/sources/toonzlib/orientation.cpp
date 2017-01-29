@@ -63,15 +63,16 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_WIDTH = 8;
   const int EXTENDER_HEIGHT = 15;
   const int SOUND_PREVIEW_HEIGHT = 6;
-  const int FRAME_HEADER_HEIGHT = 50; // increased from PLAY_MARKER_SIZE + (3 * ONION_DOT_SIZE + ONION_SIZE) / 2 + 2;
-  const int LAYER_HEADER_WIDTH = 530;
+  const int FRAME_HEADER_HEIGHT = 50;
+  const int LAYER_HEADER_WIDTH = 380;
   const int PLAY_RANGE_Y = 0;
   const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = PLAY_MARKER_SIZE;
   const int ICON_WIDTH = 21;
   const int ICON_OFFSET = ICON_WIDTH + 1;
-  const int ICONS_WIDTH = ICON_OFFSET * 4;
-  const int LAYER_NUMBER_WIDTH = 90;
-  const int LAYER_NAME_WIDTH = 175;
+  const int ICONS_WIDTH = ICON_OFFSET * 4; // 88
+  const int LAYER_NUMBER_WIDTH = 44;
+  const int LAYER_NAME_WIDTH = 130;
+  // remaining: 118
 
 public:
   LeftToRightOrientation ();
