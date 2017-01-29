@@ -103,6 +103,13 @@ NumberRange NumberRange::adjusted (int addFrom, int addTo) const {
   return NumberRange (_from + addFrom, _to + addTo);
 }
 
+double NumberRange::ratio (int at) const {
+  double result = ((double) at - _from) / (_to - _from);
+  if (result < 0) result = 0;
+  if (result > 1) result = 1;
+  return result;
+}
+
 /// -------------------------------------------------------------------------------
 
 //const int Orientations::COUNT = 2;
@@ -231,7 +238,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   QPoint soundTopLeft (20, CELL_HEIGHT * 2 + 7);
   int trackLen = 60;
   addRect (PredefinedRect::VOLUME_TRACK, QRect (soundTopLeft, QSize (3, trackLen)));
-  // addRect (PredefinedRect::VOLUME_AREA, QRect (8, CELL_HEIGHT * 2 + 3, CELL_WIDTH - 7, m_tabBox.y () - 3));
+  addRect (PredefinedRect::VOLUME_AREA, QRect (CELL_DRAG_WIDTH, CELL_HEIGHT * 2 + 4, 29 - CELL_DRAG_WIDTH, trackLen));
 
   addLine (PredefinedLine::LOCKED, verticalLine ((CELL_DRAG_WIDTH + 1) / 2, NumberRange (0, CELL_HEIGHT)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_WIDTH)));
@@ -400,6 +407,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   QPoint soundTopLeft (columnName.left (), columnName.bottom () - 8);
   int trackLen = 60;
   addRect (PredefinedRect::VOLUME_TRACK, QRect (soundTopLeft, QSize (trackLen, 3)));
+  addRect (PredefinedRect::VOLUME_AREA, QRect (columnName.topLeft (), QSize (trackLen, columnName.height ())));
 
   addLine (PredefinedLine::LOCKED, verticalLine (CELL_DRAG_HEIGHT / 2, NumberRange (0, CELL_WIDTH)));
   addLine (PredefinedLine::SEE_MARKER_THROUGH, horizontalLine (0, NumberRange (0, CELL_DRAG_HEIGHT)));

@@ -1758,9 +1758,15 @@ public:
 
   void onDrag(const QMouseEvent *event) override {
     if (!m_enabled) return;
-    double v =
-        (double)(60 - (event->pos().y() - (XsheetGUI::RowHeight * 2 + 4))) /
-        60.0;
+
+    const Orientation *o = getViewer ()->orientation ();
+    QRect track = o->rect (PredefinedRect::VOLUME_TRACK);
+    NumberRange range = o->frameSide (track);
+    int frameAxis = o->frameAxis (event->pos ());
+    double v = range.ratio (frameAxis);
+    if (o->flipVolume ())
+      v = 1 - v;
+
     TXsheet *xsh       = getViewer()->getXsheet();
     TXshColumn *column = xsh->getColumn(m_index);
     if (!column) return;

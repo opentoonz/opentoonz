@@ -43,6 +43,7 @@ public:
 	int length () const { return _to - _from;  }
   int middle () const { return (_to + _from) / 2; }
   int weight (double toWeight) const;
+  double ratio (int at) const;
 
   NumberRange adjusted (int addFrom, int addTo) const;
 };
@@ -88,8 +89,8 @@ enum class PredefinedRect {
   COLUMN_NAME, //! where to display column name. clicking will rename
   COLUMN_NUMBER,
   SOUND_ICON,
-  VOLUME_TRACK //! area where track is displayed
-  // VOLUME_AREA //! active area for mouse in sound column header
+  VOLUME_TRACK, //! area where track is displayed
+  VOLUME_AREA //! active area for volume control 
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked

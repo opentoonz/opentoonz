@@ -1513,8 +1513,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
               QTimer::singleShot(interval, this, SLOT(update()));
           }
           update();
-        } else if (x >= 15 && x <= 25 && RowHeight * 2 + 4 < y &&
-                   y < 8 * RowHeight + 4)
+        } else if (o->rect (PredefinedRect::VOLUME_AREA).contains (mouseInCell))
           setDragTool(XsheetGUI::DragTool::makeVolumeDragTool(m_viewer));
         else
           setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
@@ -1605,8 +1604,9 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
   TStageObjectId columnId = m_viewer->getObjectId(col);
   TStageObjectId parentId = xsh->getStageObjectParent(columnId);
 
-  if (col < 0) m_tooltip = tr("Click to select camera");
-  if (column && column->getSoundTextColumn())
+  if (col < 0)
+    m_tooltip = tr("Click to select camera");
+  else if (column && column->getSoundTextColumn())
     m_tooltip = tr("");
   else if (o->rect (PredefinedRect::DRAG_LAYER).contains(mouseInCell)) {
     m_tooltip = tr("Click to select column, drag to move it");
@@ -1619,10 +1619,9 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
   } else {
     if (column && column->getSoundColumn()) {
       // sound column
-      if (x > 20 && 3 * RowHeight + 5 <= y && y < 3 * RowHeight + 33)
+      if (o->rect (PredefinedRect::SOUND_ICON).contains (mouseInCell))
         m_tooltip = tr("Click to play the soundtrack back");
-      else if (x >= 10 && x <= 20 && RowHeight + RowHeight / 2 < y &&
-               y < 8 * RowHeight - RowHeight / 2)
+      else if (o->rect (PredefinedRect::VOLUME_AREA).contains (mouseInCell))
         m_tooltip = tr("Set the volume of the soundtrack");
     }
 
