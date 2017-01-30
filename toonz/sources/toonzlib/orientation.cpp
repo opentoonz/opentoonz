@@ -241,6 +241,7 @@ TopToBottomOrientation::TopToBottomOrientation () {
   addRect (PredefinedRect::LAYER_NAME, eyeArea);
   addRect (PredefinedRect::LAYER_NUMBER, QRect (0, 0, -1, -1)); // don't display
   addRect (PredefinedRect::SOUND_ICON, QRect (29, 3 * CELL_HEIGHT + 4, 40, 30));
+  addRect (PredefinedRect::LOOP_ICON, QRect (keyRect.left (), 0, 10, 11));
 
   QPoint soundTopLeft (20, CELL_HEIGHT * 2 + 7);
   int trackLen = 60;
@@ -429,6 +430,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::LAYER_NAME, columnName);
   addRect (PredefinedRect::LAYER_NUMBER, QRect (ICONS_WIDTH, 0, LAYER_NUMBER_WIDTH, CELL_HEIGHT));
   addRect (PredefinedRect::SOUND_ICON, eye.translated (ICON_OFFSET, 0));
+  addRect (PredefinedRect::LOOP_ICON, QRect (0, keyRect.top (), 10, 11));
 
   QPoint soundTopLeft (columnName.left (), columnName.bottom () - 8);
   int trackLen = 60;

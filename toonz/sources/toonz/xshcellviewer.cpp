@@ -1468,6 +1468,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 //-----------------------------------------------------------------------------
 
 void CellArea::drawKeyframe (QPainter &p, const QRect toBeUpdated) {
+  const Orientation *o = m_viewer->orientation ();
   int r0, r1, c0, c1;  // range of visible rows and columns
   CellRange visible = m_viewer->xyRectToRange (toBeUpdated);
   r0 = visible.from ().frame ();
@@ -1477,10 +1478,10 @@ void CellArea::drawKeyframe (QPainter &p, const QRect toBeUpdated) {
 
   static QPixmap selectedKey = QPixmap (":Resources/selected_key.bmp");
   static QPixmap key = QPixmap (":Resources/key.bmp");
-  const QRect &keyRect = m_viewer->orientation ()->rect (PredefinedRect::KEY_ICON);
+  const QRect &keyRect = o->rect (PredefinedRect::KEY_ICON);
 
   TXsheet *xsh = m_viewer->getXsheet ();
-  ColumnFan *columnFan = xsh->getColumnFan (m_viewer->orientation ());
+  ColumnFan *columnFan = xsh->getColumnFan (o);
   int col;
   for (col = c0; col <= c1; col++) {
     if (!columnFan->isActive (col)) continue;
@@ -1500,7 +1501,7 @@ void CellArea::drawKeyframe (QPainter &p, const QRect toBeUpdated) {
 
     /*- first, draw key segments -*/
     p.setPen (m_viewer->getTextColor ());
-    int line_layerAxis = layerAxis + m_viewer->orientation ()->layerSide (keyRect).middle ();
+    int line_layerAxis = layerAxis + o->layerSide (keyRect).middle ();
     for (row = row0; row <= row1; row++) {
       int segmentRow0, segmentRow1;
       double ease0, ease1;
@@ -1554,7 +1555,7 @@ void CellArea::drawKeyframe (QPainter &p, const QRect toBeUpdated) {
       // drawing loop button
       p.setBrush (Qt::white);
       p.setPen (Qt::black);
-      QPoint target = m_viewer->orientation ()->frameLayerToXY (icon_frameAxis, icon_layerAxis);
+      QPoint target = o->frameLayerToXY (icon_frameAxis, icon_layerAxis);
       p.drawRect (QRect (target, QSize (10, 10)));
       p.setBrush (Qt::NoBrush);
       // drawing the bottom edge (rounded)
@@ -1571,7 +1572,6 @@ void CellArea::drawKeyframe (QPainter &p, const QRect toBeUpdated) {
     }
     if (pegbar->isCycleEnabled ()) {
       // the row zigzag bellow the button
-      const Orientation *o = m_viewer->orientation ();
       int ymax = m_viewer->rowToFrameAxis (r1 + 1);
       int qy = icon_frameAxis + 12;
       int zig = 2;
@@ -1730,6 +1730,8 @@ public:
 //----------------------------------------------------------
 
 void CellArea::mousePressEvent(QMouseEvent *event) {
+  const Orientation *o = m_viewer->orientation ();
+
   m_viewer->setQtModifiers(event->modifiers());
   assert(!m_isPanning);
   m_isMousePressed = true;
@@ -1793,13 +1795,14 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
       // only if key frame area is active
       int k0, k1;
-      bool isKeyFrameArea =
-        (pegbar && pegbar->getKeyframeRange (k0, k1) &&
-        (k1 > k0 || k0 == row) && k0 <= row && row <= k1 + 1 &&
-        m_viewer->orientation ()->rect (PredefinedRect::KEYFRAME_AREA).contains (mouseInCell));
+      bool isKeyframeFrame =
+        pegbar && pegbar->getKeyframeRange (k0, k1) &&
+        (k1 > k0 || k0 == row) && k0 <= row && row <= k1 + 1;
+      bool isKeyFrameArea = isKeyframeFrame &&
+        o->rect (PredefinedRect::KEYFRAME_AREA).contains (mouseInCell);
+      bool accept = false;
 
       if (isKeyFrameArea) {           // They are in the keyframe selection
-        bool accept = false;
         if (pegbar->isKeyframe(row))  // in the keyframe
         {
           m_viewer->setCurrentRow(
@@ -1823,25 +1826,25 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
               accept = true;
             }
           }
-          if (row == k1 + 1)  // in the cycle toggle
-          {
-            pegbar->enableCycle(!pegbar->isCycleEnabled());
-            TUndoManager::manager()->add(new CycleUndo(pegbar, this));
-            accept = true;
-          }
         }
-        if (accept) {
-          m_viewer->dragToolClick (event);
-          event->accept ();
-          update ();
-          return;
-        }
-        // keep searching
       }
+      else if (isKeyframeFrame && row == k1 + 1 &&
+        o->rect (PredefinedRect::LOOP_ICON).contains (mouseInCell)) { // cycle toggle
+        pegbar->enableCycle (!pegbar->isCycleEnabled ());
+        TUndoManager::manager ()->add (new CycleUndo (pegbar, this));
+        accept = true;
+      }
+      if (accept) {
+        m_viewer->dragToolClick (event);
+        event->accept ();
+        update ();
+        return;
+      }
+      // keep searching
     }
 
     if ((!xsh->getCell(row, col).isEmpty()) && 
-      m_viewer->orientation ()->rect (PredefinedRect::DRAG_AREA).contains (mouseInCell)) {
+      o->rect (PredefinedRect::DRAG_AREA).contains (mouseInCell)) {
       TXshColumn *column = xsh->getColumn(col);
       if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
         int r0, r1;
@@ -1867,7 +1870,7 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     } else {
       m_viewer->getKeyframeSelection()->selectNone();
       if (isSoundColumn && 
-        m_viewer->orientation ()->rect (PredefinedRect::PREVIEW_TRACK).contains (mouseInCell))
+        o->rect (PredefinedRect::PREVIEW_TRACK).contains (mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeSoundScrubTool(
             m_viewer, column->getSoundColumn()));
       else if (m_levelExtenderRect.contains(pos.x, pos.y))
@@ -1893,6 +1896,8 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void CellArea::mouseMoveEvent(QMouseEvent *event) {
+  const Orientation *o = m_viewer->orientation ();
+
   m_viewer->setQtModifiers(event->modifiers());
   setCursor(Qt::ArrowCursor);
   QPoint pos        = event->pos();
@@ -1921,6 +1926,7 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
   QPoint cellTopLeft = m_viewer->positionToXY (CellPosition (row, col));
   int x = m_pos.x () - cellTopLeft.x ();
   int y = m_pos.y () - cellTopLeft.y ();
+  QPoint mouseInCell = m_pos - cellTopLeft;
 
   TXsheet *xsh = m_viewer->getXsheet();
 
@@ -1937,9 +1943,10 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
 
   TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
   int k0, k1;
-  if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
-      pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row &&
-      row <= k1 + 1 && ColumnWidth - 13 <= x && x <= ColumnWidth) {
+  bool isKeyframeFrame = Preferences::instance ()->isShowKeyframesOnXsheetCellAreaEnabled () &&
+    pegbar && pegbar->getKeyframeRange (k0, k1) && k0 <= row && row <= k1 + 1;
+  if (isKeyframeFrame
+      && o->rect (PredefinedRect::KEYFRAME_AREA).contains (mouseInCell)) {
     if (pegbar->isKeyframe(row))  // key frame
       m_tooltip = tr("Click to select keyframe, drag to move it");
     else {
@@ -1955,10 +1962,12 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
         else if (rh1 == row)
           m_tooltip = tr("Click and drag to set the deceleration range");
       }
-      if (row == k1 + 1)  // cycle toggle of key frames
-        m_tooltip = tr("Set the cycle of previous keyframes");
     }
-  } else if ((!xsh->getCell(row, col).isEmpty() || isSoundColumn) && x < 6)
+  }
+  else if (isKeyframeFrame && row == k1 + 1 &&
+    o->rect (PredefinedRect::LOOP_ICON).contains (mouseInCell)) // cycle toggle of key frames
+    m_tooltip = tr ("Set the cycle of previous keyframes");
+  else if ((!xsh->getCell(row, col).isEmpty() || isSoundColumn) && x < 6)
     m_tooltip = tr("Click and drag to move the selection");
   else if (isZeraryColumn)
     m_tooltip = QString::fromStdWString(column->getZeraryFxColumn()
