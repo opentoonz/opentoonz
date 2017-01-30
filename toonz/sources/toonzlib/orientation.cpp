@@ -61,7 +61,7 @@ class LeftToRightOrientation : public Orientation {
   const int CELL_HEIGHT = 20;
   const int CELL_DRAG_HEIGHT = 6;
   const int EXTENDER_WIDTH = 8;
-  const int EXTENDER_HEIGHT = 15;
+  const int EXTENDER_HEIGHT = 12;
   const int SOUND_PREVIEW_HEIGHT = 6;
   const int FRAME_HEADER_HEIGHT = 50;
   const int LAYER_HEADER_WIDTH = 380;
@@ -389,8 +389,8 @@ LeftToRightOrientation::LeftToRightOrientation () {
   QRect nameRect = cellRect.adjusted (7, 4, -6, 0);
   addRect (PredefinedRect::CELL_NAME, nameRect);
   addRect (PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect.adjusted (0, 0, 0, -KEY_ICON_HEIGHT));
-  addRect (PredefinedRect::END_EXTENDER, QRect (1, -EXTENDER_HEIGHT - KEY_ICON_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
-  addRect (PredefinedRect::BEGIN_EXTENDER, QRect (-EXTENDER_WIDTH, -EXTENDER_HEIGHT - KEY_ICON_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+  addRect (PredefinedRect::END_EXTENDER, QRect (1, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+  addRect (PredefinedRect::BEGIN_EXTENDER, QRect (-EXTENDER_WIDTH, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect (PredefinedRect::KEYFRAME_AREA, keyRect);
   addRect (PredefinedRect::DRAG_AREA, QRect (0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
   QRect soundRect (0, CELL_DRAG_HEIGHT, CELL_WIDTH, CELL_HEIGHT - CELL_DRAG_HEIGHT - SOUND_PREVIEW_HEIGHT);
@@ -507,7 +507,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   head.lineTo (QPointF (0, 0));
   addPath (PredefinedPath::VOLUME_SLIDER_HEAD, head);
 
-  addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (0, KEY_ICON_HEIGHT));
+  addPoint (PredefinedPoint::KEY_HIDDEN, QPoint (0, 10));
   addPoint (PredefinedPoint::EXTENDER_XY_RADIUS, QPoint (75, 30));
   addPoint (PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT, soundTopLeft + QPoint (0, 5));
 
