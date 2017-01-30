@@ -892,6 +892,8 @@ void CellArea::drawSelectionBackground (QPainter &p) const {
 }
 
 void CellArea::drawExtenderHandles (QPainter &p) {
+  const Orientation *o = m_viewer->orientation ();
+
   m_levelExtenderRect = QRect ();
   m_upperLevelExtenderRect = QRect ();
 
@@ -911,17 +913,17 @@ void CellArea::drawExtenderHandles (QPainter &p) {
 
   // smart tab
   QPoint smartTabPosOffset = Preferences::instance ()->isShowKeyframesOnXsheetCellAreaEnabled ()
-    ? QPoint (0, 0) : m_viewer->orientation ()->point (PredefinedPoint::KEY_HIDDEN);
+    ? QPoint (0, 0) : o->point (PredefinedPoint::KEY_HIDDEN);
 
   int distance, offset;
   TApp::instance ()->getCurrentScene ()->getScene ()->getProperties ()->getMarkers (
     distance, offset);
   if (distance == 0) distance = 6;
 
-  QPoint xyRadius = m_viewer->orientation ()->point (PredefinedPoint::EXTENDER_XY_RADIUS);
+  QPoint xyRadius = o->point (PredefinedPoint::EXTENDER_XY_RADIUS);
 
   // bottom / right extender handle
-  m_levelExtenderRect = m_viewer->orientation ()->rect (PredefinedRect::END_EXTENDER)
+  m_levelExtenderRect = o->rect (PredefinedRect::END_EXTENDER)
     .translated (selected.bottomRight () + smartTabPosOffset);
   p.setPen (Qt::black);
   p.setBrush (SmartTabColor);
@@ -930,14 +932,14 @@ void CellArea::drawExtenderHandles (QPainter &p) {
     ? m_viewer->getLightLineColor ()
     : m_viewer->getMarkerLineColor ();
   p.setPen (color);
-  QLine extenderLine = m_viewer->orientation ()->line (PredefinedLine::EXTENDER_LINE);
+  QLine extenderLine = o->line (PredefinedLine::EXTENDER_LINE);
   extenderLine.setP1 (extenderLine.p1 () + smartTabPosOffset);
   p.drawLine (extenderLine.translated (selected.bottomRight ()));
 
   // up / left extender handle
   if (isCtrlPressed && selRow0 > 0 && !m_viewer->areCellsSelectedEmpty ()) {
-    QPoint properPoint = m_viewer->orientation ()->topRightCorner (selected);
-    m_upperLevelExtenderRect = m_viewer->orientation ()->rect (PredefinedRect::BEGIN_EXTENDER)
+    QPoint properPoint = o->topRightCorner (selected);
+    m_upperLevelExtenderRect = o->rect (PredefinedRect::BEGIN_EXTENDER)
       .translated (properPoint + smartTabPosOffset);
     p.setPen (Qt::black);
     p.setBrush (SmartTabColor);
@@ -955,13 +957,13 @@ void CellArea::drawExtenderHandles (QPainter &p) {
 //-----------------------------------------------------------------------------
 
 void CellArea::drawSoundCell(QPainter &p, int row, int col) {
+  const Orientation *o = m_viewer->orientation ();
   TXshSoundColumn *soundColumn =
       m_viewer->getXsheet()->getColumn(col)->getSoundColumn();
   QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
   int x           = xy.x ();
   int y           = xy.y ();
-  QRect cellRect = m_viewer->orientation ()->rect (PredefinedRect::CELL)
-    .translated (xy);
+  QRect cellRect = o->rect (PredefinedRect::CELL).translated (xy);
   QRect rect = cellRect.adjusted (1, 0, -1, 0);
   int maxNumFrame = soundColumn->getMaxFrame() + 1;
   int startFrame  = soundColumn->getFirstRow();
@@ -996,15 +998,15 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   drawEndOfDragHandle (p, isLastRow, xy, cellColor);
   drawLockedDottedLine (p, soundColumn->isLocked (), xy, cellColor);
 
-  QRect trackRect = m_viewer->orientation ()->rect (PredefinedRect::SOUND_TRACK)
+  QRect trackRect = o->rect (PredefinedRect::SOUND_TRACK)
     .translated (xy);
-  QRect previewRect = m_viewer->orientation ()->rect (PredefinedRect::PREVIEW_TRACK)
+  QRect previewRect = o->rect (PredefinedRect::PREVIEW_TRACK)
     .translated (xy);
-  NumberRange trackBounds = m_viewer->orientation ()->layerSide (trackRect);
-  NumberRange previewBounds = m_viewer->orientation ()->layerSide (previewRect);
+  NumberRange trackBounds = o->layerSide (trackRect);
+  NumberRange previewBounds = o->layerSide (previewRect);
   NumberRange trackAndPreview (trackBounds.from (), previewBounds.to ());
 
-  NumberRange timeBounds = m_viewer->orientation ()->frameSide (trackRect);
+  NumberRange timeBounds = o->frameSide (trackRect);
   int offset  = row - cell.getFrameId().getNumber(); // rows since start of the clip
   int begin   = timeBounds.from (); // time axis
   int end     = timeBounds.to ();
@@ -1013,7 +1015,7 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   int trackWidth = trackBounds.length ();
   int lastMin, lastMax;
   DoublePair minmax;
-  soundLevel->getValueAtPixel(m_viewer->orientation (), soundPixel, minmax);
+  soundLevel->getValueAtPixel(o, soundPixel, minmax);
 
   double pmin = minmax.first;
   double pmax = minmax.second;
@@ -1026,7 +1028,7 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
 
   int i;
   for (i = begin; i <= end; i++) {
-    soundLevel->getValueAtPixel(m_viewer->orientation (), soundPixel, minmax);
+    soundLevel->getValueAtPixel(o, soundPixel, minmax);
     soundPixel++;
     int min, max;
     pmin = minmax.first;
@@ -1038,7 +1040,7 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
 
     if (scrub && i % 2) {
       p.setPen (m_viewer->getSoundColumnHlColor ());
-      QLine stroke = m_viewer->orientation ()->horizontalLine (i, previewBounds);
+      QLine stroke = o->horizontalLine (i, previewBounds);
       p.drawLine (stroke);
     }
     else if (i != begin || !isFirstRow) {
@@ -1047,16 +1049,16 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
         p.setPen(cellColor);
       else
         p.setPen(m_viewer->getSoundColumnTrackColor());
-      QLine stroke = m_viewer->orientation ()->horizontalLine (i, previewBounds);
+      QLine stroke = o->horizontalLine (i, previewBounds);
       p.drawLine (stroke);
     }
 
     if (i != begin) {
       // "audio track" in the middle of the column
       p.setPen(m_viewer->getSoundColumnTrackColor());
-      QLine minLine = m_viewer->orientation ()->horizontalLine (i, NumberRange (lastMin, min));
+      QLine minLine = o->horizontalLine (i, NumberRange (lastMin, min));
       p.drawLine (minLine);
-      QLine maxLine = m_viewer->orientation ()->horizontalLine (i, NumberRange (lastMax, max));
+      QLine maxLine = o->horizontalLine (i, NumberRange (lastMax, max));
       p.drawLine (maxLine);
     }
 
@@ -1074,21 +1076,15 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   if (isFirstRow) {
     QRect modifierRect = m_viewer->orientation ()->rect (PredefinedRect::BEGIN_SOUND_EDIT)
       .translated (xy);
-    if (r0 != r0WithoutOff) {
+    if (r0 != r0WithoutOff)
       p.fillRect (modifierRect, SoundColumnExtenderColor);
-      // p.drawLine (m_viewer->orientation ()->horizontalLine (begin + 1, trackAndPreview));
-      // p.drawLine (m_viewer->orientation ()->horizontalLine (begin + 2, trackAndPreview));
-    }
     m_soundLevelModifyRects.append(modifierRect); // list of clipping rects
   }
   if (isLastRow) {
     QRect modifierRect = m_viewer->orientation ()->rect (PredefinedRect::END_SOUND_EDIT)
       .translated (xy);
-    if (r1 != r1WithoutOff) {
+    if (r1 != r1WithoutOff)
       p.fillRect (modifierRect, SoundColumnExtenderColor);
-      // p.drawLine (m_viewer->orientation ()->horizontalLine (end, trackAndPreview));
-      // p.drawLine (m_viewer->orientation ()->horizontalLine (end - 1, trackAndPreview));
-    }
     m_soundLevelModifyRects.append(modifierRect);
   }
 }
@@ -1125,6 +1121,8 @@ void CellArea::drawLockedDottedLine (QPainter &p, bool isLocked, const QPoint &x
 //-----------------------------------------------------------------------------
 
 void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
+  const Orientation *o = m_viewer->orientation ();
+
   TXsheet *xsh  = m_viewer->getXsheet();
   TXshCell cell = xsh->getCell(row, col);
   TXshCell prevCell;
@@ -1143,7 +1141,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
   int x      = xy.x ();
   int y      = xy.y ();
-  QRect cellRect = m_viewer->orientation ()->rect (PredefinedRect::CELL)
+  QRect cellRect = o->rect (PredefinedRect::CELL)
     .translated (xy);
   QRect rect = cellRect.adjusted (1, 1, -1, -1);
   if (cell.isEmpty()) {  // it means previous is not empty
@@ -1204,19 +1202,16 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // draw marker interval
   if (isAfterMarkers) {
     p.setPen(m_viewer->getMarkerLineColor());
-    p.drawLine(m_viewer->orientation ()->line (PredefinedLine::SEE_MARKER_THROUGH)
-      .translated (xy));
+    p.drawLine(o->line (PredefinedLine::SEE_MARKER_THROUGH).translated (xy));
   }
 
-  QRect nameRect = m_viewer->orientation ()->rect (PredefinedRect::CELL_NAME)
-    .translated (xy);
+  QRect nameRect = o->rect (PredefinedRect::CELL_NAME).translated (xy);
 
   if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
     TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
     int r0, r1;
     if (pegbar && pegbar->getKeyframeRange (r0, r1))
-      nameRect = m_viewer->orientation ()->rect (PredefinedRect::CELL_NAME_WITH_KEYFRAME)
-        .translated (xy);
+      nameRect = o->rect (PredefinedRect::CELL_NAME_WITH_KEYFRAME).translated (xy);
   }
 
   // draw text in red if the file does not exist
@@ -1243,7 +1238,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     PredefinedLine which = Preferences::instance ()->isLevelNameOnEachMarkerEnabled ()
       ? PredefinedLine::CONTINUE_LEVEL : PredefinedLine::CONTINUE_LEVEL_WITH_NAME;
 
-    QLine continueLine = m_viewer->orientation ()->line (which).translated (xy);
+    QLine continueLine = o->line (which).translated (xy);
     p.drawLine(continueLine);
   }
   // draw frame number
@@ -1354,6 +1349,8 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
 
 void CellArea::drawPaletteCell(QPainter &p, int row, int col,
                                bool isReference) {
+  const Orientation *o = m_viewer->orientation ();
+
   TXsheet *xsh  = m_viewer->getXsheet();
   TXshCell cell = xsh->getCell(row, col);
   TXshCell prevCell;
@@ -1368,8 +1365,9 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
   int x      = xy.x ();
   int y      = xy.y ();
-  QRect rect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
-  if (cell.isEmpty()) {  // vuol dire che la precedente non e' vuota
+  QRect cellRect = o->rect (PredefinedRect::CELL).translated (xy);
+  QRect rect = cellRect.adjusted (1, 1, -1, -1);
+  if (cell.isEmpty()) {  // this means the former is not empty
     QColor levelEndColor = m_viewer->getTextColor();
     levelEndColor.setAlphaF(0.3);
     p.setPen(levelEndColor);
@@ -1407,7 +1405,8 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 
   if (isAfterMarkers) {
     p.setPen(m_viewer->getMarkerLineColor());
-    p.drawLine(x, y, x + 6, y);
+    p.drawLine (o->line (PredefinedLine::SEE_MARKER_THROUGH)
+      .translated (xy));
   }
 
   if (sameLevel && prevCell.m_frameId == cell.m_frameId &&
@@ -1415,8 +1414,9 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
                           // do not write anything and draw a vertical line
     QPen oldPen = p.pen();
     p.setPen(QPen(m_viewer->getTextColor(), 1));
-    int x = rect.center().x();
-    p.drawLine(x, rect.top(), x, rect.bottom());
+    QLine continueLine = o->line (
+      PredefinedLine::CONTINUE_LEVEL).translated (xy);
+    p.drawLine (continueLine);
     p.setPen(oldPen);
   } else {
     TFrameId fid = cell.m_frameId;
