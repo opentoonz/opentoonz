@@ -25,11 +25,12 @@
 using std::vector;
 using std::map;
 
-// Defines timeline direction: top to bottom;  left to right; right to left.
+// Defines timeline direction: top to bottom;  left to right.
 // old (vertical timeline) = new (universal)    = old (kept)
 //                x        =   layer axis       =   column
 //                y        =   frame axis       =    row
 
+// A pair of numbers
 class DVAPI NumberRange {
 	int _from, _to; // _from <= _to
 
@@ -129,6 +130,7 @@ enum class PredefinedRange {
   HEADER_LAYER, //! size of row header width(v) / column header height(h)
 };
 
+// Knows everything about geometry of a particular orientation.
 class DVAPI Orientation {
 protected:
   map<PredefinedRect, QRect> _rects;
@@ -184,6 +186,7 @@ protected:
   void addRange (PredefinedRange which, const NumberRange &range);
 };
 
+// Enumerates all orientations available in the system as global const objects.
 class DVAPI Orientations {
 	const Orientation *_topToBottom, *_leftToRight;
   vector<const Orientation *> _all;
