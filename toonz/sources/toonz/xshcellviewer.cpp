@@ -1799,34 +1799,44 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
         m_viewer->orientation ()->rect (PredefinedRect::KEYFRAME_AREA).contains (mouseInCell));
 
       if (isKeyFrameArea) {           // They are in the keyframe selection
+        bool accept = false;
         if (pegbar->isKeyframe(row))  // in the keyframe
         {
           m_viewer->setCurrentRow(
               row);  // If you click on the key, change the current row as well
           setDragTool(XsheetGUI::DragTool::makeKeyframeMoverTool(m_viewer));
+          accept = true;
         } else {
           int r0, r1;
           double e0, e1;
           int rh0, rh1;
           if (pegbar->getKeyframeSpan(row, r0, e0, r1, e1) &&
               getEaseHandles(r0, r1, e0, e1, rh0, rh1)) {
-            if (rh0 == row)  // in a keyframe handle
-              setDragTool(XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(
-                  m_viewer, true, r0));
-            else if (rh1 == row)  // in a keyframe handle
-              setDragTool(XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(
-                  m_viewer, false, r1));
+            if (rh0 == row) { // in a keyframe handle
+              setDragTool (XsheetGUI::DragTool::makeKeyFrameHandleMoverTool (
+                m_viewer, true, r0));
+              accept = true;
+            }
+            else if (rh1 == row) { // in a keyframe handle
+              setDragTool (XsheetGUI::DragTool::makeKeyFrameHandleMoverTool (
+                m_viewer, false, r1));
+              accept = true;
+            }
           }
           if (row == k1 + 1)  // in the cycle toggle
           {
             pegbar->enableCycle(!pegbar->isCycleEnabled());
             TUndoManager::manager()->add(new CycleUndo(pegbar, this));
+            accept = true;
           }
         }
-        m_viewer->dragToolClick(event);
-        event->accept();
-        update();
-        return;
+        if (accept) {
+          m_viewer->dragToolClick (event);
+          event->accept ();
+          update ();
+          return;
+        }
+        // keep searching
       }
     }
 

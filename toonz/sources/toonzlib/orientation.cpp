@@ -390,7 +390,7 @@ LeftToRightOrientation::LeftToRightOrientation () {
   addRect (PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect.adjusted (0, 0, 0, -KEY_ICON_HEIGHT));
   addRect (PredefinedRect::END_EXTENDER, QRect (1, -EXTENDER_HEIGHT - KEY_ICON_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect (PredefinedRect::BEGIN_EXTENDER, QRect (-EXTENDER_WIDTH, -EXTENDER_HEIGHT - KEY_ICON_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
-  addRect (PredefinedRect::KEYFRAME_AREA, QRect (0, CELL_HEIGHT - KEY_ICON_HEIGHT, CELL_WIDTH, KEY_ICON_HEIGHT));
+  addRect (PredefinedRect::KEYFRAME_AREA, keyRect);
   addRect (PredefinedRect::DRAG_AREA, QRect (0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
   QRect soundRect (0, CELL_DRAG_HEIGHT, CELL_WIDTH, CELL_HEIGHT - CELL_DRAG_HEIGHT - SOUND_PREVIEW_HEIGHT);
   addRect (PredefinedRect::SOUND_TRACK, soundRect);
