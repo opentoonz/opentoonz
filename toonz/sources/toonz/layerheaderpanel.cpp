@@ -3,6 +3,9 @@
 #include <QPainter>
 
 #include "xsheetviewer.h"
+#include "xshcolumnviewer.h"
+
+using XsheetGUI::ColumnArea;
 
 #if QT_VERSION >= 0x050500
 LayerHeaderPanel::LayerHeaderPanel (XsheetViewer *viewer, QWidget *parent, Qt::WindowFlags flags)
@@ -59,19 +62,10 @@ void LayerHeaderPanel::paintEvent (QPaintEvent *event) {
   QColor slightlyLighter = { mix (background, Qt::white, 0.95) };
   p.fillRect (QRect (QPoint (0, 0), size ()), slightlyLighter);
 
-  // code duplication with: xshcolumnviewer.cpp DrawHeader methods
-
-  static QPixmap eyePixmap = QPixmap (":Resources/x_prev_eye.png");
-  drawIcon (p, PredefinedRect::EYE, XsheetGUI::PreviewVisibleColor, eyePixmap);
-
-  static QPixmap camstandPixmap = QPixmap (":Resources/x_table_view.png");
-  drawIcon (p, PredefinedRect::PREVIEW_LAYER, boost::none, camstandPixmap);
-
-  static QPixmap lockPixmap = QPixmap (":Resources/x_lock.png");
-  drawIcon (p, PredefinedRect::LOCK, QColor (255, 255, 255, 128), lockPixmap);
-
-  static QPixmap soundPixmap = QPixmap (":Resources/sound_header_off.png");
-  drawIcon (p, PredefinedRect::SOUND_ICON, boost::none, soundPixmap);
+  drawIcon (p, PredefinedRect::EYE, XsheetGUI::PreviewVisibleColor, ColumnArea::Pixmaps::eye ());
+  drawIcon (p, PredefinedRect::PREVIEW_LAYER, boost::none, ColumnArea::Pixmaps::cameraStand ());
+  drawIcon (p, PredefinedRect::LOCK, QColor (255, 255, 255, 128), ColumnArea::Pixmaps::lock ());
+  drawIcon (p, PredefinedRect::SOUND_ICON, boost::none, ColumnArea::Pixmaps::sound ());
 
   QRect numberRect = o->rect (PredefinedRect::LAYER_NUMBER);
   p.drawText (numberRect, Qt::AlignCenter | Qt::TextSingleLine, "#");
@@ -80,6 +74,17 @@ void LayerHeaderPanel::paintEvent (QPaintEvent *event) {
   p.drawText (nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
     QObject::tr ("Layer name"));
 
+  drawLines (p, numberRect, nameRect);
+}
+
+void LayerHeaderPanel::drawIcon (QPainter &p, PredefinedRect rect, optional<QColor> fill, const QPixmap &pixmap) const {
+  QRect iconRect = orientations.leftToRight ()->rect (rect);
+  if (fill)
+    p.fillRect (iconRect, *fill);
+  p.drawPixmap (iconRect, pixmap);
+}
+
+void LayerHeaderPanel::drawLines (QPainter &p, const QRect &numberRect, const QRect &nameRect) const {
   p.setPen (withAlpha (m_viewer->getTextColor (), 0.5));
 
   QLine line = { leftSide (shorter (numberRect)).translated (2, 0) };
@@ -90,13 +95,6 @@ void LayerHeaderPanel::paintEvent (QPaintEvent *event) {
 
   line = rightSide (shorter (nameRect));
   p.drawLine (line);
-}
-
-void LayerHeaderPanel::drawIcon (QPainter &p, PredefinedRect rect, optional<QColor> fill, const QPixmap &pixmap) const {
-  QRect iconRect = orientations.leftToRight ()->rect (rect);
-  if (fill)
-    p.fillRect (iconRect, *fill);
-  p.drawPixmap (iconRect, pixmap);
 }
 
 void LayerHeaderPanel::showOrHide (const Orientation *o) {

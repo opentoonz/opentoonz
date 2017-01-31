@@ -264,6 +264,16 @@ public:
 
   QPixmap getColumnIcon(int columnIndex);
 
+  class Pixmaps {
+  public:
+    static const QPixmap &eye ();
+    static const QPixmap &cameraStand ();
+    static const QPixmap &cameraStandTransparent ();
+    static const QPixmap &lock ();
+    static const QPixmap &sound ();
+    static const QPixmap &soundPlaying ();
+  };
+
 protected:
   void select(int columnIndex, QMouseEvent *event);
 

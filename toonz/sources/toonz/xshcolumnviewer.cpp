@@ -536,6 +536,31 @@ void ColumnArea::DrawHeader ::prepare () const {
 }
 
 //-----------------------------------------------------------------------------
+const QPixmap &ColumnArea::Pixmaps ::eye () {
+  static QPixmap eye = QPixmap (":Resources/x_prev_eye.png");
+  return eye;
+}
+const QPixmap &ColumnArea::Pixmaps ::cameraStand () {
+  static QPixmap cameraStand = QPixmap (":Resources/x_table_view.png");
+  return cameraStand;
+}
+const QPixmap &ColumnArea::Pixmaps ::cameraStandTransparent () {
+  static QPixmap cameraStandTransparent = QPixmap (":Resources/x_table_view_transp.png");
+  return cameraStandTransparent;
+}
+const QPixmap &ColumnArea::Pixmaps ::lock () {
+  static QPixmap lock = QPixmap (":Resources/x_lock.png");
+  return lock;
+}
+const QPixmap &ColumnArea::Pixmaps ::sound () {
+  static QPixmap sound = QPixmap (":Resources/sound_header_off.png");
+  return sound;
+}
+const QPixmap &ColumnArea::Pixmaps ::soundPlaying () {
+  static QPixmap soundPlaying = QPixmap (":Resources/sound_header_on.png");
+  return soundPlaying;
+}
+//-----------------------------------------------------------------------------
 
 void ColumnArea::DrawHeader ::levelColors (QColor &columnColor, QColor &dragColor) const {
   enum { Normal, Reference, Control } usage = Reference;
@@ -621,11 +646,10 @@ void ColumnArea::DrawHeader ::drawEye () const {
 
   QRect prevViewRect = o->rect (PredefinedRect::EYE_AREA).translated (orig);
   QRect eyeRect = o->rect (PredefinedRect::EYE).translated (orig);
-  static QPixmap prevViewPix = QPixmap (":Resources/x_prev_eye.png");
 
   // preview visible toggle
   p.fillRect (prevViewRect, PreviewVisibleColor);
-  p.drawPixmap (eyeRect, prevViewPix);
+  p.drawPixmap (eyeRect, Pixmaps::eye ());
 }
 
 void ColumnArea::DrawHeader ::drawPreviewToggle (int opacity) const {
@@ -637,13 +661,11 @@ void ColumnArea::DrawHeader ::drawPreviewToggle (int opacity) const {
 
   QRect tableViewRect = o->rect (PredefinedRect::PREVIEW_LAYER_AREA).translated (orig);
   QRect tableViewImgRect = o->rect (PredefinedRect::PREVIEW_LAYER).translated (orig);
-  static QPixmap tableViewPix = QPixmap (":Resources/x_table_view.png");
-  static QPixmap tableTranspViewPix = QPixmap (":Resources/x_table_view_transp.png");
 
   p.fillRect (tableViewRect, CamStandVisibleColor);
   p.drawPixmap (tableViewImgRect, opacity < 255
-    ? tableTranspViewPix
-    : tableViewPix);
+    ? Pixmaps::cameraStandTransparent ()
+    : Pixmaps::cameraStand ());
 }
 
 void ColumnArea::DrawHeader ::drawLock () const {
@@ -651,7 +673,6 @@ void ColumnArea::DrawHeader ::drawLock () const {
     return;
 
   QRect lockModeRect = o->rect (PredefinedRect::LOCK).translated (orig);
-  static QPixmap lockModePix = QPixmap (":Resources/x_lock.png");
 
   // lock button
   p.setPen (Qt::gray);
@@ -660,7 +681,7 @@ void ColumnArea::DrawHeader ::drawLock () const {
   lockModeRect.adjust (1, 1, -1, -1);
   bool isLocked = column && column->isLocked ();
   if (isLocked)
-    p.drawPixmap (lockModeRect, lockModePix);
+    p.drawPixmap (lockModeRect, Pixmaps::lock ());
 }
 
 void ColumnArea::DrawHeader ::drawColumnNumber () const {
@@ -700,12 +721,9 @@ void ColumnArea::DrawHeader ::drawColumnName () const {
 }
 
 void ColumnArea::DrawHeader ::drawSoundIcon (bool isPlaying) const {
-  static QPixmap soundActiveIcon = QPixmap (":Resources/sound_header_on.png");
-  static QPixmap soundIcon = QPixmap (":Resources/sound_header_off.png");
-
   QRect rect = m_viewer->orientation ()->rect (PredefinedRect::SOUND_ICON)
     .translated (orig);
-  p.drawPixmap (rect, isPlaying ? soundActiveIcon : soundIcon);
+  p.drawPixmap (rect, isPlaying ? Pixmaps::soundPlaying () : Pixmaps::sound ());
 }
 
 void ColumnArea::DrawHeader ::drawVolumeControl (double volume) const {
