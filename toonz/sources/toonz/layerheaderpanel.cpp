@@ -22,11 +22,32 @@ LayerHeaderPanel::LayerHeaderPanel (XsheetViewer *viewer, QWidget *parent, Qt::W
 LayerHeaderPanel::~LayerHeaderPanel () {
 }
 
-QColor mix (const QColor &a, const QColor &b, double w) {
-  return QColor (
-    a.red () * w + b.red () * (1 - w),
-    a.green () * w + b.green () * (1 - w),
-    a.blue () * w + b.blue () * (1 - w));
+namespace {
+
+  QColor mix (const QColor &a, const QColor &b, double w) {
+    return QColor (
+      a.red () * w + b.red () * (1 - w),
+      a.green () * w + b.green () * (1 - w),
+      a.blue () * w + b.blue () * (1 - w));
+  }
+
+  QColor withAlpha (const QColor &color, int alpha) {
+    QColor result (color);
+    result.setAlpha (alpha);
+    return result;
+  }
+
+  QRect shorter (const QRect original) {
+    return original.adjusted (0, 2, 0, -2);
+  }
+
+  QLine leftSide (const QRect &r) {
+    return QLine (r.topLeft (), r.bottomLeft ());
+  }
+
+  QLine rightSide (const QRect &r) {
+    return QLine (r.topRight (), r.bottomRight ());
+  }
 }
 
 void LayerHeaderPanel::paintEvent (QPaintEvent *event) {
@@ -58,6 +79,17 @@ void LayerHeaderPanel::paintEvent (QPaintEvent *event) {
   QRect nameRect = o->rect (PredefinedRect::LAYER_NAME).adjusted (2, 0, -2, 0);
   p.drawText (nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
     QObject::tr ("Layer name"));
+
+  p.setPen (withAlpha (m_viewer->getTextColor (), 192));
+
+  QLine line = { leftSide (shorter (numberRect)).translated (2, 0) };
+  p.drawLine (line);
+
+  line = rightSide (shorter (numberRect)).translated (-2, 0);
+  p.drawLine (line);
+
+  line = rightSide (shorter (nameRect));
+  p.drawLine (line);
 }
 
 void LayerHeaderPanel::drawIcon (QPainter &p, PredefinedRect rect, optional<QColor> fill, const QPixmap &pixmap) const {
