@@ -168,7 +168,7 @@ TXsheet::TXsheetImp::~TXsheetImp() {
 //-----------------------------------------------------------------------------
 
 void TXsheet::TXsheetImp::initColumnFans () {
-  for (auto o : orientations.all ()) {
+  for (auto o : Orientations::all ()) {
     int index = o->dimension (PredefinedDimension::INDEX);
     m_columnFans[index].setDimension (o->dimension (PredefinedDimension::LAYER));
   }

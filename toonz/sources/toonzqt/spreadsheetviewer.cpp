@@ -395,7 +395,7 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
     , m_markRowDistance(6)
     , m_markRowOffset(0)
     , m_isComputingSize(false) {
-  // m_orientation = orientations.topToBottom ();
+  // m_orientation = Orientations::topToBottom ();
 
   setFocusPolicy(Qt::NoFocus);
 

@@ -162,7 +162,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("XsheetViewer");
 
-  m_orientation = orientations.leftToRight ();
+  m_orientation = Orientations::leftToRight ();
 
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());

@@ -1457,7 +1457,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     // when clicking the column fan
     else if (m_col >= 0 && !fan->isActive(m_col))  // column Fan
     {
-      for (auto o : orientations.all ()) {
+      for (auto o : Orientations::all ()) {
         fan = xsh->getColumnFan (o);
         for (int i = m_col; i >= 0 && !fan->isActive (i); i--)
           fan->activate (i);

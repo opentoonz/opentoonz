@@ -14,7 +14,7 @@ LayerHeaderPanel::LayerHeaderPanel (XsheetViewer *viewer, QWidget *parent, Qt::W
 #endif
   : QWidget (parent, flags), m_viewer (viewer)
 {
-  const Orientation *o = orientations.leftToRight ();
+  const Orientation *o = Orientations::leftToRight ();
   QRect rect = o->rect (PredefinedRect::LAYER_HEADER_PANEL);
   
   setObjectName ("layerHeaderPanel");
@@ -56,7 +56,7 @@ namespace {
 void LayerHeaderPanel::paintEvent (QPaintEvent *event) {
   QPainter p (this);
 
-  const Orientation *o = orientations.leftToRight ();
+  const Orientation *o = Orientations::leftToRight ();
   
   QColor background = m_viewer->getBGColor ();
   QColor slightlyLighter = { mix (background, Qt::white, 0.95) };
@@ -78,7 +78,7 @@ void LayerHeaderPanel::paintEvent (QPaintEvent *event) {
 }
 
 void LayerHeaderPanel::drawIcon (QPainter &p, PredefinedRect rect, optional<QColor> fill, const QPixmap &pixmap) const {
-  QRect iconRect = orientations.leftToRight ()->rect (rect);
+  QRect iconRect = Orientations::leftToRight ()->rect (rect);
   if (fill)
     p.fillRect (iconRect, *fill);
   p.drawPixmap (iconRect, pixmap);

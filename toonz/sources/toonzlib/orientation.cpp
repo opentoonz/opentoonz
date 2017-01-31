@@ -6,8 +6,6 @@
 
 using std::pair;
 
-Orientations orientations;
-
 namespace {
   const int KEY_ICON_WIDTH = 11;
   const int KEY_ICON_HEIGHT = 13;
@@ -50,7 +48,7 @@ public:
   virtual CellPosition arrowShift (int direction) const override;
 
   virtual QString name () const override { return "Xsheet"; }
-  virtual const Orientation *next () const override { return orientations.leftToRight (); }
+  virtual const Orientation *next () const override { return Orientations::leftToRight (); }
 
   virtual bool isVerticalTimeline () const override { return true;  }
   virtual bool flipVolume () const override { return true;  }
@@ -94,7 +92,7 @@ public:
   virtual CellPosition arrowShift (int direction) const override;
 
   virtual QString name () const override { return "Timeline"; }
-  virtual const Orientation *next () const override { return orientations.topToBottom (); }
+  virtual const Orientation *next () const override { return Orientations::topToBottom (); }
 
   virtual bool isVerticalTimeline () const override { return false; }
   virtual bool flipVolume () const override { return false; }
@@ -133,15 +131,19 @@ Orientations::~Orientations () {
 	delete _leftToRight; _leftToRight = nullptr;
 }
 
-const Orientation *Orientations::topToBottom () const {
-  if (!_topToBottom)
-    throw std::exception ("!_topToBottom");
-  return _topToBottom;
+const Orientations &Orientations::instance () {
+  static Orientations singleton;
+  return singleton;
 }
-const Orientation *Orientations::leftToRight () const {
-  if (!_leftToRight)
-    throw std::exception ("!_leftToRight");
-  return _leftToRight;
+
+const Orientation *Orientations::topToBottom () {
+  return instance ()._topToBottom;
+}
+const Orientation *Orientations::leftToRight () {
+  return instance ()._leftToRight;
+}
+const vector<const Orientation *> &Orientations::all () {
+  return instance ()._all;
 }
 
 /// -------------------------------------------------------------------------------

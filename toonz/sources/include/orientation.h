@@ -192,18 +192,18 @@ class DVAPI Orientations {
 	const Orientation *_topToBottom, *_leftToRight;
   vector<const Orientation *> _all;
 
+  Orientations ();
 public:
-	Orientations ();
 	~Orientations ();
+
+  static const Orientations &instance ();
 
   static const int COUNT = 2;
 
-  const Orientation *topToBottom () const;
-  const Orientation *leftToRight () const;
+  static const Orientation *topToBottom ();
+  static const Orientation *leftToRight ();
 
-  const vector<const Orientation *> &all () const { return _all;  }
+  static const vector<const Orientation *> &all ();
 };
-
-extern DVVAR Orientations orientations;
 
 #endif

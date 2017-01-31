@@ -213,7 +213,7 @@ void TXshSoundLevel::computeValuesFor (const Orientation *o) {
 //-----------------------------------------------------------------------------
 
 void TXshSoundLevel::computeValues () {
-  for (auto o : orientations.all ())
+  for (auto o : Orientations::all ())
     computeValuesFor (o);
 }
 
