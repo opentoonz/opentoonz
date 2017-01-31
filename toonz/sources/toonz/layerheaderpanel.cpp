@@ -31,9 +31,9 @@ namespace {
       a.blue () * w + b.blue () * (1 - w));
   }
 
-  QColor withAlpha (const QColor &color, int alpha) {
+  QColor withAlpha (const QColor &color, double alpha) {
     QColor result (color);
-    result.setAlpha (alpha);
+    result.setAlpha (alpha * 255);
     return result;
   }
 
@@ -80,7 +80,7 @@ void LayerHeaderPanel::paintEvent (QPaintEvent *event) {
   p.drawText (nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
     QObject::tr ("Layer name"));
 
-  p.setPen (withAlpha (m_viewer->getTextColor (), 192));
+  p.setPen (withAlpha (m_viewer->getTextColor (), 0.5));
 
   QLine line = { leftSide (shorter (numberRect)).translated (2, 0) };
   p.drawLine (line);
