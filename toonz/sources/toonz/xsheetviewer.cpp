@@ -170,6 +170,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   QRect noteArea (0, 0, 75, 120);
   m_noteArea = new XsheetGUI::NoteArea(this);
   m_noteScrollArea = new XsheetScrollArea(this);
+  m_noteScrollArea->setObjectName ("xsheetArea");
   m_noteScrollArea->setWidget(m_noteArea);
   m_noteScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_noteScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

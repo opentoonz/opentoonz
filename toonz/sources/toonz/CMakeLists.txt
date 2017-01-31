@@ -62,6 +62,7 @@ set(MOC_HEADERS
     keyframedata.h
     keyframeselection.h
     keyframemover.h
+	layerheaderpanel.h
     levelcreatepopup.h
     levelsettingspopup.h
     linesfadepopup.h
@@ -217,6 +218,7 @@ set(SOURCES
     fxparameditorpopup.cpp
     histogrampopup.cpp
     insertfxpopup.cpp
+	layerheaderpanel.cpp
     levelcreatepopup.cpp
     levelsettingspopup.cpp
     linetestcapturepane.cpp

@@ -453,7 +453,8 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 #endif
     : QFrame(parent), m_viewer(parent), m_flipOrientationButton (nullptr),
     m_noteButton (nullptr), m_precNoteButton (nullptr),
-    m_nextNoteButton (nullptr), m_frameDisplayStyleCombo (nullptr) {
+    m_nextNoteButton (nullptr), m_frameDisplayStyleCombo (nullptr),
+    m_layerHeaderPanel (nullptr) {
 
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("cornerWidget");
@@ -463,6 +464,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_precNoteButton         = new QToolButton(this);
   m_nextNoteButton         = new QToolButton(this);
   m_frameDisplayStyleCombo = new QComboBox(this);
+  m_layerHeaderPanel       = new LayerHeaderPanel (m_viewer, this);
 
   //-----
 
@@ -536,41 +538,54 @@ void NoteArea::removeLayout () {
   currentLayout->removeWidget (m_precNoteButton);
   currentLayout->removeWidget (m_nextNoteButton);
   currentLayout->removeWidget (m_frameDisplayStyleCombo);
+  currentLayout->removeWidget (m_layerHeaderPanel);
   delete currentLayout;
 }
 
 void NoteArea::createLayout () {
-  setFixedSize (m_viewer->orientation ()->rect (PredefinedRect::NOTE_AREA).size ());
+  const Orientation *o = m_viewer->orientation ();
+  setFixedSize (o->rect (PredefinedRect::NOTE_AREA).size ());
 
-  QBoxLayout *mainLayout = new QBoxLayout (QBoxLayout::Direction (
-    m_viewer->orientation ()->dimension (PredefinedDimension::QBOXLAYOUT_DIRECTION)));
-  Qt::AlignmentFlag centerAlign = Qt::AlignmentFlag (
-    m_viewer->orientation ()->dimension (PredefinedDimension::CENTER_ALIGN));
-  mainLayout->setMargin (0);
-  mainLayout->setSpacing (0);
+  // has two elements: main layout and header panel
+  QVBoxLayout *panelLayout = new QVBoxLayout ();
+  panelLayout->setMargin (0);
+  panelLayout->setSpacing (0);
   {
-    mainLayout->addWidget (m_flipOrientationButton, 0, centerAlign);
-
-    mainLayout->addStretch (1);
-
-    mainLayout->addWidget (m_noteButton, 0, centerAlign);
-
-    QHBoxLayout *buttonsLayout = new QHBoxLayout ();
-    buttonsLayout->setMargin (0);
-    buttonsLayout->setSpacing (0);
+    QBoxLayout *mainLayout = new QBoxLayout (QBoxLayout::Direction (
+      o->dimension (PredefinedDimension::QBOXLAYOUT_DIRECTION)));
+    Qt::AlignmentFlag centerAlign = Qt::AlignmentFlag (
+      o->dimension (PredefinedDimension::CENTER_ALIGN));
+    mainLayout->setMargin (0);
+    mainLayout->setSpacing (0);
     {
-      buttonsLayout->addStretch (1);
-      buttonsLayout->addWidget (m_precNoteButton, 0);
-      buttonsLayout->addWidget (m_nextNoteButton, 0);
-      buttonsLayout->addStretch (1);
+      mainLayout->addWidget (m_flipOrientationButton, 0, centerAlign);
+
+      mainLayout->addStretch (1);
+
+      mainLayout->addWidget (m_noteButton, 0, centerAlign);
+
+      QHBoxLayout *buttonsLayout = new QHBoxLayout ();
+      buttonsLayout->setMargin (0);
+      buttonsLayout->setSpacing (0);
+      {
+        buttonsLayout->addStretch (1);
+        buttonsLayout->addWidget (m_precNoteButton, 0);
+        buttonsLayout->addWidget (m_nextNoteButton, 0);
+        buttonsLayout->addStretch (1);
+      }
+      mainLayout->addLayout (buttonsLayout, 0);
+
+      mainLayout->addStretch (1);
+
+      mainLayout->addWidget (m_frameDisplayStyleCombo, 0);
     }
-    mainLayout->addLayout (buttonsLayout, 0);
+    panelLayout->addLayout (mainLayout);
 
-    mainLayout->addStretch (1);
-
-    mainLayout->addWidget (m_frameDisplayStyleCombo, 0);
+    panelLayout->addWidget (m_layerHeaderPanel);
   }
-  setLayout (mainLayout);
+  setLayout (panelLayout);
+
+  m_layerHeaderPanel->showOrHide (o);
 }
 
 //-----------------------------------------------------------------------------

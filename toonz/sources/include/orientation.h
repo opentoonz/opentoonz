@@ -92,7 +92,8 @@ enum class PredefinedRect {
   SOUND_ICON,
   VOLUME_TRACK, //! area where track is displayed
   VOLUME_AREA, //! active area for volume control 
-  LOOP_ICON //! area for repeat animation icon
+  LOOP_ICON, //! area for repeat animation icon
+  LAYER_HEADER_PANEL //! panel displaying headers for the layer rows in timeline mode
 };
 enum class PredefinedLine {
   LOCKED, //! dotted vertical line when cell is locked

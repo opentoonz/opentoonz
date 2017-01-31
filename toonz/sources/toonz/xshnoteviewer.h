@@ -13,6 +13,8 @@
 #include <QFrame>
 #include <QScrollArea>
 
+#include "layerheaderpanel.h"
+
 //-----------------------------------------------------------------------------
 
 // forward declaration
@@ -125,6 +127,8 @@ class NoteArea final : public QFrame {
   QToolButton *m_precNoteButton;
 
   QComboBox *m_frameDisplayStyleCombo;
+
+  LayerHeaderPanel *m_layerHeaderPanel;
 
 public:
 #if QT_VERSION >= 0x050500
