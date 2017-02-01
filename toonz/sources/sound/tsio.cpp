@@ -8,10 +8,6 @@
 
 // static TPluginInfo info("soundIOPlugin");
 
-void cribbioNonCapiscoNulla() {}
-
-void mammaChePaura() {}
-
 void initSoundIo() {
   TSoundTrackReader::define("wav", TSoundTrackReaderWav::create);
   TSoundTrackWriter::define("wav", TSoundTrackWriterWav::create);

@@ -752,7 +752,7 @@
   <item>"STD_particlesFx.friction"			"Friction"			</item>
   <item>"STD_particlesFx.friction_ctrl"			"Control Image"		</item>
   <item>"STD_particlesFx.wind"			"Wind Intensity"		</item>
-  <item>"STD_particlesFx.wind_angle"			"Wing Angle"			</item>
+  <item>"STD_particlesFx.wind_angle"			"Wind Angle"			</item>
   <item>"STD_particlesFx.swing_mode"			"Swing Mode"		</item>
   <item>"STD_particlesFx.scattering_x"			"Horizontal"		</item>
   <item>"STD_particlesFx.scattering_y"			"Vertical"			</item>
@@ -1234,7 +1234,7 @@
   <item>"STD_iwa_TiledParticlesFx.friction"			"Friction"			</item>
   <item>"STD_iwa_TiledParticlesFx.friction_ctrl"			"Control Image"		</item>
   <item>"STD_iwa_TiledParticlesFx.wind"			"Wind Intensity"		</item>
-  <item>"STD_iwa_TiledParticlesFx.wind_angle"			"Wing Angle"			</item>
+  <item>"STD_iwa_TiledParticlesFx.wind_angle"			"Wind Angle"			</item>
   <item>"STD_iwa_TiledParticlesFx.swing_mode"			"Swing Mode"		</item>
   <item>"STD_iwa_TiledParticlesFx.scattering_x"			"Horizontal"		</item>
   <item>"STD_iwa_TiledParticlesFx.scattering_y"			"Vertical"			</item>

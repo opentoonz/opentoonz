@@ -20,12 +20,18 @@ public:
   int frame() const { return _frame; }
   int layer() const { return _layer; }
 
+  void setFrame (int frame) { _frame = frame; }
+  void setLayer (int layer) { _layer = layer; }
+
   CellPosition &operator=(const CellPosition &that) = default;
 
   operator bool() const { return _frame || _layer; }
 
   CellPosition operator+(const CellPosition &add) {
     return CellPosition(_frame + add._frame, _layer + add._layer);
+  }
+  CellPosition operator*(const CellPosition &mult) {
+    return CellPosition(_frame * mult._frame, _layer * mult._layer);
   }
   void ensureValid() {
     if (_frame < 0) _frame = 0;

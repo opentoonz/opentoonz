@@ -297,7 +297,9 @@ Preferences::Preferences()
     , m_fastRenderPath("desktop")
     , m_ffmpegTimeout(30)
     , m_shortcutPreset("defopentoonz")
-    , m_useNumpadForSwitchingStyles(true) {
+    , m_useNumpadForSwitchingStyles(true)
+    , m_useArrowKeyToShiftCellSelection(false)
+    , m_inputCellsWithoutDoubleClickingEnabled(false) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -571,6 +573,10 @@ Preferences::Preferences()
   setShortcutPreset(m_shortcutPreset.toStdString());
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "useArrowKeyToShiftCellSelection",
+           m_useArrowKeyToShiftCellSelection);
+  getValue(*m_settings, "inputCellsWithoutDoubleClickingEnabled",
+           m_inputCellsWithoutDoubleClickingEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -1342,4 +1348,19 @@ int Preferences::matchLevelFormat(const TFilePath &fp) const {
 void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
   m_useNumpadForSwitchingStyles = on;
   m_settings->setValue("useNumpadForSwitchingStyles", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableUseArrowKeyToShiftCellSelection(bool on) {
+  m_useArrowKeyToShiftCellSelection = on;
+  m_settings->setValue("useArrowKeyToShiftCellSelection", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableInputCellsWithoutDoubleClicking(bool on) {
+  m_inputCellsWithoutDoubleClickingEnabled = on;
+  m_settings->setValue("inputCellsWithoutDoubleClickingEnabled",
+                       on ? "1" : "0");
 }

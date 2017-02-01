@@ -905,11 +905,42 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
   int frameCount = getXsheet()->getFrameCount();
   CellPosition now(getCurrentRow(), getCurrentColumn());
   CellPosition shift = orientation()->arrowShift(event->key());
+  CellPosition stride (1, 1); // stride in row and column axes
+
+  TCellSelection *cellSel =
+      dynamic_cast<TCellSelection *>(TSelection::getCurrent());
+  // Use arrow keys to shift the cell selection. Ctrl + arrow keys to resize the
+  // selection range.
+  if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled() &&
+      cellSel && !cellSel->isEmpty()) {
+    int r0, c0, r1, c1;
+    cellSel->getSelectedCells(r0, c0, r1, c1);
+    stride.setFrame (cellSel->getSelectedCells ().getRowCount ());
+
+    if (m_cellArea->isControlPressed()) { // resize
+      if (r0 == r1 && shift.frame () < 0) return;
+      if (c0 == c1 && shift.layer () < 0) return;
+      cellSel->selectCells(r0, c0, r1 + shift.frame (), c1 + shift.layer ());
+      updateCells();
+      TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+      return;
+    } else { // shift
+      CellPosition offset (shift * stride);
+      int movedR0 = std::max (0, r0 + offset.frame ());
+      int movedC0 = std::max (0, c0 + offset.layer ());
+      int diffFrame = movedR0 - r0;
+      int diffLayer = movedC0 - c0;
+      cellSel->selectCells(r0 + diffFrame, c0 + diffLayer,
+                           r1 + diffFrame, c1 + diffLayer);
+      TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+    }
+  }
+
   if (shift) {
-    now = now + shift;
-    now.ensureValid();
-    setCurrentRow(now.frame());
-    setCurrentColumn(now.layer());
+    now = now + shift * stride;
+    now.ensureValid ();
+    setCurrentRow (now.frame ());
+    setCurrentColumn (now.layer ());
     return;
   }
 
@@ -1122,7 +1153,16 @@ void XsheetViewer::onSelectionSwitched(TSelection *oldSelection,
 /*! update display of the cell selection range in title bar
 */
 void XsheetViewer::onSelectionChanged(TSelection *selection) {
-  if ((TSelection *)getCellSelection() == selection) changeWindowTitle();
+  if ((TSelection *)getCellSelection() == selection) {
+    changeWindowTitle();
+    if (Preferences::instance()->isInputCellsWithoutDoubleClickingEnabled()) {
+      TCellSelection *cellSel = getCellSelection();
+      if (!cellSel->isEmpty())
+        m_cellArea->showRenameField(
+            cellSel->getSelectedCells().m_r0, cellSel->getSelectedCells().m_c0,
+            cellSel->getSelectedCells().getColCount() > 1);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

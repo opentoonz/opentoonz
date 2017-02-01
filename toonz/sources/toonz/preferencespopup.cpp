@@ -975,6 +975,18 @@ void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
       "NumpadForSwitchingStyles");
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onUseArrowKeyToShiftCellSelectionClicked(int on) {
+  m_pref->enableUseArrowKeyToShiftCellSelection(on);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onInputCellsWithoutDoubleClickingClicked(int on) {
+  m_pref->enableInputCellsWithoutDoubleClicking(on);
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1162,6 +1174,10 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Ignore Alpha Channel on Levels in Column 1"), this);
   CheckBox *showKeyframesOnCellAreaCB =
       new CheckBox(tr("Show Keyframes on Cell Area"), this);
+  CheckBox *useArrowKeyToShiftCellSelectionCB =
+      new CheckBox(tr("Use Arrow Key to Shift Cell Selection"), this);
+  CheckBox *inputCellsWithoutDoubleClickingCB =
+      new CheckBox(tr("Enable to Input Cells without Double Clicking"), this);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1416,6 +1432,10 @@ PreferencesPopup::PreferencesPopup()
   ignoreAlphaonColumn1CB->setChecked(m_pref->isIgnoreAlphaonColumn1Enabled());
   showKeyframesOnCellAreaCB->setChecked(
       m_pref->isShowKeyframesOnXsheetCellAreaEnabled());
+  useArrowKeyToShiftCellSelectionCB->setChecked(
+      m_pref->isUseArrowKeyToShiftCellSelectionEnabled());
+  inputCellsWithoutDoubleClickingCB->setChecked(
+      m_pref->isInputCellsWithoutDoubleClickingEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -1856,11 +1876,13 @@ PreferencesPopup::PreferencesPopup()
 
       xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 3, 0, 1, 2);
       xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
+      xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 5, 0, 1, 2);
+      xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 6, 0, 1, 2);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
     xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(5, 1);
+    xsheetFrameLay->setRowStretch(7, 1);
     xsheetBox->setLayout(xsheetFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
@@ -2188,6 +2210,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDragCellsBehaviourChanged(int)));
   ret = ret && connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onShowKeyframesOnCellAreaChanged(int)));
+  ret = ret &&
+        connect(useArrowKeyToShiftCellSelectionCB, SIGNAL(stateChanged(int)),
+                SLOT(onUseArrowKeyToShiftCellSelectionClicked(int)));
+  ret = ret &&
+        connect(inputCellsWithoutDoubleClickingCB, SIGNAL(stateChanged(int)),
+                SLOT(onInputCellsWithoutDoubleClickingClicked(int)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

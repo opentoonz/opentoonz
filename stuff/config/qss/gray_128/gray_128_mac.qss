@@ -125,21 +125,14 @@ QCheckBox:disabled {
 }
 QGroupBox {
   border: 1px solid;
-  margin-left: 5px;
-  margin-right: 5px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  margin: 6px 0 0 0;
+  padding: 5px 3px;
 }
 QGroupBox::title {
   subcontrol-origin: margin;
-  padding: 0px;
-  margin-top: -4px;
-  /*bottom: 3px;*/
   left: 15px;
+  margin: -2px 0 0 0;
+  padding: 0 3px;
 }
 /* ------ Toonz Classes Difinitions ------ */
 /* ------ TPanel ------ */
@@ -1154,5 +1147,3 @@ QDialog #dialogButtonFrame {
   border-right-color: white;
   border-bottom-color: white;
 }
-
-//# sourceMappingURL=gray_128_mac.qss.map

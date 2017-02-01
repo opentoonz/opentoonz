@@ -483,7 +483,8 @@ void TApp::onFrameSwitched() {
   TCellSelection *sel =
       dynamic_cast<TCellSelection *>(TSelection::getCurrent());
 
-  if (sel && !sel->isRowSelected(row)) {
+  if (sel && !sel->isRowSelected(row) &&
+      !Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled()) {
     sel->selectNone();
   }
 }
