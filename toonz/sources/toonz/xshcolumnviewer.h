@@ -228,25 +228,25 @@ class ColumnArea final : public QWidget {
     bool isEmpty, isCurrent;
     TXshColumn *column;
     QPoint orig;
+
   public:
+    DrawHeader(ColumnArea *area, QPainter &p, int col);
 
-    DrawHeader (ColumnArea *area, QPainter &p, int col);
+    void prepare() const;
 
-    void prepare () const;
+    void levelColors(QColor &columnColor, QColor &dragColor) const;
+    void soundColors(QColor &columnColor, QColor &dragColor) const;
+    void paletteColors(QColor &columnColor, QColor &dragColor) const;
 
-    void levelColors (QColor &columnColor, QColor &dragColor) const;
-    void soundColors (QColor &columnColor, QColor &dragColor) const;
-    void paletteColors (QColor &columnColor, QColor &dragColor) const;
+    void drawBaseFill(const QColor &columnColor, const QColor &dragColor) const;
+    void drawEye() const;
+    void drawPreviewToggle(int opacity) const;
+    void drawLock() const;
+    void drawColumnNumber() const;
+    void drawColumnName() const;
 
-    void drawBaseFill (const QColor &columnColor, const QColor &dragColor) const;
-    void drawEye () const;
-    void drawPreviewToggle (int opacity) const;
-    void drawLock () const;
-    void drawColumnNumber () const;
-    void drawColumnName () const;
-
-    void drawSoundIcon (bool isPlaying) const;
-    void drawVolumeControl (double volume) const;
+    void drawSoundIcon(bool isPlaying) const;
+    void drawVolumeControl(double volume) const;
   };
 
 public:
@@ -266,12 +266,12 @@ public:
 
   class Pixmaps {
   public:
-    static const QPixmap &eye ();
-    static const QPixmap &cameraStand ();
-    static const QPixmap &cameraStandTransparent ();
-    static const QPixmap &lock ();
-    static const QPixmap &sound ();
-    static const QPixmap &soundPlaying ();
+    static const QPixmap &eye();
+    static const QPixmap &cameraStand();
+    static const QPixmap &cameraStandTransparent();
+    static const QPixmap &lock();
+    static const QPixmap &sound();
+    static const QPixmap &soundPlaying();
   };
 
 protected:

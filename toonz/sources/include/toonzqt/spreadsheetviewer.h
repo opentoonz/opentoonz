@@ -371,10 +371,10 @@ public:
   int columnToX(int col) const;
   int rowToY(int row) const;
 
-  CellPosition xyToPosition (const QPoint &point) const;
-  QPoint positionToXY (const CellPosition &pos) const;
+  CellPosition xyToPosition(const QPoint &point) const;
+  QPoint positionToXY(const CellPosition &pos) const;
 
-  CellRange xyRectToRange (const QRect &rect) const;
+  CellRange xyRectToRange(const QRect &rect) const;
 
   // const Orientation *orientation () const { return m_orientation; }
 

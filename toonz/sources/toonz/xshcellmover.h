@@ -89,7 +89,7 @@ private:
 class LevelMoverTool : public XsheetGUI::DragTool {
 protected:
   TPoint m_grabOffset;
-  TPoint m_startPos, m_lastPos, m_aimedPos; // x=col, y=row coordinates
+  TPoint m_startPos, m_lastPos, m_aimedPos;  // x=col, y=row coordinates
   TDimension m_range;
 
   int m_qualifiers;

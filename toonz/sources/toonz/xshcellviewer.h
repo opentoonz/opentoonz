@@ -64,14 +64,18 @@ class CellArea final : public QWidget {
   RenameCellField *m_renameCell;
 
   void drawCells(QPainter &p, const QRect toBeUpdated);
-  void drawNonEmptyBackground (QPainter &p) const;
-  void drawFoldedColumns (QPainter &p, int layerAxis, const NumberRange &frameAxis) const;
-  void drawSelectionBackground (QPainter &p) const;
-  void drawExtenderHandles (QPainter &p);
-  
-  void drawDragHandle (QPainter &p, const QPoint &xy, const QColor &sideColor) const;
-  void drawEndOfDragHandle (QPainter &p, bool isEnd, const QPoint &xy, const QColor &cellColor) const;
-  void drawLockedDottedLine (QPainter &p, bool isLocked, const QPoint &xy, const QColor &cellColor) const;
+  void drawNonEmptyBackground(QPainter &p) const;
+  void drawFoldedColumns(QPainter &p, int layerAxis,
+                         const NumberRange &frameAxis) const;
+  void drawSelectionBackground(QPainter &p) const;
+  void drawExtenderHandles(QPainter &p);
+
+  void drawDragHandle(QPainter &p, const QPoint &xy,
+                      const QColor &sideColor) const;
+  void drawEndOfDragHandle(QPainter &p, bool isEnd, const QPoint &xy,
+                           const QColor &cellColor) const;
+  void drawLockedDottedLine(QPainter &p, bool isLocked, const QPoint &xy,
+                            const QColor &cellColor) const;
 
   void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
   void drawSoundTextCell(QPainter &p, int row, int col);
@@ -79,7 +83,7 @@ class CellArea final : public QWidget {
   void drawPaletteCell(QPainter &p, int row, int col, bool isReference = false);
 
   void drawKeyframe(QPainter &p, const QRect toBeUpdated);
-  void drawKeyframeLine (QPainter &p, int col, const NumberRange &rows) const;
+  void drawKeyframeLine(QPainter &p, int col, const NumberRange &rows) const;
 
   void drawNotes(QPainter &p, const QRect toBeUpdated);
 

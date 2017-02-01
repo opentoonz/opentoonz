@@ -25,7 +25,8 @@ class TIStream;
    isActive().
 
    Class provides column layer-axis coordinate too.
-   It's possible to know column index by column layer-axis coordinate, colToLayerAxis()
+   It's possible to know column index by column layer-axis coordinate,
+   colToLayerAxis()
    and vice versa, layerAxisToCol().
 */
 //=============================================================================
@@ -54,7 +55,7 @@ Constructs a ColumnFan with default value.
   ColumnFan();
 
   //! Adjust column sizes when switching orientation
-  void setDimension (int unfolded);
+  void setDimension(int unfolded);
 
   /*!
 Set column \b col not folded.
@@ -73,7 +74,8 @@ Return true if column \b col is active, column is not folded, else return false.
   bool isActive(int col) const;
 
   /*!
-Return column index of column in layer axis (x for vertical timeline, y for horizontal).
+Return column index of column in layer axis (x for vertical timeline, y for
+horizontal).
 \sa colToLayerAxis()
 */
   int layerAxisToCol(int layerAxis) const;
@@ -84,7 +86,7 @@ of column identified by \b col.
 */
   int colToLayerAxis(int col) const;
 
-  void copyFoldedStateFrom (const ColumnFan &from);
+  void copyFoldedStateFrom(const ColumnFan &from);
 
   bool isEmpty() const;
 

@@ -145,9 +145,9 @@ void TXshSoundLevel::saveData(TOStream &os) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSoundLevel::computeValuesFor (const Orientation *o) {
-  int frameHeight = o->dimension (PredefinedDimension::FRAME); // time axis
-  int index = o->dimension (PredefinedDimension::INDEX);
+void TXshSoundLevel::computeValuesFor(const Orientation *o) {
+  int frameHeight = o->dimension(PredefinedDimension::FRAME);  // time axis
+  int index       = o->dimension(PredefinedDimension::INDEX);
   map<int, DoublePair> &values = m_values[index];
 
   if (frameHeight == 0) frameHeight = 1;
@@ -178,7 +178,7 @@ void TXshSoundLevel::computeValuesFor (const Orientation *o) {
   if (absMaxPressure <= 0) return;
 
   // Adjusting using a fixed scaleFactor
-  int desiredAmplitude = o->dimension (PredefinedDimension::SOUND_AMPLITUDE);
+  int desiredAmplitude = o->dimension(PredefinedDimension::SOUND_AMPLITUDE);
   // results will be in range -desiredAmplitude .. +desiredAmplitude
   double weightA = desiredAmplitude / absMaxPressure;
 
@@ -212,15 +212,15 @@ void TXshSoundLevel::computeValuesFor (const Orientation *o) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSoundLevel::computeValues () {
-  for (auto o : Orientations::all ())
-    computeValuesFor (o);
+void TXshSoundLevel::computeValues() {
+  for (auto o : Orientations::all()) computeValuesFor(o);
 }
 
 //-----------------------------------------------------------------------------
 
-void TXshSoundLevel::getValueAtPixel(const Orientation *o, int pixel, DoublePair &values) const {
-  int index = o->dimension (PredefinedDimension::INDEX);
+void TXshSoundLevel::getValueAtPixel(const Orientation *o, int pixel,
+                                     DoublePair &values) const {
+  int index = o->dimension(PredefinedDimension::INDEX);
   std::map<int, DoublePair>::const_iterator it = m_values[index].find(pixel);
   if (it != m_values[index].end()) values = it->second;
 }

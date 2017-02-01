@@ -371,10 +371,10 @@ qDebug() << "check: " << srcIndex << ":" <<
 }
 
 void LevelMoverTool::onClick(const QMouseEvent *e) {
-  QPoint pos = e->pos();
-  CellPosition cellPosition = getViewer ()->xyToPosition (e->pos ());
-  int row = cellPosition.frame ();
-  int col = cellPosition.layer ();
+  QPoint pos                = e->pos();
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
 
   m_qualifiers = 0;
   if (Preferences::instance()->getDragCellsBehaviour() == 1)
@@ -510,8 +510,8 @@ void LevelMoverTool::onCellChange(int row, int col) {
 }
 
 void LevelMoverTool::onDrag(const QMouseEvent *e) {
-  CellPosition cellPosition = getViewer ()->xyToPosition (e->pos ());
-  onCellChange(cellPosition.frame (), cellPosition.layer ());
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  onCellChange(cellPosition.frame(), cellPosition.layer());
   refreshCellsArea();
   refreshColumnsArea();
 }
@@ -536,10 +536,12 @@ void LevelMoverTool::drawCellsArea(QPainter &p) {
   if (rect.x0 < 0) rect.x0 = 0;
   if (rect.y0 < 0) rect.y0 = 0;
 
-  QRect screen = getViewer ()->rangeToXYRect (CellRange (CellPosition (rect.y0, rect.x0), CellPosition (rect.y1 + 1, rect.x1 + 1)));
+  QRect screen = getViewer()->rangeToXYRect(CellRange(
+      CellPosition(rect.y0, rect.x0), CellPosition(rect.y1 + 1, rect.x1 + 1)));
   p.setPen((m_aimedPos == m_lastPos && m_validPos) ? QColor(190, 220, 255)
                                                    : QColor(255, 0, 0));
   int i;
-  for (i = 0; i < 3; i++) // thick border inside cell
-	  p.drawRect(QRect (screen.topLeft () + QPoint (i, i), screen.size () - QSize (2 * i, 2 * i)));
+  for (i = 0; i < 3; i++)  // thick border inside cell
+    p.drawRect(QRect(screen.topLeft() + QPoint(i, i),
+                     screen.size() - QSize(2 * i, 2 * i)));
 }

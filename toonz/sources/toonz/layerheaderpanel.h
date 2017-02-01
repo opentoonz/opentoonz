@@ -21,20 +21,24 @@ private:
 
 public:
 #if QT_VERSION >= 0x050500
-  LayerHeaderPanel (XsheetViewer *viewer, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  LayerHeaderPanel(XsheetViewer *viewer, QWidget *parent = 0,
+                   Qt::WindowFlags flags = 0);
 #else
-  LayerHeaderPanel (XsheetViewer *viewer, QWidget *parent = 0, Qt::WFlags flags = 0);
+  LayerHeaderPanel(XsheetViewer *viewer, QWidget *parent = 0,
+                   Qt::WFlags flags = 0);
 #endif
-  ~LayerHeaderPanel ();
+  ~LayerHeaderPanel();
 
-  void showOrHide (const Orientation *o);
+  void showOrHide(const Orientation *o);
 
 protected:
-  void paintEvent (QPaintEvent *event) override;
+  void paintEvent(QPaintEvent *event) override;
 
 private:
-  void drawIcon (QPainter &p, PredefinedRect rect, optional<QColor> fill, const QPixmap &pixmap) const;
-  void drawLines (QPainter &p, const QRect &numberRect, const QRect &nameRect) const;
+  void drawIcon(QPainter &p, PredefinedRect rect, optional<QColor> fill,
+                const QPixmap &pixmap) const;
+  void drawLines(QPainter &p, const QRect &numberRect,
+                 const QRect &nameRect) const;
 };
 
 #endif

@@ -11,15 +11,14 @@
 //=============================================================================
 // ColumnFan
 
-ColumnFan::ColumnFan() : m_firstFreePos(0), m_unfolded (74), m_folded (9) {}
-
+ColumnFan::ColumnFan() : m_firstFreePos(0), m_unfolded(74), m_folded(9) {}
 
 //-----------------------------------------------------------------------------
 
-void ColumnFan::setDimension (int unfolded) {
+void ColumnFan::setDimension(int unfolded) {
   m_unfolded = unfolded;
   // folded always 9
-  update ();
+  update();
 }
 
 //-----------------------------------------------------------------------------
@@ -51,7 +50,7 @@ void ColumnFan::update() {
 
 //-----------------------------------------------------------------------------
 
-int ColumnFan::layerAxisToCol (int coord) const {
+int ColumnFan::layerAxisToCol(int coord) const {
   if (coord < m_firstFreePos) {
     std::map<int, int>::const_iterator it = m_table.lower_bound(coord);
     if (it == m_table.end()) return -3;
@@ -63,7 +62,7 @@ int ColumnFan::layerAxisToCol (int coord) const {
 
 //-----------------------------------------------------------------------------
 
-int ColumnFan::colToLayerAxis (int col) const {
+int ColumnFan::colToLayerAxis(int col) const {
   int m = m_columns.size();
   if (col >= 0 && col < m)
     return m_columns[col].m_pos;
@@ -110,15 +109,15 @@ bool ColumnFan::isEmpty() const { return m_columns.empty(); }
 
 //-----------------------------------------------------------------------------
 
-void ColumnFan::copyFoldedStateFrom (const ColumnFan &from) {
-  for (int i = 0, n = (int) m_columns.size (); i < n; i++)
-    if (!from.isActive (i))
-      deactivate (i);
+void ColumnFan::copyFoldedStateFrom(const ColumnFan &from) {
+  for (int i = 0, n = (int)m_columns.size(); i < n; i++)
+    if (!from.isActive(i)) deactivate(i);
 }
 
 //-----------------------------------------------------------------------------
 
-void ColumnFan::saveData(TOStream &os) { // only saves indices of folded columns
+void ColumnFan::saveData(
+    TOStream &os) {  // only saves indices of folded columns
   int index, n = (int)m_columns.size();
   for (index = 0; index < n;) {
     while (index < n && m_columns[index].m_active) index++;

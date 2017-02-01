@@ -21,7 +21,6 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-
 class DVAPI TXshSoundLevel final : public TXshLevel {
   PERSIST_DECLARATION(TXshSoundLevel)
 
@@ -63,10 +62,11 @@ public:
   void save() override;
   void save(const TFilePath &path);
 
-  void computeValuesFor (const Orientation *o);
+  void computeValuesFor(const Orientation *o);
   void computeValues();
 
-  void getValueAtPixel(const Orientation *o, int pixel, DoublePair &values) const;
+  void getValueAtPixel(const Orientation *o, int pixel,
+                       DoublePair &values) const;
 
   /*! Set frame rate to \b fps. \sa getSamplePerFrame() */
   void setFrameRate(double fps);

@@ -77,140 +77,140 @@ void RowArea::setDragTool(DragTool *dragTool) {
 
 //-----------------------------------------------------------------------------
 
-void RowArea::drawRows (QPainter &p, int r0, int r1) {
+void RowArea::drawRows(QPainter &p, int r0, int r1) {
   int playR0, playR1, step;
-  XsheetGUI::getPlayRange (playR0, playR1, step);
+  XsheetGUI::getPlayRange(playR0, playR1, step);
 
-  if (!XsheetGUI::isPlayRangeEnabled ()) {
-    TXsheet *xsh = m_viewer->getXsheet ();
-    playR1 = xsh->getFrameCount () - 1;
-    playR0 = 0;
+  if (!XsheetGUI::isPlayRangeEnabled()) {
+    TXsheet *xsh = m_viewer->getXsheet();
+    playR1       = xsh->getFrameCount() - 1;
+    playR0       = 0;
   }
 
 #ifdef _WIN32
-  static QFont font ("Arial", XSHEET_FONT_SIZE, QFont::Bold);
+  static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Bold);
 #else
-  static QFont font ("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
 #endif
-  p.setFont (font);
+  p.setFont(font);
 
   // marker interval
   int distance, offset;
-  TApp::instance ()->getCurrentScene ()->getScene ()->getProperties ()->getMarkers (
-    distance, offset);
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+      distance, offset);
 
   // default value
   if (distance == 0) distance = 6;
 
-  QRect visibleRect = visibleRegion ().boundingRect ();
+  QRect visibleRect = visibleRegion().boundingRect();
 
-  int x0 = visibleRect.left ();
-  int x1 = visibleRect.right ();
-  int y0 = visibleRect.top ();
-  int y1 = visibleRect.bottom ();
-  NumberRange layerSide = m_viewer->orientation ()->layerSide (visibleRect);
+  int x0                = visibleRect.left();
+  int x1                = visibleRect.right();
+  int y0                = visibleRect.top();
+  int y1                = visibleRect.bottom();
+  NumberRange layerSide = m_viewer->orientation()->layerSide(visibleRect);
 
   for (int r = r0; r <= r1; r++) {
-    int frameAxis = m_viewer->rowToFrameAxis (r);
+    int frameAxis = m_viewer->rowToFrameAxis(r);
 
     //--- draw horizontal line
     QColor color = ((r - offset) % distance == 0 && r != 0)
-      ? m_viewer->getMarkerLineColor ()
-      : m_viewer->getLightLineColor ();
-    p.setPen (color);
-    QLine horizontalLine = m_viewer->orientation ()->horizontalLine (frameAxis, layerSide);
-    p.drawLine (horizontalLine);
+                       ? m_viewer->getMarkerLineColor()
+                       : m_viewer->getLightLineColor();
+    p.setPen(color);
+    QLine horizontalLine =
+        m_viewer->orientation()->horizontalLine(frameAxis, layerSide);
+    p.drawLine(horizontalLine);
 
     // draw frame text
     if (playR0 <= r && r <= playR1) {
-      p.setPen (((r - m_r0) % step == 0) ? m_viewer->getPreviewFrameTextColor ()
-        : m_viewer->getTextColor ());
+      p.setPen(((r - m_r0) % step == 0) ? m_viewer->getPreviewFrameTextColor()
+                                        : m_viewer->getTextColor());
     }
     // not in preview range
     else
-      p.setPen (m_viewer->getTextColor ());
+      p.setPen(m_viewer->getTextColor());
 
-    QPoint basePoint = m_viewer->positionToXY (CellPosition (r, 0));
-    QRect labelRect = m_viewer->orientation ()->rect (PredefinedRect::FRAME_LABEL)
-      .translated (basePoint);
-    int align = m_viewer->orientation ()->dimension (PredefinedDimension::FRAME_LABEL_ALIGN);
+    QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
+    QRect labelRect  = m_viewer->orientation()
+                          ->rect(PredefinedRect::FRAME_LABEL)
+                          .translated(basePoint);
+    int align = m_viewer->orientation()->dimension(
+        PredefinedDimension::FRAME_LABEL_ALIGN);
     // display time and/or frame number
-    switch (m_viewer->getFrameDisplayStyle ()) {
+    switch (m_viewer->getFrameDisplayStyle()) {
     case XsheetViewer::SecAndFrame: {
-      int frameRate = TApp::instance ()
-        ->getCurrentScene ()
-        ->getScene ()
-        ->getProperties ()
-        ->getOutputProperties ()
-        ->getFrameRate ();
+      int frameRate = TApp::instance()
+                          ->getCurrentScene()
+                          ->getScene()
+                          ->getProperties()
+                          ->getOutputProperties()
+                          ->getFrameRate();
       QString str;
       int koma = (r + 1) % frameRate;
       if (koma == 1) {
         int sec = (r + 1) / frameRate;
-        str = QString ("%1' %2\"")
-          .arg (QString::number (sec).rightJustified (2, '0'))
-          .arg (QString::number (koma).rightJustified (2, '0'));
-      }
-      else {
+        str     = QString("%1' %2\"")
+                  .arg(QString::number(sec).rightJustified(2, '0'))
+                  .arg(QString::number(koma).rightJustified(2, '0'));
+      } else {
         if (koma == 0) koma = frameRate;
-        str = QString ("%1\"").arg (QString::number (koma).rightJustified (2, '0'));
+        str = QString("%1\"").arg(QString::number(koma).rightJustified(2, '0'));
       }
 
-      p.drawText (labelRect, align, str);
+      p.drawText(labelRect, align, str);
 
       break;
     }
 
     case XsheetViewer::Frame: {
-      QString number = QString::number (r + 1);
-      p.drawText (labelRect, align, number);
+      QString number = QString::number(r + 1);
+      p.drawText(labelRect, align, number);
       break;
     }
 
-                              // 6 second sheet (144frames per page)
+    // 6 second sheet (144frames per page)
     case XsheetViewer::SixSecSheet: {
-      int frameRate = TApp::instance ()
-        ->getCurrentScene ()
-        ->getScene ()
-        ->getProperties ()
-        ->getOutputProperties ()
-        ->getFrameRate ();
+      int frameRate = TApp::instance()
+                          ->getCurrentScene()
+                          ->getScene()
+                          ->getProperties()
+                          ->getOutputProperties()
+                          ->getFrameRate();
       QString str;
       int koma = (r + 1) % (frameRate * 6);
       if ((r + 1) % frameRate == 1) {
         int page = (r + 1) / (frameRate * 6) + 1;
-        str = QString ("p%1 %2")
-          .arg (QString::number (page))
-          .arg (QString::number (koma).rightJustified (3, '0'));
-      }
-      else {
+        str      = QString("p%1 %2")
+                  .arg(QString::number(page))
+                  .arg(QString::number(koma).rightJustified(3, '0'));
+      } else {
         if (koma == 0) koma = frameRate * 6;
-        str = QString ("%1").arg (QString::number (koma).rightJustified (3, '0'));
+        str = QString("%1").arg(QString::number(koma).rightJustified(3, '0'));
       }
-      p.drawText (labelRect, align, str);
+      p.drawText(labelRect, align, str);
       break;
     }
-                                    // 3 second sheet (72frames per page)
+    // 3 second sheet (72frames per page)
     case XsheetViewer::ThreeSecSheet: {
-      int frameRate = TApp::instance ()
-        ->getCurrentScene ()
-        ->getScene ()
-        ->getProperties ()
-        ->getOutputProperties ()
-        ->getFrameRate ();
+      int frameRate = TApp::instance()
+                          ->getCurrentScene()
+                          ->getScene()
+                          ->getProperties()
+                          ->getOutputProperties()
+                          ->getFrameRate();
       QString str;
       int koma = (r + 1) % (frameRate * 3);
       if ((r + 1) % frameRate == 1) {
         int page = (r + 1) / (frameRate * 3) + 1;
-        str = QString ("p%1 %2")
-          .arg (QString::number (page))
-          .arg (QString::number (koma).rightJustified (2, '0'));
-      }
-      else {
+        str      = QString("p%1 %2")
+                  .arg(QString::number(page))
+                  .arg(QString::number(koma).rightJustified(2, '0'));
+      } else {
         if (koma == 0) koma = frameRate * 3;
-        str = QString ("%1").arg (QString::number (koma).rightJustified (2, '0'));
+        str = QString("%1").arg(QString::number(koma).rightJustified(2, '0'));
       }
-      p.drawText (labelRect, align, str);
+      p.drawText(labelRect, align, str);
       break;
     }
     }
@@ -219,35 +219,35 @@ void RowArea::drawRows (QPainter &p, int r0, int r1) {
 
 //-----------------------------------------------------------------------------
 
-void RowArea::drawPlayRange (QPainter &p, int r0, int r1) {
-  bool playRangeEnabled = XsheetGUI::isPlayRangeEnabled ();
+void RowArea::drawPlayRange(QPainter &p, int r0, int r1) {
+  bool playRangeEnabled = XsheetGUI::isPlayRangeEnabled();
 
   // Update the play range internal fields
   if (playRangeEnabled) {
     int step;
-    XsheetGUI::getPlayRange (m_r0, m_r1, step);
+    XsheetGUI::getPlayRange(m_r0, m_r1, step);
   }
   // if the preview range is not set, then put markers at the first and the last
   // frames of the scene
   else {
-    TXsheet *xsh = m_viewer->getXsheet ();
-    m_r1 = xsh->getFrameCount () - 1;
+    TXsheet *xsh = m_viewer->getXsheet();
+    m_r1         = xsh->getFrameCount() - 1;
     if (m_r1 == -1) return;
     m_r0 = 0;
   }
 
-  QColor ArrowColor = (playRangeEnabled) ? QColor (255, 255, 255) : grey150;
-  p.setBrush (QBrush (ArrowColor));
+  QColor ArrowColor = (playRangeEnabled) ? QColor(255, 255, 255) : grey150;
+  p.setBrush(QBrush(ArrowColor));
 
   if (m_r0 > r0 - 1 && r1 + 1 > m_r0)
-    m_viewer->drawPredefinedPath (p,
-      PredefinedPath::BEGIN_PLAY_RANGE, CellPosition (m_r0, 0),
-      ArrowColor, QColor (Qt::black));
+    m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_PLAY_RANGE,
+                                 CellPosition(m_r0, 0), ArrowColor,
+                                 QColor(Qt::black));
 
   if (m_r1 > r0 - 1 && r1 + 1 > m_r1)
-    m_viewer->drawPredefinedPath (p,
-      PredefinedPath::END_PLAY_RANGE, CellPosition (m_r1, 0),
-      ArrowColor, QColor (Qt::black));
+    m_viewer->drawPredefinedPath(p, PredefinedPath::END_PLAY_RANGE,
+                                 CellPosition(m_r1, 0), ArrowColor,
+                                 QColor(Qt::black));
 }
 
 //-----------------------------------------------------------------------------
@@ -256,9 +256,11 @@ void RowArea::drawCurrentRowGadget(QPainter &p, int r0, int r1) {
   int currentRow = m_viewer->getCurrentRow();
   if (currentRow < r0 || r1 < currentRow) return;
 
-  QPoint topLeft = m_viewer->positionToXY (CellPosition (currentRow, 0));
-  QRect header = m_viewer->orientation ()->rect (PredefinedRect::FRAME_HEADER)
-    .translated (topLeft).adjusted (1, 1, -2, -2);
+  QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
+  QRect header   = m_viewer->orientation()
+                     ->rect(PredefinedRect::FRAME_HEADER)
+                     .translated(topLeft)
+                     .adjusted(1, 1, -2, -2);
   p.fillRect(header, m_viewer->getCurrentRowBgColor());
 }
 
@@ -289,9 +291,11 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     p.setPen(currentPen);
   }
 
-  QRect onionRect = m_viewer->orientation ()->rect (PredefinedRect::ONION);
-  int onionCenter_frame = m_viewer->orientation ()->frameSide (onionRect).middle ();
-  int onionCenter_layer = m_viewer->orientation ()->layerSide (onionRect).middle ();
+  QRect onionRect = m_viewer->orientation()->rect(PredefinedRect::ONION);
+  int onionCenter_frame =
+      m_viewer->orientation()->frameSide(onionRect).middle();
+  int onionCenter_layer =
+      m_viewer->orientation()->layerSide(onionRect).middle();
 
   //-- draw movable onions
 
@@ -308,36 +312,35 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   if (minMos < 0)  // previous frames
   {
     int layerAxis = onionCenter_layer;
-    int fromFrameAxis = m_viewer->rowToFrameAxis (currentRow + minMos)
-      + onionCenter_frame;
-    int toFrameAxis = m_viewer->rowToFrameAxis (currentRow)
-      + onionCenter_frame;
-    QLine verticalLine = m_viewer->orientation ()
-      ->verticalLine (layerAxis, NumberRange (fromFrameAxis, toFrameAxis));
-    p.drawLine (verticalLine);
+    int fromFrameAxis =
+        m_viewer->rowToFrameAxis(currentRow + minMos) + onionCenter_frame;
+    int toFrameAxis = m_viewer->rowToFrameAxis(currentRow) + onionCenter_frame;
+    QLine verticalLine = m_viewer->orientation()->verticalLine(
+        layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
+    p.drawLine(verticalLine);
   }
   if (maxMos > 0)  // forward frames
   {
     int layerAxis = onionCenter_layer;
-    int fromFrameAxis = m_viewer->rowToFrameAxis (currentRow)
-      + onionCenter_frame;
-    int toFrameAxis = m_viewer->rowToFrameAxis (currentRow + maxMos)
-      + onionCenter_frame;
-    QLine verticalLine = m_viewer->orientation ()
-      ->verticalLine (layerAxis, NumberRange (fromFrameAxis, toFrameAxis));
-    p.drawLine (verticalLine);
+    int fromFrameAxis =
+        m_viewer->rowToFrameAxis(currentRow) + onionCenter_frame;
+    int toFrameAxis =
+        m_viewer->rowToFrameAxis(currentRow + maxMos) + onionCenter_frame;
+    QLine verticalLine = m_viewer->orientation()->verticalLine(
+        layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
+    p.drawLine(verticalLine);
   }
 
   // Draw onion skin main handle
-  QPoint handleTopLeft = m_viewer->positionToXY (CellPosition (currentRow, 0));
-  QRect handleRect = onionRect.translated (handleTopLeft);
-  int angle180 = 16 * 180;
-  int turn = m_viewer->orientation ()->dimension (PredefinedDimension::ONION_TURN)
-    * 16;
-  p.setBrush (QBrush (backColor));
-  p.drawChord (handleRect, turn, angle180);
-  p.setBrush (QBrush (frontColor));
-  p.drawChord (handleRect, turn + angle180, angle180);
+  QPoint handleTopLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
+  QRect handleRect     = onionRect.translated(handleTopLeft);
+  int angle180         = 16 * 180;
+  int turn =
+      m_viewer->orientation()->dimension(PredefinedDimension::ONION_TURN) * 16;
+  p.setBrush(QBrush(backColor));
+  p.drawChord(handleRect, turn, angle180);
+  p.setBrush(QBrush(frontColor));
+  p.drawChord(handleRect, turn + angle180, angle180);
 
   // draw onion skin dots
   p.setPen(Qt::red);
@@ -351,9 +354,10 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
       p.setBrush(mos < 0 ? backColor : frontColor);
     else
       p.setBrush(Qt::NoBrush);
-    QPoint topLeft = m_viewer->positionToXY (CellPosition (currentRow + mos, 0));
-    QRect dotRect = m_viewer->orientation ()->rect (PredefinedRect::ONION_DOT)
-      .translated (topLeft);
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow + mos, 0));
+    QRect dotRect  = m_viewer->orientation()
+                        ->rect(PredefinedRect::ONION_DOT)
+                        .translated(topLeft);
     p.drawEllipse(dotRect);
   }
 
@@ -368,9 +372,10 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
       p.setBrush(QBrush(QColor(0, 255, 255)));
     else
       p.setBrush(Qt::NoBrush);
-    QPoint topLeft = m_viewer->positionToXY (CellPosition (fos, 0));
-    QRect dotRect = m_viewer->orientation ()->rect (PredefinedRect::ONION_DOT_FIXED)
-      .translated (topLeft);
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(fos, 0));
+    QRect dotRect  = m_viewer->orientation()
+                        ->rect(PredefinedRect::ONION_DOT_FIXED)
+                        .translated(topLeft);
     p.drawEllipse(dotRect);
   }
 
@@ -378,10 +383,12 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   if (m_showOnionToSet != None) {
     p.setPen(QColor(255, 128, 0));
     p.setBrush(QBrush(QColor(255, 255, 0)));
-    QPoint topLeft = m_viewer->positionToXY (CellPosition (m_row, 0));
-    QRect dotRect = m_viewer->orientation ()->rect (
-      m_showOnionToSet == Fos ? PredefinedRect::ONION_DOT_FIXED : PredefinedRect::ONION_DOT)
-      .translated (topLeft);
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(m_row, 0));
+    QRect dotRect =
+        m_viewer->orientation()
+            ->rect(m_showOnionToSet == Fos ? PredefinedRect::ONION_DOT_FIXED
+                                           : PredefinedRect::ONION_DOT)
+            .translated(topLeft);
     p.drawEllipse(dotRect);
   }
 }
@@ -427,7 +434,8 @@ void RowArea::drawPinnedCenterKeys(QPainter &p, int r0, int r1) {
   int columnCount    = xsh->getColumnCount();
   int prev_pinnedCol = -2;
 
-  QRect keyRect = m_viewer->orientation ()->rect (PredefinedRect::PINNED_CENTER_KEY);
+  QRect keyRect =
+      m_viewer->orientation()->rect(PredefinedRect::PINNED_CENTER_KEY);
   p.setPen(Qt::black);
 
   r1 = (r1 < xsh->getFrameCount() - 1) ? xsh->getFrameCount() - 1 : r1;
@@ -441,14 +449,14 @@ void RowArea::drawPinnedCenterKeys(QPainter &p, int r0, int r1) {
     if (tmp_pinnedCol != prev_pinnedCol) {
       prev_pinnedCol = tmp_pinnedCol;
       if (r != r0 - 1) {
-        QPoint mouseInCell = m_pos - m_viewer->positionToXY (CellPosition (r, 0));
-        if (keyRect.contains (mouseInCell))
+        QPoint mouseInCell = m_pos - m_viewer->positionToXY(CellPosition(r, 0));
+        if (keyRect.contains(mouseInCell))
           p.setBrush(QColor(30, 210, 255));
         else
           p.setBrush(QColor(0, 175, 255));
 
-		    QPoint topLeft = m_viewer->positionToXY (CellPosition (r, 0));
-        QRect adjusted = keyRect.translated (topLeft);
+        QPoint topLeft = m_viewer->positionToXY(CellPosition(r, 0));
+        QRect adjusted = keyRect.translated(topLeft);
         p.drawRect(adjusted);
 
         QFont font = p.font();
@@ -471,10 +479,10 @@ void RowArea::paintEvent(QPaintEvent *event) {
 
   QPainter p(this);
 
-  CellRange cellRange = m_viewer->xyRectToRange (toBeUpdated);
+  CellRange cellRange = m_viewer->xyRectToRange(toBeUpdated);
   int r0, r1;  // range of visible rows
-  r0 = cellRange.from ().frame ();
-  r1 = cellRange.to ().frame ();
+  r0 = cellRange.from().frame();
+  r1 = cellRange.to().frame();
 
   p.setClipRect(toBeUpdated);
 
@@ -500,7 +508,7 @@ void RowArea::paintEvent(QPaintEvent *event) {
 //-----------------------------------------------------------------------------
 
 void RowArea::mousePressEvent(QMouseEvent *event) {
-  const Orientation *o = m_viewer->orientation ();
+  const Orientation *o = m_viewer->orientation();
 
   m_viewer->setQtModifiers(event->modifiers());
   if (event->button() == Qt::LeftButton) {
@@ -511,27 +519,26 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
     TPoint pos(event->pos().x(), event->pos().y());
     int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
 
-    int row = m_viewer->xyToPosition (pos).frame ();
-    QPoint topLeft = m_viewer->positionToXY (CellPosition (row, 0));
-    QPoint mouseInCell = event->pos () - topLeft;
+    int row            = m_viewer->xyToPosition(pos).frame();
+    QPoint topLeft     = m_viewer->positionToXY(CellPosition(row, 0));
+    QPoint mouseInCell = event->pos() - topLeft;
 
     if (Preferences::instance()->isOnionSkinEnabled() &&
-        o->rect (PredefinedRect::ONION_AREA).contains (mouseInCell)) {
+        o->rect(PredefinedRect::ONION_AREA).contains(mouseInCell)) {
       if (row == currentFrame) {
         setDragTool(
             XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
         frameAreaIsClicked = true;
-      } else if (o->rect (PredefinedRect::ONION_FIXED_DOT_AREA)
-            .contains (mouseInCell))
+      } else if (o->rect(PredefinedRect::ONION_FIXED_DOT_AREA)
+                     .contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeKeyOnionSkinMaskModifierTool(
             m_viewer, true));
-      else if (o->rect (PredefinedRect::ONION_DOT_AREA)
-            .contains (mouseInCell))
+      else if (o->rect(PredefinedRect::ONION_DOT_AREA).contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeKeyOnionSkinMaskModifierTool(
             m_viewer, false));
       else {
-        setDragTool (
-          XsheetGUI::DragTool::makeCurrentFrameModifierTool (m_viewer));
+        setDragTool(
+            XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
         frameAreaIsClicked = true;
       }
     } else {
@@ -549,7 +556,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
         setDragTool(
             XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
         frameAreaIsClicked = true;
-      } else if (o->rect (PredefinedRect::PLAY_RANGE).contains (mouseInCell) &&
+      } else if (o->rect(PredefinedRect::PLAY_RANGE).contains(mouseInCell) &&
                  (row == playR0 || row == playR1)) {
         if (!playRangeEnabled) XsheetGUI::setPlayRange(playR0, playR1, step);
         setDragTool(XsheetGUI::DragTool::makePlayRangeModifierTool(m_viewer));
@@ -588,7 +595,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void RowArea::mouseMoveEvent(QMouseEvent *event) {
-  const Orientation *o = m_viewer->orientation ();
+  const Orientation *o = m_viewer->orientation();
   m_viewer->setQtModifiers(event->modifiers());
   QPoint pos = event->pos();
 
@@ -600,7 +607,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  m_row = m_viewer->xyToPosition(pos).frame ();
+  m_row = m_viewer->xyToPosition(pos).frame();
   int x = pos.x();
 
   if ((event->buttons() & Qt::LeftButton) != 0 &&
@@ -619,15 +626,15 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   if (getDragTool()) return;
 
   int currentRow = TApp::instance()->getCurrentFrame()->getFrame();
-  int row        = m_viewer->xyToPosition (m_pos).frame ();
+  int row        = m_viewer->xyToPosition(m_pos).frame();
   QPoint mouseInCell =
-    event->pos () - m_viewer->positionToXY (CellPosition (row, 0));
+      event->pos() - m_viewer->positionToXY(CellPosition(row, 0));
   if (row < 0) return;
   // whether to show ability to set onion marks
   if (Preferences::instance()->isOnionSkinEnabled() && row != currentRow) {
-    if (o->rect (PredefinedRect::ONION_FIXED_DOT_AREA).contains (mouseInCell))
+    if (o->rect(PredefinedRect::ONION_FIXED_DOT_AREA).contains(mouseInCell))
       m_showOnionToSet = Fos;
-    else if (o->rect (PredefinedRect::ONION_DOT_AREA).contains (mouseInCell))
+    else if (o->rect(PredefinedRect::ONION_DOT_AREA).contains(mouseInCell))
       m_showOnionToSet = Mos;
   }
 
@@ -636,7 +643,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   bool isRootBonePinned;
   int pinnedCenterColumnId = -1;
   if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton &&
-      o->rect (PredefinedRect::PINNED_CENTER_KEY).contains (mouseInCell)) {
+      o->rect(PredefinedRect::PINNED_CENTER_KEY).contains(mouseInCell)) {
     int col      = m_viewer->getCurrentColumn();
     TXsheet *xsh = m_viewer->getXsheet();
     if (col >= 0 && xsh && !xsh->isColumnEmpty(col)) {
@@ -659,12 +666,12 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
 
   update();
 
-  QPoint base0 = m_viewer->positionToXY (CellPosition (m_r0, 0));
-  QPoint base1 = m_viewer->positionToXY (CellPosition (m_r1, 0));
-  QPainterPath startArrow = o->path (PredefinedPath::BEGIN_PLAY_RANGE)
-    .translated (base0);
-  QPainterPath endArrow = o->path (PredefinedPath::END_PLAY_RANGE)
-    .translated (base1);
+  QPoint base0 = m_viewer->positionToXY(CellPosition(m_r0, 0));
+  QPoint base1 = m_viewer->positionToXY(CellPosition(m_r1, 0));
+  QPainterPath startArrow =
+      o->path(PredefinedPath::BEGIN_PLAY_RANGE).translated(base0);
+  QPainterPath endArrow =
+      o->path(PredefinedPath::END_PLAY_RANGE).translated(base1);
 
   if (startArrow.contains(m_pos))
     m_tooltip = tr("Playback Start Marker");
@@ -675,8 +682,8 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
                     .arg(pinnedCenterColumnId + 1)
                     .arg((isRootBonePinned) ? " (Root)" : "");
   else if (row == currentRow) {
-    if (Preferences::instance()->isOnionSkinEnabled() && 
-        o->rect (PredefinedRect::ONION).contains (mouseInCell))
+    if (Preferences::instance()->isOnionSkinEnabled() &&
+        o->rect(PredefinedRect::ONION).contains(mouseInCell))
       m_tooltip = tr("Double Click to Toggle Onion Skin");
     else
       m_tooltip = tr("Curren Frame");
@@ -698,7 +705,7 @@ void RowArea::mouseReleaseEvent(QMouseEvent *event) {
 
   TPoint pos(event->pos().x(), event->pos().y());
 
-  int row = m_viewer->xyToPosition(pos).frame ();
+  int row = m_viewer->xyToPosition(pos).frame();
   if (m_playRangeActiveInMousePress && row == m_mousePressRow &&
       (13 <= pos.x && pos.x <= 26 && (row == m_r0 || row == m_r1)))
     onRemoveMarkers();
@@ -749,12 +756,15 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
 
 void RowArea::mouseDoubleClickEvent(QMouseEvent *event) {
   int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
-  int row          = m_viewer->xyToPosition (event->pos()).frame ();
-  QPoint mouseInCell = event->pos () - m_viewer->positionToXY (CellPosition (row, 0));
+  int row          = m_viewer->xyToPosition(event->pos()).frame();
+  QPoint mouseInCell =
+      event->pos() - m_viewer->positionToXY(CellPosition(row, 0));
   if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
       event->buttons() & Qt::LeftButton &&
       Preferences::instance()->isOnionSkinEnabled() && row == currentFrame &&
-      m_viewer->orientation ()->rect (PredefinedRect::ONION).contains (mouseInCell)) {
+      m_viewer->orientation()
+          ->rect(PredefinedRect::ONION)
+          .contains(mouseInCell)) {
     TOnionSkinMaskHandle *osmh = TApp::instance()->getCurrentOnionSkin();
     OnionSkinMask osm          = osmh->getOnionSkinMask();
     osm.enable(!osm.isEnabled());

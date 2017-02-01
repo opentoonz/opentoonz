@@ -434,22 +434,23 @@ public:
   }
 
   //-------
-  const Orientation *orientation () const;
-  void flipOrientation ();
+  const Orientation *orientation() const;
+  void flipOrientation();
 
-  CellPosition xyToPosition (const QPoint &point) const;
-  CellPosition xyToPosition (const TPoint &point) const;
-  CellPosition xyToPosition (const TPointD &point) const;
-  QPoint positionToXY (const CellPosition &pos) const;
+  CellPosition xyToPosition(const QPoint &point) const;
+  CellPosition xyToPosition(const TPoint &point) const;
+  CellPosition xyToPosition(const TPointD &point) const;
+  QPoint positionToXY(const CellPosition &pos) const;
 
-  int columnToLayerAxis (int layer) const;
-  int rowToFrameAxis (int frame) const;
+  int columnToLayerAxis(int layer) const;
+  int rowToFrameAxis(int frame) const;
 
-  CellRange xyRectToRange (const QRect &rect) const;
-  QRect rangeToXYRect (const CellRange &range) const;
+  CellRange xyRectToRange(const QRect &rect) const;
+  QRect rangeToXYRect(const CellRange &range) const;
 
-  void drawPredefinedPath (QPainter &p, PredefinedPath which, const CellPosition &pos,
-    optional<QColor> fill, optional<QColor> outline) const;
+  void drawPredefinedPath(QPainter &p, PredefinedPath which,
+                          const CellPosition &pos, optional<QColor> fill,
+                          optional<QColor> outline) const;
   //---------
 
   void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
@@ -697,14 +698,14 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
   void timerEvent(QTimerEvent *) override;
 
-  void positionSections ();
-  void disconnectScrollBars ();
-  void connectScrollBars ();
-  void connectOrDisconnectScrollBars (bool toConnect);
-  void connectOrDisconnect (bool toConnect,
-    QWidget *sender, const char *signal, QWidget *receiver, const char *slot);
+  void positionSections();
+  void disconnectScrollBars();
+  void connectScrollBars();
+  void connectOrDisconnectScrollBars(bool toConnect);
+  void connectOrDisconnect(bool toConnect, QWidget *sender, const char *signal,
+                           QWidget *receiver, const char *slot);
 signals:
-  void orientationChanged (const Orientation *newOrientation);
+  void orientationChanged(const Orientation *newOrientation);
 
 public slots:
   void onSceneSwitched();
@@ -728,7 +729,7 @@ public slots:
 
   void resetXsheetNotes();
 
-  void onOrientationChanged (const Orientation *newOrientation);
+  void onOrientationChanged(const Orientation *newOrientation);
 };
 
 #endif  // XSHEETVIEWER_H

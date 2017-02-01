@@ -48,8 +48,8 @@ TEnv::IntVar FrameDisplayStyleInXsheetRowArea(
 namespace XsheetGUI {
 //-----------------------------------------------------------------------------
 
-const int ColumnWidth = 74;
-const int RowHeight   = 20;
+const int ColumnWidth     = 74;
+const int RowHeight       = 20;
 const int SCROLLBAR_WIDTH = 16;
 
 }  // namespace XsheetGUI
@@ -155,22 +155,22 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
-    , m_orientation (nullptr) {
+    , m_orientation(nullptr) {
 
-	setFocusPolicy(Qt::StrongFocus);
+  setFocusPolicy(Qt::StrongFocus);
 
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("XsheetViewer");
 
-  m_orientation = Orientations::leftToRight ();
+  m_orientation = Orientations::leftToRight();
 
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());
 
-  QRect noteArea (0, 0, 75, 120);
-  m_noteArea = new XsheetGUI::NoteArea(this);
+  QRect noteArea(0, 0, 75, 120);
+  m_noteArea       = new XsheetGUI::NoteArea(this);
   m_noteScrollArea = new XsheetScrollArea(this);
-  m_noteScrollArea->setObjectName ("xsheetArea");
+  m_noteScrollArea->setObjectName("xsheetArea");
   m_noteScrollArea->setWidget(m_noteArea);
   m_noteScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_noteScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -196,11 +196,12 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_rowScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_rowScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-  connectScrollBars ();
+  connectScrollBars();
 
-  connect (this, &XsheetViewer::orientationChanged, this, &XsheetViewer::onOrientationChanged);
+  connect(this, &XsheetViewer::orientationChanged, this,
+          &XsheetViewer::onOrientationChanged);
 
-  emit orientationChanged (orientation ());
+  emit orientationChanged(orientation());
 }
 
 //-----------------------------------------------------------------------------
@@ -262,90 +263,91 @@ void XsheetViewer::dragToolLeave(QEvent *e) {
 
 //-----------------------------------------------------------------------------
 
-const Orientation *XsheetViewer::orientation () const {
-  if (!m_orientation)
-    throw std::exception ("!m_orientation");
+const Orientation *XsheetViewer::orientation() const {
+  if (!m_orientation) throw std::exception("!m_orientation");
   return m_orientation;
 }
 
-void XsheetViewer::flipOrientation () {
-  m_orientation = orientation ()->next ();
-  emit orientationChanged (orientation ());
+void XsheetViewer::flipOrientation() {
+  m_orientation = orientation()->next();
+  emit orientationChanged(orientation());
 }
 
-void XsheetViewer::onOrientationChanged (const Orientation *newOrientation) {
-  disconnectScrollBars ();
+void XsheetViewer::onOrientationChanged(const Orientation *newOrientation) {
+  disconnectScrollBars();
 
-  positionSections ();
-  refreshContentSize (0, 0);
+  positionSections();
+  refreshContentSize(0, 0);
 
-  connectScrollBars ();
+  connectScrollBars();
 
-  update ();
+  update();
 }
 
-void XsheetViewer::positionSections () {
-  const Orientation *o = orientation ();
-  QRect size = QRect (QPoint (0, 0), geometry ().size ());
-  NumberRange allLayer = o->layerSide (size);
-  NumberRange allFrame = o->frameSide (size);
+void XsheetViewer::positionSections() {
+  const Orientation *o = orientation();
+  QRect size           = QRect(QPoint(0, 0), geometry().size());
+  NumberRange allLayer = o->layerSide(size);
+  NumberRange allFrame = o->frameSide(size);
 
-  NumberRange headerLayer = o->range (PredefinedRange::HEADER_LAYER);
-  NumberRange headerFrame = o->range (PredefinedRange::HEADER_FRAME);
-  NumberRange bodyLayer (headerLayer.to (), allLayer.to ());
-  NumberRange bodyFrame (headerFrame.to (), allFrame.to ());
+  NumberRange headerLayer = o->range(PredefinedRange::HEADER_LAYER);
+  NumberRange headerFrame = o->range(PredefinedRange::HEADER_FRAME);
+  NumberRange bodyLayer(headerLayer.to(), allLayer.to());
+  NumberRange bodyFrame(headerFrame.to(), allFrame.to());
 
-  m_noteScrollArea->setGeometry (o->frameLayerRect (headerFrame, headerLayer));
-  m_cellScrollArea->setGeometry (o->frameLayerRect (bodyFrame, bodyLayer));
-  m_columnScrollArea->setGeometry (o->frameLayerRect (
-    headerFrame, bodyLayer.adjusted (0, -XsheetGUI::SCROLLBAR_WIDTH)));
-  m_rowScrollArea->setGeometry (o->frameLayerRect (
-    bodyFrame.adjusted (0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
+  m_noteScrollArea->setGeometry(o->frameLayerRect(headerFrame, headerLayer));
+  m_cellScrollArea->setGeometry(o->frameLayerRect(bodyFrame, bodyLayer));
+  m_columnScrollArea->setGeometry(o->frameLayerRect(
+      headerFrame, bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
+  m_rowScrollArea->setGeometry(o->frameLayerRect(
+      bodyFrame.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
 }
 
-void XsheetViewer::disconnectScrollBars () {
-  connectOrDisconnectScrollBars (false);
+void XsheetViewer::disconnectScrollBars() {
+  connectOrDisconnectScrollBars(false);
 }
-void XsheetViewer::connectScrollBars () {
-  connectOrDisconnectScrollBars (true);
-}
+void XsheetViewer::connectScrollBars() { connectOrDisconnectScrollBars(true); }
 
-void XsheetViewer::connectOrDisconnectScrollBars (bool toConnect) {
-  const Orientation *o = orientation ();
-  bool isVertical = o->isVerticalTimeline ();
+void XsheetViewer::connectOrDisconnectScrollBars(bool toConnect) {
+  const Orientation *o = orientation();
+  bool isVertical      = o->isVerticalTimeline();
   QWidget *scrolledVertically =
-    (isVertical ? m_rowScrollArea : m_columnScrollArea)->verticalScrollBar ();
+      (isVertical ? m_rowScrollArea : m_columnScrollArea)->verticalScrollBar();
   QWidget *scrolledHorizontally =
-    (isVertical ? m_columnScrollArea : m_rowScrollArea)->horizontalScrollBar ();
+      (isVertical ? m_columnScrollArea : m_rowScrollArea)
+          ->horizontalScrollBar();
 
-  connectOrDisconnect (toConnect,
-    scrolledVertically, SIGNAL (valueChanged (int)),
-    m_cellScrollArea->verticalScrollBar (), SLOT (setValue (int)));
-  connectOrDisconnect (toConnect,
-    m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
-    scrolledVertically, SLOT (setValue (int)));
+  connectOrDisconnect(toConnect, scrolledVertically, SIGNAL(valueChanged(int)),
+                      m_cellScrollArea->verticalScrollBar(),
+                      SLOT(setValue(int)));
+  connectOrDisconnect(toConnect, m_cellScrollArea->verticalScrollBar(),
+                      SIGNAL(valueChanged(int)), scrolledVertically,
+                      SLOT(setValue(int)));
 
-  connectOrDisconnect (toConnect,
-    scrolledHorizontally, SIGNAL (valueChanged (int)),
-    m_cellScrollArea->horizontalScrollBar (), SLOT (setValue (int)));
-  connectOrDisconnect (toConnect,
-    m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)),
-    scrolledHorizontally, SLOT (setValue (int)));
+  connectOrDisconnect(
+      toConnect, scrolledHorizontally, SIGNAL(valueChanged(int)),
+      m_cellScrollArea->horizontalScrollBar(), SLOT(setValue(int)));
+  connectOrDisconnect(toConnect, m_cellScrollArea->horizontalScrollBar(),
+                      SIGNAL(valueChanged(int)), scrolledHorizontally,
+                      SLOT(setValue(int)));
 
-  connectOrDisconnect (toConnect,
-    m_cellScrollArea->verticalScrollBar (), SIGNAL (valueChanged (int)),
-    this, isVertical ? SLOT (updateCellRowAree ()) : SLOT (updateCellColumnAree ()));
-  connectOrDisconnect (toConnect,
-    m_cellScrollArea->horizontalScrollBar (), SIGNAL (valueChanged (int)),
-    this, isVertical ? SLOT (updateCellColumnAree ()) : SLOT (updateCellRowAree ()));
+  connectOrDisconnect(
+      toConnect, m_cellScrollArea->verticalScrollBar(),
+      SIGNAL(valueChanged(int)), this,
+      isVertical ? SLOT(updateCellRowAree()) : SLOT(updateCellColumnAree()));
+  connectOrDisconnect(
+      toConnect, m_cellScrollArea->horizontalScrollBar(),
+      SIGNAL(valueChanged(int)), this,
+      isVertical ? SLOT(updateCellColumnAree()) : SLOT(updateCellRowAree()));
 }
 
-void XsheetViewer::connectOrDisconnect (bool toConnect,
-  QWidget *sender, const char *signal, QWidget *receiver, const char *slot) {
+void XsheetViewer::connectOrDisconnect(bool toConnect, QWidget *sender,
+                                       const char *signal, QWidget *receiver,
+                                       const char *slot) {
   if (toConnect)
-    connect (sender, signal, receiver, slot);
+    connect(sender, signal, receiver, slot);
   else
-    disconnect (sender, signal, receiver, slot);
+    disconnect(sender, signal, receiver, slot);
 }
 
 //-----------------------------------------------------------------------------
@@ -515,33 +517,34 @@ void XsheetViewer::timerEvent(QTimerEvent *) {
 bool XsheetViewer::refreshContentSize(int dx, int dy) {
   QSize viewportSize = m_cellScrollArea->viewport()->size();
   QPoint offset      = m_cellArea->pos();
-  offset = QPoint(qMin(0, offset.x() - dx), qMin(0, offset.y() - dy)); // what?
+  offset = QPoint(qMin(0, offset.x() - dx), qMin(0, offset.y() - dy));  // what?
 
   TXsheet *xsh    = getXsheet();
   int frameCount  = xsh ? xsh->getFrameCount() : 0;
   int columnCount = xsh ? xsh->getColumnCount() : 0;
-  QPoint contentSize = positionToXY (CellPosition (frameCount + 1, columnCount + 1));
+  QPoint contentSize =
+      positionToXY(CellPosition(frameCount + 1, columnCount + 1));
 
-  QSize actualSize(contentSize.x (), contentSize.y ());
-  int x = viewportSize.width () - offset.x (); // wtf is going on
+  QSize actualSize(contentSize.x(), contentSize.y());
+  int x = viewportSize.width() - offset.x();  // wtf is going on
   int y = viewportSize.height() - offset.y();
   if (x > actualSize.width()) actualSize.setWidth(x);
   if (y > actualSize.height()) actualSize.setHeight(y);
 
   if (actualSize == m_cellArea->size())
-   return false;
+    return false;
   else {
-    const Orientation *o = orientation ();
-    NumberRange allLayer = o->layerSide (QRect (QPoint (0, 0), actualSize));
-    NumberRange allFrame = o->frameSide (QRect (QPoint (0, 0), actualSize));
-    NumberRange headerLayer = o->range (PredefinedRange::HEADER_LAYER);
-    NumberRange headerFrame = o->range (PredefinedRange::HEADER_FRAME);
+    const Orientation *o    = orientation();
+    NumberRange allLayer    = o->layerSide(QRect(QPoint(0, 0), actualSize));
+    NumberRange allFrame    = o->frameSide(QRect(QPoint(0, 0), actualSize));
+    NumberRange headerLayer = o->range(PredefinedRange::HEADER_LAYER);
+    NumberRange headerFrame = o->range(PredefinedRange::HEADER_FRAME);
 
     m_isComputingSize = true;
-    m_noteArea->setFixedSize (o->rect (PredefinedRect::NOTE_AREA).size ());
+    m_noteArea->setFixedSize(o->rect(PredefinedRect::NOTE_AREA).size());
     m_cellArea->setFixedSize(actualSize);
-    m_rowArea->setFixedSize(o->frameLayerRect (allFrame, headerLayer).size ());
-    m_columnArea->setFixedSize(o->frameLayerRect (headerFrame, allLayer).size ());
+    m_rowArea->setFixedSize(o->frameLayerRect(allFrame, headerLayer).size());
+    m_columnArea->setFixedSize(o->frameLayerRect(headerFrame, allLayer).size());
     m_isComputingSize = false;
     return true;
   }
@@ -551,83 +554,87 @@ bool XsheetViewer::refreshContentSize(int dx, int dy) {
 
 // call when in doubt
 void XsheetViewer::updateAreeSize() {
-  const Orientation *o = orientation ();
-  QRect viewArea (QPoint (0, 0), m_cellScrollArea->geometry ()
-    .adjusted (0, 0, -XsheetGUI::SCROLLBAR_WIDTH, -XsheetGUI::SCROLLBAR_WIDTH).size ());
+  const Orientation *o = orientation();
+  QRect viewArea(QPoint(0, 0), m_cellScrollArea->geometry()
+                                   .adjusted(0, 0, -XsheetGUI::SCROLLBAR_WIDTH,
+                                             -XsheetGUI::SCROLLBAR_WIDTH)
+                                   .size());
 
-  QPoint areaFilled (0, 0);
-  TXsheet *xsh = getXsheet ();
+  QPoint areaFilled(0, 0);
+  TXsheet *xsh = getXsheet();
   if (xsh)
-    areaFilled = positionToXY (CellPosition (xsh->getFrameCount () + 1, xsh->getColumnCount () + 1));
-  viewArea = viewArea & QRect (0, 0, areaFilled.x (), areaFilled.y ());
+    areaFilled = positionToXY(
+        CellPosition(xsh->getFrameCount() + 1, xsh->getColumnCount() + 1));
+  viewArea = viewArea & QRect(0, 0, areaFilled.x(), areaFilled.y());
 
-  NumberRange allLayer = o->layerSide (viewArea);
-  NumberRange allFrame = o->frameSide (viewArea);
-  NumberRange headerLayer = o->range (PredefinedRange::HEADER_LAYER);
-  NumberRange headerFrame = o->range (PredefinedRange::HEADER_FRAME);
+  NumberRange allLayer    = o->layerSide(viewArea);
+  NumberRange allFrame    = o->frameSide(viewArea);
+  NumberRange headerLayer = o->range(PredefinedRange::HEADER_LAYER);
+  NumberRange headerFrame = o->range(PredefinedRange::HEADER_FRAME);
 
-  m_cellArea->setFixedSize (viewArea.size ());
-  m_rowArea->setFixedSize (o->frameLayerRect (allFrame, headerLayer).size ());
-  m_columnArea->setFixedSize (o->frameLayerRect (headerFrame, allLayer).size ());
+  m_cellArea->setFixedSize(viewArea.size());
+  m_rowArea->setFixedSize(o->frameLayerRect(allFrame, headerLayer).size());
+  m_columnArea->setFixedSize(o->frameLayerRect(headerFrame, allLayer).size());
 }
 
 //-----------------------------------------------------------------------------
 
-CellPosition XsheetViewer::xyToPosition (const QPoint &point) const {
-  const Orientation *o = orientation ();
-	return o->xyToPosition (point, getXsheet ()->getColumnFan (o));
+CellPosition XsheetViewer::xyToPosition(const QPoint &point) const {
+  const Orientation *o = orientation();
+  return o->xyToPosition(point, getXsheet()->getColumnFan(o));
 }
-CellPosition XsheetViewer::xyToPosition (const TPoint &point) const {
-	return xyToPosition (QPoint (point.x, point.y));
+CellPosition XsheetViewer::xyToPosition(const TPoint &point) const {
+  return xyToPosition(QPoint(point.x, point.y));
 }
-CellPosition XsheetViewer::xyToPosition (const TPointD &point) const {
-	return xyToPosition (QPoint ((int) point.x, (int) point.y));
-}
-
-//-----------------------------------------------------------------------------
-
-QPoint XsheetViewer::positionToXY (const CellPosition &pos) const {
-  const Orientation *o = orientation ();
-  return o->positionToXY (pos, getXsheet ()->getColumnFan (o));
-}
-
-int XsheetViewer::columnToLayerAxis (int layer) const {
-  const Orientation *o = orientation ();
-  return o->colToLayerAxis (layer, getXsheet ()->getColumnFan (o));
-}
-int XsheetViewer::rowToFrameAxis (int frame) const {
-	return orientation ()->rowToFrameAxis (frame);
+CellPosition XsheetViewer::xyToPosition(const TPointD &point) const {
+  return xyToPosition(QPoint((int)point.x, (int)point.y));
 }
 
 //-----------------------------------------------------------------------------
 
-CellRange XsheetViewer::xyRectToRange (const QRect &rect) const {
-	CellPosition topLeft = xyToPosition (rect.topLeft ());
-	CellPosition bottomRight = xyToPosition (rect.bottomRight ());
-	return CellRange (topLeft, bottomRight);
+QPoint XsheetViewer::positionToXY(const CellPosition &pos) const {
+  const Orientation *o = orientation();
+  return o->positionToXY(pos, getXsheet()->getColumnFan(o));
+}
+
+int XsheetViewer::columnToLayerAxis(int layer) const {
+  const Orientation *o = orientation();
+  return o->colToLayerAxis(layer, getXsheet()->getColumnFan(o));
+}
+int XsheetViewer::rowToFrameAxis(int frame) const {
+  return orientation()->rowToFrameAxis(frame);
 }
 
 //-----------------------------------------------------------------------------
 
-QRect XsheetViewer::rangeToXYRect (const CellRange &range) const {
-	QPoint from = positionToXY (range.from ());
-	QPoint to = positionToXY (range.to ());
-	QPoint topLeft = QPoint (min (from.x (), to.x ()), min (from.y (), to.y ()));
-	QPoint bottomRight = QPoint (max (from.x (), to.x ()), max (from.y (), to.y ()));
-	return QRect (topLeft, bottomRight);
+CellRange XsheetViewer::xyRectToRange(const QRect &rect) const {
+  CellPosition topLeft     = xyToPosition(rect.topLeft());
+  CellPosition bottomRight = xyToPosition(rect.bottomRight());
+  return CellRange(topLeft, bottomRight);
 }
 
 //-----------------------------------------------------------------------------
 
-void XsheetViewer::drawPredefinedPath (QPainter &p, PredefinedPath which, const CellPosition &pos,
-  optional<QColor> fill, optional<QColor> outline) const {
-  QPoint xy = positionToXY (pos);
-  QPainterPath path = orientation ()->path (which).translated (xy);
-  if (fill)
-    p.fillPath (path, QBrush (*fill));
+QRect XsheetViewer::rangeToXYRect(const CellRange &range) const {
+  QPoint from        = positionToXY(range.from());
+  QPoint to          = positionToXY(range.to());
+  QPoint topLeft     = QPoint(min(from.x(), to.x()), min(from.y(), to.y()));
+  QPoint bottomRight = QPoint(max(from.x(), to.x()), max(from.y(), to.y()));
+  return QRect(topLeft, bottomRight);
+}
+
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::drawPredefinedPath(QPainter &p, PredefinedPath which,
+                                      const CellPosition &pos,
+                                      optional<QColor> fill,
+                                      optional<QColor> outline) const {
+  QPoint xy         = positionToXY(pos);
+  QPainterPath path = orientation()->path(which).translated(xy);
+  if (fill) p.fillPath(path, QBrush(*fill));
   if (outline) {
-    p.setPen (*outline);
-    p.drawPath (path);
+    p.setPen(*outline);
+    p.drawPath(path);
   }
 }
 
@@ -821,7 +828,7 @@ void XsheetViewer::paintEvent(QPaintEvent*)
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::resizeEvent(QResizeEvent *event) {
-  positionSections ();
+  positionSections();
 
   //(New Layout Manager) introduced automatic refresh
   refreshContentSize(
@@ -896,13 +903,13 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
   if (changeFrameSkippingHolds(event)) return;
 
   int frameCount = getXsheet()->getFrameCount();
-  CellPosition now (getCurrentRow (), getCurrentColumn ());
-  CellPosition shift = orientation ()->arrowShift (event->key ());
+  CellPosition now(getCurrentRow(), getCurrentColumn());
+  CellPosition shift = orientation()->arrowShift(event->key());
   if (shift) {
     now = now + shift;
-    now.ensureValid ();
-    setCurrentRow (now.frame ());
-    setCurrentColumn (now.layer ());
+    now.ensureValid();
+    setCurrentRow(now.frame());
+    setCurrentColumn(now.layer());
     return;
   }
 
@@ -952,8 +959,8 @@ void XsheetViewer::enterEvent(QEvent *) { m_cellArea->onControlPressed(false); }
 */
 void XsheetViewer::scrollTo(int row, int col) {
   QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
-  QPoint topLeft = positionToXY (CellPosition (row, col));
-  QRect cellRect(topLeft, QSize (XsheetGUI::ColumnWidth, XsheetGUI::RowHeight));
+  QPoint topLeft    = positionToXY(CellPosition(row, col));
+  QRect cellRect(topLeft, QSize(XsheetGUI::ColumnWidth, XsheetGUI::RowHeight));
 
   int deltaX = 0;
   int deltaY = 0;
@@ -1026,23 +1033,22 @@ void XsheetViewer::onCurrentColumnSwitched() {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::scrollToColumn(int col) {
-	int x0 = columnToLayerAxis (col);
-	int x1 = columnToLayerAxis (col + 1);
+  int x0 = columnToLayerAxis(col);
+  int x1 = columnToLayerAxis(col + 1);
 
-	if (orientation ()->isVerticalTimeline ())
-		scrollToHorizontalRange (x0, x1);
-	else
-		scrollToVerticalRange (x0, x1);
+  if (orientation()->isVerticalTimeline())
+    scrollToHorizontalRange(x0, x1);
+  else
+    scrollToVerticalRange(x0, x1);
 }
 
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::scrollToHorizontalRange(int x0, int x1) {
   QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
-  if (visibleRect.isEmpty ())
-    return;
-  int visibleLeft   = visibleRect.left();
-  int visibleRight  = visibleRect.right();
+  if (visibleRect.isEmpty()) return;
+  int visibleLeft  = visibleRect.left();
+  int visibleRight = visibleRect.right();
 
   if (visibleLeft > x0) {  // If they are out of left visible region
     int deltaX = x0 - visibleLeft;
@@ -1060,23 +1066,22 @@ void XsheetViewer::scrollToHorizontalRange(int x0, int x1) {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::scrollToRow(int row) {
-	int y0 = rowToFrameAxis (row);
-	int y1 = rowToFrameAxis (row + 1);
+  int y0 = rowToFrameAxis(row);
+  int y1 = rowToFrameAxis(row + 1);
 
-	if (orientation ()->isVerticalTimeline ())
-		scrollToVerticalRange (y0, y1);
-	else
-		scrollToHorizontalRange (y0, y1);
+  if (orientation()->isVerticalTimeline())
+    scrollToVerticalRange(y0, y1);
+  else
+    scrollToHorizontalRange(y0, y1);
 }
 
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::scrollToVerticalRange(int y0, int y1) {
-	int yMin = min (y0, y1);
-	int yMax = max (y0, y1);
-	QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
-  if (visibleRect.isEmpty ())
-    return;
+  int yMin          = min(y0, y1);
+  int yMax          = max(y0, y1);
+  QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
+  if (visibleRect.isEmpty()) return;
   int visibleTop    = visibleRect.top();
   int visibleBottom = visibleRect.bottom();
 
@@ -1205,11 +1210,12 @@ void XsheetViewer::setCurrentNoteIndex(int currentNoteIndex) {
   int col            = notes->getNoteCol(currentNoteIndex);
   TPointD pos        = notes->getNotePos(currentNoteIndex);
 
-  QPoint topLeft = positionToXY (CellPosition (row, col)) + QPoint (pos.x, pos.y); // actually xy
-  QSize size (XsheetGUI::NoteWidth, XsheetGUI::NoteHeight);
-  QRect noteRect (topLeft, size);
-  scrollToHorizontalRange(noteRect.left (), noteRect.right ());
-  scrollToVerticalRange(noteRect.top (), noteRect.bottom ());
+  QPoint topLeft = positionToXY(CellPosition(row, col)) +
+                   QPoint(pos.x, pos.y);  // actually xy
+  QSize size(XsheetGUI::NoteWidth, XsheetGUI::NoteHeight);
+  QRect noteRect(topLeft, size);
+  scrollToHorizontalRange(noteRect.left(), noteRect.right());
+  scrollToVerticalRange(noteRect.top(), noteRect.bottom());
 }
 
 //-----------------------------------------------------------------------------

@@ -106,10 +106,10 @@ public:
     return ++currentId;
   }
 
-  void copyFoldedState ();
+  void copyFoldedState();
 
 private:
-  void initColumnFans ();
+  void initColumnFans();
 
   // not implemented
   TXsheetImp(const TXsheetImp &);
@@ -150,8 +150,7 @@ TXsheet::TXsheetImp::TXsheetImp()
     , m_viewColumn(-1)
     , m_mixedSound(0)
     , m_scene(0) {
-
-  initColumnFans ();
+  initColumnFans();
 }
 
 //-----------------------------------------------------------------------------
@@ -167,16 +166,16 @@ TXsheet::TXsheetImp::~TXsheetImp() {
 
 //-----------------------------------------------------------------------------
 
-void TXsheet::TXsheetImp::initColumnFans () {
-  for (auto o : Orientations::all ()) {
-    int index = o->dimension (PredefinedDimension::INDEX);
-    m_columnFans[index].setDimension (o->dimension (PredefinedDimension::LAYER));
+void TXsheet::TXsheetImp::initColumnFans() {
+  for (auto o : Orientations::all()) {
+    int index = o->dimension(PredefinedDimension::INDEX);
+    m_columnFans[index].setDimension(o->dimension(PredefinedDimension::LAYER));
   }
 }
 
-void TXsheet::TXsheetImp::copyFoldedState () {
+void TXsheet::TXsheetImp::copyFoldedState() {
   for (int i = 1; i < Orientations::COUNT; i++)
-    m_columnFans[i].copyFoldedStateFrom (m_columnFans[0]);
+    m_columnFans[i].copyFoldedStateFrom(m_columnFans[0]);
 }
 
 //=============================================================================
@@ -215,19 +214,17 @@ int TXsheet::getFrameCount() const { return m_imp->m_frameCount; }
 //-----------------------------------------------------------------------------
 
 const TXshCell &TXsheet::getCell(int row, int col) const {
-	return getCell (CellPosition (row, col));
+  return getCell(CellPosition(row, col));
 }
 
-const TXshCell &TXsheet::getCell (const CellPosition &pos) const {
-	static const TXshCell emptyCell;
+const TXshCell &TXsheet::getCell(const CellPosition &pos) const {
+  static const TXshCell emptyCell;
 
-	TXshColumnP column = m_imp->m_columnSet.getColumn (pos.layer ());
-	if (!column)
-		return emptyCell;
-	TXshCellColumn *xshColumn = column->getCellColumn ();
-	if (!xshColumn)
-		return emptyCell;
-	return xshColumn->getCell (pos.frame ());
+  TXshColumnP column = m_imp->m_columnSet.getColumn(pos.layer());
+  if (!column) return emptyCell;
+  TXshCellColumn *xshColumn = column->getCellColumn();
+  if (!xshColumn) return emptyCell;
+  return xshColumn->getCell(pos.frame());
 }
 
 //-----------------------------------------------------------------------------
@@ -619,8 +616,8 @@ void TXsheet::reverseCells(int r0, int c0, int r1, int c1) {
   for (int j = c0; j <= c1; j++) {
     int i1, i2;
     for (i1 = r0, i2 = r1; i1 < i2; i1++, i2--) {
-      TXshCell app1 = getCell(CellPosition (i1, j));
-      TXshCell app2 = getCell(CellPosition (i2, j));
+      TXshCell app1 = getCell(CellPosition(i1, j));
+      TXshCell app2 = getCell(CellPosition(i2, j));
       setCell(i1, j, app2);
       setCell(i2, j, app1);
     }
@@ -637,7 +634,7 @@ void TXsheet::swingCells(int r0, int c0, int r1, int c1) {
 
   for (int j = c0; j <= c1; j++) {
     for (int i1 = r0Mod, i2 = r1 - 1; i2 >= r0; i1++, i2--) {
-      TXshCell cell = getCell(CellPosition (i2, j));
+      TXshCell cell = getCell(CellPosition(i2, j));
       setCell(i1, j, cell);
     }
   }
@@ -649,30 +646,31 @@ bool TXsheet::incrementCells(int r0, int c0, int r1, int c1,
                              vector<std::pair<TRect, TXshCell>> &forUndo) {
   for (int j = c0; j <= c1; j++) {
     int i = r0;
-    while (getCell(CellPosition (i, j)).isEmpty() && i <= r1 - 1) i++;
+    while (getCell(CellPosition(i, j)).isEmpty() && i <= r1 - 1) i++;
 
     for (; i <= r1 - 1; i++) {
-      if (getCell(CellPosition (i + 1, j)).isEmpty()) break;
-      const TXshCell &ce1 = getCell(CellPosition (i, j)), &ce2 = getCell(CellPosition (i + 1, j));
+      if (getCell(CellPosition(i + 1, j)).isEmpty()) break;
+      const TXshCell &ce1 = getCell(CellPosition(i, j)),
+                     &ce2 = getCell(CellPosition(i + 1, j));
       if (ce2.getSimpleLevel() != ce1.getSimpleLevel() ||
           ce2.getFrameId().getNumber() < ce1.getFrameId().getNumber())
         return false;
     }
     i = r0;
-    while (getCell(CellPosition (i, j)).isEmpty() && i <= r1 - 1) i++;
+    while (getCell(CellPosition(i, j)).isEmpty() && i <= r1 - 1) i++;
     int count;
     for (; i <= r1 - 1; i++) {
       count = 1;
-      if (getCell(CellPosition (i + 1, j)).isEmpty()) continue;
+      if (getCell(CellPosition(i + 1, j)).isEmpty()) continue;
 
-      int frame1 = getCell(CellPosition (i, j)).getFrameId().getNumber();
+      int frame1 = getCell(CellPosition(i, j)).getFrameId().getNumber();
       if (frame1 == -1) break;
-      while (!getCell(CellPosition (i + 1, j)).isEmpty() &&
-             getCell(CellPosition (i + 1, j)).getFrameId().getNumber() ==
-                 getCell(CellPosition (i, j)).getFrameId().getNumber())
+      while (!getCell(CellPosition(i + 1, j)).isEmpty() &&
+             getCell(CellPosition(i + 1, j)).getFrameId().getNumber() ==
+                 getCell(CellPosition(i, j)).getFrameId().getNumber())
         i++, count++;
 
-      int frame2 = getCell(CellPosition (i + 1, j)).getFrameId().getNumber();
+      int frame2 = getCell(CellPosition(i + 1, j)).getFrameId().getNumber();
       if (frame2 == -1) break;
 
       if (frame1 + count == frame2)
@@ -683,15 +681,17 @@ bool TXsheet::incrementCells(int r0, int c0, int r1, int c1,
         insertCells(i + 1, j, numCells);
         forUndo.push_back(std::pair<TRect, TXshCell>(
             TRect(i + 1, j, i + 1 + numCells - 1, j), TXshCell()));
-        for (int k = 1; k <= numCells; k++) setCell(i + k, j, getCell(CellPosition (i, j)));
+        for (int k = 1; k <= numCells; k++)
+          setCell(i + k, j, getCell(CellPosition(i, j)));
         i += numCells;
         r1 += numCells;
       } else  // remove
       {
         int numCells = count - frame2 + frame1;
         i            = i - numCells;
-        forUndo.push_back(std::pair<TRect, TXshCell>(
-            TRect(i + 1, j, i + 1 + numCells - 1, j), getCell(CellPosition (i + 1, j))));
+        forUndo.push_back(
+            std::pair<TRect, TXshCell>(TRect(i + 1, j, i + 1 + numCells - 1, j),
+                                       getCell(CellPosition(i + 1, j))));
         removeCells(i + 1, j, numCells);
         r1 -= numCells;
       }
@@ -709,7 +709,7 @@ void TXsheet::duplicateCells(int r0, int c0, int r1, int c1, int upTo) {
   for (int j = c0; j <= c1; j++) {
     insertCells(r1 + 1, j, upTo - (r1 + 1) + 1);
     for (int i = r1 + 1; i <= upTo; i++)
-      setCell(i, j, getCell(CellPosition (r0 + ((i - (r1 + 1)) % chunk), j)));
+      setCell(i, j, getCell(CellPosition(r0 + ((i - (r1 + 1)) % chunk), j)));
   }
 }
 
@@ -726,7 +726,7 @@ void TXsheet::stepCells(int r0, int c0, int r1, int c1, int type) {
   int k = 0;
   for (int r = r0; r <= r1; r++)
     for (int c = c0; c <= c1; c++) {
-      cells[k++] = getCell(CellPosition (r, c));
+      cells[k++] = getCell(CellPosition(r, c));
     }
 
   int nrows = nr * (type - 1);
@@ -755,13 +755,13 @@ void TXsheet::increaseStepCells(int r0, int c0, int &r1, int c1) {
   for (c = c0; c <= c1; c++) {
     int r = r0, i = 0, rEnd = r1;
     while (r <= rEnd) {
-      TXshCell cell = getCell(CellPosition (r, c));
+      TXshCell cell = getCell(CellPosition(r, c));
       if (!cell.isEmpty()) {
         insertCells(r, c);
         setCell(r, c, cell);
         rEnd++;
         r++;
-        while (cell == getCell(CellPosition (r, c)) && r <= rEnd) r++;
+        while (cell == getCell(CellPosition(r, c)) && r <= rEnd) r++;
       } else
         r++;
       i++;
@@ -784,11 +784,11 @@ void TXsheet::decreaseStepCells(int r0, int c0, int &r1, int c1) {
   for (c = c0; c <= c1; c++) {
     int r = r0, i = 0, rEnd = r1;
     while (r <= rEnd) {
-      TXshCell cell = getCell(CellPosition (r, c));
+      TXshCell cell = getCell(CellPosition(r, c));
       if (!cell.isEmpty()) {
         r++;
         bool removed = false;
-        while (cell == getCell(CellPosition (r, c)) && r <= rEnd) {
+        while (cell == getCell(CellPosition(r, c)) && r <= rEnd) {
           if (!removed) {
             removed = true;
             removeCells(r, c);
@@ -828,7 +828,7 @@ void TXsheet::eachCells(int r0, int c0, int r1, int c1, int type) {
   for (j = r0, i = 0; i < size;
        j += type)  // in cells copio il contenuto delle celle che mi interessano
   {
-    for (k = c0; k <= c1; k++, i++) cells[i] = getCell(CellPosition (j, k));
+    for (k = c0; k <= c1; k++, i++) cells[i] = getCell(CellPosition(j, k));
   }
 
   int c;
@@ -860,8 +860,8 @@ int TXsheet::reframeCells(int r0, int r1, int col, int type) {
   cells.clear();
 
   for (int r = r0; r <= r1; r++) {
-    if (cells.size() == 0 || cells.last() != getCell(CellPosition (r, col)))
-      cells.push_back(getCell(CellPosition (r, col)));
+    if (cells.size() == 0 || cells.last() != getCell(CellPosition(r, col)))
+      cells.push_back(getCell(CellPosition(r, col)));
   }
 
   if (cells.empty()) return 0;
@@ -900,9 +900,9 @@ void TXsheet::resetStepCells(int r0, int c0, int r1, int c1) {
     TXshCell *cells = new TXshCell[size];
     while (r <= r1) {
       // mi prendo le celle che mi servono
-      cells[i] = getCell(CellPosition (r, c));
+      cells[i] = getCell(CellPosition(r, c));
       r++;
-      while (cells[i] == getCell(CellPosition (r, c)) && r <= r1) r++;
+      while (cells[i] == getCell(CellPosition(r, c)) && r <= r1) r++;
       i++;
     }
 
@@ -928,7 +928,7 @@ void TXsheet::rollupCells(int r0, int c0, int r1, int c1) {
 
   // in cells copio il contenuto delle celle che mi interessano
   int k;
-  for (k = c0; k <= c1; k++) cells[k - c0] = getCell(CellPosition (r0, k));
+  for (k = c0; k <= c1; k++) cells[k - c0] = getCell(CellPosition(r0, k));
 
   for (k = c0; k <= c1; k++) removeCells(r0, k, 1);
 
@@ -951,7 +951,7 @@ void TXsheet::rolldownCells(int r0, int c0, int r1, int c1) {
 
   // in cells copio il contenuto delle celle che mi interessano
   int k;
-  for (k = c0; k <= c1; k++) cells[k - c0] = getCell(CellPosition (r1, k));
+  for (k = c0; k <= c1; k++) cells[k - c0] = getCell(CellPosition(r1, k));
 
   for (k = c0; k <= c1; k++) removeCells(r1, k, 1);
 
@@ -1218,7 +1218,7 @@ void TXsheet::loadData(TIStream &is) {
       fxSet.loadData(is);
     } else if (tagName == "columnFan") {
       m_imp->m_columnFans[0].loadData(is);
-      m_imp->copyFoldedState ();
+      m_imp->copyFoldedState();
     } else if (tagName == "noteSet") {
       m_notes->loadData(is);
     } else {
@@ -1248,7 +1248,7 @@ void TXsheet::saveData(TOStream &os) {
   fxDag->saveData(os, getFirstFreeColumnIndex());
   os.closeChild();
 
-  ColumnFan *columnFan = getColumnFan(0); // all fans share folded state
+  ColumnFan *columnFan = getColumnFan(0);  // all fans share folded state
   if (!columnFan->isEmpty()) {
     os.openChild("columnFan");
     columnFan->saveData(os);
@@ -1470,7 +1470,7 @@ FxDag *TXsheet::getFxDag() const { return m_imp->m_fxDag; }
 //-----------------------------------------------------------------------------
 
 ColumnFan *TXsheet::getColumnFan(const Orientation *o) const {
-  int index = o->dimension (PredefinedDimension::INDEX);
+  int index = o->dimension(PredefinedDimension::INDEX);
   return &m_imp->m_columnFans[index];
 }
 
@@ -1537,7 +1537,7 @@ TRectD TXsheet::getBBox(int r) const {
   struct locals {
     static TRectD getBBox(const TXsheet *xsh, int r, int c) {
       // Discriminate cell content
-      const TXshCell &cell = xsh->getCell(CellPosition (r, c));
+      const TXshCell &cell = xsh->getCell(CellPosition(r, c));
       if (cell.isEmpty()) return voidRect;
 
       if (TXshChildLevel *cl = cell.getChildLevel())
@@ -1603,10 +1603,10 @@ TRectD TXsheet::getBBox(int r) const {
 
 //-----------------------------------------------------------------------
 
-bool TXsheet::isRectEmpty (const CellPosition &pos0, const CellPosition &pos1) const {
-	for (int frame = pos0.frame (); frame <= pos1.frame (); frame++)
-		for (int layer = pos0.layer (); layer <= pos1.layer (); layer++)
-			if (!getCell (CellPosition (frame, layer)).isEmpty ())
-				return false;
-	return true;
+bool TXsheet::isRectEmpty(const CellPosition &pos0,
+                          const CellPosition &pos1) const {
+  for (int frame = pos0.frame(); frame <= pos1.frame(); frame++)
+    for (int layer = pos0.layer(); layer <= pos1.layer(); layer++)
+      if (!getCell(CellPosition(frame, layer)).isEmpty()) return false;
+  return true;
 }

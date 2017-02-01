@@ -509,7 +509,7 @@ void RenameCellField::showInRowCol(int row, int col) {
   m_row = row;
   m_col = col;
 
-  QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
+  QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
   move(xy - QPoint(1, 2));
   static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
   setFont(font);
@@ -739,81 +739,83 @@ void CellArea::setDragTool(DragTool *dragTool) {
 
 //-----------------------------------------------------------------------------
 
-void CellArea::drawCells (QPainter &p, const QRect toBeUpdated) {
-  TXsheet *xsh = m_viewer->getXsheet ();
-  ColumnFan *columnFan = xsh->getColumnFan (m_viewer->orientation ());
+void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
+  TXsheet *xsh         = m_viewer->getXsheet();
+  ColumnFan *columnFan = xsh->getColumnFan(m_viewer->orientation());
 
   // selected cells range
-  TCellSelection *cellSelection = m_viewer->getCellSelection ();
+  TCellSelection *cellSelection = m_viewer->getCellSelection();
   int rS0, cS0, rS1, cS1;
-  if (!cellSelection->isEmpty ())
-    cellSelection->getSelectedCells (rS0, cS0, rS1, cS1);
+  if (!cellSelection->isEmpty())
+    cellSelection->getSelectedCells(rS0, cS0, rS1, cS1);
 
   // visible cells range
-  CellRange visible = m_viewer->xyRectToRange (toBeUpdated);
+  CellRange visible = m_viewer->xyRectToRange(toBeUpdated);
   int r0, r1, c0, c1;  // range of visible rows and columns
-  r0 = visible.from ().frame ();
-  r1 = visible.to ().frame ();
-  c0 = visible.from ().layer ();
-  c1 = visible.to ().layer ();
+  r0 = visible.from().frame();
+  r1 = visible.to().frame();
+  c0 = visible.from().layer();
+  c1 = visible.to().layer();
 
-  drawNonEmptyBackground (p);
-  
-  drawSelectionBackground (p);
+  drawNonEmptyBackground(p);
+
+  drawSelectionBackground(p);
 
   // marker interval every 6 frames
   int distance, offset;
-  TApp::instance ()->getCurrentScene ()->getScene ()->getProperties ()->getMarkers (
-    distance, offset);
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+      distance, offset);
   if (distance == 0) distance = 6;
 
-  int currentRow = m_viewer->getCurrentRow ();
+  int currentRow = m_viewer->getCurrentRow();
   int col, row;
 
-  int drawLeft = std::max (1, toBeUpdated.left ());
-  int drawRight = std::min (width (), toBeUpdated.right ());
+  int drawLeft  = std::max(1, toBeUpdated.left());
+  int drawRight = std::min(width(), toBeUpdated.right());
 
-  int drawTop = std::max (1, toBeUpdated.top ());
-  int drawBottom = std::min (height () - 2, toBeUpdated.bottom ());
-  QRect drawingArea (QPoint (drawLeft, drawTop), QPoint (drawRight, drawBottom));
-  NumberRange frameSide = m_viewer->orientation ()->frameSide (drawingArea);
+  int drawTop    = std::max(1, toBeUpdated.top());
+  int drawBottom = std::min(height() - 2, toBeUpdated.bottom());
+  QRect drawingArea(QPoint(drawLeft, drawTop), QPoint(drawRight, drawBottom));
+  NumberRange frameSide = m_viewer->orientation()->frameSide(drawingArea);
 
   // for each layer
-  m_soundLevelModifyRects.clear ();
+  m_soundLevelModifyRects.clear();
   for (col = c0; col <= c1; col++) {
     // x in vertical timeline / y in horizontal
-    int layerAxis = m_viewer->columnToLayerAxis (col);
+    int layerAxis = m_viewer->columnToLayerAxis(col);
 
-    if (!columnFan->isActive (col)) { // folded column
-      drawFoldedColumns (p, layerAxis, frameSide);
+    if (!columnFan->isActive(col)) {  // folded column
+      drawFoldedColumns(p, layerAxis, frameSide);
       continue;
     }
 
-    TXshColumn *column = xsh->getColumn (col);
-    bool isColumn = (column) ? true : false;
-    bool isSoundColumn = false;
-    bool isPaletteColumn = false;
+    TXshColumn *column     = xsh->getColumn(col);
+    bool isColumn          = (column) ? true : false;
+    bool isSoundColumn     = false;
+    bool isPaletteColumn   = false;
     bool isSoundTextColumn = false;
     if (isColumn) {
-      isSoundColumn = column->getSoundColumn () != 0;
-      isPaletteColumn = column->getPaletteColumn () != 0;
-      isSoundTextColumn = column->getSoundTextColumn () != 0;
+      isSoundColumn     = column->getSoundColumn() != 0;
+      isPaletteColumn   = column->getPaletteColumn() != 0;
+      isSoundTextColumn = column->getSoundTextColumn() != 0;
     }
     // check if the column is reference
     bool isReference = true;
     if (column) {  // Verifico se la colonna e' una mask
-      if (column->isControl () || column->isRendered () ||
-        column->getMeshColumn ())
+      if (column->isControl() || column->isRendered() ||
+          column->getMeshColumn())
         isReference = false;
     }
 
-    NumberRange layerAxisRange (layerAxis + 1, m_viewer->columnToLayerAxis (col + 1));
+    NumberRange layerAxisRange(layerAxis + 1,
+                               m_viewer->columnToLayerAxis(col + 1));
 
     // draw vertical line
     if (layerAxis > 0) {
-      p.setPen (m_viewer->getVerticalLineColor ());
-      QLine verticalLine = m_viewer->orientation ()->verticalLine (layerAxis, frameSide);
-      p.drawLine (verticalLine);
+      p.setPen(m_viewer->getVerticalLineColor());
+      QLine verticalLine =
+          m_viewer->orientation()->verticalLine(layerAxis, frameSide);
+      p.drawLine(verticalLine);
     }
 
     // for each frame
@@ -821,150 +823,157 @@ void CellArea::drawCells (QPainter &p, const QRect toBeUpdated) {
       // draw horizontal lines
       // hide top-most marker line
       QColor color = ((row - offset) % distance == 0 && row != 0)
-        ? m_viewer->getMarkerLineColor ()
-        : m_viewer->getLightLineColor ();
+                         ? m_viewer->getMarkerLineColor()
+                         : m_viewer->getLightLineColor();
 
-      p.setPen (color);
-      int frameAxis = m_viewer->rowToFrameAxis (row);
-      QLine horizontalLine = m_viewer->orientation ()->horizontalLine (frameAxis, layerAxisRange);
-      p.drawLine (horizontalLine);
+      p.setPen(color);
+      int frameAxis = m_viewer->rowToFrameAxis(row);
+      QLine horizontalLine =
+          m_viewer->orientation()->horizontalLine(frameAxis, layerAxisRange);
+      p.drawLine(horizontalLine);
       if (!isColumn) continue;
       // Cells appearance depending on the type of column
       if (isSoundColumn)
-        drawSoundCell (p, row, col);
+        drawSoundCell(p, row, col);
       else if (isPaletteColumn)
-        drawPaletteCell (p, row, col, isReference);
+        drawPaletteCell(p, row, col, isReference);
       else if (isSoundTextColumn)
-        drawSoundTextCell (p, row, col);
+        drawSoundTextCell(p, row, col);
       else
-        drawLevelCell (p, row, col, isReference);
+        drawLevelCell(p, row, col, isReference);
     }
   }
 
-  drawExtenderHandles (p);
+  drawExtenderHandles(p);
 }
 
 // slightly bright background for non-empty rectangular area
-void CellArea::drawNonEmptyBackground (QPainter &p) const {
-  TXsheet *xsh = m_viewer->getXsheet ();
+void CellArea::drawNonEmptyBackground(QPainter &p) const {
+  TXsheet *xsh = m_viewer->getXsheet();
 
-  int totalFrames = xsh->getFrameCount ();
-  if (!totalFrames)
-    return;
+  int totalFrames = xsh->getFrameCount();
+  if (!totalFrames) return;
 
   int lastNonEmptyCol;
-  for (lastNonEmptyCol = xsh->getColumnCount () - 1; lastNonEmptyCol >= 0; lastNonEmptyCol--) {
-    TXshColumn *currentColumn = xsh->getColumn (lastNonEmptyCol);
+  for (lastNonEmptyCol = xsh->getColumnCount() - 1; lastNonEmptyCol >= 0;
+       lastNonEmptyCol--) {
+    TXshColumn *currentColumn = xsh->getColumn(lastNonEmptyCol);
     if (!currentColumn) continue;
-    if (!currentColumn->isEmpty ())
-      break;
+    if (!currentColumn->isEmpty()) break;
   }
-  QPoint xy = m_viewer->positionToXY (CellPosition (totalFrames, lastNonEmptyCol + 1));
-  p.fillRect (1, 0, xy.x (), xy.y (), QBrush (m_viewer->getNotEmptyColumnColor ()));
+  QPoint xy =
+      m_viewer->positionToXY(CellPosition(totalFrames, lastNonEmptyCol + 1));
+  p.fillRect(1, 0, xy.x(), xy.y(), QBrush(m_viewer->getNotEmptyColumnColor()));
 }
 
-void CellArea::drawFoldedColumns (QPainter &p, int layerAxis, const NumberRange &frameAxis) const {
+void CellArea::drawFoldedColumns(QPainter &p, int layerAxis,
+                                 const NumberRange &frameAxis) const {
   // 3 white bars
-  for (int i = 0; i < 3; i++) { 
-    QRect whiteRect = m_viewer->orientation ()->foldedRectangle (layerAxis, frameAxis, i);
-    p.fillRect (whiteRect, QBrush (Qt::white));
+  for (int i = 0; i < 3; i++) {
+    QRect whiteRect =
+        m_viewer->orientation()->foldedRectangle(layerAxis, frameAxis, i);
+    p.fillRect(whiteRect, QBrush(Qt::white));
   }
 
   // 3 dark lines
-  p.setPen (m_viewer->getLightLineColor ());
-  for (int i = 0; i < 3; i++) { 
-    QLine darkLine = m_viewer->orientation ()->foldedRectangleLine (layerAxis, frameAxis, i);
-    p.drawLine (darkLine);
+  p.setPen(m_viewer->getLightLineColor());
+  for (int i = 0; i < 3; i++) {
+    QLine darkLine =
+        m_viewer->orientation()->foldedRectangleLine(layerAxis, frameAxis, i);
+    p.drawLine(darkLine);
   }
 }
 
-void CellArea::drawSelectionBackground (QPainter &p) const {
+void CellArea::drawSelectionBackground(QPainter &p) const {
   // selected cells range
-  TCellSelection *cellSelection = m_viewer->getCellSelection ();
-  if (cellSelection->isEmpty ())
-    return;
+  TCellSelection *cellSelection = m_viewer->getCellSelection();
+  if (cellSelection->isEmpty()) return;
 
   int selRow0, selCol0, selRow1, selCol1;
-  cellSelection->getSelectedCells (selRow0, selCol0, selRow1, selCol1);
-  QRect selectionRect = m_viewer->rangeToXYRect (CellRange (
-    CellPosition (selRow0, selCol0), CellPosition (selRow1 + 1, selCol1 + 1)));
-  p.fillRect (selectionRect, QBrush (m_viewer->getSelectedEmptyCellColor ()));
+  cellSelection->getSelectedCells(selRow0, selCol0, selRow1, selCol1);
+  QRect selectionRect = m_viewer->rangeToXYRect(CellRange(
+      CellPosition(selRow0, selCol0), CellPosition(selRow1 + 1, selCol1 + 1)));
+  p.fillRect(selectionRect, QBrush(m_viewer->getSelectedEmptyCellColor()));
 }
 
-void CellArea::drawExtenderHandles (QPainter &p) {
-  const Orientation *o = m_viewer->orientation ();
+void CellArea::drawExtenderHandles(QPainter &p) {
+  const Orientation *o = m_viewer->orientation();
 
-  m_levelExtenderRect = QRect ();
-  m_upperLevelExtenderRect = QRect ();
+  m_levelExtenderRect      = QRect();
+  m_upperLevelExtenderRect = QRect();
 
   // selected cells range
-  TCellSelection *cellSelection = m_viewer->getCellSelection ();
-  if (cellSelection->isEmpty () || m_viewer->areSoundCellsSelected ())
-    return;
+  TCellSelection *cellSelection = m_viewer->getCellSelection();
+  if (cellSelection->isEmpty() || m_viewer->areSoundCellsSelected()) return;
 
   int selRow0, selCol0, selRow1, selCol1;
-  cellSelection->getSelectedCells (selRow0, selCol0, selRow1, selCol1);
-  QRect selected = m_viewer->rangeToXYRect (CellRange (
-    CellPosition (selRow0, selCol0), CellPosition (selRow1 + 1, selCol1 + 1)));
-  
+  cellSelection->getSelectedCells(selRow0, selCol0, selRow1, selCol1);
+  QRect selected = m_viewer->rangeToXYRect(CellRange(
+      CellPosition(selRow0, selCol0), CellPosition(selRow1 + 1, selCol1 + 1)));
+
   int x0, y0, x1, y1;
-  x0 = selected.left (); x1 = selected.right ();
-  y0 = selected.top (); y1 = selected.bottom ();
+  x0 = selected.left();
+  x1 = selected.right();
+  y0 = selected.top();
+  y1 = selected.bottom();
 
   // smart tab
-  QPoint smartTabPosOffset = Preferences::instance ()->isShowKeyframesOnXsheetCellAreaEnabled ()
-    ? QPoint (0, 0) : o->point (PredefinedPoint::KEY_HIDDEN);
+  QPoint smartTabPosOffset =
+      Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()
+          ? QPoint(0, 0)
+          : o->point(PredefinedPoint::KEY_HIDDEN);
 
   int distance, offset;
-  TApp::instance ()->getCurrentScene ()->getScene ()->getProperties ()->getMarkers (
-    distance, offset);
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+      distance, offset);
   if (distance == 0) distance = 6;
 
-  QPoint xyRadius = o->point (PredefinedPoint::EXTENDER_XY_RADIUS);
+  QPoint xyRadius = o->point(PredefinedPoint::EXTENDER_XY_RADIUS);
 
   // bottom / right extender handle
-  m_levelExtenderRect = o->rect (PredefinedRect::END_EXTENDER)
-    .translated (selected.bottomRight () + smartTabPosOffset);
-  p.setPen (Qt::black);
-  p.setBrush (SmartTabColor);
-  p.drawRoundRect (m_levelExtenderRect, xyRadius.x (), xyRadius.y ());
+  m_levelExtenderRect =
+      o->rect(PredefinedRect::END_EXTENDER)
+          .translated(selected.bottomRight() + smartTabPosOffset);
+  p.setPen(Qt::black);
+  p.setBrush(SmartTabColor);
+  p.drawRoundRect(m_levelExtenderRect, xyRadius.x(), xyRadius.y());
   QColor color = ((selRow1 + 1 - offset) % distance != 0)
-    ? m_viewer->getLightLineColor ()
-    : m_viewer->getMarkerLineColor ();
-  p.setPen (color);
-  QLine extenderLine = o->line (PredefinedLine::EXTENDER_LINE);
-  extenderLine.setP1 (extenderLine.p1 () + smartTabPosOffset);
-  p.drawLine (extenderLine.translated (selected.bottomRight ()));
+                     ? m_viewer->getLightLineColor()
+                     : m_viewer->getMarkerLineColor();
+  p.setPen(color);
+  QLine extenderLine = o->line(PredefinedLine::EXTENDER_LINE);
+  extenderLine.setP1(extenderLine.p1() + smartTabPosOffset);
+  p.drawLine(extenderLine.translated(selected.bottomRight()));
 
   // up / left extender handle
-  if (isCtrlPressed && selRow0 > 0 && !m_viewer->areCellsSelectedEmpty ()) {
-    QPoint properPoint = o->topRightCorner (selected);
-    m_upperLevelExtenderRect = o->rect (PredefinedRect::BEGIN_EXTENDER)
-      .translated (properPoint + smartTabPosOffset);
-    p.setPen (Qt::black);
-    p.setBrush (SmartTabColor);
-    p.drawRoundRect (m_upperLevelExtenderRect, xyRadius.x (), xyRadius.y ());
+  if (isCtrlPressed && selRow0 > 0 && !m_viewer->areCellsSelectedEmpty()) {
+    QPoint properPoint       = o->topRightCorner(selected);
+    m_upperLevelExtenderRect = o->rect(PredefinedRect::BEGIN_EXTENDER)
+                                   .translated(properPoint + smartTabPosOffset);
+    p.setPen(Qt::black);
+    p.setBrush(SmartTabColor);
+    p.drawRoundRect(m_upperLevelExtenderRect, xyRadius.x(), xyRadius.y());
     QColor color = ((selRow0 - offset) % distance != 0)
-      ? m_viewer->getLightLineColor ()
-      : m_viewer->getMarkerLineColor ();
-    p.setPen (color);
-    p.drawLine (extenderLine.translated (properPoint));
+                       ? m_viewer->getLightLineColor()
+                       : m_viewer->getMarkerLineColor();
+    p.setPen(color);
+    p.drawLine(extenderLine.translated(properPoint));
   }
 
-  p.setBrush (Qt::NoBrush);
+  p.setBrush(Qt::NoBrush);
 }
 
 //-----------------------------------------------------------------------------
 
 void CellArea::drawSoundCell(QPainter &p, int row, int col) {
-  const Orientation *o = m_viewer->orientation ();
+  const Orientation *o = m_viewer->orientation();
   TXshSoundColumn *soundColumn =
       m_viewer->getXsheet()->getColumn(col)->getSoundColumn();
-  QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
-  int x           = xy.x ();
-  int y           = xy.y ();
-  QRect cellRect = o->rect (PredefinedRect::CELL).translated (xy);
-  QRect rect = cellRect.adjusted (1, 0, -1, 0);
+  QPoint xy       = m_viewer->positionToXY(CellPosition(row, col));
+  int x           = xy.x();
+  int y           = xy.y();
+  QRect cellRect  = o->rect(PredefinedRect::CELL).translated(xy);
+  QRect rect      = cellRect.adjusted(1, 0, -1, 0);
   int maxNumFrame = soundColumn->getMaxFrame() + 1;
   int startFrame  = soundColumn->getFirstRow();
   TXshCell cell   = soundColumn->getCell(row);
@@ -991,28 +1000,28 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
                                  isSelected);
 
   // cells background
-  QRect backgroundRect = cellRect.adjusted (1, 1, -1, -1);
+  QRect backgroundRect = cellRect.adjusted(1, 1, -1, -1);
   p.fillRect(backgroundRect, cellColor);
-  
-  drawDragHandle (p, xy, sideColor);
-  drawEndOfDragHandle (p, isLastRow, xy, cellColor);
-  drawLockedDottedLine (p, soundColumn->isLocked (), xy, cellColor);
 
-  QRect trackRect = o->rect (PredefinedRect::SOUND_TRACK)
-    .translated (xy);
-  QRect previewRect = o->rect (PredefinedRect::PREVIEW_TRACK)
-    .translated (xy);
-  NumberRange trackBounds = o->layerSide (trackRect);
-  NumberRange previewBounds = o->layerSide (previewRect);
-  NumberRange trackAndPreview (trackBounds.from (), previewBounds.to ());
+  drawDragHandle(p, xy, sideColor);
+  drawEndOfDragHandle(p, isLastRow, xy, cellColor);
+  drawLockedDottedLine(p, soundColumn->isLocked(), xy, cellColor);
 
-  NumberRange timeBounds = o->frameSide (trackRect);
-  int offset  = row - cell.getFrameId().getNumber(); // rows since start of the clip
-  int begin   = timeBounds.from (); // time axis
-  int end     = timeBounds.to ();
-  int soundPixel  = begin - m_viewer->rowToFrameAxis (offset); // pixels since start of clip
+  QRect trackRect   = o->rect(PredefinedRect::SOUND_TRACK).translated(xy);
+  QRect previewRect = o->rect(PredefinedRect::PREVIEW_TRACK).translated(xy);
+  NumberRange trackBounds   = o->layerSide(trackRect);
+  NumberRange previewBounds = o->layerSide(previewRect);
+  NumberRange trackAndPreview(trackBounds.from(), previewBounds.to());
 
-  int trackWidth = trackBounds.length ();
+  NumberRange timeBounds = o->frameSide(trackRect);
+  int offset =
+      row - cell.getFrameId().getNumber();  // rows since start of the clip
+  int begin = timeBounds.from();            // time axis
+  int end   = timeBounds.to();
+  int soundPixel =
+      begin - m_viewer->rowToFrameAxis(offset);  // pixels since start of clip
+
+  int trackWidth = trackBounds.length();
   int lastMin, lastMax;
   DoublePair minmax;
   soundLevel->getValueAtPixel(o, soundPixel, minmax);
@@ -1020,9 +1029,9 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   double pmin = minmax.first;
   double pmax = minmax.second;
 
-  int center = trackBounds.middle ();
-  lastMin   = tcrop((int)pmin, -trackWidth / 2, 0) + center;
-  lastMax   = tcrop((int)pmax, 0, trackWidth / 2 - 1) + center;
+  int center = trackBounds.middle();
+  lastMin    = tcrop((int)pmin, -trackWidth / 2, 0) + center;
+  lastMax    = tcrop((int)pmax, 0, trackWidth / 2 - 1) + center;
 
   bool scrub = m_viewer->isScrubHighlighted(row, col);
 
@@ -1034,32 +1043,31 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
     pmin = minmax.first;
     pmax = minmax.second;
 
-    center = trackBounds.middle ();
-    min   = tcrop((int)pmin, -trackWidth / 2, 0) + center;
-    max   = tcrop((int)pmax, 0, trackWidth / 2 - 1) + center;
+    center = trackBounds.middle();
+    min    = tcrop((int)pmin, -trackWidth / 2, 0) + center;
+    max    = tcrop((int)pmax, 0, trackWidth / 2 - 1) + center;
 
     if (scrub && i % 2) {
-      p.setPen (m_viewer->getSoundColumnHlColor ());
-      QLine stroke = o->horizontalLine (i, previewBounds);
-      p.drawLine (stroke);
-    }
-    else if (i != begin || !isFirstRow) {
+      p.setPen(m_viewer->getSoundColumnHlColor());
+      QLine stroke = o->horizontalLine(i, previewBounds);
+      p.drawLine(stroke);
+    } else if (i != begin || !isFirstRow) {
       // preview tool on the right side
       if (i % 2)
         p.setPen(cellColor);
       else
         p.setPen(m_viewer->getSoundColumnTrackColor());
-      QLine stroke = o->horizontalLine (i, previewBounds);
-      p.drawLine (stroke);
+      QLine stroke = o->horizontalLine(i, previewBounds);
+      p.drawLine(stroke);
     }
 
     if (i != begin) {
       // "audio track" in the middle of the column
       p.setPen(m_viewer->getSoundColumnTrackColor());
-      QLine minLine = o->horizontalLine (i, NumberRange (lastMin, min));
-      p.drawLine (minLine);
-      QLine maxLine = o->horizontalLine (i, NumberRange (lastMax, max));
-      p.drawLine (maxLine);
+      QLine minLine = o->horizontalLine(i, NumberRange(lastMin, min));
+      p.drawLine(minLine);
+      QLine maxLine = o->horizontalLine(i, NumberRange(lastMax, max));
+      p.drawLine(maxLine);
     }
 
     lastMin = min;
@@ -1074,17 +1082,17 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   assert(ret);
 
   if (isFirstRow) {
-    QRect modifierRect = m_viewer->orientation ()->rect (PredefinedRect::BEGIN_SOUND_EDIT)
-      .translated (xy);
-    if (r0 != r0WithoutOff)
-      p.fillRect (modifierRect, SoundColumnExtenderColor);
-    m_soundLevelModifyRects.append(modifierRect); // list of clipping rects
+    QRect modifierRect = m_viewer->orientation()
+                             ->rect(PredefinedRect::BEGIN_SOUND_EDIT)
+                             .translated(xy);
+    if (r0 != r0WithoutOff) p.fillRect(modifierRect, SoundColumnExtenderColor);
+    m_soundLevelModifyRects.append(modifierRect);  // list of clipping rects
   }
   if (isLastRow) {
-    QRect modifierRect = m_viewer->orientation ()->rect (PredefinedRect::END_SOUND_EDIT)
-      .translated (xy);
-    if (r1 != r1WithoutOff)
-      p.fillRect (modifierRect, SoundColumnExtenderColor);
+    QRect modifierRect = m_viewer->orientation()
+                             ->rect(PredefinedRect::END_SOUND_EDIT)
+                             .translated(xy);
+    if (r1 != r1WithoutOff) p.fillRect(modifierRect, SoundColumnExtenderColor);
     m_soundLevelModifyRects.append(modifierRect);
   }
 }
@@ -1092,36 +1100,39 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
 //-----------------------------------------------------------------------------
 
 // paint side bar
-void CellArea::drawDragHandle (QPainter &p, const QPoint &xy, const QColor &sideColor) const {
-  QRect dragHandleRect = m_viewer->orientation ()->rect (PredefinedRect::DRAG_HANDLE_CORNER)
-    .translated (xy);
-  p.fillRect (dragHandleRect, QBrush (sideColor));
+void CellArea::drawDragHandle(QPainter &p, const QPoint &xy,
+                              const QColor &sideColor) const {
+  QRect dragHandleRect = m_viewer->orientation()
+                             ->rect(PredefinedRect::DRAG_HANDLE_CORNER)
+                             .translated(xy);
+  p.fillRect(dragHandleRect, QBrush(sideColor));
 }
 
 // cut off triangle at the end of drag handle
-void CellArea::drawEndOfDragHandle (QPainter &p, bool isEnd, const QPoint &xy, const QColor &cellColor) const {
-  if (!isEnd)
-    return;
-  QPainterPath corner = m_viewer->orientation ()->path (PredefinedPath::DRAG_HANDLE_CORNER)
-    .translated (xy);
-  p.fillPath (corner, QBrush (cellColor));
+void CellArea::drawEndOfDragHandle(QPainter &p, bool isEnd, const QPoint &xy,
+                                   const QColor &cellColor) const {
+  if (!isEnd) return;
+  QPainterPath corner = m_viewer->orientation()
+                            ->path(PredefinedPath::DRAG_HANDLE_CORNER)
+                            .translated(xy);
+  p.fillPath(corner, QBrush(cellColor));
 }
 
 // draw dot line if the column is locked
-void CellArea::drawLockedDottedLine (QPainter &p, bool isLocked, const QPoint &xy, const QColor &cellColor) const {
-  if (!isLocked)
-    return;
-  p.setPen (QPen (cellColor, 2, Qt::DotLine));
-  QLine dottedLine = m_viewer->orientation ()->line (PredefinedLine::LOCKED)
-    .translated (xy);
-  p.drawLine (dottedLine);
+void CellArea::drawLockedDottedLine(QPainter &p, bool isLocked,
+                                    const QPoint &xy,
+                                    const QColor &cellColor) const {
+  if (!isLocked) return;
+  p.setPen(QPen(cellColor, 2, Qt::DotLine));
+  QLine dottedLine =
+      m_viewer->orientation()->line(PredefinedLine::LOCKED).translated(xy);
+  p.drawLine(dottedLine);
 }
-
 
 //-----------------------------------------------------------------------------
 
 void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
-  const Orientation *o = m_viewer->orientation ();
+  const Orientation *o = m_viewer->orientation();
 
   TXsheet *xsh  = m_viewer->getXsheet();
   TXshCell cell = xsh->getCell(row, col);
@@ -1132,18 +1143,17 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   bool isSelected                   = cellSelection->isCellSelected(row, col) ||
                     columnSelection->isColumnSelected(col);
 
-  if (row > 0) prevCell = xsh->getCell(row - 1, col); // cell in previous frame
+  if (row > 0) prevCell = xsh->getCell(row - 1, col);  // cell in previous frame
   // nothing to draw
   if (cell.isEmpty() && prevCell.isEmpty()) return;
   TXshCell nextCell;
-  nextCell = xsh->getCell(row + 1, col); // cell in next frame
+  nextCell = xsh->getCell(row + 1, col);  // cell in next frame
 
-  QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
-  int x      = xy.x ();
-  int y      = xy.y ();
-  QRect cellRect = o->rect (PredefinedRect::CELL)
-    .translated (xy);
-  QRect rect = cellRect.adjusted (1, 1, -1, -1);
+  QPoint xy      = m_viewer->positionToXY(CellPosition(row, col));
+  int x          = xy.x();
+  int y          = xy.y();
+  QRect cellRect = o->rect(PredefinedRect::CELL).translated(xy);
+  QRect rect     = cellRect.adjusted(1, 1, -1, -1);
   if (cell.isEmpty()) {  // it means previous is not empty
     // diagonal cross meaning end of level
     QColor levelEndColor = m_viewer->getTextColor();
@@ -1178,19 +1188,18 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // paint cell
   p.fillRect(rect, QBrush(cellColor));
 
-  drawDragHandle (p, xy, sideColor);
+  drawDragHandle(p, xy, sideColor);
 
-  if (yetToCleanupCell) // ORIENTATION: what's this?
+  if (yetToCleanupCell)  // ORIENTATION: what's this?
     p.fillRect(
         rect.adjusted(rect.width() / 2, 0, 0, 0),
         (isSelected) ? SelectedFullcolorColumnColor : FullcolorColumnColor);
 
-  bool isLastRow = nextCell.isEmpty () ||
-    cell.m_level.getPointer () != nextCell.m_level.getPointer ();
-  drawEndOfDragHandle (p, isLastRow, xy, cellColor);
+  bool isLastRow = nextCell.isEmpty() ||
+                   cell.m_level.getPointer() != nextCell.m_level.getPointer();
+  drawEndOfDragHandle(p, isLastRow, xy, cellColor);
 
-  drawLockedDottedLine (p, xsh->getColumn (col)->isLocked (), xy, cellColor);
-
+  drawLockedDottedLine(p, xsh->getColumn(col)->isLocked(), xy, cellColor);
 
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
@@ -1202,16 +1211,17 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // draw marker interval
   if (isAfterMarkers) {
     p.setPen(m_viewer->getMarkerLineColor());
-    p.drawLine(o->line (PredefinedLine::SEE_MARKER_THROUGH).translated (xy));
+    p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
   }
 
-  QRect nameRect = o->rect (PredefinedRect::CELL_NAME).translated (xy);
+  QRect nameRect = o->rect(PredefinedRect::CELL_NAME).translated(xy);
 
   if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
     TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
     int r0, r1;
-    if (pegbar && pegbar->getKeyframeRange (r0, r1))
-      nameRect = o->rect (PredefinedRect::CELL_NAME_WITH_KEYFRAME).translated (xy);
+    if (pegbar && pegbar->getKeyframeRange(r0, r1))
+      nameRect =
+          o->rect(PredefinedRect::CELL_NAME_WITH_KEYFRAME).translated(xy);
   }
 
   // draw text in red if the file does not exist
@@ -1235,10 +1245,12 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // draw continue line
   if (sameLevel && prevCell.m_frameId == cell.m_frameId) {
     // not on line marker
-    PredefinedLine which = Preferences::instance ()->isLevelNameOnEachMarkerEnabled ()
-      ? PredefinedLine::CONTINUE_LEVEL : PredefinedLine::CONTINUE_LEVEL_WITH_NAME;
+    PredefinedLine which =
+        Preferences::instance()->isLevelNameOnEachMarkerEnabled()
+            ? PredefinedLine::CONTINUE_LEVEL
+            : PredefinedLine::CONTINUE_LEVEL_WITH_NAME;
 
-    QLine continueLine = o->line (which).translated (xy);
+    QLine continueLine = o->line(which).translated(xy);
     p.drawLine(continueLine);
   }
   // draw frame number
@@ -1287,9 +1299,9 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   nextCell = xsh->getCell(row + 1, col);
 
   if (cell.isEmpty() && prevCell.isEmpty()) return;
-  QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
-  int x      = xy.x ();
-  int y      = xy.y ();
+  QPoint xy  = m_viewer->positionToXY(CellPosition(row, col));
+  int x      = xy.x();
+  int y      = xy.y();
   QRect rect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
   if (cell.isEmpty()) {  // vuol dire che la precedente non e' vuota
     p.setPen(m_viewer->getLightLineColor());
@@ -1349,7 +1361,7 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
 
 void CellArea::drawPaletteCell(QPainter &p, int row, int col,
                                bool isReference) {
-  const Orientation *o = m_viewer->orientation ();
+  const Orientation *o = m_viewer->orientation();
 
   TXsheet *xsh  = m_viewer->getXsheet();
   TXshCell cell = xsh->getCell(row, col);
@@ -1362,11 +1374,11 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   TXshCell nextCell     = xsh->getCell(row + 1, col);
 
   if (cell.isEmpty() && prevCell.isEmpty()) return;
-  QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
-  int x      = xy.x ();
-  int y      = xy.y ();
-  QRect cellRect = o->rect (PredefinedRect::CELL).translated (xy);
-  QRect rect = cellRect.adjusted (1, 1, -1, -1);
+  QPoint xy      = m_viewer->positionToXY(CellPosition(row, col));
+  int x          = xy.x();
+  int y          = xy.y();
+  QRect cellRect = o->rect(PredefinedRect::CELL).translated(xy);
+  QRect rect     = cellRect.adjusted(1, 1, -1, -1);
   if (cell.isEmpty()) {  // this means the former is not empty
     QColor levelEndColor = m_viewer->getTextColor();
     levelEndColor.setAlphaF(0.3);
@@ -1389,11 +1401,11 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 
   p.fillRect(rect, QBrush(cellColor));
 
-  drawDragHandle (p, xy, sideColor);
-  bool isLastRow = nextCell.isEmpty () ||
-    cell.m_level.getPointer () != nextCell.m_level.getPointer ();
-  drawEndOfDragHandle (p, isLastRow, xy, cellColor);
-  drawLockedDottedLine (p, xsh->getColumn (col)->isLocked (), xy, cellColor);
+  drawDragHandle(p, xy, sideColor);
+  bool isLastRow = nextCell.isEmpty() ||
+                   cell.m_level.getPointer() != nextCell.m_level.getPointer();
+  drawEndOfDragHandle(p, isLastRow, xy, cellColor);
+  drawLockedDottedLine(p, xsh->getColumn(col)->isLocked(), xy, cellColor);
 
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
@@ -1405,8 +1417,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 
   if (isAfterMarkers) {
     p.setPen(m_viewer->getMarkerLineColor());
-    p.drawLine (o->line (PredefinedLine::SEE_MARKER_THROUGH)
-      .translated (xy));
+    p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
   }
 
   if (sameLevel && prevCell.m_frameId == cell.m_frameId &&
@@ -1414,9 +1425,8 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
                           // do not write anything and draw a vertical line
     QPen oldPen = p.pen();
     p.setPen(QPen(m_viewer->getTextColor(), 1));
-    QLine continueLine = o->line (
-      PredefinedLine::CONTINUE_LEVEL).translated (xy);
-    p.drawLine (continueLine);
+    QLine continueLine = o->line(PredefinedLine::CONTINUE_LEVEL).translated(xy);
+    p.drawLine(continueLine);
     p.setPen(oldPen);
   } else {
     TFrameId fid = cell.m_frameId;
@@ -1467,144 +1477,154 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 
 //-----------------------------------------------------------------------------
 
-void CellArea::drawKeyframe (QPainter &p, const QRect toBeUpdated) {
-  const Orientation *o = m_viewer->orientation ();
+void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
+  const Orientation *o = m_viewer->orientation();
   int r0, r1, c0, c1;  // range of visible rows and columns
-  CellRange visible = m_viewer->xyRectToRange (toBeUpdated);
-  r0 = visible.from ().frame ();
-  r1 = visible.to ().frame ();
-  c0 = visible.from ().layer ();
-  c1 = visible.to ().layer ();
+  CellRange visible = m_viewer->xyRectToRange(toBeUpdated);
+  r0                = visible.from().frame();
+  r1                = visible.to().frame();
+  c0                = visible.from().layer();
+  c1                = visible.to().layer();
 
-  static QPixmap selectedKey = QPixmap (":Resources/selected_key.bmp");
-  static QPixmap key = QPixmap (":Resources/key.bmp");
-  const QRect &keyRect = o->rect (PredefinedRect::KEY_ICON);
+  static QPixmap selectedKey = QPixmap(":Resources/selected_key.bmp");
+  static QPixmap key         = QPixmap(":Resources/key.bmp");
+  const QRect &keyRect       = o->rect(PredefinedRect::KEY_ICON);
 
-  TXsheet *xsh = m_viewer->getXsheet ();
-  ColumnFan *columnFan = xsh->getColumnFan (o);
+  TXsheet *xsh         = m_viewer->getXsheet();
+  ColumnFan *columnFan = xsh->getColumnFan(o);
   int col;
   for (col = c0; col <= c1; col++) {
-    if (!columnFan->isActive (col)) continue;
-    int layerAxis = m_viewer->columnToLayerAxis (col);
+    if (!columnFan->isActive(col)) continue;
+    int layerAxis = m_viewer->columnToLayerAxis(col);
 
-    TStageObject *pegbar = xsh->getStageObject (m_viewer->getObjectId (col));
+    TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
     if (!pegbar) return;
 
     int row0, row1;
-    bool emptyKeyframe = !pegbar->getKeyframeRange (row0, row1);
+    bool emptyKeyframe = !pegbar->getKeyframeRange(row0, row1);
     if (emptyKeyframe) continue;
 
     bool emptyKeyframeRange = row0 >= row1;
     int row;
-    row0 = std::max (row0, r0);
-    row1 = std::min (row1, r1);
+    row0 = std::max(row0, r0);
+    row1 = std::min(row1, r1);
 
     /*- first, draw key segments -*/
-    p.setPen (m_viewer->getTextColor ());
-    int line_layerAxis = layerAxis + o->layerSide (keyRect).middle ();
+    p.setPen(m_viewer->getTextColor());
+    int line_layerAxis = layerAxis + o->layerSide(keyRect).middle();
     for (row = row0; row <= row1; row++) {
       int segmentRow0, segmentRow1;
       double ease0, ease1;
-      if (pegbar->getKeyframeSpan (row, segmentRow0, ease0, segmentRow1, ease1)) {
+      if (pegbar->getKeyframeSpan(row, segmentRow0, ease0, segmentRow1,
+                                  ease1)) {
+        drawKeyframeLine(p, col, NumberRange(segmentRow0, segmentRow1));
 
-        drawKeyframeLine (p, col, NumberRange (segmentRow0, segmentRow1));
-
-        if (segmentRow1 - segmentRow0 > 4) { // only show if distance more than 4 frames
+        if (segmentRow1 - segmentRow0 >
+            4) {  // only show if distance more than 4 frames
           int handleRow0, handleRow1;
-          if (getEaseHandles (segmentRow0, segmentRow1, ease0, ease1, handleRow0, handleRow1)) {
-            m_viewer->drawPredefinedPath (p,
-              PredefinedPath::BEGIN_EASE_TRIANGLE, CellPosition (handleRow0, col),
-              m_viewer->getLightLineColor (), m_viewer->getTextColor ());
+          if (getEaseHandles(segmentRow0, segmentRow1, ease0, ease1, handleRow0,
+                             handleRow1)) {
+            m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_EASE_TRIANGLE,
+                                         CellPosition(handleRow0, col),
+                                         m_viewer->getLightLineColor(),
+                                         m_viewer->getTextColor());
 
-            m_viewer->drawPredefinedPath (p,
-              PredefinedPath::END_EASE_TRIANGLE, CellPosition (handleRow1, col),
-              m_viewer->getLightLineColor (), m_viewer->getTextColor ());
+            m_viewer->drawPredefinedPath(p, PredefinedPath::END_EASE_TRIANGLE,
+                                         CellPosition(handleRow1, col),
+                                         m_viewer->getLightLineColor(),
+                                         m_viewer->getTextColor());
           }
         }
         // skip to next segment
         row = segmentRow1 - 1;
-      }
-      else if (pegbar->isKeyframe (row) && pegbar->isKeyframe (row + 1)) {
+      } else if (pegbar->isKeyframe(row) && pegbar->isKeyframe(row + 1)) {
         // 2 keyframes in a row - connect with a short line
-        drawKeyframeLine (p, col, NumberRange (row, row + 1));
+        drawKeyframeLine(p, col, NumberRange(row, row + 1));
       }
     }
 
     /*- then draw keyframe pixmaps -*/
     int icon_layerAxis = line_layerAxis - 5;
     for (row = row0; row <= row1; row++) {
-      p.setPen (m_viewer->getTextColor ());
-      if (pegbar->isKeyframe (row)) {
-        QPoint target = keyRect
-          .translated (m_viewer->positionToXY (CellPosition (row, col))).topLeft ();
-        if (m_viewer->getKeyframeSelection () &&
-          m_viewer->getKeyframeSelection ()->isSelected (row, col)) {
+      p.setPen(m_viewer->getTextColor());
+      if (pegbar->isKeyframe(row)) {
+        QPoint target =
+            keyRect.translated(m_viewer->positionToXY(CellPosition(row, col)))
+                .topLeft();
+        if (m_viewer->getKeyframeSelection() &&
+            m_viewer->getKeyframeSelection()->isSelected(row, col)) {
           // keyframe selected
-          p.drawPixmap (target, selectedKey);
-        }
-        else {
+          p.drawPixmap(target, selectedKey);
+        } else {
           // keyframe not selected
-          p.drawPixmap (target, key);
+          p.drawPixmap(target, key);
         }
       }
     }
 
-    int icon_frameAxis = m_viewer->rowToFrameAxis (row1 + 1);
+    int icon_frameAxis = m_viewer->rowToFrameAxis(row1 + 1);
     if (!emptyKeyframeRange && row0 <= row1 + 1) {
       // there's just a keyframe
       // drawing loop button
-      p.setBrush (Qt::white);
-      p.setPen (Qt::black);
-      QPoint target = o->frameLayerToXY (icon_frameAxis, icon_layerAxis);
-      p.drawRect (QRect (target, QSize (10, 10)));
-      p.setBrush (Qt::NoBrush);
+      p.setBrush(Qt::white);
+      p.setPen(Qt::black);
+      QPoint target = o->frameLayerToXY(icon_frameAxis, icon_layerAxis);
+      p.drawRect(QRect(target, QSize(10, 10)));
+      p.setBrush(Qt::NoBrush);
       // drawing the bottom edge (rounded)
-      p.drawLine (target + QPoint (1, 10), target + QPoint (9, 10));
-      p.setPen (Qt::white);
-      p.drawLine (target + QPoint (3, 10), target + QPoint (7, 10));
-      p.setPen (Qt::black);
-      p.drawLine (target + QPoint (3, 11), target + QPoint (7, 11));
+      p.drawLine(target + QPoint(1, 10), target + QPoint(9, 10));
+      p.setPen(Qt::white);
+      p.drawLine(target + QPoint(3, 10), target + QPoint(7, 10));
+      p.setPen(Qt::black);
+      p.drawLine(target + QPoint(3, 11), target + QPoint(7, 11));
 
       // drawing the arrow
-      p.drawArc (QRect (target + QPoint (2, 3), QSize (6, 6)), 180 * 16, 270 * 16);
-      p.drawLine (target + QPoint (5, 2), target + QPoint (5, 5));
-      p.drawLine (target + QPoint (5, 2), target + QPoint (8, 2));
+      p.drawArc(QRect(target + QPoint(2, 3), QSize(6, 6)), 180 * 16, 270 * 16);
+      p.drawLine(target + QPoint(5, 2), target + QPoint(5, 5));
+      p.drawLine(target + QPoint(5, 2), target + QPoint(8, 2));
     }
-    if (pegbar->isCycleEnabled ()) {
+    if (pegbar->isCycleEnabled()) {
       // the row zigzag bellow the button
-      int ymax = m_viewer->rowToFrameAxis (r1 + 1);
-      int qy = icon_frameAxis + 12;
-      int zig = 2;
-      int qx = icon_layerAxis + 5;
-      p.setPen (m_viewer->getTextColor ());
-      p.drawLine (o->frameLayerToXY (qy, qx), o->frameLayerToXY (qy + zig, qx - zig));
+      int ymax = m_viewer->rowToFrameAxis(r1 + 1);
+      int qy   = icon_frameAxis + 12;
+      int zig  = 2;
+      int qx   = icon_layerAxis + 5;
+      p.setPen(m_viewer->getTextColor());
+      p.drawLine(o->frameLayerToXY(qy, qx),
+                 o->frameLayerToXY(qy + zig, qx - zig));
       while (qy < ymax) {
-        p.drawLine (o->frameLayerToXY (qy + zig, qx - zig), o->frameLayerToXY (qy + 3 * zig, qx + zig));
-        p.drawLine (o->frameLayerToXY (qy + 3 * zig, qx + zig), o->frameLayerToXY (qy + 5 * zig, qx - zig));
+        p.drawLine(o->frameLayerToXY(qy + zig, qx - zig),
+                   o->frameLayerToXY(qy + 3 * zig, qx + zig));
+        p.drawLine(o->frameLayerToXY(qy + 3 * zig, qx + zig),
+                   o->frameLayerToXY(qy + 5 * zig, qx - zig));
         qy += 4 * zig;
       }
     }
   }
 }
 
-void CellArea::drawKeyframeLine (QPainter &p, int col, const NumberRange &rows) const {
-  const QRect &keyRect = m_viewer->orientation ()->rect (PredefinedRect::KEY_ICON);
-  QPoint begin = keyRect.center () + m_viewer->positionToXY (CellPosition (rows.from (), col));
-  QPoint end = keyRect.center () + m_viewer->positionToXY (CellPosition (rows.to (), col));
+void CellArea::drawKeyframeLine(QPainter &p, int col,
+                                const NumberRange &rows) const {
+  const QRect &keyRect =
+      m_viewer->orientation()->rect(PredefinedRect::KEY_ICON);
+  QPoint begin =
+      keyRect.center() + m_viewer->positionToXY(CellPosition(rows.from(), col));
+  QPoint end =
+      keyRect.center() + m_viewer->positionToXY(CellPosition(rows.to(), col));
 
-  p.setPen (m_viewer->getTextColor ());
-  p.drawLine (QLine (begin, end));
+  p.setPen(m_viewer->getTextColor());
+  p.drawLine(QLine(begin, end));
 }
 
 //-----------------------------------------------------------------------------
 
 void CellArea::drawNotes(QPainter &p, const QRect toBeUpdated) {
-  CellRange visible = m_viewer->xyRectToRange (toBeUpdated);
+  CellRange visible = m_viewer->xyRectToRange(toBeUpdated);
   int r0, r1, c0, c1;  // range of visible rows and columns
-  r0 = visible.from ().frame ();
-  r1 = visible.to ().frame ();
-  c0 = visible.from ().layer ();
-  c1 = visible.to ().layer ();
+  r0 = visible.from().frame();
+  r1 = visible.to().frame();
+  c0 = visible.from().layer();
+  c1 = visible.to().layer();
 
   TXsheet *xsh = m_viewer->getXsheet();
   if (!xsh) return;
@@ -1625,8 +1645,8 @@ void CellArea::drawNotes(QPainter &p, const QRect toBeUpdated) {
     int r = notes->getNoteRow(i);
     int c = notes->getNoteCol(i);
     if (r < r0 || r > r1 || c < c0 || c > c1) continue;
-	QPoint xy = m_viewer->positionToXY (CellPosition (r, c));
-    TPointD pos = notes->getNotePos(i) + TPointD(xy.x (), xy.y ());
+    QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
+    TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
     noteWidget->paint(&p, QPoint(pos.x, pos.y),
                       i == m_viewer->getCurrentNoteIndex());
   }
@@ -1634,10 +1654,9 @@ void CellArea::drawNotes(QPainter &p, const QRect toBeUpdated) {
 
 //-----------------------------------------------------------------------------
 
-bool CellArea::getEaseHandles(int r0, int r1,
-							  double e0, double e1,
-							  int &rh0, int &rh1) {
-  if (r1 <= r0 + 4) { // ... what?
+bool CellArea::getEaseHandles(int r0, int r1, double e0, double e1, int &rh0,
+                              int &rh1) {
+  if (r1 <= r0 + 4) {  // ... what?
     rh0 = r0;
     rh1 = r1;
     return false;
@@ -1696,9 +1715,11 @@ void CellArea::paintEvent(QPaintEvent *event) {
   // focus cell border
   int row    = m_viewer->getCurrentRow();
   int col    = m_viewer->getCurrentColumn();
-  QPoint xy = m_viewer->positionToXY (CellPosition (row, col));
-  QRect rect = m_viewer->orientation ()->rect (PredefinedRect::CELL)
-    .translated (xy).adjusted (1, 1, -1, -1);
+  QPoint xy  = m_viewer->positionToXY(CellPosition(row, col));
+  QRect rect = m_viewer->orientation()
+                   ->rect(PredefinedRect::CELL)
+                   .translated(xy)
+                   .adjusted(1, 1, -1, -1);
   p.setPen(Qt::black);
   p.setBrush(Qt::NoBrush);
   p.drawRect(rect);
@@ -1730,7 +1751,7 @@ public:
 //----------------------------------------------------------
 
 void CellArea::mousePressEvent(QMouseEvent *event) {
-  const Orientation *o = m_viewer->orientation ();
+  const Orientation *o = m_viewer->orientation();
 
   m_viewer->setQtModifiers(event->modifiers());
   assert(!m_isPanning);
@@ -1738,13 +1759,13 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     assert(getDragTool() == 0);
 
-  TPoint pos(event->pos().x(), event->pos().y());
-	CellPosition cellPosition = m_viewer->xyToPosition (event->pos ());
-	int row = cellPosition.frame ();
-	int col = cellPosition.layer ();
-	QPoint cellTopLeft = m_viewer->positionToXY (CellPosition (row, col));
-  QPoint mouseInCell = event->pos () - cellTopLeft;
-  int x = mouseInCell.x (); // where in the cell click is
+    TPoint pos(event->pos().x(), event->pos().y());
+    CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
+    int row                   = cellPosition.frame();
+    int col                   = cellPosition.layer();
+    QPoint cellTopLeft        = m_viewer->positionToXY(CellPosition(row, col));
+    QPoint mouseInCell        = event->pos() - cellTopLeft;
+    int x                     = mouseInCell.x();  // where in the cell click is
 
     // Check if a note is clicked
     TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
@@ -1752,8 +1773,8 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     for (i = notes->getCount() - 1; i >= 0; i--) {
       int r       = notes->getNoteRow(i);
       int c       = notes->getNoteCol(i);
-	    QPoint xy   = m_viewer->positionToXY (CellPosition (r, c));
-      TPointD pos = notes->getNotePos(i) + TPointD(xy.x (), xy.y ());
+      QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
+      TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
       QRect rect(pos.x, pos.y, NoteWidth, NoteHeight);
       if (!rect.contains(event->pos())) continue;
       setDragTool(XsheetGUI::DragTool::makeNoteMoveTool(m_viewer));
@@ -1763,7 +1784,7 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       update();
       return;
     }
-	// If I have not clicked on a note, and there's a note selected, deselect it
+    // If I have not clicked on a note, and there's a note selected, deselect it
     if (m_viewer->getCurrentNoteIndex() >= 0) m_viewer->setCurrentNoteIndex(-1);
 
     TXsheet *xsh       = m_viewer->getXsheet();
@@ -1795,11 +1816,12 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
       // only if key frame area is active
       int k0, k1;
-      bool isKeyframeFrame =
-        pegbar && pegbar->getKeyframeRange (k0, k1) &&
-        (k1 > k0 || k0 == row) && k0 <= row && row <= k1 + 1;
-      bool isKeyFrameArea = isKeyframeFrame &&
-        o->rect (PredefinedRect::KEYFRAME_AREA).contains (mouseInCell);
+      bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
+                             (k1 > k0 || k0 == row) && k0 <= row &&
+                             row <= k1 + 1;
+      bool isKeyFrameArea =
+          isKeyframeFrame &&
+          o->rect(PredefinedRect::KEYFRAME_AREA).contains(mouseInCell);
       bool accept = false;
 
       if (isKeyFrameArea) {           // They are in the keyframe selection
@@ -1815,36 +1837,35 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
           int rh0, rh1;
           if (pegbar->getKeyframeSpan(row, r0, e0, r1, e1) &&
               getEaseHandles(r0, r1, e0, e1, rh0, rh1)) {
-            if (rh0 == row) { // in a keyframe handle
-              setDragTool (XsheetGUI::DragTool::makeKeyFrameHandleMoverTool (
-                m_viewer, true, r0));
+            if (rh0 == row) {  // in a keyframe handle
+              setDragTool(XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(
+                  m_viewer, true, r0));
               accept = true;
-            }
-            else if (rh1 == row) { // in a keyframe handle
-              setDragTool (XsheetGUI::DragTool::makeKeyFrameHandleMoverTool (
-                m_viewer, false, r1));
+            } else if (rh1 == row) {  // in a keyframe handle
+              setDragTool(XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(
+                  m_viewer, false, r1));
               accept = true;
             }
           }
         }
-      }
-      else if (isKeyframeFrame && row == k1 + 1 &&
-        o->rect (PredefinedRect::LOOP_ICON).contains (mouseInCell)) { // cycle toggle
-        pegbar->enableCycle (!pegbar->isCycleEnabled ());
-        TUndoManager::manager ()->add (new CycleUndo (pegbar, this));
+      } else if (isKeyframeFrame && row == k1 + 1 &&
+                 o->rect(PredefinedRect::LOOP_ICON)
+                     .contains(mouseInCell)) {  // cycle toggle
+        pegbar->enableCycle(!pegbar->isCycleEnabled());
+        TUndoManager::manager()->add(new CycleUndo(pegbar, this));
         accept = true;
       }
       if (accept) {
-        m_viewer->dragToolClick (event);
-        event->accept ();
-        update ();
+        m_viewer->dragToolClick(event);
+        event->accept();
+        update();
         return;
       }
       // keep searching
     }
 
-    if ((!xsh->getCell(row, col).isEmpty()) && 
-      o->rect (PredefinedRect::DRAG_AREA).contains (mouseInCell)) {
+    if ((!xsh->getCell(row, col).isEmpty()) &&
+        o->rect(PredefinedRect::DRAG_AREA).contains(mouseInCell)) {
       TXshColumn *column = xsh->getColumn(col);
       if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
         int r0, r1;
@@ -1869,8 +1890,8 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
         setDragTool(XsheetGUI::DragTool::makeLevelMoverTool(m_viewer));
     } else {
       m_viewer->getKeyframeSelection()->selectNone();
-      if (isSoundColumn && 
-        o->rect (PredefinedRect::PREVIEW_TRACK).contains (mouseInCell))
+      if (isSoundColumn &&
+          o->rect(PredefinedRect::PREVIEW_TRACK).contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeSoundScrubTool(
             m_viewer, column->getSoundColumn()));
       else if (m_levelExtenderRect.contains(pos.x, pos.y))
@@ -1896,7 +1917,7 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void CellArea::mouseMoveEvent(QMouseEvent *event) {
-  const Orientation *o = m_viewer->orientation ();
+  const Orientation *o = m_viewer->orientation();
 
   m_viewer->setQtModifiers(event->modifiers());
   setCursor(Qt::ArrowCursor);
@@ -1920,13 +1941,13 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  CellPosition cellPosition = m_viewer->xyToPosition (pos);
-  int row = cellPosition.frame ();
-  int col = cellPosition.layer ();
-  QPoint cellTopLeft = m_viewer->positionToXY (CellPosition (row, col));
-  int x = m_pos.x () - cellTopLeft.x ();
-  int y = m_pos.y () - cellTopLeft.y ();
-  QPoint mouseInCell = m_pos - cellTopLeft;
+  CellPosition cellPosition = m_viewer->xyToPosition(pos);
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
+  QPoint cellTopLeft        = m_viewer->positionToXY(CellPosition(row, col));
+  int x                     = m_pos.x() - cellTopLeft.x();
+  int y                     = m_pos.y() - cellTopLeft.y();
+  QPoint mouseInCell        = m_pos - cellTopLeft;
 
   TXsheet *xsh = m_viewer->getXsheet();
 
@@ -1943,10 +1964,11 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
 
   TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
   int k0, k1;
-  bool isKeyframeFrame = Preferences::instance ()->isShowKeyframesOnXsheetCellAreaEnabled () &&
-    pegbar && pegbar->getKeyframeRange (k0, k1) && k0 <= row && row <= k1 + 1;
-  if (isKeyframeFrame
-      && o->rect (PredefinedRect::KEYFRAME_AREA).contains (mouseInCell)) {
+  bool isKeyframeFrame =
+      Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
+      pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
+  if (isKeyframeFrame &&
+      o->rect(PredefinedRect::KEYFRAME_AREA).contains(mouseInCell)) {
     if (pegbar->isKeyframe(row))  // key frame
       m_tooltip = tr("Click to select keyframe, drag to move it");
     else {
@@ -1963,10 +1985,10 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
           m_tooltip = tr("Click and drag to set the deceleration range");
       }
     }
-  }
-  else if (isKeyframeFrame && row == k1 + 1 &&
-    o->rect (PredefinedRect::LOOP_ICON).contains (mouseInCell)) // cycle toggle of key frames
-    m_tooltip = tr ("Set the cycle of previous keyframes");
+  } else if (isKeyframeFrame && row == k1 + 1 &&
+             o->rect(PredefinedRect::LOOP_ICON)
+                 .contains(mouseInCell))  // cycle toggle of key frames
+    m_tooltip = tr("Set the cycle of previous keyframes");
   else if ((!xsh->getCell(row, col).isEmpty() || isSoundColumn) && x < 6)
     m_tooltip = tr("Click and drag to move the selection");
   else if (isZeraryColumn)
@@ -2023,9 +2045,9 @@ void CellArea::mouseReleaseEvent(QMouseEvent *event) {
 
 void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   TPoint pos(event->pos().x(), event->pos().y());
-  CellPosition cellPosition = m_viewer->xyToPosition (event->pos ());
-  int row = cellPosition.frame ();
-  int col = cellPosition.layer ();
+  CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
   // Se la colonna e' sound non devo fare nulla
   TXshColumn *column = m_viewer->getXsheet()->getColumn(col);
   if (column && (column->getSoundColumn() || column->getSoundTextColumn()))
@@ -2037,9 +2059,9 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   for (i = notes->getCount() - 1; i >= 0; i--) {
     int r       = notes->getNoteRow(i);
     int c       = notes->getNoteCol(i);
-	  QPoint xy   = m_viewer->positionToXY (CellPosition (r, c));
-    TPointD pos = notes->getNotePos(i) + TPointD(xy.x (), xy.y ());
-	  QRect rect (pos.x, pos.y, NoteWidth, NoteHeight);
+    QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
+    TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
+    QRect rect(pos.x, pos.y, NoteWidth, NoteHeight);
     if (!rect.contains(event->pos())) continue;
     m_viewer->setCurrentNoteIndex(i);
     m_viewer->getNotesWidget().at(i)->openNotePopup();
@@ -2050,9 +2072,11 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   oh->setObjectId(m_viewer->getObjectId(col));
 
   if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
-    int x = pos.x - m_viewer->positionToXY(cellPosition).x (); // click coordinate relative to cell topleft
-    TStageObject *pegbar =
-        m_viewer->getXsheet()->getStageObject(m_viewer->getObjectId(col)); // AREA
+    int x = pos.x -
+            m_viewer->positionToXY(cellPosition)
+                .x();  // click coordinate relative to cell topleft
+    TStageObject *pegbar = m_viewer->getXsheet()->getStageObject(
+        m_viewer->getObjectId(col));  // AREA
     bool isKeyFrameArea = (pegbar && pegbar->isKeyframe(row) &&
                            ColumnWidth - 13 <= x && x <= ColumnWidth)
                               ? true
@@ -2081,9 +2105,9 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   TPoint pos(event->pos().x(), event->pos().y());
-  CellPosition cellPosition = m_viewer->xyToPosition (event->pos ());
-  int row = cellPosition.frame ();
-  int col = cellPosition.layer ();
+  CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
 
   QMenu menu(this);
 
@@ -2093,8 +2117,8 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   for (i = notes->getCount() - 1; i >= 0; i--) {
     int r       = notes->getNoteRow(i);
     int c       = notes->getNoteCol(i);
-	  QPoint xy = m_viewer->positionToXY (CellPosition (r, c));
-    TPointD pos = notes->getNotePos(i) + TPointD(xy.x (), xy.y ());
+    QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
+    TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
     QRect rect(pos.x, pos.y, NoteWidth, NoteHeight);
     if (!rect.contains(event->pos())) continue;
     m_viewer->setCurrentNoteIndex(i);
@@ -2104,14 +2128,15 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   }
 
   TXsheet *xsh         = m_viewer->getXsheet();
-  int x0               = m_viewer->positionToXY (cellPosition).x ();
+  int x0               = m_viewer->positionToXY(cellPosition).x();
   int x                = pos.x - x0;
   TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
   int k0, k1;
   int r0, r1, c0, c1;
   if (col >= 0) m_viewer->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
 
-  if (pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 && // AREA
+  if (pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row &&
+      row <= k1 &&  // AREA
       ColumnWidth - 13 <= x && x <= ColumnWidth &&
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
     TStageObjectId objectId;

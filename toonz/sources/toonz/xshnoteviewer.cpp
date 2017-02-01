@@ -451,25 +451,30 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WindowFlags flags)
 #else
 NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-    : QFrame(parent), m_viewer(parent), m_flipOrientationButton (nullptr),
-    m_noteButton (nullptr), m_precNoteButton (nullptr),
-    m_nextNoteButton (nullptr), m_frameDisplayStyleCombo (nullptr),
-    m_layerHeaderPanel (nullptr) {
+    : QFrame(parent)
+    , m_viewer(parent)
+    , m_flipOrientationButton(nullptr)
+    , m_noteButton(nullptr)
+    , m_precNoteButton(nullptr)
+    , m_nextNoteButton(nullptr)
+    , m_frameDisplayStyleCombo(nullptr)
+    , m_layerHeaderPanel(nullptr) {
 
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("cornerWidget");
 
-  m_flipOrientationButton  = new QPushButton (m_viewer->orientation ()->name (), this);
+  m_flipOrientationButton =
+      new QPushButton(m_viewer->orientation()->name(), this);
   m_noteButton             = new QToolButton(this);
   m_precNoteButton         = new QToolButton(this);
   m_nextNoteButton         = new QToolButton(this);
   m_frameDisplayStyleCombo = new QComboBox(this);
-  m_layerHeaderPanel       = new LayerHeaderPanel (m_viewer, this);
+  m_layerHeaderPanel       = new LayerHeaderPanel(m_viewer, this);
 
   //-----
 
-  m_flipOrientationButton->setObjectName ("flipOrientationButton");
-  m_flipOrientationButton->setFocusPolicy (Qt::FocusPolicy::NoFocus);
+  m_flipOrientationButton->setObjectName("flipOrientationButton");
+  m_flipOrientationButton->setFocusPolicy(Qt::FocusPolicy::NoFocus);
 
   m_noteButton->setObjectName("ToolbarToolButton");
   m_noteButton->setFixedSize(44, 26);
@@ -503,11 +508,12 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
       (int)m_viewer->getFrameDisplayStyle());
 
   // layout
-  createLayout ();
+  createLayout();
 
   // signal-slot connections
   bool ret = true;
-  ret = ret && connect (m_flipOrientationButton, SIGNAL (clicked()), SLOT (flipOrientation()));
+  ret      = ret && connect(m_flipOrientationButton, SIGNAL(clicked()),
+                       SLOT(flipOrientation()));
 
   ret = ret && connect(m_noteButton, SIGNAL(clicked()), SLOT(toggleNewNote()));
   ret = ret &&
@@ -515,11 +521,12 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   ret = ret &&
         connect(m_nextNoteButton, SIGNAL(clicked()), this, SLOT(nextNote()));
 
-  ret = ret && connect(m_frameDisplayStyleCombo, SIGNAL(currentIndexChanged(int)),
+  ret =
+      ret && connect(m_frameDisplayStyleCombo, SIGNAL(currentIndexChanged(int)),
                      this, SLOT(onFrameDisplayStyleChanged(int)));
 
-  ret = ret && connect (m_viewer, &XsheetViewer::orientationChanged,
-    this, &NoteArea::onXsheetOrientationChanged);
+  ret = ret && connect(m_viewer, &XsheetViewer::orientationChanged, this,
+                       &NoteArea::onXsheetOrientationChanged);
 
   updateButtons();
 
@@ -528,64 +535,63 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
 //-----------------------------------------------------------------------------
 
-void NoteArea::removeLayout () {
-  QLayout *currentLayout = layout ();
-  if (!currentLayout)
-    return;
+void NoteArea::removeLayout() {
+  QLayout *currentLayout = layout();
+  if (!currentLayout) return;
 
-  currentLayout->removeWidget (m_flipOrientationButton);
-  currentLayout->removeWidget (m_noteButton);
-  currentLayout->removeWidget (m_precNoteButton);
-  currentLayout->removeWidget (m_nextNoteButton);
-  currentLayout->removeWidget (m_frameDisplayStyleCombo);
-  currentLayout->removeWidget (m_layerHeaderPanel);
+  currentLayout->removeWidget(m_flipOrientationButton);
+  currentLayout->removeWidget(m_noteButton);
+  currentLayout->removeWidget(m_precNoteButton);
+  currentLayout->removeWidget(m_nextNoteButton);
+  currentLayout->removeWidget(m_frameDisplayStyleCombo);
+  currentLayout->removeWidget(m_layerHeaderPanel);
   delete currentLayout;
 }
 
-void NoteArea::createLayout () {
-  const Orientation *o = m_viewer->orientation ();
-  setFixedSize (o->rect (PredefinedRect::NOTE_AREA).size ());
+void NoteArea::createLayout() {
+  const Orientation *o = m_viewer->orientation();
+  setFixedSize(o->rect(PredefinedRect::NOTE_AREA).size());
 
   // has two elements: main layout and header panel
-  QVBoxLayout *panelLayout = new QVBoxLayout ();
-  panelLayout->setMargin (0);
-  panelLayout->setSpacing (0);
+  QVBoxLayout *panelLayout = new QVBoxLayout();
+  panelLayout->setMargin(0);
+  panelLayout->setSpacing(0);
   {
-    QBoxLayout *mainLayout = new QBoxLayout (QBoxLayout::Direction (
-      o->dimension (PredefinedDimension::QBOXLAYOUT_DIRECTION)));
-    Qt::AlignmentFlag centerAlign = Qt::AlignmentFlag (
-      o->dimension (PredefinedDimension::CENTER_ALIGN));
-    mainLayout->setMargin (0);
-    mainLayout->setSpacing (0);
+    QBoxLayout *mainLayout = new QBoxLayout(QBoxLayout::Direction(
+        o->dimension(PredefinedDimension::QBOXLAYOUT_DIRECTION)));
+    Qt::AlignmentFlag centerAlign =
+        Qt::AlignmentFlag(o->dimension(PredefinedDimension::CENTER_ALIGN));
+    mainLayout->setMargin(0);
+    mainLayout->setSpacing(0);
     {
-      mainLayout->addWidget (m_flipOrientationButton, 0, centerAlign);
+      mainLayout->addWidget(m_flipOrientationButton, 0, centerAlign);
 
-      mainLayout->addStretch (1);
+      mainLayout->addStretch(1);
 
-      mainLayout->addWidget (m_noteButton, 0, centerAlign);
+      mainLayout->addWidget(m_noteButton, 0, centerAlign);
 
-      QHBoxLayout *buttonsLayout = new QHBoxLayout ();
-      buttonsLayout->setMargin (0);
-      buttonsLayout->setSpacing (0);
+      QHBoxLayout *buttonsLayout = new QHBoxLayout();
+      buttonsLayout->setMargin(0);
+      buttonsLayout->setSpacing(0);
       {
-        buttonsLayout->addStretch (1);
-        buttonsLayout->addWidget (m_precNoteButton, 0);
-        buttonsLayout->addWidget (m_nextNoteButton, 0);
-        buttonsLayout->addStretch (1);
+        buttonsLayout->addStretch(1);
+        buttonsLayout->addWidget(m_precNoteButton, 0);
+        buttonsLayout->addWidget(m_nextNoteButton, 0);
+        buttonsLayout->addStretch(1);
       }
-      mainLayout->addLayout (buttonsLayout, 0);
+      mainLayout->addLayout(buttonsLayout, 0);
 
-      mainLayout->addStretch (1);
+      mainLayout->addStretch(1);
 
-      mainLayout->addWidget (m_frameDisplayStyleCombo, 0);
+      mainLayout->addWidget(m_frameDisplayStyleCombo, 0);
     }
-    panelLayout->addLayout (mainLayout);
+    panelLayout->addLayout(mainLayout);
 
-    panelLayout->addWidget (m_layerHeaderPanel);
+    panelLayout->addWidget(m_layerHeaderPanel);
   }
-  setLayout (panelLayout);
+  setLayout(panelLayout);
 
-  m_layerHeaderPanel->showOrHide (o);
+  m_layerHeaderPanel->showOrHide(o);
 }
 
 //-----------------------------------------------------------------------------
@@ -608,14 +614,12 @@ void NoteArea::updateButtons() {
 
 //-----------------------------------------------------------------------------
 
-void NoteArea::flipOrientation () {
-  m_viewer->flipOrientation ();
-}
+void NoteArea::flipOrientation() { m_viewer->flipOrientation(); }
 
-void NoteArea::onXsheetOrientationChanged (const Orientation *newOrientation) {
-  m_flipOrientationButton->setText (newOrientation->name ());
-  removeLayout ();
-  createLayout ();
+void NoteArea::onXsheetOrientationChanged(const Orientation *newOrientation) {
+  m_flipOrientationButton->setText(newOrientation->name());
+  removeLayout();
+  createLayout();
 }
 
 //-----------------------------------------------------------------------------

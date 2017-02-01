@@ -141,17 +141,17 @@ public:
   void updateButtons();
 
 protected slots:
-  void flipOrientation ();
+  void flipOrientation();
   void toggleNewNote();
   void nextNote();
   void precNote();
 
   void onFrameDisplayStyleChanged(int id);
-  void onXsheetOrientationChanged (const Orientation *orientation);
+  void onXsheetOrientationChanged(const Orientation *orientation);
 
 protected:
-  void removeLayout ();
-  void createLayout ();
+  void removeLayout();
+  void createLayout();
 };
 
 }  // namespace XsheetGUI;
