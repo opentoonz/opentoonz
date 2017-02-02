@@ -73,7 +73,8 @@ class LeftToRightOrientation : public Orientation {
   const int ICONS_WIDTH        = ICON_OFFSET * 4;  // 88
   const int LAYER_NUMBER_WIDTH = 44;
   const int LAYER_NAME_WIDTH   = 130;
-  const int LAYER_HEADER_WIDTH = ICONS_WIDTH + LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH;
+  const int LAYER_HEADER_WIDTH =
+      ICONS_WIDTH + LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH;
 
 public:
   LeftToRightOrientation();

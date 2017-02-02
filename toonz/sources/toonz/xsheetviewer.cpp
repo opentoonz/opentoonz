@@ -264,7 +264,7 @@ void XsheetViewer::dragToolLeave(QEvent *e) {
 //-----------------------------------------------------------------------------
 
 const Orientation *XsheetViewer::orientation() const {
-  if (!m_orientation) throw std::exception("!m_orientation");
+  if (!m_orientation) throw std::runtime_error("!m_orientation");
   return m_orientation;
 }
 
