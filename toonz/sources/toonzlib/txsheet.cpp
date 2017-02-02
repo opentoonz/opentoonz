@@ -1248,7 +1248,8 @@ void TXsheet::saveData(TOStream &os) {
   fxDag->saveData(os, getFirstFreeColumnIndex());
   os.closeChild();
 
-  ColumnFan *columnFan = getColumnFan(0);  // all fans share folded state
+  // does not matter which Orientation to take, as all fans share folded data
+  ColumnFan *columnFan = getColumnFan(Orientations::topToBottom());
   if (!columnFan->isEmpty()) {
     os.openChild("columnFan");
     columnFan->saveData(os);

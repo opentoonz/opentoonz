@@ -61,7 +61,7 @@ public:
 class LeftToRightOrientation : public Orientation {
   const int CELL_WIDTH           = 50;
   const int CELL_HEIGHT          = 20;
-  const int CELL_DRAG_HEIGHT     = 6;
+  const int CELL_DRAG_HEIGHT     = 5;
   const int EXTENDER_WIDTH       = 8;
   const int EXTENDER_HEIGHT      = 12;
   const int SOUND_PREVIEW_HEIGHT = 6;

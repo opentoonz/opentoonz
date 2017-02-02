@@ -12,7 +12,7 @@
 #include "xshnoteviewer.h"
 #include "cellkeyframeselection.h"
 #include "toonzqt/spreadsheetviewer.h"
-#include "Orientation.h"
+#include "orientation.h"
 #include <boost/optional.hpp>
 
 using boost::optional;

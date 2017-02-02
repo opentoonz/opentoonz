@@ -524,7 +524,7 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
   // Se la cella non e' vuota setto il testo
-  TXsheet *xsh  = m_viewer->getXsheet();
+  TXsheet *xsh = m_viewer->getXsheet();
 
   // adjust text position
   int padding = 3;
@@ -556,11 +556,11 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
     if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
       setText(
           (fid.isEmptyFrame() || fid.isNoFrame())
-                  ? QString::fromStdWString(levelName)
+              ? QString::fromStdWString(levelName)
               : (multiColumnSelected)
                     ? m_viewer->getFrameNumberWithLetters(fid.getNumber())
-                  : QString::fromStdWString(levelName) + QString(" ") +
-                        m_viewer->getFrameNumberWithLetters(fid.getNumber()));
+                    : QString::fromStdWString(levelName) + QString(" ") +
+                          m_viewer->getFrameNumberWithLetters(fid.getNumber()));
     else {
       std::string frameNumber("");
       if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
@@ -569,8 +569,8 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
                   ? QString::fromStdWString(levelName)
                   : (multiColumnSelected)
                         ? QString::fromStdString(frameNumber)
-                  : QString::fromStdWString(levelName) + QString(" ") +
-                        QString::fromStdString(frameNumber));
+                        : QString::fromStdWString(levelName) + QString(" ") +
+                              QString::fromStdString(frameNumber));
     }
     selectAll();
   }
@@ -643,22 +643,22 @@ void RenameCellField::renameCell() {
       // previous frames
       // (when editing not empty column)
 
-    TXshCell cell;
-    int tmpRow = m_row;
-    while (1) {
+      TXshCell cell;
+      int tmpRow = m_row;
+      while (1) {
         cell = xsheet->getCell(tmpRow, c);
-      if (!cell.isEmpty() || tmpRow == 0) break;
-      tmpRow--;
-    }
+        if (!cell.isEmpty() || tmpRow == 0) break;
+        tmpRow--;
+      }
       TXshLevel *xl = cell.m_level.getPointer();
-    if (!xl || (xl->getType() == OVL_XSHLEVEL &&
+      if (!xl || (xl->getType() == OVL_XSHLEVEL &&
                   xl->getPath().getFrame() == TFrameId::NO_FRAME)) {
         cells.append(TXshCell());
         continue;
       }
-    // if the next upper cell is empty, then make this cell empty too
-    if (fid == TFrameId::NO_FRAME)
-      fid = (m_row - tmpRow <= 1) ? cell.m_frameId : TFrameId(0);
+      // if the next upper cell is empty, then make this cell empty too
+      if (fid == TFrameId::NO_FRAME)
+        fid = (m_row - tmpRow <= 1) ? cell.m_frameId : TFrameId(0);
       cells.append(TXshCell(xl, fid));
       changed = true;
     }
@@ -772,7 +772,7 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
     QLineEdit::keyPressEvent(event);
     return;
     break;
-}
+  }
   if (isCtrlPressed &&
       Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled()) {
     if (r0 == r1 && offset.y() == -1) return;

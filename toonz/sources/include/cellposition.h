@@ -20,8 +20,8 @@ public:
   int frame() const { return _frame; }
   int layer() const { return _layer; }
 
-  void setFrame (int frame) { _frame = frame; }
-  void setLayer (int layer) { _layer = layer; }
+  void setFrame(int frame) { _frame = frame; }
+  void setLayer(int layer) { _layer = layer; }
 
   CellPosition &operator=(const CellPosition &that) = default;
 
