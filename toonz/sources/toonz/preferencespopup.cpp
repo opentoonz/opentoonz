@@ -1146,7 +1146,7 @@ PreferencesPopup::PreferencesPopup()
   m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
   m_fastRenderPathFileField =
       new DVGui::FileField(this, QString("desktop"), false, true);
-  m_ffmpegTimeout = new DVGui::IntLineEdit(this, 30, 1);
+  m_ffmpegTimeout            = new DVGui::IntLineEdit(this, 30, 1);
   m_imageMagickPathFileField = new DVGui::FileField(this, QString(""));
 
   //--- Drawing ------------------------------

@@ -99,7 +99,8 @@ void Ffmpeg::setFrameRate(double fps) { m_frameRate = fps; }
 
 void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
-void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex, bool keepTransparency) {
+void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex,
+                                     bool keepTransparency, int scale) {
   m_frameCount++;
   QString tempPath = getFfmpegCache().getQString() + "//" +
                      QString::fromStdString(m_path.getName()) + "tempOut" +
@@ -137,8 +138,15 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex, bool ke
     painter.begin(&nonTranspImage);
     painter.drawImage(0, 0, qi);
     painter.end();
+
     nonTranspImage.save(tempPath, format, -1);
   } else {
+    // usually scaling is done by ffmpeg, but transparent gifs scale here
+    if (scale != 100) {
+      int width  = (qi.width() * scale) / 100;
+      int height = (qi.height() * scale) / 100;
+      qi         = qi.scaled(width, height);
+    }
     qi.save(tempPath, format, -1);
   }
   free(buffer);
@@ -409,7 +417,7 @@ void Ffmpeg::getFramesFromMovie(int frame) {
 
 QString Ffmpeg::cleanPathSymbols() {
   return m_path.getQString().remove(QRegExp(
-      QString::fromUtf8("[-`~!@#$%^&*()_�+=|:;<>��,.?/{}\'\"\\[\\]\\\\]")));
+      QString::fromUtf8("[-`~!@#$%^&*()_+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
 }
 
 int Ffmpeg::getGifFrameCount() {

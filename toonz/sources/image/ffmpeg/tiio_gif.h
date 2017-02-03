@@ -50,7 +50,7 @@ private:
   bool m_firstPass = true;
   bool checkImageMagick();
   bool checkDithering();
-  QString m_thresholdsPath;
+  QString m_imageMagickPath;
 };
 
 //===========================================================

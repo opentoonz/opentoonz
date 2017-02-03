@@ -76,7 +76,8 @@ private:
 
   DVGui::FileField *m_customProjectRootFileField;
 
-  DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField, *m_imageMagickPathFileField;
+  DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField,
+      *m_imageMagickPathFileField;
 
   QGroupBox *m_autoSaveGroup;
 

@@ -74,7 +74,7 @@ TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
 //-----------------------------------------------------------
 
 TLevelWriterGif::~TLevelWriterGif() {
-  if (!checkImageMagick() && m_transparent) {
+  if (m_transparent && !checkImageMagick()) {
     QString msg(QObject::tr(
         "ImageMagick is not configured correctly in  "
         "preferences. \nThe file will be processed without transparency."));
@@ -89,8 +89,6 @@ TLevelWriterGif::~TLevelWriterGif() {
     int i             = 1;
     for (QImage *image : m_images) {
       // get only the trimmed area
-      // QImage copy = QImage(m_lx, m_ly, QImage::Format_ARGB32);
-      // copy.fill(qRgba(0, 0, 0, 0));
       QImage copy = image->copy(m_left, m_top, m_lx, m_ly);
       // make a copy in order to be able to do non-transparent and padding
       QImage newCopy = QImage(m_lx, m_ly, QImage::Format_ARGB32);
@@ -110,19 +108,21 @@ TLevelWriterGif::~TLevelWriterGif() {
         int height = (newCopy.height() * m_scale) / 100;
         newCopy    = newCopy.scaled(width, height);
       }
-      QString tempPath = m_path.getQString() + "tempOut" +
-                         QString::number(i).rightJustified(4, '0') + "." +
-                         "png";
+      QString tempPath = ffmpegWriter->getFfmpegCache().getQString() + "//" +
+                         QString::fromStdString(m_path.getName()) + "tempOut" +
+                         QString::number(i) + ".png";
+      ;
       newCopy.save(tempPath, "PNG", -1);
       ffmpegWriter->addToCleanUp(tempPath);
       i++;
-      // ffmpegWriter->createIntermediateImage(img, frameIndex);
     }
     m_images.clear();
   }
-  int fr = m_frameRate;
   // use ImageMagick for Transparent Images
   if (m_transparent) {
+    QString tempPath = ffmpegWriter->getFfmpegCache().getQString() + "//" +
+                       QString::fromStdString(m_path.getName()) + "tempOut";
+
     QStringList imargs;
     imargs << "-dispose";
     imargs << "previous";
@@ -149,7 +149,7 @@ TLevelWriterGif::~TLevelWriterGif() {
         imargs << "o8x8";
       }
     }
-    imargs << m_path.getQString() + "tempOut*.png";
+    imargs << tempPath + "*.png";
     imargs << m_path.getQString();
     QString path = QDir::currentPath() + "/convert";
 #if defined(_WIN32)
@@ -157,7 +157,7 @@ TLevelWriterGif::~TLevelWriterGif() {
 #endif
     QProcess imageMagick;
     QString currPath = QDir::currentPath();
-    QDir::setCurrent(m_thresholdsPath);
+    QDir::setCurrent(m_imageMagickPath);
     imageMagick.start(path, imargs);
     imageMagick.waitForFinished(30000);
     QDir::setCurrent(currPath);
@@ -187,8 +187,7 @@ TLevelWriterGif::~TLevelWriterGif() {
     QString paletteFilters = filters + " [x]; [x][1:v] paletteuse";
     if (m_palette) {
       palette = ffmpegWriter->getFfmpegCache().getQString() + "//" +
-              QString::fromStdString(m_path.getName()) + "palette.png";
-      // palette = m_path.getQString() + "palette.png";
+                QString::fromStdString(m_path.getName()) + "palette.png";
       palettePreIArgs << "-v";
       palettePreIArgs << "warning";
 
@@ -241,7 +240,6 @@ TImageWriterP TLevelWriterGif::getFrameWriter(TFrameId fid) {
 
 //-----------------------------------------------------------
 void TLevelWriterGif::setFrameRate(double fps) {
-  // m_fps = fps;
   m_frameRate = fps;
   ffmpegWriter->setFrameRate(fps);
 }
@@ -259,7 +257,7 @@ bool TLevelWriterGif::checkImageMagick() {
   path = path + ".exe";
 #endif
   if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
-    m_thresholdsPath = Preferences::instance()->getImageMagickPath();
+    m_imageMagickPath = Preferences::instance()->getImageMagickPath();
     return true;
   }
 
@@ -271,7 +269,7 @@ bool TLevelWriterGif::checkImageMagick() {
   if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
     Preferences::instance()->setImageMagickPath(
         Preferences::instance()->getFfmpegPath().toStdString());
-    m_thresholdsPath = Preferences::instance()->getFfmpegPath();
+    m_imageMagickPath = Preferences::instance()->getFfmpegPath();
     return true;
   }
 
@@ -283,7 +281,7 @@ bool TLevelWriterGif::checkImageMagick() {
   if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
     Preferences::instance()->setImageMagickPath(
         QDir::currentPath().toStdString());
-    m_thresholdsPath = QDir::currentPath();
+    m_imageMagickPath = QDir::currentPath();
     return true;
   }
 
@@ -373,7 +371,8 @@ void TLevelWriterGif::save(const TImageP &img, int frameIndex) {
       if (b > m_bottom) m_bottom = b;
     }
   } else {
-    ffmpegWriter->createIntermediateImage(img, frameIndex, m_transparent);
+    ffmpegWriter->createIntermediateImage(img, frameIndex, m_transparent,
+                                          m_scale);
   }
   m_frameCount++;
 }
