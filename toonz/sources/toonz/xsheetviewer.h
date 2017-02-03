@@ -52,6 +52,7 @@ const QColor SelectedLevelColumnColor(191, 237, 191);
 const QColor VectorColumnColor(212, 212, 133);
 const QColor VectorColumnBorderColor(79, 79, 49);
 const QColor SelectedVectorColumnColor(234, 234, 194);
+const QColor FoldUnfoldButtonColor(0, 194, 211);
 
 // SubXsheet column
 const QColor ChildColumnColor(214, 154, 219);
@@ -224,12 +225,15 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   QColor m_vectorColumnColor;          //(212,212,133)
   QColor m_vectorColumnBorderColor;    //(79,79,49)
   QColor m_selectedVectorColumnColor;  //(234,234,194)
+  QColor m_foldUnfoldButtonColor;      //(0,194,211)
   Q_PROPERTY(QColor VectorColumnColor READ getVectorColumnColor WRITE
                  setVectorColumnColor)
   Q_PROPERTY(QColor VectorColumnBorderColor READ getVectorColumnBorderColor
                  WRITE setVectorColumnBorderColor)
   Q_PROPERTY(QColor SelectedVectorColumnColor READ getSelectedVectorColumnColor
                  WRITE setSelectedVectorColumnColor)
+  Q_PROPERTY(QColor FoldUnfoldButtonColor READ getFoldUnfoldButtonColor
+                 WRITE setFoldUnfoldButtonColor)
   // subXsheet column
   QColor m_childColumnColor;          //(214,154,219)
   QColor m_childColumnBorderColor;    //(80,57,82)
@@ -451,6 +455,11 @@ public:
   void drawPredefinedPath(QPainter &p, PredefinedPath which,
                           const CellPosition &pos, optional<QColor> fill,
                           optional<QColor> outline) const;
+
+  //---------
+
+  bool isFolded(TXshColumn *column) const { return true; }
+
   //---------
 
   void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
@@ -558,12 +567,18 @@ public:
   void setSelectedVectorColumnColor(const QColor &color) {
     m_selectedVectorColumnColor = color;
   }
+  void setFoldUnfoldButtonColor(const QColor &color) {
+    m_foldUnfoldButtonColor = color;
+  }
   QColor getVectorColumnColor() const { return m_vectorColumnColor; }
   QColor getVectorColumnBorderColor() const {
     return m_vectorColumnBorderColor;
   }
   QColor getSelectedVectorColumnColor() const {
     return m_selectedVectorColumnColor;
+  }
+  QColor getFoldUnfoldButtonColor() const {
+    return m_foldUnfoldButtonColor;
   }
   // subXsheet column
   void setChildColumnColor(const QColor &color) { m_childColumnColor = color; }

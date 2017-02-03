@@ -104,6 +104,7 @@ enum class PredefinedRect {
                        //! timeline mode
   THUMBNAIL_AREA,      //! area for header thumbnails and other icons
   THUMBNAIL,           //! the actual thumbnail, if there is one
+  FOLD_UNFOLD_AREA,    //! icon to unfold a vector layer
   PEGBAR_NAME,         //! where to display pegbar name
   PARENT_HANDLE_NAME,  //! where to display parent handle number
   FILTER_COLOR         //! where to show layer's filter color
@@ -132,7 +133,9 @@ enum class PredefinedPath {
   BEGIN_PLAY_RANGE,     //! play range markers
   END_PLAY_RANGE,
   VOLUME_SLIDER_TRACK,  //! slider track
-  VOLUME_SLIDER_HEAD    //! slider head
+  VOLUME_SLIDER_HEAD,   //! slider head
+  FOLDED,               //! layer contains some sublayers (folded)
+  UNFOLDED              //! unfolded
 };
 enum class PredefinedPoint {
   KEY_HIDDEN,  //! move extender handle that much if key icons are disabled

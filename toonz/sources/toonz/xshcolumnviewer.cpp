@@ -715,6 +715,24 @@ void ColumnArea::DrawHeader::drawLock() const {
   if (isLocked) p.drawPixmap(lockModeImgRect, Pixmaps::lock());
 }
 
+void ColumnArea::DrawHeader::drawFoldUnfoldButton() const {
+  if (col < 0 || isEmpty) return;
+  if (!column->getLevelColumn()) return; // only vector layers
+
+  QRect mouseArea = o->rect(PredefinedRect::FOLD_UNFOLD_AREA);
+  if (mouseArea.isEmpty())
+    return;
+
+  QPoint base = orig + mouseArea.topLeft();
+  QPainterPath triangle = o->path(m_viewer->isFolded(column) ?
+    PredefinedPath::FOLDED : PredefinedPath::UNFOLDED).translated (base);
+
+  QColor fillColor = m_viewer->getFoldUnfoldButtonColor();
+  p.fillPath(triangle, QBrush(fillColor));
+  p.setPen(m_viewer->getTextColor());
+  p.drawPath(triangle);
+}
+
 void ColumnArea::DrawHeader::drawColumnNumber() const {
   if (o->isVerticalTimeline()) return;
   if (col < 0 || isEmpty ||
@@ -1165,6 +1183,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(column ? column->getOpacity() : 0);
   drawHeader.drawLock();
+  drawHeader.drawFoldUnfoldButton();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
   QPixmap iconPixmap = getColumnIcon(col);

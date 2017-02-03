@@ -373,6 +373,8 @@ TopToBottomOrientation::TopToBottomOrientation() {
       PredefinedRect::PARENT_HANDLE_NAME,
       QRect(INDENT + pegbarname.width() - 20, HDRROW4, 20, CELL_HEIGHT - 3));
 
+  addRect(PredefinedRect::FOLD_UNFOLD_AREA, QRect(0, 0, -1, -1)); // hide
+
   //
   // Lines
   //
@@ -455,6 +457,21 @@ TopToBottomOrientation::TopToBottomOrientation() {
   head.lineTo(QPointF(4, -4));
   head.lineTo(QPointF(0, 0));
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
+
+  int size = 4;
+  QPainterPath folded(QPointF(0, size)); // triangle down
+  folded.lineTo(QPointF(size, -size));
+  folded.lineTo(QPointF(-size, -size));
+  folded.lineTo(QPointF(0, size));
+  folded.translate(eye.width() / 2, eye.height() / 2);
+  addPath(PredefinedPath::FOLDED, folded);
+
+  QPainterPath unfolded(QPointF(size, 0)); // triangle right
+  unfolded.lineTo(QPointF(-size, size));
+  unfolded.lineTo(QPointF(-size, -size));
+  unfolded.lineTo(QPointF(size, 0));
+  unfolded.translate(eye.width() / 2, eye.height() / 2);
+  addPath(PredefinedPath::UNFOLDED, unfolded);
 
   //
   // Points
@@ -652,6 +669,8 @@ LeftToRightOrientation::LeftToRightOrientation() {
           QRect(columnName.topRight(), QSize(27, columnName.height()))
               .adjusted(-28, 0, -28, 0));
 
+  addRect(PredefinedRect::FOLD_UNFOLD_AREA, eye.translated(4 * ICON_OFFSET, 0));
+
   //
   // Lines
   //
@@ -734,6 +753,21 @@ LeftToRightOrientation::LeftToRightOrientation() {
   head.lineTo(QPointF(-4, -4));
   head.lineTo(QPointF(0, 0));
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
+
+  int size = 4;
+  QPainterPath folded(QPointF(size, 0)); // triangle right
+  folded.lineTo(QPointF(-size, size));
+  folded.lineTo(QPointF(-size, -size));
+  folded.lineTo(QPointF(size, 0));
+  folded.translate(eye.width() / 2, eye.height() / 2);
+  addPath(PredefinedPath::FOLDED, folded);
+
+  QPainterPath unfolded(QPointF(0, size)); // triangle down
+  unfolded.lineTo(QPointF(size, -size));
+  unfolded.lineTo(QPointF(-size, -size));
+  unfolded.lineTo(QPointF(0, size));
+  unfolded.translate(eye.width() / 2, eye.height() / 2);
+  addPath(PredefinedPath::UNFOLDED, unfolded);
 
   //
   // Points
