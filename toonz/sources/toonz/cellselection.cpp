@@ -1591,7 +1591,12 @@ void TCellSelection::deleteCells() {
       new DeleteCellsUndo(new TCellSelection(m_range), data);
 
   deleteCellsWithoutUndo(r0, c0, r1, c1);
-  selectNone();
+  // emit selectionChanged() signal so that the rename field will update
+  // accordingly
+  if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled())
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  else
+    selectNone();
 
   TUndoManager::manager()->add(undo);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -1616,7 +1621,12 @@ void TCellSelection::cutCells(bool withoutCopy) {
   cutCellsWithoutUndo(r0, c0, r1, c1);
 
   TUndoManager::manager()->add(undo);
-  selectNone();
+  // cutCellsWithoutUndo will clear the selection, so select cells again
+  if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled()) {
+    selectCells(r0, c0, r1, c1);
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  } else
+    selectNone();
 
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 }
