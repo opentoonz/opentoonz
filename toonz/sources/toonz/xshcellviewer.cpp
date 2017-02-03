@@ -544,10 +544,10 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   setStyleSheet(styleSheetStr);
 
   TXshCell cell = xsh->getCell(row, col);
+  QPoint xy     = m_viewer->positionToXY(CellPosition(row, col)) - QPoint(1, 2);
   if (!cell.isEmpty()) {
     setFixedSize(XsheetGUI::ColumnWidth - 5, XsheetGUI::RowHeight + 4);
-    QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
-    move(xy - QPoint(1, 2));
+    move(xy);
 
     TFrameId fid           = cell.getFrameId();
     std::wstring levelName = cell.m_level->getName();
@@ -578,7 +578,7 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   // clear the field if the empty cell is clicked
   else {
     setFixedSize(XsheetGUI::ColumnWidth + 3, XsheetGUI::RowHeight + 4);
-    move(QPoint(m_viewer->columnToX(col) - 1, m_viewer->rowToY(row) - 2));
+    move(xy);
 
     setText("");
   }
