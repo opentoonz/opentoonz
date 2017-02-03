@@ -1700,7 +1700,12 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
             startTransparencyPopupTimer(event);
         }
       }
-      // sound column
+	  else if (o->rect(PredefinedRect::FOLD_UNFOLD_AREA).contains(mouseInCell) &&
+		  event->button() == Qt::LeftButton) {
+		  m_viewer->subLayers()->get(column)->foldUnfold();
+		  update();
+	  }
+	  // sound column
       else if (column && column->getSoundColumn()) {
         if (o->rect(PredefinedRect::SOUND_ICON).contains(mouseInCell)) {
           TXshSoundColumn *s = column->getSoundColumn();

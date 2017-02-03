@@ -156,7 +156,9 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
-    , m_orientation(nullptr) {
+    , m_orientation(nullptr)
+    , m_subLayers(this)
+{
 
   setFocusPolicy(Qt::StrongFocus);
 
@@ -1471,6 +1473,10 @@ TPanel *createXsheetViewer(QWidget *parent)
   return panel;
 }
 */
+
+bool XsheetViewer::isFolded(TXshColumn *column) {
+  return m_subLayers.get(column)->isFolded();
+}
 
 //=============================================================================
 // XSheetViewerCommand

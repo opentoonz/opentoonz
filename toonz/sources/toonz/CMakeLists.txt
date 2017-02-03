@@ -246,6 +246,7 @@ set(SOURCES
     shortcutpopup.cpp
     startuppopup.cpp
     subcameramanager.cpp
+	sublayers.cpp
     timestretchpopup.cpp
     trackerpopup.cpp
     vectorizerpopup.cpp

@@ -15,6 +15,7 @@
 #include "saveloadqsettings.h"
 #include "toonzqt/spreadsheetviewer.h"
 #include "orientation.h"
+#include "sublayers.h"
 #include <boost/optional.hpp>
 
 using boost::optional;
@@ -356,6 +357,8 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
 
   const Orientation *m_orientation;
 
+  SubLayers m_subLayers;
+
 public:
   enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
 
@@ -458,7 +461,9 @@ public:
 
   //---------
 
-  bool isFolded(TXshColumn *column) const { return true; }
+  SubLayers *subLayers() { return &m_subLayers; }
+
+  bool isFolded(TXshColumn *column);
 
   //---------
 
