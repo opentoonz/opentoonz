@@ -5,11 +5,13 @@
 
 #include <map>
 #include <memory>
+#include <vector>
 
 #include "toonz/txshcolumn.h"
 
 using std::map;
 using std::unique_ptr;
+using std::vector;
 
 class XsheetViewer;
 
@@ -43,6 +45,7 @@ private:
 //! Base interface.
 
 class SubLayer {
+  vector<unique_ptr<SubLayer>> m_children;
 public:
 
   SubLayer() { }
@@ -51,6 +54,12 @@ public:
   virtual bool hasChildren() const { return false; }
   virtual bool isFolded() const { return true; }
   virtual void foldUnfold() { }
+
+  const vector<unique_ptr<SubLayer>> &children() const { return m_children; }
+
+private:
+  SubLayer(const SubLayer &from) = delete;
+  SubLayer &operator = (const SubLayer &from) = delete;
 };
 
 #endif
