@@ -24,6 +24,9 @@ const char wauxslash = '\\';
 #include <cctype>
 #include <sstream>
 
+// QT
+#include <QObject>
+
 bool TFilePath::m_underscoreFormatAllowed = true;
 
 namespace {
@@ -480,6 +483,7 @@ bool TFilePath::isRoot() const {
 // ritorna ""(niente tipo, niente punto), "." (file con tipo) o ".." (file con
 // tipo e frame)
 std::string TFilePath::getDots() const {
+  if (isFfmpegType()) return ".";
   int i            = getLastSlash(m_path);
   std::wstring str = m_path.substr(i + 1);
   // potrei anche avere a.b.c.d dove d e' l'estensione
@@ -561,7 +565,7 @@ std::string TFilePath::getLevelName() const {
 std::wstring TFilePath::getLevelNameW() const {
   int i            = getLastSlash(m_path);  // cerco l'ultimo slash
   std::wstring str = m_path.substr(i + 1);  // str e' m_path senza directory
-
+  if (isFfmpegType()) return str;
   int j = str.rfind(L".");                       // str[j..] = ".type"
   if (j == (int)std::wstring::npos) return str;  // no frame; no type
   i = str.substr(0, j).rfind(L'.');
@@ -597,6 +601,7 @@ TFilePath TFilePath::getParentDir() const  // noSlash!
 //-----------------------------------------------------------------------------
 
 bool TFilePath::isLevelName() const {
+  if (isFfmpegType()) return false;
   try {
     return getFrame() == TFrameId(TFrameId::EMPTY_FRAME);
   }
@@ -632,12 +637,24 @@ TFrameId TFilePath::getFrame() const {
   if (iswalpha(str[k])) letter = str[k++] + ('a' - L'a');
 
   if (number == 0 || k < i)  // || letter!='\0')
-    throw(::to_string(m_path) + ": malformed frame name.");
+    throw TMalformedFrameException(
+        *this,
+        str + L": " + QObject::tr("Malformed frame name").toStdWString());
+
   return TFrameId(number, letter);
 }
 
 //-----------------------------------------------------------------------------
 
+bool TFilePath::isFfmpegType() const {
+  QString type = QString::fromStdString(getType()).toLower();
+  if (type == "gif" || type == "mp4" || type == "webm")
+    return true;
+  else
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 TFilePath TFilePath::withType(const std::string &type) const {
   assert(type.length() < 2 || type.substr(0, 2) != "..");
   int i            = getLastSlash(m_path);  // cerco l'ultimo slash

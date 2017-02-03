@@ -51,7 +51,7 @@ void getSafeAreaSizeList(QList<QList<double>> &_sizeList) {
   static TFilePath projectPath;
   static QString safeAreaName;
 
-  TFilePath fp                = ToonzFolder::getFirstProjectsFolder();
+  TFilePath fp                = TEnv::getConfigDir();
   QString currentSafeAreaName = QString::fromStdString(EnvSafeAreaName);
 
   if (fp != projectPath || currentSafeAreaName != safeAreaName) {
@@ -60,7 +60,7 @@ void getSafeAreaSizeList(QList<QList<double>> &_sizeList) {
     projectPath  = fp;
     safeAreaName = currentSafeAreaName;
 
-    std::string safeAreaFileName = "safeArea.ini";
+    std::string safeAreaFileName = "safearea.ini";
 
     while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() &&
            fp.getParentDir() != TFilePath())

@@ -104,8 +104,8 @@ namespace {
 //
 
 const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.0";
-const char *applicationFullName = "OpenToonz 1.0";
+const char *applicationVersion  = "1.1";
+const char *applicationFullName = "OpenToonz 1.1";
 const char *rootVarName         = "TOONZROOT";
 const char *systemVarPrefix     = "TOONZ";
 

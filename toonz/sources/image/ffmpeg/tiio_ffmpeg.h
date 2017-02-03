@@ -42,6 +42,7 @@ public:
   TFilePath getFfmpegCache();
   ffmpegFileInfo getInfo();
   void disablePrecompute();
+  int getGifFrameCount();
 
 private:
   QString m_intermediateFormat, m_ffmpegPath, m_audioPath, m_audioFormat;
@@ -53,6 +54,7 @@ private:
   QVector<QString> m_cleanUpList;
   QStringList m_audioArgs;
   TUINT32 m_sampleRate;
+  QString cleanPathSymbols();
 };
 
 #endif

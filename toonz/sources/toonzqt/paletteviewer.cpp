@@ -392,7 +392,7 @@ void PaletteViewer::createPaletteToolBar() {
   nameDisplayModeGroup->addAction(bothDisplayAct);
 
   viewMode->addAction(smallThumbAct);
-  viewModeGroup->addAction(mediumThumbAct);
+  viewMode->addAction(mediumThumbAct);
   viewMode->addAction(largeThumbAct);
   viewMode->addAction(listAct);
   viewMode->addSeparator();
@@ -911,10 +911,7 @@ void PaletteViewer::saveStudioPalette() {
     if (ret == 2 || ret == 0) return;
     sp->setPalette(fp, getPalette(), false);
 
-    question = "Do you want to update all linked styles in current scene ?";
-    ret      = DVGui::MsgBox(question, tr("Update"), tr("Don't Update"), 0);
-    if (ret == 1)
-      StudioPaletteCmd::updateAllLinkedStyles(m_paletteHandle, m_xsheetHandle);
+    StudioPaletteCmd::updateAllLinkedStyles(m_paletteHandle, m_xsheetHandle);
 
     palette->setDirtyFlag(false);
   }

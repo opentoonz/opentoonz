@@ -35,8 +35,8 @@ TSceneProperties::TSceneProperties()
     , m_markerOffset(0)
     , m_fullcolorSubsampling(1)
     , m_tlvSubsampling(1)
-    , m_fieldGuideSize(12)
-    , m_fieldGuideAspectRatio(1.38) {
+    , m_fieldGuideSize(16)
+    , m_fieldGuideAspectRatio(1.77778) {
   // Default color
   m_notesColor.push_back(TPixel32(255, 235, 140));
   m_notesColor.push_back(TPixel32(255, 160, 120));
@@ -80,8 +80,6 @@ void TSceneProperties::assign(const TSceneProperties *sprop) {
     for (int i     = 0; i < (int)m_cameras.size(); i++)
       m_cameras[i] = new TCamera(*m_cameras[i]);
   }
-  *m_outputProp           = *sprop->m_outputProp;
-  *m_previewProp          = *sprop->m_previewProp;
   m_bgColor               = sprop->m_bgColor;
   m_markerDistance        = sprop->m_markerDistance;
   m_markerOffset          = sprop->m_markerOffset;

@@ -130,6 +130,18 @@ E&apos; possibile che il file sia corrotto.</translation>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>DPI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -299,7 +311,11 @@ E&apos; possibile che il file sia corrotto.</translation>
     <name>DVGui::ProgressDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="unfinished">Toonz</translation>
+        <translation type="obsolete">Toonz</translation>
+    </message>
+    <message>
+        <source>OpenToonz</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -568,6 +584,10 @@ E&apos; possibile che il file sia corrotto.</translation>
     <message>
         <source>&amp;Display Areas as Filled</source>
         <translation>&amp;Mostra Zone come Riempite</translation>
+    </message>
+    <message>
+        <source>&amp;Locator</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1268,14 +1288,6 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t Update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>     (Color Model: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -1291,16 +1303,16 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remove Links</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Style</source>
         <translation type="unfinished">Nuovo Stile</translation>
     </message>
     <message>
         <source>New Page</source>
         <translation type="unfinished">Nuova Pagina</translation>
+    </message>
+    <message>
+        <source>Name Editor</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1646,7 +1658,7 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
     </message>
     <message>
         <source>It is not possible to assing a shortcut with modifiers to the visualization commands.</source>
-        <translation>Non è possibile assegnare uno shortcut con modificatori ai comandi di visualizzazione.</translation>
+        <translation type="vanished">Non è possibile assegnare uno shortcut con modificatori ai comandi di visualizzazione.</translation>
     </message>
     <message>
         <source>It is not possible to save the motion path.</source>
@@ -1725,10 +1737,6 @@ Are you sure?</source>
     </message>
     <message>
         <source>Toggle Link  in Palette : %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove Link  in Palette : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1824,7 +1832,15 @@ Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OpenToonz 1.0</source>
+        <source>OpenToonz 1.1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Reference  in Palette : %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to assign a shortcut with modifiers to the visualization commands.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

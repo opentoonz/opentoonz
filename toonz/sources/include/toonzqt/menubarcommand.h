@@ -145,7 +145,8 @@ public:
   std::string getShortcutFromId(CommandId id);
   int getKeyFromShortcut(const std::string &shortcut);
   int getKeyFromId(CommandId id);
-  void setShortcut(QAction *action, std::string shortcutString);
+  void setShortcut(QAction *action, std::string shortcutString,
+                   bool keepDefault = true);
 
   QAction *getAction(CommandId id, bool createIfNeeded = false);
 

@@ -1077,6 +1077,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_NewLevel);
   addMenuItem(fileMenu, MI_LoadLevel);
+  addMenuItem(fileMenu, MI_SaveAllLevels);
   addMenuItem(fileMenu, MI_SaveLevel);
   addMenuItem(fileMenu, MI_SaveLevelAs);
   addMenuItem(fileMenu, MI_ExportLevel);
@@ -1098,6 +1099,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_OutputSettings);
   addMenuItem(fileMenu, MI_Render);
+  addMenuItem(fileMenu, MI_FastRender);
   //  addMenuItem(fileMenu, MI_SavePreviewedFrames);
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_PrintXsheet);
@@ -1338,11 +1340,13 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
   addMenuItem(windowsMenu, MI_OpenHistoryPanel);
+  addMenuItem(windowsMenu, MI_AudioRecording);
   windowsMenu->addSeparator();
   addMenuItem(windowsMenu, MI_ResetRoomLayout);
 
   //---Help Menu
   QMenu *helpMenu = addMenu(tr("Help"), fullMenuBar);
+  addMenuItem(helpMenu, MI_StartupPopup);
   addMenuItem(helpMenu, MI_About);
 
   return fullMenuBar;

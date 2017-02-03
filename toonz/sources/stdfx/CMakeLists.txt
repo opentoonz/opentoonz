@@ -71,6 +71,7 @@ set(HEADERS
     iwa_noise1234.h
     iwa_fresnel.h
     iwa_pnperspectivefx.h
+    iwa_soapbubblefx.h
 )
 
 set(SOURCES
@@ -244,6 +245,7 @@ set(SOURCES
     iwa_simplexnoise.cpp
     iwa_noise1234.cpp
     iwa_pnperspectivefx.cpp
+    iwa_soapbubblefx.cpp
 )
 
 set(OBJCSOURCES

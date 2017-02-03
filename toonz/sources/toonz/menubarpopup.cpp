@@ -71,9 +71,12 @@ public:
 //-----------------------------------------------------------------------------
 
 class MenuBarSubmenuItem final : public QTreeWidgetItem {
+  /*- title before translation -*/
+  QString m_orgTitle;
+
 public:
   MenuBarSubmenuItem(QTreeWidgetItem* parent, QString& title)
-      : QTreeWidgetItem(parent, UserType) {
+      : QTreeWidgetItem(parent, UserType), m_orgTitle(title) {
     setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsDragEnabled |
              Qt::ItemIsDropEnabled | Qt::ItemIsEnabled);
     /*- Menu title will be translated if the title is registered in translation
@@ -86,6 +89,9 @@ public:
     setToolTip(0, QObject::tr(
                       "[Drag] to move position, [Double Click] to edit title"));
   }
+
+  QString getOrgTitle() const { return m_orgTitle; }
+  void setOrgTitle(const QString title) { m_orgTitle = title; }
 };
 
 //=============================================================================
@@ -115,6 +121,10 @@ MenuBarTree::MenuBarTree(TFilePath& path, QWidget* parent)
   }
 
   loadMenuTree(fp);
+
+  bool ret = connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this,
+                     SLOT(onItemChanged(QTreeWidgetItem*, int)));
+  assert(ret);
 }
 
 //-----------------------------------------------------------------------------
@@ -230,7 +240,8 @@ void MenuBarTree::saveMenuRecursive(QXmlStreamWriter& writer,
       writer.writeEmptyElement("separator");
     else if (subMenu) {
       writer.writeStartElement("menu");
-      writer.writeAttribute("title", subMenu->text(0));
+      // save original title instead of translated one
+      writer.writeAttribute("title", subMenu->getOrgTitle());
 
       saveMenuRecursive(writer, subMenu);
 
@@ -324,6 +335,14 @@ void MenuBarTree::removeItem() {
     item->parent()->removeChild(item);
 
   delete item;
+}
+
+//-----------------------------------------------------------------------------
+
+void MenuBarTree::onItemChanged(QTreeWidgetItem* item, int column) {
+  MenuBarSubmenuItem* submenuItem = dynamic_cast<MenuBarSubmenuItem*>(item);
+  if (!submenuItem) return;
+  submenuItem->setOrgTitle(submenuItem->text(0));
 }
 
 //=============================================================================

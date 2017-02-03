@@ -21,6 +21,7 @@ class QVideoFrame;
 class QTimer;
 class QIntValidator;
 class QRegExpValidator;
+class QPushButton;
 
 namespace DVGui {
 class FileField;
@@ -121,6 +122,31 @@ signals:
 };
 
 //=============================================================================
+// PencilTestSaveInFolderPopup
+//-----------------------------------------------------------------------------
+
+class PencilTestSaveInFolderPopup : public DVGui::Dialog {
+  Q_OBJECT
+
+  DVGui::FileField* m_parentFolderField;
+  QLineEdit *m_projectField, *m_episodeField, *m_sequenceField, *m_sceneField,
+      *m_subFolderNameField;
+
+  QCheckBox *m_subFolderCB, *m_autoSubNameCB;
+  QComboBox* m_subNameFormatCombo;
+
+public:
+  PencilTestSaveInFolderPopup(QWidget* parent = 0);
+  QString getPath();
+
+protected slots:
+  void updateSubFolderName();
+  void onAutoSubNameCBClicked(bool);
+  void onShowPopupOnLaunchCBClicked(bool);
+  void onOkPressed();
+};
+
+//=============================================================================
 // PencilTestPopup
 //-----------------------------------------------------------------------------
 
@@ -137,7 +163,7 @@ class PencilTestPopup : public DVGui::Dialog {
   LevelNameLineEdit* m_levelNameEdit;
   QCheckBox *m_upsideDownCB, *m_onionSkinCB, *m_saveOnCaptureCB, *m_timerCB;
   QPushButton *m_fileFormatOptionButton, *m_captureWhiteBGButton,
-      *m_captureButton;
+      *m_captureButton, *m_loadImageButton;
   DVGui::FileField* m_saveInFileFld;
   FrameNumberLineEdit* m_frameNumberEdit;
   DVGui::IntField *m_thresholdFld, *m_contrastFld, *m_brightnessFld,
@@ -146,6 +172,11 @@ class PencilTestPopup : public DVGui::Dialog {
   QTimer *m_captureTimer, *m_countdownTimer;
 
   QImage m_whiteBGImg;
+
+  // used only for Windows
+  QPushButton* m_captureFilterSettingsBtn;
+
+  PencilTestSaveInFolderPopup* m_saveInFolderPopup;
 
   int m_timerId;
   QString m_cacheImagePath;
@@ -177,12 +208,17 @@ protected slots:
   void onImageCaptured(int, const QImage&);
   void onCaptureWhiteBGButtonPressed();
   void onOnionCBToggled(bool);
+  void onLoadImageButtonPressed();
   void onOnionOpacityFldEdited();
   void onTimerCBToggled(bool);
   void onCaptureTimerTimeout();
   void onCountDown();
 
   void onCaptureButtonClicked(bool);
+  void onCaptureFilterSettingsBtnPressed();
+
+public slots:
+  void openSaveInFolderPopup();
 };
 
 #endif

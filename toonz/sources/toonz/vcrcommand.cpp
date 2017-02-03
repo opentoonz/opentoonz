@@ -53,13 +53,16 @@ public:
     int col = TApp::instance()->getCurrentColumn()->getColumnIndex();
 
     const TXshCell &cell = xsh->getCell(row, col);
-    if (cell.isEmpty()) return;
 
-    for (++row; xsh->getCell(row, col) == cell; ++row)
-      ;
-
-    if (!xsh->getCell(row, col).isEmpty())
-      TApp::instance()->getCurrentFrame()->setFrame(row);
+    int frameCount = xsh->getFrameCount();
+    while (row < frameCount) {
+      row++;
+      if (xsh->getCell(row, col).isEmpty()) continue;
+      if (xsh->getCell(row, col) != cell) {
+        TApp::instance()->getCurrentFrame()->setFrame(row);
+        break;
+      }
+    }
   }
 };
 
@@ -76,19 +79,21 @@ public:
     int col = TApp::instance()->getCurrentColumn()->getColumnIndex();
 
     TXshCell cell = xsh->getCell(row, col);
-    if (cell.isEmpty()) return;
 
-    for (--row; row >= 0 && xsh->getCell(row, col) == cell;
-         --row)  // Get *last* cell in previous uniform
-      ;          // cell block
+    // Get *last* cell in previous uniform cell block
+    while (row >= 0) {
+      row--;
+      if (xsh->getCell(row, col).isEmpty()) continue;
+      if (xsh->getCell(row, col) != cell) {
+        cell = xsh->getCell(row, col);
+        break;
+      }
+    }
 
-    if (row >= 0 && !xsh->getCell(row, col).isEmpty()) {
+    if (row >= 0) {
       cell = xsh->getCell(row, col);
-      while (row > 0 &&
-             xsh->getCell(row - 1, col) ==
-                 cell)  // Get *first* cell in current uniform
-        --row;          // cell block
-
+      // Get *first* cell in current uniform cell block
+      while (row > 0 && xsh->getCell(row - 1, col) == cell) --row;
       TApp::instance()->getCurrentFrame()->setFrame(row);
     }
   }

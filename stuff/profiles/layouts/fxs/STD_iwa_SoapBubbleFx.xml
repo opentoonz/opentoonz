@@ -1,0 +1,33 @@
+<fxlayout>
+  <page name="Color and Shape">
+    <vbox>
+      <separator label="Bubble Color"/>
+      <control>intensity</control>
+      <control>refractiveIndex</control>
+      <control>thickMax</control>
+      <control>thickMin</control>
+      <control>RGamma</control>
+      <control>GGamma</control>
+      <control>BGamma</control>
+    </vbox>
+    <vbox>
+      <separator label="Shape"/>
+      <control>binarizeThresold</control>
+      <control>shapeAspectRatio</control>
+      <control>blurRadius</control>
+      <control>blurPower</control>
+    </vbox>
+  </page>
+  <page name="Noise">
+    <vbox>
+      <control>normalSampleDistance</control>
+      <control>noiseSubDepth</control>
+      <control>noiseResolutionS</control>
+      <control>noiseResolutionT</control>
+      <control>noiseSubCompositeRatio</control>
+      <control>noiseEvolution</control>
+      <control>noiseDepthMixRatio</control>
+      <control>noiseThicknessMixRatio</control>
+    </vbox>
+  </page>
+</fxlayout>

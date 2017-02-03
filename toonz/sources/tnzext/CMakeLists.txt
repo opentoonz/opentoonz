@@ -94,10 +94,19 @@ if(APPLE)
     find_library(ACCE_LIB Accelerate)
 endif()
 
-include_directories(
-    SYSTEM
-    ${SDKROOT}/superlu/SuperLU_4.1/SRC
-)
+if(WIN32 OR APPLE)
+    # Warning, this looks wrong,
+    # should _only_ use SUPERLU_INCLUDE_DIR, for now do this with Linux.
+    include_directories(
+        SYSTEM
+        ${SDKROOT}/superlu/SuperLU_4.1/SRC
+    )
+else()
+    include_directories(
+        SYSTEM
+        ${SUPERLU_INCLUDE_DIR}
+    )
+endif()
 
 if(WIN32)
     target_link_libraries(tnzext

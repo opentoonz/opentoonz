@@ -505,9 +505,14 @@ void TStyleSelection::enableCommands() {
     enableCommand(this, MI_PasteNames, &TStyleSelection::pasteStylesName);
 
     // available only for level palette
-    if (m_paletteHandle->getPalette()->getGlobalName() == L"")
+    if (m_paletteHandle->getPalette()->getGlobalName() == L"") {
       enableCommand(this, MI_GetColorFromStudioPalette,
                     &TStyleSelection::getBackOriginalStyle);
+      enableCommand(this, MI_ToggleLinkToStudioPalette,
+                    &TStyleSelection::toggleLink);
+      enableCommand(this, MI_RemoveReferenceToStudioPalette,
+                    &TStyleSelection::removeLink);
+    }
   }
   enableCommand(this, MI_Clear, &TStyleSelection::deleteStyles);
   enableCommand(this, MI_EraseUnusedStyles, &TStyleSelection::eraseUnsedStyle);
@@ -1408,14 +1413,15 @@ public:
 void TStyleSelection::toggleLink() {
   TPalette *palette = getPalette();
   if (!palette || m_pageIndex < 0) return;
+  if (isEmpty() || palette->isLocked()) return;
   int n = m_styleIndicesInPage.size();
   if (n <= 0) return;
 
   std::vector<std::pair<int, std::wstring>> oldColorStylesLinked;
   std::vector<std::pair<int, std::wstring>> newColorStylesLinked;
 
-  bool somethingHasBeenLinked = false;
-
+  bool somethingHasBeenLinked    = false;
+  bool somethingChanged          = false;
   bool currentStyleIsInSelection = false;
 
   TPalette::Page *page = palette->getPage(m_pageIndex);
@@ -1435,6 +1441,7 @@ void TStyleSelection::toggleLink() {
       name[0] = name[0] == L'-' ? L'+' : L'-';
       cs->setGlobalName(name);
       if (name[0] == L'+') somethingHasBeenLinked = true;
+      somethingChanged                            = true;
     }
     undo->setColorStyle(index, oldCs, name);
 
@@ -1442,6 +1449,13 @@ void TStyleSelection::toggleLink() {
         palette->getPage(m_pageIndex)->search(m_paletteHandle->getStyleIndex()))
       currentStyleIsInSelection = true;
   }
+
+  // if nothing changed, do not set dirty flag, nor register undo
+  if (!somethingChanged) {
+    delete undo;
+    return;
+  }
+
   if (somethingHasBeenLinked)
     StudioPalette::instance()->updateLinkedColors(palette);
 
@@ -1460,6 +1474,7 @@ void TStyleSelection::toggleLink() {
 void TStyleSelection::eraseToggleLink() {
   TPalette *palette = getPalette();
   if (!palette || m_pageIndex < 0) return;
+  if (isEmpty() || palette->isLocked()) return;
   int n = m_styleIndicesInPage.size();
   if (n <= 0) return;
 
@@ -1575,7 +1590,7 @@ public:
   int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
-    return QObject::tr("Remove Link  in Palette : %1")
+    return QObject::tr("Remove Reference  in Palette : %1")
         .arg(QString::fromStdWString(m_palette->getPaletteName()));
   }
   int getHistoryType() override { return HistoryType::Palette; }
@@ -1585,11 +1600,11 @@ public:
 /*! remove link from studio palette. Delete the global and the orginal names.
  * return true if something changed
 */
-bool TStyleSelection::removeLink() {
+void TStyleSelection::removeLink() {
   TPalette *palette = getPalette();
-  if (!palette || m_pageIndex < 0) return false;
+  if (!palette || m_pageIndex < 0) return;
   int n = m_styleIndicesInPage.size();
-  if (n <= 0) return false;
+  if (n <= 0) return;
 
   TPalette::Page *page = palette->getPage(m_pageIndex);
   assert(page);
@@ -1614,12 +1629,10 @@ bool TStyleSelection::removeLink() {
   }
 
   if (somethingChanged) {
-    palette->setDirtyFlag(true);
+    m_paletteHandle->notifyColorStyleChanged(false);
     TUndoManager::manager()->add(undo);
   } else
     delete undo;
-
-  return somethingChanged;
 }
 
 //=============================================================================
@@ -1780,4 +1793,27 @@ void TStyleSelection::getBackOriginalStyle() {
     m_paletteHandle->notifyColorStyleSwitched();
   } else
     delete undo;
+}
+
+//-----------------------------------------------------------------------------
+/*! return true if there is at least one linked style in the selection
+*/
+
+bool TStyleSelection::hasLinkedStyle() {
+  TPalette *palette = getPalette();
+  if (!palette || m_pageIndex < 0 || isEmpty()) return false;
+  if (m_styleIndicesInPage.size() <= 0) return false;
+
+  TPalette::Page *page = palette->getPage(m_pageIndex);
+  assert(page);
+
+  // for each selected style
+  for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
+       it != m_styleIndicesInPage.end(); ++it) {
+    TColorStyle *cs    = page->getStyle(*it);
+    std::wstring gname = cs->getGlobalName();
+    // if the style has link, return true
+    if (gname != L"" && (gname[0] == L'-' || gname[0] == L'+')) return true;
+  }
+  return false;
 }

@@ -752,7 +752,7 @@
   <item>"STD_particlesFx.friction"			"Friction"			</item>
   <item>"STD_particlesFx.friction_ctrl"			"Control Image"		</item>
   <item>"STD_particlesFx.wind"			"Wind Intensity"		</item>
-  <item>"STD_particlesFx.wind_angle"			"Wing Angle"			</item>
+  <item>"STD_particlesFx.wind_angle"			"Wind Angle"			</item>
   <item>"STD_particlesFx.swing_mode"			"Swing Mode"		</item>
   <item>"STD_particlesFx.scattering_x"			"Horizontal"		</item>
   <item>"STD_particlesFx.scattering_y"			"Vertical"			</item>
@@ -1174,6 +1174,27 @@
   <item>"STD_iwa_PNPerspectiveFx.alpha_rendering"	"Alpha Rendering"</item>
   <item>"STD_iwa_PNPerspectiveFx.waveHeight"		"Wave Height"</item>
   
+  <item>"STD_iwa_SoapBubbleFx"	"SoapBubble Iwa"	</item>
+  <item>"STD_iwa_SoapBubbleFx.intensity"	"Intensity"	</item>
+  <item>"STD_iwa_SoapBubbleFx.refractiveIndex"	"Refractive Index"	</item>
+  <item>"STD_iwa_SoapBubbleFx.thickMax"	"Thick Max"	</item>
+  <item>"STD_iwa_SoapBubbleFx.thickMin"	"Thick Min"	</item>
+  <item>"STD_iwa_SoapBubbleFx.RGamma"	"R Gamma"	</item>
+  <item>"STD_iwa_SoapBubbleFx.GGamma"	"G Gamma"	</item>
+  <item>"STD_iwa_SoapBubbleFx.BGamma"	"B Gamma"	</item>
+  <item>"STD_iwa_SoapBubbleFx.binarizeThresold"	"Threshold"	</item>
+  <item>"STD_iwa_SoapBubbleFx.shapeAspectRatio"	"Shape Aspect Ratio"	</item>
+  <item>"STD_iwa_SoapBubbleFx.blurRadius"	"Blur Radius"	</item>
+  <item>"STD_iwa_SoapBubbleFx.blurPower"	"Power"	</item>
+  <item>"STD_iwa_SoapBubbleFx.normalSampleDistance"	"Sample Distance"	</item>
+  <item>"STD_iwa_SoapBubbleFx.noiseSubDepth"	"Sub Depth"	</item>
+  <item>"STD_iwa_SoapBubbleFx.noiseResolutionS"	"S Resolution"	</item>
+  <item>"STD_iwa_SoapBubbleFx.noiseResolutionT"	"T Resolution"	</item>
+  <item>"STD_iwa_SoapBubbleFx.noiseSubCompositeRatio"	"Sub Amplitude Ratio"	</item>
+  <item>"STD_iwa_SoapBubbleFx.noiseEvolution"	"Evolution"	</item>
+  <item>"STD_iwa_SoapBubbleFx.noiseDepthMixRatio"	"Noise to Depth"	</item>
+  <item>"STD_iwa_SoapBubbleFx.noiseThicknessMixRatio"	"Noise to Thickness"	</item>
+
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>
@@ -1213,7 +1234,7 @@
   <item>"STD_iwa_TiledParticlesFx.friction"			"Friction"			</item>
   <item>"STD_iwa_TiledParticlesFx.friction_ctrl"			"Control Image"		</item>
   <item>"STD_iwa_TiledParticlesFx.wind"			"Wind Intensity"		</item>
-  <item>"STD_iwa_TiledParticlesFx.wind_angle"			"Wing Angle"			</item>
+  <item>"STD_iwa_TiledParticlesFx.wind_angle"			"Wind Angle"			</item>
   <item>"STD_iwa_TiledParticlesFx.swing_mode"			"Swing Mode"		</item>
   <item>"STD_iwa_TiledParticlesFx.scattering_x"			"Horizontal"		</item>
   <item>"STD_iwa_TiledParticlesFx.scattering_y"			"Vertical"			</item>

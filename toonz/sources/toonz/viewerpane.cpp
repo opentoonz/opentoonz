@@ -77,7 +77,7 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WindowFlags flags)
 #else
 SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 #endif
-    : TPanel(parent) {
+    : StyleShortcutSwitchablePanel(parent) {
   QFrame *hbox = new QFrame(this);
   hbox->setFrameStyle(QFrame::StyledPanel);
   hbox->setObjectName("ViewerPanel");
@@ -94,6 +94,7 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
       new ImageUtils::FullScreenWidget(viewer);
 
   fsWidget->setWidget(m_sceneViewer = new SceneViewer(fsWidget));
+  m_sceneViewer->setIsStyleShortcutSwitchable();
 
   bool ret = true;
   ret      = ret && connect(m_sceneViewer, SIGNAL(onZoomChanged()),
@@ -120,7 +121,7 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 
   int buttons = FlipConsole::cFullConsole;
 
-  buttons &= (~FlipConsole::eSound);
+  // buttons &= (~FlipConsole::eSound);
   buttons &= (~FlipConsole::eFilledRaster);
   buttons &= (~FlipConsole::eDefineLoadBox);
   buttons &= (~FlipConsole::eUseLoadBox);
@@ -150,6 +151,10 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
         connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
                 m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
 
+  ret =
+      ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
+                     this, SLOT(onButtonPressed(FlipConsole::EGadget)));
+
   ret = ret && connect(m_sceneViewer, SIGNAL(previewStatusChanged()), this,
                        SLOT(update()));
 
@@ -157,7 +162,8 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
                        SLOT(onSceneSwitched()));
 
   assert(ret);
-
+  m_flipConsole->setChecked(FlipConsole::eSound, true);
+  m_playSound = m_flipConsole->isChecked(FlipConsole::eSound);
   m_flipConsole->setFrameRate(app->getCurrentScene()
                                   ->getScene()
                                   ->getProperties()
@@ -220,7 +226,8 @@ SceneViewerPanel::~SceneViewerPanel() {}
 
 //-----------------------------------------------------------------------------
 
-void SceneViewerPanel::showEvent(QShowEvent *) {
+void SceneViewerPanel::showEvent(QShowEvent *event) {
+  StyleShortcutSwitchablePanel::showEvent(event);
   TApp *app                    = TApp::instance();
   TFrameHandle *frameHandle    = app->getCurrentFrame();
   TSceneHandle *sceneHandle    = app->getCurrentScene();
@@ -259,10 +266,6 @@ void SceneViewerPanel::showEvent(QShowEvent *) {
   ret = ret && connect(app->getCurrentTool(), SIGNAL(toolSwitched()),
                        m_sceneViewer, SLOT(onToolSwitched()));
 
-  ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-                       SLOT(onPreferenceChanged()));
-  m_flipConsole->onPreferenceChanged();
-
   assert(ret);
 
   // Aggiorno FPS al valore definito nel viewer corrente.
@@ -272,7 +275,8 @@ void SceneViewerPanel::showEvent(QShowEvent *) {
 
 //-----------------------------------------------------------------------------
 
-void SceneViewerPanel::hideEvent(QHideEvent *) {
+void SceneViewerPanel::hideEvent(QHideEvent *event) {
+  StyleShortcutSwitchablePanel::hideEvent(event);
   TApp *app                    = TApp::instance();
   TFrameHandle *frameHandle    = app->getCurrentFrame();
   TSceneHandle *sceneHandle    = app->getCurrentScene();
@@ -305,9 +309,6 @@ void SceneViewerPanel::hideEvent(QHideEvent *) {
   disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
              SLOT(onToolSwitched()));
 
-  disconnect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-             SLOT(onPreferenceChanged()));
-
   m_flipConsole->setActive(false);
 }
 
@@ -326,25 +327,49 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   TPanelTitleBarButtonSet *viewModeButtonSet;
   m_referenceModeBs = viewModeButtonSet = new TPanelTitleBarButtonSet();
-  int x                                 = -188;
+  int x                                 = -232;
   int iconWidth                         = 17;
   TPanelTitleBarButton *button;
-  button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
-                                    ":Resources/freeze_over.png",
-                                    ":Resources/freeze_on.png");
-  button->setToolTip(tr("Freeze"));
-  titleBar->add(QPoint(x, 2), button);
-  ret = ret && connect(button, SIGNAL(toggled(bool)), m_sceneViewer,
-                       SLOT(freeze(bool)));
-  ret = ret && connect(m_sceneViewer, SIGNAL(freezeStateChanged(bool)), button,
-                       SLOT(setPressed(bool)));
 
+  // buttons for show / hide toggle for the field guide and the safe area
+  TPanelTitleBarButtonForSafeArea *safeAreaButton =
+      new TPanelTitleBarButtonForSafeArea(titleBar, ":Resources/safearea.png",
+                                          ":Resources/safearea_over.png",
+                                          ":Resources/safearea_on.png");
+  safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
+  titleBar->add(QPoint(x, 1), safeAreaButton);
+  ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
+                       CommandManager::instance()->getAction(MI_SafeArea),
+                       SLOT(trigger()));
+  ret = ret && connect(CommandManager::instance()->getAction(MI_SafeArea),
+                       SIGNAL(triggered(bool)), safeAreaButton,
+                       SLOT(setPressed(bool)));
+  // initialize state
+  safeAreaButton->setPressed(
+      CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
+
+  button = new TPanelTitleBarButton(titleBar, ":Resources/fieldguide.png",
+                                    ":Resources/fieldguide_over.png",
+                                    ":Resources/fieldguide_on.png");
+  button->setToolTip(tr("Field Guide"));
+  x += 5 + iconWidth;
+  titleBar->add(QPoint(x, 1), button);
+  ret = ret && connect(button, SIGNAL(toggled(bool)),
+                       CommandManager::instance()->getAction(MI_FieldGuide),
+                       SLOT(trigger()));
+  ret = ret && connect(CommandManager::instance()->getAction(MI_FieldGuide),
+                       SIGNAL(triggered(bool)), button, SLOT(setPressed(bool)));
+  // initialize state
+  button->setPressed(
+      CommandManager::instance()->getAction(MI_FieldGuide)->isChecked());
+
+  // view mode toggles
   button = new TPanelTitleBarButton(titleBar, ":Resources/standard.png",
                                     ":Resources/standard_over.png",
                                     ":Resources/standard_on.png");
   button->setToolTip(tr("Camera Stand View"));
-  x += 18 + iconWidth;
-  titleBar->add(QPoint(x, 2), button);
+  x += 10 + iconWidth;
+  titleBar->add(QPoint(x, 1), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::NORMAL_REFERENCE);
   button->setPressed(true);
 
@@ -352,25 +377,37 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                                     ":Resources/3D_over.png",
                                     ":Resources/3D_on.png");
   button->setToolTip(tr("3D View"));
-  x += 5 + iconWidth;
-  titleBar->add(QPoint(x, 2), button);
+  x += 19;  // width of standard.png = 18pixels
+  titleBar->add(QPoint(x, 1), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA3D_REFERENCE);
 
   button = new TPanelTitleBarButton(titleBar, ":Resources/view_camera.png",
                                     ":Resources/view_camera_over.png",
                                     ":Resources/view_camera_on.png");
   button->setToolTip(tr("Camera View"));
-  x += 5 + iconWidth;
-  titleBar->add(QPoint(x, 2), button);
+  x += 18;  // width of 3D.png = 18pixels
+  titleBar->add(QPoint(x, 1), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA_REFERENCE);
   ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer,
                        SLOT(setReferenceMode(int)));
 
+  // freeze button
+  button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
+                                    ":Resources/freeze_over.png",
+                                    ":Resources/freeze_on.png");
+  x += 10 + 19;  // width of viewcamera.png = 18pixels
+
+  button->setToolTip(tr("Freeze"));  // RC1
+  titleBar->add(QPoint(x, 1), button);
+  ret = ret && connect(button, SIGNAL(toggled(bool)), m_sceneViewer,
+                       SLOT(freeze(bool)));
+
+  // preview toggles
   m_previewButton = new TPanelTitleBarButton(
       titleBar, ":Resources/viewpreview.png", ":Resources/viewpreview_over.png",
       ":Resources/viewpreview_on.png");
-  x += 18 + iconWidth;
-  titleBar->add(QPoint(x, 2), m_previewButton);
+  x += 5 + iconWidth;
+  titleBar->add(QPoint(x, 1), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
   ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)),
                        SLOT(enableFullPreview(bool)));
@@ -379,8 +416,9 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
       new TPanelTitleBarButton(titleBar, ":Resources/subcamera_preview.png",
                                ":Resources/subcamera_preview_over.png",
                                ":Resources/subcamera_preview_on.png");
-  x += 5 + iconWidth;
-  titleBar->add(QPoint(x, 2), m_subcameraPreviewButton);
+  x += 28;  // width of viewpreview.png =28pixels
+
+  titleBar->add(QPoint(x, 1), m_subcameraPreviewButton);
   m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));
   ret = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
                        SLOT(enableSubCameraPreview(bool)));
@@ -437,6 +475,12 @@ void SceneViewerPanel::onXshLevelSwitched(TXshLevel *) { changeWindowTitle(); }
 //-----------------------------------------------------------------------------
 
 void SceneViewerPanel::onPlayingStatusChanged(bool playing) {
+  if (playing) {
+    m_playing = true;
+  } else {
+    m_playing = false;
+    m_first   = true;
+  }
   if (Preferences::instance()->getOnionSkinDuringPlayback()) return;
   OnionSkinMask osm =
       TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
@@ -541,7 +585,6 @@ void SceneViewerPanel::onSceneChanged() {
   updateFrameRange();
   updateFrameMarkers();
   changeWindowTitle();
-
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   assert(scene);
@@ -551,6 +594,7 @@ void SceneViewerPanel::onSceneChanged() {
   int frameIndex = TApp::instance()->getCurrentFrame()->getFrameIndex();
   if (m_keyFrameButton->getCurrentFrame() != frameIndex)
     m_keyFrameButton->setCurrentFrame(frameIndex);
+  hasSoundtrack();
 }
 
 //-----------------------------------------------------------------------------
@@ -578,6 +622,14 @@ void SceneViewerPanel::onFrameSwitched() {
   m_flipConsole->setCurrentFrame(frameIndex + 1);
   if (m_keyFrameButton->getCurrentFrame() != frameIndex)
     m_keyFrameButton->setCurrentFrame(frameIndex);
+
+  if (m_playing && m_playSound) {
+    if (m_first == true && hasSoundtrack()) {
+      playAudioFrame(frameIndex);
+    } else if (m_hasSoundtrack) {
+      playAudioFrame(frameIndex);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -600,4 +652,65 @@ void SceneViewerPanel::onFrameTypeChanged() {
 
   updateFrameRange();
   updateFrameMarkers();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewerPanel::onPreferenceChanged(const QString &prefName) {
+  // if no name specified (on StyleShortcutSelectivePanel::showEvent),
+  // then process all updates
+  if (prefName == "BlankCount" || prefName == "BlankColor" ||
+      prefName.isEmpty())
+    m_flipConsole->onPreferenceChanged();
+
+  StyleShortcutSwitchablePanel::onPreferenceChanged(prefName);
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewerPanel::playAudioFrame(int frame) {
+  if (m_first) {
+    m_first = false;
+    m_fps   = TApp::instance()
+                ->getCurrentScene()
+                ->getScene()
+                ->getProperties()
+                ->getOutputProperties()
+                ->getFrameRate();
+    m_samplesPerFrame = m_sound->getSampleRate() / abs(m_fps);
+  }
+  if (!m_sound) return;
+  m_viewerFps = m_flipConsole->getCurrentFps();
+  double s0 = frame * m_samplesPerFrame, s1 = s0 + m_samplesPerFrame;
+
+  // make the sound stop if the viewerfps is higher so the next sound can play
+  // on time.
+  if (m_fps < m_viewerFps)
+    TApp::instance()->getCurrentXsheet()->getXsheet()->stopScrub();
+  TApp::instance()->getCurrentXsheet()->getXsheet()->play(m_sound, s0, s1,
+                                                          false);
+}
+
+bool SceneViewerPanel::hasSoundtrack() {
+  if (m_sound != NULL) {
+    m_sound         = NULL;
+    m_hasSoundtrack = false;
+    m_first         = true;
+  }
+  TXsheetHandle *xsheetHandle    = TApp::instance()->getCurrentXsheet();
+  TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
+  m_sound                        = xsheetHandle->getXsheet()->makeSound(prop);
+  if (m_sound == NULL) {
+    m_hasSoundtrack = false;
+    return false;
+  } else {
+    m_hasSoundtrack = true;
+    return true;
+  }
+}
+
+void SceneViewerPanel::onButtonPressed(FlipConsole::EGadget button) {
+  if (button == FlipConsole::eSound) {
+    m_playSound = !m_playSound;
+  }
 }

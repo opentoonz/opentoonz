@@ -86,7 +86,7 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WindowFlags flags)
 #else
 ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 #endif
-    : TPanel(parent) {
+    : StyleShortcutSwitchablePanel(parent) {
   TApp *app = TApp::instance();
 
   QFrame *hbox = new QFrame(this);
@@ -103,6 +103,7 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
   ImageUtils::FullScreenWidget *fsWidget =
       new ImageUtils::FullScreenWidget(this);
   fsWidget->setWidget(m_sceneViewer = new SceneViewer(fsWidget));
+  m_sceneViewer->setIsStyleShortcutSwitchable();
 
 #if defined(Q_OS_WIN) && (QT_VERSION >= 0x050500) && (QT_VERSION < 0x050600)
   //  Workaround for QTBUG-48288
@@ -189,6 +190,9 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
                        SLOT(update()));
   ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this,
                        SLOT(onSceneSwitched()));
+  ret = ret && connect(m_toolOptions, SIGNAL(newPanelCreated()), this,
+                       SLOT(updateTabFocus()));
+
   assert(ret);
 
   // note: initializeTitleBar() refers to m_sceneViewer
@@ -336,7 +340,8 @@ ComboViewerPanel::~ComboViewerPanel() {
 
 //-----------------------------------------------------------------------------
 
-void ComboViewerPanel::showEvent(QShowEvent *) {
+void ComboViewerPanel::showEvent(QShowEvent *event) {
+  StyleShortcutSwitchablePanel::showEvent(event);
   TApp *app                    = TApp::instance();
   TFrameHandle *frameHandle    = app->getCurrentFrame();
   TSceneHandle *sceneHandle    = app->getCurrentScene();
@@ -388,9 +393,6 @@ void ComboViewerPanel::showEvent(QShowEvent *) {
 
   ret = ret && connect(app->getCurrentTool(), SIGNAL(toolSwitched()),
                        m_sceneViewer, SLOT(onToolSwitched()));
-  ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-                       SLOT(onPreferenceChanged()));
-  m_flipConsole->onPreferenceChanged();
 
   assert(ret);
 
@@ -403,7 +405,8 @@ void ComboViewerPanel::showEvent(QShowEvent *) {
 
 //-----------------------------------------------------------------------------
 
-void ComboViewerPanel::hideEvent(QHideEvent *) {
+void ComboViewerPanel::hideEvent(QHideEvent *event) {
+  StyleShortcutSwitchablePanel::hideEvent(event);
   TApp *app = TApp::instance();
   disconnect(app->getCurrentScene());
   disconnect(app->getCurrentLevel());
@@ -781,3 +784,12 @@ bool ComboViewerPanel::isFrameAlreadyCached(int frame) {
 }
 
 //-----------------------------------------------------------------------------
+
+void ComboViewerPanel::onPreferenceChanged(const QString &prefName) {
+  // if no name specified (on showEvent), then process all updates
+  if (prefName == "BlankCount" || prefName == "BlankColor" ||
+      prefName.isEmpty())
+    m_flipConsole->onPreferenceChanged();
+
+  StyleShortcutSwitchablePanel::onPreferenceChanged(prefName);
+}

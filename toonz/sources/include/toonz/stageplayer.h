@@ -102,6 +102,8 @@ public:
   static double m_onionSkinFrontSize;
   static double m_onionSkinBackSize;
 
+  TPixel32 m_filterColor;
+
 public:
   Player();
 

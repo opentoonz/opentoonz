@@ -23,6 +23,8 @@ class FullColorBrushToolNotifier;
 class FullColorBrushTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(FullColorBrushTool)
 
+  void updateCurrentColor();
+
 public:
   FullColorBrushTool(std::string name);
 

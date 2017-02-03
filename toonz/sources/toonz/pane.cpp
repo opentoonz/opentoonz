@@ -226,10 +226,10 @@ void TPanelTitleBarButton::mousePressEvent(QMouseEvent *e) {
 
 void TPanelTitleBarButtonForSafeArea::getSafeAreaNameList(
     QList<QString> &nameList) {
-  TFilePath fp                = ToonzFolder::getFirstProjectsFolder();
+  TFilePath fp                = TEnv::getConfigDir();
   QString currentSafeAreaName = QString::fromStdString(EnvSafeAreaName);
 
-  std::string safeAreaFileName = "safeArea.ini";
+  std::string safeAreaFileName = "safearea.ini";
 
   while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() &&
          fp.getParentDir() != TFilePath())

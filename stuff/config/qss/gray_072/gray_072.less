@@ -1,3 +1,4 @@
+// out: gray_072.qss
 /* LESS Definitions */
 
 /*Image URL*/
@@ -29,7 +30,12 @@
 .baseBG(light, @light: 0%){
 	background-color: lighten(@m_baseBG, @light);
 }
-
+.set_border_color(@lefttop, @rightbottom){
+	border-left-color: 	@lefttop;
+	border-top-color: 	@lefttop;
+	border-right-color: 	@rightbottom;
+	border-bottom-color: 	@rightbottom;
+}
 .base_inset(@dark: 0%){
 	.baseBG(@dark);
 	border-style: inset;
@@ -84,6 +90,9 @@
 QWidget {
 	color: @m_baseTxtColor;
 	.baseBG;
+	&:disabled{
+		color: @m_disabledTxtColor;
+	}
 }
 
 QFrame {
@@ -339,14 +348,21 @@ QSlider {
 
 QGroupBox {
 	border: 1px solid @m_baseTxtColor;
-	.set_margin( 5px, 5px );
-	.set_padding( 3px, 5px );
+	margin: 6px 0 0 0;
+	padding: 5px 3px;
+	
 	&::title {
 		subcontrol-origin: margin;
-		padding: 0px;
-		margin-top: -4px;
-		/*bottom: 3px;*/
 		left: 15px;
+		margin: -2px 0 0 0;
+		padding: 0 3px;
+	}
+	&::indicator {
+		&:extend(QCheckBox::indicator all);
+	}
+	&:disabled{
+		color: @m_base_darkH;
+		border-color: @m_disabledTxtColor;
 	}
 }
 
@@ -747,7 +763,7 @@ DvDirTreeView {
 /*---------------------------------------------------------------------------*/
 #CleanupSettingsFrame, 
 #LoadLevelFrame,
-#SolidLineFrame{
+#SolidLineFrame {
 	border: 1px solid @m_baseTxtColor;
 }
 
@@ -821,30 +837,29 @@ ParamsPage {
 	}
 }
 /* Customize QScrollBar  vertical*/
-#XsheetScrollBar {
-	.baseBG(light, 10%);
+QScrollBar {
 	border: 1px solid black;
 
 	&:vertical {
-		width: 18px;
-		.set_margin( 0px, 20px );
+		width: 16px;
+		.set_margin( 0px, 16px );
 	}
 	&:horizontal {
-		height: 18px;
-		.set_margin( 20px, 0px );
+		height: 16px;
+		.set_margin( 16px, 0px );
 	}
 
 	&::handle {
-		border-width: 4;
+		border-width: 3;
 		image-position: center center;
 		&:vertical {
-			border-image: url("@{image_url}/sb_g_vhandle.png")4;
+			border-image: url("@{image_url}/sb_g_vhandle.png")3;
 			image: url("@{image_url}/sb_g_vline.png");
 			min-height: 40px;
 		}
 		
 		&:horizontal {
-			border-image: url("@{image_url}/sb_g_hhandle.png")4;
+			border-image: url("@{image_url}/sb_g_hhandle.png")3;
 			image: url("@{image_url}/sb_g_hline.png");
 			min-width: 40px;
 		}
@@ -854,7 +869,7 @@ ParamsPage {
 		subcontrol-origin: margin;
 		&:vertical {
 			image: url("@{image_url}/sb_g_downarrow.png");
-			height: 20px;
+			height: 16px;
 			subcontrol-position: bottom;
 			&:pressed {
 				image: url("@{image_url}/sb_g_downarrow_pressed.png");
@@ -862,7 +877,7 @@ ParamsPage {
 		}
 		&:horizontal {
 			image: url("@{image_url}/sb_g_rarrow.png");
-			width: 20px;
+			width: 16px;
 			subcontrol-position: right;
 			&:pressed{
 				image: url("@{image_url}/sb_g_rarrow_pressed.png");
@@ -874,7 +889,7 @@ ParamsPage {
 		subcontrol-origin: margin;
 		&:vertical {
 			image: url("@{image_url}/sb_g_uparrow.png");
-			height: 20px;
+			height: 16px;
 			subcontrol-position: top;
 			&:pressed {
 				image: url("@{image_url}/sb_g_uparrow_pressed.png");
@@ -882,7 +897,7 @@ ParamsPage {
 		}
 		&:horizontal {
 			image: url("@{image_url}/sb_g_larrow.png");
-			width: 20px;
+			width: 16px;
 			subcontrol-position: left;
 			&:pressed{
 				image: url("@{image_url}/sb_g_larrow_pressed.png");
@@ -890,8 +905,8 @@ ParamsPage {
 		}
 	}
 
-	&::add-page {
-		background: none;
+	&::add-page, &::sub-page {
+	    .baseBG(light, 10%);
 	}
 }
 
@@ -904,6 +919,8 @@ XsheetViewer {
 	qproperty-BGColor: rgb(72,72,72);
 	qproperty-LightLineColor: rgb(32,32,32);
 	qproperty-MarkerLineColor: rgb(30, 150, 196);
+	qproperty-VerticalLineColor: rgb(120,120,120);
+	qproperty-VerticalLineHeadColor: rgb(160,160,160);
 	qproperty-PreviewFrameTextColor: rgb(150, 230, 230);
 	qproperty-CurrentRowBgColor: rgb(80,96,130);
 
@@ -1365,4 +1382,43 @@ QDialog #dialogButtonFrame {
 
 #LargeSizedText {
     font-size: 17px;
+}
+
+#GearButton {
+    qproperty-icon: url("@{image_url}/gear.png");
+}
+
+#SubfolderButton {
+    qproperty-icon: url("@{image_url}/subfolder.png");
+}
+
+#StartupLabel {
+    padding: 3px;
+	&:hover {
+		.baseBG(light, 10%);
+	}    
+}
+
+#WordButton {
+    font-size: 12px;
+    color: black;
+	background-color: rgb(192, 192, 192);
+	border-style: outset;
+	.set_border_color(white,black);
+	border-width: 1px;
+ 	border-radius: 1px;
+   	.set_padding(3px, 3px);
+	&:pressed {
+	    background-color: rgb(250, 255, 162);
+	    border-style: inset;
+	    .set_border_color(black,white);
+	}
+	&:hover {
+	    background-color: rgb(250, 255, 162);
+		&:pressed {
+	        background-color: rgb(250, 255, 162);
+    	    border-style: inset;
+	        .set_border_color(black,white);
+	    }
+	}
 }

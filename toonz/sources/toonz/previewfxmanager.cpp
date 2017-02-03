@@ -1327,6 +1327,7 @@ void PreviewFxManager::unfreeze(FlipBook *flipbook) {
 
     // Also any associated pb status
     delete flipbook->getProgressBarStatus();
+    flipbook->setProgressBarStatus(NULL);
 
     previewInstance->addFlipbook(flipbook);
     previewInstance->refreshViewRects();

@@ -57,7 +57,7 @@ public:
   bool isConstantFolder(int index) const;
 
   TFilePath getFolder(int index) const;
-  TFilePath getFolder(std::string name) const;
+  TFilePath getFolder(std::string name, bool absolute = false) const;
 
   TFilePath getScenesPath() const;
 

@@ -520,8 +520,13 @@ void RasterPainter::flushRasterImages() {
       else if (m_nodes[i].m_onionMode == Node::eOnionSkinBack)
         colorscale = TPixel32(backOnionColor.r, backOnionColor.g,
                               backOnionColor.b, m_nodes[i].m_alpha);
-    } else
+    } else {
+      if (m_nodes[i].m_filterColor != TPixel32::Black) {
+        colorscale   = m_nodes[i].m_filterColor;
+        colorscale.m = m_nodes[i].m_alpha;
+      }
       inksOnly = tc & ToonzCheck::eInksOnly;
+    }
 
     if (TRaster32P src32 = m_nodes[i].m_raster)
       TRop::quickPut(viewedRaster, src32, aff, colorscale,
@@ -602,6 +607,9 @@ void RasterPainter::flushRasterImages() {
   glDisable(GL_DITHER);
   glDisable(GL_LOGIC_OP);
 
+/* disable, since these features are never enabled, and cause OpenGL to assert
+ * on systems that don't support them: see #591 */
+#if 0
 #ifdef GL_EXT_convolution
   glDisable(GL_CONVOLUTION_1D_EXT);
   glDisable(GL_CONVOLUTION_2D_EXT);
@@ -611,6 +619,7 @@ void RasterPainter::flushRasterImages() {
 #ifdef GL_EXT_histogram
   glDisable(GL_HISTOGRAM_EXT);
   glDisable(GL_MINMAX_EXT);
+#endif
 #endif
 
 #ifdef GL_EXT_texture3D
@@ -920,7 +929,8 @@ void RasterPainter::onRasterImage(TRasterImage *ri,
 
   m_nodes.push_back(Node(r, 0, alpha, aff, ri->getSavebox(), bbox,
                          player.m_frame, player.m_isCurrentColumn, onionMode,
-                         doPremultiply, whiteTransp, ignoreAlpha));
+                         doPremultiply, whiteTransp, ignoreAlpha,
+                         player.m_filterColor));
 }
 
 //-----------------------------------------------------------------------------
@@ -960,7 +970,7 @@ void RasterPainter::onToonzImage(TToonzImage *ti, const Stage::Player &player) {
 
   m_nodes.push_back(Node(r, ti->getPalette(), alpha, aff, ti->getSavebox(),
                          bbox, player.m_frame, player.m_isCurrentColumn,
-                         onionMode, false, false, false));
+                         onionMode, false, false, false, player.m_filterColor));
 }
 
 //**********************************************************************************************

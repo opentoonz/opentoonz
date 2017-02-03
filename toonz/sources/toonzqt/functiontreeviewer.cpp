@@ -1184,11 +1184,14 @@ void FunctionTreeModel::onChange(const TParamChange &tpc) {
 
     struct Func final : public TFunctorInvoker::BaseFunctor {
       FunctionTreeModel *m_obj;
-      const TParamChange *m_tpc;
+      // Use a copy of 'TParamChange' since callers declare
+      // and free this value on the stack,
+      // so we can't ensure its valid later on when the notifier executes.
+      const TParamChange m_tpc;
 
       Func(FunctionTreeModel *obj, const TParamChange *tpc)
-          : m_obj(obj), m_tpc(tpc) {}
-      void operator()() override { m_obj->onParamChange(m_tpc->m_dragging); }
+          : m_obj(obj), m_tpc(*tpc) {}
+      void operator()() override { m_obj->onParamChange(m_tpc.m_dragging); }
     };
 
     QMetaObject::invokeMethod(TFunctorInvoker::instance(), "invoke",
@@ -1212,7 +1215,10 @@ void FunctionTreeModel::resetAll() {
   beginResetModel();
 #endif
   m_activeChannels.clear();
-  setRootItem(0);
+
+  TreeModel::Item *root_item = getRootItem();
+  setRootItem_NoFree(NULL);
+
   m_stageObjects = 0;
   m_fxs          = 0;
 #if QT_VERSION < 0x050000
@@ -1222,6 +1228,10 @@ void FunctionTreeModel::resetAll() {
   beginRefresh();
   refreshActiveChannels();
   endRefresh();
+
+  // postpone until after refresh,
+  // since its members are used for reference.
+  delete root_item;
 
   m_currentChannel = 0;
 

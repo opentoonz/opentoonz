@@ -1,8 +1,8 @@
 
 
 extern "C" {
-#include "slu_ddefs.h"
-#include "slu_util.h"
+#include <slu_ddefs.h>
+#include <slu_util.h>
 }
 
 #include <algorithm>
@@ -308,8 +308,15 @@ void tlin::factorize(SuperMatrix *A, SuperFactors *&F, superlu_options_t *opt) {
   StatInit(&stat);
 
   int result;
+
+#if defined(SUPERLU_MAJOR_VERSION) && (SUPERLU_MAJOR_VERSION >= 5)
+  GlobalLU_t Glu;
+  dgstrf(opt, &AC, sp_ienv(1), sp_ienv(2), etree, NULL, 0, F->perm_c, F->perm_r,
+         F->L, F->U, &Glu, &stat, &result);
+#else
   dgstrf(opt, &AC, sp_ienv(1), sp_ienv(2), etree, NULL, 0, F->perm_c, F->perm_r,
          F->L, F->U, &stat, &result);
+#endif
 
   StatFree(&stat);
 

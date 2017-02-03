@@ -12,6 +12,7 @@
 #include "iocommand.h"
 #include "tapp.h"
 #include "comboviewerpane.h"
+#include "startuppopup.h"
 
 // TnzTools includes
 #include "tools/toolcommandids.h"
@@ -1275,6 +1276,12 @@ void MainWindow::onMenuCheckboxChanged() {
 void MainWindow::showEvent(QShowEvent *event) {
   getCurrentRoom()->layout()->setEnabled(true);  // See main function in
                                                  // main.cpp
+  if (Preferences::instance()->isStartupPopupEnabled() &&
+      !m_startupPopupShown) {
+    StartupPopup *startupPopup = new StartupPopup();
+    startupPopup->show();
+    m_startupPopupShown = true;
+  }
 }
 extern const char *applicationName;
 extern const char *applicationVersion;
@@ -1558,9 +1565,9 @@ QAction *MainWindow::createToolAction(const char *id, const char *iconName,
 void MainWindow::defineActions() {
   createMenuFileAction(MI_NewScene, tr("&New Scene"), "Ctrl+N");
   createMenuFileAction(MI_LoadScene, tr("&Load Scene..."), "Ctrl+L");
-  createMenuFileAction(MI_SaveScene, tr("&Save Scene"), "Ctrl+S");
-  createMenuFileAction(MI_SaveSceneAs, tr("&Save Scene As..."), "Ctrl+Shift+S");
-  createMenuFileAction(MI_SaveAll, tr("&Save All"), "");
+  createMenuFileAction(MI_SaveScene, tr("&Save Scene"), "Ctrl+Shift+S");
+  createMenuFileAction(MI_SaveSceneAs, tr("&Save Scene As..."), "");
+  createMenuFileAction(MI_SaveAll, tr("&Save All"), "Ctrl+S");
   createMenuFileAction(MI_RevertScene, tr("&Revert Scene"), "");
 
   QAction *act = CommandManager::instance()->getAction(MI_RevertScene);
@@ -1576,9 +1583,10 @@ void MainWindow::defineActions() {
                        "");
   createMenuFileAction(MI_ClearRecentLevel, tr("&Clear Recent level File List"),
                        "");
-  createMenuFileAction(MI_NewLevel, tr("&New Level..."), "");
+  createMenuFileAction(MI_NewLevel, tr("&New Level..."), "Alt+N");
   createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
   createMenuFileAction(MI_SaveLevel, tr("&Save Level"), "");
+  createMenuFileAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
   createMenuFileAction(MI_SaveLevelAs, tr("&Save Level As..."), "");
   createMenuFileAction(MI_ExportLevel, tr("&Export Level..."), "");
   createMenuFileAction(MI_ConvertFileWithInput, tr("&Convert File..."), "");
@@ -1590,9 +1598,10 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_ProjectSettings, tr("&Project Settings..."), "");
   createMenuFileAction(MI_SaveDefaultSettings, tr("&Save Default Settings"),
                        "");
-  createMenuFileAction(MI_OutputSettings, tr("&Output Settings..."), "");
+  createMenuFileAction(MI_OutputSettings, tr("&Output Settings..."), "Ctrl+O");
   createMenuFileAction(MI_PreviewSettings, tr("&Preview Settings..."), "");
-  createMenuFileAction(MI_Render, tr("&Render"), "");
+  createMenuFileAction(MI_Render, tr("&Render"), "Ctrl+Shift+R");
+  createMenuFileAction(MI_FastRender, tr("&Fast Render to MP4"), "Alt+R");
   createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
   createRightClickMenuAction(MI_SavePreviewedFrames,
                              tr("&Save Previewed Frames"), "");
@@ -1607,13 +1616,13 @@ void MainWindow::defineActions() {
       MI_FreezePreview, tr("Freeze Preview"), tr("Unfreeze Preview"));
   // createAction(MI_SavePreview,         "&Save Preview",		"");
   createRightClickMenuAction(MI_SavePreset, tr("&Save As Preset"), "");
-  createMenuFileAction(MI_Preferences, tr("&Preferences..."), "");
+  createMenuFileAction(MI_Preferences, tr("&Preferences..."), "Ctrl+U");
   createMenuFileAction(MI_ShortcutPopup, tr("&Configure Shortcuts..."), "");
   createMenuFileAction(MI_PrintXsheet, tr("&Print Xsheet"), "");
   createMenuFileAction("MI_RunScript", tr("Run Script..."), "");
   createMenuFileAction("MI_OpenScriptConsole", tr("Open Script Console..."),
                        "");
-  createMenuFileAction(MI_Print, tr("&Print Current Frame..."), "");
+  createMenuFileAction(MI_Print, tr("&Print Current Frame..."), "Ctrl+P");
   createMenuFileAction(MI_Quit, tr("&Quit"), "Ctrl+Q");
 #ifndef NDEBUG
   createMenuFileAction("MI_ReloadStyle", tr("Reload qss"), "");
@@ -1639,10 +1648,14 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_PasteNames, tr("Paste Name"), "");
   createRightClickMenuAction(MI_GetColorFromStudioPalette,
                              tr("Get Color from Studio Palette"), "");
-  createMenuEditAction(MI_Clear, tr("&Delete"), "Delete");
+  createRightClickMenuAction(MI_ToggleLinkToStudioPalette,
+                             tr("Toggle Link to Studio Palette"), "");
+  createRightClickMenuAction(MI_RemoveReferenceToStudioPalette,
+                             tr("Remove Reference to Studio Palette"), "");
+  createMenuEditAction(MI_Clear, tr("&Delete"), "Del");
   createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
   createMenuEditAction(MI_Group, tr("&Group"), "Ctrl+G");
-  createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "");
+  createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "Ctrl+Shift+G");
   createMenuEditAction(MI_BringToFront, tr("&Bring to Front"), "Ctrl+]");
   createMenuEditAction(MI_BringForward, tr("&Bring Forward"), "]");
   createMenuEditAction(MI_SendBack, tr("&Send Back"), "Ctrl+[");
@@ -1677,7 +1690,7 @@ void MainWindow::defineActions() {
                         MenuScanCleanupCommandType);
   CameraTestCheck::instance()->setToggle(toggle);
 
-  createToggle(MI_OpacityCheck, tr("&Opacity Check"), "1", false,
+  createToggle(MI_OpacityCheck, tr("&Opacity Check"), "Alt+1", false,
                MenuScanCleanupCommandType);
 
   createMenuScanCleanupAction(MI_Cleanup, tr("&Cleanup"), "");
@@ -1747,8 +1760,8 @@ void MainWindow::defineActions() {
   createMenuCellsAction(MI_Increment, tr("&Autoexpose"), "");
   createMenuCellsAction(MI_Dup, tr("&Repeat..."), "");
   createMenuCellsAction(MI_ResetStep, tr("&Reset Step"), "");
-  createMenuCellsAction(MI_IncreaseStep, tr("&Increase Step"), "");
-  createMenuCellsAction(MI_DecreaseStep, tr("&Decrease Step"), "");
+  createMenuCellsAction(MI_IncreaseStep, tr("&Increase Step"), "'");
+  createMenuCellsAction(MI_DecreaseStep, tr("&Decrease Step"), ";");
   createMenuCellsAction(MI_Step2, tr("&Step 2"), "");
   createMenuCellsAction(MI_Step3, tr("&Step 3"), "");
   createMenuCellsAction(MI_Step4, tr("&Step 4"), "");
@@ -1762,26 +1775,26 @@ void MainWindow::defineActions() {
   createMenuCellsAction(MI_Autorenumber, tr("&Autorenumber"), "");
   createMenuCellsAction(MI_CloneLevel, tr("&Clone"), "");
   createMenuCellsAction(MI_DrawingSubForward,
-                        tr("Drawing Substitution Forward"), ".");
+                        tr("Drawing Substitution Forward"), "W");
   createMenuCellsAction(MI_DrawingSubBackward,
-                        tr("Drawing Substitution Backward"), ",");
+                        tr("Drawing Substitution Backward"), "Q");
   createMenuCellsAction(MI_DrawingSubGroupForward,
-                        tr("Similar Drawing Substitution Forward"), "Ctrl+.");
+                        tr("Similar Drawing Substitution Forward"), "Alt+W");
   createMenuCellsAction(MI_DrawingSubGroupBackward,
-                        tr("Similar Drawing Substitution Backward"), "Ctrl+,");
+                        tr("Similar Drawing Substitution Backward"), "Alt+Q");
 
   createMenuCellsAction(MI_Reframe1, tr("1's"), "");
   createMenuCellsAction(MI_Reframe2, tr("2's"), "");
   createMenuCellsAction(MI_Reframe3, tr("3's"), "");
   createMenuCellsAction(MI_Reframe4, tr("4's"), "");
 
-  createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "");
+  createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "Z");
 
   createToggle(MI_ViewCamera, tr("&Camera Box"), "",
                ViewCameraToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_ViewTable, tr("&Table"), "", ViewTableToggleAction ? 1 : 0,
                MenuViewCommandType);
-  createToggle(MI_FieldGuide, tr("&Field Guide"), "",
+  createToggle(MI_FieldGuide, tr("&Field Guide"), "Shift+G",
                FieldGuideToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_ViewBBox, tr("&Raster Bounding Box"), "",
                ViewBBoxToggleAction ? 1 : 0, MenuViewCommandType);
@@ -1840,18 +1853,16 @@ void MainWindow::defineActions() {
   createToggle(MI_Link, tr("Link Flipbooks"), "", LinkToggleAction ? 1 : 0,
                MenuViewCommandType);
 
-  createPlaybackAction(MI_Play, tr("Play"), "");
-  createPlaybackAction(MI_Loop, tr("Loop"), "");
+  createPlaybackAction(MI_Play, tr("Play"), "P");
+  createPlaybackAction(MI_Loop, tr("Loop"), "L");
   createPlaybackAction(MI_Pause, tr("Pause"), "");
-  createPlaybackAction(MI_FirstFrame, tr("First Frame"), "");
-  createPlaybackAction(MI_LastFrame, tr("Last Frame"), "");
-  createPlaybackAction(MI_PrevFrame, tr("Previous Frame"), "Shift+A");
-  createPlaybackAction(MI_NextFrame, tr("Next Frame"), "Shift+S");
+  createPlaybackAction(MI_FirstFrame, tr("First Frame"), "Alt+,");
+  createPlaybackAction(MI_LastFrame, tr("Last Frame"), "Alt+.");
+  createPlaybackAction(MI_PrevFrame, tr("Previous Frame"), "Shift+,");
+  createPlaybackAction(MI_NextFrame, tr("Next Frame"), "Shift+.");
 
-  createAction(MI_NextDrawing, tr("Next Drawing"), "Shift+X",
-               PlaybackCommandType);
-  createAction(MI_PrevDrawing, tr("Prev Drawing"), "Shift+Z",
-               PlaybackCommandType);
+  createAction(MI_NextDrawing, tr("Next Drawing"), ".", PlaybackCommandType);
+  createAction(MI_PrevDrawing, tr("Prev Drawing"), ",", PlaybackCommandType);
   createAction(MI_NextStep, tr("Next Step"), "", PlaybackCommandType);
   createAction(MI_PrevStep, tr("Prev Step"), "", PlaybackCommandType);
 
@@ -1866,7 +1877,7 @@ void MainWindow::defineActions() {
   createViewerAction(MI_CompareToSnapshot, tr("Compare to Snapshot"), "");
 
   createFillAction(MI_AutoFillToggle,
-                   tr("Toggle Autofill on Current Palette Color"), "");
+                   tr("Toggle Autofill on Current Palette Color"), "Shift+A");
 
   toggle =
       createToggle(MI_DockingCheck, tr("&Lock Room Panes"), "",
@@ -1908,8 +1919,8 @@ void MainWindow::defineActions() {
   //  createAction(MI_Export,            "Export",           "Ctrl+E");
 
   createMenuWindowsAction(MI_OpenComboViewer, tr("&ComboViewer"), "");
-  createMenuWindowsAction(MI_OpenHistoryPanel, tr("&History"), "");
-
+  createMenuWindowsAction(MI_OpenHistoryPanel, tr("&History"), "Ctrl+H");
+  createMenuWindowsAction(MI_AudioRecording, tr("Record Audio"), "Alt+A");
   createMenuWindowsAction(MI_ResetRoomLayout, tr("&Reset to Default Rooms"),
                           "");
   createMenuWindowsAction(MI_MaximizePanel, tr("Toggle Maximize Panel"), "`");
@@ -1917,10 +1928,10 @@ void MainWindow::defineActions() {
                           tr("Toggle Main Window's Full Screen Mode"),
                           "Ctrl+`");
   createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
-
+  createMenuWindowsAction(MI_StartupPopup, tr("&Startup Popup..."), "Alt+S");
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
-  createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "//", false,
+  createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "/", false,
                RightClickMenuCommandType);
   createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false,
                RightClickMenuCommandType);
@@ -1991,12 +2002,16 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_DisableAllColumns, tr("OFF All"), "");
   createRightClickMenuAction(MI_DisableSelectedColumns, tr("OFF Selected"), "");
   createRightClickMenuAction(MI_SwapEnabledColumns, tr("Swap ON/OFF"), "");
-  createRightClickMenuAction(MI_LockThisColumnOnly, tr("Lock This Only"), "");
-  createRightClickMenuAction(MI_LockSelectedColumns, tr("Lock Selected"), "");
-  createRightClickMenuAction(MI_LockAllColumns, tr("Lock All"), "");
+  createRightClickMenuAction(MI_LockThisColumnOnly, tr("Lock This Only"),
+                             "Shift+L");
+  createRightClickMenuAction(MI_LockSelectedColumns, tr("Lock Selected"),
+                             "Ctrl+Shift+L");
+  createRightClickMenuAction(MI_LockAllColumns, tr("Lock All"),
+                             "Ctrl+Alt+Shift+L");
   createRightClickMenuAction(MI_UnlockSelectedColumns, tr("Unlock Selected"),
-                             "");
-  createRightClickMenuAction(MI_UnlockAllColumns, tr("Unlock All"), "");
+                             "Ctrl+Shift+U");
+  createRightClickMenuAction(MI_UnlockAllColumns, tr("Unlock All"),
+                             "Ctrl+Alt+Shift+U");
   createRightClickMenuAction(MI_ToggleColumnLocks, tr("Swap Lock/Unlock"), "");
   /*-- カレントカラムの右側のカラムを全て非表示にするコマンド --*/
   createRightClickMenuAction(MI_DeactivateUpperColumns,
@@ -2012,31 +2027,32 @@ void MainWindow::defineActions() {
   createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "A");
   createToolAction(T_Tape, "tape", tr("Tape Tool"), "T");
   createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "K");
-  createToolAction(T_RGBPicker, "RGBpicker", tr("RGB Picker Tool"), "");
+  createToolAction(T_RGBPicker, "RGBpicker", tr("RGB Picker Tool"), "R");
   createToolAction(T_ControlPointEditor, "controlpointeditor",
                    tr("Control Point Editor Tool"), "C");
-  createToolAction(T_Pinch, "pinch", tr("Pinch Tool"), "P");
+  createToolAction(T_Pinch, "pinch", tr("Pinch Tool"), "M");
   createToolAction(T_Pump, "pump", tr("Pump Tool"), "");
   createToolAction(T_Magnet, "magnet", tr("Magnet Tool"), "");
   createToolAction(T_Bender, "bender", tr("Bender Tool"), "");
   createToolAction(T_Iron, "iron", tr("Iron Tool"), "");
   createToolAction(T_Cutter, "cutter", tr("Cutter Tool"), "");
-  createToolAction(T_Skeleton, "skeleton", tr("Skeleton Tool"), "");
+  createToolAction(T_Skeleton, "skeleton", tr("Skeleton Tool"), "V");
   createToolAction(T_Tracker, "tracker", tr("Tracker Tool"), "");
-  createToolAction(T_Hook, "hook", tr("Hook Tool"), "");
+  createToolAction(T_Hook, "hook", tr("Hook Tool"), "O");
   createToolAction(T_Zoom, "zoom", tr("Zoom Tool"), "Shift+Space");
   createToolAction(T_Rotate, "rotate", tr("Rotate Tool"), "Ctrl+Space");
   createToolAction(T_Hand, "hand", tr("Hand Tool"), "Space");
-  createToolAction(T_Plastic, "plastic", tr("Plastic Tool"), "");
+  createToolAction(T_Plastic, "plastic", tr("Plastic Tool"), "X");
   createToolAction(T_Ruler, "ruler", tr("Ruler Tool"), "");
   createToolAction(T_Finger, "finger", tr("Finger Tool"), "");
 
   createViewerAction(V_ZoomIn, tr("Zoom In"), "+");
   createViewerAction(V_ZoomOut, tr("Zoom Out"), "-");
-  createViewerAction(V_ZoomReset, tr("Reset View"), "0");
-  createViewerAction(V_ZoomFit, tr("Fit to Window"), "");
+  createViewerAction(V_ZoomReset, tr("Reset View"), "Alt+0");
+  createViewerAction(V_ZoomFit, tr("Fit to Window"), "Alt+9");
   createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
-  createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"), "");
+  createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"),
+                     "Alt+F");
   CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen,
                                              tr("Full Screen Mode"),
                                              tr("Exit Full Screen Mode"));
@@ -2046,13 +2062,13 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_GlobalKey", tr("Global Key"), "");
 
   createToolOptionsAction("A_IncreaseMaxBrushThickness",
-                          tr("Brush size - Increase max"), "");
+                          tr("Brush size - Increase max"), "I");
   createToolOptionsAction("A_DecreaseMaxBrushThickness",
-                          tr("Brush size - Decrease max"), "");
+                          tr("Brush size - Decrease max"), "U");
   createToolOptionsAction("A_IncreaseMinBrushThickness",
-                          tr("Brush size - Increase min"), "");
+                          tr("Brush size - Increase min"), "J");
   createToolOptionsAction("A_DecreaseMinBrushThickness",
-                          tr("Brush size - Decrease min"), "");
+                          tr("Brush size - Decrease min"), "H");
   createToolOptionsAction("A_IncreaseBrushHardness",
                           tr("Brush hardness - Increase"), "");
   createToolOptionsAction("A_DecreaseBrushHardness",
@@ -2071,7 +2087,7 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_PreserveThickness",
                           tr("Preserve Thickness"), "");
   createToolOptionsAction("A_ToolOption_PressureSensitivity",
-                          tr("Pressure Sensitivity"), "");
+                          tr("Pressure Sensitivity"), "Shift+P");
   createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "F8");
   createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "F7");
   createToolOptionsAction("A_ToolOption_Smooth", tr("Smooth"), "");

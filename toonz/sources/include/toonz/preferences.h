@@ -99,6 +99,14 @@ public:
   void setAutosavePeriod(int minutes);
   int getAutosavePeriod() const { return m_autosavePeriod; }  // minutes
 
+  void enableAutosaveScene(bool on);
+  bool isAutosaveSceneEnabled() const { return m_autosaveSceneEnabled; }
+
+  void enableAutosaveOtherFiles(bool on);
+  bool isAutosaveOtherFilesEnabled() const {
+    return m_autosaveOtherFilesEnabled;
+  }
+
   void enableLevelsBackup(bool enabled);
   bool isLevelsBackupEnabled() const { return m_levelsBackupEnabled; }
 
@@ -109,6 +117,9 @@ public:
   bool isReplaceAfterSaveLevelAsEnabled() const {
     return m_replaceAfterSaveLevelAs;
   }
+
+  void enableStartupPopup(bool on);
+  bool isStartupPopupEnabled() { return m_startupPopupEnabled; }
 
   void setProjectRoot(int index);
   int getProjectRoot() { return m_projectRoot; }
@@ -296,6 +307,11 @@ public:
     return m_multiLayerStylePickerEnabled;
   }
 
+  void enableUseNumpadForSwitchingStyles(bool on);
+  bool isUseNumpadForSwitchingStylesEnabled() const {
+    return m_useNumpadForSwitchingStyles;
+  }
+
   // Xsheet  tab
 
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
@@ -322,6 +338,16 @@ public:
   void enableShowKeyframesOnXsheetCellArea(bool on);
   bool isShowKeyframesOnXsheetCellAreaEnabled() const {
     return m_showKeyframesOnXsheetCellArea;
+  }
+
+  void enableUseArrowKeyToShiftCellSelection(bool on);
+  bool isUseArrowKeyToShiftCellSelectionEnabled() const {
+    return m_useArrowKeyToShiftCellSelection;
+  }
+
+  void enableInputCellsWithoutDoubleClicking(bool on);
+  bool isInputCellsWithoutDoubleClickingEnabled() const {
+    return m_inputCellsWithoutDoubleClickingEnabled;
   }
 
   // Animation  tab
@@ -397,7 +423,8 @@ public:
   bool getPrecompute() { return m_precompute; }
   void setFfmpegTimeout(int seconds);
   int getFfmpegTimeout() { return m_ffmpegTimeout; }
-
+  void setFastRenderPath(std::string path);
+  QString getFastRenderPath() const { return m_fastRenderPath; }
   // Uncategorized - internals
 
   void setAskForOverrideRender(bool on);
@@ -408,6 +435,9 @@ public:
 
   int getTextureSize() const { return m_textureSize; }
   bool useDrawPixel() { return m_textureSize == 0; }
+
+  void setShortcutPreset(std::string preset);
+  QString getShortcutPreset() { return m_shortcutPreset; }
 
   int getShmMax() const {
     return m_shmmax;
@@ -436,8 +466,9 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_customProjectRoot,
-      m_imageMagickPath;
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
+      m_customProjectRoot, m_imageMagickPath;
+  QString m_fastRenderPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
@@ -460,11 +491,13 @@ private:
       m_generatedMovieViewEnabled, m_xsheetAutopanEnabled,
       m_ignoreAlphaonColumn1Enabled, m_previewAlwaysOpenNewFlipEnabled,
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
+      m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
       m_defaultViewerEnabled, m_pixelsOnly;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
-      m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly;
+      m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly,
+      m_startupPopupEnabled;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
   bool m_onionSkinDuringPlayback;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
@@ -502,6 +535,15 @@ private:
   std::string m_layerNameEncoding = "SJIS";  // Fixed to SJIS for now. You can
                                              // add interface if you wanna
                                              // change encoding.
+  // whether to use numpad and tab key shortcut for selecting styles
+  bool m_useNumpadForSwitchingStyles;
+
+  // use arrow key to shift cel selection, ctrl + arrow key to resize the
+  // selection range.
+  bool m_useArrowKeyToShiftCellSelection;
+
+  // enable to input drawing numbers into cells without double-clicking
+  bool m_inputCellsWithoutDoubleClickingEnabled;
 
 private:
   Preferences();

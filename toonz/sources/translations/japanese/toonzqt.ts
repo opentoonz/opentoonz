@@ -29,6 +29,29 @@
     </message>
 </context>
 <context>
+    <name>AddWordButton</name>
+    <message>
+        <source>Character</source>
+        <translation>キャラクター</translation>
+    </message>
+    <message>
+        <source>Part</source>
+        <translation>部位</translation>
+    </message>
+    <message>
+        <source>Suffix</source>
+        <translation>接尾辞</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation>新規作成</translation>
+    </message>
+    <message>
+        <source>Add New Word for %1</source>
+        <translation>%1 に新しい単語を追加する</translation>
+    </message>
+</context>
+<context>
     <name>AdjustPaletteDialog</name>
     <message>
         <source>Adjust Current Level to This Palette</source>
@@ -129,6 +152,18 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
         <translation>プリセット名に &quot;,&quot; (カンマ)を使用できません</translation>
+    </message>
+    <message>
+        <source>DPI</source>
+        <translation>DPI</translation>
+    </message>
+    <message>
+        <source>Pixels</source>
+        <translation>ピクセルサイズ</translation>
+    </message>
+    <message>
+        <source>x</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -299,7 +334,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::ProgressDialog</name>
     <message>
         <source>Toonz</source>
-        <translation>OpenToonz</translation>
+        <translation type="vanished">OpenToonz</translation>
+    </message>
+    <message>
+        <source>OpenToonz</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -367,6 +406,17 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Ease Out:</source>
         <translation>スローアウト：</translation>
+    </message>
+</context>
+<context>
+    <name>EasyInputArea</name>
+    <message>
+        <source>Warning</source>
+        <translation>警告</translation>
+    </message>
+    <message>
+        <source>%1 is already registered</source>
+        <translation>%1 は既に登録されています</translation>
     </message>
 </context>
 <context>
@@ -568,6 +618,10 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>&amp;Display Areas as Filled</source>
         <translation>領域を塗りつぶししたとして表示 (&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Locator</source>
+        <translation>ロケーター (&amp;L)</translation>
     </message>
 </context>
 <context>
@@ -1159,6 +1213,21 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
 </context>
 <context>
+    <name>NewWordDialog</name>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>Enter new word</source>
+        <translation>単語を入力してください</translation>
+    </message>
+</context>
+<context>
     <name>PageViewer</name>
     <message>
         <source>Toggle Link to Studio Palette</source>
@@ -1285,11 +1354,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Update</source>
-        <translation>更新する</translation>
+        <translation type="vanished">更新する</translation>
     </message>
     <message>
         <source>Don&apos;t Update</source>
-        <translation>更新しない</translation>
+        <translation type="vanished">更新しない</translation>
     </message>
     <message>
         <source>     (Color Model: </source>
@@ -1308,7 +1377,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Remove Links</source>
-        <translation>スタジオパレットとのリンクを消去</translation>
+        <translation type="vanished">スタジオパレットとのリンクを消去</translation>
     </message>
     <message>
         <source>New Style</source>
@@ -1317,6 +1386,10 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>New Page</source>
         <translation>新規ページ</translation>
+    </message>
+    <message>
+        <source>Name Editor</source>
+        <translation>スタイル名エディタ</translation>
     </message>
 </context>
 <context>
@@ -1660,7 +1733,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>It is not possible to assing a shortcut with modifiers to the visualization commands.</source>
-        <translation>視覚化コマンドには、修飾キーと組み合わせたキーボードショートカットを割り当てできません。</translation>
+        <translation type="vanished">視覚化コマンドには、修飾キーと組み合わせたキーボードショートカットを割り当てできません。</translation>
     </message>
     <message>
         <source>It is not possible to save the motion path.</source>
@@ -1739,7 +1812,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Remove Link  in Palette : %1</source>
-        <translation>リンクを消去 : パレット %1</translation>
+        <translation type="vanished">リンクを消去 : パレット %1</translation>
     </message>
     <message>
         <source>Get Color from Studio Palette</source>
@@ -1844,8 +1917,16 @@ Are you sure?</source>
         <translation>設定</translation>
     </message>
     <message>
-        <source>OpenToonz 1.0</source>
+        <source>OpenToonz 1.1</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Remove Reference  in Palette : %1</source>
+        <translation>スタジオパレットへの参照を消去：パレット%1</translation>
+    </message>
+    <message>
+        <source>It is not possible to assign a shortcut with modifiers to the visualization commands.</source>
+        <translation>視覚化コマンドには、修飾キーと組み合わせたキーボードショートカットを割り当てできません。</translation>
     </message>
 </context>
 <context>
@@ -2172,7 +2253,7 @@ Apply</source>
     </message>
     <message>
         <source>Apply</source>
-        <translation>適用</translation>
+        <translation type="vanished">適用</translation>
     </message>
     <message>
         <source>Style Name</source>
@@ -2181,6 +2262,14 @@ Apply</source>
     <message>
         <source>Name Editor: # %1</source>
         <translation>スタイル名を編集: # %1</translation>
+    </message>
+    <message>
+        <source>Apply and Next</source>
+        <translation>適用して次へ</translation>
+    </message>
+    <message>
+        <source>Easy Inputs</source>
+        <translation>簡易入力</translation>
     </message>
 </context>
 <context>
@@ -2221,6 +2310,13 @@ Apply</source>
     <message>
         <source>Plain color</source>
         <translation>通常の色</translation>
+    </message>
+</context>
+<context>
+    <name>WordButton</name>
+    <message>
+        <source>Remove %1</source>
+        <translation type="unfinished">%1 を削除</translation>
     </message>
 </context>
 </TS>

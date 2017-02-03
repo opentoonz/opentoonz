@@ -485,17 +485,15 @@ bool LoadScenePopup::execute() {
 void LoadScenePopup::initFolder() { setInitialFolderByCurrentRoom(); }
 
 void LoadScenePopup::setInitialFolderByCurrentRoom() {
-  QString roomName = TApp::instance()->getCurrentRoomName();
+  QString roomName  = TApp::instance()->getCurrentRoomName();
+  TProjectP project = TProjectManager::instance()->getCurrentProject();
   TFilePath scenePath;
   if (roomName == "Cleanup" || roomName == "InknPaint")
-    scenePath = TProjectManager::instance()->getCurrentProject()->getFolder(
-        TProject::Drawings);
+    scenePath = project->getFolder(TProject::Drawings, true);
   else if (roomName == "PltEdit")
-    scenePath = TProjectManager::instance()->getCurrentProject()->getFolder(
-        TProject::Palettes);
+    scenePath = project->getFolder(TProject::Palettes, true);
   else
-    scenePath = TProjectManager::instance()->getCurrentProject()->getFolder(
-        TProject::Scenes);
+    scenePath = project->getFolder(TProject::Scenes, true);
   setFolder(scenePath);
 }
 

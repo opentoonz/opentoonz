@@ -359,7 +359,7 @@ void PreferencesPopup::onChunkSizeChanged() {
 void PreferencesPopup::onBlankCountChanged() {
   if (m_blanksCount && m_blankColor)
     m_pref->setBlankValues(m_blanksCount->getValue(), m_blankColor->getColor());
-  TApp::instance()->getCurrentScene()->notifyPreferenceChanged();
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("BlankCount");
 }
 
 //-----------------------------------------------------------------------------
@@ -378,7 +378,7 @@ void PreferencesPopup::onBlankColorChanged(const TPixel32 &, bool isDragging) {
 
   if (m_blanksCount && m_blankColor)
     m_pref->setBlankValues(m_blanksCount->getValue(), m_blankColor->getColor());
-  TApp::instance()->getCurrentScene()->notifyPreferenceChanged();
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("BlankColor");
 }
 
 //-----------------------------------------------------------------------------
@@ -554,9 +554,37 @@ void PreferencesPopup::onDefaultViewerChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onAutoSaveChanged(int index) {
-  m_minuteFld->setEnabled(index == Qt::Checked);
-  m_pref->enableAutosave(index == Qt::Checked);
+void PreferencesPopup::onAutoSaveChanged(bool on) {
+  m_pref->enableAutosave(on);
+  if (on && !m_autoSaveSceneCB->isChecked() &&
+      !m_autoSaveOtherFilesCB->isChecked()) {
+    m_autoSaveSceneCB->setChecked(true);
+    m_autoSaveOtherFilesCB->setChecked(true);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveSceneChanged(int index) {
+  m_pref->enableAutosaveScene(index == Qt::Checked);
+  if (!m_autoSaveOtherFilesCB->isChecked() && index == Qt::Unchecked) {
+    m_autoSaveGroup->setChecked(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveOtherFilesChanged(int index) {
+  m_pref->enableAutosaveOtherFiles(index == Qt::Checked);
+  if (!m_autoSaveSceneCB->isChecked() && index == Qt::Unchecked) {
+    m_autoSaveGroup->setChecked(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onStartupPopupChanged(int index) {
+  m_pref->enableStartupPopup(index == Qt::Checked);
 }
 
 //-----------------------------------------------------------------------------
@@ -902,8 +930,68 @@ void PreferencesPopup::onImageMagickPathChanged() {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onFastRenderPathChanged() {
+  QString text = m_fastRenderPathFileField->getPath();
+  m_pref->setFastRenderPath(text.toStdString());
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onFfmpegTimeoutChanged() {
   m_pref->setFfmpegTimeout(m_ffmpegTimeout->getValue());
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
+  if (checked) {
+    // check if there are any commands with numpadkey shortcuts
+    CommandManager *cm = CommandManager::instance();
+    QList<QAction *> actionsList;
+    for (int key = Qt::Key_0; key <= Qt::Key_9; key++) {
+      std::string str = QKeySequence(key).toString().toStdString();
+      QAction *action = cm->getActionFromShortcut(str);
+      if (action) actionsList.append(action);
+    }
+    QAction *tabAction = cm->getActionFromShortcut("Tab");
+    if (tabAction) actionsList.append(tabAction);
+    tabAction = cm->getActionFromShortcut("Shift+Tab");
+    if (tabAction) actionsList.append(tabAction);
+    // if there are actions using numpad shortcuts, notify to release them.
+    if (!actionsList.isEmpty()) {
+      QString msgStr =
+          tr("Numpad keys are assigned to the following commands.\nIs it OK to "
+             "release these shortcuts?");
+      for (int a = 0; a < actionsList.size(); a++) {
+        msgStr += "\n" + actionsList.at(a)->iconText() + "  (" +
+                  actionsList.at(a)->shortcut().toString() + ")";
+      }
+      int ret = DVGui::MsgBox(msgStr, tr("OK"), tr("Cancel"), 1);
+      if (ret == 2 || ret == 0) {  // canceled
+        m_useNumpadForSwitchingStyles->setChecked(false);
+        return;
+      } else {  // accepted, then release shortcuts
+        for (int a = 0; a < actionsList.size(); a++)
+          cm->setShortcut(actionsList[a], "");
+      }
+    }
+  }
+  m_pref->enableUseNumpadForSwitchingStyles(checked);
+  // emit signal to update Palette and Viewer
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "NumpadForSwitchingStyles");
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onUseArrowKeyToShiftCellSelectionClicked(int on) {
+  m_pref->enableUseArrowKeyToShiftCellSelection(on);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onInputCellsWithoutDoubleClickingClicked(int on) {
+  m_pref->enableInputCellsWithoutDoubleClicking(on);
 }
 
 //**********************************************************************************
@@ -933,8 +1021,14 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Default Viewer for Movie Formats"), this);
   CheckBox *minimizeRasterMemoryCB =
       new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
-  CheckBox *autoSaveCB = new CheckBox(tr("Save Automatically Every Minutes"));
-  m_minuteFld          = new DVGui::IntLineEdit(this, 15, 1, 60);
+  m_autoSaveGroup = new QGroupBox(tr("Save Automatically"), this);
+  m_autoSaveGroup->setCheckable(true);
+  m_autoSaveSceneCB = new CheckBox(tr("Automatically Save the Scene File"));
+  m_autoSaveOtherFilesCB =
+      new CheckBox(tr("Automatically Save Non-Scene Files"));
+  CheckBox *startupPopupCB =
+      new CheckBox(tr("Show Startup Window when OpenToonz Starts"));
+  m_minuteFld = new DVGui::IntLineEdit(this, 15, 1, 60);
   CheckBox *replaceAfterSaveLevelAsCB =
       new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
 
@@ -1049,8 +1143,10 @@ PreferencesPopup::PreferencesPopup()
 
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
-  m_ffmpegPathFileFld        = new DVGui::FileField(this, QString(""));
-  m_ffmpegTimeout            = new DVGui::IntLineEdit(this, 30, 1);
+  m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
+  m_fastRenderPathFileField =
+      new DVGui::FileField(this, QString("desktop"), false, true);
+  m_ffmpegTimeout = new DVGui::IntLineEdit(this, 30, 1);
   m_imageMagickPathFileField = new DVGui::FileField(this, QString(""));
 
   //--- Drawing ------------------------------
@@ -1071,6 +1167,8 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use the TLV Savebox to Limit Filling Operations"), this);
   CheckBox *minimizeSaveboxAfterEditingCB =
       new CheckBox(tr("Minimize Savebox after Editing"), this);
+  m_useNumpadForSwitchingStyles =
+      new CheckBox(tr("Use Numpad and Tab keys for Switching Styles"), this);
 
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
@@ -1084,6 +1182,10 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Ignore Alpha Channel on Levels in Column 1"), this);
   CheckBox *showKeyframesOnCellAreaCB =
       new CheckBox(tr("Show Keyframes on Cell Area"), this);
+  CheckBox *useArrowKeyToShiftCellSelectionCB =
+      new CheckBox(tr("Use Arrow Key to Shift Cell Selection"), this);
+  CheckBox *inputCellsWithoutDoubleClickingCB =
+      new CheckBox(tr("Enable to Input Cells without Double Clicking"), this);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1145,9 +1247,11 @@ PreferencesPopup::PreferencesPopup()
   //--- General ------------------------------
   useDefaultViewerCB->setChecked(m_pref->isDefaultViewerEnabled());
   minimizeRasterMemoryCB->setChecked(m_pref->isRasterOptimizedMemory());
-  autoSaveCB->setChecked(m_pref->isAutosaveEnabled());
+  m_autoSaveGroup->setChecked(m_pref->isAutosaveEnabled());
+  m_autoSaveSceneCB->setChecked(m_pref->isAutosaveSceneEnabled());
+  m_autoSaveOtherFilesCB->setChecked(m_pref->isAutosaveOtherFilesEnabled());
   m_minuteFld->setValue(m_pref->getAutosavePeriod());
-  m_minuteFld->setEnabled(m_pref->isAutosaveEnabled());
+  startupPopupCB->setChecked(m_pref->isStartupPopupEnabled());
   replaceAfterSaveLevelAsCB->setChecked(
       m_pref->isReplaceAfterSaveLevelAsEnabled());
 
@@ -1273,6 +1377,8 @@ PreferencesPopup::PreferencesPopup()
   m_ffmpegPathFileFld->setPath(path);
   path = m_pref->getImageMagickPath();
   m_imageMagickPathFileField->setPath(path);
+  path = m_pref->getFastRenderPath();
+  m_fastRenderPathFileField->setPath(path);
   m_ffmpegTimeout->setValue(m_pref->getFfmpegTimeout());
 
   //--- Drawing ------------------------------
@@ -1281,6 +1387,8 @@ PreferencesPopup::PreferencesPopup()
   minimizeSaveboxAfterEditingCB->setChecked(
       m_pref->isMinimizeSaveboxAfterEditing());
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
+  m_useNumpadForSwitchingStyles->setChecked(
+      m_pref->isUseNumpadForSwitchingStylesEnabled());
 
   QStringList scanLevelTypes;
   scanLevelTypes << "tif"
@@ -1334,6 +1442,10 @@ PreferencesPopup::PreferencesPopup()
   ignoreAlphaonColumn1CB->setChecked(m_pref->isIgnoreAlphaonColumn1Enabled());
   showKeyframesOnCellAreaCB->setChecked(
       m_pref->isShowKeyframesOnXsheetCellAreaEnabled());
+  useArrowKeyToShiftCellSelectionCB->setChecked(
+      m_pref->isUseArrowKeyToShiftCellSelectionEnabled());
+  inputCellsWithoutDoubleClickingCB->setChecked(
+      m_pref->isInputCellsWithoutDoubleClickingEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -1394,16 +1506,29 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(minimizeRasterMemoryCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-      QHBoxLayout *saveAutoLay = new QHBoxLayout();
-      saveAutoLay->setMargin(0);
-      saveAutoLay->setSpacing(15);
-      {
-        saveAutoLay->addWidget(autoSaveCB, 0);
-        saveAutoLay->addWidget(m_minuteFld, 0);
-        saveAutoLay->addStretch(1);
-      }
-      generalFrameLay->addLayout(saveAutoLay, 0);
 
+      QVBoxLayout *autoSaveOptionsLay = new QVBoxLayout();
+      autoSaveOptionsLay->setMargin(10);
+      {
+        QHBoxLayout *saveAutoLay = new QHBoxLayout();
+        saveAutoLay->setMargin(0);
+        saveAutoLay->setSpacing(5);
+        {
+          saveAutoLay->addWidget(new QLabel(tr("Interval(Minutes): "), this));
+          saveAutoLay->addWidget(m_minuteFld, 0);
+          saveAutoLay->addStretch(1);
+        }
+        autoSaveOptionsLay->addLayout(saveAutoLay, 0);
+
+        autoSaveOptionsLay->addWidget(m_autoSaveSceneCB, 0,
+                                      Qt::AlignLeft | Qt::AlignVCenter);
+        autoSaveOptionsLay->addWidget(m_autoSaveOtherFilesCB, 0,
+                                      Qt::AlignLeft | Qt::AlignVCenter);
+      }
+      m_autoSaveGroup->setLayout(autoSaveOptionsLay);
+      generalFrameLay->addWidget(m_autoSaveGroup);
+      generalFrameLay->addWidget(startupPopupCB, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
       // Unit, CameraUnit
       QGridLayout *unitLay = new QGridLayout();
       unitLay->setMargin(0);
@@ -1683,6 +1808,14 @@ PreferencesPopup::PreferencesPopup()
         ioGridLay->addWidget(new QLabel(tr("FFmpeg Timeout:")), 8, 0,
                              Qt::AlignRight);
         ioGridLay->addWidget(m_ffmpegTimeout, 8, 1, 1, 3);
+        ioGridLay->addWidget(new QLabel(" "), 9, 0);
+        ioGridLay->addWidget(
+            new QLabel(tr("Please indicate where you would like "
+                          "exports from Fast Render(MP4) to go.")),
+            10, 0, 1, 4);
+        ioGridLay->addWidget(new QLabel(tr("Fast Render Path: ")), 11, 0,
+                             Qt::AlignRight);
+        ioGridLay->addWidget(m_fastRenderPathFileField, 11, 1, 1, 3);
       }
       ioLay->addLayout(ioGridLay);
       ioLay->addStretch(1);
@@ -1733,6 +1866,9 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(multiLayerStylePickerCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      drawingFrameLay->addWidget(m_useNumpadForSwitchingStyles, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
+
       drawingFrameLay->addStretch(1);
     }
     drawingBox->setLayout(drawingFrameLay);
@@ -1762,11 +1898,13 @@ PreferencesPopup::PreferencesPopup()
 
       xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 3, 0, 1, 2);
       xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
+      xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 5, 0, 1, 2);
+      xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 6, 0, 1, 2);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
     xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(5, 1);
+    xsheetFrameLay->setRowStretch(7, 1);
     xsheetBox->setLayout(xsheetFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
@@ -1925,10 +2063,16 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefaultViewerChanged(int)));
   ret = ret && connect(minimizeRasterMemoryCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onRasterOptimizedMemoryChanged(int)));
-  ret = ret && connect(autoSaveCB, SIGNAL(stateChanged(int)),
-                       SLOT(onAutoSaveChanged(int)));
+  ret = ret && connect(m_autoSaveGroup, SIGNAL(toggled(bool)),
+                       SLOT(onAutoSaveChanged(bool)));
+  ret = ret && connect(m_autoSaveSceneCB, SIGNAL(stateChanged(int)),
+                       SLOT(onAutoSaveSceneChanged(int)));
+  ret = ret && connect(m_autoSaveOtherFilesCB, SIGNAL(stateChanged(int)),
+                       SLOT(onAutoSaveOtherFilesChanged(int)));
   ret = ret && connect(m_minuteFld, SIGNAL(editingFinished()),
                        SLOT(onMinuteChanged()));
+  ret = ret && connect(startupPopupCB, SIGNAL(stateChanged(int)),
+                       SLOT(onStartupPopupChanged(int)));
   ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
                        SLOT(onDragCellsBehaviourChanged(int)));
   ret = ret && connect(m_undoMemorySize, SIGNAL(editingFinished()),
@@ -2047,6 +2191,8 @@ PreferencesPopup::PreferencesPopup()
   //--- Import/Export ----------------------
   ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onFfmpegPathChanged()));
+  ret = ret && connect(m_fastRenderPathFileField, SIGNAL(pathChanged()), this,
+                       SLOT(onFastRenderPathChanged()));
   ret = ret && connect(m_ffmpegTimeout, SIGNAL(editingFinished()), this,
                        SLOT(onFfmpegTimeoutChanged()));
   ret = ret && connect(m_imageMagickPathFileField, SIGNAL(pathChanged()), this,
@@ -2074,6 +2220,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_defLevelDpi, SIGNAL(valueChanged()),
                        SLOT(onDefLevelParameterChanged()));
+  ret = ret && connect(m_useNumpadForSwitchingStyles, SIGNAL(clicked(bool)),
+                       SLOT(onUseNumpadForSwitchingStylesClicked(bool)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),
@@ -2086,6 +2234,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDragCellsBehaviourChanged(int)));
   ret = ret && connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onShowKeyframesOnCellAreaChanged(int)));
+  ret = ret &&
+        connect(useArrowKeyToShiftCellSelectionCB, SIGNAL(stateChanged(int)),
+                SLOT(onUseArrowKeyToShiftCellSelectionClicked(int)));
+  ret = ret &&
+        connect(inputCellsWithoutDoubleClickingCB, SIGNAL(stateChanged(int)),
+                SLOT(onInputCellsWithoutDoubleClickingClicked(int)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

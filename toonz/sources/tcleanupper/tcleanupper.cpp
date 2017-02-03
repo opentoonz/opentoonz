@@ -63,8 +63,8 @@ inline ostream &operator<<(ostream &out, const TFilePath &fp) {
 namespace {
 
 const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.0";
-const char *applicationFullName = "OpenToonz 1.0";
+const char *applicationVersion  = "1.1";
+const char *applicationFullName = "OpenToonz 1.1";
 const char *rootVarName         = "TOONZROOT";
 const char *systemVarPrefix     = "TOONZ";
 
@@ -625,6 +625,14 @@ int main(int argc, char *argv[]) {
   /*-- CleanupSettingsファイルパスを直接入力した場合 --*/
   else {
     try {
+      TProjectManager *pm    = TProjectManager::instance();
+      TProjectP sceneProject = pm->loadSceneProject(fp);
+      if (!sceneProject) {
+        cerr << "can't open project." << endl;
+        return -3;
+      }
+      scene->setProject(sceneProject.getPointer());
+
       /*- CleanupSettingsファイルに対応するTIFファイルが有るかチェック -*/
       TFilePath tifImagePath = fp.withType("tif");
       std::wcout << L"tifImagePath : " << tifImagePath.getWideString()

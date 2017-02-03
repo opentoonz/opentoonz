@@ -304,5 +304,6 @@
       <file>Resources/switchport_on.png</file>
       <file>Resources/switchport_off.png</file>
       <file>Resources/switchport_over.png</file>
+      <file>Resources/plus.png</file>
     </qresource>
 </RCC>

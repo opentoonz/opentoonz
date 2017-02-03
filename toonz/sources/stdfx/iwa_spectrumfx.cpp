@@ -13,25 +13,27 @@ const float PI = 3.14159265f;
 }
 
 /*------------------------------------
- シャボン色マップの生成
+ Calculate soap bubble color map
 ------------------------------------*/
-void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame) {
-  int j, k;     /*- bubbleColor[j][k] = [256][3] -*/
-  float d;      /*- 膜厚(μm) -*/
-  int ram;      /*- 波長のfor文用 -*/
-  float rambda; /*- 波長(μm) -*/
+void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
+                                   bool computeAngularAxis) {
+  int i, j, k;  /* bubbleColor[j][k] = [256][3] */
+  float d;      /* Thickness of the film (μm) */
+  int ram;      /* rambda iterator */
+  float rambda; /* wavelength of light (μm) */
   struct REFLECTIVITY {
-    float r_ab, t_ab, r_ba, t_ba; /*- 各境界での振幅反射率、振幅透過率 -*/
-    float r_real, r_img; /*- 薄膜の振幅反射率 -*/
-    float R;             /*- エネルギー反射率 -*/
+    /* transmission and reflection amplitudes for each boundary */
+    float r_ab, t_ab, r_ba, t_ba;
+    float r_real, r_img; /* reflection amplitude of the film */
+    float R;             /* energy reflectance */
   } p, s;
-  float R_final;                   /*- エネルギー反射率の最終版 -*/
-  float phi;                       /*- 位相 -*/
-  float color_x, color_y, color_z; /*- ｘｙｚ表色系 -*/
+  float R_final;                   /* combined energy reflectance */
+  float phi;                       /* phase */
+  float color_x, color_y, color_z; /* xyz color channels */
 
   float temp_rgb_f[3];
 
-  /*- パラメータを得る -*/
+  /* obtain parameters */
   float intensity       = (float)m_intensity->getValue(frame);
   float refractiveIndex = (float)m_refractiveIndex->getValue(frame);
   float thickMax        = (float)m_thickMax->getValue(frame);
@@ -41,79 +43,99 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame) {
                        (float)m_BGamma->getValue(frame)};
   float lensFactor = (float)m_lensFactor->getValue(frame);
 
-  /*- 入射角は０で固定 -*/
+  /* for Iwa_SpectrumFx, incident angle is fixed to 0,
+     for Iwa_SoapBubbleFx, compute for all discrete incident angles*/
+  int i_max        = (computeAngularAxis) ? 256 : 1;
+  float3 *bubble_p = bubbleColor;
 
-  /*- 各境界での振幅反射率、振幅透過率の計算(PS偏光とも) -*/
-  /*- P偏光 -*/
-  p.r_ab = (1.0 - refractiveIndex) / (1.0 + refractiveIndex);
-  p.t_ab = (1.0f - p.r_ab) / refractiveIndex;
-  p.r_ba = -p.r_ab;
-  p.t_ba = (1.0f + p.r_ab) * refractiveIndex;
-  /*- S偏光 -*/
-  s.r_ab = (1.0 - refractiveIndex) / (1.0 + refractiveIndex);
-  s.t_ab = 1.0f + s.r_ab;
-  s.r_ba = -s.r_ab;
-  s.t_ba = 1.0f - s.r_ab;
+  /* for each discrete incident angle */
+  for (i = 0; i < i_max; i++) {
+    /* incident angle (radian) */
+    float angle_in = PI / 2.0f / 255.0f * (float)i;
+    /* refraction angle (radian) */
+    float angle_re = asinf(sinf(angle_in) / refractiveIndex);
 
-  for (j = 0; j < 256; j++) { /*- 膜厚d -*/
-    /*- 膜厚d(μm)の計算 -*/
-    d = thickMin +
-        (thickMax - thickMin) * powf(((float)j / 255.0f), lensFactor);
+    /* transmission and reflection amplitudes for each boundary, for each
+     * polarization */
+    float cos_in = cosf(angle_in);
+    float cos_re = cosf(angle_re);
+    // P-polarized light
+    p.r_ab = (cos_re - refractiveIndex * cos_in) /
+             (cos_re + refractiveIndex * cos_re);
+    p.t_ab = (1.0f - p.r_ab) / refractiveIndex;
+    p.r_ba = -p.r_ab;
+    p.t_ba = (1.0f + p.r_ab) * refractiveIndex;
+    // S-polarized light
+    s.r_ab = (cos_in - refractiveIndex * cos_re) /
+             (cos_in + refractiveIndex * cos_re);
+    s.t_ab = 1.0f + s.r_ab;
+    s.r_ba = -s.r_ab;
+    s.t_ba = 1.0f - s.r_ab;
 
-    /*-  膜厚が負になることもありうる。その場合は d = 0 に合わせる -*/
-    if (d < 0.0f) d = 0.0f;
+    /* for each discrete thickness */
+    for (j = 0; j < 256; j++) {
+      /* calculate the thickness of film (μm) */
+      d = thickMin +
+          (thickMax - thickMin) * powf(((float)j / 255.0f), lensFactor);
 
-    /*- これから積算するので、XYZ表色系各チャンネルの初期化 -*/
-    color_x = 0.0f;
-    color_y = 0.0f;
-    color_z = 0.0f;
+      /* there may be a case that the thickness is smaller than 0 */
+      if (d < 0.0f) d = 0.0f;
 
-    for (ram = 0; ram < 34; ram++) { /*- 波長λ（380nm-710nm） -*/
-      /*- 波長λ(μm)の計算 -*/
-      rambda = 0.38f + 0.01f * (float)ram;
-      /*- 位相の計算 -*/
-      phi = 4.0f * PI * refractiveIndex * d / rambda;
-      /*- 薄膜の振幅反射率の計算（PS偏光とも） -*/
-      /*- P偏光 -*/
-      p.r_real = p.r_ab + p.t_ab * p.r_ba * p.t_ba * cosf(phi);
-      p.r_img  = p.t_ab * p.r_ba * p.t_ba * sinf(phi);
-      /*- S偏光 -*/
-      s.r_real = s.r_ab + s.t_ab * s.r_ba * s.t_ba * cosf(phi);
-      s.r_img  = s.t_ab * s.r_ba * s.t_ba * sinf(phi);
+      /* initialize XYZ color channels */
+      color_x = 0.0f;
+      color_y = 0.0f;
+      color_z = 0.0f;
 
-      p.R = p.r_real * p.r_real + p.r_img * p.r_img;
-      s.R = s.r_real * s.r_real + s.r_img * s.r_img;
+      /* for each wavelength (in the range of visible light, 380nm-710nm) */
+      for (ram = 0; ram < 34; ram++) {
+        /* wavelength `λ` (μm) */
+        rambda = 0.38f + 0.01f * (float)ram;
+        /* phase of light */
+        phi = 4.0f * PI * refractiveIndex * d * cos_re / rambda;
+        /* reflection amplitude of the film for each polarization */
+        // P-polarized light
+        p.r_real = p.r_ab + p.t_ab * p.r_ba * p.t_ba * cosf(phi);
+        p.r_img  = p.t_ab * p.r_ba * p.t_ba * sinf(phi);
+        // S-polarized light
+        s.r_real = s.r_ab + s.t_ab * s.r_ba * s.t_ba * cosf(phi);
+        s.r_img  = s.t_ab * s.r_ba * s.t_ba * sinf(phi);
 
-      /*- エネルギー反射率 -*/
-      R_final = (p.R + s.R) / 2.0f;
+        p.R = p.r_real * p.r_real + p.r_img * p.r_img;
+        s.R = s.r_real * s.r_real + s.r_img * s.r_img;
 
-      color_x += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 0];
-      color_y += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 1];
-      color_z += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 2];
+        /* combined energy reflectance */
+        R_final = (p.R + s.R) / 2.0f;
 
-    } /*- 次のramへ(波長λ) -*/
+        /* accumulate XYZ channel values */
+        color_x += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 0];
+        color_y += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 1];
+        color_z += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 2];
 
-    temp_rgb_f[0] =
-        3.240479f * color_x - 1.537150f * color_y - 0.498535f * color_z;
-    temp_rgb_f[1] =
-        -0.969256f * color_x + 1.875992f * color_y + 0.041556f * color_z;
-    temp_rgb_f[2] =
-        0.055648f * color_x - 0.204043f * color_y + 1.057311f * color_z;
+      } /* next wavelength (ram) */
 
-    /*- オーバーフローをまるめる -*/
-    for (k = 0; k < 3; k++) {
-      if (temp_rgb_f[k] < 0.0f) temp_rgb_f[k] = 0.0f;
+      temp_rgb_f[0] =
+          3.240479f * color_x - 1.537150f * color_y - 0.498535f * color_z;
+      temp_rgb_f[1] =
+          -0.969256f * color_x + 1.875992f * color_y + 0.041556f * color_z;
+      temp_rgb_f[2] =
+          0.055648f * color_x - 0.204043f * color_y + 1.057311f * color_z;
 
-      /*- ガンマ処理 -*/
-      temp_rgb_f[k] = powf((temp_rgb_f[k] / 255.0f), rgbGamma[k]);
+      /* clamp overflows */
+      for (k = 0; k < 3; k++) {
+        if (temp_rgb_f[k] < 0.0f) temp_rgb_f[k] = 0.0f;
 
-      if (temp_rgb_f[k] >= 1.0f) temp_rgb_f[k] = 1.0f;
-    }
-    bubbleColor[j].x = temp_rgb_f[0];
-    bubbleColor[j].y = temp_rgb_f[1];
-    bubbleColor[j].z = temp_rgb_f[2];
+        /* gamma adjustment */
+        temp_rgb_f[k] = powf((temp_rgb_f[k] / 255.0f), rgbGamma[k]);
 
-  } /*- 次のjへ(膜厚d) -*/
+        if (temp_rgb_f[k] >= 1.0f) temp_rgb_f[k] = 1.0f;
+      }
+      bubble_p->x = temp_rgb_f[0];
+      bubble_p->y = temp_rgb_f[1];
+      bubble_p->z = temp_rgb_f[2];
+      bubble_p++;
+
+    } /*- next thickness d (j) -*/
+  }   /*- next incident angle (i) -*/
 }
 
 //------------------------------------

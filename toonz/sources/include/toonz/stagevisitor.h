@@ -209,11 +209,14 @@ private:
     bool m_doPremultiply;  //!< Whether the image must be premultiplied
     bool m_whiteTransp;    //!< Whether white must be intended as transparent
 
+    TPixel32 m_filterColor;
+
   public:
     Node(const TRasterP &raster, TPalette *palette, int alpha,
          const TAffine &aff, const TRect &savebox, const TRectD &bbox,
          int frame, bool isCurrentColumn, OnionMode onionMode,
-         bool doPremultiply, bool whiteTransp, bool isFirstColumn)
+         bool doPremultiply, bool whiteTransp, bool isFirstColumn,
+         TPixel32 filterColor = TPixel32::Black)
         : m_raster(raster)
         , m_aff(aff)
         , m_savebox(savebox)
@@ -225,7 +228,8 @@ private:
         , m_onionMode(onionMode)
         , m_doPremultiply(doPremultiply)
         , m_whiteTransp(whiteTransp)
-        , m_isFirstColumn(isFirstColumn) {}
+        , m_isFirstColumn(isFirstColumn)
+        , m_filterColor(filterColor) {}
   };
 
   struct VisualizationOptions {

@@ -92,7 +92,7 @@ elseif(UNIX)
     else()
         set(PLATFORM 32)
     endif()
-    if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         add_definitions(-DLINUX)
     else()
         message(WARNING "Support for generic Unix (Not Apple or Linux) isn't yet working!")
@@ -147,6 +147,13 @@ find_package(Qt5 REQUIRED
     LinguistTools
     Multimedia
 )
+
+set(QT_MINIMUM_VERSION 5.5.0)
+if(Qt5Core_VERSION VERSION_LESS QT_MINIMUM_VERSION)
+    MESSAGE(FATAL_ERROR "Minimum supported Qt version: ${QT_MINIMUM_VERSION}.
+    Installed version: ${Qt5Core_VERSION}")
+endif()
+unset(QT_MINIMUM_VERSION)
 
 if(WIN32)
     include_directories(
@@ -281,7 +288,6 @@ elseif(UNIX)
     find_package(GLEW)
 
     find_package(SuperLU REQUIRED)
-    set(SUPERLU_INCLUDE_DIR ${SUPERLU_INCLUDE_DIR}/superlu)
     set(SUPERLU_LIB ${SUPERLU_LIBRARY})
 
     find_package(JPEG REQUIRED)

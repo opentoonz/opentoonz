@@ -5,7 +5,8 @@
 #include "menubarcommandids.h"
 #include "formatsettingspopups.h"
 #include "filebrowsermodel.h"
-
+#include "cellselection.h"
+#include "toonzqt/tselectionhandle.h"
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/filefield.h"
@@ -65,11 +66,27 @@
 #include <QTimer>
 #include <QIntValidator>
 #include <QRegExpValidator>
+#include <QPushButton>
+
+#ifdef _WIN32
+#include <dshow.h>
+#endif
 
 using namespace DVGui;
 
 // Connected camera
 TEnv::StringVar CamCapCameraName("CamCapCameraName", "");
+// Camera resolution
+TEnv::StringVar CamCapCameraResolution("CamCapCameraResolution", "");
+// Whether to open save-in popup on launch
+TEnv::IntVar CamCapOpenSaveInPopupOnLaunch("CamCapOpenSaveInPopupOnLaunch", 0);
+// SaveInFolderPopup settings
+TEnv::IntVar CamCapSaveInPopupSubFolder("CamCapSaveInPopupSubFolder", 0);
+TEnv::StringVar CamCapSaveInPopupProject("CamCapSaveInPopupProject", "");
+TEnv::StringVar CamCapSaveInPopupEpisode("CamCapSaveInPopupEpisode", "1");
+TEnv::StringVar CamCapSaveInPopupSequence("CamCapSaveInPopupSequence", "1");
+TEnv::StringVar CamCapSaveInPopupScene("CamCapSaveInPopupScene", "1");
+TEnv::IntVar CamCapSaveInPopupAutoSubName("CamCapSaveInPopupAutoSubName", 1);
 
 namespace {
 
@@ -305,6 +322,90 @@ int letterToNum(QChar appendix) {
     return 0;
 }
 
+#ifdef _WIN32
+void openCaptureFilterSettings(const QWidget* parent,
+                               const QString& cameraName) {
+  HRESULT hr;
+
+  ICreateDevEnum* createDevEnum = NULL;
+  IEnumMoniker* enumMoniker     = NULL;
+  IMoniker* moniker             = NULL;
+
+  IBaseFilter* deviceFilter;
+
+  ISpecifyPropertyPages* specifyPropertyPages;
+  CAUUID cauuid;
+  // set parent's window handle in order to make the dialog modal
+  HWND ghwndApp = (HWND)(parent->winId());
+
+  // initialize COM
+  CoInitialize(NULL);
+
+  // get device list
+  CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER,
+                   IID_ICreateDevEnum, (PVOID*)&createDevEnum);
+
+  // create EnumMoniker
+  createDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory,
+                                       &enumMoniker, 0);
+  if (enumMoniker == NULL) {
+    // if no connected devices found
+    return;
+  }
+
+  // reset EnumMoniker
+  enumMoniker->Reset();
+
+  // find target camera
+  ULONG fetched      = 0;
+  bool isCameraFound = false;
+  while (hr = enumMoniker->Next(1, &moniker, &fetched), hr == S_OK) {
+    // get friendly name (= device name) of the camera
+    IPropertyBag* pPropertyBag;
+    moniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPropertyBag);
+    VARIANT var;
+    var.vt = VT_BSTR;
+    VariantInit(&var);
+
+    pPropertyBag->Read(L"FriendlyName", &var, 0);
+
+    QString deviceName = QString::fromWCharArray(var.bstrVal);
+
+    VariantClear(&var);
+
+    if (deviceName == cameraName) {
+      // bind monkier to the filter
+      moniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&deviceFilter);
+
+      // release moniker etc.
+      moniker->Release();
+      enumMoniker->Release();
+      createDevEnum->Release();
+
+      isCameraFound = true;
+      break;
+    }
+  }
+
+  // if no matching camera found
+  if (!isCameraFound) return;
+
+  // open capture filter popup
+  hr = deviceFilter->QueryInterface(IID_ISpecifyPropertyPages,
+                                    (void**)&specifyPropertyPages);
+  if (hr == S_OK) {
+    hr = specifyPropertyPages->GetPages(&cauuid);
+
+    hr = OleCreatePropertyFrame(ghwndApp, 30, 30, NULL, 1,
+                                (IUnknown**)&deviceFilter, cauuid.cElems,
+                                (GUID*)cauuid.pElems, 0, 0, NULL);
+
+    CoTaskMemFree(cauuid.pElems);
+    specifyPropertyPages->Release();
+  }
+}
+#endif
+
 }  // namespace
 
 //=============================================================================
@@ -479,18 +580,303 @@ void LevelNameLineEdit::onEditingFinished() {
 
 //=============================================================================
 
+PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
+    : Dialog(parent, true, false, "PencilTestSaveInFolder") {
+  setWindowTitle("Create the Destination Subfolder to Save");
+
+  m_parentFolderField = new FileField(
+      this, QString("+%1").arg(QString::fromStdString(TProject::Extras)));
+
+  m_subFolderCB = new QCheckBox(tr("Create Subfolder"), this);
+
+  QFrame* subFolderFrame = new QFrame(this);
+
+  QGroupBox* infoGroupBox    = new QGroupBox(tr("Infomation"), this);
+  QGroupBox* subNameGroupBox = new QGroupBox(tr("Subfolder Name"), this);
+
+  m_projectField  = new QLineEdit(this);
+  m_episodeField  = new QLineEdit(this);
+  m_sequenceField = new QLineEdit(this);
+  m_sceneField    = new QLineEdit(this);
+
+  m_autoSubNameCB      = new QCheckBox(tr("Auto Format:"), this);
+  m_subNameFormatCombo = new QComboBox(this);
+  m_subFolderNameField = new QLineEdit(this);
+
+  QCheckBox* showPopupOnLaunchCB =
+      new QCheckBox(tr("Show This on Launch of the Camera Capture"), this);
+
+  QPushButton* okBtn     = new QPushButton(tr("OK"), this);
+  QPushButton* cancelBtn = new QPushButton(tr("Cancel"), this);
+
+  //---- properties
+
+  m_subFolderCB->setChecked(CamCapSaveInPopupSubFolder != 0);
+  subFolderFrame->setEnabled(CamCapSaveInPopupSubFolder != 0);
+
+  // project name
+  QString prjName = QString::fromStdString(CamCapSaveInPopupProject.getValue());
+  if (prjName.isEmpty()) {
+    prjName = TProjectManager::instance()
+                  ->getCurrentProject()
+                  ->getName()
+                  .getQString();
+  }
+  m_projectField->setText(prjName);
+
+  m_episodeField->setText(
+      QString::fromStdString(CamCapSaveInPopupEpisode.getValue()));
+  m_sequenceField->setText(
+      QString::fromStdString(CamCapSaveInPopupSequence.getValue()));
+  m_sceneField->setText(
+      QString::fromStdString(CamCapSaveInPopupScene.getValue()));
+
+  m_autoSubNameCB->setChecked(CamCapSaveInPopupAutoSubName != 0);
+  m_subNameFormatCombo->setEnabled(CamCapSaveInPopupAutoSubName != 0);
+  QStringList items;
+  items << tr("C- + Sequence + Scene") << tr("Sequence + Scene")
+        << tr("Episode + Sequence + Scene")
+        << tr("Project + Episode + Sequence + Scene");
+  m_subNameFormatCombo->addItems(items);
+
+  showPopupOnLaunchCB->setChecked(CamCapOpenSaveInPopupOnLaunch != 0);
+
+  addButtonBarWidget(okBtn, cancelBtn);
+
+  //---- layout
+  m_topLayout->setMargin(10);
+  m_topLayout->setSpacing(10);
+  {
+    QHBoxLayout* saveInLay = new QHBoxLayout();
+    saveInLay->setMargin(0);
+    saveInLay->setSpacing(3);
+    {
+      saveInLay->addWidget(new QLabel(tr("Save In:"), this), 0);
+      saveInLay->addWidget(m_parentFolderField, 1);
+    }
+    m_topLayout->addLayout(saveInLay);
+
+    m_topLayout->addWidget(m_subFolderCB, 0, Qt::AlignLeft);
+
+    QVBoxLayout* subFolderLay = new QVBoxLayout();
+    subFolderLay->setMargin(0);
+    subFolderLay->setSpacing(10);
+    {
+      QGridLayout* infoLay = new QGridLayout();
+      infoLay->setMargin(10);
+      infoLay->setHorizontalSpacing(3);
+      infoLay->setVerticalSpacing(10);
+      {
+        infoLay->addWidget(new QLabel(tr("Project:"), this), 0, 0);
+        infoLay->addWidget(m_projectField, 0, 1);
+
+        infoLay->addWidget(new QLabel(tr("Episode:"), this), 1, 0);
+        infoLay->addWidget(m_episodeField, 1, 1);
+
+        infoLay->addWidget(new QLabel(tr("Sequence:"), this), 2, 0);
+        infoLay->addWidget(m_sequenceField, 2, 1);
+
+        infoLay->addWidget(new QLabel(tr("Scene:"), this), 3, 0);
+        infoLay->addWidget(m_sceneField, 3, 1);
+      }
+      infoLay->setColumnStretch(0, 0);
+      infoLay->setColumnStretch(1, 1);
+      infoGroupBox->setLayout(infoLay);
+      subFolderLay->addWidget(infoGroupBox, 0);
+
+      QGridLayout* subNameLay = new QGridLayout();
+      subNameLay->setMargin(10);
+      subNameLay->setHorizontalSpacing(3);
+      subNameLay->setVerticalSpacing(10);
+      {
+        subNameLay->addWidget(m_autoSubNameCB, 0, 0);
+        subNameLay->addWidget(m_subNameFormatCombo, 0, 1);
+
+        subNameLay->addWidget(new QLabel(tr("Subfolder Name:"), this), 1, 0);
+        subNameLay->addWidget(m_subFolderNameField, 1, 1);
+      }
+      subNameLay->setColumnStretch(0, 0);
+      subNameLay->setColumnStretch(1, 1);
+      subNameGroupBox->setLayout(subNameLay);
+      subFolderLay->addWidget(subNameGroupBox, 0);
+    }
+    subFolderFrame->setLayout(subFolderLay);
+    m_topLayout->addWidget(subFolderFrame);
+
+    m_topLayout->addWidget(showPopupOnLaunchCB, 0, Qt::AlignLeft);
+
+    m_topLayout->addStretch(1);
+  }
+
+  resize(300, 400);
+
+  //---- signal-slot connection
+  bool ret = true;
+
+  ret = ret && connect(m_subFolderCB, SIGNAL(clicked(bool)), subFolderFrame,
+                       SLOT(setEnabled(bool)));
+  ret = ret && connect(m_projectField, SIGNAL(textEdited(const QString&)), this,
+                       SLOT(updateSubFolderName()));
+  ret = ret && connect(m_episodeField, SIGNAL(textEdited(const QString&)), this,
+                       SLOT(updateSubFolderName()));
+  ret = ret && connect(m_sequenceField, SIGNAL(textEdited(const QString&)),
+                       this, SLOT(updateSubFolderName()));
+  ret = ret && connect(m_sceneField, SIGNAL(textEdited(const QString&)), this,
+                       SLOT(updateSubFolderName()));
+  ret = ret && connect(m_autoSubNameCB, SIGNAL(clicked(bool)), this,
+                       SLOT(onAutoSubNameCBClicked(bool)));
+
+  ret = ret && connect(showPopupOnLaunchCB, SIGNAL(clicked(bool)), this,
+                       SLOT(onShowPopupOnLaunchCBClicked(bool)));
+
+  ret = ret && connect(okBtn, SIGNAL(clicked(bool)), this, SLOT(onOkPressed()));
+  ret = ret && connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(reject()));
+
+  assert(ret);
+
+  updateSubFolderName();
+}
+
+//-----------------------------------------------------------------------------
+
+QString PencilTestSaveInFolderPopup::getPath() {
+  if (!m_subFolderCB->isChecked()) return m_parentFolderField->getPath();
+
+  return m_parentFolderField->getPath() + "\\" + m_subFolderNameField->text();
+}
+
+//-----------------------------------------------------------------------------
+namespace {
+QString formatString(QString inStr, int charNum) {
+  if (inStr.isEmpty()) return QString("0").rightJustified(charNum, '0');
+
+  QString numStr, postStr;
+  // find the first non-digit character
+  int index = inStr.indexOf(QRegExp("[^0-9]"), 0);
+
+  if (index == -1)  // only digits
+    numStr = inStr;
+  else if (index == 0)  // only post strings
+    return inStr;
+  else {  // contains both
+    numStr  = inStr.left(index);
+    postStr = inStr.right(inStr.length() - index);
+  }
+  return numStr.rightJustified(charNum, '0') + postStr;
+}
+};
+
+void PencilTestSaveInFolderPopup::updateSubFolderName() {
+  if (!m_autoSubNameCB->isChecked()) return;
+
+  QString episodeStr  = formatString(m_episodeField->text(), 3);
+  QString sequenceStr = formatString(m_sequenceField->text(), 3);
+  QString sceneStr    = formatString(m_sceneField->text(), 4);
+
+  QString str;
+
+  switch (m_subNameFormatCombo->currentIndex()) {
+  case 0:  // C- + Sequence + Scene
+    str = QString("C-%1-%2").arg(sequenceStr).arg(sceneStr);
+    break;
+  case 1:  // Sequence + Scene
+    str = QString("%1-%2").arg(sequenceStr).arg(sceneStr);
+    break;
+  case 2:  // Episode + Sequence + Scene
+    str = QString("%1-%2-%3").arg(episodeStr).arg(sequenceStr).arg(sceneStr);
+    break;
+  case 3:  // Project + Episode + Sequence + Scene
+    str = QString("%1-%2-%3-%4")
+              .arg(m_projectField->text())
+              .arg(episodeStr)
+              .arg(sequenceStr)
+              .arg(sceneStr);
+    break;
+  default:
+    return;
+  }
+  m_subFolderNameField->setText(str);
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestSaveInFolderPopup::onAutoSubNameCBClicked(bool on) {
+  m_subNameFormatCombo->setEnabled(on);
+  updateSubFolderName();
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestSaveInFolderPopup::onShowPopupOnLaunchCBClicked(bool on) {
+  CamCapOpenSaveInPopupOnLaunch = (on) ? 1 : 0;
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestSaveInFolderPopup::onOkPressed() {
+  if (!m_subFolderCB->isChecked()) {
+    accept();
+    return;
+  }
+
+  // check the subFolder value
+  QString subFolderName = m_subFolderNameField->text();
+  if (subFolderName.isEmpty()) {
+    DVGui::MsgBox(WARNING, tr("Subfolder name should not be empty."));
+    return;
+  }
+
+  int index = subFolderName.indexOf(QRegExp("[\\]:;|=,\\[\\*\\.\"/\\\\]"), 0);
+  if (index >= 0) {
+    DVGui::MsgBox(WARNING, tr("Subfolder name should not contain following "
+                              "characters:  * . \" / \\ [ ] : ; | = , "));
+    return;
+  }
+
+  TFilePath fp(m_parentFolderField->getPath());
+  fp += TFilePath(subFolderName);
+  TFilePath actualFp =
+      TApp::instance()->getCurrentScene()->getScene()->decodeFilePath(fp);
+
+  if (QFileInfo::exists(actualFp.getQString())) {
+    DVGui::MsgBox(WARNING,
+                  tr("Folder %1 already exists.").arg(actualFp.getQString()));
+    return;
+  }
+
+  // save the current properties to env data
+  CamCapSaveInPopupSubFolder   = (m_subFolderCB->isChecked()) ? 1 : 0;
+  CamCapSaveInPopupProject     = m_projectField->text().toStdString();
+  CamCapSaveInPopupEpisode     = m_episodeField->text().toStdString();
+  CamCapSaveInPopupSequence    = m_sequenceField->text().toStdString();
+  CamCapSaveInPopupScene       = m_sceneField->text().toStdString();
+  CamCapSaveInPopupAutoSubName = (m_autoSubNameCB->isChecked()) ? 1 : 0;
+
+  // create folder
+  try {
+    TSystem::mkDir(actualFp);
+  } catch (...) {
+    MsgBox(CRITICAL, tr("It is not possible to create the %1 folder.")
+                         .arg(toQString(actualFp)));
+    return;
+  }
+
+  accept();
+}
+
+//=============================================================================
+
 PencilTestPopup::PencilTestPopup()
-    : Dialog(TApp::instance()->getMainWindow(), false, false, "PencilTest")
-    , m_currentCamera(NULL)
-    , m_cameraImageCapture(NULL)
-    , m_captureWhiteBGCue(false)
-    , m_captureCue(false) {
+    // set the parent 0 in order to enable the popup behind the main window
+    : Dialog(0, false, false, "PencilTest"),
+      m_currentCamera(NULL),
+      m_cameraImageCapture(NULL),
+      m_captureWhiteBGCue(false),
+      m_captureCue(false) {
   setWindowTitle(tr("Camera Capture"));
 
   // add maximize button to the dialog
-  Qt::WindowFlags flags = windowFlags();
-  flags |= Qt::WindowMaximizeButtonHint;
-  setWindowFlags(flags);
+  setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
 
   layout()->setSizeConstraint(QLayout::SetNoConstraint);
 
@@ -537,6 +923,7 @@ PencilTestPopup::PencilTestPopup()
 
   QGroupBox* displayFrame = new QGroupBox(tr("Display"), this);
   m_onionSkinCB           = new QCheckBox(tr("Show onion skin"), this);
+  m_loadImageButton       = new QPushButton(tr("Load Selected Image"), this);
   m_onionOpacityFld       = new IntField(this);
 
   QGroupBox* timerFrame = new QGroupBox(tr("Interval timer"), this);
@@ -547,6 +934,17 @@ PencilTestPopup::PencilTestPopup()
 
   m_captureButton          = new QPushButton(tr("Capture\n[Return key]"), this);
   QPushButton* closeButton = new QPushButton(tr("Close"), this);
+
+#ifdef _WIN32
+  m_captureFilterSettingsBtn = new QPushButton(this);
+#else
+  m_captureFilterSettingsBtn = 0;
+#endif
+
+  QPushButton* subfolderButton = new QPushButton(tr("Subfolder"), this);
+
+  m_saveInFolderPopup = new PencilTestSaveInFolderPopup(this);
+
   //----
 
   m_resolutionCombo->setMaximumWidth(fontMetrics().width("0000 x 0000") + 25);
@@ -598,161 +996,179 @@ PencilTestPopup::PencilTestPopup()
   m_captureButton->setIcon(style.standardIcon(QStyle::SP_DialogOkButton));
   m_captureButton->setIconSize(QSize(30, 30));
 
-  //---- layout ----
-  QHBoxLayout* mainLay = new QHBoxLayout();
-  mainLay->setMargin(0);
-  mainLay->setSpacing(10);
-  {
-    QVBoxLayout* leftLay = new QVBoxLayout();
-    leftLay->setMargin(5);
-    leftLay->setSpacing(10);
-    {
-      QHBoxLayout* camLay = new QHBoxLayout();
-      camLay->setMargin(0);
-      camLay->setSpacing(3);
-      {
-        camLay->addWidget(new QLabel(tr("Camera:"), this), 0);
-        camLay->addWidget(m_cameraListCombo, 1);
-        camLay->addWidget(refreshCamListButton, 0);
-        camLay->addSpacing(10);
-        camLay->addWidget(new QLabel(tr("Resolution:"), this), 0);
-        camLay->addWidget(m_resolutionCombo, 1);
-        camLay->addStretch(0);
-      }
-      leftLay->addLayout(camLay, 0);
-      leftLay->addWidget(m_cameraViewfinder, 1);
-    }
-    mainLay->addLayout(leftLay, 1);
-
-    QVBoxLayout* rightLay = new QVBoxLayout();
-    rightLay->setMargin(0);
-    rightLay->setSpacing(5);
-    {
-      QVBoxLayout* fileLay = new QVBoxLayout();
-      fileLay->setMargin(10);
-      fileLay->setSpacing(10);
-      {
-        QGridLayout* levelLay = new QGridLayout();
-        levelLay->setMargin(0);
-        levelLay->setHorizontalSpacing(3);
-        levelLay->setVerticalSpacing(10);
-        {
-          levelLay->addWidget(new QLabel(tr("Name:"), this), 0, 0,
-                              Qt::AlignRight);
-          levelLay->addWidget(m_levelNameEdit, 0, 1);
-          levelLay->addWidget(nextLevelButton, 0, 2);
-
-          levelLay->addWidget(new QLabel(tr("Frame:"), this), 1, 0,
-                              Qt::AlignRight);
-          levelLay->addWidget(m_frameNumberEdit, 1, 1);
-        }
-        levelLay->setColumnStretch(0, 0);
-        levelLay->setColumnStretch(1, 1);
-        levelLay->setColumnStretch(2, 0);
-        fileLay->addLayout(levelLay, 0);
-
-        QHBoxLayout* fileTypeLay = new QHBoxLayout();
-        fileTypeLay->setMargin(0);
-        fileTypeLay->setSpacing(3);
-        {
-          fileTypeLay->addWidget(new QLabel(tr("File Type:"), this), 0);
-          fileTypeLay->addWidget(m_fileTypeCombo, 1);
-          fileTypeLay->addSpacing(10);
-          fileTypeLay->addWidget(m_fileFormatOptionButton);
-        }
-        fileLay->addLayout(fileTypeLay, 0);
-
-        QHBoxLayout* saveInLay = new QHBoxLayout();
-        saveInLay->setMargin(0);
-        saveInLay->setSpacing(3);
-        {
-          saveInLay->addWidget(new QLabel(tr("Save In:"), this), 0);
-          saveInLay->addWidget(m_saveInFileFld, 1);
-        }
-        fileLay->addLayout(saveInLay, 0);
-
-        fileLay->addWidget(m_saveOnCaptureCB, 0);
-      }
-      fileFrame->setLayout(fileLay);
-      rightLay->addWidget(fileFrame, 0);
-
-      QGridLayout* imageLay = new QGridLayout();
-      imageLay->setMargin(10);
-      imageLay->setHorizontalSpacing(3);
-      imageLay->setVerticalSpacing(10);
-      {
-        imageLay->addWidget(new QLabel(tr("Color type:"), this), 0, 0,
-                            Qt::AlignRight);
-        imageLay->addWidget(m_colorTypeCombo, 0, 1);
-
-        imageLay->addWidget(new QLabel(tr("Threshold:"), this), 1, 0,
-                            Qt::AlignRight);
-        imageLay->addWidget(m_thresholdFld, 1, 1, 1, 2);
-
-        imageLay->addWidget(new QLabel(tr("Contrast:"), this), 2, 0,
-                            Qt::AlignRight);
-        imageLay->addWidget(m_contrastFld, 2, 1, 1, 2);
-
-        imageLay->addWidget(new QLabel(tr("Brightness:"), this), 3, 0,
-                            Qt::AlignRight);
-        imageLay->addWidget(m_brightnessFld, 3, 1, 1, 2);
-
-        imageLay->addWidget(m_upsideDownCB, 4, 0, 1, 3, Qt::AlignLeft);
-
-        imageLay->addWidget(new QLabel(tr("BG reduction:"), this), 5, 0,
-                            Qt::AlignRight);
-        imageLay->addWidget(m_bgReductionFld, 5, 1, 1, 2);
-
-        imageLay->addWidget(m_captureWhiteBGButton, 6, 0, 1, 3);
-      }
-      imageLay->setColumnStretch(0, 0);
-      imageLay->setColumnStretch(1, 0);
-      imageLay->setColumnStretch(2, 1);
-      imageFrame->setLayout(imageLay);
-      rightLay->addWidget(imageFrame, 0);
-
-      QGridLayout* displayLay = new QGridLayout();
-      displayLay->setMargin(10);
-      displayLay->setHorizontalSpacing(3);
-      displayLay->setVerticalSpacing(10);
-      {
-        displayLay->addWidget(m_onionSkinCB, 0, 0, 1, 2);
-
-        displayLay->addWidget(new QLabel(tr("Opacity(%):"), this), 1, 0,
-                              Qt::AlignRight);
-        displayLay->addWidget(m_onionOpacityFld, 1, 1);
-      }
-      displayLay->setColumnStretch(0, 0);
-      displayLay->setColumnStretch(1, 1);
-      // displayLay->setColumnStretch(2, 1);
-      displayFrame->setLayout(displayLay);
-      rightLay->addWidget(displayFrame);
-
-      QGridLayout* timerLay = new QGridLayout();
-      timerLay->setMargin(10);
-      timerLay->setHorizontalSpacing(3);
-      timerLay->setVerticalSpacing(10);
-      {
-        timerLay->addWidget(m_timerCB, 0, 0, 1, 2);
-
-        timerLay->addWidget(new QLabel(tr("Interval(sec):"), this), 1, 0,
-                            Qt::AlignRight);
-        timerLay->addWidget(m_timerIntervalFld, 1, 1);
-      }
-      timerLay->setColumnStretch(0, 0);
-      timerLay->setColumnStretch(1, 1);
-      timerFrame->setLayout(timerLay);
-      rightLay->addWidget(timerFrame);
-
-      rightLay->addStretch(1);
-
-      rightLay->addWidget(m_captureButton, 0);
-      rightLay->addSpacing(20);
-      rightLay->addWidget(closeButton, 0);
-    }
-    mainLay->addLayout(rightLay, 0);
+  if (m_captureFilterSettingsBtn) {
+    m_captureFilterSettingsBtn->setObjectName("GearButton");
+    m_captureFilterSettingsBtn->setFixedSize(23, 23);
+    m_captureFilterSettingsBtn->setIconSize(QSize(15, 15));
+    m_captureFilterSettingsBtn->setToolTip(
+        tr("Video Capture Filter Settings..."));
   }
-  m_topLayout->addLayout(mainLay);
+
+  subfolderButton->setObjectName("SubfolderButton");
+  subfolderButton->setIconSize(QSize(15, 15));
+  m_saveInFileFld->setMaximumWidth(380);
+
+  m_saveInFolderPopup->hide();
+
+  //---- layout ----
+  m_topLayout->setMargin(10);
+  m_topLayout->setSpacing(10);
+  {
+    QHBoxLayout* camLay = new QHBoxLayout();
+    camLay->setMargin(0);
+    camLay->setSpacing(3);
+    {
+      camLay->addWidget(new QLabel(tr("Camera:"), this), 0);
+      camLay->addWidget(m_cameraListCombo, 1);
+      camLay->addWidget(refreshCamListButton, 0);
+      camLay->addSpacing(10);
+      camLay->addWidget(new QLabel(tr("Resolution:"), this), 0);
+      camLay->addWidget(m_resolutionCombo, 1);
+
+      if (m_captureFilterSettingsBtn) {
+        camLay->addSpacing(10);
+        camLay->addWidget(m_captureFilterSettingsBtn);
+      }
+
+      camLay->addStretch(0);
+      camLay->addSpacing(15);
+      camLay->addWidget(new QLabel(tr("Save In:"), this), 0);
+      camLay->addWidget(m_saveInFileFld, 1);
+
+      camLay->addSpacing(10);
+      camLay->addWidget(subfolderButton, 0);
+    }
+    m_topLayout->addLayout(camLay, 0);
+
+    QHBoxLayout* bottomLay = new QHBoxLayout();
+    bottomLay->setMargin(0);
+    bottomLay->setSpacing(10);
+    {
+      bottomLay->addWidget(m_cameraViewfinder, 1);
+
+      QVBoxLayout* rightLay = new QVBoxLayout();
+      rightLay->setMargin(0);
+      rightLay->setSpacing(5);
+      {
+        QVBoxLayout* fileLay = new QVBoxLayout();
+        fileLay->setMargin(10);
+        fileLay->setSpacing(10);
+        {
+          QGridLayout* levelLay = new QGridLayout();
+          levelLay->setMargin(0);
+          levelLay->setHorizontalSpacing(3);
+          levelLay->setVerticalSpacing(10);
+          {
+            levelLay->addWidget(new QLabel(tr("Name:"), this), 0, 0,
+                                Qt::AlignRight);
+            levelLay->addWidget(m_levelNameEdit, 0, 1);
+            levelLay->addWidget(nextLevelButton, 0, 2);
+
+            levelLay->addWidget(new QLabel(tr("Frame:"), this), 1, 0,
+                                Qt::AlignRight);
+            levelLay->addWidget(m_frameNumberEdit, 1, 1);
+          }
+          levelLay->setColumnStretch(0, 0);
+          levelLay->setColumnStretch(1, 1);
+          levelLay->setColumnStretch(2, 0);
+          fileLay->addLayout(levelLay, 0);
+
+          QHBoxLayout* fileTypeLay = new QHBoxLayout();
+          fileTypeLay->setMargin(0);
+          fileTypeLay->setSpacing(3);
+          {
+            fileTypeLay->addWidget(new QLabel(tr("File Type:"), this), 0);
+            fileTypeLay->addWidget(m_fileTypeCombo, 1);
+            fileTypeLay->addSpacing(10);
+            fileTypeLay->addWidget(m_fileFormatOptionButton);
+          }
+          fileLay->addLayout(fileTypeLay, 0);
+
+          fileLay->addWidget(m_saveOnCaptureCB, 0);
+        }
+        fileFrame->setLayout(fileLay);
+        rightLay->addWidget(fileFrame, 0);
+
+        QGridLayout* imageLay = new QGridLayout();
+        imageLay->setMargin(10);
+        imageLay->setHorizontalSpacing(3);
+        imageLay->setVerticalSpacing(10);
+        {
+          imageLay->addWidget(new QLabel(tr("Color type:"), this), 0, 0,
+                              Qt::AlignRight);
+          imageLay->addWidget(m_colorTypeCombo, 0, 1);
+
+          imageLay->addWidget(new QLabel(tr("Threshold:"), this), 1, 0,
+                              Qt::AlignRight);
+          imageLay->addWidget(m_thresholdFld, 1, 1, 1, 2);
+
+          imageLay->addWidget(new QLabel(tr("Contrast:"), this), 2, 0,
+                              Qt::AlignRight);
+          imageLay->addWidget(m_contrastFld, 2, 1, 1, 2);
+
+          imageLay->addWidget(new QLabel(tr("Brightness:"), this), 3, 0,
+                              Qt::AlignRight);
+          imageLay->addWidget(m_brightnessFld, 3, 1, 1, 2);
+
+          imageLay->addWidget(m_upsideDownCB, 4, 0, 1, 3, Qt::AlignLeft);
+
+          imageLay->addWidget(new QLabel(tr("BG reduction:"), this), 5, 0,
+                              Qt::AlignRight);
+          imageLay->addWidget(m_bgReductionFld, 5, 1, 1, 2);
+
+          imageLay->addWidget(m_captureWhiteBGButton, 6, 0, 1, 3);
+        }
+        imageLay->setColumnStretch(0, 0);
+        imageLay->setColumnStretch(1, 0);
+        imageLay->setColumnStretch(2, 1);
+        imageFrame->setLayout(imageLay);
+        rightLay->addWidget(imageFrame, 0);
+
+        QGridLayout* displayLay = new QGridLayout();
+        displayLay->setMargin(10);
+        displayLay->setHorizontalSpacing(3);
+        displayLay->setVerticalSpacing(10);
+        {
+          displayLay->addWidget(m_onionSkinCB, 0, 0, 1, 2);
+
+          displayLay->addWidget(new QLabel(tr("Opacity(%):"), this), 1, 0,
+                                Qt::AlignRight);
+          displayLay->addWidget(m_onionOpacityFld, 1, 1);
+          displayLay->addWidget(m_loadImageButton, 2, 0, 1, 2);
+        }
+        displayLay->setColumnStretch(0, 0);
+        displayLay->setColumnStretch(1, 1);
+        // displayLay->setColumnStretch(2, 1);
+        displayFrame->setLayout(displayLay);
+        rightLay->addWidget(displayFrame);
+
+        QGridLayout* timerLay = new QGridLayout();
+        timerLay->setMargin(10);
+        timerLay->setHorizontalSpacing(3);
+        timerLay->setVerticalSpacing(10);
+        {
+          timerLay->addWidget(m_timerCB, 0, 0, 1, 2);
+
+          timerLay->addWidget(new QLabel(tr("Interval(sec):"), this), 1, 0,
+                              Qt::AlignRight);
+          timerLay->addWidget(m_timerIntervalFld, 1, 1);
+        }
+        timerLay->setColumnStretch(0, 0);
+        timerLay->setColumnStretch(1, 1);
+        timerFrame->setLayout(timerLay);
+        rightLay->addWidget(timerFrame);
+
+        rightLay->addStretch(1);
+
+        rightLay->addWidget(m_captureButton, 0);
+        rightLay->addSpacing(20);
+        rightLay->addWidget(closeButton, 0);
+        rightLay->addSpacing(10);
+      }
+      bottomLay->addLayout(rightLay, 0);
+    }
+    m_topLayout->addLayout(bottomLay, 1);
+  }
 
   //---- signal-slot connections ----
   bool ret = true;
@@ -774,6 +1190,8 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(onCaptureWhiteBGButtonPressed()));
   ret = ret && connect(m_onionSkinCB, SIGNAL(toggled(bool)), this,
                        SLOT(onOnionCBToggled(bool)));
+  ret = ret && connect(m_loadImageButton, SIGNAL(pressed()), this,
+                       SLOT(onLoadImageButtonPressed()));
   ret = ret && connect(m_onionOpacityFld, SIGNAL(valueEditedByHand()), this,
                        SLOT(onOnionOpacityFldEdited()));
   ret = ret && connect(m_upsideDownCB, SIGNAL(toggled(bool)),
@@ -788,6 +1206,11 @@ PencilTestPopup::PencilTestPopup()
   ret = ret && connect(closeButton, SIGNAL(clicked()), this, SLOT(reject()));
   ret = ret && connect(m_captureButton, SIGNAL(clicked(bool)), this,
                        SLOT(onCaptureButtonClicked(bool)));
+  if (m_captureFilterSettingsBtn)
+    ret = ret && connect(m_captureFilterSettingsBtn, SIGNAL(pressed()), this,
+                         SLOT(onCaptureFilterSettingsBtnPressed()));
+  ret = ret && connect(subfolderButton, SIGNAL(clicked(bool)), this,
+                       SLOT(openSaveInFolderPopup()));
   assert(ret);
 
   refreshCameraList();
@@ -797,6 +1220,15 @@ PencilTestPopup::PencilTestPopup()
   if (startupCamIndex > 0) {
     m_cameraListCombo->setCurrentIndex(startupCamIndex);
     onCameraListComboActivated(startupCamIndex);
+  }
+
+  QString resStr = QString::fromStdString(CamCapCameraResolution.getValue());
+  if (m_currentCamera && !resStr.isEmpty()) {
+    int startupResolutionIndex = m_resolutionCombo->findText(resStr);
+    if (startupResolutionIndex > 0) {
+      m_resolutionCombo->setCurrentIndex(startupResolutionIndex);
+      onResolutionComboActivated(resStr);
+    }
   }
 
   onNextName();
@@ -960,6 +1392,9 @@ void PencilTestPopup::onResolutionComboActivated(const QString& itemText) {
 
   m_currentCamera->start();
   m_cameraViewfinder->setImage(QImage());
+
+  // update env
+  CamCapCameraResolution = itemText.toStdString();
 }
 
 //-----------------------------------------------------------------------------
@@ -1129,6 +1564,7 @@ void PencilTestPopup::hideEvent(QHideEvent* event) {
     if (m_currentCamera->state() == QCamera::LoadedState)
       m_currentCamera->unload();
   }
+  Dialog::hideEvent(event);
 }
 
 //-----------------------------------------------------------------------------
@@ -1172,6 +1608,76 @@ void PencilTestPopup::onCaptureWhiteBGButtonPressed() {
 void PencilTestPopup::onOnionCBToggled(bool on) {
   m_cameraViewfinder->setShowOnionSkin(on);
   m_onionOpacityFld->setEnabled(on);
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onLoadImageButtonPressed() {
+  TCellSelection* cellSelection = dynamic_cast<TCellSelection*>(
+      TApp::instance()->getCurrentSelection()->getSelection());
+  if (cellSelection) {
+    int c0;
+    int r0;
+    TCellSelection::Range range = cellSelection->getSelectedCells();
+    if (range.isEmpty()) {
+      error(tr("No image selected.  Please select an image in the Xsheet."));
+      return;
+    }
+    c0 = range.m_c0;
+    r0 = range.m_r0;
+    TXshCell cell =
+        TApp::instance()->getCurrentXsheet()->getXsheet()->getCell(r0, c0);
+    if (cell.getSimpleLevel() == nullptr) {
+      error(tr("No image selected.  Please select an image in the Xsheet."));
+      return;
+    }
+    TXshSimpleLevel* level = cell.getSimpleLevel();
+    int type               = level->getType();
+    if (type != TXshLevelType::OVL_XSHLEVEL) {
+      error(tr("The selected image is not in a raster level."));
+      return;
+    }
+    TImageP origImage = cell.getImage(false);
+    TRasterImageP tempImage(origImage);
+    TRasterImage* image = (TRasterImage*)tempImage->cloneImage();
+
+    int m_lx          = image->getRaster()->getLx();
+    int m_ly          = image->getRaster()->getLy();
+    QString res       = m_resolutionCombo->currentText();
+    QStringList texts = res.split(' ');
+    if (m_lx != texts[0].toInt() || m_ly != texts[2].toInt()) {
+      error(
+          tr("The selected image size does not match the current camera "
+             "settings."));
+      return;
+    }
+    int m_bpp      = image->getRaster()->getPixelSize();
+    int totalBytes = m_lx * m_ly * m_bpp;
+    image->getRaster()->yMirror();
+
+    // lock raster to get data
+    image->getRaster()->lock();
+    void* buffin = image->getRaster()->getRawData();
+    assert(buffin);
+    void* buffer = malloc(totalBytes);
+    memcpy(buffer, buffin, totalBytes);
+
+    image->getRaster()->unlock();
+
+    QImage qi = QImage((uint8_t*)buffer, m_lx, m_ly, QImage::Format_ARGB32);
+    QImage qi2(qi.size(), QImage::Format_ARGB32);
+    qi2.fill(QColor(Qt::white).rgb());
+    QPainter painter(&qi2);
+    if (m_upsideDownCB->isChecked()) {
+      painter.translate(m_lx / 2, m_ly / 2);
+      painter.rotate(180);
+      painter.translate(-m_lx / 2, -m_ly / 2);
+    }
+    painter.drawImage(0, 0, qi);
+    m_cameraViewfinder->setPreviousImage(qi2);
+    m_onionSkinCB->setChecked(true);
+    free(buffer);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1403,4 +1909,40 @@ bool PencilTestPopup::importImage(QImage& image) {
 
 //-----------------------------------------------------------------------------
 
+void PencilTestPopup::onCaptureFilterSettingsBtnPressed() {
+  if (!m_currentCamera || m_deviceName.isNull()) return;
+
+  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  for (int c = 0; c < cameras.size(); c++) {
+    if (cameras.at(c).deviceName() == m_deviceName) {
+#ifdef _WIN32
+      openCaptureFilterSettings(this, cameras.at(c).description());
+#endif
+      return;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::openSaveInFolderPopup() {
+  if (m_saveInFolderPopup->exec()) {
+    QString oldPath = m_saveInFileFld->getPath();
+    m_saveInFileFld->setPath(m_saveInFolderPopup->getPath());
+    if (oldPath == m_saveInFileFld->getPath()) onNextName();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 OpenPopupCommandHandler<PencilTestPopup> openPencilTestPopup(MI_PencilTest);
+
+// specialized in order to call openSaveInFolderPopup()
+template <>
+void OpenPopupCommandHandler<PencilTestPopup>::execute() {
+  if (!m_popup) m_popup = new PencilTestPopup();
+  m_popup->show();
+  m_popup->raise();
+  m_popup->activateWindow();
+  if (CamCapOpenSaveInPopupOnLaunch != 0) m_popup->openSaveInFolderPopup();
+}

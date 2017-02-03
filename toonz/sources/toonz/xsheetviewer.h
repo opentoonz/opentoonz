@@ -176,12 +176,18 @@ class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
   // Row
   QColor m_currentRowBgColor;      // current frame / column (210,210,210)
   QColor m_markerLineColor;        // marker lines (0, 255, 246)
+  QColor m_verticalLineColor;      // vertical lines
+  QColor m_verticalLineHeadColor;  // vertical lines in column head
   QColor m_textColor;              // text color (black)
   QColor m_previewFrameTextColor;  // frame number in preview range (blue)
   Q_PROPERTY(QColor CurrentRowBgColor READ getCurrentRowBgColor WRITE
                  setCurrentRowBgColor)
   Q_PROPERTY(
       QColor MarkerLineColor READ getMarkerLineColor WRITE setMarkerLineColor)
+  Q_PROPERTY(QColor VerticalLineColor READ getVerticalLineColor WRITE
+                 setVerticalLineColor)
+  Q_PROPERTY(QColor VerticalLineHeadColor READ getVerticalLineHeadColor WRITE
+                 setVerticalLineHeadColor)
   Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
   Q_PROPERTY(QColor PreviewFrameTextColor READ getPreviewFrameTextColor WRITE
                  setPreviewFrameTextColor)
@@ -476,6 +482,14 @@ public:
   QColor getCurrentRowBgColor() const { return m_currentRowBgColor; }
   void setMarkerLineColor(const QColor &color) { m_markerLineColor = color; }
   QColor getMarkerLineColor() const { return m_markerLineColor; }
+  void setVerticalLineColor(const QColor &color) {
+    m_verticalLineColor = color;
+  }
+  QColor getVerticalLineColor() const { return m_verticalLineColor; }
+  void setVerticalLineHeadColor(const QColor &color) {
+    m_verticalLineHeadColor = color;
+  }
+  QColor getVerticalLineHeadColor() const { return m_verticalLineHeadColor; }
   void setTextColor(const QColor &color) { m_textColor = color; }
   QColor getTextColor() const { return m_textColor; }
   void setPreviewFrameTextColor(const QColor &color) {

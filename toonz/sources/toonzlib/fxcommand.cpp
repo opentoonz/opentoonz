@@ -2022,12 +2022,11 @@ QString DeleteLinksUndo::getHistoryString() {
 
   if (!m_terminalFxs.empty()) {
     str += QString("  :  ");
-    std::list<TFxP>::const_iterator it1;
     std::list<TFx *>::const_iterator ft;
     for (ft = m_terminalFxs.begin(); ft != m_terminalFxs.end(); ++ft) {
       if (ft != m_terminalFxs.begin()) str += QString(",  ");
-      str += QString("%1- -Xsheet")
-                 .arg(QString::fromStdWString((*it1)->getName()));
+      str +=
+          QString("%1- -Xsheet").arg(QString::fromStdWString((*ft)->getName()));
     }
   }
 

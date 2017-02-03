@@ -44,7 +44,7 @@ TMainWindow::TMainWindow(QWidget *parent, Qt::WindowFlags flags)
   // Allocate the dock layout
   m_layout = new DockLayout;
   m_layout->setContentsMargins(0, 0, 0, 0);
-  m_layout->setSpacing(8);
+  m_layout->setSpacing(4);
   m_layout->setDecoAllocator(new TDockDecoAllocator);
   vlayout->addLayout(m_layout);
   vlayout->setAlignment(m_layout, Qt::AlignTop);

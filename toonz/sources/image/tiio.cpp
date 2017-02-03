@@ -76,6 +76,7 @@
 #include "./ffmpeg/tiio_webm.h"
 #include "./ffmpeg/tiio_mp4.h"
 #include "./mesh/tiio_mesh.h"
+#include "./sprite/tiio_sprite.h"
 
 //-------------------------------------------------------------------
 
@@ -161,6 +162,11 @@ void initImageIo(bool lightVersion) {
   Tiio::defineWriterMaker("rgb", Tiio::makeSgiWriter, true);
   TFileType::declare("rgb", TFileType::RASTER_IMAGE);
   Tiio::defineWriterProperties("rgb", new Tiio::SgiWriterProperties());
+
+  TLevelWriter::define("spritesheet", TLevelWriterSprite::create, true);
+  TFileType::declare("spritesheet", TFileType::RASTER_LEVEL);
+  Tiio::defineWriterProperties("spritesheet",
+                               new Tiio::SpriteWriterProperties());
 
 // ffmpeg
 #if !defined(_WIN32) || defined(x64)

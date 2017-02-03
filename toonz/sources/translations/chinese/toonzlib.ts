@@ -332,6 +332,14 @@
         <source>color model</source>
         <translation>色彩模型</translation>
     </message>
+    <message>
+        <source>Set Picked Position of Style#%1 in Palette%2 : %3,%4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Colors by Using Picked Positions in Palette %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

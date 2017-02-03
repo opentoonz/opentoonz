@@ -927,6 +927,30 @@ Do you want to proceed?</source>
     </message>
 </context>
 <context>
+    <name>StylePickerTool</name>
+    <message>
+        <source>No current level.</source>
+        <translation>レベルが選択されていません。</translation>
+    </message>
+    <message>
+        <source>Current level has no available palette.</source>
+        <translation>現在のレベルには有効なパレットがありません。</translation>
+    </message>
+    <message>
+        <source>Palette must have more than one palette to be organized.</source>
+        <translation>パレットの整理には２つ以上のページが必要です。</translation>
+    </message>
+</context>
+<context>
+    <name>StylePickerToolOptionsBox</name>
+    <message>
+        <source>With this option being activated, the picked style will be
+moved to the end of the first page of the palette.</source>
+        <translation>このオプションを有効にしてカラーモデルから色を拾っていくと、サンプルされた
+スタイルがパレットの1ページ目の末尾に順番に移動します。</translation>
+    </message>
+</context>
+<context>
     <name>TrackerTool</name>
     <message>
         <source>Width:</source>

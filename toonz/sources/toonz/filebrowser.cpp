@@ -148,7 +148,8 @@ QMutex levelFileMutex;
 
 inline bool isMultipleFrameType(std::string type) {
   return (type == "tlv" || type == "tzl" || type == "pli" || type == "mov" ||
-          type == "avi" || type == "3gp");
+          type == "avi" || type == "3gp" || type == "gif" || type == "mp4" ||
+          type == "webm");
 }
 
 //=============================================================================
@@ -598,6 +599,18 @@ void FileBrowser::refreshCurrentFolderItems() {
     m_multiFileItemMap.clear();
 
     for (it = all_files.begin(); it != all_files.end(); it++) {
+      TFrameId tFrameId;
+      try {
+        tFrameId = it->getFrame();
+      } catch (TMalformedFrameException tmfe) {
+        // Incorrect frame name sequence. Warning to the user in the message
+        // center.
+        DVGui::warning(QString::fromStdWString(
+            tmfe.getMessage() + L": " +
+            QObject::tr("Skipping frame.").toStdWString()));
+        continue;
+      }
+
       TFilePath levelName(it->getLevelName());
 
       if (levelName.isLevelName()) {
@@ -617,7 +630,7 @@ void FileBrowser::refreshCurrentFolderItems() {
         levelItem.m_fileSize += fileInfo.size();
 
         // store frameId
-        levelItem.m_frameIds.push_back(it->getFrame());
+        levelItem.m_frameIds.push_back(tFrameId);
 
         levelItem.m_frameCount++;
       }

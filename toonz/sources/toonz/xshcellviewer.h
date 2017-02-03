@@ -27,16 +27,23 @@ public:
   RenameCellField(QWidget *parent, XsheetViewer *viewer);
   ~RenameCellField() {}
 
-  void showInRowCol(int row, int col);
+  void showInRowCol(int row, int col, bool multiColumnSelected = false);
+
+  bool isLocatedAt(int row, int col) { return row == m_row && col == m_col; }
 
 protected:
   void focusOutEvent(QFocusEvent *) override;
   void keyPressEvent(QKeyEvent *event) override;
+  bool eventFilter(QObject *, QEvent *) override;
+
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
   void renameCell();
 
 protected slots:
   void onReturnPressed();
+  void onXsheetChanged();
 };
 
 //=============================================================================
@@ -88,8 +95,14 @@ public:
 
   // display upper-directional smart tab only when pressing ctrl key
   void onControlPressed(bool pressed);
+  const bool isControlPressed();
 
   //	void keyUpDownPressed(int newRow);
+
+  void showRenameField(int row, int col, bool multiColumnSelected = false) {
+    m_renameCell->showInRowCol(row, col, multiColumnSelected);
+  }
+  void hideRenameField() { m_renameCell->hide(); }
 
 protected:
   void paintEvent(QPaintEvent *) override;

@@ -18,7 +18,8 @@ FileField::BrowserPopupController *FileField::m_browserPopupController = 0;
 // FileField
 //-----------------------------------------------------------------------------
 
-FileField::FileField(QWidget *parent, QString path, bool readOnly)
+FileField::FileField(QWidget *parent, QString path, bool readOnly,
+                     bool doNotBrowseInitialPath)
     : QWidget(parent)
     , m_filters(QStringList())
     , m_fileMode(QFileDialog::DirectoryOnly)
@@ -32,6 +33,9 @@ FileField::FileField(QWidget *parent, QString path, bool readOnly)
 
   m_fileBrowseButton->setMinimumSize(20, WidgetHeight);
   m_fileBrowseButton->setObjectName("PushButton_NoPadding");
+
+  // if the initial text is not path, set the string here and prevent browsing
+  if (doNotBrowseInitialPath) m_descriptionText = path;
 
   QHBoxLayout *mainLayout = new QHBoxLayout();
   mainLayout->setMargin(0);
@@ -90,7 +94,7 @@ void FileField::browseDirectory() {
   if (!m_browserPopupController) return;
   m_browserPopupController->openPopup(
       m_filters, (m_fileMode == QFileDialog::DirectoryOnly),
-      m_lastSelectedPath);
+      (m_lastSelectedPath == m_descriptionText) ? "" : m_lastSelectedPath);
   if (m_browserPopupController->isExecute())
     directory = m_browserPopupController->getPath();
 

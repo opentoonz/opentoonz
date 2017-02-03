@@ -113,7 +113,8 @@ PageViewer::PageViewer(QWidget *parent, PaletteViewType viewType,
     , m_viewType(viewType)
     , m_nameDisplayMode(Style)
     , m_hasPasteColors(hasPasteColors)
-    , m_changeStyleCommand(0) {
+    , m_changeStyleCommand(0)
+    , m_styleNameEditor(NULL) {
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("PageViewer");
   setFocusPolicy(Qt::StrongFocus);
@@ -124,9 +125,6 @@ PageViewer::PageViewer(QWidget *parent, PaletteViewType viewType,
     QAction *pasteColorsAct = cmd->getAction(MI_PasteColors);
     addAction(pasteColorsAct);
   }
-
-  m_styleNameEditor = new StyleNameEditor(this);
-  m_styleNameEditor->hide();
 
   m_renameTextField->hide();
   m_renameTextField->setObjectName("RenameColorTextField");
@@ -171,7 +169,7 @@ void PageViewer::setPaletteHandle(TPaletteHandle *paletteHandle) {
   m_styleSelection->setPaletteHandle(paletteHandle);
   connect(paletteHandle, SIGNAL(colorStyleChanged()), SLOT(update()));
 
-  m_styleNameEditor->setPaletteHandle(paletteHandle);
+  if (m_styleNameEditor) m_styleNameEditor->setPaletteHandle(paletteHandle);
 }
 
 //-----------------------------------------------------------------------------
@@ -454,6 +452,10 @@ void PageViewer::drawColorName(QPainter &p, QRect &nameRect, TColorStyle *style,
       name += "  " + toQString(g.first) + ":" + QString::number(g.second);
     if (style->getFlags() != 0) name += "(autopaint)";
 
+    TPoint pickedPos = style->getPickedPosition();
+    if (pickedPos != TPoint())
+      name += QString(" (%1,%2)").arg(pickedPos.x).arg(pickedPos.y);
+
     p.drawText(nameRect.adjusted(6, 4, -6, -4), name);
 
     QColor borderCol(getTextColor());
@@ -587,6 +589,18 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       QRect nameRect = getColorNameRect(i);
       drawColorName(p, nameRect, style, styleIndex);
 
+      // if numpad shortcut is activated, draw shortcut scope
+      if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+          m_viewType == LEVEL_PALETTE &&
+          palette->getStyleShortcut(styleIndex) >= 0) {
+        p.setPen(QPen(QColor(0, 0, 0, 128), 2));
+        p.drawLine(nameRect.topLeft() + QPoint(2, 1),
+                   nameRect.bottomLeft() + QPoint(2, 0));
+        p.setPen(QPen(QColor(255, 255, 255, 128), 2));
+        p.drawLine(nameRect.topLeft() + QPoint(4, 1),
+                   nameRect.bottomLeft() + QPoint(4, 0));
+      }
+
       // selezione
       if (m_styleSelection->isSelected(m_page->getIndex(), i)) {
         p.setPen(Qt::white);
@@ -622,10 +636,37 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       TColorStyle *style = m_page->getStyle(i);
       int styleIndex     = m_page->getStyleId(i);
 
+      // if numpad shortcut is activated, draw shortcut scope
+      if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+          m_viewType == LEVEL_PALETTE &&
+          palette->getStyleShortcut(styleIndex) >= 0) {
+        QRect itemRect = getItemRect(i);
+        // paint dark
+        p.setPen(Qt::NoPen);
+        p.setBrush(QColor(0, 0, 0, 64));
+        p.drawRect(itemRect);
+        // check the neighbours and draw light lines
+        p.setPen(QPen(QColor(255, 255, 255, 128), 2));
+        // top
+        if (!hasShortcut(i - m_chipPerRow))
+          p.drawLine(itemRect.topLeft(), itemRect.topRight() - QPoint(1, 0));
+        // left
+        if (i % m_chipPerRow == 0 || !hasShortcut(i - 1))
+          p.drawLine(itemRect.topLeft() + QPoint(0, 1), itemRect.bottomLeft());
+        // bottom
+        if (!hasShortcut(i + m_chipPerRow))
+          p.drawLine(itemRect.bottomLeft() + QPoint(1, 0),
+                     itemRect.bottomRight());
+        // right
+        if ((i + 1) % m_chipPerRow == 0 || !hasShortcut(i + 1))
+          p.drawLine(itemRect.topRight(),
+                     itemRect.bottomRight() - QPoint(0, 1));
+      }
+
       // draw white frame if the style is selected or current
       if (m_styleSelection->isSelected(m_page->getIndex(), i) ||
           currentStyleIndex == styleIndex) {
-        QRect itemRect = getItemRect(i).adjusted(-1, -2, 1, 2);
+        QRect itemRect = getItemRect(i).adjusted(0, -1, 0, 1);
         p.setPen(Qt::NoPen);
         p.setBrush(Qt::white);
         p.drawRoundRect(itemRect, 7, 25);
@@ -772,10 +813,39 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
 
       // draw "Autopaint for lines" indicator
+      int offset = 0;
       if (style->getFlags() != 0) {
         QRect aflRect(chipRect.bottomLeft() + QPoint(0, -14), QSize(12, 15));
         p.drawRect(aflRect);
         p.drawText(aflRect, Qt::AlignCenter, "A");
+        offset += 12;
+      }
+
+      // draw "Picked Position" indicator (not show on small chip mode)
+      if (style->getPickedPosition() != TPoint() && m_viewMode != SmallChips) {
+        QRect ppRect(chipRect.bottomLeft() + QPoint(offset, -14),
+                     QSize(12, 15));
+        p.drawRect(ppRect);
+        QPoint markPos = ppRect.center() + QPoint(1, 0);
+        p.drawEllipse(markPos, 3, 3);
+        p.drawLine(markPos - QPoint(5, 0), markPos + QPoint(5, 0));
+        p.drawLine(markPos - QPoint(0, 5), markPos + QPoint(0, 5));
+      }
+
+      // if numpad shortcut is activated, draw shortcut number on top
+      if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+          m_viewType == LEVEL_PALETTE &&
+          palette->getStyleShortcut(styleIndex) >= 0 &&
+          m_viewMode != SmallChips) {
+        int key      = palette->getStyleShortcut(styleIndex);
+        int shortcut = key - Qt::Key_0;
+        QRect ssRect(chipRect.center().x() - 8, chipRect.top() - 11, 16, 20);
+        p.setBrush(Qt::gray);
+        p.drawChord(ssRect, 0, -180 * 16);
+        tmpFont.setPointSize(6);
+        p.setFont(tmpFont);
+        p.drawText(ssRect.adjusted(0, 10, 0, 0), Qt::AlignCenter,
+                   QString().setNum(shortcut));
       }
 
       // revert font set
@@ -1009,6 +1079,10 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
   menu.addAction(openStyleControlAct);
   QAction *openStyleNameEditorAct = menu.addAction(tr("Name Editor"));
   connect(openStyleNameEditorAct, &QAction::triggered, [&]() {
+    if (!m_styleNameEditor) {
+      m_styleNameEditor = new StyleNameEditor(this);
+      m_styleNameEditor->setPaletteHandle(getPaletteHandle());
+    }
     m_styleNameEditor->show();
     m_styleNameEditor->raise();
     m_styleNameEditor->activateWindow();
@@ -1023,27 +1097,21 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   // remove links from studio palette
   if (m_viewType == LEVEL_PALETTE && m_styleSelection &&
-      !m_styleSelection->isEmpty() && !isLocked) {
+      !m_styleSelection->isEmpty() && !isLocked &&
+      m_styleSelection->hasLinkedStyle()) {
     menu.addSeparator();
-    QAction *removeLinkAct = menu.addAction(tr("Remove Links"));
-    connect(removeLinkAct, SIGNAL(triggered()), this, SLOT(removeLink()));
+    QAction *toggleStyleLink = cmd->getAction("MI_ToggleLinkToStudioPalette");
+    menu.addAction(toggleStyleLink);
+    QAction *removeStyleLink =
+        cmd->getAction("MI_RemoveReferenceToStudioPalette");
+    menu.addAction(removeStyleLink);
+    QAction *getBackOriginalAct =
+        cmd->getAction("MI_GetColorFromStudioPalette");
+    menu.addAction(getBackOriginalAct);
   }
 
   if (((indexPage == 0 && index > 0) || (indexPage > 0 && index >= 0)) &&
       index < getChipCount() && !isLocked) {
-    // iwsw commented out temporarly
-    /*
-    wstring globalName = m_page->getStyle(index)->getGlobalName();
-    if (m_viewType != STUDIO_PALETTE &&
-            globalName != L"" &&
-            (globalName[0] == L'-' || globalName[0] == L'+'))
-    {
-            createMenuAction(menu, "MI_ToggleLinkToStudioPalette", tr("Toggle
-    Link to Studio Palette"), "toggleLink()");
-            createMenuAction(menu, "MI_RemoveReferenceToStudioPalette",
-    tr("Remove Reference to Studio Palette"), "eraseToggleLink()");
-    }
-    */
     if (pasteValueAct) pasteValueAct->setEnabled(true);
     if (pasteColorsAct) pasteColorsAct->setEnabled(true);
 
@@ -1061,29 +1129,20 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
     clearAct->setEnabled(false);
   }
 
-  // get color from the original studio palette
-  if (m_viewType == LEVEL_PALETTE && m_styleSelection &&
-      !m_styleSelection->isEmpty() && !isLocked) {
-    menu.addSeparator();
-    QAction *getBackOriginalAct =
-        cmd->getAction("MI_GetColorFromStudioPalette");
-    menu.addAction(getBackOriginalAct);
-  }
-
-  // iwsw commented out temporarly
-  /*
-  if (m_viewType != STUDIO_PALETTE)
-  {
-          menu.addSeparator();
-          menu.addAction(cmd->getAction(MI_EraseUnusedStyles));
-  }
-  */
   if (m_page) {
+    menu.addSeparator();
     QAction *newStyle = menu.addAction(tr("New Style"));
     connect(newStyle, SIGNAL(triggered()), SLOT(addNewColor()));
     QAction *newPage = menu.addAction(tr("New Page"));
     connect(newPage, SIGNAL(triggered()), SLOT(addNewPage()));
   }
+
+  /*
+  if (m_viewType != STUDIO_PALETTE) {
+          menu.addAction(cmd->getAction(MI_EraseUnusedStyles));
+  }
+  */
+
   menu.exec(event->globalPos());
 }
 
@@ -1371,22 +1430,12 @@ void PageViewer::onStyleRenamed() {
 }
 
 //-----------------------------------------------------------------------------
-/*! Recall \b TStyleSelection::toggleLink() to current page style selection.
-*/
-void PageViewer::toggleLink() {
-  if (!m_page || !m_styleSelection || m_styleSelection->isEmpty()) return;
-  m_styleSelection->toggleLink();
-  update();
-  emit changeWindowTitleSignal();
-}
 
-//-----------------------------------------------------------------------------
-/*! Recall \b TStyleSelection::eraseToggleLink() to current page style
- * selection.
-*/
-void PageViewer::eraseToggleLink() {
-  if (!m_page || !m_styleSelection || m_styleSelection->isEmpty()) return;
-  m_styleSelection->eraseToggleLink();
+bool PageViewer::hasShortcut(int indexInPage) {
+  if (!m_page) return false;
+  if (indexInPage < 0 || indexInPage >= m_page->getStyleCount()) return false;
+  int styleIndex = m_page->getStyleId(indexInPage);
+  return (m_page->getPalette()->getStyleShortcut(styleIndex) >= 0);
 }
 
 //=============================================================================
@@ -1652,13 +1701,6 @@ void PageViewer::updateCommandLocks() {
   cmd->getAction("MI_BlendColors")->setEnabled(!isLocked);
   cmd->getAction("MI_PasteNames")->setEnabled(!isLocked);
   cmd->getAction("MI_GetColorFromStudioPalette")->setEnabled(!isLocked);
-}
-
-//-----------------------------------------------------------------------------
-/*! remove link and revert to the normal style
-*/
-void PageViewer::removeLink() {
-  if (!m_page || !m_styleSelection || m_styleSelection->isEmpty()) return;
-
-  if (m_styleSelection->removeLink()) emit changeWindowTitleSignal();
+  cmd->getAction("MI_ToggleLinkToStudioPalette")->setEnabled(!isLocked);
+  cmd->getAction("MI_RemoveReferenceToStudioPalette")->setEnabled(!isLocked);
 }
