@@ -8,9 +8,10 @@
 #include <vector>
 
 #include "toonz/txshcolumn.h"
+#include "cellposition.h"
 
 using std::map;
-using std::unique_ptr;
+using std::shared_ptr;
 using std::vector;
 
 class XsheetViewer;
@@ -23,18 +24,16 @@ class SubLayer;
 //! Each node in the tree is called SubLayer.
 
 class SubLayers {
-  XsheetViewer *m_viewer;
-  map<TXshColumn *, unique_ptr<SubLayer>> m_items;
+  class Imp;
+  Imp *imp;
+
 public:
 
   SubLayers(XsheetViewer *viewer);
   ~SubLayers();
 
-  SubLayer *get(TXshColumn *column);
-
-private:
-  bool isGood(TXshColumn *column) const;
-  SubLayer *build(TXshColumn *column) const;
+  shared_ptr<SubLayer> get(const CellPosition &pos);
+  shared_ptr<SubLayer> get(const TXshColumn *column);
 };
 
 //! Basically, a tree node.
@@ -45,7 +44,7 @@ private:
 //! Base interface.
 
 class SubLayer {
-  vector<unique_ptr<SubLayer>> m_children;
+  vector<shared_ptr<SubLayer>> m_children;
 public:
 
   SubLayer() { }
@@ -55,7 +54,7 @@ public:
   virtual bool isFolded() const { return true; }
   virtual void foldUnfold() { }
 
-  const vector<unique_ptr<SubLayer>> &children() const { return m_children; }
+  vector<shared_ptr<SubLayer>> children() const { return m_children; }
 
 private:
   SubLayer(const SubLayer &from) = delete;

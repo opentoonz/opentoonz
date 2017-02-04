@@ -717,7 +717,7 @@ void ColumnArea::DrawHeader::drawLock() const {
 
 void ColumnArea::DrawHeader::drawFoldUnfoldButton() const {
   if (col < 0 || isEmpty) return;
-  if (!column->getLevelColumn()) return; // only vector layers
+  if (!m_viewer->subLayers()->get(column)->hasChildren()) return;
 
   QRect mouseArea = o->rect(PredefinedRect::FOLD_UNFOLD_AREA);
   if (mouseArea.isEmpty())
@@ -1658,9 +1658,6 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     // get mouse position
     QPoint mouseInCell =
         event->pos() - m_viewer->positionToXY(CellPosition(0, m_col));
-    // int x = event->pos().x() - m_viewer->columnToX(m_col);
-    // int y = event->pos().y();
-    // QPoint mouseInCell(x, y);
     int x = mouseInCell.x(), y = mouseInCell.y();
 
     if (!isEmpty && m_col >= 0) {
