@@ -400,13 +400,13 @@ void StartupPopup::onCreateButton() {
     return;
   }
 
-  if (m_widthFld->getValue() < 1) {
-    DVGui::warning(tr("The width must be 1 or more."));
+  if (m_widthFld->getValue() <= 0) {
+    DVGui::warning(tr("The width must be greater than zero."));
     m_widthFld->setFocus();
     return;
   }
-  if (m_heightFld->getValue() < 1) {
-    DVGui::warning(tr("The height must be 1 or more."));
+  if (m_heightFld->getValue() <= 0) {
+    DVGui::warning(tr("The height must be greater than zero."));
     m_heightFld->setFocus();
     return;
   }
