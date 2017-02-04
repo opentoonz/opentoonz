@@ -107,6 +107,7 @@ set(MOC_HEADERS
     shortcutpopup.h
     startuppopup.h
     subcameramanager.h
+	sublayers.h
     subscenecommand.h
     svncleanupdialog.h
     svncommitdialog.h

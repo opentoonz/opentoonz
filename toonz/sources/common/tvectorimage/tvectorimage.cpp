@@ -171,8 +171,10 @@ int TVectorImage::addStroke(TStroke *stroke, bool discardPoints) {
   else
     gid = m_imp->m_strokes.back()->m_groupId;
 
-  m_imp->m_strokes.push_back(new VIStroke(stroke, gid));
+  VIStroke *added = new VIStroke(stroke, gid);
+  m_imp->m_strokes.push_back(added);
   m_imp->m_areValidRegions = false;
+  emit strokeAdded(added->m_s);
   return m_imp->m_strokes.size() - 1;
 }
 
@@ -553,7 +555,7 @@ int TVectorImage::getStrokeIndexById(int id) const {
 
 //-----------------------------------------------------------------------------
 
-int TVectorImage::getStrokeIndex(TStroke *stroke) const {
+int TVectorImage::getStrokeIndex(const TStroke *stroke) const {
   int n = m_imp->m_strokes.size();
 
   for (int i = 0; i < n; i++)

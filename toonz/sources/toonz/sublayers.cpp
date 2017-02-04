@@ -45,17 +45,19 @@ public:
   virtual void foldUnfold() override { m_folded = !m_folded; }
   virtual QString name() const { return QString::fromStdWString (m_level->getName()); }
 
+protected slots:
+  void updateStrokeAdded(TStroke *stroke);
+  void updateStrokeRemoved(TStroke *stroke);
 private:
   TVectorImageP vectorImage() const;
+  SubLayer *build(TStroke *stroke) const;
 };
 
 class StrokeSubLayer final : public SubLayer {
-  TStrokeP m_stroke;
-  //TVectorImageP m_vectorImage;
-  //int m_index;
+  TStroke *m_stroke; // weak pointer - don't own
 
 public:
-  StrokeSubLayer(TStrokeP stroke) : m_stroke(stroke) { }
+  StrokeSubLayer(TStroke *stroke) : m_stroke(stroke) { }
 
   virtual bool hasActivator() const override { return true; }
   virtual QString name() const override { return QString::number(m_stroke->getId ()); }
@@ -128,7 +130,8 @@ SimpleLevelSubLayer::SimpleLevelSubLayer(TXshSimpleLevelP level)
   for (int i = 0; i < image->getStrokeCount(); i++)
     m_children.push_back(shared_ptr<StrokeSubLayer> (new StrokeSubLayer(image->getStroke(i))));
 
-  // subscribe to notifications from the image
+  connect(image.getPointer (), &TVectorImage::strokeAdded, this, &SimpleLevelSubLayer::updateStrokeAdded);
+  connect(image.getPointer (), &TVectorImage::strokeRemoved, this, &SimpleLevelSubLayer::updateStrokeRemoved);
 }
 
 bool SimpleLevelSubLayer::hasChildren() const {
@@ -141,6 +144,22 @@ TVectorImageP SimpleLevelSubLayer::vectorImage() const {
   if (!image) return nullptr;
   TVectorImageP vectorImage = { dynamic_cast<TVectorImage *> (image.getPointer()) };
   return vectorImage;
+}
+
+void SimpleLevelSubLayer::updateStrokeAdded(TStroke *stroke) {
+  TVectorImageP image = vectorImage();
+  int index = image->getStrokeIndex(stroke);
+  
+  vector<shared_ptr<SubLayer>>::iterator it;
+  for (it = m_children.begin(); index >= 0 && it < m_children.end(); it++, index--);
+  m_children.insert(it, shared_ptr<SubLayer> (build (stroke)));
+}
+
+void SimpleLevelSubLayer::updateStrokeRemoved(TStroke *stroke) {
+}
+
+SubLayer *SimpleLevelSubLayer::build(TStroke *stroke) const {
+  return new StrokeSubLayer(stroke);
 }
 
 //-----------------------------------------------------------------------------

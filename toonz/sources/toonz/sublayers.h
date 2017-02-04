@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include <QObject>
 #include <QString>
 
 #include "toonz/txshcolumn.h"
@@ -45,7 +46,9 @@ public:
 //! This object is only a means of presenting and manipulating underlying data.
 //! Base interface.
 
-class SubLayer {
+class SubLayer : public QObject {
+  Q_OBJECT
+
 protected:
   vector<shared_ptr<SubLayer>> m_children;
 public:

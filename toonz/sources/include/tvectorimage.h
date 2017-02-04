@@ -3,6 +3,8 @@
 #ifndef TVECTORIMAGE_INCLUDED
 #define TVECTORIMAGE_INCLUDED
 
+#include <QObject>
+
 #include <memory>
 
 #include "timage.h"
@@ -55,7 +57,9 @@ class VIStroke;
     A vector image is a set of strokes and regions.
   \relates  TImage
 */
-class DVAPI TVectorImage final : public TImage {
+class DVAPI TVectorImage final : public QObject, public TImage {
+  Q_OBJECT
+
   class Imp;
   int pickGroup(const TPointD &pos, bool onEnteredGroup) const;
 
@@ -124,7 +128,7 @@ public:
   int getStrokeIndexById(int id) const;
 
   //! Get the stroke index by id
-  int getStrokeIndex(TStroke *stroke) const;
+  int getStrokeIndex(const TStroke *stroke) const;
 
   //! Group strokes in the \b fromIndex - \b toIndex range
   /*! Only adjacent strokes can be grouped*/
@@ -392,6 +396,10 @@ existing stroke. this method is used for undoing removeEndpoints . */
 #ifdef NEW_REGION_FILL
   void resetRegionFinder();
 #endif
+
+signals:
+  void strokeAdded(TStroke *stroke);
+  void strokeRemoved(TStroke *stroke);
 
 private:  // not implemented
   TVectorImage(const TVectorImage &);
