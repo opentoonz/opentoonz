@@ -4,10 +4,11 @@
 #include "toonz\txshlevelcolumn.h"
 #include "toonz\txshsimplelevel.h"
 
+#include "tstroke.h"
 #include "tvectorimage.h"
 #include "xsheetviewer.h"
 
-class SubLayers::Imp {
+class SubLayers::Imp final {
   typedef TXshSimpleLevel Level;
 
   XsheetViewer *m_viewer;
@@ -21,62 +22,46 @@ public:
   shared_ptr<SubLayer> get(const TXshColumn *column);
 
 private:
-
-  class LocateLevel {
-    XsheetViewer *m_viewer;
-    CellPosition m_pos;
-    bool m_success;
-    Level *m_level;
-  public:
-    LocateLevel(XsheetViewer *viewer, const CellPosition &pos);
-
-    operator bool() const { return m_success; }
-    Level *level() const { return m_level; }
-  };
-
+  Level *findLevel(const CellPosition &pos);
   SubLayer *build(Level *level) const;
 };
 
+// sub layer indicating that there is no sub layer
+// special case pattern
+class EmptySubLayer final : public SubLayer {
+};
+
 // Contains multiple sublayers, each is a TStroke
-class SimpleLevelSubLayer : public SubLayer {
-  TXshSimpleLevel *m_level;
+class SimpleLevelSubLayer final : public SubLayer {
+  TXshSimpleLevelP m_level;
   bool m_folded;
 
 public:
-  SimpleLevelSubLayer(TXshSimpleLevel *level): m_level (level), m_folded(true) { }
+  SimpleLevelSubLayer(TXshSimpleLevelP level);
+  ~SimpleLevelSubLayer() { }
 
   virtual bool hasChildren() const override;
   virtual bool isFolded() const override { return m_folded; }
   virtual void foldUnfold() override { m_folded = !m_folded; }
+  virtual QString name() const { return QString::fromStdWString (m_level->getName()); }
 
 private:
   TVectorImageP vectorImage() const;
 };
 
-// sub layer indicating that there is no sub layer
-// special case pattern
-class EmptySubLayer : public SubLayer {
+class StrokeSubLayer final : public SubLayer {
+  TStrokeP m_stroke;
+  //TVectorImageP m_vectorImage;
+  //int m_index;
+
+public:
+  StrokeSubLayer(TStrokeP stroke) : m_stroke(stroke) { }
+
+  virtual bool hasActivator() const override { return true; }
+  virtual QString name() const override { return QString::number(m_stroke->getId ()); }
 };
 
 //-----------------------------------------------------------------------------
-
-SubLayers::Imp::LocateLevel::LocateLevel(XsheetViewer *viewer, const CellPosition &pos)
-  : m_viewer (viewer), m_pos (pos), m_success (false) {
-  if (pos.layer() < 0)
-    return;
-  TXshColumn *column = m_viewer->getXsheet()->getColumn(pos.layer());
-  if (!column)
-    return;
-  TXshLevelColumn *levelColumn = column->getLevelColumn();
-  if (!levelColumn)
-    return;
-  const TXshCell &cell = levelColumn->getCell(pos.frame());
-  m_level = cell.getSimpleLevel();
-  if (!m_level)
-    return;
-
-  m_success = true;
-}
 
 //-----------------------------------------------------------------------------
 
@@ -104,10 +89,9 @@ shared_ptr<SubLayer> SubLayers::Imp::get(const TXshColumn *column) {
   return get(CellPosition(m_viewer->getCurrentRow (), column->getIndex ()));
 }
 shared_ptr<SubLayer> SubLayers::Imp::get(const CellPosition &pos) {
-  LocateLevel locate(m_viewer, pos);
-  if (!locate)
+  Level *level = findLevel(pos);
+  if (!level)
     return shared_ptr<SubLayer>(new EmptySubLayer());
-  Level *level = locate.level();
 
   map<Level *, shared_ptr<SubLayer>>::iterator it = m_items.find(level);
   if (it != m_items.end())
@@ -118,11 +102,34 @@ shared_ptr<SubLayer> SubLayers::Imp::get(const CellPosition &pos) {
   return newItem;
 }
 
+SubLayers::Imp::Level *SubLayers::Imp::findLevel(const CellPosition &pos) {
+  if (pos.layer() < 0)
+    return nullptr;
+  TXshColumn *column = m_viewer->getXsheet()->getColumn(pos.layer());
+  if (!column)
+    return nullptr;
+  TXshLevelColumn *levelColumn = column->getLevelColumn();
+  if (!levelColumn)
+    return nullptr;
+  const TXshCell &cell = levelColumn->getCell(pos.frame());
+  return cell.getSimpleLevel();
+}
+
 SubLayer *SubLayers::Imp::build(Level *level) const {
   return new SimpleLevelSubLayer(level);
 }
 
 //-----------------------------------------------------------------------------
+
+SimpleLevelSubLayer::SimpleLevelSubLayer(TXshSimpleLevelP level)
+  : m_level(level), m_folded(true) {
+  TVectorImageP image = vectorImage();
+  
+  for (int i = 0; i < image->getStrokeCount(); i++)
+    m_children.push_back(shared_ptr<StrokeSubLayer> (new StrokeSubLayer(image->getStroke(i))));
+
+  // subscribe to notifications from the image
+}
 
 bool SimpleLevelSubLayer::hasChildren() const {
   return vectorImage ()->getStrokeCount() != 0;
@@ -136,3 +143,4 @@ TVectorImageP SimpleLevelSubLayer::vectorImage() const {
   return vectorImage;
 }
 
+//-----------------------------------------------------------------------------

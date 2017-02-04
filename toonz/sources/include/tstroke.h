@@ -387,6 +387,10 @@ Take from \b curves the control points used to create the stroke
 
 //-----------------------------------------------------------------------------
 
+#ifdef _WIN32
+template class DVAPI TSmartPointerT<TStroke>;
+#endif
+
 typedef TSmartPointerT<TStroke> TStrokeP;
 
 //***************************************************************************

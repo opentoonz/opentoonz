@@ -7,6 +7,8 @@
 #include <memory>
 #include <vector>
 
+#include <QString>
+
 #include "toonz/txshcolumn.h"
 #include "cellposition.h"
 
@@ -23,7 +25,7 @@ class SubLayer;
 //! When a layer is expanded, it has a tree of descendants.
 //! Each node in the tree is called SubLayer.
 
-class SubLayers {
+class SubLayers final {
   class Imp;
   Imp *imp;
 
@@ -44,6 +46,7 @@ public:
 //! Base interface.
 
 class SubLayer {
+protected:
   vector<shared_ptr<SubLayer>> m_children;
 public:
 
@@ -53,6 +56,8 @@ public:
   virtual bool hasChildren() const { return false; }
   virtual bool isFolded() const { return true; }
   virtual void foldUnfold() { }
+  virtual bool hasActivator() const { return false; }
+  virtual QString name() const { return ""; }
 
   vector<shared_ptr<SubLayer>> children() const { return m_children; }
 
