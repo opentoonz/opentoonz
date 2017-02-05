@@ -32,10 +32,26 @@ public:
   TXsheet *xsheet() const;
   int getCurrentFrame() const;
 
-  SubLayers *subLayers() const { return m_subLayers; }
   const Orientation *orientation() const { return m_orientation; }
+  ColumnFan *columnFan() const { return m_columnFan; }
+  SubLayers *subLayers() const { return m_subLayers; }
+
+  // orientation
 
   void flipOrientation();
+
+  CellPosition xyToPosition(const QPoint &point) const;
+  QPoint positionToXY(const CellPosition &pos) const;
+
+  int columnToLayerAxis(int layer) const;
+  int rowToFrameAxis(int frame) const;
+
+  QRect rect(PredefinedRect which) const { return orientation()->rect(which); }
+  QLine line(PredefinedLine which) const { return orientation()->line(which); }
+  int dimension(PredefinedDimension which) const { return orientation()->dimension(which); }
+  QPainterPath path(PredefinedPath which) const { return orientation()->path(which); }
+  QPoint point(PredefinedPoint which) const { return orientation()->point(which); }
+  NumberRange range(PredefinedRange which) const { return orientation()->range(which); }
 };
 
 #endif

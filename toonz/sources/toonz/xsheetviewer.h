@@ -438,7 +438,7 @@ public:
   }
 
   //-------
-  ScreenMapper *screenMapper() { return m_screenMapper; }
+  ScreenMapper *screenMapper() const { return m_screenMapper; }
 
   const Orientation *orientation() const;
   void flipOrientation();

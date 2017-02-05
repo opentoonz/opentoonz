@@ -618,8 +618,7 @@ void XsheetViewer::updateAreeSize() {
 //-----------------------------------------------------------------------------
 
 CellPosition XsheetViewer::xyToPosition(const QPoint &point) const {
-  const Orientation *o = orientation();
-  return o->xyToPosition(point, getXsheet()->getColumnFan(o));
+  return screenMapper()->xyToPosition(point);
 }
 CellPosition XsheetViewer::xyToPosition(const TPoint &point) const {
   return xyToPosition(QPoint(point.x, point.y));
@@ -631,8 +630,7 @@ CellPosition XsheetViewer::xyToPosition(const TPointD &point) const {
 //-----------------------------------------------------------------------------
 
 QPoint XsheetViewer::positionToXY(const CellPosition &pos) const {
-  const Orientation *o = orientation();
-  return o->positionToXY(pos, getXsheet()->getColumnFan(o));
+  return screenMapper()->positionToXY(pos);
 }
 
 int XsheetViewer::columnToLayerAxis(int layer) const {

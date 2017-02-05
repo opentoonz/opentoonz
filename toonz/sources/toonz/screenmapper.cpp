@@ -12,6 +12,8 @@ ScreenMapper::ScreenMapper(XsheetViewer *viewer)
   m_orientation = Orientations::leftToRight();
   m_columnFan = new ColumnFan();
   m_subLayers = new SubLayers(this);
+
+  m_columnFan->setDimension(dimension(PredefinedDimension::LAYER));
 }
 
 ScreenMapper::~ScreenMapper() {
@@ -30,4 +32,19 @@ int ScreenMapper::getCurrentFrame() const {
 
 void ScreenMapper::flipOrientation() {
   m_orientation = orientation ()->next();
+  m_columnFan->setDimension(dimension(PredefinedDimension::LAYER));
+}
+
+CellPosition ScreenMapper::xyToPosition(const QPoint &point) const {
+  return orientation ()->xyToPosition(point, columnFan());
+}
+QPoint ScreenMapper::positionToXY(const CellPosition &pos) const {
+  return orientation ()->positionToXY(pos, columnFan());
+}
+
+int ScreenMapper::columnToLayerAxis(int layer) const {
+  return orientation()->colToLayerAxis(layer, columnFan());
+}
+int ScreenMapper::rowToFrameAxis(int frame) const {
+  return orientation()->rowToFrameAxis(frame);
 }
