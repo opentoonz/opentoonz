@@ -10,7 +10,7 @@
 ScreenMapper::ScreenMapper(XsheetViewer *viewer)
   : m_viewer (viewer), m_orientation (nullptr), m_columnFan (nullptr), m_subLayers (nullptr) {
   m_orientation = Orientations::leftToRight();
-  m_columnFan = new ColumnFan();
+  m_columnFan = new ColumnFanGeometry();
   m_subLayers = new SubLayers(this);
 
   m_columnFan->setDimension(dimension(PredefinedDimension::LAYER));

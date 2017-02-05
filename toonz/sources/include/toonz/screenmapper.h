@@ -5,6 +5,7 @@
 
 #include "orientation.h"
 #include "sublayers.h"
+#include "columnfan.h"
 
 //! Class responsible for mapping logical (row, col) to screen XY and back
 //! Gathers and hides all objects required to do so
@@ -21,7 +22,7 @@ class ScreenMapper final {
   XsheetViewer *m_viewer;
 
   const Orientation *m_orientation;
-  ColumnFan *m_columnFan;
+  ColumnFanGeometry *m_columnFan;
   SubLayers *m_subLayers;
   // place for zoom-in variable here
 
@@ -33,7 +34,7 @@ public:
   int getCurrentFrame() const;
 
   const Orientation *orientation() const { return m_orientation; }
-  ColumnFan *columnFan() const { return m_columnFan; }
+  ColumnFanGeometry *columnFan() const { return m_columnFan; }
   SubLayers *subLayers() const { return m_subLayers; }
 
   // orientation

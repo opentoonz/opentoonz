@@ -517,8 +517,7 @@ in TXsheetImp.
   */
   FxDag *getFxDag() const;
   /*! Returns a pointer to object \b ColumnFan contained in \b TXsheetImp, this
-          object allows the user to manage columns visualization in xsheet.
-          TXsheet maintains one column fan per each orientation.
+          object allows the user to collapse and expand columns.
   */
   ColumnFan *getColumnFan() const;
   /*! Returns a pointer to \b ToonzScene contained in \b TXsheetImp, that is the

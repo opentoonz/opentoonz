@@ -36,14 +36,14 @@ public:
   TopToBottomOrientation();
 
   virtual CellPosition xyToPosition(const QPoint &xy,
-                                    const ColumnFan *fan) const override;
+                                    const ColumnFanGeometry *fan) const override;
   virtual QPoint positionToXY(const CellPosition &position,
-                              const ColumnFan *fan) const override;
+                              const ColumnFanGeometry *fan) const override;
   virtual CellPositionRatio xyToPositionRatio(const QPoint &xy) const override;
   virtual QPoint positionRatioToXY(
       const CellPositionRatio &ratio) const override;
 
-  virtual int colToLayerAxis(int layer, const ColumnFan *fan) const override;
+  virtual int colToLayerAxis(int layer, const ColumnFanGeometry *fan) const override;
   virtual int rowToFrameAxis(int frame) const override;
 
   virtual QPoint frameLayerToXY(int frameAxis, int layerAxis) const override;
@@ -93,14 +93,14 @@ public:
   LeftToRightOrientation();
 
   virtual CellPosition xyToPosition(const QPoint &xy,
-                                    const ColumnFan *fan) const override;
+                                    const ColumnFanGeometry *fan) const override;
   virtual QPoint positionToXY(const CellPosition &position,
-                              const ColumnFan *fan) const override;
+                              const ColumnFanGeometry *fan) const override;
   virtual CellPositionRatio xyToPositionRatio(const QPoint &xy) const override;
   virtual QPoint positionRatioToXY(
       const CellPositionRatio &ratio) const override;
 
-  virtual int colToLayerAxis(int layer, const ColumnFan *fan) const override;
+  virtual int colToLayerAxis(int layer, const ColumnFanGeometry *fan) const override;
   virtual int rowToFrameAxis(int frame) const override;
 
   virtual QPoint frameLayerToXY(int frameAxis, int layerAxis) const override;
@@ -498,13 +498,13 @@ TopToBottomOrientation::TopToBottomOrientation() {
 }
 
 CellPosition TopToBottomOrientation::xyToPosition(const QPoint &xy,
-                                                  const ColumnFan *fan) const {
+                                                  const ColumnFanGeometry *fan) const {
   int layer = fan->layerAxisToCol(xy.x());
   int frame = xy.y() / CELL_HEIGHT;
   return CellPosition(frame, layer);
 }
 QPoint TopToBottomOrientation::positionToXY(const CellPosition &position,
-                                            const ColumnFan *fan) const {
+                                            const ColumnFanGeometry *fan) const {
   int x = colToLayerAxis(position.layer(), fan);
   int y = rowToFrameAxis(position.frame());
   return QPoint(x, y);
@@ -523,7 +523,7 @@ QPoint TopToBottomOrientation::positionRatioToXY(
 }
 
 int TopToBottomOrientation::colToLayerAxis(int layer,
-                                           const ColumnFan *fan) const {
+                                           const ColumnFanGeometry *fan) const {
   return fan->colToLayerAxis(layer);
 }
 int TopToBottomOrientation::rowToFrameAxis(int frame) const {
@@ -794,13 +794,13 @@ LeftToRightOrientation::LeftToRightOrientation() {
 }
 
 CellPosition LeftToRightOrientation::xyToPosition(const QPoint &xy,
-                                                  const ColumnFan *fan) const {
+                                                  const ColumnFanGeometry *fan) const {
   int layer = fan->layerAxisToCol(xy.y());
   int frame = xy.x() / CELL_WIDTH;
   return CellPosition(frame, layer);
 }
 QPoint LeftToRightOrientation::positionToXY(const CellPosition &position,
-                                            const ColumnFan *fan) const {
+                                            const ColumnFanGeometry *fan) const {
   int y = colToLayerAxis(position.layer(), fan);
   int x = rowToFrameAxis(position.frame());
   return QPoint(x, y);
@@ -819,7 +819,7 @@ QPoint LeftToRightOrientation::positionRatioToXY(
 }
 
 int LeftToRightOrientation::colToLayerAxis(int layer,
-                                           const ColumnFan *fan) const {
+                                           const ColumnFanGeometry *fan) const {
   return fan->colToLayerAxis(layer);
 }
 int LeftToRightOrientation::rowToFrameAxis(int frame) const {

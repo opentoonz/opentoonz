@@ -92,7 +92,7 @@ struct TXsheet::TXsheetImp {
   int m_viewColumn;
 
   TSoundTrackP m_mixedSound;
-  ColumnFan m_columnFan; // only tracks folded state
+  ColumnFanFoldData m_columnFan;
   XshHandleManager *m_handleManager;
   ToonzScene *m_scene;
 
@@ -1228,7 +1228,8 @@ void TXsheet::saveData(TOStream &os) {
   fxDag->saveData(os, getFirstFreeColumnIndex());
   os.closeChild();
 
-  ColumnFan *columnFan = &m_imp->m_columnFan;
+  ColumnFanFoldData *columnFan = &m_imp->m_columnFan;
+  columnFan->trim();
   if (!columnFan->isEmpty()) {
     os.openChild("columnFan");
     columnFan->saveData(os);

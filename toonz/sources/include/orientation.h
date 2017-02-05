@@ -51,7 +51,7 @@ public:
   NumberRange adjusted(int addFrom, int addTo) const;
 };
 
-class ColumnFan;
+class ColumnFanGeometry;
 class QPixmap;
 class QPainterPath;
 
@@ -159,13 +159,13 @@ protected:
 
 public:
   virtual CellPosition xyToPosition(const QPoint &xy,
-                                    const ColumnFan *fan) const = 0;
+                                    const ColumnFanGeometry *fan) const = 0;
   virtual QPoint positionToXY(const CellPosition &position,
-                              const ColumnFan *fan) const                = 0;
+                              const ColumnFanGeometry *fan) const = 0;
   virtual CellPositionRatio xyToPositionRatio(const QPoint &xy) const    = 0;
   virtual QPoint positionRatioToXY(const CellPositionRatio &ratio) const = 0;
 
-  virtual int colToLayerAxis(int layer, const ColumnFan *fan) const = 0;
+  virtual int colToLayerAxis(int layer, const ColumnFanGeometry *fan) const = 0;
   virtual int rowToFrameAxis(int frame) const = 0;
 
   virtual QPoint frameLayerToXY(int frameAxis, int layerAxis) const = 0;
