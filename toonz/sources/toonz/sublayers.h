@@ -17,7 +17,7 @@ using std::map;
 using std::shared_ptr;
 using std::vector;
 
-class XsheetViewer;
+class ScreenMapper;
 
 class SubLayer;
 
@@ -32,7 +32,7 @@ class SubLayers final {
 
 public:
 
-  SubLayers(XsheetViewer *viewer);
+  SubLayers(ScreenMapper *mapper);
   ~SubLayers();
 
   shared_ptr<SubLayer> get(const CellPosition &pos);

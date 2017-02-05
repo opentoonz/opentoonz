@@ -156,16 +156,14 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
-    , m_orientation(nullptr)
-    , m_subLayers(this)
+    , m_screenMapper (nullptr)
 {
+  m_screenMapper = new ScreenMapper(this);
 
   setFocusPolicy(Qt::StrongFocus);
 
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("XsheetViewer");
-
-  m_orientation = Orientations::topToBottom();
 
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());
@@ -226,6 +224,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
 XsheetViewer::~XsheetViewer() {
   delete m_cellKeyframeSelection;
   delete m_dragTool;
+  delete m_screenMapper;
 }
 
 //-----------------------------------------------------------------------------
@@ -281,13 +280,12 @@ void XsheetViewer::dragToolLeave(QEvent *e) {
 //-----------------------------------------------------------------------------
 
 const Orientation *XsheetViewer::orientation() const {
-  if (!m_orientation) throw std::runtime_error("!m_orientation");
-  return m_orientation;
+  return m_screenMapper->orientation();
 }
 
 void XsheetViewer::flipOrientation() {
-  m_orientation = orientation()->next();
-  emit orientationChanged(orientation());
+  m_screenMapper->flipOrientation();
+  emit orientationChanged(orientation()); // move to ScreenMapper?
 }
 
 void XsheetViewer::onOrientationChanged(const Orientation *newOrientation) {
@@ -1473,10 +1471,6 @@ TPanel *createXsheetViewer(QWidget *parent)
   return panel;
 }
 */
-
-bool XsheetViewer::isFolded(TXshColumn *column) {
-  return m_subLayers.get(column)->isFolded();
-}
 
 //=============================================================================
 // XSheetViewerCommand

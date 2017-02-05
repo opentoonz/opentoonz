@@ -19,7 +19,6 @@ set(MOC_HEADERS
     cellkeyframedata.h
     cellkeyframeselection.h
     cellselection.h
-	../include/cellposition.h
     cleanuppaletteviewer.h
     cleanuppopup.h
     cleanuppreview.h
@@ -79,7 +78,6 @@ set(MOC_HEADERS
     meshifypopup.h
     messagepanel.h
     moviegenerator.h
-	../include/orientation.h
     onionskinmaskgui.h
     outputsettingspopup.h
     overwritepopup.h
@@ -159,7 +157,10 @@ set(MOC_HEADERS
     processor.h
 )
 
-set(HEADERS ${MOC_HEADERS})
+set(HEADERS ${MOC_HEADERS}
+	../include/cellposition.h
+	../include/orientation.h
+	screenmapper.h)
 
 set(SOURCES
     floatingpanelcommand.cpp
@@ -263,6 +264,7 @@ set(SOURCES
     iocommand.cpp
     levelcommand.cpp
     print.cpp
+	screenmapper.cpp
     subscenecommand.cpp
     svncleanupdialog.cpp
     svncommitdialog.cpp

@@ -1,22 +1,23 @@
 #include "sublayers.h"
 
-#include "toonz\txshcell.h"
-#include "toonz\txshlevelcolumn.h"
-#include "toonz\txshsimplelevel.h"
+#include "toonz/screenmapper.h"
+#include "toonz/txshcell.h"
+#include "toonz/txshlevelcolumn.h"
+#include "toonz/txshsimplelevel.h"
+#include "toonz/txsheet.h"
 
 #include "tstroke.h"
 #include "tvectorimage.h"
-#include "..\..\common\tvectorimage\tvectorimageP.h"
-#include "xsheetviewer.h"
+#include "../../common/tvectorimage/tvectorimageP.h"
 
 class SubLayers::Imp final {
   typedef TXshSimpleLevel Level;
 
-  XsheetViewer *m_viewer;
+  ScreenMapper *m_mapper;
   map<Level *, shared_ptr<SubLayer>> m_items;
 
 public:
-  Imp(XsheetViewer *viewer);
+  Imp(ScreenMapper *mapper);
   ~Imp() { }
 
   shared_ptr<SubLayer> get(const CellPosition &pos);
@@ -71,8 +72,8 @@ public:
 
 //-----------------------------------------------------------------------------
 
-SubLayers::SubLayers(XsheetViewer *viewer): imp (nullptr) {
-  imp = new Imp(viewer);
+SubLayers::SubLayers(ScreenMapper *mapper): imp (nullptr) {
+  imp = new Imp(mapper);
 }
 
 SubLayers::~SubLayers() {
@@ -88,11 +89,11 @@ shared_ptr<SubLayer> SubLayers::get(const TXshColumn *column) {
 
 //-----------------------------------------------------------------------------
 
-SubLayers::Imp::Imp(XsheetViewer *viewer): m_viewer (viewer) {
+SubLayers::Imp::Imp(ScreenMapper *mapper): m_mapper (mapper) {
 }
 
 shared_ptr<SubLayer> SubLayers::Imp::get(const TXshColumn *column) {
-  return get(CellPosition(m_viewer->getCurrentRow (), column->getIndex ()));
+  return get(CellPosition(m_mapper->getCurrentFrame (), column->getIndex ()));
 }
 shared_ptr<SubLayer> SubLayers::Imp::get(const CellPosition &pos) {
   Level *level = findLevel(pos);
@@ -111,7 +112,7 @@ shared_ptr<SubLayer> SubLayers::Imp::get(const CellPosition &pos) {
 SubLayers::Imp::Level *SubLayers::Imp::findLevel(const CellPosition &pos) {
   if (pos.layer() < 0)
     return nullptr;
-  TXshColumn *column = m_viewer->getXsheet()->getColumn(pos.layer());
+  TXshColumn *column = m_mapper->xsheet ()->getColumn(pos.layer());
   if (!column)
     return nullptr;
   TXshLevelColumn *levelColumn = column->getLevelColumn();

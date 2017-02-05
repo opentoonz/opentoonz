@@ -717,14 +717,15 @@ void ColumnArea::DrawHeader::drawLock() const {
 
 void ColumnArea::DrawHeader::drawFoldUnfoldButton() const {
   if (col < 0 || isEmpty) return;
-  if (!m_viewer->subLayers()->get(column)->hasChildren()) return;
+  shared_ptr<SubLayer> rootLayer = m_viewer->screenMapper()->subLayers()->get(column);
+  if (!rootLayer->hasChildren()) return;
 
   QRect mouseArea = o->rect(PredefinedRect::FOLD_UNFOLD_AREA);
   if (mouseArea.isEmpty())
     return;
 
   QPoint base = orig + mouseArea.topLeft();
-  QPainterPath triangle = o->path(m_viewer->isFolded(column) ?
+  QPainterPath triangle = o->path(rootLayer->isFolded() ?
     PredefinedPath::FOLDED : PredefinedPath::UNFOLDED).translated (base);
 
   QColor fillColor = m_viewer->getFoldUnfoldButtonColor();
@@ -1699,7 +1700,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       }
 	  else if (o->rect(PredefinedRect::FOLD_UNFOLD_AREA).contains(mouseInCell) &&
 		  event->button() == Qt::LeftButton) {
-		  m_viewer->subLayers()->get(column)->foldUnfold();
+		  m_viewer->screenMapper()->subLayers()->get(column)->foldUnfold();
 		  update();
 	  }
 	  // sound column

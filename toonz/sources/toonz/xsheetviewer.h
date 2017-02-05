@@ -14,8 +14,7 @@
 #include "cellkeyframeselection.h"
 #include "saveloadqsettings.h"
 #include "toonzqt/spreadsheetviewer.h"
-#include "orientation.h"
-#include "sublayers.h"
+#include "toonz/screenmapper.h"
 #include <boost/optional.hpp>
 
 using boost::optional;
@@ -355,9 +354,7 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
 
   Qt::KeyboardModifiers m_qtModifiers;
 
-  const Orientation *m_orientation;
-
-  SubLayers m_subLayers;
+  ScreenMapper *m_screenMapper;
 
 public:
   enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
@@ -441,6 +438,8 @@ public:
   }
 
   //-------
+  ScreenMapper *screenMapper() { return m_screenMapper; }
+
   const Orientation *orientation() const;
   void flipOrientation();
 
@@ -458,12 +457,6 @@ public:
   void drawPredefinedPath(QPainter &p, PredefinedPath which,
                           const CellPosition &pos, optional<QColor> fill,
                           optional<QColor> outline) const;
-
-  //---------
-
-  SubLayers *subLayers() { return &m_subLayers; }
-
-  bool isFolded(TXshColumn *column);
 
   //---------
 
