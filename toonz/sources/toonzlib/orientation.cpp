@@ -67,8 +67,8 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_HEIGHT      = 12;
   const int SOUND_PREVIEW_HEIGHT = 6;
   const int FRAME_HEADER_HEIGHT  = 50;
-  const int PLAY_RANGE_Y         = 0;
-  const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = PLAY_MARKER_SIZE;
+  const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = 0;
+  const int PLAY_RANGE_Y       = ONION_SIZE;
   const int ICON_WIDTH         = 21;
   const int ICON_OFFSET        = ICON_WIDTH + 1;
   const int ICONS_WIDTH        = ICON_OFFSET * 4;  // 88
@@ -497,8 +497,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
       PredefinedRect::ONION_DOT_FIXED,
       QRect(ONION_X + adjustOnion, ONION_Y, ONION_DOT_SIZE, ONION_DOT_SIZE));
   addRect(PredefinedRect::ONION_AREA,
-          QRect(ONION_X, ONION_Y, CELL_WIDTH,
-                FRAME_HEADER_HEIGHT - PLAY_MARKER_SIZE));
+          QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_SIZE));
   addRect(PredefinedRect::ONION_FIXED_DOT_AREA,
           QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_DOT_SIZE));
   addRect(PredefinedRect::ONION_DOT_AREA,
