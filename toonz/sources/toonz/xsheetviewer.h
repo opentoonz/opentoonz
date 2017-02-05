@@ -159,8 +159,9 @@ protected:
 //! Note: some refactoring is needed. XsheetViewer is going to derive from
 //! SpreadsheetViewer.
 
-class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller,
-  public SaveLoadQSettings {
+class XsheetViewer final : public QFrame,
+                           public Spreadsheet::FrameScroller,
+                           public SaveLoadQSettings {
   Q_OBJECT
 
   QColor m_lightLightBgColor;

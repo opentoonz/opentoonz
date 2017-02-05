@@ -160,9 +160,9 @@ const vector<const Orientation *> &Orientations::all() {
 const Orientation *Orientations::byName(const QString &name) {
   vector<const Orientation *> m_all = all();
   for (auto it = m_all.begin(); it != m_all.end(); it++)
-    if ((*it)->name() == name)
-      return *it;
-  throw std::runtime_error((QString("no such orientation: ") + name).toStdString().c_str());
+    if ((*it)->name() == name) return *it;
+  throw std::runtime_error(
+      (QString("no such orientation: ") + name).toStdString().c_str());
 }
 
 /// -------------------------------------------------------------------------------

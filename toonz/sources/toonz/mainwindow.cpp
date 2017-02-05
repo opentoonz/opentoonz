@@ -255,7 +255,8 @@ void Room::save() {
     TPanel *pane = static_cast<TPanel *>(layout->itemAt(i)->widget());
     settings.setValue("name", pane->objectName());
     settings.setValue("geometry", geometries[i]);  // Use passed geometry
-    if (SaveLoadQSettings *persistent = dynamic_cast<SaveLoadQSettings *> (pane->widget()))
+    if (SaveLoadQSettings *persistent =
+            dynamic_cast<SaveLoadQSettings *>(pane->widget()))
       persistent->save(settings);
     if (pane->getViewType() != -1)
       // If panel has different viewtypes, store current one
@@ -305,7 +306,8 @@ void Room::load(const TFilePath &fp) {
       // Allocate panel
       paneObjectName = name.toString();
       pane           = TPanelFactory::createPanel(this, paneObjectName);
-      if (SaveLoadQSettings *persistent = dynamic_cast<SaveLoadQSettings *> (pane->widget()))
+      if (SaveLoadQSettings *persistent =
+              dynamic_cast<SaveLoadQSettings *>(pane->widget()))
         persistent->load(settings);
     }
 

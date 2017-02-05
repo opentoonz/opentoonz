@@ -1388,8 +1388,7 @@ void XsheetViewer::save(QSettings &settings) const {
 }
 void XsheetViewer::load(QSettings &settings) {
   QVariant name = settings.value("orientation");
-  if (!name.canConvert(QVariant::String))
-    return;
+  if (!name.canConvert(QVariant::String)) return;
 
   m_orientation = Orientations::byName(name.toString());
   emit orientationChanged(orientation());

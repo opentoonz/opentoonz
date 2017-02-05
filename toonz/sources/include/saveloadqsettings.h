@@ -12,7 +12,7 @@ class QSettings;
 class SaveLoadQSettings {
 public:
   virtual void save(QSettings &settings) const = 0;
-  virtual void load(QSettings &settings) = 0;
+  virtual void load(QSettings &settings)       = 0;
 };
 
 #endif
