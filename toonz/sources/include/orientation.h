@@ -179,6 +179,7 @@ public:
   virtual bool flipVolume() const         = 0;
 
   virtual QString name() const            = 0;
+  virtual QString caption() const         = 0;
   virtual const Orientation *next() const = 0;
 
   const QRect &rect(PredefinedRect which) const { return _rects.at(which); }
@@ -221,6 +222,8 @@ public:
   static const Orientation *leftToRight();
 
   static const vector<const Orientation *> &all();
+
+  static const Orientation *byName(const QString &name);
 };
 
 #endif

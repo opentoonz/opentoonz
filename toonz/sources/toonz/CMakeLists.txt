@@ -93,6 +93,7 @@ set(MOC_HEADERS
     renumberpopup.h
     reslist.h
     ruler.h
+	../include/saveloadqsettings.h
     savepresetpopup.h
     scanlist.h
     scanpopup.h

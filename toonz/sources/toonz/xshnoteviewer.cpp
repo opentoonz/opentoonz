@@ -617,7 +617,7 @@ void NoteArea::updateButtons() {
 void NoteArea::flipOrientation() { m_viewer->flipOrientation(); }
 
 void NoteArea::onXsheetOrientationChanged(const Orientation *newOrientation) {
-  m_flipOrientationButton->setText(newOrientation->name());
+  m_flipOrientationButton->setText(newOrientation->caption());
   removeLayout();
   createLayout();
 }

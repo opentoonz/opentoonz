@@ -162,7 +162,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("XsheetViewer");
 
-  m_orientation = Orientations::leftToRight();
+  m_orientation = Orientations::topToBottom();
 
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());
@@ -1379,6 +1379,20 @@ QString XsheetViewer::getFrameNumberWithLetters(int frame) {
 void XsheetViewer::setFrameDisplayStyle(FrameDisplayStyle style) {
   m_frameDisplayStyle              = style;
   FrameDisplayStyleInXsheetRowArea = (int)style;
+}
+
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::save(QSettings &settings) const {
+  settings.setValue("orientation", orientation()->name());
+}
+void XsheetViewer::load(QSettings &settings) {
+  QVariant name = settings.value("orientation");
+  if (!name.canConvert(QVariant::String))
+    return;
+
+  m_orientation = Orientations::byName(name.toString());
+  emit orientationChanged(orientation());
 }
 
 //-----------------------------------------------------------------------------

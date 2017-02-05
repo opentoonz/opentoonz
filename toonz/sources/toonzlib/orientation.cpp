@@ -49,7 +49,8 @@ public:
 
   virtual CellPosition arrowShift(int direction) const override;
 
-  virtual QString name() const override { return "Xsheet"; }
+  virtual QString name() const override { return "TopToBottom"; }
+  virtual QString caption() const override { return "Xsheet"; }
   virtual const Orientation *next() const override {
     return Orientations::leftToRight();
   }
@@ -97,7 +98,8 @@ public:
 
   virtual CellPosition arrowShift(int direction) const override;
 
-  virtual QString name() const override { return "Timeline"; }
+  virtual QString name() const override { return "LeftToRight"; }
+  virtual QString caption() const override { return "Timeline"; }
   virtual const Orientation *next() const override {
     return Orientations::topToBottom();
   }
@@ -154,6 +156,13 @@ const Orientation *Orientations::leftToRight() {
 }
 const vector<const Orientation *> &Orientations::all() {
   return instance()._all;
+}
+const Orientation *Orientations::byName(const QString &name) {
+  vector<const Orientation *> m_all = all();
+  for (auto it = m_all.begin(); it != m_all.end(); it++)
+    if ((*it)->name() == name)
+      return *it;
+  throw std::runtime_error((QString("no such orientation: ") + name).toStdString().c_str());
 }
 
 /// -------------------------------------------------------------------------------

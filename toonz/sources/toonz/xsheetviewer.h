@@ -11,6 +11,7 @@
 #include "xshrowviewer.h"
 #include "xshnoteviewer.h"
 #include "cellkeyframeselection.h"
+#include "saveloadqsettings.h"
 #include "toonzqt/spreadsheetviewer.h"
 #include "orientation.h"
 #include <boost/optional.hpp>
@@ -158,7 +159,8 @@ protected:
 //! Note: some refactoring is needed. XsheetViewer is going to derive from
 //! SpreadsheetViewer.
 
-class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
+class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller,
+  public SaveLoadQSettings {
   Q_OBJECT
 
   QColor m_lightLightBgColor;
@@ -681,6 +683,10 @@ public:
 
   void setFrameDisplayStyle(FrameDisplayStyle style);
   FrameDisplayStyle getFrameDisplayStyle() { return m_frameDisplayStyle; }
+
+  // SaveLoadQSettings
+  virtual void save(QSettings &settings) const override;
+  virtual void load(QSettings &settings) override;
 
 protected:
   void scrollToColumn(int col);
