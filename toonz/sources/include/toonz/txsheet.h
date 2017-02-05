@@ -18,6 +18,8 @@
 // STD includes
 #include <set>
 
+#include <QObject>
+
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -88,9 +90,8 @@ insertColumn()
 moveColumn().
 
         You can manage also column visualization in xsheet, using the xsheet
-object \b ColumnFan
+        object \b ColumnFan
         getColumnFan(), and find column icon getColumnIcon().
-
                 cell positions will be identified by a pair of row+column index,
 which is a separate class.
 
@@ -125,7 +126,9 @@ xsheet refers using
         getScene() and setScene().
 */
 
-class DVAPI TXsheet final : public TSmartObject, public TPersist {
+class DVAPI TXsheet final : public QObject, public TSmartObject, public TPersist {
+  Q_OBJECT
+
   PERSIST_DECLARATION(TXsheet)
 
 public:
@@ -517,7 +520,7 @@ in TXsheetImp.
           object allows the user to manage columns visualization in xsheet.
           TXsheet maintains one column fan per each orientation.
   */
-  ColumnFan *getColumnFan(const Orientation *o) const;
+  ColumnFan *getColumnFan() const;
   /*! Returns a pointer to \b ToonzScene contained in \b TXsheetImp, that is the
      scene to
           which the xsheet refers.
@@ -548,6 +551,9 @@ in TXsheetImp.
 
   //! Returns the xsheet content's \a camstand bbox at the specified row.
   TRectD getBBox(int row) const;
+
+signals:
+  void columnFanFoldedUnfolded(const ColumnFan *fan);
 
 protected:
   bool checkCircularReferences(TXsheet *childCandidate);

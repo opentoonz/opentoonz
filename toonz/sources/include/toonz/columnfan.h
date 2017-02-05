@@ -86,7 +86,7 @@ of column identified by \b col.
 */
   int colToLayerAxis(int col) const;
 
-  void copyFoldedStateFrom(const ColumnFan &from);
+  void copyFoldedStateFrom(const ColumnFan *from);
 
   bool isEmpty() const;
 

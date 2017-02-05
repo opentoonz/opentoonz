@@ -48,3 +48,9 @@ int ScreenMapper::columnToLayerAxis(int layer) const {
 int ScreenMapper::rowToFrameAxis(int frame) const {
   return orientation()->rowToFrameAxis(frame);
 }
+
+//----------------------------------------------------------------------------------
+
+void ScreenMapper::onColumnFanFoldedUnfolded(const ColumnFan *origin) const {
+  m_columnFan->copyFoldedStateFrom(origin);
+}

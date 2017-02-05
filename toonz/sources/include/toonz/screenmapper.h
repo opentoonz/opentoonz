@@ -52,6 +52,10 @@ public:
   QPainterPath path(PredefinedPath which) const { return orientation()->path(which); }
   QPoint point(PredefinedPoint which) const { return orientation()->point(which); }
   NumberRange range(PredefinedRange which) const { return orientation()->range(which); }
+
+  // column fan
+
+  void onColumnFanFoldedUnfolded(const ColumnFan *origin) const;
 };
 
 #endif

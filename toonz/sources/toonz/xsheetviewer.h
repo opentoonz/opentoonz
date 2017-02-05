@@ -722,6 +722,7 @@ signals:
 
 public slots:
   void onSceneSwitched();
+  void onXsheetSwitched();
   void onXsheetChanged();
   void onCurrentFrameSwitched();
   void onPlayingStatusChanged();
@@ -744,6 +745,7 @@ public slots:
 
   void onOrientationChanged(const Orientation *newOrientation);
   void onPrepareToScrollOffset(const QPoint &offset);
+  void onColumnFanFoldedUnfolded(const ColumnFan *fan);
 };
 
 #endif  // XSHEETVIEWER_H

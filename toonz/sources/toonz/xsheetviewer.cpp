@@ -634,11 +634,10 @@ QPoint XsheetViewer::positionToXY(const CellPosition &pos) const {
 }
 
 int XsheetViewer::columnToLayerAxis(int layer) const {
-  const Orientation *o = orientation();
-  return o->colToLayerAxis(layer, getXsheet()->getColumnFan(o));
+  return screenMapper()->columnToLayerAxis(layer);
 }
 int XsheetViewer::rowToFrameAxis(int frame) const {
-  return orientation()->rowToFrameAxis(frame);
+  return screenMapper()->rowToFrameAxis(frame);
 }
 
 //-----------------------------------------------------------------------------
@@ -780,13 +779,15 @@ void XsheetViewer::showEvent(QShowEvent *) {
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
   ret = ret && connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-                       SLOT(updateAllAree()));
-  ret = ret && connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-                       SLOT(resetXsheetNotes()));
+    SLOT(onXsheetSwitched()));
   ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
                        SLOT(onXsheetChanged()));
   ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
                        SLOT(changeWindowTitle()));
+
+  TXsheet *xsheet = xsheetHandle->getXsheet();
+  ret = ret && connect(xsheet, &TXsheet::columnFanFoldedUnfolded, this,
+    &XsheetViewer::onColumnFanFoldedUnfolded);
 
   ret = ret &&
         connect(app->getCurrentSelection(),
@@ -834,11 +835,15 @@ void XsheetViewer::hideEvent(QHideEvent *) {
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
   disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-             SLOT(updateAllAree()));
+    SLOT(onXsheetSwitched()));
   disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
              SLOT(onXsheetChanged()));
   disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
              SLOT(changeWindowTitle()));
+
+  TXsheet *xsheet = xsheetHandle->getXsheet();
+  disconnect(xsheet, &TXsheet::columnFanFoldedUnfolded, this,
+    &XsheetViewer::onColumnFanFoldedUnfolded);
 
   disconnect(app->getCurrentSelection(),
              SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
@@ -1069,6 +1074,14 @@ void XsheetViewer::onSceneSwitched() {
   updateAllAree();
   clearNoteWidgets();
   m_noteArea->updateButtons();
+}
+
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::onXsheetSwitched() {
+  updateAllAree();
+  resetXsheetNotes();
+  onColumnFanFoldedUnfolded(getXsheet()->getColumnFan());
 }
 
 //-----------------------------------------------------------------------------
@@ -1444,6 +1457,12 @@ QString XsheetViewer::getFrameNumberWithLetters(int frame) {
 void XsheetViewer::setFrameDisplayStyle(FrameDisplayStyle style) {
   m_frameDisplayStyle              = style;
   FrameDisplayStyleInXsheetRowArea = (int)style;
+}
+
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::onColumnFanFoldedUnfolded (const ColumnFan *fan) {
+  screenMapper()->onColumnFanFoldedUnfolded(fan);
 }
 
 //-----------------------------------------------------------------------------
