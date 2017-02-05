@@ -552,6 +552,8 @@ in TXsheetImp.
   //! Returns the xsheet content's \a camstand bbox at the specified row.
   TRectD getBBox(int row) const;
 
+  void notifyColumnFanFoldedUnfolded();
+
 signals:
   void columnFanFoldedUnfolded(const ColumnFan *fan);
 

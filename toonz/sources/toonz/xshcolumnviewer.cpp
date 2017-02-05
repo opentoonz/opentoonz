@@ -1093,7 +1093,9 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
 	  const Orientation *o = mapper->orientation();
 
 	  int layerAxis = mapper->columnToLayerAxis(col);
-	  QRect columnHeader = { mapper->rect(PredefinedRect::LAYER_HEADER) };
+//??? old:	  QRect columnHeader = { mapper->rect(PredefinedRect::LAYER_HEADER) };
+	  QPoint xy = { mapper->positionToXY(CellPosition(0, col)) };
+	  QRect columnHeader = { mapper->rect(PredefinedRect::LAYER_HEADER).translated(xy) };
 	  NumberRange frameAxis = { o->frameSide(columnHeader) };
 
 	  p.fillRect(columnHeader, m_viewer->getDarkBGColor());
@@ -1671,10 +1673,10 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     // when clicking the column fan
     else if (m_col >= 0 && !fan->isActive(m_col))  // column Fan
     {
-      fan = m_viewer->screenMapper()->columnFan();
+      fan = xsh->getColumnFan();
       for (int i = m_col; i >= 0 && !fan->isActive(i); i--) fan->activate(i);
 
-      emit xsh->columnFanFoldedUnfolded(fan);
+      xsh->notifyColumnFanFoldedUnfolded();
       TApp::instance()->getCurrentScene()->setDirtyFlag(true);
       TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
       return;

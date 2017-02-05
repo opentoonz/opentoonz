@@ -1198,7 +1198,7 @@ void TXsheet::loadData(TIStream &is) {
       fxSet.loadData(is);
     } else if (tagName == "columnFan") {
       m_imp->m_columnFan.loadData(is);
-      emit columnFanFoldedUnfolded(&m_imp->m_columnFan);
+      notifyColumnFanFoldedUnfolded();
     } else if (tagName == "noteSet") {
       m_notes->loadData(is);
     } else {
@@ -1588,4 +1588,10 @@ bool TXsheet::isRectEmpty(const CellPosition &pos0,
     for (int layer = pos0.layer(); layer <= pos1.layer(); layer++)
       if (!getCell(CellPosition(frame, layer)).isEmpty()) return false;
   return true;
+}
+
+//-----------------------------------------------------------------------
+
+void TXsheet::notifyColumnFanFoldedUnfolded() {
+  emit columnFanFoldedUnfolded(getColumnFan());
 }
