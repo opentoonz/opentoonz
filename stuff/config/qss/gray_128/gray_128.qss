@@ -1106,6 +1106,9 @@ QDialog #dialogButtonFrame {
 #GearButton {
   qproperty-icon: url("imgs/gear.png");
 }
+#SubfolderButton {
+  qproperty-icon: url("imgs/subfolder.png");
+}
 #StartupLabel {
   padding: 3px;
 }

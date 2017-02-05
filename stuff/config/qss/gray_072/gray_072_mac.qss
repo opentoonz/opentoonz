@@ -12,6 +12,9 @@ QWidget {
   color: #e6e6e6;
   background-color: #484848;
 }
+QWidget:disabled {
+  color: #808080;
+}
 QFrame {
   margin: 0px;
   border: 0px;
@@ -362,6 +365,10 @@ QGroupBox::title {
   left: 15px;
   margin: -2px 0 0 0;
   padding: 0 3px;
+}
+QGroupBox:disabled {
+  color: #202020;
+  border-color: #808080;
 }
 QSplitter::handle {
   background-color: #888888;
@@ -1370,6 +1377,9 @@ QDialog #dialogButtonFrame {
 }
 #GearButton {
   qproperty-icon: url("imgs/gear.png");
+}
+#SubfolderButton {
+  qproperty-icon: url("imgs/subfolder.png");
 }
 #StartupLabel {
   padding: 3px;

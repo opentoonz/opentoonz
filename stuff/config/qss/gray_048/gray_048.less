@@ -91,7 +91,10 @@
 
 QWidget {
 	color: @m_baseTxtColor;
-	.baseBG;
+	.baseBG;	
+	&:disabled{
+		color: @m_disabledTxtColor;
+	}
 }
 
 QFrame {
@@ -358,6 +361,10 @@ QGroupBox {
 	}
 	&::indicator {
 		&:extend(QCheckBox::indicator all);
+	}
+	&:disabled{
+		color: @m_base_darkH;
+		border-color: @m_disabledTxtColor;
 	}
 }
 
@@ -1380,6 +1387,10 @@ QDialog #dialogButtonFrame {
 
 #GearButton {
     qproperty-icon: url("@{image_url}/gear.png");
+}
+
+#SubfolderButton {
+    qproperty-icon: url("@{image_url}/subfolder.png");
 }
 
 #StartupLabel {
