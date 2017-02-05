@@ -182,6 +182,8 @@ public:
                         int i) const;
   QLine foldedRectangleLine(int layerAxis, const NumberRange &frameAxis,
                             int i) const;
+  QRect foldedHeader(int layerAxis, NumberRange frameAxis,
+    int i) const;
 
   virtual CellPosition arrowShift(int direction) const = 0;
 

@@ -215,6 +215,15 @@ QLine Orientation::foldedRectangleLine(int layerAxis,
                                        int i) const {
   return verticalLine(layerAxis + i * 3, frameAxis);
 }
+QRect Orientation::foldedHeader(int layerAxis, NumberRange frameAxis,
+  int i) const {
+  if (i == 1) // middle
+    frameAxis = frameAxis.adjusted(3, 0);
+  QPoint topLeft = frameLayerToXY(frameAxis.from(), layerAxis + i * 3);
+  QPoint size = frameLayerToXY(frameAxis.length(), 3);
+  return QRect(topLeft, QSize(size.x(), size.y()));
+}
+
 
 void Orientation::addRect(PredefinedRect which, const QRect &rect) {
   _rects.insert(pair<PredefinedRect, QRect>(which, rect));

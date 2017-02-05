@@ -1050,6 +1050,7 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
   int x0, y0, x, y;
 
   if (o->isVerticalTimeline()) {
+/*??? Old stuff
     x0 = rect.topLeft().x() + 1;
     y0 = 0;
 
@@ -1087,6 +1088,37 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
     p.drawLine(x, y - 1, x, y + 1);
     x++;
     p.drawPoint(x, y);
+*/
+	  const ScreenMapper *mapper = m_viewer->screenMapper();
+	  const Orientation *o = mapper->orientation();
+
+	  int layerAxis = mapper->columnToLayerAxis(col);
+	  QRect columnHeader = { mapper->rect(PredefinedRect::LAYER_HEADER) };
+	  NumberRange frameAxis = { o->frameSide(columnHeader) };
+
+	  p.fillRect(columnHeader, m_viewer->getDarkBGColor());
+	  frameAxis = frameAxis.adjusted(20, 0);
+
+	  p.setPen(m_viewer->getDarkLineColor());
+	  p.setBrush(QBrush(m_viewer->getLightLightBGColor()));
+	  for (int i = 0; i < 3; i++)
+		  p.drawRect(o->foldedHeader(layerAxis, frameAxis, i));
+
+	  // triangles
+	  p.setPen(Qt::black);
+	  layerAxis++;
+	  int f = frameAxis.from() - 6;
+	  p.drawLine(o->verticalLine(layerAxis, NumberRange(f, f)));
+	  layerAxis++;
+	  p.drawLine(o->verticalLine(layerAxis, NumberRange(f - 1, f + 1)));
+	  layerAxis++;
+	  p.drawLine(o->verticalLine(layerAxis, NumberRange(f - 2, f + 2)));
+	  layerAxis += 3;
+	  p.drawLine(o->verticalLine(layerAxis, NumberRange(f - 2, f + 2)));
+	  layerAxis++;
+	  p.drawLine(o->verticalLine(layerAxis, NumberRange(f - 1, f + 1)));
+	  layerAxis++;
+	  p.drawLine(o->verticalLine(layerAxis, NumberRange(f, f)));
   } else {
     x0 = 0;
     y0 = rect.topLeft().y() + 1;
