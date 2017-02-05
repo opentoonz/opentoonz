@@ -13,6 +13,8 @@
 #include "tools/tool.h"
 #include "tools/cursors.h"
 
+#include "tcurves.h"
+
 #include <QCoreApplication>
 #include <QRadialGradient>
 
@@ -213,6 +215,29 @@ protected:
                        bool horizontal, bool isDecimal);
   static void drawEmptyCircle(TPointD point, int thick, bool isLxEven,
                               bool isLyEven, bool isPencil);
+};
+
+//************************************************************************
+//    Animation Auto-complete declaration
+//    Detects repetitions in strokes within/across frames and predicts
+//    the next stroke(s) accordingly.
+//************************************************************************
+
+typedef std::vector<TThickQuadratic *> Neighbors;
+
+class AnimationAutoComplete {
+public:
+  AnimationAutoComplete() {}
+  ~AnimationAutoComplete() {}
+
+  Neighbors getNeighbors(TThickQuadratic* samplePoint);
+
+private:
+  void generatePoints();
+
+private:
+  int m_spaceVicinityRadius;
+
 };
 
 #endif  // BRUSHTOOL_H
