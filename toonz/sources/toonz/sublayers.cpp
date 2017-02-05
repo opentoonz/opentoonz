@@ -6,6 +6,7 @@
 
 #include "tstroke.h"
 #include "tvectorimage.h"
+#include "..\..\common\tvectorimage\tvectorimageP.h"
 #include "xsheetviewer.h"
 
 class SubLayers::Imp final {
@@ -46,11 +47,12 @@ public:
   virtual QString name() const { return QString::fromStdWString (m_level->getName()); }
 
 protected slots:
-  void updateStrokeAdded(TStroke *stroke);
-  void updateStrokeRemoved(TStroke *stroke);
+  void afterStrokeListChanged();
 private:
   TVectorImageP vectorImage() const;
   SubLayer *build(TStroke *stroke) const;
+
+  bool hasChild(const TStroke *stroke, vector<shared_ptr<SubLayer>>::const_iterator &child) const;
 };
 
 class StrokeSubLayer final : public SubLayer {
@@ -61,6 +63,8 @@ public:
 
   virtual bool hasActivator() const override { return true; }
   virtual QString name() const override { return QString::number(m_stroke->getId ()); }
+
+  bool owns(const TStroke *stroke) const { return m_stroke == stroke; }
 };
 
 //-----------------------------------------------------------------------------
@@ -130,8 +134,7 @@ SimpleLevelSubLayer::SimpleLevelSubLayer(TXshSimpleLevelP level)
   for (int i = 0; i < image->getStrokeCount(); i++)
     m_children.push_back(shared_ptr<StrokeSubLayer> (new StrokeSubLayer(image->getStroke(i))));
 
-  connect(image.getPointer (), &TVectorImage::strokeAdded, this, &SimpleLevelSubLayer::updateStrokeAdded);
-  connect(image.getPointer (), &TVectorImage::strokeRemoved, this, &SimpleLevelSubLayer::updateStrokeRemoved);
+  connect(image.getPointer (), &TVectorImage::strokeListChanged, this, &SimpleLevelSubLayer::afterStrokeListChanged);
 }
 
 bool SimpleLevelSubLayer::hasChildren() const {
@@ -146,16 +149,31 @@ TVectorImageP SimpleLevelSubLayer::vectorImage() const {
   return vectorImage;
 }
 
-void SimpleLevelSubLayer::updateStrokeAdded(TStroke *stroke) {
+void SimpleLevelSubLayer::afterStrokeListChanged() {
   TVectorImageP image = vectorImage();
-  int index = image->getStrokeIndex(stroke);
-  
-  vector<shared_ptr<SubLayer>>::iterator it;
-  for (it = m_children.begin(); index >= 0 && it < m_children.end(); it++, index--);
-  m_children.insert(it, shared_ptr<SubLayer> (build (stroke)));
+  vector<shared_ptr<SubLayer>> newList;
+
+  QMutexLocker sl(image->getMutex ());
+
+  for (UINT i = 0; i < image->getStrokeCount(); i++) {
+    VIStroke *stroke = image->getVIStroke(i);
+
+    vector<shared_ptr<SubLayer>>::const_iterator child;
+    if (hasChild(stroke->m_s, child))
+      newList.push_back(*child);
+    else
+      newList.push_back(shared_ptr<SubLayer> (build(stroke->m_s)));
+  }
+  m_children = newList;
 }
 
-void SimpleLevelSubLayer::updateStrokeRemoved(TStroke *stroke) {
+bool SimpleLevelSubLayer::hasChild(const TStroke *stroke, vector<shared_ptr<SubLayer>>::const_iterator &child) const {
+  for (child = m_children.begin(); child != m_children.end(); child++) {
+    StrokeSubLayer *subLayer = dynamic_cast<StrokeSubLayer *> (child->get());
+    if (subLayer->owns(stroke))
+      return true;
+  }
+  return false;
 }
 
 SubLayer *SimpleLevelSubLayer::build(TStroke *stroke) const {

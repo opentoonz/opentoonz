@@ -398,8 +398,7 @@ existing stroke. this method is used for undoing removeEndpoints . */
 #endif
 
 signals:
-  void strokeAdded(TStroke *stroke);
-  void strokeRemoved(TStroke *stroke);
+  void strokeListChanged(); // strokes added or removed
 
 private:  // not implemented
   TVectorImage(const TVectorImage &);

@@ -171,10 +171,9 @@ int TVectorImage::addStroke(TStroke *stroke, bool discardPoints) {
   else
     gid = m_imp->m_strokes.back()->m_groupId;
 
-  VIStroke *added = new VIStroke(stroke, gid);
-  m_imp->m_strokes.push_back(added);
+  m_imp->m_strokes.push_back(new VIStroke(stroke, gid));
   m_imp->m_areValidRegions = false;
-  emit strokeAdded(added->m_s);
+  emit strokeListChanged();
   return m_imp->m_strokes.size() - 1;
 }
 
@@ -292,6 +291,7 @@ TStroke *TVectorImage::Imp::removeStroke(int index, bool doComputeRegions) {
     if (doComputeRegions) computeRegions();
   }
 
+  emit m_vi->strokeListChanged();
   return stroke->m_s;
 }
 
@@ -325,6 +325,7 @@ void TVectorImage::Imp::removeStrokes(const std::vector<int> &toBeRemoved,
     else
       m_areValidRegions = false;
   }
+  emit m_vi->strokeListChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -1112,6 +1113,7 @@ void TVectorImage::Imp::notifyChangedStrokes(
 #ifdef _DEBUG
   checkIntersections();
 #endif
+  emit m_vi->strokeListChanged();
 }
 
 //-----------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 set(MOC_HEADERS
     ../include/tundo.h
     ../include/tthread.h
-    ../include/tvectorimage.h
     ../common/tcore/tthreadp.h
+    ../include/tvectorimage.h
     ../include/tipcsrv.h
     ../include/tipcsrvP.h
     ../include/tmsgcore.h

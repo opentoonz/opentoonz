@@ -3188,7 +3188,7 @@ void TVectorImage::Imp::insertStrokeAt(VIStroke *vs, int strokeIndex,
 
   vs->m_isNewForFill = true;
   m_strokes.insert(it, vs);
-  emit m_vi->strokeAdded(vs->m_s);
+  emit m_vi->strokeListChanged();
 
   if (!m_computedAlmostOnce) return;
 
