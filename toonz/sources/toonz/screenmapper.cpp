@@ -52,5 +52,9 @@ int ScreenMapper::rowToFrameAxis(int frame) const {
 //----------------------------------------------------------------------------------
 
 void ScreenMapper::onColumnFanFoldedUnfolded(const ColumnFan *origin) const {
-  m_columnFan->copyFoldedStateFrom(origin);
+  updateColumnFan();
+}
+
+void ScreenMapper::updateColumnFan() const {
+  m_columnFan->updateExtras(xsheet()->getColumnFan(), subLayers()->childrenDimensions());
 }

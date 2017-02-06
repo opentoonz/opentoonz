@@ -1733,7 +1733,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       }
 	  else if (o->rect(PredefinedRect::FOLD_UNFOLD_AREA).contains(mouseInCell) &&
 		  event->button() == Qt::LeftButton) {
-		  m_viewer->screenMapper()->subLayers()->get(column)->foldUnfold();
+		  m_viewer->screenMapper()->subLayers()->foldUnfold(column);
 		  update();
 	  }
 	  // sound column

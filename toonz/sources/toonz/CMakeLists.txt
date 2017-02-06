@@ -160,7 +160,7 @@ set(MOC_HEADERS
 set(HEADERS ${MOC_HEADERS}
 	../include/cellposition.h
 	../include/orientation.h
-	screenmapper.h)
+	../include/toonz/screenmapper.h)
 
 set(SOURCES
     floatingpanelcommand.cpp

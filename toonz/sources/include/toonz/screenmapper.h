@@ -30,6 +30,7 @@ public:
   ScreenMapper(XsheetViewer *viewer);
   ~ScreenMapper();
 
+  XsheetViewer *viewer() const { return m_viewer; }
   TXsheet *xsheet() const;
   int getCurrentFrame() const;
 
@@ -57,6 +58,7 @@ public:
   // column fan
 
   void onColumnFanFoldedUnfolded(const ColumnFan *origin) const;
+  void updateColumnFan() const;
 };
 
 #endif

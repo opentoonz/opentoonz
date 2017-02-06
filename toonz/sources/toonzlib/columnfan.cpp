@@ -1,5 +1,3 @@
-
-
 #include "toonz/columnfan.h"
 
 // TnzCore includes
@@ -7,6 +5,8 @@
 
 // STD includss
 #include <assert.h>
+
+using std::vector;
 
 //=============================================================================
 // ColumnFanFoldData
@@ -69,6 +69,13 @@ namespace {
   const int FOLDED_SIZE = 9;
 }
 
+int ColumnFanGeometry::Column::width(int unfolded) const {
+  if (m_active)
+    return unfolded + m_extra;
+  else
+    return FOLDED_SIZE;
+}
+
 ColumnFanGeometry::ColumnFanGeometry() : m_firstFreePos(0), m_unfolded(74) {}
 
 //-----------------------------------------------------------------------------
@@ -82,11 +89,13 @@ void ColumnFanGeometry::setDimension(int unfolded) {
 //-----------------------------------------------------------------------------
 
 void ColumnFanGeometry::update() {
-  int lastPos     = -m_unfolded;
-  bool lastActive = true;
-  int m           = m_columns.size();
+//???  int lastPos     = -m_unfolded;
+//???  bool lastActive = true;
+  int from = 0, to;
+  int m = m_columns.size();
   int i;
   for (i = 0; i < m; i++) {
+/*???
     bool active = m_columns[i].m_active;
     if (lastActive)
       lastPos += m_unfolded;
@@ -94,12 +103,21 @@ void ColumnFanGeometry::update() {
       lastPos += FOLDED_SIZE;
     m_columns[i].m_pos = lastPos;
     lastActive         = active;
+*/
+    m_columns[i].m_pos = from;
+    to = from + m_columns[i].width(m_unfolded);
+    if (m_columns[i].m_active) // advance if this is unfolded
+      from = to;
+    else if (i + 1 >= m || m_columns[i + 1].m_active) // or next is unfolded
+      from = to;
   }
-  m_firstFreePos = lastPos + (lastActive ? m_unfolded : FOLDED_SIZE);
+  m_firstFreePos = from;
+
   m_table.clear();
   for (i = 0; i < m; i++)
     if (m_columns[i].m_active)
-      m_table[m_columns[i].m_pos + m_unfolded - 1] = i;
+//???      m_table[m_columns[i].m_pos + m_unfolded - 1] = i;
+      m_table[m_columns[i].m_pos + m_columns[i].width(m_unfolded) - 1] = i;
     else if (i + 1 < m && m_columns[i + 1].m_active)
       m_table[m_columns[i + 1].m_pos - 1] = i;
     else if (i + 1 == m)
@@ -169,7 +187,7 @@ bool ColumnFanGeometry::isActive(int col) const {
 
 //-----------------------------------------------------------------------------
 
-void ColumnFanGeometry::copyFoldedStateFrom(const ColumnFan &from) {
+void ColumnFanGeometry::updateExtras(const ColumnFan *from, const vector<int> &extras) {
 /* ???
   for (int i = 0, n = (int)from.m_columns.size(); i < n; i++)
     if (!from.isActive(i)) deactivate(i);
@@ -178,8 +196,14 @@ void ColumnFanGeometry::copyFoldedStateFrom(const ColumnFan &from) {
   update();
 */
   m_columns.clear();
+/*???
   for (int i = 0; i < from->count(); i++)
-	  m_columns.push_back(Column(from->isActive(i)));
+  m_columns.push_back(Column(from->isActive(i)));
+*/
+  for (int i = 0; i < extras.size(); i++) {
+    Column add(from->isActive(i), extras[i]);
+    m_columns.push_back(add);
+  }
   update();
 }
 

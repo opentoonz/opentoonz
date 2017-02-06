@@ -17,6 +17,8 @@ using std::map;
 using std::shared_ptr;
 using std::vector;
 
+class TXshSimpleLevel;
+
 class ScreenMapper;
 
 class SubLayer;
@@ -27,16 +29,26 @@ class SubLayer;
 //! Each node in the tree is called SubLayer.
 
 class SubLayers final {
-  class Imp;
-  Imp *imp;
+  typedef TXshSimpleLevel Level;
+
+  ScreenMapper *m_mapper;
+  map<Level *, shared_ptr<SubLayer>> m_items;
 
 public:
 
-  SubLayers(ScreenMapper *mapper);
-  ~SubLayers();
+  SubLayers(ScreenMapper *mapper): m_mapper(mapper) { }
+  ~SubLayers() { }
 
   shared_ptr<SubLayer> get(const CellPosition &pos);
   shared_ptr<SubLayer> get(const TXshColumn *column);
+
+  void foldUnfold(const TXshColumn *column);
+
+  vector<int> childrenDimensions();
+
+private:
+  Level *findLevel(const CellPosition &pos);
+  SubLayer *build(Level *level) const;
 };
 
 //! Basically, a tree node.
@@ -62,6 +74,10 @@ public:
   virtual bool hasActivator() const { return false; }
   virtual QString name() const { return ""; }
 
+  int ownDimension() const;
+  virtual int childrenDimension() const;
+
+protected:
   vector<shared_ptr<SubLayer>> children() const { return m_children; }
 
 private:

@@ -1463,6 +1463,7 @@ void XsheetViewer::setFrameDisplayStyle(FrameDisplayStyle style) {
 
 void XsheetViewer::onColumnFanFoldedUnfolded (const ColumnFan *fan) {
   screenMapper()->onColumnFanFoldedUnfolded(fan);
+  updateCellColumnAree();
 }
 
 //-----------------------------------------------------------------------------

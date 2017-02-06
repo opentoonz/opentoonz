@@ -9,24 +9,7 @@
 #include "tstroke.h"
 #include "tvectorimage.h"
 #include "../../common/tvectorimage/tvectorimageP.h"
-
-class SubLayers::Imp final {
-  typedef TXshSimpleLevel Level;
-
-  ScreenMapper *m_mapper;
-  map<Level *, shared_ptr<SubLayer>> m_items;
-
-public:
-  Imp(ScreenMapper *mapper);
-  ~Imp() { }
-
-  shared_ptr<SubLayer> get(const CellPosition &pos);
-  shared_ptr<SubLayer> get(const TXshColumn *column);
-
-private:
-  Level *findLevel(const CellPosition &pos);
-  SubLayer *build(Level *level) const;
-};
+#include "xsheetviewer.h"
 
 // sub layer indicating that there is no sub layer
 // special case pattern
@@ -56,6 +39,7 @@ private:
   bool hasChild(const TStroke *stroke, vector<shared_ptr<SubLayer>>::const_iterator &child) const;
 };
 
+// SubLayer representing a single stroke
 class StrokeSubLayer final : public SubLayer {
   TStroke *m_stroke; // weak pointer - don't own
 
@@ -69,33 +53,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// SubLayers
 
-//-----------------------------------------------------------------------------
-
-SubLayers::SubLayers(ScreenMapper *mapper): imp (nullptr) {
-  imp = new Imp(mapper);
-}
-
-SubLayers::~SubLayers() {
-  delete imp;
-}
-
-shared_ptr<SubLayer> SubLayers::get(const CellPosition &pos) {
-  return imp->get(pos);
-}
 shared_ptr<SubLayer> SubLayers::get(const TXshColumn *column) {
-  return imp->get(column);
-}
-
-//-----------------------------------------------------------------------------
-
-SubLayers::Imp::Imp(ScreenMapper *mapper): m_mapper (mapper) {
-}
-
-shared_ptr<SubLayer> SubLayers::Imp::get(const TXshColumn *column) {
+  if (!column)
+    return shared_ptr<SubLayer>(new EmptySubLayer());
   return get(CellPosition(m_mapper->getCurrentFrame (), column->getIndex ()));
 }
-shared_ptr<SubLayer> SubLayers::Imp::get(const CellPosition &pos) {
+shared_ptr<SubLayer> SubLayers::get(const CellPosition &pos) {
   Level *level = findLevel(pos);
   if (!level)
     return shared_ptr<SubLayer>(new EmptySubLayer());
@@ -109,7 +74,7 @@ shared_ptr<SubLayer> SubLayers::Imp::get(const CellPosition &pos) {
   return newItem;
 }
 
-SubLayers::Imp::Level *SubLayers::Imp::findLevel(const CellPosition &pos) {
+SubLayers::Level *SubLayers::findLevel(const CellPosition &pos) {
   if (pos.layer() < 0)
     return nullptr;
   TXshColumn *column = m_mapper->xsheet ()->getColumn(pos.layer());
@@ -122,8 +87,50 @@ SubLayers::Imp::Level *SubLayers::Imp::findLevel(const CellPosition &pos) {
   return cell.getSimpleLevel();
 }
 
-SubLayer *SubLayers::Imp::build(Level *level) const {
+SubLayer *SubLayers::build(Level *level) const {
   return new SimpleLevelSubLayer(level);
+}
+
+//-----------------------------------------------------------------------------
+
+vector<int> SubLayers::childrenDimensions() {
+  vector<int> result;
+  TXsheet *xsheet = m_mapper->xsheet();
+  ColumnFan *fan = xsheet->getColumnFan();
+  int count = xsheet->getColumnCount();
+
+  for (int i = 0; i < count; i++) {
+    const TXshColumn *column = xsheet->getColumn(i);
+    shared_ptr<SubLayer> subLayer = get(column);
+    result.push_back(subLayer->childrenDimension());
+  }
+  return result;
+}
+
+void SubLayers::foldUnfold(const TXshColumn *column) {
+  shared_ptr<SubLayer> subLayer = get(column);
+  subLayer->foldUnfold();
+  m_mapper->updateColumnFan();
+}
+
+//-----------------------------------------------------------------------------
+// SubLayer
+
+namespace {
+  const int SUBLAYER_SIZE = 20;
+}
+
+int SubLayer::ownDimension() const {
+  return SUBLAYER_SIZE;
+}
+
+int SubLayer::childrenDimension() const {
+  if (isFolded())
+    return 0;
+  int sum = 0;
+  for (shared_ptr<SubLayer> child : children())
+    sum += child->ownDimension() + child->childrenDimension();
+  return sum;
 }
 
 //-----------------------------------------------------------------------------

@@ -5,6 +5,8 @@
 
 #include "tcommon.h"
 
+#include <vector>
+
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -69,16 +71,20 @@ colToLayerAxis() and vice versa, layerAxisToCol().
 */
 class DVAPI ColumnFanGeometry : public ColumnFan {
   class Column {
+    int m_extra; //! extra width added when the layer is unfolded
   public:
     bool m_active;
     int m_pos;
-    Column() : m_active(true), m_pos(0) {}
-    Column(bool active) : m_active(active), m_pos(0) { }
+
+    Column() : m_active(true), m_pos(0), m_extra (0) {}
+    Column(bool active, int extra) : m_active(active), m_pos(0), m_extra (extra) { }
+
+    int width(int unfolded) const;
   };
   std::vector<Column> m_columns;
   std::map<int, int> m_table;
   int m_firstFreePos;
-  int m_unfolded, m_folded;
+  int m_unfolded;
 
   /*!
   Called by activate() and deactivate() to update columns coordinates.
@@ -88,7 +94,7 @@ public:
 
   ColumnFanGeometry();
 
-  void copyFoldedStateFrom(const ColumnFan *from);
+  void updateExtras(const ColumnFan *from, const std::vector<int> &extras);
 
   virtual void activate(int col) override;
   virtual void deactivate(int col) override;
