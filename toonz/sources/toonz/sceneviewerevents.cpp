@@ -902,9 +902,9 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (!ret) {
     TFrameHandle *fh = TApp::instance()->getCurrentFrame();
 
-    if (key == TwConsts::TK_UpArrow)
+    if (key == TwConsts::TK_UpArrow || key == TwConsts::TK_LeftArrow)
       fh->prevFrame();
-    else if (key == TwConsts::TK_DownArrow)
+    else if (key == TwConsts::TK_DownArrow || key == TwConsts::TK_RightArrow)
       fh->nextFrame();
     else if (key == TwConsts::TK_Home)
       fh->firstFrame();

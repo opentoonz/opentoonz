@@ -1091,7 +1091,10 @@ void XsheetViewer::scrollToHorizontalRange(int x0, int x1) {
     scroll(QPoint(deltaX, 0));
     return;
   }
-  updateCellColumnAree();
+  if (orientation()->isVerticalTimeline())
+    updateCellColumnAree();
+  else
+    updateCellRowAree();
 }
 
 //-----------------------------------------------------------------------------
@@ -1133,8 +1136,10 @@ void XsheetViewer::scrollToVerticalRange(int y0, int y1) {
       return;
     }
   }
-  m_rowArea->update(m_rowArea->visibleRegion());
-  m_cellArea->update(m_cellArea->visibleRegion());
+  if (orientation()->isVerticalTimeline())
+    updateCellRowAree();
+  else
+    updateCellColumnAree();
 }
 
 //-----------------------------------------------------------------------------
