@@ -49,6 +49,13 @@ int ScreenMapper::rowToFrameAxis(int frame) const {
   return orientation()->rowToFrameAxis(frame);
 }
 
+NumberRange ScreenMapper::rowsToFrameAxis(const NumberRange &frames) const {
+  return NumberRange(rowToFrameAxis(frames.from()), rowToFrameAxis(frames.to()));
+}
+NumberRange ScreenMapper::colsToLayerAxis(const NumberRange &layers) const {
+  return NumberRange(columnToLayerAxis(layers.from()), columnToLayerAxis(layers.to()));
+}
+
 //----------------------------------------------------------------------------------
 
 void ScreenMapper::onColumnFanFoldedUnfolded(const ColumnFan *origin) const {

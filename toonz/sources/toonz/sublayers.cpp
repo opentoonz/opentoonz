@@ -74,7 +74,7 @@ shared_ptr<SubLayer> SubLayers::get(const CellPosition &pos) {
   return newItem;
 }
 
-SubLayers::Level *SubLayers::findLevel(const CellPosition &pos) {
+SubLayers::Level *SubLayers::findLevel(const CellPosition &pos) const {
   if (pos.layer() < 0)
     return nullptr;
   TXshColumn *column = m_mapper->xsheet ()->getColumn(pos.layer());

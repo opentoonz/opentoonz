@@ -48,6 +48,9 @@ public:
   int columnToLayerAxis(int layer) const;
   int rowToFrameAxis(int frame) const;
 
+  NumberRange rowsToFrameAxis(const NumberRange &frames) const;
+  NumberRange colsToLayerAxis(const NumberRange &layers) const;
+
   QRect rect(PredefinedRect which) const { return orientation()->rect(which); }
   QLine line(PredefinedLine which) const { return orientation()->line(which); }
   int dimension(PredefinedDimension which) const { return orientation()->dimension(which); }

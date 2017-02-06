@@ -47,7 +47,7 @@ public:
   vector<int> childrenDimensions();
 
 private:
-  Level *findLevel(const CellPosition &pos);
+  Level *findLevel(const CellPosition &pos) const;
   SubLayer *build(Level *level) const;
 };
 

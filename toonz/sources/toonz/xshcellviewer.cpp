@@ -945,6 +945,9 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
       p.drawLine(verticalLine);
     }
 
+    if (isColumn && !isSoundColumn && !isPaletteColumn && !isSoundTextColumn)
+      drawSubLayers(p, CellPosition(currentRow, col));
+
     // for each frame
     for (row = r0; row <= r1; row++) {
       // draw horizontal lines
@@ -1438,6 +1441,27 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 #endif
     p.drawText(nameRect, Qt::AlignLeft | Qt::AlignBottom, elidaName);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos) const {
+  const ScreenMapper *mapper = m_viewer->screenMapper();
+  shared_ptr<SubLayer> subLayer = mapper->subLayers()->get(pos);
+
+  TXshColumn *column = mapper->xsheet()->getColumn(pos.layer());
+  int frameFrom, frameTo;
+  if (!column->getLevelRange(pos.frame(), frameFrom, frameTo)) // empty cell
+    return;
+  NumberRange frames (frameFrom, frameTo + 1);
+  NumberRange frameAxis = mapper->rowsToFrameAxis(frames);
+
+  NumberRange layers(pos.layer(), pos.layer() + 1);
+  int layerOffset = mapper->dimension(PredefinedDimension::LAYER);
+  NumberRange layerAxis = mapper->colsToLayerAxis(layers).adjusted(layerOffset, 0);
+  
+  QRect fillRect = mapper->orientation()->frameLayerRect(frameAxis, layerAxis);
+  p.fillRect(fillRect, QBrush(m_viewer->getSubLayerColor()));
 }
 
 //-----------------------------------------------------------------------------

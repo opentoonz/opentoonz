@@ -77,6 +77,8 @@ class CellArea final : public QWidget {
   void drawSelectionBackground(QPainter &p) const;
   void drawExtenderHandles(QPainter &p);
 
+  void drawSubLayers(QPainter &p, const CellPosition &pos) const;
+
   void drawDragHandle(QPainter &p, const QPoint &xy,
                       const QColor &sideColor) const;
   void drawEndOfDragHandle(QPainter &p, bool isEnd, const QPoint &xy,
