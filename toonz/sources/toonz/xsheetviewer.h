@@ -52,7 +52,12 @@ const QColor SelectedLevelColumnColor(191, 237, 191);
 const QColor VectorColumnColor(212, 212, 133);
 const QColor VectorColumnBorderColor(79, 79, 49);
 const QColor SelectedVectorColumnColor(234, 234, 194);
-const QColor FoldUnfoldButtonColor(0, 194, 211);
+const QColor FoldUnfoldButtonColor(203, 203, 203);
+
+// SubLayers
+const QColor SubLayerColor(0, 194, 211);
+const QColor SubLayerBorderColor(0, 94, 138);
+const QColor SelectedSubLayerColor(0, 240, 255);
 
 // SubXsheet column
 const QColor ChildColumnColor(214, 154, 219);
@@ -227,13 +232,25 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   QColor m_selectedVectorColumnColor;  //(234,234,194)
   QColor m_foldUnfoldButtonColor;      //(0,194,211)
   Q_PROPERTY(QColor VectorColumnColor READ getVectorColumnColor WRITE
-                 setVectorColumnColor)
+    setVectorColumnColor)
   Q_PROPERTY(QColor VectorColumnBorderColor READ getVectorColumnBorderColor
-                 WRITE setVectorColumnBorderColor)
+    WRITE setVectorColumnBorderColor)
   Q_PROPERTY(QColor SelectedVectorColumnColor READ getSelectedVectorColumnColor
-                 WRITE setSelectedVectorColumnColor)
+    WRITE setSelectedVectorColumnColor)
   Q_PROPERTY(QColor FoldUnfoldButtonColor READ getFoldUnfoldButtonColor
-                 WRITE setFoldUnfoldButtonColor)
+    WRITE setFoldUnfoldButtonColor)
+
+  // SubLayers
+  QColor m_subLayerColor; // (0,194,211)
+  QColor m_subLayerBorderColor; // (0,94,138)
+  QColor m_selectedSubLayerColor; // (0,240,255)
+  Q_PROPERTY(QColor SubLayerColor READ getSubLayerColor WRITE
+    setSubLayerColor)
+  Q_PROPERTY(QColor SubLayerBorderColor READ getSubLayerBorderColor
+    WRITE setSubLayerBorderColor)
+  Q_PROPERTY(QColor SelectedSubLayerColor READ getSelectedSubLayerColor
+    WRITE setSelectedSubLayerColor)
+
   // subXsheet column
   QColor m_childColumnColor;          //(214,154,219)
   QColor m_childColumnBorderColor;    //(80,57,82)
@@ -578,6 +595,19 @@ public:
   QColor getFoldUnfoldButtonColor() const {
     return m_foldUnfoldButtonColor;
   }
+  // SubLayers
+  void setSubLayerColor(const QColor &color) {
+    m_subLayerColor = color;
+  }
+  void setSubLayerBorderColor(const QColor &color) {
+    m_subLayerBorderColor = color;
+  }
+  void setSelectedSubLayerColor(const QColor &color) {
+    m_selectedSubLayerColor = color;
+  }
+  QColor getSubLayerColor() const { return m_subLayerColor; }
+  QColor getSubLayerBorderColor() const { return m_subLayerBorderColor; }
+  QColor getSelectedSubLayerColor() const { return m_selectedSubLayerColor; }
   // subXsheet column
   void setChildColumnColor(const QColor &color) { m_childColumnColor = color; }
   void setChildColumnBorderColor(const QColor &color) {
