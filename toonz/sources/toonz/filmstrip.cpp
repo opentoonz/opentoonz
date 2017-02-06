@@ -850,11 +850,17 @@ void FilmstripFrames::keyPressEvent(QKeyEvent *event) {
   level->getFids(fids);
   if (fids.empty()) return;
 
+  TFrameId newId = 0;
+  if (fh->getFrameType() == TFrameHandle::LevelFrame) {
+	  int frameCount = (int)fids.size();
+	  newId = index2fid(frameCount);
+  }
+
   fh->setFrameIds(fids);
   if (event->key() == Qt::Key_Up)
     fh->prevFrame();
   else if (event->key() == Qt::Key_Down)
-    fh->nextFrame();
+    fh->nextFrame(newId);
   else if (event->key() == Qt::Key_Home)
     fh->firstFrame();
   else if (event->key() == Qt::Key_End)

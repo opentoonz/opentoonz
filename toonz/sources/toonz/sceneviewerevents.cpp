@@ -904,8 +904,22 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
 
     if (key == TwConsts::TK_UpArrow)
       fh->prevFrame();
-    else if (key == TwConsts::TK_DownArrow)
-      fh->nextFrame();
+	else if (key == TwConsts::TK_DownArrow) {
+		TFrameId newId = 0;
+		if (fh->getFrameType() == TFrameHandle::LevelFrame) {
+			
+			TXshSimpleLevel *level = TApp::instance()->getCurrentLevel()->getLevel()->getSimpleLevel();
+			if (level) {
+				std::vector<TFrameId> fids;
+				level->getFids(fids);
+				if (!fids.empty()) {
+					int frameCount = (int)fids.size();
+					newId = level->index2fid(frameCount);
+				}
+			}
+		}
+		fh->nextFrame(newId);
+	}
     else if (key == TwConsts::TK_Home)
       fh->firstFrame();
     else if (key == TwConsts::TK_End)
