@@ -9,6 +9,10 @@
 #include <QPoint>
 #include <QColor>
 
+#include <memory>
+
+using std::shared_ptr;
+
 // forward declaration
 class XsheetViewer;
 class TObjectHandle;
@@ -19,6 +23,7 @@ class QComboBox;
 class Orientation;
 class TApp;
 class TXsheet;
+class SubLayer;
 
 //=============================================================================
 namespace XsheetGUI {
@@ -261,6 +266,8 @@ class ColumnArea final : public QWidget {
     void drawVolumeControl(double volume) const;
 
     void drawSubLayers() const;
+    void drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const;
+    void drawSubLayerName(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const;
   };
 
 public:

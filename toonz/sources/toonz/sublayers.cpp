@@ -49,7 +49,7 @@ public:
   StrokeSubLayer(SubLayer *parent, TStroke *stroke): SubLayer(parent), m_stroke(stroke) { }
 
   virtual bool hasActivator() const override { return true; }
-  virtual QString name() const override { return QString::number(m_stroke->getId ()); }
+  virtual QString name() const override { return QString ("Stroke " + QString::number(m_stroke->getId ())); }
 
   bool owns(const TStroke *stroke) const { return m_stroke == stroke; }
 };

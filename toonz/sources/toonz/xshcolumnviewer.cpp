@@ -718,15 +718,18 @@ void ColumnArea::DrawHeader::drawLock() const {
 void ColumnArea::DrawHeader::drawFoldUnfoldButton() const {
   if (col < 0 || isEmpty) return;
   shared_ptr<SubLayer> rootLayer = m_viewer->screenMapper()->subLayers()->get(column);
-  if (!rootLayer->hasChildren()) return;
+  drawSubLayerFoldUnfoldButton(rootLayer, orig);
+}
+void ColumnArea::DrawHeader::drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const {
+  if (!subLayer->hasChildren()) return;
 
   QRect mouseArea = o->rect(PredefinedRect::FOLD_UNFOLD_AREA);
   if (mouseArea.isEmpty())
     return;
 
-  QPoint base = orig + mouseArea.topLeft();
-  QPainterPath triangle = o->path(rootLayer->isFolded() ?
-    PredefinedPath::FOLDED : PredefinedPath::UNFOLDED).translated (base);
+  QPoint offset = base + mouseArea.topLeft();
+  QPainterPath triangle = o->path(subLayer->isFolded() ?
+    PredefinedPath::FOLDED : PredefinedPath::UNFOLDED).translated(offset);
 
   QColor fillColor = m_viewer->getFoldUnfoldButtonColor();
   p.fillPath(triangle, QBrush(fillColor));
@@ -753,6 +756,10 @@ void ColumnArea::DrawHeader::drawColumnNumber() const {
 }
 
 void ColumnArea::DrawHeader::drawColumnName() const {
+  if (column && column->getSoundColumn() &&
+      !o->isVerticalTimeline())  // covered by volume
+    return;
+
   TStageObjectId columnId    = m_viewer->getObjectId(col);
   TStageObject *columnObject = xsh->getStageObject(columnId);
 
@@ -885,6 +892,14 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
              Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QString(parentId.toString().c_str()));
 }
+void ColumnArea::DrawHeader::drawSubLayerName(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const {
+  p.setPen(Qt::black);
+
+  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME)
+    .translated(base).adjusted(2, 0, -2, 0);
+  p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
+    subLayer->name());
+}
 
 void ColumnArea::DrawHeader::drawParentHandleName() const {
   if (col < 0 || isEmpty || !o->isVerticalTimeline() ||
@@ -990,12 +1005,14 @@ void ColumnArea::DrawHeader::drawSubLayers() const {
 
     QPoint layerOffset = baseLayerOffset + subLayerOffset * i;
     QPoint depthOffset = frameOffset * subLayer->depth();
+    QPoint totalOffset = layerOffset + depthOffset;
 
-    QRect rect = { mapper->rect(PredefinedRect::LAYER_HEADER).translated(layerOffset + depthOffset) };
+    QRect rect = { mapper->rect(PredefinedRect::LAYER_HEADER).translated(layerOffset) };
     p.fillRect(rect, QBrush(m_viewer->getSubLayerColor()));
 
-    //drawCollapseExpandButton();
-    //drawName();
+    drawSubLayerFoldUnfoldButton(subLayer, totalOffset);
+    drawSubLayerName(subLayer, totalOffset);
+
     //drawActivator();
   }
 }
