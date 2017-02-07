@@ -125,6 +125,8 @@ enum class PredefinedDimension {
   ONION_TURN,            //! onion handle turn in degrees
   QBOXLAYOUT_DIRECTION,  //! direction of QBoxLayout
   CENTER_ALIGN,          //! horizontal / vertical align
+  SUBLAYER,              //! expanded sublayer width / height
+  SUBLAYER_DEPTH         //! horiz/vert offset with each depth level
 };
 enum class PredefinedPath {
   DRAG_HANDLE_CORNER,   //! triangle corner at drag sidebar

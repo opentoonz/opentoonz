@@ -20,6 +20,7 @@ using std::vector;
 class TXshSimpleLevel;
 
 class ScreenMapper;
+class Orientation;
 
 class SubLayer;
 
@@ -44,7 +45,7 @@ public:
 
   void foldUnfold(const TXshColumn *column);
 
-  vector<int> childrenDimensions();
+  vector<int> childrenDimensions(const Orientation *o);
 
 private:
   Level *findLevel(const CellPosition &pos) const;
@@ -62,10 +63,13 @@ class SubLayer : public QObject {
   Q_OBJECT
 
 protected:
+  //! direct descendants of this node
   vector<shared_ptr<SubLayer>> m_children;
+  //! root has depth 0, its children have depth 1 and so on
+  int m_depth;
 public:
 
-  SubLayer() { }
+  SubLayer(SubLayer *parent);
   virtual ~SubLayer() { }
 
   virtual bool hasChildren() const { return false; }
@@ -74,8 +78,13 @@ public:
   virtual bool hasActivator() const { return false; }
   virtual QString name() const { return ""; }
 
-  int ownDimension() const;
-  virtual int childrenDimension() const;
+  int depth() const { return m_depth; }
+
+  int ownDimension(const Orientation *o) const;
+  virtual int childrenDimension(const Orientation *o) const;
+
+  //! list subnodes reachable by following expanded nodes
+  vector<shared_ptr<SubLayer>> childrenFlatTree() const;
 
 protected:
   vector<shared_ptr<SubLayer>> children() const { return m_children; }

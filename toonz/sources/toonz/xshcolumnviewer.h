@@ -259,6 +259,8 @@ class ColumnArea final : public QWidget {
 
     void drawSoundIcon(bool isPlaying) const;
     void drawVolumeControl(double volume) const;
+
+    void drawSubLayers() const;
   };
 
 public:

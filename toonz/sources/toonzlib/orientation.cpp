@@ -411,6 +411,8 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION,
                QBoxLayout::Direction::TopToBottom);
   addDimension(PredefinedDimension::CENTER_ALIGN, Qt::AlignHCenter);
+  addDimension(PredefinedDimension::SUBLAYER, CELL_HEIGHT);
+  addDimension(PredefinedDimension::SUBLAYER_DEPTH, CELL_HEIGHT);
 
   //
   // Paths
@@ -707,6 +709,8 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION,
                QBoxLayout::Direction::LeftToRight);
   addDimension(PredefinedDimension::CENTER_ALIGN, Qt::AlignVCenter);
+  addDimension(PredefinedDimension::SUBLAYER, CELL_HEIGHT);
+  addDimension(PredefinedDimension::SUBLAYER_DEPTH, ICON_OFFSET);
 
   //
   // Paths

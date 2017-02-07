@@ -56,6 +56,10 @@ NumberRange ScreenMapper::colsToLayerAxis(const NumberRange &layers) const {
   return NumberRange(columnToLayerAxis(layers.from()), columnToLayerAxis(layers.to()));
 }
 
+QPoint ScreenMapper::frameLayerToXY(int frameAxis, int layerAxis) const {
+  return orientation()->frameLayerToXY(frameAxis, layerAxis);
+}
+
 //----------------------------------------------------------------------------------
 
 void ScreenMapper::onColumnFanFoldedUnfolded(const ColumnFan *origin) const {
@@ -63,5 +67,6 @@ void ScreenMapper::onColumnFanFoldedUnfolded(const ColumnFan *origin) const {
 }
 
 void ScreenMapper::updateColumnFan() const {
-  m_columnFan->updateExtras(xsheet()->getColumnFan(), subLayers()->childrenDimensions());
+  m_columnFan->updateExtras(xsheet()->getColumnFan(), 
+    subLayers()->childrenDimensions(orientation()));
 }

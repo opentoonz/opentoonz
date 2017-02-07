@@ -14,6 +14,8 @@
 // sub layer indicating that there is no sub layer
 // special case pattern
 class EmptySubLayer final : public SubLayer {
+public:
+  EmptySubLayer() : SubLayer(nullptr) { }
 };
 
 // Contains multiple sublayers, each is a TStroke
@@ -34,7 +36,7 @@ protected slots:
   void afterStrokeListChanged();
 private:
   TVectorImageP vectorImage() const;
-  SubLayer *build(TStroke *stroke) const;
+  SubLayer *build(TStroke *stroke);
 
   bool hasChild(const TStroke *stroke, vector<shared_ptr<SubLayer>>::const_iterator &child) const;
 };
@@ -44,7 +46,7 @@ class StrokeSubLayer final : public SubLayer {
   TStroke *m_stroke; // weak pointer - don't own
 
 public:
-  StrokeSubLayer(TStroke *stroke) : m_stroke(stroke) { }
+  StrokeSubLayer(SubLayer *parent, TStroke *stroke): SubLayer(parent), m_stroke(stroke) { }
 
   virtual bool hasActivator() const override { return true; }
   virtual QString name() const override { return QString::number(m_stroke->getId ()); }
@@ -93,7 +95,7 @@ SubLayer *SubLayers::build(Level *level) const {
 
 //-----------------------------------------------------------------------------
 
-vector<int> SubLayers::childrenDimensions() {
+vector<int> SubLayers::childrenDimensions(const Orientation *o) {
   vector<int> result;
   TXsheet *xsheet = m_mapper->xsheet();
   ColumnFan *fan = xsheet->getColumnFan();
@@ -102,7 +104,7 @@ vector<int> SubLayers::childrenDimensions() {
   for (int i = 0; i < count; i++) {
     const TXshColumn *column = xsheet->getColumn(i);
     shared_ptr<SubLayer> subLayer = get(column);
-    result.push_back(subLayer->childrenDimension());
+    result.push_back(subLayer->childrenDimension(o));
   }
   return result;
 }
@@ -116,31 +118,45 @@ void SubLayers::foldUnfold(const TXshColumn *column) {
 //-----------------------------------------------------------------------------
 // SubLayer
 
-namespace {
-  const int SUBLAYER_SIZE = 20;
+SubLayer::SubLayer(SubLayer *parent): m_depth (0) {
+  if (parent)
+    m_depth = parent->depth() + 1;
 }
 
-int SubLayer::ownDimension() const {
-  return SUBLAYER_SIZE;
+int SubLayer::ownDimension(const Orientation *o) const {
+  return o->dimension(PredefinedDimension::SUBLAYER);
 }
 
-int SubLayer::childrenDimension() const {
+int SubLayer::childrenDimension(const Orientation *o) const {
   if (isFolded())
     return 0;
   int sum = 0;
   for (shared_ptr<SubLayer> child : children())
-    sum += child->ownDimension() + child->childrenDimension();
+    sum += child->ownDimension(o) + child->childrenDimension(o);
   return sum;
 }
 
+vector<shared_ptr<SubLayer>> SubLayer::childrenFlatTree() const {
+  vector<shared_ptr<SubLayer>> result;
+  if (isFolded())
+    return result;
+  for (shared_ptr<SubLayer> child : children()) {
+    result.push_back(child);
+    vector<shared_ptr<SubLayer>> descendants = child->childrenFlatTree();
+    result.insert(result.end(), descendants.begin(), descendants.end());
+  }
+  return result;
+}
+
 //-----------------------------------------------------------------------------
+// SimpleLevelSubLayer
 
 SimpleLevelSubLayer::SimpleLevelSubLayer(TXshSimpleLevelP level)
-  : m_level(level), m_folded(true) {
+  : SubLayer(nullptr), m_level(level), m_folded(true) {
   TVectorImageP image = vectorImage();
   
   for (int i = 0; i < image->getStrokeCount(); i++)
-    m_children.push_back(shared_ptr<StrokeSubLayer> (new StrokeSubLayer(image->getStroke(i))));
+    m_children.push_back(shared_ptr<StrokeSubLayer> (new StrokeSubLayer(this, image->getStroke(i))));
 
   connect(image.getPointer (), &TVectorImage::strokeListChanged, this, &SimpleLevelSubLayer::afterStrokeListChanged);
 }
@@ -184,8 +200,8 @@ bool SimpleLevelSubLayer::hasChild(const TStroke *stroke, vector<shared_ptr<SubL
   return false;
 }
 
-SubLayer *SimpleLevelSubLayer::build(TStroke *stroke) const {
-  return new StrokeSubLayer(stroke);
+SubLayer *SimpleLevelSubLayer::build(TStroke *stroke) {
+  return new StrokeSubLayer(this, stroke);
 }
 
 //-----------------------------------------------------------------------------

@@ -977,6 +977,29 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
   p.drawPath(head);
 }
 
+void ColumnArea::DrawHeader::drawSubLayers() const {
+  const ScreenMapper *mapper = m_viewer->screenMapper();
+  vector<shared_ptr<SubLayer>> subLayers =
+    mapper->subLayers()->get(column)->childrenFlatTree();
+
+  QPoint baseLayerOffset = orig + mapper->frameLayerToXY(0, mapper->dimension(PredefinedDimension::LAYER));
+  QPoint subLayerOffset = mapper->frameLayerToXY(0, mapper->dimension(PredefinedDimension::SUBLAYER));
+  QPoint frameOffset = mapper->frameLayerToXY(mapper->dimension(PredefinedDimension::SUBLAYER_DEPTH), 0);
+  for (int i = 0; i < subLayers.size(); i++) {
+    shared_ptr<SubLayer> subLayer = subLayers[i];
+
+    QPoint layerOffset = baseLayerOffset + subLayerOffset * i;
+    QPoint depthOffset = frameOffset * subLayer->depth();
+
+    QRect rect = { mapper->rect(PredefinedRect::LAYER_HEADER).translated(layerOffset + depthOffset) };
+    p.fillRect(rect, QBrush(m_viewer->getSubLayerColor()));
+
+    //drawCollapseExpandButton();
+    //drawName();
+    //drawActivator();
+  }
+}
+
 //=============================================================================
 // ColumnArea
 //-----------------------------------------------------------------------------
@@ -1226,6 +1249,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
   drawHeader.drawFilterColor();
+  drawHeader.drawSubLayers();
 }
 
 //-----------------------------------------------------------------------------
@@ -1413,7 +1437,7 @@ QPixmap ColumnArea::getColumnIcon(int columnIndex) {
 
 //-----------------------------------------------------------------------------
 
-void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
+void ColumnArea::paintEvent(QPaintEvent *event) {
   QRect toBeUpdated = event->rect();
 
   QPainter p(this);
