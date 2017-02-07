@@ -49,7 +49,7 @@ public:
   StrokeSubLayer(SubLayers *subLayers, SubLayer *parent, TStroke *stroke): SubLayer(subLayers, parent), m_stroke(stroke) { }
 
   virtual bool hasActivator() const override { return true; }
-  virtual QString name() const override { return QString ("Stroke " + QString::number(m_stroke->getId ())); }
+  virtual QString name() const override;
 
   bool owns(const TStroke *stroke) const { return m_stroke == stroke; }
 };
@@ -208,3 +208,11 @@ SubLayer *SimpleLevelSubLayer::build(TStroke *stroke) {
 }
 
 //-----------------------------------------------------------------------------
+// StrokeSubLayer
+
+QString StrokeSubLayer::name() const {
+  QString prefix = m_stroke->name();
+  if (prefix.isEmpty())
+    prefix = "Shape";
+  return prefix + " " + QString::number(m_stroke->getId());
+}

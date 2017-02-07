@@ -499,6 +499,10 @@ public:
   // scroll the cell area to make a cell at (row,col) visible
   void scrollTo(int row, int col);
 
+private:
+  void setDefaultColors();
+
+public:
   // QProperty
   void setLightLightBGColor(const QColor &color) {
     m_lightLightBgColor = color;

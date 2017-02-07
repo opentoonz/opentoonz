@@ -899,7 +899,7 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
 void ColumnArea::DrawHeader::drawSubLayerName(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const {
   p.setPen(Qt::black);
 
-  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME)
+  QRect nameRect = o->rect(PredefinedRect::SUBLAYER_NAME)
     .translated(base).adjusted(2, 0, -2, 0);
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
     subLayer->name());

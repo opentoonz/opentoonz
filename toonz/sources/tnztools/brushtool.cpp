@@ -157,6 +157,7 @@ static void split(TStroke *stroke, const std::vector<double> &parameterValues,
 
     // Add new stroke
     TStroke *strokeAdd = new TStroke(points);
+    strokeAdd->setName(stroke->name());
     strokeAdd->setStyle(stroke->getStyle());
     strokeAdd->outlineOptions() = stroke->outlineOptions();
     strokes.push_back(strokeAdd);
@@ -182,6 +183,7 @@ static void split(TStroke *stroke, const std::vector<double> &parameterValues,
 
   assert(points.size() & 1);
   TStroke *strokeAdd = new TStroke(points);
+  strokeAdd->setName(stroke->name());
   strokeAdd->setStyle(stroke->getStyle());
   strokeAdd->outlineOptions() = stroke->outlineOptions();
   strokes.push_back(strokeAdd);
@@ -1326,6 +1328,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     } else {
       flushTrackPoint();
       stroke = m_track.makeStroke(error);
+	  stroke->setName("Brush");
     }
     int points = stroke->getControlPointCount();
 
@@ -1380,6 +1383,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     } else {
       flushTrackPoint();
       stroke = m_track.makeStroke(error);
+	  stroke->setName("Brush");
     }
     stroke->setStyle(m_styleId);
     {

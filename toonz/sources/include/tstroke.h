@@ -369,6 +369,10 @@ Take from \b curves the control points used to create the stroke
   int getId() const;
   void setId(int id);
 
+  //! tells which tool this stroke was created with
+  QString name() const;
+  void setName(const QString &name);
+
   //! Return the average value of stroke thickness
   double getAverageThickness() const;
 

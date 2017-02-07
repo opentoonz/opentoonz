@@ -107,7 +107,8 @@ enum class PredefinedRect {
   FOLD_UNFOLD_AREA,    //! icon to unfold a vector layer
   PEGBAR_NAME,         //! where to display pegbar name
   PARENT_HANDLE_NAME,  //! where to display parent handle number
-  FILTER_COLOR         //! where to show layer's filter color
+  FILTER_COLOR,        //! where to show layer's filter color
+  SUBLAYER_NAME        //! area to draw sublayer name
 };
 enum class PredefinedLine {
   LOCKED,              //! dotted vertical line when cell is locked
@@ -142,7 +143,8 @@ enum class PredefinedPath {
 enum class PredefinedPoint {
   KEY_HIDDEN,  //! move extender handle that much if key icons are disabled
   EXTENDER_XY_RADIUS,        //! x and y radius for rounded rectangle
-  VOLUME_DIVISIONS_TOP_LEFT  //! where to draw volume slider
+  VOLUME_DIVISIONS_TOP_LEFT, //! where to draw volume slider
+  PEGBAR_NAME
 };
 enum class PredefinedRange {
   HEADER_FRAME,  //! size of of column header height(v) / row header width(h)

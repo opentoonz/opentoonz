@@ -160,6 +160,8 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
 {
   m_screenMapper = new ScreenMapper(this);
 
+  setDefaultColors();
+
   setFocusPolicy(Qt::StrongFocus);
 
   setFrameStyle(QFrame::StyledPanel);
@@ -225,6 +227,16 @@ XsheetViewer::~XsheetViewer() {
   delete m_cellKeyframeSelection;
   delete m_dragTool;
   delete m_screenMapper;
+}
+
+//-----------------------------------------------------------------------------
+
+// in case the colors are missing from .qss file
+void XsheetViewer::setDefaultColors() {
+  m_foldUnfoldButtonColor = XsheetGUI::FoldUnfoldButtonColor;
+  m_subLayerColor = XsheetGUI::SubLayerColor;
+  m_subLayerBorderColor = XsheetGUI::SubLayerBorderColor;
+  m_selectedSubLayerColor = XsheetGUI::SelectedSubLayerColor;
 }
 
 //-----------------------------------------------------------------------------

@@ -586,7 +586,14 @@ public:
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) override {}
+  TStroke *makeStroke() const override;
 };
+
+TStroke *LinePrimitive::makeStroke() const {
+  TStroke *polyLine = MultiLinePrimitive::makeStroke();
+  polyLine->setName("Line");
+  return polyLine;
+}
 
 //=============================================================================
 // Ellipse Primitive Class Declaration
@@ -1160,6 +1167,7 @@ TStroke *RectanglePrimitive::makeStroke() const {
     points[8] = points[0];
     stroke    = new TStroke(points);
   }
+  stroke->setName("Rectangle");
   stroke->setSelfLoop();
   return stroke;
 }
@@ -1241,7 +1249,9 @@ void CirclePrimitive::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 //-----------------------------------------------------------------------------
 
 TStroke *CirclePrimitive::makeStroke() const {
-  return makeEllipticStroke(getThickness(), m_centre, m_radius, m_radius);
+  TStroke *ellipse = makeEllipticStroke(getThickness(), m_centre, m_radius, m_radius);
+  ellipse->setName("Circle");
+  return ellipse;
 }
 
 //-----------------------------------------------------------------------------
@@ -1561,6 +1571,7 @@ TStroke *MultiLinePrimitive::makeStroke() const {
     points.push_back(TThickPoint(vertex, thick));
   }
   stroke = new TStroke(points);
+  stroke->setName("Polyline");
   if (m_closed) stroke->setSelfLoop();
 
   return stroke;
@@ -1902,6 +1913,7 @@ void ArcPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
     points[7] = TThickPoint(0.5 * (points[6] + points[8]), thick);
     if (m_stroke) delete m_stroke;
     m_stroke = new TStroke(points);
+    m_stroke->setName("Arc");
     m_clickNumber++;
     break;
 
@@ -2073,6 +2085,7 @@ TStroke *PolygonPrimitive::makeStroke() const {
     }
     stroke = new TStroke(points);
   }
+  stroke->setName("Polygon");
   stroke->setSelfLoop();
   return stroke;
 }

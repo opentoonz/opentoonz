@@ -31,6 +31,7 @@ class TopToBottomOrientation : public Orientation {
   const int PLAY_RANGE_X = FRAME_HEADER_WIDTH / 2 - PLAY_MARKER_SIZE;
   const int ONION_X = 0, ONION_Y = 0;
   const int ICON_WIDTH = CELL_HEIGHT;
+  const int SUBLAYER_WIDTH       = CELL_HEIGHT;
 
 public:
   TopToBottomOrientation();
@@ -88,6 +89,7 @@ class LeftToRightOrientation : public Orientation {
       ICONS_WIDTH + LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH;
   const int FOLDED_LAYER_HEADER_HEIGHT = 8;
   const int FOLDED_LAYER_HEADER_WIDTH  = LAYER_HEADER_WIDTH;
+  const int SUBLAYER_HEIGHT    = CELL_HEIGHT;
 
 public:
   LeftToRightOrientation();
@@ -375,6 +377,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   QPoint soundTopLeft(volumeArea.left() + 12, volumeArea.top() + 4);
   addRect(PredefinedRect::VOLUME_TRACK,
           QRect(soundTopLeft, QSize(3, trackLen)));
+  addRect(PredefinedRect::SUBLAYER_NAME, QRect(10, 6, SUBLAYER_WIDTH - 10, CELL_HEIGHT - 3));
 
   QRect pegbarname(INDENT, HDRROW4, CELL_WIDTH - 11, CELL_HEIGHT - 3);
   addRect(PredefinedRect::PEGBAR_NAME, pegbarname);
@@ -411,7 +414,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION,
                QBoxLayout::Direction::TopToBottom);
   addDimension(PredefinedDimension::CENTER_ALIGN, Qt::AlignHCenter);
-  addDimension(PredefinedDimension::SUBLAYER, CELL_HEIGHT);
+  addDimension(PredefinedDimension::SUBLAYER, SUBLAYER_WIDTH);
   addDimension(PredefinedDimension::SUBLAYER_DEPTH, CELL_HEIGHT);
 
   //
@@ -491,6 +494,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addPoint(PredefinedPoint::EXTENDER_XY_RADIUS, QPoint(30, 75));
   addPoint(PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT,
            soundTopLeft - QPoint(5, 0));
+  addPoint(PredefinedPoint::PEGBAR_NAME, QPoint(12, CELL_HEIGHT * 3 + 48));
 
   //
   // Ranges
@@ -681,6 +685,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
               .adjusted(-28, 0, -28, 0));
 
   addRect(PredefinedRect::FOLD_UNFOLD_AREA, eye.translated(4 * ICON_OFFSET, 0));
+  addRect(PredefinedRect::SUBLAYER_NAME, QRect(ICONS_WIDTH, 0, LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH, SUBLAYER_HEIGHT));
 
   //
   // Lines
@@ -709,7 +714,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION,
                QBoxLayout::Direction::LeftToRight);
   addDimension(PredefinedDimension::CENTER_ALIGN, Qt::AlignVCenter);
-  addDimension(PredefinedDimension::SUBLAYER, CELL_HEIGHT);
+  addDimension(PredefinedDimension::SUBLAYER, SUBLAYER_HEIGHT);
   addDimension(PredefinedDimension::SUBLAYER_DEPTH, ICON_OFFSET);
 
   //
@@ -789,6 +794,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addPoint(PredefinedPoint::EXTENDER_XY_RADIUS, QPoint(75, 30));
   addPoint(PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT,
            soundTopLeft + QPoint(0, 3));
+  addPoint(PredefinedPoint::PEGBAR_NAME, QPoint(-1, -1)); // hide
 
   //
   // Ranges

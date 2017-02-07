@@ -7,6 +7,8 @@
 #include "tcurveutil.h"
 #include "tcurves.h"
 
+#include <QString>
+
 namespace {
 void drawQuadraticCenterline(const TQuadratic &inQuad, double pixelSize,
                              double from, double to) {
@@ -409,6 +411,7 @@ DVAPI TStroke *makeEllipticStroke(double thick, TPointD center, double radiusX,
                            // points[15]+TThickPoint(-c1dx,  c1dy,0);//
 
   TStroke *stroke = new TStroke(points);
+  stroke->setName("Ellipse");
   stroke->setSelfLoop();
   return stroke;
 }

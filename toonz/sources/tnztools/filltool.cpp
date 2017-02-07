@@ -1429,6 +1429,7 @@ public:
       m_track.filterPoints();
       double error    = (m_isPath ? 20.0 : 30.0 / 11) * sqrt(pixelSize2);
       TStroke *stroke = m_track.makeStroke(error);
+      stroke->setName("AreaFill");
 
       stroke->setStyle(1);
       m_track.clear();

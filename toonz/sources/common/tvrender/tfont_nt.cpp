@@ -187,6 +187,7 @@ TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode,
     }
 
     TStroke *stroke = new TStroke();
+    stroke->setName(QString::fromWCharArray(&charcode, 1));
     stroke->reshape(&(points[0]), points.size());
     stroke->setSelfLoop(true);
     image->addStroke(stroke);
