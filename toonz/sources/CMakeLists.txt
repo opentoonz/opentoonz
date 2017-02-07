@@ -58,6 +58,8 @@ elseif(APPLE)
         set(QT_LIB_PATH "${QT_PATH}/")
         set(CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
 
+		message("QT_PATH:" ${QT_PATH})
+		message("QT_LIB_PATH:" ${QT_LIB_PATH})
         message("CMAKE_PREFIX_PATH:" ${CMAKE_PREFIX_PATH})
         add_definitions(
             -DMACOSX
