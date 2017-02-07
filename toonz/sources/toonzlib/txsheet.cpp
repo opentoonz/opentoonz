@@ -1594,5 +1594,5 @@ bool TXsheet::isRectEmpty(const CellPosition &pos0,
 //-----------------------------------------------------------------------
 
 void TXsheet::notifyColumnFanFoldedUnfolded() {
-  emit columnFanFoldedUnfolded(getColumnFan());
+  emit columnFanFoldedUnfolded();
 }

@@ -15,7 +15,7 @@
 // special case pattern
 class EmptySubLayer final : public SubLayer {
 public:
-  EmptySubLayer() : SubLayer(nullptr) { }
+  EmptySubLayer(SubLayers *subLayers) : SubLayer(subLayers, nullptr) { }
 };
 
 // Contains multiple sublayers, each is a TStroke
@@ -24,7 +24,7 @@ class SimpleLevelSubLayer final : public SubLayer {
   bool m_folded;
 
 public:
-  SimpleLevelSubLayer(TXshSimpleLevelP level);
+  SimpleLevelSubLayer(SubLayers *subLayers, TXshSimpleLevelP level);
   ~SimpleLevelSubLayer() { }
 
   virtual bool hasChildren() const override;
@@ -33,7 +33,7 @@ public:
   virtual QString name() const { return QString::fromStdWString (m_level->getName()); }
 
 protected slots:
-  void afterStrokeListChanged();
+  void onStrokeListChanged();
 private:
   TVectorImageP vectorImage() const;
   SubLayer *build(TStroke *stroke);
@@ -46,7 +46,7 @@ class StrokeSubLayer final : public SubLayer {
   TStroke *m_stroke; // weak pointer - don't own
 
 public:
-  StrokeSubLayer(SubLayer *parent, TStroke *stroke): SubLayer(parent), m_stroke(stroke) { }
+  StrokeSubLayer(SubLayers *subLayers, SubLayer *parent, TStroke *stroke): SubLayer(subLayers, parent), m_stroke(stroke) { }
 
   virtual bool hasActivator() const override { return true; }
   virtual QString name() const override { return QString ("Stroke " + QString::number(m_stroke->getId ())); }
@@ -59,13 +59,13 @@ public:
 
 shared_ptr<SubLayer> SubLayers::get(const TXshColumn *column) {
   if (!column)
-    return shared_ptr<SubLayer>(new EmptySubLayer());
+    return shared_ptr<SubLayer>(new EmptySubLayer(this));
   return get(CellPosition(m_mapper->getCurrentFrame (), column->getIndex ()));
 }
 shared_ptr<SubLayer> SubLayers::get(const CellPosition &pos) {
   Level *level = findLevel(pos);
   if (!level)
-    return shared_ptr<SubLayer>(new EmptySubLayer());
+    return shared_ptr<SubLayer>(new EmptySubLayer(this));
 
   map<Level *, shared_ptr<SubLayer>>::iterator it = m_items.find(level);
   if (it != m_items.end())
@@ -89,8 +89,8 @@ SubLayers::Level *SubLayers::findLevel(const CellPosition &pos) const {
   return cell.getSimpleLevel();
 }
 
-SubLayer *SubLayers::build(Level *level) const {
-  return new SimpleLevelSubLayer(level);
+SubLayer *SubLayers::build(Level *level) {
+  return new SimpleLevelSubLayer(this, level);
 }
 
 //-----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ void SubLayers::foldUnfold(const TXshColumn *column) {
 //-----------------------------------------------------------------------------
 // SubLayer
 
-SubLayer::SubLayer(SubLayer *parent): m_depth (0) {
+SubLayer::SubLayer(SubLayers *subLayers, SubLayer *parent): m_subLayers (subLayers), m_depth (0) {
   if (parent)
     m_depth = parent->depth() + 1;
 }
@@ -151,14 +151,14 @@ vector<shared_ptr<SubLayer>> SubLayer::childrenFlatTree() const {
 //-----------------------------------------------------------------------------
 // SimpleLevelSubLayer
 
-SimpleLevelSubLayer::SimpleLevelSubLayer(TXshSimpleLevelP level)
-  : SubLayer(nullptr), m_level(level), m_folded(true) {
+SimpleLevelSubLayer::SimpleLevelSubLayer(SubLayers *subLayers, TXshSimpleLevelP level)
+  : SubLayer(subLayers, nullptr), m_level(level), m_folded(true) {
   TVectorImageP image = vectorImage();
   
   for (int i = 0; i < image->getStrokeCount(); i++)
-    m_children.push_back(shared_ptr<StrokeSubLayer> (new StrokeSubLayer(this, image->getStroke(i))));
+    m_children.push_back(shared_ptr<StrokeSubLayer> (new StrokeSubLayer(subLayers, this, image->getStroke(i))));
 
-  connect(image.getPointer (), &TVectorImage::strokeListChanged, this, &SimpleLevelSubLayer::afterStrokeListChanged);
+  connect(image.getPointer (), &TVectorImage::strokeListChanged, this, &SimpleLevelSubLayer::onStrokeListChanged);
 }
 
 bool SimpleLevelSubLayer::hasChildren() const {
@@ -173,22 +173,25 @@ TVectorImageP SimpleLevelSubLayer::vectorImage() const {
   return vectorImage;
 }
 
-void SimpleLevelSubLayer::afterStrokeListChanged() {
+void SimpleLevelSubLayer::onStrokeListChanged() {
   TVectorImageP image = vectorImage();
   vector<shared_ptr<SubLayer>> newList;
 
-  QMutexLocker sl(image->getMutex ());
+  {
+    QMutexLocker sl(image->getMutex());
 
-  for (UINT i = 0; i < image->getStrokeCount(); i++) {
-    VIStroke *stroke = image->getVIStroke(i);
+    for (UINT i = 0; i < image->getStrokeCount(); i++) {
+      VIStroke *stroke = image->getVIStroke(i);
 
-    vector<shared_ptr<SubLayer>>::const_iterator child;
-    if (hasChild(stroke->m_s, child))
-      newList.push_back(*child);
-    else
-      newList.push_back(shared_ptr<SubLayer> (build(stroke->m_s)));
+      vector<shared_ptr<SubLayer>>::const_iterator child;
+      if (hasChild(stroke->m_s, child))
+        newList.push_back(*child);
+      else
+        newList.push_back(shared_ptr<SubLayer>(build(stroke->m_s)));
+    }
+    m_children = newList;
   }
-  m_children = newList;
+  subLayers()->screenMapper()->updateColumnFan();
 }
 
 bool SimpleLevelSubLayer::hasChild(const TStroke *stroke, vector<shared_ptr<SubLayer>>::const_iterator &child) const {
@@ -201,7 +204,7 @@ bool SimpleLevelSubLayer::hasChild(const TStroke *stroke, vector<shared_ptr<SubL
 }
 
 SubLayer *SimpleLevelSubLayer::build(TStroke *stroke) {
-  return new StrokeSubLayer(this, stroke);
+  return new StrokeSubLayer(subLayers(), this, stroke);
 }
 
 //-----------------------------------------------------------------------------

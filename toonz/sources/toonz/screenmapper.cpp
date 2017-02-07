@@ -62,11 +62,8 @@ QPoint ScreenMapper::frameLayerToXY(int frameAxis, int layerAxis) const {
 
 //----------------------------------------------------------------------------------
 
-void ScreenMapper::onColumnFanFoldedUnfolded(const ColumnFan *origin) const {
-  updateColumnFan();
-}
-
 void ScreenMapper::updateColumnFan() const {
   m_columnFan->updateExtras(xsheet()->getColumnFan(), 
     subLayers()->childrenDimensions(orientation()));
+  m_viewer->update();
 }

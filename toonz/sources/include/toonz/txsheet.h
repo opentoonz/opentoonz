@@ -554,7 +554,7 @@ in TXsheetImp.
   void notifyColumnFanFoldedUnfolded();
 
 signals:
-  void columnFanFoldedUnfolded(const ColumnFan *fan);
+  void columnFanFoldedUnfolded();
 
 protected:
   bool checkCircularReferences(TXsheet *childCandidate);

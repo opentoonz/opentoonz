@@ -631,7 +631,11 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   // check if the column is reference
   bool isEditingSpline = app->getCurrentObject()->isSpline();
 
-  QRect rect = o->rect(PredefinedRect::LAYER_HEADER).translated(orig);
+  QRect baseRect = o->rect(PredefinedRect::LAYER_HEADER).translated(orig);
+  NumberRange frameRange = o->frameSide(baseRect);
+  NumberRange layerRange = m_viewer->screenMapper()->colsToLayerAxis(
+    NumberRange(col, col + 1)); // to include unfolded sublayers
+  QRect rect = o->frameLayerRect(frameRange, layerRange);
 
   int x0 = rect.left();
   int x1 = rect.right();

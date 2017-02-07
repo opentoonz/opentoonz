@@ -775,7 +775,7 @@ public slots:
 
   void onOrientationChanged(const Orientation *newOrientation);
   void onPrepareToScrollOffset(const QPoint &offset);
-  void onColumnFanFoldedUnfolded(const ColumnFan *fan);
+  void onColumnFanFoldedUnfolded();
 };
 
 #endif  // XSHEETVIEWER_H

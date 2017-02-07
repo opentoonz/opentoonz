@@ -40,6 +40,8 @@ public:
   SubLayers(ScreenMapper *mapper): m_mapper(mapper) { }
   ~SubLayers() { }
 
+  ScreenMapper *screenMapper() const { return m_mapper; }
+
   shared_ptr<SubLayer> get(const CellPosition &pos);
   shared_ptr<SubLayer> get(const TXshColumn *column);
 
@@ -49,7 +51,7 @@ public:
 
 private:
   Level *findLevel(const CellPosition &pos) const;
-  SubLayer *build(Level *level) const;
+  SubLayer *build(Level *level);
 };
 
 //! Basically, a tree node.
@@ -61,15 +63,17 @@ private:
 
 class SubLayer : public QObject {
   Q_OBJECT
-
+    
+  //! reference to parent container
+  SubLayers *m_subLayers;
+  //! root has depth 0, its children have depth 1 and so on
+  int m_depth; 
 protected:
   //! direct descendants of this node
   vector<shared_ptr<SubLayer>> m_children;
-  //! root has depth 0, its children have depth 1 and so on
-  int m_depth;
 public:
 
-  SubLayer(SubLayer *parent);
+  SubLayer(SubLayers *subLayers, SubLayer *parent);
   virtual ~SubLayer() { }
 
   virtual bool hasChildren() const { return false; }
@@ -78,6 +82,7 @@ public:
   virtual bool hasActivator() const { return false; }
   virtual QString name() const { return ""; }
 
+  SubLayers *subLayers() const { return m_subLayers; }
   int depth() const { return m_depth; }
 
   int ownDimension(const Orientation *o) const;

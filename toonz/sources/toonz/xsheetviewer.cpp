@@ -1081,7 +1081,7 @@ void XsheetViewer::onSceneSwitched() {
 void XsheetViewer::onXsheetSwitched() {
   updateAllAree();
   resetXsheetNotes();
-  onColumnFanFoldedUnfolded(getXsheet()->getColumnFan());
+  onColumnFanFoldedUnfolded();
 }
 
 //-----------------------------------------------------------------------------
@@ -1104,6 +1104,7 @@ void XsheetViewer::onPreferenceChanged(const QString &prefName) {
 
 void XsheetViewer::onCurrentFrameSwitched() {
   int row           = TApp::instance()->getCurrentFrame()->getFrame();
+  screenMapper()->updateColumnFan();
   QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
   if (visibleRect.isEmpty()) {
     m_isCurrentFrameSwitched = true;
@@ -1461,8 +1462,8 @@ void XsheetViewer::setFrameDisplayStyle(FrameDisplayStyle style) {
 
 //-----------------------------------------------------------------------------
 
-void XsheetViewer::onColumnFanFoldedUnfolded (const ColumnFan *fan) {
-  screenMapper()->onColumnFanFoldedUnfolded(fan);
+void XsheetViewer::onColumnFanFoldedUnfolded () {
+  screenMapper()->updateColumnFan();
   updateCellColumnAree();
 }
 

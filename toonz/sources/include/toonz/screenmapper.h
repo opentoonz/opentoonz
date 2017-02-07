@@ -62,7 +62,6 @@ public:
 
   // column fan
 
-  void onColumnFanFoldedUnfolded(const ColumnFan *origin) const;
   void updateColumnFan() const;
 };
 
