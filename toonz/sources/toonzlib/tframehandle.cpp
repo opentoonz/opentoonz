@@ -134,13 +134,12 @@ void TFrameHandle::nextFrame(TFrameId id) {
       // frame dopo l'ultimo.
       // TXshSimpleLevel *sl =
       // TApp::instance()->getCurrentLevel()->getSimpleLevel();
-		if (id != 0) {
-			setFid(id);
-		}
-		else {
-			TFrameId fid = m_fids.back();  // sl->index2fid(sl->getFrameCount());
-			setFid(fid);
-		}
+      if (id != 0) {
+        setFid(id);
+      } else {
+        TFrameId fid = m_fids.back();  // sl->index2fid(sl->getFrameCount());
+        setFid(fid);
+      }
     } else
       setFid(*it);
   } else {

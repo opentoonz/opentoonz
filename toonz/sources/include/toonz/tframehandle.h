@@ -105,7 +105,7 @@ public:
 
 public slots:
 
-void nextFrame(TFrameId = 0);
+  void nextFrame(TFrameId = 0);
   void prevFrame();
   void firstFrame();
   void lastFrame();
