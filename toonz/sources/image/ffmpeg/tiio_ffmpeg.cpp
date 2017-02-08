@@ -9,6 +9,7 @@
 #include <QRegExp>
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
+#include "toonzqt/dvdialog.h"
 
 Ffmpeg::Ffmpeg() {
   m_ffmpegPath         = Preferences::instance()->getFfmpegPath();
@@ -163,12 +164,19 @@ void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
   // write the file
   QProcess ffmpeg;
   ffmpeg.start(m_ffmpegPath + "/ffmpeg", args);
-  ffmpeg.waitForFinished(m_ffmpegTimeout);
-  QString results = ffmpeg.readAllStandardError();
-  results += ffmpeg.readAllStandardOutput();
-  int exitCode = ffmpeg.exitCode();
-  ffmpeg.close();
-  std::string strResults = results.toStdString();
+  if (ffmpeg.waitForFinished(m_ffmpegTimeout)) {
+    QString results = ffmpeg.readAllStandardError();
+    results += ffmpeg.readAllStandardOutput();
+    int exitCode = ffmpeg.exitCode();
+    ffmpeg.close();
+    std::string strResults = results.toStdString();
+  } else {
+    DVGui::warning(
+        QObject::tr("FFmpeg timed out.\n"
+                    "Please check the file for errors.\n"
+                    "If the file doesn't play or is incomplete, \n"
+                    "Please try raising the FFmpeg timeout in Preferences."));
+  }
 }
 
 QString Ffmpeg::runFfprobe(QStringList args) {
