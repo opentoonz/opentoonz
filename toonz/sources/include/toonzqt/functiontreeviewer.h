@@ -70,7 +70,7 @@ class FunctionViewer;
   TnzExt library).
 */
 
-class FunctionTreeModel final : public TreeModel, public TParamObserver {
+class DVAPI FunctionTreeModel final : public TreeModel, public TParamObserver {
   Q_OBJECT
 
 public:
@@ -202,8 +202,9 @@ color, which
 
 private:
   ChannelGroup
-      *m_stageObjects,  //!< Predefined group for stage object channels.
-      *m_fxs;           //!< Predefined group for fx parameters.
+      *m_stageObjects,   //!< Predefined group for stage object channels.
+      *m_pathAnimations, //!< Predefined group for strokes being animated
+      *m_fxs;            //!< Predefined group for fx parameters.
 
   std::vector<Channel *> m_activeChannels;
 
@@ -299,6 +300,7 @@ private:
   // Update functions
 
   void refreshStageObjects(TXsheet *xsh);
+  void refreshPathAnimation(TXsheet *xsh);
   void refreshFxs(TXsheet *xsh);
   void refreshPlasticDeformations();
   void addActiveChannels(TreeModel::Item *item);

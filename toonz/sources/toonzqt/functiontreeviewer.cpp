@@ -12,6 +12,9 @@
 #include "tparamset.h"
 #include "tmacrofx.h"
 #include "tparamchange.h"
+#include "tstroke.h"
+#include "tvectorimage.h"
+#include "../common/tvectorimage/tvectorimageP.h"
 
 // TnzExt includes
 #include "ext/plasticskeleton.h"
@@ -25,6 +28,8 @@
 #include "toonz/tcolumnfx.h"
 #include "toonz/tfxhandle.h"
 #include "toonz/tobjecthandle.h"
+#include "toonz/txshlevelcolumn.h"
+#include "toonz/txshsimplelevel.h"
 
 // TnzQt includes
 #include "toonzqt/functionviewer.h"
@@ -115,6 +120,30 @@ public:
   }
 
   QVariant data(int role) const override;
+};
+
+//=============================================================================
+
+class LevelColumnChannelGroup final : public FunctionTreeModel::ChannelGroup {
+  TXsheet *m_xsheet;
+  TXshLevelColumn *m_column;
+public:
+
+  LevelColumnChannelGroup(TXsheet *xsheet, TXshLevelColumn *column) : m_xsheet (xsheet), m_column(column) {}
+  void build();
+
+  QString getShortName() const override;
+  QString getLongName() const override;
+};
+
+class StrokeChannelGroup final : public FunctionTreeModel::ChannelGroup {
+  TStroke *m_stroke;
+public:
+
+  StrokeChannelGroup(TStroke *stroke) : m_stroke(stroke) {}
+
+  QString getShortName() const override;
+  QString getLongName() const override;
 };
 
 }  // namespace
@@ -543,6 +572,59 @@ QVariant SkVDChannelGroup::data(int role) const {
 
 //=============================================================================
 //
+// LevelColumnChannelGroup
+//
+//-----------------------------------------------------------------------------
+
+void LevelColumnChannelGroup::build() {
+  clear();
+
+  // inside it, create node for each tstroke
+  int f0, f1;
+  m_column->getRange(f0, f1);
+  for (int f = f0; f <= f1; f++) {
+    const TXshCell &cell = m_column->getCell(f);
+    TFrameId frameId = cell.getFrameId();
+    TXshSimpleLevel *level = cell.getSimpleLevel();
+    if (!level)
+      continue;
+    TImageP image = level->getFrame(frameId, false);
+    if (!image)
+      continue;
+    TVectorImageP vectorImage = { dynamic_cast<TVectorImage *> (image.getPointer()) };
+    if (!vectorImage)
+      continue;
+    for (int i = 0; i < vectorImage->getStrokeCount(); i++) {
+      StrokeChannelGroup *strokeGroup = new StrokeChannelGroup(vectorImage->getStroke(i));
+      appendChild(strokeGroup);
+    }
+  }
+}
+
+QString LevelColumnChannelGroup::getShortName() const {
+  int index = m_column->getIndex();
+  TStageObjectId columnId = TStageObjectId::ColumnId(index);
+  TStageObject *columnObject = m_xsheet->getStageObject(columnId);
+  return QString::fromStdString(columnObject->getName());
+}
+QString LevelColumnChannelGroup::getLongName() const {
+  return getShortName();
+}
+
+//=============================================================================
+//
+// StrokeChannelGroup
+//
+//-----------------------------------------------------------------------------
+
+QString StrokeChannelGroup::getShortName() const {
+  return m_stroke->name() + " " + QString::number(m_stroke->getId());
+}
+QString StrokeChannelGroup::getLongName() const {
+  return getShortName();
+}
+//=============================================================================
+//
 // Channel
 //
 //-----------------------------------------------------------------------------
@@ -820,16 +902,19 @@ void FunctionTreeModel::refreshData(TXsheet *xsh) {
 
       if (xsh) {
         getRootItem()->appendChild(m_stageObjects = new ChannelGroup("Stage"));
+        getRootItem()->appendChild(m_pathAnimations = new ChannelGroup("PathAnimation"));
         getRootItem()->appendChild(m_fxs = new ChannelGroup("FX"));
 
-        assert(getRootItem()->getChildCount() == 2);
+        assert(getRootItem()->getChildCount() == 3);
         assert(getRootItem()->getChild(0) == m_stageObjects);
-        assert(getRootItem()->getChild(1) == m_fxs);
+        assert(getRootItem()->getChild(1) == m_pathAnimations);
+        assert(getRootItem()->getChild(2) == m_fxs);
       }
     }
 
     if (xsh) {
       refreshStageObjects(xsh);
+      refreshPathAnimation(xsh);
       refreshFxs(xsh);
     }
 
@@ -893,6 +978,27 @@ void FunctionTreeModel::refreshStageObjects(TXsheet *xsh) {
   // As plastic deformations are stored in stage objects, refresh them if
   // necessary
   refreshPlasticDeformations();
+}
+
+//-----------------------------------------------------------------------------
+
+void FunctionTreeModel::refreshPathAnimation(TXsheet *xsh) {
+  m_pathAnimations->clear();
+
+  // create node for each column
+  for (int i = 0; i < xsh->getColumnCount(); i++) {
+
+    TXshColumn *column = xsh->getColumn(i);
+    if (!column)
+      continue;
+    TXshLevelColumn *levelColumn = column->getLevelColumn();
+    if (!levelColumn || levelColumn->isEmpty())
+      continue;
+
+    LevelColumnChannelGroup *columnGroup = new LevelColumnChannelGroup(xsh, levelColumn);
+    m_pathAnimations->appendChild(columnGroup);
+    columnGroup->build();
+  }
 }
 
 //-----------------------------------------------------------------------------
