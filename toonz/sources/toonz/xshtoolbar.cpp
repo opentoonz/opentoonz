@@ -80,6 +80,27 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
   m_repeatButton->setObjectName("XSheetToolbarButton");
   m_repeatButton->setToolTip(tr("Repeat Selection"));
 
+  m_collapseSubButton = new QPushButton(this);
+  m_collapseSubButton->setIconSize(QSize(37, 19));
+  QIcon collapseSubIcon = createQIconPNG("collapse");
+  m_collapseSubButton->setIcon(collapseSubIcon);
+  m_collapseSubButton->setObjectName("XSheetToolbarLevelButton");
+  m_collapseSubButton->setToolTip(tr("Collapse into Sub-XSheet"));
+
+  m_enterSubButton = new QPushButton(this);
+  m_enterSubButton->setIconSize(QSize(19, 19));
+  QIcon enterSubIcon = createQIconPNG("sub_enter");
+  m_enterSubButton->setIcon(enterSubIcon);
+  m_enterSubButton->setObjectName("XSheetToolbarLevelButton");
+  m_enterSubButton->setToolTip(tr("Open Sub-XSheet"));
+
+  m_leaveSubButton = new QPushButton(this);
+  m_leaveSubButton->setIconSize(QSize(19, 19));
+  QIcon leaveSubIcon = createQIconPNG("sub_leave");
+  m_leaveSubButton->setIcon(leaveSubIcon);
+  m_leaveSubButton->setObjectName("XSheetToolbarLevelButton");
+  m_leaveSubButton->setToolTip(tr("Close Sub-XSheet"));
+
   TApp *app        = TApp::instance();
   m_keyFrameButton = new ViewerKeyframeNavigator(this, app->getCurrentFrame());
   m_keyFrameButton->setObjectHandle(app->getCurrentObject());
@@ -104,9 +125,12 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
       m_toolbar->addSeparator();
       m_toolbar->addWidget(m_repeatButton);
       m_toolbar->addSeparator();
+      m_toolbar->addWidget(m_collapseSubButton);
+      m_toolbar->addWidget(m_enterSubButton);
+      m_toolbar->addWidget(m_leaveSubButton);
+      m_toolbar->addSeparator();
       m_toolbar->addWidget(m_keyFrameButton);
       toolbarLayout->addWidget(m_toolbar);
-
       toolbarLayout->addStretch(0);
     }
     mainLay->addLayout(toolbarLayout, 0);
@@ -134,7 +158,16 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
                        SLOT(onReframe3sButtonPressed()));
   ret = ret && connect(m_repeatButton, SIGNAL(released()), this,
                        SLOT(onRepeatButtonPressed()));
+  ret = ret && connect(m_collapseSubButton, SIGNAL(released()), this,
+                       SLOT(onCollapseSubButtonPressed()));
+  ret = ret && connect(m_enterSubButton, SIGNAL(released()), this,
+                       SLOT(onEnterSubButtonPressed()));
+  ret = ret && connect(m_leaveSubButton, SIGNAL(released()), this,
+                       SLOT(onLeaveSubButtonPressed()));
+
   assert(ret);
+
+  m_leaveSubButton->hide();
 }
 
 //-----------------------------------------------------------------------------
@@ -187,6 +220,24 @@ void Toolbar::onReframe3sButtonPressed() {
 
 void Toolbar::onRepeatButtonPressed() {
   CommandManager::instance()->execute("MI_Dup");
+}
+
+//-----------------------------------------------------------------------------
+
+void Toolbar::onCollapseSubButtonPressed() {
+  CommandManager::instance()->execute("MI_Collapse");
+}
+
+//-----------------------------------------------------------------------------
+
+void Toolbar::onEnterSubButtonPressed() {
+  CommandManager::instance()->execute("MI_OpenChild");
+}
+
+//-----------------------------------------------------------------------------
+
+void Toolbar::onLeaveSubButtonPressed() {
+  CommandManager::instance()->execute("MI_CloseChild");
 }
 
 //-----------------------------------------------------------------------------
