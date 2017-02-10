@@ -1,13 +1,37 @@
-# preferred homebrew's directories.
+
+if(WITH_SYSTEM_SUPERLU)
+    # depend on CMake's defaults
+    set(_header_hints)
+    set(_header_suffixes
+        superlu
+    )
+    set(_lib_suffixes)
+else()
+    # preferred homebrew's directories.
+    set(_header_hints
+        ${THIRDPARTY_LIBS_HINTS}
+    )
+    set(_header_suffixes
+        superlu43/4.3_1/include/superlu
+        superlu/SuperLU_4.1/include
+    )
+    set(_lib_hints
+        ${THIRDPARTY_LIBS_HINTS}
+    )
+    set(_lib_suffixes
+        lzo/2.09/lib
+        lzo/2.03/lib/LZO_lib
+    )
+endif()
+
 find_path(
     SUPERLU_INCLUDE_DIR
     NAMES
         slu_Cnames.h
     HINTS
-        ${THIRDPARTY_LIBS_HINTS}
+        ${_header_hints}
     PATH_SUFFIXES
-        superlu43/4.3_1/include/superlu
-        superlu/SuperLU_4.1/include
+        ${_header_suffixes}
 )
 
 find_library(
@@ -17,10 +41,9 @@ find_library(
         libsuperlu.a
         libsuperlu_4.1.a
     HINTS
-        ${THIRDPARTY_LIBS_HINTS}
+        ${_lib_hints}
     PATH_SUFFIXES
-        superlu43/4.3_1/lib
-        superlu
+        ${_lib_suffixes}
 )
 
 message("***** SuperLU Header path:" ${SUPERLU_INCLUDE_DIR})
@@ -40,3 +63,8 @@ mark_as_advanced(
     SUPERLU_LIBRARY
     SUPERLU_INCLUDE_DIR
 )
+
+unset(_header_hints)
+unset(_header_suffixes)
+unset(_lib_hints)
+unset(_lib_suffixes)
