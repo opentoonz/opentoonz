@@ -118,6 +118,31 @@
     </message>
 </context>
 <context>
+    <name>AudioRecordingPopup</name>
+    <message>
+        <source>Audio Recording</source>
+        <translation>録音</translation>
+    </message>
+    <message>
+        <source>Save and Insert</source>
+        <translation>保存して挿入</translation>
+    </message>
+    <message>
+        <source>Sync with XSheet</source>
+        <translation>タイムシートと同期する</translation>
+    </message>
+    <message>
+        <source> </source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>The microphone is not available: 
+Please select a different device or check the microphone.</source>
+        <translation>マイクが使用できません：
+別のデバイスを選択するか、マイクを確認して下さい。</translation>
+    </message>
+</context>
+<context>
     <name>AutocenterPopup</name>
     <message>
         <source>Autocenter</source>
@@ -4480,6 +4505,14 @@ Do you want to create it?</source>
         <source>&amp;Startup Popup...</source>
         <translation>スタートアップウィンドウ(&amp;S) ...</translation>
     </message>
+    <message>
+        <source>&amp;Fast Render to MP4</source>
+        <translation>MP4ムービーをレンダリング (&amp;F)</translation>
+    </message>
+    <message>
+        <source>Record Audio</source>
+        <translation>録音する</translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5043,6 +5076,10 @@ What do you want to do?</source>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
+    <message>
+        <source>Render</source>
+        <translation>レンダリング</translation>
+    </message>
 </context>
 <context>
     <name>OverwriteDialog</name>
@@ -5301,6 +5338,113 @@ Do you want to overwrite it?</source>
     <message>
         <source>Video Capture Filter Settings...</source>
         <translation>ビデオキャプチャ設定 ...</translation>
+    </message>
+    <message>
+        <source>Load Selected Image</source>
+        <translation>選択した画像を読み込み</translation>
+    </message>
+    <message>
+        <source>Subfolder</source>
+        <translation>カットフォルダ</translation>
+    </message>
+    <message>
+        <source>No image selected.  Please select an image in the Xsheet.</source>
+        <translation>画像が選択されていません。タイムシート内から選択して下さい。</translation>
+    </message>
+    <message>
+        <source>The selected image is not in a raster level.</source>
+        <translation>選択された画像はラスターレベルではありません。</translation>
+    </message>
+    <message>
+        <source>The selected image size does not match the current camera settings.</source>
+        <translation>選択された画像のサイズが、現在のカメラサイズと一致しません。</translation>
+    </message>
+</context>
+<context>
+    <name>PencilTestSaveInFolderPopup</name>
+    <message>
+        <source>Create Subfolder</source>
+        <translation>カットフォルダを作成する</translation>
+    </message>
+    <message>
+        <source>Infomation</source>
+        <translation>基本情報</translation>
+    </message>
+    <message>
+        <source>Subfolder Name</source>
+        <translation>フォルダ名</translation>
+    </message>
+    <message>
+        <source>Auto Format:</source>
+        <translation>自動生成：</translation>
+    </message>
+    <message>
+        <source>Show This on Launch of the Camera Capture</source>
+        <translation>”カメラから取り込む”起動時にこのポップアップを表示する</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>C- + Sequence + Scene</source>
+        <translation>C- + シーン + カット</translation>
+    </message>
+    <message>
+        <source>Sequence + Scene</source>
+        <translation>シーン + カット</translation>
+    </message>
+    <message>
+        <source>Episode + Sequence + Scene</source>
+        <translation>話数 + シーン + カット</translation>
+    </message>
+    <message>
+        <source>Project + Episode + Sequence + Scene</source>
+        <translation>作品名 + 話数 + シーン + カット</translation>
+    </message>
+    <message>
+        <source>Save In:</source>
+        <translation>作成場所：</translation>
+    </message>
+    <message>
+        <source>Project:</source>
+        <translation>作品名：</translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation>話数：</translation>
+    </message>
+    <message>
+        <source>Sequence:</source>
+        <translation>シーン：</translation>
+    </message>
+    <message>
+        <source>Scene:</source>
+        <translation>カット番号：</translation>
+    </message>
+    <message>
+        <source>Subfolder Name:</source>
+        <translation>フォルダ名：</translation>
+    </message>
+    <message>
+        <source>Subfolder name should not be empty.</source>
+        <translation>フォルダ名を入力してください。</translation>
+    </message>
+    <message>
+        <source>Subfolder name should not contain following characters:  * . &quot; / \ [ ] : ; | = , </source>
+        <translation>フォルダ名に次のいずれかを含む事はできません：  * . &quot; / \ [ ] : ; | = , </translation>
+    </message>
+    <message>
+        <source>Folder %1 already exists.</source>
+        <translation>フォルダ %1 は既に存在します。</translation>
+    </message>
+    <message>
+        <source>It is not possible to create the %1 folder.</source>
+        <translation>%1 フォルダを作成できません。</translation>
     </message>
 </context>
 <context>
@@ -6008,6 +6152,40 @@ Do you want to overwrite it?</source>
     <message>
         <source>Show Startup Window when OpenToonz Starts</source>
         <translation>OpenToonzの起動時にスタートアップウィンドウを表示する</translation>
+    </message>
+    <message>
+        <source>Numpad keys are assigned to the following commands.
+Is it OK to release these shortcuts?</source>
+        <translation>数字キーは既に以下のコマンドのショートカットに割り当てられています。
+これらのショートカットを解除してもよろしいですか？</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>Use Numpad and Tab keys for Switching Styles</source>
+        <translation>数字キーとTabキーでスタイルを選択する</translation>
+    </message>
+    <message>
+        <source>Use Arrow Key to Shift Cell Selection</source>
+        <translation>矢印キーでコマ選択を移動する</translation>
+    </message>
+    <message>
+        <source>Enable to Input Cells without Double Clicking</source>
+        <translation>ダブルクリックなしでシートのコマを入力できるようにする</translation>
+    </message>
+    <message>
+        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <translation>”MP4ムービーのレンダリング”コマンドの出力先を指定してください。</translation>
+    </message>
+    <message>
+        <source>Fast Render Path: </source>
+        <translation>保存先のパス：</translation>
     </message>
 </context>
 <context>
@@ -7689,6 +7867,14 @@ Do you want to overwrite it?</source>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
         <translation>%1 を削除します。よろしいですか？</translation>
+    </message>
+    <message>
+        <source>FFmpeg not found, please set the location in the Preferences and restart.</source>
+        <translation>FFmpegが見つかりません。環境設定でパスを指定し、OpenToonzを再起動してください。</translation>
+    </message>
+    <message>
+        <source>Skipping frame.</source>
+        <translation>フレームをスキップしています。</translation>
     </message>
 </context>
 <context>
@@ -10194,6 +10380,45 @@ Please refer to the user guide for details.</source>
     <message>
         <source>Subsampling</source>
         <translation>離散サンプリング</translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::ColumnTransparencyPopup</name>
+    <message>
+        <source>None</source>
+        <translation>なし</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>赤</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>緑</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>青</translation>
+    </message>
+    <message>
+        <source>DarkYellow</source>
+        <translation>暗い黄色</translation>
+    </message>
+    <message>
+        <source>DarkCyan</source>
+        <translation>暗いシアン</translation>
+    </message>
+    <message>
+        <source>DarkMagenta</source>
+        <translation>暗いマゼンタ</translation>
+    </message>
+    <message>
+        <source>N.B. Filter doesn&apos;t affect vector levels</source>
+        <translation>※ カラーフィルタはベクターレベルには適用されません</translation>
+    </message>
+    <message>
+        <source>Filter:</source>
+        <translation>フィルタ：</translation>
     </message>
 </context>
 <context>

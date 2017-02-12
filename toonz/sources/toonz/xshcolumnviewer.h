@@ -13,6 +13,7 @@ class TObjectHandle;
 class TXsheetHandle;
 class TStageObjectId;
 class TXshColumn;
+class QComboBox;
 
 //=============================================================================
 namespace XsheetGUI {
@@ -153,6 +154,8 @@ class ColumnTransparencyPopup final : public QWidget {
   QLineEdit *m_value;
   TXshColumn *m_column;
 
+  QComboBox *m_filterColorCombo;
+
 public:
   ColumnTransparencyPopup(QWidget *parent);
   void setColumn(TXshColumn *column);
@@ -166,6 +169,8 @@ protected slots:
   void onSliderChange(int val);
   void onSliderValueChanged(int);
   void onValueChanged(const QString &);
+
+  void onFilterColorChanged(int id);
 };
 
 //! La classe si occupa della visualizzazione dell'area che gestisce le colonne.

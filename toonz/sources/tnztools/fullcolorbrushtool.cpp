@@ -130,9 +130,9 @@ public:
 
 FullColorBrushTool::FullColorBrushTool(std::string name)
     : TTool(name)
-    , m_thickness("Thickness", 1, 100, 1, 5, false)
-    , m_pressure("Pressure Sensitivity", true)
-    , m_opacity("Opacity:", 0, 100, 100, 100, true)
+    , m_thickness("Size", 1, 100, 1, 5, false)
+    , m_pressure("Pressure", true)
+    , m_opacity("Opacity", 0, 100, 100, 100, true)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_preset("Preset:")
     , m_styleId(0)
@@ -172,9 +172,9 @@ void FullColorBrushTool::onCanvasSizeChanged() {
 //---------------------------------------------------------------------------------------------------
 
 void FullColorBrushTool::updateTranslation() {
-  m_thickness.setQStringName(tr("Thickness"));
-  m_pressure.setQStringName(tr("Pressure Sensitivity"));
-  m_opacity.setQStringName(tr("Opacity:"));
+  m_thickness.setQStringName(tr("Size"));
+  m_pressure.setQStringName(tr("Pressure"));
+  m_opacity.setQStringName(tr("Opacity"));
   m_hardness.setQStringName(tr("Hardness:"));
   m_preset.setQStringName(tr("Preset:"));
 }
@@ -452,25 +452,36 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
       setValue(prop, value);
     }
 
+    void addMinMaxSeparate(TIntPairProperty &prop, double min, double max) {
+      if (min == 0.0 && max == 0.0) return;
+      const TIntPairProperty::Range &range = prop.getRange();
+
+      TIntPairProperty::Value value = prop.getValue();
+      value.first += min;
+      value.second += max;
+      if (value.first > value.second) value.first = value.second;
+      value.first  = tcrop<double>(value.first, range.first, range.second);
+      value.second = tcrop<double>(value.second, range.first, range.second);
+
+      setValue(prop, value);
+    }
+
   } locals = {this};
 
-  switch (e.getModifiersMask()) {
-  /*--
-   * Altキー+マウス移動で、ブラシサイズ（Min/Maxとも）を変える（CtrlやShiftでは誤操作の恐れがある）
-   * --*/
-  case TMouseEvent::ALT_KEY: {
-    // User wants to alter the minimum brush size
+  // if (e.isAltPressed() && !e.isCtrlPressed()) {
+  // const TPointD &diff = pos - m_mousePos;
+  // double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
+
+  // locals.addMinMax(m_thickness, int(add));
+  //} else
+  if (e.isCtrlPressed() && e.isAltPressed()) {
     const TPointD &diff = pos - m_mousePos;
-    double add          = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
+    double max          = diff.x / 2;
+    double min          = diff.y / 2;
 
-    locals.addMinMax(m_thickness, int(add));
-
-    break;
-  }
-
-  default:
+    locals.addMinMaxSeparate(m_thickness, int(min), int(max));
+  } else {
     m_brushPos = pos;
-    break;
   }
 
   m_mousePos = pos;
@@ -552,7 +563,8 @@ void FullColorBrushTool::setWorkAndBackupImages() {
 bool FullColorBrushTool::onPropertyChanged(std::string propertyName) {
   m_minThick = m_thickness.getValue().first;
   m_maxThick = m_thickness.getValue().second;
-  if (propertyName == "Hardness:" || propertyName == "Thickness") {
+  if (propertyName == "Hardness:" || propertyName == "Thickness" ||
+      propertyName == "Size") {
     m_brushPad = ToolUtils::getBrushPad(m_thickness.getValue().second,
                                         m_hardness.getValue() * 0.01);
     TRectD rect(m_brushPos - TPointD(m_maxThick + 2, m_maxThick + 2),

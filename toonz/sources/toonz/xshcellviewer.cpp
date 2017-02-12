@@ -25,6 +25,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/tselectionhandle.h"
 #include "historytypes.h"
+#include "toonzqt/menubarcommand.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -495,50 +496,88 @@ namespace XsheetGUI {
 
 RenameCellField::RenameCellField(QWidget *parent, XsheetViewer *viewer)
     : QLineEdit(parent), m_viewer(viewer), m_row(-1), m_col(-1) {
-  setFixedSize(XsheetGUI::ColumnWidth + 3, XsheetGUI::RowHeight + 4);
   connect(this, SIGNAL(returnPressed()), SLOT(onReturnPressed()));
   setContextMenuPolicy(Qt::PreventContextMenu);
+  setObjectName("RenameCellField");
+  setAttribute(Qt::WA_TranslucentBackground, true);
+  installEventFilter(this);
 }
 
 //-----------------------------------------------------------------------------
 
-void RenameCellField::showInRowCol(int row, int col) {
+void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   m_viewer->scrollTo(row, col);
 
   m_row = row;
   m_col = col;
 
-  move(QPoint(m_viewer->columnToX(col) - 1, m_viewer->rowToY(row) - 2));
+#ifdef _WIN32
+  static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+#else
   static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+#endif
   setFont(font);
+  setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
   // Se la cella non e' vuota setto il testo
-  TXsheet *xsh  = m_viewer->getXsheet();
+  TXsheet *xsh = m_viewer->getXsheet();
+
+  // adjust text position
+  int padding = 3;
+  if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
+    TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
+    int r0, r1;
+    if (pegbar && pegbar->getKeyframeRange(r0, r1)) padding += 9;
+  }
+
+  // make the field semi-transparent
+  QColor bgColor        = m_viewer->getColumnHeadPastelizer();
+  QString styleSheetStr = QString(
+                              "#RenameCellField { padding-right:%1px; "
+                              "background-color:rgba(%2,%3,%4,75); color:%5;}")
+                              .arg(padding)
+                              .arg(bgColor.red())
+                              .arg(bgColor.green())
+                              .arg(bgColor.blue())
+                              .arg(m_viewer->getTextColor().name());
+  setStyleSheet(styleSheetStr);
+
   TXshCell cell = xsh->getCell(row, col);
   if (!cell.isEmpty()) {
+    setFixedSize(XsheetGUI::ColumnWidth - 5, XsheetGUI::RowHeight + 4);
+    move(QPoint(m_viewer->columnToX(col) + 7, m_viewer->rowToY(row) - 2));
+
     TFrameId fid           = cell.getFrameId();
     std::wstring levelName = cell.m_level->getName();
 
     // convert the last one digit of the frame number to alphabet
     // Ex.  12 -> 1B    21 -> 2A   30 -> 3
     if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
-      setText((fid.isEmptyFrame() || fid.isNoFrame())
-                  ? QString::fromStdWString(levelName)
-                  : QString::fromStdWString(levelName) + QString(" ") +
-                        m_viewer->getFrameNumberWithLetters(fid.getNumber()));
+      setText(
+          (fid.isEmptyFrame() || fid.isNoFrame())
+              ? QString::fromStdWString(levelName)
+              : (multiColumnSelected)
+                    ? m_viewer->getFrameNumberWithLetters(fid.getNumber())
+                    : QString::fromStdWString(levelName) + QString(" ") +
+                          m_viewer->getFrameNumberWithLetters(fid.getNumber()));
     else {
       std::string frameNumber("");
       if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
       if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
       setText((frameNumber.empty())
                   ? QString::fromStdWString(levelName)
-                  : QString::fromStdWString(levelName) + QString(" ") +
-                        QString::fromStdString(frameNumber));
+                  : (multiColumnSelected)
+                        ? QString::fromStdString(frameNumber)
+                        : QString::fromStdWString(levelName) + QString(" ") +
+                              QString::fromStdString(frameNumber));
     }
     selectAll();
   }
   // clear the field if the empty cell is clicked
   else {
+    setFixedSize(XsheetGUI::ColumnWidth + 3, XsheetGUI::RowHeight + 4);
+    move(QPoint(m_viewer->columnToX(col) - 1, m_viewer->rowToY(row) - 2));
+
     setText("");
   }
   show();
@@ -563,7 +602,6 @@ void RenameCellField::renameCell() {
     parse_with_letter(QString::fromStdWString(newName), levelName, fid);
   else
     parse(QString::fromStdWString(newName), levelName, fid);
-  TXshLevel *xl   = 0;
   TXsheet *xsheet = m_viewer->getXsheet();
 
   bool animationSheetEnabled =
@@ -591,32 +629,46 @@ void RenameCellField::renameCell() {
     return;
   }
 
+  TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+      TApp::instance()->getCurrentSelection()->getSelection());
+  if (!cellSelection) return;
+
+  QList<TXshCell> cells;
+
   if (levelName == L"") {
-    // prendo il livello dalla cella precedente. Se non c'e' dalla corrente
-    // (forse sto modificando una cella non vuota)
+    int r0, c0, r1, c1;
+    cellSelection->getSelectedCells(r0, c0, r1, c1);
+    bool changed = false;
+    // rename cells for each column in the selection
+    for (int c = c0; c <= c1; c++) {
+      // if there is no level at the current cell, take the level from the
+      // previous frames
+      // (when editing not empty column)
 
-    // no: faccio il contrario. cfr #6152. celle A-1,B-1. Edito B-1 e la
-    // rinomino in 2. Quindi devo prima verificare
-    // che la cella corrente non sia vuota
-
-    TXshCell cell;
-    int tmpRow = m_row;
-    while (1) {
-      cell = xsheet->getCell(tmpRow, m_col);
-      if (!cell.isEmpty() || tmpRow == 0) break;
-      tmpRow--;
+      TXshCell cell;
+      int tmpRow = m_row;
+      while (1) {
+        cell = xsheet->getCell(tmpRow, c);
+        if (!cell.isEmpty() || tmpRow == 0) break;
+        tmpRow--;
+      }
+      TXshLevel *xl = cell.m_level.getPointer();
+      if (!xl || (xl->getType() == OVL_XSHLEVEL &&
+                  xl->getPath().getFrame() == TFrameId::NO_FRAME)) {
+        cells.append(TXshCell());
+        continue;
+      }
+      // if the next upper cell is empty, then make this cell empty too
+      if (fid == TFrameId::NO_FRAME)
+        fid = (m_row - tmpRow <= 1) ? cell.m_frameId : TFrameId(0);
+      cells.append(TXshCell(xl, fid));
+      changed = true;
     }
-    xl = cell.m_level.getPointer();
-    if (!xl || (xl->getType() == OVL_XSHLEVEL &&
-                xl->getPath().getFrame() == TFrameId::NO_FRAME))
-      return;
-    // if the next upper cell is empty, then make this cell empty too
-    if (fid == TFrameId::NO_FRAME)
-      fid = (m_row - tmpRow <= 1) ? cell.m_frameId : TFrameId(0);
+    if (!changed) return;
   } else {
     ToonzScene *scene   = m_viewer->getXsheet()->getScene();
     TLevelSet *levelSet = scene->getLevelSet();
-    xl                  = levelSet->getLevel(levelName);
+    TXshLevel *xl       = levelSet->getLevel(levelName);
     if (!xl && fid != TFrameId::NO_FRAME) {
       if (animationSheetEnabled) {
         Preferences *pref   = Preferences::instance();
@@ -628,22 +680,19 @@ void RenameCellField::renameCell() {
       } else
         xl = scene->createNewLevel(TZI_XSHLEVEL, levelName);
     }
+    if (!xl) return;
+    cells.append(TXshCell(xl, fid));
   }
-  if (!xl) return;
-
-  TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
-      TApp::instance()->getCurrentSelection()->getSelection());
-  if (!cellSelection) return;
-
-  TXshCell cell(xl, fid);
 
   if (fid.getNumber() == 0) {
     TCellSelection::Range range = cellSelection->getSelectedCells();
     cellSelection->deleteCells();
     // revert cell selection
     cellSelection->selectCells(range.m_r0, range.m_c0, range.m_r1, range.m_c1);
-  } else
-    cellSelection->renameCells(cell);
+  } else if (cells.size() == 1)
+    cellSelection->renameCells(cells[0]);
+  else
+    cellSelection->renameMultiCells(cells);
 }
 
 //-----------------------------------------------------------------------------
@@ -659,8 +708,9 @@ void RenameCellField::onReturnPressed() {
   int offset                  = range.m_r1 - range.m_r0 + 1;
   cellSelection->selectCells(range.m_r0 + offset, range.m_c0,
                              range.m_r1 + offset, range.m_c1);
+  showInRowCol(m_row + offset, m_col, range.getColCount() > 1);
+  m_viewer->updateCells();
   TApp::instance()->getCurrentSelection()->notifySelectionChanged();
-  showInRowCol(m_row + offset, m_col);
 }
 
 //-----------------------------------------------------------------------------
@@ -669,6 +719,28 @@ void RenameCellField::focusOutEvent(QFocusEvent *e) {
   hide();
 
   QLineEdit::focusOutEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+// Override shortcut keys for cell selection commands
+
+bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
+  if (e->type() != QEvent::ShortcutOverride) return false;
+
+  TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+      TApp::instance()->getCurrentSelection()->getSelection());
+  if (!cellSelection) return false;
+
+  QKeyEvent *ke = (QKeyEvent *)e;
+  std::string keyStr =
+      QKeySequence(ke->key() + ke->modifiers()).toString().toStdString();
+  QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
+  if (!action) return false;
+
+  std::string actionId = CommandManager::instance()->getIdFromAction(action);
+
+  if (actionId == "MI_Undo" || actionId == "MI_Redo") return true;
+  return TCellSelection::isEnabledCommand(actionId);
 }
 
 //-----------------------------------------------------------------------------
@@ -681,23 +753,76 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
     QLineEdit::keyPressEvent(event);
     return;
   }
-  TCellSelection::Range range = cellSelection->getSelectedCells();
-  int offset                  = range.m_r1 - range.m_r0 + 1;
 
-  if (event->key() == Qt::Key_Up && m_row > 0) {
-    renameCell();
-    cellSelection->selectCells(range.m_r0 - offset, range.m_c0,
-                               range.m_r1 - offset, range.m_c1);
-    showInRowCol(m_row - offset, m_col);
-    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
-  } else if (event->key() == Qt::Key_Down) {
-    renameCell();
-    cellSelection->selectCells(range.m_r0 + offset, range.m_c0,
-                               range.m_r1 + offset, range.m_c1);
-    showInRowCol(m_row + offset, m_col);
-    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
-  } else
+  int r0, c0, r1, c1;
+  cellSelection->getSelectedCells(r0, c0, r1, c1);
+  int rowStride = r1 - r0 + 1;
+
+  QPoint offset(0, 0);
+  switch (int key = event->key()) {
+  case Qt::Key_Up:
+    offset.setY(-1);
+    break;
+  case Qt::Key_Down:
+    offset.setY(1);
+    break;
+  case Qt::Key_Left:
+    offset.setX(-1);
+    break;
+  case Qt::Key_Right:
+    offset.setX(1);
+    break;
+  default:
     QLineEdit::keyPressEvent(event);
+    return;
+    break;
+  }
+  if (isCtrlPressed &&
+      Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled()) {
+    if (r0 == r1 && offset.y() == -1) return;
+    if (c0 == c1 && offset.x() == -1) return;
+    cellSelection->selectCells(r0, c0, r1 + offset.y(), c1 + offset.x());
+  } else {
+    offset.setY(offset.y() * rowStride);
+    if (r0 + offset.y() < 0) offset.setY(-r0);
+    if (c0 + offset.x() < 0) return;
+    // It needs to be discussed - I made not to rename cell with arrow key.
+    // 19/Jan/2017 shun-iwasawa
+    // renameCell();
+    cellSelection->selectCells(r0 + offset.y(), c0 + offset.x(),
+                               r1 + offset.y(), c1 + offset.x());
+    showInRowCol(m_row + offset.y(), m_col + offset.x(), c1 - c0 > 0);
+  }
+  m_viewer->updateCells();
+  TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void RenameCellField::showEvent(QShowEvent *) {
+  bool ret = connect(TApp::instance()->getCurrentXsheet(),
+                     SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
+  assert(ret);
+}
+
+//-----------------------------------------------------------------------------
+
+void RenameCellField::hideEvent(QHideEvent *) {
+  disconnect(TApp::instance()->getCurrentXsheet(), SIGNAL(xsheetChanged()),
+             this, SLOT(onXsheetChanged()));
+}
+
+//-----------------------------------------------------------------------------
+
+void RenameCellField::onXsheetChanged() {
+  TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+      TApp::instance()->getCurrentSelection()->getSelection());
+  if (!cellSelection) {
+    hide();
+    return;
+  }
+  TCellSelection::Range range = cellSelection->getSelectedCells();
+  showInRowCol(m_row, m_col, range.getColCount() > 1);
 }
 
 //=============================================================================
@@ -830,10 +955,8 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
     x1 = m_viewer->columnToX(col + 1);
 
     // draw vertical lines
-    p.setPen(Qt::black);
+    p.setPen(m_viewer->getVerticalLineColor());
     if (x > 0) p.drawLine(x, y0, x, y1);
-    p.setPen(Qt::white);
-    if (x > 1) p.drawLine(x - 1, y0, x - 1, y1);
 
     for (row = r0; row <= r1; row++) {
       // draw horizontal lines
@@ -1151,6 +1274,9 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
 #endif
   p.setFont(font);
+
+  // do not draw frame number under RenameCellField
+  if (m_renameCell->isVisible() && m_renameCell->isLocatedAt(row, col)) return;
 
   // if the same level & same fId with the previous cell, then draw vertical
   // line
@@ -1605,7 +1731,7 @@ void CellArea::paintEvent(QPaintEvent *event) {
   int col    = m_viewer->getCurrentColumn();
   int x      = m_viewer->columnToX(col);
   int y      = m_viewer->rowToY(row);
-  QRect rect = QRect(x + 1, y + 1, ColumnWidth - 3, RowHeight - 2);
+  QRect rect = QRect(x + 1, y + 1, ColumnWidth - 2, RowHeight - 2);
   p.setPen(Qt::black);
   p.setBrush(Qt::NoBrush);
   p.drawRect(rect);
@@ -1958,7 +2084,9 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
        m_viewer->getXsheet()->getCell(row, col).isEmpty()))
     return;
 
-  m_renameCell->showInRowCol(row, col);
+  int colCount = m_viewer->getCellSelection()->getSelectedCells().getColCount();
+
+  m_renameCell->showInRowCol(row, col, colCount > 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -2112,6 +2240,10 @@ void CellArea::onControlPressed(bool pressed) {
   isCtrlPressed = pressed;
   update();
 }
+
+//-----------------------------------------------------------------------------
+
+const bool CellArea::isControlPressed() { return isCtrlPressed; }
 
 //-----------------------------------------------------------------------------
 void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {

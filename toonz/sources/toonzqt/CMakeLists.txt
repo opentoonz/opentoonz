@@ -204,7 +204,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(incs)
 foreach(dir ${Qt5Widgets_INCLUDE_DIRS})
-   set(incs ${incs} -I${dir})
+    set(incs ${incs} -I${dir})
 endforeach()
 
 qt5_add_resources(SOURCES ${RESOURCES})

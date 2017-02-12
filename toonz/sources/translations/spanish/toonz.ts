@@ -121,6 +121,30 @@
     </message>
 </context>
 <context>
+    <name>AudioRecordingPopup</name>
+    <message>
+        <source>Audio Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save and Insert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync with XSheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The microphone is not available: 
+Please select a different device or check the microphone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AutocenterPopup</name>
     <message>
         <source>Autocenter</source>
@@ -841,7 +865,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Camera Stand View</source>
-        <translation></translation>
+        <translation>Vista de cámara</translation>
     </message>
     <message>
         <source>3D View</source>
@@ -849,7 +873,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Camera View</source>
-        <translation></translation>
+        <translation>Vista de cámara</translation>
     </message>
     <message>
         <source>Freeze</source>
@@ -1142,7 +1166,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Append Default Palette</source>
-        <translation type="unfinished"></translation>
+        <translation>Anexar paleta predefinida</translation>
     </message>
     <message>
         <source>When activated, styles of the default palette
@@ -1150,7 +1174,11 @@ What do you want to do?</source>
 be appended to the palette after conversion in 
 order to save the effort of creating styles 
 before color designing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si esta activa, los estilos de la paleta predefinida
+($TOONZSTUDIOPALETTE\cleanup_default.tpl) serán 
+anexados a la paleta, luego de la conversión para 
+ahorrar el esfuerzo de tener que crear estilos antes 
+de diseñar el color.</translation>
     </message>
     <message>
         <source>Remove Unused Styles from Input Palette</source>
@@ -3247,19 +3275,19 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Drawing Substitution Forward</source>
-        <translation></translation>
+        <translation>Sustituir dibujos hacia adelante</translation>
     </message>
     <message>
         <source>Drawing Substitution Backward</source>
-        <translation></translation>
+        <translation>Sustituir dibujos hacia atrás</translation>
     </message>
     <message>
         <source>Similar Drawing Substitution Forward</source>
-        <translation></translation>
+        <translation>Sustituir dibujos similares hacia adelante</translation>
     </message>
     <message>
         <source>Similar Drawing Substitution Backward</source>
-        <translation></translation>
+        <translation>Sustituir dibujos similares hacia atrás</translation>
     </message>
     <message>
         <source>&amp;Set Key</source>
@@ -3267,7 +3295,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Camera Box</source>
-        <translation>&amp;Riquadro di Camera</translation>
+        <translation>&amp;Marco de la cámara</translation>
     </message>
     <message>
         <source>&amp;Table</source>
@@ -4439,7 +4467,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Refresh Folder Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Refrescar árbol de carpetas</translation>
     </message>
     <message>
         <source>&amp;Save All Levels</source>
@@ -4479,6 +4507,14 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Startup Popup...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Fast Render to MP4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Audio</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5043,6 +5079,10 @@ What do you want to do?</source>
         <source>Warning</source>
         <translation>Advertencia</translation>
     </message>
+    <message>
+        <source>Render</source>
+        <translation type="unfinished">Procesamiento</translation>
+    </message>
 </context>
 <context>
     <name>OverwriteDialog</name>
@@ -5287,6 +5327,22 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Video Capture Filter Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load Selected Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No image selected.  Please select an image in the Xsheet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected image is not in a raster level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected image size does not match the current camera settings.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5944,8 +6000,8 @@ Do you want to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rooms*:</source>
-        <translation type="unfinished"></translation>
+        <source>Rooms *:</source>
+        <translation type="vanished">Espacios de trabajo *:</translation>
     </message>
     <message>
         <source>OpenToonz can use FFmpeg for additional file formats.</source>
@@ -5985,6 +6041,35 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Show Startup Window when OpenToonz Starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Numpad keys are assigned to the following commands.
+Is it OK to release these shortcuts?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Aceptar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Numpad and Tab keys for Switching Styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rooms*:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Render Path: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7585,15 +7670,15 @@ error no definido.</translation>
     </message>
     <message>
         <source>Change current drawing %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar dibujo actual %1</translation>
     </message>
     <message>
         <source>Sensitivity Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Error de sensibilidad</translation>
     </message>
     <message>
         <source>Add color model&apos;s palette to the destination palette.</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar la paleta del modelo de color a la paleta de destino.</translation>
     </message>
     <message>
         <source>%1: the current scene has been modified.
@@ -7664,6 +7749,14 @@ Do you want to overwrite it?</source>
     <message>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg not found, please set the location in the Preferences and restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skipping frame.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9173,7 +9266,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Windows</source>
-        <translation>Windows</translation>
+        <translation>Ventanas</translation>
     </message>
     <message>
         <source>Other Windows</source>
@@ -9848,7 +9941,7 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Sensitivity:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sensibilidad:</translation>
     </message>
 </context>
 <context>
@@ -10179,6 +10272,45 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
 </context>
 <context>
+    <name>XsheetGUI::ColumnTransparencyPopup</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">Ninguno</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkYellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkCyan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkMagenta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N.B. Filter doesn&apos;t affect vector levels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>XsheetGUI::NoteArea</name>
     <message>
         <source>Frame</source>
@@ -10264,7 +10396,7 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
     <message>
         <source>Pinned Center : Col%1%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Centro fijo: Col%1%2</translation>
     </message>
 </context>
 <context>

@@ -29,6 +29,29 @@
     </message>
 </context>
 <context>
+    <name>AddWordButton</name>
+    <message>
+        <source>Character</source>
+        <translation>キャラクター</translation>
+    </message>
+    <message>
+        <source>Part</source>
+        <translation>部位</translation>
+    </message>
+    <message>
+        <source>Suffix</source>
+        <translation>接尾辞</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation>新規作成</translation>
+    </message>
+    <message>
+        <source>Add New Word for %1</source>
+        <translation>%1 に新しい単語を追加する</translation>
+    </message>
+</context>
+<context>
     <name>AdjustPaletteDialog</name>
     <message>
         <source>Adjust Current Level to This Palette</source>
@@ -383,6 +406,17 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Ease Out:</source>
         <translation>スローアウト：</translation>
+    </message>
+</context>
+<context>
+    <name>EasyInputArea</name>
+    <message>
+        <source>Warning</source>
+        <translation>警告</translation>
+    </message>
+    <message>
+        <source>%1 is already registered</source>
+        <translation>%1 は既に登録されています</translation>
     </message>
 </context>
 <context>
@@ -1176,6 +1210,21 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
         <translation type="vanished">ファイル名は次の記号のどれかを含むことができません： --- \ / : ? &quot; | --- </translation>
+    </message>
+</context>
+<context>
+    <name>NewWordDialog</name>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>Enter new word</source>
+        <translation>単語を入力してください</translation>
     </message>
 </context>
 <context>
@@ -2204,7 +2253,7 @@ Apply</source>
     </message>
     <message>
         <source>Apply</source>
-        <translation>適用</translation>
+        <translation type="vanished">適用</translation>
     </message>
     <message>
         <source>Style Name</source>
@@ -2213,6 +2262,14 @@ Apply</source>
     <message>
         <source>Name Editor: # %1</source>
         <translation>スタイル名を編集: # %1</translation>
+    </message>
+    <message>
+        <source>Apply and Next</source>
+        <translation>適用して次へ</translation>
+    </message>
+    <message>
+        <source>Easy Inputs</source>
+        <translation>簡易入力</translation>
     </message>
 </context>
 <context>
@@ -2253,6 +2310,13 @@ Apply</source>
     <message>
         <source>Plain color</source>
         <translation>通常の色</translation>
+    </message>
+</context>
+<context>
+    <name>WordButton</name>
+    <message>
+        <source>Remove %1</source>
+        <translation type="unfinished">%1 を削除</translation>
     </message>
 </context>
 </TS>

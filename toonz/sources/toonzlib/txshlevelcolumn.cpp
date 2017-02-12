@@ -113,6 +113,10 @@ void TXshLevelColumn::loadData(TIStream &is) {
       int opacity;
       is >> opacity;
       setOpacity((UCHAR)opacity);
+    } else if (tagName == "filter_color_id") {
+      int id;
+      is >> id;
+      setFilterColorId(id);
     } else if (tagName == "cells") {
       while (is.openChild(tagName)) {
         if (tagName == "cell") {
@@ -164,6 +168,8 @@ void TXshLevelColumn::loadData(TIStream &is) {
 void TXshLevelColumn::saveData(TOStream &os) {
   os.child("status") << getStatusWord();
   if (getOpacity() < 255) os.child("camerastand_opacity") << (int)getOpacity();
+  if (getFilterColorId() != 0)
+    os.child("filter_color_id") << (int)getFilterColorId();
   int r0, r1;
   if (getRange(r0, r1)) {
     os.openChild("cells");

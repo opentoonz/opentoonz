@@ -4,6 +4,64 @@ set(CMAKE_BUILD_TYPE_INIT Release)
 
 project(OpenToonz)
 
+
+#-----------------------------------------------------------------------------
+# Platform Specific Defaults
+
+# list of var-names
+set(_init_vars)
+
+# initialize to ON
+macro(option_defaults_init)
+    foreach(_var ${ARGV})
+        set(${_var} ON)
+        list(APPEND _init_vars "${_var}")
+    endforeach()
+    unset(_var)
+endmacro()
+
+# remove from namespace
+macro(option_defaults_clear)
+    foreach(_var ${_init_vars})
+        unset(${_var})
+    endforeach()
+    unset(_var)
+    unset(_init_vars)
+endmacro()
+
+# values to initialize WITH_****
+option_defaults_init(
+    _init_SYSTEM_LZO
+)
+
+# customize...
+if(WIN32)
+    set(_init_SYSTEM_LZO                     OFF)
+    set(_init_SYSTEM_SUPERLU                 OFF)
+elseif(APPLE)
+    set(_init_SYSTEM_LZO                     OFF)
+    set(_init_SYSTEM_SUPERLU                 OFF)
+elseif(UNIX)
+    set(_init_SYSTEM_LZO                     ON)
+    set(_init_SYSTEM_SUPERLU                 ON)
+endif()
+
+
+#-----------------------------------------------------------------------------
+# Build Options
+
+option(WITH_SYSTEM_LZO "Use the system LZO library instead of 'thirdpary'" ${_init_SYSTEM_LZO})
+option(WITH_SYSTEM_SUPERLU "Use the system SuperLU library instead of 'thirdpary'" ${_init_SYSTEM_SUPERLU})
+
+# avoid using again
+option_defaults_clear()
+
+# end option(...)
+
+
+#-----------------------------------------------------------------------------
+# Third Party & System Libs
+
 include(${CMAKE_SOURCE_DIR}/../cmake/util_compiler.cmake)
 
 get_filename_component(SDKROOT ../../thirdparty/ ABSOLUTE)
@@ -260,7 +318,7 @@ elseif(APPLE)
     message("**************** lz4 lib:" ${LZ4_LIB_INCLUDE_DIRS})
     find_path(LZ4_STATIC lz4frame_static.h PATH ${LZ4_LIB_INCLUDE_DIRS})
     if(LZ4_STATIC-FOUND)
-       add_definitions(-DLZ4_STATIC)
+        add_definitions(-DLZ4_STATIC)
     endif()
 
     pkg_check_modules(USB_LIB REQUIRED libusb-1.0)
@@ -310,7 +368,7 @@ elseif(UNIX)
     message("**************** lz4 lib:" ${LZ4_LIB_INCLUDE_DIRS})
     find_path(LZ4_STATIC lz4frame_static.h PATH ${LZ4_LIB_INCLUDE_DIRS})
     if(LZ4_STATIC-FOUND)
-       add_definitions(-DLZ4_STATIC)
+        add_definitions(-DLZ4_STATIC)
     endif()
 
     pkg_check_modules(USB_LIB REQUIRED libusb-1.0)

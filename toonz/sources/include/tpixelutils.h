@@ -126,14 +126,52 @@ DVAPI inline T quickOverPixPremultT(const T &bot, const T &top) {
 }
 //------------------------------------------------------------------------------------
 /*-- Show raster images darken-blended on the viewer --*/
+/* references from ino_blend_darken.cpp */
 template <class T, class Q>
 DVAPI inline T quickOverPixDarkenBlendedT(const T &bot, const T &top) {
-  UINT max = T::maxChannelValue;
+  struct locals {
+    static inline double comp(const double ch_a, const double ch_b,
+                              const double alpha) {
+      return clamp(ch_b + ch_a * (1.0 - alpha));
+    }
+    static inline double darken_ch(const double dn, const double dn_a,
+                                   const double up, const double up_a) {
+      return (up / up_a < dn / dn_a) ? comp(dn, up, up_a) : comp(up, dn, dn_a);
+    }
+    static inline double clamp(double val) {
+      return (val < 0.0) ? 0.0 : (val > 1.0) ? 1.0 : val;
+    }
+  };  // locals
+
   if (bot.m == 0) return top;
-  TUINT32 r = (top.r < bot.r) ? top.r : bot.r;
-  TUINT32 g = (top.g < bot.g) ? top.g : bot.g;
-  TUINT32 b = (top.b < bot.b) ? top.b : bot.b;
-  return T((Q)r, (Q)g, (Q)b, max);
+
+  if (top.m == T::maxChannelValue && bot.m == T::maxChannelValue) {
+    TUINT32 r = (top.r < bot.r) ? top.r : bot.r;
+    TUINT32 g = (top.g < bot.g) ? top.g : bot.g;
+    TUINT32 b = (top.b < bot.b) ? top.b : bot.b;
+    return T((Q)r, (Q)g, (Q)b, T::maxChannelValue);
+  }
+
+  double maxi = static_cast<double>(T::maxChannelValue);  // 255or65535
+
+  double upr = static_cast<double>(top.r) / maxi;
+  double upg = static_cast<double>(top.g) / maxi;
+  double upb = static_cast<double>(top.b) / maxi;
+  double upa = static_cast<double>(top.m) / maxi;
+  double dnr = static_cast<double>(bot.r) / maxi;
+  double dng = static_cast<double>(bot.g) / maxi;
+  double dnb = static_cast<double>(bot.b) / maxi;
+  double dna = static_cast<double>(bot.m) / maxi;
+  dnr        = locals::darken_ch(dnr, dna, upr, upa);
+  dng        = locals::darken_ch(dng, dna, upg, upa);
+  dnb        = locals::darken_ch(dnb, dna, upb, upa);
+  dna        = locals::comp(dna, upa, upa);
+  T out;
+  out.r = static_cast<Q>(dnr * (maxi + 0.999999));
+  out.g = static_cast<Q>(dng * (maxi + 0.999999));
+  out.b = static_cast<Q>(dnb * (maxi + 0.999999));
+  out.m = static_cast<Q>(dna * (maxi + 0.999999));
+  return out;
 }
 
 //-----------------------------------------------------------------------------

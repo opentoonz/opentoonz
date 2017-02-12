@@ -39,6 +39,7 @@ protected:
 protected slots:
   void insertMenu();
   void removeItem();
+  void onItemChanged(QTreeWidgetItem*, int);
 };
 
 //=============================================================================

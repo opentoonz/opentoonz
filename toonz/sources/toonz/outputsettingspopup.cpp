@@ -165,7 +165,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
     showOtherSettingsButton = new QPushButton("", this);
     otherSettingsLabel      = new QLabel(tr("Other Settings"), this);
     otherSettingsFrame      = new QFrame(this);
-
+    m_renderButton          = new QPushButton(tr("Render"), this);
     // Gamma
     m_gammaFld = new DVGui::DoubleLineEdit();
     // Dominant Field
@@ -503,7 +503,9 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
     }
     fileSettingsBox->setLayout(fileSetBoxLay);
     m_topLayout->addWidget(fileSettingsBox, 0);
-
+    if (!isPreview) {
+      m_topLayout->addWidget(m_renderButton);
+    }
     m_topLayout->addStretch(1);
   }
 
@@ -520,6 +522,8 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
                   SLOT(onFormatChanged(const QString &)));
     ret = ret && connect(m_fileFormatButton, SIGNAL(pressed()), this,
                          SLOT(openSettingsPopup()));
+    ret = ret && connect(m_renderButton, SIGNAL(pressed()), this,
+                         SLOT(onRenderClicked()));
   }
   ret = ret &&
         connect(m_outputCameraOm, SIGNAL(currentIndexChanged(const QString &)),
@@ -650,6 +654,12 @@ void OutputSettingsPopup::onApplyShrinkChecked(int state) {
 
 void OutputSettingsPopup::onSubcameraChecked(int state) {
   getProperties()->setSubcameraPreview(state == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
+void OutputSettingsPopup::onRenderClicked() {
+  CommandManager::instance()->execute("MI_Render");
 }
 
 //-----------------------------------------------------------------------------

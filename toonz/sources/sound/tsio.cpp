@@ -8,10 +8,6 @@
 
 // static TPluginInfo info("soundIOPlugin");
 
-void cribbioNonCapiscoNulla() {}
-
-void mammaChePaura() {}
-
 void initSoundIo() {
   TSoundTrackReader::define("wav", TSoundTrackReaderWav::create);
   TSoundTrackWriter::define("wav", TSoundTrackWriterWav::create);
@@ -20,6 +16,10 @@ void initSoundIo() {
   TSoundTrackReader::define("aiff", TSoundTrackReaderAiff::create);
   TSoundTrackWriter::define("aiff", TSoundTrackWriterAiff::create);
   TFileType::declare("aiff", TFileType::AUDIO_LEVEL);
+
+  TSoundTrackReader::define("aif", TSoundTrackReaderAiff::create);
+  TSoundTrackWriter::define("aif", TSoundTrackWriterAiff::create);
+  TFileType::declare("aif", TFileType::AUDIO_LEVEL);
 
   TSoundTrackReader::define("raw", TSoundTrackReaderRaw::create);
   TSoundTrackWriter::define("raw", TSoundTrackWriterRaw::create);

@@ -15,7 +15,7 @@ set(SOURCES
     raw/tsio_raw.cpp
     mp3/tsio_mp3.cpp
 )
-    
+
 add_library(sound SHARED ${HEADERS} ${SOURCES})
 add_definitions(
     -DSOUND_EXPORTS

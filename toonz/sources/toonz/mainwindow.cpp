@@ -1652,7 +1652,7 @@ void MainWindow::defineActions() {
                              tr("Toggle Link to Studio Palette"), "");
   createRightClickMenuAction(MI_RemoveReferenceToStudioPalette,
                              tr("Remove Reference to Studio Palette"), "");
-  createMenuEditAction(MI_Clear, tr("&Delete"), "Delete");
+  createMenuEditAction(MI_Clear, tr("&Delete"), "Del");
   createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
   createMenuEditAction(MI_Group, tr("&Group"), "Ctrl+G");
   createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "Ctrl+Shift+G");

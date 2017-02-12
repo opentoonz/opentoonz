@@ -49,6 +49,7 @@ class OutputSettingsPopup : public DVGui::Dialog {
 
   DVGui::DoubleLineEdit *m_frameRateFld;
   QPushButton *m_fileFormatButton;
+  QPushButton *m_renderButton;
   CameraSettingsPopup *m_cameraSettings;
   QComboBox *m_presetCombo;
 
@@ -86,6 +87,7 @@ protected slots:
   void onRasterGranularityChanged(int type);
   void onStereoChecked(int);
   void onStereoChanged();
+  void onRenderClicked();
 
   /*-- OutputSettingsのPreset登録/削除/選択 --*/
   void onAddPresetButtonPressed();

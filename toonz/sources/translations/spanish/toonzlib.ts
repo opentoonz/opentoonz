@@ -500,7 +500,7 @@
     </message>
     <message>
         <source>color model</source>
-        <translation type="unfinished"></translation>
+        <translation>modelo de color</translation>
     </message>
     <message>
         <source>Set Picked Position of Style#%1 in Palette%2 : %3,%4</source>

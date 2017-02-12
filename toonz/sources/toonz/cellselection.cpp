@@ -1033,8 +1033,8 @@ public:
 
 //-----------------------------------------------------------------------------
 // if at least one of the cell in the range, return false
-bool checkIfCellsHaveTheSameContent(int &r0, int &c0, int &r1, int &c1,
-                                    TXshCell &cell) {
+bool checkIfCellsHaveTheSameContent(const int &r0, const int &c0, const int &r1,
+                                    const int &c1, const TXshCell &cell) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   for (int c = c0; c <= c1; c++) {
     for (int r = r0; r <= r1; r++) {
@@ -1072,6 +1072,13 @@ public:
       : m_data(data), m_cell(cell) {
     int r0, c0, r1, c1;
     selection->getSelectedCells(r0, c0, r1, c1);
+    m_selection = new TCellSelection();
+    m_selection->selectCells(r0, c0, r1, c1);
+  }
+
+  RenameCellsUndo(int r0, int c0, int r1, int c1, QMimeData *data,
+                  TXshCell &cell)
+      : m_data(data), m_cell(cell) {
     m_selection = new TCellSelection();
     m_selection->selectCells(r0, c0, r1, c1);
   }
@@ -1195,6 +1202,22 @@ void TCellSelection::enableCommands() {
   enableCommand(this, MI_Reframe2, &TCellSelection::reframe2Cells);
   enableCommand(this, MI_Reframe3, &TCellSelection::reframe3Cells);
   enableCommand(this, MI_Reframe4, &TCellSelection::reframe4Cells);
+}
+//-----------------------------------------------------------------------------
+// Used in RenameCellField::eventFilter()
+
+bool TCellSelection::isEnabledCommand(
+    std::string commandId) {  // static function
+  static QList<std::string> commands = {
+      MI_Autorenumber, MI_Reverse,    MI_Swing,        MI_Random,
+      MI_Increment,    MI_ResetStep,  MI_IncreaseStep, MI_DecreaseStep,
+      MI_Step2,        MI_Step3,      MI_Step4,        MI_Each2,
+      MI_Each3,        MI_Each4,      MI_Rollup,       MI_Rolldown,
+      MI_TimeStretch,  MI_CloneLevel, MI_SetKeyframes, MI_Copy,
+      MI_Paste,        MI_PasteInto,  MI_Cut,          MI_Clear,
+      MI_Insert,       MI_PasteInto,  MI_Reframe1,     MI_Reframe2,
+      MI_Reframe3,     MI_Reframe4};
+  return commands.contains(commandId);
 }
 
 //-----------------------------------------------------------------------------
@@ -1568,7 +1591,12 @@ void TCellSelection::deleteCells() {
       new DeleteCellsUndo(new TCellSelection(m_range), data);
 
   deleteCellsWithoutUndo(r0, c0, r1, c1);
-  selectNone();
+  // emit selectionChanged() signal so that the rename field will update
+  // accordingly
+  if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled())
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  else
+    selectNone();
 
   TUndoManager::manager()->add(undo);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -1593,7 +1621,12 @@ void TCellSelection::cutCells(bool withoutCopy) {
   cutCellsWithoutUndo(r0, c0, r1, c1);
 
   TUndoManager::manager()->add(undo);
-  selectNone();
+  // cutCellsWithoutUndo will clear the selection, so select cells again
+  if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled()) {
+    selectCells(r0, c0, r1, c1);
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  } else
+    selectNone();
 
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 }
@@ -2052,3 +2085,31 @@ void TCellSelection::renameCells(TXshCell &cell) {
 }
 
 //-----------------------------------------------------------------------------
+// rename cells for each columns with correspondent item in the list
+
+void TCellSelection::renameMultiCells(QList<TXshCell> &cells) {
+  if (isEmpty()) return;
+  int r0, c0, r1, c1;
+  getSelectedCells(r0, c0, r1, c1);
+  assert(cells.size() == c1 - c0 + 1);
+  // register undo only if the cell is modified
+  bool somethingChanged = false;
+  for (int c = c0; c <= c1; c++) {
+    somethingChanged =
+        !checkIfCellsHaveTheSameContent(r0, c, r1, c, cells[c - c0]);
+    if (somethingChanged) break;
+  }
+  if (!somethingChanged) return;
+
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  TUndoManager::manager()->beginBlock();
+  for (int c = c0; c <= c1; c++) {
+    TCellData *data = new TCellData();
+    data->setCells(xsh, r0, c, r1, c);
+    RenameCellsUndo *undo =
+        new RenameCellsUndo(r0, c, r1, c, data, cells[c - c0]);
+    undo->redo();
+    TUndoManager::manager()->add(undo);
+  }
+  TUndoManager::manager()->endBlock();
+}

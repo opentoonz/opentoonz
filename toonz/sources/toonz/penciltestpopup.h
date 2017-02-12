@@ -122,6 +122,31 @@ signals:
 };
 
 //=============================================================================
+// PencilTestSaveInFolderPopup
+//-----------------------------------------------------------------------------
+
+class PencilTestSaveInFolderPopup : public DVGui::Dialog {
+  Q_OBJECT
+
+  DVGui::FileField* m_parentFolderField;
+  QLineEdit *m_projectField, *m_episodeField, *m_sequenceField, *m_sceneField,
+      *m_subFolderNameField;
+
+  QCheckBox *m_subFolderCB, *m_autoSubNameCB;
+  QComboBox* m_subNameFormatCombo;
+
+public:
+  PencilTestSaveInFolderPopup(QWidget* parent = 0);
+  QString getPath();
+
+protected slots:
+  void updateSubFolderName();
+  void onAutoSubNameCBClicked(bool);
+  void onShowPopupOnLaunchCBClicked(bool);
+  void onOkPressed();
+};
+
+//=============================================================================
 // PencilTestPopup
 //-----------------------------------------------------------------------------
 
@@ -150,6 +175,8 @@ class PencilTestPopup : public DVGui::Dialog {
 
   // used only for Windows
   QPushButton* m_captureFilterSettingsBtn;
+
+  PencilTestSaveInFolderPopup* m_saveInFolderPopup;
 
   int m_timerId;
   QString m_cacheImagePath;
@@ -189,6 +216,9 @@ protected slots:
 
   void onCaptureButtonClicked(bool);
   void onCaptureFilterSettingsBtnPressed();
+
+public slots:
+  void openSaveInFolderPopup();
 };
 
 #endif

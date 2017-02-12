@@ -64,6 +64,8 @@ class DVAPI TXshColumn : public TColumnHeader, public TPersist {
   int m_colorTag;  // Usato solo in tabkids
   UCHAR m_opacity;
 
+  int m_filterColorId;
+
 protected:
   enum {
     eCamstandVisible       = 0x1,
@@ -90,7 +92,12 @@ public:
   /*!
 Constructs a TXshColumn with default value.
 */
-  TXshColumn() : m_status(0), m_xsheet(0), m_colorTag(0), m_opacity(255) {}
+  TXshColumn()
+      : m_status(0)
+      , m_xsheet(0)
+      , m_colorTag(0)
+      , m_opacity(255)
+      , m_filterColorId(0) {}
 
   enum ColumnType {
     eLevelType = 0,
@@ -236,6 +243,9 @@ Set column color tag to \b colorTag.
   void setColorTag(int colorTag) {
     m_colorTag = colorTag;
   }  // Usato solo in tabkids
+
+  int getFilterColorId() const { return m_filterColorId; }
+  void setFilterColorId(int id) { m_filterColorId = id; }
 };
 
 #ifdef _WIN32

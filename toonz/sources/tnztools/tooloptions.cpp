@@ -214,7 +214,6 @@ void ToolOptionControlBuilder::visit(TDoublePairProperty *p) {
       m_tool, p, QObject::tr("Min:"), QObject::tr("Max:"), m_toolHandle);
   hLayout()->addWidget(control, 150);
   m_panel->addControl(control);
-
   if (p->getName() == "Size:" || p->getName() == "Size") {
     CommandManager *cm = CommandManager::instance();
     QAction *a;
@@ -244,8 +243,8 @@ void ToolOptionControlBuilder::visit(TIntPairProperty *p) {
       m_tool, p, QObject::tr("Min:"), QObject::tr("Max:"), m_toolHandle);
   hLayout()->addWidget(control, 100);
   m_panel->addControl(control);
-
-  if (p->getName() == "Size:") {
+  if (p->getName() == "Size:" || p->getName() == "Thickness" ||
+      p->getName() == "Size") {
     CommandManager *cm = CommandManager::instance();
     QAction *a;
     a = cm->getAction("A_IncreaseMaxBrushThickness");
@@ -278,7 +277,6 @@ void ToolOptionControlBuilder::visit(TIntProperty *p) {
     control->enableSlider(false);
     control->setFixedWidth(45);
   }
-
   hLayout()->addWidget(control, 100);
   m_panel->addControl(control);
   if (p->getName() == "Size:") {
