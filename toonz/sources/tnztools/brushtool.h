@@ -7,13 +7,12 @@
 #include "tproperty.h"
 #include "trasterimage.h"
 #include "ttoonzimage.h"
+#include "tcurves.h"
 
 #include "toonz/strokegenerator.h"
 
 #include "tools/tool.h"
 #include "tools/cursors.h"
-
-#include "tcurves.h"
 
 #include <QCoreApplication>
 #include <QRadialGradient>
@@ -102,6 +101,31 @@ private:
   std::vector<TThickPoint> m_rawPoints;
   std::vector<TThickPoint> m_outputPoints;
 };
+
+//************************************************************************
+//    Animation Auto-complete declaration
+//    Detects repetitions in strokes within/across frames and predicts
+//    the next stroke(s) accordingly.
+//************************************************************************
+
+typedef std::vector<TThickQuadratic *> ArrayOfTQ;
+
+class AnimationAutoComplete {
+public:
+  AnimationAutoComplete() {}
+  ~AnimationAutoComplete() {}
+
+  //ArrayOfTQ getNeighbors(TThickQuadratic* samplePoint);
+  void addStroke(TStroke* stroke);
+
+private:
+  //void generatePoints();
+
+private:
+  int m_spaceVicinityRadius;
+  std::vector<TStroke*> m_strokes;
+};
+
 //************************************************************************
 //    Brush Tool declaration
 //************************************************************************
@@ -197,6 +221,8 @@ protected:
 
   SmoothStroke m_smoothStroke;
 
+  AnimationAutoComplete m_animationAutoComplete;
+
   BrushPresetManager
       m_presetsManager;  //!< Manager for presets of this tool instance
 
@@ -215,29 +241,6 @@ protected:
                        bool horizontal, bool isDecimal);
   static void drawEmptyCircle(TPointD point, int thick, bool isLxEven,
                               bool isLyEven, bool isPencil);
-};
-
-//************************************************************************
-//    Animation Auto-complete declaration
-//    Detects repetitions in strokes within/across frames and predicts
-//    the next stroke(s) accordingly.
-//************************************************************************
-
-typedef std::vector<TThickQuadratic *> Neighbors;
-
-class AnimationAutoComplete {
-public:
-  AnimationAutoComplete() {}
-  ~AnimationAutoComplete() {}
-
-  Neighbors getNeighbors(TThickQuadratic* samplePoint);
-
-private:
-  void generatePoints();
-
-private:
-  int m_spaceVicinityRadius;
-
 };
 
 #endif  // BRUSHTOOL_H

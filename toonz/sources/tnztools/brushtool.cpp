@@ -1363,6 +1363,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
                                          // hanno 1 solo chunk.
       stroke->insertControlPoints(0.5);
 
+	m_animationAutoComplete.addStroke(stroke);
     addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                      m_isFrameCreated, m_isLevelCreated);
     TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
@@ -2176,4 +2177,11 @@ void BrushPresetManager::addPreset(const BrushData &data) {
 void BrushPresetManager::removePreset(const std::wstring &name) {
   m_presets.erase(BrushData(name));
   save();
+}
+
+//------------------------------------------------------------------
+
+void AnimationAutoComplete::addStroke(TStroke* stroke)
+{
+	m_strokes.push_back(stroke);
 }
