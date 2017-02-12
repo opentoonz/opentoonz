@@ -409,6 +409,8 @@ PaletteViewer #ToolBarContainer #keyFrameNavigator {
   border: 0px;
 }
 #TabBarContainer {
+  qproperty-BottomAboveLineColor: #787878;
+  qproperty-BottomBelowLineColor: #ffffff;
   background-color: #0a0a0a;
 }
 #TabBarContainer #ScrollLeftButton,
