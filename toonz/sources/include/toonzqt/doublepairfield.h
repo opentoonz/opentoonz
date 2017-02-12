@@ -81,10 +81,14 @@ protected:
   QColor m_lightLineColor; /*-- スライダ溝の明るい色（白） --*/
   QColor m_darkLineColor; /*-- スライダ溝の暗い色（128,128,128） --*/
   QColor m_middleLineColor;
+  QColor m_lightLineEdgeColor;
   Q_PROPERTY(
       QColor LightLineColor READ getLightLineColor WRITE setLightLineColor);
   Q_PROPERTY(QColor DarkLineColor READ getDarkLineColor WRITE setDarkLineColor);
-  Q_PROPERTY(QColor MiddleLineColor READ getMiddleLineColor WRITE setMiddleLineColor);
+  Q_PROPERTY(
+      QColor MiddleLineColor READ getMiddleLineColor WRITE setMiddleLineColor);
+  Q_PROPERTY(QColor LightLineEdgeColor READ getLightLineEdgeColor WRITE
+                 setLightLineEdgeColor);
 
   DoubleValueLineEdit *m_leftLineEdit;
   DoubleValueLineEdit *m_rightLineEdit;
@@ -147,6 +151,10 @@ public:
   QColor getDarkLineColor() const { return m_darkLineColor; }
   void setMiddleLineColor(const QColor &color) { m_middleLineColor = color; }
   QColor getMiddleLineColor() const { return m_middleLineColor; }
+  void setLightLineEdgeColor(const QColor &color) {
+    m_lightLineEdgeColor = color;
+  }
+  QColor getLightLineEdgeColor() const { return m_lightLineEdgeColor; }
 
 protected:
   /*! Return value corresponding \b x position. */
