@@ -455,8 +455,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::KEY_ICON, keyRect);
   QRect nameRect = cellRect.adjusted(7, 4, -6, 0);
   addRect(PredefinedRect::CELL_NAME, nameRect);
-  addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME,
-          nameRect.adjusted(0, 0, 0, -KEY_ICON_HEIGHT));
+  addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect);
   addRect(PredefinedRect::END_EXTENDER,
           QRect(1, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect(PredefinedRect::BEGIN_EXTENDER,
