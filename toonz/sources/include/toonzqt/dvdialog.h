@@ -88,6 +88,11 @@ Dialog DVAPI *createMsgBox(MsgType type, const QString &text,
                            const QStringList &buttons, int defaultButtonIndex,
                            QWidget *parent = 0);
 
+Dialog DVAPI *createMsgandCheckbox(MsgType type, const QString &text,
+                                   const QString &checkBoxText,
+                                   const QStringList &buttons,
+                                   int defaultButtonIndex, QWidget *parent = 0);
+
 // void DVAPI error(const QString &msg);
 // void DVAPI info(const QString &msg);
 
@@ -244,6 +249,23 @@ public:
   void clearButtonBar();
 signals:
   void dialogClosed();
+};
+
+//-----------------------------------------------------------------------------
+
+class DVAPI MessageAndCheckboxDialog final : public DVGui::Dialog {
+  Q_OBJECT
+
+  int m_checked = 0;
+
+public:
+  MessageAndCheckboxDialog(QWidget *parent = 0, bool hasButton = false,
+                           bool hasFixedSize   = true,
+                           const QString &name = QString());
+
+public slots:
+  void onCheckboxChanged(int checked);
+  void onButtonPressed(int id);
 };
 
 //-----------------------------------------------------------------------------

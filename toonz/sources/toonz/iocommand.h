@@ -136,8 +136,8 @@ public:
       , col0(-1)
       , row1(-1)
       , col1(-1)
-      //, importPolicy(ASK_USER)
-      , importPolicy(LOAD)
+      , importPolicy(static_cast<ImportPolicy>(
+            Preferences::instance()->getDefaultImportPolicy()))
       , expose(Preferences::instance()->isAutoExposeEnabled()) {}
 
   LoadResourceArguments(const TFilePath &fp,
@@ -147,8 +147,8 @@ public:
       , col0(-1)
       , row1(-1)
       , col1(-1)
-      //, importPolicy(ASK_USER)
-      , importPolicy(LOAD)
+      , importPolicy(static_cast<ImportPolicy>(
+            Preferences::instance()->getDefaultImportPolicy()))
       , expose(Preferences::instance()->isAutoExposeEnabled()) {
     resourceDatas.push_back(fp);
   }
