@@ -1992,8 +1992,15 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       // keep searching
     }
 
-    if ((!xsh->getCell(row, col).isEmpty()) &&
-        o->rect(PredefinedRect::DRAG_AREA).contains(mouseInCell)) {
+    if (m_levelExtenderRect.contains(pos.x, pos.y)) {
+      m_viewer->getKeyframeSelection()->selectNone();
+      setDragTool(XsheetGUI::DragTool::makeLevelExtenderTool(m_viewer));
+    } else if (event->modifiers() & Qt::ControlModifier &&
+               m_upperLevelExtenderRect.contains(pos.x, pos.y)) {
+      m_viewer->getKeyframeSelection()->selectNone();
+      setDragTool(XsheetGUI::DragTool::makeLevelExtenderTool(m_viewer, true));
+    } else if ((!xsh->getCell(row, col).isEmpty()) &&
+               o->rect(PredefinedRect::DRAG_AREA).contains(mouseInCell)) {
       TXshColumn *column = xsh->getColumn(col);
       if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
         int r0, r1;
@@ -2022,11 +2029,6 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
           o->rect(PredefinedRect::PREVIEW_TRACK).contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeSoundScrubTool(
             m_viewer, column->getSoundColumn()));
-      else if (m_levelExtenderRect.contains(pos.x, pos.y))
-        setDragTool(XsheetGUI::DragTool::makeLevelExtenderTool(m_viewer));
-      else if (event->modifiers() & Qt::ControlModifier &&
-               m_upperLevelExtenderRect.contains(pos.x, pos.y))
-        setDragTool(XsheetGUI::DragTool::makeLevelExtenderTool(m_viewer, true));
       else if (isSoundColumn &&
                rectContainsPos(m_soundLevelModifyRects, event->pos()))
         setDragTool(XsheetGUI::DragTool::makeSoundLevelModifierTool(m_viewer));
