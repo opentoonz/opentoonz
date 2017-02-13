@@ -189,6 +189,7 @@ void SimpleLevelSubLayer::onStrokeListChanged() {
       else
         newList.push_back(shared_ptr<SubLayer>(build(stroke->m_s)));
     }
+    std::reverse(newList.begin(), newList.end());
     m_children = newList;
   }
   subLayers()->screenMapper()->updateColumnFan();
