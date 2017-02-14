@@ -514,6 +514,7 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   m_row = row;
   m_col = col;
 
+  setFixedSize(m_viewer->screenMapper()->rect(PredefinedRect::CELL).size());
 #ifdef _WIN32
   static QFont font("Arial", -1, QFont::Normal);
 #else
