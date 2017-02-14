@@ -5,6 +5,9 @@
 #include "toonz/txshlevelcolumn.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txsheet.h"
+#include "toonz/imagemanager.h"
+
+#include "../toonzlib/imagebuilders.h"
 
 #include "tstroke.h"
 #include "tvectorimage.h"
@@ -18,24 +21,25 @@ public:
   EmptySubLayer(SubLayers *subLayers) : SubLayer(subLayers, nullptr) { }
 };
 
-// Contains multiple sublayers, each is a TStroke
-class SimpleLevelSubLayer final : public SubLayer {
-  TXshSimpleLevelP m_level;
+// SubLayer containing stroke sub layers for each particular TFrame
+class FrameSubLayer final : public SubLayer {
+  TFrameId m_frameId;
   bool m_folded;
 
 public:
-  SimpleLevelSubLayer(SubLayers *subLayers, TXshSimpleLevelP level);
-  ~SimpleLevelSubLayer() { }
+  FrameSubLayer(SubLayers *subLayers, const TFrameId &frameId);
+  ~FrameSubLayer() { }
 
   virtual bool hasChildren() const override;
   virtual bool isFolded() const override { return m_folded; }
   virtual void foldUnfold() override { m_folded = !m_folded; }
-  virtual QString name() const { return QString::fromStdWString (m_level->getName()); }
+  virtual QString name() const { return QString::fromStdString(m_frameId.expand()); }
 
 protected slots:
   void onStrokeListChanged();
 private:
   TVectorImageP vectorImage() const;
+  TXshSimpleLevel *getLevel() const;
   SubLayer *build(TStroke *stroke);
 
   bool hasChild(const TStroke *stroke, vector<shared_ptr<SubLayer>>::const_iterator &child) const;
@@ -59,38 +63,47 @@ public:
 
 shared_ptr<SubLayer> SubLayers::get(const TXshColumn *column) {
   if (!column)
-    return shared_ptr<SubLayer>(new EmptySubLayer(this));
+    return empty();
   return get(CellPosition(m_mapper->getCurrentFrame (), column->getIndex ()));
 }
+shared_ptr<SubLayer> SubLayers::get(const TXshColumn *column, int frame) {
+  if (!column)
+    return empty();
+  return get(CellPosition(frame, column->getIndex()));
+}
 shared_ptr<SubLayer> SubLayers::get(const CellPosition &pos) {
-  Level *level = findLevel(pos);
-  if (!level)
-    return shared_ptr<SubLayer>(new EmptySubLayer(this));
+  optional<TFrameId> frameId = findFrameId(pos);
+  if (!frameId)
+    return empty();
 
-  map<Level *, shared_ptr<SubLayer>>::iterator it = m_items.find(level);
+  map<TFrameId, shared_ptr<SubLayer>>::iterator it = m_items.find(*frameId);
   if (it != m_items.end())
     return it->second;
 
-  shared_ptr<SubLayer> newItem { build(level) };
-  m_items.insert(std::make_pair(level, shared_ptr<SubLayer>(newItem)));
+  shared_ptr<SubLayer> newItem { build(*frameId) };
+  if (newItem)
+    m_items.insert(std::make_pair(*frameId, shared_ptr<SubLayer>(newItem)));
   return newItem;
 }
 
-SubLayers::Level *SubLayers::findLevel(const CellPosition &pos) const {
+optional<TFrameId> SubLayers::findFrameId(const CellPosition &pos) const {
   if (pos.layer() < 0)
-    return nullptr;
-  TXshColumn *column = m_mapper->xsheet ()->getColumn(pos.layer());
+    return boost::none;
+  TXshColumn *column = m_mapper->xsheet()->getColumn(pos.layer());
   if (!column)
-    return nullptr;
+    return boost::none;
   TXshLevelColumn *levelColumn = column->getLevelColumn();
   if (!levelColumn)
-    return nullptr;
+    return boost::none;
   const TXshCell &cell = levelColumn->getCell(pos.frame());
-  return cell.getSimpleLevel();
+  return cell.getFrameId();
 }
 
-SubLayer *SubLayers::build(Level *level) {
-  return new SimpleLevelSubLayer(this, level);
+SubLayer *SubLayers::build(TFrameId frameId) {
+  return new FrameSubLayer(this, frameId);
+}
+shared_ptr<SubLayer> SubLayers::empty() {
+  return shared_ptr<SubLayer> (new EmptySubLayer(this));
 }
 
 //-----------------------------------------------------------------------------
@@ -149,31 +162,57 @@ vector<shared_ptr<SubLayer>> SubLayer::childrenFlatTree() const {
 }
 
 //-----------------------------------------------------------------------------
-// SimpleLevelSubLayer
+// FrameSubLayer
 
-SimpleLevelSubLayer::SimpleLevelSubLayer(SubLayers *subLayers, TXshSimpleLevelP level)
-  : SubLayer(subLayers, nullptr), m_level(level), m_folded(true) {
+FrameSubLayer::FrameSubLayer(SubLayers *subLayers, const TFrameId &frameId)
+  : SubLayer(subLayers, nullptr), m_frameId(frameId), m_folded(true) {
   TVectorImageP image = vectorImage();
-  
+  if (!image) return;
+
   for (int i = 0; i < image->getStrokeCount(); i++)
-    m_children.push_back(shared_ptr<StrokeSubLayer> (new StrokeSubLayer(subLayers, this, image->getStroke(i))));
+    m_children.push_back(shared_ptr<StrokeSubLayer>(new StrokeSubLayer(subLayers, this, image->getStroke(i))));
 
-  connect(image.getPointer (), &TVectorImage::strokeListChanged, this, &SimpleLevelSubLayer::onStrokeListChanged);
+  // subscribe??
+  connect(image.getPointer(), &TVectorImage::strokeListChanged, this, &FrameSubLayer::onStrokeListChanged);
 }
 
-bool SimpleLevelSubLayer::hasChildren() const {
-  return vectorImage ()->getStrokeCount() != 0;
+bool FrameSubLayer::hasChildren() const {
+  TVectorImageP image = vectorImage();
+  return image && image->getStrokeCount() != 0;
 }
 
-TVectorImageP SimpleLevelSubLayer::vectorImage() const {
-  TFrameId fid = { m_level->getFirstFid() };
-  TImageP image = m_level->getFrame(fid, false);
+TVectorImageP FrameSubLayer::vectorImage() const {
+  TXshSimpleLevel *level = getLevel();
+  if (!level) return nullptr;
+
+  TImageP image = level->getFrame(m_frameId, false);
   if (!image) return nullptr;
+
   TVectorImageP vectorImage = { dynamic_cast<TVectorImage *> (image.getPointer()) };
   return vectorImage;
 }
 
-void SimpleLevelSubLayer::onStrokeListChanged() {
+// find first matching level
+TXshSimpleLevel *FrameSubLayer::getLevel() const {
+  TXsheet *xsheet = subLayers()->screenMapper()->xsheet();
+  for (int i = 0; i < xsheet->getColumnCount(); i++) {
+    TXshColumn *column = xsheet->getColumn(i);
+    if (!column) continue;
+    TXshLevelColumn *levelColumn = column->getLevelColumn();
+    if (!levelColumn) continue;
+    
+    int f0, f1;
+    levelColumn->getRange(f0, f1);
+    for (int j = f0; j <= f1; j++) {
+      const TXshCell &cell = levelColumn->getCell(j);
+      if (cell.getFrameId() == m_frameId)
+        return cell.getSimpleLevel();
+    }
+  }
+  return nullptr;
+}
+
+void FrameSubLayer::onStrokeListChanged() {
   TVectorImageP image = vectorImage();
   vector<shared_ptr<SubLayer>> newList;
 
@@ -195,7 +234,7 @@ void SimpleLevelSubLayer::onStrokeListChanged() {
   subLayers()->screenMapper()->updateColumnFan();
 }
 
-bool SimpleLevelSubLayer::hasChild(const TStroke *stroke, vector<shared_ptr<SubLayer>>::const_iterator &child) const {
+bool FrameSubLayer::hasChild(const TStroke *stroke, vector<shared_ptr<SubLayer>>::const_iterator &child) const {
   for (child = m_children.begin(); child != m_children.end(); child++) {
     StrokeSubLayer *subLayer = dynamic_cast<StrokeSubLayer *> (child->get());
     if (subLayer->owns(stroke))
@@ -204,7 +243,7 @@ bool SimpleLevelSubLayer::hasChild(const TStroke *stroke, vector<shared_ptr<SubL
   return false;
 }
 
-SubLayer *SimpleLevelSubLayer::build(TStroke *stroke) {
+SubLayer *FrameSubLayer::build(TStroke *stroke) {
   return new StrokeSubLayer(subLayers(), this, stroke);
 }
 

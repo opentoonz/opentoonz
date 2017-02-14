@@ -94,6 +94,10 @@ inline std::ostream &operator<<(std::ostream &out, const TFrameId &f) {
 
 //-----------------------------------------------------------------------------
 
+#ifdef WIN32
+template DVAPI class std::basic_string<wchar_t>; // wstring
+#endif
+
 /*!The class TFilePath defines a file path.Its constructor creates a string
    according
    to the platform and to certain rules.For more information see the

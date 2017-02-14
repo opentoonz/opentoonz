@@ -7,15 +7,20 @@
 #include <memory>
 #include <vector>
 
+#include <boost/optional.hpp>
+
 #include <QObject>
 #include <QString>
 
+#include "tfilepath.h"
 #include "toonz/txshcolumn.h"
 #include "cellposition.h"
 
 using std::map;
 using std::shared_ptr;
 using std::vector;
+
+using boost::optional;
 
 class TXshSimpleLevel;
 
@@ -26,14 +31,12 @@ class SubLayer;
 
 //! Each XsheetViewer has one of these.
 //! Keeps track of which layers are expanded / which ones are collapsed.
-//! When a layer is expanded, it has a tree of descendants.
+//! When a layer is expanded, each frame has a separate tree of subnodes.
 //! Each node in the tree is called SubLayer.
 
 class SubLayers final {
-  typedef TXshSimpleLevel Level;
-
   ScreenMapper *m_mapper;
-  map<Level *, shared_ptr<SubLayer>> m_items;
+  map<TFrameId, shared_ptr<SubLayer>> m_items;
 
 public:
 
@@ -43,6 +46,7 @@ public:
   ScreenMapper *screenMapper() const { return m_mapper; }
 
   shared_ptr<SubLayer> get(const CellPosition &pos);
+  shared_ptr<SubLayer> get(const TXshColumn *column, int frame);
   shared_ptr<SubLayer> get(const TXshColumn *column);
 
   void foldUnfold(const TXshColumn *column);
@@ -50,8 +54,9 @@ public:
   vector<int> childrenDimensions(const Orientation *o);
 
 private:
-  Level *findLevel(const CellPosition &pos) const;
-  SubLayer *build(Level *level);
+  optional<TFrameId> findFrameId(const CellPosition &pos) const;
+  SubLayer *build(TFrameId frameId);
+  shared_ptr<SubLayer> empty();
 };
 
 //! Basically, a tree node.
