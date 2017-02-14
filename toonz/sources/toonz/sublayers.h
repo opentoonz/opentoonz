@@ -36,7 +36,8 @@ class SubLayer;
 
 class SubLayers final {
   ScreenMapper *m_mapper;
-  map<TFrameId, shared_ptr<SubLayer>> m_items;
+  map<const TXshColumn *, shared_ptr<SubLayer>> m_layers;
+  map<TFrameId, shared_ptr<SubLayer>> m_frames;
 
 public:
 
@@ -45,11 +46,9 @@ public:
 
   ScreenMapper *screenMapper() const { return m_mapper; }
 
-  shared_ptr<SubLayer> get(const CellPosition &pos);
-  shared_ptr<SubLayer> get(const TXshColumn *column, int frame);
-  shared_ptr<SubLayer> get(const TXshColumn *column);
-
-  void foldUnfold(const TXshColumn *column);
+  shared_ptr<SubLayer> layer(const TXshColumn *column);
+  shared_ptr<SubLayer> frame(const CellPosition &pos);
+  shared_ptr<SubLayer> frame(const TXshColumn *column, int frame);
 
   vector<int> childrenDimensions(const Orientation *o);
 
@@ -68,22 +67,23 @@ private:
 
 class SubLayer : public QObject {
   Q_OBJECT
-    
+
   //! reference to parent container
   SubLayers *m_subLayers;
   //! root has depth 0, its children have depth 1 and so on
   int m_depth; 
 protected:
+  bool m_folded;
   //! direct descendants of this node
   vector<shared_ptr<SubLayer>> m_children;
 public:
 
   SubLayer(SubLayers *subLayers, SubLayer *parent);
-  virtual ~SubLayer() { }
+  virtual ~SubLayer();
 
   virtual bool hasChildren() const { return false; }
-  virtual bool isFolded() const { return true; }
-  virtual void foldUnfold() { }
+  virtual bool isFolded() const { return m_folded; }
+  virtual void foldUnfold();
   virtual bool hasActivator() const { return false; }
   virtual QString name() const { return ""; }
 
@@ -93,11 +93,13 @@ public:
   int ownDimension(const Orientation *o) const;
   virtual int childrenDimension(const Orientation *o) const;
 
+  virtual vector<shared_ptr<SubLayer>> children() const { return m_children; }
+
   //! list subnodes reachable by following expanded nodes
   vector<shared_ptr<SubLayer>> childrenFlatTree() const;
 
-protected:
-  vector<shared_ptr<SubLayer>> children() const { return m_children; }
+signals:
+  void foldToggled();
 
 private:
   SubLayer(const SubLayer &from) = delete;

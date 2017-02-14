@@ -721,7 +721,7 @@ void ColumnArea::DrawHeader::drawLock() const {
 
 void ColumnArea::DrawHeader::drawFoldUnfoldButton() const {
   if (col < 0 || isEmpty) return;
-  shared_ptr<SubLayer> rootLayer = m_viewer->screenMapper()->subLayers()->get(column);
+  shared_ptr<SubLayer> rootLayer = m_viewer->screenMapper()->subLayers()->layer(column);
   drawSubLayerFoldUnfoldButton(rootLayer, orig);
 }
 void ColumnArea::DrawHeader::drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const {
@@ -999,7 +999,7 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
 void ColumnArea::DrawHeader::drawSubLayers() const {
   const ScreenMapper *mapper = m_viewer->screenMapper();
   vector<shared_ptr<SubLayer>> subLayers =
-    mapper->subLayers()->get(column)->childrenFlatTree();
+    mapper->subLayers()->layer(column)->childrenFlatTree();
 
   QPoint baseLayerOffset = orig + mapper->frameLayerToXY(0, mapper->dimension(PredefinedDimension::LAYER));
   QPoint subLayerOffset = mapper->frameLayerToXY(0, mapper->dimension(PredefinedDimension::SUBLAYER));
@@ -1778,7 +1778,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       }
 	  else if (o->rect(PredefinedRect::FOLD_UNFOLD_AREA).contains(mouseInCell) &&
 		  event->button() == Qt::LeftButton) {
-		  m_viewer->screenMapper()->subLayers()->foldUnfold(column);
+		  m_viewer->screenMapper()->subLayers()->layer(column)->foldUnfold();
 		  update();
 	  }
 	  // sound column

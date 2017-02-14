@@ -1448,7 +1448,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 
 void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos) const {
   const ScreenMapper *mapper = m_viewer->screenMapper();
-  shared_ptr<SubLayer> subLayer = mapper->subLayers()->get(pos);
+  // shared_ptr<SubLayer> subLayer = mapper->subLayers()->layer(pos.layer());
 
   TXshColumn *column = mapper->xsheet()->getColumn(pos.layer());
   int frameFrom, frameTo;

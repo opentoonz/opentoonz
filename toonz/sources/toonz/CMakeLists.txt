@@ -99,6 +99,7 @@ set(MOC_HEADERS
     sceneviewer.h
     sceneviewercontextmenu.h
     sceneviewerevents.h
+	../include/toonz/screenmapper.h
     scriptconsolepanel.h
     selectionutils.h
     shifttracetool.h
@@ -159,8 +160,7 @@ set(MOC_HEADERS
 
 set(HEADERS ${MOC_HEADERS}
 	../include/cellposition.h
-	../include/orientation.h
-	../include/toonz/screenmapper.h)
+	../include/orientation.h)
 
 set(SOURCES
     floatingpanelcommand.cpp

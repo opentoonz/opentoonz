@@ -7,6 +7,8 @@
 #include "sublayers.h"
 #include "columnfan.h"
 
+#include <QObject>
+
 //! Class responsible for mapping logical (row, col) to screen XY and back
 //! Gathers and hides all objects required to do so
 //! All screen mapping requests should go through this,
@@ -18,7 +20,9 @@
 
 class XsheetViewer;
 
-class ScreenMapper final {
+class ScreenMapper final : public QObject {
+  Q_OBJECT
+
   XsheetViewer *m_viewer;
 
   const Orientation *m_orientation;

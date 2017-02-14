@@ -6,6 +6,8 @@
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txsheet.h"
 #include "toonz/imagemanager.h"
+#include "toonz/tstageobjectid.h"
+#include "toonz/tstageobject.h"
 
 #include "../toonzlib/imagebuilders.h"
 
@@ -21,18 +23,27 @@ public:
   EmptySubLayer(SubLayers *subLayers) : SubLayer(subLayers, nullptr) { }
 };
 
+// Keeps folded state for a column
+class LayerSubLayer final : public SubLayer {
+  const TXshColumn *m_column;
+public:
+  LayerSubLayer(SubLayers *subLayers, const TXshColumn *column);
+
+  virtual bool hasChildren() const override;
+  virtual QString name() const;
+
+protected:
+  virtual vector<shared_ptr<SubLayer>> children() const;
+};
+
 // SubLayer containing stroke sub layers for each particular TFrame
 class FrameSubLayer final : public SubLayer {
   TFrameId m_frameId;
-  bool m_folded;
 
 public:
   FrameSubLayer(SubLayers *subLayers, const TFrameId &frameId);
-  ~FrameSubLayer() { }
 
   virtual bool hasChildren() const override;
-  virtual bool isFolded() const override { return m_folded; }
-  virtual void foldUnfold() override { m_folded = !m_folded; }
   virtual QString name() const { return QString::fromStdString(m_frameId.expand()); }
 
 protected slots:
@@ -61,28 +72,34 @@ public:
 //-----------------------------------------------------------------------------
 // SubLayers
 
-shared_ptr<SubLayer> SubLayers::get(const TXshColumn *column) {
+shared_ptr<SubLayer> SubLayers::layer(const TXshColumn *column) {
   if (!column)
     return empty();
-  return get(CellPosition(m_mapper->getCurrentFrame (), column->getIndex ()));
+  map<const TXshColumn *, shared_ptr<SubLayer>>::iterator it = m_layers.find(column);
+  if (it != m_layers.end())
+    return it->second;
+  shared_ptr<SubLayer> newLayer { new LayerSubLayer(this, column) };
+  m_layers.insert(std::make_pair(column, shared_ptr<SubLayer>(newLayer)));
+  return newLayer;
 }
-shared_ptr<SubLayer> SubLayers::get(const TXshColumn *column, int frame) {
+
+shared_ptr<SubLayer> SubLayers::frame(const TXshColumn *column, int frameNumber) {
   if (!column)
     return empty();
-  return get(CellPosition(frame, column->getIndex()));
+  return frame(CellPosition(frameNumber, column->getIndex()));
 }
-shared_ptr<SubLayer> SubLayers::get(const CellPosition &pos) {
+
+shared_ptr<SubLayer> SubLayers::frame(const CellPosition &pos) {
   optional<TFrameId> frameId = findFrameId(pos);
   if (!frameId)
     return empty();
 
-  map<TFrameId, shared_ptr<SubLayer>>::iterator it = m_items.find(*frameId);
-  if (it != m_items.end())
+  map<TFrameId, shared_ptr<SubLayer>>::iterator it = m_frames.find(*frameId);
+  if (it != m_frames.end())
     return it->second;
 
   shared_ptr<SubLayer> newItem { build(*frameId) };
-  if (newItem)
-    m_items.insert(std::make_pair(*frameId, shared_ptr<SubLayer>(newItem)));
+  m_frames.insert(std::make_pair(*frameId, shared_ptr<SubLayer>(newItem)));
   return newItem;
 }
 
@@ -116,24 +133,22 @@ vector<int> SubLayers::childrenDimensions(const Orientation *o) {
 
   for (int i = 0; i < count; i++) {
     const TXshColumn *column = xsheet->getColumn(i);
-    shared_ptr<SubLayer> subLayer = get(column);
-    result.push_back(subLayer->childrenDimension(o));
+    shared_ptr<SubLayer> root = layer(column);
+    result.push_back(root->childrenDimension(o));
   }
   return result;
-}
-
-void SubLayers::foldUnfold(const TXshColumn *column) {
-  shared_ptr<SubLayer> subLayer = get(column);
-  subLayer->foldUnfold();
-  m_mapper->updateColumnFan();
 }
 
 //-----------------------------------------------------------------------------
 // SubLayer
 
-SubLayer::SubLayer(SubLayers *subLayers, SubLayer *parent): m_subLayers (subLayers), m_depth (0) {
+SubLayer::SubLayer(SubLayers *subLayers, SubLayer *parent): m_subLayers (subLayers), m_depth (0), m_folded(true) {
   if (parent)
     m_depth = parent->depth() + 1;
+  connect(this, &SubLayer::foldToggled, m_subLayers->screenMapper(), &ScreenMapper::updateColumnFan);
+}
+SubLayer::~SubLayer() {
+  disconnect(this, &SubLayer::foldToggled, m_subLayers->screenMapper(), &ScreenMapper::updateColumnFan);
 }
 
 int SubLayer::ownDimension(const Orientation *o) const {
@@ -161,11 +176,49 @@ vector<shared_ptr<SubLayer>> SubLayer::childrenFlatTree() const {
   return result;
 }
 
+void SubLayer::foldUnfold() {
+  if (hasChildren())
+    m_folded = !m_folded;
+  else if (m_folded)
+    m_folded = false;
+  else
+    return;
+
+  emit foldToggled();
+}
+
+//-----------------------------------------------------------------------------
+// LayerSubLayer
+
+LayerSubLayer::LayerSubLayer(SubLayers *subLayers, const TXshColumn *column):
+  SubLayer (subLayers, nullptr), m_column (column) {
+  assert(m_column);
+}
+
+bool LayerSubLayer::hasChildren() const {
+  return !m_column->isEmpty();
+}
+
+QString LayerSubLayer::name() const {
+  int col = m_column->getIndex();
+  TStageObjectId columnId = subLayers()->screenMapper()->viewer()->getObjectId(col);
+  TStageObject *columnObject = subLayers()->screenMapper()->xsheet()->getStageObject(columnId);
+
+  return QString::fromStdString(columnObject->getName());
+}
+
+// substitute with frame sublayer children
+vector<shared_ptr<SubLayer>> LayerSubLayer::children() const {
+  int frame = subLayers()->screenMapper()->getCurrentFrame();
+  shared_ptr<SubLayer> frameSubLayer = subLayers()->frame(m_column, frame);
+  return frameSubLayer->children();
+}
+
 //-----------------------------------------------------------------------------
 // FrameSubLayer
 
 FrameSubLayer::FrameSubLayer(SubLayers *subLayers, const TFrameId &frameId)
-  : SubLayer(subLayers, nullptr), m_frameId(frameId), m_folded(true) {
+  : SubLayer(subLayers, nullptr), m_frameId(frameId) {
   TVectorImageP image = vectorImage();
   if (!image) return;
 
