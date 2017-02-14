@@ -13,6 +13,7 @@
 
 #include "tools/tool.h"
 #include "tools/cursors.h"
+#include "tstroke.h"
 
 #include <QCoreApplication>
 #include <QRadialGradient>
@@ -117,13 +118,21 @@ public:
 
   //ArrayOfTQ getNeighbors(TThickQuadratic* samplePoint);
   void addStroke(TStroke* stroke);
+  ArrayOfTQ getNeighbours(const TThickQuadratic* point);
 
 private:
   //void generatePoints();
 
+  class TStrokeWithNeighbours
+  {
+  public:
+	  TStroke* stroke;
+	  ArrayOfTQ neighbours;
+  };
+
 private:
   int m_spaceVicinityRadius;
-  std::vector<TStroke*> m_strokes;
+  std::vector<TStrokeWithNeighbours*> m_strokesWithNeighbours;
 };
 
 //************************************************************************

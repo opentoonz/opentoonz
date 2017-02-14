@@ -2183,5 +2183,20 @@ void BrushPresetManager::removePreset(const std::wstring &name) {
 
 void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
-	m_strokes.push_back(stroke);
+	TStrokeWithNeighbours* strokeWithNeighbours = new TStrokeWithNeighbours();
+	strokeWithNeighbours->stroke = stroke;
+
+	for (int i = 0; i < stroke->getChunkCount(); i++)
+	{
+		ArrayOfTQ Neighbours = getNeighbours(stroke->getChunk(i));
+		strokeWithNeighbours->neighbours = Neighbours;
+	}
+
+	m_strokesWithNeighbours.push_back(strokeWithNeighbours);
+}
+
+ArrayOfTQ AnimationAutoComplete::getNeighbours(const TThickQuadratic* point)
+{
+	ArrayOfTQ dummy;
+	return dummy;
 }
