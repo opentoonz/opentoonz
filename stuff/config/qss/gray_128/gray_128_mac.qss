@@ -1080,7 +1080,9 @@ QDialog #dialogButtonFrame {
 #IntPairField,
 #DoublePairField {
   qproperty-LightLineColor: white;
-  qproperty-DarkLineColor: #808080;
+  qproperty-LightLineEdgeColor: white;
+  qproperty-DarkLineColor: #c6c6c6;
+  qproperty-MiddleLineColor: #808080;
   qproperty-HandleLeftPixmap: url("imgs/h_slider_left.png");
   qproperty-HandleRightPixmap: url("imgs/h_slider_right.png");
   qproperty-HandleLeftGrayPixmap: url("imgs/h_slider_left_disabled.png");
