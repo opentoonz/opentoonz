@@ -80,11 +80,8 @@ inline int ImageLoader::buildSubsampling(int imFlags, BuildExtData *data) {
 
 //-------------------------------------------------------------------------
 
-TImageP ImageLoader::build(int imFlags, void *extData) {
-  assert(extData);
-
-  // Extract external data
-  BuildExtData *data = static_cast<BuildExtData *>(extData);
+TImageP ImageLoader::build(int imFlags, BuildExtData *data) {
+  assert(data);
 
   int subsampling = buildSubsampling(imFlags, data);
 
@@ -148,10 +145,9 @@ TImageP ImageLoader::build(int imFlags, void *extData) {
 
 //-------------------------------------------------------------------------
 
-bool ImageLoader::isImageCompatible(int imFlags, void *extData) {
-  assert(extData);
+bool ImageLoader::isImageCompatible(int imFlags, BuildExtData *data) {
+  assert(data);
 
-  BuildExtData *data        = static_cast<BuildExtData *>(extData);
   const TXshSimpleLevel *sl = data->m_sl;
 
   // NOTE: Vector and Mesh dont care about sub sampling rate and bit depth
@@ -242,7 +238,7 @@ bool ImageRasterizer::getInfo(TImageInfo &info, int imFlags, void *extData) {
 
 //-------------------------------------------------------------------------
 
-TImageP ImageRasterizer::build(int imFlags, void *extData) {
+TImageP ImageRasterizer::build(int imFlags, BuildExtData *data) {
   assert(!(imFlags &
            ~(ImageManager::dontPutInCache | ImageManager::forceRebuild)));
 
@@ -250,12 +246,11 @@ TImageP ImageRasterizer::build(int imFlags, void *extData) {
   TPoint off(0, 0);
 
   // Fetch image
-  assert(extData);
-  ImageLoader::BuildExtData *data = (ImageLoader::BuildExtData *)extData;
+  assert(data);
 
   const std::string &srcImgId = data->m_sl->getImageId(data->m_fid);
 
-  TImageP img = ImageManager::instance()->getImage(srcImgId, imFlags, extData);
+  TImageP img = ImageManager::instance()->getImage(srcImgId, imFlags, data);
   if (img) {
     TVectorImageP vi = img;
     if (vi) {
@@ -364,18 +359,17 @@ bool ImageFiller::getInfo(TImageInfo &info, int imFlags, void *extData) {
 
 //-------------------------------------------------------------------------
 
-TImageP ImageFiller::build(int imFlags, void *extData) {
+TImageP ImageFiller::build(int imFlags, BuildExtData *data) {
   assert(imFlags == ImageManager::none);
 
   // Fetch image
-  assert(extData);
+  assert(data);
 
-  ImageLoader::BuildExtData *data = (ImageLoader::BuildExtData *)extData;
   assert(data->m_subs == 0);
 
   const std::string &srcImgId = data->m_sl->getImageId(data->m_fid);
 
-  TImageP img = ImageManager::instance()->getImage(srcImgId, imFlags, extData);
+  TImageP img = ImageManager::instance()->getImage(srcImgId, imFlags, data);
   if (img) {
     TRasterImageP ri = img;
     if (ri) {

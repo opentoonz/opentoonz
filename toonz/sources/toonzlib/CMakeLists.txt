@@ -25,6 +25,7 @@ set(MOC_HEADERS
     ../include/toonz/ikjacobian.h
     ../include/toonz/iknode.h
     ../include/toonz/ikskeleton.h
+    imagebuilders.h
     ../include/toonz/imagelocation.h
     ../include/toonz/imagemanager.h
     ../include/toonz/imagepainter.h
@@ -154,7 +155,6 @@ set(MOC_HEADERS
     sandor_fxs/YOMBInputParam.h
     sandor_fxs/YOMBParam.h
     texturemanager.h
-    imagebuilders.h
 )
 
 set(HEADERS ${MOC_HEADERS})

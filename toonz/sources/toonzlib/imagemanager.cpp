@@ -82,13 +82,13 @@ ImageBuilder::~ImageBuilder() {}
 
 //-----------------------------------------------------------------------------
 
-bool ImageBuilder::areInfosCompatible(int imFlags, void *extData) {
+bool ImageBuilder::areInfosCompatible(int imFlags, BuildExtData *extData) {
   return m_info.m_valid;
 }
 
 //-----------------------------------------------------------------------------
 
-bool ImageBuilder::isImageCompatible(int imFlags, void *extData) {
+bool ImageBuilder::isImageCompatible(int imFlags, BuildExtData *extData) {
   return m_info.m_valid;
 }
 
@@ -159,6 +159,12 @@ bool ImageBuilder::setImageInfo(TImageInfo &info, TImageReader *ir) {
 
   return false;
 }
+
+void ImageBuilder::invalidate() {
+  m_info = TImageInfo();
+  m_imFlags = ImageManager::none;
+}
+
 
 //************************************************************************************
 //    Image Manager Privates implementation
@@ -263,7 +269,7 @@ void ImageManager::clear() {
 //-----------------------------------------------------------------------------
 
 TImageInfo *ImageManager::getInfo(const std::string &id, int imFlags,
-                                  void *extData) {
+                                  ImageBuilder::BuildExtData *extData) {
   // Lock for table read and try to find data in the cache
   QReadLocker tableLocker(&m_imp->m_tableLock);
 
@@ -295,7 +301,7 @@ TImageInfo *ImageManager::getInfo(const std::string &id, int imFlags,
 //-----------------------------------------------------------------------------
 
 TImageP ImageManager::getImage(const std::string &id, int imFlags,
-                               void *extData) {
+                               ImageBuilder::BuildExtData *extData) {
   assert(!((imFlags & ImageManager::toBeModified) &&
            (imFlags & ImageManager::dontPutInCache)));
   assert(!((imFlags & ImageManager::toBeModified) &&

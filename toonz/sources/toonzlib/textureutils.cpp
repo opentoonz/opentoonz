@@ -96,7 +96,7 @@ TRasterImageP getTexture(const TXshSimpleLevel *sl, const TFrameId &fid,
   // Vector case
   std::string id = sl->getImageId(fid) + "_rasterized";
 
-  ImageLoader::BuildExtData extData(sl, fid);
+  ImageBuilder::BuildExtData extData(sl, fid);
   TRasterImageP ri(ImageManager::instance()->getImage(
       id, ImageManager::dontPutInCache, &extData));
 

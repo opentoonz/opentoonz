@@ -567,7 +567,7 @@ TImageP TXshSimpleLevel::getFrame(const TFrameId &fid, UCHAR imFlags,
 
   const std::string &imgId = getImageId(fid);
 
-  ImageLoader::BuildExtData extData(this, fid, subsampling);
+  ImageBuilder::BuildExtData extData(this, fid, subsampling);
   TImageP img = ImageManager::instance()->getImage(imgId, imFlags, &extData);
 
   if (imFlags & ImageManager::toBeModified) {
@@ -606,7 +606,7 @@ TImageP TXshSimpleLevel::getFrameIcon(const TFrameId &fid) const {
   // NOTE: Icons caching is DISABLED at this stage. It is now responsibility of
   // ToonzQt's IconGenerator class.
 
-  ImageLoader::BuildExtData extData(this, fid);
+  ImageBuilder::BuildExtData extData(this, fid);
   extData.m_subs = 1, extData.m_icon = true;
 
   const std::string &imgId = getImageId(fid);
@@ -648,7 +648,7 @@ TRasterImageP TXshSimpleLevel::getFrameToCleanup(const TFrameId &fid) const {
   bool flag           = (m_scannedPath != TFilePath());
   std::string imageId = getImageId(fid, flag ? Scanned : 0);
 
-  ImageLoader::BuildExtData extData(this, fid, 1);
+  ImageBuilder::BuildExtData extData(this, fid, 1);
   TRasterImageP img = ImageManager::instance()->getImage(
       imageId, ImageManager::dontPutInCache, &extData);
   if (!img) return img;
@@ -674,7 +674,7 @@ TImageP TXshSimpleLevel::getFullsampledFrame(const TFrameId &fid,
 
   std::string imageId = getImageId(fid);
 
-  ImageLoader::BuildExtData extData(this, fid, 1);
+  ImageBuilder::BuildExtData extData(this, fid, 1);
   TImageP img = ImageManager::instance()->getImage(imageId, imFlags, &extData);
 
   if (imFlags & ImageManager::toBeModified) {
@@ -796,6 +796,7 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img) {
   }
 
   ImageManager::instance()->setImage(imageId, img);  // Invalidates if !img
+  emit ImageManager::instance()->updatedFrame(fid);
 
   if (frameStatus == Normal) {
     // Only a normal frame can have these. Justified since:
@@ -1591,7 +1592,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
         if (getContentHistory())
           lw->setContentHistory(getContentHistory()->clone());
 
-        ImageLoader::BuildExtData extData(this, TFrameId());
+        ImageBuilder::BuildExtData extData(this, TFrameId());
 
         for (auto const &fid : fids) {
           std::string imageId = getImageId(
@@ -1655,7 +1656,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
           fids = std::vector<TFrameId>(m_editableRange.begin(),
                                        m_editableRange.end());
 
-        ImageLoader::BuildExtData extData(this, TFrameId());
+        ImageBuilder::BuildExtData extData(this, TFrameId());
 
         for (auto const &fid : fids) {
           std::string imageId = getImageId(

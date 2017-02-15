@@ -56,7 +56,7 @@ TImageP Stage::Player::image() const {
       (slType == OVL_XSHLEVEL || slType == TZI_XSHLEVEL))
     id = id + "_filled";
 
-  ImageLoader::BuildExtData extData(m_sl, m_fid);
+  ImageBuilder::BuildExtData extData(m_sl, m_fid);
   return ImageManager::instance()->getImage(id, ImageManager::none, &extData);
 }
 

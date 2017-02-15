@@ -34,14 +34,16 @@ class SubLayer;
 //! When a layer is expanded, each frame has a separate tree of subnodes.
 //! Each node in the tree is called SubLayer.
 
-class SubLayers final {
+class SubLayers final : public QObject {
+  Q_OBJECT
+
   ScreenMapper *m_mapper;
   map<const TXshColumn *, shared_ptr<SubLayer>> m_layers;
   map<TFrameId, shared_ptr<SubLayer>> m_frames;
 
 public:
 
-  SubLayers(ScreenMapper *mapper): m_mapper(mapper) { }
+  SubLayers(ScreenMapper *mapper);
   ~SubLayers() { }
 
   ScreenMapper *screenMapper() const { return m_mapper; }
@@ -54,8 +56,11 @@ public:
 
 private:
   optional<TFrameId> findFrameId(const CellPosition &pos) const;
-  SubLayer *build(TFrameId frameId);
+  SubLayer *build(const TFrameId &frameId);
   shared_ptr<SubLayer> empty();
+
+private slots:
+  void onFrameUpdated(const TFrameId &frameId);
 };
 
 //! Basically, a tree node.
@@ -79,7 +84,7 @@ protected:
 public:
 
   SubLayer(SubLayers *subLayers, SubLayer *parent);
-  virtual ~SubLayer();
+  virtual ~SubLayer() { }
 
   virtual bool hasChildren() const { return false; }
   virtual bool isFolded() const { return m_folded; }

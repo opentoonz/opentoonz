@@ -39,12 +39,15 @@ protected:
 // SubLayer containing stroke sub layers for each particular TFrame
 class FrameSubLayer final : public SubLayer {
   TFrameId m_frameId;
+  bool m_subscribed;
 
 public:
   FrameSubLayer(SubLayers *subLayers, const TFrameId &frameId);
 
   virtual bool hasChildren() const override;
   virtual QString name() const { return QString::fromStdString(m_frameId.expand()); }
+
+  void subscribeStrokeListChanged();
 
 protected slots:
   void onStrokeListChanged();
@@ -71,6 +74,11 @@ public:
 
 //-----------------------------------------------------------------------------
 // SubLayers
+
+SubLayers::SubLayers(ScreenMapper *mapper) : m_mapper(mapper) {
+  connect(ImageManager::instance(), &ImageManager::updatedFrame, this, &SubLayers::onFrameUpdated);
+}
+
 
 shared_ptr<SubLayer> SubLayers::layer(const TXshColumn *column) {
   if (!column)
@@ -116,11 +124,20 @@ optional<TFrameId> SubLayers::findFrameId(const CellPosition &pos) const {
   return cell.getFrameId();
 }
 
-SubLayer *SubLayers::build(TFrameId frameId) {
+SubLayer *SubLayers::build(const TFrameId &frameId) {
   return new FrameSubLayer(this, frameId);
 }
 shared_ptr<SubLayer> SubLayers::empty() {
   return shared_ptr<SubLayer> (new EmptySubLayer(this));
+}
+
+void SubLayers::onFrameUpdated(const TFrameId &frameId) {
+  map<TFrameId, shared_ptr<SubLayer>>::iterator it = m_frames.find(frameId);
+  if (it == m_frames.end())
+    return;
+  FrameSubLayer *subLayer = dynamic_cast<FrameSubLayer *> (it->second.get());
+  assert(subLayer);
+  subLayer->subscribeStrokeListChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -146,9 +163,6 @@ SubLayer::SubLayer(SubLayers *subLayers, SubLayer *parent): m_subLayers (subLaye
   if (parent)
     m_depth = parent->depth() + 1;
   connect(this, &SubLayer::foldToggled, m_subLayers->screenMapper(), &ScreenMapper::updateColumnFan);
-}
-SubLayer::~SubLayer() {
-  disconnect(this, &SubLayer::foldToggled, m_subLayers->screenMapper(), &ScreenMapper::updateColumnFan);
 }
 
 int SubLayer::ownDimension(const Orientation *o) const {
@@ -218,15 +232,22 @@ vector<shared_ptr<SubLayer>> LayerSubLayer::children() const {
 // FrameSubLayer
 
 FrameSubLayer::FrameSubLayer(SubLayers *subLayers, const TFrameId &frameId)
-  : SubLayer(subLayers, nullptr), m_frameId(frameId) {
+  : SubLayer(subLayers, nullptr), m_frameId(frameId), m_subscribed(false) {
+  subscribeStrokeListChanged();
+}
+
+void FrameSubLayer::subscribeStrokeListChanged() {
+  if (m_subscribed)
+    return;
+
   TVectorImageP image = vectorImage();
   if (!image) return;
 
   for (int i = 0; i < image->getStrokeCount(); i++)
-    m_children.push_back(shared_ptr<StrokeSubLayer>(new StrokeSubLayer(subLayers, this, image->getStroke(i))));
+    m_children.push_back(shared_ptr<StrokeSubLayer>(new StrokeSubLayer(subLayers(), this, image->getStroke(i))));
 
-  // subscribe??
   connect(image.getPointer(), &TVectorImage::strokeListChanged, this, &FrameSubLayer::onStrokeListChanged);
+  m_subscribed = true;
 }
 
 bool FrameSubLayer::hasChildren() const {
