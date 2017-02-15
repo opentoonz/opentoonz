@@ -95,11 +95,10 @@ void IntPairField::paintEvent(QPaintEvent *) {
   int y  = height() / 2;
 
   p.setPen(getLightLineColor());
-  p.drawLine(x0 + 1, y, x1, y);
-  p.drawPoint(x1 + 1, y - 1);
+  p.drawLine(x0 - 1, y, x1, y);
   p.setPen(getLightLineEdgeColor());
-  p.drawLine(x0 - 1, y, x0, y);
   p.drawPoint(x1 + 1, y);
+  p.drawPoint(x1 + 1, y - 1);
   p.drawPoint(x1 + 1, y - 2);
   p.drawPoint(x1 + 1, y - 3);
   p.setPen(getMiddleLineColor());
