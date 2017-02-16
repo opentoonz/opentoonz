@@ -19,7 +19,8 @@
 @m_dialog_border_color:	rgb(0,0,0);
 
 /*Color for Selected Item*/
-@m_selectedBG:	rgb(88,148,88);
+@m_selectedBG:	rgb(68,128,68);
+@m_selectedText:	rgb(88,228,88);
 
 /*Color for title texts*/
 @m_titleTxtColor: lighten(@m_selectedBG, 10%);
@@ -170,7 +171,7 @@ QMenu
 	&::item {
 		&:selected{
 			background: @m_selectedBG;
-			color: black;
+			color: @m_baseInputColor; 
 		}
 		&:disabled{
 			.baseBG;
@@ -441,6 +442,8 @@ PaletteViewer #ToolBarContainer
 #PaletteTabBar, 
 #FxSettingsTabBar{
 	.baseBG(5%);
+	border-bottom: 1px rgb(88, 88, 88);
+	border-style: groove;
 	&::tab {
 		.set_padding( 7px, 2px );
 		.baseBG(5%); /* for non selected tab */
@@ -501,6 +504,10 @@ PaletteViewer #ToolBarContainer
 	QPushButton {
 		margin: 1px;
 		margin-top: 3px;
+		min-width:34px;
+		padding: 4px;
+		padding-top: 2px;
+		padding-bottom: 2px;
 		&:checked {
 			.baseBG(light, 10%);
 			border: 1px solid rgb(132, 132, 132);
@@ -510,11 +517,16 @@ PaletteViewer #ToolBarContainer
 			border: 1px solid rgb(132, 132, 132);
 		}
 	}
+	QLineEdit {
+		min-width: 28px;
+		max-width: 30px;
+	}
 }
 
 
 #StyleEditorTabBar {
-
+	border-bottom: 1px rgb(88, 88, 88);
+	border-style: groove;
 	QPushButton {
 		margin: 10px;
 	}
@@ -609,6 +621,7 @@ PaletteViewer #ToolBarContainer
 #colorSliderField
 {
 	font-size: 12px;
+	min-height:12px;
 }
 
 #colorSliderField {
@@ -805,16 +818,16 @@ DvItemViewerPanel {
 	qproperty-TextColor: @m_baseTxtColor;
 	qproperty-AlternateBackground: #3d3d3d;
 	qproperty-SelectedTextColor: black;
-	qproperty-FolderTextColor: rgb(150, 230, 230);
-	qproperty-SelectedItemBackground: #80a0dc;
+	qproperty-FolderTextColor: rgb(130, 190, 130);
+	qproperty-SelectedItemBackground: @m_selectedBG;
 }
 
 DvDirTreeView {
 	qproperty-TextColor: @m_baseTxtColor;
 	qproperty-SelectedTextColor: black;
-	qproperty-FolderTextColor: rgb(150, 230, 230);
+	qproperty-FolderTextColor: rgb(130, 190, 130);
 	qproperty-SelectedFolderTextColor: rgb(0,30,0);
-	qproperty-SelectedItemBackground: #80a0dc;
+	qproperty-SelectedItemBackground: @m_selectedBG;
 	alternate-background-color: lighten(@m_baseBG, 5%);
 }
 
@@ -1057,7 +1070,7 @@ XsheetViewer {
 
 #FunctionParametersPanel
 {
-	border: 1px solid @m_baseTxtColor;
+	border: 1px solid rgb(88, 88, 88);
 }
 #FunctionEditorTree,#ShortcutTree
 {
@@ -1110,7 +1123,7 @@ FunctionPanel {
  
 FunctionTreeView {
 	qproperty-TextColor: rgb(230,230,230);
-	qproperty-CurrentTextColor: rgb(230, 100, 100);
+	qproperty-CurrentTextColor: @m_selectedText;
 }
 
 SpreadsheetViewer {
@@ -1130,7 +1143,7 @@ SpreadsheetViewer {
 	qproperty-SelectedSceneRangeEmptyColor: rgb(117,117,117);
 	qproperty-TextColor: rgb(230,230,230);
 	qproperty-ColumnHeaderBorderColor: rgb(142,142,142);
-	qproperty-SelectedColumnTextColor: rgb(230, 100, 100);
+	qproperty-SelectedColumnTextColor: @m_selectedText;
 }
 #keyFrameNavigator
 {
@@ -1141,10 +1154,10 @@ SpreadsheetViewer {
 
 #ExpressionField
 {
-	.base_inset(light, 50%);
-	border-width: 2px;
+	.baseBG(light, 70%);
+	border: 1px solid rgb(88, 88, 88);
 	border-radius: 2px;
-	margin: 0px;
+	min-height: 14px;
 }
 
 #FunctionSegmentViewerLinkButton
@@ -1380,7 +1393,7 @@ QDialog #dialogButtonFrame {
         padding: 2px;
         &:selected{
             background-color: @m_selectedBG;
-            /* color : black; */
+            color : @m_baseInputColor;
         }
         &:hover{
             background-color: lighten(@m_baseBG, 5%);
