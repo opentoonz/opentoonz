@@ -949,14 +949,14 @@ void FunctionSheet::setSelection(FunctionSelection *selection) {
 //-----------------------------------------------------------------------------
 
 void FunctionSheet::showEvent(QShowEvent *e) {
-  registerFrameScroller();
+  m_frameScroller.registerFrameScroller();
   SpreadsheetViewer::showEvent(e);
 }
 
 //-----------------------------------------------------------------------------
 
 void FunctionSheet::hideEvent(QHideEvent *e) {
-  unregisterFrameScroller();
+  m_frameScroller.unregisterFrameScroller();
   SpreadsheetViewer::hideEvent(e);
 }
 

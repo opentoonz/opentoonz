@@ -4,6 +4,7 @@
 #include "toonzqt/gutil.h"
 
 #include "toonz/tframehandle.h"
+#include "orientation.h"
 
 #include <QKeyEvent>
 #include <QWheelEvent>
@@ -21,60 +22,91 @@
 namespace Spreadsheet {
 
 //=============================================================================
-FrameScroller::FrameScroller() {}
+FrameScroller::FrameScroller():
+  m_orientation(Orientations::topToBottom()), m_scrollArea(nullptr), m_lastX(0), m_lastY(0) {
+}
 
 FrameScroller::~FrameScroller() {}
 
-void FrameScroller::connectScroller(FrameScroller *scroller) {
-  if (scroller != this && !m_connectedScrollers.contains(scroller)) {
-    m_connectedScrollers.append(scroller);
-    scroller->connectScroller(this);
-    QScrollBar *sb0 = getFrameScrollArea()->verticalScrollBar();
-    QScrollBar *sb1 = scroller->getFrameScrollArea()->verticalScrollBar();
-    QObject::connect(sb0, SIGNAL(valueChanged(int)), sb1, SLOT(setValue(int)));
-    QObject::connect(sb1, SIGNAL(valueChanged(int)), sb0, SLOT(setValue(int)));
-  }
+void FrameScroller::setFrameScrollArea(QScrollArea *scrollArea) {
+  disconnectScrollbars();
+  m_scrollArea = scrollArea;
+  connectScrollbars();
 }
 
-void FrameScroller::disconnectScroller(FrameScroller *scroller) {
-  if (m_connectedScrollers.contains(scroller)) {
-    m_connectedScrollers.removeAll(scroller);
-    scroller->disconnectScroller(this);
-    QScrollBar *sb0 = getFrameScrollArea()->verticalScrollBar();
-    QScrollBar *sb1 = scroller->getFrameScrollArea()->verticalScrollBar();
-    QObject::disconnect(sb0, SIGNAL(valueChanged(int)), sb1,
-                        SLOT(setValue(int)));
-    QObject::disconnect(sb1, SIGNAL(valueChanged(int)), sb0,
-                        SLOT(setValue(int)));
-  }
+void FrameScroller::disconnectScrollbars() {
+  if (!m_scrollArea)
+    return;
+  disconnect(m_scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, &FrameScroller::onVScroll);
+  disconnect(m_scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this, &FrameScroller::onHScroll);
 }
 
-bool FrameScroller::isScrollerConnected(FrameScroller *scroller) {
-  return m_connectedScrollers.contains(scroller);
+void FrameScroller::connectScrollbars() {
+  if (!m_scrollArea)
+    return;
+  m_lastX = m_scrollArea->horizontalScrollBar()->value();
+  m_lastY = m_scrollArea->verticalScrollBar()->value();
+  connect(m_scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, &FrameScroller::onVScroll);
+  connect(m_scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this, &FrameScroller::onHScroll);
+}
+
+void FrameScroller::onVScroll(int y) {
+  QPoint offset(0, y - m_lastY);
+  m_lastY = y;
+  handleScroll(offset);
+}
+void FrameScroller::onHScroll(int x) {
+  QPoint offset(0, x - m_lastX);
+  m_lastX = x;
+  handleScroll(offset);
 }
 
 static QList<FrameScroller *> frameScrollers;
 
+void FrameScroller::handleScroll(const QPoint &offset) const {
+  CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
+  if (!ratio.frame()) // only synchronize changes by frames axis
+    return;
+
+  for (int i = 0; i < frameScrollers.size(); i++)
+    if (frameScrollers[i] != this)
+      frameScrollers[i]->onScroll(ratio);
+}
+
+void adjustScrollbarWithoutSignals(QScrollBar *scrollBar, int add);
+
+void FrameScroller::onScroll(const CellPositionRatio &ratio) {
+  QPoint offset = orientation()->positionRatioToXY(ratio);
+  if (offset.x())
+    adjustScrollbarWithoutSignals(m_scrollArea->horizontalScrollBar(), offset.x());
+  if (offset.y())
+    adjustScrollbarWithoutSignals(m_scrollArea->verticalScrollBar(), offset.y());
+}
+void adjustScrollbarWithoutSignals(QScrollBar *scrollBar, int add) {
+  scrollBar->blockSignals(true);
+  scrollBar->setValue(scrollBar->value() + add);
+  scrollBar->blockSignals(false);
+}
+
 void FrameScroller::registerFrameScroller() {
-  if (!frameScrollers.contains(this)) {
-    for (int i = 0; i < frameScrollers.size(); i++)
-      connectScroller(frameScrollers[i]);
+  if (!frameScrollers.contains(this))
     frameScrollers.append(this);
-  }
 }
 
 void FrameScroller::unregisterFrameScroller() {
-  if (frameScrollers.contains(this)) {
+  if (frameScrollers.contains(this))
     frameScrollers.removeAll(this);
-    for (int i = 0; i < frameScrollers.size(); i++)
-      disconnectScroller(frameScrollers[i]);
-  }
 }
 
-void FrameScroller::prepareToScroll(int dy) {
-  if (dy == 0) return;
+void FrameScroller::prepareToScrollOthers(const QPoint &offset) {
+  CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
   for (int i = 0; i < frameScrollers.size(); i++)
-    if (frameScrollers[i] != this) frameScrollers[i]->onPrepareToScroll(dy);
+    if (frameScrollers[i] != this)
+      frameScrollers[i]->prepareToScrollRatio(ratio);
+}
+void FrameScroller::prepareToScrollRatio(const CellPositionRatio &ratio) {
+  QPoint offset = orientation()->positionRatioToXY(ratio);
+  emit prepareToScrollOffset(offset);
 }
 
 //=============================================================================
@@ -394,7 +426,8 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
     , m_currentRow(0)
     , m_markRowDistance(6)
     , m_markRowOffset(0)
-    , m_isComputingSize(false) {
+    , m_isComputingSize(false)
+    , m_frameScroller() {
   // m_orientation = Orientations::topToBottom ();
 
   setFocusPolicy(Qt::NoFocus);
@@ -433,6 +466,9 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
   m_rowScrollArea->setFixedWidth(30);
   m_columnScrollArea->setFixedHeight(m_rowHeight * 3 - 3);
   // m_columnScrollArea->setFixedHeight(m_rowHeight * 3 + 60 - 63);
+
+  m_frameScroller.setFrameScrollArea(m_cellScrollArea);
+  connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset, this, &SpreadsheetViewer::onPrepareToScrollOffset);
 
   //---- layout
   QGridLayout *layout = new QGridLayout();
@@ -527,7 +563,7 @@ void SpreadsheetViewer::setColumnCount(int columnCount) {
 void SpreadsheetViewer::scroll(QPoint delta) {
   int x = delta.x();
   int y = delta.y();
-  prepareToScroll(y);
+  m_frameScroller.prepareToScrollOthers(delta);
 
   QScrollBar *hSc = m_cellScrollArea->horizontalScrollBar();
   QScrollBar *vSc = m_cellScrollArea->verticalScrollBar();
@@ -552,6 +588,10 @@ void SpreadsheetViewer::scroll(QPoint delta) {
 
   hSc->setValue(valueH);
   vSc->setValue(valueV);
+}
+
+void SpreadsheetViewer::onPrepareToScrollOffset(const QPoint &offset) {
+  refreshContentSize(offset.x(), offset.y());
 }
 
 void SpreadsheetViewer::setAutoPanSpeed(const QPoint &speed) {

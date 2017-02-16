@@ -196,6 +196,9 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_rowScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_rowScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+  m_frameScroller.setFrameScrollArea(m_cellScrollArea);
+  connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset, this, &XsheetViewer::onPrepareToScrollOffset);
+
   connectScrollBars();
 
   connect(this, &XsheetViewer::orientationChanged, this,
@@ -277,6 +280,7 @@ void XsheetViewer::onOrientationChanged(const Orientation *newOrientation) {
   disconnectScrollBars();
 
   positionSections();
+  m_frameScroller.setOrientation(newOrientation);
   refreshContentSize(0, 0);
 
   connectScrollBars();
@@ -429,7 +433,7 @@ frameHandle->setFrame(row);*/
 void XsheetViewer::scroll(QPoint delta) {
   int x = delta.x();
   int y = delta.y();
-  prepareToScroll(y);
+  m_frameScroller.prepareToScrollOthers(delta);
 
   int valueH    = m_cellScrollArea->horizontalScrollBar()->value() + x;
   int valueV    = m_cellScrollArea->verticalScrollBar()->value() + y;
@@ -459,7 +463,9 @@ void XsheetViewer::scroll(QPoint delta) {
 
 //-----------------------------------------------------------------------------
 
-void XsheetViewer::onPrepareToScroll(int dy) { refreshContentSize(0, dy); }
+void XsheetViewer::onPrepareToScrollOffset(const QPoint &offset) {
+  refreshContentSize(offset.x(), offset.y());
+}
 
 //-----------------------------------------------------------------------------
 
@@ -715,7 +721,7 @@ bool XsheetViewer::isScrubHighlighted(int row, int col) {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::showEvent(QShowEvent *) {
-  registerFrameScroller();
+  m_frameScroller.registerFrameScroller();
   if (m_isCurrentFrameSwitched) onCurrentFrameSwitched();
   if (m_isCurrentColumnSwitched) onCurrentColumnSwitched();
   m_isCurrentFrameSwitched = false;
@@ -774,7 +780,7 @@ void XsheetViewer::showEvent(QShowEvent *) {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::hideEvent(QHideEvent *) {
-  unregisterFrameScroller();
+  m_frameScroller.unregisterFrameScroller();
 
   TApp *app = TApp::instance();
 

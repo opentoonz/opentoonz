@@ -162,6 +162,7 @@ set(SOURCES
     autoclose.cpp
     autopos.cpp
     captureparameters.cpp
+	cellpositionratio.cpp
     childstack.cpp
     cleanupcolorstyles.cpp
     cleanuppalette.cpp
@@ -194,6 +195,7 @@ set(SOURCES
     Naa2TlvConverter.cpp
     observer.cpp
     onionskinmask.cpp
+	orientation.cpp
     outputproperties.cpp
     preferences.cpp
     rasterbrush.cpp
@@ -311,7 +313,6 @@ set(SOURCES
     plasticdeformerfx.cpp
     txshmeshcolumn.cpp
     textureutils.cpp
-	orientation.cpp
 )
 
 if(WIN32)

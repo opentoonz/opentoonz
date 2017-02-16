@@ -160,7 +160,6 @@ protected:
 //! SpreadsheetViewer.
 
 class XsheetViewer final : public QFrame,
-                           public Spreadsheet::FrameScroller,
                            public SaveLoadQSettings {
   Q_OBJECT
 
@@ -331,6 +330,8 @@ class XsheetViewer final : public QFrame,
   XsheetGUI::CellArea *m_cellArea;
   XsheetGUI::NoteArea *m_noteArea;
 
+  Spreadsheet::FrameScroller m_frameScroller;
+
   int m_timerId;
   QPoint m_autoPanSpeed;
   QPoint m_lastAutoPanPos;
@@ -427,7 +428,6 @@ public:
   void setCurrentRow(int row);
 
   void scroll(QPoint delta);
-  void onPrepareToScroll(int dy) override;
 
   void setAutoPanSpeed(const QPoint &speed);
   void setAutoPanSpeed(const QRect &widgetBounds, const QPoint &mousePos);
@@ -463,9 +463,6 @@ public:
   bool refreshContentSize(int scrollDx, int scrollDy);
 
   void updateAreeSize();
-
-  // provvisorio
-  QScrollArea *getFrameScrollArea() const override { return m_cellScrollArea; }
 
   QList<XsheetGUI::NoteWidget *> getNotesWidget() const;
   void addNoteWidget(XsheetGUI::NoteWidget *w);
@@ -737,6 +734,7 @@ public slots:
   void resetXsheetNotes();
 
   void onOrientationChanged(const Orientation *newOrientation);
+  void onPrepareToScrollOffset(const QPoint &offset);
 };
 
 #endif  // XSHEETVIEWER_H

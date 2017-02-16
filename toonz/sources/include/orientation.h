@@ -15,6 +15,7 @@
 
 #include "tcommon.h"
 #include "cellposition.h"
+#include "toonz/cellpositionratio.h"
 #include <QPoint>
 #include <QLine>
 #include <QRect>
@@ -150,6 +151,8 @@ public:
                                     const ColumnFan *fan) const = 0;
   virtual QPoint positionToXY(const CellPosition &position,
                               const ColumnFan *fan) const = 0;
+  virtual CellPositionRatio xyToPositionRatio(const QPoint &xy) const = 0;
+  virtual QPoint positionRatioToXY(const CellPositionRatio &ratio) const = 0;
 
   virtual int colToLayerAxis(int layer, const ColumnFan *fan) const = 0;
   virtual int rowToFrameAxis(int frame) const = 0;
