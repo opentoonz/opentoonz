@@ -36,7 +36,8 @@ public:
   virtual QPoint positionToXY(const CellPosition &position,
                               const ColumnFan *fan) const override;
   virtual CellPositionRatio xyToPositionRatio(const QPoint &xy) const override;
-  virtual QPoint positionRatioToXY(const CellPositionRatio &ratio) const override;
+  virtual QPoint positionRatioToXY(
+      const CellPositionRatio &ratio) const override;
 
   virtual int colToLayerAxis(int layer, const ColumnFan *fan) const override;
   virtual int rowToFrameAxis(int frame) const override;
@@ -87,7 +88,8 @@ public:
   virtual QPoint positionToXY(const CellPosition &position,
                               const ColumnFan *fan) const override;
   virtual CellPositionRatio xyToPositionRatio(const QPoint &xy) const override;
-  virtual QPoint positionRatioToXY(const CellPositionRatio &ratio) const override;
+  virtual QPoint positionRatioToXY(
+      const CellPositionRatio &ratio) const override;
 
   virtual int colToLayerAxis(int layer, const ColumnFan *fan) const override;
   virtual int rowToFrameAxis(int frame) const override;
@@ -409,12 +411,14 @@ QPoint TopToBottomOrientation::positionToXY(const CellPosition &position,
   int y = rowToFrameAxis(position.frame());
   return QPoint(x, y);
 }
-CellPositionRatio TopToBottomOrientation::xyToPositionRatio(const QPoint &xy) const {
-  Ratio frame { xy.y(), CELL_HEIGHT };
-  Ratio layer { xy.x(), CELL_WIDTH };
-  return CellPositionRatio { frame, layer };
+CellPositionRatio TopToBottomOrientation::xyToPositionRatio(
+    const QPoint &xy) const {
+  Ratio frame{xy.y(), CELL_HEIGHT};
+  Ratio layer{xy.x(), CELL_WIDTH};
+  return CellPositionRatio{frame, layer};
 }
-QPoint TopToBottomOrientation::positionRatioToXY(const CellPositionRatio &ratio) const {
+QPoint TopToBottomOrientation::positionRatioToXY(
+    const CellPositionRatio &ratio) const {
   int x = ratio.layer() * CELL_WIDTH;
   int y = ratio.frame() * CELL_HEIGHT;
   return QPoint(x, y);
@@ -643,12 +647,14 @@ QPoint LeftToRightOrientation::positionToXY(const CellPosition &position,
   int x = rowToFrameAxis(position.frame());
   return QPoint(x, y);
 }
-CellPositionRatio LeftToRightOrientation::xyToPositionRatio(const QPoint &xy) const {
-  Ratio frame { xy.x(), CELL_WIDTH };
-  Ratio layer { xy.y(), CELL_HEIGHT };
-  return CellPositionRatio { frame, layer };
+CellPositionRatio LeftToRightOrientation::xyToPositionRatio(
+    const QPoint &xy) const {
+  Ratio frame{xy.x(), CELL_WIDTH};
+  Ratio layer{xy.y(), CELL_HEIGHT};
+  return CellPositionRatio{frame, layer};
 }
-QPoint LeftToRightOrientation::positionRatioToXY(const CellPositionRatio &ratio) const {
+QPoint LeftToRightOrientation::positionRatioToXY(
+    const CellPositionRatio &ratio) const {
   int x = ratio.frame() * CELL_WIDTH;
   int y = ratio.layer() * CELL_HEIGHT;
   return QPoint(x, y);

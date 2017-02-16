@@ -20,24 +20,26 @@ class DVAPI Ratio {
 
   void normalize();
   Ratio normalized() const;
+
 public:
   Ratio(int num, int denom);
 
-  friend Ratio operator + (const Ratio &a, const Ratio &b);
-  friend Ratio operator - (const Ratio &a, const Ratio &b);
-  friend Ratio operator * (const Ratio &a, const Ratio &b);
-  friend Ratio operator / (const Ratio &a, const Ratio &b);
+  friend Ratio operator+(const Ratio &a, const Ratio &b);
+  friend Ratio operator-(const Ratio &a, const Ratio &b);
+  friend Ratio operator*(const Ratio &a, const Ratio &b);
+  friend Ratio operator/(const Ratio &a, const Ratio &b);
 
-  friend int operator * (const Ratio &a, int b);
+  friend int operator*(const Ratio &a, int b);
 
-  bool operator ! () const { return m_num == 0; }
+  bool operator!() const { return m_num == 0; }
 };
 
 class DVAPI CellPositionRatio {
   Ratio m_frame, m_layer;
+
 public:
-  CellPositionRatio(const Ratio &frame, const Ratio &layer):
-    m_frame(frame), m_layer(layer) { }
+  CellPositionRatio(const Ratio &frame, const Ratio &layer)
+      : m_frame(frame), m_layer(layer) {}
 
   Ratio frame() const { return m_frame; }
   Ratio layer() const { return m_layer; }

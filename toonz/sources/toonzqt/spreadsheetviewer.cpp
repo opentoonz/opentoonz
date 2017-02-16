@@ -22,9 +22,11 @@
 namespace Spreadsheet {
 
 //=============================================================================
-FrameScroller::FrameScroller():
-  m_orientation(Orientations::topToBottom()), m_scrollArea(nullptr), m_lastX(0), m_lastY(0) {
-}
+FrameScroller::FrameScroller()
+    : m_orientation(Orientations::topToBottom())
+    , m_scrollArea(nullptr)
+    , m_lastX(0)
+    , m_lastY(0) {}
 
 FrameScroller::~FrameScroller() {}
 
@@ -35,19 +37,21 @@ void FrameScroller::setFrameScrollArea(QScrollArea *scrollArea) {
 }
 
 void FrameScroller::disconnectScrollbars() {
-  if (!m_scrollArea)
-    return;
-  disconnect(m_scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, &FrameScroller::onVScroll);
-  disconnect(m_scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this, &FrameScroller::onHScroll);
+  if (!m_scrollArea) return;
+  disconnect(m_scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this,
+             &FrameScroller::onVScroll);
+  disconnect(m_scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged,
+             this, &FrameScroller::onHScroll);
 }
 
 void FrameScroller::connectScrollbars() {
-  if (!m_scrollArea)
-    return;
+  if (!m_scrollArea) return;
   m_lastX = m_scrollArea->horizontalScrollBar()->value();
   m_lastY = m_scrollArea->verticalScrollBar()->value();
-  connect(m_scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, &FrameScroller::onVScroll);
-  connect(m_scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this, &FrameScroller::onHScroll);
+  connect(m_scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this,
+          &FrameScroller::onVScroll);
+  connect(m_scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this,
+          &FrameScroller::onHScroll);
 }
 
 void FrameScroller::onVScroll(int y) {
@@ -65,12 +69,11 @@ static QList<FrameScroller *> frameScrollers;
 
 void FrameScroller::handleScroll(const QPoint &offset) const {
   CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
-  if (!ratio.frame()) // only synchronize changes by frames axis
+  if (!ratio.frame())  // only synchronize changes by frames axis
     return;
 
   for (int i = 0; i < frameScrollers.size(); i++)
-    if (frameScrollers[i] != this)
-      frameScrollers[i]->onScroll(ratio);
+    if (frameScrollers[i] != this) frameScrollers[i]->onScroll(ratio);
 }
 
 void adjustScrollbarWithoutSignals(QScrollBar *scrollBar, int add);
@@ -78,9 +81,11 @@ void adjustScrollbarWithoutSignals(QScrollBar *scrollBar, int add);
 void FrameScroller::onScroll(const CellPositionRatio &ratio) {
   QPoint offset = orientation()->positionRatioToXY(ratio);
   if (offset.x())
-    adjustScrollbarWithoutSignals(m_scrollArea->horizontalScrollBar(), offset.x());
+    adjustScrollbarWithoutSignals(m_scrollArea->horizontalScrollBar(),
+                                  offset.x());
   if (offset.y())
-    adjustScrollbarWithoutSignals(m_scrollArea->verticalScrollBar(), offset.y());
+    adjustScrollbarWithoutSignals(m_scrollArea->verticalScrollBar(),
+                                  offset.y());
 }
 void adjustScrollbarWithoutSignals(QScrollBar *scrollBar, int add) {
   scrollBar->blockSignals(true);
@@ -89,13 +94,11 @@ void adjustScrollbarWithoutSignals(QScrollBar *scrollBar, int add) {
 }
 
 void FrameScroller::registerFrameScroller() {
-  if (!frameScrollers.contains(this))
-    frameScrollers.append(this);
+  if (!frameScrollers.contains(this)) frameScrollers.append(this);
 }
 
 void FrameScroller::unregisterFrameScroller() {
-  if (frameScrollers.contains(this))
-    frameScrollers.removeAll(this);
+  if (frameScrollers.contains(this)) frameScrollers.removeAll(this);
 }
 
 void FrameScroller::prepareToScrollOthers(const QPoint &offset) {
@@ -468,7 +471,8 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
   // m_columnScrollArea->setFixedHeight(m_rowHeight * 3 + 60 - 63);
 
   m_frameScroller.setFrameScrollArea(m_cellScrollArea);
-  connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset, this, &SpreadsheetViewer::onPrepareToScrollOffset);
+  connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset,
+          this, &SpreadsheetViewer::onPrepareToScrollOffset);
 
   //---- layout
   QGridLayout *layout = new QGridLayout();

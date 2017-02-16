@@ -197,7 +197,8 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_rowScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   m_frameScroller.setFrameScrollArea(m_cellScrollArea);
-  connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset, this, &XsheetViewer::onPrepareToScrollOffset);
+  connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset,
+          this, &XsheetViewer::onPrepareToScrollOffset);
 
   connectScrollBars();
 

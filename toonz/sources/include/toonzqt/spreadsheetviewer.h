@@ -34,11 +34,11 @@ class GenericPanel;
 
 //-------------------------------------------------------------------
 
-// use composition rather than inheritance (multiple QObject inheritance problems)
-// the way this works:
-// scroll area scrollbars sends event to this;
-// it notifies every other FrameScroller in global connected pool with difference;
-// they handle it by adjusting their scrollbars
+// Use composition rather than inheritance.
+// How this works:
+// * scroll area scrollbars sends event to this;
+// * it notifies every other FrameScroller with difference;
+// * they handle it by adjusting their scrollbars
 class DVAPI FrameScroller final : public QObject {
   Q_OBJECT
 
