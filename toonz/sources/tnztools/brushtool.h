@@ -109,7 +109,7 @@ private:
 //    the next stroke(s) accordingly.
 //************************************************************************
 
-typedef std::vector<TThickQuadratic *> ArrayOfTQ;
+typedef std::set<const TThickQuadratic *> SetOfConstTQ;
 
 class AnimationAutoComplete {
 public:
@@ -118,7 +118,10 @@ public:
 
   //ArrayOfTQ getNeighbors(TThickQuadratic* samplePoint);
   void addStroke(TStroke* stroke);
-  ArrayOfTQ getNeighbours(const TThickQuadratic* point);
+  SetOfConstTQ getNeighbours(const TThickQuadratic* point);
+  bool withinSpaceVicinity(const TThickQuadratic* samplePoint,const TThickQuadratic* point );
+  void drawSpaceVicinity(TStroke* stroke);
+
 
 private:
   //void generatePoints();
@@ -127,11 +130,11 @@ private:
   {
   public:
 	  TStroke* stroke;
-	  ArrayOfTQ neighbours;
+	  SetOfConstTQ neighbours;
   };
 
 private:
-  int m_spaceVicinityRadius;
+  int m_spaceVicinityRadius = 100;
   std::vector<TStrokeWithNeighbours*> m_strokesWithNeighbours;
 };
 
