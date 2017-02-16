@@ -146,8 +146,8 @@ set(MOC_HEADERS
     historypane.h
     cleanupsettingspane.h
     penciltestpopup.h
-	locatorpopup.h
-	styleshortcutswitchablepanel.h
+    locatorpopup.h
+    styleshortcutswitchablepanel.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -522,6 +522,15 @@ exec \$OPENTOONZ_BASE/bin/OpenToonz_${VERSION} \"\$@\"
             "$<TARGET_FILE:tfarmserver>"
         DESTINATION bin
     )
+
+    if(LZODRIVER_FOUND)
+        install(
+            PROGRAMS
+                "$<TARGET_FILE:lzocompress>"
+                "$<TARGET_FILE:lzodecompress>"
+            DESTINATION bin
+        )
+    endif()
 
     install(
         FILES
