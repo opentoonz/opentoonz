@@ -43,7 +43,12 @@ elseif(APPLE)
     set(_init_SYSTEM_SUPERLU                 OFF)
 elseif(UNIX)
     set(_init_SYSTEM_LZO                     ON)
-    set(_init_SYSTEM_SUPERLU                 ON)
+# Travis CI only provides old version of SuperLU 
+    if(DEFINED ENV{TRAVIS})
+        set(_init_SYSTEM_SUPERLU                 OFF)
+    else()
+        set(_init_SYSTEM_SUPERLU                 ON)
+    endif()
 endif()
 
 
@@ -158,7 +163,7 @@ elseif(UNIX)
 
     set(CMAKE_CXX_STANDARD 11)
 
-    find_package(Qt5Widgets)
+    #find_package(Qt5Widgets)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -lstdc++ -std=c++11")
 else()
