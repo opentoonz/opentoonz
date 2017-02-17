@@ -301,7 +301,7 @@ QGroupBox:disabled {
 }
 /* between the Studio Palette and the Style Editor */
 QSplitter::handle {
-  background-color: #707070;
+  background-color: #3d3d3d;
 }
 /* ------ Toonz Classes Difinitions ------ */
 TPanel {
@@ -1188,7 +1188,7 @@ PopupButton::menu-indicator:disabled {
   padding-top: 1px;
   padding-bottom: 1px;
   background-color: #232323;
-  border: 1px solid #a8a8a8;
+  border: 1px solid #585858;
   border-radius: 2px;
 }
 #TopBarTab::tab:selected {
