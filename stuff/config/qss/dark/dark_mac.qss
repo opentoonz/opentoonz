@@ -191,6 +191,10 @@ QComboBox:disabled {
   border: 1px solid #585858;
   color: #808080;
 }
+QComboBox QAbstractItemView {
+  outline: 0px;
+  selection-background-color: #448044;
+}
 QPushButton {
   /* .base_outset; */
   border: 1px solid #666666;
@@ -341,8 +345,7 @@ PaletteViewer #ToolBarContainer #keyFrameNavigator {
 #PaletteTabBar,
 #FxSettingsTabBar {
   background-color: #232323;
-  border-bottom: 1px #585858;
-  border-style: groove;
+  border-bottom: 1px solid #585858;
 }
 #PaletteTabBar::tab,
 #FxSettingsTabBar::tab {
@@ -427,8 +430,7 @@ PaletteViewer #ToolBarContainer #keyFrameNavigator {
   max-width: 30px;
 }
 #StyleEditorTabBar {
-  border-bottom: 1px #585858;
-  border-style: groove;
+  border-bottom: 1px solid #585858;
   background-color: #232323;
 }
 #StyleEditorTabBar QPushButton {
@@ -1049,6 +1051,7 @@ SpreadsheetViewer {
 #CameraSettingsRadioButton::indicator {
   width: 21px;
   height: 21px;
+  background-color: #303030;
 }
 #CameraSettingsRadioButton::indicator:checked {
   image: url("imgs/cam_lock.png");
@@ -1064,6 +1067,7 @@ SpreadsheetViewer {
 }
 #CameraSettingsRadioButton_Small {
   padding: 2px;
+  background-color: #303030;
 }
 #CameraSettingsRadioButton_Small::indicator {
   width: 11px;
@@ -1096,6 +1100,7 @@ SpreadsheetViewer {
   /*space between button and text*/
 }
 #EditToolLockButton::indicator {
+  background-color: #303030;
   border-width: 0px;
   width: 21px;
   height: 21px;
@@ -1234,6 +1239,9 @@ QDialog #dialogButtonFrame {
 }
 #PreferencesPopup QListWidget::item:hover {
   background-color: #3d3d3d;
+}
+QListView {
+  outline: 0;
 }
 #OutputSettingsBox {
   border: 1px solid #585858;
