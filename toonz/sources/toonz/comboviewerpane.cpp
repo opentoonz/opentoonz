@@ -426,7 +426,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   TPanelTitleBarButtonSet *viewModeButtonSet;
   m_referenceModeBs = viewModeButtonSet = new TPanelTitleBarButtonSet();
   int x                                 = -232;
-  int iconWidth                         = 17;
+  int iconWidth                         = 18;
   TPanelTitleBarButton *button;
 
   // buttons for show / hide toggle for the field guide and the safe area
@@ -450,7 +450,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                                     ":Resources/fieldguide_over.png",
                                     ":Resources/fieldguide_on.png");
   button->setToolTip(tr("Field Guide"));
-  x += 5 + iconWidth;
+  x += 3 + iconWidth; // width of safearea.png 18px
   titleBar->add(QPoint(x, 1), button);
   ret = ret && connect(button, SIGNAL(toggled(bool)),
                        CommandManager::instance()->getAction(MI_FieldGuide),
@@ -466,7 +466,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                                     ":Resources/standard_over.png",
                                     ":Resources/standard_on.png");
   button->setToolTip(tr("Camera Stand View"));
-  x += 10 + iconWidth;
+  x += 10 + 16; //field guide width is 16
   titleBar->add(QPoint(x, 1), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::NORMAL_REFERENCE);
   button->setPressed(true);
@@ -475,7 +475,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                                     ":Resources/3D_over.png",
                                     ":Resources/3D_on.png");
   button->setToolTip(tr("3D View"));
-  x += 19;  // width of standard.png = 18pixels
+  x += 3 + iconWidth;  // width of standard.png = 18 pixels
   titleBar->add(QPoint(x, 1), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA3D_REFERENCE);
 
@@ -483,7 +483,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                                     ":Resources/view_camera_over.png",
                                     ":Resources/view_camera_on.png");
   button->setToolTip(tr("Camera View"));
-  x += 18;  // width of 3D.png = 18pixels
+  x += 3 + 23;  // width of 3D.png = 23 pixels
   titleBar->add(QPoint(x, 1), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA_REFERENCE);
   ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer,
@@ -493,7 +493,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
                                     ":Resources/freeze_over.png",
                                     ":Resources/freeze_on.png");
-  x += 10 + 19;  // width of viewcamera.png = 18pixels
+  x += 10 + 23;  // width of viewcamera.png = 23 pixels
 
   button->setToolTip(tr("Freeze"));  // RC1
   titleBar->add(QPoint(x, 1), button);
@@ -504,7 +504,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   m_previewButton = new TPanelTitleBarButton(
       titleBar, ":Resources/viewpreview.png", ":Resources/viewpreview_over.png",
       ":Resources/viewpreview_on.png");
-  x += 5 + iconWidth;
+  x += 10 + 16; // width of freeze is 16 pixels
   titleBar->add(QPoint(x, 1), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
   ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)),
@@ -514,7 +514,7 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
       new TPanelTitleBarButton(titleBar, ":Resources/subcamera_preview.png",
                                ":Resources/subcamera_preview_over.png",
                                ":Resources/subcamera_preview_on.png");
-  x += 28;  // width of viewpreview.png =28pixels
+  x += 3 + 28;  // width of viewpreview.png =28pixels
 
   titleBar->add(QPoint(x, 1), m_subcameraPreviewButton);
   m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));
