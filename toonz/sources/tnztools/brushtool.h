@@ -120,7 +120,9 @@ public:
   void addStroke(TStroke* stroke);
   SetOfConstTQ getNeighbours(const TThickQuadratic* point);
   bool withinSpaceVicinity(const TThickQuadratic* samplePoint,const TThickQuadratic* point );
-  void drawSpaceVicinity(TStroke* stroke);
+
+  //TODO: remove at production
+  std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
 
 
 private:

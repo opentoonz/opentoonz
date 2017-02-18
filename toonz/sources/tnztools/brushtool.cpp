@@ -38,6 +38,8 @@
 #include "tgl.h"
 #include "trop.h"
 
+#include "drawutil.h"
+
 // Qt includes
 #include <QPainter>
 
@@ -1364,7 +1366,16 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       stroke->insertControlPoints(0.5);
 
 	m_animationAutoComplete.addStroke(stroke);
-	//m_animationAutoComplete.drawSpaceVicinity(stroke);
+
+	//TODO: remove at production
+	//===============================================================================================
+	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete.drawSpaceVicinity(stroke);
+
+	for (auto i : spaceVicinities)
+		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
+						 m_isFrameCreated, m_isLevelCreated);
+	//===============================================================================================
+
     addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                      m_isFrameCreated, m_isLevelCreated);
     TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
@@ -2198,7 +2209,6 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 		SetOfConstTQ neighbours = getNeighbours(stroke->getChunk(i));
 		strokeWithNeighbours->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
-
 }
 
 SetOfConstTQ AnimationAutoComplete::getNeighbours(const TThickQuadratic* point)
@@ -2235,11 +2245,13 @@ bool AnimationAutoComplete::withinSpaceVicinity(const TThickQuadratic*samplePoin
 
 }
 
-void AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
+//TODO: remove at production
+std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
 {
-	for(int i=0;i<stroke->getChunkCount();i++)
-	{
-		tglDrawCircle(stroke->getChunk(i)->getP1(),m_spaceVicinityRadius);
+	std::vector<TStroke*> strokes;
 
-	}
+	for(int i = 0; i < stroke->getChunkCount(); i++)
+		strokes.push_back(makeEllipticStroke(3, stroke->getChunk(i)->getP0(), m_spaceVicinityRadius, m_spaceVicinityRadius));
+
+	return strokes;
 }
