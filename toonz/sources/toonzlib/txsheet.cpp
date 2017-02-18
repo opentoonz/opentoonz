@@ -31,6 +31,7 @@
 #include "toonz/stage.h"
 #include "toonz/textureutils.h"
 #include "xshhandlemanager.h"
+#include "toonz/pathanimations.h"
 
 #include "toonz/txsheet.h"
 
@@ -86,6 +87,7 @@ struct TXsheet::TXsheetImp {
   TColumnSetT<TXshColumn> m_columnSet;
   TStageObjectTree *m_pegTree;
   FxDag *m_fxDag;
+  PathAnimations *m_pathAnimations;
 
   int m_frameCount;
   int m_soloColumn;
@@ -144,7 +146,8 @@ TXsheet::TXsheetImp::TXsheetImp()
     , m_soloColumn(-1)
     , m_viewColumn(-1)
     , m_mixedSound(0)
-    , m_scene(0) {
+    , m_scene(0)
+    , m_pathAnimations(nullptr) {
 }
 
 //-----------------------------------------------------------------------------
@@ -153,6 +156,7 @@ TXsheet::TXsheetImp::~TXsheetImp() {
   assert(m_pegTree);
   assert(m_fxDag);
   assert(m_handleManager);
+  delete m_pathAnimations;
   delete m_pegTree;
   delete m_fxDag;
   delete m_handleManager;
@@ -171,6 +175,7 @@ TXsheet::TXsheet()
   m_imp->m_handleManager = new XshHandleManager(this);
   m_imp->m_pegTree->setHandleManager(m_imp->m_handleManager);
   m_imp->m_pegTree->createGrammar(this);
+  m_imp->m_pathAnimations = new PathAnimations(this);
 }
 
 //-----------------------------------------------------------------------------

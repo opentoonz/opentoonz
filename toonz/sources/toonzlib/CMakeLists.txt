@@ -157,7 +157,9 @@ set(MOC_HEADERS
     texturemanager.h
 )
 
-set(HEADERS ${MOC_HEADERS})
+set(HEADERS ${MOC_HEADERS}
+	../include/toonz/pathanimations.h
+)
 
 set(SOURCES
     autoadjust.cpp
@@ -200,6 +202,7 @@ set(SOURCES
     onionskinmask.cpp
 	orientation.cpp
     outputproperties.cpp
+	pathanimations.cpp
     preferences.cpp
     rasterbrush.cpp
     rasterstrokegenerator.cpp
