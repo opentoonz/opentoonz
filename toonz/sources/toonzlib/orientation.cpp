@@ -687,7 +687,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
 
   addRect(PredefinedRect::FOLD_UNFOLD_AREA, eye.translated(4 * ICON_OFFSET, 0));
   addRect(PredefinedRect::SUBLAYER_NAME, QRect(ICONS_WIDTH, 0, LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH, SUBLAYER_HEIGHT));
-  addRect(PredefinedRect::SUBLAYER_ACTIVATOR, QRect(0, 0, ICON_WIDTH, CELL_HEIGHT));
+  addRect(PredefinedRect::SUBLAYER_ACTIVATOR, QRect(ICONS_WIDTH, 0, ICON_WIDTH, CELL_HEIGHT));
 
   //
   // Lines

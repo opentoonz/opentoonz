@@ -15,13 +15,15 @@ class XsheetViewer;
 class SubLayerOffsets {
   QPoint m_topLeft;
   QPoint m_shifted; //! includes shift for depth in the tree of sublayers
+  QPoint m_name; //! also accounts for activator icon
 
 public:
-  SubLayerOffsets(const QPoint &topLeft, const QPoint &shifted);
+  SubLayerOffsets(const QPoint &topLeft, const QPoint &shifted, const QPoint &name);
   static SubLayerOffsets forLayer(const QPoint &topLeft);
 
   QPoint topLeft() const { return m_topLeft; }
   QPoint shifted() const { return m_shifted; }
+  QPoint name() const { return m_name; }
 };
 
 //! Class responsible for mapping logical (row, col) to screen XY and back

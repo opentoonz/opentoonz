@@ -12,12 +12,12 @@
 //-------------------------------------------------------------------------------------------
 // SubLayerOffsets
 
-SubLayerOffsets::SubLayerOffsets(const QPoint &topLeft, const QPoint &shifted)
-  : m_topLeft (topLeft), m_shifted (shifted)
+SubLayerOffsets::SubLayerOffsets(const QPoint &topLeft, const QPoint &shifted, const QPoint &name)
+  : m_topLeft (topLeft), m_shifted (shifted), m_name (name)
 { }
 
 SubLayerOffsets SubLayerOffsets::forLayer(const QPoint &topLeft) {
-  return SubLayerOffsets(topLeft, topLeft);
+  return SubLayerOffsets(topLeft, topLeft, topLeft);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -100,5 +100,10 @@ SubLayerOffsets ScreenMapper::subLayerOffsets(const TXshColumn *column, int subL
   QPoint layerOffset = baseLayerOffset + subLayerOffset * subLayerIndex;
   QPoint depthOffset = frameOffset * subLayer->depth();
   QPoint totalOffset = layerOffset + depthOffset;
-  return SubLayerOffsets(layerOffset, totalOffset);
+  QPoint nameOffset = totalOffset;
+  if (subLayer->hasActivator()) {
+    int frameSide = orientation()->frameSide(rect(PredefinedRect::SUBLAYER_ACTIVATOR)).length();
+    nameOffset = nameOffset + frameLayerToXY(frameSide, 0);
+  }
+  return SubLayerOffsets(layerOffset, totalOffset, nameOffset);
 }

@@ -913,7 +913,7 @@ void ColumnArea::DrawHeader::drawSubLayerName(const shared_ptr<SubLayer> &subLay
   p.setPen(Qt::black);
 
   QRect nameRect = o->rect(PredefinedRect::SUBLAYER_NAME)
-    .translated(offsets.shifted()).adjusted(2, 0, -2, 0);
+    .translated(offsets.name()).adjusted(2, 0, -2, 0);
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
     subLayer->name());
 }
@@ -1013,7 +1013,7 @@ void ColumnArea::DrawHeader::drawSubLayerActivator(const shared_ptr<SubLayer> &s
   if (!subLayer->hasActivator())
     return;
 
-  QRect rect = o->rect(PredefinedRect::SUBLAYER_ACTIVATOR).translated(offsets.topLeft());
+  QRect rect = o->rect(PredefinedRect::SUBLAYER_ACTIVATOR).translated(offsets.shifted());
 
   p.setPen(Qt::gray);
   p.setBrush(QColor(255, 255, 255, 128));
@@ -1773,10 +1773,10 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
 		  shared_ptr<SubLayer> subLayer = subLayers[i];
 		  SubLayerOffsets offsets = mapper->subLayerOffsets(column, i);
 
-		  if (mapper->rect(PredefinedRect::SUBLAYER_ACTIVATOR)
-			  .contains(event->pos() - offsets.topLeft()))
-			  subLayer->toggleActivator();
-	  }
+      if (mapper->rect(PredefinedRect::SUBLAYER_ACTIVATOR)
+        .contains(event->pos() - offsets.shifted()))
+        subLayer->toggleActivator();
+    }
   }
   
   if (!isEmpty && m_col >= 0) {
