@@ -62,11 +62,13 @@ private:
 // SubLayer representing a single stroke
 class StrokeSubLayer final : public SubLayer {
   TStroke *m_stroke; // weak pointer - don't own
+  bool m_activated;
 
 public:
-  StrokeSubLayer(SubLayers *subLayers, SubLayer *parent, TStroke *stroke): SubLayer(subLayers, parent), m_stroke(stroke) { }
+  StrokeSubLayer(SubLayers *subLayers, SubLayer *parent, TStroke *stroke);
 
   virtual bool hasActivator() const override { return true; }
+  virtual bool isActivated() const override { return m_activated; }
   virtual QString name() const override;
 
   bool owns(const TStroke *stroke) const { return m_stroke == stroke; }
@@ -323,6 +325,10 @@ SubLayer *FrameSubLayer::build(TStroke *stroke) {
 
 //-----------------------------------------------------------------------------
 // StrokeSubLayer
+
+StrokeSubLayer::StrokeSubLayer(SubLayers *subLayers, SubLayer *parent, TStroke *stroke)
+  : SubLayer(subLayers, parent), m_stroke(stroke), m_activated (false)
+{ }
 
 QString StrokeSubLayer::name() const {
   QString prefix = m_stroke->name();

@@ -378,6 +378,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::VOLUME_TRACK,
           QRect(soundTopLeft, QSize(3, trackLen)));
   addRect(PredefinedRect::SUBLAYER_NAME, QRect(10, 6, SUBLAYER_WIDTH - 10, CELL_HEIGHT - 3));
+  addRect(PredefinedRect::SUBLAYER_ACTIVATOR, QRect(0, 0, SUBLAYER_WIDTH, CELL_HEIGHT));
 
   QRect pegbarname(INDENT, HDRROW4, CELL_WIDTH - 11, CELL_HEIGHT - 3);
   addRect(PredefinedRect::PEGBAR_NAME, pegbarname);
@@ -686,6 +687,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
 
   addRect(PredefinedRect::FOLD_UNFOLD_AREA, eye.translated(4 * ICON_OFFSET, 0));
   addRect(PredefinedRect::SUBLAYER_NAME, QRect(ICONS_WIDTH, 0, LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH, SUBLAYER_HEIGHT));
+  addRect(PredefinedRect::SUBLAYER_ACTIVATOR, QRect(0, 0, ICON_WIDTH, CELL_HEIGHT));
 
   //
   // Lines

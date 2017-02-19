@@ -589,6 +589,19 @@ const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
   static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
   return soundPlaying;
 }
+const QPixmap &ColumnArea::Pixmaps::keyNonActive() {
+  static QPixmap key = QPixmap(":Resources/key_no.png");
+  return key;
+}
+const QPixmap &ColumnArea::Pixmaps::keyPartial() {
+  static QPixmap key = QPixmap(":Resources/key_partial.png");
+  return key;
+}
+const QPixmap &ColumnArea::Pixmaps::keyActive() {
+  static QPixmap key = QPixmap(":Resources/key_total.png");
+  return key;
+}
+
 //-----------------------------------------------------------------------------
 
 void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
@@ -996,6 +1009,19 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
   p.drawPath(head);
 }
 
+void ColumnArea::DrawHeader::drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer, const QPoint &layerOffset) const {
+  if (!subLayer->hasActivator())
+    return;
+
+  QRect rect = o->rect(PredefinedRect::SUBLAYER_ACTIVATOR).translated(layerOffset);
+
+  p.setPen(Qt::gray);
+  p.setBrush(QColor(255, 255, 255, 128));
+  p.drawRect(rect);
+  p.drawPixmap(rect, subLayer->isActivated() ? Pixmaps::keyActive() : Pixmaps::keyNonActive());
+}
+
+
 void ColumnArea::DrawHeader::drawSubLayers() const {
   const ScreenMapper *mapper = m_viewer->screenMapper();
   vector<shared_ptr<SubLayer>> subLayers =
@@ -1017,7 +1043,7 @@ void ColumnArea::DrawHeader::drawSubLayers() const {
     drawSubLayerFoldUnfoldButton(subLayer, totalOffset);
     drawSubLayerName(subLayer, totalOffset);
 
-    //drawActivator();
+    drawSubLayerActivator(subLayer, layerOffset);
   }
 }
 

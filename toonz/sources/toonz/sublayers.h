@@ -90,6 +90,7 @@ public:
   virtual bool isFolded() const { return m_folded; }
   virtual void foldUnfold();
   virtual bool hasActivator() const { return false; }
+  virtual bool isActivated() const { return false; }
   virtual QString name() const { return ""; }
 
   SubLayers *subLayers() const { return m_subLayers; }

@@ -268,6 +268,7 @@ class ColumnArea final : public QWidget {
     void drawSubLayers() const;
     void drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const;
     void drawSubLayerName(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const;
+    void drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer, const QPoint &layerOffset) const;
   };
 
 public:
@@ -297,6 +298,10 @@ public:
     static const QPixmap &lock();
     static const QPixmap &sound();
     static const QPixmap &soundPlaying();
+
+    static const QPixmap &keyNonActive();
+    static const QPixmap &keyPartial();
+    static const QPixmap &keyActive();
   };
 
 protected:

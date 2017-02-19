@@ -108,7 +108,8 @@ enum class PredefinedRect {
   PEGBAR_NAME,         //! where to display pegbar name
   PARENT_HANDLE_NAME,  //! where to display parent handle number
   FILTER_COLOR,        //! where to show layer's filter color
-  SUBLAYER_NAME        //! area to draw sublayer name
+  SUBLAYER_NAME,       //! area to draw sublayer name
+  SUBLAYER_ACTIVATOR   //! activator key icon placement
 };
 enum class PredefinedLine {
   LOCKED,              //! dotted vertical line when cell is locked
