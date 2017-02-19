@@ -9,6 +9,21 @@
 
 #include <QObject>
 
+class XsheetViewer;
+
+//! Key screen points for displaying a sub layer (in a given ScreenMapper)
+class SubLayerOffsets {
+  QPoint m_topLeft;
+  QPoint m_shifted; //! includes shift for depth in the tree of sublayers
+
+public:
+  SubLayerOffsets(const QPoint &topLeft, const QPoint &shifted);
+  static SubLayerOffsets forLayer(const QPoint &topLeft);
+
+  QPoint topLeft() const { return m_topLeft; }
+  QPoint shifted() const { return m_shifted; }
+};
+
 //! Class responsible for mapping logical (row, col) to screen XY and back
 //! Gathers and hides all objects required to do so
 //! All screen mapping requests should go through this,
@@ -17,8 +32,6 @@
 //! Each XsheetViewer has a single instance of ScreenMapper.
 //! ScreenMapper has internal state that lets XsheetViewer be customized
 //! independently from other windows.
-
-class XsheetViewer;
 
 class ScreenMapper final : public QObject {
   Q_OBJECT
@@ -67,6 +80,10 @@ public:
   // column fan
 
   void updateColumnFan() const;
+
+  // sub layers
+
+  SubLayerOffsets subLayerOffsets(const TXshColumn *column, int subLayerIndex) const;
 };
 
 #endif

@@ -7,6 +7,22 @@
 #include "tapp.h"
 #include "xsheetviewer.h"
 
+#include <algorithm>
+
+//-------------------------------------------------------------------------------------------
+// SubLayerOffsets
+
+SubLayerOffsets::SubLayerOffsets(const QPoint &topLeft, const QPoint &shifted)
+  : m_topLeft (topLeft), m_shifted (shifted)
+{ }
+
+SubLayerOffsets SubLayerOffsets::forLayer(const QPoint &topLeft) {
+  return SubLayerOffsets(topLeft, topLeft);
+}
+
+//-------------------------------------------------------------------------------------------
+// ScreenMapper
+
 ScreenMapper::ScreenMapper(XsheetViewer *viewer)
   : m_viewer (viewer), m_orientation (nullptr), m_columnFan (nullptr), m_subLayers (nullptr) {
   m_orientation = Orientations::leftToRight();
@@ -66,4 +82,23 @@ void ScreenMapper::updateColumnFan() const {
   m_columnFan->updateExtras(xsheet()->getColumnFan(), 
     subLayers()->childrenDimensions(orientation()));
   m_viewer->update();
+}
+
+//----------------------------------------------------------------------------------
+
+SubLayerOffsets ScreenMapper::subLayerOffsets(const TXshColumn *column, int subLayerIndex) const {
+  int col = column == nullptr ? -1 : column->getIndex();
+  QPoint orig = m_viewer->positionToXY(CellPosition(0, std::max(col, 0)));
+
+  QPoint baseLayerOffset = orig + frameLayerToXY(0, dimension(PredefinedDimension::LAYER));
+  QPoint subLayerOffset = frameLayerToXY(0, dimension(PredefinedDimension::SUBLAYER));
+  QPoint frameOffset = frameLayerToXY(dimension(PredefinedDimension::SUBLAYER_DEPTH), 0);
+
+  vector<shared_ptr<SubLayer>> childrenTree = subLayers()->layer(column)->childrenFlatTree();
+  shared_ptr<SubLayer> subLayer = childrenTree[subLayerIndex];
+
+  QPoint layerOffset = baseLayerOffset + subLayerOffset * subLayerIndex;
+  QPoint depthOffset = frameOffset * subLayer->depth();
+  QPoint totalOffset = layerOffset + depthOffset;
+  return SubLayerOffsets(layerOffset, totalOffset);
 }

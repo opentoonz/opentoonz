@@ -24,6 +24,7 @@ class Orientation;
 class TApp;
 class TXsheet;
 class SubLayer;
+class SubLayerOffsets;
 
 //=============================================================================
 namespace XsheetGUI {
@@ -266,9 +267,9 @@ class ColumnArea final : public QWidget {
     void drawVolumeControl(double volume) const;
 
     void drawSubLayers() const;
-    void drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const;
-    void drawSubLayerName(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const;
-    void drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer, const QPoint &layerOffset) const;
+    void drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const;
+    void drawSubLayerName(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const;
+    void drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const;
   };
 
 public:

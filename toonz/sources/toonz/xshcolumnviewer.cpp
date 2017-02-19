@@ -735,16 +735,16 @@ void ColumnArea::DrawHeader::drawLock() const {
 void ColumnArea::DrawHeader::drawFoldUnfoldButton() const {
   if (col < 0 || isEmpty) return;
   shared_ptr<SubLayer> rootLayer = m_viewer->screenMapper()->subLayers()->layer(column);
-  drawSubLayerFoldUnfoldButton(rootLayer, orig);
+  drawSubLayerFoldUnfoldButton(rootLayer, SubLayerOffsets::forLayer(orig));
 }
-void ColumnArea::DrawHeader::drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const {
+void ColumnArea::DrawHeader::drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const {
   if (!subLayer->hasChildren()) return;
 
   QRect mouseArea = o->rect(PredefinedRect::FOLD_UNFOLD_AREA);
   if (mouseArea.isEmpty())
     return;
 
-  QPoint offset = base + mouseArea.topLeft();
+  QPoint offset = offsets.shifted() + mouseArea.topLeft();
   QPainterPath triangle = o->path(subLayer->isFolded() ?
     PredefinedPath::FOLDED : PredefinedPath::UNFOLDED).translated(offset);
 
@@ -909,11 +909,11 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
              Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QString(parentId.toString().c_str()));
 }
-void ColumnArea::DrawHeader::drawSubLayerName(const shared_ptr<SubLayer> &subLayer, const QPoint &base) const {
+void ColumnArea::DrawHeader::drawSubLayerName(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const {
   p.setPen(Qt::black);
 
   QRect nameRect = o->rect(PredefinedRect::SUBLAYER_NAME)
-    .translated(base).adjusted(2, 0, -2, 0);
+    .translated(offsets.shifted()).adjusted(2, 0, -2, 0);
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
     subLayer->name());
 }
@@ -1009,11 +1009,11 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
   p.drawPath(head);
 }
 
-void ColumnArea::DrawHeader::drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer, const QPoint &layerOffset) const {
+void ColumnArea::DrawHeader::drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const {
   if (!subLayer->hasActivator())
     return;
 
-  QRect rect = o->rect(PredefinedRect::SUBLAYER_ACTIVATOR).translated(layerOffset);
+  QRect rect = o->rect(PredefinedRect::SUBLAYER_ACTIVATOR).translated(offsets.topLeft());
 
   p.setPen(Qt::gray);
   p.setBrush(QColor(255, 255, 255, 128));
@@ -1027,23 +1027,16 @@ void ColumnArea::DrawHeader::drawSubLayers() const {
   vector<shared_ptr<SubLayer>> subLayers =
     mapper->subLayers()->layer(column)->childrenFlatTree();
 
-  QPoint baseLayerOffset = orig + mapper->frameLayerToXY(0, mapper->dimension(PredefinedDimension::LAYER));
-  QPoint subLayerOffset = mapper->frameLayerToXY(0, mapper->dimension(PredefinedDimension::SUBLAYER));
-  QPoint frameOffset = mapper->frameLayerToXY(mapper->dimension(PredefinedDimension::SUBLAYER_DEPTH), 0);
   for (int i = 0; i < subLayers.size(); i++) {
     shared_ptr<SubLayer> subLayer = subLayers[i];
+    SubLayerOffsets offsets = mapper->subLayerOffsets(column, i);
 
-    QPoint layerOffset = baseLayerOffset + subLayerOffset * i;
-    QPoint depthOffset = frameOffset * subLayer->depth();
-    QPoint totalOffset = layerOffset + depthOffset;
-
-    QRect rect = { mapper->rect(PredefinedRect::LAYER_HEADER).translated(layerOffset) };
+    QRect rect = { mapper->rect(PredefinedRect::LAYER_HEADER).translated(offsets.topLeft()) };
     p.fillRect(rect, QBrush(m_viewer->getSubLayerColor()));
 
-    drawSubLayerFoldUnfoldButton(subLayer, totalOffset);
-    drawSubLayerName(subLayer, totalOffset);
-
-    drawSubLayerActivator(subLayer, layerOffset);
+    drawSubLayerFoldUnfoldButton(subLayer, offsets);
+    drawSubLayerName(subLayer, offsets);
+    drawSubLayerActivator(subLayer, offsets);
   }
 }
 
@@ -1730,42 +1723,63 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
 
   m_col = -1;  // new in 6.4
 
+  if (event->button() == Qt::MidButton) {
+    m_pos = event->pos();
+    m_isPanning = true;
+    return;
+  }
   // both left and right click can change the selection
-  if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton) {
-    TXsheet *xsh   = m_viewer->getXsheet();
-    ColumnFan *fan = m_viewer->screenMapper()->columnFan();
-    m_col          = m_viewer->xyToPosition(event->pos()).layer();
-    // do nothing for the camera column
-    if (m_col < 0)  // CAMERA
-    {
-      TApp::instance()->getCurrentSelection()->getSelection()->makeNotCurrent();
-      m_viewer->getColumnSelection()->selectNone();
-    }
-    // when clicking the column fan
-    else if (m_col >= 0 && !fan->isActive(m_col))  // column Fan
-    {
-      fan = xsh->getColumnFan();
-      for (int i = m_col; i >= 0 && !fan->isActive(i); i--) fan->activate(i);
+  if (event->button() != Qt::LeftButton && event->button() != Qt::RightButton)
+    return;
 
-      xsh->notifyColumnFanFoldedUnfolded();
-      TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-      return;
-    }
-    // set the clicked column to current
-    else
-      m_viewer->setCurrentColumn(m_col);
+  TXsheet *xsh   = m_viewer->getXsheet();
+  ColumnFan *fan = m_viewer->screenMapper()->columnFan();
+  m_col          = m_viewer->xyToPosition(event->pos()).layer();
+  // do nothing for the camera column
+  if (m_col < 0)  // CAMERA
+  {
+    TApp::instance()->getCurrentSelection()->getSelection()->makeNotCurrent();
+    m_viewer->getColumnSelection()->selectNone();
+  }
+  // when clicking the column fan
+  else if (m_col >= 0 && !fan->isActive(m_col))  // column Fan
+  {
+    fan = xsh->getColumnFan();
+    for (int i = m_col; i >= 0 && !fan->isActive(i); i--) fan->activate(i);
 
-    TXshColumn *column = xsh->getColumn(m_col);
-    bool isEmpty       = !column || column->isEmpty();
-    TApp::instance()->getCurrentObject()->setIsSpline(false);
+    xsh->notifyColumnFanFoldedUnfolded();
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    return;
+  }
+  // set the clicked column to current
+  else
+    m_viewer->setCurrentColumn(m_col);
 
-    // get mouse position
-    QPoint mouseInCell =
-        event->pos() - m_viewer->positionToXY(CellPosition(0, m_col));
-    int x = mouseInCell.x(), y = mouseInCell.y();
+  TXshColumn *column = xsh->getColumn(m_col);
+  bool isEmpty       = !column || column->isEmpty();
+  TApp::instance()->getCurrentObject()->setIsSpline(false);
 
-    if (!isEmpty && m_col >= 0) {
+  // get mouse position
+  QPoint mouseInCell =
+      event->pos() - m_viewer->positionToXY(CellPosition(0, m_col));
+  int x = mouseInCell.x(), y = mouseInCell.y();
+
+  const ScreenMapper *mapper = m_viewer->screenMapper();
+  vector<shared_ptr<SubLayer>> subLayers =
+	  mapper->subLayers()->layer(column)->childrenFlatTree();
+  if (!mapper->rect(PredefinedRect::LAYER_HEADER).contains(mouseInCell) && subLayers.size()) {
+	  for (int i = 0; i < subLayers.size(); i++) {
+		  shared_ptr<SubLayer> subLayer = subLayers[i];
+		  SubLayerOffsets offsets = mapper->subLayerOffsets(column, i);
+
+		  if (mapper->rect(PredefinedRect::SUBLAYER_ACTIVATOR)
+			  .contains(event->pos() - offsets.topLeft()))
+			  subLayer->toggleActivator();
+	  }
+  }
+  
+  if (!isEmpty && m_col >= 0) {
       // grabbing the left side of the column enables column move
       if (o->rect(PredefinedRect::DRAG_LAYER).contains(mouseInCell)) {
         setDragTool(XsheetGUI::DragTool::makeColumnMoveTool(m_viewer));
@@ -1840,31 +1854,26 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
             event->button() == Qt::RightButton)
           return;
 
-        setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
-
-        // toggle columnIcon visibility with alt+click
-        TXshLevelColumn *levelColumn = column->getLevelColumn();
-        if (levelColumn &&
-            Preferences::instance()->getColumnIconLoadingPolicy() ==
-                Preferences::LoadOnDemand &&
-            (event->modifiers() & Qt::AltModifier)) {
-          levelColumn->setIconVisible(!levelColumn->isIconVisible());
-        }
-      }
-      // synchronize the current column and the current fx
-      TApp::instance()->getCurrentFx()->setFx(column->getFx());
-    } else if (m_col >= 0) {
       setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
-      TApp::instance()->getCurrentFx()->setFx(0);
+
+      // toggle columnIcon visibility with alt+click
+      TXshLevelColumn *levelColumn = column->getLevelColumn();
+      if (levelColumn &&
+          Preferences::instance()->getColumnIconLoadingPolicy() ==
+              Preferences::LoadOnDemand &&
+          (event->modifiers() & Qt::AltModifier)) {
+        levelColumn->setIconVisible(!levelColumn->isIconVisible());
+      }
     }
-
-    m_viewer->dragToolClick(event);
-    update();
-
-  } else if (event->button() == Qt::MidButton) {
-    m_pos       = event->pos();
-    m_isPanning = true;
+    // synchronize the current column and the current fx
+    TApp::instance()->getCurrentFx()->setFx(column->getFx());
+  } else if (m_col >= 0) {
+    setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
+    TApp::instance()->getCurrentFx()->setFx(0);
   }
+
+  m_viewer->dragToolClick(event);
+  update();
 }
 
 //-----------------------------------------------------------------------------

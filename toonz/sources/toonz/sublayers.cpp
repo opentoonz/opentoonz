@@ -69,6 +69,8 @@ public:
 
   virtual bool hasActivator() const override { return true; }
   virtual bool isActivated() const override { return m_activated; }
+  virtual void toggleActivator() override { m_activated = !m_activated; }
+
   virtual QString name() const override;
 
   bool owns(const TStroke *stroke) const { return m_stroke == stroke; }
