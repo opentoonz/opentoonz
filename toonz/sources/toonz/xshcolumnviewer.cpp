@@ -756,7 +756,7 @@ void ColumnArea::DrawHeader::drawSubLayerFoldUnfoldButton(const shared_ptr<SubLa
     PredefinedPath::FOLDED : PredefinedPath::UNFOLDED).translated(offset);
 
   QColor fillColor = m_viewer->getFoldUnfoldButtonColor();
-  p.fillPath(triangle, QBrush(fillColor));
+  p.setBrush(fillColor);
   p.setPen(m_viewer->getTextColor());
   p.drawPath(triangle);
 }
@@ -1021,7 +1021,7 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
   QPoint cursor = o->frameLayerToXY(frameAxis, layerAxis);
   QPainterPath head =
       o->path(PredefinedPath::VOLUME_SLIDER_HEAD).translated(cursor);
-  p.fillPath(head, QBrush(Qt::white));
+  p.setBrush(Qt::white);
   p.setPen(m_viewer->getLightLineColor());
   p.drawPath(head);
 }
