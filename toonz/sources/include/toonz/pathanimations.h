@@ -23,17 +23,21 @@ using std::map;
 
 class TXsheet;
 class TXshColumn;
+class TStroke;
 
 class DVAPI StrokeId final {
   TXsheet *m_xsheet;
   TXshColumn *m_column;
   TFrameId m_frameId;
+  TStroke *m_stroke;
 
 public:
-  StrokeId(TXsheet *xsheet, TXshColumn *column, const TFrameId &frameId);
+  StrokeId(TXsheet *xsheet, TXshColumn *column, const TFrameId &frameId, TStroke *stroke);
 
   friend bool operator == (const StrokeId &a, const StrokeId &b);
   friend bool operator < (const StrokeId &a, const StrokeId &b);
+
+  QString name() const;
 };
 
 // storage class for keyframes for all parameters animating
