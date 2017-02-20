@@ -263,6 +263,7 @@ class ColumnArea final : public QWidget {
     void drawParentHandleName() const;
     void drawFilterColor() const;
 
+    void drawNoSoundIcon() const;
     void drawSoundIcon(bool isPlaying) const;
     void drawVolumeControl(double volume) const;
 
@@ -293,12 +294,12 @@ public:
 
   class Pixmaps {
   public:
-    static const QPixmap &eye();
-    static const QPixmap &cameraStand();
-    static const QPixmap &cameraStandTransparent();
-    static const QPixmap &lock();
-    static const QPixmap &sound();
-    static const QPixmap &soundPlaying();
+    static const QPixmap &eye(bool timeline);
+    static const QPixmap &cameraStand(bool timeline);
+    static const QPixmap &cameraStandTransparent(bool timeline);
+    static const QPixmap &lock(bool timeline);
+    static const QPixmap &sound(bool timeline);
+    static const QPixmap &soundPlaying(bool timeline);
 
     static const QPixmap &activatorActive();
     static const QPixmap &activatorInactive();

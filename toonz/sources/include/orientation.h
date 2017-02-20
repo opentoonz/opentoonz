@@ -198,6 +198,7 @@ public:
 
   virtual bool isVerticalTimeline() const = 0;
   virtual bool flipVolume() const         = 0;
+  bool isTimeline() const { return !isVerticalTimeline(); }
 
   virtual QString name() const            = 0;
   virtual QString caption() const         = 0;

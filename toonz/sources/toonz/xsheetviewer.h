@@ -110,6 +110,8 @@ const QColor EmptyColumnColor(124, 124, 124);
 // Occupied column
 const QColor NotEmptyColumnColor(164, 164, 164);
 
+const QColor TimelineIconBackground(25, 25, 25);
+
 const QColor SelectedEmptyCellColor(210, 210, 210);
 const QColor SmartTabColor(255, 255, 255, 150);
 
@@ -201,10 +203,13 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   // Column
   QColor m_emptyColumnHeadColor;     // empty column header (200,200,200)
   QColor m_selectedColumnTextColor;  // selected column text (red)
+  QColor m_timelineIconColor;        // background for icons (25, 25, 25)
   Q_PROPERTY(QColor EmptyColumnHeadColor READ getEmptyColumnHeadColor WRITE
                  setEmptyColumnHeadColor)
   Q_PROPERTY(QColor SelectedColumnTextColor READ getSelectedColumnTextColor
                  WRITE setSelectedColumnTextColor)
+  Q_PROPERTY(QColor TimelineIconColor READ getTimelineIconColor
+      WRITE setTimelineIconColor)
   // Cell
   QColor m_emptyCellColor;          // empty cell (124,124,124)
   QColor m_notEmptyColumnColor;     // occupied column (164,164,164)
@@ -550,6 +555,12 @@ public:
   }
   QColor getSelectedColumnTextColor() const {
     return m_selectedColumnTextColor;
+  }
+  void setTimelineIconColor (const QColor &color) {
+    m_timelineIconColor = color;
+  }
+  QColor getTimelineIconColor() const {
+    return m_timelineIconColor;
   }
   // Cell
   void setEmptyCellColor(const QColor &color) { m_emptyCellColor = color; }

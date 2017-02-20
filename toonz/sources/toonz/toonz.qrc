@@ -318,8 +318,14 @@
         <file>Resources/texture_off.svg</file>
         <file>Resources/texture_on.svg</file>
         <file>Resources/thumbnails_view_act.png</file>
+        <file>Resources/timeline_eye.png</file>
+        <file>Resources/timeline_camstand.png</file>
+        <file>Resources/timeline_camstand_transparent.png</file>
         <file>Resources/timeline_key_active.png</file>
         <file>Resources/timeline_key_inactive.png</file>
+        <file>Resources/timeline_lock.png</file>
+        <file>Resources/timeline_sound.png</file>
+        <file>Resources/timeline_sound_playing.png</file>
         <file>Resources/toggle_audibility_click.png</file>
         <file>Resources/toggle_audibility_over.png</file>
         <file>Resources/toggle_lock.png</file>

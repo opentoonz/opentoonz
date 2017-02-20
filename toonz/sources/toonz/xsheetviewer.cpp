@@ -157,6 +157,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
     , m_screenMapper (nullptr)
+    , m_timelineIconColor(XsheetGUI::TimelineIconBackground)
 {
   m_screenMapper = new ScreenMapper(this);
 
