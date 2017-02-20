@@ -755,9 +755,6 @@ void ColumnArea::DrawHeader::drawSubLayerFoldUnfoldButton(const shared_ptr<SubLa
   QPainterPath triangle = o->path(subLayer->isFolded() ?
     PredefinedPath::FOLDED : PredefinedPath::UNFOLDED).translated(offset);
 
-  QColor iconBG = m_viewer->getTimelineIconColor();
-  p.fillRect(mouseArea.translated(offsets.shifted()), iconBG);
-
   QColor fillColor = m_viewer->getFoldUnfoldButtonColor();
   p.fillPath(triangle, QBrush(fillColor));
   p.setPen(m_viewer->getTextColor());
@@ -1034,11 +1031,8 @@ void ColumnArea::DrawHeader::drawSubLayerActivator(const shared_ptr<SubLayer> &s
     return;
 
   QRect rect = o->rect(PredefinedRect::SUBLAYER_ACTIVATOR).translated(offsets.shifted());
-
-  p.setPen(Qt::gray);
-  p.setBrush(m_viewer->getTimelineIconColor());
-  p.drawRect(rect);
-  p.drawPixmap(rect, subLayer->isActivated() ? Pixmaps::activatorActive() : Pixmaps::activatorInactive());
+  const QPixmap &icon = subLayer->isActivated() ? Pixmaps::activatorActive() : Pixmaps::activatorInactive();
+  p.drawPixmap(rect, icon);
 }
 
 

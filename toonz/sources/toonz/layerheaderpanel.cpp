@@ -62,17 +62,12 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 
   const Orientation *o = Orientations::leftToRight();
 
-  QColor background      = m_viewer->getBGColor();
-  QColor slightlyLighter = {mix(background, Qt::white, 0.95)};
-  QRect rect             = QRect(QPoint(0, 0), size());
-  p.fillRect(rect.adjusted(0, 0, -3, 0), slightlyLighter);
+  QColor background = m_viewer->getTimelineIconColor();
+  p.fillRect(QRect(QPoint(0, 0), size()), background);
 
-  drawIcon(p, PredefinedRect::EYE, XsheetGUI::PreviewVisibleColor,
-           ColumnArea::Pixmaps::eye());
-  drawIcon(p, PredefinedRect::PREVIEW_LAYER, boost::none,
-           ColumnArea::Pixmaps::cameraStand());
-  drawIcon(p, PredefinedRect::LOCK, QColor(255, 255, 255, 128),
-           ColumnArea::Pixmaps::lock());
+  drawIcon(p, PredefinedRect::EYE, ColumnArea::Pixmaps::eye(o->isTimeline()));
+  drawIcon(p, PredefinedRect::PREVIEW_LAYER, ColumnArea::Pixmaps::cameraStand(o->isTimeline()));
+  drawIcon(p, PredefinedRect::LOCK, ColumnArea::Pixmaps::lock(o->isTimeline()));
 
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
 
@@ -92,18 +87,9 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 }
 
 void LayerHeaderPanel::drawIcon(QPainter &p, PredefinedRect rect,
-                                optional<QColor> fill,
                                 const QPixmap &pixmap) const {
-  QRect iconRect =
-      Orientations::leftToRight()->rect(rect).adjusted(-2, 0, -2, 0);
-
-  if (rect == PredefinedRect::LOCK) {
-    p.setPen(Qt::gray);
-    p.setBrush(QColor(255, 255, 255, 128));
-    p.drawRect(iconRect);
-    iconRect.adjust(1, 1, -1, -1);
-  } else if (fill)
-    p.fillRect(iconRect, *fill);
+  QRect iconRect = Orientations::leftToRight()->rect(rect).adjusted(-2, 0, -2, 0);
+  p.fillRect(iconRect, m_viewer->getTimelineIconColor());
   p.drawPixmap(iconRect, pixmap);
 }
 
