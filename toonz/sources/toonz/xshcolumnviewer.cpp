@@ -589,16 +589,12 @@ const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
   static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
   return soundPlaying;
 }
-const QPixmap &ColumnArea::Pixmaps::keyNonActive() {
-  static QPixmap key = QPixmap(":Resources/key_no.png");
+const QPixmap &ColumnArea::Pixmaps::activatorActive() {
+  static QPixmap key = QPixmap(":Resources/timeline_key_active.png");
   return key;
 }
-const QPixmap &ColumnArea::Pixmaps::keyPartial() {
-  static QPixmap key = QPixmap(":Resources/key_partial.png");
-  return key;
-}
-const QPixmap &ColumnArea::Pixmaps::keyActive() {
-  static QPixmap key = QPixmap(":Resources/key_total.png");
+const QPixmap &ColumnArea::Pixmaps::activatorInactive() {
+  static QPixmap key = QPixmap(":Resources/timeline_key_inactive.png");
   return key;
 }
 
@@ -1018,7 +1014,7 @@ void ColumnArea::DrawHeader::drawSubLayerActivator(const shared_ptr<SubLayer> &s
   p.setPen(Qt::gray);
   p.setBrush(QColor(255, 255, 255, 128));
   p.drawRect(rect);
-  p.drawPixmap(rect, subLayer->isActivated() ? Pixmaps::keyActive() : Pixmaps::keyNonActive());
+  p.drawPixmap(rect, subLayer->isActivated() ? Pixmaps::activatorActive() : Pixmaps::activatorInactive());
 }
 
 

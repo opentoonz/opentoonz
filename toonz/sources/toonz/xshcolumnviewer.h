@@ -300,9 +300,8 @@ public:
     static const QPixmap &sound();
     static const QPixmap &soundPlaying();
 
-    static const QPixmap &keyNonActive();
-    static const QPixmap &keyPartial();
-    static const QPixmap &keyActive();
+    static const QPixmap &activatorActive();
+    static const QPixmap &activatorInactive();
   };
 
 protected:
