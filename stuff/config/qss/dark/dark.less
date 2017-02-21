@@ -91,11 +91,15 @@
 
 /* ------ Qt Widgets Common Difinitions ------ */
 
+QMenu,
+QMenuBar,
+QMainWindow,
 QWidget {
 	color: @m_baseTxtColor;
 	.baseBG;
 	font-family: @platform_font;
-	font-size: 12px;	
+	font-size: 12px;
+	font-weight: normal;	
 	&:disabled{
 		color: @m_disabledTxtColor;
 	}
@@ -253,7 +257,7 @@ QLineEdit {
 	.baseBG(5%);
 	border-width: 1px;
  	border-radius: 2px;
-	 border: 1px solid rgb(88, 88, 88);
+	 border: 1px solid rgb(78, 78, 78);
 	&:disabled {
 	    .baseBG(light, 10%);
 		color: @m_disabledTxtColor;
@@ -263,7 +267,7 @@ QComboBox {
 	/*darken little bit*/
 	color: @m_baseInputColor;
 	.baseBG(5%);
-	border: 1px solid rgb(88, 88, 88);
+	border: 1px solid rgb(78, 78, 78);
 	.set_padding( 1px, 1px );
 	border-radius: 3px;
     padding-left: 4px;
@@ -286,7 +290,7 @@ QComboBox {
 	}
 	&:disabled {
 	    .baseBG(light, 10%);
-		border: 1px solid rgb(88, 88, 88);
+		border: 1px solid rgb(78, 78, 78);
 		color: @m_disabledTxtColor;
 	}
 }
@@ -382,6 +386,9 @@ QGroupBox {
 		left: 15px;
 		margin: -2px 0 0 0;
 		padding: 0 3px;
+		&:disabled{
+			color: @m_disabledTxtColor;
+		}
 	}
 	&::indicator {
 		&:extend(QCheckBox::indicator all);
@@ -507,7 +514,7 @@ PaletteViewer #ToolBarContainer
 	QPushButton {
 		margin: 1px;
 		margin-top: 3px;
-		min-width:34px;
+		min-width:10px;
 		padding: 4px;
 		padding-top: 2px;
 		padding-bottom: 2px;
@@ -595,6 +602,8 @@ PaletteViewer #ToolBarContainer
 	margin: 0px;
 	border: 2px;
 	image-position: center center;
+	min-height: 8px;
+	max-width: 14px;
 }
 
 #colorSliderAddButton
@@ -1369,7 +1378,7 @@ PopupButton {
 }
 
 #DockSeparator{
-    .base_outset(light, 5%);
+    .baseBG(5%);
 	//border-image: url("@{image_url}/dock_handle_border.png") 2; 
 	border-width: 0;
 }
@@ -1381,7 +1390,7 @@ PopupButton {
 /*------ Popups -------*/
 
 QDialog #dialogButtonFrame {
-	.baseBG(10%);
+	.baseBG;
 }
 
 #SceneSettings QLabel
@@ -1522,4 +1531,12 @@ Filmstrip {
 	        .set_border_color(black,white);
 	    }
 	}
+}
+
+PencilTestPopup {
+	/* Allow for using a 768 screen */
+	min-height: 730px;
+	/* some clipping will still occur on width, but this
+	   allows for filling half of a 1024 screen */
+	min-width: 512px;
 }
