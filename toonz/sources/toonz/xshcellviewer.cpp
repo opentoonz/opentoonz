@@ -869,7 +869,8 @@ void CellArea::setDragTool(DragTool *dragTool) {
 
 void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   TXsheet *xsh         = m_viewer->getXsheet();
-  ColumnFan *columnFan = m_viewer->screenMapper ()->columnFan();
+  ScreenMapper *screenMapper = m_viewer->screenMapper();
+  ColumnFan *columnFan = screenMapper->columnFan();
 
   // selected cells range
   TCellSelection *cellSelection = m_viewer->getCellSelection();
@@ -946,11 +947,13 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
       p.drawLine(verticalLine);
     }
 
-    if (isColumn && !isSoundColumn && !isPaletteColumn && !isSoundTextColumn)
-      drawSubLayers(p, CellPosition(currentRow, col));
+    bool hasSubLayers = !screenMapper->subLayers()->layer(column)->isFolded();
+    shared_ptr<SubLayer> currentSubLayer = screenMapper->subLayers()->cell(CellPosition(currentRow, col));
 
     // for each frame
     for (row = r0; row <= r1; row++) {
+      if (hasSubLayers && currentSubLayer == screenMapper->subLayers()->cell(CellPosition(row, col)))
+        drawSubLayers(p, CellPosition(row, col));
       // draw horizontal lines
       // hide top-most marker line
       QColor color = ((row - offset) % distance == 0 && row != 0)
@@ -1448,13 +1451,10 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 
 void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos) const {
   const ScreenMapper *mapper = m_viewer->screenMapper();
-  // shared_ptr<SubLayer> subLayer = mapper->subLayers()->layer(pos.layer());
+  // shared_ptr<SubLayer> subLayer = mapper->subLayers()->cell(pos);
 
   TXshColumn *column = mapper->xsheet()->getColumn(pos.layer());
-  int frameFrom, frameTo;
-  if (!column->getLevelRange(pos.frame(), frameFrom, frameTo)) // empty cell
-    return;
-  NumberRange frames (frameFrom, frameTo + 1);
+  NumberRange frames (pos.frame(), pos.frame() + 1);
   NumberRange frameAxis = mapper->rowsToFrameAxis(frames);
 
   NumberRange layers(pos.layer(), pos.layer() + 1);
