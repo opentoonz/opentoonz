@@ -18,6 +18,7 @@
 #include <QCoreApplication>
 #include <QRadialGradient>
 
+#include <unordered_set>
 //--------------------------------------------------------------
 
 //  Forward declarations
@@ -109,7 +110,22 @@ private:
 //    the next stroke(s) accordingly.
 //************************************************************************
 
-typedef std::set<const TThickQuadratic *> SetOfConstTQ;
+class  TThickQuadraticWithIndex
+{
+public:
+    const TThickQuadratic* point;
+    TStroke* stroke;
+};
+
+typedef std::unordered_set< TThickQuadraticWithIndex *> SetOfConstTQ;
+
+class TStrokeWithNeighbours
+{
+public:
+    TStroke* stroke;
+    SetOfConstTQ neighbours;
+
+};
 
 class AnimationAutoComplete {
 public:
@@ -120,18 +136,8 @@ public:
   void addStroke(TStroke* stroke);
   SetOfConstTQ getNeighbours(const TThickQuadratic* point);
   bool withinSpaceVicinity(const TThickQuadratic* samplePoint,const TThickQuadratic* point );
-  void drawSpaceVicinity(TStroke* stroke);
 
-
-private:
-  //void generatePoints();
-
-  class TStrokeWithNeighbours
-  {
-  public:
-	  TStroke* stroke;
-	  SetOfConstTQ neighbours;
-  };
+  bool isSimilar (TStroke* operation1, TStroke* operation2 );
 
 private:
   int m_spaceVicinityRadius = 100;

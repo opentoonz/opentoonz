@@ -2185,16 +2185,16 @@ void BrushPresetManager::removePreset(const std::wstring &name) {
 void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
 	TStrokeWithNeighbours* strokeWithNeighbours = new TStrokeWithNeighbours();
+
+
 	m_strokesWithNeighbours.push_back(strokeWithNeighbours);
 
 	strokeWithNeighbours->stroke = stroke;
 
-	int chuckCount = stroke->getChunkCount();
-	for (int i = 0; i < chuckCount-1; i++)
-	{
-		//tglDrawCircle(stroke->getChunk(i)->getP2(), 100);
 
-		//ToolUtils::drawSquare(stroke->getChunk(i)->getP2(),100,TPixel::Red);
+	int chuckCount = stroke->getChunkCount();
+    for (int i = 0; i < chuckCount; i++)
+    {
 		SetOfConstTQ neighbours = getNeighbours(stroke->getChunk(i));
 		strokeWithNeighbours->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
@@ -2203,30 +2203,29 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 
 SetOfConstTQ AnimationAutoComplete::getNeighbours(const TThickQuadratic* point)
 {
-	SetOfConstTQ neighbours;
+    SetOfConstTQ neighbours;
 
-	for(int i = 0; i < m_strokesWithNeighbours.size(); i++)
-	{
-		TStroke* stroke = m_strokesWithNeighbours[i]->stroke;
-		int chuckCount = stroke->getChunkCount();
+    for(int i = 0; i < m_strokesWithNeighbours.size(); i++)
+    {
+        TStroke* stroke = m_strokesWithNeighbours[i]->stroke;
 
+        for(int j = 0; j < stroke->getChunkCount(); j++)
+            if(withinSpaceVicinity(point, stroke->getChunk(j)))
+            {
+                TThickQuadraticWithIndex *samplePoint = new TThickQuadraticWithIndex();
+                samplePoint->stroke = stroke;
+                samplePoint->point = stroke->getChunk(j);
 
-		for(int j = 0; j < chuckCount; j++)
-			if(withinSpaceVicinity(point, stroke->getChunk(j)))
-				neighbours.insert(stroke->getChunk(j));
-	}
+                neighbours.insert(samplePoint);
+            }
+    }
 
-	return neighbours;
+    return neighbours;
 }
 
 bool AnimationAutoComplete::withinSpaceVicinity(const TThickQuadratic*samplePoint, const TThickQuadratic* point)
 {
-//	double diffrenceX= samplePoint->getP1().x-point->getP1().x;
-//	double diffrenceY= samplePoint->getP1().y-point->getP1().y;
-//	double squareX = pow(diffrenceX, 2);
-//	double squareY = pow(diffrenceY, 2);
-//	double addSquare = squareX+squareY;
-//	double distance = sqrt(addSquare);
+
 	double distance = norm(samplePoint->getP2() - point->getP2());
 	if(distance <= m_spaceVicinityRadius)
 		return true;
@@ -2235,11 +2234,20 @@ bool AnimationAutoComplete::withinSpaceVicinity(const TThickQuadratic*samplePoin
 
 }
 
-void AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
+bool AnimationAutoComplete::isSimilar(TStroke* operation1, TStroke* operation2)
 {
-	for(int i=0;i<stroke->getChunkCount();i++)
-	{
-		tglDrawCircle(stroke->getChunk(i)->getP1(),m_spaceVicinityRadius);
+    int centerIndex = operation1->getChunkCount()/2;
+    int minimumDistance = norm(operation1->getChunk(centerIndex)->getP0() - operation2->getChunk(0)->getP0());
+    int index = 0;
+    for(int i = 1; i < operation2->getChunkCount() ; i++)
+    {
+        if(norm(operation1->getChunk(centerIndex)->getP0() - operation2->getChunk(i)->getP0()) < minimumDistance)
+        {
+            minimumDistance = norm(operation1->getChunk(centerIndex)->getP0() - operation2->getChunk(i)->getP0());
+            index = i;
+        }
+    }
 
-	}
+    if(operation1->getStyle() == operation2->getStyle()) return true;
 }
+
