@@ -39,6 +39,7 @@ class QReadWriteLock;
 class ImageManager;
 
 class TXshSimpleLevel;
+class TXshCell;
 //=====================================================
 
 //***************************************************************************************
@@ -339,7 +340,7 @@ private:
   ImageManager &operator=(const ImageManager &);
 
 signals:
-  void updatedFrame(const TFrameId &frameId);
+  void updatedFrame(const TXshCell &cellId);
 };
 
 #endif

@@ -14,6 +14,7 @@
 #include "toonz/stage.h"
 #include "toonz/textureutils.h"
 #include "toonz/levelset.h"
+#include "toonz/txshcell.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -796,7 +797,7 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img) {
   }
 
   ImageManager::instance()->setImage(imageId, img);  // Invalidates if !img
-  emit ImageManager::instance()->updatedFrame(fid);
+  emit ImageManager::instance()->updatedFrame(TXshCell(this, fid));
 
   if (frameStatus == Normal) {
     // Only a normal frame can have these. Justified since:

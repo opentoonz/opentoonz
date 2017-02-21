@@ -72,6 +72,12 @@ or different frameId; otherwise returns false.
             m_frameId != c.m_frameId);
   }
 
+  //! Compare this cell with another
+  bool operator <(const TXshCell &c) const {
+    return m_level < c.m_level ||
+      m_level == c.m_level && m_frameId < c.m_frameId;
+  }
+
   /*!
 Returns true if level is equal to zero.
 */

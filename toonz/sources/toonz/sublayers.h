@@ -13,6 +13,7 @@
 #include <QString>
 
 #include "tfilepath.h"
+#include "toonz/txshcell.h"
 #include "toonz/txshcolumn.h"
 #include "cellposition.h"
 
@@ -39,7 +40,7 @@ class SubLayers final : public QObject {
 
   ScreenMapper *m_mapper;
   map<const TXshColumn *, shared_ptr<SubLayer>> m_layers;
-  map<TFrameId, shared_ptr<SubLayer>> m_frames;
+  map<TXshCell, shared_ptr<SubLayer>> m_cellSubLayers;
 
 public:
 
@@ -49,18 +50,18 @@ public:
   ScreenMapper *screenMapper() const { return m_mapper; }
 
   shared_ptr<SubLayer> layer(const TXshColumn *column);
-  shared_ptr<SubLayer> frame(const CellPosition &pos);
-  shared_ptr<SubLayer> frame(const TXshColumn *column, int frame);
+  shared_ptr<SubLayer> cell(const CellPosition &pos);
+  shared_ptr<SubLayer> cell(const TXshColumn *column, int frame);
 
   vector<int> childrenDimensions(const Orientation *o);
 
 private:
-  optional<TFrameId> findFrameId(const CellPosition &pos) const;
-  SubLayer *build(const TFrameId &frameId);
+  optional<TXshCell> findCell(const CellPosition &pos) const;
+  SubLayer *build(const TXshCell &cellId);
   shared_ptr<SubLayer> empty();
 
 private slots:
-  void onFrameUpdated(const TFrameId &frameId);
+  void onFrameUpdated(const TXshCell &cellId);
 };
 
 //! Basically, a tree node.

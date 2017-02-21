@@ -1685,16 +1685,6 @@ void TCellSelection::openTimeStretchPopup() {
 
 //-----------------------------------------------------------------------------
 
-static bool operator<(const TXshCell &a, const TXshCell &b) {
-  if (a.getSimpleLevel() < b.getSimpleLevel())
-    return true;
-  else if (a.getSimpleLevel() > b.getSimpleLevel())
-    return false;
-  return a.m_frameId < b.m_frameId;
-}
-
-//-----------------------------------------------------------------------------
-
 static void dRenumberCells(int col, int r0, int r1) {
   typedef std::vector<std::pair<TFrameId, TFrameId>> FramesMap;
   typedef std::map<TXshCell, TXshCell> CellsMap;
