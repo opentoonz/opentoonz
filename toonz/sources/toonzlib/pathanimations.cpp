@@ -2,29 +2,27 @@
 
 #include "toonz/txsheet.h"
 #include "toonz/txshcolumn.h"
+#include "toonz/txshcell.h"
 #include "tstroke.h"
 
 //-----------------------------------------------------------------------------
 // StrokeId
 
-StrokeId::StrokeId(TXsheet *xsheet, TXshColumn *column, const TFrameId &frameId, TStroke *stroke)
-  : m_xsheet (xsheet), m_column (column), m_frameId (frameId), m_stroke (stroke)
+StrokeId::StrokeId(TXsheet *xsheet, const TXshCell &cellId, TStroke *stroke)
+  : m_xsheet (xsheet), m_cellId (cellId), m_stroke (stroke)
 { }
 
 bool operator == (const StrokeId &a, const StrokeId &b) {
   return a.m_xsheet == b.m_xsheet &&
-    a.m_column == b.m_column &&
-    a.m_frameId == b.m_frameId &&
+    a.m_cellId == b.m_cellId &&
     a.m_stroke == b.m_stroke;
 }
 
 bool operator < (const StrokeId &a, const StrokeId &b) {
   if (a.m_xsheet < b.m_xsheet) return true;
   if (a.m_xsheet > b.m_xsheet) return false;
-  if (a.m_column < b.m_column) return true;
-  if (a.m_column > b.m_column) return false;
-  if (a.m_frameId < b.m_frameId) return true;
-  if (a.m_frameId > b.m_frameId) return false;
+  if (a.m_cellId < b.m_cellId) return true;
+  if (b.m_cellId < a.m_cellId) return false;
   if (a.m_stroke < b.m_stroke) return true;
   if (a.m_stroke > b.m_stroke) return false;
   return false;

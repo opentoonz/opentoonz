@@ -6,6 +6,7 @@
 #include "tcommon.h"
 #include "tparamset.h"
 #include "tfilepath.h"
+#include "toonz/txshcell.h"
 
 #include <map>
 
@@ -22,17 +23,16 @@ using std::map;
 #endif
 
 class TXsheet;
-class TXshColumn;
+class TXshCell;
 class TStroke;
 
 class DVAPI StrokeId final {
   TXsheet *m_xsheet;
-  TXshColumn *m_column;
-  TFrameId m_frameId;
+  TXshCell m_cellId;
   TStroke *m_stroke;
 
 public:
-  StrokeId(TXsheet *xsheet, TXshColumn *column, const TFrameId &frameId, TStroke *stroke);
+  StrokeId(TXsheet *xsheet, const TXshCell &cell, TStroke *stroke);
 
   friend bool operator == (const StrokeId &a, const StrokeId &b);
   friend bool operator < (const StrokeId &a, const StrokeId &b);
