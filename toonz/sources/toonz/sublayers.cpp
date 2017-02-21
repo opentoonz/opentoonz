@@ -8,6 +8,7 @@
 #include "toonz/imagemanager.h"
 #include "toonz/tstageobjectid.h"
 #include "toonz/tstageobject.h"
+#include "toonz/pathanimations.h"
 
 #include "../toonzlib/imagebuilders.h"
 
@@ -47,6 +48,7 @@ public:
   virtual bool hasChildren() const override;
   virtual QString name() const;
 
+  TXshCell cell() const { return m_cellId; }
   void subscribeStrokeListChanged();
 
 protected slots:
@@ -60,19 +62,23 @@ private:
 
 // SubLayer representing a single stroke
 class StrokeSubLayer final : public SubLayer {
+  CellSubLayer *m_parent;
   TStroke *m_stroke; // weak pointer - don't own
   bool m_activated;
 
 public:
-  StrokeSubLayer(SubLayers *subLayers, SubLayer *parent, TStroke *stroke);
+  StrokeSubLayer(SubLayers *subLayers, CellSubLayer *parent, TStroke *stroke);
 
   virtual bool hasActivator() const override { return true; }
   virtual bool isActivated() const override { return m_activated; }
-  virtual void toggleActivator() override { m_activated = !m_activated; }
+  virtual void toggleActivator() override;
 
   virtual QString name() const override;
 
   bool owns(const TStroke *stroke) const { return m_stroke == stroke; }
+private:
+  StrokeId strokeId() const;
+  TXshCell cell() const;
 };
 
 //-----------------------------------------------------------------------------
@@ -168,6 +174,10 @@ SubLayer::SubLayer(SubLayers *subLayers, SubLayer *parent): m_subLayers (subLaye
   connect(this, &SubLayer::foldToggled, m_subLayers->screenMapper(), &ScreenMapper::updateColumnFan);
 }
 
+TXsheet *SubLayer::xsheet() const {
+  return subLayers()->screenMapper()->xsheet();
+}
+
 int SubLayer::ownDimension(const Orientation *o) const {
   return o->dimension(PredefinedDimension::SUBLAYER);
 }
@@ -219,7 +229,7 @@ bool LayerSubLayer::hasChildren() const {
 QString LayerSubLayer::name() const {
   int col = m_column->getIndex();
   TStageObjectId columnId = subLayers()->screenMapper()->viewer()->getObjectId(col);
-  TStageObject *columnObject = subLayers()->screenMapper()->xsheet()->getStageObject(columnId);
+  TStageObject *columnObject = xsheet()->getStageObject(columnId);
 
   return QString::fromStdString(columnObject->getName());
 }
@@ -312,8 +322,8 @@ SubLayer *CellSubLayer::build(TStroke *stroke) {
 //-----------------------------------------------------------------------------
 // StrokeSubLayer
 
-StrokeSubLayer::StrokeSubLayer(SubLayers *subLayers, SubLayer *parent, TStroke *stroke)
-  : SubLayer(subLayers, parent), m_stroke(stroke), m_activated (false)
+StrokeSubLayer::StrokeSubLayer(SubLayers *subLayers, CellSubLayer *parent, TStroke *stroke)
+  : SubLayer(subLayers, parent), m_parent(parent), m_stroke(stroke), m_activated (false)
 { }
 
 QString StrokeSubLayer::name() const {
@@ -321,4 +331,17 @@ QString StrokeSubLayer::name() const {
   if (prefix.isEmpty())
     prefix = "Shape";
   return prefix + " " + QString::number(m_stroke->getId());
+}
+
+void StrokeSubLayer::toggleActivator() {
+  m_activated = !m_activated;
+  if (m_activated)
+    xsheet()->pathAnimations()->takeSnapshot(strokeId());
+}
+
+StrokeId StrokeSubLayer::strokeId() const {
+  return StrokeId(xsheet(), cell(), m_stroke);
+}
+TXshCell StrokeSubLayer::cell() const {
+  return dynamic_cast<CellSubLayer *> (m_parent)->cell();
 }

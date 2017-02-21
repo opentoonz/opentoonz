@@ -98,6 +98,7 @@ public:
   virtual QString name() const { return ""; }
 
   SubLayers *subLayers() const { return m_subLayers; }
+  TXsheet *xsheet() const;
   int depth() const { return m_depth; }
 
   int ownDimension(const Orientation *o) const;

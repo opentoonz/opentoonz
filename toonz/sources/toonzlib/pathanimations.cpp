@@ -56,3 +56,8 @@ TParamSetP PathAnimations::addStroke(const StrokeId &strokeId) {
   m_shapeAnimation.insert(std::make_pair(strokeId, newOne));
   return newOne;
 }
+
+void PathAnimations::takeSnapshot(const StrokeId &strokeId) {
+  TParamSetP root = addStroke(strokeId);
+  // ...
+}

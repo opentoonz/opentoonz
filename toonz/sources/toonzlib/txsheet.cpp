@@ -1601,3 +1601,9 @@ bool TXsheet::isRectEmpty(const CellPosition &pos0,
 void TXsheet::notifyColumnFanFoldedUnfolded() {
   emit columnFanFoldedUnfolded();
 }
+
+//-----------------------------------------------------------------------
+
+PathAnimations *TXsheet::pathAnimations() const {
+  return m_imp->m_pathAnimations;
+}

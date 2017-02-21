@@ -51,6 +51,7 @@ class TXshSoundColumn;
 class TXshNoteSet;
 class TFrameId;
 class Orientation;
+class PathAnimations;
 
 //=============================================================================
 
@@ -550,6 +551,9 @@ in TXsheetImp.
 
   //! Returns the xsheet content's \a camstand bbox at the specified row.
   TRectD getBBox(int row) const;
+
+  //! Access path animations storage
+  PathAnimations *pathAnimations() const;
 
   void notifyColumnFanFoldedUnfolded();
 

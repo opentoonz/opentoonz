@@ -52,6 +52,8 @@ public:
 
   TParamSetP stroke(const StrokeId &strokeId) const;
   TParamSetP addStroke(const StrokeId &strokeId);
+
+  void takeSnapshot(const StrokeId &strokeId);
 };
 
 #endif
