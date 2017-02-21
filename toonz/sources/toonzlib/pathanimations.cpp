@@ -33,31 +33,46 @@ QString StrokeId::name() const {
 }
 
 //-----------------------------------------------------------------------------
+// PathAnimation
+
+PathAnimation::PathAnimation(PathAnimations *animations, const StrokeId &strokeId)
+  : m_animations(animations), m_strokeId(strokeId)
+{ }
+
+void PathAnimation::takeSnapshot() {
+  updateChunks();
+  // update points
+}
+
+void PathAnimation::updateChunks() {
+  TStroke *stroke = m_strokeId.stroke();
+  for (int i = 0; i < stroke->getChunkCount(); i++) {
+    const TThickQuadratic *chunk = stroke->getChunk(i);
+
+  }
+}
+
+//-----------------------------------------------------------------------------
 // PathAnimations
 
 PathAnimations::PathAnimations(TXsheet *xsheet) :
   m_xsheet(xsheet)
 { }
 
-TParamSetP PathAnimations::stroke(const StrokeId &strokeId) const {
-  map<StrokeId, TParamSetP>::const_iterator it = m_shapeAnimation.find(strokeId);
+shared_ptr<PathAnimation> PathAnimations::stroke(const StrokeId &strokeId) const {
+  map<StrokeId, shared_ptr<PathAnimation>>::const_iterator it = m_shapeAnimation.find(strokeId);
   if (it == m_shapeAnimation.end())
     return nullptr;
   return it->second;
 }
 
-TParamSetP PathAnimations::addStroke(const StrokeId &strokeId) {
-  TParamSetP alreadyHas = stroke(strokeId);
+shared_ptr<PathAnimation> PathAnimations::addStroke(const StrokeId &strokeId) {
+  shared_ptr<PathAnimation> alreadyHas = stroke(strokeId);
   if (alreadyHas)
     return alreadyHas;
   // race condition?
 
-  TParamSetP newOne = new TParamSet(strokeId.name().toStdString());
-  m_shapeAnimation.insert(std::make_pair(strokeId, newOne));
+  shared_ptr<PathAnimation> newOne { new PathAnimation(this, strokeId) };
+  m_shapeAnimation[strokeId] = newOne;
   return newOne;
-}
-
-void PathAnimations::takeSnapshot(const StrokeId &strokeId) {
-  TParamSetP root = addStroke(strokeId);
-  // ...
 }

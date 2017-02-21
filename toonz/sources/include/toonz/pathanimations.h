@@ -9,8 +9,10 @@
 #include "toonz/txshcell.h"
 
 #include <map>
+#include <memory>
 
 using std::map;
+using std::shared_ptr;
 
 #undef DVAPI
 #undef DVVAR
@@ -37,23 +39,38 @@ public:
   friend bool operator == (const StrokeId &a, const StrokeId &b);
   friend bool operator < (const StrokeId &a, const StrokeId &b);
 
+  TStroke *stroke() const { return m_stroke; }
+
   QString name() const;
 };
 
-// storage class for keyframes for all parameters animating
-// a particular TStroke
+class PathAnimations;
+
+//! Keyframe data for a particular TStroke
+class DVAPI PathAnimation final {
+  PathAnimations *m_animations;
+  StrokeId m_strokeId;
+  TParamSetP m_params;
+public:
+  PathAnimation(PathAnimations *animations, const StrokeId &strokeId);
+  ~PathAnimation() { }
+
+  void takeSnapshot();
+private:
+  void updateChunks();
+};
+
+//! Storage for all strokes animation keyframes
 class DVAPI PathAnimations final {
   TXsheet *m_xsheet;
-  map<StrokeId, TParamSetP> m_shapeAnimation;
+  map<StrokeId, shared_ptr<PathAnimation>> m_shapeAnimation;
 
 public:
   PathAnimations(TXsheet *xsheet);
   ~PathAnimations() { }
 
-  TParamSetP stroke(const StrokeId &strokeId) const;
-  TParamSetP addStroke(const StrokeId &strokeId);
-
-  void takeSnapshot(const StrokeId &strokeId);
+  shared_ptr<PathAnimation> stroke(const StrokeId &strokeId) const;
+  shared_ptr<PathAnimation> addStroke(const StrokeId &strokeId);
 };
 
 #endif
