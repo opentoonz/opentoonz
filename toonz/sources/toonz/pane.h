@@ -96,12 +96,14 @@ class TPanelTitleBar final : public QFrame {
   Q_OBJECT
 
   bool m_isActive;
+  bool m_isViewer   = false;
+  bool m_isFlipbook = false;
   bool m_closeButtonHighlighted;
   std::vector<std::pair<QPoint, QWidget *>> m_buttons;
 
   QPixmap m_borderPm, m_activeBorderPm, m_floatBorderPm, m_floatActiveBorderPm;
   QColor m_titleColor, m_activeTitleColor;
-  QColor m_separatorColor, m_activeIconColor;
+  QColor m_separatorColor, m_activeIconColor, m_freezeColor;
 
 public:
   TPanelTitleBar(QWidget *parent                      = 0,
@@ -112,7 +114,8 @@ public:
 
   void setIsActive(bool value);
   bool isActive() { return m_isActive; }
-
+  void isViewer(bool status) { m_isViewer = status; }
+  void isFlipbook(bool status) { m_isFlipbook = status; }
   // pos = widget position. n.b. if pos.x()<0 then origin is topright corner
   void add(const QPoint &pos, QWidget *widget);
 
@@ -133,14 +136,12 @@ public:
   QColor getActiveTitleColor() const { return m_activeTitleColor; }
   void setActiveTitleColor(const QColor &color) { m_activeTitleColor = color; }
 
-  void setSeparatorColor(const QColor &color) {
-	  m_separatorColor = color;
-  }
+  void setSeparatorColor(const QColor &color) { m_separatorColor = color; }
   QColor getSeparatorColor() const { return m_separatorColor; }
-  void setActiveIconColor(const QColor &color) {
-	  m_activeIconColor = color;
-  }
+  void setActiveIconColor(const QColor &color) { m_activeIconColor = color; }
   QColor getActiveIconColor() const { return m_activeIconColor; }
+  void setFreezeColor(const QColor &color) { m_freezeColor = color; }
+  QColor getFreezeColor() const { return m_freezeColor; }
 
 protected:
   void resizeEvent(QResizeEvent *e) override;
@@ -164,12 +165,11 @@ protected:
   Q_PROPERTY(QColor ActiveTitleColor READ getActiveTitleColor WRITE
                  setActiveTitleColor);
 
-  
-  Q_PROPERTY(QColor SeparatorColor READ getSeparatorColor WRITE
-	  setSeparatorColor);
-  Q_PROPERTY(QColor ActiveIconColor READ getActiveIconColor WRITE
-	  setActiveIconColor);
-
+  Q_PROPERTY(
+      QColor SeparatorColor READ getSeparatorColor WRITE setSeparatorColor);
+  Q_PROPERTY(
+      QColor ActiveIconColor READ getActiveIconColor WRITE setActiveIconColor);
+  Q_PROPERTY(QColor FreezeColor READ getFreezeColor WRITE setFreezeColor);
 
 signals:
 

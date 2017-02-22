@@ -324,7 +324,7 @@ void SceneViewerPanel::resizeEvent(QResizeEvent *e) {
 
 void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   bool ret = true;
-
+  titleBar->isViewer(true);
   TPanelTitleBarButtonSet *viewModeButtonSet;
   m_referenceModeBs = viewModeButtonSet = new TPanelTitleBarButtonSet();
   int x                                 = -232;

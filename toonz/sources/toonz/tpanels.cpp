@@ -922,7 +922,8 @@ void FlipbookPanel::reset() { m_flipbook->reset(); }
 //-----------------------------------------------------------------------------
 
 void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
-  bool ret      = true;
+  bool ret = true;
+  titleBar->isFlipbook(true);
   int x         = -87;
   int iconWidth = 17;
   // safe area button
