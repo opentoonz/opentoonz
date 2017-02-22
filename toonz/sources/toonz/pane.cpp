@@ -381,7 +381,10 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
     else
       painter.drawPixmap(closeRect, closeButtonPixmap);
   }
-
+  int x = rect.topRight().x();
+  painter.setPen(getActiveIconColor());
+  painter.fillRect(x-137, 1, 23, 16, getActiveIconColor());
+  painter.fillRect(x - 104, 1, 16, 16, getActiveIconColor());
   painter.end();
 }
 

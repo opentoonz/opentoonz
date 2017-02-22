@@ -101,6 +101,7 @@ class TPanelTitleBar final : public QFrame {
 
   QPixmap m_borderPm, m_activeBorderPm, m_floatBorderPm, m_floatActiveBorderPm;
   QColor m_titleColor, m_activeTitleColor;
+  QColor m_separatorColor, m_activeIconColor;
 
 public:
   TPanelTitleBar(QWidget *parent                      = 0,
@@ -132,6 +133,15 @@ public:
   QColor getActiveTitleColor() const { return m_activeTitleColor; }
   void setActiveTitleColor(const QColor &color) { m_activeTitleColor = color; }
 
+  void setSeparatorColor(const QColor &color) {
+	  m_separatorColor = color;
+  }
+  QColor getSeparatorColor() const { return m_separatorColor; }
+  void setActiveIconColor(const QColor &color) {
+	  m_activeIconColor = color;
+  }
+  QColor getActiveIconColor() const { return m_activeIconColor; }
+
 protected:
   void resizeEvent(QResizeEvent *e) override;
 
@@ -153,6 +163,13 @@ protected:
   Q_PROPERTY(QColor TitleColor READ getTitleColor WRITE setTitleColor);
   Q_PROPERTY(QColor ActiveTitleColor READ getActiveTitleColor WRITE
                  setActiveTitleColor);
+
+  
+  Q_PROPERTY(QColor SeparatorColor READ getSeparatorColor WRITE
+	  setSeparatorColor);
+  Q_PROPERTY(QColor ActiveIconColor READ getActiveIconColor WRITE
+	  setActiveIconColor);
+
 
 signals:
 
