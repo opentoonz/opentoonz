@@ -691,35 +691,43 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
 void ColumnArea::DrawHeader::drawEye() const {
   if (col < 0 || isEmpty) return;
-  if (!column->isPreviewVisible() || column->getPaletteColumn() ||
-      column->getSoundTextColumn())
+  if (column->getPaletteColumn() || column->getSoundTextColumn())
     return;
 
-  QRect prevViewRect = o->rect(PredefinedRect::EYE_AREA).translated(orig);
-  QRect eyeRect      = o->rect(PredefinedRect::EYE).translated(orig);
-  // preview visible toggle
-  QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor() : PreviewVisibleColor;
-  p.fillRect(prevViewRect, iconBG);
+  bool drawBackground = o->isTimeline() || column->isPreviewVisible();
+  if (drawBackground) {
+    QRect prevViewRect = o->rect(PredefinedRect::EYE_AREA).translated(orig);
+    QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor() : PreviewVisibleColor;
+    p.fillRect(prevViewRect, iconBG);
+  }
+
+  if (!column->isPreviewVisible()) return;
+
+  QRect eyeRect = o->rect(PredefinedRect::EYE).translated(orig);
   p.drawPixmap(eyeRect, Pixmaps::eye(o->isTimeline()));
 }
 
 void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
   if (col < 0 || isEmpty) return;
   // camstand visible toggle
-  if (!column->isCamstandVisible() || column->getPaletteColumn() ||
-      column->getSoundTextColumn())
+  if (column->getPaletteColumn() || column->getSoundTextColumn())
     return;
 
-  QRect tableViewRect =
+  bool drawBackground = o->isTimeline() || column->isCamstandVisible();
+  if (drawBackground) {
+    QRect tableViewRect =
       o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig);
-  QRect tableViewImgRect =
-      o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
+    QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor() : CamStandVisibleColor;
+    p.fillRect(tableViewRect, iconBG);
+  }
 
-  QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor() : CamStandVisibleColor;
-  p.fillRect(tableViewRect, iconBG);
+  if (!column->isCamstandVisible()) return;
+
   const QPixmap &icon = opacity < 255
     ? Pixmaps::cameraStandTransparent(o->isTimeline())
     : Pixmaps::cameraStand(o->isTimeline());
+  QRect tableViewImgRect =
+    o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
   p.drawPixmap(tableViewImgRect, icon);
 }
 
