@@ -212,7 +212,7 @@ FlipBook::FlipBook(QWidget *parent, QString viewerTitle,
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(1);
+  mainLayout->setMargin(0);
   mainLayout->setSpacing(0);
   {
     mainLayout->addWidget(fsWidget, 1);
