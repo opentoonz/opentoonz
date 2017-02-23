@@ -796,7 +796,7 @@ ParamsPage {
 }
 /* Customize QScrollBar  vertical*/
 QScrollBar {
-  border: 1px solid black;
+  border: 1px solid #0f0f0f;
   /* buttons */
 }
 QScrollBar:vertical {
@@ -921,6 +921,9 @@ XsheetViewer {
   qproperty-LightBGColor: #f0f0f0;
   qproperty-DarkBGColor: #e1e1e1;
   qproperty-DarkLineColor: #969696;
+}
+XsheetViewer QScrollBar {
+  border: 1px solid #232323;
 }
 /*------- Schematic ---------*/
 #SchematicBottomFrame {
