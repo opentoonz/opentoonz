@@ -59,21 +59,17 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
 
   m_reframe1sButton = new QPushButton(tr("1's"), this);
   m_reframe1sButton->setToolTip(tr("Reframe on 1's"));
-  m_reframe1sButton->setFixedHeight(25);
   m_reframe1sButton->setObjectName("XSheetToolbarButton");
 
   m_reframe2sButton = new QPushButton(tr("2's"), this);
   m_reframe2sButton->setToolTip(tr("Reframe on 2's"));
-  m_reframe2sButton->setFixedHeight(25);
   m_reframe2sButton->setObjectName("XSheetToolbarButton");
 
   m_reframe3sButton = new QPushButton(tr("3's"), this);
   m_reframe3sButton->setToolTip(tr("Reframe on 3's"));
-  m_reframe3sButton->setFixedHeight(25);
   m_reframe3sButton->setObjectName("XSheetToolbarButton");
 
   m_repeatButton = new QPushButton(this);
-  m_repeatButton->setMinimumWidth(26);
   m_repeatButton->setIconSize(QSize(18, 18));
   QIcon repeatIcon = createQIconPNG("repeat_icon");
   m_repeatButton->setIcon(repeatIcon);
@@ -81,21 +77,21 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
   m_repeatButton->setToolTip(tr("Repeat Selection"));
 
   m_collapseSubButton = new QPushButton(this);
-  m_collapseSubButton->setIconSize(QSize(37, 19));
+  m_collapseSubButton->setIconSize(QSize(18, 18));
   QIcon collapseSubIcon = createQIconPNG("collapse");
   m_collapseSubButton->setIcon(collapseSubIcon);
   m_collapseSubButton->setObjectName("XSheetToolbarLevelButton");
   m_collapseSubButton->setToolTip(tr("Collapse into Sub-XSheet"));
 
   m_enterSubButton = new QPushButton(this);
-  m_enterSubButton->setIconSize(QSize(19, 19));
+  m_enterSubButton->setIconSize(QSize(18, 18));
   QIcon enterSubIcon = createQIconPNG("sub_enter");
   m_enterSubButton->setIcon(enterSubIcon);
   m_enterSubButton->setObjectName("XSheetToolbarLevelButton");
   m_enterSubButton->setToolTip(tr("Open Sub-XSheet"));
 
   m_leaveSubButton = new QPushButton(this);
-  m_leaveSubButton->setIconSize(QSize(19, 19));
+  m_leaveSubButton->setIconSize(QSize(18, 18));
   QIcon leaveSubIcon = createQIconPNG("sub_leave");
   m_leaveSubButton->setIcon(leaveSubIcon);
   m_leaveSubButton->setObjectName("XSheetToolbarLevelButton");

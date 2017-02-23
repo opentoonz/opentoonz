@@ -56,6 +56,8 @@
         <file>Resources/close_pane_rollover.png</file>
         <file>Resources/closedfolder.png</file>
         <file>Resources/collapse.png</file>
+        <file>Resources/collapse_click.png</file>
+        <file>Resources/collapse_over.png</file>
         <file>Resources/controlpointeditor.svg</file>
         <file>Resources/controlpointeditor_rollover.svg</file>
         <file>Resources/compare.png</file>
@@ -300,9 +302,11 @@
         <file>Resources/sub3.png</file>
         <file>Resources/sub4.png</file>
         <file>Resources/sub_enter.png</file>
-        <file>Resources/sub_enter_rollover.png</file>
+        <file>Resources/sub_enter_over.png</file>
+        <file>Resources/sub_enter_click.png</file>
         <file>Resources/sub_leave.png</file>
-        <file>Resources/sub_leave_rollover.png</file>
+        <file>Resources/sub_leave_over.png</file>
+        <file>Resources/sub_leave_click.png</file>
         <file>Resources/swap_off.png</file>
         <file>Resources/swap_on.png</file>
         <file>Resources/svg.png</file>

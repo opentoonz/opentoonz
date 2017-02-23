@@ -838,7 +838,6 @@ ParamsPage {
   background-color: #000080;
 }
 #XSheetToolbarLevelButton {
-  background: #303030;
   padding-left: 2;
   padding-right: 2;
   margin-left: 2;
