@@ -7,6 +7,7 @@
 /*Text Color*/
 @m_baseTxtColor: rgb(190,190,190);
 @m_baseInputColor: rgb(220,220,220);
+@m_baseDarkInputColor: rgb(205,205,205);
 @m_disabledTxtColor: rgb(128,128,128);
 
 @m_baseBG: 	rgb(48,48,48);
@@ -218,6 +219,7 @@ QToolBar
 		border-image: none;
 		&:hover {
 			border-image: url("@{image_url}/over.png") 2;
+			border-radius: 4px;
 		}
 		&:checked, 
 		&:pressed {
@@ -253,7 +255,7 @@ QToolBar
 
 QLineEdit {
 	/*darken little bit*/
-	color: @m_baseInputColor;
+	color: @m_baseDarkInputColor;
 	.baseBG(5%);
 	border-width: 1px;
  	border-radius: 2px;
@@ -265,7 +267,7 @@ QLineEdit {
 }
 QComboBox {
 	/*darken little bit*/
-	color: @m_baseInputColor;
+	color: @m_baseDarkInputColor;
 	.baseBG(5%);
 	border: 1px solid rgb(78, 78, 78);
 	.set_padding( 1px, 1px );
@@ -302,6 +304,7 @@ QComboBox QAbstractItemView {
 
 QPushButton {
 	/* .base_outset; */
+	color: darken(@m_baseInputColor, 5);
 	border: 1px solid rgb(102,102,102);
  	border-radius: 4px;
    	.set_padding(15px, 3px);
@@ -309,13 +312,13 @@ QPushButton {
 		.base_inset(light, 5%);
 	}
 	&:pressed {
-	    .baseBG(light, 10%);
+	    .baseBG(light, 7%);
 	}
 	/*lighten lilttle bit when hover*/
 	&:hover {
 		.baseBG(light, 10%);
 		&:pressed {
-		    .baseBG(light, 10%);
+		    .baseBG(light, 7%);
 	    }
     	&:checked {
     		.base_inset(light, 5%);
@@ -523,8 +526,17 @@ PaletteViewer #ToolBarContainer
 			border: 1px solid rgb(132, 132, 132);
 		}
 		&:hover {
-			.baseBG(light, 20%);
+			.baseBG(light, 15%);
 			border: 1px solid rgb(132, 132, 132);
+			&:checked {
+				.baseBG(light, 20%);
+				&:pressed {
+					.baseBG(light, 13%);
+				}
+			}
+		}
+		&:pressed {
+			.baseBG(light, 13%);
 		}
 	}
 	QLineEdit {
@@ -1390,7 +1402,7 @@ PopupButton {
 /*------ Popups -------*/
 
 QDialog #dialogButtonFrame {
-	.baseBG;
+	.baseBG(5%);
 }
 
 #SceneSettings QLabel
@@ -1540,3 +1552,9 @@ PencilTestPopup {
 	   allows for filling half of a 1024 screen */
 	min-width: 512px;
 }
+
+TPanelTitleBar {
+ 	qproperty-SeparatorColor: darken(@m_baseBG, 5);
+ 	qproperty-ActiveIconColor:rgb(0, 180, 0);
+ 	qproperty-FreezeColor:rgb(200, 0, 0);
+  }

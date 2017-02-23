@@ -127,6 +127,7 @@ QToolBar QToolButton {
 }
 QToolBar QToolButton:hover {
   border-image: url("imgs/over.png") 2;
+  border-radius: 4px;
 }
 QToolBar QToolButton:checked,
 QToolBar QToolButton:pressed {
@@ -154,7 +155,7 @@ QToolBar QToolBar {
 }
 QLineEdit {
   /*darken little bit*/
-  color: #dcdcdc;
+  color: #cdcdcd;
   background-color: #232323;
   border-width: 1px;
   border-radius: 2px;
@@ -166,7 +167,7 @@ QLineEdit:disabled {
 }
 QComboBox {
   /*darken little bit*/
-  color: #dcdcdc;
+  color: #cdcdcd;
   background-color: #232323;
   border: 1px solid #4e4e4e;
   padding-left: 1px;
@@ -204,6 +205,7 @@ QComboBox QAbstractItemView {
 }
 QPushButton {
   /* .base_outset; */
+  color: #cfcfcf;
   border: 1px solid #666666;
   border-radius: 4px;
   padding-left: 15px;
@@ -222,13 +224,13 @@ QPushButton:checked {
   border-bottom-color: #797979;
 }
 QPushButton:pressed {
-  background-color: #4a4a4a;
+  background-color: #424242;
 }
 QPushButton:hover {
   background-color: #4a4a4a;
 }
 QPushButton:hover:pressed {
-  background-color: #4a4a4a;
+  background-color: #424242;
 }
 QPushButton:hover:checked {
   background-color: #3d3d3d;
@@ -432,8 +434,17 @@ PaletteViewer #ToolBarContainer #keyFrameNavigator {
   border: 1px solid #848484;
 }
 #StyleEditor QPushButton:hover {
-  background-color: #636363;
+  background-color: #565656;
   border: 1px solid #848484;
+}
+#StyleEditor QPushButton:hover:checked {
+  background-color: #636363;
+}
+#StyleEditor QPushButton:hover:checked:pressed {
+  background-color: #515151;
+}
+#StyleEditor QPushButton:pressed {
+  background-color: #515151;
 }
 #StyleEditor QLineEdit {
   min-width: 28px;
@@ -1226,7 +1237,7 @@ PopupButton::menu-indicator:disabled {
 }
 /*------ Popups -------*/
 QDialog #dialogButtonFrame {
-  background-color: #303030;
+  background-color: #232323;
 }
 #SceneSettings QLabel {
   color: #56a156;
@@ -1359,4 +1370,9 @@ PencilTestPopup {
   /* some clipping will still occur on width, but this
 	   allows for filling half of a 1024 screen */
   min-width: 512px;
+}
+TPanelTitleBar {
+  qproperty-SeparatorColor: #232323;
+  qproperty-ActiveIconColor: #00b400;
+  qproperty-FreezeColor: #c80000;
 }
