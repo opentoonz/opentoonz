@@ -41,14 +41,53 @@ PathAnimation::PathAnimation(PathAnimations *animations, const StrokeId &strokeI
 
 void PathAnimation::takeSnapshot() {
   updateChunks();
-  // update points
+  snapshotChunks();
 }
 
+// ensures that chunks count matches the referenced stroke
+// and that each chunk has params for all of its points and thicknesses
 void PathAnimation::updateChunks() {
+  m_params->removeAllParam();
+
+  map<const TThickQuadratic *, TParamSet *> chunks;
+
   TStroke *stroke = m_strokeId.stroke();
   for (int i = 0; i < stroke->getChunkCount(); i++) {
     const TThickQuadratic *chunk = stroke->getChunk(i);
+    map<const TThickQuadratic *, TParamSet *>::iterator found = m_lastChunks.find(chunk);
+    
+    TParamSet *param;
+    if (found != m_lastChunks.end()) {
+      chunks.insert(*found);
+      param = found->second;
+    }
+    else {
+      param = new TParamSet();
+      chunks.insert(pair<const TThickQuadratic *, TParamSet *>(chunk, param));
+    }
+    m_params->addParam(param, "Chunk " + std::to_string(i + 1));
 
+    if (param->getParamCount()) // has params for lifetime of the chunk
+      continue;
+    param->addParam(new TPointParam(chunk->getP0()), "point0");
+    param->addParam(new TPointParam(chunk->getP1()), "point1");
+    param->addParam(new TPointParam(chunk->getP2()), "point2");
+    param->addParam(new TDoubleParam(chunk->getThickness0()), "thick0");
+    param->addParam(new TDoubleParam(chunk->getThickness1()), "thick1");
+    param->addParam(new TDoubleParam(chunk->getThickness2()), "thick2");
+  }
+  m_lastChunks = chunks;
+}
+
+// sets a keyframe for the points and thicknesses
+void PathAnimation::snapshotChunks() {
+  TStroke *stroke = m_strokeId.stroke();
+  for (int i = 0; i < stroke->getChunkCount(); i++) {
+    const TThickQuadratic *chunk = stroke->getChunk(i);
+    map<const TThickQuadratic *, TParamSet *>::iterator found = m_lastChunks.find(chunk);
+    TParamSet *param = found->second;
+
+    // set key frame in some way
   }
 }
 

@@ -4,6 +4,8 @@
 #define PATH_ANIMATIONS_INCLUDED
 
 #include "tcommon.h"
+#include "tcurves.h"
+#include "tdoubleparam.h"
 #include "tparamset.h"
 #include "tfilepath.h"
 #include "toonz/txshcell.h"
@@ -12,6 +14,7 @@
 #include <memory>
 
 using std::map;
+using std::pair;
 using std::shared_ptr;
 
 #undef DVAPI
@@ -50,6 +53,7 @@ class PathAnimations;
 class DVAPI PathAnimation final {
   PathAnimations *m_animations;
   StrokeId m_strokeId;
+  map<const TThickQuadratic *, TParamSet *> m_lastChunks;
   TParamSetP m_params;
 public:
   PathAnimation(PathAnimations *animations, const StrokeId &strokeId);
@@ -58,6 +62,7 @@ public:
   void takeSnapshot();
 private:
   void updateChunks();
+  void snapshotChunks();
 };
 
 //! Storage for all strokes animation keyframes

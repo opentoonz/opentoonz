@@ -450,6 +450,10 @@ public:
   //! Return third control point \b P2.
   TThickPoint getThickP2() const { return TThickPoint(m_p2, m_thickP2); }
 
+  double getThickness0() const { return m_thickP0; }
+  double getThickness1() const { return m_thickP1; }
+  double getThickness2() const { return m_thickP2; }
+
   void split(double t, TThickQuadratic &first, TThickQuadratic &second) const;
 
   TRectD getBBox() const;
