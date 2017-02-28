@@ -129,6 +129,9 @@ Returns the \b TFrameId correspondent to cell.
 Returns the TPalette associated with current cell, if any.
 */
   TPalette *getPalette() const;
+
+  //! get cell name
+  QString name() const;
 };
 
 #endif

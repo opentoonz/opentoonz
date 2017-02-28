@@ -49,6 +49,12 @@
 #include <QDrag>
 #include <QMimeData>
 
+#include <vector>
+using std::vector;
+
+#include <boost/optional.hpp>
+using boost::optional;
+
 #include "toonzqt/functiontreeviewer.h"
 
 //*************************************************************************************
@@ -134,6 +140,19 @@ public:
 
   QString getShortName() const override;
   QString getLongName() const override;
+};
+
+class CellChannelGroup final : public FunctionTreeModel::ChannelGroup {
+  LevelColumnChannelGroup *m_parent;
+  TXshCell m_cell;
+
+  CellChannelGroup(LevelColumnChannelGroup *parent, const TXshCell &cell) : m_parent(parent), m_cell(cell) { }
+public:
+
+  static optional<CellChannelGroup *> buildAndAdd(LevelColumnChannelGroup *parent, const TXshCell &cell);
+
+  QString getShortName() const override { return m_cell.name(); }
+  QString getLongName() const override { return m_cell.name(); }
 };
 
 class StrokeChannelGroup final : public FunctionTreeModel::ChannelGroup {
@@ -578,26 +597,18 @@ QVariant SkVDChannelGroup::data(int role) const {
 
 void LevelColumnChannelGroup::build() {
   clear();
+  vector<TXshCell> cells;
 
   // inside it, create node for each tstroke
   int f0, f1;
   m_column->getRange(f0, f1);
   for (int f = f0; f <= f1; f++) {
     const TXshCell &cell = m_column->getCell(f);
-    TFrameId frameId = cell.getFrameId();
-    TXshSimpleLevel *level = cell.getSimpleLevel();
-    if (!level)
+    if (std::find(cells.begin(), cells.end(), cell) != cells.end())
       continue;
-    TImageP image = level->getFrame(frameId, false);
-    if (!image)
-      continue;
-    TVectorImageP vectorImage = { dynamic_cast<TVectorImage *> (image.getPointer()) };
-    if (!vectorImage)
-      continue;
-    for (int i = 0; i < vectorImage->getStrokeCount(); i++) {
-      StrokeChannelGroup *strokeGroup = new StrokeChannelGroup(vectorImage->getStroke(i));
-      appendChild(strokeGroup);
-    }
+    cells.push_back(cell);
+
+    CellChannelGroup::buildAndAdd(this, cell);
   }
 }
 
@@ -609,6 +620,33 @@ QString LevelColumnChannelGroup::getShortName() const {
 }
 QString LevelColumnChannelGroup::getLongName() const {
   return getShortName();
+}
+
+//=============================================================================
+//
+// CellChannelGroup
+//
+//-----------------------------------------------------------------------------
+
+optional<CellChannelGroup *> CellChannelGroup::buildAndAdd(LevelColumnChannelGroup *parent, const TXshCell &cell) {
+  TFrameId frameId = cell.getFrameId();
+  TXshSimpleLevel *level = cell.getSimpleLevel();
+  if (!level)
+    return boost::none;
+  TImageP image = level->getFrame(frameId, false);
+  if (!image)
+    return boost::none;
+  TVectorImageP vectorImage = { dynamic_cast<TVectorImage *> (image.getPointer()) };
+  if (!vectorImage)
+    return boost::none;
+  
+  CellChannelGroup *cellGroup = new CellChannelGroup(parent, cell);
+  parent->appendChild(cellGroup);
+  for (int i = 0; i < vectorImage->getStrokeCount(); i++) {
+    StrokeChannelGroup *strokeGroup = new StrokeChannelGroup(vectorImage->getStroke(i));
+    cellGroup->appendChild(strokeGroup);
+  }
+  return cellGroup;
 }
 
 //=============================================================================
