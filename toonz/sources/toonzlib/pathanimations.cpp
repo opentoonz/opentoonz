@@ -37,11 +37,17 @@ QString StrokeId::name() const {
 
 PathAnimation::PathAnimation(PathAnimations *animations, const StrokeId &strokeId)
   : m_animations(animations), m_strokeId(strokeId)
-{ }
+{
+  m_params = new TParamSet(name().toStdString());
+}
 
 void PathAnimation::takeSnapshot() {
   updateChunks();
   snapshotChunks();
+}
+
+int PathAnimation::chunkCount() const {
+  return m_strokeId.stroke()->getChunkCount();
 }
 
 // ensures that chunks count matches the referenced stroke
@@ -49,21 +55,21 @@ void PathAnimation::takeSnapshot() {
 void PathAnimation::updateChunks() {
   m_params->removeAllParam();
 
-  map<const TThickQuadratic *, TParamSet *> chunks;
+  map<const TThickQuadratic *, TParamSetP> chunks;
 
   TStroke *stroke = m_strokeId.stroke();
   for (int i = 0; i < stroke->getChunkCount(); i++) {
     const TThickQuadratic *chunk = stroke->getChunk(i);
-    map<const TThickQuadratic *, TParamSet *>::iterator found = m_lastChunks.find(chunk);
+    map<const TThickQuadratic *, TParamSetP>::iterator found = m_lastChunks.find(chunk);
     
-    TParamSet *param;
+    TParamSetP param;
     if (found != m_lastChunks.end()) {
       chunks.insert(*found);
       param = found->second;
     }
     else {
       param = new TParamSet();
-      chunks.insert(pair<const TThickQuadratic *, TParamSet *>(chunk, param));
+      chunks.insert(pair<const TThickQuadratic *, TParamSetP>(chunk, param));
     }
     m_params->addParam(param, "Chunk " + std::to_string(i + 1));
 
@@ -84,11 +90,15 @@ void PathAnimation::snapshotChunks() {
   TStroke *stroke = m_strokeId.stroke();
   for (int i = 0; i < stroke->getChunkCount(); i++) {
     const TThickQuadratic *chunk = stroke->getChunk(i);
-    map<const TThickQuadratic *, TParamSet *>::iterator found = m_lastChunks.find(chunk);
-    TParamSet *param = found->second;
+    map<const TThickQuadratic *, TParamSetP>::iterator found = m_lastChunks.find(chunk);
+    TParamSetP param = found->second;
 
     // set key frame in some way
   }
+}
+
+QString PathAnimation::name() const {
+  return m_strokeId.name();
 }
 
 //-----------------------------------------------------------------------------

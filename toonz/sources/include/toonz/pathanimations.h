@@ -53,15 +53,20 @@ class PathAnimations;
 class DVAPI PathAnimation final {
   PathAnimations *m_animations;
   StrokeId m_strokeId;
-  map<const TThickQuadratic *, TParamSet *> m_lastChunks;
+  map<const TThickQuadratic *, TParamSetP> m_lastChunks;
   TParamSetP m_params;
 public:
   PathAnimation(PathAnimations *animations, const StrokeId &strokeId);
   ~PathAnimation() { }
 
+  QString name() const;
+
   void takeSnapshot();
-private:
   void updateChunks();
+
+  int chunkCount() const;
+
+private:
   void snapshotChunks();
 };
 

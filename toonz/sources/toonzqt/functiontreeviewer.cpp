@@ -30,6 +30,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelcolumn.h"
 #include "toonz/txshsimplelevel.h"
+#include "toonz/pathanimations.h"
 
 // TnzQt includes
 #include "toonzqt/functionviewer.h"
@@ -138,9 +139,13 @@ public:
   LevelColumnChannelGroup(TXsheet *xsheet, TXshLevelColumn *column) : m_xsheet (xsheet), m_column(column) {}
   void build();
 
+  TXsheet *xsheet() const { return m_xsheet; }
+  PathAnimations *pathAnimations() const { return m_xsheet->pathAnimations(); }
+
   QString getShortName() const override;
   QString getLongName() const override;
 };
+//-----------------------------------------------------------------------------
 
 class CellChannelGroup final : public FunctionTreeModel::ChannelGroup {
   LevelColumnChannelGroup *m_parent;
@@ -154,15 +159,32 @@ public:
   QString getShortName() const override { return m_cell.name(); }
   QString getLongName() const override { return m_cell.name(); }
 };
+//-----------------------------------------------------------------------------
 
+// contains tree nodes for a particular TStroke
 class StrokeChannelGroup final : public FunctionTreeModel::ChannelGroup {
-  TStroke *m_stroke;
+  shared_ptr<PathAnimation> m_animation;
 public:
 
-  StrokeChannelGroup(TStroke *stroke) : m_stroke(stroke) {}
+  StrokeChannelGroup(shared_ptr<PathAnimation> animation) : m_animation(animation) {}
+  void build();
 
   QString getShortName() const override;
   QString getLongName() const override;
+};
+//-----------------------------------------------------------------------------
+
+// contains tree nodes for a particular TStroke
+class ThickPointChannelGroup final : public FunctionTreeModel::ChannelGroup {
+  shared_ptr<PathAnimation> m_animation;
+  int m_index;
+public:
+
+  ThickPointChannelGroup(shared_ptr<PathAnimation> animation, int index) : m_animation(animation), m_index(index) {}
+  void build();
+
+  QString getShortName() const override { return QString::number(m_index + 1); }
+  QString getLongName() const override { return QString::number(m_index + 1); }
 };
 
 }  // namespace
@@ -643,8 +665,11 @@ optional<CellChannelGroup *> CellChannelGroup::buildAndAdd(LevelColumnChannelGro
   CellChannelGroup *cellGroup = new CellChannelGroup(parent, cell);
   parent->appendChild(cellGroup);
   for (int i = 0; i < vectorImage->getStrokeCount(); i++) {
-    StrokeChannelGroup *strokeGroup = new StrokeChannelGroup(vectorImage->getStroke(i));
+    StrokeId strokeId { parent->xsheet(), cell, vectorImage->getStroke(i) };
+    shared_ptr<PathAnimation> animation = parent->pathAnimations()->addStroke(strokeId);
+    StrokeChannelGroup *strokeGroup = new StrokeChannelGroup(animation);
     cellGroup->appendChild(strokeGroup);
+    strokeGroup->build();
   }
   return cellGroup;
 }
@@ -655,12 +680,33 @@ optional<CellChannelGroup *> CellChannelGroup::buildAndAdd(LevelColumnChannelGro
 //
 //-----------------------------------------------------------------------------
 
+void StrokeChannelGroup::build() {
+  clear();
+
+  m_animation->updateChunks();
+  for (int i = 0; i < m_animation->chunkCount(); i++) {
+    ThickPointChannelGroup *pointGroup = new ThickPointChannelGroup(m_animation, i);
+    appendChild(pointGroup);
+    pointGroup->build();
+  }
+}
+
 QString StrokeChannelGroup::getShortName() const {
-  return m_stroke->name() + " " + QString::number(m_stroke->getId());
+  return m_animation->name();
 }
 QString StrokeChannelGroup::getLongName() const {
-  return getShortName();
+  return m_animation->name();
 }
+
+//=============================================================================
+//
+// ThickPointChannelGroup
+//
+//-----------------------------------------------------------------------------
+void ThickPointChannelGroup::build() {
+  // nothing for now
+}
+
 //=============================================================================
 //
 // Channel
