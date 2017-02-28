@@ -47,7 +47,11 @@ void PathAnimation::takeSnapshot() {
 }
 
 int PathAnimation::chunkCount() const {
-  return m_strokeId.stroke()->getChunkCount();
+  return m_params->getParamCount();
+}
+
+TParamSetP PathAnimation::chunk(int i) const {
+  return m_params->getParam(i);
 }
 
 // ensures that chunks count matches the referenced stroke
@@ -89,8 +93,10 @@ void PathAnimation::snapshotChunks() {
     const TThickQuadratic *chunk = stroke->getChunk(i);
     map<const TThickQuadratic *, TParamSetP>::iterator found = m_lastChunks.find(chunk);
     TParamSetP param = found->second;
-
-    // set key frame in some way
+    // get p0 tthickpointparamp
+      // set its value to current interpolation (?)
+    // get p1 tthickpointparamp
+    // get p2 tthickpointparamp
   }
 }
 

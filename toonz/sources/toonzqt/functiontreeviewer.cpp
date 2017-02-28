@@ -174,17 +174,30 @@ public:
 };
 //-----------------------------------------------------------------------------
 
-// contains tree nodes for a particular TStroke
-class ThickPointChannelGroup final : public FunctionTreeModel::ChannelGroup {
+// node for a chunk of a stroke
+class ChunkChannelGroup final : public FunctionTreeModel::ChannelGroup {
   shared_ptr<PathAnimation> m_animation;
   int m_index;
 public:
 
-  ThickPointChannelGroup(shared_ptr<PathAnimation> animation, int index) : m_animation(animation), m_index(index) {}
+  ChunkChannelGroup(shared_ptr<PathAnimation> animation, int index) : m_animation(animation), m_index(index) {}
   void build();
 
-  QString getShortName() const override { return QString::number(m_index + 1); }
-  QString getLongName() const override { return QString::number(m_index + 1); }
+  QString getShortName() const override { return "Chunk" + QString::number(m_index + 1); }
+  QString getLongName() const override { return "Chunk" + QString::number(m_index + 1); }
+};
+
+//-----------------------------------------------------------------------------
+class ThickPointChannelGroup final : public FunctionTreeModel::ChannelGroup {
+  TThickPointParamP m_param;
+  int m_index;
+public:
+
+  ThickPointChannelGroup(TThickPointParamP param, int index) : m_param(param), m_index (index) { }
+  void build();
+
+  QString getShortName() const override { return "p" + QString::number(m_index); }
+  QString getLongName() const override { return "p" + QString::number(m_index); }
 };
 
 }  // namespace
@@ -645,9 +658,7 @@ QString LevelColumnChannelGroup::getLongName() const {
 }
 
 //=============================================================================
-//
 // CellChannelGroup
-//
 //-----------------------------------------------------------------------------
 
 optional<CellChannelGroup *> CellChannelGroup::buildAndAdd(LevelColumnChannelGroup *parent, const TXshCell &cell) {
@@ -675,9 +686,7 @@ optional<CellChannelGroup *> CellChannelGroup::buildAndAdd(LevelColumnChannelGro
 }
 
 //=============================================================================
-//
 // StrokeChannelGroup
-//
 //-----------------------------------------------------------------------------
 
 void StrokeChannelGroup::build() {
@@ -685,9 +694,9 @@ void StrokeChannelGroup::build() {
 
   m_animation->updateChunks();
   for (int i = 0; i < m_animation->chunkCount(); i++) {
-    ThickPointChannelGroup *pointGroup = new ThickPointChannelGroup(m_animation, i);
-    appendChild(pointGroup);
-    pointGroup->build();
+    ChunkChannelGroup *chunkGroup = new ChunkChannelGroup(m_animation, i);
+    appendChild(chunkGroup);
+    chunkGroup->build();
   }
 }
 
@@ -699,12 +708,35 @@ QString StrokeChannelGroup::getLongName() const {
 }
 
 //=============================================================================
-//
+// ChunkChannelGroup
+//-----------------------------------------------------------------------------
+void ChunkChannelGroup::build() {
+  TParamSetP chunk = m_animation->chunk(m_index);
+  FunctionTreeModel *model = dynamic_cast<FunctionTreeModel *> (getModel());
+  assert(model);
+
+  for (int i = 0; i < 3; i++) {
+    TThickPointParamP point = chunk->getParam(i);
+    ThickPointChannelGroup *pointGroup = new ThickPointChannelGroup(point, i);
+    appendChild(pointGroup);
+    pointGroup->build();
+  }
+}
+
+//=============================================================================
 // ThickPointChannelGroup
-//
 //-----------------------------------------------------------------------------
 void ThickPointChannelGroup::build() {
-  // nothing for now
+  FunctionTreeModel *model = dynamic_cast<FunctionTreeModel *> (getModel());
+  assert(model);
+
+  FunctionTreeModel::Channel *channel;
+  channel = new FunctionTreeModel::Channel(model, m_param->getX().getPointer());
+  appendChild(channel);
+  channel = new FunctionTreeModel::Channel(model, m_param->getY().getPointer());
+  appendChild(channel);
+  channel = new FunctionTreeModel::Channel(model, m_param->getThickness().getPointer());
+  appendChild(channel);
 }
 
 //=============================================================================
