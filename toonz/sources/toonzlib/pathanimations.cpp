@@ -75,12 +75,9 @@ void PathAnimation::updateChunks() {
 
     if (param->getParamCount()) // has params for lifetime of the chunk
       continue;
-    param->addParam(new TPointParam(chunk->getP0()), "point0");
-    param->addParam(new TPointParam(chunk->getP1()), "point1");
-    param->addParam(new TPointParam(chunk->getP2()), "point2");
-    param->addParam(new TDoubleParam(chunk->getThickness0()), "thick0");
-    param->addParam(new TDoubleParam(chunk->getThickness1()), "thick1");
-    param->addParam(new TDoubleParam(chunk->getThickness2()), "thick2");
+    param->addParam(new TThickPointParam(chunk->getThickP0()), "point0");
+    param->addParam(new TThickPointParam(chunk->getThickP1()), "point1");
+    param->addParam(new TThickPointParam(chunk->getThickP2()), "point2");
   }
   m_lastChunks = chunks;
 }
