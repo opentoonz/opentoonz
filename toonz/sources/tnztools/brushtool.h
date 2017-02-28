@@ -109,21 +109,35 @@ private:
 //    Detects repetitions in strokes within/across frames and predicts
 //    the next stroke(s) accordingly.
 //************************************************************************
+typedef TThickQuadratic* SamplePoint;
 
-class  TThickQuadraticWithIndex
+struct SimilarPair
+{
+    double dissimilarityFactor;
+    PointWithStroke* point1;
+    PointWithStroke* point2;
+    std::vector<SimilarPair*> connections;
+};
+
+class  PointWithStroke
 {
 public:
-    const TThickQuadratic* point;
+    const SamplePoint point;
     TStroke* stroke;
 };
 
-typedef std::unordered_set< TThickQuadraticWithIndex *> SetOfConstTQ;
+typedef std::unordered_set< PointWithStroke *> SetOfPoints;
 
-class TStrokeWithNeighbours
+class StrokeWithNeighbours
 {
 public:
     TStroke* stroke;
-    SetOfConstTQ neighbours;
+    SetOfPoints neighbours;
+
+};
+
+class GlobalSimilarityGraph
+{
 
 };
 
@@ -132,16 +146,26 @@ public:
   AnimationAutoComplete() {}
   ~AnimationAutoComplete() {}
 
-  //ArrayOfTQ getNeighbors(TThickQuadratic* samplePoint);
   void addStroke(TStroke* stroke);
-  SetOfConstTQ getNeighbours(const TThickQuadratic* point);
-  bool withinSpaceVicinity(const TThickQuadratic* samplePoint,const TThickQuadratic* point );
 
-  bool isSimilar (TStroke* operation1, TStroke* operation2 );
+  //TODO: remove at production
+  std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
 
 private:
   int m_spaceVicinityRadius = 100;
-  std::vector<TStrokeWithNeighbours*> m_strokesWithNeighbours;
+  std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
+
+  double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
+  StrokeWithNeighbours mostSimilarStroke (StrokeWithNeighbours* stroke);
+
+  SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
+  double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
+  double getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2);
+  double getTemporalSimilarity(PointWithStroke* point1, PointWithStroke* point2);
+  double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
+
+  SetOfPoints getNeighbours(const SamplePoint point);
+  bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point );
 };
 
 //************************************************************************

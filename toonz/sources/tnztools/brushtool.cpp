@@ -38,6 +38,8 @@
 #include "tgl.h"
 #include "trop.h"
 
+#include "drawutil.h"
+
 // Qt includes
 #include <QPainter>
 
@@ -1364,7 +1366,16 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       stroke->insertControlPoints(0.5);
 
 	m_animationAutoComplete.addStroke(stroke);
-	//m_animationAutoComplete.drawSpaceVicinity(stroke);
+
+	//TODO: remove at production
+	//===============================================================================================
+	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete.drawSpaceVicinity(stroke);
+
+	for (auto i : spaceVicinities)
+		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
+						 m_isFrameCreated, m_isLevelCreated);
+	//===============================================================================================
+
     addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                      m_isFrameCreated, m_isLevelCreated);
     TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
@@ -2184,7 +2195,7 @@ void BrushPresetManager::removePreset(const std::wstring &name) {
 
 void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
-	TStrokeWithNeighbours* strokeWithNeighbours = new TStrokeWithNeighbours();
+    StrokeWithNeighbours* strokeWithNeighbours = new StrokeWithNeighbours();
 
 
 	m_strokesWithNeighbours.push_back(strokeWithNeighbours);
@@ -2195,15 +2206,14 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 	int chuckCount = stroke->getChunkCount();
     for (int i = 0; i < chuckCount; i++)
     {
-		SetOfConstTQ neighbours = getNeighbours(stroke->getChunk(i));
+        SetOfPoints neighbours = getNeighbours(stroke->getChunk(i));
 		strokeWithNeighbours->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
-
 }
 
-SetOfConstTQ AnimationAutoComplete::getNeighbours(const TThickQuadratic* point)
+SetOfPoints AnimationAutoComplete::getNeighbours(const SamplePoint point)
 {
-    SetOfConstTQ neighbours;
+    SetOfPoints neighbours;
 
     for(int i = 0; i < m_strokesWithNeighbours.size(); i++)
     {
@@ -2212,7 +2222,7 @@ SetOfConstTQ AnimationAutoComplete::getNeighbours(const TThickQuadratic* point)
         for(int j = 0; j < stroke->getChunkCount(); j++)
             if(withinSpaceVicinity(point, stroke->getChunk(j)))
             {
-                TThickQuadraticWithIndex *samplePoint = new TThickQuadraticWithIndex();
+                PointWithStroke *samplePoint = new PointWithStroke();
                 samplePoint->stroke = stroke;
                 samplePoint->point = stroke->getChunk(j);
 
@@ -2223,31 +2233,99 @@ SetOfConstTQ AnimationAutoComplete::getNeighbours(const TThickQuadratic* point)
     return neighbours;
 }
 
-bool AnimationAutoComplete::withinSpaceVicinity(const TThickQuadratic*samplePoint, const TThickQuadratic* point)
+bool AnimationAutoComplete::withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point)
 {
-
 	double distance = norm(samplePoint->getP2() - point->getP2());
 	if(distance <= m_spaceVicinityRadius)
 		return true;
 	else
-		return false;
+        return false;
+}
+
+double AnimationAutoComplete::pointsSimilarity(PointWithStroke* point1, PointWithStroke* point2)
+{
+    double dissimilarityFactor = 0;
+    // the smaller the factor the more similar they are
+    dissimilarityFactor += getAppearanceSimilarity(point1, point2);
+    dissimilarityFactor += getTemporalSimilarity(point1, point2);
+    dissimilarityFactor += getSpatialSimilarity(point1, point2);
+
+    return dissimilarityFactor;
+}
+
+double AnimationAutoComplete::getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2)
+{
+    double dissimilarityFactor = 0;
+    if(point1->stroke->getStyle() != point2->stroke->getStyle())
+        dissimilarityFactor++;
+
+    dissimilarityFactor += fabs(point1->point->getThickP0().thick - point2->point->getThickP0().thick);
+
+    return dissimilarityFactor;
+}
+
+double AnimationAutoComplete::getTemporalSimilarity(PointWithStroke *point1, PointWithStroke *point2)
+{
+
 
 }
 
-bool AnimationAutoComplete::isSimilar(TStroke* operation1, TStroke* operation2)
+double AnimationAutoComplete::getSpatialSimilarity(PointWithStroke *point1, PointWithStroke *point2)
 {
-    int centerIndex = operation1->getChunkCount()/2;
-    int minimumDistance = norm(operation1->getChunk(centerIndex)->getP0() - operation2->getChunk(0)->getP0());
-    int index = 0;
-    for(int i = 1; i < operation2->getChunkCount() ; i++)
+
+}
+
+double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2)
+{
+    double dissimilarityScore = 0;
+    std::vector<SimilarPair> similarPairs;
+
+
+    for(int i = 0; i<stroke1->getChunkCount(); i++)
     {
-        if(norm(operation1->getChunk(centerIndex)->getP0() - operation2->getChunk(i)->getP0()) < minimumDistance)
+        SimilarPair pair = getMostSimilarPoint(stroke1->stroke->getChunk(i), stroke2->stroke);
+        similarPairs.push_back(pair);
+        dissimilarityScore += pair.dissimilarityFactor;
+    }
+
+    return dissimilarityScore;
+}
+
+StrokeWithNeighbours AnimationAutoComplete::mostSimilarStroke(StrokeWithNeighbours* stroke)
+{
+    for(int i=0;i<m_strokesWithNeighbours.size();i++)
+    {
+        operationsSimilarity(stroke, m_strokesWithNeighbours[i+1]);
+    }
+}
+
+SimilarPair AnimationAutoComplete::getMostSimilarPoint(PointWithStroke *point, TStroke *stroke)
+{
+    SimilarPair mostSimilarPair;
+    mostSimilarPair.point1 = point;
+    mostSimilarPair.dissimilarityFactor = pointsSimilarity(point, stroke->getChunk(0));
+
+    for (int i = 1; i < stroke->getChunkCount(); i++)
+    {
+        double similarityScore = pointsSimilarity(point, stroke->getChunk(i));
+        if (mostSimilarPair.dissimilarityFactor > similarityScore)
         {
-            minimumDistance = norm(operation1->getChunk(centerIndex)->getP0() - operation2->getChunk(i)->getP0());
-            index = i;
+            mostSimilarPair.point2 = stroke->getChunk(i);
+            mostSimilarPair.dissimilarityFactor = similarityScore;
         }
     }
 
-    if(operation1->getStyle() == operation2->getStyle()) return true;
+    return mostSimilarPair;
+}
+
+//TODO: remove at production
+std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
+{
+	std::vector<TStroke*> strokes;
+
+    for(int i = 0; i < stroke->getChunkCount(); i++)
+        strokes.push_back(makeEllipticStroke(3, stroke->getChunk(i)->getP0(), m_spaceVicinityRadius, m_spaceVicinityRadius));
+
+	return strokes;
 }
 
