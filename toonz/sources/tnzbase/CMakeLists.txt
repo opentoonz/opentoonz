@@ -80,6 +80,7 @@ set(SOURCES
     ../common/tparam/tpixelparam.cpp
     ../common/tparam/tpointparam.cpp
     ../common/tparam/trangeparam.cpp
+	../common/tparam/tthickpointparam.cpp
     ../common/tparam/tspectrumparam.cpp
     ../common/tparam/ttonecurveparam.cpp
     ../common/txsheet/tcolumnset.cpp

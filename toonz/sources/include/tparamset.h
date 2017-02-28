@@ -168,6 +168,38 @@ DEFINE_PARAM_SMARTPOINTER(TPointParam, TPointD)
 
 //------------------------------------------------------------------------------
 
+class TThickPointParamImp;
+
+class DVAPI TThickPointParam final : public TParamSet {
+  PERSIST_DECLARATION(TThickPointParam)
+  TThickPointParamImp *m_data;
+
+public:
+  TThickPointParam(const TThickPoint &p = TThickPoint());
+  TThickPointParam(const TThickPointParam &src);
+  ~TThickPointParam();
+
+  TThickPointParam *clone() const override { return new TThickPointParam(*this); }
+  void copy(TParam *src) override;
+
+  TThickPoint getDefaultValue() const;
+  TThickPoint getValue(double frame) const;
+  void setValue(double frame, const TPointD &p);
+  void setValue(double frame, const TThickPoint &p);
+  void setDefaultValue(const TThickPoint &p);
+
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
+
+  TDoubleParamP &getX();
+  TDoubleParamP &getY();
+  TDoubleParamP &getThickness();
+};
+
+DEFINE_PARAM_SMARTPOINTER(TThickPointParam, TThickPoint)
+
+//------------------------------------------------------------------------------
+
 #ifdef _WIN32
 class TPixelParam;
 template class DVAPI TPersistDeclarationT<TPixelParam>;
