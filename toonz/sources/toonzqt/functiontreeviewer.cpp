@@ -1352,7 +1352,7 @@ void FunctionTreeModel::refreshActiveChannels() {
   m_activeChannels.clear();
 
   if (m_stageObjects) addActiveChannels(m_stageObjects);
-
+  if (m_pathAnimations) addActiveChannels(m_pathAnimations);
   if (m_fxs) addActiveChannels(m_fxs);
 }
 
