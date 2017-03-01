@@ -64,6 +64,13 @@ using boost::optional;
 
 namespace {
 
+class TopLevelChannelGroup final : public FunctionTreeModel::ChannelGroup {
+public:
+  TopLevelChannelGroup(const QString &name) : ChannelGroup(name) { }
+
+  virtual QString getIdName() const override { return getShortName().toLower(); }
+};
+
 class ParamChannelGroup final : public FunctionTreeModel::ParamWrapper,
                                 public FunctionTreeModel::ChannelGroup {
 public:
@@ -133,13 +140,15 @@ public:
 
 class LevelColumnChannelGroup final : public FunctionTreeModel::ChannelGroup {
   TXsheet *m_xsheet;
-  TXshLevelColumn *m_column;
+  int m_index;
+  // TXshLevelColumn *m_column;
 public:
 
-  LevelColumnChannelGroup(TXsheet *xsheet, TXshLevelColumn *column) : m_xsheet (xsheet), m_column(column) {}
+  LevelColumnChannelGroup(TXsheet *xsheet, int m_index);
   void build();
 
   TXsheet *xsheet() const { return m_xsheet; }
+  TXshLevelColumn *column() const;
   PathAnimations *pathAnimations() const { return m_xsheet->pathAnimations(); }
 
   QString getShortName() const override;
@@ -151,13 +160,11 @@ class CellChannelGroup final : public FunctionTreeModel::ChannelGroup {
   LevelColumnChannelGroup *m_parent;
   TXshCell m_cell;
 
-  CellChannelGroup(LevelColumnChannelGroup *parent, const TXshCell &cell) : m_parent(parent), m_cell(cell) { }
+  CellChannelGroup(LevelColumnChannelGroup *parent, const TXshCell &cell)
+    : ChannelGroup (cell.name()), m_parent(parent), m_cell(cell) { }
 public:
 
   static optional<CellChannelGroup *> buildAndAdd(LevelColumnChannelGroup *parent, const TXshCell &cell);
-
-  QString getShortName() const override { return m_cell.name(); }
-  QString getLongName() const override { return m_cell.name(); }
 };
 //-----------------------------------------------------------------------------
 
@@ -166,11 +173,8 @@ class StrokeChannelGroup final : public FunctionTreeModel::ChannelGroup {
   shared_ptr<PathAnimation> m_animation;
 public:
 
-  StrokeChannelGroup(shared_ptr<PathAnimation> animation) : m_animation(animation) {}
+  StrokeChannelGroup(shared_ptr<PathAnimation> animation);
   void build();
-
-  QString getShortName() const override;
-  QString getLongName() const override;
 };
 //-----------------------------------------------------------------------------
 
@@ -180,24 +184,17 @@ class ChunkChannelGroup final : public FunctionTreeModel::ChannelGroup {
   int m_index;
 public:
 
-  ChunkChannelGroup(shared_ptr<PathAnimation> animation, int index) : m_animation(animation), m_index(index) {}
+  ChunkChannelGroup(shared_ptr<PathAnimation> animation, int index);
   void build();
-
-  QString getShortName() const override { return "Chunk" + QString::number(m_index + 1); }
-  QString getLongName() const override { return "Chunk" + QString::number(m_index + 1); }
 };
 
 //-----------------------------------------------------------------------------
 class ThickPointChannelGroup final : public FunctionTreeModel::ChannelGroup {
   TThickPointParamP m_param;
-  int m_index;
 public:
 
-  ThickPointChannelGroup(TThickPointParamP param, int index) : m_param(param), m_index (index) { }
+  ThickPointChannelGroup(TThickPointParamP param, int index);
   void build();
-
-  QString getShortName() const override { return "p" + QString::number(m_index); }
-  QString getLongName() const override { return "p" + QString::number(m_index); }
 private:
   void addChannel(FunctionTreeModel *model, TDoubleParamP &param);
 };
@@ -632,9 +629,17 @@ QVariant SkVDChannelGroup::data(int role) const {
 //
 //-----------------------------------------------------------------------------
 
+LevelColumnChannelGroup::LevelColumnChannelGroup(TXsheet *xsheet, int index)
+  : m_xsheet(xsheet), m_index (index) {
+  setName(getShortName());
+}
+
 void LevelColumnChannelGroup::build() {
   clear();
   vector<TXshCell> cells;
+  TXshLevelColumn *m_column = column();
+  if (!m_column)
+    return;
 
   // inside it, create node for each tstroke
   int f0, f1;
@@ -649,9 +654,14 @@ void LevelColumnChannelGroup::build() {
   }
 }
 
+TXshLevelColumn *LevelColumnChannelGroup::column() const {
+  TXshColumn *column = m_xsheet->getColumn(m_index);
+  return column ? column->getLevelColumn() : nullptr;
+}
+
+
 QString LevelColumnChannelGroup::getShortName() const {
-  int index = m_column->getIndex();
-  TStageObjectId columnId = TStageObjectId::ColumnId(index);
+  TStageObjectId columnId = TStageObjectId::ColumnId(m_index);
   TStageObject *columnObject = m_xsheet->getStageObject(columnId);
   return QString::fromStdString(columnObject->getName());
 }
@@ -691,6 +701,10 @@ optional<CellChannelGroup *> CellChannelGroup::buildAndAdd(LevelColumnChannelGro
 // StrokeChannelGroup
 //-----------------------------------------------------------------------------
 
+StrokeChannelGroup::StrokeChannelGroup(shared_ptr<PathAnimation> animation)
+  : ChannelGroup (animation->name()), m_animation(animation) {
+}
+
 void StrokeChannelGroup::build() {
   clear();
 
@@ -702,16 +716,15 @@ void StrokeChannelGroup::build() {
   }
 }
 
-QString StrokeChannelGroup::getShortName() const {
-  return m_animation->name();
-}
-QString StrokeChannelGroup::getLongName() const {
-  return m_animation->name();
-}
-
 //=============================================================================
 // ChunkChannelGroup
 //-----------------------------------------------------------------------------
+ChunkChannelGroup::ChunkChannelGroup(shared_ptr<PathAnimation> animation, int index)
+  : m_animation(animation), m_index(index) {
+
+  setName("Chunk" + QString::number(m_index + 1));
+}
+
 void ChunkChannelGroup::build() {
   TParamSetP chunk = m_animation->chunk(m_index);
   FunctionTreeModel *model = dynamic_cast<FunctionTreeModel *> (getModel());
@@ -728,6 +741,11 @@ void ChunkChannelGroup::build() {
 //=============================================================================
 // ThickPointChannelGroup
 //-----------------------------------------------------------------------------
+ThickPointChannelGroup::ThickPointChannelGroup(TThickPointParamP param, int index)
+  : m_param(param) {
+  setName("p" + QString::number(index));
+}
+
 void ThickPointChannelGroup::build() {
   FunctionTreeModel *model = dynamic_cast<FunctionTreeModel *> (getModel());
   assert(model);
@@ -891,7 +909,7 @@ QString FunctionTreeModel::Channel::getExprRefName() const {
   FunctionTreeModel::ChannelGroup *parentGroup =
       dynamic_cast<FunctionTreeModel::ChannelGroup *>(getParent());
   if (parentGroup) {
-    return QString("fx.") + parentGroup->getIdName() + QString(".") + tmpName;
+    return parentGroup->getIdName() + QString(".") + tmpName;
   } else
     return "";
 }
@@ -1022,9 +1040,9 @@ void FunctionTreeModel::refreshData(TXsheet *xsh) {
       setRootItem(new ChannelGroup("Root"));
 
       if (xsh) {
-        getRootItem()->appendChild(m_stageObjects = new ChannelGroup("Stage"));
-        getRootItem()->appendChild(m_pathAnimations = new ChannelGroup("PathAnimation"));
-        getRootItem()->appendChild(m_fxs = new ChannelGroup("FX"));
+        getRootItem()->appendChild(m_stageObjects = new TopLevelChannelGroup("Stage"));
+        getRootItem()->appendChild(m_pathAnimations = new TopLevelChannelGroup("PathAnimation"));
+        getRootItem()->appendChild(m_fxs = new TopLevelChannelGroup("FX"));
 
         assert(getRootItem()->getChildCount() == 3);
         assert(getRootItem()->getChild(0) == m_stageObjects);
@@ -1116,7 +1134,7 @@ void FunctionTreeModel::refreshPathAnimation(TXsheet *xsh) {
     if (!levelColumn || levelColumn->isEmpty())
       continue;
 
-    LevelColumnChannelGroup *columnGroup = new LevelColumnChannelGroup(xsh, levelColumn);
+    LevelColumnChannelGroup *columnGroup = new LevelColumnChannelGroup(xsh, i);
     m_pathAnimations->appendChild(columnGroup);
     columnGroup->build();
   }

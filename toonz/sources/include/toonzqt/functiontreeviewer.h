@@ -105,6 +105,7 @@ to
     bool isActive() const override;
     bool isAnimated() const override;
 
+    void setName(const QString &name) { m_name = name; }
     virtual QString getShortName() const { return m_name; }
     virtual QString getLongName() const { return m_name; }
 
