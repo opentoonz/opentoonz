@@ -198,6 +198,8 @@ public:
 
   QString getShortName() const override { return "p" + QString::number(m_index); }
   QString getLongName() const override { return "p" + QString::number(m_index); }
+private:
+  void addChannel(FunctionTreeModel *model, TDoubleParamP &param);
 };
 
 }  // namespace
@@ -730,13 +732,16 @@ void ThickPointChannelGroup::build() {
   FunctionTreeModel *model = dynamic_cast<FunctionTreeModel *> (getModel());
   assert(model);
 
+  addChannel(model, m_param->getX());
+  addChannel(model, m_param->getY());
+  addChannel(model, m_param->getThickness());
+}
+
+void ThickPointChannelGroup::addChannel(FunctionTreeModel *model, TDoubleParamP &param) {
   FunctionTreeModel::Channel *channel;
-  channel = new FunctionTreeModel::Channel(model, m_param->getX().getPointer());
+  channel = new FunctionTreeModel::Channel(model, param.getPointer());
   appendChild(channel);
-  channel = new FunctionTreeModel::Channel(model, m_param->getY().getPointer());
-  appendChild(channel);
-  channel = new FunctionTreeModel::Channel(model, m_param->getThickness().getPointer());
-  appendChild(channel);
+  channel->setChannelGroup(this);
 }
 
 //=============================================================================
