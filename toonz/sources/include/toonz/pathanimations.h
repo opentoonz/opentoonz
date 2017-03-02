@@ -66,7 +66,7 @@ public:
   void updateChunks();
 
   bool isActivated() const { return m_activated; }
-  void toggleActivated() { m_activated = !m_activated; }
+  void toggleActivated();
 
   int chunkCount() const;
   TParamSetP chunk(int i) const;
@@ -85,6 +85,8 @@ class DVAPI PathAnimations final {
 public:
   PathAnimations(TXsheet *xsheet);
   ~PathAnimations() { }
+
+  TXsheet *xsheet() const { return m_xsheet; }
 
   shared_ptr<PathAnimation> stroke(const StrokeId &strokeId) const;
   shared_ptr<PathAnimation> addStroke(const StrokeId &strokeId);

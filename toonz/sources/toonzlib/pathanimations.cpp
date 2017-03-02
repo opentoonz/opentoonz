@@ -119,6 +119,11 @@ QString PathAnimation::name() const {
   return m_strokeId.name();
 }
 
+void PathAnimation::toggleActivated() {
+  m_activated = !m_activated;
+  emit m_animations->xsheet()->sublayerActivatedChanged();
+}
+
 //-----------------------------------------------------------------------------
 // PathAnimations
 

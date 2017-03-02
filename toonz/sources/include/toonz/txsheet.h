@@ -559,6 +559,7 @@ in TXsheetImp.
 
 signals:
   void columnFanFoldedUnfolded();
+  void sublayerActivatedChanged();
 
 protected:
   bool checkCircularReferences(TXsheet *childCandidate);

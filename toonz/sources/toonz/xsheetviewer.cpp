@@ -801,6 +801,8 @@ void XsheetViewer::showEvent(QShowEvent *) {
   TXsheet *xsheet = xsheetHandle->getXsheet();
   ret = ret && connect(xsheet, &TXsheet::columnFanFoldedUnfolded, this,
     &XsheetViewer::onColumnFanFoldedUnfolded);
+  ret = ret && connect(xsheet, &TXsheet::sublayerActivatedChanged, this,
+    &XsheetViewer::updateColumnArea);
 
   ret = ret &&
         connect(app->getCurrentSelection(),
@@ -857,6 +859,8 @@ void XsheetViewer::hideEvent(QHideEvent *) {
   TXsheet *xsheet = xsheetHandle->getXsheet();
   disconnect(xsheet, &TXsheet::columnFanFoldedUnfolded, this,
     &XsheetViewer::onColumnFanFoldedUnfolded);
+  disconnect(xsheet, &TXsheet::sublayerActivatedChanged, this,
+    &XsheetViewer::updateColumnArea);
 
   disconnect(app->getCurrentSelection(),
              SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
