@@ -61,14 +61,16 @@ public:
 
   QString name() const;
 
-  void takeSnapshot();
+  void takeSnapshot(int atFrame);
   void updateChunks();
 
   int chunkCount() const;
   TParamSetP chunk(int i) const;
 
 private:
-  void snapshotChunks();
+  void snapshotChunks(int atFrame);
+  void setThickPointKeyframe(TThickPointParamP thickPoint, int frame);
+  void setDoubleKeyframe(TDoubleParamP &param, int frame);
 };
 
 //! Storage for all strokes animation keyframes

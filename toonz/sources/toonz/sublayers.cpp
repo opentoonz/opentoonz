@@ -335,8 +335,10 @@ QString StrokeSubLayer::name() const {
 
 void StrokeSubLayer::toggleActivator() {
   m_activated = !m_activated;
-  if (m_activated)
-    xsheet()->pathAnimations()->stroke(strokeId())->takeSnapshot();
+  if (!m_activated)
+    return;
+  shared_ptr<PathAnimation> animation { xsheet()->pathAnimations()->addStroke(strokeId()) };
+  animation->takeSnapshot(subLayers()->screenMapper()->getCurrentFrame());
 }
 
 StrokeId StrokeSubLayer::strokeId() const {

@@ -1,5 +1,6 @@
 #include "toonz/pathanimations.h"
 
+#include "toonz/doubleparamcmd.h"
 #include "toonz/txsheet.h"
 #include "toonz/txshcolumn.h"
 #include "toonz/txshcell.h"
@@ -41,9 +42,9 @@ PathAnimation::PathAnimation(PathAnimations *animations, const StrokeId &strokeI
   m_params = new TParamSet(name().toStdString());
 }
 
-void PathAnimation::takeSnapshot() {
+void PathAnimation::takeSnapshot(int atFrame) {
   updateChunks();
-  snapshotChunks();
+  snapshotChunks(atFrame);
 }
 
 int PathAnimation::chunkCount() const {
@@ -87,17 +88,31 @@ void PathAnimation::updateChunks() {
 }
 
 // sets a keyframe for the points and thicknesses
-void PathAnimation::snapshotChunks() {
+void PathAnimation::snapshotChunks(int frame) {
   TStroke *stroke = m_strokeId.stroke();
+
   for (int i = 0; i < stroke->getChunkCount(); i++) {
     const TThickQuadratic *chunk = stroke->getChunk(i);
     map<const TThickQuadratic *, TParamSetP>::iterator found = m_lastChunks.find(chunk);
-    TParamSetP param = found->second;
-    // get p0 tthickpointparamp
-      // set its value to current interpolation (?)
-    // get p1 tthickpointparamp
-    // get p2 tthickpointparamp
+    assert(found != m_lastChunks.end());
+
+    TParamSetP chunkParam = found->second;
+    for (int j = 0; j < 3; j++)
+      setThickPointKeyframe(chunkParam->getParam(j), frame);
   }
+}
+
+void PathAnimation::setThickPointKeyframe(TThickPointParamP thickPoint, int frame) {
+  if (!thickPoint)
+    return;
+  setDoubleKeyframe(thickPoint->getX(), frame);
+  setDoubleKeyframe(thickPoint->getY(), frame);
+  setDoubleKeyframe(thickPoint->getThickness(), frame);
+}
+
+void PathAnimation::setDoubleKeyframe(TDoubleParamP &param, int frame) {
+  KeyframeSetter setter(param.getPointer(), -1, false);
+  setter.createKeyframe(frame);
 }
 
 QString PathAnimation::name() const {
