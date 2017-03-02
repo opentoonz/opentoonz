@@ -64,13 +64,12 @@ private:
 class StrokeSubLayer final : public SubLayer {
   CellSubLayer *m_parent;
   TStroke *m_stroke; // weak pointer - don't own
-  bool m_activated;
 
 public:
   StrokeSubLayer(SubLayers *subLayers, CellSubLayer *parent, TStroke *stroke);
 
   virtual bool hasActivator() const override { return true; }
-  virtual bool isActivated() const override { return m_activated; }
+  virtual bool isActivated() const override;
   virtual void toggleActivator() override;
 
   virtual QString name() const override;
@@ -323,7 +322,7 @@ SubLayer *CellSubLayer::build(TStroke *stroke) {
 // StrokeSubLayer
 
 StrokeSubLayer::StrokeSubLayer(SubLayers *subLayers, CellSubLayer *parent, TStroke *stroke)
-  : SubLayer(subLayers, parent), m_parent(parent), m_stroke(stroke), m_activated (false)
+  : SubLayer(subLayers, parent), m_parent(parent), m_stroke(stroke)
 { }
 
 QString StrokeSubLayer::name() const {
@@ -333,11 +332,16 @@ QString StrokeSubLayer::name() const {
   return prefix + " " + QString::number(m_stroke->getId());
 }
 
+bool StrokeSubLayer::isActivated() const {
+  shared_ptr<PathAnimation> animation = xsheet()->pathAnimations()->addStroke(strokeId());
+  return animation->isActivated();
+}
+
 void StrokeSubLayer::toggleActivator() {
-  m_activated = !m_activated;
-  if (!m_activated)
+  shared_ptr<PathAnimation> animation = xsheet()->pathAnimations()->addStroke(strokeId());
+  animation->toggleActivated();
+  if (!animation->isActivated())
     return;
-  shared_ptr<PathAnimation> animation { xsheet()->pathAnimations()->addStroke(strokeId()) };
   animation->takeSnapshot(subLayers()->screenMapper()->getCurrentFrame());
 }
 

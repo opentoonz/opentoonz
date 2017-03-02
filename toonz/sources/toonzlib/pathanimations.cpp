@@ -37,7 +37,7 @@ QString StrokeId::name() const {
 // PathAnimation
 
 PathAnimation::PathAnimation(PathAnimations *animations, const StrokeId &strokeId)
-  : m_animations(animations), m_strokeId(strokeId)
+  : m_animations(animations), m_strokeId(strokeId), m_activated (false)
 {
   m_params = new TParamSet(name().toStdString());
 }

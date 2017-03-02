@@ -53,6 +53,7 @@ class PathAnimations;
 class DVAPI PathAnimation final {
   PathAnimations *m_animations;
   StrokeId m_strokeId;
+  bool m_activated;
   map<const TThickQuadratic *, TParamSetP> m_lastChunks;
   TParamSetP m_params; //! chunk nodes
 public:
@@ -63,6 +64,9 @@ public:
 
   void takeSnapshot(int atFrame);
   void updateChunks();
+
+  bool isActivated() const { return m_activated; }
+  void toggleActivated() { m_activated = !m_activated; }
 
   int chunkCount() const;
   TParamSetP chunk(int i) const;
