@@ -93,10 +93,10 @@ QIcon DVAPI createQIconPNG(const char *iconPNGName);
 QIcon DVAPI createQIconOnOff(const char *iconSVGName, bool withOver = true);
 QIcon DVAPI createQIconOnOffPNG(const char *iconPNGName, bool withOver = true);
 
-inline QSize DVAPI dimension2QSize(const TDimension &sz) {
+inline QSize dimension2QSize(const TDimension &sz) {
   return QSize(sz.lx, sz.ly);
 }
-inline TDimension DVAPI qsize2Dimension(const QSize &sz) {
+inline TDimension qsize2Dimension(const QSize &sz) {
   return TDimension(sz.width(), sz.height());
 }
 QString DVAPI toQString(const TFilePath &path);
@@ -117,33 +117,33 @@ bool DVAPI isResourceOrFolder(const QUrl &url);
 bool DVAPI acceptResourceDrop(const QList<QUrl> &urls);
 bool DVAPI acceptResourceOrFolderDrop(const QList<QUrl> &urls);
 
-inline QPointF DVAPI toQPointF(const TPointD &p) { return QPointF(p.x, p.y); }
-inline QPointF DVAPI toQPointF(const TPoint &p) { return QPointF(p.x, p.y); }
-inline QPoint DVAPI toQPoint(const TPoint &p) { return QPoint(p.x, p.y); }
-inline TPointD DVAPI toTPointD(const QPointF &p) {
+inline QPointF toQPointF(const TPointD &p) { return QPointF(p.x, p.y); }
+inline QPointF toQPointF(const TPoint &p) { return QPointF(p.x, p.y); }
+inline QPoint toQPoint(const TPoint &p) { return QPoint(p.x, p.y); }
+inline TPointD toTPointD(const QPointF &p) {
   return TPointD(p.x(), p.y());
 }
-inline TPointD DVAPI toTPointD(const QPoint &p) {
+inline TPointD toTPointD(const QPoint &p) {
   return TPointD(p.x(), p.y());
 }
-inline TPoint DVAPI toTPoint(const QPoint &p) { return TPoint(p.x(), p.y()); }
+inline TPoint toTPoint(const QPoint &p) { return TPoint(p.x(), p.y()); }
 
-inline QRect DVAPI toQRect(const TRect &r) {
+inline QRect toQRect(const TRect &r) {
   return QRect(r.x0, r.y0, r.getLx(), r.getLy());
 }
-inline QRectF DVAPI toQRectF(const TRectD &r) {
+inline QRectF toQRectF(const TRectD &r) {
   return QRectF(r.x0, r.y0, r.getLx(), r.getLy());
 }
-inline QRectF DVAPI toQRectF(const TRect &r) {
+inline QRectF toQRectF(const TRect &r) {
   return QRectF(r.x0, r.y0, r.getLx(), r.getLy());
 }
-inline TRect DVAPI toTRect(const QRect &r) {
+inline TRect toTRect(const QRect &r) {
   return TRect(r.left(), r.top(), r.right(), r.bottom());
 }
-inline TRectD DVAPI toTRectD(const QRectF &r) {
+inline TRectD toTRectD(const QRectF &r) {
   return TRectD(r.left(), r.top(), r.right(), r.bottom());
 }
-inline TRectD DVAPI toTRectD(const QRect &r) {
+inline TRectD toTRectD(const QRect &r) {
   return TRectD(r.left(), r.top(), r.right() + 1, r.bottom() + 1);
 }
 

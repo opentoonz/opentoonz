@@ -210,16 +210,16 @@ public:
   double m_end;
 };
 
-inline DVAPI TFxTimeRegion operator+(const TFxTimeRegion &tr1,
-                                     const TFxTimeRegion &tr2) {
+inline TFxTimeRegion operator+(const TFxTimeRegion &tr1,
+                               const TFxTimeRegion &tr2) {
   return TFxTimeRegion(tr1) += tr2;
 }
 
-inline DVAPI TFxTimeRegion operator+(const TFxTimeRegion &tr1, double shift) {
+inline TFxTimeRegion operator+(const TFxTimeRegion &tr1, double shift) {
   return TFxTimeRegion(tr1) += shift;
 }
 
-inline DVAPI TFxTimeRegion operator-(const TFxTimeRegion &tr1, double shift) {
+inline TFxTimeRegion operator-(const TFxTimeRegion &tr1, double shift) {
   return TFxTimeRegion(tr1) -= shift;
 }
 
