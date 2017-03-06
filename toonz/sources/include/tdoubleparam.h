@@ -156,9 +156,9 @@ public:
   std::string getValueAlias(double frame, int precision) override;
 };
 
-DV_IMPORT_API void splitSpeedInOutSegment(TDoubleKeyframe &k,
-                                          TDoubleKeyframe &k0,
-                                          TDoubleKeyframe &k1);
+DVAPI void splitSpeedInOutSegment(TDoubleKeyframe &k,
+                                  TDoubleKeyframe &k0,
+                                  TDoubleKeyframe &k1);
 
 //---------------------------------------------------------
 
