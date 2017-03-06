@@ -20,7 +20,7 @@
 
 #include "tthread.h"
 
-#include <strstream>
+#include <sstream>
 #include <string>
 using namespace std;
 
@@ -691,7 +691,7 @@ void FarmController::loadServersData(const TFilePath &globalRoot) {
     is.getline(line, 80);
 
     if (line[0] != '#' && QString(line) != "") {
-      istrstream iss(line);
+      stringstream iss(line);
 
       char hostName[512];
       char ipAddr[80];
