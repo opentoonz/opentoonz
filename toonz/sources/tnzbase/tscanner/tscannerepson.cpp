@@ -14,7 +14,7 @@
 #include <cassert>
 #include <memory>
 #include <fstream>
-#include <strstream>
+#include <sstream>
 
 using namespace TScannerUtil;
 
@@ -311,7 +311,7 @@ throw TException("Scan area too large, select a correct paper size");
 
       bytes_to_read = lines * counter;
       if (stx != 0x02) {
-        std::ostrstream os;
+        std::stringstream os;
         os << "header corrupted (" << std::hex << stx << ")" << '\0';
         throw TException(os.str());
       }
@@ -641,8 +641,7 @@ throw TException("Scanner error resetting");
 
 #ifdef _DEBUG
   memcpy(&status, &(buffer2[1]), 1);
-  std::ostrstream os;
-  os.freeze(false);
+  std::stringstream os;
   os << "stx = " << stx << " status = " << status << " counter=" << counter
      << '\n'
      << '\0';
@@ -754,8 +753,7 @@ bool TScannerEpson::expectACK() {
 
 #ifdef _DEBUG
   if (ack != ACK) {
-    std::ostrstream os;
-    os.freeze(false);
+    std::stringstream os;
     os << "ack fails ret = 0x" << std::hex << (int)ack << '\n' << '\0';
     TSystem::outputDebug(os.str());
   }
@@ -939,8 +937,7 @@ void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status,
   status = buffer[1];
 
 #ifdef _DEBUG
-  std::ostrstream os;
-  os.freeze(false);
+  std::stringstream os;
 
   os << "fatal=" << fatalError;
   os << " notReady=" << notReady;
@@ -973,8 +970,7 @@ void TScannerEpson::ESCI_readLineData2(unsigned char &stx,
   status = buffer[1];
 
 #ifdef _DEBUG
-  std::ostrstream os;
-  os.freeze(false);
+  std::stringstream os;
 
   os << "fatal=" << fatalError;
   os << " notReady=" << notReady;

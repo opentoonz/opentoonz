@@ -2462,12 +2462,11 @@ void CenterLineVectorizer::vectorize() {
 
 #ifdef DEBUG
 void printTime(TStopWatch &sw, string name) {
-  ostrstream ss;
+  stringstream ss;
   ss << name << " : ";
   sw.print(ss);
   ss << '\n' << '\0';
   string s = ss.str();
-  ss.freeze(false);
   TSystem::outputDebug(s);
 }
 #endif
