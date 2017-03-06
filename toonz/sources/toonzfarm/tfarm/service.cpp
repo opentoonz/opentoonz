@@ -27,7 +27,7 @@
 
 //------------------------------------------------------------------------------
 
-LPTSTR GetLastErrorText(LPTSTR lpszBuf, DWORD dwSize) {
+static LPTSTR GetLastErrorText(LPTSTR lpszBuf, DWORD dwSize) {
   DWORD dwRet;
   LPTSTR lpszTemp = NULL;
 
