@@ -151,9 +151,9 @@ inline void tglDrawSegment(double x0, double y0, double x1, double y1) {
  */
 DVAPI void tglDrawRect(const TRectD &rect);
 
-inline void DVAPI tglDrawRect(const TRect &rect) { tglDrawRect(convert(rect)); }
+inline void tglDrawRect(const TRect &rect) { tglDrawRect(convert(rect)); }
 
-inline void DVAPI tglDrawRect(double x0, double y0, double x1, double y1) {
+inline void tglDrawRect(double x0, double y0, double x1, double y1) {
   tglDrawRect(TRectD(x0, y0, x1, y1));
 }
 
@@ -162,9 +162,9 @@ inline void DVAPI tglDrawRect(double x0, double y0, double x1, double y1) {
  */
 DVAPI void tglFillRect(const TRectD &rect);
 
-inline void DVAPI tglFillRect(const TRect &rect) { tglFillRect(convert(rect)); }
+inline void tglFillRect(const TRect &rect) { tglFillRect(convert(rect)); }
 
-inline void DVAPI tglFillRect(double x0, double y0, double x1, double y1) {
+inline void tglFillRect(double x0, double y0, double x1, double y1) {
   tglFillRect(TRectD(x0, y0, x1, y1));
 }
 
