@@ -66,7 +66,7 @@ typedef struct { unsigned short m, b, g, r; } SPIXEL;
 #define LPIXEL_B_SHIFT 16
 #endif
 
-#elif TNZ_MACHINE_CHANNEL_ORDER_RGBM
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
 
 typedef struct _LPIXEL { unsigned char r, g, b, m; } LPIXEL;
 typedef struct _SPIXEL { unsigned short r, g, b, m; } SPIXEL;
@@ -94,7 +94,7 @@ typedef struct _SPIXEL { unsigned short r, g, b, m; } SPIXEL;
 #define LPIXEL_G_SHIFT 16
 #define LPIXEL_B_SHIFT 24
 #endif
-#elif TNZ_MACHINE_CHANNEL_ORDER_MRGB
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
 
 typedef struct _LPIXEL { unsigned char m, r, g, b; } LPIXEL;
 typedef struct _SPIXEL { unsigned short m, r, g, b; } SPIXEL;
