@@ -20,6 +20,8 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/stage2.h"
 #include "toonz/tstageobject.h"
+#include "toonz/txsheet.h"
+#include "toonz/pathanimations.h"
 
 #include "tw/keycodes.h"
 
@@ -670,6 +672,9 @@ void ControlPointEditorTool::leftButtonDrag(const TPointD &pos,
                                                 // selezione nel movimento
     moveControlPoints(delta);
     m_isImageChanged = true;
+	
+	StrokeId strokeId { getXsheet (), getImageCell(), vi->getStroke(currentStroke) };
+	getXsheet()->pathAnimations()->addStroke(strokeId)->takeSnapshot (getFrame());
   }
   if (m_action == SEGMENT_MOVEMENT) {
     m_moveControlPointEditorStroke = *m_controlPointEditorStroke.clone();
