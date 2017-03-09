@@ -258,7 +258,7 @@ signals:
 
 class TPanelFactory {
   QString m_panelType;
-  static QMap<QString, TPanelFactory *> m_table;
+  static QMap<QString, TPanelFactory *>& tableInstance();
 
 public:
   TPanelFactory(QString panelType);
