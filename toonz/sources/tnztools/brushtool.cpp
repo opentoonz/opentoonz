@@ -26,6 +26,7 @@
 #include "toonz/txshsimplelevel.h"
 #include "toonz/toonzimageutils.h"
 #include "toonz/palettecontroller.h"
+#include "toonz/tpalettehandle.h"
 #include "toonz/stage2.h"
 
 // TnzCore includes
@@ -37,8 +38,8 @@
 #include "tstroke.h"
 #include "tgl.h"
 #include "trop.h"
-
 #include "drawutil.h"
+#include "tvectorbrushstyle.h"
 
 // Qt includes
 #include <QPainter>
@@ -1071,7 +1072,7 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       // nel caso che il colore corrente sia un cleanup/studiopalette color
       // oppure il colore di un colorfield
       m_styleId       = app->getCurrentLevelStyleIndex();
-      TColorStyle *cs = app->getCurrentLevelStyle();
+	  TColorStyle *cs = app->getCurrentLevelStyle();
       if (cs) {
         TRasterStyleFx *rfx = cs ? cs->getRasterStyleFx() : 0;
         m_active =
@@ -2280,10 +2281,10 @@ double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1
     double dissimilarityScore = 0;
     std::vector<SimilarPair> similarPairs;
 
-
-    for(int i = 0; i<stroke1->getChunkCount(); i++)
+	for(int i = 0; i < stroke1->stroke->getChunkCount(); i++)
     {
-        SimilarPair pair = getMostSimilarPoint(stroke1->stroke->getChunk(i), stroke2->stroke);
+		PointWithStroke* point = new PointWithStroke(stroke1->stroke->getChunk(i), stroke1->stroke);
+		SimilarPair pair = getMostSimilarPoint(point, stroke2->stroke);
         similarPairs.push_back(pair);
         dissimilarityScore += pair.dissimilarityFactor;
     }
@@ -2302,17 +2303,23 @@ StrokeWithNeighbours AnimationAutoComplete::mostSimilarStroke(StrokeWithNeighbou
 SimilarPair AnimationAutoComplete::getMostSimilarPoint(PointWithStroke *point, TStroke *stroke)
 {
     SimilarPair mostSimilarPair;
+
     mostSimilarPair.point1 = point;
-    mostSimilarPair.dissimilarityFactor = pointsSimilarity(point, stroke->getChunk(0));
+	PointWithStroke* point2 = new PointWithStroke(stroke->getChunk(0), stroke);
+	mostSimilarPair.dissimilarityFactor = pointsSimilarity(point, point2);
+	mostSimilarPair.point2 = point2;
 
     for (int i = 1; i < stroke->getChunkCount(); i++)
     {
-        double similarityScore = pointsSimilarity(point, stroke->getChunk(i));
+		point2 = new PointWithStroke(stroke->getChunk(i), stroke);
+		double similarityScore = pointsSimilarity(point, point2);
         if (mostSimilarPair.dissimilarityFactor > similarityScore)
         {
-            mostSimilarPair.point2 = stroke->getChunk(i);
+			delete mostSimilarPair.point2;
+			mostSimilarPair.point2 = point2;
             mostSimilarPair.dissimilarityFactor = similarityScore;
         }
+		else delete point2;
     }
 
     return mostSimilarPair;
@@ -2329,3 +2336,15 @@ std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
 	return strokes;
 }
 
+void GlobalSimilarityGraph::insertNode(SimilarPair *pair, std::vector<SimilarPair *> connections)
+{
+	this->connections.insert(std::pair<SimilarPair*, std::vector<SimilarPair*>>(pair, connections));
+	numberOfNodes++;
+}
+
+std::vector<SimilarPair *> GlobalSimilarityGraph::getConnections(SimilarPair *pair)
+{
+	if (pair)
+		return this->connections[pair];
+	return std::vector<SimilarPair *>();
+}

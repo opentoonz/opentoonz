@@ -111,19 +111,34 @@ private:
 //************************************************************************
 typedef TThickQuadratic* SamplePoint;
 
-struct SimilarPair
-{
-    double dissimilarityFactor;
-    PointWithStroke* point1;
-    PointWithStroke* point2;
-    std::vector<SimilarPair*> connections;
-};
-
 class  PointWithStroke
 {
 public:
-    const SamplePoint point;
+	PointWithStroke() {}
+	PointWithStroke(SamplePoint point, TStroke* stroke) : point(point), stroke(stroke) {}
+	~PointWithStroke() {}
+	SamplePoint point;
     TStroke* stroke;
+};
+
+struct SimilarPair
+{
+	double dissimilarityFactor;
+	PointWithStroke* point1;
+	PointWithStroke* point2;
+};
+
+class GlobalSimilarityGraph
+{
+	std::map<SimilarPair*, std::vector<SimilarPair*>> connections;
+
+public:
+	int numberOfNodes = 0;
+
+	GlobalSimilarityGraph() {}
+	~GlobalSimilarityGraph() {}
+	void insertNode(SimilarPair* pair, std::vector<SimilarPair*> connections);
+	std::vector<SimilarPair *> getConnections(SimilarPair* pair);
 };
 
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
@@ -133,11 +148,6 @@ class StrokeWithNeighbours
 public:
     TStroke* stroke;
     SetOfPoints neighbours;
-
-};
-
-class GlobalSimilarityGraph
-{
 
 };
 
