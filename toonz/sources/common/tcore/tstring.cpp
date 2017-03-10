@@ -8,8 +8,11 @@
 #include <QString>
 #endif
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4996)
+#endif
+
+#ifdef _WIN32
 #include "windows.h"
 #endif
 

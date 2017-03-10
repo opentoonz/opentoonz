@@ -298,7 +298,9 @@ typedef PlasticSkeletonDeformation SkD;
 //===============================================================================
 
 #ifdef _WIN32
+#ifndef TFX_EXPORTS
 template class DVAPI TSmartPointerT<PlasticSkeletonDeformation>;
+#endif
 #endif
 
 typedef TSmartPointerT<PlasticSkeletonDeformation> PlasticSkeletonDeformationP;

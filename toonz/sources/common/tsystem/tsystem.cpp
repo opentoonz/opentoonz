@@ -23,15 +23,13 @@ using namespace std;
 #include <QCoreApplication>
 #include <QUuid>
 
+#include <QDesktopServices>
+#include <QHostInfo>
+
 #ifdef _WIN32
-#include <qdesktopservices>
-#include <qhostinfo>
 #include <shlobj.h>
 #include <shellapi.h>
 #include <winnt.h>
-#else
-#include <QDesktopServices>
-#include <QHostInfo>
 #endif
 
 #include <QStringList>

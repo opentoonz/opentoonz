@@ -33,7 +33,7 @@ extern "C" {
 
 namespace {
 
-__declspec(align(16)) class TPixelFloat {
+DV_ALIGNED(16) class TPixelFloat {
 public:
   TPixelFloat() : b(0), g(0), r(0), m(0) {}
 
