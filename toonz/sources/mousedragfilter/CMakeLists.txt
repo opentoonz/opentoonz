@@ -1,4 +1,4 @@
-if(APPLE)
+if(BUILD_ENV_APPLE)
     cmake_minimum_required(VERSION 2.8.11)
     project(MouseDragFilter)
 

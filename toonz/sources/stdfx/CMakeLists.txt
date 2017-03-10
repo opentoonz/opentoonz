@@ -257,7 +257,7 @@ add_definitions(
     -DTNZSTDFX_EXPORTS
 )
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzstdfx.dylib")
 endif()
 
@@ -278,7 +278,7 @@ endif()
 
 _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     # macports を使っていると symbol が非互換の /opt/lib が引っ掛かってしまう
     find_library(ICONV_LIB iconv HINTS /usr/lib)
     if(ICONV_LIB-NOTFOUND)
