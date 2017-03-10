@@ -114,7 +114,7 @@ set(SOURCES
     tscanner/tscannerepson.cpp
 )
 
-if(WIN32)
+if(BUILD_TARGET_WIN)
     set(SOURCES ${SOURCES}
         tscanner/TScannerIO/TUSBScannerIO_W.cpp
     )
@@ -135,19 +135,19 @@ set(OBJCSOURCES
     tscanner/tscannertwain.cpp
 )
 
-if(WIN32)
+if(BUILD_TARGET_WIN)
     set(OBJCSOURCES ${OBJCSOURCES}
         ../common/twain/ttwain_stateW.c
         ../common/twain/ttwain_utilW.c
         ../common/twain/ttwain_winW.c
     )
-elseif(APPLE)
+elseif(BUILD_TARGET_APPLE)
     set(OBJCSOURCES ${OBJCSOURCES}
         ../common/twain/ttwain_stateM.c
         ../common/twain/ttwain_utilM.c
         ../common/twain/ttwain_winM.c
     )
-elseif(UNIX)
+elseif(BUILD_TARGET_UNIX)
     set(OBJCSOURCES ${OBJCSOURCES}
         ../common/twain/ttwain_stateX.c
         ../common/twain/ttwain_utilX.c
@@ -155,7 +155,7 @@ elseif(UNIX)
     )
 endif()
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     #set_source_files_properties(${OBJCSOURCES} PROPERTIES LANGUAGE OBJCXX)
     set_source_files_properties(${OBJCSOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
@@ -164,7 +164,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(tnzbase SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzbase.dylib")
 endif()
 
@@ -189,11 +189,11 @@ include_directories(
     ${SDKROOT}/libusb/libusb-1.0.9/include
 )
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     set(EXTRA_LIBS
         tnzcore
     )
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     find_library(TWAIN_LIB TWAIN)
     find_library(IOKIT_LIB IOKit)
     find_library(COCOA_LIB Cocoa)
@@ -205,16 +205,17 @@ elseif(APPLE)
         ${IOKIT_LIB}
         ${COCOA_LIB}
     )
-elseif(UNIX)
+elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore")
-    set(EXTRA_LIBS ${EXTRA_LIBS}
-        ${SDL_LIB_LIBRARIES}
-    )
-
-    include_directories(
-        SYSTEM
-        ${SDL_LIB_INCLUDE_DIRS}
-    )
+    if(NOT BUILD_TARGET_WIN)
+        set(EXTRA_LIBS ${EXTRA_LIBS}
+            ${SDL_LIB_LIBRARIES}
+        )
+        include_directories(
+            SYSTEM
+            ${SDL_LIB_INCLUDE_DIRS}
+        )
+    endif()
 endif()
 
 target_link_libraries(tnzbase Qt5::Core Qt5::Gui ${EXTRA_LIBS})

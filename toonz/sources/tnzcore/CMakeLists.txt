@@ -245,17 +245,17 @@ set(SOURCES
     ../common/tmsgcore.cpp
 )
 
-if(WIN32)
+if(BUILD_TARGET_WIN)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_nt.cpp
         ../common/tvrender/tfont_nt.cpp
     )
-elseif(APPLE)
+elseif(BUILD_TARGET_APPLE)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_mac.cpp
         ../common/tvrender/tfont_mac.cpp
     )
-elseif(UNIX)
+elseif(BUILD_TARGET_UNIX)
     set(SOURCES ${SOURCES}
         ../common/tvrender/tfont_qt.cpp
     )
@@ -276,7 +276,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(tnzcore SHARED ${HEADERS} ${SOURCES})
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzcore.dylib")
 endif()
 
@@ -306,7 +306,8 @@ include_directories(
     ../common/flash
     ${SDKROOT}/Lz4/Lz4_131/lib/
 )
-if(WIN32)
+
+if(BUILD_TARGET_WIN)
     if(PLATFORM EQUAL 32)
         include_directories(
             SYSTEM
@@ -315,7 +316,8 @@ if(WIN32)
     endif()
 endif()
 
-if(WIN32)
+
+if(BUILD_ENV_MSVC)
     set(EXTRA_LIBS
         netapi32.lib
         mpr.lib
@@ -323,7 +325,7 @@ if(WIN32)
         opengl32.lib
         glu32.lib
     )
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     find_library(AUDIOUNIT_LIB AudioUnit)
     find_library(AUDIOTB_LIB AudioToolbox)
     find_library(CARBON_LIB Carbon)
@@ -333,15 +335,25 @@ elseif(APPLE)
         ${AUDIOTB_LIB}
         ${CARBON_LIB}
     )
-elseif(UNIX)
-    set(QT_LIB)  # avoid warning
-    include_directories(
-        SYSTEM
-        ${FREETYPE_INCLUDE_DIRS}
-    )
+elseif(BUILD_ENV_UNIXLIKE)
+    if(NOT BUILD_TARGET_WIN)
+        include_directories(
+            SYSTEM
+            ${FREETYPE_INCLUDE_DIRS}
+        )
+    endif()
     set(EXTRA_LIBS
         ${GLU_LIB}
     )
+    if(BUILD_TARGET_WIN)
+        set(EXTRA_LIBS
+            ${EXTRA_LIBS}
+            -lnetapi32
+            -lmpr
+            -lwinmm
+            -lpsapi
+        )
+    endif()
 endif()
 
 target_link_libraries(tnzcore
