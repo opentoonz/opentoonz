@@ -15,9 +15,12 @@
 // boost includes
 #include <boost/range.hpp>
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4996)
+#endif
+
 // OS-specific includes
 #ifdef _WIN32
-#pragma warning(disable : 4996)
 #include <io.h>
 #endif
 #ifdef LINUX

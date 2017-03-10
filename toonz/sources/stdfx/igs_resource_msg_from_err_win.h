@@ -60,15 +60,30 @@ const std::string msg_from_err_(/* 直によんではいけない */
 }
 }
 /*--- ::GetLastError()値からエラーメッセージを得る ---*/
-#define igs_resource_msg_from_err(tit, error_message_id)                       \
-  igs::resource::msg_from_err_(                                                \
-      tit, error_message_id, TEXT(__FILE__), TEXT(igs_tostr(__LINE__)),        \
-      TEXT(__FUNCSIG__), TEXT(igs_tostr_(_MSC_VER)),                           \
-      TEXT(igs_tostr(_MSC_FULL_VER)), TEXT(__DATE__), TEXT(__TIME__))
-/*--- エラーメッセージを得る ---*/
-#define igs_resource_msg_from_er(tit)                                          \
-  igs::resource::msg_from_err_(                                                \
-      tit, NO_ERROR, TEXT(__FILE__), TEXT(igs_tostr(__LINE__)),                \
-      TEXT(__FUNCSIG__), TEXT(igs_tostr_(_MSC_VER)),                           \
-      TEXT(igs_tostr(_MSC_FULL_VER)), TEXT(__DATE__), TEXT(__TIME__))
+#ifdef _MSC_VER
+  #define igs_resource_msg_from_err(tit, error_message_id)                       \
+    igs::resource::msg_from_err_(                                                \
+        tit, error_message_id, TEXT(__FILE__), TEXT(igs_tostr(__LINE__)),        \
+        TEXT(__FUNCSIG__), TEXT(igs_tostr_(_MSC_VER)),                           \
+        TEXT(igs_tostr(_MSC_FULL_VER)), TEXT(__DATE__), TEXT(__TIME__))
+  /*--- エラーメッセージを得る ---*/
+  #define igs_resource_msg_from_er(tit)                                          \
+    igs::resource::msg_from_err_(                                                \
+        tit, NO_ERROR, TEXT(__FILE__), TEXT(igs_tostr(__LINE__)),                \
+        TEXT(__FUNCSIG__), TEXT(igs_tostr_(_MSC_VER)),                           \
+        TEXT(igs_tostr(_MSC_FULL_VER)), TEXT(__DATE__), TEXT(__TIME__))
+#else
+  #define igs_resource_msg_from_err(tit, error_message_id)                       \
+    igs::resource::msg_from_err_(                                                \
+        tit, error_message_id, TEXT(__FILE__), TEXT(igs_tostr(__LINE__)),        \
+        TEXT(__PRETTY_FUNCTION__), TEXT(__VERSION__),                            \
+        TEXT(__VERSION__), TEXT(__DATE__), TEXT(__TIME__))
+  /*--- エラーメッセージを得る ---*/
+  #define igs_resource_msg_from_er(tit)                                          \
+    igs::resource::msg_from_err_(                                                \
+        tit, NO_ERROR, TEXT(__FILE__), TEXT(igs_tostr(__LINE__)),                \
+        TEXT(__PRETTY_FUNCTION__), TEXT(__VERSION__),                            \
+        TEXT(__VERSION__), TEXT(__DATE__), TEXT(__TIME__))
+#endif
+
 #endif /* !igs_resource_msg_from_err_h */

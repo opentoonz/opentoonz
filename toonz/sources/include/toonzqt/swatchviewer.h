@@ -3,7 +3,7 @@
 #ifndef SWATCHVIEWER_H
 #define SWATCHVIEWER_H
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4251)
 #endif
 

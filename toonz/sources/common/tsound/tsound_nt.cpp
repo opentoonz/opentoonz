@@ -862,13 +862,13 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 class WaveFormat final : public WAVEFORMATEX {
 public:
   WaveFormat(){};
-  WaveFormat(unsigned char channelCount, unsigned TINT32 sampleRate,
+  WaveFormat(unsigned char channelCount, TUINT32 sampleRate,
              unsigned char bitPerSample);
 
   ~WaveFormat(){};
 };
 
-WaveFormat::WaveFormat(unsigned char channelCount, unsigned TINT32 sampleRate,
+WaveFormat::WaveFormat(unsigned char channelCount, TUINT32 sampleRate,
                        unsigned char bitPerSample) {
   wFormatTag      = WAVE_FORMAT_PCM;
   nChannels       = channelCount;
@@ -889,7 +889,7 @@ public:
   void open(const WaveFormat &wf);
   void close();
 
-  void prepareHeader(char *sampleBuffer, unsigned TINT32 sampleBufferSize,
+  void prepareHeader(char *sampleBuffer, TUINT32 sampleBufferSize,
                      WAVEHDR &whdr);
 
   void unprepareHeader(WAVEHDR &whdr);
@@ -949,7 +949,7 @@ void WinSoundInputDevice::close() {
 //--------------------------------------------------------------------
 
 void WinSoundInputDevice::prepareHeader(char *sampleBuffer,
-                                        unsigned TINT32 sampleBufferSize,
+                                        TUINT32 sampleBufferSize,
                                         WAVEHDR &whdr) {
   whdr.lpData         = sampleBuffer;
   whdr.dwBufferLength = sampleBufferSize;  // numero di byte
