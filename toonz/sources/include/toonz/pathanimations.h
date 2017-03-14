@@ -8,6 +8,7 @@
 #include "tdoubleparam.h"
 #include "tparamset.h"
 #include "tfilepath.h"
+#include "tvectorimage.h"
 #include "toonz/txshcell.h"
 
 #include <map>
@@ -71,6 +72,8 @@ public:
   int chunkCount() const;
   TParamSetP chunk(int i) const;
 
+  void animate(int frame) const;
+
 private:
   void snapshotChunks(int atFrame);
   void setThickPointKeyframe(TThickPointParamP thickPoint, int frame);
@@ -90,6 +93,9 @@ public:
 
   shared_ptr<PathAnimation> stroke(const StrokeId &strokeId) const;
   shared_ptr<PathAnimation> addStroke(const StrokeId &strokeId);
+
+  //! update all animatied strokes to match specified frame
+  void setFrame(TVectorImage *vi, const TXshCell &cell, int frame);
 };
 
 #endif

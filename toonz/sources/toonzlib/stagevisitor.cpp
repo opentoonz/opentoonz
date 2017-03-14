@@ -47,6 +47,7 @@
 #include "toonz/levelproperties.h"
 #include "toonz/autoclose.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/pathanimations.h"
 #include "imagebuilders.h"
 
 // Qt includes
@@ -800,6 +801,8 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
 
   int oldFrame = vPalette->getFrame();
   vPalette->setFrame(player.m_frame);
+  
+  player.m_xsh->pathAnimations()->setFrame(vi, TXshCell(player.m_sl, player.m_fid), player.m_frame);
 
   if (player.m_onionSkinDistance != c_noOnionSkin) {
     TPixel32 frontOnionColor, backOnionColor;

@@ -440,6 +440,9 @@ public:
   //! Set the value of third control point \b P2 to \b TThickPoint \b p.
   void setThickP2(const TThickPoint &p);
 
+  //! Set P0 / P1 / P2
+  void setThickP(int i, const TThickPoint &p);
+
   //! Return the \b TThickPoint of quadratic at parameter \b t.
   TThickPoint getThickPoint(double t) const;
 

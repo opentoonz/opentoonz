@@ -124,6 +124,25 @@ void PathAnimation::toggleActivated() {
   emit m_animations->xsheet()->sublayerActivatedChanged();
 }
 
+void PathAnimation::animate(int frame) const {
+  TStroke *stroke = m_strokeId.stroke();
+  for (int i = 0; i < chunkCount(); i++) {
+    TParamSetP chunkParam = chunk(i);
+    if (!chunkParam) // bad...
+      continue;
+
+    TThickQuadratic *chunk = const_cast<TThickQuadratic *> (stroke->getChunk(i));
+    for (int j = 0; j < 3; j++) {
+      TThickPointParamP pointParam = chunkParam->getParam(j);
+      chunk->setThickP(j, TThickPoint(
+        pointParam->getX()->getValue(frame),
+        pointParam->getY()->getValue(frame),
+        pointParam->getThickness()->getValue(frame)));
+    }
+  }
+  stroke->invalidate();
+}
+
 //-----------------------------------------------------------------------------
 // PathAnimations
 
@@ -147,4 +166,13 @@ shared_ptr<PathAnimation> PathAnimations::addStroke(const StrokeId &strokeId) {
   shared_ptr<PathAnimation> newOne { new PathAnimation(this, strokeId) };
   m_shapeAnimation[strokeId] = newOne;
   return newOne;
+}
+
+void PathAnimations::setFrame(TVectorImage *vi, const TXshCell &cell, int frame) {
+  for (int i = 0; i < vi->getStrokeCount(); i++) {
+    StrokeId strokeId { m_xsheet, cell, vi->getStroke (i) };
+
+    shared_ptr<PathAnimation> animation = addStroke(strokeId);
+    animation->animate(frame);
+  }
 }

@@ -397,6 +397,23 @@ void TThickQuadratic::setThickP2(const TThickPoint &p) {
 }
 
 //-----------------------------------------------------------------------------
+void TThickQuadratic::setThickP(int i, const TThickPoint &p) {
+  switch (i) {
+  case 0:
+    setThickP0(p);
+    return;
+  case 1:
+    setThickP1(p);
+    return;
+  case 2:
+    setThickP2(p);
+    return;
+  default:
+    throw std::runtime_error("setThickP should be called with i = 0..2");
+  }
+}
+
+//-----------------------------------------------------------------------------
 TThickPoint TThickQuadratic::getThickPoint(double t) const {
   double s = 1 - t;
   return TThickPoint(
