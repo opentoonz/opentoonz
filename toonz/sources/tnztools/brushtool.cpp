@@ -1377,11 +1377,11 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
 	//TODO: remove at production
 	//===============================================================================================
-	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete.drawSpaceVicinity(stroke);
+//	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete.drawSpaceVicinity(stroke);
 
-	for (auto i : spaceVicinities)
-		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
-						 m_isFrameCreated, m_isLevelCreated);
+//	for (auto i : spaceVicinities)
+//		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
+//						 m_isFrameCreated, m_isLevelCreated);
 	//===============================================================================================
 
     addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
@@ -2212,9 +2212,6 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 
 	strokeWithNeighbours->stroke = stroke;
 
-
-
-
 	int chuckCount = stroke->getChunkCount();
     for (int i = 0; i < chuckCount; i++)
     {
@@ -2222,7 +2219,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 		strokeWithNeighbours->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
 
-	if (m_strokesWithNeighbours.size() > 2)
+	if (m_strokesWithNeighbours.size() >= 2)
 		initializeSynthesis();
 }
 
@@ -2260,7 +2257,10 @@ bool AnimationAutoComplete::withinSpaceVicinity(const SamplePoint samplePoint, c
 void AnimationAutoComplete::initializeSynthesis()
 {
 	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
-	StrokeWithNeighbours* similarStroke = mostSimilarStroke(lastStroke);
+	//StrokeWithNeighbours* similarStroke = mostSimilarStroke(lastStroke);
+	StrokeWithNeighbours* similarStroke = NULL;
+	if (m_strokesWithNeighbours.size() == 2)
+		similarStroke = m_strokesWithNeighbours.front();
 	if (similarStroke)
 	{
 		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
@@ -2328,11 +2328,12 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	StrokeWithNeighbours* outputStroke = new StrokeWithNeighbours();
 	std::vector<TThickPoint> points;
 
-	for(int i=0;i<similarStroke->stroke->getChunkCount();i++)
-	{
+	int loopCount = (int)fmin((double)similarStroke->stroke->getChunkCount(), (double)nextToSimilarStroke->stroke->getChunkCount());
 
-		TPointD p1 = similarStroke->stroke->getChunk(i)->getP1();
-		TPointD p2 = nextToSimilarStroke->stroke->getChunk(i)->getP1();
+	for(int i = 0; i < loopCount; i++)
+	{
+		TPointD p1 = similarStroke->stroke->getChunk(i)->getP0();
+		TPointD p2 = nextToSimilarStroke->stroke->getChunk(i)->getP0();
 		double x1 = p1.x , x2 = p2.x;
 		double y1 = p1.y , y2 = p2.y;
 
@@ -2341,11 +2342,8 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 		double x_output = lastStroke->stroke->getChunk(i)->getP0().x + x_diffrence;
 		double y_output = lastStroke->stroke->getChunk(i)->getP0().y + y_diffrence;
 		TThickPoint p = TThickPoint(x_output,y_output,similarStroke->stroke->getChunk(i)->getThickP0().thick);
-		points[i]=p;
+		points.push_back(p);
 	}
-
-	// x - y = a - b;
-	//TThickPoint point = nextToSimilarStroke->stroke->getChunk(i);
 
 	outputStroke->stroke = new TStroke(points);
 	return outputStroke;
