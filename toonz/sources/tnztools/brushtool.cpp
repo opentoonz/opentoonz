@@ -2205,10 +2205,14 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
     StrokeWithNeighbours* strokeWithNeighbours = new StrokeWithNeighbours();
 
+	if(m_strokesWithNeighbours.size()!=0)
+		m_strokesWithNeighbours.back()->nextStroke = strokeWithNeighbours;
 
 	m_strokesWithNeighbours.push_back(strokeWithNeighbours);
 
 	strokeWithNeighbours->stroke = stroke;
+
+
 
 
 	int chuckCount = stroke->getChunkCount();
@@ -2257,9 +2261,12 @@ void AnimationAutoComplete::initializeSynthesis()
 {
 	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
 	StrokeWithNeighbours* similarStroke = mostSimilarStroke(lastStroke);
-	StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
-	StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
-	m_synthesizedStrokes.push_back(nextStroke);
+	if (similarStroke)
+	{
+		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
+		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
+		m_synthesizedStrokes.push_back(nextStroke);
+	}
 }
 
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getSynthesizedStrokes()
@@ -2321,6 +2328,22 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	StrokeWithNeighbours* outputStroke = new StrokeWithNeighbours();
 	std::vector<TThickPoint> points;
 
+	for(int i=0;i<similarStroke->stroke->getChunkCount();i++)
+	{
+
+		TPointD p1 = similarStroke->stroke->getChunk(i)->getP1();
+		TPointD p2 = nextToSimilarStroke->stroke->getChunk(i)->getP1();
+		double x1 = p1.x , x2 = p2.x;
+		double y1 = p1.y , y2 = p2.y;
+
+		double x_diffrence = x2-x1;
+		double y_diffrence = y2-y1;
+		double x_output = lastStroke->stroke->getChunk(i)->getP0().x + x_diffrence;
+		double y_output = lastStroke->stroke->getChunk(i)->getP0().y + y_diffrence;
+		TThickPoint p = TThickPoint(x_output,y_output,similarStroke->stroke->getChunk(i)->getThickP0().thick);
+		points[i]=p;
+	}
+
 	// x - y = a - b;
 	//TThickPoint point = nextToSimilarStroke->stroke->getChunk(i);
 
@@ -2332,7 +2355,7 @@ StrokeWithNeighbours* AnimationAutoComplete::mostSimilarStroke(StrokeWithNeighbo
 {
     for(int i=0;i<m_strokesWithNeighbours.size();i++)
     {
-        operationsSimilarity(stroke, m_strokesWithNeighbours[i+1]);
+		operationsSimilarity(stroke, m_strokesWithNeighbours[i]);
     }
 }
 
