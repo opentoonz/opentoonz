@@ -148,7 +148,7 @@ class StrokeWithNeighbours
 public:
     TStroke* stroke;
     SetOfPoints neighbours;
-
+	StrokeWithNeighbours *nextStroke;
 };
 
 class AnimationAutoComplete {
@@ -157,6 +157,7 @@ public:
   ~AnimationAutoComplete() {}
 
   void addStroke(TStroke* stroke);
+  std::vector<StrokeWithNeighbours*> getSynthesizedStrokes();
 
   //TODO: remove at production
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
@@ -164,9 +165,11 @@ public:
 private:
   int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
+  std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
 
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
-  StrokeWithNeighbours mostSimilarStroke (StrokeWithNeighbours* stroke);
+  StrokeWithNeighbours* mostSimilarStroke (StrokeWithNeighbours* stroke);
+  StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke, StrokeWithNeighbours* similarStroke, StrokeWithNeighbours* nextToSimilarStroke);
 
   SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
@@ -175,7 +178,10 @@ private:
   double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
 
   SetOfPoints getNeighbours(const SamplePoint point);
-  bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point );
+  bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
+  void initializeSynthesis();
+  void search();
+  void assign();
 };
 
 //************************************************************************

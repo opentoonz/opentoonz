@@ -1368,6 +1368,13 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
 	m_animationAutoComplete.addStroke(stroke);
 
+	std::vector<StrokeWithNeighbours*> synthesizedStrokes = m_animationAutoComplete.getSynthesizedStrokes();
+
+	// draws synthesized strokes
+	for (auto stroke : synthesizedStrokes)
+		addStrokeToImage(getApplication(), vi, stroke->stroke, m_breakAngles.getValue(),
+						 m_isFrameCreated, m_isLevelCreated);
+
 	//TODO: remove at production
 	//===============================================================================================
 	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete.drawSpaceVicinity(stroke);
@@ -2210,6 +2217,9 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
         SetOfPoints neighbours = getNeighbours(stroke->getChunk(i));
 		strokeWithNeighbours->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
+
+	if (m_strokesWithNeighbours.size() > 2)
+		initializeSynthesis();
 }
 
 SetOfPoints AnimationAutoComplete::getNeighbours(const SamplePoint point)
@@ -2240,7 +2250,21 @@ bool AnimationAutoComplete::withinSpaceVicinity(const SamplePoint samplePoint, c
 	if(distance <= m_spaceVicinityRadius)
 		return true;
 	else
-        return false;
+		return false;
+}
+
+void AnimationAutoComplete::initializeSynthesis()
+{
+	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
+	StrokeWithNeighbours* similarStroke = mostSimilarStroke(lastStroke);
+	StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
+	StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
+	m_synthesizedStrokes.push_back(nextStroke);
+}
+
+std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getSynthesizedStrokes()
+{
+	return m_synthesizedStrokes;
 }
 
 double AnimationAutoComplete::pointsSimilarity(PointWithStroke* point1, PointWithStroke* point2)
@@ -2289,10 +2313,22 @@ double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1
         dissimilarityScore += pair.dissimilarityFactor;
     }
 
-    return dissimilarityScore;
+	return dissimilarityScore;
 }
 
-StrokeWithNeighbours AnimationAutoComplete::mostSimilarStroke(StrokeWithNeighbours* stroke)
+StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWithNeighbours *lastStroke, StrokeWithNeighbours *similarStroke, StrokeWithNeighbours *nextToSimilarStroke)
+{
+	StrokeWithNeighbours* outputStroke = new StrokeWithNeighbours();
+	std::vector<TThickPoint> points;
+
+	// x - y = a - b;
+	//TThickPoint point = nextToSimilarStroke->stroke->getChunk(i);
+
+	outputStroke->stroke = new TStroke(points);
+	return outputStroke;
+}
+
+StrokeWithNeighbours* AnimationAutoComplete::mostSimilarStroke(StrokeWithNeighbours* stroke)
 {
     for(int i=0;i<m_strokesWithNeighbours.size();i++)
     {
