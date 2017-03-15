@@ -180,8 +180,8 @@ void TPanelTitleBarButton::setPressed(bool pressed) {
 void TPanelTitleBarButton::paintEvent(QPaintEvent *event) {
   QPainter painter(this);
   painter.drawPixmap(
-      0, 0, m_pressed ? m_pressedPixmap
-                      : m_rollover ? m_rolloverPixmap : m_standardPixmap);
+      0, 0, m_pressed ? m_pressedPixmap : m_rollover ? m_rolloverPixmap
+                                                     : m_standardPixmap);
   painter.end();
 }
 
@@ -381,7 +381,26 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
     else
       painter.drawPixmap(closeRect, closeButtonPixmap);
   }
-
+  if (m_isViewer) {
+    int x                  = rect.topRight().x();
+    QColor activeIconColor = getActiveIconColor();
+    QColor separatorColor  = getSeparatorColor();
+    painter.fillRect(x - 231, 1, 18, 16, activeIconColor);   // safearea icon
+    painter.fillRect(x - 210, 1, 16, 16, activeIconColor);   // fieldguide icon
+    painter.fillRect(x - 190, 0, 2, 18, separatorColor);     // spacer
+    painter.fillRect(x - 184, 1, 18, 16, activeIconColor);   // table icon
+    painter.fillRect(x - 163, 1, 23, 16, activeIconColor);   // 3d icon
+    painter.fillRect(x - 137, 1, 23, 16, activeIconColor);   // camera icon
+    painter.fillRect(x - 110, 0, 2, 18, separatorColor);     // spacer
+    painter.fillRect(x - 104, 1, 16, 16, getFreezeColor());  // freeze icon
+    painter.fillRect(x - 84, 0, 2, 18, separatorColor);      // spacer
+    painter.fillRect(x - 78, 1, 28, 16, activeIconColor);    // preview icon
+    painter.fillRect(x - 47, 1, 18, 16, activeIconColor);    // subpreview icon
+  }
+  if (m_isFlipbook) {
+    int x = rect.topRight().x();
+    painter.fillRect(x - 86, 1, 18, 16, getActiveIconColor());
+  }
   painter.end();
 }
 
