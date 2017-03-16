@@ -67,6 +67,7 @@ protected:
   void showEvent(QShowEvent *) override;
   void loadPresetList();
   void savePresetList();
+  void refreshRecentScenes();
   QString aspectRatioValueToString(double value, int width = 0, int height = 0);
   double aspectRatioStringToValue(const QString &s);
   bool parsePresetString(const QString &str, QString &name, int &xres,
