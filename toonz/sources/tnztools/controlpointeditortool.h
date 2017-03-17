@@ -12,11 +12,11 @@
 // ControlPointEditorStroke
 //-----------------------------------------------------------------------------
 
-/*!La classe ControlPointEditorStroke effettua tutte le operazioni matematiche
- * sullo Stroke */
+/*!ControlPointEditorStroke class performs all mathematical operations
+ * on Stroke */
 class ControlPointEditorStroke {
 private:
-  //! Punti di controllo comprensivi di SpeedIn e SpeenOut
+  //! Control Points include speed in and speed out
   class ControlPoint {
   public:
     int m_indexPoint;
@@ -36,14 +36,13 @@ private:
   TStroke *m_stroke;
   int m_strokeIndex;
 
-  /*! Viene riempito il vettore \b m_controlPoints scegliendo da \b m_stroke
-  soltanto
-  i punti di controllo nelle posizioni pari.
+  /*! Fills the vector \b m_controlPoints choosing from \b m_stroke
+  only the control points in even positions.
   */
   void updateControlPoints();
 
-  //! Viene settato il valore \b p.m_isCusp osservando lo SpeedIn e SpeedOut del
-  //! punto.
+  //! Sets the value \b p.m_isCusp keeping SpeedIn and SpeedOut
+  //! of the point.
   void setCusp(ControlPoint &p);
 
   void setSpeedIn(ControlPoint &cp, const TPointD &p) {
@@ -53,33 +52,27 @@ private:
     cp.m_speedOut = p - m_stroke->getControlPoint(cp.m_indexPoint);
   }
 
-  /*! Inserisce un punto nel chunk di lunghezza maggiore selezionato tra quelli
-     compresi
-          tra il chunk \b indexA e \b indexB.
+  /*!Inserts the point in chunk of the greater length among those
+     included between the chunk \b indexA and \b indexB.
   */
   void insertPoint(int indexA, int indexB);
 
-  /*! Verifica che in \b m_stroke tra due cuspidi sia sempre presente un numero
-  pari
-  di Chunk: in caso contrario richiama la \b insertPoint;
+  /*! Check that \b m_stroke between two cusps is always an even number
+  of Chunk: otherwise it calls \b insertPoint;
   */
   void adjustChunkParity();
 
-  //! Sposta il punto di controllo \b index di un fattore delta
+  //! Move the control point number \b index by factor delta
   void moveSingleControlPoint(int indexPoint, const TPointD &delta);
 
-  /*! Sposta i punti di controllo precedenti al punto \b index di un fattore
-delta.
-Se \b moveSpeed==true e' usato per movimento degli speed, altrimenti per
-            movimento dei punti di controllo.
+  /*! Move the control prior to the point \b index by a factor delta.
+If \b moveSpeed==true adjusts move speed, otherwise moves the control points.
   */
   void movePrecControlPoints(int indexPoint, const TPointD &delta,
                              bool moveSpeed);
 
-  /*! Sposta i punti di controllo successivi al punto \b index di un fattore
-delta.
-Se \b moveSpeed==true e' usato per movimento degli speed, altrimenti per
-            movimento dei punti di controllo.
+  /*! Move the control following the point \b index by a factor delta.
+If \b moveSpeed==true adjusts move speed, otherwise moves the control points.
   */
   void moveNextControlPoints(int indexPoint, const TPointD &delta,
                              bool moveSpeed);
@@ -114,27 +107,26 @@ public:
 
   int getControlPointCount() const { return m_controlPoints.size(); }
 
-  //! Ritorna \b true se il punto index e' una cuspide.
+  //! Returns \b true if the point index is a cusp.
   bool getIsCusp(int index) const {
     assert(m_stroke && 0 <= index && index < (int)getControlPointCount());
     return m_controlPoints[index].m_isCusp;
   }
 
-  //! Viene settato il valore \b m_isCusp del punto index-esimo a \b isCusp.
+  //! Sets the value of \b m_isCusp of the index-th point to \b isCusp.
   void linkUnlinkSpeeds(int index, bool isCusp) {
     m_controlPoints[index].m_isCusp = isCusp;
   }
 
-  /*! Sposta il ControlPoint \b index di un fattore delta con continuita',
-            cioe' spostando anche i punti di controllo adiacenti se
-     necessario.*/
+  /*! Moves the ControlPoint \b index by a factor of delta with continuity,
+  that is moving adjacent control points if necessary.*/
   void moveControlPoint(int index, const TPointD &delta);
 
-  //! Cancella il punto di controllo \b point.
+  //! Remove the control point \b index.
   void deleteControlPoint(int index);
 
-  /*! Aggiunge il punto di controllo \b point.
-                  Ritorna l'indice del punto di controllo appena inserito.*/
+  /*! Add the control point \b pos.
+	  Returns the index of newly added control point.*/
   int addControlPoint(const TPointD &pos);
 
   /*! Ritorna l'indice del cp piu' vicino al punto pos.
@@ -154,15 +146,13 @@ public:
   int getClosestSpeed(const TPointD &pos, double &minDistance2,
                       bool &isIn) const;
 
-  /*! Sposta il bilancino del punto \b index di un fattore delta. \b isIn deve
-     essere
-                  true se si vuole spostare lo SpeedIn.*/
+  /*! Move the balance of the point \b index by a factor delta. \b isIn must
+     be true if you want to move SpeedIn. */
   void moveSpeed(int index, const TPointD &delta, bool isIn, double pixelSize);
 
-  /*! Se isLinear e' true setta a "0" il valore dello speedIn e il valore dello
-     speedOut;
-                  altrimenti li setta ad un valore di default. Ritorna vero se
-     almeno un punto e' ststo modificato.*/
+  /*! If isLinear is true, sets to "0" the value of speedIn and the value
+     speedOut; otherwise sets it to default value. Returns true if at least
+		 one point is modified.*/
   bool setLinear(int index, bool isLinear);
 
   void setLinearSpeedIn(int index);
