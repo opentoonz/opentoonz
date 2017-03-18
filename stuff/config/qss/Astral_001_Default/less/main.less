@@ -1,0 +1,24 @@
+// -----------------------------------------------------------------------------
+// Main file - outputs the default theme
+// -----------------------------------------------------------------------------
+
+// The cascade is important!
+//   01. base > all
+//   02. components > all
+//   03. layouts > mainwindow.less > everything else
+//   04. mods > 
+
+// -----------------------------------------------------------------------------
+
+// Base
+@import 'base/colors';
+@import 'base/mixins';
+
+// Components
+@import 'components/all';
+
+// Layouts
+@import 'layouts/all';
+
+// Overrides
+@import (reference) 'mods/all';

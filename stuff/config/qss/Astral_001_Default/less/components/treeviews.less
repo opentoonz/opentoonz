@@ -1,0 +1,94 @@
+/* -----------------------------------------------------------------------------
+   Component: Treeviews / Branch
+----------------------------------------------------------------------------- */
+
+// List
+// -----------------------------------------------------------------------------
+
+.tree-list {
+  background-color: @tree-bg-color;
+  alternate-background-color: @tree-bg-color-alt;
+  border: 0;
+  margin: 0;
+  outline: 0;
+  &::item {
+    color: @text-color;
+    &:selected {
+      .selected-primary; // base/mixins.less
+    }
+    &:focus {
+      border: 0;
+      outline: 0;
+    }
+  }
+}
+
+// Branch Size 22
+// -----------------------------------------------------------------------------
+
+.branch-22 {
+  &:adjoins-item {
+    border-image: url('@{img-url}/tree_branch-end.png') 0;
+  }
+  &:has-siblings {
+    border-image: url('@{img-url}/tree_vline.png') 0;
+    &:adjoins-item {
+      border-image: url('@{img-url}/tree_branch-more.png') 0;
+    }
+  }
+  &:has-children {
+    &:closed {
+      border-image: none;
+      image: url('@{img-url}/tree_branch-closed_nosib.png');
+    }
+    &:open {
+      border-image: none;
+      image: url('@{img-url}/tree_branch-open_nosib.png');
+    }
+    &:has-siblings {
+      &:closed {
+        border-image: none;
+        image: url('@{img-url}/tree_branch-closed.png');
+      }
+      &:open {
+        border-image: none;
+        image: url('@{img-url}/tree_branch-open.png');
+      }
+    }
+  }
+}
+
+// Branch Size 17
+// -----------------------------------------------------------------------------
+
+.branch-17 {
+  &:adjoins-item {
+    border-image: url('@{img-url}/tree17_branch-end.png') 0;
+  }
+  &:has-siblings {
+    border-image: url('@{img-url}/tree17_vline.png') 0;
+    &:adjoins-item {
+      border-image: url('@{img-url}/tree17_branch-more.png') 0;
+    }
+  }
+  &:has-children {
+    &:closed {
+      border-image: none;
+      image: url('@{img-url}/tree17_branch-closed_nosib.png');
+    }
+    &:open {
+      border-image: none;
+      image: url('@{img-url}/tree17_branch-open_nosib.png');
+    }
+    &:has-siblings {
+      &:closed {
+        border-image: none;
+        image: url('@{img-url}/tree17_branch-closed.png');
+      }
+      &:open {
+        border-image: none;
+        image: url('@{img-url}/tree17_branch-open.png');
+      }
+    }
+  }
+}

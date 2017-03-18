@@ -1,0 +1,30 @@
+// -----------------------------------------------------------------------------
+// Mixins
+// -----------------------------------------------------------------------------
+
+// Common Typography
+// -----------------------------------------------------------------------------
+
+@text-weight: normal;
+@text-size: 12px;
+@text-family-base: 'Segoe UI', 'Helvetica', 'Ubuntu', 'Arial', sans-serif;
+@text-family-code: 'Courier New', 'Monaco', monospace;
+
+.text-regular() {
+  font: @text-weight @text-size @text-family-base;
+}
+.text-code() {
+  font: @text-weight @text-size @text-family-code;
+}
+
+// Selected Objects and Hover States
+// -----------------------------------------------------------------------------
+
+.selected-primary() {
+  background-color: @selected-bg-color;
+  color: @selected-text-color;
+}
+.selected-secondary() {
+  background-color: @selected-bg-color-secondary;
+  color: @selected-text-color-secondary;
+}

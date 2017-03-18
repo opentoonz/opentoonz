@@ -1,0 +1,55 @@
+/* -----------------------------------------------------------------------------
+   Mods: Scroll Bars
+----------------------------------------------------------------------------- */
+
+// This removes the top/right borders from the vertical bar and the left/bottom
+// borders from the horizontal bar.
+//
+// This mod was designed to be used with #FileBrowser and #PaletteViewer so that
+// the QScrollBar sits flush against #DockSeparator and QToolBars, etc.
+// May also be used in other places...
+
+.mods {
+  &.scrollbars-01 {
+    &:horizontal {
+      margin-bottom: 0;
+      height: 16px;
+    }
+    &:vertical {
+      margin-right: 0;
+      width: 16px;
+    }
+
+    &::handle {
+      &:horizontal {
+        margin: 1px 16px 0 16px;
+      }
+      &:vertical {
+        margin: 16px 0 16px 1px;
+      }
+    }
+
+    &:add-line { // right
+      &:horizontal {
+        margin-bottom: 0;
+        margin-right: 0;
+      }
+      &:vertical { // bottom
+        margin-right: 0;
+        margin-bottom: 0;
+      }
+    }
+
+    &:sub-line {
+      &:horizontal { // left
+        margin-right: 0;
+        margin-bottom: 0;
+        margin-left: 0;
+      }
+      &:vertical { // up
+        margin-top: 0;
+        margin-right: 0;
+      }
+    }
+  }
+}

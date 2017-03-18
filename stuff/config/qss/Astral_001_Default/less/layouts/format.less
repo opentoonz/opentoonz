@@ -1,0 +1,93 @@
+/* -----------------------------------------------------------------------------
+   Cleanup Settings
+----------------------------------------------------------------------------- */
+
+#CleanupSettings {
+  & QLabel {}
+  // Space out the boxes vertically
+  & #CleanupSettingsFrame {
+    margin-top: 2px;
+    margin-bottom: 4px;
+  }
+  & QGroupBox {
+    margin-bottom: 3px;
+  }
+}
+
+#CleanupSettingsFrame {
+  // I've added some margin to #CleanupSettings QDockWidget ONLY (see above).
+  // Because I have a feeling this might be used elsewhere...
+  &:extend(.box-base all); // components/borders.less
+}
+
+#CleanupSettingsShowButton {
+  &:extend(.button-show all); // components/buttons.less
+}
+
+ParamsPage {
+  qproperty-TextColor: @text-color;
+}
+
+/* -----------------------------------------------------------------------------
+   Camera Settings
+----------------------------------------------------------------------------- */
+
+#CameraSettingsButton {
+  padding: 2px;
+}
+
+#CameraSettingsRadioButton {
+  &::indicator {
+    // Apply a button style
+    &:extend(.button-tool all); // components/buttons.less
+    // Apply an icon
+    &:extend(.icon-lock all); // components/icons.less
+  }
+}
+
+#CameraSettingsDPI {
+  color: @label-title;
+}
+
+#CameraSettingsRadioButton_Small {
+  padding: 0;
+  &::indicator {
+    &:extend(.button-radio all); // components/buttons.less
+    background-color: transparent; // Fills the height
+    border: 0;
+    height: 21px; // Gives more hit detection (requires background property)
+    margin: 0;
+    padding: 0;
+    width: 11px;
+  }
+}
+
+#ForceSquaredPixelButton { // "FSP"
+  // Apply a button style
+  &:extend(.button-tool all); // components/buttons.less
+  // Apply an icon
+  &:extend(.icon-fsp all); // components/icons.less
+  // Remove margin... else SVG gets crushed
+  margin: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Output Settings
+----------------------------------------------------------------------------- */
+
+#OutputSettingsLabel {
+  color: @label-title;
+  font-weight: bold;
+}
+
+#OutputSettingsBox {
+  &:extend(.box-base all); // components/borders.less
+}
+
+#OutputSettingsCameraBox {
+  &:extend(.box-base all); // components/borders.less
+}
+
+#OutputSettingsShowButton {
+  &:extend(.button-show all); // components/buttons.less
+}

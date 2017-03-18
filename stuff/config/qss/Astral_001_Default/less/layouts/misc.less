@@ -1,0 +1,48 @@
+/* -----------------------------------------------------------------------------
+   Misc 
+----------------------------------------------------------------------------- */
+
+#MatchLineButton {
+    background-color: lighten(@bg, 15%);
+    &::pressed {
+        background-color: lighten(@bg, 30%);
+    }
+}
+
+#LargeSizedText {
+    font-size: 17px;
+}
+
+/* -----------------------------------------------------------------------------
+   Unknowns
+----------------------------------------------------------------------------- */
+
+// Below are classes I couldn't locate in the app so I was not able to test
+// them - I left the properties as they were from the gray072 theme.
+
+// If you find a bug or a complaint, it may be due to one or more of these.
+
+#StartupLabel {
+    padding: 3px;
+    &:hover {
+        background: lighten(@bg, 10%);
+    }
+}
+
+QStatusBar {
+  background-color: rgb(192,192,192);
+  &::item {
+    border: 0;
+  }
+  & QLabel {
+    background-color: rgb(192,192,192);
+  }
+  & #StatusBarLabel {
+    background-color: rgb(255,255,255);
+    padding: 1px 3px;
+  }
+}
+
+#TitleTxtLabel {
+  color: @label-title;
+}
