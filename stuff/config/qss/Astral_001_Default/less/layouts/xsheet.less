@@ -152,10 +152,12 @@ XsheetViewer {
 FunctionTreeView {
   qproperty-TextColor: @function-treeview-text-color;
   qproperty-CurrentTextColor: @function-treeview-text-color-selected;
+  & QScrollBar {
+    &:extend(.mods.scrollbars-01 all); // mods/scrollbars.less
+  }
 }
 
 FunctionPanel {
-  font-weight: bold;
   qproperty-BGColor: @function-panel-bg-color;
   qproperty-ValueLineColor: @function-panel-ValueLine-color;
   qproperty-FrameLineColor: @function-panel-FrameLine-color;
@@ -191,7 +193,6 @@ SpreadsheetViewer {
 #ExpressionField {
   background-color: @function-ExpressionFieldBG-color;
 	border: 1px solid @function-ExpressionFieldBorder-color;
-  font-weight: bold;
 	margin: 0;
 }
 

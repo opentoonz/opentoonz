@@ -3,7 +3,6 @@
 ----------------------------------------------------------------------------- */
 
 QWidget {
-  .text-regular; // base/mixins.less
   background-color: @bg;
   color: @text-color;
   &:disabled {
@@ -23,7 +22,6 @@ QFrame {
 
 QToolTip,
 #helpToolTip {
-  .text-regular; // base/mixins.less
   background-color: @tooltip-bg-color;
   border: 1px solid @tooltip-border-color;
   color: @tooltip-text-color;
@@ -104,7 +102,8 @@ QMenuBar {
     background-color: @rooms-tab-bg-color;
     border-color: @rooms-tab-border-color;
     color: @rooms-tab-text-color;
-    padding: 1px 7px 1px 7px;
+    padding-top: 1px;
+    padding-bottom: 1px;
     margin-bottom: 0;
     &:selected {
       background-color: @rooms-tab-bg-color-selected;
@@ -170,7 +169,6 @@ QMenu {
 TPanelTitleBar {
   background-color: @title-bg-color;
   border-bottom: 1px solid @title-border-color;
-  font-weight: bold;
   height: @title-size;
   min-height: @title-size;
   qproperty-TitleColor: @title-text-color;

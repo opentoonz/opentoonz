@@ -121,11 +121,11 @@ PaletteViewer QToolBar QToolButton:pressed {
 }
 .button-radio:unchecked,
 #CameraSettingsRadioButton_Small::indicator:unchecked {
-  image: url('imgs/white/radiobutton_unchecked.svg');
+  image: url('imgs/white/radiobutton_unchecked.png');
 }
 .button-radio:checked,
 #CameraSettingsRadioButton_Small::indicator:checked {
-  image: url('imgs/white/radiobutton_checked.svg');
+  image: url('imgs/white/radiobutton_checked.png');
 }
 /* -----------------------------------------------------------------------------
    Component: Group Boxes
@@ -155,23 +155,23 @@ QGroupBox,
 .icon-lock:unchecked,
 #CameraSettingsRadioButton::indicator:unchecked,
 #EditToolLockButton::indicator:unchecked {
-  image: url('imgs/white/cam_unlock.svg');
+  image: url('imgs/white/cam_unlock.png');
 }
 .icon-lock:checked,
 #CameraSettingsRadioButton::indicator:checked,
 #EditToolLockButton::indicator:checked {
-  image: url('imgs/white/cam_lock.svg');
+  image: url('imgs/white/cam_lock.png');
 }
 .icon-fsp,
 #ForceSquaredPixelButton {
   height: 16px;
-  image: url('imgs/white/fsp_unchecked.svg');
+  image: url('imgs/white/fsp_unchecked.png');
   padding: 1px;
   width: 16px;
 }
 .icon-fsp:checked,
 #ForceSquaredPixelButton:checked {
-  image: url('imgs/white/fsp_checked.svg');
+  image: url('imgs/white/fsp_checked.png');
 }
 .icon-fsp:checked:hover,
 #ForceSquaredPixelButton:checked:hover {
@@ -391,7 +391,6 @@ ProjectPopup QTreeView::item:focus,
    Main
 ----------------------------------------------------------------------------- */
 QWidget {
-  font: normal 12px 'Segoe UI', 'Helvetica', 'Ubuntu', 'Arial', sans-serif;
   background-color: #484848;
   color: #bfbfbf;
 }
@@ -408,7 +407,6 @@ QFrame {
 ----------------------------------------------------------------------------- */
 QToolTip,
 #helpToolTip {
-  font: normal 12px 'Segoe UI', 'Helvetica', 'Ubuntu', 'Arial', sans-serif;
   background-color: #ffffe1;
   border: 1px solid #000;
   color: #000;
@@ -480,7 +478,8 @@ QMenuBar::item:pressed {
   background-color: #343434;
   border-color: #222222;
   color: #999999;
-  padding: 1px 7px 1px 7px;
+  padding-top: 1px;
+  padding-bottom: 1px;
   margin-bottom: 0;
 }
 #TopBarTab::tab:selected {
@@ -536,7 +535,6 @@ QMenu::indicator {
 TPanelTitleBar {
   background-color: #3b3b3b;
   border-bottom: 1px solid #292929;
-  font-weight: bold;
   height: 20px;
   min-height: 20px;
   qproperty-TitleColor: #a6a6a6;
@@ -893,7 +891,7 @@ QSlider::groove:horizontal {
 }
 QSlider::handle:horizontal {
   background-color: transparent;
-  image: url('imgs/white/slider_handle.svg');
+  image: url('imgs/white/slider_handle.png');
   margin: -6px 0;
   width: 14px;
 }
@@ -1022,7 +1020,6 @@ ParamsPage {
 ----------------------------------------------------------------------------- */
 #OutputSettingsLabel {
   color: #94afe2;
-  font-weight: bold;
 }
 /* -----------------------------------------------------------------------------
    Misc 
@@ -1068,8 +1065,7 @@ QStatusBar #StatusBarLabel {
   margin-left: -4px;
 }
 #StyleEditor #bottomWidget {
-  border-bottom: 1px solid #292929;
-  padding: 3px 2px;
+  padding: 3px 2px 8px 3px;
 }
 #HexagonalColorWheel {
   qproperty-BGColor: #484848;
@@ -1119,10 +1115,6 @@ QStatusBar #StatusBarLabel {
 #PlainColorPageParts #tasksRemoveBox,
 #PlainColorPageParts #tasksAddBox {
   max-width: 35px;
-}
-#colorSliderLabel,
-#colorSliderField {
-  font-weight: bold;
 }
 /* -----------------------------------------------------------------------------
    Palette Viewer / Studio Palette
@@ -1242,7 +1234,7 @@ FxSettings QToolBar QToolBar {
    Script Console
 ----------------------------------------------------------------------------- */
 #ScriptConsole {
-  font: normal 12px 'Courier New', 'Monaco', monospace;
+  font-family: 'Courier New', 'Monaco', monospace;
   border: 0;
   color: #000;
   padding: 3px;
@@ -1516,7 +1508,6 @@ FunctionTreeView {
   qproperty-CurrentTextColor: #E66464;
 }
 FunctionPanel {
-  font-weight: bold;
   qproperty-BGColor: #3b3b3b;
   qproperty-ValueLineColor: #484848;
   qproperty-FrameLineColor: #606060;
@@ -1548,7 +1539,6 @@ SpreadsheetViewer {
 #ExpressionField {
   background-color: #e6e6e6;
   border: 1px solid #333;
-  font-weight: bold;
   margin: 0;
 }
 #FunctionSegmentViewerLinkButton {
@@ -1570,6 +1560,7 @@ SpreadsheetViewer {
 #FileBrowser QScrollBar:horizontal,
 PaletteViewer QScrollBar:horizontal,
 #ShortcutTree QScrollBar:horizontal,
+FunctionTreeView QScrollBar:horizontal,
 #SceneCast QScrollBar:horizontal {
   margin-bottom: 0;
   height: 16px;
@@ -1578,6 +1569,7 @@ PaletteViewer QScrollBar:horizontal,
 #FileBrowser QScrollBar:vertical,
 PaletteViewer QScrollBar:vertical,
 #ShortcutTree QScrollBar:vertical,
+FunctionTreeView QScrollBar:vertical,
 #SceneCast QScrollBar:vertical {
   margin-right: 0;
   width: 16px;
@@ -1586,6 +1578,7 @@ PaletteViewer QScrollBar:vertical,
 #FileBrowser QScrollBar::handle:horizontal,
 PaletteViewer QScrollBar::handle:horizontal,
 #ShortcutTree QScrollBar::handle:horizontal,
+FunctionTreeView QScrollBar::handle:horizontal,
 #SceneCast QScrollBar::handle:horizontal {
   margin: 1px 16px 0 16px;
 }
@@ -1593,6 +1586,7 @@ PaletteViewer QScrollBar::handle:horizontal,
 #FileBrowser QScrollBar::handle:vertical,
 PaletteViewer QScrollBar::handle:vertical,
 #ShortcutTree QScrollBar::handle:vertical,
+FunctionTreeView QScrollBar::handle:vertical,
 #SceneCast QScrollBar::handle:vertical {
   margin: 16px 0 16px 1px;
 }
@@ -1600,6 +1594,7 @@ PaletteViewer QScrollBar::handle:vertical,
 #FileBrowser QScrollBar:add-line:horizontal,
 PaletteViewer QScrollBar:add-line:horizontal,
 #ShortcutTree QScrollBar:add-line:horizontal,
+FunctionTreeView QScrollBar:add-line:horizontal,
 #SceneCast QScrollBar:add-line:horizontal {
   margin-bottom: 0;
   margin-right: 0;
@@ -1608,6 +1603,7 @@ PaletteViewer QScrollBar:add-line:horizontal,
 #FileBrowser QScrollBar:add-line:vertical,
 PaletteViewer QScrollBar:add-line:vertical,
 #ShortcutTree QScrollBar:add-line:vertical,
+FunctionTreeView QScrollBar:add-line:vertical,
 #SceneCast QScrollBar:add-line:vertical {
   margin-right: 0;
   margin-bottom: 0;
@@ -1616,6 +1612,7 @@ PaletteViewer QScrollBar:add-line:vertical,
 #FileBrowser QScrollBar:sub-line:horizontal,
 PaletteViewer QScrollBar:sub-line:horizontal,
 #ShortcutTree QScrollBar:sub-line:horizontal,
+FunctionTreeView QScrollBar:sub-line:horizontal,
 #SceneCast QScrollBar:sub-line:horizontal {
   margin-right: 0;
   margin-bottom: 0;
@@ -1625,6 +1622,7 @@ PaletteViewer QScrollBar:sub-line:horizontal,
 #FileBrowser QScrollBar:sub-line:vertical,
 PaletteViewer QScrollBar:sub-line:vertical,
 #ShortcutTree QScrollBar:sub-line:vertical,
+FunctionTreeView QScrollBar:sub-line:vertical,
 #SceneCast QScrollBar:sub-line:vertical {
   margin-top: 0;
   margin-right: 0;
