@@ -1,0 +1,90 @@
+/* -----------------------------------------------------------------------------
+   Component: Button Styles
+----------------------------------------------------------------------------- */
+
+// Show (+/-) Button
+// -----------------------------------------------------------------------------
+
+.button-show {
+  image: url('@{img-url}/plus.png');
+  image-position: center center;
+  margin: 0;
+  padding: 0;
+  &:checked {
+    background-color: @button-bg-color;
+    border-color: @button-border-color;
+    image: url('@{img-url}/minus.png');
+    &:pressed {
+      background-color: @button-bg-color-pressed;
+      border-color: @button-border-color-pressed;
+    }
+    &:hover {
+      background-color: @button-bg-color-hover;
+    }
+  }
+}
+
+// Tool Button
+// -----------------------------------------------------------------------------
+
+.button-tool {
+  background-color: @bg;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  margin: 1px;
+  padding: 0;
+  &:hover {
+    background-color: @button-bg-color;
+    border-color: @button-border-color;
+  }
+  &:pressed {
+    background-color: @button-bg-color-pressed;
+    border-color: @button-border-color-pressed;
+  }
+  &:checked {
+    background-color: @button-bg-color-checked;
+    border-color: @button-border-color-checked;
+  }
+  &:disabled {
+    color: @text-color-disabled;
+  }
+  &::menu-indicator {
+    image: none;
+  }
+  &::menu-button {
+    border-image: none;
+  }
+  & QLabel {
+    margin-top: 1px;
+  }
+  & QToolBar {
+    border: 0;
+  }
+}
+
+// Minimalist Flat/Highlight Button
+// -----------------------------------------------------------------------------
+
+.button-flat {
+  background-color: none;
+  border: 0;
+  border-radius: 0;
+  &:hover {
+    background-color: @selected-bg-color-secondary;
+  }
+  &:pressed {
+    background-color: @accent1;
+  }
+}
+
+// Radio Button
+// -----------------------------------------------------------------------------
+
+.button-radio {
+  &:unchecked {
+    image: url('@{img-url}/@{radiobutton-img-unchecked}');
+  }
+  &:checked {
+    image: url('@{img-url}/@{radiobutton-img-checked}');
+  }
+}

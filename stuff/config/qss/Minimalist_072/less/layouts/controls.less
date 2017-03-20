@@ -1,0 +1,197 @@
+/* -----------------------------------------------------------------------------
+   UI Controls
+----------------------------------------------------------------------------- */
+
+QPushButton {
+  background-color: @button-bg-color;
+  border: 1px solid @button-border-color;
+  border-radius: 2px;
+  color: @button-text-color;
+  padding: 3px 15px;
+  &:hover {
+    background-color: @button-bg-color-hover;
+    border-color: @button-border-color-hover;
+    color: @button-text-color-hover;
+  }
+  &:pressed {
+    background-color: @button-bg-color-pressed;
+    border-color: @button-border-color-pressed;
+    color: @button-text-color-pressed;
+  }
+  &:checked {
+    background-color: @button-bg-color-checked;
+    border-color: @button-border-color-checked;
+    color: @button-text-color-checked;
+    &:hover {
+      background-color: @button-bg-color-checked-hover;
+    }
+  }
+  &:disabled {
+    background-color: @button-bg-color-disabled;
+    border-color: @button-border-color-disabled;
+    color: @button-text-color-disabled;
+  }
+}
+
+#PushButton_NoPadding {
+  padding: 3px;
+}
+
+/* Camera Capture */
+
+#GearButton {
+    qproperty-icon: url('@{img-url}/gear.png');
+}
+
+#SubfolderButton {
+    qproperty-icon: url('@{img-url}/subfolder.png');
+}
+
+/* -------------------------------------------------------------------------- */
+
+QComboBox {
+  &:extend(QPushButton);
+  padding: 1px 0 1px 5px;
+  &:hover {
+    &:extend(QPushButton:hover);
+  }
+  &:checked {
+    &:extend(QPushButton:pressed);
+  }
+  &:disabled {
+    &:extend(QPushButton:disabled);
+  }
+  &::drop-down {
+    border: 0;
+  }
+  &::down-arrow {
+    image: url('@{img-url}/combo_down_arrow.png');
+    &:disabled {
+      image: url('@{img-url}/combo_down_arrow-disabled.png');
+    }
+  }
+  & QAbstractItemView {
+    background-color: @menu-bg-color;
+    border: 1px solid @menu-border-color;
+    selection-background-color: @selected-bg-color;
+    selection-color: @selected-text-color;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+QLineEdit {
+  background-image: url('@{img-url}/@{input-bg-img}');
+  background-repeat: repeat-x;
+  background-color: @input-bg-color;
+  border: 1px solid @input-border-color;
+  border-radius: 2px;
+  color: @input-text-color;
+  selection-background-color: @selected-bg-color;
+  selection-color: @selected-text-color;
+  &:focus {
+    border-color: @focus-color;
+  }
+  &:disabled {
+    background-color: @input-bg-color-disabled;
+    border-color: @input-border-color-disabled;
+    color: @input-text-color-disabled;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+QCheckBox {
+  color: @text-color;
+  &:hover {
+    color: @checkbox-text-color-hover;
+  }
+  &:disabled {
+    color: @text-color-disabled;
+  }
+  &::indicator {
+    background-color: @checkbox-bg-color;
+    border: 1px solid @checkbox-border-color;
+    border-radius: 2px;
+    height: 9px; // fix for QGroupBox
+    padding: 1px;
+    width: 9px; // fix for QMenu
+    &:hover {
+      background-color: @checkbox-bg-color-hover;
+      border-color: @checkbox-border-color-hover;
+    }
+    &:checked {
+      background-color: @checkbox-bg-color-checked;
+      border-color: @checkbox-border-color-checked;
+      image: url('@{img-url}/check_indicator.png');
+      &:hover {
+        &:extend(QCheckBox::indicator:hover);
+      }
+      &:disabled {
+        background-color: @checkbox-bg-color-disabled;
+        border-color: @checkbox-border-color-disabled;
+        image: url('@{img-url}/check_indicator-disabled.png');
+      }
+    }
+    &:disabled {
+      background-color: @checkbox-bg-color-disabled;
+      border-color: @checkbox-border-color-disabled;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+QGroupBox {
+  &:extend(.box-base); // components/borders.less
+  margin: 6px 0 0 0;
+  padding: 5px 0px;
+  &::title {
+    subcontrol-origin: margin;
+    left: 15px;
+    margin: -3px 0 0 0;
+    padding: 0 3px;
+    &:disabled {
+      color: @text-color-disabled;
+    }
+  }
+  &::indicator {
+    &:extend(QCheckBox::indicator all);
+    subcontrol-origin: margin;
+    margin-top: 2px;
+  }
+  &:disabled {
+    color: @text-color-disabled;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+QSlider {
+  &::groove:horizontal {
+    background-color: @slider-groove-color;
+    margin: 6px 0;
+  }
+  &::handle:horizontal {
+    background-color: transparent;
+    image: url('@{img-url}/slider_handle.png');
+    margin: -6px 0;
+    width: 14px;
+  }
+}
+
+// IMO this could be re-implemented, it's not very pretty but there isn't
+// much we can do with QSS.
+
+#IntPairField, 
+#DoublePairField {
+	qproperty-LightLineColor: @slider-groove-color;
+  qproperty-LightLineEdgeColor: @slider-groove-color; // new
+	qproperty-DarkLineColor: @slider-groove-color;
+  qproperty-MiddleLineColor: @slider-groove-color; // new
+	qproperty-HandleLeftPixmap: url("@{img-url}/slider_left_handle.png");
+	qproperty-HandleRightPixmap: url("@{img-url}/slider_right_handle.png");
+
+	qproperty-HandleLeftGrayPixmap: url("@{img-url}/h_slider_left_disabled.png");
+  qproperty-HandleRightGrayPixmap: url("@{img-url}/h_slider_right_disabled.png");
+}

@@ -1,0 +1,58 @@
+/* -----------------------------------------------------------------------------
+   Schematic Node Viewer
+----------------------------------------------------------------------------- */
+
+#SchematicBottomFrame {
+  background-color: @bg;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#SchematicSceneViewer {
+  background-color: @schematic-viewer-bg-color;
+  border-bottom: 1px solid @accent1;
+}
+
+/* -----------------------------------------------------------------------------
+   FX Settings
+----------------------------------------------------------------------------- */
+
+// Technically a popup 'window' but I'm placing it here regardless.
+
+#FxSettingsTabBar {
+  &:extend(.tab-container all); // components/tabs.less
+  &::tab {
+    // We use round tabs here because the entire window has margin...
+    &:extend(.tab-round all); // components/tabs.less
+  }
+}
+
+FxSettings {
+  & QToolBar {
+    min-height: 20px; // Prevent shrink
+    padding: 0;
+    & QToolBar {
+      border: 0;
+    }
+  }
+}
+
+#FxSettingsLabel {
+  color: @schematic-label-text-color;
+}
+
+#FxSettingsHelpButton {
+  background-color: @schematic-help-button-bg-color;
+  color: #000;
+  // Remove vertical padding... else text gets clipped
+  padding-top: 0;
+  padding-bottom: 0;
+  &:hover {
+    background-color: @schematic-help-button-bg-color-hover;
+  }
+}
+
+#FxSettingsPreviewShowButton {
+  &:extend(.button-show all); // components/buttons.less
+}

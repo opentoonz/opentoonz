@@ -1,0 +1,16 @@
+/* -----------------------------------------------------------------------------
+   Film Strip
+----------------------------------------------------------------------------- */
+
+#FilmStrip {
+  QAbstractScrollArea { // Applies BG color to panel
+    background-color: @filmstrip-bg-color;
+  }
+  QComboBox {
+    border-radius: 0;
+    border-width: 0;
+    & QAbstractItemView { // Override QAbstractScrollArea (above)
+      background-color: @menu-bg-color;
+    }
+  }
+}

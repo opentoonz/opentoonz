@@ -1,0 +1,69 @@
+/* -----------------------------------------------------------------------------
+   Popup Windows
+----------------------------------------------------------------------------- */
+
+QDialog {
+  background-color: @bg;
+  & #dialogButtonFrame {
+    background-color: @dialog-bg-color;
+    border-top: 1px solid @accent1;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Scene Settings
+----------------------------------------------------------------------------- */
+
+#SceneSettings {
+  & QLabel {
+    color: @text-color;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Preferences
+----------------------------------------------------------------------------- */
+
+#PreferencesPopup {
+  & QListWidget {
+    &:extend(.tree-list all); // components/treeviews.less
+    border: 1px solid @accent1;
+    &::item {
+      border: 0; // Removes indent
+      padding: 3px;
+      &:hover {
+        .selected-secondary; // base/mixins.less
+      }
+      &:selected {
+        .selected-primary; // base/mixins.less
+      }
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Keyboard Shortcuts
+----------------------------------------------------------------------------- */
+
+#ShortcutTree {
+  &:extend(.tree-list all); // components/treeviews.less
+  alternate-background-color: @browser-itemview-bg-color-alt;
+  border: 1px solid @accent1;
+  &::branch { // Size "17"
+    &:extend(.branch-17 all); // components/treeviews.less
+  }
+  & QScrollBar {
+    &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   New Project / Configure Project Window
+----------------------------------------------------------------------------- */
+
+ProjectPopup {
+    & QLabel {}
+    & QTreeView {
+      &:extend(.tree-list all); // components/treeviews.less
+    }
+}
