@@ -191,8 +191,10 @@ TPalette::TPalette()
   Page *page            = addPage(pageName);
   page->addStyle(TPixel32(255, 255, 255, 0));
   page->addStyle(TPixel32(0, 0, 0, 255));
+  page->addStyle(TPixel32(255, 0, 0, 105));
   getStyle(0)->setName(L"color_0");
   getStyle(1)->setName(L"color_1");
+  getStyle(2)->setName(L"Auto_predection");
 
   for (int i = 0; i < 10; i++) m_shortcuts['0' + i] = i;
 }

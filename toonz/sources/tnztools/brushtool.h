@@ -168,14 +168,19 @@ private:
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
 
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
+
   StrokeWithNeighbours* mostSimilarStroke (StrokeWithNeighbours* stroke);
-  StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke, StrokeWithNeighbours* similarStroke, StrokeWithNeighbours* nextToSimilarStroke);
+
+  StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
+												  StrokeWithNeighbours* nextToSimilarStroke);
 
   SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
+
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
   double getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getTemporalSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
+
 
   SetOfPoints getNeighbours(const SamplePoint point);
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);

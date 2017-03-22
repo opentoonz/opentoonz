@@ -1372,8 +1372,11 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
 	// draws synthesized strokes
 	for (auto stroke : synthesizedStrokes)
+	{
+		stroke->stroke->setStyle(2);
 		addStrokeToImage(getApplication(), vi, stroke->stroke, m_breakAngles.getValue(),
 						 m_isFrameCreated, m_isLevelCreated);
+	}
 
 	//TODO: remove at production
 	//===============================================================================================
@@ -2307,7 +2310,8 @@ double AnimationAutoComplete::getSpatialSimilarity(PointWithStroke *point1, Poin
 
 }
 
-double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2)
+double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1,
+												   StrokeWithNeighbours* stroke2)
 {
     double dissimilarityScore = 0;
     std::vector<SimilarPair> similarPairs;
