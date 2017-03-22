@@ -1,11 +1,9 @@
 
 
-#include "tundo.h"
 #include "tthreadmessage.h"
 #include "tvectorimage.h"
 #include "drawutil.h"
-#include "controlpointselection.h"
-#include "tproperty.h"
+#include "controlpointeditortool.h"
 #include "tenv.h"
 
 #include "tools/tool.h"
@@ -106,102 +104,8 @@ void getSegmentParameter(ControlPointEditorStroke *cpEditor, int beforeIndex,
 }
 
 }  // namespace
-//=============================================================================
-// ControlPointEditorTool
-//-----------------------------------------------------------------------------
+ControlPointEditorTool controlPointEditorTool;
 
-class ControlPointEditorTool final : public TTool {
-  Q_DECLARE_TR_FUNCTIONS(ControlPointEditorTool)
-
-  bool m_draw;
-  bool m_isMenuViewed;
-  int m_lastPointSelected;
-  bool m_isImageChanged;
-  ControlPointSelection m_selection;
-  ControlPointEditorStroke m_controlPointEditorStroke;
-  std::pair<int, int> m_moveSegmentLimitation;  // Indici dei punti di controllo
-                                                // che limitano la curva da
-                                                // muovere
-  ControlPointEditorStroke m_moveControlPointEditorStroke;  // Usate per muovere
-                                                            // la curva durante
-                                                            // il drag.
-  TRectD m_selectingRect;
-  TPointD m_pos;
-
-  TPropertyGroup m_prop;
-  TBoolProperty
-      m_autoSelectDrawing;  // Consente di scegliere se swichare tra i livelli.
-
-  enum Action {
-    NONE,
-    RECT_SELECTION,
-    CP_MOVEMENT,
-    SEGMENT_MOVEMENT,
-    IN_SPEED_MOVEMENT,
-    OUT_SPEED_MOVEMENT
-  };
-  Action m_action;
-
-  enum CursorType { NORMAL, ADD, EDIT_SPEED, EDIT_SEGMENT, NO_ACTIVE };
-  CursorType m_cursorType;
-
-  TUndo *m_undo;
-
-  StrokeId makeStrokeId(TVectorImageP vi, int index);
-
-public:
-  ControlPointEditorTool();
-
-  ToolType getToolType() const override { return TTool::LevelWriteTool; }
-
-  void updateTranslation() override;
-
-  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
-
-  // da TSelectionOwner: chiamato quando la selezione corrente viene cambiata
-  void onSelectionChanged() { invalidate(); }
-
-  // da TSelectionOwner: chiamato quando si vuole ripristinare una vecchia
-  // selezione
-  // attualmente non usato
-  bool select(const TSelection *) { return false; }
-  ControlPointEditorStroke getControlPointEditorStroke() {
-    return m_controlPointEditorStroke;
-  };
-
-  void initUndo();
-
-  void getNearestStrokeColumnIndexes(std::vector<int> &indexes, TPointD pos);
-
-  void drawMovingSegment();
-  void drawControlPoint();
-  void draw() override;
-  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
-  void rightButtonDown(const TPointD &pos, const TMouseEvent &) override;
-
-  void moveControlPoints(const TPointD &delta);
-  void moveSpeed(const TPointD &delta, bool isIn);
-  void moveSegment(const TPointD &delta, bool dragging, bool isShiftPressed);
-
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
-  void addContextMenuItems(QMenu *menu) override;
-
-  void linkSpeedInOut(int index);
-  void unlinkSpeedInOut(int pointIndex);
-
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos) override;
-  void onEnter() override;
-  void onLeave() override;
-  bool onPropertyChanged(std::string propertyName) override;
-
-  void onActivate() override;
-  void onDeactivate() override;
-  void onImageChanged() override;
-  int getCursorId() const override;
-
-} controlPointEditorTool;
 
 //=============================================================================
 // Spline Editor Tool
@@ -219,7 +123,8 @@ ControlPointEditorTool::ControlPointEditorTool()
     , m_undo(0)
     , m_isMenuViewed(false)
     , m_moveControlPointEditorStroke()
-    , m_moveSegmentLimitation() {
+    , m_moveSegmentLimitation()
+    , m_subscribedFrameChanged(false) {
   bind(TTool::Vectors);
   m_prop.bind(m_autoSelectDrawing);
   m_selection.setControlPointEditorStroke(&m_controlPointEditorStroke);
@@ -236,6 +141,20 @@ StrokeId ControlPointEditorTool::makeStrokeId(TVectorImageP vi, int index) {
   TXshLevelP level        = app->getCurrentLevel()->getLevel();
 
   return StrokeId{xsh, TXshCell(level, getFrameId()), vi->getStroke(index)};
+}
+
+//-----------------------------------------------------------------------------
+
+void ControlPointEditorTool::subscribeFrameChanged() {
+  if (m_subscribedFrameChanged)
+    return;
+
+  TTool::Application *app = TTool::getApplication();
+  TFrameHandle *handle = app->getCurrentFrame();
+  handle->connect(handle, &TFrameHandle::frameSwitched, this, &ControlPointEditorTool::frameSwitched);
+  m_subscribedFrameChanged = true;
+
+  frameSwitched();
 }
 
 //-----------------------------------------------------------------------------
@@ -372,6 +291,8 @@ void ControlPointEditorTool::drawControlPoint() {
 void ControlPointEditorTool::draw() {
   TVectorImageP vi(getImage(false));
   if (!m_draw) return;
+
+  subscribeFrameChanged();
 
   int currentStroke = m_controlPointEditorStroke.getStrokeIndex();
   if (!vi || currentStroke == -1 ||
@@ -909,6 +830,15 @@ int ControlPointEditorTool::getCursorId() const {
   default:
     return ToolCursor::SplineEditorCursor;
   }
+}
+
+//---------------------------------------------------------------------------
+
+void ControlPointEditorTool::frameSwitched() {
+  TTool::Application *app = TTool::getApplication();
+  int frame = app->getCurrentFrame()->getFrame();
+  m_controlPointEditorStroke.setFrame(frame);
+  m_moveControlPointEditorStroke.setFrame(frame);
 }
 
 //=============================================================================

@@ -12,6 +12,7 @@ set(MOC_HEADERS
     rgbpickertool.h
     rulertool.h
     stylepickertool.h
+	controlpointeditortool.h
 )
 
 set(HEADERS ${MOC_HEADERS}
