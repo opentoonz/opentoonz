@@ -203,9 +203,9 @@ color, which
 
 private:
   ChannelGroup
-      *m_stageObjects,   //!< Predefined group for stage object channels.
-      *m_pathAnimations, //!< Predefined group for strokes being animated
-      *m_fxs;            //!< Predefined group for fx parameters.
+      *m_stageObjects,    //!< Predefined group for stage object channels.
+      *m_pathAnimations,  //!< Predefined group for strokes being animated
+      *m_fxs;             //!< Predefined group for fx parameters.
 
   std::vector<Channel *> m_activeChannels;
 

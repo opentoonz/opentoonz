@@ -565,35 +565,37 @@ void ColumnArea::DrawHeader::prepare() const {
 
 //-----------------------------------------------------------------------------
 const QPixmap &ColumnArea::Pixmaps::eye(bool timeline) {
-  static QPixmap eye = QPixmap(":Resources/x_prev_eye.png");
+  static QPixmap eye         = QPixmap(":Resources/x_prev_eye.png");
   static QPixmap eyeTimeline = QPixmap(":Resources/timeline_eye.png");
   return timeline ? eyeTimeline : eye;
 }
 const QPixmap &ColumnArea::Pixmaps::cameraStand(bool timeline) {
   static QPixmap cameraStand = QPixmap(":Resources/x_table_view.png");
-  static QPixmap cameraStandTimeline = QPixmap(":Resources/timeline_camstand.png");
+  static QPixmap cameraStandTimeline =
+      QPixmap(":Resources/timeline_camstand.png");
   return timeline ? cameraStandTimeline : cameraStand;
 }
 const QPixmap &ColumnArea::Pixmaps::cameraStandTransparent(bool timeline) {
   static QPixmap cameraStandTransparent =
       QPixmap(":Resources/x_table_view_transp.png");
   static QPixmap cameraStandTransparentTimeline =
-    QPixmap(":Resources/timeline_camstand_transparent.png");
-  return timeline? cameraStandTransparentTimeline : cameraStandTransparent;
+      QPixmap(":Resources/timeline_camstand_transparent.png");
+  return timeline ? cameraStandTransparentTimeline : cameraStandTransparent;
 }
 const QPixmap &ColumnArea::Pixmaps::lock(bool timeline) {
-  static QPixmap lock = QPixmap(":Resources/x_lock.png");
+  static QPixmap lock         = QPixmap(":Resources/x_lock.png");
   static QPixmap lockTimeline = QPixmap(":Resources/timeline_lock.png");
   return timeline ? lockTimeline : lock;
 }
 const QPixmap &ColumnArea::Pixmaps::sound(bool timeline) {
-  static QPixmap sound = QPixmap(":Resources/sound_header_off.png");
+  static QPixmap sound         = QPixmap(":Resources/sound_header_off.png");
   static QPixmap soundTimeline = QPixmap(":Resources/timeline_sound.png");
   return timeline ? soundTimeline : sound;
 }
 const QPixmap &ColumnArea::Pixmaps::soundPlaying(bool timeline) {
   static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
-  static QPixmap soundPlayingTimeline = QPixmap(":Resources/timeline_sound_playing.png");
+  static QPixmap soundPlayingTimeline =
+      QPixmap(":Resources/timeline_sound_playing.png");
   return timeline ? soundPlayingTimeline : soundPlaying;
 }
 const QPixmap &ColumnArea::Pixmaps::activatorActive() {
@@ -650,7 +652,7 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   QRect baseRect = o->rect(PredefinedRect::LAYER_HEADER).translated(orig);
   NumberRange frameRange = o->frameSide(baseRect);
   NumberRange layerRange = m_viewer->screenMapper()->colsToLayerAxis(
-    NumberRange(col, col + 1)); // to include unfolded sublayers
+      NumberRange(col, col + 1));  // to include unfolded sublayers
   QRect rect = o->frameLayerRect(frameRange, layerRange);
 
   int x0 = rect.left();
@@ -697,7 +699,8 @@ void ColumnArea::DrawHeader::drawEye() const {
   bool drawBackground = o->isTimeline() || column->isPreviewVisible();
   if (drawBackground) {
     QRect prevViewRect = o->rect(PredefinedRect::EYE_AREA).translated(orig);
-    QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor() : PreviewVisibleColor;
+    QColor iconBG      = o->isTimeline() ? m_viewer->getTimelineIconColor()
+                                    : PreviewVisibleColor;
     p.fillRect(prevViewRect, iconBG);
   }
 
@@ -716,18 +719,19 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
   bool drawBackground = o->isTimeline() || column->isCamstandVisible();
   if (drawBackground) {
     QRect tableViewRect =
-      o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig);
-    QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor() : CamStandVisibleColor;
+        o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig);
+    QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor()
+                                    : CamStandVisibleColor;
     p.fillRect(tableViewRect, iconBG);
   }
 
   if (!column->isCamstandVisible()) return;
 
   const QPixmap &icon = opacity < 255
-    ? Pixmaps::cameraStandTransparent(o->isTimeline())
-    : Pixmaps::cameraStand(o->isTimeline());
+                            ? Pixmaps::cameraStandTransparent(o->isTimeline())
+                            : Pixmaps::cameraStand(o->isTimeline());
   QRect tableViewImgRect =
-    o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
+      o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
   p.drawPixmap(tableViewImgRect, icon);
 }
 
@@ -739,7 +743,8 @@ void ColumnArea::DrawHeader::drawLock() const {
 
   // lock button
   p.setPen(Qt::gray);
-  QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor() : QColor (255, 255, 255, 128);
+  QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor()
+                                  : QColor(255, 255, 255, 128);
   p.setBrush(iconBG);
   p.drawRect(lockModeRect);
   p.setBrush(Qt::NoBrush);
@@ -749,19 +754,23 @@ void ColumnArea::DrawHeader::drawLock() const {
 
 void ColumnArea::DrawHeader::drawFoldUnfoldButton() const {
   if (col < 0 || isEmpty) return;
-  shared_ptr<SubLayer> rootLayer = m_viewer->screenMapper()->subLayers()->layer(column);
+  shared_ptr<SubLayer> rootLayer =
+      m_viewer->screenMapper()->subLayers()->layer(column);
   drawSubLayerFoldUnfoldButton(rootLayer, SubLayerOffsets::forLayer(orig));
 }
-void ColumnArea::DrawHeader::drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const {
+void ColumnArea::DrawHeader::drawSubLayerFoldUnfoldButton(
+    const shared_ptr<SubLayer> &subLayer,
+    const SubLayerOffsets &offsets) const {
   if (!subLayer->hasChildren()) return;
 
   QRect mouseArea = o->rect(PredefinedRect::FOLD_UNFOLD_AREA);
-  if (mouseArea.isEmpty())
-    return;
+  if (mouseArea.isEmpty()) return;
 
   QPoint offset = offsets.shifted() + mouseArea.topLeft();
-  QPainterPath triangle = o->path(subLayer->isFolded() ?
-    PredefinedPath::FOLDED : PredefinedPath::UNFOLDED).translated(offset);
+  QPainterPath triangle =
+      o->path(subLayer->isFolded() ? PredefinedPath::FOLDED
+                                   : PredefinedPath::UNFOLDED)
+          .translated(offset);
 
   QColor fillColor = m_viewer->getFoldUnfoldButtonColor();
   p.setBrush(fillColor);
@@ -928,9 +937,10 @@ void ColumnArea::DrawHeader::drawSubLayerName(const shared_ptr<SubLayer> &subLay
   p.setPen(Qt::black);
 
   QRect nameRect = o->rect(PredefinedRect::SUBLAYER_NAME)
-    .translated(offsets.name()).adjusted(2, 0, -2, 0);
+                       .translated(offsets.name())
+                       .adjusted(2, 0, -2, 0);
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
-    subLayer->name());
+             subLayer->name());
 }
 
 void ColumnArea::DrawHeader::drawParentHandleName() const {
@@ -969,18 +979,18 @@ void ColumnArea::DrawHeader::drawFilterColor() const {
 
 void ColumnArea::DrawHeader::drawNoSoundIcon() const {
   if (col < 0 || isEmpty) return;
-  QRect rect = m_viewer->orientation()->rect(PredefinedRect::SOUND_ICON)
-    .translated(orig);
-  if (o->isTimeline())
-    p.fillRect(rect, m_viewer->getTimelineIconColor());
+  QRect rect = m_viewer->orientation()
+                   ->rect(PredefinedRect::SOUND_ICON)
+                   .translated(orig);
+  if (o->isTimeline()) p.fillRect(rect, m_viewer->getTimelineIconColor());
 }
 void ColumnArea::DrawHeader::drawSoundIcon(bool isPlaying) const {
   QRect rect = m_viewer->orientation()
                    ->rect(PredefinedRect::SOUND_ICON)
                    .translated(orig);
-  if (o->isTimeline())
-    p.fillRect(rect, m_viewer->getTimelineIconColor());
-  const QPixmap &icon = isPlaying ? Pixmaps::soundPlaying(o->isTimeline()) : Pixmaps::sound(o->isTimeline());
+  if (o->isTimeline()) p.fillRect(rect, m_viewer->getTimelineIconColor());
+  const QPixmap &icon = isPlaying ? Pixmaps::soundPlaying(o->isTimeline())
+                                  : Pixmaps::sound(o->isTimeline());
   p.drawPixmap(rect, icon);
 }
 
@@ -1034,26 +1044,29 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
   p.drawPath(head);
 }
 
-void ColumnArea::DrawHeader::drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const {
-  if (!subLayer->hasActivator())
-    return;
+void ColumnArea::DrawHeader::drawSubLayerActivator(
+    const shared_ptr<SubLayer> &subLayer,
+    const SubLayerOffsets &offsets) const {
+  if (!subLayer->hasActivator()) return;
 
-  QRect rect = o->rect(PredefinedRect::SUBLAYER_ACTIVATOR).translated(offsets.shifted());
-  const QPixmap &icon = subLayer->isActivated() ? Pixmaps::activatorActive() : Pixmaps::activatorInactive();
+  QRect rect =
+      o->rect(PredefinedRect::SUBLAYER_ACTIVATOR).translated(offsets.shifted());
+  const QPixmap &icon = subLayer->isActivated() ? Pixmaps::activatorActive()
+                                                : Pixmaps::activatorInactive();
   p.drawPixmap(rect, icon);
 }
-
 
 void ColumnArea::DrawHeader::drawSubLayers() const {
   const ScreenMapper *mapper = m_viewer->screenMapper();
   vector<shared_ptr<SubLayer>> subLayers =
-    mapper->subLayers()->layer(column)->childrenFlatTree();
+      mapper->subLayers()->layer(column)->childrenFlatTree();
 
   for (int i = 0; i < subLayers.size(); i++) {
     shared_ptr<SubLayer> subLayer = subLayers[i];
-    SubLayerOffsets offsets = mapper->subLayerOffsets(column, i);
+    SubLayerOffsets offsets       = mapper->subLayerOffsets(column, i);
 
-    QRect rect = { mapper->rect(PredefinedRect::LAYER_HEADER).translated(offsets.topLeft()) };
+    QRect rect = {mapper->rect(PredefinedRect::LAYER_HEADER)
+                      .translated(offsets.topLeft())};
     p.fillRect(rect, QBrush(m_viewer->getSubLayerColor()));
 
     drawSubLayerFoldUnfoldButton(subLayer, offsets);
@@ -1747,7 +1760,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
   m_col = -1;  // new in 6.4
 
   if (event->button() == Qt::MidButton) {
-    m_pos = event->pos();
+    m_pos       = event->pos();
     m_isPanning = true;
     return;
   }
@@ -1790,14 +1803,15 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
 
   const ScreenMapper *mapper = m_viewer->screenMapper();
   vector<shared_ptr<SubLayer>> subLayers =
-	  mapper->subLayers()->layer(column)->childrenFlatTree();
-  if (!mapper->rect(PredefinedRect::LAYER_HEADER).contains(mouseInCell) && subLayers.size()) {
-	  for (int i = 0; i < subLayers.size(); i++) {
-		  shared_ptr<SubLayer> subLayer = subLayers[i];
-		  SubLayerOffsets offsets = mapper->subLayerOffsets(column, i);
+      mapper->subLayers()->layer(column)->childrenFlatTree();
+  if (!mapper->rect(PredefinedRect::LAYER_HEADER).contains(mouseInCell) &&
+      subLayers.size()) {
+    for (int i = 0; i < subLayers.size(); i++) {
+      shared_ptr<SubLayer> subLayer = subLayers[i];
+      SubLayerOffsets offsets       = mapper->subLayerOffsets(column, i);
 
       if (mapper->rect(PredefinedRect::SUBLAYER_ACTIVATOR)
-        .contains(event->pos() - offsets.shifted()))
+              .contains(event->pos() - offsets.shifted()))
         subLayer->toggleActivator();
     }
   }

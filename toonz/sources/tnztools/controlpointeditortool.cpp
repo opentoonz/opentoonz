@@ -147,6 +147,8 @@ class ControlPointEditorTool final : public TTool {
 
   TUndo *m_undo;
 
+  StrokeId makeStrokeId(TVectorImageP vi, int index);
+
 public:
   ControlPointEditorTool();
 
@@ -223,6 +225,17 @@ ControlPointEditorTool::ControlPointEditorTool()
   m_selection.setControlPointEditorStroke(&m_controlPointEditorStroke);
 
   m_autoSelectDrawing.setId("AutoSelectDrawing");
+}
+
+//-----------------------------------------------------------------------------
+
+StrokeId ControlPointEditorTool::makeStrokeId(TVectorImageP vi, int index) {
+  TTool::Application *app = TTool::getApplication();
+  TXsheet *xsh            = app->getCurrentXsheet()->getXsheet();
+  int currentFrame        = app->getCurrentFrame()->getFrameIndex();
+  TXshLevelP level        = app->getCurrentLevel()->getLevel();
+
+  return StrokeId{xsh, TXshCell(level, getFrameId()), vi->getStroke(index)};
 }
 
 //-----------------------------------------------------------------------------
@@ -364,7 +377,7 @@ void ControlPointEditorTool::draw() {
   if (!vi || currentStroke == -1 ||
       m_controlPointEditorStroke.getControlPointCount() == 0 ||
       vi->getStrokeCount() == 0 || (int)vi->getStrokeCount() <= currentStroke) {
-    m_controlPointEditorStroke.setStroke((TVectorImage *)0, -1);
+    m_controlPointEditorStroke.unsetStroke();
     return;
   }
 
@@ -397,7 +410,7 @@ void ControlPointEditorTool::mouseMove(const TPointD &pos,
   // di controllo
   TVectorImageP vi(getImage(false));
   if (!vi) {
-    m_controlPointEditorStroke.setStroke((TVectorImage *)0, -1);
+    m_controlPointEditorStroke.unsetStroke();
     m_cursorType = NO_ACTIVE;
     return;
   } else
@@ -437,7 +450,7 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
       m_controlPointEditorStroke.getPointTypeAt(pos, maxDist2, pointIndex);
 
   if (pointType == ControlPointEditorStroke::NONE) {
-    // ho cliccato lontano dalla curva corrente
+    // clicked away from current curve
     TTool::Application *app = TTool::getApplication();
     if (m_autoSelectDrawing.getValue()) {
       // Non sono in nessun gadget
@@ -477,7 +490,7 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
         dist2 < 25 * getPixelSize() * getPixelSize()) {
       // ho cliccato vicino alla curva index-esima
       assert(0 <= index && index < vi->getStrokeCount());
-      m_controlPointEditorStroke.setStroke(vi, index);
+      m_controlPointEditorStroke.setStroke(vi, index, makeStrokeId(vi, index));
       m_action = NONE;
       m_selection.makeCurrent();
     } else {
@@ -672,9 +685,11 @@ void ControlPointEditorTool::leftButtonDrag(const TPointD &pos,
                                                 // selezione nel movimento
     moveControlPoints(delta);
     m_isImageChanged = true;
-	
-	StrokeId strokeId { getXsheet (), getImageCell(), vi->getStroke(currentStroke) };
-	getXsheet()->pathAnimations()->addStroke(strokeId)->takeSnapshot (getFrame());
+
+    StrokeId strokeId{getXsheet(), getImageCell(),
+                      vi->getStroke(currentStroke)};
+    getXsheet()->pathAnimations()->addStroke(strokeId)->takeSnapshot(
+        getFrame());
   }
   if (m_action == SEGMENT_MOVEMENT) {
     m_moveControlPointEditorStroke = *m_controlPointEditorStroke.clone();
@@ -718,7 +733,7 @@ void ControlPointEditorTool::leftButtonUp(const TPointD &pos,
   QMutexLocker lock(vi->getMutex());
 
   if (m_action == EDIT_SEGMENT) {
-    m_moveControlPointEditorStroke.setStroke((TVectorImage *)0, -1);
+    m_moveControlPointEditorStroke.unsetStroke();
     TPointD delta = pos - m_pos;
     moveSegment(delta, false, e.isShiftPressed());
   }
@@ -729,7 +744,7 @@ void ControlPointEditorTool::leftButtonUp(const TPointD &pos,
       if (!TTool::getApplication()
                ->getCurrentObject()
                ->isSpline())  // se non e' una spline deseleziono
-        m_controlPointEditorStroke.setStroke((TVectorImage *)0, -1);
+        m_controlPointEditorStroke.unsetStroke();
       m_action         = NONE;
       m_isImageChanged = false;
     } else {
@@ -825,7 +840,7 @@ void ControlPointEditorTool::onEnter() {
   if(currentStroke==-1 || !vi)
           return;
 
-  m_controlPointEditorStroke.setStroke((TVectorImage*)0, -1);
+  m_controlPointEditorStroke.unsetStroke();
 
 if(TTool::getApplication()->getCurrentObject()->isSpline())
           m_controlPointEditorStroke.setStroke(vi, 0);*/
@@ -850,7 +865,7 @@ bool ControlPointEditorTool::onPropertyChanged(std::string propertyName) {
 void ControlPointEditorTool::onActivate() {
   // TODO: getApplication()->editImageOrSpline();
   m_autoSelectDrawing.setValue(AutoSelectDrawing ? 1 : 0);
-  m_controlPointEditorStroke.setStroke((TVectorImage *)0, -1);
+  m_controlPointEditorStroke.unsetStroke();
   m_draw = true;
 }
 
@@ -868,11 +883,12 @@ void ControlPointEditorTool::onImageChanged() {
   if (!vi || currentStroke == -1 ||
       m_controlPointEditorStroke.getControlPointCount() == 0 ||
       vi->getStrokeCount() == 0 || (int)vi->getStrokeCount() <= currentStroke) {
-    m_controlPointEditorStroke.setStroke((TVectorImage *)0, -1);
+    m_controlPointEditorStroke.unsetStroke();
     return;
   } else {
     m_selection.selectNone();
-    m_controlPointEditorStroke.setStroke(vi, currentStroke);
+    m_controlPointEditorStroke.setStroke(vi, currentStroke,
+                                         makeStrokeId(vi, currentStroke));
   }
 }
 

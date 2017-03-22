@@ -147,8 +147,7 @@ TXsheet::TXsheetImp::TXsheetImp()
     , m_viewColumn(-1)
     , m_mixedSound(0)
     , m_scene(0)
-    , m_pathAnimations(nullptr) {
-}
+    , m_pathAnimations(nullptr) {}
 
 //-----------------------------------------------------------------------------
 
@@ -1455,9 +1454,7 @@ FxDag *TXsheet::getFxDag() const { return m_imp->m_fxDag; }
 
 //-----------------------------------------------------------------------------
 
-ColumnFan *TXsheet::getColumnFan() const {
-  return &m_imp->m_columnFan;
-}
+ColumnFan *TXsheet::getColumnFan() const { return &m_imp->m_columnFan; }
 
 //-----------------------------------------------------------------------------
 

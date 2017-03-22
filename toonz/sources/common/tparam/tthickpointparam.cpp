@@ -5,21 +5,24 @@
 
 class TThickPointParamImp final {
   TDoubleParamP m_x, m_y, m_thickness;
+
 public:
   TThickPointParamImp(const TThickPoint &p);
   TThickPointParamImp(const TThickPointParamImp &src);
-  ~TThickPointParamImp() { }
+  ~TThickPointParamImp() {}
 
   friend class TThickPointParam;
 };
 
-TThickPointParamImp::TThickPointParamImp(const TThickPoint &p) :
-  m_x(new TDoubleParam(p.x)), m_y(new TDoubleParam(p.y)), m_thickness(new TDoubleParam(p.thick))
-{ }
+TThickPointParamImp::TThickPointParamImp(const TThickPoint &p)
+    : m_x(new TDoubleParam(p.x))
+    , m_y(new TDoubleParam(p.y))
+    , m_thickness(new TDoubleParam(p.thick)) {}
 
-TThickPointParamImp::TThickPointParamImp(const TThickPointParamImp &src) :
-  m_x(src.m_x->clone()), m_y(src.m_y->clone()), m_thickness(src.m_thickness->clone())
-{ }
+TThickPointParamImp::TThickPointParamImp(const TThickPointParamImp &src)
+    : m_x(src.m_x->clone())
+    , m_y(src.m_y->clone())
+    , m_thickness(src.m_thickness->clone()) {}
 
 //-----------------------------------------------------------------------------
 
@@ -39,9 +42,7 @@ TThickPointParam::TThickPointParam(const TThickPointParam &src) {
   addParam(m_data->m_thickness, "thickness");
 }
 
-TThickPointParam::~TThickPointParam() {
-  delete m_data;
-}
+TThickPointParam::~TThickPointParam() { delete m_data; }
 
 void TThickPointParam::copy(TParam *src) {
   TThickPointParam *p = dynamic_cast<TThickPointParam *>(src);
@@ -54,20 +55,19 @@ void TThickPointParam::copy(TParam *src) {
 
 TThickPoint TThickPointParam::getDefaultValue() const {
   return TThickPoint(m_data->m_x->getDefaultValue(),
-    m_data->m_y->getDefaultValue(),
-    m_data->m_thickness->getDefaultValue());
+                     m_data->m_y->getDefaultValue(),
+                     m_data->m_thickness->getDefaultValue());
 }
 TThickPoint TThickPointParam::getValue(double frame) const {
-  return TThickPoint(m_data->m_x->getValue(frame),
-    m_data->m_y->getValue(frame),
-    m_data->m_thickness->getValue(frame));
+  return TThickPoint(m_data->m_x->getValue(frame), m_data->m_y->getValue(frame),
+                     m_data->m_thickness->getValue(frame));
 }
 void TThickPointParam::setValue(double frame, const TPointD &p) {
   m_data->m_x->setValue(frame, p.x);
   m_data->m_y->setValue(frame, p.y);
 }
 void TThickPointParam::setValue(double frame, const TThickPoint &p) {
-  this->setValue(frame, (const TPointD &) p);
+  this->setValue(frame, (const TPointD &)p);
   m_data->m_thickness->setValue(frame, p.thick);
 }
 void TThickPointParam::setDefaultValue(const TThickPoint &p) {
@@ -104,12 +104,6 @@ void TThickPointParam::saveData(TOStream &os) {
   os.closeChild();
 }
 
-TDoubleParamP &TThickPointParam::getX() {
-  return m_data->m_x;
-}
-TDoubleParamP &TThickPointParam::getY() {
-  return m_data->m_y;
-}
-TDoubleParamP &TThickPointParam::getThickness() {
-  return m_data->m_thickness;
-}
+TDoubleParamP &TThickPointParam::getX() { return m_data->m_x; }
+TDoubleParamP &TThickPointParam::getY() { return m_data->m_y; }
+TDoubleParamP &TThickPointParam::getThickness() { return m_data->m_thickness; }

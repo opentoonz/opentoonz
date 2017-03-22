@@ -202,9 +202,8 @@ void TColumnSelection::cloneChild() {
 //-----------------------------------------------------------------------------
 
 void TColumnSelection::hideColumns() {
-  TApp *app = TApp::instance();
-  ColumnFan *columnFan =
-      app->getCurrentXsheet()->getXsheet()->getColumnFan();
+  TApp *app            = TApp::instance();
+  ColumnFan *columnFan = app->getCurrentXsheet()->getXsheet()->getColumnFan();
   std::set<int>::iterator it = m_indices.begin();
   for (; it != m_indices.end(); ++it) columnFan->deactivate(*it);
   m_indices.clear();

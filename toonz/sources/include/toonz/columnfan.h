@@ -31,26 +31,26 @@ isActive().
 //! Shared base class
 class DVAPI ColumnFan {
 public:
-  ColumnFan() { }
-  virtual ~ColumnFan() { }
+  ColumnFan() {}
+  virtual ~ColumnFan() {}
 
   //! Set column \b col not folded.
   virtual void activate(int col) = 0;
   //! Fold column \b col.
   virtual void deactivate(int col) = 0;
-  //! Return true if column \b col is active, column is not folded, else return false.
+  //! Return true if column \b col is active, column is not folded, else return
+  //! false.
   virtual bool isActive(int col) const = 0;
 
   virtual bool isEmpty() const = 0;
-  virtual int count() const = 0;
+  virtual int count() const    = 0;
 };
 
 //! Knows which columns are folded and which are unfolded
 class DVAPI ColumnFanFoldData : public ColumnFan {
-  std::vector<bool> m_columns; // true if active
+  std::vector<bool> m_columns;  // true if active
 public:
-
-  ColumnFanFoldData() { }
+  ColumnFanFoldData() {}
 
   virtual void activate(int col) override;
   virtual void deactivate(int col) override;
@@ -71,13 +71,14 @@ colToLayerAxis() and vice versa, layerAxisToCol().
 */
 class DVAPI ColumnFanGeometry : public ColumnFan {
   class Column {
-    int m_extra; //! extra width added when the layer is unfolded
+    int m_extra;  //! extra width added when the layer is unfolded
   public:
     bool m_active;
     int m_pos;
 
-    Column() : m_active(true), m_pos(0), m_extra (0) {}
-    Column(bool active, int extra) : m_active(active), m_pos(0), m_extra (extra) { }
+    Column() : m_active(true), m_pos(0), m_extra(0) {}
+    Column(bool active, int extra)
+        : m_active(active), m_pos(0), m_extra(extra) {}
 
     int width(int unfolded) const;
   };
@@ -90,8 +91,8 @@ class DVAPI ColumnFanGeometry : public ColumnFan {
   Called by activate() and deactivate() to update columns coordinates.
   */
   void update();
-public:
 
+public:
   ColumnFanGeometry();
 
   void updateExtras(const ColumnFan *from, const std::vector<int> &extras);

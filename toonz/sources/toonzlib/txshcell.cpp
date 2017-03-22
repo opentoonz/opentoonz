@@ -61,7 +61,7 @@ TPalette *TXshCell::getPalette() const {
 }
 
 QString TXshCell::name() const {
-  QString levelName = QString::fromStdWString (m_level->getName());
+  QString levelName = QString::fromStdWString(m_level->getName());
   QString frameName = QString::number(m_frameId.getNumber());
   return levelName + ' ' + frameName;
 }

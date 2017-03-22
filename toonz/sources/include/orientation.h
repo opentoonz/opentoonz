@@ -143,8 +143,8 @@ enum class PredefinedPath {
 };
 enum class PredefinedPoint {
   KEY_HIDDEN,  //! move extender handle that much if key icons are disabled
-  EXTENDER_XY_RADIUS,        //! x and y radius for rounded rectangle
-  VOLUME_DIVISIONS_TOP_LEFT, //! where to draw volume slider
+  EXTENDER_XY_RADIUS,         //! x and y radius for rounded rectangle
+  VOLUME_DIVISIONS_TOP_LEFT,  //! where to draw volume slider
   PEGBAR_NAME
 };
 enum class PredefinedRange {
@@ -187,8 +187,7 @@ public:
                         int i) const;
   QLine foldedRectangleLine(int layerAxis, const NumberRange &frameAxis,
                             int i) const;
-  QRect foldedHeader(int layerAxis, NumberRange frameAxis,
-    int i) const;
+  QRect foldedHeader(int layerAxis, NumberRange frameAxis, int i) const;
 
   virtual CellPosition arrowShift(int direction) const = 0;
 

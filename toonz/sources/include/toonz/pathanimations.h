@@ -32,6 +32,8 @@ class TXsheet;
 class TXshCell;
 class TStroke;
 
+class PathAnimations;
+
 class DVAPI StrokeId final {
   TXsheet *m_xsheet;
   TXshCell m_cellId;
@@ -40,26 +42,29 @@ class DVAPI StrokeId final {
 public:
   StrokeId(TXsheet *xsheet, const TXshCell &cell, TStroke *stroke);
 
-  friend bool operator == (const StrokeId &a, const StrokeId &b);
-  friend bool operator < (const StrokeId &a, const StrokeId &b);
+  friend bool operator==(const StrokeId &a, const StrokeId &b);
+  friend bool operator<(const StrokeId &a, const StrokeId &b);
 
+  PathAnimations *pathAnimations() const;
   TStroke *stroke() const { return m_stroke; }
 
   QString name() const;
 };
 
-class PathAnimations;
-
 //! Keyframe data for a particular TStroke
+//! The stroke is represented by a TParamSet
+//! Its children are chunks; each chunk has a TParamSet
+//! Each chunk has 3 control points: p0, p1, p2; each corresponds a
+//! TThickPointParam
 class DVAPI PathAnimation final {
   PathAnimations *m_animations;
   StrokeId m_strokeId;
   bool m_activated;
   map<const TThickQuadratic *, TParamSetP> m_lastChunks;
-  TParamSetP m_params; //! chunk nodes
+  TParamSetP m_params;  //! chunk nodes
 public:
   PathAnimation(PathAnimations *animations, const StrokeId &strokeId);
-  ~PathAnimation() { }
+  ~PathAnimation() {}
 
   QString name() const;
 
@@ -70,14 +75,22 @@ public:
   void toggleActivated();
 
   int chunkCount() const;
-  TParamSetP chunk(int i) const;
+  TParamSetP chunkParam(int i) const;
+
+  TThickPointParamP pointParam(int chunk, int point) const;
 
   void animate(int frame) const;
+
+  int controlPointCount() const;
+  TThickPoint getControlPointPos(int cpIndex, int frame) const;
+  void setControlPointPos(int cpIndex, int frame, const TThickPoint &pos);
 
 private:
   void snapshotChunks(int atFrame);
   void setThickPointKeyframe(TThickPointParamP thickPoint, int frame);
   void setDoubleKeyframe(TDoubleParamP &param, int frame);
+
+  TThickPointParamP controlPoint(int cpIndex) const;
 };
 
 //! Storage for all strokes animation keyframes
@@ -87,7 +100,7 @@ class DVAPI PathAnimations final {
 
 public:
   PathAnimations(TXsheet *xsheet);
-  ~PathAnimations() { }
+  ~PathAnimations() {}
 
   TXsheet *xsheet() const { return m_xsheet; }
 

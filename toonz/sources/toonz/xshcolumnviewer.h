@@ -268,9 +268,12 @@ class ColumnArea final : public QWidget {
     void drawVolumeControl(double volume) const;
 
     void drawSubLayers() const;
-    void drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const;
-    void drawSubLayerName(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const;
-    void drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets) const;
+    void drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer,
+                                      const SubLayerOffsets &offsets) const;
+    void drawSubLayerName(const shared_ptr<SubLayer> &subLayer,
+                          const SubLayerOffsets &offsets) const;
+    void drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer,
+                               const SubLayerOffsets &offsets) const;
   };
 
 public:

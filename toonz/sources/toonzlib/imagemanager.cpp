@@ -161,10 +161,9 @@ bool ImageBuilder::setImageInfo(TImageInfo &info, TImageReader *ir) {
 }
 
 void ImageBuilder::invalidate() {
-  m_info = TImageInfo();
+  m_info    = TImageInfo();
   m_imFlags = ImageManager::none;
 }
-
 
 //************************************************************************************
 //    Image Manager Privates implementation

@@ -14,11 +14,12 @@ class XsheetViewer;
 //! Key screen points for displaying a sub layer (in a given ScreenMapper)
 class SubLayerOffsets {
   QPoint m_topLeft;
-  QPoint m_shifted; //! includes shift for depth in the tree of sublayers
-  QPoint m_name; //! also accounts for activator icon
+  QPoint m_shifted;  //! includes shift for depth in the tree of sublayers
+  QPoint m_name;     //! also accounts for activator icon
 
 public:
-  SubLayerOffsets(const QPoint &topLeft, const QPoint &shifted, const QPoint &name);
+  SubLayerOffsets(const QPoint &topLeft, const QPoint &shifted,
+                  const QPoint &name);
   static SubLayerOffsets forLayer(const QPoint &topLeft);
 
   QPoint topLeft() const { return m_topLeft; }
@@ -74,10 +75,18 @@ public:
 
   QRect rect(PredefinedRect which) const { return orientation()->rect(which); }
   QLine line(PredefinedLine which) const { return orientation()->line(which); }
-  int dimension(PredefinedDimension which) const { return orientation()->dimension(which); }
-  QPainterPath path(PredefinedPath which) const { return orientation()->path(which); }
-  QPoint point(PredefinedPoint which) const { return orientation()->point(which); }
-  NumberRange range(PredefinedRange which) const { return orientation()->range(which); }
+  int dimension(PredefinedDimension which) const {
+    return orientation()->dimension(which);
+  }
+  QPainterPath path(PredefinedPath which) const {
+    return orientation()->path(which);
+  }
+  QPoint point(PredefinedPoint which) const {
+    return orientation()->point(which);
+  }
+  NumberRange range(PredefinedRange which) const {
+    return orientation()->range(which);
+  }
 
   // column fan
 
@@ -85,7 +94,8 @@ public:
 
   // sub layers
 
-  SubLayerOffsets subLayerOffsets(const TXshColumn *column, int subLayerIndex) const;
+  SubLayerOffsets subLayerOffsets(const TXshColumn *column,
+                                  int subLayerIndex) const;
 };
 
 #endif

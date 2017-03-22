@@ -44,7 +44,8 @@ public:
   virtual QPoint positionRatioToXY(
       const CellPositionRatio &ratio) const override;
 
-  virtual int colToLayerAxis(int layer, const ColumnFanGeometry *fan) const override;
+  virtual int colToLayerAxis(int layer,
+                             const ColumnFanGeometry *fan) const override;
   virtual int rowToFrameAxis(int frame) const override;
 
   virtual QPoint frameLayerToXY(int frameAxis, int layerAxis) const override;
@@ -102,7 +103,8 @@ public:
   virtual QPoint positionRatioToXY(
       const CellPositionRatio &ratio) const override;
 
-  virtual int colToLayerAxis(int layer, const ColumnFanGeometry *fan) const override;
+  virtual int colToLayerAxis(int layer,
+                             const ColumnFanGeometry *fan) const override;
   virtual int rowToFrameAxis(int frame) const override;
 
   virtual QPoint frameLayerToXY(int frameAxis, int layerAxis) const override;
@@ -218,14 +220,13 @@ QLine Orientation::foldedRectangleLine(int layerAxis,
   return verticalLine(layerAxis + i * 3, frameAxis);
 }
 QRect Orientation::foldedHeader(int layerAxis, NumberRange frameAxis,
-  int i) const {
-  if (i == 1) // middle
-    frameAxis = frameAxis.adjusted(3, 0);
+                                int i) const {
+  if (i == 1)  // middle
+    frameAxis    = frameAxis.adjusted(3, 0);
   QPoint topLeft = frameLayerToXY(frameAxis.from(), layerAxis + i * 3);
-  QPoint size = frameLayerToXY(frameAxis.length(), 3);
+  QPoint size    = frameLayerToXY(frameAxis.length(), 3);
   return QRect(topLeft, QSize(size.x(), size.y()));
 }
-
 
 void Orientation::addRect(PredefinedRect which, const QRect &rect) {
   _rects.insert(pair<PredefinedRect, QRect>(which, rect));
@@ -474,14 +475,14 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
 
   int size = 4;
-  QPainterPath folded(QPointF(0, size)); // triangle down
+  QPainterPath folded(QPointF(0, size));  // triangle down
   folded.lineTo(QPointF(size, -size));
   folded.lineTo(QPointF(-size, -size));
   folded.lineTo(QPointF(0, size));
   folded.translate(eye.width() / 2, eye.height() / 2);
   addPath(PredefinedPath::FOLDED, folded);
 
-  QPainterPath unfolded(QPointF(size, 0)); // triangle right
+  QPainterPath unfolded(QPointF(size, 0));  // triangle right
   unfolded.lineTo(QPointF(-size, size));
   unfolded.lineTo(QPointF(-size, -size));
   unfolded.lineTo(QPointF(size, 0));
@@ -775,14 +776,14 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
 
   int size = 4;
-  QPainterPath folded(QPointF(size, 0)); // triangle right
+  QPainterPath folded(QPointF(size, 0));  // triangle right
   folded.lineTo(QPointF(-size, size));
   folded.lineTo(QPointF(-size, -size));
   folded.lineTo(QPointF(size, 0));
   folded.translate(eye.width() / 2, eye.height() / 2);
   addPath(PredefinedPath::FOLDED, folded);
 
-  QPainterPath unfolded(QPointF(0, size)); // triangle down
+  QPainterPath unfolded(QPointF(0, size));  // triangle down
   unfolded.lineTo(QPointF(size, -size));
   unfolded.lineTo(QPointF(-size, -size));
   unfolded.lineTo(QPointF(0, size));

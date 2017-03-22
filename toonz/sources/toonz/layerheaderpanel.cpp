@@ -66,7 +66,8 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
   p.fillRect(QRect(QPoint(0, 0), size()), background);
 
   drawIcon(p, PredefinedRect::EYE, ColumnArea::Pixmaps::eye(o->isTimeline()));
-  drawIcon(p, PredefinedRect::PREVIEW_LAYER, ColumnArea::Pixmaps::cameraStand(o->isTimeline()));
+  drawIcon(p, PredefinedRect::PREVIEW_LAYER,
+           ColumnArea::Pixmaps::cameraStand(o->isTimeline()));
   drawIcon(p, PredefinedRect::LOCK, ColumnArea::Pixmaps::lock(o->isTimeline()));
 
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);

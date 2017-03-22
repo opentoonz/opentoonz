@@ -1230,7 +1230,7 @@ TStroke::TStroke(const TStroke &other)
       other.m_imp->m_areDisabledComputeOfCaches;
   m_imp->m_flag           = other.m_imp->m_flag;
   m_imp->m_outlineOptions = other.m_imp->m_outlineOptions;
-  m_imp->m_name = other.m_imp->m_name;
+  m_imp->m_name           = other.m_imp->m_name;
 
   // Are they sure as regards exceptions ?
   m_imp->m_centerLineArray.resize(other.m_imp->m_centerLineArray.size());
@@ -3771,10 +3771,7 @@ TStroke *TStroke::create(const vector<TThickQuadratic *> &curves) {
 }
 
 QString TStroke::name() const { return m_imp->m_name; }
-void TStroke::setName(const QString &name) {
-  m_imp->m_name = name;
-}
-
+void TStroke::setName(const QString &name) { m_imp->m_name = name; }
 
 //============================================================================
 

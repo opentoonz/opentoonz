@@ -181,7 +181,9 @@ public:
       TSmartPointerT<DERIVED>::m_pointer->addRef();
   }
 
-  operator TSmartPointerT<BASE>() const { return TSmartPointerT<BASE>(getPointer()); }
+  operator TSmartPointerT<BASE>() const {
+    return TSmartPointerT<BASE>(getPointer());
+  }
 };
 
 #endif

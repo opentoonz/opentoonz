@@ -92,7 +92,7 @@ void insertPoint(TStroke *stroke, int indexA, int indexB) {
 ControlPointEditorStroke *ControlPointEditorStroke::clone() const {
   ControlPointEditorStroke *controlPointEditorStroke =
       new ControlPointEditorStroke();
-  controlPointEditorStroke->setStroke(m_vi->clone(), m_strokeIndex);
+  controlPointEditorStroke->setStroke(m_vi->clone(), m_strokeIndex, m_strokeId);
   return controlPointEditorStroke;
 }
 
@@ -425,11 +425,11 @@ void ControlPointEditorStroke::moveSingleControlPoint(int index,
   bool selfLoop = isSelfLoop();
   int cpCount = selfLoop ? m_controlPoints.size() + 1 : m_controlPoints.size();
 
-  TThickPoint p = stroke->getControlPoint(pointIndex);
+  TThickPoint p = getControlPointPos(pointIndex);
   p             = TThickPoint(p + delta, p.thick);
-  stroke->setControlPoint(pointIndex, p);
+  setControlPointPos(pointIndex, p);
   if (pointIndex == 0 && selfLoop)
-    stroke->setControlPoint(stroke->getControlPointCount() - 1, p);
+    setControlPointPos(stroke->getControlPointCount() - 1, p);
 
   // Directions must be recalculated in the linear cases
   if ((selfLoop || index > 0) && isSpeedInLinear(index)) {
@@ -453,9 +453,11 @@ void ControlPointEditorStroke::moveSingleControlPoint(int index,
 //-----------------------------------------------------------------------------
 
 void ControlPointEditorStroke::setStroke(const TVectorImageP &vi,
-                                         int strokeIndex) {
+                                         int strokeIndex,
+                                         const optional<StrokeId> &strokeId) {
   m_strokeIndex = strokeIndex;
   m_vi          = vi;
+  m_strokeId    = strokeId;
   if (!vi || strokeIndex == -1) {
     m_controlPoints.clear();
     return;
@@ -902,6 +904,24 @@ void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex,
 
 //-----------------------------------------------------------------------------
 
+shared_ptr<PathAnimation> ControlPointEditorStroke::getPathAnimation() const {
+  if (!m_strokeId)
+    throw std::runtime_error(
+        "ControlPointEditorStroke::getPathAnimation: !m_strokeId");
+  return m_strokeId->pathAnimations()->addStroke(*m_strokeId);
+}
+TThickPoint ControlPointEditorStroke::getControlPointPos(int index) const {
+  shared_ptr<PathAnimation> pathAnimation = getPathAnimation();
+  return pathAnimation->getControlPointPos(index, m_frame);
+}
+void ControlPointEditorStroke::setControlPointPos(int index,
+                                                  const TThickPoint &pos) {
+  shared_ptr<PathAnimation> pathAnimation = getPathAnimation();
+  pathAnimation->setControlPointPos(index, m_frame, pos);
+}
+
+//-----------------------------------------------------------------------------
+
 ControlPointEditorStroke::PointType ControlPointEditorStroke::getPointTypeAt(
     const TPointD &pos, double &distance2, int &index) const {
   TStroke *stroke = getStroke();
@@ -1102,7 +1122,7 @@ void ControlPointSelection::deleteControlPoints() {
     if (isSelected(i)) m_controlPointEditorStroke->deleteControlPoint(i);
 
   if (m_controlPointEditorStroke->getControlPointCount() == 0) {
-    m_controlPointEditorStroke->setStroke((TVectorImage *)0, -1);
+    m_controlPointEditorStroke->unsetStroke();
     if (!isCurrentObjectSpline) {
       UndoControlPointEditor *cpEditorUndo =
           dynamic_cast<UndoControlPointEditor *>(undo);

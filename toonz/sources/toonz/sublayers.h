@@ -43,9 +43,8 @@ class SubLayers final : public QObject {
   map<TXshCell, shared_ptr<SubLayer>> m_cellSubLayers;
 
 public:
-
   SubLayers(ScreenMapper *mapper);
-  ~SubLayers() { }
+  ~SubLayers() {}
 
   ScreenMapper *screenMapper() const { return m_mapper; }
 
@@ -77,15 +76,16 @@ class SubLayer : public QObject {
   //! reference to parent container
   SubLayers *m_subLayers;
   //! root has depth 0, its children have depth 1 and so on
-  int m_depth; 
+  int m_depth;
+
 protected:
   bool m_folded;
   //! direct descendants of this node
   vector<shared_ptr<SubLayer>> m_children;
-public:
 
+public:
   SubLayer(SubLayers *subLayers, SubLayer *parent);
-  virtual ~SubLayer() { }
+  virtual ~SubLayer() {}
 
   virtual bool hasChildren() const { return false; }
   virtual bool isFolded() const { return m_folded; }
@@ -93,7 +93,7 @@ public:
 
   virtual bool hasActivator() const { return false; }
   virtual bool isActivated() const { return false; }
-  virtual void toggleActivator() { }
+  virtual void toggleActivator() {}
 
   virtual QString name() const { return ""; }
 
@@ -114,7 +114,7 @@ signals:
 
 private:
   SubLayer(const SubLayer &from) = delete;
-  SubLayer &operator = (const SubLayer &from) = delete;
+  SubLayer &operator=(const SubLayer &from) = delete;
 };
 
 #endif

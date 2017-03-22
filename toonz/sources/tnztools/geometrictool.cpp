@@ -1249,7 +1249,8 @@ void CirclePrimitive::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 //-----------------------------------------------------------------------------
 
 TStroke *CirclePrimitive::makeStroke() const {
-  TStroke *ellipse = makeEllipticStroke(getThickness(), m_centre, m_radius, m_radius);
+  TStroke *ellipse =
+      makeEllipticStroke(getThickness(), m_centre, m_radius, m_radius);
   ellipse->setName("Circle");
   return ellipse;
 }

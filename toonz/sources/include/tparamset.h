@@ -179,7 +179,9 @@ public:
   TThickPointParam(const TThickPointParam &src);
   ~TThickPointParam();
 
-  TThickPointParam *clone() const override { return new TThickPointParam(*this); }
+  TThickPointParam *clone() const override {
+    return new TThickPointParam(*this);
+  }
   void copy(TParam *src) override;
 
   TThickPoint getDefaultValue() const;

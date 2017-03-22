@@ -156,9 +156,8 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
-    , m_screenMapper (nullptr)
-    , m_timelineIconColor(XsheetGUI::TimelineIconBackground)
-{
+    , m_screenMapper(nullptr)
+    , m_timelineIconColor(XsheetGUI::TimelineIconBackground) {
   m_screenMapper = new ScreenMapper(this);
 
   setDefaultColors();
@@ -235,8 +234,8 @@ XsheetViewer::~XsheetViewer() {
 // in case the colors are missing from .qss file
 void XsheetViewer::setDefaultColors() {
   m_foldUnfoldButtonColor = XsheetGUI::FoldUnfoldButtonColor;
-  m_subLayerColor = XsheetGUI::SubLayerColor;
-  m_subLayerBorderColor = XsheetGUI::SubLayerBorderColor;
+  m_subLayerColor         = XsheetGUI::SubLayerColor;
+  m_subLayerBorderColor   = XsheetGUI::SubLayerBorderColor;
   m_selectedSubLayerColor = XsheetGUI::SelectedSubLayerColor;
 }
 
@@ -298,7 +297,7 @@ const Orientation *XsheetViewer::orientation() const {
 
 void XsheetViewer::flipOrientation() {
   m_screenMapper->flipOrientation();
-  emit orientationChanged(orientation()); // move to ScreenMapper?
+  emit orientationChanged(orientation());  // move to ScreenMapper?
 }
 
 void XsheetViewer::onOrientationChanged(const Orientation *newOrientation) {
@@ -792,7 +791,7 @@ void XsheetViewer::showEvent(QShowEvent *) {
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
   ret = ret && connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-    SLOT(onXsheetSwitched()));
+                       SLOT(onXsheetSwitched()));
   ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
                        SLOT(onXsheetChanged()));
   ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
@@ -800,9 +799,9 @@ void XsheetViewer::showEvent(QShowEvent *) {
 
   TXsheet *xsheet = xsheetHandle->getXsheet();
   ret = ret && connect(xsheet, &TXsheet::columnFanFoldedUnfolded, this,
-    &XsheetViewer::onColumnFanFoldedUnfolded);
+                       &XsheetViewer::onColumnFanFoldedUnfolded);
   ret = ret && connect(xsheet, &TXsheet::sublayerActivatedChanged, this,
-    &XsheetViewer::updateColumnArea);
+                       &XsheetViewer::updateColumnArea);
 
   ret = ret &&
         connect(app->getCurrentSelection(),
@@ -850,7 +849,7 @@ void XsheetViewer::hideEvent(QHideEvent *) {
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
   disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-    SLOT(onXsheetSwitched()));
+             SLOT(onXsheetSwitched()));
   disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
              SLOT(onXsheetChanged()));
   disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
@@ -858,9 +857,9 @@ void XsheetViewer::hideEvent(QHideEvent *) {
 
   TXsheet *xsheet = xsheetHandle->getXsheet();
   disconnect(xsheet, &TXsheet::columnFanFoldedUnfolded, this,
-    &XsheetViewer::onColumnFanFoldedUnfolded);
+             &XsheetViewer::onColumnFanFoldedUnfolded);
   disconnect(xsheet, &TXsheet::sublayerActivatedChanged, this,
-    &XsheetViewer::updateColumnArea);
+             &XsheetViewer::updateColumnArea);
 
   disconnect(app->getCurrentSelection(),
              SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
@@ -1120,7 +1119,7 @@ void XsheetViewer::onPreferenceChanged(const QString &prefName) {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::onCurrentFrameSwitched() {
-  int row           = TApp::instance()->getCurrentFrame()->getFrame();
+  int row = TApp::instance()->getCurrentFrame()->getFrame();
   screenMapper()->updateColumnFan();
   QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
   if (visibleRect.isEmpty()) {
@@ -1479,7 +1478,7 @@ void XsheetViewer::setFrameDisplayStyle(FrameDisplayStyle style) {
 
 //-----------------------------------------------------------------------------
 
-void XsheetViewer::onColumnFanFoldedUnfolded () {
+void XsheetViewer::onColumnFanFoldedUnfolded() {
   screenMapper()->updateColumnFan();
   updateCellColumnAree();
 }

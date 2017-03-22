@@ -58,14 +58,14 @@ public:
     TFrameId m_fid;  //!< m_sl's fid at which the image will be loaded
 
     int m_subs;  //!< The subsampling factor for image loading (0 meaning either
-                 //!< 'the currently stored one' if an image is already cached, or
-                 //!< m_sl's subsampling property otherwise)
+    //!< 'the currently stored one' if an image is already cached, or
+    //!< m_sl's subsampling property otherwise)
     bool m_icon;  //!< Whether the icon (if any) should be loaded instead
 
   public:
     BuildExtData(const TXshSimpleLevel *sl, const TFrameId &fid, int subs = 0,
-      bool icon = false)
-      : m_sl(sl), m_fid(fid), m_subs(subs), m_icon(icon) {}
+                 bool icon = false)
+        : m_sl(sl), m_fid(fid), m_subs(subs), m_icon(icon) {}
   };
 
 public:
@@ -220,27 +220,29 @@ class DVAPI ImageManager final : public QObject {
 
 public:
   enum {
-    none = 0x0,
+    none           = 0x0,
     dontPutInCache = 0x1,  // Prevents IM from storing built images in the cache
-    forceRebuild = 0x2,  // Forces rebuild of images (like an invalidate())
+    forceRebuild   = 0x2,  // Forces rebuild of images (like an invalidate())
     toBeModified =
-    0x4,          // Whether the retrieved image will be signed as modified
+        0x4,          // Whether the retrieved image will be signed as modified
     toBeSaved = 0x8,  // User will save the image, reverts toBeModified
 
     is64bitEnabled = 0x10,  // Whether 64-bit rasters are allowed to return
 
     controlFlags = 0xF,  // Flags dealing with management control
     imageFlags =
-    ~controlFlags  // ImageManager flags supportable by custom ImageBuilders
+        ~controlFlags  // ImageManager flags supportable by custom ImageBuilders
   };
 
 public:
   static ImageManager *instance();
 
   /*!
-  Binds a string identifier to an ImageBuilder instance, which is necessary before
+  Binds a string identifier to an ImageBuilder instance, which is necessary
+  before
   any image or
-  image data can be retrieved. If the specified id was already bound, it is first
+  image data can be retrieved. If the specified id was already bound, it is
+  first
   unbound.
   Binding an id to 0 is equivalent to unbinding it.
   */
@@ -263,36 +265,42 @@ public:
 
   // load icon (and image) data of all frames into cache
   void loadAllTlvIconsAndPutInCache(TXshSimpleLevel *, std::vector<TFrameId>,
-    std::vector<std::string>, bool);
+                                    std::vector<std::string>, bool);
 
   /*!
-  Returns the image built by the object associated with the specified identifier,
+  Returns the image built by the object associated with the specified
+  identifier,
   using the
   supplied control flags for additional options. Provided the builder type
   associated to the
   identifier is known, a further external reference can be supplied to the
   request. In this case,
-  users should enforce manual invalidate() invocations whenever the supplied data
+  users should enforce manual invalidate() invocations whenever the supplied
+  data
   changes.
 
   \warning Users take responsibility in modifying the returned image's data \b
   only when imFlags
   contains the \c toBeModified bit.
   */
-  TImageP getImage(const std::string &id, int imFlags, ImageBuilder::BuildExtData *extData);
+  TImageP getImage(const std::string &id, int imFlags,
+                   ImageBuilder::BuildExtData *extData);
 
   /*!
   Returns the image info associated to the specified identifier.
 
   \warning The return type is not explicitly \c const since some of TImageInfo's
   data (namely,
-  the image's bounding box) may need to be modified by the user together with the
+  the image's bounding box) may need to be modified by the user together with
+  the
   associated image.
-  Like in getImage(), users take responsibility in modifying the returned data \b
+  Like in getImage(), users take responsibility in modifying the returned data
+  \b
   only when imFlags
   contains the \c toBeModified bit.
   */
-  TImageInfo *getInfo(const std::string &id, int imFlags, ImageBuilder::BuildExtData *extData);
+  TImageInfo *getInfo(const std::string &id, int imFlags,
+                      ImageBuilder::BuildExtData *extData);
 
   //! Invalidates cached data associated to the specified id, forcing the next
   //! getInfo() or

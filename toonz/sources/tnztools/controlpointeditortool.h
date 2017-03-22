@@ -126,7 +126,7 @@ public:
   void deleteControlPoint(int index);
 
   /*! Add the control point \b pos.
-	  Returns the index of newly added control point.*/
+          Returns the index of newly added control point.*/
   int addControlPoint(const TPointD &pos);
 
   /*! Ritorna l'indice del cp piu' vicino al punto pos.
@@ -152,7 +152,7 @@ public:
 
   /*! If isLinear is true, sets to "0" the value of speedIn and the value
      speedOut; otherwise sets it to default value. Returns true if at least
-		 one point is modified.*/
+                 one point is modified.*/
   bool setLinear(int index, bool isLinear);
 
   void setLinearSpeedIn(int index);

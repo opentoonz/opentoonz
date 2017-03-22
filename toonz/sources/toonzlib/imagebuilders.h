@@ -64,7 +64,9 @@ public:
   ImageRasterizer() {}
   ~ImageRasterizer() {}
 
-  bool isImageCompatible(int imFlags, BuildExtData *extData) override { return true; }
+  bool isImageCompatible(int imFlags, BuildExtData *extData) override {
+    return true;
+  }
 
 protected:
   bool getInfo(TImageInfo &info, int imFlags, void *extData) override;
@@ -78,7 +80,9 @@ public:
   ImageFiller() {}
   ~ImageFiller() {}
 
-  bool isImageCompatible(int imFlags, BuildExtData *extData) override { return true; }
+  bool isImageCompatible(int imFlags, BuildExtData *extData) override {
+    return true;
+  }
 
 protected:
   bool getInfo(TImageInfo &info, int imFlags, void *extData) override;

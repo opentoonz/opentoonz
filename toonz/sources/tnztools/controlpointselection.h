@@ -8,6 +8,12 @@
 #include "tstroke.h"
 #include "tvectorimage.h"
 #include "tcurves.h"
+#include "toonz/pathanimations.h"
+
+#include <memory>
+using std::shared_ptr;
+#include <boost/optional.hpp>
+using boost::optional;
 
 //=============================================================================
 // ControlPointEditorStroke
@@ -33,7 +39,9 @@ private:
 
   QList<ControlPoint> m_controlPoints;
   TVectorImageP m_vi;
+  optional<StrokeId> m_strokeId;
   int m_strokeIndex;
+  int m_frame;
 
   void adjustChunkParity();
 
@@ -54,10 +62,14 @@ private:
 
   void moveSingleControlPoint(int index, const TPointD &delta);
 
+  shared_ptr<PathAnimation> getPathAnimation() const;
+  TThickPoint getControlPointPos(int index) const;
+  void setControlPointPos(int index, const TThickPoint &pos);
+
 public:
   enum PointType { CONTROL_POINT, SPEED_IN, SPEED_OUT, SEGMENT, NONE };
 
-  ControlPointEditorStroke() : m_vi() {}
+  ControlPointEditorStroke() : m_vi(), m_strokeId(), m_frame(0) {}
 
   ~ControlPointEditorStroke() { m_controlPoints.clear(); }
 
@@ -66,15 +78,19 @@ public:
   /*! Modify stroke: between two linear or cusp point must be a pair chunk
 number.
 PAY ATTENTION: Can add control point in the stroke. */
-  void setStroke(const TVectorImageP &vi, int strokeIndex);
+  void setStroke(const TVectorImageP &vi, int strokeIndex,
+                 const optional<StrokeId> &strokeId);
   TStroke *getStroke() const {
     return m_vi ? m_vi->getStroke(m_strokeIndex) : 0;
   }
+  void unsetStroke() { setStroke(nullptr, -1, boost::none); }
 
   void setStrokeIndex(int strokeIndex) { m_strokeIndex = strokeIndex; }
   int getStrokeIndex() const { return m_strokeIndex; }
 
   int getControlPointCount() const { return m_controlPoints.size(); }
+
+  void setFrame(int frame) { m_frame = frame; }
 
   TThickPoint getControlPoint(int index) const;
   /*! From index point in \b ControlPointEditorStroke to index point in \b

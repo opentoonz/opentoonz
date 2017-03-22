@@ -12,16 +12,15 @@ using std::vector;
 // ColumnFanFoldData
 
 void ColumnFanFoldData::activate(int col) {
-  int m = m_columns.size();
-  if (col < m)
-    m_columns[col] = true;
+  int m                       = m_columns.size();
+  if (col < m) m_columns[col] = true;
 }
 void ColumnFanFoldData::deactivate(int col) {
-  while ((int) m_columns.size() <= col) m_columns.push_back(true);
+  while ((int)m_columns.size() <= col) m_columns.push_back(true);
   m_columns[col] = false;
 }
 bool ColumnFanFoldData::isActive(int col) const {
-  return 0 <= col && col < (int) m_columns.size() ? m_columns[col] : true;
+  return 0 <= col && col < (int)m_columns.size() ? m_columns[col] : true;
 }
 
 void ColumnFanFoldData::trim() {
@@ -30,14 +29,13 @@ void ColumnFanFoldData::trim() {
   for (i = m - 1; i >= 0 && m_columns[i]; i--)
     ;
   i++;
-  if (i < m)
-    m_columns.erase(m_columns.begin() + i, m_columns.end());
+  if (i < m) m_columns.erase(m_columns.begin() + i, m_columns.end());
 }
 
 //-----------------------------------------------------------------------------
 
 void ColumnFanFoldData::saveData(TOStream &os) {
-  int index, n = (int) m_columns.size();
+  int index, n = (int)m_columns.size();
   for (index = 0; index < n;) {
     while (index < n && m_columns[index]) index++;
     if (index < n) {
@@ -92,7 +90,7 @@ void ColumnFanGeometry::update() {
 //???  int lastPos     = -m_unfolded;
 //???  bool lastActive = true;
   int from = 0, to;
-  int m = m_columns.size();
+  int m    = m_columns.size();
   int i;
   for (i = 0; i < m; i++) {
 /*???
@@ -105,10 +103,10 @@ void ColumnFanGeometry::update() {
     lastActive         = active;
 */
     m_columns[i].m_pos = from;
-    to = from + m_columns[i].width(m_unfolded);
-    if (m_columns[i].m_active) // advance if this is unfolded
+    to                 = from + m_columns[i].width(m_unfolded);
+    if (m_columns[i].m_active)  // advance if this is unfolded
       from = to;
-    else if (i + 1 >= m || m_columns[i + 1].m_active) // or next is unfolded
+    else if (i + 1 >= m || m_columns[i + 1].m_active)  // or next is unfolded
       from = to;
   }
   m_firstFreePos = from;

@@ -868,9 +868,9 @@ void CellArea::setDragTool(DragTool *dragTool) {
 //-----------------------------------------------------------------------------
 
 void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
-  TXsheet *xsh         = m_viewer->getXsheet();
+  TXsheet *xsh               = m_viewer->getXsheet();
   ScreenMapper *screenMapper = m_viewer->screenMapper();
-  ColumnFan *columnFan = screenMapper->columnFan();
+  ColumnFan *columnFan       = screenMapper->columnFan();
 
   // selected cells range
   TCellSelection *cellSelection = m_viewer->getCellSelection();
@@ -948,11 +948,14 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
     }
 
     bool hasSubLayers = !screenMapper->subLayers()->layer(column)->isFolded();
-    shared_ptr<SubLayer> currentSubLayer = screenMapper->subLayers()->cell(CellPosition(currentRow, col));
+    shared_ptr<SubLayer> currentSubLayer =
+        screenMapper->subLayers()->cell(CellPosition(currentRow, col));
 
     // for each frame
     for (row = r0; row <= r1; row++) {
-      if (hasSubLayers && currentSubLayer == screenMapper->subLayers()->cell(CellPosition(row, col)))
+      if (hasSubLayers &&
+          currentSubLayer ==
+              screenMapper->subLayers()->cell(CellPosition(row, col)))
         drawSubLayers(p, CellPosition(row, col));
       // draw horizontal lines
       // hide top-most marker line
@@ -1454,13 +1457,14 @@ void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos) const {
   // shared_ptr<SubLayer> subLayer = mapper->subLayers()->cell(pos);
 
   TXshColumn *column = mapper->xsheet()->getColumn(pos.layer());
-  NumberRange frames (pos.frame(), pos.frame() + 1);
+  NumberRange frames(pos.frame(), pos.frame() + 1);
   NumberRange frameAxis = mapper->rowsToFrameAxis(frames);
 
   NumberRange layers(pos.layer(), pos.layer() + 1);
   int layerOffset = mapper->dimension(PredefinedDimension::LAYER);
-  NumberRange layerAxis = mapper->colsToLayerAxis(layers).adjusted(layerOffset, 0);
-  
+  NumberRange layerAxis =
+      mapper->colsToLayerAxis(layers).adjusted(layerOffset, 0);
+
   QRect fillRect = mapper->orientation()->frameLayerRect(frameAxis, layerAxis);
   p.fillRect(fillRect, QBrush(m_viewer->getSubLayerColor()));
 }
