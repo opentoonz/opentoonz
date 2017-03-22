@@ -2340,12 +2340,20 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 		TPointD p2 = nextToSimilarStroke->stroke->getChunk(i)->getP0();
 		double x1 = p1.x , x2 = p2.x;
 		double y1 = p1.y , y2 = p2.y;
-
 		double x_diffrence = x2-x1;
 		double y_diffrence = y2-y1;
 		double x_output = lastStroke->stroke->getChunk(i)->getP0().x + x_diffrence;
 		double y_output = lastStroke->stroke->getChunk(i)->getP0().y + y_diffrence;
+
 		TThickPoint p = TThickPoint(x_output,y_output,similarStroke->stroke->getChunk(i)->getThickP0().thick);
+
+		if(points.size() > 0)
+		{
+			TThickPoint old = points.back();
+			if (norm2(p - old) < 4) continue;
+			TThickPoint mid((old + p) * 0.5, (p.thick + old.thick) * 0.5);
+			points.push_back(mid);
+		}
 		points.push_back(p);
 	}
 
