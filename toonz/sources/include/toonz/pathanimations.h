@@ -73,6 +73,8 @@ public:
 
   bool isActivated() const { return m_activated; }
   void toggleActivated();
+  
+  void clearKeyframes();
 
   int chunkCount() const;
   TParamSetP chunkParam(int i) const;
@@ -88,7 +90,9 @@ public:
 private:
   void snapshotChunks(int atFrame);
   void setThickPointKeyframe(TThickPointParamP thickPoint, int frame);
+  void setThickPointInanimate(TThickPointParamP thickPoint, int frame);
   void setDoubleKeyframe(TDoubleParamP &param, int frame);
+
 
   TThickPointParamP controlPoint(int cpIndex) const;
 };

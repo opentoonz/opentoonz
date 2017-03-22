@@ -343,8 +343,9 @@ void StrokeSubLayer::toggleActivator() {
   shared_ptr<PathAnimation> animation =
       xsheet()->pathAnimations()->addStroke(strokeId());
   animation->toggleActivated();
-  if (!animation->isActivated()) return;
   animation->takeSnapshot(subLayers()->screenMapper()->getCurrentFrame());
+  if (!animation->isActivated())
+    animation->clearKeyframes();
 }
 
 StrokeId StrokeSubLayer::strokeId() const {

@@ -89,7 +89,8 @@ void PathAnimation::updateChunks() {
   m_lastChunks = chunks;
 }
 
-// sets a keyframe for the points and thicknesses
+// while activated: sets a keyframe at current frame to match current curve
+// while deactivated: updates the curve to match current state
 void PathAnimation::snapshotChunks(int frame) {
   TStroke *stroke = m_strokeId.stroke();
 
@@ -101,7 +102,10 @@ void PathAnimation::snapshotChunks(int frame) {
 
     TParamSetP chunkParam = found->second;
     for (int j = 0; j < 3; j++)
-      setThickPointKeyframe(chunkParam->getParam(j), frame);
+      if (m_activated)
+        setThickPointKeyframe(chunkParam->getParam(j), frame);
+      else
+        setThickPointInanimate(chunkParam->getParam(j), frame);
   }
 }
 
@@ -111,6 +115,14 @@ void PathAnimation::setThickPointKeyframe(TThickPointParamP thickPoint,
   setDoubleKeyframe(thickPoint->getX(), frame);
   setDoubleKeyframe(thickPoint->getY(), frame);
   setDoubleKeyframe(thickPoint->getThickness(), frame);
+}
+
+void PathAnimation::setThickPointInanimate(TThickPointParamP thickPoint,
+                                           int frame) {
+  if (!thickPoint) return;
+  thickPoint->getX()->setDefaultValue(thickPoint->getX()->getValue(frame));
+  thickPoint->getY()->setDefaultValue(thickPoint->getY()->getValue(frame));
+  thickPoint->getThickness()->setDefaultValue(thickPoint->getThickness()->getValue(frame));
 }
 
 void PathAnimation::setDoubleKeyframe(TDoubleParamP &param, int frame) {
@@ -125,12 +137,25 @@ void PathAnimation::toggleActivated() {
   emit m_animations->xsheet()->sublayerActivatedChanged();
 }
 
+void PathAnimation::clearKeyframes() {
+  TStroke *stroke = m_strokeId.stroke();
+  for (int i = 0; i < chunkCount(); i++) {
+    TParamSetP chunk = chunkParam(i);
+    assert(chunk);
+
+    TThickQuadratic *quad = const_cast<TThickQuadratic *>(stroke->getChunk(i));
+    for (int j = 0; j < 3; j++) {
+      TThickPointParamP pointParam = chunk->getParam(j);
+      pointParam->clearKeyframes();
+    }
+  }
+}
+
 void PathAnimation::animate(int frame) const {
   TStroke *stroke = m_strokeId.stroke();
   for (int i = 0; i < chunkCount(); i++) {
     TParamSetP chunk = chunkParam(i);
-    if (!chunk)  // bad...
-      continue;
+    assert(chunk);
 
     TThickQuadratic *quad = const_cast<TThickQuadratic *>(stroke->getChunk(i));
     for (int j = 0; j < 3; j++) {
