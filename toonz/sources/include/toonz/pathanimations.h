@@ -10,6 +10,7 @@
 #include "tfilepath.h"
 #include "tvectorimage.h"
 #include "toonz/txshcell.h"
+#include "toonz/tapplication.h"
 
 #include <map>
 #include <memory>
@@ -113,6 +114,10 @@ public:
 
   //! update all animatied strokes to match specified frame
   void setFrame(TVectorImage *vi, const TXshCell &cell, int frame);
+
+  static StrokeId appStrokeId(const TApplication *app, TStroke *stroke);
+  static shared_ptr<PathAnimation> appStroke(const TApplication *app, TStroke *stroke);
+  static void appSnapshot(const TApplication *app, TStroke *stroke);
 };
 
 #endif

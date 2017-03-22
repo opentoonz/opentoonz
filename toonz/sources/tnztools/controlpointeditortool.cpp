@@ -135,12 +135,7 @@ ControlPointEditorTool::ControlPointEditorTool()
 //-----------------------------------------------------------------------------
 
 StrokeId ControlPointEditorTool::makeStrokeId(TVectorImageP vi, int index) {
-  TTool::Application *app = TTool::getApplication();
-  TXsheet *xsh            = app->getCurrentXsheet()->getXsheet();
-  int currentFrame        = app->getCurrentFrame()->getFrameIndex();
-  TXshLevelP level        = app->getCurrentLevel()->getLevel();
-
-  return StrokeId{xsh, TXshCell(level, getFrameId()), vi->getStroke(index)};
+  return PathAnimations::appStrokeId(TTool::getApplication(), vi->getStroke(index));
 }
 
 //-----------------------------------------------------------------------------

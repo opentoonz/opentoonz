@@ -27,6 +27,7 @@
 #include "toonz/toonzimageutils.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/stage2.h"
+#include "toonz/pathanimations.h"
 #include "toonz/preferences.h"
 
 // TnzCore includes
@@ -362,6 +363,7 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
                                                        stroke->getBBox());
       TStroke *str = new TStroke(*strokes[i]);
       vi->addStroke(str);
+      PathAnimations::appSnapshot(application, str);
       TUndoManager::manager()->add(new UndoPencil(str, fillInformation, sl, id,
                                                   frameCreated, levelCreated));
     }
@@ -373,6 +375,7 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
                                                      stroke->getBBox());
     TStroke *str = new TStroke(*stroke);
     vi->addStroke(str);
+    PathAnimations::appSnapshot(application, str);
     TUndoManager::manager()->add(new UndoPencil(str, fillInformation, sl, id,
                                                 frameCreated, levelCreated));
   }
@@ -1406,6 +1409,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
     addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                      m_isFrameCreated, m_isLevelCreated);
+
     TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
     invalidate();
     assert(stroke);

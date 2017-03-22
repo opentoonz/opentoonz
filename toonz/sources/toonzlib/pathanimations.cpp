@@ -4,6 +4,10 @@
 #include "toonz/txsheet.h"
 #include "toonz/txshcolumn.h"
 #include "toonz/txshcell.h"
+#include "toonz/txsheethandle.h"
+#include "toonz/txshlevelhandle.h"
+#include "toonz/tframehandle.h"
+#include "toonz/tcolumnhandle.h"
 #include "tstroke.h"
 
 //-----------------------------------------------------------------------------
@@ -185,6 +189,10 @@ void PathAnimation::setControlPointPos(int cpIndex, int frame,
 }
 
 TThickPointParamP PathAnimation::controlPoint(int cpIndex) const {
+  assert(chunkCount());
+  int cpCount = controlPointCount();
+  int chCount = chunkCount();
+
   if (cpIndex <= 0)
     return pointParam(0, 0);
   else if (cpIndex >= controlPointCount())
@@ -226,4 +234,23 @@ void PathAnimations::setFrame(TVectorImage *vi, const TXshCell &cell,
     shared_ptr<PathAnimation> animation = addStroke(strokeId);
     animation->animate(frame);
   }
+}
+
+StrokeId PathAnimations::appStrokeId(const TApplication *app, TStroke *stroke) {
+  TXsheet *xsheet = app->getCurrentXsheet()->getXsheet();
+  TXshLevelP level = app->getCurrentLevel()->getLevel();
+  int frame = app->getCurrentFrame()->getFrame();
+  int layer = app->getCurrentColumn()->getColumnIndex();
+  TXshCell cell = xsheet->getCell(CellPosition(frame, layer));
+  return StrokeId { xsheet, cell, stroke };
+}
+
+shared_ptr<PathAnimation> PathAnimations::appStroke(const TApplication *app, TStroke *stroke) {
+  TXsheet *xsheet = app->getCurrentXsheet()->getXsheet();
+  return xsheet->pathAnimations()->addStroke(appStrokeId (app, stroke));
+}
+
+void PathAnimations::appSnapshot(const TApplication *app, TStroke *stroke) {
+  shared_ptr<PathAnimation> animation = appStroke(app, stroke);
+  animation->takeSnapshot(app->getCurrentFrame()->getFrame());
 }
