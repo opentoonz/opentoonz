@@ -97,6 +97,23 @@
 
 #endif
 
+#ifdef HAIKU
+#define PLATFORM HAIKU
+#include <grp.h>
+#include <utime.h>
+#include <sys/param.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <pwd.h>
+#include <dlfcn.h>
+#include <utime.h>
+#include <sys/time.h>
+
+#endif
+
 #ifndef PLATFORM
 PLATFORM_NOT_SUPPORTED
 #endif
@@ -185,6 +202,11 @@ bool TSystem::memoryShortage() {
   // to be done...
   return false;
 
+#elif defined(HAIKU)
+
+  // to be done...
+  return false;
+
 #else
 
   @ @ @ERROR : PLATFORM NOT SUPPORTED
@@ -252,6 +274,11 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
   // to be done...
   totalFree = 512 * 1024;
 
+#elif defined(HAIKU)
+
+  // to be done...
+  totalFree = 512 * 1024;
+
 #else
   @ @ @ERROR : PLATFORM NOT SUPPORTED
 #endif
@@ -280,6 +307,9 @@ TINT64 TSystem::getDiskSize(const TFilePath &diskName) {
     return 0;
   }
 #ifndef _WIN32
+#ifdef HAIKU
+	size = 0;
+#else
   struct statfs buf;
 #ifdef __sgi
   statfs(::to_string(diskName).c_str(), &buf, sizeof(struct statfs), 0);
@@ -287,6 +317,7 @@ TINT64 TSystem::getDiskSize(const TFilePath &diskName) {
   statfs(::to_string(diskName).c_str(), &buf);
 #endif
   size = (TINT64)((buf.f_blocks * buf.f_bsize) >> 10);
+#endif
 #else
   DWORD sectorsPerCluster;     // sectors per cluster
   DWORD bytesPerSector;        // bytes per sector
@@ -317,6 +348,9 @@ TINT64 TSystem::getFreeDiskSize(const TFilePath &diskName) {
     return 0;
   }
 #ifndef _WIN32
+#ifdef HAIKU
+	size = 0;
+#else
   struct statfs buf;
 #ifdef __sgi
   statfs(diskName.getWideString().c_str(), &buf, sizeof(struct statfs), 0);
@@ -324,6 +358,7 @@ TINT64 TSystem::getFreeDiskSize(const TFilePath &diskName) {
   statfs(::to_string(diskName).c_str(), &buf);
 #endif
   size = (TINT64)(buf.f_bfree * buf.f_bsize) >> 10;
+#endif
 #else
   DWORD sectorsPerCluster;     // sectors per cluster
   DWORD bytesPerSector;        // bytes per sector
@@ -379,6 +414,11 @@ TINT64 TSystem::getMemorySize(bool onlyPhisicalMemory) {
   return ret;
 
 #elif defined(MACOSX)
+
+  // to be done...
+  return 512 * 1024;
+
+#elif defined(HAIKU)
 
   // to be done...
   return 512 * 1024;

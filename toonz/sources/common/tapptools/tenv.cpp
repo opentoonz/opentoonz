@@ -5,7 +5,7 @@
 #include "tconvert.h"
 #include "tfilepath_io.h"
 
-#ifdef LINUX
+#if defined(LINUX) || defined(HAIKU)
 #include <QDir>
 #endif
 #include <QSettings>

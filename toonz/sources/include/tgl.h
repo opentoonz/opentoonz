@@ -21,7 +21,7 @@
 #define GLUT_NO_WARNING_DISABLE
 #endif
 
-#ifdef LINUX
+#if defined(LINUX) || defined(HAIKU)
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>

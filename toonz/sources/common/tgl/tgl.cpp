@@ -12,14 +12,14 @@
 #ifdef _WIN32
 #include <cstdlib>
 #include <GL/glut.h>
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(HAIKU)
 #include <GL/glut.h>
 #else
 #include <GLUT/glut.h>
 #endif
 #endif
 
-#if defined(MACOSX) || defined(LINUX)
+#if defined(MACOSX) || defined(LINUX) || defined(HAIKU)
 #include <QGLContext>
 #endif
 
@@ -617,7 +617,7 @@ void tglMakeCurrent(TGlContext context) {
 
 void tglDoneCurrent(TGlContext) { wglMakeCurrent(NULL, NULL); }
 
-#elif defined(LINUX) || defined(__sgi) || defined(MACOSX)
+#elif defined(LINUX) || defined(__sgi) || defined(MACOSX) || defined(HAIKU)
 
 TGlContext tglGetCurrentContext() {
   return reinterpret_cast<TGlContext>(

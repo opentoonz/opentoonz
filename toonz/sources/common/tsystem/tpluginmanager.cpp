@@ -19,12 +19,16 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <dirent.h>
+#ifndef HAIKU
 #include <sys/dir.h>
+#endif
 #include <sys/param.h>  // for getfsstat
 #ifdef MACOSX
 #include <sys/ucred.h>
 #endif
+#ifndef HAIKU
 #include <sys/mount.h>
+#endif
 #include <pwd.h>
 #include <dlfcn.h>
 #endif
@@ -171,7 +175,7 @@ void TPluginManager::loadPlugin(const TFilePath &fp) {
 void TPluginManager::loadPlugins(const TFilePath &dir) {
 #if defined(_WIN32)
   const std::string extension = "dll";
-#elif defined(LINUX) || defined(__sgi)
+#elif defined(LINUX) || defined(__sgi) || defined(HAIKU)
   const std::string extension = "so";
 #elif defined(MACOSX)
   const std::string extension = "dylib";

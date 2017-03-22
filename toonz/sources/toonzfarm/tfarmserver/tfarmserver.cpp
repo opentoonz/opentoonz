@@ -610,7 +610,7 @@ void FarmServer::queryHwInfo(HwInfo &hwInfo) {
   sysctl(mib, 2, &physMemSize, &len, NULL, 0);
 #endif
 
-#ifdef LINUX
+#if defined(LINUX) || defined(HAIKU)
   TINT64 physMemSize =
       (TINT64)sysconf(_SC_PHYS_PAGES) * (TINT64)sysconf(_SC_PAGE_SIZE);
 #endif

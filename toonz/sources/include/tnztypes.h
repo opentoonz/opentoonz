@@ -18,7 +18,7 @@ typedef uint32_t TUINT32;
 typedef int64_t TINT64;
 typedef uint64_t TUINT64;
 
-#elif defined(__LP64__) && (!defined(LINUX))
+#elif defined(__LP64__) && (!defined(LINUX)) && (!defined(HAIKU))
 
 #define TINT32                                                                 \
   ;                                                                            \
@@ -37,6 +37,13 @@ typedef unsigned __int64_t TUINT64;
 #elif defined(LINUX)
 #include <stdint.h>
 #define TINT32 __int32_t
+typedef uint32_t TUINT32;
+typedef int64_t TINT64;
+typedef uint64_t TUINT64;
+
+#elif defined(HAIKU)
+#include <stdint.h>
+#define TINT32 int32_t
 typedef uint32_t TUINT32;
 typedef int64_t TINT64;
 typedef uint64_t TUINT64;

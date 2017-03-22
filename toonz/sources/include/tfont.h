@@ -140,7 +140,7 @@ public:
 
 // --------- TFont methods  called on curren font -----------
 
-#if !defined(__LP64__) || defined(LINUX)
+#if !defined(__LP64__) || defined(LINUX) || defined(HAIKU)
 
   TPoint drawChar(TVectorImageP &outImage, wchar_t charcode,
                   wchar_t nextCode = 0) {

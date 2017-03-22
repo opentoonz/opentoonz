@@ -15,7 +15,7 @@
 #include "tmsg.h"
 #include "copP.h"*/
 
-#if defined(MACOSX) || defined(LINUX)
+#if defined(MACOSX) || defined(LINUX) || defined(HAIKU)
 #define TRUE 1
 #define FALSE 0
 #endif

@@ -19,7 +19,7 @@ extern "C" {
 
 char *convertWCHAR2CHAR(const wchar_t *fname);
 
-#if defined(MACOSX) || defined(LINUX)
+#if defined(MACOSX) || defined(LINUX) || defined(HAIKU)
 
 #include <sys/types.h>
 #include <sys/stat.h>

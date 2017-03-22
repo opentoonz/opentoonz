@@ -1,6 +1,6 @@
 
 
-#if defined(__LP64__) && !defined(LINUX)
+#if defined(__LP64__) && !defined(LINUX) && !defined(HAIKU)
 
 // Toonz includes
 #include "tvectorimage.h"

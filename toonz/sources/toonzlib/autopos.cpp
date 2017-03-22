@@ -17,7 +17,7 @@ fare resize e realloc size dello stack a 65000 unita'
 
 */
 
-#if defined(MACOSX) || defined(LINUX)
+#if defined(MACOSX) || defined(LINUX) || defined(HAIKU)
 #define TRUE 1
 #define FALSE 0
 #endif

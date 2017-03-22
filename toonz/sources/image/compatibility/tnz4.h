@@ -36,7 +36,7 @@ TNZ_LITTLE_ENDIAN undefined !!
   unsigned char b, g, r, m;
 #elif defined(__sgi)
   unsigned char m, b, g, r;
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(HAIKU)
   unsigned char r, g, b, m;
 #elif defined(MACOSX)
   unsigned char m, r, g, b;
@@ -50,7 +50,7 @@ typedef struct SPIXEL {
   unsigned short b, g, r, m;
 #elif defined(__sgi)
   unsigned short m, b, g, r;
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(HAIKU)
   unsigned short r, g, b, m;
 #elif defined(MACOSX)
   unsigned char m, r, g, b;
