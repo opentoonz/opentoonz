@@ -83,7 +83,16 @@
 ----------------------------------------------------------------------------- */
 
 PaletteViewer {
-  QToolBar {
+  &  DvScrollWidget {
+    & QPushButton {
+      border-radius: 0;
+      border-top: 0;
+    }
+    & #ScrollRightButton {
+      border-right: 0;
+    }
+  }
+  & QToolBar {
     background: none;
     border-bottom: 1px solid @tabbar-border-color;
     padding: 0;
@@ -92,10 +101,10 @@ PaletteViewer {
       // Very compact space so we can do without margin here...
       margin: 0;
     }
-    QToolButton {
+    & QToolButton {
       &:extend(.button-flat all); // components/buttons.less
       margin: 0 0 1px 0; // Adds height to QToolBar
-      padding: 0;
+      padding: 1px 1px 2px 1px;
     }
   }
   & QScrollBar {
@@ -107,7 +116,7 @@ PaletteViewer {
   & QTreeView {
     &:extend(.tree-list all); // components/treeviews.less
     &::branch {
-      &:extend(.branch-17 all);
+      &:extend(.branch-17 all); // components/treeviews.less
     }
   }
 }
@@ -124,13 +133,18 @@ PaletteViewer {
 }
 
 #PaletteLockButton {
+  border-radius: 0;
+  margin: 0 0 1px 1px;
   &:hover {
-    background-color: @selected-bg-color;
+    background-color: @paletteviewer-lock-color-active;
+    border-color: @paletteviewer-lock-color-active;
   }
   &:checked {
     background-color: @paletteviewer-lock-color-active;
+    border-color: @paletteviewer-lock-color-active;
     &:hover {
-      background-color: @selected-bg-color-secondary;
+      background-color: @paletteviewer-lock-color-active-hover;
+      border-color: @paletteviewer-lock-color-active-hover;
     }
   }
 }
@@ -140,7 +154,7 @@ PaletteViewer {
 ----------------------------------------------------------------------------- */
 
 #WordButton {
-  &:extend(QPushButton all); // views/controls.less
+  &:extend(QPushButton all); // layouts/controls.less
   // Remove horizontal padding... else moderate length text gets clipped
   padding-right: 0;
   padding-left: 0;

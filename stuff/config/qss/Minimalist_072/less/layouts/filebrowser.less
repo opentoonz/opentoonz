@@ -83,6 +83,9 @@ DvDirTreeView {
   &:extend(#FileBrowser all);
   & QTreeView {
     &:extend(.tree-list all); // components/treeviews.less
+    &::branch {
+      &:extend(.branch-17 all); // components/treeviews.less
+    }
   }
   & QToolBar {
     border-top: 1px solid @accent1;

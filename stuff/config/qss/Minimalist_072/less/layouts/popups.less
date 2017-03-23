@@ -26,7 +26,7 @@ QDialog {
 
 #PreferencesPopup {
   & QListWidget {
-    &:extend(.tree-list all); // components/treeviews.less
+    alternate-background-color: @bg;
     border: 1px solid @accent1;
     &::item {
       border: 0; // Removes indent

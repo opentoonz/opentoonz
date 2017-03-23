@@ -7,6 +7,16 @@
   border: 0;
   margin: 0;
   padding: 0;
+  & QToolBar {
+    &::separator:horizontal {
+      margin: 0;
+    }
+    & QToolButton {
+      &:extend(.button-tool all); // components/buttons.less
+      padding: 1px;
+      margin: 2px;
+    }
+  }
 }
 
 #SchematicSceneViewer {
@@ -17,8 +27,6 @@
 /* -----------------------------------------------------------------------------
    FX Settings
 ----------------------------------------------------------------------------- */
-
-// Technically a popup 'window' but I'm placing it here regardless.
 
 #FxSettingsTabBar {
   &:extend(.tab-container all); // components/tabs.less

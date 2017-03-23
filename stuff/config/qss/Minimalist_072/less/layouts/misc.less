@@ -2,6 +2,12 @@
    Misc 
 ----------------------------------------------------------------------------- */
 
+#HistoryPanel {
+  & QScrollBar {
+    &:extend(.mods-scrollbars-01 all);
+  }
+}
+
 #MatchLineButton {
     background-color: lighten(@bg, 15%);
     &::pressed {

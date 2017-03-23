@@ -14,19 +14,20 @@
 
 // Text
 @text-color: #bfbfbf;
+@text-color-light: lighten(@text-color, 15%);
 @text-color-disabled: darken(@text-color, 30%);
 
 // Selected Color (Primary)
-@selected-bg-color: darken(@palette-tangerine, 5%);
-@selected-text-color: #000;
+@selected-bg-color: @palette-horizon;;
+@selected-text-color: lighten(@text-color, 20%);
 
 // Selected Color (Secondary)
-@selected-bg-color-secondary: lighten(@bg, 8%);
-@selected-text-color-secondary: contrast(@selected-bg-color-secondary, @text-color, #000);
+@selected-bg-color-secondary: lighten(@bg, 10%);
+@selected-text-color-secondary: @text-color;
 
 // Dock Separator
 @dock-bg-color: darken(@bg, 15%);
-@dock-placeholder-color: @palette-yellow-green;
+@dock-placeholder-color: @palette-scooter;
 
 // Misc
 @widget-border-color: @dock-bg-color;
@@ -36,12 +37,12 @@
 @tooltip-text-color: #000;
 
 // Scrollable ToolBar Buttons
-@toolbar-scrollbutton-bg-color: #e1e1e1;
-@toolbar-scrollbutton-bg-color-hover: #f5f5f5;
-@toolbar-scrollbutton-bg-color-pressed: #c8c8c8;
+@toolbar-scrollbutton-bg-color: darken(#e1e1e1, 25%);
+@toolbar-scrollbutton-bg-color-hover: lighten(@toolbar-scrollbutton-bg-color, 10%);
+@toolbar-scrollbutton-bg-color-pressed: darken(@toolbar-scrollbutton-bg-color, 25%);
 
 // Labels
-@label-title: lighten(@palette-chetwode-blue, 5%);
+@label-title: @palette-scooter-light;
 @label-error: @palette-red;
 
 // Treeview
@@ -74,11 +75,11 @@
 
 // Room Tabs
 @rooms-tab-bg-color: @tab-bg-color;
-@rooms-tab-bg-color-selected: @rooms-tab-bg-color;
+@rooms-tab-bg-color-selected: darken(@bg, 15%);
 @rooms-tab-bg-color-hover: lighten(@rooms-tab-bg-color, 5%);
 @rooms-tab-border-color: @tab-border-color;
 @rooms-tab-text-color: @tab-text-color;
-@rooms-tab-text-color-selected: @palette-orange;
+@rooms-tab-text-color-selected: @text-color-light;
 
 // -----------------------------------------------------------------------------
 // QMenu / Context Menu
@@ -87,7 +88,7 @@
 @menu-bg-color: darken(@bg, 5%);
 @menu-border-color: @accent1;
 @menu-separator-color: @menu-border-color;
-@menu-checkbox-text-color-checked: @palette-orange;
+@menu-checkbox-text-color-checked: @palette-scooter-light;
 
 // -----------------------------------------------------------------------------
 // DockWidget Title Bar
@@ -98,7 +99,7 @@
 @title-bg-color: darken(@bg, 5%);
 @title-border-color: @accent1;
 @title-text-color: darken(@text-color, 10%);
-@title-text-color-active: lighten(@text-color, 10%);
+@title-text-color-active: lighten(@text-color, 15%);
 
 // Note: IMG values must be set to NONE for QSS to work...
 @title-img: 'none';
@@ -138,7 +139,7 @@
 @button-border-color-pressed: darken(@button-bg-color-pressed, 10.2%);
 @button-text-color-pressed: @text-color;
 
-@button-bg-color-checked: darken(@button-bg-color-pressed, 5%);
+@button-bg-color-checked: darken(@button-bg-color-pressed, 8%);
 @button-bg-color-checked-hover: lighten(@button-bg-color-checked, 5%);
 @button-border-color-checked: darken(@button-border-color-pressed, 5%);
 @button-text-color-checked: @text-color;
@@ -148,13 +149,29 @@
 @button-text-color-disabled: @text-color-disabled;
 
 // -----------------------------------------------------------------------------
+// Tool Button
+// -----------------------------------------------------------------------------
+
+@toolbutton-bg-color: @bg;
+@toolbutton-border-color: @toolbutton-bg-color;
+
+@toolbutton-bg-color-hover: @button-bg-color-hover;
+@toolbutton-border-color-hover: @button-border-color;
+
+@toolbutton-bg-color-pressed: @button-bg-color-pressed;
+@toolbutton-border-color-pressed: @button-border-color-pressed;
+
+@toolbutton-bg-color-checked: @button-bg-color-checked;
+@toolbutton-border-color-checked: @button-border-color-checked;
+
+// -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
 // -----------------------------------------------------------------------------
 
 @focus-color: @selected-bg-color;
 @input-bg-img: 'lineedit_shadow.png';
-@input-bg-color: darken(@bg, 10%);
-@input-border-color: darken(@input-bg-color, 3%);
+@input-bg-color: darken(@bg, 12%);
+@input-border-color: darken(@bg, 16%);
 @input-text-color: @text-color;
 @input-selection-text-color: @selected-text-color;
 @input-selection-bg-color: @selected-bg-color;
@@ -192,7 +209,7 @@
 // QSlider / IntPairField / DoublePairField
 // -----------------------------------------------------------------------------
 
-@slider-groove-color: @accent1;
+@slider-groove-color: @input-bg-color;
 @slider-groove-color-highlight: lighten(@bg, 2%);
 
 // -----------------------------------------------------------------------------
@@ -205,7 +222,7 @@
 // File Browser
 // -----------------------------------------------------------------------------
 
-@browser-folder-text-color: @palette-water-leaf-blue;
+@browser-folder-text-color: @palette-scooter-light;
 @browser-folder-text-color-selected: @selected-text-color;
 
 @browser-itemview-bg-color: darken(@bg, 6%);
@@ -222,7 +239,8 @@
 // Palette Viewer
 // -----------------------------------------------------------------------------
 
-@paletteviewer-lock-color-active: @palette-chihiro;
+@paletteviewer-lock-color-active: @palette-burnt-sienna;
+@paletteviewer-lock-color-active-hover: lighten(@paletteviewer-lock-color-active, 10%);
 
 // -----------------------------------------------------------------------------
 // Style Editor
@@ -258,7 +276,7 @@
 // XSheet
 // -----------------------------------------------------------------------------
 
-@xsheet-combobox-maxwidth:                    62px;
+@xsheet-combobox-maxwidth:                  62px;
 
 // XSheet Context Menus
 @xsheet-menu-preview-color:                 #E6E678;

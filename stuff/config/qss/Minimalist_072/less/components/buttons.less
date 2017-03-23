@@ -28,22 +28,22 @@
 // -----------------------------------------------------------------------------
 
 .button-tool {
-  background-color: @bg;
-  border: 1px solid transparent;
+  background-color: @toolbutton-bg-color;
+  border: 1px solid @toolbutton-border-color;
   border-radius: 2px;
   margin: 1px;
   padding: 0;
   &:hover {
-    background-color: @button-bg-color;
-    border-color: @button-border-color;
+    background-color: @toolbutton-bg-color-hover;
+    border-color: @toolbutton-border-color-hover;
   }
   &:pressed {
-    background-color: @button-bg-color-pressed;
-    border-color: @button-border-color-pressed;
+    background-color: @toolbutton-bg-color-pressed;
+    border-color: @toolbutton-border-color-pressed;
   }
   &:checked {
-    background-color: @button-bg-color-checked;
-    border-color: @button-border-color-checked;
+    background-color: @toolbutton-bg-color-checked;
+    border-color: @toolbutton-border-color-checked;
   }
   &:disabled {
     color: @text-color-disabled;
@@ -69,6 +69,7 @@
   background-color: none;
   border: 0;
   border-radius: 0;
+  margin: 0;
   &:hover {
     background-color: @selected-bg-color-secondary;
   }

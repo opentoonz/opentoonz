@@ -49,7 +49,9 @@ QSplitter::handle {
 ----------------------------------------------------------------------------- */
 
 #TopBar {
+  background: @topbar-bg-color;
   border-bottom: 1px solid @topbar-border-color; // I have conditions (#C001)
+  height: 21px;
   & #EditToolLockButton {
     spacing: 0;
     &::indicator {
@@ -58,7 +60,9 @@ QSplitter::handle {
       border: 0;
       border-radius: 0;
       margin: 0;
-      padding: 2px 3px 0 2px;
+      padding: 0 3px 0 2px;
+      height: 16px;
+      width: 16px;
     }
   }
 }
@@ -99,16 +103,23 @@ QMenuBar {
   padding: 0;
   &::tab {
     background-color: @rooms-tab-bg-color;
-    border: 1px solid @rooms-tab-border-color;
+    border-top: 1px solid @rooms-tab-border-color;
+    border-right: 1px solid @rooms-tab-border-color;
     color: @rooms-tab-text-color;
-    margin: 0 1px;
-    padding: 0 10px;
+    margin: 0 0 0 0;
+    padding: 2px 10px 3px 10px;
     &:hover {
       background-color: @rooms-tab-bg-color-hover;
     }
     &:selected {
       background-color: @rooms-tab-bg-color-selected;
       color: @rooms-tab-text-color-selected;
+    }
+    &:first {
+      border-left: 1px solid @rooms-tab-border-color;
+    }
+    &:last {
+      border-right: 1px solid @rooms-tab-border-color;
     }
   }
 }
@@ -313,8 +324,8 @@ QToolBar {
  DvScrollWidget {
   & QPushButton {
     background-color: @toolbar-scrollbutton-bg-color;
-    border: 0;
-    border-radius: 1px;
+    border: 1px solid @accent1;
+    border-radius: 2px;
     padding: 0;
     max-width: 15px;
     min-width: 15px;
