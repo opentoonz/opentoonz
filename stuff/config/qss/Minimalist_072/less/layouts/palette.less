@@ -3,11 +3,16 @@
 ----------------------------------------------------------------------------- */
 
 #StyleEditor {
-  #TabBarContainer {
+  & #TabBarContainer {
     margin-left: -4px; // Resets container margin
   }
-  #bottomWidget {
+  & #bottomWidget {
     padding: 3px 2px 8px 3px;
+    & QPushButton {
+      &:checked {
+        color: @autoapply-button-text-color;
+      }
+    }
   }
 }
 
@@ -26,7 +31,7 @@
 
 /* Horizontal QSlider */
 
-// I don't know what #colorSlider does, it seems to have no effect here.
+// START: I don't know what #colorSlider does, it seems to have no effect here.
 
 #colorSlider {
   &::groove:horizontal {
@@ -39,32 +44,30 @@
   }
 }
 
+// ----- End
+
 #colorSliderAddButton, 
 #colorSliderSubButton {
   background: none;
-  border: 0;
+  border-color: transparent;
   image-position: center center;
-  margin-bottom: 1px; // Pressed effect placeholder (#F001)
-  max-height: 16px;
   min-height: 16px;
   padding: 0;
-  max-width: 18px;
   min-width: 18px;
   &:hover {
-    background: none;
+    &:extend(.button-tool:hover); // layouts/controls.less
   }
   &:pressed {
-    margin-top: 1px; // Moves button down for pressed effect (#F001)
-    margin-bottom: 0;
+    &:extend(.button-tool:pressed); // layouts/controls.less
   }
 }
 
 #colorSliderAddButton {
-  image: url('@{img-url}/colorslider_add.png');
+  image: url('@{img-url}/arrow_right.png');
 }
 
 #colorSliderSubButton {
-  image: url('@{img-url}/colorslider_sub.png');
+  image: url('@{img-url}/arrow_left.png');
 }
 
 #PlainColorPageParts {
@@ -83,13 +86,25 @@
 ----------------------------------------------------------------------------- */
 
 PaletteViewer {
-  &  DvScrollWidget {
+  & DvScrollWidget {
     & QPushButton {
-      border-radius: 0;
       border-top: 0;
+      margin-bottom: 1px;
+      max-width: 15px;
+      min-width: 15px;
+    }
+    & #ScrollLeftButton {
+      border-right: 1px solid @accent1;
+      border-left: 1px solid @accent1;
+      image: url('@{img-url}/arrow_left.png');
+      max-width: 15px;
+      min-width: 15px;
     }
     & #ScrollRightButton {
       border-right: 0;
+      margin-left: 1px;
+      max-width: 15px;
+      min-width: 15px;
     }
   }
   & QToolBar {
@@ -98,7 +113,7 @@ PaletteViewer {
     padding: 0;
     margin: 0;
     &::separator:horizontal {
-      // Very compact space so we can do without margin here...
+      // Very compact space - so we can do without margin here...
       margin: 0;
     }
     & QToolButton {
@@ -117,6 +132,9 @@ PaletteViewer {
     &:extend(.tree-list all); // components/treeviews.less
     &::branch {
       &:extend(.branch-17 all); // components/treeviews.less
+    }
+    & QScrollBar {
+      &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
     }
   }
 }

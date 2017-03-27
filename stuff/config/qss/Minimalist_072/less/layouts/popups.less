@@ -6,7 +6,7 @@ QDialog {
   background-color: @bg;
   & #dialogButtonFrame {
     background-color: @dialog-bg-color;
-    border-top: 1px solid @accent1;
+    border-top: 1px solid @dialog-border-color;
   }
 }
 
@@ -16,7 +16,7 @@ QDialog {
 
 #SceneSettings {
   & QLabel {
-    color: @text-color;
+    color: @label-title;
   }
 }
 
@@ -26,7 +26,8 @@ QDialog {
 
 #PreferencesPopup {
   & QListWidget {
-    alternate-background-color: @bg;
+    background-color: @tree-bg-color;
+    alternate-background-color: @tree-bg-color;
     border: 1px solid @accent1;
     &::item {
       border: 0; // Removes indent
@@ -47,11 +48,9 @@ QDialog {
 
 #ShortcutTree {
   &:extend(.tree-list all); // components/treeviews.less
+  background-color: @browser-itemview-bg-color;
   alternate-background-color: @browser-itemview-bg-color-alt;
   border: 1px solid @accent1;
-  &::branch { // Size "17"
-    &:extend(.branch-17 all); // components/treeviews.less
-  }
   & QScrollBar {
     &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
   }
@@ -62,8 +61,13 @@ QDialog {
 ----------------------------------------------------------------------------- */
 
 ProjectPopup {
-    & QLabel {}
+    & QLabel {
+      color: @label-title;
+    }
     & QTreeView {
       &:extend(.tree-list all); // components/treeviews.less
+      &::branch {
+        &:extend(.branch-22 all); // components/treeviews.less
+      }
     }
 }

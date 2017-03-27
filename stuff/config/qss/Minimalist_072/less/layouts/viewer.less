@@ -41,46 +41,80 @@ FlipBook {
   & #ToolBarContainer {
     background-color: transparent;
     border-top: 2px solid @accent1; // FixMe?
-    #ScrollLeftButton,
-    #ScrollRightButton {
-      margin-top: 2px;
+    border-bottom: 1px solid @accent1;
+    // Hides right border on #ScrollRightButton when FPS Slider is
+    // hidden.
+    padding-right: -1px;
+    & QLineEdit {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: @fps-input-border-color;
     }
   }
 }
 
 #FlipConsolePlayToolBar {
+  &::separator:horizontal {
+    margin: 0 2px;
+  }
   & QToolButton {
     margin-top: 2px;
-    height: 18px;
+    margin-bottom: 2px;
+    height: 16px;
   }
 }
 
 #ViewerFpsSlider {
-  // This inherits QScrollBar...
-  margin-right: 2px;
-  margin-left: 2px;
-  max-width: 300px;
-  min-width: 50px;
-  &::sub-line {
-    margin-left: 3px;
+  background-color: transparent;
+  background-image: url('@{img-url}/slider_groove.png');
+  background-position: center center;
+  background-repeat: repeat-x;
+  border: 0;
+  height: 19px;
+  margin: 0 3px 0 31px;
+  max-width: 400px;
+  min-width: 0px;
+  &::sub-line:horizontal {
+    border: 1px solid @fps-input-border-color;
+    subcontrol-origin: absolute;
+    height: 17px;
+    left: -33px;
   }
-  &::add-line {
-    margin-right: 3px;
+  &::add-line:horizontal {
+    subcontrol-position: left;
+    border: 1px solid @fps-input-border-color;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    left: 12px;
+    height: 17px;
+    image-position: center center;
+  }
+  &::handle {
+    &::horizontal {
+      @size: 9px;
+      background-color: @slider-handle-bg-color;
+      border: 1px solid @slider-handle-border-color;
+      border-radius: 2px;
+      margin: 1px 0 2px 0;
+      min-width: @size;
+      width: @size;
+      max-width: @size;
+    }
   }
 }
 
 FlipSlider {
-  qproperty-PBHeight: 19;
+  qproperty-PBHeight: 15;
 
-  qproperty-PBOverlay: url('@{img-url}/flipslider.png');
-  qproperty-PBMarker: url('@{img-url}/flipmarker.png');
+  qproperty-PBOverlay: url('@{img-url}/@{flipslider-img}');
+  qproperty-PBMarker: url('@{img-url}/@{flipmarker-img}');
   qproperty-PBColorMarginLeft: 1;
-  qproperty-PBColorMarginTop: 1;
+  qproperty-PBColorMarginTop: 2;
   qproperty-PBColorMarginRight: 1;
-  qproperty-PBColorMarginBottom: 1;
+  qproperty-PBColorMarginBottom: 2;
 
-  qproperty-PBMarkerMarginLeft: 5;
-  qproperty-PBMarkerMarginRight: 5;
+  qproperty-PBMarkerMarginLeft: 3;
+  qproperty-PBMarkerMarginRight: 3;
   qproperty-notStartedColor: @flipslider-notstarted-color;
   qproperty-startedColor: @flipslider-started-color;
   qproperty-baseColor: @flipslider-base-color;

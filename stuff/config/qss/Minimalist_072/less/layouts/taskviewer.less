@@ -21,10 +21,10 @@
       margin: 2px 2px 3px 2px;
     }
   }
-}
-
-#Tasks {
   & QTreeView {
     &:extend(.tree-list all); // components/treeviews.less
+    &::branch {
+      &:extend(.branch-17 all); // components/treeviews.less
+    }
   }
 }

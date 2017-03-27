@@ -15,7 +15,7 @@
 }
 
 #CleanupSettingsFrame {
-  // I've added some margin to #CleanupSettings QDockWidget ONLY (above).
+  // Added some margin to #CleanupSettings QDockWidget ONLY (above).
   &:extend(.box-base all); // components/borders.less
 }
 
@@ -41,7 +41,6 @@ ParamsPage {
     &:extend(.button-tool all); // components/buttons.less
     // Apply an icon
     &:extend(.icon-lock all); // components/icons.less
-    padding: 2px;
   }
 }
 
@@ -52,12 +51,11 @@ ParamsPage {
 #CameraSettingsRadioButton_Small {
   padding: 0;
   &::indicator {
-    &:extend(.button-radio all); // components/buttons.less
-    background-color: transparent; // Fills the height
+    &:extend(QRadioButton::indicator all); // layouts/controls.less
+    background-color: transparent;
     border: 0;
-    height: 21px; // Gives more hit area (requires background property)
+    height: 21px;
     margin: 0;
-    padding: 0;
     width: 11px;
   }
 }

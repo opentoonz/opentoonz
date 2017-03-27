@@ -13,7 +13,7 @@
     }
     & QToolButton {
       &:extend(.button-tool all); // components/buttons.less
-      padding: 1px;
+      padding: 0;
       margin: 2px;
     }
   }
@@ -38,8 +38,11 @@
 
 FxSettings {
   & QToolBar {
-    min-height: 20px; // Prevent shrink
-    padding: 0;
+    border-top: 1px solid @accent1;
+    border-right: 1px solid @accent1;
+    border-left: 1px solid @accent1;
+    min-height: 23px; // Prevent shrink
+    padding: 3px 0;
     & QToolBar {
       border: 0;
     }

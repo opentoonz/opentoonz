@@ -4,8 +4,10 @@
 
 QPushButton {
   background-color: @button-bg-color;
-  border: 1px solid @button-border-color;
-  border-radius: 2px;
+  border-color: @button-border-color;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: @button-border-radius;
   color: @button-text-color;
   padding: 3px 15px;
   &:hover {
@@ -84,12 +86,14 @@ QLineEdit {
   background-image: url('@{img-url}/@{input-bg-img}');
   background-repeat: repeat-x;
   background-color: @input-bg-color;
-  border: 1px solid @input-border-color;
-  border-radius: 2px;
+  border-color: @input-border-color;
+  border-style: @input-border-style;
+  border-width: @input-border-width;
+  border-radius: @input-border-radius;
   color: @input-text-color;
   selection-background-color: @selected-bg-color;
   selection-color: @selected-text-color;
-  padding-left: 2px;
+  padding: 0 0 0 1px;
   &:focus {
     border-color: @focus-color;
   }
@@ -98,6 +102,7 @@ QLineEdit {
     border-color: @input-border-color-disabled;
     color: @input-text-color-disabled;
   }
+
 }
 
 /* -------------------------------------------------------------------------- */
@@ -143,6 +148,21 @@ QCheckBox {
 
 /* -------------------------------------------------------------------------- */
 
+QRadioButton {
+  &::indicator {
+    &:unchecked {
+      image: url('@{img-url}/radiobutton_unchecked.png');
+      image-position: center center;
+    }
+    &:checked {
+      image: url('@{img-url}/radiobutton_checked.png');
+      image-position: center center;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
 QGroupBox {
   &:extend(.box-base); // components/borders.less
   margin: 6px 0 0 0;
@@ -170,18 +190,24 @@ QGroupBox {
 
 QSlider {
   &::groove:horizontal {
-    background-color: @slider-groove-color;
-    margin: 6px 0;
+    background-color: transparent;
+    background-image: url('@{img-url}/slider_groove.png');
+    background-position: center center;
+    background-repeat: repeat-x;
+    margin: 0;
+    height: 20px;
+    min-height: 20px;
   }
   &::handle:horizontal {
-    background-color: transparent;
-    image: url('@{img-url}/slider_handle.png');
-    margin: -6px 0;
-    width: 14px;
+    background: @slider-handle-bg-color;
+    border: 1px solid @accent1;
+    width: 9px;
+    margin: 2px 0 2px 0;
+    border-radius: 2px;
   }
 }
 
-// IMO this could be re-implemented, it's not very pretty but there isn't
+// This could be re-implemented, it's not very pretty but there isn't
 // much we can do with QSS.
 
 #IntPairField, 

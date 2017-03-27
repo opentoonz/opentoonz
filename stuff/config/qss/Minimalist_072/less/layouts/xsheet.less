@@ -46,6 +46,15 @@
 XsheetViewer {
   & QComboBox {
     max-width: @xsheet-combobox-maxwidth; // Prevents clipping
+    & QAbstractItemView {
+      // Prevent squash due to above variable
+      @size: 80px;
+      width: @size;
+      min-width: @size;
+    }
+  }
+  & QScrollBar {
+    &:extend(.mods-scrollbars-02 all); // mods/scrollbars.less
   }
   qproperty-TextColor: @xsheet-text-color;
   qproperty-BGColor: @xsheet-bg-color;
@@ -169,6 +178,9 @@ FunctionPanel {
 }
 
 SpreadsheetViewer {
+  & QScrollBar {
+    &:extend(.mods-scrollbars-02 all); // mods/scrollbars.less
+  }
   qproperty-LightLightBGColor: @xsheet-LightLightBG-color; // paired
   qproperty-CurrentRowBgColor: @xsheet-CurrentRowBG-color; // paired
   qproperty-LightLineColor: @xsheet-LightLine-color; // paired

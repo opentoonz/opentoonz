@@ -50,19 +50,23 @@ QSplitter::handle {
 
 #TopBar {
   background: @topbar-bg-color;
+  border: 0;
   border-bottom: 1px solid @topbar-border-color; // I have conditions (#C001)
   height: 21px;
   & #EditToolLockButton {
     spacing: 0;
     &::indicator {
     // Inherits from #ToolOptions (toolbar.less) so we need to override
-      background-color: transparent;
+      background-color: @topbar-bg-color;
       border: 0;
       border-radius: 0;
       margin: 0;
       padding: 0 3px 0 2px;
       height: 16px;
       width: 16px;
+      &:checked {
+        image: url('@{img-url}/cam_lock.png');
+      }
     }
   }
 }
@@ -80,6 +84,7 @@ QSplitter::handle {
 
 QMenuBar {
   background-color: @topbar-bg-color;
+  border: 0;
   &::item {
     background-color: @topbar-bg-color;
     border-left: 1px solid @topbar-bg-color; // Spacing for QMenu
@@ -176,7 +181,9 @@ QMenu {
 
 TPanelTitleBar {
   background-color: @title-bg-color;
-  border-bottom: 1px solid @title-border-color;
+  border-color: @title-border-color;
+  border-style: solid;
+  border-width: @title-border-width;
   font-weight: 700;
   height: @title-size;
   min-height: @title-size;
@@ -239,14 +246,14 @@ QScrollBar {
     &:horizontal { // right
       subcontrol-position: right;
       image: url('@{img-url}/scroll-right.png');
-      image-position: top;
+      image-position: center center;
       margin: 1px;
       width: 13px;
     }
     &:vertical { // down
       subcontrol-position: bottom;
       image: url('@{img-url}/scroll-down.png');
-      image-position: left;
+      image-position: center center;
       margin: 1px;
       height: 13px;
     }
@@ -266,14 +273,14 @@ QScrollBar {
     &:horizontal { // left
       subcontrol-position: left;
       image: url('@{img-url}/scroll-left.png');
-      image-position: top;
+      image-position: center center;
       margin: 1px;
       width: 13px;
     }
     &:vertical { // up
       subcontrol-position: top;
       image: url('@{img-url}/scroll-up.png');
-      image-position: top;
+      image-position: center center;
       margin: 1px;
       height: 13px;
     }
@@ -292,10 +299,8 @@ QScrollBar {
    Tool Bars (Global)
 ----------------------------------------------------------------------------- */
 
-// Don't over-develop things here as it could cause things to break in other
-// places.
-//
-// If you're looking for the #ToolBar DockWidget, look in /layouts/toolbar.less.
+// Don't over-develop here, it could cause things to break in other places.
+// If you're looking for the #ToolBar DockWidget look in /layouts/toolbar.less.
 
 QToolBar {
   padding: 0;
@@ -320,15 +325,18 @@ QToolBar {
 
 // Scrollable QToolBar buttons - these show when QToolBar is too small to show
 // all of its content.
+//
+// This is a generic global style, pay attention to #ComboViewer and
+// #PaletteViewer variants when tweaking these.
 
  DvScrollWidget {
   & QPushButton {
     background-color: @toolbar-scrollbutton-bg-color;
-    border: 1px solid @accent1;
-    border-radius: 2px;
+    border: 0;
+    border-radius: 0;
     padding: 0;
-    max-width: 15px;
-    min-width: 15px;
+    max-width: 16px;
+    min-width: 16px;
     &:hover {
       background-color: @toolbar-scrollbutton-bg-color-hover;
     }
@@ -342,14 +350,17 @@ QToolBar {
 #ScrollRightButton,
 #ScrollUpButton,
 #ScrollDownButton {
-  max-width: 15px;
-  min-width: 15px;
+  max-width: 16px;
+  min-width: 16px;
 }
 #ScrollLeftButton {
   image: url('@{img-url}/arrow_left.png');
+  border-right: 1px solid @accent1;
 }
 #ScrollRightButton {
   image: url('@{img-url}/arrow_right.png');
+  border-left: 1px solid @accent1;
+  border-right: 1px solid @accent1;
 }
 #ScrollUpButton {
   image: url('@{img-url}/arrow_up.png');
