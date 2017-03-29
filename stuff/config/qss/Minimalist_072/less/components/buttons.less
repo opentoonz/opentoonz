@@ -44,21 +44,12 @@
   &:checked {
     background-color: @toolbutton-bg-color-checked;
     border-color: @toolbutton-border-color-checked;
+    &:hover {
+      background-color: @toolbutton-bg-color-checked-hover;
+    }
   }
   &:disabled {
     color: @text-color-disabled;
-  }
-  &::menu-indicator {
-    image: none;
-  }
-  &::menu-button {
-    border-image: none;
-  }
-  & QLabel {
-    margin-top: 1px;
-  }
-  & QToolBar {
-    border: 0;
   }
 }
 

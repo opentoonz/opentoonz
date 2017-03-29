@@ -5,7 +5,7 @@
 #TaskSheetItem,
 #tasksRemoveBox,
 #tasksAddBox {
-  &:extend(QLineEdit all); // layouts/controls.less
+  &:extend(.QLineEdit all); // layouts/controls.less
 } 
 
 #TaskSheetItemLabel {
@@ -23,6 +23,7 @@
   }
   & QTreeView {
     &:extend(.tree-list all); // components/treeviews.less
+    background-color: @browser-itemview-bg-color;
     &::branch {
       &:extend(.branch-17 all); // components/treeviews.less
     }

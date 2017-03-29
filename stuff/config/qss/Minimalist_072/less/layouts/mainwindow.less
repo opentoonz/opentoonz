@@ -22,9 +22,9 @@ QFrame {
 
 QToolTip,
 #helpToolTip {
-  background-color: @tooltip-bg-color;
-  border: 1px solid @tooltip-border-color;
-  color: @tooltip-text-color;
+  background-color: #ffffe1;
+  border: 1px solid #000;
+  color: #000;
   padding: 1px 0;
 }
 
@@ -34,7 +34,8 @@ QToolTip,
 
 #DockSeparator,
 QMainWindow::separator,
-QSplitter::handle {
+QSplitter::handle,
+TPanel {
   background-color: @dock-bg-color;
   height: 4px;
   width: 4px;
@@ -56,17 +57,14 @@ QSplitter::handle {
   & #EditToolLockButton {
     spacing: 0;
     &::indicator {
-    // Inherits from #ToolOptions (toolbar.less) so we need to override
+      // Inherits from #ToolOptions (toolbar.less)
       background-color: @topbar-bg-color;
       border: 0;
       border-radius: 0;
+      height: 16px;
       margin: 0;
       padding: 0 3px 0 2px;
-      height: 16px;
       width: 16px;
-      &:checked {
-        image: url('@{img-url}/cam_lock.png');
-      }
     }
   }
 }
@@ -170,7 +168,7 @@ QMenu {
     }
   }
   &::indicator {
-    &:extend(QCheckBox::indicator all); // views/controls.less
+    &:extend(.QCheckBox::indicator all); // views/controls.less
     margin-left: 7px;
   }
 }
@@ -193,10 +191,6 @@ TPanelTitleBar {
   qproperty-ActiveBorderPixmap: url('@{img-url}/@{title-img-active}');
   qproperty-FloatBorderPixmap: url('@{img-url}/@{title-img-float}');
   qproperty-FloatActiveBorderPixmap: url('@{img-url}/@{title-img-float-active}');
-}
-
-TPanel {
-  background-color: @widget-border-color;
 }
 
 /* -----------------------------------------------------------------------------
@@ -318,6 +312,18 @@ QToolBar {
   }
   QToolButton {
     &:extend(.button-tool all); // components/buttons.less
+    &::menu-indicator {
+      image: none;
+    }
+    &::menu-button {
+      border-image: none;
+    }
+  }
+  & QLabel {
+    margin-top: 1px;
+  }
+  & QToolBar {
+    border: 0;
   }
 }
 
@@ -360,7 +366,7 @@ QToolBar {
 #ScrollRightButton {
   image: url('@{img-url}/arrow_right.png');
   border-left: 1px solid @accent1;
-  border-right: 1px solid @accent1;
+  border-right: 1px solid @accent1; // FPS Slider
 }
 #ScrollUpButton {
   image: url('@{img-url}/arrow_up.png');

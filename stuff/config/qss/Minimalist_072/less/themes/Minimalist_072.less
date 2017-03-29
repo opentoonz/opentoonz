@@ -10,11 +10,9 @@
 
 // Accents
 @accent1: darken(@bg, 11%);
-@accent2: lighten(@bg, 10%);
 
 // Text
 @text-color: #bfbfbf;
-@text-color-light: lighten(@text-color, 15%);
 @text-color-disabled: darken(@text-color, 30%);
 
 // Selected Color (Primary)
@@ -30,12 +28,7 @@
 @dock-placeholder-color: @palette-chihiro;
 
 // Misc
-@widget-border-color: @dock-bg-color;
-@dialog-bg-color: @bg;
-@dialog-border-color: lighten(@bg, 5%);
-@tooltip-bg-color: #ffffe1;
-@tooltip-border-color: #000;
-@tooltip-text-color: #000;
+@dialog-border-color: @accent1;
 
 // Scrollable ToolBar Buttons
 @toolbar-scrollbutton-bg-color: @bg;
@@ -47,7 +40,7 @@
 @label-error: @palette-red;
 
 // Treeview
-@tree-bg-color: darken(@bg, 8%);
+@tree-bg-color: @bg;
 @tree-bg-color-alt: @tree-bg-color;
 
 // Groupbox
@@ -83,7 +76,7 @@
 @rooms-tab-bg-color-hover: lighten(@rooms-tab-bg-color, 5%);
 @rooms-tab-border-color: @tab-border-color;
 @rooms-tab-text-color: @tab-text-color;
-@rooms-tab-text-color-selected: @text-color-light;
+@rooms-tab-text-color-selected: lighten(@text-color, 35%);
 
 // -----------------------------------------------------------------------------
 // QMenu / Context Menu
@@ -141,11 +134,11 @@
 @button-border-color-hover: @button-border-color;
 @button-text-color-hover: lighten(@button-text-color, 5%);
 
-@button-bg-color-pressed: darken(@bg, 6%);
+@button-bg-color-pressed: darken(@bg, 15%);
 @button-border-color-pressed: darken(@button-bg-color-pressed, 5%);
 @button-text-color-pressed: @text-color;
 
-@button-bg-color-checked: darken(@button-bg-color-pressed, 6%);
+@button-bg-color-checked: darken(@bg, 12%);
 @button-bg-color-checked-hover: lighten(@button-bg-color-checked, 5%);
 @button-border-color-checked: darken(@button-bg-color-checked, 8%);
 @button-text-color-checked: @text-color;
@@ -167,19 +160,19 @@
 @toolbutton-bg-color-pressed: @button-bg-color-pressed;
 @toolbutton-border-color-pressed: @button-border-color-pressed;
 
-@toolbutton-bg-color-checked: darken(@bg, 12%);
+@toolbutton-bg-color-checked: @button-bg-color-checked;
+@toolbutton-bg-color-checked-hover: lighten(@toolbutton-bg-color-checked, 5%);
 @toolbutton-border-color-checked: darken(@toolbutton-bg-color-checked, 8%);
 
 // -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
 // -----------------------------------------------------------------------------
 
-@focus-color: @selected-bg-color;
+@focus-bg-color: @input-bg-color;
+@focus-border-color: @selected-bg-color;
 @input-bg-img: 'none';
 @input-bg-color: darken(@bg, 10%);
 @input-border-color: darken(@input-bg-color, 5%);
-@input-border-style: solid;
-@input-border-width: 1px;
 @input-border-radius: 2px;
 @input-text-color: @text-color;
 @input-selection-text-color: @selected-text-color;
@@ -193,7 +186,7 @@
 // QCheckBox
 // -----------------------------------------------------------------------------
 
-@checkbox-text-color-hover: lighten(@text-color, 10%);
+@checkbox-text-color-hover: lighten(@text-color, 35%);
 
 @checkbox-bg-color: @input-bg-color;
 @checkbox-border-color: @input-border-color;
@@ -259,7 +252,6 @@
 // -----------------------------------------------------------------------------
 
 @styleeditor-wheel-bg-color: @bg;
-@autoapply-button-text-color: @text-color-light;
 
 // -----------------------------------------------------------------------------
 // ComboViewer / Viewer / FlipBook
@@ -294,8 +286,6 @@
 // XSheet
 // -----------------------------------------------------------------------------
 
-@xsheet-combobox-maxwidth:                  62px;
-
 // XSheet Context Menus
 @xsheet-menu-preview-color:                 #E6E678;
 @xsheet-menu-lock-color:                    #F5F5F5;
@@ -308,7 +298,7 @@
 // XSheet Spreadsheet Viewer
 @xsheet-text-color:                         @text-color;
 @xsheet-bg-color:                           #484848;
-@xsheet-LightLine-color:                    @accent1;
+@xsheet-LightLine-color:                    #2c2c2c;
 @xsheet-MarkerLine-color:                   #1E96C4;
 @xsheet-VerticalLine-color:                 #626262;
 @xsheet-VerticalLineHead-color:             #808080;

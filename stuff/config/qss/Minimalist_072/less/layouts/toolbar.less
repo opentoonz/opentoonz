@@ -12,6 +12,7 @@
     height: @title-toolbar-size;
     max-height: @title-toolbar-size;
     min-height: @title-toolbar-size;
+    qproperty-BorderPixmap: url('none');
     qproperty-ActiveBorderPixmap: url('none');
     qproperty-FloatBorderPixmap: url('@{img-url}/@{title-toolbar-img-float}');
     qproperty-FloatActiveBorderPixmap: url('@{img-url}/@{title-toolbar-img-float}');
@@ -38,6 +39,7 @@
     width: @title-toolbar-size;
     min-width: @title-toolbar-size;
     max-width: @title-toolbar-size;
+    qproperty-BorderPixmap: url('none');
     qproperty-ActiveBorderPixmap: url('none');
     qproperty-FloatBorderPixmap: url('@{img-url}/@{title-toolbar-img-float}');
     qproperty-FloatActiveBorderPixmap: url('@{img-url}/@{title-toolbar-img-float}');
@@ -57,13 +59,10 @@ IconViewField {
   // override anything from here...
   spacing: 0;
   &::indicator {
+    // Add button style
     &:extend(.button-tool all); // components/buttons.less
+    // Add icon
     &:extend(.icon-lock all); // components/buttons.less
-    &:checked {
-      &:hover {
-      background-color: @button-bg-color-checked-hover;
-      }
-    }
   }
 }
 

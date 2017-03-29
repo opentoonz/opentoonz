@@ -44,15 +44,6 @@
 ----------------------------------------------------------------------------- */
 
 XsheetViewer {
-  & QComboBox {
-    max-width: @xsheet-combobox-maxwidth; // Prevents clipping
-    & QAbstractItemView {
-      // Prevent squash due to above variable
-      @size: 80px;
-      width: @size;
-      min-width: @size;
-    }
-  }
   & QScrollBar {
     &:extend(.mods-scrollbars-02 all); // mods/scrollbars.less
   }
@@ -208,7 +199,8 @@ SpreadsheetViewer {
 	margin: 0;
 }
 
-#FunctionSegmentViewerLinkButton:extend(QPushButton all) { // components/buttons.less
+#FunctionSegmentViewerLinkButton {
+  &:extend(.QPushButton all); // components/buttons.less
   background-image: url('@{img-url}/segment_unlinked.png');
   background-repeat: no-repeat;
   &:hover {

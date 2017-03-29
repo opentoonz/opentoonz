@@ -2,11 +2,13 @@
    UI Controls
 ----------------------------------------------------------------------------- */
 
-QPushButton {
+// For Qt selectors we use placeholders and then extend to those.
+// This is to avoid the compiler getting confused and extending the selector
+// anywhere its called (even in nests).
+
+.QPushButton {
   background-color: @button-bg-color;
-  border-color: @button-border-color;
-  border-style: solid;
-  border-width: 1px;
+  border: 1px solid @button-border-color;
   border-radius: @button-border-radius;
   color: @button-text-color;
   padding: 3px 15px;
@@ -35,6 +37,10 @@ QPushButton {
   }
 }
 
+QPushButton { // Default control
+  &:extend(.QPushButton all);
+}
+
 #PushButton_NoPadding {
   padding: 3px;
 }
@@ -51,17 +57,14 @@ QPushButton {
 
 /* -------------------------------------------------------------------------- */
 
-QComboBox {
-  &:extend(QPushButton);
+.QComboBox {
+  &:extend(.QPushButton);
   padding: 1px 0 1px 5px;
   &:hover {
-    &:extend(QPushButton:hover);
-  }
-  &:checked {
-    &:extend(QPushButton:pressed);
+    &:extend(.QPushButton:hover);
   }
   &:disabled {
-    &:extend(QPushButton:disabled);
+    &:extend(.QPushButton:disabled);
   }
   &::drop-down {
     border: 0;
@@ -80,34 +83,40 @@ QComboBox {
   }
 }
 
+QComboBox { // Default control
+  &:extend(.QComboBox all);
+}
+
 /* -------------------------------------------------------------------------- */
 
-QLineEdit {
+.QLineEdit {
   background-image: url('@{img-url}/@{input-bg-img}');
   background-repeat: repeat-x;
   background-color: @input-bg-color;
-  border-color: @input-border-color;
-  border-style: @input-border-style;
-  border-width: @input-border-width;
+  border: 1px solid @input-border-color;
   border-radius: @input-border-radius;
   color: @input-text-color;
   selection-background-color: @selected-bg-color;
   selection-color: @selected-text-color;
   padding: 0 0 0 1px;
   &:focus {
-    border-color: @focus-color;
+    background-color: @focus-bg-color;
+    border-color: @focus-border-color;
   }
   &:disabled {
     background-color: @input-bg-color-disabled;
     border-color: @input-border-color-disabled;
     color: @input-text-color-disabled;
   }
+}
 
+QLineEdit { // Default control
+  &:extend(.QLineEdit all);
 }
 
 /* -------------------------------------------------------------------------- */
 
-QCheckBox {
+.QCheckBox {
   color: @text-color;
   &:hover {
     color: @checkbox-text-color-hover;
@@ -131,7 +140,7 @@ QCheckBox {
       border-color: @checkbox-border-color-checked;
       image: url('@{img-url}/check_indicator.png');
       &:hover {
-        &:extend(QCheckBox::indicator:hover);
+        &:extend(.QCheckBox::indicator:hover);
       }
       &:disabled {
         background-color: @checkbox-bg-color-disabled;
@@ -146,9 +155,13 @@ QCheckBox {
   }
 }
 
+QCheckBox { // Default control
+  &:extend(.QCheckBox all);
+}
+
 /* -------------------------------------------------------------------------- */
 
-QRadioButton {
+.QRadioButton {
   &::indicator {
     &:unchecked {
       image: url('@{img-url}/radiobutton_unchecked.png');
@@ -161,10 +174,14 @@ QRadioButton {
   }
 }
 
+QRadioButton { // Default control
+  &:extend(.QRadioButton all);
+}
+
 /* -------------------------------------------------------------------------- */
 
-QGroupBox {
-  &:extend(.box-base); // components/borders.less
+.QGroupBox {
+  &:extend(.box-base); // components/boxes.less
   margin: 6px 0 0 0;
   padding: 5px 0px;
   &::title {
@@ -177,7 +194,7 @@ QGroupBox {
     }
   }
   &::indicator {
-    &:extend(QCheckBox::indicator all);
+    &:extend(.QCheckBox::indicator all);
     subcontrol-origin: margin;
     margin-top: 2px;
   }
@@ -186,9 +203,13 @@ QGroupBox {
   }
 }
 
+QGroupBox { // Default control
+  &:extend(.QGroupBox all);
+}
+
 /* -------------------------------------------------------------------------- */
 
-QSlider {
+.QSlider {
   &::groove:horizontal {
     background-color: transparent;
     background-image: url('@{img-url}/slider_groove.png');
@@ -200,15 +221,16 @@ QSlider {
   }
   &::handle:horizontal {
     background: @slider-handle-bg-color;
-    border: 1px solid @accent1;
+    border: 1px solid @slider-handle-border-color;
     width: 9px;
     margin: 2px 0 2px 0;
     border-radius: 2px;
   }
 }
 
-// This could be re-implemented, it's not very pretty but there isn't
-// much we can do with QSS.
+QSlider { // Default control
+  &:extend(.QSlider all);
+}
 
 #IntPairField, 
 #DoublePairField {

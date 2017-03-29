@@ -51,7 +51,7 @@ ParamsPage {
 #CameraSettingsRadioButton_Small {
   padding: 0;
   &::indicator {
-    &:extend(QRadioButton::indicator all); // layouts/controls.less
+    &:extend(.QRadioButton::indicator all); // layouts/controls.less
     background-color: transparent;
     border: 0;
     height: 21px;
@@ -60,7 +60,7 @@ ParamsPage {
   }
 }
 
-#ForceSquaredPixelButton { // "FSP"
+#ForceSquaredPixelButton {
   // Apply a button style
   &:extend(.button-tool all); // components/buttons.less
   // Apply an icon

@@ -23,72 +23,55 @@
   }
 }
 
-// Branch Size 22
+// Branch Size
 // -----------------------------------------------------------------------------
 
-.branch-22 {
+// Extend to one of the branch sizes below that suits the situation.
+
+// Base mixin
+
+.branch-base(@size: 17) {
   &:adjoins-item {
-    border-image: url('@{img-url}/tree_branch-end.png') 0;
+    border-image: url('@{img-url}/tree@{size}_branch-end.png') 0;
   }
   &:has-siblings {
-    border-image: url('@{img-url}/tree_vline.png') 0;
+    border-image: url('@{img-url}/tree@{size}_vline.png') 0;
     &:adjoins-item {
-      border-image: url('@{img-url}/tree_branch-more.png') 0;
+      border-image: url('@{img-url}/tree@{size}_branch-more.png') 0;
     }
   }
   &:has-children {
     &:closed {
       border-image: none;
-      image: url('@{img-url}/tree_branch-closed_nosib.png');
+      image: url('@{img-url}/tree@{size}_branch-closed_nosib.png');
     }
     &:open {
       border-image: none;
-      image: url('@{img-url}/tree_branch-open_nosib.png');
+      image: url('@{img-url}/tree@{size}_branch-open_nosib.png');
     }
     &:has-siblings {
       &:closed {
         border-image: none;
-        image: url('@{img-url}/tree_branch-closed.png');
+        image: url('@{img-url}/tree@{size}_branch-closed.png');
       }
       &:open {
         border-image: none;
-        image: url('@{img-url}/tree_branch-open.png');
+        image: url('@{img-url}/tree@{size}_branch-open.png');
       }
     }
   }
 }
 
-// Branch Size 17
+// Size 17
 // -----------------------------------------------------------------------------
 
 .branch-17 {
-  &:adjoins-item {
-    border-image: url('@{img-url}/tree17_branch-end.png') 0;
-  }
-  &:has-siblings {
-    border-image: url('@{img-url}/tree17_vline.png') 0;
-    &:adjoins-item {
-      border-image: url('@{img-url}/tree17_branch-more.png') 0;
-    }
-  }
-  &:has-children {
-    &:closed {
-      border-image: none;
-      image: url('@{img-url}/tree17_branch-closed_nosib.png');
-    }
-    &:open {
-      border-image: none;
-      image: url('@{img-url}/tree17_branch-open_nosib.png');
-    }
-    &:has-siblings {
-      &:closed {
-        border-image: none;
-        image: url('@{img-url}/tree17_branch-closed.png');
-      }
-      &:open {
-        border-image: none;
-        image: url('@{img-url}/tree17_branch-open.png');
-      }
-    }
-  }
+  .branch-base(17);
+}
+
+// Size 22
+// -----------------------------------------------------------------------------
+
+.branch-22 {
+  .branch-base(22);
 }

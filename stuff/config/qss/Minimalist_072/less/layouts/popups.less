@@ -5,8 +5,11 @@
 QDialog {
   background-color: @bg;
   & #dialogButtonFrame {
-    background-color: @dialog-bg-color;
+    background-color: @bg;
     border-top: 1px solid @dialog-border-color;
+    & QPushButton {
+      padding: 3px 15px;
+    }
   }
 }
 
@@ -26,8 +29,8 @@ QDialog {
 
 #PreferencesPopup {
   & QListWidget {
-    background-color: @tree-bg-color;
-    alternate-background-color: @tree-bg-color;
+    background-color: @browser-itemview-bg-color;
+    alternate-background-color: @browser-itemview-bg-color;
     border: 1px solid @accent1;
     &::item {
       border: 0; // Removes indent
@@ -48,6 +51,9 @@ QDialog {
 
 #ShortcutTree {
   &:extend(.tree-list all); // components/treeviews.less
+  &::branch {
+    &:extend(.branch-17 all); // components/treeviews.less
+  }
   background-color: @browser-itemview-bg-color;
   alternate-background-color: @browser-itemview-bg-color-alt;
   border: 1px solid @accent1;

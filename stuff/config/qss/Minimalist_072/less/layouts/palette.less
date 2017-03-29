@@ -3,15 +3,23 @@
 ----------------------------------------------------------------------------- */
 
 #StyleEditor {
+  & QPushButton {
+    // Temporary fix for channel buttons
+    margin: 2px 1px;
+    padding: 0;
+  }
   & #TabBarContainer {
     margin-left: -4px; // Resets container margin
   }
+  & QScrollBar {
+    &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
+  }
   & #bottomWidget {
+    border-top: 1px solid @accent1;
     padding: 3px 2px 8px 3px;
     & QPushButton {
-      &:checked {
-        color: @autoapply-button-text-color;
-      }
+      // Override above fix
+      padding: 3px 5px;
     }
   }
 }
@@ -71,7 +79,7 @@
 }
 
 #PlainColorPageParts {
-  border-bottom: 1px solid @accent1;
+  border-top: 1px solid @accent1;
   & QLineEdit {
     max-width: 35px;
   }
@@ -172,7 +180,7 @@ PaletteViewer {
 ----------------------------------------------------------------------------- */
 
 #WordButton {
-  &:extend(QPushButton all); // layouts/controls.less
+  &:extend(.QPushButton all); // layouts/controls.less
   // Remove horizontal padding... else moderate length text gets clipped
   padding-right: 0;
   padding-left: 0;

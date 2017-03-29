@@ -24,26 +24,24 @@
 #ViewerPanel,
 FlipBook {
 
-  // Possible BUG 01:
+  // BUG 01:
   // 2px width is required for the border-top property to work.
   // There is a hard-coded GRAY line that is persistent no matter what.
-  // Consider fixing this in the source...
   //
-  // Possible BUG 02:
+  // BUG 02:
   // When opening a new ComboViewer panel from the Windows menu...
   // The border-top property will not be shown until the app has been
-  // restarted.
-  // Consider fixing this in the source...
+  // restarted, or the theme reloaded.
   //
   // If these BUGS have been fixed then consider if the border-top
-  // property below requires adjustment, to 1px for example...
+  // property below requires adjustment, to 1px for example.
 
   & #ToolBarContainer {
     background-color: transparent;
-    border-top: 2px solid @accent1; // FixMe?
+    border-top: 2px solid @accent1;
     border-bottom: 1px solid @accent1;
-    // Hides right border on #ScrollRightButton when FPS Slider is
-    // hidden.
+    // Hides right border on #ScrollRightButton when
+    // FPS Slider is hidden
     padding-right: -1px;
     & QLineEdit {
       border-top-right-radius: 0;
