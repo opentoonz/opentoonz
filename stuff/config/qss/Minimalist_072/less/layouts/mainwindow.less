@@ -356,8 +356,18 @@ QToolBar {
 #ScrollRightButton,
 #ScrollUpButton,
 #ScrollDownButton {
+  background-color: @toolbar-scrollbutton-bg-color;
+  border: 0;
+  border-radius: 0;
   max-width: 16px;
   min-width: 16px;
+  padding: 0;
+  &:hover {
+    background-color: @toolbar-scrollbutton-bg-color-hover;
+  }
+  &:pressed {
+    background-color: @toolbar-scrollbutton-bg-color-pressed;
+  }
 }
 #ScrollLeftButton {
   image: url('@{img-url}/arrow_left.png');

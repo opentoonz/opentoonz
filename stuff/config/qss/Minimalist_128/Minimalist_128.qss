@@ -687,8 +687,24 @@ DvScrollWidget QPushButton:pressed {
 #ScrollRightButton,
 #ScrollUpButton,
 #ScrollDownButton {
+  background-color: #949494;
+  border: 0;
+  border-radius: 0;
   max-width: 16px;
   min-width: 16px;
+  padding: 0;
+}
+#ScrollLeftButton:hover,
+#ScrollRightButton:hover,
+#ScrollUpButton:hover,
+#ScrollDownButton:hover {
+  background-color: #aeaeae;
+}
+#ScrollLeftButton:pressed,
+#ScrollRightButton:pressed,
+#ScrollUpButton:pressed,
+#ScrollDownButton:pressed {
+  background-color: #7b7b7b;
 }
 #ScrollLeftButton {
   image: url('../Minimalist_072/imgs/black/arrow_left.png');
