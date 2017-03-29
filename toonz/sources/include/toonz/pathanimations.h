@@ -84,18 +84,10 @@ public:
 
   void animate(int frame) const;
 
-  int controlPointCount() const;
-  TThickPoint getControlPointPos(int cpIndex, int frame) const;
-  void setControlPointPos(int cpIndex, int frame, const TThickPoint &pos);
-  TThickPoint getChunkPoint(int chunk, int point, int frame) const;
-
 private:
   void snapshotChunks(int atFrame);
   void setThickPointKeyframe(TThickPointParamP thickPoint, const TThickPoint &p, int frame);
   void setThickPointInanimate(TThickPointParamP thickPoint, const TThickPoint &p, int frame);
-
-  TThickPointParamP controlPoint(int cpIndex) const;
-  TThickPoint position(const TThickPointParamP &param, int frame) const;
 };
 
 //!----------------------------------------------------------------------

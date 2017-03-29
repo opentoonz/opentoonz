@@ -163,47 +163,6 @@ void PathAnimation::animate(int frame) const {
   stroke->invalidate();
 }
 
-int PathAnimation::controlPointCount() const { return chunkCount() * 2 + 1; }
-
-TThickPoint PathAnimation::getControlPointPos(int cpIndex, int frame) const {
-  TThickPointParamP param = controlPoint(cpIndex);
-  return position(param, frame);
-}
-void PathAnimation::setControlPointPos(int cpIndex, int frame,
-                                       const TThickPoint &pos) {
-  TThickPointParamP param = controlPoint(cpIndex);
-  if (isActivated())
-    param->setValue(frame, pos);
-  else
-    param->setDefaultValue(pos);
-}
-
-TThickPointParamP PathAnimation::controlPoint(int cpIndex) const {
-  assert(chunkCount());
-  int cpCount = controlPointCount();
-  int chCount = chunkCount();
-
-  if (cpIndex <= 0)
-    return pointParam(0, 0);
-  else if (cpIndex >= controlPointCount())
-    return pointParam(chunkCount() - 1, 2);
-  else {
-    int chunk = (cpIndex - 1) / 2;
-    return pointParam(chunk, cpIndex - chunk * 2);
-  }
-}
-
-TThickPoint PathAnimation::getChunkPoint(int chunk, int point, int frame) const {
-  TThickPointParamP param = pointParam(chunk, point);
-  return position(param, frame);
-}
-TThickPoint PathAnimation::position(const TThickPointParamP &param, int frame) const {
-  if (isActivated())
-    return param->getValue(frame);
-  else
-    return param->getDefaultValue();
-}
-
 //-----------------------------------------------------------------------------
 // PathAnimations
 

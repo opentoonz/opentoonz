@@ -64,10 +64,6 @@ private:
   void moveSingleControlPoint(int index, const TPointD &delta);
 
   shared_ptr<PathAnimation> getPathAnimation() const;
-  // TThickPoint getControlPointPos(int index) const;
-  // void setControlPointPos(int index, const TThickPoint &pos);
-  // TThickPoint getChunkPoint(int chunk, int point) const;
-
   void takeSnapshot();
 
 public:

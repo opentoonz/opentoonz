@@ -347,6 +347,7 @@ void ControlPointEditorStroke::updateDependentPoint(int index) {
   int i;
   for (i = 0; i < (int)points.size(); i++)
     stroke->setControlPoint(points[i].first, points[i].second);
+  takeSnapshot();
 
   m_vi->notifyChangedStrokes(m_strokeIndex);
 }
