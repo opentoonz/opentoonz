@@ -285,7 +285,7 @@ void ControlPointEditorStroke::updatePoints() {
     selfLoop = false;
   }
 
-  // Se e' self loop  devo aggiungere un punto in piu' al cpCount
+  // Self-closed curve requires 1 extra point
   std::vector<TThickPoint> points;
 
   int cpCount = selfLoop ? m_controlPoints.size() + 1 : m_controlPoints.size();
@@ -332,6 +332,7 @@ void ControlPointEditorStroke::updatePoints() {
   }
 
   stroke->reshape(&points[0], points.size());
+  takeSnapshot();
   m_vi->notifyChangedStrokes(m_strokeIndex);
 }
 
