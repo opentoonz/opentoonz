@@ -65,6 +65,7 @@ private:
 
   shared_ptr<PathAnimation> getPathAnimation() const;
   void takeSnapshot();
+  void clearAndSnapshot();
 
 public:
   enum PointType { CONTROL_POINT, SPEED_IN, SPEED_OUT, SEGMENT, NONE };

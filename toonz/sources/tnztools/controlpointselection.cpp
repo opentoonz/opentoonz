@@ -332,7 +332,7 @@ void ControlPointEditorStroke::updatePoints() {
   }
 
   stroke->reshape(&points[0], points.size());
-  takeSnapshot();
+  clearAndSnapshot();
   m_vi->notifyChangedStrokes(m_strokeIndex);
 }
 
@@ -795,7 +795,7 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos) {
 
   stroke->reshape(&points[0], points.size());
   resetControlPoints();
-  takeSnapshot();
+  clearAndSnapshot();
 
   getPointTypeAt(pos, d, indexAtPos);
   return indexAtPos;
@@ -925,6 +925,12 @@ shared_ptr<PathAnimation> ControlPointEditorStroke::getPathAnimation() const {
 // perform all operations on stroke, and periodically take snapshot of it
 void ControlPointEditorStroke::takeSnapshot() {
   getPathAnimation()->takeSnapshot(m_frame);
+}
+
+void ControlPointEditorStroke::clearAndSnapshot() {
+  shared_ptr<PathAnimation> animation = getPathAnimation();
+  animation->clearKeyframes();
+  animation->takeSnapshot(m_frame);
 }
 
 //-----------------------------------------------------------------------------
