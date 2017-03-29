@@ -54,40 +54,45 @@ TThickPoint computeLinearPoint(const TThickPoint &p1, const TThickPoint &p2,
   return p1 + factor * v;
 }
 
-//-----------------------------------------------------------------------------
-/*! Insert a point in the most long chunk between chunk \b indexA and chunk \b
- * indexB. */
-void insertPoint(TStroke *stroke, int indexA, int indexB) {
-  assert(stroke);
-  int j          = 0;
-  int chunkCount = indexB - indexA;
-  if (chunkCount % 2 == 0) return;
-  double length = 0;
-  double firstW, lastW;
-  for (j = indexA; j < indexB; j++) {
-    // cerco il chunk piu' lungo
-    double w0 = stroke->getW(stroke->getChunk(j)->getP0());
-    double w1;
-    if (j == stroke->getChunkCount() - 1)
-      w1 = 1;
-    else
-      w1           = stroke->getW(stroke->getChunk(j)->getP2());
-    double length0 = stroke->getLength(w0);
-    double length1 = stroke->getLength(w1);
-    if (length < length1 - length0) {
-      firstW = w0;
-      lastW  = w1;
-      length = length1 - length0;
-    }
-  }
-  stroke->insertControlPoints((firstW + lastW) * 0.5);
-}
-
 }  // namespace
 
 //=============================================================================
 // ControlPointEditorStroke
 //-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+/*! Insert a point in the longest chunk between chunk \b indexA and chunk \b
+* indexB. */
+void ControlPointEditorStroke::insertPoint(int indexA, int indexB) {
+  TStroke *stroke = getStroke();
+  assert(stroke);
+  int j = 0;
+  int chunkCount = indexB - indexA;
+  if (chunkCount % 2 == 0) return;
+  double maxLength = 0;
+  double firstW, lastW;
+  for (j = indexA; j < indexB; j++) {
+    // find the longest chunk
+    double w0 = stroke->getW(stroke->getChunk(j)->getP0());
+    double w1;
+    if (j == stroke->getChunkCount() - 1)
+      w1 = 1;
+    else
+      w1 = stroke->getW(stroke->getChunk(j)->getP2());
+    assert(w1 > w0);
+    double length0 = stroke->getLength(w0);
+    double length1 = stroke->getLength(w1);
+    assert(length1 > length0);
+    if (maxLength < length1 - length0) {
+      firstW = w0;
+      lastW = w1;
+      maxLength = length1 - length0;
+    }
+  }
+
+  stroke->insertControlPoints((firstW + lastW) * 0.5);
+  takeSnapshot();
+}
 
 ControlPointEditorStroke *ControlPointEditorStroke::clone() const {
   ControlPointEditorStroke *controlPointEditorStroke =
@@ -129,23 +134,24 @@ int ControlPointEditorStroke::prevIndex(int index) const {
 void ControlPointEditorStroke::adjustChunkParity() {
   TStroke *stroke = getStroke();
   if (!stroke) return;
+  
   int firstChunk;
   int secondChunk = stroke->getChunkCount();
   int i;
   for (i = stroke->getChunkCount() - 1; i > 0; i--) {
     if (tdistance(stroke->getChunk(i - 1)->getP0(),
-                  stroke->getChunk(i)->getP2()) < 0.5)
+      stroke->getChunk(i)->getP2()) < 0.5)
       continue;
     TPointD p0 = stroke->getChunk(i - 1)->getP1();
     TPointD p1 = stroke->getChunk(i - 1)->getP2();
     TPointD p2 = stroke->getChunk(i)->getP1();
     if (isCuspPoint(p0, p1, p2) || isLinearPoint(p0, p1, p2)) {
       firstChunk = i;
-      insertPoint(stroke, firstChunk, secondChunk);
+      insertPoint(firstChunk, secondChunk);
       secondChunk = firstChunk;
     }
   }
-  insertPoint(stroke, 0, secondChunk);
+  insertPoint(0, secondChunk);
 }
 
 //-----------------------------------------------------------------------------
@@ -169,7 +175,7 @@ void ControlPointEditorStroke::resetControlPoints() {
   for (i = 0; i < cpCount; i = i + 4) {
     TThickPoint speedIn, speedOut;
     bool isPickOut    = false;
-    TThickPoint p     = stroke->getControlPoint(i);
+    TThickPoint p = stroke->getControlPoint(i);
     TThickPoint precP = stroke->getControlPoint(i - 1);
     TThickPoint nextP = stroke->getControlPoint(i + 1);
     if (0 < i && i < cpCount - 1)  // calcola speedIn e speedOut
@@ -425,11 +431,11 @@ void ControlPointEditorStroke::moveSingleControlPoint(int index,
   bool selfLoop = isSelfLoop();
   int cpCount = selfLoop ? m_controlPoints.size() + 1 : m_controlPoints.size();
 
-  TThickPoint p = getControlPointPos(pointIndex);
-  p             = TThickPoint(p + delta, p.thick);
-  setControlPointPos(pointIndex, p);
+  TThickPoint p = stroke->getControlPoint(pointIndex);
+  p = TThickPoint(p + delta, p.thick);
+  stroke->setControlPoint(pointIndex, p);
   if (pointIndex == 0 && selfLoop)
-    setControlPointPos(stroke->getControlPointCount() - 1, p);
+    stroke->setControlPoint(stroke->getControlPointCount() - 1, p);
 
   // Directions must be recalculated in the linear cases
   if ((selfLoop || index > 0) && isSpeedInLinear(index)) {
@@ -448,6 +454,8 @@ void ControlPointEditorStroke::moveSingleControlPoint(int index,
     if (m_controlPoints[nextIndex].m_isCusp && isSpeedInLinear(nextIndex))
       setLinearSpeedIn(nextIndex, true, false);
   }
+
+  takeSnapshot();
 }
 
 //-----------------------------------------------------------------------------
@@ -785,6 +793,7 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos) {
 
   stroke->reshape(&points[0], points.size());
   resetControlPoints();
+  takeSnapshot();
 
   getPointTypeAt(pos, d, indexAtPos);
   return indexAtPos;
@@ -910,14 +919,10 @@ shared_ptr<PathAnimation> ControlPointEditorStroke::getPathAnimation() const {
         "ControlPointEditorStroke::getPathAnimation: !m_strokeId");
   return m_strokeId->pathAnimations()->addStroke(*m_strokeId);
 }
-TThickPoint ControlPointEditorStroke::getControlPointPos(int index) const {
-  shared_ptr<PathAnimation> pathAnimation = getPathAnimation();
-  return pathAnimation->getControlPointPos(index, m_frame);
-}
-void ControlPointEditorStroke::setControlPointPos(int index,
-                                                  const TThickPoint &pos) {
-  shared_ptr<PathAnimation> pathAnimation = getPathAnimation();
-  pathAnimation->setControlPointPos(index, m_frame, pos);
+
+// perform all operations on stroke, and periodically take snapshot of it
+void ControlPointEditorStroke::takeSnapshot() {
+  getPathAnimation()->takeSnapshot(m_frame);
 }
 
 //-----------------------------------------------------------------------------

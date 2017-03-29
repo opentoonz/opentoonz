@@ -43,6 +43,7 @@ private:
   int m_strokeIndex;
   int m_frame;
 
+  void insertPoint(int indexA, int indexB);
   void adjustChunkParity();
 
   /*! Reset m_controlPoints. */
@@ -63,8 +64,11 @@ private:
   void moveSingleControlPoint(int index, const TPointD &delta);
 
   shared_ptr<PathAnimation> getPathAnimation() const;
-  TThickPoint getControlPointPos(int index) const;
-  void setControlPointPos(int index, const TThickPoint &pos);
+  // TThickPoint getControlPointPos(int index) const;
+  // void setControlPointPos(int index, const TThickPoint &pos);
+  // TThickPoint getChunkPoint(int chunk, int point) const;
+
+  void takeSnapshot();
 
 public:
   enum PointType { CONTROL_POINT, SPEED_IN, SPEED_OUT, SEGMENT, NONE };

@@ -107,31 +107,24 @@ void PathAnimation::snapshotChunks(int frame) {
     TParamSetP chunkParam = found->second;
     for (int j = 0; j < 3; j++)
       if (m_activated)
-        setThickPointKeyframe(chunkParam->getParam(j), frame);
+        setThickPointKeyframe(chunkParam->getParam(j), chunk->getThickP(j), frame);
       else
-        setThickPointInanimate(chunkParam->getParam(j), frame);
+        setThickPointInanimate(chunkParam->getParam(j), chunk->getThickP(j), frame);
   }
 }
 
 void PathAnimation::setThickPointKeyframe(TThickPointParamP thickPoint,
+                                          const TThickPoint &p,
                                           int frame) {
   if (!thickPoint) return;
-  setDoubleKeyframe(thickPoint->getX(), frame);
-  setDoubleKeyframe(thickPoint->getY(), frame);
-  setDoubleKeyframe(thickPoint->getThickness(), frame);
+  thickPoint->setValue(frame, p);
 }
 
 void PathAnimation::setThickPointInanimate(TThickPointParamP thickPoint,
+                                           const TThickPoint &p,
                                            int frame) {
   if (!thickPoint) return;
-  thickPoint->getX()->setDefaultValue(thickPoint->getX()->getValue(frame));
-  thickPoint->getY()->setDefaultValue(thickPoint->getY()->getValue(frame));
-  thickPoint->getThickness()->setDefaultValue(thickPoint->getThickness()->getValue(frame));
-}
-
-void PathAnimation::setDoubleKeyframe(TDoubleParamP &param, int frame) {
-  KeyframeSetter setter(param.getPointer(), -1, false);
-  setter.createKeyframe(frame);
+  thickPoint->setDefaultValue(p);
 }
 
 QString PathAnimation::name() const { return m_strokeId.name(); }
@@ -174,10 +167,7 @@ int PathAnimation::controlPointCount() const { return chunkCount() * 2 + 1; }
 
 TThickPoint PathAnimation::getControlPointPos(int cpIndex, int frame) const {
   TThickPointParamP param = controlPoint(cpIndex);
-  if (isActivated())
-    return param->getValue(frame);
-  else
-    return param->getDefaultValue();
+  return position(param, frame);
 }
 void PathAnimation::setControlPointPos(int cpIndex, int frame,
                                        const TThickPoint &pos) {
@@ -201,6 +191,17 @@ TThickPointParamP PathAnimation::controlPoint(int cpIndex) const {
     int chunk = (cpIndex - 1) / 2;
     return pointParam(chunk, cpIndex - chunk * 2);
   }
+}
+
+TThickPoint PathAnimation::getChunkPoint(int chunk, int point, int frame) const {
+  TThickPointParamP param = pointParam(chunk, point);
+  return position(param, frame);
+}
+TThickPoint PathAnimation::position(const TThickPointParamP &param, int frame) const {
+  if (isActivated())
+    return param->getValue(frame);
+  else
+    return param->getDefaultValue();
 }
 
 //-----------------------------------------------------------------------------

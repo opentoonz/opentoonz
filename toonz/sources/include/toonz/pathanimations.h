@@ -71,7 +71,7 @@ public:
 
   void takeSnapshot(int atFrame);
   void updateChunks();
-
+  
   bool isActivated() const { return m_activated; }
   void toggleActivated();
   
@@ -79,7 +79,7 @@ public:
 
   int chunkCount() const;
   TParamSetP chunkParam(int i) const;
-
+  
   TThickPointParamP pointParam(int chunk, int point) const;
 
   void animate(int frame) const;
@@ -87,17 +87,18 @@ public:
   int controlPointCount() const;
   TThickPoint getControlPointPos(int cpIndex, int frame) const;
   void setControlPointPos(int cpIndex, int frame, const TThickPoint &pos);
+  TThickPoint getChunkPoint(int chunk, int point, int frame) const;
 
 private:
   void snapshotChunks(int atFrame);
-  void setThickPointKeyframe(TThickPointParamP thickPoint, int frame);
-  void setThickPointInanimate(TThickPointParamP thickPoint, int frame);
-  void setDoubleKeyframe(TDoubleParamP &param, int frame);
-
+  void setThickPointKeyframe(TThickPointParamP thickPoint, const TThickPoint &p, int frame);
+  void setThickPointInanimate(TThickPointParamP thickPoint, const TThickPoint &p, int frame);
 
   TThickPointParamP controlPoint(int cpIndex) const;
+  TThickPoint position(const TThickPointParamP &param, int frame) const;
 };
 
+//!----------------------------------------------------------------------
 //! Storage for all strokes animation keyframes
 class DVAPI PathAnimations final {
   TXsheet *m_xsheet;

@@ -1482,9 +1482,9 @@ void TStroke::setControlPoint(int n, const TThickPoint &pos) {
 
 //-----------------------------------------------------------------------------
 
-//! Ridisegna lo stroke
+//! Redraw stroke
 void TStroke::reshape(const TThickPoint pos[], int count) {
-  // count deve essere dispari e maggiore o uguale a tre
+  // count must be odd and at least 3
   assert(count >= 3);
   assert(count & 1);
   QuadStrokeChunkArray &chunkArray = m_imp->m_centerLineArray;
@@ -1693,7 +1693,7 @@ void TStroke::insertControlPoints(double w) {
   assert(0 <= chunk && chunk < getChunkCount());
   assert(0 <= tOfDivision && tOfDivision <= 1.0);
 
-  // calcolo i due "cionchi"
+  // calculate two parts
   TThickQuadratic *tqfirst  = new TThickQuadratic,
                   *tqsecond = new TThickQuadratic;
 
@@ -1701,15 +1701,15 @@ void TStroke::insertControlPoints(double w) {
 
   m_imp->updateParameterValue(w, chunk, tqfirst, tqsecond);
 
-  // recupero la posizione nella lista delle curve
+  // recover position in the list of curves
   QuadStrokeChunkArray::iterator it = m_imp->m_centerLineArray.begin();
 
-  // elimino la curva vecchia
+  // delete the old curve
   advance(it, chunk);
   delete *it;
   it = m_imp->m_centerLineArray.erase(it);
 
-  // ed aggiungo le nuove
+  // and add new
   it = m_imp->m_centerLineArray.insert(it, tqsecond);
   m_imp->m_centerLineArray.insert(it, tqfirst);
 

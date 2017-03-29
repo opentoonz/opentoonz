@@ -442,6 +442,8 @@ public:
 
   //! Set P0 / P1 / P2
   void setThickP(int i, const TThickPoint &p);
+  //! Get P0 / P1 / P2
+  TThickPoint getThickP(int i) const;
 
   //! Return the \b TThickPoint of quadratic at parameter \b t.
   TThickPoint getThickPoint(double t) const;
