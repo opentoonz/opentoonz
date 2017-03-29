@@ -75,7 +75,7 @@ QToolBar QToolButton:checked,
 #ForceSquaredPixelButton:checked,
 #SchematicBottomFrame QToolBar QToolButton:checked,
 #EditToolLockButton::indicator:checked {
-  background-color: #232323;
+  background-color: #161616;
   border-color: #444444;
 }
 .button-tool:checked:hover,
@@ -84,7 +84,7 @@ QToolBar QToolButton:checked:hover,
 #ForceSquaredPixelButton:checked:hover,
 #SchematicBottomFrame QToolBar QToolButton:checked:hover,
 #EditToolLockButton::indicator:checked:hover {
-  background-color: #303030;
+  background-color: #232323;
 }
 .button-tool:disabled,
 QToolBar QToolButton:disabled,
@@ -762,15 +762,15 @@ QPushButton:pressed,
 QPushButton:checked,
 #WordButton:checked,
 #FunctionSegmentViewerLinkButton:checked {
-  background-color: #232323;
-  border-color: #161616;
+  background-color: #161616;
+  border-color: #000000;
   color: #bfbfbf;
 }
 .QPushButton:checked:hover,
 QPushButton:checked:hover,
 #WordButton:checked:hover,
 #FunctionSegmentViewerLinkButton:checked:hover {
-  background-color: #303030;
+  background-color: #232323;
 }
 .QPushButton:disabled,
 QPushButton:disabled,
