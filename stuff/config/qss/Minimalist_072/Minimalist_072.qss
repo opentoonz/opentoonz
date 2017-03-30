@@ -485,7 +485,7 @@ QMenuBar::item:pressed {
 }
 #TopBarTab::tab:selected {
   background-color: #222222;
-  color: #ffffff;
+  color: #cccccc;
 }
 #TopBarTab::tab:first {
   border-left: 1px solid #242424;

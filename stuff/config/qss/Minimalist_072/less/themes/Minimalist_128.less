@@ -143,6 +143,19 @@
 @styleeditor-wheel-bg-color: @bg;
 
 // -----------------------------------------------------------------------------
+// ComboViewer / Viewer / FlipBook
+// -----------------------------------------------------------------------------
+
+// Ruler
+@viewer-ruler-bg-color: lighten(@bg, 20%);
+
+// -----------------------------------------------------------------------------
+// Schematic Node Viewer
+// -----------------------------------------------------------------------------
+
+@schematic-label-text-color: #000;
+
+// -----------------------------------------------------------------------------
 // XSheet
 // -----------------------------------------------------------------------------
 
@@ -180,7 +193,7 @@
 @xsheet-SelectedFullColorColumn-color:      rgb(205,235,237);
 
 @xsheet-FxColumn-color:                     rgb(130,129,93);
-@xsheet-FxColumnBorder-color:               darken(desaturate(@xsheet-FxColumn-color, 15%), 35%);
+@xsheet-FxColumnBorder-color:               darken(desaturate(@xsheet-FxColumn-color, 10%), 20%);
 @xsheet-SelectedFxColumn-color:             rgb(193,192,174);
 
 @xsheet-ReferenceColumn-color:              rgb(171,171,171);

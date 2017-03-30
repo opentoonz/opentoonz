@@ -1355,7 +1355,7 @@ FxSettings QToolBar QToolBar {
   border: 0;
 }
 #FxSettingsLabel {
-  color: #a0e680;
+  color: #000;
 }
 #FxSettingsHelpButton {
   background-color: #80a0dc;
@@ -1556,7 +1556,7 @@ FlipSlider {
   qproperty-baseColor: #787878;
 }
 Ruler {
-  qproperty-ParentBGColor: #808080;
+  qproperty-ParentBGColor: #b3b3b3;
   qproperty-ScaleColor: #000;
 }
 #RulerToolOptionValues {
@@ -1623,7 +1623,7 @@ XsheetViewer {
   qproperty-FullcolorColumnBorderColor: #427c81;
   qproperty-SelectedFullcolorColumnColor: #cdebed;
   qproperty-FxColumnColor: #82815d;
-  qproperty-FxColumnBorderColor: #171716;
+  qproperty-FxColumnBorderColor: #404039;
   qproperty-SelectedFxColumnColor: #c1c0ae;
   qproperty-ReferenceColumnColor: #ababab;
   qproperty-ReferenceColumnBorderColor: #525252;

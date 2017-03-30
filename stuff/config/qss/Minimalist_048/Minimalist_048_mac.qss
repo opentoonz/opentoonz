@@ -473,7 +473,7 @@ QMenuBar::item:pressed {
   padding: 0;
 }
 #TopBarTab::tab {
-  background-color: #232323;
+  background-color: #303030;
   border-top: 1px solid #0c0c0c;
   border-right: 1px solid #0c0c0c;
   color: #8c8c8c;
@@ -481,11 +481,11 @@ QMenuBar::item:pressed {
   padding: 2px 10px 3px 10px;
 }
 #TopBarTab::tab:hover {
-  background-color: #303030;
+  background-color: #3d3d3d;
 }
 #TopBarTab::tab:selected {
   background-color: #0a0a0a;
-  color: #ffffff;
+  color: #cccccc;
 }
 #TopBarTab::tab:first {
   border-left: 1px solid #0c0c0c;
