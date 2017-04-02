@@ -74,7 +74,7 @@ TFilePath getGlobalRoot() {
   // Leggo la localRoot da File txt
 
   Tifstream is(
-      TFilePath("./OpenToonz_1.0.app/Contents/Resources/configfarmroot.txt"));
+      TFilePath("./OpenToonz_" + applicationVersion + ".app/Contents/Resources/configfarmroot.txt"));
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -106,7 +106,7 @@ TFilePath getLocalRoot() {
           TFilePath("toonzfarm");
 #else
   Tifstream is(
-      TFilePath("./OpenToonz_1.0.app/Contents/Resources/configfarmroot.txt"));
+      TFilePath("./OpenToonz_" + applicationVersion + ".app/Contents/Resources/configfarmroot.txt"));
   if (is) {
     char line[1024];
     is.getline(line, 80);
