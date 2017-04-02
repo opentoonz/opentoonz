@@ -1,5 +1,4 @@
 
-
 #include "tfarmserver.h"
 #include "tfarmexecutor.h"
 #include "tfarmcontroller.h"
@@ -60,12 +59,16 @@ class FarmServer;
 
 namespace {
 
+const char *applicationName     = "OpenToonz";
+const char *applicationVersion  = "1.1";
+const char *applicationRevision = "2";
+
 //--------------------------------------------------------------------
 TFilePath getGlobalRoot() {
   TFilePath rootDir;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\FARMROOT");
+  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\" + applicationVersion + "\\FARMROOT");
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
   // Leggo la localRoot da File txt
@@ -98,7 +101,7 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  TFilePath name("SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\TOONZROOT");
+  TFilePath name("SOFTWARE\\OpenToonz\\OpenToonz\\" + applicationVersion + "\\TOONZROOT");
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else

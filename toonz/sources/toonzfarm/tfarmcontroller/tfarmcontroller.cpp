@@ -53,11 +53,15 @@ int inline STRICMP(const char *a, const char *b) {
 
 namespace {
 
+const char *applicationName     = "OpenToonz";
+const char *applicationVersion  = "1.1";
+const char *applicationRevision = "2";
+
 TFilePath getGlobalRoot() {
   TFilePath rootDir;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\FARMROOT");
+  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\" + applicationVersion + "\\FARMROOT");
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
 
@@ -90,7 +94,7 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\TOONZROOT");
+  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\" + applicationVersion + "\\TOONZROOT");
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
