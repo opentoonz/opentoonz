@@ -61,13 +61,15 @@ TFilePath getGlobalRoot() {
   TFilePath rootDir;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\" + applicationVersion + "\\FARMROOT");
+  QString regpath = L"SOFTWARE\\OpenToonz\\OpenToonz\\" + applicationVersion + "\\FARMROOT";
+  TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
 
   // Leggo la globalRoot da File txt
+  QString macpath = "./OpenToonz_" + applicationVersion + ".app/Contents/Resources/configfarmroot.txt";
   Tifstream is(
-      TFilePath("./OpenToonz_" + applicationVersion + ".app/Contents/Resources/configfarmroot.txt"));
+      TFilePath(macpath));
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -94,14 +96,16 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\" + applicationVersion + "\\TOONZROOT");
+  QString regpath = L"SOFTWARE\\OpenToonz\\OpenToonz\\" + applicationVersion + "\\FARMROOT";
+  TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
   // Leggo la localRoot da File txt
+  QString macpath = "./OpenToonz_" + applicationVersion + ".app/Contents/Resources/configfarmroot.txt";
 
   Tifstream is(
-      TFilePath("./OpenToonz_" + applicationVersion + ".app/Contents/Resources/configfarmroot.txt"));
+      TFilePath(macpath));
   if (is) {
     char line[1024];
     is.getline(line, 80);
