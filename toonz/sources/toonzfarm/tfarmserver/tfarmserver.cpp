@@ -73,10 +73,10 @@ TFilePath getGlobalRoot() {
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
   // Leggo la localRoot da File txt
-  QString macpath = "./OpenToonz_" + applicationVersion + ".app/Contents/Resources/configfarmroot.txt";
-
+  std::string unixpath = "./OpenToonz_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+  TFilePath name(unixpath);
   Tifstream is(
-      TFilePath(macpath));
+      TFilePath(TSystem::getSystemValue(name).toStdString()));
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -108,10 +108,10 @@ TFilePath getLocalRoot() {
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
-  QString macpath = "./OpenToonz_" + applicationVersion + ".app/Contents/Resources/configfarmroot.txt";
-
-  Tifstream is(
-      TFilePath(macpath));
+std::string unixpath = "./OpenToonz_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+TFilePath name(unixpath);
+Tifstream is(
+    TFilePath(TSystem::getSystemValue(name).toStdString()));
   if (is) {
     char line[1024];
     is.getline(line, 80);
