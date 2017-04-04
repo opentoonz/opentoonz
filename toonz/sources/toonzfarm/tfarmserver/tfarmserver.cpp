@@ -68,7 +68,7 @@ TFilePath getGlobalRoot() {
   TFilePath rootDir;
 
 #ifdef _WIN32
-  std::wstring regpath = L"SOFTWARE\\OpenToonz\\OpenToonz\\" + std::wstring(applicationVersion) + "\\FARMROOT";
+  std::wstring regpath = L"SOFTWARE\\OpenToonz\\OpenToonz\\" + std::wstring(applicationVersion.str()) + "\\FARMROOT";
   TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
@@ -103,7 +103,7 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  std::wstring regpath = L"SOFTWARE\\OpenToonz\\OpenToonz\\" + std::wstring(applicationVersion) + "\\FARMROOT";
+  std::wstring regpath = L"SOFTWARE\\OpenToonz\\OpenToonz\\" + std::wstring(applicationVersion.str()) + "\\FARMROOT";
   TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
