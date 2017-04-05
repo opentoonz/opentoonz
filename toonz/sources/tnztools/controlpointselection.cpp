@@ -331,8 +331,8 @@ void ControlPointEditorStroke::updatePoints() {
     }
   }
 
-  stroke->reshape(&points[0], points.size());
-  clearAndSnapshot();
+  Reshape recreated = stroke->reshape(&points[0], points.size());
+  maybeClearAndSnapshot(recreated);
   m_vi->notifyChangedStrokes(m_strokeIndex);
 }
 
@@ -931,6 +931,13 @@ void ControlPointEditorStroke::clearAndSnapshot() {
   shared_ptr<PathAnimation> animation = getPathAnimation();
   animation->clearKeyframes();
   animation->takeSnapshot(m_frame);
+}
+
+void ControlPointEditorStroke::maybeClearAndSnapshot(Reshape recreated) {
+  if (recreated == Reshape::Recreated)
+    clearAndSnapshot();
+  else
+    takeSnapshot();
 }
 
 //-----------------------------------------------------------------------------

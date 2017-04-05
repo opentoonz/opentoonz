@@ -34,6 +34,10 @@ class TStrokeProp;
 class TSegment;
 class TFlash;
 
+enum class Reshape {
+  Recreated, Moved
+};
+
 //===================================================================
 
 //***************************************************************************
@@ -165,7 +169,10 @@ The first method doesn't change the point thickness
   }
 
   //! Reshape stroke
-  void reshape(const TThickPoint pos[], int count);
+  Reshape reshape(const TThickPoint pos[], int count);
+  //! Move curve (the number of chunks must remain the same)
+  Reshape move(const TThickPoint pos[], int count);
+  void countNegativeThickness(const TThickPoint pos[], int count);
 
   /*!
 Return chunk at position index

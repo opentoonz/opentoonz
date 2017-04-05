@@ -1482,25 +1482,51 @@ void TStroke::setControlPoint(int n, const TThickPoint &pos) {
 
 //-----------------------------------------------------------------------------
 
-//! Redraw stroke
-void TStroke::reshape(const TThickPoint pos[], int count) {
+//! Recreate shape
+Reshape TStroke::reshape(const TThickPoint pos[], int count) {
+  if (count == getControlPointCount())
+    return move(pos, count);
+
   // count must be odd and at least 3
   assert(count >= 3);
   assert(count & 1);
   QuadStrokeChunkArray &chunkArray = m_imp->m_centerLineArray;
   clearPointerContainer(chunkArray);
 
-  m_imp->m_negativeThicknessPoints = 0;
-  for (int i = 0; i < count - 1; i += 2) {
+  for (int i = 0; i + 2 < count; i += 2)
     chunkArray.push_back(new TThickQuadratic(pos[i], pos[i + 1], pos[i + 2]));
-    if (pos[i].thick <= 0) m_imp->m_negativeThicknessPoints++;
-    if (pos[i + 1].thick <= 0) m_imp->m_negativeThicknessPoints++;
-  }
-  if (pos[count - 1].thick <= 0) m_imp->m_negativeThicknessPoints++;
+  countNegativeThickness(pos, count);
 
   invalidate();
-  // m_imp->computeBBox();
   m_imp->computeParameterInControlPoint();
+
+  return Reshape::Recreated;
+}
+
+//-----------------------------------------------------------------------------
+
+Reshape TStroke::move(const TThickPoint pos[], int count) {
+  assert(count >= 3);
+  assert(count & 1);
+  QuadStrokeChunkArray &chunkArray = m_imp->m_centerLineArray;
+  // i is offset within pos array
+  for (int i = 0, chunk = 0; i + 2 < count; i += 2, chunk++)
+    for (int j = 0; j < 3; j++)
+      chunkArray[chunk]->setThickP(j, pos[i + j]);
+  countNegativeThickness(pos, count);
+
+  invalidate();
+  m_imp->computeParameterInControlPoint();
+
+  return Reshape::Moved;
+}
+
+//-----------------------------------------------------------------------------
+
+void TStroke::countNegativeThickness(const TThickPoint pos[], int count) {
+  m_imp->m_negativeThicknessPoints = 0;
+  for (int i = 0; i < count; i++)
+    if (pos[i].thick <= 0) m_imp->m_negativeThicknessPoints++;
 }
 
 //-----------------------------------------------------------------------------
