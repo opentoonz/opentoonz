@@ -1291,12 +1291,13 @@ QDialog #dialogButtonFrame QPushButton {
    Preferences
 ----------------------------------------------------------------------------- */
 #PreferencesPopup QListWidget {
-  background-color: #808080;
-  alternate-background-color: #808080;
+  background-color: #9a9a9a;
+  alternate-background-color: #9a9a9a;
   border: 1px solid #404040;
+  font-size: 13px;
 }
 #PreferencesPopup QListWidget::item {
-  border: 1px solid #808080;
+  border: 0;
   padding: 3px;
 }
 #PreferencesPopup QListWidget::item:hover {
