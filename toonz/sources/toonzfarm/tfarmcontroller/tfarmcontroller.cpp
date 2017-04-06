@@ -61,18 +61,22 @@ TFilePath getGlobalRoot() {
   TFilePath rootDir;
 
 #ifdef _WIN32
-  QString regpath = QString::fromStdString("SOFTWARE\\OpenToonz\\OpenToonz\\" + std::string(applicationVersion) + "\\FARMROOT");
+  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
   TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
 
   // Leggo la globalRoot da File txt
+<<<<<<< HEAD
   // set path to something suitable for most linux (Unix?) systems
   std::string unixpath = "/etc/opentoonz/opentoonz.conf";
 #ifdef MACOSX
   // If MACOSX, change to MACOSX path
   std::string unixpath = "./OpenToonz_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
 #endif
+=======
+  std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+>>>>>>> master
   TFilePath name(unixpath);
   Tifstream is(
       TFilePath(TSystem::getSystemValue(name).toStdString()));
@@ -102,18 +106,22 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  QString regpath = QString::fromStdString("SOFTWARE\\OpenToonz\\OpenToonz\\" + std::string(applicationVersion) + "\\FARMROOT");
+  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
   TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
   // Leggo la localRoot da File txt
+<<<<<<< HEAD
   // set path to something suitable for most linux (Unix?) systems
   std::string unixpath = "/etc/opentoonz/opentoonz.conf";
 #ifdef MACOSX
   // If MACOSX, change to MACOSX path
   std::string unixpath = "./OpenToonz_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
 #endif
+=======
+  std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+>>>>>>> master
   TFilePath name(unixpath);
   Tifstream is(
       TFilePath(TSystem::getSystemValue(name).toStdString()));
