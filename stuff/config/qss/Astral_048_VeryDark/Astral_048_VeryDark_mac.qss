@@ -6,7 +6,7 @@
 #CleanupSettingsShowButton,
 #OutputSettingsShowButton,
 #FxSettingsPreviewShowButton {
-  image: url('../Minimalist_072/imgs/white/plus.png');
+  image: url('../Astral_072_Dark/imgs/white/plus.png');
   image-position: center center;
   margin: 0;
   padding: 0;
@@ -18,7 +18,7 @@
 #FxSettingsPreviewShowButton:checked {
   background-color: #565656;
   border-color: #232323;
-  image: url('../Minimalist_072/imgs/white/minus.png');
+  image: url('../Astral_072_Dark/imgs/white/minus.png');
 }
 .button-show:checked:pressed,
 #LoadLevelShowButton:checked:pressed,
@@ -138,23 +138,23 @@ QGroupBox {
 .icon-lock:unchecked,
 #CameraSettingsRadioButton::indicator:unchecked,
 #EditToolLockButton::indicator:unchecked {
-  image: url('../Minimalist_072/imgs/white/cam_unlock.png');
+  image: url('../Astral_072_Dark/imgs/white/cam_unlock.png');
 }
 .icon-lock:checked,
 #CameraSettingsRadioButton::indicator:checked,
 #EditToolLockButton::indicator:checked {
-  image: url('../Minimalist_072/imgs/white/cam_lock.png');
+  image: url('../Astral_072_Dark/imgs/white/cam_lock.png');
 }
 .icon-fsp,
 #ForceSquaredPixelButton {
   height: 16px;
-  image: url('../Minimalist_072/imgs/white/fsp_unchecked.png');
+  image: url('../Astral_072_Dark/imgs/white/fsp_unchecked.png');
   padding: 1px;
   width: 16px;
 }
 .icon-fsp:checked,
 #ForceSquaredPixelButton:checked {
-  image: url('../Minimalist_072/imgs/white/fsp_checked.png');
+  image: url('../Astral_072_Dark/imgs/white/fsp_checked.png');
 }
 /* -----------------------------------------------------------------------------
    Component: Tabs
@@ -285,7 +285,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:adjoins-item,
 #Tasks QTreeView::branch:adjoins-item,
 #FunctionEditorTree::branch:adjoins-item {
-  border-image: url('../Minimalist_072/imgs/white/tree17_branch-end.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree17_branch-end.png') 0;
 }
 .branch-17:has-siblings,
 #SceneCast QTreeView::branch:has-siblings,
@@ -293,7 +293,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-siblings,
 #Tasks QTreeView::branch:has-siblings,
 #FunctionEditorTree::branch:has-siblings {
-  border-image: url('../Minimalist_072/imgs/white/tree17_vline.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree17_vline.png') 0;
 }
 .branch-17:has-siblings:adjoins-item,
 #SceneCast QTreeView::branch:has-siblings:adjoins-item,
@@ -301,7 +301,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-siblings:adjoins-item,
 #Tasks QTreeView::branch:has-siblings:adjoins-item,
 #FunctionEditorTree::branch:has-siblings:adjoins-item {
-  border-image: url('../Minimalist_072/imgs/white/tree17_branch-more.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree17_branch-more.png') 0;
 }
 .branch-17:has-children:closed,
 #SceneCast QTreeView::branch:has-children:closed,
@@ -310,7 +310,7 @@ ProjectPopup QTreeView::item:focus,
 #Tasks QTreeView::branch:has-children:closed,
 #FunctionEditorTree::branch:has-children:closed {
   border-image: none;
-  image: url('../Minimalist_072/imgs/white/tree17_branch-closed_nosib.png');
+  image: url('../Astral_072_Dark/imgs/white/tree17_branch-closed_nosib.png');
 }
 .branch-17:has-children:open,
 #SceneCast QTreeView::branch:has-children:open,
@@ -319,7 +319,7 @@ ProjectPopup QTreeView::item:focus,
 #Tasks QTreeView::branch:has-children:open,
 #FunctionEditorTree::branch:has-children:open {
   border-image: none;
-  image: url('../Minimalist_072/imgs/white/tree17_branch-open_nosib.png');
+  image: url('../Astral_072_Dark/imgs/white/tree17_branch-open_nosib.png');
 }
 .branch-17:has-children:has-siblings:closed,
 #SceneCast QTreeView::branch:has-children:has-siblings:closed,
@@ -328,7 +328,7 @@ ProjectPopup QTreeView::item:focus,
 #Tasks QTreeView::branch:has-children:has-siblings:closed,
 #FunctionEditorTree::branch:has-children:has-siblings:closed {
   border-image: none;
-  image: url('../Minimalist_072/imgs/white/tree17_branch-closed.png');
+  image: url('../Astral_072_Dark/imgs/white/tree17_branch-closed.png');
 }
 .branch-17:has-children:has-siblings:open,
 #SceneCast QTreeView::branch:has-children:has-siblings:open,
@@ -337,46 +337,46 @@ ProjectPopup QTreeView::item:focus,
 #Tasks QTreeView::branch:has-children:has-siblings:open,
 #FunctionEditorTree::branch:has-children:has-siblings:open {
   border-image: none;
-  image: url('../Minimalist_072/imgs/white/tree17_branch-open.png');
+  image: url('../Astral_072_Dark/imgs/white/tree17_branch-open.png');
 }
 .branch-22:adjoins-item,
 #DirTreeView::branch:adjoins-item,
 ProjectPopup QTreeView::branch:adjoins-item {
-  border-image: url('../Minimalist_072/imgs/white/tree22_branch-end.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree22_branch-end.png') 0;
 }
 .branch-22:has-siblings,
 #DirTreeView::branch:has-siblings,
 ProjectPopup QTreeView::branch:has-siblings {
-  border-image: url('../Minimalist_072/imgs/white/tree22_vline.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree22_vline.png') 0;
 }
 .branch-22:has-siblings:adjoins-item,
 #DirTreeView::branch:has-siblings:adjoins-item,
 ProjectPopup QTreeView::branch:has-siblings:adjoins-item {
-  border-image: url('../Minimalist_072/imgs/white/tree22_branch-more.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree22_branch-more.png') 0;
 }
 .branch-22:has-children:closed,
 #DirTreeView::branch:has-children:closed,
 ProjectPopup QTreeView::branch:has-children:closed {
   border-image: none;
-  image: url('../Minimalist_072/imgs/white/tree22_branch-closed_nosib.png');
+  image: url('../Astral_072_Dark/imgs/white/tree22_branch-closed_nosib.png');
 }
 .branch-22:has-children:open,
 #DirTreeView::branch:has-children:open,
 ProjectPopup QTreeView::branch:has-children:open {
   border-image: none;
-  image: url('../Minimalist_072/imgs/white/tree22_branch-open_nosib.png');
+  image: url('../Astral_072_Dark/imgs/white/tree22_branch-open_nosib.png');
 }
 .branch-22:has-children:has-siblings:closed,
 #DirTreeView::branch:has-children:has-siblings:closed,
 ProjectPopup QTreeView::branch:has-children:has-siblings:closed {
   border-image: none;
-  image: url('../Minimalist_072/imgs/white/tree22_branch-closed.png');
+  image: url('../Astral_072_Dark/imgs/white/tree22_branch-closed.png');
 }
 .branch-22:has-children:has-siblings:open,
 #DirTreeView::branch:has-children:has-siblings:open,
 ProjectPopup QTreeView::branch:has-children:has-siblings:open {
   border-image: none;
-  image: url('../Minimalist_072/imgs/white/tree22_branch-open.png');
+  image: url('../Astral_072_Dark/imgs/white/tree22_branch-open.png');
 }
 /* -----------------------------------------------------------------------------
    Main
@@ -551,10 +551,10 @@ TPanelTitleBar {
   min-height: 20px;
   qproperty-TitleColor: #a6a6a6;
   qproperty-ActiveTitleColor: #e5e5e5;
-  qproperty-BorderPixmap: url('../Minimalist_072/imgs/white/none');
-  qproperty-ActiveBorderPixmap: url('../Minimalist_072/imgs/white/none');
-  qproperty-FloatBorderPixmap: url('../Minimalist_072/imgs/white/none');
-  qproperty-FloatActiveBorderPixmap: url('../Minimalist_072/imgs/white/none');
+  qproperty-BorderPixmap: url('../Astral_072_Dark/imgs/white/none');
+  qproperty-ActiveBorderPixmap: url('../Astral_072_Dark/imgs/white/none');
+  qproperty-FloatBorderPixmap: url('../Astral_072_Dark/imgs/white/none');
+  qproperty-FloatActiveBorderPixmap: url('../Astral_072_Dark/imgs/white/none');
 }
 /* -----------------------------------------------------------------------------
    Scroll Bars (Global)
@@ -598,14 +598,14 @@ QScrollBar::add-line:vertical:pressed {
 }
 QScrollBar::add-line:horizontal {
   subcontrol-position: right;
-  image: url('../Minimalist_072/imgs/white/scroll-right.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-right.png');
   image-position: center center;
   margin: 1px;
   width: 13px;
 }
 QScrollBar::add-line:vertical {
   subcontrol-position: bottom;
-  image: url('../Minimalist_072/imgs/white/scroll-down.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-down.png');
   image-position: center center;
   margin: 1px;
   height: 13px;
@@ -622,14 +622,14 @@ QScrollBar::sub-line:vertical:pressed {
 }
 QScrollBar::sub-line:horizontal {
   subcontrol-position: left;
-  image: url('../Minimalist_072/imgs/white/scroll-left.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-left.png');
   image-position: center center;
   margin: 1px;
   width: 13px;
 }
 QScrollBar::sub-line:vertical {
   subcontrol-position: top;
-  image: url('../Minimalist_072/imgs/white/scroll-up.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-up.png');
   image-position: center center;
   margin: 1px;
   height: 13px;
@@ -707,19 +707,19 @@ DvScrollWidget QPushButton:pressed {
   background-color: #161616;
 }
 #ScrollLeftButton {
-  image: url('../Minimalist_072/imgs/white/arrow_left.png');
+  image: url('../Astral_072_Dark/imgs/white/arrow_left.png');
   border-right: 1px solid #141414;
 }
 #ScrollRightButton {
-  image: url('../Minimalist_072/imgs/white/arrow_right.png');
+  image: url('../Astral_072_Dark/imgs/white/arrow_right.png');
   border-left: 1px solid #141414;
   border-right: 1px solid #141414;
 }
 #ScrollUpButton {
-  image: url('../Minimalist_072/imgs/white/arrow_up.png');
+  image: url('../Astral_072_Dark/imgs/white/arrow_up.png');
 }
 #ScrollDownButton {
-  image: url('../Minimalist_072/imgs/white/arrow_down.png');
+  image: url('../Astral_072_Dark/imgs/white/arrow_down.png');
 }
 #keyFrameNavigator {
   background: none;
@@ -803,10 +803,10 @@ QComboBox:disabled {
 }
 /* Camera Capture */
 #GearButton {
-  qproperty-icon: url('../Minimalist_072/imgs/white/gear.png');
+  qproperty-icon: url('../Astral_072_Dark/imgs/white/gear.png');
 }
 #SubfolderButton {
-  qproperty-icon: url('../Minimalist_072/imgs/white/subfolder.png');
+  qproperty-icon: url('../Astral_072_Dark/imgs/white/subfolder.png');
 }
 /* -------------------------------------------------------------------------- */
 .QComboBox,
@@ -819,11 +819,11 @@ QComboBox::drop-down {
 }
 .QComboBox::down-arrow,
 QComboBox::down-arrow {
-  image: url('../Minimalist_072/imgs/white/combo_down_arrow.png');
+  image: url('../Astral_072_Dark/imgs/white/combo_down_arrow.png');
 }
 .QComboBox::down-arrow:disabled,
 QComboBox::down-arrow:disabled {
-  image: url('../Minimalist_072/imgs/white/combo_down_arrow-disabled.png');
+  image: url('../Astral_072_Dark/imgs/white/combo_down_arrow-disabled.png');
 }
 .QComboBox QAbstractItemView,
 QComboBox QAbstractItemView {
@@ -838,7 +838,7 @@ QLineEdit,
 #TaskSheetItem,
 #tasksRemoveBox,
 #tasksAddBox {
-  background-image: url('../Minimalist_072/imgs/white/none');
+  background-image: url('../Astral_072_Dark/imgs/white/none');
   background-repeat: repeat-x;
   background-color: #1c1c1c;
   border: 1px solid #3d3d3d;
@@ -910,7 +910,7 @@ QCheckBox::indicator:checked,
 QGroupBox::indicator:checked {
   background-color: #1c1c1c;
   border-color: #3d3d3d;
-  image: url('../Minimalist_072/imgs/white/check_indicator.png');
+  image: url('../Astral_072_Dark/imgs/white/check_indicator.png');
 }
 .QCheckBox::indicator:checked:disabled,
 QMenu::indicator:checked:disabled,
@@ -919,7 +919,7 @@ QCheckBox::indicator:checked:disabled,
 QGroupBox::indicator:checked:disabled {
   background-color: #232323;
   border-color: #1c1c1c;
-  image: url('../Minimalist_072/imgs/white/check_indicator-disabled.png');
+  image: url('../Astral_072_Dark/imgs/white/check_indicator-disabled.png');
 }
 .QCheckBox::indicator:disabled,
 QMenu::indicator:disabled,
@@ -933,13 +933,13 @@ QGroupBox::indicator:disabled {
 .QRadioButton::indicator:unchecked,
 QRadioButton::indicator:unchecked,
 #CameraSettingsRadioButton_Small::indicator:unchecked {
-  image: url('../Minimalist_072/imgs/white/radiobutton_unchecked.png');
+  image: url('../Astral_072_Dark/imgs/white/radiobutton_unchecked.png');
   image-position: center center;
 }
 .QRadioButton::indicator:checked,
 QRadioButton::indicator:checked,
 #CameraSettingsRadioButton_Small::indicator:checked {
-  image: url('../Minimalist_072/imgs/white/radiobutton_checked.png');
+  image: url('../Astral_072_Dark/imgs/white/radiobutton_checked.png');
   image-position: center center;
 }
 /* -------------------------------------------------------------------------- */
@@ -972,7 +972,7 @@ QGroupBox:disabled {
 .QSlider::groove:horizontal,
 QSlider::groove:horizontal {
   background-color: transparent;
-  background-image: url('../Minimalist_072/imgs/white/slider_groove.png');
+  background-image: url('../Astral_072_Dark/imgs/white/slider_groove.png');
   background-position: center center;
   background-repeat: repeat-x;
   margin: 0;
@@ -993,10 +993,10 @@ QSlider::handle:horizontal {
   qproperty-LightLineEdgeColor: #0a0a0a;
   qproperty-DarkLineColor: #0a0a0a;
   qproperty-MiddleLineColor: #0a0a0a;
-  qproperty-HandleLeftPixmap: url("../Minimalist_072/imgs/white/slider_left_handle.png");
-  qproperty-HandleRightPixmap: url("../Minimalist_072/imgs/white/slider_right_handle.png");
-  qproperty-HandleLeftGrayPixmap: url("../Minimalist_072/imgs/white/h_slider_left_disabled.png");
-  qproperty-HandleRightGrayPixmap: url("../Minimalist_072/imgs/white/h_slider_right_disabled.png");
+  qproperty-HandleLeftPixmap: url("../Astral_072_Dark/imgs/white/slider_left_handle.png");
+  qproperty-HandleRightPixmap: url("../Astral_072_Dark/imgs/white/slider_right_handle.png");
+  qproperty-HandleLeftGrayPixmap: url("../Astral_072_Dark/imgs/white/h_slider_left_disabled.png");
+  qproperty-HandleRightGrayPixmap: url("../Astral_072_Dark/imgs/white/h_slider_right_disabled.png");
 }
 /* -----------------------------------------------------------------------------
    File Browser
@@ -1062,7 +1062,7 @@ DvDirTreeView {
    Film Strip
 ----------------------------------------------------------------------------- */
 #FilmStrip QAbstractScrollArea {
-  background-color: #000;
+  background-color: #000000;
 }
 #FilmStrip QComboBox {
   border-radius: 0;
@@ -1196,10 +1196,10 @@ QStatusBar #StatusBarLabel {
   min-width: 18px;
 }
 #colorSliderAddButton {
-  image: url('../Minimalist_072/imgs/white/arrow_right.png');
+  image: url('../Astral_072_Dark/imgs/white/arrow_right.png');
 }
 #colorSliderSubButton {
-  image: url('../Minimalist_072/imgs/white/arrow_left.png');
+  image: url('../Astral_072_Dark/imgs/white/arrow_left.png');
 }
 #PlainColorPageParts {
   border-top: 1px solid #141414;
@@ -1219,7 +1219,7 @@ PaletteViewer DvScrollWidget QPushButton {
 PaletteViewer DvScrollWidget #ScrollLeftButton {
   border-right: 1px solid #141414;
   border-left: 1px solid #141414;
-  image: url('../Minimalist_072/imgs/white/arrow_left.png');
+  image: url('../Astral_072_Dark/imgs/white/arrow_left.png');
   max-width: 15px;
   min-width: 15px;
 }
@@ -1291,12 +1291,12 @@ QDialog #dialogButtonFrame QPushButton {
    Preferences
 ----------------------------------------------------------------------------- */
 #PreferencesPopup QListWidget {
-  background-color: #262626;
-  alternate-background-color: #262626;
+  background-color: #303030;
+  alternate-background-color: #303030;
   border: 1px solid #141414;
 }
 #PreferencesPopup QListWidget::item {
-  border: 0;
+  border: 1px solid #303030;
   padding: 3px;
 }
 #PreferencesPopup QListWidget::item:hover {
@@ -1372,7 +1372,7 @@ FxSettings QToolBar QToolBar {
 #ScriptConsole {
   font-family: 'Courier New', monospace;
   border: 0;
-  color: #000;
+  color: #000000;
   padding: 3px;
 }
 #ScriptConsole QFrame {
@@ -1403,7 +1403,7 @@ FxSettings QToolBar QToolBar {
 ----------------------------------------------------------------------------- */
 #ToolBar TPanelTitleBar {
   background-color: #303030;
-  background-image: url('../Minimalist_072/imgs/white/title_grip_horizontal-dark.png');
+  background-image: url('../Astral_072_Dark/imgs/white/title_grip_horizontal-dark.png');
   background-repeat: no-repeat;
   border: 0;
   height: 16px;
@@ -1411,8 +1411,8 @@ FxSettings QToolBar QToolBar {
   min-height: 16px;
   qproperty-BorderPixmap: url('none');
   qproperty-ActiveBorderPixmap: url('none');
-  qproperty-FloatBorderPixmap: url('../Minimalist_072/imgs/white/titlebar_float.png');
-  qproperty-FloatActiveBorderPixmap: url('../Minimalist_072/imgs/white/titlebar_float.png');
+  qproperty-FloatBorderPixmap: url('../Astral_072_Dark/imgs/white/titlebar_float.png');
+  qproperty-FloatActiveBorderPixmap: url('../Astral_072_Dark/imgs/white/titlebar_float.png');
 }
 #ToolBar QToolBar {
   padding-left: 2px;
@@ -1422,7 +1422,7 @@ FxSettings QToolBar QToolBar {
 ----------------------------------------------------------------------------- */
 #ToolOptions TPanelTitleBar {
   background-color: #303030;
-  background-image: url('../Minimalist_072/imgs/white/title_grip_vertical-dark.png');
+  background-image: url('../Astral_072_Dark/imgs/white/title_grip_vertical-dark.png');
   background-repeat: no-repeat;
   border: 0;
   width: 16px;
@@ -1430,14 +1430,14 @@ FxSettings QToolBar QToolBar {
   max-width: 16px;
   qproperty-BorderPixmap: url('none');
   qproperty-ActiveBorderPixmap: url('none');
-  qproperty-FloatBorderPixmap: url('../Minimalist_072/imgs/white/titlebar_float.png');
-  qproperty-FloatActiveBorderPixmap: url('../Minimalist_072/imgs/white/titlebar_float.png');
+  qproperty-FloatBorderPixmap: url('../Astral_072_Dark/imgs/white/titlebar_float.png');
+  qproperty-FloatActiveBorderPixmap: url('../Astral_072_Dark/imgs/white/titlebar_float.png');
 }
 IconViewField {
-  qproperty-ScalePegPixmap: url("../Minimalist_072/imgs/white/selectiontool_scalepeg.png");
-  qproperty-RotationPixmap: url("../Minimalist_072/imgs/white/selectiontool_rotation.png");
-  qproperty-PositionPixmap: url("../Minimalist_072/imgs/white/selectiontool_position.png");
-  qproperty-ThicknessPixmap: url("../Minimalist_072/imgs/white/selectiontool_thickness.png");
+  qproperty-ScalePegPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_scalepeg.png");
+  qproperty-RotationPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_rotation.png");
+  qproperty-PositionPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_position.png");
+  qproperty-ThicknessPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_thickness.png");
 }
 #EditToolLockButton {
   spacing: 0;
@@ -1445,11 +1445,11 @@ IconViewField {
 PopupButton::menu-indicator {
   border-left: 0;
   height: 17px;
-  image: url('../Minimalist_072/imgs/white/combo_down_arrow.png');
+  image: url('../Astral_072_Dark/imgs/white/combo_down_arrow.png');
   width: 10px;
 }
 PopupButton::menu-indicator:disabled {
-  image: url('../Minimalist_072/imgs/white/combo_down_arrow-disabled.png');
+  image: url('../Astral_072_Dark/imgs/white/combo_down_arrow-disabled.png');
 }
 #Cap,
 #Join {
@@ -1508,7 +1508,7 @@ FlipBook #ToolBarContainer QLineEdit {
 }
 #ViewerFpsSlider {
   background-color: transparent;
-  background-image: url('../Minimalist_072/imgs/white/slider_groove.png');
+  background-image: url('../Astral_072_Dark/imgs/white/slider_groove.png');
   background-position: center center;
   background-repeat: repeat-x;
   border: 0;
@@ -1543,15 +1543,15 @@ FlipBook #ToolBarContainer QLineEdit {
 }
 FlipSlider {
   qproperty-PBHeight: 15;
-  qproperty-PBOverlay: url('../Minimalist_072/imgs/white/flipslider-dark.png');
-  qproperty-PBMarker: url('../Minimalist_072/imgs/white/flipmarker-dark.png');
+  qproperty-PBOverlay: url('../Astral_072_Dark/imgs/white/flipslider-dark.png');
+  qproperty-PBMarker: url('../Astral_072_Dark/imgs/white/flipmarker-dark.png');
   qproperty-PBColorMarginLeft: 1;
   qproperty-PBColorMarginTop: 2;
   qproperty-PBColorMarginRight: 1;
   qproperty-PBColorMarginBottom: 2;
   qproperty-PBMarkerMarginLeft: 3;
   qproperty-PBMarkerMarginRight: 3;
-  qproperty-notStartedColor: #CC2222;
+  qproperty-notStartedColor: #cc2222;
   qproperty-startedColor: #00ff00;
   qproperty-baseColor: #232323;
 }
@@ -1578,21 +1578,21 @@ Ruler {
 /* xsheetColumnHeader (Context Menus)
 ----------------------------------------------------------------------------- */
 #xsheetColumnAreaMenu_Preview {
-  background-color: #E6E678;
+  background-color: #e6e678;
 }
 #xsheetColumnAreaMenu_Lock {
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 }
 #xsheetColumnAreaMenu_Camstand {
-  background-color: #FFA480;
+  background-color: #ffa480;
 }
 #xsheetColumnAreaMenu_Preview,
 #xsheetColumnAreaMenu_Lock,
 #xsheetColumnAreaMenu_Camstand {
-  color: #000;
+  color: #000000;
 }
 #noteTextEdit {
-  color: #000;
+  color: #000000;
 }
 /* XSheet Spreadsheet
 ----------------------------------------------------------------------------- */
@@ -1600,50 +1600,50 @@ XsheetViewer {
   qproperty-TextColor: #bfbfbf;
   qproperty-BGColor: #484848;
   qproperty-LightLineColor: #2c2c2c;
-  qproperty-MarkerLineColor: #1E96C4;
+  qproperty-MarkerLineColor: #1e96c4;
   qproperty-VerticalLineColor: #626262;
   qproperty-VerticalLineHeadColor: #808080;
-  qproperty-PreviewFrameTextColor: #96E6E6;
+  qproperty-PreviewFrameTextColor: #96e6e6;
   qproperty-CurrentRowBgColor: #506082;
   qproperty-EmptyColumnHeadColor: #606060;
-  qproperty-SelectedColumnTextColor: #E66464;
+  qproperty-SelectedColumnTextColor: #e66464;
   qproperty-EmptyCellColor: #404040;
   qproperty-NotEmptyColumnColor: #484848;
-  qproperty-SelectedEmptyCellColor: #6C6C6C;
-  qproperty-LevelColumnColor: #4C6E4C;
-  qproperty-LevelColumnBorderColor: #8FB38F;
-  qproperty-SelectedLevelColumnColor: #6B8C6B;
-  qproperty-VectorColumnColor: #7B7B4C;
-  qproperty-VectorColumnBorderColor: #BBBB9A;
-  qproperty-SelectedVectorColumnColor: #8C8C60;
-  qproperty-ChildColumnColor: #6A526B;
-  qproperty-ChildColumnBorderColor: #B1A3B3;
-  qproperty-SelectedChildColumnColor: #7A617A;
-  qproperty-FullcolorColumnColor: #657A96;
-  qproperty-FullcolorColumnBorderColor: #9EB8BB;
-  qproperty-SelectedFullcolorColumnColor: #8896A7;
-  qproperty-FxColumnColor: #56553C;
-  qproperty-FxColumnBorderColor: #95958A;
-  qproperty-SelectedFxColumnColor: #6A6D5A;
+  qproperty-SelectedEmptyCellColor: #6c6c6c;
+  qproperty-LevelColumnColor: #4c6e4c;
+  qproperty-LevelColumnBorderColor: #8fb38f;
+  qproperty-SelectedLevelColumnColor: #6b8c6b;
+  qproperty-VectorColumnColor: #7b7b4c;
+  qproperty-VectorColumnBorderColor: #bbbb9a;
+  qproperty-SelectedVectorColumnColor: #8c8c60;
+  qproperty-ChildColumnColor: #6a526b;
+  qproperty-ChildColumnBorderColor: #b1a3b3;
+  qproperty-SelectedChildColumnColor: #7a617a;
+  qproperty-FullcolorColumnColor: #657a96;
+  qproperty-FullcolorColumnBorderColor: #9eb8bb;
+  qproperty-SelectedFullcolorColumnColor: #8896a7;
+  qproperty-FxColumnColor: #56553c;
+  qproperty-FxColumnBorderColor: #95958a;
+  qproperty-SelectedFxColumnColor: #6a6d5a;
   qproperty-ReferenceColumnColor: #616161;
-  qproperty-ReferenceColumnBorderColor: #A2A2A2;
+  qproperty-ReferenceColumnBorderColor: #a2a2a2;
   qproperty-SelectedReferenceColumnColor: #828282;
-  qproperty-PaletteColumnColor: #3A655F;
-  qproperty-PaletteColumnBorderColor: #86ACA7;
-  qproperty-SelectedPaletteColumnColor: #5F8581;
-  qproperty-MeshColumnColor: #684D86;
-  qproperty-MeshColumnBorderColor: #BA92EF;
-  qproperty-SelectedMeshColumnColor: #8A75A2;
+  qproperty-PaletteColumnColor: #3a655f;
+  qproperty-PaletteColumnBorderColor: #86aca7;
+  qproperty-SelectedPaletteColumnColor: #5f8581;
+  qproperty-MeshColumnColor: #684d86;
+  qproperty-MeshColumnBorderColor: #ba92ef;
+  qproperty-SelectedMeshColumnColor: #8a75a2;
   qproperty-SoundColumnColor: #657456;
-  qproperty-SoundColumnBorderColor: #A0AF7D;
-  qproperty-SelectedSoundColumnColor: #7F956A;
-  qproperty-SoundColumnHlColor: #34FE5E;
-  qproperty-SoundColumnTrackColor: #B6C29D;
-  qproperty-ColumnHeadPastelizer: #000;
+  qproperty-SoundColumnBorderColor: #a0af7d;
+  qproperty-SelectedSoundColumnColor: #7f956a;
+  qproperty-SoundColumnHlColor: #34fe5e;
+  qproperty-SoundColumnTrackColor: #b6c29d;
+  qproperty-ColumnHeadPastelizer: #000000;
   qproperty-SelectedColumnHead: #506082;
   qproperty-LightLightBGColor: #404040;
-  qproperty-LightBGColor: #F0F0F0;
-  qproperty-DarkBGColor: #E1E1E1;
+  qproperty-LightBGColor: #f0f0f0;
+  qproperty-DarkBGColor: #e1e1e1;
   qproperty-DarkLineColor: #969696;
 }
 /* -----------------------------------------------------------------------------
@@ -1668,7 +1668,7 @@ XsheetViewer {
 ----------------------------------------------------------------------------- */
 FunctionTreeView {
   qproperty-TextColor: #bfbfbf;
-  qproperty-CurrentTextColor: #E66464;
+  qproperty-CurrentTextColor: #e66464;
 }
 FunctionPanel {
   qproperty-BGColor: #232323;
@@ -1677,14 +1677,14 @@ FunctionPanel {
   qproperty-OtherCurvesColor: #707070;
   qproperty-RulerBackground: #1c1c1c;
   qproperty-TextColor: #bfbfbf;
-  qproperty-SubColor: #000;
-  qproperty-SelectedColor: #BFFFFF;
+  qproperty-SubColor: #000000;
+  qproperty-SelectedColor: #bfffff;
 }
 SpreadsheetViewer {
   qproperty-LightLightBGColor: #404040;
   qproperty-CurrentRowBgColor: #506082;
   qproperty-LightLineColor: #2c2c2c;
-  qproperty-MarkerLineColor: #1E96C4;
+  qproperty-MarkerLineColor: #1e96c4;
   qproperty-BGColor: #484848;
   qproperty-VerticalLineColor: #626262;
   qproperty-KeyFrameColor: #995d1d;
@@ -1693,30 +1693,30 @@ SpreadsheetViewer {
   qproperty-InBetweenColor: #666250;
   qproperty-InBetweenBorderColor: #cdcec8;
   qproperty-SelectedInBetweenColor: #7e8079;
-  qproperty-SelectedEmptyColor: #6C6C6C;
+  qproperty-SelectedEmptyColor: #6c6c6c;
   qproperty-SelectedSceneRangeEmptyColor: #757575;
   qproperty-TextColor: #bfbfbf;
   qproperty-ColumnHeaderBorderColor: #808080;
-  qproperty-SelectedColumnTextColor: #E66464;
+  qproperty-SelectedColumnTextColor: #e66464;
 }
 #ExpressionField {
   background-color: #e6e6e6;
-  border: 1px solid #333;
+  border: 1px solid #333333;
   margin: 0;
 }
 #FunctionSegmentViewerLinkButton {
-  background-image: url('../Minimalist_072/imgs/white/segment_unlinked.png');
+  background-image: url('../Astral_072_Dark/imgs/white/segment_unlinked.png');
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:hover {
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:checked {
-  background-image: url('../Minimalist_072/imgs/white/segment_linked.png');
+  background-image: url('../Astral_072_Dark/imgs/white/segment_linked.png');
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:disabled {
-  background-image: url('../Minimalist_072/imgs/white/segment_disabled.png');
+  background-image: url('../Astral_072_Dark/imgs/white/segment_disabled.png');
   background-repeat: no-repeat;
 }
 /* -----------------------------------------------------------------------------

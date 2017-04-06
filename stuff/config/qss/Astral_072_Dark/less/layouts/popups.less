@@ -29,11 +29,11 @@ QDialog {
 
 #PreferencesPopup {
   & QListWidget {
-    background-color: @browser-itemview-bg-color;
-    alternate-background-color: @browser-itemview-bg-color;
+    background-color: @bg;
+    alternate-background-color: @bg;
     border: 1px solid @accent1;
     &::item {
-      border: 0; // Removes indent
+      border: 1px solid @bg; // Removes indent
       padding: 3px;
       &:hover {
         .selected-secondary; // base/mixins.less
