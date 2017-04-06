@@ -68,12 +68,12 @@ TFilePath getGlobalRoot() {
   TFilePath rootDir;
 
 #ifdef _WIN32
-  QString regpath = QString::fromStdString("SOFTWARE\\OpenToonz\\OpenToonz\\" + std::string(applicationVersion) + "\\FARMROOT");
+  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
   TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
   // Leggo la localRoot da File txt
-  std::string unixpath = "./OpenToonz_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+  std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
   TFilePath name(unixpath);
   Tifstream is(
       TFilePath(TSystem::getSystemValue(name).toStdString()));
@@ -103,12 +103,12 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  QString regpath = QString::fromStdString("SOFTWARE\\OpenToonz\\OpenToonz\\" + std::string(applicationVersion) + "\\FARMROOT");
+  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
   TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
-std::string unixpath = "./OpenToonz_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
 TFilePath name(unixpath);
 Tifstream is(
     TFilePath(TSystem::getSystemValue(name).toStdString()));
