@@ -75,8 +75,7 @@ TFilePath getGlobalRoot() {
   std::string unixpath = "/etc/" + std::string(applicationName) + "/opentoonz.conf";
 #  endif
   TFilePath name(unixpath);
-  Tifstream is(
-      TFilePath(TSystem::getSystemValue(name).toStdString()));
+  Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -117,8 +116,7 @@ TFilePath getLocalRoot() {
   std::string unixpath = "/etc/" + std::string(applicationName) + "/opentoonz.conf";
 #  endif
   TFilePath name(unixpath);
-  Tifstream is(
-      TFilePath(TSystem::getSystemValue(name).toStdString()));
+  Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
