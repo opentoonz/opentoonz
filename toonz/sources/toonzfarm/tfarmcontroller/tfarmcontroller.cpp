@@ -8,6 +8,8 @@
 #include "tfilepath_io.h"
 #include "service.h"
 #include "tcli.h"
+#include "tversion.h"
+using namespace TVER;
 
 #include "tthreadmessage.h"
 #include "tthread.h"
@@ -53,21 +55,18 @@ int inline STRICMP(const char *a, const char *b) {
 
 namespace {
 
-const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.1";
-const char *applicationRevision = "2";
-
 TFilePath getGlobalRoot() {
+  TVER::ToonzVersion tver;
   TFilePath rootDir;
 
 #ifdef _WIN32
-  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
+  std::string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT";
   TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
 
   // Leggo la globalRoot da File txt
-  std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+  std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
   TFilePath name(unixpath);
   Tifstream is(
       TFilePath(TSystem::getSystemValue(name).toStdString()));
@@ -97,13 +96,13 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
+  std:string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT");
   TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
   // Leggo la localRoot da File txt
-  std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+  std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
   TFilePath name(unixpath);
   Tifstream is(
       TFilePath(TSystem::getSystemValue(name).toStdString()));
@@ -2209,6 +2208,8 @@ public:
 //------------------------------------------------------------------------------
 
 void ControllerService::onStart(int argc, char *argv[]) {
+  TVER::ToonzVersion tver;
+
   // Initialize thread components
   TThread::init();
 
@@ -2234,7 +2235,7 @@ void ControllerService::onStart(int argc, char *argv[]) {
     m_userLog             = new TUserLog(logFilePath);
   }
 
-  m_userLog->info("ToonzFarm Controller 1.0\n\n");
+  m_userLog->info( tver.getAppVersionInfo("Farm Controller") + "\n\n");
 
   TFilePath globalRoot = getGlobalRoot();
   if (globalRoot.isEmpty()) {
