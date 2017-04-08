@@ -2235,8 +2235,8 @@ void ControllerService::onStart(int argc, char *argv[]) {
     TFilePath logFilePath = lRootDir + "controller.log";
     m_userLog             = new TUserLog(logFilePath);
   }
-
-  m_userLog->info( tver.getAppVersionInfo("Farm Controller") + "\n\n".c_str());
+  std:string appverinfo = tver.getAppVersionInfo("Farm Controller") + "\n\n";
+  m_userLog->info( appverinfo.c_str() );
 
   TFilePath globalRoot = getGlobalRoot();
   if (globalRoot.isEmpty()) {
