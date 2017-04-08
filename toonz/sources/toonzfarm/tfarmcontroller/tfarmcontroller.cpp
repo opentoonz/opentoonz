@@ -93,6 +93,7 @@ TFilePath getGlobalRoot() {
 //--------------------------------------------------------------------
 
 TFilePath getLocalRoot() {
+  TVER::ToonzVersion tver;
   TFilePath lroot;
 
 #ifdef _WIN32
@@ -2235,7 +2236,7 @@ void ControllerService::onStart(int argc, char *argv[]) {
     m_userLog             = new TUserLog(logFilePath);
   }
 
-  m_userLog->info( tver.getAppVersionInfo("Farm Controller") + "\n\n");
+  m_userLog->info( tver.getAppVersionInfo("Farm Controller") + "\n\n".c_str());
 
   TFilePath globalRoot = getGlobalRoot();
   if (globalRoot.isEmpty()) {

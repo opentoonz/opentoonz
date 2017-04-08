@@ -43,8 +43,8 @@ namespace TVER {
 	std::string ToonzVersion::getAppVersionInfo( std::string msg ){
 		std::string appinfo = std::string(applicationName);
 		appinfo += " " + msg + " v";
-		appinfo += std:to_string(applicationVersion);
-		appinfo += "." + std:to_string(applicationRevision;
+		appinfo += std::to_string(applicationVersion);
+		appinfo += "." + std::to_string(applicationRevision;
 		return appinfo;
 	}
 
