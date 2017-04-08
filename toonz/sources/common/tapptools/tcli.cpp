@@ -50,7 +50,7 @@ static SpecialUsageElement bra("[");
 static SpecialUsageElement ket("]");
 static Switcher help("-help", "Print this help page");
 static Switcher release("-release", "Print the current Toonz version");
-static Switcher release("-version", "Print the current Toonz version");
+static Switcher version("-version", "Print the current Toonz version");
 static Switcher libRelease("-librelease", "");
 // hidden: print the lib version
 
@@ -330,6 +330,7 @@ UsageImp::UsageImp(string progName)
 void UsageImp::addStandardUsages() {
   add(help);
   add(release);
+  add(version);
   add(libRelease);
 }
 
@@ -701,7 +702,7 @@ bool Usage::parse(int argc, char *argv[], std::ostream &err) {
       print(err);
       return false;
     }
-    if (release) {
+    if (release || version) {
       printToonzRelease(err);
       return false;
     }
