@@ -50,6 +50,7 @@ static SpecialUsageElement bra("[");
 static SpecialUsageElement ket("]");
 static Switcher help("-help", "Print this help page");
 static Switcher release("-release", "Print the current Toonz version");
+static Switcher release("-version", "Print the current Toonz version");
 static Switcher libRelease("-librelease", "");
 // hidden: print the lib version
 
