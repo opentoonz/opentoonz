@@ -21,30 +21,30 @@ namespace TVER {
 	};
 
 	std::string ToonzVersion::getAppName( void ) {
-		std::string appname = ToonzVersion.applicationName;
+		std::string appname = applicationName;
 		return appname;
 	}
 	float ToonzVersion::getAppVersion( void ) {
-		float appver = ToonzVersion.applicationVersion;
+		float appver = applicationVersion;
 		return appver;
 	}
 	float ToonzVersion::getAppRevision( void ) {
-		float apprev = ToonzVersion.applicationRevision;
+		float apprev = applicationRevision;
 		return apprev;
 	}
 	std::string ToonzVersion::getAppVersionString( void ){
-		std::string appver = std::to_string(ToonzVersion.applicationVersion);
+		std::string appver = std::to_string(applicationVersion);
 		return appver;
 	}
 	std::string ToonzVersion::getAppRevisionString( void ){
-		std::string apprev = std::to_string(ToonzVersion.applicationRevision);
+		std::string apprev = std::to_string(applicationRevision);
 		return apprev;
 	}
 	std::string ToonzVersion::getAppVersionInfo( std::string msg ){
-		std::string appinfo = std::string(ToonzVersion.applicationName);
+		std::string appinfo = std::string(applicationName);
 		appinfo += " " + msg + " v";
-		appinfo += std:to_string(ToonzVersion.applicationVersion);
-		appinfo += "." + std:to_string(ToonzVersion.applicationRevision;
+		appinfo += std:to_string(applicationVersion);
+		appinfo += "." + std:to_string(applicationRevision;
 		return appinfo;
 	}
 
