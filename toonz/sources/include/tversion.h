@@ -18,25 +18,25 @@ namespace TVER {
 			const char *applicationName     = "OpenToonz";
 			const float applicationVersion  = 1.1;
 			const float applicationRevision = 2;
-	}
+	};
 
-	char *TVER::getAppName( void ) {
-	   return std::string(applicationName);
+	std::string ToonzVersion::getAppName( void ) {
+	   return std::string(ToonzVersion.applicationName);
 	}
-	float TVER::getAppVersion( void ) {
-	   return applicationVersion;
+	float ToonzVersion::getAppVersion( void ) {
+	   return ToonzVersion.applicationVersion;
 	}
-	float TVER::getAppRevision( void ) {
-	   return applicationRevision;
+	float ToonzVersion::getAppRevision( void ) {
+	   return ToonzVersion.applicationRevision;
 	}
-	std::string TVER::getAppVersionString( void ){
-	   return std:to_string(applicationVersion);
+	std::string ToonzVersion::getAppVersionString( void ){
+	   return std:to_string(ToonzVersion.applicationVersion);
 	}
-	std::string TVER::getAppRevisionString( void ){
-	   return std:to_string(applicationRevision);
+	std::string ToonzVersion::getAppRevisionString( void ){
+	   return std:to_string(ToonzVersion.applicationRevision);
 	}
-	std::string TVER::getAppVersionInfo( std::string msg ){
-	   return std::string(applicationName) + " " + msg + " v" + std:to_string(applicationVersion) + "." + std:to_string(applicationRevision);
+	std::string ToonzVersion::getAppVersionInfo( std::string msg ){
+	   return std::string(ToonzVersion.applicationName) + " " + msg + " v" + std:to_string(ToonzVersion.applicationVersion) + "." + std:to_string(ToonzVersion.applicationRevision);
 	}
 
 
