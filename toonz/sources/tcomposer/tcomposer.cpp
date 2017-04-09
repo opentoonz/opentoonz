@@ -557,6 +557,9 @@ static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
 // TODO: il main comincia a diventare troppo lungo. Forse val la pena
 // separarlo in varie funzioni
 // (tipo initToonzEnvironment(), parseCommandLine(), ecc)
+// TODO: the main starts getting too long. Perhaps it is worth
+// separated into various functions
+// (type initToonzEnvironment (), ParseCommandLine (), etc.)
 
 DV_IMPORT_API void initStdFx();
 DV_IMPORT_API void initColorFx();

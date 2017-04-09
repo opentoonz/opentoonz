@@ -742,7 +742,7 @@ void FarmServerService::onStart(int argc, char *argv[]) {
   if (!lRootDirExists) {
     std::string errMsg("Unable to start the Server");
     errMsg += "\n";
-    errMsg += "The directory specified as Local Root does not exist";
+    errMsg += "The directory " + std::to_string(lRootDir) + " specified as Local Root does not exist";
     errMsg += "\n";
 
     addToMessageLog(errMsg);
@@ -758,7 +758,7 @@ void FarmServerService::onStart(int argc, char *argv[]) {
 
   TFilePath gRootDir = getGlobalRoot();
   if (::to_string(gRootDir) == "") {
-    std::string errMsg("Unable to get TFARMGLOBALROOT environment variable");
+    std::string errMsg("Unable to get TFARMGLOBALROOT environment variable (" + std::to_string(gRootDir) + ")");
     addToMessageLog(errMsg);
 
 // DEBUG MAC SERVIZIO (DA TOGLIERE)
@@ -827,7 +827,8 @@ void FarmServerService::onStart(int argc, char *argv[]) {
     msg += TSystem::getHostName();
     msg += " from the servers config file";
     msg += "\n";
-    msg += "Using the default port number 8002";
+    msg += "Using the default port number ";
+    msg += QString::number(m_port);
     msg += "\n";
     msg += "\n";
 

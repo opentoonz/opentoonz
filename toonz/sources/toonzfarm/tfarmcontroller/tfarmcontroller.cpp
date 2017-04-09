@@ -2220,7 +2220,7 @@ void ControllerService::onStart(int argc, char *argv[]) {
     if (!lRootDirExists) {
       QString errMsg("Unable to start the Controller");
       errMsg += "\n";
-      errMsg += "The directory specified as Local Root does not exist";
+      errMsg += "The directory " + std::to_string(lRootDir) + " specified as Local Root does not exist";
       errMsg += "\n";
 
       addToMessageLog(errMsg);
@@ -2237,7 +2237,7 @@ void ControllerService::onStart(int argc, char *argv[]) {
 
   TFilePath globalRoot = getGlobalRoot();
   if (globalRoot.isEmpty()) {
-    QString errMsg("Unable to get FARMROOT environment variable\n");
+    QString errMsg("Unable to get FARMROOT environment variable (" + std::to_string(globalRoot) + " )\n");
     addToMessageLog(errMsg);
 
     // exit the program
