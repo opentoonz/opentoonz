@@ -109,8 +109,7 @@ TFilePath getLocalRoot() {
 #else
 std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
 TFilePath name(unixpath);
-Tifstream is(
-    TFilePath(TSystem::getSystemValue(name).toStdString()));
+Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
