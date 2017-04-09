@@ -34,7 +34,7 @@ namespace TVER {
 	}
 	std::string ToonzVersion::getAppVersionString( void ){
 		char buffer [50];
-		sprintf (buffer, "%.1*f", applicationVersion);
+		sprintf (buffer, "%.1f", applicationVersion);
 		std::string appver = std::string(buffer);
 		return appver;
 	}
