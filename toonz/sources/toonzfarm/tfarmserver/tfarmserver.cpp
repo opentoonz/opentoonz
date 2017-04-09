@@ -742,7 +742,7 @@ void FarmServerService::onStart(int argc, char *argv[]) {
   if (!lRootDirExists) {
     std::string errMsg("Unable to start the Server");
     errMsg += "\n";
-    errMsg += "The directory " + std::to_string(lRootDir) + " specified as Local Root does not exist";
+    errMsg += "The directory " + ::to_string(lRootDir) + " specified as Local Root does not exist";
     errMsg += "\n";
 
     addToMessageLog(errMsg);
