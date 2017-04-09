@@ -33,11 +33,15 @@ namespace TVER {
 		return apprev;
 	}
 	std::string ToonzVersion::getAppVersionString( void ){
-		std::string appver = boost::str(boost::format("%.1*f") % applicationVersion);
+		char buffer [50];
+		sprintf (buffer, "%.1*f", applicationVersion);
+		std::string appver = std::string(buffer);
 		return appver;
 	}
 	std::string ToonzVersion::getAppRevisionString( void ){
-		std::string apprev = boost::str(boost::format("%g") % applicationRevision);
+		char buffer [50];
+		sprintf (buffer, "%g", applicationRevision);
+		std::string apprev = std::string(buffer);
 		return apprev;
 	}
 	std::string ToonzVersion::getAppVersionInfo( std::string msg ){
