@@ -12,11 +12,11 @@
 @accent1: darken(@bg, 11%);
 
 // Text
-@text-color: #bfbfbf;
+@text-color: #cccccc;
 @text-color-disabled: darken(@text-color, 30%);
 
 // Selected Color (Primary)
-@selected-bg-color: @palette-cornflower-blue;
+@selected-bg-color: @palette-wedgewood;
 @selected-text-color: lighten(@text-color, 20%);
 
 // Selected Color (Secondary)
@@ -40,7 +40,7 @@
 @label-error: @palette-red;
 
 // Treeview
-@tree-bg-color: @bg;
+@tree-bg-color: darken(@bg, 0%);
 @tree-bg-color-alt: @tree-bg-color;
 
 // Groupbox
@@ -56,7 +56,7 @@
 
 // Tabs
 @tab-bg-color: lighten(@tabbar-bg-color, 0%);
-@tab-bg-color-hover: lighten(@tab-bg-color, 5%);
+@tab-bg-color-hover: lighten(@bg, 3%);
 @tab-bg-color-selected: @bg;
 @tab-text-color: darken(@text-color, 20%);
 @tab-text-color-selected: lighten(@text-color, 15%);
@@ -73,7 +73,7 @@
 // Room Tabs
 @rooms-tab-bg-color: @tab-bg-color;
 @rooms-tab-bg-color-selected: darken(@bg, 15%);
-@rooms-tab-bg-color-hover: lighten(@rooms-tab-bg-color, 5%);
+@rooms-tab-bg-color-hover: lighten(@bg, 5%);
 @rooms-tab-border-color: @tab-border-color;
 @rooms-tab-text-color: @tab-text-color;
 @rooms-tab-text-color-selected: lighten(@text-color, 5%);
@@ -84,8 +84,8 @@
 
 @menu-bg-color: darken(@bg, 5%);
 @menu-border-color: @accent1;
-@menu-separator-color: lighten(@menu-bg-color, 8%);
-@menu-checkbox-text-color-checked: @palette-scooter-light;
+@menu-separator-color: @accent1;
+@menu-checkbox-text-color-checked: @text-color;
 
 // -----------------------------------------------------------------------------
 // DockWidget Title Bar
@@ -106,7 +106,7 @@
 @title-img-float-active: 'none';
 
 // For DockWidgets that display no text in Title Bar
-@title-toolbar-size: 16px;
+@title-toolbar-size: 13px;
 @title-toolbar-img-horizontal: 'title_grip_horizontal.png';
 @title-toolbar-img-vertical: 'title_grip_vertical.png';
 @title-toolbar-img-float: 'titlebar_float.png';
@@ -115,11 +115,19 @@
 // QScrollBar
 // -----------------------------------------------------------------------------
 
-@scrollbar-bg-color: darken(@bg, 10%);
-@scrollbar-handle-bg-color: @bg;
-@scrollbar-handle-border-color: lighten(@scrollbar-handle-bg-color, 1%);
-@scrollbar-button-bg-color: @scrollbar-handle-bg-color;
-@scrollbar-button-bg-color-pressed: lighten(@scrollbar-button-bg-color, 5%);
+// Bar Frame
+@scrollbar-bg-color: darken(@bg, 5%);
+
+// Handle
+@scrollbar-handle-bg-color: lighten(@bg, 5%);
+@scrollbar-handle-bg-color-hover: lighten(@bg, 10%);
+@scrollbar-handle-bg-color-pressed: lighten(@bg, 15%);
+
+// Arrow Buttons
+@scrollbar-button-bg-color: @scrollbar-bg-color;
+
+@scrollbar-button-bg-color-hover: lighten(@scrollbar-button-bg-color, 15%);
+@scrollbar-button-bg-color-pressed: lighten(@scrollbar-button-bg-color-hover, 5%);
 
 // -----------------------------------------------------------------------------
 // QPushButton
@@ -130,22 +138,29 @@
 @button-border-radius: 2px;
 @button-text-color: lighten(@text-color, 0%);
 
-@button-bg-color-hover: lighten(@button-bg-color, 5%);
+@button-bg-color-hover: lighten(@bg, 15%);
 @button-border-color-hover: @button-border-color;
 @button-text-color-hover: lighten(@button-text-color, 5%);
 
-@button-bg-color-pressed: darken(@bg, 15%);
-@button-border-color-pressed: darken(@button-bg-color-pressed, 5%);
+@button-bg-color-pressed: darken(@bg, 10%);
+@button-border-color-pressed: darken(@bg, 15%);
 @button-text-color-pressed: @text-color;
 
-@button-bg-color-checked: darken(@bg, 12%);
-@button-bg-color-checked-hover: lighten(@button-bg-color-checked, 5%);
-@button-border-color-checked: darken(@button-bg-color-checked, 8%);
+@button-bg-color-checked: darken(@bg, 10%);
+@button-bg-color-checked-hover: darken(@bg, 2%);
+@button-border-color-checked: darken(@bg, 15%);
 @button-text-color-checked: @text-color;
 
 @button-bg-color-disabled: lighten(@bg, 4%);
 @button-border-color-disabled: darken(@bg, 4%);
 @button-text-color-disabled: @text-color-disabled;
+
+// -----------------------------------------------------------------------------
+// QComboBox
+// -----------------------------------------------------------------------------
+
+@combo-down-arrow-img: 'combo_down_arrow.png';
+@combo-down-arrow-img-disabled: 'combo_down_arrow-disabled.png';
 
 // -----------------------------------------------------------------------------
 // Tool Button
@@ -161,8 +176,8 @@
 @toolbutton-border-color-pressed: @button-border-color-pressed;
 
 @toolbutton-bg-color-checked: @button-bg-color-checked;
-@toolbutton-bg-color-checked-hover: lighten(@toolbutton-bg-color-checked, 5%);
-@toolbutton-border-color-checked: darken(@toolbutton-bg-color-checked, 8%);
+@toolbutton-bg-color-checked-hover: lighten(@bg, 15%);
+@toolbutton-border-color-checked: darken(@bg, 15%);
 
 // -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
@@ -170,7 +185,7 @@
 
 @focus-bg-color: @input-bg-color;
 @focus-border-color: @selected-bg-color;
-@input-bg-img: 'none';
+
 @input-bg-color: darken(@bg, 10%);
 @input-border-color: darken(@input-bg-color, 5%);
 @input-border-radius: 2px;
@@ -196,6 +211,9 @@
 
 @checkbox-bg-color-checked: @checkbox-bg-color;
 @checkbox-border-color-checked: @checkbox-border-color;
+
+@checkbox-icon-checked: 'check_indicator.png';
+@checkbox-icon-disabled: 'check_indicator-disabled.png';
 
 @checkbox-bg-color-disabled: @input-bg-color-disabled;
 @checkbox-border-color-disabled: @input-border-color-disabled;
@@ -230,8 +248,8 @@
 @browser-folder-text-color: @palette-scooter-light;
 @browser-folder-text-color-selected: @selected-text-color;
 
-@browser-itemview-bg-color: darken(@bg, 8%);
-@browser-itemview-bg-color-alt: lighten(@browser-itemview-bg-color, 5%);
+@browser-itemview-bg-color: darken(@bg, 5%);
+@browser-itemview-bg-color-alt: lighten(@browser-itemview-bg-color, 3%);
 
 // -----------------------------------------------------------------------------
 // Script Console
@@ -269,8 +287,8 @@
 @viewer-ruler-scale-color: @text-color;
 @viewer-ruler-ToolOptionValues-color: darken(@bg, 50%);
 
-// FPS Slider
-@fps-input-border-color: @accent1;
+// FPS
+@fps-input-border-color: darken(@bg, 12%);
 
 // -----------------------------------------------------------------------------
 // Schematic Node Viewer
@@ -300,7 +318,7 @@
 @xsheet-bg-color:                           #484848;
 @xsheet-LightLine-color:                    #2c2c2c;
 @xsheet-MarkerLine-color:                   #1E96C4;
-@xsheet-VerticalLine-color:                 #626262;
+@xsheet-VerticalLine-color:                 darken(#626262, 25%);
 @xsheet-VerticalLineHead-color:             #808080;
 @xsheet-PreviewFrameText-color:             #96E6E6;
 @xsheet-CurrentRowBG-color:                 #506082;
@@ -367,14 +385,14 @@
 @function-treeview-text-color-selected: @palette-sunglo;
 
 // Function Curve Panel
-@function-panel-bg-color: darken(@bg, 5%);
+@function-panel-bg-color: #3b3b3b;
 @function-panel-ValueLine-color: rgb(72, 72, 72);
 @function-panel-FrameLine-color: rgb(96, 96, 96);
 @function-panel-OtherCurves-color: lighten(@function-panel-bg-color, 30%);
 @function-panel-RulerBG-color: darken(@function-panel-bg-color, 3%);
 @function-panel-Text-color: @text-color;
 @function-panel-Sub-color: #000;
-@function-panel-Selected-color: #BFFFFF;
+@function-panel-Selected-color: @palette-orange;
 
 // Function Spreadsheet Viewer
 @function-KeyFrame-color: rgb(153,93,29);

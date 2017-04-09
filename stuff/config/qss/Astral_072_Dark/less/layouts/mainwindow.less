@@ -58,13 +58,11 @@ TPanel {
     spacing: 0;
     &::indicator {
       // Inherits from #ToolOptions (toolbar.less)
-      background-color: @topbar-bg-color;
-      border: 0;
-      border-radius: 0;
-      height: 16px;
-      margin: 0;
-      padding: 0 3px 0 2px;
-      width: 16px;
+      &:extend(.button-tool all);
+      height: 17px;
+      margin: 1px 2px 0 0;
+      padding-left: 1px;
+      padding-right: 1px;
     }
   }
 }
@@ -205,78 +203,88 @@ QScrollBar {
   background-color: @scrollbar-bg-color;
   border: 0;
   &:horizontal {
-    height: 17px;
+    height: 16px;
     margin: 0;
   }
   &:vertical {
     margin: 0;
-    width: 17px;
+    width: 16px;
   }
 
   &::handle {
-    background-color: @scrollbar-handle-bg-color;
-    border: 1px solid @scrollbar-handle-border-color;
+    border: 0;
+    &:horizontal,
+    &:vertical {
+      &:hover {
+        background-color: @scrollbar-handle-bg-color-hover;
+      }
+      &:pressed {
+        background-color: @scrollbar-handle-bg-color-pressed;
+      }
+    }
     &:horizontal {
-      margin: 1px 17px;
+      background-color: @scrollbar-handle-bg-color;
+      margin: 2px 15px;
       min-width: 20px;
     }
     &:vertical {
-      margin: 17px 1px;
+      background-color: @scrollbar-handle-bg-color;
+      margin: 15px 2px;
       min-height: 20px;
     }
   }
 
   &::add-line {
     subcontrol-origin: margin;
-    background-color: @scrollbar-button-bg-color;
-    border: 1px solid @scrollbar-button-bg-color;
-    &:horizontal,
-    &:vertical {
-      &:pressed {
-        background-color: @scrollbar-button-bg-color-pressed;
-        border-color: @scrollbar-button-bg-color-pressed;
-      }
-    }
+    border: 0;
     &:horizontal { // right
       subcontrol-position: right;
+      background-color: @scrollbar-button-bg-color;
       image: url('@{img-url}/scroll-right.png');
       image-position: center center;
-      margin: 1px;
-      width: 13px;
+      margin: 0;
+      width: 15px;
+      &:pressed {
+        background-color: @scrollbar-button-bg-color-pressed;
+      }
     }
     &:vertical { // down
       subcontrol-position: bottom;
+      background-color: @scrollbar-button-bg-color;
       image: url('@{img-url}/scroll-down.png');
       image-position: center center;
-      margin: 1px;
-      height: 13px;
+      margin: 0;
+      height: 15px;
+      &:pressed {
+        background-color: @scrollbar-button-bg-color-pressed;
+      }
     }
   }
 
   &::sub-line {
-    background-color: @scrollbar-button-bg-color;
-    border: 1px solid @scrollbar-button-bg-color;
+    border: 0;
     subcontrol-origin: margin;
-    &:horizontal,
-    &:vertical {
-      &:pressed {
-        background-color: @scrollbar-button-bg-color-pressed;
-        border-color: @scrollbar-button-bg-color-pressed;
-      }
-    }
     &:horizontal { // left
       subcontrol-position: left;
+      background-color: @scrollbar-button-bg-color;
       image: url('@{img-url}/scroll-left.png');
       image-position: center center;
-      margin: 1px;
-      width: 13px;
+      margin: 0;
+      width: 15px;
+      &:pressed {
+        background-color: @scrollbar-button-bg-color-pressed;
+      }
     }
     &:vertical { // up
       subcontrol-position: top;
+      background-color: @scrollbar-button-bg-color;
       image: url('@{img-url}/scroll-up.png');
       image-position: center center;
-      margin: 1px;
-      height: 13px;
+      margin: 0;
+      height: 15px;
+      &:pressed {
+        background-color: @scrollbar-button-bg-color-pressed;
+      }
     }
   }
 

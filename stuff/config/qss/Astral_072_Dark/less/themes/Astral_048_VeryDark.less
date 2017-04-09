@@ -11,6 +11,9 @@
 // Background
 @bg: #303030;
 
+// Selected Color (Primary)
+@selected-bg-color: @palette-cornflower-blue;
+
 // -----------------------------------------------------------------------------
 // TopBar / Room Tabs
 // -----------------------------------------------------------------------------
@@ -19,41 +22,42 @@
 @rooms-tab-bg-color: @topbar-bg-color;
 
 // -----------------------------------------------------------------------------
-// DockWidget Title Bar
+// QMenu / Context Menu
 // -----------------------------------------------------------------------------
 
-// For DockWidgets that display no text in Title Bar
-@title-toolbar-img-horizontal: 'title_grip_horizontal-dark.png';
-@title-toolbar-img-vertical: 'title_grip_vertical-dark.png';
+@menu-bg-color: darken(@bg, 4%);
 
 // -----------------------------------------------------------------------------
 // QScrollBar
 // -----------------------------------------------------------------------------
 
-@scrollbar-bg-color: darken(@bg, 6%);
+@scrollbar-bg-color: darken(@bg, 4%);
 
 // -----------------------------------------------------------------------------
 // QPushButton
 // -----------------------------------------------------------------------------
 
-@button-bg-color: lighten(@bg, 15%);
+@button-bg-color: lighten(@bg, 12%);
 @button-border-color: darken(@bg, 5%);
 
-@button-bg-color-checked: darken(@bg, 10%);
-@button-border-color-checked: darken(@bg, 50%);
+@button-bg-color-hover: lighten(@bg, 20%);
+
+@button-bg-color-checked: darken(@bg, 5%);
+@button-border-color-checked: darken(@bg, 10%);
 
 // -----------------------------------------------------------------------------
 // Tool Button
 // -----------------------------------------------------------------------------
 
-@toolbutton-border-color-checked: lighten(@bg, 8%);
+@toolbutton-bg-color-checked: lighten(@bg, 35%);
+@toolbutton-border-color-checked: lighten(@bg, 0%);
 
 // -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
 // -----------------------------------------------------------------------------
 
 @input-bg-color: darken(@bg, 8%);
-@input-border-color: lighten(@bg, 5%);
+@input-border-color: lighten(@bg, 10%);
 
 // -----------------------------------------------------------------------------
 // File Browser
@@ -61,12 +65,6 @@
 
 @browser-itemview-bg-color: darken(@bg, 4%);
 @browser-itemview-bg-color-alt: lighten(@tree-bg-color-alt, 4%);
-
-// -----------------------------------------------------------------------------
-// Style Editor
-// -----------------------------------------------------------------------------
-
-@styleeditor-wheel-bg-color: @bg;
 
 // -----------------------------------------------------------------------------
 // ComboViewer / Viewer / FlipBook

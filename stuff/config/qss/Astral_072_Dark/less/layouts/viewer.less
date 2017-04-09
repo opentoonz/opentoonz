@@ -44,9 +44,9 @@ FlipBook {
     // FPS Slider is hidden
     padding-right: -1px;
     & QLineEdit {
+      border-color: @fps-input-border-color;
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
-      border-color: @fps-input-border-color;
     }
   }
 }
@@ -70,22 +70,34 @@ FlipBook {
   border: 0;
   height: 19px;
   margin: 0 3px 0 31px;
-  max-width: 400px;
+  max-width: 450px;
   min-width: 0px;
   &::sub-line:horizontal {
-    border: 1px solid @fps-input-border-color;
     subcontrol-origin: absolute;
+    background-color: @button-bg-color;
+    border: 1px solid @button-border-color;
     height: 17px;
     left: -33px;
+    width: 14px;
+    &:pressed {
+      background-color: @button-bg-color-pressed;
+      border-color: @button-border-color-pressed;
+    }
   }
   &::add-line:horizontal {
     subcontrol-position: left;
-    border: 1px solid @fps-input-border-color;
+    background-color: @button-bg-color;
+    border: 1px solid @button-border-color;
     border-top-right-radius: 2px;
     border-bottom-right-radius: 2px;
-    left: 12px;
+    left: 13px;
     height: 17px;
     image-position: center center;
+    width: 13px;
+    &:pressed {
+      background-color: @button-bg-color-pressed;
+      border-color: @button-border-color-pressed;
+    }
   }
   &::handle {
     &::horizontal {
@@ -93,7 +105,7 @@ FlipBook {
       background-color: @slider-handle-bg-color;
       border: 1px solid @slider-handle-border-color;
       border-radius: 2px;
-      margin: 1px 0 2px 0;
+      margin: 2px 0 3px 0;
       min-width: @size;
       width: @size;
       max-width: @size;

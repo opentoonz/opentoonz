@@ -70,9 +70,9 @@ QPushButton { // Default control
     border: 0;
   }
   &::down-arrow {
-    image: url('@{img-url}/combo_down_arrow.png');
+    image: url('@{img-url}/@{combo-down-arrow-img}');
     &:disabled {
-      image: url('@{img-url}/combo_down_arrow-disabled.png');
+      image: url('@{img-url}/@{combo-down-arrow-img-disabled}');
     }
   }
   & QAbstractItemView {
@@ -90,8 +90,6 @@ QComboBox { // Default control
 /* -------------------------------------------------------------------------- */
 
 .QLineEdit {
-  background-image: url('@{img-url}/@{input-bg-img}');
-  background-repeat: repeat-x;
   background-color: @input-bg-color;
   border: 1px solid @input-border-color;
   border-radius: @input-border-radius;
@@ -138,14 +136,14 @@ QLineEdit { // Default control
     &:checked {
       background-color: @checkbox-bg-color-checked;
       border-color: @checkbox-border-color-checked;
-      image: url('@{img-url}/check_indicator.png');
+      image: url('@{img-url}/@{checkbox-icon-checked}');
       &:hover {
         &:extend(.QCheckBox::indicator:hover);
       }
       &:disabled {
         background-color: @checkbox-bg-color-disabled;
         border-color: @checkbox-border-color-disabled;
-        image: url('@{img-url}/check_indicator-disabled.png');
+        image: url('@{img-url}/@{checkbox-icon-disabled}');
       }
     }
     &:disabled {

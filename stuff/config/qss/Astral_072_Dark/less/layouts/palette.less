@@ -11,9 +11,6 @@
   & #TabBarContainer {
     margin-left: -4px; // Resets container margin
   }
-  & QScrollBar {
-    &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
-  }
   & #bottomWidget {
     border-top: 1px solid @accent1;
     padding: 3px 2px 8px 3px;
@@ -130,9 +127,6 @@ PaletteViewer {
       padding: 1px 1px 2px 1px;
     }
   }
-  & QScrollBar {
-    &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
-  }
 }
 
 #StudioPalette {
@@ -140,9 +134,6 @@ PaletteViewer {
     &:extend(.tree-list all); // components/treeviews.less
     &::branch {
       &:extend(.branch-17 all); // components/treeviews.less
-    }
-    & QScrollBar {
-      &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
     }
   }
 }

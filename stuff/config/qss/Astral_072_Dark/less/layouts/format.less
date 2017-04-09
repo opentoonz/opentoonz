@@ -36,6 +36,9 @@ ParamsPage {
 }
 
 #CameraSettingsRadioButton {
+  &:hover {
+    background: none;
+  }
   &::indicator {
     // Apply a button style
     &:extend(.button-tool all); // components/buttons.less
@@ -66,6 +69,7 @@ ParamsPage {
   // Apply an icon
   &:extend(.icon-fsp all); // components/icons.less
   margin: 0;
+  background: none; // fix for 128 highlight img
 }
 
 /* -----------------------------------------------------------------------------

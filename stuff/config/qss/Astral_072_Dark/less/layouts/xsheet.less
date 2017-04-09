@@ -44,9 +44,6 @@
 ----------------------------------------------------------------------------- */
 
 XsheetViewer {
-  & QScrollBar {
-    &:extend(.mods-scrollbars-02 all); // mods/scrollbars.less
-  }
   qproperty-TextColor: @xsheet-text-color;
   qproperty-BGColor: @xsheet-bg-color;
   qproperty-LightLineColor: @xsheet-LightLine-color;
@@ -136,6 +133,8 @@ XsheetViewer {
 #FunctionEditorTree {
   // Don't extend all else FunctionTreeView qproperties won't work
   &:extend(.tree-list);
+  background-color: @browser-itemview-bg-color;
+  alternate-background-color: @browser-itemview-bg-color;
   border-top: 1px solid @accent1;
   &::branch { // Size "17"
     // OK to extend all on branch
@@ -152,9 +151,6 @@ XsheetViewer {
 FunctionTreeView {
   qproperty-TextColor: @function-treeview-text-color;
   qproperty-CurrentTextColor: @function-treeview-text-color-selected;
-  & QScrollBar {
-    &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
-  }
 }
 
 FunctionPanel {
@@ -169,9 +165,6 @@ FunctionPanel {
 }
 
 SpreadsheetViewer {
-  & QScrollBar {
-    &:extend(.mods-scrollbars-02 all); // mods/scrollbars.less
-  }
   qproperty-LightLightBGColor: @xsheet-LightLightBG-color; // paired
   qproperty-CurrentRowBgColor: @xsheet-CurrentRowBG-color; // paired
   qproperty-LightLineColor: @xsheet-LightLine-color; // paired

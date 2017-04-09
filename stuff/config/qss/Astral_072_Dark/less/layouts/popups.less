@@ -59,7 +59,10 @@ QDialog {
   alternate-background-color: @browser-itemview-bg-color-alt;
   border: 1px solid @accent1;
   & QScrollBar {
-    &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
+    &:vertical {
+      width: 16px;
+      margin-right: -1px;
+    }
   }
 }
 

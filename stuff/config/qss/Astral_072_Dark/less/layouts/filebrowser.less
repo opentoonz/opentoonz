@@ -13,7 +13,10 @@
     &:extend(.branch-22 all);  // components/treeviews.less
   }
   & QScrollBar {
-    &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
+    &:horizontal {
+      height: 16px;
+      margin-bottom: -1px;
+    }
   }
 }
 
@@ -37,9 +40,12 @@ DvItemViewerPanel {
     border-right: 1px solid @accent1;
     border-bottom: 1px solid @accent1;
     margin: 0;
+      & QScrollBar {
+    &:vertical {
+      width: 16px;
+      margin-right: -1px;
+    }
   }
-  & QScrollBar {
-    &:extend(.mods-scrollbars-01 all); // mods/scrollbars.less
   }
   & QToolButton {
     padding: 1px;

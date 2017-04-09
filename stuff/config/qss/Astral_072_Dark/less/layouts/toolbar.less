@@ -57,6 +57,9 @@ IconViewField {
   // Properties here also apply to the Room Tabs lock icon.
   // Be sure to head over to (layouts/mainwindow.less) if you need to
   // override anything from here...
+  &:hover {
+    background: none; // fix for 128 QCheckBox hover state
+  }
   spacing: 0;
   &::indicator {
     // Add button style
