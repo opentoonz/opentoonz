@@ -96,7 +96,7 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  std:string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT");
+  std:string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT";
   TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
