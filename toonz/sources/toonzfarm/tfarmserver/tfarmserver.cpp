@@ -758,7 +758,7 @@ void FarmServerService::onStart(int argc, char *argv[]) {
 
   TFilePath gRootDir = getGlobalRoot();
   if (::to_string(gRootDir) == "") {
-    std::string errMsg("Unable to get TFARMGLOBALROOT environment variable (" + std::to_string(gRootDir) + ")");
+    std::string errMsg("Unable to get TFARMGLOBALROOT environment variable (" + ::to_string(gRootDir) + ")");
     addToMessageLog(errMsg);
 
 // DEBUG MAC SERVIZIO (DA TOGLIERE)
