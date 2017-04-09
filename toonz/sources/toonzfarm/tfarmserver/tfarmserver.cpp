@@ -10,6 +10,8 @@
 #include "tlog.h"
 #include "tfilepath_io.h"
 #include "tcli.h"
+#include "tversion.h"
+using namespace TVER;
 
 #include <string>
 #include <map>
@@ -59,24 +61,20 @@ class FarmServer;
 
 namespace {
 
-const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.1";
-const char *applicationRevision = "2";
-
 //--------------------------------------------------------------------
 TFilePath getGlobalRoot() {
+  TVER::ToonzVersion tver;
   TFilePath rootDir;
 
 #ifdef _WIN32
-  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
+  std::string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT";
   TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
   // Leggo la localRoot da File txt
-  std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+  std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
   TFilePath name(unixpath);
-  Tifstream is(
-      TFilePath(TSystem::getSystemValue(name).toStdString()));
+  Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -100,15 +98,16 @@ TFilePath getGlobalRoot() {
 //--------------------------------------------------------------------
 
 TFilePath getLocalRoot() {
+  TVER::ToonzVersion tver;
   TFilePath lroot;
 
 #ifdef _WIN32
-  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
+  QString regpath = QString::fromStdString("SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT");
   TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
-std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
 TFilePath name(unixpath);
 Tifstream is(
     TFilePath(TSystem::getSystemValue(name).toStdString()));
@@ -731,6 +730,7 @@ static bool loadServerData(const QString &hostname, QString &addr, int &port) {
 void FarmServerService::onStart(int argc, char *argv[]) {
   // Initialize thread components
   TThread::init();
+  TVER::ToonzVersion tver;
 
 #ifdef _WIN32
 //  DebugBreak();
@@ -815,7 +815,8 @@ void FarmServerService::onStart(int argc, char *argv[]) {
     m_userLog             = new TUserLog(logFilePath);
   }
 
-  m_userLog->info("ToonzFarm Server 1.0");
+  std:string appverinfo = tver.getAppVersionInfo("Farm Server") + "\n\n";
+  m_userLog->info( appverinfo.c_str() );
 
   // legge dal file di configurazione dei server il numero di porta da
   // utilizzare
