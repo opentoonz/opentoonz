@@ -89,7 +89,8 @@ QToolBar QToolButton:checked:hover,
 #ForceSquaredPixelButton:checked:hover,
 #SchematicBottomFrame QToolBar QToolButton:checked:hover,
 #EditToolLockButton::indicator:checked:hover {
-  background-color: #6e6e6e;
+  background-color: #404040;
+  border-color: #222222;
 }
 .button-tool:disabled,
 #TopBar #EditToolLockButton::indicator:disabled,
@@ -144,23 +145,23 @@ QGroupBox {
 .icon-lock:unchecked,
 #CameraSettingsRadioButton::indicator:unchecked,
 #EditToolLockButton::indicator:unchecked {
-  image: url('imgs/white/cam_unlock.png');
+  image: url('imgs/white/cam_unlock.svg');
 }
 .icon-lock:checked,
 #CameraSettingsRadioButton::indicator:checked,
 #EditToolLockButton::indicator:checked {
-  image: url('imgs/white/cam_lock.png');
+  image: url('imgs/white/cam_lock.svg');
 }
 .icon-fsp,
 #ForceSquaredPixelButton {
   height: 16px;
-  image: url('imgs/white/fsp_unchecked.png');
+  image: url('imgs/white/fsp_unchecked.svg');
   padding: 1px;
   width: 16px;
 }
 .icon-fsp:checked,
 #ForceSquaredPixelButton:checked {
-  image: url('imgs/white/fsp_checked.png');
+  image: url('imgs/white/fsp_checked.svg');
 }
 /* -----------------------------------------------------------------------------
    Component: Tabs
@@ -854,8 +855,8 @@ QLineEdit,
 #TaskSheetItem,
 #tasksRemoveBox,
 #tasksAddBox {
-  background-color: #2f2f2f;
-  border: 1px solid #222222;
+  background-color: #343434;
+  border: 1px solid #272727;
   border-radius: 2px;
   color: #cccccc;
   selection-background-color: #5483a6;
@@ -867,7 +868,7 @@ QLineEdit:focus,
 #TaskSheetItem:focus,
 #tasksRemoveBox:focus,
 #tasksAddBox:focus {
-  background-color: #2f2f2f;
+  background-color: #343434;
   border-color: #5483a6;
 }
 .QLineEdit:disabled,
@@ -897,8 +898,8 @@ QMenu::indicator,
 QCheckBox::indicator,
 .QGroupBox::indicator,
 QGroupBox::indicator {
-  background-color: #2f2f2f;
-  border: 1px solid #222222;
+  background-color: #343434;
+  border: 1px solid #272727;
   border-radius: 2px;
   height: 9px;
   padding: 1px;
@@ -914,17 +915,17 @@ QCheckBox::indicator:checked:hover,
 .QGroupBox::indicator:checked:hover,
 QGroupBox::indicator:hover,
 QGroupBox::indicator:checked:hover {
-  background-color: #3b3b3b;
-  border-color: #222222;
+  background-color: #404040;
+  border-color: #a1a1a1;
 }
 .QCheckBox::indicator:checked,
 QMenu::indicator:checked,
 QCheckBox::indicator:checked,
 .QGroupBox::indicator:checked,
 QGroupBox::indicator:checked {
-  background-color: #2f2f2f;
-  border-color: #222222;
-  image: url('imgs/white/check_indicator.png');
+  background-color: #343434;
+  border-color: #272727;
+  image: url('imgs/white/checkmark.svg');
 }
 .QCheckBox::indicator:checked:disabled,
 QMenu::indicator:checked:disabled,
@@ -933,7 +934,7 @@ QCheckBox::indicator:checked:disabled,
 QGroupBox::indicator:checked:disabled {
   background-color: #3b3b3b;
   border-color: #343434;
-  image: url('imgs/white/check_indicator-disabled.png');
+  image: url('imgs/white/checkmark-disabled.svg');
 }
 .QCheckBox::indicator:disabled,
 QMenu::indicator:disabled,
@@ -947,13 +948,13 @@ QGroupBox::indicator:disabled {
 .QRadioButton::indicator:unchecked,
 QRadioButton::indicator:unchecked,
 #CameraSettingsRadioButton_Small::indicator:unchecked {
-  image: url('imgs/white/radiobutton_unchecked.png');
+  image: url('imgs/white/radiobutton_unchecked.svg');
   image-position: center center;
 }
 .QRadioButton::indicator:checked,
 QRadioButton::indicator:checked,
 #CameraSettingsRadioButton_Small::indicator:checked {
-  image: url('imgs/white/radiobutton_checked.png');
+  image: url('imgs/white/radiobutton_checked.svg');
   image-position: center center;
 }
 /* -------------------------------------------------------------------------- */
@@ -1529,6 +1530,7 @@ FlipBook #ToolBarContainer QLineEdit {
   border-color: #292929;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  height: 17px;
 }
 #FlipConsolePlayToolBar::separator:horizontal {
   margin: 0 2px;

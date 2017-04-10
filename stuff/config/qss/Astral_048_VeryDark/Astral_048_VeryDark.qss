@@ -79,8 +79,8 @@ QToolBar QToolButton:checked,
 #ForceSquaredPixelButton:checked,
 #SchematicBottomFrame QToolBar QToolButton:checked,
 #EditToolLockButton::indicator:checked {
-  background-color: #898989;
-  border-color: #303030;
+  background-color: #000000;
+  border-color: #565656;
 }
 .button-tool:checked:hover,
 #TopBar #EditToolLockButton::indicator:checked:hover,
@@ -89,7 +89,8 @@ QToolBar QToolButton:checked:hover,
 #ForceSquaredPixelButton:checked:hover,
 #SchematicBottomFrame QToolBar QToolButton:checked:hover,
 #EditToolLockButton::indicator:checked:hover {
-  background-color: #565656;
+  background-color: #282828;
+  border-color: #0a0a0a;
 }
 .button-tool:disabled,
 #TopBar #EditToolLockButton::indicator:disabled,
@@ -144,23 +145,23 @@ QGroupBox {
 .icon-lock:unchecked,
 #CameraSettingsRadioButton::indicator:unchecked,
 #EditToolLockButton::indicator:unchecked {
-  image: url('../Astral_072_Dark/imgs/white/cam_unlock.png');
+  image: url('../Astral_072_Dark/imgs/white/cam_unlock.svg');
 }
 .icon-lock:checked,
 #CameraSettingsRadioButton::indicator:checked,
 #EditToolLockButton::indicator:checked {
-  image: url('../Astral_072_Dark/imgs/white/cam_lock.png');
+  image: url('../Astral_072_Dark/imgs/white/cam_lock.svg');
 }
 .icon-fsp,
 #ForceSquaredPixelButton {
   height: 16px;
-  image: url('../Astral_072_Dark/imgs/white/fsp_unchecked.png');
+  image: url('../Astral_072_Dark/imgs/white/fsp_unchecked.svg');
   padding: 1px;
   width: 16px;
 }
 .icon-fsp:checked,
 #ForceSquaredPixelButton:checked {
-  image: url('../Astral_072_Dark/imgs/white/fsp_checked.png');
+  image: url('../Astral_072_Dark/imgs/white/fsp_checked.svg');
 }
 /* -----------------------------------------------------------------------------
    Component: Tabs
@@ -915,7 +916,7 @@ QCheckBox::indicator:checked:hover,
 QGroupBox::indicator:hover,
 QGroupBox::indicator:checked:hover {
   background-color: #282828;
-  border-color: #4a4a4a;
+  border-color: #898989;
 }
 .QCheckBox::indicator:checked,
 QMenu::indicator:checked,
@@ -924,7 +925,7 @@ QCheckBox::indicator:checked,
 QGroupBox::indicator:checked {
   background-color: #1c1c1c;
   border-color: #4a4a4a;
-  image: url('../Astral_072_Dark/imgs/white/check_indicator.png');
+  image: url('../Astral_072_Dark/imgs/white/checkmark.svg');
 }
 .QCheckBox::indicator:checked:disabled,
 QMenu::indicator:checked:disabled,
@@ -933,7 +934,7 @@ QCheckBox::indicator:checked:disabled,
 QGroupBox::indicator:checked:disabled {
   background-color: #232323;
   border-color: #1c1c1c;
-  image: url('../Astral_072_Dark/imgs/white/check_indicator-disabled.png');
+  image: url('../Astral_072_Dark/imgs/white/checkmark-disabled.svg');
 }
 .QCheckBox::indicator:disabled,
 QMenu::indicator:disabled,
@@ -947,13 +948,13 @@ QGroupBox::indicator:disabled {
 .QRadioButton::indicator:unchecked,
 QRadioButton::indicator:unchecked,
 #CameraSettingsRadioButton_Small::indicator:unchecked {
-  image: url('../Astral_072_Dark/imgs/white/radiobutton_unchecked.png');
+  image: url('../Astral_072_Dark/imgs/white/radiobutton_unchecked.svg');
   image-position: center center;
 }
 .QRadioButton::indicator:checked,
 QRadioButton::indicator:checked,
 #CameraSettingsRadioButton_Small::indicator:checked {
-  image: url('../Astral_072_Dark/imgs/white/radiobutton_checked.png');
+  image: url('../Astral_072_Dark/imgs/white/radiobutton_checked.svg');
   image-position: center center;
 }
 /* -------------------------------------------------------------------------- */
@@ -1529,6 +1530,7 @@ FlipBook #ToolBarContainer QLineEdit {
   border-color: #111111;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  height: 17px;
 }
 #FlipConsolePlayToolBar::separator:horizontal {
   margin: 0 2px;

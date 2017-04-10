@@ -176,8 +176,9 @@
 @toolbutton-border-color-pressed: @button-border-color-pressed;
 
 @toolbutton-bg-color-checked: @button-bg-color-checked;
-@toolbutton-bg-color-checked-hover: lighten(@bg, 15%);
+@toolbutton-bg-color-checked-hover: darken(@bg, 3%);
 @toolbutton-border-color-checked: darken(@bg, 15%);
+@toolbutton-border-color-checked-hover: darken(@bg, 15%);
 
 // -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
@@ -186,7 +187,7 @@
 @focus-bg-color: @input-bg-color;
 @focus-border-color: @selected-bg-color;
 
-@input-bg-color: darken(@bg, 10%);
+@input-bg-color: darken(@bg, 8%);
 @input-border-color: darken(@input-bg-color, 5%);
 @input-border-radius: 2px;
 @input-text-color: @text-color;
@@ -207,13 +208,13 @@
 @checkbox-border-color: @input-border-color;
 
 @checkbox-bg-color-hover: lighten(@checkbox-bg-color, 5%);
-@checkbox-border-color-hover: @checkbox-border-color;
+@checkbox-border-color-hover: lighten(@bg, 35%);
 
 @checkbox-bg-color-checked: @checkbox-bg-color;
 @checkbox-border-color-checked: @checkbox-border-color;
 
-@checkbox-icon-checked: 'check_indicator.png';
-@checkbox-icon-disabled: 'check_indicator-disabled.png';
+@checkbox-icon-checked: 'checkmark.svg';
+@checkbox-icon-disabled: 'checkmark-disabled.svg';
 
 @checkbox-bg-color-disabled: @input-bg-color-disabled;
 @checkbox-border-color-disabled: @input-border-color-disabled;
