@@ -6,10 +6,12 @@
 #CleanupSettingsShowButton,
 #OutputSettingsShowButton,
 #FxSettingsPreviewShowButton {
-  image: url('imgs/white/plus.png');
+  image: url('imgs/white/plus.svg');
   image-position: center center;
   margin: 0;
-  padding: 0;
+  padding: 1px;
+  min-width: 10px;
+  min-height: 10px;
 }
 .button-show:checked,
 #LoadLevelShowButton:checked,
@@ -18,7 +20,7 @@
 #FxSettingsPreviewShowButton:checked {
   background-color: #626262;
   border-color: #343434;
-  image: url('imgs/white/minus.png');
+  image: url('imgs/white/minus.svg');
 }
 .button-show:checked:pressed,
 #LoadLevelShowButton:checked:pressed,
@@ -26,7 +28,7 @@
 #OutputSettingsShowButton:checked:pressed,
 #FxSettingsPreviewShowButton:checked:pressed {
   background-color: #2f2f2f;
-  border-color: #222222;
+  border-color: #5483a6;
 }
 .button-show:checked:hover,
 #LoadLevelShowButton:checked:hover,
@@ -70,7 +72,7 @@ QToolBar QToolButton:pressed,
 #SchematicBottomFrame QToolBar QToolButton:pressed,
 #EditToolLockButton::indicator:pressed {
   background-color: #2f2f2f;
-  border-color: #222222;
+  border-color: #5483a6;
 }
 .button-tool:checked,
 #TopBar #EditToolLockButton::indicator:checked,
@@ -292,7 +294,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:adjoins-item,
 #Tasks QTreeView::branch:adjoins-item,
 #FunctionEditorTree::branch:adjoins-item {
-  border-image: url('imgs/white/tree17_branch-end.png') 0;
+  border-image: url('imgs/white/tree17_branch-end.svg') 0;
 }
 .branch-17:has-siblings,
 #SceneCast QTreeView::branch:has-siblings,
@@ -300,7 +302,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-siblings,
 #Tasks QTreeView::branch:has-siblings,
 #FunctionEditorTree::branch:has-siblings {
-  border-image: url('imgs/white/tree17_vline.png') 0;
+  border-image: url('imgs/white/tree17_vline.svg') 0;
 }
 .branch-17:has-siblings:adjoins-item,
 #SceneCast QTreeView::branch:has-siblings:adjoins-item,
@@ -308,7 +310,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-siblings:adjoins-item,
 #Tasks QTreeView::branch:has-siblings:adjoins-item,
 #FunctionEditorTree::branch:has-siblings:adjoins-item {
-  border-image: url('imgs/white/tree17_branch-more.png') 0;
+  border-image: url('imgs/white/tree17_branch-more.svg') 0;
 }
 .branch-17:has-children:closed,
 #SceneCast QTreeView::branch:has-children:closed,
@@ -316,8 +318,9 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:closed,
 #Tasks QTreeView::branch:has-children:closed,
 #FunctionEditorTree::branch:has-children:closed {
+  background: url('imgs/white/tree17_branch-closed_nosib.svg') no-repeat;
   border-image: none;
-  image: url('imgs/white/tree17_branch-closed_nosib.png');
+  image: none;
 }
 .branch-17:has-children:open,
 #SceneCast QTreeView::branch:has-children:open,
@@ -325,8 +328,9 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:open,
 #Tasks QTreeView::branch:has-children:open,
 #FunctionEditorTree::branch:has-children:open {
+  background: url('imgs/white/tree17_branch-open_nosib.svg') no-repeat;
   border-image: none;
-  image: url('imgs/white/tree17_branch-open_nosib.png');
+  image: none;
 }
 .branch-17:has-children:has-siblings:closed,
 #SceneCast QTreeView::branch:has-children:has-siblings:closed,
@@ -334,8 +338,9 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:has-siblings:closed,
 #Tasks QTreeView::branch:has-children:has-siblings:closed,
 #FunctionEditorTree::branch:has-children:has-siblings:closed {
+  background: url('imgs/white/tree17_branch-closed.svg') no-repeat;
   border-image: none;
-  image: url('imgs/white/tree17_branch-closed.png');
+  image: none;
 }
 .branch-17:has-children:has-siblings:open,
 #SceneCast QTreeView::branch:has-children:has-siblings:open,
@@ -343,47 +348,52 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:has-siblings:open,
 #Tasks QTreeView::branch:has-children:has-siblings:open,
 #FunctionEditorTree::branch:has-children:has-siblings:open {
+  background: url('imgs/white/tree17_branch-open.svg') no-repeat;
   border-image: none;
-  image: url('imgs/white/tree17_branch-open.png');
+  image: none;
 }
 .branch-22:adjoins-item,
 #DirTreeView::branch:adjoins-item,
 ProjectPopup QTreeView::branch:adjoins-item {
-  border-image: url('imgs/white/tree22_branch-end.png') 0;
+  border-image: url('imgs/white/tree22_branch-end.svg') 0;
 }
 .branch-22:has-siblings,
 #DirTreeView::branch:has-siblings,
 ProjectPopup QTreeView::branch:has-siblings {
-  border-image: url('imgs/white/tree22_vline.png') 0;
+  border-image: url('imgs/white/tree22_vline.svg') 0;
 }
 .branch-22:has-siblings:adjoins-item,
 #DirTreeView::branch:has-siblings:adjoins-item,
 ProjectPopup QTreeView::branch:has-siblings:adjoins-item {
-  border-image: url('imgs/white/tree22_branch-more.png') 0;
+  border-image: url('imgs/white/tree22_branch-more.svg') 0;
 }
 .branch-22:has-children:closed,
 #DirTreeView::branch:has-children:closed,
 ProjectPopup QTreeView::branch:has-children:closed {
+  background: url('imgs/white/tree22_branch-closed_nosib.svg') no-repeat;
   border-image: none;
-  image: url('imgs/white/tree22_branch-closed_nosib.png');
+  image: none;
 }
 .branch-22:has-children:open,
 #DirTreeView::branch:has-children:open,
 ProjectPopup QTreeView::branch:has-children:open {
+  background: url('imgs/white/tree22_branch-open_nosib.svg') no-repeat;
   border-image: none;
-  image: url('imgs/white/tree22_branch-open_nosib.png');
+  image: none;
 }
 .branch-22:has-children:has-siblings:closed,
 #DirTreeView::branch:has-children:has-siblings:closed,
 ProjectPopup QTreeView::branch:has-children:has-siblings:closed {
+  background: url('imgs/white/tree22_branch-closed.svg') no-repeat;
   border-image: none;
-  image: url('imgs/white/tree22_branch-closed.png');
+  image: none;
 }
 .branch-22:has-children:has-siblings:open,
 #DirTreeView::branch:has-children:has-siblings:open,
 ProjectPopup QTreeView::branch:has-children:has-siblings:open {
+  background: url('imgs/white/tree22_branch-open.svg') no-repeat;
   border-image: none;
-  image: url('imgs/white/tree22_branch-open.png');
+  image: none;
 }
 /* -----------------------------------------------------------------------------
    Main
@@ -591,12 +601,12 @@ QScrollBar::handle:vertical:pressed {
 }
 QScrollBar::handle:horizontal {
   background-color: #555555;
-  margin: 2px 15px;
+  margin: 2px 16px;
   min-width: 20px;
 }
 QScrollBar::handle:vertical {
   background-color: #555555;
-  margin: 15px 2px;
+  margin: 16px 2px;
   min-height: 20px;
 }
 QScrollBar::add-line {
@@ -606,10 +616,8 @@ QScrollBar::add-line {
 QScrollBar::add-line:horizontal {
   subcontrol-position: right;
   background-color: #3b3b3b;
-  image: url('imgs/white/scroll-right.png');
-  image-position: center center;
   margin: 0;
-  width: 15px;
+  width: 16px;
 }
 QScrollBar::add-line:horizontal:pressed {
   background-color: #6e6e6e;
@@ -617,10 +625,8 @@ QScrollBar::add-line:horizontal:pressed {
 QScrollBar::add-line:vertical {
   subcontrol-position: bottom;
   background-color: #3b3b3b;
-  image: url('imgs/white/scroll-down.png');
-  image-position: center center;
   margin: 0;
-  height: 15px;
+  height: 16px;
 }
 QScrollBar::add-line:vertical:pressed {
   background-color: #6e6e6e;
@@ -632,10 +638,8 @@ QScrollBar::sub-line {
 QScrollBar::sub-line:horizontal {
   subcontrol-position: left;
   background-color: #3b3b3b;
-  image: url('imgs/white/scroll-left.png');
-  image-position: center center;
   margin: 0;
-  width: 15px;
+  width: 16px;
 }
 QScrollBar::sub-line:horizontal:pressed {
   background-color: #6e6e6e;
@@ -643,13 +647,27 @@ QScrollBar::sub-line:horizontal:pressed {
 QScrollBar::sub-line:vertical {
   subcontrol-position: top;
   background-color: #3b3b3b;
-  image: url('imgs/white/scroll-up.png');
-  image-position: center center;
   margin: 0;
-  height: 15px;
+  height: 16px;
 }
 QScrollBar::sub-line:vertical:pressed {
   background-color: #6e6e6e;
+}
+QScrollBar::up-arrow:vertical {
+  image: url('imgs/white/scroll-up.svg');
+  image-position: center center;
+}
+QScrollBar::down-arrow:vertical {
+  image: url('imgs/white/scroll-down.svg');
+  image-position: center center;
+}
+QScrollBar::left-arrow:horizontal {
+  image: url('imgs/white/scroll-left.svg');
+  image-position: center center;
+}
+QScrollBar::right-arrow:horizontal {
+  image: url('imgs/white/scroll-right.svg');
+  image-position: center center;
 }
 QScrollBar::sub-page:horizontal,
 QScrollBar::add-page:horizontal,
@@ -724,19 +742,19 @@ DvScrollWidget QPushButton:pressed {
   background-color: #2f2f2f;
 }
 #ScrollLeftButton {
-  image: url('imgs/white/arrow_left.png');
+  image: url('imgs/white/scroll-left.svg');
   border-right: 1px solid #2c2c2c;
 }
 #ScrollRightButton {
-  image: url('imgs/white/arrow_right.png');
+  image: url('imgs/white/scroll-right.svg');
   border-left: 1px solid #2c2c2c;
   border-right: 1px solid #2c2c2c;
 }
 #ScrollUpButton {
-  image: url('imgs/white/arrow_up.png');
+  image: url('imgs/white/scroll-up.svg');
 }
 #ScrollDownButton {
-  image: url('imgs/white/arrow_down.png');
+  image: url('imgs/white/scroll-down.svg');
 }
 #keyFrameNavigator {
   background: none;
@@ -788,7 +806,7 @@ QPushButton:pressed,
 #WordButton:pressed,
 #FunctionSegmentViewerLinkButton:pressed {
   background-color: #2f2f2f;
-  border-color: #222222;
+  border-color: #5483a6;
   color: #cccccc;
 }
 .QPushButton:checked,
@@ -820,10 +838,10 @@ QComboBox:disabled {
 }
 /* Camera Capture */
 #GearButton {
-  qproperty-icon: url('imgs/white/gear.png');
+  qproperty-icon: url('imgs/white/gear.svg');
 }
 #SubfolderButton {
-  qproperty-icon: url('imgs/white/subfolder.png');
+  qproperty-icon: url('imgs/white/subfolder.svg');
 }
 /* -------------------------------------------------------------------------- */
 .QComboBox,
@@ -836,11 +854,11 @@ QComboBox::drop-down {
 }
 .QComboBox::down-arrow,
 QComboBox::down-arrow {
-  image: url('imgs/white/combo_down_arrow.png');
+  image: url('imgs/white/combo-down.svg');
 }
 .QComboBox::down-arrow:disabled,
 QComboBox::down-arrow:disabled {
-  image: url('imgs/white/combo_down_arrow-disabled.png');
+  image: url('imgs/white/combo-down-disabled.svg');
 }
 .QComboBox QAbstractItemView,
 QComboBox QAbstractItemView {
@@ -1221,10 +1239,10 @@ QStatusBar #StatusBarLabel {
   min-width: 18px;
 }
 #colorSliderAddButton {
-  image: url('imgs/white/arrow_right.png');
+  image: url('imgs/white/scroll-right.svg');
 }
 #colorSliderSubButton {
-  image: url('imgs/white/arrow_left.png');
+  image: url('imgs/white/scroll-left.svg');
 }
 #PlainColorPageParts {
   border-top: 1px solid #2c2c2c;
@@ -1341,6 +1359,9 @@ QDialog #dialogButtonFrame QPushButton {
   alternate-background-color: #434343;
   border: 1px solid #2c2c2c;
 }
+#ShortcutTree::item {
+  padding: 1px 0;
+}
 #ShortcutTree QScrollBar:vertical {
   width: 16px;
   margin-right: -1px;
@@ -1433,12 +1454,12 @@ FxSettings QToolBar QToolBar {
 ----------------------------------------------------------------------------- */
 #ToolBar TPanelTitleBar {
   background-color: #484848;
-  background-image: url('imgs/white/title_grip_horizontal.png');
+  background-image: url('imgs/white/title_grip_horizontal.svg');
   background-repeat: no-repeat;
   border: 0;
-  height: 13px;
-  max-height: 13px;
-  min-height: 13px;
+  height: 17px;
+  max-height: 17px;
+  min-height: 17px;
   qproperty-BorderPixmap: url('none');
   qproperty-ActiveBorderPixmap: url('none');
   qproperty-FloatBorderPixmap: url('imgs/white/titlebar_float.png');
@@ -1452,22 +1473,22 @@ FxSettings QToolBar QToolBar {
 ----------------------------------------------------------------------------- */
 #ToolOptions TPanelTitleBar {
   background-color: #484848;
-  background-image: url('imgs/white/title_grip_vertical.png');
+  background-image: url('imgs/white/title_grip_vertical.svg');
   background-repeat: no-repeat;
   border: 0;
-  width: 13px;
-  min-width: 13px;
-  max-width: 13px;
+  width: 17px;
+  min-width: 17px;
+  max-width: 17px;
   qproperty-BorderPixmap: url('none');
   qproperty-ActiveBorderPixmap: url('none');
   qproperty-FloatBorderPixmap: url('imgs/white/titlebar_float.png');
   qproperty-FloatActiveBorderPixmap: url('imgs/white/titlebar_float.png');
 }
 IconViewField {
-  qproperty-ScalePegPixmap: url("imgs/white/selectiontool_scalepeg.png");
-  qproperty-RotationPixmap: url("imgs/white/selectiontool_rotation.png");
-  qproperty-PositionPixmap: url("imgs/white/selectiontool_position.png");
-  qproperty-ThicknessPixmap: url("imgs/white/selectiontool_thickness.png");
+  qproperty-ScalePegPixmap: url("imgs/white/selectiontool_scalepeg.svg");
+  qproperty-RotationPixmap: url("imgs/white/selectiontool_rotation.svg");
+  qproperty-PositionPixmap: url("imgs/white/selectiontool_position.svg");
+  qproperty-ThicknessPixmap: url("imgs/white/selectiontool_thickness.svg");
 }
 #EditToolLockButton {
   spacing: 0;
@@ -1530,7 +1551,7 @@ FlipBook #ToolBarContainer QLineEdit {
   border-color: #292929;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
-  height: 17px;
+  height: 16px;
 }
 #FlipConsolePlayToolBar::separator:horizontal {
   margin: 0 2px;
@@ -1555,13 +1576,14 @@ FlipBook #ToolBarContainer QLineEdit {
   subcontrol-origin: absolute;
   background-color: #626262;
   border: 1px solid #343434;
-  height: 17px;
+  height: 16px;
   left: -33px;
+  padding-left: 1px;
   width: 14px;
 }
 #ViewerFpsSlider::sub-line:horizontal:pressed {
   background-color: #2f2f2f;
-  border-color: #222222;
+  border-color: #5483a6;
 }
 #ViewerFpsSlider::add-line:horizontal {
   subcontrol-position: left;
@@ -1570,13 +1592,13 @@ FlipBook #ToolBarContainer QLineEdit {
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
   left: 13px;
-  height: 17px;
+  height: 16px;
   image-position: center center;
   width: 13px;
 }
 #ViewerFpsSlider::add-line:horizontal:pressed {
   background-color: #2f2f2f;
-  border-color: #222222;
+  border-color: #5483a6;
 }
 #ViewerFpsSlider::handle::horizontal {
   background-color: #878787;
@@ -1589,8 +1611,8 @@ FlipBook #ToolBarContainer QLineEdit {
 }
 FlipSlider {
   qproperty-PBHeight: 15;
-  qproperty-PBOverlay: url('imgs/white/flipslider.png');
-  qproperty-PBMarker: url('imgs/white/flipmarker.png');
+  qproperty-PBOverlay: url('imgs/white/flipslider.svg');
+  qproperty-PBMarker: url('imgs/white/flipmarker.svg');
   qproperty-PBColorMarginLeft: 1;
   qproperty-PBColorMarginTop: 2;
   qproperty-PBColorMarginRight: 1;
@@ -1753,17 +1775,17 @@ SpreadsheetViewer {
   margin: 0;
 }
 #FunctionSegmentViewerLinkButton {
-  background-image: url('imgs/white/segment_unlinked.png');
+  background-image: url('imgs/white/segment_unlinked.svg');
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:hover {
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:checked {
-  background-image: url('imgs/white/segment_linked.png');
+  background-image: url('imgs/white/segment_linked.svg');
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:disabled {
-  background-image: url('imgs/white/segment_disabled.png');
+  background-image: url('imgs/white/segment_disabled.svg');
   background-repeat: no-repeat;
 }

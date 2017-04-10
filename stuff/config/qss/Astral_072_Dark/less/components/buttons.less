@@ -6,14 +6,16 @@
 // -----------------------------------------------------------------------------
 
 .button-show {
-  image: url('@{img-url}/plus.png');
+  image: url('@{img-url}/plus.svg');
   image-position: center center;
   margin: 0;
-  padding: 0;
+  padding: 1px;
+  min-width: 10px;
+  min-height: 10px;
   &:checked {
     background-color: @button-bg-color;
     border-color: @button-border-color;
-    image: url('@{img-url}/minus.png');
+    image: url('@{img-url}/minus.svg');
     &:pressed {
       background-color: @button-bg-color-pressed;
       border-color: @button-border-color-pressed;

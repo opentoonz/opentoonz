@@ -6,10 +6,12 @@
 #CleanupSettingsShowButton,
 #OutputSettingsShowButton,
 #FxSettingsPreviewShowButton {
-  image: url('../Astral_072_Dark/imgs/white/plus.png');
+  image: url('../Astral_072_Dark/imgs/white/plus.svg');
   image-position: center center;
   margin: 0;
-  padding: 0;
+  padding: 1px;
+  min-width: 10px;
+  min-height: 10px;
 }
 .button-show:checked,
 #LoadLevelShowButton:checked,
@@ -18,7 +20,7 @@
 #FxSettingsPreviewShowButton:checked {
   background-color: #4f4f4f;
   border-color: #232323;
-  image: url('../Astral_072_Dark/imgs/white/minus.png');
+  image: url('../Astral_072_Dark/imgs/white/minus.svg');
 }
 .button-show:checked:pressed,
 #LoadLevelShowButton:checked:pressed,
@@ -26,7 +28,7 @@
 #OutputSettingsShowButton:checked:pressed,
 #FxSettingsPreviewShowButton:checked:pressed {
   background-color: #161616;
-  border-color: #0a0a0a;
+  border-color: #5483a6;
 }
 .button-show:checked:hover,
 #LoadLevelShowButton:checked:hover,
@@ -70,7 +72,7 @@ QToolBar QToolButton:pressed,
 #SchematicBottomFrame QToolBar QToolButton:pressed,
 #EditToolLockButton::indicator:pressed {
   background-color: #161616;
-  border-color: #0a0a0a;
+  border-color: #5483a6;
 }
 .button-tool:checked,
 #TopBar #EditToolLockButton::indicator:checked,
@@ -89,8 +91,8 @@ QToolBar QToolButton:checked:hover,
 #ForceSquaredPixelButton:checked:hover,
 #SchematicBottomFrame QToolBar QToolButton:checked:hover,
 #EditToolLockButton::indicator:checked:hover {
-  background-color: #282828;
-  border-color: #0a0a0a;
+  background-color: #303030;
+  border-color: #565656;
 }
 .button-tool:disabled,
 #TopBar #EditToolLockButton::indicator:disabled,
@@ -272,7 +274,7 @@ QTreeWidget::item:selected,
 #ShortcutTree::item:selected,
 ProjectPopup QTreeView::item:selected,
 #Tasks QTreeView::item:selected {
-  background-color: #3998d6;
+  background-color: #5483a6;
   color: #ffffff;
 }
 .tree-list::item:focus,
@@ -292,7 +294,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:adjoins-item,
 #Tasks QTreeView::branch:adjoins-item,
 #FunctionEditorTree::branch:adjoins-item {
-  border-image: url('../Astral_072_Dark/imgs/white/tree17_branch-end.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree17_branch-end.svg') 0;
 }
 .branch-17:has-siblings,
 #SceneCast QTreeView::branch:has-siblings,
@@ -300,7 +302,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-siblings,
 #Tasks QTreeView::branch:has-siblings,
 #FunctionEditorTree::branch:has-siblings {
-  border-image: url('../Astral_072_Dark/imgs/white/tree17_vline.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree17_vline.svg') 0;
 }
 .branch-17:has-siblings:adjoins-item,
 #SceneCast QTreeView::branch:has-siblings:adjoins-item,
@@ -308,7 +310,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-siblings:adjoins-item,
 #Tasks QTreeView::branch:has-siblings:adjoins-item,
 #FunctionEditorTree::branch:has-siblings:adjoins-item {
-  border-image: url('../Astral_072_Dark/imgs/white/tree17_branch-more.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree17_branch-more.svg') 0;
 }
 .branch-17:has-children:closed,
 #SceneCast QTreeView::branch:has-children:closed,
@@ -316,8 +318,9 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:closed,
 #Tasks QTreeView::branch:has-children:closed,
 #FunctionEditorTree::branch:has-children:closed {
+  background: url('../Astral_072_Dark/imgs/white/tree17_branch-closed_nosib.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/white/tree17_branch-closed_nosib.png');
+  image: none;
 }
 .branch-17:has-children:open,
 #SceneCast QTreeView::branch:has-children:open,
@@ -325,8 +328,9 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:open,
 #Tasks QTreeView::branch:has-children:open,
 #FunctionEditorTree::branch:has-children:open {
+  background: url('../Astral_072_Dark/imgs/white/tree17_branch-open_nosib.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/white/tree17_branch-open_nosib.png');
+  image: none;
 }
 .branch-17:has-children:has-siblings:closed,
 #SceneCast QTreeView::branch:has-children:has-siblings:closed,
@@ -334,8 +338,9 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:has-siblings:closed,
 #Tasks QTreeView::branch:has-children:has-siblings:closed,
 #FunctionEditorTree::branch:has-children:has-siblings:closed {
+  background: url('../Astral_072_Dark/imgs/white/tree17_branch-closed.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/white/tree17_branch-closed.png');
+  image: none;
 }
 .branch-17:has-children:has-siblings:open,
 #SceneCast QTreeView::branch:has-children:has-siblings:open,
@@ -343,47 +348,52 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:has-siblings:open,
 #Tasks QTreeView::branch:has-children:has-siblings:open,
 #FunctionEditorTree::branch:has-children:has-siblings:open {
+  background: url('../Astral_072_Dark/imgs/white/tree17_branch-open.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/white/tree17_branch-open.png');
+  image: none;
 }
 .branch-22:adjoins-item,
 #DirTreeView::branch:adjoins-item,
 ProjectPopup QTreeView::branch:adjoins-item {
-  border-image: url('../Astral_072_Dark/imgs/white/tree22_branch-end.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree22_branch-end.svg') 0;
 }
 .branch-22:has-siblings,
 #DirTreeView::branch:has-siblings,
 ProjectPopup QTreeView::branch:has-siblings {
-  border-image: url('../Astral_072_Dark/imgs/white/tree22_vline.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree22_vline.svg') 0;
 }
 .branch-22:has-siblings:adjoins-item,
 #DirTreeView::branch:has-siblings:adjoins-item,
 ProjectPopup QTreeView::branch:has-siblings:adjoins-item {
-  border-image: url('../Astral_072_Dark/imgs/white/tree22_branch-more.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/white/tree22_branch-more.svg') 0;
 }
 .branch-22:has-children:closed,
 #DirTreeView::branch:has-children:closed,
 ProjectPopup QTreeView::branch:has-children:closed {
+  background: url('../Astral_072_Dark/imgs/white/tree22_branch-closed_nosib.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/white/tree22_branch-closed_nosib.png');
+  image: none;
 }
 .branch-22:has-children:open,
 #DirTreeView::branch:has-children:open,
 ProjectPopup QTreeView::branch:has-children:open {
+  background: url('../Astral_072_Dark/imgs/white/tree22_branch-open_nosib.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/white/tree22_branch-open_nosib.png');
+  image: none;
 }
 .branch-22:has-children:has-siblings:closed,
 #DirTreeView::branch:has-children:has-siblings:closed,
 ProjectPopup QTreeView::branch:has-children:has-siblings:closed {
+  background: url('../Astral_072_Dark/imgs/white/tree22_branch-closed.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/white/tree22_branch-closed.png');
+  image: none;
 }
 .branch-22:has-children:has-siblings:open,
 #DirTreeView::branch:has-children:has-siblings:open,
 ProjectPopup QTreeView::branch:has-children:has-siblings:open {
+  background: url('../Astral_072_Dark/imgs/white/tree22_branch-open.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/white/tree22_branch-open.png');
+  image: none;
 }
 /* -----------------------------------------------------------------------------
    Main
@@ -466,7 +476,7 @@ QMenuBar::item:selected {
   color: #cccccc;
 }
 QMenuBar::item:pressed {
-  background-color: #3998d6;
+  background-color: #5483a6;
   color: #ffffff;
 }
 /* -----------------------------------------------------------------------------
@@ -509,14 +519,14 @@ QMenu::item {
   padding: 3px 28px;
 }
 QMenu::item:selected {
-  background-color: #3998d6;
+  background-color: #5483a6;
   color: #ffffff;
 }
 QMenu::item:checked {
   color: #cccccc;
 }
 QMenu::item:checked:selected {
-  background-color: #3998d6;
+  background-color: #5483a6;
   color: #ffffff;
 }
 QMenu::item:disabled {
@@ -537,7 +547,7 @@ QMenu::icon {
   padding: 1px;
 }
 QMenu::icon:checked {
-  background-color: #3998d6;
+  background-color: #5483a6;
 }
 QMenu::indicator {
   margin-left: 7px;
@@ -591,12 +601,12 @@ QScrollBar::handle:vertical:pressed {
 }
 QScrollBar::handle:horizontal {
   background-color: #3d3d3d;
-  margin: 2px 15px;
+  margin: 2px 16px;
   min-width: 20px;
 }
 QScrollBar::handle:vertical {
   background-color: #3d3d3d;
-  margin: 15px 2px;
+  margin: 16px 2px;
   min-height: 20px;
 }
 QScrollBar::add-line {
@@ -606,10 +616,8 @@ QScrollBar::add-line {
 QScrollBar::add-line:horizontal {
   subcontrol-position: right;
   background-color: #262626;
-  image: url('../Astral_072_Dark/imgs/white/scroll-right.png');
-  image-position: center center;
   margin: 0;
-  width: 15px;
+  width: 16px;
 }
 QScrollBar::add-line:horizontal:pressed {
   background-color: #595959;
@@ -617,10 +625,8 @@ QScrollBar::add-line:horizontal:pressed {
 QScrollBar::add-line:vertical {
   subcontrol-position: bottom;
   background-color: #262626;
-  image: url('../Astral_072_Dark/imgs/white/scroll-down.png');
-  image-position: center center;
   margin: 0;
-  height: 15px;
+  height: 16px;
 }
 QScrollBar::add-line:vertical:pressed {
   background-color: #595959;
@@ -632,10 +638,8 @@ QScrollBar::sub-line {
 QScrollBar::sub-line:horizontal {
   subcontrol-position: left;
   background-color: #262626;
-  image: url('../Astral_072_Dark/imgs/white/scroll-left.png');
-  image-position: center center;
   margin: 0;
-  width: 15px;
+  width: 16px;
 }
 QScrollBar::sub-line:horizontal:pressed {
   background-color: #595959;
@@ -643,13 +647,27 @@ QScrollBar::sub-line:horizontal:pressed {
 QScrollBar::sub-line:vertical {
   subcontrol-position: top;
   background-color: #262626;
-  image: url('../Astral_072_Dark/imgs/white/scroll-up.png');
-  image-position: center center;
   margin: 0;
-  height: 15px;
+  height: 16px;
 }
 QScrollBar::sub-line:vertical:pressed {
   background-color: #595959;
+}
+QScrollBar::up-arrow:vertical {
+  image: url('../Astral_072_Dark/imgs/white/scroll-up.svg');
+  image-position: center center;
+}
+QScrollBar::down-arrow:vertical {
+  image: url('../Astral_072_Dark/imgs/white/scroll-down.svg');
+  image-position: center center;
+}
+QScrollBar::left-arrow:horizontal {
+  image: url('../Astral_072_Dark/imgs/white/scroll-left.svg');
+  image-position: center center;
+}
+QScrollBar::right-arrow:horizontal {
+  image: url('../Astral_072_Dark/imgs/white/scroll-right.svg');
+  image-position: center center;
 }
 QScrollBar::sub-page:horizontal,
 QScrollBar::add-page:horizontal,
@@ -724,19 +742,19 @@ DvScrollWidget QPushButton:pressed {
   background-color: #161616;
 }
 #ScrollLeftButton {
-  image: url('../Astral_072_Dark/imgs/white/arrow_left.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-left.svg');
   border-right: 1px solid #141414;
 }
 #ScrollRightButton {
-  image: url('../Astral_072_Dark/imgs/white/arrow_right.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-right.svg');
   border-left: 1px solid #141414;
   border-right: 1px solid #141414;
 }
 #ScrollUpButton {
-  image: url('../Astral_072_Dark/imgs/white/arrow_up.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-up.svg');
 }
 #ScrollDownButton {
-  image: url('../Astral_072_Dark/imgs/white/arrow_down.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-down.svg');
 }
 #keyFrameNavigator {
   background: none;
@@ -788,7 +806,7 @@ QPushButton:pressed,
 #WordButton:pressed,
 #FunctionSegmentViewerLinkButton:pressed {
   background-color: #161616;
-  border-color: #0a0a0a;
+  border-color: #5483a6;
   color: #cccccc;
 }
 .QPushButton:checked,
@@ -820,10 +838,10 @@ QComboBox:disabled {
 }
 /* Camera Capture */
 #GearButton {
-  qproperty-icon: url('../Astral_072_Dark/imgs/white/gear.png');
+  qproperty-icon: url('../Astral_072_Dark/imgs/white/gear.svg');
 }
 #SubfolderButton {
-  qproperty-icon: url('../Astral_072_Dark/imgs/white/subfolder.png');
+  qproperty-icon: url('../Astral_072_Dark/imgs/white/subfolder.svg');
 }
 /* -------------------------------------------------------------------------- */
 .QComboBox,
@@ -836,17 +854,17 @@ QComboBox::drop-down {
 }
 .QComboBox::down-arrow,
 QComboBox::down-arrow {
-  image: url('../Astral_072_Dark/imgs/white/combo_down_arrow.png');
+  image: url('../Astral_072_Dark/imgs/white/combo-down.svg');
 }
 .QComboBox::down-arrow:disabled,
 QComboBox::down-arrow:disabled {
-  image: url('../Astral_072_Dark/imgs/white/combo_down_arrow-disabled.png');
+  image: url('../Astral_072_Dark/imgs/white/combo-down-disabled.svg');
 }
 .QComboBox QAbstractItemView,
 QComboBox QAbstractItemView {
   background-color: #262626;
   border: 1px solid #141414;
-  selection-background-color: #3998d6;
+  selection-background-color: #5483a6;
   selection-color: #ffffff;
 }
 /* -------------------------------------------------------------------------- */
@@ -859,7 +877,7 @@ QLineEdit,
   border: 1px solid #4a4a4a;
   border-radius: 2px;
   color: #cccccc;
-  selection-background-color: #3998d6;
+  selection-background-color: #5483a6;
   selection-color: #ffffff;
   padding: 0 0 0 1px;
 }
@@ -869,7 +887,7 @@ QLineEdit:focus,
 #tasksRemoveBox:focus,
 #tasksAddBox:focus {
   background-color: #1c1c1c;
-  border-color: #3998d6;
+  border-color: #5483a6;
 }
 .QLineEdit:disabled,
 QLineEdit:disabled,
@@ -1033,7 +1051,7 @@ DvItemViewerPanel {
   qproperty-AlternateBackground: #3a3a3a;
   qproperty-SelectedTextColor: #ffffff;
   qproperty-FolderTextColor: #99d5e6;
-  qproperty-SelectedItemBackground: #3998d6;
+  qproperty-SelectedItemBackground: #5483a6;
 }
 #FileBrowser DvItemViewerPanel,
 #SceneCast DvItemViewerPanel {
@@ -1058,7 +1076,7 @@ DvItemViewerPanel {
 DvDirTreeView {
   qproperty-TextColor: #cccccc;
   qproperty-SelectedTextColor: #ffffff;
-  qproperty-SelectedItemBackground: #3998d6;
+  qproperty-SelectedItemBackground: #5483a6;
   qproperty-FolderTextColor: #99d5e6;
   qproperty-SelectedFolderTextColor: #ffffff;
   alternate-background-color: #303030;
@@ -1221,10 +1239,10 @@ QStatusBar #StatusBarLabel {
   min-width: 18px;
 }
 #colorSliderAddButton {
-  image: url('../Astral_072_Dark/imgs/white/arrow_right.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-right.svg');
 }
 #colorSliderSubButton {
-  image: url('../Astral_072_Dark/imgs/white/arrow_left.png');
+  image: url('../Astral_072_Dark/imgs/white/scroll-left.svg');
 }
 #PlainColorPageParts {
   border-top: 1px solid #141414;
@@ -1330,7 +1348,7 @@ QDialog #dialogButtonFrame QPushButton {
   color: #cccccc;
 }
 #PreferencesPopup QListWidget::item:selected {
-  background-color: #3998d6;
+  background-color: #5483a6;
   color: #ffffff;
 }
 /* -----------------------------------------------------------------------------
@@ -1340,6 +1358,9 @@ QDialog #dialogButtonFrame QPushButton {
   background-color: #262626;
   alternate-background-color: #3a3a3a;
   border: 1px solid #141414;
+}
+#ShortcutTree::item {
+  padding: 1px 0;
 }
 #ShortcutTree QScrollBar:vertical {
   width: 16px;
@@ -1433,12 +1454,12 @@ FxSettings QToolBar QToolBar {
 ----------------------------------------------------------------------------- */
 #ToolBar TPanelTitleBar {
   background-color: #303030;
-  background-image: url('../Astral_072_Dark/imgs/white/title_grip_horizontal.png');
+  background-image: url('../Astral_072_Dark/imgs/white/title_grip_horizontal.svg');
   background-repeat: no-repeat;
   border: 0;
-  height: 13px;
-  max-height: 13px;
-  min-height: 13px;
+  height: 17px;
+  max-height: 17px;
+  min-height: 17px;
   qproperty-BorderPixmap: url('none');
   qproperty-ActiveBorderPixmap: url('none');
   qproperty-FloatBorderPixmap: url('../Astral_072_Dark/imgs/white/titlebar_float.png');
@@ -1452,22 +1473,22 @@ FxSettings QToolBar QToolBar {
 ----------------------------------------------------------------------------- */
 #ToolOptions TPanelTitleBar {
   background-color: #303030;
-  background-image: url('../Astral_072_Dark/imgs/white/title_grip_vertical.png');
+  background-image: url('../Astral_072_Dark/imgs/white/title_grip_vertical.svg');
   background-repeat: no-repeat;
   border: 0;
-  width: 13px;
-  min-width: 13px;
-  max-width: 13px;
+  width: 17px;
+  min-width: 17px;
+  max-width: 17px;
   qproperty-BorderPixmap: url('none');
   qproperty-ActiveBorderPixmap: url('none');
   qproperty-FloatBorderPixmap: url('../Astral_072_Dark/imgs/white/titlebar_float.png');
   qproperty-FloatActiveBorderPixmap: url('../Astral_072_Dark/imgs/white/titlebar_float.png');
 }
 IconViewField {
-  qproperty-ScalePegPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_scalepeg.png");
-  qproperty-RotationPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_rotation.png");
-  qproperty-PositionPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_position.png");
-  qproperty-ThicknessPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_thickness.png");
+  qproperty-ScalePegPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_scalepeg.svg");
+  qproperty-RotationPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_rotation.svg");
+  qproperty-PositionPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_position.svg");
+  qproperty-ThicknessPixmap: url("../Astral_072_Dark/imgs/white/selectiontool_thickness.svg");
 }
 #EditToolLockButton {
   spacing: 0;
@@ -1530,7 +1551,7 @@ FlipBook #ToolBarContainer QLineEdit {
   border-color: #111111;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
-  height: 17px;
+  height: 16px;
 }
 #FlipConsolePlayToolBar::separator:horizontal {
   margin: 0 2px;
@@ -1555,13 +1576,14 @@ FlipBook #ToolBarContainer QLineEdit {
   subcontrol-origin: absolute;
   background-color: #4f4f4f;
   border: 1px solid #232323;
-  height: 17px;
+  height: 16px;
   left: -33px;
+  padding-left: 1px;
   width: 14px;
 }
 #ViewerFpsSlider::sub-line:horizontal:pressed {
   background-color: #161616;
-  border-color: #0a0a0a;
+  border-color: #5483a6;
 }
 #ViewerFpsSlider::add-line:horizontal {
   subcontrol-position: left;
@@ -1570,13 +1592,13 @@ FlipBook #ToolBarContainer QLineEdit {
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
   left: 13px;
-  height: 17px;
+  height: 16px;
   image-position: center center;
   width: 13px;
 }
 #ViewerFpsSlider::add-line:horizontal:pressed {
   background-color: #161616;
-  border-color: #0a0a0a;
+  border-color: #5483a6;
 }
 #ViewerFpsSlider::handle::horizontal {
   background-color: #878787;
@@ -1589,8 +1611,8 @@ FlipBook #ToolBarContainer QLineEdit {
 }
 FlipSlider {
   qproperty-PBHeight: 15;
-  qproperty-PBOverlay: url('../Astral_072_Dark/imgs/white/flipslider-dark.png');
-  qproperty-PBMarker: url('../Astral_072_Dark/imgs/white/flipmarker-dark.png');
+  qproperty-PBOverlay: url('../Astral_072_Dark/imgs/white/flipslider-dark.svg');
+  qproperty-PBMarker: url('../Astral_072_Dark/imgs/white/flipmarker-dark.svg');
   qproperty-PBColorMarginLeft: 1;
   qproperty-PBColorMarginTop: 2;
   qproperty-PBColorMarginRight: 1;
@@ -1753,17 +1775,17 @@ SpreadsheetViewer {
   margin: 0;
 }
 #FunctionSegmentViewerLinkButton {
-  background-image: url('../Astral_072_Dark/imgs/white/segment_unlinked.png');
+  background-image: url('../Astral_072_Dark/imgs/white/segment_unlinked.svg');
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:hover {
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:checked {
-  background-image: url('../Astral_072_Dark/imgs/white/segment_linked.png');
+  background-image: url('../Astral_072_Dark/imgs/white/segment_linked.svg');
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:disabled {
-  background-image: url('../Astral_072_Dark/imgs/white/segment_disabled.png');
+  background-image: url('../Astral_072_Dark/imgs/white/segment_disabled.svg');
   background-repeat: no-repeat;
 }

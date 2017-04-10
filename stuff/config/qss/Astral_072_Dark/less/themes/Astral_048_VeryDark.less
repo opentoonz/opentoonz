@@ -11,9 +11,6 @@
 // Background
 @bg: #303030;
 
-// Selected Color (Primary)
-@selected-bg-color: @palette-cornflower-blue;
-
 // -----------------------------------------------------------------------------
 // TopBar / Room Tabs
 // -----------------------------------------------------------------------------
@@ -50,7 +47,9 @@
 // -----------------------------------------------------------------------------
 
 @toolbutton-bg-color-checked: darken(@bg, 35%);
+@toolbutton-bg-color-checked-hover: darken(@bg, 0%);
 @toolbutton-border-color-checked: lighten(@bg, 15%);
+@toolbutton-border-color-checked-hover: @toolbutton-border-color-checked;
 
 // -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
@@ -71,8 +70,8 @@
 // -----------------------------------------------------------------------------
 
 // Flip Slider
-@flipmarker-img: 'flipmarker-dark.png';
-@flipslider-img: 'flipslider-dark.png';
+@flipmarker-img: 'flipmarker-dark.svg';
+@flipslider-img: 'flipslider-dark.svg';
 @flipslider-base-color: darken(@bg, 5%);
 
 // -----------------------------------------------------------------------------

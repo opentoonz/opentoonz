@@ -6,10 +6,12 @@
 #CleanupSettingsShowButton,
 #OutputSettingsShowButton,
 #FxSettingsPreviewShowButton {
-  image: url('../Astral_072_Dark/imgs/black/plus.png');
+  image: url('../Astral_072_Dark/imgs/black/plus.svg');
   image-position: center center;
   margin: 0;
-  padding: 0;
+  padding: 1px;
+  min-width: 10px;
+  min-height: 10px;
 }
 .button-show:checked,
 #LoadLevelShowButton:checked,
@@ -18,7 +20,7 @@
 #FxSettingsPreviewShowButton:checked {
   background-color: QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #adadad, stop: 1 #949494);
   border-color: #5a5a5a;
-  image: url('../Astral_072_Dark/imgs/black/minus.png');
+  image: url('../Astral_072_Dark/imgs/black/minus.svg');
 }
 .button-show:checked:pressed,
 #LoadLevelShowButton:checked:pressed,
@@ -90,6 +92,7 @@ QToolBar QToolButton:checked:hover,
 #SchematicBottomFrame QToolBar QToolButton:checked:hover,
 #EditToolLockButton::indicator:checked:hover {
   background-color: QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #636363, stop: 1 #7d7d7d);
+  border-color: #5a5a5a;
 }
 .button-tool:disabled,
 #TopBar #EditToolLockButton::indicator:disabled,
@@ -144,23 +147,23 @@ QGroupBox {
 .icon-lock:unchecked,
 #CameraSettingsRadioButton::indicator:unchecked,
 #EditToolLockButton::indicator:unchecked {
-  image: url('../Astral_072_Dark/imgs/black/cam_unlock.png');
+  image: url('../Astral_072_Dark/imgs/black/cam_unlock.svg');
 }
 .icon-lock:checked,
 #CameraSettingsRadioButton::indicator:checked,
 #EditToolLockButton::indicator:checked {
-  image: url('../Astral_072_Dark/imgs/black/cam_lock.png');
+  image: url('../Astral_072_Dark/imgs/black/cam_lock.svg');
 }
 .icon-fsp,
 #ForceSquaredPixelButton {
   height: 16px;
-  image: url('../Astral_072_Dark/imgs/black/fsp_unchecked.png');
+  image: url('../Astral_072_Dark/imgs/black/fsp_unchecked.svg');
   padding: 1px;
   width: 16px;
 }
 .icon-fsp:checked,
 #ForceSquaredPixelButton:checked {
-  image: url('../Astral_072_Dark/imgs/black/fsp_checked.png');
+  image: url('../Astral_072_Dark/imgs/black/fsp_checked.svg');
 }
 /* -----------------------------------------------------------------------------
    Component: Tabs
@@ -291,7 +294,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:adjoins-item,
 #Tasks QTreeView::branch:adjoins-item,
 #FunctionEditorTree::branch:adjoins-item {
-  border-image: url('../Astral_072_Dark/imgs/black/tree17_branch-end.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/black/tree17_branch-end.svg') 0;
 }
 .branch-17:has-siblings,
 #SceneCast QTreeView::branch:has-siblings,
@@ -299,7 +302,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-siblings,
 #Tasks QTreeView::branch:has-siblings,
 #FunctionEditorTree::branch:has-siblings {
-  border-image: url('../Astral_072_Dark/imgs/black/tree17_vline.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/black/tree17_vline.svg') 0;
 }
 .branch-17:has-siblings:adjoins-item,
 #SceneCast QTreeView::branch:has-siblings:adjoins-item,
@@ -307,7 +310,7 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-siblings:adjoins-item,
 #Tasks QTreeView::branch:has-siblings:adjoins-item,
 #FunctionEditorTree::branch:has-siblings:adjoins-item {
-  border-image: url('../Astral_072_Dark/imgs/black/tree17_branch-more.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/black/tree17_branch-more.svg') 0;
 }
 .branch-17:has-children:closed,
 #SceneCast QTreeView::branch:has-children:closed,
@@ -315,8 +318,9 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:closed,
 #Tasks QTreeView::branch:has-children:closed,
 #FunctionEditorTree::branch:has-children:closed {
+  background: url('../Astral_072_Dark/imgs/black/tree17_branch-closed_nosib.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/black/tree17_branch-closed_nosib.png');
+  image: none;
 }
 .branch-17:has-children:open,
 #SceneCast QTreeView::branch:has-children:open,
@@ -324,8 +328,9 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:open,
 #Tasks QTreeView::branch:has-children:open,
 #FunctionEditorTree::branch:has-children:open {
+  background: url('../Astral_072_Dark/imgs/black/tree17_branch-open_nosib.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/black/tree17_branch-open_nosib.png');
+  image: none;
 }
 .branch-17:has-children:has-siblings:closed,
 #SceneCast QTreeView::branch:has-children:has-siblings:closed,
@@ -333,8 +338,9 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:has-siblings:closed,
 #Tasks QTreeView::branch:has-children:has-siblings:closed,
 #FunctionEditorTree::branch:has-children:has-siblings:closed {
+  background: url('../Astral_072_Dark/imgs/black/tree17_branch-closed.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/black/tree17_branch-closed.png');
+  image: none;
 }
 .branch-17:has-children:has-siblings:open,
 #SceneCast QTreeView::branch:has-children:has-siblings:open,
@@ -342,47 +348,52 @@ ProjectPopup QTreeView::item:focus,
 #ShortcutTree::branch:has-children:has-siblings:open,
 #Tasks QTreeView::branch:has-children:has-siblings:open,
 #FunctionEditorTree::branch:has-children:has-siblings:open {
+  background: url('../Astral_072_Dark/imgs/black/tree17_branch-open.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/black/tree17_branch-open.png');
+  image: none;
 }
 .branch-22:adjoins-item,
 #DirTreeView::branch:adjoins-item,
 ProjectPopup QTreeView::branch:adjoins-item {
-  border-image: url('../Astral_072_Dark/imgs/black/tree22_branch-end.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/black/tree22_branch-end.svg') 0;
 }
 .branch-22:has-siblings,
 #DirTreeView::branch:has-siblings,
 ProjectPopup QTreeView::branch:has-siblings {
-  border-image: url('../Astral_072_Dark/imgs/black/tree22_vline.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/black/tree22_vline.svg') 0;
 }
 .branch-22:has-siblings:adjoins-item,
 #DirTreeView::branch:has-siblings:adjoins-item,
 ProjectPopup QTreeView::branch:has-siblings:adjoins-item {
-  border-image: url('../Astral_072_Dark/imgs/black/tree22_branch-more.png') 0;
+  border-image: url('../Astral_072_Dark/imgs/black/tree22_branch-more.svg') 0;
 }
 .branch-22:has-children:closed,
 #DirTreeView::branch:has-children:closed,
 ProjectPopup QTreeView::branch:has-children:closed {
+  background: url('../Astral_072_Dark/imgs/black/tree22_branch-closed_nosib.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/black/tree22_branch-closed_nosib.png');
+  image: none;
 }
 .branch-22:has-children:open,
 #DirTreeView::branch:has-children:open,
 ProjectPopup QTreeView::branch:has-children:open {
+  background: url('../Astral_072_Dark/imgs/black/tree22_branch-open_nosib.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/black/tree22_branch-open_nosib.png');
+  image: none;
 }
 .branch-22:has-children:has-siblings:closed,
 #DirTreeView::branch:has-children:has-siblings:closed,
 ProjectPopup QTreeView::branch:has-children:has-siblings:closed {
+  background: url('../Astral_072_Dark/imgs/black/tree22_branch-closed.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/black/tree22_branch-closed.png');
+  image: none;
 }
 .branch-22:has-children:has-siblings:open,
 #DirTreeView::branch:has-children:has-siblings:open,
 ProjectPopup QTreeView::branch:has-children:has-siblings:open {
+  background: url('../Astral_072_Dark/imgs/black/tree22_branch-open.svg') no-repeat;
   border-image: none;
-  image: url('../Astral_072_Dark/imgs/black/tree22_branch-open.png');
+  image: none;
 }
 /* -----------------------------------------------------------------------------
    Main
@@ -590,12 +601,12 @@ QScrollBar::handle:vertical:pressed {
 }
 QScrollBar::handle:horizontal {
   background-color: #787878;
-  margin: 2px 15px;
+  margin: 2px 16px;
   min-width: 20px;
 }
 QScrollBar::handle:vertical {
   background-color: #787878;
-  margin: 15px 2px;
+  margin: 16px 2px;
   min-height: 20px;
 }
 QScrollBar::add-line {
@@ -605,10 +616,8 @@ QScrollBar::add-line {
 QScrollBar::add-line:horizontal {
   subcontrol-position: right;
   background-color: #9a9a9a;
-  image: url('../Astral_072_Dark/imgs/black/scroll-right.png');
-  image-position: center center;
   margin: 0;
-  width: 15px;
+  width: 16px;
 }
 QScrollBar::add-line:horizontal:pressed {
   background-color: #cdcdcd;
@@ -616,10 +625,8 @@ QScrollBar::add-line:horizontal:pressed {
 QScrollBar::add-line:vertical {
   subcontrol-position: bottom;
   background-color: #9a9a9a;
-  image: url('../Astral_072_Dark/imgs/black/scroll-down.png');
-  image-position: center center;
   margin: 0;
-  height: 15px;
+  height: 16px;
 }
 QScrollBar::add-line:vertical:pressed {
   background-color: #cdcdcd;
@@ -631,10 +638,8 @@ QScrollBar::sub-line {
 QScrollBar::sub-line:horizontal {
   subcontrol-position: left;
   background-color: #9a9a9a;
-  image: url('../Astral_072_Dark/imgs/black/scroll-left.png');
-  image-position: center center;
   margin: 0;
-  width: 15px;
+  width: 16px;
 }
 QScrollBar::sub-line:horizontal:pressed {
   background-color: #cdcdcd;
@@ -642,13 +647,27 @@ QScrollBar::sub-line:horizontal:pressed {
 QScrollBar::sub-line:vertical {
   subcontrol-position: top;
   background-color: #9a9a9a;
-  image: url('../Astral_072_Dark/imgs/black/scroll-up.png');
-  image-position: center center;
   margin: 0;
-  height: 15px;
+  height: 16px;
 }
 QScrollBar::sub-line:vertical:pressed {
   background-color: #cdcdcd;
+}
+QScrollBar::up-arrow:vertical {
+  image: url('../Astral_072_Dark/imgs/black/scroll-up.svg');
+  image-position: center center;
+}
+QScrollBar::down-arrow:vertical {
+  image: url('../Astral_072_Dark/imgs/black/scroll-down.svg');
+  image-position: center center;
+}
+QScrollBar::left-arrow:horizontal {
+  image: url('../Astral_072_Dark/imgs/black/scroll-left.svg');
+  image-position: center center;
+}
+QScrollBar::right-arrow:horizontal {
+  image: url('../Astral_072_Dark/imgs/black/scroll-right.svg');
+  image-position: center center;
 }
 QScrollBar::sub-page:horizontal,
 QScrollBar::add-page:horizontal,
@@ -723,19 +742,19 @@ DvScrollWidget QPushButton:pressed {
   background-color: #7b7b7b;
 }
 #ScrollLeftButton {
-  image: url('../Astral_072_Dark/imgs/black/arrow_left.png');
+  image: url('../Astral_072_Dark/imgs/black/scroll-left.svg');
   border-right: 1px solid #404040;
 }
 #ScrollRightButton {
-  image: url('../Astral_072_Dark/imgs/black/arrow_right.png');
+  image: url('../Astral_072_Dark/imgs/black/scroll-right.svg');
   border-left: 1px solid #404040;
   border-right: 1px solid #404040;
 }
 #ScrollUpButton {
-  image: url('../Astral_072_Dark/imgs/black/arrow_up.png');
+  image: url('../Astral_072_Dark/imgs/black/scroll-up.svg');
 }
 #ScrollDownButton {
-  image: url('../Astral_072_Dark/imgs/black/arrow_down.png');
+  image: url('../Astral_072_Dark/imgs/black/scroll-down.svg');
 }
 #keyFrameNavigator {
   background: none;
@@ -819,10 +838,10 @@ QComboBox:disabled {
 }
 /* Camera Capture */
 #GearButton {
-  qproperty-icon: url('../Astral_072_Dark/imgs/black/gear.png');
+  qproperty-icon: url('../Astral_072_Dark/imgs/black/gear.svg');
 }
 #SubfolderButton {
-  qproperty-icon: url('../Astral_072_Dark/imgs/black/subfolder.png');
+  qproperty-icon: url('../Astral_072_Dark/imgs/black/subfolder.svg');
 }
 /* -------------------------------------------------------------------------- */
 .QComboBox,
@@ -835,11 +854,11 @@ QComboBox::drop-down {
 }
 .QComboBox::down-arrow,
 QComboBox::down-arrow {
-  image: url('../Astral_072_Dark/imgs/black/combo_down_arrow.png');
+  image: url('../Astral_072_Dark/imgs/black/combo-down.svg');
 }
 .QComboBox::down-arrow:disabled,
 QComboBox::down-arrow:disabled {
-  image: url('../Astral_072_Dark/imgs/black/combo_down_arrow-disabled.png');
+  image: url('../Astral_072_Dark/imgs/black/combo-down-disabled.svg');
 }
 .QComboBox QAbstractItemView,
 QComboBox QAbstractItemView {
@@ -855,7 +874,7 @@ QLineEdit,
 #tasksRemoveBox,
 #tasksAddBox {
   background-color: #d9d9d9;
-  border: 1px solid #676767;
+  border: 1px solid #5a5a5a;
   border-radius: 2px;
   color: #000000;
   selection-background-color: #000080;
@@ -868,7 +887,7 @@ QLineEdit:focus,
 #tasksRemoveBox:focus,
 #tasksAddBox:focus {
   background-color: #ffffff;
-  border-color: #676767;
+  border-color: #5a5a5a;
 }
 .QLineEdit:disabled,
 QLineEdit:disabled,
@@ -898,7 +917,7 @@ QCheckBox::indicator,
 .QGroupBox::indicator,
 QGroupBox::indicator {
   background-color: #d9d9d9;
-  border: 1px solid #676767;
+  border: 1px solid #5a5a5a;
   border-radius: 2px;
   height: 9px;
   padding: 1px;
@@ -915,7 +934,7 @@ QCheckBox::indicator:checked:hover,
 QGroupBox::indicator:hover,
 QGroupBox::indicator:checked:hover {
   background-color: #e6e6e6;
-  border-color: #676767;
+  border-color: #4d4d4d;
 }
 .QCheckBox::indicator:checked,
 QMenu::indicator:checked,
@@ -923,8 +942,8 @@ QCheckBox::indicator:checked,
 .QGroupBox::indicator:checked,
 QGroupBox::indicator:checked {
   background-color: #d9d9d9;
-  border-color: #676767;
-  image: url('../Astral_072_Dark/imgs/black/check_indicator.png');
+  border-color: #5a5a5a;
+  image: url('../Astral_072_Dark/imgs/black/checkmark.svg');
 }
 .QCheckBox::indicator:checked:disabled,
 QMenu::indicator:checked:disabled,
@@ -933,7 +952,7 @@ QCheckBox::indicator:checked:disabled,
 QGroupBox::indicator:checked:disabled {
   background-color: #9f9f9f;
   border-color: #737373;
-  image: url('../Astral_072_Dark/imgs/black/check_indicator-disabled.png');
+  image: url('../Astral_072_Dark/imgs/black/checkmark-disabled.svg');
 }
 .QCheckBox::indicator:disabled,
 QMenu::indicator:disabled,
@@ -947,13 +966,13 @@ QGroupBox::indicator:disabled {
 .QRadioButton::indicator:unchecked,
 QRadioButton::indicator:unchecked,
 #CameraSettingsRadioButton_Small::indicator:unchecked {
-  image: url('../Astral_072_Dark/imgs/black/radiobutton_unchecked.png');
+  image: url('../Astral_072_Dark/imgs/black/radiobutton_unchecked.svg');
   image-position: center center;
 }
 .QRadioButton::indicator:checked,
 QRadioButton::indicator:checked,
 #CameraSettingsRadioButton_Small::indicator:checked {
-  image: url('../Astral_072_Dark/imgs/black/radiobutton_checked.png');
+  image: url('../Astral_072_Dark/imgs/black/radiobutton_checked.svg');
   image-position: center center;
 }
 /* -------------------------------------------------------------------------- */
@@ -1220,10 +1239,10 @@ QStatusBar #StatusBarLabel {
   min-width: 18px;
 }
 #colorSliderAddButton {
-  image: url('../Astral_072_Dark/imgs/black/arrow_right.png');
+  image: url('../Astral_072_Dark/imgs/black/scroll-right.svg');
 }
 #colorSliderSubButton {
-  image: url('../Astral_072_Dark/imgs/black/arrow_left.png');
+  image: url('../Astral_072_Dark/imgs/black/scroll-left.svg');
 }
 #PlainColorPageParts {
   border-top: 1px solid #404040;
@@ -1340,6 +1359,9 @@ QDialog #dialogButtonFrame QPushButton {
   alternate-background-color: #a6a6a6;
   border: 1px solid #404040;
 }
+#ShortcutTree::item {
+  padding: 1px 0;
+}
 #ShortcutTree QScrollBar:vertical {
   width: 16px;
   margin-right: -1px;
@@ -1432,12 +1454,12 @@ FxSettings QToolBar QToolBar {
 ----------------------------------------------------------------------------- */
 #ToolBar TPanelTitleBar {
   background-color: #808080;
-  background-image: url('../Astral_072_Dark/imgs/black/title_grip_horizontal.png');
+  background-image: url('../Astral_072_Dark/imgs/black/title_grip_horizontal.svg');
   background-repeat: no-repeat;
   border: 0;
-  height: 13px;
-  max-height: 13px;
-  min-height: 13px;
+  height: 17px;
+  max-height: 17px;
+  min-height: 17px;
   qproperty-BorderPixmap: url('none');
   qproperty-ActiveBorderPixmap: url('none');
   qproperty-FloatBorderPixmap: url('../Astral_072_Dark/imgs/black/titlebar_float.png');
@@ -1451,22 +1473,22 @@ FxSettings QToolBar QToolBar {
 ----------------------------------------------------------------------------- */
 #ToolOptions TPanelTitleBar {
   background-color: #808080;
-  background-image: url('../Astral_072_Dark/imgs/black/title_grip_vertical.png');
+  background-image: url('../Astral_072_Dark/imgs/black/title_grip_vertical.svg');
   background-repeat: no-repeat;
   border: 0;
-  width: 13px;
-  min-width: 13px;
-  max-width: 13px;
+  width: 17px;
+  min-width: 17px;
+  max-width: 17px;
   qproperty-BorderPixmap: url('none');
   qproperty-ActiveBorderPixmap: url('none');
   qproperty-FloatBorderPixmap: url('../Astral_072_Dark/imgs/black/titlebar_float.png');
   qproperty-FloatActiveBorderPixmap: url('../Astral_072_Dark/imgs/black/titlebar_float.png');
 }
 IconViewField {
-  qproperty-ScalePegPixmap: url("../Astral_072_Dark/imgs/black/selectiontool_scalepeg.png");
-  qproperty-RotationPixmap: url("../Astral_072_Dark/imgs/black/selectiontool_rotation.png");
-  qproperty-PositionPixmap: url("../Astral_072_Dark/imgs/black/selectiontool_position.png");
-  qproperty-ThicknessPixmap: url("../Astral_072_Dark/imgs/black/selectiontool_thickness.png");
+  qproperty-ScalePegPixmap: url("../Astral_072_Dark/imgs/black/selectiontool_scalepeg.svg");
+  qproperty-RotationPixmap: url("../Astral_072_Dark/imgs/black/selectiontool_rotation.svg");
+  qproperty-PositionPixmap: url("../Astral_072_Dark/imgs/black/selectiontool_position.svg");
+  qproperty-ThicknessPixmap: url("../Astral_072_Dark/imgs/black/selectiontool_thickness.svg");
 }
 #EditToolLockButton {
   spacing: 0;
@@ -1529,6 +1551,7 @@ FlipBook #ToolBarContainer QLineEdit {
   border-color: #616161;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  height: 16px;
 }
 #FlipConsolePlayToolBar::separator:horizontal {
   margin: 0 2px;
@@ -1553,8 +1576,9 @@ FlipBook #ToolBarContainer QLineEdit {
   subcontrol-origin: absolute;
   background-color: QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #adadad, stop: 1 #949494);
   border: 1px solid #5a5a5a;
-  height: 17px;
+  height: 16px;
   left: -33px;
+  padding-left: 1px;
   width: 14px;
 }
 #ViewerFpsSlider::sub-line:horizontal:pressed {
@@ -1568,7 +1592,7 @@ FlipBook #ToolBarContainer QLineEdit {
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
   left: 13px;
-  height: 17px;
+  height: 16px;
   image-position: center center;
   width: 13px;
 }
@@ -1587,8 +1611,8 @@ FlipBook #ToolBarContainer QLineEdit {
 }
 FlipSlider {
   qproperty-PBHeight: 15;
-  qproperty-PBOverlay: url('../Astral_072_Dark/imgs/black/flipslider.png');
-  qproperty-PBMarker: url('../Astral_072_Dark/imgs/black/flipmarker.png');
+  qproperty-PBOverlay: url('../Astral_072_Dark/imgs/black/flipslider.svg');
+  qproperty-PBMarker: url('../Astral_072_Dark/imgs/black/flipmarker.svg');
   qproperty-PBColorMarginLeft: 1;
   qproperty-PBColorMarginTop: 2;
   qproperty-PBColorMarginRight: 1;
@@ -1751,18 +1775,18 @@ SpreadsheetViewer {
   margin: 0;
 }
 #FunctionSegmentViewerLinkButton {
-  background-image: url('../Astral_072_Dark/imgs/black/segment_unlinked.png');
+  background-image: url('../Astral_072_Dark/imgs/black/segment_unlinked.svg');
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:hover {
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:checked {
-  background-image: url('../Astral_072_Dark/imgs/black/segment_linked.png');
+  background-image: url('../Astral_072_Dark/imgs/black/segment_linked.svg');
   background-repeat: no-repeat;
 }
 #FunctionSegmentViewerLinkButton:disabled {
-  background-image: url('../Astral_072_Dark/imgs/black/segment_disabled.png');
+  background-image: url('../Astral_072_Dark/imgs/black/segment_disabled.svg');
   background-repeat: no-repeat;
 }
 QWidget::tab {

@@ -32,31 +32,35 @@
 
 .branch-base(@size: 17) {
   &:adjoins-item {
-    border-image: url('@{img-url}/tree@{size}_branch-end.png') 0;
+    border-image: url('@{img-url}/tree@{size}_branch-end.svg') 0;
   }
   &:has-siblings {
-    border-image: url('@{img-url}/tree@{size}_vline.png') 0;
+    border-image: url('@{img-url}/tree@{size}_vline.svg') 0;
     &:adjoins-item {
-      border-image: url('@{img-url}/tree@{size}_branch-more.png') 0;
+      border-image: url('@{img-url}/tree@{size}_branch-more.svg') 0;
     }
   }
   &:has-children {
     &:closed {
+      background: url('@{img-url}/tree@{size}_branch-closed_nosib.svg') no-repeat;
       border-image: none;
-      image: url('@{img-url}/tree@{size}_branch-closed_nosib.png');
+      image: none;
     }
     &:open {
+      background: url('@{img-url}/tree@{size}_branch-open_nosib.svg') no-repeat;
       border-image: none;
-      image: url('@{img-url}/tree@{size}_branch-open_nosib.png');
+      image: none;
     }
     &:has-siblings {
       &:closed {
+        background: url('@{img-url}/tree@{size}_branch-closed.svg') no-repeat;
         border-image: none;
-        image: url('@{img-url}/tree@{size}_branch-closed.png');
+        image: none;
       }
       &:open {
+        background: url('@{img-url}/tree@{size}_branch-open.svg') no-repeat;
         border-image: none;
-        image: url('@{img-url}/tree@{size}_branch-open.png');
+        image: none;
       }
     }
   }

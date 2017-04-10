@@ -224,12 +224,12 @@ QScrollBar {
     }
     &:horizontal {
       background-color: @scrollbar-handle-bg-color;
-      margin: 2px 15px;
+      margin: 2px 16px;
       min-width: 20px;
     }
     &:vertical {
       background-color: @scrollbar-handle-bg-color;
-      margin: 15px 2px;
+      margin: 16px 2px;
       min-height: 20px;
     }
   }
@@ -240,10 +240,8 @@ QScrollBar {
     &:horizontal { // right
       subcontrol-position: right;
       background-color: @scrollbar-button-bg-color;
-      image: url('@{img-url}/scroll-right.png');
-      image-position: center center;
       margin: 0;
-      width: 15px;
+      width: 16px;
       &:pressed {
         background-color: @scrollbar-button-bg-color-pressed;
       }
@@ -251,10 +249,8 @@ QScrollBar {
     &:vertical { // down
       subcontrol-position: bottom;
       background-color: @scrollbar-button-bg-color;
-      image: url('@{img-url}/scroll-down.png');
-      image-position: center center;
       margin: 0;
-      height: 15px;
+      height: 16px;
       &:pressed {
         background-color: @scrollbar-button-bg-color-pressed;
       }
@@ -267,10 +263,8 @@ QScrollBar {
     &:horizontal { // left
       subcontrol-position: left;
       background-color: @scrollbar-button-bg-color;
-      image: url('@{img-url}/scroll-left.png');
-      image-position: center center;
       margin: 0;
-      width: 15px;
+      width: 16px;
       &:pressed {
         background-color: @scrollbar-button-bg-color-pressed;
       }
@@ -278,14 +272,32 @@ QScrollBar {
     &:vertical { // up
       subcontrol-position: top;
       background-color: @scrollbar-button-bg-color;
-      image: url('@{img-url}/scroll-up.png');
-      image-position: center center;
       margin: 0;
-      height: 15px;
+      height: 16px;
       &:pressed {
         background-color: @scrollbar-button-bg-color-pressed;
       }
     }
+  }
+
+  &::up-arrow:vertical {
+    image: url('@{img-url}/scroll-up.svg');
+    image-position: center center;
+  }
+
+  &::down-arrow:vertical {
+    image: url('@{img-url}/scroll-down.svg');
+    image-position: center center;
+  }
+
+  &::left-arrow:horizontal {
+    image: url('@{img-url}/scroll-left.svg');
+    image-position: center center;
+  }
+
+  &::right-arrow:horizontal {
+    image: url('@{img-url}/scroll-right.svg');
+    image-position: center center;
   }
 
   &::sub-page,
@@ -378,19 +390,19 @@ QToolBar {
   }
 }
 #ScrollLeftButton {
-  image: url('@{img-url}/arrow_left.png');
+  image: url('@{img-url}/scroll-left.svg');
   border-right: 1px solid @accent1;
 }
 #ScrollRightButton {
-  image: url('@{img-url}/arrow_right.png');
+  image: url('@{img-url}/scroll-right.svg');
   border-left: 1px solid @accent1;
   border-right: 1px solid @accent1; // FPS Slider
 }
 #ScrollUpButton {
-  image: url('@{img-url}/arrow_up.png');
+  image: url('@{img-url}/scroll-up.svg');
 }
 #ScrollDownButton {
-  image: url('@{img-url}/arrow_down.png');
+  image: url('@{img-url}/scroll-down.svg');
 }
 
 #keyFrameNavigator {

@@ -106,9 +106,9 @@
 @title-img-float-active: 'none';
 
 // For DockWidgets that display no text in Title Bar
-@title-toolbar-size: 13px;
-@title-toolbar-img-horizontal: 'title_grip_horizontal.png';
-@title-toolbar-img-vertical: 'title_grip_vertical.png';
+@title-toolbar-size: 17px;
+@title-toolbar-img-horizontal: 'title_grip_horizontal.svg';
+@title-toolbar-img-vertical: 'title_grip_vertical.svg';
 @title-toolbar-img-float: 'titlebar_float.png';
 
 // -----------------------------------------------------------------------------
@@ -143,7 +143,7 @@
 @button-text-color-hover: lighten(@button-text-color, 5%);
 
 @button-bg-color-pressed: darken(@bg, 10%);
-@button-border-color-pressed: darken(@bg, 15%);
+@button-border-color-pressed: @selected-bg-color;
 @button-text-color-pressed: @text-color;
 
 @button-bg-color-checked: darken(@bg, 10%);
@@ -159,8 +159,8 @@
 // QComboBox
 // -----------------------------------------------------------------------------
 
-@combo-down-arrow-img: 'combo_down_arrow.png';
-@combo-down-arrow-img-disabled: 'combo_down_arrow-disabled.png';
+@combo-down-arrow-img: 'combo-down.svg';
+@combo-down-arrow-img-disabled: 'combo-down-disabled.svg';
 
 // -----------------------------------------------------------------------------
 // Tool Button
@@ -277,8 +277,8 @@
 // -----------------------------------------------------------------------------
 
 // Flip Slider
-@flipmarker-img: 'flipmarker.png';
-@flipslider-img: 'flipslider.png';
+@flipmarker-img: 'flipmarker.svg';
+@flipslider-img: 'flipslider.svg';
 @flipslider-base-color: darken(@bg, 3%);
 @flipslider-notstarted-color: #CC2222;
 @flipslider-started-color: @palette-green;
