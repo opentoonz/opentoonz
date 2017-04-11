@@ -72,7 +72,13 @@ TFilePath getGlobalRoot() {
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
   // Leggo la localRoot da File txt
+#  ifdef MACOSX
+  // If MACOSX, change to MACOSX path
   std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
+#  else
+  // set path to something suitable for most linux (Unix?) systems
+  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
+#  endif
   TFilePath name(unixpath);
   Tifstream is(name);
   if (is) {
@@ -107,7 +113,13 @@ TFilePath getLocalRoot() {
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
-std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
+#  ifdef MACOSX
+  // If MACOSX, change to MACOSX path
+  std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
+#  else
+  // set path to something suitable for most linux (Unix?) systems
+  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
+#  endif
 TFilePath name(unixpath);
 Tifstream is(name);
   if (is) {
