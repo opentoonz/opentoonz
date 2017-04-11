@@ -2310,6 +2310,42 @@ double AnimationAutoComplete::getSpatialSimilarity(PointWithStroke *point1, Poin
 
 }
 
+double AnimationAutoComplete::getNeighborhoodSimilarity(StrokeWithNeighbours* operation1,StrokeWithNeighbours* operation2)
+{
+
+
+}
+
+double min=10000000;
+void AnimationAutoComplete::search(StrokeWithNeighbours* operation1)
+{
+    minOperationIndex score_stroke;
+
+    for(int i=m_strokesWithNeighbours.size();i<=m_strokesWithNeighbours.size()-30;i--)
+    {
+        double score = getNeighborhoodSimilarity(operation1,m_strokesWithNeighbours[i]->nextStroke);
+        if(score<min)
+        {
+            min=score;
+            score_stroke.score = min;
+
+            score_stroke.stroke = m_strokesWithNeighbours[i]->stroke;
+        }
+    }
+
+    std::vector<StrokeWithNeighbours*> similarstroke;
+    for(int i=m_strokesWithNeighbours.size();i<=m_strokesWithNeighbours.size()-30;i--)
+    {
+        double score = operationsSimilarity(operation1,m_strokesWithNeighbours[i]->nextStroke);
+        if(score<2*min)
+        {
+            similarstroke.push_back(m_strokesWithNeighbours[i]->nextStroke);
+        }
+    }
+
+
+}
+
 double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1,
 												   StrokeWithNeighbours* stroke2)
 {
@@ -2326,6 +2362,18 @@ double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1
 
 	return dissimilarityScore;
 }
+
+double AnimationAutoComplete::magnitude(std::vector<double> points)
+{
+    double sum=0;
+    for(int i=0;i<points.size();i++)
+    {
+        sum+= points[i]*points[i];
+    }
+    sum = sqrt(sum);
+    return sum;
+}
+
 
 StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWithNeighbours *lastStroke, StrokeWithNeighbours *similarStroke, StrokeWithNeighbours *nextToSimilarStroke)
 {

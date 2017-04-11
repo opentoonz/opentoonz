@@ -128,6 +128,7 @@ struct SimilarPair
 	PointWithStroke* point2;
 };
 
+
 class GlobalSimilarityGraph
 {
 	std::map<SimilarPair*, std::vector<SimilarPair*>> connections;
@@ -142,6 +143,15 @@ public:
 };
 
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
+
+
+struct minOperationIndex
+{
+public:
+    double score;
+    TStroke* stroke;
+};
+
 
 class StrokeWithNeighbours
 {
@@ -166,6 +176,7 @@ private:
   int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
+  std::vector<double> points;
 
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
@@ -180,13 +191,16 @@ private:
   double getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getTemporalSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
-
+  double getNeighborhoodSimilarity(StrokeWithNeighbours* operation1, StrokeWithNeighbours* operation2);
+  double magnitude(std::vector<double> points);
 
   SetOfPoints getNeighbours(const SamplePoint point);
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
   void initializeSynthesis();
-  void search();
+  void search(StrokeWithNeighbours *operation1);
   void assign();
+
+
 };
 
 //************************************************************************
