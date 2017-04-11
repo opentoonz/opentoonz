@@ -18,8 +18,8 @@
 #CleanupSettingsShowButton:checked,
 #OutputSettingsShowButton:checked,
 #FxSettingsPreviewShowButton:checked {
-  background-color: #626262;
-  border-color: #343434;
+  background-color: #2f2f2f;
+  border-color: #222222;
   image: url('imgs/white/minus.svg');
 }
 .button-show:checked:pressed,
@@ -35,7 +35,7 @@
 #CleanupSettingsShowButton:checked:hover,
 #OutputSettingsShowButton:checked:hover,
 #FxSettingsPreviewShowButton:checked:hover {
-  background-color: #6e6e6e;
+  background-color: #434343;
 }
 .button-tool,
 #TopBar #EditToolLockButton::indicator,
@@ -72,7 +72,7 @@ QToolBar QToolButton:pressed,
 #SchematicBottomFrame QToolBar QToolButton:pressed,
 #EditToolLockButton::indicator:pressed {
   background-color: #2f2f2f;
-  border-color: #5483a6;
+  border-color: #151515;
 }
 .button-tool:checked,
 #TopBar #EditToolLockButton::indicator:checked,
@@ -1583,7 +1583,7 @@ FlipBook #ToolBarContainer QLineEdit {
 }
 #ViewerFpsSlider::sub-line:horizontal:pressed {
   background-color: #2f2f2f;
-  border-color: #5483a6;
+  border-color: #2c2c2c;
 }
 #ViewerFpsSlider::add-line:horizontal {
   subcontrol-position: left;
@@ -1598,7 +1598,7 @@ FlipBook #ToolBarContainer QLineEdit {
 }
 #ViewerFpsSlider::add-line:horizontal:pressed {
   background-color: #2f2f2f;
-  border-color: #5483a6;
+  border-color: #2c2c2c;
 }
 #ViewerFpsSlider::handle::horizontal {
   background-color: #878787;

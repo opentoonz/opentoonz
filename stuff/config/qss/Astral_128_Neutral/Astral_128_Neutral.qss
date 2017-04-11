@@ -18,8 +18,8 @@
 #CleanupSettingsShowButton:checked,
 #OutputSettingsShowButton:checked,
 #FxSettingsPreviewShowButton:checked {
-  background-color: QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #adadad, stop: 1 #949494);
-  border-color: #5a5a5a;
+  background-color: QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #4d4d4d, stop: 1 #666666);
+  border-color: #404040;
   image: url('../Astral_072_Dark/imgs/black/minus.svg');
 }
 .button-show:checked:pressed,
@@ -35,7 +35,7 @@
 #CleanupSettingsShowButton:checked:hover,
 #OutputSettingsShowButton:checked:hover,
 #FxSettingsPreviewShowButton:checked:hover {
-  background-color: QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #c7c7c7, stop: 1 #adadad);
+  background-color: QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #636363, stop: 1 #7d7d7d);
 }
 .button-tool,
 #TopBar #EditToolLockButton::indicator,
