@@ -1,7 +1,7 @@
 
 
 #include "brushtool.h"
-
+#include <map>
 // TnzTools includes
 #include "tools/toolhandle.h"
 #include "tools/toolutils.h"
@@ -1058,7 +1058,7 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   int col   = app->getCurrentColumn()->getColumnIndex();
   m_isPath  = app->getCurrentObject()->isSpline();
   m_enabled = col >= 0 || m_isPath;
-  // todo: gestire autoenable
+  // : gestire autoenable
   if (!m_enabled) return;
   if (!m_isPath) {
     m_currentColor = TPixel32::Black;
@@ -1386,6 +1386,11 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 //		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
 //						 m_isFrameCreated, m_isLevelCreated);
 	//===============================================================================================
+    TStroke* m_strokeLine = m_animationAutoComplete.drawstrokeLine(stroke);
+
+    addStrokeToImage(getApplication(), vi, m_strokeLine, m_breakAngles.getValue(),
+                     m_isFrameCreated, m_isLevelCreated);
+    //========================================================================
 
     addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                      m_isFrameCreated, m_isLevelCreated);
@@ -2218,7 +2223,8 @@ void BrushPresetManager::removePreset(const std::wstring &name) {
 
 //------------------------------------------------------------------
 
-void AnimationAutoComplete::addStroke(TStroke* stroke)
+
+            void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
     StrokeWithNeighbours* strokeWithNeighbours = new StrokeWithNeighbours();
 
@@ -2239,6 +2245,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 	if (m_strokesWithNeighbours.size() >= 2)
 		initializeSynthesis();
 }
+
 
 SetOfPoints AnimationAutoComplete::getNeighbours(const SamplePoint point)
 {
@@ -2415,9 +2422,37 @@ std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
 
     for(int i = 0; i < stroke->getChunkCount(); i++)
         strokes.push_back(makeEllipticStroke(3, stroke->getChunk(i)->getP0(), m_spaceVicinityRadius, m_spaceVicinityRadius));
-
-	return strokes;
+    return strokes;
 }
+
+TStroke* AnimationAutoComplete::drawstrokeLine(TStroke *stroke)
+{
+    //todo: strokeline
+    std::vector<TPointD> vec;
+    vec.push_back(stroke->getChunk(1)->getP0());
+
+    double y2 = stroke->getChunk(1)->getP2().y;
+    double y1 = stroke->getChunk(1)->getP0().y;
+    double x2 = stroke->getChunk(1)->getP2().x;
+    double x1 = stroke->getChunk(1)->getP0().x;
+
+    double slope= (y2 - y1) / (x2 - x1);
+
+    double c = y2 - (slope * x2);
+
+    double new_x = x2 + 100;
+    double new_y = slope*new_x + c;
+    vec.push_back(TPointD(new_x, new_y));
+    TStroke* strokeLine = new TStroke(vec);
+    return strokeLine;
+}
+
+//TODO : getNormal
+/*TStroke* AnimationAutoComplete::getNormal(StrokeWithNeighbours *stroke)
+{
+   TStroke = drawstrokeLine();
+
+}*/
 
 void GlobalSimilarityGraph::insertNode(SimilarPair *pair, std::vector<SimilarPair *> connections)
 {

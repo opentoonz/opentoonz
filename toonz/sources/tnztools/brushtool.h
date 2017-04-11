@@ -114,31 +114,31 @@ typedef TThickQuadratic* SamplePoint;
 class  PointWithStroke
 {
 public:
-	PointWithStroke() {}
-	PointWithStroke(SamplePoint point, TStroke* stroke) : point(point), stroke(stroke) {}
-	~PointWithStroke() {}
-	SamplePoint point;
+    PointWithStroke() {}
+    PointWithStroke(SamplePoint point, TStroke* stroke) : point(point), stroke(stroke) {}
+    ~PointWithStroke() {}
+    SamplePoint point;
     TStroke* stroke;
 };
 
 struct SimilarPair
 {
-	double dissimilarityFactor;
-	PointWithStroke* point1;
-	PointWithStroke* point2;
+    double dissimilarityFactor;
+    PointWithStroke* point1;
+    PointWithStroke* point2;
 };
 
 class GlobalSimilarityGraph
 {
-	std::map<SimilarPair*, std::vector<SimilarPair*>> connections;
+    std::map<SimilarPair*, std::vector<SimilarPair*>> connections;
 
 public:
-	int numberOfNodes = 0;
+    int numberOfNodes = 0;
 
-	GlobalSimilarityGraph() {}
-	~GlobalSimilarityGraph() {}
-	void insertNode(SimilarPair* pair, std::vector<SimilarPair*> connections);
-	std::vector<SimilarPair *> getConnections(SimilarPair* pair);
+    GlobalSimilarityGraph() {}
+    ~GlobalSimilarityGraph() {}
+    void insertNode(SimilarPair* pair, std::vector<SimilarPair*> connections);
+    std::vector<SimilarPair *> getConnections(SimilarPair* pair);
 };
 
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
@@ -148,7 +148,7 @@ class StrokeWithNeighbours
 public:
     TStroke* stroke;
     SetOfPoints neighbours;
-	StrokeWithNeighbours *nextStroke;
+    StrokeWithNeighbours *nextStroke;
 };
 
 class AnimationAutoComplete {
@@ -162,6 +162,11 @@ public:
   //TODO: remove at production
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
 
+
+  TStroke* drawstrokeLine(TStroke* stroke);
+
+  TStroke*  getNormal(StrokeWithNeighbours* stroke);
+
 private:
   int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
@@ -172,7 +177,7 @@ private:
   StrokeWithNeighbours* mostSimilarStroke (StrokeWithNeighbours* stroke);
 
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
-												  StrokeWithNeighbours* nextToSimilarStroke);
+                                                  StrokeWithNeighbours* nextToSimilarStroke);
 
   SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
 

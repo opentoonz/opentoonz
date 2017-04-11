@@ -144,7 +144,7 @@ You can now run the application:
 
 ```
 $ cd bin
-$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz_1.0
+$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz_1.1
 ```
 
 ### Performing a System Installation
