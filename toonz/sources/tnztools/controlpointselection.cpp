@@ -105,6 +105,16 @@ shared_ptr<PathAnimation> ControlPointEditor::Replace::pathAnimation() const {
   return PathAnimations::appStroke(TTool::getApplication(), editor()->getStroke());
 }
 
+TThickQuadratic ControlPointEditor::Replace::toRemove(int i, int frame) const {
+  assert(i >= 0 && i <= m_to - m_from);
+  TThickQuadratic result;
+  shared_ptr<PathAnimation> anim = pathAnimation();
+  // interpolate chunk (from + i) to frame
+  for (int j = 0; j < 3; j++)
+    result.setThickP(j, anim->pointParam(from() + i, j)->getValue (frame));
+  return result;
+}
+
 //=============================================================================
 // ReplaceAddPoint
 //-----------------------------------------------------------------------------
@@ -170,11 +180,11 @@ vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
     nextIndex < e->getControlPointCount() && e->isSpeedInLinear(nextIndex);
 
   TThickPoint a[5];
-  a[0] = toRemove(0)->getThickP0();
-  a[1] = toRemove(0)->getThickP1();
-  a[2] = toRemove(1)->getThickP0();
-  a[3] = toRemove(1)->getThickP1();
-  a[4] = toRemove(1)->getThickP2();
+  a[0] = toRemove(0, frame).getThickP0();
+  a[1] = toRemove(0, frame).getThickP1();
+  a[2] = toRemove(1, frame).getThickP0();
+  a[3] = toRemove(1, frame).getThickP1();
+  a[4] = toRemove(1, frame).getThickP2();
   // double dist2 = tdistance2(pos, TPointD(a[2]));
   double dist2 = 0;
   TThickPoint d[7];
@@ -182,7 +192,7 @@ vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
   if (isBeforePointLinear && isNextPointLinear) {
     // If both points are linear, add a linear point
     d[0] = a[1];
-    d[3] = toRemove(m_chunk - from())->getThickPoint(m_t);
+    d[3] = toRemove(m_chunk - from(), frame).getThickPoint(m_t);
     d[6] = a[3];
     d[2] = computeLinearPoint(d[0], d[3], 0.01, true);   // SpeedIn
     d[4] = computeLinearPoint(d[3], d[6], 0.01, false);  // SpeedOut

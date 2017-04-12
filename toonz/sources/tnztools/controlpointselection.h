@@ -51,7 +51,8 @@ namespace ControlPointEditor {
     ControlPointEditorStroke *editor() const { return m_editor; }
     int from() const { return m_from; }
     int to() const { return m_to; }
-    const TThickQuadratic *toRemove(int i) const { return m_toRemove[i]; }
+    //! interpolates removed chunk to specified frame
+    TThickQuadratic toRemove(int i, int frame) const;
 
     //! Position chunks to be added; position them at
     //! keyframes as well.
