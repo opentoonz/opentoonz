@@ -1,0 +1,370 @@
+// out: ../../Astral_001_Default.qss
+
+// Import Main
+@import '../main';
+
+// -----------------------------------------------------------------------------
+// "Astral" Default Theme Variables
+// -----------------------------------------------------------------------------
+
+// IMG Directory
+@img-url: 'imgs/white';
+
+// Background
+@bg: #484848;
+
+// Accents
+@accent1: darken(@bg, 12%);
+@accent2: lighten(@bg, 10%);
+
+// Text
+@text-color: #bfbfbf;
+@text-color-disabled: darken(@text-color, 30%);
+
+// Selected Color (Primary)
+@selected-bg-color: @palette-chetwode-blue;
+@selected-text-color: #000;
+
+// Selected Color (Secondary)
+@selected-bg-color-secondary: lighten(@bg, 8%);
+@selected-text-color-secondary: contrast(@selected-bg-color-secondary, @text-color, #000);
+
+// Dock Separator
+@dock-bg-color: darken(@bg, 15%);
+@dock-placeholder-color: @palette-electric-lime;
+
+// Misc
+@widget-border-color: @dock-bg-color;
+@dialog-bg-color: darken(@bg, 5%);
+@tooltip-bg-color: #ffffe1;
+@tooltip-border-color: #000;
+@tooltip-text-color: #000;
+
+// Scrollable ToolBar Buttons
+@toolbar-scrollbutton-bg-color: #e1e1e1;
+@toolbar-scrollbutton-bg-color-hover: #f5f5f5;
+@toolbar-scrollbutton-bg-color-pressed: #c8c8c8;
+
+// Labels
+@label-title: lighten(@palette-chetwode-blue, 5%);
+@label-error: @palette-red;
+
+// Treeview
+@tree-bg-color: darken(@bg, 6%);
+@tree-bg-color-alt: @tree-bg-color;
+
+// -----------------------------------------------------------------------------
+// Tabs
+// -----------------------------------------------------------------------------
+
+// Container
+@tabbar-bg-color: darken(@bg, 8%);
+@tabbar-border-color: darken(@accent1, 2%);
+
+// Tabs
+@tab-bg-color: lighten(@tabbar-bg-color, 0%);
+@tab-bg-color-hover: lighten(@tab-bg-color, 5%);
+@tab-bg-color-selected: @bg;
+@tab-text-color: darken(@text-color, 15%);
+@tab-text-color-selected: lighten(@text-color, 15%);
+@tab-border-color: darken(@accent1, 3%);
+
+// -----------------------------------------------------------------------------
+// TopBar / Room Tabs
+// -----------------------------------------------------------------------------
+
+// Top Menu Bar
+@topbar-bg-color: @bg;
+@topbar-border-color: @accent1;
+
+// Room Tabs
+@rooms-tab-bg-color: @tab-bg-color;
+@rooms-tab-bg-color-selected: @tab-bg-color-selected;
+@rooms-tab-border-color: @tab-border-color;
+@rooms-tab-text-color: @tab-text-color;
+@rooms-tab-text-color-selected: @tab-text-color-selected;
+
+// -----------------------------------------------------------------------------
+// QMenu / Context Menu
+// -----------------------------------------------------------------------------
+
+@menu-bg-color: darken(@bg, 5%);
+@menu-border-color: @accent1;
+@menu-separator-color: @menu-border-color;
+@menu-checkbox-text-color-checked: @text-color;
+
+// -----------------------------------------------------------------------------
+// DockWidget Title Bar
+// -----------------------------------------------------------------------------
+
+// Note: IMG values must be set to NONE for QSS to work...
+
+// Global Title Bar
+@title-size: 20px;
+@title-bg-color: darken(@bg, 5%);
+@title-border-color: @accent1;
+@title-text-color: darken(@text-color, 10%);
+@title-text-color-active: lighten(@text-color, 10%);
+
+@title-img: 'none';
+@title-img-active: 'none';
+@title-img-float: 'none';
+@title-img-float-active: 'none';
+
+// For DockWidgets that display no text in Title Bar
+@title-toolbar-size: 16px;
+@title-toolbar-img-horizontal: 'title_grip_horizontal.png';
+@title-toolbar-img-vertical: 'title_grip_vertical.png';
+@title-toolbar-img-float: 'titlebar_float.png';
+
+// -----------------------------------------------------------------------------
+// QScrollBar
+// -----------------------------------------------------------------------------
+
+@scrollbar-bg-color: lighten(@dock-bg-color, 5%);
+@scrollbar-handle-bg-color: @bg;
+@scrollbar-handle-border-color: lighten(@scrollbar-handle-bg-color, 1%);
+@scrollbar-button-bg-color: @scrollbar-handle-bg-color;
+@scrollbar-button-bg-color-pressed: lighten(@scrollbar-button-bg-color, 5%);
+
+// -----------------------------------------------------------------------------
+// QPushButton
+// -----------------------------------------------------------------------------
+
+@button-bg-color: lighten(@bg, 8%);
+@button-border-color: darken(@bg, 8%);
+@button-text-color: lighten(@text-color, 5%);
+
+@button-bg-color-hover: lighten(@button-bg-color, 5%);
+@button-border-color-hover: @button-border-color;
+@button-text-color-hover: lighten(@button-text-color, 5%);
+
+@button-bg-color-pressed: darken(@bg, 8%);
+@button-border-color-pressed: darken(@button-bg-color-pressed, 10.2%);
+@button-text-color-pressed: @text-color;
+
+@button-bg-color-checked: darken(@button-bg-color-pressed, 5%);
+@button-bg-color-checked-hover: lighten(@button-bg-color-checked, 5%);
+@button-border-color-checked: darken(@button-border-color-pressed, 5%);
+@button-text-color-checked: @text-color;
+
+@button-bg-color-disabled: lighten(@bg, 4%);
+@button-border-color-disabled: darken(@bg, 4%);
+@button-text-color-disabled: @text-color-disabled;
+
+// -----------------------------------------------------------------------------
+// QLineEdit / Input Boxes
+// -----------------------------------------------------------------------------
+
+@focus-color: darken(desaturate(@selected-bg-color, 20%), 15%);
+@input-bg-img: 'lineedit_shadow.png';
+@input-bg-color: darken(@bg, 10%);
+@input-border-color: darken(@input-bg-color, 3%);
+@input-text-color: @text-color;
+@input-selection-text-color: @selected-text-color;
+@input-selection-bg-color: @selected-bg-color;
+
+@input-bg-color-disabled: darken(@bg, 5%);
+@input-border-color-disabled: darken(@input-bg-color-disabled, 5%);
+@input-text-color-disabled: @text-color-disabled;
+
+// -----------------------------------------------------------------------------
+// QCheckBox
+// -----------------------------------------------------------------------------
+
+@checkbox-text-color-hover: lighten(@text-color, 10%);
+
+@checkbox-bg-color: @input-bg-color;
+@checkbox-border-color: @input-border-color;
+
+@checkbox-bg-color-hover: lighten(@checkbox-bg-color, 5%);
+@checkbox-border-color-hover: @checkbox-border-color;
+
+@checkbox-bg-color-checked: @checkbox-bg-color;
+@checkbox-border-color-checked: @checkbox-border-color;
+
+@checkbox-bg-color-disabled: @input-bg-color-disabled;
+@checkbox-border-color-disabled: @input-border-color-disabled;
+
+// -----------------------------------------------------------------------------
+// QRadioButton
+// -----------------------------------------------------------------------------
+
+@radiobutton-img-unchecked: 'radiobutton_unchecked.png';
+@radiobutton-img-checked: 'radiobutton_checked.png';
+
+// -----------------------------------------------------------------------------
+// QSlider / IntPairField / DoublePairField
+// -----------------------------------------------------------------------------
+
+@slider-groove-color: @accent1;
+@slider-groove-color-highlight: lighten(@bg, 2%);
+
+// -----------------------------------------------------------------------------
+// Film Strip
+// -----------------------------------------------------------------------------
+
+@filmstrip-bg-color: #000;
+
+// -----------------------------------------------------------------------------
+// File Browser
+// -----------------------------------------------------------------------------
+
+@browser-folder-text-color: @palette-water-leaf-blue;
+@browser-folder-text-color-selected: @selected-text-color;
+
+@browser-itemview-bg-color: darken(@bg, 6%);
+@browser-itemview-bg-color-alt: lighten(@tree-bg-color-alt, 4%);
+
+// -----------------------------------------------------------------------------
+// Script Console
+// -----------------------------------------------------------------------------
+
+@scriptconsole-bg-color: rgb(220, 220, 220);
+@scriptconsole-text-color: #000;
+
+// -----------------------------------------------------------------------------
+// Palette Viewer
+// -----------------------------------------------------------------------------
+
+@paletteviewer-lock-color-active: @palette-chihiro;
+
+// -----------------------------------------------------------------------------
+// Style Editor
+// -----------------------------------------------------------------------------
+
+@styleeditor-wheel-bg-color: @bg;
+
+// -----------------------------------------------------------------------------
+// ComboViewer / Viewer / FlipBook
+// -----------------------------------------------------------------------------
+
+// Flip Slider
+@flipslider-base-color: darken(@bg, 20%);
+@flipslider-notstarted-color: #CC2222;
+@flipslider-started-color: @palette-green; // Render to memory color?
+
+// Ruler
+@viewer-ruler-bg-color: @bg;
+@viewer-ruler-scale-color: @text-color;
+@viewer-ruler-ToolOptionValues-color: darken(@bg, 50%);
+
+// -----------------------------------------------------------------------------
+// Schematic Node Viewer
+// -----------------------------------------------------------------------------
+
+@schematic-viewer-bg-color: darken(@bg, 5%);
+@schematic-label-text-color: @palette-yellow-green;
+
+@schematic-help-button-bg-color: @palette-chetwode-blue;
+@schematic-help-button-bg-color-hover: lighten(@schematic-help-button-bg-color, 10%);
+
+// -----------------------------------------------------------------------------
+// XSheet
+// -----------------------------------------------------------------------------
+
+@xsheet-combobox-maxwidth:                    57px;
+
+// XSheet Context Menus
+@xsheet-menu-preview-color:                 #E6E678;
+@xsheet-menu-lock-color:                    #F5F5F5;
+@xsheet-menu-camstand-color:                #FFA480;
+@xsheet-menu-text-color:                    #000;
+
+// XSheet Notes
+@xsheet-notes-text-color:                   #000;
+
+// XSheet Spreadsheet Viewer
+@xsheet-text-color:                           @text-color;
+@xsheet-bg-color:                           #484848;
+@xsheet-LightLine-color:                    @accent1;
+@xsheet-MarkerLine-color:                   #1E96C4;
+@xsheet-VerticalLine-color:                 @accent2;
+@xsheet-VerticalLineHead-color:             lighten(@accent2, 8%);
+@xsheet-PreviewFrameText-color:             #96E6E6;
+@xsheet-CurrentRowBG-color:                 #506082;
+
+@xsheet-EmptyColumnHead-color:              #606060;
+@xsheet-SelectedColumnText-color:           #E66464;
+
+@xsheet-EmptyCell-color:                    #404040;
+@xsheet-NotEmptyColumn-color:               #484848;
+@xsheet-SelectedEmptyCell-color:            #6C6C6C;
+
+@xsheet-LevelColumn-color:                  #4C6E4C;
+@xsheet-LevelColumnBorder-color:            #8FB38F;
+@xsheet-SelectedLevelColumn-color:          #6B8C6B;
+
+@xsheet-VectorColumn-color:                 #7B7B4C;
+@xsheet-VectorColumnBorder-color:           #BBBB9A;
+@xsheet-SelectedVectorColumn-color:         #8C8C60;
+
+@xsheet-ChildColumn-color:                  #6A526B;
+@xsheet-ChildColumnBorder-color:            #B1A3B3;
+@xsheet-SelectedChildColumn-color:          #7A617A;
+
+@xsheet-FullColorColumn-color:              #657A96;
+@xsheet-FullColorColumnBorder-color:        #9EB8BB;
+@xsheet-SelectedFullColorColumn-color:      #8896A7;
+
+@xsheet-FxColumn-color:                     #56553C;
+@xsheet-FxColumnBorder-color:               #95958A;
+@xsheet-SelectedFxColumn-color:             #6A6D5A;
+
+@xsheet-ReferenceColumn-color:              #616161;
+@xsheet-ReferenceColumnBorder-color:        #A2A2A2;
+@xsheet-SelectedReferenceColumn-color:      #828282;
+
+@xsheet-PaletteColumn-color:                #3A655F;
+@xsheet-PaletteColumnBorder-color:          #86ACA7;
+@xsheet-SelectedPaletteColumn-color:        #5F8581;
+
+@xsheet-MeshColumn-color:                   #684D86;
+@xsheet-MeshColumnBorder-color:             #BA92EF;
+@xsheet-SelectedMeshColumn-color:           #8A75A2;
+
+@xsheet-SoundColumn-color:                  #657456;
+@xsheet-SoundColumnBorder-color:            #A0AF7D;
+@xsheet-SelectedSoundColumn-color:          #7F956A;
+@xsheet-SoundColumnHL-color:                #34FE5E;
+@xsheet-SoundColumnTrack-color:             #B6C29D;
+
+@xsheet-ColumnHeadPastelizer-color:         #000;
+@xsheet-SelectedColumnHead-color:           #506082;
+
+@xsheet-LightLightBG-color:                 #404040;
+@xsheet-LightBG-color:                      #F0F0F0;
+@xsheet-DarkBG-color:                       #E1E1E1;
+@xsheet-DarkLine-color:                     #969696;
+
+// -----------------------------------------------------------------------------
+// Function Editor
+// -----------------------------------------------------------------------------
+
+// Function Treeview
+@function-treeview-text-color: @text-color;
+@function-treeview-text-color-selected: @palette-sunglo;
+
+// Function Curve Panel
+@function-panel-bg-color: darken(@bg, 5%);
+@function-panel-ValueLine-color: rgb(72, 72, 72);
+@function-panel-FrameLine-color: rgb(96, 96, 96);
+@function-panel-OtherCurves-color: lighten(@function-panel-bg-color, 30%);
+@function-panel-RulerBG-color: darken(@function-panel-bg-color, 3%);
+@function-panel-Text-color: @text-color;
+@function-panel-Sub-color: #000;
+@function-panel-Selected-color: #BFFFFF;
+
+// Function Spreadsheet Viewer
+@function-KeyFrame-color: rgb(153,93,29);
+@function-KeyFrameBorder-color: rgb(201,176,75);
+@function-SelectedKeyFrame-color: rgb(151,128,86);
+
+@function-Inbetween-color: rgb(102,98,80);
+@function-InbetweenBorder-color: rgb(205,206,200);
+@function-SelectedInbetween-color: rgb(126,128,121);
+
+@function-SelectedSceneRangeEmpty-color: rgb(117,117,117);
+
+@function-ExpressionFieldBG-color: #e6e6e6;
+@function-ExpressionFieldBorder-color: #333;

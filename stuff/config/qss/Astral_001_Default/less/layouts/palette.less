@@ -1,0 +1,152 @@
+/* -----------------------------------------------------------------------------
+   Style Editor
+----------------------------------------------------------------------------- */
+
+#StyleEditor {
+  #TabBarContainer {
+    margin-left: -4px; // Resets container margin
+  }
+  #bottomWidget {
+    padding: 3px 2px 8px 3px;
+  }
+}
+
+#StyleEditorTabBar {
+  &:extend(.tab-container all); // components/tabs.less
+  &::tab {
+    &:extend(.tab-flat all); // components/tabs.less
+  }
+}
+
+#HexagonalColorWheel {
+  qproperty-BGColor: @styleeditor-wheel-bg-color;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Horizontal QSlider */
+
+// I don't know what #colorSlider does, it seems to have no effect here.
+// Leaving it as it was from gray072...
+
+#colorSlider {
+  &::groove:horizontal {
+    height: 1px;
+    border-image: none;
+  }
+  &::handle:horizontal {
+    width: 8px;
+    margin: -8px -4px;
+  }
+}
+
+#colorSliderAddButton, 
+#colorSliderSubButton {
+  background: none;
+  border: 0;
+  image-position: center center;
+  margin-bottom: 1px; // Pressed effect placeholder (#F001)
+  max-height: 16px;
+  min-height: 16px;
+  padding: 0;
+  max-width: 18px;
+  min-width: 18px;
+  &:hover {
+    background: none;
+  }
+  &:pressed {
+    margin-top: 1px; // Moves button down for pressed effect (#F001)
+    margin-bottom: 0;
+  }
+}
+
+#colorSliderAddButton {
+  image: url('@{img-url}/colorslider_add.png');
+}
+
+#colorSliderSubButton {
+  image: url('@{img-url}/colorslider_sub.png');
+}
+
+#PlainColorPageParts {
+  border-bottom: 1px solid @accent1;
+  & QLineEdit {
+    max-width: 35px;
+  }
+}
+
+#colorSliderLabel, 
+#colorSliderField {
+}
+
+/* -----------------------------------------------------------------------------
+   Palette Viewer / Studio Palette
+----------------------------------------------------------------------------- */
+
+PaletteViewer {
+  QToolBar {
+    background: none;
+    border-bottom: 1px solid @tabbar-border-color;
+    padding: 0;
+    margin: 0;
+    &::separator:horizontal {
+      // Very compact space so we can do without margin here...
+      margin: 0;
+    }
+    QToolButton {
+      &:extend(.button-flat all); // components/buttons.less
+      margin: 0 0 1px 0; // Adds height to QToolBar
+      padding: 0;
+    }
+  }
+  & QScrollBar {
+    &:extend(.mods.scrollbars-01 all); // mods/scrollbars.less
+  }
+}
+
+#StudioPalette {
+  & QTreeView {
+    &:extend(.tree-list all); // components/treeviews.less
+    &::branch {
+      &:extend(.branch-17 all);
+    }
+  }
+}
+
+#PaletteTabBar {
+  &:extend(.tab-container all); // components/tabs.less
+  &::tab {
+    &:extend(.tab-flat all); // components/tabs.less
+  }
+}
+
+#PageViewer {
+  qproperty-TextColor: @text-color;
+}
+
+#PaletteLockButton {
+  &:hover {
+    background-color: @selected-bg-color;
+  }
+  &:checked {
+    background-color: @paletteviewer-lock-color-active;
+    &:hover {
+      background-color: @selected-bg-color-secondary;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Quick Renamer
+----------------------------------------------------------------------------- */
+
+#WordButton {
+  &:extend(QPushButton all); // views/controls.less
+  // Remove horizontal padding... else moderate length text gets clipped
+  padding-right: 0;
+  padding-left: 0;
+}
+
+#SolidLineFrame {
+  &:extend(.box-base all); // components/boxes.less
+}
