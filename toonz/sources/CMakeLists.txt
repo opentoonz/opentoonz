@@ -472,7 +472,7 @@ include_directories(
     ${PNG_INCLUDE_DIRS}
 )
 
-if(BUILD_ENV_WIN OR BUILD_ENV_APPLE)
+if(BUILD_ENV_MSVC OR BUILD_ENV_APPLE)
     find_path(
         BOOST_ROOT
             include/boost
