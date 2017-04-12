@@ -134,8 +134,6 @@ If something doesn't compile or link, please run `make` this way to help spot th
 $ LANG=C make VERBOSE=1
 ```
 
-Currently on ubuntu you'll face a [build error](https://github.com/opentoonz/opentoonz/issues/866) complaining about linking `lzocompress` or `liblzo2.a`. A Workaround is to open toonz/build/CMakeCache.txt and replace every `liblzo2.a` with `liblzo2.so`. Build again and it should work fine.
-
 #### Debug Build
 If you need to debug the application, you should be able to use `cmake -DCMAKE_BUILD_TYPE=Debug`.
 
