@@ -1262,7 +1262,6 @@ PaletteViewer DvScrollWidget QPushButton {
 PaletteViewer DvScrollWidget #ScrollLeftButton {
   border-right: 1px solid #2c2c2c;
   border-left: 1px solid #2c2c2c;
-  image: url('imgs/white/arrow_left.png');
   max-width: 15px;
   min-width: 15px;
 }
