@@ -329,7 +329,9 @@ bool LevelCreatePopup::levelExists(std::wstring levelName) {
   TLevelSet *levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
 
-  fp       = scene->getDefaultLevelPath(getLevelType(), levelName);
+  TFilePath parentDir(m_pathFld->getPath().toStdWString());
+  fp = scene->getDefaultLevelPath(getLevelType(), levelName)
+           .withParentDir(parentDir);
   actualFp = scene->decodeFilePath(fp);
 
   if (levelSet->getLevel(levelName) != 0 ||
