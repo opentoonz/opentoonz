@@ -1523,6 +1523,18 @@ Reshape TStroke::move(const TThickPoint pos[], int count) {
 
 //-----------------------------------------------------------------------------
 
+void TStroke::replaceChunks(int from, int to, const vector<TThickQuadratic *> &toAdd) {
+  QuadStrokeChunkArray &chunks = m_imp->m_centerLineArray;
+  for (int i = from; i <= to; i++) {
+    TThickQuadratic *toRemove = chunks[from];
+    delete toRemove;
+    chunks.erase(chunks.begin() + from);
+  }
+  chunks.insert(chunks.begin() + from, toAdd.begin(), toAdd.end());
+}
+
+//-----------------------------------------------------------------------------
+
 void TStroke::countNegativeThickness(const TThickPoint pos[], int count) {
   m_imp->m_negativeThicknessPoints = 0;
   for (int i = 0; i < count; i++)

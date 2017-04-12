@@ -12,8 +12,55 @@
 
 #include <memory>
 using std::shared_ptr;
+#include <vector>
+using std::vector;
 #include <boost/optional.hpp>
 using boost::optional;
+
+
+class ControlPointEditorStroke;
+
+namespace ControlPointEditor {
+
+  //! Removes several chunks from TStroke and replaces them
+  //! with other chunks. Adjusts PathAnimation accordingly
+  class Replace {
+    ControlPointEditorStroke *m_editor;
+    int m_from, m_to; // chunk numbers to remove, inclusive
+
+  protected:
+    vector<const TThickQuadratic *> m_toRemove; // chunks to remove
+    vector<TThickQuadratic *> m_toAdd; // chunks added
+
+    void setFrom(int from) { m_from = from; }
+    void setTo(int to) { m_to = to; }
+
+    //! Copy pointers to removed chunks
+    void fillToRemove();
+    //! Create chunks to be added, even if not positioned
+    virtual void fillToAdd() = 0;
+    //! Produce a list of points re-positioning "to be added"
+    //! chunks at a given frame. Called before replacement
+    virtual vector<TThickPoint> place(int frame) const = 0;
+
+    shared_ptr<PathAnimation> pathAnimation() const;
+  public:
+    Replace(ControlPointEditorStroke *editor);
+    virtual ~Replace() { }
+
+    ControlPointEditorStroke *editor() const { return m_editor; }
+    int from() const { return m_from; }
+    int to() const { return m_to; }
+    const TThickQuadratic *toRemove(int i) const { return m_toRemove[i]; }
+
+    //! Position chunks to be added; position them at
+    //! keyframes as well.
+    //! Perform cut & replace on the stroke
+    void execute();
+  private:
+    void snapshot(int frame);
+  };
+};
 
 //=============================================================================
 // ControlPointEditorStroke
@@ -21,6 +68,7 @@ using boost::optional;
 
 class ControlPointEditorStroke {
 private:
+
   class ControlPoint {
   public:
     int m_pointIndex;
@@ -92,6 +140,10 @@ PAY ATTENTION: Can add control point in the stroke. */
 
   int getControlPointCount() const { return m_controlPoints.size(); }
 
+  int majorSegmentContaining(int controlPointIndex) const;
+  int cpIndex(int major) const { return m_controlPoints[major].m_pointIndex; }
+
+  int  getFrame() const { return m_frame; }
   void setFrame(int frame) { m_frame = frame; }
 
   TThickPoint getControlPoint(int index) const;

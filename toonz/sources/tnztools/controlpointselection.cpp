@@ -57,6 +57,213 @@ TThickPoint computeLinearPoint(const TThickPoint &p1, const TThickPoint &p2,
 }  // namespace
 
 //=============================================================================
+// Replace
+//-----------------------------------------------------------------------------
+
+ControlPointEditor::Replace::Replace(ControlPointEditorStroke *editor)
+  : m_editor(editor), m_from(-1), m_to(-1) {
+}
+
+void ControlPointEditor::Replace::fillToRemove() {
+  TStroke *stroke = editor()->getStroke();
+  m_toRemove.clear();
+  for (int i = from(); i <= to(); i++)
+    m_toRemove.push_back(stroke->getChunk(i));
+}
+
+void ControlPointEditor::Replace::execute() {
+  // snapshot at current frame
+  snapshot(editor()->getFrame());
+
+  // snapshot at each other frame
+  shared_ptr<PathAnimation> anim = pathAnimation();
+  set<double> keyframes = anim->getKeyframes();
+  for (set<double>::iterator it = keyframes.begin(); it != keyframes.end(); it++)
+    snapshot((int) *it);
+
+  // perform replace
+  editor()->getStroke()->replaceChunks(m_from, m_to, m_toAdd);
+  anim->updateChunks();
+}
+
+void ControlPointEditor::Replace::snapshot(int frame) {
+  vector<TThickPoint> points = place(frame);
+  assert(points.size() == m_toAdd.size() * 2 + 1);
+  // c is chunk number
+  // i is control point base number
+  for (int c = 0, i = 0; c < m_toAdd.size(); c++, i += 2)
+    for (int j = 0; j < 3; j++)
+      m_toAdd[c]->setThickP(j, points[i + j]);
+
+  // now copy curve information to PathAnimation
+  shared_ptr<PathAnimation> anim = pathAnimation();
+  for (int c = 0; c < m_toAdd.size(); c++)
+    anim->snapshotChunk(m_toAdd[c], frame);
+}
+
+shared_ptr<PathAnimation> ControlPointEditor::Replace::pathAnimation() const {
+  return PathAnimations::appStroke(TTool::getApplication(), editor()->getStroke());
+}
+
+//=============================================================================
+// ReplaceAddPoint
+//-----------------------------------------------------------------------------
+
+//! Remove 2 chunks and replace them with 4 chunks
+class ReplaceAddPoint final : public ControlPointEditor::Replace {
+  double m_w;
+  int m_chunk; // chunk containing w
+  double m_t; // t parameter of curve within chunk corresponding to w
+  int m_oldCPCount; // control point count prior to replacement
+  int m_pointIndex; // index of control point after w
+  int m_major; // major index of segment start
+  int m_prevCP; // control point index
+
+  static const int TO_ADD = 4; //! number of chunks added
+
+protected:
+  virtual void fillToAdd() override;
+  virtual vector<TThickPoint> place(int frame) const override;
+
+public:
+  ReplaceAddPoint(ControlPointEditorStroke *editor, double w);
+
+};
+
+ReplaceAddPoint::ReplaceAddPoint(ControlPointEditorStroke *editor, double w):
+  Replace (editor), m_w (w)
+{
+  TStroke *stroke = editor->getStroke();
+  stroke->getChunkAndT(w, m_chunk, m_t);
+
+  m_pointIndex = stroke->getControlPointIndexAfterParameter(w);
+  m_major = editor->majorSegmentContaining(m_pointIndex);
+  m_prevCP = editor->cpIndex(m_major);
+  assert(m_prevCP >= 0);
+
+  setFrom(m_major * 2);
+  setTo(m_major * 2 + 1);
+  fillToRemove();
+  fillToAdd();
+}
+
+void ReplaceAddPoint::fillToAdd() {
+  m_toAdd.clear();
+  for (int i = 0; i < TO_ADD; i++)
+    m_toAdd.push_back(new TThickQuadratic());
+  shared_ptr<PathAnimation> anim =
+    PathAnimations::appStroke(TTool::getApplication(), editor()->getStroke());
+  for (int i = 0; i < TO_ADD; i++)
+    anim->addChunk(m_toAdd[i]);
+}
+
+
+
+vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
+  ControlPointEditorStroke *e = editor();
+  TStroke *stroke = e->getStroke();
+
+  bool isBeforePointLinear = e->isSpeedOutLinear(m_major);
+  int nextIndex =
+    (e->isSelfLoop() && m_major == e->getControlPointCount() - 1) ? 0 : m_major + 1;
+  bool isNextPointLinear =
+    nextIndex < e->getControlPointCount() && e->isSpeedInLinear(nextIndex);
+
+  TThickPoint a[5];
+  a[0] = toRemove(0)->getP0();
+  a[1] = toRemove(0)->getP1();
+  a[2] = toRemove(1)->getP0();
+  a[3] = toRemove(1)->getP1();
+  a[4] = toRemove(1)->getP2();
+  // double dist2 = tdistance2(pos, TPointD(a[2]));
+  double dist2 = 0;
+  TThickPoint d[7];
+
+  if (isBeforePointLinear && isNextPointLinear) {
+    // If both points are linear, add a linear point
+    d[0] = a[1];
+    d[3] = toRemove(m_chunk - from())->getThickPoint(m_t);
+    d[6] = a[3];
+    d[2] = computeLinearPoint(d[0], d[3], 0.01, true);   // SpeedIn
+    d[4] = computeLinearPoint(d[3], d[6], 0.01, false);  // SpeedOut
+    d[1] = 0.5 * (d[0] + d[2]);
+    d[5] = 0.5 * (d[4] + d[6]);
+  }
+  else if (dist2 < 32) {
+    // a[2] and clicked point are very close
+    TThickPoint b0 = 0.5 * (a[0] + a[1]);
+    TThickPoint b1 = 0.5 * (a[2] + a[1]);
+    TThickPoint c0 = 0.5 * (b0 + b1);
+
+    TThickPoint b2 = 0.5 * (a[2] + a[3]);
+    TThickPoint b3 = 0.5 * (a[3] + a[4]);
+
+    TThickPoint c1 = 0.5 * (b2 + b3);
+    d[0] = b0;
+    d[1] = c0;
+    d[2] = b1;
+    d[3] = a[2];
+    d[4] = b2;
+    d[5] = c1;
+    d[6] = b3;
+  }
+  else {
+    bool isInFirstChunk = true;
+    if (m_pointIndex > m_prevCP + 2) {
+      // If they are in the second chunk, exchange points
+      tswap(a[0], a[4]);
+      tswap(a[1], a[3]);
+      isInFirstChunk = false;
+    }
+
+    double w0 = (e->isSelfLoop() && m_prevCP + 4 == m_oldCPCount - 1 &&
+      !isInFirstChunk)
+      ? 1
+      : stroke->getW(a[0]);
+    double w1 = stroke->getW(a[2]);
+    double t = (m_w - w0) / (w1 - w0);
+
+    TThickPoint p = stroke->getThickPoint(m_w);
+    TThickPoint b0 = TThickPoint((1 - t) * a[0] + t * a[1],
+      (1 - t) * a[0].thick + t * a[1].thick);
+    TThickPoint b1 = TThickPoint((1 - t) * a[1] + t * a[2],
+      (1 - t) * a[1].thick + t * a[2].thick);
+    TThickPoint c0 =
+      TThickPoint(0.5 * a[0] + 0.5 * b0, (1 - t) * a[0].thick + t * b0.thick);
+    TThickPoint c1 =
+      TThickPoint(0.5 * b0 + 0.5 * p, (1 - t) * b0.thick + t * p.thick);
+    TThickPoint c2 =
+      TThickPoint(0.5 * c0 + 0.5 * c1, (1 - t) * c0.thick + t * c1.thick);
+
+    d[0] = (isInFirstChunk) ? c0 : a[3];
+    d[1] = (isInFirstChunk) ? c2 : a[2];
+    d[2] = (isInFirstChunk) ? c1 : b1;
+    d[3] = p;
+    d[4] = (isInFirstChunk) ? b1 : c1;
+    d[5] = (isInFirstChunk) ? a[2] : c2;
+    d[6] = (isInFirstChunk) ? a[3] : c0;
+  }
+  if (isBeforePointLinear && !isNextPointLinear)
+    d[1] = computeLinearPoint(d[0], d[2], 0.01, false);
+  else if (isNextPointLinear && !isBeforePointLinear)
+    d[5] = computeLinearPoint(d[4], d[6], 0.01, true);
+
+  vector<TThickPoint> points;
+  points.push_back(a[0]);
+  points.push_back(d[0]);
+  points.push_back(d[1]);
+  points.push_back(d[2]);
+  points.push_back(d[3]);
+  points.push_back(d[4]);
+  points.push_back(d[5]);
+  points.push_back(d[6]);
+  points.push_back(a[4]);
+
+  return points;
+}
+
+
+//=============================================================================
 // ControlPointEditorStroke
 //-----------------------------------------------------------------------------
 
@@ -127,6 +334,20 @@ int ControlPointEditorStroke::prevIndex(int index) const {
   }
 
   return -1;
+}
+
+//-----------------------------------------------------------------------------
+
+//! controlPointIndex is of 4x major point kind
+//! returns major point index
+int ControlPointEditorStroke::majorSegmentContaining(int controlPointIndex) const {
+  int index;
+  for (int i = 0; i < getControlPointCount(); i++) {
+    int majorPoint = m_controlPoints[i].m_pointIndex;
+    if (controlPointIndex >= majorPoint + 1 && controlPointIndex <= majorPoint + 4)
+      index = i;
+  }
+  return index;
 }
 
 //-----------------------------------------------------------------------------
@@ -695,107 +916,12 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos) {
   }
 
   ControlPoint precCp = m_controlPoints[index];
-  assert(precCp.m_pointIndex >= 0);
-  std::vector<TThickPoint> points;
-
-  for (i = 0; i < cpCount; i++) {
-    if (i != precCp.m_pointIndex + 1 && i != precCp.m_pointIndex + 2 &&
-        i != precCp.m_pointIndex + 3)
-      points.push_back(stroke->getControlPoint(i));
-    if (i == precCp.m_pointIndex + 2) {
-      bool isBeforePointLinear = isSpeedOutLinear(index);
-      int nextIndex =
-          (isSelfLoop() && index == m_controlPoints.size() - 1) ? 0 : index + 1;
-      bool isNextPointLinear =
-          nextIndex < (int)m_controlPoints.size() && isSpeedInLinear(nextIndex);
-
-      TThickPoint a0 = stroke->getControlPoint(precCp.m_pointIndex);
-      TThickPoint a1 = stroke->getControlPoint(precCp.m_pointIndex + 1);
-      TThickPoint a2 = stroke->getControlPoint(precCp.m_pointIndex + 2);
-      TThickPoint a3 = stroke->getControlPoint(precCp.m_pointIndex + 3);
-      TThickPoint a4 = stroke->getControlPoint(precCp.m_pointIndex + 4);
-      double dist2   = tdistance2(pos, TPointD(a2));
-      TThickPoint d0, d1, d2, d3, d4, d5, d6;
-
-      if (isBeforePointLinear && isNextPointLinear) {
-        // Se sono entrambi i punti lineari  inserisco un punto lineare
-        d0 = a1;
-        d3 = stroke->getThickPoint(w);
-        d6 = a3;
-        d2 = computeLinearPoint(d0, d3, 0.01, true);   // SpeedIn
-        d4 = computeLinearPoint(d3, d6, 0.01, false);  // SpeedOut
-        d1 = 0.5 * (d0 + d2);
-        d5 = 0.5 * (d4 + d6);
-      } else if (dist2 < 32) {
-        // Sono molto vicino al punto che non viene visualizzato
-        TThickPoint b0 = 0.5 * (a0 + a1);
-        TThickPoint b1 = 0.5 * (a2 + a1);
-        TThickPoint c0 = 0.5 * (b0 + b1);
-
-        TThickPoint b2 = 0.5 * (a2 + a3);
-        TThickPoint b3 = 0.5 * (a3 + a4);
-
-        TThickPoint c1 = 0.5 * (b2 + b3);
-        d0             = b0;
-        d1             = c0;
-        d2             = b1;
-        d3             = a2;
-        d4             = b2;
-        d5             = c1;
-        d6             = b3;
-      } else {
-        bool isInFirstChunk = true;
-        if (pointIndex > precCp.m_pointIndex + 2) {
-          // nel caso in cui sono nel secondo chunk scambio i punti
-          a0 = a4;
-          tswap(a1, a3);
-          isInFirstChunk = false;
-        }
-
-        double w0 = (isSelfLoop() && precCp.m_pointIndex + 4 == cpCount - 1 &&
-                     !isInFirstChunk)
-                        ? 1
-                        : stroke->getW(a0);
-        double w1 = stroke->getW(a2);
-        double t  = (w - w0) / (w1 - w0);
-
-        TThickPoint p  = stroke->getThickPoint(w);
-        TThickPoint b0 = TThickPoint((1 - t) * a0 + t * a1,
-                                     (1 - t) * a0.thick + t * a1.thick);
-        TThickPoint b1 = TThickPoint((1 - t) * a1 + t * a2,
-                                     (1 - t) * a1.thick + t * a2.thick);
-        TThickPoint c0 =
-            TThickPoint(0.5 * a0 + 0.5 * b0, (1 - t) * a0.thick + t * b0.thick);
-        TThickPoint c1 =
-            TThickPoint(0.5 * b0 + 0.5 * p, (1 - t) * b0.thick + t * p.thick);
-        TThickPoint c2 =
-            TThickPoint(0.5 * c0 + 0.5 * c1, (1 - t) * c0.thick + t * c1.thick);
-
-        d0 = (isInFirstChunk) ? c0 : a3;
-        d1 = (isInFirstChunk) ? c2 : a2;
-        d2 = (isInFirstChunk) ? c1 : b1;
-        d3 = p;
-        d4 = (isInFirstChunk) ? b1 : c1;
-        d5 = (isInFirstChunk) ? a2 : c2;
-        d6 = (isInFirstChunk) ? a3 : c0;
-      }
-      if (isBeforePointLinear && !isNextPointLinear)
-        d1 = computeLinearPoint(d0, d2, 0.01, false);
-      else if (isNextPointLinear && !isBeforePointLinear)
-        d5 = computeLinearPoint(d4, d6, 0.01, true);
-      points.push_back(d0);
-      points.push_back(d1);
-      points.push_back(d2);
-      points.push_back(d3);
-      points.push_back(d4);
-      points.push_back(d5);
-      points.push_back(d6);
-    }
-  }
-
-  stroke->reshape(&points[0], points.size());
+  int prevCPIndex = precCp.m_pointIndex;
+  assert(prevCPIndex >= 0);
+  
+  ReplaceAddPoint replace { this, w };
+  replace.execute();
   resetControlPoints();
-  clearAndSnapshot();
 
   getPointTypeAt(pos, d, indexAtPos);
   return indexAtPos;

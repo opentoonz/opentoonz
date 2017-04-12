@@ -48,7 +48,7 @@ PathAnimation::PathAnimation(PathAnimations *animations,
 
 void PathAnimation::takeSnapshot(int atFrame) {
   updateChunks();
-  snapshotChunks(atFrame);
+  snapshotCurrentChunks(atFrame);
 }
 
 int PathAnimation::chunkCount() const { return m_params->getParamCount(); }
@@ -93,38 +93,49 @@ void PathAnimation::updateChunks() {
   m_lastChunks = chunks;
 }
 
+void PathAnimation::addChunk(const TThickQuadratic *chunk) {
+  map<const TThickQuadratic *, TParamSetP>::iterator found =
+    m_lastChunks.find(chunk);
+  if (found != m_lastChunks.end()) // already present
+    return;
+  TParamSetP param = new TParamSet();
+  m_lastChunks.insert(pair<const TThickQuadratic *, TParamSetP>(chunk, param));
+
+  m_params->addParam(param, "Chunk ?"); // reindex later
+  param->addParam(new TThickPointParam(chunk->getThickP0()), "point0");
+  param->addParam(new TThickPointParam(chunk->getThickP1()), "point1");
+  param->addParam(new TThickPointParam(chunk->getThickP2()), "point2");
+}
+
 // while activated: sets a keyframe at current frame to match current curve
 // while deactivated: updates the curve to match current state
-void PathAnimation::snapshotChunks(int frame) {
+void PathAnimation::snapshotCurrentChunks(int frame) {
   TStroke *stroke = m_strokeId.stroke();
 
   for (int i = 0; i < stroke->getChunkCount(); i++) {
     const TThickQuadratic *chunk = stroke->getChunk(i);
-    map<const TThickQuadratic *, TParamSetP>::iterator found =
-        m_lastChunks.find(chunk);
-    assert(found != m_lastChunks.end());
-
-    TParamSetP chunkParam = found->second;
-    for (int j = 0; j < 3; j++)
-      if (m_activated)
-        setThickPointKeyframe(chunkParam->getParam(j), chunk->getThickP(j), frame);
-      else
-        setThickPointInanimate(chunkParam->getParam(j), chunk->getThickP(j), frame);
+    snapshotChunk(chunk, frame);
   }
 }
 
-void PathAnimation::setThickPointKeyframe(TThickPointParamP thickPoint,
-                                          const TThickPoint &p,
-                                          int frame) {
-  if (!thickPoint) return;
-  thickPoint->setValue(frame, p);
+void PathAnimation::snapshotChunk(const TThickQuadratic *chunk, int frame) {
+  map<const TThickQuadratic *, TParamSetP>::iterator found =
+    m_lastChunks.find(chunk);
+  assert(found != m_lastChunks.end());
+
+  TParamSetP chunkParam = found->second;
+  for (int j = 0; j < 3; j++)
+    snapshotThickPoint(chunkParam->getParam(j), chunk->getThickP(j), frame);
 }
 
-void PathAnimation::setThickPointInanimate(TThickPointParamP thickPoint,
-                                           const TThickPoint &p,
-                                           int frame) {
-  if (!thickPoint) return;
-  thickPoint->setDefaultValue(p);
+void PathAnimation::snapshotThickPoint(TThickPointParamP param,
+                                       const TThickPoint &point,
+                                       int frame) {
+  if (!param) return;
+  if (m_activated)
+    param->setValue(frame, point);
+  else
+    param->setDefaultValue(point);
 }
 
 QString PathAnimation::name() const { return m_strokeId.name(); }
@@ -146,6 +157,16 @@ void PathAnimation::clearKeyframes() {
       pointParam->clearKeyframes();
     }
   }
+}
+
+set<double> PathAnimation::getKeyframes() const {
+  set<double> result;
+  if (!m_lastChunks.size())
+    return result;
+
+  TParamSetP anyParam = m_lastChunks.begin()->second;
+  anyParam->getKeyframes(result);
+  return result;
 }
 
 void PathAnimation::animate(int frame) const {

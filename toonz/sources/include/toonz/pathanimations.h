@@ -14,10 +14,14 @@
 
 #include <map>
 #include <memory>
+#include <set>
+#include <vector>
 
 using std::map;
 using std::pair;
 using std::shared_ptr;
+using std::set;
+using std::vector;
 
 #undef DVAPI
 #undef DVVAR
@@ -52,6 +56,13 @@ public:
   QString name() const;
 };
 
+//! Makes a snapshot of one kind or another
+class Snapshotter {
+public:
+  virtual void set(TThickPointParamP param, const TThickPoint &p) = 0;
+  virtual ~Snapshotter() { }
+};
+
 //! Keyframe data for a particular TStroke
 //! The stroke is represented by a TParamSet
 //! Its children are chunks; each chunk has a TParamSet
@@ -70,11 +81,17 @@ public:
   QString name() const;
 
   void takeSnapshot(int atFrame);
+  //! updates chunk count and array
   void updateChunks();
-  
+  //! add chunk to collection, only if not present yet
+  void addChunk(const TThickQuadratic *chunk);
+  //! remember position of specified chunk
+  void snapshotChunk(const TThickQuadratic *chunk, int frame);
+
   bool isActivated() const { return m_activated; }
   void toggleActivated();
   
+  set<double> getKeyframes() const;
   void clearKeyframes();
 
   int chunkCount() const;
@@ -85,9 +102,10 @@ public:
   void animate(int frame) const;
 
 private:
-  void snapshotChunks(int atFrame);
-  void setThickPointKeyframe(TThickPointParamP thickPoint, const TThickPoint &p, int frame);
-  void setThickPointInanimate(TThickPointParamP thickPoint, const TThickPoint &p, int frame);
+  //! updates chunk animation info
+  void snapshotCurrentChunks(int atFrame);
+  //! remember position of specified thick point
+  void snapshotThickPoint(TThickPointParamP param, const TThickPoint &point, int frame);
 };
 
 //!----------------------------------------------------------------------
