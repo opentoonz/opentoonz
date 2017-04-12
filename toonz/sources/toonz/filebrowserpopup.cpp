@@ -1269,6 +1269,15 @@ void LoadLevelPopup::updateBottomGUI() {
     // six letters of the scene name from the level name
     m_levelName->setText(getLevelNameWithoutSceneNumber(fp.getName()));
 
+    // If the option "Show "ABC" Appendix to the Frame Number in Xsheet Cell" is
+    // ON, frame numbers normally increment at interval of 10.
+    // Placing such level with "Auto" step option will cause unwanted
+    // spacing between frames in Xsheet. Setting the step to "1" can prevent
+    // such problem.
+    if (Preferences::instance()->isShowFrameNumberWithLettersEnabled() &&
+        m_stepCombo->currentIndex() == 0)
+      m_stepCombo->setCurrentIndex(1);
+
     m_arrangementFrame->setEnabled(true);
   }
   updatePosTo();

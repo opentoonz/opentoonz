@@ -174,6 +174,7 @@ private slots:
   void onUseNumpadForSwitchingStylesClicked(bool);
   void onUseArrowKeyToShiftCellSelectionClicked(int);
   void onInputCellsWithoutDoubleClickingClicked(int);
+  void onWatchFileSystemClicked(int);
 };
 
 //**********************************************************************************

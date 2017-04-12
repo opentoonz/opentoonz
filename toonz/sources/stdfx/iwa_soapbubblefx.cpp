@@ -67,6 +67,8 @@ Iwa_SoapBubbleFx::Iwa_SoapBubbleFx()
     , m_shape_aspect_ratio(1.0)
     , m_blur_radius(5.0)
     , m_blur_power(0.5)
+    , m_multi_source(false)
+    , m_mask_center(false)
     , m_normal_sample_distance(1)
     , m_noise_sub_depth(3)
     , m_noise_resolution_s(18.0)
@@ -85,6 +87,8 @@ Iwa_SoapBubbleFx::Iwa_SoapBubbleFx()
   bindParam(this, "shapeAspectRatio", m_shape_aspect_ratio);
   bindParam(this, "blurRadius", m_blur_radius);
   bindParam(this, "blurPower", m_blur_power);
+  bindParam(this, "multiSource", m_multi_source);
+  bindParam(this, "maskCenter", m_mask_center);
   bindParam(this, "normalSampleDistance", m_normal_sample_distance);
   bindParam(this, "noiseSubDepth", m_noise_sub_depth);
   bindParam(this, "noiseResolutionS", m_noise_resolution_s);
@@ -118,23 +122,37 @@ void Iwa_SoapBubbleFx::doCompute(TTile& tile, double frame,
 
   TDimensionI dim(tile.getRaster()->getLx(), tile.getRaster()->getLy());
   TRectD bBox(tile.m_pos, TPointD(dim.lx, dim.ly));
+  QList<TRasterGR8P> allocatedRasList;
 
   /* soap bubble color map */
   TRasterGR8P bubbleColor_ras(sizeof(float3) * 256 * 256, 1);
   bubbleColor_ras->lock();
+  allocatedRasList.append(bubbleColor_ras);
   float3* bubbleColor_p = (float3*)bubbleColor_ras->getRawData();
   calcBubbleMap(bubbleColor_p, frame, true);
+
+  if (checkCancelAndReleaseRaster(allocatedRasList, tile, settings)) return;
 
   /* depth map */
   TRasterGR8P depth_map_ras(sizeof(float) * dim.lx * dim.ly, 1);
   depth_map_ras->lock();
+  allocatedRasList.append(depth_map_ras);
   float* depth_map_p = (float*)depth_map_ras->getRawData();
+
+  /* alpha map */
+  TRasterGR8P alpha_map_ras(sizeof(float) * dim.lx * dim.ly, 1);
+  alpha_map_ras->lock();
+  allocatedRasList.append(alpha_map_ras);
+  float* alpha_map_p = (float*)alpha_map_ras->getRawData();
 
   /* if the depth image is connected, use it */
   if (m_depth.isConnected()) {
     TTile depth_tile;
     m_depth->allocateAndCompute(depth_tile, bBox.getP00(), dim,
                                 tile.getRaster(), frame, settings);
+
+    if (checkCancelAndReleaseRaster(allocatedRasList, tile, settings)) return;
+
     TRasterP depthRas = depth_tile.getRaster();
     depthRas->lock();
 
@@ -142,9 +160,11 @@ void Iwa_SoapBubbleFx::doCompute(TTile& tile, double frame,
     TRaster64P depthRas64 = (TRaster64P)depthRas;
     {
       if (depthRas32)
-        convertToBrightness<TRaster32P, TPixel32>(depthRas32, depth_map_p, dim);
+        convertToBrightness<TRaster32P, TPixel32>(depthRas32, depth_map_p,
+                                                  alpha_map_p, dim);
       else if (depthRas64)
-        convertToBrightness<TRaster64P, TPixel64>(depthRas64, depth_map_p, dim);
+        convertToBrightness<TRaster64P, TPixel64>(depthRas64, depth_map_p,
+                                                  alpha_map_p, dim);
     }
     depthRas->unlock();
   }
@@ -157,46 +177,60 @@ void Iwa_SoapBubbleFx::doCompute(TTile& tile, double frame,
       m_shape->allocateAndCompute(shape_tile, bBox.getP00(), dim, tmp, frame,
                                   settings);
     }
-    processShape(frame, shape_tile, depth_map_p, dim, settings);
+
+    if (checkCancelAndReleaseRaster(allocatedRasList, tile, settings)) return;
+
+    processShape(frame, shape_tile, depth_map_p, alpha_map_p, dim, settings);
   }
+
+  if (checkCancelAndReleaseRaster(allocatedRasList, tile, settings)) return;
 
   /* compute the thickness input and temporarily store to the tile */
   m_input->compute(tile, frame, settings);
 
+  if (checkCancelAndReleaseRaster(allocatedRasList, tile, settings)) return;
+
   TRasterGR8P thickness_map_ras(sizeof(float) * dim.lx * dim.ly, 1);
   thickness_map_ras->lock();
+  allocatedRasList.append(thickness_map_ras);
   float* thickness_map_p = (float*)thickness_map_ras->getRawData();
   TRasterP thicknessRas  = tile.getRaster();
   TRaster32P ras32       = (TRaster32P)thicknessRas;
   TRaster64P ras64       = (TRaster64P)thicknessRas;
   {
     if (ras32)
-      convertToBrightness<TRaster32P, TPixel32>(ras32, thickness_map_p, dim);
+      convertToBrightness<TRaster32P, TPixel32>(ras32, thickness_map_p, nullptr,
+                                                dim);
     else if (ras64)
-      convertToBrightness<TRaster64P, TPixel64>(ras64, thickness_map_p, dim);
+      convertToBrightness<TRaster64P, TPixel64>(ras64, thickness_map_p, nullptr,
+                                                dim);
   }
+
+  if (checkCancelAndReleaseRaster(allocatedRasList, tile, settings)) return;
 
   /* process noise */
   processNoise(thickness_map_p, depth_map_p, dim, frame, settings);
 
+  if (checkCancelAndReleaseRaster(allocatedRasList, tile, settings)) return;
+
   if (ras32)
     convertToRaster<TRaster32P, TPixel32>(ras32, thickness_map_p, depth_map_p,
-                                          dim, bubbleColor_p);
+                                          alpha_map_p, dim, bubbleColor_p);
   else if (ras64)
     convertToRaster<TRaster64P, TPixel64>(ras64, thickness_map_p, depth_map_p,
-                                          dim, bubbleColor_p);
+                                          alpha_map_p, dim, bubbleColor_p);
 
-  thickness_map_ras->unlock();
-  depth_map_ras->unlock();
-  bubbleColor_ras->unlock();
+  for (int i = 0; i < allocatedRasList.size(); i++)
+    allocatedRasList.at(i)->unlock();
 }
 
 //------------------------------------
 
 template <typename RASTER, typename PIXEL>
 void Iwa_SoapBubbleFx::convertToBrightness(const RASTER srcRas, float* dst,
-                                           TDimensionI dim) {
-  float* dst_p = dst;
+                                           float* alpha, TDimensionI dim) {
+  float* dst_p   = dst;
+  float* alpha_p = alpha;
   for (int j = 0; j < dim.ly; j++) {
     PIXEL* pix = srcRas->pixels(j);
     for (int i = 0; i < dim.lx; i++, dst_p++, pix++) {
@@ -205,6 +239,10 @@ void Iwa_SoapBubbleFx::convertToBrightness(const RASTER srcRas, float* dst,
       float b = (float)pix->b / (float)PIXEL::maxChannelValue;
       /* brightness */
       *dst_p = 0.298912f * r + 0.586611f * g + 0.114478f * b;
+      if (alpha) {
+        *alpha_p = (float)pix->m / (float)PIXEL::maxChannelValue;
+        alpha_p++;
+      }
     }
   }
 }
@@ -213,16 +251,20 @@ void Iwa_SoapBubbleFx::convertToBrightness(const RASTER srcRas, float* dst,
 
 template <typename RASTER, typename PIXEL>
 void Iwa_SoapBubbleFx::convertToRaster(const RASTER ras, float* thickness_map_p,
-                                       float* depth_map_p, TDimensionI dim,
-                                       float3* bubbleColor_p) {
+                                       float* depth_map_p, float* alpha_map_p,
+                                       TDimensionI dim, float3* bubbleColor_p) {
   float* depth_p     = depth_map_p;
   float* thickness_p = thickness_map_p;
+  float* alpha_p     = alpha_map_p;
   for (int j = 0; j < dim.ly; j++) {
     PIXEL* pix = ras->pixels(j);
-    for (int i = 0; i < dim.lx; i++, depth_p++, thickness_p++, pix++) {
-      float alpha = (float)pix->m / PIXEL::maxChannelValue;
-      if (alpha == 0.0f) /* no change for the transparent pixels */
+    for (int i = 0; i < dim.lx;
+         i++, depth_p++, thickness_p++, alpha_p++, pix++) {
+      float alpha = (*alpha_p) * (float)pix->m / (float)PIXEL::maxChannelValue;
+      if (alpha == 0.0f) { /* no change for the transparent pixels */
+        pix->m = (typename PIXEL::Channel)0;
         continue;
+      }
 
       float coordinate[2];
       coordinate[0] = 256.0f * std::min(1.0f, *depth_p);
@@ -265,15 +307,19 @@ void Iwa_SoapBubbleFx::convertToRaster(const RASTER ras, float* thickness_map_p,
           nColors[3] * interp_ratio[0] * interp_ratio[1];
 
       /* clamp */
-      float val = color.x * (float)PIXEL::maxChannelValue + 0.5f;
+      float val = alpha * (float)PIXEL::maxChannelValue + 0.5f;
+      pix->m = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
+                                             ? (float)PIXEL::maxChannelValue
+                                             : val);
+      val    = alpha * color.x * (float)PIXEL::maxChannelValue + 0.5f;
       pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
                                              ? (float)PIXEL::maxChannelValue
                                              : val);
-      val    = color.y * (float)PIXEL::maxChannelValue + 0.5f;
+      val    = alpha * color.y * (float)PIXEL::maxChannelValue + 0.5f;
       pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
                                              ? (float)PIXEL::maxChannelValue
                                              : val);
-      val    = color.z * (float)PIXEL::maxChannelValue + 0.5f;
+      val    = alpha * color.z * (float)PIXEL::maxChannelValue + 0.5f;
       pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
                                              ? (float)PIXEL::maxChannelValue
                                              : val);
@@ -284,15 +330,16 @@ void Iwa_SoapBubbleFx::convertToRaster(const RASTER ras, float* thickness_map_p,
 //------------------------------------
 
 void Iwa_SoapBubbleFx::processShape(double frame, TTile& shape_tile,
-                                    float* depth_map_p, TDimensionI dim,
+                                    float* depth_map_p, float* alpha_map_p,
+                                    TDimensionI dim,
                                     const TRenderSettings& settings) {
   TRaster32P shapeRas = shape_tile.getRaster();
   shapeRas->lock();
 
   /* binarize the shape image */
-  TRasterGR8P binarized_ras(sizeof(char) * dim.lx * dim.ly, 1);
+  TRasterGR8P binarized_ras(sizeof(USHORT) * dim.lx * dim.ly, 1);
   binarized_ras->lock();
-  char* binarized_p = (char*)binarized_ras->getRawData();
+  USHORT* binarized_p = (USHORT*)binarized_ras->getRawData();
 
   TRasterGR8P distance_ras(sizeof(float) * dim.lx * dim.ly, 1);
   distance_ras->lock();
@@ -300,11 +347,27 @@ void Iwa_SoapBubbleFx::processShape(double frame, TTile& shape_tile,
 
   float binarize_thres = (float)m_binarize_threshold->getValue(frame);
 
-  do_binarize(shapeRas, binarized_p, binarize_thres, distance_p, dim);
+  int regionCount = do_binarize(shapeRas, binarized_p, binarize_thres,
+                                distance_p, alpha_map_p, dim);
 
   shapeRas->unlock();
 
-  do_distance_transform(distance_p, dim, frame);
+  if (settings.m_isCanceled && *settings.m_isCanceled) {
+    binarized_ras->unlock();
+    distance_ras->unlock();
+    return;
+  }
+
+  do_distance_transform(distance_p, binarized_p, regionCount, dim, frame);
+
+  if (settings.m_isCanceled && *settings.m_isCanceled) {
+    binarized_ras->unlock();
+    distance_ras->unlock();
+    return;
+  }
+
+  if (m_mask_center->getValue())
+    applyDistanceToAlpha(distance_p, alpha_map_p, dim);
 
   /* create blur filter */
   float blur_radius = (float)m_blur_radius->getValue(frame) *
@@ -315,7 +378,7 @@ void Iwa_SoapBubbleFx::processShape(double frame, TTile& shape_tile,
     float power      = (float)m_blur_power->getValue(frame);
     float* tmp_depth = depth_map_p;
     float* tmp_dist  = distance_p;
-    char* bin_p      = binarized_p;
+    USHORT* bin_p    = binarized_p;
     for (int i = 0; i < dim.lx * dim.ly;
          i++, tmp_depth++, tmp_dist++, bin_p++) {
       if (*bin_p == 0)
@@ -336,9 +399,16 @@ void Iwa_SoapBubbleFx::processShape(double frame, TTile& shape_tile,
 
   do_createBlurFilter(blur_filter_p, blur_filter_size, blur_radius);
 
+  if (settings.m_isCanceled && *settings.m_isCanceled) {
+    blur_filter_ras->unlock();
+    binarized_ras->unlock();
+    distance_ras->unlock();
+    return;
+  }
+
   /* blur filtering, normarize & power */
   do_applyFilter(depth_map_p, dim, distance_p, binarized_p, blur_filter_p,
-                 blur_filter_size, frame);
+                 blur_filter_size, frame, settings);
 
   distance_ras->unlock();
   binarized_ras->unlock();
@@ -347,19 +417,77 @@ void Iwa_SoapBubbleFx::processShape(double frame, TTile& shape_tile,
 
 //------------------------------------
 
-void Iwa_SoapBubbleFx::do_binarize(TRaster32P srcRas, char* dst_p, float thres,
-                                   float* distance_p, TDimensionI dim) {
+int Iwa_SoapBubbleFx::do_binarize(TRaster32P srcRas, USHORT* dst_p, float thres,
+                                  float* distance_p, float* alpha_map_p,
+                                  TDimensionI dim) {
   TPixel32::Channel channelThres =
       (TPixel32::Channel)(thres * (float)TPixel32::maxChannelValue);
-  char* tmp_p     = dst_p;
+  USHORT* tmp_p   = dst_p;
   float* tmp_dist = distance_p;
+  float* alpha_p  = alpha_map_p;
   for (int j = 0; j < dim.ly; j++) {
     TPixel32* pix = srcRas->pixels(j);
-    for (int i = 0; i < dim.lx; i++, pix++, tmp_p++, tmp_dist++) {
+    for (int i = 0; i < dim.lx; i++, pix++, tmp_p++, tmp_dist++, alpha_p++) {
       (*tmp_p)    = (pix->m > channelThres) ? 1 : 0;
       (*tmp_dist) = (*tmp_p == 1) ? INF : 0.0f;
+      *alpha_p    = (float)pix->m / (float)TPixel32::maxChannelValue;
     }
   }
+
+  // label regions when multi bubble option is on
+  if (!m_multi_source->getValue()) return 1;
+
+  QList<int> lut;
+  for (int i      = 0; i < 65536; i++) lut.append(i);
+  tmp_p           = dst_p;
+  int regionCount = 0;
+  for (int j = 0; j < dim.ly; j++) {
+    for (int i = 0; i < dim.lx; i++, tmp_p++) {
+      if ((*tmp_p) == 1) {
+        int up   = (j == 0) ? 0 : *(tmp_p - dim.lx);
+        int left = (i == 0) ? 0 : *(tmp_p - 1);
+        assert(up >= 0 && left >= 0);
+        if (!up && !left) {
+          if (regionCount < 65535) regionCount++;
+          (*tmp_p) = regionCount;
+        } else if (up && !left)
+          (*tmp_p) = up;
+        else if (!up && left)
+          (*tmp_p) = left;
+        else if (up == left)
+          (*tmp_p) = up;
+        else if (up > left) {
+          (*tmp_p) = left;
+          lut[up]  = left;
+        } else {
+          (*tmp_p)  = up;
+          lut[left] = up;
+        }
+      }
+    }
+  }
+
+  // organize lut
+  QList<int> convIndex;
+  int currentIndex = 0;
+  for (int i = 0; i < 65536; i++) {
+    if (lut.at(i) == i) {
+      lut[i] = currentIndex;
+      currentIndex++;
+    } else
+      convIndex.append(i);
+  }
+  for (int i             = 0; i < convIndex.count(); i++)
+    lut[convIndex.at(i)] = lut.at(lut.at(convIndex.at(i)));
+
+  // apply lut
+  tmp_p = dst_p;
+  for (int j = 0; j < dim.ly; j++) {
+    for (int i = 0; i < dim.lx; i++, tmp_p++) {
+      (*tmp_p) = lut[*tmp_p];
+    }
+  }
+  return regionCount;
 }
 
 //------------------------------------
@@ -392,16 +520,17 @@ void Iwa_SoapBubbleFx::do_createBlurFilter(float* dst_p, int size,
 //------------------------------------
 
 void Iwa_SoapBubbleFx::do_applyFilter(float* depth_map_p, TDimensionI dim,
-                                      float* distance_p, char* binarized_p,
+                                      float* distance_p, USHORT* binarized_p,
                                       float* blur_filter_p,
-                                      int blur_filter_size, double frame) {
+                                      int blur_filter_size, double frame,
+                                      const TRenderSettings& settings) {
   float power = (float)m_blur_power->getValue(frame);
 
   memset(depth_map_p, 0, sizeof(float) * dim.lx * dim.ly);
 
   int fil_margin = (blur_filter_size - 1) / 2;
   float* dst_p   = depth_map_p;
-  char* bin_p    = binarized_p;
+  USHORT* bin_p  = binarized_p;
   for (int j = 0; j < dim.ly; j++) {
     for (int i = 0; i < dim.lx; i++, dst_p++, bin_p++) {
       if (*bin_p == 0) continue;
@@ -421,6 +550,7 @@ void Iwa_SoapBubbleFx::do_applyFilter(float* depth_map_p, TDimensionI dim,
       /* power the value */
       *dst_p = 1.0f - std::pow(*dst_p, power);
     }
+    if (settings.m_isCanceled && *settings.m_isCanceled) return;
   }
 }
 
@@ -662,13 +792,15 @@ void Iwa_SoapBubbleFx::add_noise(float* thickness_map_p, float* depth_map_p,
 }
 //------------------------------------
 
-void Iwa_SoapBubbleFx::do_distance_transform(float* dst_p, TDimensionI dim,
+void Iwa_SoapBubbleFx::do_distance_transform(float* dst_p, USHORT* binarized_p,
+                                             int regionCount, TDimensionI dim,
                                              double frame) {
   float ar = (float)m_shape_aspect_ratio->getValue(frame);
 
   float* f = new float[std::max(dim.lx, dim.ly)];
 
-  float max_val = 0.0f;
+  QList<float> max_val;
+  for (int r = 0; r <= regionCount; r++) max_val.append(0.0f);
 
   float* tmp_dst = dst_p;
   /* transform along rows */
@@ -694,19 +826,45 @@ void Iwa_SoapBubbleFx::do_distance_transform(float* dst_p, TDimensionI dim,
         dt(f, dim.ly,
            ar); /* ar : taking account of the aspect ratio of the shape */
     for (int j = 0; j < dim.ly; j++) {
-      dst_p[j * dim.lx + i]       = d[j];
-      if (d[j] > max_val) max_val = d[j];
+      dst_p[j * dim.lx + i] = d[j];
+      int regionId          = binarized_p[j * dim.lx + i];
+      if (d[j] > max_val[regionId]) max_val[regionId] = d[j];
     }
     delete[] d;
   }
 
   tmp_dst = dst_p;
-  max_val = std::sqrt(max_val);
+  for (int r = 0; r <= regionCount; r++) max_val[r] = std::sqrt(max_val[r]);
 
   /* square root and normalize */
-  for (int i = 0; i < dim.lx * dim.ly; i++, *tmp_dst++) {
-    *tmp_dst = std::sqrt(*tmp_dst) / max_val;
+  USHORT* region_p = binarized_p;
+  for (int i = 0; i < dim.lx * dim.ly; i++, *tmp_dst++, region_p++) {
+    if (max_val[*region_p] > 0)
+      *tmp_dst = std::sqrt(*tmp_dst) / max_val[*region_p];
   }
+}
+//------------------------------------
+
+bool Iwa_SoapBubbleFx::checkCancelAndReleaseRaster(
+    const QList<TRasterGR8P>& allocatedRasList, TTile& tile,
+    const TRenderSettings& settings) {
+  if (settings.m_isCanceled && *settings.m_isCanceled) {
+    for (int i = 0; i < allocatedRasList.size(); i++)
+      allocatedRasList.at(i)->unlock();
+    tile.getRaster()->clear();
+    return true;
+  } else
+    return false;
+}
+//------------------------------------
+
+void Iwa_SoapBubbleFx::applyDistanceToAlpha(float* distance_p,
+                                            float* alpha_map_p,
+                                            TDimensionI dim) {
+  float* d_p = distance_p;
+  float* a_p = alpha_map_p;
+  for (int i = 0; i < dim.lx * dim.ly; i++, d_p++, a_p++)
+    (*a_p) *= 1.0f - (*d_p);
 }
 
 //==============================================================================

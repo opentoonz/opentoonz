@@ -17,6 +17,8 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
+#include "tapp.h"
+#include "toonz/tscenehandle.h"
 
 #include <QPainter>
 #include <QPixmap>
@@ -46,6 +48,50 @@ QStringList getLevelFileNames(TFilePath path) {
   return list.filter(regExp);
 }
 }  // namespace
+
+//=============================================================================
+// MyFileSystemWatcher
+//-----------------------------------------------------------------------------
+
+MyFileSystemWatcher::MyFileSystemWatcher() {
+  m_watcher = new QFileSystemWatcher(this);
+
+  bool ret = connect(m_watcher, SIGNAL(directoryChanged(const QString &)), this,
+                     SIGNAL(directoryChanged(const QString &)));
+  assert(ret);
+}
+
+void MyFileSystemWatcher::addPaths(const QStringList &paths, bool onlyNewPath) {
+  if (paths.isEmpty()) return;
+  if (onlyNewPath) {
+    for (int p = 0; p < paths.size(); p++) {
+      QString path = paths.at(p);
+      if (!m_watchedPath.contains(path)) {
+        m_watchedPath.append(path);
+        m_watcher->addPath(path);
+      }
+    }
+  } else {
+    m_watchedPath.append(paths);
+    m_watcher->addPaths(paths);
+  }
+}
+
+void MyFileSystemWatcher::removePaths(const QStringList &paths) {
+  if (m_watchedPath.isEmpty() || paths.isEmpty()) return;
+  for (int p = 0; p < paths.size(); p++) {
+    QString path = paths.at(p);
+    bool ret     = m_watchedPath.removeOne(path);
+    assert(ret);
+    if (!m_watchedPath.contains(path)) m_watcher->removePath(path);
+  }
+}
+
+void MyFileSystemWatcher::removeAllPaths() {
+  if (m_watchedPath.isEmpty()) return;
+  m_watcher->removePaths(m_watcher->directories());
+  m_watchedPath.clear();
+}
 
 //=============================================================================
 // DvDirTreeViewDelegate
@@ -289,30 +335,37 @@ DvDirTreeView::DvDirTreeView(QWidget *parent)
   setIndentation(14);
   setAlternatingRowColors(true);
 
-  m_dirFileSystemWatcher = new QFileSystemWatcher(this);
-
   // Connect all possible changes that can alter the
   // bottom horizontal scrollbar to resize contents...
-  connect(this, SIGNAL(expanded(const QModelIndex &)), this,
-          SLOT(resizeToConts()));
+  bool ret = true;
+  ret      = ret && connect(this, SIGNAL(expanded(const QModelIndex &)), this,
+                       SLOT(resizeToConts()));
 
-  connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
-          SLOT(resizeToConts()));
+  ret = ret && connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
+                       SLOT(resizeToConts()));
 
-  connect(this->model(), SIGNAL(layoutChanged()), this, SLOT(resizeToConts()));
+  ret = ret && connect(this->model(), SIGNAL(layoutChanged()), this,
+                       SLOT(resizeToConts()));
 
-  connect(this, SIGNAL(expanded(const QModelIndex &)), this,
-          SLOT(onExpanded(const QModelIndex &)));
+  if (Preferences::instance()->isWatchFileSystemEnabled()) {
+    ret = ret && connect(this, SIGNAL(expanded(const QModelIndex &)), this,
+                         SLOT(onExpanded(const QModelIndex &)));
 
-  connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
-          SLOT(onCollapsed(const QModelIndex &)));
+    ret = ret && connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
+                         SLOT(onCollapsed(const QModelIndex &)));
+    addPathsToWatcher();
+  }
+  ret = ret && connect(MyFileSystemWatcher::instance(),
+                       SIGNAL(directoryChanged(const QString &)), this,
+                       SLOT(onMonitoredDirectoryChanged(const QString &)));
 
-  connect(m_dirFileSystemWatcher, SIGNAL(directoryChanged(const QString &)),
-          this, SLOT(onMonitoredDirectoryChanged(const QString &)));
+  ret = ret && connect(TApp::instance()->getCurrentScene(),
+                       SIGNAL(preferenceChanged(const QString &)), this,
+                       SLOT(onPreferenceChanged(const QString &)));
+
+  assert(ret);
 
   setAcceptDrops(true);
-
-  updateWatcher();
 }
 
 //-----------------------------------------------------------------------------
@@ -404,6 +457,13 @@ void DvDirTreeView::contextMenuEvent(QContextMenuEvent *e) {
   DvDirModelNode *node = DvDirModel::instance()->getNode(index);
   if (!node) return;
 
+  QMenu menu(this);
+
+  if (!Preferences::instance()->isWatchFileSystemEnabled()) {
+    QAction *refresh = CommandManager::instance()->getAction("MI_RefreshTree");
+    menu.addAction(refresh);
+  }
+
   DvDirVersionControlNode *vcNode =
       dynamic_cast<DvDirVersionControlNode *>(node);
   if (vcNode) {
@@ -412,7 +472,6 @@ void DvDirTreeView::contextMenuEvent(QContextMenuEvent *e) {
     std::string pathType = path.getType();
     DvDirVersionControlProjectNode *vcProjectNode =
         dynamic_cast<DvDirVersionControlProjectNode *>(node);
-    QMenu menu(this);
     QAction *action;
     if (vcNode->isUnderVersionControl()) {
       if (vcProjectNode || (fileExists && pathType == "tnz")) {
@@ -480,9 +539,9 @@ void DvDirTreeView::contextMenuEvent(QContextMenuEvent *e) {
                 SLOT(purgeCurrentVersionControlNode()));
       }
     }
-
-    menu.exec(e->globalPos());
   }
+
+  if (!menu.isEmpty()) menu.exec(e->globalPos());
 }
 
 //-----------------------------------------------------------------------------
@@ -1542,14 +1601,10 @@ DvItemListModel::Status DvDirTreeView::getItemVersionControlStatus(
 
 /*- Refresh monitoring paths according to expand/shrink state of the folder tree
  * -*/
-void DvDirTreeView::updateWatcher() {
-  if (!m_dirFileSystemWatcher->directories().isEmpty())
-    m_dirFileSystemWatcher->removePaths(m_dirFileSystemWatcher->directories());
-
+void DvDirTreeView::addPathsToWatcher() {
   QStringList paths;
   getExpandedPathsRecursive(rootIndex(), paths);
-
-  m_dirFileSystemWatcher->addPaths(paths);
+  if (!paths.isEmpty()) MyFileSystemWatcher::instance()->addPaths(paths);
 }
 
 void DvDirTreeView::getExpandedPathsRecursive(const QModelIndex &index,
@@ -1576,7 +1631,8 @@ void DvDirTreeView::getExpandedPathsRecursive(const QModelIndex &index,
 void DvDirTreeView::onExpanded(const QModelIndex &index) {
   QStringList paths;
   getExpandedPathsRecursive(index, paths);
-  m_dirFileSystemWatcher->addPaths(paths);
+  paths.removeFirst();
+  MyFileSystemWatcher::instance()->addPaths(paths);
 }
 
 void DvDirTreeView::onCollapsed(const QModelIndex &index) {
@@ -1586,7 +1642,7 @@ void DvDirTreeView::onCollapsed(const QModelIndex &index) {
     QModelIndex child = DvDirModel::instance()->index(r, 0, index);
     getExpandedPathsRecursive(child, paths);
   }
-  m_dirFileSystemWatcher->removePaths(paths);
+  MyFileSystemWatcher::instance()->removePaths(paths);
 }
 
 void DvDirTreeView::onMonitoredDirectoryChanged(const QString &dirPath) {
@@ -1604,9 +1660,30 @@ void DvDirTreeView::onMonitoredDirectoryChanged(const QString &dirPath) {
         dynamic_cast<DvDirModelFileFolderNode *>(node->getChild(c));
     if (childNode) paths.append(toQString(childNode->getPath()));
   }
-  /*- if there are paths which are already being monitored, they will be
-   * ignored. -*/
-  m_dirFileSystemWatcher->addPaths(paths);
+  MyFileSystemWatcher::instance()->addPaths(paths, true);
+}
+
+// on preference changed, update file browser's behavior
+void DvDirTreeView::onPreferenceChanged(const QString &prefName) {
+  // react only when the related preference is changed
+  if (prefName != "WatchFileSystem") return;
+  bool ret = true;
+  if (Preferences::instance()->isWatchFileSystemEnabled()) {
+    ret = ret && connect(this, SIGNAL(expanded(const QModelIndex &)), this,
+                         SLOT(onExpanded(const QModelIndex &)));
+
+    ret = ret && connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
+                         SLOT(onCollapsed(const QModelIndex &)));
+    addPathsToWatcher();
+  } else {
+    ret = ret && disconnect(this, SIGNAL(expanded(const QModelIndex &)), this,
+                            SLOT(onExpanded(const QModelIndex &)));
+    ret = ret && disconnect(this, SIGNAL(collapsed(const QModelIndex &)), this,
+                            SLOT(onCollapsed(const QModelIndex &)));
+
+    MyFileSystemWatcher::instance()->removeAllPaths();
+  }
+  assert(ret);
 }
 
 //=============================================================================

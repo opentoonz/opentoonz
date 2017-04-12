@@ -72,6 +72,7 @@ set(HEADERS
     iwa_fresnel.h
     iwa_pnperspectivefx.h
     iwa_soapbubblefx.h
+	iwa_bokehfx.h
 )
 
 set(SOURCES
@@ -246,6 +247,9 @@ set(SOURCES
     iwa_noise1234.cpp
     iwa_pnperspectivefx.cpp
     iwa_soapbubblefx.cpp
+	${SDKROOT}/kiss_fft130/kiss_fft.c
+	${SDKROOT}/kiss_fft130/tools/kiss_fftnd.c
+	iwa_bokehfx.cpp
 )
 
 set(OBJCSOURCES
@@ -275,6 +279,10 @@ else()
         ${SDKROOT}/glew/glew-1.9.0/include
     )
 endif()
+
+include_directories(
+    ${SDKROOT}/kiss_fft130
+)
 
 _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
 

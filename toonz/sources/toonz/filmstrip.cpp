@@ -875,7 +875,7 @@ void FilmstripFrames::keyPressEvent(QKeyEvent *event) {
     return;
 
   m_selection->selectNone();
-  m_selection->select(fh->getFid());
+  if (getLevel()) m_selection->select(fh->getFid());
   int index = fid2index(fh->getFid());
   if (index >= 0) exponeFrame(index);
 }

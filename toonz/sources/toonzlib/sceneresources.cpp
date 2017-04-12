@@ -14,6 +14,8 @@
 #include "toonz/preferences.h"
 #include "tpalette.h"
 
+#include "tmsgcore.h"
+
 #include "tconvert.h"
 #include "tlogger.h"
 #include "tsystem.h"
@@ -429,7 +431,8 @@ void SceneSound::save() {
       TSystem::copyFile(actualFp, m_oldActualPath);
     }
   } catch (...) {
-    TLogger::error() << "Can't save " << actualFp;
+    DVGui::warning(QObject::tr("Can't save") +
+                   QString::fromStdWString(L": " + actualFp.getLevelNameW()));
   }
 }
 
@@ -537,9 +540,13 @@ ResourceImporter::ResourceImporter(ToonzScene *scene, TProject *dstProject,
     , m_dstScene(new ToonzScene())
     , m_importStrategy(importStrategy) {
   m_dstScene->setProject(dstProject);
-  TFilePath newFp =
-      dstProject->getScenesPath() +
-      (scene->getScenePath() - scene->getProject()->getScenesPath());
+  // scene file may not be in the "+scenes" path for the sandbox project.
+  // in such case, try to save as "+scenes/filename.tnz" on import.
+  TFilePath relativeScenePath =
+      scene->getScenePath() - scene->getProject()->getScenesPath();
+  if (relativeScenePath.isAbsolute())
+    relativeScenePath = scene->getScenePath().withoutParentDir();
+  TFilePath newFp     = dstProject->getScenesPath() + relativeScenePath;
   makeUnique(newFp);
   m_dstScene->setScenePath(newFp);
 }

@@ -460,7 +460,7 @@ SchematicViewer::SchematicViewer(QWidget *parent)
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(1);
+  mainLayout->setMargin(0);
   mainLayout->setSpacing(0);
   {
     mainLayout->addWidget(m_viewer, 1);

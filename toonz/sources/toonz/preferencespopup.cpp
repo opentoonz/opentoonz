@@ -1000,6 +1000,15 @@ void PreferencesPopup::onInputCellsWithoutDoubleClickingClicked(int on) {
   m_pref->enableInputCellsWithoutDoubleClicking(on);
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onWatchFileSystemClicked(int on) {
+  m_pref->enableWatchFileSystem(on);
+  // emit signal to update behavior of the File browser
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "WatchFileSystem");
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1045,6 +1054,8 @@ PreferencesPopup::PreferencesPopup()
   m_chunkSizeFld =
       new DVGui::IntLineEdit(this, m_pref->getDefaultTaskChunkSize(), 1, 2000);
   CheckBox *sceneNumberingCB = new CheckBox(tr("Show Info in Rendered Frames"));
+  CheckBox *watchFileSystemCB = new CheckBox(
+      tr("Watch File System and Update File Browser Automatically"), this);
 
   m_projectRootDocuments = new CheckBox(tr("My Documents/OpenToonz*"), this);
   m_projectRootDesktop   = new CheckBox(tr("Desktop/OpenToonz*"), this);
@@ -1268,6 +1279,7 @@ PreferencesPopup::PreferencesPopup()
   m_cellsDragBehaviour->setCurrentIndex(m_pref->getDragCellsBehaviour());
   m_levelsBackup->setChecked(m_pref->isLevelsBackupEnabled());
   sceneNumberingCB->setChecked(m_pref->isSceneNumberingEnabled());
+  watchFileSystemCB->setChecked(m_pref->isWatchFileSystemEnabled());
 
   m_customProjectRootFileField->setPath(m_pref->getCustomProjectRoot());
 
@@ -1567,6 +1579,9 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(sceneNumberingCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      generalFrameLay->addWidget(watchFileSystemCB, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
+
       QGroupBox *projectGroupBox =
           new QGroupBox(tr("Additional Project Locations"), this);
       QGridLayout *projectRootLay = new QGridLayout();
@@ -2090,6 +2105,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onLevelsBackupChanged(int)));
   ret = ret && connect(sceneNumberingCB, SIGNAL(stateChanged(int)),
                        SLOT(onSceneNumberingChanged(int)));
+  ret = ret && connect(watchFileSystemCB, SIGNAL(stateChanged(int)),
+                       SLOT(onWatchFileSystemClicked(int)));
   ret = ret && connect(m_chunkSizeFld, SIGNAL(editingFinished()), this,
                        SLOT(onChunkSizeChanged()));
   ret = ret && connect(m_customProjectRootFileField, SIGNAL(pathChanged()),

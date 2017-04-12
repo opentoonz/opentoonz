@@ -26,3 +26,9 @@ Release/
 Release Library/
 ipch/
 .idea
+
+# qtcreator files
+*.config
+*.creator
+*.files
+*.includes
