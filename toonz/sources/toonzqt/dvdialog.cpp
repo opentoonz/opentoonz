@@ -766,12 +766,7 @@ MessageAndCheckboxDialog::MessageAndCheckboxDialog(QWidget *parent,
 
 //=============================================================================
 
-void MessageAndCheckboxDialog::onButtonPressed(int id) {
-  if (m_checked > 0) {
-    done(id + 5);
-  } else
-    done(id);
-}
+void MessageAndCheckboxDialog::onButtonPressed(int id) { done(id); }
 
 //=============================================================================
 
@@ -785,7 +780,7 @@ RadioButtonDialog::RadioButtonDialog(const QString &labelText,
                                      const QList<QString> &radioButtonList,
                                      QWidget *parent, Qt::WindowFlags f)
     : Dialog(parent, true, true), m_result(1) {
-  setWindowTitle(tr("Toonz"));
+  setWindowTitle(tr("OpenToonz"));
 
   setMinimumSize(20, 20);
 
@@ -1230,10 +1225,9 @@ Dialog *DVGui::createMsgBox(MsgType type, const QString &text,
 
 //-----------------------------------------------------------------------------
 
-Dialog *DVGui::createMsgandCheckbox(MsgType type, const QString &text,
-                                    const QString &checkBoxText,
-                                    const QStringList &buttons,
-                                    int defaultButtonIndex, QWidget *parent) {
+MessageAndCheckboxDialog *DVGui::createMsgandCheckbox(
+    MsgType type, const QString &text, const QString &checkBoxText,
+    const QStringList &buttons, int defaultButtonIndex, QWidget *parent) {
   MessageAndCheckboxDialog *dialog = new MessageAndCheckboxDialog(parent, true);
   dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
   dialog->setAlignment(Qt::AlignLeft);

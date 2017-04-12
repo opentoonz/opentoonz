@@ -154,27 +154,23 @@ public:
       QStringList buttons;
       buttons << QObject::tr("Import") << QObject::tr("Load")
               << QObject::tr("Cancel");
-
-      DVGui::Dialog *importDialog = DVGui::createMsgandCheckbox(
-          DVGui::QUESTION, label, checkBoxLabel, buttons, 0);
-      int ret = importDialog->exec();
-
+      DVGui::MessageAndCheckboxDialog *importDialog =
+          DVGui::createMsgandCheckbox(DVGui::QUESTION, label, checkBoxLabel,
+                                      buttons, 0);
+      int ret     = importDialog->exec();
+      int checked = importDialog->getChecked();
       importDialog->deleteLater();
 
-      if (ret == 0 || ret == 3 || ret == 5 || ret == 8) {
+      if (ret == 0 || ret == 3) {
         m_aborted = true;
         return A_CANCEL;
       }
-      if (ret >= 5) {
-        if (ret == 6) {
-          Preferences::instance()->setDefaultImportPolicy(1);
-          TApp::instance()->getCurrentScene()->notifyImportPolicyChanged(1);
-        } else if (ret == 7) {
-          Preferences::instance()->setDefaultImportPolicy(2);
-          TApp::instance()->getCurrentScene()->notifyImportPolicyChanged(2);
-        }
-
-        ret = ret - 5;
+      if (ret == 1 && checked > 0) {
+        Preferences::instance()->setDefaultImportPolicy(1);
+        TApp::instance()->getCurrentScene()->notifyImportPolicyChanged(1);
+      } else if (ret == 2 && checked > 0) {
+        Preferences::instance()->setDefaultImportPolicy(2);
+        TApp::instance()->getCurrentScene()->notifyImportPolicyChanged(2);
       }
       m_importEnabled = (ret == 1);
       return ret == 1 ? A_IMPORT : A_LOAD;
