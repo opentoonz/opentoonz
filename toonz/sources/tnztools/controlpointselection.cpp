@@ -170,11 +170,11 @@ vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
     nextIndex < e->getControlPointCount() && e->isSpeedInLinear(nextIndex);
 
   TThickPoint a[5];
-  a[0] = toRemove(0)->getP0();
-  a[1] = toRemove(0)->getP1();
-  a[2] = toRemove(1)->getP0();
-  a[3] = toRemove(1)->getP1();
-  a[4] = toRemove(1)->getP2();
+  a[0] = toRemove(0)->getThickP0();
+  a[1] = toRemove(0)->getThickP1();
+  a[2] = toRemove(1)->getThickP0();
+  a[3] = toRemove(1)->getThickP1();
+  a[4] = toRemove(1)->getThickP2();
   // double dist2 = tdistance2(pos, TPointD(a[2]));
   double dist2 = 0;
   TThickPoint d[7];
