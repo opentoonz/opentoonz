@@ -382,9 +382,13 @@ public:
 };
 
 //==============================================================================
+
+#if !defined(_MSC_VER) || defined(TSOUND_EXPORTS)
 template <class T>
 TSoundTrackP TSoundTrackT<T>::apply(TSoundTransform *transform) {
   assert(transform);
   return transform->compute(*this);
 }
+#endif
+
 #endif
