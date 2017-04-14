@@ -9,8 +9,6 @@ extern "C" {
 /*
 #if defined(_WIN32)
 typedef struct {unsigned char b,g,r,m;}  LPIXEL;
-#elif defined(__sgi)
-typedef struct { unsigned char  m,b,g,r; } LPIXEL;
 #elif defined (LINUX)
 typedef struct { unsigned char  r,g,b,m; } LPIXEL;
 #else

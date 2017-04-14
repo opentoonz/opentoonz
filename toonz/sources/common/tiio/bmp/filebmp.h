@@ -6,17 +6,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
-#if defined(_WIN32)
-typedef struct {unsigned char b,g,r,m;}  LPIXEL;
-#elif defined(__sgi)
-typedef struct { unsigned char  m,b,g,r; } LPIXEL;
-#elif defined (LINUX)
-typedef struct { unsigned char  r,g,b,m; } LPIXEL;
-#else
-#error	Not yet implemented
-#endif
-*/
+
 enum BMP_ERROR_CODE {
   OK,
   UNSUPPORTED_BMP_FORMAT = -1,

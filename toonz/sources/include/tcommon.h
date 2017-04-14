@@ -38,26 +38,6 @@ typedef std::wstring TString;
 
 // STL
 
-/*
- * On  Irix stl_alloc.h refers to nanosleep and timespec
- */
-
-#ifdef __sgi
-/*
-#if (_MIPS_SZLONG == 32)
-struct timespec {TLong tv_sec; TLong tv_nsec;};
-#else
-struct timespec {int tv_sec; TLong tv_nsec;};
-#endif
-
-#ifdef __cplusplus
-extern "C"
-#endif
-int nanosleep(struct timespec *, int);
-*/
-
-#endif
-
 #include <list>
 #include <vector>
 #include <map>

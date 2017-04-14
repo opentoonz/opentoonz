@@ -5,17 +5,6 @@
 //////////////////////////////////////////////////////////////////////
 #ifdef _WIN32
 #include "Windows.h"
-#else
-#ifdef __sgi
-
-#include <time.h>
-typedef struct timespec {
-  time_t tv_sec; /* seconds */
-  long tv_nsec;  /* and nanoseconds */
-} timespec_t;
-int nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
-
-#endif
 #endif
 
 #include <vector>

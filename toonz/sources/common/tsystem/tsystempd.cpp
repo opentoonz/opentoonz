@@ -81,22 +81,6 @@
 
 #endif
 
-#ifdef __sgi
-#define PLATFORM SGI
-#include <sys/param.h>
-#include <unistd.h>
-#include <grp.h>
-#include <sys/dir.h>  // dirent.h
-#include <sys/utime.h>
-#include <sys/swap.h>
-#include <sys/statfs.h>
-#include <pwd.h>
-#include <mntent.h>
-
-#include <dlfcn.h>
-
-#endif
-
 #ifndef PLATFORM
 PLATFORM_NOT_SUPPORTED
 #endif
@@ -208,31 +192,6 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
   else
     return buff.ullAvailPageFile >> 10;
 
-#elif defined(__sgi)
-
-  // check for virtual memory
-  int numberOfResources =
-      swapctl(SC_GETNSWP, 0); /* get number of swapping resources configued */
-
-  if (numberOfResources == 0) return 0;
-
-  // avrei voluto fare: struct swaptable *table = new struct swaptable[...]
-  struct swaptable *table = (struct swaptable *)calloc(
-      1, sizeof(struct swapent) * numberOfResources + sizeof(int));
-
-  table->swt_n = numberOfResources;
-  swapctl(SC_LIST, table); /* list all the swapping resources */
-
-  TINT64 virtualFree  = 0;
-  TINT64 physicalFree = 0;
-
-  for (int i = 0; i < table->swt_n; i++) {
-    virtualFree += table->swt_ent[i].ste_free;
-  }
-
-  free(table);
-  totalFree = virtualFree << 4 + physicalFree;
-
 #elif defined(LINUX)
 
   struct sysinfo *sysInfo = (struct sysinfo *)calloc(1, sizeof(struct sysinfo));
@@ -281,11 +240,7 @@ TINT64 TSystem::getDiskSize(const TFilePath &diskName) {
   }
 #ifndef _WIN32
   struct statfs buf;
-#ifdef __sgi
-  statfs(::to_string(diskName).c_str(), &buf, sizeof(struct statfs), 0);
-#else
   statfs(::to_string(diskName).c_str(), &buf);
-#endif
   size = (TINT64)((buf.f_blocks * buf.f_bsize) >> 10);
 #else
   DWORD sectorsPerCluster;     // sectors per cluster
@@ -318,11 +273,7 @@ TINT64 TSystem::getFreeDiskSize(const TFilePath &diskName) {
   }
 #ifndef _WIN32
   struct statfs buf;
-#ifdef __sgi
-  statfs(diskName.getWideString().c_str(), &buf, sizeof(struct statfs), 0);
-#else
   statfs(::to_string(diskName).c_str(), &buf);
-#endif
   size = (TINT64)(buf.f_bfree * buf.f_bsize) >> 10;
 #else
   DWORD sectorsPerCluster;     // sectors per cluster
@@ -357,14 +308,6 @@ TINT64 TSystem::getMemorySize(bool onlyPhisicalMemory) {
   else
     return buff.dwTotalPageFile >> 10;
 
-#elif defined(__sgi)
-
-  int physicalMemory;
-
-  if (swapctl(SC_GETSWAPMAX, &physicalMemory))
-    return ((size_t)0);
-  else
-    return logSwapLibero >> 1;
 #elif defined(LINUX)
 
   struct sysinfo *sysInfo = (struct sysinfo *)calloc(1, sizeof(struct sysinfo));
@@ -549,11 +492,6 @@ TString TSystemException::getMessage() const {
     msg =
         L": Path points to a remote machine and the link to that machine is no "
         L"longer active.";
-    break;
-#endif
-#if defined(__sgi)
-  case EDIRCORRUPTED:
-    msg = L": The directory is corrupted on disk.";
     break;
 #endif
   case EOVERFLOW:

@@ -34,7 +34,7 @@ TNZ_LITTLE_ENDIAN undefined !!
     typedef struct LPIXEL {
 #ifdef _WIN32
   unsigned char b, g, r, m;
-#elif defined(__sgi)
+#elif !TNZ_LITTLE_ENDIAN
   unsigned char m, b, g, r;
 #elif defined(LINUX)
   unsigned char r, g, b, m;
@@ -48,7 +48,7 @@ TNZ_LITTLE_ENDIAN undefined !!
 typedef struct SPIXEL {
 #ifdef _WIN32
   unsigned short b, g, r, m;
-#elif defined(__sgi)
+#elif !TNZ_LITTLE_ENDIAN
   unsigned short m, b, g, r;
 #elif defined(LINUX)
   unsigned short r, g, b, m;

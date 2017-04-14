@@ -157,13 +157,8 @@ bool TThreadImp::setThreadPriority(TThread::TThreadPriority) {
 
 bool TThreadImp::setPreferredProcessor(int processorId) {
 #ifdef __sgi
-#if (OP_RELEASE == rel_2)
-  assert(!"Not implemented");
-  return false;
-#else
   int rc = pthread_setrunon_np(processorId);
   return (rc != -1);
-#endif
 #else
   assert(0);
   return false;

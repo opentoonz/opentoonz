@@ -187,38 +187,6 @@ Uint32 ElapsedTimeCB(Uint32 interval, void *param) {
 }
 }
 
-#elif defined(__sgi)
-class TTimer::Imp {
-public:
-  Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer)
-      : m_action(0) {}
-  ~Imp() {}
-
-  void start(UINT delay) {
-    if (m_started) throw TException("The timer is already started");
-
-    m_started = true;
-  }
-
-  void stop() { m_started = false; }
-
-  std::string getName() { return m_name; }
-  TUINT64 getTicks() { return m_ticks; }
-  UINT getDelay() { return m_delay; }
-
-  std::string m_name;
-
-  UINT m_timerRes;
-  UINT m_type;
-  TTimer *m_timer;
-
-  UINT m_timerID;
-  UINT m_delay;
-  TUINT64 m_ticks;
-  bool m_started;
-
-  TGenericTimerAction *m_action;
-};
 #elif defined(MACOSX)
 class TTimer::Imp {
 public:

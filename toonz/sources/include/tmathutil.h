@@ -8,11 +8,7 @@
 
 #include <numeric>
 
-#ifndef __sgi
 #include <cmath>
-#else
-#include <math.h>
-#endif
 
 #undef DVAPI
 #undef DVVAR

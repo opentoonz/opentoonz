@@ -33,11 +33,7 @@
 #include <map>
 using namespace std;
 
-#ifdef __sgi
-#define TERMINAL "xwsh"
-#else
 #define TERMINAL "xterm"
-#endif
 
 using namespace TwConsts;
 

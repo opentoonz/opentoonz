@@ -179,7 +179,7 @@ switch (RandomFloatType)
   }
 return -1;
 */
-#ifndef __sgi
+#if TNZ_LITTLE_ENDIAN
   *retH = high;
   *retH &= 0x007fffff;
   *retH |= 0x3ff00000;

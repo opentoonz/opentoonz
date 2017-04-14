@@ -49,22 +49,6 @@ char *tempnam(const char *, const char *);
 
 #endif
 
-#ifdef __sgi
-#define PLATFORM SGI
-#include <sys/param.h>
-#include <unistd.h>
-#include <grp.h>
-#include <sys/dir.h>  // dirent.h
-#include <sys/utime.h>
-#include <sys/swap.h>
-#include <sys/statfs.h>
-#include <pwd.h>
-#include <mntent.h>
-
-#include <dlfcn.h>
-
-#endif
-
 #ifndef PLATFORM
 PLATFORM_NOT_SUPPORTED
 #endif
@@ -135,19 +119,11 @@ const unsigned short TFileStatus::OtherExecutable    = S_IXOTH;
 #define UTIME utime
 #define FTIME ftime
 
-#ifdef __sgi
-const int TSystem::MaxFNameLen                       = MAXNAMELEN;
-const unsigned short TFileStatus::UserReadable       = S_IREAD;
-const unsigned short TFileStatus::UserWritable       = S_IWRITE;
-const unsigned short TFileStatus::UserExecutable     = S_IEXEC;
-const unsigned short TFileStatus::IfDir              = S_IFDIR;
-#else
 const int TSystem::MaxFNameLen                   = 1024;
 const unsigned short TFileStatus::UserReadable   = __S_IREAD;
 const unsigned short TFileStatus::UserWritable   = __S_IWRITE;
 const unsigned short TFileStatus::UserExecutable = __S_IEXEC;
 const unsigned short TFileStatus::IfDir          = __S_IFDIR;
-#endif
 
 #endif
 
@@ -1040,11 +1016,7 @@ ULONG TSystem::getDiskSize(const TFilePath &diskName) {
   }
 #ifndef WIN32
   struct statfs buf;
-#ifdef __sgi
-  statfs(diskName.getFullPath().c_str(), &buf, sizeof(struct statfs), 0);
-#else
   statfs(diskName.getFullPath().c_str(), &buf);
-#endif
   size = (ULONG)((buf.f_blocks * buf.f_bsize) >> 10);
 #else
   DWORD sectorsPerCluster;     // sectors per cluster
@@ -1077,11 +1049,7 @@ ULONG TSystem::getFreeDiskSize(const TFilePath &diskName) {
   }
 #ifndef WIN32
   struct statfs buf;
-#ifdef __sgi
-  statfs(diskName.getFullPath().c_str(), &buf, sizeof(struct statfs), 0);
-#else
   statfs(diskName.getFullPath().c_str(), &buf);
-#endif
   size = (ULONG)(buf.f_bfree * buf.f_bsize) >> 10;
 #else
   DWORD sectorsPerCluster;     // sectors per cluster
@@ -1118,29 +1086,6 @@ ULONG TSystem::getFreeMemorySize() {
   virtualFree  = buff.dwAvailVirtual;
   totalFree    = (physicalFree + virtualFree) >> 10;
 #else
-#ifdef __sgi
-  // check for virtual memory
-  int numberOfResources =
-      swapctl(SC_GETNSWP, 0); /* get number of swapping resources configued */
-
-  if (numberOfResources == 0) return 0;
-
-  // avrei voluto fare: struct swaptable *table = new struct swaptable[...]
-  struct swaptable *table = (struct swaptable *)calloc(
-      1, sizeof(struct swapent) * numberOfResources + sizeof(int));
-
-  table->swt_n = numberOfResources;
-  swapctl(SC_LIST, table); /* list all the swapping resources */
-
-  ULONG virtualFree  = 0;
-  ULONG physicalFree = 0;
-  for (int i = 0; i < table->swt_n; i++) {
-    virtualFree += table->swt_ent[i].ste_free;
-  }
-
-  free(table);
-  totalFree = virtualFree << 4 + physicalFree;
-#else
 #ifdef LINUX
 
   struct sysinfo *sysInfo = (struct sysinfo *)calloc(1, sizeof(struct sysinfo));
@@ -1155,13 +1100,8 @@ ULONG TSystem::getFreeMemorySize() {
 #else
   @ @ @ERROR : PLATFORM NOT SUPPORTED
 #endif
-#endif  //__sgi
 
 #endif  // WIN32
-
-#ifndef WIN32
-#else
-#endif
 
   return totalFree;
 }
@@ -1174,12 +1114,8 @@ ostream &operator<<(ostream &out, const TTime &t) {
 
 //------------------------------------------------------------
 
-#ifdef __sgi
-extern "C" long sginap(long ticks);
-#else
 #ifdef LINUX
 extern "C" int usleep(unsigned int);
-#endif
 #endif
 
 void TSystem::sleep(const TDeltaTime &delay) {
@@ -1189,13 +1125,9 @@ void TSystem::sleep(const TDeltaTime &delay) {
 #ifdef WIN32
   Sleep(ms);
 #else
-#ifdef __sgi
-  sginap(ms * CLK_TCK / 1000);
-#else
 #ifdef LINUX
   ms *= 1000;
   usleep(ms);
-#endif
 #endif
 #endif
 }
@@ -1478,11 +1410,7 @@ int TSystem::getProcessorCount() {
   GetSystemInfo(&sysInfo);
   return sysInfo.dwNumberOfProcessors;
 #else
-#ifdef __sgi
-  return sysconf(_SC_NPROC_CONF);
-#else
   return sysconf(_SC_NPROCESSORS_CONF);
-#endif
 #endif
 }
 

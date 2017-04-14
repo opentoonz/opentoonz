@@ -10,20 +10,6 @@
 #include "tcolorstyles.h"
 #endif
 
-/*
-#ifndef __sgi
-#include <algorithm>
-#endif
-*/
-
-// The following must be old IRIX code. Should be re-tested.
-// It seems that gcc compiles it, but requiring a LOT of
-// resources... very suspect...
-
-/*#ifdef __LP64__
-#include "optimize_for_lp64.h"
-#endif*/
-
 //=============================================================================
 //=============================================================================
 //=============================================================================

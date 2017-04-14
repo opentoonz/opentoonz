@@ -263,10 +263,6 @@ elseif(UNIX)
         set(SOURCES ${SOURCES}
             ../common/tsound/tsound_sdl.cpp
         )
-    else()
-        set(SOURCES ${SOURCES}
-            ../common/tsound/tsound_x.cpp
-        )
     endif()
 endif()
 

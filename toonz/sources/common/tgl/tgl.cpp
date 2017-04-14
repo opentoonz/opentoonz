@@ -8,7 +8,6 @@
 #include "timage_io.h"
 #include "tcurves.h"
 
-#ifndef __sgi
 #ifdef _WIN32
 #include <cstdlib>
 #include <GL/glut.h>
@@ -16,7 +15,6 @@
 #include <GL/glut.h>
 #else
 #include <GLUT/glut.h>
-#endif
 #endif
 
 #if defined(MACOSX) || defined(LINUX)
@@ -83,33 +81,23 @@ double tglGetTextWidth(const std::string &s, void *font) {
 //-----------------------------------------------------------------------------
 
 void tglDrawText(const TPointD &p, const std::string &s, void *character) {
-#ifndef __sgi
   glPushMatrix();
   glTranslated(p.x, p.y, 0);
   double factor = 0.07;
   glScaled(factor, factor, factor);
   for (int i = 0; i < (int)s.size(); i++) glutStrokeCharacter(character, s[i]);
   glPopMatrix();
-#else
-  assert("Not Yet Implemented" && 0);
-  std::cout << s << std::endl;
-#endif
 }
 
 //-----------------------------------------------------------------------------
 
 void tglDrawText(const TPointD &p, const std::wstring &s, void *character) {
-#ifndef __sgi
   glPushMatrix();
   glTranslated(p.x, p.y, 0);
   double factor = 0.07;
   glScaled(factor, factor, factor);
   for (int i = 0; i < (int)s.size(); i++) glutStrokeCharacter(character, s[i]);
   glPopMatrix();
-#else
-  assert("Not Yet Implemented" && 0);
-  std::cout << s << std::endl;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -617,7 +605,7 @@ void tglMakeCurrent(TGlContext context) {
 
 void tglDoneCurrent(TGlContext) { wglMakeCurrent(NULL, NULL); }
 
-#elif defined(LINUX) || defined(__sgi) || defined(MACOSX)
+#elif defined(LINUX) || defined(MACOSX)
 
 TGlContext tglGetCurrentContext() {
   return reinterpret_cast<TGlContext>(

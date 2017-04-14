@@ -12,17 +12,11 @@
 #include "tgl.h"
 #include "tcurves.h"
 
-#ifndef __sgi
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#else
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
-#endif
 
-#if defined(LINUX) || defined(__sgi)
+#if defined(LINUX)
 #include <GL/glx.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -276,7 +270,7 @@ void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &ras,
 }
 
 // end of WIN32
-#elif defined(__sgi) || defined(LINUX)
+#elif defined(LINUX)
 
 //=============================================================================
 
@@ -426,13 +420,7 @@ void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &ras,
 
   glFlush();
 
-#if defined(__sgi)
-
-  glReadPixels(0, 0, ras->getLx(), ras->getLy(), GL_ABGR_EXT, GL_UNSIGNED_BYTE,
-               ras->getRawData());
-
-#elif defined(LINUX)
-
+#if defined(LINUX)
   glReadPixels(0, 0, ras->getLx(), ras->getLy(), GL_RGBA, GL_UNSIGNED_BYTE,
                ras->getRawData());
 #endif
