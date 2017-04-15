@@ -463,6 +463,7 @@ public:
 
 public slots:
   void onHistoryChanged(bool, bool);
+  void onPreferenceChanged(const QString &);
 
 signals:
   void folderUp();

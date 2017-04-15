@@ -1892,8 +1892,8 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   // check if the output dpi is incompatible with pixels only mode
   if (Preferences::instance()->getPixelsOnly()) {
     TPointD dpi = scene->getCurrentCamera()->getDpi();
-    if (!areAlmostEqual(dpi.x, Stage::standardDpi) ||
-        !areAlmostEqual(dpi.y, Stage::standardDpi)) {
+    if (!areAlmostEqual(dpi.x, Stage::standardDpi, 0.1) ||
+        !areAlmostEqual(dpi.y, Stage::standardDpi, 0.1)) {
       QString question = QObject::tr(
           "This scene is incompatible with pixels only mode of the current "
           "OpenToonz version.\nWhat would you like to do?");

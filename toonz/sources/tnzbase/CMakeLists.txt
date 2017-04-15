@@ -205,8 +205,6 @@ elseif(APPLE)
         ${IOKIT_LIB}
         ${COCOA_LIB}
     )
-
-    target_link_libraries(tnzbase Qt5::Core Qt5::Gui)
 elseif(UNIX)
     _find_toonz_library(EXTRA_LIBS "tnzcore")
     set(EXTRA_LIBS ${EXTRA_LIBS}
@@ -217,7 +215,6 @@ elseif(UNIX)
         SYSTEM
         ${SDL_LIB_INCLUDE_DIRS}
     )
-    target_link_libraries(tnzbase Qt5::Core Qt5::Gui)
 endif()
 
 target_link_libraries(tnzbase Qt5::Core Qt5::Gui ${EXTRA_LIBS})

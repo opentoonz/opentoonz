@@ -146,7 +146,7 @@ StartupPopup::StartupPopup()
   m_recentBox->setFixedWidth(200);
   m_sceneBox->setMinimumWidth(480);
   m_projectBox->setMinimumWidth(480);
-  m_buttonFrame->setFixedHeight(30);
+  m_buttonFrame->setFixedHeight(34);
   //--- layout
   m_topLayout->setMargin(0);
   m_topLayout->setSpacing(0);
@@ -400,13 +400,13 @@ void StartupPopup::onCreateButton() {
     return;
   }
 
-  if (m_widthFld->getValue() < 1) {
-    DVGui::warning(tr("The width must be 1 or more."));
+  if (m_widthFld->getValue() <= 0) {
+    DVGui::warning(tr("The width must be greater than zero."));
     m_widthFld->setFocus();
     return;
   }
-  if (m_heightFld->getValue() < 1) {
-    DVGui::warning(tr("The height must be 1 or more."));
+  if (m_heightFld->getValue() <= 0) {
+    DVGui::warning(tr("The height must be greater than zero."));
     m_heightFld->setFocus();
     return;
   }

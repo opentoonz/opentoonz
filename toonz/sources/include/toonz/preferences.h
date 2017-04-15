@@ -127,6 +127,9 @@ public:
   void setCustomProjectRoot(std::wstring path);
   QString getCustomProjectRoot() { return m_customProjectRoot; }
 
+  void enableWatchFileSystem(bool on);
+  bool isWatchFileSystemEnabled() { return m_watchFileSystem; }
+
   // Interface  tab
 
   void setCurrentLanguage(int currentLanguage);
@@ -542,6 +545,9 @@ private:
 
   // enable to input drawing numbers into cells without double-clicking
   bool m_inputCellsWithoutDoubleClickingEnabled;
+
+  // enable to watch file system in order to update file browser automatically
+  bool m_watchFileSystem;
 
 private:
   Preferences();

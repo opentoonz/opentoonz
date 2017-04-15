@@ -2057,7 +2057,10 @@ void MainWindow::defineActions() {
                                              tr("Full Screen Mode"),
                                              tr("Exit Full Screen Mode"));
 
-  createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
+  QAction *refreshAct =
+      createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
+  refreshAct->setIconText(tr("Refresh"));
+  refreshAct->setIcon(createQIconOnOffPNG("refresh"));
 
   createToolOptionsAction("A_ToolOption_GlobalKey", tr("Global Key"), "");
 

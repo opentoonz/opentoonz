@@ -1847,7 +1847,12 @@ const std::vector<UCHAR> *FlipConsole::getProgressBarStatus() const {
 
 //--------------------------------------------------------------------
 
-void FlipConsole::onPreferenceChanged() {
+void FlipConsole::onPreferenceChanged(const QString &prefName) {
+  // react only when related properties are changed
+  if (prefName != "BlankCount" && prefName != "BlankColor" &&
+      !prefName.isEmpty())
+    return;
+
   if (m_drawBlanksEnabled) {
     Preferences::instance()->getBlankValues(m_blanksCount, m_blankColor);
     if (m_blanksCount == 0) {

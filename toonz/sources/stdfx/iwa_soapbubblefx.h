@@ -26,6 +26,8 @@ protected:
   TDoubleParamP m_shape_aspect_ratio;
   TDoubleParamP m_blur_radius;
   TDoubleParamP m_blur_power;
+  TBoolParamP m_multi_source;
+  TBoolParamP m_mask_center;
 
   // noise parameters
   TIntParamP m_normal_sample_distance;
@@ -38,24 +40,27 @@ protected:
   TDoubleParamP m_noise_thickness_mix_ratio;
 
   template <typename RASTER, typename PIXEL>
-  void convertToBrightness(const RASTER srcRas, float* dst, TDimensionI dim);
+  void convertToBrightness(const RASTER srcRas, float* dst, float* alpha,
+                           TDimensionI dim);
 
   template <typename RASTER, typename PIXEL>
   void convertToRaster(const RASTER ras, float* thickness_map_p,
-                       float* depth_map_p, TDimensionI dim,
+                       float* depth_map_p, float* alpha_map_p, TDimensionI dim,
                        float3* bubbleColor_p);
 
   void processShape(double frame, TTile& shape_tile, float* depth_map_p,
-                    TDimensionI dim, const TRenderSettings& settings);
+                    float* alpha_map_p, TDimensionI dim,
+                    const TRenderSettings& settings);
 
-  void do_binarize(TRaster32P srcRas, char* dst_p, float thres,
-                   float* distance_p, TDimensionI dim);
+  int do_binarize(TRaster32P srcRas, USHORT* dst_p, float thres,
+                  float* distance_p, float* alpha_map_p, TDimensionI dim);
 
   void do_createBlurFilter(float* dst_p, int size, float radius);
 
   void do_applyFilter(float* depth_map_p, TDimensionI dim, float* distace_p,
-                      char* binarized_p, float* blur_filter_p,
-                      int blur_filter_size, double frame);
+                      USHORT* binarized_p, float* blur_filter_p,
+                      int blur_filter_size, double frame,
+                      const TRenderSettings& settings);
 
   void processNoise(float* thickness_map_p, float* depth_map_p, TDimensionI dim,
                     double frame, const TRenderSettings& settings);
@@ -76,7 +81,15 @@ protected:
                  float* noise_map_p, float noise_thickness_mix_ratio,
                  float noise_depth_mix_ratio);
 
-  void do_distance_transform(float* dst_p, TDimensionI dim, double frame);
+  void do_distance_transform(float* dst_p, USHORT* binarized_p, int regionCount,
+                             TDimensionI dim, double frame);
+
+  // if the rendering process is canceled, release raster and return TRUE
+  bool checkCancelAndReleaseRaster(const QList<TRasterGR8P>&, TTile&,
+                                   const TRenderSettings&);
+
+  void applyDistanceToAlpha(float* distance_p, float* alpha_map_p,
+                            TDimensionI dim);
 
 public:
   Iwa_SoapBubbleFx();

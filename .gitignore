@@ -32,3 +32,4 @@ ipch/
 *.creator
 *.files
 *.includes
+*.autosave

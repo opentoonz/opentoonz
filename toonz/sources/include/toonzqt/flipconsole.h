@@ -393,7 +393,7 @@ protected slots:
   void onFPSEdited();
 
 public slots:
-  void onPreferenceChanged();
+  void onPreferenceChanged(const QString &);
 
 private:
   friend class PlaybackExecutor;

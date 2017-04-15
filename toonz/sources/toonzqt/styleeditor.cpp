@@ -2833,7 +2833,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
 
   /* ------- layout ------- */
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->setMargin(1);
+  mainLayout->setMargin(0);
   mainLayout->setSpacing(0);
   {
     QHBoxLayout *hLayout = new QHBoxLayout;
