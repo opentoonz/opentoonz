@@ -2336,9 +2336,9 @@ double AnimationAutoComplete::getNeighborhoodSimilarity(StrokeWithNeighbours* op
 
 }
 
-double min=10000000;
 void AnimationAutoComplete::search(StrokeWithNeighbours* operation1)
 {
+	double min = 10000000;
     minOperationIndex score_stroke;
 
     for(int i=m_strokesWithNeighbours.size();i<=m_strokesWithNeighbours.size()-30;i--)
@@ -2348,7 +2348,6 @@ void AnimationAutoComplete::search(StrokeWithNeighbours* operation1)
         {
             min=score;
             score_stroke.score = min;
-
             score_stroke.stroke = m_strokesWithNeighbours[i]->stroke;
         }
     }
@@ -2362,8 +2361,6 @@ void AnimationAutoComplete::search(StrokeWithNeighbours* operation1)
             similarstroke.push_back(m_strokesWithNeighbours[i]->nextStroke);
         }
     }
-
-
 }
 
 double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1,
