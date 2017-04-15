@@ -1409,18 +1409,17 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   }
 }
 //--------------------------------------------------------------------------------------------------
-double gaussionConstant( SamplePoint chuck1,SamplePoint chuck2)
+double AnimationAutoComplete::gaussianConstant( SamplePoint chuck1, SamplePoint chuck2)
 {
- TPointD sample1= chuck1->getP0();
- TPointD sample2= chuck2->getP0();
- TThickPoint s1; TThickPoint s2;
- s1.x=sample1.x;  s1.y=sample1.y;
- s2.x=sample2.x;  s2.y=sample2.y;
- double distance=tdistance2(s1,s2);
- distance=sqrt(distance);
- #define OMEGA 10
- return exp(-distance/OMEGA);
-
+	TPointD sample1= chuck1->getP0();
+	TPointD sample2= chuck2->getP0();
+	TThickPoint s1; TThickPoint s2;
+	s1.x=sample1.x;  s1.y=sample1.y;
+	s2.x=sample2.x;  s2.y=sample2.y;
+	double distance=tdistance2(s1,s2);
+	distance=sqrt(distance);
+	#define OMEGA 10
+	return exp(-distance/OMEGA);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2287,16 +2286,12 @@ bool AnimationAutoComplete::withinSpaceVicinity(const SamplePoint samplePoint, c
 void AnimationAutoComplete::initializeSynthesis()
 {
 	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
-	//StrokeWithNeighbours* similarStroke = mostSimilarStroke(lastStroke);
-	StrokeWithNeighbours* similarStroke = NULL;
-	if (m_strokesWithNeighbours.size() == 2)
-		similarStroke = m_strokesWithNeighbours.front();
-	if (similarStroke)
-	{
-		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
-		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
-		m_synthesizedStrokes.push_back(nextStroke);
-	}
+	std::vector<StrokeWithNeighbours*> similarStrokes = search(lastStroke);
+
+	StrokeWithNeighbours* outputsStroke = assign(similarStrokes);
+
+	if(outputsStroke)
+		m_synthesizedStrokes.push_back(outputsStroke);
 }
 
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getSynthesizedStrokes()
@@ -2312,7 +2307,12 @@ double AnimationAutoComplete::pointsSimilarity(PointWithStroke* point1, PointWit
     dissimilarityFactor += getTemporalSimilarity(point1, point2);
     dissimilarityFactor += getSpatialSimilarity(point1, point2);
 
-    return dissimilarityFactor;
+	return dissimilarityFactor;
+}
+
+double AnimationAutoComplete::pointsSimilarityWithoutWeights(PointWithStroke *point1, PointWithStroke *point2)
+{
+
 }
 
 double AnimationAutoComplete::getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2)
@@ -2343,31 +2343,77 @@ double AnimationAutoComplete::getNeighborhoodSimilarity(StrokeWithNeighbours* op
 
 }
 
-void AnimationAutoComplete::search(StrokeWithNeighbours* operation1)
+std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeighbours* operation1)
 {
-	double min = 10000000;
-    minOperationIndex score_stroke;
 
-    for(int i=m_strokesWithNeighbours.size();i<=m_strokesWithNeighbours.size()-30;i--)
+	if(!operation1)
+		return std::vector<StrokeWithNeighbours*>();
+
+	double min = 10000000;
+	StrokeWithScore score_stroke;
+
+	for(int i = m_strokesWithNeighbours.size()-1; i > m_strokesWithNeighbours.size()-30; i--)
     {
-        double score = getNeighborhoodSimilarity(operation1,m_strokesWithNeighbours[i]->nextStroke);
-        if(score<min)
+		if (!m_strokesWithNeighbours[i]->nextStroke)
+			continue;
+
+		double score = getNeighborhoodSimilarity(operation1, m_strokesWithNeighbours[i]->nextStroke);
+		if(score < min)
         {
-            min=score;
+			min = score;
             score_stroke.score = min;
-            score_stroke.stroke = m_strokesWithNeighbours[i]->stroke;
+			score_stroke.stroke = m_strokesWithNeighbours[i];
         }
     }
 
     std::vector<StrokeWithNeighbours*> similarstroke;
-    for(int i=m_strokesWithNeighbours.size();i<=m_strokesWithNeighbours.size()-30;i--)
+	for(int i = m_strokesWithNeighbours.size()-1; i > m_strokesWithNeighbours.size() - 30; i--)
     {
-        double score = operationsSimilarity(operation1,m_strokesWithNeighbours[i]->nextStroke);
-        if(score<2*min)
-        {
+		if (!m_strokesWithNeighbours[i]->nextStroke)
+			continue;
+
+		double score = operationsSimilarity(operation1, m_strokesWithNeighbours[i]->nextStroke);
+
+		if(score < 2 * min)
             similarstroke.push_back(m_strokesWithNeighbours[i]->nextStroke);
-        }
     }
+
+	return similarstroke;
+}
+
+StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighbours *> similarStrokes)
+{
+	if(similarStrokes.empty())
+		return nullptr;
+
+	double min = 9999999999;
+	StrokeWithScore outputStroke;
+	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
+
+	for (StrokeWithNeighbours* similarStroke : similarStrokes) {
+		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
+		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
+
+		std::vector<SimilarPair> similarStrokeMatchingPairs = getSimilarPairs(similarStroke, nextToSimilarStroke);
+		std::vector<SimilarPair> lastDrawnMatchingPairs = getSimilarPairs(nextStroke, lastStroke);
+
+		for (int i = 0; i < similarStrokeMatchingPairs.size() || i < lastDrawnMatchingPairs.size(); i++)
+		{
+			double guassian = gaussianConstant(similarStrokeMatchingPairs[i].point1->point , similarStrokeMatchingPairs[i].point2->point);
+			double similarityScore = pointsSimilarity(similarStrokeMatchingPairs[i].point1, similarStrokeMatchingPairs[i].point2);
+			double similarityScoreWithoutWeights = pointsSimilarityWithoutWeights(lastDrawnMatchingPairs[i].point1, lastDrawnMatchingPairs[i].point2);
+			double score = guassian * pow((similarityScore - similarityScoreWithoutWeights), 2);
+
+			if (score > min)
+				continue;
+
+			min = score;
+			outputStroke.score = min;
+			outputStroke.stroke = similarStroke;
+		}
+	}
+
+	return outputStroke.stroke;
 }
 
 double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1,
@@ -2395,7 +2441,12 @@ double AnimationAutoComplete::magnitude(std::vector<double> points)
         sum+= points[i]*points[i];
     }
     sum = sqrt(sum);
-    return sum;
+	return sum;
+}
+
+std::vector<SimilarPair> AnimationAutoComplete::getSimilarPairs(StrokeWithNeighbours *, StrokeWithNeighbours *)
+{
+
 }
 
 
@@ -2433,12 +2484,19 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	return outputStroke;
 }
 
-StrokeWithNeighbours* AnimationAutoComplete::mostSimilarStroke(StrokeWithNeighbours* stroke)
+std::vector<StrokeWithScore> AnimationAutoComplete::getSimilarStrokes(StrokeWithNeighbours* stroke)
 {
-    for(int i=0;i<m_strokesWithNeighbours.size();i++)
-    {
-		operationsSimilarity(stroke, m_strokesWithNeighbours[i]);
-    }
+	std::vector<StrokeWithScore> similarStrokes;
+
+	for(int i = 0; i < m_strokesWithNeighbours.size(); i++)
+	{
+		StrokeWithScore strokeWithScore;
+		strokeWithScore.stroke = m_strokesWithNeighbours[i];
+		strokeWithScore.score = operationsSimilarity(stroke, m_strokesWithNeighbours[i]);
+		similarStrokes.push_back(strokeWithScore);
+	}
+
+	return similarStrokes;
 }
 
 SimilarPair AnimationAutoComplete::getMostSimilarPoint(PointWithStroke *point, TStroke *stroke)

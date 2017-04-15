@@ -144,21 +144,19 @@ public:
 
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
 
-
-struct minOperationIndex
-{
-public:
-    double score;
-    TStroke* stroke;
-};
-
-
 class StrokeWithNeighbours
 {
 public:
     TStroke* stroke;
     SetOfPoints neighbours;
     StrokeWithNeighbours *nextStroke;
+};
+
+struct StrokeWithScore
+{
+public:
+	double score;
+	StrokeWithNeighbours* stroke;
 };
 
 class AnimationAutoComplete {
@@ -183,9 +181,11 @@ private:
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
   std::vector<double> points;
 
+  double gaussianConstant( SamplePoint chuck1, SamplePoint chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
-  StrokeWithNeighbours* mostSimilarStroke (StrokeWithNeighbours* stroke);
+  // stroke with corresponding similarity score
+  std::vector<StrokeWithScore> getSimilarStrokes (StrokeWithNeighbours* stroke);
 
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
                                                   StrokeWithNeighbours* nextToSimilarStroke);
@@ -193,17 +193,19 @@ private:
   SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
 
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
+  double pointsSimilarityWithoutWeights(PointWithStroke* point1, PointWithStroke* point2);
   double getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getTemporalSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getNeighborhoodSimilarity(StrokeWithNeighbours* operation1, StrokeWithNeighbours* operation2);
   double magnitude(std::vector<double> points);
+  std::vector<SimilarPair> getSimilarPairs(StrokeWithNeighbours*, StrokeWithNeighbours*);
 
   SetOfPoints getNeighbours(const SamplePoint point);
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
   void initializeSynthesis();
-  void search(StrokeWithNeighbours *operation1);
-  void assign();
+  std::vector<StrokeWithNeighbours*> search(StrokeWithNeighbours *operation1);
+  StrokeWithNeighbours* assign(std::vector<StrokeWithNeighbours*>);
 
 
 };
