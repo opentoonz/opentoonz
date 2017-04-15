@@ -390,6 +390,14 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
     if ((event->buttons() & Qt::MidButton) == 0)
       m_mouseButton = Qt::NoButton;
     else
+        // scrub with shift and middle click
+        if (event->modifiers() & Qt::ShiftModifier) {
+      if (curPos.x() > m_pos.x()) {
+        CommandManager::instance()->execute("MI_NextFrame");
+      } else if (curPos.x() < m_pos.x()) {
+        CommandManager::instance()->execute("MI_PrevFrame");
+      }
+    } else
       // panning
       panQt(curPos - m_pos);
     m_pos = curPos;
@@ -592,7 +600,28 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
   }  // end switch
 
   if (abs(delta) > 0) {
-    zoomQt(event->pos(), exp(0.001 * delta));
+    // scrub with mouse wheel
+    if ((event->modifiers() & Qt::ControlModifier) &&
+        (event->modifiers() & Qt::ShiftModifier)) {
+      if (delta < 0) {
+        CommandManager::instance()->execute("MI_NextStep");
+      } else if (delta > 0) {
+        CommandManager::instance()->execute("MI_PrevStep");
+      }
+    } else if (event->modifiers() & Qt::ShiftModifier) {
+      if (delta < 0) {
+        CommandManager::instance()->execute("MI_NextFrame");
+      } else if (delta > 0) {
+        CommandManager::instance()->execute("MI_PrevFrame");
+      }
+    } else if (event->modifiers() & Qt::ControlModifier) {
+      if (delta < 0) {
+        CommandManager::instance()->execute("MI_NextDrawing");
+      } else if (delta > 0) {
+        CommandManager::instance()->execute("MI_PrevDrawing");
+      }
+    } else
+      zoomQt(event->pos(), exp(0.001 * delta));
   }
   event->accept();
 }

@@ -420,6 +420,8 @@ TImageP TImageReaderPli::doLoad() {
   outVectImage->checkIntersections();
 #endif
 
+  outVectImage->findRegions();
+
   return TImageP(outVectImage);
 }
 

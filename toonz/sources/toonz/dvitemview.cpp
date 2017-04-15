@@ -17,6 +17,7 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tproject.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -1868,6 +1869,12 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   addAction(exportFileListAction);
   addSeparator();
 
+  if (itemViewer->m_windowType == DvItemViewer::Browser &&
+      !Preferences::instance()->isWatchFileSystemEnabled()) {
+    addAction(CommandManager::instance()->getAction("MI_RefreshTree"));
+    addSeparator();
+  }
+
   connect(exportFileListAction, SIGNAL(triggered()), itemViewer->getPanel(),
           SLOT(exportFileList()));
 
@@ -1884,6 +1891,12 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
 
   connect(m_folderBack, SIGNAL(triggered()), SIGNAL(folderBack()));
   connect(m_folderFwd, SIGNAL(triggered()), SIGNAL(folderFwd()));
+
+  if (itemViewer->m_windowType == DvItemViewer::Browser) {
+    connect(TApp::instance()->getCurrentScene(),
+            SIGNAL(preferenceChanged(const QString &)), this,
+            SLOT(onPreferenceChanged(const QString &)));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1898,4 +1911,20 @@ void DvItemViewerButtonBar::onHistoryChanged(bool backEnable, bool fwdEnable) {
     m_folderFwd->setEnabled(true);
   else
     m_folderFwd->setEnabled(false);
+}
+
+//-----------------------------------------------------------------------------
+
+void DvItemViewerButtonBar::onPreferenceChanged(const QString &prefName) {
+  // react only when the related preference is changed
+  if (prefName != "WatchFileSystem") return;
+
+  QAction *refreshAct = CommandManager::instance()->getAction("MI_RefreshTree");
+  if (Preferences::instance()->isWatchFileSystemEnabled()) {
+    removeAction(refreshAct);
+    removeAction(actions().last());  // remove separator
+  } else {
+    addAction(refreshAct);
+    addSeparator();
+  }
 }

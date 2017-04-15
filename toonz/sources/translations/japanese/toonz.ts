@@ -4513,6 +4513,10 @@ Do you want to create it?</source>
         <source>Record Audio</source>
         <translation>録音する</translation>
     </message>
+    <message>
+        <source>Refresh</source>
+        <translation>更新</translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -6186,6 +6190,10 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Fast Render Path: </source>
         <translation>保存先のパス：</translation>
+    </message>
+    <message>
+        <source>Watch File System and Update File Browser Automatically</source>
+        <translation>ファイルブラウザの内容を自動的に更新する</translation>
     </message>
 </context>
 <context>
@@ -9222,7 +9230,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Apply</source>
-        <translation>適用</translation>
+        <translation type="vanished">適用</translation>
     </message>
     <message>
         <source>Use selected preset as shortcuts</source>
@@ -9267,6 +9275,14 @@ Please commit or revert changes first.</source>
     <message>
         <source>Load from file...</source>
         <translation>ファイルから読み込む...</translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation>読み込み</translation>
+    </message>
+    <message>
+        <source>Shortcut Presets</source>
+        <translation>ショートカットプリセット</translation>
     </message>
 </context>
 <context>
@@ -10508,6 +10524,10 @@ Please refer to the user guide for details.</source>
     <message>
         <source>Pinned Center : Col%1%2</source>
         <translation>固定ピン ： Col%1%2</translation>
+    </message>
+    <message>
+        <source>Set Auto Markers</source>
+        <translation>素材の範囲にマーカーを自動設定</translation>
     </message>
 </context>
 <context>

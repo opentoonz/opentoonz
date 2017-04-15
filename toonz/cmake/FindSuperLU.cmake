@@ -19,8 +19,7 @@ else()
         ${THIRDPARTY_LIBS_HINTS}
     )
     set(_lib_suffixes
-        lzo/2.09/lib
-        lzo/2.03/lib/LZO_lib
+        superlu
     )
 endif()
 

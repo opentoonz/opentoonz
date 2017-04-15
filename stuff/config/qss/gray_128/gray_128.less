@@ -248,6 +248,8 @@ PaletteViewer #ToolBarContainer
     }
 }
 #TabBarContainer{
+	qproperty-BottomAboveLineColor: rgb(120, 120, 120);
+	qproperty-BottomBelowLineColor: rgb(255, 255, 255);
 	.baseBG(15%);
 	& #ScrollLeftButton,
 	& #ScrollRightButton{
@@ -1171,7 +1173,9 @@ QDialog #dialogButtonFrame {
 #IntPairField, 
 #DoublePairField {
 	qproperty-LightLineColor: white;
-	qproperty-DarkLineColor: rgb(128,128,128);
+	qproperty-LightLineEdgeColor: white;
+	qproperty-DarkLineColor: rgb(198,198,198);
+	qproperty-MiddleLineColor: @m_baseBG;
 	qproperty-HandleLeftPixmap: url("@{image_url}/h_slider_left.png");
 	qproperty-HandleRightPixmap: url("@{image_url}/h_slider_right.png");
 	qproperty-HandleLeftGrayPixmap: url("@{image_url}/h_slider_left_disabled.png");

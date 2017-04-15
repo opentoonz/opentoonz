@@ -377,6 +377,12 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
                                                 frameCreated, levelCreated));
   }
 
+  // Update regions. It will call roundStroke() in
+  // TVectorImage::Imp::findIntersections().
+  // roundStroke() will slightly modify all the stroke positions.
+  // It is needed to update information for Fill Check.
+  vi->findRegions();
+
   for (int k = 0; k < (int)strokes.size(); k++) delete strokes[k];
   strokes.clear();
 
@@ -1396,6 +1402,20 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   } else if (TToonzImageP ti = image) {
     finishRasterBrush(pos, e.m_pressure);
   }
+}
+//--------------------------------------------------------------------------------------------------
+double gaussionConstant( SamplePoint chuck1,SamplePoint chuck2)
+{
+ TPointD sample1= chuck1->getP0();
+ TPointD sample2= chuck2->getP0();
+ TThickPoint s1; TThickPoint s2;
+ s1.x=sample1.x;  s1.y=sample1.y;
+ s2.x=sample2.x;  s2.y=sample2.y;
+ double distance=tdistance2(s1,s2);
+ distance=sqrt(distance);
+ #define OMEGA 10
+ return exp(-distance/OMEGA);
+
 }
 
 //--------------------------------------------------------------------------------------------------

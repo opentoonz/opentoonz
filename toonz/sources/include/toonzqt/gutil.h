@@ -155,11 +155,25 @@ QPainterPath DVAPI strokeToPainterPath(TStroke *stroke);
 // It is also used to take 6px on the left before the tabBar
 
 class DVAPI TabBarContainter final : public QFrame {
+  Q_OBJECT
 public:
   TabBarContainter(QWidget *parent = 0);
 
 protected:
+  QColor m_bottomBelowLineColor, m_bottomAboveLineColor;
+  Q_PROPERTY(QColor BottomBelowLineColor READ getBottomBelowLineColor WRITE
+                 setBottomBelowLineColor);
+  Q_PROPERTY(QColor BottomAboveLineColor READ getBottomAboveLineColor WRITE
+                 setBottomAboveLineColor);
   void paintEvent(QPaintEvent *event) override;
+  void setBottomBelowLineColor(const QColor &color) {
+    m_bottomBelowLineColor = color;
+  }
+  QColor getBottomBelowLineColor() const { return m_bottomBelowLineColor; }
+  void setBottomAboveLineColor(const QColor &color) {
+    m_bottomAboveLineColor = color;
+  }
+  QColor getBottomAboveLineColor() const { return m_bottomAboveLineColor; }
 };
 
 //-----------------------------------------------------------------------------
