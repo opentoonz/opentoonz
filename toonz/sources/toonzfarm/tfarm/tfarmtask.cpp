@@ -367,7 +367,7 @@ QString getExeName(bool isComposer) {
   return name + ".exe ";
 #elif MACOSX
   TVER::ToonzVersion tver;
-  return "\"./" + QString(tver.getAppName()) + "_" + QString(tver.getAppVersionString()) + ".app/Contents/MacOS/" + name + "\" ";
+  return "\"./" + QString::QString(tver.getAppName()) + "_" + QString::QString(tver.getAppVersionString()) + ".app/Contents/MacOS/" + name + "\" ";
 #else
   return name;
 #endif
