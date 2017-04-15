@@ -368,9 +368,9 @@ QString getExeName(bool isComposer) {
 #elif MACOSX
   TVER::ToonzVersion tver;
   QString namepath = "\"./";
-  namepath += tver.getAppName();
+  namepath += QString::fromStdString(tver.getAppName());
   namepath += "_";
-  namepath += tver.getAppVersionString();
+  namepath += QString::fromStdString(tver.getAppVersionString());
   namepath += ".app/Contents/MacOS/";
   namepath += name;
   namepath += "\" ";
