@@ -392,27 +392,44 @@ ConvertPopup::ConvertPopup(bool specifyInput)
     upperLay->setMargin(0);
     upperLay->setSpacing(5);
     {
-      upperLay->addWidget(new QLabel(tr("Start:"), this), 0, 0);
-      upperLay->addWidget(m_fromFld, 0, 1);
-      upperLay->addWidget(new QLabel(tr("  End:"), this), 0, 2);
-      upperLay->addWidget(m_toFld, 0, 3);
+      int row = 0;
+      if (specifyInput) {
+        upperLay->addWidget(new QLabel(tr("File to convert:"), this), row, 0);
+        upperLay->addWidget(m_convertFileFld, row, 1, 1, 4);
+        row++;
+      }
 
-      upperLay->addWidget(new QLabel(tr("Save in:"), this), 1, 0);
-      upperLay->addWidget(m_saveInFileFld, 1, 1, 1, 4);
+      upperLay->addWidget(new QLabel(tr("Start:"), this), row, 0);
+      upperLay->addWidget(m_fromFld, row, 1);
+      upperLay->addWidget(new QLabel(tr("  End:"), this), row, 2);
+      upperLay->addWidget(m_toFld, row, 3);
+      row++;
 
-      upperLay->addWidget(new QLabel(tr("File Name:"), this), 2, 0);
-      upperLay->addWidget(m_fileNameFld, 2, 1, 1, 4);
+      upperLay->addWidget(new QLabel(tr("Save in:"), this), row, 0);
+      upperLay->addWidget(m_saveInFileFld, row, 1, 1, 4);
+      row++;
 
-      upperLay->addWidget(new QLabel(tr("File Format:"), this), 3, 0);
-      upperLay->addWidget(m_fileFormat, 3, 1, 1, 2);
-      upperLay->addWidget(m_formatOptions, 3, 3);
+      upperLay->addWidget(new QLabel(tr("File Name:"), this), row, 0);
+      upperLay->addWidget(m_fileNameFld, row, 1, 1, 4);
+      ;
+      row++;
 
-      upperLay->addWidget(m_bgColorLabel, 4, 0);
-      upperLay->addWidget(m_bgColorField, 4, 1, 1, 4);
+      upperLay->addWidget(new QLabel(tr("File Format:"), this), row, 0);
+      upperLay->addWidget(m_fileFormat, row, 1, 1, 2);
+      upperLay->addWidget(m_formatOptions, row, 3);
+      ;
+      row++;
 
-      upperLay->addWidget(m_skip, 5, 1, 1, 4);
+      upperLay->addWidget(m_bgColorLabel, row, 0);
+      upperLay->addWidget(m_bgColorField, row, 1, 1, 4);
+      ;
+      row++;
 
-      upperLay->addWidget(m_removeDotBeforeFrameNumber, 6, 1, 1, 4);
+      upperLay->addWidget(m_skip, row, 1, 1, 4);
+      ;
+      row++;
+
+      upperLay->addWidget(m_removeDotBeforeFrameNumber, row, 1, 1, 4);
     }
     upperLay->setColumnStretch(0, 0);
     upperLay->setColumnStretch(1, 1);

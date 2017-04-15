@@ -180,8 +180,6 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu,
       new DvItemViewerButtonBar(m_itemViewer, box);
   DvItemViewerPanel *viewerPanel = m_itemViewer->getPanel();
 
-  m_fileSystemWatcher = new QFileSystemWatcher(this);
-
   viewerPanel->addColumn(DvItemListModel::FileType, 50);
   viewerPanel->addColumn(DvItemListModel::FrameCount, 50);
   viewerPanel->addColumn(DvItemListModel::FileSize, 50);
@@ -252,7 +250,7 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu,
   ret = ret && connect(&m_frameCountReader, SIGNAL(calculatedFrameCount()),
                        m_itemViewer->getPanel(), SLOT(update()));
 
-  QAction *refresh = CommandManager::instance()->getAction("MI_RefreshTree");
+  QAction *refresh = CommandManager::instance()->getAction(MI_RefreshTree);
   ret = ret && connect(refresh, SIGNAL(triggered()), this, SLOT(refresh()));
   addAction(refresh);
 
@@ -278,10 +276,12 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu,
   ret = ret && connect(this, SIGNAL(historyChanged(bool, bool)), buttonBar,
                        SLOT(onHistoryChanged(bool, bool)));
 
-  // check out the update of the current folder
-  ret = ret &&
-        connect(m_fileSystemWatcher, SIGNAL(directoryChanged(const QString &)),
-                this, SLOT(onFileSystemChanged(const QString &)));
+  // check out the update of the current folder.
+  // Use MyFileSystemWatcher which is shared by all browsers.
+  // Adding and removing paths to the watcher is done in DvDirTreeView.
+  ret = ret && connect(MyFileSystemWatcher::instance(),
+                       SIGNAL(directoryChanged(const QString &)), this,
+                       SLOT(onFileSystemChanged(const QString &)));
 
   // store the first item("Root") in the history
   m_indexHistoryList.append(m_folderTreeView->currentIndex());
@@ -411,6 +411,7 @@ void FileBrowser::clearHistory() {
 /*! update the current folder when changes detected from QFileSystemWatcher
 */
 void FileBrowser::onFileSystemChanged(const QString &folderPath) {
+  if (folderPath != m_folder.getQString()) return;
   // changes may create/delete of folder, so update the DvDirModel
   QModelIndex parentFolderIndex = m_folderTreeView->currentIndex();
   DvDirModel::instance()->refresh(parentFolderIndex);
@@ -685,10 +686,6 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode,
     m_folderName->setText("");
   else
     m_folderName->setText(toQString(fp));
-
-  /*- reset the watching path -*/
-  m_fileSystemWatcher->removePaths(m_fileSystemWatcher->directories());
-  if (fp != TFilePath()) m_fileSystemWatcher->addPath(toQString(fp));
 
   refreshCurrentFolderItems();
 
@@ -1103,6 +1100,9 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
   if (files.empty()) {
     menu->addAction(cm->getAction(MI_ShowFolderContents));
     menu->addAction(cm->getAction(MI_SelectAll));
+    if (!Preferences::instance()->isWatchFileSystemEnabled()) {
+      menu->addAction(cm->getAction(MI_RefreshTree));
+    }
     return menu;
   }
 
@@ -1388,6 +1388,11 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
       menu->addSeparator();
       menu->addMenu(vcMenu);
     }
+  }
+
+  if (!Preferences::instance()->isWatchFileSystemEnabled()) {
+    menu->addSeparator();
+    menu->addAction(cm->getAction(MI_RefreshTree));
   }
 
   assert(ret);

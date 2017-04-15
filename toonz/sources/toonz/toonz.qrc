@@ -456,5 +456,7 @@
       <file>Resources/locator.png</file>
       <file>Resources/locator_click.png</file>
       <file>Resources/locator_over.png</file>
+      <file>Resources/refresh.png</file>
+      <file>Resources/refresh_over.png</file>
     </qresource>
 </RCC>

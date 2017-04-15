@@ -657,12 +657,7 @@ void SceneViewerPanel::onFrameTypeChanged() {
 //-----------------------------------------------------------------------------
 
 void SceneViewerPanel::onPreferenceChanged(const QString &prefName) {
-  // if no name specified (on StyleShortcutSelectivePanel::showEvent),
-  // then process all updates
-  if (prefName == "BlankCount" || prefName == "BlankColor" ||
-      prefName.isEmpty())
-    m_flipConsole->onPreferenceChanged();
-
+  m_flipConsole->onPreferenceChanged(prefName);
   StyleShortcutSwitchablePanel::onPreferenceChanged(prefName);
 }
 

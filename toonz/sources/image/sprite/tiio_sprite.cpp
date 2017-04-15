@@ -66,7 +66,9 @@ TLevelWriterSprite::TLevelWriterSprite(const TFilePath &path,
   m_rightPadding = QString::fromStdString(rightPadding).toInt();
   m_format       = QString::fromStdWString(
       ((TEnumProperty *)(m_properties->getProperty("Format")))->getValue());
-
+  TBoolProperty *trim =
+      (TBoolProperty *)m_properties->getProperty("Trim Empty Space");
+  m_trim = trim->getValue();
   if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
 }
 
@@ -218,23 +220,30 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
   QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
 
   int l = qi->width(), r = 0, t = qi->height(), b = 0;
-  for (int y = 0; y < qi->height(); ++y) {
-    QRgb *row      = (QRgb *)qi->scanLine(y);
-    bool rowFilled = false;
-    for (int x = 0; x < qi->width(); ++x) {
-      if (qAlpha(row[x])) {
-        rowFilled = true;
-        r         = std::max(r, x);
-        if (l > x) {
-          l = x;
-          x = r;
+  if (m_trim) {
+    for (int y = 0; y < qi->height(); ++y) {
+      QRgb *row      = (QRgb *)qi->scanLine(y);
+      bool rowFilled = false;
+      for (int x = 0; x < qi->width(); ++x) {
+        if (qAlpha(row[x])) {
+          rowFilled = true;
+          r         = std::max(r, x);
+          if (l > x) {
+            l = x;
+            x = r;
+          }
         }
       }
+      if (rowFilled) {
+        t = std::min(t, y);
+        b = y;
+      }
     }
-    if (rowFilled) {
-      t = std::min(t, y);
-      b = y;
-    }
+  } else {
+    l = 0;
+    r = qi->width() - 1;
+    t = 0;
+    b = qi->height() - 1;
   }
   if (m_firstPass) {
     m_firstPass = false;
@@ -264,7 +273,8 @@ Tiio::SpriteWriterProperties::SpriteWriterProperties()
     , m_leftPadding("Left Padding", 0, 100, 0)
     , m_rightPadding("Right Padding", 0, 100, 0)
     , m_scale("Scale", 1, 100, 100)
-    , m_format("Format") {
+    , m_format("Format")
+    , m_trim("Trim Empty Space", true) {
   m_format.addValue(L"Grid");
   m_format.addValue(L"Vertical");
   m_format.addValue(L"Horizontal");
@@ -275,6 +285,7 @@ Tiio::SpriteWriterProperties::SpriteWriterProperties()
   bind(m_leftPadding);
   bind(m_rightPadding);
   bind(m_scale);
+  bind(m_trim);
 }
 
 // Tiio::Reader* Tiio::makeSpriteReader(){ return nullptr; }
