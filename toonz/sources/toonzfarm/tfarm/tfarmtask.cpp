@@ -19,7 +19,14 @@
 // MACOSX includes
 #ifdef _WIN32
 #include <winsock.h>
+#elif MACOSX
+#include "tversion.h"
+using namespace TVER;
+#include <netdb.h>      // gethostbyname
+#include <arpa/inet.h>  // inet_ntoa
 #else
+// these were included for OSX, i'm not sure if they are required for linux or not?
+// leaving them in as linux was building sucessfully already. damies13 - 2017-04-15.
 #include <netdb.h>      // gethostbyname
 #include <arpa/inet.h>  // inet_ntoa
 #endif
@@ -359,6 +366,7 @@ QString getExeName(bool isComposer) {
 #ifdef _WIN32
   return name + ".exe ";
 #elif MACOSX
+  TVER::ToonzVersion tver;
   return "\"./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/MacOS/" + name + "\" ";
 #else
   return name;
