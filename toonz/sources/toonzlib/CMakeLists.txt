@@ -157,6 +157,7 @@ set(MOC_HEADERS
 set(HEADERS ${MOC_HEADERS})
 
 set(SOURCES
+    animationautocomplete.cpp
     autoadjust.cpp
     autoclose.cpp
     autopos.cpp
