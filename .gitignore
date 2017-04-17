@@ -28,7 +28,8 @@ ipch/
 .idea
 
 # qtcreator files
-*.config
-*.creator
-*.files
-*.includes
+**.config
+**.creator
+**.files
+**.includes
+**.autosave

@@ -53,6 +53,7 @@ public:
 public:
   static ToonzCheck *instance();
 
+
   int getChecks() const { return m_mask; }
   void toggleCheck(int checkType) {
     m_mask ^= checkType;
