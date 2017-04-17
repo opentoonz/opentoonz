@@ -106,6 +106,114 @@ private:
 };
 
 //************************************************************************
+//<<<<<<< Updated upstream
+//=======
+//    Animation Auto-complete declaration
+//    Detects repetitions in strokes within/across frames and predicts
+//    the next stroke(s) accordingly.
+//************************************************************************
+typedef TThickQuadratic* SamplePoint;
+
+/*class  PointWithStroke
+{
+public:
+    PointWithStroke() {}
+    PointWithStroke(SamplePoint point, TStroke* stroke) : point(point), stroke(stroke) {}
+    ~PointWithStroke() {}
+    SamplePoint point;
+    TStroke* stroke;
+    int index;
+};
+
+struct SimilarPair
+{
+    double dissimilarityFactor;
+    PointWithStroke* point1;
+    PointWithStroke* point2;
+};
+
+
+class GlobalSimilarityGraph
+{
+    std::map<SimilarPair*, std::vector<SimilarPair*>> connections;
+
+public:
+    int numberOfNodes = 0;
+
+    GlobalSimilarityGraph() {}
+    ~GlobalSimilarityGraph() {}
+    void insertNode(SimilarPair* pair, std::vector<SimilarPair*> connections);
+    std::vector<SimilarPair *> getConnections(SimilarPair* pair);
+};*/
+
+//typedef std::unordered_set< PointWithStroke *> SetOfPoints;
+
+
+struct minOperationIndex
+{
+public:
+    double score;
+    TStroke* stroke;
+};
+
+/*
+class StrokeWithNeighbours
+{
+public:
+    TStroke* stroke;
+    SetOfPoints neighbours;
+    StrokeWithNeighbours *nextStroke;
+};
+
+class AnimationAutoComplete {
+public:
+  AnimationAutoComplete() {}
+  ~AnimationAutoComplete() {}
+
+  void addStroke(TStroke* stroke);
+  std::vector<StrokeWithNeighbours*> getSynthesizedStrokes();
+
+  //TODO: remove at production
+  std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
+
+
+  TStroke* drawstrokeLine(TStroke* stroke);
+
+  TPointD  getNormal(PointWithStroke* pointer);
+
+private:
+  int m_spaceVicinityRadius = 100;
+  std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
+  std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
+  std::vector<double> points;
+
+  double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
+
+  StrokeWithNeighbours* mostSimilarStroke (StrokeWithNeighbours* stroke);
+
+  StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
+                                                  StrokeWithNeighbours* nextToSimilarStroke);
+
+  SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
+
+  double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
+  double getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2);
+  double getTemporalSimilarity(PointWithStroke* point1, PointWithStroke* point2);
+  double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
+  double getNeighborhoodSimilarity(StrokeWithNeighbours* operation1, StrokeWithNeighbours* operation2);
+  double magnitude(std::vector<double> points);
+
+  SetOfPoints getNeighbours(const SamplePoint point);
+  bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
+  void initializeSynthesis();
+  void search(StrokeWithNeighbours *operation1);
+  void assign();
+
+
+};
+*/
+//************************************************************************
+//>>>>>>> Stashed changes
 //    Brush Tool declaration
 //************************************************************************
 

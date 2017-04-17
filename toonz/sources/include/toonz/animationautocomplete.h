@@ -20,6 +20,8 @@ public:
 	~PointWithStroke() {}
 	SamplePoint point;
 	TStroke* stroke;
+    int index;
+
 };
 
 struct SimilarPair
@@ -74,7 +76,7 @@ public:
 
   TStroke* drawstrokeLine(TStroke* stroke);
 
-  TStroke*  getNormal(StrokeWithNeighbours* stroke);
+  TPointD  getNormal(PointWithStroke* pointer);
 
 private:
   int m_spaceVicinityRadius = 100;

@@ -324,35 +324,85 @@ std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
 TStroke* AnimationAutoComplete::drawstrokeLine(TStroke *stroke)
 {
 	//todo: strokeline
-	std::vector<TPointD> vec;
-	vec.push_back(stroke->getChunk(1)->getP0());
+    std::vector<TPointD> vec;
+    if( 1>=stroke->getChunkCount())
+      {  return nullptr;}
+    else {
+    vec.push_back(stroke->getChunk(1)->getP0());
 
-	double y2 = stroke->getChunk(1)->getP2().y;
-	double y1 = stroke->getChunk(1)->getP0().y;
-	double x2 = stroke->getChunk(1)->getP2().x;
-	double x1 = stroke->getChunk(1)->getP0().x;
+    double y2 = stroke->getChunk(1)->getP1().y;
+    double y1 = stroke->getChunk(1)->getP0().y;
+    double x2 = stroke->getChunk(1)->getP1().x;
+    double x1 = stroke->getChunk(1)->getP0().x;
 
-	double slope= (y2 - y1) / (x2 - x1);
+    double slope_tangent= (y2 - y1) / (x2 - x1);
+   if (slope_tangent==0)
+   {
+       double new_x=x1+100;
+       vec.push_back(TPointD(new_x,y1));
+       TStroke* strokeLine = new TStroke(vec);
+       return strokeLine;
+   }
 
-	double c = y2 - (slope * x2);
+   else {
+    double c_tangent = y2 - (slope_tangent * x2);
 
-	double new_x = x2 + 100;
-	double new_y = slope*new_x + c;
-	vec.push_back(TPointD(new_x, new_y));
+    double slope_prependicular=1/slope_tangent;
+    double c_prependicular=y2+(slope_prependicular*x2);
+
+    double new_x = x2 + 100;
+    double new_y =(-slope_prependicular*new_x )+c_prependicular;
+
+    vec.push_back(TPointD(new_x,new_y));
 	TStroke* strokeLine = new TStroke(vec);
-	return strokeLine;
+    return strokeLine;}
+    }
 }
 
-//TODO : getNormal
-/*TStroke* AnimationAutoComplete::getNormal(StrokeWithNeighbours *stroke)
-{
-   TStroke = drawstrokeLine();
 
-}*/
+
+//TODO : getNormal
+TPointD AnimationAutoComplete::getNormal(PointWithStroke* pointer)
+{
+    if( pointer->index>=pointer->stroke->getChunkCount())
+        return ;
+    else {
+    //vec.push_back(stroke->getChunk(pointer->index)->getP0());
+
+    double y2 = pointer->stroke->getChunk(pointer->index)->getP1().y;
+    double y1 = pointer->stroke->getChunk(pointer->index)->getP0().y;
+    double x2 = pointer->stroke->getChunk(pointer->index)->getP1().x;
+    double x1 = pointer->stroke->getChunk(pointer->index)->getP0().x;
+
+    double slope_tangent= (y2 - y1) / (x2 - x1);
+    if(slope_tangent==0)
+    {
+        return TPointD(0,1);
+
+    }
+    else{
+        double c_tangent = y2 - (slope_tangent * x2);
+
+        double slope_prependicular=1/slope_tangent;
+        double c_prependicular=y2+(slope_prependicular*x2);
+
+    double new_x = x2 + 10;
+    double new_y =(-slope_prependicular*new_x )+c_prependicular;
+    // Todo:Magnitude sqrt() lel x pow 2 + y pow 2 ;
+    double x_def=new_x-x2;
+    double y_def=new_y-y2;
+    double x_pow2=x_def*x_def;
+    double y_pow2= y_def*y_def;
+    double point_magnitude=sqrt(x_pow2+y_pow2);
+    double x_unit=x_def/point_magnitude;
+    double y_unit =y_def/point_magnitude;
+    return TPointD(x_unit,y_unit);}}
+
+}
 
 void GlobalSimilarityGraph::insertNode(SimilarPair *pair, std::vector<SimilarPair *> connections)
 {
-	this->connections.insert(std::pair<SimilarPair*, std::vector<SimilarPair*>>(pair, connections));
+    this->connections.insert(std::pair<SimilarPair*, std::vector<SimilarPair*>>(pair, connections));
 	numberOfNodes++;
 }
 
