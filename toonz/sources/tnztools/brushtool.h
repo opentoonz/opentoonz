@@ -119,14 +119,22 @@ public:
 	~PointWithStroke() {}
 	SamplePoint point;
     TStroke* stroke;
+    int index;
 };
 
+struct Neighbor
+{
+    TStroke* stroke;
+    int localTimeStamp;// we calculate the local timestamp by dividing the index over the total number of points
+};
+typedef std::vector<Neighbor*> Neighbors;
 struct SimilarPair
 {
 	double dissimilarityFactor;
 	PointWithStroke* point1;
 	PointWithStroke* point2;
 };
+
 
 
 class GlobalSimilarityGraph
@@ -150,6 +158,8 @@ struct minOperationIndex
 public:
     double score;
     TStroke* stroke;
+    SetOfPoints neighbours;
+    int index;
 };
 
 
@@ -157,7 +167,7 @@ class StrokeWithNeighbours
 {
 public:
     TStroke* stroke;
-    SetOfPoints neighbours;
+    std::unordered_set<StrokeWithNeighbours*> neighbours;
 	StrokeWithNeighbours *nextStroke;
 };
 
@@ -176,14 +186,14 @@ private:
   int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
-  std::vector<double> points;
 
-  double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
   StrokeWithNeighbours* mostSimilarStroke (StrokeWithNeighbours* stroke);
 
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
 												  StrokeWithNeighbours* nextToSimilarStroke);
+  double operationsSimilarity (TStroke* stroke1, TStroke* stroke2);
+  int withinTemporalVicinity(PointWithStroke* point1, PointWithStroke* point2);
 
   SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
 
@@ -191,16 +201,23 @@ private:
   double getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getTemporalSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
-  double getNeighborhoodSimilarity(StrokeWithNeighbours* operation1, StrokeWithNeighbours* operation2);
-  double magnitude(std::vector<double> points);
+  TPointD meanGlobal(std::vector<SamplePoint> globalSamples);
+  SimilarPair* meanLocal(std::vector<SimilarPair*> localPairs);
+  TPointD deviationGlobal(std::vector<SamplePoint>globalSamples );
+  SimilarPair* deviationLocal(std::vector<SimilarPair*>localPairs );
 
-  SetOfPoints getNeighbours(const SamplePoint point);
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
   void initializeSynthesis();
   void search(StrokeWithNeighbours *operation1);
   void assign();
 
+  std::vector<double> differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
+  double getNeighborhoodSimilarities(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
+  std::vector<double> getCentralSimilarities(TStroke* stroke);
+  std::vector <SimilarPair*> getNeighborhoodMatchingPairs (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
+  SamplePoint minimizeDissimilarity (SamplePoint* central, SamplePoint* point);
 
+  std::vector<StrokeWithNeighbours *> getNeighbours(SamplePoint point);
 };
 
 //************************************************************************
