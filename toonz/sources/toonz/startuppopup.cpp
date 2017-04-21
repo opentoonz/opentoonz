@@ -392,7 +392,8 @@ void StartupPopup::refreshRecentScenes() {
     }
   }
   bool ret = true;
-  for (int i = 0; i < m_recentNamesLabels.count() && i < 10; i++) {
+  for (int i = 0;
+       i < m_recentNamesLabels.count() && i < RECENT_SCENES_MAX_COUNT; i++) {
     ret = ret && connect(m_recentNamesLabels[i], SIGNAL(wasClicked(int)), this,
                          SLOT(onRecentSceneClicked(int)));
   }
@@ -821,7 +822,8 @@ void StartupPopup::onRecentSceneClicked(int index) {
   if (!TSystem::doesExistFileOrLevel(TFilePath(path.toStdWString()))) {
     RecentFiles::instance()->removeFilePath(index, RecentFiles::Scene);
     RecentFiles::instance()->refreshRecentFilesMenu(RecentFiles::Scene);
-    for (int i = 0; i < m_recentNamesLabels.count() && i < 7; i++) {
+    for (int i = 0;
+         i < m_recentNamesLabels.count() && i < RECENT_SCENES_MAX_COUNT; i++) {
       disconnect(m_recentNamesLabels[i]);
     }
     QString msg = QObject::tr("The selected scene could not be found.");

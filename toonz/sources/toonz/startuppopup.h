@@ -52,7 +52,8 @@ class StartupPopup final : public DVGui::Dialog {
   CameraSettingsWidget *m_cameraSettingsWidget;
   double m_dpi;
   int m_xRes, m_yRes;
-  bool m_updating = false;
+  const int RECENT_SCENES_MAX_COUNT = 10;
+  bool m_updating                   = false;
   QString m_presetListFile;
   QGroupBox *m_projectBox;
   QGroupBox *m_sceneBox;
