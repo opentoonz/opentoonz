@@ -392,7 +392,7 @@ void StartupPopup::refreshRecentScenes() {
     }
   }
   bool ret = true;
-  for (int i = 0; i < m_recentNamesLabels.count() && i < 7; i++) {
+  for (int i = 0; i < m_recentNamesLabels.count() && i < 10; i++) {
     ret = ret && connect(m_recentNamesLabels[i], SIGNAL(wasClicked(int)), this,
                          SLOT(onRecentSceneClicked(int)));
   }
