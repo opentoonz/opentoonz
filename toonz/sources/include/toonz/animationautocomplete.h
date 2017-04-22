@@ -2,6 +2,7 @@
 #define ANIMATIONAUTOCOMPLETE_H
 
 #include <unordered_set>
+#include <vector>
 
 #include "tstroke.h"
 
@@ -73,6 +74,7 @@ public:
   AnimationAutoComplete() {}
   ~AnimationAutoComplete() {}
 
+
   void addStroke(TStroke* stroke);
   std::vector<StrokeWithNeighbours*> getSynthesizedStrokes();
 
@@ -133,6 +135,12 @@ private:
   SimilarPair* meanLocal(std::vector<SimilarPair *> localPairs);
   TPointD deviationGlobal(std::vector<SamplePoint> globalSamples);
   SimilarPair* deviationLocal(std::vector<SimilarPair *> localPairs);
+
+  // hungarian function for matching pairs
+   // double hungarian_method();
+
+
+
 };
 
 #endif // ANIMATIONAUTOCOMPLETE_H

@@ -1,5 +1,3 @@
-
-
 #include "autopos.h"
 #include "cleanupcommon.h"
 

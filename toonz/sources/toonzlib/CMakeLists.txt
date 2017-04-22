@@ -175,6 +175,7 @@ set(SOURCES
     fxdag.cpp
     glrasterpainter.cpp
     hook.cpp
+    hungarian.cpp
     ikengine.cpp
     ikjacobian.cpp
     iknode.cpp

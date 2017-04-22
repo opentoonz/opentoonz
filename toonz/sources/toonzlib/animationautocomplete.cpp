@@ -3,6 +3,69 @@
 #include "tcurves.h"
 #include "drawutil.h"
 
+/*
+// hungarian method
+//double AnimationAutoComplete::hungarian_method(double [], double [])
+//{
+  //  // for each row fint the min and subtract it foe each element in this row
+
+  //double min_in_row =0;
+
+  //for (int r =0 ; r < nrows ; r++)
+  {
+      min_in_row = C[r,0];
+              for (int c =0; c <ncol ; c++)
+      {
+          if (C[r,c]< min_in_row )
+          {
+              min_in_row= c[r,c];
+          }
+
+                      for (int c=0 ; c< ncol; c++)
+              {
+                  C[r,c] -= min_in_row;
+              }
+
+      }
+  }
+
+  // find the zero in the resulting matrix , ithere is no starred * zero
+  // in its row or column , satr z , repeat for each element in the matrix
+
+
+     for (int r =0 ; r < nrows ; r++)
+                  {
+
+                      if (C[r,c] == 0 && RowCover [r] ==0 && ColCover[c]==0)
+
+                      {
+                          M[r,c]=1;
+                              RowCover[r]=1;
+                                  ColCover[c]=1;
+
+
+                      }
+
+                  }
+                                  for (int r= 0; r< nrows ; r++)
+                                  RowCover[r] = 0;
+                                  for (int c=0;c< ncol;c++)
+                                  Colcover[c]=0;
+
+
+
+
+
+}
+
+
+*/
+
+
+
+
+
+//--------------------------------------------------------------------------------------
 void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
 
