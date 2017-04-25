@@ -17,7 +17,7 @@ class PointWithStroke
 {
 public:
     PointWithStroke() {}
-    PointWithStroke(SamplePoint point, TStroke* stroke) : point(point), stroke(stroke) {}
+    PointWithStroke(SamplePoint point, TStroke* stroke, int index) : point(point), stroke(stroke), index(index) {}
     ~PointWithStroke() {}
     SamplePoint point;
     TStroke* stroke;
@@ -141,7 +141,7 @@ private:
 
   double magnitude(std::vector<double> points);
 
-  std::vector<StrokeWithNeighbours*> getNeighbours(SamplePoint point);
+  std::vector<StrokeWithNeighbours*> getNeighbours(PointWithStroke point);
 
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
   void initializeSynthesis();
