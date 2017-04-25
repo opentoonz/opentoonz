@@ -582,6 +582,29 @@ TStroke* AnimationAutoComplete::drawNormalStroke(TStroke *stroke)
 }
 
 
+bool predictinPossitionUpdate(StrokeWithNeighbours currentStroke,StrokeWithNeighbours nextStroke)
+{
+    int count=0;
+    if(currentStroke.stroke->getChunkCount()>nextStroke.stroke->getChunkCount())
+        count=nextStroke.stroke->getChunkCount();
+    else
+        count=currentStroke.stroke->getChunkCount();
+    SamplePoint sampleCurrentStroke;//sample point
+    SamplePoint sampleNextStroke;
+
+    for(int i=0;i<count;i++)
+    {
+        sampleCurrentStroke=currentStroke.stroke->getChunk(i);
+        sampleNextStroke=nextStroke.stroke->getChunk(i);
+        //std::vector<TPointD> matrixA;
+        SamplePoint subtractionMatrix=sampleNextStroke-sampleCurrentStroke;
+
+
+    }
+
+
+}
+
 
 //TODO : getNormal
 TPointD AnimationAutoComplete::getNormal(PointWithStroke* pointer)
