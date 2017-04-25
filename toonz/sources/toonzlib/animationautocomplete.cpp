@@ -344,11 +344,13 @@ std::vector<double> AnimationAutoComplete::getCentralSimilarities(std::vector<Si
 	std::vector<double> centralSimilarities;
     if(n%2==0)
 	{
-        central->index=(n/2);
+        central1->index=(n/2);
+        central2->index=(n/2);
 	}
 	else
 	{
-        central->index=((n/2)+1);
+        central1->index=((n/2)+1);
+        central2->index=((n/2)+1);
 	}
     for(int i=0;i<n;i++)
 	{
