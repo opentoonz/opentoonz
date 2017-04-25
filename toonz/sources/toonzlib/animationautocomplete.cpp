@@ -2,7 +2,7 @@
 
 #include "tcurves.h"
 #include "drawutil.h"
-#include "hungarian.h"
+
 
 #include "toonz/hungarian.h"
 
@@ -256,8 +256,8 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
 		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
 
-        std::vector<SimilarPairPoints> similarStrokeMatchingPairs = getSimilarPairs(similarStroke, nextToSimilarStroke);
-        std::vector<SimilarPairPoints> lastDrawnMatchingPairs = getSimilarPairs(nextStroke, lastStroke);
+        std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairs(similarStroke, nextToSimilarStroke);
+        std::vector<SimilarPairPoint> lastDrawnMatchingPairs = getSimilarPairs(nextStroke, lastStroke);
 
 		for (int i = 0; i < similarStrokeMatchingPairs.size() || i < lastDrawnMatchingPairs.size(); i++)
 		{
@@ -278,20 +278,18 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 	return outputStroke.stroke;
 }
 
-std::vector<double> AnimationAutoComplete::differnceOfTwoNeighborhood(std::vector<SimilarPairPoints> similarPairPoints)
+std::vector<double> AnimationAutoComplete::differnceOfTwoNeighborhood(std::vector<SimilarPairPoint> similarPairPoints)
 {
-    for(SimilarPairPoints similarPair : similarPairPoints)
+    for(SimilarPairPoint similarPair : similarPairPoints)
     {
 
     }
-	std::vector<double> centralSimilarities1 = getCentralSimilarities(stroke1->stroke);
-	std::vector<double> centralSimilarities2 = getCentralSimilarities(stroke2->stroke);
 
 	  std::vector<double> centralSimilarities;
 
 
-	  std::transform(centralSimilarities1.begin(),centralSimilarities1.end(),centralSimilarities2.begin(),std::back_inserter(centralSimilarities),
-					 std::minus<double>());
+      //std::transform(centralSimilarities1.begin(),centralSimilarities1.end(),centralSimilarities2.begin(),std::back_inserter(centralSimilarities),
+                     //std::minus<double>());
 
 	  std::transform(centralSimilarities.begin(), centralSimilarities.end(),centralSimilarities.begin(),centralSimilarities.begin(),std::multiplies<double>());
 
@@ -303,9 +301,9 @@ std::vector<double> AnimationAutoComplete::differnceOfTwoNeighborhood(std::vecto
 
 double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2)
 {
-	double similarityScore = 100000;
+
 	double disSimilarityScore = 0;
-    std::vector<SimilarPairPoints> similarPairs = getSimilarPairs(stroke1,stroke2);
+    std::vector<SimilarPairPoint> similarPairs = getSimilarPairs(stroke1,stroke2);
 
   for(int i=0;i<similarPairs.size();i++)
   {
@@ -335,14 +333,14 @@ double AnimationAutoComplete::getSampleId(int index, int n)
     return (index/n);
 }
 
-std::vector<double> AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoints> similarPairPoints)
+double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints)
 {
     PointWithStroke* central1;
     PointWithStroke* central2;
-    central1->stroke=similarPairPoints[0].point1.stroke;
-    central2->stroke=similarPairPoints[0].point2.stroke;
+    central1->stroke=similarPairPoints[0].point1->stroke;
+    central2->stroke=similarPairPoints[0].point2->stroke;
     int n = similarPairPoints.size();
-	std::vector<double> centralSimilarities;
+    double dissimilarityfactor =0;
     if(n%2==0)
 	{
         central1->index=(n/2);
@@ -355,17 +353,14 @@ std::vector<double> AnimationAutoComplete::getCentralSimilarities(std::vector<Si
 	}
     for(int i=0;i<n;i++)
 	{
-		if (i!=central->index)
+        if (i!=central1->index||central2->index)
 		{
-			PointWithStroke* point;
-			point->index=i;
-			point->stroke=stroke;
 
-			double similarityfactor = pointsSimilarity(point, central);
-			centralSimilarities.push_back(similarityfactor);
+            dissimilarityfactor += pow(pointsSimilarity(similarPairPoints[i].point1, central1)-pointsSimilarity(similarPairPoints[i].point2,central2),2);
+
 		}
 	}
-	return centralSimilarities;
+    return dissimilarityfactor/n;
 
 }
 
@@ -380,7 +375,7 @@ double AnimationAutoComplete::magnitude(std::vector<double> points)
 	return sum;
 }
 
-std::vector<SimilarPairPoints> AnimationAutoComplete::getSimilarPairs(StrokeWithNeighbours *, StrokeWithNeighbours *)
+std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairs(StrokeWithNeighbours *, StrokeWithNeighbours *)
 {
 
 }
@@ -420,11 +415,11 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	return outputStroke;
 }
 
-std::vector<SimilarPairStrokes *> AnimationAutoComplete::getNeighborhoodMatchingPairs(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
+std::vector<SimilarPairStroke *> AnimationAutoComplete::getNeighborhoodMatchingPairs(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
 {
       HungarianAlgorithm hA;
       vector<int> Assignment;
-      hA.Solve()
+
 }
 
 TPointD AnimationAutoComplete::meanGlobal(std::vector<SamplePoint> globalSamples)
@@ -460,14 +455,14 @@ std::vector<StrokeWithScore> AnimationAutoComplete::getSimilarStrokes(StrokeWith
 	return similarStrokes;
 }
 
-SimilarPairPoints* AnimationAutoComplete::meanLocal(std::vector<SimilarPairPoints *> localPairs)
+SimilarPairPoint* AnimationAutoComplete::meanLocal(std::vector<SimilarPairPoint *> localPairs)
 {
 	double mean1x = 0;
 	double mean1y = 0;
 	double mean2x = 0;
 	double mean2y = 0;
 
-    for(SimilarPairPoints* similarPair : localPairs)
+    for(SimilarPairPoint* similarPair : localPairs)
 	{
 		int index1 = similarPair->point1->index;
 		mean1x +=  similarPair->point1->stroke->getChunk(index1)->getP0().x;
@@ -477,7 +472,7 @@ SimilarPairPoints* AnimationAutoComplete::meanLocal(std::vector<SimilarPairPoint
 		mean2y = similarPair->point2->stroke->getChunk(index2)->getP0().y;
 
 	}
-    SimilarPairPoints* mean = new SimilarPairPoints();
+    SimilarPairPoint* mean = new SimilarPairPoint();
    int size = localPairs.size();
 	mean->point1->point->setP0(TPointD(mean1x/size,mean1y/size));
 	mean->point2->point->setP0(TPointD(mean2x/size,mean2y/size));
@@ -505,19 +500,19 @@ TPointD AnimationAutoComplete::deviationGlobal(std::vector<SamplePoint> globalSa
 	return std;
 }
 
-SimilarPairPoints* AnimationAutoComplete::deviationLocal(std::vector<SimilarPairPoints *> localPairs)
+SimilarPairPoint* AnimationAutoComplete::deviationLocal(std::vector<SimilarPairPoint *> localPairs)
 {
-    SimilarPairPoints* mean = meanLocal(localPairs);
+    SimilarPairPoint* mean = meanLocal(localPairs);
 	double std1X =  0;
 	double std1Y =  0;
 	double std2X =  0;
 	double std2Y =  0;
-    SimilarPairPoints* std = new SimilarPairPoints();
+    SimilarPairPoint* std = new SimilarPairPoint();
 
 	int size = localPairs.size()-1;
 
 
-    for(SimilarPairPoints* similarPair: localPairs)
+    for(SimilarPairPoint* similarPair: localPairs)
 	{
 		int index1 = similarPair->point1->index;
 		std1X+=pow(similarPair->point1->stroke->getChunk(index1)->getP0().x-mean->point1->point->getP0().x,2);
@@ -531,9 +526,9 @@ SimilarPairPoints* AnimationAutoComplete::deviationLocal(std::vector<SimilarPair
 	return std;
 }
 
-SimilarPairPoints AnimationAutoComplete::getMostSimilarPoint(PointWithStroke *point, TStroke *stroke)
+SimilarPairPoint AnimationAutoComplete::getMostSimilarPoint(PointWithStroke *point, TStroke *stroke)
 {
-    SimilarPairPoints mostSimilarPair;
+    SimilarPairPoint mostSimilarPair;
 
 	mostSimilarPair.point1 = point;
 	PointWithStroke* point2 = new PointWithStroke(stroke->getChunk(0), stroke);
@@ -556,13 +551,13 @@ SimilarPairPoints AnimationAutoComplete::getMostSimilarPoint(PointWithStroke *po
     return mostSimilarPair;
 }
 
-SimilarPairStrokes ** AnimationAutoComplete::prepareHungarian(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
+/*/SimilarPairStroke ** AnimationAutoComplete::prepareHungarian(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
 
 {
-    SimilarPairStrokes** HungarianMatrix;
+    SimilarPairStroke** HungarianMatrix;
     std::vector<std::vector<double>> Scores;
     std::vector<std::pair<TStroke,std::vector<TStroke>> correspondingStrokes;
-    HungarianMatrix= new SimilarPairStrokes *[stroke2->neighbours.size()];
+    HungarianMatrix= new SimilarPairStroke *[stroke2->neighbours.size()];
     int i=0;
     int j=0;
     for(StrokeWithNeighbours* sN1 : stroke1->neighbours)
@@ -584,6 +579,7 @@ SimilarPairStrokes ** AnimationAutoComplete::prepareHungarian(StrokeWithNeighbou
     }
     return HungarianMatrix;
 }
+/*/
 //TODO: remove at production
 std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
 {
@@ -704,33 +700,39 @@ TPointD AnimationAutoComplete::getNormal(PointWithStroke* pointer)
 
 }
 
-void GlobalSimilarityGraph::insertNode(SimilarPairPoints *pair, std::vector<SimilarPairPoints *> connections)
+void GlobalSimilarityGraph::insertNode(SimilarPairPoint *pair, std::vector<SimilarPairPoint *> connections)
 {
-    this->connections.insert(std::pair<SimilarPairPoints*, std::vector<SimilarPairPoints*>>(pair, connections));
+    this->connections.insert(std::pair<SimilarPairPoint*, std::vector<SimilarPairPoint*>>(pair, connections));
 	numberOfNodes++;
 }
 
-std::vector<SimilarPairPoints *> GlobalSimilarityGraph::getConnections(SimilarPairPoints *pair)
+std::vector<SimilarPairPoint *> GlobalSimilarityGraph::getConnections(SimilarPairPoint *pair)
 {
 	if (pair)
 		return this->connections[pair];
-    return std::vector<SimilarPairPoints *>();
+    return std::vector<SimilarPairPoint *>();
 }
 
-void AnimationAutoComplete::getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
+std::vector<SimilarPairPoint*> AnimationAutoComplete::getSimilarPairPoint(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
 {
     // TODO; replace el harie with HunharianMatrix
     std::vector<std::vector<double>> input;
     std::vector<int>assignment;
     int sizeSTroke1 = stroke1->stroke->getChunkCount();
     int sizeSTroke2 = stroke2->stroke->getChunkCount();
-    std::vector<SimilarPair>similarPointsIndex;
+    std::vector<SimilarPairPoint*>similarPointsIndex;
 
     for(int i=0;i<sizeSTroke1;i++)
     {
        for(int j=0;j<sizeSTroke2;j++)
        {
-          double pointsimilar = pointsSimilarity(stroke1->stroke(i),stroke2->stroke(j));
+           PointWithStroke* point1;
+           point1->index=i;
+           point1->stroke=stroke1->stroke;
+           PointWithStroke* point2;
+           point2->index=j;
+           point2->stroke=stroke2->stroke;
+          double pointsimilar = pointsSimilarity(point1,point2);
           input[i][j]=pointsimilar;
        }
     }
@@ -739,18 +741,18 @@ void AnimationAutoComplete::getSimilarPairPoints(StrokeWithNeighbours *stroke1, 
 
     hungarian.Solve(input,assignment);
 
-    for(int i=0;i<assignmet->size();i++)
+    for(int i=0;i<assignment.size();i++)
     {
        if(assignment[i]!=-1)
        {
-          SimilarPair p;
-          PointWithStroke point1;
+          SimilarPairPoint* p;
+          PointWithStroke* point1;
 
-          point1.index=i;
-          PointWithStroke point2;
-          point2.index=assignment[i];
-          p.point1=point1;
-          p.point2=point2;
+          point1->index=i;
+          PointWithStroke* point2;
+          point2->index=assignment[i];
+          p->point1=point1;
+          p->point2=point2;
 
         similarPointsIndex.push_back(p);
        }
