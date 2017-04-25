@@ -105,7 +105,7 @@ public:
 
   //TODO: remove at production
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
-	 //TODO: remove at production
+  //TODO: remove at production
   TStroke* drawNormalStroke(TStroke* stroke);
 
   TPointD  getNormal(PointWithStroke* pointer);
@@ -156,6 +156,8 @@ private:
   SimilarPairPoint* deviationLocal(std::vector<SimilarPairPoint *> localPairs);
   double differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2,  std::vector<SimilarPairStroke> similarPairStrokes);
 
+  // oday's alternative to generate synthesized stroke
+  std::vector<TPointD> predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke);
 };
 
 #endif // ANIMATIONAUTOCOMPLETE_H

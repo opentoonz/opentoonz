@@ -7,7 +7,8 @@
 
 void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
-
+	// clears previous predictions
+	m_synthesizedStrokes.clear();
 	StrokeWithNeighbours* strokeWithNeighbours = new StrokeWithNeighbours();
 
 	if(m_strokesWithNeighbours.size()!=0)
@@ -162,11 +163,10 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
         double score = getNeighborhoodSimilarity(lastStroke, m_strokesWithNeighbours[i]);
         score_stroke.score = min;
         score_stroke.stroke = m_strokesWithNeighbours[i];
+
 		if(score < min)
-		{
 			min = score;
 
-		}
         scores.push_back(score_stroke);
 	}
 
@@ -193,7 +193,9 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 
 	for (StrokeWithNeighbours* similarStroke : similarStrokes) {
 		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
-		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
+		//StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
+		StrokeWithNeighbours* nextStroke = new StrokeWithNeighbours();
+		nextStroke->stroke = new TStroke(predictionPositionUpdate(lastStroke, similarStroke));
 
 		std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairPoints(similarStroke, nextToSimilarStroke);
 		std::vector<SimilarPairPoint> lastDrawnMatchingPairs = getSimilarPairPoints(nextStroke, lastStroke);
@@ -595,29 +597,29 @@ TStroke* AnimationAutoComplete::drawNormalStroke(TStroke *stroke)
 }
 
 
-std::vector<TPointD> predictinPossitionUpdate(StrokeWithNeighbours currentStroke,StrokeWithNeighbours nextStroke)
+std::vector<TPointD> AnimationAutoComplete::predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke)
 {
     int count=0;
-    if(currentStroke.stroke->getChunkCount()>nextStroke.stroke->getChunkCount())
-        count=nextStroke.stroke->getChunkCount();
+	if(currentStroke->stroke->getChunkCount()>nextStroke->stroke->getChunkCount())
+		count=nextStroke->stroke->getChunkCount();
     else
-        count=currentStroke.stroke->getChunkCount();
+		count=currentStroke->stroke->getChunkCount();
     SamplePoint sampleCurrentStroke;//sample point
     SamplePoint sampleNextStroke;
     std::vector<TPointD>predectedStrock;
     for(int i=0;i<count;i++)
     {
-        sampleCurrentStroke=currentStroke.stroke->getChunk(i);
-        sampleNextStroke=nextStroke.stroke->getChunk(i);
+		sampleCurrentStroke=currentStroke->stroke->getChunk(i);
+		sampleNextStroke=nextStroke->stroke->getChunk(i);
         //std::vector<TPointD> matrixA;
-        SamplePoint subtractionMatrix=sampleNextStroke-sampleCurrentStroke;
+		TPointD subtractionMatrix = sampleNextStroke->getP0() - sampleCurrentStroke->getP0();
         TPointD Segma;
         Segma.x=1;
         Segma.y=1;
         //SamplePoint result=subtractionMatrix+sampleCurrentStroke+Segma;
-        TPointD result=subtractionMatrix->getP0().operator +(sampleCurrentStroke->getP0());
-        result=result.operator +(Segma);
-        predectedStrock[0]=result;
+		TPointD result = subtractionMatrix + (sampleCurrentStroke->getP0());
+		result = result +(Segma);
+		predectedStrock.push_back(result);
     }
     return predectedStrock;
 }
