@@ -105,14 +105,14 @@ public:
 
   //TODO: remove at production
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
-
-  TStroke* drawstrokeLine(TStroke* stroke);
+	 //TODO: remove at production
+  TStroke* drawNormalStroke(TStroke* stroke);
 
   TPointD  getNormal(PointWithStroke* pointer);
 
 private:
 
-  int m_spaceVicinityRadius = 100;
+  const int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
   std::vector<double> points;
@@ -135,7 +135,7 @@ private:
   double getTemporalSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getNeighborhoodSimilarity(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
-  std::vector<SimilarPairPoint*> getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
+  std::vector<SimilarPairPoint> getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
   std::vector<SimilarPairStroke> getSimilarPairStrokes(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
 
   double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);

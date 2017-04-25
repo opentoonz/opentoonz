@@ -5,8 +5,6 @@
 
 #include "toonz/hungarian.h"
 
-
-//--------------------------------------------------------------------------------------
 void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
 
@@ -570,7 +568,7 @@ std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(Stro
       return SimilarPairStrokeVector;
 }
 
-TStroke* AnimationAutoComplete::drawstrokeLine(TStroke *stroke)
+TStroke* AnimationAutoComplete::drawNormalStroke(TStroke *stroke)
 {
 	//todo: strokeline
     std::vector<TPointD> vec;
@@ -662,14 +660,13 @@ std::vector<SimilarPairPoint *> GlobalSimilarityGraph::getConnections(SimilarPai
     return std::vector<SimilarPairPoint *>();
 }
 
-std::vector<SimilarPairPoint*> AnimationAutoComplete::getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
+std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
 {
-    // TODO; replace el harie with HunharianMatrix
-    std::vector<std::vector<double>> input;
+	HungerianMatrix input;
     std::vector<int>assignment;
     int sizeSTroke1 = stroke1->stroke->getChunkCount();
     int sizeSTroke2 = stroke2->stroke->getChunkCount();
-    std::vector<SimilarPairPoint*>similarPointsIndex;
+	std::vector<SimilarPairPoint> similarPointsIndex;
 
     for(int i=0;i<sizeSTroke1;i++)
     {
@@ -694,16 +691,16 @@ std::vector<SimilarPairPoint*> AnimationAutoComplete::getSimilarPairPoints(Strok
     {
        if(assignment[i]!=-1)
        {
-          SimilarPairPoint* p;
+		  SimilarPairPoint p;
           PointWithStroke* point1;
 
           point1->index=i;
           PointWithStroke* point2;
           point2->index=assignment[i];
-          p->point1=point1;
-          p->point2=point2;
+		  p.point1=point1;
+		  p.point2=point2;
 
-        similarPointsIndex.push_back(p);
+		  similarPointsIndex.push_back(p);
        }
     }
 }
