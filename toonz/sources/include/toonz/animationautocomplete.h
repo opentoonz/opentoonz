@@ -38,7 +38,11 @@ struct SimilarPair
 	PointWithStroke* point1;
 	PointWithStroke* point2;
 };
-
+struct MatchingOperations
+{
+    TStroke* stroke1;
+    TStroke* stroke2;
+};
 
 class GlobalSimilarityGraph
 {
@@ -67,6 +71,13 @@ struct StrokeWithScore
 {
 	double score;
 	StrokeWithNeighbours* stroke;
+};
+
+struct Hungarian
+{
+    TStroke* stroke1;
+    TStroke* stroke2;
+    double score;
 };
 
 class AnimationAutoComplete {
@@ -104,6 +115,7 @@ private:
 												  StrokeWithNeighbours* nextToSimilarStroke);
 
   SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
+  Hungarian ** prepareHungarian (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
   double pointsSimilarityWithoutWeights(PointWithStroke* point1, PointWithStroke* point2);
