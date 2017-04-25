@@ -191,8 +191,8 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
 		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
 
-        std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairs(similarStroke, nextToSimilarStroke);
-        std::vector<SimilarPairPoint> lastDrawnMatchingPairs = getSimilarPairs(nextStroke, lastStroke);
+		std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairPoints(similarStroke, nextToSimilarStroke);
+		std::vector<SimilarPairPoint> lastDrawnMatchingPairs = getSimilarPairPoints(nextStroke, lastStroke);
 
 		for (int i = 0; i < similarStrokeMatchingPairs.size() || i < lastDrawnMatchingPairs.size(); i++)
 		{
@@ -238,7 +238,7 @@ double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1
 {
 
 	double disSimilarityScore = 0;
-    std::vector<SimilarPairPoint> similarPairs = getSimilarPairs(stroke1,stroke2);
+	std::vector<SimilarPairPoint> similarPairs = getSimilarPairPoints(stroke1,stroke2);
 
   for(int i=0;i<similarPairs.size();i++)
   {
@@ -309,12 +309,6 @@ double AnimationAutoComplete::magnitude(std::vector<double> points)
 	sum = sqrt(sum);
 	return sum;
 }
-
-std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairs(StrokeWithNeighbours *, StrokeWithNeighbours *)
-{
-
-}
-
 
 StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWithNeighbours *lastStroke, StrokeWithNeighbours *similarStroke, StrokeWithNeighbours *nextToSimilarStroke)
 {
@@ -668,7 +662,7 @@ std::vector<SimilarPairPoint *> GlobalSimilarityGraph::getConnections(SimilarPai
     return std::vector<SimilarPairPoint *>();
 }
 
-std::vector<SimilarPairPoint*> AnimationAutoComplete::getSimilarPairPoint(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
+std::vector<SimilarPairPoint*> AnimationAutoComplete::getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
 {
     // TODO; replace el harie with HunharianMatrix
     std::vector<std::vector<double>> input;

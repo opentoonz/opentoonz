@@ -129,7 +129,6 @@ private:
                                                   StrokeWithNeighbours* nextToSimilarStroke);
 
   SimilarPairPoint getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
-  SimilarPairStroke ** prepareHungarian (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
   double pointsSimilarityWithoutWeights(PointWithStroke* point1, PointWithStroke* point2);
@@ -137,10 +136,8 @@ private:
   double getTemporalSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getNeighborhoodSimilarity(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
-  std::vector<SimilarPairPoint*> AnimationAutoComplete::getSimilarPairPoint(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
+  std::vector<SimilarPairPoint*> getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
   double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
-
-
 
   std::vector<SimilarPairStroke *> AnimationAutoComplete::getNeighborhoodMatchingPairs(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
 
@@ -148,8 +145,6 @@ private:
   SamplePoint minimizeDissimilarity (SamplePoint* central, SamplePoint* point);
 
   double magnitude(std::vector<double> points);
-
-  std::vector<SimilarPairPoint> getSimilarPairs(StrokeWithNeighbours*, StrokeWithNeighbours*);
 
   std::vector<StrokeWithNeighbours*> getNeighbours(SamplePoint point);
 
@@ -165,11 +160,6 @@ private:
   TPointD deviationGlobal(std::vector<SamplePoint> globalSamples);
   SimilarPairPoint* deviationLocal(std::vector<SimilarPairPoint *> localPairs);
   std::vector<double> AnimationAutoComplete::differnceOfTwoNeighborhood(std::vector<SimilarPairPoint> similarPairPoints);
-
-  // hungarian function for matching pairs
-   // double hungarian_method();
-
-
 
 };
 
