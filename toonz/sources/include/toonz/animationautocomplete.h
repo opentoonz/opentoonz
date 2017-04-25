@@ -32,12 +32,13 @@ struct Neighbor
 
 typedef std::vector<Neighbor*> Neighbors;
 
-struct SimilarPair
+struct SimilarPairPoint
 {
 	double dissimilarityFactor;
 	PointWithStroke* point1;
 	PointWithStroke* point2;
 };
+
 struct MatchingOperations
 {
     TStroke* stroke1;
@@ -46,15 +47,15 @@ struct MatchingOperations
 
 class GlobalSimilarityGraph
 {
-	std::map<SimilarPair*, std::vector<SimilarPair*>> connections;
+    std::map<SimilarPairPoint*, std::vector<SimilarPairPoint*>> connections;
 
 public:
 	int numberOfNodes = 0;
 
 	GlobalSimilarityGraph() {}
 	~GlobalSimilarityGraph() {}
-	void insertNode(SimilarPair* pair, std::vector<SimilarPair*> connections);
-	std::vector<SimilarPair *> getConnections(SimilarPair* pair);
+    void insertNode(SimilarPairPoint* pair, std::vector<SimilarPairPoint*> connections);
+    std::vector<SimilarPairPoint *> getConnections(SimilarPairPoint* pair);
 };
 
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
@@ -66,6 +67,13 @@ public:
 	TStroke* stroke;
 	std::unordered_set<StrokeWithNeighbours*> neighbours;
 	StrokeWithNeighbours *nextStroke;
+};
+
+struct SimilarPairStroke
+{
+    double dissimilarityFactor;
+    StrokeWithNeighbours* stroke1;
+    StrokeWithNeighbours* stroke2;
 };
 
 struct StrokeWithScore
@@ -115,7 +123,7 @@ private:
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
 												  StrokeWithNeighbours* nextToSimilarStroke);
 
-  SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
+  SimilarPairPoint getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
   Hungarian ** prepareHungarian (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
@@ -127,14 +135,14 @@ private:
 
   std::vector<double> getCentralSimilarities(TStroke* stroke);
 
-  std::vector <SimilarPair*> getNeighborhoodMatchingPairs (StrokeWithNeighbours* stroke1,
+  std::vector <SimilarPairPoint*> getNeighborhoodMatchingPairs (StrokeWithNeighbours* stroke1,
 														   StrokeWithNeighbours* stroke2);
 
   SamplePoint minimizeDissimilarity (SamplePoint* central, SamplePoint* point);
 
   double magnitude(std::vector<double> points);
 
-  std::vector<SimilarPair> getSimilarPairs(StrokeWithNeighbours*, StrokeWithNeighbours*);
+  std::vector<SimilarPairPoint> getSimilarPairs(StrokeWithNeighbours*, StrokeWithNeighbours*);
   std::vector<double> differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
   std::vector<StrokeWithNeighbours*> getNeighbours(SamplePoint point);
 
@@ -145,9 +153,9 @@ private:
   StrokeWithNeighbours* assign(std::vector<StrokeWithNeighbours*>);
 
   TPointD meanGlobal(std::vector<SamplePoint> globalSamples);
-  SimilarPair* meanLocal(std::vector<SimilarPair *> localPairs);
+  SimilarPairPoint* meanLocal(std::vector<SimilarPairPoint *> localPairs);
   TPointD deviationGlobal(std::vector<SamplePoint> globalSamples);
-  SimilarPair* deviationLocal(std::vector<SimilarPair *> localPairs);
+  SimilarPairPoint* deviationLocal(std::vector<SimilarPairPoint *> localPairs);
 
   // hungarian function for matching pairs
    // double hungarian_method();
