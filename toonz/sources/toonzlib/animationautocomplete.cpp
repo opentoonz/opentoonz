@@ -525,14 +525,17 @@ std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
     return strokes;
 }
 
-HungerianMatrix AnimationAutoComplete::setHungerianMatrix(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
+std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
 {
     HungarianAlgorithm obj_hungarianAlgorithm;
     std::vector<StrokeWithNeighbours*>ReorderStroke1;
     std::vector<StrokeWithNeighbours*>ReorderStroke2;
     std::vector<int>SolveFunctionVector;
+    std::vector<SimilarPairStroke> SimilarPairStrokeVector;
+    SimilarPairStroke similarPairStroke;
 
-    HungerianMatrix m_hungerianMatrix;
+    // un ordered set to vectors
+    HungerianMatrix hungerianMatrix;
 
     for(StrokeWithNeighbours*stroke:stroke1->neighbours)
     {
@@ -542,6 +545,7 @@ HungerianMatrix AnimationAutoComplete::setHungerianMatrix(StrokeWithNeighbours *
     {
         ReorderStroke2.push_back(stroke);
     }
+    // prepare Hungerian matrix
         for(int i = 0; i<ReorderStroke1.size(); i++)
         {
             std::vector<double>PushedVector;
@@ -551,9 +555,25 @@ HungerianMatrix AnimationAutoComplete::setHungerianMatrix(StrokeWithNeighbours *
      double Score=operationsSimilarity(ReorderStroke1[i],ReorderStroke2[j]);
         PushedVector.push_back(Score);
         }
-         m_hungerianMatrix.push_back(PushedVector);
+         hungerianMatrix.push_back(PushedVector);
     }
- obj_hungarianAlgorithm.Solve(m_hungerianMatrix ,SolveFunctionVector);
+        // function solve hungarian matrix and return vector of most similar pairs
+ obj_hungarianAlgorithm.Solve(hungerianMatrix ,SolveFunctionVector);
+ //prepare vector of similar pair stroke
+      for( int i=0;i<SolveFunctionVector.size();i++)
+        {
+          // strokepair1 is the i of vector solveFunctionVector;
+          // strokepair2 is the index of vector solveFunctionVector[i];
+
+          StrokeWithNeighbours* strokepair1=ReorderStroke1[i];
+          StrokeWithNeighbours* strokepair2=ReorderStroke2[SolveFunctionVector[i]];
+          similarPairStroke.stroke1=strokepair1;
+          similarPairStroke.stroke2=strokepair2;
+          similarPairStroke.dissimilarityFactor=hungerianMatrix[i][SolveFunctionVector[i]];
+          SimilarPairStrokeVector.push_back(similarPairStroke);
+
+      }
+      return SimilarPairStrokeVector;
 }
 
 TStroke* AnimationAutoComplete::drawstrokeLine(TStroke *stroke)

@@ -106,7 +106,7 @@ public:
   //TODO: remove at production
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
 
-  HungerianMatrix setHungerianMatrix(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
+  std::vector<SimilarPairStroke> getSimilarPairStrokes(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
   TStroke* drawstrokeLine(TStroke* stroke);
 
   TPointD  getNormal(PointWithStroke* pointer);
