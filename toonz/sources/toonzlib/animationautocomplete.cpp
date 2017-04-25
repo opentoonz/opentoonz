@@ -302,10 +302,10 @@ double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoin
 double AnimationAutoComplete::magnitude(std::vector<double> points)
 {
 	double sum=0;
+
 	for(int i=0;i<points.size();i++)
-	{
 		sum+= points[i]*points[i];
-	}
+
 	sum = sqrt(sum);
 	return sum;
 }
