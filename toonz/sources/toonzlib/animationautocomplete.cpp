@@ -438,60 +438,6 @@ SimilarPairPoint* AnimationAutoComplete::deviationLocal(std::vector<SimilarPairP
 	return std;
 }
 
-SimilarPairPoint AnimationAutoComplete::getMostSimilarPoint(PointWithStroke *point, TStroke *stroke)
-{
-    SimilarPairPoint mostSimilarPair;
-
-	mostSimilarPair.point1 = point;
-	PointWithStroke* point2 = new PointWithStroke(stroke->getChunk(0), stroke);
-	mostSimilarPair.dissimilarityFactor = pointsSimilarity(point, point2);
-	mostSimilarPair.point2 = point2;
-
-	for (int i = 1; i < stroke->getChunkCount(); i++)
-	{
-		point2 = new PointWithStroke(stroke->getChunk(i), stroke);
-		double similarityScore = pointsSimilarity(point, point2);
-		if (mostSimilarPair.dissimilarityFactor > similarityScore)
-		{
-			delete mostSimilarPair.point2;
-			mostSimilarPair.point2 = point2;
-			mostSimilarPair.dissimilarityFactor = similarityScore;
-		}
-		else delete point2;
-	}
-
-    return mostSimilarPair;
-}
-
-/*/SimilarPairStroke ** AnimationAutoComplete::prepareHungarian(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
-
-{
-    SimilarPairStroke** HungarianMatrix;
-    std::vector<std::vector<double>> Scores;
-    std::vector<std::pair<TStroke,std::vector<TStroke>> correspondingStrokes;
-    HungarianMatrix= new SimilarPairStroke *[stroke2->neighbours.size()];
-    int i=0;
-    int j=0;
-    for(StrokeWithNeighbours* sN1 : stroke1->neighbours)
-    {
-        HungarianMatrix[i]= new SimilarPairStrokes [stroke1->neighbours.size()];
-        for(StrokeWithNeighbours* sN2 : stroke2->neighbours)
-        {
-            SimilarPairStrokes hungarian ;
-
-            hungarian.score = operationsSimilarity(sN1, sN2);
-            hungarian.stroke1=sN1->stroke;
-            hungarian.stroke2=sN2->stroke;
-
-            HungarianMatrix[i][j]=hungarian;
-            j++;
-        }
-        i++;
-        j=0;
-    }
-    return HungarianMatrix;
-}
-/*/
 //TODO: remove at production
 std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
 {

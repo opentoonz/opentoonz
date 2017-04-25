@@ -120,11 +120,8 @@ private:
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
   int withinTemporalVicinity(PointWithStroke* point1, PointWithStroke* point2);
 
-  StrokeWithNeighbours* mostSimilarStroke (StrokeWithNeighbours* stroke);
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
                                                   StrokeWithNeighbours* nextToSimilarStroke);
-
-  SimilarPairPoint getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
 
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
   double pointsSimilarityWithoutWeights(PointWithStroke* point1, PointWithStroke* point2);
