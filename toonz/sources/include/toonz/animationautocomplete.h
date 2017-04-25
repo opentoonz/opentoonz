@@ -112,6 +112,8 @@ private:
   double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getNeighborhoodSimilarity(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
 
+  void getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
+
   std::vector<double> getCentralSimilarities(TStroke* stroke);
 
   std::vector <SimilarPair*> getNeighborhoodMatchingPairs (StrokeWithNeighbours* stroke1,

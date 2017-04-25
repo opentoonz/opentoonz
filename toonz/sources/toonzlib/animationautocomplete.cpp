@@ -2,6 +2,7 @@
 
 #include "tcurves.h"
 #include "drawutil.h"
+#include "hungarian.h"
 
 /*
 // hungarian method
@@ -652,3 +653,48 @@ std::vector<SimilarPair *> GlobalSimilarityGraph::getConnections(SimilarPair *pa
 		return this->connections[pair];
 	return std::vector<SimilarPair *>();
 }
+
+void AnimationAutoComplete::getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
+{
+    // TODO; replace el harie with HunharianMatrix
+    std::vector<std::vector<double>> input;
+    std::vector<int>assignment;
+    int sizeSTroke1 = stroke1->stroke->getChunkCount();
+    int sizeSTroke2 = stroke2->stroke->getChunkCount();
+    std::vector<SimilarPair>similarPointsIndex;
+
+    for(int i=0;i<sizeSTroke1;i++)
+    {
+       for(int j=0;j<sizeSTroke2;j++)
+       {
+          double pointsimilar = pointsSimilarity(stroke1->stroke(i),stroke2->stroke(j));
+          input[i][j]=pointsimilar;
+       }
+    }
+
+    HungarianAlgorithm hungarian;
+
+    hungarian.Solve(input,assignment);
+
+    for(int i=0;i<assignmet->size();i++)
+    {
+       if(assignment[i]!=-1)
+       {
+          SimilarPair p;
+          PointWithStroke point1;
+
+          point1.index=i;
+          PointWithStroke point2;
+          point2.index=assignment[i];
+          p.point1=point1;
+          p.point2=point2;
+
+        similarPointsIndex.push_back(p);
+       }
+    }
+}
+
+
+
+
+
