@@ -2,7 +2,9 @@
 
 #include "tcurves.h"
 #include "drawutil.h"
-#include "hungarian.h"
+
+#include "toonz/hungarian.h"
+
 
 /*
 // hungarian method
@@ -586,7 +588,38 @@ std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
 
 	for(int i = 0; i < stroke->getChunkCount(); i++)
 		strokes.push_back(makeEllipticStroke(3, stroke->getChunk(i)->getP0(), m_spaceVicinityRadius, m_spaceVicinityRadius));
-	return strokes;
+    return strokes;
+}
+
+HungerianMatrix AnimationAutoComplete::setHungerianMatrix(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
+{
+    HungarianAlgorithm obj_hungarianAlgorithm;
+    std::vector<StrokeWithNeighbours*>ReorderStroke1;
+    std::vector<StrokeWithNeighbours*>ReorderStroke2;
+    std::vector<int>SolveFunctionVector;
+
+    HungerianMatrix m_hungerianMatrix;
+
+    for(StrokeWithNeighbours*stroke:stroke1->neighbours)
+    {
+        ReorderStroke1.push_back(stroke);
+    }
+    for(StrokeWithNeighbours*stroke:stroke2->neighbours)
+    {
+        ReorderStroke2.push_back(stroke);
+    }
+        for(int i = 0; i<ReorderStroke1.size(); i++)
+        {
+            std::vector<double>PushedVector;
+            for(int j=0;j<ReorderStroke2.size();j++)
+            {
+
+     double Score=operationsSimilarity(ReorderStroke1[i],ReorderStroke2[j]);
+        PushedVector.push_back(Score);
+        }
+         m_hungerianMatrix.push_back(PushedVector);
+    }
+ obj_hungarianAlgorithm.Solve(m_hungerianMatrix ,SolveFunctionVector);
 }
 
 TStroke* AnimationAutoComplete::drawstrokeLine(TStroke *stroke)

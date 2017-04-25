@@ -58,6 +58,7 @@ public:
 };
 
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
+typedef std::vector<std::vector<double> > HungerianMatrix;
 
 class StrokeWithNeighbours
 {
@@ -92,17 +93,17 @@ public:
   //TODO: remove at production
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
 
-
+  HungerianMatrix setHungerianMatrix(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
   TStroke* drawstrokeLine(TStroke* stroke);
 
   TPointD  getNormal(PointWithStroke* pointer);
 
 private:
+
   int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
   std::vector<double> points;
-
   double gaussianConstant( SamplePoint chuck1, SamplePoint chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
   int withinTemporalVicinity(PointWithStroke* point1, PointWithStroke* point2);
