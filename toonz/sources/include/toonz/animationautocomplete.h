@@ -38,7 +38,11 @@ struct SimilarPair
 	PointWithStroke* point1;
 	PointWithStroke* point2;
 };
-
+struct MatchingOperations
+{
+    TStroke* stroke1;
+    TStroke* stroke2;
+};
 
 class GlobalSimilarityGraph
 {
@@ -54,6 +58,7 @@ public:
 };
 
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
+typedef std::vector<std::vector<double> > HungerianMatrix;
 
 class StrokeWithNeighbours
 {
@@ -69,6 +74,13 @@ struct StrokeWithScore
 	StrokeWithNeighbours* stroke;
 };
 
+struct Hungarian
+{
+    TStroke* stroke1;
+    TStroke* stroke2;
+    double score;
+};
+
 class AnimationAutoComplete {
 public:
   AnimationAutoComplete() {}
@@ -81,17 +93,17 @@ public:
   //TODO: remove at production
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
 
-
+  HungerianMatrix setHungerianMatrix(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
   TStroke* drawstrokeLine(TStroke* stroke);
 
   TPointD  getNormal(PointWithStroke* pointer);
 
 private:
+
   int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
   std::vector<double> points;
-
   double gaussianConstant( SamplePoint chuck1, SamplePoint chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
   int withinTemporalVicinity(PointWithStroke* point1, PointWithStroke* point2);
@@ -104,6 +116,7 @@ private:
 												  StrokeWithNeighbours* nextToSimilarStroke);
 
   SimilarPair getMostSimilarPoint(PointWithStroke* point, TStroke* stroke);
+  Hungarian ** prepareHungarian (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
   double pointsSimilarityWithoutWeights(PointWithStroke* point1, PointWithStroke* point2);
