@@ -342,13 +342,6 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	return outputStroke;
 }
 
-std::vector<SimilarPairStroke *> AnimationAutoComplete::getNeighborhoodMatchingPairs(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
-{
-      HungarianAlgorithm hA;
-      vector<int> Assignment;
-
-}
-
 TPointD AnimationAutoComplete::meanGlobal(std::vector<SamplePoint> globalSamples)
 {
 	double mean1 =0;

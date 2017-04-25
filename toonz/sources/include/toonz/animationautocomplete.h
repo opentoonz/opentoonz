@@ -134,11 +134,6 @@ private:
 
   double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
 
-  std::vector<SimilarPairStroke *> AnimationAutoComplete::getNeighborhoodMatchingPairs(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
-
-
-  SamplePoint minimizeDissimilarity (SamplePoint* central, SamplePoint* point);
-
   double magnitude(std::vector<double> points);
 
   std::vector<StrokeWithNeighbours*> getNeighbours(SamplePoint point);
