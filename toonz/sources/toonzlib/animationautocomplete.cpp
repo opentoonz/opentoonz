@@ -210,7 +210,7 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 
 			min = score;
 			outputStroke.score = min;
-			outputStroke.stroke = similarStroke;
+            outputStroke.stroke = nextStroke;
 		}
 	}
 
