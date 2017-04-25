@@ -208,27 +208,73 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 		}
 	}
 
-	return outputStroke.stroke;
+    return outputStroke.stroke;
 }
 
-std::vector<double> AnimationAutoComplete::differnceOfTwoNeighborhood(std::vector<SimilarPairPoint> similarPairPoints)
+double AnimationAutoComplete::getSimilarPairPointBySampleId(TStroke *stroke1, TStroke *stroke2)
 {
-    for(SimilarPairPoint similarPair : similarPairPoints)
+    int minimumIndex =0;
+    int maximumIndex =0;
+    if(stroke1->getChunkCount()<stroke2->getChunkCount())
     {
-
+        minimumIndex = stroke1->getChunkCount();
+        maximumIndex=stroke2->getChunkCount();
+    }
+    else
+    {
+        minimumIndex = stroke2->getChunkCount();
+        maximumIndex = stroke1->getChunkCount();
     }
 
-	  std::vector<double> centralSimilarities;
+    std::vector<SimilarPairPoint> similarPairs;
 
+    for(int i=0;i<minimumIndex;i++)
+    {
+        double nearestSampleId = 99999999;
+        int minimum =0;
+        for(int j=0;j<maximumIndex;j++)
+        {
+            double sampleId = fabs(getSampleId(i,minimumIndex)-getSampleId(j,maximumIndex));
+            if(sampleId<nearestSampleId)
+            {
+                nearestSampleId=sampleId;
+                minimum = j;
+            }
+        }
+        SimilarPairPoint similarPair;
+        PointWithStroke* point1;
+        point1->index=i;
+        point1->stroke=stroke1;
+        similarPair.point1=point1;
+        PointWithStroke* point2;
+        point2->index=minimum;
+        point2->stroke=stroke2;
+        similarPair.point2=point2;
+        similarPairs.push_back((similarPair));
 
-      //std::transform(centralSimilarities1.begin(),centralSimilarities1.end(),centralSimilarities2.begin(),std::back_inserter(centralSimilarities),
-                     //std::minus<double>());
+    }
+    double disimilarity =0;
+    for(int i=0;i<similarPairs.size();i++)
+    {
+        disimilarity += pointsSimilarity(similarPairs[i].point1, similarPairs[i].point2);
+    }
 
-	  std::transform(centralSimilarities.begin(), centralSimilarities.end(),centralSimilarities.begin(),centralSimilarities.begin(),std::multiplies<double>());
+return disimilarity/similarPairs.size();
 
-	  //remember to absolute
+}
 
-  return centralSimilarities;
+double AnimationAutoComplete::differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2,  std::vector<SimilarPairStroke> similarPairStrokes)
+{
+    double differenceInScores = 0;
+
+    for(SimilarPairStroke similarPair : similarPairStrokes)
+    {
+        double stroke1Similarity = operationsSimilarity(stroke1, similarPair.stroke1);
+        double stroke2Similarity = operationsSimilarity(stroke2, similarPair.stroke2);
+        differenceInScores += pow(stroke1Similarity - stroke2Similarity, 2);
+    }
+
+    return differenceInScores;
 }
 
 
@@ -236,7 +282,9 @@ double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1
 {
 
 	double disSimilarityScore = 0;
+
 	std::vector<SimilarPairPoint> similarPairs = getSimilarPairPoints(stroke1,stroke2);
+
 
   for(int i=0;i<similarPairs.size();i++)
   {
@@ -248,15 +296,17 @@ double AnimationAutoComplete::operationsSimilarity(StrokeWithNeighbours* stroke1
 
 double AnimationAutoComplete::getNeighborhoodSimilarity(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
 {
-	//double neighboursSimilarity =operationsSimilarity(stroke1->stroke,stroke1->neighbours.->stroke);
-    double neighbourhoodSimilarity = 0;
+    // if output was not accurate we should consider implementing a different operationsSimilarity that
+    // doesn't simply return a double representing an average of points similarity.
+    // we should instead return a vector.
 
-	for(StrokeWithNeighbours* neighbour : stroke1->neighbours)
-        neighbourhoodSimilarity += operationsSimilarity(stroke1 ,neighbour);
-		//std::transform(sum.begin(), sum.end(), neighboursSimilarity.begin(),
-					   //neighboursSimilarity.begin(), std::plus<double>());
+    std::vector <SimilarPairPoint> similarPoints=getSimilarPairPoints(stroke1,stroke2);
+    double centralSimilarities = getCentralSimilarities(similarPoints);
 
-    return neighbourhoodSimilarity/stroke1->neighbours.size();
+    std::vector<SimilarPairStroke> similarStrokes = getSimilarPairStrokes(stroke1,stroke2);
+    double differenceInNeighborhoods = differnceOfTwoNeighborhood(stroke1,stroke2, similarStrokes);
+
+    return sqrt(centralSimilarities + differenceInNeighborhoods);
 }
 
 double AnimationAutoComplete::getSampleId(int index, int n)
@@ -307,6 +357,7 @@ double AnimationAutoComplete::magnitude(std::vector<double> points)
 	sum = sqrt(sum);
 	return sum;
 }
+
 
 StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWithNeighbours *lastStroke, StrokeWithNeighbours *similarStroke, StrokeWithNeighbours *nextToSimilarStroke)
 {
@@ -627,6 +678,7 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
 		  similarPointsIndex.push_back(p);
        }
     }
+    return similarPointsIndex;
 }
 
 
