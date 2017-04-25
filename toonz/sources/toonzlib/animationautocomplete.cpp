@@ -369,8 +369,12 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 {
 	StrokeWithNeighbours* outputStroke = new StrokeWithNeighbours();
 	std::vector<TThickPoint> points;
+    double count1 = similarStroke->stroke->getChunkCount();
+    double count2 = nextToSimilarStroke->stroke->getChunkCount();
 
-	int loopCount = (int)fmin((double)similarStroke->stroke->getChunkCount(), (double)nextToSimilarStroke->stroke->getChunkCount());
+    int loopCount = (int)fmin(count1, count2);
+    int count3 = lastStroke->stroke->getChunkCount();
+    loopCount = (int) fmin (loopCount,count3);
 
 	for(int i = 0; i < loopCount; i++)
 	{
