@@ -367,21 +367,6 @@ TPointD AnimationAutoComplete::meanGlobal(std::vector<SamplePoint> globalSamples
    return mean;
 }
 
-std::vector<StrokeWithScore> AnimationAutoComplete::getSimilarStrokes(StrokeWithNeighbours* stroke)
-{
-	std::vector<StrokeWithScore> similarStrokes;
-
-	for(int i = 0; i < m_strokesWithNeighbours.size(); i++)
-	{
-		StrokeWithScore strokeWithScore;
-		strokeWithScore.stroke = m_strokesWithNeighbours[i];
-		strokeWithScore.score = operationsSimilarity(stroke, m_strokesWithNeighbours[i]);
-		similarStrokes.push_back(strokeWithScore);
-	}
-
-	return similarStrokes;
-}
-
 SimilarPairPoint* AnimationAutoComplete::meanLocal(std::vector<SimilarPairPoint *> localPairs)
 {
 	double mean1x = 0;

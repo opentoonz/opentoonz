@@ -115,13 +115,10 @@ private:
   const int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
-  std::vector<double> points;
+
   double gaussianConstant( SamplePoint chuck1, SamplePoint chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
   int withinTemporalVicinity(PointWithStroke* point1, PointWithStroke* point2);
-
-  // stroke with corresponding similarity score
-  std::vector<StrokeWithScore> getSimilarStrokes (StrokeWithNeighbours* stroke);
 
   StrokeWithNeighbours* mostSimilarStroke (StrokeWithNeighbours* stroke);
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
