@@ -131,6 +131,7 @@ public:
   static StrokeId appStrokeId(const TApplication *app, TStroke *stroke);
   static shared_ptr<PathAnimation> appStroke(const TApplication *app, TStroke *stroke);
   static void appSnapshot(const TApplication *app, TStroke *stroke);
+  static void appClearAndSnapshot(const TApplication *app, TStroke *stroke);
 };
 
 #endif

@@ -12,6 +12,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
+#include "toonz/pathanimations.h"
 
 #ifdef _DEBUG
 #include "tcolorstyles.h"
@@ -456,6 +457,7 @@ Altrimenti non si fa altro che aumentarli i punti di controllo
       }
     }
 
+    PathAnimations::appClearAndSnapshot(TTool::getApplication(), m_strokeRef);
     invalidate();
 
     m_dragged = false;

@@ -1741,6 +1741,7 @@ bool TVectorImage::isComputedRegionAlmostOnce() const {
 void TVectorImage::splitStroke(int strokeIndex,
                                const std::vector<DoublePair> &sortedWRanges) {
   m_imp->splitStroke(strokeIndex, sortedWRanges);
+  emit strokeListChanged();
 }
 
 void TVectorImage::Imp::splitStroke(

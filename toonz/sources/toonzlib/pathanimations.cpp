@@ -249,3 +249,9 @@ void PathAnimations::appSnapshot(const TApplication *app, TStroke *stroke) {
   shared_ptr<PathAnimation> animation = appStroke(app, stroke);
   animation->takeSnapshot(app->getCurrentFrame()->getFrame());
 }
+
+void PathAnimations::appClearAndSnapshot(const TApplication *app, TStroke *stroke) {
+  shared_ptr<PathAnimation> animation = appStroke(app, stroke);
+  animation->clearKeyframes();
+  animation->takeSnapshot(app->getCurrentFrame()->getFrame());
+}
