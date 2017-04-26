@@ -12,6 +12,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
+#include "toonz/pathanimations.h"
 
 using namespace ToolUtils;
 
@@ -304,6 +305,7 @@ void BenderTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
       } else {
         stroke->setSelfLoop(false);
       }
+      PathAnimations::appSnapshot(TTool::getApplication(), stroke);
     }
 
     vi->notifyChangedStrokes(m_changedStrokes, oldStrokesArray);
