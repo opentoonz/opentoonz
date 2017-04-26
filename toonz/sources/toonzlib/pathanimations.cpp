@@ -207,6 +207,16 @@ shared_ptr<PathAnimation> PathAnimations::addStroke(const StrokeId &strokeId) {
   return newOne;
 }
 
+void PathAnimations::removeStroke(const TStroke *stroke) {
+  // remove all mentions of the stroke
+  for (map<StrokeId, shared_ptr<PathAnimation>>::iterator it =
+    m_shapeAnimation.begin(); it != m_shapeAnimation.end(); )
+    if (it->first.stroke() == stroke)
+      m_shapeAnimation.erase(it++);
+    else
+      it++;
+}
+
 void PathAnimations::setFrame(TVectorImage *vi, const TXshCell &cell,
                               int frame) {
   for (int i = 0; i < vi->getStrokeCount(); i++) {
@@ -215,6 +225,11 @@ void PathAnimations::setFrame(TVectorImage *vi, const TXshCell &cell,
     shared_ptr<PathAnimation> animation = addStroke(strokeId);
     animation->animate(frame);
   }
+}
+
+PathAnimations *PathAnimations::appAnimations(const TApplication *app) {
+  TXsheet *xsheet = app->getCurrentXsheet()->getXsheet();
+  return xsheet->pathAnimations();
 }
 
 StrokeId PathAnimations::appStrokeId(const TApplication *app, TStroke *stroke) {
@@ -227,8 +242,7 @@ StrokeId PathAnimations::appStrokeId(const TApplication *app, TStroke *stroke) {
 }
 
 shared_ptr<PathAnimation> PathAnimations::appStroke(const TApplication *app, TStroke *stroke) {
-  TXsheet *xsheet = app->getCurrentXsheet()->getXsheet();
-  return xsheet->pathAnimations()->addStroke(appStrokeId (app, stroke));
+  return appAnimations(app)->addStroke(appStrokeId (app, stroke));
 }
 
 void PathAnimations::appSnapshot(const TApplication *app, TStroke *stroke) {

@@ -122,10 +122,12 @@ public:
 
   shared_ptr<PathAnimation> stroke(const StrokeId &strokeId) const;
   shared_ptr<PathAnimation> addStroke(const StrokeId &strokeId);
+  void removeStroke(const TStroke *stroke);
 
   //! update all animatied strokes to match specified frame
   void setFrame(TVectorImage *vi, const TXshCell &cell, int frame);
 
+  static PathAnimations *appAnimations(const TApplication *app);
   static StrokeId appStrokeId(const TApplication *app, TStroke *stroke);
   static shared_ptr<PathAnimation> appStroke(const TApplication *app, TStroke *stroke);
   static void appSnapshot(const TApplication *app, TStroke *stroke);

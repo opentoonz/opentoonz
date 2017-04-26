@@ -37,6 +37,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
+#include "toonz/pathanimations.h"
 
 #include "ext/StrokeDeformation.h"
 #include "ext/SmoothDeformation.h"
@@ -323,6 +324,7 @@ void PinchTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
   TStroke *deactivateStroke          = m_deformation->deactivate();
   deactivateStroke->outlineOptions() = status->stroke2change_->outlineOptions();
+  PathAnimations::appAnimations(TTool::getApplication())->removeStroke(status->stroke2change_);
   replaceStroke(status->stroke2change_, deactivateStroke, m_n, vi);
 
   status->stroke2change_ = 0;
@@ -340,6 +342,7 @@ void PinchTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   moveCursor(pos);
 
   notifyImageChanged();
+  PathAnimations::appSnapshot(TTool::getApplication(), deactivateStroke);
 
   assert(m_undo);
   TUndoManager::manager()->add(m_undo);

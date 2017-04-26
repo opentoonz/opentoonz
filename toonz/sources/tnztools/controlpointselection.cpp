@@ -932,6 +932,7 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos) {
   ReplaceAddPoint replace { this, w };
   replace.execute();
   resetControlPoints();
+  takeSnapshot();
 
   getPointTypeAt(pos, d, indexAtPos);
   return indexAtPos;

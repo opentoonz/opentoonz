@@ -3062,6 +3062,8 @@ void TVectorImage::replaceStroke(int index, TStroke *newStroke) {
   for (p1 = m_imp->m_intersectionData->m_intList.first(); p1; p1 = p1->next())
     for (p2 = (*p1).m_strokeList.first(); p2; p2      = p2->next())
       if (p2->m_edge.m_index == index) p2->m_edge.m_s = newStroke;
+
+  emit strokeListChanged();
 }
 
 //-----------------------------------------------------------------------------
