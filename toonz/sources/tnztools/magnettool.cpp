@@ -15,6 +15,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
+#include "toonz/pathanimations.h"
 
 using namespace ToolUtils;
 
@@ -361,7 +362,7 @@ lefrightButtonDown(p);
                                  *(m_strokeToModifyCorners[count++]));
       }
 
-      // ricostruisco una stroke con quella data
+      // reconstruct stroke with this data
       ref = merge(sc.m_splitted);
 
       if (sc.m_parent->isSelfLoop()) {
@@ -375,8 +376,9 @@ lefrightButtonDown(p);
       }
 
       sc.m_parent->swapGeometry(*ref);
+      PathAnimations::appSnapshot(TTool::getApplication(), sc.m_parent);
 
-      delete ref;  // elimino la curva temporanea
+      delete ref;  // delete temporary curve
       clearPointerContainer(
           sc.m_splitted);           // pulisco le stroke trovate con lo split
       sc.m_splittedToMove.clear();  // pulisco il contenitore ( le stroke
