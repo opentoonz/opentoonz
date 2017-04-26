@@ -17,6 +17,7 @@
 // Toonz includes
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
+#include "toonz/pathanimations.h"
 
 // TnzTools includes
 #include "tools/tool.h"
@@ -427,6 +428,7 @@ void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
       m_undo = 0;
 
       vi->notifyChangedStrokes(m_strokeIndex, oldStroke);
+      emit vi->strokeListChanged();
       notifyImageChanged();
 
       delete oldStroke;
@@ -435,9 +437,11 @@ void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 
 cleanup:
 
-  if (m_inStroke)
+  if (m_inStroke) {
     m_inStroke->setStyle(
-        m_strokeStyleId);  // Make the image stroke visible again
+      m_strokeStyleId);  // Make the image stroke visible again
+    PathAnimations::appSnapshot(TTool::getApplication(), m_inStroke);
+  }
 
   m_strokeIndex = m_strokeStyleId = -1;
 
