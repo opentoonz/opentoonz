@@ -3,7 +3,7 @@
 #ifndef _PLI_IO_H
 #define _PLI_IO_H
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4661)
 #pragma warning(disable : 4018)
 #endif

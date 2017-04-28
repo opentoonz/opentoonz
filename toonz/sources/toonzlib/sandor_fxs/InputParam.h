@@ -8,7 +8,7 @@
 #define AFX_INPUTPARAM_H__41D42157_F2EE_11D5_B92D_0040F674BE6A__INCLUDED_
 
 #ifdef _WIN32
-#include "Windows.h"
+#include "windows.h"
 #endif
 #include <algorithm>
 #include <string>

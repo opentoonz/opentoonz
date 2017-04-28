@@ -11,7 +11,7 @@
 #include <iostream>
 
 using namespace std;
-#ifdef _WIN32
+#ifdef _MSC_VER
 
 #include <io.h>
 #include <windows.h>
@@ -89,11 +89,7 @@ sperando che sia il nome del file => compila ma non funziona
 */
 {}
 
-Tifstream::~Tifstream() {
-#ifdef _WIN32
-  fclose(m_file);
-#endif
-}
+Tifstream::~Tifstream() {}
 
 Tofstream::Tofstream(const TFilePath &fp, bool append_existing)
     : ofstream(

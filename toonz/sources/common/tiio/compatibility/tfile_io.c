@@ -7,7 +7,7 @@
 #include <windows.h>
 #include <assert.h>
 
-LPSTR AtlW2AHelper(LPSTR lpa, LPCWSTR lpw, int nChars, UINT acp) {
+static LPSTR AtlW2AHelper(LPSTR lpa, LPCWSTR lpw, int nChars, UINT acp) {
   assert(lpw != NULL);
   assert(lpa != NULL);
   /*

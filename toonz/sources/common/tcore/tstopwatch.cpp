@@ -369,7 +369,7 @@ void TStopWatch::printGlobals() { printGlobals(cout); }
 //-----------------------------------------------------------
 #ifdef _WIN32
 
-void dummyFunction() {
+static void dummyFunction() {
   // It's used just to calculate the overhead
   return;
 }

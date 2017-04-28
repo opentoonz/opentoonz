@@ -5,8 +5,11 @@
 #include "tfilepath_io.h"
 #include <QDateTime>
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4996)
+#endif
+
+#ifdef _WIN32
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>

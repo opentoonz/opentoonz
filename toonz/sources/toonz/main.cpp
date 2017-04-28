@@ -396,7 +396,9 @@ int main(int argc, char *argv[]) {
   fmt.setStencil(true);
   QGLFormat::setDefaultFormat(fmt);
 
-#ifdef LINUX
+  // seems this function should be called at all systems
+  // pheraps in some GLUT-implementations initalization is mere formality
+#if defined(LINUX) || (defined(_WIN32) && defined(__GNUC__))
   glutInit(&argc, argv);
 #endif
 

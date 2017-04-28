@@ -34,9 +34,12 @@ void DVAPI shutdown();
 class ExecutorId;  // Private
 class Runnable;
 
-#if !(defined(MACOSX) || defined(LINUX))
-template class TSmartPointerT<Runnable>;
+}  // namespace TThread
+#ifdef _WIN32
+template class DVAPI TSmartPointerT<TThread::Runnable>;
 #endif
+namespace TThread {
+
 typedef TSmartPointerT<Runnable> RunnableP;
 
 //------------------------------------------------------------------------------

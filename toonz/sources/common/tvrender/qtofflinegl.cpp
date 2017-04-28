@@ -6,9 +6,9 @@
 
 //-----------------------------------------------------------------------------
 
-#ifdef _WIN32
+#if 0 // was _WIN32, this function not used
 
-void swapRedBlueChannels(
+static void swapRedBlueChannels(
     void *buffer,
     int bufferSize)  // Flips The Red And Blue Bytes (WidthxHeight)
 {

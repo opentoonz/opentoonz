@@ -62,6 +62,17 @@ class TRasterPT;
 class TRaster;
 typedef TSmartPointerT<TRaster> TRasterP;
 
+
+//------------------------------------------------------------
+
+//
+// Smart Pointer a TRaster
+//
+
+#ifdef _WIN32
+template class DVAPI TSmartPointerT<TRaster>;
+#endif
+
 //=========================================================
 /*!This class stores bitmap images. */
 class DVAPI TRaster : public TSmartObject {
@@ -202,16 +213,6 @@ protected:
 private:
   void remap(UCHAR *newLocation);
 };
-
-//------------------------------------------------------------
-
-//
-// Smart Pointer a TRaster
-//
-
-#ifdef _WIN32
-template class DVAPI TSmartPointerT<TRaster>;
-#endif
 
 //------------------------------------------------------------
 

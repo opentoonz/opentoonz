@@ -61,7 +61,7 @@ inline T antialias(const T &a, int num) {
 */
 
 template <class T, class Q>
-DVAPI inline T overPixT(const T &bot, const T &top) {
+inline T overPixT(const T &bot, const T &top) {
   UINT max = T::maxChannelValue;
 
   if (top.m == max) return top;
@@ -78,7 +78,7 @@ DVAPI inline T overPixT(const T &bot, const T &top) {
 
 //-----------------------------------------------------------------------------
 template <class T, class S, class Q>
-DVAPI inline T overPixGRT(const T &bot, const S &top) {
+inline T overPixGRT(const T &bot, const S &top) {
   UINT max = T::maxChannelValue;
 
   if (top.value == max) return T(top.value, top.value, top.value, top.value);
@@ -98,8 +98,7 @@ DVAPI inline T overPixGRT(const T &bot, const S &top) {
 // as the other, but without if's. it's quicker if you know for sure that top.m
 // is not 0 or 255.
 template <class T, class Q>
-
-DVAPI inline T quickOverPixT(const T &bot, const T &top) {
+inline T quickOverPixT(const T &bot, const T &top) {
   UINT max = T::maxChannelValue;
 
   TUINT32 r = top.r + bot.r * (max - top.m) / max;
@@ -113,8 +112,7 @@ DVAPI inline T quickOverPixT(const T &bot, const T &top) {
 //------------------------------------------------------------------------------------
 
 template <class T, class Q>
-
-DVAPI inline T quickOverPixPremultT(const T &bot, const T &top) {
+inline T quickOverPixPremultT(const T &bot, const T &top) {
   UINT max = T::maxChannelValue;
 
   TUINT32 r = (top.r * top.m + bot.r * (max - top.m)) / max;
@@ -128,7 +126,7 @@ DVAPI inline T quickOverPixPremultT(const T &bot, const T &top) {
 /*-- Show raster images darken-blended on the viewer --*/
 /* references from ino_blend_darken.cpp */
 template <class T, class Q>
-DVAPI inline T quickOverPixDarkenBlendedT(const T &bot, const T &top) {
+inline T quickOverPixDarkenBlendedT(const T &bot, const T &top) {
   struct locals {
     static inline double comp(const double ch_a, const double ch_b,
                               const double alpha) {
@@ -176,7 +174,7 @@ DVAPI inline T quickOverPixDarkenBlendedT(const T &bot, const T &top) {
 
 //-----------------------------------------------------------------------------
 template <class T, class S, class Q>
-DVAPI inline T quickOverPixGRT(const T &bot, const S &top) {
+inline T quickOverPixGRT(const T &bot, const S &top) {
   UINT max = T::maxChannelValue;
 
   double aux = (max - top.value) / max;
@@ -190,70 +188,70 @@ DVAPI inline T quickOverPixGRT(const T &bot, const S &top) {
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel32 overPix(const TPixel32 &bot, const TPixelGR8 &top) {
+inline TPixel32 overPix(const TPixel32 &bot, const TPixelGR8 &top) {
   return overPixGRT<TPixel32, TPixelGR8, UCHAR>(bot, top);
 }
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel64 overPix(const TPixel64 &bot, const TPixelGR16 &top) {
+inline TPixel64 overPix(const TPixel64 &bot, const TPixelGR16 &top) {
   return overPixGRT<TPixel64, TPixelGR16, USHORT>(bot, top);
 }
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel32 overPix(const TPixel32 &bot, const TPixel32 &top) {
+inline TPixel32 overPix(const TPixel32 &bot, const TPixel32 &top) {
   return overPixT<TPixel32, UCHAR>(bot, top);
 }
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel64 overPix(const TPixel64 &bot, const TPixel64 &top) {
+inline TPixel64 overPix(const TPixel64 &bot, const TPixel64 &top) {
   return overPixT<TPixel64, USHORT>(bot, top);
 }
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel32 quickOverPix(const TPixel32 &bot, const TPixelGR8 &top) {
+inline TPixel32 quickOverPix(const TPixel32 &bot, const TPixelGR8 &top) {
   return quickOverPixGRT<TPixel32, TPixelGR8, UCHAR>(bot, top);
 }
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel64 quickOverPix(const TPixel64 &bot, const TPixelGR16 &top) {
+inline TPixel64 quickOverPix(const TPixel64 &bot, const TPixelGR16 &top) {
   return quickOverPixGRT<TPixel64, TPixelGR16, USHORT>(bot, top);
 }
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel32 quickOverPix(const TPixel32 &bot, const TPixel32 &top) {
+inline TPixel32 quickOverPix(const TPixel32 &bot, const TPixel32 &top) {
   return quickOverPixT<TPixel32, UCHAR>(bot, top);
 }
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel32 quickOverPixPremult(const TPixel32 &bot,
-                                          const TPixel32 &top) {
+inline TPixel32 quickOverPixPremult(const TPixel32 &bot,
+                                    const TPixel32 &top) {
   return quickOverPixPremultT<TPixel32, UCHAR>(bot, top);
 }
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel64 quickOverPix(const TPixel64 &bot, const TPixel64 &top) {
+inline TPixel64 quickOverPix(const TPixel64 &bot, const TPixel64 &top) {
   return quickOverPixT<TPixel64, USHORT>(bot, top);
 }
 
 //------------------------------------------------------------------------------------
 
-DVAPI inline TPixel32 quickOverPixDarkenBlended(const TPixel32 &bot,
-                                                const TPixel32 &top) {
+inline TPixel32 quickOverPixDarkenBlended(const TPixel32 &bot,
+                                          const TPixel32 &top) {
   return quickOverPixDarkenBlendedT<TPixel32, UCHAR>(bot, top);
 }
 
 //-----------------------------------------------------------------------------
 
 template <class T, class Q>
-DVAPI inline void overPix(T &outPix, const T &bot, const T &top) {
+inline void overPix(T &outPix, const T &bot, const T &top) {
   UINT max = T::maxChannelValue;
 
   if (top.m == max)
@@ -272,7 +270,7 @@ DVAPI inline void overPix(T &outPix, const T &bot, const T &top) {
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel32 overPixOnWhite(const TPixel32 &top) {
+inline TPixel32 overPixOnWhite(const TPixel32 &top) {
   UINT max = TPixel32::maxChannelValue;
 
   if (top.m == max)
@@ -284,7 +282,7 @@ DVAPI inline TPixel32 overPixOnWhite(const TPixel32 &top) {
                     top.b + max - top.m, max);
 }
 
-DVAPI inline TPixel32 overPixOnBlack(const TPixel32 &top) {
+inline TPixel32 overPixOnBlack(const TPixel32 &top) {
   UINT max = TPixel32::maxChannelValue;
 
   if (top.m == max) return top;
@@ -299,7 +297,7 @@ DVAPI inline TPixel32 overPixOnBlack(const TPixel32 &top) {
 /*! this function combines two GR8 pixels returning the darker.
 */
 
-DVAPI inline TPixelGR8 over(const TPixelGR8 &bot, const TPixelGR8 &top) {
+inline TPixelGR8 over(const TPixelGR8 &bot, const TPixelGR8 &top) {
   return TPixelGR8(std::min(bot.value, top.value));
 }
 
@@ -333,7 +331,7 @@ DVAPI inline TPixelGR8 over(const TPixelGR8 &bot, const TPixelGR8 &top) {
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline void premult(TPixel32 &pix) {
+inline void premult(TPixel32 &pix) {
   const int MAGICFAC = (257U * 256U + 1U);
   UINT fac           = MAGICFAC * pix.m;
 
@@ -342,20 +340,20 @@ DVAPI inline void premult(TPixel32 &pix) {
   pix.b = (UINT)(pix.b * fac + (1U << 23)) >> 24;
 }
 
-DVAPI inline void premult(TPixel64 &pix) {
+inline void premult(TPixel64 &pix) {
   pix.r = pix.r * pix.m / 65535.0;
   pix.g = pix.g * pix.m / 65535.0;
   pix.b = pix.b * pix.m / 65535.0;
 }
 
-DVAPI inline void depremult(TPixel32 &pix) {
+inline void depremult(TPixel32 &pix) {
   float fac = 255.0f / pix.m;
   pix.r     = std::min(pix.r * fac, 255.0f);
   pix.g     = std::min(pix.g * fac, 255.0f);
   pix.b     = std::min(pix.b * fac, 255.0f);
 }
 
-DVAPI inline void depremult(TPixel64 &pix) {
+inline void depremult(TPixel64 &pix) {
   double fac = 65535.0 / pix.m;
   pix.r      = std::min(pix.r * fac, 65535.0);
   pix.g      = std::min(pix.g * fac, 65535.0);
@@ -372,7 +370,7 @@ const double *depremultiplyTable();
 
 //-----------------------------------------------------------------------------
 
-DVAPI inline TPixel32 premultiply(const TPixel32 &pix) {
+inline TPixel32 premultiply(const TPixel32 &pix) {
   const int MAGICFAC = (257U * 256U + 1U);
   UINT fac           = MAGICFAC * pix.m;
 
@@ -381,17 +379,17 @@ DVAPI inline TPixel32 premultiply(const TPixel32 &pix) {
                   ((UINT)(pix.b * fac + (1U << 23)) >> 24), pix.m);
 }
 
-DVAPI inline TPixel64 premultiply(const TPixel64 &pix) {
+inline TPixel64 premultiply(const TPixel64 &pix) {
   return TPixel64(pix.r * pix.m / 65535.0, pix.g * pix.m / 65535.0,
                   pix.b * pix.m / 65535.0, pix.m);
 }
 
-DVAPI inline TPixel32 depremultiply(const TPixel32 &pix) {
+inline TPixel32 depremultiply(const TPixel32 &pix) {
   return TPixel32(pix.r * 255.0 / pix.m, pix.g * 255.0 / pix.m,
                   pix.b * 255.0 / pix.m, pix.m);
 }
 
-DVAPI inline TPixel64 depremultiply(const TPixel64 &pix) {
+inline TPixel64 depremultiply(const TPixel64 &pix) {
   return TPixel64(pix.r * 65535.0 / pix.m, pix.g * 65535.0 / pix.m,
                   pix.b * 65535.0 / pix.m, pix.m);
 }

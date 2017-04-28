@@ -27,13 +27,13 @@
 #include <QMutex>
 #include <QMutexLocker>
 
-#include <strstream>
+#include <sstream>
 
 namespace {
 QMutex mutex;
 
 void printTime(TStopWatch &sw, std::string name) {
-  std::ostrstream ss;
+  std::stringstream ss;
   ss << name << " : ";
   sw.print(ss);
   ss << '\n' << '\0';
