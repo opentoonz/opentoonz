@@ -1401,10 +1401,10 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 //		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
 //						 m_isFrameCreated, m_isLevelCreated);
 	//===============================================================================================
-//    TStroke* m_strokeLine = m_animationAutoComplete->drawstrokeLine(stroke);
-// if( m_strokeLine)
-//    addStrokeToImage(getApplication(), vi, m_strokeLine, m_breakAngles.getValue(),
-//                     m_isFrameCreated, m_isLevelCreated);
+    TStroke* m_strokeLine = m_animationAutoComplete->drawNormalStroke(stroke);
+if( m_strokeLine)
+   addStrokeToImage(getApplication(), vi, m_strokeLine, m_breakAngles.getValue(),
+                     m_isFrameCreated, m_isLevelCreated);
     //========================================================================
 
     addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
