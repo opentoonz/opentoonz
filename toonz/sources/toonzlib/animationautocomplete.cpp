@@ -161,7 +161,7 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
     for(; i > hamada && i > -1; i--)
 	{
         double score = getNeighborhoodSimilarity(lastStroke, m_strokesWithNeighbours[i]);
-        score_stroke.score = min;
+		score_stroke.score = min;
         score_stroke.stroke = m_strokesWithNeighbours[i];
 
 		if(score < min)
@@ -193,9 +193,7 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 
 	for (StrokeWithNeighbours* similarStroke : similarStrokes) {
 		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
-		//StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
-		StrokeWithNeighbours* nextStroke = new StrokeWithNeighbours();
-		nextStroke->stroke = new TStroke(predictionPositionUpdate(lastStroke, similarStroke));
+		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
 
 		std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairPoints(similarStroke, nextToSimilarStroke);
 		std::vector<SimilarPairPoint> lastDrawnMatchingPairs = getSimilarPairPoints(nextStroke, lastStroke);
