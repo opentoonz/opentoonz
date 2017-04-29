@@ -1387,6 +1387,12 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
                          m_isFrameCreated, m_isLevelCreated);
     }
 
+    if (m_animationAutoComplete->m_stroke4)
+    {
+        m_animationAutoComplete->m_stroke4->setStyle(2);
+        addStrokeToImage(getApplication(), vi, m_animationAutoComplete->m_stroke4, m_breakAngles.getValue(),
+                         m_isFrameCreated, m_isLevelCreated);
+    }
     //TODO: remove at production
     //===============================================================================================
 //	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete.drawSpaceVicinity(stroke);

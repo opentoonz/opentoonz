@@ -7,6 +7,7 @@
 
 void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
+    m_stroke4 =  nullptr;
 	// clears previous predictions
 	m_synthesizedStrokes.clear();
 	StrokeWithNeighbours* strokeWithNeighbours = new StrokeWithNeighbours();
@@ -165,8 +166,10 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
         score_stroke.stroke = m_strokesWithNeighbours[i];
 
 		if(score < min)
-			min = score;
-
+        {
+            min = score;
+        m_stroke4=m_strokesWithNeighbours[i]->stroke;
+        }
         scores.push_back(score_stroke);
 	}
 
