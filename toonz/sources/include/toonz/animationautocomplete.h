@@ -133,9 +133,9 @@ private:
   std::vector<SimilarPairPoint> getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
   std::vector<SimilarPairStroke> getSimilarPairStrokes(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
 
-bool strokeSelfLooping(TStroke* stroke);
-  double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
-  double AnimationAutoComplete::getSimilarPairPointBySampleId(TStroke *stroke1, TStroke *stroke2);
+  bool strokeSelfLooping(TStroke* stroke);
+  double getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
+  double getSimilarPairPointBySampleId(TStroke *stroke1, TStroke *stroke2);
 
   std::vector<SimilarPairStroke *> AnimationAutoComplete::getNeighborhoodMatchingPairs(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
 
