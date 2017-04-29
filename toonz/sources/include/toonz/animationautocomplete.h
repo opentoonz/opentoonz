@@ -109,7 +109,7 @@ public:
   TStroke* drawNormalStroke(TStroke* stroke);
 
   TPointD  getNormal(PointWithStroke* pointer);
-
+ TStroke * m_stroke4;
 private:
 
   const int m_spaceVicinityRadius = 100;

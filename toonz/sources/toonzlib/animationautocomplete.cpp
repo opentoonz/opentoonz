@@ -7,6 +7,7 @@
 
 void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
+    m_stroke4 =  nullptr;
 	// clears previous predictions
 	m_synthesizedStrokes.clear();
 	StrokeWithNeighbours* strokeWithNeighbours = new StrokeWithNeighbours();
@@ -192,8 +193,10 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
         score_stroke.stroke = m_strokesWithNeighbours[i];
 
 		if(score < min)
-			min = score;
-
+        {
+            min = score;
+            m_stroke4=m_strokesWithNeighbours[i]->stroke;
+        }
         scores.push_back(score_stroke);
 	}
 
@@ -601,7 +604,7 @@ TStroke* AnimationAutoComplete::drawNormalStroke(TStroke *stroke)
    if (slope_tangent==0)
    {
        double new_x=x1+100;
-       vec.push_back(TPointD(new_x,y1));
+       vec.push_back(TPointD(0,1));
        TStroke* strokeLine = new TStroke(vec);
        return strokeLine;
    }
@@ -615,7 +618,7 @@ TStroke* AnimationAutoComplete::drawNormalStroke(TStroke *stroke)
     double new_x = x2 + 100;
     double new_y =(-slope_prependicular*new_x )+c_prependicular;
 
-    vec.push_back(TPointD(new_x,new_y));
+    vec.push_back(TPointD(abs(new_x),abs(new_y)));
 	TStroke* strokeLine = new TStroke(vec);
     return strokeLine;}
     }
@@ -685,7 +688,11 @@ TPointD AnimationAutoComplete::getNormal(PointWithStroke* pointer)
     double point_magnitude=sqrt(x_pow2+y_pow2);
     double x_unit=x_def/point_magnitude;
     double y_unit =y_def/point_magnitude;
-    return TPointD(x_unit,y_unit);}}
+    return TPointD(abs(x_unit),abs(y_unit));
+
+
+        }
+    }
 
 }
 
