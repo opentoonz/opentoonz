@@ -26,8 +26,6 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
         std::vector<StrokeWithNeighbours*> neighbours = getNeighbours(point);
 		strokeWithNeighbours->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
-    bool zblo7a=false;
-    zblo7a=strokeSelfLooping(stroke);
 
 
 	if (m_strokesWithNeighbours.size() >= 2)
