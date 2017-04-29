@@ -27,7 +27,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 		strokeWithNeighbours->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
     bool zblo7a=false;
-    zblo7a=inRange(stroke);
+    zblo7a=strokeSelfLooping(stroke);
 
 
 	if (m_strokesWithNeighbours.size() >= 2)
@@ -35,7 +35,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 }
 
 //----------
-bool AnimationAutoComplete::inRange(TStroke* stroke)
+bool AnimationAutoComplete::strokeSelfLooping(TStroke* stroke)
 {
     int count = stroke->getChunkCount();
     double range =3;
