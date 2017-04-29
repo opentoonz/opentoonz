@@ -25,9 +25,36 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
         std::vector<StrokeWithNeighbours*> neighbours = getNeighbours(point);
 		strokeWithNeighbours->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
+    bool zblo7a=false;
+    zblo7a=inRange(stroke);
+
 
 	if (m_strokesWithNeighbours.size() >= 2)
 		initializeSynthesis();
+}
+
+//----------
+bool AnimationAutoComplete::inRange(TStroke* stroke)
+{
+    int count = stroke->getChunkCount();
+    double range =3;
+    TThickQuadratic* lastPointHolder=stroke->getChunk(count-1);
+
+    TPointD lastpoint=lastPointHolder->getP2();
+    for (int i =0;i<count-1;i++)
+    {
+        TThickQuadratic *currentPointHolder=stroke->getChunk(i);
+        TPointD currentPoint=currentPointHolder->getP0();
+        //calculate the distance
+        double x=lastpoint.x-currentPoint.x;
+        x=x*x;
+        double y=lastpoint.y-currentPoint.y;
+        y=y*y;
+        double d=sqrt(x+y);
+        if(d<range)
+            return true;
+    }
+    return false;
 }
 
 //--------------------------------------------------------------------------------------------------
