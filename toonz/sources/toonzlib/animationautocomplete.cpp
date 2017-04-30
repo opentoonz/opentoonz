@@ -5,6 +5,8 @@
 
 #include "toonz/hungarian.h"
 
+#include <toonz/strokegenerator.h>
+
 void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
 #ifdef DEBUGGING
@@ -68,6 +70,7 @@ bool AnimationAutoComplete::strokeSelfLooping(TStroke* stroke)
 //--------------------------------------------------------------------------------------------------
 double AnimationAutoComplete::gaussianConstant(SamplePoint chuck1, SamplePoint chuck2)
 {
+
 	TPointD sample1= chuck1->getP0();
 	TPointD sample2= chuck2->getP0();
 	TThickPoint s1; TThickPoint s2;
@@ -134,9 +137,9 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getSynthesizedStrokes(
 double AnimationAutoComplete::pointsSimilarity(PointWithStroke* point1, PointWithStroke* point2)
 {
 	double dissimilarityFactor = 0;
-	dissimilarityFactor += pow(getAppearanceSimilarity(point1, point2),2);
-	dissimilarityFactor += pow(getTemporalSimilarity(point1, point2),2);
-	dissimilarityFactor += pow(getSpatialSimilarity(point1, point2),2);
+	dissimilarityFactor += 0.0 * pow(getAppearanceSimilarity(point1, point2),2);
+	dissimilarityFactor += 0.5 * pow(getTemporalSimilarity(point1, point2),2);
+	dissimilarityFactor += 0.5 * pow(getSpatialSimilarity(point1, point2),2);
 
 	return sqrt(dissimilarityFactor);
 }
@@ -176,13 +179,9 @@ double AnimationAutoComplete::getTemporalSimilarity(PointWithStroke *point1, Poi
 
 double AnimationAutoComplete::getSpatialSimilarity(PointWithStroke *point1, PointWithStroke *point2)
 {
-    TPointD direction1 = getNormal(point1);
-    TPointD direction2 = getNormal(point2);
-	double direction = sqrt(pow((direction1.x-direction2.x),2)+pow((direction1.y-direction2.y),2));
-	//double position = sqrt(pow(point1->point->getP0().x-point2->point->getP0().x,2)+(pow((point1->point->getP0().y-point2->point->getP0().x),2)));
-
-	return sqrt(direction);
-
+	TPointD direction1 = getTangentUnitVector(point1);
+	TPointD direction2 = getTangentUnitVector(point2);
+	return tdistance(direction1, direction2);
 }
 
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeighbours* lastStroke)
@@ -461,9 +460,21 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 
 	for(int i = 0; i < loopCount; i++)
 	{
-		TPointD p1 = similarStroke->stroke->getChunk(i)->getP0();
-		TPointD p3 = lastStroke->stroke->getChunk(i)->getP0() ;
-		TPointD p2 = nextToSimilarStroke->stroke->getChunk(i)->getP0();
+		TPointD p1;
+		TPointD p3;
+		TPointD p2;
+		if(loopCount!=lastStroke->stroke->getChunkCount()-2)
+		{
+		 p1 = similarStroke->stroke->getChunk(i)->getP0();
+		 p3 = lastStroke->stroke->getChunk(i)->getP0() ;
+		 p2 = nextToSimilarStroke->stroke->getChunk(i)->getP0();
+		}
+		else
+		{
+			p1 = similarStroke->stroke->getChunk(i)->getP2();
+			p3 = lastStroke->stroke->getChunk(i)->getP2() ;
+			p2 = nextToSimilarStroke->stroke->getChunk(i)->getP2();
+		}
 		double x1 = p1.x , x2 = p2.x;
 		double y1 = p1.y , y2 = p2.y;
 		double x_diffrence = fabs(x2-x1);
@@ -649,42 +660,27 @@ std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(Stro
 
 #ifdef DEBUGGING
 #ifdef SHOW_NORMALS
-TStroke* AnimationAutoComplete::drawNormalStroke(TStroke *stroke)
+std::vector<TStroke*> AnimationAutoComplete::drawNormalStrokes(TStroke *stroke)
 {
-	//todo: strokeline
-    std::vector<TPointD> vec;
-    if( 1>=stroke->getChunkCount())
-      {  return nullptr;}
-    else {
-    vec.push_back(stroke->getChunk(1)->getP0());
+	std::vector<TStroke*> output;
+	if(stroke->getChunkCount() < 1)
+		return output; //empty vector
 
-    double y2 = stroke->getChunk(1)->getP1().y;
-    double y1 = stroke->getChunk(1)->getP0().y;
-    double x2 = stroke->getChunk(1)->getP1().x;
-    double x1 = stroke->getChunk(1)->getP0().x;
+	for (int i = 0; i < stroke->getChunkCount(); i++)
+	{
+		PointWithStroke* point = new PointWithStroke(stroke->getChunk(i), stroke, i);
+		TPointD normal = getTangentUnitVector(point);
 
-    double slope_tangent= (y2 - y1) / (x2 - x1);
-   if (slope_tangent==0)
-   {
-       double new_x=x1+100;
-       vec.push_back(TPointD(0,1));
-       TStroke* strokeLine = new TStroke(vec);
-       return strokeLine;
-   }
+		StrokeGenerator strokeGenerator;
+		strokeGenerator.add(point->point->getThickP0(), 1);
 
-   else {
-    double c_tangent = y2 - (slope_tangent * x2);
+		TThickPoint point2 = point->point->getThickP0() + normal*30;
+		strokeGenerator.add(point2, 1);
 
-    double slope_prependicular=1/slope_tangent;
-    double c_prependicular=y2+(slope_prependicular*x2);
+		output.push_back(strokeGenerator.makeStroke(0));
+	}
 
-    double new_x = x2 + 100;
-    double new_y =(-slope_prependicular*new_x )+c_prependicular;
-
-    vec.push_back(TPointD(abs(new_x),abs(new_y)));
-	TStroke* strokeLine = new TStroke(vec);
-    return strokeLine;}
-    }
+	return output;
 }
 #endif //show normals
 #endif //debugging
@@ -716,48 +712,33 @@ std::vector<TPointD> AnimationAutoComplete::predictionPositionUpdate(StrokeWithN
     return predectedStrock;
 }
 
-
-//TODO : getNormal
-TPointD AnimationAutoComplete::getNormal(PointWithStroke* pointer)
+TPointD AnimationAutoComplete::getTangentUnitVector(PointWithStroke* pointWithStroke)
 {
-    if( pointer->index>=pointer->stroke->getChunkCount())
-        return ;
-    else {
-    //vec.push_back(stroke->getChunk(pointer->index)->getP0());
+	assert(pointWithStroke->index < pointWithStroke->stroke->getChunkCount());
+	double y2 =0;
+	double y1 =0;
+	double x2 =0;
+	double x1 =0;
+	if(pointWithStroke->index!=pointWithStroke->stroke->getChunkCount()-1)
+	{
 
-    double y2 = pointer->stroke->getChunk(pointer->index)->getP1().y;
-    double y1 = pointer->stroke->getChunk(pointer->index)->getP0().y;
-    double x2 = pointer->stroke->getChunk(pointer->index)->getP1().x;
-    double x1 = pointer->stroke->getChunk(pointer->index)->getP0().x;
+	 y2 = pointWithStroke->point->getP1().y;
+	 y1 = pointWithStroke->point->getP0().y;
+	 x2 = pointWithStroke->point->getP1().x;
+	 x1 = pointWithStroke->point->getP0().x;
+	}
+	else
+	{
+		y2 = pointWithStroke->point->getP1().y;
+		y1 = pointWithStroke->point->getP2().y;
+		x2 = pointWithStroke->point->getP1().x;
+		x1 = pointWithStroke->point->getP2().x;
+	}
 
-    double slope_tangent= (y2 - y1) / (x2 - x1);
-    if(slope_tangent==0)
-    {
-        return TPointD(0,1);
+	TPointD point1 = TPointD(x1, y1);
+	TPointD point2 = TPointD(x2, y2);
 
-    }
-    else{
-        double c_tangent = y2 - (slope_tangent * x2);
-
-        double slope_prependicular=1/slope_tangent;
-        double c_prependicular=y2+(slope_prependicular*x2);
-
-    double new_x = x2 + 10;
-    double new_y =(-slope_prependicular*new_x )+c_prependicular;
-    // Todo:Magnitude sqrt() lel x pow 2 + y pow 2 ;
-    double x_def=new_x-x2;
-    double y_def=new_y-y2;
-    double x_pow2=x_def*x_def;
-    double y_pow2= y_def*y_def;
-    double point_magnitude=sqrt(x_pow2+y_pow2);
-    double x_unit=x_def/point_magnitude;
-    double y_unit =y_def/point_magnitude;
-    return TPointD(abs(x_unit),abs(y_unit));
-
-
-        }
-    }
-
+	return normalize(point2 - point1);
 }
 
 void GlobalSimilarityGraph::insertNode(SimilarPairPoint *pair, std::vector<SimilarPairPoint *> connections)

@@ -200,6 +200,16 @@ inline double tdistance(const TPointD &p1, const TPointD &p2) {
 }
 
 /*!
+\relates TPointT
+This helper function returns the slope of two points
+*/
+inline double tslope(const TPointD &p1, const TPointD &p2) {
+	if (p1.x == p2.x)
+		return NAN;
+	return (p2.y - p1.y) / (p2.x - p1.x);
+}
+
+/*!
 the cross product
 \relates TPointT
 */

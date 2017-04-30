@@ -5,7 +5,7 @@
 
 #ifdef DEBUGGING
 	//#define SHOW_NORMALS
-	//#define SHOW_MATCHING_STROKE
+	#define SHOW_MATCHING_STROKE
 	//#define SHOW_PAIR_LINES
 	//#define SHOW_SPACE_VICINITY
 #endif
@@ -118,7 +118,7 @@ public:
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
 #endif
 #ifdef SHOW_NORMALS
-  TStroke* drawNormalStroke(TStroke* stroke);
+  std::vector<TStroke *> drawNormalStrokes(TStroke* stroke);
 #endif
 #ifdef SHOW_MATCHING_STROKE
   TStroke* matchedStroke;
@@ -135,7 +135,7 @@ private:
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
 
-  TPointD  getNormal(PointWithStroke* pointer);
+  TPointD  getTangentUnitVector(PointWithStroke* pointer);
   double gaussianConstant( SamplePoint chuck1, SamplePoint chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
   int withinTemporalVicinity(PointWithStroke* point1, PointWithStroke* point2);

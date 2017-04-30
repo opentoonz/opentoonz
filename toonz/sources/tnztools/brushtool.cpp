@@ -1426,10 +1426,10 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 #endif
 
 #ifdef SHOW_NORMALS
-   TStroke* m_strokeLine = m_animationAutoComplete->drawNormalStroke(stroke);
- if( m_strokeLine)
-  addStrokeToImage(getApplication(), vi, m_strokeLine, m_breakAngles.getValue(),
-					m_isFrameCreated, m_isLevelCreated);
+   std::vector<TStroke*> normal = m_animationAutoComplete->drawNormalStrokes(stroke);
+   for (auto stroke : normal)
+	   addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
+						m_isFrameCreated, m_isLevelCreated);
 #endif
 #endif // debugging
 
