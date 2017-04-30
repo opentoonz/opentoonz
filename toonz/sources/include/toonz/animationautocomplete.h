@@ -134,10 +134,10 @@ private:
   std::vector<SimilarPairStroke> getSimilarPairStrokes(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
 
 
-  double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
-  double AnimationAutoComplete::getSimilarPairPointBySampleId(TStroke *stroke1, TStroke *stroke2);
+  double getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
+  double getSimilarPairPointBySampleId(TStroke *stroke1, TStroke *stroke2);
 
-  std::vector<SimilarPairStroke *> AnimationAutoComplete::getNeighborhoodMatchingPairs(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
+  std::vector<SimilarPairStroke *> getNeighborhoodMatchingPairs(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
 
   double magnitude(std::vector<double> points);
 
