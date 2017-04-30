@@ -1,6 +1,8 @@
 #ifndef ANIMATIONAUTOCOMPLETE_H
 #define ANIMATIONAUTOCOMPLETE_H
 
+//#define DEBUGGING
+
 #include <unordered_set>
 #include <vector>
 
@@ -103,19 +105,22 @@ public:
   void addStroke(TStroke* stroke);
   std::vector<StrokeWithNeighbours*> getSynthesizedStrokes();
 
+#ifdef DEBUGGING
   //TODO: remove at production
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
-  //TODO: remove at production
   TStroke* drawNormalStroke(TStroke* stroke);
-
-  TPointD  getNormal(PointWithStroke* pointer);
- TStroke * m_stroke4;
+  TStroke* matchedStroke;
+  std::vector<TStroke*> m_similarPairLines;
+  std::vector<TStroke*> m_oldSimilarPairLines;
+  //END remove at production
+#endif
 private:
 
   const int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
 
+  TPointD  getNormal(PointWithStroke* pointer);
   double gaussianConstant( SamplePoint chuck1, SamplePoint chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
   int withinTemporalVicinity(PointWithStroke* point1, PointWithStroke* point2);
@@ -133,7 +138,7 @@ private:
   std::vector<SimilarPairPoint> getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
   std::vector<SimilarPairStroke> getSimilarPairStrokes(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
 
-
+  bool strokeSelfLooping(TStroke* stroke);
   double getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
   double getSimilarPairPointBySampleId(TStroke *stroke1, TStroke *stroke2);
 

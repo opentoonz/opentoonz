@@ -37,6 +37,7 @@
 #include "tenv.h"
 #include "tregion.h"
 #include "tstroke.h"
+#include "tvectorimage.h"
 #include "tgl.h"
 #include "trop.h"
 #include "drawutil.h"
@@ -1387,16 +1388,36 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
                          m_isFrameCreated, m_isLevelCreated);
     }
 
-    if (m_animationAutoComplete->m_stroke4)
+#ifdef DEBUGGING
+    if (m_animationAutoComplete->matchedStroke)
     {
-        m_animationAutoComplete->m_stroke4->setStyle(2);
-        addStrokeToImage(getApplication(), vi, m_animationAutoComplete->m_stroke4, m_breakAngles.getValue(),
+        m_animationAutoComplete->matchedStroke->setStyle(2);
+        addStrokeToImage(getApplication(), vi, m_animationAutoComplete->matchedStroke, m_breakAngles.getValue(),
                          m_isFrameCreated, m_isLevelCreated);
     }
+
+
+    std::vector<TStroke*> similarPairLines = m_animationAutoComplete->m_similarPairLines;
+    std::vector<TStroke*> oldSimilarPairLines = m_animationAutoComplete->m_oldSimilarPairLines;
+
+//    for (auto stroke : oldSimilarPairLines)
+//    {
+//        VIStroke* s = new VIStroke();
+//        s->m_s = stroke;
+//        image->deleteStroke(s);
+//    }
+
+    // draw lines between similar pair strokes
+    for (auto stroke : similarPairLines)
+    {
+        stroke->setStyle(2);
+        addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
+                         m_isFrameCreated, m_isLevelCreated);
+    }
+#endif
     //TODO: remove at production
     //===============================================================================================
 //	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete.drawSpaceVicinity(stroke);
-
 //	for (auto i : spaceVicinities)
 //		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
 //						 m_isFrameCreated, m_isLevelCreated);
