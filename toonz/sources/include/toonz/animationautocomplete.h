@@ -1,13 +1,13 @@
 #ifndef ANIMATIONAUTOCOMPLETE_H
 #define ANIMATIONAUTOCOMPLETE_H
 
-//#define DEBUGGING
+#define DEBUGGING
 
 #ifdef DEBUGGING
-//#define SHOW_NORMALS
-//#define SHOW_MATCHING_STROKE
-//#define SHOW_PAIR_LINES
-//#define SHOW_SPACE_VICINITY
+	//#define SHOW_NORMALS
+	//#define SHOW_MATCHING_STROKE
+	//#define SHOW_PAIR_LINES
+	//#define SHOW_SPACE_VICINITY
 #endif
 
 #include <unordered_set>
@@ -165,7 +165,8 @@ private:
 
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
   void initializeSynthesis();
-  double AnimationAutoComplete::getSampleId(int index, int n);
+  double getSampleId(int index, int n);
+  double getReversedSampleId(int index, int n);
   std::vector<StrokeWithNeighbours*> search(StrokeWithNeighbours *operation1);
   StrokeWithNeighbours* assign(std::vector<StrokeWithNeighbours*>);
 

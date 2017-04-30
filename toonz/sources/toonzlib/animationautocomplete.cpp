@@ -165,9 +165,13 @@ double AnimationAutoComplete::getAppearanceSimilarity(PointWithStroke* point1, P
 
 double AnimationAutoComplete::getTemporalSimilarity(PointWithStroke *point1, PointWithStroke *point2)
 {
-    double sampleId1=getSampleId(point1->index, point1->stroke->getChunkCount());
-    double sampleId2=getSampleId(point2->index, point2->stroke->getChunkCount());
-    return (fabs(sampleId1-sampleId2));
+	double sampleId1 = getSampleId(point1->index, point1->stroke->getChunkCount());
+	double sampleId2 = getSampleId(point2->index, point2->stroke->getChunkCount());
+
+	double reverseSampleId1 = getReversedSampleId(point1->index, point1->stroke->getChunkCount());
+	double reverseSampleId2 = getReversedSampleId(point2->index, point2->stroke->getChunkCount());
+
+	return fmax(fabs(sampleId1 - sampleId2), fabs(reverseSampleId1 - reverseSampleId2));
 }
 
 double AnimationAutoComplete::getSpatialSimilarity(PointWithStroke *point1, PointWithStroke *point2)
@@ -381,7 +385,14 @@ double AnimationAutoComplete::getSampleId(int index, int n)
 {
     //in case we use global time stamp, we will multiply by 0.9
     // to avoid having samples in different strokes with the same global TS
-    return (index/n);
+	return (index/n);
+}
+
+// to handle the case when a user draws a stroke in a direction and then the a similar stroke in the opposite direction
+// for example drawing a line starting top to bottom and then another similar line but bottom up.
+double AnimationAutoComplete::getReversedSampleId(int index, int n)
+{
+	return (n - index) / n;
 }
 
 double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints)
