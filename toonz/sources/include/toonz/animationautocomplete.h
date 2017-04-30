@@ -135,7 +135,7 @@ private:
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
 
   TPointD  getTangentUnitVector(PointWithStroke* pointer);
-  double gaussianConstant( SamplePoint chuck1, SamplePoint chuck2);
+  double gaussianConstant(PointWithStroke* chuck1, PointWithStroke* chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
   int withinTemporalVicinity(PointWithStroke* point1, PointWithStroke* point2);
 

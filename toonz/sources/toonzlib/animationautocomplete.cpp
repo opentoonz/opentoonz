@@ -68,11 +68,20 @@ bool AnimationAutoComplete::strokeSelfLooping(TStroke* stroke)
 }
 
 //--------------------------------------------------------------------------------------------------
-double AnimationAutoComplete::gaussianConstant(SamplePoint chuck1, SamplePoint chuck2)
+double AnimationAutoComplete::gaussianConstant(PointWithStroke *chuck1, PointWithStroke *chuck2)
 {
+	TPointD sample1;
+	TPointD sample2;
+	if(chuck1->index==chuck1->stroke->getChunkCount()-1)
+		sample1=chuck1->point->getP2();
+	if (chuck2->index==chuck2->stroke->getChunkCount()-1)
+		sample2= chuck2->point->getP2();
+	else
+	{
 
-	TPointD sample1= chuck1->getP0();
-	TPointD sample2= chuck2->getP0();
+	 sample1= chuck1->point->getP0();
+	 sample2= chuck2->point->getP0();
+	}
 	TThickPoint s1; TThickPoint s2;
 	s1.x=sample1.x;  s1.y=sample1.y;
 	s2.x=sample2.x;  s2.y=sample2.y;
@@ -186,6 +195,7 @@ double AnimationAutoComplete::getSpatialSimilarity(PointWithStroke *point1, Poin
 
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeighbours* lastStroke)
 {
+	bool lastStrokeIsSelfLooping = strokeSelfLooping(lastStroke->stroke);
 
     if(!lastStroke)
 		return std::vector<StrokeWithNeighbours*>();
@@ -211,7 +221,8 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
             min = score;
 #ifdef DEBUGGING
 #ifdef SHOW_MATCHING_STROKE
-            matchedStroke=m_strokesWithNeighbours[i]->stroke;
+			if (lastStrokeIsSelfLooping == strokeSelfLooping(m_strokesWithNeighbours[i]->stroke))
+				matchedStroke=m_strokesWithNeighbours[i]->stroke;
 #endif
 #endif
         }
@@ -223,7 +234,7 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
 	{
         double score = Score.score;
 
-		if(score <(2* min))
+		if((score <2*min) && (lastStrokeIsSelfLooping == strokeSelfLooping(Score.stroke->stroke)))
             similarstrokes.push_back(Score.stroke);
 	}
 
@@ -248,7 +259,7 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 
         for (int i = 0; i < similarStrokeMatchingPairs.size() && i < lastDrawnMatchingPairs.size(); i++)
 		{
-			double guassian = gaussianConstant(similarStrokeMatchingPairs[i].point1->point , similarStrokeMatchingPairs[i].point2->point);
+			double guassian = gaussianConstant(similarStrokeMatchingPairs[i].point1 , similarStrokeMatchingPairs[i].point2);
 			double similarityScore = pointsSimilarity(similarStrokeMatchingPairs[i].point1, similarStrokeMatchingPairs[i].point2);
 			double similarityScoreWithoutWeights = pointsSimilarityWithoutWeights(lastDrawnMatchingPairs[i].point1, lastDrawnMatchingPairs[i].point2);
 			double score = guassian * pow((similarityScore - similarityScoreWithoutWeights), 2);
