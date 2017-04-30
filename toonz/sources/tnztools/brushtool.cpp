@@ -1389,14 +1389,15 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     }
 
 #ifdef DEBUGGING
+#ifdef SHOW_MATCHING_STROKE
     if (m_animationAutoComplete->matchedStroke)
     {
         m_animationAutoComplete->matchedStroke->setStyle(2);
         addStrokeToImage(getApplication(), vi, m_animationAutoComplete->matchedStroke, m_breakAngles.getValue(),
                          m_isFrameCreated, m_isLevelCreated);
     }
-
-
+#endif
+#ifdef SHOW_PAIR_LINES
     std::vector<TStroke*> similarPairLines = m_animationAutoComplete->m_similarPairLines;
     std::vector<TStroke*> oldSimilarPairLines = m_animationAutoComplete->m_oldSimilarPairLines;
 
@@ -1414,19 +1415,23 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
         addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                          m_isFrameCreated, m_isLevelCreated);
     }
-#endif
+#endif // show matching stroke
     //TODO: remove at production
-    //===============================================================================================
-//	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete.drawSpaceVicinity(stroke);
-//	for (auto i : spaceVicinities)
-//		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
-//						 m_isFrameCreated, m_isLevelCreated);
-	//===============================================================================================
-   //TStroke* m_strokeLine = m_animationAutoComplete->drawNormalStroke(stroke);
- //if( m_strokeLine)
-  //addStrokeToImage(getApplication(), vi, m_strokeLine, m_breakAngles.getValue(),
-					//m_isFrameCreated, m_isLevelCreated);
-    //========================================================================
+
+#ifdef SHOW_SPACE_VICINITY
+	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete->drawSpaceVicinity(stroke);
+	for (auto i : spaceVicinities)
+		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
+						 m_isFrameCreated, m_isLevelCreated);
+#endif
+
+#ifdef SHOW_NORMALS
+   TStroke* m_strokeLine = m_animationAutoComplete->drawNormalStroke(stroke);
+ if( m_strokeLine)
+  addStrokeToImage(getApplication(), vi, m_strokeLine, m_breakAngles.getValue(),
+					m_isFrameCreated, m_isLevelCreated);
+#endif
+#endif // debugging
 
     addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                      m_isFrameCreated, m_isLevelCreated);

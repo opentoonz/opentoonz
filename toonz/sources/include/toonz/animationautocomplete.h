@@ -3,6 +3,13 @@
 
 //#define DEBUGGING
 
+#ifdef DEBUGGING
+//#define SHOW_NORMALS
+//#define SHOW_MATCHING_STROKE
+//#define SHOW_PAIR_LINES
+//#define SHOW_SPACE_VICINITY
+#endif
+
 #include <unordered_set>
 #include <vector>
 
@@ -107,13 +114,21 @@ public:
 
 #ifdef DEBUGGING
   //TODO: remove at production
+#ifdef SHOW_SPACE_VICINITY
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
+#endif
+#ifdef SHOW_NORMALS
   TStroke* drawNormalStroke(TStroke* stroke);
+#endif
+#ifdef SHOW_MATCHING_STROKE
   TStroke* matchedStroke;
+#endif
+#ifdef SHOW_PAIR_LINES
   std::vector<TStroke*> m_similarPairLines;
   std::vector<TStroke*> m_oldSimilarPairLines;
-  //END remove at production
 #endif
+#endif
+
 private:
 
   const int m_spaceVicinityRadius = 100;

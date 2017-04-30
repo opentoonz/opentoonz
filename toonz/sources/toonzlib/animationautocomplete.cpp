@@ -9,9 +9,13 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 {
 #ifdef DEBUGGING
     //TODO: remove at production
+#ifdef SHOW_PAIR_LINES
     m_oldSimilarPairLines = m_similarPairLines;
     m_similarPairLines.clear();
+#endif
+#ifdef SHOW_MATCHING_STROKE
     matchedStroke =  nullptr;
+#endif
 #endif
 	// clears previous predictions
 	m_synthesizedStrokes.clear();
@@ -83,6 +87,8 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWit
 	{
 		TStroke* stroke = m_strokesWithNeighbours[i]->stroke;
 
+		// we used to exclude the stroke that is being compared from the neighbours
+		// now we don't. we don't see any impact on accuracy
 		for(int j = 0; j < stroke->getChunkCount(); j++)
             if(withinSpaceVicinity(point.point, stroke->getChunk(j)))
 			{
@@ -93,9 +99,8 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWit
 	int size = m_strokesWithNeighbours.size();
     if(size>2)
 	{
-
-	neighbours.push_back(m_strokesWithNeighbours[size-2]);
-	neighbours.push_back(m_strokesWithNeighbours[size-3]);
+		neighbours.push_back(m_strokesWithNeighbours[size-2]);
+		neighbours.push_back(m_strokesWithNeighbours[size-3]);
 	}
 
 	return neighbours;
@@ -202,7 +207,9 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
         {
             min = score;
 #ifdef DEBUGGING
+#ifdef SHOW_MATCHING_STROKE
             matchedStroke=m_strokesWithNeighbours[i]->stroke;
+#endif
 #endif
         }
         scores.push_back(score_stroke);
@@ -562,6 +569,7 @@ SimilarPairPoint* AnimationAutoComplete::deviationLocal(std::vector<SimilarPairP
 }
 
 #ifdef DEBUGGING
+#ifdef SHOW_SPACE_VICINITY
 //TODO: remove at production
 std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
 {
@@ -571,7 +579,8 @@ std::vector<TStroke*> AnimationAutoComplete::drawSpaceVicinity(TStroke *stroke)
 		strokes.push_back(makeEllipticStroke(3, stroke->getChunk(i)->getP0(), m_spaceVicinityRadius, m_spaceVicinityRadius));
     return strokes;
 }
-#endif
+#endif // draw space vicinity
+#endif // debugging
 
 std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
 {
@@ -628,6 +637,7 @@ std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(Stro
 }
 
 #ifdef DEBUGGING
+#ifdef SHOW_NORMALS
 TStroke* AnimationAutoComplete::drawNormalStroke(TStroke *stroke)
 {
 	//todo: strokeline
@@ -665,7 +675,8 @@ TStroke* AnimationAutoComplete::drawNormalStroke(TStroke *stroke)
     return strokeLine;}
     }
 }
-#endif
+#endif //show normals
+#endif //debugging
 
 std::vector<TPointD> AnimationAutoComplete::predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke)
 {
@@ -802,6 +813,7 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
 
           similarPoints.push_back(p);
 #ifdef DEBUGGING
+#ifdef SHOW_PAIR_LINES
           //TODO: Remove at Production
           TPointD beginning = p.point1->point->getP0();
           TPointD end = p.point2->point->getP0();
@@ -814,7 +826,8 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
           v.push_back(end);
           TStroke* s = new TStroke(v);
           m_similarPairLines.push_back(s);
-#endif
+#endif //show maching strokes
+#endif //debugging
        }
     }
     return similarPoints;
