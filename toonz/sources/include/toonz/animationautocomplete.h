@@ -105,11 +105,12 @@ public:
 
   //TODO: remove at production
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
-  //TODO: remove at production
   TStroke* drawNormalStroke(TStroke* stroke);
-
   TPointD  getNormal(PointWithStroke* pointer);
- TStroke * m_stroke4;
+  TStroke* matchedStroke;
+  std::vector<TStroke*> m_similarPairLines;
+  std::vector<TStroke*> m_oldSimilarPairLines;
+  //END remove at production
 private:
 
   const int m_spaceVicinityRadius = 100;

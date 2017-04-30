@@ -971,7 +971,8 @@ void markDeadIntersections(VIList<Intersection> &intList, Intersection *p) {
 
   if (p->m_numInter == 1) {
     while (p1 && !!p1->m_nextIntersection) p1 = p1->next();
-    assert(p1);
+    //TO DO Remove Comment At Production
+    //assert(p1);
     if (!p1) return;
 
     Intersection *nextInt         = p1->m_nextIntersection;
