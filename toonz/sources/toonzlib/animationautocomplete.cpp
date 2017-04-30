@@ -47,7 +47,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 bool AnimationAutoComplete::strokeSelfLooping(TStroke* stroke)
 {
     int count = stroke->getChunkCount();
-    double range =3;
+	double range = 8;
     TThickQuadratic* lastPointHolder=stroke->getChunk(count-1);
 
     TPointD lastpoint=lastPointHolder->getP2();
@@ -465,9 +465,9 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 		TPointD p2;
 		if(loopCount!=lastStroke->stroke->getChunkCount()-2)
 		{
-		 p1 = similarStroke->stroke->getChunk(i)->getP0();
-		 p3 = lastStroke->stroke->getChunk(i)->getP0() ;
-		 p2 = nextToSimilarStroke->stroke->getChunk(i)->getP0();
+			p1 = similarStroke->stroke->getChunk(i)->getP0();
+			p3 = lastStroke->stroke->getChunk(i)->getP0() ;
+			p2 = nextToSimilarStroke->stroke->getChunk(i)->getP0();
 		}
 		else
 		{
@@ -494,8 +494,12 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 		points.push_back(p);
 	}
 
-    if (nextToSimilarStroke->stroke->isSelfLoop())
-        outputStroke->stroke->setSelfLoop();
+	if (strokeSelfLooping(nextToSimilarStroke->stroke))
+	{
+		TThickPoint midpoint((points.front() + points.back()) * 0.5, (points.front().thick + points.back().thick) * 0.5);
+		points.push_back(midpoint);
+		points.push_back(points.front());
+	}
 
 	outputStroke->stroke = new TStroke(points);
 	return outputStroke;

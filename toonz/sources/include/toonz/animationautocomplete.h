@@ -64,7 +64,6 @@ class GlobalSimilarityGraph
 public:
     int numberOfNodes = 0;
 
-
 	GlobalSimilarityGraph() {}
 	~GlobalSimilarityGraph() {}
     void insertNode(SimilarPairPoint* pair, std::vector<SimilarPairPoint*> connections);
