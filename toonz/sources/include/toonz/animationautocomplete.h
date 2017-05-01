@@ -133,12 +133,11 @@ public:
 #endif
 
 private:
-
   const int m_spaceVicinityRadius = 100;
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
 
-  TPointD  getTangentUnitVector(PointWithStroke* pointer);
+  TPointD getTangentUnitVector(PointWithStroke* pointer);
   double gaussianConstant(PointWithStroke* chuck1, PointWithStroke* chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
@@ -167,12 +166,11 @@ private:
 
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
   void initializeSynthesis();
-  double getSampleId(int index, int n);
-  double getReversedSampleId(int index, int n);
+  double getSampleId(const int &index, const int &n);
+  double getReversedSampleId(const int &index, const int &n);
   std::vector<StrokeWithNeighbours*> search(StrokeWithNeighbours *operation1);
   StrokeWithNeighbours* assign(std::vector<StrokeWithNeighbours*>);
   std::vector<StrokeWithNeighbours*> getContextStrokes(StrokeWithNeighbours* stroke);
-
 
   TPointD meanGlobal(std::vector<SamplePoint> globalSamples);
   SimilarPairPoint* meanLocal(std::vector<SimilarPairPoint *> localPairs);
