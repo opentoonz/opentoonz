@@ -263,6 +263,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
+// Enables high-DPI scaling. This attribute must be set before QApplication is
+// constructed. Available from Qt 5.6.
+#if QT_VERSION >= 0x050600
+  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+
   QApplication a(argc, argv);
 
 #ifdef MACOSX
@@ -340,6 +346,9 @@ int main(int argc, char *argv[]) {
   a.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
+  // Enable to render smooth icons on high dpi monitors
+  a.setAttribute(Qt::AA_UseHighDpiPixmaps);
+
   // Set the app's locale for numeric stuff to standard C. This is important for
   // atof() and similar
   // calls that are locale-dependant.
@@ -360,10 +369,12 @@ int main(int argc, char *argv[]) {
   // splash screen
   QPixmap splashPixmap(":Resources/splash.png");
 #ifdef _WIN32
-  a.setFont(QFont("Arial", 10));
+  QFont font("Arial", -1);
 #else
-  a.setFont(QFont("Helvetica", 10));
+  QFont font("Helvetica", -1);
 #endif
+  font.setPixelSize(13);
+  a.setFont(font);
 
   QString offsetStr("\n\n\n\n\n\n\n\n");
 

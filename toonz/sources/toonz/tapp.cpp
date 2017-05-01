@@ -57,6 +57,8 @@
 #include <QDebug>
 #include <QEvent>
 #include <QCoreApplication>
+#include <QApplication>
+#include <QDesktopWidget>
 
 //===================================================================
 

@@ -3,7 +3,7 @@ pushd thirdparty/tiff-4.0.3
 CFLAGS="-fPIC" CXXFLAGS="-fPIC" ./configure --disable-jbig && make
 popd
 cd toonz && mkdir build && cd build
-source /opt/qt55/bin/qt55-env.sh
+source /opt/qt56/bin/qt56-env.sh
 cmake ../sources \
     -DWITH_SYSTEM_SUPERLU:BOOL=OFF
 # according to https://docs.travis-ci.com/user/ci-environment/#Virtualization-environments

@@ -538,4 +538,6 @@ if(APPLE)
         ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH}
         $<TARGET_FILE:executable>
     )
+    # add capability for retina displays
+    set_target_properties(OpenToonz_1.1 PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
 endif()

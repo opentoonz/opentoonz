@@ -641,10 +641,11 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0,
         }
 
 #ifdef _WIN32
-        static QFont font("Arial", 9, QFont::Normal);
+        static QFont font("Arial", -1, QFont::Bold);
 #else
-        static QFont font("Helvetica", 9, QFont::Normal);
+        static QFont font("Helvetica", -1, QFont::Bold);
 #endif
+        font.setPixelSize(12);
         painter.setFont(font);
         painter.drawText(cellRect.adjusted(10, 0, 0, 0),
                          Qt::AlignVCenter | Qt::AlignLeft, text);
