@@ -6,8 +6,9 @@
 #ifdef DEBUGGING
 	//#define SHOW_NORMALS
 	#define SHOW_MATCHING_STROKE
-	//#define SHOW_PAIR_LINES
+	#define SHOW_PAIR_LINES
 	//#define SHOW_SPACE_VICINITY
+	//#define SHOW_PAIR_STROKES
 #endif
 
 #include <unordered_set>
@@ -126,6 +127,9 @@ public:
   std::vector<TStroke*> m_similarPairLines;
   std::vector<TStroke*> m_oldSimilarPairLines;
 #endif
+#ifdef SHOW_PAIR_STROKES
+  std::vector<TStroke*> pairStrokes;
+#endif
 #endif
 
 private:
@@ -154,9 +158,8 @@ private:
 
   bool strokeSelfLooping(TStroke* stroke);
   double getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
+  PointWithStroke* getCentralSample(StrokeWithNeighbours* stroke);
   double getSimilarPairPointBySampleId(TStroke *stroke1, TStroke *stroke2);
-
-  std::vector<SimilarPairStroke *> getNeighborhoodMatchingPairs(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
 
   double magnitude(std::vector<double> points);
 
