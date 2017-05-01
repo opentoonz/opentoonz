@@ -138,6 +138,12 @@ void AnimationAutoComplete::initializeSynthesis()
 		m_synthesizedStrokes.push_back(outputsStroke);
 }
 
+void AnimationAutoComplete::Smoothing(std::vector<StrokeWithNeighbours*> strokeWithNeighbours)
+{
+
+
+}
+
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getSynthesizedStrokes()
 {
 	return m_synthesizedStrokes;

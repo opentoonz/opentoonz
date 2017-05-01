@@ -177,6 +177,7 @@ private:
   SimilarPairPoint* meanLocal(std::vector<SimilarPairPoint *> localPairs);
   TPointD deviationGlobal(std::vector<SamplePoint> globalSamples);
   SimilarPairPoint* deviationLocal(std::vector<SimilarPairPoint *> localPairs);
+
   double differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2,  std::vector<SimilarPairStroke> similarPairStrokes);
 
   // oday's alternative to generate synthesized stroke
