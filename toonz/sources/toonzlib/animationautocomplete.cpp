@@ -39,7 +39,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 	}
 
 
-	if (m_strokesWithNeighbours.size() >= 2)
+    if (m_strokesWithNeighbours.size() >= 3)
 		initializeSynthesis();
 }
 
@@ -243,7 +243,7 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
         //StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
         StrokeWithNeighbours* nextStroke = new StrokeWithNeighbours();
-        nextStroke->stroke = new TStroke(predictionPositionUpdate(lastStroke, similarStroke));
+        nextStroke->stroke = new TStroke(predictionPositionUpdate( similarStroke,lastStroke));
 
 		std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairPoints(similarStroke, nextToSimilarStroke);
 		std::vector<SimilarPairPoint> lastDrawnMatchingPairs = getSimilarPairPoints(nextStroke, lastStroke);
@@ -708,13 +708,13 @@ std::vector<TPointD> AnimationAutoComplete::predictionPositionUpdate(StrokeWithN
         //std::vector<TPointD> matrixA;
         TPointD subtractionMatrix = sampleNextStroke->getP0() - sampleCurrentStroke->getP0();
         TPointD Segma;
-        //Segma.x=10;
+        Segma.x=150;
        // Segma.y=10;
-        Segma=sampleNextStroke->getP0();
-        Segma.x=50;
-        Segma.y=50;
+        //Segma=sampleNextStroke->getP0();
+       // Segma.x=50;
+        //Segma.y=50;
         //SamplePoint result=subtractionMatrix+sampleCurrentStroke+Segma;
-        TPointD result = subtractionMatrix + (sampleCurrentStroke->getP0());
+        TPointD result = subtractionMatrix +(sampleCurrentStroke->getP0());
         result = result +Segma;
         if(predectedStrock.size()>0)
         {
