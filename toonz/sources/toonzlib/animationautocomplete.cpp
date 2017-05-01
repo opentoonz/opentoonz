@@ -16,7 +16,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
     m_similarPairLines.clear();
 #endif
 #ifdef SHOW_MATCHING_STROKE
-    matchedStroke =  nullptr;
+ matchedStroke =  nullptr;
 #endif
 #endif
 	// clears previous predictions
@@ -32,7 +32,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 
 	getNeighbours(strokeWithNeighbours);
 
-	if (m_strokesWithNeighbours.size() >= 2)
+    if (m_strokesWithNeighbours.size() >= 3)
 		initializeSynthesis();
 }
 
@@ -249,13 +249,18 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 	if(similarStrokes.empty())
 		return nullptr;
 
-	double min = 9999999999;
+    double min = 9999999999;
 	StrokeWithScore outputStroke;
 	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
 
 	for (StrokeWithNeighbours* similarStroke : similarStrokes) {
 		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
+#ifdef ADAM_SYSTHESIS
 		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke);
+#endif
+#ifdef ODAY_SYNTHESIS
+		StrokeWithNeighbours* nextStroke = predictionPositionUpdate( similarStroke,lastStroke);
+#endif
 
 		std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairPoints(similarStroke, nextToSimilarStroke);
 		std::vector<SimilarPairPoint> lastDrawnMatchingPairs = getSimilarPairPoints(nextStroke, lastStroke);
@@ -409,19 +414,9 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	TPointD centralOutputStroke = (centralNextToSimilarStroke - centralSimilarStroke) + centralLastStroke;
 	TPointD offset = centralOutputStroke - centralNextToSimilarStroke;
 
-	for (int i = 0; i < outputStroke->stroke->getChunkCount(); i++)
-	{
-		TPointD oldPosition = outputStroke->stroke->getChunk(i)->getP0();
-		TPointD oldPositionP1 = outputStroke->stroke->getChunk(i)->getP1();
-		outputStroke->stroke->getChunk(i)->setP1(oldPositionP1 + offset);
-		outputStroke->stroke->getChunk(i)->setP0(oldPosition + offset);
+	TAffine aff = TTranslation(offset);
 
-		if (i == outputStroke->stroke->getChunkCount()-1)
-		{
-			TPointD oldPositionP2 = outputStroke->stroke->getChunk(i)->getP2();
-			outputStroke->stroke->getChunk(i)->setP2(oldPositionP2 + offset);
-		}
-	}
+	outputStroke->stroke->transform(aff);
 
 	getNeighbours(outputStroke);
 	return outputStroke;
@@ -624,7 +619,7 @@ std::vector<TStroke*> AnimationAutoComplete::drawNormalStrokes(TStroke *stroke)
 #endif //show normals
 #endif //debugging
 
-std::vector<TPointD> AnimationAutoComplete::predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke)
+StrokeWithNeighbours* AnimationAutoComplete::predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke)
 {
     int count=0;
 	if(currentStroke->stroke->getChunkCount()>nextStroke->stroke->getChunkCount())
@@ -637,18 +632,34 @@ std::vector<TPointD> AnimationAutoComplete::predictionPositionUpdate(StrokeWithN
     for(int i=0;i<count;i++)
     {
 		sampleCurrentStroke=currentStroke->stroke->getChunk(i);
-		sampleNextStroke=nextStroke->stroke->getChunk(i);
+        sampleNextStroke=nextStroke->stroke->getChunk(i);
         //std::vector<TPointD> matrixA;
-		TPointD subtractionMatrix = sampleNextStroke->getP0() - sampleCurrentStroke->getP0();
+        TPointD subtractionMatrix = sampleNextStroke->getP0() - sampleCurrentStroke->getP0();
         TPointD Segma;
-        Segma.x=1;
-        Segma.y=1;
+        Segma.x=150;
+       // Segma.y=10;
+        //Segma=sampleNextStroke->getP0();
+       // Segma.x=50;
+        //Segma.y=50;
         //SamplePoint result=subtractionMatrix+sampleCurrentStroke+Segma;
-		TPointD result = subtractionMatrix + (sampleCurrentStroke->getP0());
-		result = result +(Segma);
+        TPointD result = subtractionMatrix +(sampleCurrentStroke->getP0());
+        result = result +Segma;
+        if(predectedStrock.size()>0)
+        {
+            TPointD midPoint;
+            TPointD tmp;
+            tmp=predectedStrock.back();
+            midPoint.x=((result.x+tmp.x)/2);
+            midPoint.y=((result.y+tmp.y)/2);
+          predectedStrock.push_back(midPoint);
+        }
 		predectedStrock.push_back(result);
     }
-    return predectedStrock;
+
+	StrokeWithNeighbours* output = new StrokeWithNeighbours();
+	output->stroke = new TStroke(predectedStrock);
+	getNeighbours(output);
+	return output;
 }
 
 TPointD AnimationAutoComplete::getTangentUnitVector(PointWithStroke* pointWithStroke)

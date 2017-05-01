@@ -3,6 +3,9 @@
 
 #define DEBUGGING
 
+//#define ODAY_SYNTHESIS
+#define ADAM_SYSTHESIS
+
 #ifdef DEBUGGING
 	//#define SHOW_NORMALS
 	#define SHOW_MATCHING_STROKE
@@ -180,7 +183,7 @@ private:
   double differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2,  std::vector<SimilarPairStroke> similarPairStrokes);
 
   // oday's alternative to generate synthesized stroke
-  std::vector<TPointD> predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke);
+  StrokeWithNeighbours *predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke);
 };
 
 #endif // ANIMATIONAUTOCOMPLETE_H
