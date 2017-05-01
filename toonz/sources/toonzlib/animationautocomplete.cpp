@@ -30,14 +30,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 
 	strokeWithNeighbours->stroke = stroke;
 
-	int chuckCount = stroke->getChunkCount();
-	for (int i = 0; i < chuckCount; i++)
-	{
-        PointWithStroke point(stroke->getChunk(i), stroke, i);
-        std::vector<StrokeWithNeighbours*> neighbours = getNeighbours(point);
-		strokeWithNeighbours->neighbours.insert(neighbours.begin(), neighbours.end());
-	}
-
+	getNeighbours(strokeWithNeighbours);
 
 	if (m_strokesWithNeighbours.size() >= 2)
 		initializeSynthesis();
@@ -91,6 +84,17 @@ double AnimationAutoComplete::gaussianConstant(PointWithStroke *chuck1, PointWit
 	return exp(-distance/OMEGA);
 }
 
+void AnimationAutoComplete::getNeighbours(StrokeWithNeighbours* stroke)
+{
+	int chuckCount = stroke->stroke->getChunkCount();
+	for (int i = 0; i < chuckCount; i++)
+	{
+		PointWithStroke point(stroke->stroke->getChunk(i), stroke->stroke, i);
+		std::vector<StrokeWithNeighbours*> neighbours = getNeighbours(point);
+		stroke->neighbours.insert(neighbours.begin(), neighbours.end());
+	}
+}
+
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWithStroke point)
 {
 	std::vector<StrokeWithNeighbours*> neighbours;
@@ -102,7 +106,7 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWit
 		// we used to exclude the stroke that is being compared from the neighbours
 		// now we don't. we don't see any impact on accuracy
 		for(int j = 0; j < stroke->getChunkCount(); j++)
-            if(withinSpaceVicinity(point.point, stroke->getChunk(j)))
+			if(withinSpaceVicinity(point.point, stroke->getChunk(j)))
 			{
 				neighbours.push_back(m_strokesWithNeighbours[i]);
 				break;
@@ -138,11 +142,7 @@ void AnimationAutoComplete::initializeSynthesis()
 		m_synthesizedStrokes.push_back(outputsStroke);
 }
 
-void AnimationAutoComplete::Smoothing(std::vector<StrokeWithNeighbours*> strokeWithNeighbours)
-{
 
-
-}
 
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getSynthesizedStrokes()
 {
@@ -203,8 +203,7 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
 {
 	bool lastStrokeIsSelfLooping = strokeSelfLooping(lastStroke->stroke);
 
-    if(!lastStroke)
-		return std::vector<StrokeWithNeighbours*>();
+	assert(lastStroke);
 
 	double min = 10000000;
 	StrokeWithScore score_stroke;
@@ -279,7 +278,18 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 		}
 	}
 
-    return outputStroke.stroke;
+	return outputStroke.stroke;
+}
+
+std::vector<StrokeWithNeighbours *> AnimationAutoComplete::getContextStrokes(StrokeWithNeighbours *stroke)
+{
+	std::vector<StrokeWithNeighbours*> contextStrokes;
+
+	for(StrokeWithNeighbours* neighbor : stroke->neighbours)
+		if (neighbor->stroke->getLength() >= (2 * stroke->stroke->getLength()))
+			contextStrokes.push_back(neighbor);
+
+	return contextStrokes;
 }
 
 double AnimationAutoComplete::differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2,  std::vector<SimilarPairStroke> similarPairStrokes)
@@ -297,7 +307,7 @@ double AnimationAutoComplete::differnceOfTwoNeighborhood(StrokeWithNeighbours* s
     }
 
 
-    return differenceInScores/stroke1->stroke->getChunkCount();
+	return differenceInScores;
 
 
 }
@@ -334,9 +344,7 @@ double AnimationAutoComplete::getNeighborhoodSimilarity(StrokeWithNeighbours *st
 
 	std::vector<SimilarPairStroke> similarStrokes = getSimilarPairStrokes(stroke1,stroke2);
 	double differenceInNeighborhoods = differnceOfTwoNeighborhood(stroke1,stroke2, similarStrokes);
-	double similarities = operationsSimilarity(stroke1,stroke2);
 
-	//return sqrt(centralSimilarities + differenceInNeighborhoods);
 	return sqrt (centralSimilarities + differenceInNeighborhoods);
 }
 
@@ -438,7 +446,7 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 		TPointD p1;
 		TPointD p3;
 		TPointD p2;
-		if(loopCount!=lastStroke->stroke->getChunkCount()-2)
+		if(loopCount != lastStroke->stroke->getChunkCount()-2)
 		{
 			p1 = similarStroke->stroke->getChunk(i)->getP0();
 			p3 = lastStroke->stroke->getChunk(i)->getP0() ;
@@ -477,6 +485,7 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	}
 
 	outputStroke->stroke = new TStroke(points);
+	getNeighbours(outputStroke);
 	return outputStroke;
 }
 

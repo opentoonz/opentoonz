@@ -6,7 +6,7 @@
 #ifdef DEBUGGING
 	//#define SHOW_NORMALS
 	#define SHOW_MATCHING_STROKE
-	#define SHOW_PAIR_LINES
+	//#define SHOW_PAIR_LINES
 	//#define SHOW_SPACE_VICINITY
 	//#define SHOW_PAIR_STROKES
 #endif
@@ -141,7 +141,6 @@ private:
   TPointD  getTangentUnitVector(PointWithStroke* pointer);
   double gaussianConstant(PointWithStroke* chuck1, PointWithStroke* chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
-  int withinTemporalVicinity(PointWithStroke* point1, PointWithStroke* point2);
 
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
                                                   StrokeWithNeighbours* nextToSimilarStroke);
@@ -164,6 +163,7 @@ private:
   double magnitude(std::vector<double> points);
 
   std::vector<StrokeWithNeighbours*> getNeighbours(PointWithStroke point);
+  void getNeighbours(StrokeWithNeighbours* stroke);
 
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
   void initializeSynthesis();
@@ -171,6 +171,7 @@ private:
   double getReversedSampleId(int index, int n);
   std::vector<StrokeWithNeighbours*> search(StrokeWithNeighbours *operation1);
   StrokeWithNeighbours* assign(std::vector<StrokeWithNeighbours*>);
+  std::vector<StrokeWithNeighbours*> getContextStrokes(StrokeWithNeighbours* stroke);
 
 
   TPointD meanGlobal(std::vector<SamplePoint> globalSamples);
