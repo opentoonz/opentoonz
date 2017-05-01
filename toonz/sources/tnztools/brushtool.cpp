@@ -1417,7 +1417,6 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     }
 #endif // show matching stroke
     //TODO: remove at production
-
 #ifdef SHOW_SPACE_VICINITY
 	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete->drawSpaceVicinity(stroke);
 	for (auto i : spaceVicinities)
