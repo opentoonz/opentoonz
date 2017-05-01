@@ -1416,6 +1416,16 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
                          m_isFrameCreated, m_isLevelCreated);
     }
 #endif // show matching stroke
+#ifdef SHOW_PAIR_STROKES
+	std::vector<TStroke*> pairStrokes = m_animationAutoComplete->pairStrokes;
+
+	for (auto stroke : pairStrokes)
+	{
+		stroke->setStyle(2);
+		addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
+						 m_isFrameCreated, m_isLevelCreated);
+	}
+#endif
     //TODO: remove at production
 #ifdef SHOW_SPACE_VICINITY
 	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete->drawSpaceVicinity(stroke);
