@@ -255,7 +255,7 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 
 	for (StrokeWithNeighbours* similarStroke : similarStrokes) {
 		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
-		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
+		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke);
 
 		std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairPoints(similarStroke, nextToSimilarStroke);
 		std::vector<SimilarPairPoint> lastDrawnMatchingPairs = getSimilarPairPoints(nextStroke, lastStroke);
@@ -383,21 +383,6 @@ double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoin
 	return sqrt(dissimilarityfactor)/n;
 }
 
-PointWithStroke *AnimationAutoComplete::getCentralSample(StrokeWithNeighbours *stroke)
-{
-	PointWithStroke* central1 = new PointWithStroke();
-	central1->stroke = stroke->stroke;
-	int n = stroke->stroke->getChunkCount();
-
-	if(n%2==0)
-		central1->index=(n/2);
-	else
-		central1->index=((n/2)+1);
-
-	central1->point = stroke->stroke->getChunk(central1->index);
-	return central1;
-}
-
 double AnimationAutoComplete::magnitude(std::vector<double> points)
 {
 	double sum=0;
@@ -410,61 +395,34 @@ double AnimationAutoComplete::magnitude(std::vector<double> points)
 }
 
 
-StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWithNeighbours *lastStroke, StrokeWithNeighbours *similarStroke, StrokeWithNeighbours *nextToSimilarStroke)
+StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWithNeighbours *lastStroke, StrokeWithNeighbours *similarStroke)
 {
 	StrokeWithNeighbours* outputStroke = new StrokeWithNeighbours();
-	std::vector<TThickPoint> points;
-    double count1 = similarStroke->stroke->getChunkCount();
-    double count2 = nextToSimilarStroke->stroke->getChunkCount();
+	StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
 
-    int loopCount = (int)fmin(count1, count2);
-    int count3 = lastStroke->stroke->getChunkCount();
-    loopCount = (int) fmin (loopCount,count3);
+	TPointD centralSimilarStroke = similarStroke->getCentralSample()->point->getP0();
+	TPointD centralNextToSimilarStroke = nextToSimilarStroke->getCentralSample()->point->getP0();
+	TPointD centralLastStroke = lastStroke->getCentralSample()->point->getP0();
 
-	for(int i = 0; i < loopCount; i++)
+	outputStroke->stroke = new TStroke(*nextToSimilarStroke->stroke);
+
+	TPointD centralOutputStroke = (centralNextToSimilarStroke - centralSimilarStroke) + centralLastStroke;
+	TPointD offset = centralOutputStroke - centralNextToSimilarStroke;
+
+	for (int i = 0; i < outputStroke->stroke->getChunkCount(); i++)
 	{
-		TPointD p1;
-		TPointD p3;
-		TPointD p2;
-		if(loopCount != lastStroke->stroke->getChunkCount()-2)
-		{
-			p1 = similarStroke->stroke->getChunk(i)->getP0();
-			p3 = lastStroke->stroke->getChunk(i)->getP0() ;
-			p2 = nextToSimilarStroke->stroke->getChunk(i)->getP0();
-		}
-		else
-		{
-			p1 = similarStroke->stroke->getChunk(i)->getP2();
-			p3 = lastStroke->stroke->getChunk(i)->getP2() ;
-			p2 = nextToSimilarStroke->stroke->getChunk(i)->getP2();
-		}
-		double x1 = p1.x , x2 = p2.x;
-		double y1 = p1.y , y2 = p2.y;
-		double x_diffrence = fabs(x2-x1);
-		double y_diffrence = fabs(y2-y1);
-		double x_output = p3.x + x_diffrence;
-		double y_output = p3.y+ y_diffrence;
+		TPointD oldPosition = outputStroke->stroke->getChunk(i)->getP0();
+		TPointD oldPositionP1 = outputStroke->stroke->getChunk(i)->getP1();
+		outputStroke->stroke->getChunk(i)->setP1(oldPositionP1 + offset);
+		outputStroke->stroke->getChunk(i)->setP0(oldPosition + offset);
 
-		TThickPoint p = TThickPoint(x_output,y_output,similarStroke->stroke->getChunk(i)->getThickP0().thick);
-
-		if(points.size() > 0)
+		if (i == outputStroke->stroke->getChunkCount()-1)
 		{
-			TThickPoint old = points.back();
-			if (norm2(p - old) < 4) continue;
-			TThickPoint mid((old + p) * 0.5, (p.thick + old.thick) * 0.5);
-			points.push_back(mid);
+			TPointD oldPositionP2 = outputStroke->stroke->getChunk(i)->getP2();
+			outputStroke->stroke->getChunk(i)->setP2(oldPositionP2 + offset);
 		}
-		points.push_back(p);
 	}
 
-	if (strokeSelfLooping(nextToSimilarStroke->stroke))
-	{
-		TThickPoint midpoint((points.front() + points.back()) * 0.5, (points.front().thick + points.back().thick) * 0.5);
-		points.push_back(midpoint);
-		points.push_back(points.front());
-	}
-
-	outputStroke->stroke = new TStroke(points);
 	getNeighbours(outputStroke);
 	return outputStroke;
 }
@@ -622,8 +580,8 @@ std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(Stro
 
 #ifdef SHOW_PAIR_STROKES
 		  //TODO: Remove at Production
-		  TPointD beginning = getCentralSample(strokepair1)->point->getP0();
-		  TPointD end		= getCentralSample(strokepair2)->point->getP0();
+		  TPointD beginning = strokepair1->getCentralSample()->point->getP0();
+		  TPointD end		= strokepair2->getCentralSample()->point->getP0();
 		  TPointD middle = (end + beginning);
 		  middle.x = middle.x / 2;
 		  middle.y = middle.y / 2;
@@ -804,4 +762,19 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
     }
 
     return similarPoints;
+}
+
+PointWithStroke *StrokeWithNeighbours::getCentralSample()
+{
+	PointWithStroke* central1 = new PointWithStroke();
+	central1->stroke = stroke;
+	int n = stroke->getChunkCount();
+
+	if(n%2==0)
+		central1->index=(n/2);
+	else
+		central1->index=((n/2)+1);
+
+	central1->point = stroke->getChunk(central1->index);
+	return central1;
 }

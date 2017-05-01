@@ -81,6 +81,8 @@ public:
     TStroke* stroke;
     std::unordered_set<StrokeWithNeighbours*> neighbours;
     StrokeWithNeighbours *nextStroke;
+
+	PointWithStroke* getCentralSample();
 };
 
 struct SimilarPairStroke
@@ -141,8 +143,7 @@ private:
   double gaussianConstant(PointWithStroke* chuck1, PointWithStroke* chuck2);
   double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
-  StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke,StrokeWithNeighbours* similarStroke,
-                                                  StrokeWithNeighbours* nextToSimilarStroke);
+  StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke, StrokeWithNeighbours* similarStroke);
 
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
   double pointsSimilarityWithoutWeights(PointWithStroke* point1, PointWithStroke* point2);
@@ -156,7 +157,6 @@ private:
 
   bool strokeSelfLooping(TStroke* stroke);
   double getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
-  PointWithStroke* getCentralSample(StrokeWithNeighbours* stroke);
   double getSimilarPairPointBySampleId(TStroke *stroke1, TStroke *stroke2);
 
   double magnitude(std::vector<double> points);
