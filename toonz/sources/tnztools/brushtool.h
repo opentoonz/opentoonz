@@ -28,7 +28,7 @@ class TTileSaverCM32;
 class RasterStrokeGenerator;
 class BluredBrush;
 class AnimationAutoComplete;
-
+class StrokeWithNeighbours;
 //--------------------------------------------------------------
 
 //************************************************************************
@@ -117,6 +117,7 @@ public:
   BrushTool(std::string name, int targetType);
 
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
+  std::vector<StrokeWithNeighbours*> synthesizedStrokes;
 
   ToolOptionsBox *createOptionsBox() override;
 

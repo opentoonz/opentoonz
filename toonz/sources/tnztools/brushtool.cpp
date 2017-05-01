@@ -1378,7 +1378,11 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
 	m_animationAutoComplete->addStroke(stroke);
 
-	std::vector<StrokeWithNeighbours*> synthesizedStrokes = m_animationAutoComplete->getSynthesizedStrokes();
+	if (synthesizedStrokes.size())
+		// I don't know why -2 but it works
+		vi.getPointer()->deleteStroke(vi.getPointer()->getStrokeCount()-2);
+
+	synthesizedStrokes = m_animationAutoComplete->getSynthesizedStrokes();
 
     // draws synthesized strokes
     for (auto stroke : synthesizedStrokes)

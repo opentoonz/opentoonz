@@ -1,7 +1,7 @@
 #ifndef ANIMATIONAUTOCOMPLETE_H
 #define ANIMATIONAUTOCOMPLETE_H
 
-#define DEBUGGING
+//#define DEBUGGING
 
 //#define ODAY_SYNTHESIS
 #define ADAM_SYSTHESIS
@@ -137,9 +137,10 @@ public:
 #endif
 #endif
 
+  std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
 private:
   const int m_spaceVicinityRadius = 100;
-  std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
+
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
 
   TPointD getTangentUnitVector(PointWithStroke* pointer);

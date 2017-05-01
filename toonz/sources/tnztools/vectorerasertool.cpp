@@ -1,5 +1,3 @@
-
-
 // TnzTools includes
 #include "tools/toolhandle.h"
 #include "tools/toolutils.h"
