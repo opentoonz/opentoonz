@@ -1383,7 +1383,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     // draws synthesized strokes
     for (auto stroke : synthesizedStrokes)
     {
-        stroke->stroke->setStyle(2);
+        stroke->stroke->setStyle(3);
         addStrokeToImage(getApplication(), vi, stroke->stroke, m_breakAngles.getValue(),
                          m_isFrameCreated, m_isLevelCreated);
     }

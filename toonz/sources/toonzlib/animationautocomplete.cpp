@@ -16,7 +16,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
     m_similarPairLines.clear();
 #endif
 #ifdef SHOW_MATCHING_STROKE
-    matchedStroke =  nullptr;
+ matchedStroke =  nullptr;
 #endif
 #endif
 	// clears previous predictions
@@ -235,13 +235,15 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 	if(similarStrokes.empty())
 		return nullptr;
 
-	double min = 9999999999;
+    double min = 9999999999;
 	StrokeWithScore outputStroke;
 	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
 
 	for (StrokeWithNeighbours* similarStroke : similarStrokes) {
 		StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
-		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
+        //StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke, nextToSimilarStroke);
+        StrokeWithNeighbours* nextStroke = new StrokeWithNeighbours();
+        nextStroke->stroke = new TStroke(predictionPositionUpdate(lastStroke, similarStroke));
 
 		std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairPoints(similarStroke, nextToSimilarStroke);
 		std::vector<SimilarPairPoint> lastDrawnMatchingPairs = getSimilarPairPoints(nextStroke, lastStroke);
@@ -702,15 +704,27 @@ std::vector<TPointD> AnimationAutoComplete::predictionPositionUpdate(StrokeWithN
     for(int i=0;i<count;i++)
     {
 		sampleCurrentStroke=currentStroke->stroke->getChunk(i);
-		sampleNextStroke=nextStroke->stroke->getChunk(i);
+        sampleNextStroke=nextStroke->stroke->getChunk(i);
         //std::vector<TPointD> matrixA;
-		TPointD subtractionMatrix = sampleNextStroke->getP0() - sampleCurrentStroke->getP0();
+        TPointD subtractionMatrix = sampleNextStroke->getP0() - sampleCurrentStroke->getP0();
         TPointD Segma;
-        Segma.x=1;
-        Segma.y=1;
+        //Segma.x=10;
+       // Segma.y=10;
+        Segma=sampleNextStroke->getP0();
+        Segma.x=50;
+        Segma.y=50;
         //SamplePoint result=subtractionMatrix+sampleCurrentStroke+Segma;
-		TPointD result = subtractionMatrix + (sampleCurrentStroke->getP0());
-		result = result +(Segma);
+        TPointD result = subtractionMatrix + (sampleCurrentStroke->getP0());
+        result = result +Segma;
+        if(predectedStrock.size()>0)
+        {
+            TPointD midPoint;
+            TPointD tmp;
+            tmp=predectedStrock.back();
+            midPoint.x=((result.x+tmp.x)/2);
+            midPoint.y=((result.y+tmp.y)/2);
+          predectedStrock.push_back(midPoint);
+        }
 		predectedStrock.push_back(result);
     }
     return predectedStrock;

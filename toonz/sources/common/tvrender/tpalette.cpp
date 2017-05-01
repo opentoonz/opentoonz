@@ -192,9 +192,17 @@ TPalette::TPalette()
   page->addStyle(TPixel32(255, 255, 255, 0));
   page->addStyle(TPixel32(0, 0, 0, 255));
   page->addStyle(TPixel32(160, 210, 255, 105));
+
   getStyle(0)->setName(L"color_0");
   getStyle(1)->setName(L"color_1");
   getStyle(2)->setName(L"Animation_AutoComplete");
+  //TODO:remove at production
+  page->addStyle(TPixel32(105, 210, 151, 160));
+  getStyle(3)->setName(L"Show_Similar");
+  page->addStyle(TPixel32(105, 100, 100, 160));
+  getStyle(4)->setName(L"dep1");
+  page->addStyle(TPixel32(89, 100, 160, 160));
+  getStyle(5)->setName(L"Show_Similar");
 
   for (int i = 0; i < 10; i++) m_shortcuts['0' + i] = i;
 }
