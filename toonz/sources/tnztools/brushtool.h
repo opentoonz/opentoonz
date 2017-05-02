@@ -117,7 +117,11 @@ public:
   BrushTool(std::string name, int targetType);
 
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
+
   std::vector<StrokeWithNeighbours*> synthesizedStrokes;
+
+  // TODO: remove at production
+  int bullshitStrokes = 0;
 
   ToolOptionsBox *createOptionsBox() override;
 

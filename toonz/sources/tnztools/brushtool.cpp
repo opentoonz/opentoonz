@@ -1378,9 +1378,12 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
 	m_animationAutoComplete->addStroke(stroke);
 
-	if (synthesizedStrokes.size())
+	while(bullshitStrokes)
+	{
 		// I don't know why -2 but it works
-		vi.getPointer()->deleteStroke(vi.getPointer()->getStrokeCount()-2);
+		vi.getPointer()->deleteStroke(vi.getPointer()->getStrokeCount() - 2);
+		bullshitStrokes--;
+	}
 
 	synthesizedStrokes = m_animationAutoComplete->getSynthesizedStrokes();
 
@@ -1390,6 +1393,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
         stroke->stroke->setStyle(3);
         addStrokeToImage(getApplication(), vi, stroke->stroke, m_breakAngles.getValue(),
                          m_isFrameCreated, m_isLevelCreated);
+		bullshitStrokes++;
     }
 
 #ifdef DEBUGGING
@@ -1399,18 +1403,11 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
         m_animationAutoComplete->matchedStroke->setStyle(2);
         addStrokeToImage(getApplication(), vi, m_animationAutoComplete->matchedStroke, m_breakAngles.getValue(),
                          m_isFrameCreated, m_isLevelCreated);
+		bullshitStrokes++;
     }
 #endif
 #ifdef SHOW_PAIR_LINES
     std::vector<TStroke*> similarPairLines = m_animationAutoComplete->m_similarPairLines;
-    std::vector<TStroke*> oldSimilarPairLines = m_animationAutoComplete->m_oldSimilarPairLines;
-
-//    for (auto stroke : oldSimilarPairLines)
-//    {
-//        VIStroke* s = new VIStroke();
-//        s->m_s = stroke;
-//        image->deleteStroke(s);
-//    }
 
     // draw lines between similar pair strokes
     for (auto stroke : similarPairLines)
@@ -1418,6 +1415,9 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
         stroke->setStyle(2);
         addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                          m_isFrameCreated, m_isLevelCreated);
+		bullshitStrokes++;
+		if (!bullshitStrokes)
+			assert(bullshitStrokes);
     }
 #endif // show matching stroke
 #ifdef SHOW_PAIR_STROKES
@@ -1428,21 +1428,28 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 		stroke->setStyle(2);
 		addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
 						 m_isFrameCreated, m_isLevelCreated);
+		bullshitStrokes++;
 	}
 #endif
     //TODO: remove at production
 #ifdef SHOW_SPACE_VICINITY
 	std::vector<TStroke*> spaceVicinities = m_animationAutoComplete->drawSpaceVicinity(stroke);
 	for (auto i : spaceVicinities)
+	{
 		addStrokeToImage(getApplication(), vi, i, m_breakAngles.getValue(),
 						 m_isFrameCreated, m_isLevelCreated);
+		bullshitStrokes++;
+	}
 #endif
 
 #ifdef SHOW_NORMALS
    std::vector<TStroke*> normal = m_animationAutoComplete->drawNormalStrokes(stroke);
    for (auto stroke : normal)
+   {
 	   addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
 						m_isFrameCreated, m_isLevelCreated);
+	   bullshitStrokes++;
+   }
 #endif
 #endif // debugging
 

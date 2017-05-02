@@ -12,8 +12,8 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 #ifdef DEBUGGING
     //TODO: remove at production
 #ifdef SHOW_PAIR_LINES
-    m_oldSimilarPairLines = m_similarPairLines;
-    m_similarPairLines.clear();
+	m_oldSimilarPairLines = m_similarPairLines;
+	m_similarPairLines.clear();
 #endif
 #ifdef SHOW_MATCHING_STROKE
  matchedStroke =  nullptr;
@@ -225,7 +225,7 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
 #ifdef DEBUGGING
 #ifdef SHOW_MATCHING_STROKE
 			if (lastStrokeIsSelfLooping == strokeSelfLooping(m_strokesWithNeighbours[i]->stroke))
-				matchedStroke=m_strokesWithNeighbours[i]->stroke;
+				matchedStroke = m_strokesWithNeighbours[i]->stroke;
 #endif
 #endif
         }

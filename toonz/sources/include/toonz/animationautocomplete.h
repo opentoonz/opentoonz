@@ -1,17 +1,17 @@
 #ifndef ANIMATIONAUTOCOMPLETE_H
 #define ANIMATIONAUTOCOMPLETE_H
 
-//#define DEBUGGING
+#define DEBUGGING
 
 //#define ODAY_SYNTHESIS
 #define ADAM_SYSTHESIS
 
 #ifdef DEBUGGING
-	//#define SHOW_NORMALS
-	#define SHOW_MATCHING_STROKE
-	//#define SHOW_PAIR_LINES
-	//#define SHOW_SPACE_VICINITY
-	//#define SHOW_PAIR_STROKES
+		//#define SHOW_NORMALS
+		//#define SHOW_MATCHING_STROKE
+		//#define SHOW_PAIR_LINES
+		//#define SHOW_SPACE_VICINITY
+		//#define SHOW_PAIR_STROKES
 #endif
 
 #include <unordered_set>
