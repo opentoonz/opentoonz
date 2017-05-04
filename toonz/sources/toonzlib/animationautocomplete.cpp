@@ -15,7 +15,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 	m_oldSimilarPairLines = m_similarPairLines;
 	m_similarPairLines.clear();
 #endif
-#ifdef SHOW_MATCHING_STROKE
+#if defined(SHOW_PAIR_LINES) || defined(SHOW_MATCHING_STROKE)
  matchedStroke =  nullptr;
 #endif
 #endif
@@ -223,9 +223,9 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
         {
             min = score;
 #ifdef DEBUGGING
-#ifdef SHOW_MATCHING_STROKE
+#if defined(SHOW_PAIR_LINES) || defined(SHOW_MATCHING_STROKE)
 			if (lastStrokeIsSelfLooping == strokeSelfLooping(m_strokesWithNeighbours[i]->stroke))
-				matchedStroke = m_strokesWithNeighbours[i]->stroke;
+				matchedStroke = m_strokesWithNeighbours[i];
 #endif
 #endif
         }
@@ -304,6 +304,13 @@ double AnimationAutoComplete::differnceOfTwoNeighborhood(StrokeWithNeighbours* s
         double stroke1Similarity = operationsSimilarity(stroke1, similarPair.stroke1);
         double stroke2Similarity = operationsSimilarity(stroke2, similarPair.stroke2);
         differenceInScores += (stroke1Similarity - stroke2Similarity);
+
+#ifdef SHOW_PAIR_STROKES
+		//TODO: Remove at Production
+		TPointD beginning = similarPair.stroke1->getCentralSample()->point->getP0();
+		TPointD end		= similarPair.stroke2->getCentralSample()->point->getP0();
+		pairStrokes.push_back(generateLineStroke(beginning, end));
+#endif //show maching strokes
     }
 
 	return differenceInScores;
@@ -405,9 +412,9 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	StrokeWithNeighbours* outputStroke = new StrokeWithNeighbours();
 	StrokeWithNeighbours* nextToSimilarStroke = similarStroke->nextStroke;
 
-	TPointD centralSimilarStroke = similarStroke->getCentralSample()->point->getP0();
-	TPointD centralNextToSimilarStroke = nextToSimilarStroke->getCentralSample()->point->getP0();
-	TPointD centralLastStroke = lastStroke->getCentralSample()->point->getP0();
+	TPointD centralSimilarStroke = similarStroke->getCentralSample();
+	TPointD centralNextToSimilarStroke = nextToSimilarStroke->getCentralSample();
+	TPointD centralLastStroke = lastStroke->getCentralSample();
 
 	outputStroke->stroke = new TStroke(*nextToSimilarStroke->stroke);
 
@@ -421,6 +428,34 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	getNeighbours(outputStroke);
 	return outputStroke;
 }
+
+#if defined(SHOW_PAIR_LINES) || defined(SHOW_PAIR_STROKES)
+TStroke *AnimationAutoComplete::generateLineStroke(TPointD beginning, TPointD end)
+{
+	if (beginning == end)
+		return nullptr;
+	TPointD middle = (end + beginning);
+	middle.x = middle.x / 2;
+	middle.y = middle.y / 2;
+	std::vector<TPointD> v;
+	v.push_back(beginning);
+	v.push_back(middle);
+	v.push_back(end);
+	return new TStroke(v);
+}
+
+bool AnimationAutoComplete::pairsAreMatchingStrokeAndLastStroke(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
+{
+	if (!matchedStroke)
+		return false;
+
+	if ((stroke1->getCentralSample() == matchedStroke->getCentralSample() && stroke2->getCentralSample() == m_strokesWithNeighbours.back()->getCentralSample()) ||
+		(stroke1->getCentralSample() == m_strokesWithNeighbours.back()->getCentralSample() && stroke2->getCentralSample() == matchedStroke->getCentralSample())  )
+		return true;
+
+	return false;
+}
+#endif
 
 TPointD AnimationAutoComplete::meanGlobal(std::vector<SamplePoint> globalSamples)
 {
@@ -572,22 +607,6 @@ std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(Stro
           similarPairStroke.stroke2=strokepair2;
           similarPairStroke.dissimilarityFactor=hungerianMatrix[i][SolveFunctionVector[i]];
           SimilarPairStrokeVector.push_back(similarPairStroke);
-
-#ifdef SHOW_PAIR_STROKES
-		  //TODO: Remove at Production
-		  TPointD beginning = strokepair1->getCentralSample()->point->getP0();
-		  TPointD end		= strokepair2->getCentralSample()->point->getP0();
-		  TPointD middle = (end + beginning);
-		  middle.x = middle.x / 2;
-		  middle.y = middle.y / 2;
-		  std::vector<TPointD> v;
-		  v.push_back(beginning);
-		  v.push_back(middle);
-		  v.push_back(end);
-		  TStroke* s = new TStroke(v);
-		  pairStrokes.push_back(s);
-#endif //show maching strokes
-
       }
       return SimilarPairStrokeVector;
 }
@@ -756,17 +775,13 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
 #ifdef DEBUGGING
 #ifdef SHOW_PAIR_LINES
           //TODO: Remove at Production
-          TPointD beginning = p.point1->point->getP0();
-          TPointD end = p.point2->point->getP0();
-          TPointD middle = (end + beginning);
-          middle.x = middle.x / 2;
-          middle.y = middle.y / 2;
-          std::vector<TPointD> v;
-          v.push_back(beginning);
-          v.push_back(middle);
-          v.push_back(end);
-          TStroke* s = new TStroke(v);
-          m_similarPairLines.push_back(s);
+		  //only draw matching pairs between the last stroke and matching stroke
+		  if (pairsAreMatchingStrokeAndLastStroke(stroke1, stroke2))
+		  {
+			  TPointD beginning = p.point1->point->getP0();
+			  TPointD end = p.point2->point->getP0();
+			  m_similarPairLines.push_back(generateLineStroke(beginning, end));
+		  }
 #endif //show maching strokes
 #endif //debugging
        }
@@ -775,7 +790,7 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
     return similarPoints;
 }
 
-PointWithStroke *StrokeWithNeighbours::getCentralSample()
+TPointD StrokeWithNeighbours::getCentralSample()
 {
 	PointWithStroke* central1 = new PointWithStroke();
 	central1->stroke = stroke;
@@ -787,5 +802,5 @@ PointWithStroke *StrokeWithNeighbours::getCentralSample()
 		central1->index=((n/2)+1);
 
 	central1->point = stroke->getChunk(central1->index);
-	return central1;
+	return central1->point->getP0();
 }

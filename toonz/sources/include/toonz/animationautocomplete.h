@@ -1,7 +1,7 @@
 #ifndef ANIMATIONAUTOCOMPLETE_H
 #define ANIMATIONAUTOCOMPLETE_H
 
-#define DEBUGGING
+//#define DEBUGGING
 
 //#define ODAY_SYNTHESIS
 #define ADAM_SYSTHESIS
@@ -9,7 +9,7 @@
 #ifdef DEBUGGING
 		//#define SHOW_NORMALS
 		//#define SHOW_MATCHING_STROKE
-		//#define SHOW_PAIR_LINES
+		#define SHOW_PAIR_LINES
 		//#define SHOW_SPACE_VICINITY
 		//#define SHOW_PAIR_STROKES
 #endif
@@ -85,7 +85,7 @@ public:
     std::unordered_set<StrokeWithNeighbours*> neighbours;
     StrokeWithNeighbours *nextStroke;
 
-	PointWithStroke* getCentralSample();
+	TPointD getCentralSample();
 };
 
 struct SimilarPairStroke
@@ -125,8 +125,8 @@ public:
 #ifdef SHOW_NORMALS
   std::vector<TStroke *> drawNormalStrokes(TStroke* stroke);
 #endif
-#ifdef SHOW_MATCHING_STROKE
-  TStroke* matchedStroke;
+#if defined(SHOW_PAIR_LINES) || defined(SHOW_MATCHING_STROKE)
+  StrokeWithNeighbours* matchedStroke;
 #endif
 #ifdef SHOW_PAIR_LINES
   std::vector<TStroke*> m_similarPairLines;
@@ -149,6 +149,12 @@ private:
 
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke, StrokeWithNeighbours* similarStroke);
 
+#if defined(SHOW_PAIR_LINES) || defined(SHOW_PAIR_STROKES)
+  TStroke* generateLineStroke(TPointD beginning, TPointD end);
+#endif
+#ifdef SHOW_PAIR_LINES
+  bool pairsAreMatchingStrokeAndLastStroke(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
+#endif
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
   double pointsSimilarityWithoutWeights(PointWithStroke* point1, PointWithStroke* point2);
   double getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2);
