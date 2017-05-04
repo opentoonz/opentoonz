@@ -9,7 +9,7 @@
 #ifdef DEBUGGING
 		//#define SHOW_NORMALS
 		//#define SHOW_MATCHING_STROKE
-		#define SHOW_PAIR_LINES
+		//#define SHOW_PAIR_LINES
 		//#define SHOW_SPACE_VICINITY
 		//#define SHOW_PAIR_STROKES
 #endif
@@ -191,6 +191,7 @@ private:
 
   // oday's alternative to generate synthesized stroke
   StrokeWithNeighbours *predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke);
+  void getPredictedNeighours(StrokeWithNeighbours* predictedStroke, StrokeWithNeighbours* similarStroke);
 };
 
 #endif // ANIMATIONAUTOCOMPLETE_H

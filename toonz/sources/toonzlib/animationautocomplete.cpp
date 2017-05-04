@@ -138,8 +138,8 @@ void AnimationAutoComplete::initializeSynthesis()
 
 	StrokeWithNeighbours* outputsStroke = assign(similarStrokes);
 
-	if(outputsStroke)
-		m_synthesizedStrokes.push_back(outputsStroke);
+//	if(outputsStroke)
+//		m_synthesizedStrokes.push_back(outputsStroke);
 }
 
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getSynthesizedStrokes()
@@ -251,6 +251,7 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 
     double min = 9999999999;
 	StrokeWithScore outputStroke;
+    StrokeWithNeighbours* finalSimilarStroke;
 	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
 
 	for (StrokeWithNeighbours* similarStroke : similarStrokes) {
@@ -278,9 +279,10 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 			min = score;
 			outputStroke.score = min;
             outputStroke.stroke = nextStroke;
+            finalSimilarStroke = similarStroke;
 		}
 	}
-
+    getPredictedNeighours(outputStroke.stroke, finalSimilarStroke->nextStroke);
 	return outputStroke.stroke;
 }
 
@@ -677,8 +679,26 @@ StrokeWithNeighbours* AnimationAutoComplete::predictionPositionUpdate(StrokeWith
 
 	StrokeWithNeighbours* output = new StrokeWithNeighbours();
 	output->stroke = new TStroke(predectedStrock);
-	getNeighbours(output);
-	return output;
+    //getNeighbours(output);
+    return output;
+}
+
+void AnimationAutoComplete::getPredictedNeighours(StrokeWithNeighbours *predictedStroke, StrokeWithNeighbours *similarStroke)
+{
+    getNeighbours(similarStroke);
+	TPointD predictedCentral = predictedStroke->getCentralSample();
+	TPointD similarCentral = similarStroke->getCentralSample();
+    TPointD offset = predictedCentral - similarCentral;
+    TAffine aff = TTranslation(offset);
+
+    for (StrokeWithNeighbours* neighbour : similarStroke->neighbours)
+    {
+        StrokeWithNeighbours* newNeighbour = new StrokeWithNeighbours();
+        newNeighbour->stroke = new TStroke(*neighbour->stroke);
+        newNeighbour->stroke->transform(aff);
+        predictedStroke->neighbours.insert(newNeighbour);
+        m_synthesizedStrokes.push_back(newNeighbour);
+    }
 }
 
 TPointD AnimationAutoComplete::getTangentUnitVector(PointWithStroke* pointWithStroke)
