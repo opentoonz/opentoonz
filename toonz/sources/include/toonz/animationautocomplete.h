@@ -3,8 +3,8 @@
 
 #define DEBUGGING
 
-//#define ODAY_SYNTHESIS
-#define ADAM_SYSTHESIS
+#define ODAY_SYNTHESIS
+//#define ADAM_SYSTHESIS
 
 #ifdef DEBUGGING
 		//#define SHOW_NORMALS
