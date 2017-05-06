@@ -1059,6 +1059,8 @@ void TVectorImage::Imp::notifyChangedStrokes(
   assert(oldStrokeArray.empty() ||
          strokeIndexArray.size() == oldStrokeArray.size());
 
+  emit m_vi->strokeListChanged();
+
   if (!m_computedAlmostOnce && !m_notIntersectingStrokes) return;
 
   typedef std::list<TEdge *> EdgeList;
@@ -1113,7 +1115,6 @@ void TVectorImage::Imp::notifyChangedStrokes(
 #ifdef _DEBUG
   checkIntersections();
 #endif
-  emit m_vi->strokeListChanged();
 }
 
 //-----------------------------------------------------------------------------

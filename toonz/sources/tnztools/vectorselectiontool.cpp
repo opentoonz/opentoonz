@@ -17,6 +17,7 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tobjecthandle.h"
 #include "toonz/tstageobject.h"
+#include "toonz/pathanimations.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -224,6 +225,7 @@ void VectorFreeDeformer::deformImage() {
       TThickPoint p = deform(originalStroke->getControlPoint(j));
       stroke->setControlPoint(j, p);
     }
+    PathAnimations::appSnapshot(TTool::getApplication(), stroke);
   }
 
   if (m_computeRegion) deformRegions();
