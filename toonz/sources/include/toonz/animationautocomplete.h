@@ -1,17 +1,21 @@
 #ifndef ANIMATIONAUTOCOMPLETE_H
 #define ANIMATIONAUTOCOMPLETE_H
 
+/*!
+It is a macro to be used to enable debugging parts of the code. It has no effect in itself.
+You must enable one or more of the debugging macros below. ie. SHOW_TANGENT_LINES
+*/
 //#define DEBUGGING
 
 //#define ODAY_SYNTHESIS
 #define ADAM_SYSTHESIS
 
 #ifdef DEBUGGING
-		//#define SHOW_NORMALS
-		//#define SHOW_MATCHING_STROKE
-		//#define SHOW_PAIR_LINES
-		//#define SHOW_SPACE_VICINITY
-		//#define SHOW_PAIR_STROKES
+		//#define SHOW_TANGENT_LINES // Shows tangent lines for each sample point on a stroke
+		//#define SHOW_MATCHING_STROKE // highlights the stroke that had the highest similarity score with the last stroke.
+		//#define SHOW_PAIR_LINES // draws lines connecting sample points that are matching in two strokes
+		//#define SHOW_SPACE_VICINITY // draws the space vicinity around each sample point.
+		//#define SHOW_PAIR_STROKES // draws lines connecting different strokes that are matching in two neighbourhoods
 #endif
 
 #include <unordered_set>
@@ -26,6 +30,10 @@
 //************************************************************************
 typedef TThickQuadratic* SamplePoint;
 
+/*!
+Contains the point, the stroke it's part of, and its index within that stroke.
+*/
+//TODO: inherit from SamplePoint
 class PointWithStroke
 {
 public:
@@ -37,14 +45,6 @@ public:
     int index;
 };
 
-struct Neighbor
-{
-    TStroke* stroke;
-    int localTimeStamp;// we calculate the local timestamp by dividing the index over the total number of points
-};
-
-typedef std::vector<Neighbor*> Neighbors;
-
 struct SimilarPairPoint
 {
     double dissimilarityFactor;
@@ -52,32 +52,10 @@ struct SimilarPairPoint
     PointWithStroke* point2;
 };
 
-struct MatchingOperations
-{
-    TStroke* stroke1;
-    TStroke* stroke2;
-};
-
-class GlobalSimilarityGraph
-{
-
-    std::map<SimilarPairPoint*, std::vector<SimilarPairPoint*>> connections;
-
-
-
-public:
-    int numberOfNodes = 0;
-
-	GlobalSimilarityGraph() {}
-	~GlobalSimilarityGraph() {}
-    void insertNode(SimilarPairPoint* pair, std::vector<SimilarPairPoint*> connections);
-    std::vector<SimilarPairPoint *> getConnections(SimilarPairPoint* pair);
-
-};
-
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
 typedef std::vector<std::vector<double> > HungerianMatrix;
 
+// TODO: inherit TStroke
 class StrokeWithNeighbours
 {
 public:
@@ -101,20 +79,23 @@ struct StrokeWithScore
     StrokeWithNeighbours* stroke;
 };
 
-struct Hungarian
-{
-    TStroke* stroke1;
-    TStroke* stroke2;
-    double score;
-};
-
+/*!
+This is the main class that has all the functions for similarity analysis and synthesis
+*/
 class AnimationAutoComplete {
 public:
   AnimationAutoComplete() {}
   ~AnimationAutoComplete() {}
 
-
+  /*!
+  To get prediction this function should be called as you add each new stroke to the canvas.
+  This is the starting point where all the other functions gets called.
+  */
   void addStroke(TStroke* stroke);
+
+  /*!
+  After adding strokes you should expect the predicted strokes to be returned using this function.
+  */
   std::vector<StrokeWithNeighbours*> getSynthesizedStrokes();
 
 #ifdef DEBUGGING
@@ -122,7 +103,7 @@ public:
 #ifdef SHOW_SPACE_VICINITY
   std::vector<TStroke*> drawSpaceVicinity(TStroke* stroke);
 #endif
-#ifdef SHOW_NORMALS
+#ifdef SHOW_TANGENT_LINES
   std::vector<TStroke *> drawNormalStrokes(TStroke* stroke);
 #endif
 #if defined(SHOW_PAIR_LINES) || defined(SHOW_MATCHING_STROKE)
@@ -137,15 +118,15 @@ public:
 #endif
 #endif
 
-  std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours;
+
 private:
   const int m_spaceVicinityRadius = 100;
 
-  std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;
+  std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours; // Stores all the drawn strokes.
+  std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;	  // Stores output ie predicted strokes
 
-  TPointD getTangentUnitVector(PointWithStroke* pointer);
+  TPointD getTangentUnitVector(PointWithStroke* pointer); // gets the tangent to a certain point. useful for spacial similarity analysis
   double gaussianConstant(PointWithStroke* chuck1, PointWithStroke* chuck2);
-  double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke, StrokeWithNeighbours* similarStroke);
 
@@ -155,31 +136,45 @@ private:
 #ifdef SHOW_PAIR_LINES
   bool pairsAreMatchingStrokeAndLastStroke(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
 #endif
+
+  //  Similarity Analysis functions
+  double operationsSimilarity (StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2);
   double pointsSimilarity (PointWithStroke* point1, PointWithStroke* point2);
   double pointsSimilarityWithoutWeights(PointWithStroke* point1, PointWithStroke* point2);
   double getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getTemporalSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getSpatialSimilarity(PointWithStroke* point1, PointWithStroke* point2);
   double getNeighborhoodSimilarity(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
+  double getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
 
+  // takes two strokes and returns pairs of matching points
   std::vector<SimilarPairPoint> getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
+  // takes two strokes and returns pairs of matching strokes within thier respective neighbourhoods
   std::vector<SimilarPairStroke> getSimilarPairStrokes(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
 
+  // returns whether a stroke is self looping ie, circle, rectangle or any other closed shape
   bool strokeSelfLooping(TStroke* stroke);
-  double getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints);
-  double getSimilarPairPointBySampleId(TStroke *stroke1, TStroke *stroke2);
 
+  // sqrt( p1^2 + p2^2 + ... )
   double magnitude(std::vector<double> points);
 
+  // returns the neighbours within the space vicinity as well as its two preceding strokes
   std::vector<StrokeWithNeighbours*> getNeighbours(PointWithStroke point);
+  // the neighbourhood of a stroke is a union of the neighbours of all of its sample points
   void getNeighbours(StrokeWithNeighbours* stroke);
 
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
-  void initializeSynthesis();
-  double getSampleId(const int &index, const int &n);
-  double getReversedSampleId(const int &index, const int &n);
+
+  void beginSynthesis();
   std::vector<StrokeWithNeighbours*> search(StrokeWithNeighbours *operation1);
   StrokeWithNeighbours* assign(std::vector<StrokeWithNeighbours*>);
+
+  // Sample ID is the index of a point divided by the total number (n) of sample points in a stroke
+  double getSampleId(const int &index, const int &n);
+  double getReversedSampleId(const int &index, const int &n);
+
+  // a context stroke is a long stroke that serves as a context to the neighbourhood
+  // a context stroke is longer than 2 * the length of the predicted stroke
   std::vector<StrokeWithNeighbours*> getContextStrokes(StrokeWithNeighbours* stroke);
 
   TPointD meanGlobal(std::vector<SamplePoint> globalSamples);
@@ -189,7 +184,7 @@ private:
 
   double differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2,  std::vector<SimilarPairStroke> similarPairStrokes);
 
-  // oday's alternative to generate synthesized stroke
+  // Oday's alternative to generate synthesized stroke
   StrokeWithNeighbours *predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke);
   void getPredictedNeighours(StrokeWithNeighbours* predictedStroke, StrokeWithNeighbours* similarStroke);
 };

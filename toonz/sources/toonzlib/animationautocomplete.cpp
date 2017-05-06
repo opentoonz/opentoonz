@@ -33,7 +33,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 	getNeighbours(strokeWithNeighbours);
 
     if (m_strokesWithNeighbours.size() >= 3)
-		initializeSynthesis();
+		beginSynthesis();
 }
 
 //----------
@@ -131,7 +131,7 @@ bool AnimationAutoComplete::withinSpaceVicinity(const SamplePoint samplePoint, c
 		return false;
 }
 
-void AnimationAutoComplete::initializeSynthesis()
+void AnimationAutoComplete::beginSynthesis()
 {
 	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
 	std::vector<StrokeWithNeighbours*> similarStrokes = search(lastStroke);
@@ -614,7 +614,7 @@ std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(Stro
 }
 
 #ifdef DEBUGGING
-#ifdef SHOW_NORMALS
+#ifdef SHOW_TANGENT_LINES
 std::vector<TStroke*> AnimationAutoComplete::drawNormalStrokes(TStroke *stroke)
 {
 	std::vector<TStroke*> output;
@@ -727,19 +727,6 @@ TPointD AnimationAutoComplete::getTangentUnitVector(PointWithStroke* pointWithSt
 	TPointD point2 = TPointD(x2, y2);
 
 	return normalize(point2 - point1);
-}
-
-void GlobalSimilarityGraph::insertNode(SimilarPairPoint *pair, std::vector<SimilarPairPoint *> connections)
-{
-    this->connections.insert(std::pair<SimilarPairPoint*, std::vector<SimilarPairPoint*>>(pair, connections));
-	numberOfNodes++;
-}
-
-std::vector<SimilarPairPoint *> GlobalSimilarityGraph::getConnections(SimilarPairPoint *pair)
-{
-	if (pair)
-		return this->connections[pair];
-    return std::vector<SimilarPairPoint *>();
 }
 
 std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2)
