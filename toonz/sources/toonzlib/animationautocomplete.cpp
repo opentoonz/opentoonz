@@ -222,12 +222,6 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
 		if(score < min)
         {
             min = score;
-#ifdef DEBUGGING
-#if defined(SHOW_PAIR_LINES) || defined(SHOW_MATCHING_STROKE)
-			if (lastStrokeIsSelfLooping == strokeSelfLooping(m_strokesWithNeighbours[i]->stroke))
-				matchedStroke = m_strokesWithNeighbours[i];
-#endif
-#endif
         }
         scores.push_back(score_stroke);
 	}
@@ -685,16 +679,33 @@ StrokeWithNeighbours* AnimationAutoComplete::predictionPositionUpdate(StrokeWith
 
 void AnimationAutoComplete::getPredictedNeighours(StrokeWithNeighbours *predictedStroke, StrokeWithNeighbours *similarStroke)
 {
+#ifdef DEBUGGING
+#if defined(SHOW_PAIR_LINES) || defined(SHOW_MATCHING_STROKE)
+	matchedStroke = similarStroke;
+#endif
+#endif
+
     getNeighbours(similarStroke);
 	TPointD predictedCentral = predictedStroke->getCentralSample();
 	TPointD similarCentral = similarStroke->getCentralSample();
     TPointD offset = predictedCentral - similarCentral;
     TAffine aff = TTranslation(offset);
 
-    for (StrokeWithNeighbours* neighbour : similarStroke->neighbours)
+	TStroke* dummyStroke = new TStroke(*predictedStroke->stroke);
+	StrokeWithNeighbours* clonePredictedStroke = new StrokeWithNeighbours();
+	clonePredictedStroke->stroke = dummyStroke;
+	clonePredictedStroke->neighbours = predictedStroke->neighbours;
+
+	//the clonePredictedStroke gets his neighbours filled in this function
+	std::vector<SimilarPairStroke> neighbourhoodPairs = getSimilarPairStrokes(clonePredictedStroke, similarStroke);
+
+	for (SimilarPairStroke pair : neighbourhoodPairs)
     {
+		SetOfStrokes::const_iterator it = clonePredictedStroke->neighbours.find(pair.stroke2);
+		if (it == clonePredictedStroke->neighbours.end())
+			continue;
         StrokeWithNeighbours* newNeighbour = new StrokeWithNeighbours();
-        newNeighbour->stroke = new TStroke(*neighbour->stroke);
+		newNeighbour->stroke = new TStroke(*pair.stroke2->stroke);
         newNeighbour->stroke->transform(aff);
         predictedStroke->neighbours.insert(newNeighbour);
         m_synthesizedStrokes.push_back(newNeighbour);

@@ -1398,10 +1398,10 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
 #ifdef DEBUGGING
 #ifdef SHOW_MATCHING_STROKE
-    if (m_animationAutoComplete->matchedStroke)
+	if (m_animationAutoComplete->matchedStroke)
     {
-        m_animationAutoComplete->matchedStroke->setStyle(2);
-        addStrokeToImage(getApplication(), vi, m_animationAutoComplete->matchedStroke, m_breakAngles.getValue(),
+		m_animationAutoComplete->matchedStroke->stroke->setStyle(2);
+		addStrokeToImage(getApplication(), vi, m_animationAutoComplete->matchedStroke->stroke, m_breakAngles.getValue(),
                          m_isFrameCreated, m_isLevelCreated);
 		bullshitStrokes++;
     }
