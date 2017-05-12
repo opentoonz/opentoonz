@@ -5,14 +5,14 @@
 It is a macro to be used to enable debugging parts of the code. It has no effect in itself.
 You must enable one or more of the debugging macros below. ie. SHOW_TANGENT_LINES
 */
-#define DEBUGGING
+//#define DEBUGGING
 
 //#define ODAY_SYNTHESIS
 #define ADAM_SYSTHESIS
 
 #ifdef DEBUGGING
 		//#define SHOW_TANGENT_LINES // Shows tangent lines for each sample point on a stroke
-		#define SHOW_MATCHING_STROKE // highlights the stroke that had the highest similarity score with the last stroke.
+		//#define SHOW_MATCHING_STROKE // highlights the stroke that had the highest similarity score with the last stroke.
 		//#define SHOW_PAIR_LINES // draws lines connecting sample points that are matching in two strokes
 		//#define SHOW_SPACE_VICINITY // draws the space vicinity around each sample point.
 		//#define SHOW_PAIR_STROKES // draws lines connecting different strokes that are matching in two neighbourhoods

@@ -299,7 +299,7 @@ double AnimationAutoComplete::differnceOfTwoNeighborhood(StrokeWithNeighbours* s
     {
         double stroke1Similarity = operationsSimilarity(stroke1, similarPair.stroke1);
         double stroke2Similarity = operationsSimilarity(stroke2, similarPair.stroke2);
-        differenceInScores += (stroke1Similarity - stroke2Similarity);
+		differenceInScores += abs(stroke1Similarity - stroke2Similarity);
 
 #ifdef SHOW_PAIR_STROKES
 		//TODO: Remove at Production
