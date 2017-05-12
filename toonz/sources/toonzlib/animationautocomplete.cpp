@@ -360,7 +360,8 @@ double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoin
     central1->stroke=similarPairPoints[0].point1->stroke;
     central2->stroke=similarPairPoints[0].point2->stroke;
 	int n = similarPairPoints.size();
-    double dissimilarityfactor =0;
+	double dissimilarityfactor = 0;
+
 	if(n%2 == 0)
 	{
 		central1->index=(n/2);
@@ -371,20 +372,29 @@ double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoin
 		central1->index=((n/2)+1);
 		central2->index=((n/2)+1);
 	}
+
+	if (n == 1)
+	{
+		central1->index = 0;
+		central2->index = 0;
+	}
+
 	central1->point = similarPairPoints[central1->index].point1->point;
 	central2->point = similarPairPoints[central2->index].point2->point;
 	std::vector<double>similarity1;
 	std::vector<double>similarity2;
 
 	for(int i = 0; i < n; i++)
-	{
-
 		if (i != central1->index)
 			similarity1.push_back(pointsSimilarity(similarPairPoints[i].point1, central1));
-	}
+
 	for(int i=0;i<n;i++)
 		if (i != central2->index)
 			similarity2.push_back(pointsSimilarity(similarPairPoints[i].point2,central2));
+
+	if (!similarity1.size() || !similarity2.size())
+		return 999999;
+
 	for(int i=0;i<n;i++)
 		dissimilarityfactor+=pow(similarity1[i]-similarity2[i],2);
 
@@ -737,6 +747,9 @@ TPointD AnimationAutoComplete::getTangentUnitVector(PointWithStroke* pointWithSt
 	TPointD point1 = TPointD(x1, y1);
 	TPointD point2 = TPointD(x2, y2);
 
+	if (point2 - point1 == TPointD(0, 0))
+		return TPointD(0, 0);
+
 	return normalize(point2 - point1);
 }
 
@@ -814,10 +827,13 @@ TPointD StrokeWithNeighbours::getCentralSample()
 	central1->stroke = stroke;
 	int n = stroke->getChunkCount();
 
-	if(n%2==0)
-		central1->index=(n/2);
+	if(n%2 == 0)
+		central1->index = n/2;
 	else
-		central1->index=((n/2)+1);
+		central1->index = (n/2) + 1;
+
+	if (n == 1)
+		central1->index = 0;
 
 	central1->point = stroke->getChunk(central1->index);
 	return central1->point->getP0();
