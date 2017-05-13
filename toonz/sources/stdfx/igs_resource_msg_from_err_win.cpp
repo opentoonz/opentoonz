@@ -1,4 +1,6 @@
 #include "igs_resource_msg_from_err.h"
+#include <locale>
+#include <stdexcept>
 
 /*------ localeを日本に設定し日本語を扱うことを指示
 (しないと日本語文字部分のみ処理しない)

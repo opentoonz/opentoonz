@@ -427,7 +427,7 @@ struct TFontManager::Impl {
   // has the @-version, the library use it.
   bool m_vertical;
 
-  TFontManager::Impl() : m_loaded(false), m_currentFont(0), m_vertical(false) {}
+  Impl() : m_loaded(false), m_currentFont(0), m_vertical(false) {}
 };
 
 //---------------------------------------------------------

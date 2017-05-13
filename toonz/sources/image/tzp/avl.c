@@ -8,7 +8,7 @@
  |                                                                            |
  *----------------------------------------------------------------------------*/
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4113)
 #pragma warning(disable : 4996)

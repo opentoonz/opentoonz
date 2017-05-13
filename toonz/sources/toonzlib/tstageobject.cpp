@@ -43,11 +43,11 @@ using namespace std;
 // il problema si verifica ruotando gli oggetti sul camera stand
 //
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma optimize("", off)
 #endif
 static TAffine makeRotation(double ang) { return TRotation(ang); }
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma optimize("", on)
 #endif
 

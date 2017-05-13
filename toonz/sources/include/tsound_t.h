@@ -137,14 +137,7 @@ from which it's created.It hasn't reference to the object.
 
 //! Applies a trasformation (echo, reverb, ect) to the object and returns the
 //! transformed soundtrack
-#if defined(MACOSX) || defined(LINUX)
   TSoundTrackP apply(TSoundTransform *transform) override;
-#else  // _WIN32
-  TSoundTrackP apply(TSoundTransform *transform) override {
-    assert(transform);
-    return transform->compute(*this);
-  }
-#endif
   //----------------------------------------------------------------------------
 
   //! Returns the pressure of the sample s about the channel chan
@@ -389,11 +382,13 @@ public:
 };
 
 //==============================================================================
-#if defined(MACOSX) || defined(LINUX)
+
+#if !defined(_MSC_VER) || defined(TSOUND_EXPORTS)
 template <class T>
-DVAPI TSoundTrackP TSoundTrackT<T>::apply(TSoundTransform *transform) {
+TSoundTrackP TSoundTrackT<T>::apply(TSoundTransform *transform) {
   assert(transform);
   return transform->compute(*this);
 }
 #endif
+
 #endif
