@@ -112,6 +112,7 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWit
 			{
 				double strokeLength = stroke->getLength();
 				neighbours.push_back(m_strokesWithNeighbours[i]);
+				m_strokesWithNeighbours[i]->neighbours.insert(point.stroke); // if you're my neighbour, then I'm your neighbour
 				if ((strokeLength > maxLength) &&
 					(strokeLength >= point.stroke->stroke->getLength() * 2))
 				{
@@ -719,7 +720,6 @@ void AnimationAutoComplete::getPredictedNeighours(StrokeWithNeighbours *predicte
 #endif
 #endif
 
-    getNeighbours(similarStroke);
 	TPointD predictedCentral = predictedStroke->getCentralSample();
 	TPointD similarCentral = similarStroke->getCentralSample();
     TPointD offset = predictedCentral - similarCentral;
