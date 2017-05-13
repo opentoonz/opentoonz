@@ -65,9 +65,9 @@ double AnimationAutoComplete::gaussianConstant(PointWithStroke *chuck1, PointWit
 {
 	TPointD sample1;
 	TPointD sample2;
-	if(chuck1->index==chuck1->stroke->getChunkCount()-1)
+	if(chuck1->index==chuck1->stroke->stroke->getChunkCount()-1)
 		sample1=chuck1->point->getP2();
-	if (chuck2->index==chuck2->stroke->getChunkCount()-1)
+	if (chuck2->index==chuck2->stroke->stroke->getChunkCount()-1)
 		sample2= chuck2->point->getP2();
 	else
 	{
@@ -89,7 +89,7 @@ void AnimationAutoComplete::getNeighbours(StrokeWithNeighbours* stroke)
 	int chuckCount = stroke->stroke->getChunkCount();
 	for (int i = 0; i < chuckCount; i++)
 	{
-		PointWithStroke point(stroke->stroke->getChunk(i), stroke->stroke, i);
+		PointWithStroke point(stroke->stroke->getChunk(i), stroke, i);
 		std::vector<StrokeWithNeighbours*> neighbours = getNeighbours(point);
 		stroke->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
@@ -98,6 +98,8 @@ void AnimationAutoComplete::getNeighbours(StrokeWithNeighbours* stroke)
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWithStroke point)
 {
 	std::vector<StrokeWithNeighbours*> neighbours;
+	StrokeWithNeighbours* contextStroke;
+	double maxLength = 0;
 
 	for(int i = 0; i < m_strokesWithNeighbours.size(); i++)
 	{
@@ -108,15 +110,32 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWit
 		for(int j = 0; j < stroke->getChunkCount(); j++)
 			if(withinSpaceVicinity(point.point, stroke->getChunk(j)))
 			{
+				double strokeLength = stroke->getLength();
 				neighbours.push_back(m_strokesWithNeighbours[i]);
+				if ((strokeLength > maxLength) &&
+					(strokeLength >= point.stroke->stroke->getLength() * 2))
+				{
+					contextStroke = m_strokesWithNeighbours[i];
+					maxLength = strokeLength;
+				}
 				break;
 			}
 	}
-	int size = m_strokesWithNeighbours.size();
-    if(size>2)
+
+	// set the context stroke
+	if(point.stroke->contextStroke)
 	{
-		neighbours.push_back(m_strokesWithNeighbours[size-2]);
-		neighbours.push_back(m_strokesWithNeighbours[size-3]);
+	   if(point.stroke->contextStroke->stroke->getLength() < maxLength)
+			point.stroke->contextStroke = contextStroke;
+	}
+	else
+		point.stroke->contextStroke = contextStroke;
+
+	int size = m_strokesWithNeighbours.size();
+	if(size > 2)
+	{
+		neighbours.push_back(m_strokesWithNeighbours[size - 2]);
+		neighbours.push_back(m_strokesWithNeighbours[size - 3]);
 	}
 
 	return neighbours;
@@ -171,7 +190,7 @@ double AnimationAutoComplete::pointsSimilarityWithoutWeights(PointWithStroke *po
 double AnimationAutoComplete::getAppearanceSimilarity(PointWithStroke* point1, PointWithStroke* point2)
 {
 	double dissimilarityFactor = 0;
-	if(point1->stroke->getStyle() != point2->stroke->getStyle())
+	if(point1->stroke->stroke->getStyle() != point2->stroke->stroke->getStyle())
 		dissimilarityFactor++;
 
     dissimilarityFactor += fabs(point1->point->getThickP0().thick - point2->point->getThickP0().thick);
@@ -181,11 +200,11 @@ double AnimationAutoComplete::getAppearanceSimilarity(PointWithStroke* point1, P
 
 double AnimationAutoComplete::getTemporalSimilarity(PointWithStroke *point1, PointWithStroke *point2)
 {
-	double sampleId1 = getSampleId(point1->index, point1->stroke->getChunkCount());
-	double sampleId2 = getSampleId(point2->index, point2->stroke->getChunkCount());
+	double sampleId1 = getSampleId(point1->index, point1->stroke->stroke->getChunkCount());
+	double sampleId2 = getSampleId(point2->index, point2->stroke->stroke->getChunkCount());
 
-	double reverseSampleId1 = getReversedSampleId(point1->index, point1->stroke->getChunkCount());
-	double reverseSampleId2 = getReversedSampleId(point2->index, point2->stroke->getChunkCount());
+	double reverseSampleId1 = getReversedSampleId(point1->index, point1->stroke->stroke->getChunkCount());
+	double reverseSampleId2 = getReversedSampleId(point2->index, point2->stroke->stroke->getChunkCount());
 
 	return fmax(fabs(sampleId1 - sampleId2), fabs(reverseSampleId1 - reverseSampleId2));
 }
@@ -357,20 +376,20 @@ double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoin
 {
     PointWithStroke* central1 = new PointWithStroke();
     PointWithStroke* central2 = new PointWithStroke();
-    central1->stroke=similarPairPoints[0].point1->stroke;
-    central2->stroke=similarPairPoints[0].point2->stroke;
+	central1->stroke = similarPairPoints[0].point1->stroke;
+	central2->stroke = similarPairPoints[0].point2->stroke;
 	int n = similarPairPoints.size();
 	double dissimilarityfactor = 0;
 
 	if(n%2 == 0)
 	{
-		central1->index=(n/2);
-		central2->index=(n/2);
+		central1->index = (n/2);
+		central2->index = (n/2);
 	}
 	else
 	{
-		central1->index=((n/2)+1);
-		central2->index=((n/2)+1);
+		central1->index = ((n/2)+1);
+		central2->index = ((n/2)+1);
 	}
 
 	if (n == 1)
@@ -381,31 +400,31 @@ double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoin
 
 	central1->point = similarPairPoints[central1->index].point1->point;
 	central2->point = similarPairPoints[central2->index].point2->point;
-	std::vector<double>similarity1;
-	std::vector<double>similarity2;
+	std::vector<double> similarity1;
+	std::vector<double> similarity2;
 
 	for(int i = 0; i < n; i++)
 		if (i != central1->index)
 			similarity1.push_back(pointsSimilarity(similarPairPoints[i].point1, central1));
 
-	for(int i=0;i<n;i++)
+	for(int i = 0; i < n; i++)
 		if (i != central2->index)
 			similarity2.push_back(pointsSimilarity(similarPairPoints[i].point2,central2));
 
 	if (!similarity1.size() || !similarity2.size())
 		return 999999;
 
-	for(int i=0;i<n;i++)
-		dissimilarityfactor+=pow(similarity1[i]-similarity2[i],2);
+	for(int i = 0; i < n; i++)
+		dissimilarityfactor += pow(similarity1[i] - similarity2[i], 2);
 
 	return sqrt(dissimilarityfactor)/n;
 }
 
 double AnimationAutoComplete::magnitude(std::vector<double> points)
 {
-	double sum=0;
+	double sum = 0;
 
-	for(int i=0;i<points.size();i++)
+	for(int i = 0; i < points.size(); i++)
 		sum+= points[i]*points[i];
 
 	sum = sqrt(sum);
@@ -465,8 +484,8 @@ bool AnimationAutoComplete::pairsAreMatchingStrokeAndLastStroke(StrokeWithNeighb
 
 TPointD AnimationAutoComplete::meanGlobal(std::vector<SamplePoint> globalSamples)
 {
-	double mean1 =0;
-	double mean2 =0;
+	double mean1 = 0;
+	double mean2 = 0;
    for(SamplePoint sample : globalSamples)
    {
 	   mean1 += sample->getP0().x;
@@ -491,17 +510,18 @@ SimilarPairPoint* AnimationAutoComplete::meanLocal(std::vector<SimilarPairPoint 
     for(SimilarPairPoint* similarPair : localPairs)
 	{
 		int index1 = similarPair->point1->index;
-		mean1x +=  similarPair->point1->stroke->getChunk(index1)->getP0().x;
-		mean1y+= similarPair->point1->stroke->getChunk(index1)->getP0().y;
 		int index2 = similarPair->point2->index;
-		mean2x = similarPair->point2->stroke->getChunk(index2)->getP0().x;
-		mean2y = similarPair->point2->stroke->getChunk(index2)->getP0().y;
 
+		mean1x	  += similarPair->point1->stroke->stroke->getChunk(index1)->getP0().x;
+		mean1y	  += similarPair->point1->stroke->stroke->getChunk(index1)->getP0().y;
+		mean2x	   = similarPair->point2->stroke->stroke->getChunk(index2)->getP0().x;
+		mean2y	   = similarPair->point2->stroke->stroke->getChunk(index2)->getP0().y;
 	}
+
     SimilarPairPoint* mean = new SimilarPairPoint();
    int size = localPairs.size();
-	mean->point1->point->setP0(TPointD(mean1x/size,mean1y/size));
-	mean->point2->point->setP0(TPointD(mean2x/size,mean2y/size));
+	mean->point1->point->setP0(TPointD(mean1x / size, mean1y / size));
+	mean->point2->point->setP0(TPointD(mean2x / size, mean2y / size));
 
 	return mean;
 }
@@ -516,12 +536,12 @@ TPointD AnimationAutoComplete::deviationGlobal(std::vector<SamplePoint> globalSa
 
 	for(SamplePoint samplePoint: globalSamples)
 	{
-		stdX+=pow(samplePoint->getP0().x-mean.x,2);
-		stdY+=pow(samplePoint->getP0().y-mean.y,2);
+		stdX += pow(samplePoint->getP0().x - mean.x,2);
+		stdY += pow(samplePoint->getP0().y - mean.y,2);
 	}
 
-	std.x=stdX/size;
-	std.y=stdY/size;
+	std.x = stdX/size;
+	std.y = stdY/size;
 	return std;
 }
 
@@ -534,19 +554,21 @@ SimilarPairPoint* AnimationAutoComplete::deviationLocal(std::vector<SimilarPairP
 	double std2Y =  0;
     SimilarPairPoint* std = new SimilarPairPoint();
 
-	int size = localPairs.size()-1;
+	int size = localPairs.size() - 1;
 
     for(SimilarPairPoint* similarPair: localPairs)
 	{
 		int index1 = similarPair->point1->index;
-		std1X+=pow(similarPair->point1->stroke->getChunk(index1)->getP0().x-mean->point1->point->getP0().x,2);
-		std1Y+=pow(similarPair->point1->stroke->getChunk(index1)->getP0().y-mean->point1->point->getP0().y,2);
 		int index2 = similarPair->point2->index;
-		std2X+=pow(similarPair->point2->stroke->getChunk(index2)->getP0().x-mean->point2->point->getP0().x,2);
-		std2Y+=pow(similarPair->point2->stroke->getChunk(index2)->getP0().y-mean->point2->point->getP0().y,2);
+
+		std1X += pow(similarPair->point1->stroke->stroke->getChunk(index1)->getP0().x - mean->point1->point->getP0().x,2);
+		std1Y += pow(similarPair->point1->stroke->stroke->getChunk(index1)->getP0().y - mean->point1->point->getP0().y,2);
+		std2X += pow(similarPair->point2->stroke->stroke->getChunk(index2)->getP0().x - mean->point2->point->getP0().x,2);
+		std2Y += pow(similarPair->point2->stroke->stroke->getChunk(index2)->getP0().y - mean->point2->point->getP0().y,2);
 	}
-	std->point1->point->setP0(TPointD(std1X/size,std1Y/size));
-	std->point2->point->setP0(TPointD(std2X/size,std2Y/size));
+
+	std->point1->point->setP0(TPointD(std1X / size, std1Y / size));
+	std->point2->point->setP0(TPointD(std2X / size, std2Y / size));
 	return std;
 }
 
@@ -577,20 +599,18 @@ std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(Stro
     HungerianMatrix hungerianMatrix;
 
     for(StrokeWithNeighbours*stroke:stroke1->neighbours)
-    {
         ReorderStroke1.push_back(stroke);
-    }
+
     for(StrokeWithNeighbours*stroke:stroke2->neighbours)
-    {
         ReorderStroke2.push_back(stroke);
-    }
+
     // prepare Hungerian matrix
-    for(int i = 0; i<ReorderStroke1.size(); i++)
+	for(int i = 0; i < ReorderStroke1.size(); i++)
     {
-        std::vector<double>PushedVector;
-        for(int j=0;j<ReorderStroke2.size();j++)
+		std::vector<double> PushedVector;
+		for(int j = 0; j < ReorderStroke2.size(); j++)
         {
-            double Score=operationsSimilarity(ReorderStroke1[i],ReorderStroke2[j]);
+			double Score = operationsSimilarity(ReorderStroke1[i], ReorderStroke2[j]);
             PushedVector.push_back(Score);
         }
 
@@ -598,22 +618,24 @@ std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(Stro
     }
         // function solve hungarian matrix and return vector of most similar pairs
     if (hungerianMatrix.size())
-        obj_hungarianAlgorithm.Solve(hungerianMatrix ,SolveFunctionVector);
+		obj_hungarianAlgorithm.Solve(hungerianMatrix, SolveFunctionVector);
+
       //prepare vector of similar pair stroke
 	  for(int i = 0; i < SolveFunctionVector.size(); i++)
-        {
+	  {
           // strokepair1 is the i of vector solveFunctionVector;
           // strokepair2 is the index of vector solveFunctionVector[i];
           if(SolveFunctionVector[i] == -1)
               continue;
 
-          StrokeWithNeighbours* strokepair1=ReorderStroke1[i];
-          StrokeWithNeighbours* strokepair2=ReorderStroke2[SolveFunctionVector[i]];
-          similarPairStroke.stroke1=strokepair1;
-          similarPairStroke.stroke2=strokepair2;
-          similarPairStroke.dissimilarityFactor=hungerianMatrix[i][SolveFunctionVector[i]];
+		  StrokeWithNeighbours* strokepair1 = ReorderStroke1[i];
+		  StrokeWithNeighbours* strokepair2 = ReorderStroke2[SolveFunctionVector[i]];
+		  similarPairStroke.stroke1 = strokepair1;
+		  similarPairStroke.stroke2 = strokepair2;
+		  similarPairStroke.dissimilarityFactor = hungerianMatrix[i][SolveFunctionVector[i]];
           SimilarPairStrokeVector.push_back(similarPairStroke);
       }
+
       return SimilarPairStrokeVector;
 }
 
@@ -647,37 +669,39 @@ std::vector<TStroke*> AnimationAutoComplete::drawNormalStrokes(TStroke *stroke)
 StrokeWithNeighbours* AnimationAutoComplete::predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke)
 {
     int count=0;
-	if(currentStroke->stroke->getChunkCount()>nextStroke->stroke->getChunkCount())
-		count=nextStroke->stroke->getChunkCount();
+	if(currentStroke->stroke->getChunkCount() > nextStroke->stroke->getChunkCount())
+		count = nextStroke->stroke->getChunkCount();
     else
-		count=currentStroke->stroke->getChunkCount();
+		count = currentStroke->stroke->getChunkCount();
     SamplePoint sampleCurrentStroke;//sample point
     SamplePoint sampleNextStroke;
     std::vector<TPointD>predectedStrock;
-    for(int i=0;i<count;i++)
+	for(int i = 0; i < count; i++)
     {
-		sampleCurrentStroke=currentStroke->stroke->getChunk(i);
-        sampleNextStroke=nextStroke->stroke->getChunk(i);
+		sampleCurrentStroke = currentStroke->stroke->getChunk(i);
+		sampleNextStroke = nextStroke->stroke->getChunk(i);
         //std::vector<TPointD> matrixA;
         TPointD subtractionMatrix = sampleNextStroke->getP0() - sampleCurrentStroke->getP0();
         TPointD Segma;
-        Segma.x=150;
+		Segma.x = 150;
        // Segma.y=10;
         //Segma=sampleNextStroke->getP0();
        // Segma.x=50;
         //Segma.y=50;
         //SamplePoint result=subtractionMatrix+sampleCurrentStroke+Segma;
         TPointD result = subtractionMatrix +(sampleCurrentStroke->getP0());
-        result = result +Segma;
+		result = result + Segma;
+
         if(predectedStrock.size()>0)
         {
             TPointD midPoint;
             TPointD tmp;
-            tmp=predectedStrock.back();
-            midPoint.x=((result.x+tmp.x)/2);
-            midPoint.y=((result.y+tmp.y)/2);
+			tmp = predectedStrock.back();
+			midPoint.x = ((result.x + tmp.x)/2);
+			midPoint.y = ((result.y + tmp.y)/2);
           predectedStrock.push_back(midPoint);
         }
+
 		predectedStrock.push_back(result);
     }
 
@@ -724,12 +748,12 @@ void AnimationAutoComplete::getPredictedNeighours(StrokeWithNeighbours *predicte
 
 TPointD AnimationAutoComplete::getTangentUnitVector(PointWithStroke* pointWithStroke)
 {
-	assert(pointWithStroke->index < pointWithStroke->stroke->getChunkCount());
-	double y2 =0;
-	double y1 =0;
-	double x2 =0;
-	double x1 =0;
-	if(pointWithStroke->index!=pointWithStroke->stroke->getChunkCount()-1)
+	assert(pointWithStroke->index < pointWithStroke->stroke->stroke->getChunkCount());
+	double y2 = 0;
+	double y1 = 0;
+	double x2 = 0;
+	double x1 = 0;
+	if(pointWithStroke->index!=pointWithStroke->stroke->stroke->getChunkCount()-1)
 	{
 		y2 = pointWithStroke->point->getP1().y;
 		y1 = pointWithStroke->point->getP0().y;
@@ -764,19 +788,21 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
     for(int i=0;i<sizeSTroke1;i++)
     {
        std::vector<double> tmp;
+
        for(int j=0;j<sizeSTroke2;j++)
        {
            PointWithStroke* point1 = new PointWithStroke();
-           point1->index=i;
+		   point1->index = i;
            point1->point = stroke1->stroke->getChunk(i);
-           point1->stroke=stroke1->stroke;
+		   point1->stroke = stroke1;
            PointWithStroke* point2 = new PointWithStroke();
-           point2->index=j;
+		   point2->index = j;
            point2->point = stroke2->stroke->getChunk(j);
-           point2->stroke=stroke2->stroke;
-           double pointsimilar = pointsSimilarity(point1,point2);
+		   point2->stroke = stroke2;
+		   double pointsimilar = pointsSimilarity(point1, point2);
            tmp.push_back(pointsimilar);
        }
+
        input.push_back(tmp);
     }
 
@@ -784,23 +810,23 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
 
     hungarian.Solve(input,assignment);
 
-    for(int i=0;i<assignment.size();i++)
+	for(int i = 0; i < assignment.size(); i++)
     {
-       if(assignment[i]!=-1)
+	   if(assignment[i] != -1)
        {
 		  SimilarPairPoint p;
           PointWithStroke* point1 = new PointWithStroke();
-          point1->index=i;
-          point1->stroke = stroke1->stroke;
+		  point1->index = i;
+		  point1->stroke = stroke1;
           point1->point = stroke1->stroke->getChunk(point1->index);
 
           PointWithStroke* point2 = new PointWithStroke();
-          point2->index=assignment[i];
-          point2->stroke = stroke2->stroke;
+		  point2->index = assignment[i];
+		  point2->stroke = stroke2;
           point2->point = stroke2->stroke->getChunk(point2->index);
 
-		  p.point1=point1;
-		  p.point2=point2;
+		  p.point1 = point1;
+		  p.point2 = point2;
 
           similarPoints.push_back(p);
 #ifdef DEBUGGING
@@ -824,7 +850,7 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
 TPointD StrokeWithNeighbours::getCentralSample()
 {
 	PointWithStroke* central1 = new PointWithStroke();
-	central1->stroke = stroke;
+	central1->stroke = this;
 	int n = stroke->getChunkCount();
 
 	if(n%2 == 0)

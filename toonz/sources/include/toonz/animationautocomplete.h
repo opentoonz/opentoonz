@@ -30,28 +30,21 @@ You must enable one or more of the debugging macros below. ie. SHOW_TANGENT_LINE
 //************************************************************************
 typedef TThickQuadratic* SamplePoint;
 
+class StrokeWithNeighbours;
+
 /*!
 Contains the point, the stroke it's part of, and its index within that stroke.
 */
 class PointWithStroke
 {
 public:
-    PointWithStroke() {}
-	PointWithStroke(SamplePoint point, TStroke* stroke, int index) : point(point), stroke(stroke), index(index) {}
-    ~PointWithStroke() {}
+	PointWithStroke() {}
+	PointWithStroke(SamplePoint point, StrokeWithNeighbours* stroke, int index) : point(point), stroke(stroke), index(index) {}
+	~PointWithStroke() {}
 	SamplePoint point;
-    TStroke* stroke;
+	StrokeWithNeighbours* stroke;
 	int index;
 };
-
-struct SimilarPairPoint
-{
-    double dissimilarityFactor;
-    PointWithStroke* point1;
-    PointWithStroke* point2;
-};
-
-class StrokeWithNeighbours;
 
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
 typedef std::unordered_set< StrokeWithNeighbours *> SetOfStrokes;
@@ -60,11 +53,26 @@ typedef std::vector< std::vector<double> > HungerianMatrix;
 class StrokeWithNeighbours
 {
 public:
+	StrokeWithNeighbours()
+	{
+		stroke		  = nullptr;
+		nextStroke	  = nullptr;
+		contextStroke = nullptr;
+	}
+
     TStroke* stroke;
 	SetOfStrokes neighbours;
-    StrokeWithNeighbours *nextStroke;
+	StrokeWithNeighbours* nextStroke;
+	StrokeWithNeighbours* contextStroke;
 
 	TPointD getCentralSample();
+};
+
+struct SimilarPairPoint
+{
+	double dissimilarityFactor;
+	PointWithStroke* point1;
+	PointWithStroke* point2;
 };
 
 struct SimilarPairStroke
