@@ -125,6 +125,9 @@ public:
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 
+  void doPathStuff(TVectorImageP vi);
+  void makeVectorStrokeAndAddToImage(TVectorImageP vi);
+
   void draw() override;
 
   void onEnter() override;

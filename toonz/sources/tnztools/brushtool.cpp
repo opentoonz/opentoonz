@@ -1031,14 +1031,14 @@ void BrushTool::onDeactivate() {
    * ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
    * ---*/
   if (m_tileSaver && !m_isPath) {
-    bool isValid = m_enabled && m_active;
-    m_enabled    = false;
-    if (isValid) {
+	bool isValid = m_enabled && m_active;
+	m_enabled = false;
+	if (isValid) {
       TImageP image = getImage(true);
       if (TToonzImageP ti = image)
         finishRasterBrush(m_mousePos,
                           1); /*-- 最後のストロークの筆圧は1とする --*/
-    }
+	}
   }
   m_workRas   = TRaster32P();
   m_backupRas = TRasterCM32P();
@@ -1292,93 +1292,101 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 
 //---------------------------------------------------------------------------------------------------------------
 
+
+void BrushTool::doPathStuff(TVectorImageP vi) {
+	double error = 20.0 * getPixelSize();
+	flushTrackPoint();
+	TStroke *stroke = m_track.makeStroke(error);
+
+	if (!isJustCreatedSpline(vi.getPointer())) {
+		m_isPrompting = true;
+
+		QString question("Are you sure you want to replace the motion path?");
+		int ret =
+			DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"), 0);
+
+		m_isPrompting = false;
+
+		if (ret == 2 || ret == 0) return;
+	}
+
+	QMutexLocker lock(vi->getMutex());
+
+	TUndo *undo =
+	  new UndoPath(getXsheet()->getStageObject(getObjectId())->getSpline());
+
+	while (vi->getStrokeCount() > 0) vi->deleteStroke(0);
+	vi->addStroke(stroke, false);
+
+	notifyImageChanged();
+	TUndoManager::manager()->add(undo);
+
+	m_track.clear();
+	invalidate();
+}
+
+void BrushTool::makeVectorStrokeAndAddToImage(TVectorImageP vi) {
+	if (m_track.isEmpty()) {
+		m_styleId = 0;
+		m_track.clear();
+		return;
+	}
+
+	m_track.filterPoints();
+	double error = 30.0 / (1 + 0.5 * m_accuracy.getValue());
+	error *= getPixelSize();
+
+	flushTrackPoint();
+	TStroke *stroke = m_track.makeStroke(error);
+	stroke->setStyle(m_styleId);
+
+	{
+		TStroke::OutlineOptions &options = stroke->outlineOptions();
+		options.m_capStyle               = m_capStyle.getIndex();
+		options.m_joinStyle              = m_joinStyle.getIndex();
+		options.m_miterUpper             = m_miterJoinLimit.getValue();
+	}
+
+	m_styleId = 0;
+
+	QMutexLocker lock(vi->getMutex());
+	if (stroke->getControlPointCount() == 3 &&
+	  stroke->getControlPoint(0) !=
+		  stroke->getControlPoint(2))  // gli stroke con solo 1 chunk vengono
+									   // fatti dal tape tool...e devono venir
+									   // riconosciuti come speciali di
+									   // autoclose proprio dal fatto che
+									   // hanno 1 solo chunk.
+	stroke->insertControlPoints(0.5);
+
+	addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
+				   m_isFrameCreated, m_isLevelCreated);
+	TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
+	invalidate();
+	assert(stroke);
+	m_track.clear();
+}
+
 void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   bool isValid = m_enabled && m_active;
-  m_enabled    = false;
-
+  m_enabled = false;
   if (!isValid) return;
 
-  if (m_isPath) {
-    double error = 20.0 * getPixelSize();
-    flushTrackPoint();
-    TStroke *stroke = m_track.makeStroke(error);
-    int points      = stroke->getControlPointCount();
-
-    if (TVectorImageP vi = getImage(true)) {
-      struct Cleanup {
-        BrushTool *m_this;
-        ~Cleanup() { m_this->m_track.clear(), m_this->invalidate(); }
-      } cleanup = {this};
-
-      if (!isJustCreatedSpline(vi.getPointer())) {
-        m_isPrompting = true;
-
-        QString question("Are you sure you want to replace the motion path?");
-        int ret =
-            DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"), 0);
-
-        m_isPrompting = false;
-
-        if (ret == 2 || ret == 0) return;
-      }
-
-      QMutexLocker lock(vi->getMutex());
-
-      TUndo *undo =
-          new UndoPath(getXsheet()->getStageObject(getObjectId())->getSpline());
-
-      while (vi->getStrokeCount() > 0) vi->deleteStroke(0);
-      vi->addStroke(stroke, false);
-
-      notifyImageChanged();
-      TUndoManager::manager()->add(undo);
-    }
-
-    return;
-  }
-
   TImageP image = getImage(true);
+
   if (TVectorImageP vi = image) {
-    if (m_track.isEmpty()) {
-      m_styleId = 0;
-      m_track.clear();
-      return;
-    }
-    m_track.filterPoints();
-    double error = 30.0 / (1 + 0.5 * m_accuracy.getValue());
-    error *= getPixelSize();
-
-    flushTrackPoint();
-    TStroke *stroke = m_track.makeStroke(error);
-    stroke->setStyle(m_styleId);
-    {
-      TStroke::OutlineOptions &options = stroke->outlineOptions();
-      options.m_capStyle               = m_capStyle.getIndex();
-      options.m_joinStyle              = m_joinStyle.getIndex();
-      options.m_miterUpper             = m_miterJoinLimit.getValue();
-    }
-    m_styleId = 0;
-
-    QMutexLocker lock(vi->getMutex());
-    if (stroke->getControlPointCount() == 3 &&
-        stroke->getControlPoint(0) !=
-            stroke->getControlPoint(2))  // gli stroke con solo 1 chunk vengono
-                                         // fatti dal tape tool...e devono venir
-                                         // riconosciuti come speciali di
-                                         // autoclose proprio dal fatto che
-                                         // hanno 1 solo chunk.
-      stroke->insertControlPoints(0.5);
-
-    addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
-                     m_isFrameCreated, m_isLevelCreated);
-    TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
-    invalidate();
-    assert(stroke);
-    m_track.clear();
-  } else if (TToonzImageP ti = image) {
-    finishRasterBrush(pos, e.m_pressure);
+	  if (m_isPath) {
+		  doPathStuff(vi);
+		  return;
+	  }
+	  makeVectorStrokeAndAddToImage(vi);
   }
+
+  else if (TToonzImageP ti = image)
+	  finishRasterBrush(pos, e.m_pressure);
 }
+
+
 
 //--------------------------------------------------------------------------------------------------
 
