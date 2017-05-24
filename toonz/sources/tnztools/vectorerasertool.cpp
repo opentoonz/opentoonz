@@ -32,6 +32,8 @@
 #include "tinbetween.h"
 #include "drawutil.h"
 
+#include "tw/keycodes.h"
+
 // Qt includes
 #include <QCoreApplication>  // For Qt translation support
 
@@ -281,6 +283,7 @@ public:
 
   int getCursorId() const override { return ToolCursor::EraserCursor; }
   void onImageChanged() override;
+  bool keyDown(int key, TUINT32 flags, const TPoint &pos) override;
 
   /*-- ドラッグ中にツールが切り替わった場合、Eraseの終了処理を行う --*/
   void onDeactivate() override;
@@ -903,6 +906,18 @@ void EraserTool::onImageChanged() {
 
 //-----------------------------------------------------------------------------
 
+bool EraserTool::keyDown(int key, TUINT32 flags, const TPoint &pos) {
+  if (!m_active) return false;
+  if (m_eraseType.getValue() == NORMAL_ERASE &&
+      (key == TwConsts::TK_UpArrow || key == TwConsts::TK_DownArrow ||
+       key == TwConsts::TK_LeftArrow || key == TwConsts::TK_RightArrow)) {
+    return true;
+  }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+
 void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   if (!m_active) return;
   TImageP image(getImage(true));
@@ -1399,7 +1414,7 @@ void EraserTool::multiEreserRegion(TStroke *stroke, const TMouseEvent &e) {
 }
 
 //-----------------------------------------------------------------------------
-/*! ドラッグ中にツールが切り替わった場合、Erase終了処理を行う
+/*! When the tool is switched during dragging, Erase end processing is performed
 */
 void EraserTool::onDeactivate() {
   if (!m_active) return;
