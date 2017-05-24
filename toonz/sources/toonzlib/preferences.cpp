@@ -103,7 +103,7 @@ inline bool formatLess(const Preferences::LevelFormat &a,
 //=================================================================
 
 void getDefaultLevelFormats(LevelFormatVector &lfv) {
-  lfv.resize(2);
+  lfv.resize(3);
   {
     LevelFormat &lf = lfv[0];
 
@@ -116,6 +116,11 @@ void getDefaultLevelFormats(LevelFormatVector &lfv) {
     lfv[1].m_name                  = Preferences::tr("Adobe Photoshop");
     lfv[1].m_pathFormat            = QRegExp("..*\\.psd", Qt::CaseInsensitive);
     lfv[1].m_options.m_premultiply = true;
+
+    // for all PNG files, set premultiply by default
+    lfv[2].m_name = Preferences::tr("PNG");
+    lfv[2].m_pathFormat = QRegExp("..*\\.png", Qt::CaseInsensitive);
+    lfv[2].m_options.m_premultiply = true;
   }
 }
 
