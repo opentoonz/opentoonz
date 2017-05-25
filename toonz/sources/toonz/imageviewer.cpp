@@ -1088,6 +1088,10 @@ void ImageViewer::updateImageViewer() {
 //-----------------------------------------------------------------------------
 
 TAffine ImageViewer::getImgToWidgetAffine() const {
+  if (!m_image) {
+    TAffine emptyAffine;
+    return emptyAffine;
+  }
   assert(m_image);
   return getImgToWidgetAffine(getImageBoundsD(m_image));
 }
