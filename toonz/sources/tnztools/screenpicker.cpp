@@ -63,8 +63,9 @@ void ScreenPicker::mousePressEvent(QWidget *widget, QMouseEvent *me) {
 //------------------------------------------------------------------
 
 void ScreenPicker::mouseMoveEvent(QWidget *widget, QMouseEvent *me) {
-  assert(m_mouseGrabbed);
-  if (!m_mousePressed) return;
+  // On fast movements, the mouse release can fire before the mouse movement
+  //assert(m_mouseGrabbed); - can cause a crash
+  if (!m_mousePressed || !m_mouseGrabbed) return;
 
   QPoint pos(widget->mapToGlobal(me->pos()));
   m_geometry = QRect(QRect(m_start, QSize(1, 1)) | QRect(pos, QSize(1, 1)));
