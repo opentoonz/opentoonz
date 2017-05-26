@@ -9,7 +9,7 @@
 #include <QRegExp>
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
-#include "toonzqt/dvdialog.h"
+#include "tmsgcore.h"
 
 Ffmpeg::Ffmpeg() {
   m_ffmpegPath         = Preferences::instance()->getFfmpegPath();
