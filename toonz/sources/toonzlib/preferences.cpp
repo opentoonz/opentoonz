@@ -313,7 +313,9 @@ Preferences::Preferences()
     , m_importPolicy(0)
     , m_watchFileSystem(true) {
   TCamera camera;
-  m_defLevelType   = PLI_XSHLEVEL;
+  // Change while vector level fill is still unreliable. 05/2017 JCB
+  // m_defLevelType   = PLI_XSHLEVEL;
+  m_defLevelType   = TZP_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
   m_defLevelHeight = camera.getSize().ly;
   m_defLevelDpi    = camera.getDpi().x;
