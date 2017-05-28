@@ -3,7 +3,7 @@
 #include "TUSBScannerIO.h"
 #include "tsystem.h"
 #include <iostream>
-#include <strstream>
+#include <sstream>
 
 //#define HAS_LIBUSB
 
@@ -46,7 +46,7 @@ TUSBScannerIOPD::TUSBScannerIOPD()
 
 namespace {
 void buf2printable(const unsigned char *buffer, const int size,
-                   ostrstream &os) {
+                   stringstream &os) {
   int i = 0;
   if ((size == 2) && (buffer[0] == 0x1b)) {
     os << "ESC ";
@@ -155,8 +155,7 @@ int TUSBScannerIO::receive(unsigned char *buffer, int size) {
                         30 * 1000);
 
   if (m_data->m_trace) {
-    ostrstream os;
-    os.freeze(false);
+    stringstream os;
     os << "receive: size=" << size << " got = " << count << " buf=";
     buf2printable(buffer, count, os);
     os << '\n' << '\0';
@@ -184,8 +183,7 @@ int TUSBScannerIO::send(unsigned char *buffer, int size) {
   count = usb_bulk_write(m_data->m_handle, m_data->m_epW, (char *)buffer, size,
                          30 * 1000);
   if (m_data->m_trace) {
-    ostrstream os;
-    os.freeze(false);
+    stringstream os;
     os << "send: size=" << size << " wrote = " << count << " buf=";
     buf2printable(buffer, size, os);
     os << '\n' << '\0';

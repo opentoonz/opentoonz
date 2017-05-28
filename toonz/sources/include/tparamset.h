@@ -42,7 +42,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4251)
 #endif
@@ -104,7 +104,7 @@ private:
   TParamSetImp *m_imp = nullptr;
 };
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 

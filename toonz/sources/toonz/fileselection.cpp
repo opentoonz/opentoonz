@@ -336,8 +336,6 @@ void FileSelection::showFolderContents() {
 
 //------------------------------------------------------------------------
 
-extern QWidget *CurrentOpenedBrowser;
-
 void FileSelection::viewFileInfo() {
   std::vector<TFilePath> files;
   getSelectedFiles(files);
@@ -353,7 +351,7 @@ void FileSelection::viewFileInfo() {
       break;
     }
     if (!infoViewer) {
-      infoViewer = new InfoViewer(CurrentOpenedBrowser);
+      infoViewer = new InfoViewer();
       m_infoViewers.append(infoViewer);
     }
     infoViewer->setItem(0, 0, files[j]);

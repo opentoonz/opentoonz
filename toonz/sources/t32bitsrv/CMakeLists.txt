@@ -8,7 +8,7 @@ add_executable(t32bitsrv
     t32movmsg.h
 )
 
-if(WIN32)
+if(BUILD_TARGET_WIN)
     include_directories(
         SYSTEM
         ${SDKROOT}/quicktime/QT73SDK/CIncludes
@@ -22,7 +22,7 @@ target_link_libraries(t32bitsrv
     image
 )
 
-if(APPLE AND PLATFORM EQUAL 32)
+if(BUILD_ENV_APPLE AND PLATFORM EQUAL 32)
     get_target_property(bin t32bitsrv LOCATION)
     get_filename_component(bindir ${bin} DIRECTORY)
 

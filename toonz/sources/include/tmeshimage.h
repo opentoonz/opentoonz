@@ -91,10 +91,6 @@ public:
   }
 };
 
-//-----------------------------------------------------------------------------
-
-typedef tcg::Vertex<RigidPoint> TTextureVertex;
-
 //=================================================================================
 
 namespace tcg {
@@ -110,6 +106,16 @@ struct point_traits<RigidPoint> {
 };
 
 }  // namespace tcg
+
+//-----------------------------------------------------------------------------
+
+template class DVAPI tcg::Vertex<TPointD>;
+template class DVAPI tcg::Vertex<RigidPoint>;
+
+typedef tcg::Vertex<RigidPoint> TTextureVertex;
+
+template class DVAPI tcg::Mesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>>;
+template class DVAPI tcg::TriMesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>>;
 
 //***********************************************************************************
 //    TTextureMesh (Textured Mesh Type)  declaration

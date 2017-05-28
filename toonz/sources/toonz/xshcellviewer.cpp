@@ -512,10 +512,11 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   m_col = col;
 
 #ifdef _WIN32
-  static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Arial", -1, QFont::Normal);
 #else
-  static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Helvetica", -1, QFont::Normal);
 #endif
+  font.setPixelSize(XSHEET_FONT_PX_SIZE);
   setFont(font);
   setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
@@ -1269,10 +1270,11 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
                  : m_viewer->getTextColor());
 
 #ifdef _WIN32
-  static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Arial", -1, QFont::Normal);
 #else
-  static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Helvetica", -1, QFont::Normal);
 #endif
+  font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
   // do not draw frame number under RenameCellField
@@ -1376,16 +1378,21 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   QString text = cell.getSoundTextLevel()->getFrameText(fid.getNumber() - 1);
   p.setPen(Qt::black);
   QRect nameRect = rect.adjusted(8, -H_ADJUST, -10, H_ADJUST);
-  // il nome va scritto se e' diverso dalla cella precedente oppure se
-  // siamo su una marker line
-  static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+// il nome va scritto se e' diverso dalla cella precedente oppure se
+// siamo su una marker line
+#ifdef _WIN32
+  static QFont font("Arial", -1, QFont::Normal);
+#else
+  static QFont font("Helvetica", -1, QFont::Normal);
+#endif
+  font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
 #if QT_VERSION >= 0x050500
   QFontMetrics metric(font);
   QString elidaName = elideText(text, metric, nameRect.width(), "~");
 #else
-  QString elidaName   = elideText(text, font, nameRect.width(), "~");
+  QString elidaName = elideText(text, font, nameRect.width(), "~");
 #endif
 
   if (!sameLevel || prevCell.m_frameId != fid)
@@ -1487,11 +1494,12 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
                    : m_viewer->getTextColor());
 // il nome va scritto se e' diverso dalla cella precedente oppure se
 // siamo su una marker line
-#ifndef _WIN32
-    static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+#ifdef _WIN32
+    static QFont font("Arial", -1, QFont::Normal);
 #else
-    static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+    static QFont font("Helvetica", -1, QFont::Normal);
 #endif
+    font.setPixelSize(XSHEET_FONT_PX_SIZE);
     p.setFont(font);
     QFontMetrics fm(font);
 

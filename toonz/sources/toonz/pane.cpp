@@ -35,7 +35,6 @@ extern TEnv::StringVar EnvSafeAreaName;
 //=============================================================================
 // TPanel
 //-----------------------------------------------------------------------------
-extern QWidget *CurrentOpenedBrowser;
 
 TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
                TDockWidget::Orientation orientation)
@@ -57,20 +56,6 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
   connect(m_panelTitleBar, SIGNAL(closeButtonPressed()), this,
           SLOT(onCloseButtonPressed()));
   setOrientation(orientation);
-}
-
-void TPanel::hideEvent(QHideEvent *) {
-  if (CurrentOpenedBrowser) {
-    CurrentOpenedBrowser->setWindowModality(Qt::ApplicationModal);
-    // setWindowModality(Qt::NonModal);
-  }
-}
-
-void TPanel::showEvent(QShowEvent *) {
-  if (CurrentOpenedBrowser) {
-    CurrentOpenedBrowser->setWindowModality(Qt::NonModal);
-    // setWindowModality(Qt::WindowModal);
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -457,25 +442,28 @@ void TPanelTitleBar::resizeEvent(QResizeEvent *e) {
 //-----------------------------------------------------------------------------
 
 TPanelFactory::TPanelFactory(QString panelType) : m_panelType(panelType) {
-  assert(m_table.count(panelType) == 0);
-  m_table[m_panelType] = this;
+  assert(tableInstance().count(panelType) == 0);
+  tableInstance()[m_panelType] = this;
 }
 
 //-----------------------------------------------------------------------------
 
-TPanelFactory::~TPanelFactory() { m_table.remove(m_panelType); }
+TPanelFactory::~TPanelFactory() { tableInstance().remove(m_panelType); }
 
 //-----------------------------------------------------------------------------
 
-QMap<QString, TPanelFactory *> TPanelFactory::m_table;
+QMap<QString, TPanelFactory *> &TPanelFactory::tableInstance() {
+  static QMap<QString, TPanelFactory *> table;
+  return table;
+}
 
 //-----------------------------------------------------------------------------
 
 TPanel *TPanelFactory::createPanel(QWidget *parent, QString panelType) {
   TPanel *panel = 0;
 
-  QMap<QString, TPanelFactory *>::iterator it = m_table.find(panelType);
-  if (it == m_table.end()) {
+  QMap<QString, TPanelFactory *>::iterator it = tableInstance().find(panelType);
+  if (it == tableInstance().end()) {
     TPanel *panel = new TPanel(parent);
     panel->setPanelType(panelType.toStdString());
     return panel;

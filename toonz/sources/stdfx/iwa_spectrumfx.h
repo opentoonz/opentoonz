@@ -35,6 +35,10 @@ protected:
   TDoubleParamP m_RGamma;
   TDoubleParamP m_GGamma;
   TDoubleParamP m_BGamma;
+
+  TDoubleParamP m_loopSpectrumFadeWidth;
+  TDoubleParamP m_spectrumShift;
+
   TDoubleParamP m_lensFactor;
   TDoubleParamP m_lightThres;
   TDoubleParamP m_lightIntensity;

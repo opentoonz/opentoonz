@@ -10,9 +10,6 @@
 // TnzBase includes
 #include "trasterfxrenderdata.h"
 
-// TnzExt includes
-#include "ext/plasticskeletondeformation.h"
-
 // STD includes
 #include <vector>
 #include <set>

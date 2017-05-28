@@ -744,6 +744,14 @@ void Naa2TlvConverter::addBorderInks()  // add syntethic inks: lines between two
   m_syntheticInkRas = new WorkRaster<unsigned char>(lx, ly);
   for (int i = 0; i < lx * ly; i++) m_syntheticInkRas->pixels(0)[i] = 0;
 
+  // calculate brightness of all colors in order to decide the region on which
+  // the border to be added
+  QList<int> colorsBrightness;
+  QVector<TPixel32>::iterator c;
+  for (c = m_colors.begin(); c != m_colors.end(); ++c)
+    colorsBrightness.append((int)(*c).r * 30 + (int)(*c).g * 59 +
+                            (int)(*c).b * 11);
+
   int borderInkColorIndex = m_colors.count();
   m_colors.append(TPixel32(255, 0, 0));
 
@@ -778,7 +786,9 @@ void Naa2TlvConverter::addBorderInks()  // add syntethic inks: lines between two
             // OLD: note: we consider only regions with a lower index, to avoid
             // to create double border strokes
             // NEW: we put syntetic ink pixels in larger regions
-            if (m_regions[c1].pixelCount < m_regions[c].pixelCount) {
+            // UPDATE 2017/5/12 : we put ink on darker style
+            if (colorsBrightness[m_regions[c1].colorIndex] >
+                colorsBrightness[m_regions[c].colorIndex]) {
               touchesOtherRegion = true;
               break;
             }
@@ -1002,7 +1012,7 @@ int Naa2TlvConverter::measureThickness(int x0, int y0) {
 //-----------------------------------------------------------------------------
 
 TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks,
-                                       QList<int> &usedStyleIds) {
+                                       QList<int> &usedStyleIds, double dpi) {
   if (!m_valid || m_colors.empty() || m_regions.empty() || !m_regionRas)
     return TToonzImageP();
   int lx                = m_regionRas->getLx();
@@ -1053,15 +1063,67 @@ TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks,
         outScanLine[x] = TPixelCM32(styleId, 0, 0);
       else if (m_syntheticInkRas->pixels(y)[x] == 1)
         outScanLine[x] =
-            TPixelCM32(transparentSyntheticInks ? 0 : styleId, styleId, 0);
+            TPixelCM32(transparentSyntheticInks ? 0 : styleId, 0, 0);
       else
         outScanLine[x] = TPixelCM32(0, styleId, 255);
     }
   }
 
+  struct locals {
+    static bool compare(const QPair<int, int> &p1, const QPair<int, int> &p2) {
+      return p1.second > p2.second;
+    }
+
+    static void addPaint(QList<QPair<int, int>> &list, const int paintId) {
+      if (paintId == 0) return;
+      for (int i = 0; i < list.size(); i++)
+        if (list[i].first == paintId) {
+          list[i].second += 1;
+          return;
+        }
+      list.append(QPair<int, int>(paintId, 1));
+    }
+  };  // locals
+
+  // Here, expand paint area under the solid ink pixel in order to prevent the
+  // gap appears when the "Add Antialiasing" option is activated.
+  TRasterCM32P copiedRas = ras->clone();
+  copiedRas->lock();
+  for (int y = 0; y < ly; y++) {
+    TPixelCM32 *topScanLine    = copiedRas->pixels((y == 0) ? y : y - 1);
+    TPixelCM32 *middleScanLine = copiedRas->pixels(y);
+    TPixelCM32 *bottomScanLine = copiedRas->pixels((y == ly - 1) ? y : y + 1);
+    TPixelCM32 *outScanLine    = ras->pixels(y);
+    for (int x = 0; x < lx; x++) {
+      if (!middleScanLine[x].isPureInk() || middleScanLine[x].getPaint() != 0)
+        continue;
+
+      int prev_x = (x == 0) ? x : x - 1;
+      int next_x = (x == lx - 1) ? x : x + 1;
+      QList<QPair<int, int>> neighborPaints;
+      locals::addPaint(neighborPaints, topScanLine[prev_x].getPaint());
+      locals::addPaint(neighborPaints, topScanLine[x].getPaint());
+      locals::addPaint(neighborPaints, topScanLine[next_x].getPaint());
+      locals::addPaint(neighborPaints, middleScanLine[prev_x].getPaint());
+      locals::addPaint(neighborPaints, middleScanLine[next_x].getPaint());
+      locals::addPaint(neighborPaints, bottomScanLine[prev_x].getPaint());
+      locals::addPaint(neighborPaints, bottomScanLine[x].getPaint());
+      locals::addPaint(neighborPaints, bottomScanLine[next_x].getPaint());
+      qSort(neighborPaints.begin(), neighborPaints.end(), locals::compare);
+
+      if (!neighborPaints.isEmpty())
+        outScanLine[x].setPaint(neighborPaints[0].first);
+    }
+  }
+  copiedRas->unlock();
+
   TToonzImageP ti = new TToonzImage(ras, ras->getBounds());
   ti->setPalette(palette);
-  ti->setDpi(72, 72);
+
+  if (dpi > 0.0)  // for now, accept only square pixel
+    ti->setDpi(dpi, dpi);
+  else
+    ti->setDpi(72, 72);
 
   return ti;
 }

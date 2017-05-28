@@ -466,7 +466,7 @@ public:
 //-----------------------------------------------------------------------------
 
 SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
-    : QGLWidget(parent, touchProxy())
+    : GLWidgetForHighDpi(parent, touchProxy())
     , m_pressure(0)
     , m_lastMousePos(0, 0)
     , m_mouseButton(Qt::NoButton)
@@ -765,6 +765,7 @@ TPointD SceneViewer::winToWorld(const QPoint &pos) const {
     } else
       return TAffine() * TPointD(0, 0);
   }
+
   return getViewMatrix().inv() * pp;
 }
 
@@ -2556,10 +2557,12 @@ void SceneViewer::invalidateToolStatus() {
 */
 
 TRectD SceneViewer::getGeometry() const {
+  int devPixRatio = getDevPixRatio();
   TTool *tool     = TApp::instance()->getCurrentTool()->getTool();
-  TPointD topLeft = tool->getMatrix().inv() * winToWorld(geometry().topLeft());
-  TPointD bottomRight =
-      tool->getMatrix().inv() * winToWorld(geometry().bottomRight());
+  TPointD topLeft =
+      tool->getMatrix().inv() * winToWorld(geometry().topLeft() * devPixRatio);
+  TPointD bottomRight = tool->getMatrix().inv() *
+                        winToWorld(geometry().bottomRight() * devPixRatio);
 
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
   if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {

@@ -298,7 +298,7 @@ public:
 };
 
 // default imp generator
-std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(
+static std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(
     const TDimension &dim, std::shared_ptr<TOfflineGL::Imp> shared) {
   return std::make_shared<WIN32Implementation>(dim, shared);
 }
@@ -710,13 +710,13 @@ TNZ_MACHINE_CHANNEL_ORDER_MRGB
 
   GLenum fmt = TGL_FMT;
   /*
-#ifdef TNZ_MACHINE_CHANNEL_ORDER_BGRM
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
 GL_BGRA_EXT;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MBGR
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
 GL_ABGR_EXT;
-#elif TNZ_MACHINE_CHANNEL_ORDER_RGBM
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
 GL_RGBA;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MRGB
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
 #warning "to do"
 GL_ABGR_EXT;
 #else

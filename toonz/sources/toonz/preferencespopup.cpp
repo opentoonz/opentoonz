@@ -338,6 +338,19 @@ void PreferencesPopup::onRoomChoiceChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onImportPolicyChanged(int index) {
+  m_pref->setDefaultImportPolicy(index);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onImportPolicyExternallyChanged(int policy) {
+  // call slot function onImportPolicyChanged() accordingly
+  m_importPolicy->setCurrentIndex(policy);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onScanLevelTypeChanged(const QString &text) {
   m_pref->setScanLevelType(text.toStdString());
 }
@@ -1145,6 +1158,8 @@ PreferencesPopup::PreferencesPopup()
 
   QComboBox *paletteTypeForRasterColorModelComboBox = new QComboBox(this);
 
+  m_importPolicy = new QComboBox;
+
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
   m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
@@ -1375,6 +1390,13 @@ PreferencesPopup::PreferencesPopup()
   paletteTypeForRasterColorModelComboBox->addItems(paletteTypes);
   paletteTypeForRasterColorModelComboBox->setCurrentIndex(
       m_pref->getPaletteTypeOnLoadRasterImageAsColorModel());
+
+  QStringList policies;
+  policies << tr("Always ask before loading or importing")
+           << tr("Always import the file to the current project")
+           << tr("Always load the file from the current location");
+  m_importPolicy->addItems(policies);
+  m_importPolicy->setCurrentIndex(m_pref->getDefaultImportPolicy());
 
   //--- Import/Export ------------------------------
   QString path = m_pref->getFfmpegPath();
@@ -1713,6 +1735,15 @@ PreferencesPopup::PreferencesPopup()
     loadingFrameLay->setMargin(15);
     loadingFrameLay->setSpacing(10);
     {
+      QHBoxLayout *importLay = new QHBoxLayout();
+      importLay->setMargin(0);
+      importLay->setSpacing(5);
+      {
+        importLay->addWidget(new QLabel(tr("Default File Import Behavior:")));
+        importLay->addWidget(m_importPolicy);
+      }
+      importLay->addStretch(0);
+      loadingFrameLay->addLayout(importLay, 0);
       loadingFrameLay->addWidget(exposeLoadedLevelsCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
       loadingFrameLay->addWidget(createSubfolderCB, 0,
@@ -1725,11 +1756,11 @@ PreferencesPopup::PreferencesPopup()
       cacheLay->setHorizontalSpacing(5);
       cacheLay->setVerticalSpacing(10);
       {
-        cacheLay->addWidget(new QLabel(tr("Default TLV Caching Behavior")), 0,
+        cacheLay->addWidget(new QLabel(tr("Default TLV Caching Behavior:")), 0,
                             0, Qt::AlignRight | Qt::AlignVCenter);
         cacheLay->addWidget(initialLoadTlvCachingBehaviorComboBox, 0, 1);
 
-        cacheLay->addWidget(new QLabel(tr("Column Icon"), this), 1, 0,
+        cacheLay->addWidget(new QLabel(tr("Column Icon:"), this), 1, 0,
                             Qt::AlignRight | Qt::AlignVCenter);
         cacheLay->addWidget(m_columnIconOm, 1, 1);
 
@@ -1742,7 +1773,7 @@ PreferencesPopup::PreferencesPopup()
 
         cacheLay->addWidget(
             new QLabel(
-                tr("Palette Type on Loading Raster Image as Color Model")),
+                tr("Palette Type on Loading Raster Image as Color Model:")),
             3, 0, Qt::AlignRight | Qt::AlignVCenter);
         cacheLay->addWidget(paletteTypeForRasterColorModelComboBox, 3, 1, 1, 5);
       }
@@ -2182,6 +2213,11 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(paletteTypeForRasterColorModelComboBox,
                        SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onPaletteTypeForRasterColorModelChanged(int)));
+  ret = ret && connect(m_importPolicy, SIGNAL(currentIndexChanged(int)),
+                       SLOT(onImportPolicyChanged(int)));
+  ret = ret && connect(TApp::instance()->getCurrentScene(),
+                       SIGNAL(importPolicyChanged(int)), this,
+                       SLOT(onImportPolicyExternallyChanged(int)));
 
   //--- Import/Export ----------------------
   ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,

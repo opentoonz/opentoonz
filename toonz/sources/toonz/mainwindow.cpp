@@ -2281,6 +2281,16 @@ void RecentFiles::moveFilePath(int fromIndex, int toIndex, FileType fileType) {
 
 //-----------------------------------------------------------------------------
 
+void RecentFiles::removeFilePath(int index, FileType fileType) {
+  if (fileType == Scene)
+    m_recentScenes.removeAt(index);
+  else if (fileType == Level)
+    m_recentLevels.removeAt(index);
+  saveRecentFiles();
+}
+
+//-----------------------------------------------------------------------------
+
 QString RecentFiles::getFilePath(int index, FileType fileType) const {
   return (fileType == Scene)
              ? m_recentScenes[index]

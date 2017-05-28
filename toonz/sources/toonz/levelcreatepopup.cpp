@@ -304,26 +304,15 @@ void LevelCreatePopup::updatePath() {
 void LevelCreatePopup::nextName() {
   const std::unique_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
 
-  TLevelSet *levelSet =
-      TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
-  ToonzScene *scene      = TApp::instance()->getCurrentScene()->getScene();
   std::wstring levelName = L"";
 
   // Select a different unique level name in case it already exists (either in
   // scene or on disk)
-  TFilePath fp;
-  TFilePath actualFp;
+
   for (;;) {
     levelName = nameBuilder->getNext();
 
-    if (levelSet->getLevel(levelName) != 0) continue;
-
-    fp       = scene->getDefaultLevelPath(getLevelType(), levelName);
-    actualFp = scene->decodeFilePath(fp);
-
-    if (TSystem::doesExistFileOrLevel(actualFp)) {
-      continue;
-    }
+    if (levelExists(levelName)) continue;
 
     break;
   }
@@ -331,6 +320,28 @@ void LevelCreatePopup::nextName() {
   m_nameFld->setText(QString::fromStdWString(levelName));
 }
 
+//-----------------------------------------------------------------------------
+
+bool LevelCreatePopup::levelExists(std::wstring levelName) {
+  TFilePath fp;
+  TFilePath actualFp;
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  TLevelSet *levelSet =
+      TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
+
+  TFilePath parentDir(m_pathFld->getPath().toStdWString());
+  fp = scene->getDefaultLevelPath(getLevelType(), levelName)
+           .withParentDir(parentDir);
+  actualFp = scene->decodeFilePath(fp);
+
+  if (levelSet->getLevel(levelName) != 0 ||
+      TSystem::doesExistFileOrLevel(actualFp)) {
+    return true;
+  } else
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 void LevelCreatePopup::showEvent(QShowEvent *) {
   nextName();
   update();
@@ -382,7 +393,15 @@ void LevelCreatePopup::onLevelTypeChanged(const QString &text) {
   else
     setSizeWidgetEnable(false);
   updatePath();
-  nextName();
+
+  std::wstring levelName = m_nameFld->text().toStdWString();
+  // check if the name already exists or if it is a 1 letter name
+  // one letter names are most likely created automatically so
+  // this makes sure that automatically created names
+  // don't skip a letter.
+  if (levelExists(levelName) || levelName.length() == 1) {
+    nextName();
+  }
   m_nameFld->setFocus();
 }
 

@@ -21,7 +21,7 @@ add_definitions(
     -DSOUND_EXPORTS
 )
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libsound.dylib")
 endif()
 

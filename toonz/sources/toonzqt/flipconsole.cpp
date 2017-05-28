@@ -1355,26 +1355,31 @@ void FlipConsole::pressLinkedConsoleButton(UINT button, FlipConsole *parent) {
 //-----------------------------------------------------------------------------
 
 void FlipConsole::onButtonPressed(int button) {
-  // if(!isVisible()) return;
   makeCurrent();
-  doButtonPressed(button);
+  if (m_playbackExecutor.isRunning() &&
+      (button == FlipConsole::ePlay || button == FlipConsole::eLoop)) {
+    pressButton(ePause);
+  } else
+    doButtonPressed(button);
 
   if (m_areLinked) pressLinkedConsoleButton(button, this);
 }
 
 //-----------------------------------------------------------------------------
 void FlipConsole::pressButton(EGadget buttonId) {
-  if (m_buttons.contains(buttonId)) {
-    // If you press "play" or "loop play" button while playing, which means
-    // "pause"
-    if (m_playbackExecutor.isRunning() &&
-        (buttonId == ePlay || buttonId == eLoop)) {
-      m_buttons[ePause]->click();
-      return;
-    }
-    m_buttons[buttonId]->click();
-  } else if (m_actions.contains(buttonId))
-    m_actions[buttonId]->trigger();
+  if (m_visibleConsoles.indexOf(this) < 0 && m_visibleConsoles.size() > 0) {
+    FlipConsole *console = m_visibleConsoles.at(0);
+    console->makeCurrent();
+    if (console->m_buttons.contains(buttonId)) {
+      console->m_buttons[buttonId]->click();
+    } else if (console->m_actions.contains(buttonId))
+      console->m_actions[buttonId]->trigger();
+  } else {
+    if (m_buttons.contains(buttonId)) {
+      m_buttons[buttonId]->click();
+    } else if (m_actions.contains(buttonId))
+      m_actions[buttonId]->trigger();
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -710,10 +710,12 @@ void TFx::loadData(TIStream &is) {
       while (!is.eos()) {
         std::string paramName;
         while (is.openChild(paramName)) {
-          TParamP param = getParams()->getParam(paramName);
-          if (param)
-            param->loadData(is);
-          else  // il parametro non e' presente -> skip
+          TParamVar *paramVar = getParams()->getParamVar(paramName);
+          if (paramVar && paramVar->getParam()) {
+            paramVar->getParam()->loadData(is);
+            if (paramVar->isObsolete())
+              onObsoleteParamLoaded(paramVar->getParam()->getName());
+          } else  // il parametro non e' presente -> skip
             skipChild(is);
 
           is.closeChild();
@@ -840,10 +842,12 @@ void TFx::saveData(TOStream &os) {
   if (linkedSetRoot == this) {
     os.openChild("params");
     for (int i = 0; i < getParams()->getParamCount(); i++) {
-      std::string paramName = getParams()->getParamName(i);
-      TParam *param         = getParams()->getParam(i);
+      std::string paramName     = getParams()->getParamName(i);
+      const TParamVar *paramVar = getParams()->getParamVar(i);
+      // skip saving for the obsolete parameters
+      if (paramVar->isObsolete()) continue;
       os.openChild(paramName);
-      param->saveData(os);
+      paramVar->getParam()->saveData(os);
       os.closeChild();
     }
     os.closeChild();

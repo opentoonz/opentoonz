@@ -22,7 +22,7 @@ typedef struct T_CHAN_REC *T_CHAN;
 #define TPROC_OPEN_READ_BINARY 0x4
 
 #ifdef WIN32
-#include "Windows.h"
+#include "windows.h"
 #define TPROC_LIB HMODULE
 #define TPROC_FUNC FARPROC
 #else

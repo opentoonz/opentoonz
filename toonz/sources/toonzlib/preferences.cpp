@@ -103,7 +103,7 @@ inline bool formatLess(const Preferences::LevelFormat &a,
 //=================================================================
 
 void getDefaultLevelFormats(LevelFormatVector &lfv) {
-  lfv.resize(1);
+  lfv.resize(3);
   {
     LevelFormat &lf = lfv[0];
 
@@ -111,6 +111,16 @@ void getDefaultLevelFormats(LevelFormatVector &lfv) {
     lf.m_pathFormat = QRegExp(".+[0-9]{4,4}\\.tga", Qt::CaseInsensitive);
     lf.m_options.m_whiteTransp = true;
     lf.m_options.m_antialias   = 70;
+
+    // for all PSD files, set the premultiply options to layers
+    lfv[1].m_name                  = Preferences::tr("Adobe Photoshop");
+    lfv[1].m_pathFormat            = QRegExp("..*\\.psd", Qt::CaseInsensitive);
+    lfv[1].m_options.m_premultiply = true;
+
+    // for all PNG files, set premultiply by default
+    lfv[2].m_name = Preferences::tr("PNG");
+    lfv[2].m_pathFormat = QRegExp("..*\\.png", Qt::CaseInsensitive);
+    lfv[2].m_options.m_premultiply = true;
   }
 }
 
@@ -300,6 +310,7 @@ Preferences::Preferences()
     , m_useNumpadForSwitchingStyles(true)
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
+    , m_importPolicy(0)
     , m_watchFileSystem(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -578,6 +589,7 @@ Preferences::Preferences()
            m_useArrowKeyToShiftCellSelection);
   getValue(*m_settings, "inputCellsWithoutDoubleClickingEnabled",
            m_inputCellsWithoutDoubleClickingEnabled);
+  getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
 }
 
@@ -1293,6 +1305,13 @@ void Preferences::setPrecompute(bool enabled) { m_precompute = enabled; }
 void Preferences::setFfmpegTimeout(int seconds) {
   m_ffmpegTimeout = seconds;
   m_settings->setValue("ffmpegTimeout", seconds);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setDefaultImportPolicy(int policy) {
+  m_importPolicy = policy;
+  m_settings->setValue("importPolicy", policy);
 }
 
 //-----------------------------------------------------------------

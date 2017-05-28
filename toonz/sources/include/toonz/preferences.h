@@ -269,6 +269,9 @@ public:
     return m_paletteTypeOnLoadRasterImageAsColorModel;
   }
 
+  void setDefaultImportPolicy(int policy);
+  int getDefaultImportPolicy() { return m_importPolicy; }
+
   // Drawing  tab
 
   void setScanLevelType(std::string s);
@@ -482,7 +485,7 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-  int m_projectRoot;
+  int m_projectRoot, m_importPolicy;
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
