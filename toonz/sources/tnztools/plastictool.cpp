@@ -387,8 +387,10 @@ void PlasticToolOptionsBox::SkelIdsComboBox::updateCurrentSkeleton() {
 //****************************************************************************************
 
 PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
-                                             TPaletteHandle *pltHandle)
-    : GenericToolOptionsBox(parent, tool, pltHandle, PlasticTool::MODES_COUNT)
+                                             TPaletteHandle *pltHandle,
+                                             ToolHandle *toolHandle)
+    : GenericToolOptionsBox(parent, tool, pltHandle, PlasticTool::MODES_COUNT,
+                            toolHandle)
     , m_tool(tool)
     , m_subToolbars(new GenericToolOptionsBox *[PlasticTool::MODES_COUNT])
 //, m_subToolbarActions(new QAction*[PlasticTool::MODES_COUNT])
@@ -721,8 +723,9 @@ ToolOptionsBox *PlasticTool::createOptionsBox() {
   // Create the options box
   TPaletteHandle *currPalette =
       TTool::getApplication()->getPaletteController()->getCurrentLevelPalette();
+  ToolHandle *currTool = m_application->getCurrentTool();
   PlasticToolOptionsBox *optionsBox =
-      new PlasticToolOptionsBox(0, this, currPalette);
+      new PlasticToolOptionsBox(0, this, currPalette, currTool);
 
   // Connect it to receive m_mode notifications
   m_mode.addListener(optionsBox);

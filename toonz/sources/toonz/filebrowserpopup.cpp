@@ -62,9 +62,6 @@
 #include <QCoreApplication>
 #include <QMainWindow>
 
-QWidget *CurrentOpenedBrowser =
-    0;  // not nice....it is used to get rid of blocking modality
-
 //***********************************************************************************
 //    FileBrowserPopup  implementation
 //***********************************************************************************
@@ -353,7 +350,6 @@ void FileBrowserPopup::setOkText(const QString &text) {
 //-----------------------------------------------------------------------------
 
 void FileBrowserPopup::hideEvent(QHideEvent *e) {
-  CurrentOpenedBrowser = 0;
   TSelectionHandle::getCurrent()->popSelection();
   m_dialogSize = size();
   move(pos());
@@ -363,7 +359,6 @@ void FileBrowserPopup::hideEvent(QHideEvent *e) {
 //-----------------------------------------------------------------------------
 
 void FileBrowserPopup::showEvent(QShowEvent *) {
-  CurrentOpenedBrowser = this;
   TSelectionHandle::getCurrent()->pushSelection();
   m_selectedPaths.clear();
   m_currentFIdsSet.clear();
@@ -376,6 +371,11 @@ void FileBrowserPopup::showEvent(QShowEvent *) {
     m_nameField->setFocus();
   }
   resize(m_dialogSize);
+
+  // Set ALL the file browsers non-modal (even if opened with exec())
+  // in order to handle the info viewer and the flipbook which are opened
+  // with "Info..." and "View..." commands respectively.
+  setWindowModality(Qt::NonModal);
 }
 
 //***********************************************************************************
@@ -399,6 +399,14 @@ bool GenericLoadFilePopup::execute() {
 //-----------------------------------------------------------------------------
 
 TFilePath GenericLoadFilePopup::getPath() {
+  // In case that this function is called twice before closing the popup.
+  // Note that the file browser popup will be always non-modal even if opened
+  // with exec().
+  // see FileBrowserPopup::showEvent()
+  if (isVisible()) {
+    activateWindow();
+    return TFilePath();
+  }
   return (exec() == QDialog::Rejected) ? TFilePath() : *m_selectedPaths.begin();
 }
 
@@ -450,6 +458,14 @@ bool GenericSaveFilePopup::execute() {
 //-----------------------------------------------------------------------------
 
 TFilePath GenericSaveFilePopup::getPath() {
+  // In case that this function is called twice before closing the popup.
+  // Note that the file browser popup will be always non-modal even if opened
+  // with exec().
+  // see FileBrowserPopup::showEvent()
+  if (isVisible()) {
+    activateWindow();
+    return TFilePath();
+  }
   return (exec() == QDialog::Rejected) ? TFilePath() : *m_selectedPaths.begin();
 }
 
@@ -1268,6 +1284,15 @@ void LoadLevelPopup::updateBottomGUI() {
     // removing
     // six letters of the scene name from the level name
     m_levelName->setText(getLevelNameWithoutSceneNumber(fp.getName()));
+
+    // If the option "Show "ABC" Appendix to the Frame Number in Xsheet Cell" is
+    // ON, frame numbers normally increment at interval of 10.
+    // Placing such level with "Auto" step option will cause unwanted
+    // spacing between frames in Xsheet. Setting the step to "1" can prevent
+    // such problem.
+    if (Preferences::instance()->isShowFrameNumberWithLettersEnabled() &&
+        m_stepCombo->currentIndex() == 0)
+      m_stepCombo->setCurrentIndex(1);
 
     m_arrangementFrame->setEnabled(true);
   }

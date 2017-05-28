@@ -325,20 +325,20 @@ set(OBJCSOURCES filebrowsermodel.cpp)
 # Resource file(s)
 set(RESOURCES toonz.qrc)
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     set(RC_FILE toonz.rc)
 endif()
 
 qt5_add_resources(SOURCES ${RESOURCES})
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     #set_source_files_properties(${OBJCSOURCES} PROPERTIES LANGUAGE OBJCXX)
     set_source_files_properties(${OBJCSOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
 
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     add_executable(OpenToonz_${VERSION} WIN32 ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES} ${RC_FILE})
 else()
     set(MACOSX_BUNDLE_ICON_FILE "OpenToonz.icns")
@@ -354,7 +354,7 @@ else()
     #)
 endif()
 
-if(WIN32)
+if(BUILD_TARGET_WIN)
     add_definitions(
         -DUNICODE
         -D_UNICODE
@@ -372,13 +372,13 @@ include_directories(
     ../../sources/toonzqt
 )
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     include_directories(../../sources/mousedragfilter)
 endif()
 
 
 
-if(WIN32)
+if(BUILD_TARGET_WIN)
     if(PLATFORM EQUAL 32)
         include_directories(
             SYSTEM
@@ -387,14 +387,14 @@ if(WIN32)
     endif()
 endif()
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     target_link_libraries(OpenToonz_${VERSION}
         Qt5::WinMain Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
         Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia
         ${GL_LIB} ${GLUT_LIB} strmiids
         tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm
     )
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     find_library(COCOA_LIB Cocoa)
 
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
@@ -410,13 +410,17 @@ elseif(APPLE)
         ${COCOA_LIB} ${EXTRA_LIBS} mousedragfilter
     )
 
-elseif(UNIX)
+elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
 
     # 変なところにライブラリ生成するカスども
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
     set(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${OPENBLAS_LIB})
+
+    if(BUILD_TARGET_WIN)
+        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids)
+    endif()
 
     target_link_libraries(
         OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
@@ -426,7 +430,7 @@ elseif(UNIX)
     )
 endif()
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     # CMAKE_RUNTIME_OUTPUT_DIRECTORY should be equivalent to usage on windows despite empty
     # OSX だと CMAKE_RUNTIME_OUTPUT_DIRECTORY が空だが Windows 版と同じ使い方ができるようにしておく
     get_target_property(bin OpenToonz_${VERSION} LOCATION)
@@ -439,7 +443,7 @@ if(LZODRIVER_FOUND)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzodecompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzodecompress)
 endif()
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     get_target_property(loc OpenToonz_${VERSION} MACOSX_BUNDLE_NAME)
     message(" ==> App Bundle: " ${loc})
     message(" ==> Mach-o: " ${bin})
@@ -461,7 +465,55 @@ if(APPLE)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/qss)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
-elseif(UNIX)
+elseif(BUILD_ENV_UNIXLIKE AND BUILD_TARGET_WIN)
+    # Setup files on Windows platform while cross compilation.
+    install(
+        TARGETS
+            OpenToonz_${VERSION}
+        DESTINATION bin
+    )
+
+    install(
+        PROGRAMS
+            "$<TARGET_FILE:tcleanup>"
+            "$<TARGET_FILE:tcomposer>"
+            "$<TARGET_FILE:tconverter>"
+            "$<TARGET_FILE:tfarmcontroller>"
+            "$<TARGET_FILE:tfarmserver>"
+        DESTINATION bin
+    )
+
+    if(LZODRIVER_FOUND)
+        install(
+            PROGRAMS
+                "$<TARGET_FILE:lzocompress>"
+                "$<TARGET_FILE:lzodecompress>"
+            DESTINATION bin
+        )
+    endif()
+
+    install(
+        FILES
+            "$<TARGET_FILE:tnzcore>"
+            "$<TARGET_FILE:tnzbase>"
+            "$<TARGET_FILE:toonzlib>"
+            "$<TARGET_FILE:colorfx>"
+            "$<TARGET_FILE:tnzext>"
+            "$<TARGET_FILE:image>"
+            "$<TARGET_FILE:sound>"
+            "$<TARGET_FILE:toonzqt>"
+            "$<TARGET_FILE:tnztools>"
+            "$<TARGET_FILE:tnzstdfx>"
+            "$<TARGET_FILE:tfarm>"
+        DESTINATION bin
+    )
+    
+    install(
+        DIRECTORY
+            ${CMAKE_SOURCE_DIR}/../../stuff
+        DESTINATION share/opentoonz
+    )
+elseif(BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN)
     # Setup files on Linux/Unix platform.
     # not essential since the binary can run in-place,
     # but useful for package managers.
@@ -489,6 +541,14 @@ if [ ! -d \$HOME/.config/OpenToonz/stuff ]; then
     cp -r \$OPENTOONZ_BASE/share/opentoonz/stuff \$HOME/.config/OpenToonz
 fi
 
+if [ ! -d \$HOME/.config/OpenToonz/stuff/projects/library ]; then
+    mkdir -p \$HOME/.config/OpenToonz/stuff/projects/library
+fi
+
+if [ ! -d \$HOME/.config/OpenToonz/stuff/projects/fxs ]; then
+    mkdir -p \$HOME/.config/OpenToonz/stuff/projects/fxs
+fi
+
 if [ ! -e \$HOME/.config/OpenToonz/SystemVar.ini ]; then
     cat << EOF > $HOME/.config/OpenToonz/SystemVar.ini
 [General]
@@ -496,8 +556,8 @@ OPENTOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
 OpenToonzPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
 TOONZCACHEROOT=\"\$HOME/.config/OpenToonz/stuff/cache\"
 TOONZCONFIG=\"\$HOME/.config/OpenToonz/stuff/config\"
-TOONZFXPRESETS=\"\$HOME/.config/OpenToonz/stuff/projects/fxs\"
-TOONZLIBRARY=\"\$HOME/.config/OpenToonz/stuff/projects/library\"
+TOONZFXPRESETS=\"\$HOME/.config/OpenToonz/stuff/fxs\"
+TOONZLIBRARY=\"\$HOME/.config/OpenToonz/stuff/library\"
 TOONZPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
 TOONZPROJECTS=\"$HOME/.config/OpenToonz/stuff/projects\"
 TOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"

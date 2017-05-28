@@ -1143,6 +1143,8 @@
   <item>"STD_iwa_SpectrumFx.RGamma"	"R Gamma"	</item>
   <item>"STD_iwa_SpectrumFx.GGamma"	"G Gamma"	</item>
   <item>"STD_iwa_SpectrumFx.BGamma"	"B Gamma"	</item>
+  <item>"STD_iwa_SpectrumFx.loopSpectrumFadeWidth"	"Loop Spectrum Fade Width"	</item>
+  <item>"STD_iwa_SpectrumFx.spectrumShift"	"Spectrum Shift"	</item>
   <item>"STD_iwa_SpectrumFx.lensFactor"	"Lens Factor"	</item>
   <item>"STD_iwa_SpectrumFx.lightThres"	"Light Threshod"</item>
   <item>"STD_iwa_SpectrumFx.lightIntensity"	"Light Intensity"</item>
@@ -1175,6 +1177,7 @@
   <item>"STD_iwa_PNPerspectiveFx.waveHeight"		"Wave Height"</item>
   
   <item>"STD_iwa_SoapBubbleFx"	"SoapBubble Iwa"	</item>
+  <item>"STD_iwa_SoapBubbleFx.renderMode"	"Render Mode"	</item>
   <item>"STD_iwa_SoapBubbleFx.intensity"	"Intensity"	</item>
   <item>"STD_iwa_SoapBubbleFx.refractiveIndex"	"Refractive Index"	</item>
   <item>"STD_iwa_SoapBubbleFx.thickMax"	"Thick Max"	</item>
@@ -1182,7 +1185,13 @@
   <item>"STD_iwa_SoapBubbleFx.RGamma"	"R Gamma"	</item>
   <item>"STD_iwa_SoapBubbleFx.GGamma"	"G Gamma"	</item>
   <item>"STD_iwa_SoapBubbleFx.BGamma"	"B Gamma"	</item>
+  <item>"STD_iwa_SoapBubbleFx.loopSpectrumFadeWidth"	"Loop Spectrum Fade Width"	</item>
+  <item>"STD_iwa_SoapBubbleFx.spectrumShift"	"Spectrum Shift"	</item>
   <item>"STD_iwa_SoapBubbleFx.binarizeThresold"	"Threshold"	</item>
+  <item>"STD_iwa_SoapBubbleFx.multiSource"	"Multiple Bubbles in Shape Image"	</item>
+  <item>"STD_iwa_SoapBubbleFx.maskCenter"	"Mask Center of the Bubble"	</item>
+  <item>"STD_iwa_SoapBubbleFx.centerOpacity"	"Opacity of Bubble's Center"	</item>
+  <item>"STD_iwa_SoapBubbleFx.fitThickness"	"Fit Thickness Image to Each Bubble"	</item>
   <item>"STD_iwa_SoapBubbleFx.shapeAspectRatio"	"Shape Aspect Ratio"	</item>
   <item>"STD_iwa_SoapBubbleFx.blurRadius"	"Blur Radius"	</item>
   <item>"STD_iwa_SoapBubbleFx.blurPower"	"Power"	</item>
@@ -1195,6 +1204,26 @@
   <item>"STD_iwa_SoapBubbleFx.noiseDepthMixRatio"	"Noise to Depth"	</item>
   <item>"STD_iwa_SoapBubbleFx.noiseThicknessMixRatio"	"Noise to Thickness"	</item>
 
+  <item>"STD_iwa_BokehFx"	"Bokeh Iwa"</item>
+  <item>"STD_iwa_BokehFx.on_focus_distance"	"On-Focus Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_amount"	"Bokeh Amount"</item>
+  <item>"STD_iwa_BokehFx.hardness"	"Hardness"</item>
+  <item>"STD_iwa_BokehFx.premultiply1"		"Layer1 Premultiply"</item>
+  <item>"STD_iwa_BokehFx.distance1"		"Layer1 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment1"	"Layer1 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehFx.premultiply2"		"Layer2 Premultiply"</item>
+  <item>"STD_iwa_BokehFx.distance2"		"Layer2 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment2"	"Layer2 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehFx.premultiply3"		"Layer3 Premultiply"</item>
+  <item>"STD_iwa_BokehFx.distance3"		"Layer3 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment3"	"Layer3 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehFx.premultiply4"		"Layer4 Premultiply"</item>
+  <item>"STD_iwa_BokehFx.distance4"		"Layer4 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment4"	"Layer4 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehFx.premultiply5"		"Layer5 Premultiply"</item>
+  <item>"STD_iwa_BokehFx.distance5"		"Layer5 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment5"	"Layer5 Bokeh Adjustment"</item>
+  
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>

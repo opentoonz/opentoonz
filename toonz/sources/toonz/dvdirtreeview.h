@@ -32,6 +32,27 @@ class QFileSystemWatcher;
 
 //==============================================================
 
+class MyFileSystemWatcher : public QObject {  // singleton
+  Q_OBJECT
+
+  QStringList m_watchedPath;
+  QFileSystemWatcher *m_watcher;
+  MyFileSystemWatcher();
+
+public:
+  static MyFileSystemWatcher *instance() {
+    static MyFileSystemWatcher _instance;
+    return &_instance;
+  }
+
+  void addPaths(const QStringList &paths, bool onlyNewPath = false);
+  void removePaths(const QStringList &paths);
+  void removeAllPaths();
+
+signals:
+  void directoryChanged(const QString &path);
+};
+
 //**********************************************************************************
 //    DvDirTreeView  declaration
 //**********************************************************************************
@@ -155,6 +176,7 @@ public slots:
   void onExpanded(const QModelIndex &);
   void onCollapsed(const QModelIndex &);
   void onMonitoredDirectoryChanged(const QString &);
+  void onPreferenceChanged(const QString &);
 
 protected:
   QSize sizeHint() const override;
@@ -189,10 +211,9 @@ private:
   // Using for version control node refreshing
   DvDirVersionControlNode *m_currentRefreshedNode;
 
-  QFileSystemWatcher *m_dirFileSystemWatcher;
   /*- Refresh monitoring paths according to expand/shrink state of the folder
    * tree -*/
-  void updateWatcher();
+  void addPathsToWatcher();
   void getExpandedPathsRecursive(const QModelIndex &, QStringList &);
 };
 

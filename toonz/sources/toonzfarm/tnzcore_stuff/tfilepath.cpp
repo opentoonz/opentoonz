@@ -15,13 +15,12 @@ const char auxslash = '\\';
 //=============================================================================
 
 // TFrameId::operator string() const
-string TFrameId::expand(FrameFormat format) const {
+std::string TFrameId::expand(FrameFormat format) const {
   if (m_frame == EMPTY_FRAME)
     return "";
   else if (m_frame == NO_FRAME)
     return "-";
-  char buffer[80];
-  ostrstream o_buff(buffer, sizeof(buffer));
+  std::stringstream o_buff;
   if (format == FOUR_ZEROS) {
     o_buff.fill('0');
     o_buff.width(4);
@@ -31,8 +30,7 @@ string TFrameId::expand(FrameFormat format) const {
     o_buff << m_frame;
   }
   if (m_letter != '\0') o_buff << m_letter;
-  int len = o_buff.pcount();
-  return string(buffer, len);
+  return o_buff.str();
 }
 
 //-------------------------------------------------------------------

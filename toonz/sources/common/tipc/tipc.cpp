@@ -338,7 +338,8 @@ bool tipc::startSlaveServer(QString srvName, QString cmdline) {
   // the *MAIN* thread
   // in *this process* exits. So, if this is not the main thread, we must move
   // the socket there.
-  if (QThread::currentThread() != QCoreApplication::instance()->thread())
+  if (QCoreApplication::instance() &&
+      QThread::currentThread() != QCoreApplication::instance()->thread())
     dummySock->moveToThread(QCoreApplication::instance()->thread());
 
   // If a connection error takes place, release the dummy socket.

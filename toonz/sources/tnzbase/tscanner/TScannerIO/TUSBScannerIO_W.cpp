@@ -5,7 +5,7 @@
 
 #include <windows.h>
 
-#include <strstream>
+#include <sstream>
 
 class TUSBScannerIOPD {
 public:
@@ -17,7 +17,7 @@ public:
 //-----------------------------------------------------------------------------
 namespace {
 void buf2printable(const unsigned char *buffer, const int size,
-                   std::ostrstream &os) {
+                   std::stringstream &os) {
   int i = 0;
   if ((size == 2) && (buffer[0] == 0x1b)) {
     os << "ESC ";
@@ -79,8 +79,7 @@ int TUSBScannerIO::receive(unsigned char *buffer, int size) {
     ReadFile(m_data->m_handle, ptr, bytesToRead, &count, &overlapped);
     DWORD waitRC = WaitForSingleObject(overlapped.hEvent, INFINITE);
     if (m_data->m_trace) {
-      std::ostrstream os;
-      os.freeze(false);
+      std::stringstream os;
       os << "receive: size=" << size << " got = " << count << " buf=";
       buf2printable(ptr, count, os);
       os << '\n' << '\0';
@@ -109,8 +108,7 @@ int TUSBScannerIO::send(unsigned char *buffer, int size) {
     WriteFile(m_data->m_handle, buffer, bytesToWrite, &count, 0);
 
     if (m_data->m_trace) {
-      std::ostrstream os;
-      os.freeze(false);
+      std::stringstream os;
       os << "send: size=" << size << " wrote = " << count << " buf=";
       buf2printable(buffer, size, os);
       os << '\n' << '\0';

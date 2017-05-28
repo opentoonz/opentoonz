@@ -35,6 +35,7 @@ class LineEdit;
 class ColorField;
 class ProgressDialog;
 class CheckBox;
+class DoubleLineEdit;
 }
 
 namespace ImageUtils {
@@ -89,6 +90,8 @@ public slots:
   void onFormatChanged(const QString &);
   void onPalettePathChanged();
 
+  void onDpiModeSelected(int index);
+
 protected:
   Convert2Tlv *makeTlvConverter(const TFilePath &sourceFilePath);
   bool checkParameters() const;
@@ -112,6 +115,10 @@ private:
       *m_antialiasLabel;
 
   QPushButton *m_okBtn, *m_cancelBtn, *m_formatOptions;
+
+  QComboBox *m_dpiMode;
+  DVGui::DoubleLineEdit *m_dpiFld;
+  double m_imageDpi;
 
   class Converter;
   Converter *m_converter;

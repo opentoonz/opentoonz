@@ -9,7 +9,7 @@
 #include <cmath>
 
 //------------------------------------------------------------------------------
-#ifdef _WIN32
+#ifdef _MSC_VER
 #define ISNAN _isnan
 #else
 #define ISNAN std::isnan

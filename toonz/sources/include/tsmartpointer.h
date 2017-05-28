@@ -101,7 +101,7 @@ public:                                                                        \
 //=========================================================
 
 template <class T>
-class DVAPI TSmartPointerT {
+class TSmartPointerT {
 protected:
   T *m_pointer;
 
@@ -166,7 +166,7 @@ public:
 //=========================================================
 
 template <class DERIVED, class BASE>
-class DVAPI TDerivedSmartPointerT : public TSmartPointerT<DERIVED> {
+class TDerivedSmartPointerT : public TSmartPointerT<DERIVED> {
 public:
   typedef TDerivedSmartPointerT<DERIVED, BASE> DerivedSmartPointer;
 

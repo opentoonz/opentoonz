@@ -163,7 +163,7 @@ private:
 
   \sa DockLayout and DockPlaceholder classes.
 */
-class DVAPI DockWidget : public QWidget {
+class DVAPI DockWidget : public QFrame {
   friend class DockLayout;  // DockLayout is granted access to placeholders'
                             // privates
   friend class DockPlaceholder;  // As above.

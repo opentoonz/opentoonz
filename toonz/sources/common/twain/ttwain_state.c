@@ -1,6 +1,6 @@
 
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4996)
 #endif
 
@@ -676,9 +676,9 @@ static BOOL CALLBACK myHackEnumFunction2(HWND hwnd, LPARAM lParam) {
 
 /*---------------------------------------------------------------------------*/
 
-void bringToTop(HWND hwnd) { BringWindowToTop(hwnd); }
+static void bringToTop(HWND hwnd) { BringWindowToTop(hwnd); }
 
-void putToBottom(HWND hwnd) {
+static void putToBottom(HWND hwnd) {
   const int unused = 0;
 
   BOOL rc = SetWindowPos(hwnd,         // handle to window

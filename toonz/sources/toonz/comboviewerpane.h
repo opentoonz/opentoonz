@@ -52,6 +52,14 @@ class ComboViewerPanel final : public StyleShortcutSwitchablePanel,
   Ruler *m_hRuler;
   bool m_visibleFlag[CVPARTS_COUNT];
   bool m_onionSkinActive = false;
+  bool m_playSound       = true;
+  bool m_hasSoundtrack   = false;
+  bool m_playing         = false;
+  double m_fps;
+  int m_viewerFps;
+  double m_samplesPerFrame;
+  bool m_first         = true;
+  TSoundTrack *m_sound = NULL;
 
   TPanelTitleBarButton *m_previewButton;
   TPanelTitleBarButton *m_subcameraPreviewButton;
@@ -99,6 +107,8 @@ protected:
     m_flipConsole->makeCurrent();
   };
   void widgetClearFocusOnLeave() override { m_sceneViewer->clearFocus(); };
+  void playAudioFrame(int frame);
+  bool hasSoundtrack();
 
 public slots:
   void onSceneChanged();
@@ -109,6 +119,7 @@ public slots:
   // for showing/hiding the parts
   void onShowHideActionTriggered(QAction *);
   void enableFlipConsoleForCamerastand(bool on);
+  void onButtonPressed(FlipConsole::EGadget button);
 
 protected slots:
   void onFrameChanged();

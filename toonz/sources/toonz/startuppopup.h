@@ -52,7 +52,8 @@ class StartupPopup final : public DVGui::Dialog {
   CameraSettingsWidget *m_cameraSettingsWidget;
   double m_dpi;
   int m_xRes, m_yRes;
-  bool m_updating = false;
+  const int RECENT_SCENES_MAX_COUNT = 10;
+  bool m_updating                   = false;
   QString m_presetListFile;
   QGroupBox *m_projectBox;
   QGroupBox *m_sceneBox;
@@ -67,6 +68,7 @@ protected:
   void showEvent(QShowEvent *) override;
   void loadPresetList();
   void savePresetList();
+  void refreshRecentScenes();
   QString aspectRatioValueToString(double value, int width = 0, int height = 0);
   double aspectRatioStringToValue(const QString &s);
   bool parsePresetString(const QString &str, QString &name, int &xres,

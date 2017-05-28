@@ -6,7 +6,7 @@ Building OpenToonz from source requires the following dependencies:
 - Git
 - GCC or Clang
 - CMake (3.4.1 or newer).
-- Qt5 (5.5 or newer)
+- Qt5 (5.6 or newer)
 - Boost (1.55 or newer)
 - SDL2
 - LibPNG
@@ -144,7 +144,7 @@ You can now run the application:
 
 ```
 $ cd bin
-$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz_1.0
+$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz_1.1
 ```
 
 ### Performing a System Installation

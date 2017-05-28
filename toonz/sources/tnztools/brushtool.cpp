@@ -374,6 +374,12 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
                                                 frameCreated, levelCreated));
   }
 
+  // Update regions. It will call roundStroke() in
+  // TVectorImage::Imp::findIntersections().
+  // roundStroke() will slightly modify all the stroke positions.
+  // It is needed to update information for Fill Check.
+  vi->findRegions();
+
   for (int k = 0; k < (int)strokes.size(); k++) delete strokes[k];
   strokes.clear();
 

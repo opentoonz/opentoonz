@@ -2582,7 +2582,7 @@ public:
     m_quasiArea += (p2.y + p1.y) * (p1.x - p2.x);
   }
 
-  bool isClockwise() { return m_quasiArea > 0.5; }
+  bool isClockwise() { return m_quasiArea > 0.1; }
 };
 
 //----------------------------------------------------------------------------------------------

@@ -402,8 +402,8 @@ class PlasticToolOptionsBox final : public GenericToolOptionsBox,
   Q_OBJECT
 
 public:
-  PlasticToolOptionsBox(QWidget *parent, TTool *tool,
-                        TPaletteHandle *pltHandle);
+  PlasticToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                        ToolHandle *toolHandle);
 
 private:
   class SkelIdsComboBox;

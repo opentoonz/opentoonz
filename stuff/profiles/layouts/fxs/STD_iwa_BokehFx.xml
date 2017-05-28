@@ -1,0 +1,44 @@
+<fxlayout help_command="iexplore" help_file="BokehIwa.html">
+	<page name="Bokeh Iwa">
+ 	<vbox>
+		<control>on_focus_distance</control>
+		<control>bokeh_amount</control>
+		<control>hardness</control>
+  	</vbox>
+  
+      	<separator label="Layer1"/>
+   	<vbox>
+		<control>premultiply1</control>
+		<control>distance1</control>
+		<control>bokeh_adjustment1</control>
+   	</vbox>
+
+      	<separator label="Layer2"/>
+   	<vbox>
+		<control>premultiply2</control>
+		<control>distance2</control>
+		<control>bokeh_adjustment2</control>
+   	</vbox>
+
+      	<separator label="Layer3"/>
+   	<vbox>
+		<control>premultiply3</control>
+		<control>distance3</control>
+		<control>bokeh_adjustment3</control>
+   	</vbox>
+
+      	<separator label="Layer4"/>
+   	<vbox>
+		<control>premultiply4</control>
+		<control>distance4</control>
+		<control>bokeh_adjustment4</control>
+   	</vbox>
+
+      	<separator label="Layer5"/>
+   	<vbox>
+		<control>premultiply5</control>
+		<control>distance5</control>
+		<control>bokeh_adjustment5</control>
+   	</vbox>
+	</page>
+</fxlayout>

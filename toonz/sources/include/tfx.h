@@ -210,16 +210,16 @@ public:
   double m_end;
 };
 
-inline DVAPI TFxTimeRegion operator+(const TFxTimeRegion &tr1,
-                                     const TFxTimeRegion &tr2) {
+inline TFxTimeRegion operator+(const TFxTimeRegion &tr1,
+                               const TFxTimeRegion &tr2) {
   return TFxTimeRegion(tr1) += tr2;
 }
 
-inline DVAPI TFxTimeRegion operator+(const TFxTimeRegion &tr1, double shift) {
+inline TFxTimeRegion operator+(const TFxTimeRegion &tr1, double shift) {
   return TFxTimeRegion(tr1) += shift;
 }
 
-inline DVAPI TFxTimeRegion operator-(const TFxTimeRegion &tr1, double shift) {
+inline TFxTimeRegion operator-(const TFxTimeRegion &tr1, double shift) {
   return TFxTimeRegion(tr1) -= shift;
 }
 
@@ -499,6 +499,10 @@ public:
   virtual void callEndRenderFrameHandler(const TRenderSettings *rs,
                                          double frame) {}
 
+  // This function will be called in TFx::loadData whenever the obsolete
+  // parameter is loaded. Do nothing by default.
+  virtual void onObsoleteParamLoaded(const std::string &paramName) {}
+
 public:
   // Id-related functions
 
@@ -539,6 +543,7 @@ inline std::string TFx::getFxType() const { return getDeclaration()->getId(); }
 //-------------------------------------------------------------------
 
 #define FX_DECLARATION(T)                                                      \
+  \
 public:                                                                        \
   const TPersistDeclaration *getDeclaration() const override;
 

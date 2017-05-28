@@ -15,6 +15,8 @@
 #include "toonz/txsheet.h"
 #include "toonz/fxdag.h"
 #include "toonz/tapplication.h"
+#include "toonz/txshzeraryfxcolumn.h"
+#include "toonz/tcolumnfx.h"
 #include "tw/stringtable.h"
 
 // TnzBase includes
@@ -25,6 +27,7 @@
 // TnzCore includes
 #include "tstream.h"
 #include "tsystem.h"
+#include "tconst.h"
 
 // Qt includes
 #include <QMenu>
@@ -557,6 +560,18 @@ void AddFxContextMenu::onAddFx(QAction *action) {
     TFxCommand::addFx(fx, fxs, m_app,
                       m_app->getCurrentColumn()->getColumnIndex(),
                       m_app->getCurrentFrame()->getFrameIndex());
+
+    // move the zerary fx node to the clicked position
+    if (fx->isZerary() &&
+        fx->getAttributes()->getDagNodePos() != TConst::nowhere) {
+      TXsheet *xsh = m_app->getCurrentXsheet()->getXsheet();
+      TXshZeraryFxColumn *column =
+          xsh->getColumn(m_app->getCurrentColumn()->getColumnIndex())
+              ->getZeraryFxColumn();
+      if (column)
+        column->getZeraryColumnFx()->getAttributes()->setDagNodePos(
+            fx->getAttributes()->getDagNodePos());
+    }
 
     m_app->getCurrentXsheet()->notifyXsheetChanged();
     // memorize the latest operation

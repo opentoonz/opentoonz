@@ -1096,6 +1096,14 @@ PegbarChannelField::PegbarChannelField(TTool *tool,
 
 void PegbarChannelField::onChange(TMeasuredValue *fld) {
   if (!m_tool->isEnabled()) return;
+
+  // the camera will crash with a value of 0
+  if (m_tool->getObjectId().isCamera()) {
+    if (fld->getMeasure()->getName() == "scale" &&
+        fld->getValue(TMeasuredValue::MainUnit) == 0) {
+      fld->setValue(TMeasuredValue::MainUnit, 0.0001);
+    }
+  }
   TUndoManager::manager()->beginBlock();
   TStageObjectValues before;
   before.setFrameHandle(m_frameHandle);

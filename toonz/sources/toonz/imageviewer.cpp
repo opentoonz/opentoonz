@@ -200,7 +200,7 @@ public:
 
 ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook,
                          bool showHistogram)
-    : QOpenGLWidget(parent)
+    : GLWidgetForHighDpi(parent)
     , m_pressedMousePos(0, 0)
     , m_mouseButton(Qt::NoButton)
     , m_draggingZoomSelection(false)
@@ -322,7 +322,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   bool addedSep = false;
 
-  if (m_isHistogramEnable && visibleRegion().contains(event->pos())) {
+  if (m_isHistogramEnable &&
+      visibleRegion().contains(event->pos() * getDevPixRatio())) {
     menu->addSeparator();
     addedSep = true;
     action   = menu->addAction(tr("Show Histogram"));
@@ -729,18 +730,20 @@ void ImageViewer::updateCursor(const TPoint &curPos) {
 /*! If middle button is pressed pan the image. Update current mouse position.
 */
 void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
-  TPoint curPos = TPoint(event->pos().x(), event->pos().y());
+  QPoint curQPos = event->pos() * getDevPixRatio();
+
+  TPoint curPos = TPoint(curQPos.x(), curQPos.y());
 
   if (m_visualSettings.m_defineLoadbox && m_flipbook) {
     if (m_mouseButton == Qt::LeftButton)
       updateLoadbox(curPos);
     else if (m_mouseButton == Qt::MidButton)
-      panQt(event->pos() - m_pos);
+      panQt(curQPos - m_pos);
     else
       updateCursor(curPos);
     update();
     event->ignore();
-    m_pos = event->pos();
+    m_pos = curQPos;
     return;
   }
 
@@ -762,11 +765,11 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
   }
 
   if (m_compareSettings.m_dragCompareX || m_compareSettings.m_dragCompareY)
-    dragCompare(event->pos() - m_pos);
+    dragCompare(curQPos - m_pos);
   else if (m_mouseButton == Qt::MidButton)
-    panQt(event->pos() - m_pos);
+    panQt(curQPos - m_pos);
 
-  m_pos = event->pos();
+  m_pos = curQPos;
 
   // pick the color if the histogram popup is opened
   if (m_isHistogramEnable && m_histogramPopup->isVisible() && !m_isColorModel) {
@@ -830,8 +833,10 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
   if (!m_isHistogramEnable) return;
   if (!m_histogramPopup->isVisible()) return;
 
+  QPoint curPos = event->pos() * getDevPixRatio();
+
   // avoid to pick outside of the flip
-  if ((!m_image) || !rect().contains(event->pos())) {
+  if ((!m_image) || !rect().contains(curPos)) {
     // throw transparent color
     m_histogramPopup->updateInfo(TPixel32::Transparent, TPointD(-1, -1));
     return;
@@ -839,7 +844,7 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
 
   StylePicker picker(m_image);
 
-  TPoint mousePos = TPoint(event->pos().x(), height() - 1 - event->pos().y());
+  TPoint mousePos = TPoint(curPos.x(), height() - 1 - curPos.y());
   TRectD area     = TRectD(mousePos.x, mousePos.y, mousePos.x, mousePos.y);
 
   // iwsw commented out temporarily
@@ -854,7 +859,7 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
   // Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
   //	get3DLutUtil()->releaseFBO();
 
-  QPoint viewP = mapFrom(this, event->pos());
+  QPoint viewP = mapFrom(this, curPos);
   TPointD pos  = getViewAff().inv() *
                 TPointD(viewP.x() - width() / 2, -viewP.y() + height() / 2);
   TPointD imagePos = TPointD(0.5 * m_image->getBBox().getLx() + pos.x,
@@ -952,7 +957,7 @@ void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
 //------------------------------------------------------------------------------
 
 void ImageViewer::mousePressEvent(QMouseEvent *event) {
-  m_pos                   = event->pos();
+  m_pos                   = event->pos() * getDevPixRatio();
   m_pressedMousePos       = TPoint(m_pos.x(), m_pos.y());
   m_mouseButton           = event->button();
   m_draggingZoomSelection = false;
@@ -1036,8 +1041,8 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
 void ImageViewer::wheelEvent(QWheelEvent *event) {
   if (event->orientation() == Qt::Horizontal) return;
   int delta = event->delta() > 0 ? 120 : -120;
-  QPoint center(event->pos().x() - width() / 2,
-                -event->pos().y() + height() / 2);
+  QPoint center(event->pos().x() * getDevPixRatio() - width() / 2,
+                -event->pos().y() * getDevPixRatio() + height() / 2);
   zoomQt(center, exp(0.001 * delta));
 }
 
@@ -1146,7 +1151,8 @@ void ImageViewer::adaptView(const QRect &geomRect) {
 void ImageViewer::doSwapBuffers() { glFlush(); }
 
 void ImageViewer::changeSwapBehavior(bool enable) {
-  setUpdateBehavior(enable ? PartialUpdate : NoPartialUpdate);
+  // do nothing for now as setUpdateBehavior is not available with QGLWidget
+  // setUpdateBehavior(enable ? PartialUpdate : NoPartialUpdate);
 }
 
 //-----------------------------------------------------------------------------

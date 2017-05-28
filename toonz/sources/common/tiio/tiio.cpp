@@ -13,8 +13,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4786)
+#endif
+
+#ifdef _WIN32
 #include <io.h>
 #endif
 

@@ -8,6 +8,8 @@
 // TnzCore includes
 #include "tsmartpointer.h"
 #include "tpersist.h"
+#include "tmeshimage.h" // add imported template
+                        // instance tcg::Vertex<TPointD> (for Windows dll)
 
 // TnzExt includes
 #include "plastichandle.h"
@@ -169,7 +171,9 @@ private:
 //===============================================================================
 
 #ifdef _WIN32
+#ifndef TFX_EXPORTS
 template class DVAPI TSmartPointerT<PlasticSkeleton>;
+#endif
 #endif
 
 typedef TSmartPointerT<PlasticSkeleton> PlasticSkeletonP;
