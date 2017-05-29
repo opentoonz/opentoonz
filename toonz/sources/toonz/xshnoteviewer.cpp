@@ -373,7 +373,8 @@ NoteWidget::NoteWidget(XsheetViewer *parent, int noteIndex)
 
 void NoteWidget::paint(QPainter *painter, QPoint pos, bool isCurrent) {
   painter->translate(pos);
-  QRect rect(0, 0, width(), height());
+//  QRect rect(0, 0, width(), height());
+  QRect rect = m_viewer->orientation()->rect(PredefinedRect::NOTE_ICON);
 
   TXshNoteSet *notes   = m_viewer->getXsheet()->getNotes();
   TSceneProperties *sp = m_viewer->getXsheet()->getScene()->getProperties();

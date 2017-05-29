@@ -540,9 +540,9 @@ ColumnArea::DrawHeader::DrawHeader(ColumnArea *nArea, QPainter &nP, int nCol)
 void ColumnArea::DrawHeader::prepare() const {
 // Preparing painter
 #ifdef _WIN32
-  QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+  QFont font("Arial", XSHEET_FONT_PX_SIZE, QFont::Normal);
 #else
-  QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+  QFont font("Helvetica", XSHEET_FONT_PX_SIZE, QFont::Normal);
 #endif
   p.setFont(font);
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -842,6 +842,85 @@ void ColumnArea::setDragTool(DragTool *dragTool) {
 }
 
 //-----------------------------------------------------------------------------
+void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
+	const Orientation *o = m_viewer->orientation();
+
+	QPoint orig = m_viewer->positionToXY(CellPosition(0, col));
+	QRect rect = o->rect(PredefinedRect::FOLDED_LAYER_HEADER).translated(orig);
+
+	int x0, y0, x, y;
+
+	if (o->isVerticalTimeline())
+	{
+		x0 = rect.topLeft().x() + 1;
+		y0 = 0;
+
+		p.setPen(m_viewer->getDarkLineColor());
+		p.fillRect(x0, 0, rect.width(), 18, QBrush(m_viewer->getDarkBGColor()));
+		p.fillRect(x0, 16, 2, rect.height() - 33, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(x0 + 3, 19, 2, rect.height() - 35, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(x0 + 6, 16, 2, rect.height() - 33, QBrush(m_viewer->getLightLightBGColor()));
+
+		p.setPen(m_viewer->getDarkLineColor());
+		p.drawLine(x0 - 1, 16, x0 - 1, rect.height());
+		p.drawLine(x0 + 2, 16, x0 + 2, rect.height());
+		p.drawLine(x0 + 5, 16, x0 + 5, rect.height());
+		p.drawLine(x0, 16, x0 + 1, 16);
+		p.drawLine(x0 + 3, 19, x0 + 4, 19);
+		p.drawLine(x0 + 6, 16, x0 + 7, 16);
+
+		// triangolini
+		p.setPen(Qt::black);
+		x = x0;
+		y = 12;
+		p.drawPoint(QPointF(x, y));
+		x++;
+		p.drawLine(x, y - 1, x, y + 1);
+		x++;
+		p.drawLine(x, y - 2, x, y + 2);
+		x += 3;
+		p.drawLine(x, y - 2, x, y + 2);
+		x++;
+		p.drawLine(x, y - 1, x, y + 1);
+		x++;
+		p.drawPoint(x, y);
+	}
+	else
+	{
+		x0 = 0;
+		y0 = rect.topLeft().y() + 1;
+
+		p.setPen(m_viewer->getDarkLineColor());
+		p.fillRect(0, y0, 18, rect.height(), QBrush(m_viewer->getDarkBGColor()));
+		p.fillRect(16, y0, rect.width() - 33, 2, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(19, y0 + 3, rect.width() - 35, 2, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(16, y0 + 6, rect.width() - 33, 2, QBrush(m_viewer->getLightLightBGColor()));
+
+		p.setPen(m_viewer->getDarkLineColor());
+		p.drawLine(16, y0 - 1, rect.width(), y0 - 1);
+		p.drawLine(16, y0 + 2, rect.width(), y0 + 2);
+		p.drawLine(16, y0 + 5, rect.width(), y0 + 5);
+		p.drawLine(16, y0, 16, y0 + 1);
+		p.drawLine(19, y0 + 3, 19, y0 + 4);
+		p.drawLine(16, y0 + 6, 16, y0 + 7);
+
+		// triangolini
+		p.setPen(Qt::black);
+		x = 12;
+		y = y0;
+		p.drawPoint(QPointF(x, y));
+		y++;
+		p.drawLine(x - 1, y, x + 1, y);
+		y++;
+		p.drawLine(x - 2, y, x + 2, y);
+		y += 3;
+		p.drawLine(x - 2, y, x + 2, y);
+		y++;
+		p.drawLine(x - 1, y, x + 1, y);
+		y++;
+		p.drawPoint(x, y);
+	}
+}
 
 void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   TColumnSelection *selection = m_viewer->getColumnSelection();
@@ -1024,7 +1103,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
   int currentColumnIndex = m_viewer->getCurrentColumn();
-  int x                  = m_viewer->columnToX(col);
+  int x                  = m_viewer->columnToLayerAxis(col);
 
   QRect rect(x, 0, ColumnWidth, height());
 
@@ -1238,41 +1317,7 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   for (col = c0; col <= c1; col++) {
     // draw column fan (collapsed columns)
     if (!columnFan->isActive(col)) {
-      int x = m_viewer->columnToLayerAxis(col);
-      QRect rect(x, 0, 8, height());
-      int x0 = rect.topLeft().x() + 1;
-      int y  = 16;
-
-      p.setPen(m_viewer->getDarkLineColor());
-      p.fillRect(x0, 0, 8, 18, QBrush(m_viewer->getDarkBGColor()));
-      p.fillRect(x0, y, 2, 84, QBrush(m_viewer->getLightLightBGColor()));
-      p.fillRect(x0 + 3, y + 3, 2, 82,
-                 QBrush(m_viewer->getLightLightBGColor()));
-      p.fillRect(x0 + 6, y, 2, 84, QBrush(m_viewer->getLightLightBGColor()));
-
-      p.setPen(m_viewer->getDarkLineColor());
-      p.drawLine(x0 - 1, y, x0 - 1, rect.height());
-      p.drawLine(x0 + 2, y, x0 + 2, rect.height());
-      p.drawLine(x0 + 5, y, x0 + 5, rect.height());
-      p.drawLine(x0, y, x0 + 1, y);
-      p.drawLine(x0 + 3, y + 3, x0 + 4, y + 3);
-      p.drawLine(x0 + 6, y, x0 + 7, y);
-
-      // triangolini
-      p.setPen(Qt::black);
-      x = x0;
-      y = y - 4;
-      p.drawPoint(QPointF(x, y));
-      x++;
-      p.drawLine(x, y - 1, x, y + 1);
-      x++;
-      p.drawLine(x, y - 2, x, y + 2);
-      x += 3;
-      p.drawLine(x, y - 2, x, y + 2);
-      x++;
-      p.drawLine(x, y - 1, x, y + 1);
-      x++;
-      p.drawPoint(x, y);
+		drawFoldedColumnHead(p, col);
     } else if (col >= 0) {
       TXshColumn *column = m_viewer->getXsheet()->getColumn(col);
 
@@ -1477,6 +1522,12 @@ void ColumnArea::startTransparencyPopupTimer(QMouseEvent *e) {  // AREA
   int x = e->pos().x() - m_tabBox.left() -
           m_viewer->columnToLayerAxis(m_col);  // what is happening here?
   int y = e->pos().y() - m_tabBox.bottom();
+
+  if (!m_viewer->orientation()->isVerticalTimeline())
+  {
+	  x = e->pos().x() - m_tabBox.left() + 6;
+	  y = e->pos().y() - m_tabBox.top() + 4 - m_viewer->columnToLayerAxis(m_col);
+  }
   m_columnTransparencyPopup->move(e->globalPos().x() - x + 2,
                                   e->globalPos().y() - y + 1);
 

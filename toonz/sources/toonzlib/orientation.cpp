@@ -24,6 +24,8 @@ class TopToBottomOrientation : public Orientation {
   const int EXTENDER_HEIGHT     = 8;
   const int SOUND_PREVIEW_WIDTH = 7;
   const int LAYER_HEADER_HEIGHT = CELL_HEIGHT * 3 + 60;
+  const int FOLDED_LAYER_HEADER_HEIGHT = LAYER_HEADER_HEIGHT;
+  const int FOLDED_LAYER_HEADER_WIDTH = 8;
   const int FRAME_HEADER_WIDTH  = CELL_WIDTH;
   const int PLAY_RANGE_X        = FRAME_HEADER_WIDTH / 2 - PLAY_MARKER_SIZE;
   const int ONION_X = 0, ONION_Y = 0;
@@ -79,6 +81,8 @@ class LeftToRightOrientation : public Orientation {
   const int LAYER_NAME_WIDTH   = 130;
   const int LAYER_HEADER_WIDTH =
       ICONS_WIDTH + LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH;
+  const int FOLDED_LAYER_HEADER_HEIGHT = 8;
+  const int FOLDED_LAYER_HEADER_WIDTH = LAYER_HEADER_WIDTH;
 
 public:
   LeftToRightOrientation();
@@ -261,12 +265,16 @@ TopToBottomOrientation::TopToBottomOrientation() {
       QRect(CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect(PredefinedRect::NOTE_AREA,
           QRect(QPoint(0, 0), QSize(FRAME_HEADER_WIDTH, LAYER_HEADER_HEIGHT)));
+  addRect(PredefinedRect::NOTE_ICON,
+	  QRect(QPoint(0, 0), QSize(CELL_WIDTH - 2, CELL_HEIGHT - 2)));
   addRect(PredefinedRect::FRAME_LABEL,
-          QRect(3, 1, CELL_WIDTH - 6, CELL_HEIGHT - 2));
+          QRect(CELL_WIDTH / 2, 1, CELL_WIDTH / 2, CELL_HEIGHT - 2));
   addRect(PredefinedRect::FRAME_HEADER,
           QRect(0, 0, FRAME_HEADER_WIDTH, CELL_HEIGHT));
   addRect(PredefinedRect::LAYER_HEADER,
           QRect(0, 0, CELL_WIDTH, LAYER_HEADER_HEIGHT));
+  addRect(PredefinedRect::FOLDED_LAYER_HEADER,
+	  QRect(0, 0, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT));
   addRect(PredefinedRect::PLAY_RANGE,
           QRect(PLAY_RANGE_X, 0, PLAY_MARKER_SIZE, CELL_HEIGHT));
   addRect(PredefinedRect::ONION,
@@ -332,7 +340,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addDimension(PredefinedDimension::SOUND_AMPLITUDE,
                int(sqrt(CELL_HEIGHT * soundRect.width()) / 2));
   addDimension(PredefinedDimension::FRAME_LABEL_ALIGN,
-               Qt::AlignRight | Qt::AlignVCenter);
+               Qt::AlignCenter);
   addDimension(PredefinedDimension::ONION_TURN, 0);
   addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION,
                QBoxLayout::Direction::TopToBottom);
@@ -495,13 +503,17 @@ LeftToRightOrientation::LeftToRightOrientation() {
                 CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::NOTE_AREA,
           QRect(QPoint(0, 0), QSize(LAYER_HEADER_WIDTH, FRAME_HEADER_HEIGHT)));
+  addRect(PredefinedRect::NOTE_ICON,
+	  QRect(QPoint(0, 0), QSize(CELL_WIDTH - 2, CELL_HEIGHT - 2)));
   addRect(
       PredefinedRect::FRAME_LABEL,
-      QRect(CELL_WIDTH / 2, 1, CELL_WIDTH / 2 - 1, FRAME_HEADER_HEIGHT - 2));
+      QRect(CELL_WIDTH / 4, 1, CELL_WIDTH / 2, FRAME_HEADER_HEIGHT - 2));
   addRect(PredefinedRect::FRAME_HEADER,
           QRect(0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT));
   addRect(PredefinedRect::LAYER_HEADER,
           QRect(0, 0, LAYER_HEADER_WIDTH, CELL_HEIGHT));
+  addRect(PredefinedRect::FOLDED_LAYER_HEADER,
+	  QRect(0, 0, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT));
   addRect(PredefinedRect::PLAY_RANGE,
           QRect(0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
   addRect(PredefinedRect::ONION,
@@ -568,7 +580,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addDimension(PredefinedDimension::INDEX, 1);
   addDimension(PredefinedDimension::SOUND_AMPLITUDE, soundRect.height() / 2);
   addDimension(PredefinedDimension::FRAME_LABEL_ALIGN,
-               Qt::AlignRight | Qt::AlignBottom | Qt::TextWordWrap);
+               Qt::AlignHCenter | Qt::AlignBottom | Qt::TextWordWrap);
   addDimension(PredefinedDimension::ONION_TURN, 90);
   addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION,
                QBoxLayout::Direction::LeftToRight);

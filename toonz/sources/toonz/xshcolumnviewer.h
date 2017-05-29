@@ -257,6 +257,7 @@ public:
 #endif
   ~ColumnArea();
 
+  void drawFoldedColumnHead(QPainter &p, int col);
   void drawLevelColumnHead(QPainter &p, int col);
   void drawSoundColumnHead(QPainter &p, int col);
   void drawPaletteColumnHead(QPainter &p, int col);

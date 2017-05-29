@@ -547,8 +547,11 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   TXshCell cell = xsh->getCell(row, col);
   QPoint xy     = m_viewer->positionToXY(CellPosition(row, col)) - QPoint(1, 2);
   if (!cell.isEmpty()) {
-    setFixedSize(XsheetGUI::ColumnWidth - 5, XsheetGUI::RowHeight + 4);
-    move(xy);
+	if (m_viewer->orientation()->isVerticalTimeline())
+		setFixedSize(m_viewer->orientation()->dimension(PredefinedDimension::LAYER), XsheetGUI::RowHeight + 4);
+	else
+		setFixedSize(m_viewer->orientation()->dimension(PredefinedDimension::FRAME), XsheetGUI::RowHeight + 4);
+	move(xy + QPoint(0, -2));
 
     TFrameId fid           = cell.getFrameId();
     std::wstring levelName = cell.m_level->getName();
@@ -578,8 +581,11 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   }
   // clear the field if the empty cell is clicked
   else {
-    setFixedSize(XsheetGUI::ColumnWidth + 3, XsheetGUI::RowHeight + 4);
-    move(xy);
+	if (m_viewer->orientation()->isVerticalTimeline())
+		setFixedSize(m_viewer->orientation()->dimension(PredefinedDimension::LAYER), XsheetGUI::RowHeight + 4);
+	else
+		setFixedSize(m_viewer->orientation()->dimension(PredefinedDimension::FRAME), XsheetGUI::RowHeight + 4);
+	move(xy + QPoint(-1, -2));
 
     setText("");
   }
@@ -1317,9 +1323,16 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   drawDragHandle(p, xy, sideColor);
 
   if (yetToCleanupCell)  // ORIENTATION: what's this?
-    p.fillRect(
-        rect.adjusted(rect.width() / 2, 0, 0, 0),
-        (isSelected) ? SelectedFullcolorColumnColor : FullcolorColumnColor);
+  {
+	  if (o->isVerticalTimeline())
+		  p.fillRect(
+			  rect.adjusted(rect.width() / 2, 0, 0, 0),
+			  (isSelected) ? SelectedFullcolorColumnColor : FullcolorColumnColor);
+	  else
+		  p.fillRect(
+			  rect.adjusted(0, rect.height() / 2, 0, 0),
+			  (isSelected) ? SelectedFullcolorColumnColor : FullcolorColumnColor);
+  }
 
   bool isLastRow = nextCell.isEmpty() ||
                    cell.m_level.getPointer() != nextCell.m_level.getPointer();
@@ -1513,7 +1526,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   int x          = xy.x();
   int y          = xy.y();
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(xy);
-  QRect rect     = cellRect.adjusted(1, 1, -1, -1);
+  QRect rect     = cellRect.adjusted(1, 1, 0, 0);
   if (cell.isEmpty()) {  // this means the former is not empty
     QColor levelEndColor = m_viewer->getTextColor();
     levelEndColor.setAlphaF(0.3);

@@ -72,9 +72,11 @@ enum class PredefinedRect {
   BEGIN_SOUND_EDIT,         //! top sound resize
   END_SOUND_EDIT,           //! bottom sound resize
   NOTE_AREA,                //! size of top left note controls
+  NOTE_ICON,                //! size of note icons that appear in cells area
   FRAME_LABEL,              //! area for writing frame number
   FRAME_HEADER,
   LAYER_HEADER,
+  FOLDED_LAYER_HEADER,      //! size of layer header when it is folded
   PLAY_RANGE,       //! area for play range marker within frame header
   ONION,            //! onion handle placement
   ONION_DOT,        //! moveable dot placement
