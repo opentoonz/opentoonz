@@ -15,7 +15,7 @@ namespace {
 #define _pri_h_
 
 /* Windowsではstdint.hが見付からない */
-#if defined _WIN32
+#if defined _MSC_VER
 typedef int int32_t;
 #else
 #include <stdint.h> /* for int32_t */
@@ -211,7 +211,7 @@ private:
 #include <stdio.h>
 
 /* Windowsではstdint.hが見つからない */
-#if defined _WIN32
+#if defined _MSC_VER
 typedef int int32_t;
 typedef unsigned short uint16_t;
 #else
@@ -316,7 +316,7 @@ list_node *list_root::pop(list_node *clp_old) {
 #include <stdio.h>
 
 /* Windowsではstdint.hが見つからない */
-#if defined _WIN32
+#if defined _MSC_VER
 typedef int int32_t;
 #else
 #include <stdint.h> /* for int32_t */
@@ -631,7 +631,7 @@ int brush_curve_blur::save(double d_xp, double d_yp, const char *cp_fname) {
 #include <stdio.h>
 
 /* Windowsではstdint.hが見つからない */
-#if defined _WIN32
+#if defined _MSC_VER
 typedef int int32_t;
 typedef unsigned short uint16_t;
 #else
@@ -1040,7 +1040,7 @@ private:
 #include "igs_line_blur.h"  // "pri.h" "calculator_geometry.h"
 
 /* WindowsではM_PIが見つからない */
-#if defined _WIN32
+#if defined _MSC_VER
 #define M_PI 3.14159265358979323846
 #endif
 
@@ -1138,7 +1138,7 @@ void calculator_geometry::get_dd_rotate_by_pos(double d_xp1, double d_yp1,
 #include <stdio.h>
 
 /* Windowsではstdint.hが見つからない */
-#if defined _WIN32
+#if defined _MSC_VER
 typedef int int32_t;
 typedef unsigned short uint16_t;
 #else
@@ -1822,7 +1822,7 @@ void pixel_line_node::int2double_body(void) {
 #include "igs_line_blur.h"  // "pri.h" "pixel_line_node.h"
 
 /* WindowsではM_PIが見つからない */
-#if defined _WIN32
+#if defined _MSC_VER
 #define M_PI 3.14159265358979323846
 #endif
 
@@ -2473,7 +2473,7 @@ private:
 #include "igs_line_blur.h"  // "pri.h" "pixel_line_root.h" "pixel_select_same_way.h"
 
 /* WindowsではM_PIが見つからない */
-#if defined _WIN32
+#if defined _MSC_VER
 #define M_PI 3.14159265358979323846
 #endif
 
@@ -4012,7 +4012,7 @@ private:
 #include <math.h>   /* M_PI */
 
 /* WindowsではM_PIが見つからない */
-#if defined _WIN32
+#if defined _MSC_VER
 #define M_PI 3.14159265358979323846
 #endif
 
@@ -4428,7 +4428,7 @@ int pixel_select_curve_blur_root::save(double d_xp, double d_yp,
 #include <stdio.h>
 
 /* Windowsではstdint.hが見つからない */
-#if defined _WIN32
+#if defined _MSC_VER
 typedef int int32_t;
 typedef unsigned short uint16_t;
 #else

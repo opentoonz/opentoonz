@@ -36,10 +36,14 @@ protected:
   void keyPressEvent(QKeyEvent *event) override;
   bool eventFilter(QObject *, QEvent *) override;
 
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
+
   void renameCell();
 
 protected slots:
   void onReturnPressed();
+  void onXsheetChanged();
 };
 
 //=============================================================================
@@ -98,6 +102,7 @@ public:
   void showRenameField(int row, int col, bool multiColumnSelected = false) {
     m_renameCell->showInRowCol(row, col, multiColumnSelected);
   }
+  void hideRenameField() { m_renameCell->hide(); }
 
 protected:
   void paintEvent(QPaintEvent *) override;

@@ -994,8 +994,13 @@ void PreviewFxRenderPort::onRenderRasterStarted(
 
 void PreviewFxRenderPort::onRenderRasterCompleted(
     const RenderData &renderData) {
-  /*-- 計算の途中でキャンセルされた場合、結果を出さない --*/
-  if (renderData.m_info.m_isCanceled && *renderData.m_info.m_isCanceled) return;
+  /*-- Do not show the result if canceled while rendering --*/
+  if (renderData.m_info.m_isCanceled && *renderData.m_info.m_isCanceled) {
+    // set m_renderFailed to true in order to prevent updating
+    // m_overallRenderedRegion at PreviewFxInstance::onRenderFinished().
+    m_owner->m_renderFailed = true;
+    return;
+  }
 
   m_owner->onRenderRasterCompleted(renderData);
 }

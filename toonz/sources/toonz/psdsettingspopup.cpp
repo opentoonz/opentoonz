@@ -169,8 +169,18 @@ PsdSettingsPopup::PsdSettingsPopup()
   m_createSubXSheet->setMaximumHeight(WidgetHeight);
   m_createSubXSheet->setEnabled(false);
 
+  m_levelNameType = new QComboBox();
+  QStringList types;
+  types << tr("FileName#LayerName") << tr("LayerName");
+  m_levelNameType->addItems(types);
+  m_levelNameType->setFixedHeight(WidgetHeight);
+  m_levelNameType->setEnabled(false);
+
   QLabel *modeLbl = new QLabel(tr("Load As:"));
   modeLbl->setObjectName("TitleTxtLabel");
+
+  QLabel *levelNameLbl = new QLabel(tr("Level Name:"));
+  levelNameLbl->setObjectName("TitleTxtLabel");
 
   QGridLayout *gridMode = new QGridLayout();
   gridMode->setColumnMinimumWidth(0, 65);
@@ -179,6 +189,8 @@ PsdSettingsPopup::PsdSettingsPopup()
   gridMode->addWidget(m_loadMode, 0, 1, Qt::AlignLeft);
   gridMode->addWidget(m_modeDescription, 1, 1, Qt::AlignLeft);
   gridMode->addWidget(m_createSubXSheet, 2, 1, Qt::AlignLeft);
+  gridMode->addWidget(levelNameLbl, 3, 0, Qt::AlignRight);
+  gridMode->addWidget(m_levelNameType, 3, 1, Qt::AlignLeft);
   QHBoxLayout *modeLayout = new QHBoxLayout;
   modeLayout->addLayout(gridMode);
   modeLayout->addStretch();
@@ -247,11 +259,16 @@ bool PsdSettingsPopup::subxsheet() {
   return (m_createSubXSheet->isEnabled() && m_createSubXSheet->isChecked());
 }
 
+int PsdSettingsPopup::levelNameType() {
+  return m_levelNameType->currentIndex();
+}
+
 void PsdSettingsPopup::onModeChanged(const QString &mode) {
   if (mode == "Single Image") {
     m_mode = FLAT;
     m_modeDescription->setText(modesDescription[0]);
     m_createSubXSheet->setEnabled(false);
+    m_levelNameType->setEnabled(false);
     QList<QAbstractButton *> buttons = m_psdFolderOptions->buttons();
     while (!buttons.isEmpty()) {
       QAbstractButton *btn = buttons.takeFirst();
@@ -261,6 +278,7 @@ void PsdSettingsPopup::onModeChanged(const QString &mode) {
     m_mode = FRAMES;
     m_modeDescription->setText(modesDescription[1]);
     m_createSubXSheet->setEnabled(false);
+    m_levelNameType->setEnabled(false);
     QList<QAbstractButton *> buttons = m_psdFolderOptions->buttons();
     while (!buttons.isEmpty()) {
       QAbstractButton *btn = buttons.takeFirst();
@@ -274,6 +292,7 @@ void PsdSettingsPopup::onModeChanged(const QString &mode) {
       m_mode = COLUMNS;
     m_modeDescription->setText(modesDescription[2]);
     m_createSubXSheet->setEnabled(true);
+    m_levelNameType->setEnabled(true);
     QList<QAbstractButton *> buttons = m_psdFolderOptions->buttons();
     while (!buttons.isEmpty()) {
       QAbstractButton *btn = buttons.takeFirst();
@@ -342,7 +361,10 @@ void PsdSettingsPopup::doPsdParser() {
       int layerId      = m_psdparser->getLevelId(i);
       std::string name = m_path.getName();
       if (layerId > 0 && m_mode != FRAMES) {
-        name += "#" + std::to_string(layerId);
+        if (m_levelNameType->currentIndex() == 0)  // FileName#LevelName
+          name += "#" + std::to_string(layerId);
+        else  // LevelName
+          name += "##" + std::to_string(layerId);
       }
       if (mode != "") name += mode;
       name += m_path.getDottedType();

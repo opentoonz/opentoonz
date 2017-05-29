@@ -46,7 +46,7 @@ using namespace ToolUtils;
 TEnv::DoubleVar VectorBrushMinSize("InknpaintVectorBrushMinSize", 1);
 TEnv::DoubleVar VectorBrushMaxSize("InknpaintVectorBrushMaxSize", 5);
 TEnv::IntVar VectorCapStyle("InknpaintVectorCapStyle", 1);
-TEnv::IntVar VectorJoinStyle("InknpaintVectorJoinStyle", 0);
+TEnv::IntVar VectorJoinStyle("InknpaintVectorJoinStyle", 1);
 TEnv::IntVar VectorMiterValue("InknpaintVectorMiterValue", 4);
 TEnv::DoubleVar RasterBrushMinSize("InknpaintRasterBrushMinSize", 1);
 TEnv::DoubleVar RasterBrushMaxSize("InknpaintRasterBrushMaxSize", 5);
@@ -373,6 +373,12 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
     TUndoManager::manager()->add(new UndoPencil(str, fillInformation, sl, id,
                                                 frameCreated, levelCreated));
   }
+
+  // Update regions. It will call roundStroke() in
+  // TVectorImage::Imp::findIntersections().
+  // roundStroke() will slightly modify all the stroke positions.
+  // It is needed to update information for Fill Check.
+  vi->findRegions();
 
   for (int k = 0; k < (int)strokes.size(); k++) delete strokes[k];
   strokes.clear();

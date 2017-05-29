@@ -4,7 +4,7 @@
 #include "tconvert.h"
 
 #ifdef _WIN32
-#include <Winsock2.h>
+#include <winsock2.h>
 #else
 #include <errno.h> /* obligatory includes */
 #include <signal.h>

@@ -496,7 +496,6 @@ namespace XsheetGUI {
 
 RenameCellField::RenameCellField(QWidget *parent, XsheetViewer *viewer)
     : QLineEdit(parent), m_viewer(viewer), m_row(-1), m_col(-1) {
-  setFixedSize(XsheetGUI::ColumnWidth + 3, XsheetGUI::RowHeight + 4);
   connect(this, SIGNAL(returnPressed()), SLOT(onReturnPressed()));
   setContextMenuPolicy(Qt::PreventContextMenu);
   setObjectName("RenameCellField");
@@ -512,12 +511,12 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   m_row = row;
   m_col = col;
 
-  move(QPoint(m_viewer->columnToX(col) - 1, m_viewer->rowToY(row) - 2));
 #ifdef _WIN32
-  static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Arial", -1, QFont::Normal);
 #else
-  static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Helvetica", -1, QFont::Normal);
 #endif
+  font.setPixelSize(XSHEET_FONT_PX_SIZE);
   setFont(font);
   setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
@@ -546,6 +545,9 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
 
   TXshCell cell = xsh->getCell(row, col);
   if (!cell.isEmpty()) {
+    setFixedSize(XsheetGUI::ColumnWidth - 5, XsheetGUI::RowHeight + 4);
+    move(QPoint(m_viewer->columnToX(col) + 7, m_viewer->rowToY(row) - 2));
+
     TFrameId fid           = cell.getFrameId();
     std::wstring levelName = cell.m_level->getName();
 
@@ -574,6 +576,9 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   }
   // clear the field if the empty cell is clicked
   else {
+    setFixedSize(XsheetGUI::ColumnWidth + 3, XsheetGUI::RowHeight + 4);
+    move(QPoint(m_viewer->columnToX(col) - 1, m_viewer->rowToY(row) - 2));
+
     setText("");
   }
   show();
@@ -733,8 +738,10 @@ bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
   QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
   if (!action) return false;
 
-  return TCellSelection::isEnabledCommand(
-      CommandManager::instance()->getIdFromAction(action));
+  std::string actionId = CommandManager::instance()->getIdFromAction(action);
+
+  if (actionId == "MI_Undo" || actionId == "MI_Redo") return true;
+  return TCellSelection::isEnabledCommand(actionId);
 }
 
 //-----------------------------------------------------------------------------
@@ -789,6 +796,34 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
   }
   m_viewer->updateCells();
   TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void RenameCellField::showEvent(QShowEvent *) {
+  bool ret = connect(TApp::instance()->getCurrentXsheet(),
+                     SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
+  assert(ret);
+}
+
+//-----------------------------------------------------------------------------
+
+void RenameCellField::hideEvent(QHideEvent *) {
+  disconnect(TApp::instance()->getCurrentXsheet(), SIGNAL(xsheetChanged()),
+             this, SLOT(onXsheetChanged()));
+}
+
+//-----------------------------------------------------------------------------
+
+void RenameCellField::onXsheetChanged() {
+  TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+      TApp::instance()->getCurrentSelection()->getSelection());
+  if (!cellSelection) {
+    hide();
+    return;
+  }
+  TCellSelection::Range range = cellSelection->getSelectedCells();
+  showInRowCol(m_row, m_col, range.getColCount() > 1);
 }
 
 //=============================================================================
@@ -1235,10 +1270,11 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
                  : m_viewer->getTextColor());
 
 #ifdef _WIN32
-  static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Arial", -1, QFont::Normal);
 #else
-  static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Helvetica", -1, QFont::Normal);
 #endif
+  font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
   // do not draw frame number under RenameCellField
@@ -1342,16 +1378,21 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   QString text = cell.getSoundTextLevel()->getFrameText(fid.getNumber() - 1);
   p.setPen(Qt::black);
   QRect nameRect = rect.adjusted(8, -H_ADJUST, -10, H_ADJUST);
-  // il nome va scritto se e' diverso dalla cella precedente oppure se
-  // siamo su una marker line
-  static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+// il nome va scritto se e' diverso dalla cella precedente oppure se
+// siamo su una marker line
+#ifdef _WIN32
+  static QFont font("Arial", -1, QFont::Normal);
+#else
+  static QFont font("Helvetica", -1, QFont::Normal);
+#endif
+  font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
 #if QT_VERSION >= 0x050500
   QFontMetrics metric(font);
   QString elidaName = elideText(text, metric, nameRect.width(), "~");
 #else
-  QString elidaName   = elideText(text, font, nameRect.width(), "~");
+  QString elidaName = elideText(text, font, nameRect.width(), "~");
 #endif
 
   if (!sameLevel || prevCell.m_frameId != fid)
@@ -1453,11 +1494,12 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
                    : m_viewer->getTextColor());
 // il nome va scritto se e' diverso dalla cella precedente oppure se
 // siamo su una marker line
-#ifndef _WIN32
-    static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
+#ifdef _WIN32
+    static QFont font("Arial", -1, QFont::Normal);
 #else
-    static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+    static QFont font("Helvetica", -1, QFont::Normal);
 #endif
+    font.setPixelSize(XSHEET_FONT_PX_SIZE);
     p.setFont(font);
     QFontMetrics fm(font);
 

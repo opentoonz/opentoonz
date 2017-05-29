@@ -1017,8 +1017,13 @@ static TFilePath getLevelPathAndSetNameWithPsdLevelName(
     TXshSimpleLevel *xshLevel) {
   TFilePath retfp = xshLevel->getPath();
 
-  QString name     = QString::fromStdWString(retfp.getWideName());
-  QStringList list = name.split("#");
+  QString name        = QString::fromStdWString(retfp.getWideName());
+  bool removeFileName = name.contains("##");
+  if (removeFileName) {
+    retfp = TFilePath(
+        QString::fromStdWString(retfp.getWideString()).replace("##", "#"));
+  }
+  QStringList list = name.split("#", QString::SkipEmptyParts);
 
   if (list.size() >= 2 && list.at(1) != "frames") {
     bool hasLayerId;
@@ -1036,6 +1041,8 @@ static TFilePath getLevelPathAndSetNameWithPsdLevelName(
       list[1]                 = layerNameCodec->toUnicode(levelName.c_str());
       std::wstring wLevelName = list.join("#").toStdWString();
       retfp                   = retfp.withName(wLevelName);
+
+      if (removeFileName) wLevelName = list[1].toStdWString();
 
       TLevelSet *levelSet = xshLevel->getScene()->getLevelSet();
       if (levelSet &&

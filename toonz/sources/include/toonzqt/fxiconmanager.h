@@ -130,6 +130,8 @@ const struct {
     {"STD_iwa_MotionBlurFx", "fx_iwa_motionblur"},
     {"STD_iwa_SpectrumFx", "fx_iwa_spectrum"},
     {"STD_iwa_PerspectiveDistortFx", "fx_iwa_perspective_distort"},
+    {"STD_iwa_BokehFx", "fx_iwa_bokeh"},
+    {"STD_iwa_SoapBubbleFx", "fx_iwa_soapbubble"},
     {0, 0}};
 };
 

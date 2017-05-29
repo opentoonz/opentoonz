@@ -17,6 +17,7 @@
 #include "toonzqt/colorfield.h"
 #include "toonzqt/checkbox.h"
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/doublefield.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -26,6 +27,7 @@
 #include "toutputproperties.h"
 #include "convert2tlv.h"
 #include "toonz/preferences.h"
+#include "toonz/tcamera.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -57,6 +59,9 @@ TEnv::IntVar ConvertPopupAppendDefaultPalette(
     "ConvertPopupAppendDefaultPalette", 0);
 TEnv::IntVar ConvertPopupRemoveUnusedStyles("ConvertPopupRemoveUnusedStyles",
                                             0);
+// dpi settings for conversion to tlv
+TEnv::IntVar ConvertPopupDpiMode("ConvertPopupDpiMode", 2);  // Custom DPI
+TEnv::DoubleVar ConvertPopupDpiValue("ConvertPopupDpiValue", 72.0);
 
 //=============================================================================
 // convertPopup
@@ -203,7 +208,8 @@ void ConvertPopup::Converter::convertLevel(
       TPaletteP palette = popup->readUserProvidedPalette();
       ImageUtils::convertNaa2Tlv(sourceFileFullPath, dstFileFullPath, from, to,
                                  m_parent->m_notifier, palette.getPointer(),
-                                 m_parent->m_removeUnusedStyles->isChecked());
+                                 m_parent->m_removeUnusedStyles->isChecked(),
+                                 m_parent->m_dpiFld->getValue());
     } else {
       convertLevelWithConvert2Tlv(sourceFileFullPath);
     }
@@ -392,27 +398,44 @@ ConvertPopup::ConvertPopup(bool specifyInput)
     upperLay->setMargin(0);
     upperLay->setSpacing(5);
     {
-      upperLay->addWidget(new QLabel(tr("Start:"), this), 0, 0);
-      upperLay->addWidget(m_fromFld, 0, 1);
-      upperLay->addWidget(new QLabel(tr("  End:"), this), 0, 2);
-      upperLay->addWidget(m_toFld, 0, 3);
+      int row = 0;
+      if (specifyInput) {
+        upperLay->addWidget(new QLabel(tr("File to convert:"), this), row, 0);
+        upperLay->addWidget(m_convertFileFld, row, 1, 1, 4);
+        row++;
+      }
 
-      upperLay->addWidget(new QLabel(tr("Save in:"), this), 1, 0);
-      upperLay->addWidget(m_saveInFileFld, 1, 1, 1, 4);
+      upperLay->addWidget(new QLabel(tr("Start:"), this), row, 0);
+      upperLay->addWidget(m_fromFld, row, 1);
+      upperLay->addWidget(new QLabel(tr("  End:"), this), row, 2);
+      upperLay->addWidget(m_toFld, row, 3);
+      row++;
 
-      upperLay->addWidget(new QLabel(tr("File Name:"), this), 2, 0);
-      upperLay->addWidget(m_fileNameFld, 2, 1, 1, 4);
+      upperLay->addWidget(new QLabel(tr("Save in:"), this), row, 0);
+      upperLay->addWidget(m_saveInFileFld, row, 1, 1, 4);
+      row++;
 
-      upperLay->addWidget(new QLabel(tr("File Format:"), this), 3, 0);
-      upperLay->addWidget(m_fileFormat, 3, 1, 1, 2);
-      upperLay->addWidget(m_formatOptions, 3, 3);
+      upperLay->addWidget(new QLabel(tr("File Name:"), this), row, 0);
+      upperLay->addWidget(m_fileNameFld, row, 1, 1, 4);
+      ;
+      row++;
 
-      upperLay->addWidget(m_bgColorLabel, 4, 0);
-      upperLay->addWidget(m_bgColorField, 4, 1, 1, 4);
+      upperLay->addWidget(new QLabel(tr("File Format:"), this), row, 0);
+      upperLay->addWidget(m_fileFormat, row, 1, 1, 2);
+      upperLay->addWidget(m_formatOptions, row, 3);
+      ;
+      row++;
 
-      upperLay->addWidget(m_skip, 5, 1, 1, 4);
+      upperLay->addWidget(m_bgColorLabel, row, 0);
+      upperLay->addWidget(m_bgColorField, row, 1, 1, 4);
+      ;
+      row++;
 
-      upperLay->addWidget(m_removeDotBeforeFrameNumber, 6, 1, 1, 4);
+      upperLay->addWidget(m_skip, row, 1, 1, 4);
+      ;
+      row++;
+
+      upperLay->addWidget(m_removeDotBeforeFrameNumber, row, 1, 1, 4);
     }
     upperLay->setColumnStretch(0, 0);
     upperLay->setColumnStretch(1, 1);
@@ -545,6 +568,9 @@ QFrame *ConvertPopup::createTlvSettings() {
   m_removeUnusedStyles =
       new QCheckBox(tr("Remove Unused Styles from Input Palette"));
 
+  m_dpiMode = new QComboBox();
+  m_dpiFld  = new DVGui::DoubleLineEdit();
+
   m_unpaintedFolder->setFileMode(QFileDialog::DirectoryOnly);
   m_unpaintedSuffix->setMaximumWidth(40);
   QStringList items1;
@@ -569,6 +595,17 @@ QFrame *ConvertPopup::createTlvSettings() {
   m_palettePath->setFileMode(QFileDialog::ExistingFile);
   m_palettePath->setFilters(QStringList("tpl"));
   // m_tolerance->setMaximumWidth(10);
+
+  QStringList dpiModes;
+  dpiModes << tr("Image DPI") << tr("Current Camera DPI") << tr("Custom DPI");
+  m_dpiMode->addItems(dpiModes);
+  m_dpiMode->setToolTip(tr(
+      "Specify the policy for setting DPI of converted tlv. \n"
+      "If you select the \"Image DPI\" option and the source image does not \n"
+      "contain the dpi information, then the current camera dpi will be "
+      "used.\n"));
+  m_dpiMode->setCurrentIndex(ConvertPopupDpiMode);
+  m_dpiFld->setValue(ConvertPopupDpiValue);
 
   QGridLayout *gridLay = new QGridLayout();
   {
@@ -599,6 +636,11 @@ QFrame *ConvertPopup::createTlvSettings() {
     gridLay->addWidget(m_removeUnusedStyles, 5, 1, 1, 3);
     gridLay->addWidget(m_appendDefaultPalette, 6, 1, 1, 3);
     gridLay->addWidget(m_saveBackupToNopaint, 7, 1, 1, 3);
+
+    gridLay->addWidget(new QLabel(tr("Dpi:")), 8, 0,
+                       Qt::AlignRight | Qt::AlignVCenter);
+    gridLay->addWidget(m_dpiMode, 8, 1);
+    gridLay->addWidget(m_dpiFld, 8, 2);
   }
   gridLay->setColumnStretch(0, 0);
   gridLay->setColumnStretch(1, 1);
@@ -611,6 +653,8 @@ QFrame *ConvertPopup::createTlvSettings() {
                        SLOT(onAntialiasSelected(int)));
   ret = ret && connect(m_palettePath, SIGNAL(pathChanged()), this,
                        SLOT(onPalettePathChanged()));
+  ret = ret && connect(m_dpiMode, SIGNAL(currentIndexChanged(int)), this,
+                       SLOT(onDpiModeSelected(int)));
 
   assert(ret);
 
@@ -745,6 +789,9 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
   }
 
   m_srcFilePaths = fps;
+
+  m_imageDpi = 0.0;
+
   if (m_srcFilePaths.size() == 1) {
     setWindowTitle(tr("Convert 1 Level"));
     m_fromFld->setEnabled(true);
@@ -766,6 +813,11 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
         if (end.getNumber() > 0)
           m_toFld->setText(QString::number(end.getNumber()));
       }
+
+      // use the image dpi for the converted tlv
+      const TImageInfo *ii = lrTmp->getImageInfo();
+      if (ii)
+        m_imageDpi = ii->m_dpix;  // for now, consider only the horizontal dpi
     }
     // m_fromFld->setText("1");
     // m_toFld->setText(QString::number(levelTmp->getFrameCount()==-2?1:levelTmp->getFrameCount()));
@@ -828,7 +880,7 @@ Convert2Tlv *ConvertPopup::makeTlvConverter(const TFilePath &sourceFilePath) {
       m_applyAutoclose->isChecked(), palettePath, m_tolerance->getValue(),
       m_antialias->currentIndex(), m_antialiasIntensity->getValue(),
       getTlvMode() == TlvMode_UnpaintedFromNonAA,
-      m_appendDefaultPalette->isChecked());
+      m_appendDefaultPalette->isChecked(), m_dpiFld->getValue());
   return converter;
 }
 
@@ -1066,7 +1118,7 @@ void ConvertPopup::apply() {
   // if parameters are not ok do nothing and don't close the dialog
   if (!checkParameters()) return;
 
-  /*--- envにパラメータを記憶 ---*/
+  // store the parameters in user env file
   ConvertPopupFileFormat    = m_fileFormat->currentText().toStdString();
   TPixel32 bgCol            = m_bgColorField->getColor();
   ConvertPopupBgColorR      = (int)bgCol.r;
@@ -1079,6 +1131,10 @@ void ConvertPopup::apply() {
   ConvertPopupAppendDefaultPalette =
       m_appendDefaultPalette->isChecked() ? 1 : 0;
   ConvertPopupRemoveUnusedStyles = m_removeUnusedStyles->isChecked() ? 1 : 0;
+
+  ConvertPopupDpiMode = m_dpiMode->currentIndex();
+  if (m_dpiMode->currentIndex() == 2)  // In the case of Custom DPI
+    ConvertPopupDpiValue = m_dpiFld->getValue();
 
   // parameters are ok: close the dialog first
   close();
@@ -1212,6 +1268,30 @@ bool ConvertPopup::isSaveTlvBackupToNopaintActive() {
              TlvMode_Unpainted /*-- Unpainted Tlvが選択されている --*/
          && m_saveBackupToNopaint->isChecked(); /*-- Save Backup to "nopaint"
                                                    Folder オプションが有効 --*/
+}
+
+//-------------------------------------------------------------------
+
+void ConvertPopup::onDpiModeSelected(int index) {
+  double dpiVal;
+  if (index == 2) {  // Custom
+    m_dpiFld->setEnabled(true);
+    dpiVal = ConvertPopupDpiValue;
+  } else {  // Image or Camera DPI
+    m_dpiFld->setEnabled(false);
+    if (index == 1 || m_imageDpi == 0.0) {  // If dpi information is not
+                                            // contained in the source, use the
+                                            // camera dpi
+      dpiVal = TApp::instance()
+                   ->getCurrentScene()
+                   ->getScene()
+                   ->getCurrentCamera()
+                   ->getDpi()
+                   .x;
+    } else
+      dpiVal = m_imageDpi;
+  }
+  m_dpiFld->setValue(dpiVal);
 }
 
 //=============================================================================

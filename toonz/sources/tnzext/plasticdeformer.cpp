@@ -803,10 +803,10 @@ void PlasticDeformer::Imp::compileStep3(
   if (invK) {
     m_invK.reset(invK);
 
-    m_x.reset((double *)malloc(kSize * sizeof(double)));
-    m_y.reset((double *)malloc(kSize * sizeof(double)));
-    m_fx.reset((double *)malloc(kSize * sizeof(double)));
-    m_fy.reset((double *)malloc(kSize * sizeof(double)));
+    m_x.reset(new double[kSize]);
+    m_y.reset(new double[kSize]);
+    m_fx.reset(new double[kSize]);
+    m_fy.reset(new double[kSize]);
   } else
     m_compiled = false;
 }

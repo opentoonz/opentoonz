@@ -633,7 +633,7 @@ void convert(const TFilePath &source, const TFilePath &dest,
 void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
                     const TFrameId &from, const TFrameId &to,
                     FrameTaskNotifier *frameNotifier, TPalette *palette,
-                    bool removeUnusedStyles) {
+                    bool removeUnusedStyles, double dpi) {
   std::string dstExt = dest.getType(), srcExt = source.getType();
 
   // Load source level structure
@@ -674,8 +674,8 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
 
       converter.process(raster);
 
-      if (TToonzImageP dstImg =
-              converter.makeTlv(false, usedStyleIds))  // Opaque synthetic inks
+      if (TToonzImageP dstImg = converter.makeTlv(
+              false, usedStyleIds, dpi))  // Opaque synthetic inks
       {
         if (converter.getPalette() == 0)
           converter.setPalette(dstImg->getPalette());

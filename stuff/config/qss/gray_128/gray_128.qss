@@ -167,6 +167,8 @@ PaletteViewer #ToolBarContainer #keyFrameNavigator {
   border: 0px;
 }
 #TabBarContainer {
+  qproperty-BottomAboveLineColor: #787878;
+  qproperty-BottomBelowLineColor: #ffffff;
   background-color: #5a5a5a;
 }
 #TabBarContainer #ScrollLeftButton,
@@ -1102,7 +1104,9 @@ QDialog #dialogButtonFrame {
 #IntPairField,
 #DoublePairField {
   qproperty-LightLineColor: white;
-  qproperty-DarkLineColor: #808080;
+  qproperty-LightLineEdgeColor: white;
+  qproperty-DarkLineColor: #c6c6c6;
+  qproperty-MiddleLineColor: #808080;
   qproperty-HandleLeftPixmap: url("imgs/h_slider_left.png");
   qproperty-HandleRightPixmap: url("imgs/h_slider_right.png");
   qproperty-HandleLeftGrayPixmap: url("imgs/h_slider_left_disabled.png");
@@ -1127,6 +1131,9 @@ QDialog #dialogButtonFrame {
 }
 #GearButton {
   qproperty-icon: url("imgs/gear.png");
+}
+#SubfolderButton {
+  qproperty-icon: url("imgs/subfolder.png");
 }
 #StartupLabel {
   padding: 3px;

@@ -374,9 +374,9 @@ TabBarContainter::TabBarContainter(QWidget *parent) : QFrame(parent) {
 
 void TabBarContainter::paintEvent(QPaintEvent *event) {
   QPainter p(this);
-  p.setPen(QColor(120, 120, 120));
+  p.setPen(getBottomAboveLineColor());
   p.drawLine(0, height() - 2, width(), height() - 2);
-  p.setPen(Qt::white);
+  p.setPen(getBottomBelowLineColor());
   p.drawLine(0, height() - 1, width(), height() - 1);
 }
 

@@ -48,6 +48,14 @@
 namespace TRop {
 namespace borders {
 
+// Standard type instantiations
+
+template class DVAPI RasterEdgeIterator<PixelSelector<TPixel32>>;
+template class DVAPI RasterEdgeIterator<PixelSelector<TPixel64>>;
+template class DVAPI RasterEdgeIterator<PixelSelector<TPixelGR8>>;
+template class DVAPI RasterEdgeIterator<PixelSelector<TPixelGR16>>;
+template class DVAPI RasterEdgeIterator<PixelSelector<TPixelCM32>>;
+
 //**********************************************************************
 //    Borders Extraction Reader  (callbacks container)
 //**********************************************************************
@@ -158,9 +166,16 @@ class ImageMesh final : public TSmartObject,
 
 //--------------------------------------------------------------------------------
 
+}
+}  // namespace TRop::borders
+
 #ifdef _WIN32
-template class TSmartPointerT<ImageMesh>;
+template class DVAPI TSmartPointerT<TRop::borders::ImageMesh>;
 #endif
+
+namespace TRop {
+namespace borders {
+
 typedef TSmartPointerT<ImageMesh> ImageMeshP;
 
 //**********************************************************************
@@ -250,6 +265,9 @@ public:
 template <typename Pixel>
 void readMeshes(const TRasterPT<Pixel> &raster,
                 ImageMeshesReaderT<Pixel> &reader);
+
+//--------------------------------------------------------------------------------
+
 }
 }  // namespace TRop::borders
 

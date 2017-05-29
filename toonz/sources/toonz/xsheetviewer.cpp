@@ -1064,7 +1064,9 @@ void XsheetViewer::onSelectionChanged(TSelection *selection) {
     changeWindowTitle();
     if (Preferences::instance()->isInputCellsWithoutDoubleClickingEnabled()) {
       TCellSelection *cellSel = getCellSelection();
-      if (!cellSel->isEmpty())
+      if (cellSel->isEmpty())
+        m_cellArea->hideRenameField();
+      else
         m_cellArea->showRenameField(
             cellSel->getSelectedCells().m_r0, cellSel->getSelectedCells().m_c0,
             cellSel->getSelectedCells().getColCount() > 1);

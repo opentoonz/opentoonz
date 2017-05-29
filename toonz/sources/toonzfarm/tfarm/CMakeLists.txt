@@ -27,7 +27,7 @@ add_definitions(
     -DTFARM_EXPORTS
 )
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtfarm.dylib")
 endif()
 
@@ -38,19 +38,22 @@ include_directories(
     ../include
 )
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     set(EXTRA_LIBS
         tnzcore tnzbase toonzlib
         ws2_32.lib
     )
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     set(EXTRA_LIBS
         ${CMAKE_CURRENT_BINARY_DIR}/../../tnzcore/libtnzcore.dylib
         ${CMAKE_CURRENT_BINARY_DIR}/../../tnzbase/libtnzbase.dylib
         ${CMAKE_CURRENT_BINARY_DIR}/../../toonzlib/libtoonzlib.dylib
     )
-elseif(UNIX)
+elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;tnzext")
+    if(BUILD_TARGET_WIN)
+        set(EXTRA_LIBS ${EXTRA_LIBS} -lws2_32)
+    endif()
 endif()
 
 target_link_libraries(tfarm

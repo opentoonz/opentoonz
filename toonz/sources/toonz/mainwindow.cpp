@@ -1652,7 +1652,7 @@ void MainWindow::defineActions() {
                              tr("Toggle Link to Studio Palette"), "");
   createRightClickMenuAction(MI_RemoveReferenceToStudioPalette,
                              tr("Remove Reference to Studio Palette"), "");
-  createMenuEditAction(MI_Clear, tr("&Delete"), "Delete");
+  createMenuEditAction(MI_Clear, tr("&Delete"), "Del");
   createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
   createMenuEditAction(MI_Group, tr("&Group"), "Ctrl+G");
   createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "Ctrl+Shift+G");
@@ -2058,7 +2058,10 @@ void MainWindow::defineActions() {
                                              tr("Full Screen Mode"),
                                              tr("Exit Full Screen Mode"));
 
-  createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
+  QAction *refreshAct =
+      createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
+  refreshAct->setIconText(tr("Refresh"));
+  refreshAct->setIcon(createQIconOnOffPNG("refresh"));
 
   createToolOptionsAction("A_ToolOption_GlobalKey", tr("Global Key"), "");
 
@@ -2274,6 +2277,16 @@ void RecentFiles::moveFilePath(int fromIndex, int toIndex, FileType fileType) {
     m_recentLevels.move(fromIndex, toIndex);
   else
     m_recentFlipbookImages.move(fromIndex, toIndex);
+  saveRecentFiles();
+}
+
+//-----------------------------------------------------------------------------
+
+void RecentFiles::removeFilePath(int index, FileType fileType) {
+  if (fileType == Scene)
+    m_recentScenes.removeAt(index);
+  else if (fileType == Level)
+    m_recentLevels.removeAt(index);
   saveRecentFiles();
 }
 

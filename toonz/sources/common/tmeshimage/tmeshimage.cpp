@@ -15,12 +15,6 @@
 //    Explicit instantiations
 //******************************************************************************
 
-template class DV_EXPORT_API tcg::Vertex<TPointD>;
-template class DV_EXPORT_API
-    tcg::Mesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>>;
-template class DV_EXPORT_API
-    tcg::TriMesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>>;
-
 typedef tcg::TriMesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>> TriMesh_base;
 
 //******************************************************************************

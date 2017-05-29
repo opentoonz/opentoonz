@@ -16,8 +16,5 @@
 #endif
 
 DVAPI void initSoundIo();
-DVAPI void mammaChePaura();
-
-DVAPI void cribbioNonCapiscoNulla();
 
 #endif

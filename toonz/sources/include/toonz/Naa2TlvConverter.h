@@ -146,7 +146,8 @@ public:
       return -1;
   }
 
-  TToonzImageP makeTlv(bool transparentSyntheticInks, QList<int> &usedStyleIds);
+  TToonzImageP makeTlv(bool transparentSyntheticInks, QList<int> &usedStyleIds,
+                       double dpi = 0.0);
 
   TVectorImageP vectorize(const TToonzImageP &ti);
   TVectorImageP vectorize(const TRaster32P &ras);

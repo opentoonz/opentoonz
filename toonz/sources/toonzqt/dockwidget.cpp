@@ -105,7 +105,7 @@ inline void DockLayout::update() {
 //! (i.e. not docked
 //! into the layout).
 DockWidget::DockWidget(QWidget *parent, Qt::WindowFlags flags)
-    : QWidget(parent, flags)
+    : QFrame(parent, flags)
     , m_dragging(false)
     , m_resizing(false)
     , m_floating(true)

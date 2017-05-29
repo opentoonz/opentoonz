@@ -254,8 +254,6 @@ private:
   QStringList m_filter;
   std::map<TFilePath, Item> m_multiFileItemMap;
 
-  QFileSystemWatcher *m_fileSystemWatcher;
-
 private:
   void readFrameCount(Item &item);
   void readInfo(Item &item);

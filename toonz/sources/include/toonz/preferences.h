@@ -127,6 +127,9 @@ public:
   void setCustomProjectRoot(std::wstring path);
   QString getCustomProjectRoot() { return m_customProjectRoot; }
 
+  void enableWatchFileSystem(bool on);
+  bool isWatchFileSystemEnabled() { return m_watchFileSystem; }
+
   // Interface  tab
 
   void setCurrentLanguage(int currentLanguage);
@@ -265,6 +268,9 @@ public:
   int getPaletteTypeOnLoadRasterImageAsColorModel() const {
     return m_paletteTypeOnLoadRasterImageAsColorModel;
   }
+
+  void setDefaultImportPolicy(int policy);
+  int getDefaultImportPolicy() { return m_importPolicy; }
 
   // Drawing  tab
 
@@ -485,7 +491,7 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-  int m_projectRoot;
+  int m_projectRoot, m_importPolicy;
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
@@ -549,6 +555,9 @@ private:
 
   // enable to input drawing numbers into cells without double-clicking
   bool m_inputCellsWithoutDoubleClickingEnabled;
+
+  // enable to watch file system in order to update file browser automatically
+  bool m_watchFileSystem;
 
 private:
   Preferences();

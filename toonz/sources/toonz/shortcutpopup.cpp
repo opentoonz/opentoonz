@@ -35,6 +35,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QTextStream>
+#include <QGroupBox>
 
 // STD includes
 #include <vector>
@@ -380,9 +381,11 @@ ShortcutPopup::ShortcutPopup()
   m_savePresetButton = new QPushButton("Save As", this);
   m_savePresetButton->setToolTip(tr("Save Current Shortcuts as New Preset"));
   m_savePresetButton->setIcon(QIcon(":Resources/saveas_on.png"));
-  m_loadPresetButton = new QPushButton(tr("Apply"));
+  m_loadPresetButton = new QPushButton(tr("Load"));
   m_loadPresetButton->setToolTip(tr("Use selected preset as shortcuts"));
   m_loadPresetButton->setIcon(QIcon(":Resources/green.png"));
+  QGroupBox *presetBox = new QGroupBox(tr("Shortcut Presets"), this);
+  presetBox->setObjectName("SolidLineFrame");
   m_clearAllShortcutsButton = new QPushButton(tr("Clear All Shortcuts"));
   QLabel *noSearchResultLabel =
       new QLabel(tr("Couldn't find any matching command."), this);
@@ -422,7 +425,7 @@ ShortcutPopup::ShortcutPopup()
     m_topLayout->addLayout(bottomLayout, 0);
     m_topLayout->addSpacing(10);
     QHBoxLayout *presetLay = new QHBoxLayout();
-    presetLay->setMargin(0);
+    presetLay->setMargin(5);
     presetLay->setSpacing(5);
     {
       presetLay->addWidget(new QLabel("Preset:", this), 0);
@@ -431,7 +434,8 @@ ShortcutPopup::ShortcutPopup()
       presetLay->addWidget(m_savePresetButton, 0);
       presetLay->addWidget(m_deletePresetButton, 0);
     }
-    m_topLayout->addLayout(presetLay, 0);
+    presetBox->setLayout(presetLay);
+    m_topLayout->addWidget(presetBox, 0, Qt::AlignCenter);
     m_topLayout->addSpacing(10);
     QHBoxLayout *exportLay = new QHBoxLayout();
     exportLay->setMargin(0);

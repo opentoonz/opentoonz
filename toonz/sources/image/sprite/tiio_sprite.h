@@ -38,6 +38,7 @@ private:
   std::vector<QImage *> m_images;
   std::vector<QImage> m_imagesResized;
   bool m_firstPass = true;
+  bool m_trim      = true;
   QString m_format;
   // void *m_buffer;
 };
@@ -53,6 +54,7 @@ public:
   TEnumProperty m_format;
   TIntProperty m_topPadding, m_bottomPadding, m_leftPadding, m_rightPadding;
   TIntProperty m_scale;
+  TBoolProperty m_trim;
   SpriteWriterProperties();
 };
 

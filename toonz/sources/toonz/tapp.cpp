@@ -57,6 +57,8 @@
 #include <QDebug>
 #include <QEvent>
 #include <QCoreApplication>
+#include <QApplication>
+#include <QDesktopWidget>
 
 //===================================================================
 
@@ -673,13 +675,6 @@ void TApp::autosave() {
     return;
   } else
     m_autosaveSuspended = false;
-
-  if (scene->isUntitled() &&
-      Preferences::instance()->isAutosaveSceneEnabled()) {
-    DVGui::warning(
-        tr("It is not possible to automatically save an untitled scene."));
-    return;
-  }
 
   DVGui::ProgressDialog pb(
       "Autosaving scene..." + toQString(scene->getScenePath()), 0, 0, 1);
