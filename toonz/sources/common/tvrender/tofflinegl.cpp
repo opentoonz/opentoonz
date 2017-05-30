@@ -240,7 +240,22 @@ public:
   {
     void *b = buffer;  // Pointer To The Buffer
 
-#ifdef x64
+#if !defined(x64) && defined(_MSC_VER)
+    __asm        // Assembler Code To Follow
+    {
+        mov ecx, bufferSize  // Counter Set To Dimensions Of Our Memory Block
+        mov ebx, b  // Points ebx To Our Data (b)
+        label:  // Label Used For Looping
+          mov al,[ebx+0]  // Loads Value At ebx Into al
+          mov ah,[ebx+2]  // Loads Value At ebx+2 Into ah
+          mov [ebx+2],al  // Stores Value In al At ebx+2
+          mov [ebx+0],ah  // Stores Value In ah At ebx
+
+          add ebx,4  // Moves Through The Data By 4 Bytes
+          dec ecx  // Decreases Our Loop Counter
+          jnz label  // If Not Zero Jump Back To Label
+    }
+#else
     int size   = bufferSize;
     UCHAR *pix = (UCHAR *)b;
     while (size > 0) {
@@ -261,21 +276,6 @@ public:
                 ebx+=4;
             size--;
           }*/
-#else
-    __asm        // Assembler Code To Follow
-    {
-        mov ecx, bufferSize  // Counter Set To Dimensions Of Our Memory Block
-        mov ebx, b  // Points ebx To Our Data (b)
-        label:  // Label Used For Looping
-          mov al,[ebx+0]  // Loads Value At ebx Into al
-          mov ah,[ebx+2]  // Loads Value At ebx+2 Into ah
-          mov [ebx+2],al  // Stores Value In al At ebx+2
-          mov [ebx+0],ah  // Stores Value In ah At ebx
-
-          add ebx,4  // Moves Through The Data By 4 Bytes
-          dec ecx  // Decreases Our Loop Counter
-          jnz label  // If Not Zero Jump Back To Label
-    }
 #endif
   }
 
