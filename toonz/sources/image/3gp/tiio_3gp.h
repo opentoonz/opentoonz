@@ -3,7 +3,7 @@
 #ifndef TIIO_3GP_H
 #define TIIO_3_H
 
-#ifdef x64
+#if defined(x64) || (defined(__GNUC__) && defined(_WIN32))
 #include "tiio_3gp_proxy.h"
 #else
 

@@ -20,7 +20,7 @@
 // Platform-specific includes
 #if defined(_WIN32)
 
-#ifndef x64
+#if !defined(x64) && !defined(__GNUC__)
 
 #define list QuickTime_list
 #define map QuickTime_map
@@ -169,7 +169,7 @@ void initImageIo(bool lightVersion) {
                                new Tiio::SpriteWriterProperties());
 
 // ffmpeg
-#if !defined(_WIN32) || defined(x64)
+#if !defined(_WIN32) || defined(x64) || (defined(_WIN32) && defined(__GNUC__))
   if (Ffmpeg::checkFfmpeg()) {
     bool ffprobe = Ffmpeg::checkFfprobe();
     if (Ffmpeg::checkFormat("webm")) {

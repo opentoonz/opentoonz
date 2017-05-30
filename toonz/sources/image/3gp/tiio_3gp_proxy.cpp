@@ -1,6 +1,6 @@
 
 
-#if (defined(x64) || defined(__LP64__) || defined(LINUX))
+#if defined(x64) || defined(__LP64__) || defined(LINUX) || (defined(_WIN32) && defined(__GNUC__))
 
 // Toonz includes
 #include "tfilepath.h"

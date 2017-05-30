@@ -1,6 +1,6 @@
 
 
-#ifndef x64
+#if !defined(x64) && !(defined(__GNUC__) && defined(_WIN32))
 
 #include "texception.h"
 #include "tsound.h"
