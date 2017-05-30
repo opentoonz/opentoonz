@@ -856,12 +856,17 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
         ->getProperties()
         ->getMarkers(markerDistance, markerOffset);
     if (event->angleDelta().x() == 0) {  // vertical scroll
+		if (!orientation()->isVerticalTimeline())
+			markerDistance = 1;
       int scrollPixels = (event->angleDelta().y() > 0 ? 1 : -1) *
-                         markerDistance * XsheetGUI::RowHeight;
+                         markerDistance * orientation()->cellHeight();
       scroll(QPoint(0, -scrollPixels));
     } else {  // horizontal scroll
+		if (orientation()->isVerticalTimeline())
+			markerDistance = 1;
       int scrollPixels =
-          (event->angleDelta().x() > 0 ? 1 : -1) * XsheetGUI::ColumnWidth;
+          (event->angleDelta().x() > 0 ? 1 : -1) * 
+		  markerDistance * orientation()->cellWidth();
       scroll(QPoint(-scrollPixels, 0));
     }
     break;
@@ -959,24 +964,24 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
 
   default: {
     QRect visibleRect   = m_cellArea->visibleRegion().boundingRect();
-    int visibleRowCount = visibleRect.height() / XsheetGUI::RowHeight;
+    int visibleRowCount = visibleRect.height() / orientation()->cellHeight();
 
     switch (key) {
     case Qt::Key_PageUp:
       locals.scrollTo(
-          visibleRect.top() - visibleRowCount * XsheetGUI::RowHeight,
+          visibleRect.top() - visibleRowCount * orientation()->cellHeight(),
           visibleRect);
       break;
     case Qt::Key_PageDown:
       locals.scrollTo(
-          visibleRect.bottom() + visibleRowCount * XsheetGUI::RowHeight,
+          visibleRect.bottom() + visibleRowCount * orientation()->cellHeight(),
           visibleRect);
       break;
     case Qt::Key_Home:
       locals.scrollTo(0, visibleRect);
       break;
     case Qt::Key_End:
-      locals.scrollTo((frameCount + 1) * XsheetGUI::RowHeight, visibleRect);
+      locals.scrollTo((frameCount + 1) * orientation()->cellHeight(), visibleRect);
       break;
     }
     break;
@@ -998,7 +1003,7 @@ void XsheetViewer::enterEvent(QEvent *) { m_cellArea->onControlPressed(false); }
 void XsheetViewer::scrollTo(int row, int col) {
   QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
   QPoint topLeft    = positionToXY(CellPosition(row, col));
-  QRect cellRect(topLeft, QSize(XsheetGUI::ColumnWidth, XsheetGUI::RowHeight));
+  QRect cellRect(topLeft, QSize(orientation()->cellWidth(), orientation()->cellHeight()));
 
   int deltaX = 0;
   int deltaY = 0;

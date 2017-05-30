@@ -200,6 +200,9 @@ public:
     return _ranges.at(which);
   }
 
+  virtual int cellWidth() const = 0;
+  virtual int cellHeight() const = 0;
+
 protected:
   void addRect(PredefinedRect which, const QRect &rect);
   void addLine(PredefinedLine which, const QLine &line);

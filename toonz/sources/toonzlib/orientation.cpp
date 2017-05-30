@@ -3,6 +3,7 @@
 
 #include <QPainterPath>
 #include <QBoxLayout>
+#include <math.h>
 
 using std::pair;
 
@@ -62,6 +63,9 @@ public:
 
   virtual bool isVerticalTimeline() const override { return true; }
   virtual bool flipVolume() const override { return true; }
+
+  virtual int cellWidth() const override { return CELL_WIDTH; }
+  virtual int cellHeight() const override { return CELL_HEIGHT; }
 };
 
 class LeftToRightOrientation : public Orientation {
@@ -116,6 +120,9 @@ public:
 
   virtual bool isVerticalTimeline() const override { return false; }
   virtual bool flipVolume() const override { return false; }
+
+  virtual int cellWidth() const override { return CELL_WIDTH; }
+  virtual int cellHeight() const override { return CELL_HEIGHT; }
 };
 
 /// -------------------------------------------------------------------------------

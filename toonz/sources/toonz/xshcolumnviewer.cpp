@@ -618,6 +618,11 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
   QRect rect = o->rect(PredefinedRect::LAYER_HEADER).translated(orig);
 
+  if(o->isVerticalTimeline())
+     rect.adjust(0, 0, 0, -2);
+  else
+     rect.adjust(0, 0, -2, 0);
+
   int x0 = rect.left();
   int x1 = rect.right();
   int y0 = rect.top();
@@ -625,6 +630,11 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
   // fill base color
   if (isEmpty || col < 0) {
+    if (o->isVerticalTimeline())
+	  rect.adjust(2, 0, 0, 0);
+	else
+	  rect.adjust(0, 2, 0, 0);
+
     p.fillRect(rect, m_viewer->getEmptyColumnHeadColor());
 
     p.setPen(m_viewer->getVerticalLineHeadColor());
@@ -636,6 +646,10 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
     // column handle
     QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
+	if (o->isVerticalTimeline())
+		sideBar.adjust(0, 0, 0, -2);
+	else
+		sideBar.adjust(0, 0, -2, 0);
     p.fillRect(sideBar, sideBar.contains(area->m_pos) ? Qt::yellow : dragColor);
   }
 
@@ -970,10 +984,10 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
 
   // Draw column
-  QPoint pegbarNamePos = orig + QPoint(12, RowHeight * 3 + 48);
+  QPoint pegbarNamePos = orig + QPoint(12, o->cellHeight() * 3 + 48);
   QPoint handleNamePos =
       orig +
-      QPoint(ColumnWidth - 10 - p.fontMetrics().width('B'), RowHeight * 3 + 48);
+      QPoint(o->cellWidth() - 10 - p.fontMetrics().width('B'), o->cellHeight() * 3 + 48);
 
   DrawHeader drawHeader(this, p, col);
   drawHeader.prepare();
@@ -988,7 +1002,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 
   p.setPen(m_viewer->getTextColor());
 
-  if (col >= 0 && !isEmpty) {
+  if (col >= 0 && !isEmpty && o->isVerticalTimeline()) {
     // pegbar name
     p.drawText(pegbarNamePos, QString(parentId.toString().c_str()));
 
@@ -998,8 +1012,8 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
       p.drawText(handleNamePos, QString::fromStdString(handle));
 
     // thumbnail
-    QRect thumbnailRect(orig.x() + 9, orig.y() + RowHeight * 2 + 7,
-                        ColumnWidth - 11, 42);
+    QRect thumbnailRect(orig.x() + 9, orig.y() + o->cellHeight() * 2 + 7,
+                        o->cellWidth() - 11, 42);
 
     // for zerary fx, display fxId here instead of thumbnail
     TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
@@ -1045,6 +1059,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 
 void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
+  const Orientation *o = m_viewer->orientation();
 
   int x = m_viewer->columnToLayerAxis(col);
 
@@ -1066,7 +1081,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
                    ->rect(PredefinedRect::LAYER_HEADER)
                    .translated(orig);
 
-  QPoint columnNamePos = orig + QPoint(12, RowHeight);
+  QPoint columnNamePos = orig + QPoint(12, o->cellHeight());
 
   bool isCurrent = m_viewer->getCurrentColumn() == col;
 
@@ -1089,6 +1104,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
 
 void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
+  const Orientation *o = m_viewer->orientation();
 
   QPoint orig = m_viewer->positionToXY(CellPosition(0, max(col, 0)));
 
@@ -1105,7 +1121,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   int currentColumnIndex = m_viewer->getCurrentColumn();
   int x                  = m_viewer->columnToLayerAxis(col);
 
-  QRect rect(x, 0, ColumnWidth, height());
+  QRect rect(x, 0, o->cellWidth(), height());
 
   TXsheet *xsh = m_viewer->getXsheet();
 
@@ -1127,8 +1143,8 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   p.setPen(Qt::black);
   if (col >= 0 && !isEmpty) {
     static QPixmap paletteHeader(":Resources/palette_header.png");
-    QRect thumbnailRect(orig.x() + 9, orig.y() + RowHeight * 2 + 7,
-                        ColumnWidth - 11, 42);
+    QRect thumbnailRect(orig.x() + 9, orig.y() + o->cellHeight() * 2 + 7,
+                        o->cellWidth() - 11, 42);
     p.drawPixmap(thumbnailRect, paletteHeader);
   }
 }
@@ -1137,6 +1153,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
 
 void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
+  const Orientation *o = m_viewer->orientation();
 
   int x = m_viewer->columnToLayerAxis(col);
 
@@ -1149,7 +1166,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
-  QRect rect(x, 0, ColumnWidth, height());
+  QRect rect(x, 0, o->cellWidth(), height());
 
   int x0, x1, y, y0, y1;
 
@@ -1208,13 +1225,13 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
                QString(std::to_string(col + 1).c_str()));
 
     x0     = orig.x() + m_tabBox.x() + 1;
-    int x1 = x0 + RowHeight;
-    int x2 = x0 + 2 * RowHeight;
-    int x3 = x0 + 3 * RowHeight + 2;
+    int x1 = x0 + o->cellHeight();
+    int x2 = x0 + 2 * o->cellHeight();
+    int x3 = x0 + 3 * o->cellHeight() + 2;
     y0     = orig.y() + m_tabBox.y();
     y1     = orig.y() + m_tabBox.height() + 1;
     // Sfondo dei due bottoni che non vengono mostrati
-    p.fillRect(QRect(x0, y0, 2 * RowHeight, RowHeight),
+    p.fillRect(QRect(x0, y0, 2 * o->cellHeight(), o->cellHeight()),
                m_viewer->getDarkBGColor());
     p.setPen(m_viewer->getDarkBGColor());
     p.drawLine(x0, y0 - 1, x3, y0 - 1);
@@ -1222,7 +1239,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
 
     // Linea di separazione tra indice e nome
     p.setPen(m_viewer->getDarkLineColor());
-    p.drawLine(orig.x(), y1 + 1, orig.x() + ColumnWidth, y1 + 1);
+    p.drawLine(orig.x(), y1 + 1, orig.x() + o->cellWidth(), y1 + 1);
     // contorno del bottone in alto a dx
     p.drawLine(x2, y0, x2, y1);
     p.drawLine(x2, y0, x3, y0);
@@ -1256,7 +1273,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   p.drawLine(x0, y0, x1, y0);
 
   if (isSelected) {
-    QRect box(x0, y0 + 1, ColumnWidth, height() - 3 * RowHeight - 6);
+    QRect box(x0, y0 + 1, o->cellWidth(), height() - 3 * o->cellHeight() - 6);
     QRect adjustBox = box.adjusted(0, 0, -2, -1);
     p.setPen(ColorSelection);
     p.drawRect(adjustBox);
@@ -1266,6 +1283,8 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
 //-----------------------------------------------------------------------------
 
 QPixmap ColumnArea::getColumnIcon(int columnIndex) {
+  const Orientation *o = m_viewer->orientation();
+
   if (columnIndex == -1) {  // Indice colonna = -1 -> CAMERA
     TApp *app             = TApp::instance();
     static QPixmap camera = QPixmap(":Resources/camera.png");
@@ -1290,10 +1309,10 @@ QPixmap ColumnArea::getColumnIcon(int columnIndex) {
         IconGenerator::instance()->getIcon(xl, cell.m_frameId, false, onDemand);
 #ifndef LINETEST
     return scalePixmapKeepingAspectRatio(
-        icon, QSize(ColumnWidth, height() - 3 * RowHeight - 8));
+        icon, QSize(o->cellWidth(), height() - 3 * o->cellHeight() - 8));
 #else
     return scalePixmapKeepingAspectRatio(
-        icon, QSize(ColumnWidth, height() - 4 * RowHeight - 8));
+        icon, QSize(o->cellWidth(), height() - 4 * o->cellHeight() - 8));
 #endif
   }
 }
@@ -1343,7 +1362,10 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
 
   p.setPen(grey150);
   p.setBrush(Qt::NoBrush);
-  p.drawRect(toBeUpdated.adjusted(0, 0, -1, -1));
+  if (m_viewer->orientation()->isVerticalTimeline())
+	  p.drawRect(toBeUpdated.adjusted(0, 0, 0, -3));
+  else
+	  p.drawRect(toBeUpdated.adjusted(0, 0, -3, 0));
 
   if (getDragTool()) getDragTool()->drawColumnsArea(p);
 }

@@ -551,18 +551,24 @@ void NoteArea::removeLayout() {
 
 void NoteArea::createLayout() {
   const Orientation *o = m_viewer->orientation();
-  setFixedSize(o->rect(PredefinedRect::NOTE_AREA).size());
+  QRect rect = o->rect(PredefinedRect::NOTE_AREA);
+  if(o->isVerticalTimeline())
+      rect.adjust(0, 0, 0, -3);
+  else
+	  rect.adjust(0, 0, -3, 0);
+
+  setFixedSize(rect.size());
 
   // has two elements: main layout and header panel
   QVBoxLayout *panelLayout = new QVBoxLayout();
-  panelLayout->setMargin(0);
+  panelLayout->setMargin(1);
   panelLayout->setSpacing(0);
   {
     QBoxLayout *mainLayout = new QBoxLayout(QBoxLayout::Direction(
         o->dimension(PredefinedDimension::QBOXLAYOUT_DIRECTION)));
     Qt::AlignmentFlag centerAlign =
         Qt::AlignmentFlag(o->dimension(PredefinedDimension::CENTER_ALIGN));
-    mainLayout->setMargin(0);
+    mainLayout->setMargin(1);
     mainLayout->setSpacing(0);
     {
       mainLayout->addWidget(m_flipOrientationButton, 0, centerAlign);
