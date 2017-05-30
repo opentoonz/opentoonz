@@ -34,13 +34,6 @@ class Toolbar final : public QFrame {
   QPushButton *m_newVectorLevelButton;
   QPushButton *m_newToonzRasterLevelButton;
   QPushButton *m_newRasterLevelButton;
-  QPushButton *m_reframe1sButton;
-  QPushButton *m_reframe2sButton;
-  QPushButton *m_reframe3sButton;
-  QPushButton *m_repeatButton;
-  QPushButton *m_collapseSubButton;
-  QPushButton *m_enterSubButton;
-  QPushButton *m_leaveSubButton;
   ViewerKeyframeNavigator *m_keyFrameButton;
   QToolBar *m_toolbar;
 
@@ -57,13 +50,6 @@ protected slots:
   void onNewVectorLevelButtonPressed();
   void onNewToonzRasterLevelButtonPressed();
   void onNewRasterLevelButtonPressed();
-  void onReframe1sButtonPressed();
-  void onReframe2sButtonPressed();
-  void onReframe3sButtonPressed();
-  void onRepeatButtonPressed();
-  void onCollapseSubButtonPressed();
-  void onEnterSubButtonPressed();
-  void onLeaveSubButtonPressed();
 };
 
 }  // namespace XsheetGUI;

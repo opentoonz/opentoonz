@@ -10,7 +10,6 @@
 #include "toonzqt/gutil.h"
 
 // TnzLib includes
-#include "toonz/toonzscene.h"
 #include "toonz/preferences.h"
 
 // Qt includes
@@ -57,46 +56,6 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
   m_newRasterLevelButton->setObjectName("XSheetToolbarLevelButton");
   m_newRasterLevelButton->setToolTip(tr("New Raster Level"));
 
-  m_reframe1sButton = new QPushButton(tr("1's"), this);
-  m_reframe1sButton->setToolTip(tr("Reframe on 1's"));
-  m_reframe1sButton->setObjectName("XSheetToolbarButton");
-
-  m_reframe2sButton = new QPushButton(tr("2's"), this);
-  m_reframe2sButton->setToolTip(tr("Reframe on 2's"));
-  m_reframe2sButton->setObjectName("XSheetToolbarButton");
-
-  m_reframe3sButton = new QPushButton(tr("3's"), this);
-  m_reframe3sButton->setToolTip(tr("Reframe on 3's"));
-  m_reframe3sButton->setObjectName("XSheetToolbarButton");
-
-  m_repeatButton = new QPushButton(this);
-  m_repeatButton->setIconSize(QSize(18, 18));
-  QIcon repeatIcon = createQIconPNG("repeat_icon");
-  m_repeatButton->setIcon(repeatIcon);
-  m_repeatButton->setObjectName("XSheetToolbarButton");
-  m_repeatButton->setToolTip(tr("Repeat Selection"));
-
-  m_collapseSubButton = new QPushButton(this);
-  m_collapseSubButton->setIconSize(QSize(18, 18));
-  QIcon collapseSubIcon = createQIconPNG("collapse");
-  m_collapseSubButton->setIcon(collapseSubIcon);
-  m_collapseSubButton->setObjectName("XSheetToolbarLevelButton");
-  m_collapseSubButton->setToolTip(tr("Collapse into Sub-XSheet"));
-
-  m_enterSubButton = new QPushButton(this);
-  m_enterSubButton->setIconSize(QSize(18, 18));
-  QIcon enterSubIcon = createQIconPNG("sub_enter");
-  m_enterSubButton->setIcon(enterSubIcon);
-  m_enterSubButton->setObjectName("XSheetToolbarLevelButton");
-  m_enterSubButton->setToolTip(tr("Open Sub-XSheet"));
-
-  m_leaveSubButton = new QPushButton(this);
-  m_leaveSubButton->setIconSize(QSize(18, 18));
-  QIcon leaveSubIcon = createQIconPNG("sub_leave");
-  m_leaveSubButton->setIcon(leaveSubIcon);
-  m_leaveSubButton->setObjectName("XSheetToolbarLevelButton");
-  m_leaveSubButton->setToolTip(tr("Close Sub-XSheet"));
-
   TApp *app        = TApp::instance();
   m_keyFrameButton = new ViewerKeyframeNavigator(this, app->getCurrentFrame());
   m_keyFrameButton->setObjectHandle(app->getCurrentObject());
@@ -115,15 +74,30 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
       m_toolbar->addWidget(m_newToonzRasterLevelButton);
       m_toolbar->addWidget(m_newRasterLevelButton);
       m_toolbar->addSeparator();
-      m_toolbar->addWidget(m_reframe1sButton);
-      m_toolbar->addWidget(m_reframe2sButton);
-      m_toolbar->addWidget(m_reframe3sButton);
+      QAction *reframeOnes =
+          CommandManager::instance()->getAction("MI_Reframe1");
+      m_toolbar->addAction(reframeOnes);
+      QAction *reframeTwos =
+          CommandManager::instance()->getAction("MI_Reframe2");
+      m_toolbar->addAction(reframeTwos);
+      QAction *reframeThrees =
+          CommandManager::instance()->getAction("MI_Reframe3");
+      m_toolbar->addAction(reframeThrees);
+
       m_toolbar->addSeparator();
-      m_toolbar->addWidget(m_repeatButton);
+
+      QAction *repeat = CommandManager::instance()->getAction("MI_Dup");
+      m_toolbar->addAction(repeat);
+
       m_toolbar->addSeparator();
-      m_toolbar->addWidget(m_collapseSubButton);
-      m_toolbar->addWidget(m_enterSubButton);
-      m_toolbar->addWidget(m_leaveSubButton);
+
+      QAction *collapse = CommandManager::instance()->getAction("MI_Collapse");
+      m_toolbar->addAction(collapse);
+      QAction *open = CommandManager::instance()->getAction("MI_OpenChild");
+      m_toolbar->addAction(open);
+      QAction *leave = CommandManager::instance()->getAction("MI_CloseChild");
+      m_toolbar->addAction(leave);
+
       m_toolbar->addSeparator();
       m_toolbar->addWidget(m_keyFrameButton);
       toolbarLayout->addWidget(m_toolbar);
@@ -146,24 +120,9 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
                        SLOT(onNewToonzRasterLevelButtonPressed()));
   ret = ret && connect(m_newRasterLevelButton, SIGNAL(released()), this,
                        SLOT(onNewRasterLevelButtonPressed()));
-  ret = ret && connect(m_reframe1sButton, SIGNAL(released()), this,
-                       SLOT(onReframe1sButtonPressed()));
-  ret = ret && connect(m_reframe2sButton, SIGNAL(released()), this,
-                       SLOT(onReframe2sButtonPressed()));
-  ret = ret && connect(m_reframe3sButton, SIGNAL(released()), this,
-                       SLOT(onReframe3sButtonPressed()));
-  ret = ret && connect(m_repeatButton, SIGNAL(released()), this,
-                       SLOT(onRepeatButtonPressed()));
-  ret = ret && connect(m_collapseSubButton, SIGNAL(released()), this,
-                       SLOT(onCollapseSubButtonPressed()));
-  ret = ret && connect(m_enterSubButton, SIGNAL(released()), this,
-                       SLOT(onEnterSubButtonPressed()));
-  ret = ret && connect(m_leaveSubButton, SIGNAL(released()), this,
-                       SLOT(onLeaveSubButtonPressed()));
-
   assert(ret);
 
-  m_leaveSubButton->hide();
+  // m_leaveSubButton->hide();
 }
 
 //-----------------------------------------------------------------------------
@@ -192,48 +151,6 @@ void Toolbar::onNewRasterLevelButtonPressed() {
   Preferences::instance()->setDefLevelType(OVL_XSHLEVEL);
   CommandManager::instance()->execute("MI_NewLevel");
   Preferences::instance()->setDefLevelType(defaultLevelType);
-}
-
-//-----------------------------------------------------------------------------
-
-void Toolbar::onReframe1sButtonPressed() {
-  CommandManager::instance()->execute("MI_Reframe1");
-}
-
-//-----------------------------------------------------------------------------
-
-void Toolbar::onReframe2sButtonPressed() {
-  CommandManager::instance()->execute("MI_Reframe2");
-}
-
-//-----------------------------------------------------------------------------
-
-void Toolbar::onReframe3sButtonPressed() {
-  CommandManager::instance()->execute("MI_Reframe3");
-}
-
-//-----------------------------------------------------------------------------
-
-void Toolbar::onRepeatButtonPressed() {
-  CommandManager::instance()->execute("MI_Dup");
-}
-
-//-----------------------------------------------------------------------------
-
-void Toolbar::onCollapseSubButtonPressed() {
-  CommandManager::instance()->execute("MI_Collapse");
-}
-
-//-----------------------------------------------------------------------------
-
-void Toolbar::onEnterSubButtonPressed() {
-  CommandManager::instance()->execute("MI_OpenChild");
-}
-
-//-----------------------------------------------------------------------------
-
-void Toolbar::onLeaveSubButtonPressed() {
-  CommandManager::instance()->execute("MI_CloseChild");
 }
 
 //-----------------------------------------------------------------------------

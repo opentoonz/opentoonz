@@ -590,13 +590,7 @@ ParamsPage {
   padding-right: 2;
   margin-left: 2;
   margin-right: 2;
-}
-#XSheetToolbarButton {
-  background: #808080;
-  padding-left: 3;
-  padding-right: 3;
-  margin-left: 2;
-  margin-right: 2;
+  border: 0px;
 }
 #XSheetToolbar {
   margin: 0;
@@ -604,8 +598,8 @@ ParamsPage {
   border: 0;
 }
 #XSheetToolbar::separator:horizontal {
-  margin-right: 7;
-  margin-left: 5;
+  margin-right: 4;
+  margin-left: 4;
 }
 /* Customize QScrollBar  vertical*/
 QScrollBar {

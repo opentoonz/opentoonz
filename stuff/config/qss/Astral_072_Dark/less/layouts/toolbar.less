@@ -98,3 +98,17 @@ PopupButton {
     }
   }
 }
+
+#XSheetToolbar {
+	margin: 0;
+	padding: 0;
+	border: 0;
+		&::separator:horizontal {
+		margin-right: 3;
+		margin-left: 3;
+	}
+  #XSheetToolbarLevelButton {
+    &:extend(.button-tool all);
+    padding: 2; 
+  }
+}

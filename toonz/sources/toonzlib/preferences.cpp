@@ -118,8 +118,8 @@ void getDefaultLevelFormats(LevelFormatVector &lfv) {
     lfv[1].m_options.m_premultiply = true;
 
     // for all PNG files, set premultiply by default
-    lfv[2].m_name = Preferences::tr("PNG");
-    lfv[2].m_pathFormat = QRegExp("..*\\.png", Qt::CaseInsensitive);
+    lfv[2].m_name                  = Preferences::tr("PNG");
+    lfv[2].m_pathFormat            = QRegExp("..*\\.png", Qt::CaseInsensitive);
     lfv[2].m_options.m_premultiply = true;
   }
 }
