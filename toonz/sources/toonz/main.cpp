@@ -82,6 +82,14 @@
 #include <QLibraryInfo>
 #include <QHash>
 
+
+#ifdef _WIN32
+#ifndef x64
+#include <float.h>
+#endif
+#endif
+
+
 using namespace DVGui;
 #if defined LINETEST
 const char *applicationName    = "Toonz LineTest";

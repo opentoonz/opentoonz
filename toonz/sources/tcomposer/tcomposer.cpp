@@ -74,6 +74,14 @@
 #include <QWaitCondition>
 #include <QMessageBox>
 
+
+#ifdef _WIN32
+#ifndef x64
+#include <float.h>
+#endif
+#endif
+
+
 //==================================================================================
 
 using namespace std;
