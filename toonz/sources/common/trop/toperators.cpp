@@ -4,9 +4,17 @@
 #include "tpixel.h"
 #include "tpixelutils.h"
 
-#ifdef _WIN32
+// calls to _mm_* functions disabled in code for now (marked as comment)
+// so disable include <emmintrin.h>
+/*
+#if defined(_WIN32) && defined(x64)
+  #define ENABLE_SSE2
+#endif
+
+#ifdef ENABLE_SSE2
 #include <emmintrin.h>  // per SSE2
 #endif
+ */
 
 namespace {
 inline double luminance(TPixel32 *pix) {

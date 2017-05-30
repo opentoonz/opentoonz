@@ -7,7 +7,11 @@
 #include "tropcm.h"
 #include "tpalette.h"
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(x64)
+#define USE_SSE2
+#endif
+
+#ifdef USE_SSE2
 #include <emmintrin.h>  // per SSE2
 #endif
 
@@ -156,7 +160,7 @@ void do_overT2(TRasterPT<T> rout, const TRasterPT<T> &rup) {
 
 //-----------------------------------------------------------------------------
 
-#ifdef _WIN32
+#ifdef USE_SSE2
 
 void do_over_SSE2(TRaster32P rout, const TRaster32P &rup) {
   __m128i zeros = _mm_setzero_si128();
@@ -331,7 +335,7 @@ void TRop::over(const TRasterP &rout, const TRasterP &rup, const TPoint &pos) {
 
   // TRaster64P rout64 = rout, rin64 = rin;
   if (rout32 && rup32) {
-#ifdef _WIN32
+#ifdef USE_SSE2
     if (TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2)
       do_over_SSE2(rout32, rup32);
     else

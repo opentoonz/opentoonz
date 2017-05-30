@@ -23,7 +23,7 @@ extern "C" {
 #include "toonz4.6/raster.h"
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(x64)
 #define USE_SSE2
 #endif
 
@@ -75,7 +75,7 @@ void TRop::convert(const TRaster32P &rasOut, const TRasterCM32P &rasIn,
 
   rasOut->lock();
   rasIn->lock();
-#ifdef _WIN32
+#ifdef USE_SSE2
   if (TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) {
     __m128i zeros = _mm_setzero_si128();
     TPixelFloat *paints =
