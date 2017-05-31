@@ -282,6 +282,7 @@ public:
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixd(modelview_matrix);
 
+    glColor4fv(color);
     restart(get_width());
   }
 };
