@@ -1,9 +1,15 @@
 #include "layerheaderpanel.h"
 
 #include <QPainter>
+#include <QToolTip>
 
 #include "xsheetviewer.h"
 #include "xshcolumnviewer.h"
+
+#include "tapp.h"
+#include "toonz/tscenehandle.h"
+#include "toonz/txsheethandle.h"
+#include "toonz/tobjecthandle.h"
 
 using XsheetGUI::ColumnArea;
 
@@ -21,6 +27,8 @@ LayerHeaderPanel::LayerHeaderPanel(XsheetViewer *viewer, QWidget *parent,
   setObjectName("layerHeaderPanel");
 
   setFixedSize(rect.size());
+
+  setMouseTracking(true);
 }
 
 LayerHeaderPanel::~LayerHeaderPanel() {}
@@ -53,7 +61,8 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 
   QColor background      = m_viewer->getBGColor();
   QColor slightlyLighter = {mix(background, Qt::white, 0.95)};
-  p.fillRect(QRect(QPoint(0, 0), size()), slightlyLighter);
+  QRect rect = QRect(QPoint(0, 0), size());
+  p.fillRect(rect.adjusted(0, 0, -3, 0), slightlyLighter);
 
   drawIcon(p, PredefinedRect::EYE, XsheetGUI::PreviewVisibleColor,
            ColumnArea::Pixmaps::eye());
@@ -67,7 +76,7 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
   p.drawText(numberRect, Qt::AlignCenter | Qt::TextSingleLine, "#");
 
-  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME).adjusted(2, 0, -2, 0);
+  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME).adjusted(2, 0, -3, 0);
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QObject::tr("Layer name"));
 
@@ -102,4 +111,114 @@ void LayerHeaderPanel::showOrHide(const Orientation *o) {
     hide();
   else
     show();
+}
+
+//-----------------------------------------------------------------------------
+
+void LayerHeaderPanel::mousePressEvent(QMouseEvent *event) {
+	const Orientation *o = Orientations::leftToRight();
+
+	m_doOnRelease = 0;
+
+	if (event->button() == Qt::LeftButton) {
+		// get mouse position
+		QPoint pos = event->pos();
+
+		// preview button
+	    if (o->rect(PredefinedRect::EYE_AREA).contains(pos)) {
+		    m_doOnRelease = ToggleAllPreviewVisible;
+	    }
+		// sound column
+		else if (o->rect(PredefinedRect::SOUND_ICON).contains(pos)) {
+			// do nothing
+		}
+		// camstand button
+		else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(pos)) {
+			m_doOnRelease = ToggleAllTransparency;
+		}
+		// lock button
+		else if (o->rect(PredefinedRect::LOCK).contains(pos)) {
+			m_doOnRelease = ToggleAllLock;
+		}
+	}
+
+	update();
+}
+
+void LayerHeaderPanel::mouseMoveEvent(QMouseEvent *event) {
+	const Orientation *o = Orientations::leftToRight();
+
+	QPoint pos = event->pos();
+
+	// preview button
+	if (o->rect(PredefinedRect::EYE_AREA).contains(pos)) {
+		m_tooltip = tr("Preview Visbility Toggle All");
+	}
+	// camstand button
+	else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(pos)) {
+		m_tooltip = tr("Camera Stand Visibility Toggle All");
+	}
+	// lock button
+	else if (o->rect(PredefinedRect::LOCK).contains(pos)) {
+		m_tooltip = tr("Lock Toggle All");
+	}
+	else {
+		m_tooltip = tr("");
+	}
+
+	m_pos = pos;
+
+	update();
+}
+
+//-----------------------------------------------------------------------------
+
+bool LayerHeaderPanel::event(QEvent *event) {
+	if (event->type() == QEvent::ToolTip) {
+		if (!m_tooltip.isEmpty())
+			QToolTip::showText(mapToGlobal(m_pos), m_tooltip);
+		else
+			QToolTip::hideText();
+	}
+	return QWidget::event(event);
+}
+
+//-----------------------------------------------------------------------------
+
+void LayerHeaderPanel::mouseReleaseEvent(QMouseEvent *event) {
+	TApp *app = TApp::instance();
+	TXsheet *xsh = m_viewer->getXsheet();
+	int col, totcols = xsh->getColumnCount();
+	bool sound_changed = false;
+
+	if (m_doOnRelease != 0 && totcols > 0)
+	{
+		for (col = 0; col < totcols; col++)
+		{
+			if (!xsh->isColumnEmpty(col)) {
+				TXshColumn *column = xsh->getColumn(col);
+
+				if (m_doOnRelease == ToggleAllPreviewVisible) {
+					column->setPreviewVisible(!column->isPreviewVisible());
+				}
+				else if (m_doOnRelease == ToggleAllTransparency) {
+					column->setCamstandVisible(!column->isCamstandVisible());
+					if (column->getSoundColumn()) sound_changed = true;
+				}
+				else if (m_doOnRelease == ToggleAllLock) {
+					column->lock(!column->isLocked());
+				}
+			}
+		}
+
+		if (sound_changed) {
+			app->getCurrentXsheet()->notifyXsheetSoundChanged();
+		}
+
+		app->getCurrentScene()->notifySceneChanged();
+		app->getCurrentXsheet()->notifyXsheetChanged();
+	}
+	m_viewer->updateColumnArea();
+	update();
+	m_doOnRelease = 0;
 }

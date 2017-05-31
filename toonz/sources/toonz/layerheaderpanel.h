@@ -16,6 +16,12 @@ class XsheetViewer;
 class LayerHeaderPanel final : public QWidget {
   Q_OBJECT
 
+  enum { ToggleAllTransparency = 1, ToggleAllPreviewVisible, ToggleAllLock };
+
+  int m_doOnRelease;
+  QString m_tooltip;
+  QPoint m_pos;
+
 private:
   XsheetViewer *m_viewer;
 
@@ -33,6 +39,11 @@ public:
 
 protected:
   void paintEvent(QPaintEvent *event) override;
+
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  bool event(QEvent *event) override;
 
 private:
   void drawIcon(QPainter &p, PredefinedRect rect, optional<QColor> fill,
