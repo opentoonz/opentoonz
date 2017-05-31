@@ -37,6 +37,7 @@ private:
   int m_left = 0, m_right = 0, m_top = 0, m_bottom = 0;
   std::vector<QImage *> m_images;
   std::vector<QImage> m_imagesResized;
+  std::vector<int> m_frameIndexOrder;
   bool m_firstPass = true;
   bool m_trim      = true;
   QString m_format;
