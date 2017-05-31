@@ -764,6 +764,18 @@ DvScrollWidget QPushButton:pressed {
 #keyFrameNavigator QToolButton {
   min-width: 18px;
 }
+#keyFrameNavigator #PreviousKey {
+  image: url('imgs/white/prevkey.png');
+}
+#keyFrameNavigator #PreviousKey:disabled {
+  image: url('imgs/white/prevkey_disabled.png');
+}
+#keyFrameNavigator #NextKey {
+  image: url('imgs/white/nextkey.png');
+}
+#keyFrameNavigator #NextKey:disabled {
+  image: url('imgs/white/nextkey_disabled.png');
+}
 /* -----------------------------------------------------------------------------
    Treeviews (Global)
 ----------------------------------------------------------------------------- */
@@ -1422,7 +1434,7 @@ FxSettings QToolBar QToolBar {
 #ScriptConsole {
   font-family: 'Courier New', monospace;
   border: 0;
-  color: #000000;
+  color: #000;
   padding: 3px;
 }
 #ScriptConsole QFrame {
@@ -1618,7 +1630,7 @@ FlipSlider {
   qproperty-PBColorMarginBottom: 2;
   qproperty-PBMarkerMarginLeft: 3;
   qproperty-PBMarkerMarginRight: 3;
-  qproperty-notStartedColor: #cc2222;
+  qproperty-notStartedColor: #CC2222;
   qproperty-startedColor: #00ff00;
   qproperty-baseColor: #404040;
 }
@@ -1645,21 +1657,21 @@ Ruler {
 /* xsheetColumnHeader (Context Menus)
 ----------------------------------------------------------------------------- */
 #xsheetColumnAreaMenu_Preview {
-  background-color: #e6e678;
+  background-color: #E6E678;
 }
 #xsheetColumnAreaMenu_Lock {
-  background-color: #f5f5f5;
+  background-color: #F5F5F5;
 }
 #xsheetColumnAreaMenu_Camstand {
-  background-color: #ffa480;
+  background-color: #FFA480;
 }
 #xsheetColumnAreaMenu_Preview,
 #xsheetColumnAreaMenu_Lock,
 #xsheetColumnAreaMenu_Camstand {
-  color: #000000;
+  color: #000;
 }
 #noteTextEdit {
-  color: #000000;
+  color: #000;
 }
 /* XSheet Spreadsheet
 ----------------------------------------------------------------------------- */
@@ -1667,50 +1679,50 @@ XsheetViewer {
   qproperty-TextColor: #cccccc;
   qproperty-BGColor: #484848;
   qproperty-LightLineColor: #2c2c2c;
-  qproperty-MarkerLineColor: #1e96c4;
+  qproperty-MarkerLineColor: #1E96C4;
   qproperty-VerticalLineColor: #222222;
   qproperty-VerticalLineHeadColor: #808080;
-  qproperty-PreviewFrameTextColor: #96e6e6;
+  qproperty-PreviewFrameTextColor: #96E6E6;
   qproperty-CurrentRowBgColor: #506082;
   qproperty-EmptyColumnHeadColor: #606060;
-  qproperty-SelectedColumnTextColor: #e66464;
+  qproperty-SelectedColumnTextColor: #3998d6;
   qproperty-EmptyCellColor: #404040;
   qproperty-NotEmptyColumnColor: #484848;
-  qproperty-SelectedEmptyCellColor: #6c6c6c;
-  qproperty-LevelColumnColor: #4c6e4c;
-  qproperty-LevelColumnBorderColor: #8fb38f;
-  qproperty-SelectedLevelColumnColor: #6b8c6b;
-  qproperty-VectorColumnColor: #7b7b4c;
-  qproperty-VectorColumnBorderColor: #bbbb9a;
-  qproperty-SelectedVectorColumnColor: #8c8c60;
-  qproperty-ChildColumnColor: #6a526b;
-  qproperty-ChildColumnBorderColor: #b1a3b3;
-  qproperty-SelectedChildColumnColor: #7a617a;
-  qproperty-FullcolorColumnColor: #657a96;
-  qproperty-FullcolorColumnBorderColor: #9eb8bb;
-  qproperty-SelectedFullcolorColumnColor: #8896a7;
-  qproperty-FxColumnColor: #56553c;
-  qproperty-FxColumnBorderColor: #95958a;
-  qproperty-SelectedFxColumnColor: #6a6d5a;
+  qproperty-SelectedEmptyCellColor: #6C6C6C;
+  qproperty-LevelColumnColor: #4C6E4C;
+  qproperty-LevelColumnBorderColor: #8FB38F;
+  qproperty-SelectedLevelColumnColor: #6B8C6B;
+  qproperty-VectorColumnColor: #7B7B4C;
+  qproperty-VectorColumnBorderColor: #BBBB9A;
+  qproperty-SelectedVectorColumnColor: #8C8C60;
+  qproperty-ChildColumnColor: #6A526B;
+  qproperty-ChildColumnBorderColor: #B1A3B3;
+  qproperty-SelectedChildColumnColor: #7A617A;
+  qproperty-FullcolorColumnColor: #657A96;
+  qproperty-FullcolorColumnBorderColor: #9EB8BB;
+  qproperty-SelectedFullcolorColumnColor: #8896A7;
+  qproperty-FxColumnColor: #56553C;
+  qproperty-FxColumnBorderColor: #95958A;
+  qproperty-SelectedFxColumnColor: #6A6D5A;
   qproperty-ReferenceColumnColor: #616161;
-  qproperty-ReferenceColumnBorderColor: #a2a2a2;
+  qproperty-ReferenceColumnBorderColor: #A2A2A2;
   qproperty-SelectedReferenceColumnColor: #828282;
-  qproperty-PaletteColumnColor: #3a655f;
-  qproperty-PaletteColumnBorderColor: #86aca7;
-  qproperty-SelectedPaletteColumnColor: #5f8581;
-  qproperty-MeshColumnColor: #684d86;
-  qproperty-MeshColumnBorderColor: #ba92ef;
-  qproperty-SelectedMeshColumnColor: #8a75a2;
+  qproperty-PaletteColumnColor: #3A655F;
+  qproperty-PaletteColumnBorderColor: #86ACA7;
+  qproperty-SelectedPaletteColumnColor: #5F8581;
+  qproperty-MeshColumnColor: #684D86;
+  qproperty-MeshColumnBorderColor: #BA92EF;
+  qproperty-SelectedMeshColumnColor: #8A75A2;
   qproperty-SoundColumnColor: #657456;
-  qproperty-SoundColumnBorderColor: #a0af7d;
-  qproperty-SelectedSoundColumnColor: #7f956a;
-  qproperty-SoundColumnHlColor: #34fe5e;
-  qproperty-SoundColumnTrackColor: #b6c29d;
-  qproperty-ColumnHeadPastelizer: #000000;
+  qproperty-SoundColumnBorderColor: #A0AF7D;
+  qproperty-SelectedSoundColumnColor: #7F956A;
+  qproperty-SoundColumnHlColor: #34FE5E;
+  qproperty-SoundColumnTrackColor: #B6C29D;
+  qproperty-ColumnHeadPastelizer: #000;
   qproperty-SelectedColumnHead: #506082;
   qproperty-LightLightBGColor: #404040;
-  qproperty-LightBGColor: #f0f0f0;
-  qproperty-DarkBGColor: #e1e1e1;
+  qproperty-LightBGColor: #F0F0F0;
+  qproperty-DarkBGColor: #E1E1E1;
   qproperty-DarkLineColor: #969696;
 }
 /* -----------------------------------------------------------------------------
@@ -1737,7 +1749,7 @@ XsheetViewer {
 ----------------------------------------------------------------------------- */
 FunctionTreeView {
   qproperty-TextColor: #cccccc;
-  qproperty-CurrentTextColor: #e66464;
+  qproperty-CurrentTextColor: #3998d6;
 }
 FunctionPanel {
   qproperty-BGColor: #3b3b3b;
@@ -1746,14 +1758,14 @@ FunctionPanel {
   qproperty-OtherCurvesColor: #888888;
   qproperty-RulerBackground: #333333;
   qproperty-TextColor: #cccccc;
-  qproperty-SubColor: #000000;
-  qproperty-SelectedColor: #ffa500;
+  qproperty-SubColor: #000;
+  qproperty-SelectedColor: #FFA500;
 }
 SpreadsheetViewer {
   qproperty-LightLightBGColor: #404040;
   qproperty-CurrentRowBgColor: #506082;
   qproperty-LightLineColor: #2c2c2c;
-  qproperty-MarkerLineColor: #1e96c4;
+  qproperty-MarkerLineColor: #1E96C4;
   qproperty-BGColor: #484848;
   qproperty-VerticalLineColor: #222222;
   qproperty-KeyFrameColor: #995d1d;
@@ -1762,15 +1774,15 @@ SpreadsheetViewer {
   qproperty-InBetweenColor: #666250;
   qproperty-InBetweenBorderColor: #cdcec8;
   qproperty-SelectedInBetweenColor: #7e8079;
-  qproperty-SelectedEmptyColor: #6c6c6c;
+  qproperty-SelectedEmptyColor: #6C6C6C;
   qproperty-SelectedSceneRangeEmptyColor: #757575;
   qproperty-TextColor: #cccccc;
   qproperty-ColumnHeaderBorderColor: #808080;
-  qproperty-SelectedColumnTextColor: #e66464;
+  qproperty-SelectedColumnTextColor: #3998d6;
 }
 #ExpressionField {
   background-color: #e6e6e6;
-  border: 1px solid #333333;
+  border: 1px solid #333;
   margin: 0;
 }
 #FunctionSegmentViewerLinkButton {

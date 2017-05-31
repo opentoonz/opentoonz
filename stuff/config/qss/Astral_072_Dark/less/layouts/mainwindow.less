@@ -412,6 +412,18 @@ QToolBar {
   & QToolButton {
     min-width: 18px;
   }
+  #PreviousKey{
+    image: url('@{img-url}/prevkey.png');
+	  &:disabled{
+		  image: url('@{img-url}/prevkey_disabled.png');
+	  }
+  }
+  #NextKey{
+	  image: url('@{img-url}/nextkey.png');
+	  &:disabled{
+		  image: url('@{img-url}/nextkey_disabled.png');
+	  }
+  }
 }
 
 /* -----------------------------------------------------------------------------

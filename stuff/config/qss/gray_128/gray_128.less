@@ -899,9 +899,26 @@ SpreadsheetViewer {
 	qproperty-ColumnHeaderBorderColor: rgb(46,47,46);
 	qproperty-SelectedColumnTextColor: rgb(255, 0, 0);
 }
-#keyFrameNavigator
-{
-	border: 0px;
+#keyFrameNavigator {
+  background: none; // Fixes BG overflow
+  margin: 0;
+  padding: 0;
+  border: 0;
+  & QToolButton {
+    min-width: 18px;
+  }
+  #PreviousKey{
+    image: url('@{image_url}/prevkey.png');
+	  &:disabled{
+		  image: url('@{image_url}/prevkey_disabled.png');
+	  }
+  }
+  #NextKey{
+	  image: url('@{image_url}/nextkey.png');
+	  &:disabled{
+		  image: url('@{image_url}/nextkey_disabled.png');
+	  }
+  }
 }
 
 #ExpressionField

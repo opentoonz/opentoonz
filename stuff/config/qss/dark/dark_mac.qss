@@ -1027,9 +1027,25 @@ SpreadsheetViewer {
   qproperty-SelectedColumnTextColor: #58e458;
 }
 #keyFrameNavigator {
-  border: 0px;
-  margin: 0px;
-  padding: 0px;
+  background: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+#keyFrameNavigator QToolButton {
+  min-width: 18px;
+}
+#keyFrameNavigator #PreviousKey {
+  image: url('imgs/prevkey.png');
+}
+#keyFrameNavigator #PreviousKey:disabled {
+  image: url('imgs/prevkey_disabled.png');
+}
+#keyFrameNavigator #NextKey {
+  image: url('imgs/nextkey.png');
+}
+#keyFrameNavigator #NextKey:disabled {
+  image: url('imgs/nextkey_disabled.png');
 }
 #ExpressionField {
   background-color: #e3e3e3;
