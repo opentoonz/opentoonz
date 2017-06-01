@@ -614,6 +614,8 @@ void XsheetViewer::showEvent(QShowEvent *) {
                        SLOT(onSceneSwitched()));
   ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
                        SLOT(changeWindowTitle()));
+  ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+                       this, SLOT(onPreferenceChanged(const QString &)));
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
   ret = ret && connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
@@ -940,9 +942,14 @@ void XsheetViewer::onSceneSwitched() {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::onXsheetChanged() {
-  updatePanelsSizes();
   refreshContentSize(0, 0);
   updateAllAree();
+}
+
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::onPreferenceChanged(const QString &prefName) {
+  if (prefName == "XSheetToolbar") updatePanelsSizes();
 }
 
 //-----------------------------------------------------------------------------

@@ -993,7 +993,7 @@ void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
 
 void PreferencesPopup::onShowXSheetToolbarClicked(bool checked) {
   m_pref->enableShowXSheetToolbar(checked);
-  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XSheetToolbar");
 }
 
 //-----------------------------------------------------------------------------

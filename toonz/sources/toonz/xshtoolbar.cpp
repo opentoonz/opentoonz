@@ -11,6 +11,7 @@
 
 // TnzLib includes
 #include "toonz/preferences.h"
+#include "toonz/tscenehandle.h"
 
 // Qt includes
 #include <QPushButton>
@@ -164,7 +165,7 @@ void Toolbar::showToolbar(bool show) {
 void Toolbar::toggleXSheetToolbar() {
   bool toolbarEnabled = Preferences::instance()->isShowXSheetToolbarEnabled();
   Preferences::instance()->enableShowXSheetToolbar(!toolbarEnabled);
-  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XSheetToolbar");
 }
 
 //-----------------------------------------------------------------------------

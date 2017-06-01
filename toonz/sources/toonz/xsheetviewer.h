@@ -692,7 +692,7 @@ public slots:
   void updateCellRowAree();
 
   void onScrubStopped();
-
+  void onPreferenceChanged(const QString &prefName);
   //! Aggiorna il "titolo" del widget.
   void changeWindowTitle();
 
