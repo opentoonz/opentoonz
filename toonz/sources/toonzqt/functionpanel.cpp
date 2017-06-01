@@ -1068,7 +1068,7 @@ void FunctionPanel::paintEvent(QPaintEvent *e) {
   m_gadgets.clear();
 
   QPainter painter(this);
-  QFont font("Arial", 8);
+  QFont font("Segoe UI", 8);
   painter.setFont(font);
   QFontMetrics fm(font);
 
