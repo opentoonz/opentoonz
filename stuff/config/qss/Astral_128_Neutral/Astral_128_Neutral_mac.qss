@@ -1767,11 +1767,7 @@ XsheetViewer {
 ----------------------------------------------------------------------------- */
 FunctionTreeView {
   qproperty-TextColor: #000;
-<<<<<<< HEAD
-  qproperty-CurrentTextColor: #000eb6;
-=======
   qproperty-CurrentTextColor: #b30000;
->>>>>>> master
 }
 FunctionPanel {
   qproperty-BGColor: #e1e1e1;

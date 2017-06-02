@@ -1703,11 +1703,7 @@ XsheetViewer {
   qproperty-PreviewFrameTextColor: #96E6E6;
   qproperty-CurrentRowBgColor: #506082;
   qproperty-EmptyColumnHeadColor: #606060;
-<<<<<<< HEAD
-  qproperty-SelectedColumnTextColor: #3998d6;
-=======
   qproperty-SelectedColumnTextColor: #E66464;
->>>>>>> master
   qproperty-EmptyCellColor: #404040;
   qproperty-NotEmptyColumnColor: #484848;
   qproperty-SelectedEmptyCellColor: #6C6C6C;
@@ -1771,11 +1767,7 @@ XsheetViewer {
 ----------------------------------------------------------------------------- */
 FunctionTreeView {
   qproperty-TextColor: #cccccc;
-<<<<<<< HEAD
-  qproperty-CurrentTextColor: #3998d6;
-=======
   qproperty-CurrentTextColor: #E66464;
->>>>>>> master
 }
 FunctionPanel {
   qproperty-BGColor: #3b3b3b;
@@ -1804,11 +1796,7 @@ SpreadsheetViewer {
   qproperty-SelectedSceneRangeEmptyColor: #757575;
   qproperty-TextColor: #cccccc;
   qproperty-ColumnHeaderBorderColor: #808080;
-<<<<<<< HEAD
-  qproperty-SelectedColumnTextColor: #3998d6;
-=======
   qproperty-SelectedColumnTextColor: #E66464;
->>>>>>> master
 }
 #ExpressionField {
   background-color: #e6e6e6;
