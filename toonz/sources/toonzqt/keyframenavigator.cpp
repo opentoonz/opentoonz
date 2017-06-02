@@ -52,13 +52,6 @@ KeyframeNavigator::KeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle)
   QWidget* prevWidget = widgetForAction(m_actPreviewKey); // obtain a widget generated from QAction
   prevWidget->setObjectName("PreviousKey");
 
-  //QIcon previewActIcon = createQIconPNG("prevkey");
-  //previewActIcon.addFile(QString(":Resources/prevkey_disabled.png"), QSize(),
-  //                       QIcon::Disabled);
-  //m_actPreviewKey = new QAction(previewActIcon, tr("Previous Key"), this);
-  //connect(m_actPreviewKey, SIGNAL(triggered()), SLOT(togglePrevKeyAct()));
-  //addAction(m_actPreviewKey);
-
   m_actKeyNo = new QAction(createQIconPNG("key_no"), tr("Set Key"), this);
   connect(m_actKeyNo, SIGNAL(triggered()), SLOT(toggleKeyAct()));
   addAction(m_actKeyNo);
@@ -81,13 +74,6 @@ KeyframeNavigator::KeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle)
   addAction(m_actNextKey);
   QWidget* nextWidget = widgetForAction(m_actNextKey); // obtain a widget generated from QAction
   nextWidget->setObjectName("NextKey");
-
-  //QIcon nextActIcon = createQIconPNG("nextkey");
-  //nextActIcon.addFile(QString(":Resources/nextkey_disabled.png"), QSize(),
-  //                    QIcon::Disabled);
-  //m_actNextKey = new QAction(nextActIcon, tr("Next Key"), this);
-  //connect(m_actNextKey, SIGNAL(triggered()), SLOT(toggleNextKeyAct()));
-  //addAction(m_actNextKey);
 }
 
 //-----------------------------------------------------------------------------

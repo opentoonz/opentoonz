@@ -1703,7 +1703,7 @@ XsheetViewer {
   qproperty-PreviewFrameTextColor: #000eb6;
   qproperty-CurrentRowBgColor: #d2d2d2;
   qproperty-EmptyColumnHeadColor: #8f8f8f;
-  qproperty-SelectedColumnTextColor: #000eb6;
+  qproperty-SelectedColumnTextColor: #b30000;
   qproperty-EmptyCellColor: #7c7c7c;
   qproperty-NotEmptyColumnColor: #a4a4a4;
   qproperty-SelectedEmptyCellColor: #d2d2d2;
@@ -1796,7 +1796,7 @@ SpreadsheetViewer {
   qproperty-SelectedSceneRangeEmptyColor: #d2d2d2;
   qproperty-TextColor: #000;
   qproperty-ColumnHeaderBorderColor: #343434;
-  qproperty-SelectedColumnTextColor: #000eb6;
+  qproperty-SelectedColumnTextColor: #b30000;
 }
 #ExpressionField {
   background-color: #e6e6e6;
