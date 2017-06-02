@@ -161,6 +161,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_isComputingSize(false)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
+    , m_toolbarHeight(30)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea)) {
   setFocusPolicy(Qt::StrongFocus);
 
@@ -169,6 +170,14 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
 
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());
+
+  m_toolbarScrollArea = new XsheetScrollArea(this);
+  m_toolbarScrollArea->setFixedSize(m_x0 * 12, m_toolbarHeight);
+  m_toolbarScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_toolbarScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_toolbar = new XsheetGUI::Toolbar(this);
+  m_toolbar->setFixedSize(m_x0 * 12, m_toolbarHeight);
+  m_toolbarScrollArea->setWidget(m_toolbar);
 
   m_noteArea = new XsheetGUI::NoteArea(this);
   m_noteArea->setFixedSize(m_x0 + 1, m_y0 - 3);
@@ -605,6 +614,8 @@ void XsheetViewer::showEvent(QShowEvent *) {
                        SLOT(onSceneSwitched()));
   ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
                        SLOT(changeWindowTitle()));
+  ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+                       this, SLOT(onPreferenceChanged(const QString &)));
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
   ret = ret && connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
@@ -693,15 +704,35 @@ void XsheetViewer::paintEvent(QPaintEvent*)
 
 //-----------------------------------------------------------------------------
 
-void XsheetViewer::resizeEvent(QResizeEvent *event) {
+void XsheetViewer::updatePanelsSizes() {
   int w              = width();
   int h              = height();
   int scrollBarWidth = 16;
-  m_noteScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
-  m_cellScrollArea->setGeometry(m_x0, m_y0, w - m_x0, h - m_y0);
-  m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - scrollBarWidth, m_y0 - 3);
-  m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - scrollBarWidth);
+  if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
+    m_toolbar->showToolbar(true);
+    m_toolbarScrollArea->setGeometry(1, 1, m_x0 * 12, m_y0 - 3);
+    m_noteScrollArea->setGeometry(3, m_toolbarHeight + 1, m_x0 - 4, m_y0 - 3);
+    m_cellScrollArea->setGeometry(m_x0, m_y0 + m_toolbarHeight, w - m_x0,
+                                  h - m_y0 - m_toolbarHeight);
+    m_columnScrollArea->setGeometry(m_x0, m_toolbarHeight + 1,
+                                    w - m_x0 - scrollBarWidth, m_y0 - 3);
+    m_rowScrollArea->setGeometry(1, m_y0 + m_toolbarHeight, m_x0 - 1,
+                                 h - m_y0 - scrollBarWidth - m_toolbarHeight);
+  } else {
+    m_toolbar->showToolbar(false);
+    m_toolbarScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
+    m_noteScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
+    m_cellScrollArea->setGeometry(m_x0, m_y0, w - m_x0, h - m_y0);
+    m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - scrollBarWidth,
+                                    m_y0 - 3);
+    m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - scrollBarWidth);
+  }
+}
 
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::resizeEvent(QResizeEvent *event) {
+  updatePanelsSizes();
   //(Nuovo Layout Manager) Reintrodotto per il refresh automatico
   refreshContentSize(
       0,
@@ -913,6 +944,12 @@ void XsheetViewer::onSceneSwitched() {
 void XsheetViewer::onXsheetChanged() {
   refreshContentSize(0, 0);
   updateAllAree();
+}
+
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::onPreferenceChanged(const QString &prefName) {
+  if (prefName == "XSheetToolbar") updatePanelsSizes();
 }
 
 //-----------------------------------------------------------------------------

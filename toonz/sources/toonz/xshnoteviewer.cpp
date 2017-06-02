@@ -458,7 +458,6 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_precNoteButton         = new QToolButton(this);
   m_nextNoteButton         = new QToolButton(this);
   m_frameDisplayStyleCombo = new QComboBox(this);
-
   //-----
 
   toolButton->setObjectName("ToolbarToolButton");
@@ -498,6 +497,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   mainLay->setSpacing(5);
   {
     mainLay->addStretch(1);
+
     mainLay->addWidget(toolButton, 0, Qt::AlignHCenter);
 
     QHBoxLayout *noteLay = new QHBoxLayout();

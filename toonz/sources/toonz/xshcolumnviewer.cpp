@@ -1900,6 +1900,8 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     }
     menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_FoldColumns));
+    menu.addSeparator();
+    menu.addAction(cmdManager->getAction(MI_ToggleXSheetToolbar));
 
     // force the selected cells placed in n-steps
     if (!xsh->isColumnEmpty(col)) {

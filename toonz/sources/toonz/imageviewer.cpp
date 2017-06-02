@@ -1103,7 +1103,8 @@ TAffine ImageViewer::getImgToWidgetAffine() const {
 TAffine ImageViewer::getImgToWidgetAffine(const TRectD &geom) const {
   TPointD geomCenter((geom.x0 + geom.x1) * 0.5, (geom.y0 + geom.y1) * 0.5);
 
-  QRect widGeom(geometry());
+  QRect widGeom(rect());
+
   TPointD viewerCenter((widGeom.left() + widGeom.right() + 1) * 0.5,
                        (widGeom.top() + widGeom.bottom() + 1) * 0.5);
 
@@ -1117,7 +1118,7 @@ TAffine ImageViewer::getImgToWidgetAffine(const TRectD &geom) const {
 //! Adapts image viewer's affine to display the passed image rect at maximized
 //! ratio
 void ImageViewer::adaptView(const TRect &imgRect, const TRect &viewRect) {
-  QRect viewerRect(geometry());
+  QRect viewerRect(rect());
 
   double imageScale = std::min(viewerRect.width() / (double)viewRect.getLx(),
                                viewerRect.height() / (double)viewRect.getLy());

@@ -1479,10 +1479,12 @@ const double ToolUtils::ConeSubVolume::m_values[] = {
 //---------------------------------------------------------------------------------------------
 
 void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
-                            const TPixel32 &color, TPoint delta, bool isPicking,
+                            const TPixel32 &color, TPoint delta,
+                            double pixelSize, bool isPicking,
                             std::vector<TRectD> *otherBalloons) {
   QString qText = QString::fromStdString(text);
-  QFont font("Arial", 10);  // ,QFont::Bold);
+  QFont font("Arial");  // ,QFont::Bold);
+  font.setPixelSize(13);
   QFontMetrics fm(font);
   QRect textRect = fm.boundingRect(qText);
 
@@ -1491,7 +1493,6 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
 
   // avoid other balloons
   if (otherBalloons) {
-    double pixelSize              = sqrt(tglGetPixelSize2());
     std::vector<TRectD> &balloons = *otherBalloons;
     int n                         = (int)balloons.size();
     TDimensionD balloonSize(pixelSize * (textRect.width() + mrg * 2),
@@ -1517,7 +1518,6 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   int y0 = textRect.top() - mrg;
   int y1 = textRect.bottom() + mrg;
 
-  double pixelSize = sqrt(tglGetPixelSize2());
   if (isPicking) {
     TTool::Viewer *viewer =
         TTool::getApplication()->getCurrentTool()->getTool()->getViewer();

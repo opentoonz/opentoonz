@@ -138,6 +138,7 @@ set(MOC_HEADERS
     xsheetviewer.h
     xshnoteviewer.h
     xshrowviewer.h
+    xshtoolbar.h
     comboviewerpane.h
     historypane.h
     cleanupsettingspane.h
@@ -195,6 +196,7 @@ set(SOURCES
     xsheetviewer.cpp
     xshnoteviewer.cpp
     xshrowviewer.cpp
+    xshtoolbar.cpp
     sceneviewer.cpp
     sceneviewerevents.cpp
     viewerdraw.cpp

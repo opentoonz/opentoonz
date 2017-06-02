@@ -43,7 +43,8 @@ QToolBar QToolButton,
 #CameraSettingsRadioButton::indicator,
 #ForceSquaredPixelButton,
 #SchematicBottomFrame QToolBar QToolButton,
-#EditToolLockButton::indicator {
+#EditToolLockButton::indicator,
+#XSheetToolbar #XSheetToolbarLevelButton {
   background-color: #484848;
   border: 1px solid #484848;
   border-radius: 2px;
@@ -58,7 +59,8 @@ QToolBar QToolButton:hover,
 #colorSliderAddButton:hover,
 #colorSliderSubButton:hover,
 #SchematicBottomFrame QToolBar QToolButton:hover,
-#EditToolLockButton::indicator:hover {
+#EditToolLockButton::indicator:hover,
+#XSheetToolbar #XSheetToolbarLevelButton:hover {
   background-color: #6e6e6e;
   border-color: #343434;
 }
@@ -70,7 +72,8 @@ QToolBar QToolButton:pressed,
 #colorSliderAddButton:pressed,
 #colorSliderSubButton:pressed,
 #SchematicBottomFrame QToolBar QToolButton:pressed,
-#EditToolLockButton::indicator:pressed {
+#EditToolLockButton::indicator:pressed,
+#XSheetToolbar #XSheetToolbarLevelButton:pressed {
   background-color: #2f2f2f;
   border-color: #151515;
 }
@@ -80,7 +83,8 @@ QToolBar QToolButton:checked,
 #CameraSettingsRadioButton::indicator:checked,
 #ForceSquaredPixelButton:checked,
 #SchematicBottomFrame QToolBar QToolButton:checked,
-#EditToolLockButton::indicator:checked {
+#EditToolLockButton::indicator:checked,
+#XSheetToolbar #XSheetToolbarLevelButton:checked {
   background-color: #2f2f2f;
   border-color: #222222;
 }
@@ -90,7 +94,8 @@ QToolBar QToolButton:checked:hover,
 #CameraSettingsRadioButton::indicator:checked:hover,
 #ForceSquaredPixelButton:checked:hover,
 #SchematicBottomFrame QToolBar QToolButton:checked:hover,
-#EditToolLockButton::indicator:checked:hover {
+#EditToolLockButton::indicator:checked:hover,
+#XSheetToolbar #XSheetToolbarLevelButton:checked:hover {
   background-color: #404040;
   border-color: #222222;
 }
@@ -100,7 +105,8 @@ QToolBar QToolButton:disabled,
 #CameraSettingsRadioButton::indicator:disabled,
 #ForceSquaredPixelButton:disabled,
 #SchematicBottomFrame QToolBar QToolButton:disabled,
-#EditToolLockButton::indicator:disabled {
+#EditToolLockButton::indicator:disabled,
+#XSheetToolbar #XSheetToolbarLevelButton:disabled {
   color: #808080;
 }
 .button-flat,
@@ -1533,6 +1539,18 @@ PopupButton::menu-indicator:disabled {
   min-width: 28px;
   padding: 0;
 }
+#XSheetToolbar {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+#XSheetToolbar::separator:horizontal {
+  margin-right: 3;
+  margin-left: 3;
+}
+#XSheetToolbar #XSheetToolbarLevelButton {
+  padding: 2;
+}
 /* -----------------------------------------------------------------------------
    ComboViewer / Viewer / FlipBook
 ----------------------------------------------------------------------------- */
@@ -1685,7 +1703,11 @@ XsheetViewer {
   qproperty-PreviewFrameTextColor: #96E6E6;
   qproperty-CurrentRowBgColor: #506082;
   qproperty-EmptyColumnHeadColor: #606060;
+<<<<<<< HEAD
   qproperty-SelectedColumnTextColor: #3998d6;
+=======
+  qproperty-SelectedColumnTextColor: #E66464;
+>>>>>>> master
   qproperty-EmptyCellColor: #404040;
   qproperty-NotEmptyColumnColor: #484848;
   qproperty-SelectedEmptyCellColor: #6C6C6C;
@@ -1749,7 +1771,11 @@ XsheetViewer {
 ----------------------------------------------------------------------------- */
 FunctionTreeView {
   qproperty-TextColor: #cccccc;
+<<<<<<< HEAD
   qproperty-CurrentTextColor: #3998d6;
+=======
+  qproperty-CurrentTextColor: #E66464;
+>>>>>>> master
 }
 FunctionPanel {
   qproperty-BGColor: #3b3b3b;
@@ -1778,7 +1804,11 @@ SpreadsheetViewer {
   qproperty-SelectedSceneRangeEmptyColor: #757575;
   qproperty-TextColor: #cccccc;
   qproperty-ColumnHeaderBorderColor: #808080;
+<<<<<<< HEAD
   qproperty-SelectedColumnTextColor: #3998d6;
+=======
+  qproperty-SelectedColumnTextColor: #E66464;
+>>>>>>> master
 }
 #ExpressionField {
   background-color: #e6e6e6;

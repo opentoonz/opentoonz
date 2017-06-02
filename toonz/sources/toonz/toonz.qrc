@@ -55,6 +55,9 @@
         <file>Resources/close_pane.png</file>
         <file>Resources/close_pane_rollover.png</file>
         <file>Resources/closedfolder.png</file>
+        <file>Resources/collapse.png</file>
+        <file>Resources/collapse_click.png</file>
+        <file>Resources/collapse_over.png</file>
         <file>Resources/controlpointeditor.svg</file>
         <file>Resources/controlpointeditor_rollover.svg</file>
         <file>Resources/compare.png</file>
@@ -155,6 +158,15 @@
         <file>Resources/my_computer.png</file>
         <file>Resources/my_documents.png</file>
         <file>Resources/network.png</file>
+        <file>Resources/new_raster_level.png</file>
+        <file>Resources/new_raster_level_over.png</file>
+        <file>Resources/new_raster_level_click.png</file>
+        <file>Resources/new_toonz_raster_level.png</file>
+        <file>Resources/new_toonz_raster_level_click.png</file>
+        <file>Resources/new_toonz_raster_level_over.png</file>
+        <file>Resources/new_vector_level.png</file>
+        <file>Resources/new_vector_level_click.png</file>
+        <file>Resources/new_vector_level_over.png</file>
         <file>Resources/newmemo.png</file>
         <file>Resources/newmemo_disabled.png</file>
         <file>Resources/newpage.png</file>
@@ -227,6 +239,9 @@
         <file>Resources/render_done_with_errors.png</file>
         <file>Resources/render_computing.png</file>
         <file>Resources/render_suspended.png</file>
+        <file>Resources/repeat_icon.png</file>
+        <file>Resources/repeat_icon_click.png</file>
+        <file>Resources/repeat_icon_over.png</file>
         <file>Resources/resizeColumnNode.svg</file>
         <file>Resources/rightTitle_inactive.png</file>
         <file>Resources/rightTitle.png</file>
@@ -287,7 +302,11 @@
         <file>Resources/sub3.png</file>
         <file>Resources/sub4.png</file>
         <file>Resources/sub_enter.png</file>
-        <file>Resources/sub_enter_rollover.png</file>
+        <file>Resources/sub_enter_over.png</file>
+        <file>Resources/sub_enter_click.png</file>
+        <file>Resources/sub_leave.png</file>
+        <file>Resources/sub_leave_over.png</file>
+        <file>Resources/sub_leave_click.png</file>
         <file>Resources/swap_off.png</file>
         <file>Resources/swap_on.png</file>
         <file>Resources/svg.png</file>

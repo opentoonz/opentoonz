@@ -101,9 +101,11 @@ void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
 void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   m_frameCount++;
+  if (m_frameNumberOffset == -1) m_frameNumberOffset = frameIndex - 1;
   QString tempPath = getFfmpegCache().getQString() + "//" +
                      QString::fromStdString(m_path.getName()) + "tempOut" +
-                     QString::number(m_frameCount) + "." + m_intermediateFormat;
+                     QString::number(frameIndex - m_frameNumberOffset) + "." +
+                     m_intermediateFormat;
   std::string saveStatus = "";
   TRasterImageP tempImage(img);
   TRasterImage *image = (TRasterImage *)tempImage->cloneImage();

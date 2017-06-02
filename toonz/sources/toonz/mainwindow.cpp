@@ -1729,10 +1729,23 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_CameraSettings, tr("&Camera Settings..."), "");
   createMiscAction(MI_CameraStage, tr("&Camera Settings..."), "");
 
-  createMenuXsheetAction(MI_OpenChild, tr("&Open Sub-xsheet"), "");
-  createMenuXsheetAction(MI_CloseChild, tr("&Close Sub-xsheet"), "");
+  QAction *openChildAction =
+      createMenuXsheetAction(MI_OpenChild, tr("&Open Sub-xsheet"), "");
+  openChildAction->setIconText("Open Sub-XSheet");
+  openChildAction->setIcon(createQIconOnOffPNG("sub_enter"));
+
+  QAction *closeChildAction =
+      createMenuXsheetAction(MI_CloseChild, tr("&Close Sub-xsheet"), "");
+  closeChildAction->setIconText("Close Sub-XSheet");
+  closeChildAction->setIcon(createQIconOnOffPNG("sub_leave"));
+
   createMenuXsheetAction(MI_ExplodeChild, tr("Explode Sub-xsheet"), "");
-  createMenuXsheetAction(MI_Collapse, tr("Collapse"), "");
+
+  QAction *collapseAction =
+      createMenuXsheetAction(MI_Collapse, tr("Collapse"), "");
+  collapseAction->setIconText("Collapse");
+  collapseAction->setIcon(createQIconOnOffPNG("collapse"));
+
   createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
   createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
   createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
@@ -1753,12 +1766,17 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
-
+  createRightClickMenuAction(MI_ToggleXSheetToolbar,
+                             tr("Toggle XSheet Toolbar"), "");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
   createMenuCellsAction(MI_Swing, tr("&Swing"), "");
   createMenuCellsAction(MI_Random, tr("&Random"), "");
   createMenuCellsAction(MI_Increment, tr("&Autoexpose"), "");
-  createMenuCellsAction(MI_Dup, tr("&Repeat..."), "");
+
+  QAction *repeatAction = createMenuCellsAction(MI_Dup, tr("&Repeat..."), "");
+  repeatAction->setIconText("Repeat");
+  repeatAction->setIcon(createQIconOnOffPNG("repeat_icon"));
+
   createMenuCellsAction(MI_ResetStep, tr("&Reset Step"), "");
   createMenuCellsAction(MI_IncreaseStep, tr("&Increase Step"), "'");
   createMenuCellsAction(MI_DecreaseStep, tr("&Decrease Step"), ";");
@@ -1782,10 +1800,18 @@ void MainWindow::defineActions() {
                         tr("Similar Drawing Substitution Forward"), "Alt+W");
   createMenuCellsAction(MI_DrawingSubGroupBackward,
                         tr("Similar Drawing Substitution Backward"), "Alt+Q");
+  QAction *reframeOnesAction =
+      createMenuCellsAction(MI_Reframe1, tr("1's"), "");
+  reframeOnesAction->setIconText("1's");
 
-  createMenuCellsAction(MI_Reframe1, tr("1's"), "");
-  createMenuCellsAction(MI_Reframe2, tr("2's"), "");
-  createMenuCellsAction(MI_Reframe3, tr("3's"), "");
+  QAction *reframeTwosAction =
+      createMenuCellsAction(MI_Reframe2, tr("2's"), "");
+  reframeTwosAction->setIconText("2's");
+
+  QAction *reframeThreesAction =
+      createMenuCellsAction(MI_Reframe3, tr("3's"), "");
+  reframeThreesAction->setIconText("3's");
+
   createMenuCellsAction(MI_Reframe4, tr("4's"), "");
 
   createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "Z");
@@ -2246,9 +2272,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2373,9 +2399,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2402,9 +2428,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene)
-            ? MI_ClearRecentScene
-            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
+                                                        ? MI_ClearRecentLevel
+                                                        : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);
