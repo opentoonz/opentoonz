@@ -204,6 +204,7 @@ void FullColorBrushTool::onActivate() {
 //--------------------------------------------------------------------------------------------------
 
 void FullColorBrushTool::onDeactivate() {
+  if (m_mousePressed) leftButtonUp(m_mousePos, m_mouseEvent);
   m_workRaster = TRaster32P();
   m_backUpRas  = TRasterP();
 }
@@ -249,8 +250,9 @@ bool FullColorBrushTool::preLeftButtonDown() {
 void FullColorBrushTool::leftButtonDown(const TPointD &pos,
                                         const TMouseEvent &e) {
   m_brushPos = m_mousePos = pos;
-
-  Viewer *viewer = getViewer();
+  m_mousePressed          = true;
+  m_mouseEvent            = e;
+  Viewer *viewer          = getViewer();
   if (!viewer) return;
 
   TRasterImageP ri = (TRasterImageP)getImage(true);
@@ -308,8 +310,8 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos,
 void FullColorBrushTool::leftButtonDrag(const TPointD &pos,
                                         const TMouseEvent &e) {
   m_brushPos = m_mousePos = pos;
-
-  TRasterImageP ri = (TRasterImageP)getImage(true);
+  m_mouseEvent            = e;
+  TRasterImageP ri        = (TRasterImageP)getImage(true);
   if (!ri) return;
 
   double maxThickness = m_thickness.getValue().second;
@@ -425,6 +427,7 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos,
 
   notifyImageChanged();
   m_strokeRect.empty();
+  m_mousePressed = false;
 }
 
 //---------------------------------------------------------------------------------------------------------------

@@ -1254,7 +1254,7 @@ void SceneViewer::drawOverlay() {
       else {
         glPushMatrix();
         tglMultMatrix(m_drawCameraAff);
-        m_pixelSize = sqrt(tglGetPixelSize2());
+        m_pixelSize = sqrt(tglGetPixelSize2()) * getDevPixRatio();
         ViewerDraw::drawCamera(f, m_pixelSize);
         glPopMatrix();
       }
@@ -1352,7 +1352,7 @@ void SceneViewer::drawOverlay() {
     if (tool->getToolType() & TTool::LevelTool &&
         !app->getCurrentObject()->isSpline())
       glScaled(m_dpiScale.x, m_dpiScale.y, 1);
-    m_pixelSize = sqrt(tglGetPixelSize2());
+    m_pixelSize = sqrt(tglGetPixelSize2()) * getDevPixRatio();
     tool->draw();
     glPopMatrix();
     // Used (only in the T_RGBPicker tool) to notify and set the currentColor

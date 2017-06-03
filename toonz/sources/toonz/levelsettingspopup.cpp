@@ -1193,10 +1193,16 @@ public:
     for (i = 0; i < simpleLevels.size(); i++) {
       TFilePath path = simpleLevels[i]->getPath();
       path           = simpleLevels[i]->getScene()->decodeFilePath(path);
+      FlipBook *fb;
       if (TSystem::doesExistFileOrLevel(path))
-        ::viewFile(path);
-      else
-        FlipBookPool::instance()->pop()->setLevel(simpleLevels[i]);
+        fb = ::viewFile(path);
+      else {
+        fb = FlipBookPool::instance()->pop();
+        fb->setLevel(simpleLevels[i]);
+      }
+      if (fb) {
+        FileBrowserPopup::setModalBrowserToParent(fb->parentWidget());
+      }
     }
   }
 

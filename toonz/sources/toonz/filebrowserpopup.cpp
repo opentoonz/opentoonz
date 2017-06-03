@@ -61,6 +61,7 @@
 #include <QGroupBox>
 #include <QCoreApplication>
 #include <QMainWindow>
+#include <QApplication>
 
 //***********************************************************************************
 //    FileBrowserPopup  implementation
@@ -371,11 +372,32 @@ void FileBrowserPopup::showEvent(QShowEvent *) {
     m_nameField->setFocus();
   }
   resize(m_dialogSize);
+}
 
-  // Set ALL the file browsers non-modal (even if opened with exec())
-  // in order to handle the info viewer and the flipbook which are opened
-  // with "Info..." and "View..." commands respectively.
-  setWindowModality(Qt::NonModal);
+//-----------------------------------------------------------------------------
+// utility function. Make the widget to be a child of modal file browser in
+// order to allow control.
+
+void FileBrowserPopup::setModalBrowserToParent(QWidget *widget) {
+  if (!widget) return;
+  QWidget *pwidget = NULL;
+  foreach (pwidget, QApplication::topLevelWidgets()) {
+    if ((pwidget->isWindow()) && (pwidget->isModal()) &&
+        (pwidget->isVisible())) {
+      FileBrowserPopup *popup = qobject_cast<FileBrowserPopup *>(pwidget);
+      if (popup) {
+        // According to the description of QDialog;
+        // "setParent() function  will clear the window flags specifying the
+        // window-system properties for the widget (in particular it will reset
+        // the Qt::Dialog flag)."
+        // So keep the window flags and set back after calling setParent().
+        Qt::WindowFlags flags = widget->windowFlags();
+        widget->setParent(pwidget);
+        widget->setWindowFlags(flags);
+        return;
+      }
+    }
+  }
 }
 
 //***********************************************************************************
@@ -399,14 +421,6 @@ bool GenericLoadFilePopup::execute() {
 //-----------------------------------------------------------------------------
 
 TFilePath GenericLoadFilePopup::getPath() {
-  // In case that this function is called twice before closing the popup.
-  // Note that the file browser popup will be always non-modal even if opened
-  // with exec().
-  // see FileBrowserPopup::showEvent()
-  if (isVisible()) {
-    activateWindow();
-    return TFilePath();
-  }
   return (exec() == QDialog::Rejected) ? TFilePath() : *m_selectedPaths.begin();
 }
 
@@ -458,14 +472,6 @@ bool GenericSaveFilePopup::execute() {
 //-----------------------------------------------------------------------------
 
 TFilePath GenericSaveFilePopup::getPath() {
-  // In case that this function is called twice before closing the popup.
-  // Note that the file browser popup will be always non-modal even if opened
-  // with exec().
-  // see FileBrowserPopup::showEvent()
-  if (isVisible()) {
-    activateWindow();
-    return TFilePath();
-  }
   return (exec() == QDialog::Rejected) ? TFilePath() : *m_selectedPaths.begin();
 }
 

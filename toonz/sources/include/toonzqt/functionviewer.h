@@ -51,6 +51,7 @@ class QStackedWidget;
 class QAction;
 class QScrollArea;
 class QSplitter;
+class QVBoxLayout;
 
 namespace DVGui {
 class ValueField;
@@ -154,7 +155,7 @@ private:
   TFxHandle *m_fxHandle;
   TColumnHandle *m_columnHandle;
   TSceneHandle *m_sceneHandle;
-
+  QVBoxLayout *m_leftLayout;
   TFrameHandle
       m_localFrame;  //!< Internal timeline - which is attached to m_frameHandle
                      //!  <I>in case</I> it is not zero.

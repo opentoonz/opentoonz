@@ -183,7 +183,6 @@ public:
     return str;
   }
 };
-
 //-----------------------------------------------------------------------------
 }
 
@@ -354,6 +353,7 @@ void FileSelection::viewFileInfo() {
       infoViewer = new InfoViewer();
       m_infoViewers.append(infoViewer);
     }
+    FileBrowserPopup::setModalBrowserToParent(infoViewer);
     infoViewer->setItem(0, 0, files[j]);
   }
 }
@@ -371,8 +371,12 @@ void FileSelection::viewFile() {
         (files[i].getType() == "mov" || files[i].getType() == "avi" ||
          files[i].getType() == "3gp"))
       QDesktopServices::openUrl(QUrl("file:///" + toQString(files[i])));
-    else
-      ::viewFile(files[i]);
+    else {
+      FlipBook *fb = ::viewFile(files[i]);
+      if (fb) {
+        FileBrowserPopup::setModalBrowserToParent(fb->parentWidget());
+      }
+    }
   }
 }
 

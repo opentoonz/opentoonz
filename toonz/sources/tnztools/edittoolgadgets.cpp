@@ -19,9 +19,19 @@
 
 #include "historytypes.h"
 
+#include <QApplication>
+#include <QDesktopWidget>
+
 using namespace EditToolGadgets;
 
 GLdouble FxGadget::m_selectedColor[3] = {0.2, 0.8, 0.1};
+
+namespace {
+int getDevPixRatio() {
+  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
+  return devPixRatio;
+}
+}
 
 //*************************************************************************************
 //    FxGadgetUndo  definition
@@ -172,13 +182,15 @@ void FxGadget::setValue(const TPointParamP &param, const TPointD &pos) {
 
 //---------------------------------------------------------------------------
 
-void FxGadget::setPixelSize() { setPixelSize(sqrt(tglGetPixelSize2())); }
+void FxGadget::setPixelSize() {
+  setPixelSize(sqrt(tglGetPixelSize2()) * getDevPixRatio());
+}
 
 //---------------------------------------------------------------------------
 
 void FxGadget::drawTooltip(const TPointD &tooltipPos,
                            std::string tooltipPosText) {
-  double unit = sqrt(tglGetPixelSize2());
+  double unit = sqrt(tglGetPixelSize2()) * getDevPixRatio();
   glPushMatrix();
   glTranslated(tooltipPos.x, tooltipPos.y, 0.0);
   double sc = unit * 1.6;
@@ -482,7 +494,7 @@ void AngleFxGadget::draw(bool picking) {
   else
     glColor3d(0, 0, 1);
   glPushName(getId());
-  double pixelSize = sqrt(tglGetPixelSize2());
+  double pixelSize = sqrt(tglGetPixelSize2()) * getDevPixRatio();
   double r         = pixelSize * 40;
   double a = pixelSize * 10, b = pixelSize * 5;
   tglDrawCircle(m_pos, r);

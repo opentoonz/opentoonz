@@ -9,6 +9,7 @@
 #include <QRegExp>
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
+#include "tmsgcore.h"
 
 Ffmpeg::Ffmpeg() {
   m_ffmpegPath         = Preferences::instance()->getFfmpegPath();
@@ -100,9 +101,11 @@ void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
 void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   m_frameCount++;
+  if (m_frameNumberOffset == -1) m_frameNumberOffset = frameIndex - 1;
   QString tempPath = getFfmpegCache().getQString() + "//" +
                      QString::fromStdString(m_path.getName()) + "tempOut" +
-                     QString::number(m_frameCount) + "." + m_intermediateFormat;
+                     QString::number(frameIndex - m_frameNumberOffset) + "." +
+                     m_intermediateFormat;
   std::string saveStatus = "";
   TRasterImageP tempImage(img);
   TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
@@ -163,12 +166,19 @@ void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
   // write the file
   QProcess ffmpeg;
   ffmpeg.start(m_ffmpegPath + "/ffmpeg", args);
-  ffmpeg.waitForFinished(m_ffmpegTimeout);
-  QString results = ffmpeg.readAllStandardError();
-  results += ffmpeg.readAllStandardOutput();
-  int exitCode = ffmpeg.exitCode();
-  ffmpeg.close();
-  std::string strResults = results.toStdString();
+  if (ffmpeg.waitForFinished(m_ffmpegTimeout)) {
+    QString results = ffmpeg.readAllStandardError();
+    results += ffmpeg.readAllStandardOutput();
+    int exitCode = ffmpeg.exitCode();
+    ffmpeg.close();
+    std::string strResults = results.toStdString();
+  } else {
+    DVGui::warning(
+        QObject::tr("FFmpeg timed out.\n"
+                    "Please check the file for errors.\n"
+                    "If the file doesn't play or is incomplete, \n"
+                    "Please try raising the FFmpeg timeout in Preferences."));
+  }
 }
 
 QString Ffmpeg::runFfprobe(QStringList args) {
