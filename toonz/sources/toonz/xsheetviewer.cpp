@@ -51,6 +51,7 @@ namespace XsheetGUI {
 const int ColumnWidth     = 74;
 const int RowHeight       = 20;
 const int SCROLLBAR_WIDTH = 16;
+const int TOOLBAR_HEIGHT  = 30;
 
 }  // namespace XsheetGUI
 
@@ -154,7 +155,6 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_isComputingSize(false)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
-    , m_toolbarHeight(30)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
     , m_orientation(nullptr) {
  
@@ -168,15 +168,11 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());
       
-/* From #989 needs to be converted to new method
   m_toolbarScrollArea = new XsheetScrollArea(this);
-  m_toolbarScrollArea->setFixedSize(m_x0 * 12, m_toolbarHeight);
   m_toolbarScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbarScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbar = new XsheetGUI::Toolbar(this);
-  m_toolbar->setFixedSize(m_x0 * 12, m_toolbarHeight);
   m_toolbarScrollArea->setWidget(m_toolbar);
-*/
 
   QRect noteArea(0, 0, 75, 120);
   m_noteArea       = new XsheetGUI::NoteArea(this);  
@@ -311,12 +307,30 @@ void XsheetViewer::positionSections() {
   NumberRange bodyLayer(headerLayer.to(), allLayer.to());
   NumberRange bodyFrame(headerFrame.to(), allFrame.to());
 
+  m_toolbarScrollArea->setGeometry(0, 0, width() - XsheetGUI::SCROLLBAR_WIDTH, XsheetGUI::TOOLBAR_HEIGHT);
+
+  if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
+	  if (o->isVerticalTimeline()) {
+		  headerFrame = headerFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT, XsheetGUI::TOOLBAR_HEIGHT);
+		  bodyFrame = bodyFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT, 0);
+	  }
+	  else {
+		  headerLayer = headerLayer.adjusted(XsheetGUI::TOOLBAR_HEIGHT, XsheetGUI::TOOLBAR_HEIGHT);
+		  bodyLayer = bodyLayer.adjusted(XsheetGUI::TOOLBAR_HEIGHT, 0);
+	  }
+
+	  m_toolbar->showToolbar(true);
+  }
+  else {
+	  m_toolbar->showToolbar(false);
+  }
+
   m_noteScrollArea->setGeometry(o->frameLayerRect(headerFrame, headerLayer));
   m_cellScrollArea->setGeometry(o->frameLayerRect(bodyFrame, bodyLayer));
   m_columnScrollArea->setGeometry(o->frameLayerRect(
-      headerFrame, bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
+	  headerFrame, bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
   m_rowScrollArea->setGeometry(o->frameLayerRect(
-      bodyFrame.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
+	  bodyFrame.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
 }
 
 void XsheetViewer::disconnectScrollBars() {
@@ -847,39 +861,7 @@ void XsheetViewer::paintEvent(QPaintEvent*)
 
 //-----------------------------------------------------------------------------
 
-/* From #989 needs to be converted to new method in positionSections()
-void XsheetViewer::updatePanelsSizes() {
-  int w              = width();
-  int h              = height();
-  int scrollBarWidth = 16;
-  if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
-    m_toolbar->showToolbar(true);
-    m_toolbarScrollArea->setGeometry(1, 1, m_x0 * 12, m_y0 - 3);
-    m_noteScrollArea->setGeometry(3, m_toolbarHeight + 1, m_x0 - 4, m_y0 - 3);
-    m_cellScrollArea->setGeometry(m_x0, m_y0 + m_toolbarHeight, w - m_x0,
-                                  h - m_y0 - m_toolbarHeight);
-    m_columnScrollArea->setGeometry(m_x0, m_toolbarHeight + 1,
-                                    w - m_x0 - scrollBarWidth, m_y0 - 3);
-    m_rowScrollArea->setGeometry(1, m_y0 + m_toolbarHeight, m_x0 - 1,
-                                 h - m_y0 - scrollBarWidth - m_toolbarHeight);
-  } else {
-    m_toolbar->showToolbar(false);
-    m_toolbarScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
-    m_noteScrollArea->setGeometry(3, 1, m_x0 - 4, m_y0 - 3);
-    m_cellScrollArea->setGeometry(m_x0, m_y0, w - m_x0, h - m_y0);
-    m_columnScrollArea->setGeometry(m_x0, 1, w - m_x0 - scrollBarWidth,
-                                    m_y0 - 3);
-    m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - scrollBarWidth);
-  }
-}
-*/
-
-//-----------------------------------------------------------------------------
-
 void XsheetViewer::resizeEvent(QResizeEvent *event) {
-/* From #989 needs to be converted to new method in positionSections()
-  updatePanelsSizes();
-*/
   positionSections();
   
   //(New Layout Manager) introduced automatic refresh
@@ -1088,7 +1070,7 @@ void XsheetViewer::onXsheetChanged() {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::onPreferenceChanged(const QString &prefName) {
-  if (prefName == "XSheetToolbar") updatePanelsSizes();
+  if (prefName == "XSheetToolbar") positionSections();
 }
 
 //-----------------------------------------------------------------------------
