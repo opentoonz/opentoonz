@@ -19,6 +19,7 @@
 #include "toonzqt/filefield.h"
 
 // TnzLib includes
+#include "toonz/txsheethandle.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txshleveltypes.h"
@@ -990,6 +991,19 @@ void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onShowXSheetToolbarClicked(bool checked) {
+  m_pref->enableShowXSheetToolbar(checked);
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XSheetToolbar");
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onExpandFunctionHeaderClicked(bool checked) {
+  m_pref->enableExpandFunctionHeader(checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onUseArrowKeyToShiftCellSelectionClicked(int on) {
   m_pref->enableUseArrowKeyToShiftCellSelection(on);
 }
@@ -1204,6 +1218,12 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Arrow Key to Shift Cell Selection"), this);
   CheckBox *inputCellsWithoutDoubleClickingCB =
       new CheckBox(tr("Enable to Input Cells without Double Clicking"), this);
+  m_showXSheetToolbar = new QGroupBox(tr("Show Toolbar in the XSheet "), this);
+  m_showXSheetToolbar->setCheckable(true);
+  m_expandFunctionHeader = new CheckBox(
+      tr("Expand Function Editor Header to Match XSheet Toolbar Height "
+         "(Requires Restart)"),
+      this);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1470,6 +1490,8 @@ PreferencesPopup::PreferencesPopup()
       m_pref->isUseArrowKeyToShiftCellSelectionEnabled());
   inputCellsWithoutDoubleClickingCB->setChecked(
       m_pref->isInputCellsWithoutDoubleClickingEnabled());
+  m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
+  m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -1892,7 +1914,6 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(m_useNumpadForSwitchingStyles, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-
       drawingFrameLay->addStretch(1);
     }
     drawingBox->setLayout(drawingFrameLay);
@@ -1924,11 +1945,21 @@ PreferencesPopup::PreferencesPopup()
       xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
       xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 5, 0, 1, 2);
       xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 6, 0, 1, 2);
+
+      QVBoxLayout *xSheetToolbarLay = new QVBoxLayout();
+      xSheetToolbarLay->setMargin(10);
+      {
+        xSheetToolbarLay->addWidget(m_expandFunctionHeader, 0,
+                                    Qt::AlignLeft | Qt::AlignVCenter);
+      }
+      m_showXSheetToolbar->setLayout(xSheetToolbarLay);
+
+      xsheetFrameLay->addWidget(m_showXSheetToolbar, 7, 0, 3, 3);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
     xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(7, 1);
+    xsheetFrameLay->setRowStretch(11, 1);
     xsheetBox->setLayout(xsheetFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
@@ -2269,6 +2300,10 @@ PreferencesPopup::PreferencesPopup()
   ret = ret &&
         connect(inputCellsWithoutDoubleClickingCB, SIGNAL(stateChanged(int)),
                 SLOT(onInputCellsWithoutDoubleClickingClicked(int)));
+  ret = ret && connect(m_showXSheetToolbar, SIGNAL(clicked(bool)),
+                       SLOT(onShowXSheetToolbarClicked(bool)));
+  ret = ret && connect(m_expandFunctionHeader, SIGNAL(clicked(bool)),
+                       SLOT(onExpandFunctionHeaderClicked(bool)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

@@ -72,13 +72,13 @@ private:
       *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
-      *m_useNumpadForSwitchingStyles;
+      *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader;
 
   DVGui::FileField *m_customProjectRootFileField;
 
   DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField;
 
-  QGroupBox *m_autoSaveGroup;
+  QGroupBox *m_autoSaveGroup, *m_showXSheetToolbar;
 
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
@@ -172,6 +172,8 @@ private slots:
   void onFfmpegTimeoutChanged();
   void onFastRenderPathChanged();
   void onUseNumpadForSwitchingStylesClicked(bool);
+  void onShowXSheetToolbarClicked(bool);
+  void onExpandFunctionHeaderClicked(bool);
   void onUseArrowKeyToShiftCellSelectionClicked(int);
   void onInputCellsWithoutDoubleClickingClicked(int);
   void onWatchFileSystemClicked(int);

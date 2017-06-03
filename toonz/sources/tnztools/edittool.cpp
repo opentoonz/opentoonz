@@ -30,6 +30,8 @@
 #include <QCoreApplication>
 
 #include <QDebug>
+#include <QApplication>
+#include <QDesktopWidget>
 
 //=============================================================================
 // Scale Constraints
@@ -290,12 +292,13 @@ class DragSplinePositionTool final : public DragChannelTool {
   double m_tolerance;
 
 public:
-  DragSplinePositionTool(const TStroke *spline, bool globalKeyframesEnabled)
+  DragSplinePositionTool(const TStroke *spline, bool globalKeyframesEnabled,
+                         double pixelSize)
       : DragChannelTool(TStageObject::T_Path, globalKeyframesEnabled)
       , m_spline(spline)
       , m_offset(0.0)
       , m_splineLength(0)
-      , m_tolerance(0) {}
+      , m_tolerance(pixelSize * 10.0) {}
 
   double getLengthAtPos(const TPointD &pos) const {
     assert(m_spline);
@@ -322,7 +325,6 @@ else return 0.0;
     m_firstPos = pos;
     start();
     assert(m_spline);
-    m_tolerance    = sqrt(tglGetPixelSize2()) * 10;
     m_splineLength = m_spline->getLength();
     m_lengthAtCPs.clear();
     int n = m_spline->getControlPointCount();
@@ -929,8 +931,8 @@ void EditTool::leftButtonDown(const TPointD &ppos, const TMouseEvent &e) {
 
     case Translation:
       if (const TStroke *spline = getSpline())
-        m_dragTool =
-            new DragSplinePositionTool(spline, m_globalKeyframes.getValue());
+        m_dragTool = new DragSplinePositionTool(
+            spline, m_globalKeyframes.getValue(), getPixelSize());
       else
         m_dragTool = new DragPositionTool(m_lockPositionX.getValue(),
                                           m_lockPositionY.getValue(),
@@ -1157,7 +1159,7 @@ void EditTool::draw() {
     return;
   }
 
-  double unit = sqrt(tglGetPixelSize2());
+  double unit = getPixelSize();
 
   /*-- ObjectのCenter位置を取得 --*/
   glPushMatrix();

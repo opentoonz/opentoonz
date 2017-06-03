@@ -263,9 +263,11 @@ void ViewerDraw::drawGridAndGuides(SceneViewer *viewer, double sc, Ruler *vr,
   if (vr) vGuideCount = vr->getGuideCount();
   if (hr) hGuideCount = hr->getGuideCount();
 
-  int rectX1, rectx2, recty1, recty2;
-  viewer->geometry().getCoords(&rectX1, &rectx2, &recty1, &recty2);
-  TRect clipRect = TRect(rectX1 - 20, recty2 + 20, recty1 + 10, rectx2 - 10);
+  // int xp1, yp1, xp2, yp2;
+  // viewer->geometry().getCoords(&xp1, &yp1, &xp2, &yp2);
+  TRect clipRect = TRect(-20, -10, viewer->width() + 10, viewer->height() + 20);
+  // TRect clipRect = TRect(xp1- 20, yp2 + 20, xp2 + 10, yp1 - 10);
+  // viewer->rect().adjusted(-20, -10, 10, 20);
   clipRect -=
       TPoint((clipRect.x0 + clipRect.x1) / 2, (clipRect.y0 + clipRect.y1) / 2);
 

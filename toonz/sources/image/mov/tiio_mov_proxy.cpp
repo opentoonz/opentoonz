@@ -206,8 +206,6 @@ TLevelWriterMov::~TLevelWriterMov() {
   QString res;
 
   stream << (msg << QString("$closeLWMov") << m_id);
-  if (tipc::readMessage(stream, msg) != "ok")
-    throw TException("Unable to write file");
 }
 
 //------------------------------------------------------------------

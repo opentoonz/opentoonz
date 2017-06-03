@@ -1096,8 +1096,8 @@ qDebug("
       color = TPixel32(200, 200, 10, 200);
     else if (code == m_device)
       color = TPixel32(185, 255, 255);
-    ToolUtils::drawBalloon(pos, hook.m_name, color, TPoint(20, 20), isPicking(),
-                           &balloons);
+    ToolUtils::drawBalloon(pos, hook.m_name, color, TPoint(20, 20),
+                           getPixelSize(), isPicking(), &balloons);
     glPopName();
   }
 
@@ -1202,7 +1202,8 @@ glPopMatrix();
                      255 * (191 - ialfa) / alfa, alfa);
       ToolUtils::drawBalloon(otherColumnsHooks[j].m_pos,
                              otherColumnsHooks[j].m_name,  // getHandle(),
-                             color, TPoint(20, 20), false, &balloons);
+                             color, TPoint(20, 20), getPixelSize(), false,
+                             &balloons);
 
       HookData baseHook = currentColumnHooks[0];
       baseHook.m_pos    = otherColumnsHooks[j].m_pos;
@@ -1228,7 +1229,7 @@ glPopMatrix();
     TPixel32 color(100, 255, 100, 100);
     if (code == m_device) color = TPixel32(185, 255, 255);
     ToolUtils::drawBalloon(magicLink.m_h0.m_pos, name, color, TPoint(20, -20),
-                           isPicking(), &balloons);
+                           getPixelSize(), isPicking(), &balloons);
     glPopName();
   }
 }
@@ -1416,7 +1417,7 @@ void SkeletonTool::draw() {
 
   if (m_label != "")
     ToolUtils::drawBalloon(m_labelPos, m_label, TPixel32::Red, TPoint(20, -20),
-                           false);
+                           getPixelSize(), false);
 
   bool ikEnabled = m_mode.getValue() == INVERSE_KINEMATICS;
   assert(glGetError() == GL_NO_ERROR);
