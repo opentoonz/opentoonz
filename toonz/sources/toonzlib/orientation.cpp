@@ -250,7 +250,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME,
           nameRect.adjusted(0, 0, -KEY_ICON_WIDTH, 0));
   addRect(PredefinedRect::END_EXTENDER,
-          QRect(-EXTENDER_WIDTH - KEY_ICON_WIDTH, 1, EXTENDER_WIDTH,
+          QRect(-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0, EXTENDER_WIDTH,
                 EXTENDER_HEIGHT));
   addRect(PredefinedRect::BEGIN_EXTENDER,
           QRect(-EXTENDER_WIDTH - KEY_ICON_WIDTH, -EXTENDER_HEIGHT,
@@ -271,15 +271,15 @@ TopToBottomOrientation::TopToBottomOrientation() {
       PredefinedRect::END_SOUND_EDIT,
       QRect(CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect(PredefinedRect::NOTE_AREA,
-          QRect(QPoint(0, 0), QSize(FRAME_HEADER_WIDTH, LAYER_HEADER_HEIGHT)));
+          QRect(QPoint(0, 0), QSize(FRAME_HEADER_WIDTH, LAYER_HEADER_HEIGHT - 1)));
   addRect(PredefinedRect::NOTE_ICON,
 	  QRect(QPoint(0, 0), QSize(CELL_WIDTH - 2, CELL_HEIGHT - 2)));
   addRect(PredefinedRect::FRAME_LABEL,
           QRect(CELL_WIDTH / 2, 1, CELL_WIDTH / 2, CELL_HEIGHT - 2));
   addRect(PredefinedRect::FRAME_HEADER,
-          QRect(0, 0, FRAME_HEADER_WIDTH, CELL_HEIGHT));
+          QRect(0, 0, FRAME_HEADER_WIDTH - 1, CELL_HEIGHT));
   addRect(PredefinedRect::LAYER_HEADER,
-          QRect(0, 0, CELL_WIDTH, LAYER_HEADER_HEIGHT));
+          QRect(0, 1, CELL_WIDTH, LAYER_HEADER_HEIGHT - 3));
   addRect(PredefinedRect::FOLDED_LAYER_HEADER,
 	  QRect(0, 0, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT));
   addRect(PredefinedRect::PLAY_RANGE,
@@ -315,7 +315,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::PREVIEW_LAYER, eye.translated(0, CELL_HEIGHT));
   addRect(PredefinedRect::LOCK, QRect(9, CELL_HEIGHT + 6, 16, 16));
   addRect(PredefinedRect::DRAG_LAYER,
-          QRect(0, 0, CELL_DRAG_WIDTH, LAYER_HEADER_HEIGHT));
+          QRect(0, 0, CELL_DRAG_WIDTH, LAYER_HEADER_HEIGHT - 3));
   addRect(PredefinedRect::LAYER_NAME, eyeArea);
   addRect(PredefinedRect::LAYER_NUMBER, QRect(0, 0, -1, -1));  // hide
   addRect(PredefinedRect::SOUND_ICON, QRect(29, 3 * CELL_HEIGHT + 4, 40, 30));
@@ -491,7 +491,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::CELL_NAME, nameRect);
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect);
   addRect(PredefinedRect::END_EXTENDER,
-          QRect(1, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+          QRect(0, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect(PredefinedRect::BEGIN_EXTENDER,
           QRect(-EXTENDER_WIDTH, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH,
                 EXTENDER_HEIGHT));
@@ -509,16 +509,16 @@ LeftToRightOrientation::LeftToRightOrientation() {
           QRect(CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2,
                 CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::NOTE_AREA,
-          QRect(QPoint(0, 0), QSize(LAYER_HEADER_WIDTH, FRAME_HEADER_HEIGHT)));
+          QRect(QPoint(0, 0), QSize(LAYER_HEADER_WIDTH - 1, FRAME_HEADER_HEIGHT)));
   addRect(PredefinedRect::NOTE_ICON,
 	  QRect(QPoint(0, 0), QSize(CELL_WIDTH - 2, CELL_HEIGHT - 2)));
   addRect(
       PredefinedRect::FRAME_LABEL,
       QRect(CELL_WIDTH / 4, 1, CELL_WIDTH / 2, FRAME_HEADER_HEIGHT - 2));
   addRect(PredefinedRect::FRAME_HEADER,
-          QRect(0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT));
+          QRect(0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT - 1));
   addRect(PredefinedRect::LAYER_HEADER,
-          QRect(0, 0, LAYER_HEADER_WIDTH, CELL_HEIGHT));
+          QRect(1, 0, LAYER_HEADER_WIDTH - 3, CELL_HEIGHT));
   addRect(PredefinedRect::FOLDED_LAYER_HEADER,
 	  QRect(0, 0, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT));
   addRect(PredefinedRect::PLAY_RANGE,
@@ -554,7 +554,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::PREVIEW_LAYER, eye.translated(2 * ICON_OFFSET, 0));
   addRect(PredefinedRect::LOCK, eye.translated(3 * ICON_OFFSET, 0));
   addRect(PredefinedRect::DRAG_LAYER,
-          QRect(0, 0, LAYER_HEADER_WIDTH, CELL_DRAG_HEIGHT));
+          QRect(0, 0, LAYER_HEADER_WIDTH - 3, CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LAYER_NAME, columnName);
   addRect(PredefinedRect::LAYER_NUMBER,
           QRect(ICONS_WIDTH, 0, LAYER_NUMBER_WIDTH, CELL_HEIGHT));

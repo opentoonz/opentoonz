@@ -618,11 +618,6 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
   QRect rect = o->rect(PredefinedRect::LAYER_HEADER).translated(orig);
 
-  if(o->isVerticalTimeline())
-     rect.adjust(0, 0, 0, -2);
-  else
-     rect.adjust(0, 0, -2, 0);
-
   int x0 = rect.left();
   int x1 = rect.right();
   int y0 = rect.top();
@@ -646,10 +641,7 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
     // column handle
     QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
-	if (o->isVerticalTimeline())
-		sideBar.adjust(0, 0, 0, -2);
-	else
-		sideBar.adjust(0, 0, -2, 0);
+
     p.fillRect(sideBar, sideBar.contains(area->m_pos) ? Qt::yellow : dragColor);
   }
 
@@ -1363,11 +1355,12 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   p.setPen(grey150);
   p.setBrush(Qt::NoBrush);
   if (m_viewer->orientation()->isVerticalTimeline())
-	  p.drawRect(toBeUpdated.adjusted(0, 0, 0, -3));
+	  p.drawRect(toBeUpdated.adjusted(0, 1, 0, -4));
   else
-	  p.drawRect(toBeUpdated.adjusted(0, 0, -3, 0));
+	  p.drawRect(toBeUpdated.adjusted(1, 0, -4, 0));
 
   if (getDragTool()) getDragTool()->drawColumnsArea(p);
+
 }
 
 //-----------------------------------------------------------------------------

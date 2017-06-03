@@ -373,7 +373,6 @@ NoteWidget::NoteWidget(XsheetViewer *parent, int noteIndex)
 
 void NoteWidget::paint(QPainter *painter, QPoint pos, bool isCurrent) {
   painter->translate(pos);
-//  QRect rect(0, 0, width(), height());
   QRect rect = m_viewer->orientation()->rect(PredefinedRect::NOTE_ICON);
 
   TXshNoteSet *notes   = m_viewer->getXsheet()->getNotes();
@@ -552,10 +551,6 @@ void NoteArea::removeLayout() {
 void NoteArea::createLayout() {
   const Orientation *o = m_viewer->orientation();
   QRect rect = o->rect(PredefinedRect::NOTE_AREA);
-  if(o->isVerticalTimeline())
-      rect.adjust(0, 0, 0, -3);
-  else
-	  rect.adjust(0, 0, -3, 0);
 
   setFixedSize(rect.size());
 

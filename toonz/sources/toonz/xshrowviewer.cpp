@@ -263,7 +263,7 @@ void RowArea::drawCurrentRowGadget(QPainter &p, int r0, int r1) {
   QRect header   = m_viewer->orientation()
                      ->rect(PredefinedRect::FRAME_HEADER)
                      .translated(topLeft)
-                     .adjusted(1, 1, -2, -2);
+                     .adjusted(1, 1, 0, 0);
   p.fillRect(header, m_viewer->getCurrentRowBgColor());
 }
 

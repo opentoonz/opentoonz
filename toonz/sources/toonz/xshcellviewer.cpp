@@ -521,7 +521,7 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
 #endif
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   setFont(font);
-  setAlignment(Qt::AlignRight | Qt::AlignBottom);
+  setAlignment(Qt::AlignLeft | Qt::AlignBottom);
 
   // Se la cella non e' vuota setto il testo
   TXsheet *xsh = m_viewer->getXsheet();
@@ -549,8 +549,8 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   TXshCell cell = xsh->getCell(row, col);
   QPoint xy     = m_viewer->positionToXY(CellPosition(row, col)) - QPoint(1, 2);
   if (!cell.isEmpty()) {
-	setFixedSize(o->cellWidth(), o->cellHeight() + 4);
-	move(xy + QPoint(0, -2));
+	setFixedSize(o->cellWidth(), o->cellHeight() + 2);
+	move(xy + QPoint(1, 1));
 
     TFrameId fid           = cell.getFrameId();
     std::wstring levelName = cell.m_level->getName();
@@ -580,8 +580,8 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   }
   // clear the field if the empty cell is clicked
   else {
-	setFixedSize(o->cellWidth(), o->cellHeight() + 4);
-	move(xy + QPoint(-1, -2));
+	setFixedSize(o->cellWidth(), o->cellHeight() + 2);
+	move(xy + QPoint(1, 1));
 
     setText("");
   }
@@ -940,15 +940,16 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
     for (row = r0; row <= r1; row++) {
       // draw horizontal lines
       // hide top-most marker line
-      QColor color = ((row - offset) % distance == 0 && row != 0)
-                         ? m_viewer->getMarkerLineColor()
-                         : m_viewer->getLightLineColor();
+		QColor color = ((row - offset) % distance == 0 && row != 0)
+			? m_viewer->getMarkerLineColor()
+			: m_viewer->getLightLineColor();
 
       p.setPen(color);
       int frameAxis = m_viewer->rowToFrameAxis(row);
       QLine horizontalLine =
-          m_viewer->orientation()->horizontalLine(frameAxis, layerAxisRange);
+		  m_viewer->orientation()->horizontalLine(frameAxis, layerAxisRange);
       p.drawLine(horizontalLine);
+
       if (!isColumn) continue;
       // Cells appearance depending on the type of column
       if (isSoundColumn)
@@ -1118,10 +1119,7 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
                                  isSelected);
 
   // cells background
-  if (o->isVerticalTimeline())
-	  p.fillRect(rect.adjusted(0, 0, -1, 0), QBrush(cellColor));
-  else
-	  p.fillRect(rect.adjusted(0, 0, 0, -1), QBrush(cellColor));
+  p.fillRect(rect, QBrush(cellColor));
 
   drawDragHandle(p, xy, sideColor);
   drawEndOfDragHandle(p, isLastRow, xy, cellColor);
@@ -1306,10 +1304,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   }
 
   // paint cell
-  if(o->isVerticalTimeline())
-     p.fillRect(rect.adjusted(0, 0, -1, 0), QBrush(cellColor));
-  else
-     p.fillRect(rect.adjusted(0, 0, 0, -1), QBrush(cellColor));
+  p.fillRect(rect, QBrush(cellColor));
 
   drawDragHandle(p, xy, sideColor);
 
@@ -1437,7 +1432,8 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   QPoint xy  = m_viewer->positionToXY(CellPosition(row, col));
   int x      = xy.x();
   int y      = xy.y();
-  QRect rect = QRect(x + 1, y + 1, o->cellWidth(), o->cellHeight());
+  QRect cellRect = o->rect(PredefinedRect::CELL).translated(xy);
+  QRect rect = cellRect.adjusted(1, 1, 0, 0);
   if (cell.isEmpty()) {  // vuol dire che la precedente non e' vuota
     p.setPen(m_viewer->getLightLineColor());
     p.drawLine(rect.topLeft(), rect.bottomRight());
@@ -1448,10 +1444,8 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   int levelType;
   QColor cellColor, sideColor;
   m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell);
-  if (o->isVerticalTimeline())
-	  p.fillRect(rect.adjusted(0, 0, -1, 0), QBrush(cellColor));
-  else
-	  p.fillRect(rect.adjusted(0, 0, 0, -1), QBrush(cellColor));
+
+  p.fillRect(rect, QBrush(cellColor));
 
   if (nextCell.isEmpty() ||
       cell.m_level.getPointer() != nextCell.m_level.getPointer()) {
@@ -1542,10 +1536,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     sideColor = m_viewer->getPaletteColumnBorderColor();
   }
 
-  if (o->isVerticalTimeline())
-	  p.fillRect(rect.adjusted(0, 0, -1, 0), QBrush(cellColor));
-  else
-	  p.fillRect(rect.adjusted(0, 0, 0, -1), QBrush(cellColor));
+  p.fillRect(rect, QBrush(cellColor));
 
   drawDragHandle(p, xy, sideColor);
   bool isLastRow = nextCell.isEmpty() ||
