@@ -1458,3 +1458,7 @@ QDialog #dialogButtonFrame {
   border-right-color: white;
   border-bottom-color: white;
 }
+#CastBrowser {
+  margin: 0px;
+  border: 0px;
+}

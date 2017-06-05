@@ -467,7 +467,6 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WFlags flags)
   setObjectName("CastBrowser");
   setFrameStyle(QFrame::StyledPanel);
   setStyleSheet("QSplitter::handle {height:4px;}");
-  setStyleSheet("#CastBrowser { margin:1px;border:0px }");
 
   m_treeViewer = new CastTreeViewer(this);
   m_treeViewer->resize(300, m_treeViewer->size().height());
