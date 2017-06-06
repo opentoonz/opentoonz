@@ -39,6 +39,8 @@ private:
   bool m_isUnpaintedFromNAA;
   bool m_appendDefaultPalette;
 
+  double m_dpi;
+
   void buildToonzRaster(TRasterCM32P &rout, const TRasterP &rin1,
                         const TRasterP &rin2);
   void doFill(TRasterCM32P &rout, const TRaster32P &rin);
@@ -66,7 +68,7 @@ public:
               const TFilePath &outFolder, const QString &outName, int from,
               int to, bool doAutoclose, const TFilePath &palettePath,
               int colorTolerance, int antialiasType, int antialiasValue,
-              bool isUnpaintedFromNAA, bool appendDefaultPalette);
+              bool isUnpaintedFromNAA, bool appendDefaultPalette, double dpi);
 
   bool init(std::string &errorMessage);
   int getFramesToConvertCount();

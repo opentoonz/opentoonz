@@ -356,10 +356,11 @@ private:
   TRectD m_selectingRect, m_firstRect;
 
   TPointD m_mousePos, m_brushPos, m_firstPos;
-
+  TMouseEvent m_mouseEvent;
   double m_thick;
 
   bool m_firstTime, m_selecting, m_firstFrameSelected, m_isXsheetCell;
+  bool m_mousePressed = false;
 
 } fullColorEraser(T_Eraser);  // Tools are statically instantiated
 
@@ -431,15 +432,18 @@ void FullColorEraserTool::onActivate() {
 
 //--------------------------------------------------------------------------------------------------
 
-void FullColorEraserTool::onDeactivate() {}
+void FullColorEraserTool::onDeactivate() {
+  if (m_mousePressed) leftButtonUp(m_mousePos, m_mouseEvent);
+}
 
 //--------------------------------------------------------------------------------------------------
 
 void FullColorEraserTool::leftButtonDown(const TPointD &pos,
                                          const TMouseEvent &e) {
   m_brushPos = m_mousePos = pos;
-
-  TRasterImageP ri = (TRasterImageP)getImage(true);
+  m_mouseEvent            = e;
+  m_mousePressed          = true;
+  TRasterImageP ri        = (TRasterImageP)getImage(true);
   if (!ri) return;
   TRectD invalidateRect;
   TRasterP ras = ri->getRaster();
@@ -524,8 +528,8 @@ void FullColorEraserTool::leftButtonDown(const TPointD &pos,
 void FullColorEraserTool::leftButtonDrag(const TPointD &pos,
                                          const TMouseEvent &e) {
   m_brushPos = m_mousePos = pos;
-
-  double pixelSize2 = getPixelSize() * getPixelSize();
+  m_mouseEvent            = e;
+  double pixelSize2       = getPixelSize() * getPixelSize();
 
   TRasterImageP ri = (TRasterImageP)getImage(true);
   if (!ri) return;
@@ -786,6 +790,7 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
         invalidate(stroke->getBBox().enlarge(2));
     }
   }
+  m_mousePressed = false;
 }
 
 //----------------------------------------------------------------------------------------------------------

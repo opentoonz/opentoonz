@@ -379,7 +379,8 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
     if ((m_tabletEvent && m_pressure > 0) || m_mouseButton == Qt::LeftButton) {
       // sometimes the mousePressedEvent is postponed to a wrong  mouse move
       // event!
-      if (m_buttonClicked) tool->leftButtonDrag(pos, toonzEvent);
+      if (m_buttonClicked && !m_toolSwitched)
+        tool->leftButtonDrag(pos, toonzEvent);
     } else if (m_pressure == 0) {
       tool->mouseMove(pos, toonzEvent);
       // m_tabletEvent=false;
@@ -412,7 +413,7 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   // evita i press ripetuti
   if (m_buttonClicked) return;
   m_buttonClicked = true;
-
+  m_toolSwitched  = false;
   if (m_freezedStatus != NO_FREEZED) return;
 
   if (m_mouseButton != Qt::NoButton) return;
@@ -554,7 +555,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
     }
 
     if (m_mouseButton == Qt::LeftButton) {
-      tool->leftButtonUp(pos, toonzEvent);
+      if (!m_toolSwitched) tool->leftButtonUp(pos, toonzEvent);
       TApp::instance()->getCurrentTool()->setToolBusy(false);
     }
   }
@@ -1117,7 +1118,7 @@ void SceneViewer::dropEvent(QDropEvent *e) {
 
 void SceneViewer::onToolSwitched() {
   m_forceGlFlush = true;
-
+  m_toolSwitched = true;
   invalidateToolStatus();
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();

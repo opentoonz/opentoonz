@@ -54,6 +54,25 @@ public:
 namespace TRop {
 namespace borders {
 
+//--------------------------------------------------------------------------------
+
+// Standard type instantiations
+
+template void DVAPI readMeshes<TPixel32>(
+    const TRasterPT<TPixel32> &raster, ImageMeshesReaderT<TPixel32> &reader);
+template void DVAPI readMeshes<TPixel64>(
+    const TRasterPT<TPixel64> &raster, ImageMeshesReaderT<TPixel64> &reader);
+template void DVAPI readMeshes<TPixelGR8>(
+    const TRasterPT<TPixelGR8> &raster, ImageMeshesReaderT<TPixelGR8> &reader);
+template void DVAPI readMeshes<TPixelGR16>(
+    const TRasterPT<TPixelGR16> &raster,
+    ImageMeshesReaderT<TPixelGR16> &reader);
+template void DVAPI readMeshes<TPixelCM32>(
+    const TRasterPT<TPixelCM32> &raster,
+    ImageMeshesReaderT<TPixelCM32> &reader);
+
+//--------------------------------------------------------------------------------
+
 template <typename Pix>
 void readBorders_simple(const TRasterPT<Pix> &raster, BordersReader &reader,
                         bool onlyCorners) {
@@ -305,27 +324,5 @@ void readMeshes(const TRasterPT<Pix> &raster, ImageMeshesReaderT<Pix> &reader) {
   raster->unlock();
 }
 
-//--------------------------------------------------------------
-
-// Standard type instantiations
-
-template DV_EXPORT_API class RasterEdgeIterator<PixelSelector<TPixel32>>;
-template DV_EXPORT_API class RasterEdgeIterator<PixelSelector<TPixel64>>;
-template DV_EXPORT_API class RasterEdgeIterator<PixelSelector<TPixelGR8>>;
-template DV_EXPORT_API class RasterEdgeIterator<PixelSelector<TPixelGR16>>;
-template DV_EXPORT_API class RasterEdgeIterator<PixelSelector<TPixelCM32>>;
-
-template DV_EXPORT_API void readMeshes<TPixel32>(
-    const TRasterPT<TPixel32> &raster, ImageMeshesReaderT<TPixel32> &reader);
-template DV_EXPORT_API void readMeshes<TPixel64>(
-    const TRasterPT<TPixel64> &raster, ImageMeshesReaderT<TPixel64> &reader);
-template DV_EXPORT_API void readMeshes<TPixelGR8>(
-    const TRasterPT<TPixelGR8> &raster, ImageMeshesReaderT<TPixelGR8> &reader);
-template DV_EXPORT_API void readMeshes<TPixelGR16>(
-    const TRasterPT<TPixelGR16> &raster,
-    ImageMeshesReaderT<TPixelGR16> &reader);
-template DV_EXPORT_API void readMeshes<TPixelCM32>(
-    const TRasterPT<TPixelCM32> &raster,
-    ImageMeshesReaderT<TPixelCM32> &reader);
 }
 }  // namespace TRop::borders

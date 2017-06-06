@@ -643,7 +643,8 @@ Convert2Tlv::Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2,
                          int from, int to, bool doAutoclose,
                          const TFilePath &palettePath, int colorTolerance,
                          int antialiasType, int antialiasValue,
-                         bool isUnpaintedFromNAA, bool appendDefaultPalette)
+                         bool isUnpaintedFromNAA, bool appendDefaultPalette,
+                         double dpi)
     : m_size(0, 0)
     , m_level1()
     , m_levelIn1()
@@ -660,7 +661,8 @@ Convert2Tlv::Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2,
     , m_antialiasType(antialiasType)
     , m_antialiasValue(antialiasValue)
     , m_isUnpaintedFromNAA(isUnpaintedFromNAA)
-    , m_appendDefaultPalette(appendDefaultPalette) {
+    , m_appendDefaultPalette(appendDefaultPalette)
+    , m_dpi(dpi) {
   if (filepath1 != TFilePath()) {
     m_levelIn1 = filepath1.getParentDir() + filepath1.getLevelName();
     if (outFolder != TFilePath())
@@ -886,10 +888,13 @@ bool Convert2Tlv::convertNext(std::string &errorMessage) {
   TRop::computeBBox(rout, bbox);
   timg->setSavebox(bbox);
 
-  double dpix, dpiy;
-
-  imgIn1->getDpi(dpix, dpiy);
-  timg->setDpi(dpix, dpiy);
+  if (m_dpi > 0.0)  // specify dpi in the convert popup
+    timg->setDpi(m_dpi, m_dpi);
+  else {
+    double dpix, dpiy;
+    imgIn1->getDpi(dpix, dpiy);
+    timg->setDpi(dpix, dpiy);
+  }
 
   TLevel::Iterator itaux = m_it;
   itaux++;

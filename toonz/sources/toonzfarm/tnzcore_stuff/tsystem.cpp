@@ -390,10 +390,9 @@ string TTime::getDate() const { return getFormattedString("%b %d %Y"); }
 //-----------------------------------------------------------------------------------
 
 string TTime::getTime() const {  // hh:mm:ss
-  char buffer[10];
-  ostrstream buff_s(buffer, sizeof(buffer));
+  stringstream buff_s;
   buff_s << "." << m_msec << '\0';
-  return getFormattedString("%X") + buffer;
+  return getFormattedString("%X") + buff_s.str();
 }
 
 //-----------------------------------------------------------------------------------
@@ -431,10 +430,9 @@ string TFileStatus::getGroup() const {
   struct group *grp = getgrgid(m_fStatus.st_gid);
   if (grp) return string(grp->gr_name);
 #endif
-  char buffer[1024];
-  ostrstream buff(buffer, sizeof(buffer));
+  stringstream buff;
   buff << m_fStatus.st_gid;
-  return string(buffer, buff.pcount());
+  return buff.str();
 }
 
 //-----------------------------------------------------------------------------------
@@ -444,10 +442,9 @@ string TFileStatus::getUser() const {
   struct passwd *pw = getpwuid(m_fStatus.st_uid);
   if (pw) return string(pw->pw_name);
 #endif
-  char buffer[1024];
-  ostrstream buff(buffer, sizeof(buffer));
+  stringstream buff;
   buff << m_fStatus.st_uid;
-  return string(buffer, buff.pcount());
+  return buff.str();
 }
 
 //-----------------------------------------------------------------------------------

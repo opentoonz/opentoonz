@@ -213,7 +213,7 @@ qt5_add_resources(SOURCES ${RESOURCES})
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS} OPTIONS ${incs})
 
 add_library(toonzqt SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzqt.dylib")
 endif()
 
@@ -228,10 +228,16 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext;toonzlib;sound")
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     set(EXTRA_LIBS ${EXTRA_LIBS}
         advapi32.lib
     )
+elseif(BUILD_ENV_UNIXLIKE)
+    if(BUILD_TARGET_WIN)
+        set(EXTRA_LIBS ${EXTRA_LIBS}
+            -ladvapi32
+        )
+    endif()
 endif()
 
 target_link_libraries(toonzqt Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::OpenGL ${EXTRA_LIBS} ${GL_LIB})

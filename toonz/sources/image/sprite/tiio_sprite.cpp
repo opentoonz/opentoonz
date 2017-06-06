@@ -194,6 +194,8 @@ void TLevelWriterSprite::saveSoundTrack(TSoundTrack *st) {}
 //-----------------------------------------------------------
 
 void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
+  m_frameIndexOrder.push_back(frameIndex);
+  std::sort(m_frameIndexOrder.begin(), m_frameIndexOrder.end());
   TRasterImageP tempImage(img);
   TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
 
@@ -261,7 +263,14 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
   newQi->fill(qRgba(0, 0, 0, 0));
   QPainter painter(newQi);
   painter.drawImage(QPoint(0, 0), *qi);
-  m_images.push_back(newQi);
+
+  // Make sure to order the images according to their frame index
+  // Not just what comes out first
+  std::vector<int>::iterator it;
+  it = find(m_frameIndexOrder.begin(), m_frameIndexOrder.end(), frameIndex);
+  int pos = std::distance(m_frameIndexOrder.begin(), it);
+
+  m_images.insert(m_images.begin() + pos, newQi);
   delete image;
   delete qi;
   free(buffer);

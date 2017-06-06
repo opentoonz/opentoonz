@@ -11,6 +11,55 @@ project(OpenToonz)
 # list of var-names
 set(_init_vars)
 
+#-----------------------------------------------------------------------------
+# Select build target
+set(BUILD_TARGET_WIN       OFF)
+set(BUILD_TARGET_APPLE     OFF)
+set(BUILD_TARGET_UNIX      OFF)
+if(WIN32)
+    set(BUILD_TARGET_WIN    ON)
+    message(STATUS "Target system is WIN")
+elseif(APPLE)
+    set(BUILD_TARGET_APPLE  ON)
+    message(STATUS "Target system is APPLE")
+elseif(UNIX)
+    set(BUILD_TARGET_UNIX   ON)
+    message(STATUS "Target system is UNIX")
+else()
+    set(BUILD_TARGET_UNIX   ON)
+    message(WARNING "Target system unknown, set UNIX by default")
+    message(STATUS "Target system is UNIX (actually unknown)")
+endif()
+
+#-----------------------------------------------------------------------------
+# Select build environment
+
+set(BUILD_ENV_MSVC     OFF)
+set(BUILD_ENV_APPLE    OFF)
+set(BUILD_ENV_UNIXLIKE OFF)
+if(MSVC)
+    set(BUILD_ENV_MSVC ON)
+    if(NOT BUILD_TARGET_WIN)
+        message(WARNING "Build environment is MSVC, but target system is not WIN")
+    endif()
+    message(STATUS "Build environment is MSVC")
+elseif(CMAKE_HOST_APPLE)
+    set(BUILD_ENV_APPLE ON)
+    if(NOT BUILD_TARGET_APPLE)
+        message(WARNING "Build environment is APPLE, but target system is not APPLE")
+    endif()
+    message(STATUS "Build environment is APPLE")
+elseif(CMAKE_HOST_UNIX OR CMAKE_COMPILER_IS_GNUCC)
+    set(BUILD_ENV_UNIXLIKE ON)
+    if(NOT BUILD_TARGET_UNIX AND NOT BUILD_TARGET_WIN)
+        message(WARNING "Build environment is UNIXLIKE, but target system is not UNIX or WIN")
+    endif()
+    message(STATUS "Build environment is UNIXLIKE")
+else()
+    message(ERROR "Unsupported build environment, only MSVC, APPLE and UNIXLIKE are supported")
+endif()
+
+
 # initialize to ON
 macro(option_defaults_init)
     foreach(_var ${ARGV})
@@ -35,13 +84,13 @@ option_defaults_init(
 )
 
 # customize...
-if(WIN32)
+if(BUILD_ENV_MSVC)
     set(_init_SYSTEM_LZO                     OFF)
     set(_init_SYSTEM_SUPERLU                 OFF)
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     set(_init_SYSTEM_LZO                     OFF)
     set(_init_SYSTEM_SUPERLU                 OFF)
-elseif(UNIX)
+elseif(BUILD_ENV_UNIXLIKE)
     set(_init_SYSTEM_LZO                     ON)
     set(_init_SYSTEM_SUPERLU                 ON)
 endif()
@@ -67,17 +116,15 @@ include(${CMAKE_SOURCE_DIR}/../cmake/util_compiler.cmake)
 get_filename_component(SDKROOT ../../thirdparty/ ABSOLUTE)
 message(STATUS "SDK Root:" ${SDKROOT})
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake")
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(THIRDPARTY_LIBS_HINTS "/usr/local/Cellar/" "/opt/include" ${SDKROOT})
-elseif(WIN32 OR UNIX)
+elseif(BUILD_ENV_MSVC OR BUILD_ENV_UNIXLIKE)
     set(THIRDPARTY_LIBS_HINTS ${SDKROOT})
 endif()
 
 message(STATUS "Thirdpary Library Search path:" ${THIRDPARTY_LIBS_HINTS})
 
-if(WIN32)
-    message(STATUS "Windows System")
-
+if(BUILD_ENV_MSVC)
     if(MSVC_VERSION GREATER 1800)
         if(CMAKE_SIZEOF_VOID_P EQUAL 4)
             set(QT_PATH "C:/Qt/5.6/msvc2015" CACHE PATH "Qt instlattion directory")
@@ -104,9 +151,7 @@ if(WIN32)
         -DNOMINMAX
         -D_USE_MATH_DEFINES
     )
-elseif(APPLE)
-    message(STATUS "Apple System")
-
+elseif(BUILD_ENV_APPLE)
     if(NOT PLATFORM)
         set(PLATFORM 64)
     endif()
@@ -139,9 +184,7 @@ elseif(APPLE)
     else()
         message(FATAL_ERROR "Invalid PLATFORM:" ${PLATFORM} ". 'PLATFORM' must be 32 or 64.")
     endif()
-elseif(UNIX)
-    message(STATUS "Unix System")
-
+elseif(BUILD_ENV_UNIXLIKE)
     # Needed for correct Qt detection
     cmake_minimum_required(VERSION 2.8.12)
 
@@ -152,7 +195,7 @@ elseif(UNIX)
     endif()
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         add_definitions(-DLINUX)
-    else()
+    elseif(NOT BUILD_TARGET_WIN)
         message(WARNING "Support for generic Unix (Not Apple or Linux) isn't yet working!")
     endif()
 
@@ -161,8 +204,6 @@ elseif(UNIX)
     find_package(Qt5Widgets)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -lstdc++ -std=c++11")
-else()
-    message(ERROR "Unknown System")
 endif()
 
 add_definitions(
@@ -175,7 +216,7 @@ add_definitions(
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_MACOSX_RPATH ON)
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
@@ -213,7 +254,7 @@ if(Qt5Core_VERSION VERSION_LESS QT_MINIMUM_VERSION)
 endif()
 unset(QT_MINIMUM_VERSION)
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     include_directories(
         SYSTEM
         ${SDKROOT}/glut/3.7.6/include
@@ -234,7 +275,7 @@ macro(_find_toonz_library OUT_LIB_LIST IN_LIB_LIST)
     foreach(arg ${IN_LIB_LIST})
         unset(COREPATH CACHE)
         # find しても cmake が走るときにはできていないので完全なパス名を生成して返すだけ
-        if(APPLE)
+        if(BUILD_ENV_APPLE)
             set(LIBPATH ${CMAKE_CURRENT_BINARY_DIR}/../${arg}/lib${arg}${CMAKE_SHARED_LIBRARY_SUFFIX})
         else()
             set(LIBPATH ${arg})
@@ -247,7 +288,9 @@ endmacro()
 set(TNZSTDFX_Location)
 set(TFARM_Location)
 
-if(WIN32)
+set(QT_LIB)  # avoid warning
+
+if(BUILD_ENV_MSVC)
     if(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(PLATFORM 32)
         set(PLATFORM2)
@@ -286,7 +329,7 @@ if(WIN32)
     if(PLATFORM EQUAL 32)
         set(QT_LIB ${SDKROOT}/quicktime/QT73SDK/Libraries/QTMLClient.lib)
     endif()
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     find_library(GLUT_LIB GLUT)
     find_library(GL_LIB OpenGL)
     find_library(Z_LIB z)
@@ -333,10 +376,19 @@ elseif(APPLE)
     find_package(LZO REQUIRED)
     message("LZO:" ${LZO_INCLUDE_DIR})
 
-elseif(UNIX)
-    find_library(GL_LIB GL)
-    find_library(GLU_LIB GLU)
-    find_library(GLUT_LIB glut)
+elseif(BUILD_ENV_UNIXLIKE)
+    if(BUILD_TARGET_WIN)
+        if(PLATFORM EQUAL 32)
+            set(QT_LIB ${SDKROOT}/quicktime/QT73SDK/Libraries/QTMLClient.lib)
+        endif()
+        find_library(GL_LIB opengl32)
+        find_library(GLU_LIB glu32)
+        find_library(GLUT_LIB NAMES glut freeglut)
+    else()
+        find_library(GL_LIB GL)
+        find_library(GLU_LIB GLU)
+        find_library(GLUT_LIB glut)
+    endif()
     find_library(Z_LIB z)
 
     find_package(TIFF REQUIRED)
@@ -371,8 +423,6 @@ elseif(UNIX)
         add_definitions(-DLZ4_STATIC)
     endif()
 
-    pkg_check_modules(USB_LIB REQUIRED libusb-1.0)
-
     # TODO: check for them properly in some sane order with pkg-config
     find_library(OPENBLAS_LIB NAMES cblas gslcblas openblas blas)
     message("OpenBLAS:" ${OPENBLAS_LIB})
@@ -383,8 +433,11 @@ elseif(UNIX)
     find_package(LZO REQUIRED)
     message("LZO:" ${LZO_INCLUDE_DIR})
 
-    pkg_check_modules(FREETYPE REQUIRED freetype2)
-    pkg_check_modules(SDL_LIB REQUIRED sdl2)
+    if(NOT BUILD_TARGET_WIN)
+        pkg_check_modules(USB_LIB REQUIRED libusb-1.0)
+        pkg_check_modules(FREETYPE REQUIRED freetype2)
+        pkg_check_modules(SDL_LIB REQUIRED sdl2)
+    endif()
 endif()
 
 
@@ -419,7 +472,7 @@ include_directories(
     ${PNG_INCLUDE_DIRS}
 )
 
-if(WIN32 OR APPLE)
+if(BUILD_ENV_MSVC OR BUILD_ENV_APPLE)
     find_path(
         BOOST_ROOT
             include/boost
@@ -450,17 +503,17 @@ include_directories(
     ${JPEG_INCLUDE_DIR}
 )
 
-if(WIN32 AND PLATFORM EQUAL 64)
+if(BUILD_TARGET_WIN AND PLATFORM EQUAL 64)
     add_definitions(-Dx64)
 endif()
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     # place Toonz.exe and dlls in the same directory
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     # pass
-elseif(UNIX)
+elseif(BUILD_ENV_UNIXLIKE)
     set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
     # Mirror relative bin/lib location for installation
@@ -474,7 +527,7 @@ elseif(UNIX)
     endif()
 endif()
 
-if(MSVC AND MSVC_VERSION EQUAL 1800)
+if(BUILD_ENV_MSVC AND MSVC_VERSION EQUAL 1800)
     # Visual C++ 2013 cannot handle UTF-8 without BOM
     # Non-ascii characters in comments would not be a problem
     add_compile_options("/wd4819")
@@ -524,15 +577,15 @@ add_subdirectory(tcomposer)
 add_subdirectory(tconverter)
 add_subdirectory(toonzfarm)
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     add_subdirectory(mousedragfilter)
 endif()
 
-if((PLATFORM EQUAL 32) AND (WIN32 OR APPLE))
+if((PLATFORM EQUAL 32) AND (BUILD_TARGET_WIN OR BUILD_TARGET_APPLE))
     add_subdirectory(t32bitsrv)
 endif()
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     add_custom_command(TARGET executable
         POST_BUILD COMMAND
         ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH}

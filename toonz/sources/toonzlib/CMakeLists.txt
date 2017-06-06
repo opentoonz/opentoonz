@@ -314,7 +314,7 @@ set(SOURCES
     textureutils.cpp
 )
 
-if(WIN32)
+if(BUILD_TARGET_WIN)
     set(SOURCES ${SOURCES}
         avicodecrestrictions.cpp
     )
@@ -325,7 +325,7 @@ add_translation(toonzlib ${HEADERS} ${SOURCES})
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(toonzlib SHARED ${HEADERS} ${SOURCES})
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzlib.dylib")
 endif()
 
@@ -344,13 +344,13 @@ include_directories(
     ../toonzfarm/include
 )
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     target_link_libraries(toonzlib
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script
         ${GLUT_LIB} ${GL_LIB} vfw32.lib
         tnzcore tnzbase tnzext
     )
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     set(EXTRA_LIBS
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.dylib
@@ -359,8 +359,12 @@ elseif(APPLE)
     )
 
     target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
-elseif(UNIX)
+elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext")
+
+    if(BUILD_TARGET_WIN)
+        set(EXTRA_LIBS ${EXTRA_LIBS} -lvfw32)
+    endif()
 
     target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
 endif()

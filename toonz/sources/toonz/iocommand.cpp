@@ -1242,10 +1242,11 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
 
     //--- If both the level and scene is clean, then open the quit confirmation
     // dialog
-    //if (!isLevelOrSceneIsDirty && msg == "Quit") {
+    // if (!isLevelOrSceneIsDirty && msg == "Quit") {
     //  QString question("Are you sure ?");
     //  int ret =
-    //      DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
+    //      DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"),
+    //      0);
     //  if (ret == 0 || ret == 2) {
     //    // cancel (or closed message box window)
     //    return false;
@@ -2122,6 +2123,7 @@ static int loadPSDResource(IoCmd::LoadResourceArguments &args,
     } else {
       TFilePath psdpath = popup->getPsdPath(i);
       TXshLevel *xl     = 0;
+
       try {
         xl = ::loadResource(scene, psdpath, args.castFolder, row0, col0, row1,
                             col1, !popup->subxsheet());

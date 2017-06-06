@@ -59,6 +59,19 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
      * polarization */
     float cos_in = cosf(angle_in);
     float cos_re = cosf(angle_re);
+
+    // compute the offset in order to make the seam of looped-spectrum curved
+    // along the stripe
+    float seam_offset = 0.0f;
+    if (fadeWidth != 0.0f) {  // if the fade width is 0, the seam does not curve
+      float base_light_diff =
+          (thickMax + thickMin) / cosf(asinf(1 / refractiveIndex));
+      float offset_width = 0.5f * (base_light_diff - thickMax - thickMin);
+      seam_offset        = 0.5f * (base_light_diff *
+                                cosf(asinf(cosf(angle_in) / refractiveIndex)) -
+                            thickMax - thickMin - offset_width);
+    }
+
     // P-polarized light
     p.r_ab = (cos_re - refractiveIndex * cos_in) /
              (cos_re + refractiveIndex * cos_re);
@@ -85,15 +98,25 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
       float tmp_t[2];
       float tmp_ratio[2];
 
-      if (t < fadeWidth) {
+      if (t < seam_offset - fadeWidth) {
+        tmp_t[0]     = t + 1.0f;
+        tmp_t[1]     = 0;  // unused
+        tmp_ratio[0] = 1.0f;
+        tmp_ratio[1] = 0.0f;
+      } else if (t < seam_offset + fadeWidth) {
         tmp_t[0]     = t;
         tmp_t[1]     = t + 1.0f;
-        tmp_ratio[0] = 0.5f + 0.5f * t / fadeWidth;
+        tmp_ratio[0] = 0.5f + 0.5f * (t - seam_offset) / fadeWidth;
         tmp_ratio[1] = 1.0f - tmp_ratio[0];
-      } else if (t > 1.0f - fadeWidth) {
+      } else if (t > 1.0f + seam_offset + fadeWidth) {
+        tmp_t[0]     = t - 1.0f;
+        tmp_t[1]     = 0;  // unused
+        tmp_ratio[0] = 1.0f;
+        tmp_ratio[1] = 0.0f;
+      } else if (t > 1.0f + seam_offset - fadeWidth) {
         tmp_t[0]     = t;
         tmp_t[1]     = t - 1.0f;
-        tmp_ratio[0] = 0.5f + 0.5f * (1.0f - t) / fadeWidth;
+        tmp_ratio[0] = 0.5f + 0.5f * (1.0f - t + seam_offset) / fadeWidth;
         tmp_ratio[1] = 1.0f - tmp_ratio[0];
       } else {  // no fade
         tmp_t[0]     = t;

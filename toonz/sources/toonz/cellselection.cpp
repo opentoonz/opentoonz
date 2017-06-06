@@ -910,7 +910,8 @@ public:
 //=============================================================================
 
 bool pasteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1,
-                           bool insert = true, bool doZeraryClone = true) {
+                           bool insert = true, bool doZeraryClone = true,
+                           bool skipEmptyCells = true) {
   TXsheet *xsh              = TApp::instance()->getCurrentXsheet()->getXsheet();
   QClipboard *clipboard     = QApplication::clipboard();
   const QMimeData *mimeData = clipboard->mimeData();
@@ -921,7 +922,8 @@ bool pasteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1,
   if (r0 < 0 || c0 < 0) return false;
 
   /*-- この中で、r1,c1はペースト範囲にあわせリサイズされる --*/
-  bool ret = cellData->getCells(xsh, r0, c0, r1, c1, insert, doZeraryClone);
+  bool ret = cellData->getCells(xsh, r0, c0, r1, c1, insert, doZeraryClone,
+                                skipEmptyCells);
   if (!ret) return false;
 
   // Se la selezione corrente e' TCellSelection selezione le celle copiate
@@ -992,16 +994,16 @@ public:
     }
 
     /*-- クリップボードの内容を取っておく --*/
-    const QMimeData *mimeData = clipboard->mimeData();
+    QMimeData *mimeData = cloneData(clipboard->mimeData());
 
     /*--
      * ペースト前にあったセル配列をcellDataとしていったんクリップボードに入れ、ペーストさせる
      * --*/
     clipboard->setMimeData(cloneData(m_beforeData), QClipboard::Clipboard);
-    pasteCellsWithoutUndo(r0, c0, c1, r1, true, false);
+    pasteCellsWithoutUndo(r0, c0, r1, c1, true, false, false);
 
     /*-- クリップボードを元に戻す --*/
-    clipboard->setMimeData(cloneData(mimeData), QClipboard::Clipboard);
+    clipboard->setMimeData(mimeData, QClipboard::Clipboard);
 
     // Se le selezione corrente e' TCellSelection seleziono le celle che sono in
     // oldSelection

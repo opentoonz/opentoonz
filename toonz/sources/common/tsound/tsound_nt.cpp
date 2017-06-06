@@ -62,11 +62,13 @@ private:
 };
 #endif
 
-int makeDWORD(const short lo, const short hi) {
+/*
+static int makeDWORD(const short lo, const short hi) {
   int dw = hi << 16;
   dw |= lo;
   return dw;
 }
+*/
 
 //==============================================================================
 class WavehdrQueue;
@@ -136,7 +138,7 @@ private:
 
 //==============================================================================
 
-WAVEHDR *prepareWaveHeader(HWAVEOUT wout, const TSoundTrackP &subTrack,
+static WAVEHDR *prepareWaveHeader(HWAVEOUT wout, const TSoundTrackP &subTrack,
                            ULONG &count) {
   WAVEHDR *whdr = new WAVEHDR;
   memset(whdr, 0, sizeof(WAVEHDR));

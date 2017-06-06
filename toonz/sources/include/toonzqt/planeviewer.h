@@ -8,6 +8,9 @@
 #include "traster.h"
 #include "timage.h"
 
+// TnzQt includes
+#include "toonzqt/glwidget_for_highdpi.h"
+
 // Qt includes
 #include <QGLWidget>
 
@@ -57,7 +60,7 @@ shader fx for some unknown reasons. So I will reluctantly keep using the
 obsolete class until the shader fx being overhauled. 2016/6/22 Shun
 */
 
-class DVAPI PlaneViewer : public QGLWidget {
+class DVAPI PlaneViewer : public GLWidgetForHighDpi {
 public:
   PlaneViewer(QWidget *parent);
 

@@ -9,6 +9,7 @@
 #include "timageinfo.h"
 #include "trop.h"
 #include "tsound.h"
+#include "tmsgcore.h"
 
 // tipc includes
 #include "tipc.h"
@@ -139,7 +140,7 @@ TLevelWriter3gp::~TLevelWriter3gp() {
 
   stream << (msg << QString("$closeLW3gp") << m_id);
   if (tipc::readMessage(stream, msg) != "ok")
-    throw TException("Unable to write file");
+    DVGui::warning("Unable to write file");
 }
 
 //------------------------------------------------------------------
