@@ -618,7 +618,8 @@ void ToolOptionCombo::doOnActivated(int index) {
     onActivated(index);
     setCurrentIndex(index);
     // for updating the cursor
-    m_toolHandle->notifyToolChanged();
+    std::string toolName = m_tool->getName();
+    if (toolName != "T_Plastic") m_toolHandle->notifyToolChanged();
     return;
   }
 
