@@ -8,6 +8,8 @@
 #include "tfilepath_io.h"
 #include "service.h"
 #include "tcli.h"
+#include "tversion.h"
+using namespace TVER;
 
 #include "tthreadmessage.h"
 #include "tthread.h"
@@ -54,16 +56,25 @@ int inline STRICMP(const char *a, const char *b) {
 namespace {
 
 TFilePath getGlobalRoot() {
+  TVER::ToonzVersion tver;
   TFilePath rootDir;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\FARMROOT");
+  std::string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT";
+  TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
 
   // Leggo la globalRoot da File txt
-  Tifstream is(
-      TFilePath("./OpenToonz_1.0.app/Contents/Resources/configfarmroot.txt"));
+#  ifdef MACOSX
+  // If MACOSX, change to MACOSX path
+  std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
+#  else
+  // set path to something suitable for most linux (Unix?) systems
+  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
+#  endif
+  TFilePath name(unixpath);
+  Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -87,17 +98,25 @@ TFilePath getGlobalRoot() {
 //--------------------------------------------------------------------
 
 TFilePath getLocalRoot() {
+  TVER::ToonzVersion tver;
   TFilePath lroot;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\TOONZROOT");
+  std:string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT";
+  TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
   // Leggo la localRoot da File txt
-
-  Tifstream is(
-      TFilePath("./OpenToonz_1.0.app/Contents/Resources/configfarmroot.txt"));
+#  ifdef MACOSX
+  // If MACOSX, change to MACOSX path
+  std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
+#  else
+  // set path to something suitable for most linux (Unix?) systems
+  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
+#  endif
+  TFilePath name(unixpath);
+  Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -2202,6 +2221,7 @@ public:
 void ControllerService::onStart(int argc, char *argv[]) {
   // Initialize thread components
   TThread::init();
+  TVER::ToonzVersion tver;
 
   if (isRunningAsConsoleApp()) {
     // i messaggi verranno ridiretti sullo standard output
@@ -2212,7 +2232,7 @@ void ControllerService::onStart(int argc, char *argv[]) {
     if (!lRootDirExists) {
       QString errMsg("Unable to start the Controller");
       errMsg += "\n";
-      errMsg += "The directory specified as Local Root does not exist";
+      errMsg += "The directory " + lRootDir.getQString() + " specified as Local Root does not exist";
       errMsg += "\n";
 
       addToMessageLog(errMsg);
@@ -2224,12 +2244,12 @@ void ControllerService::onStart(int argc, char *argv[]) {
     TFilePath logFilePath = lRootDir + "controller.log";
     m_userLog             = new TUserLog(logFilePath);
   }
-
-  m_userLog->info("ToonzFarm Controller 1.0\n\n");
+  std:string appverinfo = tver.getAppVersionInfo("Farm Controller") + "\n\n";
+  m_userLog->info( appverinfo.c_str() );
 
   TFilePath globalRoot = getGlobalRoot();
   if (globalRoot.isEmpty()) {
-    QString errMsg("Unable to get FARMROOT environment variable\n");
+    QString errMsg("Unable to get FARMROOT environment variable (" + globalRoot.getQString() + ")\n");
     addToMessageLog(errMsg);
 
     // exit the program
@@ -2243,7 +2263,7 @@ void ControllerService::onStart(int argc, char *argv[]) {
 
   if (!globalRootExists) {
     QString errMsg(
-        "The directory specified as TFARMGLOBALROOT does not exist\n");
+        "The directory " + globalRoot.getQString() + " specified as TFARMGLOBALROOT does not exist\n");
     addToMessageLog(errMsg);
 
     // exit the program
