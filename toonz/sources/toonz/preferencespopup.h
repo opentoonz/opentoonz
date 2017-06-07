@@ -72,7 +72,8 @@ private:
       *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
-      *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader;
+      *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
+      *m_newLevelToCameraSizeCB;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -144,6 +145,7 @@ private slots:
   void onRegionAntialiasChanged(int);
   void onImportPolicyChanged(int);
   void onImportPolicyExternallyChanged(int policy);
+  void onNewLevelToCameraSizeChanged(bool checked);
 
 #ifdef LINETEST
   void onLineTestFpsCapture(int);

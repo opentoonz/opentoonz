@@ -596,9 +596,18 @@ bool LevelCreatePopup::apply() {
 void LevelCreatePopup::update() {
   updatePath();
   Preferences *pref = Preferences::instance();
-
-  m_widthFld->setValue(pref->getDefLevelWidth());
-  m_heightFld->setValue(pref->getDefLevelHeight());
+  if (pref->isNewLevelSizeToCameraSizeEnabled()) {
+    TDimensionD camSize = TApp::instance()
+                              ->getCurrentScene()
+                              ->getScene()
+                              ->getCurrentCamera()
+                              ->getSize();
+    m_widthFld->setValue(camSize.lx);
+    m_heightFld->setValue(camSize.ly);
+  } else {
+    m_widthFld->setValue(pref->getDefLevelWidth());
+    m_heightFld->setValue(pref->getDefLevelHeight());
+  }
   m_dpiFld->setValue(pref->getDefLevelDpi());
   int levelType = pref->getDefLevelType();
   int index     = -1;
