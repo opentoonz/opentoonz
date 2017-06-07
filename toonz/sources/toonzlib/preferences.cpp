@@ -300,6 +300,7 @@ Preferences::Preferences()
     , m_useNumpadForSwitchingStyles(true)
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
+    , m_importPolicy(0)
     , m_watchFileSystem(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -578,6 +579,7 @@ Preferences::Preferences()
            m_useArrowKeyToShiftCellSelection);
   getValue(*m_settings, "inputCellsWithoutDoubleClickingEnabled",
            m_inputCellsWithoutDoubleClickingEnabled);
+  getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
 }
 
@@ -1293,6 +1295,13 @@ void Preferences::setPrecompute(bool enabled) { m_precompute = enabled; }
 void Preferences::setFfmpegTimeout(int seconds) {
   m_ffmpegTimeout = seconds;
   m_settings->setValue("ffmpegTimeout", seconds);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setDefaultImportPolicy(int policy) {
+  m_importPolicy = policy;
+  m_settings->setValue("importPolicy", policy);
 }
 
 //-----------------------------------------------------------------

@@ -16,7 +16,7 @@ long TSystem::getCPUExtensions() {
 }
 
 #else
-#ifndef _WIN32
+#ifndef _MSC_VER
 long TSystem::getCPUExtensions() { return TSystem::CPUExtensionsNone; }
 #else
 namespace {

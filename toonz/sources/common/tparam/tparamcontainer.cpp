@@ -67,12 +67,17 @@ const TParamVar *TParamContainer::getParamVar(int index) const {
 }
 
 TParam *TParamContainer::getParam(std::string name) const {
+  TParamVar *var = getParamVar(name);
+  return (var) ? var->getParam() : 0;
+}
+
+TParamVar *TParamContainer::getParamVar(std::string name) const {
   std::map<std::string, TParamVar *>::const_iterator it;
   it = m_imp->m_nameTable.find(name);
   if (it == m_imp->m_nameTable.end())
     return 0;
   else
-    return it->second->getParam();
+    return it->second;
 }
 
 void TParamContainer::unlink() {

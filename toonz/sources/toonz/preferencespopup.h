@@ -53,7 +53,7 @@ private:
 
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
-      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm;
+      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -142,6 +142,8 @@ private slots:
   void onLevelFormatEdited();
   void onShow0ThickLinesChanged(int);
   void onRegionAntialiasChanged(int);
+  void onImportPolicyChanged(int);
+  void onImportPolicyExternallyChanged(int policy);
 
 #ifdef LINETEST
   void onLineTestFpsCapture(int);

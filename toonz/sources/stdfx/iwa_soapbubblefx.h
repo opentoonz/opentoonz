@@ -21,12 +21,18 @@ protected:
   TRasterFxPort m_shape;
   /* another option, to input a depth map directly */
   TRasterFxPort m_depth;
+  // rendering mode
+  TIntEnumParamP m_renderMode;
   // shape parameters
   TDoubleParamP m_binarize_threshold;
   TDoubleParamP m_shape_aspect_ratio;
   TDoubleParamP m_blur_radius;
   TDoubleParamP m_blur_power;
   TBoolParamP m_multi_source;
+  TDoubleParamP m_center_opacity;
+  TBoolParamP m_fit_thickness;
+
+  // obsolete parameter. to be conerted to m_center_opacity
   TBoolParamP m_mask_center;
 
   // noise parameters
@@ -39,6 +45,8 @@ protected:
   TDoubleParamP m_noise_depth_mix_ratio;
   TDoubleParamP m_noise_thickness_mix_ratio;
 
+  enum { RENDER_MODE_BUBBLE, RENDER_MODE_THICKNESS, RENDER_MODE_DEPTH };
+
   template <typename RASTER, typename PIXEL>
   void convertToBrightness(const RASTER srcRas, float* dst, float* alpha,
                            TDimensionI dim);
@@ -49,11 +57,13 @@ protected:
                        float3* bubbleColor_p);
 
   void processShape(double frame, TTile& shape_tile, float* depth_map_p,
-                    float* alpha_map_p, TDimensionI dim,
+                    float* alpha_map_p, USHORT* regionIds_p,
+                    QList<QRect>& regionBoundingRects, TDimensionI dim,
                     const TRenderSettings& settings);
 
   int do_binarize(TRaster32P srcRas, USHORT* dst_p, float thres,
-                  float* distance_p, float* alpha_map_p, TDimensionI dim);
+                  float* distance_p, float* alpha_map_p,
+                  QList<QRect>& regionBoundingRects, TDimensionI dim);
 
   void do_createBlurFilter(float* dst_p, int size, float radius);
 
@@ -89,13 +99,22 @@ protected:
                                    const TRenderSettings&);
 
   void applyDistanceToAlpha(float* distance_p, float* alpha_map_p,
-                            TDimensionI dim);
+                            TDimensionI dim, float center_opacity);
+
+  void fitThicknessPatches(TRasterP thickRas, TDimensionI thickDim,
+                           float* thickness_map_p, TDimensionI dim,
+                           USHORT* regionIds_p,
+                           QList<QRect>& regionBoundingRects);
 
 public:
   Iwa_SoapBubbleFx();
 
   void doCompute(TTile& tile, double frame,
                  const TRenderSettings& settings) override;
+
+  // This will be called in TFx::loadData when obsolete "mask center" value is
+  // loaded
+  void onObsoleteParamLoaded(const std::string& paramName) override;
 };
 
 #endif

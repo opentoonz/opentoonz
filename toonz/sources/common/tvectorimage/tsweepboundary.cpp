@@ -14,7 +14,7 @@
 
 #ifdef _WIN32
 #include <crtdbg.h>
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 #include "tsweepboundary.h"

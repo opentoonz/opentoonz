@@ -52,6 +52,20 @@ namespace {
 // the first value in the preset list
 const QString custom = QObject::tr("<custom>");
 
+void removeAll(QLayout *layout) {
+  QLayoutItem *child;
+  while (layout->count() != 0) {
+    child = layout->takeAt(0);
+    if (child->layout() != 0) {
+      removeAll(child->layout());
+    } else if (child->widget() != 0) {
+      delete child->widget();
+    }
+
+    delete child;
+  }
+}
+
 QString removeZeros(QString srcStr) {
   if (!srcStr.contains('.')) return srcStr;
 
@@ -346,16 +360,20 @@ void StartupPopup::showEvent(QShowEvent *) {
 
   // update recent scenes
   // clear items if they exist first
+  refreshRecentScenes();
+  // center window
+  this->move(QApplication::desktop()->screen()->rect().center() -
+             this->rect().center());
+}
 
-  if (m_recentSceneLay->count() > 0) {
-    QLayoutItem *child;
-    while (m_recentSceneLay->count() != 0) {
-      child = m_recentSceneLay->takeAt(0);
-      delete child;
-    }
-  }
+//-----------------------------------------------------------------------------
 
+void StartupPopup::refreshRecentScenes() {
+  removeAll(m_recentSceneLay);
+
+  m_sceneNames.clear();
   m_sceneNames = RecentFiles::instance()->getFilesNameList(RecentFiles::Scene);
+  m_recentNamesLabels.clear();
   m_recentNamesLabels = QVector<StartupLabel *>(m_sceneNames.count());
 
   if (m_sceneNames.count() <= 0) {
@@ -369,21 +387,18 @@ void StartupPopup::showEvent(QShowEvent *) {
       m_recentNamesLabels[i] = new StartupLabel(justName, this, i);
       m_recentNamesLabels[i]->setToolTip(
           name.remove(0, name.indexOf(" ") + 1));  // remove "#. " prefix
-      m_recentSceneLay->addWidget(m_recentNamesLabels[i], i, Qt::AlignTop);
+      m_recentSceneLay->addWidget(m_recentNamesLabels[i], 0, Qt::AlignTop);
       i++;
     }
-    m_recentSceneLay->addStretch(100);
   }
-
   bool ret = true;
-  for (int i = 0; i < m_recentNamesLabels.count() && i < 7; i++) {
+  for (int i = 0;
+       i < m_recentNamesLabels.count() && i < RECENT_SCENES_MAX_COUNT; i++) {
     ret = ret && connect(m_recentNamesLabels[i], SIGNAL(wasClicked(int)), this,
                          SLOT(onRecentSceneClicked(int)));
   }
   assert(ret);
-  // center window
-  this->move(QApplication::desktop()->screen()->rect().center() -
-             this->rect().center());
+  m_recentSceneLay->addStretch(1);
 }
 
 //-----------------------------------------------------------------------------
@@ -804,10 +819,22 @@ void StartupPopup::onRecentSceneClicked(int index) {
   if (index < 0) return;
   QString path =
       RecentFiles::instance()->getFilePath(index, RecentFiles::Scene);
-  IoCmd::loadScene(TFilePath(path.toStdWString()), false);
-  RecentFiles::instance()->moveFilePath(index, 0, RecentFiles::Scene);
-  RecentFiles::instance()->refreshRecentFilesMenu(RecentFiles::Scene);
-  hide();
+  if (!TSystem::doesExistFileOrLevel(TFilePath(path.toStdWString()))) {
+    RecentFiles::instance()->removeFilePath(index, RecentFiles::Scene);
+    RecentFiles::instance()->refreshRecentFilesMenu(RecentFiles::Scene);
+    for (int i = 0;
+         i < m_recentNamesLabels.count() && i < RECENT_SCENES_MAX_COUNT; i++) {
+      disconnect(m_recentNamesLabels[i]);
+    }
+    QString msg = QObject::tr("The selected scene could not be found.");
+    DVGui::warning(msg);
+    refreshRecentScenes();
+  } else {
+    IoCmd::loadScene(TFilePath(path.toStdWString()), false);
+    RecentFiles::instance()->moveFilePath(index, 0, RecentFiles::Scene);
+    RecentFiles::instance()->refreshRecentFilesMenu(RecentFiles::Scene);
+    hide();
+  }
 }
 
 //-----------------------------------------------------------------------------

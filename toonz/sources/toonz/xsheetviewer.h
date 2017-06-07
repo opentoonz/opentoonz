@@ -13,13 +13,8 @@
 #include "cellkeyframeselection.h"
 #include "toonzqt/spreadsheetviewer.h"
 
-#ifdef _WIN32
-#define XSHEET_FONT_SIZE 9
+#define XSHEET_FONT_PX_SIZE 12
 #define H_ADJUST 2
-#else
-#define XSHEET_FONT_SIZE 11
-#define H_ADJUST 0
-#endif
 
 // forward declaration
 class TXsheet;

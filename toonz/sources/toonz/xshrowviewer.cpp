@@ -89,10 +89,13 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
   }
 
 #ifdef _WIN32
-  static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Bold);
+  static QFont font("Arial", -1, QFont::Bold);
 #else
-  static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
+  static QFont font("Helvetica", -1, QFont::Normal);
 #endif
+  // set font size in pixel
+  font.setPixelSize(XSHEET_FONT_PX_SIZE);
+
   p.setFont(font);
 
   // marker interval

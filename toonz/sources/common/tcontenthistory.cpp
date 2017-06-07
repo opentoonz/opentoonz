@@ -7,7 +7,7 @@
 #include <QProcess>
 #include <QTextStream>
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 #include <map>
 #include <QFile>

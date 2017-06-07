@@ -31,8 +31,6 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
   float phi;                       /* phase */
   float color_x, color_y, color_z; /* xyz color channels */
 
-  float temp_rgb_f[3];
-
   /* obtain parameters */
   float intensity       = (float)m_intensity->getValue(frame);
   float refractiveIndex = (float)m_refractiveIndex->getValue(frame);
@@ -42,6 +40,8 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
                        (float)m_GGamma->getValue(frame),
                        (float)m_BGamma->getValue(frame)};
   float lensFactor = (float)m_lensFactor->getValue(frame);
+  float shift      = (float)m_spectrumShift->getValue(frame);
+  float fadeWidth  = (float)m_loopSpectrumFadeWidth->getValue(frame) / 2.0f;
 
   /* for Iwa_SpectrumFx, incident angle is fixed to 0,
      for Iwa_SoapBubbleFx, compute for all discrete incident angles*/
@@ -74,64 +74,97 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
 
     /* for each discrete thickness */
     for (j = 0; j < 256; j++) {
-      /* calculate the thickness of film (μm) */
-      d = thickMin +
-          (thickMax - thickMin) * powf(((float)j / 255.0f), lensFactor);
+      // normalize within 0-1 and shift
+      float t = (float)j / 255.0f + shift;
+      // get fractional part
+      t -= std::floor(t);
+      // apply lens factor
+      t = powf(t, lensFactor);
 
-      /* there may be a case that the thickness is smaller than 0 */
-      if (d < 0.0f) d = 0.0f;
+      float tmp_rgb[2][3];
+      float tmp_t[2];
+      float tmp_ratio[2];
 
-      /* initialize XYZ color channels */
-      color_x = 0.0f;
-      color_y = 0.0f;
-      color_z = 0.0f;
-
-      /* for each wavelength (in the range of visible light, 380nm-710nm) */
-      for (ram = 0; ram < 34; ram++) {
-        /* wavelength `λ` (μm) */
-        rambda = 0.38f + 0.01f * (float)ram;
-        /* phase of light */
-        phi = 4.0f * PI * refractiveIndex * d * cos_re / rambda;
-        /* reflection amplitude of the film for each polarization */
-        // P-polarized light
-        p.r_real = p.r_ab + p.t_ab * p.r_ba * p.t_ba * cosf(phi);
-        p.r_img  = p.t_ab * p.r_ba * p.t_ba * sinf(phi);
-        // S-polarized light
-        s.r_real = s.r_ab + s.t_ab * s.r_ba * s.t_ba * cosf(phi);
-        s.r_img  = s.t_ab * s.r_ba * s.t_ba * sinf(phi);
-
-        p.R = p.r_real * p.r_real + p.r_img * p.r_img;
-        s.R = s.r_real * s.r_real + s.r_img * s.r_img;
-
-        /* combined energy reflectance */
-        R_final = (p.R + s.R) / 2.0f;
-
-        /* accumulate XYZ channel values */
-        color_x += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 0];
-        color_y += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 1];
-        color_z += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 2];
-
-      } /* next wavelength (ram) */
-
-      temp_rgb_f[0] =
-          3.240479f * color_x - 1.537150f * color_y - 0.498535f * color_z;
-      temp_rgb_f[1] =
-          -0.969256f * color_x + 1.875992f * color_y + 0.041556f * color_z;
-      temp_rgb_f[2] =
-          0.055648f * color_x - 0.204043f * color_y + 1.057311f * color_z;
-
-      /* clamp overflows */
-      for (k = 0; k < 3; k++) {
-        if (temp_rgb_f[k] < 0.0f) temp_rgb_f[k] = 0.0f;
-
-        /* gamma adjustment */
-        temp_rgb_f[k] = powf((temp_rgb_f[k] / 255.0f), rgbGamma[k]);
-
-        if (temp_rgb_f[k] >= 1.0f) temp_rgb_f[k] = 1.0f;
+      if (t < fadeWidth) {
+        tmp_t[0]     = t;
+        tmp_t[1]     = t + 1.0f;
+        tmp_ratio[0] = 0.5f + 0.5f * t / fadeWidth;
+        tmp_ratio[1] = 1.0f - tmp_ratio[0];
+      } else if (t > 1.0f - fadeWidth) {
+        tmp_t[0]     = t;
+        tmp_t[1]     = t - 1.0f;
+        tmp_ratio[0] = 0.5f + 0.5f * (1.0f - t) / fadeWidth;
+        tmp_ratio[1] = 1.0f - tmp_ratio[0];
+      } else {  // no fade
+        tmp_t[0]     = t;
+        tmp_t[1]     = 0;  // unused
+        tmp_ratio[0] = 1.0f;
+        tmp_ratio[1] = 0.0f;
       }
-      bubble_p->x = temp_rgb_f[0];
-      bubble_p->y = temp_rgb_f[1];
-      bubble_p->z = temp_rgb_f[2];
+
+      /* compute colors for two thickness values and fade them*/
+      for (int fadeId = 0; fadeId < 2; fadeId++) {
+        // if composit ratio is 0, skip computing
+        if (tmp_ratio[fadeId] == 0.0f) continue;
+
+        /* calculate the thickness of film (μm) */
+        d = thickMin + (thickMax - thickMin) * tmp_t[fadeId];
+
+        /* there may be a case that the thickness is smaller than 0 */
+        if (d < 0.0f) d = 0.0f;
+
+        /* initialize XYZ color channels */
+        color_x = 0.0f;
+        color_y = 0.0f;
+        color_z = 0.0f;
+
+        /* for each wavelength (in the range of visible light, 380nm-710nm) */
+        for (ram = 0; ram < 34; ram++) {
+          /* wavelength `λ` (μm) */
+          rambda = 0.38f + 0.01f * (float)ram;
+          /* phase of light */
+          phi = 4.0f * PI * refractiveIndex * d * cos_re / rambda;
+          /* reflection amplitude of the film for each polarization */
+          // P-polarized light
+          p.r_real = p.r_ab + p.t_ab * p.r_ba * p.t_ba * cosf(phi);
+          p.r_img  = p.t_ab * p.r_ba * p.t_ba * sinf(phi);
+          // S-polarized light
+          s.r_real = s.r_ab + s.t_ab * s.r_ba * s.t_ba * cosf(phi);
+          s.r_img  = s.t_ab * s.r_ba * s.t_ba * sinf(phi);
+
+          p.R = p.r_real * p.r_real + p.r_img * p.r_img;
+          s.R = s.r_real * s.r_real + s.r_img * s.r_img;
+
+          /* combined energy reflectance */
+          R_final = (p.R + s.R) / 2.0f;
+
+          /* accumulate XYZ channel values */
+          color_x += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 0];
+          color_y += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 1];
+          color_z += intensity * cie_d65[ram] * R_final * xyz[ram * 3 + 2];
+
+        } /* next wavelength (ram) */
+
+        tmp_rgb[fadeId][0] =
+            3.240479f * color_x - 1.537150f * color_y - 0.498535f * color_z;
+        tmp_rgb[fadeId][1] =
+            -0.969256f * color_x + 1.875992f * color_y + 0.041556f * color_z;
+        tmp_rgb[fadeId][2] =
+            0.055648f * color_x - 0.204043f * color_y + 1.057311f * color_z;
+
+        /* clamp overflows */
+        for (k = 0; k < 3; k++) {
+          if (tmp_rgb[fadeId][k] < 0.0f) tmp_rgb[fadeId][k] = 0.0f;
+
+          /* gamma adjustment */
+          tmp_rgb[fadeId][k] = powf((tmp_rgb[fadeId][k] / 255.0f), rgbGamma[k]);
+
+          if (tmp_rgb[fadeId][k] >= 1.0f) tmp_rgb[fadeId][k] = 1.0f;
+        }
+      }
+      bubble_p->x = tmp_rgb[0][0] * tmp_ratio[0] + tmp_rgb[1][0] * tmp_ratio[1];
+      bubble_p->y = tmp_rgb[0][1] * tmp_ratio[0] + tmp_rgb[1][1] * tmp_ratio[1];
+      bubble_p->z = tmp_rgb[0][2] * tmp_ratio[0] + tmp_rgb[1][2] * tmp_ratio[1];
       bubble_p++;
 
     } /*- next thickness d (j) -*/
@@ -149,7 +182,9 @@ Iwa_SpectrumFx::Iwa_SpectrumFx()
     , m_BGamma(1.0)
     , m_lensFactor(1.0)
     , m_lightThres(1.0)
-    , m_lightIntensity(1.0) {
+    , m_lightIntensity(1.0)
+    , m_loopSpectrumFadeWidth(0.0)
+    , m_spectrumShift(0.0) {
   addInputPort("Source", m_input);
   addInputPort("Light", m_light);
   bindParam(this, "intensity", m_intensity);
@@ -162,6 +197,8 @@ Iwa_SpectrumFx::Iwa_SpectrumFx()
   bindParam(this, "lensFactor", m_lensFactor);
   bindParam(this, "lightThres", m_lightThres);
   bindParam(this, "lightIntensity", m_lightIntensity);
+  bindParam(this, "loopSpectrumFadeWidth", m_loopSpectrumFadeWidth);
+  bindParam(this, "spectrumShift", m_spectrumShift);
 
   m_intensity->setValueRange(0.0, 8.0);
   m_refractiveIndex->setValueRange(1.0, 3.0);
@@ -173,6 +210,8 @@ Iwa_SpectrumFx::Iwa_SpectrumFx()
   m_lensFactor->setValueRange(0.01, 10.0);
   m_lightThres->setValueRange(-5.0, 1.0);
   m_lightIntensity->setValueRange(0.0, 1.0);
+  m_loopSpectrumFadeWidth->setValueRange(0.0, 1.0);
+  m_spectrumShift->setValueRange(-10.0, 10.0);
 }
 
 //------------------------------------

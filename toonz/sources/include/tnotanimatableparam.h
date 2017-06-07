@@ -28,7 +28,7 @@
 //  TNotAnimatableParamChange
 //-----------------------------------------------------------------------------
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4251)
 #endif
@@ -444,7 +444,7 @@ TUndo *TNotAnimatableParamChange<T>::createUndo() const {
 
 //-----------------------------------------------------------------------------
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 

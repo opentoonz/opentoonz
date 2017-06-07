@@ -3,7 +3,7 @@
 #ifndef CLEANUPCAMERASETTINGSWIDGET_H
 #define CLEANUPCAMERASETTINGSWIDGET_H
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4251)
 #endif
 

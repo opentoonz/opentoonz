@@ -169,7 +169,9 @@ private:
 //===============================================================================
 
 #ifdef _WIN32
+#ifndef TFX_EXPORTS
 template class DVAPI TSmartPointerT<PlasticSkeleton>;
+#endif
 #endif
 
 typedef TSmartPointerT<PlasticSkeleton> PlasticSkeletonP;

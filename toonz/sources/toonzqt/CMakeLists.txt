@@ -86,6 +86,7 @@ set(MOC_HEADERS
     ../include/toonzqt/flipconsoleowner.h
     ../include/toonzqt/combohistogram.h
     ../include/toonzqt/fxiconmanager.h
+    ../include/toonzqt/glwidget_for_highdpi.h
     pluginhost.h
 )
 

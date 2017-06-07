@@ -8,6 +8,8 @@
 		<control>RGamma</control>
 		<control>GGamma</control>
 		<control>BGamma</control>
+		<control>loopSpectrumFadeWidth</control>
+		<control>spectrumShift</control>
 		<control>lensFactor</control>
 		<control>lightThres</control>
 		<control>lightIntensity</control>
