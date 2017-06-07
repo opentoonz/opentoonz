@@ -1,5 +1,4 @@
 
-
 #include "tfarmserver.h"
 #include "tfarmexecutor.h"
 #include "tfarmcontroller.h"
@@ -60,18 +59,29 @@ class FarmServer;
 
 namespace {
 
+const char *applicationName     = "OpenToonz";
+const char *applicationVersion  = "1.1";
+const char *applicationRevision = "2";
+
 //--------------------------------------------------------------------
 TFilePath getGlobalRoot() {
   TFilePath rootDir;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\FARMROOT");
+  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
+  TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
   // Leggo la localRoot da File txt
-
-  Tifstream is(
-      TFilePath("./OpenToonz_1.0.app/Contents/Resources/configfarmroot.txt"));
+#  ifdef MACOSX
+  // If MACOSX, change to MACOSX path
+  std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+#  else
+  // set path to something suitable for most linux (Unix?) systems
+  std::string unixpath = "/etc/" + std::string(applicationName) + "/opentoonz.conf";
+#  endif
+  TFilePath name(unixpath);
+  Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -98,12 +108,20 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  TFilePath name("SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\TOONZROOT");
+  QString regpath = QString::fromStdString("SOFTWARE\\" + std::string(applicationName) + "\\" + std::string(applicationName) + "\\" + std::string(applicationVersion) + "\\FARMROOT");
+  TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
-  Tifstream is(
-      TFilePath("./OpenToonz_1.0.app/Contents/Resources/configfarmroot.txt"));
+#  ifdef MACOSX
+  // If MACOSX, change to MACOSX path
+  std::string unixpath = "./" + std::string(applicationName) + "_" + std::string(applicationVersion) + ".app/Contents/Resources/configfarmroot.txt";
+#  else
+  // set path to something suitable for most linux (Unix?) systems
+  std::string unixpath = "/etc/" + std::string(applicationName) + "/opentoonz.conf";
+#  endif
+TFilePath name(unixpath);
+Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
