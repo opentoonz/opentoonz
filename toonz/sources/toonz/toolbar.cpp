@@ -18,7 +18,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
-TEnv::IntVar ShowAllToolsToggle("ShowAllToolsToggle", 0);
+TEnv::IntVar ShowAllToolsToggle("ShowAllToolsToggle", 1);
 
 //=============================================================================
 // Toolbar
