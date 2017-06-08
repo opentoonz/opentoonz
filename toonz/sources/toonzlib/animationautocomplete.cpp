@@ -156,7 +156,7 @@ void AnimationAutoComplete::beginSynthesis()
 	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
 	std::vector<StrokeWithNeighbours*> similarStrokes = search(lastStroke);
 
-	StrokeWithNeighbours* outputsStroke = assign(similarStrokes);
+	m_synthesizedStrokes = assign(similarStrokes);
 
 //	if(outputsStroke)
 //		m_synthesizedStrokes.push_back(outputsStroke);
@@ -258,10 +258,10 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::search(StrokeWithNeigh
     return similarstrokes;
 }
 
-StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighbours *> similarStrokes)
+std::vector<StrokeWithNeighbours*> AnimationAutoComplete::assign(std::vector<StrokeWithNeighbours *> similarStrokes)
 {
 	if(similarStrokes.empty())
-		return nullptr;
+		return std::vector<StrokeWithNeighbours*>();
 
     double min = 9999999999;
 	StrokeWithScore outputStroke;
@@ -274,7 +274,7 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
 		StrokeWithNeighbours* nextStroke = generateSynthesizedStroke(lastStroke, similarStroke);
 #endif
 #ifdef ODAY_SYNTHESIS
-		StrokeWithNeighbours* nextStroke = predictionPositionUpdate( similarStroke,lastStroke);
+		StrokeWithNeighbours* nextStroke = predictionPositionUpdate(similarStroke, lastStroke);
 #endif
 
 		std::vector<SimilarPairPoint> similarStrokeMatchingPairs = getSimilarPairPoints(similarStroke, nextToSimilarStroke);
@@ -296,8 +296,17 @@ StrokeWithNeighbours *AnimationAutoComplete::assign(std::vector<StrokeWithNeighb
             finalSimilarStroke = similarStroke;
 		}
 	}
-    getPredictedNeighours(outputStroke.stroke, finalSimilarStroke->nextStroke);
-	return outputStroke.stroke;
+
+	std::vector<StrokeWithNeighbours*> outputStrokes;
+
+#ifdef ADAM_SYSTHESIS
+	outputStrokes = getPredictedNeighours(outputStroke.stroke, finalSimilarStroke->nextStroke);
+#endif
+#ifdef ODAY_SYNTHESIS
+	outputStrokes.push_back(outputStroke.stroke);
+#endif
+
+	return outputStrokes;
 }
 
 std::vector<StrokeWithNeighbours *> AnimationAutoComplete::getContextStrokes(StrokeWithNeighbours *stroke)
@@ -444,7 +453,9 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 
 	outputStroke->stroke = new TStroke(*nextToSimilarStroke->stroke);
 
-	TPointD centralOutputStroke = (centralNextToSimilarStroke - centralSimilarStroke) + centralLastStroke;
+	// last - output = similiar -next
+	// output = last -(simiilar - next)
+	TPointD centralOutputStroke = centralLastStroke - (centralSimilarStroke - centralNextToSimilarStroke) ;
 	TPointD offset = centralOutputStroke - centralNextToSimilarStroke;
 
 	TAffine aff = TTranslation(offset);
@@ -686,8 +697,8 @@ StrokeWithNeighbours* AnimationAutoComplete::predictionPositionUpdate(StrokeWith
         TPointD Segma;
 		Segma.x = 150;
        // Segma.y=10;
-        //Segma=sampleNextStroke->getP0();
-       // Segma.x=50;
+		Segma=sampleNextStroke->getP0();
+		Segma.x=50;
         //Segma.y=50;
         //SamplePoint result=subtractionMatrix+sampleCurrentStroke+Segma;
         TPointD result = subtractionMatrix +(sampleCurrentStroke->getP0());
@@ -712,7 +723,7 @@ StrokeWithNeighbours* AnimationAutoComplete::predictionPositionUpdate(StrokeWith
     return output;
 }
 
-void AnimationAutoComplete::getPredictedNeighours(StrokeWithNeighbours *predictedStroke, StrokeWithNeighbours *similarStroke)
+std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getPredictedNeighours(StrokeWithNeighbours *predictedStroke, StrokeWithNeighbours *similarStroke)
 {
 #ifdef DEBUGGING
 #if defined(SHOW_PAIR_LINES) || defined(SHOW_MATCHING_STROKE)
@@ -732,6 +743,7 @@ void AnimationAutoComplete::getPredictedNeighours(StrokeWithNeighbours *predicte
 
 	//the clonePredictedStroke gets his neighbours filled in this function
 	std::vector<SimilarPairStroke> neighbourhoodPairs = getSimilarPairStrokes(clonePredictedStroke, similarStroke);
+	std::vector<StrokeWithNeighbours*> newNeighbours;
 
 	for (SimilarPairStroke pair : neighbourhoodPairs)
     {
@@ -742,8 +754,10 @@ void AnimationAutoComplete::getPredictedNeighours(StrokeWithNeighbours *predicte
 		newNeighbour->stroke = new TStroke(*pair.stroke2->stroke);
         newNeighbour->stroke->transform(aff);
         predictedStroke->neighbours.insert(newNeighbour);
-        m_synthesizedStrokes.push_back(newNeighbour);
+		newNeighbours.push_back(newNeighbour);
     }
+
+	return newNeighbours;
 }
 
 TPointD AnimationAutoComplete::getTangentUnitVector(PointWithStroke* pointWithStroke)

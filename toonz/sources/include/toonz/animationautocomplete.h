@@ -7,14 +7,14 @@ You must enable one or more of the debugging macros below. ie. SHOW_TANGENT_LINE
 */
 //#define DEBUGGING
 
-//#define ODAY_SYNTHESIS
-#define ADAM_SYSTHESIS
+#define ODAY_SYNTHESIS
+//#define ADAM_SYSTHESIS
 
 #ifdef DEBUGGING
 		//#define SHOW_TANGENT_LINES // Shows tangent lines for each sample point on a stroke
 		//#define SHOW_MATCHING_STROKE // highlights the stroke that had the highest similarity score with the last stroke.
 		//#define SHOW_PAIR_LINES // draws lines connecting sample points that are matching in two strokes
-		//#define SHOW_SPACE_VICINITY // draws the space vicinity around each sample point.
+		#define SHOW_SPACE_VICINITY // draws the space vicinity around each sample point.
 		//#define SHOW_PAIR_STROKES // draws lines connecting different strokes that are matching in two neighbourhoods
 #endif
 
@@ -134,7 +134,7 @@ private:
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours; // Stores all the drawn strokes.
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;	  // Stores output ie predicted strokes
 
-  TPointD getTangentUnitVector(PointWithStroke* pointer); // gets the tangent to a certain point. useful for spacial similarity analysis
+  TPointD getTangentUnitVector(PointWithStroke* pointer); // gets the tangent to a certain point. useful for spatial similarity analysis
   double gaussianConstant(PointWithStroke* chuck1, PointWithStroke* chuck2);
 
   StrokeWithNeighbours *generateSynthesizedStroke(StrokeWithNeighbours* lastStroke, StrokeWithNeighbours* similarStroke);
@@ -176,7 +176,7 @@ private:
 
   void beginSynthesis();
   std::vector<StrokeWithNeighbours*> search(StrokeWithNeighbours *operation1);
-  StrokeWithNeighbours* assign(std::vector<StrokeWithNeighbours*>);
+  std::vector<StrokeWithNeighbours*> assign(std::vector<StrokeWithNeighbours*>);
 
   // Sample ID is the index of a point divided by the total number (n) of sample points in a stroke
   double getSampleId(const int &index, const int &n);
@@ -195,7 +195,7 @@ private:
 
   // Oday's alternative to generate synthesized stroke
   StrokeWithNeighbours *predictionPositionUpdate(StrokeWithNeighbours* currentStroke, StrokeWithNeighbours* nextStroke);
-  void getPredictedNeighours(StrokeWithNeighbours* predictedStroke, StrokeWithNeighbours* similarStroke);
+  std::vector<StrokeWithNeighbours*> getPredictedNeighours(StrokeWithNeighbours* predictedStroke, StrokeWithNeighbours* similarStroke);
 };
 
 #endif // ANIMATIONAUTOCOMPLETE_H
