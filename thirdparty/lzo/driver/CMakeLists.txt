@@ -23,3 +23,12 @@ else()
 	target_link_libraries(lzodecompress ${LZO_LIBRARY})
 endif()
 set(LZODRIVER_FOUND true PARENT_SCOPE)
+
+if (UNIX)
+	install(
+		TARGETS
+			lzocompress
+			lzodecompress
+		DESTINATION bin
+	)
+endif()
