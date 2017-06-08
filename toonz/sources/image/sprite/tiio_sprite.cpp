@@ -101,14 +101,16 @@ TLevelWriterSprite::~TLevelWriterSprite() {
   int spriteSheetWidth;
   int spriteSheetHeight;
   if (m_format == "Grid") {
+    // Calculate Grid Size
     while (horizDim * horizDim < m_imagesResized.size()) horizDim++;
     totalHorizPadding = horizDim * horizPadding;
     spriteSheetWidth  = horizDim * resizedWidth + totalHorizPadding;
     vertDim           = horizDim;
+    // Figure out if there is one row too many (Such as 6 images needs 3 x 2 grid)
     if (vertDim * vertDim - vertDim >= m_imagesResized.size()) {
       vertDim          = vertDim - 1;
-      totalVertPadding = vertDim * vertPadding;
     }
+    totalVertPadding = vertDim * vertPadding;
     spriteSheetHeight = vertDim * resizedHeight + totalVertPadding;
   } else if (m_format == "Vertical") {
     spriteSheetWidth  = resizedWidth + horizPadding;
@@ -117,7 +119,6 @@ TLevelWriterSprite::~TLevelWriterSprite() {
   } else if (m_format == "Horizontal") {
     spriteSheetWidth  = m_imagesResized.size() * (resizedWidth + horizPadding);
     spriteSheetHeight = resizedHeight + vertPadding;
-    ;
     horizDim = m_imagesResized.size();
   }
 
