@@ -246,7 +246,7 @@ FunctionPanel::FunctionPanel(QWidget *parent)
     , m_currentFrameStatus(0)
     , m_selection(0)
     , m_curveShape(SMOOTH) {
-  setWindowTitle(tr("Function Curves"));
+  setWindowTitle(tr("Function Curves - Use Control Key to Modify Positions"));
 
   m_viewTransform.translate(50, 200);
   m_viewTransform.scale(5, -1);
