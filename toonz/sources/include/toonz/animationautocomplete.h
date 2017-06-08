@@ -57,15 +57,15 @@ public:
 	{
 		stroke		  = nullptr;
 		nextStroke	  = nullptr;
-		contextStroke = nullptr;
 	}
 
     TStroke* stroke;
 	SetOfStrokes neighbours;
 	StrokeWithNeighbours* nextStroke;
-	StrokeWithNeighbours* contextStroke;
+    std::unordered_set<StrokeWithNeighbours*> contextStrokes;
 
 	TPointD getCentralSample();
+    double getLength();
 };
 
 struct SimilarPairPoint
@@ -133,6 +133,7 @@ private:
 
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours; // Stores all the drawn strokes.
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;	  // Stores output ie predicted strokes
+  void insertVectorIntoSet(std::vector<StrokeWithNeighbours*> vector, std::unordered_set<StrokeWithNeighbours*> set);
 
   TPointD getTangentUnitVector(PointWithStroke* pointer); // gets the tangent to a certain point. useful for spatial similarity analysis
   double gaussianConstant(PointWithStroke* chuck1, PointWithStroke* chuck2);
@@ -160,6 +161,9 @@ private:
   std::vector<SimilarPairPoint> getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
   // takes two strokes and returns pairs of matching strokes within thier respective neighbourhoods
   std::vector<SimilarPairStroke> getSimilarPairStrokes(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
+  std::vector<SimilarPairStroke *> localAnalysis(std::vector<StrokeWithNeighbours*> similarStrokes, StrokeWithNeighbours *lastStroke);
+
+  StrokeWithNeighbours* AnimationAutoComplete::getLocalSimilarPairStrokes(std::unordered_set<StrokeWithNeighbours*> contextStrokes, StrokeWithNeighbours *stroke);
 
   // returns whether a stroke is self looping ie, circle, rectangle or any other closed shape
   bool strokeSelfLooping(TStroke* stroke);
