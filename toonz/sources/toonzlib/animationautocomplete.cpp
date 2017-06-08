@@ -98,8 +98,7 @@ void AnimationAutoComplete::getNeighbours(StrokeWithNeighbours* stroke)
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWithStroke point)
 {
 	std::vector<StrokeWithNeighbours*> neighbours;
-	StrokeWithNeighbours* contextStroke;
-	double maxLength = 0;
+    std:vector <StrokeWithNeighbours*> contextStrokes;
 
 	for(int i = 0; i < m_strokesWithNeighbours.size(); i++)
 	{
@@ -113,24 +112,15 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWit
 				double strokeLength = stroke->getLength();
 				neighbours.push_back(m_strokesWithNeighbours[i]);
 				m_strokesWithNeighbours[i]->neighbours.insert(point.stroke); // if you're my neighbour, then I'm your neighbour
-				if ((strokeLength > maxLength) &&
-					(strokeLength >= point.stroke->stroke->getLength() * 2))
-				{
-					contextStroke = m_strokesWithNeighbours[i];
-					maxLength = strokeLength;
-				}
-				break;
+
+                if ((strokeLength >= point.stroke->getLength() * 2))
+                    contextStrokes.push_back( m_strokesWithNeighbours[i]);
+
+                break;
 			}
 	}
 
-	// set the context stroke
-	if(point.stroke->contextStroke)
-	{
-	   if(point.stroke->contextStroke->stroke->getLength() < maxLength)
-			point.stroke->contextStroke = contextStroke;
-	}
-	else
-		point.stroke->contextStroke = contextStroke;
+    insertVectorIntoSet(contextStrokes, point.stroke->contextStrokes);
 
 	int size = m_strokesWithNeighbours.size();
 	if(size > 2)
@@ -140,6 +130,11 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWit
 	}
 
 	return neighbours;
+}
+
+void AnimationAutoComplete:: insertVectorIntoSet(std::vector<StrokeWithNeighbours*> vector, std::unordered_set<StrokeWithNeighbours*> set)
+{
+    std::copy( vector.begin(), vector.end(), std::inserter(set , set.end() ) );
 }
 
 bool AnimationAutoComplete::withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point)
@@ -155,6 +150,7 @@ void AnimationAutoComplete::beginSynthesis()
 {
 	StrokeWithNeighbours* lastStroke = m_strokesWithNeighbours.back();
 	std::vector<StrokeWithNeighbours*> similarStrokes = search(lastStroke);
+
 
 	StrokeWithNeighbours* outputsStroke = assign(similarStrokes);
 
@@ -639,6 +635,38 @@ std::vector<SimilarPairStroke> AnimationAutoComplete::getSimilarPairStrokes(Stro
 
       return SimilarPairStrokeVector;
 }
+StrokeWithNeighbours* AnimationAutoComplete::getLocalSimilarPairStrokes(std::unordered_set<StrokeWithNeighbours*> contextStrokes, StrokeWithNeighbours *stroke)
+{
+    double min = 99999999999;
+    StrokeWithNeighbours* minOperation = new StrokeWithNeighbours();
+    for(StrokeWithNeighbours* contextStroke: contextStrokes)
+    {
+        double score = operationsSimilarity(contextStroke,stroke);
+        if(score<min)
+        {
+            min =score;
+            minOperation=contextStroke;
+        }
+    }
+    return minOperation;
+
+}
+std::vector<SimilarPairStroke*> AnimationAutoComplete::localAnalysis(std::vector<StrokeWithNeighbours *> similarStrokes, StrokeWithNeighbours *lastStroke)
+{
+    std::vector<SimilarPairStroke*> similarContextStroke;
+    for(StrokeWithNeighbours* contextStroke: lastStroke->contextStrokes)
+    {
+    for(int i=0;i<similarStrokes.size();i++)
+    {
+        SimilarPairStroke* similarPairs = new SimilarPairStroke();
+        similarPairs->stroke1=lastStroke;
+        StrokeWithNeighbours* stroke2 = getLocalSimilarPairStrokes(similarStrokes[i]->contextStrokes,contextStroke);
+        similarPairs->stroke2=stroke2;
+        similarContextStroke.push_back(similarPairs);
+    }
+    }
+    return similarContextStroke;
+}
 
 #ifdef DEBUGGING
 #ifdef SHOW_TANGENT_LINES
@@ -862,5 +890,10 @@ TPointD StrokeWithNeighbours::getCentralSample()
 		central1->index = 0;
 
 	central1->point = stroke->getChunk(central1->index);
-	return central1->point->getP0();
+    return central1->point->getP0();
+}
+
+double StrokeWithNeighbours::getLength()
+{
+    return stroke->getLength();
 }
