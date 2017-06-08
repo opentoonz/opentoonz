@@ -205,10 +205,10 @@ public:
     try {
       TFilePathSet fps = TSystem::readDirectory(m_path);
       fps.sort(caseInsensitiveLessThan);
-      for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++) {
-        if (TFileStatus(*it).isDirectory()) new FileFolderItem(this, *it);
+      for (auto &&e : fps) {
+        if (TFileStatus(e).isDirectory()) new FileFolderItem(this, e);
         // else
-        //  new SimpleFileItem(this, *it);
+        //  new SimpleFileItem(this, e);
       }
     } catch (TException &e) {
       TMessage::error(toString(e.getMessage()));
@@ -233,8 +233,8 @@ public:
     clearItems();
 
     TFilePathSet fps = TSystem::getDisks();
-    for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++) {
-      TTreeViewItem *item = new FileFolderItem(this, *it);
+    for (auto &&e : fps) {
+      TTreeViewItem *item = new FileFolderItem(this, e);
     }
   }
   void drawIcon(TTreeView *w, const TPoint &origin) {

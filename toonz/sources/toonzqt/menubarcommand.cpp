@@ -63,8 +63,7 @@ CommandManager::CommandManager() {}
 //---------------------------------------------------------
 
 CommandManager::~CommandManager() {
-  std::map<std::string, Node *>::iterator it;
-  for (it = m_idTable.begin(); it != m_idTable.end(); ++it) delete it->second;
+  for (auto &&e : m_idTable) delete e.second;
 }
 
 //---------------------------------------------------------
@@ -228,9 +227,8 @@ void CommandManager::execute(CommandId id) {
 void CommandManager::getActions(CommandType type,
                                 std::vector<QAction *> &actions) {
   AuxActionsCreatorManager::instance()->createAuxActions(qApp);
-  std::map<QAction *, Node *>::iterator it;
-  for (it = m_qactionTable.begin(); it != m_qactionTable.end(); ++it)
-    if (it->second->m_type == type) actions.push_back(it->first);
+  for (auto &&e : m_qactionTable)
+    if (e.second->m_type == type) actions.push_back(e.first);
 }
 
 //---------------------------------------------------------
@@ -244,9 +242,8 @@ QAction *CommandManager::getActionFromShortcut(std::string shortcutString) {
 //---------------------------------------------------------
 
 std::string CommandManager::getShortcutFromAction(QAction *action) {
-  std::map<std::string, Node *>::iterator it = m_shortcutTable.begin();
-  for (; it != m_shortcutTable.end(); ++it) {
-    if (it->second->m_qaction == action) return it->first;
+  for (auto &&e : m_shortcutTable) {
+    if (e.second->m_qaction == action) return e.first;
   }
   return "";
 }

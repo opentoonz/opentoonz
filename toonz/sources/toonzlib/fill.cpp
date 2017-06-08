@@ -429,13 +429,12 @@ void fill(const TRaster32P &ras, const TRaster32P &ref,
     if (oldxd > 0) seeds.push(FillSeed(oldxc, oldxd, y, dy));
   }
 
-  std::map<int, std::vector<std::pair<int, int>>>::iterator it;
-  for (it = segments.begin(); it != segments.end(); it++) {
-    TPixel32 *line    = ras->pixels(it->first);
+  for (auto &&e : segments) {
+    TPixel32 *line    = ras->pixels(e.first);
     TPixel32 *refLine = 0;
     TPixel32 *refPix;
-    if (ref) refLine = ref->pixels(it->first);
-    std::vector<std::pair<int, int>> segmentVector = it->second;
+    if (ref) refLine = ref->pixels(e.first);
+    std::vector<std::pair<int, int>> segmentVector = e.second;
     for (int i = 0; i < (int)segmentVector.size(); i++) {
       std::pair<int, int> segment = segmentVector[i];
       if (segment.second >= segment.first) {

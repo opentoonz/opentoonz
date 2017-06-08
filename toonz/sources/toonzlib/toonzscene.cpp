@@ -1040,10 +1040,10 @@ bool ToonzScene::convertLevelIfNeeded(TFilePath &levelPath) {
     TLevelP inLevel = lr->loadInfo();
     if (!inLevel || inLevel->getFrameCount() == 0) return false;
     TLevelP outLevel;
-    for (TLevel::Iterator it = inLevel->begin(); it != inLevel->end(); ++it) {
-      TVectorImageP img = lr->getFrameReader(it->first)->load();
+    for (auto &&e : *inLevel) {
+      TVectorImageP img = lr->getFrameReader(e.first)->load();
       if (!img) continue;
-      lw->getFrameWriter(it->first)->save(img);
+      lw->getFrameWriter(e.first)->save(img);
     }
   } else if (ltype.m_oldLevelFlag) {
     TLevelP outLevel;
@@ -1067,11 +1067,11 @@ bool ToonzScene::convertLevelIfNeeded(TFilePath &levelPath) {
     if (!inLevel || inLevel->getFrameCount() == 0) return false;
     outLevel->setPalette(palette.getPointer());
     try {
-      for (TLevel::Iterator it = inLevel->begin(); it != inLevel->end(); ++it) {
-        TToonzImageP img = lr->getFrameReader(it->first)->load();
+      for (auto &&e : *inLevel) {
+        TToonzImageP img = lr->getFrameReader(e.first)->load();
         if (!img) continue;
         img->setPalette(palette.getPointer());
-        lw->getFrameWriter(it->first)->save(img);
+        lw->getFrameWriter(e.first)->save(img);
       }
     } catch (TException &e) {
       // devo buttare il tlv che stavo salvando!

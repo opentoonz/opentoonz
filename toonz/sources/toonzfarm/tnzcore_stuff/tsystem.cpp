@@ -712,8 +712,8 @@ void TSystem::rmDir(const TFilePath &path) {
 
 void TSystem::rmDirTree(const TFilePath &path) {
   TFilePathSet pathSet = readDirectory(path);
-  for (TFilePathSet::iterator it = pathSet.begin(); it != pathSet.end(); it++) {
-    TFilePath path = *it;
+  for (auto &&e : pathSet) {
+    TFilePath path = e;
     if (TFileStatus(path).isDirectory())
       rmDirTree(path);
     else
@@ -728,8 +728,8 @@ void TSystem::copyDir(const TFilePath &dst, const TFilePath &src) {
   if (!TFileStatus(dst).doesExist()) mkDir(dst);
 
   TFilePathSet pathSet = readDirectory(src);
-  for (TFilePathSet::iterator it = pathSet.begin(); it != pathSet.end(); it++) {
-    TFilePath path = *it;
+  for (auto &&e : pathSet) {
+    TFilePath path = e;
     if (TFileStatus(path).isDirectory())
       copyDir(path.withParentDir(dst), path);
     else
@@ -891,9 +891,8 @@ void TSystem::readDirectory(TFilePathSet &dst, const TFilePath &path) {
 //------------------------------------------------------------
 
 void TSystem::readDirectory(TFilePathSet &dst, const TFilePathSet &pathSet) {
-  for (TFilePathSet::const_iterator it = pathSet.begin(); it != pathSet.end();
-       it++)
-    readDirectory(dst, *it);
+  for (auto const &e : pathSet)
+    readDirectory(dst, e);
 }
 
 //------------------------------------------------------------
@@ -955,9 +954,8 @@ void TSystem::readDirectoryTree(TFilePathSet &dst, const TFilePath &path) {
 
 void TSystem::readDirectoryTree(TFilePathSet &dst,
                                 const TFilePathSet &pathSet) {
-  for (TFilePathSet::const_iterator it = pathSet.begin(); it != pathSet.end();
-       it++)
-    readDirectoryTree(dst, *it);
+  for (auto const &e : pathSet)
+    readDirectoryTree(dst, e);
 }
 
 //------------------------------------------------------------
@@ -1348,9 +1346,8 @@ void TSystem::loadPlugins(const TFilePath &dir) {
   TFilePathSet dirContent = TSystem::readDirectory(dir);
   if (dirContent.empty()) return;
 
-  for (TFilePathSet::iterator it = dirContent.begin(); it != dirContent.end();
-       it++) {
-    TFilePath fp = *it;
+  for (auto &&e : dirContent) {
+    TFilePath fp = e;
     if (fp.getType() != extension) continue;
 
 // cout << "Loading..." << fp << endl;

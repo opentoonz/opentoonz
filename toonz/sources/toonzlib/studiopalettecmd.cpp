@@ -178,9 +178,8 @@ class DeleteFolderUndo final : public TUndo {
 public:
   DeleteFolderUndo(const TFilePath &path, const TFilePathSet &pathSet)
       : m_path(path), m_pathSet(pathSet), m_paletteList() {
-    for (TFilePathSet::const_iterator it = m_pathSet.begin();
-         it != m_pathSet.end(); it++) {
-      TFilePath path = *it;
+    for (auto const &e : m_pathSet) {
+      TFilePath path = e;
       if (path.getType() == "tpl")
         m_paletteList.push_back(StudioPalette::instance()->getPalette(path));
     }
@@ -190,9 +189,8 @@ public:
     StudioPalette::instance()->createFolder(m_path.getParentDir(),
                                             m_path.getWideName());
     int paletteCount = -1;
-    for (TFilePathSet::const_iterator it = m_pathSet.begin();
-         it != m_pathSet.end(); it++) {
-      TFilePath path = *it;
+    for (auto const &e : m_pathSet) {
+      TFilePath path = e;
       if (path.getType() == "tpl")  // Is a palette
         StudioPalette::instance()->setPalette(
             path, m_paletteList.at(++paletteCount)->clone(), true);
