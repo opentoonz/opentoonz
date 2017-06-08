@@ -767,7 +767,7 @@ unsigned int ViewerDraw::createDiskDisplayList() {
       sinCosTable[i].y = sin(ang);
     }
   }
-  double r = 10 * Stage::inch;
+  double r = 20 * Stage::inch;
   glNewList(id, GL_COMPILE);
   glColor3d(.6, .65, .7);
   glBegin(GL_POLYGON);
