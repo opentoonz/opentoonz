@@ -36,6 +36,11 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 		beginSynthesis();
 }
 
+void AnimationAutoComplete::setStrokesWithNeighbours(std::vector<StrokeWithNeighbours*> p_strokes)
+{
+	m_strokesWithNeighbours = p_strokes;
+}
+
 //----------
 bool AnimationAutoComplete::strokeSelfLooping(TStroke* stroke)
 {
@@ -120,7 +125,7 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWit
 			}
 	}
 
-    insertVectorIntoSet(contextStrokes, point.stroke->contextStrokes);
+	point.stroke->contextStrokes = insertVectorIntoSet(contextStrokes, point.stroke->contextStrokes);
 
 	int size = m_strokesWithNeighbours.size();
 	if(size > 2)
@@ -132,9 +137,10 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWit
 	return neighbours;
 }
 
-void AnimationAutoComplete:: insertVectorIntoSet(std::vector<StrokeWithNeighbours*> vector, std::unordered_set<StrokeWithNeighbours*> set)
+std::unordered_set<StrokeWithNeighbours*> AnimationAutoComplete:: insertVectorIntoSet(std::vector<StrokeWithNeighbours*> vector, std::unordered_set<StrokeWithNeighbours*> set)
 {
     std::copy( vector.begin(), vector.end(), std::inserter(set , set.end() ) );
+	return set;
 }
 
 bool AnimationAutoComplete::withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point)
@@ -153,13 +159,24 @@ void AnimationAutoComplete::beginSynthesis()
 
 	m_synthesizedStrokes = assign(similarStrokes);
 
-//	if(outputsStroke)
-//		m_synthesizedStrokes.push_back(outputsStroke);
+	if (m_numberOfLevelDeepIntoRecursion < m_recursionLimit && m_synthesizedStrokes.size())
+	{
+		AnimationAutoComplete aac(m_numberOfLevelDeepIntoRecursion+1);
+		aac.setStrokesWithNeighbours(m_strokesWithNeighbours);
+		aac.addStroke(m_synthesizedStrokes.back()->stroke);
+		m_synthesizedStrokes = concatinateVectors(m_synthesizedStrokes, aac.getSynthesizedStrokes());
+	}
 }
 
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getSynthesizedStrokes()
 {
 	return m_synthesizedStrokes;
+}
+
+std::vector<StrokeWithNeighbours*> AnimationAutoComplete::concatinateVectors(std::vector<StrokeWithNeighbours*> vector1, std::vector<StrokeWithNeighbours*> vector2)
+{
+	std::move(vector2.begin(), vector2.end(), std::back_inserter(vector1));
+	return vector1;
 }
 
 double AnimationAutoComplete::pointsSimilarity(PointWithStroke* point1, PointWithStroke* point2)
@@ -293,13 +310,13 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::assign(std::vector<Str
 	}
 
 	std::vector<StrokeWithNeighbours*> outputStrokes;
-
-#ifdef ADAM_SYSTHESIS
-	outputStrokes = getPredictedNeighours(outputStroke.stroke, finalSimilarStroke->nextStroke);
-#endif
-#ifdef ODAY_SYNTHESIS
 	outputStrokes.push_back(outputStroke.stroke);
-#endif
+//#ifdef ADAM_SYSTHESIS
+//	//outputStrokes = getPredictedNeighours(outputStroke.stroke, finalSimilarStroke->nextStroke);
+//#endif
+//#ifdef ODAY_SYNTHESIS
+//	outputStrokes.push_back(outputStroke.stroke);
+//#endif
 
 	return outputStrokes;
 }

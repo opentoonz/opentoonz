@@ -7,8 +7,8 @@ You must enable one or more of the debugging macros below. ie. SHOW_TANGENT_LINE
 */
 //#define DEBUGGING
 
-#define ODAY_SYNTHESIS
-//#define ADAM_SYSTHESIS
+//#define ODAY_SYNTHESIS
+#define ADAM_SYSTHESIS
 
 #ifdef DEBUGGING
 		//#define SHOW_TANGENT_LINES // Shows tangent lines for each sample point on a stroke
@@ -93,7 +93,7 @@ This is the main class that has all the functions for similarity analysis and sy
 */
 class AnimationAutoComplete {
 public:
-  AnimationAutoComplete() {}
+  AnimationAutoComplete(int p_numberOfLevelsDeepIntoRecursion = 0) { m_numberOfLevelDeepIntoRecursion = p_numberOfLevelsDeepIntoRecursion; }
   ~AnimationAutoComplete() {}
 
   /*!
@@ -101,6 +101,11 @@ public:
   This is the starting point where all the other functions gets called.
   */
   void addStroke(TStroke* stroke);
+
+  /*!
+  Sets the m_strokesWithNeighbours vector. used to recursively produce predicted strokes.
+  */
+  void setStrokesWithNeighbours(std::vector<StrokeWithNeighbours*> p_strokes);
 
   /*!
   After adding strokes you should expect the predicted strokes to be returned using this function.
@@ -129,11 +134,15 @@ public:
 
 
 private:
+  int m_numberOfLevelDeepIntoRecursion = 0;
+  const int m_recursionLimit = 5;
   const int m_spaceVicinityRadius = 100;
 
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours; // Stores all the drawn strokes.
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;	  // Stores output ie predicted strokes
-  void insertVectorIntoSet(std::vector<StrokeWithNeighbours*> vector, std::unordered_set<StrokeWithNeighbours*> set);
+
+  std::vector<StrokeWithNeighbours*> concatinateVectors(std::vector<StrokeWithNeighbours*> vector1, std::vector<StrokeWithNeighbours*> vector2);
+  std::unordered_set<StrokeWithNeighbours*> insertVectorIntoSet(std::vector<StrokeWithNeighbours*> vector, std::unordered_set<StrokeWithNeighbours*> set);
 
   TPointD getTangentUnitVector(PointWithStroke* pointer); // gets the tangent to a certain point. useful for spatial similarity analysis
   double gaussianConstant(PointWithStroke* chuck1, PointWithStroke* chuck2);
