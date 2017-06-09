@@ -141,7 +141,9 @@ private:
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours; // Stores all the drawn strokes.
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;	  // Stores output ie predicted strokes
 
-  std::vector<StrokeWithNeighbours*> concatinateVectors(std::vector<StrokeWithNeighbours*> vector1, std::vector<StrokeWithNeighbours*> vector2);
+  template <class T>
+  std::vector<T> concatinateVectors(std::vector<T> vector1, std::vector<T> vector2);
+
   std::unordered_set<StrokeWithNeighbours*> insertVectorIntoSet(std::vector<StrokeWithNeighbours*> vector, std::unordered_set<StrokeWithNeighbours*> set);
 
   TPointD getTangentUnitVector(PointWithStroke* pointer); // gets the tangent to a certain point. useful for spatial similarity analysis
@@ -170,7 +172,8 @@ private:
   std::vector<SimilarPairPoint> getSimilarPairPoints(StrokeWithNeighbours *stroke1, StrokeWithNeighbours *stroke2);
   // takes two strokes and returns pairs of matching strokes within thier respective neighbourhoods
   std::vector<SimilarPairStroke> getSimilarPairStrokes(StrokeWithNeighbours* stroke1 ,StrokeWithNeighbours* stroke2);
-  std::vector<SimilarPairStroke *> localAnalysis(std::vector<StrokeWithNeighbours*> similarStrokes, StrokeWithNeighbours *lastStroke);
+
+  std::vector<std::vector<SimilarPairStroke*>> localAnalysis(std::vector<StrokeWithNeighbours*> similarStrokes, StrokeWithNeighbours *lastStroke);
 
   StrokeWithNeighbours* AnimationAutoComplete::getLocalSimilarPairStrokes(std::unordered_set<StrokeWithNeighbours*> contextStrokes, StrokeWithNeighbours *stroke);
 
@@ -184,6 +187,7 @@ private:
   std::vector<StrokeWithNeighbours*> getNeighbours(PointWithStroke point);
   // the neighbourhood of a stroke is a union of the neighbours of all of its sample points
   void getNeighbours(StrokeWithNeighbours* stroke);
+  void localPrediction(std::vector<std::vector<SimilarPairStroke> > allSimilarContextStrokes, std::vector<SimilarPairPoint>& means, std::vector<SimilarPairPoint>& deviations);
 
   bool withinSpaceVicinity(const SamplePoint samplePoint, const SamplePoint point);
 
@@ -200,9 +204,9 @@ private:
   std::vector<StrokeWithNeighbours*> getContextStrokes(StrokeWithNeighbours* stroke);
 
   TPointD meanGlobal(std::vector<SamplePoint> globalSamples);
-  SimilarPairPoint* meanLocal(std::vector<SimilarPairPoint *> localPairs);
+  SimilarPairPoint meanLocal(std::vector<SimilarPairPoint> localPairs);
   TPointD deviationGlobal(std::vector<SamplePoint> globalSamples);
-  SimilarPairPoint* deviationLocal(std::vector<SimilarPairPoint *> localPairs);
+  SimilarPairPoint deviationLocal(std::vector<SimilarPairPoint> localPairs, SimilarPairPoint mean);
 
   double differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2,  std::vector<SimilarPairStroke> similarPairStrokes);
 
