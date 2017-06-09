@@ -112,7 +112,6 @@ Features from the modified libtiff and needed currently, so this isn't a simple 
 $ cd opentoonz/thirdparty/tiff-4.0.3
 $ ./configure --with-pic --disable-jbig
 $ make
-$ cd -
 ```
 
 ### Building OpenToonz
@@ -122,8 +121,10 @@ $ cd ../../toonz
 $ mkdir build
 $ cd build
 $ cmake ../sources
-$ make
+$ make -j 4
 ```
+Replace the `4` in `make -j 4` with how many cores you have in your processor. e.g. `make -j 8` if you have 8 cores.
+
 
 The build takes a lot of time, be patient.
 
