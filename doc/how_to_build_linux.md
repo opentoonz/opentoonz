@@ -121,8 +121,10 @@ $ cd ../../toonz
 $ mkdir build
 $ cd build
 $ cmake ../sources
-$ make
+$ make -j 4
 ```
+Replace the `4` in `make -j 4` with how many cores you have in your processor. e.g. `make -j 8` if you have 8 cores.
+
 
 The build takes a lot of time, be patient.
 
