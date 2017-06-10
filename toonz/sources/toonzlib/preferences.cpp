@@ -762,6 +762,7 @@ void Preferences::setAutosavePeriod(int minutes) {
   m_settings->setValue("autosavePeriod", QString::number(minutes));
   emit stopAutoSave();
   emit startAutoSave();
+  emit autoSavePeriodChanged();
 }
 
 //-----------------------------------------------------------------

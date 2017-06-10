@@ -467,6 +467,7 @@ Q_SIGNALS:
 
   void stopAutoSave();
   void startAutoSave();
+  void autoSavePeriodChanged();
 
 private:
   std::unique_ptr<QSettings> m_settings;

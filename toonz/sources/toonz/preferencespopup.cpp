@@ -359,7 +359,8 @@ void PreferencesPopup::onScanLevelTypeChanged(const QString &text) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onMinuteChanged() {
-  m_pref->setAutosavePeriod(m_minuteFld->getValue());
+  if (m_minuteFld->getValue() != m_pref->getAutosavePeriod())
+    m_pref->setAutosavePeriod(m_minuteFld->getValue());
 }
 
 //-----------------------------------------------------------------------------
@@ -569,12 +570,25 @@ void PreferencesPopup::onDefaultViewerChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onAutoSaveChanged(bool on) {
-  m_pref->enableAutosave(on);
+  if (m_autoSaveGroup->isChecked() != m_pref->isAutosaveEnabled())
+    m_pref->enableAutosave(on);
   if (on && !m_autoSaveSceneCB->isChecked() &&
       !m_autoSaveOtherFilesCB->isChecked()) {
     m_autoSaveSceneCB->setChecked(true);
     m_autoSaveOtherFilesCB->setChecked(true);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveExternallyChanged() {
+  m_autoSaveGroup->setChecked(Preferences::instance()->isAutosaveEnabled());
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSavePeriodExternallyChanged() {
+  m_minuteFld->setValue(m_pref->getAutosavePeriod());
 }
 
 //-----------------------------------------------------------------------------
@@ -2120,6 +2134,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onRasterOptimizedMemoryChanged(int)));
   ret = ret && connect(m_autoSaveGroup, SIGNAL(toggled(bool)),
                        SLOT(onAutoSaveChanged(bool)));
+  ret = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
+                       SLOT(onAutoSaveExternallyChanged()));
+  ret = ret && connect(m_pref, SIGNAL(startAutoSave()), this,
+                       SLOT(onAutoSaveExternallyChanged()));
+  ret = ret && connect(m_pref, SIGNAL(autoSavePeriodChanged()), this,
+                       SLOT(onAutoSavePeriodExternallyChanged()));
   ret = ret && connect(m_autoSaveSceneCB, SIGNAL(stateChanged(int)),
                        SLOT(onAutoSaveSceneChanged(int)));
   ret = ret && connect(m_autoSaveOtherFilesCB, SIGNAL(stateChanged(int)),

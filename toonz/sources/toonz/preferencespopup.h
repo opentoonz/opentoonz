@@ -43,7 +43,7 @@ private:
 
 private:
   Preferences *m_pref;
-
+  
   FormatProperties *m_formatProperties;
 
   DVGui::ColorField *m_blankColor, *m_frontOnionColor, *m_backOnionColor,
@@ -90,6 +90,8 @@ private slots:
   void onProjectRootChanged();
   void onCustomProjectRootChanged();
   void onPixelUnitExternallySelected(bool on);
+  void onAutoSaveExternallyChanged();
+  void onAutoSavePeriodExternallyChanged();
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
   void onRoomChoiceChanged(int index);
