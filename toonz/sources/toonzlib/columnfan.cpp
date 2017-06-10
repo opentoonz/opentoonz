@@ -110,7 +110,7 @@ bool ColumnFan::isEmpty() const { return m_columns.empty(); }
 //-----------------------------------------------------------------------------
 
 void ColumnFan::copyFoldedStateFrom(const ColumnFan &from) {
-  for (int i = 0, n = (int)m_columns.size(); i < n; i++)
+  for (int i = 0, n = (int)from.m_columns.size(); i < n; i++)
     if (!from.isActive(i)) deactivate(i);
 }
 

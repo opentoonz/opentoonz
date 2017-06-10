@@ -605,8 +605,11 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   // pan by middle-drag
   if (m_isPanning) {
     QPoint delta = m_pos - pos;
-    delta.setX(0);
-    m_viewer->scroll(delta);
+	if (o->isVerticalTimeline())
+		delta.setX(0);
+	else
+		delta.setY(0);
+	m_viewer->scroll(delta);
     return;
   }
 
@@ -616,7 +619,10 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   if ((event->buttons() & Qt::LeftButton) != 0 &&
       !visibleRegion().contains(pos)) {
     QRect bounds = visibleRegion().boundingRect();
-    m_viewer->setAutoPanSpeed(bounds, pos);
+	if(o->isVerticalTimeline())
+		m_viewer->setAutoPanSpeed(bounds, QPoint(bounds.left(), pos.y()));
+	else
+		m_viewer->setAutoPanSpeed(bounds, QPoint(pos.x(), bounds.top()));
   } else
     m_viewer->stopAutoPan();
 
@@ -689,7 +695,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
         o->rect(PredefinedRect::ONION).contains(mouseInCell))
       m_tooltip = tr("Double Click to Toggle Onion Skin");
     else
-      m_tooltip = tr("Curren Frame");
+      m_tooltip = tr("Current Frame");
   } else if (m_showOnionToSet == Fos)
     m_tooltip = tr("Fixed Onion Skin Toggle");
   else if (m_showOnionToSet == Mos)

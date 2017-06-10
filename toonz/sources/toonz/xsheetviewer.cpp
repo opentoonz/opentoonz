@@ -169,9 +169,11 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
       TApp::instance()->getCurrentXsheet());
       
   m_toolbarScrollArea = new XsheetScrollArea(this);
+  m_toolbarScrollArea->setFixedSize(m_orientation->cellWidth() * 12, XsheetGUI::TOOLBAR_HEIGHT);
   m_toolbarScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbarScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbar = new XsheetGUI::Toolbar(this);
+  m_toolbar->setFixedSize(m_orientation->cellWidth() * 12, XsheetGUI::TOOLBAR_HEIGHT);
   m_toolbarScrollArea->setWidget(m_toolbar);
 
   QRect noteArea(0, 0, 75, 120);
@@ -307,9 +309,12 @@ void XsheetViewer::positionSections() {
   NumberRange bodyLayer(headerLayer.to(), allLayer.to());
   NumberRange bodyFrame(headerFrame.to(), allFrame.to());
 
-  m_toolbarScrollArea->setGeometry(0, 0, width() - XsheetGUI::SCROLLBAR_WIDTH, XsheetGUI::TOOLBAR_HEIGHT);
-
   if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
+	  m_toolbar->showToolbar(true);
+
+	  int w = geometry().size().width();
+	  m_toolbarScrollArea->setGeometry(0, 0, w, XsheetGUI::TOOLBAR_HEIGHT);
+
 	  if (o->isVerticalTimeline()) {
 		  headerFrame = headerFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT, XsheetGUI::TOOLBAR_HEIGHT);
 		  bodyFrame = bodyFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT, 0);
@@ -318,8 +323,6 @@ void XsheetViewer::positionSections() {
 		  headerLayer = headerLayer.adjusted(XsheetGUI::TOOLBAR_HEIGHT, XsheetGUI::TOOLBAR_HEIGHT);
 		  bodyLayer = bodyLayer.adjusted(XsheetGUI::TOOLBAR_HEIGHT, 0);
 	  }
-
-	  m_toolbar->showToolbar(true);
   }
   else {
 	  m_toolbar->showToolbar(false);
@@ -328,7 +331,7 @@ void XsheetViewer::positionSections() {
   m_noteScrollArea->setGeometry(o->frameLayerRect(headerFrame, headerLayer));
   m_cellScrollArea->setGeometry(o->frameLayerRect(bodyFrame, bodyLayer));
   m_columnScrollArea->setGeometry(o->frameLayerRect(
-	  headerFrame, bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
+	  headerFrame.adjusted(0,-1), bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
   m_rowScrollArea->setGeometry(o->frameLayerRect(
 	  bodyFrame.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
 }
@@ -459,8 +462,7 @@ frameHandle->setFrame(row);*/
 void XsheetViewer::scroll(QPoint delta) {
   int x = delta.x();
   int y = delta.y();
-  m_frameScroller.prepareToScrollOthers(delta);
-
+ 
   int valueH    = m_cellScrollArea->horizontalScrollBar()->value() + x;
   int valueV    = m_cellScrollArea->verticalScrollBar()->value() + y;
   int maxValueH = m_cellScrollArea->horizontalScrollBar()->maximum();
@@ -490,7 +492,7 @@ void XsheetViewer::scroll(QPoint delta) {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::onPrepareToScrollOffset(const QPoint &offset) {
-  refreshContentSize(offset.x(), offset.y());
+	refreshContentSize(offset.x(), offset.y());
 }
 
 //-----------------------------------------------------------------------------
@@ -597,7 +599,8 @@ void XsheetViewer::updateAreeSize() {
   if (xsh)
     areaFilled = positionToXY(
         CellPosition(xsh->getFrameCount() + 1, xsh->getColumnCount() + 1));
-  viewArea = viewArea & QRect(0, 0, areaFilled.x(), areaFilled.y());
+  if (viewArea.right() < areaFilled.x()) viewArea.setRight(areaFilled.x());
+  if (viewArea.bottom() < areaFilled.y()) viewArea.setBottom(areaFilled.y());
 
   NumberRange allLayer    = o->layerSide(viewArea);
   NumberRange allFrame    = o->frameSide(viewArea);
@@ -882,6 +885,7 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
         ->getScene()
         ->getProperties()
         ->getMarkers(markerDistance, markerOffset);
+
     if (event->angleDelta().x() == 0) {  // vertical scroll
 		if (!orientation()->isVerticalTimeline())
 			markerDistance = 1;
@@ -1070,7 +1074,10 @@ void XsheetViewer::onXsheetChanged() {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::onPreferenceChanged(const QString &prefName) {
-  if (prefName == "XSheetToolbar") positionSections();
+	if (prefName == "XSheetToolbar") {
+		positionSections();
+		refreshContentSize(0, 0);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1225,6 +1232,7 @@ void XsheetViewer::updateAllAree(bool isDragging) {
     m_rowArea->update(m_rowArea->visibleRegion());
     m_columnArea->update(m_columnArea->visibleRegion());
   }
+  m_toolbar->update(m_toolbar->visibleRegion());
 }
 
 //-----------------------------------------------------------------------------

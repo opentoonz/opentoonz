@@ -625,11 +625,6 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
   // fill base color
   if (isEmpty || col < 0) {
-    if (o->isVerticalTimeline())
-	  rect.adjust(2, 0, 0, 0);
-	else
-	  rect.adjust(0, 2, 0, 0);
-
     p.fillRect(rect, m_viewer->getEmptyColumnHeadColor());
 
     p.setPen(m_viewer->getVerticalLineHeadColor());
@@ -663,8 +658,8 @@ void ColumnArea::DrawHeader::drawEye() const {
   if (col < 0 || isEmpty) return;
   if (!column->isPreviewVisible()) return;
 
-  QRect prevViewRect = o->rect(PredefinedRect::EYE_AREA).translated(orig);
-  QRect eyeRect      = o->rect(PredefinedRect::EYE).translated(orig);
+  QRect prevViewRect = o->rect(PredefinedRect::EYE_AREA).translated(orig).adjusted(1, 0, 1, 0);
+  QRect eyeRect      = o->rect(PredefinedRect::EYE).translated(orig).adjusted(1, 0, 1, 0);
 
   // preview visible toggle
   p.fillRect(prevViewRect, PreviewVisibleColor);
@@ -677,9 +672,9 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
   if (!column->isCamstandVisible()) return;
 
   QRect tableViewRect =
-      o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig);
+      o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig).adjusted(1, 0, 1, 0);
   QRect tableViewImgRect =
-      o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
+      o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig).adjusted(1, 0, 1, 0);
 
   p.fillRect(tableViewRect, CamStandVisibleColor);
   p.drawPixmap(tableViewImgRect, opacity < 255
@@ -690,7 +685,7 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
 void ColumnArea::DrawHeader::drawLock() const {
   if (col < 0 || isEmpty) return;
 
-  QRect lockModeRect = o->rect(PredefinedRect::LOCK).translated(orig);
+  QRect lockModeRect = o->rect(PredefinedRect::LOCK).translated(orig).adjusted(1, 0, 1, 0);
 
   // lock button
   p.setPen(Qt::gray);
@@ -731,7 +726,7 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 
   QRect columnName = o->rect(PredefinedRect::LAYER_NAME)
                          .translated(orig)
-                         .adjusted(2, 0, -2, 0);
+                         .adjusted(0, 0, -2, 0);
   p.drawText(columnName, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QString(name.c_str()));
 }
@@ -739,7 +734,7 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 void ColumnArea::DrawHeader::drawSoundIcon(bool isPlaying) const {
   QRect rect = m_viewer->orientation()
                    ->rect(PredefinedRect::SOUND_ICON)
-                   .translated(orig);
+                   .translated(orig).adjusted(1, 0, 1, 0);
   p.drawPixmap(rect, isPlaying ? Pixmaps::soundPlaying() : Pixmaps::sound());
 }
 
@@ -862,18 +857,18 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
 		y0 = 0;
 
 		p.setPen(m_viewer->getDarkLineColor());
-		p.fillRect(x0, 0, rect.width(), 18, QBrush(m_viewer->getDarkBGColor()));
-		p.fillRect(x0, 16, 2, rect.height() - 33, QBrush(m_viewer->getLightLightBGColor()));
-		p.fillRect(x0 + 3, 19, 2, rect.height() - 35, QBrush(m_viewer->getLightLightBGColor()));
-		p.fillRect(x0 + 6, 16, 2, rect.height() - 33, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(x0, 1, rect.width(), 18, QBrush(m_viewer->getDarkBGColor()));
+		p.fillRect(x0, 17, 2, rect.height() - 34, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(x0 + 3, 20, 2, rect.height() - 36, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(x0 + 6, 17, 2, rect.height() - 34, QBrush(m_viewer->getLightLightBGColor()));
 
 		p.setPen(m_viewer->getDarkLineColor());
-		p.drawLine(x0 - 1, 16, x0 - 1, rect.height());
-		p.drawLine(x0 + 2, 16, x0 + 2, rect.height());
-		p.drawLine(x0 + 5, 16, x0 + 5, rect.height());
-		p.drawLine(x0, 16, x0 + 1, 16);
-		p.drawLine(x0 + 3, 19, x0 + 4, 19);
-		p.drawLine(x0 + 6, 16, x0 + 7, 16);
+		p.drawLine(x0, 17, x0 - 1, rect.height() - 1);
+		p.drawLine(x0 + 2, 17, x0 + 2, rect.height() - 1);
+		p.drawLine(x0 + 5, 17, x0 + 5, rect.height() - 1);
+		p.drawLine(x0, 17, x0 + 1, 16);
+		p.drawLine(x0 + 3, 20, x0 + 4, 19);
+		p.drawLine(x0 + 6, 17, x0 + 7, 16);
 
 		// triangolini
 		p.setPen(Qt::black);
@@ -893,22 +888,22 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
 	}
 	else
 	{
-		x0 = 0;
+		x0 = 1;
 		y0 = rect.topLeft().y() + 1;
 
 		p.setPen(m_viewer->getDarkLineColor());
-		p.fillRect(0, y0, 18, rect.height(), QBrush(m_viewer->getDarkBGColor()));
-		p.fillRect(16, y0, rect.width() - 33, 2, QBrush(m_viewer->getLightLightBGColor()));
-		p.fillRect(19, y0 + 3, rect.width() - 35, 2, QBrush(m_viewer->getLightLightBGColor()));
-		p.fillRect(16, y0 + 6, rect.width() - 33, 2, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(1, y0, 18, rect.height(), QBrush(m_viewer->getDarkBGColor()));
+		p.fillRect(17, y0, rect.width() - 34, 2, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(20, y0 + 3, rect.width() - 36, 2, QBrush(m_viewer->getLightLightBGColor()));
+		p.fillRect(17, y0 + 6, rect.width() - 34, 2, QBrush(m_viewer->getLightLightBGColor()));
 
 		p.setPen(m_viewer->getDarkLineColor());
-		p.drawLine(16, y0 - 1, rect.width(), y0 - 1);
-		p.drawLine(16, y0 + 2, rect.width(), y0 + 2);
-		p.drawLine(16, y0 + 5, rect.width(), y0 + 5);
-		p.drawLine(16, y0, 16, y0 + 1);
-		p.drawLine(19, y0 + 3, 19, y0 + 4);
-		p.drawLine(16, y0 + 6, 16, y0 + 7);
+		p.drawLine(17, y0 - 1, rect.width() - 1, y0 - 1);
+		p.drawLine(17, y0 + 2, rect.width() - 1, y0 + 2);
+		p.drawLine(17, y0 + 5, rect.width() - 1, y0 + 5);
+		p.drawLine(17, y0, 16, y0 + 1);
+		p.drawLine(20, y0 + 3, 19, y0 + 4);
+		p.drawLine(17, y0 + 6, 16, y0 + 7);
 
 		// triangolini
 		p.setPen(Qt::black);
@@ -1133,7 +1128,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
 
   // pallete icon
   p.setPen(Qt::black);
-  if (col >= 0 && !isEmpty) {
+  if (col >= 0 && !isEmpty && o->isVerticalTimeline()) {
     static QPixmap paletteHeader(":Resources/palette_header.png");
     QRect thumbnailRect(orig.x() + 9, orig.y() + o->cellHeight() * 2 + 7,
                         o->cellWidth() - 11, 42);
@@ -1355,9 +1350,9 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   p.setPen(grey150);
   p.setBrush(Qt::NoBrush);
   if (m_viewer->orientation()->isVerticalTimeline())
-	  p.drawRect(toBeUpdated.adjusted(0, 1, 0, -4));
+	  p.drawRect(toBeUpdated.adjusted(0, 1, 0, -3));
   else
-	  p.drawRect(toBeUpdated.adjusted(1, 0, -4, 0));
+	  p.drawRect(toBeUpdated.adjusted(1, 0, -3, 0));
 
   if (getDragTool()) getDragTool()->drawColumnsArea(p);
 
@@ -1710,7 +1705,10 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
 
   if (m_isPanning) {  // Pan tasto centrale
     QPoint delta = m_pos - pos;
-    delta.setY(0);
+	if(o->isVerticalTimeline())
+		delta.setY(0);
+	else
+		delta.setX(0);
     m_viewer->scroll(delta);
     return;
   }
@@ -1732,7 +1730,10 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
   if ((event->buttons() & Qt::LeftButton) != 0 &&
       !visibleRegion().contains(pos)) {
     QRect bounds = visibleRegion().boundingRect();
-    m_viewer->setAutoPanSpeed(bounds, pos);
+	if (o->isVerticalTimeline())
+		m_viewer->setAutoPanSpeed(bounds, QPoint(pos.x(), bounds.top()));
+	else
+		m_viewer->setAutoPanSpeed(bounds, QPoint(bounds.left(), pos.y()));
   } else
     m_viewer->stopAutoPan();
 

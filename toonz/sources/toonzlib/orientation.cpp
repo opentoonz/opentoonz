@@ -79,7 +79,7 @@ class LeftToRightOrientation : public Orientation {
   const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = 0;
   const int PLAY_RANGE_Y       = ONION_SIZE;
   const int ICON_WIDTH         = 21;
-  const int ICON_OFFSET        = ICON_WIDTH + 1;
+  const int ICON_OFFSET        = ICON_WIDTH;
   const int ICONS_WIDTH        = ICON_OFFSET * 4;  // 88
   const int LAYER_NUMBER_WIDTH = 44;
   const int LAYER_NAME_WIDTH   = 130;
@@ -245,7 +245,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
                 (CELL_HEIGHT - KEY_ICON_HEIGHT) / 2, KEY_ICON_WIDTH,
                 KEY_ICON_HEIGHT);
   addRect(PredefinedRect::KEY_ICON, keyRect);
-  QRect nameRect = cellRect.adjusted(7, 4, -6, 0);
+  QRect nameRect = cellRect.adjusted(8, 4, -6, 0);
   addRect(PredefinedRect::CELL_NAME, nameRect);
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME,
           nameRect.adjusted(0, 0, -KEY_ICON_WIDTH, 0));
@@ -281,7 +281,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::LAYER_HEADER,
           QRect(0, 1, CELL_WIDTH, LAYER_HEADER_HEIGHT - 3));
   addRect(PredefinedRect::FOLDED_LAYER_HEADER,
-	  QRect(0, 0, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT));
+	  QRect(0, 1, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT - 3));
   addRect(PredefinedRect::PLAY_RANGE,
           QRect(PLAY_RANGE_X, 0, PLAY_MARKER_SIZE, CELL_HEIGHT));
   addRect(PredefinedRect::ONION,
@@ -306,7 +306,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
                 (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
   addRect(PredefinedRect::RENAME_COLUMN,
           QRect(0, 6, CELL_WIDTH, CELL_HEIGHT - 3));
-  QRect eyeArea(10, 6, CELL_WIDTH - 12, CELL_HEIGHT - 3);
+  QRect eyeArea(9, 6, CELL_WIDTH - 12, CELL_HEIGHT - 3);
   addRect(PredefinedRect::EYE_AREA, eyeArea);
   QRect eye(eyeArea.right() - 18, 7, 18, 15);
   addRect(PredefinedRect::EYE, eye);
@@ -487,7 +487,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   QRect keyRect((CELL_WIDTH - KEY_ICON_WIDTH) / 2,
                 CELL_HEIGHT - KEY_ICON_HEIGHT, KEY_ICON_WIDTH, KEY_ICON_HEIGHT);
   addRect(PredefinedRect::KEY_ICON, keyRect);
-  QRect nameRect = cellRect.adjusted(7, 4, -6, 0);
+  QRect nameRect = cellRect.adjusted(5, 4, -6, 0);
   addRect(PredefinedRect::CELL_NAME, nameRect);
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect);
   addRect(PredefinedRect::END_EXTENDER,
@@ -520,7 +520,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::LAYER_HEADER,
           QRect(1, 0, LAYER_HEADER_WIDTH - 3, CELL_HEIGHT));
   addRect(PredefinedRect::FOLDED_LAYER_HEADER,
-	  QRect(0, 0, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT));
+	  QRect(1, 0, FOLDED_LAYER_HEADER_WIDTH - 3, FOLDED_LAYER_HEADER_HEIGHT));
   addRect(PredefinedRect::PLAY_RANGE,
           QRect(0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
   addRect(PredefinedRect::ONION,

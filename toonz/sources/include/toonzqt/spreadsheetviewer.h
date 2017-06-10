@@ -45,6 +45,7 @@ class DVAPI FrameScroller final : public QObject {
   const Orientation *m_orientation;
   QScrollArea *m_scrollArea;
   int m_lastX, m_lastY;
+  bool m_syncing;
 
 public:
   FrameScroller();
@@ -60,6 +61,9 @@ public:
   void unregisterFrameScroller();
 
   void prepareToScrollOthers(const QPoint &offset);
+
+  void setSyncing(bool s) { m_syncing = s; }
+  bool isSyncing() { return m_syncing; }
 
 private:
   void connectScrollbars();

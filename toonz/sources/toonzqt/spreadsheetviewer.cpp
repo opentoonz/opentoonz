@@ -26,7 +26,8 @@ FrameScroller::FrameScroller()
     : m_orientation(Orientations::topToBottom())
     , m_scrollArea(nullptr)
     , m_lastX(0)
-    , m_lastY(0) {}
+    , m_lastY(0)
+    ,m_syncing(false){}
 
 FrameScroller::~FrameScroller() {}
 
@@ -56,41 +57,55 @@ void FrameScroller::connectScrollbars() {
 
 void FrameScroller::onVScroll(int y) {
   QPoint offset(0, y - m_lastY);
+  if (isSyncing()) return;
   m_lastY = y;
+  setSyncing(true);
   handleScroll(offset);
+  setSyncing(false);
 }
 void FrameScroller::onHScroll(int x) {
-  QPoint offset(0, x - m_lastX);
+  QPoint offset(x - m_lastX, 0);
+  if (isSyncing()) return;
   m_lastX = x;
+  setSyncing(true);
   handleScroll(offset);
+  setSyncing(false);
 }
 
 static QList<FrameScroller *> frameScrollers;
 
 void FrameScroller::handleScroll(const QPoint &offset) const {
   CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
-  if (!ratio.frame())  // only synchronize changes by frames axis
+  if( (m_orientation->isVerticalTimeline() && offset.x()) 
+	  || (!m_orientation->isVerticalTimeline() && offset.y())) // only synchronize changes by frames axis
     return;
 
   for (int i = 0; i < frameScrollers.size(); i++)
-    if (frameScrollers[i] != this) frameScrollers[i]->onScroll(ratio);
+	  if (frameScrollers[i] != this)
+	  {
+		  if (!frameScrollers[i]->isSyncing())
+		  {
+			  frameScrollers[i]->onScroll(ratio);
+			  break;
+		  }
+	  }
 }
 
-void adjustScrollbarWithoutSignals(QScrollBar *scrollBar, int add);
+void adjustScrollbar(QScrollBar *scrollBar, int add);
 
 void FrameScroller::onScroll(const CellPositionRatio &ratio) {
   QPoint offset = orientation()->positionRatioToXY(ratio);
   if (offset.x())
-    adjustScrollbarWithoutSignals(m_scrollArea->horizontalScrollBar(),
+    adjustScrollbar(m_scrollArea->horizontalScrollBar(),
                                   offset.x());
   if (offset.y())
-    adjustScrollbarWithoutSignals(m_scrollArea->verticalScrollBar(),
+    adjustScrollbar(m_scrollArea->verticalScrollBar(),
                                   offset.y());
+
+  emit prepareToScrollOffset(offset);
 }
-void adjustScrollbarWithoutSignals(QScrollBar *scrollBar, int add) {
-  scrollBar->blockSignals(true);
+void adjustScrollbar(QScrollBar *scrollBar, int add) {
   scrollBar->setValue(scrollBar->value() + add);
-  scrollBar->blockSignals(false);
 }
 
 void FrameScroller::registerFrameScroller() {
@@ -105,7 +120,7 @@ void FrameScroller::prepareToScrollOthers(const QPoint &offset) {
   CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
   for (int i = 0; i < frameScrollers.size(); i++)
     if (frameScrollers[i] != this)
-      frameScrollers[i]->prepareToScrollRatio(ratio);
+		  frameScrollers[i]->prepareToScrollRatio(ratio);
 }
 void FrameScroller::prepareToScrollRatio(const CellPositionRatio &ratio) {
   QPoint offset = orientation()->positionRatioToXY(ratio);
@@ -568,7 +583,6 @@ void SpreadsheetViewer::setColumnCount(int columnCount) {
 void SpreadsheetViewer::scroll(QPoint delta) {
   int x = delta.x();
   int y = delta.y();
-  m_frameScroller.prepareToScrollOthers(delta);
 
   QScrollBar *hSc = m_cellScrollArea->horizontalScrollBar();
   QScrollBar *vSc = m_cellScrollArea->verticalScrollBar();
@@ -596,7 +610,7 @@ void SpreadsheetViewer::scroll(QPoint delta) {
 }
 
 void SpreadsheetViewer::onPrepareToScrollOffset(const QPoint &offset) {
-  refreshContentSize(offset.x(), offset.y());
+	refreshContentSize(offset.x(), offset.y());
 }
 
 void SpreadsheetViewer::setAutoPanSpeed(const QPoint &speed) {
