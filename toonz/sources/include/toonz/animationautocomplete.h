@@ -14,7 +14,7 @@ You must enable one or more of the debugging macros below. ie. SHOW_TANGENT_LINE
 		//#define SHOW_TANGENT_LINES // Shows tangent lines for each sample point on a stroke
 		//#define SHOW_MATCHING_STROKE // highlights the stroke that had the highest similarity score with the last stroke.
 		//#define SHOW_PAIR_LINES // draws lines connecting sample points that are matching in two strokes
-		#define SHOW_SPACE_VICINITY // draws the space vicinity around each sample point.
+		//#define SHOW_SPACE_VICINITY // draws the space vicinity around each sample point.
 		//#define SHOW_PAIR_STROKES // draws lines connecting different strokes that are matching in two neighbourhoods
 #endif
 
@@ -37,13 +37,20 @@ Contains the point, the stroke it's part of, and its index within that stroke.
 */
 class PointWithStroke
 {
+	bool lastPoint = false;
 public:
-	PointWithStroke() {}
-	PointWithStroke(SamplePoint point, StrokeWithNeighbours* stroke, int index) : point(point), stroke(stroke), index(index) {}
+	PointWithStroke();
+	PointWithStroke(SamplePoint point, StrokeWithNeighbours* stroke, int index);
 	~PointWithStroke() {}
 	SamplePoint point;
 	StrokeWithNeighbours* stroke;
 	int index;
+
+	TPointD getTPointD();
+	void setLastPoint(bool value);
+	PointWithStroke getNext();
+	PointWithStroke getPrevious();
+	void normalizeP1();
 };
 
 typedef std::unordered_set< PointWithStroke *> SetOfPoints;
@@ -62,10 +69,16 @@ public:
     TStroke* stroke;
 	SetOfStrokes neighbours;
 	StrokeWithNeighbours* nextStroke;
-    std::unordered_set<StrokeWithNeighbours*> contextStrokes;
+	std::unordered_set<StrokeWithNeighbours*> contextStrokes;
 
 	TPointD getCentralSample();
+	PointWithStroke getCentralPointWithStroke();
     double getLength();
+	TPointD getTPointD(int i);
+	SamplePoint getChunk(int i);
+	PointWithStroke getPointWithStroke(int i);
+	bool isLastPoint(int i);
+	void setPoint(int i, TPointD newPoint);
 };
 
 struct SimilarPairPoint
@@ -136,7 +149,7 @@ public:
 private:
   int m_numberOfLevelDeepIntoRecursion = 0;
   const int m_recursionLimit = 5;
-  const int m_spaceVicinityRadius = 100;
+  const int m_spaceVicinityRadius = 200;
 
   std::vector<StrokeWithNeighbours*> m_strokesWithNeighbours; // Stores all the drawn strokes.
   std::vector<StrokeWithNeighbours*> m_synthesizedStrokes;	  // Stores output ie predicted strokes
@@ -195,13 +208,22 @@ private:
   std::vector<StrokeWithNeighbours*> search(StrokeWithNeighbours *operation1);
   std::vector<StrokeWithNeighbours*> assign(std::vector<StrokeWithNeighbours*>);
 
+  StrokeWithNeighbours* adaptToContext(StrokeWithNeighbours* stroke, StrokeWithNeighbours* similarStroke);
+  bool hasContext(StrokeWithNeighbours* stroke, StrokeWithNeighbours* context);
+
   // Sample ID is the index of a point divided by the total number (n) of sample points in a stroke
   double getSampleId(const int &index, const int &n);
   double getReversedSampleId(const int &index, const int &n);
 
   // a context stroke is a long stroke that serves as a context to the neighbourhood
   // a context stroke is longer than 2 * the length of the predicted stroke
-  std::vector<StrokeWithNeighbours*> getContextStrokes(StrokeWithNeighbours* stroke);
+  void getContextStrokes(StrokeWithNeighbours* stroke);
+
+  double getClosestDistanceToContextStroke(PointWithStroke point, StrokeWithNeighbours* context);
+  PointWithStroke getClosestPointInContextStroke(PointWithStroke point, StrokeWithNeighbours* context);
+  TPointD getProjectionOnContext(PointWithStroke point, StrokeWithNeighbours* context);
+  TPointD getProjectionOnLine(TPointD point, TPointD L1, TPointD L2);
+  TPointD movePointTowardsAnotherByDistance(TPointD start, TPointD end, double distanceToTravel);
 
   TPointD meanGlobal(std::vector<SamplePoint> globalSamples);
   SimilarPairPoint meanLocal(std::vector<SimilarPairPoint> localPairs);

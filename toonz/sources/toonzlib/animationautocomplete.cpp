@@ -31,6 +31,7 @@ void AnimationAutoComplete::addStroke(TStroke* stroke)
 	strokeWithNeighbours->stroke = stroke;
 
 	getNeighbours(strokeWithNeighbours);
+	getContextStrokes(strokeWithNeighbours);
 
 	if (m_strokesWithNeighbours.size() >= 3)
 		beginSynthesis();
@@ -95,6 +96,11 @@ void AnimationAutoComplete::getNeighbours(StrokeWithNeighbours* stroke)
 	for (int i = 0; i < chuckCount; i++)
 	{
 		PointWithStroke point(stroke->stroke->getChunk(i), stroke, i);
+		if (i == chuckCount - 1)
+			point.setLastPoint(true);
+		else
+			point.setLastPoint(false);
+
 		std::vector<StrokeWithNeighbours*> neighbours = getNeighbours(point);
 		stroke->neighbours.insert(neighbours.begin(), neighbours.end());
 	}
@@ -105,7 +111,6 @@ void AnimationAutoComplete::getNeighbours(StrokeWithNeighbours* stroke)
 std::vector<StrokeWithNeighbours*> AnimationAutoComplete::getNeighbours(PointWithStroke point)
 {
 	std::vector<StrokeWithNeighbours*> neighbours;
-std:vector <StrokeWithNeighbours*> contextStrokes;
 
 	for(int i = 0; i < m_strokesWithNeighbours.size(); i++)
 	{
@@ -116,18 +121,11 @@ std:vector <StrokeWithNeighbours*> contextStrokes;
 		for(int j = 0; j < stroke->getChunkCount(); j++)
 			if(withinSpaceVicinity(point.point, stroke->getChunk(j)))
 			{
-				double strokeLength = stroke->getLength();
 				neighbours.push_back(m_strokesWithNeighbours[i]);
 				m_strokesWithNeighbours[i]->neighbours.insert(point.stroke); // if you're my neighbour, then I'm your neighbour
-
-				if ((strokeLength >= point.stroke->getLength() * 2))
-					contextStrokes.push_back( m_strokesWithNeighbours[i]);
-
 				break;
 			}
 	}
-
-	point.stroke->contextStrokes = insertVectorIntoSet(contextStrokes, point.stroke->contextStrokes);
 
 	int size = m_strokesWithNeighbours.size();
 	if(size > 2)
@@ -161,6 +159,7 @@ void AnimationAutoComplete::beginSynthesis()
 
 	m_synthesizedStrokes = assign(similarStrokes);
 
+	// call the whole system recursively
 	if (m_numberOfLevelDeepIntoRecursion < m_recursionLimit && m_synthesizedStrokes.size())
 	{
 		AnimationAutoComplete aac(m_numberOfLevelDeepIntoRecursion+1);
@@ -309,30 +308,114 @@ std::vector<StrokeWithNeighbours*> AnimationAutoComplete::assign(std::vector<Str
 			outputStroke.score = min;
 			outputStroke.stroke = nextStroke;
 			finalSimilarStroke = similarStroke;
+#ifdef DEBUGGING
+#if defined(SHOW_PAIR_LINES) || defined(SHOW_MATCHING_STROKE)
+	matchedStroke = finalSimilarStroke;
+#endif
+#endif
 		}
 	}
 
+	//StrokeWithNeighbours* output = adaptToContext(outputStroke.stroke, finalSimilarStroke->nextStroke);
+	StrokeWithNeighbours* output = outputStroke.stroke;
+
 	std::vector<StrokeWithNeighbours*> outputStrokes;
-	outputStrokes.push_back(outputStroke.stroke);
-	//#ifdef ADAM_SYSTHESIS
-	//	//outputStrokes = getPredictedNeighours(outputStroke.stroke, finalSimilarStroke->nextStroke);
-	//#endif
-	//#ifdef ODAY_SYNTHESIS
-	//	outputStrokes.push_back(outputStroke.stroke);
-	//#endif
+
+	if (output)
+		outputStrokes.push_back(output);
+//	#ifdef ADAM_SYSTHESIS
+//		outputStrokes = getPredictedNeighours(output, finalSimilarStroke->nextStroke);
+//	#endif
+//	#ifdef ODAY_SYNTHESIS
+//		outputStrokes.push_back(outputStroke.stroke);
+//	#endif
 
 	return outputStrokes;
 }
 
-std::vector<StrokeWithNeighbours *> AnimationAutoComplete::getContextStrokes(StrokeWithNeighbours *stroke)
+StrokeWithNeighbours* AnimationAutoComplete::adaptToContext(StrokeWithNeighbours* stroke, StrokeWithNeighbours* similarStroke)
 {
-	std::vector<StrokeWithNeighbours*> contextStrokes;
+	// currently only handling a single shared context
+	StrokeWithNeighbours* context;
 
-	for(StrokeWithNeighbours* neighbor : stroke->neighbours)
-		if (neighbor->stroke->getLength() >= (2 * stroke->stroke->getLength()))
-			contextStrokes.push_back(neighbor);
+	if (!stroke->contextStrokes.size())
+		return stroke;
 
-	return contextStrokes;
+	context = *(stroke->contextStrokes.begin());
+
+	if (!hasContext(similarStroke, context))
+		return stroke;
+
+	//std::vector<TPointD> newStrokePoints;
+	double averageDistance = 0;
+
+	for (int i = 0; i < stroke->stroke->getChunkCount(); i++)
+	{
+		double distanceToTravel = getClosestDistanceToContextStroke(similarStroke->getPointWithStroke(i), context);
+		averageDistance += distanceToTravel;
+
+//		TPointD projectionOnContext = getProjectionOnContext(stroke->getPointWithStroke(i), context);
+
+//		if (projectionOnContext == TPointD(-1, -1))
+//			continue; // TODO: handle case where one point is parallel to the context
+
+//		TPointD point = stroke->getTPointD(i);
+
+//		TPointD newPoint = movePointTowardsAnotherByDistance(point, projectionOnContext, distanceToTravel);
+
+//		stroke->getChunk(i)->setP0(newPoint);
+
+//		stroke->getPointWithStroke(i).normalizeP1();
+
+//		if (newStrokePoints.size())
+//		{
+//			TPointD lastPoint = newStrokePoints.back();
+//			TPointD mid = lastPoint + newPoint;
+//			mid.x /= 2;
+//			mid.y /= 2;
+//			newStrokePoints.push_back(mid);
+//		}
+
+		//newStrokePoints.push_back(newPoint);
+	}
+
+	averageDistance /= stroke->stroke->getChunkCount();
+	TPointD projectionOnContext = getProjectionOnContext(stroke->getCentralPointWithStroke(), context);
+	TPointD newPoint = movePointTowardsAnotherByDistance(stroke->getCentralSample(), projectionOnContext, averageDistance);
+
+	TAffine aff = TTranslation(-newPoint);
+	stroke->stroke->transform(aff);
+
+//	TStroke* newTStroke = new TStroke(newStrokePoints);
+//	newTStroke->setAverageThickness(stroke->stroke->getAverageThickness());
+//	StrokeWithNeighbours* newStroke = new StrokeWithNeighbours();
+//	newStroke->stroke = newTStroke;
+//	getNeighbours(newStroke);
+//	getContextStrokes(newStroke);
+
+//	return newStroke;
+	return stroke;
+}
+
+bool AnimationAutoComplete::hasContext(StrokeWithNeighbours* stroke, StrokeWithNeighbours* context)
+{
+	bool foundCommonContext = false;
+
+	for (StrokeWithNeighbours* similarContext : stroke->contextStrokes)
+		if (similarContext == context)
+		{
+			foundCommonContext = true;
+			break;
+		}
+
+	return foundCommonContext;
+}
+
+void AnimationAutoComplete::getContextStrokes(StrokeWithNeighbours *stroke)
+{
+	for(StrokeWithNeighbours* neighbour : stroke->neighbours)
+		if (neighbour->stroke->getLength() >= (2 * stroke->stroke->getLength()))
+			stroke->contextStrokes.insert(neighbour);
 }
 
 double AnimationAutoComplete::differnceOfTwoNeighborhood(StrokeWithNeighbours* stroke1, StrokeWithNeighbours* stroke2,  std::vector<SimilarPairStroke> similarPairStrokes)
@@ -395,6 +478,80 @@ inline double AnimationAutoComplete::getSampleId(const int &index, const int &n)
 inline double AnimationAutoComplete::getReversedSampleId(const int &index, const int &n)
 {
 	return (n - index) / n;
+}
+
+double AnimationAutoComplete::getClosestDistanceToContextStroke(PointWithStroke point, StrokeWithNeighbours* context)
+{
+	TPointD projection = getProjectionOnContext(point, context);
+	return tdistance(point.getTPointD(), projection);
+}
+
+PointWithStroke AnimationAutoComplete::getClosestPointInContextStroke(PointWithStroke point, StrokeWithNeighbours* context)
+{
+	PointWithStroke closestPoint;
+	double minimumDistance = 99999999999;
+
+	for (int i = 0; i < context->stroke->getChunkCount() - 1; i++)
+	{
+		double distance = tdistance(point.getTPointD(), context->getTPointD(i));
+		if (distance < minimumDistance)
+		{
+			closestPoint = context->getPointWithStroke(i);
+			minimumDistance = distance;
+		}
+	}
+
+	return closestPoint;
+}
+
+TPointD AnimationAutoComplete::getProjectionOnContext(PointWithStroke point, StrokeWithNeighbours* context)
+{
+	PointWithStroke closestPointOnContext = getClosestPointInContextStroke(point, context);
+	PointWithStroke next = closestPointOnContext.getNext();
+	PointWithStroke previous = closestPointOnContext.getPrevious();
+
+	TPointD projectionOnNext;
+	TPointD projectionOnPrevious;
+	if (next.stroke)
+		projectionOnNext = getProjectionOnLine(point.getTPointD(), closestPointOnContext.getTPointD(), next.getTPointD());
+	if (previous.stroke)
+		projectionOnPrevious = getProjectionOnLine(point.getTPointD(), closestPointOnContext.getTPointD(), previous.getTPointD());
+
+	double distance = tdistance(point.getTPointD(), projectionOnNext);
+	double distance2 = tdistance(point.getTPointD(), projectionOnPrevious);
+
+	return (distance > distance2) ? projectionOnNext : projectionOnPrevious;
+}
+
+TPointD AnimationAutoComplete::getProjectionOnLine(TPointD point, TPointD L1, TPointD L2)
+{
+	// the Line has two points A and B
+	// the projection is the Point D
+	// the outside point is C
+	// https://stackoverflow.com/questions/10301001/perpendicular-on-a-line-segment-from-a-given-point
+	//t=[(Cx-Ax)(Bx-Ax)+(Cy-Ay)(By-Ay)]/[(Bx-Ax)^2+(By-Ay)^2]
+	double a = (point.x - L1.x) * (L2.x - L1.x);
+	double b = (point.y - L1.y) * (L2.y - L1.y);
+	double c = pow(L2.x - L1.x, 2);
+	double d = pow(L2.y - L1.y, 2);
+
+	if (c + d == 0)
+		return TPointD(-1, -1);
+
+	double t = (a + b) / (c + d);
+
+	//Dx=Ax+t(Bx-Ax)
+	//Dy=Ay+t(By-Ay)
+	TPointD projection;
+	projection.x = L1.x + t*(L2.x - L1.x);
+	projection.y = L1.y + t*(L2.y - L1.y);
+
+	return projection;
+}
+
+TPointD AnimationAutoComplete::movePointTowardsAnotherByDistance(TPointD start, TPointD end, double distanceToTravel)
+{
+	return distanceToTravel * normalize((end - start)) + start;
 }
 
 double AnimationAutoComplete::getCentralSimilarities(std::vector<SimilarPairPoint> similarPairPoints)
@@ -478,6 +635,7 @@ StrokeWithNeighbours *AnimationAutoComplete::generateSynthesizedStroke(StrokeWit
 	outputStroke->stroke->transform(aff);
 
 	getNeighbours(outputStroke);
+	getContextStrokes(outputStroke);
 	return outputStroke;
 }
 
@@ -770,11 +928,9 @@ StrokeWithNeighbours* AnimationAutoComplete::predictionPositionUpdate(StrokeWith
 		//std::vector<TPointD> matrixA;
 		TPointD subtractionMatrix = sampleNextStroke->getP0() - sampleCurrentStroke->getP0();
 		TPointD Segma;
-		Segma.x = 150;
-		// Segma.y=10;
 		Segma=sampleNextStroke->getP0();
 		Segma.x=50;
-		//Segma.y=50;
+		Segma.y=50;
 		//SamplePoint result=subtractionMatrix+sampleCurrentStroke+Segma;
 		TPointD result = subtractionMatrix +(sampleCurrentStroke->getP0());
 		result = result + Segma;
@@ -938,23 +1094,120 @@ std::vector<SimilarPairPoint> AnimationAutoComplete::getSimilarPairPoints(Stroke
 
 TPointD StrokeWithNeighbours::getCentralSample()
 {
-	PointWithStroke* central1 = new PointWithStroke();
-	central1->stroke = this;
+	return getCentralPointWithStroke().getTPointD();
+}
+
+PointWithStroke StrokeWithNeighbours::getCentralPointWithStroke()
+{
+	PointWithStroke central1 ;
+	central1.stroke = this;
 	int n = stroke->getChunkCount();
 
 	if(n%2 == 0)
-		central1->index = n/2;
+		central1.index = n/2;
 	else
-		central1->index = (n/2) + 1;
+		central1.index = (n/2) + 1;
 
 	if (n == 1)
-		central1->index = 0;
+		central1.index = 0;
 
-	central1->point = stroke->getChunk(central1->index);
-	return central1->point->getP0();
+	central1.point = stroke->getChunk(central1.index);
+	return central1;
 }
 
 double StrokeWithNeighbours::getLength()
 {
 	return stroke->getLength();
+}
+
+TPointD StrokeWithNeighbours::getTPointD(int i)
+{
+	if (isLastPoint(i))
+		return stroke->getChunk(i)->getP2();
+
+	return stroke->getChunk(i)->getP0();
+}
+
+SamplePoint StrokeWithNeighbours::getChunk(int i)
+{
+	return stroke->getChunk(i);
+}
+
+PointWithStroke StrokeWithNeighbours::getPointWithStroke(int i)
+{
+	PointWithStroke point(stroke->getChunk(i), this, i);
+	point.setLastPoint(isLastPoint(i));
+	return point;
+}
+
+bool StrokeWithNeighbours::isLastPoint(int i)
+{
+	if (i == stroke->getChunkCount() - 1)
+		return true;
+
+	return false;
+}
+
+void StrokeWithNeighbours::setPoint(int i, TPointD newPoint)
+{
+	if (isLastPoint(i))
+		stroke->getChunk(i)->setP2(newPoint);
+	else
+		stroke->getChunk(i)->setP0(newPoint);
+}
+
+void PointWithStroke::setLastPoint(bool value)
+{
+	lastPoint = value;
+}
+
+PointWithStroke PointWithStroke::getNext()
+{
+	if (stroke->isLastPoint(index))
+		return PointWithStroke();
+
+	return PointWithStroke(stroke->getChunk(index+1), stroke, index+1);
+}
+
+PointWithStroke PointWithStroke::getPrevious()
+{
+	if (index == 0)
+		return PointWithStroke();
+
+	return PointWithStroke(stroke->getChunk(index-1), stroke, index-1);
+}
+
+void PointWithStroke::normalizeP1()
+{
+	if (stroke->isLastPoint(index))
+		return;
+
+	TPointD P1 = getTPointD() + getNext().getTPointD();
+	P1.x /= 2.0;
+	P1.y /= 2.0;
+
+	point->setP1(P1);
+}
+
+PointWithStroke::PointWithStroke()
+{
+	index = -1;
+	stroke = nullptr;
+	point = nullptr;
+}
+
+PointWithStroke::PointWithStroke(SamplePoint point, StrokeWithNeighbours* stroke, int index) : point(point), stroke(stroke), index(index)
+{
+	if (stroke->isLastPoint(index))
+		lastPoint = true;
+	else
+		lastPoint = false;
+}
+
+TPointD PointWithStroke::getTPointD()
+{
+	if (lastPoint)
+		return point->getP2();
+
+	return point->getP0();
 }
