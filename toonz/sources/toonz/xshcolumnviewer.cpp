@@ -540,10 +540,12 @@ ColumnArea::DrawHeader::DrawHeader(ColumnArea *nArea, QPainter &nP, int nCol)
 void ColumnArea::DrawHeader::prepare() const {
 // Preparing painter
 #ifdef _WIN32
-  QFont font("Arial", XSHEET_FONT_PX_SIZE, QFont::Normal);
+  QFont font("Arial", -1, QFont::Normal);
 #else
-  QFont font("Helvetica", XSHEET_FONT_PX_SIZE, QFont::Normal);
+  QFont font("Helvetica", -1, QFont::Normal);
 #endif
+  font.setPixelSize(XSHEET_FONT_PX_SIZE);
+
   p.setFont(font);
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 }
@@ -726,7 +728,7 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 
   QRect columnName = o->rect(PredefinedRect::LAYER_NAME)
                          .translated(orig)
-                         .adjusted(0, 0, -2, 0);
+                         .adjusted(3, 0, -2, 0);
   p.drawText(columnName, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QString(name.c_str()));
 }
