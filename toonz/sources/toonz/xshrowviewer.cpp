@@ -281,8 +281,10 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   TPixel frontPixel, backPixel;
   bool inksOnly;
   Preferences::instance()->getOnionData(frontPixel, backPixel, inksOnly);
-  QColor frontColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b);
-  QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b);
+  QColor frontColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b,
+	  128);
+  QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b,
+	  128);
 
   // If the onion skin is disabled, draw dash line instead.
   if (osMask.isEnabled())
@@ -320,7 +322,10 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     int toFrameAxis = m_viewer->rowToFrameAxis(currentRow) + onionCenter_frame;
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
-    p.drawLine(verticalLine);
+	if (m_viewer->orientation()->isVerticalTimeline())
+		p.drawLine(verticalLine.x1() + 1, verticalLine.y1() + 4, verticalLine.x2() + 1, verticalLine.y2() - 10);
+	else
+		p.drawLine(verticalLine.x1() + 4, verticalLine.y1(), verticalLine.x2() - 10, verticalLine.y2());
   }
   if (maxMos > 0)  // forward frames
   {
@@ -331,7 +336,10 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
         m_viewer->rowToFrameAxis(currentRow + maxMos) + onionCenter_frame;
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
-    p.drawLine(verticalLine);
+	if (m_viewer->orientation()->isVerticalTimeline())
+		p.drawLine(verticalLine.x1() + 1, verticalLine.y1() + 10, verticalLine.x2() + 1, verticalLine.y2() - 4);
+	else
+		p.drawLine(verticalLine.x1() + 10, verticalLine.y1(), verticalLine.x2() - 4, verticalLine.y2());
   }
 
   // Draw onion skin main handle
@@ -372,7 +380,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     if (m_showOnionToSet == Fos && fos == m_row) continue;
 
     if (osMask.isEnabled())
-      p.setBrush(QBrush(QColor(0, 255, 255)));
+      p.setBrush(QBrush(QColor(0, 255, 255, 128)));
     else
       p.setBrush(Qt::NoBrush);
     QPoint topLeft = m_viewer->positionToXY(CellPosition(fos, 0));
