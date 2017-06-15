@@ -1349,14 +1349,14 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
   }
 
-  QRect nameRect = o->rect(PredefinedRect::CELL_NAME).translated(xy);
+  QRect nameRect = o->rect(PredefinedRect::CELL_NAME).translated(QPoint(x, y));
 
   if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
     TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
     int r0, r1;
     if (pegbar && pegbar->getKeyframeRange(r0, r1))
       nameRect =
-          o->rect(PredefinedRect::CELL_NAME_WITH_KEYFRAME).translated(xy);
+          o->rect(PredefinedRect::CELL_NAME_WITH_KEYFRAME).translated(QPoint(x, y));
   }
 
   // draw text in red if the file does not exist
@@ -1399,7 +1399,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     // convert the last one digit of the frame number to alphabet
     // Ex.  12 -> 1B    21 -> 2A   30 -> 3
     if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
-      p.drawText(nameRect, Qt::AlignRight,
+      p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom,
                  m_viewer->getFrameNumberWithLetters(fid.getNumber()));
     else {
       std::string frameNumber("");
@@ -1407,7 +1407,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
       if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
       // add letter
       if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
-      p.drawText(nameRect, Qt::AlignRight, QString::fromStdString(frameNumber));
+      p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom, QString::fromStdString(frameNumber));
     }
   }
 
@@ -1423,7 +1423,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 #else
     QString elidaName = elideText(text, font, nameRect.width());
 #endif
-    p.drawText(nameRect, Qt::AlignLeft, elidaName);
+    p.drawText(nameRect, Qt::AlignLeft | Qt::AlignBottom, elidaName);
   }
 }
 
@@ -1597,7 +1597,15 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
     if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
 
-    QRect nameRect = rect.adjusted(7, 4, -12, 0);
+	QRect nameRect = o->rect(PredefinedRect::CELL_NAME).translated(QPoint(x, y));
+
+	if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
+		TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
+		int r0, r1;
+		if (pegbar && pegbar->getKeyframeRange(r0, r1))
+			nameRect =
+			o->rect(PredefinedRect::CELL_NAME_WITH_KEYFRAME).translated(QPoint(x, y));
+	}
 
     bool isRed                         = false;
     TXshPaletteLevel *pl               = cell.getPaletteLevel();
@@ -1619,8 +1627,21 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     // e' diverso dal precedente
     QString numberStr;
     if (!sameLevel || prevCell.m_frameId != cell.m_frameId) {
-      numberStr = QString::fromStdString(frameNumber);
-      p.drawText(nameRect, Qt::AlignRight, numberStr);
+	  // convert the last one digit of the frame number to alphabet
+	  // Ex.  12 -> 1B    21 -> 2A   30 -> 3
+	  if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
+		  numberStr = m_viewer->getFrameNumberWithLetters(fid.getNumber());
+		  p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom, numberStr);
+	  }
+	  else {
+		  std::string frameNumber("");
+		  // set number
+		  if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
+		  // add letter
+		  if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
+		  numberStr = QString::fromStdString(frameNumber);
+		  p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom, numberStr);
+	  }
     }
 
     QString text = QString::fromStdWString(levelName);
@@ -1633,7 +1654,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 #endif
 
     if (!sameLevel || isAfterMarkers)
-      p.drawText(nameRect, Qt::AlignLeft, elidaName);
+      p.drawText(nameRect, Qt::AlignLeft | Qt::AlignBottom, elidaName);
   }
 }
 

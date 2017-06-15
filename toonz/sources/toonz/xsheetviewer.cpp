@@ -331,7 +331,7 @@ void XsheetViewer::positionSections() {
   m_noteScrollArea->setGeometry(o->frameLayerRect(headerFrame, headerLayer));
   m_cellScrollArea->setGeometry(o->frameLayerRect(bodyFrame, bodyLayer));
   m_columnScrollArea->setGeometry(o->frameLayerRect(
-	  headerFrame.adjusted(0,-1), bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
+	  headerFrame.adjusted(-1,-1), bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
   m_rowScrollArea->setGeometry(o->frameLayerRect(
 	  bodyFrame.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
 }

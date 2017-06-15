@@ -76,7 +76,7 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
   p.drawText(numberRect, Qt::AlignCenter | Qt::TextSingleLine, "#");
 
-  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME).adjusted(2, 0, -3, 0);
+  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME).adjusted(2, 0, -1, 0);
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QObject::tr("Layer name"));
 
@@ -86,8 +86,17 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 void LayerHeaderPanel::drawIcon(QPainter &p, PredefinedRect rect,
                                 optional<QColor> fill,
                                 const QPixmap &pixmap) const {
-  QRect iconRect = Orientations::leftToRight()->rect(rect);
-  if (fill) p.fillRect(iconRect, *fill);
+  QRect iconRect = Orientations::leftToRight()->rect(rect).adjusted(-2,0,-2,0);
+
+  if (rect == PredefinedRect::LOCK)
+  {
+	  p.setPen(Qt::gray);
+	  p.setBrush(QColor(255, 255, 255, 128));
+	  p.drawRect(iconRect);
+	  iconRect.adjust(1, 1, -1, -1);
+  }
+  else
+     if (fill) p.fillRect(iconRect, *fill);
   p.drawPixmap(iconRect, pixmap);
 }
 

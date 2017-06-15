@@ -245,7 +245,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
                 (CELL_HEIGHT - KEY_ICON_HEIGHT) / 2, KEY_ICON_WIDTH,
                 KEY_ICON_HEIGHT);
   addRect(PredefinedRect::KEY_ICON, keyRect);
-  QRect nameRect = cellRect.adjusted(8, 4, -6, 0);
+  QRect nameRect = cellRect.adjusted(8, 0, -6, 0);
   addRect(PredefinedRect::CELL_NAME, nameRect);
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME,
           nameRect.adjusted(0, 0, -KEY_ICON_WIDTH, 0));
@@ -306,7 +306,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
                 (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
   addRect(PredefinedRect::RENAME_COLUMN,
           QRect(0, 6, CELL_WIDTH, CELL_HEIGHT - 3));
-  QRect eyeArea(9, 6, CELL_WIDTH - 12, CELL_HEIGHT - 3);
+  QRect eyeArea(9, 6, CELL_WIDTH - 11, CELL_HEIGHT - 3);
   addRect(PredefinedRect::EYE_AREA, eyeArea);
   QRect eye(eyeArea.right() - 18, 7, 18, 15);
   addRect(PredefinedRect::EYE, eye);
@@ -487,7 +487,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   QRect keyRect((CELL_WIDTH - KEY_ICON_WIDTH) / 2,
                 CELL_HEIGHT - KEY_ICON_HEIGHT, KEY_ICON_WIDTH, KEY_ICON_HEIGHT);
   addRect(PredefinedRect::KEY_ICON, keyRect);
-  QRect nameRect = cellRect.adjusted(5, 4, -6, 0);
+  QRect nameRect = cellRect.adjusted(4, 4, -6, 0);
   addRect(PredefinedRect::CELL_NAME, nameRect);
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect);
   addRect(PredefinedRect::END_EXTENDER,
@@ -543,10 +543,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
       PredefinedRect::PINNED_CENTER_KEY,
       QRect((CELL_WIDTH - PINNED_SIZE) / 2,
             (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
-  QRect columnName(ICONS_WIDTH + LAYER_NUMBER_WIDTH, 0, LAYER_NAME_WIDTH,
+  QRect columnName(ICONS_WIDTH + LAYER_NUMBER_WIDTH, 0, LAYER_NAME_WIDTH - 2,
                    CELL_HEIGHT);
   addRect(PredefinedRect::RENAME_COLUMN, columnName);
-  QRect eye(0, 0, ICON_WIDTH, CELL_HEIGHT);
+  QRect eye(2, 0, ICON_WIDTH, CELL_HEIGHT);
   addRect(PredefinedRect::EYE_AREA, eye);
   addRect(PredefinedRect::EYE, eye);
   addRect(PredefinedRect::PREVIEW_LAYER_AREA,

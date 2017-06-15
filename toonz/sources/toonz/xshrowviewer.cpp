@@ -325,7 +325,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 	if (m_viewer->orientation()->isVerticalTimeline())
 		p.drawLine(verticalLine.x1() + 1, verticalLine.y1() + 4, verticalLine.x2() + 1, verticalLine.y2() - 10);
 	else
-		p.drawLine(verticalLine.x1() + 4, verticalLine.y1(), verticalLine.x2() - 10, verticalLine.y2());
+		p.drawLine(verticalLine.x1() + 4, verticalLine.y1() + 1, verticalLine.x2() - 10, verticalLine.y2() + 1);
   }
   if (maxMos > 0)  // forward frames
   {
@@ -339,7 +339,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 	if (m_viewer->orientation()->isVerticalTimeline())
 		p.drawLine(verticalLine.x1() + 1, verticalLine.y1() + 10, verticalLine.x2() + 1, verticalLine.y2() - 4);
 	else
-		p.drawLine(verticalLine.x1() + 10, verticalLine.y1(), verticalLine.x2() - 4, verticalLine.y2());
+		p.drawLine(verticalLine.x1() + 10, verticalLine.y1() + 1, verticalLine.x2() - 4, verticalLine.y2() + 1);
   }
 
   // Draw onion skin main handle
