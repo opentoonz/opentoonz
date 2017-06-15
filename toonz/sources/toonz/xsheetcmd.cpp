@@ -651,7 +651,9 @@ public:
                         ->getScene()
                         ->getXsheet()
                         ->getCell(m_row, m_col);
-    if (!cell.m_level || !cell.m_level->getSimpleLevel()) return;
+    if (!cell.m_level ||
+        !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel()))
+      return;
 
     TFrameId id = cell.m_frameId;
 
@@ -660,7 +662,9 @@ public:
                             ->getScene()
                             ->getXsheet()
                             ->getCell(m_row + m_count, m_col);
-    if (!nextCell.m_level || !nextCell.m_level->getSimpleLevel()) return;
+    if (!cell.m_level ||
+        !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel()))
+      return;
 
     TFrameId nextId = nextCell.m_frameId;
 
@@ -710,10 +714,15 @@ bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col) {
   TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
   TXshCell cell           = xsh->getCell(row, col);
 
-  if (!cell.m_level || !cell.m_level->getSimpleLevel()) return false;
+  if (!cell.m_level ||
+      !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel()))
+    return false;
 
   std::vector<TFrameId> fids;
-  cell.m_level->getSimpleLevel()->getFids(fids);
+  if (cell.m_level->getSimpleLevel())
+    cell.m_level->getSimpleLevel()->getFids(fids);
+  if (cell.m_level->getChildLevel())
+    cell.m_level->getChildLevel()->getFids(fids);
   int n = fids.size();
 
   if (n < 2) return false;
