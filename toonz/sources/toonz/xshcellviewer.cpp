@@ -2379,6 +2379,9 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
   menu.addSeparator();
   if (!soundCellsSelected)
     menu.addAction(cmdManager->getAction(MI_ImportMagpieFile));
+  TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+  if (sl || TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel())
+    menu.addAction(cmdManager->getAction(MI_LipSyncPopup));
 }
 //-----------------------------------------------------------------------------
 /*! replace level with another level in the cast

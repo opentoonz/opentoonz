@@ -10,13 +10,13 @@
 
 #include <QPushButton>
 #include <QLabel>
+#include <QCheckBox>
 
 // forward declaration
 class QLabel;
 class TXshSimpleLevel;
 class TXshChildLevel;
 class TFrameId;
-
 
 //=============================================================================
 // LipSyncPopup
@@ -25,7 +25,6 @@ class TFrameId;
 class LipSyncPopup final : public DVGui::Dialog {
   Q_OBJECT
 
-  
   QLabel *m_aiLabel;
   QLabel *m_oLabel;
   QLabel *m_eLabel;
@@ -51,7 +50,7 @@ class LipSyncPopup final : public DVGui::Dialog {
   int m_col;
   bool m_valid = false;
   QStringList m_textLines;
-
+  QCheckBox *m_restToEnd;
 
 public:
   LipSyncPopup();
@@ -66,6 +65,5 @@ public slots:
   void onPathChanged();
   void onStartValueChanged();
 };
-
 
 #endif  // LIPSYNCPOPUP_H
