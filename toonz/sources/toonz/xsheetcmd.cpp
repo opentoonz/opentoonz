@@ -566,18 +566,27 @@ class DrawingSubtitutionUndo final : public TUndo {
 private:
   int m_direction, m_row, m_col;
   TCellSelection::Range m_range;
-  bool m_selected;
+  bool m_selected, m_isEmpty;
 
 public:
   DrawingSubtitutionUndo(int dir, TCellSelection::Range range, int row, int col,
-                         bool selected)
+                         bool selected, bool isEmpty)
       : m_direction(dir)
       , m_range(range)
       , m_row(row)
       , m_col(col)
-      , m_selected(selected) {}
+      , m_selected(selected)
+      , m_isEmpty(isEmpty) {}
 
   void undo() const override {
+    if (m_isEmpty) {
+      TXsheet *xsh =
+          TApp::instance()->getCurrentScene()->getScene()->getXsheet();
+      xsh->clearCells(m_row, m_col);
+      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+      return;
+    }
     if (!m_selected) {
       changeDrawing(-m_direction, m_row, m_col);
       return;
@@ -629,7 +638,8 @@ public:
 
 protected:
   static bool changeDrawing(int delta, int row, int col);
-  static void setDrawing(const TFrameId &fid, int row, int col, TXshCell cell);
+  static void setDrawing(const TFrameId &fid, int row, int col, TXshCell cell,
+                         TXshLevel *level);
   friend class DrawingSubtitutionGroupUndo;
 };
 
@@ -641,10 +651,11 @@ private:
   int m_row;
   int m_col;
   int m_count;
+  bool m_isEmpty;
 
 public:
-  DrawingSubtitutionGroupUndo(int dir, int row, int col)
-      : m_direction(dir), m_col(col), m_row(row) {
+  DrawingSubtitutionGroupUndo(int dir, int row, int col, bool isEmpty)
+      : m_direction(dir), m_col(col), m_row(row), m_isEmpty(isEmpty) {
     m_count       = 1;
     TXshCell cell = TTool::getApplication()
                         ->getCurrentScene()
@@ -662,8 +673,9 @@ public:
                             ->getScene()
                             ->getXsheet()
                             ->getCell(m_row + m_count, m_col);
-    if (!cell.m_level ||
-        !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel()))
+    if (!nextCell.m_level ||
+        !(nextCell.m_level->getSimpleLevel() ||
+          nextCell.m_level->getChildLevel()))
       return;
 
     TFrameId nextId = nextCell.m_frameId;
@@ -680,6 +692,7 @@ public:
   }
 
   void undo() const override {
+    if (m_isEmpty) return;
     int n = 1;
     DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row, m_col);
     while (n < m_count) {
@@ -689,6 +702,7 @@ public:
   }
 
   void redo() const override {
+    if (m_isEmpty) return;
     int n = 1;
     DrawingSubtitutionUndo::changeDrawing(m_direction, m_row, m_col);
     while (n < m_count) {
@@ -713,10 +727,20 @@ bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col) {
   TTool::Application *app = TTool::getApplication();
   TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
   TXshCell cell           = xsh->getCell(row, col);
-
-  if (!cell.m_level ||
-      !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel()))
+  bool usePrevCell        = false;
+  if (cell.isEmpty()) {
+    TXshCell prevCell = xsh->getCell(row - 1, col);
+    if (prevCell.isEmpty() ||
+        !(prevCell.m_level->getSimpleLevel() ||
+          prevCell.m_level->getChildLevel()))
+      return false;
+    cell        = prevCell;
+    usePrevCell = true;
+  } else if (!cell.m_level ||
+             !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel()))
     return false;
+  TXshLevel *level  = cell.m_level->getSimpleLevel();
+  if (!level) level = cell.m_level->getChildLevel();
 
   std::vector<TFrameId> fids;
   if (cell.m_level->getSimpleLevel())
@@ -733,19 +757,24 @@ bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col) {
   if (it == fids.end()) return false;
 
   int index = std::distance(fids.begin(), it);
+  if (usePrevCell) {
+    index -= 1;
+    cell = xsh->getCell(row, col);
+  }
   while (delta < 0) delta += n;
   index = (index + delta) % n;
 
-  setDrawing(fids[index], row, col, cell);
+  setDrawing(fids[index], row, col, cell, level);
 
   return true;
 }
 
 void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col,
-                                        TXshCell cell) {
+                                        TXshCell cell, TXshLevel *level) {
   TTool::Application *app = TTool::getApplication();
   TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
   cell.m_frameId          = fid;
+  cell.m_level            = level;
   xsh->setCell(row, col, cell);
   TStageObject *pegbar = xsh->getStageObject(TStageObjectId::ColumnId(col));
   pegbar->setOffset(pegbar->getOffset());
@@ -770,9 +799,12 @@ static void drawingSubstituion(int dir) {
   }
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-
+  TXshCell cell =
+      TApp::instance()->getCurrentScene()->getScene()->getXsheet()->getCell(
+          row, col);
+  bool isEmpty = cell.isEmpty();
   DrawingSubtitutionUndo *undo =
-      new DrawingSubtitutionUndo(dir, range, row, col, selected);
+      new DrawingSubtitutionUndo(dir, range, row, col, selected, isEmpty);
   TUndoManager::manager()->add(undo);
 
   undo->redo();
@@ -781,8 +813,12 @@ static void drawingSubstituion(int dir) {
 static void drawingSubstituionGroup(int dir) {
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+  TXshCell cell =
+      TApp::instance()->getCurrentScene()->getScene()->getXsheet()->getCell(
+          row, col);
+  bool isEmpty = cell.isEmpty();
   DrawingSubtitutionGroupUndo *undo =
-      new DrawingSubtitutionGroupUndo(dir, row, col);
+      new DrawingSubtitutionGroupUndo(dir, row, col, isEmpty);
   TUndoManager::manager()->add(undo);
   undo->redo();
 }
