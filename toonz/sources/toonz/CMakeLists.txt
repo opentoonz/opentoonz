@@ -67,6 +67,7 @@ set(MOC_HEADERS
     linetestcapturepane.h
     linetestpane.h
     linetestviewer.h
+    lipsyncpopup.h
     loadfolderpopup.h
     magpiefileimportpopup.h
     mainwindow.h
@@ -222,6 +223,7 @@ set(SOURCES
     linetestcapturepane.cpp
     linetestpane.cpp
     linetestviewer.cpp
+    lipsyncpopup.cpp
     magpiefileimportpopup.cpp
     outputsettingspopup.cpp
     overwritepopup.cpp

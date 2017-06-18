@@ -315,4 +315,5 @@
 #define MI_StartupPopup "MI_StartupPopup"
 #define MI_PencilTest "MI_PencilTest"
 #define MI_AudioRecording "MI_AudioRecording"
+#define MI_LipSyncPopup "MI_LipSyncPopup"
 #endif
