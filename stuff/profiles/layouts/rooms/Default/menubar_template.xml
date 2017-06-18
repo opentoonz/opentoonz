@@ -149,6 +149,8 @@
     <command>MI_PrevDrawing</command>
     <command>MI_NextStep</command>
     <command>MI_PrevStep</command>
+    <separator/>
+    <command>MI_LipSyncPopup</command>
   </menu>
   <menu title="Cells">
     <command>MI_Reverse</command>
@@ -179,7 +181,6 @@
     <command>MI_Duplicate</command>
     <command>MI_MergeFrames</command>
     <command>MI_CloneLevel</command>
-    <command>MI_LipSyncPopup</command>
   </menu>
   <menu title="View">
     <command>MI_ViewCamera</command>
