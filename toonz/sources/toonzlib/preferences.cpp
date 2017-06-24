@@ -313,6 +313,7 @@ Preferences::Preferences()
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
+    , m_ignoreImageDpi(false)
     , m_watchFileSystem(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -545,7 +546,7 @@ Preferences::Preferences()
   getValue(*m_settings, "DefLevelWidth", m_defLevelWidth);
   getValue(*m_settings, "DefLevelHeight", m_defLevelHeight);
   getValue(*m_settings, "DefLevelDpi", m_defLevelDpi);
-
+  getValue(*m_settings, "IgnoreImageDpi", m_ignoreImageDpi);
   getValue(*m_settings, "viewerBGColor", m_viewerBGColor);
   getValue(*m_settings, "previewBGColor", m_previewBGColor);
   getValue(*m_settings, "chessboardColor1", m_chessboardColor1);
@@ -1268,6 +1269,13 @@ void Preferences::setDefLevelHeight(double height) {
 void Preferences::setDefLevelDpi(double dpi) {
   m_defLevelDpi = dpi;
   m_settings->setValue("DefLevelDpi", dpi);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setIgnoreImageDpi(bool on) {
+  m_ignoreImageDpi = on;
+  m_settings->setValue("IgnoreImageDpi", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
