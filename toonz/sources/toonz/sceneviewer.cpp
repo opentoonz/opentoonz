@@ -65,6 +65,7 @@
 #include "tofflinegl.h"
 #include "tstopwatch.h"
 #include "trop.h"
+#include "tproperty.h"
 #include "timagecache.h"
 #include "trasterimage.h"
 #include "tstroke.h"
@@ -93,13 +94,13 @@ namespace {
 
 int l_displayListsSpaceId =
     -1;  //!< Display lists space id associated with SceneViewers
-QGLWidget *l_proxy = 0;  //!< Proxy associated with the above
+QOpenGLWidget *l_proxy = 0;  //!< Proxy associated with the above
 std::set<TGlContext>
     l_contexts;  //!< Stores every SceneViewer context (see ~SceneViewer)
 
 //-------------------------------------------------------------------------------
 
-QGLWidget *touchProxy() {
+QOpenGLWidget *touchProxy() {
   struct GLWidgetProxy final : public TGLDisplayListsProxy {
     ~GLWidgetProxy() {
       delete l_proxy;
@@ -112,7 +113,7 @@ QGLWidget *touchProxy() {
 
   // If it does not exist, create the viewer's display lists proxy
   if (!l_proxy) {
-    l_proxy = new QGLWidget;
+    l_proxy = new QOpenGLWidget;
     l_displayListsSpaceId =
         TGLDisplayListsManager::instance()->storeProxy(new GLWidgetProxy);
   }
@@ -565,7 +566,7 @@ SceneViewer::~SceneViewer() {
     std::set<TGlContext>::iterator ct, cEnd(l_contexts.end());
     for (ct = l_contexts.begin(); ct != cEnd; ++ct)
       TGLDisplayListsManager::instance()->releaseContext(*ct);
-    assert(!l_proxy);
+    //assert(!l_proxy);
   }
 
   makeCurrent();
@@ -621,7 +622,7 @@ void SceneViewer::onRenderCompleted(int frame) {
 //-------------------------------------------------------------------------------
 
 void SceneViewer::onPreviewUpdate() {
-  updateGL();
+  update();
   emit previewStatusChanged();
 }
 
@@ -629,7 +630,8 @@ void SceneViewer::onPreviewUpdate() {
 
 void SceneViewer::startForegroundDrawing() {
   makeCurrent();
-  setAutoBufferSwap(false);
+  //setAutoBufferSwap(false);
+  update(); // needed?
   glPushMatrix();
   tglMultMatrix(getViewMatrix());
 
@@ -661,7 +663,8 @@ void SceneViewer::endForegroundDrawing() {
     assert(glGetError() == GL_NO_ERROR);
   }
 
-  setAutoBufferSwap(true);
+  // setAutoBufferSwap(true);
+  update(); // needed?
   m_foregroundDrawing = false;
 }
 
@@ -1532,7 +1535,7 @@ void SceneViewer::paintGL() {
 
   // Il freezed e' attivo ed e' in stato "update": faccio il grab del viewer.
   if (m_freezedStatus == UPDATE_FREEZED) {
-    m_viewGrabImage = rasterFromQImage(grabFrameBuffer(false));
+    m_viewGrabImage = rasterFromQImage(grabFramebuffer());
     m_freezedStatus = NORMAL_FREEZED;
   }
 
@@ -1569,6 +1572,22 @@ void SceneViewer::drawScene() {
   bool fillFullColorRaster = TXshSimpleLevel::m_fillFullColorRaster;
   TXshSimpleLevel::m_fillFullColorRaster = false;
 
+  // Guided Drawing Check
+  std::string toolName  = app->getCurrentTool()->getTool()->getName();
+  bool useGuidedDrawing = false;
+  if (toolName == "T_Brush" || toolName == "T_Geometric") {
+    TPropertyGroup *toolProps =
+        app->getCurrentTool()->getTool()->getProperties(0);
+    int count = toolProps->getPropertyCount();
+    TProperty *toolProperty;
+    for (int i = 0; i < count; i++) {
+      toolProperty = toolProps->getProperty(i);
+      if (toolProperty->getName() == "Guided")
+        useGuidedDrawing =
+            QString::fromStdString(toolProperty->getValueAsString()).toInt();
+    }
+  }
+
   m_minZ = 0;
   if (is3DView()) {
     Stage::OpenGlPainter painter(getViewMatrix(), clipRect, m_visualSettings,
@@ -1592,6 +1611,14 @@ void SceneViewer::drawScene() {
     args.m_osm         = &osm;
     args.m_camera3d    = true;
     args.m_xsheetLevel = xsheetLevel;
+    args.m_currentFrameId =
+        app->getCurrentXsheet()
+            ->getXsheet()
+            ->getCell(app->getCurrentFrame()->getFrame(), args.m_col)
+            .getFrameId();
+    args.m_isGuidedDrawingEnabled = useGuidedDrawing;
+
+    // args.m_currentFrameId = app->getCurrentFrame()->getFid();
     Stage::visit(painter, args);
 
     m_minZ = painter.getMinZ();
@@ -1623,7 +1650,7 @@ void SceneViewer::drawScene() {
       Stage::visit(painter, app->getCurrentLevel()->getLevel(),
                    app->getCurrentFrame()->getFid(),
                    app->getCurrentOnionSkin()->getOnionSkinMask(),
-                   frameHandle->isPlaying());
+                   frameHandle->isPlaying(), useGuidedDrawing);
     } else {
       std::pair<TXsheet *, int> xr;
       int xsheetLevel = 0;
@@ -1642,6 +1669,12 @@ void SceneViewer::drawScene() {
       args.m_osm         = &osm;
       args.m_xsheetLevel = xsheetLevel;
       args.m_isPlaying   = frameHandle->isPlaying();
+      args.m_currentFrameId =
+          app->getCurrentXsheet()
+              ->getXsheet()
+              ->getCell(app->getCurrentFrame()->getFrame(), args.m_col)
+              .getFrameId();
+      args.m_isGuidedDrawingEnabled = useGuidedDrawing;
       Stage::visit(painter, args);
     }
 
@@ -1779,7 +1812,7 @@ void SceneViewer::navigatorPan(const QPoint &delta) {
 
 void SceneViewer::GLInvalidateAll() {
   m_clipRect.empty();
-  updateGL();
+  update();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();
 }
@@ -1788,7 +1821,7 @@ void SceneViewer::GLInvalidateAll() {
 
 void SceneViewer::GLInvalidateRect(const TRectD &rect) {
   m_clipRect = rect;
-  updateGL();
+  update();
   m_clipRect.empty();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();

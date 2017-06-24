@@ -48,6 +48,7 @@
 #include "toonz/autoclose.h"
 #include "toonz/txshleveltypes.h"
 #include "imagebuilders.h"
+#include "toonz/tframehandle.h"
 
 // Qt includes
 #include <QImage>
@@ -836,6 +837,22 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   rd.m_colorCheckIndex   = ToonzCheck::instance()->getColorIndex();
   rd.m_show0ThickStrokes = prefs.getShow0ThickLines();
   rd.m_regionAntialias   = prefs.getRegionAntialias();
+
+  if (player.m_onionSkinDistance == -1 &&
+      (player.m_isCurrentColumn || player.m_isCurrentXsheetLevel)) {
+    rd.m_showGuidedDrawing = player.m_isGuidedDrawingEnabled;
+    int currentStrokeCount = 0;
+    int totalStrokes       = vi->getStrokeCount();
+    TXshSimpleLevel *sl    = player.m_sl;
+
+    if (sl) {
+      TImageP image          = sl->getFrame(player.m_currentFrameId, false);
+      TVectorImageP vecImage = image;
+      if (vecImage) currentStrokeCount = vecImage->getStrokeCount();
+      if (currentStrokeCount < totalStrokes)
+        rd.m_indexToHighlight = currentStrokeCount;
+    }
+  }
 
   if (tc & (ToonzCheck::eTransparency | ToonzCheck::eGap)) {
     TPixel dummy;

@@ -83,12 +83,13 @@ public:
                            //! of) the current column
   bool m_isCurrentXsheetLevel;  //!< Whether the player's xsheet is the \a
                                 //! current one
-
+  bool m_isGuidedDrawingEnabled = false;
   TXshSimpleLevel *m_sl;  //!< (not owned) The player's simple level
   TFrameId m_fid;         //!< The player's frame in m_sl
-
-  TXsheet *m_xsh;  //!< (not owned) The player's xsheet
-  int m_column;    //!< The player's xsheet column
+  TFrameId
+      m_currentFrameId;  // The current frame selected in the level or xsheet
+  TXsheet *m_xsh;        //!< (not owned) The player's xsheet
+  int m_column;          //!< The player's xsheet column
   int m_frame;  //!< The player's xhseet row (could be not the current, due to
                 //! onion skin?)
 

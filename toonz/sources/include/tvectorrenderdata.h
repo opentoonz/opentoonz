@@ -61,9 +61,9 @@ public:
   TPixel m_tCheckInk;    //!< Color to be used for <I>ink check</I> mode.
   TPixel m_tCheckPaint;  //!< Color to be used for <I>paint check</I> mode.
 
-  int m_colorCheckIndex;  //!< Color index to be highlighted in <I>color
-                          //! check</I> mode.
-
+  int m_colorCheckIndex;    //!< Color index to be highlighted in <I>color
+                            //! check</I> mode.
+  int m_indexToHighlight;   // for guided vector drawing
   bool m_alphaChannel,      //!< Whether alpha channel is enabled.
       m_antiAliasing,       //!< Whether antialiasing must be applied.
       m_isImagePattern,     //!< \internal  Seems like a bad bug-patch - inquire
@@ -79,8 +79,11 @@ public:
                             //! rendered anyway.
       m_regionAntialias,    //!< Whether regions should be rendered with
                             //! antialiasing at boundaries.
-      m_isOfflineRender;    //!< Whether image rendering is in render or
+      m_isOfflineRender,    //!< Whether image rendering is in render or
                             //! camera-stand (preview) mode.
+      m_showGuidedDrawing,  // Whether this image is being used for guided
+                            // drawing
+      m_highLightNow;       // Show highlight on active stroke
   //!  \deprecated  Use the above individual options instead.
   //!  \todo  Remove it ASAP.
 public:
@@ -111,7 +114,10 @@ public:
       , m_regionAntialias(false)  // No need for pretty region boundaries,
                                   // typically shadowed by strokes
       // This is also related to interference with the directly above param
-      , m_isOfflineRender(false) {}  // By definition
+      , m_isOfflineRender(false)  // By definition
+      , m_indexToHighlight(-1)
+      , m_highLightNow(false)
+      , m_showGuidedDrawing(false) {}
 
   TVectorRenderData(ProductionSettings, const TAffine &aff,
                     const TRect &clippingRect, const TPalette *palette,
@@ -137,7 +143,10 @@ public:
       , m_show0ThickStrokes(false)  // Invisible strokes must be invisible
       , m_regionAntialias(true)  // Pretty region boundaries under invisible or
                                  // semitransparent strokes
-      , m_isOfflineRender(true) {}  // By definition
+      , m_isOfflineRender(true)  // By definition
+      , m_indexToHighlight(-1)
+      , m_highLightNow(false)
+      , m_showGuidedDrawing(false) {}
 
   TVectorRenderData(const TVectorRenderData &other, const TAffine &aff,
                     const TRect &clippingRect, const TPalette *palette,
@@ -161,7 +170,10 @@ public:
       , m_is3dView(other.m_is3dView)
       , m_show0ThickStrokes(other.m_show0ThickStrokes)
       , m_regionAntialias(other.m_regionAntialias)
-      , m_isOfflineRender(other.m_isOfflineRender) {
+      , m_isOfflineRender(other.m_isOfflineRender)
+      , m_indexToHighlight(other.m_indexToHighlight)
+      , m_highLightNow(other.m_highLightNow)
+      , m_showGuidedDrawing(other.m_showGuidedDrawing) {
   }  //!< Constructs from explicit primary context settings while
      //!  copying the rest from another instance.
 
@@ -188,7 +200,10 @@ public:
       , m_is3dView(is3dView)
       , m_show0ThickStrokes(true)
       , m_regionAntialias(false)
-      , m_isOfflineRender(false) {
+      , m_isOfflineRender(false)
+      , m_indexToHighlight(-1)
+      , m_highLightNow(false)
+      , m_showGuidedDrawing(false) {
   }  //!< Constructs settings with default ViewerSettings.
      //!  \deprecated   Use constructors with explicit settings type tag.
 };

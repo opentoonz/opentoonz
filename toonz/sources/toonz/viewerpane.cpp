@@ -317,7 +317,7 @@ void SceneViewerPanel::hideEvent(QHideEvent *event) {
 void SceneViewerPanel::resizeEvent(QResizeEvent *e) {
   QWidget::resizeEvent(e);
   repaint();
-  m_sceneViewer->updateGL();
+  m_sceneViewer->update();
 }
 
 //-----------------------------------------------------------------------------

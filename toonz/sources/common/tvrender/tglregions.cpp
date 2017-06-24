@@ -132,6 +132,29 @@ void drawControlPoints(const TVectorRenderData &rd, TStroke *stroke,
 
 #endif
 
+//-----------------------------------------------------------------------------
+// Used for Guided Drawing
+void drawFirstControlPoint(const TVectorRenderData &rd, TStroke *stroke) {
+  TPointD p;
+  glPushMatrix();
+
+  tglMultMatrix(rd.m_aff);
+
+  glPointSize(2.0);
+  glBegin(GL_LINES);
+
+  const TThickQuadratic *chunk = stroke->getChunk(0);
+  p                            = chunk->getP0();
+  glColor3d(0.0, 1.0, 0.0);
+  glVertex2d(p.x - 5, p.y + 5);
+  glVertex2d(p.x + 5, p.y - 5);
+  glVertex2d(p.x + 5, p.y + 5);
+  glVertex2d(p.x - 5, p.y - 5);
+
+  glEnd();
+  glPopMatrix();
+}
+
 //=============================================================================
 
 /*TPixel TransparencyCheckBlackBgInk = TPixel(255,255,255);
@@ -483,11 +506,29 @@ static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
       if (color.m != 0) visible = true;
     }
   }
-#if DISEGNO_OUTLINE == 0
-  if (visible)
-#endif
-    tglDraw(rd, s, false);
 
+  if (visible) {
+    // Change stroke color to blue if guided drawing
+    if (rd.m_showGuidedDrawing && rd.m_highLightNow) {
+      double m[4]      = {1.0, 1.0, 1.0, 1.0}, c[4];
+      TPixel32 bgColor = TPixel32::Blue;
+      m[3]             = 1.0 - 0.35;
+
+      c[0] = (1.0 - m[3]) * bgColor.r, c[1] = (1.0 - m[3]) * bgColor.g,
+      c[2] = (1.0 - m[3]) * bgColor.b;
+      c[3] = 0.0;
+
+      TColorFunction *cf       = new TGenericColorFunction(m, c);
+      TVectorRenderData *newRd = new TVectorRenderData(
+          rd, rd.m_aff, rd.m_clippingRect, rd.m_palette, cf);
+      tglDraw(*newRd, s, false);
+      delete newRd;
+      TStroke *new_s = (TStroke *)s;
+      drawFirstControlPoint(rd, new_s);
+    } else {
+      tglDraw(rd, s, false);
+    }
+  }
 #ifdef _DEBUG
 // drawControlPoints(rd, vim->getStroke(i), sqrt(tglGetPixelSize2()), true);
 // assert(checkQuadraticDistance(vim->getStroke(i),true));
@@ -542,6 +583,11 @@ rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
           tglDoDraw(rdRegions, vim->getRegion(regionIndex));
     while (strokeIndex < vim->getStrokeCount() &&
            vim->sameGroup(strokeIndex, currStrokeIndex)) {
+      if (rd.m_indexToHighlight != strokeIndex) {
+        rd.m_highLightNow = false;
+      } else {
+        rd.m_highLightNow = true;
+      }
 #if DISEGNO_OUTLINE == 1
       CurrStrokeIndex = strokeIndex;
       CurrVimg        = vim;

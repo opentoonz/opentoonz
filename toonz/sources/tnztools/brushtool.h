@@ -36,7 +36,7 @@ struct BrushData final : public TPersist {
 
   std::wstring m_name;
   double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
-  bool m_selective, m_pencil, m_breakAngles, m_pressure;
+  bool m_selective, m_pencil, m_breakAngles, m_pressure, m_guidedDrawing;
   int m_cap, m_join, m_miter;
 
   BrushData();
@@ -168,6 +168,7 @@ protected:
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
+  TBoolProperty m_guidedDrawing;
 
   StrokeGenerator m_track;
   RasterStrokeGenerator *m_rasterTrack;
