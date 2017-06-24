@@ -57,6 +57,7 @@ TEnv::IntVar BrushBreakSharpAngles("InknpaintBrushBreakSharpAngles", 0);
 TEnv::IntVar RasterBrushPencilMode("InknpaintRasterBrushPencilMode", 0);
 TEnv::IntVar BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
 TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
+TEnv::IntVar VectorGuidedDrawing("InknPaintVectorGuidedDrawing", 0);
 
 //-------------------------------------------------------------------
 
@@ -741,6 +742,7 @@ BrushTool::BrushTool(std::string name, int targetType)
     , m_breakAngles("Break", true)
     , m_pencil("Pencil", false)
     , m_pressure("Pressure", true)
+    , m_guidedDrawing("Guided", false)
     , m_capStyle("Cap")
     , m_joinStyle("Join")
     , m_miterJoinLimit("Miter:", 0, 100, 4)
@@ -775,6 +777,11 @@ BrushTool::BrushTool(std::string name, int targetType)
   }
 
   m_prop[0].bind(m_pressure);
+  if (targetType & TTool::Vectors) {
+    m_prop[0].bind(m_guidedDrawing);
+    m_guidedDrawing.setId("GuidedDrawing");
+  }
+
   m_prop[0].bind(m_preset);
   m_preset.setId("BrushPreset");
   m_preset.addValue(CUSTOM_WSTR);
@@ -968,6 +975,7 @@ void BrushTool::updateTranslation() {
   m_capStyle.setQStringName(tr("Cap"));
   m_joinStyle.setQStringName(tr("Join"));
   m_miterJoinLimit.setQStringName(tr("Miter:"));
+  m_guidedDrawing.setQStringName(tr("Guided"));
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -1015,6 +1023,7 @@ void BrushTool::onActivate() {
     m_accuracy.setValue(BrushAccuracy);
     m_smooth.setValue(BrushSmooth);
     m_hardness.setValue(RasterBrushHardness);
+    m_guidedDrawing.setValue(VectorGuidedDrawing);
   }
   if (m_targetType & TTool::ToonzImage) {
     m_brushPad = ToolUtils::getBrushPad(m_rasThickness.getValue().second,
@@ -1839,7 +1848,11 @@ bool BrushTool::onPropertyChanged(std::string propertyName) {
   }
 
   if (m_targetType & TTool::Vectors) {
-    if (propertyName == m_joinStyle.getName()) notifyTool = true;
+    if (propertyName == m_joinStyle.getName())
+      notifyTool = true;
+    else if (propertyName == m_guidedDrawing.getName()) {
+      VectorGuidedDrawing = m_guidedDrawing.getValue();
+    }
   }
   if (m_targetType & TTool::ToonzImage) {
     if (propertyName == m_hardness.getName()) setWorkAndBackupImages();
@@ -1909,6 +1922,7 @@ void BrushTool::loadPreset() {
       m_capStyle.setIndex(preset.m_cap);
       m_joinStyle.setIndex(preset.m_join);
       m_miterJoinLimit.setValue(preset.m_miter);
+      m_guidedDrawing.setValue(preset.m_guidedDrawing);
     } else {
       m_rasThickness.setValue(TDoublePairProperty::Value(
           std::max(preset.m_min, 1.0), preset.m_max));
@@ -1931,8 +1945,9 @@ void BrushTool::addPreset(QString name) {
   BrushData preset(name.toStdWString());
 
   if (getTargetType() & TTool::Vectors) {
-    preset.m_min = m_thickness.getValue().first;
-    preset.m_max = m_thickness.getValue().second;
+    preset.m_min           = m_thickness.getValue().first;
+    preset.m_max           = m_thickness.getValue().second;
+    preset.m_guidedDrawing = m_guidedDrawing.getValue();
   } else {
     preset.m_min = m_rasThickness.getValue().first;
     preset.m_max = m_rasThickness.getValue().second;
@@ -2005,7 +2020,8 @@ BrushData::BrushData()
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
-    , m_miter(0) {}
+    , m_miter(0)
+    , m_guidedDrawing(false) {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2024,7 +2040,8 @@ BrushData::BrushData(const std::wstring &name)
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
-    , m_miter(0) {}
+    , m_miter(0)
+    , m_guidedDrawing(false) {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2058,6 +2075,9 @@ void BrushData::saveData(TOStream &os) {
   os.closeChild();
   os.openChild("Pressure_Sensitivity");
   os << (int)m_pressure;
+  os.closeChild();
+  os.openChild("Guided_Drawing");
+  os << (int)m_guidedDrawing;
   os.closeChild();
   os.openChild("Cap");
   os << m_cap;
@@ -2093,6 +2113,8 @@ void BrushData::loadData(TIStream &is) {
       is >> val, m_selective = val, is.matchEndTag();
     else if (tagName == "Pencil")
       is >> val, m_pencil = val, is.matchEndTag();
+    else if (tagName == "Guided_Drawing")
+      is >> val, m_guidedDrawing = val, is.matchEndTag();
     else if (tagName == "Break_Sharp_Angles")
       is >> val, m_breakAngles = val, is.matchEndTag();
     else if (tagName == "Pressure_Sensitivity")

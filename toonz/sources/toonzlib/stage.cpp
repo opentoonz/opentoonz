@@ -213,6 +213,9 @@ public:
   int m_currentXsheetLevel;   // level of the current xsheet, see: editInPlace
   int m_xsheetLevel;          // xsheet-level of the column being processed
 
+  // for guided drawing
+  TFrameId m_currentFrameId;
+  bool m_isGuidedDrawingEnabled;
   std::vector<TXshColumn *> m_ancestors;
 
   const ImagePainter::VisualSettings *m_vs;
@@ -385,11 +388,13 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
     // Build and store a player
 
     Player player;
-    player.m_sl     = sl;
-    player.m_fid    = cell.m_frameId;
-    player.m_xsh    = xsh;
-    player.m_column = col;
-    player.m_frame  = row;
+    player.m_sl                     = sl;
+    player.m_fid                    = cell.m_frameId;
+    player.m_xsh                    = xsh;
+    player.m_column                 = col;
+    player.m_frame                  = row;
+    player.m_currentFrameId         = m_currentFrameId;
+    player.m_isGuidedDrawingEnabled = m_isGuidedDrawingEnabled;
     player.m_dpiAff = sl ? getDpiAffine(sl, cell.m_frameId) : TAffine();
     player.m_onionSkinDistance   = m_onionSkinDistance;
     player.m_isCurrentColumn     = (m_currentColumnIndex == col);
@@ -661,12 +666,14 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
       const TFrameId &fid2 = level->index2fid(rows[i]);
       if (fid2 == fid) continue;
       players.push_back(Player());
-      Player &player                = players.back();
-      player.m_sl                   = level;
-      player.m_frame                = level->guessIndex(fid);
-      player.m_fid                  = fid2;
-      player.m_isCurrentColumn      = true;
-      player.m_isCurrentXsheetLevel = true;
+      Player &player                  = players.back();
+      player.m_sl                     = level;
+      player.m_frame                  = level->guessIndex(fid);
+      player.m_fid                    = fid2;
+      player.m_isCurrentColumn        = true;
+      player.m_isCurrentXsheetLevel   = true;
+      player.m_currentFrameId         = m_currentFrameId;
+      player.m_isGuidedDrawingEnabled = m_isGuidedDrawingEnabled;
 #ifdef NUOVO_ONION
       player.m_onionSkinDistance = rows[i] - row;
 #else
@@ -742,16 +749,18 @@ void Stage::visit(Visitor &visitor, const VisitArgs &args) {
   bool isPlaying           = args.m_isPlaying;
 
   StageBuilder sb;
-  sb.m_vs                 = &visitor.m_vs;
-  TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
-  TStageObject *camera    = xsh->getStageObject(cameraId);
-  TAffine cameraAff       = camera->getPlacement(row);
-  double z                = camera->getZ(row);
-  sb.m_cameraPlacement    = ZPlacement(cameraAff, z);
-  sb.m_camera3d           = camera3d;
-  sb.m_currentColumnIndex = col;
-  sb.m_xsheetLevel        = xsheetLevel;
-  sb.m_onionSkinMask      = *osm;
+  sb.m_vs                     = &visitor.m_vs;
+  TStageObjectId cameraId     = xsh->getStageObjectTree()->getCurrentCameraId();
+  TStageObject *camera        = xsh->getStageObject(cameraId);
+  TAffine cameraAff           = camera->getPlacement(row);
+  double z                    = camera->getZ(row);
+  sb.m_cameraPlacement        = ZPlacement(cameraAff, z);
+  sb.m_camera3d               = camera3d;
+  sb.m_currentColumnIndex     = col;
+  sb.m_xsheetLevel            = xsheetLevel;
+  sb.m_onionSkinMask          = *osm;
+  sb.m_currentFrameId         = args.m_currentFrameId;
+  sb.m_isGuidedDrawingEnabled = args.m_isGuidedDrawingEnabled;
   Player::m_onionSkinFrontSize = 0;
   Player::m_onionSkinBackSize  = 0;
   sb.addFrame(sb.m_players, scene, xsh, row, 0, args.m_onlyVisible,
@@ -782,10 +791,13 @@ void Stage::visit(Visitor &visitor, ToonzScene *scene, TXsheet *xsh, int row) {
                 and \b StageBuilder::visit().
 */
 void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
-                  const OnionSkinMask &osm, bool isPlaying) {
+                  const OnionSkinMask &osm, bool isPlaying,
+                  int isGuidedDrawingEnabled) {
   StageBuilder sb;
   sb.m_vs                      = &visitor.m_vs;
   sb.m_onionSkinMask           = osm;
+  sb.m_currentFrameId          = fid;
+  sb.m_isGuidedDrawingEnabled  = isGuidedDrawingEnabled;
   Player::m_onionSkinFrontSize = 0;
   Player::m_onionSkinBackSize  = 0;
   sb.addSimpleLevelFrame(sb.m_players, level, fid);
@@ -796,7 +808,9 @@ void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
 //-----------------------------------------------------------------------------
 
 void Stage::visit(Visitor &visitor, TXshLevel *level, const TFrameId &fid,
-                  const OnionSkinMask &osm, bool isPlaying) {
+                  const OnionSkinMask &osm, bool isPlaying,
+                  bool isGuidedDrawingEnabled) {
   if (level && level->getSimpleLevel())
-    visit(visitor, level->getSimpleLevel(), fid, osm, isPlaying);
+    visit(visitor, level->getSimpleLevel(), fid, osm, isPlaying,
+          isGuidedDrawingEnabled ? 1 : 0);
 }
