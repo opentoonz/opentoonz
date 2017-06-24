@@ -267,6 +267,8 @@ int main(int argc, char *argv[]) {
 // constructed. Available from Qt 5.6.
 #if QT_VERSION >= 0x050600
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+  QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+
 #endif
 
   QApplication a(argc, argv);
@@ -312,6 +314,8 @@ int main(int argc, char *argv[]) {
   // angle,
   //	force Qt to use desktop OpenGL
   a.setAttribute(Qt::AA_UseDesktopOpenGL, true);
+  a.setAttribute(Qt::AA_ShareOpenGLContexts);
+  
 #endif
 
   // Some Qt objects are destroyed badly withouth a living qApp. So, we must
