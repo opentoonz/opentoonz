@@ -9,21 +9,21 @@
 - cmake
   - Version 3.2.2 confirmed to work.
 - Qt
-  - http://download.qt.io/official_releases/qt/5.6/5.6.0/
-    - qt-opensource-mac-x64-clang-5.6.0.dmg
+  - http://download.qt.io/official_releases/qt/5.6/5.6.2/
+    - qt-opensource-mac-x64-clang-5.6.2.dmg
 - boost
   - http://www.boost.org/users/history/version_1_55_0.html (or later, though only 1.55.0 is supported)
 
 ## Building on MacOSX
 
-### 0. Install Qt
+### 0. Install Qt 5.6 (Most recent is 5.6.2)
 
 ### 1. Install Dependent Packages
 
 With homebrew, you can install them with following command.
 
 ```
-$ brew install glew lz4 libjpeg libpng lzo pkg-config libusb
+$ brew install glew lz4 libjpeg libpng lzo pkg-config libusb cmake
 ```
 
 Or, you should build and install them manually.
@@ -61,13 +61,15 @@ $ mv ~/Downloads/boost_1_55_0.tar.bz2 .
 $ tar xjvf boost_1_55_0.tar.bz2
 ```
 
-### 5. Build Everything Together
+### 5. Update the Path to Your Qt 5.6 Install in opentoonz/toonz/sources/CMakeLists.txt line 160 or 172 
+
+### 6. Build Everything Together
 
 ```
 $ cd ../../toonz
 $ mkdir build
 $ cd build
-  CMAKE_PREFIX_PATH=~/Qt5.6.0/5.6/clang_64 cmake ../sources
+  CMAKE_PREFIX_PATH=~/Qt5.6.2/5.6/clang_64 cmake ../sources
 $ make
 ```
 
