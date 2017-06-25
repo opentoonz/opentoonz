@@ -29,10 +29,12 @@ $ brew install glew lz4 libjpeg libpng lzo pkg-config libusb
 Or, you should build and install them manually.
 
 
-### 2. Clone the Repository
+### 2. Clone the Repository - Make Sure Git LFS is Installed
 
 ```
 $ git clone https://github.com/opentoonz/opentoonz
+cd opentoonz
+git lfs pull
 ```
 
 ### (Optional) Create the stuff Directory
@@ -40,13 +42,13 @@ $ git clone https://github.com/opentoonz/opentoonz
 If the directory `/Applications/OpenToonz/OpenToonz_1.1_stuff` does not exist, enter the following command:
 
 ```
-$ sudo cp -r opentoonz/stuff /Applications/OpenToonz/OpenToonz_1.1_stuff
+$ sudo cp -r stuff /Applications/OpenToonz/OpenToonz_1.1_stuff
 ```
 
 ### 3. Build tiff in thirdparty
 
 ```
-$ cd opentoonz/thirdparty/tiff-4.0.3
+$ cd thirdparty/tiff-4.0.3
 $ ./configure && make
 ```
 
