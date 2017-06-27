@@ -122,6 +122,9 @@ public:
 
   bool isBold(const QString &family, const QString &style);
   bool isItalic(const QString &family, const QString &style);
+// --------- TFont methods  called on curren font -----------
+
+#if !defined(__LP64__) || defined(LINUX) || defined(BSD)
 
   TPoint drawChar(TVectorImageP &outImage, wchar_t charcode,
                   wchar_t nextCode = 0) {
@@ -156,4 +159,5 @@ public:
 
 //-----------------------------------------------------------------------------
 
+#endif
 #endif
