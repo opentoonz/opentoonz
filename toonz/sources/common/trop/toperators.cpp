@@ -918,7 +918,7 @@ void TRop::ropout(const TRasterP &source, const TRasterP &matte,
 
 //-----------------------------------------------------------------------------
 
-void TRop::atop(const TRasterP &rup, const TRasterP &rdown,
+void TRop::zatop(const TRasterP &rup, const TRasterP &rdown,
                 const TRasterP &rout) {
   // calcola rup ATOP rdown
 
@@ -964,7 +964,7 @@ void TRop::atop(const TRasterP &rup, const TRasterP &rdown,
 
     FOR_EACH_PIXEL_64_END_LOOP
   } else
-    throw TRopException("TRop::atop invalid raster combination");
+    throw TRopException("TRop::zatop invalid raster combination");
 }
 
 //-----------------------------------------------------------------------------

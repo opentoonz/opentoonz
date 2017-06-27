@@ -9,6 +9,8 @@
 #define TNZ_MACHINE_CHANNEL_ORDER_MBGR 1
 #elif defined(LINUX)
 #define TNZ_MACHINE_CHANNEL_ORDER_BGRM 1
+#elif defined(BSD)
+#define TNZ_MACHINE_CHANNEL_ORDER_BGRM 1
 #elif defined(MACOSX)
 #define TNZ_MACHINE_CHANNEL_ORDER_MRGB 1
 #else

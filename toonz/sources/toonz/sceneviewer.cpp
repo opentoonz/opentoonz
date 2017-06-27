@@ -1,5 +1,5 @@
 
-#ifdef LINUX
+#if defined(LINUX) || defined(BSD)
 #define GL_GLEXT_PROTOTYPES
 #endif
 

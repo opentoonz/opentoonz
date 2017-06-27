@@ -672,7 +672,7 @@ public:
 
     m_dn->compute(tile, frame, ri);
 
-    TRop::atop(upTile.getRaster(), tile.getRaster(), tile.getRaster());
+    TRop::zatop(upTile.getRaster(), tile.getRaster(), tile.getRaster());
   }
 
   void doDryCompute(TRectD &rect, double frame,

@@ -11,7 +11,7 @@
 #include "trop.h"
 
 // Platform-specific includes
-#if defined(LINUX)
+#if defined(LINUX) || defined(BSD)
 
 #include "qtofflinegl.h"
 #include <X11/Xlib.h>
@@ -307,7 +307,7 @@ static std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(
 // XImplementation : implementazione offlineGL  Server X (MACOSX & LINUX)
 //-----------------------------------------------------------------------------
 
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(BSD)
 namespace {
 // The XScopedLock stuff doesn't seem finished,
 // why not just do the same as with win32 and use a Qt lock??
@@ -540,7 +540,7 @@ public:
 //--------------------------------------------------
 
 TOfflineGL::TOfflineGL(TDimension dim, const TOfflineGL *shared) : m_imp(0) {
-#if defined(LINUX)
+#if defined(LINUX) || defined(BSD)
   QMutexLocker locker(&linuxImpMutex);
 #endif
 
@@ -558,7 +558,7 @@ TOfflineGL::TOfflineGL(TDimension dim, const TOfflineGL *shared) : m_imp(0) {
 //-----------------------------------------------------------------------------
 
 TOfflineGL::TOfflineGL(const TRaster32P &raster, const TOfflineGL *shared) {
-#if defined(LINUX)
+#if defined(LINUX) || defined(BSD)
   QMutexLocker locker(&linuxImpMutex);
 #endif
 

@@ -26,6 +26,8 @@
 
 #if defined(MACOSX)
 #include <sys/malloc.h>
+#elif defined(BSD)
+#include <stdlib.h>
 #else
 #include <malloc.h>
 #endif

@@ -123,8 +123,6 @@ public:
   bool isBold(const QString &family, const QString &style);
   bool isItalic(const QString &family, const QString &style);
 
-  // --------- TFont methods  called on curren font -----------
-
   TPoint drawChar(TVectorImageP &outImage, wchar_t charcode,
                   wchar_t nextCode = 0) {
     return getCurrentFont()->drawChar(outImage, charcode, nextCode);

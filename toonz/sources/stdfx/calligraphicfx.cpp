@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/types.h>
-#include <sys/timeb.h>
 #include <string.h>
 #include <math.h>
 

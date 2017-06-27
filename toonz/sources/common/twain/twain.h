@@ -101,7 +101,7 @@ TWPT_BGR,
  * Platform Dependent Definitions and Typedefs                              *
  ****************************************************************************/
 
-#ifdef LINUX
+#if defined(LINUX) || defined(BSD)
 #include <wchar.h>
 #endif
 

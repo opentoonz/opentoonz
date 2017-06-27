@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #else  //_WIN32
 
-#if defined(__APPLE_CC__)
+#if defined(__APPLE_CC__) || defined(BSD)
 #include <unistd.h>
 #else
 #include <sys/unistd.h>

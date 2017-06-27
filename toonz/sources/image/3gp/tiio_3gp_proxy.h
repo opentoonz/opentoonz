@@ -3,7 +3,7 @@
 #ifndef TIIO_3GP_PROXY_H
 #define TIIO_3GP_PROXY_H
 
-#if defined(x64) || defined(__LP64__) || defined(LINUX)
+#if defined(x64) || defined(__LP64__) || defined(LINUX) || defined(BSD)
 
 // Qt includes
 #include <QString>

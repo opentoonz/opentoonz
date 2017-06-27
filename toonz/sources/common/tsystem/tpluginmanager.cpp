@@ -15,7 +15,6 @@
 #include <sys/param.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/timeb.h>  // for ftime
 #include <stdio.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -171,7 +170,7 @@ void TPluginManager::loadPlugin(const TFilePath &fp) {
 void TPluginManager::loadPlugins(const TFilePath &dir) {
 #if defined(_WIN32)
   const std::string extension = "dll";
-#elif defined(LINUX) || defined(__sgi)
+#elif defined(LINUX) || defined(BSD) || defined(__sgi)
   const std::string extension = "so";
 #elif defined(MACOSX)
   const std::string extension = "dylib";

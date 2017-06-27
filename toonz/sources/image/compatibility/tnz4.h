@@ -9,6 +9,8 @@
 
 #if defined(MACOSX)
 #include <sys/malloc.h>
+#elif defined(BSD)
+#include <stdlib.h>
 #else
 #include <malloc.h>
 #endif
@@ -38,6 +40,8 @@ TNZ_LITTLE_ENDIAN undefined !!
   unsigned char m, b, g, r;
 #elif defined(LINUX)
   unsigned char r, g, b, m;
+#elif defined(BSD)
+  unsigned char r, g, b, m;
 #elif defined(MACOSX)
   unsigned char m, r, g, b;
 #else
@@ -51,6 +55,8 @@ typedef struct SPIXEL {
 #elif defined(__sgi)
   unsigned short m, b, g, r;
 #elif defined(LINUX)
+  unsigned short r, g, b, m;
+#elif defined(BSD)
   unsigned short r, g, b, m;
 #elif defined(MACOSX)
   unsigned char m, r, g, b;

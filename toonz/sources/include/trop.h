@@ -260,7 +260,7 @@ DVAPI void ropin(const TRasterP &source, const TRasterP &matte,
 DVAPI void ropout(const TRasterP &source, const TRasterP &matte,
                   const TRasterP &rout);
 
-DVAPI void atop(const TRasterP &rup, const TRasterP &rdown,
+DVAPI void zatop(const TRasterP &rup, const TRasterP &rdown,
                 const TRasterP &rout);
 
 DVAPI void txor(const TRasterP &rup, const TRasterP &rdown,

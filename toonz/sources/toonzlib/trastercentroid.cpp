@@ -15,6 +15,10 @@
 #include "tmsg.h"
 #include "copP.h"*/
 
+#if defined(MACOSX) || defined(LINUX) || defined(BSD)
+#define TRUE 1
+#define FALSE 0
+#endif
 /*------------------------------------------------------------------------*/
 namespace {
 UCHAR First_preseed_table[256] = {

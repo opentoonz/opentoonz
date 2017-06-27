@@ -29,7 +29,6 @@ using namespace std;
 #ifndef _WIN32
 #include <sys/param.h>
 #include <unistd.h>
-#include <sys/timeb.h>
 #endif
 
 int inline STRICMP(const QString &a, const QString &b) {

@@ -297,7 +297,7 @@ http://japanese-linux-man-pages.coding-school.com/man/X_strerror_r-3
     } else {
       errmsg += "strerror_r() returns bad value";
     }
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
     char buff[4096];
     int ret = ::strerror_r(erno, buff, sizeof(buff));
     if (!ret) {

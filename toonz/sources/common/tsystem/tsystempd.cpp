@@ -12,7 +12,6 @@
 #include "tconvert.h"
 
 #include <time.h>
-#include <sys/timeb.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -81,6 +80,26 @@
 #include <dlfcn.h>
 
 #include "Carbon/Carbon.h"
+
+#endif
+
+#if defined(BSD)
+#define PLATFORM BSD
+#include <grp.h>
+#include <utime.h>
+#include <sys/param.h>
+#include <sys/ucred.h>
+#include <sys/mount.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/dir.h>
+#include <pwd.h>
+#include <dlfcn.h>
+#include <utime.h>
+#include <sys/time.h>
 
 #endif
 
@@ -188,6 +207,11 @@ bool TSystem::memoryShortage() {
   // to be done...
   return false;
 
+#elif defined(BSD)
+
+  // to be done...
+  return false;
+
 #else
 
   @ @ @ERROR : PLATFORM NOT SUPPORTED
@@ -254,6 +278,11 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
 
   // to be done...
   totalFree = 512 * 1024;
+
+#elif defined(BSD)
+
+  // to be done...
+  totalFree = 768 * 1024;
 
 #else
   @ @ @ERROR : PLATFORM NOT SUPPORTED
@@ -385,6 +414,11 @@ TINT64 TSystem::getMemorySize(bool onlyPhisicalMemory) {
 
   // to be done...
   return 512 * 1024;
+
+#elif defined(BSD)
+
+  // to be done...
+  return 768 * 1024;
 
 #else
   @ @ @ERROR : PLATFORM NOT SUPPORTED
@@ -542,7 +576,7 @@ TString TSystemException::getMessage() const {
   case ELOOP:
     msg = L": Too many symbolic links were encountered in translating path.";
     break;
-#ifndef MACOSX
+#if !defined(MACOSX) && !defined(BSD)
   case EMULTIHOP:
     msg =
         L": Components of path require hopping to multiple remote machines and "

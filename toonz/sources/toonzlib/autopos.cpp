@@ -17,6 +17,11 @@ fare resize e realloc size dello stack a 65000 unita'
 
 */
 
+#if defined(MACOSX) || defined(LINUX) || defined(BSD)
+#define TRUE 1
+#define FALSE 0
+#endif
+
 #define SECURITY_MARGIN_MM 4.0
 
 static bool Debug_flag = false;

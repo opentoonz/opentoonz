@@ -122,7 +122,7 @@ void CALLBACK ElapsedTimeCB(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1,
   if (imp->m_action) imp->m_action->sendCommand(imp->m_ticks);
 }
 };
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(BSD)
 
 #include <SDL_timer.h>
 #include <SDL.h>
