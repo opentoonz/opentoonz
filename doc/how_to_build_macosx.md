@@ -23,13 +23,13 @@
 With homebrew, you can install them with following command.
 
 ```
-$ brew install glew lz4 libjpeg libpng lzo pkg-config libusb cmake
+$ brew install glew lz4 libjpeg libpng lzo pkg-config libusb cmake git-lfs
 ```
 
 Or, you should build and install them manually.
 
 
-### 2. Clone the Repository - Make Sure Git LFS is Installed
+### 2. Clone the Repository
 
 ```
 $ git clone https://github.com/opentoonz/opentoonz
