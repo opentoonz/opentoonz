@@ -69,6 +69,7 @@ If using Qt 5.6.2, this is unnecessary.
 ```
 $ cd ../lzo
 $ cp -r 2.03/include/lzo driver
+```
 
 ### 6. Build Everything Together
 
