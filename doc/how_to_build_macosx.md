@@ -61,7 +61,14 @@ $ mv ~/Downloads/boost_1_55_0.tar.bz2 .
 $ tar xjvf boost_1_55_0.tar.bz2
 ```
 
-### 5. Update the Path to Your Qt 5.6 Install in opentoonz/toonz/sources/CMakeLists.txt line 160 or 172 
+### 5. Update the path to your Qt 5.6 install in opentoonz/toonz/sources/CMakeLists.txt line 160 or 172 
+If using Qt 5.6.2, this is unnecessary.
+
+### 6. Copy the lzo header folder to the lzo driver directory
+
+```
+$ cd ../lzo
+$ cp -r 2.03/include/lzo driver
 
 ### 6. Build Everything Together
 
