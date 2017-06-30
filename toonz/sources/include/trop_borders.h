@@ -165,7 +165,6 @@ class ImageMesh final : public TSmartObject,
                         public tcg::Mesh<Vertex, Edge, Face> {};
 
 //--------------------------------------------------------------------------------
-
 }
 }  // namespace TRop::borders
 
@@ -267,7 +266,6 @@ void readMeshes(const TRasterPT<Pixel> &raster,
                 ImageMeshesReaderT<Pixel> &reader);
 
 //--------------------------------------------------------------------------------
-
 }
 }  // namespace TRop::borders
 

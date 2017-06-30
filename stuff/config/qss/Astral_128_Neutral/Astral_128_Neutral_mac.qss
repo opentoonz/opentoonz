@@ -770,6 +770,18 @@ DvScrollWidget QPushButton:pressed {
 #keyFrameNavigator QToolButton {
   min-width: 18px;
 }
+#keyFrameNavigator #PreviousKey {
+  image: url('../Astral_072_Dark/imgs/black/prevkey.png');
+}
+#keyFrameNavigator #PreviousKey:disabled {
+  image: url('../Astral_072_Dark/imgs/black/prevkey_disabled.png');
+}
+#keyFrameNavigator #NextKey {
+  image: url('../Astral_072_Dark/imgs/black/nextkey.png');
+}
+#keyFrameNavigator #NextKey:disabled {
+  image: url('../Astral_072_Dark/imgs/black/nextkey_disabled.png');
+}
 /* -----------------------------------------------------------------------------
    Treeviews (Global)
 ----------------------------------------------------------------------------- */

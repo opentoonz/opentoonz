@@ -230,8 +230,7 @@ inline TPixel32 quickOverPix(const TPixel32 &bot, const TPixel32 &top) {
 
 //-----------------------------------------------------------------------------
 
-inline TPixel32 quickOverPixPremult(const TPixel32 &bot,
-                                    const TPixel32 &top) {
+inline TPixel32 quickOverPixPremult(const TPixel32 &bot, const TPixel32 &top) {
   return quickOverPixPremultT<TPixel32, UCHAR>(bot, top);
 }
 

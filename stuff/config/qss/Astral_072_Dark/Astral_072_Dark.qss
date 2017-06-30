@@ -770,6 +770,18 @@ DvScrollWidget QPushButton:pressed {
 #keyFrameNavigator QToolButton {
   min-width: 18px;
 }
+#keyFrameNavigator #PreviousKey {
+  image: url('imgs/white/prevkey.png');
+}
+#keyFrameNavigator #PreviousKey:disabled {
+  image: url('imgs/white/prevkey_disabled.png');
+}
+#keyFrameNavigator #NextKey {
+  image: url('imgs/white/nextkey.png');
+}
+#keyFrameNavigator #NextKey:disabled {
+  image: url('imgs/white/nextkey_disabled.png');
+}
 /* -----------------------------------------------------------------------------
    Treeviews (Global)
 ----------------------------------------------------------------------------- */

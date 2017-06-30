@@ -111,18 +111,18 @@ Features from the modified libtiff and needed currently, so this isn't a simple 
 ```
 $ cd opentoonz/thirdparty/tiff-4.0.3
 $ ./configure --with-pic --disable-jbig
-$ make
-$ cd -
+$ make -j$(nproc)
+$ cd ../../
 ```
 
 ### Building OpenToonz
 
 ```
-$ cd ../../toonz
+$ cd toonz
 $ mkdir build
 $ cd build
 $ cmake ../sources
-$ make
+$ make -j$(nproc)
 ```
 
 The build takes a lot of time, be patient.

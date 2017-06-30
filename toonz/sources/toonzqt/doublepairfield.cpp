@@ -98,19 +98,8 @@ void DoubleValuePairField::paintEvent(QPaintEvent *) {
   int x1 = value2pos(m_maxValue);
   int y  = height() / 2;
 
-  p.setPen(getLightLineColor());
+  p.setPen(QPen(getDarkLineColor(), 4));
   p.drawLine(x0 - 1, y, x1, y);
-  p.setPen(getLightLineEdgeColor());
-  p.drawPoint(x1 + 1, y);
-  p.drawPoint(x1 + 1, y - 1);
-  p.drawPoint(x1 + 1, y - 2);
-  p.drawPoint(x1 + 1, y - 3);
-  p.setPen(getMiddleLineColor());
-  p.drawLine(x0, y - 2, x1 - 1, y - 2);
-  p.setPen(getDarkLineColor());
-  p.drawLine(x0 - 1, y - 3, x1, y - 3);
-  p.drawPoint(x0 - 1, y - 1);
-  p.drawPoint(x0 - 1, y - 2);
 
   p.setPen(Qt::black);
 

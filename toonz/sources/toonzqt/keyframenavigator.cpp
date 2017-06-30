@@ -42,12 +42,17 @@ KeyframeNavigator::KeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle)
 
   setObjectName("keyFrameNavigator");
 
-  QIcon previewActIcon = createQIconPNG("prevkey");
-  previewActIcon.addFile(QString(":Resources/prevkey_disabled.png"), QSize(),
-                         QIcon::Disabled);
-  m_actPreviewKey = new QAction(previewActIcon, tr("Previous Key"), this);
+  QPixmap emptyPrevPixmap(
+      23, 23);  // set transparent icon to show button's background
+  emptyPrevPixmap.fill(Qt::transparent);
+  QIcon emptyPrevIcon(emptyPrevPixmap);
+
+  m_actPreviewKey = new QAction(emptyPrevIcon, tr("Previous Key"), this);
   connect(m_actPreviewKey, SIGNAL(triggered()), SLOT(togglePrevKeyAct()));
   addAction(m_actPreviewKey);
+  QWidget *prevWidget = widgetForAction(
+      m_actPreviewKey);  // obtain a widget generated from QAction
+  prevWidget->setObjectName("PreviousKey");
 
   m_actKeyNo = new QAction(createQIconPNG("key_no"), tr("Set Key"), this);
   connect(m_actKeyNo, SIGNAL(triggered()), SLOT(toggleKeyAct()));
@@ -62,12 +67,17 @@ KeyframeNavigator::KeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle)
   connect(m_actKeyTotal, SIGNAL(triggered()), SLOT(toggleKeyAct()));
   addAction(m_actKeyTotal);
 
-  QIcon nextActIcon = createQIconPNG("nextkey");
-  nextActIcon.addFile(QString(":Resources/nextkey_disabled.png"), QSize(),
-                      QIcon::Disabled);
-  m_actNextKey = new QAction(nextActIcon, tr("Next Key"), this);
+  QPixmap emptyNextPixmap(
+      23, 23);  // set transparent icon to show button's background
+  emptyNextPixmap.fill(Qt::transparent);
+  QIcon emptyNextIcon(emptyNextPixmap);
+
+  m_actNextKey = new QAction(emptyNextIcon, tr("Next Key"), this);
   connect(m_actNextKey, SIGNAL(triggered()), SLOT(toggleNextKeyAct()));
   addAction(m_actNextKey);
+  QWidget *nextWidget =
+      widgetForAction(m_actNextKey);  // obtain a widget generated from QAction
+  nextWidget->setObjectName("NextKey");
 }
 
 //-----------------------------------------------------------------------------
