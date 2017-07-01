@@ -32,7 +32,6 @@ public:
   bool m_opened;
 
   QAudioOutput *m_audioOutput;
-  QAudioFormat *m_format;
   QBuffer *m_buffer;
 
   TSoundOutputDeviceImp()
@@ -112,7 +111,6 @@ public:
 bool TSoundOutputDeviceImp::doOpenDevice() {
   m_opened      = false;
   m_audioOutput = NULL;
-  m_format      = new QAudioFormat();
   m_opened      = true;
   return m_opened;
 }
