@@ -651,11 +651,10 @@ private:
   int m_row;
   int m_col;
   int m_count;
-  bool m_isEmpty;
 
 public:
-  DrawingSubtitutionGroupUndo(int dir, int row, int col, bool isEmpty)
-      : m_direction(dir), m_col(col), m_row(row), m_isEmpty(isEmpty) {
+  DrawingSubtitutionGroupUndo(int dir, int row, int col)
+      : m_direction(dir), m_col(col), m_row(row) {
     m_count       = 1;
     TXshCell cell = TTool::getApplication()
                         ->getCurrentScene()
@@ -692,7 +691,6 @@ public:
   }
 
   void undo() const override {
-    if (m_isEmpty) return;
     int n = 1;
     DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row, m_col);
     while (n < m_count) {
@@ -702,7 +700,6 @@ public:
   }
 
   void redo() const override {
-    if (m_isEmpty) return;
     int n = 1;
     DrawingSubtitutionUndo::changeDrawing(m_direction, m_row, m_col);
     while (n < m_count) {
@@ -817,8 +814,9 @@ static void drawingSubstituionGroup(int dir) {
       TApp::instance()->getCurrentScene()->getScene()->getXsheet()->getCell(
           row, col);
   bool isEmpty = cell.isEmpty();
+  if (isEmpty) return;
   DrawingSubtitutionGroupUndo *undo =
-      new DrawingSubtitutionGroupUndo(dir, row, col, isEmpty);
+      new DrawingSubtitutionGroupUndo(dir, row, col);
   TUndoManager::manager()->add(undo);
   undo->redo();
 }
