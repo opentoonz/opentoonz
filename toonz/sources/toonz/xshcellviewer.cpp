@@ -764,7 +764,21 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
   cellSelection->getSelectedCells(r0, c0, r1, c1);
   stride.setFrame(cellSelection->getSelectedCells().getRowCount());
 
-  CellPosition offset = m_viewer->orientation()->arrowShift(event->key());
+//  CellPosition offset = m_viewer->orientation()->arrowShift(event->key());
+
+  CellPosition offset;
+  switch (int key = event->key()) {
+  case Qt::Key_Up:
+  case Qt::Key_Down:
+  case Qt::Key_Left:
+  case Qt::Key_Right:
+	  offset = m_viewer->orientation()->arrowShift(key);
+	  break;
+  default:
+	  QLineEdit::keyPressEvent(event);
+	  return;
+	  break;
+  }
 
   if (isCtrlPressed &&
       Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled()) {
