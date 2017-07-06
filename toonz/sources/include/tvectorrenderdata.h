@@ -49,6 +49,7 @@ public:
 public:
   const TColorFunction
       *m_cf;  //!< [\p not-owned] Transform to be used for drawing RGBM colors.
+  const TColorFunction *m_guidedCf;
   const TPalette *m_palette;  //!< [\p not-owned] Palette to be used for
                               //! translating color indexes to
   //!                 RGBM colors.
@@ -61,9 +62,10 @@ public:
   TPixel m_tCheckInk;    //!< Color to be used for <I>ink check</I> mode.
   TPixel m_tCheckPaint;  //!< Color to be used for <I>paint check</I> mode.
 
-  int m_colorCheckIndex;    //!< Color index to be highlighted in <I>color
-                            //! check</I> mode.
-  int m_indexToHighlight;   // for guided vector drawing
+  int m_colorCheckIndex;   //!< Color index to be highlighted in <I>color
+                           //! check</I> mode.
+  int m_indexToHighlight;  // for guided vector drawing
+
   bool m_alphaChannel,      //!< Whether alpha channel is enabled.
       m_antiAliasing,       //!< Whether antialiasing must be applied.
       m_isImagePattern,     //!< \internal  Seems like a bad bug-patch - inquire
@@ -117,6 +119,7 @@ public:
       , m_isOfflineRender(false)  // By definition
       , m_indexToHighlight(-1)
       , m_highLightNow(false)
+      , m_guidedCf(0)
       , m_showGuidedDrawing(false) {}
 
   TVectorRenderData(ProductionSettings, const TAffine &aff,
@@ -146,6 +149,7 @@ public:
       , m_isOfflineRender(true)  // By definition
       , m_indexToHighlight(-1)
       , m_highLightNow(false)
+      , m_guidedCf(0)
       , m_showGuidedDrawing(false) {}
 
   TVectorRenderData(const TVectorRenderData &other, const TAffine &aff,
@@ -173,6 +177,7 @@ public:
       , m_isOfflineRender(other.m_isOfflineRender)
       , m_indexToHighlight(other.m_indexToHighlight)
       , m_highLightNow(other.m_highLightNow)
+      , m_guidedCf(other.m_guidedCf)
       , m_showGuidedDrawing(other.m_showGuidedDrawing) {
   }  //!< Constructs from explicit primary context settings while
      //!  copying the rest from another instance.
@@ -203,6 +208,7 @@ public:
       , m_isOfflineRender(false)
       , m_indexToHighlight(-1)
       , m_highLightNow(false)
+      , m_guidedCf(0)
       , m_showGuidedDrawing(false) {
   }  //!< Constructs settings with default ViewerSettings.
      //!  \deprecated   Use constructors with explicit settings type tag.

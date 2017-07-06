@@ -72,7 +72,7 @@ DVAPI void visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
 
 DVAPI void visit(Visitor &visitor, TXshLevel *level, const TFrameId &fid,
                  const OnionSkinMask &osm, bool isPlaying,
-                 bool isGuidedDrawingEnabled = false);
+                 double isGuidedDrawingEnabled = 0.0);
 
 //-----------------------------------------------------------------------------
 }  // namespace Stage

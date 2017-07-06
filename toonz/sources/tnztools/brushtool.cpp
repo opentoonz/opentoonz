@@ -742,7 +742,7 @@ BrushTool::BrushTool(std::string name, int targetType)
     , m_breakAngles("Break", true)
     , m_pencil("Pencil", false)
     , m_pressure("Pressure", true)
-    , m_guidedDrawing("Guided", false)
+    , m_guidedDrawing("Guided")
     , m_capStyle("Cap")
     , m_joinStyle("Join")
     , m_miterJoinLimit("Miter:", 0, 100, 4)
@@ -780,6 +780,10 @@ BrushTool::BrushTool(std::string name, int targetType)
   if (targetType & TTool::Vectors) {
     m_prop[0].bind(m_guidedDrawing);
     m_guidedDrawing.setId("GuidedDrawing");
+    m_guidedDrawing.addValue(L"None");
+    m_guidedDrawing.addValue(L"Closest");
+    m_guidedDrawing.addValue(L"Farthest");
+    m_guidedDrawing.addValue(L"All");
   }
 
   m_prop[0].bind(m_preset);
@@ -1023,7 +1027,7 @@ void BrushTool::onActivate() {
     m_accuracy.setValue(BrushAccuracy);
     m_smooth.setValue(BrushSmooth);
     m_hardness.setValue(RasterBrushHardness);
-    m_guidedDrawing.setValue(VectorGuidedDrawing);
+    m_guidedDrawing.setIndex(VectorGuidedDrawing);
   }
   if (m_targetType & TTool::ToonzImage) {
     m_brushPad = ToolUtils::getBrushPad(m_rasThickness.getValue().second,
@@ -1851,7 +1855,7 @@ bool BrushTool::onPropertyChanged(std::string propertyName) {
     if (propertyName == m_joinStyle.getName())
       notifyTool = true;
     else if (propertyName == m_guidedDrawing.getName()) {
-      VectorGuidedDrawing = m_guidedDrawing.getValue();
+      VectorGuidedDrawing = m_guidedDrawing.getIndex();
     }
   }
   if (m_targetType & TTool::ToonzImage) {
@@ -1922,7 +1926,7 @@ void BrushTool::loadPreset() {
       m_capStyle.setIndex(preset.m_cap);
       m_joinStyle.setIndex(preset.m_join);
       m_miterJoinLimit.setValue(preset.m_miter);
-      m_guidedDrawing.setValue(preset.m_guidedDrawing);
+      m_guidedDrawing.setIndex(preset.m_guidedDrawing);
     } else {
       m_rasThickness.setValue(TDoublePairProperty::Value(
           std::max(preset.m_min, 1.0), preset.m_max));
@@ -1947,7 +1951,7 @@ void BrushTool::addPreset(QString name) {
   if (getTargetType() & TTool::Vectors) {
     preset.m_min           = m_thickness.getValue().first;
     preset.m_max           = m_thickness.getValue().second;
-    preset.m_guidedDrawing = m_guidedDrawing.getValue();
+    preset.m_guidedDrawing = m_guidedDrawing.getIndex();
   } else {
     preset.m_min = m_rasThickness.getValue().first;
     preset.m_max = m_rasThickness.getValue().second;

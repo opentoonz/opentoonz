@@ -510,17 +510,8 @@ static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
   if (visible) {
     // Change stroke color to blue if guided drawing
     if (rd.m_showGuidedDrawing && rd.m_highLightNow) {
-      double m[4]      = {1.0, 1.0, 1.0, 1.0}, c[4];
-      TPixel32 bgColor = TPixel32::Blue;
-      m[3]             = 1.0 - 0.35;
-
-      c[0] = (1.0 - m[3]) * bgColor.r, c[1] = (1.0 - m[3]) * bgColor.g,
-      c[2] = (1.0 - m[3]) * bgColor.b;
-      c[3] = 0.0;
-
-      TColorFunction *cf       = new TGenericColorFunction(m, c);
       TVectorRenderData *newRd = new TVectorRenderData(
-          rd, rd.m_aff, rd.m_clippingRect, rd.m_palette, cf);
+          rd, rd.m_aff, rd.m_clippingRect, rd.m_palette, rd.m_guidedCf);
       tglDraw(*newRd, s, false);
       delete newRd;
       TStroke *new_s = (TStroke *)s;

@@ -76,7 +76,8 @@ namespace {
 void updateOnionSkinSize(const PlayerSet &players) {
   assert(Player::m_onionSkinFrontSize == 0 && Player::m_onionSkinBackSize == 0);
   int i;
-  int maxOnionSkinFrontValue = 0, maxOnionSkinBackValue = 0;
+  int maxOnionSkinFrontValue = 0, maxOnionSkinBackValue = 0,
+      firstBackOnionSkin = 0, lastBackVisibleSkin = 0;
   for (i = 0; i < (int)players.size(); i++) {
     Player player = players[i];
     if (player.m_onionSkinDistance == c_noOnionSkin) continue;
@@ -86,9 +87,20 @@ void updateOnionSkinSize(const PlayerSet &players) {
     if (player.m_onionSkinDistance < 0 &&
         maxOnionSkinBackValue > player.m_onionSkinDistance)
       maxOnionSkinBackValue = player.m_onionSkinDistance;
+    if (firstBackOnionSkin == 0 && player.m_onionSkinDistance < 0)
+      firstBackOnionSkin = player.m_onionSkinDistance;
+    else if (player.m_onionSkinDistance < 0 &&
+             firstBackOnionSkin < player.m_onionSkinDistance)
+      firstBackOnionSkin = player.m_onionSkinDistance;
+    // Level Editing Mode can send players at a depth beyond what is visible.
+    if (player.m_onionSkinDistance < lastBackVisibleSkin &&
+        player.m_isVisibleinOSM)
+      lastBackVisibleSkin = player.m_onionSkinDistance;
   }
-  Player::m_onionSkinFrontSize = maxOnionSkinFrontValue;
-  Player::m_onionSkinBackSize  = maxOnionSkinBackValue;
+  Player::m_onionSkinFrontSize  = maxOnionSkinFrontValue;
+  Player::m_onionSkinBackSize   = maxOnionSkinBackValue;
+  Player::m_firstBackOnionSkin  = firstBackOnionSkin;
+  Player::m_lastBackVisibleSkin = lastBackVisibleSkin;
 }
 
 //-----------------------------------------------------------------------------
@@ -215,7 +227,7 @@ public:
 
   // for guided drawing
   TFrameId m_currentFrameId;
-  bool m_isGuidedDrawingEnabled;
+  int m_isGuidedDrawingEnabled;
   std::vector<TXshColumn *> m_ancestors;
 
   const ImagePainter::VisualSettings *m_vs;
@@ -672,8 +684,10 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
       player.m_fid                    = fid2;
       player.m_isCurrentColumn        = true;
       player.m_isCurrentXsheetLevel   = true;
+      player.m_isEditingLevel         = true;
       player.m_currentFrameId         = m_currentFrameId;
       player.m_isGuidedDrawingEnabled = m_isGuidedDrawingEnabled;
+      player.m_isVisibleinOSM         = rows[i] >= 0;
 #ifdef NUOVO_ONION
       player.m_onionSkinDistance = rows[i] - row;
 #else
@@ -691,6 +705,7 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
     player.m_onionSkinDistance  = 0;
   player.m_isCurrentColumn      = true;
   player.m_isCurrentXsheetLevel = true;
+  player.m_isEditingLevel       = true;
   player.m_ancestorColumnIndex  = -1;
   player.m_dpiAff               = getDpiAffine(level, fid);
 }
@@ -761,8 +776,10 @@ void Stage::visit(Visitor &visitor, const VisitArgs &args) {
   sb.m_onionSkinMask          = *osm;
   sb.m_currentFrameId         = args.m_currentFrameId;
   sb.m_isGuidedDrawingEnabled = args.m_isGuidedDrawingEnabled;
-  Player::m_onionSkinFrontSize = 0;
-  Player::m_onionSkinBackSize  = 0;
+  Player::m_onionSkinFrontSize  = 0;
+  Player::m_onionSkinBackSize   = 0;
+  Player::m_firstBackOnionSkin  = 0;
+  Player::m_lastBackVisibleSkin = 0;
   sb.addFrame(sb.m_players, scene, xsh, row, 0, args.m_onlyVisible,
               args.m_checkPreviewVisibility);
 
@@ -794,12 +811,14 @@ void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
                   const OnionSkinMask &osm, bool isPlaying,
                   int isGuidedDrawingEnabled) {
   StageBuilder sb;
-  sb.m_vs                      = &visitor.m_vs;
-  sb.m_onionSkinMask           = osm;
-  sb.m_currentFrameId          = fid;
-  sb.m_isGuidedDrawingEnabled  = isGuidedDrawingEnabled;
-  Player::m_onionSkinFrontSize = 0;
-  Player::m_onionSkinBackSize  = 0;
+  sb.m_vs                       = &visitor.m_vs;
+  sb.m_onionSkinMask            = osm;
+  sb.m_currentFrameId           = fid;
+  sb.m_isGuidedDrawingEnabled   = isGuidedDrawingEnabled;
+  Player::m_onionSkinFrontSize  = 0;
+  Player::m_onionSkinBackSize   = 0;
+  Player::m_firstBackOnionSkin  = 0;
+  Player::m_lastBackVisibleSkin = 0;
   sb.addSimpleLevelFrame(sb.m_players, level, fid);
   updateOnionSkinSize(sb.m_players);
   sb.visit(sb.m_players, visitor, isPlaying);
@@ -809,8 +828,8 @@ void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
 
 void Stage::visit(Visitor &visitor, TXshLevel *level, const TFrameId &fid,
                   const OnionSkinMask &osm, bool isPlaying,
-                  bool isGuidedDrawingEnabled) {
+                  double isGuidedDrawingEnabled) {
   if (level && level->getSimpleLevel())
     visit(visitor, level->getSimpleLevel(), fid, osm, isPlaying,
-          isGuidedDrawingEnabled ? 1 : 0);
+          (int)isGuidedDrawingEnabled);
 }

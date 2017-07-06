@@ -303,7 +303,7 @@ public:
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
-  TBoolProperty m_guidedDrawing;
+  TEnumProperty m_guidedDrawing;
   TPropertyGroup m_prop[2];
 
   int m_targetType;
@@ -324,7 +324,7 @@ public:
       , m_joinStyle("Join")
       , m_miterJoinLimit("Miter:", 0, 100, 4)
       , m_targetType(targetType)
-      , m_guidedDrawing("Guided", false) {
+      , m_guidedDrawing("Guided") {
     if (targetType & TTool::Vectors) m_prop[0].bind(m_toolSize);
     if (targetType & TTool::ToonzImage || targetType & TTool::RasterImage) {
       m_prop[0].bind(m_rasterToolSize);
@@ -348,6 +348,10 @@ public:
     if (targetType & TTool::Vectors) {
       m_prop[0].bind(m_guidedDrawing);
       m_guidedDrawing.setId("GuidedDrawing");
+      m_guidedDrawing.addValue(L"None");
+      m_guidedDrawing.addValue(L"Closest");
+      m_guidedDrawing.addValue(L"Farthest");
+      m_guidedDrawing.addValue(L"All");
     }
 
     m_capStyle.addValue(BUTT_WSTR);
@@ -797,7 +801,7 @@ public:
       m_param.m_selective.setValue(GeometricSelective ? 1 : 0);
       m_param.m_autogroup.setValue(GeometricGroupIt ? 1 : 0);
       m_param.m_autofill.setValue(GeometricAutofill ? 1 : 0);
-      m_param.m_guidedDrawing.setValue(GeometricGuidedDrawing ? 1 : 0);
+      m_param.m_guidedDrawing.setIndex(GeometricGuidedDrawing);
       std::wstring typeCode = ::to_wstring(GeometricType.getValue());
       m_param.m_type.setValue(typeCode);
       GeometricType = ::to_string(typeCode);
@@ -883,7 +887,7 @@ public:
       }
       GeometricGroupIt = m_param.m_autofill.getValue();
     } else if (propertyName == m_param.m_guidedDrawing.getName())
-      GeometricGuidedDrawing = m_param.m_guidedDrawing.getValue();
+      GeometricGuidedDrawing = m_param.m_guidedDrawing.getIndex();
     else if (propertyName == m_param.m_selective.getName())
       GeometricSelective = m_param.m_selective.getValue();
     else if (propertyName == m_param.m_pencil.getName())
