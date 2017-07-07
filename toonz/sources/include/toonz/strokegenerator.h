@@ -69,6 +69,8 @@ public:
   */
   void add(const TThickPoint &point, double pixelSize2);
 
+  TPointD getFirstPoint();  // returns the first point
+
   //! Filtra i punti di m_points
   /*!
     Verifica se i primi sei e gli ultimi sei punti successivi hanno una

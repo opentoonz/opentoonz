@@ -1836,6 +1836,19 @@ void BrushTool::draw() {
   tglColor(m_isPrompting ? TPixel32::Green : m_currentColor);
   m_track.drawAllFragments();
 
+  if (m_firstStroke) {
+    glColor3d(1.0, 0.0, 0.0);
+    m_rangeTrack.drawAllFragments();
+    glColor3d(0.0, 0.6, 0.0);
+    TPointD firstPoint        = m_rangeTrack.getFirstPoint();
+    TPointD topLeftCorner     = TPointD(firstPoint.x - 5, firstPoint.y - 5);
+    TPointD topRightCorner    = TPointD(firstPoint.x + 5, firstPoint.y - 5);
+    TPointD bottomLeftCorner  = TPointD(firstPoint.x - 5, firstPoint.y + 5);
+    TPointD bottomRightCorner = TPointD(firstPoint.x + 5, firstPoint.y + 5);
+    tglDrawSegment(topLeftCorner, bottomRightCorner);
+    tglDrawSegment(topRightCorner, bottomLeftCorner);
+  }
+
   if (getApplication()->getCurrentObject()->isSpline()) return;
 
   // Draw the brush outline - change color when the Ink / Paint check is
@@ -1847,7 +1860,7 @@ void BrushTool::draw() {
   // normally draw in red
   else
     glColor3d(1.0, 0.0, 0.0);
-  m_rangeTrack.drawAllFragments();
+
   if (TToonzImageP ti = img) {
     TRasterP ras = ti->getRaster();
     int lx       = ras->getLx();
