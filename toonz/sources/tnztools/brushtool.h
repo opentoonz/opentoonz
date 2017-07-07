@@ -134,7 +134,7 @@ public:
 
   TPropertyGroup *getProperties(int targetType) override;
   bool onPropertyChanged(std::string propertyName) override;
-
+  void resetFrameRange();
   void onImageChanged() override;
   void setWorkAndBackupImages();
   void updateWorkAndBackupRasters(const TRect &rect);
@@ -167,7 +167,7 @@ protected:
   TBoolProperty m_breakAngles;
   TBoolProperty m_pencil;
   TBoolProperty m_pressure;
-  TBoolProperty m_frameRange;
+  TEnumProperty m_frameRange;
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;

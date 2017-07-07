@@ -69,6 +69,10 @@ TEnv::IntVar VectorBrushFrameRange("VectorBrushFrameRange", 0);
 #define BEVEL_WSTR L"bevel_join"
 #define MITER_WSTR L"miter_join"
 #define CUSTOM_WSTR L"<custom>"
+#define LINEAR_WSTR L"Linear"
+#define EASEIN_WSTR L"Ease In"
+#define EASEOUT_WSTR L"Ease Out"
+#define EASEINOUT_WSTR L"Ease In / Ease Out"
 
 //-------------------------------------------------------------------
 //
@@ -755,7 +759,7 @@ BrushTool::BrushTool(std::string name, int targetType)
     , m_isPrompting(false)
     , m_firstTime(true)
     , m_presetsLoaded(false)
-    , m_frameRange("Frame Range", false)
+    , m_frameRange("Frame Range:")
     , m_workingFrameId(TFrameId()) {
   bind(targetType);
 
@@ -765,8 +769,6 @@ BrushTool::BrushTool(std::string name, int targetType)
     m_prop[0].bind(m_smooth);
     m_prop[0].bind(m_breakAngles);
     m_breakAngles.setId("BreakSharpAngles");
-    m_prop[0].bind(m_frameRange);
-    m_frameRange.setId("FrameRange");
   }
 
   if (targetType & TTool::ToonzImage) {
@@ -780,6 +782,17 @@ BrushTool::BrushTool(std::string name, int targetType)
   }
 
   m_prop[0].bind(m_pressure);
+
+  if (targetType & TTool::Vectors) {
+    m_frameRange.addValue(L"Off");
+    m_frameRange.addValue(LINEAR_WSTR);
+    m_frameRange.addValue(EASEIN_WSTR);
+    m_frameRange.addValue(EASEOUT_WSTR);
+    m_frameRange.addValue(EASEINOUT_WSTR);
+    m_prop[0].bind(m_frameRange);
+    m_frameRange.setId("FrameRange");
+  }
+
   m_prop[0].bind(m_preset);
   m_preset.setId("BrushPreset");
   m_preset.addValue(CUSTOM_WSTR);
@@ -973,7 +986,7 @@ void BrushTool::updateTranslation() {
   m_capStyle.setQStringName(tr("Cap"));
   m_joinStyle.setQStringName(tr("Join"));
   m_miterJoinLimit.setQStringName(tr("Miter:"));
-  m_frameRange.setQStringName("Frame Range");
+  m_frameRange.setQStringName("Frame Range:");
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -1021,14 +1034,14 @@ void BrushTool::onActivate() {
     m_accuracy.setValue(BrushAccuracy);
     m_smooth.setValue(BrushSmooth);
     m_hardness.setValue(RasterBrushHardness);
-    m_frameRange.setValue(VectorBrushFrameRange);
+    m_frameRange.setIndex(VectorBrushFrameRange);
   }
   if (m_targetType & TTool::ToonzImage) {
     m_brushPad = ToolUtils::getBrushPad(m_rasThickness.getValue().second,
                                         m_hardness.getValue() * 0.01);
     setWorkAndBackupImages();
   }
-  m_firstFrameId = -1;
+  resetFrameRange();
   // TODO:app->editImageOrSpline();
 }
 
@@ -1050,7 +1063,7 @@ void BrushTool::onDeactivate() {
   }
   m_workRas   = TRaster32P();
   m_backupRas = TRasterCM32P();
-  if (m_firstStroke) delete m_firstStroke;
+  resetFrameRange();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1177,9 +1190,6 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
     m_smoothStroke.beginStroke(m_smooth.getValue());
     addTrackPoint(TThickPoint(pos, thickness), getPixelSize() * getPixelSize());
-
-    // if (m_frameRange.getValue() && m_firstFrameId == -1) m_firstFrameId =
-    // getFrameId();
   }
 }
 
@@ -1380,7 +1390,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
                                          // autoclose proprio dal fatto che
                                          // hanno 1 solo chunk.
       stroke->insertControlPoints(0.5);
-    if (m_frameRange.getValue()) {
+    if (m_frameRange.getIndex()) {
       if (m_firstFrameId == -1) {
         m_firstStroke  = new TStroke(*stroke);
         m_firstFrameId = getFrameId();
@@ -1407,12 +1417,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
           m_rangeTrack   = m_track;
           m_firstFrameId = getFrameId();
         } else {
-          m_rangeTrack.clear();
-          m_firstFrameId = -1;
-          if (m_firstStroke) {
-            delete m_firstStroke;
-            m_firstStroke = 0;
-          }
+          resetFrameRange();
         }
 
         if (application) {
@@ -1477,12 +1482,24 @@ bool BrushTool::doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
   for (int i = 0; i < m; ++i) {
     TFrameId fid = fids[i];
     assert(firstFrameId <= fid && fid <= lastFrameId);
-    // if the size is greater than 1, t is the frameId divided by the size minus
-    // 1
-    // else t is .5
+
     // This is an attempt to divide the tween evenly
     double t = m > 1 ? (double)i / (double)(m - 1) : 0.5;
-    // Setto il fid come corrente per notificare il cambiamento dell'immagine
+    double s = t;
+    switch (m_frameRange.getIndex()) {
+    case 1:  // LINEAR_WSTR
+      break;
+    case 2:  // EASEIN_WSTR
+      s = t * t;
+      break;  // s'(0) = 0
+    case 3:   // EASEOUT_WSTR
+      s = t * (2 - t);
+      break;  // s'(1) = 0
+    case 4:   // EASEINOUT_WSTR:
+      s = t * t * (3 - 2 * t);
+      break;  // s'(0) = s'(1) = 0
+    }
+
     TTool::Application *app = TTool::getApplication();
     if (app) {
       if (app->getCurrentFrame()->isEditingScene())
@@ -1505,7 +1522,7 @@ bool BrushTool::doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
     else {
       assert(firstImage->getStrokeCount() == 1);
       assert(lastImage->getStrokeCount() == 1);
-      TVectorImageP vi = TInbetween(firstImage, lastImage).tween(t);
+      TVectorImageP vi = TInbetween(firstImage, lastImage).tween(s);
       assert(vi->getStrokeCount() == 1);
       addStrokeToImage(getApplication(), img, vi->getStroke(0),
                        m_breakAngles.getValue(), m_isFrameCreated,
@@ -1926,6 +1943,17 @@ void BrushTool::setWorkAndBackupImages() {
 
 //------------------------------------------------------------------
 
+void BrushTool::resetFrameRange() {
+  m_rangeTrack.clear();
+  m_firstFrameId = -1;
+  if (m_firstStroke) {
+    delete m_firstStroke;
+    m_firstStroke = 0;
+  }
+}
+
+//------------------------------------------------------------------
+
 bool BrushTool::onPropertyChanged(std::string propertyName) {
   // Set the following to true whenever a different piece of interface must
   // be refreshed - done once at the end.
@@ -1974,9 +2002,9 @@ bool BrushTool::onPropertyChanged(std::string propertyName) {
   } else if (propertyName == m_miterJoinLimit.getName()) {
     VectorMiterValue = m_miterJoinLimit.getValue();
   } else if (propertyName == m_frameRange.getName()) {
-    VectorBrushFrameRange = m_frameRange.getValue();
-    m_rangeTrack.clear();
-    m_firstFrameId = -1;
+    int index             = m_frameRange.getIndex();
+    VectorBrushFrameRange = index;
+    if (index == 0) resetFrameRange();
   }
 
   if (m_targetType & TTool::Vectors) {
@@ -2050,7 +2078,7 @@ void BrushTool::loadPreset() {
       m_capStyle.setIndex(preset.m_cap);
       m_joinStyle.setIndex(preset.m_join);
       m_miterJoinLimit.setValue(preset.m_miter);
-      m_frameRange.setValue(preset.m_frameRange);
+      m_frameRange.setIndex(preset.m_frameRange);
     } else {
       m_rasThickness.setValue(TDoublePairProperty::Value(
           std::max(preset.m_min, 1.0), preset.m_max));
@@ -2090,7 +2118,7 @@ void BrushTool::addPreset(QString name) {
   preset.m_cap         = m_capStyle.getIndex();
   preset.m_join        = m_joinStyle.getIndex();
   preset.m_miter       = m_miterJoinLimit.getValue();
-  preset.m_frameRange  = m_frameRange.getValue();
+  preset.m_frameRange  = m_frameRange.getIndex();
 
   // Pass the preset to the manager
   m_presetsManager.addPreset(preset);
