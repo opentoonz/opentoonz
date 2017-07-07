@@ -7,7 +7,7 @@
 #include "tproperty.h"
 #include "trasterimage.h"
 #include "ttoonzimage.h"
-
+#include "tstroke.h"
 #include "toonz/strokegenerator.h"
 
 #include "tools/tool.h"
@@ -36,7 +36,7 @@ struct BrushData final : public TPersist {
 
   std::wstring m_name;
   double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
-  bool m_selective, m_pencil, m_breakAngles, m_pressure;
+  bool m_selective, m_pencil, m_breakAngles, m_pressure, m_frameRange;
   int m_cap, m_join, m_miter;
 
   BrushData();
@@ -151,6 +151,8 @@ public:
 
   void addTrackPoint(const TThickPoint &point, double pixelSize2);
   void flushTrackPoint();
+  bool doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
+                           TFrameId lastFrameId, TStroke *lastStroke);
 
 protected:
   TPropertyGroup m_prop[2];
@@ -165,16 +167,18 @@ protected:
   TBoolProperty m_breakAngles;
   TBoolProperty m_pencil;
   TBoolProperty m_pressure;
+  TBoolProperty m_frameRange;
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
 
   StrokeGenerator m_track;
+  StrokeGenerator m_rangeTrack;
   RasterStrokeGenerator *m_rasterTrack;
-
+  TStroke *m_firstStroke;
   TTileSetCM32 *m_tileSet;
   TTileSaverCM32 *m_tileSaver;
-
+  TFrameId m_firstFrameId;
   TPixel32 m_currentColor;
   int m_styleId;
   double m_minThick, m_maxThick;
