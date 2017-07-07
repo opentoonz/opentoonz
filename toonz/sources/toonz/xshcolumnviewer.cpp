@@ -991,56 +991,75 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 
   p.setPen(m_viewer->getTextColor());
 
-  if (col >= 0 && !isEmpty && o->isVerticalTimeline()) {
-    // pegbar name
-    p.drawText(pegbarNamePos, QString(parentId.toString().c_str()));
+  if (col >= 0 && !isEmpty) {
+	  if (o->isVerticalTimeline())
+	  {
+		  // pegbar name
+		  p.drawText(pegbarNamePos, QString(parentId.toString().c_str()));
 
-    std::string handle = xsh->getStageObject(columnId)->getParentHandle();
-    if (handle[0] == 'H' && handle.length() > 1) handle = handle.substr(1);
-    if (parentId != TStageObjectId::TableId)
-      p.drawText(handleNamePos, QString::fromStdString(handle));
+		  std::string handle = xsh->getStageObject(columnId)->getParentHandle();
+		  if (handle[0] == 'H' && handle.length() > 1) handle = handle.substr(1);
+		  if (parentId != TStageObjectId::TableId)
+			  p.drawText(handleNamePos, QString::fromStdString(handle));
 
-    // thumbnail
-    QRect thumbnailRect(orig.x() + 9, orig.y() + o->cellHeight() * 2 + 7,
-                        o->cellWidth() - 11, 42);
+		  // thumbnail
+		  QRect thumbnailRect(orig.x() + 9, orig.y() + o->cellHeight() * 2 + 7,
+			  o->cellWidth() - 11, 42);
 
-    // for zerary fx, display fxId here instead of thumbnail
-    TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
-    if (zColumn) {
-      QFont font("Verdana", 8);
-      p.setFont(font);
+		  // for zerary fx, display fxId here instead of thumbnail
+		  TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+		  if (zColumn) {
+			  QFont font("Verdana", 8);
+			  p.setFont(font);
 
-      TFx *fx        = zColumn->getZeraryColumnFx()->getZeraryFx();
-      QString fxName = QString::fromStdWString(fx->getFxId());
-      p.drawText(thumbnailRect, Qt::TextWrapAnywhere | Qt::TextWordWrap,
-                 fxName);
-    } else {
-      TXshLevelColumn *levelColumn = column->getLevelColumn();
+			  TFx *fx = zColumn->getZeraryColumnFx()->getZeraryFx();
+			  QString fxName = QString::fromStdWString(fx->getFxId());
+			  p.drawText(thumbnailRect, Qt::TextWrapAnywhere | Qt::TextWordWrap,
+				  fxName);
+		  }
+		  else {
+			  TXshLevelColumn *levelColumn = column->getLevelColumn();
 
-      if (levelColumn &&
-          Preferences::instance()->getColumnIconLoadingPolicy() ==
-              Preferences::LoadOnDemand &&
-          !levelColumn->isIconVisible()) {
-        // display nothing
-      } else {
-        QPixmap iconPixmap = getColumnIcon(col);
-        if (!iconPixmap.isNull()) {
-          p.drawPixmap(thumbnailRect, iconPixmap);
-        }
-        // notify that the column icon is already shown
-        if (levelColumn) levelColumn->setIconVisible(true);
-      }
+			  if (levelColumn &&
+				  Preferences::instance()->getColumnIconLoadingPolicy() ==
+				  Preferences::LoadOnDemand &&
+				  !levelColumn->isIconVisible()) {
+				  // display nothing
+			  }
+			  else {
+				  QPixmap iconPixmap = getColumnIcon(col);
+				  if (!iconPixmap.isNull()) {
+					  p.drawPixmap(thumbnailRect, iconPixmap);
+				  }
+				  // notify that the column icon is already shown
+				  if (levelColumn) levelColumn->setIconVisible(true);
+			  }
 
-      // filter color
-      if (column->getFilterColorId() != 0) {
-        QRect filterColorRect(thumbnailRect.topRight().x() - 14,
-                              thumbnailRect.topRight().y(), 14, 14);
-        p.fillRect(filterColorRect, Qt::white);
-        p.drawPixmap(
-            filterColorRect.adjusted(2, 2, -2, -2),
-            getColorChipIcon(column->getFilterColorId()).pixmap(12, 12));
-      }
-    }
+			  // filter color
+			  if (column->getFilterColorId() != 0) {
+				  QRect filterColorRect(thumbnailRect.topRight().x() - 14,
+					  thumbnailRect.topRight().y(), 14, 14);
+				  p.fillRect(filterColorRect, Qt::white);
+				  p.drawPixmap(
+					  filterColorRect.adjusted(2, 2, -2, -2),
+					  getColorChipIcon(column->getFilterColorId()).pixmap(12, 12));
+			  }
+		  }
+	  }
+	  else
+	  {
+		  // filter color
+		  if (column->getFilterColorId() != 0) {
+			  QRect LayerNameRect = o->rect(PredefinedRect::LAYER_NAME)
+				  .translated(orig)
+				  .adjusted(3, 0, -2, 0);
+			  QRect filterColorRect(LayerNameRect.topRight().x() - 14,
+				  LayerNameRect.topRight().y() + 5, 14, 14);
+			  p.drawPixmap(
+				  filterColorRect.adjusted(2, 2, -2, -2),
+				  getColorChipIcon(column->getFilterColorId()).pixmap(12, 12));
+		  }
+	  }
   }
 }
 
@@ -1352,7 +1371,7 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   p.setPen(grey150);
   p.setBrush(Qt::NoBrush);
   if (m_viewer->orientation()->isVerticalTimeline())
-	  p.drawRect(toBeUpdated.adjusted(0, 1, -1, -3));
+	  p.drawRect(toBeUpdated.adjusted(0, 0, -1, -3));
   else
 	  p.drawRect(toBeUpdated.adjusted(0, 0, -3, 0));
 
