@@ -1766,6 +1766,7 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
+  createMenuXsheetAction(MI_NewNoteLevel, tr("New Note Level"), "");
   createRightClickMenuAction(MI_ToggleXSheetToolbar,
                              tr("Toggle XSheet Toolbar"), "");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
