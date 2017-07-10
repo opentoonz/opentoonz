@@ -28,6 +28,7 @@
 #include "toonz/levelset.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/txshsoundtextlevel.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/tstageobjectkeyframe.h"
 #include "toonz/txshcolumn.h"
@@ -662,7 +663,8 @@ public:
                         ->getXsheet()
                         ->getCell(m_row, m_col);
     if (!cell.m_level ||
-        !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel()))
+        !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel() ||
+          cell.m_level->getSoundTextLevel()))
       return;
 
     TFrameId id = cell.m_frameId;
@@ -674,7 +676,8 @@ public:
                             ->getCell(m_row + m_count, m_col);
     if (!nextCell.m_level ||
         !(nextCell.m_level->getSimpleLevel() ||
-          nextCell.m_level->getChildLevel()))
+          nextCell.m_level->getChildLevel() ||
+          nextCell.m_level->getSoundTextLevel()))
       return;
 
     TFrameId nextId = nextCell.m_frameId;
@@ -729,39 +732,71 @@ bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col) {
     TXshCell prevCell = xsh->getCell(row - 1, col);
     if (prevCell.isEmpty() ||
         !(prevCell.m_level->getSimpleLevel() ||
-          prevCell.m_level->getChildLevel()))
+          prevCell.m_level->getChildLevel() ||
+          prevCell.m_level->getSoundTextLevel()))
       return false;
     cell        = prevCell;
     usePrevCell = true;
   } else if (!cell.m_level ||
-             !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel()))
+             !(cell.m_level->getSimpleLevel() ||
+               cell.m_level->getChildLevel() ||
+               cell.m_level->getSoundTextLevel()))
     return false;
   TXshLevel *level  = cell.m_level->getSimpleLevel();
   if (!level) level = cell.m_level->getChildLevel();
+  if (!level) level = cell.m_level->getSoundTextLevel();
 
   std::vector<TFrameId> fids;
+  int framesTextSize = 0;
+  int n, index;
+  bool usingSoundText = false;
+  TFrameId cellFrameId;
   if (cell.m_level->getSimpleLevel())
     cell.m_level->getSimpleLevel()->getFids(fids);
   if (cell.m_level->getChildLevel())
     cell.m_level->getChildLevel()->getFids(fids);
-  int n = fids.size();
+  if (cell.m_level->getSoundTextLevel()) {
+    n              = cell.m_level->getSoundTextLevel()->m_framesText.size();
+    usingSoundText = true;
+  } else
+    n = fids.size();
 
   if (n < 2) return false;
 
-  std::vector<TFrameId>::iterator it;
-  it = std::find(fids.begin(), fids.end(), cell.m_frameId);
+  if (!usingSoundText) {
+    std::vector<TFrameId>::iterator it;
+    it = std::find(fids.begin(), fids.end(), cell.m_frameId);
 
-  if (it == fids.end()) return false;
+    if (it == fids.end()) return false;
 
-  int index = std::distance(fids.begin(), it);
+    index = std::distance(fids.begin(), it);
+  } else
+    index = cell.getFrameId().getNumber();
+
   if (usePrevCell) {
     index -= 1;
     cell = xsh->getCell(row, col);
   }
-  while (delta < 0) delta += n;
-  index = (index + delta) % n;
 
-  setDrawing(fids[index], row, col, cell, level);
+  // if negative direction, add the size to the direction to avoid a negative
+  // modulo
+  while (delta < 0) delta += n;
+  // the index is the remainder
+  index = (index + delta) % n;
+  assert(index < n);
+
+  // sound text levels can't have a 0 index frame id
+  // the index points to a qlist<qstring>
+  // reading 1 below the frameid number
+  // and you can't have a -1 index on a qlist
+  if (usingSoundText && index == 0) index = n;
+
+  if (!usingSoundText)
+    cellFrameId = fids[index];
+  else
+    cellFrameId = TFrameId(index);
+
+  setDrawing(cellFrameId, row, col, cell, level);
 
   return true;
 }
