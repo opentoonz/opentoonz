@@ -36,8 +36,8 @@ struct BrushData final : public TPersist {
 
   std::wstring m_name;
   double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
-  bool m_selective, m_pencil, m_breakAngles, m_pressure, m_frameRange;
-  int m_cap, m_join, m_miter;
+  bool m_selective, m_pencil, m_breakAngles, m_pressure;
+  int m_cap, m_join, m_miter, m_frameRange, m_snapping;
 
   BrushData();
   BrushData(const std::wstring &name);
@@ -168,6 +168,7 @@ protected:
   TBoolProperty m_pencil;
   TBoolProperty m_pressure;
   TEnumProperty m_frameRange;
+  TEnumProperty m_snapping;
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
@@ -182,6 +183,10 @@ protected:
   TPixel32 m_currentColor;
   int m_styleId;
   double m_minThick, m_maxThick;
+
+  // for snapping
+  int m_strokeIndex1, m_strokeIndex2;
+  double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
 
   TRectD m_modifiedRegion;
   TPointD m_dpiScale,
