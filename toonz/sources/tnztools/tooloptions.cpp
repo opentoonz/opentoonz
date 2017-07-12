@@ -169,6 +169,7 @@ ToolOptionControlBuilder::ToolOptionControlBuilder(ToolOptionsBox *panel,
 //-----------------------------------------------------------------------------
 
 QLabel *ToolOptionControlBuilder::addLabel(TProperty *p) {
+  if (p->getName() == "Sensitivity:") return new QLabel();
   QLabel *label = new QLabel(p->getQStringName());
   hLayout()->addWidget(label, 0);
   return label;
@@ -1568,6 +1569,8 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
     , m_pencilMode(0)
     , m_hardnessLabel(0)
     , m_joinStyleCombo(0)
+    , m_snapCheckbox(0)
+    , m_snapSensitivityCombo(0)
     , m_miterField(0) {
   TPropertyGroup *props = tool->getProperties(0);
   assert(props->getPropertyCount() > 0);
@@ -1613,13 +1616,17 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
 
     addSeparator();
     if (tool && tool->getProperties(1)) tool->getProperties(1)->accept(builder);
-
+    m_snapCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Snap"));
+    m_snapSensitivityCombo =
+        dynamic_cast<ToolOptionCombo *>(m_controls.value("Sensitivity:"));
     m_joinStyleCombo =
         dynamic_cast<ToolOptionPopupButton *>(m_controls.value("Join"));
     m_miterField =
         dynamic_cast<ToolOptionIntSlider *>(m_controls.value("Miter:"));
     m_miterField->setEnabled(m_joinStyleCombo->currentIndex() ==
                              TStroke::OutlineOptions::MITER_JOIN);
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
   }
   hLayout()->addStretch(1);
 }
@@ -1634,6 +1641,8 @@ void BrushToolOptionsBox::updateStatus() {
   if (m_miterField)
     m_miterField->setEnabled(m_joinStyleCombo->currentIndex() ==
                              TStroke::OutlineOptions::MITER_JOIN);
+  if (m_snapCheckbox)
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
 }
 
 //-----------------------------------------------------------------------------
