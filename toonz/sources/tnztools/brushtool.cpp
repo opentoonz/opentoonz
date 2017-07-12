@@ -59,7 +59,8 @@ TEnv::IntVar RasterBrushPencilMode("InknpaintRasterBrushPencilMode", 0);
 TEnv::IntVar BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
 TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
 TEnv::IntVar VectorBrushFrameRange("VectorBrushFrameRange", 0);
-TEnv::IntVar VectorBrushSnapping("VectorBrushSnapping", 0);
+TEnv::IntVar VectorBrushSnap("VectorBrushSnap", 0);
+TEnv::IntVar VectorBrushSnapSensitivity("VectorBrushSnapSensitivity", 0);
 
 //-------------------------------------------------------------------
 
@@ -80,8 +81,8 @@ TEnv::IntVar VectorBrushSnapping("VectorBrushSnapping", 0);
 #define MEDIUM_WSTR L"Medium"
 #define HIGH_WSTR L"High"
 
-const double SNAPPING_LOW    = 10.0;
-const double SNAPPING_MEDIUM = 50.0;
+const double SNAPPING_LOW    = 5.0;
+const double SNAPPING_MEDIUM = 25.0;
 const double SNAPPING_HIGH   = 100.0;
 //-------------------------------------------------------------------
 //
@@ -769,7 +770,8 @@ BrushTool::BrushTool(std::string name, int targetType)
     , m_firstTime(true)
     , m_presetsLoaded(false)
     , m_frameRange("Frame Range:")
-    , m_snapping("Snap:")
+    , m_snap("Snap", false)
+    , m_snapSensitivity("Sensitivity:")
     , m_workingFrameId(TFrameId()) {
   bind(targetType);
 
@@ -801,12 +803,13 @@ BrushTool::BrushTool(std::string name, int targetType)
     m_frameRange.addValue(EASEINOUT_WSTR);
     m_prop[0].bind(m_frameRange);
     m_frameRange.setId("FrameRange");
-    m_snapping.addValue(L"Off");
-    m_snapping.addValue(LOW_WSTR);
-    m_snapping.addValue(MEDIUM_WSTR);
-    m_snapping.addValue(HIGH_WSTR);
-    m_prop[0].bind(m_snapping);
-    m_frameRange.setId("Snap");
+    m_prop[0].bind(m_snap);
+    m_snap.setId("Snap");
+    m_snapSensitivity.addValue(LOW_WSTR);
+    m_snapSensitivity.addValue(MEDIUM_WSTR);
+    m_snapSensitivity.addValue(HIGH_WSTR);
+    m_prop[0].bind(m_snapSensitivity);
+    m_snapSensitivity.setId("SnapSensitivity");
   }
 
   m_prop[0].bind(m_preset);
@@ -1003,7 +1006,8 @@ void BrushTool::updateTranslation() {
   m_joinStyle.setQStringName(tr("Join"));
   m_miterJoinLimit.setQStringName(tr("Miter:"));
   m_frameRange.setQStringName("Frame Range:");
-  m_snapping.setQStringName("Snap:");
+  m_snap.setQStringName("Snap");
+  m_snapSensitivity.setQStringName("Sensitivity:");
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -1052,18 +1056,16 @@ void BrushTool::onActivate() {
     m_smooth.setValue(BrushSmooth);
     m_hardness.setValue(RasterBrushHardness);
     m_frameRange.setIndex(VectorBrushFrameRange);
-    m_snapping.setIndex(VectorBrushSnapping);
-    switch (VectorBrushSnapping) {
+    m_snap.setValue(VectorBrushSnap);
+    m_snapSensitivity.setIndex(VectorBrushSnapSensitivity);
+    switch (VectorBrushSnapSensitivity) {
     case 0:
-      m_minDistance2 = 0;
-      break;
-    case 1:
       m_minDistance2 = SNAPPING_LOW;
       break;
-    case 2:
+    case 1:
       m_minDistance2 = SNAPPING_MEDIUM;
       break;
-    case 3:
+    case 2:
       m_minDistance2 = SNAPPING_HIGH;
       break;
     }
@@ -1223,7 +1225,7 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     m_smoothStroke.beginStroke(m_smooth.getValue());
     // snapping
     TVectorImageP vi(img);
-    if (vi && m_snapping.getIndex() && m_strokeIndex1 != -1 &&
+    if (vi && m_snap.getValue() && m_strokeIndex1 != -1 &&
         m_strokeIndex1 < (int)(vi->getStrokeCount())) {
       TStroke *stroke1   = vi->getStroke(m_strokeIndex1);
       TThickPoint point1 = stroke1->getPoint(m_w1);
@@ -1355,7 +1357,7 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     m_currThickness  = thickness;
     TVectorImageP vi = TImageP(getImage(false));
     bool draw        = true;
-    if (vi && m_snapping.getIndex()) {
+    if (vi && m_snap.getValue()) {
       double minDistance2 = m_minDistance2;
       int i, strokeNumber = vi->getStrokeCount();
 
@@ -1447,7 +1449,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       return;
     }
 
-    if (vi && m_snapping.getIndex() && m_strokeIndex2 != -1 &&
+    if (vi && m_snap.getValue() && m_strokeIndex2 != -1 &&
         m_strokeIndex2 < (int)(vi->getStrokeCount())) {
       TStroke *stroke2   = vi->getStroke(m_strokeIndex2);
       TThickPoint point2 = stroke2->getPoint(m_w2);
@@ -1908,7 +1910,7 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
   // snapping check
   TVectorImageP vi(getImage(false));
-  if (vi && m_snapping.getIndex()) {
+  if (vi && m_snap.getValue()) {
     double minDistance2 = m_minDistance2;
     m_strokeIndex1      = -1;
 
@@ -1963,7 +1965,7 @@ void BrushTool::draw() {
 
   // snapping
   TVectorImageP vi = img;
-  if (vi && m_snapping.getIndex()) {
+  if (vi && m_snap.getValue()) {
     double thick;
     if (m_strokeIndex1 != -1 && m_strokeIndex1 < (int)(vi->getStrokeCount())) {
       tglColor(TPixelD(0.1, 0.9, 0.1));
@@ -2172,20 +2174,19 @@ bool BrushTool::onPropertyChanged(std::string propertyName) {
     int index             = m_frameRange.getIndex();
     VectorBrushFrameRange = index;
     if (index == 0) resetFrameRange();
-  } else if (propertyName == m_snapping.getName()) {
-    int index           = m_snapping.getIndex();
-    VectorBrushSnapping = index;
+  } else if (propertyName == m_snap.getName()) {
+    VectorBrushSnap = m_snap.getValue();
+  } else if (propertyName == m_snapSensitivity.getName()) {
+    int index                  = m_snapSensitivity.getIndex();
+    VectorBrushSnapSensitivity = index;
     switch (index) {
     case 0:
-      m_minDistance2 = 0;
-      break;
-    case 1:
       m_minDistance2 = SNAPPING_LOW;
       break;
-    case 2:
+    case 1:
       m_minDistance2 = SNAPPING_MEDIUM;
       break;
-    case 3:
+    case 2:
       m_minDistance2 = SNAPPING_HIGH;
       break;
     }
@@ -2263,7 +2264,8 @@ void BrushTool::loadPreset() {
       m_joinStyle.setIndex(preset.m_join);
       m_miterJoinLimit.setValue(preset.m_miter);
       m_frameRange.setIndex(preset.m_frameRange);
-      m_snapping.setIndex(preset.m_snapping);
+      m_snap.setValue(preset.m_snap);
+      m_snapSensitivity.setIndex(preset.m_snapSensitivity);
     } else {
       m_rasThickness.setValue(TDoublePairProperty::Value(
           std::max(preset.m_min, 1.0), preset.m_max));
@@ -2293,18 +2295,19 @@ void BrushTool::addPreset(QString name) {
     preset.m_max = m_rasThickness.getValue().second;
   }
 
-  preset.m_acc         = m_accuracy.getValue();
-  preset.m_smooth      = m_smooth.getValue();
-  preset.m_hardness    = m_hardness.getValue();
-  preset.m_selective   = m_selective.getValue();
-  preset.m_pencil      = m_pencil.getValue();
-  preset.m_breakAngles = m_breakAngles.getValue();
-  preset.m_pressure    = m_pressure.getValue();
-  preset.m_cap         = m_capStyle.getIndex();
-  preset.m_join        = m_joinStyle.getIndex();
-  preset.m_miter       = m_miterJoinLimit.getValue();
-  preset.m_frameRange  = m_frameRange.getIndex();
-  preset.m_snapping    = m_snapping.getIndex();
+  preset.m_acc             = m_accuracy.getValue();
+  preset.m_smooth          = m_smooth.getValue();
+  preset.m_hardness        = m_hardness.getValue();
+  preset.m_selective       = m_selective.getValue();
+  preset.m_pencil          = m_pencil.getValue();
+  preset.m_breakAngles     = m_breakAngles.getValue();
+  preset.m_pressure        = m_pressure.getValue();
+  preset.m_cap             = m_capStyle.getIndex();
+  preset.m_join            = m_joinStyle.getIndex();
+  preset.m_miter           = m_miterJoinLimit.getValue();
+  preset.m_frameRange      = m_frameRange.getIndex();
+  preset.m_snap            = m_snap.getValue();
+  preset.m_snapSensitivity = m_snapSensitivity.getIndex();
 
   // Pass the preset to the manager
   m_presetsManager.addPreset(preset);
@@ -2363,7 +2366,8 @@ BrushData::BrushData()
     , m_cap(0)
     , m_join(0)
     , m_frameRange(0)
-    , m_snapping(0)
+    , m_snap(false)
+    , m_snapSensitivity(0)
     , m_miter(0) {}
 
 //----------------------------------------------------------------------------------------------------------
@@ -2384,7 +2388,8 @@ BrushData::BrushData(const std::wstring &name)
     , m_cap(0)
     , m_join(0)
     , m_frameRange(0)
-    , m_snapping(0)
+    , m_snap(false)
+    , m_snapSensitivity(0)
     , m_miter(0) {}
 
 //----------------------------------------------------------------------------------------------------------
@@ -2430,8 +2435,10 @@ void BrushData::saveData(TOStream &os) {
   os << m_miter;
   os.openChild("Frame_Range");
   os << (int)m_frameRange;
-  os.openChild("Snapping");
-  os << (int)m_snapping;
+  os.openChild("Snap");
+  os << (int)m_snap;
+  os.openChild("SnapSensitivity");
+  os << (int)m_snapSensitivity;
   os.closeChild();
 }
 
@@ -2470,8 +2477,10 @@ void BrushData::loadData(TIStream &is) {
       is >> m_miter, is.matchEndTag();
     else if (tagName == "Frame_Range")
       is >> m_frameRange, is.matchEndTag();
-    else if (tagName == "Snapping")
-      is >> m_snapping, is.matchEndTag();
+    else if (tagName == "Snap")
+      is >> m_snap, is.matchEndTag();
+    else if (tagName == "SnapSensitivity")
+      is >> m_snapSensitivity, is.matchEndTag();
     else
       is.skipCurrentTag();
   }

@@ -2102,7 +2102,8 @@ void MainWindow::defineActions() {
                           tr("Brush hardness - Increase"), "");
   createToolOptionsAction("A_DecreaseBrushHardness",
                           tr("Brush hardness - Decrease"), "");
-
+  createToolOptionsAction("A_ToolOption_SnapSensitivity", tr("SnapSensitivity"),
+                          "");
   createToolOptionsAction("A_ToolOption_AutoGroup", tr("Auto Group"), "");
   createToolOptionsAction("A_ToolOption_BreakSharpAngles",
                           tr("Break sharp angles"), "");
