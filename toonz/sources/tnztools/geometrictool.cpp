@@ -51,6 +51,8 @@ TEnv::DoubleVar GeometricOpacity("InknpaintGeometricOpacity", 100);
 TEnv::IntVar GeometricCapStyle("InknpaintGeometricCapStyle", 0);
 TEnv::IntVar GeometricJoinStyle("InknpaintGeometricJoinStyle", 0);
 TEnv::IntVar GeometricMiterValue("InknpaintGeometricMiterValue", 4);
+TEnv::IntVar GeometricSnap("InknpaintGeometricSnap", 0);
+TEnv::IntVar GeometricSnapSensitivity("InknpaintGeometricSnapSensitivity", 0);
 
 //-------------------------------------------------------------------
 
@@ -60,6 +62,13 @@ TEnv::IntVar GeometricMiterValue("InknpaintGeometricMiterValue", 4);
 #define ROUNDJ_WSTR L"round_join"
 #define BEVEL_WSTR L"bevel_join"
 #define MITER_WSTR L"miter_join"
+#define LOW_WSTR L"Low"
+#define MEDIUM_WSTR L"Medium"
+#define HIGH_WSTR L"High"
+
+const double SNAPPING_LOW    = 5.0;
+const double SNAPPING_MEDIUM = 25.0;
+const double SNAPPING_HIGH   = 100.0;
 
 //=============================================================================
 // Utility Functions
@@ -302,10 +311,15 @@ public:
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
-
+  TBoolProperty m_snap;
+  TEnumProperty m_snapSensitivity;
   TPropertyGroup m_prop[2];
 
   int m_targetType;
+
+  // for snapping
+  int m_strokeIndex1, m_strokeIndex2;
+  double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
 
   PrimitiveParam(int targetType)
       : m_type("Shape:")  // "W_ToolOptions_ShapeType")
@@ -322,6 +336,8 @@ public:
       , m_capStyle("Cap")
       , m_joinStyle("Join")
       , m_miterJoinLimit("Miter:", 0, 100, 4)
+      , m_snap("Snap", false)
+      , m_snapSensitivity("Sensitivity")
       , m_targetType(targetType) {
     if (targetType & TTool::Vectors) m_prop[0].bind(m_toolSize);
     if (targetType & TTool::ToonzImage || targetType & TTool::RasterImage) {
@@ -332,10 +348,16 @@ public:
     m_prop[0].bind(m_type);
 
     m_prop[0].bind(m_edgeCount);
-
+    m_snapSensitivity.addValue(LOW_WSTR);
+    m_snapSensitivity.addValue(MEDIUM_WSTR);
+    m_snapSensitivity.addValue(HIGH_WSTR);
     if (targetType & TTool::Vectors) {
       m_prop[0].bind(m_autogroup);
       m_prop[0].bind(m_autofill);
+      m_prop[0].bind(m_snap);
+      m_snap.setId("Snap");
+      m_prop[0].bind(m_snapSensitivity);
+      m_snapSensitivity.setId("SnapSensitivity");
     }
     if (targetType & TTool::ToonzImage) {
       m_prop[0].bind(m_selective);
@@ -380,6 +402,8 @@ public:
     m_capStyle.setQStringName(tr("Cap"));
     m_joinStyle.setQStringName(tr("Join"));
     m_miterJoinLimit.setQStringName(tr("Miter:"));
+    m_snap.setQStringName("Snap");
+    m_snapSensitivity.setQStringName("Sensitivity:");
   }
 };
 
@@ -426,9 +450,97 @@ public:
   virtual void onActivate(){};
   virtual void onDeactivate(){};
   virtual void onImageChanged(){};
+  TPointD calculateSnap(TPointD pos);
+  void drawSnap();
+  TPointD getSnap(TPointD pos);
+  void resetSnap();
 
   virtual TStroke *makeStroke() const = 0;
 };
+
+void Primitive::resetSnap() {
+  m_param->m_strokeIndex1 = -1;
+  m_param->m_strokeIndex2 = -1;
+  m_param->m_w1           = -1;
+  m_param->m_w2           = -1;
+}
+
+TPointD Primitive::calculateSnap(TPointD pos) {
+  TVectorImageP vi(TTool::getImage(false));
+  TPointD snapPoint = pos;
+  if (vi && m_param->m_snap.getValue()) {
+    double minDistance2     = m_param->m_minDistance2;
+    m_param->m_strokeIndex1 = -1;
+
+    int i, strokeNumber = vi->getStrokeCount();
+
+    TStroke *stroke;
+    double distance2, outW;
+
+    for (i = 0; i < strokeNumber; i++) {
+      stroke = vi->getStroke(i);
+      if (stroke->getNearestW(pos, outW, distance2) &&
+          distance2 < minDistance2) {
+        minDistance2            = distance2;
+        m_param->m_strokeIndex1 = i;
+        if (areAlmostEqual(outW, 0.0, 1e-3))
+          m_param->m_w1 = 0.0;
+        else if (areAlmostEqual(outW, 1.0, 1e-3))
+          m_param->m_w1 = 1.0;
+        else
+          m_param->m_w1    = outW;
+        TThickPoint point1 = stroke->getPoint(m_param->m_w1);
+        snapPoint          = TPointD(point1.x, point1.y);
+      }
+    }
+  }
+  return snapPoint;
+}
+
+void Primitive::drawSnap() {
+  // snapping
+  TImageP img      = TTool::getImage(false, 1);
+  TVectorImageP vi = img;
+  if (vi && m_param->m_snap.getValue()) {
+    double thick;
+    if (m_param->m_strokeIndex1 != -1 &&
+        m_param->m_strokeIndex1 < (int)(vi->getStrokeCount())) {
+      tglColor(TPixelD(0.1, 0.9, 0.1));
+      TStroke *stroke1   = vi->getStroke(m_param->m_strokeIndex1);
+      TThickPoint point1 = stroke1->getPoint(m_param->m_w1);
+
+      // m_param->m_pixelSize = m_tool->getPixelSize();
+      thick = std::max(6.0, point1.thick);
+
+      tglDrawCircle(point1, thick);
+    }
+
+    TThickPoint point2;
+
+    if (m_param->m_strokeIndex2 != -1 &&
+        m_param->m_strokeIndex2 < (int)(vi->getStrokeCount())) {
+      if (m_param->m_strokeIndex2 != -1) {
+        TStroke *stroke2 = vi->getStroke(m_param->m_strokeIndex2);
+        point2           = stroke2->getPoint(m_param->m_w2);
+        thick            = std::max(6.0, point2.thick);
+        tglDrawCircle(point2, thick);
+      }
+    }
+  }
+}
+
+TPointD Primitive::getSnap(TPointD pos) {
+  TImageP img = TTool::getImage(false, 1);
+  TVectorImageP vi(img);
+  if (vi && m_param->m_snap.getValue() && m_param->m_strokeIndex1 != -1 &&
+      m_param->m_strokeIndex1 <= (int)(vi->getStrokeCount())) {
+    TStroke *stroke1   = vi->getStroke(m_param->m_strokeIndex1);
+    TThickPoint point1 = stroke1->getPoint(m_param->m_w1);
+    TPointD snapPoint  = TPointD(point1.x, point1.y);
+    return snapPoint;
+  } else
+    return pos;
+}
 
 //=============================================================================
 // Rectangle Primitive Class Declaration
@@ -585,6 +697,7 @@ public:
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) override {}
 };
 
@@ -666,6 +779,7 @@ public:
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 };
 
 //=============================================================================
@@ -800,7 +914,21 @@ public:
       m_param.m_joinStyle.setIndex(GeometricJoinStyle);
       m_param.m_miterJoinLimit.setValue(GeometricMiterValue);
       m_firstTime = false;
+      m_param.m_snap.setValue(GeometricSnap);
+      m_param.m_snapSensitivity.setIndex(GeometricSnapSensitivity);
+      switch (GeometricSnapSensitivity) {
+      case 0:
+        m_param.m_minDistance2 = SNAPPING_LOW;
+        break;
+      case 1:
+        m_param.m_minDistance2 = SNAPPING_MEDIUM;
+        break;
+      case 2:
+        m_param.m_minDistance2 = SNAPPING_HIGH;
+        break;
+      }
     }
+    m_primitive->resetSnap();
     /*--
        ショートカットでいきなりスタート（＝onEnterを通らない場合）のとき、
             LineToolが反応しないことがある対策 --*/
@@ -887,6 +1015,22 @@ public:
       GeometricJoinStyle = m_param.m_joinStyle.getIndex();
     else if (propertyName == m_param.m_miterJoinLimit.getName())
       GeometricMiterValue = m_param.m_miterJoinLimit.getValue();
+    else if (propertyName == m_param.m_snap.getName())
+      GeometricSnap = m_param.m_snap.getValue();
+    else if (propertyName == m_param.m_snapSensitivity.getName()) {
+      GeometricSnapSensitivity = m_param.m_snapSensitivity.getIndex();
+      switch (GeometricSnapSensitivity) {
+      case 0:
+        m_param.m_minDistance2 = SNAPPING_LOW;
+        break;
+      case 1:
+        m_param.m_minDistance2 = SNAPPING_MEDIUM;
+        break;
+      case 2:
+        m_param.m_minDistance2 = SNAPPING_HIGH;
+        break;
+      }
+    }
 
     return false;
   }
@@ -1018,6 +1162,7 @@ GeometricTool GeometricRasterFullColorTool(TTool::RasterImage |
 //-----------------------------------------------------------------------------
 
 void RectanglePrimitive::draw() {
+  drawSnap();
   if (m_isEditing || m_isPrompting ||
       areAlmostEqual(m_selectingRect.x0, m_selectingRect.x1) ||
       areAlmostEqual(m_selectingRect.y0, m_selectingRect.y1)) {
@@ -1047,7 +1192,7 @@ void RectanglePrimitive::leftButtonDown(const TPointD &pos,
   }
 
   if (!m_isEditing) return;
-
+  TPointD newPos = getSnap(pos);
   if (m_param->m_pencil.getValue() &&
       (m_param->m_targetType & TTool::ToonzImage ||
        m_param->m_targetType & TTool::RasterImage)) {
@@ -1056,7 +1201,7 @@ void RectanglePrimitive::leftButtonDown(const TPointD &pos,
     else
       m_startPoint = TPointD((int)pos.x + 0.5, (int)pos.y + 0.5);
   } else
-    m_startPoint     = pos;
+    m_startPoint     = newPos;
   m_selectingRect.x0 = m_startPoint.x;
   m_selectingRect.y0 = m_startPoint.y;
   m_selectingRect.x1 = m_startPoint.x;
@@ -1077,7 +1222,7 @@ void RectanglePrimitive::leftButtonDrag(const TPointD &realPos,
     pos.y = (realPos.y > m_startPoint.y) ? m_startPoint.y + distance
                                          : m_startPoint.y - distance;
   } else {
-    pos = realPos;
+    pos = calculateSnap(realPos);
   }
 
   if (m_param->m_pencil.getValue() &&
@@ -1170,12 +1315,15 @@ void RectanglePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   if (!m_isEditing) return;
   m_isEditing = false;
   m_tool->addStroke();
+  resetSnap();
 }
 
 //-----------------------------------------------------------------------------
 
 void RectanglePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  m_pos = pos;
+  TPointD newPos = calculateSnap(pos);
+  m_pos          = newPos;
+  m_tool->invalidate();
 }
 
 //-----------------------------------------------------------------------------
@@ -1197,6 +1345,7 @@ void RectanglePrimitive::onEnter() {
 //-----------------------------------------------------------------------------
 
 void CirclePrimitive::draw() {
+  drawSnap();
   if (m_isEditing || m_isPrompting) {
     tglColor(m_isEditing ? m_color : TPixel32::Green);
     tglDrawCircle(m_centre, m_radius);
@@ -1206,8 +1355,8 @@ void CirclePrimitive::draw() {
 //-----------------------------------------------------------------------------
 
 void CirclePrimitive::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
-  m_pos    = pos;
-  m_centre = pos;
+  m_pos    = getSnap(pos);
+  m_centre = m_pos;
 
   TTool::Application *app = TTool::getApplication();
   if (!app) return;
@@ -1258,7 +1407,8 @@ void CirclePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void CirclePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  m_pos = pos;
+  m_pos = calculateSnap(pos);
+  m_tool->invalidate();
 }
 
 //-----------------------------------------------------------------------------
@@ -1366,6 +1516,8 @@ void MultiLinePrimitive::moveSpeed(const TPointD &delta) {
 void MultiLinePrimitive::draw() {
   UINT size = m_vertex.size();
 
+  drawSnap();
+
   if ((m_isEditing || m_isPrompting) && size > 0) {
     tglColor(m_isEditing ? m_color : TPixel32::Green);
     std::vector<TPointD> points;
@@ -1448,6 +1600,9 @@ void MultiLinePrimitive::leftButtonDown(const TPointD &pos,
   TUndoManager::manager()->add(m_undo);
   m_mousePosition = pos;
 
+  TPointD newPos;
+  newPos = getSnap(pos);
+
   // Se clicco nell'ultimo vertice chiudo la linea.
   TPointD _pos       = pos;
   if (m_closed) _pos = m_vertex.front();
@@ -1455,7 +1610,7 @@ void MultiLinePrimitive::leftButtonDown(const TPointD &pos,
   if (e.isShiftPressed() && !m_vertex.empty())
     addVertex(rectify(m_vertex.back(), _pos));
   else
-    addVertex(_pos);
+    addVertex(newPos);
   m_undo->setNewVertex(m_vertex);
 
   m_beforeSpeedMoved = m_speedMoved;
@@ -1482,35 +1637,40 @@ void MultiLinePrimitive::leftButtonDrag(const TPointD &pos,
 void MultiLinePrimitive::leftButtonDoubleClick(const TPointD &,
                                                const TMouseEvent &e) {
   endLine();
+  resetSnap();
 }
 
 //-----------------------------------------------------------------------------
 
 void MultiLinePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   if (m_closed) endLine();
+  resetSnap();
 }
 
 //-----------------------------------------------------------------------------
 
 void MultiLinePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   m_ctrlDown = e.isCtrlPressed();
+  TPointD newPos;
+  newPos = calculateSnap(pos);
+
   if (m_isEditing) {
     if (e.isShiftPressed() && !m_vertex.empty())
-      m_mousePosition = rectify(m_vertex.back(), pos);
+      m_mousePosition = rectify(m_vertex.back(), newPos);
     else
-      m_mousePosition = pos;
+      m_mousePosition = newPos;
 
     double dist = joinDistance * joinDistance;
 
-    if (!m_vertex.empty() && (tdistance2(m_mousePosition, m_vertex.front()) <
-                              dist * m_tool->getPixelSize())) {
+    if (!m_vertex.empty() &&
+        (tdistance2(pos, m_vertex.front()) < dist * m_tool->getPixelSize())) {
       m_closed        = true;
       m_mousePosition = m_vertex.front();
     } else
       m_closed = false;
 
   } else
-    m_mousePosition = pos;
+    m_mousePosition = newPos;
   m_tool->invalidate();
 }
 
@@ -1618,6 +1778,8 @@ void MultiLinePrimitive::onImageChanged() { onActivate(); }
 void LinePrimitive::draw() {
   UINT size = m_vertex.size();
 
+  drawSnap();
+
   tglColor(TPixel32::Red);
 
   if (m_isEditing || m_isPrompting) {
@@ -1627,6 +1789,13 @@ void LinePrimitive::draw() {
     tglVertex(m_mousePosition);
     glEnd();
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void LinePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
+  TPointD newPos = calculateSnap(pos);
+  m_tool->invalidate();
 }
 
 //-----------------------------------------------------------------------------
@@ -1651,24 +1820,26 @@ void LinePrimitive::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
   if (!m_isEditing) return;
 
-  m_mousePosition = pos;
+  TPointD newPos = getSnap(pos);
 
-  TPointD _pos = pos;
+  m_mousePosition = newPos;
+
+  TPointD _pos = newPos;
 
   if (m_param->m_pencil.getValue() &&
       (m_param->m_targetType & TTool::ToonzImage ||
        m_param->m_targetType & TTool::RasterImage)) {
     if (m_param->m_rasterToolSize.getValue() % 2 != 0)
-      _pos = TPointD((int)pos.x, (int)pos.y);
+      _pos = TPointD((int)newPos.x, (int)newPos.y);
     else
-      _pos = TPointD((int)pos.x + 0.5, (int)pos.y + 0.5);
+      _pos = TPointD((int)newPos.x + 0.5, (int)newPos.y + 0.5);
   }
 
   if (m_vertex.size() == 0)
     addVertex(_pos);
   else {
     if (e.isShiftPressed() && !m_vertex.empty())
-      addVertex(rectify(m_vertex.back(), _pos));
+      addVertex(rectify(m_vertex.back(), pos));
     else
       addVertex(_pos);
     endLine();
@@ -1679,19 +1850,25 @@ void LinePrimitive::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
 void LinePrimitive::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (!m_isEditing) return;
+  TPointD newPos = calculateSnap(pos);
 
-  m_mousePosition = pos;
+  m_mousePosition = newPos;
 }
 //-----------------------------------------------------------------------------
 
 void LinePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
-  m_mousePosition = pos;
+  // snapping
+  TPointD newPos = getSnap(pos);
+
+  m_mousePosition = newPos;
   if (e.isShiftPressed() && !m_vertex.empty())
     m_vertex.push_back(rectify(m_vertex.back(), pos));
   else
-    m_vertex.push_back(pos);
+    m_vertex.push_back(newPos);
 
   endLine();
+
+  resetSnap();
 }
 //-----------------------------------------------------------------------------
 
@@ -1700,6 +1877,7 @@ void LinePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 //-----------------------------------------------------------------------------
 
 void EllipsePrimitive::draw() {
+  drawSnap();
   if (m_isEditing || m_isPrompting ||
       areAlmostEqual(m_selectingRect.x0, m_selectingRect.x1) ||
       areAlmostEqual(m_selectingRect.y0, m_selectingRect.y1)) {
@@ -1722,12 +1900,12 @@ void EllipsePrimitive::draw() {
 void EllipsePrimitive::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
   TTool::Application *app = TTool::getApplication();
   if (!app) return;
-
-  m_startPoint       = pos;
-  m_selectingRect.x0 = pos.x;
-  m_selectingRect.y0 = pos.y;
-  m_selectingRect.x1 = pos.x;
-  m_selectingRect.y1 = pos.y;
+  TPointD newPos     = getSnap(pos);
+  m_startPoint       = newPos;
+  m_selectingRect.x0 = newPos.x;
+  m_selectingRect.y0 = newPos.y;
+  m_selectingRect.x1 = newPos.x;
+  m_selectingRect.y1 = newPos.y;
 
   if (app->getCurrentObject()->isSpline()) {
     m_isEditing = true;
@@ -1760,7 +1938,7 @@ void EllipsePrimitive::leftButtonDrag(const TPointD &realPos,
     pos.y = (realPos.y > m_startPoint.y) ? m_startPoint.y + distance
                                          : m_startPoint.y - distance;
   } else {
-    pos = realPos;
+    pos = calculateSnap(realPos);
   }
   m_pos = pos;
 
@@ -1801,7 +1979,8 @@ void EllipsePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void EllipsePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  m_pos = pos;
+  m_pos = calculateSnap(pos);
+  m_tool->invalidate();
 }
 
 //-----------------------------------------------------------------------------
@@ -1823,6 +2002,8 @@ void EllipsePrimitive::onEnter() {
 //-----------------------------------------------------------------------------
 
 void ArcPrimitive::draw() {
+  drawSnap();
+
   switch (m_clickNumber) {
   case 1:
     tglColor(m_color);
@@ -1859,6 +2040,8 @@ void ArcPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   TTool::Application *app = TTool::getApplication();
   if (!app) return;
 
+  TPointD newPos = getSnap(pos);
+
   std::vector<TThickPoint> points(9);
   double thick = getThickness();
 
@@ -1880,13 +2063,13 @@ void ArcPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 
     if (!m_isEditing) return;
 
-    m_endPoint = m_startPoint = pos;
+    m_endPoint = m_startPoint = newPos;
     m_clickNumber++;
     break;
 
   case 1:
     points[0] = TThickPoint(m_startPoint, thick);
-    points[8] = TThickPoint(pos, thick);
+    points[8] = TThickPoint(newPos, thick);
     points[4] = TThickPoint(0.5 * (points[0] + points[8]), thick);
     points[2] = TThickPoint(0.5 * (points[0] + points[4]), thick);
     points[6] = TThickPoint(0.5 * (points[4] + points[8]), thick);
@@ -1906,21 +2089,23 @@ void ArcPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
     m_clickNumber = 0;
     break;
   }
+  resetSnap();
 }
 
 //-----------------------------------------------------------------------------
 
 void ArcPrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
+  TPointD newPos = calculateSnap(pos);
+
   switch (m_clickNumber) {
   case 1:
     if (e.isShiftPressed())
       m_endPoint = rectify(m_startPoint, pos);
     else
-      m_endPoint = pos;
-    m_tool->invalidate();
+      m_endPoint = newPos;
     break;
   case 2:
-    m_centralPoint = TThickPoint(pos, getThickness());
+    m_centralPoint = TThickPoint(newPos, getThickness());
     TThickQuadratic q(m_stroke->getControlPoint(0), m_centralPoint,
                       m_stroke->getControlPoint(8));
     TThickQuadratic q0, q1, q00, q01, q10, q11;
@@ -1942,10 +2127,9 @@ void ArcPrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
     m_stroke->setControlPoint(6, q10.getP2());
     m_stroke->setControlPoint(7, q11.getP1());
     m_stroke->setControlPoint(8, q11.getP2());
-
-    m_tool->invalidate();
     break;
   }
+  m_tool->invalidate();
 }
 
 //-----------------------------------------------------------------------------
@@ -1967,6 +2151,7 @@ void ArcPrimitive::onEnter() {
 //-----------------------------------------------------------------------------
 
 void PolygonPrimitive::draw() {
+  drawSnap();
   if (!m_isEditing && !m_isPrompting) return;
   tglColor(m_isEditing ? m_color : TPixel32::Green);
 
@@ -2006,7 +2191,7 @@ void PolygonPrimitive::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
 
   if (!m_isEditing) return;
 
-  m_centre = pos;
+  m_centre = getSnap(pos);
   m_radius = 0;
 }
 
@@ -2079,4 +2264,11 @@ void PolygonPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   m_isEditing = false;
 
   m_tool->addStroke();
+}
+
+//-----------------------------------------------------------------------------
+
+void PolygonPrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
+  TPointD newPos = calculateSnap(pos);
+  m_tool->invalidate();
 }
