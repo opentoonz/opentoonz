@@ -1055,20 +1055,22 @@ void BrushTool::onActivate() {
     m_accuracy.setValue(BrushAccuracy);
     m_smooth.setValue(BrushSmooth);
     m_hardness.setValue(RasterBrushHardness);
-    m_frameRange.setIndex(VectorBrushFrameRange);
-    m_snap.setValue(VectorBrushSnap);
-    m_snapSensitivity.setIndex(VectorBrushSnapSensitivity);
-    switch (VectorBrushSnapSensitivity) {
-    case 0:
-      m_minDistance2 = SNAPPING_LOW;
-      break;
-    case 1:
-      m_minDistance2 = SNAPPING_MEDIUM;
-      break;
-    case 2:
-      m_minDistance2 = SNAPPING_HIGH;
-      break;
-    }
+	if (m_targetType & TTool::Vectors) {
+		m_frameRange.setIndex(VectorBrushFrameRange);
+		m_snap.setValue(VectorBrushSnap);
+		m_snapSensitivity.setIndex(VectorBrushSnapSensitivity);
+		switch (VectorBrushSnapSensitivity) {
+		case 0:
+			m_minDistance2 = SNAPPING_LOW;
+			break;
+		case 1:
+			m_minDistance2 = SNAPPING_MEDIUM;
+			break;
+		case 2:
+			m_minDistance2 = SNAPPING_HIGH;
+			break;
+		}
+	}
   }
   if (m_targetType & TTool::ToonzImage) {
     m_brushPad = ToolUtils::getBrushPad(m_rasThickness.getValue().second,
