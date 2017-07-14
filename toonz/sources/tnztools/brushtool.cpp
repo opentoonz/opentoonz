@@ -1027,6 +1027,7 @@ void BrushTool::onActivate() {
     m_accuracy.setValue(BrushAccuracy);
     m_smooth.setValue(BrushSmooth);
     m_hardness.setValue(RasterBrushHardness);
+	if (m_targetType & TTool::Vectors)
     m_guidedDrawing.setIndex(VectorGuidedDrawing);
   }
   if (m_targetType & TTool::ToonzImage) {

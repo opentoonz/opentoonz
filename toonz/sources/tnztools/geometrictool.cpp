@@ -801,6 +801,7 @@ public:
       m_param.m_selective.setValue(GeometricSelective ? 1 : 0);
       m_param.m_autogroup.setValue(GeometricGroupIt ? 1 : 0);
       m_param.m_autofill.setValue(GeometricAutofill ? 1 : 0);
+	  if (m_param.m_targetType & TTool::Vectors)
       m_param.m_guidedDrawing.setIndex(GeometricGuidedDrawing);
       std::wstring typeCode = ::to_wstring(GeometricType.getValue());
       m_param.m_type.setValue(typeCode);
