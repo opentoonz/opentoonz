@@ -1571,24 +1571,7 @@ void SceneViewer::drawScene() {
   TXshSimpleLevel::m_fillFullColorRaster = false;
 
   // Guided Drawing Check
-  std::string toolName = app->getCurrentTool()->getTool()->getName();
-  int useGuidedDrawing = 0;
-  if (toolName == "T_Brush" || toolName == "T_Geometric") {
-    TPropertyGroup *toolProps =
-        app->getCurrentTool()->getTool()->getProperties(0);
-    int count = toolProps->getPropertyCount();
-    TProperty *toolProperty;
-    for (int i = 0; i < count; i++) {
-      toolProperty = toolProps->getProperty(i);
-      if (toolProperty->getName() == "Guided") {
-        std::string guidedValue = toolProperty->getValueAsString();
-        if (guidedValue == "None") useGuidedDrawing     = 0;
-        if (guidedValue == "Closest") useGuidedDrawing  = 1;
-        if (guidedValue == "Farthest") useGuidedDrawing = 2;
-        if (guidedValue == "All") useGuidedDrawing      = 3;
-      }
-    }
-  }
+  int useGuidedDrawing = Preferences::instance()->getGuidedDrawing();
 
   m_minZ = 0;
   if (is3DView()) {

@@ -51,7 +51,6 @@ TEnv::DoubleVar GeometricOpacity("InknpaintGeometricOpacity", 100);
 TEnv::IntVar GeometricCapStyle("InknpaintGeometricCapStyle", 0);
 TEnv::IntVar GeometricJoinStyle("InknpaintGeometricJoinStyle", 0);
 TEnv::IntVar GeometricMiterValue("InknpaintGeometricMiterValue", 4);
-TEnv::IntVar GeometricGuidedDrawing("InknPaintGeometricGuidedDrawing", 0);
 
 //-------------------------------------------------------------------
 
@@ -303,7 +302,6 @@ public:
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
-  TEnumProperty m_guidedDrawing;
   TPropertyGroup m_prop[2];
 
   int m_targetType;
@@ -323,8 +321,7 @@ public:
       , m_capStyle("Cap")
       , m_joinStyle("Join")
       , m_miterJoinLimit("Miter:", 0, 100, 4)
-      , m_targetType(targetType)
-      , m_guidedDrawing("Guided") {
+      , m_targetType(targetType) {
     if (targetType & TTool::Vectors) m_prop[0].bind(m_toolSize);
     if (targetType & TTool::ToonzImage || targetType & TTool::RasterImage) {
       m_prop[0].bind(m_rasterToolSize);
@@ -343,15 +340,6 @@ public:
       m_prop[0].bind(m_selective);
       m_prop[0].bind(m_pencil);
       m_pencil.setId("PencilMode");
-    }
-
-    if (targetType & TTool::Vectors) {
-      m_prop[0].bind(m_guidedDrawing);
-      m_guidedDrawing.setId("GuidedDrawing");
-      m_guidedDrawing.addValue(L"None");
-      m_guidedDrawing.addValue(L"Closest");
-      m_guidedDrawing.addValue(L"Farthest");
-      m_guidedDrawing.addValue(L"All");
     }
 
     m_capStyle.addValue(BUTT_WSTR);
@@ -391,7 +379,6 @@ public:
     m_capStyle.setQStringName(tr("Cap"));
     m_joinStyle.setQStringName(tr("Join"));
     m_miterJoinLimit.setQStringName(tr("Miter:"));
-    m_guidedDrawing.setQStringName(tr("Guided"));
   }
 };
 
@@ -801,8 +788,6 @@ public:
       m_param.m_selective.setValue(GeometricSelective ? 1 : 0);
       m_param.m_autogroup.setValue(GeometricGroupIt ? 1 : 0);
       m_param.m_autofill.setValue(GeometricAutofill ? 1 : 0);
-	  if (m_param.m_targetType & TTool::Vectors)
-      m_param.m_guidedDrawing.setIndex(GeometricGuidedDrawing);
       std::wstring typeCode = ::to_wstring(GeometricType.getValue());
       m_param.m_type.setValue(typeCode);
       GeometricType = ::to_string(typeCode);
@@ -887,9 +872,7 @@ public:
             QString::fromStdString(getName()));
       }
       GeometricGroupIt = m_param.m_autofill.getValue();
-    } else if (propertyName == m_param.m_guidedDrawing.getName())
-      GeometricGuidedDrawing = m_param.m_guidedDrawing.getIndex();
-    else if (propertyName == m_param.m_selective.getName())
+    } else if (propertyName == m_param.m_selective.getName())
       GeometricSelective = m_param.m_selective.getValue();
     else if (propertyName == m_param.m_pencil.getName())
       GeometricPencil = m_param.m_pencil.getValue();

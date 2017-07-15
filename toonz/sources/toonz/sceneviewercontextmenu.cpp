@@ -176,7 +176,23 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   if (Preferences::instance()->isOnionSkinEnabled() &&
       !parent->isPreviewEnabled())
     OnioniSkinMaskGUI::addOnionSkinCommand(this);
-
+  QMenu *guidedDrawingMenu = addMenu(tr("Vector Guided Drawing"));
+  action                   = guidedDrawingMenu->addAction(tr("Off"));
+  ret                      = ret &&
+        parent->connect(action, SIGNAL(triggered()), this,
+                        SLOT(setGuidedDrawingOff()));
+  action = guidedDrawingMenu->addAction(tr("Closest Drawing"));
+  ret    = ret &&
+        parent->connect(action, SIGNAL(triggered()), this,
+                        SLOT(setGuidedDrawingClosest()));
+  action = guidedDrawingMenu->addAction(tr("Farthest Drawing"));
+  ret    = ret &&
+        parent->connect(action, SIGNAL(triggered()), this,
+                        SLOT(setGuidedDrawingFarthest()));
+  action = guidedDrawingMenu->addAction(tr("All Drawings"));
+  ret    = ret &&
+        parent->connect(action, SIGNAL(triggered()), this,
+                        SLOT(setGuidedDrawingAll()));
   // Zero Thick
   if (!parent->isPreviewEnabled())
     ZeroThickToggleGui::addZeroThickCommand(this);
@@ -383,6 +399,26 @@ void SceneViewerContextMenu::onSetCurrent() {
     app->getCurrentObject()->setObjectId(id);
     app->getCurrentTool()->setTool(T_Edit);
   }
+}
+
+//-----------------------------------------------------------------------------
+void SceneViewerContextMenu::setGuidedDrawingOff() {
+  Preferences::instance()->setGuidedDrawing(0);
+}
+
+//-----------------------------------------------------------------------------
+void SceneViewerContextMenu::setGuidedDrawingClosest() {
+  Preferences::instance()->setGuidedDrawing(1);
+}
+
+//-----------------------------------------------------------------------------
+void SceneViewerContextMenu::setGuidedDrawingFarthest() {
+  Preferences::instance()->setGuidedDrawing(2);
+}
+
+//-----------------------------------------------------------------------------
+void SceneViewerContextMenu::setGuidedDrawingAll() {
+  Preferences::instance()->setGuidedDrawing(3);
 }
 
 //-----------------------------------------------------------------------------

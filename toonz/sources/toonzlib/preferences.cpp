@@ -313,6 +313,7 @@ Preferences::Preferences()
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
+    , m_guidedDrawingType(0)
     , m_watchFileSystem(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -587,6 +588,7 @@ Preferences::Preferences()
   setShortcutPreset(m_shortcutPreset.toStdString());
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "guidedDrawingType", m_guidedDrawingType);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
@@ -1373,6 +1375,13 @@ int Preferences::matchLevelFormat(const TFilePath &fp) const {
 void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
   m_useNumpadForSwitchingStyles = on;
   m_settings->setValue("useNumpadForSwitchingStyles", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setGuidedDrawing(int status) {
+  m_guidedDrawingType = status;
+  m_settings->setValue("guidedDrawingType", status);
 }
 
 //-----------------------------------------------------------------
