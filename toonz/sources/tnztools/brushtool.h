@@ -186,7 +186,7 @@ protected:
   double m_minThick, m_maxThick;
 
   // for snapping
-  int m_strokeIndex1, m_strokeIndex2;
+  int m_strokeIndex1, m_strokeIndex2, m_col, m_firstFrame;
   double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
 
   TRectD m_modifiedRegion;
