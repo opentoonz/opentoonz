@@ -337,7 +337,7 @@ public:
       , m_joinStyle("Join")
       , m_miterJoinLimit("Miter:", 0, 100, 4)
       , m_snap("Snap", false)
-      , m_snapSensitivity("Sensitivity")
+      , m_snapSensitivity("Sensitivity:")
       , m_targetType(targetType) {
     if (targetType & TTool::Vectors) m_prop[0].bind(m_toolSize);
     if (targetType & TTool::ToonzImage || targetType & TTool::RasterImage) {
