@@ -73,12 +73,12 @@ TEnv::IntVar VectorBrushSnapSensitivity("VectorBrushSnapSensitivity", 0);
 #define CUSTOM_WSTR L"<custom>"
 
 #define LINEAR_WSTR L"Linear"
-#define EASEIN_WSTR L"Ease In"
-#define EASEOUT_WSTR L"Ease Out"
-#define EASEINOUT_WSTR L"Ease In / Ease Out"
+#define EASEIN_WSTR L"In"
+#define EASEOUT_WSTR L"Out"
+#define EASEINOUT_WSTR L"In&Out"
 
 #define LOW_WSTR L"Low"
-#define MEDIUM_WSTR L"Medium"
+#define MEDIUM_WSTR L"Med"
 #define HIGH_WSTR L"High"
 
 const double SNAPPING_LOW    = 5.0;
