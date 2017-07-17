@@ -91,16 +91,22 @@ enum class PredefinedRect {
   PREVIEW_LAYER_AREA,  //! clickable area larger than preview icon, containing
                        //! it
   PREVIEW_LAYER,
-  LOCK,
+  LOCK_AREA,           //! clickable area larger than lock icon, containing it
+  LOCK,                //! the lock icon itself
   DRAG_LAYER,  //! draggable area in layer header
   LAYER_NAME,  //! where to display column name. clicking will rename
-  LAYER_NUMBER,
+  LAYER_NUMBER,  //! where to display column number.
   SOUND_ICON,
   VOLUME_TRACK,       //! area where track is displayed
   VOLUME_AREA,        //! active area for volume control
   LOOP_ICON,          //! area for repeat animation icon
-  LAYER_HEADER_PANEL  //! panel displaying headers for the layer rows in
-                      //! timeline mode
+  LAYER_HEADER_PANEL, //! panel displaying headers for the layer rows in
+					  //! timeline mode
+  THUMBNAIL_AREA,     //! area for header thumbnails and other icons
+  THUMBNAIL,          //! the actual thumbnail, if there is one
+  PEGBAR_NAME,        //! where to display pegbar name
+  PARENT_HANDLE_NAME, //! where to display parent handle number
+  FILTER_COLOR        //! where to show layer's filter color
 };
 enum class PredefinedLine {
   LOCKED,              //! dotted vertical line when cell is locked

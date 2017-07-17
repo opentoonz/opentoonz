@@ -174,6 +174,7 @@ private slots:
   void onUseNumpadForSwitchingStylesClicked(bool);
   void onShowXSheetToolbarClicked(bool);
   void onExpandFunctionHeaderClicked(bool);
+  void onShowColumnNumbersChanged(int);
   void onUseArrowKeyToShiftCellSelectionClicked(int);
   void onInputCellsWithoutDoubleClickingClicked(int);
   void onWatchFileSystemClicked(int);

@@ -182,7 +182,7 @@ protected slots:
 class ColumnArea final : public QWidget {
   Q_OBJECT
 
-  enum { ToggleTransparency = 1, TogglePreviewVisible, ToggleLock };
+  enum { ToggleTransparency = 1, ToggleAllTransparency, TogglePreviewVisible, ToggleAllPreviewVisible, ToggleLock, ToggleAllLock };
 
   ColumnTransparencyPopup *m_columnTransparencyPopup;
   QTimer *m_transparencyPopupTimer;
@@ -244,6 +244,10 @@ class ColumnArea final : public QWidget {
     void drawLock() const;
     void drawColumnNumber() const;
     void drawColumnName() const;
+	void drawThumbnail(QPixmap &iconPixmap) const;
+	void drawPegbarName() const;
+	void drawParentHandleName() const;
+	void drawFilterColor() const;
 
     void drawSoundIcon(bool isPlaying) const;
     void drawVolumeControl(double volume) const;
@@ -256,6 +260,9 @@ public:
   ColumnArea(XsheetViewer *parent, Qt::WFlags flags = 0);
 #endif
   ~ColumnArea();
+
+  void onControlPressed(bool pressed);
+  const bool isControlPressed();
 
   void drawFoldedColumnHead(QPainter &p, int col);
   void drawLevelColumnHead(QPainter &p, int col);

@@ -310,7 +310,8 @@ Preferences::Preferences()
     , m_useNumpadForSwitchingStyles(true)
     , m_showXSheetToolbar(false)
     , m_expandFunctionHeader(false)
-    , m_useArrowKeyToShiftCellSelection(false)
+	, m_showColumnNumbers(false)
+	, m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
     , m_watchFileSystem(true) {
@@ -589,6 +590,7 @@ Preferences::Preferences()
            m_useNumpadForSwitchingStyles);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
+  getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
            m_useArrowKeyToShiftCellSelection);
   getValue(*m_settings, "inputCellsWithoutDoubleClickingEnabled",
@@ -1387,6 +1389,11 @@ void Preferences::enableShowXSheetToolbar(bool on) {
 void Preferences::enableExpandFunctionHeader(bool on) {
   m_expandFunctionHeader = on;
   m_settings->setValue("expandFunctionHeader", on ? "1" : "0");
+}
+
+void Preferences::enableShowColumnNumbers(bool on) {
+	m_showColumnNumbers = on;
+	m_settings->setValue("showColumnNumbers", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

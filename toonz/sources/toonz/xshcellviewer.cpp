@@ -764,8 +764,6 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
   cellSelection->getSelectedCells(r0, c0, r1, c1);
   stride.setFrame(cellSelection->getSelectedCells().getRowCount());
 
-//  CellPosition offset = m_viewer->orientation()->arrowShift(event->key());
-
   CellPosition offset;
   switch (int key = event->key()) {
   case Qt::Key_Up:
@@ -1448,11 +1446,18 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   TXsheet *xsh  = m_viewer->getXsheet();
   TXshCell cell = xsh->getCell(row, col);
   TXshCell prevCell;
-  if (row > 0) prevCell = xsh->getCell(row - 1, col);
+
+  TCellSelection *cellSelection = m_viewer->getCellSelection();
+  TColumnSelection *columnSelection = m_viewer->getColumnSelection();
+  bool isSelected = cellSelection->isCellSelected(row, col) ||
+	  columnSelection->isColumnSelected(col);
+
+  if (row > 0) prevCell = xsh->getCell(row - 1, col); // cell in previous frame
+													  // nothing to draw
+  if (cell.isEmpty() && prevCell.isEmpty()) return;
   TXshCell nextCell;
   nextCell = xsh->getCell(row + 1, col);
 
-  if (cell.isEmpty() && prevCell.isEmpty()) return;
   QPoint xy  = m_viewer->positionToXY(CellPosition(row, col));
   int x      = xy.x();
   int y      = xy.y();
@@ -1465,8 +1470,10 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   }
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
   QRect rect = cellRect.adjusted(1, 1, 0, 0);
-  if (cell.isEmpty()) {  // vuol dire che la precedente non e' vuota
-    p.setPen(m_viewer->getLightLineColor());
+  if (cell.isEmpty()) { // diagonal cross meaning end of level
+	  QColor levelEndColor = m_viewer->getTextColor();
+	  levelEndColor.setAlphaF(0.3);
+	  p.setPen(levelEndColor);
     p.drawLine(rect.topLeft(), rect.bottomRight());
     p.drawLine(rect.topRight(), rect.bottomLeft());
     return;
@@ -1474,36 +1481,35 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
 
   int levelType;
   QColor cellColor, sideColor;
-  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell);
+  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
+	  isSelected);
 
+  // paint cell
   p.fillRect(rect, QBrush(cellColor));
 
-  if (nextCell.isEmpty() ||
-      cell.m_level.getPointer() != nextCell.m_level.getPointer()) {
-    QPainterPath path(QPointF(x, y));
-    path.lineTo(QPointF(x + 6, y));
-    path.lineTo(QPointF(x + 6, y + 2));
-    path.lineTo(QPointF(x, y + o->cellHeight() - 2));
-    p.fillPath(path, QBrush(sideColor));
-  } else
-    p.fillRect(QRect(x, y, 6, o->cellHeight()), QBrush(sideColor));
+  drawDragHandle(p, xy, sideColor);
 
+  bool isLastRow = nextCell.isEmpty() ||
+      cell.m_level.getPointer() != nextCell.m_level.getPointer();
+  drawEndOfDragHandle(p, isLastRow, xy, cellColor);
+
+  drawLockedDottedLine(p, xsh->getColumn(col)->isLocked(), xy, cellColor);
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
-  TFrameId fid = cell.m_frameId;
-  if (sameLevel &&
-      prevCell.m_frameId == fid) {  // cella uguale a quella precedente
-    // non scrivo nulla e disegno una linea verticale
-    QPen oldPen = p.pen();
-    p.setPen(QPen(Qt::black, 1, Qt::DotLine));
-    int x = rect.center().x();
-    p.drawLine(x, rect.top(), x, rect.bottom());
-    p.setPen(oldPen);
-    return;
+  int distance, offset;
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+	  distance, offset);
+  bool isAfterMarkers = (row - offset) % distance == 0 && distance != 0 && row != 0;
+
+  // draw marker interval
+  if (isAfterMarkers) {
+	  p.setPen(m_viewer->getMarkerLineColor());
+	  p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
   }
-  QString text = cell.getSoundTextLevel()->getFrameText(fid.getNumber() - 1);
+
   p.setPen(Qt::black);
-  QRect nameRect = rect.adjusted(8, -H_ADJUST, -10, H_ADJUST);
+  QRect nameRect = o->rect(PredefinedRect::CELL_NAME).translated(QPoint(x, y));
+
 // il nome va scritto se e' diverso dalla cella precedente oppure se
 // siamo su una marker line
 #ifdef _WIN32
@@ -1514,6 +1520,20 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
+  // if the same level & same fId with the previous cell,
+  // draw continue line
+  if (sameLevel && prevCell.m_frameId == cell.m_frameId) {
+	  // not on line marker
+	  PredefinedLine which =
+		  Preferences::instance()->isLevelNameOnEachMarkerEnabled()
+		  ? PredefinedLine::CONTINUE_LEVEL_WITH_NAME
+		  : PredefinedLine::CONTINUE_LEVEL;
+	  QLine continueLine = o->line(which).translated(xy);
+	  p.drawLine(continueLine);
+  }
+
+  QString text = cell.getSoundTextLevel()->getFrameText(cell.m_frameId.getNumber() - 1);
+
 #if QT_VERSION >= 0x050500
   QFontMetrics metric(font);
   QString elidaName = elideText(text, metric, nameRect.width(), "~");
@@ -1521,8 +1541,8 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   QString elidaName = elideText(text, font, nameRect.width(), "~");
 #endif
 
-  if (!sameLevel || prevCell.m_frameId != fid)
-    p.drawText(nameRect, Qt::AlignLeft, elidaName);
+  if (!sameLevel || prevCell.m_frameId != cell.m_frameId)
+	  p.drawText(nameRect, Qt::AlignLeft | Qt::AlignBottom, elidaName);
 }
 
 //-----------------------------------------------------------------------------
@@ -2194,7 +2214,7 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
              o->rect(PredefinedRect::LOOP_ICON)
                  .contains(mouseInCell))  // cycle toggle of key frames
     m_tooltip = tr("Set the cycle of previous keyframes");
-  else if ((!xsh->getCell(row, col).isEmpty() || isSoundColumn) && x < 6)
+  else if ((!xsh->getCell(row, col).isEmpty()) && o->rect(PredefinedRect::DRAG_AREA).contains(mouseInCell))
     m_tooltip = tr("Click and drag to move the selection");
   else if (isZeraryColumn)
     m_tooltip = QString::fromStdWString(column->getZeraryFxColumn()
@@ -2225,13 +2245,16 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
                       : QString::fromStdWString(levelName) + QString(" ") +
                             QString::fromStdString(frameNumber));
     }
-  } else if (isSoundColumn && x > o->cellWidth() - 6 && x < o->cellWidth())
+  } else if (isSoundColumn && o->rect(PredefinedRect::PREVIEW_TRACK).contains(mouseInCell))
     m_tooltip = tr("Click and drag to play");
   else if (m_levelExtenderRect.contains(pos))
     m_tooltip = tr("Click and drag to repeat selected cells");
   else if (isSoundColumn && rectContainsPos(m_soundLevelModifyRects, pos)) {
-    setCursor(Qt::SplitVCursor);
-    m_tooltip = tr("");
+	  if (o->isVerticalTimeline())
+		  setCursor(Qt::SplitVCursor);
+	  else
+		  setCursor(Qt::SplitHCursor);
+	  m_tooltip = tr("");
   } else
     m_tooltip = tr("");
 }

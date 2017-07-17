@@ -362,6 +362,9 @@ public:
   void enableExpandFunctionHeader(bool on);
   bool isExpandFunctionHeaderEnabled() const { return m_expandFunctionHeader; }
 
+  void enableShowColumnNumbers(bool on);
+  bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
+
   // Animation  tab
 
   void setKeyframeType(int s);
@@ -503,7 +506,7 @@ private:
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
       m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar,
-      m_expandFunctionHeader;
+      m_expandFunctionHeader, m_showColumnNumbers;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,

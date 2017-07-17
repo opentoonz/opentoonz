@@ -11,6 +11,8 @@
 #include "toonz/txsheethandle.h"
 #include "toonz/tobjecthandle.h"
 
+#include "toonz/preferences.h"
+
 using XsheetGUI::ColumnArea;
 
 #if QT_VERSION >= 0x050500
@@ -56,6 +58,7 @@ QLine rightSide(const QRect &r) { return QLine(r.topRight(), r.bottomRight()); }
 
 void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
   QPainter p(this);
+  p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
   const Orientation *o = Orientations::leftToRight();
 
@@ -70,13 +73,18 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
            ColumnArea::Pixmaps::cameraStand());
   drawIcon(p, PredefinedRect::LOCK, QColor(255, 255, 255, 128),
            ColumnArea::Pixmaps::lock());
-  drawIcon(p, PredefinedRect::SOUND_ICON, boost::none,
-           ColumnArea::Pixmaps::sound());
 
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
-  p.drawText(numberRect, Qt::AlignCenter | Qt::TextSingleLine, "#");
 
-  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME).adjusted(2, 0, -1, 0);
+  int leftadj = 2;
+  if (Preferences::instance()->isShowColumnNumbersEnabled())
+  {
+	  p.drawText(numberRect, Qt::AlignCenter | Qt::TextSingleLine, "#");
+
+	  leftadj += 20;
+  }
+
+  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME).adjusted(leftadj, 0, -1, 0);
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QObject::tr("Layer name"));
 
@@ -86,7 +94,7 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 void LayerHeaderPanel::drawIcon(QPainter &p, PredefinedRect rect,
                                 optional<QColor> fill,
                                 const QPixmap &pixmap) const {
-  QRect iconRect = Orientations::leftToRight()->rect(rect).adjusted(-2,0,-2,0);
+  QRect iconRect = Orientations::leftToRight()->rect(rect).adjusted(-2, 0,-2, 0);
 
   if (rect == PredefinedRect::LOCK)
   {
@@ -104,11 +112,14 @@ void LayerHeaderPanel::drawLines(QPainter &p, const QRect &numberRect,
                                  const QRect &nameRect) const {
   p.setPen(withAlpha(m_viewer->getTextColor(), 0.5));
 
-  QLine line = {leftSide(shorter(numberRect)).translated(2, 0)};
+  QLine line = {leftSide(shorter(numberRect)).translated(-2, 0)};
   p.drawLine(line);
 
-  line = rightSide(shorter(numberRect)).translated(-2, 0);
-  p.drawLine(line);
+  if (Preferences::instance()->isShowColumnNumbersEnabled())
+  {
+	  line = rightSide(shorter(numberRect)).translated(-2, 0);
+	  p.drawLine(line);
+  }
 
   line = rightSide(shorter(nameRect));
   p.drawLine(line);
@@ -137,16 +148,12 @@ void LayerHeaderPanel::mousePressEvent(QMouseEvent *event) {
 	    if (o->rect(PredefinedRect::EYE_AREA).contains(pos)) {
 		    m_doOnRelease = ToggleAllPreviewVisible;
 	    }
-		// sound column
-		else if (o->rect(PredefinedRect::SOUND_ICON).contains(pos)) {
-			// do nothing
-		}
 		// camstand button
 		else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(pos)) {
 			m_doOnRelease = ToggleAllTransparency;
 		}
 		// lock button
-		else if (o->rect(PredefinedRect::LOCK).contains(pos)) {
+		else if (o->rect(PredefinedRect::LOCK_AREA).contains(pos)) {
 			m_doOnRelease = ToggleAllLock;
 		}
 	}

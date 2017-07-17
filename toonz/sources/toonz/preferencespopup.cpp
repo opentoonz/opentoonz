@@ -1002,6 +1002,10 @@ void PreferencesPopup::onExpandFunctionHeaderClicked(bool checked) {
   m_pref->enableExpandFunctionHeader(checked);
 }
 
+void PreferencesPopup::onShowColumnNumbersChanged(int index) {
+	m_pref->enableShowColumnNumbers(index == Qt::Checked);
+}
+
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onUseArrowKeyToShiftCellSelectionClicked(int on) {
@@ -1224,6 +1228,7 @@ PreferencesPopup::PreferencesPopup()
       tr("Expand Function Editor Header to Match XSheet Toolbar Height "
          "(Requires Restart)"),
       this);
+  CheckBox *showColumnNumbersCB = new CheckBox(tr("Show Column Numbers in Column Headers"), this);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1492,6 +1497,7 @@ PreferencesPopup::PreferencesPopup()
       m_pref->isInputCellsWithoutDoubleClickingEnabled());
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
+  showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -1929,7 +1935,7 @@ PreferencesPopup::PreferencesPopup()
     QGridLayout *xsheetFrameLay = new QGridLayout();
     xsheetFrameLay->setMargin(15);
     xsheetFrameLay->setHorizontalSpacing(15);
-    xsheetFrameLay->setVerticalSpacing(10);
+    xsheetFrameLay->setVerticalSpacing(11);
     {
       xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")), 0,
                                 0, Qt::AlignRight | Qt::AlignVCenter);
@@ -1955,7 +1961,8 @@ PreferencesPopup::PreferencesPopup()
       m_showXSheetToolbar->setLayout(xSheetToolbarLay);
 
       xsheetFrameLay->addWidget(m_showXSheetToolbar, 7, 0, 3, 3);
-    }
+	  xsheetFrameLay->addWidget(showColumnNumbersCB, 10, 0, 1, 2);
+	}
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
     xsheetFrameLay->setColumnStretch(2, 1);
@@ -2304,6 +2311,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onShowXSheetToolbarClicked(bool)));
   ret = ret && connect(m_expandFunctionHeader, SIGNAL(clicked(bool)),
                        SLOT(onExpandFunctionHeaderClicked(bool)));
+
+  ret = ret && connect(showColumnNumbersCB, SIGNAL(stateChanged(int)),
+	  this, SLOT(onShowColumnNumbersChanged(int)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

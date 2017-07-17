@@ -991,7 +991,8 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
   case Qt::Key_Control:
     // display the upper-directional smart tab only when the ctrl key is pressed
     m_cellArea->onControlPressed(true);
-    break;
+	m_columnArea->onControlPressed(true);
+	break;
 
   default: {
     QRect visibleRect   = m_cellArea->visibleRegion().boundingRect();
@@ -1023,10 +1024,16 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
 //-----------------------------------------------------------------------------
 // display the upper-directional smart tab only when the ctrl key is pressed
 void XsheetViewer::keyReleaseEvent(QKeyEvent *event) {
-  if (event->key() == Qt::Key_Control) m_cellArea->onControlPressed(false);
+  if (event->key() == Qt::Key_Control) {
+	  m_cellArea->onControlPressed(false);
+	  m_columnArea->onControlPressed(false);
+  }
 }
 
-void XsheetViewer::enterEvent(QEvent *) { m_cellArea->onControlPressed(false); }
+void XsheetViewer::enterEvent(QEvent *) {
+	m_cellArea->onControlPressed(false);
+	m_columnArea->onControlPressed(false);
+}
 
 //-----------------------------------------------------------------------------
 /*! scroll the cell area to make a cell at (row,col) visible
