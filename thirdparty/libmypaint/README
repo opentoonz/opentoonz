@@ -1,0 +1,18 @@
+Scripts for cross-build libmypaint for Windows (MinGW) under Debian 8 Jessie
+
+1. install mingw toolchain (via apt-get for ex)
+
+2. run ./build-all.sh
+
+----------------
+
+files:
+
+  build-all.sh    - script to do all things
+  
+  build.sh        - build selected library (for ex: ./build.sh 64 json-c)
+  
+  download-all.sh - download and unpack all sources
+  
+  mingw-vars.sh   - configuration of MinGW toolchain, configured for Debian 8
+  
