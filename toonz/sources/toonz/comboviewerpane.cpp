@@ -321,16 +321,13 @@ void ComboViewerPanel::onDrawFrame(
 
   assert(frame >= 0);
   if (frame != frameHandle->getFrameIndex() + 1) {
-    if (frameHandle->isEditingScene()) {
-      TXshColumn *column = app->getCurrentXsheet()->getXsheet()->getColumn(
-          app->getCurrentColumn()->getColumnIndex());
-      if (column) {
-        TXshSoundColumn *soundColumn = column->getSoundColumn();
-        if (soundColumn && !soundColumn->isPlaying())
-          app->getCurrentFrame()->scrubColumn(frame, frame, soundColumn);
-      }
-    }
+    int oldFrame = frameHandle->getFrame();
     frameHandle->setCurrentFrame(frame);
+    if (!frameHandle->isPlaying() && !frameHandle->isEditingLevel() &&
+        oldFrame != frameHandle->getFrame())
+      frameHandle->scrubXsheet(
+          frame - 1, frame - 1,
+          TApp::instance()->getCurrentXsheet()->getXsheet());
   }
 
   else if (settings.m_blankColor != TPixel::Transparent)
@@ -384,7 +381,8 @@ void ComboViewerPanel::showEvent(QShowEvent *event) {
   // onXshLevelSwitched(TXshLevel*)： changeWindowTitle() + updateFrameRange()
   ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
                        SLOT(onXshLevelSwitched(TXshLevel *)));
-
+  ret = ret && connect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
+                       SLOT(changeWindowTitle()));
   // updateFrameRange(): update the frame slider's range
   ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
                        SLOT(updateFrameRange()));
@@ -413,13 +411,38 @@ void ComboViewerPanel::showEvent(QShowEvent *event) {
 
 void ComboViewerPanel::hideEvent(QHideEvent *event) {
   StyleShortcutSwitchablePanel::hideEvent(event);
-  TApp *app = TApp::instance();
-  disconnect(app->getCurrentScene());
-  disconnect(app->getCurrentLevel());
-  disconnect(app->getCurrentFrame());
-  disconnect(app->getCurrentObject());
-  disconnect(app->getCurrentXsheet());
-  disconnect(app->getCurrentTool());
+  TApp *app                    = TApp::instance();
+  TFrameHandle *frameHandle    = app->getCurrentFrame();
+  TSceneHandle *sceneHandle    = app->getCurrentScene();
+  TXshLevelHandle *levelHandle = app->getCurrentLevel();
+  TObjectHandle *objectHandle  = app->getCurrentObject();
+  TXsheetHandle *xshHandle     = app->getCurrentXsheet();
+
+  disconnect(xshHandle, SIGNAL(xsheetChanged()), this, SLOT(onSceneChanged()));
+
+  disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
+  disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+             SLOT(changeWindowTitle()));
+  disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
+             SLOT(onSceneChanged()));
+  disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+             SLOT(onXshLevelSwitched(TXshLevel *)));
+  disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
+             SLOT(changeWindowTitle()));
+  disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
+             SLOT(changeWindowTitle()));
+  disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
+             SLOT(updateFrameRange()));
+
+  disconnect(frameHandle, SIGNAL(frameSwitched()), this,
+             SLOT(changeWindowTitle()));
+  disconnect(frameHandle, SIGNAL(frameSwitched()), this,
+             SLOT(onFrameChanged()));
+  disconnect(frameHandle, SIGNAL(frameTypeChanged()), this,
+             SLOT(onFrameTypeChanged()));
+
+  disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
+             SLOT(onToolSwitched()));
 
   m_flipConsole->setActive(false);
 }
@@ -811,6 +834,8 @@ void ComboViewerPanel::onPreferenceChanged(const QString &prefName) {
   StyleShortcutSwitchablePanel::onPreferenceChanged(prefName);
 }
 
+//-----------------------------------------------------------------------------
+
 void ComboViewerPanel::playAudioFrame(int frame) {
   if (m_first) {
     m_first = false;
@@ -832,6 +857,8 @@ void ComboViewerPanel::playAudioFrame(int frame) {
   TApp::instance()->getCurrentXsheet()->getXsheet()->play(m_sound, s0, s1,
                                                           false);
 }
+
+//-----------------------------------------------------------------------------
 
 bool ComboViewerPanel::hasSoundtrack() {
   if (m_sound != NULL) {
