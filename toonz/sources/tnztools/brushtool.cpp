@@ -1521,7 +1521,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
           m_firstFrameId = getFrameId();
         }
 
-        if (application) {
+        if (application && !e.isCtrlPressed()) {
           if (application->getCurrentFrame()->isEditingScene()) {
             application->getCurrentColumn()->setColumnIndex(m_col);
             application->getCurrentFrame()->setFrame(m_firstFrame);
