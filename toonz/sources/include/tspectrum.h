@@ -16,7 +16,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4251)
 #endif
 
@@ -182,7 +182,7 @@ template class DVAPI TSpectrumT<TPixel64>;
 typedef TSpectrumT<TPixel32> TSpectrum;
 typedef TSpectrumT<TPixel64> TSpectrum64;
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(default : 4251)
 #endif
 

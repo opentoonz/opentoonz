@@ -432,7 +432,7 @@ void ParsedPli::setMaxThickness(double maxThickness) {
 };
 
 /* indirect inclusion of <math.h> causes 'abs' to return double on Linux */
-#ifdef LINUX
+#if defined(LINUX) || (defined(_WIN32) && defined(__GNUC__))
 template <typename T>
 T abs_workaround(T a) {
   return (a > 0) ? a : -a;
@@ -470,7 +470,7 @@ static inline short complement2(USHORT val) {
   return (val & 0x8000) ? -(val & 0x7fff) : (val & 0x7fff);
 }
 
-#ifdef LINUX
+#if defined(LINUX) || (defined(_WIN32) && defined(__GNUC__))
 #undef abs
 #endif
 

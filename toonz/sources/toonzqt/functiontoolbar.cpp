@@ -63,8 +63,8 @@ FunctionToolbar::FunctionToolbar(QWidget *parent)
   space->setMinimumHeight(22);
   space->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-  QIcon toggleIcon      = createQIconOnOffPNG("swap", false);
-  QAction *toggleAction = new QAction(tr("&Function Editor Toggle"), this);
+  QIcon toggleIcon      = createQIconOnOff("swap", false);
+  QAction *toggleAction = new QAction(tr("&Open Function Curve Editor"), this);
   assert(toggleAction);
   toggleAction->setIcon(toggleIcon);
 

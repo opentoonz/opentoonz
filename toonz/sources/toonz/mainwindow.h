@@ -228,6 +228,7 @@ public:
 
   void addFilePath(QString path, FileType fileType);
   void moveFilePath(int fromIndex, int toIndex, FileType fileType);
+  void removeFilePath(int fromIndex, FileType fileType);
   QString getFilePath(int index, FileType fileType) const;
   void clearRecentFilesList(FileType fileType);
   void loadRecentFiles();

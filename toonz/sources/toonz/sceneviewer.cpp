@@ -466,7 +466,7 @@ public:
 //-----------------------------------------------------------------------------
 
 SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
-    : QGLWidget(parent, touchProxy())
+    : GLWidgetForHighDpi(parent, touchProxy())
     , m_pressure(0)
     , m_lastMousePos(0, 0)
     , m_mouseButton(Qt::NoButton)
@@ -765,6 +765,7 @@ TPointD SceneViewer::winToWorld(const QPoint &pos) const {
     } else
       return TAffine() * TPointD(0, 0);
   }
+
   return getViewMatrix().inv() * pp;
 }
 
@@ -1253,7 +1254,7 @@ void SceneViewer::drawOverlay() {
       else {
         glPushMatrix();
         tglMultMatrix(m_drawCameraAff);
-        m_pixelSize = sqrt(tglGetPixelSize2());
+        m_pixelSize = sqrt(tglGetPixelSize2()) * getDevPixRatio();
         ViewerDraw::drawCamera(f, m_pixelSize);
         glPopMatrix();
       }
@@ -1351,7 +1352,7 @@ void SceneViewer::drawOverlay() {
     if (tool->getToolType() & TTool::LevelTool &&
         !app->getCurrentObject()->isSpline())
       glScaled(m_dpiScale.x, m_dpiScale.y, 1);
-    m_pixelSize = sqrt(tglGetPixelSize2());
+    m_pixelSize = sqrt(tglGetPixelSize2()) * getDevPixRatio();
     tool->draw();
     glPopMatrix();
     // Used (only in the T_RGBPicker tool) to notify and set the currentColor
@@ -2556,10 +2557,12 @@ void SceneViewer::invalidateToolStatus() {
 */
 
 TRectD SceneViewer::getGeometry() const {
+  int devPixRatio = getDevPixRatio();
   TTool *tool     = TApp::instance()->getCurrentTool()->getTool();
-  TPointD topLeft = tool->getMatrix().inv() * winToWorld(geometry().topLeft());
-  TPointD bottomRight =
-      tool->getMatrix().inv() * winToWorld(geometry().bottomRight());
+  TPointD topLeft =
+      tool->getMatrix().inv() * winToWorld(geometry().topLeft() * devPixRatio);
+  TPointD bottomRight = tool->getMatrix().inv() *
+                        winToWorld(geometry().bottomRight() * devPixRatio);
 
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
   if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {

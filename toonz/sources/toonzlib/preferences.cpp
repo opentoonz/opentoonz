@@ -103,7 +103,7 @@ inline bool formatLess(const Preferences::LevelFormat &a,
 //=================================================================
 
 void getDefaultLevelFormats(LevelFormatVector &lfv) {
-  lfv.resize(1);
+  lfv.resize(3);
   {
     LevelFormat &lf = lfv[0];
 
@@ -111,6 +111,16 @@ void getDefaultLevelFormats(LevelFormatVector &lfv) {
     lf.m_pathFormat = QRegExp(".+[0-9]{4,4}\\.tga", Qt::CaseInsensitive);
     lf.m_options.m_whiteTransp = true;
     lf.m_options.m_antialias   = 70;
+
+    // for all PSD files, set the premultiply options to layers
+    lfv[1].m_name                  = Preferences::tr("Adobe Photoshop");
+    lfv[1].m_pathFormat            = QRegExp("..*\\.psd", Qt::CaseInsensitive);
+    lfv[1].m_options.m_premultiply = true;
+
+    // for all PNG files, set premultiply by default
+    lfv[2].m_name                  = Preferences::tr("PNG");
+    lfv[2].m_pathFormat            = QRegExp("..*\\.png", Qt::CaseInsensitive);
+    lfv[2].m_options.m_premultiply = true;
   }
 }
 
@@ -295,11 +305,16 @@ Preferences::Preferences()
     , m_customProjectRoot("")
     , m_precompute(true)
     , m_fastRenderPath("desktop")
-    , m_ffmpegTimeout(30)
+    , m_ffmpegTimeout(60)
     , m_shortcutPreset("defopentoonz")
     , m_useNumpadForSwitchingStyles(true)
+    , m_showXSheetToolbar(false)
+    , m_expandFunctionHeader(false)
+    , m_showColumnNumbers(false)
     , m_useArrowKeyToShiftCellSelection(false)
-    , m_inputCellsWithoutDoubleClickingEnabled(false) {
+    , m_inputCellsWithoutDoubleClickingEnabled(false)
+    , m_importPolicy(0)
+    , m_watchFileSystem(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -573,10 +588,15 @@ Preferences::Preferences()
   setShortcutPreset(m_shortcutPreset.toStdString());
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
+  getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
+  getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
            m_useArrowKeyToShiftCellSelection);
   getValue(*m_settings, "inputCellsWithoutDoubleClickingEnabled",
            m_inputCellsWithoutDoubleClickingEnabled);
+  getValue(*m_settings, "importPolicy", m_importPolicy);
+  getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
 }
 
 //-----------------------------------------------------------------
@@ -1295,6 +1315,13 @@ void Preferences::setFfmpegTimeout(int seconds) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setDefaultImportPolicy(int policy) {
+  m_importPolicy = policy;
+  m_settings->setValue("importPolicy", policy);
+}
+
+//-----------------------------------------------------------------
+
 int Preferences::addLevelFormat(const LevelFormat &format) {
   LevelFormatVector::iterator lft = m_levelFormats.insert(
       std::upper_bound(m_levelFormats.begin(), m_levelFormats.end(), format,
@@ -1352,6 +1379,25 @@ void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::enableShowXSheetToolbar(bool on) {
+  m_showXSheetToolbar = on;
+  m_settings->setValue("showXSheetToolbar", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableExpandFunctionHeader(bool on) {
+  m_expandFunctionHeader = on;
+  m_settings->setValue("expandFunctionHeader", on ? "1" : "0");
+}
+
+void Preferences::enableShowColumnNumbers(bool on) {
+  m_showColumnNumbers = on;
+  m_settings->setValue("showColumnNumbers", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableUseArrowKeyToShiftCellSelection(bool on) {
   m_useArrowKeyToShiftCellSelection = on;
   m_settings->setValue("useArrowKeyToShiftCellSelection", on ? "1" : "0");
@@ -1363,4 +1409,11 @@ void Preferences::enableInputCellsWithoutDoubleClicking(bool on) {
   m_inputCellsWithoutDoubleClickingEnabled = on;
   m_settings->setValue("inputCellsWithoutDoubleClickingEnabled",
                        on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableWatchFileSystem(bool on) {
+  m_watchFileSystem = on;
+  m_settings->setValue("watchFileSystemEnabled", on ? "1" : "0");
 }

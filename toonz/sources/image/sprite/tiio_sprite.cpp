@@ -66,7 +66,9 @@ TLevelWriterSprite::TLevelWriterSprite(const TFilePath &path,
   m_rightPadding = QString::fromStdString(rightPadding).toInt();
   m_format       = QString::fromStdWString(
       ((TEnumProperty *)(m_properties->getProperty("Format")))->getValue());
-
+  TBoolProperty *trim =
+      (TBoolProperty *)m_properties->getProperty("Trim Empty Space");
+  m_trim = trim->getValue();
   if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
 }
 
@@ -99,14 +101,16 @@ TLevelWriterSprite::~TLevelWriterSprite() {
   int spriteSheetWidth;
   int spriteSheetHeight;
   if (m_format == "Grid") {
+    // Calculate Grid Size
     while (horizDim * horizDim < m_imagesResized.size()) horizDim++;
     totalHorizPadding = horizDim * horizPadding;
     spriteSheetWidth  = horizDim * resizedWidth + totalHorizPadding;
     vertDim           = horizDim;
+    // Figure out if there is one row too many (Such as 6 images needs 3 x 2 grid)
     if (vertDim * vertDim - vertDim >= m_imagesResized.size()) {
       vertDim          = vertDim - 1;
-      totalVertPadding = vertDim * vertPadding;
     }
+    totalVertPadding = vertDim * vertPadding;
     spriteSheetHeight = vertDim * resizedHeight + totalVertPadding;
   } else if (m_format == "Vertical") {
     spriteSheetWidth  = resizedWidth + horizPadding;
@@ -115,7 +119,6 @@ TLevelWriterSprite::~TLevelWriterSprite() {
   } else if (m_format == "Horizontal") {
     spriteSheetWidth  = m_imagesResized.size() * (resizedWidth + horizPadding);
     spriteSheetHeight = resizedHeight + vertPadding;
-    ;
     horizDim = m_imagesResized.size();
   }
 
@@ -192,6 +195,8 @@ void TLevelWriterSprite::saveSoundTrack(TSoundTrack *st) {}
 //-----------------------------------------------------------
 
 void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
+  m_frameIndexOrder.push_back(frameIndex);
+  std::sort(m_frameIndexOrder.begin(), m_frameIndexOrder.end());
   TRasterImageP tempImage(img);
   TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
 
@@ -218,23 +223,30 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
   QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
 
   int l = qi->width(), r = 0, t = qi->height(), b = 0;
-  for (int y = 0; y < qi->height(); ++y) {
-    QRgb *row      = (QRgb *)qi->scanLine(y);
-    bool rowFilled = false;
-    for (int x = 0; x < qi->width(); ++x) {
-      if (qAlpha(row[x])) {
-        rowFilled = true;
-        r         = std::max(r, x);
-        if (l > x) {
-          l = x;
-          x = r;
+  if (m_trim) {
+    for (int y = 0; y < qi->height(); ++y) {
+      QRgb *row      = (QRgb *)qi->scanLine(y);
+      bool rowFilled = false;
+      for (int x = 0; x < qi->width(); ++x) {
+        if (qAlpha(row[x])) {
+          rowFilled = true;
+          r         = std::max(r, x);
+          if (l > x) {
+            l = x;
+            x = r;
+          }
         }
       }
+      if (rowFilled) {
+        t = std::min(t, y);
+        b = y;
+      }
     }
-    if (rowFilled) {
-      t = std::min(t, y);
-      b = y;
-    }
+  } else {
+    l = 0;
+    r = qi->width() - 1;
+    t = 0;
+    b = qi->height() - 1;
   }
   if (m_firstPass) {
     m_firstPass = false;
@@ -252,7 +264,14 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
   newQi->fill(qRgba(0, 0, 0, 0));
   QPainter painter(newQi);
   painter.drawImage(QPoint(0, 0), *qi);
-  m_images.push_back(newQi);
+
+  // Make sure to order the images according to their frame index
+  // Not just what comes out first
+  std::vector<int>::iterator it;
+  it = find(m_frameIndexOrder.begin(), m_frameIndexOrder.end(), frameIndex);
+  int pos = std::distance(m_frameIndexOrder.begin(), it);
+
+  m_images.insert(m_images.begin() + pos, newQi);
   delete image;
   delete qi;
   free(buffer);
@@ -264,7 +283,8 @@ Tiio::SpriteWriterProperties::SpriteWriterProperties()
     , m_leftPadding("Left Padding", 0, 100, 0)
     , m_rightPadding("Right Padding", 0, 100, 0)
     , m_scale("Scale", 1, 100, 100)
-    , m_format("Format") {
+    , m_format("Format")
+    , m_trim("Trim Empty Space", true) {
   m_format.addValue(L"Grid");
   m_format.addValue(L"Vertical");
   m_format.addValue(L"Horizontal");
@@ -275,6 +295,7 @@ Tiio::SpriteWriterProperties::SpriteWriterProperties()
   bind(m_leftPadding);
   bind(m_rightPadding);
   bind(m_scale);
+  bind(m_trim);
 }
 
 // Tiio::Reader* Tiio::makeSpriteReader(){ return nullptr; }

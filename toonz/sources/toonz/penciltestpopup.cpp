@@ -991,7 +991,7 @@ PencilTestPopup::PencilTestPopup()
   m_captureTimer->setSingleShot(true);
 
   m_captureButton->setObjectName("LargeSizedText");
-  m_captureButton->setFixedHeight(80);
+  m_captureButton->setFixedHeight(75);
   QCommonStyle style;
   m_captureButton->setIcon(style.standardIcon(QStyle::SP_DialogOkButton));
   m_captureButton->setIconSize(QSize(30, 30));
@@ -1051,13 +1051,13 @@ PencilTestPopup::PencilTestPopup()
       rightLay->setSpacing(5);
       {
         QVBoxLayout* fileLay = new QVBoxLayout();
-        fileLay->setMargin(10);
-        fileLay->setSpacing(10);
+        fileLay->setMargin(8);
+        fileLay->setSpacing(5);
         {
           QGridLayout* levelLay = new QGridLayout();
           levelLay->setMargin(0);
           levelLay->setHorizontalSpacing(3);
-          levelLay->setVerticalSpacing(10);
+          levelLay->setVerticalSpacing(5);
           {
             levelLay->addWidget(new QLabel(tr("Name:"), this), 0, 0,
                                 Qt::AlignRight);
@@ -1090,9 +1090,9 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addWidget(fileFrame, 0);
 
         QGridLayout* imageLay = new QGridLayout();
-        imageLay->setMargin(10);
+        imageLay->setMargin(8);
         imageLay->setHorizontalSpacing(3);
-        imageLay->setVerticalSpacing(10);
+        imageLay->setVerticalSpacing(5);
         {
           imageLay->addWidget(new QLabel(tr("Color type:"), this), 0, 0,
                               Qt::AlignRight);
@@ -1125,9 +1125,9 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addWidget(imageFrame, 0);
 
         QGridLayout* displayLay = new QGridLayout();
-        displayLay->setMargin(10);
+        displayLay->setMargin(8);
         displayLay->setHorizontalSpacing(3);
-        displayLay->setVerticalSpacing(10);
+        displayLay->setVerticalSpacing(5);
         {
           displayLay->addWidget(m_onionSkinCB, 0, 0, 1, 2);
 
@@ -1143,9 +1143,9 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addWidget(displayFrame);
 
         QGridLayout* timerLay = new QGridLayout();
-        timerLay->setMargin(10);
+        timerLay->setMargin(8);
         timerLay->setHorizontalSpacing(3);
-        timerLay->setVerticalSpacing(10);
+        timerLay->setVerticalSpacing(5);
         {
           timerLay->addWidget(m_timerCB, 0, 0, 1, 2);
 
@@ -1161,9 +1161,9 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addStretch(1);
 
         rightLay->addWidget(m_captureButton, 0);
-        rightLay->addSpacing(20);
-        rightLay->addWidget(closeButton, 0);
         rightLay->addSpacing(10);
+        rightLay->addWidget(closeButton, 0);
+        rightLay->addSpacing(5);
       }
       bottomLay->addLayout(rightLay, 0);
     }

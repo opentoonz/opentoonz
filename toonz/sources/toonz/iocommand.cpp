@@ -148,20 +148,29 @@ public:
               "File %1 doesn't belong to the current project.\n"
               "Do you want to import it or load it from its original location?")
               .arg(QString::fromStdWString(path.getWideString()));
-
+      QString checkBoxLabel =
+          QObject::tr("Always do this action.")
+              .arg(QString::fromStdWString(path.getWideString()));
       QStringList buttons;
       buttons << QObject::tr("Import") << QObject::tr("Load")
               << QObject::tr("Cancel");
-
-      DVGui::Dialog *importDialog =
-          DVGui::createMsgBox(DVGui::QUESTION, label, buttons, 0);
-      int ret = importDialog->exec();
-
+      DVGui::MessageAndCheckboxDialog *importDialog =
+          DVGui::createMsgandCheckbox(DVGui::QUESTION, label, checkBoxLabel,
+                                      buttons, 0);
+      int ret     = importDialog->exec();
+      int checked = importDialog->getChecked();
       importDialog->deleteLater();
 
       if (ret == 0 || ret == 3) {
         m_aborted = true;
         return A_CANCEL;
+      }
+      if (ret == 1 && checked > 0) {
+        Preferences::instance()->setDefaultImportPolicy(1);
+        TApp::instance()->getCurrentScene()->notifyImportPolicyChanged(1);
+      } else if (ret == 2 && checked > 0) {
+        Preferences::instance()->setDefaultImportPolicy(2);
+        TApp::instance()->getCurrentScene()->notifyImportPolicyChanged(2);
       }
       m_importEnabled = (ret == 1);
       return ret == 1 ? A_IMPORT : A_LOAD;
@@ -1233,17 +1242,18 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
 
     //--- If both the level and scene is clean, then open the quit confirmation
     // dialog
-    if (!isLevelOrSceneIsDirty && msg == "Quit") {
-      QString question("Are you sure ?");
-      int ret =
-          DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
-      if (ret == 0 || ret == 2) {
-        // cancel (or closed message box window)
-        return false;
-      } else if (ret == 1) {
-        // ok
-      }
-    }
+    // if (!isLevelOrSceneIsDirty && msg == "Quit") {
+    //  QString question("Are you sure ?");
+    //  int ret =
+    //      DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"),
+    //      0);
+    //  if (ret == 0 || ret == 2) {
+    //    // cancel (or closed message box window)
+    //    return false;
+    //  } else if (ret == 1) {
+    //    // ok
+    //  }
+    //}
 
     RenderingSuspender suspender;
 
@@ -1892,8 +1902,8 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   // check if the output dpi is incompatible with pixels only mode
   if (Preferences::instance()->getPixelsOnly()) {
     TPointD dpi = scene->getCurrentCamera()->getDpi();
-    if (!areAlmostEqual(dpi.x, Stage::standardDpi) ||
-        !areAlmostEqual(dpi.y, Stage::standardDpi)) {
+    if (!areAlmostEqual(dpi.x, Stage::standardDpi, 0.1) ||
+        !areAlmostEqual(dpi.y, Stage::standardDpi, 0.1)) {
       QString question = QObject::tr(
           "This scene is incompatible with pixels only mode of the current "
           "OpenToonz version.\nWhat would you like to do?");
@@ -2113,6 +2123,7 @@ static int loadPSDResource(IoCmd::LoadResourceArguments &args,
     } else {
       TFilePath psdpath = popup->getPsdPath(i);
       TXshLevel *xl     = 0;
+
       try {
         xl = ::loadResource(scene, psdpath, args.castFolder, row0, col0, row1,
                             col1, !popup->subxsheet());

@@ -127,6 +127,9 @@ public:
   void setCustomProjectRoot(std::wstring path);
   QString getCustomProjectRoot() { return m_customProjectRoot; }
 
+  void enableWatchFileSystem(bool on);
+  bool isWatchFileSystemEnabled() { return m_watchFileSystem; }
+
   // Interface  tab
 
   void setCurrentLanguage(int currentLanguage);
@@ -266,6 +269,9 @@ public:
     return m_paletteTypeOnLoadRasterImageAsColorModel;
   }
 
+  void setDefaultImportPolicy(int policy);
+  int getDefaultImportPolicy() { return m_importPolicy; }
+
   // Drawing  tab
 
   void setScanLevelType(std::string s);
@@ -349,6 +355,15 @@ public:
   bool isInputCellsWithoutDoubleClickingEnabled() const {
     return m_inputCellsWithoutDoubleClickingEnabled;
   }
+
+  void enableShowXSheetToolbar(bool on);
+  bool isShowXSheetToolbarEnabled() const { return m_showXSheetToolbar; }
+
+  void enableExpandFunctionHeader(bool on);
+  bool isExpandFunctionHeaderEnabled() const { return m_expandFunctionHeader; }
+
+  void enableShowColumnNumbers(bool on);
+  bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
 
   // Animation  tab
 
@@ -479,7 +494,7 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-  int m_projectRoot;
+  int m_projectRoot, m_importPolicy;
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
@@ -490,7 +505,8 @@ private:
       m_ignoreAlphaonColumn1Enabled, m_previewAlwaysOpenNewFlipEnabled,
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
-      m_defaultViewerEnabled, m_pixelsOnly;
+      m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar,
+      m_expandFunctionHeader, m_showColumnNumbers;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
@@ -542,6 +558,9 @@ private:
 
   // enable to input drawing numbers into cells without double-clicking
   bool m_inputCellsWithoutDoubleClickingEnabled;
+
+  // enable to watch file system in order to update file browser automatically
+  bool m_watchFileSystem;
 
 private:
   Preferences();

@@ -61,7 +61,8 @@ void TCellData::setCells(TXsheet *xsh, int r0, int c0, int r1, int c1) {
 
 // data -> xsh
 bool TCellData::getCells(TXsheet *xsh, int r0, int c0, int &r1, int &c1,
-                         bool insert, bool doZeraryClone) const {
+                         bool insert, bool doZeraryClone,
+                         bool skipEmptyCells) const {
   int c;
   r1           = r0 + m_rowCount - 1;
   c1           = c0 + m_colCount - 1;
@@ -76,11 +77,13 @@ bool TCellData::getCells(TXsheet *xsh, int r0, int c0, int &r1, int &c1,
       isColumnEmpty = column->isEmpty();
       /*- 各セルに左上→右下で順に割り振られるIndex -*/
       int cellIndex = index * m_rowCount;
-      /*- セルに中身があるところまでcellIndexをインクリメント -*/
-      while (cellIndex < (index + 1) * m_rowCount &&
-             m_cells[cellIndex].isEmpty())
-        ++cellIndex;
-      /*- 選択範囲の終端 -*/
+      // increment the cellIndex and skip empty cells
+      if (skipEmptyCells) {
+        while (cellIndex < (index + 1) * m_rowCount &&
+               m_cells[cellIndex].isEmpty())
+          ++cellIndex;
+      }
+      // if the cellIndex reaches the end of the selection
       if ((int)m_cells.size() <= cellIndex)  // Celle vuote.
         return cellSet;
       /*- カラムが変更不可なら次のカラムへ -*/
@@ -152,9 +155,9 @@ void TCellData::cloneZeraryFx(int index, std::vector<TXshCell> &cells) const {
     TXshZeraryFxColumn *newFxColumn = new TXshZeraryFxColumn(0);
     newFxColumn->getZeraryColumnFx()->setZeraryFx(newZeraryFx);
     newFxLevel->setColumn(newFxColumn);
-    cells.clear();
+    // replace the zerary fx cells by the new fx
     int r;
-    for (r = firstNotEmptyIndex; r < (index + 1) * m_rowCount; r++)
-      cells.push_back(TXshCell(newFxLevel, m_cells[r].getFrameId()));
+    for (r     = firstNotEmptyIndex; r < (index + 1) * m_rowCount; r++)
+      cells[r] = TXshCell(newFxLevel, m_cells[r].getFrameId());
   }
 }

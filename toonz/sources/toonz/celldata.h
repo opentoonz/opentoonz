@@ -40,10 +40,12 @@ public:
 
   // data -> xsh;
   /*! If insert == true insert cells and shift old one.
-If column type don't match (sound vs nto sound) don't set column cells.
-If doZeraryClone == true clone zerary cells fx.*/
+If column type don't match (sound vs not sound) don't set column cells.
+If doZeraryClone == true clone zerary cells fx.
+If skipEmptyCells == false do not skip setting empty cells in data*/
   bool getCells(TXsheet *xsh, int r0, int c0, int &r1, int &c1,
-                bool insert = true, bool doZeraryClone = true) const;
+                bool insert = true, bool doZeraryClone = true,
+                bool skipEmptyCells = true) const;
 
   //! Return true if cell in TCellData can be set in \b xsh xsheet.
   bool canChange(TXsheet *xsh, int c0) const;

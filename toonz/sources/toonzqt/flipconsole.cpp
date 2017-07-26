@@ -877,7 +877,7 @@ void FlipConsole::setCurrentFPS(int val) {
 void FlipConsole::createButton(UINT buttonMask, const char *iconStr,
                                const QString &tip, bool checkable,
                                QActionGroup *group) {
-  QIcon icon      = createQIconPNG(iconStr);
+  QIcon icon      = createQIcon(iconStr);
   QAction *action = new QAction(icon, tip, m_playToolBar);
   action->setData(QVariant(buttonMask));
   action->setCheckable(checkable);
@@ -891,7 +891,7 @@ void FlipConsole::createButton(UINT buttonMask, const char *iconStr,
 QAction *FlipConsole::createCheckedButtonWithBorderImage(
     UINT buttonMask, const char *iconStr, const QString &tip, bool checkable,
     QActionGroup *group, const char *cmdId) {
-  QIcon icon            = createQIconPNG(iconStr);
+  QIcon icon            = createQIcon(iconStr);
   QWidgetAction *action = new QWidgetAction(m_playToolBar);
   action->setIcon(icon);
   action->setToolTip(tip);
@@ -923,8 +923,8 @@ QAction *FlipConsole::createDoubleButton(
     UINT buttonMask1, UINT buttonMask2, const char *iconStr1,
     const char *iconStr2, const QString &tip1, const QString &tip2,
     QActionGroup *group, DoubleButton *&widget) {
-  QAction *action1 = new QAction(createQIconPNG(iconStr1), tip1, m_playToolBar);
-  QAction *action2 = new QAction(createQIconPNG(iconStr2), tip2, m_playToolBar);
+  QAction *action1 = new QAction(createQIcon(iconStr1), tip1, m_playToolBar);
+  QAction *action2 = new QAction(createQIcon(iconStr2), tip2, m_playToolBar);
   m_actions[(EGadget)buttonMask1] = action1;
   m_actions[(EGadget)buttonMask2] = action2;
 
@@ -949,7 +949,7 @@ QAction *FlipConsole::createDoubleButton(
 
 void FlipConsole::createOnOffButton(UINT buttonMask, const char *iconStr,
                                     const QString &tip, QActionGroup *group) {
-  QIcon icon      = createQIconOnOffPNG(iconStr);
+  QIcon icon      = createQIconOnOff(iconStr);
   QAction *action = new QAction(icon, tip, m_playToolBar);
   action->setData(QVariant(buttonMask));
   action->setCheckable(true);
@@ -1120,6 +1120,7 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
   m_playToolBar = new QToolBar(this);
   m_playToolBar->setMovable(false);
   m_playToolBar->setObjectName("FlipConsolePlayToolBar");
+  m_playToolBar->setIconSize(QSize(17, 17));
   //	m_playToolBar->setObjectName("chackableButtonToolBar");
 
   // m_playToolBar->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
@@ -1127,8 +1128,7 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
   createCustomizeMenu(withCustomWidget);
 
   if (m_gadgetsMask & eSave) {
-    // just reuse the icon file named "savepalette"
-    createButton(eSave, "savepalette", tr("&Save Images"), false);
+    createButton(eSave, "save", tr("&Save Images"), false);
     // m_saveSep = m_playToolBar->addSeparator();
   }
 
@@ -1355,26 +1355,31 @@ void FlipConsole::pressLinkedConsoleButton(UINT button, FlipConsole *parent) {
 //-----------------------------------------------------------------------------
 
 void FlipConsole::onButtonPressed(int button) {
-  // if(!isVisible()) return;
   makeCurrent();
-  doButtonPressed(button);
+  if (m_playbackExecutor.isRunning() &&
+      (button == FlipConsole::ePlay || button == FlipConsole::eLoop)) {
+    pressButton(ePause);
+  } else
+    doButtonPressed(button);
 
   if (m_areLinked) pressLinkedConsoleButton(button, this);
 }
 
 //-----------------------------------------------------------------------------
 void FlipConsole::pressButton(EGadget buttonId) {
-  if (m_buttons.contains(buttonId)) {
-    // If you press "play" or "loop play" button while playing, which means
-    // "pause"
-    if (m_playbackExecutor.isRunning() &&
-        (buttonId == ePlay || buttonId == eLoop)) {
-      m_buttons[ePause]->click();
-      return;
-    }
-    m_buttons[buttonId]->click();
-  } else if (m_actions.contains(buttonId))
-    m_actions[buttonId]->trigger();
+  if (m_visibleConsoles.indexOf(this) < 0 && m_visibleConsoles.size() > 0) {
+    FlipConsole *console = m_visibleConsoles.at(0);
+    console->makeCurrent();
+    if (console->m_buttons.contains(buttonId)) {
+      console->m_buttons[buttonId]->click();
+    } else if (console->m_actions.contains(buttonId))
+      console->m_actions[buttonId]->trigger();
+  } else {
+    if (m_buttons.contains(buttonId)) {
+      m_buttons[buttonId]->click();
+    } else if (m_actions.contains(buttonId))
+      m_actions[buttonId]->trigger();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1847,7 +1852,12 @@ const std::vector<UCHAR> *FlipConsole::getProgressBarStatus() const {
 
 //--------------------------------------------------------------------
 
-void FlipConsole::onPreferenceChanged() {
+void FlipConsole::onPreferenceChanged(const QString &prefName) {
+  // react only when related properties are changed
+  if (prefName != "BlankCount" && prefName != "BlankColor" &&
+      !prefName.isEmpty())
+    return;
+
   if (m_drawBlanksEnabled) {
     Preferences::instance()->getBlankValues(m_blanksCount, m_blankColor);
     if (m_blanksCount == 0) {

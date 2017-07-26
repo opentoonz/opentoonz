@@ -72,14 +72,14 @@ set(SOURCES
 set(OBJCSOURCES
 )
 
-if(WIN32 AND PLATFORM EQUAL 32)
+if(BUILD_ENV_MSVC AND PLATFORM EQUAL 32)
     # can not link libopenblas_32.lib with SAFESEH
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
 endif()
 
 add_library(tnzext SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzext.dylib")
 endif()
 
@@ -90,11 +90,11 @@ add_definitions(
 message("subdir: tnzext")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     find_library(ACCE_LIB Accelerate)
 endif()
 
-if(WIN32 OR APPLE)
+if(BUILD_ENV_MSVC OR BUILD_ENV_APPLE)
     # Warning, this looks wrong,
     # should _only_ use SUPERLU_INCLUDE_DIR, for now do this with Linux.
     include_directories(
@@ -108,13 +108,13 @@ else()
     )
 endif()
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     target_link_libraries(tnzext
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
         ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${OPENBLAS_LIB} ${EXTRA_LIBS}
         tnzcore tnzbase
     )
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     set(EXTRA_LIBS
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.dylib
@@ -124,13 +124,11 @@ elseif(APPLE)
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
         ${ACCE_LIB} ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${EXTRA_LIBS}
     )
-elseif(UNIX)
+elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase")
-
-    set(EXTRA_LIBS ${EXTRA_LIBS} ${OPENBLAS_LIB})
 
     target_link_libraries(tnzext
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
-        ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${EXTRA_LIBS}
+        ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${OPENBLAS_LIB} ${EXTRA_LIBS}
     )
 endif()

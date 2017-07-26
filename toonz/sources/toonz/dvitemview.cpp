@@ -17,6 +17,7 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tproject.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -1021,7 +1022,7 @@ void DvItemViewerPanel::paintThumbnailItem(QPainter &p, int index) {
   if (!thumbnail.isNull()) p.drawPixmap(iconRect.topLeft(), thumbnail);
   //}
   else {
-    static QPixmap missingPixmap = QPixmap(":Resources/missing.png");
+    static QPixmap missingPixmap = QPixmap(":Resources/missing.svg");
     QRect pixmapRect(rect.left() + (rect.width() - missingPixmap.width()) / 2,
                      rect.top(), missingPixmap.width(), missingPixmap.height());
     p.drawPixmap(pixmapRect.topLeft(), missingPixmap);
@@ -1792,24 +1793,20 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
                                              QWidget *parent)
     : QToolBar(parent) {
   setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  setIconSize(QSize(17, 15));
+  setIconSize(QSize(17, 17));
   setObjectName("buttonBar");
   // buttonBar->setIconSize(QSize(10,10));
 
-  static QPixmap backButtonEnablePM =
-      QPixmap(":Resources/fb_history_back_enable.png");
-  static QPixmap backButtonDisablePM =
-      QPixmap(":Resources/fb_history_back_disable.png");
-  static QPixmap fwdButtonEnablePM =
-      QPixmap(":Resources/fb_history_fwd_enable.png");
-  static QPixmap fwdButtonDisablePM =
-      QPixmap(":Resources/fb_history_fwd_disable.png");
+  QString backButtonEnable  = QString(":Resources/fb_history_back_enable.svg");
+  QString backButtonDisable = QString(":Resources/fb_history_back_disable.svg");
+  QString fwdButtonEnable   = QString(":Resources/fb_history_fwd_enable.svg");
+  QString fwdButtonDisable  = QString(":Resources/fb_history_fwd_disable.svg");
 
   QIcon backButtonIcon, fwdButtonIcon;
-  backButtonIcon.addPixmap(backButtonEnablePM, QIcon::Normal);
-  backButtonIcon.addPixmap(backButtonDisablePM, QIcon::Disabled);
-  fwdButtonIcon.addPixmap(fwdButtonEnablePM, QIcon::Normal);
-  fwdButtonIcon.addPixmap(fwdButtonDisablePM, QIcon::Disabled);
+  backButtonIcon.addFile(backButtonEnable, QSize(), QIcon::Normal);
+  backButtonIcon.addFile(backButtonDisable, QSize(), QIcon::Disabled);
+  fwdButtonIcon.addFile(fwdButtonEnable, QSize(), QIcon::Normal);
+  fwdButtonIcon.addFile(fwdButtonDisable, QSize(), QIcon::Disabled);
 
   m_folderBack = new QAction(backButtonIcon, tr("Back"), this);
   m_folderBack->setIconText("");
@@ -1818,13 +1815,13 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   m_folderFwd->setIconText("");
   addAction(m_folderFwd);
 
-  QIcon folderUpIcon = createQIconPNG("folderup");
+  QIcon folderUpIcon = createQIcon("folderup");
   QAction *folderUp  = new QAction(folderUpIcon, tr("Up One Level"), this);
   folderUp->setIconText(tr("Up"));
   addAction(folderUp);
   addSeparator();
 
-  QIcon newFolderIcon = createQIconPNG("newfolder");
+  QIcon newFolderIcon = createQIcon("newfolder");
   QAction *newFolder  = new QAction(newFolderIcon, tr("New Folder"), this);
   newFolder->setIconText(tr("New"));
   addAction(newFolder);
@@ -1834,7 +1831,7 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   QActionGroup *actions = new QActionGroup(this);
   actions->setExclusive(true);
 
-  QIcon thumbViewIcon = createQIconOnOffPNG("viewicon");
+  QIcon thumbViewIcon = createQIconOnOff("viewicon");
   QAction *thumbView  = new QAction(thumbViewIcon, tr("Icons View"), this);
   thumbView->setCheckable(true);
   thumbView->setIconText(tr("Icon"));
@@ -1845,7 +1842,7 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   actions->addAction(thumbView);
   addAction(thumbView);
 
-  QIcon listViewIcon = createQIconOnOffPNG("viewlist");
+  QIcon listViewIcon = createQIconOnOff("viewlist");
   QAction *listView  = new QAction(listViewIcon, tr("List View"), this);
   listView->setCheckable(true);
   listView->setIconText(tr("List"));
@@ -1868,6 +1865,12 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   addAction(exportFileListAction);
   addSeparator();
 
+  if (itemViewer->m_windowType == DvItemViewer::Browser &&
+      !Preferences::instance()->isWatchFileSystemEnabled()) {
+    addAction(CommandManager::instance()->getAction("MI_RefreshTree"));
+    addSeparator();
+  }
+
   connect(exportFileListAction, SIGNAL(triggered()), itemViewer->getPanel(),
           SLOT(exportFileList()));
 
@@ -1884,6 +1887,12 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
 
   connect(m_folderBack, SIGNAL(triggered()), SIGNAL(folderBack()));
   connect(m_folderFwd, SIGNAL(triggered()), SIGNAL(folderFwd()));
+
+  if (itemViewer->m_windowType == DvItemViewer::Browser) {
+    connect(TApp::instance()->getCurrentScene(),
+            SIGNAL(preferenceChanged(const QString &)), this,
+            SLOT(onPreferenceChanged(const QString &)));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1898,4 +1907,20 @@ void DvItemViewerButtonBar::onHistoryChanged(bool backEnable, bool fwdEnable) {
     m_folderFwd->setEnabled(true);
   else
     m_folderFwd->setEnabled(false);
+}
+
+//-----------------------------------------------------------------------------
+
+void DvItemViewerButtonBar::onPreferenceChanged(const QString &prefName) {
+  // react only when the related preference is changed
+  if (prefName != "WatchFileSystem") return;
+
+  QAction *refreshAct = CommandManager::instance()->getAction("MI_RefreshTree");
+  if (Preferences::instance()->isWatchFileSystemEnabled()) {
+    removeAction(refreshAct);
+    removeAction(actions().last());  // remove separator
+  } else {
+    addAction(refreshAct);
+    addSeparator();
+  }
 }

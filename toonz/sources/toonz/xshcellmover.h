@@ -89,7 +89,7 @@ private:
 class LevelMoverTool : public XsheetGUI::DragTool {
 protected:
   TPoint m_grabOffset;
-  TPoint m_startPos, m_lastPos, m_aimedPos;
+  TPoint m_startPos, m_lastPos, m_aimedPos;  // x=col, y=row coordinates
   TDimension m_range;
 
   int m_qualifiers;
@@ -109,7 +109,7 @@ public:
   void onClick(const QMouseEvent *e) override;
   void onCellChange(int row, int col);
   void onDrag(const QMouseEvent *e) override;
-  void onRelease(int row, int col) override;
+  void onRelease(const CellPosition &pos) override;
   void drawCellsArea(QPainter &p) override;
 };
 

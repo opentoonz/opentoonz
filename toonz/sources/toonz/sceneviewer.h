@@ -13,6 +13,7 @@
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/flipconsole.h"
+#include "toonzqt/glwidget_for_highdpi.h"
 // iwsw commented out temporarily
 //#include "toonzqt/ghibli_3dlut_util.h"
 
@@ -22,9 +23,6 @@
 // Toonz includes
 #include "pane.h"
 #include "previewer.h"
-
-// Qt includes
-#include <QGLWidget>
 
 //=====================================================================
 
@@ -57,7 +55,7 @@ public:
 // SceneViewer
 //-----------------------------------------------------------------------------
 
-class SceneViewer final : public QGLWidget,
+class SceneViewer final : public GLWidgetForHighDpi,
                           public TTool::Viewer,
                           public Previewer::Listener {
   Q_OBJECT
@@ -70,7 +68,7 @@ class SceneViewer final : public QGLWidget,
   bool m_foregroundDrawing;
   bool m_tabletEvent;
   // used to handle wrong mouse drag events!
-  bool m_buttonClicked;
+  bool m_buttonClicked, m_toolSwitched;
   bool m_shownOnce = false;
   int m_referenceMode;
   int m_previewMode;

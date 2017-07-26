@@ -212,7 +212,7 @@ FlipBook::FlipBook(QWidget *parent, QString viewerTitle,
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(1);
+  mainLayout->setMargin(0);
   mainLayout->setSpacing(0);
   {
     mainLayout->addWidget(fsWidget, 1);
@@ -1872,9 +1872,9 @@ void FlipBook::showEvent(QShowEvent *e) {
   connect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer, SLOT(update()));
   // for updating the blank frame button
   if (!m_imageViewer->isColorModel()) {
-    connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-            SLOT(onPreferenceChanged()));
-    m_flipConsole->onPreferenceChanged();
+    connect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+            m_flipConsole, SLOT(onPreferenceChanged(const QString &)));
+    m_flipConsole->onPreferenceChanged("");
   }
   m_flipConsole->setActive(true);
   m_imageViewer->update();
@@ -1886,6 +1886,10 @@ void FlipBook::hideEvent(QHideEvent *e) {
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
   disconnect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer,
              SLOT(update()));
+  if (!m_imageViewer->isColorModel()) {
+    disconnect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+               m_flipConsole, SLOT(onPreferenceChanged(const QString &)));
+  }
   m_flipConsole->setActive(false);
 }
 
@@ -2074,7 +2078,9 @@ void FlipBook::onDoubleClick(QMouseEvent *me) {
   if (!img) return;
 
   TAffine toWidgetRef(m_imageViewer->getImgToWidgetAffine());
-  TRectD pixGeomD(toWidgetRef * getImageBoundsD(img));
+  TRectD pixGeomD(TScale(1.0 / (double)m_imageViewer->getDevPixRatio()) *
+                  toWidgetRef * getImageBoundsD(img));
+  // TRectD pixGeomD(toWidgetRef  * getImageBoundsD(img));
   TRect pixGeom(tceil(pixGeomD.x0), tceil(pixGeomD.y0), tfloor(pixGeomD.x1) - 1,
                 tfloor(pixGeomD.y1) - 1);
 
@@ -2173,9 +2179,10 @@ void FlipBook::loadAndCacheAllTlvImages(Level level, int fromFrame,
 //! some additional random access information may be retrieved (i.e. images may
 //! map
 //! to specific frames).
-void viewFile(const TFilePath &path, int from, int to, int step, int shrink,
-              TSoundTrack *snd, FlipBook *flipbook, bool append,
-              bool isToonzOutput) {
+// returns pointer to the opened flipbook to control modality.
+FlipBook *viewFile(const TFilePath &path, int from, int to, int step,
+                   int shrink, TSoundTrack *snd, FlipBook *flipbook,
+                   bool append, bool isToonzOutput) {
   // In case the step and shrink informations are invalid, load them from
   // preferences
   if (step == -1 || shrink == -1) {
@@ -2191,11 +2198,11 @@ void viewFile(const TFilePath &path, int from, int to, int step, int shrink,
       path.isLevelName()) {
     DVGui::warning(QObject::tr("%1  has an invalid extension format.")
                        .arg(QString::fromStdString(path.getLevelName())));
-    return;
+    return NULL;
   }
 
   // Windows Screen Saver - avoid
-  if (path.getType() == "scr") return;
+  if (path.getType() == "scr") return NULL;
 
   // Avi and movs may be viewed by an external viewer, depending on preferences
   if (path.getType() == "mov" || path.getType() == "avi" && !flipbook) {
@@ -2203,7 +2210,7 @@ void viewFile(const TFilePath &path, int from, int to, int step, int shrink,
     QSettings().value("generatedMovieViewEnabled", str);
     if (str.toInt() != 0) {
       TSystem::showDocument(path);
-      return;
+      return NULL;
     }
   }
 
@@ -2216,6 +2223,7 @@ void viewFile(const TFilePath &path, int from, int to, int step, int shrink,
   // Assign the passed level with associated infos
   flipbook->setLevel(path, 0, from, to, step, shrink, snd, append,
                      isToonzOutput);
+  return flipbook;
 }
 
 //-----------------------------------------------------------------------------

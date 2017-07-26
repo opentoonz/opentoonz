@@ -298,9 +298,11 @@ public slots:
 };
 
 // utility
+// returns pointer to the opened flipbook to control modality.
 
-void viewFile(const TFilePath &fp, int from = -1, int to = -1, int step = -1,
-              int shrink = -1, TSoundTrack *snd = 0, FlipBook *flipbook = 0,
-              bool append = false, bool isToonzOutput = false);
+FlipBook *viewFile(const TFilePath &fp, int from = -1, int to = -1,
+                   int step = -1, int shrink = -1, TSoundTrack *snd = 0,
+                   FlipBook *flipbook = 0, bool append = false,
+                   bool isToonzOutput = false);
 
 #endif  // FLIPBOOK_H

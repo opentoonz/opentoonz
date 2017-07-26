@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #define TOONZ_EXPORT __declspec(dllexport)
 #define TOONZ_PACK
 #else

@@ -26,6 +26,7 @@
 #include "toonz/tproject.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/sceneproperties.h"
+#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tparamcontainer.h"
@@ -109,15 +110,19 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
 
   //---- layout
 
-  QVBoxLayout *leftLayout = new QVBoxLayout();
-  leftLayout->setMargin(0);
-  leftLayout->setSpacing(0);
+  m_leftLayout = new QVBoxLayout();
+  m_leftLayout->setMargin(0);
+  m_leftLayout->setSpacing(0);
   {
-    leftLayout->addWidget(m_toolbar);
-    leftLayout->addSpacing(36);
-    leftLayout->addWidget(m_numericalColumns);
+    m_leftLayout->addWidget(m_toolbar);
+    if (Preferences::instance()->isShowXSheetToolbarEnabled() &&
+        Preferences::instance()->isExpandFunctionHeaderEnabled()) {
+      m_leftLayout->addSpacing(66);
+    } else
+      m_leftLayout->addSpacing(36);
+    m_leftLayout->addWidget(m_numericalColumns);
   }
-  leftPanel->setLayout(leftLayout);
+  leftPanel->setLayout(m_leftLayout);
 
   addWidget(leftPanel);
 
@@ -325,8 +330,8 @@ void FunctionViewer::setXsheetHandle(TXsheetHandle *xshHandle) {
     TXsheet *xsh = m_xshHandle->getXsheet();
     m_functionGraph->getModel()->refreshData(xsh);
 
-    bool ret =
-        connect(m_xshHandle, SIGNAL(xsheetChanged), this, SLOT(refreshModel()));
+    bool ret = connect(m_xshHandle, SIGNAL(xsheetChanged()), this,
+                       SLOT(refreshModel()));
     assert(ret);
   }
 }

@@ -714,7 +714,7 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
     // inbetween
     else if (sl->getType() == PLI_XSHLEVEL &&
              m_selection->isInInbetweenRange(fid) &&
-             event->pos().x() > width() - 12 - fs_rightMargin) {
+             event->pos().x() > width() - 20 - fs_rightMargin) {
       inbetween();
     } else {
       // move current frame when clicked without modifier
@@ -883,7 +883,7 @@ void FilmstripFrames::keyPressEvent(QKeyEvent *event) {
     return;
 
   m_selection->selectNone();
-  m_selection->select(fh->getFid());
+  if (getLevel()) m_selection->select(fh->getFid());
   int index = fid2index(fh->getFid());
   if (index >= 0) exponeFrame(index);
 }
