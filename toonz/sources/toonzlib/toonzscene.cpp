@@ -903,6 +903,7 @@ TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName,
     }
 
     if (type == TZP_XSHLEVEL || type == OVL_XSHLEVEL) {
+      double dpiY = dpi;
       sl->getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
       if (dim == TDimension()) {
         double w, h;
@@ -911,17 +912,22 @@ TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName,
           TDimensionD camSize = getCurrentCamera()->getSize();
           w                   = camSize.lx;
           h                   = camSize.ly;
+          sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
+          dpi  = getCurrentCamera()->getDpi().x;
+          dpiY = getCurrentCamera()->getDpi().y;
         } else {
-          w = pref->getDefLevelWidth();
-          h = pref->getDefLevelHeight();
+          w    = pref->getDefLevelWidth();
+          h    = pref->getDefLevelHeight();
+          dpi  = pref->getDefLevelDpi();
+          dpiY = dpi;
         }
-        dpi = pref->getDefLevelDpi();
+
         sl->getProperties()->setImageRes(
-            TDimension(tround(w * dpi), tround(h * dpi)));
+            TDimension(tround(w * dpi), tround(h * dpiY)));
       } else
         sl->getProperties()->setImageRes(dim);
 
-      sl->getProperties()->setImageDpi(TPointD(dpi, dpi));
+      sl->getProperties()->setImageDpi(TPointD(dpi, dpiY));
       sl->getProperties()->setDpi(dpi);
     }
 
