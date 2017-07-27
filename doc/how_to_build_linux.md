@@ -98,7 +98,7 @@ TOONZLIBRARY="$HOME/.config/OpenToonz/stuff/projects/library"
 TOONZPROFILES="$HOME/.config/OpenToonz/stuff/profiles"
 TOONZPROJECTS="$HOME/.config/OpenToonz/stuff/projects"
 TOONZROOT="$HOME/.config/OpenToonz/stuff"
-TOONZSTUDIOPALETTE="$HOME/.config/OpenToonz/stuff/projects/studiopalette"
+TOONZSTUDIOPALETTE="$HOME/.config/OpenToonz/stuff/studiopalette"
 EOF
 ```
 Note the generated file must not actually contain `$HOME`, this expands to an absolute path in the generated file.

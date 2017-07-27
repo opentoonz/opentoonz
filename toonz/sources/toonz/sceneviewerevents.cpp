@@ -860,7 +860,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     flags = TwConsts::TK_CapsLock;
   else if (key == Qt::Key_Backspace)
     key = TwConsts::TK_Backspace;
-  else if (key == Qt::Key_Return)
+  else if (key == Qt::Key_Return || key == Qt::Key_Enter)
     key = TwConsts::TK_Return;
   else if (key == Qt::Key_Left && !shiftButton)
     key = TwConsts::TK_LeftArrow;

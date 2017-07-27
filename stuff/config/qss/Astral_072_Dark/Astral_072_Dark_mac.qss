@@ -1551,6 +1551,14 @@ PopupButton::menu-indicator:disabled {
 #XSheetToolbar #XSheetToolbarLevelButton {
   padding: 2;
 }
+QToolBar#MediumPaddingToolBar QToolButton {
+  padding-left: 3;
+  padding-right: 3;
+}
+QToolBar#WidePaddingToolBar QToolButton {
+  padding-left: 6;
+  padding-right: 6;
+}
 /* -----------------------------------------------------------------------------
    ComboViewer / Viewer / FlipBook
 ----------------------------------------------------------------------------- */
@@ -1582,13 +1590,15 @@ FlipBook #ToolBarContainer QLineEdit {
   border-bottom-right-radius: 0;
   height: 16px;
 }
-#FlipConsolePlayToolBar::separator:horizontal {
+QToolBar#FlipConsolePlayToolBar::separator:horizontal {
   margin: 0 2px;
 }
-#FlipConsolePlayToolBar QToolButton {
+QToolBar#FlipConsolePlayToolBar QToolButton {
   margin-top: 2px;
   margin-bottom: 2px;
   height: 16px;
+  padding-left: 6px;
+  padding-right: 6px;
 }
 #ViewerFpsSlider {
   background-color: transparent;

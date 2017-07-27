@@ -86,23 +86,27 @@ AudioRecordingPopup::AudioRecordingPopup()
   m_pauseRecordingButton->setMaximumWidth(25);
   m_pausePlaybackButton->setMaximumWidth(25);
 
-  QString playDisabled   = QString(":Resources/play_disabled.png");
-  QString pauseDisabled  = QString(":Resources/pause_disabled.png");
-  QString stopDisabled   = QString(":Resources/stop_disabled.png");
-  QString recordDisabled = QString(":Resources/record_disabled.png");
+  QString playDisabled   = QString(":Resources/play_disabled.svg");
+  QString pauseDisabled  = QString(":Resources/pause_disabled.svg");
+  QString stopDisabled   = QString(":Resources/stop_disabled.svg");
+  QString recordDisabled = QString(":Resources/record_disabled.svg");
 
-  m_pauseIcon = createQIconPNG("pause");
+  m_pauseIcon = createQIcon("pause");
   m_pauseIcon.addFile(pauseDisabled, QSize(), QIcon::Disabled);
-  m_playIcon = createQIconPNG("play");
+  m_playIcon = createQIcon("play");
   m_playIcon.addFile(playDisabled, QSize(), QIcon::Disabled);
-  m_recordIcon = createQIconPNG("record");
+  m_recordIcon = createQIcon("record");
   m_recordIcon.addFile(recordDisabled, QSize(), QIcon::Disabled);
-  m_stopIcon = createQIconPNG("stop");
+  m_stopIcon = createQIcon("stop");
   m_stopIcon.addFile(stopDisabled, QSize(), QIcon::Disabled);
   m_pauseRecordingButton->setIcon(m_pauseIcon);
+  m_pauseRecordingButton->setIconSize(QSize(17, 17));
   m_playButton->setIcon(m_playIcon);
+  m_playButton->setIconSize(QSize(17, 17));
   m_recordButton->setIcon(m_recordIcon);
+  m_recordButton->setIconSize(QSize(17, 17));
   m_pausePlaybackButton->setIcon(m_pauseIcon);
+  m_pausePlaybackButton->setIconSize(QSize(17, 17));
 
   QStringList inputs = m_audioRecorder->audioInputs();
   m_deviceListCB->addItems(inputs);

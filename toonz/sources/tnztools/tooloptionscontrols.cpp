@@ -650,9 +650,14 @@ ToolOptionPopupButton::ToolOptionPopupButton(TTool *tool,
 
   TEnumProperty::Range range = property->getRange();
   TEnumProperty::Range::iterator it;
-  for (it = range.begin(); it != range.end(); ++it)
-    addItem(createQIconPNG(QString::fromStdWString(*it).toUtf8()));
-
+  for (it = range.begin(); it != range.end(); ++it) {
+    QString iconName = QString::fromStdWString(*it);
+    QAction *action  = addItem(createQIcon(iconName.toUtf8()));
+    // make the tooltip text
+    iconName = iconName.replace('_', ' ');
+    iconName = iconName.left(1).toUpper() + iconName.mid(1);
+    action->setToolTip(iconName);
+  }
   setCurrentIndex(0);
   updateStatus();
   connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));

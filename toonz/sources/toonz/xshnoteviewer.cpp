@@ -480,23 +480,23 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_noteButton->setFixedSize(44, 26);
   m_noteButton->setIconSize(QSize(38, 20));
   QIcon addNoteIcon = createQIconPNG("newmemo");
-  addNoteIcon.addFile(QString(":Resources/newmemo_disabled.png"), QSize(),
+  addNoteIcon.addFile(QString(":Resources/newmemo_disabled.svg"), QSize(),
                       QIcon::Disabled);
   m_noteButton->setIcon(addNoteIcon);
 
   m_precNoteButton->setObjectName("ToolbarToolButton");
   m_precNoteButton->setFixedSize(22, 22);
-  m_precNoteButton->setIconSize(QSize(15, 23));
-  QIcon precNoteIcon = createQIconPNG("prevkey");
-  precNoteIcon.addFile(QString(":Resources/prevkey_disabled.png"), QSize(),
+  m_precNoteButton->setIconSize(QSize(17, 17));
+  QIcon precNoteIcon = createQIcon("prevkey");
+  precNoteIcon.addFile(QString(":Resources/prevkey_disabled.svg"), QSize(),
                        QIcon::Disabled);
   m_precNoteButton->setIcon(precNoteIcon);
 
   m_nextNoteButton->setObjectName("ToolbarToolButton");
   m_nextNoteButton->setFixedSize(22, 22);
-  m_nextNoteButton->setIconSize(QSize(15, 23));
-  QIcon nextNoteIcon = createQIconPNG("nextkey");
-  nextNoteIcon.addFile(QString(":Resources/nextkey_disabled.png"), QSize(),
+  m_nextNoteButton->setIconSize(QSize(17, 17));
+  QIcon nextNoteIcon = createQIcon("nextkey");
+  nextNoteIcon.addFile(QString(":Resources/nextkey_disabled.svg"), QSize(),
                        QIcon::Disabled);
   m_nextNoteButton->setIcon(nextNoteIcon);
 
