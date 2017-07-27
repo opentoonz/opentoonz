@@ -360,7 +360,7 @@ Detenerla o esperar a su finalización antes de eliminarla.</translation>
     </message>
     <message>
         <source>Unit:</source>
-        <translation>Unidad:</translation>
+        <translation>Unidades:</translation>
     </message>
     <message>
         <source>Relative</source>
@@ -636,7 +636,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Toggle Swatch Preview</source>
-        <translation>Previsualización de muestras</translation>
+        <translation>Ver muestra</translation>
     </message>
     <message>
         <source>Toggle Opacity Check</source>
@@ -1213,7 +1213,7 @@ de diseñar el color.</translation>
     </message>
     <message>
         <source>( Custom date )</source>
-        <translation>( Fecha personalizada )</translation>
+        <translation>( fecha personalizada )</translation>
     </message>
 </context>
 <context>
@@ -3392,7 +3392,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Matte Channel</source>
-        <translation>Canal alfa</translation>
+        <translation>Canal de opacidad</translation>
     </message>
     <message>
         <source>Red Channel Greyscale</source>
@@ -6155,7 +6155,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>MLAA Intensity:</source>
-        <translation>Intensidad de MLAA:</translation>
+        <translation>Intensidad:</translation>
     </message>
 </context>
 <context>
@@ -7644,7 +7644,7 @@ error no definido.</translation>
     </message>
     <message>
         <source>----Separator----</source>
-        <translation>----Separador----</translation>
+        <translation>----separador----</translation>
     </message>
     <message>
         <source>[Drag] to move position, [Double Click] to edit title</source>
@@ -8939,7 +8939,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>A/R:</source>
-        <translation>Proporción:</translation>
+        <translation>Prop:</translation>
     </message>
     <message>
         <source>Safe Area Box 2:</source>
@@ -10010,7 +10010,7 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Toggle Swatch Preview</source>
-        <translation>Previsualización de muestras</translation>
+        <translation>Ver muestra</translation>
     </message>
     <message>
         <source>Toggle Centerlines Check</source>
@@ -10351,7 +10351,7 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
     <message>
         <source>Post</source>
-        <translation>Enviar</translation>
+        <translation>Publicar</translation>
     </message>
     <message>
         <source>Discard</source>

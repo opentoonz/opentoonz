@@ -444,11 +444,11 @@
     </message>
     <message>
         <source>Move E/W</source>
-        <translation>Mover E/O</translation>
+        <translation>Mover en X</translation>
     </message>
     <message>
         <source>Move N/S</source>
-        <translation>Mover N/S</translation>
+        <translation>Mover en Y</translation>
     </message>
     <message>
         <source>Move Z</source>

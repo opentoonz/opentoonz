@@ -174,11 +174,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>E/W:</source>
-        <translation>E/O:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation>N/S:</translation>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -198,11 +198,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>XPx:</source>
-        <translation>Xpíx:</translation>
+        <translation>X píx:</translation>
     </message>
     <message>
         <source>YPx:</source>
-        <translation>Ypíx:</translation>
+        <translation>Y píx:</translation>
     </message>
     <message>
         <source>Resulting Level Info</source>
@@ -1350,7 +1350,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <name>ParamViewer</name>
     <message>
         <source>Swatch Viewer</source>
-        <translation>Visor de muestras</translation>
+        <translation>Ver muestra</translation>
     </message>
 </context>
 <context>
@@ -2169,7 +2169,7 @@ Autom</translation>
     </message>
     <message>
         <source>Matte</source>
-        <translation>Mate</translation>
+        <translation>Opacidad</translation>
     </message>
     <message>
         <source>RGB</source>
