@@ -477,5 +477,20 @@
       <file>Resources/locator_over.png</file>
       <file>Resources/refresh.png</file>
       <file>Resources/refresh_over.png</file>
+      <file>Resources/x_prev_eye_on.svg</file>
+      <file>Resources/x_prev_eye_off.svg</file>
+      <file>Resources/x_prev_eye_disabled.svg</file>
+      <file>Resources/x_table_view_on.svg</file>
+      <file>Resources/x_table_view_off.svg</file>
+      <file>Resources/x_table_view_disabled.svg</file>
+      <file>Resources/x_lock_on.svg</file>
+      <file>Resources/x_lock_off.svg</file>
+      <file>Resources/x_lock_disabled.svg</file>
+      <file>Resources/x_level_config.svg</file>
+      <file>Resources/x_level_config_disabled.svg</file>
+      <file>Resources/x_table_view_transp2.svg</file>
+      <file>Resources/layer_header_prev_eye.svg</file>
+      <file>Resources/layer_header_table_view.svg</file>
+      <file>Resources/layer_header_lock.svg</file>
     </qresource>
 </RCC>
