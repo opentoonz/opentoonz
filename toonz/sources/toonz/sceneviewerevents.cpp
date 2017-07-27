@@ -860,7 +860,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     flags = TwConsts::TK_CapsLock;
   else if (key == Qt::Key_Backspace)
     key = TwConsts::TK_Backspace;
-  else if (key == Qt::Key_Return)
+  else if (key == Qt::Key_Return || key == Qt::Key_Enter)
     key = TwConsts::TK_Return;
   else if (key == Qt::Key_Left && !shiftButton)
     key = TwConsts::TK_LeftArrow;
@@ -935,9 +935,9 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (!ret) {
     TFrameHandle *fh = TApp::instance()->getCurrentFrame();
 
-    if (key == TwConsts::TK_UpArrow)
+    if (key == TwConsts::TK_UpArrow || key == TwConsts::TK_LeftArrow)
       fh->prevFrame();
-    else if (key == TwConsts::TK_DownArrow)
+    else if (key == TwConsts::TK_DownArrow || key == TwConsts::TK_RightArrow)
       fh->nextFrame();
     else if (key == TwConsts::TK_Home)
       fh->firstFrame();

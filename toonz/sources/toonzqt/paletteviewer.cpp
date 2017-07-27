@@ -301,7 +301,7 @@ void PaletteViewer::createPaletteToolBar() {
 
   // Lock button to avoid editing the palette by mistake
   if (m_viewType == LEVEL_PALETTE) {
-    QIcon lockIcon = createQIconOnOffPNG("lockpalette");
+    QIcon lockIcon = createQIconOnOff("lockpalette");
 
     m_lockPaletteToolButton = new QToolButton(this);
     m_lockPaletteToolButton->setIcon(lockIcon);
@@ -321,7 +321,7 @@ void PaletteViewer::createPaletteToolBar() {
     QToolButton *toolButton = new QToolButton(this);
     toolButton->setPopupMode(QToolButton::InstantPopup);
 
-    QIcon lockIcon = createQIconOnOffPNG("lockpalette");
+    QIcon lockIcon = createQIconOnOff("lockpalette");
     toolButton->setIcon(lockIcon);
 
     toolButton->setObjectName("PaletteLockButton");
@@ -349,7 +349,7 @@ void PaletteViewer::createPaletteToolBar() {
   QToolButton *viewModeButton = new QToolButton(this);
   viewModeButton->setPopupMode(QToolButton::InstantPopup);
 
-  QIcon viewModeIcon = createQIconPNG("options");
+  QIcon viewModeIcon = createQIcon("options");
   viewModeButton->setIcon(viewModeIcon);
   QMenu *viewMode = new QMenu(QString("Options"), viewModeButton);
   viewMode->setToolTip(tr("Options"));
@@ -410,14 +410,14 @@ void PaletteViewer::createPaletteToolBar() {
 
   if (m_hasPageCommand) {
     QAction *addPage;
-    QIcon addPageIcon = createQIconPNG("newpage");
+    QIcon addPageIcon = createQIcon("newpage");
     addPage = new QAction(addPageIcon, tr("&New Page"), m_paletteToolBar);
     connect(addPage, SIGNAL(triggered()), this, SLOT(addNewPage()));
 
     m_paletteToolBar->addAction(addPage);
   }
 
-  QIcon newColorIcon = createQIconPNG("newstyle");
+  QIcon newColorIcon = createQIcon("newstyle");
   QAction *addColor =
       new QAction(newColorIcon, tr("&New Style"), m_paletteToolBar);
   connect(addColor, SIGNAL(triggered()), this, SLOT(addNewColor()));
@@ -450,11 +450,11 @@ void PaletteViewer::createSavePaletteToolBar() {
   }
 
   // save palette as
-  QIcon saveAsPaletteIcon = createQIconOnOffPNG("savepaletteas", false);
+  QIcon saveAsPaletteIcon = createQIconOnOff("savepaletteas", false);
   QAction *saveAsPalette  = new QAction(
       saveAsPaletteIcon, tr("&Save Palette As"), m_savePaletteToolBar);
   // overwrite palette
-  QIcon savePaletteIcon = createQIconOnOffPNG("savepalette", false);
+  QIcon savePaletteIcon = createQIconOnOff("savepalette", false);
   QAction *savePalette =
       new QAction(savePaletteIcon, tr("&Save Palette"), m_savePaletteToolBar);
 

@@ -6,7 +6,7 @@
 
 //-----------------------------------------------------------------------------
 
-#if 0 // was _WIN32, this function not used
+#if 0  // was _WIN32, this function not used
 
 static void swapRedBlueChannels(
     void *buffer,

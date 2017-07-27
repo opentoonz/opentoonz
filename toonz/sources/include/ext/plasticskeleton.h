@@ -8,8 +8,8 @@
 // TnzCore includes
 #include "tsmartpointer.h"
 #include "tpersist.h"
-#include "tmeshimage.h" // add imported template
-                        // instance tcg::Vertex<TPointD> (for Windows dll)
+#include "tmeshimage.h"  // add imported template
+                         // instance tcg::Vertex<TPointD> (for Windows dll)
 
 // TnzExt includes
 #include "plastichandle.h"

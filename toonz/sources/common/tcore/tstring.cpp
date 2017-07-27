@@ -58,7 +58,7 @@ std::string to_string(std::wstring ws) {
 #endif
 }
 
-std::string to_string(const TFilePath &fp) {
+std::string to_string(const TFilePath& fp) {
   return ::to_string(fp.getWideString());
 }
 
@@ -80,7 +80,7 @@ std::string to_string(double value, int prec) {
   return out.str();
 }
 
-std::string to_string(void *p) {
+std::string to_string(void* p) {
   std::ostringstream out;
   out << p;
   return out.str();
@@ -125,7 +125,7 @@ bool isDouble(std::wstring s) { return isDouble(::to_string(s)); }
 
 std::string toUpper(std::string a) {
 #ifdef _WIN32
-  size_t size = a.size();
+  size_t size      = a.size();
   const char* cstr = a.c_str();
   std::vector<char> buf(cstr, cstr + size + 1);
   return _strupr(&buf[0]);
@@ -138,7 +138,7 @@ std::string toUpper(std::string a) {
 
 std::string toLower(std::string a) {
 #ifdef _WIN32
-  size_t size = a.size();
+  size_t size      = a.size();
   const char* cstr = a.c_str();
   std::vector<char> buf(cstr, cstr + size + 1);
   return _strlwr(&buf[0]);
@@ -151,7 +151,7 @@ std::string toLower(std::string a) {
 
 std::wstring toUpper(std::wstring a) {
 #ifdef _WIN32
-  size_t size = a.size();
+  size_t size         = a.size();
   const wchar_t* cstr = a.c_str();
   std::vector<wchar_t> buf(cstr, cstr + size + 1);
   return _wcsupr(&buf[0]);
@@ -164,7 +164,7 @@ std::wstring toUpper(std::wstring a) {
 
 std::wstring toLower(std::wstring a) {
 #ifdef _WIN32
-  size_t size = a.size();
+  size_t size         = a.size();
   const wchar_t* cstr = a.c_str();
   std::vector<wchar_t> buf(cstr, cstr + size + 1);
   return _wcslwr(&buf[0]);

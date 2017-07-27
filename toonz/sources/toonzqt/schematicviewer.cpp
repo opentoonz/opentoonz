@@ -450,10 +450,10 @@ SchematicViewer::SchematicViewer(QWidget *parent)
   m_fxToolbar     = new QToolBar(m_viewer);
   m_swapToolbar   = new QToolBar(m_viewer);
 
-  m_commonToolbar->setObjectName("ToolBarWithoutBorder");
-  m_stageToolbar->setObjectName("ToolBarWithoutBorder");
-  m_fxToolbar->setObjectName("ToolBarWithoutBorder");
-  m_swapToolbar->setObjectName("ToolBarWithoutBorder");
+  m_commonToolbar->setObjectName("MediumPaddingToolBar");
+  m_stageToolbar->setObjectName("MediumPaddingToolBar");
+  m_fxToolbar->setObjectName("MediumPaddingToolBar");
+  m_swapToolbar->setObjectName("MediumPaddingToolBar");
 
   createToolbars();
   createActions();
@@ -540,22 +540,22 @@ void SchematicViewer::setSchematicScene(SchematicScene *scene) {
 void SchematicViewer::createToolbars() {
   // Initialize them
   m_stageToolbar->setMovable(false);
-  m_stageToolbar->setIconSize(QSize(23, 17));
+  m_stageToolbar->setIconSize(QSize(17, 17));
   m_stageToolbar->setLayoutDirection(Qt::RightToLeft);
   m_stageToolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   m_commonToolbar->setMovable(false);
-  m_commonToolbar->setIconSize(QSize(23, 17));
+  m_commonToolbar->setIconSize(QSize(17, 17));
   m_commonToolbar->setLayoutDirection(Qt::RightToLeft);
   m_commonToolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   m_fxToolbar->setMovable(false);
-  m_fxToolbar->setIconSize(QSize(23, 17));
+  m_fxToolbar->setIconSize(QSize(17, 17));
   m_fxToolbar->setLayoutDirection(Qt::RightToLeft);
   m_fxToolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   m_swapToolbar->setMovable(false);
-  m_swapToolbar->setIconSize(QSize(23, 17));
+  m_swapToolbar->setIconSize(QSize(17, 17));
   m_swapToolbar->setLayoutDirection(Qt::RightToLeft);
   m_swapToolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
@@ -568,29 +568,29 @@ void SchematicViewer::createActions() {
           *addOutputFx = 0, *switchPort = 0;
   {
     // Fit schematic
-    QIcon fitSchematicIcon = createQIconOnOffPNG("fit", false);
+    QIcon fitSchematicIcon = createQIconOnOff("fit", false);
     m_fitSchematic =
         new QAction(fitSchematicIcon, tr("&Fit to Window"), m_commonToolbar);
     connect(m_fitSchematic, SIGNAL(triggered()), m_viewer, SLOT(fitScene()));
 
     // Center On
-    QIcon centerOnIcon = createQIconOnOffPNG("centerselection", false);
+    QIcon centerOnIcon = createQIconOnOff("centerselection", false);
     m_centerOn =
         new QAction(centerOnIcon, tr("&Focus on Current"), m_commonToolbar);
     connect(m_centerOn, SIGNAL(triggered()), m_viewer, SLOT(centerOnCurrent()));
 
     // Reorder schematic
-    QIcon reorderIcon = createQIconOnOffPNG("reorder", false);
+    QIcon reorderIcon = createQIconOnOff("reorder", false);
     m_reorder = new QAction(reorderIcon, tr("&Reorder Nodes"), m_commonToolbar);
     connect(m_reorder, SIGNAL(triggered()), m_viewer, SLOT(reorderScene()));
 
     // Normalize schematic schematic
-    QIcon normalizeIcon = createQIconOnOffPNG("resetsize", false);
+    QIcon normalizeIcon = createQIconOnOff("resetsize", false);
     m_normalize =
         new QAction(normalizeIcon, tr("&Reset Size"), m_commonToolbar);
     connect(m_normalize, SIGNAL(triggered()), m_viewer, SLOT(normalizeScene()));
 
-    QIcon nodeSizeIcon = createQIconOnOffPNG(
+    QIcon nodeSizeIcon = createQIconOnOff(
         m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
     m_nodeSize =
         new QAction(nodeSizeIcon, m_maximizedNode ? tr("&Minimize Nodes")
@@ -601,21 +601,21 @@ void SchematicViewer::createActions() {
     if (m_fullSchematic) {
       // AddPegbar
       addPegbar           = new QAction(tr("&New Pegbar"), m_stageToolbar);
-      QIcon addPegbarIcon = createQIconOnOffPNG("pegbar", false);
+      QIcon addPegbarIcon = createQIconOnOff("pegbar", false);
       addPegbar->setIcon(addPegbarIcon);
       connect(addPegbar, SIGNAL(triggered()), m_stageScene,
               SLOT(onPegbarAdded()));
 
       // AddCamera
       addCamera           = new QAction(tr("&New Camera"), m_stageToolbar);
-      QIcon addCameraIcon = createQIconOnOffPNG("camera", false);
+      QIcon addCameraIcon = createQIconOnOff("camera", false);
       addCamera->setIcon(addCameraIcon);
       connect(addCamera, SIGNAL(triggered()), m_stageScene,
               SLOT(onCameraAdded()));
 
       // AddSpline
       addSpline           = new QAction(tr("&New Motion Path"), m_stageToolbar);
-      QIcon addSplineIcon = createQIconOnOffPNG("motionpath", false);
+      QIcon addSplineIcon = createQIconOnOff("motionpath", false);
       addSpline->setIcon(addSplineIcon);
       connect(addSpline, SIGNAL(triggered()), m_stageScene,
               SLOT(onSplineAdded()));
@@ -625,7 +625,7 @@ void SchematicViewer::createActions() {
           new QAction(tr("&Swtich output port display mode"), m_stageToolbar);
       switchPort->setCheckable(true);
       switchPort->setChecked(m_stageScene->isShowLetterOnPortFlagEnabled());
-      QIcon switchPortIcon = createQIconOnOffPNG("switchport");
+      QIcon switchPortIcon = createQIconOnOff("switchport");
       switchPort->setIcon(switchPortIcon);
       connect(switchPort, SIGNAL(toggled(bool)), m_stageScene,
               SLOT(onSwitchPortModeToggled(bool)));
@@ -633,17 +633,15 @@ void SchematicViewer::createActions() {
       // InsertFx
       insertFx = CommandManager::instance()->getAction("MI_InsertFx");
       if (insertFx) {
-        QIcon insertFxIcon = createQIconOnOffPNG("fx", false);
+        QIcon insertFxIcon = createQIconOnOff("fx", false);
         insertFx->setIcon(insertFxIcon);
       }
 
       // AddOutputFx
       addOutputFx = CommandManager::instance()->getAction("MI_NewOutputFx");
-      QIcon addOutputFxIcon = createQIconOnOffPNG("output", false);
-      if (addOutputFx) addOutputFx->setIcon(addOutputFxIcon);
 
       // Swap fx/stage schematic
-      QIcon changeSchematicIcon = createQIconOnOffPNG("swap", false);
+      QIcon changeSchematicIcon = createQIconOnOff("swap", false);
       m_changeScene =
           CommandManager::instance()->getAction("A_FxSchematicToggle", true);
       if (m_changeScene) {
@@ -740,7 +738,7 @@ void SchematicViewer::onSceneSwitched() {
                         ->getXsheet()
                         ->getFxDag()
                         ->getDagGridDimension() == 0;
-  QIcon nodeSizeIcon = createQIconOnOffPNG(
+  QIcon nodeSizeIcon = createQIconOnOff(
       m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
   m_nodeSize->setIcon(nodeSizeIcon);
   QString label(m_maximizedNode ? tr("&Minimize Nodes")
@@ -799,7 +797,7 @@ void SchematicViewer::changeNodeSize() {
   // aggiono l'icona del pulsante;
   m_fxScene->resizeNodes(m_maximizedNode);
   m_stageScene->resizeNodes(m_maximizedNode);
-  QIcon nodeSizeIcon = createQIconOnOffPNG(
+  QIcon nodeSizeIcon = createQIconOnOff(
       m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
   m_nodeSize->setIcon(nodeSizeIcon);
   QString label(m_maximizedNode ? tr("&Minimize Nodes")
