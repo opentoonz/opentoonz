@@ -106,7 +106,9 @@ enum class PredefinedRect {
   THUMBNAIL,           //! the actual thumbnail, if there is one
   PEGBAR_NAME,         //! where to display pegbar name
   PARENT_HANDLE_NAME,  //! where to display parent handle number
-  FILTER_COLOR         //! where to show layer's filter color
+  FILTER_COLOR,        //! where to show layer's filter color
+  COG_AREA,            //! clickable area larger than the cog, containing it
+  COG                  //! the cog itself
 };
 enum class PredefinedLine {
   LOCKED,              //! dotted vertical line when cell is locked
