@@ -169,8 +169,9 @@ ToolOptionControlBuilder::ToolOptionControlBuilder(ToolOptionsBox *panel,
 //-----------------------------------------------------------------------------
 
 QLabel *ToolOptionControlBuilder::addLabel(TProperty *p) {
-  if (p->getName() == "Sensitivity:") return new QLabel();
-  QLabel *label = new QLabel(p->getQStringName());
+  QLabel *label;
+  if (p->getName() == "Sensitivity:") label = new QLabel("");
+  else label = new QLabel(p->getQStringName());
   hLayout()->addWidget(label, 0);
   return label;
 }
