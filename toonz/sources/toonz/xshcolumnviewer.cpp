@@ -565,21 +565,45 @@ void ColumnArea::DrawHeader::prepare() const {
 
 //-----------------------------------------------------------------------------
 const QPixmap &ColumnArea::Pixmaps::eye() {
-  static QPixmap eye = QPixmap(":Resources/x_prev_eye.png");
+  static QPixmap eye = QPixmap(":Resources/x_prev_eye_on.svg");
   return eye;
 }
+const QPixmap &ColumnArea::Pixmaps::eye_off() {
+	static QPixmap eye = QPixmap(":Resources/x_prev_eye_off.svg");
+	return eye;
+}
+const QPixmap &ColumnArea::Pixmaps::eye_disabled() {
+	static QPixmap eye = QPixmap(":Resources/x_prev_eye_disabled.svg");
+	return eye;
+}
 const QPixmap &ColumnArea::Pixmaps::cameraStand() {
-  static QPixmap cameraStand = QPixmap(":Resources/x_table_view.png");
-  return cameraStand;
+	static QPixmap cameraStand = QPixmap(":Resources/x_table_view_on.svg");
+	return cameraStand;
+}
+const QPixmap &ColumnArea::Pixmaps::cameraStand_off() {
+	static QPixmap cameraStand = QPixmap(":Resources/x_table_view_off.svg");
+	return cameraStand;
 }
 const QPixmap &ColumnArea::Pixmaps::cameraStandTransparent() {
   static QPixmap cameraStandTransparent =
-      QPixmap(":Resources/x_table_view_transp.png");
+      QPixmap(":Resources/x_table_view_transp2.svg");
   return cameraStandTransparent;
 }
+const QPixmap &ColumnArea::Pixmaps::cameraStand_disabled() {
+	static QPixmap cameraStand = QPixmap(":Resources/x_table_view_disabled.svg");
+	return cameraStand;
+}
 const QPixmap &ColumnArea::Pixmaps::lock() {
-  static QPixmap lock = QPixmap(":Resources/x_lock.png");
-  return lock;
+	static QPixmap lock = QPixmap(":Resources/x_lock_on.svg");
+	return lock;
+}
+const QPixmap &ColumnArea::Pixmaps::lock_off() {
+	static QPixmap lock = QPixmap(":Resources/x_lock_off.svg");
+	return lock;
+}
+const QPixmap &ColumnArea::Pixmaps::lock_disabled() {
+	static QPixmap lock = QPixmap(":Resources/x_lock_disabled.svg");
+	return lock;
 }
 const QPixmap &ColumnArea::Pixmaps::sound() {
   static QPixmap sound = QPixmap(":Resources/sound_header_off.png");
@@ -589,6 +613,15 @@ const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
   static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
   return soundPlaying;
 }
+const QPixmap &ColumnArea::Pixmaps::cog() {
+	static QPixmap cog = QPixmap(":Resources/x_level_config.svg");
+	return cog;
+}
+const QPixmap &ColumnArea::Pixmaps::cog_disabled() {
+	static QPixmap cog = QPixmap(":Resources/x_level_config_disabled.svg");
+	return cog;
+}
+
 //-----------------------------------------------------------------------------
 
 void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
@@ -639,21 +672,15 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   int y1 = rect.bottom();
 
   // fill base color
-  if (isEmpty || col < 0) {
-    p.fillRect(rect, m_viewer->getEmptyColumnHeadColor());
+  if (isEmpty || col < 0)
+	  p.fillRect(rect, m_viewer->getEmptyColumnHeadColor());
+  else
+	  p.fillRect(rect, columnColor);
 
-    p.setPen(m_viewer->getVerticalLineHeadColor());
-    QLine vertical =
+  p.setPen(Qt::black);
+  QLine vertical =
         o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
     p.drawLine(vertical);
-  } else {
-    p.fillRect(rect, columnColor);
-
-    // column handle
-    QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
-
-    p.fillRect(sideBar, sideBar.contains(area->m_pos) ? Qt::yellow : dragColor);
-  }
 
   // highlight selection
   bool isSelected =
@@ -671,33 +698,52 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
 void ColumnArea::DrawHeader::drawEye() const {
   if (col < 0 || isEmpty) return;
-  if (!column->isPreviewVisible() || column->getPaletteColumn() ||
-      column->getSoundTextColumn())
-    return;
 
   QRect prevViewRect = o->rect(PredefinedRect::EYE_AREA).translated(orig);
   QRect eyeRect      = o->rect(PredefinedRect::EYE).translated(orig);
   // preview visible toggle
-  p.fillRect(prevViewRect, PreviewVisibleColor);
-  p.drawPixmap(eyeRect, Pixmaps::eye());
+  p.setPen(Qt::black); // gray);
+  if (column->getPaletteColumn() || column->getSoundTextColumn()) {
+	  p.drawRect(prevViewRect);
+	  p.drawPixmap(eyeRect, Pixmaps::eye_disabled());
+  }
+  else if (!column->isPreviewVisible()) {
+	  p.drawRect(prevViewRect);
+	  p.drawPixmap(eyeRect, Pixmaps::eye_off());
+  }
+  else
+  {
+	  p.fillRect(prevViewRect, PreviewVisibleColor);
+	  p.drawRect(prevViewRect);
+	  p.drawPixmap(eyeRect, Pixmaps::eye());
+  }
 }
 
 void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
   if (col < 0 || isEmpty) return;
   // camstand visible toggle
-  if (!column->isCamstandVisible() || column->getPaletteColumn() ||
-      column->getSoundTextColumn())
-    return;
 
   QRect tableViewRect =
       o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig);
   QRect tableViewImgRect =
       o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
 
-  p.fillRect(tableViewRect, CamStandVisibleColor);
-  p.drawPixmap(tableViewImgRect, opacity < 255
-                                     ? Pixmaps::cameraStandTransparent()
-                                     : Pixmaps::cameraStand());
+  p.setPen(Qt::black); // gray);
+  if (column->getPaletteColumn() || column->getSoundTextColumn()) {
+	  p.drawRect(tableViewRect);
+	  p.drawPixmap(tableViewImgRect, Pixmaps::cameraStand_disabled());
+  }
+  else if (!column->isCamstandVisible()) {
+	  p.drawRect(tableViewRect);
+	  p.drawPixmap(tableViewImgRect, Pixmaps::cameraStand_off());
+  }
+  else {
+	  p.fillRect(tableViewRect, CamStandVisibleColor);
+	  p.drawRect(tableViewRect);
+	  p.drawPixmap(tableViewImgRect, opacity < 255
+		  ? Pixmaps::cameraStandTransparent()
+		  : Pixmaps::cameraStand());
+  }
 }
 
 void ColumnArea::DrawHeader::drawLock() const {
@@ -707,16 +753,37 @@ void ColumnArea::DrawHeader::drawLock() const {
   QRect lockModeImgRect = o->rect(PredefinedRect::LOCK).translated(orig);
 
   // lock button
-  p.setPen(Qt::gray);
-  p.setBrush(QColor(255, 255, 255, 128));
-  p.drawRect(lockModeRect);
-  p.setBrush(Qt::NoBrush);
+  p.setPen(Qt::black); // gray);
   bool isLocked = column && column->isLocked();
-  if (isLocked) p.drawPixmap(lockModeImgRect, Pixmaps::lock());
+  if (isLocked) {
+	  p.drawRect(lockModeRect);
+	  p.drawPixmap(lockModeImgRect, Pixmaps::lock());
+  }
+  else {
+	  p.drawRect(lockModeRect);
+	  p.drawPixmap(lockModeImgRect, Pixmaps::lock_off());
+  }
+}
+
+void ColumnArea::DrawHeader::drawCog() const {
+	if (col < 0 || isEmpty) return;
+
+	QRect cogRect = o->rect(PredefinedRect::COG_AREA).translated(orig);
+	QRect cogImgRect = o->rect(PredefinedRect::COG).translated(orig);
+
+	// cog button
+	p.setPen(Qt::black); // gray);
+	if (column->getSoundColumn() || column->getPaletteColumn() || column->getSoundTextColumn()) {
+		p.drawRect(cogRect);
+		p.drawPixmap(cogImgRect, Pixmaps::cog_disabled());
+	}
+	else {
+		p.drawRect(cogRect);
+		p.drawPixmap(cogImgRect, Pixmaps::cog());
+	}
 }
 
 void ColumnArea::DrawHeader::drawColumnNumber() const {
-  if (o->isVerticalTimeline()) return;
   if (col < 0 || isEmpty ||
       !Preferences::instance()->isShowColumnNumbersEnabled())
     return;
@@ -728,7 +795,6 @@ void ColumnArea::DrawHeader::drawColumnNumber() const {
                          : m_viewer->getTextColor());
 
   QRect pos = o->rect(PredefinedRect::LAYER_NUMBER).translated(orig);
-  if (pos.isEmpty()) return;
   p.drawText(pos, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine,
              QString::number(col + 1));
 }
@@ -747,6 +813,16 @@ void ColumnArea::DrawHeader::drawColumnName() const {
     name = ::to_string(zColumn->getZeraryColumnFx()->getZeraryFx()->getName());
 
   QRect columnName = o->rect(PredefinedRect::LAYER_NAME).translated(orig);
+  if (!isEmpty)
+  {
+	  if (columnName.contains(area->m_pos))
+		  p.fillRect(columnName, Qt::yellow);
+	  else if (o->isVerticalTimeline())
+		  p.fillRect(columnName, QColor(255, 255, 255, 90));
+  }
+
+  p.setPen(Qt::black); // gray);
+  p.drawRect(columnName);
 
   int rightadj = -2;
   int leftadj  = 3;
@@ -771,14 +847,9 @@ void ColumnArea::DrawHeader::drawColumnName() const {
     p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
                          : m_viewer->getTextColor());
 
-  if (o->isVerticalTimeline())
-    p.drawText(columnName.adjusted(leftadj, 0, rightadj, 0),
-               Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
-               QString(name.c_str()));
-  else
-    p.drawText(columnName.adjusted(leftadj, 0, rightadj, 0),
-               Qt::AlignLeft | Qt::AlignBottom | Qt::TextSingleLine,
-               QString(name.c_str()));
+  p.drawText(columnName.adjusted(leftadj, 0, rightadj, 0),
+             Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
+			 QString(name.c_str()));
 }
 
 void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
@@ -786,6 +857,8 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
 
   QRect thumbnailRect =
       o->rect(PredefinedRect::THUMBNAIL_AREA).translated(orig);
+  p.setPen(Qt::black); // gray);
+  p.drawRect(thumbnailRect);
 
   // sound thumbnail
   if (column->getSoundColumn()) {
@@ -916,16 +989,16 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
   int layerAxis = o->layerAxis(divisionsTopLeft);
   int frameAxis = o->frameAxis(divisionsTopLeft);
   if (o->isVerticalTimeline()) {
-    for (int i = 0; i <= 20; i++, frameAxis += 3)
+    for (int i = 0; i <= 20; i++, layerAxis += 3)
       if ((i % 10) == 0)
-        p.drawLine(o->horizontalLine(frameAxis,
-                                     NumberRange(layerAxis - 3, layerAxis)));
+        p.drawLine(o->verticalLine(layerAxis,
+                                     NumberRange(frameAxis, frameAxis + 3)));
       else if (i & 1)
         p.drawLine(
-            o->horizontalLine(frameAxis, NumberRange(layerAxis, layerAxis)));
+            o->verticalLine(layerAxis, NumberRange(frameAxis, frameAxis)));
       else
-        p.drawLine(o->horizontalLine(frameAxis,
-                                     NumberRange(layerAxis - 2, layerAxis)));
+        p.drawLine(o->verticalLine(layerAxis,
+                                     NumberRange(frameAxis, frameAxis + 2)));
   } else {
     for (int i = 0; i <= 20; i++, frameAxis += 3)
       if ((i % 10) == 0)
@@ -950,7 +1023,14 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
 
   layerAxis     = o->layerSide(trackRect).middle();
   frameAxis     = o->frameSide(trackRect).weight(volume);
+  if (o->isVerticalTimeline()) {
+	  layerAxis = o->frameSide(trackRect).middle();
+	  frameAxis = o->layerSide(trackRect).weight(volume);
+  }
   QPoint cursor = o->frameLayerToXY(frameAxis, layerAxis);
+  if (o->isVerticalTimeline()) {
+	  cursor = o->frameLayerToXY(layerAxis, frameAxis);
+  }
   QPainterPath head =
       o->path(PredefinedPath::VOLUME_SLIDER_HEAD).translated(cursor);
   p.fillPath(head, QBrush(Qt::white));
@@ -1165,6 +1245,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(column ? column->getOpacity() : 0);
   drawHeader.drawLock();
+  drawHeader.drawCog();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
   QPixmap iconPixmap = getColumnIcon(col);
@@ -1212,6 +1293,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(255);
   drawHeader.drawLock();
+  drawHeader.drawCog();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
   // Sound columns don't have an image. Passing in an image
@@ -1260,6 +1342,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(0);
   drawHeader.drawLock();
+  drawHeader.drawCog();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
   static QPixmap iconPixmap(":Resources/palette_header.png");
@@ -1311,6 +1394,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(255);
   drawHeader.drawLock();
+  drawHeader.drawCog();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
   static QPixmap iconPixmap(":Resources/magpie.png");
@@ -1646,7 +1730,13 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
 
     if (!isEmpty && m_col >= 0) {
       // grabbing the left side of the column enables column move
-      if (o->rect(PredefinedRect::DRAG_LAYER).contains(mouseInCell)) {
+		if (o->rect(PredefinedRect::DRAG_LAYER).contains(mouseInCell)
+			|| o->rect(PredefinedRect::LAYER_NUMBER).contains(mouseInCell)
+			|| (o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell)
+				&& !o->rect(PredefinedRect::SOUND_ICON).contains(mouseInCell)  // Could be True in timesheet mode since it overlaps
+				&& !o->rect(PredefinedRect::VOLUME_AREA).contains(mouseInCell) // Could be True in timesheet mode since it overlaps
+				)
+			) {
         setDragTool(XsheetGUI::DragTool::makeColumnMoveTool(m_viewer));
       }
       // lock button
@@ -1675,12 +1765,18 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
         } else {
           m_doOnRelease =
               isCtrlPressed ? ToggleAllTransparency : ToggleTransparency;
-          if (column->getSoundColumn()) {
-            // do nothing
-          } else
-            startTransparencyPopupTimer(event);
         }
       }
+	  // cog button
+	  else if (o->rect(PredefinedRect::COG_AREA).contains(mouseInCell) &&
+		  event->button() == Qt::LeftButton) {
+		  if (column->getSoundColumn() || column->getPaletteColumn() || 
+			  column->getSoundTextColumn()) {
+			  // do nothing
+		  }
+		  else
+			  m_doOnRelease = OpenSettings;
+	  }
       // sound column
       else if (column && column->getSoundColumn()) {
         if (o->rect(PredefinedRect::SOUND_ICON).contains(mouseInCell)) {
@@ -1799,8 +1895,14 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
     m_tooltip = tr("Click to select camera");
   else if (o->rect(PredefinedRect::DRAG_LAYER).contains(mouseInCell)) {
     m_tooltip = tr("Click to select column, drag to move it");
+  } else if (o->rect(PredefinedRect::LAYER_NUMBER).contains(mouseInCell)) {
+	  m_tooltip = tr("Click to select column, drag to move it");
+  } else if (o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell)) {
+	  m_tooltip = tr("Click to select column, drag to move it, double-click to edit");
   } else if (o->rect(PredefinedRect::LOCK_AREA).contains(mouseInCell)) {
     m_tooltip = tr("Lock Toggle");
+  } else if (o->rect(PredefinedRect::COG_AREA).contains(mouseInCell)) {
+	  m_tooltip = tr("Additional level settings");
   } else if (o->rect(PredefinedRect::EYE_AREA).contains(mouseInCell)) {
     m_tooltip = tr("Preview Visibility Toggle");
   } else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA)
@@ -1850,7 +1952,24 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
       column->setPreviewVisible(!column->isPreviewVisible());
     else if (m_doOnRelease == ToggleLock)
       column->lock(!column->isLocked());
-    else if (m_doOnRelease == ToggleAllPreviewVisible) {
+	else if (m_doOnRelease == OpenSettings) {
+      if (!m_columnTransparencyPopup)
+		  m_columnTransparencyPopup = new ColumnTransparencyPopup(
+			this);
+
+	  // Align popup to be next to COG button
+	  QRect cogRect = m_viewer->orientation()->rect(PredefinedRect::COG_AREA);
+	  QPoint pos = event->pos();
+	  int col = m_viewer->xyToPosition(pos).layer();
+	  CellPosition cellPosition(0, col);
+	  QPoint topLeft = m_viewer->positionToXY(cellPosition);
+	  QPoint mouseInCell = pos - topLeft;
+	  int x = cogRect.right() - mouseInCell.x() + 1; // distance from right edge of COG button
+	  int y = mouseInCell.y() - cogRect.top(); // distance from top edge of COG button
+	  m_columnTransparencyPopup->move(event->globalPos().x() + x, event->globalPos().y() - y);
+	  
+	  openTransparencyPopup();
+	} else if (m_doOnRelease == ToggleAllPreviewVisible) {
       for (col = 0; col < totcols; col++) {
         TXshColumn *column = xsh->getColumn(col);
         if (!xsh->isColumnEmpty(col) && !column->getPaletteColumn() &&

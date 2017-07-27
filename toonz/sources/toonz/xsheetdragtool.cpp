@@ -1765,7 +1765,11 @@ public:
     QRect track            = o->rect(PredefinedRect::VOLUME_TRACK);
     NumberRange range      = o->frameSide(track);
     int frameAxis          = o->frameAxis(event->pos());
-    double v               = range.ratio(frameAxis);
+	if (o->isVerticalTimeline()) {
+		range = o->layerSide(track);
+		frameAxis = o->layerAxis(event->pos());
+	}
+	double v               = range.ratio(frameAxis);
     if (o->flipVolume()) v = 1 - v;
 
     TXsheet *xsh       = getViewer()->getXsheet();
