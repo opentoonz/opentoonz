@@ -59,6 +59,8 @@ public:
 
   void save();
   void load(const TFilePath &fp);
+  bool m_panelMaximized = false;
+  DockWidget *m_activePanel;
 };
 
 //-----------------------------------------------------------------------------
@@ -68,8 +70,7 @@ class MainWindow final : public QMainWindow {
 
   bool m_saveSettingsOnQuit;
   bool m_startupPopupShown = false;
-  bool m_panelMaximized    = false;
-  DockWidget *m_activePanel;
+
   int m_oldRoomIndex;
   QString m_currentRoomsChoice;
   UpdateChecker *m_updateChecker;
