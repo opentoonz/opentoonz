@@ -567,27 +567,38 @@ class DrawingSubtitutionUndo final : public TUndo {
 private:
   int m_direction, m_row, m_col;
   TCellSelection::Range m_range;
-  bool m_selected, m_isEmpty;
+  bool m_selected;
+  std::vector<std::pair<int, int>> emptyCells;
 
 public:
   DrawingSubtitutionUndo(int dir, TCellSelection::Range range, int row, int col,
-                         bool selected, bool isEmpty)
+                         bool selected)
       : m_direction(dir)
       , m_range(range)
       , m_row(row)
       , m_col(col)
-      , m_selected(selected)
-      , m_isEmpty(isEmpty) {}
+      , m_selected(selected) {
+    TXsheet *xsh = TApp::instance()->getCurrentScene()->getScene()->getXsheet();
+    int tempCol, tempRow;
+    int c = m_range.m_c0;
+    int r = m_range.m_r0;
+    while (c <= m_range.m_c1) {
+      tempCol = c;
+      while (r <= m_range.m_r1) {
+        tempRow = r;
+        if (xsh->getCell(tempRow, tempCol).isEmpty()) {
+          emptyCells.push_back(std::make_pair(tempRow, tempCol));
+        }
+        r++;
+      }
+      r = m_range.m_r0;
+      c++;
+    }
+  }
 
   void undo() const override {
-    if (m_isEmpty) {
-      TXsheet *xsh =
-          TApp::instance()->getCurrentScene()->getScene()->getXsheet();
-      xsh->clearCells(m_row, m_col);
-      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-      TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-      return;
-    }
+    TXsheet *xsh = TApp::instance()->getCurrentScene()->getScene()->getXsheet();
+
     if (!m_selected) {
       changeDrawing(-m_direction, m_row, m_col);
       return;
@@ -598,7 +609,20 @@ public:
     while (c <= m_range.m_c1) {
       col = c;
       while (r <= m_range.m_r1) {
-        row = r;
+        row        = r;
+        bool found = false;
+        for (int i = 0; i < emptyCells.size(); i++) {
+          if (emptyCells[i].first == row && emptyCells[i].second == col) {
+            xsh->clearCells(row, col);
+            found = true;
+          }
+        }
+        if (found) {
+          r++;
+          TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+          TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+          continue;
+        }
         changeDrawing(-m_direction, row, col);
         r++;
       }
@@ -774,7 +798,7 @@ bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col) {
     index = cell.getFrameId().getNumber();
 
   if (usePrevCell) {
-    index -= 1;
+    index -= delta;
     cell = xsh->getCell(row, col);
   }
 
@@ -818,9 +842,6 @@ void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col,
 //-----------------------------------------------------------------------------
 
 static void drawingSubstituion(int dir) {
-  // TTool::Application *app = TTool::getApplication();
-  // TCellSelection *selection = dynamic_cast<TCellSelection
-  // *>(app->getCurrentSelection()->getSelection());
   TCellSelection *selection = dynamic_cast<TCellSelection *>(
       TTool::getApplication()->getCurrentSelection()->getSelection());
   TCellSelection::Range range;
@@ -831,12 +852,9 @@ static void drawingSubstituion(int dir) {
   }
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-  TXshCell cell =
-      TApp::instance()->getCurrentScene()->getScene()->getXsheet()->getCell(
-          row, col);
-  bool isEmpty = cell.isEmpty();
+
   DrawingSubtitutionUndo *undo =
-      new DrawingSubtitutionUndo(dir, range, row, col, selected, isEmpty);
+      new DrawingSubtitutionUndo(dir, range, row, col, selected);
   TUndoManager::manager()->add(undo);
 
   undo->redo();
