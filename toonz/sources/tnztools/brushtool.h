@@ -124,6 +124,7 @@ public:
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  bool keyDown(int key, TUINT32 b, const TPoint &point) override;
 
   void draw() override;
 
@@ -152,7 +153,8 @@ public:
   void addTrackPoint(const TThickPoint &point, double pixelSize2);
   void flushTrackPoint();
   bool doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
-                           TFrameId lastFrameId, TStroke *lastStroke);
+                           TFrameId lastFrameId, TStroke *lastStroke,
+                           bool drawFirstStroke = true);
 
 protected:
   TPropertyGroup m_prop[2];
@@ -211,7 +213,7 @@ protected:
   bool m_active, m_enabled,
       m_isPrompting,  //!< Whether the tool is prompting for spline
                       //! substitution.
-      m_firstTime, m_isPath, m_presetsLoaded;
+      m_firstTime, m_isPath, m_presetsLoaded, m_firstFrameRange;
 
   /*---
 作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）に別のフレームに

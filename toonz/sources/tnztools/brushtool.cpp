@@ -27,6 +27,7 @@
 #include "toonz/toonzimageutils.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/stage2.h"
+#include "tw/keycodes.h"
 
 // TnzCore includes
 #include "tstream.h"
@@ -768,6 +769,7 @@ BrushTool::BrushTool(std::string name, int targetType)
     , m_enabled(false)
     , m_isPrompting(false)
     , m_firstTime(true)
+    , m_firstFrameRange(true)
     , m_presetsLoaded(false)
     , m_frameRange("Range:")
     , m_snap("Snap", false)
@@ -1513,12 +1515,24 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
           curCol   = application->getCurrentColumn()->getColumnIndex();
           curFrame = application->getCurrentFrame()->getFrame();
         }
-        bool success = doFrameRangeStrokes(m_firstFrameId, m_firstStroke,
-                                           getFrameId(), stroke);
+        bool success =
+            doFrameRangeStrokes(m_firstFrameId, m_firstStroke, getFrameId(),
+                                stroke, m_firstFrameRange);
         if (e.isCtrlPressed()) {
-          m_firstStroke  = new TStroke(*stroke);
-          m_rangeTrack   = m_track;
-          m_firstFrameId = getFrameId();
+          if (application) {
+            if (m_firstFrameId > currentId) {
+              if (application->getCurrentFrame()->isEditingScene()) {
+                application->getCurrentColumn()->setColumnIndex(curCol);
+                application->getCurrentFrame()->setFrame(curFrame);
+              } else
+                application->getCurrentFrame()->setFid(currentId);
+            }
+          }
+          resetFrameRange();
+          m_firstStroke     = new TStroke(*stroke);
+          m_rangeTrack      = m_track;
+          m_firstFrameId    = currentId;
+          m_firstFrameRange = false;
         }
 
         if (application && !e.isCtrlPressed()) {
@@ -1547,8 +1561,18 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
 //--------------------------------------------------------------------------------------------------
 
+bool BrushTool::keyDown(int key, TUINT32 b, const TPoint &point) {
+  if (key == TwConsts::TK_Esc) {
+    resetFrameRange();
+  }
+  return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+
 bool BrushTool::doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
-                                    TFrameId lastFrameId, TStroke *lastStroke) {
+                                    TFrameId lastFrameId, TStroke *lastStroke,
+                                    bool drawFirstStroke) {
   TXshSimpleLevel *sl =
       TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel();
   TStroke *first           = new TStroke();
@@ -1556,13 +1580,14 @@ bool BrushTool::doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
   TVectorImageP firstImage = new TVectorImage();
   TVectorImageP lastImage  = new TVectorImage();
 
-  *first = *firstStroke;
-  *last  = *lastStroke;
-
+  *first       = *firstStroke;
+  *last        = *lastStroke;
+  bool swapped = false;
   if (firstFrameId > lastFrameId) {
     tswap(firstFrameId, lastFrameId);
-    *first = *lastStroke;
-    *last  = *firstStroke;
+    *first  = *lastStroke;
+    *last   = *firstStroke;
+    swapped = true;
   }
 
   firstImage->addStroke(first);
@@ -1612,17 +1637,19 @@ bool BrushTool::doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
     }
 
     TVectorImageP img = sl->getFrame(fid, true);
-    if (t == 0)
-      addStrokeToImage(getApplication(), img, firstImage->getStroke(0),
-                       m_breakAngles.getValue(), m_isFrameCreated,
-                       m_isLevelCreated);
-
-    else if (t == 1)
-      addStrokeToImage(getApplication(), img, lastImage->getStroke(0),
-                       m_breakAngles.getValue(), m_isFrameCreated,
-                       m_isLevelCreated);
-
-    else {
+    if (t == 0) {
+      if (!swapped && !drawFirstStroke) {
+      } else
+        addStrokeToImage(getApplication(), img, firstImage->getStroke(0),
+                         m_breakAngles.getValue(), m_isFrameCreated,
+                         m_isLevelCreated);
+    } else if (t == 1) {
+      if (swapped && !drawFirstStroke) {
+      } else
+        addStrokeToImage(getApplication(), img, lastImage->getStroke(0),
+                         m_breakAngles.getValue(), m_isFrameCreated,
+                         m_isLevelCreated);
+    } else {
       assert(firstImage->getStrokeCount() == 1);
       assert(lastImage->getStrokeCount() == 1);
       TVectorImageP vi = TInbetween(firstImage, lastImage).tween(s);
@@ -2126,6 +2153,7 @@ void BrushTool::resetFrameRange() {
     delete m_firstStroke;
     m_firstStroke = 0;
   }
+  m_firstFrameRange = true;
 }
 
 //------------------------------------------------------------------
