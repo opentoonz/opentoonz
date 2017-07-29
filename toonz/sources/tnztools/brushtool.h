@@ -182,13 +182,14 @@ protected:
   TStroke *m_firstStroke;
   TTileSetCM32 *m_tileSet;
   TTileSaverCM32 *m_tileSaver;
-  TFrameId m_firstFrameId;
+  TFrameId m_firstFrameId, m_veryFirstFrameId;
   TPixel32 m_currentColor;
   int m_styleId;
   double m_minThick, m_maxThick;
 
   // for snapping
-  int m_strokeIndex1, m_strokeIndex2, m_col, m_firstFrame;
+  int m_strokeIndex1, m_strokeIndex2, m_col, m_firstFrame, m_veryFirstFrame,
+      m_veryFirstCol;
   double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
 
   TRectD m_modifiedRegion;

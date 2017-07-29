@@ -1500,6 +1500,11 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
           m_firstFrame = application->getCurrentFrame()->getFrame();
         }
         m_rangeTrack = m_track;
+        if (m_firstFrameRange) {
+          m_veryFirstCol     = m_col;
+          m_veryFirstFrame   = m_firstFrame;
+          m_veryFirstFrameId = m_firstFrameId;
+        }
       } else if (m_firstFrameId == getFrameId()) {
         if (m_firstStroke) {
           delete m_firstStroke;
@@ -1537,13 +1542,15 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
         if (application && !e.isCtrlPressed()) {
           if (application->getCurrentFrame()->isEditingScene()) {
-            application->getCurrentColumn()->setColumnIndex(m_col);
-            application->getCurrentFrame()->setFrame(m_firstFrame);
+            application->getCurrentColumn()->setColumnIndex(m_veryFirstCol);
+            application->getCurrentFrame()->setFrame(m_veryFirstFrame);
           } else
-            application->getCurrentFrame()->setFid(m_firstFrameId);
+            application->getCurrentFrame()->setFid(m_veryFirstFrameId);
         }
 
-        if (!e.isCtrlPressed()) resetFrameRange();
+        if (!e.isCtrlPressed()) {
+          resetFrameRange();
+        }
       }
     } else {
       addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
