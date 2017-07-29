@@ -175,4 +175,7 @@
   SHADER_radialblurGPU
   SHADER_spinblurGPU
 </Shaders>
+  <Utility>
+    STD_nothingFx
+  </Utility>
 </fxs>

@@ -1,0 +1,7 @@
+<fxlayout>
+  <page name="Nothing">
+    <control>value</control>
+    <control>spread</control>
+  </page>
+
+</fxlayout>
