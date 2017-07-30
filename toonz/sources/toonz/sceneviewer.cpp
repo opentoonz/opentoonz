@@ -2012,9 +2012,30 @@ void SceneViewer::zoom(const TPointD &center, double factor) {
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::flipX() {
+  int x;
+  x = m_isFlippedX ? 1 : -1;
+  setViewMatrix(TScale(-1, 1) * m_viewAff[m_viewMode], m_viewMode);
+  m_isFlippedX = !m_isFlippedX;
+  invalidateAll();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::flipY() {
+  int y;
+  y = m_isFlippedY ? 1 : -1;
+  setViewMatrix(TScale(1, -1) * m_viewAff[m_viewMode], m_viewMode);
+  m_isFlippedY = !m_isFlippedY;
+  invalidateAll();
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewer::rotate(const TPointD &center, double angle) {
   if (angle == 0) return;
-  TPointD realCenter = m_viewAff[m_viewMode] * center;
+  if (m_isFlippedX != m_isFlippedY) angle = -angle;
+  TPointD realCenter                      = m_viewAff[m_viewMode] * center;
   setViewMatrix(TRotation(realCenter, angle) * m_viewAff[m_viewMode],
                 m_viewMode);
   invalidateAll();
@@ -2056,6 +2077,8 @@ void SceneViewer::swapCompared() {
 
 void SceneViewer::fitToCamera() {
   // Reset the view scale to 1:1.
+  bool tempIsFlippedX = m_isFlippedX;
+  bool tempIsFlippedY = m_isFlippedY;
   resetSceneViewer();
 
   TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -2088,7 +2111,10 @@ void SceneViewer::fitToCamera() {
   double xratio = (double)viewRect.width() / cameraRect.getLx();
   double yratio = (double)viewRect.height() / cameraRect.getLy();
   double ratio  = std::min(xratio, yratio);
-
+  if (tempIsFlippedX)
+    setViewMatrix(TScale(-1, 1) * m_viewAff[m_viewMode], m_viewMode);
+  if (tempIsFlippedY)
+    setViewMatrix(TScale(1, -1) * m_viewAff[m_viewMode], m_viewMode);
   // Scale and center on the center of \a rect.
   QPoint c = viewRect.center();
   zoom(TPointD(c.x(), c.y()), ratio);
@@ -2109,7 +2135,8 @@ void SceneViewer::resetSceneViewer() {
   m_theta3D     = 20;
   m_phi3D       = 30;
   emit onZoomChanged();
-
+  m_isFlippedX = false;
+  m_isFlippedY = false;
   invalidateAll();
 }
 
@@ -2138,10 +2165,16 @@ void SceneViewer::setActualPixelSize() {
   } else
     dpi = sl->getDpi(fid);
 
-  const double inch = Stage::inch;
+  const double inch             = Stage::inch;
+  TAffine tempAff               = getNormalZoomScale();
+  if (m_isFlippedX) tempAff     = tempAff * TScale(-1, 1);
+  if (m_isFlippedY) tempAff     = tempAff * TScale(1, -1);
+  TPointD tempScale             = dpi;
+  if (m_isFlippedX) tempScale.x = -tempScale.x;
+  if (m_isFlippedY) tempScale.y = -tempScale.y;
   for (int i = 0; i < tArrayCount(m_viewAff); i++)
-    setViewMatrix(dpi == TPointD(0, 0) ? getNormalZoomScale()
-                                       : TScale(dpi.x / inch, dpi.y / inch),
+    setViewMatrix(dpi == TPointD(0, 0) ? tempAff : TScale(tempScale.x / inch,
+                                                          tempScale.y / inch),
                   i);
 
   m_pos         = QPoint(0, 0);

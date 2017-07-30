@@ -73,7 +73,7 @@ class SceneViewer final : public GLWidgetForHighDpi,
   int m_referenceMode;
   int m_previewMode;
   bool m_isMouseEntered, m_forceGlFlush;
-
+  bool m_isFlippedX = false, m_isFlippedY = false;
   /*!  FreezedStatus:
 *  \li NO_FREEZED freezed is not active;
 *  \li NORMAL_FREEZED freezed is active: show grab image;
@@ -215,6 +215,8 @@ public:
   bool canSwapCompared() const;
 
   bool isEditPreviewSubcamera() const { return m_editPreviewSubCamera; }
+  bool getIsFlippedX() const { return m_isFlippedX; }
+  bool getIsFlippedY() const { return m_isFlippedY; }
   void setEditPreviewSubcamera(bool enabled) {
     m_editPreviewSubCamera = enabled;
   }
@@ -302,7 +304,6 @@ protected:
 
   // overriden from TTool::Viewer
   void zoom(const TPointD &center, double factor) override;
-
   void rotate(const TPointD &center, double angle) override;
   void rotate3D(double dPhi, double dTheta) override;
 
@@ -341,6 +342,8 @@ public slots:
 
   void resetSceneViewer();
   void setActualPixelSize();
+  void flipX();
+  void flipY();
   void onXsheetChanged();
   void onObjectSwitched();
   // when tool options are changed, update tooltip immediately
