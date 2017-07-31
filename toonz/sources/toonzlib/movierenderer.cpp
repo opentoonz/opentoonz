@@ -212,13 +212,17 @@ void MovieRenderer::Imp::prepareForStart() {
         // In case the raster specifics are different from those of a currently
         // existing movie, erase it
         try {
-          TLevelReaderP lr(fp);
-          lr->loadInfo();
+          if (fp.isFfmpegType()) {
+            TSystem::removeFileOrLevel(fp);
+          } else {
+            TLevelReaderP lr(fp);
+            lr->loadInfo();
 
-          const TImageInfo *info = lr->getImageInfo();
-          if (!info || info->m_lx != imageSize.lx ||
-              info->m_ly != imageSize.ly || fp.isFfmpegType())
-            TSystem::removeFileOrLevel(fp);  // nothrow
+            const TImageInfo *info = lr->getImageInfo();
+            if (!info || info->m_lx != imageSize.lx ||
+                info->m_ly != imageSize.ly)
+              TSystem::removeFileOrLevel(fp);  // nothrow
+          }
         } catch (...) {
           // Same if the level could not be read/opened
           TSystem::removeFileOrLevel(fp);  // nothrow

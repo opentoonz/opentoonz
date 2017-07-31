@@ -55,7 +55,7 @@ bool PlaneViewerZoomer::zoom(bool zoomin, bool resetZoom) {
 //=========================================================================================
 
 PlaneViewer::PlaneViewer(QWidget *parent)
-    : QGLWidget(parent)
+    : GLWidgetForHighDpi(parent)
     , m_firstResize(true)
     , m_xpos(0)
     , m_ypos(0)
@@ -160,22 +160,25 @@ void PlaneViewer::resizeGL(int width, int height) {
 //=========================================================================================
 
 void PlaneViewer::mouseMoveEvent(QMouseEvent *event) {
+  QPoint curPos = event->pos() * getDevPixRatio();
   if (event->buttons() & Qt::MidButton)
-    moveView(event->x() - m_xpos, height() - event->y() - m_ypos);
+    moveView(curPos.x() - m_xpos, height() - curPos.y() - m_ypos);
 
-  m_xpos = event->x(), m_ypos = height() - event->y();
+  m_xpos = curPos.x(), m_ypos = height() - curPos.y();
 }
 
 //------------------------------------------------------
 
 void PlaneViewer::mousePressEvent(QMouseEvent *event) {
-  m_xpos = event->x(), m_ypos = height() - event->y();
+  m_xpos = event->x() * getDevPixRatio();
+  m_ypos = height() - event->y() * getDevPixRatio();
 }
 
 //------------------------------------------------------
 
 void PlaneViewer::wheelEvent(QWheelEvent *event) {
-  TPointD pos(event->x(), height() - event->y());
+  TPointD pos(event->x() * getDevPixRatio(),
+              height() - event->y() * getDevPixRatio());
   double zoom_par = 1 + event->delta() * 0.001;
 
   zoomView(pos.x, pos.y, zoom_par);

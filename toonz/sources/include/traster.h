@@ -62,7 +62,6 @@ class TRasterPT;
 class TRaster;
 typedef TSmartPointerT<TRaster> TRasterP;
 
-
 //------------------------------------------------------------
 
 //

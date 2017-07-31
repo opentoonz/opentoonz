@@ -730,6 +730,7 @@ void ImageViewer::updateCursor(const TPoint &curPos) {
 /*! If middle button is pressed pan the image. Update current mouse position.
 */
 void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
+  if (!m_image) return;
   QPoint curQPos = event->pos() * getDevPixRatio();
 
   TPoint curPos = TPoint(curQPos.x(), curQPos.y());
@@ -947,6 +948,7 @@ int ImageViewer::getDragType(const TPoint &pos, const TRect &loadbox) {
 
 //-------------------------------------------------------------------------------
 void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
+  if (!m_image) return;
   if (m_visualSettings.m_defineLoadbox && m_flipbook) {
     m_flipbook->setLoadbox(TRect());
     update();
@@ -957,6 +959,7 @@ void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
 //------------------------------------------------------------------------------
 
 void ImageViewer::mousePressEvent(QMouseEvent *event) {
+  if (!m_image) return;
   m_pos                   = event->pos() * getDevPixRatio();
   m_pressedMousePos       = TPoint(m_pos.x(), m_pos.y());
   m_mouseButton           = event->button();
@@ -1004,6 +1007,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 /*! Reset current mouse position and current mouse button event.
 */
 void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
+  if (!m_image) return;
   if (m_draggingZoomSelection && !m_visualSettings.m_defineLoadbox) {
     m_draggingZoomSelection = false;
 
@@ -1039,6 +1043,7 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
 /*! Apply zoom.
 */
 void ImageViewer::wheelEvent(QWheelEvent *event) {
+  if (!m_image) return;
   if (event->orientation() == Qt::Horizontal) return;
   int delta = event->delta() > 0 ? 120 : -120;
   QPoint center(event->pos().x() * getDevPixRatio() - width() / 2,
@@ -1098,7 +1103,8 @@ TAffine ImageViewer::getImgToWidgetAffine() const {
 TAffine ImageViewer::getImgToWidgetAffine(const TRectD &geom) const {
   TPointD geomCenter((geom.x0 + geom.x1) * 0.5, (geom.y0 + geom.y1) * 0.5);
 
-  QRect widGeom(geometry());
+  QRect widGeom(rect());
+
   TPointD viewerCenter((widGeom.left() + widGeom.right() + 1) * 0.5,
                        (widGeom.top() + widGeom.bottom() + 1) * 0.5);
 
@@ -1112,7 +1118,7 @@ TAffine ImageViewer::getImgToWidgetAffine(const TRectD &geom) const {
 //! Adapts image viewer's affine to display the passed image rect at maximized
 //! ratio
 void ImageViewer::adaptView(const TRect &imgRect, const TRect &viewRect) {
-  QRect viewerRect(geometry());
+  QRect viewerRect(rect());
 
   double imageScale = std::min(viewerRect.width() / (double)viewRect.getLx(),
                                viewerRect.height() / (double)viewRect.getLy());

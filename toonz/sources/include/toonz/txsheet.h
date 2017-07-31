@@ -13,6 +13,8 @@
 // TnzLib includes
 #include "toonz/txshcolumn.h"
 
+#include "cellposition.h"
+
 // STD includes
 #include <set>
 
@@ -46,6 +48,7 @@ class ToonzScene;
 class TXshSoundColumn;
 class TXshNoteSet;
 class TFrameId;
+class Orientation;
 
 //=============================================================================
 
@@ -58,62 +61,68 @@ class TFrameId;
 /*!
 Inherits \b TSmartObject and \b TPersist.
 
-                The class provides a collection of functions that returns xsheet
+        The class provides a collection of functions that returns xsheet
 elements, defined in
-                struct \b TXsheetImp, and enables manipulation of these. Most
-important xsheet elements
-                are: a \b column \b set \b TColumnSetT, a \b pegbar \b tree \b
+        struct \b TXsheetImp, and enables manipulation of these. Most important
+xsheet elements
+        are: a \b column \b set \b TColumnSetT, a \b pegbar \b tree \b
 TStageObjectTree, a \b fx
-                \b dag \b FxDag, a \b sound \b track \b TSoundTrack and a \b
-scene \b ToonzScene.
+        \b dag \b FxDag, a \b sound \b track \b TSoundTrack and a \b scene \b
+ToonzScene.
 
-                A \b column \b set contains all xsheet column. A collection of
-function, concern column
-                set, allows to manage xsheet column. It's possible to know
-xsheet column number,
-                getColumnCount(), know first not empty column index,
+                For purposes of this class, a Column is a graphics layer, and a
+row is a frame number.
+                (Whether horizontal or vertial is a matter of displaying).
+
+                A \b column \b set contains all xsheet columns. A collection of
+functions, concerning column
+        set, allows to manage xsheet column. It's possible to know xsheet column
+count,
+        getColumnCount(), know first non empty column index,
 getFirstFreeColumnIndex(),
-                or know if column in datum index is empty, isColumnEmpty(). You
-can work on single xsheet
-                column, getColumn(), using its indexes: insert and remove a
-column with insertColumn()
-                and removeColumn() or move column from an index to another using
+        or know if column in datum index is empty, isColumnEmpty(). You can work
+on single xsheet
+        column, getColumn(), using its indexes: insert and remove a column with
+insertColumn()
+        and removeColumn() or move column from an index to another using
 moveColumn().
 
-                You can manage also column visualization in xsheet, using the
-xsheet object \b ColumnFan
-                getColumnFan(), and find column icon getColumnIcon().
+        You can manage also column visualization in xsheet, using the xsheet
+object \b ColumnFan
+        getColumnFan(), and find column icon getColumnIcon().
 
-                It's possible work on xsheet cells directly, getCell() and
-setCell() or getCells() and
-                setCells(); cells are identified in xsheet by two index one for
-row and one for column.
-                You can insert, remove or clear cells using insertCells(),
-removeCells() or clearCells();
-                the difference between the remove and the clear function is the
-shift of remains cells.
-                Also there are functions to manipulate cells reverseCells(),
+                cell positions will be identified by a pair of row+column index,
+which is a separate class.
+
+        It's possible work on xsheet cells directly, getCell() and setCell() or
+getCells() and
+        setCells(); cells are identified in xsheet by two index one for row and
+one for column.
+        You can insert, remove or clear cells using insertCells(), removeCells()
+or clearCells();
+        the difference between the remove and the clear function is the shift of
+remains cells.
+        Also there are functions to manipulate cells reverseCells(),
 swingCells(),
-                incrementCells(), duplicateCells(), int upTo, stepCells(),
-eachCells().
+        incrementCells(), duplicateCells(), int upTo, stepCells(), eachCells().
 
-                About \b pegbar \b tree \b TStageObjectTree, it's possible to
-manage it through the stage object's
-                related functions.
+        About \b pegbar \b tree \b TStageObjectTree, it's possible to manage it
+through the stage object's
+        related functions.
 
-                The \b fx \b dag \b FxDag getFxDag() is not managed with direct
+        The \b fx \b dag \b FxDag getFxDag() is not managed with direct
 functions but is always
-                up to date; in fact same functions update it. For example
+        up to date; in fact same functions update it. For example
 insertColumn(), if necessary,
-                insert column index in fx dag, the same happen in setCells().
+        insert column index in fx dag, the same happen in setCells().
 
-                The \b sound \b track \b TSoundTrack contain a mixed sound,
-computed using makeSound(),
-                of all \b TXshSoundColumn present in xsheet.
+        The \b sound \b track \b TSoundTrack contain a mixed sound, computed
+using makeSound(),
+        of all \b TXshSoundColumn present in xsheet.
 
-                It's possible take and know the \b scene \b ToonzScene to which
-the xsheet refers using
-                getScene() and setScene().
+        It's possible take and know the \b scene \b ToonzScene to which the
+xsheet refers using
+        getScene() and setScene().
 */
 
 class DVAPI TXsheet final : public TSmartObject, public TPersist {
@@ -159,64 +168,66 @@ public:
           \sa getMaxFrame()
   */
   int getFrameCount() const;
-  /*! Returns true if cells contained in rect delimited by first row \b \e r0,
-     last row \b \e r1
-          and first column \b \e c0, last column \b \e c1 are empty; otherwise,
-     returns false.
+
+  /*! Returns true if all cells in rect delimited by first frame \b \e
+     pos0.frame,
+     last frame \b \e pos1.frame and first layer \b \e pos0.layer, last layer \b
+     \e pos1.layer
+         are empty; otherwise, false.
   */
-  bool isRectEmpty(int r0, int c0, int r1, int c1) const;
+  bool isRectEmpty(const CellPosition &pos0, const CellPosition &pos1) const;
+
   /*! Returns the \b TXshCell cell in row identified by index \b \e row and
-     column identified by
-          index \b \e col. If column \b TXshColumnP in \b \e col is empty return
+     column identified by index \b \e col. If column \b TXshColumnP in \b \e col
+     is empty return
      an empty cell.
           \sa setCell(), getCells(), setCells()
   */
   const TXshCell &getCell(int row, int col) const;
 
+  const TXshCell &getCell(const CellPosition &pos) const;
+
   bool setCell(int row, int col, const TXshCell &cell);
   /*! Set \b \e cells[] to \b \e rowCount cells of column identified by index \b
-     \e col starting from
-          row identified by index \b \e row. If column is empty or is not a \b
-     TXshCellColumn
-          set \b \e cells[] to \b \e rowCount empty cells.
+     \e col starting from row identified by index \b \e row. If column is empty
+     or is not a \b
+     TXshCellColumn set \b \e cells[] to \b \e rowCount empty cells.
           \sa getCells(), setCells(), getCell()
 */
   void getCells(int row, int col, int rowCount, TXshCell cells[]) const;
   /*! If column identified by index \b \e col is a \b TXshCellColumn or is empty
-and is not
-          locked, this method sets to \b \e cells[] the given \b \e rowCount
-cells of column \b \e col starting from
-          row \b \e row. If column in \b \e col is empty it creates a new column
-recalling
-          \b TColumnSetT::touchColumn() and sets the new cells to \b \e cells[],
-and on creating a new
-          column it adds it to fx dag \b FxDag.
-          If cells in \b \e row and \b \e col are not empty recalls \b
-TXshCellColumn::setCells(),
-          insert the new cells \b \e cells[] in \b \e row \b \e col and shift
-old cells.
-          If xsheet change it updates xsheet's frame count.
-Return false if cannot set cells.
-          \sa getCells(), setCell(), getCell()
+    and is not
+    locked, this method sets to \b \e cells[] the given \b \e rowCount cells of
+    column \b \e col starting from
+    row \b \e row. If column in \b \e col is empty it creates a new column
+    recalling
+    \b TColumnSetT::touchColumn() and sets the new cells to \b \e cells[], and
+    on creating a new
+    column it adds it to fx dag \b FxDag.
+    If cells in \b \e row and \b \e col are not empty recalls \b
+    TXshCellColumn::setCells(),
+    insert the new cells \b \e cells[] in \b \e row \b \e col and shift old
+    cells.
+    If xsheet change it updates xsheet's frame count. Return false if cannot set
+    cells.
+    \sa getCells(), setCell(), getCell()
   */
   bool setCells(int row, int col, int rowCount, const TXshCell cells[]);
   /*! If column identified by index \b \e col is not empty, is a \b \e
-     TXshCellColumn and is not
-          locked this method inserts in row identified by index \b \e row \b \e
-     rowCount empty cells, it calls
-          TXshCellColumn::insertEmptyCells(). An update of xsheet's frame count
+     TXshCellColumn and is not locked this method inserts in row identified by
+     index \b \e row \b \e
+     rowCount empty cells, it calls TXshCellColumn::insertEmptyCells(). An
+     update of xsheet's frame count
      is performed.
           \sa setCells(), removeCells()
   */
   void insertCells(int row, int col, int rowCount = 1);
 
   /*! If column identified by index \b \e col is not empty, is a \b
-     TXshCellColumn and is not
-          locked, this method removes \b \e rowCount cells starting from \b \e
-     row, it calls
-          TXshCellColumn::removeCells(). It removes cells without shift
-     remaining cells.
-          An update of xsheet's frame count is performed.
+     TXshCellColumn and is not locked, this method removes \b \e rowCount cells
+     starting from \b \e
+     row, it calls TXshCellColumn::removeCells(). It removes cells without shift
+     remaining cells. An update of xsheet's frame count is performed.
           \sa  clearCells(), insertCells()
   */
   void removeCells(int row, int col, int rowCount = 1);
@@ -232,10 +243,10 @@ Return false if cannot set cells.
   */
   void clearAll();
   /*! Returns cell range of column identified by index \b \e col and set \b \e
-     r0 and \b \e r1
-          respectively to first and last not empty cell, it then recalls \b
-     TXshCellColumn::getRange().
-          If column is empty or is not a \b TXshCellColumn this method returns
+     r0 and \b \e r1 respectively to first and last not empty cell, it then
+     recalls \b
+     TXshCellColumn::getRange(). If column is empty or is not a \b
+     TXshCellColumn this method returns
      zero and sets
           \b \e r0 to 0 and \b \e r1 to -1.
   */
@@ -504,8 +515,9 @@ in TXsheetImp.
   FxDag *getFxDag() const;
   /*! Returns a pointer to object \b ColumnFan contained in \b TXsheetImp, this
           object allows the user to manage columns visualization in xsheet.
+          TXsheet maintains one column fan per each orientation.
   */
-  ColumnFan *getColumnFan() const;
+  ColumnFan *getColumnFan(const Orientation *o) const;
   /*! Returns a pointer to \b ToonzScene contained in \b TXsheetImp, that is the
      scene to
           which the xsheet refers.

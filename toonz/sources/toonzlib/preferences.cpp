@@ -118,8 +118,8 @@ void getDefaultLevelFormats(LevelFormatVector &lfv) {
     lfv[1].m_options.m_premultiply = true;
 
     // for all PNG files, set premultiply by default
-    lfv[2].m_name = Preferences::tr("PNG");
-    lfv[2].m_pathFormat = QRegExp("..*\\.png", Qt::CaseInsensitive);
+    lfv[2].m_name                  = Preferences::tr("PNG");
+    lfv[2].m_pathFormat            = QRegExp("..*\\.png", Qt::CaseInsensitive);
     lfv[2].m_options.m_premultiply = true;
   }
 }
@@ -308,9 +308,13 @@ Preferences::Preferences()
     , m_ffmpegTimeout(60)
     , m_shortcutPreset("defopentoonz")
     , m_useNumpadForSwitchingStyles(true)
+    , m_showXSheetToolbar(false)
+    , m_expandFunctionHeader(false)
+    , m_showColumnNumbers(false)
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
+    , m_ignoreImageDpi(false)
     , m_watchFileSystem(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -543,7 +547,7 @@ Preferences::Preferences()
   getValue(*m_settings, "DefLevelWidth", m_defLevelWidth);
   getValue(*m_settings, "DefLevelHeight", m_defLevelHeight);
   getValue(*m_settings, "DefLevelDpi", m_defLevelDpi);
-
+  getValue(*m_settings, "IgnoreImageDpi", m_ignoreImageDpi);
   getValue(*m_settings, "viewerBGColor", m_viewerBGColor);
   getValue(*m_settings, "previewBGColor", m_previewBGColor);
   getValue(*m_settings, "chessboardColor1", m_chessboardColor1);
@@ -585,6 +589,9 @@ Preferences::Preferences()
   setShortcutPreset(m_shortcutPreset.toStdString());
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
+  getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
+  getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
            m_useArrowKeyToShiftCellSelection);
   getValue(*m_settings, "inputCellsWithoutDoubleClickingEnabled",
@@ -1268,6 +1275,13 @@ void Preferences::setDefLevelDpi(double dpi) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setIgnoreImageDpi(bool on) {
+  m_ignoreImageDpi = on;
+  m_settings->setValue("IgnoreImageDpi", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::setPaletteTypeOnLoadRasterImageAsColorModel(int type) {
   m_paletteTypeOnLoadRasterImageAsColorModel = type;
   m_settings->setValue("paletteTypeOnLoadRasterImageAsColorModel", type);
@@ -1369,6 +1383,25 @@ int Preferences::matchLevelFormat(const TFilePath &fp) const {
 void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
   m_useNumpadForSwitchingStyles = on;
   m_settings->setValue("useNumpadForSwitchingStyles", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableShowXSheetToolbar(bool on) {
+  m_showXSheetToolbar = on;
+  m_settings->setValue("showXSheetToolbar", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableExpandFunctionHeader(bool on) {
+  m_expandFunctionHeader = on;
+  m_settings->setValue("expandFunctionHeader", on ? "1" : "0");
+}
+
+void Preferences::enableShowColumnNumbers(bool on) {
+  m_showColumnNumbers = on;
+  m_settings->setValue("showColumnNumbers", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

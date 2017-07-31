@@ -152,6 +152,7 @@ set(MOC_HEADERS
     sandor_fxs/YOMBParam.h
     texturemanager.h
     imagebuilders.h
+	../include/orientation.h
 )
 
 set(HEADERS ${MOC_HEADERS})
@@ -161,6 +162,7 @@ set(SOURCES
     autoclose.cpp
     autopos.cpp
     captureparameters.cpp
+	cellpositionratio.cpp
     childstack.cpp
     cleanupcolorstyles.cpp
     cleanuppalette.cpp
@@ -193,6 +195,7 @@ set(SOURCES
     Naa2TlvConverter.cpp
     observer.cpp
     onionskinmask.cpp
+	orientation.cpp
     outputproperties.cpp
     preferences.cpp
     rasterbrush.cpp

@@ -68,7 +68,7 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_foregroundDrawing;
   bool m_tabletEvent;
   // used to handle wrong mouse drag events!
-  bool m_buttonClicked;
+  bool m_buttonClicked, m_toolSwitched;
   bool m_shownOnce = false;
   int m_referenceMode;
   int m_previewMode;

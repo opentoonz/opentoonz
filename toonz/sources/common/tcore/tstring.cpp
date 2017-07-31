@@ -58,7 +58,7 @@ std::string to_string(std::wstring ws) {
 #endif
 }
 
-std::string to_string(const TFilePath &fp) {
+std::string to_string(const TFilePath& fp) {
   return ::to_string(fp.getWideString());
 }
 
@@ -80,7 +80,7 @@ std::string to_string(double value, int prec) {
   return out.str();
 }
 
-std::string to_string(void *p) {
+std::string to_string(void* p) {
   std::ostringstream out;
   out << p;
   return out.str();
@@ -125,9 +125,12 @@ bool isDouble(std::wstring s) { return isDouble(::to_string(s)); }
 
 std::string toUpper(std::string a) {
 #ifdef _WIN32
-  return _strupr(const_cast<char *>(a.c_str()));
+  size_t size      = a.size();
+  const char* cstr = a.c_str();
+  std::vector<char> buf(cstr, cstr + size + 1);
+  return _strupr(&buf[0]);
 #else
-  std::string ret = a;
+  std::string ret(a);
   for (int i = 0; i < (int)ret.length(); i++) ret[i] = toupper(ret[i]);
   return ret;
 #endif
@@ -135,9 +138,12 @@ std::string toUpper(std::string a) {
 
 std::string toLower(std::string a) {
 #ifdef _WIN32
-  return _strlwr(const_cast<char *>(a.c_str()));
+  size_t size      = a.size();
+  const char* cstr = a.c_str();
+  std::vector<char> buf(cstr, cstr + size + 1);
+  return _strlwr(&buf[0]);
 #else
-  std::string ret = a;
+  std::string ret(a);
   for (int i = 0; i < (int)ret.length(); i++) ret[i] = tolower(ret[i]);
   return ret;
 #endif
@@ -145,27 +151,26 @@ std::string toLower(std::string a) {
 
 std::wstring toUpper(std::wstring a) {
 #ifdef _WIN32
-  return _wcsupr(const_cast<wchar_t *>(a.c_str()));
+  size_t size         = a.size();
+  const wchar_t* cstr = a.c_str();
+  std::vector<wchar_t> buf(cstr, cstr + size + 1);
+  return _wcsupr(&buf[0]);
 #else
-  std::wstring ret;
-  for (int i = 0; i < (int)a.length(); i++) {
-    wchar_t c = towupper(a[i]);
-    ret += c;
-  }
+  std::wstring ret(a);
+  for (int i = 0; i < (int)ret.length(); i++) ret[i] = towupper(ret[i]);
   return ret;
 #endif
 }
 
 std::wstring toLower(std::wstring a) {
 #ifdef _WIN32
-  return _wcslwr(const_cast<wchar_t *>(a.c_str()));
+  size_t size         = a.size();
+  const wchar_t* cstr = a.c_str();
+  std::vector<wchar_t> buf(cstr, cstr + size + 1);
+  return _wcslwr(&buf[0]);
 #else
-  const int length = (int)a.length();
-  std::wstring ret;
-  ret.resize(length);
-  for (int i = 0; i < length; i++) {
-    ret[i] = towlower(a[i]);
-  }
+  std::wstring ret(a);
+  for (int i = 0; i < (int)ret.length(); i++) ret[i] = towlower(ret[i]);
   return ret;
 #endif
 }

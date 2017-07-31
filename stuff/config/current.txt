@@ -1224,6 +1224,16 @@
   <item>"STD_iwa_BokehFx.distance5"		"Layer5 Distance"</item>
   <item>"STD_iwa_BokehFx.bokeh_adjustment5"	"Layer5 Bokeh Adjustment"</item>
   
+  <item>"STD_iwa_TimeCodeFx"	"TimeCode Iwa"</item>
+  <item>"STD_iwa_TimeCodeFx.displayType"	"Display Type"</item>
+  <item>"STD_iwa_TimeCodeFx.frameRate"	"Frame Rate"</item>
+  <item>"STD_iwa_TimeCodeFx.startFrame"	"Start Frame"</item>
+  <item>"STD_iwa_TimeCodeFx.position"	"Text Position"</item>
+  <item>"STD_iwa_TimeCodeFx.size"	"Text Size"</item>
+  <item>"STD_iwa_TimeCodeFx.textColor"	"Text Color"</item>
+  <item>"STD_iwa_TimeCodeFx.showBox"	"Show Box"</item>
+  <item>"STD_iwa_TimeCodeFx.boxColor"	"Box Color"</item>
+
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>

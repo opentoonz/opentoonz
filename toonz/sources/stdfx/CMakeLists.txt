@@ -73,6 +73,7 @@ set(HEADERS
     iwa_pnperspectivefx.h
     iwa_soapbubblefx.h
 	iwa_bokehfx.h
+	iwa_timecodefx.h
 )
 
 set(SOURCES
@@ -250,6 +251,7 @@ set(SOURCES
 	${SDKROOT}/kiss_fft130/kiss_fft.c
 	${SDKROOT}/kiss_fft130/tools/kiss_fftnd.c
 	iwa_bokehfx.cpp
+	iwa_timecodefx.cpp
 )
 
 set(OBJCSOURCES

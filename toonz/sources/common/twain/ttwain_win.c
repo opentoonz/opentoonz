@@ -13,9 +13,9 @@ int TTWAIN_EnableWindow(void *hwnd, int flag) {
   return TTWAIN_EnableWindowPD(hwnd, flag);
 }
 
-//static void TTWAIN_EmptyMessageQueue(void) { TTWAIN_EmptyMessageQueuePD(); }
+// static void TTWAIN_EmptyMessageQueue(void) { TTWAIN_EmptyMessageQueuePD(); }
 
-//static void TTWAIN_ModalEventLoop(void) { TTWAIN_ModalEventLoopPD(); }
+// static void TTWAIN_ModalEventLoop(void) { TTWAIN_ModalEventLoopPD(); }
 
 #ifdef __cplusplus
 }

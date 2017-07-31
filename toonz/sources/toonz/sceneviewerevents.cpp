@@ -379,7 +379,8 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
     if ((m_tabletEvent && m_pressure > 0) || m_mouseButton == Qt::LeftButton) {
       // sometimes the mousePressedEvent is postponed to a wrong  mouse move
       // event!
-      if (m_buttonClicked) tool->leftButtonDrag(pos, toonzEvent);
+      if (m_buttonClicked && !m_toolSwitched)
+        tool->leftButtonDrag(pos, toonzEvent);
     } else if (m_pressure == 0) {
       tool->mouseMove(pos, toonzEvent);
       // m_tabletEvent=false;
@@ -412,7 +413,7 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   // evita i press ripetuti
   if (m_buttonClicked) return;
   m_buttonClicked = true;
-
+  m_toolSwitched  = false;
   if (m_freezedStatus != NO_FREEZED) return;
 
   if (m_mouseButton != Qt::NoButton) return;
@@ -554,7 +555,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
     }
 
     if (m_mouseButton == Qt::LeftButton) {
-      tool->leftButtonUp(pos, toonzEvent);
+      if (!m_toolSwitched) tool->leftButtonUp(pos, toonzEvent);
       TApp::instance()->getCurrentTool()->setToolBusy(false);
     }
   }
@@ -859,7 +860,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     flags = TwConsts::TK_CapsLock;
   else if (key == Qt::Key_Backspace)
     key = TwConsts::TK_Backspace;
-  else if (key == Qt::Key_Return)
+  else if (key == Qt::Key_Return || key == Qt::Key_Enter)
     key = TwConsts::TK_Return;
   else if (key == Qt::Key_Left && !shiftButton)
     key = TwConsts::TK_LeftArrow;
@@ -934,9 +935,9 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (!ret) {
     TFrameHandle *fh = TApp::instance()->getCurrentFrame();
 
-    if (key == TwConsts::TK_UpArrow)
+    if (key == TwConsts::TK_UpArrow || key == TwConsts::TK_LeftArrow)
       fh->prevFrame();
-    else if (key == TwConsts::TK_DownArrow)
+    else if (key == TwConsts::TK_DownArrow || key == TwConsts::TK_RightArrow)
       fh->nextFrame();
     else if (key == TwConsts::TK_Home)
       fh->firstFrame();
@@ -1117,7 +1118,7 @@ void SceneViewer::dropEvent(QDropEvent *e) {
 
 void SceneViewer::onToolSwitched() {
   m_forceGlFlush = true;
-
+  m_toolSwitched = true;
   invalidateToolStatus();
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();

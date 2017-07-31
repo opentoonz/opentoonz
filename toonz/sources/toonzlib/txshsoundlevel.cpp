@@ -145,9 +145,13 @@ void TXshSoundLevel::saveData(TOStream &os) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSoundLevel::computeValues(int frameHeight) {
+void TXshSoundLevel::computeValuesFor(const Orientation *o) {
+  int frameHeight = o->dimension(PredefinedDimension::FRAME);  // time axis
+  int index       = o->dimension(PredefinedDimension::INDEX);
+  map<int, DoublePair> &values = m_values[index];
+
   if (frameHeight == 0) frameHeight = 1;
-  m_values.clear();
+  values.clear();
   if (!m_soundTrack) {
     m_frameSoundCount = 0;
     m_samplePerFrame  = 0;
@@ -174,7 +178,9 @@ void TXshSoundLevel::computeValues(int frameHeight) {
   if (absMaxPressure <= 0) return;
 
   // Adjusting using a fixed scaleFactor
-  double weightA = 20.0 / absMaxPressure;
+  int desiredAmplitude = o->dimension(PredefinedDimension::SOUND_AMPLITUDE);
+  // results will be in range -desiredAmplitude .. +desiredAmplitude
+  double weightA = desiredAmplitude / absMaxPressure;
 
   long i = 0, j;
   long p = 0;  // se p parte da zero notazione per pixel,
@@ -187,7 +193,7 @@ void TXshSoundLevel::computeValues(int frameHeight) {
           (TINT32)(i * m_samplePerFrame + j * samplePerPixel),
           (TINT32)(i * m_samplePerFrame + (j + 1) * samplePerPixel - 1),
           TSound::MONO, min, max);
-      m_values.insert(std::pair<int, std::pair<double, double>>(
+      values.insert(std::pair<int, std::pair<double, double>>(
           p + j, std::pair<double, double>(min * weightA, max * weightA)));
     }
 
@@ -196,7 +202,7 @@ void TXshSoundLevel::computeValues(int frameHeight) {
     m_soundTrack->getMinMaxPressure(
         (TINT32)(i * m_samplePerFrame + j * samplePerPixel),
         (TINT32)((i + 1) * m_samplePerFrame - 1), TSound::MONO, min, max);
-    m_values.insert(std::pair<int, std::pair<double, double>>(
+    values.insert(std::pair<int, std::pair<double, double>>(
         p + j, std::pair<double, double>(min * weightA, max * weightA)));
 
     ++i;
@@ -206,9 +212,17 @@ void TXshSoundLevel::computeValues(int frameHeight) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSoundLevel::getValueAtPixel(int pixel, DoublePair &values) const {
-  std::map<int, DoublePair>::const_iterator it = m_values.find(pixel);
-  if (it != m_values.end()) values = it->second;
+void TXshSoundLevel::computeValues() {
+  for (auto o : Orientations::all()) computeValuesFor(o);
+}
+
+//-----------------------------------------------------------------------------
+
+void TXshSoundLevel::getValueAtPixel(const Orientation *o, int pixel,
+                                     DoublePair &values) const {
+  int index = o->dimension(PredefinedDimension::INDEX);
+  std::map<int, DoublePair>::const_iterator it = m_values[index].find(pixel);
+  if (it != m_values[index].end()) values = it->second;
 }
 
 //-----------------------------------------------------------------------------
