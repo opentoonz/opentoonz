@@ -22,6 +22,7 @@
 // TnzLib includes
 #include "toonz/txsheet.h"
 #include "toonz/tstageobject.h"
+#include "toonz/stageobjectutil.h"
 
 // STD includes
 #include <string>
@@ -30,6 +31,7 @@
 #include <QComboBox>
 #include <QToolButton>
 #include <QTimer>
+#include <QLabel>
 
 #undef DVAPI
 #undef DVVAR
@@ -325,11 +327,19 @@ class DVAPI MeasuredValueField : public DVGui::LineEdit {
   bool m_modified;
   double m_errorHighlighting;
   QTimer m_errorHighlightingTimer;
-
+  int m_xMouse = -1;
   int m_precision;
+  bool m_mouseEdit    = false;
+  bool m_labelClicked = false;
+  double m_originalValue;
 
 protected:
   bool m_isGlobalKeyframe;
+
+  // these are used for mouse dragging to edit a value
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
 
 public:
   MeasuredValueField(QWidget *parent, QString name = "numfield");
@@ -355,9 +365,15 @@ protected slots:
   void onTextChanged(const QString &);
   void errorHighlightingTick();
 
+  // clicking on the label connected to a field
+  // can be used to drag and change the value
+  void receiveMouseMove(QMouseEvent *event);
+  void receiveMousePress(QMouseEvent *event);
+  void receiveMouseRelease(QMouseEvent *event);
+
 signals:
 
-  void measuredValueChanged(TMeasuredValue *value);
+  void measuredValueChanged(TMeasuredValue *value, bool addToUndo = true);
 };
 //-----------------------------------------------------------------------------
 
@@ -370,6 +386,8 @@ class PegbarChannelField final : public MeasuredValueField,
   TObjectHandle *m_objHandle;
   TXsheetHandle *m_xshHandle;
   enum ScaleType { eNone = 0, eAR = 1, eMass = 2 } m_scaleType;
+  TStageObjectValues m_before;
+  bool m_firstMouseDrag = false;
 
 public:
   PegbarChannelField(TTool *tool, enum TStageObject::Channel actionId,
@@ -386,8 +404,9 @@ public slots:
   void onScaleTypeChanged(int type);
 
 protected slots:
-
-  void onChange(TMeasuredValue *fld);
+  // add to undo is only false if mouse dragging to change the value
+  // on mouse release, add to undo is true
+  void onChange(TMeasuredValue *fld, bool addToUndo = true);
 };
 
 //-----------------------------------------------------------------------------
@@ -399,6 +418,8 @@ class DVAPI PegbarCenterField final : public MeasuredValueField,
   int m_index;  // 0 = x, 1 = y
   TObjectHandle *m_objHandle;
   TXsheetHandle *m_xshHandle;
+  TPointD m_oldCenter;
+  bool m_firstMouseDrag = false;
 
 public:
   PegbarCenterField(TTool *tool, int index, QString name,
@@ -410,8 +431,9 @@ public:
   void updateStatus() override;
 
 protected slots:
-
-  void onChange(TMeasuredValue *fld);
+  // add to undo is only false if mouse dragging to change the value
+  // on mouse release, add to undo is true
+  void onChange(TMeasuredValue *fld, bool addToUndo = true);
 };
 
 //-----------------------------------------------------------------------------
@@ -426,8 +448,9 @@ public:
   void updateStatus() override;
 
 protected slots:
-
-  void onChange(TMeasuredValue *fld);
+  // add to undo is only false if mouse dragging to change the value
+  // on mouse release, add to undo is true
+  void onChange(TMeasuredValue *fld, bool addToUndo = true);
 };
 
 //-----------------------------------------------------------------------------
@@ -462,6 +485,7 @@ class SelectionScaleField final : public MeasuredValueField {
 
   int m_id;
   SelectionTool *m_tool;
+  double m_originalValue;
 
 public:
   SelectionScaleField(SelectionTool *tool, int actionId, QString name);
@@ -469,13 +493,15 @@ public:
   ~SelectionScaleField() {}
 
   void updateStatus();
-  bool applyChange();
+  bool applyChange(bool addToUndo = true);
 
 protected slots:
-  void onChange(TMeasuredValue *fld);
+  // add to undo is only false if mouse dragging to change the value
+  // on mouse release, add to undo is true
+  void onChange(TMeasuredValue *fld, bool addToUndo = true);
 
 signals:
-  void valueChange();
+  void valueChange(bool addToUndo);
 };
 
 //-----------------------------------------------------------------------------
@@ -493,7 +519,9 @@ public:
   void updateStatus();
 
 protected slots:
-  void onChange(TMeasuredValue *fld);
+  // add to undo is only false if mouse dragging to change the value
+  // on mouse release, add to undo is true
+  void onChange(TMeasuredValue *fld, bool addToUndo = true);
 };
 
 //-----------------------------------------------------------------------------
@@ -512,7 +540,9 @@ public:
   void updateStatus();
 
 protected slots:
-  void onChange(TMeasuredValue *fld);
+  // add to undo is only false if mouse dragging to change the value
+  // on mouse release, add to undo is true
+  void onChange(TMeasuredValue *fld, bool addToUndo = true);
 };
 
 //-----------------------------------------------------------------------------
@@ -530,7 +560,32 @@ public:
   void updateStatus();
 
 protected slots:
-  void onChange(TMeasuredValue *fld);
+  void onChange(TMeasuredValue *fld, bool addToUndo = true);
 };
+
+//-----------------------------------------------------------------------------
+
+// The ClickableLabel class is used to allow click and dragging
+// on a label to change the value of a linked field
+class ClickableLabel : public QLabel {
+  Q_OBJECT
+
+protected:
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+
+public:
+  ClickableLabel(const QString &text, QWidget *parent = Q_NULLPTR,
+                 Qt::WindowFlags f = Qt::WindowFlags());
+  ~ClickableLabel();
+
+signals:
+  void onMousePress(QMouseEvent *event);
+  void onMouseMove(QMouseEvent *event);
+  void onMouseRelease(QMouseEvent *event);
+};
+
+//-----------------------------------------------------------------------------
 
 #endif

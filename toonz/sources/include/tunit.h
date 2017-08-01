@@ -151,6 +151,12 @@ public:
   void setMeasure(const TMeasure *measure);
   void setMeasure(std::string measureName);
 
+  // used for mouse dragging to change value
+  // precision is how many times to divide by 10 to adjust value
+  // nothing calls precision yet, since just basic functionality
+  // is in place for dragging
+  void modifyValue(double direction, int precision = 0);
+
   enum UnitType { MainUnit, CurrentUnit };
 
   double getValue(UnitType uType) const {
