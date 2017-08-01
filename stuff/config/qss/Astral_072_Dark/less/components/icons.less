@@ -13,7 +13,13 @@
     image: url('@{img-url}/cam_unlock.svg');
   }
   &:checked {
+    background-color: @lock-bg-color;
+    border-color: @lock-border-color;
     image: url('@{img-url}/cam_lock.svg');
+    &:hover {
+      background-color: @lock-bg-color-hover;
+      border-color: @lock-border-color;
+    }
   }
 }
 
@@ -26,6 +32,12 @@
   padding: 1px;
   width: 16px;
   &:checked {
+    background-color: @fsp-bg-color;
+    border-color: @fsp-border-color;
     image: url('@{img-url}/fsp_checked.svg');
+    &:hover {
+      background-color: @fsp-bg-color-hover;
+      border-color: @fsp-border-color;
+    }
   }
 }

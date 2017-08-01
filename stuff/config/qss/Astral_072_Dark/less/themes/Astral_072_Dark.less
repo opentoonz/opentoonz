@@ -28,6 +28,7 @@
 @dock-placeholder-color: @palette-chihiro;
 
 // Misc
+@dialog-button-frame-bg-color: darken(@bg, 5%);
 @dialog-border-color: @accent1;
 
 // Scrollable ToolBar Buttons
@@ -38,6 +39,15 @@
 // Labels
 @label-title: @palette-scooter-light;
 @label-error: @palette-red;
+
+// Icons
+@lock-bg-color: @paletteviewer-lock-color-active;
+@lock-bg-color-hover: lighten(@lock-bg-color, 15%);
+@lock-border-color: @bg;
+
+@fsp-bg-color: #4FBCBA;
+@fsp-bg-color-hover: lighten(@fsp-bg-color, 15%);
+@fsp-border-color: @bg;
 
 // Treeview
 @tree-bg-color: darken(@bg, 0%);
@@ -119,9 +129,9 @@
 @scrollbar-bg-color: darken(@bg, 5%);
 
 // Handle
-@scrollbar-handle-bg-color: lighten(@bg, 5%);
-@scrollbar-handle-bg-color-hover: lighten(@bg, 10%);
-@scrollbar-handle-bg-color-pressed: lighten(@bg, 15%);
+@scrollbar-handle-bg-color: lighten(@bg, 8%);
+@scrollbar-handle-bg-color-hover: lighten(@bg, 20%);
+@scrollbar-handle-bg-color-pressed: lighten(@bg, 30%);
 
 // Arrow Buttons
 @scrollbar-button-bg-color: @scrollbar-bg-color;
@@ -143,7 +153,7 @@
 @button-text-color-hover: lighten(@button-text-color, 5%);
 
 @button-bg-color-pressed: darken(@bg, 10%);
-@button-border-color-pressed: @selected-bg-color;
+@button-border-color-pressed: darken(@bg, 15%);
 @button-text-color-pressed: @text-color;
 
 @button-bg-color-checked: darken(@bg, 10%);
@@ -158,6 +168,8 @@
 // -----------------------------------------------------------------------------
 // QComboBox
 // -----------------------------------------------------------------------------
+
+@combobox-bg-color: @menu-bg-color;
 
 @combo-down-arrow-img: 'combo-down.svg';
 @combo-down-arrow-img-disabled: 'combo-down-disabled.svg';

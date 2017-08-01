@@ -20,7 +20,7 @@
 @text-color-disabled: lighten(@text-color, 35%);
 
 // Selected Color (Primary)
-@selected-bg-color: @palette-very-dark-blue;
+@selected-bg-color: @palette-very-dark-blue; //#0078D7; //
 @selected-text-color: #fff;
 
 // Selected Color (Secondary)
@@ -37,6 +37,15 @@
 // Labels
 @label-title: @palette-very-dark-blue;
 
+// Icons
+@lock-bg-color: darken(@paletteviewer-lock-color-active, 10%);
+@lock-bg-color-hover: lighten(@lock-bg-color, 15%);
+@lock-border-color: darken(@lock-bg-color, 25%);
+
+@fsp-bg-color: #4FBCBA;
+@fsp-bg-color-hover: lighten(@fsp-bg-color, 15%);
+@fsp-border-color: darken(@fsp-bg-color, 25%);
+
 // Treeview
 @tree-bg-color: lighten(@bg, 10%);
 @tree-bg-color-alt: @tree-bg-color;
@@ -46,32 +55,21 @@
 // -----------------------------------------------------------------------------
 
 // Container
-@tabbar-bg-color: darken(@bg, 12%);
+@tabbar-bg-color: darken(@bg, 8%);
 
 // Tabs
-@tab-bg-color: ~'QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #a1a1a1, stop: 1 #878787)';
-@tab-bg-color-hover: @button-bg-color;
-@tab-bg-color-selected: ~'QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e3e3e3, stop: 1 #cccccc)';
 @tab-text-color: #000;
 @tab-text-color-selected: #000;
-
-// Mod
-QWidget {
-  &::tab {
-    background-image: url('@{img-url}/hl_1.png');
-    background-repeat: repeat-x;
-  }
-}
 
 // -----------------------------------------------------------------------------
 // TopBar / Room Tabs
 // -----------------------------------------------------------------------------
 
 // Room Tabs
-@rooms-tab-bg-color: ~'QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #adadad, stop: 1 #949494)';
+@rooms-tab-bg-color: darken(@bg, 8%);
 
-@rooms-tab-bg-color-selected: @palette-pixie-green;
-@rooms-tab-bg-color-hover: @button-bg-color-hover;
+@rooms-tab-bg-color-selected: @bg;
+@rooms-tab-bg-color-hover: lighten(@rooms-tab-bg-color, 10%);
 @rooms-tab-border-color: lighten(@tab-border-color, 10%);
 @rooms-tab-text-color-selected: #000;
 
@@ -87,25 +85,24 @@ QWidget {
 // -----------------------------------------------------------------------------
 
 // Global Title Bar
-@title-bg-color: ~'QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #595959, stop: 1 #4b4b4b)';
-@title-border-color: darken(@bg, 35%);
+@title-bg-color: darken(@bg, 10%);
 @title-text-color: darken(#fff, 25%);
 @title-text-color-active: #fff;
-
-// Mod
-TPanelTitleBar {
-  background-image: url('@{img-url}/hl_2.png');
-  background-repeat: repeat-x;
-}
 
 // -----------------------------------------------------------------------------
 // QScrollBar
 // -----------------------------------------------------------------------------
 
-@scrollbar-bg-color: lighten(@bg, 10%);
-@scrollbar-handle-bg-color: darken(@bg, 3%);
-@scrollbar-handle-bg-color-hover: darken(@bg, 9%);
-@scrollbar-handle-bg-color-pressed: darken(@bg, 17%);
+@scrollbar-bg-color: darken(@bg, 8%);
+@scrollbar-handle-bg-color: lighten(@bg, 8%);
+@scrollbar-handle-bg-color-hover: lighten(@bg, 15%);
+@scrollbar-handle-bg-color-pressed: lighten(@bg, 25%);
+
+// -----------------------------------------------------------------------------
+// QComboBox
+// -----------------------------------------------------------------------------
+
+//@combobox-bg-color: darken(@bg, 0%);
 
 // -----------------------------------------------------------------------------
 // QPushButton
@@ -125,20 +122,6 @@ TPanelTitleBar {
 @button-border-color-checked: darken(@bg, 25%);
 @button-text-color-checked: darken(#fff, 15%);
 
-// Mod
-QPushButton,
-QComboBox {
-  // apply highlight bg img
-  background-image: url('@{img-url}/hl_1.png');
-  background-repeat: repeat-x;
-  &:pressed,
-  &:checked,
-  &:disabled {
-    // remove highlight bg img on specific states
-    background-image: url('@{img-url}/hl_trans.png');
-  }
-}
-
 // -----------------------------------------------------------------------------
 // Tool Button
 // -----------------------------------------------------------------------------
@@ -149,9 +132,9 @@ QComboBox {
 @toolbutton-bg-color-pressed: @button-bg-color-pressed;
 @toolbutton-border-color-pressed: @button-border-color-pressed;
 
-@toolbutton-bg-color-checked: @button-bg-color-checked; //lighten(@bg, 35%);
-@toolbutton-bg-color-checked-hover: @button-bg-color-checked-hover;
-@toolbutton-border-color-checked: @button-border-color-checked;
+@toolbutton-bg-color-checked: @button-bg-color-hover;
+@toolbutton-bg-color-checked-hover: lighten(@bg, 40%);
+@toolbutton-border-color-checked: darken(@bg, 10%);
 
 // -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
@@ -159,12 +142,12 @@ QComboBox {
 
 @focus-bg-color: #fff;
 @focus-border-color: @input-border-color;
-@input-bg-color: lighten(@bg, 35%);
+@input-bg-color: lighten(@bg, 30%);
 @input-border-color: darken(@bg, 15%);
 @input-border-radius: 2px;
 
 @input-bg-color-disabled: lighten(@bg, 12%);
-@input-border-color-disabled: darken(@bg, 5%);
+@input-border-color-disabled: darken(@bg, 10%);
 
 // -----------------------------------------------------------------------------
 // QCheckBox

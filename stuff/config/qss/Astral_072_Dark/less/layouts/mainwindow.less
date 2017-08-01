@@ -5,6 +5,8 @@
 QWidget {
   background-color: @bg;
   color: @text-color;
+  font-family: Segoe UI;
+  font-weight: normal;
   &:disabled {
     color: @text-color-disabled;
   }
@@ -212,7 +214,8 @@ QScrollBar {
   }
 
   &::handle {
-    border: 0;
+    border: 1px solid @scrollbar-bg-color;
+    border-radius: 5px;
     &:horizontal,
     &:vertical {
       &:hover {
@@ -347,6 +350,31 @@ QToolBar {
   }
 }
 
+/* -----------------------------------------------------------------------------
+   Keyframe Navigator
+----------------------------------------------------------------------------- */
+
+#keyFrameNavigator {
+  background: none; // Fixes BG overflow
+  margin: 0;
+  padding: 0;
+  & QToolButton {
+    min-width: 18px;
+  }
+  #PreviousKey {
+    image: url('@{img-url}/prevkey.png');
+	  &:disabled {
+		  image: url('@{img-url}/prevkey_disabled.png');
+	  }
+  }
+  #NextKey {
+	  image: url('@{img-url}/nextkey.png');
+	  &:disabled {
+		  image: url('@{img-url}/nextkey_disabled.png');
+	  }
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 
 // Scrollable QToolBar buttons - these show when QToolBar is too small to show
@@ -403,27 +431,6 @@ QToolBar {
 }
 #ScrollDownButton {
   image: url('@{img-url}/scroll-down.svg');
-}
-
-#keyFrameNavigator {
-  background: none; // Fixes BG overflow
-  margin: 0;
-  padding: 0;
-  & QToolButton {
-    min-width: 18px;
-  }
-  #PreviousKey{
-    image: url('@{img-url}/prevkey.png');
-	  &:disabled{
-		  image: url('@{img-url}/prevkey_disabled.png');
-	  }
-  }
-  #NextKey{
-	  image: url('@{img-url}/nextkey.png');
-	  &:disabled{
-		  image: url('@{img-url}/nextkey_disabled.png');
-	  }
-  }
 }
 
 /* -----------------------------------------------------------------------------

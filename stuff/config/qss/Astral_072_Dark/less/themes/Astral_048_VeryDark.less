@@ -12,6 +12,9 @@
 // Background
 @bg: #303030;
 
+// Misc
+@dialog-button-frame-bg-color: darken(@bg, 3%);
+
 // -----------------------------------------------------------------------------
 // TopBar / Room Tabs
 // -----------------------------------------------------------------------------
@@ -47,9 +50,11 @@
 // Tool Button
 // -----------------------------------------------------------------------------
 
-@toolbutton-bg-color-checked: darken(@bg, 35%);
-@toolbutton-bg-color-checked-hover: darken(@bg, 0%);
-@toolbutton-border-color-checked: lighten(@bg, 15%);
+@toolbutton-bg-color-hover: lighten(@bg, 25%);
+
+@toolbutton-bg-color-checked: lighten(@bg, 25%);
+@toolbutton-bg-color-checked-hover: lighten(@toolbutton-bg-color-checked, 15%);
+@toolbutton-border-color-checked: darken(@bg, 8%);
 @toolbutton-border-color-checked-hover: @toolbutton-border-color-checked;
 
 // -----------------------------------------------------------------------------
@@ -57,7 +62,13 @@
 // -----------------------------------------------------------------------------
 
 @input-bg-color: darken(@bg, 8%);
-@input-border-color: lighten(@bg, 10%);
+@input-border-color: lighten(@bg, 5%);
+
+// -----------------------------------------------------------------------------
+// QCheckBox
+// -----------------------------------------------------------------------------
+
+@checkbox-border-color: lighten(@bg, 10%);
 
 // -----------------------------------------------------------------------------
 // File Browser
