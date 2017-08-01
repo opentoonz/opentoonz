@@ -422,8 +422,6 @@ ProjectPopup QTreeView::branch:has-children:has-siblings:open {
 QWidget {
   background-color: #484848;
   color: #cccccc;
-  font-family: Segoe UI;
-  font-weight: normal;
 }
 QWidget:disabled {
   color: #808080;
