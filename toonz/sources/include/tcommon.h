@@ -3,7 +3,7 @@
 #ifndef T_COMMON_INCLUDED
 #define T_COMMON_INCLUDED
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4786)
 #pragma warning(disable : 4251)
 #pragma warning(disable : 4146)
@@ -154,7 +154,7 @@ const unsigned int c_maxuint = (unsigned int)(~0U);
 #define DV_IMPORT_VAR
 #endif
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #define DV_ALIGNED(val) __declspec(align(val))
 #else
 #define DV_ALIGNED(val) __attribute__((aligned(val)))

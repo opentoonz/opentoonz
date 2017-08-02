@@ -113,8 +113,8 @@ void DVAPI convertNaa2Tlv(
     TPalette *palette =
         0,  //!< Special conversion function from an antialiased level to tlv.
             //!  \sa  Function ImageUtils::convert().
-    bool removeUnusedStyles =
-        false);  //! Remove unused styles from input palette.
+    bool removeUnusedStyles = false,
+    double dpi = 0.0);  //! Remove unused styles from input palette.
 
 double DVAPI getQuantizedZoomFactor(double zf, bool forward);
 

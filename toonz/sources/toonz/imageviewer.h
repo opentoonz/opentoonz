@@ -7,8 +7,7 @@
 //#include "toonzqt/ghibli_3dlut_util.h"
 
 #include "toonz/imagepainter.h"
-
-#include <QOpenGLWidget>
+#include "toonzqt/glwidget_for_highdpi.h"
 
 //-----------------------------------------------------------------------------
 
@@ -22,7 +21,7 @@ class HistogramPopup;
 //    ImageViewer
 //--------------------
 
-class ImageViewer final : public QOpenGLWidget {
+class ImageViewer final : public GLWidgetForHighDpi {
   Q_OBJECT
   enum DragType {
     eNone,

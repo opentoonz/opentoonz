@@ -61,9 +61,7 @@
 #include <QGroupBox>
 #include <QCoreApplication>
 #include <QMainWindow>
-
-QWidget *CurrentOpenedBrowser =
-    0;  // not nice....it is used to get rid of blocking modality
+#include <QApplication>
 
 //***********************************************************************************
 //    FileBrowserPopup  implementation
@@ -353,7 +351,6 @@ void FileBrowserPopup::setOkText(const QString &text) {
 //-----------------------------------------------------------------------------
 
 void FileBrowserPopup::hideEvent(QHideEvent *e) {
-  CurrentOpenedBrowser = 0;
   TSelectionHandle::getCurrent()->popSelection();
   m_dialogSize = size();
   move(pos());
@@ -363,7 +360,6 @@ void FileBrowserPopup::hideEvent(QHideEvent *e) {
 //-----------------------------------------------------------------------------
 
 void FileBrowserPopup::showEvent(QShowEvent *) {
-  CurrentOpenedBrowser = this;
   TSelectionHandle::getCurrent()->pushSelection();
   m_selectedPaths.clear();
   m_currentFIdsSet.clear();
@@ -376,6 +372,32 @@ void FileBrowserPopup::showEvent(QShowEvent *) {
     m_nameField->setFocus();
   }
   resize(m_dialogSize);
+}
+
+//-----------------------------------------------------------------------------
+// utility function. Make the widget to be a child of modal file browser in
+// order to allow control.
+
+void FileBrowserPopup::setModalBrowserToParent(QWidget *widget) {
+  if (!widget) return;
+  QWidget *pwidget = NULL;
+  foreach (pwidget, QApplication::topLevelWidgets()) {
+    if ((pwidget->isWindow()) && (pwidget->isModal()) &&
+        (pwidget->isVisible())) {
+      FileBrowserPopup *popup = qobject_cast<FileBrowserPopup *>(pwidget);
+      if (popup) {
+        // According to the description of QDialog;
+        // "setParent() function  will clear the window flags specifying the
+        // window-system properties for the widget (in particular it will reset
+        // the Qt::Dialog flag)."
+        // So keep the window flags and set back after calling setParent().
+        Qt::WindowFlags flags = widget->windowFlags();
+        widget->setParent(pwidget);
+        widget->setWindowFlags(flags);
+        return;
+      }
+    }
+  }
 }
 
 //***********************************************************************************
@@ -1268,6 +1290,15 @@ void LoadLevelPopup::updateBottomGUI() {
     // removing
     // six letters of the scene name from the level name
     m_levelName->setText(getLevelNameWithoutSceneNumber(fp.getName()));
+
+    // If the option "Show "ABC" Appendix to the Frame Number in Xsheet Cell" is
+    // ON, frame numbers normally increment at interval of 10.
+    // Placing such level with "Auto" step option will cause unwanted
+    // spacing between frames in Xsheet. Setting the step to "1" can prevent
+    // such problem.
+    if (Preferences::instance()->isShowFrameNumberWithLettersEnabled() &&
+        m_stepCombo->currentIndex() == 0)
+      m_stepCombo->setCurrentIndex(1);
 
     m_arrangementFrame->setEnabled(true);
   }

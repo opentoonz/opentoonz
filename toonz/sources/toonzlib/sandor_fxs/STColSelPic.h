@@ -11,7 +11,7 @@
 #if !defined(AFX_STCOLSELPIC_H__80D708B0_FCA2_11D5_B949_0040F674BE6A__INCLUDED_)
 #define AFX_STCOLSELPIC_H__80D708B0_FCA2_11D5_B949_0040F674BE6A__INCLUDED_
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4996)
 #endif
 #include <streambuf>

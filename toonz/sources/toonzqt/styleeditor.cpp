@@ -548,7 +548,7 @@ QPixmap makeSquareShading(const ColorModel &color, ColorChannel channel,
 //*****************************************************************************
 
 HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
-    : QOpenGLWidget(parent)
+    : GLWidgetForHighDpi(parent)
     , m_bgColor(128, 128, 128)  // defaul value in case this value does not set
                                 // in the style sheet
 {
@@ -597,20 +597,20 @@ void HexagonalColorWheel::initializeGL() {
 
 //-----------------------------------------------------------------------------
 
-void HexagonalColorWheel::resizeGL(int width, int height) {
-  float d                 = (width - 5.0f) / 2.5f;
-  bool isHorizontallyLong = ((d * 1.732f) < height) ? false : true;
+void HexagonalColorWheel::resizeGL(int w, int h) {
+  float d                 = (w - 5.0f) / 2.5f;
+  bool isHorizontallyLong = ((d * 1.732f) < h) ? false : true;
 
   if (isHorizontallyLong) {
-    m_triEdgeLen = (float)height / 1.732f;
-    m_triHeight  = (float)height / 2.0f;
-    m_wheelPosition.setX(((float)width - (m_triEdgeLen * 2.5f + 5.0f)) / 2.0f);
+    m_triEdgeLen = (float)h / 1.732f;
+    m_triHeight  = (float)h / 2.0f;
+    m_wheelPosition.setX(((float)w - (m_triEdgeLen * 2.5f + 5.0f)) / 2.0f);
     m_wheelPosition.setY(0.0f);
   } else {
     m_triEdgeLen = d;
     m_triHeight  = m_triEdgeLen * 0.866f;
     m_wheelPosition.setX(0.0f);
-    m_wheelPosition.setY(((float)height - (m_triHeight * 2.0f)) / 2.0f);
+    m_wheelPosition.setY(((float)h - (m_triHeight * 2.0f)) / 2.0f);
   }
 
   // set all vertices positions
@@ -637,16 +637,16 @@ void HexagonalColorWheel::resizeGL(int width, int height) {
   m_leftp[2].setY(0.0f);
 
   // GL settings
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(0.0, (GLdouble)width, (GLdouble)height, 0.0, 1.0, -1.0);
+  glOrtho(0.0, (GLdouble)w, (GLdouble)h, 0.0, 1.0, -1.0);
 
   // iwsw commented out temporarily
   /*
   if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
   m_ghibli3DLutUtil)
-  m_ghibli3DLutUtil->onResize(width,height);
+  m_ghibli3DLutUtil->onResize(w,h);
   */
 }
 
@@ -777,15 +777,16 @@ void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
 
   // check whether the mouse cursor is in the wheel or in the triangle (or
   // nothing).
+  QPoint curPos = event->pos() * getDevPixRatio();
 
   QPolygonF wheelPolygon;
   // in the case of the wheel
   wheelPolygon << m_wp[1] << m_wp[2] << m_wp[3] << m_wp[4] << m_wp[5]
                << m_wp[6];
   wheelPolygon.translate(m_wheelPosition);
-  if (wheelPolygon.toPolygon().containsPoint(event->pos(), Qt::OddEvenFill)) {
+  if (wheelPolygon.toPolygon().containsPoint(curPos, Qt::OddEvenFill)) {
     m_currentWheel = leftWheel;
-    clickLeftWheel(event->pos());
+    clickLeftWheel(curPos);
     return;
   }
 
@@ -793,9 +794,9 @@ void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
   // in the case of the triangle
   wheelPolygon << m_leftp[0] << m_leftp[1] << m_leftp[2];
   wheelPolygon.translate(m_wheelPosition);
-  if (wheelPolygon.toPolygon().containsPoint(event->pos(), Qt::OddEvenFill)) {
+  if (wheelPolygon.toPolygon().containsPoint(curPos, Qt::OddEvenFill)) {
     m_currentWheel = rightTriangle;
-    clickRightTriangle(event->pos());
+    clickRightTriangle(curPos);
     return;
   }
 
@@ -811,10 +812,10 @@ void HexagonalColorWheel::mouseMoveEvent(QMouseEvent *event) {
   case none:
     break;
   case leftWheel:
-    clickLeftWheel(event->pos());
+    clickLeftWheel(event->pos() * getDevPixRatio());
     break;
   case rightTriangle:
-    clickRightTriangle(event->pos());
+    clickRightTriangle(event->pos() * getDevPixRatio());
     break;
   }
 }

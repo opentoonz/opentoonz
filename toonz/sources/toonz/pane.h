@@ -230,8 +230,6 @@ public:
 
 protected:
   void paintEvent(QPaintEvent *) override;
-  void showEvent(QShowEvent *) override;
-  void hideEvent(QHideEvent *) override;
   void enterEvent(QEvent *) override;
   void leaveEvent(QEvent *) override;
 
@@ -258,7 +256,7 @@ signals:
 
 class TPanelFactory {
   QString m_panelType;
-  static QMap<QString, TPanelFactory *> m_table;
+  static QMap<QString, TPanelFactory *> &tableInstance();
 
 public:
   TPanelFactory(QString panelType);

@@ -86,22 +86,25 @@ void XsheetGUI::DragTool::refreshRowsArea() { getViewer()->updateRows(); }
 //-----------------------------------------------------------------------------
 
 void XsheetGUI::DragTool::onClick(const QMouseEvent *event) {
-  QPoint pos = event->pos();
-  onClick(getViewer()->yToRow(pos.y()), getViewer()->xToColumn(pos.x()));
+  QPoint xy        = event->pos();
+  CellPosition pos = getViewer()->xyToPosition(xy);
+  onClick(pos);
 }
 
 //-----------------------------------------------------------------------------
 
 void XsheetGUI::DragTool::onDrag(const QMouseEvent *event) {
-  QPoint pos = event->pos();
-  onDrag(getViewer()->yToRow(pos.y()), getViewer()->xToColumn(pos.x()));
+  QPoint xy        = event->pos();
+  CellPosition pos = getViewer()->xyToPosition(xy);
+  onDrag(pos);
 }
 
 //-----------------------------------------------------------------------------
 
 void XsheetGUI::DragTool::onRelease(const QMouseEvent *event) {
-  QPoint pos = event->pos();
-  onRelease(getViewer()->yToRow(pos.y()), getViewer()->xToColumn(pos.x()));
+  QPoint xy        = event->pos();
+  CellPosition pos = getViewer()->xyToPosition(xy);
+  onRelease(pos);
 }
 
 //=============================================================================
@@ -117,11 +120,12 @@ public:
       : DragTool(viewer), m_firstRow(0), m_firstCol(0), m_modifier() {}
   // activate when clicked the cell
   void onClick(const QMouseEvent *event) override {
-    m_modifier = event->modifiers();
-    int row    = getViewer()->yToRow(event->pos().y());
-    int col    = getViewer()->xToColumn(event->pos().x());
-    m_firstCol = col;
-    m_firstRow = row;
+    m_modifier       = event->modifiers();
+    CellPosition pos = getViewer()->xyToPosition(event->pos());
+    int row          = pos.frame();
+    int col          = pos.layer();
+    m_firstCol       = col;
+    m_firstRow       = row;
     if (m_modifier & Qt::ShiftModifier) {
       int r0, c0, r1, c1;
       getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
@@ -171,7 +175,8 @@ public:
     refreshCellsArea();
     refreshRowsArea();
   }
-  void onDrag(int row, int col) override {
+  void onDrag(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
     if (col < 0) return;
     if (row < 0) row = 0;
     if (m_modifier & Qt::ControlModifier)
@@ -626,7 +631,8 @@ public:
       , m_invert(invert) {}
 
   // called when the smart tab is clicked
-  void onClick(int row, int col) override {
+  void onClick(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
     int r0, c0, r1, c1;
     getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
     if (m_invert)
@@ -647,7 +653,8 @@ public:
     m_undo->setCells(xsh, r0, c0, m_rowCount, m_colCount);
   }
 
-  void onDrag(int row, int col) override {
+  void onDrag(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
     if (!m_invert)
       onCellChange(row, col);
     else
@@ -704,7 +711,7 @@ public:
       bool found = false;
       for (int c = 0; c < m_colCount; c++) {
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (column && column->getSoundColumn()) continue;
+        if (!column || column->getSoundColumn()) continue;
         if (!column->isCellEmpty(emptyRow)) {
           emptyRow += 1;
           found = true;
@@ -725,7 +732,7 @@ public:
       // clear cells
       for (int c = 0; c < m_colCount; c++) {
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (column && column->getSoundColumn()) continue;
+        if (!column || column->getSoundColumn()) continue;
         xsh->clearCells(m_r0, m_c0 + c, dr);
       }
     }
@@ -733,7 +740,7 @@ public:
     else {
       for (int c = 0; c < m_colCount; c++) {
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (column && column->getSoundColumn()) continue;
+        if (!column || column->getSoundColumn()) continue;
         for (int r = r0; r <= m_r0 - 1; r++) {
           xsh->setCell(r, m_c0 + c, m_columns[c].generate(r));
         }
@@ -744,7 +751,8 @@ public:
                                                  m_c0 + m_colCount - 1);
   }
 
-  void onRelease(int row, int col) override {
+  void onRelease(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
     int delta = m_r1 - (m_r0 + m_rowCount - 1);
     if (delta == 0)
       delete m_undo;
@@ -883,9 +891,9 @@ public:
     return soundColumn;
   }
 
-  void onClick(int row, int col) override {
-    m_firstRow                   = row;
-    m_col                        = col;
+  void onClick(const CellPosition &pos) override {
+    m_firstRow                   = pos.frame();
+    m_col                        = pos.layer();
     TXshSoundColumn *soundColumn = getColumn();
     if (!soundColumn) return;
     m_oldColumn = dynamic_cast<TXshSoundColumn *>(soundColumn->clone());
@@ -893,8 +901,8 @@ public:
     getViewer()->update();
   }
 
-  void onDrag(int row, int col) override {
-    onChange(row);
+  void onDrag(const CellPosition &pos) override {
+    onChange(pos.frame());
     refreshCellsArea();
   }
 
@@ -922,7 +930,8 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
-  void onRelease(int row, int col) override {
+  void onRelease(const CellPosition &pos) override {
+    int row = pos.frame();
     if (row - m_firstRow == 0) {
       m_undo = 0;
       return;
@@ -985,10 +994,11 @@ public:
     LevelMoverTool::onDrag(e);
     if (m_validPos) m_keyframeMoverTool->onDrag(e);
   }
-  void onRelease(int row, int col) override {
+  void onRelease(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
     TUndoManager::manager()->beginBlock();
-    LevelMoverTool::onRelease(row, col);
-    m_keyframeMoverTool->onRelease(row, col);
+    LevelMoverTool::onRelease(pos);
+    m_keyframeMoverTool->onRelease(pos);
     TUndoManager::manager()->endBlock();
   }
 
@@ -1089,7 +1099,8 @@ public:
       , m_r1(0)
       , m_enable(true) {}
 
-  void onClick(int row, int col) override {
+  void onClick(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
     m_r0 = m_r1             = row;
     TXsheet *xsh            = getViewer()->getXsheet();
     TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
@@ -1105,7 +1116,8 @@ public:
     m_undo = new KeyFrameHandleUndo(objId, m_startRow);
   }
 
-  void onDrag(int row, int col) override {
+  void onDrag(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
     if (!m_enable) return;
     m_r1 = row;
     onCellChange(row, col);
@@ -1127,7 +1139,8 @@ public:
     m_stageObject->setKeyframeWithoutUndo(m_startRow, m_k);
   }
 
-  void onRelease(int row, int col) override {
+  void onRelease(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
     if (!m_enable) return;
     if (m_r0 == m_r1)
       delete m_undo;
@@ -1175,21 +1188,22 @@ public:
     m_startCol         = notes->getNoteCol(currentIndex);
     QPoint p           = e->pos();
     TPointD mousePos(p.x(), p.y());
-    TPointD cellTopLeft(getViewer()->columnToX(m_startCol),
-                        getViewer()->rowToY(m_startRow));
+    QPoint xy = getViewer()->positionToXY(CellPosition(m_startRow, m_startCol));
+    TPointD cellTopLeft(xy.x(), xy.y());
     m_delta = mousePos - (cellTopLeft + m_startPos);
   }
 
   void onChange(TPointD pos) {
-    pos     = pos - m_delta;
-    int row = getViewer()->yToRow(pos.y);
-    int col = getViewer()->xToColumn(pos.x);
+    pos                       = pos - m_delta;
+    CellPosition cellPosition = getViewer()->xyToPosition(pos);
+    int row                   = cellPosition.frame();
+    int col                   = cellPosition.layer();
 
     if (row < 0) row = 0;
     if (col < 0) col = 0;
 
-    TPointD newPos =
-        pos - TPointD(getViewer()->columnToX(col), getViewer()->rowToY(row));
+    QPoint xy      = getViewer()->positionToXY(CellPosition(row, col));
+    TPointD newPos = pos - TPointD(xy.x(), xy.y());
 
     if (newPos.x < 0) newPos.x = 0;
     if (newPos.y < 0) newPos.y = 0;
@@ -1252,14 +1266,16 @@ public:
                    TApp::instance()->getCurrentFrame()->getFrame())
       , m_isFos(isFos) {}
 
-  void onClick(int row, int col) override {
+  void onClick(const CellPosition &pos) override {
+    int row            = pos.frame();
     OnionSkinMask mask = m_modifier.getMask();
     TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(mask);
     m_modifier.click(row, m_isFos);
     TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
   }
 
-  void onDrag(int row, int col) override {
+  void onDrag(const CellPosition &pos) override {
+    int row          = pos.frame();
     if (row < 0) row = 0;
     onRowChange(row);
     TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
@@ -1271,7 +1287,8 @@ public:
     TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(mask);
   }
 
-  void onRelease(int row, int col) override {
+  void onRelease(const CellPosition &pos) override {
+    int row = pos.frame();
     m_modifier.release(row);
     OnionSkinMask mask = m_modifier.getMask();
     TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(mask);
@@ -1302,12 +1319,14 @@ class CurrentFrameModifier final : public XsheetGUI::DragTool {
 public:
   CurrentFrameModifier(XsheetViewer *viewer) : DragTool(viewer) {}
 
-  void onClick(int row, int col) override {
+  void onClick(const CellPosition &pos) override {
+    int row = pos.frame();
     TApp::instance()->getCurrentFrame()->setFrame(row);
     refreshRowsArea();
   }
 
-  void onDrag(int row, int col) override {
+  void onDrag(const CellPosition &pos) override {
+    int row          = pos.frame();
     if (row < 0) row = 0;
     int lastRow      = TApp::instance()->getCurrentFrame()->getFrameIndex();
     if (lastRow == row) return;
@@ -1322,7 +1341,7 @@ public:
     app->getCurrentFrame()->scrubXsheet(row, row, getViewer()->getXsheet());
   }
 
-  void onRelease(int row, int col) override {
+  void onRelease(const CellPosition &pos) override {
     getViewer()->getXsheet()->stopScrub();
   }
 };
@@ -1354,14 +1373,16 @@ public:
   PlayRangeModifier(XsheetViewer *viewer)
       : DragTool(viewer), m_movingFirst(false) {}
 
-  void onClick(int row, int col) override {
+  void onClick(const CellPosition &pos) override {
+    int row = pos.frame();
     XsheetGUI::getPlayRange(m_oldR0, m_oldR1, m_oldStep);
     assert(m_oldR0 == row || m_oldR1 == row);
     m_movingFirst = m_oldR0 == row;
     refreshRowsArea();
   }
 
-  void onDrag(int row, int col) override {
+  void onDrag(const CellPosition &pos) override {
+    int row          = pos.frame();
     if (row < 0) row = 0;
     onRowChange(row);
     refreshRowsArea();
@@ -1391,7 +1412,8 @@ public:
     XsheetGUI::setPlayRange(r0, r1, step, false);
   }
 
-  void onRelease(int row, int col) override {
+  void onRelease(const CellPosition &pos) override {
+    int row = pos.frame();
     int newR0, newR1, newStep;
     XsheetGUI::getPlayRange(newR0, newR1, newStep);
     if (m_oldR0 != newR0 || m_oldR1 != newR1) {
@@ -1428,7 +1450,8 @@ public:
 
   void onClick(const QMouseEvent *event) override {
     TColumnSelection *selection = getViewer()->getColumnSelection();
-    int col                     = getViewer()->xToColumn(event->pos().x());
+    CellPosition cellPosition   = getViewer()->xyToPosition(event->pos());
+    int col                     = cellPosition.layer();
     m_firstColumn               = col;
     bool isSelected             = selection->isColumnSelected(col);
     if (event->modifiers() & Qt::ControlModifier) {
@@ -1453,7 +1476,8 @@ public:
     getViewer()->update();
   }
 
-  void onDrag(int row, int col) override {
+  void onDrag(const CellPosition &pos) override {
+    int col = pos.layer();
     if (!m_enabled) return;
     if (col < 0) return;
     TColumnSelection *selection = getViewer()->getColumnSelection();
@@ -1465,7 +1489,7 @@ public:
     refreshCellsArea();
     return;
   }
-  void onRelease(int row, int col) override {
+  void onRelease(const CellPosition &pos) override {
     TSelectionHandle::getCurrent()->notifySelectionChanged();
   }
 };
@@ -1559,7 +1583,8 @@ public:
       , m_lastCol(-1)
       , m_offset(0) {}
 
-  void onClick(int row, int col) override {
+  void onClick(const CellPosition &pos) override {
+    int col                     = pos.layer();
     TColumnSelection *selection = getViewer()->getColumnSelection();
     if (!selection->isColumnSelected(col)) {
       selection->selectNone();
@@ -1574,7 +1599,8 @@ public:
     assert(m_lastCol == *indices.begin());
     getViewer()->update();
   }
-  void onDrag(int row, int col) override {
+  void onDrag(const CellPosition &pos) override {
+    int col                     = pos.layer();
     TColumnSelection *selection = getViewer()->getColumnSelection();
     std::set<int> indices       = selection->getIndices();
     if (indices.empty()) return;
@@ -1595,7 +1621,7 @@ public:
          ++it)
       selection->selectColumn(*it + dCol, true);
   }
-  void onRelease(int row, int col) override {
+  void onRelease(const CellPosition &pos) override {
     int delta = m_lastCol - m_firstCol;
     if (delta == 0) return;
     TColumnSelection *selection = getViewer()->getColumnSelection();
@@ -1657,9 +1683,11 @@ public:
   ChangePegbarParentDragTool(XsheetViewer *viewer)
       : XsheetGUI::DragTool(viewer), m_firstCol(-1), m_lastCol(-1) {}
 
-  void onClick(int row, int col) override { m_firstCol = m_lastCol = col; }
-  void onDrag(int row, int col) override { m_lastCol = col; }
-  void onRelease(int row, int col) override {
+  void onClick(const CellPosition &pos) override {
+    m_firstCol = m_lastCol = pos.layer();
+  }
+  void onDrag(const CellPosition &pos) override { m_lastCol = pos.layer(); }
+  void onRelease(const CellPosition &pos) override {
     // TUndoManager::manager()->add(new ColumnMoveUndo(indices, delta));
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId columnId(getViewer()->getObjectId(m_firstCol));
@@ -1732,9 +1760,14 @@ public:
 
   void onDrag(const QMouseEvent *event) override {
     if (!m_enabled) return;
-    double v =
-        (double)(60 - (event->pos().y() - (XsheetGUI::RowHeight * 2 + 4))) /
-        60.0;
+
+    const Orientation *o   = getViewer()->orientation();
+    QRect track            = o->rect(PredefinedRect::VOLUME_TRACK);
+    NumberRange range      = o->frameSide(track);
+    int frameAxis          = o->frameAxis(event->pos());
+    double v               = range.ratio(frameAxis);
+    if (o->flipVolume()) v = 1 - v;
+
     TXsheet *xsh       = getViewer()->getXsheet();
     TXshColumn *column = xsh->getColumn(m_index);
     if (!column) return;
@@ -1782,7 +1815,8 @@ public:
       , m_oldRow(0)
       , m_timerId(0) {}
 
-  void onClick(int row, int col) override {
+  void onClick(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
     TColumnSelection *selection = getViewer()->getColumnSelection();
     selection->selectNone();
     m_startRow = row;
@@ -1790,7 +1824,10 @@ public:
     getViewer()->updateCells();
   }
 
-  void onDrag(int row, int col) override { onCellChange(row, col); }
+  void onDrag(const CellPosition &pos) override {
+    int row = pos.frame(), col = pos.layer();
+    onCellChange(row, col);
+  }
 
   void onCellChange(int row, int col) {
     assert(m_startRow >= 0);
@@ -1798,9 +1835,9 @@ public:
     getViewer()->updateCells();
   }
 
-  void onRelease(int row, int col) override {
-    int r0 = std::min(row, m_startRow);
-    int r1 = std::max(row, m_startRow);
+  void onRelease(const CellPosition &pos) override {
+    int r0 = std::min(pos.frame(), m_startRow);
+    int r1 = std::max(pos.frame(), m_startRow);
     assert(m_soundColumn);
     TApp *app         = TApp::instance();
     ToonzScene *scene = app->getCurrentScene()->getScene();
@@ -1870,7 +1907,7 @@ enum CellMovementType { NO_MOVEMENT, INSERT_CELLS, OVERWRITE_CELLS };
 class DataDragTool final : public XsheetGUI::DragTool {
   DragAndDropData *m_data;
   bool m_valid;
-  TPoint m_curPos;
+  TPoint m_curPos;  // screen xy of drag begin
   CellMovementType m_type;
 
 protected:
@@ -1928,8 +1965,9 @@ public:
   }
   void onDrag(const QDropEvent *e) override {
     TPoint pos(e->pos().x(), e->pos().y());
-    int row = getViewer()->yToRow(pos.y);
-    int col = getViewer()->xToColumn(pos.x);
+    CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+    int row                   = cellPosition.frame();
+    int col                   = cellPosition.layer();
 
     m_valid = true;
     if (e->keyboardModifiers() & Qt::ShiftModifier)
@@ -1943,8 +1981,9 @@ public:
   }
   void onRelease(const QDropEvent *e) override {
     TPoint pos(e->pos().x(), e->pos().y());
-    int row = getViewer()->yToRow(pos.y);
-    int col = getViewer()->xToColumn(pos.x);
+    CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+    int row                   = cellPosition.frame();
+    int col                   = cellPosition.layer();
     if (m_type != NO_MOVEMENT && !m_valid) return;
 
     bool insert    = m_type == INSERT_CELLS;
@@ -1973,24 +2012,23 @@ public:
     refreshCellsArea();
   }
   void drawCellsArea(QPainter &p) override {
-    TPoint pos(getViewer()->xToColumn(m_curPos.x),
-               getViewer()->yToRow(m_curPos.y));
-    TRect rect = m_data->getLevelFrameRect();
+    CellPosition beginDragPosition = getViewer()->xyToPosition(m_curPos);
+    TPoint pos(beginDragPosition.layer(),
+               beginDragPosition.frame());     // row and cell coordinates
+    TRect rect = m_data->getLevelFrameRect();  // row and cell coordinates
     if (rect.isEmpty()) return;
     rect += pos;
     if (rect.x1 < 0 || rect.y1 < 0) return;
     if (rect.x0 < 0) rect.x0 = 0;
     if (rect.y0 < 0) rect.y0 = 0;
-    int x0, y0, x1, y1;
-    x0    = getViewer()->columnToX(rect.x0);
-    x1    = getViewer()->columnToX(rect.x1 + 1);
-    y0    = getViewer()->rowToY(rect.y0);
-    y1    = getViewer()->rowToY(rect.y1 + 1);
-    int x = x1 - x0;
-    int y = y1 - y0;
+    QRect screenCell         = getViewer()->rangeToXYRect(
+        CellRange(CellPosition(rect.y0, rect.x0),
+                  CellPosition(rect.y1 + 1, rect.x1 + 1)));
     p.setPen(m_valid ? QColor(190, 220, 255) : QColor(255, 0, 0));
     int i;
-    for (i = 0; i < 3; i++) p.drawRect(x0 + i, y0 + i, x - 2 * i, y - 2 * i);
+    for (i = 0; i < 3; i++)  // thick border within cell
+      p.drawRect(QRect(screenCell.topLeft() + QPoint(i, i),
+                       screenCell.size() - QSize(2 * i, 2 * i)));
   }
 };
 

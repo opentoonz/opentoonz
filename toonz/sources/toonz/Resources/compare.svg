@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="compare.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 17 17"
+	 style="enable-background:new 0 0 17 17;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+	.st1{fill:#EBEBEB;}
+	.st2{fill:#4A4A4A;}
+	.st3{fill:#EBEBEB;fill-opacity:0.502;}
+	.st4{fill:#4A4A4A;fill-opacity:0.7412;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview20" inkscape:current-layer="svg2" inkscape:cx="10.5" inkscape:cy="8.5" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="480" inkscape:window-maximized="0" inkscape:window-width="796" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="13.882353" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<rect id="rect6_1_" x="2" y="2" class="st0" width="13" height="13"/>
+<rect id="rect12_1_" x="4" y="5" class="st1" width="7" height="5"/>
+<path class="st2" d="M11,11H4c-0.6,0-1-0.5-1-1V5c0-0.6,0.5-1,1-1h7c0.6,0,1,0.5,1,1v5C12,10.6,11.6,11,11,11z M4,10h7V5H4V10z"/>
+<rect id="rect16_1_" x="6" y="7" class="st3" width="7" height="5"/>
+<path class="st4" d="M13,13H6c-0.6,0-1-0.5-1-1V7c0-0.6,0.5-1,1-1h7c0.6,0,1,0.5,1,1v5C14,12.6,13.6,13,13,13z M6,12h7V7H6V12z"/>
+<path class="st0" d="M15,16H2c-0.6,0-1-0.5-1-1V2c0-0.6,0.5-1,1-1h13c0.6,0,1,0.5,1,1v13C16,15.6,15.6,16,15,16z M2.5,14.5h12v-12
+	h-12l0,0V14.5z"/>
+</svg>

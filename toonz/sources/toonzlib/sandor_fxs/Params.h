@@ -8,7 +8,7 @@
 #define AFX_PARAMS_H__40D9A921_F329_11D5_B92E_0040F674BE6A__INCLUDED_
 
 #ifdef _WIN32
-#include "Windows.h"
+#include "windows.h"
 #endif
 #include <fstream>
 #include <vector>

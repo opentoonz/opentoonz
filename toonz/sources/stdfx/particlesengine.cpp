@@ -26,7 +26,7 @@
 
 #include "trenderer.h"
 
-#include <strstream>
+#include <sstream>
 
 /*-----------------------------------------------------------------*/
 
@@ -34,7 +34,7 @@ Particles_Engine::Particles_Engine(ParticlesFx *parent, double frame)
     : m_parent(parent), m_frame(frame) {}
 
 static void printTime(TStopWatch &sw, std::string name) {
-  std::ostrstream ss;
+  std::stringstream ss;
   ss << name << " : ";
   sw.print(ss);
   ss << '\n' << '\0';

@@ -44,7 +44,7 @@ class PsdSettingsPopup final : public DVGui::Dialog {
   Mode m_mode;
   QPushButton *m_okBtn;
   QPushButton *m_cancelBtn;
-  QComboBox *m_loadMode;
+  QComboBox *m_loadMode, *m_levelNameType;
   DVGui::CheckBox *m_createSubXSheet;
   QButtonGroup *m_psdFolderOptions;
 
@@ -70,6 +70,7 @@ public:
   bool isFolder(int levelIndex);
   bool isSubFolder(int levelIndex, int frameIndex);
   bool subxsheet();
+  int levelNameType();
 
   int getFolderOption();
   int getSubfolderLevelIndex(int psdLevelIndex, int frameIndex);

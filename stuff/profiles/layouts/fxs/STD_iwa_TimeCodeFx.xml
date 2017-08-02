@@ -1,0 +1,14 @@
+<fxlayout>
+	<page name="TimeCode Iwa">
+ 	<vbox>
+		<control>displayType</control>
+		<control>frameRate</control>
+		<control>startFrame</control>
+		<control>position</control>
+		<control>size</control>
+		<control>textColor</control>
+		<control>showBox</control>
+		<control>boxColor</control>
+  	</vbox>
+  	</page>
+</fxlayout>

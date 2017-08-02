@@ -1,6 +1,7 @@
 <fxlayout>
   <page name="Color and Shape">
     <vbox>
+      <control>renderMode</control>
       <separator label="Bubble Color"/>
       <control>intensity</control>
       <control>refractiveIndex</control>
@@ -9,12 +10,15 @@
       <control>RGamma</control>
       <control>GGamma</control>
       <control>BGamma</control>
+		  <control>loopSpectrumFadeWidth</control>
+		  <control>spectrumShift</control>
     </vbox>
     <vbox>
       <separator label="Shape"/>
       <control>binarizeThresold</control>
       <control>multiSource</control>
-      <control>maskCenter</control>
+      <control>centerOpacity</control>
+      <control>fitThickness</control>
       <control>shapeAspectRatio</control>
       <control>blurRadius</control>
       <control>blurPower</control>

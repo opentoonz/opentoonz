@@ -60,7 +60,7 @@ set(SOURCES
     mesh/tiio_mesh.cpp
 )
 
-if(WIN32)
+if(BUILD_TARGET_WIN)
     set(HEADERS ${HEADERS}
         avi/tiio_avi.h
         mov/tiio_mov.h
@@ -71,7 +71,7 @@ if(WIN32)
         mov/tiio_movW.cpp
         3gp/tiio_3gpW.cpp
     )
-elseif(APPLE)
+elseif(BUILD_TARGET_APPLE)
     set(HEADERS ${HEADERS}
         mov/tiio_movM.h
         3gp/tiio_3gpM.h
@@ -80,7 +80,7 @@ elseif(APPLE)
         mov/tiio_movM.cpp
         3gp/tiio_3gpM.cpp
     )
-elseif(UNIX)
+elseif(BUILD_TARGET_UNIX)
     set(HEADERS ${HEADERS}
         3gp/tiio_3gp_proxy.h
         mov/tiio_mov_proxy.h
@@ -98,7 +98,7 @@ add_definitions(
     -DIMAGE_EXPORTS
 )
 
-if(APPLE)
+if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libimage.dylib")
 endif()
 
@@ -111,29 +111,29 @@ include_directories(
     ${SDKROOT}/LibJPEG/jpeg-9
 )
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     include_directories(
         SYSTEM
         ${SDKROOT}/libpng-1.6.21
     )
-    if(PLATFORM EQUAL 32)
-        include_directories(
-            SYSTEM
-            ${SDKROOT}/quicktime/QT73SDK/CIncludes
-        )
-    endif()
+endif()
+if(BUILD_TARGET_WIN AND PLATFORM EQUAL 32)
+    include_directories(
+        SYSTEM
+        ${SDKROOT}/quicktime/QT73SDK/CIncludes
+    )
 endif()
 
 
 _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
 
 
-if(WIN32)
+if(BUILD_ENV_MSVC)
     set(EXTRA_LIBS
         ${TNZLIBS}
         vfw32.lib
     )
-elseif(APPLE)
+elseif(BUILD_ENV_APPLE)
     if(PLATFORM EQUAL 32)
         find_library(CORE_SERVICES_LIB CoreServices)
         set(OSX_10_6_SDK_PATH "")
@@ -153,11 +153,15 @@ elseif(APPLE)
         ${CORE_SERVICES_LIB}
         ${QD_LIB}
     )
-else()
+elseif(BUILD_ENV_UNIXLIKE)
     # Generic Unix
     set(EXTRA_LIBS
         ${TNZLIBS}
     )
+
+    if(BUILD_TARGET_WIN)
+        set(EXTRA_LIBS ${EXTRA_LIBS} -lvfw32)
+    endif()
 endif()
 
 target_link_libraries(image Qt5::Core Qt5::Gui Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS})

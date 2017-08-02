@@ -389,15 +389,14 @@ if (maxRow <=0 ) maxRow = MAX_ROW;
 
 typename T::const_iterator cit;
 cit = c.begin();
-ostrstream  oss1;
+stringstream  oss1;
 oss1<<'['<<c.size()<<']'<<"=\n";
 TSystem::outputDebug( oss1.str() );
-oss1.freeze(false);
 
 int counter = 0;
 for( ; cit != c.end(); ++cit)
 {
-ostrstream  oss;
+stringstream  oss;
 if( ++counter == maxRow-1)
 {
   oss<<'\n';
@@ -405,7 +404,6 @@ if( ++counter == maxRow-1)
 }
 oss<<(*cit)<<'\n'<<'\0';
 TSystem::outputDebug( oss.str() );
-oss.freeze(false);
 }
           */
 }

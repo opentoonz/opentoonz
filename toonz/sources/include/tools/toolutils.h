@@ -128,7 +128,7 @@ void drawBalloon(
     std::string text,       // balloon text
     const TPixel32 &color,  // ballon background color (text is black)
     TPoint delta,  // text position (pixels; pos is the origin; y grows upward)
-    bool isPicking = false,
+    double pixelSize, bool isPicking = false,
     std::vector<TRectD> *otherBalloons =
         0);  // avoid other balloons positions; add the new ballons positions
 

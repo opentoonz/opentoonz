@@ -18,7 +18,7 @@
 
 #ifdef _WIN32
 #include <shlobj.h>
-#include <Winnetwk.h>
+#include <winnetwk.h>
 #endif
 #ifdef MACOSX
 #include <Cocoa/Cocoa.h>
