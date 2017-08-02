@@ -50,7 +50,7 @@
 @fsp-border-color: @bg;
 
 // Treeview
-@tree-bg-color: darken(@bg, 0%);
+@tree-bg-color: darken(@bg, 4%);
 @tree-bg-color-alt: @tree-bg-color;
 
 // Groupbox
@@ -132,6 +132,7 @@
 @scrollbar-handle-bg-color: lighten(@bg, 8%);
 @scrollbar-handle-bg-color-hover: lighten(@bg, 20%);
 @scrollbar-handle-bg-color-pressed: lighten(@bg, 30%);
+@scrollbar-handle-border-color: darken(@bg, 7%);
 
 // Arrow Buttons
 @scrollbar-button-bg-color: @scrollbar-bg-color;
@@ -191,6 +192,24 @@
 @toolbutton-bg-color-checked-hover: darken(@bg, 3%);
 @toolbutton-border-color-checked: darken(@bg, 15%);
 @toolbutton-border-color-checked-hover: darken(@bg, 15%);
+
+// -----------------------------------------------------------------------------
+// Icon Button
+// -----------------------------------------------------------------------------
+
+@iconbutton-bg-color: @bg;
+@iconbutton-border-color: @iconbutton-bg-color;
+
+@iconbutton-bg-color-hover: @toolbutton-bg-color-hover;
+@iconbutton-border-color-hover: @toolbutton-border-color-hover;
+
+@iconbutton-bg-color-pressed: @button-bg-color-pressed;
+@iconbutton-border-color-pressed: darken(@bg, 20%);
+
+@iconbutton-bg-color-checked: @toolbutton-bg-color-checked;
+@iconbutton-bg-color-checked-hover: @toolbutton-bg-color-checked-hover;
+@iconbutton-border-color-checked: @toolbutton-border-color-checked;
+@iconbutton-border-color-checked-hover: @toolbutton-border-color-checked-hover;
 
 // -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
@@ -262,7 +281,7 @@
 @browser-folder-text-color-selected: @selected-text-color;
 
 @browser-itemview-bg-color: darken(@bg, 5%);
-@browser-itemview-bg-color-alt: lighten(@browser-itemview-bg-color, 3%);
+@browser-itemview-bg-color-alt: lighten(@bg, 5%);
 
 // -----------------------------------------------------------------------------
 // Script Console

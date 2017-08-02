@@ -7,6 +7,8 @@
 
 #DirTreeView {
   &:extend(.tree-list all); // components/treeviews.less
+  background-color: @browser-itemview-bg-color;
+  alternate-background-color: @browser-itemview-bg-color;
   border: 1px solid @accent1;
   border-right: 0;
   &::branch {
@@ -33,19 +35,14 @@ DvItemViewerPanel {
 
 #FileBrowser {
   & DvItemViewerPanel {
-    background: @browser-itemview-bg-color;
+    //background: none;
   }
   #castFrame {
     border-top: 1px solid @accent1;
     border-right: 1px solid @accent1;
     border-bottom: 1px solid @accent1;
     margin: 0;
-      & QScrollBar {
-    &:vertical {
-      width: 16px;
-      margin-right: -1px;
-    }
-  }
+
   }
   & QToolButton {
     padding: 1px;

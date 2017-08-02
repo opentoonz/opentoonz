@@ -57,12 +57,12 @@ TPanel {
   & #EditToolLockButton {
     spacing: 0;
     &::indicator {
-      // Inherits from #ToolOptions (toolbar.less)
-      &:extend(.button-tool all);
-      height: 17px;
+      // This inherits from #ToolOptions (toolbar.less)
+      &:extend(.button-icon all);
+      height: 18px;
       margin: 1px 2px 0 0;
-      padding-left: 1px;
-      padding-right: 1px;
+      padding-left: 0;
+      padding-right: 0;
     }
   }
 }
@@ -212,7 +212,7 @@ QScrollBar {
   }
 
   &::handle {
-    border: 1px solid @scrollbar-bg-color;
+    border: 1px solid @scrollbar-handle-border-color;
     border-radius: 5px;
     &:horizontal,
     &:vertical {
@@ -314,7 +314,6 @@ QScrollBar {
    Tool Bars (Global)
 ----------------------------------------------------------------------------- */
 
-// Don't over-develop here, it could cause things to break in other places.
 // If you're looking for the #ToolBar DockWidget look in /layouts/toolbar.less.
 
 QToolBar {

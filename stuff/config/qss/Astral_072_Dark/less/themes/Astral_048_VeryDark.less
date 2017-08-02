@@ -50,12 +50,27 @@
 // Tool Button
 // -----------------------------------------------------------------------------
 
-@toolbutton-bg-color-hover: lighten(@bg, 25%);
+@toolbutton-bg-color-hover: lighten(@bg, 28%);
 
-@toolbutton-bg-color-checked: lighten(@bg, 25%);
+@toolbutton-bg-color-checked: lighten(@bg, 28%);
 @toolbutton-bg-color-checked-hover: lighten(@toolbutton-bg-color-checked, 15%);
 @toolbutton-border-color-checked: darken(@bg, 8%);
 @toolbutton-border-color-checked-hover: @toolbutton-border-color-checked;
+
+// -----------------------------------------------------------------------------
+// Icon Button
+// -----------------------------------------------------------------------------
+
+@iconbutton-bg-color-hover: @toolbutton-bg-color-hover;
+@iconbutton-border-color-hover: @toolbutton-border-color-hover;
+
+@iconbutton-bg-color-pressed: @button-bg-color-pressed;
+@iconbutton-border-color-pressed: darken(@bg, 20%);
+
+@iconbutton-bg-color-checked: darken(@bg, 15%);
+@iconbutton-bg-color-checked-hover: lighten(@iconbutton-bg-color-checked, 12%);
+@iconbutton-border-color-checked: lighten(@bg, 10%);
+@iconbutton-border-color-checked-hover: @iconbutton-border-color-checked;
 
 // -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
@@ -74,7 +89,7 @@
 // File Browser
 // -----------------------------------------------------------------------------
 
-@browser-itemview-bg-color: darken(@bg, 4%);
+@browser-itemview-bg-color: darken(@bg, 3%);
 @browser-itemview-bg-color-alt: lighten(@tree-bg-color-alt, 4%);
 
 // -----------------------------------------------------------------------------

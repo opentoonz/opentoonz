@@ -38,12 +38,8 @@
   background-color: #2b2b2b;
 }
 .button-tool,
-#TopBar #EditToolLockButton::indicator,
 QToolBar QToolButton,
-#CameraSettingsRadioButton::indicator,
-#ForceSquaredPixelButton,
 #SchematicBottomFrame QToolBar QToolButton,
-#EditToolLockButton::indicator,
 #XSheetToolbar #XSheetToolbarLevelButton {
   background-color: #303030;
   border: 1px solid #303030;
@@ -52,61 +48,91 @@ QToolBar QToolButton,
   padding: 0;
 }
 .button-tool:hover,
-#TopBar #EditToolLockButton::indicator:hover,
 QToolBar QToolButton:hover,
-#CameraSettingsRadioButton::indicator:hover,
-#ForceSquaredPixelButton:hover,
 #colorSliderAddButton:hover,
 #colorSliderSubButton:hover,
 #SchematicBottomFrame QToolBar QToolButton:hover,
-#EditToolLockButton::indicator:hover,
 #XSheetToolbar #XSheetToolbarLevelButton:hover {
-  background-color: #707070;
+  background-color: #777777;
   border-color: #232323;
 }
 .button-tool:pressed,
-#TopBar #EditToolLockButton::indicator:pressed,
 QToolBar QToolButton:pressed,
-#CameraSettingsRadioButton::indicator:pressed,
-#ForceSquaredPixelButton:pressed,
 #colorSliderAddButton:pressed,
 #colorSliderSubButton:pressed,
 #SchematicBottomFrame QToolBar QToolButton:pressed,
-#EditToolLockButton::indicator:pressed,
 #XSheetToolbar #XSheetToolbarLevelButton:pressed {
   background-color: #161616;
   border-color: #000000;
 }
 .button-tool:checked,
-#TopBar #EditToolLockButton::indicator:checked,
 QToolBar QToolButton:checked,
-#CameraSettingsRadioButton::indicator:checked,
-#ForceSquaredPixelButton:checked,
 #SchematicBottomFrame QToolBar QToolButton:checked,
-#EditToolLockButton::indicator:checked,
 #XSheetToolbar #XSheetToolbarLevelButton:checked {
-  background-color: #707070;
+  background-color: #777777;
   border-color: #1c1c1c;
 }
 .button-tool:checked:hover,
-#TopBar #EditToolLockButton::indicator:checked:hover,
 QToolBar QToolButton:checked:hover,
-#CameraSettingsRadioButton::indicator:checked:hover,
-#ForceSquaredPixelButton:checked:hover,
 #SchematicBottomFrame QToolBar QToolButton:checked:hover,
-#EditToolLockButton::indicator:checked:hover,
 #XSheetToolbar #XSheetToolbarLevelButton:checked:hover {
-  background-color: #969696;
+  background-color: #9e9e9e;
   border-color: #1c1c1c;
 }
 .button-tool:disabled,
-#TopBar #EditToolLockButton::indicator:disabled,
 QToolBar QToolButton:disabled,
+#SchematicBottomFrame QToolBar QToolButton:disabled,
+#XSheetToolbar #XSheetToolbarLevelButton:disabled {
+  color: #808080;
+}
+.button-icon,
+#TopBar #EditToolLockButton::indicator,
+#CameraSettingsRadioButton::indicator,
+#ForceSquaredPixelButton,
+#EditToolLockButton::indicator {
+  background-color: #303030;
+  border: 1px solid #303030;
+  border-radius: 2px;
+  margin: 1px;
+  padding: 0;
+}
+.button-icon:hover,
+#TopBar #EditToolLockButton::indicator:hover,
+#CameraSettingsRadioButton::indicator:hover,
+#ForceSquaredPixelButton:hover,
+#EditToolLockButton::indicator:hover {
+  background-color: #777777;
+  border-color: #232323;
+}
+.button-icon:pressed,
+#TopBar #EditToolLockButton::indicator:pressed,
+#CameraSettingsRadioButton::indicator:pressed,
+#ForceSquaredPixelButton:pressed,
+#EditToolLockButton::indicator:pressed {
+  background-color: #161616;
+  border-color: #000000;
+}
+.button-icon:checked,
+#TopBar #EditToolLockButton::indicator:checked,
+#CameraSettingsRadioButton::indicator:checked,
+#ForceSquaredPixelButton:checked,
+#EditToolLockButton::indicator:checked {
+  background-color: #0a0a0a;
+  border-color: #4a4a4a;
+}
+.button-icon:checked:hover,
+#TopBar #EditToolLockButton::indicator:checked:hover,
+#CameraSettingsRadioButton::indicator:checked:hover,
+#ForceSquaredPixelButton:checked:hover,
+#EditToolLockButton::indicator:checked:hover {
+  background-color: #282828;
+  border-color: #4a4a4a;
+}
+.button-icon:disabled,
+#TopBar #EditToolLockButton::indicator:disabled,
 #CameraSettingsRadioButton::indicator:disabled,
 #ForceSquaredPixelButton:disabled,
-#SchematicBottomFrame QToolBar QToolButton:disabled,
-#EditToolLockButton::indicator:disabled,
-#XSheetToolbar #XSheetToolbarLevelButton:disabled {
+#EditToolLockButton::indicator:disabled {
   color: #808080;
 }
 .button-flat,
@@ -118,7 +144,7 @@ PaletteViewer QToolBar QToolButton {
 }
 .button-flat:hover,
 PaletteViewer QToolBar QToolButton:hover {
-  background-color: #707070;
+  background-color: #777777;
 }
 .button-flat:pressed,
 PaletteViewer QToolBar QToolButton:pressed {
@@ -146,9 +172,10 @@ QGroupBox {
 .icon-lock,
 #CameraSettingsRadioButton::indicator,
 #EditToolLockButton::indicator {
-  height: 16px;
-  padding: 1px;
-  width: 16px;
+  border: 1px solid transparent;
+  height: 18px;
+  padding: 0;
+  width: 18px;
 }
 .icon-lock:unchecked,
 #CameraSettingsRadioButton::indicator:unchecked,
@@ -158,33 +185,18 @@ QGroupBox {
 .icon-lock:checked,
 #CameraSettingsRadioButton::indicator:checked,
 #EditToolLockButton::indicator:checked {
-  background-color: #ed6969;
-  border-color: #303030;
   image: url('../Astral_072_Dark/imgs/white/cam_lock.svg');
-}
-.icon-lock:checked:hover,
-#CameraSettingsRadioButton::indicator:checked:hover,
-#EditToolLockButton::indicator:checked:hover {
-  background-color: #f5adad;
-  border-color: #303030;
 }
 .icon-fsp,
 #ForceSquaredPixelButton {
-  height: 16px;
+  height: 18px;
   image: url('../Astral_072_Dark/imgs/white/fsp_unchecked.svg');
   padding: 1px;
-  width: 16px;
+  width: 18px;
 }
 .icon-fsp:checked,
 #ForceSquaredPixelButton:checked {
-  background-color: #4fbcba;
-  border-color: #303030;
   image: url('../Astral_072_Dark/imgs/white/fsp_checked.svg');
-}
-.icon-fsp:checked:hover,
-#ForceSquaredPixelButton:checked:hover {
-  background-color: #86d1d0;
-  border-color: #303030;
 }
 /* -----------------------------------------------------------------------------
    Component: Tabs
@@ -271,8 +283,8 @@ QTreeWidget,
 ProjectPopup QTreeView,
 #Tasks QTreeView,
 #FunctionEditorTree {
-  background-color: #303030;
-  alternate-background-color: #303030;
+  background-color: #262626;
+  alternate-background-color: #262626;
   border: 0;
   margin: 0;
   outline: 0;
@@ -468,10 +480,10 @@ TPanel {
   spacing: 0;
 }
 #TopBar #EditToolLockButton::indicator {
-  height: 17px;
+  height: 18px;
   margin: 1px 2px 0 0;
-  padding-left: 1px;
-  padding-right: 1px;
+  padding-left: 0;
+  padding-right: 0;
 }
 #TopBarTabContainer {
   background-color: #303030;
@@ -610,7 +622,7 @@ QScrollBar:vertical {
   width: 16px;
 }
 QScrollBar::handle {
-  border: 1px solid #262626;
+  border: 1px solid #1e1e1e;
   border-radius: 5px;
 }
 QScrollBar::handle:horizontal:hover,
@@ -1074,6 +1086,8 @@ QSlider::handle:horizontal {
 /* Left Pane
 ----------------------------------------------------------------------------- */
 #DirTreeView {
+  background-color: #282828;
+  alternate-background-color: #282828;
   border: 1px solid #141414;
   border-right: 0;
 }
@@ -1085,14 +1099,10 @@ QSlider::handle:horizontal {
 ----------------------------------------------------------------------------- */
 DvItemViewerPanel {
   qproperty-TextColor: #cccccc;
-  qproperty-AlternateBackground: #3a3a3a;
+  qproperty-AlternateBackground: #303030;
   qproperty-SelectedTextColor: #ffffff;
   qproperty-FolderTextColor: #99d5e6;
   qproperty-SelectedItemBackground: #5483a6;
-}
-#FileBrowser DvItemViewerPanel,
-#SceneCast DvItemViewerPanel {
-  background: #262626;
 }
 #FileBrowser #castFrame,
 #SceneCast #castFrame {
@@ -1100,11 +1110,6 @@ DvItemViewerPanel {
   border-right: 1px solid #141414;
   border-bottom: 1px solid #141414;
   margin: 0;
-}
-#FileBrowser #castFrame QScrollBar:vertical,
-#SceneCast #castFrame QScrollBar:vertical {
-  width: 16px;
-  margin-right: -1px;
 }
 #FileBrowser QToolButton,
 #SceneCast QToolButton {
@@ -1116,8 +1121,8 @@ DvDirTreeView {
   qproperty-SelectedItemBackground: #5483a6;
   qproperty-FolderTextColor: #99d5e6;
   qproperty-SelectedFolderTextColor: #ffffff;
-  alternate-background-color: #303030;
-  background-color: #303030;
+  alternate-background-color: #262626;
+  background-color: #262626;
   border: 1px solid #141414;
 }
 #FileDoesNotExistLabel {
@@ -1184,7 +1189,6 @@ ParamsPage {
 }
 #ForceSquaredPixelButton {
   margin: 0;
-  background: none;
 }
 /* -----------------------------------------------------------------------------
    Output Settings
@@ -1370,8 +1374,8 @@ QDialog #dialogButtonFrame QPushButton {
    Preferences
 ----------------------------------------------------------------------------- */
 #PreferencesPopup QListWidget {
-  background-color: #262626;
-  alternate-background-color: #262626;
+  background-color: #282828;
+  alternate-background-color: #282828;
   border: 1px solid #141414;
   font-size: 13px;
 }
@@ -1391,8 +1395,8 @@ QDialog #dialogButtonFrame QPushButton {
    Keyboard Shortcuts
 ----------------------------------------------------------------------------- */
 #ShortcutTree {
-  background-color: #262626;
-  alternate-background-color: #3a3a3a;
+  background-color: #282828;
+  alternate-background-color: #303030;
   border: 1px solid #141414;
 }
 #ShortcutTree::item {
@@ -1483,7 +1487,7 @@ FxSettings QToolBar QToolBar {
   margin: 2px 2px 3px 2px;
 }
 #Tasks QTreeView {
-  background-color: #262626;
+  background-color: #282828;
 }
 /* -----------------------------------------------------------------------------
    Tool Bar
@@ -1766,8 +1770,8 @@ XsheetViewer {
   height: 18px;
 }
 #FunctionEditorTree {
-  background-color: #262626;
-  alternate-background-color: #262626;
+  background-color: #282828;
+  alternate-background-color: #282828;
   border-top: 1px solid #141414;
 }
 /* Function Editor Spreadsheet
