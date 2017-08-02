@@ -28,7 +28,7 @@ void printToonzRelease(ostream &out) {
 
 void printLibRelease(ostream &out) {
   TVER::ToonzVersion tver;
-  out << tver.getAppVersionInfo("") << " - " __DATE__ << endl; 
+  out << tver.getAppVersionInfo("") << " - " __DATE__ << endl;
 }
 //---------------------------------------------------------
 
@@ -271,7 +271,7 @@ UsageLine TCli::operator+(const UsageLine &a, const Optional &b) {
 Optional::Optional(const UsageLine &ul) : UsageLine(ul.getCount() + 2) {
   m_elements[0]           = &bra;
   m_elements[m_count - 1] = &ket;
-  for (int i = 0; i < ul.getCount(); i++) m_elements[i + 1] = ul[i];
+  for (int i = 0; i < ul.getCount(); i++) m_elements[i + 1]= ul[i];
 }
 
 //=========================================================

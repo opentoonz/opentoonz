@@ -67,18 +67,22 @@ TFilePath getGlobalRoot() {
   TFilePath rootDir;
 
 #ifdef _WIN32
-  std::string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT";
+  std::string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" +
+                        tver.getAppName() + "\\" + tver.getAppVersionString() +
+                        "\\FARMROOT";
   TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
-  // Leggo la localRoot da File txt
-#  ifdef MACOSX
+// Leggo la localRoot da File txt
+#ifdef MACOSX
   // If MACOSX, change to MACOSX path
-  std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
-#  else
+  std::string unixpath = "./" + tver.getAppName() + "_" +
+                         tver.getAppVersionString() +
+                         ".app/Contents/Resources/configfarmroot.txt";
+#else
   // set path to something suitable for most linux (Unix?) systems
   std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
-#  endif
+#endif
   TFilePath name(unixpath);
   Tifstream is(name);
   if (is) {
@@ -108,20 +112,24 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-  QString regpath = QString::fromStdString("SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" + tver.getAppVersionString() + "\\FARMROOT");
+  QString regpath = QString::fromStdString(
+      "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() + "\\" +
+      tver.getAppVersionString() + "\\FARMROOT");
   TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
-#  ifdef MACOSX
+#ifdef MACOSX
   // If MACOSX, change to MACOSX path
-  std::string unixpath = "./" + tver.getAppName() + "_" + tver.getAppVersionString() + ".app/Contents/Resources/configfarmroot.txt";
-#  else
+  std::string unixpath = "./" + tver.getAppName() + "_" +
+                         tver.getAppVersionString() +
+                         ".app/Contents/Resources/configfarmroot.txt";
+#else
   // set path to something suitable for most linux (Unix?) systems
   std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
-#  endif
-TFilePath name(unixpath);
-Tifstream is(name);
+#endif
+  TFilePath name(unixpath);
+  Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -754,7 +762,8 @@ void FarmServerService::onStart(int argc, char *argv[]) {
   if (!lRootDirExists) {
     std::string errMsg("Unable to start the Server");
     errMsg += "\n";
-    errMsg += "The directory " + ::to_string(lRootDir) + " specified as Local Root does not exist";
+    errMsg += "The directory " + ::to_string(lRootDir) +
+              " specified as Local Root does not exist";
     errMsg += "\n";
 
     addToMessageLog(errMsg);
@@ -770,7 +779,8 @@ void FarmServerService::onStart(int argc, char *argv[]) {
 
   TFilePath gRootDir = getGlobalRoot();
   if (::to_string(gRootDir) == "") {
-    std::string errMsg("Unable to get TFARMGLOBALROOT environment variable (" + ::to_string(gRootDir) + ")");
+    std::string errMsg("Unable to get TFARMGLOBALROOT environment variable (" +
+                       ::to_string(gRootDir) + ")");
     addToMessageLog(errMsg);
 
 // DEBUG MAC SERVIZIO (DA TOGLIERE)
@@ -826,8 +836,9 @@ void FarmServerService::onStart(int argc, char *argv[]) {
     m_userLog             = new TUserLog(logFilePath);
   }
 
-  std:string appverinfo = tver.getAppVersionInfo("Farm Server") + "\n\n";
-  m_userLog->info( appverinfo.c_str() );
+std:
+  string appverinfo = tver.getAppVersionInfo("Farm Server") + "\n\n";
+  m_userLog->info(appverinfo.c_str());
 
   // legge dal file di configurazione dei server il numero di porta da
   // utilizzare
