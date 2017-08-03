@@ -85,6 +85,7 @@ void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
                           event->modifiers() & Qt::ControlModifier);
 
   toonzEvent.m_leftButtonPressed = (event->buttons() & Qt::LeftButton) != 0;
+  toonzEvent.m_isTablet = isTablet;
 }
 
 //-----------------------------------------------------------------------------
@@ -97,6 +98,7 @@ void initToonzEvent(TMouseEvent &toonzEvent, QKeyEvent *event) {
                           event->modifiers() & Qt::AltModifier,
                           event->modifiers() & Qt::ControlModifier);
   toonzEvent.m_leftButtonPressed = false;
+  toonzEvent.m_isTablet = false;
 }
 
 //-----------------------------------------------------------------------------

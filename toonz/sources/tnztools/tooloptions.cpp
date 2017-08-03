@@ -31,10 +31,12 @@
 #include "toonz/txsheethandle.h"
 #include "toonz/tstageobjectspline.h"
 #include "toonz/tframehandle.h"
+#include "toonz/tpalettehandle.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/preferences.h"
 #include "toonz/tstageobjecttree.h"
+#include "toonz/mypaintbrushstyle.h"
 
 // TnzCore includes
 #include "tproperty.h"
@@ -1622,11 +1624,39 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
                              TStroke::OutlineOptions::MITER_JOIN);
   }
   hLayout()->addStretch(1);
+  filterControls();
+}
+
+//-----------------------------------------------------------------------------
+
+void BrushToolOptionsBox::filterControls() {
+  // show or hide widgets which modify imported brush (mypaint)
+
+  bool showModifiers = false;
+  if (FullColorBrushTool* fullColorBrushTool = dynamic_cast<FullColorBrushTool*>(m_tool))
+    showModifiers = fullColorBrushTool->getBrushStyle();
+
+  for (QMap<std::string, QLabel *>::iterator it = m_labels.begin(); it != m_labels.end(); it++) {
+    bool isModifier = (it.key().substr(0, 8) == "Modifier");
+    bool isCommon = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible = isCommon || (isModifier == showModifiers);
+    it.value()->setVisible(visible);
+  }
+
+  for (QMap<std::string, ToolOptionControl *>::iterator it = m_controls.begin(); it != m_controls.end(); it++) {
+    bool isModifier = (it.key().substr(0, 8) == "Modifier");
+    bool isCommon = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible = isCommon || (isModifier == showModifiers);
+    if (QWidget* widget = dynamic_cast<QWidget*>(it.value()))
+      widget->setVisible(visible);
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void BrushToolOptionsBox::updateStatus() {
+  filterControls();
+
   QMap<std::string, ToolOptionControl *>::iterator it;
   for (it = m_controls.begin(); it != m_controls.end(); it++)
     it.value()->updateStatus();

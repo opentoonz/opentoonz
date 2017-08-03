@@ -92,15 +92,17 @@ public:
                                  //! on the event.
 
   bool m_leftButtonPressed;
+  bool m_isTablet;
 
 public:
   TMouseEvent()
-      : m_pressure(255), m_modifiersMask(NO_KEY), m_leftButtonPressed(false) {}
+      : m_pressure(255), m_modifiersMask(NO_KEY), m_leftButtonPressed(false), m_isTablet(false) {}
 
   bool isShiftPressed() const { return (m_modifiersMask & SHIFT_KEY); }
   bool isAltPressed() const { return (m_modifiersMask & ALT_KEY); }
   bool isCtrlPressed() const { return (m_modifiersMask & CTRL_KEY); }
   bool isLeftButtonPressed() const { return m_leftButtonPressed; }
+  bool isTablet() const { return m_isTablet; }
 
   void setModifiers(bool shiftPressed, bool altPressed, bool ctrlPressed) {
     m_modifiersMask = ModifierMask((shiftPressed << SHIFT_BITSHIFT) |

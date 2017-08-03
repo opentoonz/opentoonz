@@ -273,6 +273,18 @@ Returns the main color by default.
     return DOUBLE;
   }  //!< Returns the type of the specified parameter.
 
+  virtual bool hasParamDefault(int index) const {
+    return false;
+  }  //!< Value of parameter can be reset to default.
+
+  virtual void setParamDefault(int index) {
+    assert(false);
+  }  //!< Reset value of parameter to default.
+
+  virtual bool isParamDefault(int index) const {
+    return false;
+  }  //!< Check if current value of parameter equals to default
+
   virtual void setParamValue(int index, bool value) {
     assert(false);
   }  //!< Assigns a value to the specified \p bool parameter.
