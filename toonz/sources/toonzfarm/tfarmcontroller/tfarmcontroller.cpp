@@ -8,6 +8,8 @@
 #include "tfilepath_io.h"
 #include "service.h"
 #include "tcli.h"
+#include "tversion.h"
+using namespace TVER;
 
 #include "tthreadmessage.h"
 #include "tthread.h"
@@ -54,16 +56,29 @@ int inline STRICMP(const char *a, const char *b) {
 namespace {
 
 TFilePath getGlobalRoot() {
+  TVER::ToonzVersion tver;
   TFilePath rootDir;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\FARMROOT");
+  std::string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" +
+                        tver.getAppName() + "\\" + tver.getAppVersionString() +
+                        "\\FARMROOT";
+  TFilePath name(regpath);
   rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
 
-  // Leggo la globalRoot da File txt
-  Tifstream is(
-      TFilePath("./OpenToonz_1.0.app/Contents/Resources/configfarmroot.txt"));
+// Leggo la globalRoot da File txt
+#ifdef MACOSX
+  // If MACOSX, change to MACOSX path
+  std::string unixpath = "./" + tver.getAppName() + "_" +
+                         tver.getAppVersionString() +
+                         ".app/Contents/Resources/configfarmroot.txt";
+#else
+  // set path to something suitable for most linux (Unix?) systems
+  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
+#endif
+  TFilePath name(unixpath);
+  Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -87,17 +102,29 @@ TFilePath getGlobalRoot() {
 //--------------------------------------------------------------------
 
 TFilePath getLocalRoot() {
+  TVER::ToonzVersion tver;
   TFilePath lroot;
 
 #ifdef _WIN32
-  TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\TOONZROOT");
+std:
+  string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() +
+                   "\\" + tver.getAppVersionString() + "\\FARMROOT";
+  TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
           TFilePath("toonzfarm");
 #else
-  // Leggo la localRoot da File txt
-
-  Tifstream is(
-      TFilePath("./OpenToonz_1.0.app/Contents/Resources/configfarmroot.txt"));
+// Leggo la localRoot da File txt
+#ifdef MACOSX
+  // If MACOSX, change to MACOSX path
+  std::string unixpath = "./" + tver.getAppName() + "_" +
+                         tver.getAppVersionString() +
+                         ".app/Contents/Resources/configfarmroot.txt";
+#else
+  // set path to something suitable for most linux (Unix?) systems
+  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
+#endif
+  TFilePath name(unixpath);
+  Tifstream is(name);
   if (is) {
     char line[1024];
     is.getline(line, 80);
@@ -212,7 +239,7 @@ public:
 
   TPersist *create() const override { return new CtrlFarmTask; }
 } Declaration("tfarmtask");
-}
+}  // namespace
 
 //------------------------------------------------------------------------------
 
@@ -739,8 +766,8 @@ inline QString toString(const TFarmTask &task, int ver) {
     ss += ",";
     ss += QString::number(task.m_platform) + ",";
 
-    int depCount                      = 0;
-    if (task.m_dependencies) depCount = task.m_dependencies->getTaskCount();
+    int depCount = 0;
+    if (task.m_dependencies) depCount= task.m_dependencies->getTaskCount();
 
     ss += QString::number(depCount);
 
@@ -1292,8 +1319,8 @@ bool FarmController::tryToStartTask(CtrlFarmTask *task) {
       map<TaskId, CtrlFarmTask *>::iterator itSubTask =
           m_tasks.find(TaskId(*itSubTaskId));
       if (itSubTask != m_tasks.end()) {
-        CtrlFarmTask *subTask                = itSubTask->second;
-        if (tryToStartTask(subTask)) started = true;
+        CtrlFarmTask *subTask = itSubTask->second;
+        if (tryToStartTask(subTask)) started= true;
       }
     }
 
@@ -1674,7 +1701,7 @@ void FarmController::queryTaskShortInfo(const QString &id, QString &parentId,
 
 void FarmController::attachServer(const QString &name, const QString &addr,
                                   int port) {
-  FarmServerProxy *server = 0;
+  FarmServerProxy *server                      = 0;
   map<QString, FarmServerProxy *>::iterator it = m_servers.begin();
   for (; it != m_servers.end(); ++it) {
     FarmServerProxy *s = it->second;
@@ -1833,8 +1860,8 @@ void FarmController::taskCompleted(const QString &taskId, int exitCode) {
     } else {
       switch (exitCode) {
       case 0:
-        task->m_status                                = Completed;
-        if (isAScript(task)) task->m_successfullSteps = task->m_stepCount;
+        task->m_status = Completed;
+        if (isAScript(task)) task->m_successfullSteps= task->m_stepCount;
         break;
       case RENDER_LICENSE_NOT_FOUND:
         task->m_status = Waiting;
@@ -2202,6 +2229,7 @@ public:
 void ControllerService::onStart(int argc, char *argv[]) {
   // Initialize thread components
   TThread::init();
+  TVER::ToonzVersion tver;
 
   if (isRunningAsConsoleApp()) {
     // i messaggi verranno ridiretti sullo standard output
@@ -2212,7 +2240,8 @@ void ControllerService::onStart(int argc, char *argv[]) {
     if (!lRootDirExists) {
       QString errMsg("Unable to start the Controller");
       errMsg += "\n";
-      errMsg += "The directory specified as Local Root does not exist";
+      errMsg += "The directory " + lRootDir.getQString() +
+                " specified as Local Root does not exist";
       errMsg += "\n";
 
       addToMessageLog(errMsg);
@@ -2224,12 +2253,14 @@ void ControllerService::onStart(int argc, char *argv[]) {
     TFilePath logFilePath = lRootDir + "controller.log";
     m_userLog             = new TUserLog(logFilePath);
   }
-
-  m_userLog->info("ToonzFarm Controller 1.0\n\n");
+std:
+  string appverinfo = tver.getAppVersionInfo("Farm Controller") + "\n\n";
+  m_userLog->info(appverinfo.c_str());
 
   TFilePath globalRoot = getGlobalRoot();
   if (globalRoot.isEmpty()) {
-    QString errMsg("Unable to get FARMROOT environment variable\n");
+    QString errMsg("Unable to get FARMROOT environment variable (" +
+                   globalRoot.getQString() + ")\n");
     addToMessageLog(errMsg);
 
     // exit the program
@@ -2242,8 +2273,8 @@ void ControllerService::onStart(int argc, char *argv[]) {
   if (!fs.isDirectory()) globalRootExists = false;
 
   if (!globalRootExists) {
-    QString errMsg(
-        "The directory specified as TFARMGLOBALROOT does not exist\n");
+    QString errMsg("The directory " + globalRoot.getQString() +
+                   " specified as TFARMGLOBALROOT does not exist\n");
     addToMessageLog(errMsg);
 
     // exit the program
