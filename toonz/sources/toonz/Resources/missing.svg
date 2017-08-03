@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="missing.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60"
+	 style="enable-background:new 0 0 60 60;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#EBEBEB;}
+	.st1{fill:#404040;}
+	.st2{fill:#E0EEFF;stroke:#484848;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;}
+	.st3{fill:#FFE300;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;}
+	.st4{font-family:'FranklinGothic-Medium';}
+	.st5{font-size:24px;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview20" inkscape:current-layer="svg2" inkscape:cx="30" inkscape:cy="30" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="480" inkscape:window-maximized="0" inkscape:window-width="796" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="3.9333333" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g>
+	<g id="g4">
+		<rect id="rect6" y="0" class="st0" width="60" height="60"/>
+		<path id="path8" inkscape:connector-curvature="0" class="st1" d="M60,60H0V0h60V60z M1,1v58h58V1H1z"/>
+	</g>
+	<path id="path10" inkscape:connector-curvature="0" class="st2" d="M4,34.5c0,0,5.8-6.9,19.5-9c0,0,15.1,1.9,32.5,20.5
+		c0,0-8,0.5-21.1,8C34.9,54.1,24.8,42.2,4,34.5z"/>
+	<path id="path12" inkscape:connector-curvature="0" class="st2" d="M3,26.2c0,0,5.8-6.9,19.5-9c0,0,15.1,1.9,32.5,20.5
+		c0,0-8,0.5-21.1,8C33.9,45.8,23.8,33.9,3,26.2z"/>
+	<path id="path14" inkscape:connector-curvature="0" class="st2" d="M3,15.5c0,0,5.8-6.9,19.5-9c0,0,15.1,1.9,32.5,20.5
+		c0,0-8,0.5-21.1,8C33.9,35.1,23.8,23.2,3,15.5z"/>
+	<path id="path16" inkscape:connector-curvature="0" class="st3" d="M31.5,12.2L50,43.7H13L31.5,12.2z"/>
+	<text id="text18" transform="matrix(1 0 0 1 25.1021 40.621)" class="st4 st5">?</text>
+</g>
+</svg>

@@ -26,6 +26,7 @@
 #include <QRadioButton>
 #include <QThread>
 #include <QDesktopWidget>
+#include <QCheckBox>
 
 // boost includes
 #include <boost/algorithm/cxx11/any_of.hpp>
@@ -293,10 +294,33 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
     // Therefore, if the dialog is moved to the bottom-end of the screen,
     // it will be got out of the screen on the next launch.
     // The following position adjustment will also prevent such behavior.
-    QRect screen = QApplication::desktop()->screenGeometry();
-    int x        = std::min(values.at(0).toInt(), screen.width() - 50);
-    int y = std::min(std::max(30, values.at(1).toInt()), screen.height() - 90);
+
+    // try and get active screen
+    if (parent != NULL) {
+      m_currentScreen = QApplication::desktop()->screenNumber(parent);
+    }
+    QRect screen = QApplication::desktop()->availableGeometry(m_currentScreen);
+    int x        = values.at(0).toInt();
+    int y        = values.at(1).toInt();
+
+    // make sure that the window is visible on the screen
+    // all popups will popup on the active window the first time
+    // so popups moved to other monitors will be moved back
+    // when restarting OpenToonz.
+
+    // This may be somewhat annoying if a user REALLY wants the popup
+    // on another monitor by default, but this is better than
+    // a user thinking the program is broken because they didn't notice
+    // the popup on another monitor
+    if (x > screen.right() - 50) x  = screen.right() - 50;
+    if (x < screen.left()) x        = screen.left();
+    if (y > screen.bottom() - 90) y = screen.bottom() - 90;
+    if (y < screen.top()) y         = screen.top();
     setGeometry(x, y, values.at(2).toInt(), values.at(3).toInt());
+    m_settings->setValue(m_name,
+                         QString::number(x) + " " + QString::number(y) + " " +
+                             QString::number(values.at(2).toInt()) + " " +
+                             QString::number(values.at(3).toInt()));
   }
 }
 
@@ -341,8 +365,33 @@ void Dialog::resizeEvent(QResizeEvent *e) {
 //! reimplemented
 //! for this purpose.
 void Dialog::hideEvent(QHideEvent *event) {
-  move(pos());
+  int x = pos().rx();
+  int y = pos().ry();
+  // make sure the dialog is actually visible on a screen
+  int screenCount = QApplication::desktop()->screenCount();
+  int currentScreen;
+  for (int i = 0; i < screenCount; i++) {
+    if (QApplication::desktop()->screenGeometry(i).contains(pos())) {
+      currentScreen = i;
+      break;
+    } else {
+      // if not - put it back on the main window
+      currentScreen = m_currentScreen;
+    }
+  }
+  QRect screen = QApplication::desktop()->availableGeometry(currentScreen);
+
+  if (x > screen.right() - 50) x  = screen.right() - 50;
+  if (x < screen.left()) x        = screen.left();
+  if (y > screen.bottom() - 90) y = screen.bottom() - 90;
+  if (y < screen.top()) y         = screen.top();
+  move(QPoint(x, y));
   resize(size());
+  QRect r = geometry();
+  m_settings->setValue(m_name, QString::number(r.left()) + " " +
+                                   QString::number(r.top()) + " " +
+                                   QString::number(r.width()) + " " +
+                                   QString::number(r.height()));
   emit dialogClosed();
 }
 
@@ -757,11 +806,29 @@ void Dialog::addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third,
 
 //=============================================================================
 
+MessageAndCheckboxDialog::MessageAndCheckboxDialog(QWidget *parent,
+                                                   bool hasButton,
+                                                   bool hasFixedSize,
+                                                   const QString &name)
+    : Dialog(parent, hasButton, hasFixedSize, name) {}
+
+//=============================================================================
+
+void MessageAndCheckboxDialog::onButtonPressed(int id) { done(id); }
+
+//=============================================================================
+
+void MessageAndCheckboxDialog::onCheckboxChanged(int checked) {
+  m_checked = checked;
+}
+
+//=============================================================================
+
 RadioButtonDialog::RadioButtonDialog(const QString &labelText,
                                      const QList<QString> &radioButtonList,
                                      QWidget *parent, Qt::WindowFlags f)
     : Dialog(parent, true, true), m_result(1) {
-  setWindowTitle(tr("Toonz"));
+  setWindowTitle(tr("OpenToonz"));
 
   setMinimumSize(20, 20);
 
@@ -1200,6 +1267,64 @@ Dialog *DVGui::createMsgBox(MsgType type, const QString &text,
 
   QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), dialog,
                    SLOT(done(int)));
+
+  return dialog;
+}
+
+//-----------------------------------------------------------------------------
+
+MessageAndCheckboxDialog *DVGui::createMsgandCheckbox(
+    MsgType type, const QString &text, const QString &checkBoxText,
+    const QStringList &buttons, int defaultButtonIndex, QWidget *parent) {
+  MessageAndCheckboxDialog *dialog = new MessageAndCheckboxDialog(parent, true);
+  dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+  dialog->setAlignment(Qt::AlignLeft);
+  QString msgBoxTitle = getMsgBoxTitle(type);
+
+  dialog->setWindowTitle(msgBoxTitle);
+
+  QLabel *mainTextLabel = new QLabel(text, dialog);
+  mainTextLabel->setObjectName("Label");
+  QPixmap iconPixmap = getMsgBoxPixmap(type);
+  if (!iconPixmap.isNull()) {
+    QLabel *iconLabel = new QLabel(dialog);
+    iconLabel->setPixmap(iconPixmap);
+
+    QHBoxLayout *mainLayout = new QHBoxLayout;
+    mainLayout->addWidget(iconLabel);
+    mainLayout->addSpacing(16);
+    mainLayout->addWidget(mainTextLabel);
+    dialog->addLayout(mainLayout);
+  } else
+    dialog->addWidget(mainTextLabel);
+
+  // ButtonGroup: is used only to retrieve the clicked button
+  QButtonGroup *buttonGroup = new QButtonGroup(dialog);
+
+  for (int i = 0; i < (int)buttons.size(); i++) {
+    QPushButton *button = new QPushButton(buttons[i], dialog);
+    if (defaultButtonIndex == i)
+      button->setDefault(true);
+    else
+      button->setDefault(false);
+    dialog->addButtonBarWidget(button);
+
+    buttonGroup->addButton(button, i + 1);
+  }
+
+  QCheckBox *dialogCheckBox   = new QCheckBox(dialog);
+  QHBoxLayout *checkBoxLayout = new QHBoxLayout;
+  QLabel *checkBoxLabel       = new QLabel(checkBoxText, dialog);
+  checkBoxLayout->addWidget(dialogCheckBox);
+  checkBoxLayout->addWidget(checkBoxLabel);
+  checkBoxLayout->addStretch(0);
+
+  dialog->addLayout(checkBoxLayout);
+
+  QObject::connect(dialogCheckBox, SIGNAL(stateChanged(int)), dialog,
+                   SLOT(onCheckboxChanged(int)));
+  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), dialog,
+                   SLOT(onButtonPressed(int)));
 
   return dialog;
 }

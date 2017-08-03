@@ -144,6 +144,10 @@ protected slots:
   virtual void onFilePathsSelected(
       const std::set<TFilePath> &paths,
       const std::list<std::vector<TFrameId>> &fIds);
+
+  // utility function
+public:
+  static void setModalBrowserToParent(QWidget *widget);
 };
 
 //********************************************************************************

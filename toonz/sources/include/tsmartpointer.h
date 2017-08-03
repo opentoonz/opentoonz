@@ -87,9 +87,10 @@ private:
 };
 
 #define DECLARE_CLASS_CODE                                                     \
+  \
 private:                                                                       \
   static const TSmartObject::ClassCode m_classCode;                            \
-                                                                               \
+  \
 public:                                                                        \
   inline static TINT32 getInstanceCount() {                                    \
     return TSmartObject::getInstanceCount(m_classCode);                        \
@@ -101,7 +102,7 @@ public:                                                                        \
 //=========================================================
 
 template <class T>
-class DVAPI TSmartPointerT {
+class TSmartPointerT {
 protected:
   T *m_pointer;
 
@@ -166,7 +167,7 @@ public:
 //=========================================================
 
 template <class DERIVED, class BASE>
-class DVAPI TDerivedSmartPointerT : public TSmartPointerT<DERIVED> {
+class TDerivedSmartPointerT : public TSmartPointerT<DERIVED> {
 public:
   typedef TDerivedSmartPointerT<DERIVED, BASE> DerivedSmartPointer;
 

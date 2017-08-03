@@ -36,4 +36,4 @@ bool DVAPI canBeConfigured(const std::wstring &codecName);
 void DVAPI openConfiguration(const std::wstring &codecName, void *winId);
 }
 
-#endif;  // AVI_CODEC_RESTRICTIONS
+#endif  // AVI_CODEC_RESTRICTIONS

@@ -1631,7 +1631,7 @@ void DvDirTreeView::getExpandedPathsRecursive(const QModelIndex &index,
 void DvDirTreeView::onExpanded(const QModelIndex &index) {
   QStringList paths;
   getExpandedPathsRecursive(index, paths);
-  paths.removeFirst();
+  if (paths.size()) paths.removeFirst();
   MyFileSystemWatcher::instance()->addPaths(paths);
 }
 

@@ -57,6 +57,9 @@ public:
   }
 
   void notifyPixelUnitSelected(bool on) { emit pixelUnitSelected(on); }
+  void notifyImportPolicyChanged(int policy) {
+    emit importPolicyChanged(policy);
+  }
 
   void setDirtyFlag(bool dirtyFlag) {
     if (m_dirtyFlag == dirtyFlag) return;
@@ -80,6 +83,7 @@ signals:
   void nameSceneChanged();
   void preferenceChanged(const QString &prefName);
   void pixelUnitSelected(bool on);
+  void importPolicyChanged(int policy);
 };
 
 #endif  // TSCENEHANDLE_H

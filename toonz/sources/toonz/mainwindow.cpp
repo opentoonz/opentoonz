@@ -89,7 +89,8 @@ TEnv::IntVar NoShiftToggleAction("NoShiftToggleAction", 0);
 namespace {
 //=============================================================================
 
-const std::string layoutsFileName     = "layouts.txt";
+// layout file name may be overwritten by the argument
+std::string layoutsFileName           = "layouts.txt";
 const std::string currentRoomFileName = "currentRoom.txt";
 bool scrambledRooms                   = false;
 
@@ -108,8 +109,10 @@ bool readRoomList(std::vector<TFilePath> &roomPaths,
                      " not found!");
       fp = ToonzFolder::getRoomsFile(layoutsFileName);
       if (!TFileStatus(fp).doesExist()) return false;
-    } else
+    } else {
       argumentLayoutFileLoaded = true;
+      layoutsFileName          = argumentLayoutFileName.toStdString();
+    }
   } else {
     fp = ToonzFolder::getRoomsFile(layoutsFileName);
     if (!TFileStatus(fp).doesExist()) return false;
@@ -255,6 +258,9 @@ void Room::save() {
     TPanel *pane = static_cast<TPanel *>(layout->itemAt(i)->widget());
     settings.setValue("name", pane->objectName());
     settings.setValue("geometry", geometries[i]);  // Use passed geometry
+    if (SaveLoadQSettings *persistent =
+            dynamic_cast<SaveLoadQSettings *>(pane->widget()))
+      persistent->save(settings);
     if (pane->getViewType() != -1)
       // If panel has different viewtypes, store current one
       settings.setValue("viewtype", pane->getViewType());
@@ -303,6 +309,9 @@ void Room::load(const TFilePath &fp) {
       // Allocate panel
       paneObjectName = name.toString();
       pane           = TPanelFactory::createPanel(this, paneObjectName);
+      if (SaveLoadQSettings *persistent =
+              dynamic_cast<SaveLoadQSettings *>(pane->widget()))
+        persistent->load(settings);
     }
 
     if (!pane) {
@@ -1050,8 +1059,10 @@ void MainWindow::onUpgradeTabPro() {}
 //-----------------------------------------------------------------------------
 
 void MainWindow::onAbout() {
-  QLabel *label = new QLabel();
-  label->setPixmap(QPixmap(":Resources/splash.png"));
+  QLabel *label  = new QLabel();
+  QPixmap pixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+  pixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());
+  label->setPixmap(pixmap);
 
   DVGui::Dialog *dialog = new DVGui::Dialog(this, true);
   dialog->setWindowTitle(tr("About OpenToonz"));
@@ -1729,10 +1740,23 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_CameraSettings, tr("&Camera Settings..."), "");
   createMiscAction(MI_CameraStage, tr("&Camera Settings..."), "");
 
-  createMenuXsheetAction(MI_OpenChild, tr("&Open Sub-xsheet"), "");
-  createMenuXsheetAction(MI_CloseChild, tr("&Close Sub-xsheet"), "");
+  QAction *openChildAction =
+      createMenuXsheetAction(MI_OpenChild, tr("&Open Sub-xsheet"), "");
+  openChildAction->setIconText("Open Sub-XSheet");
+  openChildAction->setIcon(createQIconOnOffPNG("sub_enter"));
+
+  QAction *closeChildAction =
+      createMenuXsheetAction(MI_CloseChild, tr("&Close Sub-xsheet"), "");
+  closeChildAction->setIconText("Close Sub-XSheet");
+  closeChildAction->setIcon(createQIconOnOffPNG("sub_leave"));
+
   createMenuXsheetAction(MI_ExplodeChild, tr("Explode Sub-xsheet"), "");
-  createMenuXsheetAction(MI_Collapse, tr("Collapse"), "");
+
+  QAction *collapseAction =
+      createMenuXsheetAction(MI_Collapse, tr("Collapse"), "");
+  collapseAction->setIconText("Collapse");
+  collapseAction->setIcon(createQIconOnOffPNG("collapse"));
+
   createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
   createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
   createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
@@ -1744,7 +1768,10 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_DeleteInk, tr("&Delete Lines..."), "");
   createMenuXsheetAction(MI_MergeColumns, tr("&Merge Levels"), "");
   createMenuXsheetAction(MI_InsertFx, tr("&New FX..."), "Ctrl+F");
-  createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
+  QAction *newOutputAction =
+      createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
+  newOutputAction->setIcon(createQIconOnOff("output", false));
+
   createRightClickMenuAction(MI_FxParamEditor, tr("&Edit FX..."), "Ctrl+K");
 
   createMenuXsheetAction(MI_InsertSceneFrame, tr("Insert Frame"), "");
@@ -1753,12 +1780,17 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
-
+  createRightClickMenuAction(MI_ToggleXSheetToolbar,
+                             tr("Toggle XSheet Toolbar"), "");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
   createMenuCellsAction(MI_Swing, tr("&Swing"), "");
   createMenuCellsAction(MI_Random, tr("&Random"), "");
   createMenuCellsAction(MI_Increment, tr("&Autoexpose"), "");
-  createMenuCellsAction(MI_Dup, tr("&Repeat..."), "");
+
+  QAction *repeatAction = createMenuCellsAction(MI_Dup, tr("&Repeat..."), "");
+  repeatAction->setIconText("Repeat");
+  repeatAction->setIcon(createQIconOnOffPNG("repeat_icon"));
+
   createMenuCellsAction(MI_ResetStep, tr("&Reset Step"), "");
   createMenuCellsAction(MI_IncreaseStep, tr("&Increase Step"), "'");
   createMenuCellsAction(MI_DecreaseStep, tr("&Decrease Step"), ";");
@@ -1782,10 +1814,18 @@ void MainWindow::defineActions() {
                         tr("Similar Drawing Substitution Forward"), "Alt+W");
   createMenuCellsAction(MI_DrawingSubGroupBackward,
                         tr("Similar Drawing Substitution Backward"), "Alt+Q");
+  QAction *reframeOnesAction =
+      createMenuCellsAction(MI_Reframe1, tr("1's"), "");
+  reframeOnesAction->setIconText("1's");
 
-  createMenuCellsAction(MI_Reframe1, tr("1's"), "");
-  createMenuCellsAction(MI_Reframe2, tr("2's"), "");
-  createMenuCellsAction(MI_Reframe3, tr("3's"), "");
+  QAction *reframeTwosAction =
+      createMenuCellsAction(MI_Reframe2, tr("2's"), "");
+  reframeTwosAction->setIconText("2's");
+
+  QAction *reframeThreesAction =
+      createMenuCellsAction(MI_Reframe3, tr("3's"), "");
+  reframeThreesAction->setIconText("3's");
+
   createMenuCellsAction(MI_Reframe4, tr("4's"), "");
 
   createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "Z");
@@ -2060,7 +2100,7 @@ void MainWindow::defineActions() {
   QAction *refreshAct =
       createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
   refreshAct->setIconText(tr("Refresh"));
-  refreshAct->setIcon(createQIconOnOffPNG("refresh"));
+  refreshAct->setIcon(createQIcon("refresh"));
 
   createToolOptionsAction("A_ToolOption_GlobalKey", tr("Global Key"), "");
 
@@ -2276,6 +2316,16 @@ void RecentFiles::moveFilePath(int fromIndex, int toIndex, FileType fileType) {
     m_recentLevels.move(fromIndex, toIndex);
   else
     m_recentFlipbookImages.move(fromIndex, toIndex);
+  saveRecentFiles();
+}
+
+//-----------------------------------------------------------------------------
+
+void RecentFiles::removeFilePath(int index, FileType fileType) {
+  if (fileType == Scene)
+    m_recentScenes.removeAt(index);
+  else if (fileType == Level)
+    m_recentLevels.removeAt(index);
   saveRecentFiles();
 }
 

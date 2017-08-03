@@ -75,9 +75,9 @@ int modifiers = 0;
 
 void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
                     int widgetHeight, double pressure, bool isTablet,
-                    bool isClick) {
-  toonzEvent.m_pos =
-      TPoint(event->pos().x(), widgetHeight - 1 - event->pos().y());
+                    bool isClick, int devPixRatio) {
+  toonzEvent.m_pos = TPoint(event->pos().x() * devPixRatio,
+                            widgetHeight - 1 - event->pos().y() * devPixRatio);
   toonzEvent.m_pressure = isTablet ? int(255 * pressure) : 255;
 
   toonzEvent.setModifiers(event->modifiers() & Qt::ShiftModifier,
@@ -274,7 +274,7 @@ void SceneViewer::enterEvent(QEvent *) {
 void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
   if (m_freezedStatus != NO_FREEZED) return;
 
-  QPoint curPos  = event->pos();
+  QPoint curPos  = event->pos() * getDevPixRatio();
   bool cursorSet = false;
   m_lastMousePos = curPos;
 
@@ -359,7 +359,7 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
     tool->setViewer(this);
     TMouseEvent toonzEvent;
     initToonzEvent(toonzEvent, event, height(), m_pressure, m_tabletEvent,
-                   false);
+                   false, getDevPixRatio());
     TPointD worldPos = winToWorld(curPos);
     TPointD pos      = tool->getMatrix().inv() * worldPos;
 
@@ -379,7 +379,8 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
     if ((m_tabletEvent && m_pressure > 0) || m_mouseButton == Qt::LeftButton) {
       // sometimes the mousePressedEvent is postponed to a wrong  mouse move
       // event!
-      if (m_buttonClicked) tool->leftButtonDrag(pos, toonzEvent);
+      if (m_buttonClicked && !m_toolSwitched)
+        tool->leftButtonDrag(pos, toonzEvent);
     } else if (m_pressure == 0) {
       tool->mouseMove(pos, toonzEvent);
       // m_tabletEvent=false;
@@ -412,12 +413,12 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   // evita i press ripetuti
   if (m_buttonClicked) return;
   m_buttonClicked = true;
-
+  m_toolSwitched  = false;
   if (m_freezedStatus != NO_FREEZED) return;
 
   if (m_mouseButton != Qt::NoButton) return;
 
-  m_pos         = event->pos();
+  m_pos         = event->pos() * getDevPixRatio();
   m_mouseButton = event->button();
 
   // when using tablet, avoid unexpected drawing behavior occurs when
@@ -476,7 +477,8 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   if (m_pressure > 0 && !m_tabletEvent) m_tabletEvent = true;
 
   if (TApp::instance()->isPenCloseToTablet()) m_tabletEvent = true;
-  initToonzEvent(toonzEvent, event, height(), m_pressure, m_tabletEvent, true);
+  initToonzEvent(toonzEvent, event, height(), m_pressure, m_tabletEvent, true,
+                 getDevPixRatio());
   // if(!m_tabletEvent) qDebug() << "-----------------MOUSE PRESS 'PURO'.
   // POSSIBILE EMBOLO";
   TPointD pos = tool->getMatrix().inv() * winToWorld(m_pos);
@@ -542,8 +544,9 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
   {
     TMouseEvent toonzEvent;
     initToonzEvent(toonzEvent, event, height(), m_pressure, m_tabletEvent,
-                   false);
-    TPointD pos = tool->getMatrix().inv() * winToWorld(event->pos());
+                   false, getDevPixRatio());
+    TPointD pos =
+        tool->getMatrix().inv() * winToWorld(event->pos() * getDevPixRatio());
 
     TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
     if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
@@ -552,7 +555,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
     }
 
     if (m_mouseButton == Qt::LeftButton) {
-      tool->leftButtonUp(pos, toonzEvent);
+      if (!m_toolSwitched) tool->leftButtonUp(pos, toonzEvent);
       TApp::instance()->getCurrentTool()->setToolBusy(false);
     }
   }
@@ -620,8 +623,9 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
       } else if (delta > 0) {
         CommandManager::instance()->execute("MI_PrevDrawing");
       }
-    } else
-      zoomQt(event->pos(), exp(0.001 * delta));
+    } else {
+      zoomQt(event->pos() * getDevPixRatio(), exp(0.001 * delta));
+    }
   }
   event->accept();
 }
@@ -856,7 +860,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     flags = TwConsts::TK_CapsLock;
   else if (key == Qt::Key_Backspace)
     key = TwConsts::TK_Backspace;
-  else if (key == Qt::Key_Return)
+  else if (key == Qt::Key_Return || key == Qt::Key_Enter)
     key = TwConsts::TK_Return;
   else if (key == Qt::Key_Left && !shiftButton)
     key = TwConsts::TK_LeftArrow;
@@ -931,9 +935,9 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (!ret) {
     TFrameHandle *fh = TApp::instance()->getCurrentFrame();
 
-    if (key == TwConsts::TK_UpArrow)
+    if (key == TwConsts::TK_UpArrow || key == TwConsts::TK_LeftArrow)
       fh->prevFrame();
-    else if (key == TwConsts::TK_DownArrow)
+    else if (key == TwConsts::TK_DownArrow || key == TwConsts::TK_RightArrow)
       fh->nextFrame();
     else if (key == TwConsts::TK_Home)
       fh->firstFrame();
@@ -1000,8 +1004,10 @@ void SceneViewer::mouseDoubleClickEvent(QMouseEvent *event) {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (!tool || !tool->isEnabled()) return;
   TMouseEvent toonzEvent;
-  initToonzEvent(toonzEvent, event, height(), m_pressure, m_tabletEvent, true);
-  TPointD pos              = tool->getMatrix().inv() * winToWorld(event->pos());
+  initToonzEvent(toonzEvent, event, height(), m_pressure, m_tabletEvent, true,
+                 getDevPixRatio());
+  TPointD pos =
+      tool->getMatrix().inv() * winToWorld(event->pos() * getDevPixRatio());
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
   if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
     pos.x /= m_dpiScale.x;
@@ -1036,7 +1042,9 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e) {
   if (m_freezedStatus != NO_FREEZED) return;
   if (m_isLocator) return;
 
-  TPoint winPos(e->pos().x(), height() - e->pos().y());
+  int devPixRatio = getDevPixRatio();
+  TPoint winPos(e->pos().x() * devPixRatio,
+                height() - e->pos().y() * devPixRatio);
   std::vector<int> columnIndices;
   // enable to select all the columns regardless of the click position
   for (int i = 0;
@@ -1047,8 +1055,8 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e) {
   SceneViewerContextMenu *menu = new SceneViewerContextMenu(this);
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-  TPointD pos =
-      ((tool) ? tool->getMatrix().inv() : TAffine()) * winToWorld(e->pos());
+  TPointD pos = ((tool) ? tool->getMatrix().inv() : TAffine()) *
+                winToWorld(e->pos() * devPixRatio);
   menu->addEnterGroupCommands(pos);
 
   menu->addLevelCommands(columnIndices);
@@ -1110,7 +1118,7 @@ void SceneViewer::dropEvent(QDropEvent *e) {
 
 void SceneViewer::onToolSwitched() {
   m_forceGlFlush = true;
-
+  m_toolSwitched = true;
   invalidateToolStatus();
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();

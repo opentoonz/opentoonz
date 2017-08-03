@@ -21,6 +21,7 @@
 #include "toonzqt/doublefield.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/tabbar.h"
+#include "toonzqt/glwidget_for_highdpi.h"
 
 // Toonz includes
 //#include "../toonz/tapp.h" //iwsw commented out temporarily
@@ -32,7 +33,6 @@
 #include <QSlider>
 #include <QToolButton>
 #include <QScrollArea>
-#include <QOpenGLWidget>
 #include <QMouseEvent>
 #include <QPointF>
 
@@ -135,7 +135,7 @@ public:
 
 enum CurrentWheel { none, leftWheel, rightTriangle };
 
-class DVAPI HexagonalColorWheel final : public QOpenGLWidget {
+class DVAPI HexagonalColorWheel final : public GLWidgetForHighDpi {
   Q_OBJECT
 
   // backgoround color (R160, G160, B160)

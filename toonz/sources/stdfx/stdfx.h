@@ -15,6 +15,7 @@ class PaletteFilterFxRenderData;
 static const std::string PLUGIN_PREFIX("STD");
 
 #define FX_PLUGIN_DECLARATION(T)                                               \
+  \
 public:                                                                        \
   const TPersistDeclaration *getDeclaration() const override;
 

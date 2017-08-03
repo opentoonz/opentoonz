@@ -101,14 +101,16 @@ TLevelWriterSprite::~TLevelWriterSprite() {
   int spriteSheetWidth;
   int spriteSheetHeight;
   if (m_format == "Grid") {
+    // Calculate Grid Size
     while (horizDim * horizDim < m_imagesResized.size()) horizDim++;
     totalHorizPadding = horizDim * horizPadding;
     spriteSheetWidth  = horizDim * resizedWidth + totalHorizPadding;
     vertDim           = horizDim;
+    // Figure out if there is one row too many (Such as 6 images needs 3 x 2 grid)
     if (vertDim * vertDim - vertDim >= m_imagesResized.size()) {
       vertDim          = vertDim - 1;
-      totalVertPadding = vertDim * vertPadding;
     }
+    totalVertPadding = vertDim * vertPadding;
     spriteSheetHeight = vertDim * resizedHeight + totalVertPadding;
   } else if (m_format == "Vertical") {
     spriteSheetWidth  = resizedWidth + horizPadding;
@@ -117,7 +119,6 @@ TLevelWriterSprite::~TLevelWriterSprite() {
   } else if (m_format == "Horizontal") {
     spriteSheetWidth  = m_imagesResized.size() * (resizedWidth + horizPadding);
     spriteSheetHeight = resizedHeight + vertPadding;
-    ;
     horizDim = m_imagesResized.size();
   }
 
@@ -194,6 +195,8 @@ void TLevelWriterSprite::saveSoundTrack(TSoundTrack *st) {}
 //-----------------------------------------------------------
 
 void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
+  m_frameIndexOrder.push_back(frameIndex);
+  std::sort(m_frameIndexOrder.begin(), m_frameIndexOrder.end());
   TRasterImageP tempImage(img);
   TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
 
@@ -261,7 +264,14 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
   newQi->fill(qRgba(0, 0, 0, 0));
   QPainter painter(newQi);
   painter.drawImage(QPoint(0, 0), *qi);
-  m_images.push_back(newQi);
+
+  // Make sure to order the images according to their frame index
+  // Not just what comes out first
+  std::vector<int>::iterator it;
+  it = find(m_frameIndexOrder.begin(), m_frameIndexOrder.end(), frameIndex);
+  int pos = std::distance(m_frameIndexOrder.begin(), it);
+
+  m_images.insert(m_images.begin() + pos, newQi);
   delete image;
   delete qi;
   free(buffer);

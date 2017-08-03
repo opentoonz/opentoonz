@@ -34,7 +34,7 @@ class QLabel;
 class TXsheetHandle;
 class TPalette;
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4251)
 #endif
 
@@ -45,6 +45,7 @@ namespace DVGui {
 const int WidgetHeight = 20;
 
 class Dialog;
+class MessageAndCheckboxDialog;
 
 //=============================================================================
 
@@ -87,6 +88,10 @@ int DVAPI MsgBox(const QString &text, const QString &button1,
 Dialog DVAPI *createMsgBox(MsgType type, const QString &text,
                            const QStringList &buttons, int defaultButtonIndex,
                            QWidget *parent = 0);
+
+MessageAndCheckboxDialog DVAPI *createMsgandCheckbox(
+    MsgType type, const QString &text, const QString &checkBoxText,
+    const QStringList &buttons, int defaultButtonIndex, QWidget *parent = 0);
 
 // void DVAPI error(const QString &msg);
 // void DVAPI info(const QString &msg);
@@ -168,6 +173,7 @@ class DVAPI Dialog : public QDialog {
   // If the dialog has button then is modal too.
   bool m_hasButton;
   QString m_name;
+  int m_currentScreen = -1;
   // gmt. rendo m_buttonLayout protected per ovviare ad un problema
   // sull'addButtonBarWidget(). cfr filebrowserpopup.cpp.
   // Dobbiamo discutere di Dialog.
@@ -244,6 +250,24 @@ public:
   void clearButtonBar();
 signals:
   void dialogClosed();
+};
+
+//-----------------------------------------------------------------------------
+
+class DVAPI MessageAndCheckboxDialog final : public DVGui::Dialog {
+  Q_OBJECT
+
+  int m_checked = 0;
+
+public:
+  MessageAndCheckboxDialog(QWidget *parent = 0, bool hasButton = false,
+                           bool hasFixedSize   = true,
+                           const QString &name = QString());
+  int getChecked() { return m_checked; }
+
+public slots:
+  void onCheckboxChanged(int checked);
+  void onButtonPressed(int id);
 };
 
 //-----------------------------------------------------------------------------

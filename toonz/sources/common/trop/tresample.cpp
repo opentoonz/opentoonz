@@ -782,7 +782,7 @@ inline void calcValueNoCalc(UINT &calc_value){
   { calc_value &= ~0x80U; }
 
 template <typename PixType>
-#ifdef _WIN32
+#ifdef _MSC_VER
 __forceinline
 #endif
     void
@@ -1349,7 +1349,7 @@ void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 
 namespace {
 
-__declspec(align(16)) class TPixelFloat {
+DV_ALIGNED(16) class TPixelFloat {
 public:
   TPixelFloat() : b(0), g(0), r(0), m(0) {}
 
@@ -4593,7 +4593,7 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
     }
   }
 
-#ifdef _WIN32
+#ifdef _MSC_VER
   TRaster32P rout32 = rout;
   if ((TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) && rout32)
     resample_main_cm32_rgbm_SSE2<TPixel32>(
