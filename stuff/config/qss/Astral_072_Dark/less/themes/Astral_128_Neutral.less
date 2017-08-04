@@ -20,7 +20,7 @@
 @text-color-disabled: lighten(@text-color, 35%);
 
 // Selected Color (Primary)
-@selected-bg-color: @palette-very-dark-blue;
+@selected-bg-color: #4271B5; //#576E87;
 @selected-text-color: #fff;
 
 // Selected Color (Secondary)
@@ -35,7 +35,16 @@
 @toolbar-scrollbutton-bg-color: lighten(@bg, 8%);
 
 // Labels
-@label-title: @palette-very-dark-blue;
+@label-title: #000;
+
+// Icons
+@lock-bg-color: darken(@paletteviewer-lock-color-active, 10%);
+@lock-bg-color-hover: lighten(@lock-bg-color, 15%);
+@lock-border-color: darken(@lock-bg-color, 25%);
+
+@fsp-bg-color: #4FBCBA;
+@fsp-bg-color-hover: lighten(@fsp-bg-color, 15%);
+@fsp-border-color: darken(@fsp-bg-color, 25%);
 
 // Treeview
 @tree-bg-color: lighten(@bg, 10%);
@@ -46,32 +55,21 @@
 // -----------------------------------------------------------------------------
 
 // Container
-@tabbar-bg-color: darken(@bg, 12%);
+@tabbar-bg-color: darken(@bg, 8%);
 
 // Tabs
-@tab-bg-color: ~'QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #a1a1a1, stop: 1 #878787)';
-@tab-bg-color-hover: @button-bg-color;
-@tab-bg-color-selected: ~'QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e3e3e3, stop: 1 #cccccc)';
 @tab-text-color: #000;
 @tab-text-color-selected: #000;
-
-// Mod
-QWidget {
-  &::tab {
-    background-image: url('@{img-url}/hl_1.png');
-    background-repeat: repeat-x;
-  }
-}
 
 // -----------------------------------------------------------------------------
 // TopBar / Room Tabs
 // -----------------------------------------------------------------------------
 
 // Room Tabs
-@rooms-tab-bg-color: ~'QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #adadad, stop: 1 #949494)';
+@rooms-tab-bg-color: darken(@bg, 0%);
 
-@rooms-tab-bg-color-selected: @palette-pixie-green;
-@rooms-tab-bg-color-hover: @button-bg-color-hover;
+@rooms-tab-bg-color-selected: lighten(@bg, 15%);
+@rooms-tab-bg-color-hover: lighten(@rooms-tab-bg-color, 10%);
 @rooms-tab-border-color: lighten(@tab-border-color, 10%);
 @rooms-tab-text-color-selected: #000;
 
@@ -79,7 +77,7 @@ QWidget {
 // QMenu / Context Menu
 // -----------------------------------------------------------------------------
 
-@menu-bg-color: lighten(@bg, 25%);
+@menu-bg-color: lighten(@bg, 15%);
 @menu-separator-color: darken(@menu-bg-color, 15%);
 
 // -----------------------------------------------------------------------------
@@ -87,25 +85,26 @@ QWidget {
 // -----------------------------------------------------------------------------
 
 // Global Title Bar
-@title-bg-color: ~'QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #595959, stop: 1 #4b4b4b)';
-@title-border-color: darken(@bg, 35%);
+@title-bg-color: darken(@bg, 15%);
 @title-text-color: darken(#fff, 25%);
 @title-text-color-active: #fff;
-
-// Mod
-TPanelTitleBar {
-  background-image: url('@{img-url}/hl_2.png');
-  background-repeat: repeat-x;
-}
 
 // -----------------------------------------------------------------------------
 // QScrollBar
 // -----------------------------------------------------------------------------
 
-@scrollbar-bg-color: lighten(@bg, 10%);
-@scrollbar-handle-bg-color: darken(@bg, 3%);
-@scrollbar-handle-bg-color-hover: darken(@bg, 9%);
-@scrollbar-handle-bg-color-pressed: darken(@bg, 17%);
+@scrollbar-bg-color: darken(@bg, 4%);
+@scrollbar-handle-bg-color: lighten(@bg, 8%);
+@scrollbar-handle-bg-color-hover: lighten(@bg, 15%);
+@scrollbar-handle-bg-color-pressed: lighten(@bg, 25%);
+
+@scrollbar-handle-border-color: darken(@bg, 10%);
+
+// -----------------------------------------------------------------------------
+// QComboBox
+// -----------------------------------------------------------------------------
+
+//@combobox-bg-color: darken(@bg, 0%);
 
 // -----------------------------------------------------------------------------
 // QPushButton
@@ -125,20 +124,6 @@ TPanelTitleBar {
 @button-border-color-checked: darken(@bg, 25%);
 @button-text-color-checked: darken(#fff, 15%);
 
-// Mod
-QPushButton,
-QComboBox {
-  // apply highlight bg img
-  background-image: url('@{img-url}/hl_1.png');
-  background-repeat: repeat-x;
-  &:pressed,
-  &:checked,
-  &:disabled {
-    // remove highlight bg img on specific states
-    background-image: url('@{img-url}/hl_trans.png');
-  }
-}
-
 // -----------------------------------------------------------------------------
 // Tool Button
 // -----------------------------------------------------------------------------
@@ -149,35 +134,45 @@ QComboBox {
 @toolbutton-bg-color-pressed: @button-bg-color-pressed;
 @toolbutton-border-color-pressed: @button-border-color-pressed;
 
-@toolbutton-bg-color-checked: @button-bg-color-checked; //lighten(@bg, 35%);
+@toolbutton-bg-color-checked: @button-bg-color-checked;
 @toolbutton-bg-color-checked-hover: @button-bg-color-checked-hover;
 @toolbutton-border-color-checked: @button-border-color-checked;
+
+// -----------------------------------------------------------------------------
+// Icon Button
+// -----------------------------------------------------------------------------
+
+@iconbutton-bg-color-hover: lighten(@bg, 10%);
+@iconbutton-border-color-hover: darken(@bg, 15%);
+
+@iconbutton-bg-color-pressed: @button-bg-color-pressed;
+@iconbutton-border-color-pressed: darken(@bg, 20%);
+
+@iconbutton-bg-color-checked: @accent1;
+@iconbutton-bg-color-checked-hover: lighten(@iconbutton-bg-color-checked, 12%);
+@iconbutton-border-color-checked: darken(@accent1, 10%);
+@iconbutton-border-color-checked-hover: @iconbutton-border-color-checked;
 
 // -----------------------------------------------------------------------------
 // QLineEdit / Input Boxes
 // -----------------------------------------------------------------------------
 
-@focus-bg-color: #fff;
 @focus-border-color: @input-border-color;
-@input-bg-color: lighten(@bg, 35%);
+@input-bg-color: lighten(@bg, 25%);
 @input-border-color: darken(@bg, 15%);
 @input-border-radius: 2px;
+@focus-bg-color: lighten(@input-bg-color, 10%);
 
 @input-bg-color-disabled: lighten(@bg, 12%);
-@input-border-color-disabled: darken(@bg, 5%);
+@input-border-color-disabled: darken(@bg, 10%);
 
 // -----------------------------------------------------------------------------
 // QCheckBox
 // -----------------------------------------------------------------------------
 
 @checkbox-border-color-hover: darken(@bg, 20%);
+@checkbox-bg-color-hover: lighten(@checkbox-bg-color, 10%);
 @checkbox-text-color-hover: @text-color;
-
-QCheckBox {
-  &:hover {
-    background-color: lighten(@bg, 10%);
-  }
-}
 
 // -----------------------------------------------------------------------------
 // QSlider / IntPairField / DoublePairField
@@ -195,7 +190,7 @@ QCheckBox {
 @browser-folder-text-color: @palette-dark-blue;
 
 @browser-itemview-bg-color: lighten(@bg, 10%);
-@browser-itemview-bg-color-alt: lighten(@browser-itemview-bg-color, 5%);
+@browser-itemview-bg-color-alt: lighten(@bg, 5%);
 
 // -----------------------------------------------------------------------------
 // ComboViewer / Viewer / FlipBook
@@ -203,6 +198,13 @@ QCheckBox {
 
 // Ruler
 @viewer-ruler-bg-color: lighten(@bg, 20%);
+
+// -----------------------------------------------------------------------------
+// Palette Viewer
+// -----------------------------------------------------------------------------
+
+@paletteviewer-lock-color-active: @accent1;
+@paletteviewer-lock-color-active-hover: @iconbutton-bg-color-checked-hover;
 
 // -----------------------------------------------------------------------------
 // Schematic Node Viewer
@@ -215,16 +217,16 @@ QCheckBox {
 // -----------------------------------------------------------------------------
 
 // XSheet Spreadsheet Viewer
-@xsheet-text-color:                         @text-color;
-@xsheet-bg-color:                           lighten(@bg, 14.12%);
-@xsheet-LightLine-color:                    darken(@bg, 10%);
-@xsheet-MarkerLine-color:                   rgb(0, 255, 246);
-@xsheet-VerticalLine-color:                 darken(@bg, 30%);
+@xsheet-text-color:                         lighten(#000, 25%);
+@xsheet-bg-color:                           lighten(@bg, 5.12%);
+@xsheet-LightLine-color:                    darken(@bg, 8%);
+@xsheet-MarkerLine-color:                   #000;
+@xsheet-VerticalLine-color:                 darken(@bg, 13%);
 @xsheet-VerticalLineHead-color:             darken(@bg, 30%);
-@xsheet-PreviewFrameText-color:             @palette-dark-blue;
+@xsheet-PreviewFrameText-color:             #000;
 @xsheet-CurrentRowBG-color:                 rgb(210,210,210);
 
-@xsheet-EmptyColumnHead-color:              lighten(@bg, 6%);
+@xsheet-EmptyColumnHead-color:              lighten(@bg, -3%);
 @xsheet-SelectedColumnText-color:           darken(@palette-red, 15%);
 
 @xsheet-EmptyCell-color:                    darken(@bg, 1.57%);

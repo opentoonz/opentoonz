@@ -3,21 +3,6 @@
 ----------------------------------------------------------------------------- */
 
 #ToolBar {
-  & TPanelTitleBar {
-    // Use grip handles for title bar
-    background-color: @bg;
-    background-image: url('@{img-url}/@{title-toolbar-img-horizontal}');
-    background-repeat: no-repeat;
-    border: 0;
-    height: @title-toolbar-size;
-    max-height: @title-toolbar-size;
-    min-height: @title-toolbar-size;
-    qproperty-BorderPixmap: url('none');
-    qproperty-ActiveBorderPixmap: url('none');
-    qproperty-FloatBorderPixmap: url('@{img-url}/@{title-toolbar-img-float}');
-    qproperty-FloatActiveBorderPixmap: url('@{img-url}/@{title-toolbar-img-float}');
-  }
-
   & QToolBar {
     // This controls the spacing for the Expand-Tools button.
     // This is a very dirty way of doing it.
@@ -31,18 +16,10 @@
 
 #ToolOptions {
   & TPanelTitleBar {
-    // Use grip handles for title bar
-    background-color: @bg;
-    background-image: url('@{img-url}/@{title-toolbar-img-vertical}');
-    background-repeat: no-repeat;
-    border: 0;
-    width: @title-toolbar-size;
-    min-width: @title-toolbar-size;
-    max-width: @title-toolbar-size;
-    qproperty-BorderPixmap: url('none');
-    qproperty-ActiveBorderPixmap: url('none');
-    qproperty-FloatBorderPixmap: url('@{img-url}/@{title-toolbar-img-float}');
-    qproperty-FloatActiveBorderPixmap: url('@{img-url}/@{title-toolbar-img-float}');
+    // Remove bottom border inherited from TPanelTitleBar and add it for the
+    // right instead.
+    border-right: 1px solid @title-border-color;
+    border-bottom: 0;
   }
 }
 
@@ -63,7 +40,7 @@ IconViewField {
   spacing: 0;
   &::indicator {
     // Add button style
-    &:extend(.button-tool all); // components/buttons.less
+    &:extend(.button-icon all); // components/buttons.less
     // Add icon
     &:extend(.icon-lock all); // components/buttons.less
   }

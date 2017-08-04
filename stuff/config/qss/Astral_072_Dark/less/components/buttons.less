@@ -56,6 +56,36 @@
   }
 }
 
+// Icon Button
+// -----------------------------------------------------------------------------
+
+.button-icon {
+  background-color: @iconbutton-bg-color;
+  border: 1px solid @iconbutton-border-color;
+  border-radius: 2px;
+  margin: 1px;
+  padding: 0;
+  &:hover {
+    background-color: @iconbutton-bg-color-hover;
+    border-color: @iconbutton-border-color-hover;
+  }
+  &:pressed {
+    background-color: @iconbutton-bg-color-pressed;
+    border-color: @iconbutton-border-color-pressed;
+  }
+  &:checked {
+    background-color: @iconbutton-bg-color-checked;
+    border-color: @iconbutton-border-color-checked;
+    &:hover {
+      background-color: @iconbutton-bg-color-checked-hover;
+      border-color: @iconbutton-border-color-checked-hover;
+    }
+  }
+  &:disabled {
+    color: @text-color-disabled;
+  }
+}
+
 // Minimalist Flat/Highlight Button
 // -----------------------------------------------------------------------------
 

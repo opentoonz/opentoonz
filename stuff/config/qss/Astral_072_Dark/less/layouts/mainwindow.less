@@ -57,12 +57,12 @@ TPanel {
   & #EditToolLockButton {
     spacing: 0;
     &::indicator {
-      // Inherits from #ToolOptions (toolbar.less)
-      &:extend(.button-tool all);
-      height: 17px;
+      // This inherits from #ToolOptions (toolbar.less)
+      &:extend(.button-icon all);
+      height: 18px;
       margin: 1px 2px 0 0;
-      padding-left: 1px;
-      padding-right: 1px;
+      padding-left: 0;
+      padding-right: 0;
     }
   }
 }
@@ -212,7 +212,8 @@ QScrollBar {
   }
 
   &::handle {
-    border: 0;
+    border: 1px solid @scrollbar-handle-border-color;
+    border-radius: 5px;
     &:horizontal,
     &:vertical {
       &:hover {
@@ -313,7 +314,6 @@ QScrollBar {
    Tool Bars (Global)
 ----------------------------------------------------------------------------- */
 
-// Don't over-develop here, it could cause things to break in other places.
 // If you're looking for the #ToolBar DockWidget look in /layouts/toolbar.less.
 
 QToolBar {
@@ -344,6 +344,31 @@ QToolBar {
   }
   & QToolBar {
     border: 0;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Keyframe Navigator
+----------------------------------------------------------------------------- */
+
+#keyFrameNavigator {
+  background: none; // Fixes BG overflow
+  margin: 0;
+  padding: 0;
+  & QToolButton {
+    min-width: 18px;
+  }
+  #PreviousKey {
+    image: url('@{img-url}/prevkey.png');
+	  &:disabled {
+		  image: url('@{img-url}/prevkey_disabled.png');
+	  }
+  }
+  #NextKey {
+	  image: url('@{img-url}/nextkey.png');
+	  &:disabled {
+		  image: url('@{img-url}/nextkey_disabled.png');
+	  }
   }
 }
 
@@ -403,27 +428,6 @@ QToolBar {
 }
 #ScrollDownButton {
   image: url('@{img-url}/scroll-down.svg');
-}
-
-#keyFrameNavigator {
-  background: none; // Fixes BG overflow
-  margin: 0;
-  padding: 0;
-  & QToolButton {
-    min-width: 18px;
-  }
-  #PreviousKey{
-    image: url('@{img-url}/prevkey.png');
-	  &:disabled{
-		  image: url('@{img-url}/prevkey_disabled.png');
-	  }
-  }
-  #NextKey{
-	  image: url('@{img-url}/nextkey.png');
-	  &:disabled{
-		  image: url('@{img-url}/nextkey_disabled.png');
-	  }
-  }
 }
 
 /* -----------------------------------------------------------------------------

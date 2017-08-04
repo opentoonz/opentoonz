@@ -1,17 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1"
-	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="stop.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 17 17"
-	 style="enable-background:new 0 0 17 17;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;}
-	.st1{fill:#EBEBEB;}
-	.st2{fill:#3C3A3A;}
-</style>
-<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview10" inkscape:current-layer="svg2" inkscape:cx="10.5" inkscape:cy="8.5" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="480" inkscape:window-maximized="0" inkscape:window-width="796" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="13.882353" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
-	</sodipodi:namedview>
-<rect id="rect4" x="-2" y="0" class="st0" width="21" height="17"/>
-<rect id="rect6" x="2" y="2" class="st1" width="13" height="13"/>
-<path id="path8" inkscape:connector-curvature="0" class="st2" d="M16,1v15H1V1H16z M2,2v13h13V2H2z"/>
-</svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="100%" height="100%" viewBox="0 0 17 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><rect id="rect4" x="-2" y="0" width="21" height="17" style="fill:none;"/><g id="rect6"><rect x="2" y="2" width="13" height="13" style="fill:#ebebeb;"/><path d="M15.071,1.003l0.071,0.007l0.071,0.013l0.069,0.018l0.067,0.022l0.066,0.027l0.064,0.032l0.062,0.037l0.058,0.04l0.056,0.045l0.052,0.049l0.049,0.052l0.045,0.056l0.04,0.058l0.037,0.062l0.032,0.064l0.027,0.066l0.022,0.067l0.018,0.069l0.013,0.071l0.007,0.071l0.003,0.071l0,13l-0.003,0.071l-0.007,0.071l-0.013,0.071l-0.018,0.069l-0.022,0.067l-0.027,0.066l-0.032,0.064l-0.037,0.062l-0.04,0.058l-0.045,0.056l-0.049,0.052l-0.052,0.049l-0.056,0.045l-0.058,0.04l-0.062,0.037l-0.064,0.032l-0.066,0.027l-0.067,0.022l-0.069,0.018l-0.071,0.013l-0.071,0.007l-0.071,0.003l-13,0l-0.071,-0.003l-0.071,-0.007l-0.071,-0.013l-0.069,-0.018l-0.067,-0.022l-0.066,-0.027l-0.064,-0.032l-0.062,-0.037l-0.058,-0.04l-0.056,-0.045l-0.052,-0.049l-0.049,-0.052l-0.045,-0.056l-0.04,-0.058l-0.037,-0.062l-0.032,-0.064l-0.027,-0.066l-0.022,-0.067l-0.018,-0.069l-0.013,-0.071l-0.007,-0.071l-0.003,-0.071l0,-13l0.003,-0.071l0.007,-0.071l0.013,-0.071l0.018,-0.069l0.022,-0.067l0.027,-0.066l0.032,-0.064l0.037,-0.062l0.04,-0.058l0.045,-0.056l0.049,-0.052l0.052,-0.049l0.056,-0.045l0.058,-0.04l0.062,-0.037l0.064,-0.032l0.066,-0.027l0.067,-0.022l0.069,-0.018l0.071,-0.013l0.071,-0.007l0.071,-0.003l13,0l0.071,0.003Zm-13.071,0.997l0,13l13,0l0,-13l-13,0Z" style="fill-opacity:0.501961;"/></g></svg>
