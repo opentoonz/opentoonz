@@ -68,11 +68,11 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
   p.fillRect(rect.adjusted(0, 0, -3, 0), slightlyLighter);
 
   drawIcon(p, PredefinedRect::EYE, boost::none,
-	  QPixmap(":Resources/layer_header_prev_eye.svg"));
+	  m_viewer->getLayerHeaderPreviewImage());
   drawIcon(p, PredefinedRect::PREVIEW_LAYER, boost::none,
-	  QPixmap(":Resources/layer_header_table_view.svg"));
+	  m_viewer->getLayerHeaderCamstandImage());
   drawIcon(p, PredefinedRect::LOCK, boost::none,
-	  QPixmap(":Resources/layer_header_lock.svg"));
+	  m_viewer->getLayerHeaderLockImage());
 
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
 
@@ -93,13 +93,13 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 
 void LayerHeaderPanel::drawIcon(QPainter &p, PredefinedRect rect,
                                 optional<QColor> fill,
-                                const QPixmap &pixmap) const {
+                                const QImage &image) const {
   QRect iconRect =
       Orientations::leftToRight()->rect(rect).adjusted(-2, 0, -2, 0);
 
   if (fill)
 	  p.fillRect(iconRect, *fill);
-  p.drawPixmap(iconRect, pixmap);
+  p.drawImage(iconRect, image);
 }
 
 void LayerHeaderPanel::drawLines(QPainter &p, const QRect &numberRect,
