@@ -66,7 +66,8 @@ class SceneViewer final : public GLWidgetForHighDpi,
   Qt::MouseButton m_mouseButton;
 
   bool m_foregroundDrawing;
-  bool m_tabletEvent;
+  bool m_tabletEvent, m_tabletPressed, m_tabletReleased, m_tabletMove,
+      m_tabletActive;
   // used to handle wrong mouse drag events!
   bool m_buttonClicked, m_toolSwitched;
   bool m_shownOnce = false;

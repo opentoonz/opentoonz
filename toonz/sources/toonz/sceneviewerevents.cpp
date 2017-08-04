@@ -203,9 +203,15 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
 void SceneViewer::tabletEvent(QTabletEvent *e) {
   if (m_freezedStatus != NO_FREEZED) return;
 
-  m_tabletEvent = true;
-  m_pressure    = e->pressure();
-
+  m_tabletEvent                    = true;
+  m_pressure                       = e->pressure();
+  m_tabletPressed                  = false;
+  m_tabletReleased                 = false;
+  m_tabletMove                     = false;
+  int type                         = e->type();
+  if (type == 92) m_tabletPressed  = true;
+  if (type == 93) m_tabletReleased = true;
+  if (type == 87) m_tabletMove     = true;
   // Management of the Eraser pointer
   ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
   if (e->pointerType() == QTabletEvent::Eraser) {
@@ -378,7 +384,15 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
     // qDebug() << "mouseMoveEvent. "  << (m_tabletEvent?"tablet":"mouse")
     //         << " pressure=" << m_pressure << " mouseButton=" << m_mouseButton
     //         << " buttonClicked=" << m_buttonClicked;
-    if ((m_tabletEvent && m_pressure > 0) || m_mouseButton == Qt::LeftButton) {
+
+    // separate tablet events from mouse events
+    // don't perform a drag event if tablet not active
+    if (m_tabletActive && !m_tabletMove) return;
+    if (m_tabletEvent && m_tabletActive && m_tabletMove) {
+      tool->leftButtonDrag(pos, toonzEvent);
+    }
+
+    else if (m_mouseButton == Qt::LeftButton) {
       // sometimes the mousePressedEvent is postponed to a wrong  mouse move
       // event!
       if (m_buttonClicked && !m_toolSwitched)
@@ -388,7 +402,8 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
       // m_tabletEvent=false;
     }
     if (!cursorSet) setToolCursor(this, tool->getCursorId());
-    m_pos = curPos;
+    m_pos        = curPos;
+    m_tabletMove = false;
   } else if (m_mouseButton == Qt::MidButton) {
     if ((event->buttons() & Qt::MidButton) == 0)
       m_mouseButton = Qt::NoButton;
@@ -476,9 +491,6 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   }
 
   TMouseEvent toonzEvent;
-  if (m_pressure > 0 && !m_tabletEvent) m_tabletEvent = true;
-
-  if (TApp::instance()->isPenCloseToTablet()) m_tabletEvent = true;
   initToonzEvent(toonzEvent, event, height(), m_pressure, m_tabletEvent, true,
                  getDevPixRatio());
   // if(!m_tabletEvent) qDebug() << "-----------------MOUSE PRESS 'PURO'.
@@ -490,11 +502,16 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
     pos.x /= m_dpiScale.x;
     pos.y /= m_dpiScale.y;
   }
-  if (m_mouseButton == Qt::LeftButton) {
+  // separate tablet and mouse events
+  if (m_tabletEvent && m_tabletPressed) {
+    m_tabletActive = true;
+    tool->leftButtonDown(pos, toonzEvent);
+  } else if (m_mouseButton == Qt::LeftButton) {
     TApp::instance()->getCurrentTool()->setToolBusy(true);
     tool->leftButtonDown(pos, toonzEvent);
   }
   if (m_mouseButton == Qt::RightButton) tool->rightButtonDown(pos, toonzEvent);
+  m_tabletPressed = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -515,6 +532,8 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
 
   if (m_mouseButton != event->button()) return;
 
+  // reject if tablet was active and the up button is not actually the pen.
+  if (m_tabletActive && !m_tabletReleased) return;
   if (m_current3DDevice != NONE) {
     m_mouseButton = Qt::NoButton;
     m_tabletEvent = false;
@@ -556,7 +575,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
       pos.y /= m_dpiScale.y;
     }
 
-    if (m_mouseButton == Qt::LeftButton) {
+    if (m_mouseButton == Qt::LeftButton || m_tabletReleased) {
       if (!m_toolSwitched) tool->leftButtonUp(pos, toonzEvent);
       TApp::instance()->getCurrentTool()->setToolBusy(false);
     }
@@ -564,9 +583,13 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
 
 quit:
 
-  m_mouseButton = Qt::NoButton;
-  m_tabletEvent = false;
-  m_pressure    = 0;
+  m_mouseButton    = Qt::NoButton;
+  m_tabletEvent    = false;
+  m_tabletPressed  = false;
+  m_tabletActive   = false;
+  m_tabletReleased = false;
+  m_tabletMove     = false;
+  m_pressure       = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -669,42 +692,42 @@ bool SceneViewer::event(QEvent *e) {
   }
 
   /*
-switch(e->type())
-{
-case QEvent::Enter:
-qDebug() << "************************** Enter";
-break;
-case QEvent::Leave:
-qDebug() << "************************** Leave";
-break;
+  switch(e->type())
+  {
+  case QEvent::Enter:
+  qDebug() << "************************** Enter";
+  break;
+  case QEvent::Leave:
+  qDebug() << "************************** Leave";
+  break;
 
-case QEvent::TabletPress:
-qDebug() << "************************** TabletPress"  << m_pressure;
-break;
-case QEvent::TabletMove:
-qDebug() << "************************** TabletMove";
-break;
-case QEvent::TabletRelease:
-qDebug() << "************************** TabletRelease";
-break;
+  case QEvent::TabletPress:
+  qDebug() << "************************** TabletPress"  << m_pressure;
+  break;
+  case QEvent::TabletMove:
+  qDebug() << "************************** TabletMove";
+  break;
+  case QEvent::TabletRelease:
+  qDebug() << "************************** TabletRelease";
+  break;
 
 
-case QEvent::MouseButtonPress:
-qDebug() << "**************************MouseButtonPress"  << m_pressure << " "
-<< m_tabletEvent;
-break;
-case QEvent::MouseMove:
-qDebug() << "**************************MouseMove" <<  m_pressure;
-break;
-case QEvent::MouseButtonRelease:
-qDebug() << "**************************MouseButtonRelease";
-break;
+  case QEvent::MouseButtonPress:
+  qDebug() << "**************************MouseButtonPress"  << m_pressure << " "
+  << m_tabletEvent;
+  break;
+  case QEvent::MouseMove:
+  qDebug() << "**************************MouseMove" <<  m_pressure;
+  break;
+  case QEvent::MouseButtonRelease:
+  qDebug() << "**************************MouseButtonRelease";
+  break;
 
-case QEvent::MouseButtonDblClick:
-qDebug() << "============================== MouseButtonDblClick";
-break;
-}
-*/
+  case QEvent::MouseButtonDblClick:
+  qDebug() << "============================== MouseButtonDblClick";
+  break;
+  }
+  */
 
   return QGLWidget::event(e);
 }
