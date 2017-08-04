@@ -69,15 +69,15 @@ QToolBar QToolButton:pressed,
 QToolBar QToolButton:checked,
 #SchematicBottomFrame QToolBar QToolButton:checked,
 #XSheetToolbar #XSheetToolbarLevelButton:checked {
-  background-color: #777777;
-  border-color: #1c1c1c;
+  background-color: #000000;
+  border-color: #4a4a4a;
 }
 .button-tool:checked:hover,
 QToolBar QToolButton:checked:hover,
 #SchematicBottomFrame QToolBar QToolButton:checked:hover,
 #XSheetToolbar #XSheetToolbarLevelButton:checked:hover {
-  background-color: #9e9e9e;
-  border-color: #1c1c1c;
+  background-color: #262626;
+  border-color: #4a4a4a;
 }
 .button-tool:disabled,
 QToolBar QToolButton:disabled,
