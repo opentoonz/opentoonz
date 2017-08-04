@@ -97,11 +97,12 @@ OpenToonzPROFILES="$HOME/.config/OpenToonz/stuff/profiles"
 TOONZCACHEROOT="$HOME/.config/OpenToonz/stuff/cache"
 TOONZCONFIG="$HOME/.config/OpenToonz/stuff/config"
 TOONZFXPRESETS="$HOME/.config/OpenToonz/stuff/projects/fxs"
-TOONZLIBRARY="$HOME/.config/OpenToonz/stuff/projects/library"
+TOONZLIBRARY="$HOME/.config/OpenToonz/stuff/library"
 TOONZPROFILES="$HOME/.config/OpenToonz/stuff/profiles"
 TOONZPROJECTS="$HOME/.config/OpenToonz/stuff/projects"
 TOONZROOT="$HOME/.config/OpenToonz/stuff"
 TOONZSTUDIOPALETTE="$HOME/.config/OpenToonz/stuff/studiopalette"
+TOONZFXPRESETS="/home/USERNAME/.config/OpenToonz/stuff/fxs"
 EOF
 ```
 Note the generated file must not actually contain `$HOME`, this expands to an absolute path in the generated file.
@@ -115,6 +116,13 @@ Features from the modified libtiff are needed currently, so this isn't a simple 
 $ cd opentoonz/thirdparty/tiff-4.0.3
 $ ./configure --with-pic --disable-jbig
 $ make -j$(nproc)
+$ cd ..
+```
+
+### Building Libmypaint
+```
+$ cd libmypaint
+$ ./script-build-linux.sh
 $ cd ../../
 ```
 
