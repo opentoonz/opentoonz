@@ -250,7 +250,7 @@ class ColumnArea final : public QWidget {
     void drawEye() const;
     void drawPreviewToggle(int opacity) const;
     void drawLock() const;
-	void drawCog() const;
+	void drawConfig() const;
 	void drawColumnNumber() const;
     void drawColumnName() const;
     void drawThumbnail(QPixmap &iconPixmap) const;
@@ -283,20 +283,8 @@ public:
 
   class Pixmaps {
   public:
-    static const QPixmap &eye();
-	static const QPixmap &eye_off();
-	static const QPixmap &eye_disabled();
-	static const QPixmap &cameraStand();
-	static const QPixmap &cameraStand_off();
-	static const QPixmap &cameraStandTransparent();
-	static const QPixmap &cameraStand_disabled();
-	static const QPixmap &lock();
-	static const QPixmap &lock_off();
-	static const QPixmap &lock_disabled();
 	static const QPixmap &sound();
     static const QPixmap &soundPlaying();
-	static const QPixmap &cog();
-	static const QPixmap &cog_disabled();
   };
 
 protected:

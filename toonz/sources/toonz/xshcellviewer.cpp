@@ -1378,7 +1378,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   TXshChildLevel *cl                          = cell.getChildLevel();
   if (cl && cell.getFrameId().getNumber() - 1 >= cl->getFrameCount())
     isRed = true;
-  p.setPen(isRed ? m_viewer->getSelectedColumnTextColor()
+  p.setPen(isRed ? QColor(230, 100, 100) //m_viewer->getSelectedColumnTextColor()
                  : m_viewer->getTextColor());
 
 #ifdef _WIN32
@@ -1646,7 +1646,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     bool isRed                         = false;
     TXshPaletteLevel *pl               = cell.getPaletteLevel();
     if (pl && !pl->getPalette()) isRed = true;
-    p.setPen(isRed ? m_viewer->getSelectedColumnTextColor()
+    p.setPen(isRed ? QColor(230, 100, 100) // m_viewer->getSelectedColumnTextColor()
                    : m_viewer->getTextColor());
 // il nome va scritto se e' diverso dalla cella precedente oppure se
 // siamo su una marker line
