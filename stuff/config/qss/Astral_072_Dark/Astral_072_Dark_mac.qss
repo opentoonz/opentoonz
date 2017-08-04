@@ -174,7 +174,7 @@ QGroupBox {
 #EditToolLockButton::indicator {
   border: 1px solid transparent;
   height: 18px;
-  padding: 0;
+  padding: 0px;
   width: 18px;
 }
 .icon-lock:unchecked,
@@ -1333,16 +1333,16 @@ PaletteViewer QToolBar QToolButton {
   margin: 0 0 1px 1px;
 }
 #PaletteLockButton:hover {
-  background-color: #ed6969;
-  border-color: #ed6969;
+  background-color: #2f2f2f;
+  border-color: #2f2f2f;
 }
 #PaletteLockButton:checked {
-  background-color: #ed6969;
-  border-color: #ed6969;
+  background-color: #2f2f2f;
+  border-color: #2f2f2f;
 }
 #PaletteLockButton:checked:hover {
-  background-color: #f29797;
-  border-color: #f29797;
+  background-color: #6e6e6e;
+  border-color: #6e6e6e;
 }
 /* -----------------------------------------------------------------------------
    Quick Renamer

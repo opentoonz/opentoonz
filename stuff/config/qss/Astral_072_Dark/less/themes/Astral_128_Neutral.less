@@ -148,9 +148,9 @@
 @iconbutton-bg-color-pressed: @button-bg-color-pressed;
 @iconbutton-border-color-pressed: darken(@bg, 20%);
 
-@iconbutton-bg-color-checked: #5987CB;
+@iconbutton-bg-color-checked: @accent1;
 @iconbutton-bg-color-checked-hover: lighten(@iconbutton-bg-color-checked, 12%);
-@iconbutton-border-color-checked: darken(@bg, 20%);
+@iconbutton-border-color-checked: darken(@accent1, 10%);
 @iconbutton-border-color-checked-hover: @iconbutton-border-color-checked;
 
 // -----------------------------------------------------------------------------
@@ -198,6 +198,13 @@
 
 // Ruler
 @viewer-ruler-bg-color: lighten(@bg, 20%);
+
+// -----------------------------------------------------------------------------
+// Palette Viewer
+// -----------------------------------------------------------------------------
+
+@paletteviewer-lock-color-active: @accent1;
+@paletteviewer-lock-color-active-hover: @iconbutton-bg-color-checked-hover;
 
 // -----------------------------------------------------------------------------
 // Schematic Node Viewer

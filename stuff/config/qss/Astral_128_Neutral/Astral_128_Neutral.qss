@@ -117,16 +117,16 @@ QToolBar QToolButton:disabled,
 #CameraSettingsRadioButton::indicator:checked,
 #ForceSquaredPixelButton:checked,
 #EditToolLockButton::indicator:checked {
-  background-color: #5987cb;
-  border-color: #4d4d4d;
+  background-color: #404040;
+  border-color: #272727;
 }
 .button-icon:checked:hover,
 #TopBar #EditToolLockButton::indicator:checked:hover,
 #CameraSettingsRadioButton::indicator:checked:hover,
 #ForceSquaredPixelButton:checked:hover,
 #EditToolLockButton::indicator:checked:hover {
-  background-color: #88a9da;
-  border-color: #4d4d4d;
+  background-color: #5f5f5f;
+  border-color: #272727;
 }
 .button-icon:disabled,
 #TopBar #EditToolLockButton::indicator:disabled,
@@ -174,7 +174,7 @@ QGroupBox {
 #EditToolLockButton::indicator {
   border: 1px solid transparent;
   height: 18px;
-  padding: 0;
+  padding: 0px;
   width: 18px;
 }
 .icon-lock:unchecked,
@@ -1333,16 +1333,16 @@ PaletteViewer QToolBar QToolButton {
   margin: 0 0 1px 1px;
 }
 #PaletteLockButton:hover {
-  background-color: #ed6969;
-  border-color: #ed6969;
+  background-color: #404040;
+  border-color: #404040;
 }
 #PaletteLockButton:checked {
-  background-color: #ed6969;
-  border-color: #ed6969;
+  background-color: #404040;
+  border-color: #404040;
 }
 #PaletteLockButton:checked:hover {
-  background-color: #f29797;
-  border-color: #f29797;
+  background-color: #5f5f5f;
+  border-color: #5f5f5f;
 }
 /* -----------------------------------------------------------------------------
    Quick Renamer
