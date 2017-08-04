@@ -11,17 +11,21 @@ Building OpenToonz from source requires the following dependencies:
 - SDL2
 - LibPNG
 - SuperLU
+- LibLZMA
 - Lzo2
 - FreeType
+- Libmypaint
 
 ### Installing Dependencies on Debian / Ubuntu
 
 ```
-$ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev qttools5-dev-tools libqt5opengl5-dev qtmultimedia5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev
+$ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev qttools5-dev-tools libqt5opengl5-dev qtmultimedia5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev liblzma-dev libjson-c-dev libgirepository1.0-dev libglib2.0-dev python2.7 autotools-dev intltool gettext libtool
 ```
 
 Notes:
 * It's possible we also need `libgsl2` (or maybe `libopenblas-dev`)
+
+**TODO:** add proper packages needed (by platforms other than debian/ubuntu) to build libmypaint
 
 ### Installing Dependencies on RedHat / CentOS
 
@@ -34,11 +38,10 @@ $ rpm ...
 (it may include some useless packages)
 
 ```
-$ dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-devel lz4-devel lzma libusb-devel lzo-devel libjpeg-turbo-devel libGLEW glew-devel freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel qt5-qtmultimedia-devel blas blas-devel
+$ dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-devel lz4-devel lzma libusb-devel lzo-devel libjpeg-turbo-devel libGLEW glew-devel freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel qt5-qtmultimedia-devel blas blas-devel lzma-devel
 ```
 
 ### Installing Dependencies on ArchLinux
-
 ```
 $ sudo pacman -S base-devel git cmake boost boost-libs qt5-base qt5-svg qt5-script qt5-tools qt5-multimedia lz4 libusb lzo libjpeg-turbo glew freeglut sdl2 freetype2
 $ sudo pacman -S blas cblas
