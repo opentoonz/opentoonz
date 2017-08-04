@@ -41,8 +41,8 @@
 QToolBar QToolButton,
 #SchematicBottomFrame QToolBar QToolButton,
 #XSheetToolbar #XSheetToolbarLevelButton {
-  background-color: #484848;
-  border: 1px solid #484848;
+  background-color: transparent;
+  border: 1px solid transparent;
   border-radius: 2px;
   margin: 1px;
   padding: 0;
@@ -1706,14 +1706,14 @@ Ruler {
 ----------------------------------------------------------------------------- */
 XsheetViewer {
   qproperty-TextColor: #cccccc;
-  qproperty-BGColor: #484848;
+  qproperty-BGColor: #3c3c3c;
   qproperty-LightLineColor: #2c2c2c;
   qproperty-MarkerLineColor: #1e96c4;
   qproperty-VerticalLineColor: #222222;
   qproperty-VerticalLineHeadColor: #808080;
   qproperty-PreviewFrameTextColor: #96e6e6;
   qproperty-CurrentRowBgColor: #506082;
-  qproperty-EmptyColumnHeadColor: #606060;
+  qproperty-EmptyColumnHeadColor: #585858;
   qproperty-SelectedColumnTextColor: #e66464;
   qproperty-EmptyCellColor: #404040;
   qproperty-NotEmptyColumnColor: #484848;
