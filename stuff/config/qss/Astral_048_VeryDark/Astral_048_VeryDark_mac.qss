@@ -1829,3 +1829,6 @@ SpreadsheetViewer {
   background-image: url('../Astral_072_Dark/imgs/white/segment_disabled.svg');
   background-repeat: no-repeat;
 }
+#flipOrientationButton {
+  padding: 2px 12px;
+}
