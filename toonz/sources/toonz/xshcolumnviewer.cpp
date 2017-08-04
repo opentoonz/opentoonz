@@ -341,7 +341,7 @@ void ChangeObjectParent::refresh() {
   for (i = 0; i < pegbarList.size(); i++) addItem(pegbarList.at(i));
 
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Bold);
+  static QFont font("Segoe UI", -1, QFont::Bold);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif
@@ -462,7 +462,7 @@ void RenameColumnField::show(const QRect &rect, int col) {
   move(rect.topLeft());
   setFixedSize(rect.size());
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+  static QFont font("Segoe UI", -1, QFont::Normal);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif
@@ -1115,7 +1115,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 
 // Preparing painter
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+  static QFont font("Segoe UI", -1, QFont::Normal);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif
@@ -1184,7 +1184,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+  static QFont font("Segoe UI", -1, QFont::Normal);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif
@@ -1232,7 +1232,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   QPoint orig = m_viewer->positionToXY(CellPosition(0, max(col, 0)));
 
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+  static QFont font("Segoe UI", -1, QFont::Normal);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif
@@ -1279,7 +1279,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+  static QFont font("Segoe UI", -1, QFont::Normal);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif

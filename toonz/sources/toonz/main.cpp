@@ -97,13 +97,14 @@ const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 #endif
 
 #ifdef _WIN32
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Arial");
+TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Segoe UI");
+
 #else
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Hervetica");
+TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Helvetica");
 #endif
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 TEnv::StringVar EnvSoftwareCurrentFontWeight("SoftwareCurrentFontWeightIsBold",
-                                             "Yes");
+                                             "No");
 
 const char *applicationFullName = "OpenToonz 1.1.3";
 const char *rootVarName         = "TOONZROOT";
@@ -371,11 +372,12 @@ int main(int argc, char *argv[]) {
   splashPixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());
 // QPixmap splashPixmap(":Resources/splash.png");
 #ifdef _WIN32
-  QFont font("Arial", -1);
+  QFont font("Segoe UI", -1);
 #else
   QFont font("Helvetica", -1);
 #endif
   font.setPixelSize(13);
+  font.setWeight(50);
   a.setFont(font);
 
   QString offsetStr("\n\n\n\n\n\n\n\n");

@@ -88,7 +88,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
   }
 
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Bold);
+  static QFont font("Segoe UI", -1, QFont::Bold);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif

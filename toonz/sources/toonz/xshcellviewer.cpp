@@ -515,7 +515,7 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   m_col = col;
 
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+  static QFont font("Segoe UI", -1, QFont::Normal);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif
@@ -1382,7 +1382,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
                  : m_viewer->getTextColor());
 
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+  static QFont font("Segoe UI", -1, QFont::Normal);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif
@@ -1514,7 +1514,7 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
 // il nome va scritto se e' diverso dalla cella precedente oppure se
 // siamo su una marker line
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+  static QFont font("Segoe UI", -1, QFont::Normal);
 #else
   static QFont font("Helvetica", -1, QFont::Normal);
 #endif
@@ -1651,7 +1651,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 // il nome va scritto se e' diverso dalla cella precedente oppure se
 // siamo su una marker line
 #ifdef _WIN32
-    static QFont font("Arial", -1, QFont::Normal);
+    static QFont font("Segoe UI", -1, QFont::Normal);
 #else
     static QFont font("Helvetica", -1, QFont::Normal);
 #endif
