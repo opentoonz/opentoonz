@@ -44,10 +44,12 @@ class EnvGlobals {  // singleton
   std::string m_moduleName;
   std::string m_rootVarName;
   std::string m_systemVarPrefix;
+  std::string m_workingDirectory;
   TFilePath m_registryRoot;
   TFilePath m_envFile;
   TFilePath *m_stuffDir;
   TFilePath *m_dllRelativeDir;
+  bool m_isPortable = false;
 
   EnvGlobals() : m_stuffDir(0) {}
 
@@ -125,6 +127,18 @@ public:
 
   TFilePath getStuffDir() {
     if (m_stuffDir) return *m_stuffDir;
+
+    // TFilePath portableCheck = TFilePath((getWorkingDirectory() +
+    // "\\portable.txt"));
+    std::string testWorking = getWorkingDirectory();
+    TFilePath portableCheck =
+        TFilePath((getWorkingDirectory() + "\\portablestuff\\"));
+    std::string stringPortCheck = portableCheck.getQString().toStdString();
+    TFileStatus portableStatus(portableCheck);
+    m_isPortable = portableStatus.doesExist();
+    if (m_isPortable)
+      return TFilePath((getWorkingDirectory() + "\\portablestuff\\"));
+
     return TFilePath(getSystemVarValue(m_rootVarName));
   }
   void setStuffDir(const TFilePath &stuffDir) {
@@ -136,6 +150,9 @@ public:
     TFilePath profilesDir =
         getSystemVarPathValue(getSystemVarPrefix() + "PROFILES");
     if (profilesDir == TFilePath()) profilesDir = getStuffDir() + "profiles";
+    if (m_isPortable)
+      profilesDir =
+          TFilePath(m_workingDirectory) + TFilePath("portablestuff//profiles");
     m_envFile =
         profilesDir + "env" + (TSystem::getUserName().toStdString() + ".env");
   }
@@ -185,6 +202,15 @@ public:
 
   void setSystemVarPrefix(std::string prefix) { m_systemVarPrefix = prefix; }
   std::string getSystemVarPrefix() { return m_systemVarPrefix; }
+
+  void setWorkingDirectory(std::string workingDirectory) {
+    m_workingDirectory = workingDirectory;
+  }
+  std::string getWorkingDirectory() { return m_workingDirectory; }
+
+  void setIsPortable(bool isPortable) { m_isPortable = isPortable; }
+
+  bool getIsPortable() { return m_isPortable; }
 
   void setDllRelativeDir(const TFilePath &dllRelativeDir) {
     delete m_dllRelativeDir;
@@ -496,6 +522,7 @@ void TEnv::setSystemVarPrefix(std::string varName) {
 }
 
 std::string TEnv::getSystemVarPrefix() {
+  if (getIsPortable()) return "";
   return EnvGlobals::instance()->getSystemVarPrefix();
 }
 
@@ -507,9 +534,24 @@ TFilePath TEnv::getStuffDir() {
   //#endif
 }
 
+std::string TEnv::getWorkingDirectory() {
+  return EnvGlobals::instance()->getWorkingDirectory();
+}
+
+void TEnv::setWorkingDirectory(std::string workingDirectory) {
+  EnvGlobals::instance()->setWorkingDirectory(workingDirectory);
+}
+
+bool TEnv::getIsPortable() { return EnvGlobals::instance()->getIsPortable(); }
+
+void TEnv::setIsPortable(bool isPortable) {
+  EnvGlobals::instance()->setIsPortable(isPortable);
+}
+
 TFilePath TEnv::getConfigDir() {
   TFilePath configDir = getSystemVarPathValue(getSystemVarPrefix() + "CONFIG");
-  if (configDir == TFilePath()) configDir = getStuffDir() + "config";
+  if (configDir == TFilePath() || getIsPortable())
+    configDir = getStuffDir() + "config";
   return configDir;
 }
 

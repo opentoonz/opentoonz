@@ -109,6 +109,10 @@ const char *applicationFullName = "OpenToonz 1.1.3";
 const char *rootVarName         = "TOONZROOT";
 const char *systemVarPrefix     = "TOONZ";
 
+QString workingDirectoryTmp  = QDir::currentPath();
+QByteArray ba                = workingDirectoryTmp.toLatin1();
+const char *workingDirectory = ba.data();
+
 #ifdef MACOSX
 #include "tthread.h"
 void postThreadMsg(TThread::Message *) {}
@@ -161,6 +165,7 @@ DV_IMPORT_API void initColorFx();
 static void initToonzEnv() {
   StudioPalette::enable(true);
 
+  TEnv::setWorkingDirectory(workingDirectory);
   TEnv::setApplication(applicationName, applicationVersion,
                        applicationRevision);
   TEnv::setRootVarName(rootVarName);
