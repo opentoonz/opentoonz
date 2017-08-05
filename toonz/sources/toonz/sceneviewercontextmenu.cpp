@@ -178,7 +178,6 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
     OnioniSkinMaskGUI::addOnionSkinCommand(this);
   QMenu *guidedDrawingMenu = addMenu(tr("Vector Guided Drawing"));
   int guidedDrawingStatus  = Preferences::instance()->getGuidedDrawing();
-  // action = commandManager->createAction(MI_VectorGuidedDrawingOff, this);
   action = guidedDrawingMenu->addAction(tr("Off"));
   action->setCheckable(true);
   action->setChecked(guidedDrawingStatus == 0);
