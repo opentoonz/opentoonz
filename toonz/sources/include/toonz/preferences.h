@@ -272,6 +272,9 @@ public:
   void setDefaultImportPolicy(int policy);
   int getDefaultImportPolicy() { return m_importPolicy; }
 
+  void setIgnoreImageDpi(bool on);
+  bool isIgnoreImageDpiEnabled() const { return m_ignoreImageDpi; }
+
   // Drawing  tab
 
   void setScanLevelType(std::string s);
@@ -361,6 +364,9 @@ public:
 
   void enableExpandFunctionHeader(bool on);
   bool isExpandFunctionHeaderEnabled() const { return m_expandFunctionHeader; }
+
+  void enableShowColumnNumbers(bool on);
+  bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
 
   // Animation  tab
 
@@ -503,14 +509,14 @@ private:
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
       m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar,
-      m_expandFunctionHeader;
+      m_expandFunctionHeader, m_showColumnNumbers;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
       m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly,
       m_startupPopupEnabled;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
-  bool m_onionSkinDuringPlayback;
+  bool m_onionSkinDuringPlayback, m_ignoreImageDpi;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,

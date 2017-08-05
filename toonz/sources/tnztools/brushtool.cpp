@@ -2410,7 +2410,10 @@ BrushData::BrushData()
     , m_frameRange(0)
     , m_snap(false)
     , m_snapSensitivity(0)
-    , m_miter(0) {}
+    , m_miter(0)
+    , m_modifierSize(0.0)
+    , m_modifierOpacity(0.0)
+    {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2432,7 +2435,10 @@ BrushData::BrushData(const std::wstring &name)
     , m_frameRange(0)
     , m_snap(false)
     , m_snapSensitivity(0)
-    , m_miter(0) {}
+    , m_miter(0)
+    , m_modifierSize(0.0)
+    , m_modifierOpacity(0.0)
+    {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2482,6 +2488,12 @@ void BrushData::saveData(TOStream &os) {
   os.openChild("SnapSensitivity");
   os << (int)m_snapSensitivity;
   os.closeChild();
+  os.openChild("Modifier_Size");
+  os << m_modifierSize;
+  os.closeChild();
+  os.openChild("Modifier_Opacity");
+  os << m_modifierOpacity;
+  os.closeChild();
 }
 
 //----------------------------------------------------------------------------------------------------------
@@ -2523,6 +2535,10 @@ void BrushData::loadData(TIStream &is) {
       is >> m_snap, is.matchEndTag();
     else if (tagName == "SnapSensitivity")
       is >> m_snapSensitivity, is.matchEndTag();
+    else if (tagName == "Modifier_Size")
+      is >> m_modifierSize, is.matchEndTag();
+    else if (tagName == "Modifier_Opacity")
+      is >> m_modifierOpacity, is.matchEndTag();
     else
       is.skipCurrentTag();
   }

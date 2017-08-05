@@ -139,7 +139,7 @@ private:
 //==============================================================================
 
 static WAVEHDR *prepareWaveHeader(HWAVEOUT wout, const TSoundTrackP &subTrack,
-                           ULONG &count) {
+                                  ULONG &count) {
   WAVEHDR *whdr = new WAVEHDR;
   memset(whdr, 0, sizeof(WAVEHDR));
   whdr->dwBufferLength = subTrack->getSampleSize() * subTrack->getSampleCount();

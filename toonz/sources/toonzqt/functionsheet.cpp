@@ -251,12 +251,10 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
   QRect toBeUpdated = e->rect();
   painter.setClipRect(toBeUpdated);
 
-  int x0 = toBeUpdated.left();
-  int x1 = toBeUpdated.right();
-
   // visible columns range
-  int c0 = getViewer()->xToColumn(x0);
-  int c1 = getViewer()->xToColumn(x1);
+  CellRange visible = getViewer()->xyRectToRange(toBeUpdated);
+  int c0            = visible.from().layer();
+  int c1            = visible.to().layer();
 
   if (c0 > c1) return;
 
@@ -264,7 +262,8 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
 
   FunctionTreeModel::ChannelGroup *currentGroup = 0;
 
-  /*--- 表示範囲＋左右1カラムの範囲で、ChannelGroupを格納。無ければ0を入れる
+  /*--- Display range + right and left 1 column range ChannelGroup. If there is
+   * none, put 0
    * ---*/
   std::vector<FunctionTreeModel::ChannelGroup *> channelGroups(n);
   for (int i = 0; i < n; ++i) {
@@ -281,11 +280,11 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
   }
 
   int y0 = 0;
-  int y1 = 17;
+  int y1 = 17;  // needs work
   int y2 = 34;
   int y3 = 53;
 
-  /*--- Channelの有る範囲内を明るめのグレーで塗る ---*/
+  /*--- Fill header with background color ---*/
   for (int c = c0; c <= c1; c++) {
     FunctionTreeModel::Channel *channel = m_sheet->getChannel(c);
     if (!channel) continue;
@@ -301,16 +300,18 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
     FunctionTreeModel::Channel *channel = m_sheet->getChannel(c);
     if (!channel) continue;
     int i = c - c0 + 1;
-    /*---- 現在のColumnと前後のColumnのChannelGroup ---*/
+    /*---- Channel Column of the current Column and the preceding and following
+     * Columns ---*/
     FunctionTreeModel::ChannelGroup *prevGroup = channelGroups[c - c0],
                                     *group     = channelGroups[c - c0 + 1],
                                     *nextGroup = channelGroups[c - c0 + 2];
 
-    /*---- 前後とグループが違ってた場合、それぞれフラグを立てる ---*/
+    /*---- If the group is different from the before and after, flags are set
+     * respectively ---*/
     bool firstGroupColumn = prevGroup != group;
     bool lastGroupColumn  = nextGroup != group;
 
-    /*--- 現在のカラムの左右座標 ---*/
+    /*--- The left and right coordinates of the current column ---*/
     int x0 = getViewer()->columnToX(c);
     int x1 = getViewer()->columnToX(c + 1) - 1;
     // Column width
@@ -380,7 +381,7 @@ void FunctionSheetColumnHeadViewer::mouseMoveEvent(QMouseEvent *e) {
   }
 
   // get the column under the cursor
-  int col                             = getViewer()->xToColumn(e->pos().x());
+  int col = getViewer()->xyToPosition(e->pos()).layer();
   FunctionTreeModel::Channel *channel = m_sheet->getChannel(col);
   if (!channel) {
     setToolTip(QString(""));
@@ -392,7 +393,7 @@ void FunctionSheetColumnHeadViewer::mouseMoveEvent(QMouseEvent *e) {
 
 void FunctionSheetColumnHeadViewer::mousePressEvent(QMouseEvent *e) {
   QPoint pos   = e->pos();
-  int currentC = getViewer()->xToColumn(pos.x());
+  int currentC = getViewer()->xyToPosition(pos).layer();
   FunctionTreeModel::Channel *channel;
   for (int c = 0; c <= m_sheet->getChannelCount(); c++) {
     channel = m_sheet->getChannel(c);
@@ -428,7 +429,7 @@ void FunctionSheetColumnHeadViewer::mousePressEvent(QMouseEvent *e) {
 void FunctionSheetColumnHeadViewer::contextMenuEvent(QContextMenuEvent *ce) {
   // First, select column under cursor
   const QPoint &pos = ce->pos();
-  int cursorCol     = getViewer()->xToColumn(pos.x());
+  int cursorCol     = getViewer()->xyToPosition(pos).layer();
 
   if (cursorCol < 0 || cursorCol >= m_sheet->getChannelCount()) return;
 
@@ -510,10 +511,11 @@ FunctionSheetCellViewer::FunctionSheetCellViewer(FunctionSheet *parent)
 /*! Called when the cell panel is left/right-clicked
 */
 Spreadsheet::DragTool *FunctionSheetCellViewer::createDragTool(QMouseEvent *e) {
-  int row             = getViewer()->yToRow(e->pos().y());
-  int col             = getViewer()->xToColumn(e->pos().x());
-  bool isEmpty        = true;
-  TDoubleParam *curve = m_sheet->getCurve(col);
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
+  bool isEmpty              = true;
+  TDoubleParam *curve       = m_sheet->getCurve(col);
   if (curve) {
     int kCount = curve->getKeyframeCount();
     if (kCount > 0) {
@@ -665,8 +667,9 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0,
 //-----------------------------------------------------------------------------
 
 void FunctionSheetCellViewer::mouseDoubleClickEvent(QMouseEvent *e) {
-  int row = getViewer()->yToRow(e->pos().y());
-  int col = getViewer()->xToColumn(e->pos().x());
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
   int x0, y0, x1, y1;
   x0 = getViewer()->columnToX(col);
   x1 = getViewer()->columnToX(col + 1) - 1;
@@ -737,8 +740,6 @@ void FunctionSheetCellViewer::mousePressEvent(QMouseEvent *e) {
   if (e->button() == Qt::LeftButton || e->button() == Qt::MidButton)
     Spreadsheet::CellPanel::mousePressEvent(e);
   else if (e->button() == Qt::RightButton) {
-    int row = getViewer()->yToRow(e->pos().y());
-    int col = getViewer()->xToColumn(e->pos().x());
     update();
     openContextMenu(e);
   }
@@ -749,8 +750,9 @@ void FunctionSheetCellViewer::mousePressEvent(QMouseEvent *e) {
 void FunctionSheetCellViewer::mouseReleaseEvent(QMouseEvent *e) {
   Spreadsheet::CellPanel::mouseReleaseEvent(e);
   /*
-int row = getViewer()->yToRow(e->pos().y());
-int col = getViewer()->xToColumn(e->pos().x());
+  CellPosition cellPosition = getViewer ()->xyToPosition (e->pos ());
+int row = cellPosition.frame ();
+int col = cellPosition.layer ();
 FunctionSheet::DragTool *dragTool = m_sheet->getDragTool();
 if(dragTool) dragTool->release(row,col);
 m_sheet->setDragTool(0);
@@ -792,9 +794,10 @@ void FunctionSheetCellViewer::openContextMenu(QMouseEvent *e) {
   QAction setStep3Action(tr("Step 3"), 0);
   QAction setStep4Action(tr("Step 4"), 0);
 
-  int row             = getViewer()->yToRow(e->pos().y());
-  int col             = getViewer()->xToColumn(e->pos().x());
-  TDoubleParam *curve = m_sheet->getCurve(col);
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
+  TDoubleParam *curve       = m_sheet->getCurve(col);
   if (!curve) return;
 
   bool isEmpty    = true;
@@ -947,14 +950,14 @@ void FunctionSheet::setSelection(FunctionSelection *selection) {
 //-----------------------------------------------------------------------------
 
 void FunctionSheet::showEvent(QShowEvent *e) {
-  registerFrameScroller();
+  m_frameScroller.registerFrameScroller();
   SpreadsheetViewer::showEvent(e);
 }
 
 //-----------------------------------------------------------------------------
 
 void FunctionSheet::hideEvent(QHideEvent *e) {
-  unregisterFrameScroller();
+  m_frameScroller.unregisterFrameScroller();
   SpreadsheetViewer::hideEvent(e);
 }
 

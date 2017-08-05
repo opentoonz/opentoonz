@@ -38,6 +38,7 @@ struct BrushData final : public TPersist {
   double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
   bool m_selective, m_pencil, m_breakAngles, m_pressure, m_snap;
   int m_cap, m_join, m_miter, m_frameRange, m_snapSensitivity;
+  double m_modifierSize, m_modifierOpacity;
 
   BrushData();
   BrushData(const std::wstring &name);

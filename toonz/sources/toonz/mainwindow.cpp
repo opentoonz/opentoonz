@@ -89,7 +89,8 @@ TEnv::IntVar NoShiftToggleAction("NoShiftToggleAction", 0);
 namespace {
 //=============================================================================
 
-const std::string layoutsFileName     = "layouts.txt";
+// layout file name may be overwritten by the argument
+std::string layoutsFileName           = "layouts.txt";
 const std::string currentRoomFileName = "currentRoom.txt";
 bool scrambledRooms                   = false;
 
@@ -108,8 +109,10 @@ bool readRoomList(std::vector<TFilePath> &roomPaths,
                      " not found!");
       fp = ToonzFolder::getRoomsFile(layoutsFileName);
       if (!TFileStatus(fp).doesExist()) return false;
-    } else
+    } else {
       argumentLayoutFileLoaded = true;
+      layoutsFileName          = argumentLayoutFileName.toStdString();
+    }
   } else {
     fp = ToonzFolder::getRoomsFile(layoutsFileName);
     if (!TFileStatus(fp).doesExist()) return false;
@@ -255,6 +258,9 @@ void Room::save() {
     TPanel *pane = static_cast<TPanel *>(layout->itemAt(i)->widget());
     settings.setValue("name", pane->objectName());
     settings.setValue("geometry", geometries[i]);  // Use passed geometry
+    if (SaveLoadQSettings *persistent =
+            dynamic_cast<SaveLoadQSettings *>(pane->widget()))
+      persistent->save(settings);
     if (pane->getViewType() != -1)
       // If panel has different viewtypes, store current one
       settings.setValue("viewtype", pane->getViewType());
@@ -303,6 +309,9 @@ void Room::load(const TFilePath &fp) {
       // Allocate panel
       paneObjectName = name.toString();
       pane           = TPanelFactory::createPanel(this, paneObjectName);
+      if (SaveLoadQSettings *persistent =
+              dynamic_cast<SaveLoadQSettings *>(pane->widget()))
+        persistent->load(settings);
     }
 
     if (!pane) {
@@ -1050,8 +1059,10 @@ void MainWindow::onUpgradeTabPro() {}
 //-----------------------------------------------------------------------------
 
 void MainWindow::onAbout() {
-  QLabel *label = new QLabel();
-  label->setPixmap(QPixmap(":Resources/splash.png"));
+  QLabel *label  = new QLabel();
+  QPixmap pixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+  pixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());
+  label->setPixmap(pixmap);
 
   DVGui::Dialog *dialog = new DVGui::Dialog(this, true);
   dialog->setWindowTitle(tr("About OpenToonz"));
@@ -1757,7 +1768,10 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_DeleteInk, tr("&Delete Lines..."), "");
   createMenuXsheetAction(MI_MergeColumns, tr("&Merge Levels"), "");
   createMenuXsheetAction(MI_InsertFx, tr("&New FX..."), "Ctrl+F");
-  createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
+  QAction *newOutputAction =
+      createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
+  newOutputAction->setIcon(createQIconOnOff("output", false));
+
   createRightClickMenuAction(MI_FxParamEditor, tr("&Edit FX..."), "Ctrl+K");
 
   createMenuXsheetAction(MI_InsertSceneFrame, tr("Insert Frame"), "");
@@ -2086,7 +2100,7 @@ void MainWindow::defineActions() {
   QAction *refreshAct =
       createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
   refreshAct->setIconText(tr("Refresh"));
-  refreshAct->setIcon(createQIconOnOffPNG("refresh"));
+  refreshAct->setIcon(createQIcon("refresh"));
 
   createToolOptionsAction("A_ToolOption_GlobalKey", tr("Global Key"), "");
 

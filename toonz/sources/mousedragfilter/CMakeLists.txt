@@ -3,7 +3,7 @@ if(BUILD_ENV_APPLE)
     project(MouseDragFilter)
 
     include_directories(.)
-    find_library(FOUNDATION_LIBRARY NAMES foundation)
+    find_library(FOUNDATION_LIBRARY NAMES Foundation)
     find_library(CG_LIBRARY NAMES CoreGraphics)
     add_library(mousedragfilter mousedragfilter.mm mousedragfilter.h)
     target_link_libraries(mousedragfilter ${CG_LIBRARY} ${FOUNDATION_LIBRARY})
