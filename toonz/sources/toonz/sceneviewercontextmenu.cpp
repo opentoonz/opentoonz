@@ -177,20 +177,30 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
       !parent->isPreviewEnabled())
     OnioniSkinMaskGUI::addOnionSkinCommand(this);
   QMenu *guidedDrawingMenu = addMenu(tr("Vector Guided Drawing"));
-  action                   = guidedDrawingMenu->addAction(tr("Off"));
-  ret                      = ret &&
+  int guidedDrawingStatus  = Preferences::instance()->getGuidedDrawing();
+  // action = commandManager->createAction(MI_VectorGuidedDrawingOff, this);
+  action = guidedDrawingMenu->addAction(tr("Off"));
+  action->setCheckable(true);
+  action->setChecked(guidedDrawingStatus == 0);
+  ret = ret &&
         parent->connect(action, SIGNAL(triggered()), this,
                         SLOT(setGuidedDrawingOff()));
   action = guidedDrawingMenu->addAction(tr("Closest Drawing"));
-  ret    = ret &&
+  action->setCheckable(true);
+  action->setChecked(guidedDrawingStatus == 1);
+  ret = ret &&
         parent->connect(action, SIGNAL(triggered()), this,
                         SLOT(setGuidedDrawingClosest()));
   action = guidedDrawingMenu->addAction(tr("Farthest Drawing"));
-  ret    = ret &&
+  action->setCheckable(true);
+  action->setChecked(guidedDrawingStatus == 2);
+  ret = ret &&
         parent->connect(action, SIGNAL(triggered()), this,
                         SLOT(setGuidedDrawingFarthest()));
   action = guidedDrawingMenu->addAction(tr("All Drawings"));
-  ret    = ret &&
+  action->setCheckable(true);
+  action->setChecked(guidedDrawingStatus == 3);
+  ret = ret &&
         parent->connect(action, SIGNAL(triggered()), this,
                         SLOT(setGuidedDrawingAll()));
   // Zero Thick
