@@ -9,6 +9,7 @@
 #include "timageinfo.h"
 #include "trop.h"
 #include "tsound.h"
+#include "tmsgcore.h"
 
 // tipc includes
 #include "tipc.h"
@@ -206,6 +207,8 @@ TLevelWriterMov::~TLevelWriterMov() {
   QString res;
 
   stream << (msg << QString("$closeLWMov") << m_id);
+  if (tipc::readMessage(stream, msg) != "ok")
+    DVGui::warning("Unable to write file");
 }
 
 //------------------------------------------------------------------

@@ -478,6 +478,12 @@ void PreferencesPopup::onAutoExposeChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onIgnoreImageDpiChanged(int index) {
+  m_pref->setIgnoreImageDpi(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onSubsceneFolderChanged(int index) {
   m_pref->enableSubsceneFolder(index == Qt::Checked);
 }
@@ -671,7 +677,7 @@ void PreferencesPopup::setChessboardColor2(const TPixel32 &color,
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onColumnIconChange(const QString &value) {
-  m_pref->setColumnIconLoadingPolicy(value == QString("At Once")
+  m_pref->setColumnIconLoadingPolicy(value == tr("At Once")
                                          ? Preferences::LoadAtOnce
                                          : Preferences::LoadOnDemand);
 }
@@ -1010,6 +1016,10 @@ void PreferencesPopup::onExpandFunctionHeaderClicked(bool checked) {
   m_pref->enableExpandFunctionHeader(checked);
 }
 
+void PreferencesPopup::onShowColumnNumbersChanged(int index) {
+  m_pref->enableShowColumnNumbers(index == Qt::Checked);
+}
+
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onUseArrowKeyToShiftCellSelectionClicked(int on) {
@@ -1167,6 +1177,8 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Expose Loaded Levels in Xsheet"), this);
   CheckBox *createSubfolderCB =
       new CheckBox(tr("Create Sub-folder when Importing Sub-xsheet"), this);
+  CheckBox *m_ignoreImageDpiCB =
+      new CheckBox(tr("Use Camera DPI for All Imported Images"), this);
   // Column Icon
   m_columnIconOm                                   = new QComboBox(this);
   QComboBox *initialLoadTlvCachingBehaviorComboBox = new QComboBox(this);
@@ -1234,6 +1246,8 @@ PreferencesPopup::PreferencesPopup()
       tr("Expand Function Editor Header to Match XSheet Toolbar Height "
          "(Requires Restart)"),
       this);
+  CheckBox *showColumnNumbersCB =
+      new CheckBox(tr("Show Column Numbers in Column Headers"), this);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1393,6 +1407,7 @@ PreferencesPopup::PreferencesPopup()
 
   //--- Loading ------------------------------
   exposeLoadedLevelsCB->setChecked(m_pref->isAutoExposeEnabled());
+  m_ignoreImageDpiCB->setChecked(m_pref->isIgnoreImageDpiEnabled());
   QStringList behaviors;
   behaviors << tr("On Demand") << tr("All Icons") << tr("All Icons & Images");
   initialLoadTlvCachingBehaviorComboBox->addItems(behaviors);
@@ -1503,6 +1518,7 @@ PreferencesPopup::PreferencesPopup()
       m_pref->isInputCellsWithoutDoubleClickingEnabled());
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
+  showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -1783,6 +1799,8 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       loadingFrameLay->addWidget(removeSceneNumberFromLoadedLevelNameCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      loadingFrameLay->addWidget(m_ignoreImageDpiCB, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
 
       QGridLayout *cacheLay = new QGridLayout();
       cacheLay->setMargin(0);
@@ -1940,7 +1958,7 @@ PreferencesPopup::PreferencesPopup()
     QGridLayout *xsheetFrameLay = new QGridLayout();
     xsheetFrameLay->setMargin(15);
     xsheetFrameLay->setHorizontalSpacing(15);
-    xsheetFrameLay->setVerticalSpacing(10);
+    xsheetFrameLay->setVerticalSpacing(11);
     {
       xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")), 0,
                                 0, Qt::AlignRight | Qt::AlignVCenter);
@@ -1966,6 +1984,7 @@ PreferencesPopup::PreferencesPopup()
       m_showXSheetToolbar->setLayout(xSheetToolbarLay);
 
       xsheetFrameLay->addWidget(m_showXSheetToolbar, 7, 0, 3, 3);
+      xsheetFrameLay->addWidget(showColumnNumbersCB, 10, 0, 1, 2);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
@@ -2237,6 +2256,8 @@ PreferencesPopup::PreferencesPopup()
   //--- Loading ----------------------
   ret = ret && connect(exposeLoadedLevelsCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onAutoExposeChanged(int)));
+  ret = ret && connect(m_ignoreImageDpiCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onIgnoreImageDpiChanged(int)));
   ret = ret && connect(initialLoadTlvCachingBehaviorComboBox,
                        SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onInitialLoadTlvCachingBehaviorChanged(int)));
@@ -2317,6 +2338,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onShowXSheetToolbarClicked(bool)));
   ret = ret && connect(m_expandFunctionHeader, SIGNAL(clicked(bool)),
                        SLOT(onExpandFunctionHeaderClicked(bool)));
+
+  ret = ret && connect(showColumnNumbersCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onShowColumnNumbersChanged(int)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

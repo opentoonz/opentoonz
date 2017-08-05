@@ -9,6 +9,7 @@
 #include <QList>
 
 #include "tpersist.h"
+#include "orientation.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -30,10 +31,11 @@ class DVAPI TXshSoundLevel final : public TXshLevel {
   int m_frameSoundCount;
   double m_fps;
   //! Values is a map of \b Integer and \b DoublePair.
-  /*!Integer is horizontal value of row pixel.
+  /*! Two maps, one for vertical layout and one for horizontal.
+Integer is pixel number since start of sound.
 DoublePair is computed according to frameRate, frameCount
-and soundtrack pressure.*/
-  std::map<int, DoublePair> m_values;
+and soundtrack pressure. Means sound min and max.*/
+  std::map<int, DoublePair> m_values[Orientations::COUNT];
 
   TFilePath m_path;
 
@@ -60,9 +62,11 @@ public:
   void save() override;
   void save(const TFilePath &path);
 
-  void computeValues(int frameHeight = 20);
+  void computeValuesFor(const Orientation *o);
+  void computeValues();
 
-  void getValueAtPixel(int pixel, DoublePair &values) const;
+  void getValueAtPixel(const Orientation *o, int pixel,
+                       DoublePair &values) const;
 
   /*! Set frame rate to \b fps. \sa getSamplePerFrame() */
   void setFrameRate(double fps);

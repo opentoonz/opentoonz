@@ -73,7 +73,7 @@ private:
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
-      *m_newLevelToCameraSizeCB;
+      *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -141,6 +141,7 @@ private slots:
   void onRemoveLevelFormat();
   void onEditLevelFormat();
   void onLevelFormatEdited();
+  void onIgnoreImageDpiChanged(int index);
   void onShow0ThickLinesChanged(int);
   void onRegionAntialiasChanged(int);
   void onImportPolicyChanged(int);
@@ -176,6 +177,7 @@ private slots:
   void onUseNumpadForSwitchingStylesClicked(bool);
   void onShowXSheetToolbarClicked(bool);
   void onExpandFunctionHeaderClicked(bool);
+  void onShowColumnNumbersChanged(int);
   void onUseArrowKeyToShiftCellSelectionClicked(int);
   void onInputCellsWithoutDoubleClickingClicked(int);
   void onWatchFileSystemClicked(int);

@@ -144,6 +144,7 @@
     STD_inopnCloudsFx
     STD_particlesFx 
     STD_iwa_TiledParticlesFx
+    STD_iwa_TimeCodeFx
   </Render>
   <Stylize>
     STD_colorEmbossFx

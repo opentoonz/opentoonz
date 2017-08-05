@@ -38,41 +38,45 @@ KeyframeNavigator::KeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle)
     : QToolBar(parent), m_frameHandle(frameHandle) {
   setLayoutDirection(Qt::LeftToRight);
 
-  setIconSize(QSize(15, 23));
+  setIconSize(QSize(18, 18));
 
   setObjectName("keyFrameNavigator");
 
-  QPixmap emptyPrevPixmap(23, 23); // set transparent icon to show button's background
+  QPixmap emptyPrevPixmap(
+      23, 23);  // set transparent icon to show button's background
   emptyPrevPixmap.fill(Qt::transparent);
   QIcon emptyPrevIcon(emptyPrevPixmap);
 
   m_actPreviewKey = new QAction(emptyPrevIcon, tr("Previous Key"), this);
   connect(m_actPreviewKey, SIGNAL(triggered()), SLOT(togglePrevKeyAct()));
   addAction(m_actPreviewKey);
-  QWidget* prevWidget = widgetForAction(m_actPreviewKey); // obtain a widget generated from QAction
+  QWidget *prevWidget = widgetForAction(
+      m_actPreviewKey);  // obtain a widget generated from QAction
   prevWidget->setObjectName("PreviousKey");
 
-  m_actKeyNo = new QAction(createQIconPNG("key_no"), tr("Set Key"), this);
+  m_actKeyNo = new QAction(createQIcon("key_no"), tr("Set Key"), this);
   connect(m_actKeyNo, SIGNAL(triggered()), SLOT(toggleKeyAct()));
   addAction(m_actKeyNo);
 
   m_actKeyPartial =
-      new QAction(createQIconPNG("key_partial"), tr("Set Key"), this);
+      new QAction(createQIcon("key_partial"), tr("Set Key"), this);
   connect(m_actKeyPartial, SIGNAL(triggered()), SLOT(toggleKeyAct()));
   addAction(m_actKeyPartial);
 
-  m_actKeyTotal = new QAction(createQIconPNG("key_total"), tr("Set Key"), this);
+  m_actKeyTotal = new QAction(createQIcon("key_total"), tr("Set Key"), this);
   connect(m_actKeyTotal, SIGNAL(triggered()), SLOT(toggleKeyAct()));
   addAction(m_actKeyTotal);
 
-  QPixmap emptyNextPixmap(23, 23); // set transparent icon to show button's background
+  QPixmap emptyNextPixmap(
+      23, 23);  // set transparent icon to show button's background
   emptyNextPixmap.fill(Qt::transparent);
   QIcon emptyNextIcon(emptyNextPixmap);
 
   m_actNextKey = new QAction(emptyNextIcon, tr("Next Key"), this);
   connect(m_actNextKey, SIGNAL(triggered()), SLOT(toggleNextKeyAct()));
   addAction(m_actNextKey);
-  QWidget* nextWidget = widgetForAction(m_actNextKey); // obtain a widget generated from QAction
+  QWidget *nextWidget =
+      widgetForAction(m_actNextKey);  // obtain a widget generated from QAction
   nextWidget->setObjectName("NextKey");
 }
 

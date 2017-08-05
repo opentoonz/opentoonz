@@ -64,7 +64,7 @@ void ScreenPicker::mousePressEvent(QWidget *widget, QMouseEvent *me) {
 
 void ScreenPicker::mouseMoveEvent(QWidget *widget, QMouseEvent *me) {
   // On fast movements, the mouse release can fire before the mouse movement
-  //assert(m_mouseGrabbed); - can cause a crash
+  // assert(m_mouseGrabbed); - can cause a crash
   if (!m_mousePressed || !m_mouseGrabbed) return;
 
   QPoint pos(widget->mapToGlobal(me->pos()));

@@ -4,6 +4,7 @@
 #define XSHEET_DRAG_TOOL_H
 
 #include "tgeometry.h"
+#include "cellposition.h"
 
 // forward declaration
 class QPainter;
@@ -28,9 +29,9 @@ public:
   void refreshRowsArea();
   void refreshColumnsArea();
 
-  virtual void onClick(int row, int col) {}
-  virtual void onDrag(int row, int col) {}
-  virtual void onRelease(int row, int col) {}
+  virtual void onClick(const CellPosition &pos) {}
+  virtual void onDrag(const CellPosition &pos) {}
+  virtual void onRelease(const CellPosition &pos) {}
 
   virtual void onClick(const QMouseEvent *event);
   virtual void onDrag(const QMouseEvent *event);

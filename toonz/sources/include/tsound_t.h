@@ -133,10 +133,10 @@ from which it's created.It hasn't reference to the object.
       *dstSample++ = *srcSample++;
   }
 
-//----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
-//! Applies a trasformation (echo, reverb, ect) to the object and returns the
-//! transformed soundtrack
+  //! Applies a trasformation (echo, reverb, ect) to the object and returns the
+  //! transformed soundtrack
   TSoundTrackP apply(TSoundTransform *transform) override;
   //----------------------------------------------------------------------------
 

@@ -481,6 +481,7 @@ class BrushToolOptionsBox final : public ToolOptionsBox {
 private:
   class PresetNamePopup;
   PresetNamePopup *m_presetNamePopup;
+  void filterControls();
 
 public:
   BrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
