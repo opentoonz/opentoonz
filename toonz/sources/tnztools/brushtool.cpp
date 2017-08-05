@@ -1645,7 +1645,7 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   // locals.addMinMax(
   //  TToonzImageP(getImage(false, 1)) ? m_rasThickness : m_thickness, add);
   //} else
-  if (e.isCtrlPressed() && e.isAltPressed()) {
+  if (e.isCtrlPressed() && e.isAltPressed() && !e.isShiftPressed()) {
     const TPointD &diff = pos - m_mousePos;
     double max          = diff.x / 2;
     double min          = diff.y / 2;
@@ -2007,8 +2007,7 @@ BrushData::BrushData()
     , m_join(0)
     , m_miter(0)
     , m_modifierSize(0.0)
-    , m_modifierOpacity(0.0)
-    {}
+    , m_modifierOpacity(0.0) {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2029,8 +2028,7 @@ BrushData::BrushData(const std::wstring &name)
     , m_join(0)
     , m_miter(0)
     , m_modifierSize(0.0)
-    , m_modifierOpacity(0.0)
-    {}
+    , m_modifierOpacity(0.0) {}
 
 //----------------------------------------------------------------------------------------------------------
 
