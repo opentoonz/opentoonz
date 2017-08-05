@@ -173,6 +173,7 @@ class DVAPI Dialog : public QDialog {
   // If the dialog has button then is modal too.
   bool m_hasButton;
   QString m_name;
+  int m_currentScreen = -1;
   // gmt. rendo m_buttonLayout protected per ovviare ad un problema
   // sull'addButtonBarWidget(). cfr filebrowserpopup.cpp.
   // Dobbiamo discutere di Dialog.

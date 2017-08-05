@@ -21,7 +21,6 @@ class DragTool;
 class RowArea final : public QWidget {
   Q_OBJECT
   XsheetViewer *m_viewer;
-  int m_xa;
   int m_row;
 
   enum ShowOnionToSetFlag {

@@ -18,8 +18,6 @@ public:
   virtual void onDrawFrame(int frame,
                            const ImagePainter::VisualSettings &settings) = 0;
 
-  // return true if the frmae is in cache. reimplemented only in Flipbook
-  virtual bool isFrameAlreadyCached(int frame) { return true; };
   virtual void swapBuffers(){};
   virtual void changeSwapBehavior(bool enable){};
 };

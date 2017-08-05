@@ -367,7 +367,9 @@ int main(int argc, char *argv[]) {
 #endif
 
   // splash screen
-  QPixmap splashPixmap(":Resources/splash.png");
+  QPixmap splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+  splashPixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());
+// QPixmap splashPixmap(":Resources/splash.png");
 #ifdef _WIN32
   QFont font("Arial", -1);
 #else

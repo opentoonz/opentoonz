@@ -245,7 +245,7 @@ public:
   void getFrameRange(int &from, int &to, int &step) const {
     from = m_from, to = m_to, step = m_step;
   }
-  void setFrameRate(int rate);
+  void setFrameRate(int rate, bool forceUpdate = true);
   // if doShowHide==true, applies set visible, otherwise applies setEnabled
   void enableButton(UINT button, bool enable, bool doShowHide = true);
   void showCurrentFrame();
@@ -331,7 +331,7 @@ private:
   ImagePainter::VisualSettings m_settings;
 
   bool m_isPlay;
-  int m_fps;
+  int m_fps, m_sceneFps;
   bool m_reverse;
   int m_markerFrom, m_markerTo;
   bool m_drawBlanksEnabled;

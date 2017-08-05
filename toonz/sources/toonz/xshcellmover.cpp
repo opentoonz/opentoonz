@@ -371,9 +371,10 @@ qDebug() << "check: " << srcIndex << ":" <<
 }
 
 void LevelMoverTool::onClick(const QMouseEvent *e) {
-  QPoint pos = e->pos();
-  int row    = getViewer()->yToRow(pos.y());
-  int col    = getViewer()->xToColumn(pos.x());
+  QPoint pos                = e->pos();
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
 
   m_qualifiers = 0;
   if (Preferences::instance()->getDragCellsBehaviour() == 1)
@@ -509,13 +510,13 @@ void LevelMoverTool::onCellChange(int row, int col) {
 }
 
 void LevelMoverTool::onDrag(const QMouseEvent *e) {
-  QPoint pos = e->pos();
-  onCellChange(getViewer()->yToRow(pos.y()), getViewer()->xToColumn(pos.x()));
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  onCellChange(cellPosition.frame(), cellPosition.layer());
   refreshCellsArea();
   refreshColumnsArea();
 }
 
-void LevelMoverTool::onRelease(int row, int col) {
+void LevelMoverTool::onRelease(const CellPosition &pos) {
   m_validPos = false;
   m_range.lx = 0;
   m_range.ly = 0;
@@ -534,15 +535,13 @@ void LevelMoverTool::drawCellsArea(QPainter &p) {
   if (rect.x1 < 0 || rect.y1 < 0) return;
   if (rect.x0 < 0) rect.x0 = 0;
   if (rect.y0 < 0) rect.y0 = 0;
-  int x0, y0, x1, y1;
-  x0    = getViewer()->columnToX(rect.x0);
-  x1    = getViewer()->columnToX(rect.x1 + 1);
-  y0    = getViewer()->rowToY(rect.y0);
-  y1    = getViewer()->rowToY(rect.y1 + 1);
-  int x = x1 - x0;
-  int y = y1 - y0;
+
+  QRect screen = getViewer()->rangeToXYRect(CellRange(
+      CellPosition(rect.y0, rect.x0), CellPosition(rect.y1 + 1, rect.x1 + 1)));
   p.setPen((m_aimedPos == m_lastPos && m_validPos) ? QColor(190, 220, 255)
                                                    : QColor(255, 0, 0));
   int i;
-  for (i = 0; i < 3; i++) p.drawRect(x0 + i, y0 + i, x - 2 * i, y - 2 * i);
+  for (i = 0; i < 3; i++)  // thick border inside cell
+    p.drawRect(QRect(screen.topLeft() + QPoint(i, i),
+                     screen.size() - QSize(2 * i, 2 * i)));
 }
