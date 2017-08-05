@@ -37,6 +37,7 @@ class LipSyncPopup final : public DVGui::Dialog {
   QLabel *m_otherLabel;
 
   QLabel *m_imageLabels[10];
+  QLabel *m_textLabels[10];
   QPushButton *m_navButtons[20];
   QPixmap m_pixmaps[10];
   QPushButton *m_applyButton;
@@ -49,6 +50,7 @@ class LipSyncPopup final : public DVGui::Dialog {
   DVGui::IntLineEdit *m_startAt;
   int m_col;
   bool m_valid = false;
+  bool m_isEditingLevel;
   QStringList m_textLines;
   QCheckBox *m_restToEnd;
 

@@ -93,7 +93,7 @@ LipSyncUndo::LipSyncUndo(int col, TXshSimpleLevel *sl, TXshLevelP cl,
 void LipSyncUndo::undo() const {
   int i        = 0;
   TXsheet *xsh = TApp::instance()->getCurrentScene()->getScene()->getXsheet();
-  while (i < m_lastFrame) {
+  while (i < m_previousFrameIds.size()) {
     int currFrame  = i + m_startFrame;
     TXshCell cell  = xsh->getCell(currFrame, m_col);
     cell.m_frameId = m_previousFrameIds.at(i);
@@ -151,7 +151,7 @@ void LipSyncUndo::redo() const {
       continue;
     }
 
-    while (i < endAt) {
+    while (i < endAt && i < m_lastFrame - m_startFrame) {
       int currFrame = i + m_startFrame;
       TXshCell cell = xsh->getCell(currFrame, m_col);
       if (m_sl)
@@ -195,6 +195,7 @@ LipSyncPopup::LipSyncPopup()
   for (int i = 0; i < 10; i++) {
     m_imageLabels[i] = new QLabel();
     m_imageLabels[i]->setPixmap(m_pixmaps[i]);
+    m_textLabels[i] = new QLabel("temp", this);
   }
 
   m_file = new DVGui::FileField(this, QString(""));
@@ -225,11 +226,13 @@ LipSyncPopup::LipSyncPopup()
     phonemeLay->setHorizontalSpacing(10);
     int i = 0;  // navButtons
     int j = 0;  // imageLabels
+    int k = 0;  // textLabels
     phonemeLay->addWidget(m_aiLabel, 0, 0, 1, 2, Qt::AlignCenter);
     phonemeLay->addWidget(m_eLabel, 0, 2, 1, 2, Qt::AlignCenter);
     phonemeLay->addWidget(m_oLabel, 0, 4, 1, 2, Qt::AlignCenter);
     phonemeLay->addWidget(m_uLabel, 0, 6, 1, 2, Qt::AlignCenter);
     phonemeLay->addWidget(m_fvLabel, 0, 8, 1, 2, Qt::AlignCenter);
+
     phonemeLay->addWidget(m_imageLabels[j], 1, 0, 1, 2, Qt::AlignCenter);
     j++;
     phonemeLay->addWidget(m_imageLabels[j], 1, 2, 1, 2, Qt::AlignCenter);
@@ -240,68 +243,94 @@ LipSyncPopup::LipSyncPopup()
     j++;
     phonemeLay->addWidget(m_imageLabels[j], 1, 8, 1, 2, Qt::AlignCenter);
     j++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 0, Qt::AlignCenter);
+
+    phonemeLay->addWidget(m_textLabels[k], 2, 0, 1, 2, Qt::AlignCenter);
+    k++;
+    phonemeLay->addWidget(m_textLabels[k], 2, 2, 1, 2, Qt::AlignCenter);
+    k++;
+    phonemeLay->addWidget(m_textLabels[k], 2, 4, 1, 2, Qt::AlignCenter);
+    k++;
+    phonemeLay->addWidget(m_textLabels[k], 2, 6, 1, 2, Qt::AlignCenter);
+    k++;
+    phonemeLay->addWidget(m_textLabels[k], 2, 8, 1, 2, Qt::AlignCenter);
+    k++;
+
+    phonemeLay->addWidget(m_navButtons[i], 3, 0, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 1, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 3, 1, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 3, 2, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 3, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 3, 3, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 4, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 3, 4, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 5, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 3, 5, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 6, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 3, 6, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 7, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 3, 7, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 8, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 3, 8, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 2, 9, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 3, 9, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_lLabel, 3, 0, 1, 2, Qt::AlignCenter);
-    phonemeLay->addWidget(m_mbpLabel, 3, 2, 1, 2, Qt::AlignCenter);
-    phonemeLay->addWidget(m_wqLabel, 3, 4, 1, 2, Qt::AlignCenter);
-    phonemeLay->addWidget(m_otherLabel, 3, 6, 1, 2, Qt::AlignCenter);
-    phonemeLay->addWidget(m_restLabel, 3, 8, 1, 2, Qt::AlignCenter);
-    phonemeLay->addWidget(m_imageLabels[j], 4, 0, 1, 2, Qt::AlignCenter);
+
+    phonemeLay->addWidget(new QLabel("", this), 4, Qt::AlignCenter);
+
+    phonemeLay->addWidget(m_lLabel, 5, 0, 1, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_mbpLabel, 5, 2, 1, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_wqLabel, 5, 4, 1, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_otherLabel, 5, 6, 1, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_restLabel, 5, 8, 1, 2, Qt::AlignCenter);
+
+    phonemeLay->addWidget(m_imageLabels[j], 6, 0, 1, 2, Qt::AlignCenter);
     j++;
-    phonemeLay->addWidget(m_imageLabels[j], 4, 2, 1, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_imageLabels[j], 6, 2, 1, 2, Qt::AlignCenter);
     j++;
-    phonemeLay->addWidget(m_imageLabels[j], 4, 4, 1, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_imageLabels[j], 6, 4, 1, 2, Qt::AlignCenter);
     j++;
-    phonemeLay->addWidget(m_imageLabels[j], 4, 6, 1, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_imageLabels[j], 6, 6, 1, 2, Qt::AlignCenter);
     j++;
-    phonemeLay->addWidget(m_imageLabels[j], 4, 8, 1, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_imageLabels[j], 6, 8, 1, 2, Qt::AlignCenter);
     j++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 0, Qt::AlignCenter);
+
+    phonemeLay->addWidget(m_textLabels[k], 7, 0, 1, 2, Qt::AlignCenter);
+    k++;
+    phonemeLay->addWidget(m_textLabels[k], 7, 2, 1, 2, Qt::AlignCenter);
+    k++;
+    phonemeLay->addWidget(m_textLabels[k], 7, 4, 1, 2, Qt::AlignCenter);
+    k++;
+    phonemeLay->addWidget(m_textLabels[k], 7, 6, 1, 2, Qt::AlignCenter);
+    k++;
+    phonemeLay->addWidget(m_textLabels[k], 7, 8, 1, 2, Qt::AlignCenter);
+    k++;
+
+    phonemeLay->addWidget(m_navButtons[i], 8, 0, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 1, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 8, 1, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 2, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 8, 2, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 3, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 8, 3, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 4, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 8, 4, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 5, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 8, 5, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 6, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 8, 6, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 7, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 8, 7, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 8, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 8, 8, Qt::AlignCenter);
     i++;
-    phonemeLay->addWidget(m_navButtons[i], 5, 9, Qt::AlignCenter);
+    phonemeLay->addWidget(m_navButtons[i], 8, 9, Qt::AlignCenter);
     i++;
-    // phonemeLay->addWidget(new QLabel(tr("Lip Sync Data File: ")), 6, 0, 1, 2,
-    // Qt::AlignRight);
-    // phonemeLay->addWidget(m_file, 6, 2, 1, 8, Qt::AlignLeft);
-    phonemeLay->addWidget(new QLabel(tr("Insert at Frame: ")), 6, 0, 1, 1,
+    phonemeLay->addWidget(new QLabel("", this), 9, Qt::AlignCenter);
+    phonemeLay->addWidget(new QLabel(tr("Insert at Frame: ")), 10, 0, 1, 1,
                           Qt::AlignRight);
-    phonemeLay->addWidget(m_startAt, 6, 1, 1, 1, Qt::AlignLeft);
-    phonemeLay->addWidget(m_restToEnd, 6, 2, 1, 6, Qt::AlignLeft);
+    phonemeLay->addWidget(m_startAt, 10, 1, 1, 1, Qt::AlignLeft);
+    phonemeLay->addWidget(m_restToEnd, 10, 2, 1, 6, Qt::AlignLeft);
 
     m_topLayout->addLayout(phonemeLay, 0);
   }
@@ -351,13 +380,18 @@ void LipSyncPopup::showEvent(QShowEvent *) {
   TApp *app    = TApp::instance();
   TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
   m_col        = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+  int row      = app->getCurrentFrame()->getFrame();
+  m_isEditingLevel = app->getCurrentFrame()->isEditingLevel();
+  m_startAt->setValue(row + 1);
+  m_startAt->clearFocus();
   TXshLevelHandle *level = app->getCurrentLevel();
   m_sl                   = level->getSimpleLevel();
   if (!m_sl) {
-    int row       = app->getCurrentFrame()->getFrame();
     TXshCell cell = xsh->getCell(row, m_col);
-    m_cl          = cell.m_level->getChildLevel();
-    m_childLevel  = cell.m_level;
+    if (!cell.isEmpty()) {
+      m_cl         = cell.m_level->getChildLevel();
+      m_childLevel = cell.m_level;
+    }
   }
   if (m_cl)
     DVGui::warning(
@@ -394,7 +428,7 @@ void LipSyncPopup::onApplyButton() {
   int startFrame = m_startAt->getValue() - 1;
   TXsheet *xsh   = TApp::instance()->getCurrentScene()->getScene()->getXsheet();
 
-  int lastFrame = m_textLines.at(m_textLines.size() - 2).toInt();
+  int lastFrame = m_textLines.at(m_textLines.size() - 2).toInt() + startFrame;
 
   if (m_restToEnd->isChecked()) {
     int r0, r1, step;
@@ -403,7 +437,8 @@ void LipSyncPopup::onApplyButton() {
   }
   std::vector<TFrameId> previousFrameIds;
   std::vector<TXshLevelP> previousLevels;
-  for (int previousFrame = 0; previousFrame < lastFrame; previousFrame++) {
+  for (int previousFrame = startFrame; previousFrame < lastFrame;
+       previousFrame++) {
     TXshCell cell = xsh->getCell(previousFrame, m_col);
     previousFrameIds.push_back(cell.m_frameId);
     previousLevels.push_back(cell.m_level);
@@ -449,9 +484,6 @@ void LipSyncPopup::paintEvent(QPaintEvent *) {
   if (m_sl || m_cl) {
     int i = 0;
     while (i < 10) {
-      // TXshCell cell =
-      // TApp::instance()->getCurrentScene()->getScene()->getXsheet()->getCell(i,
-      // m_col);
       QPixmap pm;
       if (m_sl)
         pm = IconGenerator::instance()->getIcon(m_sl, m_activeFrameIds[i]);
@@ -474,6 +506,8 @@ void LipSyncPopup::paintEvent(QPaintEvent *) {
       if (!pm.isNull()) {
         m_pixmaps[i] = pm;
         m_imageLabels[i]->setPixmap(m_pixmaps[i]);
+        m_textLabels[i]->setText(
+            "Drawing: " + QString::number(m_activeFrameIds[i].getNumber()));
       }
       i++;
     }
