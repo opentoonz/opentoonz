@@ -1061,9 +1061,11 @@ LRESULT safe_ICClose(HIC hic) {
 }
 
 #ifdef _MSC_VER
-  typedef std::unique_ptr<std::remove_pointer_t<HIC>, decltype(&safe_ICClose)> hic_t;
+typedef std::unique_ptr<std::remove_pointer_t<HIC>, decltype(&safe_ICClose)>
+    hic_t;
 #else
-  typedef std::unique_ptr<std::remove_pointer<HIC>::type, decltype(&safe_ICClose)> hic_t;
+typedef std::unique_ptr<std::remove_pointer<HIC>::type, decltype(&safe_ICClose)>
+    hic_t;
 #endif
 
 hic_t safe_ICOpen(DWORD fccType, DWORD fccHandler, UINT wMode) {

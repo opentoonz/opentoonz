@@ -14,7 +14,7 @@ PopupButton::PopupButton(QWidget *parent) : QPushButton(parent), m_index(-1) {
 
   QMenu *menu = new QMenu(this);
   setMenu(menu);
-
+  menu->setToolTipsVisible(true);
   connect(this, SIGNAL(clicked(bool)), this, SLOT(showMenu()));
 }
 

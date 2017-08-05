@@ -13,6 +13,8 @@
 #include <QFrame>
 #include <QScrollArea>
 
+#include "layerheaderpanel.h"
+
 //-----------------------------------------------------------------------------
 
 // forward declaration
@@ -22,6 +24,7 @@ class TColorStyle;
 class QToolButton;
 class QPushButton;
 class QComboBox;
+class Orientation;
 
 //-----------------------------------------------------------------------------
 
@@ -117,10 +120,15 @@ class NoteArea final : public QFrame {
   std::unique_ptr<NotePopup> m_newNotePopup;  // Popup used to create new note
   XsheetViewer *m_viewer;
 
+  QPushButton *m_flipOrientationButton;
+
+  QToolButton *m_noteButton;
   QToolButton *m_nextNoteButton;
   QToolButton *m_precNoteButton;
 
   QComboBox *m_frameDisplayStyleCombo;
+
+  LayerHeaderPanel *m_layerHeaderPanel;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -133,11 +141,17 @@ public:
   void updateButtons();
 
 protected slots:
+  void flipOrientation();
   void toggleNewNote();
   void nextNote();
   void precNote();
 
   void onFrameDisplayStyleChanged(int id);
+  void onXsheetOrientationChanged(const Orientation *orientation);
+
+protected:
+  void removeLayout();
+  void createLayout();
 };
 
 }  // namespace XsheetGUI;

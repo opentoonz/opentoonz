@@ -19,6 +19,7 @@ set(MOC_HEADERS
     cellkeyframedata.h
     cellkeyframeselection.h
     cellselection.h
+	../include/cellposition.h
     cleanuppaletteviewer.h
     cleanuppopup.h
     cleanuppreview.h
@@ -61,6 +62,7 @@ set(MOC_HEADERS
     keyframedata.h
     keyframeselection.h
     keyframemover.h
+	layerheaderpanel.h
     levelcreatepopup.h
     levelsettingspopup.h
     linesfadepopup.h
@@ -78,6 +80,7 @@ set(MOC_HEADERS
     meshifypopup.h
     messagepanel.h
     moviegenerator.h
+	../include/orientation.h
     onionskinmaskgui.h
     outputsettingspopup.h
     overwritepopup.h
@@ -91,6 +94,7 @@ set(MOC_HEADERS
     renumberpopup.h
     reslist.h
     ruler.h
+	../include/saveloadqsettings.h
     savepresetpopup.h
     scanlist.h
     scanpopup.h
@@ -218,6 +222,7 @@ set(SOURCES
     fxparameditorpopup.cpp
     histogrampopup.cpp
     insertfxpopup.cpp
+	layerheaderpanel.cpp
     levelcreatepopup.cpp
     levelsettingspopup.cpp
     linetestcapturepane.cpp
@@ -560,7 +565,7 @@ TOONZLIBRARY=\"\$HOME/.config/OpenToonz/stuff/library\"
 TOONZPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
 TOONZPROJECTS=\"$HOME/.config/OpenToonz/stuff/projects\"
 TOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
-TOONZSTUDIOPALETTE=\"\$HOME/.config/OpenToonz/stuff/projects/studiopalette\"
+TOONZSTUDIOPALETTE=\"\$HOME/.config/OpenToonz/stuff/studiopalette\"
 EOF
 fi
 

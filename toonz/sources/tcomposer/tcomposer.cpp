@@ -85,7 +85,7 @@ typedef QualifierT<TFilePath> FilePathQualifier;
 namespace {
 double currentCameraSize = 12;
 double getCurrentCameraSize() { return currentCameraSize; }
-}
+}  // namespace
 
 //========================================================================
 //
@@ -223,7 +223,7 @@ void tcomposerRunOutOfContMemHandler(unsigned long size) {
   TImageCache::instance()->clear(true);
   exit(2);
 }
-}
+}  // namespace
 
 //==============================================================================================
 
@@ -403,7 +403,7 @@ static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
   r0 = r0 - 1;
   r1 = r1 - 1;
 
-  if (r0 < 0) r0                                 = 0;
+  if (r0 < 0) r0 = 0;
   if (r1 < 0 || r1 >= scene->getFrameCount()) r1 = scene->getFrameCount() - 1;
   string msg;
   assert(r1 >= r0);
@@ -557,6 +557,9 @@ static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
 // TODO: il main comincia a diventare troppo lungo. Forse val la pena
 // separarlo in varie funzioni
 // (tipo initToonzEnvironment(), parseCommandLine(), ecc)
+// TODO: the main starts getting too long. Perhaps it is worth
+// separated into various functions
+// (type initToonzEnvironment (), ParseCommandLine (), etc.)
 
 DV_IMPORT_API void initStdFx();
 DV_IMPORT_API void initColorFx();
@@ -658,8 +661,8 @@ int main(int argc, char *argv[]) {
   TVectorBrushStyle::setRootDir(libraryFolder);
   TPalette::setRootDir(libraryFolder);
   TImageStyle::setLibraryDir(libraryFolder);
-  TFilePath cacheRoot                = ToonzFolder::getCacheRootFolder();
-  if (cacheRoot.isEmpty()) cacheRoot = TEnv::getStuffDir() + "cache";
+  TFilePath cacheRoot = ToonzFolder::getCacheRootFolder();
+  if (cacheRoot.isEmpty()) cacheRoot= TEnv::getStuffDir() + "cache";
   TImageCache::instance()->setRootDir(cacheRoot);
   // #endif
 
@@ -944,8 +947,8 @@ int main(int argc, char *argv[]) {
     DVGui::info(QString::fromStdString(msg));
     TImageCache::instance()->clear(true);
   } catch (TException &e) {
-    msg = "Untrapped exception: " + ::to_string(e.getMessage()), cout << msg
-                                                                      << endl;
+    msg = "Untrapped exception: " + ::to_string(e.getMessage()),
+    cout << msg << endl;
     m_userLog->error(msg);
     TImageCache::instance()->clear(true);
   } catch (...) {

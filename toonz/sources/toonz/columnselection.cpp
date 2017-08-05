@@ -16,6 +16,7 @@
 #include "toonz/txshleveltypes.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshcell.h"
+#include "orientation.h"
 
 // TnzCore includes
 #include "tvectorimage.h"
@@ -201,10 +202,13 @@ void TColumnSelection::cloneChild() {
 //-----------------------------------------------------------------------------
 
 void TColumnSelection::hideColumns() {
-  TApp *app            = TApp::instance();
-  ColumnFan *columnFan = app->getCurrentXsheet()->getXsheet()->getColumnFan();
-  std::set<int>::iterator it = m_indices.begin();
-  for (; it != m_indices.end(); ++it) columnFan->deactivate(*it);
+  TApp *app = TApp::instance();
+  for (auto o : Orientations::all()) {
+    ColumnFan *columnFan =
+        app->getCurrentXsheet()->getXsheet()->getColumnFan(o);
+    std::set<int>::iterator it = m_indices.begin();
+    for (; it != m_indices.end(); ++it) columnFan->deactivate(*it);
+  }
   m_indices.clear();
   app->getCurrentXsheet()->notifyXsheetChanged();
   // DA FARE (non c'e una notica per il solo cambiamento della testa delle

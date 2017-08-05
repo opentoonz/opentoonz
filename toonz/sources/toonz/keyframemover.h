@@ -92,7 +92,7 @@ public:
 
   void onClick(const QMouseEvent *event) override;
   void onDrag(const QMouseEvent *event) override;
-  void onRelease(int row, int col) override;
+  void onRelease(const CellPosition &pos) override;
   void drawCellsArea(QPainter &p) override;
 };
 

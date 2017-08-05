@@ -232,6 +232,16 @@ protected slots:
   void onToolEditingFinished();
   void onStartAutoSave();
   void onStopAutoSave();
+
+signals:
+  // on OSX, there is a critical bug that SceneViewer::mousePressEvent is called
+  // when leaving the stylus and it causes unwanted stroke drawn while
+  // hover-moving of the pen.
+  // This signal is to detect tablet leave and force initializing such irregular
+  // mouse press.
+  // NOTE: For now QEvent::TabletLeaveProximity is NOT detected on Windows. See
+  // QTBUG-53628.
+  void tabletLeft();
 };
 
 #endif  // TAPP_H
