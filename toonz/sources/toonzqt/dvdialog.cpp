@@ -294,10 +294,33 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
     // Therefore, if the dialog is moved to the bottom-end of the screen,
     // it will be got out of the screen on the next launch.
     // The following position adjustment will also prevent such behavior.
-    QRect screen = QApplication::desktop()->screenGeometry();
-    int x        = std::min(values.at(0).toInt(), screen.width() - 50);
-    int y = std::min(std::max(30, values.at(1).toInt()), screen.height() - 90);
+
+    // try and get active screen
+    if (parent != NULL) {
+      m_currentScreen = QApplication::desktop()->screenNumber(parent);
+    }
+    QRect screen = QApplication::desktop()->availableGeometry(m_currentScreen);
+    int x        = values.at(0).toInt();
+    int y        = values.at(1).toInt();
+
+    // make sure that the window is visible on the screen
+    // all popups will popup on the active window the first time
+    // so popups moved to other monitors will be moved back
+    // when restarting OpenToonz.
+
+    // This may be somewhat annoying if a user REALLY wants the popup
+    // on another monitor by default, but this is better than
+    // a user thinking the program is broken because they didn't notice
+    // the popup on another monitor
+    if (x > screen.right() - 50) x  = screen.right() - 50;
+    if (x < screen.left()) x        = screen.left();
+    if (y > screen.bottom() - 90) y = screen.bottom() - 90;
+    if (y < screen.top()) y         = screen.top();
     setGeometry(x, y, values.at(2).toInt(), values.at(3).toInt());
+    m_settings->setValue(m_name,
+                         QString::number(x) + " " + QString::number(y) + " " +
+                             QString::number(values.at(2).toInt()) + " " +
+                             QString::number(values.at(3).toInt()));
   }
 }
 
@@ -342,8 +365,33 @@ void Dialog::resizeEvent(QResizeEvent *e) {
 //! reimplemented
 //! for this purpose.
 void Dialog::hideEvent(QHideEvent *event) {
-  move(pos());
+  int x = pos().rx();
+  int y = pos().ry();
+  // make sure the dialog is actually visible on a screen
+  int screenCount = QApplication::desktop()->screenCount();
+  int currentScreen;
+  for (int i = 0; i < screenCount; i++) {
+    if (QApplication::desktop()->screenGeometry(i).contains(pos())) {
+      currentScreen = i;
+      break;
+    } else {
+      // if not - put it back on the main window
+      currentScreen = m_currentScreen;
+    }
+  }
+  QRect screen = QApplication::desktop()->availableGeometry(currentScreen);
+
+  if (x > screen.right() - 50) x  = screen.right() - 50;
+  if (x < screen.left()) x        = screen.left();
+  if (y > screen.bottom() - 90) y = screen.bottom() - 90;
+  if (y < screen.top()) y         = screen.top();
+  move(QPoint(x, y));
   resize(size());
+  QRect r = geometry();
+  m_settings->setValue(m_name, QString::number(r.left()) + " " +
+                                   QString::number(r.top()) + " " +
+                                   QString::number(r.width()) + " " +
+                                   QString::number(r.height()));
   emit dialogClosed();
 }
 

@@ -2005,7 +2005,10 @@ BrushData::BrushData()
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
-    , m_miter(0) {}
+    , m_miter(0)
+    , m_modifierSize(0.0)
+    , m_modifierOpacity(0.0)
+    {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2024,7 +2027,10 @@ BrushData::BrushData(const std::wstring &name)
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
-    , m_miter(0) {}
+    , m_miter(0)
+    , m_modifierSize(0.0)
+    , m_modifierOpacity(0.0)
+    {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2068,6 +2074,12 @@ void BrushData::saveData(TOStream &os) {
   os.openChild("Miter");
   os << m_miter;
   os.closeChild();
+  os.openChild("Modifier_Size");
+  os << m_modifierSize;
+  os.closeChild();
+  os.openChild("Modifier_Opacity");
+  os << m_modifierOpacity;
+  os.closeChild();
 }
 
 //----------------------------------------------------------------------------------------------------------
@@ -2103,6 +2115,10 @@ void BrushData::loadData(TIStream &is) {
       is >> m_join, is.matchEndTag();
     else if (tagName == "Miter")
       is >> m_miter, is.matchEndTag();
+    else if (tagName == "Modifier_Size")
+      is >> m_modifierSize, is.matchEndTag();
+    else if (tagName == "Modifier_Opacity")
+      is >> m_modifierOpacity, is.matchEndTag();
     else
       is.skipCurrentTag();
   }
