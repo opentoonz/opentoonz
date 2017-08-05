@@ -128,8 +128,6 @@ public:
   TFilePath getStuffDir() {
     if (m_stuffDir) return *m_stuffDir;
 
-    // TFilePath portableCheck = TFilePath((getWorkingDirectory() +
-    // "\\portable.txt"));
     std::string testWorking = getWorkingDirectory();
     TFilePath portableCheck =
         TFilePath((getWorkingDirectory() + "\\portablestuff\\"));
