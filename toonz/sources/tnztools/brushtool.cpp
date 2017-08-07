@@ -1952,9 +1952,10 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   // snapping check
   TVectorImageP vi(getImage(false));
   if (vi && m_snap.getValue()) {
+    TPointD snapPoint = pos;
     double minDistance2 = m_minDistance2;
     m_strokeIndex1      = -1;
-
+	bool snapFound = false;
     int i, strokeNumber = vi->getStrokeCount();
 
     TStroke *stroke;
@@ -1973,10 +1974,65 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
         else
           m_w1             = outW;
         TThickPoint point1 = stroke->getPoint(m_w1);
-        TPointD snapPoint  = TPointD(point1.x, point1.y);
-        m_brushPos         = snapPoint;
+        snapPoint  = TPointD(point1.x, point1.y);
+		snapFound = true;
       }
     }
+	// check guide snapping
+	int vGuideCount = 0, hGuideCount = 0;
+	TTool::Viewer *viewer = getViewer();
+	if (viewer) {
+		vGuideCount = viewer->getVGuideCount();
+		hGuideCount = viewer->getHGuideCount();
+	}
+	double distanceToVGuide = -1.0, distanceToHGuide = -1.0;
+	double vGuide, hGuide;
+	bool useGuides = false;
+	if (vGuideCount) {
+		for (int j = 0; j < vGuideCount; j++) {
+			double guide = viewer->getVGuide(j);
+			double tempDistance = abs(guide - pos.y);
+			if (tempDistance < m_minDistance2 && (distanceToVGuide < 0 || tempDistance < distanceToVGuide)) {
+				distanceToVGuide = tempDistance;
+				vGuide = guide;
+				useGuides = true;
+			}
+
+		}
+	}
+	if (hGuideCount) {
+		for (int j = 0; j < hGuideCount; j++) {
+			double guide = viewer->getHGuide(j);
+			double tempDistance = abs(guide - pos.x);
+			if (tempDistance < m_minDistance2 && (distanceToHGuide < 0 || tempDistance < distanceToHGuide)) {
+				distanceToHGuide = tempDistance;
+				hGuide = guide;
+				useGuides = true;
+			}
+		}
+	}
+	if (useGuides && snapFound) {
+		double currYDistance = abs(snapPoint.y - pos.y);
+		double currXDistance = abs(snapPoint.x - pos.x);
+		if (distanceToVGuide < currYDistance || distanceToHGuide < currXDistance)
+			useGuides = true;
+		else useGuides = false;
+	}
+	if (useGuides) {
+		assert(distanceToHGuide >= 0);
+		assert(distanceToVGuide >= 0);
+		if (distanceToHGuide < 0 || distanceToVGuide <= distanceToHGuide)
+		{
+			snapPoint.y = 0.0;
+			snapPoint.x = pos.x;
+			
+		}
+		else {
+			snapPoint.y = pos.y;
+			snapPoint.x = 0.0;
+		}
+	}
+	m_mousePos = snapPoint;
   }
 
   invalidate();
