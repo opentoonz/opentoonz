@@ -156,6 +156,8 @@ public:
   bool doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
                            TFrameId lastFrameId, TStroke *lastStroke,
                            bool drawFirstStroke = true);
+  void checkGuideSnapping(bool beforeMousePress);
+  void checkStrokeSnapping(bool beforeMousePress);
 
 protected:
   TPropertyGroup m_prop[2];
@@ -188,16 +190,17 @@ protected:
   int m_styleId;
   double m_minThick, m_maxThick;
 
-  // for snapping
+  // for snapping and framerange
   int m_strokeIndex1, m_strokeIndex2, m_col, m_firstFrame, m_veryFirstFrame,
       m_veryFirstCol, m_targetType;
   double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
-  bool m_foundSnap = false;
+  bool m_foundFirstSnap = false, m_foundLastSnap = false, m_dragDraw = true;
   TRectD m_modifiedRegion;
   TPointD m_dpiScale,
 	  m_mousePos,  //!< Current mouse position, in world coordinates.
 	  m_brushPos,  //!< World position the brush will be painted at.
-	  m_snapPoint; // The point where vector snapping will occur.
+	  m_firstSnapPoint, 
+      m_lastSnapPoint;
 
   BluredBrush *m_bluredBrush;
   QRadialGradient m_brushPad;
