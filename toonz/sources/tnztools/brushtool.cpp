@@ -28,6 +28,7 @@
 #include "toonz/palettecontroller.h"
 #include "toonz/stage2.h"
 #include "tw/keycodes.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tstream.h"
@@ -1940,7 +1941,8 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 //-------------------------------------------------------------------------------------------------------------
 
 void BrushTool::checkStrokeSnapping(bool beforeMousePress) {
-  // snapping check
+  if (Preferences::instance()->getVectorSnappingTarget() == 1) return;
+
   TVectorImageP vi(getImage(false));
   if (vi && m_snap.getValue()) {
     m_dragDraw          = true;
@@ -1984,6 +1986,7 @@ void BrushTool::checkStrokeSnapping(bool beforeMousePress) {
 //-------------------------------------------------------------------------------------------------------------
 
 void BrushTool::checkGuideSnapping(bool beforeMousePress) {
+  if (Preferences::instance()->getVectorSnappingTarget() == 0) return;
   bool foundSnap;
   TPointD snapPoint;
   beforeMousePress ? foundSnap = m_foundFirstSnap : foundSnap = m_foundLastSnap;

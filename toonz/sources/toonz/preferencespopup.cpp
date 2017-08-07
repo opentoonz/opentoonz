@@ -852,6 +852,13 @@ void PreferencesPopup::onDefLevelParameterChanged() {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onVectorSnappingTargetChanged(int index) {
+  m_vectorSnappingTargetCB->setCurrentIndex(index);
+  m_pref->setVectorSnappingTarget(index);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::rebuildFormatsList() {
   const Preferences &prefs = *Preferences::instance();
 
@@ -1196,13 +1203,14 @@ PreferencesPopup::PreferencesPopup()
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
 
-  m_defScanLevelType = new QComboBox(this);
-  m_defLevelType     = new QComboBox(this);
-  m_defLevelWidth    = new MeasuredDoubleLineEdit(0);
-  m_defLevelHeight   = new MeasuredDoubleLineEdit(0);
-  m_defLevelDpi      = new DoubleLineEdit(0, 66.76);
-  m_autocreationType = new QComboBox(this);
-  m_dpiLabel         = new QLabel(tr("DPI:"), this);
+  m_defScanLevelType       = new QComboBox(this);
+  m_defLevelType           = new QComboBox(this);
+  m_defLevelWidth          = new MeasuredDoubleLineEdit(0);
+  m_defLevelHeight         = new MeasuredDoubleLineEdit(0);
+  m_defLevelDpi            = new DoubleLineEdit(0, 66.76);
+  m_autocreationType       = new QComboBox(this);
+  m_dpiLabel               = new QLabel(tr("DPI:"), this);
+  m_vectorSnappingTargetCB = new QComboBox(this);
   CheckBox *keepOriginalCleanedUpCB =
       new CheckBox(tr("Keep Original Cleaned Up Drawings As Backup"), this);
   CheckBox *multiLayerStylePickerCB = new CheckBox(
@@ -1492,6 +1500,11 @@ PreferencesPopup::PreferencesPopup()
   m_autocreationType->addItems(autocreationTypes);
   int autocreationType = m_pref->getAutocreationType();
   m_autocreationType->setCurrentIndex(autocreationType);
+
+  QStringList vectorSnappingTargets;
+  vectorSnappingTargets << tr("Strokes") << tr("Guides") << tr("All");
+  m_vectorSnappingTargetCB->addItems(vectorSnappingTargets);
+  m_vectorSnappingTargetCB->setCurrentIndex(m_pref->getVectorSnappingTarget());
 
   //--- Xsheet ------------------------------
   xsheetAutopanDuringPlaybackCB->setChecked(m_pref->isXsheetAutopanEnabled());
@@ -1919,6 +1932,9 @@ PreferencesPopup::PreferencesPopup()
         drawingTopLay->addWidget(new QLabel(tr("Autocreation:")), 4, 0,
                                  Qt::AlignRight);
         drawingTopLay->addWidget(m_autocreationType, 4, 1, 1, 3);
+        drawingTopLay->addWidget(new QLabel(tr("Vector Snapping:")), 5, 0,
+                                 Qt::AlignRight);
+        drawingTopLay->addWidget(m_vectorSnappingTargetCB, 5, 1, 1, 3);
       }
       drawingFrameLay->addLayout(drawingTopLay, 0);
 
@@ -2295,6 +2311,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelTypeChanged(int)));
   ret = ret && connect(m_autocreationType, SIGNAL(currentIndexChanged(int)),
                        SLOT(onAutocreationTypeChanged(int)));
+  ret =
+      ret && connect(m_vectorSnappingTargetCB, SIGNAL(currentIndexChanged(int)),
+                     SLOT(onVectorSnappingTargetChanged(int)));
   ret = ret && connect(m_defLevelWidth, SIGNAL(valueChanged()),
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_defLevelHeight, SIGNAL(valueChanged()),

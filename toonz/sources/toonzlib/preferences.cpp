@@ -255,6 +255,7 @@ Preferences::Preferences()
     , m_dragCellsBehaviour(0)
     , m_lineTestFpsCapture(25)
     , m_defLevelType(0)
+    , m_vectorSnappingTarget(SnapAll)
     , m_autocreationType(1)
     , m_autoExposeEnabled(true)
     , m_autoCreateEnabled(true)
@@ -359,7 +360,7 @@ Preferences::Preferences()
   getValue(*m_settings, "autosavePeriod", m_autosavePeriod);
   getValue(*m_settings, "taskchunksize", m_chunkSize);
   getValue(*m_settings, "xsheetStep", m_xsheetStep);
-
+  getValue(*m_settings, "vectorSnappingTarget", m_vectorSnappingTarget);
   int r = 0, g = 255, b = 0;
   getValue(*m_settings, "frontOnionColor.r", r);
   getValue(*m_settings, "frontOnionColor.g", g);
@@ -1278,6 +1279,13 @@ void Preferences::setDefLevelDpi(double dpi) {
 void Preferences::setIgnoreImageDpi(bool on) {
   m_ignoreImageDpi = on;
   m_settings->setValue("IgnoreImageDpi", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setVectorSnappingTarget(int target) {
+  m_vectorSnappingTarget = target;
+  m_settings->setValue("vectorSnappingTarget", target);
 }
 
 //-----------------------------------------------------------------
