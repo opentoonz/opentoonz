@@ -1230,7 +1230,7 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     m_smoothStroke.beginStroke(m_smooth.getValue());
     // snapping
     TVectorImageP vi(img);
-    if (if ((m_targetType & TTool::Vectors) && m_foundSnap) {
+    if ((m_targetType & TTool::Vectors) && m_foundSnap) {
       //TStroke *stroke1   = vi->getStroke(m_strokeIndex1);
       //TThickPoint point1 = stroke1->getPoint(m_w1);
       //TPointD snapPoint  = TPointD(point1.x, point1.y);
