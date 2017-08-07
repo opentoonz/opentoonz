@@ -774,6 +774,7 @@ BrushTool::BrushTool(std::string name, int targetType)
     , m_frameRange("Range:")
     , m_snap("Snap", false)
     , m_snapSensitivity("Sensitivity:")
+	, m_targetType(targetType)
     , m_workingFrameId(TFrameId()) {
   bind(targetType);
 
@@ -1229,12 +1230,11 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     m_smoothStroke.beginStroke(m_smooth.getValue());
     // snapping
     TVectorImageP vi(img);
-    if (vi && m_snap.getValue() && m_strokeIndex1 != -1 &&
-        m_strokeIndex1 < (int)(vi->getStrokeCount())) {
-      TStroke *stroke1   = vi->getStroke(m_strokeIndex1);
-      TThickPoint point1 = stroke1->getPoint(m_w1);
-      TPointD snapPoint  = TPointD(point1.x, point1.y);
-      addTrackPoint(TThickPoint(snapPoint, thickness),
+    if (if ((m_targetType & TTool::Vectors) && m_foundSnap) {
+      //TStroke *stroke1   = vi->getStroke(m_strokeIndex1);
+      //TThickPoint point1 = stroke1->getPoint(m_w1);
+      //TPointD snapPoint  = TPointD(point1.x, point1.y);
+      addTrackPoint(TThickPoint(m_snapPoint, thickness),
                     getPixelSize() * getPixelSize());
     } else
       addTrackPoint(TThickPoint(pos, thickness),
@@ -1564,6 +1564,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   } else if (TToonzImageP ti = image) {
     finishRasterBrush(pos, e.m_pressure);
   }
+  m_foundSnap = false;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1948,16 +1949,14 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
     m_brushPos = pos;
   }
   m_mousePos = pos;
-
+  m_snapPoint = pos;
+  m_foundSnap = false;
   // snapping check
   TVectorImageP vi(getImage(false));
   if (vi && m_snap.getValue()) {
-    TPointD snapPoint = pos;
     double minDistance2 = m_minDistance2;
     m_strokeIndex1      = -1;
-	bool snapFound = false;
     int i, strokeNumber = vi->getStrokeCount();
-
     TStroke *stroke;
     double distance2, outW;
 
@@ -1974,65 +1973,69 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
         else
           m_w1             = outW;
         TThickPoint point1 = stroke->getPoint(m_w1);
-        snapPoint  = TPointD(point1.x, point1.y);
-		snapFound = true;
+        m_snapPoint  = TPointD(point1.x, point1.y);
+		m_foundSnap = true;
       }
     }
-	// check guide snapping
-	int vGuideCount = 0, hGuideCount = 0;
-	TTool::Viewer *viewer = getViewer();
-	if (viewer) {
-		vGuideCount = viewer->getVGuideCount();
-		hGuideCount = viewer->getHGuideCount();
-	}
-	double distanceToVGuide = -1.0, distanceToHGuide = -1.0;
-	double vGuide, hGuide;
-	bool useGuides = false;
-	if (vGuideCount) {
-		for (int j = 0; j < vGuideCount; j++) {
-			double guide = viewer->getVGuide(j);
-			double tempDistance = abs(guide - pos.y);
-			if (tempDistance < m_minDistance2 && (distanceToVGuide < 0 || tempDistance < distanceToVGuide)) {
-				distanceToVGuide = tempDistance;
-				vGuide = guide;
-				useGuides = true;
-			}
+  }
+  if (m_targetType & TTool::Vectors) {
+	  // check guide snapping
+	  int vGuideCount = 0, hGuideCount = 0;
+	  double guideDistance = sqrt(m_minDistance2);
+	  TTool::Viewer *viewer = getViewer();
+	  if (viewer) {
+		  vGuideCount = viewer->getVGuideCount();
+		  hGuideCount = viewer->getHGuideCount();
+	  }
+	  double distanceToVGuide = -1.0, distanceToHGuide = -1.0;
+	  double vGuide, hGuide;
+	  bool useGuides = false;
+	  if (vGuideCount) {
+		  for (int j = 0; j < vGuideCount; j++) {
+			  double guide = viewer->getVGuide(j);
+			  double tempDistance = abs(guide - pos.y);
+			  if (tempDistance < guideDistance && (distanceToVGuide < 0 || tempDistance < distanceToVGuide)) {
+				  distanceToVGuide = tempDistance;
+				  vGuide = guide;
+				  useGuides = true;
+			  }
 
-		}
-	}
-	if (hGuideCount) {
-		for (int j = 0; j < hGuideCount; j++) {
-			double guide = viewer->getHGuide(j);
-			double tempDistance = abs(guide - pos.x);
-			if (tempDistance < m_minDistance2 && (distanceToHGuide < 0 || tempDistance < distanceToHGuide)) {
-				distanceToHGuide = tempDistance;
-				hGuide = guide;
-				useGuides = true;
-			}
-		}
-	}
-	if (useGuides && snapFound) {
-		double currYDistance = abs(snapPoint.y - pos.y);
-		double currXDistance = abs(snapPoint.x - pos.x);
-		if (distanceToVGuide < currYDistance || distanceToHGuide < currXDistance)
-			useGuides = true;
-		else useGuides = false;
-	}
-	if (useGuides) {
-		assert(distanceToHGuide >= 0);
-		assert(distanceToVGuide >= 0);
-		if (distanceToHGuide < 0 || distanceToVGuide <= distanceToHGuide)
-		{
-			snapPoint.y = 0.0;
-			snapPoint.x = pos.x;
-			
-		}
-		else {
-			snapPoint.y = pos.y;
-			snapPoint.x = 0.0;
-		}
-	}
-	m_mousePos = snapPoint;
+		  }
+	  }
+	  if (hGuideCount) {
+		  for (int j = 0; j < hGuideCount; j++) {
+			  double guide = viewer->getHGuide(j);
+			  double tempDistance = abs(guide - pos.x);
+			  if (tempDistance < guideDistance && (distanceToHGuide < 0 || tempDistance < distanceToHGuide)) {
+				  distanceToHGuide = tempDistance;
+				  hGuide = guide;
+				  useGuides = true;
+			  }
+		  }
+	  }
+	  if (useGuides && m_foundSnap) {
+		  double currYDistance = abs(m_snapPoint.y - pos.y);
+		  double currXDistance = abs(m_snapPoint.x - pos.x);
+		  if ((distanceToVGuide < currYDistance && distanceToVGuide < currXDistance)
+			  || (distanceToHGuide < currXDistance && distanceToHGuide < currYDistance))
+			  useGuides = true;
+		  else useGuides = false;
+	  }
+	  if (useGuides) {
+		  assert(distanceToHGuide >= 0 || distanceToVGuide >= 0);
+		  if (distanceToHGuide < 0 || (distanceToVGuide <= distanceToHGuide && distanceToVGuide >= 0))
+		  {
+			  m_snapPoint.y = vGuide;
+			  m_snapPoint.x = pos.x;
+
+		  }
+		  else {
+			  m_snapPoint.y = pos.y;
+			  m_snapPoint.x = hGuide;
+		  }
+		  m_foundSnap = true;
+	  }
+	  m_mousePos = m_snapPoint;
   }
 
   invalidate();
@@ -2062,23 +2065,24 @@ void BrushTool::draw() {
 
   // snapping
   TVectorImageP vi = img;
-  if (vi && m_snap.getValue()) {
+  if ((m_targetType & TTool::Vectors) && m_snap.getValue()) {
     double thick;
-    if (m_strokeIndex1 != -1 && m_strokeIndex1 < (int)(vi->getStrokeCount())) {
+    if (m_foundSnap) {
       tglColor(TPixelD(0.1, 0.9, 0.1));
-
-      TStroke *stroke1   = vi->getStroke(m_strokeIndex1);
-      TThickPoint point1 = stroke1->getPoint(m_w1);
-
-      m_pixelSize = getPixelSize();
-      thick       = std::max(6.0 * m_pixelSize, point1.thick);
-
-      tglDrawCircle(point1, thick);
+	  
+	  m_pixelSize = getPixelSize();
+	  if (vi && m_strokeIndex1 != -1 &&  m_strokeIndex1 < (int)(vi->getStrokeCount())) {
+		  TStroke *stroke1 = vi->getStroke(m_strokeIndex1);
+		  TThickPoint point1 = stroke1->getPoint(m_w1);		  
+		  thick = std::max(6.0 * m_pixelSize, point1.thick);
+	  }
+	  else thick = 6.0 * m_pixelSize;
+      tglDrawCircle(m_snapPoint, thick);
     }
 
     TThickPoint point2;
 
-    if (m_strokeIndex2 != -1 && m_strokeIndex2 < (int)(vi->getStrokeCount())) {
+    if (vi && m_strokeIndex2 != -1 && m_strokeIndex2 < (int)(vi->getStrokeCount())) {
       if (m_strokeIndex2 != -1) {
         TStroke *stroke2 = vi->getStroke(m_strokeIndex2);
         point2           = stroke2->getPoint(m_w2);
