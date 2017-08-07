@@ -197,10 +197,9 @@ protected:
   bool m_foundFirstSnap = false, m_foundLastSnap = false, m_dragDraw = true;
   TRectD m_modifiedRegion;
   TPointD m_dpiScale,
-	  m_mousePos,  //!< Current mouse position, in world coordinates.
-	  m_brushPos,  //!< World position the brush will be painted at.
-	  m_firstSnapPoint, 
-      m_lastSnapPoint;
+      m_mousePos,  //!< Current mouse position, in world coordinates.
+      m_brushPos,  //!< World position the brush will be painted at.
+      m_firstSnapPoint, m_lastSnapPoint;
 
   BluredBrush *m_bluredBrush;
   QRadialGradient m_brushPad;

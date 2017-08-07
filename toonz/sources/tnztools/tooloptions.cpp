@@ -172,8 +172,10 @@ ToolOptionControlBuilder::ToolOptionControlBuilder(ToolOptionsBox *panel,
 
 QLabel *ToolOptionControlBuilder::addLabel(TProperty *p) {
   QLabel *label;
-  if (p->getName() == "Sensitivity:") label = new QLabel("");
-  else label = new QLabel(p->getQStringName());
+  if (p->getName() == "Sensitivity:")
+    label = new QLabel("");
+  else
+    label = new QLabel(p->getQStringName());
   hLayout()->addWidget(label, 0);
   return label;
 }
@@ -1641,21 +1643,24 @@ void BrushToolOptionsBox::filterControls() {
   // show or hide widgets which modify imported brush (mypaint)
 
   bool showModifiers = false;
-  if (FullColorBrushTool* fullColorBrushTool = dynamic_cast<FullColorBrushTool*>(m_tool))
+  if (FullColorBrushTool *fullColorBrushTool =
+          dynamic_cast<FullColorBrushTool *>(m_tool))
     showModifiers = fullColorBrushTool->getBrushStyle();
 
-  for (QMap<std::string, QLabel *>::iterator it = m_labels.begin(); it != m_labels.end(); it++) {
+  for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
+       it != m_labels.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
-    bool isCommon = (it.key() == "Pressure" || it.key() == "Preset:");
-    bool visible = isCommon || (isModifier == showModifiers);
+    bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
     it.value()->setVisible(visible);
   }
 
-  for (QMap<std::string, ToolOptionControl *>::iterator it = m_controls.begin(); it != m_controls.end(); it++) {
+  for (QMap<std::string, ToolOptionControl *>::iterator it = m_controls.begin();
+       it != m_controls.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
-    bool isCommon = (it.key() == "Pressure" || it.key() == "Preset:");
-    bool visible = isCommon || (isModifier == showModifiers);
-    if (QWidget* widget = dynamic_cast<QWidget*>(it.value()))
+    bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
+    if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
       widget->setVisible(visible);
   }
 }

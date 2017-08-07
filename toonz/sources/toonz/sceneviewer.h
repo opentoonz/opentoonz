@@ -242,7 +242,7 @@ public:
   int getHGuideCount();
   double getVGuide(int index);
   double getHGuide(int index);
-  
+
 public:
   // SceneViewer's gadget public functions
   TPointD winToWorld(const QPoint &pos) const;
