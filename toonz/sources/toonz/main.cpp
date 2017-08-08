@@ -99,7 +99,7 @@ const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 #ifdef _WIN32
 TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Arial");
 #else
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Hervetica");
+TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Helvetica");
 #endif
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 TEnv::StringVar EnvSoftwareCurrentFontWeight("SoftwareCurrentFontWeightIsBold",
@@ -371,11 +371,12 @@ int main(int argc, char *argv[]) {
   splashPixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());
 // QPixmap splashPixmap(":Resources/splash.png");
 #ifdef _WIN32
-  QFont font("Arial", -1);
+  QFont font("Segoe UI", -1);
 #else
   QFont font("Helvetica", -1);
 #endif
   font.setPixelSize(13);
+  font.setWeight(50);
   a.setFont(font);
 
   QString offsetStr("\n\n\n\n\n\n\n\n");
@@ -636,9 +637,14 @@ int main(int argc, char *argv[]) {
   }
 
   QFont *myFont;
-
-  std::string family = EnvSoftwareCurrentFont;
-  myFont             = new QFont(QString(family.c_str()));
+  std::string fontName =
+      Preferences::instance()->getInterfaceFont().toStdString();
+  std::string isBold =
+      Preferences::instance()->getInterfaceFontWeight() ? "Yes" : "No";
+  if (fontName != "") EnvSoftwareCurrentFont = fontName;
+  EnvSoftwareCurrentFontWeight               = isBold;
+  std::string family                         = EnvSoftwareCurrentFont;
+  myFont = new QFont(QString(family.c_str()));
 
   myFont->setPixelSize(EnvSoftwareCurrentFontSize);
   /*-- フォントのBoldの指定 --*/
