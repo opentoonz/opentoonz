@@ -325,6 +325,15 @@ TopToBottomOrientation::TopToBottomOrientation() {
   static int HDRROW3		  = HDRROW2 + HDRROW_HEIGHT;	// preview, config
   static int HDRROW4		  = HDRROW3 + HDRROW_HEIGHT;	// thumbnail
   static int HDRROW5		  = HDRROW4 + THUMBNAIL_HEIGHT;	// pegbar, parent handle
+/*
+  static int THUMBNAIL_HEIGHT = 62;
+  static int HDRROW_HEIGHT = CELL_HEIGHT - 2;
+  static int INDENT = 0;
+  static int HDRROW1 = 1;							// Name, number 
+  static int HDRROW2 = HDRROW1 + HDRROW_HEIGHT;	// eye, preview, lock, config
+  static int HDRROW3 = HDRROW2 + HDRROW_HEIGHT;	// thumbnail
+  static int HDRROW4 = HDRROW3 + THUMBNAIL_HEIGHT;				// pegbar, parent handle
+*/
 
   addRect(PredefinedRect::LAYER_HEADER,
           QRect(0, 1, CELL_WIDTH, LAYER_HEADER_HEIGHT - 3));
@@ -342,34 +351,39 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::LAYER_NUMBER, QRect(INDENT + layername.width() - 20, HDRROW1, 20, HDRROW_HEIGHT));
 
   QRect eyeArea(INDENT, HDRROW2, CELL_WIDTH - ICON_WIDTH, HDRROW_HEIGHT);
+//  QRect eyeArea(INDENT, HDRROW2, ICON_WIDTH + 1, HDRROW_HEIGHT);
   addRect(PredefinedRect::EYE_AREA, eyeArea);
   QRect eye(eyeArea.left() + 1 + ((eyeArea.width() / 2) - (ICON_WIDTH / 2)),
-			eyeArea.top() + ((eyeArea.height() / 2) - (ICON_HEIGHT / 2)),
-			ICON_WIDTH, ICON_HEIGHT);
+			eyeArea.top() + ((eyeArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+			ICON_WIDTH, ICON_HEIGHT - 1);
   addRect(PredefinedRect::EYE, eye);
 
   QRect previewArea(INDENT, HDRROW3, CELL_WIDTH - ICON_WIDTH, HDRROW_HEIGHT);
+//  QRect previewArea(INDENT + eyeArea.width(), HDRROW2, ICON_WIDTH + 1, HDRROW_HEIGHT);
   addRect(PredefinedRect::PREVIEW_LAYER_AREA, previewArea);
   QRect preview(previewArea.left() + 1 + ((previewArea.width() / 2) - (ICON_WIDTH / 2)),
-				previewArea.top() + ((previewArea.height() / 2) - (ICON_HEIGHT / 2)),
-				ICON_WIDTH, ICON_HEIGHT);
+				previewArea.top() + ((previewArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+				ICON_WIDTH, ICON_HEIGHT - 1);
   addRect(PredefinedRect::PREVIEW_LAYER, preview);
 
   QRect lockArea(INDENT + eyeArea.width(), HDRROW2, ICON_WIDTH, HDRROW_HEIGHT);
+//  QRect lockArea(INDENT + eyeArea.width() + previewArea.width(), HDRROW2, ICON_WIDTH, HDRROW_HEIGHT);
   addRect(PredefinedRect::LOCK_AREA, lockArea);
-  QRect lock(lockArea.left() + 1 + ((lockArea.width() / 2) - (ICON_WIDTH / 2)),
-			 lockArea.top() + ((lockArea.height() / 2) - (ICON_HEIGHT / 2)),
-			 ICON_WIDTH, ICON_HEIGHT);
+  QRect lock(lockArea.left() + ((lockArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
+			 lockArea.top() + ((lockArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+			 ICON_WIDTH - 1, ICON_HEIGHT - 1);
   addRect(PredefinedRect::LOCK, lock);
 
   QRect configArea(INDENT + previewArea.width(), HDRROW3, ICON_WIDTH, HDRROW_HEIGHT);
+//  QRect configArea(INDENT + eyeArea.width() + previewArea.width() + lockArea.width(), HDRROW2, ICON_WIDTH, HDRROW_HEIGHT);
   addRect(PredefinedRect::CONFIG_AREA, configArea);
-  QRect config(configArea.left() + 1 + ((configArea.width() / 2) - (ICON_WIDTH / 2)),
-	  configArea.top() + ((configArea.height() / 2) - (ICON_HEIGHT / 2)),
-			   ICON_WIDTH, ICON_HEIGHT);
+  QRect config(configArea.left() + ((configArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
+			   configArea.top() + ((configArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+			   ICON_WIDTH - 1, ICON_HEIGHT - 1);
   addRect(PredefinedRect::CONFIG, config);
 
   QRect thumbnailArea(INDENT, HDRROW4, CELL_WIDTH, THUMBNAIL_HEIGHT);
+//  QRect thumbnailArea(INDENT, HDRROW3, CELL_WIDTH, THUMBNAIL_HEIGHT);
   addRect(PredefinedRect::THUMBNAIL_AREA, thumbnailArea);
   QRect thumbnail = thumbnailArea.adjusted(1, 1, 0, 0);
   addRect(PredefinedRect::THUMBNAIL, thumbnail);
@@ -386,10 +400,12 @@ TopToBottomOrientation::TopToBottomOrientation() {
           QRect(soundTopLeft, QSize(trackLen, 3)));
 
   QRect pegbarname(INDENT, HDRROW5, CELL_WIDTH, HDRROW_HEIGHT);
+//  QRect pegbarname(INDENT, HDRROW4, CELL_WIDTH, HDRROW_HEIGHT);
   addRect(PredefinedRect::PEGBAR_NAME, pegbarname);
   addRect(
       PredefinedRect::PARENT_HANDLE_NAME,
   QRect(INDENT + pegbarname.width() - 20, HDRROW5, 20, HDRROW_HEIGHT));
+//  QRect(INDENT + pegbarname.width() - 20, HDRROW4, 20, HDRROW_HEIGHT));
 
   //
   // Lines

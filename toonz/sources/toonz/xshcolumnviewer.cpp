@@ -1089,7 +1089,7 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
     p.fillRect(x0 + 6, y0 + 17, 2, rect.height() - 34,
                QBrush(m_viewer->getLightLightBGColor()));
 
-    p.setPen(Qt::black);
+    p.setPen(m_viewer->getVerticalLineColor());
     p.drawLine(x0 - 1, y0 + 17, x0 - 1, rect.height());
     p.setPen(m_viewer->getDarkLineColor());
     p.drawLine(x0 + 2, y0 + 17, x0 + 2, rect.height());
@@ -1127,7 +1127,7 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
     p.fillRect(x0 + 17, y0 + 6, rect.width() - 34, 2,
                QBrush(m_viewer->getLightLightBGColor()));
 
-    p.setPen(Qt::black);
+    p.setPen(m_viewer->getVerticalLineColor());
     p.drawLine(x0 + 17, y0 - 1, rect.width(), y0 - 1);
     p.setPen(m_viewer->getDarkLineColor());
     p.drawLine(x0 + 17, y0 + 2, rect.width(), y0 + 2);
