@@ -402,8 +402,8 @@ public:
     m_capStyle.setQStringName(tr("Cap"));
     m_joinStyle.setQStringName(tr("Join"));
     m_miterJoinLimit.setQStringName(tr("Miter:"));
-    m_snap.setQStringName("Snap");
-    m_snapSensitivity.setQStringName("Sensitivity:");
+    m_snap.setQStringName(tr("Snap"));
+    m_snapSensitivity.setQStringName(tr("Sensitivity:"));
   }
 };
 
