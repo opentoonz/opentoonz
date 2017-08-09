@@ -53,10 +53,10 @@ void TasksViewer::add(const QString &iconName, QString text, QToolBar *toolBar,
                       const char *slot, QString iconText) {
 #if QT_VERSION >= 0x050500
   QAction *action = new QAction(
-      createQIconOnOffPNG(iconName.toLatin1().constData(), false), text, this);
+      createQIconOnOff(iconName.toLatin1().constData(), false), text, this);
 #else
   QAction *action = new QAction(
-      createQIconOnOffPNG(iconName.toAscii().constData(), false), text, this);
+      createQIconOnOff(iconName.toAscii().constData(), false), text, this);
 #endif
   action->setIconText(iconText);
   bool ret = connect(action, SIGNAL(triggered(bool)),
@@ -1021,6 +1021,7 @@ TaskTreeView::TaskTreeView(TasksViewer *parent, TaskTreeModel *treeModel)
   if (!treeModel) treeModel = new TaskTreeModel(this);
   setModel(treeModel);
   setObjectName("taskeditortree");
+  setIconSize(QSize(21, 17));
 
   // connect(this, SIGNAL(pressed      (const QModelIndex &) ), this,
   // SLOT(onActivated(const QModelIndex &)));
@@ -1130,7 +1131,7 @@ QVariant TaskTreeModel::data(const QModelIndex &index, int role) const {
     case 0:
       return QVariant();
     case 1:
-      return QIcon(":Resources/farm_tasks.png");
+      return QIcon(":Resources/farm_tasks.svg");
     case 2:
     case 3:
       TFarmTask *t         = item->getTask();
@@ -1138,33 +1139,33 @@ QVariant TaskTreeModel::data(const QModelIndex &index, int role) const {
       switch (t->m_status) {
       case Suspended:
         return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_suspended.png"
+                         ? ":Resources/render_suspended.svg"
                          : (sourceFileIsCLN
-                                ? ":Resources/cln_suspended.png"
-                                : ":Resources/cleanup_suspended.png"));
+                                ? ":Resources/cln_suspended.svg"
+                                : ":Resources/cleanup_suspended.svg"));
       case Waiting:
         return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_done_with_errors.png"
+                         ? ":Resources/render_done_with_errors.svg"
                          : (sourceFileIsCLN
-                                ? ":Resources/cln_done_with_errors.png"
-                                : ":Resources/cleanup_done_with_errors.png"));
+                                ? ":Resources/cln_done_with_errors.svg"
+                                : ":Resources/cleanup_done_with_errors.svg"));
       case Running:
         return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_computing.png"
+                         ? ":Resources/render_computing.svg"
                          : (sourceFileIsCLN
-                                ? ":Resources/cln_computing.png"
-                                : ":Resources/cleanup_computing.png"));
+                                ? ":Resources/cln_computing.svg"
+                                : ":Resources/cleanup_computing.svg"));
       case Completed:
         return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_done.png"
-                         : (sourceFileIsCLN ? ":Resources/cln_done.png"
-                                            : ":Resources/cleanup_done.png"));
+                         ? ":Resources/render_done.svg"
+                         : (sourceFileIsCLN ? ":Resources/cln_done.svg"
+                                            : ":Resources/cleanup_done.svg"));
       case Aborted:
       case TaskUnknown:
         return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_failed.png"
-                         : (sourceFileIsCLN ? ":Resources/cln_failed.png"
-                                            : ":Resources/cleanup_failed.png"));
+                         ? ":Resources/render_failed.svg"
+                         : (sourceFileIsCLN ? ":Resources/cln_failed.svg"
+                                            : ":Resources/cleanup_failed.svg"));
       default:
         assert(false);
       }

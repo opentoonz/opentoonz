@@ -310,10 +310,11 @@ Preferences::Preferences()
     , m_useNumpadForSwitchingStyles(true)
     , m_showXSheetToolbar(false)
     , m_expandFunctionHeader(false)
-	, m_showColumnNumbers(false)
-	, m_useArrowKeyToShiftCellSelection(false)
+    , m_showColumnNumbers(false)
+    , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
+    , m_ignoreImageDpi(false)
     , m_watchFileSystem(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -324,8 +325,11 @@ Preferences::Preferences()
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
   TFilePath savePath  = layoutDir + TFilePath("preferences.ini");
 
+  // If no personal settings found, then try to load template settings
+  TFilePath loadPath = ToonzFolder::getModuleFile(TFilePath("preferences.ini"));
+
   m_settings.reset(new QSettings(
-      QString::fromStdWString(savePath.getWideString()), QSettings::IniFormat));
+      QString::fromStdWString(loadPath.getWideString()), QSettings::IniFormat));
 
   getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
   getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
@@ -546,7 +550,7 @@ Preferences::Preferences()
   getValue(*m_settings, "DefLevelWidth", m_defLevelWidth);
   getValue(*m_settings, "DefLevelHeight", m_defLevelHeight);
   getValue(*m_settings, "DefLevelDpi", m_defLevelDpi);
-
+  getValue(*m_settings, "IgnoreImageDpi", m_ignoreImageDpi);
   getValue(*m_settings, "viewerBGColor", m_viewerBGColor);
   getValue(*m_settings, "previewBGColor", m_previewBGColor);
   getValue(*m_settings, "chessboardColor1", m_chessboardColor1);
@@ -597,6 +601,16 @@ Preferences::Preferences()
            m_inputCellsWithoutDoubleClickingEnabled);
   getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
+
+  // in case there is no personal settings
+  if (savePath != loadPath) {
+    // copy the template settins to the personal one
+    if (TFileStatus(loadPath).doesExist())
+      TSystem::copyFile(savePath, loadPath);
+    m_settings.reset(
+        new QSettings(QString::fromStdWString(savePath.getWideString()),
+                      QSettings::IniFormat));
+  }
 }
 
 //-----------------------------------------------------------------
@@ -1274,6 +1288,13 @@ void Preferences::setDefLevelDpi(double dpi) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setIgnoreImageDpi(bool on) {
+  m_ignoreImageDpi = on;
+  m_settings->setValue("IgnoreImageDpi", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::setPaletteTypeOnLoadRasterImageAsColorModel(int type) {
   m_paletteTypeOnLoadRasterImageAsColorModel = type;
   m_settings->setValue("paletteTypeOnLoadRasterImageAsColorModel", type);
@@ -1392,8 +1413,8 @@ void Preferences::enableExpandFunctionHeader(bool on) {
 }
 
 void Preferences::enableShowColumnNumbers(bool on) {
-	m_showColumnNumbers = on;
-	m_settings->setValue("showColumnNumbers", on ? "1" : "0");
+  m_showColumnNumbers = on;
+  m_settings->setValue("showColumnNumbers", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

@@ -182,7 +182,14 @@ protected slots:
 class ColumnArea final : public QWidget {
   Q_OBJECT
 
-  enum { ToggleTransparency = 1, ToggleAllTransparency, TogglePreviewVisible, ToggleAllPreviewVisible, ToggleLock, ToggleAllLock };
+  enum {
+    ToggleTransparency = 1,
+    ToggleAllTransparency,
+    TogglePreviewVisible,
+    ToggleAllPreviewVisible,
+    ToggleLock,
+    ToggleAllLock
+  };
 
   ColumnTransparencyPopup *m_columnTransparencyPopup;
   QTimer *m_transparencyPopupTimer;
@@ -244,10 +251,10 @@ class ColumnArea final : public QWidget {
     void drawLock() const;
     void drawColumnNumber() const;
     void drawColumnName() const;
-	void drawThumbnail(QPixmap &iconPixmap) const;
-	void drawPegbarName() const;
-	void drawParentHandleName() const;
-	void drawFilterColor() const;
+    void drawThumbnail(QPixmap &iconPixmap) const;
+    void drawPegbarName() const;
+    void drawParentHandleName() const;
+    void drawFilterColor() const;
 
     void drawSoundIcon(bool isPlaying) const;
     void drawVolumeControl(double volume) const;

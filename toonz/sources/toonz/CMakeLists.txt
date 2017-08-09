@@ -563,7 +563,7 @@ TOONZLIBRARY=\"\$HOME/.config/OpenToonz/stuff/library\"
 TOONZPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
 TOONZPROJECTS=\"$HOME/.config/OpenToonz/stuff/projects\"
 TOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
-TOONZSTUDIOPALETTE=\"\$HOME/.config/OpenToonz/stuff/projects/studiopalette\"
+TOONZSTUDIOPALETTE=\"\$HOME/.config/OpenToonz/stuff/studiopalette\"
 EOF
 fi
 

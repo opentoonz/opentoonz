@@ -64,7 +64,7 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 
   QColor background      = m_viewer->getBGColor();
   QColor slightlyLighter = {mix(background, Qt::white, 0.95)};
-  QRect rect = QRect(QPoint(0, 0), size());
+  QRect rect             = QRect(QPoint(0, 0), size());
   p.fillRect(rect.adjusted(0, 0, -3, 0), slightlyLighter);
 
   drawIcon(p, PredefinedRect::EYE, XsheetGUI::PreviewVisibleColor,
@@ -77,14 +77,14 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
 
   int leftadj = 2;
-  if (Preferences::instance()->isShowColumnNumbersEnabled())
-  {
-	  p.drawText(numberRect, Qt::AlignCenter | Qt::TextSingleLine, "#");
+  if (Preferences::instance()->isShowColumnNumbersEnabled()) {
+    p.drawText(numberRect, Qt::AlignCenter | Qt::TextSingleLine, "#");
 
-	  leftadj += 20;
+    leftadj += 20;
   }
 
-  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME).adjusted(leftadj, 0, -1, 0);
+  QRect nameRect =
+      o->rect(PredefinedRect::LAYER_NAME).adjusted(leftadj, 0, -1, 0);
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QObject::tr("Layer name"));
 
@@ -94,17 +94,16 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 void LayerHeaderPanel::drawIcon(QPainter &p, PredefinedRect rect,
                                 optional<QColor> fill,
                                 const QPixmap &pixmap) const {
-  QRect iconRect = Orientations::leftToRight()->rect(rect).adjusted(-2, 0,-2, 0);
+  QRect iconRect =
+      Orientations::leftToRight()->rect(rect).adjusted(-2, 0, -2, 0);
 
-  if (rect == PredefinedRect::LOCK)
-  {
-	  p.setPen(Qt::gray);
-	  p.setBrush(QColor(255, 255, 255, 128));
-	  p.drawRect(iconRect);
-	  iconRect.adjust(1, 1, -1, -1);
-  }
-  else
-     if (fill) p.fillRect(iconRect, *fill);
+  if (rect == PredefinedRect::LOCK) {
+    p.setPen(Qt::gray);
+    p.setBrush(QColor(255, 255, 255, 128));
+    p.drawRect(iconRect);
+    iconRect.adjust(1, 1, -1, -1);
+  } else if (fill)
+    p.fillRect(iconRect, *fill);
   p.drawPixmap(iconRect, pixmap);
 }
 
@@ -115,10 +114,9 @@ void LayerHeaderPanel::drawLines(QPainter &p, const QRect &numberRect,
   QLine line = {leftSide(shorter(numberRect)).translated(-2, 0)};
   p.drawLine(line);
 
-  if (Preferences::instance()->isShowColumnNumbersEnabled())
-  {
-	  line = rightSide(shorter(numberRect)).translated(-2, 0);
-	  p.drawLine(line);
+  if (Preferences::instance()->isShowColumnNumbersEnabled()) {
+    line = rightSide(shorter(numberRect)).translated(-2, 0);
+    p.drawLine(line);
   }
 
   line = rightSide(shorter(nameRect));
@@ -136,105 +134,100 @@ void LayerHeaderPanel::showOrHide(const Orientation *o) {
 //-----------------------------------------------------------------------------
 
 void LayerHeaderPanel::mousePressEvent(QMouseEvent *event) {
-	const Orientation *o = Orientations::leftToRight();
+  const Orientation *o = Orientations::leftToRight();
 
-	m_doOnRelease = 0;
+  m_doOnRelease = 0;
 
-	if (event->button() == Qt::LeftButton) {
-		// get mouse position
-		QPoint pos = event->pos();
+  if (event->button() == Qt::LeftButton) {
+    // get mouse position
+    QPoint pos = event->pos();
 
-		// preview button
-	    if (o->rect(PredefinedRect::EYE_AREA).contains(pos)) {
-		    m_doOnRelease = ToggleAllPreviewVisible;
-	    }
-		// camstand button
-		else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(pos)) {
-			m_doOnRelease = ToggleAllTransparency;
-		}
-		// lock button
-		else if (o->rect(PredefinedRect::LOCK_AREA).contains(pos)) {
-			m_doOnRelease = ToggleAllLock;
-		}
-	}
+    // preview button
+    if (o->rect(PredefinedRect::EYE_AREA).contains(pos)) {
+      m_doOnRelease = ToggleAllPreviewVisible;
+    }
+    // camstand button
+    else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(pos)) {
+      m_doOnRelease = ToggleAllTransparency;
+    }
+    // lock button
+    else if (o->rect(PredefinedRect::LOCK_AREA).contains(pos)) {
+      m_doOnRelease = ToggleAllLock;
+    }
+  }
 
-	update();
+  update();
 }
 
 void LayerHeaderPanel::mouseMoveEvent(QMouseEvent *event) {
-	const Orientation *o = Orientations::leftToRight();
+  const Orientation *o = Orientations::leftToRight();
 
-	QPoint pos = event->pos();
+  QPoint pos = event->pos();
 
-	// preview button
-	if (o->rect(PredefinedRect::EYE_AREA).contains(pos)) {
-		m_tooltip = tr("Preview Visbility Toggle All");
-	}
-	// camstand button
-	else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(pos)) {
-		m_tooltip = tr("Camera Stand Visibility Toggle All");
-	}
-	// lock button
-	else if (o->rect(PredefinedRect::LOCK).contains(pos)) {
-		m_tooltip = tr("Lock Toggle All");
-	}
-	else {
-		m_tooltip = tr("");
-	}
+  // preview button
+  if (o->rect(PredefinedRect::EYE_AREA).contains(pos)) {
+    m_tooltip = tr("Preview Visbility Toggle All");
+  }
+  // camstand button
+  else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(pos)) {
+    m_tooltip = tr("Camera Stand Visibility Toggle All");
+  }
+  // lock button
+  else if (o->rect(PredefinedRect::LOCK).contains(pos)) {
+    m_tooltip = tr("Lock Toggle All");
+  } else {
+    m_tooltip = tr("");
+  }
 
-	m_pos = pos;
+  m_pos = pos;
 
-	update();
+  update();
 }
 
 //-----------------------------------------------------------------------------
 
 bool LayerHeaderPanel::event(QEvent *event) {
-	if (event->type() == QEvent::ToolTip) {
-		if (!m_tooltip.isEmpty())
-			QToolTip::showText(mapToGlobal(m_pos), m_tooltip);
-		else
-			QToolTip::hideText();
-	}
-	return QWidget::event(event);
+  if (event->type() == QEvent::ToolTip) {
+    if (!m_tooltip.isEmpty())
+      QToolTip::showText(mapToGlobal(m_pos), m_tooltip);
+    else
+      QToolTip::hideText();
+  }
+  return QWidget::event(event);
 }
 
 //-----------------------------------------------------------------------------
 
 void LayerHeaderPanel::mouseReleaseEvent(QMouseEvent *event) {
-	TApp *app = TApp::instance();
-	TXsheet *xsh = m_viewer->getXsheet();
-	int col, totcols = xsh->getColumnCount();
-	bool sound_changed = false;
+  TApp *app    = TApp::instance();
+  TXsheet *xsh = m_viewer->getXsheet();
+  int col, totcols = xsh->getColumnCount();
+  bool sound_changed = false;
 
-	if (m_doOnRelease != 0 && totcols > 0)
-	{
-		for (col = 0; col < totcols; col++)
-		{
-			if (!xsh->isColumnEmpty(col)) {
-				TXshColumn *column = xsh->getColumn(col);
+  if (m_doOnRelease != 0 && totcols > 0) {
+    for (col = 0; col < totcols; col++) {
+      if (!xsh->isColumnEmpty(col)) {
+        TXshColumn *column = xsh->getColumn(col);
 
-				if (m_doOnRelease == ToggleAllPreviewVisible) {
-					column->setPreviewVisible(!column->isPreviewVisible());
-				}
-				else if (m_doOnRelease == ToggleAllTransparency) {
-					column->setCamstandVisible(!column->isCamstandVisible());
-					if (column->getSoundColumn()) sound_changed = true;
-				}
-				else if (m_doOnRelease == ToggleAllLock) {
-					column->lock(!column->isLocked());
-				}
-			}
-		}
+        if (m_doOnRelease == ToggleAllPreviewVisible) {
+          column->setPreviewVisible(!column->isPreviewVisible());
+        } else if (m_doOnRelease == ToggleAllTransparency) {
+          column->setCamstandVisible(!column->isCamstandVisible());
+          if (column->getSoundColumn()) sound_changed = true;
+        } else if (m_doOnRelease == ToggleAllLock) {
+          column->lock(!column->isLocked());
+        }
+      }
+    }
 
-		if (sound_changed) {
-			app->getCurrentXsheet()->notifyXsheetSoundChanged();
-		}
+    if (sound_changed) {
+      app->getCurrentXsheet()->notifyXsheetSoundChanged();
+    }
 
-		app->getCurrentScene()->notifySceneChanged();
-		app->getCurrentXsheet()->notifyXsheetChanged();
-	}
-	m_viewer->updateColumnArea();
-	update();
-	m_doOnRelease = 0;
+    app->getCurrentScene()->notifySceneChanged();
+    app->getCurrentXsheet()->notifyXsheetChanged();
+  }
+  m_viewer->updateColumnArea();
+  update();
+  m_doOnRelease = 0;
 }

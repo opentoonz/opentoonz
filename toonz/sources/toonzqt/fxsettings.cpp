@@ -1203,7 +1203,9 @@ void FxSettings::createToolBar() {
   m_toolBar = new QToolBar(this);
   m_toolBar->setMovable(false);
   m_toolBar->setFixedHeight(23);
-  m_toolBar->setIconSize(QSize(23, 21));
+  m_toolBar->setIconSize(QSize(17, 17));
+  m_toolBar->setObjectName("MediumPaddingToolBar");
+  // m_toolBar->setIconSize(QSize(23, 21));
   // m_toolBar->setSizePolicy(QSizePolicy::MinimumExpanding,
   // QSizePolicy::MinimumExpanding);
 
@@ -1211,13 +1213,13 @@ void FxSettings::createToolBar() {
   QActionGroup *viewModeActGroup = new QActionGroup(m_toolBar);
   viewModeActGroup->setExclusive(false);
   // camera
-  QIcon camera       = createQIconOnOffPNG("viewcamera");
+  QIcon camera       = createQIconOnOff("viewcamera");
   QAction *cameraAct = new QAction(camera, tr("&Camera Preview"), m_toolBar);
   cameraAct->setCheckable(true);
   viewModeActGroup->addAction(cameraAct);
   m_toolBar->addAction(cameraAct);
   // preview
-  QIcon preview       = createQIconOnOffPNG("preview");
+  QIcon preview       = createQIconOnOff("preview");
   QAction *previewAct = new QAction(preview, tr("&Preview"), m_toolBar);
   previewAct->setCheckable(true);
   viewModeActGroup->addAction(previewAct);
@@ -1230,7 +1232,7 @@ void FxSettings::createToolBar() {
   QActionGroup *viewModeGroup = new QActionGroup(m_toolBar);
   viewModeGroup->setExclusive(true);
 
-  QAction *whiteBg = new QAction(createQIconOnOffPNG("preview_white"),
+  QAction *whiteBg = new QAction(createQIconOnOff("preview_white"),
                                  tr("&White Background"), m_toolBar);
   whiteBg->setCheckable(true);
   whiteBg->setChecked(true);
@@ -1238,14 +1240,14 @@ void FxSettings::createToolBar() {
   connect(whiteBg, SIGNAL(triggered()), this, SLOT(setWhiteBg()));
   m_toolBar->addAction(whiteBg);
 
-  QAction *blackBg = new QAction(createQIconOnOffPNG("preview_black"),
+  QAction *blackBg = new QAction(createQIconOnOff("preview_black"),
                                  tr("&Black Background"), m_toolBar);
   blackBg->setCheckable(true);
   viewModeGroup->addAction(blackBg);
   connect(blackBg, SIGNAL(triggered()), this, SLOT(setBlackBg()));
   m_toolBar->addAction(blackBg);
 
-  m_checkboardBg = new QAction(createQIconOnOffPNG("preview_checkboard"),
+  m_checkboardBg = new QAction(createQIconOnOff("preview_checkboard"),
                                tr("&Checkered Background"), m_toolBar);
   m_checkboardBg->setCheckable(true);
   viewModeGroup->addAction(m_checkboardBg);

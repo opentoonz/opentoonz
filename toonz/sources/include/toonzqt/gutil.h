@@ -120,12 +120,8 @@ bool DVAPI acceptResourceOrFolderDrop(const QList<QUrl> &urls);
 inline QPointF toQPointF(const TPointD &p) { return QPointF(p.x, p.y); }
 inline QPointF toQPointF(const TPoint &p) { return QPointF(p.x, p.y); }
 inline QPoint toQPoint(const TPoint &p) { return QPoint(p.x, p.y); }
-inline TPointD toTPointD(const QPointF &p) {
-  return TPointD(p.x(), p.y());
-}
-inline TPointD toTPointD(const QPoint &p) {
-  return TPointD(p.x(), p.y());
-}
+inline TPointD toTPointD(const QPointF &p) { return TPointD(p.x(), p.y()); }
+inline TPointD toTPointD(const QPoint &p) { return TPointD(p.x(), p.y()); }
 inline TPoint toTPoint(const QPoint &p) { return TPoint(p.x(), p.y()); }
 
 inline QRect toQRect(const TRect &r) {

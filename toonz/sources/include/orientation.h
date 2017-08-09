@@ -76,12 +76,12 @@ enum class PredefinedRect {
   FRAME_LABEL,              //! area for writing frame number
   FRAME_HEADER,
   LAYER_HEADER,
-  FOLDED_LAYER_HEADER,      //! size of layer header when it is folded
-  PLAY_RANGE,       //! area for play range marker within frame header
-  ONION,            //! onion handle placement
-  ONION_DOT,        //! moveable dot placement
-  ONION_DOT_FIXED,  //! fixed dot placement
-  ONION_AREA,       //! area where mouse events will alter onion
+  FOLDED_LAYER_HEADER,  //! size of layer header when it is folded
+  PLAY_RANGE,           //! area for play range marker within frame header
+  ONION,                //! onion handle placement
+  ONION_DOT,            //! moveable dot placement
+  ONION_DOT_FIXED,      //! fixed dot placement
+  ONION_AREA,           //! area where mouse events will alter onion
   ONION_FIXED_DOT_AREA,
   ONION_DOT_AREA,
   PINNED_CENTER_KEY,   //! displays a small blue number
@@ -91,22 +91,22 @@ enum class PredefinedRect {
   PREVIEW_LAYER_AREA,  //! clickable area larger than preview icon, containing
                        //! it
   PREVIEW_LAYER,
-  LOCK_AREA,           //! clickable area larger than lock icon, containing it
-  LOCK,                //! the lock icon itself
-  DRAG_LAYER,  //! draggable area in layer header
-  LAYER_NAME,  //! where to display column name. clicking will rename
+  LOCK_AREA,     //! clickable area larger than lock icon, containing it
+  LOCK,          //! the lock icon itself
+  DRAG_LAYER,    //! draggable area in layer header
+  LAYER_NAME,    //! where to display column name. clicking will rename
   LAYER_NUMBER,  //! where to display column number.
   SOUND_ICON,
-  VOLUME_TRACK,       //! area where track is displayed
-  VOLUME_AREA,        //! active area for volume control
-  LOOP_ICON,          //! area for repeat animation icon
-  LAYER_HEADER_PANEL, //! panel displaying headers for the layer rows in
-					  //! timeline mode
-  THUMBNAIL_AREA,     //! area for header thumbnails and other icons
-  THUMBNAIL,          //! the actual thumbnail, if there is one
-  PEGBAR_NAME,        //! where to display pegbar name
-  PARENT_HANDLE_NAME, //! where to display parent handle number
-  FILTER_COLOR        //! where to show layer's filter color
+  VOLUME_TRACK,        //! area where track is displayed
+  VOLUME_AREA,         //! active area for volume control
+  LOOP_ICON,           //! area for repeat animation icon
+  LAYER_HEADER_PANEL,  //! panel displaying headers for the layer rows in
+                       //! timeline mode
+  THUMBNAIL_AREA,      //! area for header thumbnails and other icons
+  THUMBNAIL,           //! the actual thumbnail, if there is one
+  PEGBAR_NAME,         //! where to display pegbar name
+  PARENT_HANDLE_NAME,  //! where to display parent handle number
+  FILTER_COLOR         //! where to show layer's filter color
 };
 enum class PredefinedLine {
   LOCKED,              //! dotted vertical line when cell is locked
@@ -206,7 +206,7 @@ public:
     return _ranges.at(which);
   }
 
-  virtual int cellWidth() const = 0;
+  virtual int cellWidth() const  = 0;
   virtual int cellHeight() const = 0;
 
 protected:

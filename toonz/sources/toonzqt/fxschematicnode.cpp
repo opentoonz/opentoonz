@@ -50,6 +50,7 @@
 #include <QApplication>
 #include <QMenu>
 #include <QGraphicsSceneMouseEvent>
+#include <QDesktopWidget>
 
 //********************************************************************************
 //    Local namespace
@@ -109,6 +110,12 @@ int getInputPortIndex(TFxPort *port, TFx *fx) {
   }
   return -1;
 }
+
+int getDevPixRatio() {
+  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
+  return devPixRatio;
+}
+
 }  // namespace
 
 //*****************************************************
@@ -337,8 +344,6 @@ void FxColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 
   QAction *addOutputFx =
       CommandManager::instance()->getAction("MI_NewOutputFx");
-  QIcon addOutputFxIcon = createQIconOnOffPNG("output", false);
-  if (addOutputFx) addOutputFx->setIcon(addOutputFxIcon);
 
   QAction *addPaste = new QAction(tr("&Paste Add"), &menu);
   connect(addPaste, SIGNAL(triggered()), fxScene, SLOT(onAddPaste()));
@@ -859,8 +864,6 @@ void FxPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 
   QAction *addOutputFx =
       CommandManager::instance()->getAction("MI_NewOutputFx");
-  QIcon addOutputFxIcon = createQIconOnOffPNG("output", false);
-  if (addOutputFx) addOutputFx->setIcon(addOutputFxIcon);
 
   QAction *deleteFx = new QAction(tr("&Delete"), &menu);
   connect(deleteFx, SIGNAL(triggered()), fxScene, SLOT(onDeleteFx()));
@@ -1130,8 +1133,6 @@ void FxXSheetPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 
   QAction *addOutputFx =
       CommandManager::instance()->getAction("MI_NewOutputFx");
-  QIcon addOutputFxIcon = createQIconOnOffPNG("output", false);
-  if (addOutputFx) addOutputFx->setIcon(addOutputFxIcon);
 
   QAction *addPaste = new QAction(tr("&Paste Add"), &menu);
   connect(addPaste, SIGNAL(triggered()), fxScene, SLOT(onAddPaste()));
@@ -1243,8 +1244,6 @@ void FxOutputPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   } else {
     QAction *addOutputFx =
         CommandManager::instance()->getAction("MI_NewOutputFx");
-    QIcon addOutputFxIcon = createQIconOnOffPNG("output", false);
-    addOutputFx->setIcon(addOutputFxIcon);
     menu.addAction(addOutputFx);
   }
   menu.exec(cme->screenPos());
@@ -1401,14 +1400,24 @@ void FxSchematicPort::paint(QPainter *painter,
     switch (getType()) {
     case eFxInputPort:
     case eFxGroupedInPort: {
-      QPixmap redPm = QPixmap(":Resources/fxport_red.png");
-      painter->drawPixmap(boundingRect(), redPm, QRectF(0, 0, 50, 50));
+      QRect sourceRect =
+          scene()->views()[0]->matrix().mapRect(boundingRect()).toRect();
+      QPixmap redPm =
+          QIcon(":Resources/fxport_red.svg").pixmap(sourceRect.size());
+      sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                         sourceRect.height() * getDevPixRatio());
+      painter->drawPixmap(boundingRect(), redPm, sourceRect);
     } break;
 
     case eFxOutputPort:
     case eFxGroupedOutPort: {
-      QPixmap bluePm = QPixmap(":Resources/fxport_blue.png");
-      painter->drawPixmap(boundingRect(), bluePm, QRectF(0, 0, 50, 50));
+      QRect sourceRect =
+          scene()->views()[0]->matrix().mapRect(boundingRect()).toRect();
+      QPixmap bluePm =
+          QIcon(":Resources/fxport_blue.svg").pixmap(sourceRect.size());
+      sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                         sourceRect.height() * getDevPixRatio());
+      painter->drawPixmap(boundingRect(), bluePm, sourceRect);
       FxSchematicDock *parentDock =
           dynamic_cast<FxSchematicDock *>(parentItem());
       if (parentDock) {
@@ -1426,9 +1435,14 @@ void FxSchematicPort::paint(QPainter *painter,
     } break;
 
     case eFxLinkPort:  // LinkPort
-    default: {
-      QPixmap linkPm = QPixmap(":Resources/schematic_link.png");
-      painter->drawPixmap(boundingRect(), linkPm, QRectF(0, 0, 36, 14));
+    default: {         //ここから！！！
+      QRect sourceRect =
+          scene()->views()[0]->matrix().mapRect(boundingRect()).toRect();
+      QPixmap linkPm =
+          QIcon(":Resources/schematic_link.svg").pixmap(sourceRect.size());
+      sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                         sourceRect.height() * getDevPixRatio());
+      painter->drawPixmap(boundingRect(), linkPm, sourceRect);
     } break;
     }
   }

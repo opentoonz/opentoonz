@@ -18,17 +18,17 @@ const int PINNED_SIZE        = 10;
 }
 
 class TopToBottomOrientation : public Orientation {
-  const int CELL_WIDTH          = 74;
-  const int CELL_HEIGHT         = 20;
-  const int CELL_DRAG_WIDTH     = 7;
-  const int EXTENDER_WIDTH      = 18;
-  const int EXTENDER_HEIGHT     = 8;
-  const int SOUND_PREVIEW_WIDTH = 7;
-  const int LAYER_HEADER_HEIGHT = CELL_HEIGHT * 3 + 60;
+  const int CELL_WIDTH                 = 74;
+  const int CELL_HEIGHT                = 20;
+  const int CELL_DRAG_WIDTH            = 7;
+  const int EXTENDER_WIDTH             = 18;
+  const int EXTENDER_HEIGHT            = 8;
+  const int SOUND_PREVIEW_WIDTH        = 7;
+  const int LAYER_HEADER_HEIGHT        = CELL_HEIGHT * 3 + 60;
   const int FOLDED_LAYER_HEADER_HEIGHT = LAYER_HEADER_HEIGHT;
-  const int FOLDED_LAYER_HEADER_WIDTH = 8;
-  const int FRAME_HEADER_WIDTH  = CELL_WIDTH;
-  const int PLAY_RANGE_X        = FRAME_HEADER_WIDTH / 2 - PLAY_MARKER_SIZE;
+  const int FOLDED_LAYER_HEADER_WIDTH  = 8;
+  const int FRAME_HEADER_WIDTH         = CELL_WIDTH;
+  const int PLAY_RANGE_X = FRAME_HEADER_WIDTH / 2 - PLAY_MARKER_SIZE;
   const int ONION_X = 0, ONION_Y = 0;
   const int ICON_WIDTH = CELL_HEIGHT;
 
@@ -87,7 +87,7 @@ class LeftToRightOrientation : public Orientation {
   const int LAYER_HEADER_WIDTH =
       ICONS_WIDTH + LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH;
   const int FOLDED_LAYER_HEADER_HEIGHT = 8;
-  const int FOLDED_LAYER_HEADER_WIDTH = LAYER_HEADER_WIDTH;
+  const int FOLDED_LAYER_HEADER_WIDTH  = LAYER_HEADER_WIDTH;
 
 public:
   LeftToRightOrientation();
@@ -245,53 +245,92 @@ TopToBottomOrientation::TopToBottomOrientation() {
   // Cell viewer
   QRect cellRect(0, 0, CELL_WIDTH, CELL_HEIGHT);
   addRect(PredefinedRect::CELL, cellRect);
-  addRect(PredefinedRect::DRAG_HANDLE_CORNER, QRect(0, 0, CELL_DRAG_WIDTH, CELL_HEIGHT));
-  QRect keyRect(CELL_WIDTH - KEY_ICON_WIDTH, (CELL_HEIGHT - KEY_ICON_HEIGHT) / 2, KEY_ICON_WIDTH, KEY_ICON_HEIGHT);
+  addRect(PredefinedRect::DRAG_HANDLE_CORNER,
+          QRect(0, 0, CELL_DRAG_WIDTH, CELL_HEIGHT));
+  QRect keyRect(CELL_WIDTH - KEY_ICON_WIDTH,
+                (CELL_HEIGHT - KEY_ICON_HEIGHT) / 2, KEY_ICON_WIDTH,
+                KEY_ICON_HEIGHT);
   addRect(PredefinedRect::KEY_ICON, keyRect);
   QRect nameRect = cellRect.adjusted(8, 0, -6, 0);
   addRect(PredefinedRect::CELL_NAME, nameRect);
-  addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect.adjusted(0, 0, -KEY_ICON_WIDTH, 0));
-  addRect(PredefinedRect::END_EXTENDER, QRect(-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0, EXTENDER_WIDTH, EXTENDER_HEIGHT));
-  addRect(PredefinedRect::BEGIN_EXTENDER, QRect(-EXTENDER_WIDTH - KEY_ICON_WIDTH, -EXTENDER_HEIGHT, EXTENDER_WIDTH, EXTENDER_HEIGHT));
-  addRect(PredefinedRect::KEYFRAME_AREA, QRect(CELL_WIDTH - KEY_ICON_WIDTH, 0, KEY_ICON_WIDTH, CELL_HEIGHT));
+  addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME,
+          nameRect.adjusted(0, 0, -KEY_ICON_WIDTH, 0));
+  addRect(PredefinedRect::END_EXTENDER,
+          QRect(-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0, EXTENDER_WIDTH,
+                EXTENDER_HEIGHT));
+  addRect(PredefinedRect::BEGIN_EXTENDER,
+          QRect(-EXTENDER_WIDTH - KEY_ICON_WIDTH, -EXTENDER_HEIGHT,
+                EXTENDER_WIDTH, EXTENDER_HEIGHT));
+  addRect(PredefinedRect::KEYFRAME_AREA,
+          QRect(CELL_WIDTH - KEY_ICON_WIDTH, 0, KEY_ICON_WIDTH, CELL_HEIGHT));
   addRect(PredefinedRect::DRAG_AREA, QRect(0, 0, CELL_DRAG_WIDTH, CELL_HEIGHT));
-  QRect soundRect(CELL_DRAG_WIDTH, 0, CELL_WIDTH - CELL_DRAG_WIDTH - SOUND_PREVIEW_WIDTH, CELL_HEIGHT);
+  QRect soundRect(CELL_DRAG_WIDTH, 0,
+                  CELL_WIDTH - CELL_DRAG_WIDTH - SOUND_PREVIEW_WIDTH,
+                  CELL_HEIGHT);
   addRect(PredefinedRect::SOUND_TRACK, soundRect);
-  addRect(PredefinedRect::PREVIEW_TRACK, QRect(CELL_WIDTH - SOUND_PREVIEW_WIDTH + 1, 0, SOUND_PREVIEW_WIDTH, CELL_HEIGHT));
-  addRect(PredefinedRect::BEGIN_SOUND_EDIT, QRect(CELL_DRAG_WIDTH, 0, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
-  addRect(PredefinedRect::END_SOUND_EDIT, QRect(CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
+  addRect(PredefinedRect::PREVIEW_TRACK,
+          QRect(CELL_WIDTH - SOUND_PREVIEW_WIDTH + 1, 0, SOUND_PREVIEW_WIDTH,
+                CELL_HEIGHT));
+  addRect(PredefinedRect::BEGIN_SOUND_EDIT,
+          QRect(CELL_DRAG_WIDTH, 0, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
+  addRect(
+      PredefinedRect::END_SOUND_EDIT,
+      QRect(CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect(PredefinedRect::LOOP_ICON, QRect(keyRect.left(), 0, 10, 11));
 
   // Note viewer
-  addRect(PredefinedRect::NOTE_AREA, QRect(QPoint(0, 0), QSize(FRAME_HEADER_WIDTH, LAYER_HEADER_HEIGHT - 1)));
-  addRect(PredefinedRect::NOTE_ICON, QRect(QPoint(0, 0), QSize(CELL_WIDTH - 2, CELL_HEIGHT - 2)));
+  addRect(
+      PredefinedRect::NOTE_AREA,
+      QRect(QPoint(0, 0), QSize(FRAME_HEADER_WIDTH, LAYER_HEADER_HEIGHT - 1)));
+  addRect(PredefinedRect::NOTE_ICON,
+          QRect(QPoint(0, 0), QSize(CELL_WIDTH - 2, CELL_HEIGHT - 2)));
   addRect(PredefinedRect::LAYER_HEADER_PANEL, QRect(0, 0, -1, -1));  // hide
 
   // Row viewer
-  addRect(PredefinedRect::FRAME_LABEL, QRect(CELL_WIDTH / 2, 1, CELL_WIDTH / 2, CELL_HEIGHT - 2));
-  addRect(PredefinedRect::FRAME_HEADER, QRect(0, 0, FRAME_HEADER_WIDTH - 1, CELL_HEIGHT));
-  addRect(PredefinedRect::PLAY_RANGE, QRect(PLAY_RANGE_X, 0, PLAY_MARKER_SIZE, CELL_HEIGHT));
-  addRect(PredefinedRect::ONION, QRect(ONION_X + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2, ONION_Y, ONION_SIZE, ONION_SIZE));
+  addRect(PredefinedRect::FRAME_LABEL,
+          QRect(CELL_WIDTH / 2, 1, CELL_WIDTH / 2, CELL_HEIGHT - 2));
+  addRect(PredefinedRect::FRAME_HEADER,
+          QRect(0, 0, FRAME_HEADER_WIDTH - 1, CELL_HEIGHT));
+  addRect(PredefinedRect::PLAY_RANGE,
+          QRect(PLAY_RANGE_X, 0, PLAY_MARKER_SIZE, CELL_HEIGHT));
+  addRect(PredefinedRect::ONION,
+          QRect(ONION_X + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2, ONION_Y,
+                ONION_SIZE, ONION_SIZE));
   int adjustOnion = (ONION_SIZE - ONION_DOT_SIZE) / 2;
-  addRect(PredefinedRect::ONION_DOT, QRect(ONION_X + ONION_DOT_SIZE, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE));
-  addRect(PredefinedRect::ONION_DOT_FIXED, QRect(ONION_X, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE));
-  addRect(PredefinedRect::ONION_AREA, QRect(ONION_X, ONION_Y, PLAY_RANGE_X, CELL_HEIGHT));
-  addRect(PredefinedRect::ONION_FIXED_DOT_AREA, QRect(ONION_X, ONION_Y, ONION_DOT_SIZE, CELL_HEIGHT));
-  addRect(PredefinedRect::ONION_DOT_AREA, QRect(ONION_X + ONION_DOT_SIZE, ONION_Y, ONION_DOT_SIZE, CELL_HEIGHT));
-  addRect(PredefinedRect::PINNED_CENTER_KEY, QRect((FRAME_HEADER_WIDTH - PINNED_SIZE) / 2, (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
+  addRect(PredefinedRect::ONION_DOT,
+          QRect(ONION_X + ONION_DOT_SIZE, ONION_Y + adjustOnion, ONION_DOT_SIZE,
+                ONION_DOT_SIZE));
+  addRect(
+      PredefinedRect::ONION_DOT_FIXED,
+      QRect(ONION_X, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE));
+  addRect(PredefinedRect::ONION_AREA,
+          QRect(ONION_X, ONION_Y, PLAY_RANGE_X, CELL_HEIGHT));
+  addRect(PredefinedRect::ONION_FIXED_DOT_AREA,
+          QRect(ONION_X, ONION_Y, ONION_DOT_SIZE, CELL_HEIGHT));
+  addRect(
+      PredefinedRect::ONION_DOT_AREA,
+      QRect(ONION_X + ONION_DOT_SIZE, ONION_Y, ONION_DOT_SIZE, CELL_HEIGHT));
+  addRect(PredefinedRect::PINNED_CENTER_KEY,
+          QRect((FRAME_HEADER_WIDTH - PINNED_SIZE) / 2,
+                (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
 
   // Column viewer
-  static int INDENT = 9;
-  static int HDRROW1 = 6;  // Name/eye
-  static int HDRROW2 = HDRROW1 + CELL_HEIGHT; // lock, preview
-  static int HDRROW3 = HDRROW2 + CELL_HEIGHT + 1; // thumbnail
-  static int HDRROW4 = HDRROW3 + 48; // pegbar, parenthandle
+  static int INDENT  = 9;
+  static int HDRROW1 = 6;                          // Name/eye
+  static int HDRROW2 = HDRROW1 + CELL_HEIGHT;      // lock, preview
+  static int HDRROW3 = HDRROW2 + CELL_HEIGHT + 1;  // thumbnail
+  static int HDRROW4 = HDRROW3 + 48;               // pegbar, parenthandle
 
-  addRect(PredefinedRect::LAYER_HEADER, QRect(0, 1, CELL_WIDTH, LAYER_HEADER_HEIGHT - 3));
-  addRect(PredefinedRect::DRAG_LAYER, QRect(0, 0, CELL_DRAG_WIDTH, LAYER_HEADER_HEIGHT - 3));
-  addRect(PredefinedRect::FOLDED_LAYER_HEADER, QRect(0, 1, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT - 3));
+  addRect(PredefinedRect::LAYER_HEADER,
+          QRect(0, 1, CELL_WIDTH, LAYER_HEADER_HEIGHT - 3));
+  addRect(PredefinedRect::DRAG_LAYER,
+          QRect(0, 0, CELL_DRAG_WIDTH, LAYER_HEADER_HEIGHT - 3));
+  addRect(
+      PredefinedRect::FOLDED_LAYER_HEADER,
+      QRect(0, 1, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT - 3));
 
-  addRect(PredefinedRect::RENAME_COLUMN, QRect(0, 6, CELL_WIDTH, CELL_HEIGHT - 3));
+  addRect(PredefinedRect::RENAME_COLUMN,
+          QRect(0, 6, CELL_WIDTH, CELL_HEIGHT - 3));
 
   QRect layername(INDENT, HDRROW1, CELL_WIDTH - 11, CELL_HEIGHT - 3);
   addRect(PredefinedRect::LAYER_NAME, layername);
@@ -316,26 +355,37 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::THUMBNAIL_AREA, thumbnailArea);
   QRect thumbnail(INDENT, HDRROW3, CELL_WIDTH - 11, 42);
   addRect(PredefinedRect::THUMBNAIL, thumbnail);
-  addRect(PredefinedRect::FILTER_COLOR, QRect(thumbnailArea.right() - 14, thumbnailArea.top() + 3, 12, 12));
-  addRect(PredefinedRect::SOUND_ICON, QRect(thumbnailArea.right() - 40, 3 * CELL_HEIGHT + 4, 40, 30));
+  addRect(PredefinedRect::FILTER_COLOR,
+          QRect(thumbnailArea.right() - 14, thumbnailArea.top() + 3, 12, 12));
+  addRect(PredefinedRect::SOUND_ICON,
+          QRect(thumbnailArea.right() - 40, 3 * CELL_HEIGHT + 4, 40, 30));
   int trackLen = 60;
-  QRect volumeArea(thumbnailArea.left(), thumbnailArea.top() + 1, 29 - CELL_DRAG_WIDTH, trackLen + 7);
+  QRect volumeArea(thumbnailArea.left(), thumbnailArea.top() + 1,
+                   29 - CELL_DRAG_WIDTH, trackLen + 7);
   addRect(PredefinedRect::VOLUME_AREA, volumeArea);
   QPoint soundTopLeft(volumeArea.left() + 12, volumeArea.top() + 4);
-  addRect(PredefinedRect::VOLUME_TRACK, QRect(soundTopLeft, QSize(3, trackLen)));
+  addRect(PredefinedRect::VOLUME_TRACK,
+          QRect(soundTopLeft, QSize(3, trackLen)));
 
   QRect pegbarname(INDENT, HDRROW4, CELL_WIDTH - 11, CELL_HEIGHT - 3);
   addRect(PredefinedRect::PEGBAR_NAME, pegbarname);
-  addRect(PredefinedRect::PARENT_HANDLE_NAME, QRect(INDENT + pegbarname.width() - 20, HDRROW4, 20, CELL_HEIGHT - 3));
+  addRect(
+      PredefinedRect::PARENT_HANDLE_NAME,
+      QRect(INDENT + pegbarname.width() - 20, HDRROW4, 20, CELL_HEIGHT - 3));
 
   //
   // Lines
   //
-  addLine(PredefinedLine::LOCKED, verticalLine((CELL_DRAG_WIDTH + 1) / 2, NumberRange(0, CELL_HEIGHT)));
-  addLine(PredefinedLine::SEE_MARKER_THROUGH, horizontalLine(0, NumberRange(0, CELL_DRAG_WIDTH)));
-  addLine(PredefinedLine::CONTINUE_LEVEL, verticalLine(CELL_WIDTH / 2, NumberRange(0, CELL_HEIGHT)));
-  addLine(PredefinedLine::CONTINUE_LEVEL_WITH_NAME, verticalLine(CELL_WIDTH - 11, NumberRange(0, CELL_HEIGHT)));
-  addLine(PredefinedLine::EXTENDER_LINE, horizontalLine(0, NumberRange(-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0)));
+  addLine(PredefinedLine::LOCKED,
+          verticalLine((CELL_DRAG_WIDTH + 1) / 2, NumberRange(0, CELL_HEIGHT)));
+  addLine(PredefinedLine::SEE_MARKER_THROUGH,
+          horizontalLine(0, NumberRange(0, CELL_DRAG_WIDTH)));
+  addLine(PredefinedLine::CONTINUE_LEVEL,
+          verticalLine(CELL_WIDTH / 2, NumberRange(0, CELL_HEIGHT)));
+  addLine(PredefinedLine::CONTINUE_LEVEL_WITH_NAME,
+          verticalLine(CELL_WIDTH - 11, NumberRange(0, CELL_HEIGHT)));
+  addLine(PredefinedLine::EXTENDER_LINE,
+          horizontalLine(0, NumberRange(-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0)));
 
   //
   // Dimensions
@@ -343,10 +393,12 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addDimension(PredefinedDimension::LAYER, CELL_WIDTH);
   addDimension(PredefinedDimension::FRAME, CELL_HEIGHT);
   addDimension(PredefinedDimension::INDEX, 0);
-  addDimension(PredefinedDimension::SOUND_AMPLITUDE, int(sqrt(CELL_HEIGHT * soundRect.width()) / 2));
+  addDimension(PredefinedDimension::SOUND_AMPLITUDE,
+               int(sqrt(CELL_HEIGHT * soundRect.width()) / 2));
   addDimension(PredefinedDimension::FRAME_LABEL_ALIGN, Qt::AlignCenter);
   addDimension(PredefinedDimension::ONION_TURN, 0);
-  addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION, QBoxLayout::Direction::TopToBottom);
+  addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION,
+               QBoxLayout::Direction::TopToBottom);
   addDimension(PredefinedDimension::CENTER_ALIGN, Qt::AlignHCenter);
 
   //
@@ -409,7 +461,8 @@ TopToBottomOrientation::TopToBottomOrientation() {
   //
   addPoint(PredefinedPoint::KEY_HIDDEN, QPoint(KEY_ICON_WIDTH, 0));
   addPoint(PredefinedPoint::EXTENDER_XY_RADIUS, QPoint(30, 75));
-  addPoint(PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT, soundTopLeft - QPoint(5, 0));
+  addPoint(PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT,
+           soundTopLeft - QPoint(5, 0));
 
   //
   // Ranges
@@ -491,76 +544,127 @@ LeftToRightOrientation::LeftToRightOrientation() {
   // Cell viewer
   QRect cellRect(0, 0, CELL_WIDTH, CELL_HEIGHT);
   addRect(PredefinedRect::CELL, cellRect);
-  addRect(PredefinedRect::DRAG_HANDLE_CORNER, QRect(0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
-  QRect keyRect((CELL_WIDTH - KEY_ICON_WIDTH) / 2, CELL_HEIGHT - KEY_ICON_HEIGHT, KEY_ICON_WIDTH, KEY_ICON_HEIGHT);
+  addRect(PredefinedRect::DRAG_HANDLE_CORNER,
+          QRect(0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
+  QRect keyRect((CELL_WIDTH - KEY_ICON_WIDTH) / 2,
+                CELL_HEIGHT - KEY_ICON_HEIGHT, KEY_ICON_WIDTH, KEY_ICON_HEIGHT);
   addRect(PredefinedRect::KEY_ICON, keyRect);
   QRect nameRect = cellRect.adjusted(4, 4, -6, 0);
   addRect(PredefinedRect::CELL_NAME, nameRect);
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect);
-  addRect(PredefinedRect::END_EXTENDER, QRect(0, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH, EXTENDER_HEIGHT));
-  addRect(PredefinedRect::BEGIN_EXTENDER, QRect(-EXTENDER_WIDTH, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+  addRect(PredefinedRect::END_EXTENDER,
+          QRect(0, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+  addRect(PredefinedRect::BEGIN_EXTENDER,
+          QRect(-EXTENDER_WIDTH, -EXTENDER_HEIGHT - 10, EXTENDER_WIDTH,
+                EXTENDER_HEIGHT));
   addRect(PredefinedRect::KEYFRAME_AREA, keyRect);
   addRect(PredefinedRect::DRAG_AREA, QRect(0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
-  QRect soundRect(0, CELL_DRAG_HEIGHT, CELL_WIDTH, CELL_HEIGHT - CELL_DRAG_HEIGHT - SOUND_PREVIEW_HEIGHT);
+  QRect soundRect(0, CELL_DRAG_HEIGHT, CELL_WIDTH,
+                  CELL_HEIGHT - CELL_DRAG_HEIGHT - SOUND_PREVIEW_HEIGHT);
   addRect(PredefinedRect::SOUND_TRACK, soundRect);
-  addRect(PredefinedRect::PREVIEW_TRACK, QRect(0, CELL_HEIGHT - SOUND_PREVIEW_HEIGHT + 1, CELL_WIDTH, SOUND_PREVIEW_HEIGHT));
-  addRect(PredefinedRect::BEGIN_SOUND_EDIT, QRect(0, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
-  addRect(PredefinedRect::END_SOUND_EDIT, QRect(CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
+  addRect(PredefinedRect::PREVIEW_TRACK,
+          QRect(0, CELL_HEIGHT - SOUND_PREVIEW_HEIGHT + 1, CELL_WIDTH,
+                SOUND_PREVIEW_HEIGHT));
+  addRect(PredefinedRect::BEGIN_SOUND_EDIT,
+          QRect(0, CELL_DRAG_HEIGHT, 2, CELL_HEIGHT - CELL_DRAG_HEIGHT));
+  addRect(PredefinedRect::END_SOUND_EDIT,
+          QRect(CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2,
+                CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LOOP_ICON, QRect(0, keyRect.top(), 10, 11));
 
   // Notes viewer
-  addRect(PredefinedRect::NOTE_AREA, QRect(QPoint(0, 0), QSize(LAYER_HEADER_WIDTH - 1, FRAME_HEADER_HEIGHT)));
-  addRect(PredefinedRect::NOTE_ICON, QRect(QPoint(0, 0), QSize(CELL_WIDTH - 2, CELL_HEIGHT - 2)));
-  addRect(PredefinedRect::LAYER_HEADER_PANEL, QRect(0, FRAME_HEADER_HEIGHT - CELL_HEIGHT, LAYER_HEADER_WIDTH, CELL_HEIGHT));
+  addRect(
+      PredefinedRect::NOTE_AREA,
+      QRect(QPoint(0, 0), QSize(LAYER_HEADER_WIDTH - 1, FRAME_HEADER_HEIGHT)));
+  addRect(PredefinedRect::NOTE_ICON,
+          QRect(QPoint(0, 0), QSize(CELL_WIDTH - 2, CELL_HEIGHT - 2)));
+  addRect(PredefinedRect::LAYER_HEADER_PANEL,
+          QRect(0, FRAME_HEADER_HEIGHT - CELL_HEIGHT, LAYER_HEADER_WIDTH,
+                CELL_HEIGHT));
 
   // Row viewer
-  addRect(PredefinedRect::FRAME_LABEL, QRect(CELL_WIDTH / 4, 1, CELL_WIDTH / 2, FRAME_HEADER_HEIGHT - 2));
-  addRect(PredefinedRect::FRAME_HEADER, QRect(0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT - 1));
-  addRect(PredefinedRect::PLAY_RANGE, QRect(0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
-  addRect(PredefinedRect::ONION, QRect(ONION_X, ONION_Y + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2, ONION_SIZE, ONION_SIZE));
+  addRect(PredefinedRect::FRAME_LABEL,
+          QRect(CELL_WIDTH / 4, 1, CELL_WIDTH / 2, FRAME_HEADER_HEIGHT - 2));
+  addRect(PredefinedRect::FRAME_HEADER,
+          QRect(0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT - 1));
+  addRect(PredefinedRect::PLAY_RANGE,
+          QRect(0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
+  addRect(PredefinedRect::ONION,
+          QRect(ONION_X, ONION_Y + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2,
+                ONION_SIZE, ONION_SIZE));
   int adjustOnion = (ONION_SIZE - ONION_DOT_SIZE) / 2;
-  addRect(PredefinedRect::ONION_DOT, QRect(ONION_X + adjustOnion, ONION_Y + ONION_DOT_SIZE, ONION_DOT_SIZE, ONION_DOT_SIZE));
-  addRect(PredefinedRect::ONION_DOT_FIXED, QRect(ONION_X + adjustOnion, ONION_Y, ONION_DOT_SIZE, ONION_DOT_SIZE));
-  addRect(PredefinedRect::ONION_AREA, QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_SIZE));
-  addRect(PredefinedRect::ONION_FIXED_DOT_AREA, QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_DOT_SIZE));
-  addRect(PredefinedRect::ONION_DOT_AREA, QRect(ONION_X, ONION_Y + ONION_DOT_SIZE, CELL_WIDTH, ONION_DOT_SIZE));
-  addRect(PredefinedRect::PINNED_CENTER_KEY, QRect((CELL_WIDTH - PINNED_SIZE) / 2, (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
+  addRect(PredefinedRect::ONION_DOT,
+          QRect(ONION_X + adjustOnion, ONION_Y + ONION_DOT_SIZE, ONION_DOT_SIZE,
+                ONION_DOT_SIZE));
+  addRect(
+      PredefinedRect::ONION_DOT_FIXED,
+      QRect(ONION_X + adjustOnion, ONION_Y, ONION_DOT_SIZE, ONION_DOT_SIZE));
+  addRect(PredefinedRect::ONION_AREA,
+          QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_SIZE));
+  addRect(PredefinedRect::ONION_FIXED_DOT_AREA,
+          QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_DOT_SIZE));
+  addRect(PredefinedRect::ONION_DOT_AREA,
+          QRect(ONION_X, ONION_Y + ONION_DOT_SIZE, CELL_WIDTH, ONION_DOT_SIZE));
+  addRect(
+      PredefinedRect::PINNED_CENTER_KEY,
+      QRect((CELL_WIDTH - PINNED_SIZE) / 2,
+            (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
 
   // Column viewer
-  addRect(PredefinedRect::LAYER_HEADER, QRect(1, 0, LAYER_HEADER_WIDTH - 3, CELL_HEIGHT));
-  addRect(PredefinedRect::FOLDED_LAYER_HEADER, QRect(1, 0, FOLDED_LAYER_HEADER_WIDTH - 3, FOLDED_LAYER_HEADER_HEIGHT));
-  QRect columnName(ICONS_WIDTH + 1, 0, LAYER_NAME_WIDTH + LAYER_NUMBER_WIDTH - 3, CELL_HEIGHT);
+  addRect(PredefinedRect::LAYER_HEADER,
+          QRect(1, 0, LAYER_HEADER_WIDTH - 3, CELL_HEIGHT));
+  addRect(
+      PredefinedRect::FOLDED_LAYER_HEADER,
+      QRect(1, 0, FOLDED_LAYER_HEADER_WIDTH - 3, FOLDED_LAYER_HEADER_HEIGHT));
+  QRect columnName(ICONS_WIDTH + 1, 0,
+                   LAYER_NAME_WIDTH + LAYER_NUMBER_WIDTH - 3, CELL_HEIGHT);
   addRect(PredefinedRect::RENAME_COLUMN, columnName);
   QRect eye(1, 0, ICON_WIDTH, CELL_HEIGHT);
   addRect(PredefinedRect::EYE_AREA, eye);
   addRect(PredefinedRect::EYE, eye.adjusted(1, 1, 0, 0));
   addRect(PredefinedRect::PREVIEW_LAYER_AREA, eye.translated(ICON_OFFSET, 0));
-  addRect(PredefinedRect::PREVIEW_LAYER, eye.translated(ICON_OFFSET + 1, 0).adjusted(-1, 1, -1, 0));
+  addRect(PredefinedRect::PREVIEW_LAYER,
+          eye.translated(ICON_OFFSET + 1, 0).adjusted(-1, 1, -1, 0));
   addRect(PredefinedRect::LOCK_AREA, eye.translated(2 * ICON_OFFSET, 0));
-  addRect(PredefinedRect::LOCK, eye.translated(2 * ICON_OFFSET + 1, 0).adjusted(-1, 1, -1, 0));
-  addRect(PredefinedRect::DRAG_LAYER, QRect(ICONS_WIDTH + 1, 0, LAYER_HEADER_WIDTH - ICONS_WIDTH - 3, CELL_DRAG_HEIGHT));
+  addRect(PredefinedRect::LOCK,
+          eye.translated(2 * ICON_OFFSET + 1, 0).adjusted(-1, 1, -1, 0));
+  addRect(PredefinedRect::DRAG_LAYER,
+          QRect(ICONS_WIDTH + 1, 0, LAYER_HEADER_WIDTH - ICONS_WIDTH - 3,
+                CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LAYER_NAME, columnName);
-  addRect(PredefinedRect::LAYER_NUMBER, QRect(ICONS_WIDTH + 1, 0, LAYER_NUMBER_WIDTH, CELL_HEIGHT));
-  addRect(PredefinedRect::THUMBNAIL_AREA, QRect(0, 0, -1, -1)); // hide
-  addRect(PredefinedRect::FILTER_COLOR, QRect(LAYER_HEADER_WIDTH - 17, 6, 12, 12));
-  addRect(PredefinedRect::PEGBAR_NAME, QRect(0, 0, -1, -1)); // hide
-  addRect(PredefinedRect::PARENT_HANDLE_NAME, QRect(0, 0, -1, -1)); // hide
+  addRect(PredefinedRect::LAYER_NUMBER,
+          QRect(ICONS_WIDTH + 1, 0, LAYER_NUMBER_WIDTH, CELL_HEIGHT));
+  addRect(PredefinedRect::THUMBNAIL_AREA, QRect(0, 0, -1, -1));  // hide
+  addRect(PredefinedRect::FILTER_COLOR,
+          QRect(LAYER_HEADER_WIDTH - 17, 6, 12, 12));
+  addRect(PredefinedRect::PEGBAR_NAME, QRect(0, 0, -1, -1));         // hide
+  addRect(PredefinedRect::PARENT_HANDLE_NAME, QRect(0, 0, -1, -1));  // hide
 
   int trackLen = 60;
-  QRect volumeArea(QRect(columnName.topRight(), QSize(trackLen + 8, columnName.height())).adjusted(-97, 0, -97, 0));
+  QRect volumeArea(
+      QRect(columnName.topRight(), QSize(trackLen + 8, columnName.height()))
+          .adjusted(-97, 0, -97, 0));
   addRect(PredefinedRect::VOLUME_AREA, volumeArea);
   QPoint soundTopLeft(volumeArea.left() + 4, volumeArea.top() + 12);
-  addRect(PredefinedRect::VOLUME_TRACK, QRect(soundTopLeft, QSize(trackLen, 3)));
-  addRect(PredefinedRect::SOUND_ICON, QRect(columnName.topRight(), QSize(27, columnName.height())).adjusted(-28, 0, -28, 0));
+  addRect(PredefinedRect::VOLUME_TRACK,
+          QRect(soundTopLeft, QSize(trackLen, 3)));
+  addRect(PredefinedRect::SOUND_ICON,
+          QRect(columnName.topRight(), QSize(27, columnName.height()))
+              .adjusted(-28, 0, -28, 0));
 
   //
   // Lines
   //
-  addLine(PredefinedLine::LOCKED, verticalLine(CELL_DRAG_HEIGHT / 2, NumberRange(0, CELL_WIDTH)));
-  addLine(PredefinedLine::SEE_MARKER_THROUGH, horizontalLine(0, NumberRange(0, CELL_DRAG_HEIGHT)));
-  addLine(PredefinedLine::CONTINUE_LEVEL, verticalLine(CELL_HEIGHT / 2, NumberRange(0, CELL_WIDTH)));
-  addLine(PredefinedLine::CONTINUE_LEVEL_WITH_NAME, verticalLine(CELL_HEIGHT / 2, NumberRange(0, CELL_WIDTH)));
-  addLine(PredefinedLine::EXTENDER_LINE, horizontalLine(0, NumberRange(-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0)));
+  addLine(PredefinedLine::LOCKED,
+          verticalLine(CELL_DRAG_HEIGHT / 2, NumberRange(0, CELL_WIDTH)));
+  addLine(PredefinedLine::SEE_MARKER_THROUGH,
+          horizontalLine(0, NumberRange(0, CELL_DRAG_HEIGHT)));
+  addLine(PredefinedLine::CONTINUE_LEVEL,
+          verticalLine(CELL_HEIGHT / 2, NumberRange(0, CELL_WIDTH)));
+  addLine(PredefinedLine::CONTINUE_LEVEL_WITH_NAME,
+          verticalLine(CELL_HEIGHT / 2, NumberRange(0, CELL_WIDTH)));
+  addLine(PredefinedLine::EXTENDER_LINE,
+          horizontalLine(0, NumberRange(-EXTENDER_WIDTH - KEY_ICON_WIDTH, 0)));
 
   //
   // Dimensions
@@ -569,9 +673,11 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addDimension(PredefinedDimension::FRAME, CELL_WIDTH);
   addDimension(PredefinedDimension::INDEX, 1);
   addDimension(PredefinedDimension::SOUND_AMPLITUDE, soundRect.height() / 2);
-  addDimension(PredefinedDimension::FRAME_LABEL_ALIGN, Qt::AlignHCenter | Qt::AlignBottom | Qt::TextWordWrap);
+  addDimension(PredefinedDimension::FRAME_LABEL_ALIGN,
+               Qt::AlignHCenter | Qt::AlignBottom | Qt::TextWordWrap);
   addDimension(PredefinedDimension::ONION_TURN, 90);
-  addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION, QBoxLayout::Direction::LeftToRight);
+  addDimension(PredefinedDimension::QBOXLAYOUT_DIRECTION,
+               QBoxLayout::Direction::LeftToRight);
   addDimension(PredefinedDimension::CENTER_ALIGN, Qt::AlignVCenter);
 
   //
@@ -634,7 +740,8 @@ LeftToRightOrientation::LeftToRightOrientation() {
   //
   addPoint(PredefinedPoint::KEY_HIDDEN, QPoint(0, 10));
   addPoint(PredefinedPoint::EXTENDER_XY_RADIUS, QPoint(75, 30));
-  addPoint(PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT, soundTopLeft + QPoint(0, 3));
+  addPoint(PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT,
+           soundTopLeft + QPoint(0, 3));
 
   //
   // Ranges

@@ -272,6 +272,9 @@ public:
   void setDefaultImportPolicy(int policy);
   int getDefaultImportPolicy() { return m_importPolicy; }
 
+  void setIgnoreImageDpi(bool on);
+  bool isIgnoreImageDpiEnabled() const { return m_ignoreImageDpi; }
+
   // Drawing  tab
 
   void setScanLevelType(std::string s);
@@ -513,7 +516,7 @@ private:
       m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly,
       m_startupPopupEnabled;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
-  bool m_onionSkinDuringPlayback;
+  bool m_onionSkinDuringPlayback, m_ignoreImageDpi;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,

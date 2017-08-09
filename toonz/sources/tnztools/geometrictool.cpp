@@ -1517,6 +1517,11 @@ void MultiLinePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 //-----------------------------------------------------------------------------
 
 bool MultiLinePrimitive::keyDown(int key, const TPoint &point) {
+  if (key == TwConsts::TK_Return) {
+    endLine();
+    return true;
+  }
+
   if (key != TwConsts::TK_Esc || !m_isEditing) return false;
 
   UINT size = m_vertex.size();

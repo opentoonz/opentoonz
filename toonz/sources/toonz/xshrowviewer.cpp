@@ -282,9 +282,8 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   bool inksOnly;
   Preferences::instance()->getOnionData(frontPixel, backPixel, inksOnly);
   QColor frontColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b,
-	  128);
-  QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b,
-	  128);
+                    128);
+  QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b, 128);
 
   // If the onion skin is disabled, draw dash line instead.
   if (osMask.isEnabled())
@@ -322,10 +321,12 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     int toFrameAxis = m_viewer->rowToFrameAxis(currentRow) + onionCenter_frame;
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
-	if (m_viewer->orientation()->isVerticalTimeline())
-		p.drawLine(verticalLine.x1() + 1, verticalLine.y1() + 4, verticalLine.x2() + 1, verticalLine.y2() - 10);
-	else
-		p.drawLine(verticalLine.x1() + 4, verticalLine.y1() + 1, verticalLine.x2() - 10, verticalLine.y2() + 1);
+    if (m_viewer->orientation()->isVerticalTimeline())
+      p.drawLine(verticalLine.x1() + 1, verticalLine.y1() + 4,
+                 verticalLine.x2() + 1, verticalLine.y2() - 10);
+    else
+      p.drawLine(verticalLine.x1() + 4, verticalLine.y1() + 1,
+                 verticalLine.x2() - 10, verticalLine.y2() + 1);
   }
   if (maxMos > 0)  // forward frames
   {
@@ -336,10 +337,12 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
         m_viewer->rowToFrameAxis(currentRow + maxMos) + onionCenter_frame;
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
-	if (m_viewer->orientation()->isVerticalTimeline())
-		p.drawLine(verticalLine.x1() + 1, verticalLine.y1() + 10, verticalLine.x2() + 1, verticalLine.y2() - 4);
-	else
-		p.drawLine(verticalLine.x1() + 10, verticalLine.y1() + 1, verticalLine.x2() - 4, verticalLine.y2() + 1);
+    if (m_viewer->orientation()->isVerticalTimeline())
+      p.drawLine(verticalLine.x1() + 1, verticalLine.y1() + 10,
+                 verticalLine.x2() + 1, verticalLine.y2() - 4);
+    else
+      p.drawLine(verticalLine.x1() + 10, verticalLine.y1() + 1,
+                 verticalLine.x2() - 4, verticalLine.y2() + 1);
   }
 
   // Draw onion skin main handle
@@ -613,11 +616,11 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   // pan by middle-drag
   if (m_isPanning) {
     QPoint delta = m_pos - pos;
-	if (o->isVerticalTimeline())
-		delta.setX(0);
-	else
-		delta.setY(0);
-	m_viewer->scroll(delta);
+    if (o->isVerticalTimeline())
+      delta.setX(0);
+    else
+      delta.setY(0);
+    m_viewer->scroll(delta);
     return;
   }
 
@@ -627,10 +630,10 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   if ((event->buttons() & Qt::LeftButton) != 0 &&
       !visibleRegion().contains(pos)) {
     QRect bounds = visibleRegion().boundingRect();
-	if(o->isVerticalTimeline())
-		m_viewer->setAutoPanSpeed(bounds, QPoint(bounds.left(), pos.y()));
-	else
-		m_viewer->setAutoPanSpeed(bounds, QPoint(pos.x(), bounds.top()));
+    if (o->isVerticalTimeline())
+      m_viewer->setAutoPanSpeed(bounds, QPoint(bounds.left(), pos.y()));
+    else
+      m_viewer->setAutoPanSpeed(bounds, QPoint(pos.x(), bounds.top()));
   } else
     m_viewer->stopAutoPan();
 

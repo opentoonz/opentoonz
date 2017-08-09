@@ -241,9 +241,11 @@ void SceneViewerPanel::showEvent(QShowEvent *event) {
 
   ret = ret && connect(xshHandle, SIGNAL(xsheetChanged()), this,
                        SLOT(onSceneChanged()));
-
+  ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                       SLOT(onSceneChanged()));
   ret = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this,
                        SLOT(onSceneChanged()));
+
   ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
                        SLOT(changeWindowTitle()));
 
@@ -289,7 +291,8 @@ void SceneViewerPanel::hideEvent(QHideEvent *event) {
   disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
   disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this,
              SLOT(changeWindowTitle()));
-
+  disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
+             SLOT(onSceneChanged()));
   disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
              SLOT(onXshLevelSwitched(TXshLevel *)));
   disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
@@ -470,7 +473,16 @@ void SceneViewerPanel::enableFlipConsoleForCamerastand(bool on) {
 
 //-----------------------------------------------------------------------------
 
-void SceneViewerPanel::onXshLevelSwitched(TXshLevel *) { changeWindowTitle(); }
+void SceneViewerPanel::onXshLevelSwitched(TXshLevel *) {
+  changeWindowTitle();
+  m_sceneViewer->update();
+  // If the level switched by using the level choose combo box in the film
+  // strip,
+  // the current level switches without change in the frame type (level or
+  // scene).
+  // For such case, update the frame range of the console here.
+  if (TApp::instance()->getCurrentFrame()->isEditingLevel()) updateFrameRange();
+}
 
 //-----------------------------------------------------------------------------
 
@@ -588,6 +600,14 @@ void SceneViewerPanel::onSceneChanged() {
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   assert(scene);
+  // update fps only when the scene settings is changed
+  m_flipConsole->setFrameRate(TApp::instance()
+                                  ->getCurrentScene()
+                                  ->getScene()
+                                  ->getProperties()
+                                  ->getOutputProperties()
+                                  ->getFrameRate(),
+                              false);
   // vinz: perche veniva fatto?
   // m_flipConsole->updateCurrentFPS(scene->getProperties()->getOutputProperties()->getFrameRate());
 
@@ -685,6 +705,8 @@ void SceneViewerPanel::playAudioFrame(int frame) {
   TApp::instance()->getCurrentXsheet()->getXsheet()->play(m_sound, s0, s1,
                                                           false);
 }
+
+//-----------------------------------------------------------------------------
 
 bool SceneViewerPanel::hasSoundtrack() {
   if (m_sound != NULL) {

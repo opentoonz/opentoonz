@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="schematic_link.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 36 14"
+	 style="enable-background:new 0 0 36 14;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#A2A2A2;}
+	.st1{fill:#B7B7B7;}
+	.st2{fill:#777777;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview13" inkscape:current-layer="svg2" inkscape:cx="18" inkscape:cy="7" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="480" inkscape:window-maximized="0" inkscape:window-width="796" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="16.857143" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g>
+	<rect id="rect4" y="0" class="st0" width="36" height="14"/>
+	<g id="Layer1">
+		<g>
+			<path d="M5.8,9.7h3.9v1.7H3.5V2.8h2.3V9.7z"/>
+			<path d="M13.8,2.6v1.9h-2.1V2.6H13.8z M13.8,5v6.4h-2.1V5H13.8z"/>
+			<path d="M22.6,11.4h-2.1V7.8c0-0.4,0-0.7-0.1-0.9c0-0.2-0.1-0.3-0.3-0.4c-0.1-0.1-0.3-0.2-0.6-0.2c-0.7,0-1.1,0.5-1.1,1.5v3.6
+				h-2.1V5h2v1.1c0.3-0.5,0.6-0.8,1-1s0.7-0.2,1-0.2c0.7,0,1.2,0.2,1.6,0.5c0.4,0.3,0.6,1,0.6,1.9V11.4z"/>
+			<path d="M30,7.2l2.3,4.2H30l-1.5-2.9l-1.2,1.3v1.6h-2V2.8h2V8l0.3-0.3c0.1-0.2,0.2-0.3,0.3-0.4L30,5H32L30,7.2z"/>
+		</g>
+		<path id="path9" inkscape:connector-curvature="0" class="st1" d="M0,0h36v1H1v13H0V0z"/>
+		<path id="path11" inkscape:connector-curvature="0" class="st2" d="M35,1l1-1v14H0l1-1h34V1z"/>
+	</g>
+</g>
+</svg>

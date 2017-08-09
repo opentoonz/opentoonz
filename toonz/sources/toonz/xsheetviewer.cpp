@@ -157,7 +157,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
     , m_orientation(nullptr) {
- 
+
   setFocusPolicy(Qt::StrongFocus);
 
   setFrameStyle(QFrame::StyledPanel);
@@ -167,17 +167,19 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
 
   m_cellKeyframeSelection->setXsheetHandle(
       TApp::instance()->getCurrentXsheet());
-      
+
   m_toolbarScrollArea = new XsheetScrollArea(this);
-  m_toolbarScrollArea->setFixedSize(m_orientation->cellWidth() * 12, XsheetGUI::TOOLBAR_HEIGHT);
+  m_toolbarScrollArea->setFixedSize(m_orientation->cellWidth() * 12,
+                                    XsheetGUI::TOOLBAR_HEIGHT);
   m_toolbarScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbarScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbar = new XsheetGUI::Toolbar(this);
-  m_toolbar->setFixedSize(m_orientation->cellWidth() * 12, XsheetGUI::TOOLBAR_HEIGHT);
+  m_toolbar->setFixedSize(m_orientation->cellWidth() * 12,
+                          XsheetGUI::TOOLBAR_HEIGHT);
   m_toolbarScrollArea->setWidget(m_toolbar);
 
   QRect noteArea(0, 0, 75, 120);
-  m_noteArea       = new XsheetGUI::NoteArea(this);  
+  m_noteArea       = new XsheetGUI::NoteArea(this);
   m_noteScrollArea = new XsheetScrollArea(this);
   m_noteScrollArea->setObjectName("xsheetArea");
   m_noteScrollArea->setWidget(m_noteArea);
@@ -310,30 +312,31 @@ void XsheetViewer::positionSections() {
   NumberRange bodyFrame(headerFrame.to(), allFrame.to());
 
   if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
-	  m_toolbar->showToolbar(true);
+    m_toolbar->showToolbar(true);
 
-	  int w = geometry().size().width();
-	  m_toolbarScrollArea->setGeometry(0, 0, w, XsheetGUI::TOOLBAR_HEIGHT);
+    int w = geometry().size().width();
+    m_toolbarScrollArea->setGeometry(0, 0, w, XsheetGUI::TOOLBAR_HEIGHT);
 
-	  if (o->isVerticalTimeline()) {
-		  headerFrame = headerFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT, XsheetGUI::TOOLBAR_HEIGHT);
-		  bodyFrame = bodyFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT, 0);
-	  }
-	  else {
-		  headerLayer = headerLayer.adjusted(XsheetGUI::TOOLBAR_HEIGHT, XsheetGUI::TOOLBAR_HEIGHT);
-		  bodyLayer = bodyLayer.adjusted(XsheetGUI::TOOLBAR_HEIGHT, 0);
-	  }
-  }
-  else {
-	  m_toolbar->showToolbar(false);
+    if (o->isVerticalTimeline()) {
+      headerFrame = headerFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT,
+                                         XsheetGUI::TOOLBAR_HEIGHT);
+      bodyFrame = bodyFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT, 0);
+    } else {
+      headerLayer = headerLayer.adjusted(XsheetGUI::TOOLBAR_HEIGHT,
+                                         XsheetGUI::TOOLBAR_HEIGHT);
+      bodyLayer = bodyLayer.adjusted(XsheetGUI::TOOLBAR_HEIGHT, 0);
+    }
+  } else {
+    m_toolbar->showToolbar(false);
   }
 
   m_noteScrollArea->setGeometry(o->frameLayerRect(headerFrame, headerLayer));
   m_cellScrollArea->setGeometry(o->frameLayerRect(bodyFrame, bodyLayer));
-  m_columnScrollArea->setGeometry(o->frameLayerRect(
-	  headerFrame.adjusted(-1,-1), bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
+  m_columnScrollArea->setGeometry(
+      o->frameLayerRect(headerFrame.adjusted(-1, -1),
+                        bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
   m_rowScrollArea->setGeometry(o->frameLayerRect(
-	  bodyFrame.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
+      bodyFrame.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
 }
 
 void XsheetViewer::disconnectScrollBars() {
@@ -462,7 +465,7 @@ frameHandle->setFrame(row);*/
 void XsheetViewer::scroll(QPoint delta) {
   int x = delta.x();
   int y = delta.y();
- 
+
   int valueH    = m_cellScrollArea->horizontalScrollBar()->value() + x;
   int valueV    = m_cellScrollArea->verticalScrollBar()->value() + y;
   int maxValueH = m_cellScrollArea->horizontalScrollBar()->maximum();
@@ -492,7 +495,7 @@ void XsheetViewer::scroll(QPoint delta) {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::onPrepareToScrollOffset(const QPoint &offset) {
-	refreshContentSize(offset.x(), offset.y());
+  refreshContentSize(offset.x(), offset.y());
 }
 
 //-----------------------------------------------------------------------------
@@ -866,7 +869,7 @@ void XsheetViewer::paintEvent(QPaintEvent*)
 
 void XsheetViewer::resizeEvent(QResizeEvent *event) {
   positionSections();
-  
+
   //(New Layout Manager) introduced automatic refresh
   refreshContentSize(
       0,
@@ -887,17 +890,14 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
         ->getMarkers(markerDistance, markerOffset);
 
     if (event->angleDelta().x() == 0) {  // vertical scroll
-		if (!orientation()->isVerticalTimeline())
-			markerDistance = 1;
+      if (!orientation()->isVerticalTimeline()) markerDistance = 1;
       int scrollPixels = (event->angleDelta().y() > 0 ? 1 : -1) *
                          markerDistance * orientation()->cellHeight();
       scroll(QPoint(0, -scrollPixels));
     } else {  // horizontal scroll
-		if (orientation()->isVerticalTimeline())
-			markerDistance = 1;
-      int scrollPixels =
-          (event->angleDelta().x() > 0 ? 1 : -1) * 
-		  markerDistance * orientation()->cellWidth();
+      if (orientation()->isVerticalTimeline()) markerDistance = 1;
+      int scrollPixels = (event->angleDelta().x() > 0 ? 1 : -1) *
+                         markerDistance * orientation()->cellWidth();
       scroll(QPoint(-scrollPixels, 0));
     }
     break;
@@ -991,8 +991,8 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
   case Qt::Key_Control:
     // display the upper-directional smart tab only when the ctrl key is pressed
     m_cellArea->onControlPressed(true);
-	m_columnArea->onControlPressed(true);
-	break;
+    m_columnArea->onControlPressed(true);
+    break;
 
   default: {
     QRect visibleRect   = m_cellArea->visibleRegion().boundingRect();
@@ -1013,7 +1013,8 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
       locals.scrollTo(0, visibleRect);
       break;
     case Qt::Key_End:
-      locals.scrollTo((frameCount + 1) * orientation()->cellHeight(), visibleRect);
+      locals.scrollTo((frameCount + 1) * orientation()->cellHeight(),
+                      visibleRect);
       break;
     }
     break;
@@ -1025,14 +1026,14 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
 // display the upper-directional smart tab only when the ctrl key is pressed
 void XsheetViewer::keyReleaseEvent(QKeyEvent *event) {
   if (event->key() == Qt::Key_Control) {
-	  m_cellArea->onControlPressed(false);
-	  m_columnArea->onControlPressed(false);
+    m_cellArea->onControlPressed(false);
+    m_columnArea->onControlPressed(false);
   }
 }
 
 void XsheetViewer::enterEvent(QEvent *) {
-	m_cellArea->onControlPressed(false);
-	m_columnArea->onControlPressed(false);
+  m_cellArea->onControlPressed(false);
+  m_columnArea->onControlPressed(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1041,7 +1042,8 @@ void XsheetViewer::enterEvent(QEvent *) {
 void XsheetViewer::scrollTo(int row, int col) {
   QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
   QPoint topLeft    = positionToXY(CellPosition(row, col));
-  QRect cellRect(topLeft, QSize(orientation()->cellWidth(), orientation()->cellHeight()));
+  QRect cellRect(
+      topLeft, QSize(orientation()->cellWidth(), orientation()->cellHeight()));
 
   int deltaX = 0;
   int deltaY = 0;
@@ -1081,10 +1083,10 @@ void XsheetViewer::onXsheetChanged() {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::onPreferenceChanged(const QString &prefName) {
-	if (prefName == "XSheetToolbar") {
-		positionSections();
-		refreshContentSize(0, 0);
-	}
+  if (prefName == "XSheetToolbar") {
+    positionSections();
+    refreshContentSize(0, 0);
+  }
 }
 
 //-----------------------------------------------------------------------------

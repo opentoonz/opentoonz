@@ -362,8 +362,13 @@ void StartupPopup::showEvent(QShowEvent *) {
   // clear items if they exist first
   refreshRecentScenes();
   // center window
-  this->move(QApplication::desktop()->screen()->rect().center() -
-             this->rect().center());
+  int currentScreen =
+      QApplication::desktop()->screenNumber(TApp::instance()->getMainWindow());
+  QPoint activeMonitorCenter =
+      QApplication::desktop()->availableGeometry(currentScreen).center();
+  QPoint thisPopupCenter         = this->rect().center();
+  QPoint centeredOnActiveMonitor = activeMonitorCenter - thisPopupCenter;
+  this->move(centeredOnActiveMonitor);
 }
 
 //-----------------------------------------------------------------------------
