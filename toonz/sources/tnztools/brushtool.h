@@ -90,6 +90,8 @@ public:
   // Both addPoint() and endStroke() generate new smoothed points.
   // This method will removed generated points
   void getSmoothPoints(std::vector<TThickPoint> &smoothPoints);
+  // Remove all points - used for straight lines
+  void clearPoints();
 
 private:
   void generatePoints();

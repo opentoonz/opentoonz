@@ -138,11 +138,13 @@ class PencilTestSaveInFolderPopup : public DVGui::Dialog {
 public:
   PencilTestSaveInFolderPopup(QWidget* parent = 0);
   QString getPath();
+  QString getParentPath();
 
 protected slots:
   void updateSubFolderName();
   void onAutoSubNameCBClicked(bool);
   void onShowPopupOnLaunchCBClicked(bool);
+  void onSetAsDefaultBtnPressed();
   void onOkPressed();
 };
 

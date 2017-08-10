@@ -693,6 +693,15 @@ void SmoothStroke::endStroke() {
 
 //--------------------------------------------------------------------------------------------------
 
+void SmoothStroke::clearPoints() {
+  m_outputIndex = 0;
+  m_readIndex   = -1;
+  m_outputPoints.clear();
+  m_rawPoints.clear();
+}
+
+//--------------------------------------------------------------------------------------------------
+
 void SmoothStroke::getSmoothPoints(std::vector<TThickPoint> &smoothPoints) {
   int n = m_outputPoints.size();
   for (int i = m_readIndex + 1; i <= m_outputIndex && i < n; ++i) {
@@ -1363,9 +1372,16 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     checkGuideSnapping(false);
     m_brushPos = m_lastSnapPoint;
 
-    if (m_dragDraw)
+    if (e.isShiftPressed()) {
+      m_smoothStroke.clearPoints();
+      m_track.add(TThickPoint(m_brushPos, thickness), getPixelSize() * getPixelSize());
+      m_track.removeMiddlePoints();
+    }
+
+    else if (m_dragDraw)
       addTrackPoint(TThickPoint(pos, thickness),
                     getPixelSize() * getPixelSize());
+
     invalidate();
   }
 }
@@ -1380,9 +1396,16 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
   if (m_isPath) {
     double error = 20.0 * getPixelSize();
-    flushTrackPoint();
-    TStroke *stroke = m_track.makeStroke(error);
-    int points      = stroke->getControlPointCount();
+
+    TStroke *stroke;
+    if (e.isShiftPressed()) {
+      m_track.removeMiddlePoints();
+      stroke = m_track.makeStroke(0);
+    } else {
+      flushTrackPoint();
+      stroke = m_track.makeStroke(error);
+    }
+    int points = stroke->getControlPointCount();
 
     if (TVectorImageP vi = getImage(true)) {
       struct Cleanup {
@@ -1440,8 +1463,14 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     double error = 30.0 / (1 + 0.5 * m_accuracy.getValue());
     error *= getPixelSize();
 
-    flushTrackPoint();
-    TStroke *stroke = m_track.makeStroke(error);
+    TStroke *stroke;
+    if (e.isShiftPressed()) {
+      m_track.removeMiddlePoints();
+      stroke = m_track.makeStroke(0);
+    } else {
+      flushTrackPoint();
+      stroke = m_track.makeStroke(error);
+    }
     stroke->setStyle(m_styleId);
     {
       TStroke::OutlineOptions &options = stroke->outlineOptions();
@@ -2060,7 +2089,9 @@ void BrushTool::checkGuideSnapping(bool beforeMousePress) {
 
 void BrushTool::draw() {
   /*--ショートカットでのツール切り替え時に赤点が描かれるのを防止する--*/
-  if (m_minThick == 0 && m_maxThick == 0) return;
+  if (m_minThick == 0 && m_maxThick == 0 &&
+      !Preferences::instance()->getShow0ThickLines())
+    return;
 
   TImageP img = getImage(false, 1);
 

@@ -326,8 +326,11 @@ Preferences::Preferences()
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
   TFilePath savePath  = layoutDir + TFilePath("preferences.ini");
 
+  // If no personal settings found, then try to load template settings
+  TFilePath loadPath = ToonzFolder::getModuleFile(TFilePath("preferences.ini"));
+
   m_settings.reset(new QSettings(
-      QString::fromStdWString(savePath.getWideString()), QSettings::IniFormat));
+      QString::fromStdWString(loadPath.getWideString()), QSettings::IniFormat));
 
   getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
   getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
@@ -599,6 +602,16 @@ Preferences::Preferences()
            m_inputCellsWithoutDoubleClickingEnabled);
   getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
+
+  // in case there is no personal settings
+  if (savePath != loadPath) {
+    // copy the template settins to the personal one
+    if (TFileStatus(loadPath).doesExist())
+      TSystem::copyFile(savePath, loadPath);
+    m_settings.reset(
+        new QSettings(QString::fromStdWString(savePath.getWideString()),
+                      QSettings::IniFormat));
+  }
 }
 
 //-----------------------------------------------------------------

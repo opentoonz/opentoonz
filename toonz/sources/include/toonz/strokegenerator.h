@@ -85,6 +85,9 @@ In caso affermativo li cancella.
   //! Visualizza tutti i frammenti
   void drawAllFragments();
 
+  // Only keep first and last points. Used for straight lines
+  void removeMiddlePoints();
+
   //! Restituisce il rettangolo che contiene la regione modificata
   TRectD getModifiedRegion() const;
 
