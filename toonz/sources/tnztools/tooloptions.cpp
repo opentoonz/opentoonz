@@ -171,11 +171,7 @@ ToolOptionControlBuilder::ToolOptionControlBuilder(ToolOptionsBox *panel,
 //-----------------------------------------------------------------------------
 
 QLabel *ToolOptionControlBuilder::addLabel(TProperty *p) {
-  QLabel *label;
-  if (p->getName() == "Sensitivity:")
-    label = new QLabel("");
-  else
-    label = new QLabel(p->getQStringName());
+  QLabel *label = new QLabel(p->getQStringName());
   hLayout()->addWidget(label, 0);
   return label;
 }
@@ -346,9 +342,10 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p) {
 
   case COMBOBOX:
   default: {
-    QLabel *label = addLabel(p);
-    m_panel->addLabel(p->getName(), label);
-
+    if (p->getQStringName() != "") {
+      QLabel *label = addLabel(p);
+      m_panel->addLabel(p->getName(), label);
+    }
     ToolOptionCombo *obj = new ToolOptionCombo(m_tool, p, m_toolHandle);
     control              = obj;
     widget               = obj;
@@ -1631,7 +1628,6 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
         dynamic_cast<ToolOptionIntSlider *>(m_controls.value("Miter:"));
     m_miterField->setEnabled(m_joinStyleCombo->currentIndex() ==
                              TStroke::OutlineOptions::MITER_JOIN);
-    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
   }
   hLayout()->addStretch(1);
   filterControls();
@@ -1662,6 +1658,9 @@ void BrushToolOptionsBox::filterControls() {
     bool visible    = isCommon || (isModifier == showModifiers);
     if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
       widget->setVisible(visible);
+  }
+  if (m_tool->getTargetType() & TTool::Vectors) {
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
   }
 }
 

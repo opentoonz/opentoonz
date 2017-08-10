@@ -1020,7 +1020,7 @@ void BrushTool::updateTranslation() {
   m_miterJoinLimit.setQStringName(tr("Miter:"));
   m_frameRange.setQStringName("Range:");
   m_snap.setQStringName("Snap");
-  m_snapSensitivity.setQStringName("Sensitivity:");
+  m_snapSensitivity.setQStringName("");
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -1374,7 +1374,8 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 
     if (e.isShiftPressed()) {
       m_smoothStroke.clearPoints();
-      m_track.add(TThickPoint(m_brushPos, thickness), getPixelSize() * getPixelSize());
+      m_track.add(TThickPoint(m_brushPos, thickness),
+                  getPixelSize() * getPixelSize());
       m_track.removeMiddlePoints();
     }
 
@@ -2059,10 +2060,10 @@ void BrushTool::checkGuideSnapping(bool beforeMousePress) {
     if (useGuides && foundSnap) {
       double currYDistance = abs(snapPoint.y - m_mousePos.y);
       double currXDistance = abs(snapPoint.x - m_mousePos.x);
-      if ((distanceToVGuide < currYDistance &&
-           distanceToVGuide < currXDistance) ||
-          (distanceToHGuide < currXDistance &&
-           distanceToHGuide < currYDistance))
+      double hypotenuse =
+          sqrt(pow(currYDistance, 2.0) + pow(currXDistance, 2.0));
+      if ((distanceToVGuide >= 0 && distanceToVGuide < hypotenuse) ||
+          (distanceToHGuide >= 0 && distanceToHGuide < hypotenuse))
         useGuides = true;
       else
         useGuides = false;
