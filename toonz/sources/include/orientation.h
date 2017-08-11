@@ -145,6 +145,29 @@ enum class PredefinedRange {
   HEADER_FRAME,  //! size of of column header height(v) / row header width(h)
   HEADER_LAYER,  //! size of row header width(v) / column header height(h)
 };
+enum class PredefinedFlag {
+  DRAG_LAYER_BORDER,
+  DRAG_LAYER_VISIBLE,
+  LAYER_NAME_BORDER,
+  LAYER_NAME_VISIBLE,
+  LAYER_NUMBER_BORDER,
+  LAYER_NUMBER_VISIBLE,
+  EYE_AREA_BORDER,
+  EYE_AREA_VISIBLE,
+  LOCK_AREA_BORDER,
+  LOCK_AREA_VISIBLE,
+  PREVIEW_LAYER_AREA_BORDER,
+  PREVIEW_LAYER_AREA_VISIBLE,
+  CONFIG_AREA_BORDER,
+  CONFIG_AREA_VISIBLE,
+  PEGBAR_NAME_BORDER,
+  PEGBAR_NAME_VISIBLE,
+  PARENT_HANDLE_NAME_BORDER,
+  PARENT_HANDLE_NAME_VISIBILE,
+  THUMBNAIL_AREA_BORDER,
+  THUMBNAIL_AREA_VISIBLE,
+  VOLUME_AREA_VERTICAL
+};
 
 // Knows everything about geometry of a particular orientation.
 class DVAPI Orientation {
@@ -155,6 +178,7 @@ protected:
   map<PredefinedPath, QPainterPath> _paths;
   map<PredefinedPoint, QPoint> _points;
   map<PredefinedRange, NumberRange> _ranges;
+  map<PredefinedFlag, bool> _flags;
 
 public:
   virtual CellPosition xyToPosition(const QPoint &xy,
@@ -207,6 +231,7 @@ public:
   const NumberRange &range(PredefinedRange which) const {
     return _ranges.at(which);
   }
+  const bool &flag(PredefinedFlag which) const { return _flags.at(which); }
 
   virtual int cellWidth() const  = 0;
   virtual int cellHeight() const = 0;
@@ -218,6 +243,7 @@ protected:
   void addPath(PredefinedPath which, const QPainterPath &path);
   void addPoint(PredefinedPoint which, const QPoint &point);
   void addRange(PredefinedRange which, const NumberRange &range);
+  void addFlag(PredefinedFlag which, const bool &flag);
 };
 
 // Enumerates all orientations available in the system as global const objects.
