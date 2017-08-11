@@ -81,6 +81,7 @@ TEnv::StringVar CamCapCameraResolution("CamCapCameraResolution", "");
 // Whether to open save-in popup on launch
 TEnv::IntVar CamCapOpenSaveInPopupOnLaunch("CamCapOpenSaveInPopupOnLaunch", 0);
 // SaveInFolderPopup settings
+TEnv::StringVar CamCapSaveInParentFolder("CamCapSaveInParentFolder", "");
 TEnv::IntVar CamCapSaveInPopupSubFolder("CamCapSaveInPopupSubFolder", 0);
 TEnv::StringVar CamCapSaveInPopupProject("CamCapSaveInPopupProject", "");
 TEnv::StringVar CamCapSaveInPopupEpisode("CamCapSaveInPopupEpisode", "1");
@@ -584,8 +585,14 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
     : Dialog(parent, true, false, "PencilTestSaveInFolder") {
   setWindowTitle("Create the Destination Subfolder to Save");
 
-  m_parentFolderField = new FileField(
-      this, QString("+%1").arg(QString::fromStdString(TProject::Extras)));
+  QString parentFolder = QString::fromStdString(CamCapSaveInParentFolder);
+  if (parentFolder.isEmpty())
+    parentFolder = QString("+%1").arg(QString::fromStdString(TProject::Extras));
+  m_parentFolderField = new FileField(this, parentFolder);
+
+  QPushButton* setAsDefaultBtn = new QPushButton(tr("Set As Default"), this);
+  setAsDefaultBtn->setToolTip(
+      tr("Set the current \"Save In\" path as the default."));
 
   m_subFolderCB = new QCheckBox(tr("Create Subfolder"), this);
 
@@ -638,6 +645,7 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
         << tr("Episode + Sequence + Scene")
         << tr("Project + Episode + Sequence + Scene");
   m_subNameFormatCombo->addItems(items);
+  m_subNameFormatCombo->setCurrentIndex(CamCapSaveInPopupAutoSubName - 1);
 
   showPopupOnLaunchCB->setChecked(CamCapOpenSaveInPopupOnLaunch != 0);
 
@@ -647,13 +655,18 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
   m_topLayout->setMargin(10);
   m_topLayout->setSpacing(10);
   {
-    QHBoxLayout* saveInLay = new QHBoxLayout();
+    QGridLayout* saveInLay = new QGridLayout();
     saveInLay->setMargin(0);
-    saveInLay->setSpacing(3);
+    saveInLay->setHorizontalSpacing(3);
+    saveInLay->setVerticalSpacing(0);
     {
-      saveInLay->addWidget(new QLabel(tr("Save In:"), this), 0);
-      saveInLay->addWidget(m_parentFolderField, 1);
+      saveInLay->addWidget(new QLabel(tr("Save In:"), this), 0, 0,
+                           Qt::AlignRight | Qt::AlignVCenter);
+      saveInLay->addWidget(m_parentFolderField, 0, 1);
+      saveInLay->addWidget(setAsDefaultBtn, 1, 1);
     }
+    saveInLay->setColumnStretch(0, 0);
+    saveInLay->setColumnStretch(1, 1);
     m_topLayout->addLayout(saveInLay);
 
     m_topLayout->addWidget(m_subFolderCB, 0, Qt::AlignLeft);
@@ -725,9 +738,13 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
                        SLOT(updateSubFolderName()));
   ret = ret && connect(m_autoSubNameCB, SIGNAL(clicked(bool)), this,
                        SLOT(onAutoSubNameCBClicked(bool)));
+  ret = ret && connect(m_subNameFormatCombo, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(updateSubFolderName()));
 
   ret = ret && connect(showPopupOnLaunchCB, SIGNAL(clicked(bool)), this,
                        SLOT(onShowPopupOnLaunchCBClicked(bool)));
+  ret = ret && connect(setAsDefaultBtn, SIGNAL(pressed()), this,
+                       SLOT(onSetAsDefaultBtnPressed()));
 
   ret = ret && connect(okBtn, SIGNAL(clicked(bool)), this, SLOT(onOkPressed()));
   ret = ret && connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(reject()));
@@ -743,6 +760,12 @@ QString PencilTestSaveInFolderPopup::getPath() {
   if (!m_subFolderCB->isChecked()) return m_parentFolderField->getPath();
 
   return m_parentFolderField->getPath() + "\\" + m_subFolderNameField->text();
+}
+
+//-----------------------------------------------------------------------------
+
+QString PencilTestSaveInFolderPopup::getParentPath() {
+  return m_parentFolderField->getPath();
 }
 
 //-----------------------------------------------------------------------------
@@ -813,6 +836,12 @@ void PencilTestSaveInFolderPopup::onShowPopupOnLaunchCBClicked(bool on) {
 
 //-----------------------------------------------------------------------------
 
+void PencilTestSaveInFolderPopup::onSetAsDefaultBtnPressed() {
+  CamCapSaveInParentFolder = m_parentFolderField->getPath().toStdString();
+}
+
+//-----------------------------------------------------------------------------
+
 void PencilTestSaveInFolderPopup::onOkPressed() {
   if (!m_subFolderCB->isChecked()) {
     accept();
@@ -850,7 +879,9 @@ void PencilTestSaveInFolderPopup::onOkPressed() {
   CamCapSaveInPopupEpisode     = m_episodeField->text().toStdString();
   CamCapSaveInPopupSequence    = m_sequenceField->text().toStdString();
   CamCapSaveInPopupScene       = m_sceneField->text().toStdString();
-  CamCapSaveInPopupAutoSubName = (m_autoSubNameCB->isChecked()) ? 1 : 0;
+  CamCapSaveInPopupAutoSubName = (!m_autoSubNameCB->isChecked())
+                                     ? 0
+                                     : m_subNameFormatCombo->currentIndex() + 1;
 
   // create folder
   try {
@@ -886,6 +917,8 @@ PencilTestPopup::PencilTestPopup()
                            TFilePath(L"penciltest" + dateTime + L".jpg");
   m_cacheImagePath = cacheImageFp.getQString();
 
+  m_saveInFolderPopup = new PencilTestSaveInFolderPopup(this);
+
   m_cameraViewfinder = new MyViewFinder(this);
   // CameraViewfinderContainer* cvfContainer = new
   // CameraViewfinderContainer(m_cameraViewfinder, this);
@@ -904,8 +937,9 @@ PencilTestPopup::PencilTestPopup()
   m_frameNumberEdit        = new FrameNumberLineEdit(this, startFrame);
   m_fileTypeCombo          = new QComboBox(this);
   m_fileFormatOptionButton = new QPushButton(tr("Options"), this);
-  m_saveInFileFld          = new FileField(
-      0, QString("+%1").arg(QString::fromStdString(TProject::Extras)));
+
+  m_saveInFileFld = new FileField(this, m_saveInFolderPopup->getParentPath());
+
   QToolButton* nextLevelButton = new QToolButton(this);
   m_saveOnCaptureCB =
       new QCheckBox(tr("Save images as they are captured"), this);
@@ -942,8 +976,6 @@ PencilTestPopup::PencilTestPopup()
 #endif
 
   QPushButton* subfolderButton = new QPushButton(tr("Subfolder"), this);
-
-  m_saveInFolderPopup = new PencilTestSaveInFolderPopup(this);
 
   //----
 

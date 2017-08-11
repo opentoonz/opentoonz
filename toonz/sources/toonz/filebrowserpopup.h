@@ -433,8 +433,11 @@ public:
   BrowserPopupController();
 
   bool isExecute() override { return m_isExecute; }
+  // if parentWidget is non-zero, then check if the any modal dialog is ancestor
+  // of it.
   void openPopup(QStringList filters, bool isDirectoryOnly,
-                 QString lastSelectedPath) override;
+                 QString lastSelectedPath,
+                 const QWidget *parentWidget = NULL) override;
   QString getPath() override;
 };
 

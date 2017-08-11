@@ -38,6 +38,7 @@ struct BrushData final : public TPersist {
   double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
   bool m_selective, m_pencil, m_breakAngles, m_pressure;
   int m_cap, m_join, m_miter;
+  double m_modifierSize, m_modifierOpacity;
 
   BrushData();
   BrushData(const std::wstring &name);
@@ -89,6 +90,8 @@ public:
   // Both addPoint() and endStroke() generate new smoothed points.
   // This method will removed generated points
   void getSmoothPoints(std::vector<TThickPoint> &smoothPoints);
+  // Remove all points - used for straight lines
+  void clearPoints();
 
 private:
   void generatePoints();
