@@ -630,10 +630,19 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   else {
 	  p.fillRect(rect, columnColor);
 
-	  // column handle
-	  QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
+	  if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE))
+	  {
+		  // column handle
+		  QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
 
-	  p.fillRect(sideBar, sideBar.contains(area->m_pos) ? m_viewer->getXsheetDragBarHighlightColor() : dragColor);
+		  if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER))
+		  {
+			  p.setPen(m_viewer->getVerticalLineColor());
+			  p.drawRect(sideBar);
+		  }
+
+		  p.fillRect(sideBar, sideBar.contains(area->m_pos) ? m_viewer->getXsheetDragBarHighlightColor() : dragColor);
+	  }
   }
 
   p.setPen(m_viewer->getVerticalLineColor());
@@ -657,7 +666,7 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 }
 
 void ColumnArea::DrawHeader::drawEye() const {
-  if (col < 0 || isEmpty) return;
+  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::EYE_AREA_VISIBLE)) return;
   QColor bgColor;
   QImage icon;
   int    buttonType = !column->isPreviewVisible() ? PREVIEW_OFF_XSHBUTTON : PREVIEW_ON_XSHBUTTON;
@@ -669,18 +678,24 @@ void ColumnArea::DrawHeader::drawEye() const {
   p.setPen(m_viewer->getVerticalLineColor());
 
   if (column->getPaletteColumn() || column->getSoundTextColumn()) {
-	  p.drawRect(prevViewRect);
+	  if(o->flag(PredefinedFlag::EYE_AREA_BORDER))
+	     p.drawRect(prevViewRect);
 	  return;
   }
 
   p.fillRect(prevViewRect, bgColor);  //   PreviewVisibleColor);
-  p.drawRect(prevViewRect);
+  if (o->flag(PredefinedFlag::EYE_AREA_BORDER))
+	  p.drawRect(prevViewRect);
+
+  // For Legacy (layout=1), Preview Off button is not displayed
+  if (m_viewer->getXsheetLayout() == 1 && buttonType == PREVIEW_OFF_XSHBUTTON)
+	  return;
 
   p.drawImage(eyeRect, icon);
 }
 
 void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
-  if (col < 0 || isEmpty) return;
+  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::PREVIEW_LAYER_AREA_VISIBLE)) return;
   // camstand visible toggle
   QColor bgColor;
   QImage icon;
@@ -697,18 +712,23 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
   p.setPen(m_viewer->getVerticalLineColor());
 
   if (column->getPaletteColumn() || column->getSoundTextColumn()) {
-	  p.drawRect(tableViewRect);
+	  if(o->flag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER))
+		  p.drawRect(tableViewRect);
 	  return;
   }
 
   p.fillRect(tableViewRect, bgColor);  //   CamStandVisibleColor);
-  p.drawRect(tableViewRect);
+  if (o->flag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER))
+	  p.drawRect(tableViewRect);
 
+  // For Legacy (layout=1), Camstand Off button is not displayed
+  if (m_viewer->getXsheetLayout() == 1 && buttonType == CAMSTAND_OFF_XSHBUTTON)
+	  return;
   p.drawImage(tableViewImgRect, icon);
 }
 
 void ColumnArea::DrawHeader::drawLock() const {
-  if (col < 0 || isEmpty) return;
+  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::LOCK_AREA_VISIBLE)) return;
   QColor bgColor;
   QImage icon;
   int    buttonType = !column->isLocked() ? LOCK_OFF_XSHBUTTON : LOCK_ON_XSHBUTTON;
@@ -720,13 +740,17 @@ void ColumnArea::DrawHeader::drawLock() const {
   // lock button
   p.setPen(m_viewer->getVerticalLineColor());
   p.fillRect(lockModeRect, bgColor);
-  p.drawRect(lockModeRect);
+  if(o->flag(PredefinedFlag::LOCK_AREA_BORDER))
+	  p.drawRect(lockModeRect);
 
+  // For Legacy (layout=1), Lock Off button is not displayed
+  if (m_viewer->getXsheetLayout() == 1 && buttonType == LOCK_OFF_XSHBUTTON)
+	  return;
   p.drawImage(lockModeImgRect, icon);
 }
 
 void ColumnArea::DrawHeader::drawConfig() const {
-	if (col < 0 || isEmpty) return;
+	if (col < 0 || isEmpty || !o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE)) return;
 	QColor bgColor;
 	QImage icon;
 	int    buttonType = CONFIG_XSHBUTTON;
@@ -738,7 +762,8 @@ void ColumnArea::DrawHeader::drawConfig() const {
 	// config button
 	p.setPen(m_viewer->getVerticalLineColor());
 	p.fillRect(configRect, bgColor);
-	p.drawRect(configRect);
+	if(o->flag(PredefinedFlag::CONFIG_AREA_BORDER))
+		p.drawRect(configRect);
 
 	if (column->getSoundColumn() || column->getPaletteColumn() || column->getSoundTextColumn()) return;
 
@@ -746,21 +771,28 @@ void ColumnArea::DrawHeader::drawConfig() const {
 }
 
 void ColumnArea::DrawHeader::drawColumnNumber() const {
-  if (col < 0 || isEmpty ||
+  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::LAYER_NUMBER_VISIBLE) ||
       !Preferences::instance()->isShowColumnNumbersEnabled())
     return;
+
+  QRect pos = o->rect(PredefinedRect::LAYER_NUMBER).translated(orig);
+
+  p.setPen(m_viewer->getVerticalLineColor());
+  if (o->flag(PredefinedFlag::LAYER_NUMBER_BORDER))
+	  p.drawRect(pos);
 
   p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
                        : m_viewer->getTextColor());
 
   int valign = o->isVerticalTimeline() ? Qt::AlignVCenter : Qt::AlignBottom;
 
-  QRect pos = o->rect(PredefinedRect::LAYER_NUMBER).translated(orig);
   p.drawText(pos, Qt::AlignHCenter | valign | Qt::TextSingleLine,
              QString::number(col + 1));
 }
 
 void ColumnArea::DrawHeader::drawColumnName() const {
+  if (!o->flag(PredefinedFlag::LAYER_NAME_VISIBLE)) return;
+
   TStageObjectId columnId    = m_viewer->getObjectId(col);
   TStageObject *columnObject = xsh->getStageObject(columnId);
 
@@ -777,13 +809,16 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 
   if (!isEmpty)
   {
-	  if (o->isVerticalTimeline())
+	  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() != 1) // Legacy - No background
 	  {
 		  if (columnName.contains(area->m_pos))
 			  p.fillRect(columnName, m_viewer->getXsheetDragBarHighlightColor()); // Qt::yellow);
 		  else
 			  p.fillRect(columnName, m_viewer->getXsheetColumnNameBgColor());
 	  }
+
+	  if (o->flag(PredefinedFlag::LAYER_NAME_BORDER))
+		  p.drawRect(columnName);
   }
 
   int rightadj = -2;
@@ -823,7 +858,8 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
   QRect thumbnailRect =
       o->rect(PredefinedRect::THUMBNAIL_AREA).translated(orig);
   p.setPen(m_viewer->getVerticalLineColor());
-  p.drawRect(thumbnailRect);
+  if(o->flag(PredefinedFlag::THUMBNAIL_AREA_BORDER))  
+	  p.drawRect(thumbnailRect);
 
   // sound thumbnail
   if (column->getSoundColumn()) {
@@ -835,7 +871,7 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
     return;
   }
 
-  if (!o->isVerticalTimeline()) return;
+  if (!o->isVerticalTimeline() || !o->flag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE)) return;
 
   QRect thumbnailImageRect =
       o->rect(PredefinedRect::THUMBNAIL).translated(orig);
@@ -886,13 +922,16 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
 }
 
 void ColumnArea::DrawHeader::drawPegbarName() const {
-  if (col < 0 || isEmpty || !o->isVerticalTimeline()) return;
+  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::PEGBAR_NAME_VISIBLE)) return;
 
   TStageObjectId columnId = m_viewer->getObjectId(col);
   TStageObjectId parentId = xsh->getStageObjectParent(columnId);
 
   // pegbar name
   QRect pegbarnamerect = o->rect(PredefinedRect::PEGBAR_NAME).translated(orig);
+  p.setPen(m_viewer->getVerticalLineColor());
+  if (o->flag(PredefinedFlag::PEGBAR_NAME_BORDER))
+	  p.drawRect(pegbarnamerect);
 
   if (column->getSoundColumn() || column->getSoundTextColumn() ||
       column->getPaletteColumn())
@@ -906,13 +945,16 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
 }
 
 void ColumnArea::DrawHeader::drawParentHandleName() const {
-  if (col < 0 || isEmpty || !o->isVerticalTimeline() ||
+  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::PARENT_HANDLE_NAME_VISIBILE) ||
       column->getSoundColumn() || column->getSoundTextColumn() ||
       column->getPaletteColumn())
     return;
 
   QRect parenthandleRect =
       o->rect(PredefinedRect::PARENT_HANDLE_NAME).translated(orig);
+  p.setPen(m_viewer->getVerticalLineColor());
+  if (o->flag(PredefinedFlag::PARENT_HANDLE_NAME_BORDER))
+	  p.drawRect(parenthandleRect);
 
   TStageObjectId columnId = m_viewer->getObjectId(col);
   TStageObjectId parentId = xsh->getStageObjectParent(columnId);
@@ -953,17 +995,32 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
       o->point(PredefinedPoint::VOLUME_DIVISIONS_TOP_LEFT) + orig;
   int layerAxis = o->layerAxis(divisionsTopLeft);
   int frameAxis = o->frameAxis(divisionsTopLeft);
-  if (o->isVerticalTimeline()) {
-    for (int i = 0; i <= 20; i++, layerAxis += 3)
-      if ((i % 10) == 0)
-        p.drawLine(o->verticalLine(layerAxis,
-                                     NumberRange(frameAxis, frameAxis + 3)));
-      else if (i & 1)
-        p.drawLine(
-            o->verticalLine(layerAxis, NumberRange(frameAxis, frameAxis)));
-      else
-        p.drawLine(o->verticalLine(layerAxis,
-                                     NumberRange(frameAxis, frameAxis + 2)));
+  if (o->isVerticalTimeline()) 
+  {
+      if (m_viewer->getXsheetLayout() == 1) {
+		  for (int i = 0; i <= 20; i++, frameAxis += 3)
+			  if ((i % 10) == 0)
+				  p.drawLine(o->horizontalLine(frameAxis,
+					  NumberRange(layerAxis - 3, layerAxis)));
+			  else if (i & 1)
+				  p.drawLine(
+					  o->horizontalLine(frameAxis, NumberRange(layerAxis, layerAxis)));
+			  else
+				  p.drawLine(o->horizontalLine(frameAxis,
+					  NumberRange(layerAxis - 2, layerAxis)));
+	  } else {
+		  for (int i = 0; i <= 20; i++, layerAxis += 3)
+			  if ((i % 10) == 0)
+				  p.drawLine(o->verticalLine(layerAxis,
+					  NumberRange(frameAxis, frameAxis + 3)));
+			  else if (i & 1)
+				  p.drawLine(
+					  o->verticalLine(layerAxis, NumberRange(frameAxis, frameAxis)));
+			  else
+				  p.drawLine(o->verticalLine(layerAxis,
+					  NumberRange(frameAxis, frameAxis + 2)));
+
+	  }
   } else {
     for (int i = 0; i <= 20; i++, frameAxis += 3)
       if ((i % 10) == 0)
@@ -984,17 +1041,17 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
 
   // cursor
   QRect trackRect = o->rect(PredefinedRect::VOLUME_TRACK).translated(orig);
-  if (o->flipVolume()) volume = 1 - volume;
+  if (o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) volume = 1 - volume;
 
   layerAxis     = o->layerSide(trackRect).middle();
   frameAxis     = o->frameSide(trackRect).weight(volume);
-  if (o->isVerticalTimeline()) {
+  if (o->isVerticalTimeline() && !o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) {
 	  layerAxis = o->frameSide(trackRect).middle();
 	  frameAxis = o->layerSide(trackRect).weight(volume);
   }
-  QPoint cursor = o->frameLayerToXY(frameAxis, layerAxis);
-  if (o->isVerticalTimeline()) {
-	  cursor = o->frameLayerToXY(layerAxis, frameAxis);
+  QPoint cursor = o->frameLayerToXY(frameAxis, layerAxis) + QPoint(1, 0);
+  if (o->isVerticalTimeline() && !o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) {
+	  cursor = o->frameLayerToXY(layerAxis, frameAxis) + QPoint( -2, 0);
   }
   QPainterPath head =
       o->path(PredefinedPath::VOLUME_SLIDER_HEAD).translated(cursor);
@@ -1079,7 +1136,7 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
     x0 = rect.topLeft().x() + 1;
     y0 = 0;
 
-    p.setPen(m_viewer->getDarkLineColor());
+	p.setPen(m_viewer->getDarkLineColor());
     p.fillRect(x0, y0 + 1, rect.width(), 18,
                QBrush(m_viewer->getDarkBGColor()));
     p.fillRect(x0, y0 + 17, 2, rect.height() - 34,
@@ -1696,7 +1753,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     if (!isEmpty && m_col >= 0) {
       // grabbing the left side of the column enables column move
 		if (o->rect(PredefinedRect::DRAG_LAYER).contains(mouseInCell)
-			|| (o->isVerticalTimeline()
+			|| (!o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)  // If dragbar hidden, layer name/number becomes dragbar
 				&& (o->rect(PredefinedRect::LAYER_NUMBER).contains(mouseInCell)
 			        || o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell)
 			       )
@@ -1730,6 +1787,8 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
         } else {
           m_doOnRelease =
               isCtrlPressed ? ToggleAllTransparency : ToggleTransparency;
+		  if (!o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE) && !column->getSoundColumn())
+			  startTransparencyPopupTimer(event);
         }
       }
 	  // config button

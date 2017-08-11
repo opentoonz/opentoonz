@@ -319,7 +319,6 @@ public:
   }
 
   // Xsheet  tab
-
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
                                  //! step</I> commands.
   int getXsheetStep() const {
@@ -365,6 +364,9 @@ public:
   void enableShowColumnNumbers(bool on);
   bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
 
+  void setXsheetLayoutPreference(int layout);
+  int getXsheetLayoutPreference() { return m_xsheetLayoutPreference; }
+	
   // Animation  tab
 
   void setKeyframeType(int s);
@@ -562,6 +564,7 @@ private:
   // enable to watch file system in order to update file browser automatically
   bool m_watchFileSystem;
 
+  int m_xsheetLayoutPreference; // THEME = 0, LEGACY = 1, COMPACT = 2
 private:
   Preferences();
   ~Preferences();

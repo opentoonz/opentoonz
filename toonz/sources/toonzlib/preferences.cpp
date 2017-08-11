@@ -314,7 +314,8 @@ Preferences::Preferences()
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
-    , m_watchFileSystem(true) {
+    , m_watchFileSystem(true)
+    , m_xsheetLayoutPreference(0) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -597,6 +598,7 @@ Preferences::Preferences()
            m_inputCellsWithoutDoubleClickingEnabled);
   getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
+  getValue(*m_settings, "xsheetLayoutPreference", m_xsheetLayoutPreference);
 }
 
 //-----------------------------------------------------------------
@@ -1394,6 +1396,11 @@ void Preferences::enableExpandFunctionHeader(bool on) {
 void Preferences::enableShowColumnNumbers(bool on) {
   m_showColumnNumbers = on;
   m_settings->setValue("showColumnNumbers", on ? "1" : "0");
+}
+
+void Preferences::setXsheetLayoutPreference(int layout) {
+	m_xsheetLayoutPreference = layout;
+	m_settings->setValue("xsheetLayoutPreference", layout);
 }
 
 //-----------------------------------------------------------------

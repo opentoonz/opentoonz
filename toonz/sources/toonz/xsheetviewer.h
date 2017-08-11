@@ -499,6 +499,8 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
 
   const Orientation *m_orientation;
 
+  int m_xsheetLayout;
+
 public:
   enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
 
@@ -911,6 +913,8 @@ public:
   // SaveLoadQSettings
   virtual void save(QSettings &settings) const override;
   virtual void load(QSettings &settings) override;
+
+  int getXsheetLayout() const { return m_xsheetLayout;  }
 
 protected:
   void scrollToColumn(int col);
