@@ -112,6 +112,7 @@ FilmstripFrames::FilmstripFrames(QScrollArea *parent, Qt::WFlags flags)
     , m_dragSelectionStartIndex(-1)
     , m_dragSelectionEndIndex(-1)
     , m_timerId(0)
+	, m_isGhibli(false)
     , m_selecting(false)
     , m_dragDropArmed(false)
     , m_readOnly(false) {
@@ -130,6 +131,18 @@ FilmstripFrames::FilmstripFrames(QScrollArea *parent, Qt::WFlags flags)
 
   m_selection->setView(this);
   setMouseTracking(true);
+
+  ComboViewerPanel *inknPaintViewerPanel =
+	  TApp::instance()->getInknPaintViewerPanel();
+  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
+  m_isGhibli = room == "StudioGhibli";
+  
+  if (m_isGhibli && inknPaintViewerPanel) {
+	  m_viewer = inknPaintViewerPanel->getSceneViewer();
+  }
+  else {
+	  m_viewer = TApp::instance()->getActiveViewer();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -367,14 +380,22 @@ void FilmstripFrames::showEvent(QShowEvent *) {
   connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
           SLOT(update()));
 
-  // enable navigator link with the Viewer in the InknPaint page
-  ComboViewerPanel *inknPaintViewerPanel = app->getInknPaintViewerPanel();
-  if (inknPaintViewerPanel) {
-    SceneViewer *viewer = inknPaintViewerPanel->getSceneViewer();
-    if (viewer) {
-      connect(viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
-      connect(viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
-    }
+
+
+  ComboViewerPanel *inknPaintViewerPanel =
+	  TApp::instance()->getInknPaintViewerPanel();
+  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
+  m_isGhibli = room == "StudioGhibli";
+
+  if (m_isGhibli && inknPaintViewerPanel) {
+	  m_viewer = inknPaintViewerPanel->getSceneViewer();
+  }
+  else {
+	  m_viewer = TApp::instance()->getActiveViewer();
+  }
+  if (m_viewer) {
+      connect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
+      connect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
   }
 }
 
@@ -401,13 +422,20 @@ void FilmstripFrames::hideEvent(QHideEvent *) {
              SLOT(update()));
 
   ComboViewerPanel *inknPaintViewerPanel = app->getInknPaintViewerPanel();
-  if (inknPaintViewerPanel) {
-    SceneViewer *viewer = inknPaintViewerPanel->getSceneViewer();
-    if (viewer) {
-      disconnect(viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
-      disconnect(viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
-    }
+
+  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
+  m_isGhibli = room == "StudioGhibli";
+
+  if (m_isGhibli && inknPaintViewerPanel) {
+	  m_viewer = inknPaintViewerPanel->getSceneViewer();
   }
+  else {
+	  m_viewer = TApp::instance()->getActiveViewer();
+  }
+    if (m_viewer) {
+      disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
+      disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -457,17 +485,25 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
 
   QRect naviRect;
   ComboViewerPanel *inknPaintViewerPanel =
-      TApp::instance()->getInknPaintViewerPanel();
-  if (sl->getType() == TZP_XSHLEVEL && inknPaintViewerPanel) {
+	  TApp::instance()->getInknPaintViewerPanel();
+  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
+  m_isGhibli = room == "StudioGhibli";
+  if (!m_viewer || m_viewer != TApp::instance()->getActiveViewer()) {
+	  if (m_isGhibli && inknPaintViewerPanel) {
+		  m_viewer = inknPaintViewerPanel->getSceneViewer();
+	  }
+	  else {
+		  m_viewer = TApp::instance()->getActiveViewer();
+	  }
+  }
+  if ((sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL) && m_viewer  && m_viewer->isVisible()) {
     // show navigator only if the inknpaint viewer is visible
-    if (inknPaintViewerPanel->isVisible()) {
-      SceneViewer *viewer = inknPaintViewerPanel->getSceneViewer();
+      
       // imgSize: image's pixel size
       QSize imgSize(sl->getProperties()->getImageRes().lx,
                     sl->getProperties()->getImageRes().ly);
       // Viewer affine
-      TAffine viewerAff =
-          inknPaintViewerPanel->getSceneViewer()->getViewMatrix();
+      TAffine viewerAff = m_viewer->getViewMatrix();
       // pixel size which will be displayed with 100% scale in Viewer Stage
       TFrameId currentId = TApp::instance()->getCurrentFrame()->getFid();
       double imgPixelWidth =
@@ -488,13 +524,13 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
 
       // ratio of the Viewer frame's position and size
       QRectF naviRatio(
-          (-(float)viewer->width() * 0.5f - (float)imgBottomLeft.x) /
+          (-(float)m_viewer->width() * 0.5f - (float)imgBottomLeft.x) /
               imgSizeInViewer.width(),
           1.0f -
-              ((float)viewer->height() * 0.5f - (float)imgBottomLeft.y) /
+              ((float)m_viewer->height() * 0.5f - (float)imgBottomLeft.y) /
                   imgSizeInViewer.height(),
-          (float)viewer->width() / imgSizeInViewer.width(),
-          (float)viewer->height() / imgSizeInViewer.height());
+          (float)m_viewer->width() / imgSizeInViewer.width(),
+          (float)m_viewer->height() / imgSizeInViewer.height());
 
       naviRect = QRect(iconImgRect.left() +
                            (int)(naviRatio.left() * (float)iconImgRect.width()),
@@ -511,7 +547,6 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
                               (float)iconImgRect.width());
       m_icon2ViewerRatio.setY(imgSizeInViewer.height() /
                               (float)iconImgRect.height());
-    }
   }
 
   //--- compute navigator rect end ---
@@ -682,13 +717,31 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     if (fid == TFrameId()) return;
 
-    ComboViewerPanel *inknPaintViewerPanel =
-        TApp::instance()->getInknPaintViewerPanel();
 
     // navigator pan
+	bool viewerChanged = false;
+	if (m_viewer && m_viewer != TApp::instance()->getActiveViewer()) {
+		disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
+		disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+	}
+	ComboViewerPanel *inknPaintViewerPanel =
+		TApp::instance()->getInknPaintViewerPanel();
+	std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
+	m_isGhibli = room == "StudioGhibli";
+
+	if (m_isGhibli && inknPaintViewerPanel) {
+		m_viewer = inknPaintViewerPanel->getSceneViewer();
+	}
+	else {
+		m_viewer = TApp::instance()->getActiveViewer();
+	}
+	if (m_viewer) {
+		connect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
+		connect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+	}
     if (fid == TApp::instance()->getCurrentFrame()->getFid() &&
-        sl->getType() == TZP_XSHLEVEL && inknPaintViewerPanel &&
-        inknPaintViewerPanel->isVisible() &&
+        (sl->getType() == TZP_XSHLEVEL || sl->getType() ==OVL_XSHLEVEL) && m_viewer &&
+        m_viewer->isVisible() &&
         QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
                      fs_frameSpacing / 2 +
                          fs_iconMarginTop)  //<- top-left position of the icon
@@ -778,11 +831,19 @@ void FilmstripFrames::execNavigatorPan(const QPoint &point) {
   delta.setX(delta.x() * m_icon2ViewerRatio.x());
   delta.setY(delta.y() * m_icon2ViewerRatio.y());
 
-  if (TApp::instance()->getInknPaintViewerPanel()) {
-    SceneViewer *viewer =
-        TApp::instance()->getInknPaintViewerPanel()->getSceneViewer();
-    if (viewer) viewer->navigatorPan(delta.toPoint());
+  ComboViewerPanel *inknPaintViewerPanel =
+	  TApp::instance()->getInknPaintViewerPanel();
+  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
+  m_isGhibli = room == "StudioGhibli";
+
+  if (m_isGhibli && inknPaintViewerPanel) {
+	  m_viewer = inknPaintViewerPanel->getSceneViewer();
   }
+  else {
+	  m_viewer = TApp::instance()->getActiveViewer();
+  }
+  if (m_viewer) m_viewer->navigatorPan(delta.toPoint());
+
 }
 
 //-----------------------------------------------------------------------------

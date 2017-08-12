@@ -23,6 +23,7 @@ class TXshSimpleLevel;
 class QComboBox;
 class InbetweenDialog;
 class TXshLevel;
+class SceneViewer;
 
 const int fs_leftMargin       = 2;
 const int fs_rightMargin      = 3;
@@ -164,7 +165,8 @@ private:
   TFilmstripSelection *m_selection;
   FilmstripFrameHeadGadget *m_frameHeadGadget;
   InbetweenDialog *m_inbetweenDialog;
-
+  SceneViewer *m_viewer;
+  bool m_isGhibli;
   // State data
 
   QPoint m_pos;  //!< Last mouse position.
