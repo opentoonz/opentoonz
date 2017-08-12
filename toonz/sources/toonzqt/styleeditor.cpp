@@ -1503,21 +1503,21 @@ PlainColorPage::PlainColorPage(QWidget *parent)
                        SLOT(onControlChanged(const ColorModel &, bool)));
   }
 
-  m_wheelShowButton = new QPushButton(tr("Wheel"), this);
-  m_hsvShowButton   = new QPushButton(tr("HSV"), this);
-  m_matteShowButton = new QPushButton(tr("Matte"), this);
-  m_rgbShowButton   = new QPushButton(tr("RGB"), this);
+  m_wheelShowButton         = new QPushButton(tr("Wheel"), this);
+  m_hsvShowButton           = new QPushButton(tr("HSV"), this);
+  m_matteShowButton         = new QPushButton(tr("Matte"), this);
+  m_rgbShowButton           = new QPushButton(tr("RGB"), this);
   m_toggleOrientationButton = new QPushButton(tr("↔"), this);
   m_toggleOrientationButton->setFixedWidth(20);
 
-  m_wheelFrame = new QFrame(this);
+  m_wheelFrame       = new QFrame(this);
   QFrame *hsvFrame   = new QFrame(this);
   QFrame *matteFrame = new QFrame(this);
   QFrame *rgbFrame   = new QFrame(this);
 
   m_slidersContainer = new QFrame(this);
-  m_vSplitter     = new QSplitter(this);
-  m_hSplitter = new QSplitter(this);
+  m_vSplitter        = new QSplitter(this);
+  m_hSplitter        = new QSplitter(this);
   //プロパティの設定
   // channelButtonGroup->setExclusive(true);
   m_wheelShowButton->setCheckable(true);
@@ -1565,7 +1565,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
       showButtonLayout->addWidget(m_hsvShowButton, 1);
       showButtonLayout->addWidget(m_matteShowButton, 1);
       showButtonLayout->addWidget(m_rgbShowButton, 1);
-	  showButtonLayout->addWidget(m_toggleOrientationButton, 1);
+      showButtonLayout->addWidget(m_toggleOrientationButton, 1);
     }
     mainLayout->addLayout(showButtonLayout);
 
@@ -1612,7 +1612,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
     m_slidersContainer->setLayout(slidersLayout);
     m_vSplitter->addWidget(m_slidersContainer);
 
-	m_hSplitter->addWidget(m_vSplitter);
+    m_hSplitter->addWidget(m_vSplitter);
     mainLayout->addWidget(m_hSplitter, 1);
   }
   setLayout(mainLayout);
@@ -1646,7 +1646,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   connect(m_rgbShowButton, SIGNAL(toggled(bool)), rgbFrame,
           SLOT(setVisible(bool)));
   connect(m_toggleOrientationButton, SIGNAL(clicked()), this,
-	  SLOT(toggleOrientation()));
+          SLOT(toggleOrientation()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1700,48 +1700,53 @@ void PlainColorPage::setColor(const TColorStyle &style,
 //-----------------------------------------------------------------------------
 
 void PlainColorPage::setVisibleParts(int settings) {
-	m_visibleParts = settings;
-	if (m_visibleParts & 0x01) m_wheelShowButton->setChecked(true);
-	else m_wheelShowButton->setChecked(false);
-	if (m_visibleParts & 0x02) m_hsvShowButton->setChecked(true);
-	else m_hsvShowButton->setChecked(false);
-	if (m_visibleParts & 0x04) m_matteShowButton->setChecked(true);
-	else m_matteShowButton->setChecked(false);
-	if (m_visibleParts & 0x08) m_rgbShowButton->setChecked(true);
-	else m_rgbShowButton->setChecked(false);
+  m_visibleParts = settings;
+  if (m_visibleParts & 0x01)
+    m_wheelShowButton->setChecked(true);
+  else
+    m_wheelShowButton->setChecked(false);
+  if (m_visibleParts & 0x02)
+    m_hsvShowButton->setChecked(true);
+  else
+    m_hsvShowButton->setChecked(false);
+  if (m_visibleParts & 0x04)
+    m_matteShowButton->setChecked(true);
+  else
+    m_matteShowButton->setChecked(false);
+  if (m_visibleParts & 0x08)
+    m_rgbShowButton->setChecked(true);
+  else
+    m_rgbShowButton->setChecked(false);
 }
 
 //-----------------------------------------------------------------------------
 
 int PlainColorPage::getVisibleParts() {
-	int visibleParts = 0;
-	if (m_wheelShowButton->isChecked()) visibleParts |= 0x01;
-	if (m_hsvShowButton->isChecked()) visibleParts |= 0x02;
-	if (m_matteShowButton->isChecked()) visibleParts |= 0x04;
-	if (m_rgbShowButton->isChecked()) visibleParts |= 0x08;
-	return visibleParts;
+  int visibleParts = 0;
+  if (m_wheelShowButton->isChecked()) visibleParts |= 0x01;
+  if (m_hsvShowButton->isChecked()) visibleParts |= 0x02;
+  if (m_matteShowButton->isChecked()) visibleParts |= 0x04;
+  if (m_rgbShowButton->isChecked()) visibleParts |= 0x08;
+  return visibleParts;
 }
 
 //-----------------------------------------------------------------------------
 
 void PlainColorPage::setIsVertical(bool isVertical) {
-	if (m_isVertical == isVertical) return;
-	m_isVertical = isVertical;
-	if (isVertical) {
-		m_vSplitter->insertWidget(0, m_wheelFrame);
-		m_toggleOrientationButton->setText("↔");
-	}
-	else {
-		m_hSplitter->insertWidget(0, m_wheelFrame);
-		m_toggleOrientationButton->setText("↕");
-	}
+  if (m_isVertical == isVertical) return;
+  m_isVertical = isVertical;
+  if (isVertical) {
+    m_vSplitter->insertWidget(0, m_wheelFrame);
+    m_toggleOrientationButton->setText("↔");
+  } else {
+    m_hSplitter->insertWidget(0, m_wheelFrame);
+    m_toggleOrientationButton->setText("↕");
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void PlainColorPage::toggleOrientation() {
-	setIsVertical(!m_isVertical);
-}
+void PlainColorPage::toggleOrientation() { setIsVertical(!m_isVertical); }
 
 //-----------------------------------------------------------------------------
 /*
@@ -2251,8 +2256,9 @@ private:
   static std::vector<TMyPaintBrushStyle> m_brushes;
 
 public:
-  MyPaintBrushStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent)
-    { m_chipSize = QSize(64, 64); }
+  MyPaintBrushStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent) {
+    m_chipSize = QSize(64, 64);
+  }
 
   bool loadIfNeeded() override {
     static bool m_loaded = false;
@@ -2264,15 +2270,16 @@ public:
       return false;
   }
 
-  int getChipCount() const override
-    { return m_brushes.size() + 1; }
+  int getChipCount() const override { return m_brushes.size() + 1; }
 
   static void loadItems();
 
   void drawChip(QPainter &p, QRect rect, int index) override {
     assert(0 <= index && index <= (int)m_brushes.size());
     static QImage noStyleImage(":Resources/no_mypaintbrush.png");
-    p.drawImage(rect, index == 0 ? noStyleImage : rasterToQImage(m_brushes[index-1].getPreview()));
+    p.drawImage(rect, index == 0
+                          ? noStyleImage
+                          : rasterToQImage(m_brushes[index - 1].getPreview()));
   }
 
   void onSelect(int index) override {
@@ -2281,7 +2288,7 @@ public:
     if (index == 0) {
       emit styleSelected(noStyle);
     } else {
-      emit styleSelected(m_brushes[index-1]);
+      emit styleSelected(m_brushes[index - 1]);
     }
   }
 
@@ -2294,9 +2301,8 @@ public:
       int index  = posToIndex(pos);
       if (index == 0) {
         toolTip = tr("Plain color");
-      } else
-      if (index > 0 && index <= (int)m_brushes.size()) {
-        toolTip = m_brushes[index-1].getPath().getQString();
+      } else if (index > 0 && index <= (int)m_brushes.size()) {
+        toolTip = m_brushes[index - 1].getPath().getQString();
       }
       QToolTip::showText(helpEvent->globalPos(), toolTip);
       e->accept();
@@ -2316,11 +2322,11 @@ void MyPaintBrushStyleChooserPage::loadItems() {
   std::set<TFilePath> brushFiles;
 
   TFilePathSet dirs = TMyPaintBrushStyle::getBrushesDirs();
-  for(TFilePathSet::iterator i = dirs.begin(); i != dirs.end(); ++i) {
+  for (TFilePathSet::iterator i = dirs.begin(); i != dirs.end(); ++i) {
     TFileStatus fs(*i);
     if (fs.doesExist() && fs.isDirectory()) {
       TFilePathSet files = TSystem::readDirectoryTree(*i, false, true);
-      for(TFilePathSet::iterator j = files.begin(); j != files.end(); ++j)
+      for (TFilePathSet::iterator j = files.begin(); j != files.end(); ++j)
         if (j->getType() == TMyPaintBrushStyle::getBrushType())
           brushFiles.insert(*j - *i);
     }
@@ -2328,7 +2334,8 @@ void MyPaintBrushStyleChooserPage::loadItems() {
 
   // reserve memory to avoid reallocation
   m_brushes.reserve(brushFiles.size());
-  for(std::set<TFilePath>::iterator i = brushFiles.begin(); i != brushFiles.end(); ++i)
+  for (std::set<TFilePath>::iterator i = brushFiles.begin();
+       i != brushFiles.end(); ++i)
     m_brushes.push_back(TMyPaintBrushStyle(*i));
 }
 
@@ -2854,10 +2861,9 @@ void SettingsPage::onAutofillChanged() {
 int SettingsPage::getParamIndex(const QWidget *widget) {
   int p, pCount = m_paramsLayout->rowCount();
   for (p = 0; p != pCount; ++p)
-    for(int c = 0; c < 3; ++c)
+    for (int c = 0; c < 3; ++c)
       if (QLayoutItem *item = m_paramsLayout->itemAtPosition(p, c))
-        if (item->widget() == widget)
-          return p;
+        if (item->widget() == widget) return p;
   return -1;
 }
 
@@ -2993,18 +2999,52 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   QScrollArea *plainArea = makeChooserPageWithoutScrollBar(m_plainColorPage);
 
   QScrollArea *textureArea        = makeChooserPage(m_textureStylePage);
-  QScrollArea *specialArea        = makeChooserPage(m_specialStylePage);
-  QScrollArea *customArea         = makeChooserPage(m_customStylePage);
-  QScrollArea *vectorBrushesArea  = makeChooserPage(m_vectorBrushesStylePage);
   QScrollArea *mypaintBrushesArea = makeChooserPage(m_mypaintBrushesStylePage);
   QScrollArea *settingsArea = makeChooserPageWithoutScrollBar(m_settingsPage);
+
+  QVBoxLayout *vectorLayout = new QVBoxLayout(this);
+  vectorLayout->setMargin(0);
+  vectorLayout->setSpacing(0);
+
+  QVBoxLayout *vectorOutsideLayout = new QVBoxLayout(this);
+  vectorOutsideLayout->setMargin(0);
+  vectorOutsideLayout->setSpacing(0);
+
+  QPushButton *specialButton      = new QPushButton(tr("Generated"), this);
+  QPushButton *customButton       = new QPushButton(tr("Trail"), this);
+  QPushButton *vectorBrushButton  = new QPushButton(tr("Vector Brush"), this);
+  QHBoxLayout *vectorButtonLayout = new QHBoxLayout(this);
+  m_vectorFrame                   = new QFrame(this);
+
+  specialButton->setCheckable(true);
+  customButton->setCheckable(true);
+  vectorBrushButton->setCheckable(true);
+  specialButton->setChecked(true);
+  customButton->setChecked(true);
+  vectorBrushButton->setChecked(true);
+
+  vectorButtonLayout->addWidget(specialButton);
+  vectorButtonLayout->addWidget(customButton);
+  vectorButtonLayout->addWidget(vectorBrushButton);
+
+  vectorOutsideLayout->addLayout(vectorButtonLayout);
+  vectorLayout->addWidget(m_specialStylePage);
+  vectorLayout->addWidget(m_customStylePage);
+  vectorLayout->addWidget(m_vectorBrushesStylePage);
+
+  m_vectorFrame->setLayout(vectorLayout);
+  m_vectorArea = makeChooserPage(m_vectorFrame);
+  vectorOutsideLayout->addWidget(m_vectorArea);
+
+  QFrame *vectorOutsideFrame = new QFrame(this);
+  vectorOutsideFrame->setLayout(vectorOutsideLayout);
+  QScrollArea *vectorOutsideArea =
+      makeChooserPageWithoutScrollBar(vectorOutsideFrame);
 
   m_styleChooser = new QStackedWidget(this);
   m_styleChooser->addWidget(plainArea);
   m_styleChooser->addWidget(textureArea);
-  m_styleChooser->addWidget(specialArea);
-  m_styleChooser->addWidget(customArea);
-  m_styleChooser->addWidget(vectorBrushesArea);
+  m_styleChooser->addWidget(vectorOutsideArea);
   m_styleChooser->addWidget(mypaintBrushesArea);
   m_styleChooser->addWidget(settingsArea);
   m_styleChooser->addWidget(makeChooserPageWithoutScrollBar(emptyPage));
@@ -3045,42 +3085,36 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   /* ------- signal-slot connections ------- */
 
   bool ret = true;
-  ret = ret && connect( m_styleBar,
-                        SIGNAL(currentChanged(int)),
-                        this,
-                        SLOT(setPage(int)) );
-  ret = ret && connect( m_colorParameterSelector,
-                        SIGNAL(colorParamChanged()),
-                        this,
-                        SLOT(onColorParamChanged()) );
-  ret = ret && connect( m_textureStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)));
-  ret = ret && connect( m_specialStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)) );
-  ret = ret && connect( m_customStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)) );
-  ret = ret && connect( m_vectorBrushesStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)) );
-  ret = ret && connect( m_mypaintBrushesStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)) );
-  ret = ret && connect( m_settingsPage,
-                        SIGNAL(paramStyleChanged(bool)),
-                        this,
-                        SLOT(onParamStyleChanged(bool)) );
-  ret = ret && connect( m_plainColorPage,
-                        SIGNAL(colorChanged(const ColorModel &, bool)),
-                        this,
-                        SLOT(onColorChanged(const ColorModel &, bool)) );
+  ret      = ret && connect(m_styleBar, SIGNAL(currentChanged(int)), this,
+                       SLOT(setPage(int)));
+  ret = ret && connect(m_colorParameterSelector, SIGNAL(colorParamChanged()),
+                       this, SLOT(onColorParamChanged()));
+  ret = ret &&
+        connect(m_textureStylePage, SIGNAL(styleSelected(const TColorStyle &)),
+                this, SLOT(selectStyle(const TColorStyle &)));
+  ret = ret &&
+        connect(m_specialStylePage, SIGNAL(styleSelected(const TColorStyle &)),
+                this, SLOT(selectStyle(const TColorStyle &)));
+  ret = ret &&
+        connect(m_customStylePage, SIGNAL(styleSelected(const TColorStyle &)),
+                this, SLOT(selectStyle(const TColorStyle &)));
+  ret = ret && connect(m_vectorBrushesStylePage,
+                       SIGNAL(styleSelected(const TColorStyle &)), this,
+                       SLOT(selectStyle(const TColorStyle &)));
+  ret = ret && connect(m_mypaintBrushesStylePage,
+                       SIGNAL(styleSelected(const TColorStyle &)), this,
+                       SLOT(selectStyle(const TColorStyle &)));
+  ret = ret && connect(m_settingsPage, SIGNAL(paramStyleChanged(bool)), this,
+                       SLOT(onParamStyleChanged(bool)));
+  ret = ret && connect(m_plainColorPage,
+                       SIGNAL(colorChanged(const ColorModel &, bool)), this,
+                       SLOT(onColorChanged(const ColorModel &, bool)));
+  ret = ret && connect(specialButton, SIGNAL(toggled(bool)), this,
+                       SLOT(onSpecialButtonToggled(bool)));
+  ret = ret && connect(customButton, SIGNAL(toggled(bool)), this,
+                       SLOT(onCustomButtonToggled(bool)));
+  ret = ret && connect(vectorBrushButton, SIGNAL(toggled(bool)), this,
+                       SLOT(onVectorBrushButtonToggled(bool)));
   assert(ret);
 
   /* ------- initial conditions ------- */
@@ -3171,17 +3205,15 @@ QFrame *StyleEditor::createBottomWidget() {
 void StyleEditor::updateTabBar() {
   m_styleBar->clearTabBar();
   if (m_enabled && !m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab) {
-    m_styleBar->addSimpleTab(tr("Plain"));
+    m_styleBar->addSimpleTab(tr("Color"));
     m_styleBar->addSimpleTab(tr("Texture"));
-    m_styleBar->addSimpleTab(tr("Special"));
-    m_styleBar->addSimpleTab(tr("Custom"));
-    m_styleBar->addSimpleTab(tr("Vector Brush"));
-    m_styleBar->addSimpleTab(tr("MyPaint Brush"));
+    m_styleBar->addSimpleTab(tr("Vector"));
+    m_styleBar->addSimpleTab(tr("Raster"));
     m_styleBar->addSimpleTab(tr("Settings"));
   } else if (m_enabled && m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab)
-    m_styleBar->addSimpleTab(tr("Plain"));
+    m_styleBar->addSimpleTab(tr("Color"));
   else if (m_enabled && !m_enabledOnlyFirstTab && m_enabledFirstAndLastTab) {
-    m_styleBar->addSimpleTab(tr("Plain"));
+    m_styleBar->addSimpleTab(tr("Color"));
     m_styleBar->addSimpleTab(tr("Settings"));
   } else {
     m_styleChooser->setCurrentIndex(7);
@@ -3469,7 +3501,7 @@ void StyleEditor::applyButtonClicked() {
   int styleIndex    = getStyleIndex();
   if (!palette || styleIndex < 0 || styleIndex > palette->getStyleCount())
     return;
-  
+
   copyEditedStyleToPalette(false);
 }
 
@@ -3626,20 +3658,43 @@ void StyleEditor::onParamStyleChanged(bool isDragging) {
   m_newColor->setStyle(*m_editedStyle);  //
 }
 
+//-----------------------------------------------------------------------------
+
+void StyleEditor::onSpecialButtonToggled(bool on) {
+  m_specialStylePage->setVisible(on);
+  m_vectorArea->widget()->resize(m_vectorArea->widget()->sizeHint());
+  qApp->processEvents();
+}
+
+//-----------------------------------------------------------------------------
+
+void StyleEditor::onCustomButtonToggled(bool on) {
+  m_customStylePage->setVisible(on);
+  m_vectorArea->widget()->resize(m_vectorArea->widget()->sizeHint());
+  qApp->processEvents();
+}
+
+//-----------------------------------------------------------------------------
+
+void StyleEditor::onVectorBrushButtonToggled(bool on) {
+  m_vectorBrushesStylePage->setVisible(on);
+  m_vectorArea->widget()->resize(m_vectorArea->widget()->sizeHint());
+  qApp->processEvents();
+}
 
 //-----------------------------------------------------------------------------
 
 void StyleEditor::save(QSettings &settings) const {
-	settings.setValue("isVertical", m_plainColorPage->getIsVertical());
-	settings.setValue("visibleParts", m_plainColorPage->getVisibleParts());
+  settings.setValue("isVertical", m_plainColorPage->getIsVertical());
+  settings.setValue("visibleParts", m_plainColorPage->getVisibleParts());
 }
 void StyleEditor::load(QSettings &settings) {
-	QVariant isVertical = settings.value("isVertical");
-	if (isVertical.canConvert(QVariant::Bool)) {
-		m_colorPageIsVertical = isVertical.toBool();
-		m_plainColorPage->setIsVertical(m_colorPageIsVertical);
-	}
-	QVariant visibleParts = settings.value("visibleParts");
-	if (visibleParts.canConvert(QVariant::Int))
-		m_plainColorPage->setVisibleParts(visibleParts.toInt());
+  QVariant isVertical = settings.value("isVertical");
+  if (isVertical.canConvert(QVariant::Bool)) {
+    m_colorPageIsVertical = isVertical.toBool();
+    m_plainColorPage->setIsVertical(m_colorPageIsVertical);
+  }
+  QVariant visibleParts = settings.value("visibleParts");
+  if (visibleParts.canConvert(QVariant::Int))
+    m_plainColorPage->setVisibleParts(visibleParts.toInt());
 }

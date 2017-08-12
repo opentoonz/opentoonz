@@ -459,9 +459,9 @@ class PlainColorPage final : public StyleEditorPage {
   QPushButton *m_wheelShowButton;
   QPushButton *m_hsvShowButton;
   QPushButton *m_matteShowButton;
-  QPushButton *m_rgbShowButton; 
+  QPushButton *m_rgbShowButton;
   QPushButton *m_toggleOrientationButton;
-  //QGridLayout *m_mainLayout;
+  // QGridLayout *m_mainLayout;
   QFrame *m_slidersContainer;
   QFrame *m_wheelFrame;
   QSplitter *m_vSplitter;
@@ -476,7 +476,6 @@ public:
   int getVisibleParts();
   void setIsVertical(bool isVertical);
   bool getIsVertical() { return m_isVertical; }
-
 
 protected:
   void resizeEvent(QResizeEvent *) override;
@@ -640,6 +639,8 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   StyleChooserPage *m_vectorBrushesStylePage;
   StyleChooserPage *m_mypaintBrushesStylePage;
   SettingsPage *m_settingsPage;
+  QScrollArea *m_vectorArea;
+  QFrame *m_vectorFrame;
 
   TColorStyleP
       m_oldStyle;  //!< A copy of current style \a before the last change.
@@ -736,6 +737,10 @@ protected slots:
   void onColorParamChanged();
 
   void onParamStyleChanged(bool isDragging);
+
+  void onSpecialButtonToggled(bool on);
+  void onCustomButtonToggled(bool on);
+  void onVectorBrushButtonToggled(bool on);
 
 private:
   QFrame *createBottomWidget();
