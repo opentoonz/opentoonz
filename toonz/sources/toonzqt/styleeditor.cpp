@@ -1517,7 +1517,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 
   m_slidersContainer = new QFrame(this);
   m_vSplitter        = new QSplitter(this);
-  m_hSplitter        = new QSplitter(this);
+
   //プロパティの設定
   // channelButtonGroup->setExclusive(true);
   m_wheelShowButton->setCheckable(true);
@@ -1546,8 +1546,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 
   m_vSplitter->setOrientation(Qt::Vertical);
   m_vSplitter->setFocusPolicy(Qt::NoFocus);
-  m_hSplitter->setOrientation(Qt::Horizontal);
-  m_hSplitter->setFocusPolicy(Qt::NoFocus);
+
   // m_verticalSlider->hide();
   // m_squaredColorWheel->hide();
   // m_ghibliColorWheel->hide();
@@ -1612,8 +1611,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
     m_slidersContainer->setLayout(slidersLayout);
     m_vSplitter->addWidget(m_slidersContainer);
 
-    m_hSplitter->addWidget(m_vSplitter);
-    mainLayout->addWidget(m_hSplitter, 1);
+    mainLayout->addWidget(m_vSplitter, 1);
   }
   setLayout(mainLayout);
 
@@ -1733,20 +1731,44 @@ int PlainColorPage::getVisibleParts() {
 //-----------------------------------------------------------------------------
 
 void PlainColorPage::setIsVertical(bool isVertical) {
-  if (m_isVertical == isVertical) return;
+  // if (m_isVertical == isVertical) return;
+  // not returning even if it already is the same orientation
+  // to take advantage of the resizing here
+  // this is useful for the first time the splitter is set
+  // afterwards, it will be overridden by the saved state
+  // from settings.
   m_isVertical = isVertical;
   if (isVertical) {
-    m_vSplitter->insertWidget(0, m_wheelFrame);
+    m_vSplitter->setOrientation(Qt::Vertical);
     m_toggleOrientationButton->setText("↔");
+    QList<int> sectionSizes;
+    // maximize color wheel space
+    sectionSizes << height() - 1 << 1;
+    m_vSplitter->setSizes(sectionSizes);
   } else {
-    m_hSplitter->insertWidget(0, m_wheelFrame);
+    m_vSplitter->setOrientation(Qt::Horizontal);
     m_toggleOrientationButton->setText("↕");
+    QList<int> sectionSizes;
+    sectionSizes << width() / 2 << width() / 2;
+    m_vSplitter->setSizes(sectionSizes);
   }
 }
 
 //-----------------------------------------------------------------------------
 
 void PlainColorPage::toggleOrientation() { setIsVertical(!m_isVertical); }
+
+//-----------------------------------------------------------------------------
+
+QByteArray PlainColorPage::getSplitterState() {
+  return m_vSplitter->saveState();
+}
+
+//-----------------------------------------------------------------------------
+
+void PlainColorPage::setSplitterState(QByteArray state) {
+  m_vSplitter->restoreState(state);
+}
 
 //-----------------------------------------------------------------------------
 /*
@@ -1872,7 +1894,7 @@ void StyleChooserPage::computeSize() {
   int rowCount = 0;
   if (m_chipPerRow != 0)
     rowCount = (getChipCount() + m_chipPerRow - 1) / m_chipPerRow;
-  setMinimumSize(5 * m_chipSize.width(), rowCount * m_chipSize.height() + 10);
+  setMinimumSize(3 * m_chipSize.width(), rowCount * m_chipSize.height() + 10);
   update();
 }
 
@@ -2996,32 +3018,39 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   // For the plainColorPage and the settingsPage
   // I create a "fake" QScrollArea (without ScrollingBar
   // in order to use the styleSheet to stylish its background
-  QScrollArea *plainArea = makeChooserPageWithoutScrollBar(m_plainColorPage);
-
-  QScrollArea *textureArea        = makeChooserPage(m_textureStylePage);
+  QScrollArea *plainArea   = makeChooserPageWithoutScrollBar(m_plainColorPage);
+  QScrollArea *textureArea = makeChooserPage(m_textureStylePage);
   QScrollArea *mypaintBrushesArea = makeChooserPage(m_mypaintBrushesStylePage);
   QScrollArea *settingsArea = makeChooserPageWithoutScrollBar(m_settingsPage);
 
   QVBoxLayout *vectorLayout = new QVBoxLayout(this);
   vectorLayout->setMargin(0);
   vectorLayout->setSpacing(0);
+  vectorLayout->setSizeConstraint(QLayout::SetNoConstraint);
 
   QVBoxLayout *vectorOutsideLayout = new QVBoxLayout(this);
   vectorOutsideLayout->setMargin(0);
   vectorOutsideLayout->setSpacing(0);
+  vectorOutsideLayout->setSizeConstraint(QLayout::SetNoConstraint);
 
-  QPushButton *specialButton      = new QPushButton(tr("Generated"), this);
-  QPushButton *customButton       = new QPushButton(tr("Trail"), this);
-  QPushButton *vectorBrushButton  = new QPushButton(tr("Vector Brush"), this);
-  QHBoxLayout *vectorButtonLayout = new QHBoxLayout(this);
-  m_vectorFrame                   = new QFrame(this);
-
+  QPushButton *specialButton     = new QPushButton(tr("Generated"), this);
+  QPushButton *customButton      = new QPushButton(tr("Trail"), this);
+  QPushButton *vectorBrushButton = new QPushButton(tr("Vector Brush"), this);
   specialButton->setCheckable(true);
   customButton->setCheckable(true);
   vectorBrushButton->setCheckable(true);
   specialButton->setChecked(true);
   customButton->setChecked(true);
   vectorBrushButton->setChecked(true);
+
+  QHBoxLayout *vectorButtonLayout = new QHBoxLayout(this);
+  vectorButtonLayout->setSizeConstraint(QLayout::SetNoConstraint);
+
+  QFrame *vectorFrame = new QFrame(this);
+  vectorFrame->setMinimumWidth(50);
+
+  QFrame *vectorOutsideFrame = new QFrame(this);
+  vectorOutsideFrame->setMinimumWidth(50);
 
   vectorButtonLayout->addWidget(specialButton);
   vectorButtonLayout->addWidget(customButton);
@@ -3032,14 +3061,15 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   vectorLayout->addWidget(m_customStylePage);
   vectorLayout->addWidget(m_vectorBrushesStylePage);
 
-  m_vectorFrame->setLayout(vectorLayout);
-  m_vectorArea = makeChooserPage(m_vectorFrame);
+  vectorFrame->setLayout(vectorLayout);
+  m_vectorArea = makeChooserPage(vectorFrame);
+  m_vectorArea->setMinimumWidth(50);
   vectorOutsideLayout->addWidget(m_vectorArea);
 
-  QFrame *vectorOutsideFrame = new QFrame(this);
   vectorOutsideFrame->setLayout(vectorOutsideLayout);
   QScrollArea *vectorOutsideArea =
       makeChooserPageWithoutScrollBar(vectorOutsideFrame);
+  vectorOutsideArea->setMinimumWidth(50);
 
   m_styleChooser = new QStackedWidget(this);
   m_styleChooser->addWidget(plainArea);
@@ -3687,6 +3717,7 @@ void StyleEditor::onVectorBrushButtonToggled(bool on) {
 void StyleEditor::save(QSettings &settings) const {
   settings.setValue("isVertical", m_plainColorPage->getIsVertical());
   settings.setValue("visibleParts", m_plainColorPage->getVisibleParts());
+  settings.setValue("splitterState", m_plainColorPage->getSplitterState());
 }
 void StyleEditor::load(QSettings &settings) {
   QVariant isVertical = settings.value("isVertical");
@@ -3697,4 +3728,7 @@ void StyleEditor::load(QSettings &settings) {
   QVariant visibleParts = settings.value("visibleParts");
   if (visibleParts.canConvert(QVariant::Int))
     m_plainColorPage->setVisibleParts(visibleParts.toInt());
+  QVariant splitterState = settings.value("splitterState");
+  if (splitterState.canConvert(QVariant::ByteArray))
+    m_plainColorPage->setSplitterState(splitterState.toByteArray());
 }

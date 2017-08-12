@@ -465,7 +465,6 @@ class PlainColorPage final : public StyleEditorPage {
   QFrame *m_slidersContainer;
   QFrame *m_wheelFrame;
   QSplitter *m_vSplitter;
-  QSplitter *m_hSplitter;
 
 public:
   PlainColorPage(QWidget *parent = 0);
@@ -476,6 +475,8 @@ public:
   int getVisibleParts();
   void setIsVertical(bool isVertical);
   bool getIsVertical() { return m_isVertical; }
+  QByteArray getSplitterState();
+  void setSplitterState(QByteArray state);
 
 protected:
   void resizeEvent(QResizeEvent *) override;
@@ -640,7 +641,6 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   StyleChooserPage *m_mypaintBrushesStylePage;
   SettingsPage *m_settingsPage;
   QScrollArea *m_vectorArea;
-  QFrame *m_vectorFrame;
 
   TColorStyleP
       m_oldStyle;  //!< A copy of current style \a before the last change.
