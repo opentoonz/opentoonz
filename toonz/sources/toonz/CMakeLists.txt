@@ -149,6 +149,7 @@ set(MOC_HEADERS
     penciltestpopup.h
     locatorpopup.h
     styleshortcutswitchablepanel.h
+	cameracapturelevelcontrol.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -313,6 +314,7 @@ set(SOURCES
     audiorecordingpopup.cpp
     locatorpopup.cpp
     styleshortcutswitchablepanel.cpp
+	cameracapturelevelcontrol.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp

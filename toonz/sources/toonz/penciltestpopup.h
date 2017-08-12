@@ -28,6 +28,8 @@ class FileField;
 class IntField;
 }
 
+class CameraCaptureLevelControl;
+
 //=============================================================================
 // MyViewFinder
 //-----------------------------------------------------------------------------
@@ -168,8 +170,7 @@ class PencilTestPopup : public DVGui::Dialog {
       *m_captureButton, *m_loadImageButton;
   DVGui::FileField* m_saveInFileFld;
   FrameNumberLineEdit* m_frameNumberEdit;
-  DVGui::IntField *m_thresholdFld, *m_contrastFld, *m_brightnessFld,
-      *m_bgReductionFld, *m_onionOpacityFld, *m_timerIntervalFld;
+  DVGui::IntField *m_bgReductionFld, *m_onionOpacityFld, *m_timerIntervalFld;
 
   QTimer *m_captureTimer, *m_countdownTimer;
 
@@ -179,6 +180,8 @@ class PencilTestPopup : public DVGui::Dialog {
   QPushButton* m_captureFilterSettingsBtn;
 
   PencilTestSaveInFolderPopup* m_saveInFolderPopup;
+
+  CameraCaptureLevelControl* m_camCapLevelControl;
 
   int m_timerId;
   QString m_cacheImagePath;

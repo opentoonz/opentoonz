@@ -7,6 +7,7 @@
 #include "filebrowsermodel.h"
 #include "cellselection.h"
 #include "toonzqt/tselectionhandle.h"
+#include "cameracapturelevelcontrol.h"
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/filefield.h"
@@ -131,69 +132,40 @@ void bgReduction(QImage& srcImg, QImage& bgImg, int reduction) {
   }
 }
 
-// referenced from brightnessandcontrastpopup.cpp
-void my_compute_lut(double contrast, double brightness, std::vector<int>& lut) {
-  const int maxChannelValue          = lut.size() - 1;
-  const double half_maxChannelValueD = 0.5 * maxChannelValue;
-  const double maxChannelValueD      = maxChannelValue;
+void my_compute_lut(int black, int white, float gamma, std::vector<int>& lut) {
+  const int maxChannelValue         = lut.size() - 1;
+  const float half_maxChannelValueF = 0.5f * maxChannelValue;
+  const float maxChannelValueF      = maxChannelValue;
 
-  int i;
-  double value, nvalue, power;
+  float value;
 
   int lutSize = lut.size();
-  for (i = 0; i < lutSize; i++) {
-    value = i / maxChannelValueD;
-
-    // brightness
-    if (brightness < 0.0)
-      value = value * (1.0 + brightness);
-    else
-      value = value + ((1.0 - value) * brightness);
-
-    // contrast
-    if (contrast < 0.0) {
-      if (value > 0.5)
-        nvalue = 1.0 - value;
-      else
-        nvalue                 = value;
-      if (nvalue < 0.0) nvalue = 0.0;
-      nvalue = 0.5 * pow(nvalue * 2.0, (double)(1.0 + contrast));
-      if (value > 0.5)
-        value = 1.0 - nvalue;
-      else
-        value = nvalue;
-    } else {
-      if (value > 0.5)
-        nvalue = 1.0 - value;
-      else
-        nvalue                 = value;
-      if (nvalue < 0.0) nvalue = 0.0;
-      power =
-          (contrast == 1.0) ? half_maxChannelValueD : 1.0 / (1.0 - contrast);
-      nvalue = 0.5 * pow(2.0 * nvalue, power);
-      if (value > 0.5)
-        value = 1.0 - nvalue;
-      else
-        value = nvalue;
+  for (int i = 0; i < lutSize; i++) {
+    if (i <= black)
+      value = 0.0f;
+    else if (i >= white)
+      value = 1.0f;
+    else {
+      value = (float)(i - black) / (float)(white - black);
+      value = std::pow(value, 1.0f / gamma);
     }
 
-    lut[i] = value * maxChannelValueD;
+    lut[i] = (int)std::floor(value * maxChannelValueF);
   }
 }
 
 //-----------------------------------------------------------------------------
 
 inline void doPixGray(QRgb* pix, const std::vector<int>& lut) {
-  int gray = qGray(qRgb(lut[qRed(*pix)], lut[qGreen(*pix)], lut[qBlue(*pix)]));
+  int gray = lut[qGray(*pix)];
   *pix     = qRgb(gray, gray, gray);
 }
 
 //-----------------------------------------------------------------------------
 
-inline void doPixBinary(QRgb* pix, const std::vector<int>& lut,
-                        unsigned char threshold) {
-  int gray = qGray(qRgb(lut[qRed(*pix)], lut[qGreen(*pix)], lut[qBlue(*pix)]));
-  if ((unsigned char)gray >= threshold)
+inline void doPixBinary(QRgb* pix, int threshold) {
+  int gray = qGray(*pix);
+  if (gray >= threshold)
     gray = 255;
   else
     gray = 0;
@@ -209,34 +181,18 @@ inline void doPix(QRgb* pix, const std::vector<int>& lut) {
 
 //-----------------------------------------------------------------------------
 
-void onChange(QImage& img, int contrast, int brightness, bool doGray,
-              unsigned char threshold = 0) {
-  double b      = brightness / 127.0;
-  double c      = contrast / 127.0;
-  if (c > 1) c  = 1;
-  if (c < -1) c = -1;
-
+void onChange(QImage& img, int black, int white, float gamma, bool doGray) {
   std::vector<int> lut(TPixel32::maxChannelValue + 1);
-  my_compute_lut(c, b, lut);
+  my_compute_lut(black, white, gamma, lut);
 
   int lx = img.width(), y, ly = img.height();
 
   if (doGray) {
-    if (threshold == 0) {  // Grayscale
-      for (y = 0; y < ly; ++y) {
-        QRgb *pix = (QRgb *)img.scanLine(y), *endPix = (QRgb *)(pix + lx);
-        while (pix < endPix) {
-          doPixGray(pix, lut);
-          ++pix;
-        }
-      }
-    } else {  // Binary
-      for (y = 0; y < ly; ++y) {
-        QRgb *pix = (QRgb *)img.scanLine(y), *endPix = (QRgb *)(pix + lx);
-        while (pix < endPix) {
-          doPixBinary(pix, lut, threshold);
-          ++pix;
-        }
+    for (y = 0; y < ly; ++y) {
+      QRgb *pix = (QRgb *)img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+      while (pix < endPix) {
+        doPixGray(pix, lut);
+        ++pix;
       }
     }
   } else {  // color
@@ -246,6 +202,19 @@ void onChange(QImage& img, int contrast, int brightness, bool doGray,
         doPix(pix, lut);
         ++pix;
       }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void onChangeBW(QImage& img, int threshold) {
+  int lx = img.width(), y, ly = img.height();
+  for (y = 0; y < ly; ++y) {
+    QRgb *pix = (QRgb *)img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+    while (pix < endPix) {
+      doPixBinary(pix, threshold);
+      ++pix;
     }
   }
 }
@@ -947,10 +916,8 @@ PencilTestPopup::PencilTestPopup()
   QGroupBox* imageFrame = new QGroupBox(tr("Image adjust"), this);
   m_colorTypeCombo      = new QComboBox(this);
 
-  m_thresholdFld  = new IntField(this);
-  m_contrastFld   = new IntField(this);
-  m_brightnessFld = new IntField(this);
-  m_upsideDownCB  = new QCheckBox(tr("Upside down"), this);
+  m_camCapLevelControl = new CameraCaptureLevelControl(this);
+  m_upsideDownCB       = new QCheckBox(tr("Upside down"), this);
 
   m_bgReductionFld       = new IntField(this);
   m_captureWhiteBGButton = new QPushButton(tr("Capture white BG"), this);
@@ -993,13 +960,6 @@ PencilTestPopup::PencilTestPopup()
   imageFrame->setObjectName("CleanupSettingsFrame");
   m_colorTypeCombo->addItems({"Color", "Grayscale", "Black & White"});
   m_colorTypeCombo->setCurrentIndex(0);
-  m_thresholdFld->setRange(1, 255);
-  m_thresholdFld->setValue(128);
-  m_thresholdFld->setDisabled(true);
-  m_contrastFld->setRange(-127, 127);
-  m_contrastFld->setValue(0);
-  m_brightnessFld->setRange(-127, 127);
-  m_brightnessFld->setValue(0);
   m_upsideDownCB->setChecked(false);
 
   m_bgReductionFld->setRange(0, 100);
@@ -1130,25 +1090,15 @@ PencilTestPopup::PencilTestPopup()
                               Qt::AlignRight);
           imageLay->addWidget(m_colorTypeCombo, 0, 1);
 
-          imageLay->addWidget(new QLabel(tr("Threshold:"), this), 1, 0,
+          imageLay->addWidget(m_camCapLevelControl, 1, 0, 1, 3);
+
+          imageLay->addWidget(m_upsideDownCB, 2, 0, 1, 3, Qt::AlignLeft);
+
+          imageLay->addWidget(new QLabel(tr("BG reduction:"), this), 3, 0,
                               Qt::AlignRight);
-          imageLay->addWidget(m_thresholdFld, 1, 1, 1, 2);
+          imageLay->addWidget(m_bgReductionFld, 3, 1, 1, 2);
 
-          imageLay->addWidget(new QLabel(tr("Contrast:"), this), 2, 0,
-                              Qt::AlignRight);
-          imageLay->addWidget(m_contrastFld, 2, 1, 1, 2);
-
-          imageLay->addWidget(new QLabel(tr("Brightness:"), this), 3, 0,
-                              Qt::AlignRight);
-          imageLay->addWidget(m_brightnessFld, 3, 1, 1, 2);
-
-          imageLay->addWidget(m_upsideDownCB, 4, 0, 1, 3, Qt::AlignLeft);
-
-          imageLay->addWidget(new QLabel(tr("BG reduction:"), this), 5, 0,
-                              Qt::AlignRight);
-          imageLay->addWidget(m_bgReductionFld, 5, 1, 1, 2);
-
-          imageLay->addWidget(m_captureWhiteBGButton, 6, 0, 1, 3);
+          imageLay->addWidget(m_captureWhiteBGButton, 4, 0, 1, 3);
         }
         imageLay->setColumnStretch(0, 0);
         imageLay->setColumnStretch(1, 0);
@@ -1495,7 +1445,7 @@ void PencilTestPopup::onNextName() {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onColorTypeComboChanged(int index) {
-  m_thresholdFld->setEnabled(index == 2);
+  m_camCapLevelControl->setMode(index != 2);
 }
 
 //-----------------------------------------------------------------------------
@@ -1622,11 +1572,18 @@ void PencilTestPopup::processImage(QImage& image) {
   if (!m_whiteBGImg.isNull() && m_bgReductionFld->getValue() != 0) {
     bgReduction(image, m_whiteBGImg, m_bgReductionFld->getValue());
   }
+  // obtain histogram AFTER bg reduction
+  m_camCapLevelControl->updateHistogram(image);
 
-  int threshold =
-      (m_colorTypeCombo->currentIndex() != 2) ? 0 : m_thresholdFld->getValue();
-  onChange(image, m_contrastFld->getValue(), m_brightnessFld->getValue(),
-           m_colorTypeCombo->currentIndex() != 0, threshold);
+  // color and grayscale mode
+  if (m_colorTypeCombo->currentIndex() != 2) {
+    int black, white;
+    float gamma;
+    m_camCapLevelControl->getValues(black, white, gamma);
+    onChange(image, black, white, gamma, m_colorTypeCombo->currentIndex() != 0);
+  } else {
+    onChangeBW(image, m_camCapLevelControl->getThreshold());
+  }
 }
 
 //-----------------------------------------------------------------------------
