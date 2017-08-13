@@ -68,45 +68,6 @@ $ zypper in boost-devel cmake freeglut-devel freetype2-devel gcc-c++ glew-devel 
 $ git clone https://github.com/opentoonz/opentoonz
 ```
 
-### Copying the 'stuff' Directory
-
-TODO: some parts should really be installed in $prefix/ instead... and some other in various cache or user-local places.
-cf. https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-Until then we just follow the Win32/OSX layout.
-
-The `~/.config/OpenToonz/` directory contains your settings, work and other files.
-
-Initialize this path with the folling commands:
-
-```
-$ mkdir -p $HOME/.config/OpenToonz
-$ cp -r opentoonz/stuff $HOME/.config/OpenToonz/
-```
-
-*Currently this is required to run OpenToonz.*
-
-### Creating SystemVar.ini
-
-TODO: fix the code to discover it automatically
-
-```
-$ cat << EOF > $HOME/.config/OpenToonz/SystemVar.ini
-[General]
-OPENTOONZROOT="$HOME/.config/OpenToonz/stuff"
-OpenToonzPROFILES="$HOME/.config/OpenToonz/stuff/profiles"
-TOONZCACHEROOT="$HOME/.config/OpenToonz/stuff/cache"
-TOONZCONFIG="$HOME/.config/OpenToonz/stuff/config"
-TOONZFXPRESETS="$HOME/.config/OpenToonz/stuff/projects/fxs"
-TOONZLIBRARY="$HOME/.config/OpenToonz/stuff/library"
-TOONZPROFILES="$HOME/.config/OpenToonz/stuff/profiles"
-TOONZPROJECTS="$HOME/.config/OpenToonz/stuff/projects"
-TOONZROOT="$HOME/.config/OpenToonz/stuff"
-TOONZSTUDIOPALETTE="$HOME/.config/OpenToonz/stuff/studiopalette"
-TOONZFXPRESETS="/home/USERNAME/.config/OpenToonz/stuff/fxs"
-EOF
-```
-Note the generated file must not actually contain `$HOME`, this expands to an absolute path in the generated file.
-
 ### Building LibTIFF
 
 TODO: make sure we can use the system libtiff instead and remove this section.
@@ -154,7 +115,7 @@ If you need to debug the application, you should be able to use `cmake -DCMAKE_B
 You can now run the application:
 
 ```
-$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz_1.1
+$ ./bin/opentoonz
 ```
 
 ### Performing a System Installation
