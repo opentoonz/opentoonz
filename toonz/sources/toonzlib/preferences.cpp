@@ -493,11 +493,7 @@ Preferences::Preferences()
       ++i;
       if (newPath == path) continue;
       QString fpName = QString::fromStdWString(newPath.getWideName());
-#ifdef MACOSX
-      QString string = fpName + QString("/") + fpName + QString("_mac.qss");
-#else
       QString string = fpName + QString("/") + fpName + QString(".qss");
-#endif
       if (fpName == QString("standard")) m_currentStyleSheet = i;
       m_styleSheetMaps[i] = "file:///" + path.getQString() + "/" + string;
     }
