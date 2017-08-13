@@ -252,7 +252,7 @@ void FilmstripFrames::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void FilmstripFrames::select(int index, SelectionMode mode) {
   TXshSimpleLevel *sl = getLevel();
-
+  //m_isEditingLevel = TApp::instance()->getCurrentFrame()->isEditingLevel();
   bool outOfRange = !sl || index < 0 || index >= sl->getFrameCount();
 
   TFrameId fid;
@@ -704,6 +704,10 @@ void FilmstripFrames::drawFrameIcon(QPainter &p, const QRect &r, int index,
 //-----------------------------------------------------------------------------
 
 void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
+	//bool isEditingLevel = TApp::instance()->getCurrentFrame()->isEditingLevel();
+	//bool firstActivated = false;
+	//if (m_isEditingLevel != isEditingLevel) firstActivated = true;
+	//m_isEditingLevel = isEditingLevel;
   m_selecting  = false;
   int index    = y2index(event->pos().y());
   TFrameId fid = index2fid(index);
@@ -779,7 +783,7 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
       tapp->getCurrentFrame()->setFrameIds(fids);
       tapp->getCurrentFrame()->setFid(fid);
 
-      if (!m_selection->isSelected(fid))  // selezione semplice
+      if (!m_selection->isSelected(fid) || !m_isEditingLevel)  // selezione semplice
       {
         // click su un frame non selezionato
         m_selecting = true;  // posso estendere la selezione con il drag
@@ -883,20 +887,21 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
     // autopan
     QRect visibleRect = visibleRegion().boundingRect();
     if (pos.y() < visibleRect.top())
-      m_scrollSpeed = -(5 + (visibleRect.top() - pos.y()) / 4);
+      m_scrollSpeed = -(5 + (visibleRect.top() - pos.y()) / 2);
     else if (pos.y() > visibleRect.bottom())
-      m_scrollSpeed = (5 + (pos.y() - visibleRect.bottom()) / 4);
+      m_scrollSpeed = (5 + (pos.y() - visibleRect.bottom()) / 2);
     else
       m_scrollSpeed = 0;
-    if (m_scrollSpeed != 0)
-      startAutoPanning();
+	if (m_scrollSpeed != 0) {
+		startAutoPanning();
+	}
     else
       stopAutoPanning();
     update();
   } else if (e->buttons() & Qt::MidButton) {
     // scroll con il tasto centrale
     pos = e->globalPos();
-    scroll(m_pos.y() - pos.y());
+    scroll((m_pos.y() - pos.y()) * 10);
     m_pos = pos;
   }
 }

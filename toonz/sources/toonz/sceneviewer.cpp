@@ -855,6 +855,7 @@ void SceneViewer::showEvent(QShowEvent *) {
     fitToCamera();
     m_shownOnce = true;
   }
+  TApp::instance()->setActiveViewer(this);
 }
 
 //-----------------------------------------------------------------------------

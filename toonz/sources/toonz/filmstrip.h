@@ -166,7 +166,8 @@ private:
   FilmstripFrameHeadGadget *m_frameHeadGadget;
   InbetweenDialog *m_inbetweenDialog;
   SceneViewer *m_viewer;
-  bool m_isGhibli;
+  bool m_isGhibli = false;
+  bool m_isEditingLevel = false;
   // State data
 
   QPoint m_pos;  //!< Last mouse position.
