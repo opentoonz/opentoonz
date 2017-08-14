@@ -408,6 +408,8 @@ void FilmstripFrames::hideEvent(QHideEvent *) {
   }
 }
 
+//-----------------------------------------------------------------------------
+
 void FilmstripFrames::getViewer() {
   bool viewerChanged = false;
   if (m_viewer && m_viewer != TApp::instance()->getActiveViewer()) {
@@ -415,7 +417,6 @@ void FilmstripFrames::getViewer() {
     disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
     viewerChanged = true;
   }
-  if (m_viewer && !viewerChanged) return;
   ComboViewerPanel *inknPaintViewerPanel =
       TApp::instance()->getInknPaintViewerPanel();
   if (m_isGhibli && inknPaintViewerPanel) {
