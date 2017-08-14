@@ -85,7 +85,7 @@ public:
   void updateContentHeight(int minimumHeight = -1);
 
   // makes sure that the indexed frame is visible (scrolling if necessary)
-  void exponeFrame(int index);
+  void showFrame(int index);
 
   // esegue uno scroll di dy pixel. se dy<0 fa scorrere i fotogrammi verso
   // l'alto
@@ -123,13 +123,15 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *) override;
+  void enterEvent(QEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
 
   void startAutoPanning();
   void stopAutoPanning();
   void timerEvent(QTimerEvent *) override;
-
+  TFrameId getCurrentFrameId();
+  void getViewer();
   void contextMenuEvent(QContextMenuEvent *event) override;
 
   void startDragDrop();
@@ -164,10 +166,11 @@ private:
   FilmstripFrameHeadGadget *m_frameHeadGadget;
   InbetweenDialog *m_inbetweenDialog;
   SceneViewer *m_viewer;
-  bool m_isGhibli = false;
-  bool m_justStartedSelection = false;
+  bool m_isGhibli              = false;
+  bool m_justStartedSelection  = false;
   int m_indexForResetSelection = -1;
-  bool m_allowResetSelection = false;
+  bool m_allowResetSelection   = false;
+  int m_timerInterval          = 100;
   // State data
 
   QPoint m_pos;  //!< Last mouse position.

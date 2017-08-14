@@ -197,13 +197,9 @@ public:
     return m_inknPaintViewerPanel;
   }
 
-  void setActiveViewer(SceneViewer *viewer) {
-	  m_activeViewer = viewer;
-  }
+  void setActiveViewer(SceneViewer *viewer) { m_activeViewer = viewer; }
 
-  SceneViewer *getActiveViewer() const {
-	  return m_activeViewer;
-  }
+  SceneViewer *getActiveViewer() const { return m_activeViewer; }
 
   bool isApplicationStarting() { return m_isStarting; }
 

@@ -112,7 +112,7 @@ FilmstripFrames::FilmstripFrames(QScrollArea *parent, Qt::WFlags flags)
     , m_dragSelectionStartIndex(-1)
     , m_dragSelectionEndIndex(-1)
     , m_timerId(0)
-	, m_isGhibli(false)
+    , m_isGhibli(false)
     , m_selecting(false)
     , m_dragDropArmed(false)
     , m_readOnly(false) {
@@ -132,17 +132,10 @@ FilmstripFrames::FilmstripFrames(QScrollArea *parent, Qt::WFlags flags)
   m_selection->setView(this);
   setMouseTracking(true);
 
-  ComboViewerPanel *inknPaintViewerPanel =
-	  TApp::instance()->getInknPaintViewerPanel();
-  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
+  std::string room =
+      Preferences::instance()->getCurrentRoomChoice().toStdString();
   m_isGhibli = room == "StudioGhibli";
-  
-  if (m_isGhibli && inknPaintViewerPanel) {
-	  m_viewer = inknPaintViewerPanel->getSceneViewer();
-  }
-  else {
-	  m_viewer = TApp::instance()->getActiveViewer();
-  }
+  m_viewer   = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -221,12 +214,14 @@ void FilmstripFrames::updateContentHeight(int minimumHeight) {
 
 //-----------------------------------------------------------------------------
 
-void FilmstripFrames::exponeFrame(int index) {
+void FilmstripFrames::showFrame(int index) {
+  TXshSimpleLevel *level = getLevel();
+
+  if (!level->isFid(index2fid(index))) return;
   int y0 = index2y(index);
   int y1 = y0 + m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop +
            fs_iconMarginBottom;
   if (y1 > height()) setFixedHeight(y1);
-  // else if(height()-y1>=m_iconSize.height()) updateContentHeight();
   m_scrollArea->ensureVisible(0, (y0 + y1) / 2, 50, (y1 - y0) / 2);
 }
 
@@ -235,11 +230,11 @@ void FilmstripFrames::exponeFrame(int index) {
 void FilmstripFrames::scroll(int dy) {
   QScrollBar *sb = m_scrollArea->verticalScrollBar();
   int sbValue    = sb->value();
-  
+
   updateContentHeight(getFramesHeight());
   if (sbValue + dy > getFramesHeight()) {
-	  sb->setValue(getFramesHeight());
-	  return;
+    sb->setValue(getFramesHeight());
+    return;
   }
   sb->setValue(sbValue + dy);
 }
@@ -255,7 +250,6 @@ void FilmstripFrames::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void FilmstripFrames::select(int index, SelectionMode mode) {
   TXshSimpleLevel *sl = getLevel();
-  //m_isEditingLevel = TApp::instance()->getCurrentFrame()->isEditingLevel();
   bool outOfRange = !sl || index < 0 || index >= sl->getFrameCount();
 
   TFrameId fid;
@@ -383,23 +377,7 @@ void FilmstripFrames::showEvent(QShowEvent *) {
   connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
           SLOT(update()));
 
-
-
-  ComboViewerPanel *inknPaintViewerPanel =
-	  TApp::instance()->getInknPaintViewerPanel();
-  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
-  m_isGhibli = room == "StudioGhibli";
-
-  if (m_isGhibli && inknPaintViewerPanel) {
-	  m_viewer = inknPaintViewerPanel->getSceneViewer();
-  }
-  else {
-	  m_viewer = TApp::instance()->getActiveViewer();
-  }
-  if (m_viewer) {
-      connect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
-      connect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
-  }
+  getViewer();
 }
 
 //-----------------------------------------------------------------------------
@@ -424,21 +402,31 @@ void FilmstripFrames::hideEvent(QHideEvent *) {
   disconnect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
              SLOT(update()));
 
-  ComboViewerPanel *inknPaintViewerPanel = app->getInknPaintViewerPanel();
+  if (m_viewer) {
+    disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
+    disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+  }
+}
 
-  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
-  m_isGhibli = room == "StudioGhibli";
-
+void FilmstripFrames::getViewer() {
+  bool viewerChanged = false;
+  if (m_viewer && m_viewer != TApp::instance()->getActiveViewer()) {
+    disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
+    disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+    viewerChanged = true;
+  }
+  if (m_viewer && !viewerChanged) return;
+  ComboViewerPanel *inknPaintViewerPanel =
+      TApp::instance()->getInknPaintViewerPanel();
   if (m_isGhibli && inknPaintViewerPanel) {
-	  m_viewer = inknPaintViewerPanel->getSceneViewer();
+    m_viewer = inknPaintViewerPanel->getSceneViewer();
+  } else {
+    m_viewer = TApp::instance()->getActiveViewer();
   }
-  else {
-	  m_viewer = TApp::instance()->getActiveViewer();
+  if (m_viewer) {
+    connect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
+    connect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
   }
-    if (m_viewer) {
-      disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
-      disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -487,69 +475,57 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
   //--- compute navigator rect ---
 
   QRect naviRect;
-  ComboViewerPanel *inknPaintViewerPanel =
-	  TApp::instance()->getInknPaintViewerPanel();
-  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
-  m_isGhibli = room == "StudioGhibli";
-  if (!m_viewer || m_viewer != TApp::instance()->getActiveViewer()) {
-	  if (m_isGhibli && inknPaintViewerPanel) {
-		  m_viewer = inknPaintViewerPanel->getSceneViewer();
-	  }
-	  else {
-		  m_viewer = TApp::instance()->getActiveViewer();
-	  }
-  }
-  if ((sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL) && m_viewer  && m_viewer->isVisible()) {
-    // show navigator only if the inknpaint viewer is visible
-      
-      // imgSize: image's pixel size
-      QSize imgSize(sl->getProperties()->getImageRes().lx,
-                    sl->getProperties()->getImageRes().ly);
-      // Viewer affine
-      TAffine viewerAff = m_viewer->getViewMatrix();
-      // pixel size which will be displayed with 100% scale in Viewer Stage
-      TFrameId currentId = TApp::instance()->getCurrentFrame()->getFid();
-      double imgPixelWidth =
-          (double)(imgSize.width()) / sl->getDpi(currentId).x * Stage::inch;
-      double imgPixelHeight =
-          (double)(imgSize.height()) / sl->getDpi(currentId).y * Stage::inch;
 
-      // get the image's corner positions in viewer matrix (with current zoom
-      // scale)
-      TPointD imgTopRight =
-          viewerAff * TPointD(imgPixelWidth / 2.0f, imgPixelHeight / 2.0f);
-      TPointD imgBottomLeft =
-          viewerAff * TPointD(-imgPixelWidth / 2.0f, -imgPixelHeight / 2.0f);
+  if ((sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL) &&
+      m_viewer && m_viewer->isVisible()) {
+    // imgSize: image's pixel size
+    QSize imgSize(sl->getProperties()->getImageRes().lx,
+                  sl->getProperties()->getImageRes().ly);
+    // Viewer affine
+    TAffine viewerAff = m_viewer->getViewMatrix();
+    // pixel size which will be displayed with 100% scale in Viewer Stage
+    TFrameId currentId = TApp::instance()->getCurrentFrame()->getFid();
+    double imgPixelWidth =
+        (double)(imgSize.width()) / sl->getDpi(currentId).x * Stage::inch;
+    double imgPixelHeight =
+        (double)(imgSize.height()) / sl->getDpi(currentId).y * Stage::inch;
 
-      // pixel size in viewer matrix ( with current zoom scale )
-      QSizeF imgSizeInViewer(imgTopRight.x - imgBottomLeft.x,
-                             imgTopRight.y - imgBottomLeft.y);
+    // get the image's corner positions in viewer matrix (with current zoom
+    // scale)
+    TPointD imgTopRight =
+        viewerAff * TPointD(imgPixelWidth / 2.0f, imgPixelHeight / 2.0f);
+    TPointD imgBottomLeft =
+        viewerAff * TPointD(-imgPixelWidth / 2.0f, -imgPixelHeight / 2.0f);
 
-      // ratio of the Viewer frame's position and size
-      QRectF naviRatio(
-          (-(float)m_viewer->width() * 0.5f - (float)imgBottomLeft.x) /
-              imgSizeInViewer.width(),
-          1.0f -
-              ((float)m_viewer->height() * 0.5f - (float)imgBottomLeft.y) /
-                  imgSizeInViewer.height(),
-          (float)m_viewer->width() / imgSizeInViewer.width(),
-          (float)m_viewer->height() / imgSizeInViewer.height());
+    // pixel size in viewer matrix ( with current zoom scale )
+    QSizeF imgSizeInViewer(imgTopRight.x - imgBottomLeft.x,
+                           imgTopRight.y - imgBottomLeft.y);
 
-      naviRect = QRect(iconImgRect.left() +
-                           (int)(naviRatio.left() * (float)iconImgRect.width()),
-                       iconImgRect.top() +
-                           (int)(naviRatio.top() * (float)iconImgRect.height()),
-                       (int)((float)iconImgRect.width() * naviRatio.width()),
-                       (int)((float)iconImgRect.height() * naviRatio.height()));
-      // for drag move
-      m_naviRectPos = naviRect.center();
+    // ratio of the Viewer frame's position and size
+    QRectF naviRatio(
+        (-(float)m_viewer->width() * 0.5f - (float)imgBottomLeft.x) /
+            imgSizeInViewer.width(),
+        1.0f -
+            ((float)m_viewer->height() * 0.5f - (float)imgBottomLeft.y) /
+                imgSizeInViewer.height(),
+        (float)m_viewer->width() / imgSizeInViewer.width(),
+        (float)m_viewer->height() / imgSizeInViewer.height());
 
-      naviRect = naviRect.intersected(frameRect);
+    naviRect = QRect(iconImgRect.left() +
+                         (int)(naviRatio.left() * (float)iconImgRect.width()),
+                     iconImgRect.top() +
+                         (int)(naviRatio.top() * (float)iconImgRect.height()),
+                     (int)((float)iconImgRect.width() * naviRatio.width()),
+                     (int)((float)iconImgRect.height() * naviRatio.height()));
+    // for drag move
+    m_naviRectPos = naviRect.center();
 
-      m_icon2ViewerRatio.setX(imgSizeInViewer.width() /
-                              (float)iconImgRect.width());
-      m_icon2ViewerRatio.setY(imgSizeInViewer.height() /
-                              (float)iconImgRect.height());
+    naviRect = naviRect.intersected(frameRect);
+
+    m_icon2ViewerRatio.setX(imgSizeInViewer.width() /
+                            (float)iconImgRect.width());
+    m_icon2ViewerRatio.setY(imgSizeInViewer.height() /
+                            (float)iconImgRect.height());
   }
 
   //--- compute navigator rect end ---
@@ -583,15 +559,13 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
     QRect tmp_iconImgRect =
         iconImgRect.translated(QPoint(0, oneFrameHeight * i));
     QRect tmp_frameRect = frameRect.translated(QPoint(0, oneFrameHeight * i));
-
     bool isCurrentFrame =
         (i == sl->fid2index(TApp::instance()->getCurrentFrame()->getFid()));
     bool isSelected =
         (0 <= i && i < frameCount && m_selection->isSelected(fids[i]));
-
+    TFrameId fid;
     if (0 <= i && i < frameCount) {
-      TFrameId fid = fids[i];
-
+      fid = fids[i];
       // normal or inbetween (for vector levels)
       int flags = (sl->getType() == PLI_XSHLEVEL && range.first < fid &&
                    fid < range.second)
@@ -646,7 +620,7 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
     }
 
     // navigator rect
-    if (naviRect.isValid() && isCurrentFrame) {
+    if (naviRect.isValid() && fid == getCurrentFrameId()) {
       p.setPen(QPen(Qt::red, 1));
       p.drawRect(naviRect.translated(0, oneFrameHeight * i));
       p.setPen(Qt::NoPen);
@@ -704,75 +678,71 @@ void FilmstripFrames::drawFrameIcon(QPainter &p, const QRect &r, int index,
   }
 }
 
+void FilmstripFrames::enterEvent(QEvent *event) { getViewer(); }
+
+//-----------------------------------------------------------------------------
+
+TFrameId FilmstripFrames::getCurrentFrameId() {
+  TApp *app        = TApp::instance();
+  TFrameHandle *fh = app->getCurrentFrame();
+  TFrameId currFid;
+  if (fh->isEditingLevel())
+    currFid = fh->getFid();
+  else {
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    int col      = app->getCurrentColumn()->getColumnIndex();
+    int row      = fh->getFrame();
+    if (row < 0 || col < 0) return TFrameId();
+    TXshCell cell = xsh->getCell(row, col);
+    // if (cell.isEmpty()) return;
+    currFid = cell.getFrameId();
+  }
+  return currFid;
+}
+
 //-----------------------------------------------------------------------------
 
 void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
-	//bool isEditingLevel = TApp::instance()->getCurrentFrame()->isEditingLevel();
-	//bool firstActivated = false;
-	//if (m_isEditingLevel != isEditingLevel) firstActivated = true;
-	//m_isEditingLevel = isEditingLevel;
   m_selecting  = false;
   int index    = y2index(event->pos().y());
   TFrameId fid = index2fid(index);
-  //bool alreadySelected = m_selection->isSelected(fid);
-  
+
   TXshSimpleLevel *sl = getLevel();
   int i0              = y2index(0);
   int frameHeight = m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop +
                     fs_iconMarginBottom;
   QPoint clickedPos = event->pos() - QPoint(0, (index - i0) * frameHeight);
-  bool actualIconClicked = QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
-	  fs_frameSpacing / 2 +
-	  fs_iconMarginTop)  //<- top-left position of the icon
-	  ,
-	  m_iconSize)
-	  .contains(clickedPos);
+  bool actualIconClicked =
+      QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
+                   fs_frameSpacing / 2 +
+                       fs_iconMarginTop)  //<- top-left position of the icon
+            ,
+            m_iconSize)
+          .contains(clickedPos);
 
-
-  if (event->button() == Qt::LeftButton) {
-	// return if frame empty
-	  if (fid == TFrameId()) {
-		  m_justStartedSelection = false;
-		  return;
-	  }
-
-
+  if (event->button() == Qt::LeftButton ||
+      event->button() == Qt::MiddleButton) {
     // navigator pan
-	// should be it's own function?
-	bool viewerChanged = false;
-	if (m_viewer && m_viewer != TApp::instance()->getActiveViewer()) {
-		disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
-		disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
-		viewerChanged = true;
-	}
-	ComboViewerPanel *inknPaintViewerPanel =
-		TApp::instance()->getInknPaintViewerPanel();
-	std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
-	m_isGhibli = room == "StudioGhibli";
-
-	if (m_isGhibli && inknPaintViewerPanel) {
-		m_viewer = inknPaintViewerPanel->getSceneViewer();
-	}
-	else {
-		m_viewer = TApp::instance()->getActiveViewer();
-	}
-	if (m_viewer) {
-		connect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
-		connect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
-	}
-
-	// make sure the viewer is visible and that a toonz raster or raster level is current
-    if (fid == TApp::instance()->getCurrentFrame()->getFid() &&
-        (sl->getType() == TZP_XSHLEVEL || sl->getType() ==OVL_XSHLEVEL) && m_viewer &&
-        m_viewer->isVisible() && actualIconClicked) {
+    // make sure the viewer is visible and that a toonz raster or raster level
+    // is current
+    if (fid == getCurrentFrameId() &&
+        (sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL) &&
+        m_viewer && m_viewer->isVisible() && actualIconClicked &&
+        (m_isGhibli != (event->button() == Qt::MiddleButton))) {
       m_isNavigatorPanning = true;
       execNavigatorPan(event->pos());
       QApplication::setOverrideCursor(Qt::ClosedHandCursor);
     } else
       m_isNavigatorPanning = false;
-	// end of navigator section
+    // end of navigator section
 
-	// with shift or control
+    // return if frame empty or middle button pressed
+    if (fid == TFrameId() || event->button() == Qt::MiddleButton) {
+      m_justStartedSelection = false;
+      return;
+    }
+
+    // with shift or control
     if (event->modifiers() & Qt::ShiftModifier) {
       select(index, SHIFT_SELECT);
       if (m_selection->isSelected(fid)) {
@@ -799,30 +769,27 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
       tapp->getCurrentFrame()->setFrameIds(fids);
       tapp->getCurrentFrame()->setFid(fid);
 
-      if (actualIconClicked && (!m_selection->isSelected(fid) || m_justStartedSelection))  
-      {
-        // click on a non-selected frame 
+      if (actualIconClicked &&
+          (!m_selection->isSelected(fid) || m_justStartedSelection)) {
+        // click on a non-selected frame
         m_selecting = true;  // allow drag-select
         select(index, START_DRAG_SELECT);
       } else if (m_selection->isSelected(fid)) {
-		// if it's already selected - it can be drag and dropped
+        // if it's already selected - it can be drag and dropped
         m_dragDropArmed = true;
         m_pos           = event->pos();
-		// allow a the frame to be reselected if the mouse isn't moved far
-		// this is to enable a group selection to become a single selection
-		// m_resetSelectArea = QRect(m_pos.rx() - 5, m_pos.ry() - 5, 20, 20);
-		m_allowResetSelection = true;
-		m_indexForResetSelection = index;
-	  } else if (!actualIconClicked) {
-		  // this allows clicking the frame number to trigger a instant drag
-		  select(index, ONLY_SELECT);
-		  m_dragDropArmed = true;
-		  m_pos = event->pos();
-	  }
+        // allow a the frame to be reselected if the mouse isn't moved far
+        // this is to enable a group selection to become a single selection
+        m_allowResetSelection    = true;
+        m_indexForResetSelection = index;
+      } else if (!actualIconClicked) {
+        // this allows clicking the frame number to trigger an instant drag
+        select(index, ONLY_SELECT);
+        m_dragDropArmed = true;
+        m_pos           = event->pos();
+      }
     }
     update();
-  } else if (event->button() == Qt::MidButton) {
-    m_pos = event->globalPos();
   } else if (event->button() == Qt::RightButton) {
     select(index);
   }
@@ -840,7 +807,7 @@ void FilmstripFrames::execNavigatorPan(const QPoint &point) {
                     fs_iconMarginBottom;
   QPoint clickedPos = point - QPoint(0, (index - i0) * frameHeight);
 
-  if (fid != TApp::instance()->getCurrentFrame()->getFid()) return;
+  if (fid != getCurrentFrameId()) return;
 
   QRect iconRect =
       QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
@@ -860,19 +827,7 @@ void FilmstripFrames::execNavigatorPan(const QPoint &point) {
   delta.setX(delta.x() * m_icon2ViewerRatio.x());
   delta.setY(delta.y() * m_icon2ViewerRatio.y());
 
-  ComboViewerPanel *inknPaintViewerPanel =
-	  TApp::instance()->getInknPaintViewerPanel();
-  std::string room = Preferences::instance()->getCurrentRoomChoice().toStdString();
-  m_isGhibli = room == "StudioGhibli";
-
-  if (m_isGhibli && inknPaintViewerPanel) {
-	  m_viewer = inknPaintViewerPanel->getSceneViewer();
-  }
-  else {
-	  m_viewer = TApp::instance()->getActiveViewer();
-  }
   if (m_viewer) m_viewer->navigatorPan(delta.toPoint());
-
 }
 
 //-----------------------------------------------------------------------------
@@ -883,10 +838,10 @@ void FilmstripFrames::mouseReleaseEvent(QMouseEvent *e) {
   m_dragDropArmed      = false;
   m_isNavigatorPanning = false;
   if (m_allowResetSelection) {
-	  select(m_indexForResetSelection, ONLY_SELECT);
-	  update();
+    select(m_indexForResetSelection, ONLY_SELECT);
+    update();
   }
-  m_allowResetSelection = false;
+  m_allowResetSelection    = false;
   m_indexForResetSelection = -1;
   QApplication::restoreOverrideCursor();
 }
@@ -896,19 +851,19 @@ void FilmstripFrames::mouseReleaseEvent(QMouseEvent *e) {
 void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
   QPoint pos = e->pos();
   int index  = y2index(e->pos().y());
-  if (e->buttons() & Qt::LeftButton) {
+  if (e->buttons() & Qt::LeftButton || e->buttons() & Qt::MiddleButton) {
     // navigator pan
     if (m_isNavigatorPanning) {
       execNavigatorPan(e->pos());
       e->accept();
       return;
     }
-
+    if (e->buttons() & Qt::MiddleButton) return;
     if (m_dragDropArmed) {
       if ((m_pos - e->pos()).manhattanLength() > 10) {
         startDragDrop();
-        m_dragDropArmed = false;
-		m_allowResetSelection = false;
+        m_dragDropArmed       = false;
+        m_allowResetSelection = false;
       }
     } else if (m_selecting) {
       m_pos = e->globalPos();
@@ -916,27 +871,34 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
     }
 
     // autopan
-	int slowSpeed = getOneFrameHeight() / 4;
-	int fastSpeed = getOneFrameHeight() / 2;
+    int speed = getOneFrameHeight() / 64;
+
     QRect visibleRect = visibleRegion().boundingRect();
-	int visibleTop = visibleRect.top();
-	int visibleBottom = visibleRect.bottom();
-	if (pos.y() < visibleRect.top()) {
-		if (visibleRect.top() - pos.y() > 20) m_scrollSpeed = -fastSpeed;
-		else m_scrollSpeed = -slowSpeed;
-		//m_scrollSpeed = -(5 + (visibleRect.top() - pos.y()) / 2);
-	}
-	else if (pos.y() > visibleRect.bottom()) {
-		if (pos.y() - visibleRect.bottom() > 20) m_scrollSpeed = fastSpeed;
-		else m_scrollSpeed = slowSpeed;
-		//m_scrollSpeed = (5 + (pos.y() - visibleRect.bottom()) / 2);
-	}
-    else
+    int visibleTop    = visibleRect.top();
+    int visibleBottom = visibleRect.bottom();
+    if (pos.y() < visibleRect.top()) {
+      m_scrollSpeed = -speed;
+      if (visibleRect.top() - pos.y() > 30) {
+        m_timerInterval = 50;
+      } else if (visibleRect.top() - pos.y() > 15) {
+        m_timerInterval = 150;
+      } else {
+        m_timerInterval = 300;
+      }
+    } else if (pos.y() > visibleRect.bottom()) {
+      m_scrollSpeed = speed;
+      if (pos.y() - visibleRect.bottom() > 30) {
+        m_timerInterval = 50;
+      } else if (pos.y() - visibleRect.bottom() > 15) {
+        m_timerInterval = 150;
+      } else {
+        m_timerInterval = 300;
+      }
+    } else
       m_scrollSpeed = 0;
-	if (m_scrollSpeed != 0) {
-		startAutoPanning();
-	}
-    else
+    if (m_scrollSpeed != 0) {
+      startAutoPanning();
+    } else
       stopAutoPanning();
     update();
   } else if (e->buttons() & Qt::MidButton) {
@@ -984,7 +946,7 @@ void FilmstripFrames::keyPressEvent(QKeyEvent *event) {
   m_selection->selectNone();
   if (getLevel()) m_selection->select(fh->getFid());
   int index = fid2index(fh->getFid());
-  if (index >= 0) exponeFrame(index);
+  if (index >= 0) showFrame(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -996,7 +958,7 @@ void FilmstripFrames::wheelEvent(QWheelEvent *event) {
 //-----------------------------------------------------------------------------
 
 void FilmstripFrames::startAutoPanning() {
-  if (m_timerId == 0) m_timerId = startTimer(40);
+  if (m_timerId == 0) m_timerId = startTimer(m_timerInterval);
 }
 
 //-----------------------------------------------------------------------------
@@ -1013,11 +975,15 @@ void FilmstripFrames::stopAutoPanning() {
 
 void FilmstripFrames::timerEvent(QTimerEvent *) {
   scroll(m_scrollSpeed);
-
+  // reset the timer in case m_scroll speed has changed
+  killTimer(m_timerId);
+  m_timerId = 0;
+  m_timerId = startTimer(m_timerInterval);
   if (m_selecting) {
     QPoint pos = mapFromGlobal(m_pos);
     int index  = y2index(pos.y());
     select(index, DRAG_SELECT);
+    showFrame(index);
     update();
   }
 }
@@ -1093,28 +1059,18 @@ void FilmstripFrames::onFrameSwitched() {
   // m_selection->selectNone();
   TApp *app        = TApp::instance();
   TFrameHandle *fh = app->getCurrentFrame();
-  TFrameId fid;
-  if (fh->isEditingLevel())
-    fid = fh->getFid();
-  else {
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-    int col      = app->getCurrentColumn()->getColumnIndex();
-    int row      = fh->getFrame();
-    if (row < 0 || col < 0) return;
-    TXshCell cell = xsh->getCell(row, col);
-    if (cell.isEmpty()) return;
-    fid = cell.getFrameId();
-  }
+  TFrameId fid     = getCurrentFrameId();
+
   int index = fid2index(fid);
   if (index >= 0) {
-    exponeFrame(index);
+    showFrame(index);
     // clear selection and select only the destination frame
 
-	// don't select if already selected - may be part of a group selection
-	if (!m_selection->isSelected(index2fid(index))) {
-		select(index, ONLY_SELECT);
-		m_justStartedSelection = true;
-	}
+    // don't select if already selected - may be part of a group selection
+    if (!m_selection->isSelected(index2fid(index))) {
+      select(index, ONLY_SELECT);
+      m_justStartedSelection = true;
+    }
   }
   update();
 }

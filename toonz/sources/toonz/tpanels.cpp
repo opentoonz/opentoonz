@@ -1053,7 +1053,7 @@ public:
     Filmstrip *filmstrip = new Filmstrip(panel);
     panel->setWidget(filmstrip);
     panel->setIsMaximizable(false);
-    //panel->setFixedWidth(Preferences::instance()->getIconSize().lx + 40);
+    panel->setFixedWidth(Preferences::instance()->getIconSize().lx + 40);
   }
 } filmStripFactory;
 //=============================================================================
