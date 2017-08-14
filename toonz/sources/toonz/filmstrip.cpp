@@ -235,9 +235,12 @@ void FilmstripFrames::exponeFrame(int index) {
 void FilmstripFrames::scroll(int dy) {
   QScrollBar *sb = m_scrollArea->verticalScrollBar();
   int sbValue    = sb->value();
-  int y          = visibleRegion().boundingRect().bottom() + dy + 1;
-  if (y < 0) y   = 0;
-  updateContentHeight(y);
+  
+  updateContentHeight(getFramesHeight());
+  if (sbValue + dy > getFramesHeight()) {
+	  sb->setValue(getFramesHeight());
+	  return;
+  }
   sb->setValue(sbValue + dy);
 }
 
@@ -711,22 +714,36 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
   m_selecting  = false;
   int index    = y2index(event->pos().y());
   TFrameId fid = index2fid(index);
-
+  //bool alreadySelected = m_selection->isSelected(fid);
+  
   TXshSimpleLevel *sl = getLevel();
   int i0              = y2index(0);
   int frameHeight = m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop +
                     fs_iconMarginBottom;
   QPoint clickedPos = event->pos() - QPoint(0, (index - i0) * frameHeight);
+  bool actualIconClicked = QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
+	  fs_frameSpacing / 2 +
+	  fs_iconMarginTop)  //<- top-left position of the icon
+	  ,
+	  m_iconSize)
+	  .contains(clickedPos);
+
 
   if (event->button() == Qt::LeftButton) {
-    if (fid == TFrameId()) return;
+	// return if frame empty
+	  if (fid == TFrameId()) {
+		  m_justStartedSelection = false;
+		  return;
+	  }
 
 
     // navigator pan
+	// should be it's own function?
 	bool viewerChanged = false;
 	if (m_viewer && m_viewer != TApp::instance()->getActiveViewer()) {
 		disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
 		disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+		viewerChanged = true;
 	}
 	ComboViewerPanel *inknPaintViewerPanel =
 		TApp::instance()->getInknPaintViewerPanel();
@@ -743,32 +760,31 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
 		connect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
 		connect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
 	}
+
+	// make sure the viewer is visible and that a toonz raster or raster level is current
     if (fid == TApp::instance()->getCurrentFrame()->getFid() &&
         (sl->getType() == TZP_XSHLEVEL || sl->getType() ==OVL_XSHLEVEL) && m_viewer &&
-        m_viewer->isVisible() &&
-        QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
-                     fs_frameSpacing / 2 +
-                         fs_iconMarginTop)  //<- top-left position of the icon
-              ,
-              m_iconSize)
-            .contains(clickedPos)) {
+        m_viewer->isVisible() && actualIconClicked) {
       m_isNavigatorPanning = true;
       execNavigatorPan(event->pos());
       QApplication::setOverrideCursor(Qt::ClosedHandCursor);
     } else
       m_isNavigatorPanning = false;
+	// end of navigator section
 
+	// with shift or control
     if (event->modifiers() & Qt::ShiftModifier) {
       select(index, SHIFT_SELECT);
       if (m_selection->isSelected(fid)) {
-        // click su di un frame gia' selezionato. Puo' essere l'inizio di un
+        // If the frame is already selected enable
         // drag'n'drop
         m_dragDropArmed = true;
         m_pos           = event->pos();
       }
     } else if (event->modifiers() & Qt::ControlModifier)
       select(index, CTRL_SELECT);
-    // inbetween
+
+    // was the inbetween button clicked?
     else if (sl->getType() == PLI_XSHLEVEL &&
              m_selection->isInInbetweenRange(fid) &&
              event->pos().x() > width() - 20 - fs_rightMargin) {
@@ -783,25 +799,34 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
       tapp->getCurrentFrame()->setFrameIds(fids);
       tapp->getCurrentFrame()->setFid(fid);
 
-      if (!m_selection->isSelected(fid) || !m_isEditingLevel)  // selezione semplice
+      if (actualIconClicked && (!m_selection->isSelected(fid) || m_justStartedSelection))  
       {
-        // click su un frame non selezionato
-        m_selecting = true;  // posso estendere la selezione con il drag
+        // click on a non-selected frame 
+        m_selecting = true;  // allow drag-select
         select(index, START_DRAG_SELECT);
       } else if (m_selection->isSelected(fid)) {
-        // click su di un frame gia' selezionato. Puo' essere l'inizio di un
-        // drag'n'drop
+		// if it's already selected - it can be drag and dropped
         m_dragDropArmed = true;
         m_pos           = event->pos();
-      }
+		// allow a the frame to be reselected if the mouse isn't moved far
+		// this is to enable a group selection to become a single selection
+		// m_resetSelectArea = QRect(m_pos.rx() - 5, m_pos.ry() - 5, 20, 20);
+		m_allowResetSelection = true;
+		m_indexForResetSelection = index;
+	  } else if (!actualIconClicked) {
+		  // this allows clicking the frame number to trigger a instant drag
+		  select(index, ONLY_SELECT);
+		  m_dragDropArmed = true;
+		  m_pos = event->pos();
+	  }
     }
     update();
   } else if (event->button() == Qt::MidButton) {
     m_pos = event->globalPos();
-    return;
   } else if (event->button() == Qt::RightButton) {
     select(index);
   }
+  m_justStartedSelection = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -852,12 +877,17 @@ void FilmstripFrames::execNavigatorPan(const QPoint &point) {
 
 //-----------------------------------------------------------------------------
 
-void FilmstripFrames::mouseReleaseEvent(QMouseEvent *) {
+void FilmstripFrames::mouseReleaseEvent(QMouseEvent *e) {
   stopAutoPanning();
   m_selecting          = false;
   m_dragDropArmed      = false;
   m_isNavigatorPanning = false;
-
+  if (m_allowResetSelection) {
+	  select(m_indexForResetSelection, ONLY_SELECT);
+	  update();
+  }
+  m_allowResetSelection = false;
+  m_indexForResetSelection = -1;
   QApplication::restoreOverrideCursor();
 }
 
@@ -878,6 +908,7 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
       if ((m_pos - e->pos()).manhattanLength() > 10) {
         startDragDrop();
         m_dragDropArmed = false;
+		m_allowResetSelection = false;
       }
     } else if (m_selecting) {
       m_pos = e->globalPos();
@@ -885,11 +916,21 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
     }
 
     // autopan
+	int slowSpeed = getOneFrameHeight() / 4;
+	int fastSpeed = getOneFrameHeight() / 2;
     QRect visibleRect = visibleRegion().boundingRect();
-    if (pos.y() < visibleRect.top())
-      m_scrollSpeed = -(5 + (visibleRect.top() - pos.y()) / 2);
-    else if (pos.y() > visibleRect.bottom())
-      m_scrollSpeed = (5 + (pos.y() - visibleRect.bottom()) / 2);
+	int visibleTop = visibleRect.top();
+	int visibleBottom = visibleRect.bottom();
+	if (pos.y() < visibleRect.top()) {
+		if (visibleRect.top() - pos.y() > 20) m_scrollSpeed = -fastSpeed;
+		else m_scrollSpeed = -slowSpeed;
+		//m_scrollSpeed = -(5 + (visibleRect.top() - pos.y()) / 2);
+	}
+	else if (pos.y() > visibleRect.bottom()) {
+		if (pos.y() - visibleRect.bottom() > 20) m_scrollSpeed = fastSpeed;
+		else m_scrollSpeed = slowSpeed;
+		//m_scrollSpeed = (5 + (pos.y() - visibleRect.bottom()) / 2);
+	}
     else
       m_scrollSpeed = 0;
 	if (m_scrollSpeed != 0) {
@@ -1068,7 +1109,12 @@ void FilmstripFrames::onFrameSwitched() {
   if (index >= 0) {
     exponeFrame(index);
     // clear selection and select only the destination frame
-    select(index, ONLY_SELECT);
+
+	// don't select if already selected - may be part of a group selection
+	if (!m_selection->isSelected(index2fid(index))) {
+		select(index, ONLY_SELECT);
+		m_justStartedSelection = true;
+	}
   }
   update();
 }

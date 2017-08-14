@@ -55,25 +55,24 @@ public:
   void setDarkLineColor(const QColor &color) { m_darkLineColor = color; }
   QColor getDarkLineColor() const { return m_darkLineColor; }
 
-  // helper method: ritorna il livello corrente
+  // helper method: get the current level
   TXshSimpleLevel *getLevel() const;
 
   QSize getIconSize() const { return m_iconSize; }
   int getFrameLabelWidth() const { return m_frameLabelWidth; }
 
-  // la y si riferisce al margine superiore dell'iconcina index-esima
+  // convert mouse coordinate y to a frame index and vice versa
   int y2index(int y) const;
   int index2y(int index) const;
 
-  // se c'e' un livello e 0<=index<frameCount ritorna il frameid index-esimo
-  // altrimenti ritorna TFrameId()
+  // returns the frame id of the provided index if index >= 0
+  // otherwise returns TFrameId()
   TFrameId index2fid(int index) const;
 
-  // se c'e' un livello e fid e' un frame del livello ritorna l'indice.
-  // altrimenti -1
+  // returns the index if the frame exists, otherwise -1
   int fid2index(const TFrameId &fid) const;
 
-  // restituisce l'altezza dei frames esistenti (piu' uno vuoto)
+  // returns the height of all frames plus a blank one
   int getFramesHeight() const;
 
   // aggiorna le dimensioni del QWidget in base al numero di fotogrammi del
@@ -85,8 +84,7 @@ public:
   // visibleRegion().boundingRect().bottom()
   void updateContentHeight(int minimumHeight = -1);
 
-  // assicura che il frame index-esimo sia visibile (eventualmente facendo
-  // scroll)
+  // makes sure that the indexed frame is visible (scrolling if necessary)
   void exponeFrame(int index);
 
   // esegue uno scroll di dy pixel. se dy<0 fa scorrere i fotogrammi verso
@@ -167,7 +165,9 @@ private:
   InbetweenDialog *m_inbetweenDialog;
   SceneViewer *m_viewer;
   bool m_isGhibli = false;
-  bool m_isEditingLevel = false;
+  bool m_justStartedSelection = false;
+  int m_indexForResetSelection = -1;
+  bool m_allowResetSelection = false;
   // State data
 
   QPoint m_pos;  //!< Last mouse position.
