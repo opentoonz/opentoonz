@@ -22,6 +22,9 @@ class QTimer;
 class QIntValidator;
 class QRegExpValidator;
 class QPushButton;
+#ifdef MACOSX
+class QCameraViewfinder;
+#endif
 
 namespace DVGui {
 class FileField;
@@ -182,6 +185,10 @@ class PencilTestPopup : public DVGui::Dialog {
   PencilTestSaveInFolderPopup* m_saveInFolderPopup;
 
   CameraCaptureLevelControl* m_camCapLevelControl;
+
+#ifdef MACOSX
+  QCameraViewfinder* m_dummyViewFinder;
+#endif
 
   int m_timerId;
   QString m_cacheImagePath;

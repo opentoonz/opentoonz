@@ -53,7 +53,8 @@ private:
 
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
-      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy;
+      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
+      *m_vectorSnappingTargetCB;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -124,8 +125,8 @@ private slots:
   void onTranspCheckDataChanged(const TPixel32 &, bool isDragging);
   void onOnionDataChanged(const TPixel32 &, bool isDragging);
   void onOnionDataChanged(int);
-  void onLanguageTypeChanged(int);
-  void onStyleSheetTypeChanged(int);
+  void onLanguageTypeChanged(const QString &);
+  void onStyleSheetTypeChanged(const QString &);
   void onUndoMemorySizeChanged();
   void onSVNEnabledChanged(int);
   void onAutomaticSVNRefreshChanged(int);
@@ -146,6 +147,7 @@ private slots:
   void onRegionAntialiasChanged(int);
   void onImportPolicyChanged(int);
   void onImportPolicyExternallyChanged(int policy);
+  void onVectorSnappingTargetChanged(int index);
 
 #ifdef LINETEST
   void onLineTestFpsCapture(int);

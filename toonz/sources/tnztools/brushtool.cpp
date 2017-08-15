@@ -27,6 +27,7 @@
 #include "toonz/toonzimageutils.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/stage2.h"
+#include "tw/keycodes.h"
 #include "toonz/preferences.h"
 
 // TnzCore includes
@@ -35,7 +36,8 @@
 #include "tvectorimage.h"
 #include "tenv.h"
 #include "tregion.h"
-#include "tstroke.h"
+#include "tinbetween.h"
+
 #include "tgl.h"
 #include "trop.h"
 
@@ -58,6 +60,9 @@ TEnv::IntVar BrushBreakSharpAngles("InknpaintBrushBreakSharpAngles", 0);
 TEnv::IntVar RasterBrushPencilMode("InknpaintRasterBrushPencilMode", 0);
 TEnv::IntVar BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
 TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
+TEnv::IntVar VectorBrushFrameRange("VectorBrushFrameRange", 0);
+TEnv::IntVar VectorBrushSnap("VectorBrushSnap", 0);
+TEnv::IntVar VectorBrushSnapSensitivity("VectorBrushSnapSensitivity", 0);
 
 //-------------------------------------------------------------------
 
@@ -69,6 +74,18 @@ TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
 #define MITER_WSTR L"miter_join"
 #define CUSTOM_WSTR L"<custom>"
 
+#define LINEAR_WSTR L"Linear"
+#define EASEIN_WSTR L"In"
+#define EASEOUT_WSTR L"Out"
+#define EASEINOUT_WSTR L"In&Out"
+
+#define LOW_WSTR L"Low"
+#define MEDIUM_WSTR L"Med"
+#define HIGH_WSTR L"High"
+
+const double SNAPPING_LOW    = 5.0;
+const double SNAPPING_MEDIUM = 25.0;
+const double SNAPPING_HIGH   = 100.0;
 //-------------------------------------------------------------------
 //
 // (Da mettere in libreria) : funzioni che spezzano una stroke
@@ -762,7 +779,12 @@ BrushTool::BrushTool(std::string name, int targetType)
     , m_enabled(false)
     , m_isPrompting(false)
     , m_firstTime(true)
+    , m_firstFrameRange(true)
     , m_presetsLoaded(false)
+    , m_frameRange("Range:")
+    , m_snap("Snap", false)
+    , m_snapSensitivity("Sensitivity:")
+    , m_targetType(targetType)
     , m_workingFrameId(TFrameId()) {
   bind(targetType);
 
@@ -785,6 +807,24 @@ BrushTool::BrushTool(std::string name, int targetType)
   }
 
   m_prop[0].bind(m_pressure);
+
+  if (targetType & TTool::Vectors) {
+    m_frameRange.addValue(L"Off");
+    m_frameRange.addValue(LINEAR_WSTR);
+    m_frameRange.addValue(EASEIN_WSTR);
+    m_frameRange.addValue(EASEOUT_WSTR);
+    m_frameRange.addValue(EASEINOUT_WSTR);
+    m_prop[0].bind(m_frameRange);
+    m_frameRange.setId("FrameRange");
+    m_prop[0].bind(m_snap);
+    m_snap.setId("Snap");
+    m_snapSensitivity.addValue(LOW_WSTR);
+    m_snapSensitivity.addValue(MEDIUM_WSTR);
+    m_snapSensitivity.addValue(HIGH_WSTR);
+    m_prop[0].bind(m_snapSensitivity);
+    m_snapSensitivity.setId("SnapSensitivity");
+  }
+
   m_prop[0].bind(m_preset);
   m_preset.setId("BrushPreset");
   m_preset.addValue(CUSTOM_WSTR);
@@ -978,6 +1018,9 @@ void BrushTool::updateTranslation() {
   m_capStyle.setQStringName(tr("Cap"));
   m_joinStyle.setQStringName(tr("Join"));
   m_miterJoinLimit.setQStringName(tr("Miter:"));
+  m_frameRange.setQStringName("Range:");
+  m_snap.setQStringName("Snap");
+  m_snapSensitivity.setQStringName("");
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -1025,12 +1068,29 @@ void BrushTool::onActivate() {
     m_accuracy.setValue(BrushAccuracy);
     m_smooth.setValue(BrushSmooth);
     m_hardness.setValue(RasterBrushHardness);
+    if (m_targetType & TTool::Vectors) {
+      m_frameRange.setIndex(VectorBrushFrameRange);
+      m_snap.setValue(VectorBrushSnap);
+      m_snapSensitivity.setIndex(VectorBrushSnapSensitivity);
+      switch (VectorBrushSnapSensitivity) {
+      case 0:
+        m_minDistance2 = SNAPPING_LOW;
+        break;
+      case 1:
+        m_minDistance2 = SNAPPING_MEDIUM;
+        break;
+      case 2:
+        m_minDistance2 = SNAPPING_HIGH;
+        break;
+      }
+    }
   }
   if (m_targetType & TTool::ToonzImage) {
     m_brushPad = ToolUtils::getBrushPad(m_rasThickness.getValue().second,
                                         m_hardness.getValue() * 0.01);
     setWorkAndBackupImages();
   }
+  resetFrameRange();
   // TODO:app->editImageOrSpline();
 }
 
@@ -1052,6 +1112,7 @@ void BrushTool::onDeactivate() {
   }
   m_workRas   = TRaster32P();
   m_backupRas = TRasterCM32P();
+  resetFrameRange();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1165,7 +1226,7 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
       invalidate(invalidateRect);
     }
-  } else {
+  } else {  // vector happens here
     m_track.clear();
     double thickness =
         (m_pressure.getValue() || m_isPath)
@@ -1174,10 +1235,16 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
     /*--- ストロークの最初にMaxサイズの円が描かれてしまう不具合を防止する ---*/
     if (m_pressure.getValue() && e.m_pressure == 255)
-      thickness = m_rasThickness.getValue().first;
-
+      thickness     = m_rasThickness.getValue().first;
+    m_currThickness = thickness;
     m_smoothStroke.beginStroke(m_smooth.getValue());
-    addTrackPoint(TThickPoint(pos, thickness), getPixelSize() * getPixelSize());
+
+    if ((m_targetType & TTool::Vectors) && m_foundFirstSnap) {
+      addTrackPoint(TThickPoint(m_firstSnapPoint, thickness),
+                    getPixelSize() * getPixelSize());
+    } else
+      addTrackPoint(TThickPoint(pos, thickness),
+                    getPixelSize() * getPixelSize());
   }
 }
 
@@ -1296,14 +1363,26 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
             ? computeThickness(e.m_pressure, m_thickness, m_isPath)
             : m_thickness.getValue().second * 0.5;
 
+    m_currThickness = thickness;
+
+    m_mousePos      = pos;
+    m_lastSnapPoint = pos;
+    m_foundLastSnap = false;
+    checkStrokeSnapping(false);
+    checkGuideSnapping(false);
+    m_brushPos = m_lastSnapPoint;
+
     if (e.isShiftPressed()) {
       m_smoothStroke.clearPoints();
-      m_track.add(TThickPoint(pos, thickness), getPixelSize() * getPixelSize());
+      m_track.add(TThickPoint(m_brushPos, thickness),
+                  getPixelSize() * getPixelSize());
       m_track.removeMiddlePoints();
-    } else {
+    }
+
+    else if (m_dragDraw)
       addTrackPoint(TThickPoint(pos, thickness),
                     getPixelSize() * getPixelSize());
-    }
+
     invalidate();
   }
 }
@@ -1369,6 +1448,18 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       m_track.clear();
       return;
     }
+
+    if (vi && m_snap.getValue() && m_foundLastSnap) {
+      addTrackPoint(TThickPoint(m_lastSnapPoint, m_currThickness),
+                    getPixelSize() * getPixelSize());
+    }
+    m_strokeIndex1   = -1;
+    m_strokeIndex2   = -1;
+    m_w1             = -1;
+    m_w2             = -2;
+    m_foundFirstSnap = false;
+    m_foundLastSnap  = false;
+
     m_track.filterPoints();
     double error = 30.0 / (1 + 0.5 * m_accuracy.getValue());
     error *= getPixelSize();
@@ -1399,16 +1490,185 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
                                          // autoclose proprio dal fatto che
                                          // hanno 1 solo chunk.
       stroke->insertControlPoints(0.5);
+    if (m_frameRange.getIndex()) {
+      if (m_firstFrameId == -1) {
+        m_firstStroke                   = new TStroke(*stroke);
+        m_firstFrameId                  = getFrameId();
+        TTool::Application *application = TTool::getApplication();
+        if (application) {
+          m_col        = application->getCurrentColumn()->getColumnIndex();
+          m_firstFrame = application->getCurrentFrame()->getFrame();
+        }
+        m_rangeTrack = m_track;
+        if (m_firstFrameRange) {
+          m_veryFirstCol     = m_col;
+          m_veryFirstFrame   = m_firstFrame;
+          m_veryFirstFrameId = m_firstFrameId;
+        }
+      } else if (m_firstFrameId == getFrameId()) {
+        if (m_firstStroke) {
+          delete m_firstStroke;
+          m_firstStroke = 0;
+        }
+        m_firstStroke = new TStroke(*stroke);
+        m_rangeTrack  = m_track;
+      } else {
+        TFrameId currentId = getFrameId();
+        int curCol = 0, curFrame = 0;
+        TTool::Application *application = TTool::getApplication();
+        if (application) {
+          curCol   = application->getCurrentColumn()->getColumnIndex();
+          curFrame = application->getCurrentFrame()->getFrame();
+        }
+        bool success =
+            doFrameRangeStrokes(m_firstFrameId, m_firstStroke, getFrameId(),
+                                stroke, m_firstFrameRange);
+        if (e.isCtrlPressed()) {
+          if (application) {
+            if (m_firstFrameId > currentId) {
+              if (application->getCurrentFrame()->isEditingScene()) {
+                application->getCurrentColumn()->setColumnIndex(curCol);
+                application->getCurrentFrame()->setFrame(curFrame);
+              } else
+                application->getCurrentFrame()->setFid(currentId);
+            }
+          }
+          resetFrameRange();
+          m_firstStroke     = new TStroke(*stroke);
+          m_rangeTrack      = m_track;
+          m_firstFrameId    = currentId;
+          m_firstFrameRange = false;
+        }
 
-    addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
-                     m_isFrameCreated, m_isLevelCreated);
-    TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
-    invalidate();
+        if (application && !e.isCtrlPressed()) {
+          if (application->getCurrentFrame()->isEditingScene()) {
+            application->getCurrentColumn()->setColumnIndex(m_veryFirstCol);
+            application->getCurrentFrame()->setFrame(m_veryFirstFrame);
+          } else
+            application->getCurrentFrame()->setFid(m_veryFirstFrameId);
+        }
+
+        if (!e.isCtrlPressed()) {
+          resetFrameRange();
+        }
+      }
+    } else {
+      addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
+                       m_isFrameCreated, m_isLevelCreated);
+      TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
+      invalidate();
+    }
     assert(stroke);
     m_track.clear();
+
   } else if (TToonzImageP ti = image) {
     finishRasterBrush(pos, e.m_pressure);
   }
+}
+
+//--------------------------------------------------------------------------------------------------
+
+bool BrushTool::keyDown(int key, TUINT32 b, const TPoint &point) {
+  if (key == TwConsts::TK_Esc) {
+    resetFrameRange();
+  }
+  return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+bool BrushTool::doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
+                                    TFrameId lastFrameId, TStroke *lastStroke,
+                                    bool drawFirstStroke) {
+  TXshSimpleLevel *sl =
+      TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel();
+  TStroke *first           = new TStroke();
+  TStroke *last            = new TStroke();
+  TVectorImageP firstImage = new TVectorImage();
+  TVectorImageP lastImage  = new TVectorImage();
+
+  *first       = *firstStroke;
+  *last        = *lastStroke;
+  bool swapped = false;
+  if (firstFrameId > lastFrameId) {
+    tswap(firstFrameId, lastFrameId);
+    *first  = *lastStroke;
+    *last   = *firstStroke;
+    swapped = true;
+  }
+
+  firstImage->addStroke(first);
+  lastImage->addStroke(last);
+  assert(firstFrameId <= lastFrameId);
+
+  std::vector<TFrameId> allFids;
+  sl->getFids(allFids);
+  std::vector<TFrameId>::iterator i0 = allFids.begin();
+  while (i0 != allFids.end() && *i0 < firstFrameId) i0++;
+  if (i0 == allFids.end()) return false;
+  std::vector<TFrameId>::iterator i1 = i0;
+  while (i1 != allFids.end() && *i1 <= lastFrameId) i1++;
+  assert(i0 < i1);
+  std::vector<TFrameId> fids(i0, i1);
+  int m = fids.size();
+  assert(m > 0);
+
+  TUndoManager::manager()->beginBlock();
+  for (int i = 0; i < m; ++i) {
+    TFrameId fid = fids[i];
+    assert(firstFrameId <= fid && fid <= lastFrameId);
+
+    // This is an attempt to divide the tween evenly
+    double t = m > 1 ? (double)i / (double)(m - 1) : 0.5;
+    double s = t;
+    switch (m_frameRange.getIndex()) {
+    case 1:  // LINEAR_WSTR
+      break;
+    case 2:  // EASEIN_WSTR
+      s = t * t;
+      break;  // s'(0) = 0
+    case 3:   // EASEOUT_WSTR
+      s = t * (2 - t);
+      break;  // s'(1) = 0
+    case 4:   // EASEINOUT_WSTR:
+      s = t * t * (3 - 2 * t);
+      break;  // s'(0) = s'(1) = 0
+    }
+
+    TTool::Application *app = TTool::getApplication();
+    if (app) {
+      if (app->getCurrentFrame()->isEditingScene())
+        app->getCurrentFrame()->setFrame(fid.getNumber() - 1);
+      else
+        app->getCurrentFrame()->setFid(fid);
+    }
+
+    TVectorImageP img = sl->getFrame(fid, true);
+    if (t == 0) {
+      if (!swapped && !drawFirstStroke) {
+      } else
+        addStrokeToImage(getApplication(), img, firstImage->getStroke(0),
+                         m_breakAngles.getValue(), m_isFrameCreated,
+                         m_isLevelCreated);
+    } else if (t == 1) {
+      if (swapped && !drawFirstStroke) {
+      } else
+        addStrokeToImage(getApplication(), img, lastImage->getStroke(0),
+                         m_breakAngles.getValue(), m_isFrameCreated,
+                         m_isLevelCreated);
+    } else {
+      assert(firstImage->getStrokeCount() == 1);
+      assert(lastImage->getStrokeCount() == 1);
+      TVectorImageP vi = TInbetween(firstImage, lastImage).tween(s);
+      assert(vi->getStrokeCount() == 1);
+      addStrokeToImage(getApplication(), img, vi->getStroke(0),
+                       m_breakAngles.getValue(), m_isFrameCreated,
+                       m_isLevelCreated);
+    }
+  }
+  TUndoManager::manager()->endBlock();
+  notifyImageChanged();
+  return true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1686,8 +1946,15 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
         max);
   } else {
     m_brushPos = pos;
+
+    m_mousePos       = pos;
+    m_firstSnapPoint = pos;
+    m_foundFirstSnap = false;
+
+    checkStrokeSnapping(true);
+    checkGuideSnapping(true);
+    m_brushPos = m_firstSnapPoint;
   }
-  m_mousePos = pos;
   invalidate();
 
   if (m_minThick == 0 && m_maxThick == 0) {
@@ -1697,6 +1964,124 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
     } else {
       m_minThick = m_thickness.getValue().first;
       m_maxThick = m_thickness.getValue().second;
+    }
+  }
+}
+
+//-------------------------------------------------------------------------------------------------------------
+
+void BrushTool::checkStrokeSnapping(bool beforeMousePress) {
+  if (Preferences::instance()->getVectorSnappingTarget() == 1) return;
+
+  TVectorImageP vi(getImage(false));
+  if (vi && m_snap.getValue()) {
+    m_dragDraw          = true;
+    double minDistance2 = m_minDistance2;
+    if (beforeMousePress)
+      m_strokeIndex1 = -1;
+    else
+      m_strokeIndex2 = -1;
+    int i, strokeNumber = vi->getStrokeCount();
+    TStroke *stroke;
+    double distance2, outW;
+
+    for (i = 0; i < strokeNumber; i++) {
+      stroke = vi->getStroke(i);
+      if (stroke->getNearestW(m_mousePos, outW, distance2) &&
+          distance2 < minDistance2) {
+        minDistance2                      = distance2;
+        beforeMousePress ? m_strokeIndex1 = i : m_strokeIndex2 = i;
+        if (areAlmostEqual(outW, 0.0, 1e-3))
+          beforeMousePress ? m_w1 = 0.0 : m_w2 = 0.0;
+        else if (areAlmostEqual(outW, 1.0, 1e-3))
+          beforeMousePress ? m_w1 = 1.0 : m_w2 = 1.0;
+        else
+          beforeMousePress ? m_w1 = outW : m_w2 = outW;
+        TThickPoint point1;
+        beforeMousePress ? point1 = stroke->getPoint(m_w1)
+                         : point1 = stroke->getPoint(m_w2);
+        if (beforeMousePress) {
+          m_firstSnapPoint = TPointD(point1.x, point1.y);
+          m_foundFirstSnap = true;
+        } else {
+          m_lastSnapPoint                 = TPointD(point1.x, point1.y);
+          m_foundLastSnap                 = true;
+          if (distance2 < 2.0) m_dragDraw = false;
+        }
+      }
+    }
+  }
+}
+
+//-------------------------------------------------------------------------------------------------------------
+
+void BrushTool::checkGuideSnapping(bool beforeMousePress) {
+  if (Preferences::instance()->getVectorSnappingTarget() == 0) return;
+  bool foundSnap;
+  TPointD snapPoint;
+  beforeMousePress ? foundSnap = m_foundFirstSnap : foundSnap = m_foundLastSnap;
+  beforeMousePress ? snapPoint = m_firstSnapPoint : snapPoint = m_lastSnapPoint;
+  if ((m_targetType & TTool::Vectors) && m_snap.getValue()) {
+    // check guide snapping
+    int vGuideCount = 0, hGuideCount = 0;
+    double guideDistance  = sqrt(m_minDistance2);
+    TTool::Viewer *viewer = getViewer();
+    if (viewer) {
+      vGuideCount = viewer->getVGuideCount();
+      hGuideCount = viewer->getHGuideCount();
+    }
+    double distanceToVGuide = -1.0, distanceToHGuide = -1.0;
+    double vGuide, hGuide;
+    bool useGuides = false;
+    if (vGuideCount) {
+      for (int j = 0; j < vGuideCount; j++) {
+        double guide        = viewer->getVGuide(j);
+        double tempDistance = abs(guide - m_mousePos.y);
+        if (tempDistance < guideDistance &&
+            (distanceToVGuide < 0 || tempDistance < distanceToVGuide)) {
+          distanceToVGuide = tempDistance;
+          vGuide           = guide;
+          useGuides        = true;
+        }
+      }
+    }
+    if (hGuideCount) {
+      for (int j = 0; j < hGuideCount; j++) {
+        double guide        = viewer->getHGuide(j);
+        double tempDistance = abs(guide - m_mousePos.x);
+        if (tempDistance < guideDistance &&
+            (distanceToHGuide < 0 || tempDistance < distanceToHGuide)) {
+          distanceToHGuide = tempDistance;
+          hGuide           = guide;
+          useGuides        = true;
+        }
+      }
+    }
+    if (useGuides && foundSnap) {
+      double currYDistance = abs(snapPoint.y - m_mousePos.y);
+      double currXDistance = abs(snapPoint.x - m_mousePos.x);
+      double hypotenuse =
+          sqrt(pow(currYDistance, 2.0) + pow(currXDistance, 2.0));
+      if ((distanceToVGuide >= 0 && distanceToVGuide < hypotenuse) ||
+          (distanceToHGuide >= 0 && distanceToHGuide < hypotenuse))
+        useGuides = true;
+      else
+        useGuides = false;
+    }
+    if (useGuides) {
+      assert(distanceToHGuide >= 0 || distanceToVGuide >= 0);
+      if (distanceToHGuide < 0 ||
+          (distanceToVGuide <= distanceToHGuide && distanceToVGuide >= 0)) {
+        snapPoint.y = vGuide;
+        snapPoint.x = m_mousePos.x;
+
+      } else {
+        snapPoint.y = m_mousePos.y;
+        snapPoint.x = hGuide;
+      }
+      beforeMousePress ? m_foundFirstSnap = true : m_foundLastSnap = true;
+      beforeMousePress ? m_firstSnapPoint = snapPoint : m_lastSnapPoint =
+                                                            snapPoint;
     }
   }
 }
@@ -1714,6 +2099,38 @@ void BrushTool::draw() {
   // Draw track
   tglColor(m_isPrompting ? TPixel32::Green : m_currentColor);
   m_track.drawAllFragments();
+
+  // snapping
+  TVectorImageP vi = img;
+  if ((m_targetType & TTool::Vectors) && m_snap.getValue()) {
+    m_pixelSize  = getPixelSize();
+    double thick = 6.0 * m_pixelSize;
+    if (m_foundFirstSnap) {
+      tglColor(TPixelD(0.1, 0.9, 0.1));
+      tglDrawCircle(m_firstSnapPoint, thick);
+    }
+
+    TThickPoint point2;
+
+    if (m_foundLastSnap) {
+      tglColor(TPixelD(0.1, 0.9, 0.1));
+      tglDrawCircle(m_lastSnapPoint, thick);
+    }
+  }
+
+  // frame range
+  if (m_firstStroke) {
+    glColor3d(1.0, 0.0, 0.0);
+    m_rangeTrack.drawAllFragments();
+    glColor3d(0.0, 0.6, 0.0);
+    TPointD firstPoint        = m_rangeTrack.getFirstPoint();
+    TPointD topLeftCorner     = TPointD(firstPoint.x - 5, firstPoint.y - 5);
+    TPointD topRightCorner    = TPointD(firstPoint.x + 5, firstPoint.y - 5);
+    TPointD bottomLeftCorner  = TPointD(firstPoint.x - 5, firstPoint.y + 5);
+    TPointD bottomRightCorner = TPointD(firstPoint.x + 5, firstPoint.y + 5);
+    tglDrawSegment(topLeftCorner, bottomRightCorner);
+    tglDrawSegment(topRightCorner, bottomLeftCorner);
+  }
 
   if (getApplication()->getCurrentObject()->isSpline()) return;
 
@@ -1822,6 +2239,18 @@ void BrushTool::setWorkAndBackupImages() {
 
 //------------------------------------------------------------------
 
+void BrushTool::resetFrameRange() {
+  m_rangeTrack.clear();
+  m_firstFrameId = -1;
+  if (m_firstStroke) {
+    delete m_firstStroke;
+    m_firstStroke = 0;
+  }
+  m_firstFrameRange = true;
+}
+
+//------------------------------------------------------------------
+
 bool BrushTool::onPropertyChanged(std::string propertyName) {
   // Set the following to true whenever a different piece of interface must
   // be refreshed - done once at the end.
@@ -1869,6 +2298,26 @@ bool BrushTool::onPropertyChanged(std::string propertyName) {
     VectorJoinStyle = m_joinStyle.getIndex();
   } else if (propertyName == m_miterJoinLimit.getName()) {
     VectorMiterValue = m_miterJoinLimit.getValue();
+  } else if (propertyName == m_frameRange.getName()) {
+    int index             = m_frameRange.getIndex();
+    VectorBrushFrameRange = index;
+    if (index == 0) resetFrameRange();
+  } else if (propertyName == m_snap.getName()) {
+    VectorBrushSnap = m_snap.getValue();
+  } else if (propertyName == m_snapSensitivity.getName()) {
+    int index                  = m_snapSensitivity.getIndex();
+    VectorBrushSnapSensitivity = index;
+    switch (index) {
+    case 0:
+      m_minDistance2 = SNAPPING_LOW;
+      break;
+    case 1:
+      m_minDistance2 = SNAPPING_MEDIUM;
+      break;
+    case 2:
+      m_minDistance2 = SNAPPING_HIGH;
+      break;
+    }
   }
 
   if (m_targetType & TTool::Vectors) {
@@ -1942,6 +2391,9 @@ void BrushTool::loadPreset() {
       m_capStyle.setIndex(preset.m_cap);
       m_joinStyle.setIndex(preset.m_join);
       m_miterJoinLimit.setValue(preset.m_miter);
+      m_frameRange.setIndex(preset.m_frameRange);
+      m_snap.setValue(preset.m_snap);
+      m_snapSensitivity.setIndex(preset.m_snapSensitivity);
     } else {
       m_rasThickness.setValue(TDoublePairProperty::Value(
           std::max(preset.m_min, 1.0), preset.m_max));
@@ -1971,16 +2423,19 @@ void BrushTool::addPreset(QString name) {
     preset.m_max = m_rasThickness.getValue().second;
   }
 
-  preset.m_acc         = m_accuracy.getValue();
-  preset.m_smooth      = m_smooth.getValue();
-  preset.m_hardness    = m_hardness.getValue();
-  preset.m_selective   = m_selective.getValue();
-  preset.m_pencil      = m_pencil.getValue();
-  preset.m_breakAngles = m_breakAngles.getValue();
-  preset.m_pressure    = m_pressure.getValue();
-  preset.m_cap         = m_capStyle.getIndex();
-  preset.m_join        = m_joinStyle.getIndex();
-  preset.m_miter       = m_miterJoinLimit.getValue();
+  preset.m_acc             = m_accuracy.getValue();
+  preset.m_smooth          = m_smooth.getValue();
+  preset.m_hardness        = m_hardness.getValue();
+  preset.m_selective       = m_selective.getValue();
+  preset.m_pencil          = m_pencil.getValue();
+  preset.m_breakAngles     = m_breakAngles.getValue();
+  preset.m_pressure        = m_pressure.getValue();
+  preset.m_cap             = m_capStyle.getIndex();
+  preset.m_join            = m_joinStyle.getIndex();
+  preset.m_miter           = m_miterJoinLimit.getValue();
+  preset.m_frameRange      = m_frameRange.getIndex();
+  preset.m_snap            = m_snap.getValue();
+  preset.m_snapSensitivity = m_snapSensitivity.getIndex();
 
   // Pass the preset to the manager
   m_presetsManager.addPreset(preset);
@@ -2038,10 +2493,12 @@ BrushData::BrushData()
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
+    , m_frameRange(0)
+    , m_snap(false)
+    , m_snapSensitivity(0)
     , m_miter(0)
     , m_modifierSize(0.0)
-    , m_modifierOpacity(0.0)
-    {}
+    , m_modifierOpacity(0.0) {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2060,10 +2517,12 @@ BrushData::BrushData(const std::wstring &name)
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
+    , m_frameRange(0)
+    , m_snap(false)
+    , m_snapSensitivity(0)
     , m_miter(0)
     , m_modifierSize(0.0)
-    , m_modifierOpacity(0.0)
-    {}
+    , m_modifierOpacity(0.0) {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2106,6 +2565,12 @@ void BrushData::saveData(TOStream &os) {
   os.closeChild();
   os.openChild("Miter");
   os << m_miter;
+  os.openChild("Frame_Range");
+  os << (int)m_frameRange;
+  os.openChild("Snap");
+  os << (int)m_snap;
+  os.openChild("SnapSensitivity");
+  os << (int)m_snapSensitivity;
   os.closeChild();
   os.openChild("Modifier_Size");
   os << m_modifierSize;
@@ -2148,6 +2613,12 @@ void BrushData::loadData(TIStream &is) {
       is >> m_join, is.matchEndTag();
     else if (tagName == "Miter")
       is >> m_miter, is.matchEndTag();
+    else if (tagName == "Frame_Range")
+      is >> m_frameRange, is.matchEndTag();
+    else if (tagName == "Snap")
+      is >> m_snap, is.matchEndTag();
+    else if (tagName == "SnapSensitivity")
+      is >> m_snapSensitivity, is.matchEndTag();
     else if (tagName == "Modifier_Size")
       is >> m_modifierSize, is.matchEndTag();
     else if (tagName == "Modifier_Opacity")

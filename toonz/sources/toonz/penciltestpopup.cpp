@@ -45,6 +45,9 @@
 #include <QCamera>
 #include <QCameraImageCapture>
 #include <QCameraViewfinderSettings>
+#ifdef MACOSX
+#include <QCameraViewfinder>
+#endif
 
 #include <QComboBox>
 #include <QPushButton>
@@ -944,6 +947,10 @@ PencilTestPopup::PencilTestPopup()
 
   QPushButton* subfolderButton = new QPushButton(tr("Subfolder"), this);
 
+#ifdef MACOSX
+  m_dummyViewFinder = new QCameraViewfinder(this);
+  m_dummyViewFinder->hide();
+#endif
   //----
 
   m_resolutionCombo->setMaximumWidth(fontMetrics().width("0000 x 0000") + 25);
@@ -1297,6 +1304,12 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
                this, SLOT(onImageCaptured(int, const QImage&)));
     delete m_cameraImageCapture;
   }
+
+#ifdef MACOSX
+  // this line is needed only in macosx
+  m_currentCamera->setViewfinder(m_dummyViewFinder);
+#endif
+
   m_cameraImageCapture = new QCameraImageCapture(m_currentCamera, this);
   /* Capturing to buffer currently seems not to be supported on Windows */
   // if
@@ -1367,6 +1380,10 @@ void PencilTestPopup::onResolutionComboActivated(const QString& itemText) {
   imageEncoderSettings.setResolution(newResolution);
   m_cameraImageCapture->setEncodingSettings(imageEncoderSettings);
   m_cameraViewfinder->updateSize();
+
+#ifdef MACOSX
+  m_dummyViewFinder->resize(newResolution);
+#endif
 
   // reset white bg
   m_whiteBGImg = QImage();
