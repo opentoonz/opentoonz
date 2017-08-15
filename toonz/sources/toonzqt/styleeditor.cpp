@@ -1233,9 +1233,11 @@ ColorChannelControl::ColorChannelControl(ColorChannel channel, QWidget *parent)
     : QWidget(parent), m_channel(channel), m_value(0), m_signalEnabled(true) {
   setFocusPolicy(Qt::NoFocus);
 
-  static const char *names[] = {"R", "G", "B", "A", "H", "S", "V"};
+  QStringList channelList;
+  channelList << tr("R") << tr("G") << tr("B") << tr("A") << tr("H") << tr("S")
+              << tr("V");
   assert(0 <= (int)m_channel && (int)m_channel < 7);
-  QString text = names[(int)m_channel];
+  QString text = channelList.at(m_channel);
   m_label      = new QLabel(text, this);
 
   int minValue = 0;
@@ -2196,8 +2198,9 @@ private:
   static std::vector<TMyPaintBrushStyle> m_brushes;
 
 public:
-  MyPaintBrushStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent)
-    { m_chipSize = QSize(64, 64); }
+  MyPaintBrushStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent) {
+    m_chipSize = QSize(64, 64);
+  }
 
   bool loadIfNeeded() override {
     static bool m_loaded = false;
@@ -2209,15 +2212,16 @@ public:
       return false;
   }
 
-  int getChipCount() const override
-    { return m_brushes.size() + 1; }
+  int getChipCount() const override { return m_brushes.size() + 1; }
 
   static void loadItems();
 
   void drawChip(QPainter &p, QRect rect, int index) override {
     assert(0 <= index && index <= (int)m_brushes.size());
     static QImage noStyleImage(":Resources/no_mypaintbrush.png");
-    p.drawImage(rect, index == 0 ? noStyleImage : rasterToQImage(m_brushes[index-1].getPreview()));
+    p.drawImage(rect, index == 0
+                          ? noStyleImage
+                          : rasterToQImage(m_brushes[index - 1].getPreview()));
   }
 
   void onSelect(int index) override {
@@ -2226,7 +2230,7 @@ public:
     if (index == 0) {
       emit styleSelected(noStyle);
     } else {
-      emit styleSelected(m_brushes[index-1]);
+      emit styleSelected(m_brushes[index - 1]);
     }
   }
 
@@ -2239,9 +2243,8 @@ public:
       int index  = posToIndex(pos);
       if (index == 0) {
         toolTip = tr("Plain color");
-      } else
-      if (index > 0 && index <= (int)m_brushes.size()) {
-        toolTip = m_brushes[index-1].getPath().getQString();
+      } else if (index > 0 && index <= (int)m_brushes.size()) {
+        toolTip = m_brushes[index - 1].getPath().getQString();
       }
       QToolTip::showText(helpEvent->globalPos(), toolTip);
       e->accept();
@@ -2261,11 +2264,11 @@ void MyPaintBrushStyleChooserPage::loadItems() {
   std::set<TFilePath> brushFiles;
 
   TFilePathSet dirs = TMyPaintBrushStyle::getBrushesDirs();
-  for(TFilePathSet::iterator i = dirs.begin(); i != dirs.end(); ++i) {
+  for (TFilePathSet::iterator i = dirs.begin(); i != dirs.end(); ++i) {
     TFileStatus fs(*i);
     if (fs.doesExist() && fs.isDirectory()) {
       TFilePathSet files = TSystem::readDirectoryTree(*i, false, true);
-      for(TFilePathSet::iterator j = files.begin(); j != files.end(); ++j)
+      for (TFilePathSet::iterator j = files.begin(); j != files.end(); ++j)
         if (j->getType() == TMyPaintBrushStyle::getBrushType())
           brushFiles.insert(*j - *i);
     }
@@ -2273,7 +2276,8 @@ void MyPaintBrushStyleChooserPage::loadItems() {
 
   // reserve memory to avoid reallocation
   m_brushes.reserve(brushFiles.size());
-  for(std::set<TFilePath>::iterator i = brushFiles.begin(); i != brushFiles.end(); ++i)
+  for (std::set<TFilePath>::iterator i = brushFiles.begin();
+       i != brushFiles.end(); ++i)
     m_brushes.push_back(TMyPaintBrushStyle(*i));
 }
 
@@ -2799,10 +2803,9 @@ void SettingsPage::onAutofillChanged() {
 int SettingsPage::getParamIndex(const QWidget *widget) {
   int p, pCount = m_paramsLayout->rowCount();
   for (p = 0; p != pCount; ++p)
-    for(int c = 0; c < 3; ++c)
+    for (int c = 0; c < 3; ++c)
       if (QLayoutItem *item = m_paramsLayout->itemAtPosition(p, c))
-        if (item->widget() == widget)
-          return p;
+        if (item->widget() == widget) return p;
   return -1;
 }
 
@@ -2990,42 +2993,30 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   /* ------- signal-slot connections ------- */
 
   bool ret = true;
-  ret = ret && connect( m_styleBar,
-                        SIGNAL(currentChanged(int)),
-                        this,
-                        SLOT(setPage(int)) );
-  ret = ret && connect( m_colorParameterSelector,
-                        SIGNAL(colorParamChanged()),
-                        this,
-                        SLOT(onColorParamChanged()) );
-  ret = ret && connect( m_textureStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)));
-  ret = ret && connect( m_specialStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)) );
-  ret = ret && connect( m_customStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)) );
-  ret = ret && connect( m_vectorBrushesStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)) );
-  ret = ret && connect( m_mypaintBrushesStylePage,
-                        SIGNAL(styleSelected(const TColorStyle &)),
-                        this,
-                        SLOT(selectStyle(const TColorStyle &)) );
-  ret = ret && connect( m_settingsPage,
-                        SIGNAL(paramStyleChanged(bool)),
-                        this,
-                        SLOT(onParamStyleChanged(bool)) );
-  ret = ret && connect( m_plainColorPage,
-                        SIGNAL(colorChanged(const ColorModel &, bool)),
-                        this,
-                        SLOT(onColorChanged(const ColorModel &, bool)) );
+  ret      = ret && connect(m_styleBar, SIGNAL(currentChanged(int)), this,
+                       SLOT(setPage(int)));
+  ret = ret && connect(m_colorParameterSelector, SIGNAL(colorParamChanged()),
+                       this, SLOT(onColorParamChanged()));
+  ret = ret &&
+        connect(m_textureStylePage, SIGNAL(styleSelected(const TColorStyle &)),
+                this, SLOT(selectStyle(const TColorStyle &)));
+  ret = ret &&
+        connect(m_specialStylePage, SIGNAL(styleSelected(const TColorStyle &)),
+                this, SLOT(selectStyle(const TColorStyle &)));
+  ret = ret &&
+        connect(m_customStylePage, SIGNAL(styleSelected(const TColorStyle &)),
+                this, SLOT(selectStyle(const TColorStyle &)));
+  ret = ret && connect(m_vectorBrushesStylePage,
+                       SIGNAL(styleSelected(const TColorStyle &)), this,
+                       SLOT(selectStyle(const TColorStyle &)));
+  ret = ret && connect(m_mypaintBrushesStylePage,
+                       SIGNAL(styleSelected(const TColorStyle &)), this,
+                       SLOT(selectStyle(const TColorStyle &)));
+  ret = ret && connect(m_settingsPage, SIGNAL(paramStyleChanged(bool)), this,
+                       SLOT(onParamStyleChanged(bool)));
+  ret = ret && connect(m_plainColorPage,
+                       SIGNAL(colorChanged(const ColorModel &, bool)), this,
+                       SLOT(onColorChanged(const ColorModel &, bool)));
   assert(ret);
 
   /* ------- initial conditions ------- */
