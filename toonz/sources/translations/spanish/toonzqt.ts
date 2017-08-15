@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<TS version="2.0" language="es" sourcelanguage="en">
 <context>
     <name>AddFxContextMenu</name>
     <message>
@@ -62,27 +62,27 @@
     <name>CameraSettingsWidget</name>
     <message>
         <source>Width:</source>
-        <translation type="vanished">Longitud:</translation>
+        <translation>Longitud:</translation>
     </message>
     <message>
         <source>Height:</source>
-        <translation type="vanished">Altura:</translation>
+        <translation>Altura:</translation>
     </message>
     <message>
         <source>XPx:</source>
-        <translation type="vanished">X píx:</translation>
+        <translation>X píx:</translation>
     </message>
     <message>
         <source>YPx:</source>
-        <translation type="vanished">Y píx:</translation>
+        <translation>Y píx:</translation>
     </message>
     <message>
         <source>XDpi:</source>
-        <translation type="vanished">X ppp:</translation>
+        <translation>X ppp:</translation>
     </message>
     <message>
         <source>YDpi:</source>
-        <translation type="vanished">Y ppp:</translation>
+        <translation>Y ppp:</translation>
     </message>
     <message>
         <source>Use Current Level Settings</source>
@@ -108,7 +108,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>AR:</source>
-        <translation type="vanished">Prop:</translation>
+        <translation>Prop:</translation>
     </message>
     <message>
         <source>Add</source>
@@ -132,15 +132,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>DPI</source>
-        <translation type="unfinished"></translation>
+        <translation>PPP</translation>
     </message>
     <message>
         <source>Pixels</source>
-        <translation type="unfinished"></translation>
+        <translation>Píxeles</translation>
     </message>
     <message>
         <source>x</source>
-        <translation type="unfinished"></translation>
+        <translation>x</translation>
     </message>
 </context>
 <context>
@@ -170,43 +170,43 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>CleanupCameraSettingsWidget</name>
     <message>
         <source>Closest:</source>
-        <translation type="vanished">Más cercano:</translation>
+        <translation>Más cercano:</translation>
     </message>
     <message>
         <source>E/W:</source>
-        <translation type="vanished">E/O:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation type="vanished">N/S:</translation>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>DPI:</source>
-        <translation type="vanished">PPP:</translation>
+        <translation>PPP:</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="vanished">Nombre:</translation>
+        <translation>Nombre:</translation>
     </message>
     <message>
         <source>Path:</source>
-        <translation type="vanished">Ruta:</translation>
+        <translation>Ruta:</translation>
     </message>
     <message>
         <source>Field settings</source>
-        <translation type="vanished">Opciones de campos</translation>
+        <translation>Opciones de campos</translation>
     </message>
     <message>
         <source>XPx:</source>
-        <translation type="vanished">Xpíx:</translation>
+        <translation>X píx:</translation>
     </message>
     <message>
         <source>YPx:</source>
-        <translation type="vanished">Ypíx:</translation>
+        <translation>Y píx:</translation>
     </message>
     <message>
         <source>Resulting Level Info</source>
-        <translation type="vanished">Información del nivel</translation>
+        <translation>Información del nivel</translation>
     </message>
 </context>
 <context>
@@ -243,11 +243,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Color Threshold</source>
-        <translation type="vanished">Umbral de color</translation>
+        <translation>Umbral de color</translation>
     </message>
     <message>
         <source>White Threshold</source>
-        <translation type="vanished">Umbral de blanco</translation>
+        <translation>Umbral de blanco</translation>
     </message>
     <message>
         <source>H Range</source>
@@ -311,11 +311,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>DVGui::ProgressDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="vanished">OpenToonz</translation>
+        <translation>OpenToonz</translation>
     </message>
     <message>
         <source>OpenToonz</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -351,27 +351,27 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>DvTextEdit</name>
     <message>
         <source>Bold</source>
-        <translation type="vanished">Negrita</translation>
+        <translation>Negrita</translation>
     </message>
     <message>
         <source>Italic</source>
-        <translation type="vanished">Cursiva</translation>
+        <translation>Cursiva</translation>
     </message>
     <message>
         <source>Underline</source>
-        <translation type="vanished">Subrayado</translation>
+        <translation>Subrayado</translation>
     </message>
     <message>
         <source>Align Left</source>
-        <translation type="vanished">Alinear a izquierda</translation>
+        <translation>Alinear a izquierda</translation>
     </message>
     <message>
         <source>Align Center</source>
-        <translation type="vanished">Alinear al centro</translation>
+        <translation>Alinear al centro</translation>
     </message>
     <message>
         <source>Align Right</source>
-        <translation type="vanished">Alinear a derecha</translation>
+        <translation>Alinear a derecha</translation>
     </message>
 </context>
 <context>
@@ -389,7 +389,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>FileField</name>
     <message>
         <source>...</source>
-        <translation type="vanished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -423,7 +423,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Define Sub-camera</source>
-        <translation>Definir sub-cámara</translation>
+        <translation>Definir región</translation>
     </message>
     <message>
         <source>Background Colors</source>
@@ -431,7 +431,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Framerate</source>
-        <translation>Velocidad de fotogramas</translation>
+        <translation>Velocidad (fps)</translation>
     </message>
     <message>
         <source>Playback Controls</source>
@@ -463,7 +463,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Define Sub-camera</source>
-        <translation>&amp;Definir sub-cámara</translation>
+        <translation>&amp;Definir región</translation>
     </message>
     <message>
         <source>&amp;White Background</source>
@@ -515,7 +515,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Red Channel in Grayscale</source>
-        <translation>Canal rojo en escala de gris</translation>
+        <translation>Canal rojo en escala de grises</translation>
     </message>
     <message>
         <source>Green Channel</source>
@@ -523,7 +523,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Green Channel in Grayscale</source>
-        <translation>Canal verde en escala de gris</translation>
+        <translation>Canal verde en escala de grises</translation>
     </message>
     <message>
         <source>Blue Channel</source>
@@ -531,7 +531,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Blue Channel in Grayscale</source>
-        <translation>Canal azul en escala de gris</translation>
+        <translation>Canal azul en escala de grises</translation>
     </message>
     <message>
         <source>Alpha Channel</source>
@@ -551,11 +551,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source> Frame  </source>
-        <translation type="vanished">Fotograma</translation>
+        <translation>Fotograma</translation>
     </message>
     <message>
         <source>Set the current frame</source>
-        <translation>Define el fotograma actual</translation>
+        <translation>Definir el fotograma actual</translation>
     </message>
     <message>
         <source>Drag to play the animation</source>
@@ -579,15 +579,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Display Areas as Filled</source>
-        <translation>Mostrar áreas rellenas</translation>
+        <translation>Mostrar las áreas rellenas</translation>
     </message>
     <message>
         <source>&amp;Display Areas as Filled</source>
-        <translation>Mostrar áreas &amp;rellenas</translation>
+        <translation>&amp;Mostrar las áreas rellenas</translation>
     </message>
     <message>
         <source>&amp;Locator</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Localizador</translation>
     </message>
 </context>
 <context>
@@ -652,15 +652,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Speed In / Speed Out Interpolation</source>
-        <translation>Interpolación con desaceleración / aceleración rápida</translation>
+        <translation>Interpolación con aceleraciones / desaceleraciones rápidas</translation>
     </message>
     <message>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation>Interpolación con desaceleración / aceleración suave</translation>
+        <translation>Interpolación con aceleraciones / desaceleraciones suaves</translation>
     </message>
     <message>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation>Interpolación con desaceleración / aceleración suave con %</translation>
+        <translation>Interpolación con aceleraciones / desaceleraciones suaves (%)</translation>
     </message>
     <message>
         <source>Exponential Interpolation</source>
@@ -731,15 +731,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Speed In / Speed Out</source>
-        <translation>Desaceleración / aceleración rápida</translation>
+        <translation>Aceleración / desaceleración rápida</translation>
     </message>
     <message>
         <source>Ease In / Ease Out</source>
-        <translation>Desaceleración / aceleración suave</translation>
+        <translation>Aceleración / desaceleración suave</translation>
     </message>
     <message>
         <source>Ease In / Ease Out %</source>
-        <translation>Desaceleración / aceleración suave con %</translation>
+        <translation>Aceleración / desaceleración suave %</translation>
     </message>
     <message>
         <source>Exponential</source>
@@ -759,7 +759,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="vanished">Rango:</translation>
+        <translation>Rango:</translation>
     </message>
     <message>
         <source>Interpolation:</source>
@@ -767,7 +767,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step:</source>
-        <translation type="vanished">Intervalo:</translation>
+        <translation>Intervalo:</translation>
     </message>
     <message>
         <source>Similar Shape</source>
@@ -795,7 +795,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Ease%</source>
-        <translation>Suave %</translation>
+        <translation>Suave%</translation>
     </message>
     <message>
         <source>Expo</source>
@@ -845,11 +845,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation>Interpolación con desaceleración / aceleración suave</translation>
+        <translation>Interpolación con aceleración / desaceleración suave</translation>
     </message>
     <message>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation>Interpolación con desaceleración / aceleración suave con %</translation>
+        <translation>Interpolación con aceleración / desaceleración suave (%)</translation>
     </message>
     <message>
         <source>Expression Interpolation</source>
@@ -911,7 +911,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Show Animated Only</source>
-        <translation>Mostrar solo lo animado</translation>
+        <translation>Mostrar sólo lo animado</translation>
     </message>
     <message>
         <source>Show All</source>
@@ -1159,26 +1159,26 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <name>LineEdit</name>
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation type="vanished">El nombre de un archivo no puede contener ninguno de los siguientes caracteres: /\:*?&quot;&lt;&gt;|.</translation>
+        <translation>El nombre de un archivo no puede contener ninguno de los siguientes caracteres: /\:*?&quot;&lt;&gt;|.</translation>
     </message>
 </context>
 <context>
     <name>PageViewer</name>
     <message>
         <source>Toggle Link to Studio Palette</source>
-        <translation type="vanished">Alternar vínculo con paleta de estudio</translation>
+        <translation>Alternar vínculo con paleta de estudio</translation>
     </message>
     <message>
         <source>Remove Reference to Studio Palette</source>
-        <translation type="vanished">Eliminar referencia a paleta de estudio</translation>
+        <translation>Eliminar referencia a paleta de estudio</translation>
     </message>
     <message>
         <source>New Style</source>
-        <translation type="vanished">Nuevo estilo</translation>
+        <translation>Nuevo estilo</translation>
     </message>
     <message>
         <source>New Page</source>
-        <translation type="vanished">Nueva página</translation>
+        <translation>Nueva página</translation>
     </message>
 </context>
 <context>
@@ -1221,7 +1221,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Color Model: </source>
-        <translation type="vanished">Modelo de color:</translation>
+        <translation>Modelo de color:</translation>
     </message>
     <message>
         <source>&amp;Palette Gizmo</source>
@@ -1253,7 +1253,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>&amp;Small Thumbnails With Name View</source>
-        <translation type="vanished">Vista de miniaturas pequeñas con &amp;nombre</translation>
+        <translation>Vista de miniaturas pequeñas con &amp;nombre</translation>
     </message>
     <message>
         <source>Lock Palette</source>
@@ -1289,11 +1289,11 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Update</source>
-        <translation type="vanished">Actualizar</translation>
+        <translation>Actualizar</translation>
     </message>
     <message>
         <source>Don&apos;t Update</source>
-        <translation type="vanished">No actualizar</translation>
+        <translation>No actualizar</translation>
     </message>
     <message>
         <source>     (Color Model: </source>
@@ -1312,7 +1312,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Remove Links</source>
-        <translation type="vanished">Eliminar vínculos</translation>
+        <translation>Eliminar vínculos</translation>
     </message>
     <message>
         <source>New Style</source>
@@ -1324,7 +1324,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Name Editor</source>
-        <translation type="unfinished">Editor de nombres</translation>
+        <translation>Editor de nombres</translation>
     </message>
 </context>
 <context>
@@ -1350,7 +1350,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <name>ParamViewer</name>
     <message>
         <source>Swatch Viewer</source>
-        <translation>Visor de muestras</translation>
+        <translation>Ver muestra</translation>
     </message>
 </context>
 <context>
@@ -1382,7 +1382,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <name>ProgressDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="vanished">OpenToonz</translation>
+        <translation>OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -1414,7 +1414,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Delete Styles Only</source>
-        <translation>Solo borrar los estilos</translation>
+        <translation>Sólo borrar los estilos</translation>
     </message>
     <message>
         <source>Delete Styles, Lines and Areas</source>
@@ -1470,7 +1470,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Fx Schematic</source>
-        <translation type="vanished">Diagrama de efectos</translation>
+        <translation>Diagrama de efectos</translation>
     </message>
     <message>
         <source>Save Motion Path</source>
@@ -1494,7 +1494,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>There are more cut/copied styles than selected. Paste anyway (adding styles)?</source>
-        <translation>Hay más estilos en el portapapeles que los seleccionados. ¿Pegar de todas formas (agregando estilos)?</translation>
+        <translation>Hay más estilos en el portapapeles que los seleccionados. ¿Pegar igual (agregando estilos)?</translation>
     </message>
     <message>
         <source>Paste</source>
@@ -1507,16 +1507,16 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <message>
         <source>This feature is not available in the demo version.
 For more information visit the %1 site:</source>
-        <translation type="vanished">Esta característica no está disponible en la versión de demostración.
+        <translation>Esta característica no está disponible en la versión de demostración.
 Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>To request a trial license please contact </source>
-        <translation type="vanished">Para solicitar una licencia de prueba por favor contactarse </translation>
+        <translation>Para solicitar una licencia de prueba por favor contactarse </translation>
     </message>
     <message>
         <source>For further information visit </source>
-        <translation type="vanished">Por más información visitar </translation>
+        <translation>Por más información visitar </translation>
     </message>
     <message>
         <source>Fullpath:     </source>
@@ -1632,7 +1632,7 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>Endianess:      </source>
-        <translation>Endian:      </translation>
+        <translation>Orden:      </translation>
     </message>
     <message>
         <source>It is not possible to delete the style #</source>
@@ -1680,7 +1680,7 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>It is not possible to assing a shortcut with modifiers to the visualization commands.</source>
-        <translation type="vanished">No es posible asignar a los comandos de visualización un atajo de teclado que use teclas modificadoras.</translation>
+        <translation>No es posible asignar a los comandos de visualización un atajo de teclado que use teclas modificadoras.</translation>
     </message>
     <message>
         <source>It is not possible to save the motion path.</source>
@@ -1692,7 +1692,7 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>Toonz 7.1</source>
-        <translation type="vanished">Toonz 7.1</translation>
+        <translation>Toonz 7.1</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
@@ -1764,7 +1764,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Remove Link  in Palette : %1</source>
-        <translation type="vanished">Eliminar vínculo en paleta: %1</translation>
+        <translation>Eliminar vínculo en paleta: %1</translation>
     </message>
     <message>
         <source>Get Color from Studio Palette</source>
@@ -1860,19 +1860,19 @@ Are you sure?</source>
     </message>
     <message>
         <source>OpenToonz 1.0</source>
-        <translation type="vanished">OpenToonz 1.0</translation>
+        <translation>OpenToonz 1.0</translation>
     </message>
     <message>
         <source>OpenToonz 1.1</source>
-        <translation type="unfinished">OpenToonz 1.1</translation>
+        <translation>OpenToonz 1.1</translation>
     </message>
     <message>
         <source>Remove Reference  in Palette : %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar referencia en paleta : %1</translation>
     </message>
     <message>
         <source>It is not possible to assign a shortcut with modifiers to the visualization commands.</source>
-        <translation type="unfinished"></translation>
+        <translation>No es posible asignar un atajo con modificadores a los comandos de visualización.</translation>
     </message>
 </context>
 <context>
@@ -1886,7 +1886,7 @@ Are you sure?</source>
     <name>RadioButtonDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="vanished">OpenToonz</translation>
+        <translation>OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -1929,7 +1929,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>&amp;Schematic Toggle</source>
-        <translation type="vanished">Alternar &amp;diagrama</translation>
+        <translation>Alternar &amp;diagrama</translation>
     </message>
     <message>
         <source>&amp;Swtich output port display mode</source>
@@ -1973,11 +1973,11 @@ Are you sure?</source>
     <name>SpeedInOutSegmentPage</name>
     <message>
         <source>Speed in:</source>
-        <translation type="vanished">Desaceleración rápida:</translation>
+        <translation>Desaceleración rápida:</translation>
     </message>
     <message>
         <source>Speed out:</source>
-        <translation type="vanished">Aceleración rápida:</translation>
+        <translation>Aceleración rápida:</translation>
     </message>
     <message>
         <source>First Speed:</source>
@@ -2034,7 +2034,7 @@ Are you sure?</source>
     <name>StudioPaletteTreeViewer</name>
     <message>
         <source>This folder is not empty. Delete anyway?</source>
-        <translation>Esta carpeta no está vacía. ¿Borrarla de todas formas?</translation>
+        <translation>Esta carpeta no está vacía. ¿Borrarla igual?</translation>
     </message>
     <message>
         <source>New Palette</source>
@@ -2085,19 +2085,19 @@ Are you sure?</source>
     <name>StudioPaletteViewer</name>
     <message>
         <source>&amp;New Folder</source>
-        <translation type="vanished">&amp;Nueva carpeta</translation>
+        <translation>&amp;Nueva carpeta</translation>
     </message>
     <message>
         <source>&amp;New Palette</source>
-        <translation type="vanished">&amp;Nueva paleta</translation>
+        <translation>&amp;Nueva paleta</translation>
     </message>
     <message>
         <source>&amp;Search for Palettes</source>
-        <translation type="vanished">&amp;Buscar paletas</translation>
+        <translation>&amp;Buscar paletas</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation type="vanished">&amp;Borrar</translation>
+        <translation>&amp;Borrar</translation>
     </message>
 </context>
 <context>
@@ -2112,11 +2112,11 @@ Are you sure?</source>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="vanished">Auto</translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <source>Automatically update style changes</source>
-        <translation>Actualiza automáticamente los cambios de estilo</translation>
+        <translation>Actualizar automáticamente los cambios de estilo</translation>
     </message>
     <message>
         <source>Return To Previous Style</source>
@@ -2169,7 +2169,7 @@ Autom</translation>
     </message>
     <message>
         <source>Matte</source>
-        <translation>Mate</translation>
+        <translation>Opacidad</translation>
     </message>
     <message>
         <source>RGB</source>
@@ -2240,7 +2240,7 @@ Autom</translation>
     <name>ToneCurveField</name>
     <message>
         <source>Channel:</source>
-        <translation type="vanished">Canal:</translation>
+        <translation>Canal:</translation>
     </message>
 </context>
 <context>

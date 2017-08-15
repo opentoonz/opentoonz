@@ -1332,13 +1332,13 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   if (yetToCleanupCell)  // ORIENTATION: what's this?
   {
     if (o->isVerticalTimeline())
-      p.fillRect(
-          rect.adjusted(rect.width() / 2, 0, 0, 0),
-          (isSelected) ? SelectedFullcolorColumnColor : FullcolorColumnColor);
+      p.fillRect(rect.adjusted(rect.width() / 2, 0, 0, 0),
+                 (isSelected) ? m_viewer->getSelectedFullcolorColumnColor()
+                              : m_viewer->getFullcolorColumnColor());
     else
-      p.fillRect(
-          rect.adjusted(0, rect.height() / 2, 0, 0),
-          (isSelected) ? SelectedFullcolorColumnColor : FullcolorColumnColor);
+      p.fillRect(rect.adjusted(0, rect.height() / 2, 0, 0),
+                 (isSelected) ? m_viewer->getSelectedFullcolorColumnColor()
+                              : m_viewer->getFullcolorColumnColor());
   }
 
   bool isLastRow = nextCell.isEmpty() ||
