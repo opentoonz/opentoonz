@@ -16,6 +16,7 @@
 
 // Qt includes
 #include <QString>
+#include <QPoint>
 
 #undef DVAPI
 #undef DVVAR
@@ -91,16 +92,29 @@ public:
   ModifierMask m_modifiersMask;  //!< Bitmask specifying key modifiers applying
                                  //! on the event.
 
-  bool m_leftButtonPressed;
+  Qt::MouseButtons m_buttons;
+  Qt::MouseButton m_button;
+  QPoint m_mousePos;  // mouse position obtained with QMouseEvent::pos() or
+                      // QTabletEvent::pos()
+  bool m_isTablet;
 
 public:
   TMouseEvent()
-      : m_pressure(255), m_modifiersMask(NO_KEY), m_leftButtonPressed(false) {}
+      : m_pressure(255)
+      , m_modifiersMask(NO_KEY)
+      , m_buttons(Qt::NoButton)
+      , m_button(Qt::NoButton)
+      , m_isTablet(false) {}
 
   bool isShiftPressed() const { return (m_modifiersMask & SHIFT_KEY); }
   bool isAltPressed() const { return (m_modifiersMask & ALT_KEY); }
   bool isCtrlPressed() const { return (m_modifiersMask & CTRL_KEY); }
-  bool isLeftButtonPressed() const { return m_leftButtonPressed; }
+
+  bool isLeftButtonPressed() const { return (m_buttons & Qt::LeftButton) != 0; }
+  Qt::MouseButtons buttons() const { return m_buttons; }
+  Qt::MouseButton button() const { return m_button; }
+  QPoint mousePos() const { return m_mousePos; }
+  bool isTablet() const { return m_isTablet; }
 
   void setModifiers(bool shiftPressed, bool altPressed, bool ctrlPressed) {
     m_modifiersMask = ModifierMask((shiftPressed << SHIFT_BITSHIFT) |
@@ -624,6 +638,10 @@ public:
   virtual double projectToZ(const TPoint &delta) = 0;
 
   virtual TPointD getDpiScale() const = 0;
+  virtual int getVGuideCount()        = 0;
+  virtual int getHGuideCount()        = 0;
+  virtual double getHGuide(int index) = 0;
+  virtual double getVGuide(int index) = 0;
 
   virtual void
   resetInputMethod() = 0;  // Intended to call QWidget->resetInputContext()

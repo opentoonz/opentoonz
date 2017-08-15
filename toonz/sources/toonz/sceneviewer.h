@@ -66,7 +66,8 @@ class SceneViewer final : public GLWidgetForHighDpi,
   Qt::MouseButton m_mouseButton;
 
   bool m_foregroundDrawing;
-  bool m_tabletEvent;
+  bool m_tabletEvent, m_tabletPressed, m_tabletReleased, m_tabletMove,
+      m_tabletActive;
   // used to handle wrong mouse drag events!
   bool m_buttonClicked, m_toolSwitched;
   bool m_shownOnce = false;
@@ -137,6 +138,8 @@ class SceneViewer final : public GLWidgetForHighDpi,
   LocatorPopup *m_locator;
   bool m_isLocator;
   bool m_isStyleShortcutSwitchable;
+
+  bool m_isBusyOnTabletMove;
 
   // iwsw commented out temporarily
   // Ghibli3DLutUtil * m_ghibli3DLutUtil;
@@ -235,6 +238,10 @@ public:
 
   void setIsLocator() { m_isLocator = true; }
   void setIsStyleShortcutSwitchable() { m_isStyleShortcutSwitchable = true; }
+  int getVGuideCount();
+  int getHGuideCount();
+  double getVGuide(int index);
+  double getHGuide(int index);
 
 public:
   // SceneViewer's gadget public functions
@@ -283,6 +290,11 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
   void mouseDoubleClickEvent(QMouseEvent *event) override;
+
+  void onPress(const TMouseEvent &event);
+  void onMove(const TMouseEvent &event);
+  void onRelease(const TMouseEvent &event);
+
   void wheelEvent(QWheelEvent *) override;
   void keyPressEvent(QKeyEvent *event) override;
   void keyReleaseEvent(QKeyEvent *event) override;
@@ -365,6 +377,10 @@ public slots:
 
   // delete preview-subcamera executed from context menu
   void doDeleteSubCamera();
+
+  void resetTabletStatus();
+
+  void releaseBusyOnTabletMove() { m_isBusyOnTabletMove = false; }
 
 signals:
 

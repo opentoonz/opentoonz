@@ -36,11 +36,13 @@ Older versions and unstable nightly build are also available at <https://github.
 
 ## Licensing
 
-- Files outside of the `thirdparty` directory are based on the Modified BSD License.
+- Files outside of the `thirdparty` and `stuff/library/mypaint brushes` directories are based on the Modified BSD License.
   - [modified BSD license](./LICENSE.txt).
   - Based on this license, this software may be used or changed freely for business or personal use.
 - For files in the `thirdparty` directory:
   - Please consult with the licenses in the appropriate READMEs or source codes.
+- For files in the `stuff/library/mypaint brushes` directory:
+  - Please see the licenses in `stuff/library/mypaint brushes/Licenses.txt`.
 
 ### Special Thanks
 

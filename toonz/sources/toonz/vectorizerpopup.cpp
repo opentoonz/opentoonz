@@ -451,6 +451,10 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
   addWidget(splitter);
 
   QToolBar *leftToolBar = new QToolBar, *rightToolBar = new QToolBar;
+  leftToolBar->setObjectName("MediumPaddingToolBar");
+  rightToolBar->setObjectName("MediumPaddingToolBar");
+  leftToolBar->setIconSize(QSize(17, 17));
+  rightToolBar->setIconSize(QSize(17, 17));
   {
     QWidget *toolbarsContainer = new QWidget(this);
     toolbarsContainer->setFixedHeight(22);
@@ -732,19 +736,18 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
 
   //---------------------- Toolbar --------------------------
 
-  QAction *swatchAct = new QAction(createQIconOnOffPNG("preview", true),
+  QAction *swatchAct = new QAction(createQIconOnOff("preview", true),
                                    tr("Toggle Swatch Preview"), this);
   swatchAct->setCheckable(true);
   leftToolBar->addAction(swatchAct);
 
-  QAction *centerlineAct =
-      new QAction(createQIconOnOffPNG("opacitycheck", true),
-                  tr("Toggle Centerlines Check"), this);
+  QAction *centerlineAct = new QAction(createQIconOnOff("opacitycheck", true),
+                                       tr("Toggle Centerlines Check"), this);
   centerlineAct->setCheckable(true);
   leftToolBar->addAction(centerlineAct);
 
   QToolButton *visibilityButton = new QToolButton(this);
-  visibilityButton->setIcon(createQIconPNG("options"));
+  visibilityButton->setIcon(createQIcon("options"));
   visibilityButton->setPopupMode(QToolButton::InstantPopup);
 
   QMenu *visibilityMenu = new QMenu(visibilityButton);
@@ -753,15 +756,15 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
   rightToolBar->addWidget(visibilityButton);
   rightToolBar->addSeparator();
 
-  QAction *saveAct = new QAction(createQIconOnOffPNG("save", false),
-                                 tr("Save Settings"), this);
+  QAction *saveAct =
+      new QAction(createQIconOnOff("save", false), tr("Save Settings"), this);
   rightToolBar->addAction(saveAct);
-  QAction *loadAct = new QAction(createQIconOnOffPNG("load", false),
-                                 tr("Load Settings"), this);
+  QAction *loadAct =
+      new QAction(createQIconOnOff("load", false), tr("Load Settings"), this);
   rightToolBar->addAction(loadAct);
   rightToolBar->addSeparator();
 
-  QAction *resetAct = new QAction(createQIconOnOffPNG("resetsize", false),
+  QAction *resetAct = new QAction(createQIconOnOff("resetsize", false),
                                   tr("Reset Settings"), this);
   rightToolBar->addAction(resetAct);
 

@@ -4,6 +4,9 @@
 #define SPREADSHEETVIEWER_H
 
 #include "tcommon.h"
+#include "cellposition.h"
+#include "toonz/cellpositionratio.h"
+// #include "orientation.h"
 #include <QFrame>
 #include <QScrollArea>
 
@@ -20,6 +23,7 @@
 // forward declaration
 class TFrameHandle;
 class SpreadsheetViewer;
+class Orientation;
 
 //-------------------------------------------------------------------
 
@@ -30,23 +34,51 @@ class GenericPanel;
 
 //-------------------------------------------------------------------
 
-class DVAPI FrameScroller {
-  QList<FrameScroller *> m_connectedScrollers;
+// Use composition rather than inheritance.
+// How this works:
+// * scroll area scrollbars sends event to this;
+// * it notifies every other FrameScroller with difference;
+// * they handle it by adjusting their scrollbars
+class DVAPI FrameScroller final : public QObject {
+  Q_OBJECT
+
+  const Orientation *m_orientation;
+  QScrollArea *m_scrollArea;
+  int m_lastX, m_lastY;
+  bool m_syncing;
 
 public:
   FrameScroller();
   virtual ~FrameScroller();
-  void connectScroller(FrameScroller *scroller);
-  void disconnectScroller(FrameScroller *scroller);
-  bool isScrollerConnected(FrameScroller *scroller);
 
-  virtual QScrollArea *getFrameScrollArea() const = 0;
+  void setFrameScrollArea(QScrollArea *scrollArea);
+  QScrollArea *getFrameScrollArea() const { return m_scrollArea; }
+
+  void setOrientation(const Orientation *o) { m_orientation = o; }
+  const Orientation *orientation() const { return m_orientation; }
 
   void registerFrameScroller();
   void unregisterFrameScroller();
 
-  void prepareToScroll(int dy);
-  virtual void onPrepareToScroll(int dy) {}
+  void prepareToScrollOthers(const QPoint &offset);
+
+  void setSyncing(bool s) { m_syncing = s; }
+  bool isSyncing() { return m_syncing; }
+
+private:
+  void connectScrollbars();
+  void disconnectScrollbars();
+
+  void handleScroll(const QPoint &offset) const;
+  void onScroll(const CellPositionRatio &offset);
+
+  void prepareToScrollRatio(const CellPositionRatio &offset);
+
+private slots:
+  void onVScroll(int value);
+  void onHScroll(int value);
+signals:
+  void prepareToScrollOffset(const QPoint &offset);
 };
 
 //-------------------------------------------------------------------
@@ -190,8 +222,7 @@ protected:
 
 //-------------------------------------------------------------------
 
-class DVAPI SpreadsheetViewer : public QFrame,
-                                public Spreadsheet::FrameScroller {
+class DVAPI SpreadsheetViewer : public QFrame {
   Q_OBJECT
 
   QColor m_lightLightBgColor;  // RowPanel background (124,124,124)
@@ -269,6 +300,10 @@ class DVAPI SpreadsheetViewer : public QFrame,
   int m_markRowDistance, m_markRowOffset;
   // QRect m_selectedCells; // x=col, y=row
   bool m_isComputingSize;
+  // const Orientation *m_orientation;
+
+protected:
+  Spreadsheet::FrameScroller m_frameScroller;
 
 public:
   SpreadsheetViewer(QWidget *parent);
@@ -285,9 +320,6 @@ public:
   void setCellsPanel(Spreadsheet::CellPanel *cells);
 
   int getRowCount() const { return m_rowCount; }
-
-  // provvisorio
-  QScrollArea *getFrameScrollArea() const override { return m_cellScrollArea; }
 
   // QProperty
   void setLightLightBGColor(const QColor &color) {
@@ -354,7 +386,6 @@ public:
   }
 
   void scroll(QPoint delta);
-  void onPrepareToScroll(int dy) override { refreshContentSize(0, dy); }
 
   void setAutoPanSpeed(const QPoint &speed);
   void setAutoPanSpeed(const QRect &widgetBounds, const QPoint &mousePos);
@@ -367,6 +398,13 @@ public:
   int yToRow(int y) const;
   int columnToX(int col) const;
   int rowToY(int row) const;
+
+  CellPosition xyToPosition(const QPoint &point) const;
+  QPoint positionToXY(const CellPosition &pos) const;
+
+  CellRange xyRectToRange(const QRect &rect) const;
+
+  // const Orientation *orientation () const { return m_orientation; }
 
   bool refreshContentSize(int scrollDx, int scrollDy);
 
@@ -413,6 +451,8 @@ public slots:
   void updateAreas();
   void onVSliderChanged(int);
   void onHSliderChanged(int);
+
+  void onPrepareToScrollOffset(const QPoint &offset);
   /*
 void updateAllAree();
 void updateCellColumnAree();

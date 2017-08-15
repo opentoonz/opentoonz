@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<TS version="2.0" language="es" sourcelanguage="en">
 <context>
     <name>ArtisticSolidColor</name>
     <message>
@@ -39,7 +39,7 @@
     <name>OutlineViewerStyle</name>
     <message>
         <source>OutlineViewer(OnlyDebug)</source>
-        <translation>Visor de contornos (SoloDepuración)</translation>
+        <translation>Visor de contornos (sólo depuración)</translation>
     </message>
     <message>
         <source>Control Point</source>
@@ -412,7 +412,7 @@
     </message>
     <message>
         <source>Distance</source>
-        <translation></translation>
+        <translation>Distancia</translation>
     </message>
 </context>
 <context>

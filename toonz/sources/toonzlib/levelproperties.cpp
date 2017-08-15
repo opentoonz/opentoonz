@@ -10,7 +10,7 @@
 //**********************************************************************************
 
 LevelOptions::LevelOptions()
-    : m_dpi(Stage::inch)
+    : m_dpi(Stage::standardDpi)
     , m_subsampling(1)
     , m_antialias(0)
     , m_dpiPolicy(DP_ImageDpi)

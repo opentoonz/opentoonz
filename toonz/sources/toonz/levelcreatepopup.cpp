@@ -343,8 +343,8 @@ bool LevelCreatePopup::levelExists(std::wstring levelName) {
 
 //-----------------------------------------------------------------------------
 void LevelCreatePopup::showEvent(QShowEvent *) {
-  nextName();
   update();
+  nextName();
   m_nameFld->setFocus();
   if (Preferences::instance()->getUnits() == "pixel") {
     m_dpiFld->hide();
@@ -480,6 +480,7 @@ bool LevelCreatePopup::apply() {
     error(
         tr("The level name specified is already used: please choose a "
            "different level name"));
+    m_nameFld->selectAll();
     return false;
   }
 
@@ -492,6 +493,7 @@ bool LevelCreatePopup::apply() {
     error(
         tr("The level name specified is already used: please choose a "
            "different level name"));
+    m_nameFld->selectAll();
     return false;
   }
   parentDir = scene->decodeFilePath(parentDir);
@@ -617,7 +619,7 @@ void LevelCreatePopup::update() {
     break;
   }
   if (index >= 0) m_levelTypeOm->setCurrentIndex(index);
-
+  
   /*
 (old behaviour)
 TCamera* camera = scene->getCurrentCamera();
