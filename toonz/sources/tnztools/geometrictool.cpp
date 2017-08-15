@@ -318,8 +318,10 @@ public:
   int m_targetType;
 
   // for snapping
-  int m_strokeIndex1, m_strokeIndex2;
-  double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
+  int m_strokeIndex1;
+  double m_w1, m_pixelSize, m_currThickness, m_minDistance2;
+  bool m_foundSnap = false;
+  TPointD m_snapPoint;
 
   PrimitiveParam(int targetType)
       : m_type("Shape:")  // "W_ToolOptions_ShapeType")
@@ -454,15 +456,15 @@ public:
   void drawSnap();
   TPointD getSnap(TPointD pos);
   void resetSnap();
+  TPointD checkGuideSnapping(TPointD pos);
 
   virtual TStroke *makeStroke() const = 0;
 };
 
 void Primitive::resetSnap() {
   m_param->m_strokeIndex1 = -1;
-  m_param->m_strokeIndex2 = -1;
   m_param->m_w1           = -1;
-  m_param->m_w2           = -1;
+  m_param->m_foundSnap = false;
 }
 
 TPointD Primitive::calculateSnap(TPointD pos) {
@@ -491,56 +493,15 @@ TPointD Primitive::calculateSnap(TPointD pos) {
           m_param->m_w1    = outW;
         TThickPoint point1 = stroke->getPoint(m_param->m_w1);
         snapPoint          = TPointD(point1.x, point1.y);
+		m_param->m_foundSnap = true;
+		m_param->m_snapPoint = snapPoint;
       }
     }
   }
   return snapPoint;
 }
 
-void Primitive::drawSnap() {
-  // snapping
-  TImageP img      = TTool::getImage(false, 1);
-  TVectorImageP vi = img;
-  if (vi && m_param->m_snap.getValue()) {
-    double thick;
-    if (m_param->m_strokeIndex1 != -1 &&
-        m_param->m_strokeIndex1 < (int)(vi->getStrokeCount())) {
-      tglColor(TPixelD(0.1, 0.9, 0.1));
-      TStroke *stroke1   = vi->getStroke(m_param->m_strokeIndex1);
-      TThickPoint point1 = stroke1->getPoint(m_param->m_w1);
 
-      // m_param->m_pixelSize = m_tool->getPixelSize();
-      thick = std::max(6.0, point1.thick);
-
-      tglDrawCircle(point1, thick);
-    }
-
-    TThickPoint point2;
-
-    if (m_param->m_strokeIndex2 != -1 &&
-        m_param->m_strokeIndex2 < (int)(vi->getStrokeCount())) {
-      if (m_param->m_strokeIndex2 != -1) {
-        TStroke *stroke2 = vi->getStroke(m_param->m_strokeIndex2);
-        point2           = stroke2->getPoint(m_param->m_w2);
-        thick            = std::max(6.0, point2.thick);
-        tglDrawCircle(point2, thick);
-      }
-    }
-  }
-}
-
-TPointD Primitive::getSnap(TPointD pos) {
-  TImageP img = TTool::getImage(false, 1);
-  TVectorImageP vi(img);
-  if (vi && m_param->m_snap.getValue() && m_param->m_strokeIndex1 != -1 &&
-      m_param->m_strokeIndex1 <= (int)(vi->getStrokeCount())) {
-    TStroke *stroke1   = vi->getStroke(m_param->m_strokeIndex1);
-    TThickPoint point1 = stroke1->getPoint(m_param->m_w1);
-    TPointD snapPoint  = TPointD(point1.x, point1.y);
-    return snapPoint;
-  } else
-    return pos;
-}
 
 //=============================================================================
 // Rectangle Primitive Class Declaration
@@ -1157,6 +1118,106 @@ GeometricTool GeometricRasterTool(TTool::ToonzImage | TTool::EmptyTarget);
 GeometricTool GeometricRasterFullColorTool(TTool::RasterImage |
                                            TTool::EmptyTarget);
 
+
+
+void Primitive::drawSnap() {
+	// snapping
+	if ((m_param->m_targetType & TTool::Vectors) && m_param->m_snap.getValue()) {
+		m_param->m_pixelSize = m_tool->getPixelSize();
+		double thick = 6.0 * m_param->m_pixelSize;
+		if (m_param->m_foundSnap) {
+			tglColor(TPixelD(0.1, 0.9, 0.1));
+			tglDrawCircle(m_param->m_snapPoint, thick);
+		}
+	}
+}
+
+TPointD Primitive::getSnap(TPointD pos) {
+	if (m_param->m_foundSnap) return m_param->m_snapPoint;
+	else return pos;
+	//TImageP img = TTool::getImage(false, 1);
+	//TVectorImageP vi(img);
+	//if (vi && m_param->m_snap.getValue() && m_param->m_strokeIndex1 != -1 &&
+	//    m_param->m_strokeIndex1 <= (int)(vi->getStrokeCount())) {
+	//  TStroke *stroke1   = vi->getStroke(m_param->m_strokeIndex1);
+	//  TThickPoint point1 = stroke1->getPoint(m_param->m_w1);
+	//  TPointD snapPoint  = TPointD(point1.x, point1.y);
+	//  return snapPoint;
+	//} else
+	//  return pos;
+}
+
+//-------------------------------------------------------------------------------------------------------------
+
+TPointD Primitive::checkGuideSnapping(TPointD pos) {
+	if (Preferences::instance()->getVectorSnappingTarget() == 0) return pos;
+	if ((m_param->m_targetType & TTool::Vectors) && m_param->m_snap.getValue()) {
+		// check guide snapping
+		int vGuideCount = 0, hGuideCount = 0;
+		double guideDistance = sqrt(m_param->m_minDistance2);
+		TTool::Viewer *viewer = m_tool->getViewer();
+		if (viewer) {
+			vGuideCount = viewer->getVGuideCount();
+			hGuideCount = viewer->getHGuideCount();
+		}
+		double distanceToVGuide = -1.0, distanceToHGuide = -1.0;
+		double vGuide, hGuide;
+		bool useGuides = false;
+		if (vGuideCount) {
+			for (int j = 0; j < vGuideCount; j++) {
+				double guide = viewer->getVGuide(j);
+				double tempDistance = abs(guide - pos.y);
+				if (tempDistance < guideDistance &&
+					(distanceToVGuide < 0 || tempDistance < distanceToVGuide)) {
+					distanceToVGuide = tempDistance;
+					vGuide = guide;
+					useGuides = true;
+				}
+			}
+		}
+		if (hGuideCount) {
+			for (int j = 0; j < hGuideCount; j++) {
+				double guide = viewer->getHGuide(j);
+				double tempDistance = abs(guide - pos.x);
+				if (tempDistance < guideDistance &&
+					(distanceToHGuide < 0 || tempDistance < distanceToHGuide)) {
+					distanceToHGuide = tempDistance;
+					hGuide = guide;
+					useGuides = true;
+				}
+			}
+		}
+		if (useGuides && m_param->m_foundSnap) {
+			double currYDistance = abs(m_param->m_snapPoint.y - pos.y);
+			double currXDistance = abs(m_param->m_snapPoint.x - pos.x);
+			double hypotenuse =
+				sqrt(pow(currYDistance, 2.0) + pow(currXDistance, 2.0));
+			if ((distanceToVGuide >= 0 && distanceToVGuide < hypotenuse) ||
+				(distanceToHGuide >= 0 && distanceToHGuide < hypotenuse))
+				useGuides = true;
+			else
+				useGuides = false;
+		}
+		if (useGuides) {
+			assert(distanceToHGuide >= 0 || distanceToVGuide >= 0);
+			if (distanceToHGuide < 0 ||
+				(distanceToVGuide <= distanceToHGuide && distanceToVGuide >= 0)) {
+				m_param->m_snapPoint.y = vGuide;
+				m_param->m_snapPoint.x = pos.x;
+
+			}
+			else {
+				m_param->m_snapPoint.y = pos.y;
+				m_param->m_snapPoint.x = hGuide;
+			}
+			m_param->m_foundSnap = true;
+		}
+		if (m_param->m_foundSnap) return m_param->m_snapPoint;
+		else return pos;
+	}
+	else return pos;
+}
+
 //=============================================================================
 // Rectangle Primitive Class Implementation
 //-----------------------------------------------------------------------------
@@ -1223,6 +1284,7 @@ void RectanglePrimitive::leftButtonDrag(const TPointD &realPos,
                                          : m_startPoint.y - distance;
   } else {
     pos = calculateSnap(realPos);
+	pos = checkGuideSnapping(realPos);
   }
 
   if (m_param->m_pencil.getValue() &&
@@ -1322,6 +1384,7 @@ void RectanglePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 
 void RectanglePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   TPointD newPos = calculateSnap(pos);
+  newPos = checkGuideSnapping(pos);
   m_pos          = newPos;
   m_tool->invalidate();
 }
@@ -1408,6 +1471,7 @@ void CirclePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 
 void CirclePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   m_pos = calculateSnap(pos);
+  m_pos = checkGuideSnapping(pos);
   m_tool->invalidate();
 }
 
@@ -1653,6 +1717,7 @@ void MultiLinePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   m_ctrlDown = e.isCtrlPressed();
   TPointD newPos;
   newPos = calculateSnap(pos);
+  newPos = checkGuideSnapping(pos);
 
   if (m_isEditing) {
     if (e.isShiftPressed() && !m_vertex.empty())
@@ -1800,6 +1865,7 @@ void LinePrimitive::draw() {
 
 void LinePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   TPointD newPos = calculateSnap(pos);
+  newPos = checkGuideSnapping(pos);
   m_tool->invalidate();
 }
 
@@ -1856,6 +1922,7 @@ void LinePrimitive::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 void LinePrimitive::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (!m_isEditing) return;
   TPointD newPos = calculateSnap(pos);
+  newPos = checkGuideSnapping(pos);
 
   m_mousePosition = newPos;
 }
@@ -1944,6 +2011,7 @@ void EllipsePrimitive::leftButtonDrag(const TPointD &realPos,
                                          : m_startPoint.y - distance;
   } else {
     pos = calculateSnap(realPos);
+	pos = checkGuideSnapping(realPos);
   }
   m_pos = pos;
 
@@ -1985,6 +2053,7 @@ void EllipsePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 
 void EllipsePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   m_pos = calculateSnap(pos);
+  m_pos = checkGuideSnapping(pos);
   m_tool->invalidate();
 }
 
@@ -2101,6 +2170,7 @@ void ArcPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 
 void ArcPrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   TPointD newPos = calculateSnap(pos);
+  newPos = checkGuideSnapping(pos);
 
   switch (m_clickNumber) {
   case 1:
@@ -2275,5 +2345,6 @@ void PolygonPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 
 void PolygonPrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   TPointD newPos = calculateSnap(pos);
+  newPos = checkGuideSnapping(pos);
   m_tool->invalidate();
 }
