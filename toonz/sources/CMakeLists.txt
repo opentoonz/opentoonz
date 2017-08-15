@@ -245,6 +245,7 @@ find_package(Qt5 REQUIRED
     PrintSupport
     LinguistTools
     Multimedia
+    MultimediaWidgets
 )
 
 set(QT_MINIMUM_VERSION 5.5.0)
@@ -539,7 +540,7 @@ if(BUILD_ENV_MSVC AND MSVC_VERSION EQUAL 1800)
 endif()
 
 # generate Qt translations and messages
-set(LANGUAGES japanese italian french spanish chinese german)
+set(LANGUAGES japanese italian french spanish chinese german russian)
 
 function(add_translation module)
     set(translation)

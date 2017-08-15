@@ -2116,7 +2116,8 @@ void MainWindow::defineActions() {
                           tr("Brush hardness - Increase"), "");
   createToolOptionsAction("A_DecreaseBrushHardness",
                           tr("Brush hardness - Decrease"), "");
-
+  createToolOptionsAction("A_ToolOption_SnapSensitivity", tr("SnapSensitivity"),
+                          "");
   createToolOptionsAction("A_ToolOption_AutoGroup", tr("Auto Group"), "");
   createToolOptionsAction("A_ToolOption_BreakSharpAngles",
                           tr("Break sharp angles"), "");
@@ -2254,7 +2255,7 @@ class ReloadStyle final : public MenuItemHandler {
 public:
   ReloadStyle() : MenuItemHandler("MI_ReloadStyle") {}
   void execute() override {
-    QString currentStyle = Preferences::instance()->getCurrentStyleSheet();
+    QString currentStyle = Preferences::instance()->getCurrentStyleSheetPath();
     QFile file(currentStyle);
     file.open(QFile::ReadOnly);
     QString styleSheet = QString(file.readAll());
