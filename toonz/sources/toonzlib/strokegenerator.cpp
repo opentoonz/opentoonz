@@ -5,6 +5,7 @@
 //#include "tofflinegl.h"
 
 #include "tstroke.h"
+#include "toonz/preferences.h"
 
 using namespace std;
 
@@ -117,10 +118,46 @@ void StrokeGenerator::drawFragments(int first, int last) {
   TThickPoint c;
   TPointD v;
 
+  // If drawing a straight line, a stroke can have only two points
+  if (m_points.size() == 2) {
+    a = m_points[0];
+    b = m_points[1];
+    if (Preferences::instance()->getShow0ThickLines()) {
+      if (a.thick == 0) a.thick = 0.1;
+      if (b.thick == 0) b.thick = 0.1;
+    }
+    // m_p0 = m_p1 = b;
+    assert(tdistance(b, a) > h);
+    v          = a.thick * normalize(rotate90(b - a));
+    m_p0       = a + v;
+    m_p1       = a - v;
+    v          = b.thick * normalize(rotate90(b - a));
+    TPointD p0 = b + v;
+    TPointD p1 = b - v;
+    glBegin(GL_POLYGON);
+    tglVertex(m_p0);
+    tglVertex(m_p1);
+    tglVertex(p1);
+    tglVertex(p0);
+    glEnd();
+    m_p0 = p0;
+    m_p1 = p1;
+    glBegin(GL_LINE_STRIP);
+    tglVertex(a);
+    tglVertex(b);
+    glEnd();
+    return;
+  }
+
   while (i < last) {
     a = m_points[i - 1];
     b = m_points[i];
     c = m_points[i + 1];
+    if (Preferences::instance()->getShow0ThickLines()) {
+      if (a.thick == 0) a.thick = 0.1;
+      if (b.thick == 0) b.thick = 0.1;
+      if (c.thick == 0) c.thick = 0.1;
+    }
     if (a.thick >= h && b.thick >= h && tdistance2(b, a) >= h &&
         tdistance2(a, c) >= h) {
       if (i - 1 == 0) {
@@ -205,11 +242,24 @@ TRectD StrokeGenerator::getModifiedRegion() const { return m_modifiedRegion; }
 
 //-------------------------------------------------------------------
 
+void StrokeGenerator::removeMiddlePoints() {
+  int size = m_points.size();
+  if (size > 2) {
+    m_points.erase(m_points.begin() + 1, m_points.begin() + (size - 1));
+  }
+}
+
+//-------------------------------------------------------------------
+
 TRectD StrokeGenerator::getLastModifiedRegion() {
   TRectD lastModifiedRegion = m_lastModifiedRegion;
   m_lastModifiedRegion.empty();
   return lastModifiedRegion;
 }
+
+//-------------------------------------------------------------------
+
+TPointD StrokeGenerator::getFirstPoint() { return m_points[0]; }
 
 //-------------------------------------------------------------------
 
