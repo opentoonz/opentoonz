@@ -1223,6 +1223,9 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
     , m_hardnessField(0)
     , m_poligonSideField(0)
     , m_shapeField(0)
+    , m_snapCheckbox(0)
+    , m_snapSensitivityCombo(0)
+    , m_tool(tool)
     , m_pencilMode(0) {
   setFrameStyle(QFrame::StyledPanel);
   setFixedHeight(26);
@@ -1266,6 +1269,14 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
                          SLOT(onPencilModeToggled(bool)));
   }
 
+  if (tool->getTargetType() & TTool::Vectors) {
+    m_snapCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Snap"));
+    m_snapSensitivityCombo =
+        dynamic_cast<ToolOptionCombo *>(m_controls.value("Sensitivity:"));
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
+  }
+
   ToolOptionPopupButton *m_joinStyle =
       dynamic_cast<ToolOptionPopupButton *>(m_controls.value("Join"));
   m_miterField =
@@ -1286,6 +1297,9 @@ void GeometricToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
   for (it = m_controls.begin(); it != m_controls.end(); it++)
     it.value()->updateStatus();
+  if (m_tool->getTargetType() & TTool::Vectors) {
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
+  }
 }
 
 //-----------------------------------------------------------------------------
