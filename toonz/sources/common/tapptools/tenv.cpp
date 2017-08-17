@@ -529,10 +529,6 @@ TFilePath TEnv::getStuffDir() {
   //#endif
 }
 
-std::string TEnv::getWorkingDirectory() {
-  return EnvGlobals::instance()->getWorkingDirectory();
-}
-
 void TEnv::setWorkingDirectory() {
   EnvGlobals::instance()->setWorkingDirectory();
 }
