@@ -33,16 +33,21 @@ We will first review the request, then we will accept it, add comments for rewor
 ## Bugs
 
 If you find bugs, please report details about them using [issues](https://github.com/opentoonz/opentoonz/issues).
+Please include information needed to reproduce the bug, including the operating system 
+and information directly relating to the issue. Links to screen captures of what is 
+observed on screen or video of specific steps to produce the problem are very helpful.  
 Then we will try to reproduce the bugs and fix them.
-Unfortunately, bugs can sometimes only be reproduced in your own environment,
-so we cannot reproduce them. If you believe you can fix the bug, please submit a pull request.
+Unfortunately, bugs can sometimes only be reproduced in your own environment, 
+so we cannot reproduce them. 
+If you believe you can fix the bug, please submit a pull request.
 
 ## Features
 
 If you had an idea about a new feature, please implement it and send a pull request to us.
 If you cannot implement the feature, please open a topic on the [Google Group Page](https://groups.google.com/forum/#!forum/opentoonz_en).
 It enables us to discuss implementations of the feature there.
-Feature requests posted on GitHub without an active developer or funding will be closed to keep the issue tracker from becoming cluttered with unfulfilled feature requests.
+Feature requests posted on GitHub without an active developer or funding will be closed 
+to keep the issue tracker from becoming cluttered with unfulfilled feature requests.
 
 ## Translations
 
