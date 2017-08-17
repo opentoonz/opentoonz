@@ -109,10 +109,6 @@ const char *applicationFullName = "OpenToonz 1.1.3";
 const char *rootVarName         = "TOONZROOT";
 const char *systemVarPrefix     = "TOONZ";
 
-QString workingDirectoryTmp  = QDir::currentPath();
-QByteArray ba                = workingDirectoryTmp.toLatin1();
-const char *workingDirectory = ba.data();
-
 #ifdef MACOSX
 #include "tthread.h"
 void postThreadMsg(TThread::Message *) {}
@@ -165,7 +161,7 @@ DV_IMPORT_API void initColorFx();
 static void initToonzEnv() {
   StudioPalette::enable(true);
 
-  TEnv::setWorkingDirectory(workingDirectory);
+  TEnv::setWorkingDirectory();
   TEnv::setApplication(applicationName, applicationVersion,
                        applicationRevision);
   TEnv::setRootVarName(rootVarName);
@@ -533,7 +529,7 @@ int main(int argc, char *argv[]) {
 
   loadShaderInterfaces(ToonzFolder::getLibraryFolder() + TFilePath("shaders"));
 
-  splash.showMessage(offsetStr + "Initializing Toonz application ...",
+  splash.showMessage(offsetStr + "Initializing OpenToonz ...",
                      Qt::AlignCenter, Qt::white);
   a.processEvents();
 
@@ -596,9 +592,13 @@ int main(int argc, char *argv[]) {
 
   TApp::instance()->setMainWindow(&w);
   w.setWindowTitle(applicationFullName);
-
-  splash.showMessage(offsetStr + "Starting main window ...", Qt::AlignCenter,
-                     Qt::white);
+  if (TEnv::getIsPortable()) {
+    splash.showMessage(offsetStr + "Starting OpenToonz Portable ...",
+                       Qt::AlignCenter, Qt::white);
+  } else {
+    splash.showMessage(offsetStr + "Starting main window ...", Qt::AlignCenter,
+                       Qt::white);
+  }
   a.processEvents();
 
   TFilePath fp = ToonzFolder::getModuleFile("mainwindow.ini");

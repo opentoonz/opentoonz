@@ -5,9 +5,7 @@
 #include "tconvert.h"
 #include "tfilepath_io.h"
 
-#ifdef LINUX
 #include <QDir>
-#endif
 #include <QSettings>
 
 #ifdef LEVO_MACOSX
@@ -127,13 +125,6 @@ public:
 
   TFilePath getStuffDir() {
     if (m_stuffDir) return *m_stuffDir;
-
-    std::string testWorking = getWorkingDirectory();
-    TFilePath portableCheck =
-        TFilePath((getWorkingDirectory() + "\\portablestuff\\"));
-    std::string stringPortCheck = portableCheck.getQString().toStdString();
-    TFileStatus portableStatus(portableCheck);
-    m_isPortable = portableStatus.doesExist();
     if (m_isPortable)
       return TFilePath((getWorkingDirectory() + "\\portablestuff\\"));
 
@@ -148,9 +139,6 @@ public:
     TFilePath profilesDir =
         getSystemVarPathValue(getSystemVarPrefix() + "PROFILES");
     if (profilesDir == TFilePath()) profilesDir = getStuffDir() + "profiles";
-    if (m_isPortable)
-      profilesDir =
-          TFilePath(m_workingDirectory) + TFilePath("portablestuff//profiles");
     m_envFile =
         profilesDir + "env" + (TSystem::getUserName().toStdString() + ".env");
   }
@@ -199,14 +187,24 @@ public:
   std::string getRootVarName() { return m_rootVarName; }
 
   void setSystemVarPrefix(std::string prefix) { m_systemVarPrefix = prefix; }
-  std::string getSystemVarPrefix() { return m_systemVarPrefix; }
+  std::string getSystemVarPrefix() {
+    if (getIsPortable()) return "";
+    return m_systemVarPrefix;
+  }
 
-  void setWorkingDirectory(std::string workingDirectory) {
-    m_workingDirectory = workingDirectory;
+  void setWorkingDirectory() {
+    QString workingDirectoryTmp  = QDir::currentPath();
+    QByteArray ba                = workingDirectoryTmp.toLatin1();
+    const char *workingDirectory = ba.data();
+    m_workingDirectory           = workingDirectory;
+
+    // check if portable
+    TFilePath portableCheck =
+        TFilePath(m_workingDirectory + "\\portablestuff\\");
+    TFileStatus portableStatus(portableCheck);
+    m_isPortable = portableStatus.doesExist();
   }
   std::string getWorkingDirectory() { return m_workingDirectory; }
-
-  void setIsPortable(bool isPortable) { m_isPortable = isPortable; }
 
   bool getIsPortable() { return m_isPortable; }
 
@@ -520,7 +518,6 @@ void TEnv::setSystemVarPrefix(std::string varName) {
 }
 
 std::string TEnv::getSystemVarPrefix() {
-  if (getIsPortable()) return "";
   return EnvGlobals::instance()->getSystemVarPrefix();
 }
 
@@ -536,20 +533,15 @@ std::string TEnv::getWorkingDirectory() {
   return EnvGlobals::instance()->getWorkingDirectory();
 }
 
-void TEnv::setWorkingDirectory(std::string workingDirectory) {
-  EnvGlobals::instance()->setWorkingDirectory(workingDirectory);
+void TEnv::setWorkingDirectory() {
+  EnvGlobals::instance()->setWorkingDirectory();
 }
 
 bool TEnv::getIsPortable() { return EnvGlobals::instance()->getIsPortable(); }
 
-void TEnv::setIsPortable(bool isPortable) {
-  EnvGlobals::instance()->setIsPortable(isPortable);
-}
-
 TFilePath TEnv::getConfigDir() {
   TFilePath configDir = getSystemVarPathValue(getSystemVarPrefix() + "CONFIG");
-  if (configDir == TFilePath() || getIsPortable())
-    configDir = getStuffDir() + "config";
+  if (configDir == TFilePath()) configDir = getStuffDir() + "config";
   return configDir;
 }
 

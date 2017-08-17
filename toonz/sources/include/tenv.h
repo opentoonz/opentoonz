@@ -95,10 +95,9 @@ DVAPI void setApplication(std::string applicationName, std::string version,
 DVAPI std::string getApplicationName();
 DVAPI std::string getApplicationVersion();
 
-DVAPI void setWorkingDirectory(std::string workingDirectory);
+DVAPI void setWorkingDirectory();
 DVAPI std::string getWorkingDirectory();
 
-DVAPI void setIsPortable(bool isPortable);
 DVAPI bool getIsPortable();
 
 // es.: TEnv::setModuleFullName("Toonz 5.0.1 Harlequin");
