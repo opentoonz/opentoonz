@@ -1454,7 +1454,9 @@ void CirclePrimitive::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (!m_isEditing) return;
 
   m_pos    = pos;
-  m_radius = tdistance(m_centre, pos);
+  m_pos = calculateSnap(pos);
+  m_pos = checkGuideSnapping(pos);
+  m_radius = tdistance(m_centre, m_pos);
 }
 
 //-----------------------------------------------------------------------------
@@ -2282,7 +2284,9 @@ void PolygonPrimitive::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
 void PolygonPrimitive::leftButtonDrag(const TPointD &pos,
                                       const TMouseEvent &e) {
   if (!m_isEditing) return;
-  m_radius = tdistance(m_centre, pos);
+  TPointD newPos = calculateSnap(pos);
+  newPos = checkGuideSnapping(pos);
+  m_radius = tdistance(m_centre, newPos);
 }
 
 //-----------------------------------------------------------------------------
