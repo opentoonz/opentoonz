@@ -2312,14 +2312,19 @@ void TCellSelection::convertToToonzRaster() {
 		TImageP oldPImage = xsh->getCell(r0, c0).getImage(false);
 		TVectorImageP vi = (TVectorImageP)oldPImage;
 		if (vi) {
-			TScale sc(dpi / Stage::inch, dpi / Stage::inch);
+			TPalette *plt = vi->getPalette();
+			const TAffine &aff = camera->getStageToCameraRef();
+			const TDimensionD &size = camera->getSize();
+			const TDimension &res = camera->getRes();
 
-			TRectD bbox = sc * vi->getBBox();
-			TToonzImageP ti = ToonzImageUtils::vectorToToonzImage(
-				vi, sc, vi->getPalette(), TPointD(0, 0), TDimension(xres, yres), 0, true);
-			ti->setPalette(vi->getPalette());
+			const TPointD pos(-0.5 * size.lx, -0.5 * size.ly);
+
+			// Render to toonz image
+			TToonzImageP ti = ToonzImageUtils::vectorToToonzImage(vi, aff, plt, pos, res, 0, true);
+			ti->setPalette(plt);
 
 			ti->setDpi(dpi, dpi);
+			sl->setPalette(cellLevel->getSimpleLevel()->getPalette()->clone());
 			sl->setFrame(fid, ti);
 			ti->setSavebox(TRect(0, 0, xres - 1, yres - 1));
 
