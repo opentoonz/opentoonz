@@ -897,6 +897,22 @@ void SceneViewer::hideEvent(QHideEvent *) {
   if (m_locator && m_locator->isVisible()) m_locator->hide();
 }
 
+int SceneViewer::getVGuideCount() {
+  if (viewGuideToggle.getStatus())
+    return m_vRuler->getGuideCount();
+  else
+    return 0;
+}
+int SceneViewer::getHGuideCount() {
+  if (viewGuideToggle.getStatus())
+    return m_hRuler->getGuideCount();
+  else
+    return 0;
+}
+
+double SceneViewer::getVGuide(int index) { return m_vRuler->getGuide(index); }
+double SceneViewer::getHGuide(int index) { return m_hRuler->getGuide(index); }
+
 //-----------------------------------------------------------------------------
 
 void SceneViewer::initializeGL() {

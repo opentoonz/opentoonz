@@ -245,6 +245,7 @@ find_package(Qt5 REQUIRED
     PrintSupport
     LinguistTools
     Multimedia
+    MultimediaWidgets
 )
 
 set(QT_MINIMUM_VERSION 5.5.0)

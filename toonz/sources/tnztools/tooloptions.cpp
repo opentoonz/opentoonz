@@ -342,9 +342,10 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p) {
 
   case COMBOBOX:
   default: {
-    QLabel *label = addLabel(p);
-    m_panel->addLabel(p->getName(), label);
-
+    if (p->getQStringName() != "") {
+      QLabel *label = addLabel(p);
+      m_panel->addLabel(p->getName(), label);
+    }
     ToolOptionCombo *obj = new ToolOptionCombo(m_tool, p, m_toolHandle);
     control              = obj;
     widget               = obj;
@@ -1570,6 +1571,8 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
     , m_pencilMode(0)
     , m_hardnessLabel(0)
     , m_joinStyleCombo(0)
+    , m_snapCheckbox(0)
+    , m_snapSensitivityCombo(0)
     , m_miterField(0) {
   TPropertyGroup *props = tool->getProperties(0);
   assert(props->getPropertyCount() > 0);
@@ -1615,7 +1618,10 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
 
     addSeparator();
     if (tool && tool->getProperties(1)) tool->getProperties(1)->accept(builder);
-
+    m_snapCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Snap"));
+    m_snapSensitivityCombo =
+        dynamic_cast<ToolOptionCombo *>(m_controls.value("Sensitivity:"));
     m_joinStyleCombo =
         dynamic_cast<ToolOptionPopupButton *>(m_controls.value("Join"));
     m_miterField =
@@ -1633,22 +1639,28 @@ void BrushToolOptionsBox::filterControls() {
   // show or hide widgets which modify imported brush (mypaint)
 
   bool showModifiers = false;
-  if (FullColorBrushTool* fullColorBrushTool = dynamic_cast<FullColorBrushTool*>(m_tool))
+  if (FullColorBrushTool *fullColorBrushTool =
+          dynamic_cast<FullColorBrushTool *>(m_tool))
     showModifiers = fullColorBrushTool->getBrushStyle();
 
-  for (QMap<std::string, QLabel *>::iterator it = m_labels.begin(); it != m_labels.end(); it++) {
+  for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
+       it != m_labels.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
-    bool isCommon = (it.key() == "Pressure" || it.key() == "Preset:");
-    bool visible = isCommon || (isModifier == showModifiers);
+    bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
     it.value()->setVisible(visible);
   }
 
-  for (QMap<std::string, ToolOptionControl *>::iterator it = m_controls.begin(); it != m_controls.end(); it++) {
+  for (QMap<std::string, ToolOptionControl *>::iterator it = m_controls.begin();
+       it != m_controls.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
-    bool isCommon = (it.key() == "Pressure" || it.key() == "Preset:");
-    bool visible = isCommon || (isModifier == showModifiers);
-    if (QWidget* widget = dynamic_cast<QWidget*>(it.value()))
+    bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
+    if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
       widget->setVisible(visible);
+  }
+  if (m_tool->getTargetType() & TTool::Vectors) {
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
   }
 }
 
@@ -1664,6 +1676,8 @@ void BrushToolOptionsBox::updateStatus() {
   if (m_miterField)
     m_miterField->setEnabled(m_joinStyleCombo->currentIndex() ==
                              TStroke::OutlineOptions::MITER_JOIN);
+  if (m_snapCheckbox)
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
 }
 
 //-----------------------------------------------------------------------------
