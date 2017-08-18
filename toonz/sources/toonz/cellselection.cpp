@@ -33,6 +33,7 @@
 #include "toonz/tpalettehandle.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/txshlevelhandle.h"
+#include "toonz/tcolumnhandle.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/tframehandle.h"
 #include "toonz/tobjecthandle.h"
@@ -46,12 +47,15 @@
 #include "toonz/trasterimageutils.h"
 #include "toonz/levelset.h"
 #include "toonz/tstageobjecttree.h"
+#include "toonz/stage.h"
 
 // TnzCore includes
 #include "timagecache.h"
 #include "tundo.h"
 #include "tropcm.h"
 #include "tvectorimage.h"
+#include "tsystem.h"
+#include "filebrowsermodel.h"
 
 // Qt includes
 #include <QApplication>
@@ -1204,6 +1208,7 @@ void TCellSelection::enableCommands() {
   enableCommand(this, MI_Reframe2, &TCellSelection::reframe2Cells);
   enableCommand(this, MI_Reframe3, &TCellSelection::reframe3Cells);
   enableCommand(this, MI_Reframe4, &TCellSelection::reframe4Cells);
+  enableCommand(this, MI_ConvertToToonzRaster, &TCellSelection::convertToToonzRaster);
 }
 //-----------------------------------------------------------------------------
 // Used in RenameCellField::eventFilter()
@@ -2114,4 +2119,225 @@ void TCellSelection::renameMultiCells(QList<TXshCell> &cells) {
     TUndoManager::manager()->add(undo);
   }
   TUndoManager::manager()->endBlock();
+}
+
+//=============================================================================
+// CreateLevelUndo
+//-----------------------------------------------------------------------------
+
+class CreateLevelUndo final : public TUndo {
+	int m_rowIndex;
+	int m_columnIndex;
+	int m_frameCount;
+	int m_oldLevelCount;
+	int m_step;
+	TXshSimpleLevelP m_sl;
+	bool m_areColumnsShifted;
+
+public:
+	CreateLevelUndo(int row, int column, int frameCount, int step,
+		bool areColumnsShifted)
+		: m_rowIndex(row)
+		, m_columnIndex(column)
+		, m_frameCount(frameCount)
+		, m_step(step)
+		, m_sl(0)
+		, m_areColumnsShifted(areColumnsShifted) {
+		TApp *app = TApp::instance();
+		ToonzScene *scene = app->getCurrentScene()->getScene();
+		m_oldLevelCount = scene->getLevelSet()->getLevelCount();
+	}
+	~CreateLevelUndo() { m_sl = 0; }
+
+	void onAdd(TXshSimpleLevelP sl) { m_sl = sl; }
+
+	void undo() const override {
+		TApp *app = TApp::instance();
+		ToonzScene *scene = app->getCurrentScene()->getScene();
+		TXsheet *xsh = scene->getXsheet();
+		if (m_areColumnsShifted)
+			xsh->removeColumn(m_columnIndex);
+		else if (m_frameCount > 0)
+			xsh->removeCells(m_rowIndex, m_columnIndex, m_frameCount);
+
+		TLevelSet *levelSet = scene->getLevelSet();
+		if (levelSet) {
+			int m = levelSet->getLevelCount();
+			while (m > 0 && m > m_oldLevelCount) {
+				--m;
+				TXshLevel *level = levelSet->getLevel(m);
+				if (level) levelSet->removeLevel(level);
+			}
+		}
+		app->getCurrentScene()->notifySceneChanged();
+		app->getCurrentScene()->notifyCastChange();
+		app->getCurrentXsheet()->notifyXsheetChanged();
+	}
+
+	void redo() const override {
+		if (!m_sl.getPointer()) return;
+		TApp *app = TApp::instance();
+		ToonzScene *scene = app->getCurrentScene()->getScene();
+		scene->getLevelSet()->insertLevel(m_sl.getPointer());
+		TXsheet *xsh = scene->getXsheet();
+		if (m_areColumnsShifted) xsh->insertColumn(m_columnIndex);
+		std::vector<TFrameId> fids;
+		m_sl->getFids(fids);
+		int i = m_rowIndex;
+		int f = 0;
+		while (i < m_frameCount + m_rowIndex) {
+			TFrameId fid = (fids.size() != 0) ? fids[f] : i;
+			TXshCell cell(m_sl.getPointer(), fid);
+			f++;
+			xsh->setCell(i, m_columnIndex, cell);
+			int appo = i++;
+			while (i < m_step + appo) xsh->setCell(i++, m_columnIndex, cell);
+		}
+		app->getCurrentScene()->notifySceneChanged();
+		app->getCurrentScene()->notifyCastChange();
+		app->getCurrentXsheet()->notifyXsheetChanged();
+	}
+
+	int getSize() const override { return sizeof *this; }
+	QString getHistoryString() override {
+		return QObject::tr("Create Level %1  at Column %2")
+			.arg(QString::fromStdWString(m_sl->getName()))
+			.arg(QString::number(m_columnIndex + 1));
+	}
+};
+
+
+//-----------------------------------------------------------------------------
+// Convert selected vector cells to ToonzRaster
+
+void TCellSelection::convertToToonzRaster() {
+
+	int r0, c0, r1, c1;
+	getSelectedCells(r0, c0, r1, c1);
+
+	TApp *app = TApp::instance();
+	int row = app->getCurrentFrame()->getFrame();
+	int col = app->getCurrentColumn()->getColumnIndex();
+	int i, j;
+
+	ToonzScene *scene = app->getCurrentScene()->getScene();
+	TXsheet *xsh = scene->getXsheet();
+
+	TXshCell firstCell = xsh->getCell(r0, c0);
+	if (firstCell.isEmpty()) return;
+
+	TXshSimpleLevel *sourceSl = firstCell.getSimpleLevel();
+	if (sourceSl->getType() != PLI_XSHLEVEL) return;
+
+	TFilePath sourcePath = sourceSl->getPath();
+	std::wstring sourceName = sourcePath.getWideName();
+	TFilePath parentDir("+drawings");
+	TFilePath fp =
+		scene->getDefaultLevelPath(TZP_XSHLEVEL, sourceName).withParentDir(parentDir);
+
+	TFilePath actualFp = scene->decodeFilePath(fp);
+
+	i = 1;
+	std::wstring newName = sourceName;
+	while (TSystem::doesExistFileOrLevel(actualFp)) {
+		newName = sourceName + QString::number(i).toStdWString();
+		fp = scene->getDefaultLevelPath(TZP_XSHLEVEL, newName).withParentDir(parentDir);
+		actualFp = scene->decodeFilePath(fp);
+		i++;
+	}
+	parentDir = scene->decodeFilePath(parentDir);
+	if (!TFileStatus(parentDir).doesExist()) {
+		try {
+			TSystem::mkDir(parentDir);
+			DvDirModel::instance()->refreshFolder(parentDir.getParentDir());
+		}
+		catch (...) {
+			//error(tr("Unable to create") + toQString(parentDir));
+			//return false;
+			return;
+		}
+	}
+
+	TCamera *camera = app->getCurrentScene()->getScene()->getCurrentCamera();
+	double dpi = camera->getDpi().x;
+	int xres = camera->getRes().lx;
+	int yres = camera->getRes().ly;
+
+	TXshLevel *level =
+		scene->createNewLevel(TZP_XSHLEVEL, newName, TDimension(), 0, fp);
+	TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(level);
+	assert(sl);
+	sl->setPath(fp, true);
+
+	sl->getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
+	sl->getProperties()->setDpi(dpi);
+	sl->getProperties()->setImageDpi(TPointD(dpi, dpi));
+	sl->getProperties()->setImageRes(TDimension(xres, yres));
+
+	TXshCell cell = xsh->getCell(r0, c0);
+	TFrameId frameId = cell.getFrameId();
+	TXshLevel *cellLevel = cell.getSimpleLevel();
+	std::vector<int> frameNumbers;
+	frameNumbers.push_back(frameId.getNumber());
+	
+	for (i = r0 + 1; i <= r1; i++) {
+		TXshCell newCell = xsh->getCell(i, c0);
+		TFrameId newFrameId = xsh->getCell(i, c0).getFrameId();
+		if (newCell.getSimpleLevel() == cellLevel) {
+			if (std::find(frameNumbers.begin(), frameNumbers.end(), newFrameId.getNumber()) != frameNumbers.end()) {
+				frameNumbers.push_back(newFrameId.getNumber());
+			}
+		}
+	}
+	std::sort(frameNumbers.begin(), frameNumbers.end());
+	int totalFrames = frameNumbers.size();
+	
+	col += 1;
+	TApp::instance()->getCurrentColumn()->setColumnIndex(col);
+	xsh->insertColumn(col);
+	
+
+
+	CreateLevelUndo *undo =
+		new CreateLevelUndo(row, col, totalFrames, 1, true);
+	TUndoManager::manager()->add(undo);
+
+	for (i = 0; i < totalFrames; i++) {
+		TFrameId fid(frameNumbers[i]);
+		TXshCell cell(sl, fid);
+		
+		//TRasterCM32P raster(xres, yres);
+		//raster->fill(TPixelCM32());
+		//TToonzImageP ti(raster, TRect());
+		TImageP oldPImage = xsh->getCell(r0, c0).getImage(false);
+		TVectorImageP vi = (TVectorImageP)oldPImage;
+		if (vi) {
+			TScale sc(dpi / Stage::inch, dpi / Stage::inch);
+
+			TRectD bbox = sc * vi->getBBox();
+			TToonzImageP ti = ToonzImageUtils::vectorToToonzImage(
+				vi, sc, vi->getPalette(), TPointD(0, 0), TDimension(xres, yres), 0, true);
+			ti->setPalette(vi->getPalette());
+
+			ti->setDpi(dpi, dpi);
+			sl->setFrame(fid, ti);
+			ti->setSavebox(TRect(0, 0, xres - 1, yres - 1));
+
+			xsh->setCell(row++, col, cell);
+		}
+	}
+
+	
+	sl->save(fp);
+	DvDirModel::instance()->refreshFolder(fp.getParentDir());
+	
+
+	undo->onAdd(sl);
+
+	app->getCurrentScene()->notifySceneChanged();
+	app->getCurrentScene()->notifyCastChange();
+	app->getCurrentXsheet()->notifyXsheetChanged();
+
+	app->getCurrentTool()->onImageChanged(
+		(TImage::Type)app->getCurrentImageType());
 }
