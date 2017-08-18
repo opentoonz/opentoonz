@@ -48,6 +48,7 @@
 #include "toonz/levelset.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/stage.h"
+#include "vectorizerpopup.h"
 
 // TnzCore includes
 #include "timagecache.h"
@@ -1222,7 +1223,7 @@ bool TCellSelection::isEnabledCommand(
       MI_Each3,        MI_Each4,      MI_Rollup,       MI_Rolldown,
       MI_TimeStretch,  MI_CloneLevel, MI_SetKeyframes, MI_Copy,
       MI_Paste,        MI_PasteInto,  MI_Cut,          MI_Clear,
-      MI_Insert,       MI_PasteInto,  MI_Reframe1,     MI_Reframe2,
+      MI_Insert,       MI_ConvertToToonzRaster,  MI_Reframe1,     MI_Reframe2,
       MI_Reframe3,     MI_Reframe4};
   return commands.contains(commandId);
 }
@@ -2133,15 +2134,17 @@ class CreateLevelUndo final : public TUndo {
 	int m_step;
 	TXshSimpleLevelP m_sl;
 	bool m_areColumnsShifted;
+	bool m_keepLevel;
 
 public:
 	CreateLevelUndo(int row, int column, int frameCount, int step,
-		bool areColumnsShifted)
+		bool areColumnsShifted, bool keepLevel = false)
 		: m_rowIndex(row)
 		, m_columnIndex(column)
 		, m_frameCount(frameCount)
 		, m_step(step)
 		, m_sl(0)
+		, m_keepLevel(keepLevel)
 		, m_areColumnsShifted(areColumnsShifted) {
 		TApp *app = TApp::instance();
 		ToonzScene *scene = app->getCurrentScene()->getScene();
@@ -2159,14 +2162,15 @@ public:
 			xsh->removeColumn(m_columnIndex);
 		else if (m_frameCount > 0)
 			xsh->removeCells(m_rowIndex, m_columnIndex, m_frameCount);
-
-		TLevelSet *levelSet = scene->getLevelSet();
-		if (levelSet) {
-			int m = levelSet->getLevelCount();
-			while (m > 0 && m > m_oldLevelCount) {
-				--m;
-				TXshLevel *level = levelSet->getLevel(m);
-				if (level) levelSet->removeLevel(level);
+		if (!m_keepLevel) {
+			TLevelSet *levelSet = scene->getLevelSet();
+			if (levelSet) {
+				int m = levelSet->getLevelCount();
+				while (m > 0 && m > m_oldLevelCount) {
+					--m;
+					TXshLevel *level = levelSet->getLevel(m);
+					if (level) levelSet->removeLevel(level);
+				}
 			}
 		}
 		app->getCurrentScene()->notifySceneChanged();
@@ -2277,62 +2281,62 @@ void TCellSelection::convertToToonzRaster() {
 	TXshCell cell = xsh->getCell(r0, c0);
 	TFrameId frameId = cell.getFrameId();
 	TXshLevel *cellLevel = cell.getSimpleLevel();
-	std::vector<int> frameNumbers;
-	frameNumbers.push_back(frameId.getNumber());
-	
+	std::vector<TFrameId> frameIds;
+	std::vector<TImageP> images;
+	frameIds.push_back(frameId);
+	images.push_back(cell.getImage(false));
 	for (i = r0 + 1; i <= r1; i++) {
 		TXshCell newCell = xsh->getCell(i, c0);
 		TFrameId newFrameId = xsh->getCell(i, c0).getFrameId();
 		if (newCell.getSimpleLevel() == cellLevel) {
-			if (std::find(frameNumbers.begin(), frameNumbers.end(), newFrameId.getNumber()) != frameNumbers.end()) {
-				frameNumbers.push_back(newFrameId.getNumber());
+			if (std::find(frameIds.begin(), frameIds.end(), newCell.getFrameId()) == frameIds.end()) {
+				frameIds.push_back(newFrameId);
+				images.push_back(newCell.getImage(false));
 			}
 		}
 	}
-	std::sort(frameNumbers.begin(), frameNumbers.end());
-	int totalFrames = frameNumbers.size();
+
+	int totalImages = images.size();
 	
 	col += 1;
 	TApp::instance()->getCurrentColumn()->setColumnIndex(col);
 	xsh->insertColumn(col);
-	
-
 
 	CreateLevelUndo *undo =
-		new CreateLevelUndo(row, col, totalFrames, 1, true);
+		new CreateLevelUndo(row, col, totalImages, 1, true);
 	TUndoManager::manager()->add(undo);
 
-	for (i = 0; i < totalFrames; i++) {
-		TFrameId fid(frameNumbers[i]);
+	for (i = 0; i < totalImages; i++) {
+		TFrameId fid(i + 1);
 		TXshCell cell(sl, fid);
 		
-		//TRasterCM32P raster(xres, yres);
-		//raster->fill(TPixelCM32());
-		//TToonzImageP ti(raster, TRect());
-		TImageP oldPImage = xsh->getCell(r0, c0).getImage(false);
-		TVectorImageP vi = (TVectorImageP)oldPImage;
+		TVectorImageP vi = (TVectorImageP)images[i];
 		if (vi) {
 			TPalette *plt = vi->getPalette();
 			const TAffine &aff = camera->getStageToCameraRef();
 			const TDimensionD &size = camera->getSize();
 			const TDimension &res = camera->getRes();
-
 			const TPointD pos(-0.5 * size.lx, -0.5 * size.ly);
 
 			// Render to toonz image
 			TToonzImageP ti = ToonzImageUtils::vectorToToonzImage(vi, aff, plt, pos, res, 0, true);
 			ti->setPalette(plt);
-
 			ti->setDpi(dpi, dpi);
-			sl->setPalette(cellLevel->getSimpleLevel()->getPalette()->clone());
 			sl->setFrame(fid, ti);
 			ti->setSavebox(TRect(0, 0, xres - 1, yres - 1));
 
-			xsh->setCell(row++, col, cell);
+
+			for (int k = r0; k <= r1; k++) {
+				TXshCell oldCell = xsh->getCell(k, col - 1);
+				if (oldCell.getFrameId() == frameIds[i]) {
+					xsh->setCell(k, col, cell);
+				}
+			}
 		}
 	}
 
-	
+
+	sl->setPalette(cellLevel->getSimpleLevel()->getPalette()->clone());
 	sl->save(fp);
 	DvDirModel::instance()->refreshFolder(fp.getParentDir());
 	
