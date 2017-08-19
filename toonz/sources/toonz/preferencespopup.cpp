@@ -625,8 +625,8 @@ void PreferencesPopup::onAnimationStepChanged() {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onLanguageTypeChanged(int index) {
-  m_pref->setCurrentLanguage(index);
+void PreferencesPopup::onLanguageTypeChanged(const QString &langName) {
+  m_pref->setCurrentLanguage(langName);
   QString currentLanguage = m_pref->getCurrentLanguage();
 }
 
@@ -769,10 +769,10 @@ void PreferencesPopup::onShowKeyframesOnCellAreaChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onStyleSheetTypeChanged(int index) {
-  m_pref->setCurrentStyleSheet(index);
+void PreferencesPopup::onStyleSheetTypeChanged(const QString &styleSheetName) {
+  m_pref->setCurrentStyleSheet(styleSheetName);
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  QString currentStyle = m_pref->getCurrentStyleSheet();
+  QString currentStyle = m_pref->getCurrentStyleSheetPath();
   qApp->setStyleSheet(currentStyle);
   QApplication::restoreOverrideCursor();
 }
@@ -848,6 +848,13 @@ void PreferencesPopup::onDefLevelParameterChanged() {
   m_pref->setDefLevelWidth(w);
   m_pref->setDefLevelHeight(h);
   m_pref->setDefLevelDpi(dpi);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onVectorSnappingTargetChanged(int index) {
+  m_vectorSnappingTargetCB->setCurrentIndex(index);
+  m_pref->setVectorSnappingTarget(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -1196,13 +1203,14 @@ PreferencesPopup::PreferencesPopup()
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
 
-  m_defScanLevelType = new QComboBox(this);
-  m_defLevelType     = new QComboBox(this);
-  m_defLevelWidth    = new MeasuredDoubleLineEdit(0);
-  m_defLevelHeight   = new MeasuredDoubleLineEdit(0);
-  m_defLevelDpi      = new DoubleLineEdit(0, 66.76);
-  m_autocreationType = new QComboBox(this);
-  m_dpiLabel         = new QLabel(tr("DPI:"), this);
+  m_defScanLevelType       = new QComboBox(this);
+  m_defLevelType           = new QComboBox(this);
+  m_defLevelWidth          = new MeasuredDoubleLineEdit(0);
+  m_defLevelHeight         = new MeasuredDoubleLineEdit(0);
+  m_defLevelDpi            = new DoubleLineEdit(0, 66.76);
+  m_autocreationType       = new QComboBox(this);
+  m_dpiLabel               = new QLabel(tr("DPI:"), this);
+  m_vectorSnappingTargetCB = new QComboBox(this);
   CheckBox *keepOriginalCleanedUpCB =
       new CheckBox(tr("Keep Original Cleaned Up Drawings As Backup"), this);
   CheckBox *multiLayerStylePickerCB = new CheckBox(
@@ -1331,9 +1339,10 @@ PreferencesPopup::PreferencesPopup()
   }
   //--- Interface ------------------------------
   QStringList styleSheetList;
+  currentIndex = 0;
   for (int i = 0; i < m_pref->getStyleSheetCount(); i++) {
     QString string = m_pref->getStyleSheet(i);
-    if (string == m_pref->getCurrentStyleSheet()) currentIndex = i;
+    if (string == m_pref->getCurrentStyleSheetName()) currentIndex = i;
     TFilePath path(string.toStdWString());
     styleSheetList.push_back(QString::fromStdWString(path.getWideName()));
   }
@@ -1492,6 +1501,11 @@ PreferencesPopup::PreferencesPopup()
   m_autocreationType->addItems(autocreationTypes);
   int autocreationType = m_pref->getAutocreationType();
   m_autocreationType->setCurrentIndex(autocreationType);
+
+  QStringList vectorSnappingTargets;
+  vectorSnappingTargets << tr("Strokes") << tr("Guides") << tr("All");
+  m_vectorSnappingTargetCB->addItems(vectorSnappingTargets);
+  m_vectorSnappingTargetCB->setCurrentIndex(m_pref->getVectorSnappingTarget());
 
   //--- Xsheet ------------------------------
   xsheetAutopanDuringPlaybackCB->setChecked(m_pref->isXsheetAutopanEnabled());
@@ -1919,6 +1933,9 @@ PreferencesPopup::PreferencesPopup()
         drawingTopLay->addWidget(new QLabel(tr("Autocreation:")), 4, 0,
                                  Qt::AlignRight);
         drawingTopLay->addWidget(m_autocreationType, 4, 1, 1, 3);
+        drawingTopLay->addWidget(new QLabel(tr("Vector Snapping:")), 5, 0,
+                                 Qt::AlignRight);
+        drawingTopLay->addWidget(m_vectorSnappingTargetCB, 5, 1, 1, 3);
       }
       drawingFrameLay->addLayout(drawingTopLay, 0);
 
@@ -2170,8 +2187,9 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_projectRootCustom, SIGNAL(stateChanged(int)),
                        SLOT(onProjectRootChanged()));
   //--- Interface ----------------------
-  ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onStyleSheetTypeChanged(int)));
+  ret = ret &&
+        connect(styleSheetType, SIGNAL(currentIndexChanged(const QString &)),
+                SLOT(onStyleSheetTypeChanged(const QString &)));
   ret = ret && connect(m_pixelsOnlyCB, SIGNAL(stateChanged(int)),
                        SLOT(onPixelsOnlyChanged(int)));
   // pixels unit may deactivated externally on loading scene (see
@@ -2196,8 +2214,9 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_viewStep, SIGNAL(editingFinished()),
                        SLOT(onViewValuesChanged()));
   if (languageList.size() > 1)
-    ret = ret && connect(languageType, SIGNAL(currentIndexChanged(int)),
-                         SLOT(onLanguageTypeChanged(int)));
+    ret = ret &&
+          connect(languageType, SIGNAL(currentIndexChanged(const QString &)),
+                  SLOT(onLanguageTypeChanged(const QString &)));
   ret = ret && connect(moveCurrentFrameCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onMoveCurrentFrameChanged(int)));
   ret =
@@ -2295,6 +2314,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelTypeChanged(int)));
   ret = ret && connect(m_autocreationType, SIGNAL(currentIndexChanged(int)),
                        SLOT(onAutocreationTypeChanged(int)));
+  ret =
+      ret && connect(m_vectorSnappingTargetCB, SIGNAL(currentIndexChanged(int)),
+                     SLOT(onVectorSnappingTargetChanged(int)));
   ret = ret && connect(m_defLevelWidth, SIGNAL(valueChanged()),
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_defLevelHeight, SIGNAL(valueChanged()),
