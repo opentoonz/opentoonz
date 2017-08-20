@@ -74,7 +74,8 @@ private:
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
-      *m_ignoreImageDpiCB;
+      *m_ignoreImageDpiCB, *m_useHigherDpiOnVectorSimplifyCB,
+      *m_keepFillOnVectorSimplifyCB;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -144,6 +145,8 @@ private slots:
   void onLevelFormatEdited();
   void onIgnoreImageDpiChanged(int index);
   void onShow0ThickLinesChanged(int);
+  void onKeepFillOnVectorSimplifyChanged(int);
+  void onUseHigherDpiOnVectorSimplifyChanged(int);
   void onRegionAntialiasChanged(int);
   void onImportPolicyChanged(int);
   void onImportPolicyExternallyChanged(int policy);

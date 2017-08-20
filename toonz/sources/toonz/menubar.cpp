@@ -1184,6 +1184,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(levelMenu, MI_RevertToCleanedUp);
   addMenuItem(levelMenu, MI_RevertToLastSaved);
   addMenuItem(levelMenu, MI_ConvertToVectors);
+  addMenuItem(levelMenu, MI_ConvertToToonzRaster);
+  addMenuItem(levelMenu, MI_ConvertVectorToVector);
   addMenuItem(levelMenu, MI_Tracking);
   levelMenu->addSeparator();
   addMenuItem(levelMenu, MI_ExposeResource);

@@ -484,6 +484,18 @@ void PreferencesPopup::onIgnoreImageDpiChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onKeepFillOnVectorSimplifyChanged(int index) {
+  m_pref->setKeepFillOnVectorSimplify(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onUseHigherDpiOnVectorSimplifyChanged(int index) {
+  m_pref->setUseHigherDpiOnVectorSimplify(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onSubsceneFolderChanged(int index) {
   m_pref->enableSubsceneFolder(index == Qt::Checked);
 }
@@ -1221,7 +1233,10 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Minimize Savebox after Editing"), this);
   m_useNumpadForSwitchingStyles =
       new CheckBox(tr("Use Numpad and Tab keys for Switching Styles"), this);
-
+  m_keepFillOnVectorSimplifyCB = new CheckBox(
+      tr("Keep fill when using \"Replace Vectors\" command"), this);
+  m_useHigherDpiOnVectorSimplifyCB = new CheckBox(
+      tr("Use higher DPI for calculations - Slower but more accurate"), this);
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
 
@@ -1457,7 +1472,10 @@ PreferencesPopup::PreferencesPopup()
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
   m_useNumpadForSwitchingStyles->setChecked(
       m_pref->isUseNumpadForSwitchingStylesEnabled());
-
+  m_keepFillOnVectorSimplifyCB->setChecked(
+      m_pref->getKeepFillOnVectorSimplify());
+  m_useHigherDpiOnVectorSimplifyCB->setChecked(
+      m_pref->getUseHigherDpiOnVectorSimplify());
   QStringList scanLevelTypes;
   scanLevelTypes << "tif"
                  << "png";
@@ -1949,6 +1967,16 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(m_useNumpadForSwitchingStyles, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      QGroupBox *replaceVectorGroupBox = new QGroupBox(
+          tr("Replace Vectors with Simplified Vectors Command"), this);
+      QVBoxLayout *replaceVectorsLay = new QVBoxLayout();
+      replaceVectorsLay->setMargin(10);
+      replaceVectorsLay->setSpacing(10);
+      replaceVectorsLay->addWidget(m_keepFillOnVectorSimplifyCB);
+      replaceVectorsLay->addWidget(m_useHigherDpiOnVectorSimplifyCB);
+      replaceVectorGroupBox->setLayout(replaceVectorsLay);
+      drawingFrameLay->addWidget(replaceVectorGroupBox, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addStretch(1);
     }
     drawingBox->setLayout(drawingFrameLay);
@@ -2325,6 +2353,11 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_useNumpadForSwitchingStyles, SIGNAL(clicked(bool)),
                        SLOT(onUseNumpadForSwitchingStylesClicked(bool)));
+  ret = ret && connect(m_keepFillOnVectorSimplifyCB, SIGNAL(stateChanged(int)),
+                       SLOT(onKeepFillOnVectorSimplifyChanged(int)));
+  ret = ret &&
+        connect(m_useHigherDpiOnVectorSimplifyCB, SIGNAL(stateChanged(int)),
+                SLOT(onUseHigherDpiOnVectorSimplifyChanged(int)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),

@@ -9,6 +9,7 @@
 
 class TimeStretchPopup;
 class TXshCell;
+class TXshSimpleLevel;
 
 //=============================================================================
 // TCellSelection
@@ -63,6 +64,7 @@ public:
 
   bool areAllColSelectedLocked() const;
   bool areOnlyVectorCellsSelected();
+  TXshSimpleLevel *getNewToonzRasterLevel(TXshSimpleLevel *sl);
 
   // commands
   void reverseCells();
