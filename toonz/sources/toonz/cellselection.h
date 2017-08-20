@@ -62,6 +62,7 @@ public:
   bool isColSelected(int col) const;
 
   bool areAllColSelectedLocked() const;
+  bool areOnlyVectorCellsSelected();
 
   // commands
   void reverseCells();
@@ -99,6 +100,7 @@ public:
   void reframe3Cells() { reframeCells(3); }
   void reframe4Cells() { reframeCells(4); }
   void convertToToonzRaster();
+  void convertVectortoVector();
 
   void renameCells(TXshCell &cell);
   // rename cells for each columns with correspondent item in the list
