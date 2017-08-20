@@ -96,6 +96,8 @@
     <command>MI_RevertToCleanedUp</command>
     <command>MI_RevertToLastSaved</command>
     <command>MI_ConvertToVectors</command>
+    <command>MI_ConvertToToonzRaster</command>
+    <command>MI_ConvertVectorToVector</command>
     <command>MI_Tracking</command>
     <separator/>
     <command>MI_ExposeResource</command>
