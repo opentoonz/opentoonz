@@ -54,7 +54,7 @@ private:
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
-      *m_vectorSnappingTargetCB;
+      *m_vectorSnappingTargetCB, *m_dropdownShortcutsCycleOptionsCB;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -138,6 +138,7 @@ private slots:
   void onDefLevelParameterChanged();
   void onGetFillOnlySavebox(int index);
   void onFitToFlipbook(int);
+  void onDropdownShortcutsCycleOptionsChanged(int);
   void onAddLevelFormat();
   void onRemoveLevelFormat();
   void onEditLevelFormat();
