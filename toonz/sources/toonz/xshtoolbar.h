@@ -26,7 +26,7 @@ namespace XsheetGUI {
 // XSheet Toolbar
 //-----------------------------------------------------------------------------
 
-class Toolbar final : public QFrame {
+class XSheetToolbar final : public QToolBar {
   Q_OBJECT
 
   XsheetViewer *m_viewer;
@@ -35,13 +35,13 @@ class Toolbar final : public QFrame {
   QPushButton *m_newToonzRasterLevelButton;
   QPushButton *m_newRasterLevelButton;
   ViewerKeyframeNavigator *m_keyFrameButton;
-  QToolBar *m_toolbar;
+  //QToolBar *m_toolbar;
 
 public:
 #if QT_VERSION >= 0x050500
-  Toolbar(XsheetViewer *parent = 0, Qt::WindowFlags flags = 0);
+	XSheetToolbar(XsheetViewer *parent = 0, Qt::WindowFlags flags = 0);
 #else
-  Toolbar(XsheetViewer *parent = 0, Qt::WFlags flags = 0);
+	XSheetToolbar(XsheetViewer *parent = 0, Qt::WFlags flags = 0);
 #endif
   static void toggleXSheetToolbar();
   void showToolbar(bool show);

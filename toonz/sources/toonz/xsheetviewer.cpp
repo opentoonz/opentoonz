@@ -169,13 +169,13 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
       TApp::instance()->getCurrentXsheet());
 
   m_toolbarScrollArea = new XsheetScrollArea(this);
-  m_toolbarScrollArea->setFixedSize(m_orientation->cellWidth() * 12,
-                                    XsheetGUI::TOOLBAR_HEIGHT);
+  //m_toolbarScrollArea->setFixedSize(m_orientation->cellWidth() * 12,
+                                    //XsheetGUI::TOOLBAR_HEIGHT);
   m_toolbarScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbarScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_toolbar = new XsheetGUI::Toolbar(this);
-  m_toolbar->setFixedSize(m_orientation->cellWidth() * 12,
-                          XsheetGUI::TOOLBAR_HEIGHT);
+  m_toolbar = new XsheetGUI::XSheetToolbar(this);
+  //m_toolbar->setFixedSize(m_orientation->cellWidth() * 12,
+                         //XsheetGUI::TOOLBAR_HEIGHT);
   m_toolbarScrollArea->setWidget(m_toolbar);
 
   QRect noteArea(0, 0, 75, 120);
@@ -316,7 +316,7 @@ void XsheetViewer::positionSections() {
 
     int w = geometry().size().width();
     m_toolbarScrollArea->setGeometry(0, 0, w, XsheetGUI::TOOLBAR_HEIGHT);
-
+	m_toolbar->setMaximumWidth(300);
     if (o->isVerticalTimeline()) {
       headerFrame = headerFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT,
                                          XsheetGUI::TOOLBAR_HEIGHT);

@@ -15,6 +15,7 @@
 
 // Qt includes
 #include <QPushButton>
+#include <QWidgetAction>
 
 //=============================================================================
 
@@ -25,16 +26,16 @@ namespace XsheetGUI {
 //-----------------------------------------------------------------------------
 
 #if QT_VERSION >= 0x050500
-Toolbar::Toolbar(XsheetViewer *parent, Qt::WindowFlags flags)
+	XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WindowFlags flags)
 #else
-Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
+	XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-    : QFrame(parent), m_viewer(parent) {
-  setFrameStyle(QFrame::StyledPanel);
+    : QToolBar(parent), m_viewer(parent) {
+  //setFrameStyle(QFrame::StyledPanel);
   setObjectName("cornerWidget");
-  m_toolbar = new QToolBar();
-  m_toolbar->setFixedHeight(30);
-  m_toolbar->setObjectName("XSheetToolbar");
+  //m_toolbar = new QToolBar();
+  setFixedHeight(30);
+  setObjectName("XSheetToolbar");
 
   m_newVectorLevelButton = new QPushButton(this);
   m_newVectorLevelButton->setIconSize(QSize(18, 18));
@@ -62,56 +63,66 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
   m_keyFrameButton->setObjectHandle(app->getCurrentObject());
   m_keyFrameButton->setXsheetHandle(app->getCurrentXsheet());
 
-  QVBoxLayout *mainLay = new QVBoxLayout();
-  mainLay->setMargin(0);
-  mainLay->setSpacing(5);
+  //QWidgetAction *newVectorAction = new QWidgetAction(m_newVectorLevelButton);
+  //QWidgetAction *newToonzRasterAction = new QWidgetAction(m_newToonzRasterLevelButton);
+  //QWidgetAction *newRasterAction = new QWidgetAction(m_newRasterLevelButton);
+  //QWidgetAction *keyFrameAction = new QWidgetAction(m_keyFrameButton);
+
+  //QVBoxLayout *mainLay = new QVBoxLayout();
+  //mainLay->setMargin(0);
+  //mainLay->setSpacing(5);
   {
-    mainLay->addStretch(1);
-    QHBoxLayout *toolbarLayout = new QHBoxLayout();
-    toolbarLayout->setSpacing(2);
-    toolbarLayout->setMargin(0);
+    //mainLay->addStretch(1);
+    //QHBoxLayout *toolbarLayout = new QHBoxLayout();
+    //toolbarLayout->setSpacing(2);
+    //toolbarLayout->setMargin(0);
     {
-      m_toolbar->addWidget(m_newVectorLevelButton);
-      m_toolbar->addWidget(m_newToonzRasterLevelButton);
-      m_toolbar->addWidget(m_newRasterLevelButton);
-      m_toolbar->addSeparator();
+      addWidget(m_newVectorLevelButton);
+      addWidget(m_newToonzRasterLevelButton);
+      addWidget(m_newRasterLevelButton);
+	  //addAction(newVectorAction);
+	  //addAction(newToonzRasterAction);
+	  //addAction(newRasterAction);
+
+      addSeparator();
       QAction *reframeOnes =
           CommandManager::instance()->getAction("MI_Reframe1");
-      m_toolbar->addAction(reframeOnes);
+      addAction(reframeOnes);
       QAction *reframeTwos =
           CommandManager::instance()->getAction("MI_Reframe2");
-      m_toolbar->addAction(reframeTwos);
+      addAction(reframeTwos);
       QAction *reframeThrees =
           CommandManager::instance()->getAction("MI_Reframe3");
-      m_toolbar->addAction(reframeThrees);
+      addAction(reframeThrees);
 
-      m_toolbar->addSeparator();
+      addSeparator();
 
       QAction *repeat = CommandManager::instance()->getAction("MI_Dup");
-      m_toolbar->addAction(repeat);
+      addAction(repeat);
 
-      m_toolbar->addSeparator();
+      addSeparator();
 
       QAction *collapse = CommandManager::instance()->getAction("MI_Collapse");
-      m_toolbar->addAction(collapse);
+      addAction(collapse);
       QAction *open = CommandManager::instance()->getAction("MI_OpenChild");
-      m_toolbar->addAction(open);
+      addAction(open);
       QAction *leave = CommandManager::instance()->getAction("MI_CloseChild");
-      m_toolbar->addAction(leave);
+      addAction(leave);
 
-      m_toolbar->addSeparator();
-      m_toolbar->addWidget(m_keyFrameButton);
-      toolbarLayout->addWidget(m_toolbar);
-      toolbarLayout->addStretch(0);
+      addSeparator();
+      addWidget(m_keyFrameButton);
+	  //addAction(keyFrameAction);
+      //toolbarLayout->addWidget(m_toolbar);
+      //toolbarLayout->addStretch(0);
     }
-    mainLay->addLayout(toolbarLayout, 0);
+    //mainLay->addLayout(toolbarLayout, 0);
     if (!Preferences::instance()->isShowXSheetToolbarEnabled()) {
-      m_toolbar->hide();
+      //m_toolbar->hide();
     }
 
-    mainLay->addStretch(1);
+    //mainLay->addStretch(1);
   }
-  setLayout(mainLay);
+  //setLayout(mainLay);
 
   // signal-slot connections
   bool ret = true;
@@ -128,7 +139,7 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
 
 //-----------------------------------------------------------------------------
 
-void Toolbar::onNewVectorLevelButtonPressed() {
+void XSheetToolbar::onNewVectorLevelButtonPressed() {
   int defaultLevelType = Preferences::instance()->getDefLevelType();
   Preferences::instance()->setDefLevelType(PLI_XSHLEVEL);
   CommandManager::instance()->execute("MI_NewLevel");
@@ -137,7 +148,7 @@ void Toolbar::onNewVectorLevelButtonPressed() {
 
 //-----------------------------------------------------------------------------
 
-void Toolbar::onNewToonzRasterLevelButtonPressed() {
+void XSheetToolbar::onNewToonzRasterLevelButtonPressed() {
   int defaultLevelType = Preferences::instance()->getDefLevelType();
   // Preferences::instance()->setOldDefLevelType(defaultLevelType);
   Preferences::instance()->setDefLevelType(TZP_XSHLEVEL);
@@ -147,7 +158,7 @@ void Toolbar::onNewToonzRasterLevelButtonPressed() {
 
 //-----------------------------------------------------------------------------
 
-void Toolbar::onNewRasterLevelButtonPressed() {
+void XSheetToolbar::onNewRasterLevelButtonPressed() {
   int defaultLevelType = Preferences::instance()->getDefLevelType();
   Preferences::instance()->setDefLevelType(OVL_XSHLEVEL);
   CommandManager::instance()->execute("MI_NewLevel");
@@ -156,13 +167,13 @@ void Toolbar::onNewRasterLevelButtonPressed() {
 
 //-----------------------------------------------------------------------------
 
-void Toolbar::showToolbar(bool show) {
-  show ? m_toolbar->show() : m_toolbar->hide();
+void XSheetToolbar::showToolbar(bool show) {
+  //show ? m_toolbar->show() : m_toolbar->hide();
 }
 
 //-----------------------------------------------------------------------------
 
-void Toolbar::toggleXSheetToolbar() {
+void XSheetToolbar::toggleXSheetToolbar() {
   bool toolbarEnabled = Preferences::instance()->isShowXSheetToolbarEnabled();
   Preferences::instance()->enableShowXSheetToolbar(!toolbarEnabled);
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XSheetToolbar");
@@ -175,7 +186,7 @@ void Toolbar::toggleXSheetToolbar() {
 class ToggleXSheetToolbarCommand final : public MenuItemHandler {
 public:
   ToggleXSheetToolbarCommand() : MenuItemHandler(MI_ToggleXSheetToolbar) {}
-  void execute() override { Toolbar::toggleXSheetToolbar(); }
+  void execute() override { XSheetToolbar::toggleXSheetToolbar(); }
 } ToggleXSheetToolbarCommand;
 
 //============================================================

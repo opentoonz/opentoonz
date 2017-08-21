@@ -1949,6 +1949,7 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenStyleControl, tr("&Style Editor"), "");
   createMenuWindowsAction(MI_OpenToolbar, tr("&Toolbar"), "");
   createMenuWindowsAction(MI_OpenToolOptionBar, tr("&Tool Option Bar"), "");
+  createMenuWindowsAction(MI_OpenXSheetToolbar, tr("&XSheet Toolbar"), "");
   createMenuWindowsAction(MI_OpenLevelView, tr("&Viewer"), "");
 #ifdef LINETEST
   createMenuWindowsAction(MI_OpenLineTestCapture, tr("&LineTest Capture"), "");

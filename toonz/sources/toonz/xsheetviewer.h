@@ -325,7 +325,7 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   XsheetGUI::RowArea *m_rowArea;
   XsheetGUI::CellArea *m_cellArea;
   XsheetGUI::NoteArea *m_noteArea;
-  XsheetGUI::Toolbar *m_toolbar;
+  XsheetGUI::XSheetToolbar *m_toolbar;
 
   Spreadsheet::FrameScroller m_frameScroller;
 
