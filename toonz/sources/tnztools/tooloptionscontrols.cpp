@@ -561,15 +561,16 @@ ToolOptionCombo::ToolOptionCombo(TTool *tool, TEnumProperty *property,
 //-----------------------------------------------------------------------------
 
 void ToolOptionCombo::loadEntries() {
-  TEnumProperty::Range range = m_property->getRange();
-  TEnumProperty::Range::iterator it;
+  const TEnumProperty::Range &range = m_property->getRange();
+  const TEnumProperty::Items &items = m_property->getItems();
 
+  const int count = m_property->getCount();
   int maxWidth = 0;
 
   clear();
-  for (it = range.begin(); it != range.end(); ++it) {
-    QString itemStr = QString::fromStdWString(*it);
-    addItem(itemStr);
+  for (int i = 0; i < count; ++i) {
+    QString itemStr = QString::fromStdWString(range[i]);
+    addItem(items[i].icon, items[i].name.isEmpty() ? itemStr : items[i].name, itemStr);
     int tmpWidth                      = fontMetrics().width(itemStr);
     if (tmpWidth > maxWidth) maxWidth = tmpWidth;
   }
@@ -585,7 +586,7 @@ void ToolOptionCombo::loadEntries() {
 
 void ToolOptionCombo::updateStatus() {
   QString value = QString::fromStdWString(m_property->getValue());
-  int index     = findText(value);
+  int index     = findData(value);
   if (index >= 0 && index != currentIndex()) setCurrentIndex(index);
 }
 

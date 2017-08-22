@@ -788,12 +788,11 @@ EditTool::EditTool()
   m_autoSelect.setId("AutoSelect");
 
   m_prop.bind(m_activeAxis);
-  m_activeAxis.addValue(L"Position");
-  m_activeAxis.addValue(L"Rotation");
-  m_activeAxis.addValue(L"Scale");
-  m_activeAxis.addValue(L"Shear");
-  m_activeAxis.addValue(L"Center");
-  m_activeAxis.setValue(L"Position");
+  m_activeAxis.addItem(L"Position", tr("Position", "enum item"), QIcon(":Resources/edit_position.svg"));
+  m_activeAxis.addItem(L"Rotation", tr("Rotation", "enum item"), QIcon(":Resources/edit_rotation.svg"));
+  m_activeAxis.addItem(L"Scale", tr("Scale", "enum item"), QIcon(":Resources/edit_scale.svg"));
+  m_activeAxis.addItem(L"Shear", tr("Shear", "enum item"), QIcon(":Resources/edit_shear.svg"));
+  m_activeAxis.addItem(L"Center", tr("Center", "enum item"), QIcon(":Resources/edit_center.svg"));
 
   m_activeAxis.setId("EditToolActiveAxis");
 }

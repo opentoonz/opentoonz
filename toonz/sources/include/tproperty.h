@@ -7,6 +7,8 @@
 
 #include <cstdint>
 
+#include <QIcon>
+
 #undef DVAPI
 #undef DVVAR
 
@@ -311,6 +313,17 @@ private:
 class DVAPI TEnumProperty final : public TProperty {
 public:
   typedef std::vector<std::wstring> Range;
+  // Used only for translation and styling in Qt
+  struct Item {
+    QString name;
+    QIcon icon;
+
+    Item(const QString &name = QString(),
+         const QIcon &icon = QIcon())
+        : name(name), icon(icon) {
+    }
+  };
+  typedef std::vector<Item> Items;
 
   TEnumProperty(const std::string &name) : TProperty(name), m_index(-1) {}
 
@@ -318,12 +331,14 @@ public:
                 const std::wstring &v)
       : TProperty(name), m_range(range), m_index(indexOf(v)) {
     if (m_index < 0) throw RangeError();
+    m_items.resize(m_range.size());
   }
 
   TEnumProperty(const std::string &name, Range::const_iterator i0,
                 Range::const_iterator i1, const std::wstring &v)
       : TProperty(name), m_range(i0, i1), m_index(indexOf(v)) {
     if (m_index < 0) throw RangeError();
+    m_items.resize(m_range.size());
   }
 
   TProperty *clone() const override { return new TEnumProperty(*this); }
@@ -342,10 +357,28 @@ public:
   void addValue(std::wstring value) {
     if (m_index == -1) m_index = 0;
     m_range.push_back(value);
+    m_items.push_back(Item());
+  }
+
+  void addItem(std::wstring value, const QString &name = QString(), const QIcon &icon = QIcon()) {
+    if (m_index == -1) m_index = 0;
+    m_range.push_back(value);
+    m_items.push_back(Item(name, icon));
+  }
+
+  void setItemName(int index, const QString &name) {
+    if (index < 0 || index >= (int)m_items.size()) throw RangeError();
+    m_items[index].name = name;
+  }
+
+  void setItemIcon(int index, const QIcon &icon) {
+    if (index < 0 || index >= (int)m_items.size()) throw RangeError();
+    m_items[index].icon = icon;
   }
 
   void deleteAllValues() {
     m_range.clear();
+    m_items.clear();
     m_index = -1;
   }
 
@@ -360,13 +393,18 @@ public:
     m_index = idx;
   }
 
+  int getCount() const { return (int)m_items.size(); }
+
   const Range &getRange() const { return m_range; }
+  const Items &getItems() const { return m_items; }
+
   std::wstring getValue() const {
     return (m_index < 0) ? L"" : m_range[m_index];
   }
   std::string getValueAsString() override {
     return ::to_string(m_range[m_index]);
   }
+
   int getIndex() const { return m_index; }
 
   void accept(Visitor &v) override { v.visit(this); }
@@ -376,6 +414,7 @@ public:
 
 private:
   Range m_range;
+  Items m_items;
   int m_index;
 };
 
