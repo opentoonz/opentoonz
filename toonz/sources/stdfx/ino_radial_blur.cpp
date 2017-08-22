@@ -160,22 +160,22 @@ FX_PLUGIN_IDENTIFIER(ino_radial_blur, "inoRadialBlurFx");
 //--------------------------------------------------------------------
 namespace {
 void fx_(const TRasterP in_ras  // with margin
-         ,
-         const int margin
+         , const int margin
 
          /* ここではinとrefは同サイズで使用している */
-         ,
-         const TRasterP refer_ras  // no margin
-         ,
-         const int ref_mode
+         , const TRasterP refer_ras  // no margin
+         , const int refer_mode
 
-         ,
-         TRasterP out_ras  // no margin
+         , TRasterP out_ras  // no margin
 
-         ,
-         const double xp, const double yp, const double twist,
-         const double twist_radius, const double blur, const double radius,
-         const bool alpha_rendering_sw, const bool anti_alias_sw) {
+         , const double xp
+	 , const double yp
+	 , const double twist
+	 , const double twist_radius
+	 , const double blur
+	 , const double radius
+	 , const bool alpha_rendering_sw
+	 , const bool anti_alias_sw) {
   TRasterGR8P in_gr8(in_ras->getLy(),
                      in_ras->getLx() * ino::channels() *
                          ((TRaster64P)in_ras ? sizeof(unsigned short)
@@ -183,26 +183,31 @@ void fx_(const TRasterP in_ras  // with margin
   in_gr8->lock();
 
   igs::radial_blur::convert(
-      in_ras->getRawData()  // BGRA
-      ,
-      0 /* margin機能は使っていない、のでinとref画像は同サイズ */
+    in_ras->getRawData()  // BGRA
+    , 0 /* margin機能は使っていない、のでinとref画像は同サイズ */
 
-      ,
-      (((0 <= ref_mode) && refer_ras) ? refer_ras->getRawData() : 0)  // BGRA
-      ,
-      (((0 <= ref_mode) && refer_ras) ? ino::bits(refer_ras) : 0), ref_mode
+    , (((refer_ras != nullptr) && (0 <= refer_mode) )
+		? refer_ras->getRawData() : nullptr)  // BGRA
+    , (((refer_ras != nullptr) && (0 <= refer_mode) )
+		? ino::bits(refer_ras) : 0), refer_mode
 
-      ,
-      in_gr8->getRawData()  // BGRA
+    , in_gr8->getRawData()  // BGRA
 
-      ,
-      in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(out_ras)
+    , in_ras->getLy()
+    , in_ras->getLx()
+    , ino::channels()
+    , ino::bits(out_ras)
 
-                                                             ,
-      xp + margin, yp + margin, twist, twist_radius, blur, radius
+    , xp + margin
+    , yp + margin
+    , twist
+    , twist_radius
+    , blur
+    , radius
 
-      ,
-      (anti_alias_sw ? 4 : 1), alpha_rendering_sw);
+    , (anti_alias_sw ? 4 : 1)
+    , alpha_rendering_sw
+    );
 
   ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), out_ras, margin);
   in_gr8->unlock();
@@ -229,7 +234,7 @@ void ino_radial_blur::doCompute(TTile &tile, double frame,
   // const double twist_radius = this->m_twist_radius->getValue(frame)*scale;
   const bool alpha_rend_sw = this->m_alpha_rendering->getValue();
   const bool anti_alias_sw = this->m_anti_alias->getValue();
-  const int ref_mode       = this->m_ref_mode->getValue();
+  const int refer_mode       = this->m_ref_mode->getValue();
 
   TPointD center = this->m_center->getValue(frame);
   TPointD render_center(
@@ -251,20 +256,20 @@ void ino_radial_blur::doCompute(TTile &tile, double frame,
     tile_with_margin = tile_with_margin.enlarge(margin);
   }
   /*------ 入力画像生成 --------------------------------------*/
-  TTile tile_allocated;
+  TTile enlarge_tile;
   this->m_input->allocateAndCompute(
-      tile_allocated, tile_with_margin.getP00(),
+      enlarge_tile, tile_with_margin.getP00(),
       TDimensionI(/* Pixel単位で四捨五入 */
                   static_cast<int>(tile_with_margin.getLx() + 0.5),
                   static_cast<int>(tile_with_margin.getLy() + 0.5)),
       tile.getRaster(), frame, ri);
   /*------ 参照画像生成 --------------------------------------*/
-  TTile reference_tile;
-  bool reference_sw = false;
+  TTile refer_tile;
+  bool refer_sw = false;
   if (this->m_refer.isConnected()) {
-    reference_sw = true;
+    refer_sw = true;
     this->m_refer->allocateAndCompute(
-        reference_tile, tile_with_margin.getP00(),
+        refer_tile, tile_with_margin.getP00(),
         TDimensionI(/* Pixel単位で四捨五入 */
                     static_cast<int>(tile_with_margin.getLx() + 0.5),
                     static_cast<int>(tile_with_margin.getLy() + 0.5)),
@@ -281,7 +286,7 @@ void ino_radial_blur::doCompute(TTile &tile, double frame,
        << "  cx " << center.x << "  cy " << center.y << "  blur " << blur
        << "  radius " << radius << "  twist " << twist
        // << "  twist_radius " << twist_radius
-       << "  reference " << ref_mode << "  alpha_rendering " << alpha_rend_sw
+       << "  reference " << refer_mode << "  alpha_rendering " << alpha_rend_sw
        << "  anti_alias " << anti_alias_sw << "  render_center "
        << render_center << "  frame " << frame << "  pixbits "
        << ino::pixel_bits(tile.getRaster()) << "  tile.m_pos " << tile.m_pos
@@ -290,34 +295,44 @@ void ino_radial_blur::doCompute(TTile &tile, double frame,
        << "  ri.m_affine " << ri.m_affine << "  ri_m_affine_det "
        << ri.m_affine.det() << "  shrink_x " << ri.m_shrinkX << "  shrink_y "
        << ri.m_shrinkY << "  tile_with_margin " << tile_with_margin
-       << "  tile_allocated.m_pos " << tile_allocated.m_pos
-       << "  tile_allocated_getLx " << tile_allocated.getRaster()->getLx()
-       << "  y " << tile_allocated.getRaster()->getLy();
-    if (reference_sw) {
-      os << "  reference_tile.m_pos " << reference_tile.m_pos
-         << "  reference_tile_getLx " << reference_tile.getRaster()->getLx()
-         << "  y " << reference_tile.getRaster()->getLy();
+       << "  enlarge_tile.m_pos " << enlarge_tile.m_pos
+       << "  tile_allocated_getLx " << enlarge_tile.getRaster()->getLx()
+       << "  y " << enlarge_tile.getRaster()->getLy();
+    if (refer_sw) {
+      os << "  refer_tile.m_pos " << refer_tile.m_pos
+         << "  refer_tile_getLx " << refer_tile.getRaster()->getLx()
+         << "  y " << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
-    fx_(tile_allocated.getRaster(), margin
+    enlarge_tile.getRaster()->lock();
+    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
+    fx_(enlarge_tile.getRaster()
+        , margin
 
-        ,
-        (reference_sw ? reference_tile.getRaster() : nullptr), ref_mode
+        , refer_tile.getRaster()
+	, refer_mode
 
-        ,
-        tile.getRaster()
+        , tile.getRaster()
 
-            ,
-        render_center.x, render_center.y, twist, 0.0  // twist_radius
-        ,
-        blur, radius, alpha_rend_sw, anti_alias_sw);
+        , render_center.x
+	, render_center.y
+	, twist
+	, 0.0  // twist_radius
+        , blur
+	, radius
+	, alpha_rend_sw
+	, anti_alias_sw);
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -326,6 +341,8 @@ void ino_radial_blur::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -334,6 +351,8 @@ void ino_radial_blur::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");

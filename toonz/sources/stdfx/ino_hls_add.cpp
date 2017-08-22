@@ -85,14 +85,19 @@ FX_PLUGIN_IDENTIFIER(ino_hls_add, "inohlsAddFx");
 //------------------------------------------------------------
 #include "igs_hls_add.h"
 namespace {
-void fx_(TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras,
-         const int ref_mode
-
-         ,
-         const int xoffset, const int yoffset, const int from_rgba,
-         const double offset, const double hue_scale, const double lig_scale,
-         const double sat_scale, const double alp_scale,
-         const bool anti_alias_sw) {
+void fx_(TRasterP in_ras
+         , const TRasterP noise_ras
+	 , const TRasterP refer_ras
+	 , const int refer_mode 
+         , const int xoffset
+	 , const int yoffset
+	 , const int from_rgba
+	 , const double offset
+	 , const double hue_scale
+	 , const double lig_scale
+	 , const double sat_scale
+	 , const double alp_scale
+	 , const bool anti_alias_sw) {
   /***std::vector<unsigned char> in_vec;
   ino::ras_to_vec( in_ras, ino::channels(), in_vec );
   std::vector<unsigned char> refer_vec;
@@ -113,38 +118,38 @@ void fx_(TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras,
   ino::ras_to_arr(noise_ras, ino::channels(), noise_gr8->getRawData());
 
   igs::hls_add::change(
-      // in_ras->getRawData() // BGRA
-      //&in_vec.at(0) // RGBA
-      in_gr8->getRawData()
+    // in_ras->getRawData() // BGRA
+    //&in_vec.at(0) // RGBA
+    in_gr8->getRawData()
 
-          ,
-      in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
-      ,
-      ino::channels(), ino::bits(in_ras)
+    , in_ras->getLy()
+    , in_ras->getLx()  // Not use in_ras->getWrap()
+    , ino::channels()
+    , ino::bits(in_ras)
 
-      //,noise_ras->getRawData() // BGRA
-      //,&refer_vec.at(0) // RGBA
-      ,
-      noise_gr8->getRawData()
+    //,noise_ras->getRawData() // BGRA
+    //,&refer_vec.at(0) // RGBA
+    , noise_gr8->getRawData()
 
-          ,
-      noise_ras->getLy(), noise_ras->getLx(), ino::channels(),
-      ino::bits(noise_ras)
+    , noise_ras->getLy()
+    , noise_ras->getLx()
+    , ino::channels()
+    , ino::bits(noise_ras)
 
-          ,
-      (((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData()
-                                             : 0)  // BGRA
-      ,
-      (((0 <= ref_mode) && (0 != refer_ras)) ? ino::bits(refer_ras) : 0),
-      ref_mode
+    , (((refer_ras != nullptr) && (0 <= refer_mode) )
+		? refer_ras->getRawData() : nullptr)  // BGRA
+    , (((refer_ras != nullptr) && (0 <= refer_mode) )
+		? ino::bits(refer_ras) : 0)
+    , refer_mode
 
-      ,
-      xoffset, yoffset, from_rgba, offset, hue_scale, lig_scale, sat_scale,
-      alp_scale
+    , xoffset
+    , yoffset
+    , from_rgba
+    , offset
+    , hue_scale , lig_scale , sat_scale , alp_scale
 
-      //,true	/* add_blend_sw */
-      ,
-      anti_alias_sw);
+    //,true	/* add_blend_sw */
+    , anti_alias_sw);
 
   /***ino::vec_to_ras( refer_vec, 0, 0 );
   ino::vec_to_ras( in_vec, ino::channels(), in_ras, 0 );***/
@@ -180,7 +185,7 @@ void ino_hls_add::doCompute(TTile &tile, double frame,
   const double sat_scale = this->m_sat->getValue(frame) / ino::param_range();
   const double alp_scale = this->m_alp->getValue(frame) / ino::param_range();
   const bool anti_alias_sw = this->m_anti_alias->getValue();
-  const int ref_mode       = this->m_ref_mode->getValue();
+  const int refer_mode       = this->m_ref_mode->getValue();
 
   /* ------ 画像生成 ---------------------------------------- */
   this->m_input->compute(tile, frame, rend_sets);
@@ -191,12 +196,12 @@ void ino_hls_add::doCompute(TTile &tile, double frame,
                                     tile.getRaster()->getSize(),
                                     tile.getRaster(), frame, rend_sets);
   /*------ 参照画像生成 --------------------------------------*/
-  TTile reference_tile;
-  bool reference_sw = false;
+  TTile refer_tile;
+  bool refer_sw = false;
   if (this->m_refer.isConnected()) {
-    reference_sw = true;
+    refer_sw = true;
     this->m_refer->allocateAndCompute(
-        reference_tile, tile.m_pos,
+        refer_tile, tile.m_pos,
         TDimensionI(/* Pixel単位 */
                     tile.getRaster()->getLx(),
                     tile.getRaster()
@@ -215,36 +220,44 @@ void ino_hls_add::doCompute(TTile &tile, double frame,
        << "  xo " << xoffset << "  yo " << yoffset << "  rgba " << from_rgba
        << "  offs " << offset << "  h " << hue_scale << "  l " << lig_scale
        << "  s " << sat_scale << "  a " << alp_scale << "  anti_alias "
-       << anti_alias_sw << "  reference " << ref_mode << "   tile w "
+       << anti_alias_sw << "  reference " << refer_mode << "   tile w "
        << tile.getRaster()->getLx() << "  h " << tile.getRaster()->getLy()
        << "  pixbits " << ino::pixel_bits(tile.getRaster())
        << "   noise_tile w " << noise_tile.getRaster()->getLx() << "  h "
        << noise_tile.getRaster()->getLy() << "   frame " << frame;
-    if (reference_sw) {
-      os << "  reference_tile.m_pos " << reference_tile.m_pos
-         << "  reference_tile_getLx " << reference_tile.getRaster()->getLx()
-         << "  y " << reference_tile.getRaster()->getLy();
+    if (refer_sw) {
+      os << "  refer_tile.m_pos " << refer_tile.m_pos
+         << "  refer_tile_getLx " << refer_tile.getRaster()->getLx()
+         << "  y " << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
     noise_tile.getRaster()->lock();
-    reference_tile.getRaster()->lock();
-    fx_(tile.getRaster(), noise_tile.getRaster(), reference_tile.getRaster(),
-        ref_mode
+    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
+    fx_(tile.getRaster()
+        , noise_tile.getRaster()
+	, refer_tile.getRaster()
+	, refer_mode
 
-        ,
-        xoffset, yoffset, from_rgba, offset, hue_scale, lig_scale, sat_scale,
-        alp_scale, anti_alias_sw  // --> add_blend_sw, default is true
+        , xoffset
+	, yoffset
+	, from_rgba
+	, offset
+	, hue_scale
+	, lig_scale
+	, sat_scale
+	, alp_scale
+	, anti_alias_sw  // --> add_blend_sw, default is true
         );
-    reference_tile.getRaster()->unlock();
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
     noise_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    reference_tile.getRaster()->unlock();
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
     noise_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
@@ -254,7 +267,7 @@ void ino_hls_add::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    reference_tile.getRaster()->unlock();
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
     noise_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
@@ -264,7 +277,7 @@ void ino_hls_add::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    reference_tile.getRaster()->unlock();
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
     noise_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {

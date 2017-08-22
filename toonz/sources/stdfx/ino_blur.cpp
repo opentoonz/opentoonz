@@ -97,14 +97,11 @@ FX_PLUGIN_IDENTIFIER(ino_blur, "inoBlurFx");
 //------------------------------------------------------------
 namespace {
 void fx_(const TRasterP in_ras  // with margin
-         ,
-         TRasterP out_ras  // no margin
-
-         ,
-         const TRasterP refer_ras, const int ref_mode
-
-         ,
-         const int int_radius, const double real_radius) {
+         , TRasterP out_ras  // no margin 
+         , const TRasterP refer_ras
+	 , const int refer_mode 
+         , const int int_radius
+	 , const double real_radius) {
   TRasterGR8P out_buffer(out_ras->getLy(),
                          out_ras->getLx() * ino::channels() *
                              ((TRaster64P)in_ras ? sizeof(unsigned short)
@@ -115,40 +112,28 @@ void fx_(const TRasterP in_ras  // with margin
   out_buffer->lock();
   cvt_buffer->lock();
   igs::gaussian_blur_hv::convert(
-      in_ras->getRawData()  // const void *in_with_margin (BGRA)
-      ,
-      out_buffer->getRawData()  // void *out_no_margin (BGRA)
+    in_ras->getRawData()  // const void *in_with_margin (BGRA)
+    , out_buffer->getRawData()  // void *out_no_margin (BGRA)
 
-      ,
-      in_ras->getLy()  // const int height_with_margin
-      ,
-      in_ras->getLx()  // const int width_with_margin
-      ,
-      ino::channels()  // const int channels
-      ,
-      ino::bits(in_ras)  // const int bits
+    , in_ras->getLy()  // const int height_with_margin
+    , in_ras->getLx()  // const int width_with_margin
+    , ino::channels()  // const int channels
+    , ino::bits(in_ras)  // const int bits
 
-      ,
-      (((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData()
-                                             : 0)  // BGRA
-      // const unsigned char *ref
-      ,
-      (((0 <= ref_mode) && (0 != refer_ras)) ? ino::bits(refer_ras) : 0)
-      // const int ref_bits
-      ,
-      ref_mode  // const int ref_mode
+    , (((refer_ras != nullptr) && (0 <= refer_mode) )
+		? refer_ras->getRawData()
+		: nullptr) // BGRA // const unsigned char *ref
+    , (((refer_ras != nullptr) && (0 <= refer_mode) )
+		? ino::bits(refer_ras)
+		: 0) // const int ref_bits
+    , refer_mode  // const int refer_mode
 
-      ,
-      cvt_buffer->getRawData()  // void *buffer
-      ,
-      buffer_bytes  // int buffer_bytes
+    , cvt_buffer->getRawData()  // void *buffer
+    , buffer_bytes  // int buffer_bytes
 
-      ,
-      int_radius  // const int int_radius
-      ,
-      real_radius  // const double real_radius
-                   // , 0.25
-      );
+    , int_radius  // const int int_radius
+    , real_radius  // const double real_radius // , 0.25
+    );
   ino::arr_to_ras(out_buffer->getRawData(), ino::channels(), out_ras, 0);
   cvt_buffer->unlock();
   out_buffer->unlock();
@@ -176,7 +161,7 @@ void ino_blur::doCompute(TTile &tile, double frame,
     return;
   }
   /*------- 動作パラメータを得る -----------------------------*/
-  const int ref_mode = this->m_ref_mode->getValue();
+  const int refer_mode = this->m_ref_mode->getValue();
 
   /*------ 表示の範囲を得る ----------------------------------*/
   TRectD bBox =
@@ -209,12 +194,12 @@ TTile &tile
       tile.getRaster(), frame, rend_sets);
 
   /*------ 参照画像生成 --------------------------------------*/
-  TTile ref_tile;
-  bool ref_sw = false;
+  TTile refer_tile;
+  bool refer_sw = false;
   if (this->m_refer.isConnected()) {
-    ref_sw = true;
+    refer_sw = true;
     this->m_refer->allocateAndCompute(
-        ref_tile, tile.m_pos /* TPointD */
+        refer_tile, tile.m_pos /* TPointD */
         ,
         tile.getRaster()->getSize() /* Pixel単位 */
         ,
@@ -231,8 +216,8 @@ TTile &tile
     std::ostringstream os;
     os << "params"
        << "  usr_radius " << this->m_radius->getValue(frame) << "  real_radius "
-       << real_radius << "  int_radius " << int_radius << "  ref_mode "
-       << ref_mode << "  tile"
+       << real_radius << "  int_radius " << int_radius << "  refer_mode "
+       << refer_mode << "  tile"
        << " pos " << tile.m_pos << " w " << tile.getRaster()->getLx() << " h "
        << tile.getRaster()->getLy() << "  enl_tile"
        << " w " << enlarge_tile.getRaster()->getLx() << " h "
@@ -241,30 +226,33 @@ TTile &tile
        << "  affine a11 " << rend_sets.m_affine.a11 << "  a12 "
        << rend_sets.m_affine.a12 << "  a21 " << rend_sets.m_affine.a21
        << "  a22 " << rend_sets.m_affine.a22;
-    if (ref_sw) {
-      os << "  ref_tile"
-         << " pos " << ref_tile.m_pos << " x " << ref_tile.getRaster()->getLx()
-         << " y " << ref_tile.getRaster()->getLy();
+    if (refer_sw) {
+      os << "  refer_tile"
+         << " pos " << refer_tile.m_pos << " x " << refer_tile.getRaster()->getLx()
+         << " y " << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
+    enlarge_tile.getRaster()->lock();
+    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
     fx_(enlarge_tile.getRaster()  // in with margin
-        ,
-        tile.getRaster()  // out with no margin
+        , tile.getRaster()  // out with no margin
 
-        ,
-        ref_tile.getRaster(), ref_mode
+        , refer_tile.getRaster()
+	, refer_mode
 
-        ,
-        int_radius  // margin
-        ,
-        real_radius);
+        , int_radius  // margin
+        , real_radius);
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -273,6 +261,8 @@ TTile &tile
     }
     throw;
   } catch (std::exception &e) {
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -281,6 +271,8 @@ TTile &tile
     }
     throw;
   } catch (...) {
+    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");
