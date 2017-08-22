@@ -93,7 +93,7 @@ $ cd ../../
 $ cd toonz
 $ mkdir build
 $ cd build
-$ cmake ../sources
+$ cmake ../sources # add -DCMAKE_BUILD_TYPE=Debug flag if you want to debug the application
 $ make -j$(nproc)
 ```
 
@@ -105,10 +105,6 @@ If something doesn't compile or link, please run `make` this way to help spot th
 ```
 $ LANG=C make VERBOSE=1
 ```
-
-#### Debug Build
-If you need to debug the application, you should be able to use `cmake -DCMAKE_BUILD_TYPE=Debug`.
-
 
 ### Running OpenToonz
 
