@@ -1488,7 +1488,8 @@ FxSettings QToolBar QToolBar {
 /* -----------------------------------------------------------------------------
    Tool Options
 ----------------------------------------------------------------------------- */
-#ToolOptions TPanelTitleBar {
+#ToolOptions TPanelTitleBar,
+#XSheetToolBar TPanelTitleBar {
   background-color: #303030;
   background-image: url('../Astral_072_Dark/imgs/white/title_grip_vertical.svg');
   background-repeat: no-repeat;

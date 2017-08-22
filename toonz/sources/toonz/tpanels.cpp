@@ -861,51 +861,34 @@ public:
   }
 } toolbarFactory;
 
+//=========================================================
+// XSheet Toolbar/Command Bar Panel
+//---------------------------------------------------------
+
 //-----------------------------------------------------------------------------
 XSheetToolbarPanel::XSheetToolbarPanel(QWidget *parent)
-	: TPanel(parent, 0, TDockWidget::horizontal) {
-	TApp *app = TApp::instance();
-	//m_toolOption = new ToolOptions;
-	XsheetGUI::XSheetToolbar *xsheetToolbar = new XsheetGUI::XSheetToolbar();
-	setWidget(xsheetToolbar);
-	setIsMaximizable(false);
-	setFixedHeight(36);
+    : TPanel(parent, 0, TDockWidget::horizontal) {
+  XsheetGUI::XSheetToolbar *xsheetToolbar = new XsheetGUI::XSheetToolbar();
+  setWidget(xsheetToolbar);
+  setIsMaximizable(false);
+  setFixedHeight(36);
 }
 
-
-//class XSheetToolbarFactory final : public TPanelFactory {
-//public:
-//	XSheetToolbarFactory() : TPanelFactory("XSheetToolBar") {}
-//	void initialize(TPanel *panel) override {
-//		XsheetGUI::XSheetToolbar *xsheetToolbar = new XsheetGUI::XSheetToolbar();
-//		xsheetToolbar->setParent(panel);
-//		panel->setWidget(xsheetToolbar);
-//		panel->setIsMaximizable(false);
-//		// panel->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
-//		panel->setFixedHeight(30);  // 35
-//		xsheetToolbar->setFixedHeight(30);
-//		panel->setWindowTitle(QString(""));
-//	}
-//} xsheetToolbarFactory;
-
 class XSheetToolbarFactory final : public TPanelFactory {
-	TPanel *m_panel;
-
 public:
-	XSheetToolbarFactory() : TPanelFactory("XSheetToolBar") {}
-	TPanel *createPanel(QWidget *parent) override {
-		TPanel *panel = new ToolOptionPanel(parent);
-		panel->setObjectName(getPanelType());
-		panel->setWindowTitle(getPanelType());
-		panel->resize(600, panel->height());
-		return panel;
-	}
-	void initialize(TPanel *panel) override { assert(0); }
+  XSheetToolbarFactory() : TPanelFactory("XSheetToolBar") {}
+  TPanel *createPanel(QWidget *parent) override {
+    TPanel *panel = new XSheetToolbarPanel(parent);
+    panel->setObjectName(getPanelType());
+    return panel;
+  }
+  void initialize(TPanel *panel) override {}
 } xsheetToolbarFactory;
 
 //=============================================================================
-OpenFloatingPanel openXSheetToolbarCommand(MI_OpenXSheetToolbar, "XSheetToolbar",
-	QObject::tr("XSheet Toolbar"));
+OpenFloatingPanel openXSheetToolbarCommand(MI_OpenCommandToolbar,
+                                           "XSheetToolBar",
+                                           QObject::tr("XSheet Toolbar"));
 //-----------------------------------------------------------------------------
 
 //=========================================================

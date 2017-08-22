@@ -698,7 +698,6 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
   void timerEvent(QTimerEvent *) override;
 
-  void positionSections();
   void disconnectScrollBars();
   void connectScrollBars();
   void connectOrDisconnectScrollBars(bool toConnect);
@@ -708,6 +707,7 @@ signals:
   void orientationChanged(const Orientation *newOrientation);
 
 public slots:
+  void positionSections();
   void onSceneSwitched();
   void onXsheetChanged();
   void onCurrentFrameSwitched();

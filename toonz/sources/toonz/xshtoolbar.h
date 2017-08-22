@@ -30,22 +30,23 @@ class XSheetToolbar final : public QToolBar {
   Q_OBJECT
 
   XsheetViewer *m_viewer;
-
-  QPushButton *m_newVectorLevelButton;
-  QPushButton *m_newToonzRasterLevelButton;
-  QPushButton *m_newRasterLevelButton;
   ViewerKeyframeNavigator *m_keyFrameButton;
-  //QToolBar *m_toolbar;
+  bool m_isCollapsible;
 
 public:
 #if QT_VERSION >= 0x050500
-	XSheetToolbar(XsheetViewer *parent = 0, Qt::WindowFlags flags = 0);
+  XSheetToolbar(XsheetViewer *parent = 0, Qt::WindowFlags flags = 0,
+                bool isCollapsible = false);
 #else
-	XSheetToolbar(XsheetViewer *parent = 0, Qt::WFlags flags = 0);
+  XSheetToolbar(XsheetViewer *parent = 0, Qt::WFlags flags = 0);
 #endif
   static void toggleXSheetToolbar();
   void showToolbar(bool show);
+signals:
+  void updateVisibility();
 
+protected:
+  void showEvent(QShowEvent *e) override;
 protected slots:
   void onNewVectorLevelButtonPressed();
   void onNewToonzRasterLevelButtonPressed();
