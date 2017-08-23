@@ -109,24 +109,13 @@ FX_PLUGIN_IDENTIFIER(ino_hsv_noise, "inohsvNoiseFx");
 //------------------------------------------------------------
 #include "igs_hsv_noise.h"
 namespace {
-void fx_(TRasterP in_ras
-         , const TRasterP refer_ras
-	 , const int refer_mode
+void fx_(TRasterP in_ras, const TRasterP refer_ras, const int refer_mode
 
-         , double hue_range
-	 , double sat_range
-	 , double val_range
-	 , double alp_range
-	 , unsigned long random_seed
-	 , double near_blur
-	 , double effective
-	 , double center
-	 , int type
-	 , const int camera_x
-	 , const int camera_y
-	 , const int camera_w
-	 , const int camera_h
-	 , const bool anti_alias_sw) {
+         ,
+         double hue_range, double sat_range, double val_range, double alp_range,
+         unsigned long random_seed, double near_blur, double effective,
+         double center, int type, const int camera_x, const int camera_y,
+         const int camera_w, const int camera_h, const bool anti_alias_sw) {
   TRasterGR8P in_gr8(in_ras->getLy(),
                      in_ras->getLx() * ino::channels() *
                          ((TRaster64P)in_ras ? sizeof(unsigned short)
@@ -136,29 +125,29 @@ void fx_(TRasterP in_ras
 
   /* igs::hsv_noise::change(-)は今後つかわない2011-07-15 */
   igs::hsv_noise::change(
-    // in_ras->getRawData() // BGRA
-    in_gr8->getRawData()
+      // in_ras->getRawData() // BGRA
+      in_gr8->getRawData()
 
-    , in_ras->getLy()
-    , in_ras->getLx()  // Must Not use in_ras->getWrap()
-    , ino::channels()
-    , ino::bits(in_ras)
+          ,
+      in_ras->getLy(), in_ras->getLx()  // Must Not use in_ras->getWrap()
+      ,
+      ino::channels(), ino::bits(in_ras)
 
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? refer_ras->getRawData() : nullptr)  // BGRA
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? ino::bits(refer_ras) : 0)
-    , refer_mode
+                           ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                     : nullptr)  // BGRA
+      ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
+                                                     : 0),
+      refer_mode
 
-    , camera_x, camera_y, camera_w, camera_h
+      ,
+      camera_x, camera_y, camera_w, camera_h
 
-    , hue_range, sat_range, val_range , alp_range
-    , random_seed
-    , near_blur
-    , effective, center, type
-    , effective, center, type
-    , effective, center, type
-    , anti_alias_sw);
+      ,
+      hue_range, sat_range, val_range, alp_range, random_seed, near_blur,
+      effective, center, type, effective, center, type, effective, center, type,
+      anti_alias_sw);
 
   ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
   in_gr8->unlock();
@@ -201,7 +190,7 @@ void ino_hsv_noise::doCompute(TTile &tile, double frame,
   const double term_effective =
       this->m_term_effective->getValue(frame) / ino::param_range();
   const bool anti_alias_sw = this->m_anti_alias->getValue();
-  const int refer_mode       = this->m_ref_mode->getValue();
+  const int refer_mode     = this->m_ref_mode->getValue();
 
   /* ------ 画像生成 ---------------------------------------- */
   this->m_input->compute(tile, frame, rend_sets);
@@ -259,40 +248,34 @@ void ino_hsv_noise::doCompute(TTile &tile, double frame,
        << "  camera x " << camera_x << "  y " << camera_y << "  w " << camera_w
        << "  h " << camera_h;
     if (refer_sw) {
-      os << "  refer_tile.m_pos " << refer_tile.m_pos
-         << "  refer_tile_getLx " << refer_tile.getRaster()->getLx()
-         << "  y " << refer_tile.getRaster()->getLy();
+      os << "  refer_tile.m_pos " << refer_tile.m_pos << "  refer_tile_getLx "
+         << refer_tile.getRaster()->getLx() << "  y "
+         << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
-    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
-    fx_(tile.getRaster()
-        , refer_tile.getRaster()
-	, refer_mode
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
+    fx_(tile.getRaster(), refer_tile.getRaster(), refer_mode
 
-        , hue_range
-	, sat_range
-	, val_range
-	, mat_range
-	, random_seed
-	, near_blur
-	, term_effective
-	, term_center
-	, term_type
-	, camera_x
-	, camera_y
-	, camera_w
-	, camera_h
-	, anti_alias_sw  // --> add_blend_sw, default is true
+        ,
+        hue_range, sat_range, val_range, mat_range, random_seed, near_blur,
+        term_effective, term_center, term_type, camera_x, camera_y, camera_w,
+        camera_h, anti_alias_sw  // --> add_blend_sw, default is true
         );
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -301,7 +284,9 @@ void ino_hsv_noise::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -310,7 +295,9 @@ void ino_hsv_noise::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");

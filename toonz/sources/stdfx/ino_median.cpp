@@ -83,14 +83,14 @@ FX_PLUGIN_IDENTIFIER(ino_median, "inoMedianFx")
 #include "igs_median_filter_smooth.h"
 namespace {
 void fx_(const TRasterP in_ras  // with margin
-         , const int margin
-	 , TRasterP out_ras  // no margin
+         ,
+         const int margin, TRasterP out_ras  // no margin
 
-         , const TRasterP refer_ras
-	 , const int refer_mode
+         ,
+         const TRasterP refer_ras, const int refer_mode
 
-         , const double radius
-	 , const int channel) {
+         ,
+         const double radius, const int channel) {
   TRasterGR8P out_gr8(in_ras->getLy(),
                       in_ras->getLx() * ino::channels() *
                           ((TRaster64P)in_ras ? sizeof(unsigned short)
@@ -98,23 +98,24 @@ void fx_(const TRasterP in_ras  // with margin
   out_gr8->lock();
 
   igs::median_filter_smooth::convert(
-    in_ras->getRawData()  // BGRA
-    , out_gr8->getRawData()
+      in_ras->getRawData()  // BGRA
+      ,
+      out_gr8->getRawData()
 
-    , in_ras->getLy()
-    , in_ras->getLx()
-    , ino::channels()
-    , ino::bits(in_ras)
+          ,
+      in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(in_ras)
 
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? refer_ras->getRawData() : nullptr)  // BGRA
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? ino::bits(refer_ras) : 0), refer_mode
+                                                             ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                     : nullptr)  // BGRA
+      ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
+                                                     : 0),
+      refer_mode
 
-    , channel
-    , radius
-    , 0 /* 0=Spread:外は淵のピクセル値が続いているとする */
-    );
+      ,
+      channel, radius, 0 /* 0=Spread:外は淵のピクセル値が続いているとする */
+      );
 
   ino::arr_to_ras(out_gr8->getRawData(), ino::channels(), out_ras, margin);
   out_gr8->unlock();
@@ -148,7 +149,7 @@ void ino_median::doCompute(TTile &tile, double frame,
   /* ------ Pixel単位で動作パラメータを得る ----------------- */
   const double radius = this->m_radius->getValue(frame) * mm2scale_shrink_pixel;
   /* 動作パラメータを得る */
-  const int channel  = this->m_channel->getValue();
+  const int channel    = this->m_channel->getValue();
   const int refer_mode = this->m_ref_mode->getValue();
 
   /* ------ 参照マージン含めた画像生成 ---------------------- */
@@ -232,23 +233,31 @@ void ino_median::doCompute(TTile &tile, double frame,
   try {
     tile.getRaster()->lock();
     enlarge_tile.getRaster()->lock();
-    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
     fx_(enlarge_tile.getRaster()  // in with margin
-        , enlarge_pixel  // margin
-        , tile.getRaster()  // out with no margin
+        ,
+        enlarge_pixel  // margin
+        ,
+        tile.getRaster()  // out with no margin
 
-        , refer_tile.getRaster()
-	, refer_mode
+        ,
+        refer_tile.getRaster(), refer_mode
 
-        , radius
-	, channel);
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+        ,
+        radius, channel);
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
@@ -258,7 +267,9 @@ void ino_median::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
@@ -268,7 +279,9 @@ void ino_median::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {

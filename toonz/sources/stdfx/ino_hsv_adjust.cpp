@@ -89,19 +89,11 @@ FX_PLUGIN_IDENTIFIER(ino_hsv_adjust, "inohsvAdjustFx");
 //------------------------------------------------------------
 #include "igs_hsv_adjust.h"
 namespace {
-void fx_(TRasterP in_ras
-         , const TRasterP refer_ras
-	 , const int refer_mode
-	 , const double hue_pivot
-	 , const double hue_scale
-	 , const double hue_shift
-	 , const double sat_pivot
-	 , const double sat_scale
-	 , const double sat_shift
-	 , const double val_pivot
-	 , const double val_scale
-	 , const double val_shift
-	 , const bool anti_alias_sw) {
+void fx_(TRasterP in_ras, const TRasterP refer_ras, const int refer_mode,
+         const double hue_pivot, const double hue_scale, const double hue_shift,
+         const double sat_pivot, const double sat_scale, const double sat_shift,
+         const double val_pivot, const double val_scale, const double val_shift,
+         const bool anti_alias_sw) {
   /***std::vector<unsigned char> in_vec;
   ino::ras_to_vec( in_ras, ino::channels(), in_vec );***/
 
@@ -113,27 +105,30 @@ void fx_(TRasterP in_ras
   ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
   igs::hsv_adjust::change(
-    // in_ras->getRawData() // BGRA
-    //&in_vec.at(0) // RGBA
-    in_gr8->getRawData()
+      // in_ras->getRawData() // BGRA
+      //&in_vec.at(0) // RGBA
+      in_gr8->getRawData()
 
-    , in_ras->getLy()
-    , in_ras->getLx()  // Not use in_ras->getWrap()
-    , ino::channels()
-    , ino::bits(in_ras)
+          ,
+      in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
+      ,
+      ino::channels(), ino::bits(in_ras)
 
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? refer_ras->getRawData() : nullptr)  // BGRA
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
- 		? ino::bits(refer_ras) : 0)
-    , refer_mode
+                           ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                     : nullptr)  // BGRA
+      ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
+                                                     : 0),
+      refer_mode
 
-    , hue_pivot, hue_scale, hue_shift
-    , sat_pivot, sat_scale, sat_shift
-    , val_pivot, val_scale, val_shift
+      ,
+      hue_pivot, hue_scale, hue_shift, sat_pivot, sat_scale, sat_shift,
+      val_pivot, val_scale, val_shift
 
-    //,true	/* add_blend_sw */
-    , anti_alias_sw);
+      //,true	/* add_blend_sw */
+      ,
+      anti_alias_sw);
 
   /***ino::vec_to_ras( in_vec, ino::channels(), in_ras, 0 );***/
 
@@ -174,7 +169,7 @@ void ino_hsv_adjust::doCompute(TTile &tile, double frame,
       this->m_val_shift->getValue(frame) / ino::param_range();
 
   const bool anti_alias_sw = this->m_anti_alias->getValue();
-  const int refer_mode       = this->m_ref_mode->getValue();
+  const int refer_mode     = this->m_ref_mode->getValue();
 
   /* ------ 画像生成 ---------------------------------------- */
   this->m_input->compute(tile, frame, rend_sets);
@@ -206,29 +201,32 @@ void ino_hsv_adjust::doCompute(TTile &tile, double frame,
        << "  pixbits " << ino::pixel_bits(tile.getRaster()) << "   frame "
        << frame;
     if (refer_sw) {
-      os << "  refer_tile.m_pos " << refer_tile.m_pos
-         << "  refer_tile_getLx " << refer_tile.getRaster()->getLx()
-         << "  y " << refer_tile.getRaster()->getLy();
+      os << "  refer_tile.m_pos " << refer_tile.m_pos << "  refer_tile_getLx "
+         << refer_tile.getRaster()->getLx() << "  y "
+         << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
-    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
-    fx_(tile.getRaster()
-        , refer_tile.getRaster()
-	, refer_mode
-	, hue_pivot , hue_scale , hue_shift
-	, sat_pivot , sat_scale , sat_shift
-	, val_pivot , val_scale , val_shift
-	, anti_alias_sw  // --> add_blend_sw, default is true
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
+    fx_(tile.getRaster(), refer_tile.getRaster(), refer_mode, hue_pivot,
+        hue_scale, hue_shift, sat_pivot, sat_scale, sat_shift, val_pivot,
+        val_scale, val_shift,
+        anti_alias_sw  // --> add_blend_sw, default is true
         );
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -237,7 +235,9 @@ void ino_hsv_adjust::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -246,7 +246,9 @@ void ino_hsv_adjust::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");

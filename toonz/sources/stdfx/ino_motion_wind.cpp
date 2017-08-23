@@ -170,32 +170,28 @@ FX_PLUGIN_IDENTIFIER(ino_motion_wind, "inoMotionWindFx");
 #include "igs_motion_wind.h"
 namespace {
 void fx_(const TRasterP in_ras  // with margin
-         , const TRasterP refer_ras  // with margin
-         , const int refer_mode
-	 , const int margin
-	 , TRasterP out_ras  // no margin
+         ,
+         const TRasterP refer_ras  // with margin
+         ,
+         const int refer_mode, const int margin, TRasterP out_ras  // no margin
 
-         , const int direction
-	 , const bool dark_sw
-	 , const bool alpha_rendering_sw
+         ,
+         const int direction, const bool dark_sw, const bool alpha_rendering_sw
 
-         , const double length_min
-	 , const double length_max
-	 , const double length_bias
-	 , const unsigned long length_seed
-	 , const bool length_ref_sw
+         ,
+         const double length_min, const double length_max,
+         const double length_bias, const unsigned long length_seed,
+         const bool length_ref_sw
 
-         , const double force_min
-	 , const double force_max
-	 , const double force_bias
-	 , const unsigned long force_seed
-	 , const bool force_ref_sw
+         ,
+         const double force_min, const double force_max,
+         const double force_bias, const unsigned long force_seed,
+         const bool force_ref_sw
 
-         , const double density_min
-	 , const double density_max
-	 , const double density_bias
-	 , const unsigned long density_seed
-	 , const bool density_ref_sw) {
+         ,
+         const double density_min, const double density_max,
+         const double density_bias, const unsigned long density_seed,
+         const bool density_ref_sw) {
   /***std::vector<unsigned char> in_vec;
   ino::ras_to_vec( in_ras, ino::channels(), in_vec );
   std::vector<unsigned char> refer_vec;
@@ -217,32 +213,30 @@ void fx_(const TRasterP in_ras  // with margin
     ino::ras_to_arr(refer_ras, ino::channels(), refer_gr8->getRawData());
 
     igs::motion_wind::change(
-      // in_ras->getRawData() // BGRA
-      //&in_vec.at(0) // RGBA
-      in_gr8->getRawData()  // BGRA
+        // in_ras->getRawData() // BGRA
+        //&in_vec.at(0) // RGBA
+        in_gr8->getRawData()  // BGRA
 
-      , in_ras->getLy()
-      , in_ras->getLx()
-      , ino::channels()
-      , ino::bits(in_ras)
+        ,
+        in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(in_ras)
 
-      , refer_gr8->getRawData()
+                                                               ,
+        refer_gr8->getRawData()
 
-      , refer_ras->getLy()
-      , refer_ras->getLx()
-      , ino::channels()
-      , ino::bits(refer_ras)
+            ,
+        refer_ras->getLy(), refer_ras->getLx(), ino::channels(),
+        ino::bits(refer_ras)
 
-      , refer_mode
+            ,
+        refer_mode
 
-      , direction
-      , dark_sw
-      , alpha_rendering_sw
+        ,
+        direction, dark_sw, alpha_rendering_sw
 
-      , length_seed,   length_min,  length_max,  length_bias,  length_ref_sw
-      , force_seed,     force_min,   force_max,   force_bias,   force_ref_sw
-      , density_seed, density_min, density_max, density_bias, density_ref_sw
-      );
+        ,
+        length_seed, length_min, length_max, length_bias, length_ref_sw,
+        force_seed, force_min, force_max, force_bias, force_ref_sw,
+        density_seed, density_min, density_max, density_bias, density_ref_sw);
     /***ino::vec_to_ras( refer_vec, 0, 0 );
 ino::vec_to_ras( in_vec, ino::channels(), out_ras, margin );***/
 
@@ -342,7 +336,7 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
       this->m_density_bias->getValue(frame) / ino::param_range();
   const unsigned long density_seed = this->m_density_seed->getValue(frame);
   const bool density_ref_sw        = this->m_density_ref->getValue();
-  const int refer_mode               = this->m_ref_mode->getValue();
+  const int refer_mode             = this->m_ref_mode->getValue();
 
   /* ------ 参照マージン含めた画像生成 ---------------------- */
   /* Rendering画像のBBox値 --> Pixel単位のdouble値 */
@@ -444,28 +438,35 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
   try {
     tile.getRaster()->lock();
     enlarge_tile.getRaster()->lock();
-    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
-    fx_(enlarge_tile.getRaster() // in with margin
-      , refer_tile.getRaster() // with margin
-      , refer_mode
-      , enlarge_pixel  // margin
-      , tile.getRaster()  // out with no margin
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
+    fx_(enlarge_tile.getRaster()  // in with margin
+        ,
+        refer_tile.getRaster()  // with margin
+        ,
+        refer_mode, enlarge_pixel  // margin
+        ,
+        tile.getRaster()  // out with no margin
 
-      , direction
-      , dark_sw
-      , alp_rend_sw
+        ,
+        direction, dark_sw, alp_rend_sw
 
-      ,  length_min,  length_max,  length_bias,  length_seed,  length_ref_sw
-      ,   force_min,   force_max,   force_bias,   force_seed,   force_ref_sw
-      , density_min, density_max, density_bias, density_seed, density_ref_sw
-      );
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+        ,
+        length_min, length_max, length_bias, length_seed, length_ref_sw,
+        force_min, force_max, force_bias, force_seed, force_ref_sw, density_min,
+        density_max, density_bias, density_seed, density_ref_sw);
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
@@ -475,7 +476,9 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
@@ -485,7 +488,9 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {

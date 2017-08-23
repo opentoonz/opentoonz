@@ -52,10 +52,8 @@ FX_PLUGIN_IDENTIFIER(ino_density, "inoDensityFx");
 #include "igs_density.h"
 
 namespace {
-void fx_(TRasterP in_ras
-         , TRasterP refer_ras
-	 , const int refer_mode
-	 , const double density) {
+void fx_(TRasterP in_ras, TRasterP refer_ras, const int refer_mode,
+         const double density) {
   TRasterGR8P in_gr8(in_ras->getLy(),
                      in_ras->getLx() * ino::channels() *
                          ((TRaster64P)in_ras ? sizeof(unsigned short)
@@ -64,17 +62,22 @@ void fx_(TRasterP in_ras
   ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
   igs::density::change(
-    in_gr8->getRawData()  // BGRA
-    , in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
-    , ino::channels(), ino::bits(in_ras)
+      in_gr8->getRawData()  // BGRA
+      ,
+      in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
+      ,
+      ino::channels(), ino::bits(in_ras)
 
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? refer_ras->getRawData() : nullptr)  // BGRA
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? ino::bits(refer_ras) : 0)
-    , refer_mode
+                           ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                     : nullptr)  // BGRA
+      ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
+                                                     : 0),
+      refer_mode
 
-    , density);
+      ,
+      density);
 
   ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
   in_gr8->unlock();
@@ -96,7 +99,7 @@ void ino_density::doCompute(TTile &tile, double frame,
 
   /* ------ 動作パラメータを得る ---------------------------- */
   const double density = this->m_density->getValue(frame) / ino::param_range();
-  const int refer_mode   = this->m_ref_mode->getValue();
+  const int refer_mode = this->m_ref_mode->getValue();
 
   /* ------ 画像生成 ---------------------------------------- */
   this->m_input->compute(tile, frame, rend_sets);
@@ -132,17 +135,20 @@ void ino_density::doCompute(TTile &tile, double frame,
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
-    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
-    fx_(tile.getRaster()
-        , refer_tile.getRaster()
-	, refer_mode
-	, density);
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
+    fx_(tile.getRaster(), refer_tile.getRaster(), refer_mode, density);
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -151,7 +157,9 @@ void ino_density::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -160,7 +168,9 @@ void ino_density::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");

@@ -85,20 +85,14 @@ FX_PLUGIN_IDENTIFIER(ino_hsv_add, "inohsvAddFx");
 //------------------------------------------------------------
 #include "igs_hsv_add.h"
 namespace {
-void fx_(TRasterP in_ras
-         , const TRasterP noise_ras
-	 , const TRasterP refer_ras
-	 , const int refer_mode
+void fx_(TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras,
+         const int refer_mode
 
-         , const int xoffset
-	 , const int yoffset
-	 , const int from_rgba
-	 , const double offset
-	 , const double hue_scale
-	 , const double sat_scale
-	 , const double val_scale
-	 , const double alp_scale
-	 , const bool anti_alias_sw) {
+         ,
+         const int xoffset, const int yoffset, const int from_rgba,
+         const double offset, const double hue_scale, const double sat_scale,
+         const double val_scale, const double alp_scale,
+         const bool anti_alias_sw) {
   /***std::vector<unsigned char> in_vec;
   ino::ras_to_vec( in_ras, ino::channels(), in_vec );
   std::vector<unsigned char> refer_vec;
@@ -119,36 +113,39 @@ void fx_(TRasterP in_ras
   ino::ras_to_arr(noise_ras, ino::channels(), noise_gr8->getRawData());
 
   igs::hsv_add::change(
-    // in_ras->getRawData() // BGRA
-    //&in_vec.at(0) // RGBA
-    in_gr8->getRawData()
+      // in_ras->getRawData() // BGRA
+      //&in_vec.at(0) // RGBA
+      in_gr8->getRawData()
 
-    , in_ras->getLy()
-    , in_ras->getLx()  // Not use in_ras->getWrap()
-    , ino::channels()
-    , ino::bits(in_ras)
+          ,
+      in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
+      ,
+      ino::channels(), ino::bits(in_ras)
 
-    //,noise_ras->getRawData() // BGRA
-    //,&refer_vec.at(0) // RGBA
-    , noise_gr8->getRawData()
+      //,noise_ras->getRawData() // BGRA
+      //,&refer_vec.at(0) // RGBA
+      ,
+      noise_gr8->getRawData()
 
-    , noise_ras->getLy()
-    , noise_ras->getLx()
-    , ino::channels()
-    , ino::bits(noise_ras)
+          ,
+      noise_ras->getLy(), noise_ras->getLx(), ino::channels(),
+      ino::bits(noise_ras)
 
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? refer_ras->getRawData() : nullptr)  // BGRA
-    , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? ino::bits(refer_ras) : 0)
-    , refer_mode
+          ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                     : nullptr)  // BGRA
+      ,
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
+                                                     : 0),
+      refer_mode
 
-    , xoffset, yoffset
-    , from_rgba, offset
-    , hue_scale, sat_scale, val_scale, alp_scale
+      ,
+      xoffset, yoffset, from_rgba, offset, hue_scale, sat_scale, val_scale,
+      alp_scale
 
-    //,true	/* add_blend_sw */
-    , anti_alias_sw );
+      //,true	/* add_blend_sw */
+      ,
+      anti_alias_sw);
 
   /***ino::vec_to_ras( refer_vec, 0, 0 );
   ino::vec_to_ras( in_vec, ino::channels(), in_ras, 0 );***/
@@ -184,7 +181,7 @@ void ino_hsv_add::doCompute(TTile &tile, double frame,
   const double val_scale = this->m_val->getValue(frame) / ino::param_range();
   const double alp_scale = this->m_alp->getValue(frame) / ino::param_range();
   const bool anti_alias_sw = this->m_anti_alias->getValue();
-  const int refer_mode       = this->m_ref_mode->getValue();
+  const int refer_mode     = this->m_ref_mode->getValue();
 
   /* ------ 画像生成 ---------------------------------------- */
   this->m_input->compute(tile, frame, rend_sets);
@@ -221,38 +218,36 @@ void ino_hsv_add::doCompute(TTile &tile, double frame,
        << "   noise_tile w " << noise_tile.getRaster()->getLx() << "  h "
        << noise_tile.getRaster()->getLy() << "   frame " << frame;
     if (refer_sw) {
-      os << "  refer_tile.m_pos " << refer_tile.m_pos
-         << "  refer_tile_getLx " << refer_tile.getRaster()->getLx()
-         << "  y " << refer_tile.getRaster()->getLy();
+      os << "  refer_tile.m_pos " << refer_tile.m_pos << "  refer_tile_getLx "
+         << refer_tile.getRaster()->getLx() << "  y "
+         << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
     noise_tile.getRaster()->lock();
-    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
-    fx_(tile.getRaster()
-        , noise_tile.getRaster()
-	, refer_tile.getRaster()
-	, refer_mode
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
+    fx_(tile.getRaster(), noise_tile.getRaster(), refer_tile.getRaster(),
+        refer_mode
 
-        , xoffset
-	, yoffset
-	, from_rgba
-	, offset
-	, hue_scale
-	, sat_scale
-	, val_scale
-	, alp_scale
-	, anti_alias_sw  // --> add_blend_sw, default is true
+        ,
+        xoffset, yoffset, from_rgba, offset, hue_scale, sat_scale, val_scale,
+        alp_scale, anti_alias_sw  // --> add_blend_sw, default is true
         );
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     noise_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     noise_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
@@ -262,7 +257,9 @@ void ino_hsv_add::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     noise_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
@@ -272,7 +269,9 @@ void ino_hsv_add::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     noise_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {

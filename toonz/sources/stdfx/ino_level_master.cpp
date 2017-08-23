@@ -92,7 +92,7 @@ void ino_level_master::doCompute(TTile &tile, double frame,
   double gamma           = this->m_gamma->getValue(frame) / ino::param_range();
   const bool alp_rend_sw = this->m_alpha_rendering->getValue();
   const bool anti_alias_sw = this->m_anti_alias->getValue();
-  const int refer_mode       = this->m_ref_mode->getValue();
+  const int refer_mode     = this->m_ref_mode->getValue();
   v_in.first /= ino::param_range();
   v_in.second /= ino::param_range();
   v_out.first /= ino::param_range();
@@ -127,9 +127,9 @@ void ino_level_master::doCompute(TTile &tile, double frame,
        << tile.getRaster()->getLy() << "  pixbits "
        << ino::pixel_bits(tile.getRaster()) << "   frame " << frame;
     if (refer_sw) {
-      os << "  refer_tile.m_pos " << refer_tile.m_pos
-         << "  refer_tile_getLx " << refer_tile.getRaster()->getLx()
-         << "  y " << refer_tile.getRaster()->getLy();
+      os << "  refer_tile.m_pos " << refer_tile.m_pos << "  refer_tile_getLx "
+         << refer_tile.getRaster()->getLx() << "  y "
+         << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
@@ -141,50 +141,55 @@ void ino_level_master::doCompute(TTile &tile, double frame,
                                                : sizeof(unsigned char)));
 
     in_ras->lock();
-    if (refer_tile.getRaster()!=nullptr) { refer_tile.getRaster()->lock(); }
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
     in_gr8->lock();
 
     ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
-    const TRasterP refer_ras = (refer_sw ?refer_tile.getRaster() :nullptr);
+    const TRasterP refer_ras = (refer_sw ? refer_tile.getRaster() : nullptr);
     igs::levels::change(
-      in_gr8->getRawData()
+        in_gr8->getRawData()
 
-      , in_ras->getLy()
-      , in_ras->getLx()  // Not use in_ras->getWrap()
-      , ino::channels()
-      , ino::bits(in_ras)
+            ,
+        in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
+        ,
+        ino::channels(), ino::bits(in_ras)
 
-      , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? refer_ras->getRawData() : nullptr)  // BGRA
-      , (((refer_ras != nullptr) && (0 <= refer_mode) )
-		? ino::bits(refer_ras) : 0)
-      , refer_mode
+                             ,
+        (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                       : nullptr)  // BGRA
+        ,
+        (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
+                                                       : 0),
+        refer_mode
 
-      , v_in.first, v_in.second
-      , v_in.first, v_in.second
-      , v_in.first, v_in.second
-      , v_in.first, v_in.second
-      , gamma, gamma, gamma, gamma
-      , v_out.first, v_out.second
-      , v_out.first, v_out.second
-      , v_out.first, v_out.second
-      , v_out.first, v_out.second
+        ,
+        v_in.first, v_in.second, v_in.first, v_in.second, v_in.first,
+        v_in.second, v_in.first, v_in.second, gamma, gamma, gamma, gamma,
+        v_out.first, v_out.second, v_out.first, v_out.second, v_out.first,
+        v_out.second, v_out.first, v_out.second
 
-      , true  // clamp_sw
-      , alp_rend_sw
-      , anti_alias_sw  // --> add_blend_sw, default is true
-      );
+        ,
+        true  // clamp_sw
+        ,
+        alp_rend_sw, anti_alias_sw  // --> add_blend_sw, default is true
+        );
 
     ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
 
     in_gr8->unlock();
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     in_ras->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -193,7 +198,9 @@ void ino_level_master::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -202,7 +209,9 @@ void ino_level_master::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    if (refer_tile.getRaster()!=nullptr) {refer_tile.getRaster()->unlock();}
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");
