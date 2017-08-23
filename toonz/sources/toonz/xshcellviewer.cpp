@@ -1704,8 +1704,8 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
   c0                = visible.from().layer();
   c1                = visible.to().layer();
 
-  static QPixmap selectedKey = QPixmap(":Resources/selected_key.bmp");
-  static QPixmap key         = QPixmap(":Resources/key.bmp");
+  static QPixmap selectedKey = svgToPixmap(":Resources/selected_key.svg");
+  static QPixmap key         = svgToPixmap(":Resources/key.svg");
   const QRect &keyRect       = o->rect(PredefinedRect::KEY_ICON);
 
   TXsheet *xsh         = m_viewer->getXsheet();

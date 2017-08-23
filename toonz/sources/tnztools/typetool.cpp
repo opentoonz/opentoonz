@@ -407,7 +407,7 @@ TypeTool::TypeTool()
     , m_textBox(TRectD(0, 0, 0, 0))
     , m_cursorPoint(TPointD(0, 0))
     , m_startPoint(TPointD(0, 0))
-    , m_dimension(70)
+    , m_dimension(1)      // to be set the m_size value on the first-click
     , m_validFonts(true)  // false)
     , m_fontYOffset(0)
     , m_cursorId(ToolCursor::CURSOR_NO)
@@ -423,11 +423,12 @@ TypeTool::TypeTool()
     , m_undo(0) {
   bind(TTool::CommonLevels | TTool::EmptyTarget);
   m_prop.bind(m_fontFamilyMenu);
-// Su mac non e' visibile il menu dello style perche' e' stato inserito nel nome
-// della font.
-#ifndef MACOSX
+  // Su mac non e' visibile il menu dello style perche' e' stato inserito nel
+  // nome
+  // della font.
+  //#ifndef MACOSX
   m_prop.bind(m_typeFaceMenu);
-#endif
+  //#endif
   m_prop.bind(m_size);
   m_prop.bind(m_vertical);
   m_vertical.setId("Orientation");
@@ -601,7 +602,7 @@ void TypeTool::setSize(std::wstring strSize) {
 
   TImageP img     = getImage(true);
   TToonzImageP ti = img;
-  if (ti) TFontManager::instance()->setSize((int)dimension);
+  TFontManager::instance()->setSize((int)dimension);
 
   assert(m_dimension != 0);
   double ratio = dimension / m_dimension;
@@ -869,7 +870,7 @@ glPushMatrix();
 
     double charWidth = 0;
     if (TVectorImageP vi = m_string[j].m_char) {
-      TTranslation transl(m_string[j].m_charPosition);
+      TTranslation transl(convert(descenderP) + m_string[j].m_charPosition);
       const TVectorRenderData rd(transl, TRect(), vPalette, 0, false);
       tglDraw(rd, vi.getPointer());
       charWidth = vi->getBBox().getLx();
@@ -878,7 +879,7 @@ glPushMatrix();
       ti->setPalette(vPalette);
 
       TPoint rasterCenter(dim.lx / 2, dim.ly / 2);
-      TTranslation transl1(convert(descenderP + rasterCenter));
+      TTranslation transl1(convert(rasterCenter));
       TTranslation transl2(m_string[j].m_charPosition);
       GLRasterPainter::drawRaster(transl2 * m_scale * transl1, ti, false);
 
@@ -971,24 +972,23 @@ void TypeTool::addTextToToonzImage(const TToonzImageP &currentImage) {
   TRasterCM32P targetRaster = currentImage->getRaster();
   TRect changedArea;
 
-  TPoint descenderP(0, TFontManager::instance()->getLineDescender());
-
   UINT j;
   for (j = 0; j < size; j++) {
     if (m_string[j].isReturn()) continue;
 
     if (TToonzImageP ti = m_string[j].m_char) {
-      TRectD srcBBox = ti->getBBox() + m_string[j].m_charPosition;
-      changedArea +=
-          ToonzImageUtils::convertWorldToRaster(srcBBox, currentImage);
+      TRectD srcBBox  = ti->getBBox() + m_string[j].m_charPosition;
+      TDimensionD dim = srcBBox.getSize();
+      TDimensionD enlargeAmount(dim.lx * (m_scale.a11 - 1.0),
+                                dim.ly * (m_scale.a22 - 1.0));
+      changedArea += ToonzImageUtils::convertWorldToRaster(
+          srcBBox.enlarge(enlargeAmount), currentImage);
       /*
 if( instance->hasVertical() && m_isVertical)
 vi->transform( TRotation(m_startPoint,-90) );
 */
     }
   }
-
-  changedArea = changedArea + descenderP;
 
   if (!changedArea.isEmpty()) {
     TTileSetCM32 *beforeTiles = new TTileSetCM32(targetRaster->getSize());
@@ -999,10 +999,9 @@ vi->transform( TRotation(m_startPoint,-90) );
 
       if (TToonzImageP srcTi = m_string[j].m_char) {
         TRasterCM32P srcRaster = srcTi->getRaster();
-        TTranslation transl1(convert(descenderP));
         TTranslation transl2(m_string[j].m_charPosition +
                              convert(targetRaster->getCenter()));
-        TRop::over(targetRaster, srcRaster, transl2 * m_scale * transl1);
+        TRop::over(targetRaster, srcRaster, transl2 * m_scale);
       }
     }
 
@@ -1047,8 +1046,10 @@ void TypeTool::addTextToImage() {
     for (j = 0; j < size; j++) {
       if (m_string[j].isReturn()) continue;
 
+      TPoint descenderP(0, TFontManager::instance()->getLineDescender());
       if (TVectorImageP vi = m_string[j].m_char) {
-        vi->transform(TTranslation(m_string[j].m_charPosition));
+        vi->transform(
+            TTranslation(convert(descenderP) + m_string[j].m_charPosition));
         if (instance->hasVertical() && m_isVertical)
           vi->transform(TRotation(m_startPoint, -90));
         images.push_back(vi.getPointer());
@@ -1167,9 +1168,9 @@ void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
   TVectorImageP vi = img;
   TToonzImageP ti  = img;
 
-  if (vi) setSize(m_size.getValue());
-
   if (!vi && !ti) return;
+
+  setSize(m_size.getValue());
 
   if (m_isFrameCreated) {
     if (vi)

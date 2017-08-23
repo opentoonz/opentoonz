@@ -479,7 +479,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_noteButton->setObjectName("ToolbarToolButton");
   m_noteButton->setFixedSize(44, 26);
   m_noteButton->setIconSize(QSize(38, 20));
-  QIcon addNoteIcon = createQIconPNG("newmemo");
+  QIcon addNoteIcon = createQIcon("newmemo");
   addNoteIcon.addFile(QString(":Resources/newmemo_disabled.svg"), QSize(),
                       QIcon::Disabled);
   m_noteButton->setIcon(addNoteIcon);

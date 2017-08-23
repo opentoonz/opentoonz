@@ -190,7 +190,8 @@ void copyFrontBufferToBackBuffer() {
 /*! Compute new 3Dposition and new 2D position. */
 T3DPointD computeNew3DPosition(T3DPointD start3DPos, TPointD delta2D,
                                TPointD &new2dPos, GLdouble modelView3D[16],
-                               GLdouble projection3D[16], GLint viewport3D[4]) {
+                               GLdouble projection3D[16], GLint viewport3D[4],
+                               int devPixRatio) {
   GLdouble pos2D_x, pos2D_y, pos2D_z;
   gluProject(-start3DPos.x, -start3DPos.y, start3DPos.z, modelView3D,
              projection3D, viewport3D, &pos2D_x, &pos2D_y, &pos2D_z);
@@ -198,7 +199,7 @@ T3DPointD computeNew3DPosition(T3DPointD start3DPos, TPointD delta2D,
   GLdouble pos3D_x, pos3D_y, pos3D_z;
   gluUnProject(new2dPos.x, new2dPos.y, 1, modelView3D, projection3D, viewport3D,
                &pos3D_x, &pos3D_y, &pos3D_z);
-  new2dPos.y = viewport3D[3] - new2dPos.y - 20;
+  new2dPos.y = viewport3D[3] - new2dPos.y - 20 * devPixRatio;
   return T3DPointD(pos3D_x, pos3D_y, pos3D_z);
 }
 
@@ -525,13 +526,9 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   for (int i = 0; i < tArrayCount(m_viewAff); i++)
     setViewMatrix(getNormalZoomScale(), i);
 
-  QImage image;
-  image.load(QString(":Resources/3Dside_r.png"));
-  m_3DSideR = rasterFromQImage(image);
-  image.load(QString(":Resources/3Dside_l.png"));
-  m_3DSideL = rasterFromQImage(image);
-  image.load(QString(":Resources/3Dtop.png"));
-  m_3DTop = rasterFromQImage(image);
+  m_3DSideR = rasterFromQPixmap(svgToPixmap(":Resources/3Dside_r.svg"));
+  m_3DSideL = rasterFromQPixmap(svgToPixmap(":Resources/3Dside_l.svg"));
+  m_3DTop   = rasterFromQPixmap(svgToPixmap(":Resources/3Dtop.svg"));
 
   makeCurrent();
   TGlContext context(tglGetCurrentContext());
@@ -1324,7 +1321,7 @@ void SceneViewer::drawOverlay() {
     if (m_phi3D > 0) {
       T3DPointD topRasterPos3D = computeNew3DPosition(
           T3DPointD(500, 500, 1000), TPointD(-10, -10), m_topRasterPos,
-          modelView3D, projection3D, viewport3D);
+          modelView3D, projection3D, viewport3D, getDevPixRatio());
       glRasterPos3f(topRasterPos3D.x, topRasterPos3D.y, topRasterPos3D.z);
       glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
       glDrawPixels(m_3DTop->getWrap(), m_3DTop->getLy(), TGL_FMT, TGL_TYPE,
@@ -1332,7 +1329,7 @@ void SceneViewer::drawOverlay() {
 
       T3DPointD sideRasterPos3D = computeNew3DPosition(
           T3DPointD(-500, -500, 1000), TPointD(-10, -10), m_sideRasterPos,
-          modelView3D, projection3D, viewport3D);
+          modelView3D, projection3D, viewport3D, getDevPixRatio());
       glRasterPos3f(sideRasterPos3D.x, sideRasterPos3D.y, sideRasterPos3D.z);
       glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
       glDrawPixels(m_3DSideR->getWrap(), m_3DSideR->getLy(), TGL_FMT, TGL_TYPE,
@@ -1340,7 +1337,7 @@ void SceneViewer::drawOverlay() {
     } else {
       T3DPointD topRasterPos3D = computeNew3DPosition(
           T3DPointD(-500, 500, 1000), TPointD(-10, -10), m_topRasterPos,
-          modelView3D, projection3D, viewport3D);
+          modelView3D, projection3D, viewport3D, getDevPixRatio());
       glRasterPos3f(topRasterPos3D.x, topRasterPos3D.y, topRasterPos3D.z);
       glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
       glDrawPixels(m_3DTop->getWrap(), m_3DTop->getLy(), TGL_FMT, TGL_TYPE,
@@ -1348,7 +1345,7 @@ void SceneViewer::drawOverlay() {
 
       T3DPointD sideRasterPos3D = computeNew3DPosition(
           T3DPointD(500, -500, 1000), TPointD(-10, -10), m_sideRasterPos,
-          modelView3D, projection3D, viewport3D);
+          modelView3D, projection3D, viewport3D, getDevPixRatio());
       glRasterPos3f(sideRasterPos3D.x, sideRasterPos3D.y, sideRasterPos3D.z);
       glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
       glDrawPixels(m_3DSideL->getWrap(), m_3DSideL->getLy(), TGL_FMT, TGL_TYPE,

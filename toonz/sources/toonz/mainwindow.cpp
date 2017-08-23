@@ -1934,7 +1934,9 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenFunctionEditor, tr("&Function Editor"), "");
   createMenuWindowsAction(MI_OpenFilmStrip, tr("&Level Strip"), "");
   createMenuWindowsAction(MI_OpenPalette, tr("&Palette"), "");
-  createRightClickMenuAction(MI_OpenPltGizmo, tr("&Palette Gizmo"), "");
+  QAction *pltGizmoAction =
+      createRightClickMenuAction(MI_OpenPltGizmo, tr("&Palette Gizmo"), "");
+  pltGizmoAction->setIcon(QIcon(":Resources/palettegizmo.svg"));
   createRightClickMenuAction(MI_EraseUnusedStyles, tr("&Delete Unused Styles"),
                              "");
   createMenuWindowsAction(MI_OpenTasks, tr("&Tasks"), "");
