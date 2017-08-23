@@ -1909,7 +1909,7 @@ void MainWindow::defineActions() {
   createRGBAAction(MI_RedChannel, tr("Red Channel"), "");
   createRGBAAction(MI_GreenChannel, tr("Green Channel"), "");
   createRGBAAction(MI_BlueChannel, tr("Blue Channel"), "");
-  createRGBAAction(MI_MatteChannel, tr("Matte Channel"), "");
+  createRGBAAction(MI_MatteChannel, tr("Alpha Channel"), "");
   createRGBAAction(MI_RedChannelGreyscale, tr("Red Channel Greyscale"), "");
   createRGBAAction(MI_GreenChannelGreyscale, tr("Green Channel Greyscale"), "");
   createRGBAAction(MI_BlueChannelGreyscale, tr("Blue Channel Greyscale"), "");
