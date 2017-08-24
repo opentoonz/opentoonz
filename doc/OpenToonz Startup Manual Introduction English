@@ -1,0 +1,330 @@
+2/21/2017 Edition
+
+
+
+ 			
+
+											OpenToonz
+
+											Startup Manual
+
+
+ 
+Installation Procedure
+
+Note: images accompanying the installation process can be found in the Japanese version of the startup guide found at https://opentoonz.github.io/e/
+
+Section 1
+
+The requirements for using OpenToonz comfortably are as follows:
+Windows
+•	Microsoft Windows 7 SP1/8.1/10 (64bit required)
+•	Intel Core i series processor
+•	4GB or more RAM
+•	500 MB or more available storage space
+•	1280 x 1024 or higher monitor resolution
+OS X
+•	OS X 10.9 or a later version
+•	Intel Core i series processor
+•	4 GB or more RAM
+•	500 MB or more available storage space
+•	1280 x 1024 or higher monitor resolution
+
+The requirements for using GTS comfortably are as follows:
+•	Microsoft Windows 7/8.1/10
+•	Intel Core i series processor
+•	2 GB or more RAM
+•	8 MB or more available storage space
+•	Scanner compatible with the TWAIN standard (including the driver software)
+※EPSON DS-50000 is recommended.
+
+① Download the software and start the installer. OpenToonz is at https://opentoonz.github.io/e/
+
+② Please read the terms of use carefully and if you agree, press "I agree" and proceed to the next step.
+
+③ Specify the installation location of OpenToonz software
+
+(Windows only) Specify the save destination of the Stuff folder.
+In the case of OS X, the Stuff folder is expanded to a predetermined place in advance.
+In either case, you can change the location of the folder as described later.
+In the case of Windows, furthermore, you can specify the start menu and the desktop icon.
+
+⑤ The file is copied and installation is completed.
+
+Section 2
+
+You can start OpenToonz after the installation is complete.  As of February 2017, OpenToonz supports seven languages.
+
+OpenToonz interface Panel
+Various "panels" are prepared for each function of OpenToonz's interface. The user can use the workspace. You can freely combine these panels in Room. 
+
+Xsheet (timesheet)
+Combo Viewer (Main Viewer)
+Style Editor
+Schematic
+Level Strip (level viewer) →
+Palette
+
+Xsheet
+It is an interface of timesheet (in English this is called Exposure Sheet = Xsheet)
+You can arrange the materials used in the material panel, and you can decide the timing of the movie number of each material and the simple overlap order.
+● Combo Viewer
+I use it for all the work to do while watching a picture.
+● Style Editor
+It is used to edit the color of the palette. You can edit with color wheel, RGB, HSV value.
+● Level Strip
+The thumbnail of each frame of the cell being edited is displayed in one column.
+● Schematic
+It is a panel in which the effect of the scene and the parent-child relationship of geometric transformation are displayed in a tree structure.
+● Palette
+Display the contents of the palette file.
+In addition, there are also a panel "Flipbook" for playing sequential number images and movies, and there are various panels such as a panel "Color Model" for picking up colors by displaying color samples. 
+They can be docked in each room of the main window, or used as a floating window. 
+
+Section 3
+
+OpenToonz interface
+② Workspace (Room) and menu bar
+
+OpenToonz is designed to match the work of tracing, color designation, drawing & finishing, shooting, batch processing, data management.
+A workspace combining the works is prepared in advance. They are in the OpenToonz main window.
+
+You can switch from the workspace tab in the upper right corner of the window. When switching the workspace, the contents of the menu bar also change. The arrangement of each panel can be freely changed by the user, and the information is stored in each user's profile. It is saved as a profile for everyone, and it will be reproduced the next time it starts up.
+
+Workspace tab
+
+OpenToonz has the following two basic layouts. According to the style of work the basic layout can be selected and you can edit the workspace of each layout to customize for your needs. 
+
+- Default: This is the default layout. All menus are always displayed in the menu bar.
+It is for when all processes are done by one person or for the first time using OpenToonz.
+
+- StudioGhibli: It is based on the layout used in Studio Ghibli. Works for each step. The pace is divided, only the commands required for each process are displayed in the menu bar, per process. It is suitable for cases where work is divided into two parts.
+
+● Switch layout
+- Click File> Preferences ...
+- From the Preferences dialog, select the "Interface" category
+- Select Default or StudioGhibli from the "Workspace layout" combo box
+- Restart OpenToonz
+
+※ For the StudioGhibli layout, the "Preferences ..." command is in the "Customize" menu
+
+● Workspace operation
+New: Right-click the workspace tab → "Create new"
+
+Delete: Right-click the workspace tab you want to delete → "Delete workspace" name "
+
+Rename: Double click on the workspace tab to edit it
+
+Sort: Drag workspace tab
+
+Lock:
+Click the mark on the right end of the workspace tab
+● Place the panel in the workspace
+
+- From the "Window" menu, select the required panel.
+- Drag the title bar of the panel, place it in the desired place in the main window, and embed it.
+- Similarly when dragging a panel, drag the title bar of the panel.
+
+- Window (customize for StudioGhibli layout)> click "lock workspace"
+Then you can't embed or remove the panel. 
+
+Section 4
+
+Edit the menu bar
+
+- Right-click the workspace tab for which you want to edit the menu bar → "Menu bar" Name "workspace"
+
+Select Customize 
+- Menu bar Edit window opens:
+
+On the left side of the window, the contents of the current menu bar are displayed in a tree structure.
+
+On the right side of the window, available command lists are displayed by type.
+- If you drag an arbitrary command from the command list and drop it at an arbitrary place on the menu bar, the command is added to the position in the menu bar.
+- Delete commands and add submenus can be executed from command right click menu.
+- When you are done editing, press OK to close the window. 
+The contents of the menu bar are saved for each user.
+
+About the Stuff folder
+
+The Stuff folder is a folder containing various settings of OpenToonz. Multiple users create one piece.
+If you create a Stuff folder in the shared data folder, you can create project settings and works. It is possible to unify color sample data etc.
+
+In the Stuff folder, there are several folders as follows:
+- cache: Image cache data is temporarily stored
+- config: Contains various configuration files such as style sheets, translation files
+- fxs: presets effect parameters are saved
+- library: Contains styles and video materials prepared in advance as samples in OpenToonz
+- profiles: Work environment settings etc. for each user are saved
+- projects: The project configuration file will be saved
+- studiopalette: A color swatch palette shared across the works is saved 
+- doc: Contains help files for several effects onboard OpenToonz
+- plugins: Copy plugin effect (.plugin) to this folder
+- sandbox: Contains the settings of the default sandbox project
+
+□ Naming convention of general-purpose image sequence number file
+
+For OpenToonz, for general-purpose image files, the file names follow either of the following two naming conventions.
+Treat multiple files in one folder as a series of levels
+
+ ① [level name] [4-digit example of numbers] [extensions] Example:. A.0001.tga book_C.0012.tif etc.
+② [level name] _[4-digit example of numbers] [extensions] Example:. A_0001.tga book_C_0012.tif etc.
+Normally it will be saved under the naming convention ①, for example when rendering scenes with image sequential file format.
+When Convert (file conversion) command is used, when naming convention ② is applied when converting and saving image format.
+For details, refer to "Startup manual finish" p.24 "tlv file other than tlv file type
+Please refer to "Convert to Expressions".
+
+Data Handled by OpenToonz
+
+The following figure shows the unique data format handled by OpenToonz and its relationship.
+(See Figure in original Japanese document, p. 8)
+
+① Toonz raster level file
+It is the data of the raster image of the cell. Image data of all frames of one cell is contained in one file. The extension is .tlv. (The cell is called Level in English and it is called level in OpenToonz.)
+
+② Palette file
+Information on the cell palette is described. The extension is. Tpl. as it is written in text, notepad etc.
+You can check the contents with a text editor.
+★ There is a pair of TPL files with the same name as the TLV file for each cell.
+
+③ Toonz vector level file
+It is the data of a cell drawn with a vector. Image data of all frames of one cell in one file, both palette information is included. The extension is .pli.
+
+④ Scene file
+The information of each cut is described in text. Of the material file (Toonz level, background image, etc.) It contains paths, effect information, geometric transformation information, output settings and so on. The extension is .tnz.
+
+⑤ Project file
+The path of the data storage location (project folder) for each piece of work and the default value of the scene setting are described.
+It is written in XML format.
+Roughly speaking, the color designation and finishing process completes the pallet file (TPL), level file (TLV) respectively
+
+It is made to store the data of each cell which can be made and the background material to complete the scene file (TNZ).
+It will be a photography process.
+
+Column (column) and level
+
+Various materials (cells, background materials, etc.) arranged on Xsheet (timesheet) are collectively described in OpenToonz.
+
+Levels are stored in Column (column) on Xsheet. For each Cell of Column,
+There will not be more than two levels / movie numbers. Column is not simply an arrangement on Xsheet. It has an important meaning as a unit on the data structure of OpenToonz.
+
+① Column is a level container
+- One Cell in the Column is A) Anything is contained; B) It is not a sequential number, Level is entered; C) A frame with level with serial number image is entered; C), the movie number is displayed on the frame in Xsheet.
+
+- When handling the scene of OpenToonz in shooting work, the loaded material can not be used unless they are all placed on Xsheet, even in finishing work.
+Similarly, because I do not display Xsheet's panel, I am not conscious, but at LoadLevel (??)
+The loaded Level is located in one of Columns on Xsheet.
+
+② Move and resize are done for Column
+- Geometric transformation information such as movement, resizing, camera, table, Pegbar
+P) or each Column, you can give the table to the parent.
+I have a parent-child relationship. (Stage Schematic)
+- Geometric transformation information of each Column transforms the image of the Level in it
+
+③ Effect synthesis is applied to Column
+- For the effects as well, composition is done for each Column. Evaluate each Column node with Level material
+It connects with the kutnode, and the effect processing is performed according to the flow from left to right connected to the Output node.
+(Fx Schematic)
+- Each Column node outputs the image data of the Level contained in it
+※ Xsheet can take a nested structure
+As a special case, within one level, data of multiple Columns is transferred to the child Xsheet (= SubXsheet, Subsy)
+
+There are functions that can be summarized as follows. 
+Select multiple Columns, Collapse (collapse on sub sheets) Frames
+
+You can combine the selected Columns into one SubXsheet level with the help of the following:
+Column
+Empty Column
+Stage Schematic (left) and FxSchematic (right). 
+
+Column node indicated by red arrow (empty Column is not displayed)
+
+Section 5
+
+□ Scene edit mode and level edit mode
+
+Since OpenToonz is animation production software, it deals with time series (= frame). There are 2 kinds in OpenToonz.
+There are modes that allow you to select a kind of frame, called level frame and scene frame, respectively.
+
+○ Level frame
+
+When editing one level, the frame follows the video number that the level has.
+Mainly when finishing work, when working on the picture of each video number of each level. 
+
+Please switch to level edit mode. In the level edit mode, regardless of the arrangement on the Xsheet. In the viewer, only the picture of the current frame (= movie number) of the selected level is displayed.
+
+※ To switch to the level edit mode
+While the thumbnail of the current level is displayed on the LevelStrip, left click on one of the thumbnails
+
+○ Scene frame
+
+When editing a scene, the frame follows each Xsheet line number.
+Primarily when shooting work, doing work while displaying all the materials arranged on Xsheet.
+
+Please switch OpenToonz to scene edit mode. In scene edit mode, on Xsheet, columns with CamStandVisibility (camera stand display) ON are all displayed.
+
+* Column stacking order at rendering and camera stand display is determined by the following order of priority
+
+① Hierarchical relationship of layer synthesis effect in Fx Schematic (only when rendering)
+② Z Depth value
+③ Value of SO (Stacking Order)
+④ Sorting order on Xsheet (Left is lower, going to the right overlaps upward)
+
+※ To switch to the scene edit mode
+Left click on the area where the line number (= scene frame) is displayed on the left side of Xsheet.
+Level edit mode (left) and scene edit mode (right). Left click on each red arrow to switch.
+
+OpenToonz calls each work a "project", and there is a workforce for placing the material of each process for each project. The path of Luda (project folder), the default value of scene settings newly created in the project, etc.
+
+You can save it as a project setting.
+
+● sandbox project
+
+When I open OpenToonz for the first time, the current project is sandbox. It is a default project. Folds on the left side of the FileBrowser panel.
+The circle to the left of the node name "sandbox" is red. This is a mark that the sandbox project is currently selected.
+
+● To create a project:
+
+① From the menu bar in the Browser workspace, select File> New Project, and in the input box below, specify the path to each project folder.
+← Select the storage location of the project setting file
+← Project name
+* When using the character string $ scenepath in the path, the current scene name at the time of saving the file is assigned.
+
+② Press OK, the project is created and becomes the current project.
+New project node is added to the folder tree on the left side of the FileBrowser panel and the red mark is moving.
+
+● Switching projects
+Clicking the circle on the left side of the project node name switches the current project, and the circle is marked red.
+
+□ Data management for each project
+
+Enter the path to the project folder.
+It is assumed that you put the file as follows.
++ Inputs: Scanned image (TIF etc.)
++ Drawings: Tooz level material (TLV + PLT and PLI)
++ Scenes: Scene file (TNZ)
++ Extras: background image file, audio file etc.
++ Outputs: rendered image
++ Palettes: color sample of the work (PLT). Studio Palette panel
+It is referred to as Project Palette within.
++ Scripts: script file
+
+● To change the project folder
+In the Browser Room, run Files> Project Settings .... 
+Edit the project folder path and close the log.
+
+● To set the current scene setting to the specified value for the project:
+In the Browser Room, run Files> Save Default Settings.
+
+● Doing work without creating a project
+
+The data management based on the project is to shorten the file path of the material to an alias such as "+ drawings" which makes it easy to manage, and can have scene settings common to projects as default values.
+
+It has advantages such as:
+When you use it for handling data of various works little by little, for example when doing outsourcing work on the finish.
+There is little advantage of summarizing the data for each piece, which makes it inconvenient as the labor for creating the project increases.
+In such a case, do not create a project, work with the default project "sandbox" selected, please. It is saved outside the project folder of the project created by the user and its subfolders. 
+
+Since all scene files are recognized as belonging to the sandbox project,
+It is also possible to proceed without consciousness of the work (??).
+
