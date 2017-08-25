@@ -1123,20 +1123,17 @@ void MainWindow::resetRoomsLayout() {
 }
 
 void MainWindow::maximizePanel() {
-  Room *currRoom = getCurrentRoom();
   DockLayout *currDockLayout = getCurrentRoom()->dockLayout();
-  if (currRoom->m_panelMaximized) {
-    currRoom->m_activePanel->maximizeDock();
-    currRoom->m_panelMaximized = false;
+  if (currDockLayout->getMaximized() &&
+      currDockLayout->getMaximized()->isMaximized()) {
+    currDockLayout->getMaximized()->maximizeDock();  // release maximization
     return;
   }
-  
-  QPoint p                   = mapFromGlobal(QCursor::pos());
-  QWidget *currWidget        = currDockLayout->containerOf(p);
-  DockWidget *currW = dynamic_cast<DockWidget *>(currWidget);
+
+  QPoint p            = mapFromGlobal(QCursor::pos());
+  QWidget *currWidget = currDockLayout->containerOf(p);
+  DockWidget *currW   = dynamic_cast<DockWidget *>(currWidget);
   if (currW) currW->maximizeDock();
-  currRoom->m_panelMaximized = true;
-  currRoom->m_activePanel    = currW;
 }
 
 void MainWindow::fullScreenWindow() {
