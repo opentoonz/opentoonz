@@ -116,7 +116,7 @@ void WordButton::contextMenuEvent(QContextMenuEvent* event) {
 AddWordButton::AddWordButton(const int col, QWidget* parent)
     : WordButton(tr("New"), parent), m_column(col) {
   // setFixedSize(23, 23);
-  setIcon(QIcon(":Resources/plus.png"));
+  setIcon(QIcon(":Resources/plus.svg"));
   setIconSize(QSize(16, 16));
   setToolTip(tr("Add New Word for %1").arg(columnLabel[col]));
 }

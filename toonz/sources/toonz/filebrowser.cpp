@@ -895,20 +895,20 @@ QVariant FileBrowser::getItemData(int index, DataType dataType,
     QSize iconSize = m_itemViewer->getPanel()->getIconSize();
     // parent folder icons
     if (item.m_path == m_folder.getParentDir()) {
-      static QPixmap folderUpPixmap(":Resources/folderup_icon.png");
-      return scalePixmapKeepingAspectRatio(folderUpPixmap, iconSize,
-                                           QColor(Qt::transparent));
+      static QPixmap folderUpPixmap(svgToPixmap(":Resources/folderup_icon.svg",
+                                                iconSize, Qt::KeepAspectRatio));
+      return folderUpPixmap;
     }
     // folder icons
     else if (item.m_isFolder) {
       if (item.m_isLink) {
-        static QPixmap linkIcon(":Resources/link_icon.png");
-        return scalePixmapKeepingAspectRatio(linkIcon, iconSize,
-                                             QColor(Qt::transparent));
+        static QPixmap linkIcon(svgToPixmap(":Resources/link_icon.svg",
+                                            iconSize, Qt::KeepAspectRatio));
+        return linkIcon;
       } else {
-        static QPixmap folderIcon(":Resources/folder_icon.png");
-        return scalePixmapKeepingAspectRatio(folderIcon, iconSize,
-                                             QColor(Qt::transparent));
+        static QPixmap folderIcon(svgToPixmap(":Resources/folder_icon.svg",
+                                              iconSize, Qt::KeepAspectRatio));
+        return folderIcon;
       }
     }
 

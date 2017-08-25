@@ -1586,7 +1586,7 @@ void TCellSelection::deleteCells() {
   getSelectedCells(r0, c0, r1, c1);
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   // if all the selected cells are already empty, then do nothing
-  if (xsh->isRectEmpty(r0, c0, r1, c1)) return;
+  if (xsh->isRectEmpty(CellPosition(r0, c0), CellPosition(r1, c1))) return;
   TCellData *data = new TCellData();
   data->setCells(xsh, r0, c0, r1, c1);
   DeleteCellsUndo *undo =

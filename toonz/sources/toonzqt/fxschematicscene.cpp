@@ -900,11 +900,9 @@ void FxSchematicScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 
   QAction *addOutputFx =
       CommandManager::instance()->getAction("MI_NewOutputFx");
-  QAction *copy         = CommandManager::instance()->getAction("MI_Copy");
-  QAction *cut          = CommandManager::instance()->getAction("MI_Cut");
-  QAction *paste        = CommandManager::instance()->getAction("MI_Paste");
-  QIcon addOutputFxIcon = createQIconOnOffPNG("output", false);
-  if (addOutputFx) addOutputFx->setIcon(addOutputFxIcon);
+  QAction *copy  = CommandManager::instance()->getAction("MI_Copy");
+  QAction *cut   = CommandManager::instance()->getAction("MI_Cut");
+  QAction *paste = CommandManager::instance()->getAction("MI_Paste");
 
   m_addFxContextMenu.setCurrentCursorScenePos(cme->scenePos());
 

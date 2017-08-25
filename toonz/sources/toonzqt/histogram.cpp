@@ -10,6 +10,7 @@
 #include <QPainter>
 
 #include "toonzqt/histogram.h"
+#include "toonzqt/gutil.h"
 
 const int HistogramGraph::drawMargin = 10;
 
@@ -511,13 +512,7 @@ Histogram::Histogram(QWidget *parent) : QWidget(parent) {
   upperLayout->addWidget(m_channelsListBox);
   upperLayout->addStretch(1);
 
-  QIcon icon;
-
-  QString normal = QString(":Resources/histograms.png");
-  QString click  = QString(":Resources/histograms_over.png");
-
-  icon.addFile(normal, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(click, QSize(), QIcon::Normal, QIcon::On);
+  QIcon icon = createQIcon("histograms");
 
   QPushButton *logScaleButton = new QPushButton(icon, "", this);
   logScaleButton->setToolTip(tr("Logarithmic Scale"));

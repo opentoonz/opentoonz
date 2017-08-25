@@ -1177,7 +1177,8 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
       const TPointD &imageDpi = xl->getImageDpi();
 
       if (imageDpi == TPointD() ||
-          Preferences::instance()->getUnits() == "pixel") {
+          Preferences::instance()->getUnits() == "pixel" ||
+          Preferences::instance()->isIgnoreImageDpiEnabled()) {
         // Change to "Custom Dpi" policy and use camera dpi
         TStageObjectId cameraId =
             getXsheet()->getStageObjectTree()->getCurrentCameraId();

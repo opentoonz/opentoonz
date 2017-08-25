@@ -89,7 +89,8 @@ TEnv::IntVar NoShiftToggleAction("NoShiftToggleAction", 0);
 namespace {
 //=============================================================================
 
-const std::string layoutsFileName     = "layouts.txt";
+// layout file name may be overwritten by the argument
+std::string layoutsFileName           = "layouts.txt";
 const std::string currentRoomFileName = "currentRoom.txt";
 bool scrambledRooms                   = false;
 
@@ -108,8 +109,10 @@ bool readRoomList(std::vector<TFilePath> &roomPaths,
                      " not found!");
       fp = ToonzFolder::getRoomsFile(layoutsFileName);
       if (!TFileStatus(fp).doesExist()) return false;
-    } else
+    } else {
       argumentLayoutFileLoaded = true;
+      layoutsFileName          = argumentLayoutFileName.toStdString();
+    }
   } else {
     fp = ToonzFolder::getRoomsFile(layoutsFileName);
     if (!TFileStatus(fp).doesExist()) return false;
@@ -255,6 +258,9 @@ void Room::save() {
     TPanel *pane = static_cast<TPanel *>(layout->itemAt(i)->widget());
     settings.setValue("name", pane->objectName());
     settings.setValue("geometry", geometries[i]);  // Use passed geometry
+    if (SaveLoadQSettings *persistent =
+            dynamic_cast<SaveLoadQSettings *>(pane->widget()))
+      persistent->save(settings);
     if (pane->getViewType() != -1)
       // If panel has different viewtypes, store current one
       settings.setValue("viewtype", pane->getViewType());
@@ -303,6 +309,9 @@ void Room::load(const TFilePath &fp) {
       // Allocate panel
       paneObjectName = name.toString();
       pane           = TPanelFactory::createPanel(this, paneObjectName);
+      if (SaveLoadQSettings *persistent =
+              dynamic_cast<SaveLoadQSettings *>(pane->widget()))
+        persistent->load(settings);
     }
 
     if (!pane) {
@@ -1050,8 +1059,10 @@ void MainWindow::onUpgradeTabPro() {}
 //-----------------------------------------------------------------------------
 
 void MainWindow::onAbout() {
-  QLabel *label = new QLabel();
-  label->setPixmap(QPixmap(":Resources/splash.png"));
+  QLabel *label  = new QLabel();
+  QPixmap pixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+  pixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());
+  label->setPixmap(pixmap);
 
   DVGui::Dialog *dialog = new DVGui::Dialog(this, true);
   dialog->setWindowTitle(tr("About OpenToonz"));
@@ -1766,7 +1777,10 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_DeleteInk, tr("&Delete Lines..."), "");
   createMenuXsheetAction(MI_MergeColumns, tr("&Merge Levels"), "");
   createMenuXsheetAction(MI_InsertFx, tr("&New FX..."), "Ctrl+F");
-  createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
+  QAction *newOutputAction =
+      createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
+  newOutputAction->setIcon(createQIconOnOff("output", false));
+
   createRightClickMenuAction(MI_FxParamEditor, tr("&Edit FX..."), "Ctrl+K");
 
   createMenuXsheetAction(MI_InsertSceneFrame, tr("Insert Frame"), "");
@@ -1929,7 +1943,9 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenFunctionEditor, tr("&Function Editor"), "");
   createMenuWindowsAction(MI_OpenFilmStrip, tr("&Level Strip"), "");
   createMenuWindowsAction(MI_OpenPalette, tr("&Palette"), "");
-  createRightClickMenuAction(MI_OpenPltGizmo, tr("&Palette Gizmo"), "");
+  QAction *pltGizmoAction =
+      createRightClickMenuAction(MI_OpenPltGizmo, tr("&Palette Gizmo"), "");
+  pltGizmoAction->setIcon(QIcon(":Resources/palettegizmo.svg"));
   createRightClickMenuAction(MI_EraseUnusedStyles, tr("&Delete Unused Styles"),
                              "");
   createMenuWindowsAction(MI_OpenTasks, tr("&Tasks"), "");
@@ -1994,7 +2010,7 @@ void MainWindow::defineActions() {
                              tr("Add As Cleanup Task"), "");
 
   createRightClickMenuAction(MI_SelectRowKeyframes,
-                             tr("Select All Keys in this Row"), "");
+                             tr("Select All Keys in this Frame"), "");
   createRightClickMenuAction(MI_SelectColumnKeyframes,
                              tr("Select All Keys in this Column"), "");
   createRightClickMenuAction(MI_SelectAllKeyframes, tr("Select All Keys"), "");
@@ -2007,9 +2023,9 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_SelectFollowingKeysInColumn,
                              tr("Select Following Keys in this Column"), "");
   createRightClickMenuAction(MI_SelectPreviousKeysInRow,
-                             tr("Select Previous Keys in this Row"), "");
+                             tr("Select Previous Keys in this Frame"), "");
   createRightClickMenuAction(MI_SelectFollowingKeysInRow,
-                             tr("Select Following Keys in this Row"), "");
+                             tr("Select Following Keys in this Frame"), "");
   createRightClickMenuAction(MI_InvertKeyframeSelection,
                              tr("Invert Key Selection"), "");
 
@@ -2095,7 +2111,7 @@ void MainWindow::defineActions() {
   QAction *refreshAct =
       createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
   refreshAct->setIconText(tr("Refresh"));
-  refreshAct->setIcon(createQIconOnOffPNG("refresh"));
+  refreshAct->setIcon(createQIcon("refresh"));
 
   createToolOptionsAction("A_ToolOption_GlobalKey", tr("Global Key"), "");
 
@@ -2111,7 +2127,8 @@ void MainWindow::defineActions() {
                           tr("Brush hardness - Increase"), "");
   createToolOptionsAction("A_DecreaseBrushHardness",
                           tr("Brush hardness - Decrease"), "");
-
+  createToolOptionsAction("A_ToolOption_SnapSensitivity", tr("SnapSensitivity"),
+                          "");
   createToolOptionsAction("A_ToolOption_AutoGroup", tr("Auto Group"), "");
   createToolOptionsAction("A_ToolOption_BreakSharpAngles",
                           tr("Break sharp angles"), "");
@@ -2249,7 +2266,7 @@ class ReloadStyle final : public MenuItemHandler {
 public:
   ReloadStyle() : MenuItemHandler("MI_ReloadStyle") {}
   void execute() override {
-    QString currentStyle = Preferences::instance()->getCurrentStyleSheet();
+    QString currentStyle = Preferences::instance()->getCurrentStyleSheetPath();
     QFile file(currentStyle);
     file.open(QFile::ReadOnly);
     QString styleSheet = QString(file.readAll());
@@ -2281,9 +2298,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2408,9 +2425,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2437,9 +2454,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene)
-            ? MI_ClearRecentScene
-            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
+                                                        ? MI_ClearRecentLevel
+                                                        : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

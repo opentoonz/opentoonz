@@ -57,6 +57,9 @@ public:
 
   void onDrawFrame(int frame,
                    const ImagePainter::VisualSettings &settings) override;
+  bool widgetInThisPanelIsFocused() override {
+    return m_sceneViewer->hasFocus();
+  }
 
 protected:
   void showEvent(QShowEvent *) override;
@@ -66,6 +69,13 @@ protected:
   void createFrameToolBar();
   void createPlayToolBar();
   void addColorMaskButton(QWidget *parent, const char *iconSVGName, int id);
+  // reimplementation of TPanel::widgetFocusOnEnter
+  void widgetFocusOnEnter() override {
+    m_sceneViewer->setFocus(Qt::OtherFocusReason);
+    // activate shortcut key for this flipconsole
+    m_flipConsole->makeCurrent();
+  };
+  void widgetClearFocusOnLeave() override { m_sceneViewer->clearFocus(); };
   void enableFlipConsoleForCamerastand(bool on);
   void playAudioFrame(int frame);
   bool hasSoundtrack();

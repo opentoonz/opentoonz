@@ -3542,7 +3542,7 @@ Do you want to create it?</source>
         <translation>トレースタスクとして追加</translation>
     </message>
     <message>
-        <source>Select All Keys in this Row</source>
+        <source>Select All Keys in this Frame</source>
         <translation>このフレームのキーをすべて選択</translation>
     </message>
     <message>
@@ -3570,11 +3570,11 @@ Do you want to create it?</source>
         <translation>この列の後ろのキーをすべて選択</translation>
     </message>
     <message>
-        <source>Select Previous Keys in this Row</source>
+        <source>Select Previous Keys in this Frame</source>
         <translation>このフレームの前のキーをすべて選択</translation>
     </message>
     <message>
-        <source>Select Following Keys in this Row</source>
+        <source>Select Following Keys in this Frame</source>
         <translation>このフレームの後ろのキーをすべて選択</translation>
     </message>
     <message>

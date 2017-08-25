@@ -249,12 +249,13 @@ Preferences::Preferences()
     , m_shmall(-1)
     , m_shmmni(-1)
     , m_onionPaperThickness(50)
-    , m_currentLanguage(0)
-    , m_currentStyleSheet(0)
+    , m_currentLanguage("English")
+    , m_currentStyleSheet("Astral_072_Dark")
     , m_undoMemorySize(100)
     , m_dragCellsBehaviour(0)
     , m_lineTestFpsCapture(25)
     , m_defLevelType(0)
+    , m_vectorSnappingTarget(SnapAll)
     , m_autocreationType(1)
     , m_autoExposeEnabled(true)
     , m_autoCreateEnabled(true)
@@ -310,9 +311,11 @@ Preferences::Preferences()
     , m_useNumpadForSwitchingStyles(true)
     , m_showXSheetToolbar(false)
     , m_expandFunctionHeader(false)
+    , m_showColumnNumbers(false)
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
+    , m_ignoreImageDpi(false)
     , m_watchFileSystem(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -323,8 +326,11 @@ Preferences::Preferences()
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
   TFilePath savePath  = layoutDir + TFilePath("preferences.ini");
 
+  // If no personal settings found, then try to load template settings
+  TFilePath loadPath = ToonzFolder::getModuleFile(TFilePath("preferences.ini"));
+
   m_settings.reset(new QSettings(
-      QString::fromStdWString(savePath.getWideString()), QSettings::IniFormat));
+      QString::fromStdWString(loadPath.getWideString()), QSettings::IniFormat));
 
   getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
   getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
@@ -357,7 +363,7 @@ Preferences::Preferences()
   getValue(*m_settings, "autosavePeriod", m_autosavePeriod);
   getValue(*m_settings, "taskchunksize", m_chunkSize);
   getValue(*m_settings, "xsheetStep", m_xsheetStep);
-
+  getValue(*m_settings, "vectorSnappingTarget", m_vectorSnappingTarget);
   int r = 0, g = 255, b = 0;
   getValue(*m_settings, "frontOnionColor.r", r);
   getValue(*m_settings, "frontOnionColor.g", g);
@@ -457,7 +463,7 @@ Preferences::Preferences()
   // load languages
   TFilePath lang_path = TEnv::getConfigDir() + "loc";
   TFilePathSet lang_fpset;
-  m_languageMaps[0] = "English";
+  m_languageList.append("English");
   // m_currentLanguage=0;
   try {
     TFileStatus langPathFs(lang_path);
@@ -471,8 +477,8 @@ Preferences::Preferences()
       ++i;
       if (newPath == lang_path) continue;
       if (TFileStatus(newPath).isDirectory()) {
-        QString string    = QString::fromStdWString(newPath.getWideName());
-        m_languageMaps[i] = string;
+        QString string = QString::fromStdWString(newPath.getWideName());
+        m_languageList.append(string);
       }
     }
   } catch (...) {
@@ -488,13 +494,7 @@ Preferences::Preferences()
       ++i;
       if (newPath == path) continue;
       QString fpName = QString::fromStdWString(newPath.getWideName());
-#ifdef MACOSX
-      QString string = fpName + QString("/") + fpName + QString("_mac.qss");
-#else
-      QString string = fpName + QString("/") + fpName + QString(".qss");
-#endif
-      if (fpName == QString("standard")) m_currentStyleSheet = i;
-      m_styleSheetMaps[i] = "file:///" + path.getQString() + "/" + string;
+      m_styleSheetList.append(fpName);
     }
   } catch (...) {
   }
@@ -533,8 +533,15 @@ Preferences::Preferences()
     setCurrentRoomChoice(0);
   }
 
-  getValue(*m_settings, "CurrentLanguage", m_currentLanguage);
-  getValue(*m_settings, "CurrentStyleSheet", m_currentStyleSheet);
+  QString currentLanguage;
+  currentLanguage = m_settings->value("CurrentLanguageName").toString();
+  if (!currentLanguage.isEmpty() && m_languageList.contains(currentLanguage))
+    m_currentLanguage = currentLanguage;
+  QString currentStyleSheet;
+  currentStyleSheet = m_settings->value("CurrentStyleSheetName").toString();
+  if (!currentStyleSheet.isEmpty() &&
+      m_styleSheetList.contains(currentStyleSheet))
+    m_currentStyleSheet = currentStyleSheet;
 
   getValue(*m_settings, "DragCellsBehaviour", m_dragCellsBehaviour);
 
@@ -545,7 +552,7 @@ Preferences::Preferences()
   getValue(*m_settings, "DefLevelWidth", m_defLevelWidth);
   getValue(*m_settings, "DefLevelHeight", m_defLevelHeight);
   getValue(*m_settings, "DefLevelDpi", m_defLevelDpi);
-
+  getValue(*m_settings, "IgnoreImageDpi", m_ignoreImageDpi);
   getValue(*m_settings, "viewerBGColor", m_viewerBGColor);
   getValue(*m_settings, "previewBGColor", m_previewBGColor);
   getValue(*m_settings, "chessboardColor1", m_chessboardColor1);
@@ -589,12 +596,23 @@ Preferences::Preferences()
            m_useNumpadForSwitchingStyles);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
+  getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
            m_useArrowKeyToShiftCellSelection);
   getValue(*m_settings, "inputCellsWithoutDoubleClickingEnabled",
            m_inputCellsWithoutDoubleClickingEnabled);
   getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
+
+  // in case there is no personal settings
+  if (savePath != loadPath) {
+    // copy the template settins to the personal one
+    if (TFileStatus(loadPath).doesExist())
+      TSystem::copyFile(savePath, loadPath);
+    m_settings.reset(
+        new QSettings(QString::fromStdWString(savePath.getWideString()),
+                      QSettings::IniFormat));
+  }
 }
 
 //-----------------------------------------------------------------
@@ -1156,49 +1174,64 @@ void Preferences::setUndoMemorySize(int memorySize) {
 //-----------------------------------------------------------------
 
 QString Preferences::getCurrentLanguage() const {
-  return m_languageMaps[m_currentLanguage];
+  if (m_languageList.contains(m_currentLanguage)) return m_currentLanguage;
+  // If no valid option selected, then return English
+  return m_languageList[0];
 }
 
 //-----------------------------------------------------------------
 
 QString Preferences::getLanguage(int index) const {
-  return m_languageMaps[index];
+  return m_languageList[index];
 }
 
 //-----------------------------------------------------------------
 
-int Preferences::getLanguageCount() const { return (int)m_languageMaps.size(); }
+int Preferences::getLanguageCount() const { return (int)m_languageList.size(); }
 
 //-----------------------------------------------------------------
 
-void Preferences::setCurrentLanguage(int currentLanguage) {
+void Preferences::setCurrentLanguage(const QString &currentLanguage) {
   m_currentLanguage = currentLanguage;
-  m_settings->setValue("CurrentLanguage", m_currentLanguage);
+  m_settings->setValue("CurrentLanguageName", m_currentLanguage);
 }
 
 //-----------------------------------------------------------------
 
-QString Preferences::getCurrentStyleSheet() const {
-  return m_styleSheetMaps[m_currentStyleSheet];
+QString Preferences::getCurrentStyleSheetName() const {
+  if (m_styleSheetList.contains(m_currentStyleSheet))
+    return m_currentStyleSheet;
+  // If no valid option selected, then return the first oprion
+  return m_styleSheetList.isEmpty() ? QString() : m_styleSheetList[0];
+}
+
+//-----------------------------------------------------------------
+
+QString Preferences::getCurrentStyleSheetPath() const {
+  if (m_currentStyleSheet.isEmpty()) return QString();
+  TFilePath path(TEnv::getConfigDir() + "qss");
+  QString string = m_currentStyleSheet + QString("/") + m_currentStyleSheet +
+                   QString(".qss");
+  return QString("file:///" + path.getQString() + "/" + string);
 }
 
 //-----------------------------------------------------------------
 
 QString Preferences::getStyleSheet(int index) const {
-  return m_styleSheetMaps[index];
+  return m_styleSheetList[index];
 }
 
 //-----------------------------------------------------------------
 
 int Preferences::getStyleSheetCount() const {
-  return (int)m_styleSheetMaps.size();
+  return (int)m_styleSheetList.size();
 }
 
 //-----------------------------------------------------------------
 
-void Preferences::setCurrentStyleSheet(int currentStyleSheet) {
+void Preferences::setCurrentStyleSheet(const QString &currentStyleSheet) {
   m_currentStyleSheet = currentStyleSheet;
-  m_settings->setValue("CurrentStyleSheet", m_currentStyleSheet);
+  m_settings->setValue("CurrentStyleSheetName", m_currentStyleSheet);
 }
 //-----------------------------------------------------------------
 
@@ -1268,6 +1301,20 @@ void Preferences::setDefLevelHeight(double height) {
 void Preferences::setDefLevelDpi(double dpi) {
   m_defLevelDpi = dpi;
   m_settings->setValue("DefLevelDpi", dpi);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setIgnoreImageDpi(bool on) {
+  m_ignoreImageDpi = on;
+  m_settings->setValue("IgnoreImageDpi", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setVectorSnappingTarget(int target) {
+  m_vectorSnappingTarget = target;
+  m_settings->setValue("vectorSnappingTarget", target);
 }
 
 //-----------------------------------------------------------------
@@ -1387,6 +1434,11 @@ void Preferences::enableShowXSheetToolbar(bool on) {
 void Preferences::enableExpandFunctionHeader(bool on) {
   m_expandFunctionHeader = on;
   m_settings->setValue("expandFunctionHeader", on ? "1" : "0");
+}
+
+void Preferences::enableShowColumnNumbers(bool on) {
+  m_showColumnNumbers = on;
+  m_settings->setValue("showColumnNumbers", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

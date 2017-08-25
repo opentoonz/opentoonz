@@ -439,10 +439,19 @@ static void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
       updater.update(fid, ri);
       continue;
     }
-    double dpix, dpiy;
-    original->getDpi(dpix, dpiy);
-    cl->setCustomDpi((dpix == 0 && dpiy == 0) ? xl->getProperties()->getDpi()
-                                              : TPointD());
+    // Obtain the source dpi. Changed it to be done once at the first frame of
+    // each level in order to avoid the following problem:
+    // If the original raster level has no dpi (such as TGA images), obtaining
+    // dpi in every frame causes dpi mismatch between the first frame and the
+    // following frames, since the value
+    // TXshSimpleLevel::m_properties->getDpi() will be changed to the
+    // dpi of cleanup camera (= TLV's dpi) after finishing the first frame.
+    if (firstImage) {
+      TPointD dpi;
+      original->getDpi(dpi.x, dpi.y);
+      if (dpi.x == 0 && dpi.y == 0) dpi = xl->getProperties()->getDpi();
+      cl->setSourceDpi(dpi);
+    }
 
     CleanupPreprocessedImage *cpi;
     {

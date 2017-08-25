@@ -443,6 +443,7 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask,
     , m_framesCount(1)
     , m_settings()
     , m_fps(24)
+    , m_sceneFps(24)
     , m_isPlay(false)
     , m_reverse(false)
     , m_doubleRed(0)
@@ -841,10 +842,13 @@ void FlipConsole::updateCurrentFPS(int val) {
 
 //-----------------------------------------------------------------------------
 
-void FlipConsole::setFrameRate(int val) {
-  if (!m_fpsSlider) return;
-  m_fpsSlider->setValue(val);
-  setCurrentFPS(val);
+void FlipConsole::setFrameRate(int val, bool forceUpdate) {
+  if (m_sceneFps != val || forceUpdate) {
+    if (!m_fpsSlider) return;
+    m_fpsSlider->setValue(val);
+    setCurrentFPS(val);
+  }
+  m_sceneFps = val;
 }
 
 //-----------------------------------------------------------------------------
@@ -877,7 +881,7 @@ void FlipConsole::setCurrentFPS(int val) {
 void FlipConsole::createButton(UINT buttonMask, const char *iconStr,
                                const QString &tip, bool checkable,
                                QActionGroup *group) {
-  QIcon icon      = createQIconPNG(iconStr);
+  QIcon icon      = createQIcon(iconStr);
   QAction *action = new QAction(icon, tip, m_playToolBar);
   action->setData(QVariant(buttonMask));
   action->setCheckable(checkable);
@@ -891,7 +895,7 @@ void FlipConsole::createButton(UINT buttonMask, const char *iconStr,
 QAction *FlipConsole::createCheckedButtonWithBorderImage(
     UINT buttonMask, const char *iconStr, const QString &tip, bool checkable,
     QActionGroup *group, const char *cmdId) {
-  QIcon icon            = createQIconPNG(iconStr);
+  QIcon icon            = createQIcon(iconStr);
   QWidgetAction *action = new QWidgetAction(m_playToolBar);
   action->setIcon(icon);
   action->setToolTip(tip);
@@ -923,8 +927,8 @@ QAction *FlipConsole::createDoubleButton(
     UINT buttonMask1, UINT buttonMask2, const char *iconStr1,
     const char *iconStr2, const QString &tip1, const QString &tip2,
     QActionGroup *group, DoubleButton *&widget) {
-  QAction *action1 = new QAction(createQIconPNG(iconStr1), tip1, m_playToolBar);
-  QAction *action2 = new QAction(createQIconPNG(iconStr2), tip2, m_playToolBar);
+  QAction *action1 = new QAction(createQIcon(iconStr1), tip1, m_playToolBar);
+  QAction *action2 = new QAction(createQIcon(iconStr2), tip2, m_playToolBar);
   m_actions[(EGadget)buttonMask1] = action1;
   m_actions[(EGadget)buttonMask2] = action2;
 
@@ -949,7 +953,7 @@ QAction *FlipConsole::createDoubleButton(
 
 void FlipConsole::createOnOffButton(UINT buttonMask, const char *iconStr,
                                     const QString &tip, QActionGroup *group) {
-  QIcon icon      = createQIconOnOffPNG(iconStr);
+  QIcon icon      = createQIconOnOff(iconStr);
   QAction *action = new QAction(icon, tip, m_playToolBar);
   action->setData(QVariant(buttonMask));
   action->setCheckable(true);
@@ -1059,7 +1063,7 @@ void FlipConsole::applyCustomizeMask() {
 
 void FlipConsole::createCustomizeMenu(bool withCustomWidget) {
   if (m_gadgetsMask & eCustomize) {
-    QIcon icon          = createQIconPNG("options");
+    QIcon icon          = createQIcon("options");
     QToolButton *button = new QToolButton();
     button->setIcon(icon);
     button->setPopupMode(QToolButton::MenuButtonPopup);
@@ -1120,6 +1124,7 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
   m_playToolBar = new QToolBar(this);
   m_playToolBar->setMovable(false);
   m_playToolBar->setObjectName("FlipConsolePlayToolBar");
+  m_playToolBar->setIconSize(QSize(17, 17));
   //	m_playToolBar->setObjectName("chackableButtonToolBar");
 
   // m_playToolBar->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
@@ -1127,8 +1132,7 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
   createCustomizeMenu(withCustomWidget);
 
   if (m_gadgetsMask & eSave) {
-    // just reuse the icon file named "savepalette"
-    createButton(eSave, "savepalette", tr("&Save Images"), false);
+    createButton(eSave, "save", tr("&Save Images"), false);
     // m_saveSep = m_playToolBar->addSeparator();
   }
 
