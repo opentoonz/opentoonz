@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="audio.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60"
+	 style="enable-background:new 0 0 60 60;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#EBEBEB;}
+	.st1{fill:#404040;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview12" inkscape:current-layer="svg2" inkscape:cx="30" inkscape:cy="30" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="500" inkscape:window-maximized="0" inkscape:window-width="1109" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="3.9333333" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="g4">
+	<rect id="rect6" class="st0" width="60" height="60"/>
+	<path id="path8" inkscape:connector-curvature="0" class="st1" d="M60,60H0V0h60V60z M1,1v58h58V1H1z"/>
+</g>
+<path id="path10" inkscape:connector-curvature="0" class="st1" d="M8.9,23v14h9l12,12V11l-12,12H8.9z M40.5,30
+	c0-4.2-2.1-8.3-5.6-10v20C38.4,38.3,40.5,34.2,40.5,30L40.5,30z M34.9,9v5c6.8,2,11.5,8.5,11.5,16s-4.7,14-11.5,16v5
+	c9.5-2.1,16.3-10.9,16.3-21S44.3,11.1,34.9,9z"/>
+</svg>

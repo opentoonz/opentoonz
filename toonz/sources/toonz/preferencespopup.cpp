@@ -625,8 +625,8 @@ void PreferencesPopup::onAnimationStepChanged() {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onLanguageTypeChanged(int index) {
-  m_pref->setCurrentLanguage(index);
+void PreferencesPopup::onLanguageTypeChanged(const QString &langName) {
+  m_pref->setCurrentLanguage(langName);
   QString currentLanguage = m_pref->getCurrentLanguage();
 }
 
@@ -769,10 +769,10 @@ void PreferencesPopup::onShowKeyframesOnCellAreaChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onStyleSheetTypeChanged(int index) {
-  m_pref->setCurrentStyleSheet(index);
+void PreferencesPopup::onStyleSheetTypeChanged(const QString &styleSheetName) {
+  m_pref->setCurrentStyleSheet(styleSheetName);
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  QString currentStyle = m_pref->getCurrentStyleSheet();
+  QString currentStyle = m_pref->getCurrentStyleSheetPath();
   qApp->setStyleSheet(currentStyle);
   QApplication::restoreOverrideCursor();
 }
@@ -832,7 +832,8 @@ void PreferencesPopup::onDefLevelTypeChanged(int index) {
   if (0 <= index && index < m_defLevelType->count()) {
     int levelType = m_defLevelType->itemData(index).toInt();
     m_pref->setDefLevelType(levelType);
-    bool isRaster = levelType != PLI_XSHLEVEL;
+    bool isRaster =
+        levelType != PLI_XSHLEVEL && !m_newLevelToCameraSizeCB->isChecked();
     m_defLevelWidth->setEnabled(isRaster);
     m_defLevelHeight->setEnabled(isRaster);
     if (!m_pixelsOnlyCB->isChecked()) m_defLevelDpi->setEnabled(isRaster);
@@ -848,6 +849,13 @@ void PreferencesPopup::onDefLevelParameterChanged() {
   m_pref->setDefLevelWidth(w);
   m_pref->setDefLevelHeight(h);
   m_pref->setDefLevelDpi(dpi);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onVectorSnappingTargetChanged(int index) {
+  m_vectorSnappingTargetCB->setCurrentIndex(index);
+  m_pref->setVectorSnappingTarget(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -993,6 +1001,13 @@ void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
   // emit signal to update Palette and Viewer
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
       "NumpadForSwitchingStyles");
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onNewLevelToCameraSizeChanged(bool checked) {
+  m_pref->enableNewLevelSizeToCameraSize(checked);
+  onDefLevelTypeChanged(m_defLevelType->currentIndex());
 }
 
 //-----------------------------------------------------------------------------
@@ -1196,13 +1211,17 @@ PreferencesPopup::PreferencesPopup()
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
 
-  m_defScanLevelType = new QComboBox(this);
-  m_defLevelType     = new QComboBox(this);
-  m_defLevelWidth    = new MeasuredDoubleLineEdit(0);
-  m_defLevelHeight   = new MeasuredDoubleLineEdit(0);
-  m_defLevelDpi      = new DoubleLineEdit(0, 66.76);
-  m_autocreationType = new QComboBox(this);
-  m_dpiLabel         = new QLabel(tr("DPI:"), this);
+  m_defScanLevelType       = new QComboBox(this);
+  m_defLevelType           = new QComboBox(this);
+  m_defLevelWidth          = new MeasuredDoubleLineEdit(0);
+  m_defLevelHeight         = new MeasuredDoubleLineEdit(0);
+  m_defLevelDpi            = new DoubleLineEdit(0, 66.76);
+  m_autocreationType       = new QComboBox(this);
+  m_dpiLabel               = new QLabel(tr("DPI:"), this);
+  m_vectorSnappingTargetCB = new QComboBox(this);
+  m_newLevelToCameraSizeCB =
+      new CheckBox(tr("New Levels Default to the Current Camera Size"), this);
+
   CheckBox *keepOriginalCleanedUpCB =
       new CheckBox(tr("Keep Original Cleaned Up Drawings As Backup"), this);
   CheckBox *multiLayerStylePickerCB = new CheckBox(
@@ -1331,9 +1350,10 @@ PreferencesPopup::PreferencesPopup()
   }
   //--- Interface ------------------------------
   QStringList styleSheetList;
+  currentIndex = 0;
   for (int i = 0; i < m_pref->getStyleSheetCount(); i++) {
     QString string = m_pref->getStyleSheet(i);
-    if (string == m_pref->getCurrentStyleSheet()) currentIndex = i;
+    if (string == m_pref->getCurrentStyleSheetName()) currentIndex = i;
     TFilePath path(string.toStdWString());
     styleSheetList.push_back(QString::fromStdWString(path.getWideName()));
   }
@@ -1448,7 +1468,8 @@ PreferencesPopup::PreferencesPopup()
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
   m_useNumpadForSwitchingStyles->setChecked(
       m_pref->isUseNumpadForSwitchingStylesEnabled());
-
+  m_newLevelToCameraSizeCB->setChecked(
+      m_pref->isNewLevelSizeToCameraSizeEnabled());
   QStringList scanLevelTypes;
   scanLevelTypes << "tif"
                  << "png";
@@ -1492,6 +1513,11 @@ PreferencesPopup::PreferencesPopup()
   m_autocreationType->addItems(autocreationTypes);
   int autocreationType = m_pref->getAutocreationType();
   m_autocreationType->setCurrentIndex(autocreationType);
+
+  QStringList vectorSnappingTargets;
+  vectorSnappingTargets << tr("Strokes") << tr("Guides") << tr("All");
+  m_vectorSnappingTargetCB->addItems(vectorSnappingTargets);
+  m_vectorSnappingTargetCB->setCurrentIndex(m_pref->getVectorSnappingTarget());
 
   //--- Xsheet ------------------------------
   xsheetAutopanDuringPlaybackCB->setChecked(m_pref->isXsheetAutopanEnabled());
@@ -1907,18 +1933,21 @@ PreferencesPopup::PreferencesPopup()
         drawingTopLay->addWidget(new QLabel(tr("Default Level Type:")), 1, 0,
                                  Qt::AlignRight);
         drawingTopLay->addWidget(m_defLevelType, 1, 1, 1, 3);
-
-        drawingTopLay->addWidget(new QLabel(tr("Width:")), 2, 0,
+        drawingTopLay->addWidget(m_newLevelToCameraSizeCB, 2, 0, 1, 3);
+        drawingTopLay->addWidget(new QLabel(tr("Width:")), 3, 0,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_defLevelWidth, 2, 1);
-        drawingTopLay->addWidget(new QLabel(tr("  Height:")), 2, 2,
+        drawingTopLay->addWidget(m_defLevelWidth, 3, 1);
+        drawingTopLay->addWidget(new QLabel(tr("  Height:")), 3, 2,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_defLevelHeight, 2, 3);
-        drawingTopLay->addWidget(m_dpiLabel, 3, 0, Qt::AlignRight);
-        drawingTopLay->addWidget(m_defLevelDpi, 3, 1);
-        drawingTopLay->addWidget(new QLabel(tr("Autocreation:")), 4, 0,
+        drawingTopLay->addWidget(m_defLevelHeight, 3, 3);
+        drawingTopLay->addWidget(m_dpiLabel, 4, 0, Qt::AlignRight);
+        drawingTopLay->addWidget(m_defLevelDpi, 4, 1);
+        drawingTopLay->addWidget(new QLabel(tr("Autocreation:")), 5, 0,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_autocreationType, 4, 1, 1, 3);
+        drawingTopLay->addWidget(m_autocreationType, 5, 1, 1, 3);
+        drawingTopLay->addWidget(new QLabel(tr("Vector Snapping:")), 6, 0,
+                                 Qt::AlignRight);
+        drawingTopLay->addWidget(m_vectorSnappingTargetCB, 6, 1, 1, 3);
       }
       drawingFrameLay->addLayout(drawingTopLay, 0);
 
@@ -2170,8 +2199,9 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_projectRootCustom, SIGNAL(stateChanged(int)),
                        SLOT(onProjectRootChanged()));
   //--- Interface ----------------------
-  ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onStyleSheetTypeChanged(int)));
+  ret = ret &&
+        connect(styleSheetType, SIGNAL(currentIndexChanged(const QString &)),
+                SLOT(onStyleSheetTypeChanged(const QString &)));
   ret = ret && connect(m_pixelsOnlyCB, SIGNAL(stateChanged(int)),
                        SLOT(onPixelsOnlyChanged(int)));
   // pixels unit may deactivated externally on loading scene (see
@@ -2196,8 +2226,9 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_viewStep, SIGNAL(editingFinished()),
                        SLOT(onViewValuesChanged()));
   if (languageList.size() > 1)
-    ret = ret && connect(languageType, SIGNAL(currentIndexChanged(int)),
-                         SLOT(onLanguageTypeChanged(int)));
+    ret = ret &&
+          connect(languageType, SIGNAL(currentIndexChanged(const QString &)),
+                  SLOT(onLanguageTypeChanged(const QString &)));
   ret = ret && connect(moveCurrentFrameCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onMoveCurrentFrameChanged(int)));
   ret =
@@ -2295,6 +2326,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelTypeChanged(int)));
   ret = ret && connect(m_autocreationType, SIGNAL(currentIndexChanged(int)),
                        SLOT(onAutocreationTypeChanged(int)));
+  ret =
+      ret && connect(m_vectorSnappingTargetCB, SIGNAL(currentIndexChanged(int)),
+                     SLOT(onVectorSnappingTargetChanged(int)));
   ret = ret && connect(m_defLevelWidth, SIGNAL(valueChanged()),
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_defLevelHeight, SIGNAL(valueChanged()),
@@ -2303,6 +2337,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_useNumpadForSwitchingStyles, SIGNAL(clicked(bool)),
                        SLOT(onUseNumpadForSwitchingStylesClicked(bool)));
+  ret = ret && connect(m_newLevelToCameraSizeCB, SIGNAL(clicked(bool)),
+                       SLOT(onNewLevelToCameraSizeChanged(bool)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),

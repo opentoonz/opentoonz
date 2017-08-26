@@ -416,11 +416,11 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff,
        saveBox.getLy() > 0 && saveBox.getLy() < rasterLy))
     raster_is_savebox = false;
 
-  image->getDpi(dpi.x, dpi.y);
-  if (dpi == TPointD()) {
-    dpi                         = getCustomDpi();
-    if (dpi == TPointD()) dpi.x = dpi.y = 65.0;  // using 65.0 as default DPI
-  } else if (!dpi.x)
+  // Use the same source dpi throughout the level
+  dpi = getSourceDpi();
+  if (dpi == TPointD())
+    dpi.x = dpi.y = 65.0;  // using 65.0 as default DPI //??????WHY
+  else if (!dpi.x)
     dpi.x = dpi.y;
   else if (!dpi.y)
     dpi.y = dpi.x;

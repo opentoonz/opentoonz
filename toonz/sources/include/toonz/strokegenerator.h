@@ -69,6 +69,8 @@ public:
   */
   void add(const TThickPoint &point, double pixelSize2);
 
+  TPointD getFirstPoint();  // returns the first point
+
   //! Filtra i punti di m_points
   /*!
     Verifica se i primi sei e gli ultimi sei punti successivi hanno una
@@ -82,6 +84,9 @@ In caso affermativo li cancella.
 
   //! Visualizza tutti i frammenti
   void drawAllFragments();
+
+  // Only keep first and last points. Used for straight lines
+  void removeMiddlePoints();
 
   //! Restituisce il rettangolo che contiene la regione modificata
   TRectD getModifiedRegion() const;

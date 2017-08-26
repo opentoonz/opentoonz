@@ -11,6 +11,14 @@
         <source>Unidentified Action</source>
         <translation>未定義のアクション</translation>
     </message>
+    <message>
+        <source>Skipping frame.</source>
+        <translation>フレームをスキップします。</translation>
+    </message>
+    <message>
+        <source>Malformed frame name</source>
+        <translation>フレーム番号が不正な形式です</translation>
+    </message>
 </context>
 <context>
     <name>TCenterLineStrokeStyle</name>

@@ -94,13 +94,18 @@ void adjustScrollbar(QScrollBar *scrollBar, int add);
 
 void FrameScroller::onScroll(const CellPositionRatio &ratio) {
   QPoint offset = orientation()->positionRatioToXY(ratio);
+  // scroll area should be resized before moving down the scroll bar.
+  // SpreadsheetViewer::onPrepareToScrollOffset() will be invoked immediately
+  // since the receiver is in the same thread.
+  // when moving up the scroll bar, resizing will be done in
+  // SpreadsheetViewer::onVSliderChanged().
+  if (offset.x() > 0 || offset.y() > 0) emit prepareToScrollOffset(offset);
   if (offset.x())
     adjustScrollbar(m_scrollArea->horizontalScrollBar(), offset.x());
   if (offset.y())
     adjustScrollbar(m_scrollArea->verticalScrollBar(), offset.y());
-
-  emit prepareToScrollOffset(offset);
 }
+
 void adjustScrollbar(QScrollBar *scrollBar, int add) {
   scrollBar->setValue(scrollBar->value() + add);
 }
