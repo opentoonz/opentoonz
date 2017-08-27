@@ -3,7 +3,12 @@
 #ifndef FULLCOLORBRUSHTOOL_H
 #define FULLCOLORBRUSHTOOL_H
 
+#include <ctime>
+
 #include "brushtool.h"
+#include "mypainttoonzbrush.h"
+#include "toonz/mypaintbrushstyle.h"
+#include <QElapsedTimer>
 
 //==============================================================
 
@@ -11,8 +16,9 @@
 
 class TTileSetFullColor;
 class TTileSaverFullColor;
-class BluredBrush;
+class MyPaintToonzBrush;
 class FullColorBrushToolNotifier;
+namespace mypaint { class Brush; }
 
 //==============================================================
 
@@ -20,10 +26,13 @@ class FullColorBrushToolNotifier;
 //    FullColor Brush Tool declaration
 //************************************************************************
 
-class FullColorBrushTool final : public TTool {
+class FullColorBrushTool final : public TTool, public RasterController {
   Q_DECLARE_TR_FUNCTIONS(FullColorBrushTool)
 
-  void updateCurrentColor();
+  void updateCurrentStyle();
+  double restartBrushTimer();
+  void applyClassicToonzBrushSettings(mypaint::Brush &mypaintBrush);
+  void applyToonzBrushSettings(mypaint::Brush &mypaintBrush);
 
 public:
   FullColorBrushTool(std::string name);
@@ -36,6 +45,9 @@ public:
 
   void onActivate() override;
   void onDeactivate() override;
+
+  bool askRead(const TRect &rect) override;
+  bool askWrite(const TRect &rect) override;
 
   bool preLeftButtonDown() override;
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
@@ -63,6 +75,9 @@ public:
   void removePreset();
 
   void onCanvasSizeChanged();
+  void onColorStyleChanged();
+
+  TMyPaintBrushStyle* getBrushStyle();
 
 protected:
   TPropertyGroup m_prop;
@@ -71,26 +86,24 @@ protected:
   TBoolProperty m_pressure;
   TDoublePairProperty m_opacity;
   TDoubleProperty m_hardness;
+  TDoubleProperty m_modifierSize;
+  TDoubleProperty m_modifierOpacity;
   TEnumProperty m_preset;
 
   TPixel32 m_currentColor;
-  int m_styleId, m_minThick, m_maxThick;
+  bool m_enabledPressure;
+  int m_minCursorThick, m_maxCursorThick;
 
-  double m_oldOpacity;
-
-  TPointD m_dpiScale,
-      m_mousePos,  //!< Current mouse position, in world coordinates.
-      m_brushPos;  //!< World position the brush will be painted at.
+  TPointD m_mousePos,  //!< Current mouse position, in world coordinates.
+          m_brushPos;  //!< World position the brush will be painted at.
 
   TRasterP m_backUpRas;
   TRaster32P m_workRaster;
 
-  TRect m_strokeRect, m_lastRect;
+  TRect m_strokeRect, m_strokeSegmentRect, m_lastRect;
 
-  QRadialGradient m_brushPad;
-
-  std::vector<TThickPoint> m_points;
-  BluredBrush *m_brush;
+  MyPaintToonzBrush *m_toonz_brush;
+  QElapsedTimer m_brushTimer;
 
   TTileSetFullColor *m_tileSet;
   TTileSaverFullColor *m_tileSaver;
@@ -116,8 +129,8 @@ public:
   FullColorBrushToolNotifier(FullColorBrushTool *tool);
 
 protected slots:
-
   void onCanvasSizeChanged() { m_tool->onCanvasSizeChanged(); }
+  void onColorStyleChanged() { m_tool->onColorStyleChanged(); }
 };
 
 #endif  // FULLCOLORBRUSHTOOL_H

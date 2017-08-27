@@ -816,7 +816,7 @@ StageSchematicNodePort::~StageSchematicNodePort() {}
 //--------------------------------------------------------
 
 QRectF StageSchematicNodePort::boundingRect() const {
-  return QRectF(0, 0, 14, 12);
+  return QRectF(0, 0, 18, 18);
 }
 
 //--------------------------------------------------------
@@ -840,17 +840,26 @@ void StageSchematicNodePort::paint(QPainter *painter,
     if (text.size() > 1 && text.at(0) == 'H') text.remove("H");
     painter->drawText(boundingRect(), text, textOption);
   } else {
-    QPixmap redPm     = QPixmap(":Resources/port_red.png");
-    QPixmap redPm_HL  = QPixmap(":Resources/port_red_highlight.png");
-    QPixmap bluePm    = QPixmap(":Resources/port_blue.png");
-    QPixmap bluePm_HL = QPixmap(":Resources/port_blue_highlight.png");
+    QRect imgRect(2, 2, 14, 14);
+    QRect sourceRect = scene->views()[0]->matrix().mapRect(imgRect);
+    QPixmap pixmap;
 
-    if (getType() == eStageParentPort || getType() == eStageParentGroupPort)
-      painter->drawPixmap(QRect(0, 0, 18, 18),
-                          (isHighlighted()) ? bluePm_HL : bluePm);
-    else
-      painter->drawPixmap(QRect(0, 0, 18, 18),
-                          (isHighlighted()) ? redPm_HL : redPm);
+    if (getType() == eStageParentPort || getType() == eStageParentGroupPort) {
+      if (isHighlighted())
+        pixmap = QIcon(":Resources/port_blue_highlight.svg")
+                     .pixmap(sourceRect.size());
+      else
+        pixmap = QIcon(":Resources/port_blue.svg").pixmap(sourceRect.size());
+    } else {
+      if (isHighlighted())
+        pixmap = QIcon(":Resources/port_red_highlight.svg")
+                     .pixmap(sourceRect.size());
+      else
+        pixmap = QIcon(":Resources/port_red.svg").pixmap(sourceRect.size());
+    }
+    sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                       sourceRect.height() * getDevPixRatio());
+    painter->drawPixmap(imgRect, pixmap, sourceRect);
   }
 }
 
@@ -989,22 +998,26 @@ QRectF StageSchematicSplinePort::boundingRect() const {
 void StageSchematicSplinePort::paint(QPainter *painter,
                                      const QStyleOptionGraphicsItem *option,
                                      QWidget *widget) {
-  // ChildPm : connected to the pegbar
-  QPixmap childPm = QPixmap(":Resources/spline_child_port.png");
-  QPixmap childPm_disconnect =
-      QPixmap(":Resources/spline_child_port_disconnect.png");
-  // ParentPm : connected to the spline
-  QPixmap parentPm = QPixmap(":Resources/spline_parent_port.png");
-
-  QRect rect(2, 0, 12, 6);
+  QRect rect(0, 0, 16, 8);
+  QRect sourceRect = scene()->views()[0]->matrix().mapRect(rect);
+  QPixmap pixmap;
 
   if (!m_parent->isParentPort()) {
-    if (getLinkCount() > 0)
-      painter->drawPixmap(rect, childPm);
-    else
-      painter->drawPixmap(rect, childPm_disconnect);
-  } else
-    painter->drawPixmap(rect.translated(0, 2), parentPm);
+    if (getLinkCount() > 0) {
+      static QIcon splineChildIcon(":Resources/spline_child_port.svg");
+      pixmap = splineChildIcon.pixmap(sourceRect.size());
+    } else {
+      static QIcon splineChildDisconIcon(
+          ":Resources/spline_child_port_disconnect.svg");
+      pixmap = splineChildDisconIcon.pixmap(sourceRect.size());
+    }
+  } else {
+    static QIcon splineParentIcon(":Resources/spline_parent_port.svg");
+    pixmap = splineParentIcon.pixmap(sourceRect.size());
+  }
+  sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                     sourceRect.height() * getDevPixRatio());
+  painter->drawPixmap(rect, pixmap, sourceRect);
 }
 
 //--------------------------------------------------------

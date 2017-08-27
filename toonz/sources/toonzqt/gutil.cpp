@@ -28,6 +28,8 @@
 #include <QKeyEvent>
 #include <QUrl>
 #include <QFileInfo>
+#include <QDesktopWidget>
+#include <QSvgRenderer>
 
 using namespace DVGui;
 
@@ -71,9 +73,14 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied, bool mirrored) {
 
 //-----------------------------------------------------------------------------
 
-QPixmap rasterToQPixmap(const TRaster32P &ras, bool premultiplied) {
-  QPixmap pixmap;
-  return pixmap.fromImage(rasterToQImage(ras, premultiplied));
+QPixmap rasterToQPixmap(const TRaster32P &ras, bool premultiplied,
+                        bool setDevPixRatio) {
+  QPixmap pixmap = QPixmap::fromImage(rasterToQImage(ras, premultiplied));
+  if (setDevPixRatio) {
+    static int devPixRatio = QApplication::desktop()->devicePixelRatio();
+    pixmap.setDevicePixelRatio(devPixRatio);
+  }
+  return pixmap;
 }
 
 //-----------------------------------------------------------------------------
@@ -131,7 +138,9 @@ void drawArrow(QPainter &p, const QPointF a, const QPointF b, const QPointF c,
 
 QPixmap scalePixmapKeepingAspectRatio(QPixmap pixmap, QSize size,
                                       QColor color) {
-  if (pixmap.isNull() || pixmap.size() == size) return pixmap;
+  if (pixmap.isNull()) return pixmap;
+  if (pixmap.devicePixelRatio() > 1.0) size *= pixmap.devicePixelRatio();
+  if (pixmap.size() == size) return pixmap;
   QPixmap scaledPixmap =
       pixmap.scaled(size.width(), size.height(), Qt::KeepAspectRatio,
                     Qt::SmoothTransformation);
@@ -141,7 +150,56 @@ QPixmap scalePixmapKeepingAspectRatio(QPixmap pixmap, QSize size,
   painter.drawPixmap(double(size.width() - scaledPixmap.width()) * 0.5,
                      double(size.height() - scaledPixmap.height()) * 0.5,
                      scaledPixmap);
+  newPixmap.setDevicePixelRatio(pixmap.devicePixelRatio());
   return newPixmap;
+}
+
+//-----------------------------------------------------------------------------
+
+QPixmap svgToPixmap(const QString &svgFilePath, const QSize &size,
+                    Qt::AspectRatioMode aspectRatioMode, QColor bgColor) {
+  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
+  QSvgRenderer svgRenderer(svgFilePath);
+  QSize pixmapSize;
+  QRectF renderRect;
+  if (size.isEmpty()) {
+    pixmapSize = svgRenderer.defaultSize() * devPixRatio;
+    renderRect = QRectF(QPointF(), QSizeF(pixmapSize));
+  } else {
+    pixmapSize = size * devPixRatio;
+    if (aspectRatioMode == Qt::KeepAspectRatio ||
+        aspectRatioMode == Qt::KeepAspectRatioByExpanding) {
+      QSize imgSize = svgRenderer.defaultSize();
+      QPointF scaleFactor((float)pixmapSize.width() / (float)imgSize.width(),
+                          (float)pixmapSize.height() / (float)imgSize.height());
+      float factor = (aspectRatioMode == Qt::KeepAspectRatio)
+                         ? std::min(scaleFactor.x(), scaleFactor.y())
+                         : std::max(scaleFactor.x(), scaleFactor.y());
+      QSizeF renderSize(factor * (float)imgSize.width(),
+                        factor * (float)imgSize.height());
+      QPointF topLeft(
+          ((float)pixmapSize.width() - renderSize.width()) * 0.5f,
+          ((float)pixmapSize.height() - renderSize.height()) * 0.5f);
+      renderRect = QRectF(topLeft, renderSize);
+    } else {  // Qt::IgnoreAspectRatio:
+      renderRect = QRectF(QPointF(), QSizeF(pixmapSize));
+    }
+  }
+  QPixmap pixmap(pixmapSize);
+  QPainter painter;
+  pixmap.fill(bgColor);
+  painter.begin(&pixmap);
+  svgRenderer.render(&painter, renderRect);
+  painter.end();
+  pixmap.setDevicePixelRatio(devPixRatio);
+  return pixmap;
+}
+
+//-----------------------------------------------------------------------------
+
+int getDevPixRatio() {
+  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
+  return devPixRatio;
 }
 
 //-----------------------------------------------------------------------------
@@ -153,8 +211,14 @@ QIcon createQIcon(const char *iconSVGName) {
 
   QIcon icon;
   icon.addFile(normal, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(click, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(over, QSize(), QIcon::Active);
+  if (QFile::exists(click))
+    icon.addFile(click, QSize(), QIcon::Normal, QIcon::On);
+  else
+    icon.addFile(normal, QSize(), QIcon::Normal, QIcon::On);
+  if (QFile::exists(over))
+    icon.addFile(over, QSize(), QIcon::Active);
+  else
+    icon.addFile(normal, QSize(), QIcon::Active);
 
   return icon;
 }

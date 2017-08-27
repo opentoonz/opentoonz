@@ -586,7 +586,7 @@ int main(int argc, char *argv[]) {
   a.processEvents();
 
   // Carico lo styleSheet
-  QString currentStyle = Preferences::instance()->getCurrentStyleSheet();
+  QString currentStyle = Preferences::instance()->getCurrentStyleSheetPath();
   a.setStyleSheet(currentStyle);
 
   TApp::instance()->setMainWindow(&w);

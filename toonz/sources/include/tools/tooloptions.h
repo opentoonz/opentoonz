@@ -373,6 +373,9 @@ class GeometricToolOptionsBox final : public ToolOptionsBox {
   ToolOptionCombo *m_shapeField;
   ToolOptionCheckbox *m_pencilMode;
   ToolOptionIntSlider *m_miterField;
+  ToolOptionCheckbox *m_snapCheckbox;
+  ToolOptionCombo *m_snapSensitivityCombo;
+  TTool *m_tool;
 
 public:
   GeometricToolOptionsBox(QWidget *parent, TTool *tool,
@@ -475,12 +478,15 @@ class BrushToolOptionsBox final : public ToolOptionsBox {
   ToolOptionPopupButton *m_joinStyleCombo;
   ToolOptionIntSlider *m_miterField;
   ToolOptionCombo *m_presetCombo;
+  ToolOptionCheckbox *m_snapCheckbox;
+  ToolOptionCombo *m_snapSensitivityCombo;
   QPushButton *m_addPresetButton;
   QPushButton *m_removePresetButton;
 
 private:
   class PresetNamePopup;
   PresetNamePopup *m_presetNamePopup;
+  void filterControls();
 
 public:
   BrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,

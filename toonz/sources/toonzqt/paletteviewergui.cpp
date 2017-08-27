@@ -1612,11 +1612,13 @@ void PaletteIconWidget::paintEvent(QPaintEvent *) {
   QPainter p(this);
 
   if (m_isOver) {
-    static QPixmap dragPaletteIconPixmapOver(":Resources/dragpalette_over.png");
-    p.drawPixmap(5, 2, dragPaletteIconPixmapOver);
+    static QPixmap dragPaletteIconPixmapOver(
+        svgToPixmap(":Resources/dragpalette_over.svg"));
+    p.drawPixmap(5, 1, dragPaletteIconPixmapOver);
   } else {
-    static QPixmap dragPaletteIconPixmap(":Resources/dragpalette.png");
-    p.drawPixmap(5, 2, dragPaletteIconPixmap);
+    static QPixmap dragPaletteIconPixmap(
+        svgToPixmap(":Resources/dragpalette.svg"));
+    p.drawPixmap(5, 1, dragPaletteIconPixmap);
   }
 }
 

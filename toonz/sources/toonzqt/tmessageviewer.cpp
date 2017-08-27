@@ -97,9 +97,9 @@ TMessageRepository *TMessageRepository::instance() {
 
 void TMessageRepository::messageReceived(int type, const QString &message) {
   if (gRedIcon.isNull()) {
-    gRedIcon    = QIcon(":Resources/tmsg_error.png");
-    gYellowIcon = QIcon(":Resources/tmsg_warning.png");
-    gGreenIcon  = QIcon(":Resources/tmsg_info.png");
+    gRedIcon    = QIcon(":Resources/tmsg_error.svg");
+    gYellowIcon = QIcon(":Resources/tmsg_warning.svg");
+    gGreenIcon  = QIcon(":Resources/tmsg_info.svg");
   }
 
   switch (type) {
