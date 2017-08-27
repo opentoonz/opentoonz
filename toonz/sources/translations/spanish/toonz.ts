@@ -3551,8 +3551,8 @@ Do you want to create it?</source>
         <translation>Agregar como tarea de limpieza</translation>
     </message>
     <message>
-        <source>Select All Keys in this Row</source>
-        <translation>Seleccionar todos los claves en esta fila</translation>
+        <source>Select All Keys in this Frame</source>
+        <translation>Seleccionar todos los claves en esta fotograma</translation>
     </message>
     <message>
         <source>Select All Keys in this Column</source>
@@ -3579,12 +3579,12 @@ Do you want to create it?</source>
         <translation>Seleccionar los claves siguientes en esta columna</translation>
     </message>
     <message>
-        <source>Select Previous Keys in this Row</source>
-        <translation>Seleccionar los claves anteriores en esta fila</translation>
+        <source>Select Previous Keys in this Frame</source>
+        <translation>Seleccionar los claves anteriores en esta fotograma</translation>
     </message>
     <message>
-        <source>Select Following Keys in this Row</source>
-        <translation>Seleccionar los claves siguientes en esta fila</translation>
+        <source>Select Following Keys in this Frame</source>
+        <translation>Seleccionar los claves siguientes en esta fotograma</translation>
     </message>
     <message>
         <source>Invert Key Selection</source>

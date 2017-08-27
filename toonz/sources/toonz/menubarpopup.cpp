@@ -82,8 +82,8 @@ public:
     /*- Menu title will be translated if the title is registered in translation
      * file -*/
     setText(0, StackedMenuBar::tr(title.toStdString().c_str()));
-    QIcon subMenuIcon(":Resources/browser_folder_close.png");
-    subMenuIcon.addFile(":Resources/browser_folder_open.png", QSize(),
+    QIcon subMenuIcon(":Resources/browser_folder_close.svg");
+    subMenuIcon.addFile(":Resources/browser_folder_open.svg", QSize(),
                         QIcon::Normal, QIcon::On);
     setIcon(0, subMenuIcon);
     setToolTip(0, QObject::tr(
@@ -106,6 +106,7 @@ MenuBarTree::MenuBarTree(TFilePath& path, QWidget* parent)
   setDropIndicatorShown(true);
   setDefaultDropAction(Qt::MoveAction);
   setDragDropMode(QAbstractItemView::DragDrop);
+  setIconSize(QSize(21, 17));
 
   setColumnCount(1);
   header()->close();
@@ -355,10 +356,11 @@ CommandListTree::CommandListTree(QWidget* parent) : QTreeWidget(parent) {
   setDragEnabled(true);
   setDragDropMode(QAbstractItemView::DragOnly);
   setColumnCount(1);
+  setIconSize(QSize(21, 17));
   header()->close();
 
-  QIcon menuFolderIcon(":Resources/browser_project_close.png");
-  menuFolderIcon.addFile(":Resources/browser_project_open.png", QSize(),
+  QIcon menuFolderIcon(":Resources/browser_project_close.svg");
+  menuFolderIcon.addFile(":Resources/browser_project_open.svg", QSize(),
                          QIcon::Normal, QIcon::On);
   invisibleRootItem()->setIcon(0, menuFolderIcon);
 

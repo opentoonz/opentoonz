@@ -164,18 +164,18 @@ QVariant FunctionTreeModel::ChannelGroup::data(int role) const {
     bool active   = isActive();
 
     if (active) {
-      static QIcon folderAnimOpen(":Resources/folderanim_open.png");
-      static QIcon folderAnimClose(":Resources/folderanim_close.png");
-      static QIcon folderOpen(":Resources/folder_open.png");
-      static QIcon folderClose(":Resources/folder_close.png");
+      static QIcon folderAnimOpen(":Resources/folderanim_open.svg");
+      static QIcon folderAnimClose(":Resources/folderanim_close.svg");
+      static QIcon folderOpen(":Resources/folder_open.svg");
+      static QIcon folderClose(":Resources/folder_close.svg");
 
       return animated ? isOpen() ? folderAnimOpen : folderAnimClose
                       : isOpen() ? folderOpen : folderClose;
     } else {
-      static QIcon folderAnimOpen(":Resources/folderanim_open_off.png");
-      static QIcon folderAnimClose(":Resources/folderanim_close_off.png");
-      static QIcon folderOpen(":Resources/folder_open_off.png");
-      static QIcon folderClose(":Resources/folder_close_off.png");
+      static QIcon folderAnimOpen(":Resources/folderanim_open_off.svg");
+      static QIcon folderAnimClose(":Resources/folderanim_close_off.svg");
+      static QIcon folderOpen(":Resources/folder_open_off.svg");
+      static QIcon folderClose(":Resources/folder_close_off.svg");
 
       return animated ? isOpen() ? folderAnimOpen : folderAnimClose
                       : isOpen() ? folderOpen : folderClose;
@@ -374,18 +374,18 @@ QVariant FxChannelGroup::data(int role) const {
       break;
     }
     if (isOneChildActive) {
-      static QIcon folderAnimOpen(":Resources/folderanim_open.png");
-      static QIcon folderAnimClose(":Resources/folderanim_close.png");
-      static QIcon folderOpen(":Resources/folder_open.png");
-      static QIcon folderClose(":Resources/folder_close.png");
+      static QIcon folderAnimOpen(":Resources/folderanim_open.svg");
+      static QIcon folderAnimClose(":Resources/folderanim_close.svg");
+      static QIcon folderOpen(":Resources/folder_open.svg");
+      static QIcon folderClose(":Resources/folder_close.svg");
 
       return isAnimated ? isOpen() ? folderAnimOpen : folderAnimClose
                         : isOpen() ? folderOpen : folderClose;
     } else {
-      static QIcon folderAnimOpen(":Resources/folderanim_open_off.png");
-      static QIcon folderAnimClose(":Resources/folderanim_close_off.png");
-      static QIcon folderOpen(":Resources/folder_open_off.png");
-      static QIcon folderClose(":Resources/folder_close_off.png");
+      static QIcon folderAnimOpen(":Resources/folderanim_open_off.svg");
+      static QIcon folderAnimClose(":Resources/folderanim_close_off.svg");
+      static QIcon folderOpen(":Resources/folder_open_off.svg");
+      static QIcon folderClose(":Resources/folder_close_off.svg");
 
       return isAnimated ? isOpen() ? folderAnimOpen : folderAnimClose
                         : isOpen() ? folderOpen : folderClose;
@@ -580,10 +580,10 @@ bool FunctionTreeModel::Channel::isAnimated() const {
 
 QVariant FunctionTreeModel::Channel::data(int role) const {
   if (role == Qt::DecorationRole) {
-    static QIcon paramAnimOn(":Resources/paramanim_on.png");
-    static QIcon paramAnimOff(":Resources/paramanim_off.png");
-    static QIcon paramOn(":Resources/param_on.png");
-    static QIcon paramOff(":Resources/param_off.png");
+    static QIcon paramAnimOn(":Resources/paramanim_on.svg");
+    static QIcon paramAnimOff(":Resources/paramanim_off.svg");
+    static QIcon paramOn(":Resources/param_on.svg");
+    static QIcon paramOff(":Resources/param_off.svg");
 
     return m_param->hasKeyframes() ? isActive() ? paramAnimOn : paramAnimOff
                                    : isActive() ? paramOn : paramOff;

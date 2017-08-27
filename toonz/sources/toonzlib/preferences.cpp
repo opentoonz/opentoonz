@@ -309,6 +309,7 @@ Preferences::Preferences()
     , m_ffmpegTimeout(60)
     , m_shortcutPreset("defopentoonz")
     , m_useNumpadForSwitchingStyles(true)
+    , m_newLevelSizeToCameraSizeEnabled(false)
     , m_showXSheetToolbar(false)
     , m_expandFunctionHeader(false)
     , m_showColumnNumbers(false)
@@ -596,6 +597,8 @@ Preferences::Preferences()
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
   getValue(*m_settings, "guidedDrawingType", m_guidedDrawingType);
+  getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
+           m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
   getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
@@ -1429,6 +1432,13 @@ void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
 void Preferences::setGuidedDrawing(int status) {
   m_guidedDrawingType = status;
   m_settings->setValue("guidedDrawingType", status);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableNewLevelSizeToCameraSize(bool on) {
+  m_newLevelSizeToCameraSizeEnabled = on;
+  m_settings->setValue("newLevelSizeToCameraSizeEnabled", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
