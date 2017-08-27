@@ -513,6 +513,10 @@ void SceneViewer::onMove(const TMouseEvent &event) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::mousePressEvent(QMouseEvent *event) {
+  // source can be useful for detecting touch vs mouse,
+  // but has reports of being unreliable on mac
+  // so m_gestureActive is the marker for rejecting touch events
+  int source = event->source();
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) return;
   if (m_gestureActive) {
@@ -626,6 +630,10 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
   }
   if (m_gestureActive) {
     m_gestureActive = false;
+    m_rotating      = false;
+    m_zooming       = false;
+    m_scaleFactor   = 0.0;
+    m_rotationDelta = 0.0;
     return;
   }
 
@@ -809,41 +817,80 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
 
     if (gesture->state() == Qt::GestureStarted) {
       m_gestureActive = true;
-    }
-    if (changeFlags & QPinchGesture::RotationAngleChanged) {
-      qreal rotationDelta =
-          gesture->rotationAngle() - gesture->lastRotationAngle();
-      TAffine aff    = getViewMatrix().inv();
-      TPointD center = aff * TPointD(0, 0);
-      rotate(center, -rotationDelta);
-    }
-    if (changeFlags & QPinchGesture::ScaleFactorChanged) {
-      double scaleFactor = gesture->scaleFactor();
-      // the scale factor makes for too sensitive scaling
-      // divide the change in half
-      if (scaleFactor > 1) {
-        double decimalValue = scaleFactor - 1;
-        decimalValue /= 3;
-        scaleFactor = 1 + decimalValue;
-      } else if (scaleFactor < 1) {
-        double decimalValue = 1 - scaleFactor;
-        decimalValue /= 3;
-        scaleFactor = 1 - decimalValue;
-      }
-      zoomQt(firstCenter * getDevPixRatio(), scaleFactor);
-      m_gestureActive = true;
-    }
-    if (changeFlags & QPinchGesture::CenterPointChanged) {
-      QPointF centerDelta = (gesture->centerPoint() * getDevPixRatio()) -
-                            (gesture->lastCenterPoint() * getDevPixRatio());
-      if (centerDelta.manhattanLength() > 1) {
-        panQt(centerDelta.toPoint());
-      }
-      m_gestureActive = true;
-    }
-    if (gesture->state() == Qt::GestureFinished) {
+    } else if (gesture->state() == Qt::GestureFinished) {
       m_gestureActive = false;
+      m_rotating      = false;
+      m_zooming       = false;
+      m_scaleFactor   = 0.0;
+      m_rotationDelta = 0.0;
+    } else {
+      if (changeFlags & QPinchGesture::RotationAngleChanged) {
+        qreal rotationDelta =
+            gesture->rotationAngle() - gesture->lastRotationAngle();
+        TAffine aff    = getViewMatrix().inv();
+        TPointD center = aff * TPointD(0, 0);
+        if (!m_rotating && !m_zooming) {
+          m_rotationDelta += rotationDelta;
+          double absDelta = abs(m_rotationDelta);
+          if (absDelta >= 10) {
+            m_rotating = true;
+          }
+        }
+        if (m_rotating) {
+          rotate(center, -rotationDelta);
+        }
+      }
+      if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        double scaleFactor = gesture->scaleFactor();
+        // the scale factor makes for too sensitive scaling
+        // divide the change in half
+        if (scaleFactor > 1) {
+          double decimalValue = scaleFactor - 1;
+          decimalValue /= 3;
+          scaleFactor = 1 + decimalValue;
+        } else if (scaleFactor < 1) {
+          double decimalValue = 1 - scaleFactor;
+          decimalValue /= 3;
+          scaleFactor = 1 - decimalValue;
+        }
+        if (!m_rotating && !m_zooming) {
+          double delta = scaleFactor - 1;
+          m_scaleFactor += delta;
+          if (m_scaleFactor > .2 || m_scaleFactor < -.2) {
+            m_zooming = true;
+          }
+        }
+        if (m_zooming) {
+          zoomQt(firstCenter * getDevPixRatio(), scaleFactor);
+        }
+        m_gestureActive = true;
+      }
+      if (changeFlags & QPinchGesture::CenterPointChanged) {
+        QPointF centerDelta = (gesture->centerPoint() * getDevPixRatio()) -
+                              (gesture->lastCenterPoint() * getDevPixRatio());
+        if (centerDelta.manhattanLength() > 1) {
+          // panQt(centerDelta.toPoint());
+        }
+        m_gestureActive = true;
+      }
     }
+  }
+  e->accept();
+}
+
+void SceneViewer::touchEvent(QTouchEvent *e, int type) {
+  if (type == QEvent::TouchBegin) {
+    m_touchActive = true;
+  }
+  if (e->touchPoints().count() == 1 && m_touchActive) {
+    QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+
+    QPointF centerDelta = (panPoint.pos() * getDevPixRatio()) -
+                          (panPoint.lastPos() * getDevPixRatio());
+    panQt(centerDelta.toPoint());
+  }
+  if (type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
+    m_touchActive = false;
   }
   e->accept();
 }
@@ -857,7 +904,9 @@ bool SceneViewer::event(QEvent *e) {
   }
   if (e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
       e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) {
+    touchEvent(static_cast<QTouchEvent *>(e), e->type());
     m_gestureActive = true;
+    return true;
   }
   if (e->type() == QEvent::ShortcutOverride || e->type() == QEvent::KeyPress) {
     if (!((QKeyEvent *)e)->isAutoRepeat()) {

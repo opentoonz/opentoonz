@@ -33,6 +33,7 @@ class QMenu;
 class SceneViewer;
 class LocatorPopup;
 class QGestureEvent;
+class QTouchEvent;
 
 namespace ImageUtils {
 class FullScreenWidget;
@@ -72,6 +73,11 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_buttonClicked, m_toolSwitched;
   bool m_shownOnce     = false;
   bool m_gestureActive = false;
+  bool m_touchActive   = false;
+  bool m_rotating      = false;
+  bool m_zooming       = false;
+  double m_scaleFactor;    // used for zoom gesture
+  double m_rotationDelta;  // used for rotate gesture
   int m_referenceMode;
   int m_previewMode;
   bool m_isMouseEntered, m_forceGlFlush;
@@ -285,6 +291,7 @@ protected:
   void hideEvent(QHideEvent *) override;
 
   void gestureEvent(QGestureEvent *e);
+  void touchEvent(QTouchEvent *e, int type);
   void tabletEvent(QTabletEvent *) override;
   void leaveEvent(QEvent *) override;
   void enterEvent(QEvent *) override;
