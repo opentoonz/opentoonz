@@ -32,6 +32,7 @@ class Ruler;
 class QMenu;
 class SceneViewer;
 class LocatorPopup;
+class QGestureEvent;
 
 namespace ImageUtils {
 class FullScreenWidget;
@@ -64,13 +65,13 @@ class SceneViewer final : public GLWidgetForHighDpi,
   QPoint m_lastMousePos;
   QPoint m_pos;
   Qt::MouseButton m_mouseButton;
-
   bool m_foregroundDrawing;
   bool m_tabletEvent, m_tabletPressed, m_tabletReleased, m_tabletMove,
       m_tabletActive;
   // used to handle wrong mouse drag events!
   bool m_buttonClicked, m_toolSwitched;
-  bool m_shownOnce = false;
+  bool m_shownOnce     = false;
+  bool m_gestureActive = false;
   int m_referenceMode;
   int m_previewMode;
   bool m_isMouseEntered, m_forceGlFlush;
@@ -283,6 +284,7 @@ protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
 
+  void gestureEvent(QGestureEvent *e);
   void tabletEvent(QTabletEvent *) override;
   void leaveEvent(QEvent *) override;
   void enterEvent(QEvent *) override;

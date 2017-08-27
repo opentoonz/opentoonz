@@ -542,6 +542,10 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
   // Ghibli3DLutUtil::m_isValid)
   //  m_ghibli3DLutUtil = new Ghibli3DLutUtil();
+  setAttribute(Qt::WA_AcceptTouchEvents);
+  grabGesture(Qt::SwipeGesture);
+  grabGesture(Qt::PanGesture);
+  grabGesture(Qt::PinchGesture);
 }
 
 //-----------------------------------------------------------------------------
