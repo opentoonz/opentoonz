@@ -120,6 +120,7 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tenv.h
     ../include/tmeshimage.h
     ../include/tgldisplaylistsmanager.h
+    ../include/tversion.h
 )
 
 set(SOURCES
@@ -180,7 +181,6 @@ set(SOURCES
     ../common/tvrender/tcolorstyles.cpp
     ../common/tvrender/tellipticbrush.cpp
     ../common/tvrender/tflash.cpp
-    ../common/tvrender/tfont_proxy.cpp
     ../common/tvrender/qtofflinegl.cpp
     ../common/tvrender/tglcurves.cpp
     ../common/tvrender/tglregions.cpp
@@ -243,22 +243,18 @@ set(SOURCES
     ../common/tapptools/tenv.cpp
     ../common/tmeshimage/tmeshimage.cpp
     ../common/tmsgcore.cpp
+    ../common/tvrender/tfont_qt.cpp
 )
 
 if(BUILD_TARGET_WIN)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_nt.cpp
-        ../common/tvrender/tfont_nt.cpp
     )
 elseif(BUILD_TARGET_APPLE)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_mac.cpp
-        ../common/tvrender/tfont_mac.cpp
     )
 elseif(BUILD_TARGET_UNIX)
-    set(SOURCES ${SOURCES}
-        ../common/tvrender/tfont_qt.cpp
-    )
     if(SDL_LIB_FOUND)
         set(SOURCES ${SOURCES}
             ../common/tsound/tsound_sdl.cpp

@@ -3522,8 +3522,8 @@ Vuoi crearla?</translation>
         <translation>Aggiungi Come Task di Cleanup</translation>
     </message>
     <message>
-        <source>Select All Keys in this Row</source>
-        <translation>Seleziona Tutte le Chiavi di questa Riga</translation>
+        <source>Select All Keys in this Frame</source>
+        <translation>Seleziona Tutte le Chiavi di questa Fotogramma</translation>
     </message>
     <message>
         <source>Select All Keys in this Column</source>
@@ -3550,12 +3550,12 @@ Vuoi crearla?</translation>
         <translation>Seleziona le Chiavi Successive di questa Colonna</translation>
     </message>
     <message>
-        <source>Select Previous Keys in this Row</source>
-        <translation>Seleziona le Chiavi Precedenti di questa Riga</translation>
+        <source>Select Previous Keys in this Frame</source>
+        <translation>Seleziona le Chiavi Precedenti di questa Fotogramma</translation>
     </message>
     <message>
-        <source>Select Following Keys in this Row</source>
-        <translation>Seleziona le Chiavi Successive di questa Riga</translation>
+        <source>Select Following Keys in this Frame</source>
+        <translation>Seleziona le Chiavi Successive di questa Fotogramma</translation>
     </message>
     <message>
         <source>Invert Key Selection</source>

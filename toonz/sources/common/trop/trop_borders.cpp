@@ -58,18 +58,18 @@ namespace borders {
 
 // Standard type instantiations
 
-template void DVAPI readMeshes<TPixel32>(
-    const TRasterPT<TPixel32> &raster, ImageMeshesReaderT<TPixel32> &reader);
-template void DVAPI readMeshes<TPixel64>(
-    const TRasterPT<TPixel64> &raster, ImageMeshesReaderT<TPixel64> &reader);
+template void DVAPI readMeshes<TPixel32>(const TRasterPT<TPixel32> &raster,
+                                         ImageMeshesReaderT<TPixel32> &reader);
+template void DVAPI readMeshes<TPixel64>(const TRasterPT<TPixel64> &raster,
+                                         ImageMeshesReaderT<TPixel64> &reader);
 template void DVAPI readMeshes<TPixelGR8>(
     const TRasterPT<TPixelGR8> &raster, ImageMeshesReaderT<TPixelGR8> &reader);
-template void DVAPI readMeshes<TPixelGR16>(
-    const TRasterPT<TPixelGR16> &raster,
-    ImageMeshesReaderT<TPixelGR16> &reader);
-template void DVAPI readMeshes<TPixelCM32>(
-    const TRasterPT<TPixelCM32> &raster,
-    ImageMeshesReaderT<TPixelCM32> &reader);
+template void DVAPI
+readMeshes<TPixelGR16>(const TRasterPT<TPixelGR16> &raster,
+                       ImageMeshesReaderT<TPixelGR16> &reader);
+template void DVAPI
+readMeshes<TPixelCM32>(const TRasterPT<TPixelCM32> &raster,
+                       ImageMeshesReaderT<TPixelCM32> &reader);
 
 //--------------------------------------------------------------------------------
 
@@ -323,6 +323,5 @@ void readMeshes(const TRasterPT<Pix> &raster, ImageMeshesReaderT<Pix> &reader) {
       raster, reader.pixelSelector(), reader);
   raster->unlock();
 }
-
 }
 }  // namespace TRop::borders

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="palettegizmo.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 17 17"
+	 style="enable-background:new 0 0 17 17;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#404040;stroke-width:2;stroke-linecap:square;stroke-miterlimit:1.5;}
+	.st1{fill:#E6E6E6;}
+	.st2{fill:#404040;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview19" inkscape:current-layer="svg2" inkscape:cx="10.5" inkscape:cy="8.5" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="500" inkscape:window-maximized="0" inkscape:window-width="1109" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="13.882353" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="g7">
+	<rect id="rect9" x="9" y="5" class="st0" width="7" height="7"/>
+	<rect id="rect11" x="9" y="5" class="st1" width="7" height="7"/>
+</g>
+<rect id="rect13" x="1" y="5" class="st0" width="7" height="7"/>
+<rect id="rect15" x="1" y="5" class="st1" width="7" height="7"/>
+<path id="path17" inkscape:connector-curvature="0" class="st2" d="M5,8h2v1H5v2H4V9H2V8h2V6h1V8z M15,9h-5V8h5V9z"/>
+</svg>

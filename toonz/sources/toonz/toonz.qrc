@@ -3,9 +3,9 @@
         <file>Resources/3D.png</file>
         <file>Resources/3D_on.png</file>
         <file>Resources/3D_over.png</file>
-        <file>Resources/3Dside_l.png</file>
-        <file>Resources/3Dside_r.png</file>
-        <file>Resources/3Dtop.png</file>
+        <file>Resources/3Dside_l.svg</file>
+        <file>Resources/3Dside_r.svg</file>
+        <file>Resources/3Dtop.svg</file>
         <file>Resources/RGBpicker.svg</file>
         <file>Resources/RGBpicker_rollover.svg</file>
         <file>Resources/arrow_down.png</file>
@@ -16,13 +16,12 @@
         <file>Resources/arrow_right_over.png</file>
         <file>Resources/arrow_up.png</file>
         <file>Resources/arrow_up_over.png</file>
-        <file>Resources/audio.png</file>
         <file>Resources/backg.png</file>
         <file>Resources/bender.png</file>
         <file>Resources/bender.svg</file>
         <file>Resources/bender_rollover.svg</file>
         <file>Resources/bottomover.png</file>
-        <file>Resources/broken.png</file>
+        <file>Resources/broken.svg</file>
         <file>Resources/brush.png</file>
         <file>Resources/brush.svg</file>
         <file>Resources/brush_rollover.svg</file>
@@ -33,37 +32,36 @@
         <file>Resources/centerHTitle.png</file>
         <file>Resources/centerHTitle_inactive.png</file>
         <file>Resources/centerVTitle.png</file>
-        <file>Resources/channelblue.png</file>
-        <file>Resources/channelblue_click.png</file>
-        <file>Resources/channelblue_over.png</file>
-        <file>Resources/channelgreen.png</file>
-        <file>Resources/channelgreen_click.png</file>
-        <file>Resources/channelgreen_over.png</file>
-        <file>Resources/channelmatte.png</file>
-        <file>Resources/channelmatte_click.png</file>
-        <file>Resources/channelmatte_over.png</file>
-        <file>Resources/channelred.png</file>
-        <file>Resources/channelred_click.png</file>
-        <file>Resources/channelred_over.png</file>
+        <file>Resources/channelblue.svg</file>
+        <file>Resources/channelblue_click.svg</file>
+        <file>Resources/channelblue_over.svg</file>
+        <file>Resources/channelgreen.svg</file>
+        <file>Resources/channelgreen_click.svg</file>
+        <file>Resources/channelgreen_over.svg</file>
+        <file>Resources/channelmatte.svg</file>
+        <file>Resources/channelmatte_click.svg</file>
+        <file>Resources/channelmatte_over.svg</file>
+        <file>Resources/channelred.svg</file>
+        <file>Resources/channelred_click.svg</file>
+        <file>Resources/channelred_over.svg</file>
         <file>Resources/check.png</file>
         <file>Resources/clapboard.png</file>
-        <file>Resources/cleanup_failed.png</file>
-        <file>Resources/cleanup_done.png</file>
-        <file>Resources/cleanup_done_with_errors.png</file>
-        <file>Resources/cleanup_computing.png</file>
-        <file>Resources/cleanup_suspended.png</file>
-        <file>Resources/close_pane.png</file>
-        <file>Resources/close_pane_rollover.png</file>
-        <file>Resources/closedfolder.png</file>
+        <file>Resources/cleanup_failed.svg</file>
+        <file>Resources/cleanup_done.svg</file>
+        <file>Resources/cleanup_done_with_errors.svg</file>
+        <file>Resources/cleanup_computing.svg</file>
+        <file>Resources/cleanup_suspended.svg</file>
+        <file>Resources/close_pane.svg</file>
+        <file>Resources/close_pane_rollover.svg</file>
         <file>Resources/collapse.png</file>
         <file>Resources/collapse_click.png</file>
         <file>Resources/collapse_over.png</file>
         <file>Resources/controlpointeditor.svg</file>
         <file>Resources/controlpointeditor_rollover.svg</file>
-        <file>Resources/compare.png</file>
-        <file>Resources/compare_click.png</file>
-        <file>Resources/compare_over.png</file>
-        <file>Resources/curve.png</file>
+        <file>Resources/compare.svg</file>
+        <file>Resources/compare_click.svg</file>
+        <file>Resources/compare_over.svg</file>
+        <file>Resources/curve.svg</file>
         <file>Resources/custom_off.svg</file>
         <file>Resources/custom_on.svg</file>
         <file>Resources/cutter.png</file>
@@ -71,7 +69,7 @@
         <file>Resources/cutter_rollover.svg</file>
         <file>Resources/paintbrush.svg</file>
         <file>Resources/paintbrush_rollover.svg</file>
-        <file>Resources/desktop.png</file>
+        <file>Resources/desktop.svg</file>
         <file>Resources/downTitle.png</file>
         <file>Resources/edit.svg</file>
         <file>Resources/edit_rollover.svg</file>
@@ -79,44 +77,39 @@
         <file>Resources/eraser.png</file>
         <file>Resources/eraser.svg</file>
         <file>Resources/eraser_rollover.svg</file>
-        <file>Resources/farm_tasks.png</file>
+        <file>Resources/farm_tasks.svg</file>
         <file>Resources/fill.png</file>
         <file>Resources/fill.svg</file>
         <file>Resources/fill_rollover.svg</file>
-        <file>Resources/folder_new.png</file>
-        <file>Resources/folder_new_click.png</file>
-        <file>Resources/folder_new_over.png</file>
-        <file>Resources/folderpreset_open.png</file>
-        <file>Resources/folderpreset_close.png</file>
-        <file>Resources/folderup.png</file>
-        <file>Resources/folderup_over.png</file>
-        <file>Resources/framefirst.png</file>
-        <file>Resources/framefirst_click.png</file>
-        <file>Resources/framefirst_over.png</file>
-        <file>Resources/framelast.png</file>
-        <file>Resources/framelast_click.png</file>
-        <file>Resources/framelast_over.png</file>
-        <file>Resources/framenext.png</file>
-        <file>Resources/framenext_click.png</file>
-        <file>Resources/framenext_over.png</file>
-        <file>Resources/frameprev.png</file>
-        <file>Resources/frameprev_click.png</file>
-        <file>Resources/frameprev_over.png</file>
+        <file>Resources/folderpreset_open.svg</file>
+        <file>Resources/folderpreset_close.svg</file>
+        <file>Resources/folderup.svg</file>
+        <file>Resources/folderup_over.svg</file>
+        <file>Resources/framefirst.svg</file>
+        <file>Resources/framefirst_click.svg</file>
+        <file>Resources/framefirst_over.svg</file>
+        <file>Resources/framelast.svg</file>
+        <file>Resources/framelast_click.svg</file>
+        <file>Resources/framelast_over.svg</file>
+        <file>Resources/framenext.svg</file>
+        <file>Resources/framenext_click.svg</file>
+        <file>Resources/framenext_over.svg</file>
+        <file>Resources/frameprev.svg</file>
+        <file>Resources/frameprev_click.svg</file>
+        <file>Resources/frameprev_over.svg</file>
         <file>Resources/freeze.png</file>
         <file>Resources/freeze_on.png</file>
         <file>Resources/freeze_over.png</file>
-        <file>Resources/functoggle00.png</file>
-        <file>Resources/functoggle10.png</file>
-        <file>Resources/functoggle11.png</file>
-        <file>Resources/fx.png</file>
+        <file>Resources/fx.svg</file>
         <file>Resources/geometric.svg</file>
         <file>Resources/geometric_rollover.svg</file>
         <file>Resources/h_slider.png</file>
         <file>Resources/hand.svg</file>
         <file>Resources/hand_rollover.svg</file>
-        <file>Resources/histograms.png</file>
-        <file>Resources/histograms_over.png</file>
-        <file>Resources/history.png</file>
+        <file>Resources/histograms.svg</file>
+        <file>Resources/histograms_click.svg</file>
+        <file>Resources/histograms_over.svg</file>
+        <file>Resources/history.svg</file>
         <file>Resources/hook.svg</file>
         <file>Resources/hook_rollover.svg</file>
         <file>Resources/iron.png</file>
@@ -124,18 +117,10 @@
         <file>Resources/iron_rollover.svg</file>
         <file>Resources/iconplay.png</file>
         <file>Resources/iconpause.png</file>
-        <file>Resources/key.bmp</file>
-        <file>Resources/key_off.png</file>
-        <file>Resources/key_on.png</file>
-        <file>Resources/keynext.png</file>
-        <file>Resources/keynext_dim.png</file>
-        <file>Resources/keynext_over.png</file>
-        <file>Resources/keyprev.png</file>
-        <file>Resources/keyprev_dim.png</file>
-        <file>Resources/keyprev_over.png</file>
+        <file>Resources/key.svg</file>
         <file>Resources/leftTitle.png</file>
         <file>Resources/leftTitle_inactive.png</file>
-        <file>Resources/library.png</file>
+        <file>Resources/library.svg</file>
         <file>Resources/link_child.bmp</file>
         <file>Resources/link_child_rollover.bmp</file>
         <file>Resources/link_closed.bmp</file>
@@ -143,21 +128,21 @@
         <file>Resources/link_parent.bmp</file>
         <file>Resources/lock.png</file>
         <file>Resources/lock_over.png</file>
-        <file>Resources/loop.png</file>
-        <file>Resources/loop_click.png</file>
-        <file>Resources/loop_over.png</file>
+        <file>Resources/loop.svg</file>
+        <file>Resources/loop_click.svg</file>
+        <file>Resources/loop_over.svg</file>
         <file>Resources/lock_toggle.png</file>
         <file>Resources/magnet.png</file>
         <file>Resources/magnet.svg</file>
         <file>Resources/magnet_rollover.svg</file>
-        <file>Resources/motionpath.png</file>
+        <file>Resources/motionpath_fileicon.svg</file>
         <file>Resources/motionpath.svg</file>
         <file>Resources/motionpath_delete.svg</file>
         <file>Resources/motionpath_rot.svg</file>
         <file>Resources/move.png</file>
-        <file>Resources/my_computer.png</file>
-        <file>Resources/my_documents.png</file>
-        <file>Resources/network.png</file>
+        <file>Resources/my_computer.svg</file>
+        <file>Resources/my_documents.svg</file>
+        <file>Resources/network.svg</file>
         <file>Resources/new_raster_level.png</file>
         <file>Resources/new_raster_level_over.png</file>
         <file>Resources/new_raster_level_click.png</file>
@@ -167,40 +152,31 @@
         <file>Resources/new_vector_level.png</file>
         <file>Resources/new_vector_level_click.png</file>
         <file>Resources/new_vector_level_over.png</file>
-        <file>Resources/newmemo.png</file>
-        <file>Resources/newmemo_disabled.png</file>
-        <file>Resources/newpage.png</file>
-        <file>Resources/newpage_click.png</file>
-        <file>Resources/newpage_over.png</file>
+        <file>Resources/newmemo.svg</file>
+        <file>Resources/newmemo_disabled.svg</file>
         <file>Resources/newstyle.png</file>
         <file>Resources/newstyle_click.png</file>
         <file>Resources/newstyle_over.png</file>
-        <file>Resources/nextkey.png</file>
-        <file>Resources/nextkey_disabled.png</file>
-        <file>Resources/nextkey_over.png</file>
         <file>Resources/no_specialstyle.png</file>
         <file>Resources/no_vectorbrush.png</file>
-        <file>Resources/openedfolder.png</file>
-        <file>Resources/options.png</file>
-        <file>Resources/options_click.png</file>
-        <file>Resources/options_over.png</file>
+        <file>Resources/no_mypaintbrush.png</file>
         <file>Resources/palette_add_color.bmp</file>
         <file>Resources/palette_add_page.bmp</file>
         <file>Resources/palette_chooser.bmp</file>
         <file>Resources/palette_color.bmp</file>
         <file>Resources/palette_color.png</file>
-        <file>Resources/palette_header.png</file>
+        <file>Resources/palette_header.svg</file>
         <file>Resources/palette_key.bmp</file>
         <file>Resources/palette_pattern.bmp</file>
         <file>Resources/palette_settings.bmp</file>
         <file>Resources/palette_texture.bmp</file>
         <file>Resources/palette_view_mode.bmp</file>
-        <file>Resources/paletteicon.png</file>
+        <file>Resources/paletteicon.svg</file>
         <file>Resources/pan.png</file>
-        <file>Resources/pause.png</file>
-        <file>Resources/pause_click.png</file>
-        <file>Resources/pause_disabled.png</file>
-        <file>Resources/pause_over.png</file>
+        <file>Resources/pause.svg</file>
+        <file>Resources/pause_click.svg</file>
+        <file>Resources/pause_disabled.svg</file>
+        <file>Resources/pause_over.svg</file>
         <file>Resources/pegging_top_arrow.png</file>
         <file>Resources/pegging_topright_arrow.png</file>
         <file>Resources/pen.png</file>
@@ -216,29 +192,26 @@
         <file>Resources/plaincolor_on.svg</file>
         <file>Resources/plastic.svg</file>
         <file>Resources/plastic_rollover.svg</file>
-        <file>Resources/play.png</file>
-        <file>Resources/play_click.png</file>
-        <file>Resources/play_disabled.png</file>
-        <file>Resources/play_over.png</file>
+        <file>Resources/play.svg</file>
+        <file>Resources/play_click.svg</file>
+        <file>Resources/play_disabled.svg</file>
+        <file>Resources/play_over.svg</file>
         <file>Resources/preview_toggle.png</file>
         <file>Resources/previuos_folder.png</file>
-        <file>Resources/prevkey.png</file>
-        <file>Resources/prevkey_disabled.png</file>
-        <file>Resources/prevkey_over.png</file>
-        <file>Resources/projects.png</file>
-        <file>Resources/psd.png</file>
+        <file>Resources/projects.svg</file>
+        <file>Resources/psd.svg</file>
         <file>Resources/pump.png</file>
         <file>Resources/pump.svg</file>
         <file>Resources/pump_rollover.svg</file>
-        <file>Resources/record.png</file>
-        <file>Resources/record_click.png</file>
-        <file>Resources/record_disabled.png</file>
-        <file>Resources/record_over.png</file>
-        <file>Resources/render_failed.png</file>
-        <file>Resources/render_done.png</file>
-        <file>Resources/render_done_with_errors.png</file>
-        <file>Resources/render_computing.png</file>
-        <file>Resources/render_suspended.png</file>
+        <file>Resources/record.svg</file>
+        <file>Resources/record_click.svg</file>
+        <file>Resources/record_disabled.svg</file>
+        <file>Resources/record_over.svg</file>
+        <file>Resources/render_failed.svg</file>
+        <file>Resources/render_done.svg</file>
+        <file>Resources/render_done_with_errors.svg</file>
+        <file>Resources/render_computing.svg</file>
+        <file>Resources/render_suspended.svg</file>
         <file>Resources/repeat_icon.png</file>
         <file>Resources/repeat_icon_click.png</file>
         <file>Resources/repeat_icon_over.png</file>
@@ -260,7 +233,7 @@
         <file>Resources/schematic_spin_arrows.svg</file>
         <file>Resources/schematic_spline_aim_rhomb.svg</file>
         <file>Resources/schematic_spline_aim_square.svg</file>
-        <file>Resources/selected_key.bmp</file>
+        <file>Resources/selected_key.svg</file>
         <file>Resources/selection.svg</file>
         <file>Resources/selection_add.png</file>
         <file>Resources/selection_convert.png</file>
@@ -270,30 +243,30 @@
         <file>Resources/shear.png</file>
         <file>Resources/skeleton.svg</file>
         <file>Resources/skeleton_rollover.svg</file>
-        <file>Resources/snapshot.png</file>
-        <file>Resources/snapshot_click.png</file>
-        <file>Resources/snapshot_over.png</file>
-        <file>Resources/sound.png</file>
-        <file>Resources/sound_click.png</file>
-        <file>Resources/sound_over.png</file>
-        <file>Resources/sound_header_off.png</file>
-        <file>Resources/sound_header_on.png</file>
+        <file>Resources/snapshot.svg</file>
+        <file>Resources/snapshot_click.svg</file>
+        <file>Resources/snapshot_over.svg</file>
+        <file>Resources/sound.svg</file>
+        <file>Resources/sound_click.svg</file>
+        <file>Resources/sound_over.svg</file>
+        <file>Resources/sound_header_off.svg</file>
+        <file>Resources/sound_header_on.svg</file>
         <file>Resources/sound_toggle.png</file>
         <file>Resources/special_off.svg</file>
         <file>Resources/special_on.svg</file>
-        <file>Resources/splash.png</file>
+        <file>Resources/splash.svg</file>
         <file>Resources/standard.png</file>
         <file>Resources/standard_on.png</file>
         <file>Resources/standard_over.png</file>
         <file>Resources/startup.png</file>
-        <file>Resources/start_off.png</file>
-        <file>Resources/start_on.png</file>
-        <file>Resources/stop.png</file>
-        <file>Resources/stop_click.png</file>
-        <file>Resources/stop_disabled.png</file>
-        <file>Resources/stop_over.png</file>
-        <file>Resources/stop_off.png</file>
-        <file>Resources/stop_on.png</file>
+        <file>Resources/start_off.svg</file>
+        <file>Resources/start_on.svg</file>
+        <file>Resources/stop.svg</file>
+        <file>Resources/stop_click.svg</file>
+        <file>Resources/stop_disabled.svg</file>
+        <file>Resources/stop_over.svg</file>
+        <file>Resources/stop_off.svg</file>
+        <file>Resources/stop_on.svg</file>
         <file>Resources/stroke_select.png</file>
         <file>Resources/stylepicker.svg</file>
         <file>Resources/stylepicker_rollover.svg</file>
@@ -307,12 +280,12 @@
         <file>Resources/sub_leave.png</file>
         <file>Resources/sub_leave_over.png</file>
         <file>Resources/sub_leave_click.png</file>
-        <file>Resources/swap_off.png</file>
-        <file>Resources/swap_on.png</file>
-        <file>Resources/svg.png</file>
-        <file>Resources/switch.png</file>
-        <file>Resources/switch_on.png</file>
-        <file>Resources/switch_over.png</file>
+        <file>Resources/swap_off.svg</file>
+        <file>Resources/swap_on.svg</file>
+        <file>Resources/svg.svg</file>
+        <file>Resources/switch.svg</file>
+        <file>Resources/switch_on.svg</file>
+        <file>Resources/switch_over.svg</file>
         <file>Resources/table_view_act.png</file>
         <file>Resources/tape.png</file>
         <file>Resources/tape.svg</file>
@@ -332,68 +305,68 @@
         <file>Resources/type_rollover.svg</file>
         <file>Resources/tzpicon.png</file>
         <file>Resources/tzuicon.png</file>
-        <file>Resources/unknown.png</file>
+        <file>Resources/unknown.svg</file>
         <file>Resources/upTitle.png</file>
         <file>Resources/v_chandle.png</file>
         <file>Resources/view_camera.png</file>
         <file>Resources/view_camera_on.png</file>
         <file>Resources/view_camera_over.png</file>
-        <file>Resources/viewicon_off.png</file>
-        <file>Resources/viewicon_on.png</file>
-        <file>Resources/viewicon_over.png</file>
-        <file>Resources/viewlist_off.png</file>
-        <file>Resources/viewlist_on.png</file>
-        <file>Resources/viewlist_over.png</file>
+        <file>Resources/viewicon_off.svg</file>
+        <file>Resources/viewicon_on.svg</file>
+        <file>Resources/viewicon_over.svg</file>
+        <file>Resources/viewlist_off.svg</file>
+        <file>Resources/viewlist_on.svg</file>
+        <file>Resources/viewlist_over.svg</file>
         <file>Resources/viewpreview.png</file>
         <file>Resources/viewpreview_on.png</file>
         <file>Resources/viewpreview_over.png</file>
-        <file>Resources/viewtable_off.png</file>
-        <file>Resources/viewtable_on.png</file>
-        <file>Resources/viewtable_over.png</file>
+        <file>Resources/viewtable_off.svg</file>
+        <file>Resources/viewtable_on.svg</file>
+        <file>Resources/viewtable_over.svg</file>
         <file>Resources/work.png</file>
         <file>Resources/zoom.png</file>
         <file>Resources/zoom.svg</file>
         <file>Resources/zoom_rollover.svg</file>
-        <file>Resources/browser_folder_open.png</file>
-        <file>Resources/browser_folder_close.png</file>
-        <file>Resources/browser_scene_open.png</file>
-        <file>Resources/browser_scene_close.png</file>
-        <file>Resources/browser_project_open.png</file>
-        <file>Resources/browser_project_close.png</file>
-        <file>Resources/half_R.png</file>
-        <file>Resources/half_R_click.png</file>
-        <file>Resources/half_R_over.png</file>
-        <file>Resources/half_G.png</file>
-        <file>Resources/half_G_click.png</file>
-        <file>Resources/half_G_over.png</file>
-        <file>Resources/half_B.png</file>
-        <file>Resources/half_B_click.png</file>
-        <file>Resources/half_B_over.png</file>
-        <file>Resources/half_bw.png</file>
-        <file>Resources/half_bw_click.png</file>
-        <file>Resources/half_bw_over.png</file>
-        <file>Resources/addcleanup_off.png</file>
-        <file>Resources/addcleanup_on.png</file>
-        <file>Resources/addrender_off.png</file>
-        <file>Resources/addrender_on.png</file>
-        <file>Resources/delete_off.png</file>
-        <file>Resources/delete_on.png</file>
-        <file>Resources/save_off.png</file>
-        <file>Resources/save_on.png</file>
-        <file>Resources/saveas_off.png</file>
-        <file>Resources/saveas_on.png</file>
-        <file>Resources/load_off.png</file>
-        <file>Resources/load_on.png</file>
+        <file>Resources/browser_folder_open.svg</file>
+        <file>Resources/browser_folder_close.svg</file>
+        <file>Resources/browser_scene_open.svg</file>
+        <file>Resources/browser_scene_close.svg</file>
+        <file>Resources/browser_project_open.svg</file>
+        <file>Resources/browser_project_close.svg</file>
+        <file>Resources/half_R.svg</file>
+        <file>Resources/half_R_click.svg</file>
+        <file>Resources/half_R_over.svg</file>
+        <file>Resources/half_G.svg</file>
+        <file>Resources/half_G_click.svg</file>
+        <file>Resources/half_G_over.svg</file>
+        <file>Resources/half_B.svg</file>
+        <file>Resources/half_B_click.svg</file>
+        <file>Resources/half_B_over.svg</file>
+        <file>Resources/half_bw.svg</file>
+        <file>Resources/half_bw_click.svg</file>
+        <file>Resources/half_bw_over.svg</file>
+        <file>Resources/addcleanup_off.svg</file>
+        <file>Resources/addcleanup_on.svg</file>
+        <file>Resources/addrender_off.svg</file>
+        <file>Resources/addrender_on.svg</file>
+        <file>Resources/delete_off.svg</file>
+        <file>Resources/delete_on.svg</file>
+        <file>Resources/save_off.svg</file>
+        <file>Resources/save_on.svg</file>
+        <file>Resources/saveas_off.svg</file>
+        <file>Resources/saveas_on.svg</file>
+        <file>Resources/load_off.svg</file>
+        <file>Resources/load_on.svg</file>
         <file>Resources/flip_h.png</file>
         <file>Resources/flip_v.png</file>
         <file>Resources/level_select.png</file>
-        <file>Resources/vcroot.png</file>
+        <file>Resources/vcroot.svg</file>
         <file>Resources/vcfolder_open.png</file>
-        <file>Resources/vcfolder_close.png</file>
-        <file>Resources/vcfolder_mis_open.png</file>
-        <file>Resources/vcfolder_mis_close.png</file>
-        <file>Resources/browser_vcproject_close.png</file>
-        <file>Resources/browser_vcproject_open.png</file>
+        <file>Resources/vcfolder_close.svg</file>
+        <file>Resources/vcfolder_mis_open.svg</file>
+        <file>Resources/vcfolder_mis_close.svg</file>
+        <file>Resources/browser_vcproject_close.svg</file>
+        <file>Resources/browser_vcproject_open.svg</file>
         <file>Resources/waiting.gif</file>
         <file>Resources/green.png</file>
         <file>Resources/red.png</file>
@@ -404,23 +377,23 @@
         <file>Resources/halfRed.png</file>
         <file>Resources/halfBronze.png</file>
         <file>Resources/plus.png</file>
-        <file>Resources/missing.png</file>
+        <file>Resources/missing.svg</file>
         <file>Resources/forbidden.png</file>
-        <file>Resources/define_subcamera_preview.png</file>
-        <file>Resources/define_subcamera_preview_over.png</file>
-        <file>Resources/define_subcamera_preview_click.png</file>
-        <file>Resources/use_subcamera_preview.png</file>
-        <file>Resources/use_subcamera_preview_over.png</file>
-        <file>Resources/use_subcamera_preview_click.png</file>
+        <file>Resources/define_subcamera_preview.svg</file>
+        <file>Resources/define_subcamera_preview_over.svg</file>
+        <file>Resources/define_subcamera_preview_click.svg</file>
+        <file>Resources/use_subcamera_preview.svg</file>
+        <file>Resources/use_subcamera_preview_over.svg</file>
+        <file>Resources/use_subcamera_preview_click.svg</file>
         <file>Resources/subcamera_preview.png</file>
         <file>Resources/subcamera_preview_over.png</file>
         <file>Resources/subcamera_preview_on.png</file>
-        <file>Resources/round_cap.png</file>
-        <file>Resources/butt_cap.png</file>
-        <file>Resources/projecting_cap.png</file>
-        <file>Resources/round_join.png</file>
-        <file>Resources/bevel_join.png</file>
-        <file>Resources/miter_join.png</file>
+        <file>Resources/round_cap.svg</file>
+        <file>Resources/butt_cap.svg</file>
+        <file>Resources/projecting_cap.svg</file>
+        <file>Resources/round_join.svg</file>
+        <file>Resources/bevel_join.svg</file>
+        <file>Resources/miter_join.svg</file>
         <file>Resources/init.js</file>
         <file>Resources/scripticon.png</file>
         <file>Resources/safearea.png</file>
@@ -431,18 +404,18 @@
         <file>Resources/fieldguide.png</file>
         <file>Resources/fieldguide_over.png</file>
         <file>Resources/fieldguide_on.png</file>
-        <file>Resources/folderup_icon.png</file>      
-        <file>Resources/link_icon.png</file>
-        <file>Resources/folder_icon.png</file>
-      <file>Resources/fb_history_back_enable.png</file>
-      <file>Resources/fb_history_back_disable.png</file>
-      <file>Resources/fb_history_fwd_enable.png</file>
-      <file>Resources/fb_history_fwd_disable.png</file>
+        <file>Resources/folderup_icon.svg</file>      
+        <file>Resources/link_icon.svg</file>
+        <file>Resources/folder_icon.svg</file>
+      <file>Resources/fb_history_back_enable.svg</file>
+      <file>Resources/fb_history_back_disable.svg</file>
+      <file>Resources/fb_history_fwd_enable.svg</file>
+      <file>Resources/fb_history_fwd_disable.svg</file>
       <file>Resources/x_prev_eye.png</file>
       <file>Resources/x_table_view.png</file>
       <file>Resources/x_table_view_transp.png</file>
-      <file>Resources/x_lock.png</file>
-      <file>Resources/filmstrip_inbetween.png</file>
+      <file>Resources/x_lock.svg</file>
+      <file>Resources/filmstrip_inbetween.svg</file>
       <file>Resources/history_normal.png</file>
       <file>Resources/history_brush.png</file>
       <file>Resources/history_eraser.png</file>
@@ -459,11 +432,11 @@
       <file>Resources/history_xsheet.png</file>
       <file>Resources/history_filmstrip.png</file>
       <file>Resources/history_unidentified.png</file>
-      <file>Resources/cln_suspended.png</file>
-      <file>Resources/cln_done_with_errors.png</file>
-      <file>Resources/cln_computing.png</file>
-      <file>Resources/cln_done.png</file>
-      <file>Resources/cln_failed.png</file>
+      <file>Resources/cln_suspended.svg</file>
+      <file>Resources/cln_done_with_errors.svg</file>
+      <file>Resources/cln_computing.svg</file>
+      <file>Resources/cln_done.svg</file>
+      <file>Resources/cln_failed.svg</file>
       <file>Resources/match_lup_nogap.png</file>
       <file>Resources/match_rup_nogap.png</file>
       <file>Resources/match_lup_gap.png</file>
@@ -472,10 +445,10 @@
       <file>Resources/finger_rollover.svg</file>
       <file>Resources/ruler.svg</file>
       <file>Resources/ruler_rollover.svg</file>
-      <file>Resources/locator.png</file>
-      <file>Resources/locator_click.png</file>
-      <file>Resources/locator_over.png</file>
-      <file>Resources/refresh.png</file>
-      <file>Resources/refresh_over.png</file>
+      <file>Resources/locator.svg</file>
+      <file>Resources/locator_click.svg</file>
+      <file>Resources/locator_over.svg</file>
+      <file>Resources/refresh.svg</file>
+      <file>Resources/refresh_over.svg</file>
     </qresource>
 </RCC>

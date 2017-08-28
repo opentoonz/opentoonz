@@ -29,7 +29,7 @@
    Tool Options
 ----------------------------------------------------------------------------- */
 
-#ToolOptions {
+#ToolOptions, #CommandBar {
   & TPanelTitleBar {
     // Use grip handles for title bar
     background-color: @bg;
@@ -111,4 +111,28 @@ PopupButton {
     &:extend(.button-tool all);
     padding: 2; 
   }
+}
+
+#CommandBar {
+	margin: 0;
+	padding: 0;
+	border: 0;
+		&::separator:horizontal {
+		margin-right: 3;
+		margin-left: 3;
+	}
+}
+
+QToolBar#MediumPaddingToolBar { //Schematic Toolbars
+    & QToolButton {
+      padding-left: 3;
+      padding-right: 3;
+    }
+}
+
+QToolBar#WidePaddingToolBar { //FrameNavigator
+    & QToolButton {
+      padding-left: 6;
+      padding-right: 6;
+    }  
 }

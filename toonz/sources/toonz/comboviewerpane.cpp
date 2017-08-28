@@ -321,16 +321,13 @@ void ComboViewerPanel::onDrawFrame(
 
   assert(frame >= 0);
   if (frame != frameHandle->getFrameIndex() + 1) {
-    if (frameHandle->isEditingScene()) {
-      TXshColumn *column = app->getCurrentXsheet()->getXsheet()->getColumn(
-          app->getCurrentColumn()->getColumnIndex());
-      if (column) {
-        TXshSoundColumn *soundColumn = column->getSoundColumn();
-        if (soundColumn && !soundColumn->isPlaying())
-          app->getCurrentFrame()->scrubColumn(frame, frame, soundColumn);
-      }
-    }
+    int oldFrame = frameHandle->getFrame();
     frameHandle->setCurrentFrame(frame);
+    if (!frameHandle->isPlaying() && !frameHandle->isEditingLevel() &&
+        oldFrame != frameHandle->getFrame())
+      frameHandle->scrubXsheet(
+          frame - 1, frame - 1,
+          TApp::instance()->getCurrentXsheet()->getXsheet());
   }
 
   else if (settings.m_blankColor != TPixel::Transparent)
@@ -384,7 +381,8 @@ void ComboViewerPanel::showEvent(QShowEvent *event) {
   // onXshLevelSwitched(TXshLevel*)： changeWindowTitle() + updateFrameRange()
   ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
                        SLOT(onXshLevelSwitched(TXshLevel *)));
-
+  ret = ret && connect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
+                       SLOT(changeWindowTitle()));
   // updateFrameRange(): update the frame slider's range
   ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
                        SLOT(updateFrameRange()));
@@ -414,12 +412,14 @@ void ComboViewerPanel::showEvent(QShowEvent *event) {
 void ComboViewerPanel::hideEvent(QHideEvent *event) {
   StyleShortcutSwitchablePanel::hideEvent(event);
   TApp *app = TApp::instance();
-  disconnect(app->getCurrentScene());
-  disconnect(app->getCurrentLevel());
-  disconnect(app->getCurrentFrame());
-  disconnect(app->getCurrentObject());
-  disconnect(app->getCurrentXsheet());
-  disconnect(app->getCurrentTool());
+  disconnect(app->getCurrentFrame(), 0, this, 0);
+  disconnect(app->getCurrentScene(), 0, this, 0);
+  disconnect(app->getCurrentLevel(), 0, this, 0);
+  disconnect(app->getCurrentObject(), 0, this, 0);
+  disconnect(app->getCurrentXsheet(), 0, this, 0);
+
+  disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
+             SLOT(onToolSwitched()));
 
   m_flipConsole->setActive(false);
 }
@@ -714,14 +714,14 @@ void ComboViewerPanel::onSceneChanged() {
   int frameIndex    = fh->getFrameIndex();
   int maxFrameIndex = fh->getMaxFrameIndex();
   if (frameIndex > maxFrameIndex) maxFrameIndex = frameIndex;
-
-  // set the FPS for new scene
+  // update fps only when the scene settings is changed
   m_flipConsole->setFrameRate(TApp::instance()
                                   ->getCurrentScene()
                                   ->getScene()
                                   ->getProperties()
                                   ->getOutputProperties()
-                                  ->getFrameRate());
+                                  ->getFrameRate(),
+                              false);
   // update the frame slider's range with new frameHandle
   m_flipConsole->setFrameRange(1, maxFrameIndex + 1, 1, frameIndex + 1);
 
@@ -744,6 +744,12 @@ void ComboViewerPanel::onSceneSwitched() {
   enableFlipConsoleForCamerastand(false);
   m_sceneViewer->enablePreview(SceneViewer::NO_PREVIEW);
   m_flipConsole->setChecked(FlipConsole::eDefineSubCamera, false);
+  m_flipConsole->setFrameRate(TApp::instance()
+                                  ->getCurrentScene()
+                                  ->getScene()
+                                  ->getProperties()
+                                  ->getOutputProperties()
+                                  ->getFrameRate());
   m_sceneViewer->setEditPreviewSubcamera(false);
   onSceneChanged();
 }
@@ -796,20 +802,12 @@ void ComboViewerPanel::onFrameTypeChanged() {
 
 //-----------------------------------------------------------------------------
 
-bool ComboViewerPanel::isFrameAlreadyCached(int frame) {
-  if (m_sceneViewer->isPreviewEnabled()) {
-    class Previewer *pr = Previewer::instance();
-    return pr->isFrameReady(frame - 1);
-  } else
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-
 void ComboViewerPanel::onPreferenceChanged(const QString &prefName) {
   m_flipConsole->onPreferenceChanged(prefName);
   StyleShortcutSwitchablePanel::onPreferenceChanged(prefName);
 }
+
+//-----------------------------------------------------------------------------
 
 void ComboViewerPanel::playAudioFrame(int frame) {
   if (m_first) {
@@ -832,6 +830,8 @@ void ComboViewerPanel::playAudioFrame(int frame) {
   TApp::instance()->getCurrentXsheet()->getXsheet()->play(m_sound, s0, s1,
                                                           false);
 }
+
+//-----------------------------------------------------------------------------
 
 bool ComboViewerPanel::hasSoundtrack() {
   if (m_sound != NULL) {

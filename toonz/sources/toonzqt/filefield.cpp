@@ -94,7 +94,8 @@ void FileField::browseDirectory() {
   if (!m_browserPopupController) return;
   m_browserPopupController->openPopup(
       m_filters, (m_fileMode == QFileDialog::DirectoryOnly),
-      (m_lastSelectedPath == m_descriptionText) ? "" : m_lastSelectedPath);
+      (m_lastSelectedPath == m_descriptionText) ? "" : m_lastSelectedPath,
+      this);
   if (m_browserPopupController->isExecute())
     directory = m_browserPopupController->getPath();
 

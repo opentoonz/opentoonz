@@ -157,7 +157,7 @@ elseif(BUILD_ENV_APPLE)
     endif()
     message("PLATFORM:" ${PLATFORM})
     if(PLATFORM EQUAL 64)
-        set(QT_PATH "~/Qt/5.6/clang_64/lib" CACHE PATH "Qt instlattion directory")
+        set(QT_PATH "~/Qt5.6.2/5.6/clang_64/lib" CACHE PATH "Qt instlattion directory")
         set(QT_LIB_PATH "${QT_PATH}/")
         set(CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
 
@@ -169,7 +169,7 @@ elseif(BUILD_ENV_APPLE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++11 -stdlib=libc++ -fno-implicit-templates")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
     elseif(PLATFORM EQUAL 32)
-        set(QT_PATH "~/Qt/5.6/clang_32/lib" CACHE PATH "Qt instlattion directory")
+        set(QT_PATH "~/Qt5.6.2/5.6/clang_32/lib" CACHE PATH "Qt instlattion directory")
         set(QT_LIB_PATH "${QT_PATH}/")
         set(CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
 
@@ -245,6 +245,7 @@ find_package(Qt5 REQUIRED
     PrintSupport
     LinguistTools
     Multimedia
+    MultimediaWidgets
 )
 
 set(QT_MINIMUM_VERSION 5.5.0)
@@ -329,6 +330,8 @@ if(BUILD_ENV_MSVC)
     if(PLATFORM EQUAL 32)
         set(QT_LIB ${SDKROOT}/quicktime/QT73SDK/Libraries/QTMLClient.lib)
     endif()
+    set(MYPAINT_LIB_INCLUDE_DIRS ${SDKROOT}/libmypaint/dist/${PLATFORM}/include/libmypaint)
+    set(MYPAINT_LIB_LDFLAGS ${SDKROOT}/libmypaint/dist/${PLATFORM}/libmypaint.lib)
 elseif(BUILD_ENV_APPLE)
     find_library(GLUT_LIB GLUT)
     find_library(GL_LIB OpenGL)
@@ -376,6 +379,7 @@ elseif(BUILD_ENV_APPLE)
     find_package(LZO REQUIRED)
     message("LZO:" ${LZO_INCLUDE_DIR})
 
+    pkg_check_modules(MYPAINT_LIB REQUIRED libmypaint)
 elseif(BUILD_ENV_UNIXLIKE)
     if(BUILD_TARGET_WIN)
         if(PLATFORM EQUAL 32)
@@ -438,6 +442,7 @@ elseif(BUILD_ENV_UNIXLIKE)
         pkg_check_modules(FREETYPE REQUIRED freetype2)
         pkg_check_modules(SDL_LIB REQUIRED sdl2)
     endif()
+    pkg_check_modules(MYPAINT_LIB REQUIRED libmypaint)
 endif()
 
 
@@ -501,6 +506,7 @@ include_directories(
     ${USB_LIB_INCLUDE_DIRS}
     ${SUPERLU_INCLUDE_DIR}
     ${JPEG_INCLUDE_DIR}
+    ${MYPAINT_LIB_INCLUDE_DIRS}
 )
 
 if(BUILD_TARGET_WIN AND PLATFORM EQUAL 64)
@@ -534,7 +540,7 @@ if(BUILD_ENV_MSVC AND MSVC_VERSION EQUAL 1800)
 endif()
 
 # generate Qt translations and messages
-set(LANGUAGES japanese italian french spanish chinese german)
+set(LANGUAGES japanese italian french spanish chinese german russian)
 
 function(add_translation module)
     set(translation)
