@@ -3522,7 +3522,7 @@ Do you want to create it?</source>
         <translation>添加为清稿任务</translation>
     </message>
     <message>
-        <source>Select All Keys in this Row</source>
+        <source>Select All Keys in this Frame</source>
         <translation>选择此行的全部关键帧</translation>
     </message>
     <message>
@@ -3550,11 +3550,11 @@ Do you want to create it?</source>
         <translation>选择此列后面的关键帧</translation>
     </message>
     <message>
-        <source>Select Previous Keys in this Row</source>
+        <source>Select Previous Keys in this Frame</source>
         <translation>选择此行前面的关键帧</translation>
     </message>
     <message>
-        <source>Select Following Keys in this Row</source>
+        <source>Select Following Keys in this Frame</source>
         <translation>选择此行后面的关键帧</translation>
     </message>
     <message>

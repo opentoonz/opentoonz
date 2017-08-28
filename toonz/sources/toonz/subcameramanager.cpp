@@ -119,7 +119,7 @@ bool PreviewSubCameraManager::mousePressEvent(SceneViewer *viewer,
   if (viewer->is3DView()) return true;
 
   m_mousePressed  = true;
-  m_mousePressPos = event.mousePos() * viewer->getDevPixRatio();
+  m_mousePressPos = event.mousePos() * getDevPixRatio();
   m_dragType      = getSubCameraDragEnum(viewer, m_mousePressPos);
 
   if (bitwiseExclude(m_dragType, OUTER))
@@ -133,7 +133,7 @@ bool PreviewSubCameraManager::mousePressEvent(SceneViewer *viewer,
 bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer,
                                              const TMouseEvent &event) {
   if (viewer->is3DView()) return true;
-  QPoint curPos(event.mousePos() * viewer->getDevPixRatio());
+  QPoint curPos(event.mousePos() * getDevPixRatio());
   if (event.buttons() == Qt::LeftButton) {
     if (!bitwiseContains(m_dragType, INNER)) {
       if (abs(curPos.x() - m_mousePressPos.x()) > 10 ||

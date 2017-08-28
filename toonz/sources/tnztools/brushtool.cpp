@@ -1572,7 +1572,7 @@ bool BrushTool::keyDown(int key, TUINT32 b, const TPoint &point) {
   if (key == TwConsts::TK_Esc) {
     resetFrameRange();
   }
-  return true;
+  return false;
 }
 
 //--------------------------------------------------------------------------------------------------

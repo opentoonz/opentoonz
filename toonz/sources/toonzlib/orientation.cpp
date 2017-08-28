@@ -290,7 +290,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::FRAME_LABEL,
           QRect(CELL_WIDTH / 2, 1, CELL_WIDTH / 2, CELL_HEIGHT - 2));
   addRect(PredefinedRect::FRAME_HEADER,
-          QRect(0, 0, FRAME_HEADER_WIDTH - 1, CELL_HEIGHT));
+          QRect(0, 0, FRAME_HEADER_WIDTH, CELL_HEIGHT));
   addRect(PredefinedRect::PLAY_RANGE,
           QRect(PLAY_RANGE_X, 0, PLAY_MARKER_SIZE, CELL_HEIGHT));
   addRect(PredefinedRect::ONION,
@@ -586,7 +586,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::FRAME_LABEL,
           QRect(CELL_WIDTH / 4, 1, CELL_WIDTH / 2, FRAME_HEADER_HEIGHT - 2));
   addRect(PredefinedRect::FRAME_HEADER,
-          QRect(0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT - 1));
+          QRect(0, 0, CELL_WIDTH, FRAME_HEADER_HEIGHT));
   addRect(PredefinedRect::PLAY_RANGE,
           QRect(0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
   addRect(PredefinedRect::ONION,

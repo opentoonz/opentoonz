@@ -89,7 +89,7 @@ FX_PLUGIN_IDENTIFIER(ino_hls_adjust, "inohlsAdjustFx");
 //------------------------------------------------------------
 #include "igs_hls_adjust.h"
 namespace {
-void fx_(TRasterP in_ras, const TRasterP refer_ras, const int ref_mode,
+void fx_(TRasterP in_ras, const TRasterP refer_ras, const int refer_mode,
          const double hue_pivot, const double hue_scale, const double hue_shift,
          const double lig_pivot, const double lig_scale, const double lig_shift,
          const double sat_pivot, const double sat_scale, const double sat_shift,
@@ -115,11 +115,12 @@ void fx_(TRasterP in_ras, const TRasterP refer_ras, const int ref_mode,
       ino::channels(), ino::bits(in_ras)
 
                            ,
-      (((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData()
-                                             : 0)  // BGRA
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                     : nullptr)  // BGRA
       ,
-      (((0 <= ref_mode) && (0 != refer_ras)) ? ino::bits(refer_ras) : 0),
-      ref_mode
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
+                                                     : 0),
+      refer_mode
 
       ,
       hue_pivot, hue_scale, hue_shift, lig_pivot, lig_scale, lig_shift,
@@ -167,18 +168,18 @@ void ino_hls_adjust::doCompute(TTile &tile, double frame,
   const double sat_shift =
       this->m_sat_shift->getValue(frame) / ino::param_range();
   const bool anti_alias_sw = this->m_anti_alias->getValue();
-  const int ref_mode       = this->m_ref_mode->getValue();
+  const int refer_mode     = this->m_ref_mode->getValue();
 
   /* ------ 画像生成 ---------------------------------------- */
   this->m_input->compute(tile, frame, rend_sets);
 
   /*------ 参照画像生成 --------------------------------------*/
-  TTile reference_tile;
-  bool reference_sw = false;
+  TTile refer_tile;
+  bool refer_sw = false;
   if (this->m_refer.isConnected()) {
-    reference_sw = true;
+    refer_sw = true;
     this->m_refer->allocateAndCompute(
-        reference_tile, tile.m_pos,
+        refer_tile, tile.m_pos,
         TDimensionI(/* Pixel単位 */
                     tile.getRaster()->getLx(), tile.getRaster()->getLy()),
         tile.getRaster(), frame, rend_sets);
@@ -194,28 +195,37 @@ void ino_hls_adjust::doCompute(TTile &tile, double frame,
        << hue_shift << "  l_pvt " << lig_pivot << "  l_scl " << lig_scale
        << "  l_sft " << lig_shift << "  s_pvt " << sat_pivot << "  s_scl "
        << sat_scale << "  s_sft " << sat_shift << "  anti_alias "
-       << anti_alias_sw << "  reference " << ref_mode << "   tile w "
+       << anti_alias_sw << "  reference " << refer_mode << "   tile w "
        << tile.getRaster()->getLx() << "  h " << tile.getRaster()->getLy()
        << "  pixbits " << ino::pixel_bits(tile.getRaster()) << "   frame "
        << frame;
-    if (reference_sw) {
-      os << "  reference_tile.m_pos " << reference_tile.m_pos
-         << "  reference_tile_getLx " << reference_tile.getRaster()->getLx()
-         << "  y " << reference_tile.getRaster()->getLy();
+    if (refer_sw) {
+      os << "  refer_tile.m_pos " << refer_tile.m_pos << "  refer_tile_getLx "
+         << refer_tile.getRaster()->getLx() << "  y "
+         << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
-    fx_(tile.getRaster(), (reference_sw ? reference_tile.getRaster() : nullptr),
-        ref_mode, hue_pivot, hue_scale, hue_shift, lig_pivot, lig_scale,
-        lig_shift, sat_pivot, sat_scale, sat_shift,
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
+    fx_(tile.getRaster(), refer_tile.getRaster(), refer_mode, hue_pivot,
+        hue_scale, hue_shift, lig_pivot, lig_scale, lig_shift, sat_pivot,
+        sat_scale, sat_shift,
         anti_alias_sw  // --> add_blend_sw, default is true
         );
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -224,6 +234,9 @@ void ino_hls_adjust::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -232,6 +245,9 @@ void ino_hls_adjust::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");

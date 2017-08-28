@@ -844,7 +844,8 @@ void PreferencesPopup::onDefLevelTypeChanged(int index) {
   if (0 <= index && index < m_defLevelType->count()) {
     int levelType = m_defLevelType->itemData(index).toInt();
     m_pref->setDefLevelType(levelType);
-    bool isRaster = levelType != PLI_XSHLEVEL;
+    bool isRaster =
+        levelType != PLI_XSHLEVEL && !m_newLevelToCameraSizeCB->isChecked();
     m_defLevelWidth->setEnabled(isRaster);
     m_defLevelHeight->setEnabled(isRaster);
     if (!m_pixelsOnlyCB->isChecked()) m_defLevelDpi->setEnabled(isRaster);
@@ -1012,6 +1013,13 @@ void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
   // emit signal to update Palette and Viewer
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
       "NumpadForSwitchingStyles");
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onNewLevelToCameraSizeChanged(bool checked) {
+  m_pref->enableNewLevelSizeToCameraSize(checked);
+  onDefLevelTypeChanged(m_defLevelType->currentIndex());
 }
 
 //-----------------------------------------------------------------------------
@@ -1223,6 +1231,9 @@ PreferencesPopup::PreferencesPopup()
   m_autocreationType       = new QComboBox(this);
   m_dpiLabel               = new QLabel(tr("DPI:"), this);
   m_vectorSnappingTargetCB = new QComboBox(this);
+  m_newLevelToCameraSizeCB =
+      new CheckBox(tr("New Levels Default to the Current Camera Size"), this);
+
   CheckBox *keepOriginalCleanedUpCB =
       new CheckBox(tr("Keep Original Cleaned Up Drawings As Backup"), this);
   CheckBox *multiLayerStylePickerCB = new CheckBox(
@@ -1476,6 +1487,8 @@ PreferencesPopup::PreferencesPopup()
       m_pref->getKeepFillOnVectorSimplify());
   m_useHigherDpiOnVectorSimplifyCB->setChecked(
       m_pref->getUseHigherDpiOnVectorSimplify());
+  m_newLevelToCameraSizeCB->setChecked(
+      m_pref->isNewLevelSizeToCameraSizeEnabled());
   QStringList scanLevelTypes;
   scanLevelTypes << "tif"
                  << "png";
@@ -1939,21 +1952,21 @@ PreferencesPopup::PreferencesPopup()
         drawingTopLay->addWidget(new QLabel(tr("Default Level Type:")), 1, 0,
                                  Qt::AlignRight);
         drawingTopLay->addWidget(m_defLevelType, 1, 1, 1, 3);
-
-        drawingTopLay->addWidget(new QLabel(tr("Width:")), 2, 0,
+        drawingTopLay->addWidget(m_newLevelToCameraSizeCB, 2, 0, 1, 3);
+        drawingTopLay->addWidget(new QLabel(tr("Width:")), 3, 0,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_defLevelWidth, 2, 1);
-        drawingTopLay->addWidget(new QLabel(tr("  Height:")), 2, 2,
+        drawingTopLay->addWidget(m_defLevelWidth, 3, 1);
+        drawingTopLay->addWidget(new QLabel(tr("  Height:")), 3, 2,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_defLevelHeight, 2, 3);
-        drawingTopLay->addWidget(m_dpiLabel, 3, 0, Qt::AlignRight);
-        drawingTopLay->addWidget(m_defLevelDpi, 3, 1);
-        drawingTopLay->addWidget(new QLabel(tr("Autocreation:")), 4, 0,
+        drawingTopLay->addWidget(m_defLevelHeight, 3, 3);
+        drawingTopLay->addWidget(m_dpiLabel, 4, 0, Qt::AlignRight);
+        drawingTopLay->addWidget(m_defLevelDpi, 4, 1);
+        drawingTopLay->addWidget(new QLabel(tr("Autocreation:")), 5, 0,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_autocreationType, 4, 1, 1, 3);
-        drawingTopLay->addWidget(new QLabel(tr("Vector Snapping:")), 5, 0,
+        drawingTopLay->addWidget(m_autocreationType, 5, 1, 1, 3);
+        drawingTopLay->addWidget(new QLabel(tr("Vector Snapping:")), 6, 0,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_vectorSnappingTargetCB, 5, 1, 1, 3);
+        drawingTopLay->addWidget(m_vectorSnappingTargetCB, 6, 1, 1, 3);
       }
       drawingFrameLay->addLayout(drawingTopLay, 0);
 
@@ -2358,6 +2371,8 @@ PreferencesPopup::PreferencesPopup()
   ret = ret &&
         connect(m_useHigherDpiOnVectorSimplifyCB, SIGNAL(stateChanged(int)),
                 SLOT(onUseHigherDpiOnVectorSimplifyChanged(int)));
+  ret = ret && connect(m_newLevelToCameraSizeCB, SIGNAL(clicked(bool)),
+                       SLOT(onNewLevelToCameraSizeChanged(bool)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),

@@ -100,7 +100,7 @@ void fx_(const TRasterP in_ras  // with margin
          const int margin, TRasterP out_ras  // no margin
 
          ,
-         const TRasterP refer_ras, const int ref_mode
+         const TRasterP refer_ras, const int refer_mode
 
          ,
          const int min_sw, const double radius, const double smoothing_edge,
@@ -123,12 +123,13 @@ void fx_(const TRasterP in_ras  // with margin
       in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(in_ras)
 
                                                              ,
-      (((0 <= ref_mode) && refer_ras) ? refer_ras->getRawData() : 0)  // BGRA
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                     : nullptr)  // BGRA
       ,
-      (((0 <= ref_mode) && refer_ras) ? ino::bits(refer_ras) : 0), ref_mode
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras) : 0)
 
-      ,
-      radius, smoothing_edge  // smooth_outer_range
+          ,
+      refer_mode, radius, smoothing_edge  // smooth_outer_range
       ,
       npolygon, degree + 180.0
 
@@ -168,7 +169,7 @@ void ino_maxmin::doCompute(TTile &tile, double frame,
   const double degree = this->m_degree->getValue(frame);
   const bool alp_rend_sw = this->m_alpha_rendering->getValue();
 
-  const int ref_mode = this->m_ref_mode->getValue();
+  const int refer_mode = this->m_ref_mode->getValue();
 
   /* 	tcomposer(RenderManager)でRenderingするときはthreadは1つ、
           toonz(Desktop)でPreview,Outputするなら-1を指定
@@ -220,12 +221,12 @@ void ino_maxmin::doCompute(TTile &tile, double frame,
       tile.getRaster(), frame, rend_sets);
 
   /*------ 参照画像生成 --------------------------------------*/
-  TTile ref_tile;
-  bool ref_sw = false;
+  TTile refer_tile;
+  bool refer_sw = false;
   if (this->m_refer.isConnected()) {
-    ref_sw = true;
+    refer_sw = true;
     this->m_refer->allocateAndCompute(
-        ref_tile, enlarge_tile.m_pos,
+        refer_tile, enlarge_tile.m_pos,
         TDimensionI(/* Pixel単位 */
                     enlarge_tile.getRaster()->getLx(),
                     enlarge_tile.getRaster()->getLy()),
@@ -243,21 +244,24 @@ void ino_maxmin::doCompute(TTile &tile, double frame,
        << "  min_sw " << min_sw << "  radius " << radius << "  npolygon "
        << npolygon << "  degree " << degree << "  alp_rend_sw " << alp_rend_sw
        << "  smoothing_edge " << smoothing_edge_ << "  nthread " << nthread
-       << "  ref_mode " << ref_mode << "   tile w " << tile.getRaster()->getLx()
-       << "  h " << tile.getRaster()->getLy() << "  pixbits "
-       << ino::pixel_bits(tile.getRaster()) << "   frame " << frame
-       << "   rand_sets affine_det " << rend_sets.m_affine.det()
+       << "  refer_mode " << refer_mode << "   tile w "
+       << tile.getRaster()->getLx() << "  h " << tile.getRaster()->getLy()
+       << "  pixbits " << ino::pixel_bits(tile.getRaster()) << "   frame "
+       << frame << "   rand_sets affine_det " << rend_sets.m_affine.det()
        << "  shrink x " << rend_sets.m_shrinkX << "  y " << rend_sets.m_shrinkY;
-    if (ref_sw) {
-      os << "  ref_tile.m_pos " << ref_tile.m_pos << "  ref_tile_getLx "
-         << ref_tile.getRaster()->getLx() << "  y "
-         << ref_tile.getRaster()->getLy();
+    if (refer_sw) {
+      os << "  refer_tile.m_pos " << refer_tile.m_pos << "  refer_tile_getLx "
+         << refer_tile.getRaster()->getLx() << "  y "
+         << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
-    const TRasterP refer_ras = (ref_sw ? ref_tile.getRaster() : nullptr);
+    enlarge_tile.getRaster()->lock();
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
     fx_(enlarge_tile.getRaster()  // in with margin
         ,
         enlarge_pixel  // margin
@@ -265,17 +269,25 @@ void ino_maxmin::doCompute(TTile &tile, double frame,
         tile.getRaster()  // out with no margin
 
         ,
-        refer_ras, ref_mode
+        refer_tile.getRaster(), refer_mode
 
         ,
         min_sw, radius, smoothing_edge_, npolygon, degree, alp_rend_sw
 
         ,
         nthread);
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -284,6 +296,10 @@ void ino_maxmin::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -292,6 +308,10 @@ void ino_maxmin::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");

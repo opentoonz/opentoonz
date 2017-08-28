@@ -74,8 +74,8 @@ private:
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
-      *m_ignoreImageDpiCB, *m_useHigherDpiOnVectorSimplifyCB,
-      *m_keepFillOnVectorSimplifyCB;
+      *m_useHigherDpiOnVectorSimplifyCB, *m_keepFillOnVectorSimplifyCB,
+      *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -150,6 +150,7 @@ private slots:
   void onRegionAntialiasChanged(int);
   void onImportPolicyChanged(int);
   void onImportPolicyExternallyChanged(int policy);
+  void onNewLevelToCameraSizeChanged(bool checked);
   void onVectorSnappingTargetChanged(int index);
 
 #ifdef LINETEST
