@@ -1080,6 +1080,7 @@ void toggleEditInPlace() {
       !scene->getChildStack()->getEditInPlace());
   /*- Notify the change in order to update the viewer -*/
   app->instance()->getCurrentXsheet()->notifyXsheetChanged();
+  app->instance()->getCurrentXsheet()->notifyEditInPlaceChanged();
 }
 
 //=============================================================================

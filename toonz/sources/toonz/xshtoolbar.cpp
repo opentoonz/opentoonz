@@ -12,6 +12,8 @@
 // TnzLib includes
 #include "toonz/preferences.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/toonzscene.h"
+#include "toonz/childstack.h"
 
 // Qt includes
 #include <QPushButton>
@@ -57,6 +59,15 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
   m_newRasterLevelButton->setObjectName("XSheetToolbarLevelButton");
   m_newRasterLevelButton->setToolTip(tr("New Raster Level"));
 
+  m_editInPlaceButton = new QPushButton(this);
+  m_editInPlaceButton->setIconSize(QSize(18, 18));
+  QIcon editInPlaceIcon = QIcon(":Resources/edit_in_place.svg");
+  m_editInPlaceButton->setIcon(editInPlaceIcon);
+  m_editInPlaceButton->setObjectName("XSheetToolbarLevelButton");
+  m_editInPlaceButton->setToolTip(tr("Toggle Edit In Place"));
+  m_editInPlaceButton->setCheckable(true);
+  m_editInPlaceButton->setChecked(false);
+
   TApp *app        = TApp::instance();
   m_keyFrameButton = new ViewerKeyframeNavigator(this, app->getCurrentFrame());
   m_keyFrameButton->setObjectHandle(app->getCurrentObject());
@@ -99,6 +110,7 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
       QAction *leave = CommandManager::instance()->getAction("MI_CloseChild");
       m_toolbar->addAction(leave);
 
+      m_toolbar->addWidget(m_editInPlaceButton);
       m_toolbar->addSeparator();
       m_toolbar->addWidget(m_keyFrameButton);
       toolbarLayout->addWidget(m_toolbar);
@@ -121,6 +133,10 @@ Toolbar::Toolbar(XsheetViewer *parent, Qt::WFlags flags)
                        SLOT(onNewToonzRasterLevelButtonPressed()));
   ret = ret && connect(m_newRasterLevelButton, SIGNAL(released()), this,
                        SLOT(onNewRasterLevelButtonPressed()));
+  ret = ret && connect(m_editInPlaceButton, SIGNAL(released()), this,
+                       SLOT(onEditInPlaceButtonPressed()));
+  ret = ret && connect(app->getCurrentXsheet(), SIGNAL(editInPlaceChanged()),
+                       this, SLOT(updateEditInPlaceStatus()));
   assert(ret);
 
   // m_leaveSubButton->hide();
@@ -152,6 +168,27 @@ void Toolbar::onNewRasterLevelButtonPressed() {
   Preferences::instance()->setDefLevelType(OVL_XSHLEVEL);
   CommandManager::instance()->execute("MI_NewLevel");
   Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+
+void Toolbar::onEditInPlaceButtonPressed() {
+  m_editInPlaceButton->setChecked(false);
+  CommandManager::instance()->execute("MI_ToggleEditInPlace");
+  // Don't update the icon status here.
+  // The signal from the xsheet will trigger updateEditInPlaceStatus
+}
+//-----------------------------------------------------------------------------
+
+void Toolbar::updateEditInPlaceStatus() {
+  TApp *app         = TApp::instance();
+  ToonzScene *scene = app->getCurrentScene()->getScene();
+  int ancestorCount = scene->getChildStack()->getAncestorCount();
+  if (ancestorCount == 0) {
+    m_editInPlaceButton->setChecked(false);
+    return;
+  }
+  m_editInPlaceButton->setChecked(scene->getChildStack()->getEditInPlace());
 }
 
 //-----------------------------------------------------------------------------

@@ -1763,7 +1763,12 @@ void MainWindow::defineActions() {
   collapseAction->setIconText("Collapse");
   collapseAction->setIcon(createQIconOnOffPNG("collapse"));
 
-  createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
+  QAction *editInPlaceAction = createMenuXsheetAction(
+      MI_ToggleEditInPlace, tr("Toggle Edit In Place"), "");
+  editInPlaceAction->setIconText(tr("Toggle Edit in Place"));
+  editInPlaceAction->setIcon(QIcon(":Resources/edit_in_place.svg"));
+  editInPlaceAction->setEnabled(true);
+
   createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
   createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
   createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
