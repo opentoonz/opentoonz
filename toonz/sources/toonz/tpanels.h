@@ -210,13 +210,13 @@ public:
   ToolOptionPanel(QWidget *parent);
 };
 
-class XSheetToolbarPanel final : public TPanel {
+class CommandBarPanel final : public TPanel {
   Q_OBJECT
 
   // ToolOptions *m_toolOption;
 
 public:
-  XSheetToolbarPanel(QWidget *parent);
+  CommandBarPanel(QWidget *parent);
 };
 
 //=========================================================

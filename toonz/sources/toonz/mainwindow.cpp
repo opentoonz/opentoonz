@@ -446,6 +446,12 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
   setCommandHandler(MI_MaximizePanel, this, &MainWindow::maximizePanel);
   setCommandHandler(MI_FullScreenWindow, this, &MainWindow::fullScreenWindow);
+  setCommandHandler("MI_NewVectorLevel", this,
+                    &MainWindow::onNewVectorLevelButtonPressed);
+  setCommandHandler("MI_NewToonzRasterLevel", this,
+                    &MainWindow::onNewToonzRasterLevelButtonPressed);
+  setCommandHandler("MI_NewRasterLevel", this,
+                    &MainWindow::onNewRasterLevelButtonPressed);
   // remove ffmpegCache if still exists from crashed exit
   QString ffmpegCachePath =
       ToonzFolder::getCacheRootFolder().getQString() + "//ffmpeg";
@@ -2263,6 +2269,33 @@ void MainWindow::togglePickStyleAreas() {
 void MainWindow::togglePickStyleLines() {
   CommandManager::instance()->getAction(T_StylePicker)->trigger();
   CommandManager::instance()->getAction("A_ToolOption_Mode:Lines")->trigger();
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onNewVectorLevelButtonPressed() {
+  int defaultLevelType = Preferences::instance()->getDefLevelType();
+  Preferences::instance()->setDefLevelType(PLI_XSHLEVEL);
+  CommandManager::instance()->execute("MI_NewLevel");
+  Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onNewToonzRasterLevelButtonPressed() {
+  int defaultLevelType = Preferences::instance()->getDefLevelType();
+  Preferences::instance()->setDefLevelType(TZP_XSHLEVEL);
+  CommandManager::instance()->execute("MI_NewLevel");
+  Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onNewRasterLevelButtonPressed() {
+  int defaultLevelType = Preferences::instance()->getDefLevelType();
+  Preferences::instance()->setDefLevelType(OVL_XSHLEVEL);
+  CommandManager::instance()->execute("MI_NewLevel");
+  Preferences::instance()->setDefLevelType(defaultLevelType);
 }
 
 //-----------------------------------------------------------------------------

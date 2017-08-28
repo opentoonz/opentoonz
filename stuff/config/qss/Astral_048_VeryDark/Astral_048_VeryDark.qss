@@ -1489,7 +1489,7 @@ FxSettings QToolBar QToolBar {
    Tool Options
 ----------------------------------------------------------------------------- */
 #ToolOptions TPanelTitleBar,
-#XSheetToolBar TPanelTitleBar {
+#CommandBar TPanelTitleBar {
   background-color: #303030;
   background-image: url('../Astral_072_Dark/imgs/white/title_grip_vertical.svg');
   background-repeat: no-repeat;
@@ -1551,6 +1551,15 @@ PopupButton::menu-indicator:disabled {
 }
 #XSheetToolbar #XSheetToolbarLevelButton {
   padding: 2;
+}
+#CommandBar {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+#CommandBar::separator:horizontal {
+  margin-right: 3;
+  margin-left: 3;
 }
 QToolBar#MediumPaddingToolBar QToolButton {
   padding-left: 3;
