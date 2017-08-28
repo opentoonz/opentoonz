@@ -30,6 +30,7 @@ public:
   TSoundTrackFormat m_currentFormat;
   std::set<int> m_supportedRate;
   bool m_opened;
+  double m_volume = 0.5;
 
   QAudioOutput *m_audioOutput;
   QBuffer *m_buffer;
@@ -49,6 +50,7 @@ public:
   bool doStopDevice();
   void play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop,
             bool scrubbing);
+  void prepareVolume(double volume);
 };
 
 //-----------------------------------------------------------------------------
@@ -166,6 +168,18 @@ bool TSoundOutputDevice::close() {
 
 //------------------------------------------------------------------------------
 
+void TSoundOutputDeviceImp::prepareVolume(double volume) {
+    m_volume = volume;
+}
+
+//------------------------------------------------------------------------------
+
+void TSoundOutputDevice::prepareVolume(double volume) {
+    m_imp->prepareVolume(volume);
+}
+
+//------------------------------------------------------------------------------
+
 void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1,
                               bool loop, bool scrubbing) {
   int lastSample = st->getSampleCount() - 1;
@@ -246,6 +260,7 @@ void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1,
     m_audioOutput = new QAudioOutput(format, NULL);
   }
   m_audioOutput->start(newBuffer);
+  m_audioOutput->setVolume(m_volume);
 }
 
 //------------------------------------------------------------------------------
@@ -280,14 +295,15 @@ void TSoundOutputDevice::detach(TSoundOutputDeviceListener *listener) {
 //------------------------------------------------------------------------------
 
 double TSoundOutputDevice::getVolume() {
-  if (!m_imp->m_opened) m_imp->doOpenDevice();
-
+  if (m_imp->m_audioOutput != NULL)
   return m_imp->m_audioOutput->volume();
+  else return m_imp->m_volume;
 }
 
 //------------------------------------------------------------------------------
 
 bool TSoundOutputDevice::setVolume(double volume) {
+  m_imp->m_volume = volume;
   m_imp->m_audioOutput->setVolume(volume);
   return true;
 }

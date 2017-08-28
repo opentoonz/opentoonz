@@ -809,7 +809,7 @@ void TXshSoundColumn::play(TSoundTrackP soundtrack, int s0, int s1, bool loop) {
   if (m_player) {
     try {
 #ifdef MACOSX
-      m_player->setVolume(m_volume);
+      m_player->prepareVolume(m_volume);
       TSoundTrackP mixedTrack = soundtrack;
 #else
       TSoundTrackP mixedTrack = TSoundTrack::create(
