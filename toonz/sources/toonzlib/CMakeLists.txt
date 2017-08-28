@@ -372,9 +372,5 @@ elseif(BUILD_ENV_UNIXLIKE)
         set(EXTRA_LIBS ${EXTRA_LIBS} -lvfw32)
     endif()
 
-<<<<<<< HEAD
-    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script Qt5::Multimedia ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
-=======
-    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS} ${MYPAINT_LIB_LDFLAGS})
->>>>>>> master
+    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script Qt5::Multimedia ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS} ${MYPAINT_LIB_LDFLAGS})
 endif()
