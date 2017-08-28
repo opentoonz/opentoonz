@@ -110,12 +110,6 @@ int getInputPortIndex(TFxPort *port, TFx *fx) {
   }
   return -1;
 }
-
-int getDevPixRatio() {
-  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
-  return devPixRatio;
-}
-
 }  // namespace
 
 //*****************************************************
@@ -1402,9 +1396,9 @@ void FxSchematicPort::paint(QPainter *painter,
     case eFxGroupedInPort: {
       QRect sourceRect =
           scene()->views()[0]->matrix().mapRect(boundingRect()).toRect();
-      QPixmap redPm =
-          QIcon(":Resources/fxport_red.svg").pixmap(sourceRect.size());
-      sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+      static QIcon fxPortRedIcon(":Resources/fxport_red.svg");
+      QPixmap redPm = fxPortRedIcon.pixmap(sourceRect.size());
+      sourceRect    = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
                          sourceRect.height() * getDevPixRatio());
       painter->drawPixmap(boundingRect(), redPm, sourceRect);
     } break;
@@ -1413,9 +1407,9 @@ void FxSchematicPort::paint(QPainter *painter,
     case eFxGroupedOutPort: {
       QRect sourceRect =
           scene()->views()[0]->matrix().mapRect(boundingRect()).toRect();
-      QPixmap bluePm =
-          QIcon(":Resources/fxport_blue.svg").pixmap(sourceRect.size());
-      sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+      static QIcon fxPortBlueIcon(":Resources/fxport_blue.svg");
+      QPixmap bluePm = fxPortBlueIcon.pixmap(sourceRect.size());
+      sourceRect     = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
                          sourceRect.height() * getDevPixRatio());
       painter->drawPixmap(boundingRect(), bluePm, sourceRect);
       FxSchematicDock *parentDock =

@@ -458,7 +458,7 @@ class PlainColorPage final : public StyleEditorPage {
   void updateControls();
   QPushButton *m_wheelShowButton;
   QPushButton *m_hsvShowButton;
-  QPushButton *m_matteShowButton;
+  QPushButton *m_alphaShowButton;
   QPushButton *m_rgbShowButton;
   QPushButton *m_toggleOrientationButton;
   // QGridLayout *m_mainLayout;

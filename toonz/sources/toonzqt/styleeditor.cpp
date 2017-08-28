@@ -1233,9 +1233,11 @@ ColorChannelControl::ColorChannelControl(ColorChannel channel, QWidget *parent)
     : QWidget(parent), m_channel(channel), m_value(0), m_signalEnabled(true) {
   setFocusPolicy(Qt::NoFocus);
 
-  static const char *names[] = {"R", "G", "B", "M", "H", "S", "V"};
+  QStringList channelList;
+  channelList << tr("R") << tr("G") << tr("B") << tr("A") << tr("H") << tr("S")
+              << tr("V");
   assert(0 <= (int)m_channel && (int)m_channel < 7);
-  QString text = names[(int)m_channel];
+  QString text = channelList.at(m_channel);
   m_label      = new QLabel(text, this);
 
   int minValue = 0;
@@ -1505,14 +1507,14 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 
   m_wheelShowButton         = new QPushButton(tr("Wheel"), this);
   m_hsvShowButton           = new QPushButton(tr("HSV"), this);
-  m_matteShowButton         = new QPushButton(tr("Matte"), this);
+  m_alphaShowButton         = new QPushButton(tr("Alpha"), this);
   m_rgbShowButton           = new QPushButton(tr("RGB"), this);
   m_toggleOrientationButton = new QPushButton(tr("↔"), this);
   m_toggleOrientationButton->setFixedWidth(20);
 
   m_wheelFrame       = new QFrame(this);
   QFrame *hsvFrame   = new QFrame(this);
-  QFrame *matteFrame = new QFrame(this);
+  QFrame *alphaFrame = new QFrame(this);
   QFrame *rgbFrame   = new QFrame(this);
 
   m_slidersContainer = new QFrame(this);
@@ -1522,24 +1524,24 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   // channelButtonGroup->setExclusive(true);
   m_wheelShowButton->setCheckable(true);
   m_hsvShowButton->setCheckable(true);
-  m_matteShowButton->setCheckable(true);
+  m_alphaShowButton->setCheckable(true);
   m_rgbShowButton->setCheckable(true);
   m_wheelShowButton->setMinimumWidth(30);
   m_hsvShowButton->setMinimumWidth(30);
-  m_matteShowButton->setMinimumWidth(30);
+  m_alphaShowButton->setMinimumWidth(30);
   m_rgbShowButton->setMinimumWidth(30);
 
   m_wheelFrame->setObjectName("PlainColorPageParts");
   hsvFrame->setObjectName("PlainColorPageParts");
-  matteFrame->setObjectName("PlainColorPageParts");
+  alphaFrame->setObjectName("PlainColorPageParts");
   rgbFrame->setObjectName("PlainColorPageParts");
 
   m_wheelShowButton->setChecked(true);
   m_wheelShowButton->setFocusPolicy(Qt::NoFocus);
   m_hsvShowButton->setChecked(true);
   m_hsvShowButton->setFocusPolicy(Qt::NoFocus);
-  m_matteShowButton->setChecked(true);
-  m_matteShowButton->setFocusPolicy(Qt::NoFocus);
+  m_alphaShowButton->setChecked(true);
+  m_alphaShowButton->setFocusPolicy(Qt::NoFocus);
   m_rgbShowButton->setChecked(true);
   m_rgbShowButton->setFocusPolicy(Qt::NoFocus);
   m_toggleOrientationButton->setFocusPolicy(Qt::NoFocus);
@@ -1562,7 +1564,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
     {
       showButtonLayout->addWidget(m_wheelShowButton, 1);
       showButtonLayout->addWidget(m_hsvShowButton, 1);
-      showButtonLayout->addWidget(m_matteShowButton, 1);
+      showButtonLayout->addWidget(m_alphaShowButton, 1);
       showButtonLayout->addWidget(m_rgbShowButton, 1);
       showButtonLayout->addWidget(m_toggleOrientationButton, 1);
     }
@@ -1590,12 +1592,12 @@ PlainColorPage::PlainColorPage(QWidget *parent)
       hsvFrame->setLayout(hsvLayout);
       slidersLayout->addWidget(hsvFrame, 3);
 
-      QVBoxLayout *matteLayout = new QVBoxLayout();
-      matteLayout->setMargin(4);
-      matteLayout->setSpacing(4);
-      { matteLayout->addWidget(m_channelControls[eAlpha]); }
-      matteFrame->setLayout(matteLayout);
-      slidersLayout->addWidget(matteFrame, 1);
+      QVBoxLayout *alphaLayout = new QVBoxLayout();
+      alphaLayout->setMargin(4);
+      alphaLayout->setSpacing(4);
+      { alphaLayout->addWidget(m_channelControls[eAlpha]); }
+      alphaFrame->setLayout(alphaLayout);
+      slidersLayout->addWidget(alphaFrame, 1);
 
       QVBoxLayout *rgbLayout = new QVBoxLayout();
       rgbLayout->setMargin(4);
@@ -1639,7 +1641,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
           SLOT(setVisible(bool)));
   connect(m_hsvShowButton, SIGNAL(toggled(bool)), hsvFrame,
           SLOT(setVisible(bool)));
-  connect(m_matteShowButton, SIGNAL(toggled(bool)), matteFrame,
+  connect(m_alphaShowButton, SIGNAL(toggled(bool)), alphaFrame,
           SLOT(setVisible(bool)));
   connect(m_rgbShowButton, SIGNAL(toggled(bool)), rgbFrame,
           SLOT(setVisible(bool)));
@@ -1708,9 +1710,9 @@ void PlainColorPage::setVisibleParts(int settings) {
   else
     m_hsvShowButton->setChecked(false);
   if (m_visibleParts & 0x04)
-    m_matteShowButton->setChecked(true);
+    m_alphaShowButton->setChecked(true);
   else
-    m_matteShowButton->setChecked(false);
+	  m_alphaShowButton->setChecked(false);
   if (m_visibleParts & 0x08)
     m_rgbShowButton->setChecked(true);
   else
@@ -1723,7 +1725,7 @@ int PlainColorPage::getVisibleParts() {
   int visibleParts = 0;
   if (m_wheelShowButton->isChecked()) visibleParts |= 0x01;
   if (m_hsvShowButton->isChecked()) visibleParts |= 0x02;
-  if (m_matteShowButton->isChecked()) visibleParts |= 0x04;
+  if (m_alphaShowButton->isChecked()) visibleParts |= 0x04;
   if (m_rgbShowButton->isChecked()) visibleParts |= 0x08;
   return visibleParts;
 }
@@ -2775,7 +2777,7 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
       if (m_editedStyle->hasParamDefault(p)) {
         QPushButton *pushButton = new QPushButton;
         pushButton->setToolTip(tr("Reset to default"));
-        pushButton->setIcon(createQIconPNG("delete"));
+        pushButton->setIcon(createQIcon("delete"));
         m_paramsLayout->addWidget(pushButton, p, 2);
         ret = QObject::connect(pushButton, SIGNAL(clicked(bool)), this,
                                SLOT(onValueReset())) &&

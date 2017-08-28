@@ -57,7 +57,8 @@ QImage DVAPI rasterToQImage(const TRasterP &ras, bool premultiplied = true,
 
 //-----------------------------------------------------------------------------
 
-QPixmap DVAPI rasterToQPixmap(const TRaster32P &ras, bool premultiplied = true);
+QPixmap DVAPI rasterToQPixmap(const TRaster32P &ras, bool premultiplied = true,
+                              bool setDevPixRatio = false);
 
 //-----------------------------------------------------------------------------
 
@@ -86,6 +87,19 @@ void DVAPI drawArrow(QPainter &p, const QPointF a, const QPointF b,
 
 QPixmap DVAPI scalePixmapKeepingAspectRatio(QPixmap p, QSize size,
                                             QColor color = Qt::white);
+
+//-----------------------------------------------------------------------------
+
+QPixmap DVAPI
+svgToPixmap(const QString &svgFilePath, const QSize &size = QSize(),
+            Qt::AspectRatioMode aspectRatioMode = Qt::IgnoreAspectRatio,
+            QColor bgColor                      = Qt::transparent);
+
+//-----------------------------------------------------------------------------
+// returns device-pixel ratio. It is 1 for normal monitors and 2 (or higher
+// ratio) for high DPI monitors. Setting "Display > Set custom text size(DPI)"
+// for Windows corresponds to this ratio.
+int DVAPI getDevPixRatio();
 
 //-----------------------------------------------------------------------------
 QIcon DVAPI createQIcon(const char *iconSVGName);

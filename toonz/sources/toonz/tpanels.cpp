@@ -453,8 +453,9 @@ void PaletteViewerPanel::reset() {
 
 void PaletteViewerPanel::initializeTitleBar() {
   m_isCurrentButton = new TPanelTitleBarButton(
-      getTitleBar(), ":Resources/switch.png", ":Resources/switch_over.png",
-      ":Resources/switch_on.png");
+      getTitleBar(), svgToPixmap(":Resources/switch.svg"),
+      svgToPixmap(":Resources/switch_over.svg"),
+      svgToPixmap(":Resources/switch_on.svg"));
   getTitleBar()->add(QPoint(-54, 2), m_isCurrentButton);
   m_isCurrentButton->setPressed(true);
   connect(m_isCurrentButton, SIGNAL(toggled(bool)),
