@@ -324,6 +324,11 @@ public:
     return m_useNumpadForSwitchingStyles;
   }
 
+  void enableNewLevelSizeToCameraSize(bool on);
+  bool isNewLevelSizeToCameraSizeEnabled() const {
+    return m_newLevelSizeToCameraSizeEnabled;
+  }
+
   void setVectorSnappingTarget(int target);
   int getVectorSnappingTarget() { return m_vectorSnappingTarget; }
 
@@ -561,6 +566,10 @@ private:
                                              // change encoding.
   // whether to use numpad and tab key shortcut for selecting styles
   bool m_useNumpadForSwitchingStyles;
+
+  // whether to set the new level size to be the same as the camera size by
+  // default
+  bool m_newLevelSizeToCameraSizeEnabled;
 
   // use arrow key to shift cel selection, ctrl + arrow key to resize the
   // selection range.

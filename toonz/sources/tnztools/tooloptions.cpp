@@ -2237,7 +2237,6 @@ StylePickerToolOptionsBox::StylePickerToolOptionsBox(
 
   m_layout->addWidget(m_currentStyleLabel, 0);
   m_layout->addStretch(1);
-
   // retrieve the "organize palette" checkbox from the layout and insert
   // into rightmost of the tool option bar
   ToolOptionCheckbox *organizePaletteCB =

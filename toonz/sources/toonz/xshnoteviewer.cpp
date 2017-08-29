@@ -554,6 +554,11 @@ void NoteArea::createLayout() {
 
   setFixedSize(rect.size());
 
+  if (o->isVerticalTimeline())
+    m_noteButton->setFixedSize(44, 26);
+  else
+    m_noteButton->setFixedSize(44, 22);
+
   // has two elements: main layout and header panel
   QVBoxLayout *panelLayout = new QVBoxLayout();
   panelLayout->setMargin(1);

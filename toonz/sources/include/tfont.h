@@ -53,13 +53,15 @@ public:
   // brief  get kerning distance between two characters
   TPoint getDistance(wchar_t firstChar, wchar_t secondChar) const;
 
-  int getMaxHeight() const;
   int getMaxWidth() const;
   // void disableKerning();
   // void enableKerning();
   bool hasKerning() const;
   int getLineAscender() const;
   int getLineDescender() const;
+  int getLineSpacing() const;
+  int getHeight() const;
+  int getAverageCharWidth() const;
   bool hasVertical() const;
   std::wstring getFamily() const;
   std::wstring getTypeface() const;
@@ -144,11 +146,13 @@ public:
     return getCurrentFont()->getDistance(firstChar, secondChar);
   }
 
-  int getMaxHeight() { return getCurrentFont()->getMaxHeight(); }
   int getMaxWidth() { return getCurrentFont()->getMaxWidth(); }
   bool hasKerning() { return getCurrentFont()->hasKerning(); }
   int getLineAscender() { return getCurrentFont()->getLineAscender(); }
   int getLineDescender() { return getCurrentFont()->getLineDescender(); }
+  int getLineSpacing() { return getCurrentFont()->getLineSpacing(); }
+  int getHeight() { return getCurrentFont()->getHeight(); }
+  int getAverageCharWidth() { return getCurrentFont()->getAverageCharWidth(); }
   bool hasVertical() { return getCurrentFont()->hasVertical(); }
 };
 

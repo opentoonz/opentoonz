@@ -1233,9 +1233,11 @@ ColorChannelControl::ColorChannelControl(ColorChannel channel, QWidget *parent)
     : QWidget(parent), m_channel(channel), m_value(0), m_signalEnabled(true) {
   setFocusPolicy(Qt::NoFocus);
 
-  static const char *names[] = {"R", "G", "B", "M", "H", "S", "V"};
+  QStringList channelList;
+  channelList << tr("R") << tr("G") << tr("B") << tr("A") << tr("H") << tr("S")
+              << tr("V");
   assert(0 <= (int)m_channel && (int)m_channel < 7);
-  QString text = names[(int)m_channel];
+  QString text = channelList.at(m_channel);
   m_label      = new QLabel(text, this);
 
   int minValue = 0;
@@ -1505,12 +1507,12 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 
   QPushButton *wheelShowButton = new QPushButton(tr("Wheel"), this);
   QPushButton *hsvShowButton   = new QPushButton(tr("HSV"), this);
-  QPushButton *matteShowButton = new QPushButton(tr("Matte"), this);
+  QPushButton *alphaShowButton = new QPushButton(tr("Alpha"), this);
   QPushButton *rgbShowButton   = new QPushButton(tr("RGB"), this);
 
   QFrame *wheelFrame = new QFrame(this);
   QFrame *hsvFrame   = new QFrame(this);
-  QFrame *matteFrame = new QFrame(this);
+  QFrame *alphaFrame = new QFrame(this);
   QFrame *rgbFrame   = new QFrame(this);
 
   QFrame *slidersContainer = new QFrame(this);
@@ -1520,24 +1522,24 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   // channelButtonGroup->setExclusive(true);
   wheelShowButton->setCheckable(true);
   hsvShowButton->setCheckable(true);
-  matteShowButton->setCheckable(true);
+  alphaShowButton->setCheckable(true);
   rgbShowButton->setCheckable(true);
   wheelShowButton->setMinimumWidth(30);
   hsvShowButton->setMinimumWidth(30);
-  matteShowButton->setMinimumWidth(30);
+  alphaShowButton->setMinimumWidth(30);
   rgbShowButton->setMinimumWidth(30);
 
   wheelFrame->setObjectName("PlainColorPageParts");
   hsvFrame->setObjectName("PlainColorPageParts");
-  matteFrame->setObjectName("PlainColorPageParts");
+  alphaFrame->setObjectName("PlainColorPageParts");
   rgbFrame->setObjectName("PlainColorPageParts");
 
   wheelShowButton->setChecked(true);
   wheelShowButton->setFocusPolicy(Qt::NoFocus);
   hsvShowButton->setChecked(true);
   hsvShowButton->setFocusPolicy(Qt::NoFocus);
-  matteShowButton->setChecked(true);
-  matteShowButton->setFocusPolicy(Qt::NoFocus);
+  alphaShowButton->setChecked(true);
+  alphaShowButton->setFocusPolicy(Qt::NoFocus);
   rgbShowButton->setChecked(true);
   rgbShowButton->setFocusPolicy(Qt::NoFocus);
 
@@ -1559,7 +1561,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
     {
       showButtonLayout->addWidget(wheelShowButton, 1);
       showButtonLayout->addWidget(hsvShowButton, 1);
-      showButtonLayout->addWidget(matteShowButton, 1);
+      showButtonLayout->addWidget(alphaShowButton, 1);
       showButtonLayout->addWidget(rgbShowButton, 1);
     }
     mainLayout->addLayout(showButtonLayout);
@@ -1586,12 +1588,12 @@ PlainColorPage::PlainColorPage(QWidget *parent)
       hsvFrame->setLayout(hsvLayout);
       slidersLayout->addWidget(hsvFrame, 3);
 
-      QVBoxLayout *matteLayout = new QVBoxLayout();
-      matteLayout->setMargin(4);
-      matteLayout->setSpacing(4);
-      { matteLayout->addWidget(m_channelControls[eAlpha]); }
-      matteFrame->setLayout(matteLayout);
-      slidersLayout->addWidget(matteFrame, 1);
+      QVBoxLayout *alphaLayout = new QVBoxLayout();
+      alphaLayout->setMargin(4);
+      alphaLayout->setSpacing(4);
+      { alphaLayout->addWidget(m_channelControls[eAlpha]); }
+      alphaFrame->setLayout(alphaLayout);
+      slidersLayout->addWidget(alphaFrame, 1);
 
       QVBoxLayout *rgbLayout = new QVBoxLayout();
       rgbLayout->setMargin(4);
@@ -1634,7 +1636,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
           SLOT(setVisible(bool)));
   connect(hsvShowButton, SIGNAL(toggled(bool)), hsvFrame,
           SLOT(setVisible(bool)));
-  connect(matteShowButton, SIGNAL(toggled(bool)), matteFrame,
+  connect(alphaShowButton, SIGNAL(toggled(bool)), alphaFrame,
           SLOT(setVisible(bool)));
   connect(rgbShowButton, SIGNAL(toggled(bool)), rgbFrame,
           SLOT(setVisible(bool)));

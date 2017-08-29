@@ -226,6 +226,7 @@
     <command>MI_OpenTasks</command>
     <command>MI_OpenTMessage</command>
     <command>MI_OpenToolbar</command>
+    <command>MI_OpenCommandToolbar</command>
     <command>MI_OpenToolOptionBar</command>
     <command>MI_OpenLevelView</command>
     <command>MI_OpenComboViewer</command>

@@ -1,9 +1,8 @@
 
 
-#include "xshtoolbar.h"
+#include "commandbar.h"
 
 // Tnz6 includes
-#include "xsheetviewer.h"
 #include "tapp.h"
 #include "menubarcommandids.h"
 // TnzQt includes
@@ -15,27 +14,22 @@
 #include "toonzqt/menubarcommand.h"
 
 // Qt includes
-#include <QPushButton>
 #include <QWidgetAction>
 
-//=============================================================================
-
-namespace XsheetGUI {
 
 //=============================================================================
 // Toolbar
 //-----------------------------------------------------------------------------
 
 #if QT_VERSION >= 0x050500
-XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WindowFlags flags,
+CommandBar::CommandBar(QWidget *parent, Qt::WindowFlags flags,
                              bool isCollapsible)
 #else
-XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WFlags flags)
+CommandBar::CommandBar(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-    : QToolBar(parent), m_viewer(parent), m_isCollapsible(isCollapsible) {
+    : QToolBar(parent), m_isCollapsible(isCollapsible) {
   setObjectName("cornerWidget");
-  setFixedHeight(30);
-  setObjectName("XSheetToolbar");
+  setObjectName("CommandBar");
 
   TApp *app        = TApp::instance();
   m_keyFrameButton = new ViewerKeyframeNavigator(this, app->getCurrentFrame());
@@ -80,47 +74,11 @@ XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WFlags flags)
 
     addSeparator();
     addAction(keyFrameAction);
-
-    if (!Preferences::instance()->isShowXSheetToolbarEnabled() &&
-        m_isCollapsible) {
-      hide();
-    }
   }
 }
 
-//-----------------------------------------------------------------------------
 
-void XSheetToolbar::showToolbar(bool show) {
-  if (!m_isCollapsible) return;
-  show ? this->show() : this->hide();
-}
 
-//-----------------------------------------------------------------------------
 
-void XSheetToolbar::toggleXSheetToolbar() {
-  bool toolbarEnabled = Preferences::instance()->isShowXSheetToolbarEnabled();
-  Preferences::instance()->enableShowXSheetToolbar(!toolbarEnabled);
-  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XSheetToolbar");
-}
 
-//-----------------------------------------------------------------------------
 
-void XSheetToolbar::showEvent(QShowEvent *e) {
-  if (Preferences::instance()->isShowXSheetToolbarEnabled() || !m_isCollapsible)
-    show();
-  else
-    hide();
-  emit updateVisibility();
-}
-
-//============================================================
-
-class ToggleXSheetToolbarCommand final : public MenuItemHandler {
-public:
-  ToggleXSheetToolbarCommand() : MenuItemHandler(MI_ToggleXSheetToolbar) {}
-  void execute() override { XSheetToolbar::toggleXSheetToolbar(); }
-} ToggleXSheetToolbarCommand;
-
-//============================================================
-
-}  // namespace XsheetGUI;

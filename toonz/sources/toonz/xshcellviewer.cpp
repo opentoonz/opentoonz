@@ -730,21 +730,33 @@ void RenameCellField::focusOutEvent(QFocusEvent *e) {
 // Override shortcut keys for cell selection commands
 
 bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
-  if (e->type() != QEvent::ShortcutOverride) return false;
+  // We really shouldn't allow OT defined shortcuts to be checked and used while
+  // renaming a cell
+  // but if we must, we should only return true or false if we're executing our
+  // OT action;
+  // otherwise pass event forward in case another object is interested in it.
+  if (e->type() != QEvent::ShortcutOverride)
+    return QObject::eventFilter(obj, e);  // return false;
 
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
-  if (!cellSelection) return false;
+  if (!cellSelection) return QObject::eventFilter(obj, e);  // return false;
 
   QKeyEvent *ke = (QKeyEvent *)e;
   std::string keyStr =
       QKeySequence(ke->key() + ke->modifiers()).toString().toStdString();
   QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
-  if (!action) return false;
+  if (!action) return QObject::eventFilter(obj, e);  // return false;
 
   std::string actionId = CommandManager::instance()->getIdFromAction(action);
 
-  if (actionId == "MI_Undo" || actionId == "MI_Redo") return true;
+  // These are usally standard ctrl/command strokes for text editing.
+  // Default to standard behavior and don't execute OT's action while renaming
+  // cell.
+  if (actionId == "MI_Undo" || actionId == "MI_Redo" ||
+      actionId == "MI_Clear" || actionId == "MI_Copy" ||
+      actionId == "MI_Paste" || actionId == "MI_Cut")
+    return QObject::eventFilter(obj, e);  // return true;
   return TCellSelection::isEnabledCommand(actionId);
 }
 
@@ -1394,6 +1406,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 
   // if the same level & same fId with the previous cell,
   // draw continue line
+  QString fnum;
   if (sameLevel && prevCell.m_frameId == cell.m_frameId) {
     // not on line marker
     PredefinedLine which =
@@ -1411,17 +1424,17 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     // convert the last one digit of the frame number to alphabet
     // Ex.  12 -> 1B    21 -> 2A   30 -> 3
     if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
-      p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom,
-                 m_viewer->getFrameNumberWithLetters(fid.getNumber()));
+      fnum = m_viewer->getFrameNumberWithLetters(fid.getNumber());
     else {
       std::string frameNumber("");
       // set number
       if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
       // add letter
       if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
-      p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom,
-                 QString::fromStdString(frameNumber));
+      fnum = QString::fromStdString(frameNumber);
     }
+
+    p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom, fnum);
   }
 
   // draw level name
@@ -1430,11 +1443,14 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
        Preferences::instance()->isLevelNameOnEachMarkerEnabled())) {
     std::wstring levelName = cell.m_level->getName();
     QString text           = QString::fromStdWString(levelName);
-#if QT_VERSION >= 0x050500
     QFontMetrics fm(font);
-    QString elidaName = elideText(text, fm, nameRect.width(), QString("~"));
+#if QT_VERSION >= 0x050500
+    //    QFontMetrics fm(font);
+    QString elidaName =
+        elideText(text, fm, nameRect.width() - fm.width(fnum), QString("~"));
 #else
-    QString elidaName = elideText(text, font, nameRect.width());
+    QString elidaName =
+        elideText(text, font, nameRect.width() - fm.width(fnum));
 #endif
     p.drawText(nameRect, Qt::AlignLeft | Qt::AlignBottom, elidaName);
   }

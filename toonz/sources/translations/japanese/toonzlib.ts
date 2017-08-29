@@ -7,6 +7,14 @@
         <source>Retas Level Format</source>
         <translation>RETAS レベル形式</translation>
     </message>
+    <message>
+        <source>Adobe Photoshop</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>PNG</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -339,6 +347,10 @@
     <message>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
         <translation>パレット%1　サンプル位置を用いて色を更新</translation>
+    </message>
+    <message>
+        <source>Can&apos;t save</source>
+        <translation>保存できません ：</translation>
     </message>
 </context>
 <context>

@@ -33,7 +33,9 @@ public:
 //-------------------------------------------------------------------
 
 // NameCreator genera la sequenza 'A', 'B', ...
-class DVAPI NameCreator final : public NameBuilder {
+// inherited by FlexibleNameCreator
+class DVAPI NameCreator : public NameBuilder {
+protected:
   std::vector<int> m_s;
 
 public:

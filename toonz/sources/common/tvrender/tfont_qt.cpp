@@ -70,7 +70,7 @@ TFont::Impl::~Impl() {}
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-
+// returns the offset (advance of the cursor) for the current character
 TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode,
                        wchar_t nextCharCode) const {
   QRawFont raw(QRawFont::fromFont(m_pimpl->m_font));
@@ -223,31 +223,8 @@ TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &unused, int inkId,
 //-----------------------------------------------------------------------------
 
 TPoint TFont::getDistance(wchar_t firstChar, wchar_t secondChar) const {
-  QRawFont raw(QRawFont::fromFont(m_pimpl->m_font));
-  QChar chars[2] = {firstChar, secondChar};
-  quint32 indices[2];
-  QPointF advances[2];
-  int count = 2;
-
-  if (!raw.glyphIndexesForChars(chars, 2, indices, &count) || count != 2) {
-    return TPoint(0, 0);
-  }
-
-  if (!raw.advancesForGlyphIndexes(indices, advances, 2,
-                                   QRawFont::KernedAdvances)) {
-    return TPoint(0, 0);
-  }
-
-  int advance = (int)(advances[0].x());
-
-  return TPoint(advance, 0);
-}
-
-//-----------------------------------------------------------------------------
-
-int TFont::getMaxHeight() const {
   QFontMetrics metrics(m_pimpl->m_font);
-  return metrics.ascent() - metrics.descent();
+  return TPoint(metrics.width(QChar(firstChar)), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -268,6 +245,27 @@ int TFont::getLineAscender() const {
 int TFont::getLineDescender() const {
   QFontMetrics metrics(m_pimpl->m_font);
   return metrics.descent();
+}
+
+//-----------------------------------------------------------------------------
+
+int TFont::getLineSpacing() const {
+  QFontMetrics metrics(m_pimpl->m_font);
+  return metrics.lineSpacing();
+}
+
+//-----------------------------------------------------------------------------
+
+int TFont::getHeight() const {
+  QFontMetrics metrics(m_pimpl->m_font);
+  return metrics.height();
+}
+
+//-----------------------------------------------------------------------------
+
+int TFont::getAverageCharWidth() const {
+  QFontMetrics metrics(m_pimpl->m_font);
+  return metrics.averageCharWidth();
 }
 
 //-----------------------------------------------------------------------------
