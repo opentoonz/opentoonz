@@ -76,6 +76,8 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_touchActive   = false;
   bool m_rotating      = false;
   bool m_zooming       = false;
+  bool m_panning       = false;
+  QPointF m_firstPanPoint;
   double m_scaleFactor;    // used for zoom gesture
   double m_rotationDelta;  // used for rotate gesture
   int m_referenceMode;

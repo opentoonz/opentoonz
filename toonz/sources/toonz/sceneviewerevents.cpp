@@ -632,6 +632,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
     m_gestureActive = false;
     m_rotating      = false;
     m_zooming       = false;
+    m_panning       = false;
     m_scaleFactor   = 0.0;
     m_rotationDelta = 0.0;
     return;
@@ -881,16 +882,27 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
 void SceneViewer::touchEvent(QTouchEvent *e, int type) {
   if (type == QEvent::TouchBegin) {
     m_touchActive = true;
+    if (e->touchPoints().count() == 1) {
+      m_firstPanPoint = e->touchPoints().at(0).pos();
+    }
   }
   if (e->touchPoints().count() == 1 && m_touchActive) {
     QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
-
-    QPointF centerDelta = (panPoint.pos() * getDevPixRatio()) -
-                          (panPoint.lastPos() * getDevPixRatio());
-    panQt(centerDelta.toPoint());
+    if (!m_panning) {
+      QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+      if (deltaPoint.manhattanLength() > 100) {
+        m_panning = true;
+      }
+    }
+    if (m_panning) {
+      QPointF centerDelta = (panPoint.pos() * getDevPixRatio()) -
+                            (panPoint.lastPos() * getDevPixRatio());
+      panQt(centerDelta.toPoint());
+    }
   }
   if (type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
     m_touchActive = false;
+    m_panning     = false;
   }
   e->accept();
 }
