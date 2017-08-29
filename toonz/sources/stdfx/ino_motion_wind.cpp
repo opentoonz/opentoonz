@@ -173,7 +173,7 @@ void fx_(const TRasterP in_ras  // with margin
          ,
          const TRasterP refer_ras  // with margin
          ,
-         const int ref_mode, const int margin, TRasterP out_ras  // no margin
+         const int refer_mode, const int margin, TRasterP out_ras  // no margin
 
          ,
          const int direction, const bool dark_sw, const bool alpha_rendering_sw
@@ -204,7 +204,7 @@ void fx_(const TRasterP in_ras  // with margin
   in_gr8->lock();
   ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
-  if (0 != refer_ras) {
+  if (refer_ras != nullptr) {
     TRasterGR8P refer_gr8(refer_ras->getLy(),
                           refer_ras->getLx() * ino::channels() *
                               ((TRaster64P)refer_ras ? sizeof(unsigned short)
@@ -228,18 +228,14 @@ void fx_(const TRasterP in_ras  // with margin
         ino::bits(refer_ras)
 
             ,
-        ref_mode
+        refer_mode
 
         ,
         direction, dark_sw, alpha_rendering_sw
 
         ,
-        length_seed, length_min, length_max, length_bias, length_ref_sw
-
-        ,
-        force_seed, force_min, force_max, force_bias, force_ref_sw
-
-        ,
+        length_seed, length_min, length_max, length_bias, length_ref_sw,
+        force_seed, force_min, force_max, force_bias, force_ref_sw,
         density_seed, density_min, density_max, density_bias, density_ref_sw);
     /***ino::vec_to_ras( refer_vec, 0, 0 );
 ino::vec_to_ras( in_vec, ino::channels(), out_ras, margin );***/
@@ -340,7 +336,7 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
       this->m_density_bias->getValue(frame) / ino::param_range();
   const unsigned long density_seed = this->m_density_seed->getValue(frame);
   const bool density_ref_sw        = this->m_density_ref->getValue();
-  const int ref_mode               = this->m_ref_mode->getValue();
+  const int refer_mode             = this->m_ref_mode->getValue();
 
   /* ------ 参照マージン含めた画像生成 ---------------------- */
   /* Rendering画像のBBox値 --> Pixel単位のdouble値 */
@@ -392,8 +388,8 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
 
   /* ------ 参照画像生成 ------------------------------------ */
   TTile refer_tile;
-  const bool refer_cn_is = this->m_refer.isConnected();
-  if (refer_cn_is) {
+  const bool refer_sw = this->m_refer.isConnected();
+  if (refer_sw) {
     this->m_refer->allocateAndCompute(
         refer_tile
         // tile.m_pos,
@@ -425,12 +421,12 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
 
        << "  den_min " << density_min << "  den_max " << density_max
        << "  den_bias " << density_bias << "  den_seed " << density_seed
-       << "  den_ref_sw " << density_ref_sw << "  reference " << ref_mode
+       << "  den_ref_sw " << density_ref_sw << "  reference " << refer_mode
 
        << "   tile w " << tile.getRaster()->getLx() << "  h "
        << tile.getRaster()->getLy() << "  pixbits "
        << ino::pixel_bits(tile.getRaster());
-    if (refer_cn_is) {
+    if (refer_sw) {
       os << "   rtile w " << refer_tile.getRaster()->getLx() << "  h "
          << refer_tile.getRaster()->getLy();
     }
@@ -441,14 +437,15 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
-    if (refer_cn_is) {
+    enlarge_tile.getRaster()->lock();
+    if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->lock();
     }
     fx_(enlarge_tile.getRaster()  // in with margin
         ,
-        (refer_cn_is ? refer_tile.getRaster() : nullptr)  // with margin
+        refer_tile.getRaster()  // with margin
         ,
-        ref_mode, enlarge_pixel  // margin
+        refer_mode, enlarge_pixel  // margin
         ,
         tile.getRaster()  // out with no margin
 
@@ -456,23 +453,21 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
         direction, dark_sw, alp_rend_sw
 
         ,
-        length_min, length_max, length_bias, length_seed, length_ref_sw
-
-        ,
-        force_min, force_max, force_bias, force_seed, force_ref_sw
-
-        ,
-        density_min, density_max, density_bias, density_seed, density_ref_sw);
-    if (refer_cn_is) {
+        length_min, length_max, length_bias, length_seed, length_ref_sw,
+        force_min, force_max, force_bias, force_seed, force_ref_sw, density_min,
+        density_max, density_bias, density_seed, density_ref_sw);
+    if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->unlock();
     }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    if (refer_cn_is) {
+    if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->unlock();
     }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -481,9 +476,10 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    if (refer_cn_is) {
+    if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->unlock();
     }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -492,9 +488,10 @@ void ino_motion_wind::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    if (refer_cn_is) {
+    if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->unlock();
     }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");

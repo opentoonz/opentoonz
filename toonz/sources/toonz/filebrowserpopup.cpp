@@ -2072,7 +2072,8 @@ BrowserPopupController::BrowserPopupController() : m_browserPopup() {
 
 void BrowserPopupController::openPopup(QStringList filters,
                                        bool isDirectoryOnly,
-                                       QString lastSelectedPath) {
+                                       QString lastSelectedPath,
+                                       const QWidget *parentWidget) {
   if (!m_browserPopup) m_browserPopup = new BrowserPopup();
   m_browserPopup->setWindowTitle(QString(""));
 
@@ -2083,6 +2084,19 @@ void BrowserPopupController::openPopup(QStringList filters,
                                      : QString(QObject::tr("File Browser")));
   m_browserPopup->initFolder(TFilePath(lastSelectedPath.toStdWString()));
   m_browserPopup->setFileMode(isDirectoryOnly);
+
+  if (parentWidget) {
+    QWidget *pwidget = NULL;
+    foreach (pwidget, QApplication::topLevelWidgets()) {
+      if (pwidget->isWindow() && pwidget->isVisible() &&
+          pwidget->isAncestorOf(parentWidget)) {
+        Qt::WindowFlags flags = m_browserPopup->windowFlags();
+        m_browserPopup->setParent(pwidget);
+        m_browserPopup->setWindowFlags(flags);
+        break;
+      }
+    }
+  }
 
   if (isDirectoryOnly)
     m_browserPopup->setFilename(TFilePath(lastSelectedPath.toStdWString()));

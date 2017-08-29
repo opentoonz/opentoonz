@@ -165,17 +165,17 @@ InsertFxPopup::InsertFxPopup()
   m_fxTree->setObjectName("FxTreeView");
   m_fxTree->setAlternatingRowColors(true);
 
-  QString open  = QString(":Resources/folder_close.png");
-  QString close = QString(":Resources/folder_open.png");
+  QString open  = QString(":Resources/folder_close.svg");
+  QString close = QString(":Resources/folder_open.svg");
   m_folderIcon.addFile(close, QSize(22, 22), QIcon::Normal, QIcon::On);
   m_folderIcon.addFile(open, QSize(22, 22), QIcon::Normal, QIcon::Off);
 
-  QString presetOpen  = QString(":Resources/folderpreset_close.png");
-  QString presetClose = QString(":Resources/folderpreset_open.png");
+  QString presetOpen  = QString(":Resources/folderpreset_close.svg");
+  QString presetClose = QString(":Resources/folderpreset_open.svg");
   m_presetIcon.addFile(presetClose, QSize(22, 22), QIcon::Normal, QIcon::On);
   m_presetIcon.addFile(presetOpen, QSize(22, 22), QIcon::Normal, QIcon::Off);
 
-  m_fxIcon = QIcon(QString(":Resources/fx.png"));
+  m_fxIcon = QIcon(QString(":Resources/fx.svg"));
 
   QList<QTreeWidgetItem *> fxItems;
 

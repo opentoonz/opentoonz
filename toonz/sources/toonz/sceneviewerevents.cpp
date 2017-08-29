@@ -371,9 +371,10 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
 void SceneViewer::onMove(const TMouseEvent &event) {
   if (m_freezedStatus != NO_FREEZED) return;
 
-  QPoint curPos  = event.mousePos() * getDevPixRatio();
-  bool cursorSet = false;
-  m_lastMousePos = curPos;
+  int devPixRatio = getDevPixRatio();
+  QPoint curPos   = event.mousePos() * devPixRatio;
+  bool cursorSet  = false;
+  m_lastMousePos  = curPos;
 
   if (m_editPreviewSubCamera) {
     if (!PreviewSubCameraManager::instance()->mouseMoveEvent(this, event))
@@ -416,12 +417,12 @@ void SceneViewer::onMove(const TMouseEvent &event) {
       return;
     else if (is3DView() && m_mouseButton == Qt::NoButton) {
       TRectD rect = TRectD(TPointD(m_topRasterPos.x, m_topRasterPos.y),
-                           TDimensionD(20, 20));
+                           TDimensionD(20 * devPixRatio, 20 * devPixRatio));
       if (rect.contains(TPointD(curPos.x(), curPos.y())))
         m_current3DDevice = TOP_3D;
       else {
         rect = TRectD(TPointD(m_sideRasterPos.x, m_sideRasterPos.y),
-                      TDimensionD(20, 20));
+                      TDimensionD(20 * devPixRatio, 20 * devPixRatio));
         if (rect.contains(TPointD(curPos.x(), curPos.y()))) {
           if (m_phi3D > 0)
             m_current3DDevice = SIDE_RIGHT_3D;

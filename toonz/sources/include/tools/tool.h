@@ -638,6 +638,10 @@ public:
   virtual double projectToZ(const TPoint &delta) = 0;
 
   virtual TPointD getDpiScale() const = 0;
+  virtual int getVGuideCount()        = 0;
+  virtual int getHGuideCount()        = 0;
+  virtual double getHGuide(int index) = 0;
+  virtual double getVGuide(int index) = 0;
 
   virtual void
   resetInputMethod() = 0;  // Intended to call QWidget->resetInputContext()

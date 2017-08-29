@@ -517,6 +517,12 @@ void RowArea::paintEvent(QPaintEvent *event) {
     drawPinnedCenterKeys(p, r0, r1);
 
   drawPlayRange(p, r0, r1);
+  p.setPen(m_viewer->getVerticalLineColor());
+  p.setBrush(Qt::NoBrush);
+  if (m_viewer->orientation()->isVerticalTimeline())
+    p.drawRect(toBeUpdated.adjusted(0, -1, -1, 0));
+  else
+    p.drawRect(toBeUpdated.adjusted(-1, 0, 0, -1));
 }
 
 //-----------------------------------------------------------------------------

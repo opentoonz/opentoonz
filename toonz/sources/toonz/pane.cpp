@@ -144,6 +144,23 @@ TPanelTitleBarButton::TPanelTitleBarButton(QWidget *parent,
 
 //-----------------------------------------------------------------------------
 
+TPanelTitleBarButton::TPanelTitleBarButton(QWidget *parent,
+                                           const QPixmap &standardPixmap,
+                                           const QPixmap &rolloverPixmap,
+                                           const QPixmap &pressedPixmap)
+    : QWidget(parent)
+    , m_standardPixmap(standardPixmap)
+    , m_rolloverPixmap(rolloverPixmap)
+    , m_pressedPixmap(pressedPixmap)
+    , m_rollover(false)
+    , m_pressed(false)
+    , m_buttonSet(0)
+    , m_id(0) {
+  setFixedSize(m_standardPixmap.size() / m_standardPixmap.devicePixelRatio());
+}
+
+//-----------------------------------------------------------------------------
+
 void TPanelTitleBarButton::setButtonSet(TPanelTitleBarButtonSet *buttonSet,
                                         int id) {
   m_buttonSet = buttonSet;
@@ -355,16 +372,17 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
   }
 
   if (dw->isFloating()) {
-    const static QPixmap closeButtonPixmap(":/Resources/close_pane.png");
+    const static QPixmap closeButtonPixmap(
+        svgToPixmap(":/Resources/close_pane.svg", QSize(16, 16)));
     const static QPixmap closeButtonPixmapOver(
-        ":/Resources/close_pane_rollover.png");
+        svgToPixmap(":/Resources/close_pane_rollover.svg", QSize(16, 16)));
 
-    QRect closeRect(rect.right() - 17, rect.top() + 1, 16, 16);
+    QPoint closeButtonPos(rect.right() - 17, rect.top() + 1);
 
     if (m_closeButtonHighlighted)
-      painter.drawPixmap(closeRect, closeButtonPixmapOver);
+      painter.drawPixmap(closeButtonPos, closeButtonPixmapOver);
     else
-      painter.drawPixmap(closeRect, closeButtonPixmap);
+      painter.drawPixmap(closeButtonPos, closeButtonPixmap);
   }
 
   painter.end();

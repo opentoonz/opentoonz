@@ -440,32 +440,46 @@ QIcon SVNTimeline::createIcon(const QString &fileName) {
       filePixmap = rasterToQPixmap(
           IconGenerator::generateVectorFileIcon(path, iconSize, 1));
     else if (type == "tpl")
-      filePixmap = QPixmap(":Resources/paletteicon.png");
+      filePixmap = QPixmap(":Resources/paletteicon.svg");
     else if (type == "tzp")
       filePixmap = QPixmap(":Resources/tzpicon.png");
     else if (type == "tzu")
       filePixmap = QPixmap(":Resources/tzuicon.png");
     else if (TFileType::getInfo(path) == TFileType::AUDIO_LEVEL)
-      filePixmap = QPixmap(":Resources/audio.png");
+      filePixmap = QPixmap(svgToPixmap(":Resources/audio.svg",
+                                       QSize(iconSize.lx, iconSize.ly),
+                                       Qt::KeepAspectRatio));
     else if (type == "scr")
       filePixmap = QPixmap(":Resources/savescreen.png");
     else if (type == "psd")
-      filePixmap = QPixmap(":Resources/psd.png");
+      filePixmap = QPixmap(svgToPixmap(":Resources/psd.svg",
+                                       QSize(iconSize.lx, iconSize.ly),
+                                       Qt::KeepAspectRatio));
     else if (TFileType::isViewable(TFileType::getInfo(path)) || type == "tlv")
       filePixmap = rasterToQPixmap(
           IconGenerator::generateRasterFileIcon(path, iconSize, 1));
     else if (type == "mpath")
-      filePixmap = QPixmap(":Resources/motionpath.png");
+      filePixmap = QPixmap(svgToPixmap(":Resources/motionpath_fileicon.svg",
+                                       QSize(iconSize.lx, iconSize.ly),
+                                       Qt::KeepAspectRatio));
     else if (type == "curve")
-      filePixmap = QPixmap(":Resources/curve.png");
+      filePixmap = QPixmap(svgToPixmap(":Resources/curve.svg",
+                                       QSize(iconSize.lx, iconSize.ly),
+                                       Qt::KeepAspectRatio));
     else if (type == "cln")
-      filePixmap = QPixmap(":Resources/cleanup.png");
+      filePixmap = QPixmap(svgToPixmap(":Resources/cleanup.svg",
+                                       QSize(iconSize.lx, iconSize.ly),
+                                       Qt::KeepAspectRatio));
     else if (type == "tnzbat")
-      filePixmap = QPixmap(":Resources/tasklist.png");
+      filePixmap = QPixmap(svgToPixmap(":Resources/tasklist.svg",
+                                       QSize(iconSize.lx, iconSize.ly),
+                                       Qt::KeepAspectRatio));
     else if (type == "js")
       filePixmap = QPixmap(":Resources/scripticon.png");
     else
-      filePixmap = QPixmap(":Resources/unknown.png");
+      filePixmap = QPixmap(svgToPixmap(":Resources/unknown.svg",
+                                       QSize(iconSize.lx, iconSize.ly),
+                                       Qt::KeepAspectRatio));
   }
 
   if (filePixmap.isNull()) return QIcon();
