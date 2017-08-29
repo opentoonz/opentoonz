@@ -33,11 +33,14 @@ class BluredBrush;
 
 struct BrushData final : public TPersist {
   PERSIST_DECLARATION(BrushData)
-
+  // frameRange, snapSensitivity and snap are not included
+  // for some reason, including them causes presets to break
+  // It's probably for the best since those options are 
+  // not really a part of the brush settings, just the overall tool.
   std::wstring m_name;
   double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
-  bool m_selective, m_pencil, m_breakAngles, m_pressure, m_snap;
-  int m_cap, m_join, m_miter, m_frameRange, m_snapSensitivity;
+  bool m_selective, m_pencil, m_breakAngles, m_pressure; // , m_snap;
+  int m_cap, m_join, m_miter; // , m_frameRange, m_snapSensitivity;
   double m_modifierSize, m_modifierOpacity;
 
   BrushData();
