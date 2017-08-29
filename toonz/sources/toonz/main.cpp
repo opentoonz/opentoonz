@@ -161,7 +161,6 @@ DV_IMPORT_API void initColorFx();
 static void initToonzEnv() {
   StudioPalette::enable(true);
 
-  TEnv::setWorkingDirectory();
   TEnv::setApplication(applicationName, applicationVersion,
                        applicationRevision);
   TEnv::setRootVarName(rootVarName);

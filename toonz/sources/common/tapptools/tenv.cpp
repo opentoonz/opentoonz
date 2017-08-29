@@ -49,7 +49,9 @@ class EnvGlobals {  // singleton
   TFilePath *m_dllRelativeDir;
   bool m_isPortable = false;
 
-  EnvGlobals() : m_stuffDir(0) {}
+  EnvGlobals() : m_stuffDir(0) {
+    setWorkingDirectory();
+  }
 
 public:
   ~EnvGlobals() { delete m_stuffDir; }
@@ -527,10 +529,6 @@ TFilePath TEnv::getStuffDir() {
   //#else
   return EnvGlobals::instance()->getStuffDir();
   //#endif
-}
-
-void TEnv::setWorkingDirectory() {
-  EnvGlobals::instance()->setWorkingDirectory();
 }
 
 bool TEnv::getIsPortable() { return EnvGlobals::instance()->getIsPortable(); }
