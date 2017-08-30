@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "toonz/txsheet.h"
-#include "toonz/txshleveltypes.h"
 #include "toonzqt/keyframenavigator.h"
 
 #include <QToolBar>
@@ -14,8 +13,7 @@
 //-----------------------------------------------------------------------------
 
 // forward declaration
-class XsheetViewer;
-class QPushButton;
+class QAction;
 
 //=============================================================================
 // XSheet Toolbar
@@ -24,21 +22,23 @@ class QPushButton;
 class CommandBar final : public QToolBar {
   Q_OBJECT
 
-  //XsheetViewer *m_viewer;
   ViewerKeyframeNavigator *m_keyFrameButton;
   bool m_isCollapsible;
+  QAction *m_editInPlace;
 
 public:
 #if QT_VERSION >= 0x050500
   CommandBar(QWidget *parent = 0, Qt::WindowFlags flags = 0,
-                bool isCollapsible = false);
+             bool isCollapsible = false);
 #else
-  CommandBar(XsheetViewer *parent = 0, Qt::WFlags flags = 0);
+  CommandBar(QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
-  
+
 signals:
   void updateVisibility();
- 
+
+protected slots:
+  void updateEditInPlaceStatus();
 };
 
 #endif  // COMMANDBAR_H

@@ -5,17 +5,17 @@
 // Tnz6 includes
 #include "tapp.h"
 #include "menubarcommandids.h"
+
 // TnzQt includes
-#include "toonzqt/gutil.h"
+#include "toonzqt/menubarcommand.h"
 
 // TnzLib includes
-#include "toonz/preferences.h"
 #include "toonz/tscenehandle.h"
-#include "toonzqt/menubarcommand.h"
+#include "toonz/toonzscene.h"
+#include "toonz/childstack.h"
 
 // Qt includes
 #include <QWidgetAction>
-
 
 //=============================================================================
 // Toolbar
@@ -23,9 +23,9 @@
 
 #if QT_VERSION >= 0x050500
 CommandBar::CommandBar(QWidget *parent, Qt::WindowFlags flags,
-                             bool isCollapsible)
+                       bool isCollapsible)
 #else
-CommandBar::CommandBar(XsheetViewer *parent, Qt::WFlags flags)
+CommandBar::CommandBar(QWidget *parent, Qt::WFlags flags)
 #endif
     : QToolBar(parent), m_isCollapsible(isCollapsible) {
   setObjectName("cornerWidget");
@@ -71,14 +71,29 @@ CommandBar::CommandBar(XsheetViewer *parent, Qt::WFlags flags)
     addAction(open);
     QAction *leave = CommandManager::instance()->getAction("MI_CloseChild");
     addAction(leave);
+    m_editInPlace =
+        CommandManager::instance()->getAction("MI_ToggleEditInPlace");
+    m_editInPlace->setCheckable(true);
+    addAction(m_editInPlace);
 
     addSeparator();
     addAction(keyFrameAction);
   }
+  bool ret = true;
+  ret = ret && connect(app->getCurrentXsheet(), SIGNAL(editInPlaceChanged()),
+                       this, SLOT(updateEditInPlaceStatus()));
+  assert(ret);
 }
 
+//-----------------------------------------------------------------------------
 
-
-
-
-
+void CommandBar::updateEditInPlaceStatus() {
+  TApp *app         = TApp::instance();
+  ToonzScene *scene = app->getCurrentScene()->getScene();
+  int ancestorCount = scene->getChildStack()->getAncestorCount();
+  if (ancestorCount == 0) {
+    m_editInPlace->setChecked(false);
+    return;
+  }
+  m_editInPlace->setChecked(scene->getChildStack()->getEditInPlace());
+}

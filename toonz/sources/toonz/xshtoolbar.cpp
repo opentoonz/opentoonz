@@ -1,21 +1,17 @@
-
-
 #include "xshtoolbar.h"
 
 // Tnz6 includes
 #include "xsheetviewer.h"
 #include "tapp.h"
 #include "menubarcommandids.h"
-// TnzQt includes
-#include "toonzqt/gutil.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
+#include "toonz/toonzscene.h"
 #include "toonz/tscenehandle.h"
-#include "toonzqt/menubarcommand.h"
+#include "toonz/childstack.h"
 
 // Qt includes
-#include <QPushButton>
 #include <QWidgetAction>
 
 //=============================================================================
@@ -77,7 +73,10 @@ XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WFlags flags)
     addAction(open);
     QAction *leave = CommandManager::instance()->getAction("MI_CloseChild");
     addAction(leave);
-
+    m_editInPlace =
+        CommandManager::instance()->getAction("MI_ToggleEditInPlace");
+    m_editInPlace->setCheckable(true);
+    addAction(m_editInPlace);
     addSeparator();
     addAction(keyFrameAction);
 
@@ -86,6 +85,10 @@ XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WFlags flags)
       hide();
     }
   }
+  bool ret = true;
+  ret = ret && connect(app->getCurrentXsheet(), SIGNAL(editInPlaceChanged()),
+                       this, SLOT(updateEditInPlaceStatus()));
+  assert(ret);
 }
 
 //-----------------------------------------------------------------------------
@@ -111,6 +114,19 @@ void XSheetToolbar::showEvent(QShowEvent *e) {
   else
     hide();
   emit updateVisibility();
+}
+
+//-----------------------------------------------------------------------------
+
+void XSheetToolbar::updateEditInPlaceStatus() {
+  TApp *app         = TApp::instance();
+  ToonzScene *scene = app->getCurrentScene()->getScene();
+  int ancestorCount = scene->getChildStack()->getAncestorCount();
+  if (ancestorCount == 0) {
+    m_editInPlace->setChecked(false);
+    return;
+  }
+  m_editInPlace->setChecked(scene->getChildStack()->getEditInPlace());
 }
 
 //============================================================

@@ -1218,6 +1218,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(xsheetMenu, MI_Resequence);
   addMenuItem(xsheetMenu, MI_CloneChild);
   addMenuItem(xsheetMenu, MI_ExplodeChild);
+  addMenuItem(xsheetMenu, MI_ToggleEditInPlace);
   xsheetMenu->addSeparator();
   addMenuItem(xsheetMenu, MI_ApplyMatchLines);
   addMenuItem(xsheetMenu, MI_MergeCmapped);

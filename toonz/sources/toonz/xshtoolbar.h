@@ -6,17 +6,15 @@
 #include <memory>
 
 #include "toonz/txsheet.h"
-#include "toonz/txshleveltypes.h"
 #include "toonzqt/keyframenavigator.h"
 
-#include <QFrame>
 #include <QToolBar>
 
 //-----------------------------------------------------------------------------
 
 // forward declaration
 class XsheetViewer;
-class QPushButton;
+class QAction;
 
 //-----------------------------------------------------------------------------
 
@@ -31,6 +29,7 @@ class XSheetToolbar final : public QToolBar {
 
   XsheetViewer *m_viewer;
   ViewerKeyframeNavigator *m_keyFrameButton;
+  QAction *m_editInPlace;
   bool m_isCollapsible;
 
 public:
@@ -47,6 +46,9 @@ signals:
 
 protected:
   void showEvent(QShowEvent *e) override;
+
+protected slots:
+  void updateEditInPlaceStatus();
 };
 
 }  // namespace XsheetGUI;
