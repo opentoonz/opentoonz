@@ -1,0 +1,96 @@
+/* -----------------------------------------------------------------------------
+   Tool Bar
+----------------------------------------------------------------------------- */
+
+#ToolBar {
+  & QToolBar {
+    padding-left: 2px; // spacing for expand tools button
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Tool Options
+----------------------------------------------------------------------------- */
+
+#ToolOptions {
+  & TPanelTitleBar {
+    border-right: 1px solid @accent;
+    border-bottom: 0;
+  }
+}
+
+IconViewField {
+  qproperty-ScalePegPixmap: url("@{img-url}/selectiontool_scalepeg.svg");
+  qproperty-RotationPixmap: url("@{img-url}/selectiontool_rotation.svg");
+  qproperty-PositionPixmap: url("@{img-url}/selectiontool_position.svg");
+  qproperty-ThicknessPixmap: url("@{img-url}/selectiontool_thickness.svg");
+}
+
+#EditToolLockButton {
+  // this also applies to room tab lock icon (layouts/mainwindow.less)
+  spacing: 0;
+  &:hover {
+    background: none;
+  }
+  &::indicator {
+    &:extend(.button-tool all); // button style
+    .icon-lock;                 // icon
+  }
+}
+
+PopupButton {
+  &::menu-indicator {
+    border-left: 0;
+    height: 17px;
+    image: url('@{img-url}/combo-down.svg');
+    width: 10px;
+    &:hover {
+      image: url('@{img-url}/combo-down_pressed.svg');
+    }
+    &:disabled {
+      image: url('@{img-url}/combo-down_disabled.svg');
+    }
+  }
+}
+
+#Cap,
+#Join {
+  @size: 32px;
+  padding: 0 4px 0 -8px;
+  max-width: @size;
+  min-width: @size;
+  & QMenu {
+    @size: 28px;
+    max-width: @size;
+    min-width: @size;
+    &::item {
+      max-width: @size;
+      min-width: @size;
+      padding: 0;
+    }
+  }
+}
+
+QToolBar#MediumPaddingToolBar { //Schematic Toolbars
+    & QToolButton {
+      padding-left: 3px;
+      padding-right: 3px;
+    }
+}
+
+QToolBar#WidePaddingToolBar { //FrameNavigator
+    & QToolButton {
+      padding-left: 6px;
+      padding-right: 6px;
+    }  
+}
+
+#CommandBar {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  &::separator:horizontal {
+    margin-right: 3;
+    margin-left: 3;
+  }
+}
