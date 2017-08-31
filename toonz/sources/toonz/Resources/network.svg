@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="network.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 21 17"
+	 style="enable-background:new 0 0 21 17;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#303030;}
+	.st2{fill:#E6E6E6;}
+</style>
+<rect id="rect4" y="0" class="st0" width="21" height="17"/>
+<path class="st1" d="M17,16h-3c-0.6,0-1-0.4-1-1c0,0.6-0.4,1-1,1H9c-0.6,0-1-0.4-1-1c0,0.6-0.4,1-1,1H4c-0.6,0-1-0.4-1-1v-3
+	c0-0.6,0.4-1,1-1V8c0-0.6,0.4-1,1-1h4V6C8.4,6,8,5.6,8,5V2c0-0.6,0.4-1,1-1h3c0.6,0,1,0.4,1,1v3c0,0.6-0.4,1-1,1v1h4
+	c0.6,0,1,0.4,1,1v3c0.6,0,1,0.4,1,1v3C18,15.6,17.6,16,17,16z M15,14h1v-1c-0.2,0-0.4,0-0.5-0.1C15.4,13,15.2,13,15,13V14z M10,14h1
+	v-1c-0.2,0-0.4,0-0.5-0.1C10.4,13,10.2,13,10,13V14z M5,14h1v-1c-0.2,0-0.4,0-0.5-0.1C5.4,13,5.2,13,5,13V14z M12,11
+	c0.6,0,1,0.4,1,1c0-0.6,0.4-1,1-1v-1h-2V11z M7,11c0.6,0,1,0.4,1,1c0-0.6,0.4-1,1-1v-1H7V11z M10,4c0.2,0,0.4,0,0.5,0.1
+	C10.6,4,10.8,4,11,4V3h-1V4z"/>
+<polygon class="st2" points="12,5 11,5 11,8 16,8 16,12 17,12 17,15 14,15 14,12 15,12 15,9 11,9 11,12 12,12 12,15 9,15 9,12 
+	10,12 10,9 6,9 6,12 7,12 7,15 4,15 4,12 5,12 5,8 10,8 10,5 9,5 9,2 12,2 "/>
+</svg>

@@ -1,0 +1,86 @@
+// out: ../../../Dark/Dark.qss
+
+// Include Default Theme
+@import '../Default';
+
+// IMG Location
+@img-url: '../Default/imgs/white';
+
+@bg: #303030;
+@accent: darken(@bg, 10);
+
+@text-color: #CECECE;
+
+@dock-bg-color: darken(@bg, 14);
+
+@dialogButtonFrame-bg-color: darken(@bg, 3);
+
+// -----------------------------------------------------------------------------
+// Trees
+// -----------------------------------------------------------------------------
+
+@tree-bg-color: darken(@bg, 4);
+
+// -----------------------------------------------------------------------------
+// Tabs
+// -----------------------------------------------------------------------------
+
+// Container
+@tabbar-bg-color: darken(@bg, 4);
+
+// -----------------------------------------------------------------------------
+// Titlebars
+// -----------------------------------------------------------------------------
+
+@title-bg-color: darken(@bg, 4);
+
+// -----------------------------------------------------------------------------
+// Scroll Bars
+// -----------------------------------------------------------------------------
+
+// Frame
+@scrollbar-bg-color: darken(@bg, 6);
+
+// -----------------------------------------------------------------------------
+// Slider
+// -----------------------------------------------------------------------------
+
+// SVG
+@slider-groove-img: 'slider-groove_dark.svg';
+@slider-groove-img-disabled: 'slider-groove_disabled_dark.svg';
+
+// DoublePairField, IntPairField
+@slider-groove-color: darken(@bg, 9);
+
+// -----------------------------------------------------------------------------
+// Viewer Window
+// -----------------------------------------------------------------------------
+
+// Flip Slider
+@flipmarker-img: 'flipmarker_dark.svg';
+@flipslider-img: 'flipslider_dark.svg';
+@flipslider-base-color: darken(@bg, 8);
+
+// -----------------------------------------------------------------------------
+// XSheet
+// -----------------------------------------------------------------------------
+
+@xsheet-bg-color:                           lighten(@bg, 5);
+
+@xsheet-LightLine-color:                    darken(#2c2c2c, 5);
+@xsheet-VerticalLine-color:                 darken(#626262, 35);
+
+@xsheet-EmptyColumnHead-color:              lighten(@bg, 8);
+
+@xsheet-EmptyCell-color:                    @bg;
+@xsheet-NotEmptyColumn-color:               lighten(@bg, 3);
+@xsheet-SelectedEmptyCell-color:            lighten(@bg, 15);
+
+@xsheet-LightLightBG-color:                 @xsheet-EmptyCell-color;
+
+// -----------------------------------------------------------------------------
+// Function Editor
+// -----------------------------------------------------------------------------
+
+// Function Curve Panel
+@function-panel-bg-color: #2F2F2F;

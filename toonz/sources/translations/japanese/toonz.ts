@@ -319,6 +319,48 @@ Stop it or wait for its completion before removing it.</source>
     </message>
 </context>
 <context>
+    <name>CameraCaptureLevelControl</name>
+    <message>
+        <source>Black Point Value</source>
+        <translation>シャドウ入力レベルを調整</translation>
+    </message>
+    <message>
+        <source>White Point Value</source>
+        <translation>ハイライト入力レベルを調整</translation>
+    </message>
+    <message>
+        <source>Threshold Value</source>
+        <translation>しきい値レベルを調整</translation>
+    </message>
+    <message>
+        <source>Gamma Value</source>
+        <translation>中間調入力レベル（ガンマ）を調整</translation>
+    </message>
+</context>
+<context>
+    <name>CameraCaptureLevelHistogram</name>
+    <message>
+        <source>Click to Update Histogram</source>
+        <translation>［クリック］ヒストグラムを更新</translation>
+    </message>
+    <message>
+        <source>Drag to Move White Point</source>
+        <translation>[ドラッグ] ハイライト入力レベルを調整</translation>
+    </message>
+    <message>
+        <source>Drag to Move Gamma</source>
+        <translation>[ドラッグ] 中間調入力レベルを調整</translation>
+    </message>
+    <message>
+        <source>Drag to Move Black Point</source>
+        <translation>[ドラッグ] シャドウ入力レベルを調整</translation>
+    </message>
+    <message>
+        <source>Drag to Move Threshold Point</source>
+        <translation>[ドラッグ] しきい値入力レベルを調整</translation>
+    </message>
+</context>
+<context>
     <name>CameraSettingsPopup</name>
     <message>
         <source>Name:</source>
@@ -1029,7 +1071,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>File to convert:</source>
-        <translation type="vanished">変換ファイル：</translation>
+        <translation>変換ファイル：</translation>
     </message>
     <message>
         <source>Output Name:</source>
@@ -1176,6 +1218,31 @@ before color designing.</source>
     <message>
         <source>Remove Unused Styles from Input Palette</source>
         <translation>入力パレットから使用されていない色を消去する</translation>
+    </message>
+    <message>
+        <source>Image DPI</source>
+        <translation>画像のDPI</translation>
+    </message>
+    <message>
+        <source>Current Camera DPI</source>
+        <translation>現在のカメラのDPI</translation>
+    </message>
+    <message>
+        <source>Custom DPI</source>
+        <translation>カスタムDPI</translation>
+    </message>
+    <message>
+        <source>Specify the policy for setting DPI of converted tlv. 
+If you select the &quot;Image DPI&quot; option and the source image does not 
+contain the dpi information, then the current camera dpi will be used.
+</source>
+        <translation>TLVに変換する時の、DPIの設定ポリシーを指定します。
+ただし、「画像のDPI」を選択していて、元画像にDPI情報が含ま
+れていない場合は、現在のカメラのDPIが代わりに適用されます。</translation>
+    </message>
+    <message>
+        <source>Dpi:</source>
+        <translation>DPI：</translation>
     </message>
 </context>
 <context>
@@ -2156,6 +2223,21 @@ Do you want to overwrite it?</source>
     <message>
         <source>It is not possible to delete %1.</source>
         <translation>%1 を削除できません。</translation>
+    </message>
+</context>
+<context>
+    <name>LayerHeaderPanel</name>
+    <message>
+        <source>Preview Visbility Toggle All</source>
+        <translation>全ての有効/無効を切り替え</translation>
+    </message>
+    <message>
+        <source>Camera Stand Visibility Toggle All</source>
+        <translation>全てのメインビューアに表示/非表示を切り替え</translation>
+    </message>
+    <message>
+        <source>Lock Toggle All</source>
+        <translation>全てのロックを切り替え</translation>
     </message>
 </context>
 <context>
@@ -3542,7 +3624,7 @@ Do you want to create it?</source>
         <translation>トレースタスクとして追加</translation>
     </message>
     <message>
-        <source>Select All Keys in this Row</source>
+        <source>Select All Keys in this Frame</source>
         <translation>このフレームのキーをすべて選択</translation>
     </message>
     <message>
@@ -3570,11 +3652,11 @@ Do you want to create it?</source>
         <translation>この列の後ろのキーをすべて選択</translation>
     </message>
     <message>
-        <source>Select Previous Keys in this Row</source>
+        <source>Select Previous Keys in this Frame</source>
         <translation>このフレームの前のキーをすべて選択</translation>
     </message>
     <message>
-        <source>Select Following Keys in this Row</source>
+        <source>Select Following Keys in this Frame</source>
         <translation>このフレームの後ろのキーをすべて選択</translation>
     </message>
     <message>
@@ -4517,6 +4599,14 @@ Do you want to create it?</source>
         <source>Refresh</source>
         <translation>更新</translation>
     </message>
+    <message>
+        <source>Toggle XSheet Toolbar</source>
+        <translation>タイムシートツールバーの表示/非表示</translation>
+    </message>
+    <message>
+        <source>SnapSensitivity</source>
+        <translation>スナップ感度</translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5239,15 +5329,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Threshold:</source>
-        <translation>しきい値：</translation>
+        <translation type="vanished">しきい値：</translation>
     </message>
     <message>
         <source>Contrast:</source>
-        <translation>コントラスト：</translation>
+        <translation type="vanished">コントラスト：</translation>
     </message>
     <message>
         <source>Brightness:</source>
-        <translation>明るさ：</translation>
+        <translation type="vanished">明るさ：</translation>
     </message>
     <message>
         <source>BG reduction:</source>
@@ -5363,6 +5453,119 @@ Do you want to overwrite it?</source>
         <source>The selected image size does not match the current camera settings.</source>
         <translation>選択された画像のサイズが、現在のカメラサイズと一致しません。</translation>
     </message>
+    <message>
+        <source>No</source>
+        <comment>frame id</comment>
+        <translation>フレームなし</translation>
+    </message>
+    <message>
+        <source>Previous Level</source>
+        <translation>前のレベル</translation>
+    </message>
+    <message>
+        <source>UNDEFINED WARNING</source>
+        <translation>※ 未定義の警告 ※</translation>
+    </message>
+    <message>
+        <source>The level is not registered in the scene, but exists in the file system.</source>
+        <translation>このレベルは現在のシーンに読み込まれていませんが、ファイルは存在します。</translation>
+    </message>
+    <message>
+        <source>WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
+        <translation type="vanished">警告： 画像サイズの不一致。保存されている画像のサイズは %1 x %2 ピクセルです。</translation>
+    </message>
+    <message>
+        <source>WARNING</source>
+        <translation>警告</translation>
+    </message>
+    <message>
+        <source>
+Frame %1 exists.</source>
+        <translation>
+以下のコマが撮り込み済です： %1</translation>
+    </message>
+    <message>
+        <source>
+Frames %1 exist.</source>
+        <translation>
+以下のコマが撮り込み済です： %1</translation>
+    </message>
+    <message>
+        <source>OVERWRITE 1 of</source>
+        <translation>上書き ：</translation>
+    </message>
+    <message>
+        <source>ADD to</source>
+        <translation>追加 ：</translation>
+    </message>
+    <message>
+        <source> %1 frame</source>
+        <translation> %1 コマ撮り込み済</translation>
+    </message>
+    <message>
+        <source> %1 frames</source>
+        <translation> %1 コマ撮り込み済</translation>
+    </message>
+    <message>
+        <source>The level will be newly created.</source>
+        <translation>レベルは新規作成されます。</translation>
+    </message>
+    <message>
+        <source>NEW</source>
+        <translation>新規作成</translation>
+    </message>
+    <message>
+        <source>The level is already registered in the scene.</source>
+        <translation>このレベルは既にシーンに読み込まれています。</translation>
+    </message>
+    <message>
+        <source>
+NOTE : The level is not saved.</source>
+        <translation>
+注意： このレベルはまだファイルに保存されていません。</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Failed to get image size of the existing level %1.</source>
+        <translation>
+警告： 既存のレベル %1 の画像サイズの取得に失敗しました。</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The existing level size is %1 x %2.</source>
+        <translation>
+警告： 画像サイズの不一致。既存のレベルのサイズは %1 x %2 です。</translation>
+    </message>
+    <message>
+        <source>WARNING : Level name conflicts. There already is a level %1 in the scene with the path                        
+          %2.</source>
+        <translation>警告： レベル名の重複。このシーンには、既に %1 という名前のレベルが存在します。
+既存のレベルのファイルパスは %2 です。</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The size of level with the same name is is %1 x %2.</source>
+        <translation>
+警告： 画像サイズの不一致。既存の同名のレベルのサイズは %1 x %2 です。</translation>
+    </message>
+    <message>
+        <source>WARNING : Level path conflicts. There already is a level with the path %1                        
+          in the scene with the name %2.</source>
+        <translation>警告： ファイルパスの重複。既にこのシーンには %1 から読み込まれている
+別名のレベル %2 があります。</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The size of level with the same path is %1 x %2.</source>
+        <translation>
+警告： 画像サイズの不一致。 既存の同じファイルパスのレベルのサイズは %1 x %2 です。</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
+        <translation type="unfinished">
+警告： 画像サイズの不一致。保存されている画像のサイズは %1 x %2 ピクセルです。</translation>
+    </message>
 </context>
 <context>
     <name>PencilTestSaveInFolderPopup</name>
@@ -5449,6 +5652,14 @@ Do you want to overwrite it?</source>
     <message>
         <source>It is not possible to create the %1 folder.</source>
         <translation>%1 フォルダを作成できません。</translation>
+    </message>
+    <message>
+        <source>Set As Default</source>
+        <translation>既定値に設定</translation>
+    </message>
+    <message>
+        <source>Set the current &quot;Save In&quot; path as the default.</source>
+        <translation>現在の「作成場所」のパスを既定にします。</translation>
     </message>
 </context>
 <context>
@@ -5959,11 +6170,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Default TLV Caching Behavior</source>
-        <translation>TLV画像データのキャッシュ（既定値）</translation>
+        <translation type="vanished">TLV画像データのキャッシュ（既定値）</translation>
     </message>
     <message>
         <source>Column Icon</source>
-        <translation>列アイコン表示のタイミング</translation>
+        <translation type="vanished">列アイコン表示のタイミング</translation>
     </message>
     <message>
         <source>  Height:</source>
@@ -6019,7 +6230,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Palette Type on Loading Raster Image as Color Model</source>
-        <translation>カラーモデルにラスター画像を読み込む際の、パレット生成方法</translation>
+        <translation type="vanished">カラーモデルにラスター画像を読み込む際の、パレット生成方法</translation>
     </message>
     <message>
         <source>Mouse Cursor</source>
@@ -6194,6 +6405,66 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Watch File System and Update File Browser Automatically</source>
         <translation>ファイルブラウザの内容を自動的に更新する</translation>
+    </message>
+    <message>
+        <source>Use Camera DPI for All Imported Images</source>
+        <translation>全ての読み込む画像にカメラのDPIを適用する</translation>
+    </message>
+    <message>
+        <source>Show Toolbar in the XSheet </source>
+        <translation>タイムシートパネルにツールバーを表示する</translation>
+    </message>
+    <message>
+        <source>Expand Function Editor Header to Match XSheet Toolbar Height (Requires Restart)</source>
+        <translation>パラメータエディタのヘッダの余白を、タイムシートツールバーに揃えて調整する (再起動が必要です)</translation>
+    </message>
+    <message>
+        <source>Show Column Numbers in Column Headers</source>
+        <translation>列のヘッダに列の番号を表示する</translation>
+    </message>
+    <message>
+        <source>Always ask before loading or importing</source>
+        <translation>読み込み時、毎回インポートの確認を行う</translation>
+    </message>
+    <message>
+        <source>Always import the file to the current project</source>
+        <translation>常にファイルを現在のプロジェクトにインポートする</translation>
+    </message>
+    <message>
+        <source>Always load the file from the current location</source>
+        <translation>常にファイルを元の場所から読み込む</translation>
+    </message>
+    <message>
+        <source>Strokes</source>
+        <translation>描線</translation>
+    </message>
+    <message>
+        <source>Guides</source>
+        <translation>ガイド</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>すべて</translation>
+    </message>
+    <message>
+        <source>Default File Import Behavior:</source>
+        <translation>ファイル読み込み時のインポート（既定値）：</translation>
+    </message>
+    <message>
+        <source>Default TLV Caching Behavior:</source>
+        <translation>TLV画像データのキャッシュ（既定値）：</translation>
+    </message>
+    <message>
+        <source>Column Icon:</source>
+        <translation>列アイコン：</translation>
+    </message>
+    <message>
+        <source>Palette Type on Loading Raster Image as Color Model:</source>
+        <translation>カラーモデルにラスター画像を読み込む際の、パレット生成方法：</translation>
+    </message>
+    <message>
+        <source>Vector Snapping:</source>
+        <translation>ベクターのスナップ：</translation>
     </message>
 </context>
 <context>
@@ -6375,6 +6646,18 @@ Do you want to overwrite it?</source>
     <message>
         <source>Expose layers in a group as frames in a column</source>
         <translation>グループ内の各レイヤーを１つの列の各フレームに配置</translation>
+    </message>
+    <message>
+        <source>FileName#LayerName</source>
+        <translation>ファイル名#レイヤー名</translation>
+    </message>
+    <message>
+        <source>LayerName</source>
+        <translation>レイヤー名</translation>
+    </message>
+    <message>
+        <source>Level Name:</source>
+        <translation>レベル名：</translation>
     </message>
 </context>
 <context>
@@ -7789,7 +8072,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>https://opentoonz.github.io/e/</source>
-        <translation></translation>
+        <translation>https://opentoonz.github.io/</translation>
     </message>
     <message>
         <source>Add color model&apos;s palette to the destination palette.</source>
@@ -7883,6 +8166,18 @@ Are you sure?</source>
     <message>
         <source>Skipping frame.</source>
         <translation>フレームをスキップしています。</translation>
+    </message>
+    <message>
+        <source>Always do this action.</source>
+        <translation>常にこの動作を行う。</translation>
+    </message>
+    <message>
+        <source>The selected scene could not be found.</source>
+        <translation>選択されたシーンが見つかりませんでした。</translation>
+    </message>
+    <message>
+        <source>Layer name</source>
+        <translation>レイヤー名</translation>
     </message>
 </context>
 <context>
@@ -9612,11 +9907,11 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>The width must be 1 or more.</source>
-        <translation>幅は1以上でなくてはいけません。</translation>
+        <translation type="vanished">幅は1以上でなくてはいけません。</translation>
     </message>
     <message>
         <source>The height must be 1 or more.</source>
-        <translation>高さは1以上でなくてはいけません。</translation>
+        <translation type="vanished">高さは1以上でなくてはいけません。</translation>
     </message>
     <message>
         <source>The frame rate must be 1 or more.</source>
@@ -9647,6 +9942,14 @@ Assign to &apos;%3&apos;?</source>
 Possibly the preset file has been corrupted</source>
         <translation>&apos;%1&apos;はカメラプリセットの書式として正しくないようです。
 プリセットファイルが破損している可能性があります</translation>
+    </message>
+    <message>
+        <source>The width must be greater than zero.</source>
+        <translation>幅は1以上でなくてはいけません。</translation>
+    </message>
+    <message>
+        <source>The height must be greater than zero.</source>
+        <translation>高さは1以上でなくてはいけません。</translation>
     </message>
 </context>
 <context>
@@ -9697,7 +10000,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>It is not possible to automatically save an untitled scene.</source>
-        <translation>名称未設定のシーンを自動保存できません。</translation>
+        <translation type="vanished">名称未設定のシーンを自動保存できません。</translation>
     </message>
 </context>
 <context>
@@ -10479,7 +10782,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Current Frame</source>
-        <translation type="vanished">現在のフレーム</translation>
+        <translation>現在のフレーム</translation>
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
@@ -10511,7 +10814,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Curren Frame</source>
-        <translation>現在のフレーム</translation>
+        <translation type="vanished">現在のフレーム</translation>
     </message>
     <message>
         <source>Preview This</source>
@@ -10528,6 +10831,21 @@ Please refer to the user guide for details.</source>
     <message>
         <source>Set Auto Markers</source>
         <translation>素材の範囲にマーカーを自動設定</translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::Toolbar</name>
+    <message>
+        <source>New Vector Level</source>
+        <translation>新規ベクターレベル</translation>
+    </message>
+    <message>
+        <source>New Toonz Raster Level</source>
+        <translation>新規Toonzラスターレベル</translation>
+    </message>
+    <message>
+        <source>New Raster Level</source>
+        <translation>新規ラスターレベル</translation>
     </message>
 </context>
 <context>

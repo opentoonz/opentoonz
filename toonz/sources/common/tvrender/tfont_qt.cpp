@@ -11,6 +11,7 @@
 #include <QFontMetrics>
 #include <QImage>
 #include <QPainterPath>
+#include <QPainter>
 #include <QRawFont>
 
 #include <vector>
@@ -58,7 +59,8 @@ TFont::~TFont() { delete m_pimpl; }
 
 TFont::Impl::Impl(const QString &family, const QString &style, int size) {
   m_font = QFont(family, size);
-  m_font.setStyleName(style);
+  m_font.setBold(TFontManager::instance()->isBold(family, style));
+  m_font.setItalic(TFontManager::instance()->isItalic(family, style));
 }
 
 //-----------------------------------------------------------------------------
@@ -68,7 +70,7 @@ TFont::Impl::~Impl() {}
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-
+// returns the offset (advance of the cursor) for the current character
 TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode,
                        wchar_t nextCharCode) const {
   QRawFont raw(QRawFont::fromFont(m_pimpl->m_font));
@@ -153,7 +155,7 @@ TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode,
 
 //-----------------------------------------------------------------------------
 
-TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &unused, wchar_t charcode,
+TPoint TFont::drawChar(QImage &outImage, TPoint &unused, wchar_t charcode,
                        wchar_t nextCharCode) const {
   QRawFont raw(QRawFont::fromFont(m_pimpl->m_font));
 
@@ -165,24 +167,18 @@ TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &unused, wchar_t charcode,
     return TPoint(0, 0);
   }
 
-  QImage image(raw.alphaMapForGlyph(indices[0], QRawFont::PixelAntialiasing));
-
-  if (image.format() != QImage::Format_Indexed8)
+  QImage image = raw.alphaMapForGlyph(indices[0], QRawFont::PixelAntialiasing);
+  if (image.format() != QImage::Format_Indexed8 &&
+      image.format() != QImage::Format_Alpha8)
     throw TException(L"bad QImage format " + image.format());
 
-  int height = image.height();
-  int width  = image.width();
+  QRectF boundingRect = raw.boundingRect(indices[0]);
 
-  outImage = TRasterGR8P(width, height);
-
-#if 0
-  TPixelGR8 bgp;
-  bgp.value = 255;
-  outImage->fill(bgp);
-#endif
-  void *data = outImage->getRawData();
-
-  memcpy(data, image.bits(), image.byteCount());
+  outImage = QImage(image.width(), raw.ascent() + raw.descent(),
+                    QImage::Format_Grayscale8);
+  outImage.fill(255);
+  QPainter painter(&outImage);
+  painter.drawImage(0, boundingRect.top() + raw.ascent(), image);
 
   return getDistance(charcode, nextCharCode);
 }
@@ -191,24 +187,24 @@ TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &unused, wchar_t charcode,
 
 TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &unused, int inkId,
                        wchar_t charcode, wchar_t nextCharCode) const {
-  TRasterGR8P grayAppImage;
+  QImage grayAppImage;
   this->drawChar(grayAppImage, unused, charcode, nextCharCode);
 
-  int lx = grayAppImage->getLx();
-  int ly = grayAppImage->getLy();
+  int lx = grayAppImage.width();
+  int ly = grayAppImage.height();
 
   outImage = TRasterCM32P(lx, ly);
+  outImage->lock();
 
   assert(TPixelCM32::getMaxTone() == 255);
   TPixelCM32 bgColor(0, 0, TPixelCM32::getMaxTone());
-  grayAppImage->lock();
-  outImage->lock();
   int ty = 0;
+
   for (int gy = ly - 1; gy >= 0; --gy, ++ty) {
-    TPixelGR8 *srcPix  = grayAppImage->pixels(gy);
+    uchar *srcPix      = grayAppImage.scanLine(gy);
     TPixelCM32 *tarPix = outImage->pixels(ty);
     for (int x = 0; x < lx; ++x) {
-      int tone = srcPix->value;
+      int tone = (int)(*srcPix);
 
       if (tone == 255)
         *tarPix = bgColor;
@@ -219,7 +215,6 @@ TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &unused, int inkId,
       ++tarPix;
     }
   }
-  grayAppImage->unlock();
   outImage->unlock();
 
   return getDistance(charcode, nextCharCode);
@@ -228,31 +223,8 @@ TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &unused, int inkId,
 //-----------------------------------------------------------------------------
 
 TPoint TFont::getDistance(wchar_t firstChar, wchar_t secondChar) const {
-  QRawFont raw(QRawFont::fromFont(m_pimpl->m_font));
-  QChar chars[2] = {firstChar, secondChar};
-  quint32 indices[2];
-  QPointF advances[2];
-  int count = 2;
-
-  if (!raw.glyphIndexesForChars(chars, 2, indices, &count) || count != 2) {
-    return TPoint(0, 0);
-  }
-
-  if (!raw.advancesForGlyphIndexes(indices, advances, 2,
-                                   QRawFont::KernedAdvances)) {
-    return TPoint(0, 0);
-  }
-
-  int advance = (int)(advances[0].x());
-
-  return TPoint(advance, 0);
-}
-
-//-----------------------------------------------------------------------------
-
-int TFont::getMaxHeight() const {
   QFontMetrics metrics(m_pimpl->m_font);
-  return metrics.ascent() - metrics.descent();
+  return TPoint(metrics.width(QChar(firstChar)), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -273,6 +245,27 @@ int TFont::getLineAscender() const {
 int TFont::getLineDescender() const {
   QFontMetrics metrics(m_pimpl->m_font);
   return metrics.descent();
+}
+
+//-----------------------------------------------------------------------------
+
+int TFont::getLineSpacing() const {
+  QFontMetrics metrics(m_pimpl->m_font);
+  return metrics.lineSpacing();
+}
+
+//-----------------------------------------------------------------------------
+
+int TFont::getHeight() const {
+  QFontMetrics metrics(m_pimpl->m_font);
+  return metrics.height();
+}
+
+//-----------------------------------------------------------------------------
+
+int TFont::getAverageCharWidth() const {
+  QFontMetrics metrics(m_pimpl->m_font);
+  return metrics.averageCharWidth();
 }
 
 //-----------------------------------------------------------------------------
@@ -462,3 +455,13 @@ void TFontManager::getAllTypefaces(vector<wstring> &typefaces) const {
 void TFontManager::setVertical(bool vertical) {}
 
 //---------------------------------------------------------
+
+bool TFontManager::isBold(const QString &family, const QString &style) {
+  return m_pimpl->m_qfontdb->bold(family, style);
+}
+
+//---------------------------------------------------------
+
+bool TFontManager::isItalic(const QString &family, const QString &style) {
+  return m_pimpl->m_qfontdb->italic(family, style);
+}

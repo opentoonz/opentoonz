@@ -377,10 +377,10 @@ ShortcutPopup::ShortcutPopup()
   m_exportButton->setToolTip(tr("Export Current Shortcuts"));
   m_deletePresetButton = new QPushButton("Delete", this);
   m_deletePresetButton->setToolTip(tr("Delete Current Preset"));
-  m_deletePresetButton->setIcon(QIcon(":Resources/delete_on.png"));
+  m_deletePresetButton->setIcon(QIcon(":Resources/delete_on.svg"));
   m_savePresetButton = new QPushButton("Save As", this);
   m_savePresetButton->setToolTip(tr("Save Current Shortcuts as New Preset"));
-  m_savePresetButton->setIcon(QIcon(":Resources/saveas_on.png"));
+  m_savePresetButton->setIcon(QIcon(":Resources/saveas_on.svg"));
   m_loadPresetButton = new QPushButton(tr("Load"));
   m_loadPresetButton->setToolTip(tr("Use selected preset as shortcuts"));
   m_loadPresetButton->setIcon(QIcon(":Resources/green.png"));
