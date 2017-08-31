@@ -610,7 +610,7 @@ void SVNCommitDialog::addUnversionedItem(const QString &relativePath) {
   QTreeWidgetItem *parent = 0;
   QString tempString      = "";
 
-  QIcon folderIcon = QIcon(":Resources/vcfolder_close.png");
+  QIcon folderIcon = QIcon(":Resources/vcfolder_close.svg");
 
   int levelCount = list.count();
   for (int i = 0; i < levelCount; i++) {
@@ -659,7 +659,7 @@ void SVNCommitDialog::addUnversionedFolders(const QDir &dir,
       dir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
   int count = entries.count();
 
-  QIcon folderIcon = QIcon(":Resources/vcfolder_close.png");
+  QIcon folderIcon = QIcon(":Resources/vcfolder_close.svg");
 
   for (int i = 0; i < count; i++) {
     QString entry = entries.at(i);
@@ -723,7 +723,7 @@ void SVNCommitDialog::addModifiedItem(const QString &relativePath) {
   QString tempString      = "";
 
   QBrush brush(Qt::red);
-  QIcon folderIcon = QIcon(":Resources/vcfolder_close.png");
+  QIcon folderIcon = QIcon(":Resources/vcfolder_close.svg");
 
   int levelCount = list.count();
   for (int i = 0; i < levelCount; i++) {

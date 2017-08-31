@@ -110,14 +110,14 @@ StudioPaletteTreeViewer::StudioPaletteTreeViewer(
 
   QList<QTreeWidgetItem *> paletteItems;
 
-  QString open  = QString(":Resources/folder_close.png");
-  QString close = QString(":Resources/folder_open.png");
+  QString open  = QString(":Resources/folder_close.svg");
+  QString close = QString(":Resources/folder_open.svg");
   m_folderIcon.addFile(close, QSize(21, 17), QIcon::Normal, QIcon::On);
   m_folderIcon.addFile(open, QSize(21, 17), QIcon::Normal, QIcon::Off);
 
-  QString levelPaletteIcon = QString(":Resources/palette.png");
+  QString levelPaletteIcon = QString(":Resources/palette.svg");
   m_levelPaletteIcon.addPixmap(levelPaletteIcon, QIcon::Normal, QIcon::On);
-  QString studioPaletteIcon = QString(":Resources/studiopalette.png");
+  QString studioPaletteIcon = QString(":Resources/studiopalette.svg");
   m_studioPaletteIcon.addPixmap(studioPaletteIcon, QIcon::Normal, QIcon::On);
 
   StudioPalette *studioPalette = StudioPalette::instance();

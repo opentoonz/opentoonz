@@ -578,15 +578,15 @@ const QPixmap &ColumnArea::Pixmaps::cameraStandTransparent() {
   return cameraStandTransparent;
 }
 const QPixmap &ColumnArea::Pixmaps::lock() {
-  static QPixmap lock = QPixmap(":Resources/x_lock.png");
+  static QPixmap lock = svgToPixmap(":Resources/x_lock.svg");
   return lock;
 }
 const QPixmap &ColumnArea::Pixmaps::sound() {
-  static QPixmap sound = QPixmap(":Resources/sound_header_off.png");
+  static QPixmap sound = svgToPixmap(":Resources/sound_header_off.svg");
   return sound;
 }
 const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
-  static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
+  static QPixmap soundPlaying = svgToPixmap(":Resources/sound_header_on.svg");
   return soundPlaying;
 }
 //-----------------------------------------------------------------------------
@@ -1262,7 +1262,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawLock();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
-  static QPixmap iconPixmap(":Resources/palette_header.png");
+  static QPixmap iconPixmap(svgToPixmap(":Resources/palette_header.svg"));
   drawHeader.drawThumbnail(iconPixmap);
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
@@ -1313,7 +1313,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawLock();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
-  static QPixmap iconPixmap(":Resources/magpie.png");
+  static QPixmap iconPixmap(svgToPixmap(":Resources/magpie.svg"));
   drawHeader.drawThumbnail(iconPixmap);
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();

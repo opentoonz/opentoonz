@@ -7,6 +7,13 @@ find_path(
         ${SDKROOT}
     PATH_SUFFIXES
         tiff-4.0.3/libtiff/
+# if mono or another framework with a tif library
+# is installed, ignore it.
+if(BUILD_ENV_APPLE)
+    NO_DEFAULT_PATH
+    NO_CMAKE_ENVIRONMENTPATH
+    NO_CMAKE_PATH
+endif()
 )
 
 find_library(

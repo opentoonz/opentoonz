@@ -1,0 +1,261 @@
+{
+    "comment": "MyPaint brush file", 
+    "group": "", 
+    "parent_brush_name": "ramon/Pastel_1", 
+    "settings": {
+        "anti_aliasing": {
+            "base_value": 1.0, 
+            "inputs": {}
+        }, 
+        "change_color_h": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "change_color_hsl_s": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "change_color_hsv_s": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "change_color_l": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "change_color_v": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "color_h": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "color_s": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "color_v": {
+            "base_value": 0.4980392156862745, 
+            "inputs": {}
+        }, 
+        "colorize": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "custom_input": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "custom_input_slowness": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "dabs_per_actual_radius": {
+            "base_value": 3.57, 
+            "inputs": {}
+        }, 
+        "dabs_per_basic_radius": {
+            "base_value": 3.54, 
+            "inputs": {}
+        }, 
+        "dabs_per_second": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "direction_filter": {
+            "base_value": 2.0, 
+            "inputs": {}
+        }, 
+        "elliptical_dab_angle": {
+            "base_value": 90.0, 
+            "inputs": {}
+        }, 
+        "elliptical_dab_ratio": {
+            "base_value": 1.48, 
+            "inputs": {}
+        }, 
+        "eraser": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "hardness": {
+            "base_value": 0.8, 
+            "inputs": {
+                "pressure": [
+                    [
+                        0.0, 
+                        -0.666667
+                    ], 
+                    [
+                        0.426471, 
+                        0.052083
+                    ], 
+                    [
+                        0.755882, 
+                        0.072917
+                    ], 
+                    [
+                        0.844118, 
+                        0.947917
+                    ], 
+                    [
+                        1.0, 
+                        1.0
+                    ]
+                ]
+            }
+        }, 
+        "lock_alpha": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "offset_by_random": {
+            "base_value": 0.0, 
+            "inputs": {
+                "pressure": [
+                    [
+                        0.0, 
+                        0.0
+                    ], 
+                    [
+                        0.435294, 
+                        -0.041667
+                    ], 
+                    [
+                        0.753425, 
+                        -0.6875
+                    ], 
+                    [
+                        1.0, 
+                        0.0
+                    ]
+                ], 
+                "speed1": [
+                    [
+                        0.0, 
+                        -0.285714
+                    ], 
+                    [
+                        4.0, 
+                        2.0
+                    ]
+                ], 
+                "speed2": [
+                    [
+                        0.0, 
+                        -0.285714
+                    ], 
+                    [
+                        4.0, 
+                        2.0
+                    ]
+                ]
+            }
+        }, 
+        "offset_by_speed": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "offset_by_speed_slowness": {
+            "base_value": 1.0, 
+            "inputs": {}
+        }, 
+        "opaque": {
+            "base_value": 1.0, 
+            "inputs": {}
+        }, 
+        "opaque_linearize": {
+            "base_value": 0.45, 
+            "inputs": {}
+        }, 
+        "opaque_multiply": {
+            "base_value": 0.48, 
+            "inputs": {
+                "pressure": [
+                    [
+                        0.0, 
+                        -0.3125
+                    ], 
+                    [
+                        0.0701219512195122, 
+                        -0.10416666666666674
+                    ], 
+                    [
+                        1.0, 
+                        1.0
+                    ]
+                ]
+            }
+        }, 
+        "radius_by_random": {
+            "base_value": 1.08, 
+            "inputs": {}
+        }, 
+        "radius_logarithmic": {
+            "base_value": 0.71, 
+            "inputs": {}
+        }, 
+        "restore_color": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "slow_tracking": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "slow_tracking_per_dab": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "smudge": {
+            "base_value": 0.1, 
+            "inputs": {}
+        }, 
+        "smudge_length": {
+            "base_value": 0.5, 
+            "inputs": {}
+        }, 
+        "smudge_radius_log": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "snap_to_pixel": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "speed1_gamma": {
+            "base_value": 4.0, 
+            "inputs": {}
+        }, 
+        "speed1_slowness": {
+            "base_value": 0.04, 
+            "inputs": {}
+        }, 
+        "speed2_gamma": {
+            "base_value": 4.0, 
+            "inputs": {}
+        }, 
+        "speed2_slowness": {
+            "base_value": 0.8, 
+            "inputs": {}
+        }, 
+        "stroke_duration_logarithmic": {
+            "base_value": 4.0, 
+            "inputs": {}
+        }, 
+        "stroke_holdtime": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "stroke_threshold": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }, 
+        "tracking_noise": {
+            "base_value": 0.0, 
+            "inputs": {}
+        }
+    }, 
+    "version": 3
+}
