@@ -83,9 +83,9 @@ class LeftToRightOrientation : public Orientation {
   const int PLAY_RANGE_Y       = ONION_SIZE;
   const int ICON_WIDTH         = CELL_HEIGHT;
   const int ICON_OFFSET        = ICON_WIDTH;
-  const int ICONS_WIDTH        = ICON_OFFSET * 3;  // 88
+  const int ICONS_WIDTH        = ICON_OFFSET * 4;  // 88
   const int LAYER_NUMBER_WIDTH = 20;
-  const int LAYER_NAME_WIDTH   = 170;
+  const int LAYER_NAME_WIDTH   = 150;
   const int LAYER_HEADER_WIDTH =
       ICONS_WIDTH + LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH;
   const int FOLDED_LAYER_HEADER_HEIGHT = 8;
@@ -473,7 +473,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   head.lineTo(QPointF(4, -4));
   head.lineTo(QPointF(0, 0));
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
-
+/*
   int size = 4;
   QPainterPath folded(QPointF(0, size));  // triangle down
   folded.lineTo(QPointF(size, -size));
@@ -486,6 +486,30 @@ TopToBottomOrientation::TopToBottomOrientation() {
   unfolded.lineTo(QPointF(-size, size));
   unfolded.lineTo(QPointF(-size, -size));
   unfolded.lineTo(QPointF(size, 0));
+  unfolded.translate(eye.width() / 2, eye.height() / 2);
+  addPath(PredefinedPath::UNFOLDED, unfolded);
+*/
+  QPainterPath folded(QPointF(-1, -4));  // plus sign
+  folded.lineTo(QPointF(-1, -1));
+  folded.lineTo(QPointF(-4, -1));
+  folded.lineTo(QPointF(-4, 1));
+  folded.lineTo(QPointF(-1, 1));
+  folded.lineTo(QPointF(-1, 4));
+  folded.lineTo(QPointF(1, 4));
+  folded.lineTo(QPointF(1, 1));
+  folded.lineTo(QPointF(4, 1));
+  folded.lineTo(QPointF(4, -1));
+  folded.lineTo(QPointF(1, -1));
+  folded.lineTo(QPointF(1, -4));
+  folded.lineTo(QPointF(-1, -4));
+  folded.translate(eye.width() / 2, eye.height() / 2);
+  addPath(PredefinedPath::FOLDED, folded);
+
+  QPainterPath unfolded(QPointF(-4, -1));  // minus sign
+  unfolded.lineTo(QPointF(-4, 1));
+  unfolded.lineTo(QPointF(4, 1));
+  unfolded.lineTo(QPointF(4, -1));
+  unfolded.lineTo(QPointF(-4, -1));
   unfolded.translate(eye.width() / 2, eye.height() / 2);
   addPath(PredefinedPath::UNFOLDED, unfolded);
 
@@ -663,7 +687,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::LOCK,
           eye.translated(2 * ICON_OFFSET + 1, 0).adjusted(-1, 1, -1, 0));
   addRect(PredefinedRect::DRAG_LAYER,
-          QRect(ICONS_WIDTH + 1, 0, LAYER_HEADER_WIDTH - ICONS_WIDTH - 3,
+          QRect(ICONS_WIDTH - ICON_WIDTH + 1, 0, LAYER_HEADER_WIDTH - ICONS_WIDTH + ICON_WIDTH - 3,
                 CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LAYER_NAME, columnName);
   addRect(PredefinedRect::LAYER_NUMBER,
@@ -686,7 +710,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
           QRect(columnName.topRight(), QSize(27, columnName.height()))
               .adjusted(-28, 0, -28, 0));
 
-  addRect(PredefinedRect::FOLD_UNFOLD_AREA, eye.translated(4 * ICON_OFFSET, 0));
+  addRect(PredefinedRect::FOLD_UNFOLD_AREA, eye.translated(3 * ICON_OFFSET, 0));
   addRect(PredefinedRect::SUBLAYER_NAME, QRect(ICONS_WIDTH, 0, LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH, SUBLAYER_HEIGHT));
   addRect(PredefinedRect::SUBLAYER_ACTIVATOR, QRect(ICONS_WIDTH, 0, ICON_WIDTH, CELL_HEIGHT));
 
@@ -775,19 +799,44 @@ LeftToRightOrientation::LeftToRightOrientation() {
   head.lineTo(QPointF(0, 0));
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
 
+/*
   int size = 4;
   QPainterPath folded(QPointF(size, 0));  // triangle right
   folded.lineTo(QPointF(-size, size));
   folded.lineTo(QPointF(-size, -size));
   folded.lineTo(QPointF(size, 0));
-  folded.translate(eye.width() / 2, eye.height() / 2);
+  folded.translate(eye.width() / 2, (eye.height() / 2) + 2);
   addPath(PredefinedPath::FOLDED, folded);
 
   QPainterPath unfolded(QPointF(0, size));  // triangle down
   unfolded.lineTo(QPointF(size, -size));
   unfolded.lineTo(QPointF(-size, -size));
   unfolded.lineTo(QPointF(0, size));
-  unfolded.translate(eye.width() / 2, eye.height() / 2);
+  unfolded.translate(eye.width() / 2, (eye.height() / 2) + 2);
+  addPath(PredefinedPath::UNFOLDED, unfolded);
+*/
+  QPainterPath folded(QPointF(-1, -4));  // plus sign
+  folded.lineTo(QPointF(-1, -1));
+  folded.lineTo(QPointF(-4, -1));
+  folded.lineTo(QPointF(-4, 1));
+  folded.lineTo(QPointF(-1, 1));
+  folded.lineTo(QPointF(-1, 4));
+  folded.lineTo(QPointF(1, 4));
+  folded.lineTo(QPointF(1, 1));
+  folded.lineTo(QPointF(4, 1));
+  folded.lineTo(QPointF(4, -1));
+  folded.lineTo(QPointF(1, -1));
+  folded.lineTo(QPointF(1, -4));
+  folded.lineTo(QPointF(-1, -4));
+  folded.translate(eye.width() / 2, (eye.height() / 2) + 2);
+  addPath(PredefinedPath::FOLDED, folded);
+
+  QPainterPath unfolded(QPointF(-4, -1));  // minus sign
+  unfolded.lineTo(QPointF(-4, 1));
+  unfolded.lineTo(QPointF(4, 1));
+  unfolded.lineTo(QPointF(4, -1));
+  unfolded.lineTo(QPointF(-4, -1));
+  unfolded.translate(eye.width() / 2, (eye.height() / 2) + 2);
   addPath(PredefinedPath::UNFOLDED, unfolded);
 
   //

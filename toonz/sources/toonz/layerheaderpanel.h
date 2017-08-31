@@ -46,7 +46,8 @@ protected:
   bool event(QEvent *event) override;
 
 private:
-  void drawIcon(QPainter &p, PredefinedRect rect, const QPixmap &pixmap) const;
+  void drawIcon(QPainter &p, PredefinedRect rect, optional<QColor> fill,
+                const QPixmap &pixmap) const;
   void drawLines(QPainter &p, const QRect &numberRect,
                  const QRect &nameRect) const;
 };

@@ -28,7 +28,7 @@ ScreenMapper::ScreenMapper(XsheetViewer *viewer)
     , m_orientation(nullptr)
     , m_columnFan(nullptr)
     , m_subLayers(nullptr) {
-  m_orientation = Orientations::leftToRight();
+  m_orientation = Orientations::topToBottom();
   m_columnFan   = new ColumnFanGeometry();
   m_subLayers   = new SubLayers(this);
 
@@ -44,6 +44,12 @@ TXsheet *ScreenMapper::xsheet() const { return m_viewer->getXsheet(); }
 
 int ScreenMapper::getCurrentFrame() const {
   return TApp::instance()->getCurrentFrame()->getFrame();
+}
+
+void ScreenMapper::setOrientation(const Orientation *o)
+{
+	m_orientation = o;
+	m_columnFan->setDimension(dimension(PredefinedDimension::LAYER));
 }
 
 void ScreenMapper::flipOrientation() {

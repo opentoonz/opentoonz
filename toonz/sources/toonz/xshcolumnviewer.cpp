@@ -564,39 +564,30 @@ void ColumnArea::DrawHeader::prepare() const {
 }
 
 //-----------------------------------------------------------------------------
-const QPixmap &ColumnArea::Pixmaps::eye(bool timeline) {
-  static QPixmap eye         = QPixmap(":Resources/x_prev_eye.png");
-  static QPixmap eyeTimeline = QPixmap(":Resources/timeline_eye.png");
-  return timeline ? eyeTimeline : eye;
+const QPixmap &ColumnArea::Pixmaps::eye() {
+	static QPixmap eye = QPixmap(":Resources/x_prev_eye.png");
+	return eye;
 }
-const QPixmap &ColumnArea::Pixmaps::cameraStand(bool timeline) {
-  static QPixmap cameraStand = QPixmap(":Resources/x_table_view.png");
-  static QPixmap cameraStandTimeline =
-      QPixmap(":Resources/timeline_camstand.png");
-  return timeline ? cameraStandTimeline : cameraStand;
+const QPixmap &ColumnArea::Pixmaps::cameraStand() {
+	static QPixmap cameraStand = QPixmap(":Resources/x_table_view.png");
+	return cameraStand;
 }
-const QPixmap &ColumnArea::Pixmaps::cameraStandTransparent(bool timeline) {
-  static QPixmap cameraStandTransparent =
-      QPixmap(":Resources/x_table_view_transp.png");
-  static QPixmap cameraStandTransparentTimeline =
-      QPixmap(":Resources/timeline_camstand_transparent.png");
-  return timeline ? cameraStandTransparentTimeline : cameraStandTransparent;
+const QPixmap &ColumnArea::Pixmaps::cameraStandTransparent() {
+	static QPixmap cameraStandTransparent =
+		QPixmap(":Resources/x_table_view_transp.png");
+	return cameraStandTransparent;
 }
-const QPixmap &ColumnArea::Pixmaps::lock(bool timeline) {
-  static QPixmap lock         = QPixmap(":Resources/x_lock.png");
-  static QPixmap lockTimeline = QPixmap(":Resources/timeline_lock.png");
-  return timeline ? lockTimeline : lock;
+const QPixmap &ColumnArea::Pixmaps::lock() {
+	static QPixmap lock = QPixmap(":Resources/x_lock.png");
+	return lock;
 }
-const QPixmap &ColumnArea::Pixmaps::sound(bool timeline) {
-  static QPixmap sound         = QPixmap(":Resources/sound_header_off.png");
-  static QPixmap soundTimeline = QPixmap(":Resources/timeline_sound.png");
-  return timeline ? soundTimeline : sound;
+const QPixmap &ColumnArea::Pixmaps::sound() {
+	static QPixmap sound = QPixmap(":Resources/sound_header_off.png");
+	return sound;
 }
-const QPixmap &ColumnArea::Pixmaps::soundPlaying(bool timeline) {
-  static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
-  static QPixmap soundPlayingTimeline =
-      QPixmap(":Resources/timeline_sound_playing.png");
-  return timeline ? soundPlayingTimeline : soundPlaying;
+const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
+	static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
+	return soundPlaying;
 }
 const QPixmap &ColumnArea::Pixmaps::activatorActive() {
   static QPixmap key = QPixmap(":Resources/timeline_key_active.png");
@@ -693,67 +684,64 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
 void ColumnArea::DrawHeader::drawEye() const {
   if (col < 0 || isEmpty) return;
-  if (column->getPaletteColumn() || column->getSoundTextColumn())
-    return;
+  if (!column->isPreviewVisible() || column->getPaletteColumn() ||
+	  column->getSoundTextColumn())
+	  return;
 
-  bool drawBackground = o->isTimeline() || column->isPreviewVisible();
-  if (drawBackground) {
-    QRect prevViewRect = o->rect(PredefinedRect::EYE_AREA).translated(orig);
-    QColor iconBG      = o->isTimeline() ? m_viewer->getTimelineIconColor()
-                                    : PreviewVisibleColor;
-    p.fillRect(prevViewRect, iconBG);
-  }
-
-  if (!column->isPreviewVisible()) return;
-
+  QRect prevViewRect = o->rect(PredefinedRect::EYE_AREA).translated(orig);
   QRect eyeRect = o->rect(PredefinedRect::EYE).translated(orig);
-  p.drawPixmap(eyeRect, Pixmaps::eye(o->isTimeline()));
+  // preview visible toggle
+  p.fillRect(prevViewRect, PreviewVisibleColor);
+  p.drawPixmap(eyeRect, Pixmaps::eye());
 }
 
 void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
-  if (col < 0 || isEmpty) return;
-  // camstand visible toggle
-  if (column->getPaletteColumn() || column->getSoundTextColumn())
-    return;
+	if (col < 0 || isEmpty) return;
+	// camstand visible toggle
+	if (!column->isCamstandVisible() || column->getPaletteColumn() ||
+		column->getSoundTextColumn())
+		return;
 
-  bool drawBackground = o->isTimeline() || column->isCamstandVisible();
-  if (drawBackground) {
-    QRect tableViewRect =
-        o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig);
-    QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor()
-                                    : CamStandVisibleColor;
-    p.fillRect(tableViewRect, iconBG);
-  }
+	QRect tableViewRect =
+		o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig);
+	QRect tableViewImgRect =
+		o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
 
-  if (!column->isCamstandVisible()) return;
-
-  const QPixmap &icon = opacity < 255
-                            ? Pixmaps::cameraStandTransparent(o->isTimeline())
-                            : Pixmaps::cameraStand(o->isTimeline());
-  QRect tableViewImgRect =
-      o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
-  p.drawPixmap(tableViewImgRect, icon);
+	p.fillRect(tableViewRect, CamStandVisibleColor);
+	p.drawPixmap(tableViewImgRect, opacity < 255
+		? Pixmaps::cameraStandTransparent()
+		: Pixmaps::cameraStand());
 }
 
 void ColumnArea::DrawHeader::drawLock() const {
-  if (col < 0 || isEmpty) return;
+	if (col < 0 || isEmpty) return;
 
-  QRect lockModeRect    = o->rect(PredefinedRect::LOCK_AREA).translated(orig);
-  QRect lockModeImgRect = o->rect(PredefinedRect::LOCK).translated(orig);
+	QRect lockModeRect = o->rect(PredefinedRect::LOCK_AREA).translated(orig);
+	QRect lockModeImgRect = o->rect(PredefinedRect::LOCK).translated(orig);
 
-  // lock button
-  p.setPen(Qt::gray);
-  QColor iconBG = o->isTimeline() ? m_viewer->getTimelineIconColor()
-                                  : QColor(255, 255, 255, 128);
-  p.setBrush(iconBG);
-  p.drawRect(lockModeRect);
-  p.setBrush(Qt::NoBrush);
-  bool isLocked = column && column->isLocked();
-  if (isLocked) p.drawPixmap(lockModeImgRect, Pixmaps::lock(o->isTimeline()));
+	// lock button
+	p.setPen(Qt::gray);
+	p.setBrush(QColor(255, 255, 255, 128));
+	p.drawRect(lockModeRect);
+	p.setBrush(Qt::NoBrush);
+	bool isLocked = column && column->isLocked();
+	if (isLocked) p.drawPixmap(lockModeImgRect, Pixmaps::lock());
 }
 
 void ColumnArea::DrawHeader::drawFoldUnfoldButton() const {
   if (col < 0 || isEmpty) return;
+
+  // Vector levels are the only levels at the moment that can be expanded, currently.
+  // Hide FoldUnfold button for everyone else
+  if (!column->getLevelColumn()) return;
+
+  int r0, r1;
+  TXsheet *xsh = m_viewer->getXsheet();
+  xsh->getCellRange(col, r0, r1);
+  if (0 > r0 || r1 < r0) return;
+  TXshCell cell = xsh->getCell(r0, col);
+  if (cell.m_level->getType() != PLI_XSHLEVEL) return;
+
   shared_ptr<SubLayer> rootLayer =
       m_viewer->screenMapper()->subLayers()->layer(column);
   drawSubLayerFoldUnfoldButton(rootLayer, SubLayerOffsets::forLayer(orig));
@@ -797,10 +785,6 @@ void ColumnArea::DrawHeader::drawColumnNumber() const {
 }
 
 void ColumnArea::DrawHeader::drawColumnName() const {
-  if (column && column->getSoundColumn() &&
-      !o->isVerticalTimeline())  // covered by volume
-    return;
-
   TStageObjectId columnId    = m_viewer->getObjectId(col);
   TStageObject *columnObject = xsh->getStageObject(columnId);
 
@@ -977,6 +961,7 @@ void ColumnArea::DrawHeader::drawFilterColor() const {
                getColorChipIcon(column->getFilterColorId()).pixmap(12, 12));
 }
 
+/*
 void ColumnArea::DrawHeader::drawNoSoundIcon() const {
   if (col < 0 || isEmpty) return;
   QRect rect = m_viewer->orientation()
@@ -984,14 +969,12 @@ void ColumnArea::DrawHeader::drawNoSoundIcon() const {
                    .translated(orig);
   if (o->isTimeline()) p.fillRect(rect, m_viewer->getTimelineIconColor());
 }
+*/
 void ColumnArea::DrawHeader::drawSoundIcon(bool isPlaying) const {
-  QRect rect = m_viewer->orientation()
-                   ->rect(PredefinedRect::SOUND_ICON)
-                   .translated(orig);
-  if (o->isTimeline()) p.fillRect(rect, m_viewer->getTimelineIconColor());
-  const QPixmap &icon = isPlaying ? Pixmaps::soundPlaying(o->isTimeline())
-                                  : Pixmaps::sound(o->isTimeline());
-  p.drawPixmap(rect, icon);
+	QRect rect = m_viewer->orientation()
+		->rect(PredefinedRect::SOUND_ICON)
+		.translated(orig);
+	p.drawPixmap(rect, isPlaying ? Pixmaps::soundPlaying() : Pixmaps::sound());
 }
 
 void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
@@ -1140,69 +1123,21 @@ void ColumnArea::setDragTool(DragTool *dragTool) {
 
 //-----------------------------------------------------------------------------
 void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
-  const Orientation *o = m_viewer->orientation();
+  const ScreenMapper *mapper = m_viewer->screenMapper();
+  const Orientation *o = mapper->orientation();
 
-  QPoint orig = m_viewer->positionToXY(CellPosition(0, col));
-  QRect rect  = o->rect(PredefinedRect::FOLDED_LAYER_HEADER).translated(orig);
+  int layerAxis = mapper->columnToLayerAxis(col);
+  QPoint xy = { mapper->positionToXY(CellPosition(0, col)) };
+  QRect columnHeader = { mapper->rect(PredefinedRect::LAYER_HEADER).translated(xy) };
+  NumberRange frameAxis = { o->frameSide(columnHeader) };
 
-  int x0, y0, x, y;
+  p.fillRect(columnHeader, m_viewer->getDarkBGColor());
+  frameAxis = frameAxis.adjusted(20, 0);
 
-  if (o->isVerticalTimeline()) {
-/*??? Old stuff
-    x0 = rect.topLeft().x() + 1;
-    y0 = 0;
-
-    p.setPen(m_viewer->getDarkLineColor());
-    p.fillRect(x0, y0 + 1, rect.width(), 18,
-               QBrush(m_viewer->getDarkBGColor()));
-    p.fillRect(x0, y0 + 17, 2, rect.height() - 34,
-               QBrush(m_viewer->getLightLightBGColor()));
-    p.fillRect(x0 + 3, y0 + 20, 2, rect.height() - 36,
-               QBrush(m_viewer->getLightLightBGColor()));
-    p.fillRect(x0 + 6, y0 + 17, 2, rect.height() - 34,
-               QBrush(m_viewer->getLightLightBGColor()));
-
-    p.setPen(Qt::black);
-    p.drawLine(x0 - 1, y0 + 17, x0 - 1, rect.height());
-    p.setPen(m_viewer->getDarkLineColor());
-    p.drawLine(x0 + 2, y0 + 17, x0 + 2, rect.height());
-    p.drawLine(x0 + 5, y0 + 17, x0 + 5, rect.height());
-    p.drawLine(x0, y0 + 17, x0 + 1, 17);
-    p.drawLine(x0 + 3, y0 + 20, x0 + 4, 20);
-    p.drawLine(x0 + 6, y0 + 17, x0 + 7, 17);
-
-    // triangolini
-    p.setPen(Qt::black);
-    x = x0;
-    y = 12;
-    p.drawPoint(QPointF(x, y));
-    x++;
-    p.drawLine(x, y - 1, x, y + 1);
-    x++;
-    p.drawLine(x, y - 2, x, y + 2);
-    x += 3;
-    p.drawLine(x, y - 2, x, y + 2);
-    x++;
-    p.drawLine(x, y - 1, x, y + 1);
-    x++;
-    p.drawPoint(x, y);
-*/
-	  const ScreenMapper *mapper = m_viewer->screenMapper();
-	  const Orientation *o = mapper->orientation();
-
-	  int layerAxis = mapper->columnToLayerAxis(col);
-//??? old:	  QRect columnHeader = { mapper->rect(PredefinedRect::LAYER_HEADER) };
-	  QPoint xy = { mapper->positionToXY(CellPosition(0, col)) };
-	  QRect columnHeader = { mapper->rect(PredefinedRect::LAYER_HEADER).translated(xy) };
-	  NumberRange frameAxis = { o->frameSide(columnHeader) };
-
-	  p.fillRect(columnHeader, m_viewer->getDarkBGColor());
-	  frameAxis = frameAxis.adjusted(20, 0);
-
-	  p.setPen(m_viewer->getDarkLineColor());
-	  p.setBrush(QBrush(m_viewer->getLightLightBGColor()));
-	  for (int i = 0; i < 3; i++)
-		  p.drawRect(o->foldedHeader(layerAxis, frameAxis, i));
+  p.setPen(m_viewer->getDarkLineColor());
+  p.setBrush(QBrush(m_viewer->getLightLightBGColor()));
+  for (int i = 0; i < 3; i++)
+	  p.drawRect(o->foldedHeader(layerAxis, frameAxis, i));
 
 	  // triangles
 	  p.setPen(Qt::black);
@@ -1219,45 +1154,6 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
 	  p.drawLine(o->verticalLine(layerAxis, NumberRange(f - 1, f + 1)));
 	  layerAxis++;
 	  p.drawLine(o->verticalLine(layerAxis, NumberRange(f, f)));
-  } else {
-    x0 = 0;
-    y0 = rect.topLeft().y() + 1;
-
-    p.setPen(m_viewer->getDarkLineColor());
-    p.fillRect(x0 + 1, y0, 18, rect.height(),
-               QBrush(m_viewer->getDarkBGColor()));
-    p.fillRect(x0 + 17, y0, rect.width() - 34, 2,
-               QBrush(m_viewer->getLightLightBGColor()));
-    p.fillRect(x0 + 20, y0 + 3, rect.width() - 36, 2,
-               QBrush(m_viewer->getLightLightBGColor()));
-    p.fillRect(x0 + 17, y0 + 6, rect.width() - 34, 2,
-               QBrush(m_viewer->getLightLightBGColor()));
-
-    p.setPen(Qt::black);
-    p.drawLine(x0 + 17, y0 - 1, rect.width(), y0 - 1);
-    p.setPen(m_viewer->getDarkLineColor());
-    p.drawLine(x0 + 17, y0 + 2, rect.width(), y0 + 2);
-    p.drawLine(x0 + 17, y0 + 5, rect.width(), y0 + 5);
-    p.drawLine(x0 + 17, y0, 17, y0 + 1);
-    p.drawLine(x0 + 20, y0 + 3, 20, y0 + 4);
-    p.drawLine(x0 + 17, y0 + 6, 17, y0 + 7);
-
-    // triangolini
-    p.setPen(Qt::black);
-    x = 12;
-    y = y0;
-    p.drawPoint(QPointF(x, y));
-    y++;
-    p.drawLine(x - 1, y, x + 1, y);
-    y++;
-    p.drawLine(x - 2, y, x + 2, y);
-    y += 3;
-    p.drawLine(x - 2, y, x + 2, y);
-    y++;
-    p.drawLine(x - 1, y, x + 1, y);
-    y++;
-    p.drawPoint(x, y);
-  }
 }
 
 void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
@@ -1314,7 +1210,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   drawHeader.levelColors(columnColor, dragColor);
   drawHeader.drawBaseFill(columnColor, dragColor);
   drawHeader.drawEye();
-  drawHeader.drawNoSoundIcon();
+//  drawHeader.drawNoSoundIcon();
   drawHeader.drawPreviewToggle(column ? column->getOpacity() : 0);
   drawHeader.drawLock();
   drawHeader.drawFoldUnfoldButton();
@@ -1366,6 +1262,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(255);
   drawHeader.drawLock();
+  drawHeader.drawFoldUnfoldButton();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
   // Sound columns don't have an image. Passing in an image
@@ -1414,6 +1311,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(0);
   drawHeader.drawLock();
+  drawHeader.drawFoldUnfoldButton();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
   static QPixmap iconPixmap(":Resources/palette_header.png");
@@ -1465,6 +1363,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(255);
   drawHeader.drawLock();
+  drawHeader.drawFoldUnfoldButton();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
   static QPixmap iconPixmap(":Resources/magpie.png");

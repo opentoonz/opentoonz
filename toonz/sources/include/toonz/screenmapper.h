@@ -54,6 +54,7 @@ public:
   TXsheet *xsheet() const;
   int getCurrentFrame() const;
 
+  void setOrientation(const Orientation *o);
   const Orientation *orientation() const { return m_orientation; }
   ColumnFanGeometry *columnFan() const { return m_columnFan; }
   SubLayers *subLayers() const { return m_subLayers; }
