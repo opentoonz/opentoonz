@@ -621,7 +621,7 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
     }
 
     // navigator rect
-    if (naviRect.isValid() && fid == getCurrentFrameId()) {
+    if (naviRect.isValid() && fid >= 0 && fid == getCurrentFrameId()) {
       p.setPen(QPen(Qt::red, 1));
       p.drawRect(naviRect.translated(0, oneFrameHeight * i));
       p.setPen(Qt::NoPen);
