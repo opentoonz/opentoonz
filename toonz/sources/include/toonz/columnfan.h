@@ -24,9 +24,10 @@ class TIStream;
    open folded columns, activate() and to know if column is folded or not,
    isActive().
 
-   Class provides column x-axis coordinate too.
-   It's possible to know column index by column x-axis coordinate, colToX()
-   and vice versa, xToCol().
+   Class provides column layer-axis coordinate too.
+   It's possible to know column index by column layer-axis coordinate,
+   colToLayerAxis()
+   and vice versa, layerAxisToCol().
 */
 //=============================================================================
 
@@ -40,6 +41,7 @@ class DVAPI ColumnFan {
   std::vector<Column> m_columns;
   std::map<int, int> m_table;
   int m_firstFreePos;
+  int m_unfolded, m_folded;
 
   /*!
 Called by activate() and deactivate() to update columns coordinates.
@@ -51,6 +53,9 @@ public:
 Constructs a ColumnFan with default value.
 */
   ColumnFan();
+
+  //! Adjust column sizes when switching orientation
+  void setDimension(int unfolded);
 
   /*!
 Set column \b col not folded.
@@ -69,15 +74,19 @@ Return true if column \b col is active, column is not folded, else return false.
   bool isActive(int col) const;
 
   /*!
-Return column index of column in x-axis coordinate \b x.
-\sa colToX()
+Return column index of column in layer axis (x for vertical timeline, y for
+horizontal).
+\sa colToLayerAxis()
 */
-  int xToCol(int x) const;
+  int layerAxisToCol(int layerAxis) const;
   /*!
-Return column x-axis coordinate of column identify with \b col.
-\sa xToCol()
+Return layer coordinate (x for vertical timeline, y for horizontal)
+of column identified by \b col.
+\sa layerAxisToCol()
 */
-  int colToX(int col) const;
+  int colToLayerAxis(int col) const;
+
+  void copyFoldedStateFrom(const ColumnFan &from);
 
   bool isEmpty() const;
 

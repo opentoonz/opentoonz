@@ -210,6 +210,15 @@ public:
   ToolOptionPanel(QWidget *parent);
 };
 
+class CommandBarPanel final : public TPanel {
+  Q_OBJECT
+
+  // ToolOptions *m_toolOption;
+
+public:
+  CommandBarPanel(QWidget *parent);
+};
+
 //=========================================================
 // FlipbookPanel
 //---------------------------------------------------------

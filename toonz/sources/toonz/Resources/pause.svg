@@ -1,39 +1,58 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 10.0, SVG Export Plug-In . SVG Version: 3.0.0 Build 76)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" [
-	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
-	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
-	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
-	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
-	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
-	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
-	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
-	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
-	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
-	<!ENTITY ns_svg "http://www.w3.org/2000/svg">
-	<!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
-]>
-<svg 
-	 xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" i:viewOrigin="389 308.9209" i:rulerOrigin="0 0" i:pageBounds="0 600 800 0"
-	 xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" width="24" height="19"
-	 viewBox="0 0 24 19" overflow="visible" enable-background="new 0 0 24 19" xml:space="preserve">
-	<metadata>
-		<variableSets  xmlns="&ns_vars;">
-			<variableSet  varSetName="binding1" locked="none">
-				<variables></variables>
-				<v:sampleDataSets  xmlns="&ns_custom;" xmlns:v="&ns_vars;"></v:sampleDataSets>
-			</variableSet>
-		</variableSets>
-		<sfw  xmlns="&ns_sfw;">
-			<slices></slices>
-			<sliceSourceBounds  y="289.921" x="389" width="24" height="19" bottomLeftOrigin="true"></sliceSourceBounds>
-		</sfw>
-	</metadata>
-	<g id="Layer_1" i:layer="yes" i:dimmedPercent="50" i:rgbTrio="#4F008000FFFF">
-		<path i:knockout="Off" fill="none" d="M24,19H0V0h24V19z"/>
-		<path i:knockout="Off" fill="#E6E6E6" stroke="#404040" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" d="
-			M13.366,14.921h3.473V2.949h-3.473V14.921z"/>
-		<path i:knockout="Off" fill="#E6E6E6" stroke="#404040" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" d="
-			M7.317,14.921h3.475V2.949H7.317V14.921z"/>
-	</g>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="100%"
+   height="100%"
+   viewBox="0 0 17 17"
+   version="1.1"
+   id="svg4493">
+  <defs
+     id="defs4487" />
+  <metadata
+     id="metadata4490">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(0,-1105.5197)" />
+  <rect
+     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:1.50999999;stroke-dasharray:none;stroke-opacity:0.54901963;paint-order:markers stroke fill"
+     id="rect4489"
+     width="2"
+     height="11"
+     x="5"
+     y="3" />
+  <rect
+     y="3"
+     x="10"
+     height="11"
+     width="2"
+     id="rect4491"
+     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:1.50999999;stroke-dasharray:none;stroke-opacity:0.54901963;paint-order:markers stroke fill" />
+  <rect
+     y="3"
+     x="5"
+     height="11"
+     width="2"
+     id="rect4485"
+     style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:1.50999999;stroke-dasharray:none;stroke-opacity:0.2926829;paint-order:markers stroke fill" />
+  <rect
+     style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:1.50999999;stroke-dasharray:none;stroke-opacity:0.2926829;paint-order:markers stroke fill"
+     id="rect4487"
+     width="2"
+     height="11"
+     x="10"
+     y="3" />
 </svg>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg6"
+   style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"
+   xml:space="preserve"
+   version="1.1"
+   viewBox="0 0 11 11"
+   height="100%"
+   width="100%"><metadata
+     id="metadata12"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs10" /><circle
+     r="4.5"
+     cy="5.5"
+     cx="5.5"
+     id="path4483"
+     style="fill:#aeaeae;fill-opacity:0.43089432;stroke:none;stroke-width:1.29999995;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;paint-order:markers stroke fill" /><path
+     id="circle2"
+     d="M 5.5 0 A 5.5 5.5 0 0 0 0 5.5 A 5.5 5.5 0 0 0 5.5 11 A 5.5 5.5 0 0 0 11 5.5 A 5.5 5.5 0 0 0 5.5 0 z M 5.5 1 A 4.5 4.5 0 0 1 10 5.5 A 4.5 4.5 0 0 1 5.5 10 A 4.5 4.5 0 0 1 1 5.5 A 4.5 4.5 0 0 1 5.5 1 z "
+     style="fill:#aeaeae;fill-opacity:0.43137255" /></svg>

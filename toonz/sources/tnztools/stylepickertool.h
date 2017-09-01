@@ -6,8 +6,12 @@
 #include "tools/tool.h"
 #include "tproperty.h"
 #include <QObject>
+// For Qt translation support
+#include <QCoreApplication>
 
 class StylePickerTool final : public TTool, public QObject {
+  Q_DECLARE_TR_FUNCTIONS(StylePickerTool)
+
   int m_oldStyleId, m_currentStyleId;
 
   TEnumProperty m_colorType;
@@ -49,6 +53,8 @@ public:
      toggle.
   */
   void onImageChanged() override;
+
+  void updateTranslation() override;
 };
 
 #endif

@@ -19,6 +19,7 @@ set(MOC_HEADERS
     cellkeyframedata.h
     cellkeyframeselection.h
     cellselection.h
+	../include/cellposition.h
     cleanuppaletteviewer.h
     cleanuppopup.h
     cleanuppreview.h
@@ -28,6 +29,7 @@ set(MOC_HEADERS
     colormodelviewer.h
     columncommand.h
     columnselection.h
+    commandbar.h
     convertpopup.h
     curveio.h
     drawingdata.h
@@ -61,6 +63,7 @@ set(MOC_HEADERS
     keyframedata.h
     keyframeselection.h
     keyframemover.h
+	layerheaderpanel.h
     levelcreatepopup.h
     levelsettingspopup.h
     linesfadepopup.h
@@ -77,6 +80,7 @@ set(MOC_HEADERS
     meshifypopup.h
     messagepanel.h
     moviegenerator.h
+	../include/orientation.h
     onionskinmaskgui.h
     outputsettingspopup.h
     overwritepopup.h
@@ -90,6 +94,7 @@ set(MOC_HEADERS
     renumberpopup.h
     reslist.h
     ruler.h
+	../include/saveloadqsettings.h
     savepresetpopup.h
     scanlist.h
     scanpopup.h
@@ -145,6 +150,7 @@ set(MOC_HEADERS
     penciltestpopup.h
     locatorpopup.h
     styleshortcutswitchablepanel.h
+	cameracapturelevelcontrol.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -158,6 +164,7 @@ set(HEADERS ${MOC_HEADERS})
 set(SOURCES
     floatingpanelcommand.cpp
     canvassizepopup.cpp
+    commandbar.cpp
     history.cpp
     loadfoldercommand.cpp
     loadfolderpopup.cpp
@@ -217,6 +224,7 @@ set(SOURCES
     fxparameditorpopup.cpp
     histogrampopup.cpp
     insertfxpopup.cpp
+	layerheaderpanel.cpp
     levelcreatepopup.cpp
     levelsettingspopup.cpp
     linetestcapturepane.cpp
@@ -308,6 +316,7 @@ set(SOURCES
     audiorecordingpopup.cpp
     locatorpopup.cpp
     styleshortcutswitchablepanel.cpp
+	cameracapturelevelcontrol.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp
@@ -402,7 +411,7 @@ elseif(BUILD_ENV_APPLE)
 
     target_link_libraries(OpenToonz_${VERSION}
         Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
-        Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia
+        Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets
         ${GL_LIB} ${GLUT_LIB}
         ${COCOA_LIB} ${EXTRA_LIBS} mousedragfilter
     )
@@ -558,7 +567,7 @@ TOONZLIBRARY=\"\$HOME/.config/OpenToonz/stuff/library\"
 TOONZPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
 TOONZPROJECTS=\"$HOME/.config/OpenToonz/stuff/projects\"
 TOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
-TOONZSTUDIOPALETTE=\"\$HOME/.config/OpenToonz/stuff/projects/studiopalette\"
+TOONZSTUDIOPALETTE=\"\$HOME/.config/OpenToonz/stuff/studiopalette\"
 EOF
 fi
 

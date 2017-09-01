@@ -1,62 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 10.0, SVG Export Plug-In . SVG Version: 3.0.0 Build 76)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" [
-	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
-	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
-	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
-	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
-	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
-	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
-	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
-	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
-	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
-	<!ENTITY ns_svg "http://www.w3.org/2000/svg">
-	<!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
-]>
-<svg 
-	 xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" i:viewOrigin="393.7725 305.4199" i:rulerOrigin="0 0" i:pageBounds="0 600 800 0"
-	 xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" width="13" height="13"
-	 viewBox="0 0 13 13" overflow="visible" enable-background="new 0 0 13 13" xml:space="preserve">
-	<metadata>
-		<variableSets  xmlns="http://ns.adobe.com/Variables/1.0/">
-			<variableSet  varSetName="binding1" locked="none">
-				<variables></variables>
-				<v:sampleDataSets  xmlns="http://ns.adobe.com/GenericCustomNamespace/1.0/" xmlns:v="http://ns.adobe.com/Variables/1.0/">
-					</v:sampleDataSets>
-			</variableSet>
-		</variableSets>
-		<sfw  xmlns="&ns_sfw;">
-			<slices></slices>
-			<sliceSourceBounds  y="292.42" x="393.772" width="13" height="13" bottomLeftOrigin="true"></sliceSourceBounds>
-		</sfw>
-	</metadata>
-	<g id="Layer_1" i:knockout="Off" i:layer="yes" i:dimmedPercent="50" i:rgbTrio="#4F008000FFFF">
-		<g i:knockout="Off">
-			
-				<linearGradient id="XMLID_1_" gradientUnits="userSpaceOnUse" x1="-387.2725" y1="292.4541" x2="-387.2725" y2="305.0362" gradientTransform="matrix(1 0 0 -1 393.7725 305.4199)">
-				<stop  offset="0.0112" style="stop-color:#FFFFFF"/>
-				<stop  offset="1" style="stop-color:#9C9C9C"/>
-				<a:midPointStop  offset="0.0112" style="stop-color:#FFFFFF"/>
-				<a:midPointStop  offset="0.5" style="stop-color:#FFFFFF"/>
-				<a:midPointStop  offset="1" style="stop-color:#9C9C9C"/>
-			</linearGradient>
-			<path i:knockout="Off" fill="url(#XMLID_1_)" d="M13,11c0,1.1-0.9,2-2,2H2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h9c1.1,0,2,0.9,2,2
-				V11z"/>
-		</g>
-		<g i:knockout="Off">
-			
-				<radialGradient id="XMLID_2_" cx="-390.5718" cy="302.2461" r="9.0001" fx="-390.5718" fy="302.2461" gradientTransform="matrix(1 0 0 -1 393.7725 305.4199)" gradientUnits="userSpaceOnUse">
-				<stop  offset="0" style="stop-color:#FFC7CD"/>
-				<stop  offset="0.1225" style="stop-color:#F9A4A8"/>
-				<stop  offset="0.4398" style="stop-color:#E94C4E"/>
-				<stop  offset="0.6627" style="stop-color:#E01516"/>
-				<stop  offset="0.7697" style="stop-color:#DC0000"/>
-				<a:midPointStop  offset="0" style="stop-color:#FFC7CD"/>
-				<a:midPointStop  offset="0.4576" style="stop-color:#FFC7CD"/>
-				<a:midPointStop  offset="0.7697" style="stop-color:#DC0000"/>
-			</radialGradient>
-			<path i:knockout="Off" fill="url(#XMLID_2_)" d="M11,10c0,0.55-0.45,1-1,1H3c-0.55,0-1-0.45-1-1V3c0-0.55,0.45-1,1-1h7
-				c0.55,0,1,0.45,1,1V10z"/>
-		</g>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" ns2:pageBounds="0 600 800 0" ns2:rulerOrigin="0 0" ns2:viewOrigin="393.7725 305.4199" sodipodi:docname="close_pane_rollover.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:ns0="http://ns.adobe.com/Variables/1.0/" xmlns:ns2="http://ns.adobe.com/AdobeIllustrator/10.0/" xmlns:ns3="http://ns.adobe.com/SaveForWeb/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 13 13"
+	 style="enable-background:new 0 0 13 13;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:url(#path14_1_);}
+	.st1{fill:url(#path29_1_);}
+	.st2{fill:none;stroke:#892424;stroke-linecap:round;stroke-miterlimit:10;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview31" inkscape:current-layer="svg2" inkscape:cx="6.5" inkscape:cy="6.5" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="500" inkscape:window-maximized="0" inkscape:window-width="1109" inkscape:window-x="10" inkscape:window-y="33" inkscape:zoom="18.153846" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="Layer_1" ns2:dimmedPercent="50" ns2:knockout="Off" ns2:layer="yes" ns2:rgbTrio="#4F008000FFFF">
+	<g id="g7" ns2:knockout="Off">
+		
+			<linearGradient id="path14_1_" gradientUnits="userSpaceOnUse" x1="-387.2725" y1="246.1259" x2="-387.2725" y2="233.5438" gradientTransform="matrix(1 0 0 1 393.7725 -233.1601)">
+			<stop  offset="1.120000e-02" style="stop-color:#FFFFFF"/>
+			<stop  offset="1" style="stop-color:#9C9C9C"/>
+		</linearGradient>
+		<path id="path14" inkscape:connector-curvature="0" ns2:knockout="Off" class="st0" d="M13,11c0,1.1-0.9,2-2,2H2c-1.1,0-2-0.9-2-2
+			V2c0-1.1,0.9-2,2-2h9c1.1,0,2,0.9,2,2V11z"/>
 	</g>
+	<g id="g16" ns2:knockout="Off">
+		
+			<radialGradient id="path29_1_" cx="-390.5718" cy="236.3339" r="9.0001" gradientTransform="matrix(1 0 0 1 393.7725 -233.1601)" gradientUnits="userSpaceOnUse">
+			<stop  offset="0" style="stop-color:#FFC7CD"/>
+			<stop  offset="0.1225" style="stop-color:#F9A4A8"/>
+			<stop  offset="0.4398" style="stop-color:#E94C4E"/>
+			<stop  offset="0.6627" style="stop-color:#E01516"/>
+			<stop  offset="0.7697" style="stop-color:#DC0000"/>
+		</radialGradient>
+		<path id="path29" inkscape:connector-curvature="0" ns2:knockout="Off" class="st1" d="M11,10c0,0.6-0.4,1-1,1H3c-0.5,0-1-0.4-1-1
+			V3c0-0.5,0.5-1,1-1h7c0.6,0,1,0.4,1,1V10z"/>
+	</g>
+</g>
+<line class="st2" x1="9.6" y1="3.4" x2="3.4" y2="9.6"/>
+<line class="st2" x1="3.4" y1="3.4" x2="9.6" y2="9.6"/>
 </svg>

@@ -3524,8 +3524,8 @@ Voulez-vous le créer?</translation>
         <translation>Ajouter comme Tâche de Nettoyage</translation>
     </message>
     <message>
-        <source>Select All Keys in this Row</source>
-        <translation>Sélectionner Toutes les Clés de cette Ligne</translation>
+        <source>Select All Keys in this Frame</source>
+        <translation>Sélectionner Toutes les Clés de cette Image</translation>
     </message>
     <message>
         <source>Select All Keys in this Column</source>
@@ -3552,12 +3552,12 @@ Voulez-vous le créer?</translation>
         <translation>Sélectionner les Clés Suivantes de cette Colonne</translation>
     </message>
     <message>
-        <source>Select Previous Keys in this Row</source>
-        <translation>Sélectionner les Clés Précédentes de cette Ligne</translation>
+        <source>Select Previous Keys in this Frame</source>
+        <translation>Sélectionner les Clés Précédentes de cette Image</translation>
     </message>
     <message>
-        <source>Select Following Keys in this Row</source>
-        <translation>Sélectionner les Clés Suivantes de cette Ligne</translation>
+        <source>Select Following Keys in this Frame</source>
+        <translation>Sélectionner les Clés Suivantes de cette Image</translation>
     </message>
     <message>
         <source>Invert Key Selection</source>

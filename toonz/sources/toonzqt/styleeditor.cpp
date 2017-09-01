@@ -17,6 +17,7 @@
 #include "toonz/imagestyles.h"
 #include "toonz/txshsimplelevel.h"  //iwsw
 #include "toonz/levelproperties.h"  //iwsw
+#include "toonz/mypaintbrushstyle.h"
 
 // TnzCore includes
 #include "tconvert.h"
@@ -1232,9 +1233,11 @@ ColorChannelControl::ColorChannelControl(ColorChannel channel, QWidget *parent)
     : QWidget(parent), m_channel(channel), m_value(0), m_signalEnabled(true) {
   setFocusPolicy(Qt::NoFocus);
 
-  static const char *names[] = {"R", "G", "B", "M", "H", "S", "V"};
+  QStringList channelList;
+  channelList << tr("R") << tr("G") << tr("B") << tr("A") << tr("H") << tr("S")
+              << tr("V");
   assert(0 <= (int)m_channel && (int)m_channel < 7);
-  QString text = names[(int)m_channel];
+  QString text = channelList.at(m_channel);
   m_label      = new QLabel(text, this);
 
   int minValue = 0;
@@ -1504,12 +1507,12 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 
   QPushButton *wheelShowButton = new QPushButton(tr("Wheel"), this);
   QPushButton *hsvShowButton   = new QPushButton(tr("HSV"), this);
-  QPushButton *matteShowButton = new QPushButton(tr("Matte"), this);
+  QPushButton *alphaShowButton = new QPushButton(tr("Alpha"), this);
   QPushButton *rgbShowButton   = new QPushButton(tr("RGB"), this);
 
   QFrame *wheelFrame = new QFrame(this);
   QFrame *hsvFrame   = new QFrame(this);
-  QFrame *matteFrame = new QFrame(this);
+  QFrame *alphaFrame = new QFrame(this);
   QFrame *rgbFrame   = new QFrame(this);
 
   QFrame *slidersContainer = new QFrame(this);
@@ -1519,24 +1522,24 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   // channelButtonGroup->setExclusive(true);
   wheelShowButton->setCheckable(true);
   hsvShowButton->setCheckable(true);
-  matteShowButton->setCheckable(true);
+  alphaShowButton->setCheckable(true);
   rgbShowButton->setCheckable(true);
   wheelShowButton->setMinimumWidth(30);
   hsvShowButton->setMinimumWidth(30);
-  matteShowButton->setMinimumWidth(30);
+  alphaShowButton->setMinimumWidth(30);
   rgbShowButton->setMinimumWidth(30);
 
   wheelFrame->setObjectName("PlainColorPageParts");
   hsvFrame->setObjectName("PlainColorPageParts");
-  matteFrame->setObjectName("PlainColorPageParts");
+  alphaFrame->setObjectName("PlainColorPageParts");
   rgbFrame->setObjectName("PlainColorPageParts");
 
   wheelShowButton->setChecked(true);
   wheelShowButton->setFocusPolicy(Qt::NoFocus);
   hsvShowButton->setChecked(true);
   hsvShowButton->setFocusPolicy(Qt::NoFocus);
-  matteShowButton->setChecked(true);
-  matteShowButton->setFocusPolicy(Qt::NoFocus);
+  alphaShowButton->setChecked(true);
+  alphaShowButton->setFocusPolicy(Qt::NoFocus);
   rgbShowButton->setChecked(true);
   rgbShowButton->setFocusPolicy(Qt::NoFocus);
 
@@ -1558,7 +1561,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
     {
       showButtonLayout->addWidget(wheelShowButton, 1);
       showButtonLayout->addWidget(hsvShowButton, 1);
-      showButtonLayout->addWidget(matteShowButton, 1);
+      showButtonLayout->addWidget(alphaShowButton, 1);
       showButtonLayout->addWidget(rgbShowButton, 1);
     }
     mainLayout->addLayout(showButtonLayout);
@@ -1585,12 +1588,12 @@ PlainColorPage::PlainColorPage(QWidget *parent)
       hsvFrame->setLayout(hsvLayout);
       slidersLayout->addWidget(hsvFrame, 3);
 
-      QVBoxLayout *matteLayout = new QVBoxLayout();
-      matteLayout->setMargin(4);
-      matteLayout->setSpacing(4);
-      { matteLayout->addWidget(m_channelControls[eAlpha]); }
-      matteFrame->setLayout(matteLayout);
-      slidersLayout->addWidget(matteFrame, 1);
+      QVBoxLayout *alphaLayout = new QVBoxLayout();
+      alphaLayout->setMargin(4);
+      alphaLayout->setSpacing(4);
+      { alphaLayout->addWidget(m_channelControls[eAlpha]); }
+      alphaFrame->setLayout(alphaLayout);
+      slidersLayout->addWidget(alphaFrame, 1);
 
       QVBoxLayout *rgbLayout = new QVBoxLayout();
       rgbLayout->setMargin(4);
@@ -1633,7 +1636,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
           SLOT(setVisible(bool)));
   connect(hsvShowButton, SIGNAL(toggled(bool)), hsvFrame,
           SLOT(setVisible(bool)));
-  connect(matteShowButton, SIGNAL(toggled(bool)), matteFrame,
+  connect(alphaShowButton, SIGNAL(toggled(bool)), alphaFrame,
           SLOT(setVisible(bool)));
   connect(rgbShowButton, SIGNAL(toggled(bool)), rgbFrame,
           SLOT(setVisible(bool)));
@@ -2181,6 +2184,104 @@ bool TextureStyleChooserPage::event(QEvent *e) {
 }
 
 //*****************************************************************************
+//    MyPaintBrushStyleChooserPage definition
+//*****************************************************************************
+
+class MyPaintBrushStyleChooserPage final : public StyleChooserPage {
+public:
+  struct Brush {
+    TRasterP m_raster;
+    QString m_name;
+  };
+
+private:
+  static std::vector<TMyPaintBrushStyle> m_brushes;
+
+public:
+  MyPaintBrushStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent) {
+    m_chipSize = QSize(64, 64);
+  }
+
+  bool loadIfNeeded() override {
+    static bool m_loaded = false;
+    if (!m_loaded) {
+      loadItems();
+      m_loaded = true;
+      return true;
+    } else
+      return false;
+  }
+
+  int getChipCount() const override { return m_brushes.size() + 1; }
+
+  static void loadItems();
+
+  void drawChip(QPainter &p, QRect rect, int index) override {
+    assert(0 <= index && index <= (int)m_brushes.size());
+    static QImage noStyleImage(":Resources/no_mypaintbrush.png");
+    p.drawImage(rect, index == 0
+                          ? noStyleImage
+                          : rasterToQImage(m_brushes[index - 1].getPreview()));
+  }
+
+  void onSelect(int index) override {
+    assert(0 <= index && index <= (int)m_brushes.size());
+    static TSolidColorStyle noStyle(TPixel32::Black);
+    if (index == 0) {
+      emit styleSelected(noStyle);
+    } else {
+      emit styleSelected(m_brushes[index - 1]);
+    }
+  }
+
+  bool event(QEvent *e) override {
+    static TSolidColorStyle noStyle(TPixel32::Black);
+    if (e->type() == QEvent::ToolTip) {
+      QHelpEvent *helpEvent = dynamic_cast<QHelpEvent *>(e);
+      QString toolTip;
+      QPoint pos = helpEvent->pos();
+      int index  = posToIndex(pos);
+      if (index == 0) {
+        toolTip = tr("Plain color");
+      } else if (index > 0 && index <= (int)m_brushes.size()) {
+        toolTip = m_brushes[index - 1].getPath().getQString();
+      }
+      QToolTip::showText(helpEvent->globalPos(), toolTip);
+      e->accept();
+    }
+    return StyleChooserPage::event(e);
+  }
+};
+
+//-----------------------------------------------------------------------------
+
+std::vector<TMyPaintBrushStyle> MyPaintBrushStyleChooserPage::m_brushes;
+
+//-----------------------------------------------------------------------------
+
+void MyPaintBrushStyleChooserPage::loadItems() {
+  m_brushes.clear();
+  std::set<TFilePath> brushFiles;
+
+  TFilePathSet dirs = TMyPaintBrushStyle::getBrushesDirs();
+  for (TFilePathSet::iterator i = dirs.begin(); i != dirs.end(); ++i) {
+    TFileStatus fs(*i);
+    if (fs.doesExist() && fs.isDirectory()) {
+      TFilePathSet files = TSystem::readDirectoryTree(*i, false, true);
+      for (TFilePathSet::iterator j = files.begin(); j != files.end(); ++j)
+        if (j->getType() == TMyPaintBrushStyle::getBrushType())
+          brushFiles.insert(*j - *i);
+    }
+  }
+
+  // reserve memory to avoid reallocation
+  m_brushes.reserve(brushFiles.size());
+  for (std::set<TFilePath>::iterator i = brushFiles.begin();
+       i != brushFiles.end(); ++i)
+    m_brushes.push_back(TMyPaintBrushStyle(*i));
+}
+
+//*****************************************************************************
 //    SpecialStyleChooser  definition
 //*****************************************************************************
 
@@ -2232,7 +2333,8 @@ void SpecialStyleChooserPage::loadItems() {
         tagId == 2800 ||  // imagepattern
         tagId == 2001 ||  // cleanup
         tagId == 2002 ||  // ??
-        tagId == 3000     // vector brush
+        tagId == 3000 ||  // vector brush
+        tagId == 4001     // mypaint brush
         )
       continue;
 
@@ -2589,6 +2691,17 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
       }
       }
 
+      // "reset to default" button
+      if (m_editedStyle->hasParamDefault(p)) {
+        QPushButton *pushButton = new QPushButton;
+        pushButton->setToolTip(tr("Reset to default"));
+        pushButton->setIcon(createQIcon("delete"));
+        m_paramsLayout->addWidget(pushButton, p, 2);
+        ret = QObject::connect(pushButton, SIGNAL(clicked(bool)), this,
+                               SLOT(onValueReset())) &&
+              ret;
+      }
+
       assert(ret);
     }
   }
@@ -2613,6 +2726,13 @@ void SettingsPage::updateValues() {
 
   int p, pCount = m_editedStyle->getParamCount();
   for (p = 0; p != pCount; ++p) {
+    // Update state of "reset to default" button
+    if (m_editedStyle->hasParamDefault(p)) {
+      QPushButton *pushButton = static_cast<QPushButton *>(
+          m_paramsLayout->itemAtPosition(p, 2)->widget());
+      pushButton->setEnabled(m_editedStyle->isParamDefault(p));
+    }
+
     // Update editor values
     switch (m_editedStyle->getParamType(p)) {
     case TColorStyle::BOOL: {
@@ -2680,26 +2800,39 @@ void SettingsPage::onAutofillChanged() {
 
 //-----------------------------------------------------------------------------
 
-void SettingsPage::onValueChanged(bool isDragging) {
-  struct Locals {
-    SettingsPage *m_this;
+int SettingsPage::getParamIndex(const QWidget *widget) {
+  int p, pCount = m_paramsLayout->rowCount();
+  for (p = 0; p != pCount; ++p)
+    for (int c = 0; c < 3; ++c)
+      if (QLayoutItem *item = m_paramsLayout->itemAtPosition(p, c))
+        if (item->widget() == widget) return p;
+  return -1;
+}
 
-    int paramIndex(const QWidget *widget) {
-      int p, pCount = m_this->m_paramsLayout->rowCount();
-      for (p = 0; p != pCount; ++p)
-        if (m_this->m_paramsLayout->itemAtPosition(p, 1)->widget() == widget)
-          break;
+//-----------------------------------------------------------------------------
 
-      return p;
-    }
-
-  } locals = {this};
-
+void SettingsPage::onValueReset() {
   assert(m_editedStyle);
 
   // Extract the parameter index
   QWidget *senderWidget = static_cast<QWidget *>(sender());
-  int p                 = locals.paramIndex(senderWidget);
+  int p                 = getParamIndex(senderWidget);
+
+  assert(0 <= p && p < m_editedStyle->getParamCount());
+  m_editedStyle->setParamDefault(p);
+
+  // Forward the signal to the style editor
+  if (!m_updating) emit paramStyleChanged(false);
+}
+
+//-----------------------------------------------------------------------------
+
+void SettingsPage::onValueChanged(bool isDragging) {
+  assert(m_editedStyle);
+
+  // Extract the parameter index
+  QWidget *senderWidget = static_cast<QWidget *>(sender());
+  int p                 = getParamIndex(senderWidget);
 
   assert(0 <= p && p < m_editedStyle->getParamCount());
 
@@ -2790,12 +2923,13 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   m_tabBarContainer        = new TabBarContainter(this);
   m_colorParameterSelector = new ColorParameterSelector(this);
 
-  m_plainColorPage         = new PlainColorPage(0);
-  m_textureStylePage       = new TextureStyleChooserPage(0);
-  m_specialStylePage       = new SpecialStyleChooserPage(0);
-  m_customStylePage        = new CustomStyleChooserPage(0);
-  m_vectorBrushesStylePage = new VectorBrushStyleChooserPage(0);
-  m_settingsPage           = new SettingsPage(0);
+  m_plainColorPage          = new PlainColorPage(0);
+  m_textureStylePage        = new TextureStyleChooserPage(0);
+  m_specialStylePage        = new SpecialStyleChooserPage(0);
+  m_customStylePage         = new CustomStyleChooserPage(0);
+  m_vectorBrushesStylePage  = new VectorBrushStyleChooserPage(0);
+  m_mypaintBrushesStylePage = new MyPaintBrushStyleChooserPage(0);
+  m_settingsPage            = new SettingsPage(0);
 
   QWidget *emptyPage = new StyleEditorPage(0);
 
@@ -2806,10 +2940,11 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   // in order to use the styleSheet to stylish its background
   QScrollArea *plainArea = makeChooserPageWithoutScrollBar(m_plainColorPage);
 
-  QScrollArea *textureArea       = makeChooserPage(m_textureStylePage);
-  QScrollArea *specialArea       = makeChooserPage(m_specialStylePage);
-  QScrollArea *customArea        = makeChooserPage(m_customStylePage);
-  QScrollArea *vectorBrushesArea = makeChooserPage(m_vectorBrushesStylePage);
+  QScrollArea *textureArea        = makeChooserPage(m_textureStylePage);
+  QScrollArea *specialArea        = makeChooserPage(m_specialStylePage);
+  QScrollArea *customArea         = makeChooserPage(m_customStylePage);
+  QScrollArea *vectorBrushesArea  = makeChooserPage(m_vectorBrushesStylePage);
+  QScrollArea *mypaintBrushesArea = makeChooserPage(m_mypaintBrushesStylePage);
   QScrollArea *settingsArea = makeChooserPageWithoutScrollBar(m_settingsPage);
 
   m_styleChooser = new QStackedWidget(this);
@@ -2818,6 +2953,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   m_styleChooser->addWidget(specialArea);
   m_styleChooser->addWidget(customArea);
   m_styleChooser->addWidget(vectorBrushesArea);
+  m_styleChooser->addWidget(mypaintBrushesArea);
   m_styleChooser->addWidget(settingsArea);
   m_styleChooser->addWidget(makeChooserPageWithoutScrollBar(emptyPage));
   m_styleChooser->setFocusPolicy(Qt::NoFocus);
@@ -2873,6 +3009,9 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   ret = ret && connect(m_vectorBrushesStylePage,
                        SIGNAL(styleSelected(const TColorStyle &)), this,
                        SLOT(selectStyle(const TColorStyle &)));
+  ret = ret && connect(m_mypaintBrushesStylePage,
+                       SIGNAL(styleSelected(const TColorStyle &)), this,
+                       SLOT(selectStyle(const TColorStyle &)));
   ret = ret && connect(m_settingsPage, SIGNAL(paramStyleChanged(bool)), this,
                        SLOT(onParamStyleChanged(bool)));
   ret = ret && connect(m_plainColorPage,
@@ -2883,7 +3022,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   /* ------- initial conditions ------- */
   enable(false, false, false);
   // set to the empty page
-  m_styleChooser->setCurrentIndex(6);
+  m_styleChooser->setCurrentIndex(7);
 }
 
 //-----------------------------------------------------------------------------
@@ -2973,6 +3112,7 @@ void StyleEditor::updateTabBar() {
     m_styleBar->addSimpleTab(tr("Special"));
     m_styleBar->addSimpleTab(tr("Custom"));
     m_styleBar->addSimpleTab(tr("Vector Brush"));
+    m_styleBar->addSimpleTab(tr("MyPaint Brush"));
     m_styleBar->addSimpleTab(tr("Settings"));
   } else if (m_enabled && m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab)
     m_styleBar->addSimpleTab(tr("Plain"));
@@ -2980,7 +3120,7 @@ void StyleEditor::updateTabBar() {
     m_styleBar->addSimpleTab(tr("Plain"));
     m_styleBar->addSimpleTab(tr("Settings"));
   } else {
-    m_styleChooser->setCurrentIndex(6);
+    m_styleChooser->setCurrentIndex(7);
     return;
   }
   m_tabBarContainer->layout()->update();
@@ -3027,7 +3167,7 @@ void StyleEditor::onStyleSwitched() {
 
   if (!palette) {
     // set the current page to empty
-    m_styleChooser->setCurrentIndex(6);
+    m_styleChooser->setCurrentIndex(7);
     enable(false);
     m_colorParameterSelector->clear();
     m_oldStyle    = TColorStyleP();

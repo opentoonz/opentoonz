@@ -72,7 +72,7 @@ void fx_(const TRasterP in_ras  // with margin
          const int margin, TRasterP out_ras  // no margin
 
          ,
-         const TRasterP refer_ras, const int ref_mode
+         const TRasterP refer_ras, const int refer_mode
 
          ,
          const double radius, const int channel) {
@@ -91,9 +91,12 @@ void fx_(const TRasterP in_ras  // with margin
       in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(in_ras)
 
                                                              ,
-      (((0 <= ref_mode) && refer_ras) ? refer_ras->getRawData() : 0)  // BGRA
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                     : nullptr)  // BGRA
       ,
-      (((0 <= ref_mode) && refer_ras) ? ino::bits(refer_ras) : 0), ref_mode
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
+                                                     : 0),
+      refer_mode
 
       ,
       channel, radius, 0 /* 0=Spread:外は淵のピクセル値が続いているとする */
@@ -119,9 +122,9 @@ void ino_median_filter::doCompute(TTile &tile, double frame,
 
   /* ------ Pixel単位で動作パラメータを得る ----------------- */
   /* 動作パラメータを得る */
-  const double radius = this->m_radius->getValue(frame);
-  const int channel   = this->m_channel->getValue();
-  const int ref_mode  = this->m_ref_mode->getValue();
+  const double radius  = this->m_radius->getValue(frame);
+  const int channel    = this->m_channel->getValue();
+  const int refer_mode = this->m_ref_mode->getValue();
 
   /* ------ 参照マージン含めた画像生成 ---------------------- */
   /* Rendering画像のBBox値 --> Pixel単位のdouble値 */
@@ -168,12 +171,12 @@ void ino_median_filter::doCompute(TTile &tile, double frame,
       tile.getRaster(), frame, rend_sets);
 
   /*------ 参照画像生成 --------------------------------------*/
-  TTile reference_tile;
-  bool reference_sw = false;
+  TTile refer_tile;
+  bool refer_sw = false;
   if (this->m_refer.isConnected()) {
-    reference_sw = true;
+    refer_sw = true;
     this->m_refer->allocateAndCompute(
-        reference_tile, enlarge_tile.m_pos,
+        refer_tile, enlarge_tile.m_pos,
         TDimensionI(/* Pixel単位 */
                     enlarge_tile.getRaster()->getLx(),
                     enlarge_tile.getRaster()->getLy()),
@@ -188,23 +191,25 @@ void ino_median_filter::doCompute(TTile &tile, double frame,
   if (log_sw) {
     std::ostringstream os;
     os << "params"
-       << "  radius " << radius << "  channel " << channel << "  ref_mode "
-       << ref_mode << "   tile w " << tile.getRaster()->getLx() << "  h "
+       << "  radius " << radius << "  channel " << channel << "  refer_mode "
+       << refer_mode << "   tile w " << tile.getRaster()->getLx() << "  h "
        << tile.getRaster()->getLy() << "  pixbits "
        << ino::pixel_bits(tile.getRaster()) << "   frame " << frame
        << "   rand_sets affine_det " << rend_sets.m_affine.det()
        << "  shrink x " << rend_sets.m_shrinkX << "  y " << rend_sets.m_shrinkY;
-    if (reference_sw) {
-      os << "  reference_tile.m_pos " << reference_tile.m_pos
-         << "  reference_tile_getLx " << reference_tile.getRaster()->getLx()
-         << "  y " << reference_tile.getRaster()->getLy();
+    if (refer_sw) {
+      os << "  refer_tile.m_pos " << refer_tile.m_pos << "  refer_tile_getLx "
+         << refer_tile.getRaster()->getLx() << "  y "
+         << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
-    const TRasterP refer_ras =
-        (reference_sw ? reference_tile.getRaster() : nullptr);
+    enlarge_tile.getRaster()->lock();
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
     fx_(enlarge_tile.getRaster()  // in with margin
         ,
         enlarge_pixel  // margin
@@ -212,14 +217,22 @@ void ino_median_filter::doCompute(TTile &tile, double frame,
         tile.getRaster()  // out with no margin
 
         ,
-        refer_ras, ref_mode
+        refer_tile.getRaster(), refer_mode
 
         ,
         radius, channel);
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -228,6 +241,10 @@ void ino_median_filter::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -236,6 +253,10 @@ void ino_median_filter::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
+    enlarge_tile.getRaster()->unlock();
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");

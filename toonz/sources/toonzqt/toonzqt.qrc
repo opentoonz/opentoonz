@@ -10,107 +10,106 @@
         <file>Resources/bottomover.png</file>
         <file>Resources/bold_off.png</file>
         <file>Resources/bold_on.png</file>
-        <file>Resources/camera_off.png</file>
-        <file>Resources/camera_on.png</file>
+        <file>Resources/camera_off.svg</file>
+        <file>Resources/camera_on.svg</file>
         <file>Resources/camerastand_toggle.png</file>
         <file>Resources/camerastand_toggle_transp.png</file>
-        <file>Resources/centerselection_off.png</file>
-        <file>Resources/centerselection_on.png</file>
-        <file>Resources/cleanup.png</file>
+        <file>Resources/centerselection_off.svg</file>
+        <file>Resources/centerselection_on.svg</file>
+        <file>Resources/cleanup.svg</file>
         <file>Resources/custom_off.svg</file>
         <file>Resources/custom_on.svg</file>
-        <file>Resources/delete.png</file>
-        <file>Resources/delete_over.png</file>
-        <file>Resources/dragpalette.png</file>
-        <file>Resources/dragpalette_over.png</file>
-        <file>Resources/fit_off.png</file>
-        <file>Resources/fit_on.png</file>
-        <file>Resources/fx_off.png</file>
-        <file>Resources/fx_on.png</file>
+        <file>Resources/delete.svg</file>
+        <file>Resources/delete_over.svg</file>
+        <file>Resources/dragpalette.svg</file>
+        <file>Resources/dragpalette_over.svg</file>
+        <file>Resources/fit_off.svg</file>
+        <file>Resources/fit_on.svg</file>
+        <file>Resources/fx_off.svg</file>
+        <file>Resources/fx_on.svg</file>
         <file>Resources/h_chandle.png</file>
         <file>Resources/icon.png</file>
         <file>Resources/italic_off.png</file>
         <file>Resources/italic_on.png</file>
-        <file>Resources/folder_close_off.png</file>
-        <file>Resources/folder_open_off.png</file>
-        <file>Resources/folderanim_close_off.png</file>
-        <file>Resources/folderanim_open_off.png</file>
-        <file>Resources/folder_close.png</file>
-        <file>Resources/folder_open.png</file>
-        <file>Resources/folderanim_close.png</file>
-        <file>Resources/folderanim_open.png</file>
-        <file>Resources/key_no.png</file>
-        <file>Resources/key_no_over.png</file>
-        <file>Resources/key_partial.png</file>
-        <file>Resources/key_partial_over.png</file>
-        <file>Resources/key_total.png</file>
-        <file>Resources/key_total_over.png</file>
-        <file>Resources/magpie.png</file>
-        <file>Resources/maximizenodes_off.png</file>
-        <file>Resources/maximizenodes_on.png</file>
-        <file>Resources/minimizenodes_off.png</file>
-        <file>Resources/minimizenodes_on.png</file>
-        <file>Resources/motionpath_off.png</file>
-        <file>Resources/motionpath_on.png</file>
-        <file>Resources/newfolder.png</file>
-        <file>Resources/newfolder_over.png</file>
-        <file>Resources/newpage.png</file>
-        <file>Resources/newpage_over.png</file>
+        <file>Resources/folder_close_off.svg</file>
+        <file>Resources/folder_open_off.svg</file>
+        <file>Resources/folderanim_close_off.svg</file>
+        <file>Resources/folderanim_open_off.svg</file>
+        <file>Resources/folder_close.svg</file>
+        <file>Resources/folder_open.svg</file>
+        <file>Resources/folderanim_close.svg</file>
+        <file>Resources/folderanim_open.svg</file>
+        <file>Resources/key_no.svg</file>
+        <file>Resources/key_no_over.svg</file>
+        <file>Resources/key_partial.svg</file>
+        <file>Resources/key_partial_over.svg</file>
+        <file>Resources/key_total.svg</file>
+        <file>Resources/key_total_over.svg</file>
+        <file>Resources/magpie.svg</file>
+        <file>Resources/maximizenodes_off.svg</file>
+        <file>Resources/maximizenodes_on.svg</file>
+        <file>Resources/minimizenodes_off.svg</file>
+        <file>Resources/minimizenodes_on.svg</file>
+        <file>Resources/motionpath_off.svg</file>
+        <file>Resources/motionpath_on.svg</file>
+        <file>Resources/newfolder.svg</file>
+        <file>Resources/newfolder_over.svg</file>
+        <file>Resources/newpage.svg</file>
+        <file>Resources/newpage_over.svg</file>
         <file>Resources/newpalette.png</file>
         <file>Resources/newpalette_over.png</file>
-        <file>Resources/newstyle.png</file>
-        <file>Resources/newstyle_click.png</file>
-        <file>Resources/newstyle_over.png</file>
-        <file>Resources/nextkey.png</file>
-        <file>Resources/nextkey_disabled.png</file>
-        <file>Resources/nextkey_over.png</file>
+        <file>Resources/newstyle.svg</file>
+        <file>Resources/newstyle_over.svg</file>
+        <file>Resources/nextkey.svg</file>
+        <file>Resources/nextkey_disabled.svg</file>
+        <file>Resources/nextkey_over.svg</file>
         <file>Resources/no_specialstyle.png</file>
-        <file>Resources/options.png</file>
-        <file>Resources/options_click.png</file>
-        <file>Resources/options_over.png</file>
-        <file>Resources/output_off.png</file>
-        <file>Resources/output_on.png</file>
-        <file>Resources/palette.png</file>
+        <file>Resources/options.svg</file>
+        <file>Resources/options_over.svg</file>
+        <file>Resources/output_off.svg</file>
+        <file>Resources/output_on.svg</file>
+        <file>Resources/palette.svg</file>
         <file>Resources/palette_add_color.bmp</file>
-      <file>Resources/palette_tabicon.png</file>
-        <file>Resources/palettegizmo.png</file>
-        <file>Resources/palettegizmo_over.png</file>
-        <file>Resources/param_off.png</file>
-        <file>Resources/param_on.png</file>
-        <file>Resources/paramanim_off.png</file>
-        <file>Resources/paramanim_on.png</file>
-        <file>Resources/pegbar_off.png</file>
-        <file>Resources/pegbar_on.png</file>
+        <file>Resources/palette_tabicon.png</file>
+        <file>Resources/palettegizmo.svg</file>
+        <file>Resources/palettegizmo_over.svg</file>
+        <file>Resources/param_off.svg</file>
+        <file>Resources/param_on.svg</file>
+        <file>Resources/paramanim_off.svg</file>
+        <file>Resources/paramanim_on.svg</file>
+        <file>Resources/pegbar_off.svg</file>
+        <file>Resources/pegbar_on.svg</file>
         <file>Resources/plaincolor_off.svg</file>
         <file>Resources/plaincolor_on.svg</file>
-        <file>Resources/reorder_off.png</file>
-        <file>Resources/reorder_on.png</file>
-        <file>Resources/resetsize_off.png</file>
-        <file>Resources/resetsize_on.png</file>
+        <file>Resources/reorder_off.svg</file>
+        <file>Resources/reorder_on.svg</file>
+        <file>Resources/resetsize_off.svg</file>
+        <file>Resources/resetsize_on.svg</file>
         <file>Resources/settings_off.svg</file>
         <file>Resources/settings_on.svg</file>
-        <file>Resources/preview_black_off.png</file>
-        <file>Resources/preview_black_on.png</file>
-        <file>Resources/preview_black_over.png</file>
-        <file>Resources/preview_checkboard_off.png</file>
-        <file>Resources/preview_checkboard_on.png</file>
-        <file>Resources/preview_checkboard_over.png</file>
-        <file>Resources/preview_off.png</file>
-        <file>Resources/preview_on.png</file>
-        <file>Resources/preview_over.png</file>
+        <file>Resources/preview_black_off.svg</file>
+        <file>Resources/preview_black_on.svg</file>
+        <file>Resources/preview_black_over.svg</file>
+        <file>Resources/preview_checkboard_off.svg</file>
+        <file>Resources/preview_checkboard_on.svg</file>
+        <file>Resources/preview_checkboard_over.svg</file>
+        <file>Resources/preview_off.svg</file>
+        <file>Resources/preview_on.svg</file>
+        <file>Resources/preview_over.svg</file>
         <file>Resources/preview_toggle.png</file>
-        <file>Resources/preview_white_off.png</file>
-        <file>Resources/preview_white_on.png</file>
-        <file>Resources/preview_white_over.png</file>
-        <file>Resources/prevkey.png</file>
-        <file>Resources/prevkey_disabled.png</file>
-        <file>Resources/prevkey_over.png</file>
+        <file>Resources/preview_white_off.svg</file>
+        <file>Resources/preview_white_on.svg</file>
+        <file>Resources/preview_white_over.svg</file>
+        <file>Resources/prevkey.svg</file>
+        <file>Resources/prevkey_disabled.svg</file>
+        <file>Resources/prevkey_over.svg</file>
         <file>Resources/resizeColumnNode.svg</file>
         <file>Resources/savepalette.png</file>
+        <file>Resources/save.svg</file>
         <file>Resources/savepalette_click.png</file>
+        <file>Resources/save_click.svg</file>
         <file>Resources/savepalette_over.png</file>
-        <file>Resources/saveas_on.png</file>
-        <file>Resources/saveas_off.png</file>
+        <file>Resources/save_over.svg</file>
         <file>Resources/schematic_spin_arrows.svg</file>
         <file>Resources/schematic_spline_aim_rhomb.svg</file>
         <file>Resources/schematic_spline_aim_square.svg</file>
@@ -128,35 +127,35 @@
         <file>Resources/sizemedium_over.png</file>
         <file>Resources/special_off.svg</file>
         <file>Resources/special_on.svg</file>
-        <file>Resources/swap_off.png</file>
-        <file>Resources/swap_on.png</file>
-        <file>Resources/tasklist.png</file>
+        <file>Resources/swap_off.svg</file>
+        <file>Resources/swap_on.svg</file>
+        <file>Resources/tasklist.svg</file>
         <file>Resources/text_edit_button.png</file>
         <file>Resources/texture_off.svg</file>
         <file>Resources/texture_on.svg</file>
         <file>Resources/underline_off.png</file>
         <file>Resources/underline_on.png</file>
         <file>Resources/v_chandle.png</file>
-        <file>Resources/viewcamera_off.png</file>
-        <file>Resources/viewcamera_on.png</file>
-        <file>Resources/viewcamera_over.png</file>
-        <file>Resources/unknown.png</file>
-        <file>Resources/audio.png</file>
-        <file>Resources/broken.png</file>
-        <file>Resources/opacitycheck_off.png</file>
-        <file>Resources/opacitycheck_on.png</file>
-        <file>Resources/opacitycheck_over.png</file>
-        <file>Resources/tmsg_info.png</file>
-        <file>Resources/tmsg_error.png</file>
-        <file>Resources/tmsg_warning.png</file>
-      <file>Resources/lockpalette_off.png</file>
-      <file>Resources/lockpalette_on.png</file>
-      <file>Resources/lockpalette_over.png</file>
-      <file>Resources/savepalette_off.png</file>
-      <file>Resources/savepalette_on.png</file>
-      <file>Resources/savepaletteas_off.png</file>
-      <file>Resources/savepaletteas_on.png</file>
-      <file>Resources/studiopalette.png</file>
+        <file>Resources/viewcamera_off.svg</file>
+        <file>Resources/viewcamera_on.svg</file>
+        <file>Resources/viewcamera_over.svg</file>
+        <file>Resources/unknown.svg</file>
+        <file>Resources/audio.svg</file>
+        <file>Resources/broken.svg</file>
+        <file>Resources/opacitycheck_off.svg</file>
+        <file>Resources/opacitycheck_on.svg</file>
+        <file>Resources/opacitycheck_over.svg</file>
+        <file>Resources/tmsg_info.svg</file>
+        <file>Resources/tmsg_error.svg</file>
+        <file>Resources/tmsg_warning.svg</file>
+      <file>Resources/lockpalette_off.svg</file>
+      <file>Resources/lockpalette_on.svg</file>
+      <file>Resources/lockpalette_over.svg</file>
+      <file>Resources/savepalette_off.svg</file>
+      <file>Resources/savepalette_on.svg</file>
+      <file>Resources/savepaletteas_off.svg</file>
+      <file>Resources/savepaletteas_on.svg</file>
+      <file>Resources/studiopalette.svg</file>
       <file>Resources/grad_r.png</file>
       <file>Resources/grad_g.png</file>
       <file>Resources/grad_b.png</file>
@@ -166,22 +165,22 @@
       <file>Resources/h_chandleCenter.png</file>
       <file>Resources/schematic_palette.png</file>
       <file>Resources/schematic_tablenode.png</file>
-      <file>Resources/port_red.png</file>
-      <file>Resources/port_red_highlight.png</file>
-      <file>Resources/port_blue.png</file>
-      <file>Resources/port_blue_highlight.png</file>
-      <file>Resources/spline_child_port.png</file>
-      <file>Resources/spline_child_port_disconnect.png</file>
-      <file>Resources/spline_parent_port.png</file>
+      <file>Resources/port_red.svg</file>
+      <file>Resources/port_red_highlight.svg</file>
+      <file>Resources/port_blue.svg</file>
+      <file>Resources/port_blue_highlight.svg</file>
+      <file>Resources/spline_child_port.svg</file>
+      <file>Resources/spline_child_port_disconnect.svg</file>
+      <file>Resources/spline_parent_port.svg</file>
       <file>Resources/schematic_prev_eye.png</file>
       <file>Resources/schematic_table_view.png</file>
       <file>Resources/schematic_table_view_transp.png</file>      
-      <file>Resources/fxport_red.png</file>
-      <file>Resources/fxport_blue.png</file>
+      <file>Resources/fxport_red.svg</file>
+      <file>Resources/fxport_blue.svg</file>
       <file>Resources/cachefx.png</file>
-      <file>Resources/schematic_link.png</file>
-      <file>Resources/schematic_thumbtoggle_on.png</file>
-      <file>Resources/schematic_thumbtoggle_off.png</file>
+      <file>Resources/schematic_link.svg</file>
+      <file>Resources/schematic_thumbtoggle_on.svg</file>
+      <file>Resources/schematic_thumbtoggle_off.svg</file>
       <file>Resources/dragcursor_exp_text.png</file>
       <file>Resources/fxicons/fx_checkboard.png</file>
       <file>Resources/fxicons/fx_colorcard.png</file>
@@ -299,13 +298,13 @@
       <file>Resources/fxicons/fx_iwa_bokeh.png</file>
       <file>Resources/fxicons/fx_iwa_soapbubble.png</file>
       <file>Resources/fxicons/fx_unidentified.png</file>
-      <file>Resources/keyframe_noanim.png</file>
-      <file>Resources/keyframe_key.png</file>
-      <file>Resources/keyframe_modified.png</file>
-      <file>Resources/keyframe_inbetween.png</file>
-      <file>Resources/switchport_on.png</file>
-      <file>Resources/switchport_off.png</file>
-      <file>Resources/switchport_over.png</file>
-      <file>Resources/plus.png</file>
+      <file>Resources/keyframe_noanim.svg</file>
+      <file>Resources/keyframe_key.svg</file>
+      <file>Resources/keyframe_modified.svg</file>
+      <file>Resources/keyframe_inbetween.svg</file>
+      <file>Resources/switchport_on.svg</file>
+      <file>Resources/switchport_off.svg</file>
+      <file>Resources/switchport_over.svg</file>
+      <file>Resources/plus.svg</file>
     </qresource>
 </RCC>

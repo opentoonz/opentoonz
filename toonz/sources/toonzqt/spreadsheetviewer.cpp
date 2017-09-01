@@ -4,6 +4,7 @@
 #include "toonzqt/gutil.h"
 
 #include "toonz/tframehandle.h"
+#include "orientation.h"
 
 #include <QKeyEvent>
 #include <QWheelEvent>
@@ -21,60 +22,111 @@
 namespace Spreadsheet {
 
 //=============================================================================
-FrameScroller::FrameScroller() {}
+FrameScroller::FrameScroller()
+    : m_orientation(Orientations::topToBottom())
+    , m_scrollArea(nullptr)
+    , m_lastX(0)
+    , m_lastY(0)
+    , m_syncing(false) {}
 
 FrameScroller::~FrameScroller() {}
 
-void FrameScroller::connectScroller(FrameScroller *scroller) {
-  if (scroller != this && !m_connectedScrollers.contains(scroller)) {
-    m_connectedScrollers.append(scroller);
-    scroller->connectScroller(this);
-    QScrollBar *sb0 = getFrameScrollArea()->verticalScrollBar();
-    QScrollBar *sb1 = scroller->getFrameScrollArea()->verticalScrollBar();
-    QObject::connect(sb0, SIGNAL(valueChanged(int)), sb1, SLOT(setValue(int)));
-    QObject::connect(sb1, SIGNAL(valueChanged(int)), sb0, SLOT(setValue(int)));
-  }
+void FrameScroller::setFrameScrollArea(QScrollArea *scrollArea) {
+  disconnectScrollbars();
+  m_scrollArea = scrollArea;
+  connectScrollbars();
 }
 
-void FrameScroller::disconnectScroller(FrameScroller *scroller) {
-  if (m_connectedScrollers.contains(scroller)) {
-    m_connectedScrollers.removeAll(scroller);
-    scroller->disconnectScroller(this);
-    QScrollBar *sb0 = getFrameScrollArea()->verticalScrollBar();
-    QScrollBar *sb1 = scroller->getFrameScrollArea()->verticalScrollBar();
-    QObject::disconnect(sb0, SIGNAL(valueChanged(int)), sb1,
-                        SLOT(setValue(int)));
-    QObject::disconnect(sb1, SIGNAL(valueChanged(int)), sb0,
-                        SLOT(setValue(int)));
-  }
+void FrameScroller::disconnectScrollbars() {
+  if (!m_scrollArea) return;
+  disconnect(m_scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this,
+             &FrameScroller::onVScroll);
+  disconnect(m_scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged,
+             this, &FrameScroller::onHScroll);
 }
 
-bool FrameScroller::isScrollerConnected(FrameScroller *scroller) {
-  return m_connectedScrollers.contains(scroller);
+void FrameScroller::connectScrollbars() {
+  if (!m_scrollArea) return;
+  m_lastX = m_scrollArea->horizontalScrollBar()->value();
+  m_lastY = m_scrollArea->verticalScrollBar()->value();
+  connect(m_scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this,
+          &FrameScroller::onVScroll);
+  connect(m_scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, this,
+          &FrameScroller::onHScroll);
+}
+
+void FrameScroller::onVScroll(int y) {
+  QPoint offset(0, y - m_lastY);
+  if (isSyncing()) return;
+  m_lastY = y;
+  setSyncing(true);
+  handleScroll(offset);
+  setSyncing(false);
+}
+void FrameScroller::onHScroll(int x) {
+  QPoint offset(x - m_lastX, 0);
+  if (isSyncing()) return;
+  m_lastX = x;
+  setSyncing(true);
+  handleScroll(offset);
+  setSyncing(false);
 }
 
 static QList<FrameScroller *> frameScrollers;
 
+void FrameScroller::handleScroll(const QPoint &offset) const {
+  CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
+  if ((m_orientation->isVerticalTimeline() && offset.x()) ||
+      (!m_orientation->isVerticalTimeline() &&
+       offset.y()))  // only synchronize changes by frames axis
+    return;
+
+  for (int i = 0; i < frameScrollers.size(); i++)
+    if (frameScrollers[i] != this) {
+      if (!frameScrollers[i]->isSyncing()) {
+        frameScrollers[i]->onScroll(ratio);
+        break;
+      }
+    }
+}
+
+void adjustScrollbar(QScrollBar *scrollBar, int add);
+
+void FrameScroller::onScroll(const CellPositionRatio &ratio) {
+  QPoint offset = orientation()->positionRatioToXY(ratio);
+  // scroll area should be resized before moving down the scroll bar.
+  // SpreadsheetViewer::onPrepareToScrollOffset() will be invoked immediately
+  // since the receiver is in the same thread.
+  // when moving up the scroll bar, resizing will be done in
+  // SpreadsheetViewer::onVSliderChanged().
+  if (offset.x() > 0 || offset.y() > 0) emit prepareToScrollOffset(offset);
+  if (offset.x())
+    adjustScrollbar(m_scrollArea->horizontalScrollBar(), offset.x());
+  if (offset.y())
+    adjustScrollbar(m_scrollArea->verticalScrollBar(), offset.y());
+}
+
+void adjustScrollbar(QScrollBar *scrollBar, int add) {
+  scrollBar->setValue(scrollBar->value() + add);
+}
+
 void FrameScroller::registerFrameScroller() {
-  if (!frameScrollers.contains(this)) {
-    for (int i = 0; i < frameScrollers.size(); i++)
-      connectScroller(frameScrollers[i]);
-    frameScrollers.append(this);
-  }
+  if (!frameScrollers.contains(this)) frameScrollers.append(this);
 }
 
 void FrameScroller::unregisterFrameScroller() {
-  if (frameScrollers.contains(this)) {
-    frameScrollers.removeAll(this);
-    for (int i = 0; i < frameScrollers.size(); i++)
-      disconnectScroller(frameScrollers[i]);
-  }
+  if (frameScrollers.contains(this)) frameScrollers.removeAll(this);
 }
 
-void FrameScroller::prepareToScroll(int dy) {
-  if (dy == 0) return;
+void FrameScroller::prepareToScrollOthers(const QPoint &offset) {
+  CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
   for (int i = 0; i < frameScrollers.size(); i++)
-    if (frameScrollers[i] != this) frameScrollers[i]->onPrepareToScroll(dy);
+    if (frameScrollers[i] != this)
+      frameScrollers[i]->prepareToScrollRatio(ratio);
+}
+void FrameScroller::prepareToScrollRatio(const CellPositionRatio &ratio) {
+  QPoint offset = orientation()->positionRatioToXY(ratio);
+  emit prepareToScrollOffset(offset);
 }
 
 //=============================================================================
@@ -188,14 +240,16 @@ void GenericPanel::mousePressEvent(QMouseEvent *e) {
   else
     m_dragTool = createDragTool(e);
 
-  int row = getViewer()->yToRow(e->pos().y());
-  int col = getViewer()->xToColumn(e->pos().x());
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
   if (m_dragTool) m_dragTool->click(row, col, e);
 }
 
 void GenericPanel::mouseReleaseEvent(QMouseEvent *e) {
-  int row = getViewer()->yToRow(e->pos().y());
-  int col = getViewer()->xToColumn(e->pos().x());
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
   m_viewer->stopAutoPan();
   if (m_dragTool) {
     m_dragTool->release(row, col, e);
@@ -205,8 +259,9 @@ void GenericPanel::mouseReleaseEvent(QMouseEvent *e) {
 }
 
 void GenericPanel::mouseMoveEvent(QMouseEvent *e) {
-  int row = getViewer()->yToRow(e->pos().y());
-  int col = getViewer()->xToColumn(e->pos().x());
+  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  int row                   = cellPosition.frame();
+  int col                   = cellPosition.layer();
   if (e->buttons() != 0 && m_dragTool != 0) {
     if ((e->buttons() & Qt::LeftButton) != 0 &&
         !visibleRegion().contains(e->pos())) {
@@ -289,9 +344,10 @@ void RowPanel::paintEvent(QPaintEvent *e) {
   QRect toBeUpdated = e->rect();
   QPainter p(this);
 
-  // range di righe visibili
-  int r0 = getViewer()->yToRow(toBeUpdated.top());
-  int r1 = getViewer()->yToRow(toBeUpdated.bottom());
+  CellRange visible = getViewer()->xyRectToRange(toBeUpdated);
+  // range of visible rows
+  int r0 = visible.from().frame();
+  int r1 = visible.to().frame();
 
   p.setClipRect(toBeUpdated);
   p.fillRect(toBeUpdated, QBrush(getViewer()->getLightLightBGColor()));
@@ -324,13 +380,15 @@ void CellPanel::paintEvent(QPaintEvent *e) {
   int y0 = toBeUpdated.top();
   int x1 = toBeUpdated.right(), y1 = toBeUpdated.bottom();
 
+  QRect alteredRect(QPoint(x0, y0), QPoint(x1, y1));
+  CellRange cellRange = getViewer()->xyRectToRange(alteredRect);
   // visible rows range
-  int r0 = getViewer()->yToRow(y0);
-  int r1 = getViewer()->yToRow(y1);
+  int r0 = cellRange.from().frame();
+  int r1 = cellRange.to().frame();
 
   // visible columns range
-  int c0 = getViewer()->xToColumn(x0);
-  int c1 = getViewer()->xToColumn(x1);
+  int c0 = cellRange.from().layer();
+  int c1 = cellRange.to().layer();
 
   // cambia colore alle celle prima di rowCount()
   int rowCount = getViewer()->getRowCount();
@@ -389,7 +447,10 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
     , m_currentRow(0)
     , m_markRowDistance(6)
     , m_markRowOffset(0)
-    , m_isComputingSize(false) {
+    , m_isComputingSize(false)
+    , m_frameScroller() {
+  // m_orientation = Orientations::topToBottom ();
+
   setFocusPolicy(Qt::NoFocus);
 
   setFrameStyle(QFrame::StyledPanel);
@@ -426,6 +487,10 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
   m_rowScrollArea->setFixedWidth(30);
   m_columnScrollArea->setFixedHeight(m_rowHeight * 3 - 3);
   // m_columnScrollArea->setFixedHeight(m_rowHeight * 3 + 60 - 63);
+
+  m_frameScroller.setFrameScrollArea(m_cellScrollArea);
+  connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset,
+          this, &SpreadsheetViewer::onPrepareToScrollOffset);
 
   //---- layout
   QGridLayout *layout = new QGridLayout();
@@ -520,7 +585,6 @@ void SpreadsheetViewer::setColumnCount(int columnCount) {
 void SpreadsheetViewer::scroll(QPoint delta) {
   int x = delta.x();
   int y = delta.y();
-  prepareToScroll(y);
 
   QScrollBar *hSc = m_cellScrollArea->horizontalScrollBar();
   QScrollBar *vSc = m_cellScrollArea->verticalScrollBar();
@@ -545,6 +609,10 @@ void SpreadsheetViewer::scroll(QPoint delta) {
 
   hSc->setValue(valueH);
   vSc->setValue(valueV);
+}
+
+void SpreadsheetViewer::onPrepareToScrollOffset(const QPoint &offset) {
+  refreshContentSize(offset.x(), offset.y());
 }
 
 void SpreadsheetViewer::setAutoPanSpeed(const QPoint &speed) {
@@ -583,21 +651,42 @@ void SpreadsheetViewer::setAutoPanSpeed(const QRect &widgetBounds,
   m_lastAutoPanPos = mousePos;
 }
 
-/*!Shift is a consequence of style sheet border.*/
 int SpreadsheetViewer::xToColumn(int x) const {
-  return (x + 1) / m_columnWidth;
+  CellPosition pos = xyToPosition(QPoint(x, 0));
+  return pos.layer();
 }
-
-/*!Shift is a consequence of style sheet border.*/
+int SpreadsheetViewer::yToRow(int y) const {
+  CellPosition pos = xyToPosition(QPoint(0, y));
+  return pos.frame();
+}
 int SpreadsheetViewer::columnToX(int col) const {
-  return (col * m_columnWidth) - 1;
+  QPoint xy = positionToXY(CellPosition(0, col));
+  return xy.x();
+}
+int SpreadsheetViewer::rowToY(int row) const {
+  QPoint xy = positionToXY(CellPosition(row, 0));
+  return xy.y();
 }
 
 /*!Shift is a consequence of style sheet border.*/
-int SpreadsheetViewer::yToRow(int y) const { return (y + 1) / m_rowHeight; }
+CellPosition SpreadsheetViewer::xyToPosition(const QPoint &point) const {
+  int row = (point.y() + 1) / m_rowHeight;
+  int col = (point.x() + 1) / m_columnWidth;
+  return CellPosition(row, col);
+}
 
 /*!Shift is a consequence of style sheet border.*/
-int SpreadsheetViewer::rowToY(int row) const { return (row * m_rowHeight) - 1; }
+QPoint SpreadsheetViewer::positionToXY(const CellPosition &pos) const {
+  int x = (pos.layer() * m_columnWidth) - 1;
+  int y = (pos.frame() * m_rowHeight) - 1;
+  return QPoint(x, y);
+}
+
+CellRange SpreadsheetViewer::xyRectToRange(const QRect &rect) const {
+  CellPosition topLeft     = xyToPosition(rect.topLeft());
+  CellPosition bottomRight = xyToPosition(rect.bottomRight());
+  return CellRange(topLeft, bottomRight);
+}
 
 bool SpreadsheetViewer::refreshContentSize(int scrollDx, int scrollDy) {
   QSize viewportSize = m_cellScrollArea->viewport()->size();

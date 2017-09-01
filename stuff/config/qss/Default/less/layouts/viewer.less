@@ -1,0 +1,131 @@
+/* -----------------------------------------------------------------------------
+   ComboViewer / Viewer / FlipBook
+----------------------------------------------------------------------------- */
+
+#ComboViewerPanel {
+  & Toolbar {
+    border-bottom: 1px solid @accent; // accent line against viewport
+    &::separator:horizontal {
+      // workaround for first tool button which adds spacing
+      margin: 0 0 0 2px;
+    }
+    & QToolButton {
+      margin: 2px 0 3px 2px;
+    }
+  }
+}
+
+#ComboViewerToolOptions {
+  border-bottom: 1px solid @accent; // accent line against viewport & ToolBar
+}
+
+#ComboViewer,
+#ViewerPanel,
+FlipBook {
+  & #ToolBarContainer {
+    background-color: transparent;
+    border-top: 2px solid @accent;
+    border-bottom: 1px solid @accent;
+    padding-right: -1px; // hides right border on #ScrollRightButton when
+                         // FPS Slider is turned off
+  }
+}
+
+QToolBar#FlipConsolePlayToolBar {
+  &::separator:horizontal {
+    margin: 0 3px;
+  }
+  & QToolButton {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    height: 16px;
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+}
+
+#ViewerFpsSlider {
+  background-color: transparent;
+  background-image: url('@{img-url}/@{slider-groove-img}');
+  background-position: center center;
+  background-repeat: repeat-x;
+  border: 0;
+  height: 19px;
+  margin: 0 3px 0 37px;
+  max-width: 300px;
+  min-width: 0px;
+  &::sub-line:horizontal {
+    subcontrol-origin: absolute;
+    background-color: @button-bg-color;
+    border: 1px solid @button-border-color;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    height: 16px;
+    left: -33px;
+    width: 14px;
+  }
+  &::add-line:horizontal {
+    subcontrol-position: left;
+    background-color: @button-bg-color;
+    border: 1px solid @button-border-color;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    left: 18px;
+    height: 16px;
+    image-position: center center;
+    width: 13px;
+  }
+  &::sub-line:horizontal,
+  &::add-line:horizontal {
+    &:hover {
+      &:extend(.Button:hover all);
+    }
+    &:pressed {
+      &:extend(.Button:pressed all);
+    }
+    &:disabled {
+      &:extend(.Button:disabled all);
+    }
+  }
+  &::handle {
+    &::horizontal {
+      @size: 9px;
+      background-color: @slider-handle-bg-color;
+      border: 1px solid @slider-handle-border-color;
+      border-radius: 2px;
+      margin: 2px 0 3px 0;
+      min-width: @size;
+      width: @size;
+      max-width: @size;
+    }
+  }
+}
+
+FlipSlider {
+  qproperty-PBHeight: 15;
+
+  // slider
+  qproperty-PBOverlay: url('@{img-url}/@{flipslider-img}');
+  qproperty-PBColorMarginLeft: 1;
+  qproperty-PBColorMarginTop: 2;
+  qproperty-PBColorMarginRight: 1;
+  qproperty-PBColorMarginBottom: 2;
+  
+  // marker
+  qproperty-PBMarker: url('@{img-url}/@{flipmarker-img}');
+  qproperty-PBMarkerMarginLeft: 3;
+  qproperty-PBMarkerMarginRight: 3;
+  qproperty-notStartedColor: @flipslider-notstarted-color;
+  qproperty-startedColor: @flipslider-started-color;
+  qproperty-baseColor: @flipslider-base-color;
+  qproperty-finishedColor: @flipslider-finished-color;
+}
+
+Ruler {
+  qproperty-ParentBGColor: @viewer-ruler-bg-color;
+  qproperty-ScaleColor: @viewer-ruler-scale-color;
+}
+
+#RulerToolOptionValues {
+  color: @viewer-ruler-ToolOptionValues-color;
+}
