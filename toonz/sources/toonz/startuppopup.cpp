@@ -147,6 +147,7 @@ StartupPopup::StartupPopup()
   m_resYFld->setRange(0.1, (std::numeric_limits<double>::max)());
   m_autoSaveTimeFld->setRange(1, (std::numeric_limits<int>::max)());
   m_autoSaveOnCB->setChecked(Preferences::instance()->isAutosaveEnabled());
+  m_autoSaveOnCB->setStyleSheet("QCheckBox{ background-color: none; }");
   m_autoSaveTimeFld->setEnabled(m_autoSaveOnCB->isChecked());
   m_autoSaveTimeFld->setValue(Preferences::instance()->getAutosavePeriod());
   m_showAtStartCB->setChecked(Preferences::instance()->isStartupPopupEnabled());
@@ -259,7 +260,9 @@ StartupPopup::StartupPopup()
     m_buttonLayout->addStretch();
     m_buttonLayout->addWidget(m_autoSaveOnCB);
     m_buttonLayout->addWidget(m_autoSaveTimeFld);
-    m_buttonLayout->addWidget(new QLabel(tr("Minutes")));
+    QLabel *minutesLabel = new QLabel(tr("Minutes"), this);
+    minutesLabel->setStyleSheet("QLabel{ background-color: none; }");
+    m_buttonLayout->addWidget(minutesLabel);
   }
 
   TApp *app                 = TApp::instance();
