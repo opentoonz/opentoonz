@@ -567,11 +567,11 @@ void ColumnArea::DrawHeader::prepare() const {
 
 //-----------------------------------------------------------------------------
 const QPixmap &ColumnArea::Pixmaps::sound() {
-  static QPixmap sound = QPixmap(":Resources/sound_header_off.png");
+  static QPixmap sound = svgToPixmap(":Resources/sound_header_off.svg");
   return sound;
 }
 const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
-  static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
+  static QPixmap soundPlaying = svgToPixmap(":Resources/sound_header_on.svg");
   return soundPlaying;
 }
 
@@ -687,8 +687,8 @@ void ColumnArea::DrawHeader::drawEye() const {
   if (o->flag(PredefinedFlag::EYE_AREA_BORDER))
 	  p.drawRect(prevViewRect);
 
-  // For Legacy (layout=1), Preview Off button is not displayed
-  if (m_viewer->getXsheetLayout() == 1 && buttonType == PREVIEW_OFF_XSHBUTTON)
+  // For Legacy (layout=1), Preview Off button is not displayed in Xsheet mode
+  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == 1 && buttonType == PREVIEW_OFF_XSHBUTTON)
 	  return;
 
   p.drawImage(eyeRect, icon);
@@ -721,8 +721,8 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
   if (o->flag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER))
 	  p.drawRect(tableViewRect);
 
-  // For Legacy (layout=1), Camstand Off button is not displayed
-  if (m_viewer->getXsheetLayout() == 1 && buttonType == CAMSTAND_OFF_XSHBUTTON)
+  // For Legacy (layout=1), Camstand Off button is not displayed in Xsheet mode
+  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == 1 && buttonType == CAMSTAND_OFF_XSHBUTTON)
 	  return;
   p.drawImage(tableViewImgRect, icon);
 }
@@ -743,8 +743,8 @@ void ColumnArea::DrawHeader::drawLock() const {
   if(o->flag(PredefinedFlag::LOCK_AREA_BORDER))
 	  p.drawRect(lockModeRect);
 
-  // For Legacy (layout=1), Lock Off button is not displayed
-  if (m_viewer->getXsheetLayout() == 1 && buttonType == LOCK_OFF_XSHBUTTON)
+  // For Legacy (layout=1), Lock Off button is not displayed in Xsheet mode
+  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == 1 && buttonType == LOCK_OFF_XSHBUTTON)
 	  return;
   p.drawImage(lockModeImgRect, icon);
 }
@@ -807,26 +807,35 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 
   QRect columnName = o->rect(PredefinedRect::LAYER_NAME).translated(orig);
 
+  bool nameBacklit = false;
+  int rightadj = -2;
+  int leftadj = 3;
+  int valign = o->isVerticalTimeline() ? Qt::AlignVCenter : Qt::AlignBottom;
+
   if (!isEmpty)
   {
 	  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() != 1) // Legacy - No background
 	  {
 		  if (columnName.contains(area->m_pos))
+		  {
 			  p.fillRect(columnName, m_viewer->getXsheetDragBarHighlightColor()); // Qt::yellow);
+			  nameBacklit = true;
+		  }
 		  else
 			  p.fillRect(columnName, m_viewer->getXsheetColumnNameBgColor());
 	  }
 
 	  if (o->flag(PredefinedFlag::LAYER_NAME_BORDER))
 		  p.drawRect(columnName);
-  }
 
-  int rightadj = -2;
-  int leftadj  = 3;
-  int valign   = o->isVerticalTimeline() ? Qt::AlignVCenter : Qt::AlignBottom;
+	  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == 1)
+	  {
+		  rightadj = -20;
 
-  if (!isEmpty) {
-    if (Preferences::instance()->isShowColumnNumbersEnabled()) {
+		  if (column->isPreviewVisible() && !column->getSoundTextColumn() && !column->getPaletteColumn())
+			  nameBacklit = true;
+	  }
+    else if (Preferences::instance()->isShowColumnNumbersEnabled()) {
       if (o->isVerticalTimeline())
         rightadj = -20;
       else
@@ -839,9 +848,10 @@ void ColumnArea::DrawHeader::drawColumnName() const {
       else if (column->getFilterColorId())
         rightadj -= 15;
     }
+
 	p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
-						 : o->isVerticalTimeline() ? Qt::black
-												   : m_viewer->getTextColor());
+						 : nameBacklit ? Qt::black
+									   : m_viewer->getTextColor());
   }
   else
 	  p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
@@ -1367,7 +1377,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawConfig();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
-  static QPixmap iconPixmap(":Resources/palette_header.png");
+  static QPixmap iconPixmap(svgToPixmap(":Resources/palette_header.svg"));
   drawHeader.drawThumbnail(iconPixmap);
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
@@ -1419,7 +1429,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawConfig();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
-  static QPixmap iconPixmap(":Resources/magpie.png");
+  static QPixmap iconPixmap(svgToPixmap(":Resources/magpie.svg"));
   drawHeader.drawThumbnail(iconPixmap);
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
@@ -1992,15 +2002,15 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
 		  m_columnTransparencyPopup = new ColumnTransparencyPopup(
 			this);
 
-	  // Align popup to be next to CONFIG button
+	  // Align popup to be below to CONFIG button
 	  QRect configRect = m_viewer->orientation()->rect(PredefinedRect::CONFIG_AREA);
 	  QPoint pos = event->pos();
 	  int col = m_viewer->xyToPosition(pos).layer();
 	  CellPosition cellPosition(0, col);
 	  QPoint topLeft = m_viewer->positionToXY(cellPosition);
 	  QPoint mouseInCell = pos - topLeft;
-	  int x = configRect.right() - mouseInCell.x() + 1; // distance from right edge of CONFIG button
-	  int y = mouseInCell.y() - configRect.top(); // distance from top edge of CONFIG button
+	  int x = configRect.left() - mouseInCell.x() + 1; // distance from right edge of CONFIG button
+	  int y = mouseInCell.y() - configRect.bottom(); // distance from bottum edge of CONFIG button
 	  m_columnTransparencyPopup->move(event->globalPos().x() + x, event->globalPos().y() - y);
 
 	  openTransparencyPopup();

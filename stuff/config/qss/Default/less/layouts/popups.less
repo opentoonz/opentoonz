@@ -1,0 +1,84 @@
+/* -----------------------------------------------------------------------------
+   Popup Windows
+----------------------------------------------------------------------------- */
+
+QDialog {
+  background-color: @bg;
+  & #dialogButtonFrame {
+    background-color: @dialogButtonFrame-bg-color;
+    border-top: 1px solid @dialogButtonFrame-border-color;
+    & QPushButton {
+      padding: 3px 15px;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Scene Settings
+----------------------------------------------------------------------------- */
+
+#SceneSettings {
+  & QLabel {
+    color: @label-title;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Preferences
+----------------------------------------------------------------------------- */
+
+#PreferencesPopup {
+  & QListWidget {
+    background-color: @tree-bg-color;
+    alternate-background-color: @tree-bg-color;
+    border: 1px solid @accent;
+    font-size: 13px;
+    &::item {
+      border: 0; // remove indent on hover
+      padding: 3px;
+      &:hover {
+        .selected-secondary;
+      }
+      &:selected {
+        .selected-primary;
+      }
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Keyboard Shortcuts
+----------------------------------------------------------------------------- */
+
+#ShortcutTree {
+  &::item {
+    padding: 1px 0;
+  }
+  &:extend(.tree-list all);
+  &::branch {
+    &:extend(.branch-17 all);
+  }
+  border: 1px solid @accent;
+  & QScrollBar {
+    &:vertical {
+      width: 16px;
+      margin-right: -1px;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   New Project / Configure Project Window
+----------------------------------------------------------------------------- */
+
+ProjectPopup {
+    & QLabel {
+      color: @label-title;
+    }
+    & QTreeView {
+      &:extend(.tree-list all);
+      &::branch {
+        &:extend(.branch-22 all);
+      }
+    }
+}

@@ -11,8 +11,11 @@
 #include <QTextBlock>
 #include <QMenuBar>
 #include <QPolygonF>
+#include <QDesktopWidget>
 #include "tundo.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/gutil.h"
+
 //========================================================
 //
 // StageSchematicName
@@ -122,13 +125,18 @@ QRectF SchematicThumbnailToggle::boundingRect() const {
 void SchematicThumbnailToggle::paint(QPainter *painter,
                                      const QStyleOptionGraphicsItem *option,
                                      QWidget *widget) {
-  QPixmap onPixmap(":Resources/schematic_thumbtoggle_on.png");
-  QPixmap offPixmap(":Resources/schematic_thumbtoggle_off.png");
   QRect rect(3, 3, 8, 8);
-  if (m_isDown) {
-    painter->drawPixmap(rect, offPixmap);
-  } else
-    painter->drawPixmap(rect, onPixmap);
+  QRect sourceRect = scene()->views()[0]->matrix().mapRect(rect);
+  static QIcon onIcon(":Resources/schematic_thumbtoggle_on.svg");
+  static QIcon offIcon(":Resources/schematic_thumbtoggle_off.svg");
+  QPixmap pixmap;
+  if (m_isDown)
+    pixmap = offIcon.pixmap(sourceRect.size());
+  else
+    pixmap   = onIcon.pixmap(sourceRect.size());
+  sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                     sourceRect.height() * getDevPixRatio());
+  painter->drawPixmap(rect, pixmap, sourceRect);
 }
 
 //--------------------------------------------------------

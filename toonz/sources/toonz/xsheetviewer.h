@@ -472,7 +472,7 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   XsheetGUI::RowArea *m_rowArea;
   XsheetGUI::CellArea *m_cellArea;
   XsheetGUI::NoteArea *m_noteArea;
-  XsheetGUI::Toolbar *m_toolbar;
+  XsheetGUI::XSheetToolbar *m_toolbar;
 
   Spreadsheet::FrameScroller m_frameScroller;
 
@@ -932,7 +932,6 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
   void timerEvent(QTimerEvent *) override;
 
-  void positionSections();
   void disconnectScrollBars();
   void connectScrollBars();
   void connectOrDisconnectScrollBars(bool toConnect);
@@ -942,6 +941,7 @@ signals:
   void orientationChanged(const Orientation *newOrientation);
 
 public slots:
+  void positionSections();
   void onSceneSwitched();
   void onXsheetChanged();
   void onCurrentFrameSwitched();

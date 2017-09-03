@@ -250,7 +250,7 @@ Preferences::Preferences()
     , m_shmmni(-1)
     , m_onionPaperThickness(50)
     , m_currentLanguage("English")
-    , m_currentStyleSheet("Astral_072_Dark")
+    , m_currentStyleSheet("Default")
     , m_undoMemorySize(100)
     , m_dragCellsBehaviour(0)
     , m_lineTestFpsCapture(25)
@@ -309,6 +309,7 @@ Preferences::Preferences()
     , m_ffmpegTimeout(60)
     , m_shortcutPreset("defopentoonz")
     , m_useNumpadForSwitchingStyles(true)
+    , m_newLevelSizeToCameraSizeEnabled(false)
     , m_showXSheetToolbar(false)
     , m_expandFunctionHeader(false)
     , m_showColumnNumbers(false)
@@ -595,6 +596,8 @@ Preferences::Preferences()
   setShortcutPreset(m_shortcutPreset.toStdString());
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
+           m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
   getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
@@ -1422,6 +1425,13 @@ int Preferences::matchLevelFormat(const TFilePath &fp) const {
 void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
   m_useNumpadForSwitchingStyles = on;
   m_settings->setValue("useNumpadForSwitchingStyles", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableNewLevelSizeToCameraSize(bool on) {
+  m_newLevelSizeToCameraSizeEnabled = on;
+  m_settings->setValue("newLevelSizeToCameraSizeEnabled", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

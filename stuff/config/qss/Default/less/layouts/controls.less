@@ -1,0 +1,301 @@
+/* -----------------------------------------------------------------------------
+   QT USER CONTROL CLASSES
+----------------------------------------------------------------------------- */
+
+// Styling Qt controls is best done by extending to a mixin.
+//
+// This is because if we style the Qt class directly, when we want to extend
+// the style to a different class the compiler will get confused because Qt
+// classes are unknown in LESS.
+//
+// In summary, when you want to use the style of a user control make sure to
+// extend to the mixin and not the Qt class.
+
+/* -----------------------------------------------------------------------------
+   Button
+----------------------------------------------------------------------------- */
+
+.Button {
+  background-color: @button-bg-color;
+  border-color: @button-border-color;
+  border-style: solid;
+  border-radius: 2px;
+  border-width: @button-border-size;
+  color: @button-text-color;
+  padding: 3px 15px;
+  margin: @button-margin;
+  &:hover {
+    background-color: @button-bg-color-hover;
+    border-color: @button-border-color-hover;
+    color: @button-text-color-hover;
+  }
+  &:pressed {
+    background-color: @button-bg-color-pressed;
+    border-color: @button-border-color-pressed;
+    color: @button-text-color-pressed;
+  }
+  &:checked {
+    background-color: @button-bg-color-checked;
+    border-color: @button-border-color-checked;
+    color: @button-text-color-checked;
+    &:hover {
+      background-color: @button-bg-color-checked-hover;
+      &:pressed {
+        background: @button-bg-color-checked-hover-pressed;
+      }
+    }
+  }
+  &:disabled {
+    background-color: @button-bg-color-disabled;
+    border-color: @button-border-color-disabled;
+    color: @button-text-color-disabled;
+  }
+}
+
+QPushButton { // Qt Class (do not extend to this)
+  &:extend(.Button all);
+}
+
+#PushButton_NoPadding {
+  padding: 3px;
+}
+
+#GearButton { /* Camera Capture */
+    qproperty-icon: url('@{img-url}/gear.svg');
+}
+
+#SubfolderButton { /* Camera Capture */
+    qproperty-icon: url('@{img-url}/subfolder.svg');
+}
+
+/* -----------------------------------------------------------------------------
+   ComboBox
+----------------------------------------------------------------------------- */
+
+.ComboBox {
+  background-color: @combobox-bg-color;
+  border: @combobox-border-size solid @combobox-border-color;
+  border-radius: 2px;
+  color: @combobox-text-color;
+  padding: 1px 0 1px 4px;
+  margin: @combobox-margin;
+  &:hover {
+    background-color: @combobox-bg-color-hover;
+    border-color: @combobox-border-color-hover;
+    color: @combobox-text-color-hover;
+  }
+  &:checked {
+    background-color: @combobox-bg-color-pressed;
+    border-color: @combobox-border-color-pressed;
+    color: @combobox-text-color-pressed;
+  }
+  &:disabled {
+    background-color: @combobox-bg-color-disabled;
+    border-color: @combobox-border-color-disabled;
+  }
+  &::drop-down {
+    background-color: @droparrow-bg-color;
+    border-left: @droparrow-border-size solid @droparrow-border-color;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    image: url('@{img-url}/combo-down.svg');
+    image-position: center center;
+    width: 16px;
+    &:hover {
+      image: url('@{img-url}/combo-down_pressed.svg');
+    }
+    &:disabled {
+      border-color: @combobox-border-color-disabled;
+      image: url('@{img-url}/combo-down_disabled.svg');
+    }
+  }
+  & QAbstractItemView {
+    background-color: @menu-bg-color;
+    border: 1px solid @menu-border-color;
+    selection-background-color: @selected-bg-color;
+    selection-color: @selected-text-color;
+  }
+}
+
+QComboBox { // Qt Class (do not extend to this)
+  &:extend(.ComboBox all);
+}
+
+/* -----------------------------------------------------------------------------
+   Textfield
+----------------------------------------------------------------------------- */
+
+.Input {
+  background-color: @input-bg-color;
+  border: 1px solid @input-border-color;
+  border-radius: 2px;
+  color: @input-text-color;
+  selection-background-color: @input-selection-bg-color;
+  selection-color: @input-selection-text-color;
+  padding: 0 0 0 1px;
+  &:focus {
+    background-color: @input-bg-color-focus;
+    border-color: @input-border-color-focus;
+    color: @input-text-color-focus;
+  }
+  &:disabled {
+    background-color: @input-bg-color-disabled;
+    border-color: @input-border-color-disabled;
+    color: @input-text-color-disabled;
+  }
+}
+
+QLineEdit { // Qt Class (do not extend to this)
+  &:extend(.Input all);
+}
+
+/* -----------------------------------------------------------------------------
+   CheckBox
+----------------------------------------------------------------------------- */
+
+.CheckBox {
+  color: @text-color;
+  &:hover {
+    color: @checkbox-text-color-hover;
+  }
+  &:disabled {
+    color: @text-color-disabled;
+  }
+  &::indicator {
+    background-color: @checkbox-bg-color;
+    border: 1px solid @checkbox-border-color;
+    border-radius: 2px;
+    height: 9px;      /* fix for QGroupBox */
+    padding: 1px;
+    width: 9px;       /* fix for QMenu */
+    &:hover {
+      background-color: @checkbox-bg-color-hover;
+      border-color: @checkbox-border-color-hover;
+    }
+    &:checked {
+      background-color: @checkbox-bg-color-checked;
+      border-color: @checkbox-border-color-checked;
+      image: url('@{img-url}/checkmark.svg');
+      &:hover {
+        &:extend(.CheckBox::indicator:hover);
+      }
+      &:disabled {
+        background-color: @checkbox-bg-color-disabled;
+        border-color: @checkbox-border-color-disabled;
+        image: url('@{img-url}/checkmark_disabled.svg');
+      }
+    }
+    &:disabled {
+      background-color: @checkbox-bg-color-disabled;
+      border-color: @checkbox-border-color-disabled;
+    }
+  }
+}
+
+QCheckBox { // Qt Class (do not extend to this)
+  &:extend(.CheckBox all);
+}
+
+/* -----------------------------------------------------------------------------
+   Radio Button
+----------------------------------------------------------------------------- */
+
+.RadioButton {
+  &::indicator {
+    &:unchecked {
+      image: url('@{img-url}/radiobutton_unchecked.svg');
+      image-position: center center;
+    }
+    &:checked {
+      image: url('@{img-url}/radiobutton_checked.svg');
+      image-position: center center;
+    }
+  }
+}
+
+QRadioButton { // Qt Class (do not extend to this)
+  &:extend(.RadioButton all);
+}
+
+/* -----------------------------------------------------------------------------
+   GroupBox
+----------------------------------------------------------------------------- */
+
+.GroupBox {
+  &:extend(.frame all);
+  margin: 6px 0 0 0;
+  padding: 5px 0px;
+  &::title {
+    subcontrol-origin: margin;
+    left: 15px;
+    margin: -3px 0 0 0;
+    padding: 0 3px;
+    &:hover {
+      color: @checkbox-text-color-hover;
+    }
+    &:disabled {
+      color: @text-color-disabled;
+    }
+  }
+  &::indicator {
+    &:extend(.CheckBox::indicator all);
+    subcontrol-origin: margin;
+    margin-top: 2px;
+  }
+  &:disabled {
+    color: @text-color-disabled;
+  }
+}
+
+QGroupBox { // Qt Class (do not extend to this)
+  &:extend(.GroupBox all);
+}
+
+/* -----------------------------------------------------------------------------
+   Slider
+----------------------------------------------------------------------------- */
+
+.Slider {
+  &::groove:horizontal {
+    background-color: transparent;
+    background-image: url('@{img-url}/@{slider-groove-img}');
+    background-position: center center;
+    background-repeat: repeat-x;
+    margin: 0;
+    height: 20px;
+    min-height: 20px;
+    &:disabled {
+      background-image: url('@{img-url}/@{slider-groove-img-disabled}');
+    }
+  }
+  &::handle:horizontal {
+    width: @slider-handle-width;
+    margin: -2px 0 -2px 0;
+    image: url('@{img-url}/@{slider-handle-img}');
+    &:disabled {
+      image: url('@{img-url}/@{slider-handle-img-disabled}');
+    }
+  }
+}
+
+QSlider { // Qt Class (do not extend to this)
+  &:extend(.Slider all);
+}
+
+/* -----------------------------------------------------------------------------
+   Double Slider
+----------------------------------------------------------------------------- */
+
+#IntPairField, 
+#DoublePairField {
+	qproperty-LightLineColor: @slider-groove-color;
+  qproperty-LightLineEdgeColor: @slider-groove-color;
+	qproperty-DarkLineColor: @slider-groove-color;
+  qproperty-MiddleLineColor: @slider-groove-color;
+
+	qproperty-HandleLeftPixmap: url("@{img-url}/@{slider-left-handle}");
+	qproperty-HandleRightPixmap: url("@{img-url}/@{slider-right-handle}");
+
+	qproperty-HandleLeftGrayPixmap: url("@{img-url}/@{slider-left-handle-disabled}");
+  qproperty-HandleRightGrayPixmap: url("@{img-url}/@{slider-right-handle-disabled}");
+}
