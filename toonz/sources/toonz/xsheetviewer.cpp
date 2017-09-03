@@ -217,9 +217,9 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
     , m_orientation(nullptr)
-    , m_xsheetLayout(0) {
+    , m_xsheetLayout("Classic") {
 
-  m_xsheetLayout = Preferences::instance()->getXsheetLayoutPreference();
+  m_xsheetLayout = Preferences::instance()->getLoadedXsheetLayout();
 
   setFocusPolicy(Qt::StrongFocus);
 

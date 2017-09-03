@@ -318,7 +318,8 @@ Preferences::Preferences()
     , m_importPolicy(0)
     , m_ignoreImageDpi(false)
     , m_watchFileSystem(true)
-    , m_xsheetLayoutPreference(0) {
+    , m_xsheetLayoutPreference("Classic")
+	, m_loadedXsheetLayout("Classic") {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -607,7 +608,15 @@ Preferences::Preferences()
            m_inputCellsWithoutDoubleClickingEnabled);
   getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
-  getValue(*m_settings, "xsheetLayoutPreference", m_xsheetLayoutPreference);
+
+  QString xsheetLayoutPreference;
+  xsheetLayoutPreference = m_settings->value("xsheetLayoutPreference").toString();
+  if (xsheetLayoutPreference != "")
+  {
+	  m_xsheetLayoutPreference = xsheetLayoutPreference;
+	  m_loadedXsheetLayout = xsheetLayoutPreference;
+  }
+  setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
 
   // in case there is no personal settings
   if (savePath != loadPath) {
@@ -1453,9 +1462,13 @@ void Preferences::enableShowColumnNumbers(bool on) {
   m_settings->setValue("showColumnNumbers", on ? "1" : "0");
 }
 
-void Preferences::setXsheetLayoutPreference(int layout) {
-	m_xsheetLayoutPreference = layout;
-	m_settings->setValue("xsheetLayoutPreference", layout);
+void Preferences::setXsheetLayoutPreference(std::string layout) {
+	m_xsheetLayoutPreference = QString::fromStdString(layout);
+	m_settings->setValue("xsheetLayoutPreference", m_xsheetLayoutPreference);
+}
+
+void Preferences::setLoadedXsheetLayout(std::string layout) {
+	m_loadedXsheetLayout = QString::fromStdString(layout);
 }
 
 //-----------------------------------------------------------------

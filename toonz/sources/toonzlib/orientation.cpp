@@ -348,100 +348,193 @@ TopToBottomOrientation::TopToBottomOrientation() {
 	  thumbnailArea, thumbnail, pegbarname, volumeArea;
   QPoint soundTopLeft;
 
-  switch (Preferences::instance()->getXsheetLayoutPreference())
-  {
-	  case 2:  // Compact
-		  THUMBNAIL_HEIGHT = 62;
-		  HDRROW_HEIGHT = CELL_HEIGHT - 2;
-		  INDENT = 0;
-		  HDRROW1 = 1;							// Name, number
-		  HDRROW2 = HDRROW1 + HDRROW_HEIGHT;	// eye, preview, lock, config
-		  HDRROW3 = HDRROW2 + HDRROW_HEIGHT;	// thumbnail
-		  HDRROW4 = HDRROW3 + THUMBNAIL_HEIGHT;	// pegbar, parent handle
+  QString layout = Preferences::instance()->getLoadedXsheetLayout();
 
-		  addRect(PredefinedRect::DRAG_LAYER,
-			  QRect(0, 0, -1, -1));
+  if (layout == QString("Compact")) {
+	  THUMBNAIL_HEIGHT = 62;
+	  HDRROW_HEIGHT = CELL_HEIGHT - 2;
+	  INDENT = 0;
+	  HDRROW1 = 1;							// Name, number
+	  HDRROW2 = HDRROW1 + HDRROW_HEIGHT;	// eye, preview, lock, config
+	  HDRROW3 = HDRROW2 + HDRROW_HEIGHT;	// thumbnail
+	  HDRROW4 = HDRROW3 + THUMBNAIL_HEIGHT;	// pegbar, parent handle
 
-		  addRect(PredefinedRect::RENAME_COLUMN,
-			  QRect(0, HDRROW1, CELL_WIDTH, HDRROW_HEIGHT));
+	  addRect(PredefinedRect::DRAG_LAYER,
+		  QRect(0, 0, -1, -1));
 
-		  layername = QRect(INDENT + 1, HDRROW1 + 1, CELL_WIDTH - 1, HDRROW_HEIGHT - 1);
-		  addRect(PredefinedRect::LAYER_NAME, layername);
-		  addRect(PredefinedRect::LAYER_NUMBER, QRect(INDENT + layername.width() - 20, HDRROW1, 20, HDRROW_HEIGHT));
+	  addRect(PredefinedRect::RENAME_COLUMN,
+		  QRect(0, HDRROW1, CELL_WIDTH, HDRROW_HEIGHT));
 
-		  eyeArea = QRect(INDENT, HDRROW2, ICON_WIDTH + 1, HDRROW_HEIGHT); // Compact
-		  addRect(PredefinedRect::EYE_AREA, eyeArea);
-		  eye = QRect(eyeArea.left() + 1 + ((eyeArea.width() / 2) - (ICON_WIDTH / 2)),
-			  eyeArea.top() + ((eyeArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
-			  ICON_WIDTH, ICON_HEIGHT - 1);
-		  addRect(PredefinedRect::EYE, eye);
+	  layername = QRect(INDENT + 1, HDRROW1 + 1, CELL_WIDTH - 1, HDRROW_HEIGHT - 1);
+	  addRect(PredefinedRect::LAYER_NAME, layername);
+	  addRect(PredefinedRect::LAYER_NUMBER, QRect(INDENT + layername.width() - 20, HDRROW1, 20, HDRROW_HEIGHT));
 
-		  previewArea = QRect(INDENT + eyeArea.width(), HDRROW2, ICON_WIDTH + 1, HDRROW_HEIGHT);
-		  addRect(PredefinedRect::PREVIEW_LAYER_AREA, previewArea);
-		  preview = QRect(previewArea.left() + 1 + ((previewArea.width() / 2) - (ICON_WIDTH / 2)),
-			  previewArea.top() + ((previewArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
-			  ICON_WIDTH, ICON_HEIGHT - 1);
-		  addRect(PredefinedRect::PREVIEW_LAYER, preview);
+	  eyeArea = QRect(INDENT, HDRROW2, ICON_WIDTH + 1, HDRROW_HEIGHT); // Compact
+	  addRect(PredefinedRect::EYE_AREA, eyeArea);
+	  eye = QRect(eyeArea.left() + 1 + ((eyeArea.width() / 2) - (ICON_WIDTH / 2)),
+		  eyeArea.top() + ((eyeArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+		  ICON_WIDTH, ICON_HEIGHT - 1);
+	  addRect(PredefinedRect::EYE, eye);
 
-		  lockArea =  QRect(INDENT + eyeArea.width() + previewArea.width(), HDRROW2, ICON_WIDTH, HDRROW_HEIGHT);
-		  addRect(PredefinedRect::LOCK_AREA, lockArea);
-		  lock = QRect(lockArea.left() + ((lockArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
-			  lockArea.top() + ((lockArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
-			  ICON_WIDTH - 1, ICON_HEIGHT - 1);
-		  addRect(PredefinedRect::LOCK, lock);
+	  previewArea = QRect(INDENT + eyeArea.width(), HDRROW2, ICON_WIDTH + 1, HDRROW_HEIGHT);
+	  addRect(PredefinedRect::PREVIEW_LAYER_AREA, previewArea);
+	  preview = QRect(previewArea.left() + 1 + ((previewArea.width() / 2) - (ICON_WIDTH / 2)),
+		  previewArea.top() + ((previewArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+		  ICON_WIDTH, ICON_HEIGHT - 1);
+	  addRect(PredefinedRect::PREVIEW_LAYER, preview);
 
-		  configArea = QRect(INDENT + eyeArea.width() + previewArea.width() + lockArea.width(), HDRROW2, ICON_WIDTH, HDRROW_HEIGHT);
-		  addRect(PredefinedRect::CONFIG_AREA, configArea);
-		  config = QRect(configArea.left() + ((configArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
-			  configArea.top() + ((configArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
-			  ICON_WIDTH - 1, ICON_HEIGHT - 1);
-		  addRect(PredefinedRect::CONFIG, config);
+	  lockArea = QRect(INDENT + eyeArea.width() + previewArea.width(), HDRROW2, ICON_WIDTH, HDRROW_HEIGHT);
+	  addRect(PredefinedRect::LOCK_AREA, lockArea);
+	  lock = QRect(lockArea.left() + ((lockArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
+		  lockArea.top() + ((lockArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+		  ICON_WIDTH - 1, ICON_HEIGHT - 1);
+	  addRect(PredefinedRect::LOCK, lock);
 
-		  thumbnailArea = QRect(INDENT, HDRROW3, CELL_WIDTH, THUMBNAIL_HEIGHT);
-		  addRect(PredefinedRect::THUMBNAIL_AREA, thumbnailArea);
-		  thumbnail = thumbnailArea.adjusted(1, 1, 0, 0);
-		  addRect(PredefinedRect::THUMBNAIL, thumbnail);
-		  addRect(PredefinedRect::FILTER_COLOR,
-			  QRect(thumbnail.right() - 14, thumbnail.top() + 3, 12, 12));
+	  configArea = QRect(INDENT + eyeArea.width() + previewArea.width() + lockArea.width(), HDRROW2, ICON_WIDTH, HDRROW_HEIGHT);
+	  addRect(PredefinedRect::CONFIG_AREA, configArea);
+	  config = QRect(configArea.left() + ((configArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
+		  configArea.top() + ((configArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+		  ICON_WIDTH - 1, ICON_HEIGHT - 1);
+	  addRect(PredefinedRect::CONFIG, config);
 
-		  addRect(PredefinedRect::SOUND_ICON,
-			  QRect(thumbnailArea.topLeft(), QSize(40, 30)).adjusted((thumbnailArea.width() / 2) - (40/ 2),
-																	 6,
-																	 (thumbnailArea.width() / 2) - (40 / 2),
-																	 6));
-		  volumeArea = QRect(QPoint(thumbnailArea.left() + 3, thumbnailArea.top() + 42),
-			  QSize(TRACKLEN + 8, 14));
-		  addRect(PredefinedRect::VOLUME_AREA, volumeArea);
+	  thumbnailArea = QRect(INDENT, HDRROW3, CELL_WIDTH, THUMBNAIL_HEIGHT);
+	  addRect(PredefinedRect::THUMBNAIL_AREA, thumbnailArea);
+	  thumbnail = thumbnailArea.adjusted(1, 1, 0, 0);
+	  addRect(PredefinedRect::THUMBNAIL, thumbnail);
+	  addRect(PredefinedRect::FILTER_COLOR,
+		  QRect(thumbnail.right() - 14, thumbnail.top() + 3, 12, 12));
 
-		  pegbarname = QRect(INDENT, HDRROW4, CELL_WIDTH, HDRROW_HEIGHT);
-		  addRect(PredefinedRect::PEGBAR_NAME, pegbarname);
-		  addRect(
-			  PredefinedRect::PARENT_HANDLE_NAME,
-			  QRect(INDENT + pegbarname.width() - 20, HDRROW4, 20, HDRROW_HEIGHT));
+	  addRect(PredefinedRect::SOUND_ICON,
+		  QRect(thumbnailArea.topLeft(), QSize(40, 30)).adjusted((thumbnailArea.width() / 2) - (40 / 2),
+			  6,
+			  (thumbnailArea.width() / 2) - (40 / 2),
+			  6));
+	  volumeArea = QRect(QPoint(thumbnailArea.left() + 3, thumbnailArea.top() + 42),
+		  QSize(TRACKLEN + 8, 14));
+	  addRect(PredefinedRect::VOLUME_AREA, volumeArea);
 
-		  addFlag(PredefinedFlag::DRAG_LAYER_BORDER, false);
-		  addFlag(PredefinedFlag::DRAG_LAYER_VISIBLE, false);
-		  addFlag(PredefinedFlag::LAYER_NAME_BORDER, false);
-		  addFlag(PredefinedFlag::LAYER_NAME_VISIBLE, true);
-		  addFlag(PredefinedFlag::LAYER_NUMBER_BORDER, false);
-		  addFlag(PredefinedFlag::LAYER_NUMBER_VISIBLE, true);
-		  addFlag(PredefinedFlag::EYE_AREA_BORDER, true);
-		  addFlag(PredefinedFlag::EYE_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::LOCK_AREA_BORDER, true);
-		  addFlag(PredefinedFlag::LOCK_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER, true);
-		  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::CONFIG_AREA_BORDER, true);
-		  addFlag(PredefinedFlag::CONFIG_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::PEGBAR_NAME_BORDER, true);
-		  addFlag(PredefinedFlag::PEGBAR_NAME_VISIBLE, true);
-		  addFlag(PredefinedFlag::PARENT_HANDLE_NAME_BORDER, false);
-		  addFlag(PredefinedFlag::PARENT_HANDLE_NAME_VISIBILE, true);
-		  addFlag(PredefinedFlag::THUMBNAIL_AREA_BORDER, false);
-		  addFlag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::VOLUME_AREA_VERTICAL, false);
-		  break;
-	  case 1: // Legacy
+	  pegbarname = QRect(INDENT, HDRROW4, CELL_WIDTH, HDRROW_HEIGHT);
+	  addRect(PredefinedRect::PEGBAR_NAME, pegbarname);
+	  addRect(
+		  PredefinedRect::PARENT_HANDLE_NAME,
+		  QRect(INDENT + pegbarname.width() - 20, HDRROW4, 20, HDRROW_HEIGHT));
+
+	  addFlag(PredefinedFlag::DRAG_LAYER_BORDER, false);
+	  addFlag(PredefinedFlag::DRAG_LAYER_VISIBLE, false);
+	  addFlag(PredefinedFlag::LAYER_NAME_BORDER, false);
+	  addFlag(PredefinedFlag::LAYER_NAME_VISIBLE, true);
+	  addFlag(PredefinedFlag::LAYER_NUMBER_BORDER, false);
+	  addFlag(PredefinedFlag::LAYER_NUMBER_VISIBLE, true);
+	  addFlag(PredefinedFlag::EYE_AREA_BORDER, true);
+	  addFlag(PredefinedFlag::EYE_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::LOCK_AREA_BORDER, true);
+	  addFlag(PredefinedFlag::LOCK_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER, true);
+	  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::CONFIG_AREA_BORDER, true);
+	  addFlag(PredefinedFlag::CONFIG_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::PEGBAR_NAME_BORDER, true);
+	  addFlag(PredefinedFlag::PEGBAR_NAME_VISIBLE, true);
+	  addFlag(PredefinedFlag::PARENT_HANDLE_NAME_BORDER, false);
+	  addFlag(PredefinedFlag::PARENT_HANDLE_NAME_VISIBILE, true);
+	  addFlag(PredefinedFlag::THUMBNAIL_AREA_BORDER, false);
+	  addFlag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::VOLUME_AREA_VERTICAL, false);
+  }
+  else if (layout == QString("Classic-revised")) {
+	  THUMBNAIL_HEIGHT = 44;
+	  HDRROW_HEIGHT = CELL_HEIGHT - 2;
+	  INDENT = 0;
+	  HDRROW1 = 1;							// Name, number
+	  HDRROW2 = HDRROW1 + HDRROW_HEIGHT;	// eye, lock
+	  HDRROW3 = HDRROW2 + HDRROW_HEIGHT;	// preview, config
+	  HDRROW4 = HDRROW3 + HDRROW_HEIGHT;	// thumbnail
+	  HDRROW5 = HDRROW4 + THUMBNAIL_HEIGHT;	// pegbar, parent handle
+
+	  addRect(PredefinedRect::DRAG_LAYER,
+		  QRect(0, 0, -1, -1)); // hide - Theme/Compact
+
+	  addRect(PredefinedRect::RENAME_COLUMN,
+		  QRect(0, HDRROW1, CELL_WIDTH, HDRROW_HEIGHT));
+
+	  layername = QRect(INDENT + 1, HDRROW1 + 1, CELL_WIDTH - 1, HDRROW_HEIGHT - 1);
+	  addRect(PredefinedRect::LAYER_NAME, layername);
+	  addRect(PredefinedRect::LAYER_NUMBER, QRect(INDENT + layername.width() - 20, HDRROW1, 20, HDRROW_HEIGHT));
+
+	  eyeArea = QRect(INDENT, HDRROW2, CELL_WIDTH - ICON_WIDTH, HDRROW_HEIGHT);
+	  addRect(PredefinedRect::EYE_AREA, eyeArea);
+	  eye = QRect(eyeArea.left() + 1 + ((eyeArea.width() / 2) - (ICON_WIDTH / 2)),
+		  eyeArea.top() + ((eyeArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+		  ICON_WIDTH, ICON_HEIGHT - 1);
+	  addRect(PredefinedRect::EYE, eye);
+
+	  previewArea = QRect(INDENT, HDRROW3, CELL_WIDTH - ICON_WIDTH, HDRROW_HEIGHT);
+	  addRect(PredefinedRect::PREVIEW_LAYER_AREA, previewArea);
+	  preview = QRect(previewArea.left() + 1 + ((previewArea.width() / 2) - (ICON_WIDTH / 2)),
+		  previewArea.top() + ((previewArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+		  ICON_WIDTH, ICON_HEIGHT - 1);
+	  addRect(PredefinedRect::PREVIEW_LAYER, preview);
+
+	  lockArea = QRect(INDENT + eyeArea.width(), HDRROW2, ICON_WIDTH, HDRROW_HEIGHT);
+	  addRect(PredefinedRect::LOCK_AREA, lockArea);
+	  lock = QRect(lockArea.left() + ((lockArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
+		  lockArea.top() + ((lockArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+		  ICON_WIDTH - 1, ICON_HEIGHT - 1);
+	  addRect(PredefinedRect::LOCK, lock);
+
+	  configArea = QRect(INDENT + previewArea.width(), HDRROW3, ICON_WIDTH, HDRROW_HEIGHT);
+	  addRect(PredefinedRect::CONFIG_AREA, configArea);
+	  config = QRect(configArea.left() + ((configArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
+		  configArea.top() + ((configArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
+		  ICON_WIDTH - 1, ICON_HEIGHT - 1);
+	  addRect(PredefinedRect::CONFIG, config);
+
+	  thumbnailArea = QRect(INDENT, HDRROW4, CELL_WIDTH, THUMBNAIL_HEIGHT);
+	  addRect(PredefinedRect::THUMBNAIL_AREA, thumbnailArea);
+	  thumbnail = thumbnailArea.adjusted(1, 1, 0, 0);
+	  addRect(PredefinedRect::THUMBNAIL, thumbnail);
+	  addRect(PredefinedRect::FILTER_COLOR,
+		  QRect(thumbnail.right() - 14, thumbnail.top() + 3, 12, 12));
+
+	  addRect(PredefinedRect::SOUND_ICON,
+		  QRect(thumbnailArea.topLeft(), QSize(27, 20)).adjusted((thumbnailArea.width() / 2) - (27 / 2),
+			  3,
+			  (thumbnailArea.width() / 2) - (27 / 2),
+			  3));
+
+	  volumeArea = QRect(QPoint(thumbnailArea.left() + 3, thumbnailArea.bottom() - 16),
+		  QSize(TRACKLEN + 8, 14));
+	  addRect(PredefinedRect::VOLUME_AREA, volumeArea);
+
+	  pegbarname = QRect(INDENT, HDRROW5, CELL_WIDTH, HDRROW_HEIGHT);
+	  addRect(PredefinedRect::PEGBAR_NAME, pegbarname);
+	  addRect(
+		  PredefinedRect::PARENT_HANDLE_NAME,
+		  QRect(INDENT + pegbarname.width() - 20, HDRROW5, 20, HDRROW_HEIGHT));
+
+	  addFlag(PredefinedFlag::DRAG_LAYER_BORDER, false);
+	  addFlag(PredefinedFlag::DRAG_LAYER_VISIBLE, false);
+	  addFlag(PredefinedFlag::LAYER_NAME_BORDER, false);
+	  addFlag(PredefinedFlag::LAYER_NAME_VISIBLE, true);
+	  addFlag(PredefinedFlag::LAYER_NUMBER_BORDER, false);
+	  addFlag(PredefinedFlag::LAYER_NUMBER_VISIBLE, true);
+	  addFlag(PredefinedFlag::EYE_AREA_BORDER, true);
+	  addFlag(PredefinedFlag::EYE_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::LOCK_AREA_BORDER, true);
+	  addFlag(PredefinedFlag::LOCK_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER, true);
+	  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::CONFIG_AREA_BORDER, true);
+	  addFlag(PredefinedFlag::CONFIG_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::PEGBAR_NAME_BORDER, true);
+	  addFlag(PredefinedFlag::PEGBAR_NAME_VISIBLE, true);
+	  addFlag(PredefinedFlag::PARENT_HANDLE_NAME_BORDER, false);
+	  addFlag(PredefinedFlag::PARENT_HANDLE_NAME_VISIBILE, true);
+	  addFlag(PredefinedFlag::THUMBNAIL_AREA_BORDER, true);
+	  addFlag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE, true);
+	  addFlag(PredefinedFlag::VOLUME_AREA_VERTICAL, false);
+  }
+  else {
 		  THUMBNAIL_HEIGHT = 43;
 		  HDRROW_HEIGHT = CELL_HEIGHT - 2;
 		  INDENT = CELL_DRAG_WIDTH + 2;
@@ -520,101 +613,6 @@ TopToBottomOrientation::TopToBottomOrientation() {
 		  addFlag(PredefinedFlag::THUMBNAIL_AREA_BORDER, false);
 		  addFlag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE, true);
 		  addFlag(PredefinedFlag::VOLUME_AREA_VERTICAL, true);
-
-		  break;
-	  default: // Theme
-		  THUMBNAIL_HEIGHT = 44;
-		  HDRROW_HEIGHT = CELL_HEIGHT - 2;
-		  INDENT = 0;
-		  HDRROW1 = 1;							// Name, number
-		  HDRROW2 = HDRROW1 + HDRROW_HEIGHT;	// eye, lock
-		  HDRROW3 = HDRROW2 + HDRROW_HEIGHT;	// preview, config
-		  HDRROW4 = HDRROW3 + HDRROW_HEIGHT;	// thumbnail
-		  HDRROW5 = HDRROW4 + THUMBNAIL_HEIGHT;	// pegbar, parent handle
-
-		  addRect(PredefinedRect::DRAG_LAYER,
-			  QRect(0, 0, -1, -1)); // hide - Theme/Compact
-
-		  addRect(PredefinedRect::RENAME_COLUMN,
-			  QRect(0, HDRROW1, CELL_WIDTH, HDRROW_HEIGHT));
-
-		  layername = QRect(INDENT + 1, HDRROW1 + 1, CELL_WIDTH - 1, HDRROW_HEIGHT - 1);
-		  addRect(PredefinedRect::LAYER_NAME, layername);
-		  addRect(PredefinedRect::LAYER_NUMBER, QRect(INDENT + layername.width() - 20, HDRROW1, 20, HDRROW_HEIGHT));
-
-		  eyeArea = QRect(INDENT, HDRROW2, CELL_WIDTH - ICON_WIDTH, HDRROW_HEIGHT);
-		  addRect(PredefinedRect::EYE_AREA, eyeArea);
-		  eye = QRect(eyeArea.left() + 1 + ((eyeArea.width() / 2) - (ICON_WIDTH / 2)),
-			  eyeArea.top() + ((eyeArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
-			  ICON_WIDTH, ICON_HEIGHT - 1);
-		  addRect(PredefinedRect::EYE, eye);
-
-		  previewArea = QRect(INDENT, HDRROW3, CELL_WIDTH - ICON_WIDTH, HDRROW_HEIGHT);
-		  addRect(PredefinedRect::PREVIEW_LAYER_AREA, previewArea);
-		  preview = QRect(previewArea.left() + 1 + ((previewArea.width() / 2) - (ICON_WIDTH / 2)),
-			  previewArea.top() + ((previewArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
-			  ICON_WIDTH, ICON_HEIGHT - 1);
-		  addRect(PredefinedRect::PREVIEW_LAYER, preview);
-
-		  lockArea = QRect(INDENT + eyeArea.width(), HDRROW2, ICON_WIDTH, HDRROW_HEIGHT);
-		  addRect(PredefinedRect::LOCK_AREA, lockArea);
-		  lock = QRect(lockArea.left() + ((lockArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
-			  lockArea.top() + ((lockArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
-			  ICON_WIDTH - 1, ICON_HEIGHT - 1);
-		  addRect(PredefinedRect::LOCK, lock);
-
-		  configArea = QRect(INDENT + previewArea.width(), HDRROW3, ICON_WIDTH, HDRROW_HEIGHT);
-		  addRect(PredefinedRect::CONFIG_AREA, configArea);
-		  config = QRect(configArea.left() + ((configArea.width() / 2) - ((ICON_WIDTH - 1) / 2)),
-			  configArea.top() + ((configArea.height() / 2) - ((ICON_HEIGHT - 1) / 2)),
-			  ICON_WIDTH - 1, ICON_HEIGHT - 1);
-		  addRect(PredefinedRect::CONFIG, config);
-
-		  thumbnailArea = QRect(INDENT, HDRROW4, CELL_WIDTH, THUMBNAIL_HEIGHT);
-		  addRect(PredefinedRect::THUMBNAIL_AREA, thumbnailArea);
-		  thumbnail = thumbnailArea.adjusted(1, 1, 0, 0);
-		  addRect(PredefinedRect::THUMBNAIL, thumbnail);
-		  addRect(PredefinedRect::FILTER_COLOR,
-			  QRect(thumbnail.right() - 14, thumbnail.top() + 3, 12, 12));
-
-		  addRect(PredefinedRect::SOUND_ICON,
-			  QRect(thumbnailArea.topLeft(), QSize(27, 20)).adjusted((thumbnailArea.width() / 2) - (27 / 2),
-																	 3,
-																	 (thumbnailArea.width() / 2) - (27 / 2),
-																	 3));
-		  
-		  volumeArea = QRect(QPoint(thumbnailArea.left() + 3, thumbnailArea.bottom() - 16),
-			  QSize(TRACKLEN + 8, 14));
-		  addRect(PredefinedRect::VOLUME_AREA, volumeArea);
-
-		  pegbarname = QRect(INDENT, HDRROW5, CELL_WIDTH, HDRROW_HEIGHT);
-		  addRect(PredefinedRect::PEGBAR_NAME, pegbarname);
-		  addRect(
-			  PredefinedRect::PARENT_HANDLE_NAME,
-			  QRect(INDENT + pegbarname.width() - 20, HDRROW5, 20, HDRROW_HEIGHT));
-
-		  addFlag(PredefinedFlag::DRAG_LAYER_BORDER, false);
-		  addFlag(PredefinedFlag::DRAG_LAYER_VISIBLE, false);
-		  addFlag(PredefinedFlag::LAYER_NAME_BORDER, false);
-		  addFlag(PredefinedFlag::LAYER_NAME_VISIBLE, true);
-		  addFlag(PredefinedFlag::LAYER_NUMBER_BORDER, false);
-		  addFlag(PredefinedFlag::LAYER_NUMBER_VISIBLE, true);
-		  addFlag(PredefinedFlag::EYE_AREA_BORDER, true);
-		  addFlag(PredefinedFlag::EYE_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::LOCK_AREA_BORDER, true);
-		  addFlag(PredefinedFlag::LOCK_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER, true);
-		  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::CONFIG_AREA_BORDER, true);
-		  addFlag(PredefinedFlag::CONFIG_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::PEGBAR_NAME_BORDER, true);
-		  addFlag(PredefinedFlag::PEGBAR_NAME_VISIBLE, true);
-		  addFlag(PredefinedFlag::PARENT_HANDLE_NAME_BORDER, false);
-		  addFlag(PredefinedFlag::PARENT_HANDLE_NAME_VISIBILE, true);
-		  addFlag(PredefinedFlag::THUMBNAIL_AREA_BORDER, true);
-		  addFlag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::VOLUME_AREA_VERTICAL, false);
-		  break;
   }
 
   if (flag(PredefinedFlag::VOLUME_AREA_VERTICAL))

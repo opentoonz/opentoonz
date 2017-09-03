@@ -688,7 +688,7 @@ void ColumnArea::DrawHeader::drawEye() const {
 	  p.drawRect(prevViewRect);
 
   // For Legacy (layout=1), Preview Off button is not displayed in Xsheet mode
-  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == 1 && buttonType == PREVIEW_OFF_XSHBUTTON)
+  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == QString("Classic") && buttonType == PREVIEW_OFF_XSHBUTTON)
 	  return;
 
   p.drawImage(eyeRect, icon);
@@ -722,7 +722,7 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
 	  p.drawRect(tableViewRect);
 
   // For Legacy (layout=1), Camstand Off button is not displayed in Xsheet mode
-  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == 1 && buttonType == CAMSTAND_OFF_XSHBUTTON)
+  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == QString("Classic") && buttonType == CAMSTAND_OFF_XSHBUTTON)
 	  return;
   p.drawImage(tableViewImgRect, icon);
 }
@@ -744,7 +744,7 @@ void ColumnArea::DrawHeader::drawLock() const {
 	  p.drawRect(lockModeRect);
 
   // For Legacy (layout=1), Lock Off button is not displayed in Xsheet mode
-  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == 1 && buttonType == LOCK_OFF_XSHBUTTON)
+  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == QString("Classic") && buttonType == LOCK_OFF_XSHBUTTON)
 	  return;
   p.drawImage(lockModeImgRect, icon);
 }
@@ -814,7 +814,7 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 
   if (!isEmpty)
   {
-	  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() != 1) // Legacy - No background
+	  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() != QString("Classic")) // Legacy - No background
 	  {
 		  if (columnName.contains(area->m_pos))
 		  {
@@ -828,7 +828,7 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 	  if (o->flag(PredefinedFlag::LAYER_NAME_BORDER))
 		  p.drawRect(columnName);
 
-	  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == 1)
+	  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == QString("Classic"))
 	  {
 		  rightadj = -20;
 
@@ -1007,7 +1007,7 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
   int frameAxis = o->frameAxis(divisionsTopLeft);
   if (o->isVerticalTimeline()) 
   {
-      if (m_viewer->getXsheetLayout() == 1) {
+      if (m_viewer->getXsheetLayout() == QString("Classic")) {
 		  for (int i = 0; i <= 20; i++, frameAxis += 3)
 			  if ((i % 10) == 0)
 				  p.drawLine(o->horizontalLine(frameAxis,

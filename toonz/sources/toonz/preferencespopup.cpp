@@ -1031,8 +1031,8 @@ void PreferencesPopup::onShowColumnNumbersChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onXsheetLayoutChanged(int index) {
-	m_pref->setXsheetLayoutPreference(index);
+void PreferencesPopup::onXsheetLayoutChanged(const QString &text) {
+	m_pref->setXsheetLayoutPreference(text.toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -1270,8 +1270,11 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *showColumnNumbersCB =
       new CheckBox(tr("Show Column Numbers in Column Headers"), this);
   QStringList xsheetLayouts;
-  xsheetLayouts << tr("Theme") << tr("Legacy") << tr("Compact");
+  xsheetLayouts << tr("Classic") << tr("Classic-revised") << tr("Compact");
   QComboBox *xsheetLayoutOptions = new QComboBox(this);
+  xsheetLayoutOptions->addItems(xsheetLayouts);
+  xsheetLayoutOptions->setCurrentIndex(
+	  xsheetLayoutOptions->findText(m_pref->getXsheetLayoutPreference()));
 
   QLabel *note_xsheet =
 	  new QLabel(tr("* Changes will take effect the next time you run Toonz"));
@@ -1553,8 +1556,6 @@ PreferencesPopup::PreferencesPopup()
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
-  xsheetLayoutOptions->addItems(xsheetLayouts);
-  xsheetLayoutOptions->setCurrentIndex(m_pref->getXsheetLayoutPreference());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -2400,8 +2401,8 @@ PreferencesPopup::PreferencesPopup()
 
   ret = ret && connect(showColumnNumbersCB, SIGNAL(stateChanged(int)), this,
 	  SLOT(onShowColumnNumbersChanged(int)));
-  ret = ret && connect(xsheetLayoutOptions, SIGNAL(currentIndexChanged(int)), this,
-	  SLOT(onXsheetLayoutChanged(int)));
+  ret = ret && connect(xsheetLayoutOptions, SIGNAL(currentIndexChanged(const QString &)), this,
+	  SLOT(onXsheetLayoutChanged(const QString &)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

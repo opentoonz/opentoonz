@@ -183,7 +183,7 @@ private slots:
   void onUseArrowKeyToShiftCellSelectionClicked(int);
   void onInputCellsWithoutDoubleClickingClicked(int);
   void onWatchFileSystemClicked(int);
-  void onXsheetLayoutChanged(int);
+  void onXsheetLayoutChanged(const QString &text);
 };
 
 //**********************************************************************************
