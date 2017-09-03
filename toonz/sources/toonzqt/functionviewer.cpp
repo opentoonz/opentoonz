@@ -121,6 +121,11 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
       m_leftLayout->addSpacing(66);
     } else
       m_leftLayout->addSpacing(36);
+
+	QString layout = Preferences::instance()->getLoadedXsheetLayout();
+	if (layout == QString("Compact"))
+		m_leftLayout->addSpacing(-18);
+
     m_leftLayout->addWidget(m_numericalColumns);
   }
   leftPanel->setLayout(m_leftLayout);

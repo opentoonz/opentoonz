@@ -252,6 +252,16 @@ void Orientation::addFlag(PredefinedFlag which, const bool &flag) {
 /// -------------------------------------------------------------------------------
 
 TopToBottomOrientation::TopToBottomOrientation() {
+	QString layout = Preferences::instance()->getLoadedXsheetLayout();
+
+	int use_header_height = LAYER_HEADER_HEIGHT;
+
+	if (layout == QString("Compact"))
+		use_header_height -= 18;
+
+	int user_folded_header_height = use_header_height;
+
+
   //
   // Area rectangles
   //
@@ -295,7 +305,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   // Note viewer
   addRect(
       PredefinedRect::NOTE_AREA,
-      QRect(QPoint(0, 0), QSize(FRAME_HEADER_WIDTH, LAYER_HEADER_HEIGHT - 1)));
+      QRect(QPoint(0, 0), QSize(FRAME_HEADER_WIDTH, use_header_height - 1)));
   addRect(PredefinedRect::NOTE_ICON,
           QRect(QPoint(0, 0), QSize(CELL_WIDTH - 2, CELL_HEIGHT - 2)));
   addRect(PredefinedRect::LAYER_HEADER_PANEL, QRect(0, 0, -1, -1));  // hide
@@ -330,10 +340,10 @@ TopToBottomOrientation::TopToBottomOrientation() {
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
-		  QRect(0, 1, CELL_WIDTH, LAYER_HEADER_HEIGHT - 3));
+		  QRect(0, 1, CELL_WIDTH, use_header_height - 3));
   addRect(
 		PredefinedRect::FOLDED_LAYER_HEADER,
-		QRect(0, 1, FOLDED_LAYER_HEADER_WIDTH, FOLDED_LAYER_HEADER_HEIGHT - 3));
+		QRect(0, 1, FOLDED_LAYER_HEADER_WIDTH, user_folded_header_height - 3));
 
   static int THUMBNAIL_HEIGHT;
   static int HDRROW_HEIGHT;
@@ -348,10 +358,8 @@ TopToBottomOrientation::TopToBottomOrientation() {
 	  thumbnailArea, thumbnail, pegbarname, volumeArea;
   QPoint soundTopLeft;
 
-  QString layout = Preferences::instance()->getLoadedXsheetLayout();
-
   if (layout == QString("Compact")) {
-	  THUMBNAIL_HEIGHT = 62;
+	  THUMBNAIL_HEIGHT = 44;
 	  HDRROW_HEIGHT = CELL_HEIGHT - 2;
 	  INDENT = 0;
 	  HDRROW1 = 1;							// Name, number
@@ -405,11 +413,12 @@ TopToBottomOrientation::TopToBottomOrientation() {
 		  QRect(thumbnail.right() - 14, thumbnail.top() + 3, 12, 12));
 
 	  addRect(PredefinedRect::SOUND_ICON,
-		  QRect(thumbnailArea.topLeft(), QSize(40, 30)).adjusted((thumbnailArea.width() / 2) - (40 / 2),
-			  6,
-			  (thumbnailArea.width() / 2) - (40 / 2),
-			  6));
-	  volumeArea = QRect(QPoint(thumbnailArea.left() + 3, thumbnailArea.top() + 42),
+		  QRect(thumbnailArea.topLeft(), QSize(27, 20)).adjusted((thumbnailArea.width() / 2) - (27 / 2),
+			  3,
+			  (thumbnailArea.width() / 2) - (27 / 2),
+			  3));
+
+	  volumeArea = QRect(QPoint(thumbnailArea.left() + 3, thumbnailArea.bottom() - 16),
 		  QSize(TRACKLEN + 8, 14));
 	  addRect(PredefinedRect::VOLUME_AREA, volumeArea);
 
@@ -544,7 +553,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
 		  HDRROW4 = HDRROW3 + THUMBNAIL_HEIGHT + 5; // pegbar, parenthandle
 
 		  addRect(PredefinedRect::DRAG_LAYER,
-			  QRect(0, 0, CELL_DRAG_WIDTH, LAYER_HEADER_HEIGHT - 3));
+			  QRect(0, 0, CELL_DRAG_WIDTH, use_header_height - 3));
 
 		  addRect(PredefinedRect::RENAME_COLUMN,
 			  QRect(0, HDRROW1, CELL_WIDTH, HDRROW_HEIGHT));
@@ -746,7 +755,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   // Ranges
   //
   addRange(PredefinedRange::HEADER_LAYER, NumberRange(0, FRAME_HEADER_WIDTH));
-  addRange(PredefinedRange::HEADER_FRAME, NumberRange(0, LAYER_HEADER_HEIGHT));
+  addRange(PredefinedRange::HEADER_FRAME, NumberRange(0, use_header_height));
 }
 
 CellPosition TopToBottomOrientation::xyToPosition(const QPoint &xy,
