@@ -35,6 +35,7 @@ XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WFlags flags)
   setObjectName("cornerWidget");
   setFixedHeight(30);
   setObjectName("XSheetToolbar");
+  m_editInPlace->setCheckable(true);
 }
 
 //-----------------------------------------------------------------------------

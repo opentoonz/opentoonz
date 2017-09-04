@@ -63,6 +63,7 @@ class CommandBarPopup final : public DVGui::Dialog {
   CommandBarListTree* m_commandListTree;
   CommandBarTree* m_menuBarTree;
   TFilePath m_path;
+
 public:
   CommandBarPopup(bool isXsheetToolbar = false);
 protected slots:

@@ -87,14 +87,13 @@ CommandBarTree::CommandBarTree(TFilePath& path, QWidget* parent)
   if (TFileStatus(path).isWritable())
     fp = path;
   else {
-	  if (path.getName() == "xsheettoolbar") {
-		  fp = ToonzFolder::getTemplateModuleDir() + TFilePath("xsheettoolbar.xml");
-	  }
-	  else {
-		  fp = ToonzFolder::getTemplateModuleDir() + TFilePath("commandbar.xml");
-	  }
+    if (path.getName() == "xsheettoolbar") {
+      fp = ToonzFolder::getTemplateModuleDir() + TFilePath("xsheettoolbar.xml");
+    } else {
+      fp = ToonzFolder::getTemplateModuleDir() + TFilePath("commandbar.xml");
+    }
   }
-  
+
   loadMenuTree(fp);
 }
 
@@ -121,13 +120,11 @@ void CommandBarTree::loadMenuTree(const TFilePath& fp) {
             CommandBarCommandItem* item = new CommandBarCommandItem(0, action);
             addTopLevelItem(item);
           }
-        }
-		else if (reader.name() == "separator") {
-			CommandBarSeparatorItem* sep = new CommandBarSeparatorItem(0);
-			addTopLevelItem(sep);
-			reader.skipCurrentElement();
-		}
-		else
+        } else if (reader.name() == "separator") {
+          CommandBarSeparatorItem* sep = new CommandBarSeparatorItem(0);
+          addTopLevelItem(sep);
+          reader.skipCurrentElement();
+        } else
           reader.skipCurrentElement();
       }
     } else
@@ -142,21 +139,23 @@ void CommandBarTree::loadMenuTree(const TFilePath& fp) {
 //-----------------------------------------------------------------------------
 
 void CommandBarTree::loadMenuRecursive(QXmlStreamReader& reader,
-                                    QTreeWidgetItem* parentItem) {
+                                       QTreeWidgetItem* parentItem) {
   while (reader.readNextStartElement()) {
     if (reader.name() == "command") {
       QString cmdName = reader.readElementText();
       QAction* action =
           CommandManager::instance()->getAction(cmdName.toStdString().c_str());
       if (action)
-		  CommandBarCommandItem* item = new CommandBarCommandItem(parentItem, action);
+        CommandBarCommandItem* item =
+            new CommandBarCommandItem(parentItem, action);
     } else if (reader.name() == "command_debug") {
 #ifndef NDEBUG
       QString cmdName = reader.readElementText();
       QAction* action =
           CommandManager::instance()->getAction(cmdName.toStdString().c_str());
       if (action)
-		  CommandBarCommandItem* item = new CommandBarCommandItem(parentItem, action);
+        CommandBarCommandItem* item =
+            new CommandBarCommandItem(parentItem, action);
 #else
       reader.skipCurrentElement();
 #endif
@@ -171,7 +170,6 @@ void CommandBarTree::loadMenuRecursive(QXmlStreamReader& reader,
 //-----------------------------------------------------------------------------
 
 void CommandBarTree::saveMenuTree(TFilePath& path) {
- 
   QFile file(toQString(path));
   if (!file.open(QFile::WriteOnly | QFile::Text)) {
     qDebug() << "Cannot read file" << file.errorString();
@@ -184,7 +182,7 @@ void CommandBarTree::saveMenuTree(TFilePath& path) {
 
   writer.writeStartElement("commandbar");
   { saveMenuRecursive(writer, invisibleRootItem()); }
-  writer.writeEndElement();  
+  writer.writeEndElement();
 
   writer.writeEndDocument();
 }
@@ -192,7 +190,7 @@ void CommandBarTree::saveMenuTree(TFilePath& path) {
 //-----------------------------------------------------------------------------
 
 void CommandBarTree::saveMenuRecursive(QXmlStreamWriter& writer,
-                                    QTreeWidgetItem* parentItem) {
+                                       QTreeWidgetItem* parentItem) {
   for (int c = 0; c < parentItem->childCount(); c++) {
     CommandBarCommandItem* command =
         dynamic_cast<CommandBarCommandItem*>(parentItem->child(c));
@@ -212,7 +210,8 @@ void CommandBarTree::saveMenuRecursive(QXmlStreamWriter& writer,
 //-----------------------------------------------------------------------------
 
 bool CommandBarTree::dropMimeData(QTreeWidgetItem* parent, int index,
-                               const QMimeData* data, Qt::DropAction action) {
+                                  const QMimeData* data,
+                                  Qt::DropAction action) {
   if (data->hasText()) {
     QString txt = data->text();
     QTreeWidgetItem* item;
@@ -314,7 +313,8 @@ CommandBarListTree::CommandBarListTree(QWidget* parent) : QTreeWidget(parent) {
   addFolder(ShortcutTree::tr("Tools"), ToolCommandType);
   addFolder(ShortcutTree::tr("Playback"), PlaybackCommandType);
   addFolder(ShortcutTree::tr("Fill"), FillCommandType);
-  addFolder(ShortcutTree::tr("Right-click Menu Commands"), RightClickMenuCommandType);
+  addFolder(ShortcutTree::tr("Right-click Menu Commands"),
+            RightClickMenuCommandType);
   addFolder(ShortcutTree::tr("Tool Modifiers"), ToolModifierCommandType);
   addFolder(ShortcutTree::tr("Visualization"), ZoomCommandType);
   addFolder(ShortcutTree::tr("Misc"), MiscCommandType);
@@ -328,7 +328,7 @@ CommandBarListTree::CommandBarListTree(QWidget* parent) : QTreeWidget(parent) {
 //-----------------------------------------------------------------------------
 
 void CommandBarListTree::addFolder(const QString& title, int commandType,
-                                QTreeWidgetItem* parentFolder) {
+                                   QTreeWidgetItem* parentFolder) {
   QTreeWidgetItem* folder;
   if (!parentFolder)
     folder = new QTreeWidgetItem(this);
@@ -395,15 +395,15 @@ void CommandBarListTree::mousePressEvent(QMouseEvent* event) {
 CommandBarPopup::CommandBarPopup(bool isXsheetToolbar)
     : Dialog(TApp::instance()->getMainWindow(), true, false,
              "CustomizeCommandBar") {
-  setWindowTitle(tr("Customize Command Bar"));
   QLabel* commandBarLabel;
   if (isXsheetToolbar) {
-	  m_path = ToonzFolder::getMyModuleDir() + TFilePath("xsheettoolbar.xml");
-	  commandBarLabel = new QLabel(tr("XSheet Toolbar"));
-  }
-  else {
-	  m_path = ToonzFolder::getMyModuleDir() + TFilePath("commandbar.xml");
-	  commandBarLabel = new QLabel(tr("Command Bar"));
+    m_path = ToonzFolder::getMyModuleDir() + TFilePath("xsheettoolbar.xml");
+    commandBarLabel = new QLabel(tr("XSheet Toolbar"));
+    setWindowTitle(tr("Customize XSheet Toolbar"));
+  } else {
+    m_path = ToonzFolder::getMyModuleDir() + TFilePath("commandbar.xml");
+    commandBarLabel = new QLabel(tr("Command Bar"));
+    setWindowTitle(tr("Customize Command Bar"));
   }
 
   m_commandListTree = new CommandBarListTree(this);
@@ -421,10 +421,10 @@ CommandBarPopup::CommandBarPopup(bool isXsheetToolbar)
   commandBarLabel->setFont(f);
   commandItemListLabel->setFont(f);
 
-  QLabel* noticeLabel = new QLabel(
-      tr("Duplicated commands will be ignored. Only "
-         "the last one will appear in the menu bar."),
-      this);
+  QLabel* noticeLabel =
+      new QLabel(tr("Duplicated commands will be ignored. Only "
+                    "the last one will appear in the menu bar."),
+                 this);
   QFont nf("Arial", 9, QFont::Normal);
   nf.setItalic(true);
   noticeLabel->setFont(nf);

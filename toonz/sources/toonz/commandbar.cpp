@@ -38,6 +38,7 @@ CommandBar::CommandBar(QWidget *parent, Qt::WFlags flags)
   setObjectName("cornerWidget");
   setObjectName("CommandBar");
   fillToolbar(this, isXsheetToolbar);
+  m_editInPlace->setCheckable(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -100,6 +101,7 @@ void CommandBar::fillToolbar(CommandBar *toolbar, bool isXsheetToolbar) {
                                    SIGNAL(editInPlaceChanged()), toolbar,
                                    SLOT(updateEditInPlaceStatus()));
               assert(ret);
+              toolbar->m_editInPlace->setCheckable(true);
             }
           } else {
             std::string cmdStr = cmdName.toStdString();
