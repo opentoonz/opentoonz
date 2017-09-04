@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "toonz/txsheet.h"
+#include "commandbar.h"
 #include "toonzqt/keyframenavigator.h"
 
 #include <QToolBar>
@@ -24,12 +25,10 @@ namespace XsheetGUI {
 // XSheet Toolbar
 //-----------------------------------------------------------------------------
 
-class XSheetToolbar final : public QToolBar {
+class XSheetToolbar final : public CommandBar {
   Q_OBJECT
 
   XsheetViewer *m_viewer;
-  ViewerKeyframeNavigator *m_keyFrameButton;
-  QAction *m_editInPlace;
   bool m_isCollapsible;
 
 public:
@@ -46,8 +45,10 @@ signals:
 
 protected:
   void showEvent(QShowEvent *e) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
 protected slots:
+  void doCustomizeCommandBar();
   void updateEditInPlaceStatus();
 };
 

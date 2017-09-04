@@ -16,20 +16,18 @@
 class QAction;
 
 //=============================================================================
-// XSheet Toolbar
+// CommandBar
 //-----------------------------------------------------------------------------
 
-class CommandBar final : public QToolBar {
+class CommandBar : public QToolBar {
   Q_OBJECT
-
-  ViewerKeyframeNavigator *m_keyFrameButton;
   bool m_isCollapsible;
-  QAction *m_editInPlace;
 
 public:
 #if QT_VERSION >= 0x050500
   CommandBar(QWidget *parent = 0, Qt::WindowFlags flags = 0,
-             bool isCollapsible = false);
+             bool isCollapsible = false, bool isXsheetToolbar = false);
+  QAction *m_editInPlace;
 #else
   CommandBar(QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
@@ -37,7 +35,13 @@ public:
 signals:
   void updateVisibility();
 
+protected:
+  static void fillToolbar(CommandBar *toolbar, bool isXsheetToolbar = false);
+  static void buildDefaultToolbar(CommandBar *toolbar);
+  void contextMenuEvent(QContextMenuEvent *event) override;
+
 protected slots:
+  void doCustomizeCommandBar();
   void updateEditInPlaceStatus();
 };
 
