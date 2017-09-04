@@ -924,6 +924,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::LAYER_NUMBER,
           QRect(ICONS_WIDTH + 1, 0, LAYER_NUMBER_WIDTH, CELL_HEIGHT));
   addRect(PredefinedRect::THUMBNAIL_AREA, QRect(0, 0, -1, -1));  // hide
+  addRect(PredefinedRect::THUMBNAIL, QRect(0, 0, -1, -1));  // hide
   addRect(PredefinedRect::FILTER_COLOR,
           QRect(LAYER_HEADER_WIDTH - 17, 6, 12, 12));
   addRect(PredefinedRect::PEGBAR_NAME, QRect(0, 0, -1, -1));         // hide
