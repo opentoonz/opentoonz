@@ -1463,13 +1463,9 @@ QPixmap ColumnArea::getColumnIcon(int columnIndex) {
       onDemand = m_viewer->getCurrentColumn() != columnIndex;
     QPixmap icon =
         IconGenerator::instance()->getIcon(xl, cell.m_frameId, false, onDemand);
-#ifndef LINETEST
+	QRect thumbnailImageRect = o->rect(PredefinedRect::THUMBNAIL);
     return scalePixmapKeepingAspectRatio(
-        icon, QSize(o->cellWidth(), height() - 3 * o->cellHeight() - 8));
-#else
-    return scalePixmapKeepingAspectRatio(
-        icon, QSize(o->cellWidth(), height() - 4 * o->cellHeight() - 8));
-#endif
+        icon, thumbnailImageRect.size());
   }
 }
 
