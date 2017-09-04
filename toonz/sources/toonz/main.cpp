@@ -528,7 +528,7 @@ int main(int argc, char *argv[]) {
 
   loadShaderInterfaces(ToonzFolder::getLibraryFolder() + TFilePath("shaders"));
 
-  splash.showMessage(offsetStr + "Initializing Toonz application ...",
+  splash.showMessage(offsetStr + "Initializing OpenToonz ...",
                      Qt::AlignCenter, Qt::white);
   a.processEvents();
 
@@ -591,9 +591,13 @@ int main(int argc, char *argv[]) {
 
   TApp::instance()->setMainWindow(&w);
   w.setWindowTitle(applicationFullName);
-
-  splash.showMessage(offsetStr + "Starting main window ...", Qt::AlignCenter,
-                     Qt::white);
+  if (TEnv::getIsPortable()) {
+    splash.showMessage(offsetStr + "Starting OpenToonz Portable ...",
+                       Qt::AlignCenter, Qt::white);
+  } else {
+    splash.showMessage(offsetStr + "Starting main window ...", Qt::AlignCenter,
+                       Qt::white);
+  }
   a.processEvents();
 
   TFilePath fp = ToonzFolder::getModuleFile("mainwindow.ini");
