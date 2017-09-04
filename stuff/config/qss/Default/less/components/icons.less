@@ -1,0 +1,35 @@
+/* -----------------------------------------------------------------------------
+   Component: Icons
+----------------------------------------------------------------------------- */
+
+// Camera Lock
+// -----------------------------------------------------------------------------
+
+.icon-lock() {
+  border: @toolbutton-border-size solid @toolbutton-border-color;
+  height: 18px;
+  padding: 0;
+  width: 18px;
+  &:unchecked {
+    image: url('@{img-url}/cam_unlock.svg');
+  }
+  &:checked {
+    background-color: @toolbutton-lock-bg-color-checked;
+    border-color: @toolbutton-lock-border-color-checked;
+    image: url('@{img-url}/cam_lock.svg');
+  }
+}
+
+// Force Square Pixel
+// -----------------------------------------------------------------------------
+
+.icon-fsp() {
+  height: 16px;
+  border: @toolbutton-border-size solid @toolbutton-border-color;
+  image: url('@{img-url}/fsp_unchecked.svg');
+  padding: 2px;
+  width: 16px;
+  &:checked {
+    image: url('@{img-url}/fsp_checked.svg');
+  }
+}
