@@ -881,10 +881,9 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
 
 void SceneViewer::touchEvent(QTouchEvent *e, int type) {
   if (type == QEvent::TouchBegin) {
-    m_touchActive = true;
-    if (e->touchPoints().count() == 1) {
-      m_firstPanPoint = e->touchPoints().at(0).pos();
-    }
+    m_touchActive   = true;
+    m_firstPanPoint = e->touchPoints().at(0).pos();
+    m_undoPoint     = m_firstPanPoint;
   }
   if (e->touchPoints().count() == 1 && m_touchActive) {
     QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
@@ -898,6 +897,17 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
       QPointF centerDelta = (panPoint.pos() * getDevPixRatio()) -
                             (panPoint.lastPos() * getDevPixRatio());
       panQt(centerDelta.toPoint());
+    }
+  }
+  if (e->touchPoints().count() == 3 && m_touchActive) {
+    QPointF newPoint = e->touchPoints().at(0).pos();
+    if (m_undoPoint.x() - newPoint.x() > 100) {
+      CommandManager::instance()->execute("MI_Undo");
+      m_undoPoint = newPoint;
+    }
+    if (m_undoPoint.x() - newPoint.x() < -100) {
+      CommandManager::instance()->execute("MI_Redo");
+      m_undoPoint = newPoint;
     }
   }
   if (type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
