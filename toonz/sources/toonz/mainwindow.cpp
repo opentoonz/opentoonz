@@ -307,8 +307,9 @@ void Room::load(const TFilePath &fp) {
     QVariant name = settings.value("name");
     if (name.canConvert(QVariant::String)) {
       // Allocate panel
-      paneObjectName = name.toString();
-      pane           = TPanelFactory::createPanel(this, paneObjectName);
+      paneObjectName          = name.toString();
+      std::string paneStrName = paneObjectName.toStdString();
+      pane = TPanelFactory::createPanel(this, paneObjectName);
       if (SaveLoadQSettings *persistent =
               dynamic_cast<SaveLoadQSettings *>(pane->widget()))
         persistent->load(settings);
@@ -445,6 +446,12 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
   setCommandHandler(MI_MaximizePanel, this, &MainWindow::maximizePanel);
   setCommandHandler(MI_FullScreenWindow, this, &MainWindow::fullScreenWindow);
+  setCommandHandler("MI_NewVectorLevel", this,
+                    &MainWindow::onNewVectorLevelButtonPressed);
+  setCommandHandler("MI_NewToonzRasterLevel", this,
+                    &MainWindow::onNewToonzRasterLevelButtonPressed);
+  setCommandHandler("MI_NewRasterLevel", this,
+                    &MainWindow::onNewRasterLevelButtonPressed);
   // remove ffmpegCache if still exists from crashed exit
   QString ffmpegCachePath =
       ToonzFolder::getCacheRootFolder().getQString() + "//ffmpeg";
@@ -1601,6 +1608,20 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_ClearRecentLevel, tr("&Clear Recent level File List"),
                        "");
   createMenuFileAction(MI_NewLevel, tr("&New Level..."), "Alt+N");
+
+  QAction *newVectorLevelAction =
+      createMenuFileAction(MI_NewVectorLevel, tr("&New Vector Level"), "");
+  newVectorLevelAction->setIconText(tr("New Vector Level"));
+  newVectorLevelAction->setIcon(createQIconPNG("new_vector_level"));
+  QAction *newToonzRasterLevelAction = createMenuFileAction(
+      MI_NewToonzRasterLevel, tr("&New Toonz Raster Level"), "");
+  newToonzRasterLevelAction->setIconText(tr("New Toonz Raster Level"));
+  newToonzRasterLevelAction->setIcon(createQIconPNG("new_toonz_raster_level"));
+  QAction *newRasterLevelAction =
+      createMenuFileAction(MI_NewRasterLevel, tr("&New Raster Level"), "");
+  newRasterLevelAction->setIconText(tr("New Raster Level"));
+  newRasterLevelAction->setIcon(createQIconPNG("new_raster_level"));
+
   createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
   createMenuFileAction(MI_SaveLevel, tr("&Save Level"), "");
   createMenuFileAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
@@ -1957,6 +1978,7 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenStyleControl, tr("&Style Editor"), "");
   createMenuWindowsAction(MI_OpenToolbar, tr("&Toolbar"), "");
   createMenuWindowsAction(MI_OpenToolOptionBar, tr("&Tool Option Bar"), "");
+  createMenuWindowsAction(MI_OpenCommandToolbar, tr("&Command Bar"), "");
   createMenuWindowsAction(MI_OpenLevelView, tr("&Viewer"), "");
 #ifdef LINETEST
   createMenuWindowsAction(MI_OpenLineTestCapture, tr("&LineTest Capture"), "");
@@ -2255,6 +2277,33 @@ void MainWindow::togglePickStyleAreas() {
 void MainWindow::togglePickStyleLines() {
   CommandManager::instance()->getAction(T_StylePicker)->trigger();
   CommandManager::instance()->getAction("A_ToolOption_Mode:Lines")->trigger();
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onNewVectorLevelButtonPressed() {
+  int defaultLevelType = Preferences::instance()->getDefLevelType();
+  Preferences::instance()->setDefLevelType(PLI_XSHLEVEL);
+  CommandManager::instance()->execute("MI_NewLevel");
+  Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onNewToonzRasterLevelButtonPressed() {
+  int defaultLevelType = Preferences::instance()->getDefLevelType();
+  Preferences::instance()->setDefLevelType(TZP_XSHLEVEL);
+  CommandManager::instance()->execute("MI_NewLevel");
+  Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onNewRasterLevelButtonPressed() {
+  int defaultLevelType = Preferences::instance()->getDefLevelType();
+  Preferences::instance()->setDefLevelType(OVL_XSHLEVEL);
+  CommandManager::instance()->execute("MI_NewLevel");
+  Preferences::instance()->setDefLevelType(defaultLevelType);
 }
 
 //-----------------------------------------------------------------------------

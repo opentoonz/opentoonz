@@ -14,6 +14,7 @@
 #include "xsheetviewer.h"
 #include "sceneviewer.h"
 #include "toolbar.h"
+#include "commandbar.h"
 #include "flipbook.h"
 #include "castviewer.h"
 #include "filebrowser.h"
@@ -860,6 +861,35 @@ public:
     panel->setWindowTitle(QString(""));
   }
 } toolbarFactory;
+
+//=========================================================
+// Command Bar Panel
+//---------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+CommandBarPanel::CommandBarPanel(QWidget *parent)
+    : TPanel(parent, 0, TDockWidget::horizontal) {
+  CommandBar *xsheetToolbar = new CommandBar();
+  setWidget(xsheetToolbar);
+  setIsMaximizable(false);
+  setFixedHeight(36);
+}
+
+class CommandBarFactory final : public TPanelFactory {
+public:
+  CommandBarFactory() : TPanelFactory("CommandBar") {}
+  TPanel *createPanel(QWidget *parent) override {
+    TPanel *panel = new CommandBarPanel(parent);
+    panel->setObjectName(getPanelType());
+    return panel;
+  }
+  void initialize(TPanel *panel) override {}
+} commandBarFactory;
+
+//=============================================================================
+OpenFloatingPanel openCommandBarCommand(MI_OpenCommandToolbar, "CommandBar",
+                                        QObject::tr("Command Bar"));
+//-----------------------------------------------------------------------------
 
 //=========================================================
 // ToolOptionPanel

@@ -1335,6 +1335,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(windowsMenu, MI_OpenTasks);
   addMenuItem(windowsMenu, MI_OpenTMessage);
   addMenuItem(windowsMenu, MI_OpenToolbar);
+  addMenuItem(windowsMenu, MI_OpenCommandToolbar);
   addMenuItem(windowsMenu, MI_OpenToolOptionBar);
   addMenuItem(windowsMenu, MI_OpenLevelView);
   addMenuItem(windowsMenu, MI_OpenComboViewer);

@@ -1,22 +1,56 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1"
-	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="frameprev_click.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 17 17"
-	 style="enable-background:new 0 0 17 17;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#FFFFFF;}
-	.st1{fill:#404040;}
-	.st2{fill:none;stroke:#404040;stroke-width:2;stroke-linecap:square;stroke-miterlimit:3;}
-</style>
-<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview17" inkscape:current-layer="svg2" inkscape:cx="10.5" inkscape:cy="8.5" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="480" inkscape:window-maximized="0" inkscape:window-width="796" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="13.882353" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
-	</sodipodi:namedview>
-<g>
-	<g id="g7">
-		<rect id="rect9" x="14" y="3" class="st0" width="2" height="11"/>
-		<path id="path11" inkscape:connector-curvature="0" class="st1" d="M17,15h-4V2h4V15z M14,3v11h2V3H14z"/>
-	</g>
-	<path id="path13" inkscape:connector-curvature="0" class="st2" d="M2,8.5l9-5v10L2,8.5z"/>
-	<path id="path15" inkscape:connector-curvature="0" class="st0" d="M2,8.5l9-5v10L2,8.5z"/>
-</g>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="100%"
+   height="100%"
+   viewBox="0 0 17 17"
+   version="1.1"
+   id="svg4493">
+  <defs
+     id="defs4487" />
+  <metadata
+     id="metadata4490">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(0,-1105.5197)" />
+  <path
+     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.54901961"
+     d="M 11.00041,13.5 2.0504871,8.5 11.00041,3.5000001 Z"
+     id="path4500" />
+  <path
+     id="path4492"
+     d="M 11,13.5 1.9929934,8.5 11,3.5000001 Z"
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  <rect
+     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:0.54901961;paint-order:markers stroke fill"
+     id="rect4496"
+     width="2"
+     height="11"
+     x="14"
+     y="3"
+     rx="0"
+     ry="0" />
+  <rect
+     ry="0"
+     rx="0"
+     y="3"
+     x="13.992993"
+     height="11"
+     width="2"
+     id="rect4485"
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:0.54901961;paint-order:markers stroke fill" />
 </svg>
