@@ -610,8 +610,11 @@ Preferences::Preferences()
   // in case there is no personal settings
   if (savePath != loadPath) {
     // copy the template settins to the personal one
-    if (TFileStatus(loadPath).doesExist())
-      TSystem::copyFile(savePath, loadPath);
+	// Save file to directory if it doesn't already exist.
+	if (!TFileStatus(loadPath).doesExist()) m_settings->sync();
+	// Create the settings.user folder before trying to copy or we will crash!
+	TSystem::touchParentDir(savePath);
+    TSystem::copyFile(savePath, loadPath);
     m_settings.reset(
         new QSettings(QString::fromStdWString(savePath.getWideString()),
                       QSettings::IniFormat));
