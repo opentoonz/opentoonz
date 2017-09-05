@@ -2565,10 +2565,13 @@ void BrushData::saveData(TOStream &os) {
   os.closeChild();
   os.openChild("Miter");
   os << m_miter;
+  os.closeChild();
   os.openChild("Frame_Range");
   os << (int)m_frameRange;
+  os.closeChild();
   os.openChild("Snap");
   os << (int)m_snap;
+  os.closeChild();
   os.openChild("SnapSensitivity");
   os << (int)m_snapSensitivity;
   os.closeChild();

@@ -2590,14 +2590,16 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
       std::vector<TFxP> macroFxs = macroFx->getFxs();
       int j;
       for (j = 0; j < (int)macroFxs.size(); j++) {
-        TFx *inMacroFx = macroFxs[j].getPointer();
+        TFx *inMacroFx      = macroFxs[j].getPointer();
+        std::wstring fxName = inMacroFx->getName();
+        QString qFxName     = QString::fromStdWString(fxName);
         if (inMacroFx->getFxId() == qInMacroFxId.toStdWString()) {
           int count = inMacroFx->getInputPortCount();
           if (count == 1)
-            qPortName = qInMacroFxId;
+            qPortName = qFxName;
           else {
             qPortName.remove(1, qPortName.size());
-            qPortName += ". " + qInMacroFxId;
+            qPortName += ". " + qFxName;
           }
         }
       }
