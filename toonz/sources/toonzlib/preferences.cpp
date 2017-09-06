@@ -318,8 +318,8 @@ Preferences::Preferences()
     , m_importPolicy(0)
     , m_ignoreImageDpi(false)
     , m_watchFileSystem(true)
-    , m_xsheetLayoutPreference("Classic")
-	, m_loadedXsheetLayout("Classic") {
+    , m_xsheetLayoutPreference("Compact")
+	, m_loadedXsheetLayout("Compact") {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -612,11 +612,11 @@ Preferences::Preferences()
   QString xsheetLayoutPreference;
   xsheetLayoutPreference = m_settings->value("xsheetLayoutPreference").toString();
   if (xsheetLayoutPreference != "")
-  {
 	  m_xsheetLayoutPreference = xsheetLayoutPreference;
-	  m_loadedXsheetLayout = xsheetLayoutPreference;
-  }
+  else if (savePath == loadPath) // Existing users with missing preference defaults to Classic. New users will be Compact
+	  m_xsheetLayoutPreference = QString("Classic");
   setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
+  m_loadedXsheetLayout = xsheetLayoutPreference;
 
   // in case there is no personal settings
   if (savePath != loadPath) {
