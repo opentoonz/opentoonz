@@ -202,6 +202,7 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   ret = ret &&
         parent->connect(action, SIGNAL(triggered()), this,
                         SLOT(setGuidedDrawingAll()));
+  guidedDrawingMenu->addSeparator();
   action = guidedDrawingMenu->addAction(tr("Show Animations"));
   action->setCheckable(true);
   action->setChecked(Preferences::instance()->getAnimatedGuidedDrawing());
