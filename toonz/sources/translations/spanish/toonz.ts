@@ -124,7 +124,7 @@
     <name>AudioRecordingPopup</name>
     <message>
         <source>Audio Recording</source>
-        <translation>Grabación de audio</translation>
+        <translation>Grabación de sonido</translation>
     </message>
     <message>
         <source>Save and Insert</source>
@@ -157,7 +157,7 @@ Por favor seleccionar un dispositivo diferente o comprobar el micrófono.</trans
     </message>
     <message>
         <source>Field Guide:</source>
-        <translation>Guía de campo:</translation>
+        <translation>Guía de campos:</translation>
     </message>
 </context>
 <context>
@@ -356,7 +356,7 @@ Detenerla o esperar a su finalización antes de eliminarla.</translation>
     </message>
     <message>
         <source>New Size</source>
-        <translation>Nuevo tamaño</translation>
+        <translation>Tamaño nuevo</translation>
     </message>
     <message>
         <source>Unit:</source>
@@ -767,7 +767,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Field Guide</source>
-        <translation>Guía de campo</translation>
+        <translation>Guía de campos</translation>
     </message>
 </context>
 <context>
@@ -782,7 +782,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Field Guide:</source>
-        <translation>Guía de campo:</translation>
+        <translation>Guía de campos:</translation>
     </message>
     <message>
         <source>Rotate:</source>
@@ -858,11 +858,11 @@ What do you want to do?</source>
     <name>ComboViewerPanel</name>
     <message>
         <source>Safe Area (Right Click to Select)</source>
-        <translation>Área de seguridad (clic derecho para seleccionar)</translation>
+        <translation>Áreas de seguridad (clic derecho para seleccionar)</translation>
     </message>
     <message>
         <source>Field Guide</source>
-        <translation>Guía de campo</translation>
+        <translation>Guía de campos</translation>
     </message>
     <message>
         <source>Camera Stand View</source>
@@ -1224,7 +1224,7 @@ de diseñar el color.</translation>
     </message>
     <message>
         <source>Scanner Driver:</source>
-        <translation>Controlador del escaner:</translation>
+        <translation>Controlador:</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -2473,11 +2473,11 @@ Do you want to create it?</source>
     <name>LinesFadePopup</name>
     <message>
         <source>Color Fade</source>
-        <translation>Color de desvanecimiento</translation>
+        <translation>Fundir a un color</translation>
     </message>
     <message>
         <source>Fade:</source>
-        <translation>Desvanecimiento:</translation>
+        <translation>Fundir:</translation>
     </message>
     <message>
         <source>Intensity:</source>
@@ -3044,7 +3044,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Scan Settings...</source>
-        <translation>&amp;Opciones del escaner...</translation>
+        <translation>&amp;Opciones de escaneo...</translation>
     </message>
     <message>
         <source>&amp;Scan</source>
@@ -3112,7 +3112,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Color Fade...</source>
-        <translation>&amp;Color de desvanecimiento...</translation>
+        <translation>Fundir a un &amp;color...</translation>
     </message>
     <message>
         <source>&amp;Canvas Size...</source>
@@ -3132,11 +3132,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Scene Settings...</source>
-        <translation>Opciones de la e&amp;scena...</translation>
+        <translation>Opciones de e&amp;scena...</translation>
     </message>
     <message>
         <source>&amp;Camera Settings...</source>
-        <translation>&amp;Opciones de la cámara...</translation>
+        <translation>&amp;Opciones de cámara...</translation>
     </message>
     <message>
         <source>&amp;Open Sub-xsheet</source>
@@ -3232,27 +3232,27 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Step 2</source>
-        <translation>En &amp;2</translation>
+        <translation>Exposición x&amp;2</translation>
     </message>
     <message>
         <source>&amp;Step 3</source>
-        <translation>En &amp;3</translation>
+        <translation>Exposición x&amp;3</translation>
     </message>
     <message>
         <source>&amp;Step 4</source>
-        <translation>En &amp;4</translation>
+        <translation>Exposición x&amp;4</translation>
     </message>
     <message>
         <source>&amp;Each 2</source>
-        <translation>&amp;Cada 2</translation>
+        <translation>Uno de cada &amp;2</translation>
     </message>
     <message>
         <source>&amp;Each 3</source>
-        <translation>&amp;Cada 3</translation>
+        <translation>Uno de cada &amp;3</translation>
     </message>
     <message>
         <source>&amp;Each 4</source>
-        <translation>&amp;Cada 4</translation>
+        <translation>Uno de cada &amp;4</translation>
     </message>
     <message>
         <source>&amp;Roll Up</source>
@@ -3292,11 +3292,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Set Key</source>
-        <translation>&amp;Definir clave</translation>
+        <translation>&amp;Definir fotograma clave</translation>
     </message>
     <message>
         <source>&amp;Camera Box</source>
-        <translation>&amp;Marco de la cámara</translation>
+        <translation>&amp;Marco de cámara</translation>
     </message>
     <message>
         <source>&amp;Table</source>
@@ -3304,11 +3304,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Field Guide</source>
-        <translation>&amp;Guía de campo</translation>
+        <translation>&amp;Guía de campos</translation>
     </message>
     <message>
         <source>&amp;Safe Area</source>
-        <translation>&amp;Área de seguridad</translation>
+        <translation>&amp;Áreas de seguridad</translation>
     </message>
     <message>
         <source>&amp;Camera BG Color</source>
@@ -3432,7 +3432,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Palette Gizmo</source>
-        <translation>&amp;Control de paleta</translation>
+        <translation>&amp;Asistente de paleta</translation>
     </message>
     <message>
         <source>&amp;Delete Unused Styles</source>
@@ -3552,7 +3552,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Select All Keys in this Frame</source>
-        <translation>Seleccionar todos los claves en esta fotograma</translation>
+        <translation>Seleccionar todos los claves en este fotograma</translation>
     </message>
     <message>
         <source>Select All Keys in this Column</source>
@@ -3580,11 +3580,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Select Previous Keys in this Frame</source>
-        <translation>Seleccionar los claves anteriores en esta fotograma</translation>
+        <translation>Seleccionar los claves anteriores en este fotograma</translation>
     </message>
     <message>
         <source>Select Following Keys in this Frame</source>
-        <translation>Seleccionar los claves siguientes en esta fotograma</translation>
+        <translation>Seleccionar los claves siguientes en este fotograma</translation>
     </message>
     <message>
         <source>Invert Key Selection</source>
@@ -3996,7 +3996,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Active Axis - Center</source>
-        <translation>Eje activo - Centrar</translation>
+        <translation>Eje activo - Centro</translation>
     </message>
     <message>
         <source>Build Skeleton Mode</source>
@@ -4044,15 +4044,15 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Reset Step</source>
-        <translation>&amp;Restablecer intervalo</translation>
+        <translation>&amp;Restablecer exposición</translation>
     </message>
     <message>
         <source>&amp;Increase Step</source>
-        <translation>&amp;Aumentar intervalo</translation>
+        <translation>&amp;Aumentar exposición</translation>
     </message>
     <message>
         <source>&amp;Decrease Step</source>
-        <translation>&amp;Disminuir intervalo</translation>
+        <translation>&amp;Disminuir exposición</translation>
     </message>
     <message>
         <source>Reload qss</source>
@@ -4072,15 +4072,15 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Field Guide in Capture Window</source>
-        <translation>&amp;Guía de campo en ventana de captura</translation>
+        <translation>&amp;Guía de campos en ventana de captura</translation>
     </message>
     <message>
         <source>&amp;Guide</source>
-        <translation>&amp;Guía</translation>
+        <translation>&amp;Guías</translation>
     </message>
     <message>
         <source>&amp;Ruler</source>
-        <translation>&amp;Regla</translation>
+        <translation>&amp;Reglas</translation>
     </message>
     <message>
         <source>Shift and Trace</source>
@@ -4168,7 +4168,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Raster Bounding Box</source>
-        <translation>&amp;Marco delimitador de imagen</translation>
+        <translation>&amp;Marco de imagen</translation>
     </message>
     <message>
         <source>Link Flipbooks</source>
@@ -4280,19 +4280,19 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>1&apos;s</source>
-        <translation>1s</translation>
+        <translation>simple</translation>
     </message>
     <message>
         <source>2&apos;s</source>
-        <translation>2s</translation>
+        <translation>doble</translation>
     </message>
     <message>
         <source>3&apos;s</source>
-        <translation>3s</translation>
+        <translation>triple</translation>
     </message>
     <message>
         <source>4&apos;s</source>
-        <translation>4s</translation>
+        <translation>cuádruple</translation>
     </message>
     <message>
         <source>&amp;Ink#1 Check</source>
@@ -4304,75 +4304,75 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Show This Only</source>
-        <translation>Mostrar sólo esto</translation>
+        <translation>Ver sólo esta</translation>
     </message>
     <message>
         <source>Show Selected</source>
-        <translation>Mostrar seleccionado</translation>
+        <translation>Ver seleccionadas</translation>
     </message>
     <message>
         <source>Show All</source>
-        <translation>Mostrar todo</translation>
+        <translation>Ver todas</translation>
     </message>
     <message>
         <source>Hide Selected</source>
-        <translation>Ocultar seleccionado</translation>
+        <translation>Ocultar seleccionadas</translation>
     </message>
     <message>
         <source>Hide All</source>
-        <translation>Ocultar todo</translation>
+        <translation>Ocultar todas</translation>
     </message>
     <message>
         <source>Toggle Show/Hide</source>
-        <translation>Mostrar/ocultar</translation>
+        <translation>Invertir visibilidad</translation>
     </message>
     <message>
         <source>ON This Only</source>
-        <translation>Encender sólo este</translation>
+        <translation>Activar sólo esta</translation>
     </message>
     <message>
         <source>ON Selected</source>
-        <translation>Encender seleccionado</translation>
+        <translation>Activar seleccionadas</translation>
     </message>
     <message>
         <source>ON All</source>
-        <translation>Encender todo</translation>
+        <translation>Activar todas</translation>
     </message>
     <message>
         <source>OFF All</source>
-        <translation>Apagar todo</translation>
+        <translation>Desactivar todas</translation>
     </message>
     <message>
         <source>OFF Selected</source>
-        <translation>Apagar seleccionado</translation>
+        <translation>Desactivar seleccionadas</translation>
     </message>
     <message>
         <source>Swap ON/OFF</source>
-        <translation>Alternar</translation>
+        <translation>Invertir activación</translation>
     </message>
     <message>
         <source>Lock This Only</source>
-        <translation>Bloquear sólo esto</translation>
+        <translation>Bloquear sólo esta</translation>
     </message>
     <message>
         <source>Lock Selected</source>
-        <translation>Bloquear seleccionado</translation>
+        <translation>Bloquear seleccionadas</translation>
     </message>
     <message>
         <source>Lock All</source>
-        <translation>Bloquear todo</translation>
+        <translation>Bloquear todas</translation>
     </message>
     <message>
         <source>Unlock Selected</source>
-        <translation>Desbloquear seleccionado</translation>
+        <translation>Desbloquear seleccionadas</translation>
     </message>
     <message>
         <source>Unlock All</source>
-        <translation>Desbloquear todo</translation>
+        <translation>Desbloquear todas</translation>
     </message>
     <message>
         <source>Swap Lock/Unlock</source>
-        <translation>Invertir bloqueado/desbloqueado</translation>
+        <translation>Invertir bloqueo</translation>
     </message>
     <message>
         <source>Hide Upper Columns</source>
@@ -4516,7 +4516,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Record Audio</source>
-        <translation>Grabar sonido</translation>
+        <translation>Grabación de sonido</translation>
     </message>
 </context>
 <context>
@@ -4782,7 +4782,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>File Name:</source>
-        <translation>Nombre del archivo:</translation>
+        <translation>Nombre de archivo:</translation>
     </message>
     <message>
         <source>Options</source>
@@ -4818,15 +4818,15 @@ What do you want to do?</source>
     </message>
     <message>
         <source>None</source>
-        <translation>Ninguna</translation>
+        <translation>No</translation>
     </message>
     <message>
         <source>Fx Schematic Flows</source>
-        <translation>Flujos del diagrama de efectos</translation>
+        <translation>Flujos de diagrama de efectos</translation>
     </message>
     <message>
         <source>Fx Schematic Terminal Nodes</source>
-        <translation>Nodos terminales del diagrama de efectos</translation>
+        <translation>Nodos terminales de diagrama de efectos</translation>
     </message>
     <message>
         <source>Multiple Rendering: </source>
@@ -4834,11 +4834,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Do stereoscopy</source>
-        <translation>: </translation>
+        <translation>Estereoscopía</translation>
     </message>
     <message>
         <source>Apply Shrink to Main Viewer</source>
-        <translation>Aplicar reducción al visor principal</translation>
+        <translation>Aplicar reducción a visor principal</translation>
     </message>
     <message>
         <source>Standard</source>
@@ -4846,19 +4846,19 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Improved</source>
-        <translation>Mejorada</translation>
+        <translation>Mejorado</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>Alta</translation>
+        <translation>Alto</translation>
     </message>
     <message>
         <source>Resample Balance:</source>
-        <translation>Balance del remuestreo:</translation>
+        <translation>Balance de remuestreo:</translation>
     </message>
     <message>
         <source>Channel Width:</source>
-        <translation>Ancho del canal:</translation>
+        <translation>Profundidad de color:</translation>
     </message>
     <message>
         <source>Gamma:</source>
@@ -4882,7 +4882,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Stretch from FPS:</source>
-        <translation>Estirar de FPS:</translation>
+        <translation>Estirar (fps):    Desde:</translation>
     </message>
     <message>
         <source>Single</source>
@@ -5034,11 +5034,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Frame Start:</source>
-        <translation>Fotograma de inicio:</translation>
+        <translation>Fotogramas:   Inicial:</translation>
     </message>
     <message>
         <source>End:</source>
-        <translation>Fin:</translation>
+        <translation>Final:</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -5046,7 +5046,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Frame Rate (linked to Scene Settings):</source>
-        <translation>Velocidad (fps, vinculada a opciones de escena):</translation>
+        <translation>Velocidad (fps):</translation>
     </message>
     <message>
         <source>  To:</source>
@@ -5062,7 +5062,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Enter the name for the output settings preset.</source>
-        <translation>Ingresar el nombre del ajuste de opciones de salida.</translation>
+        <translation>Ingresar nombre del ajuste de opciones de salida.</translation>
     </message>
     <message>
         <source>Add output settings preset</source>
@@ -5190,7 +5190,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Capture white BG</source>
-        <translation>Capturar fondo blanco</translation>
+        <translation>Capturar fondo vacío</translation>
     </message>
     <message>
         <source>Display</source>
@@ -5355,7 +5355,7 @@ Do you want to overwrite it?</source>
     <name>PltGizmoPopup</name>
     <message>
         <source>Palette Gizmo</source>
-        <translation>Control de paleta</translation>
+        <translation>Asistente de paleta</translation>
     </message>
     <message>
         <source>Luminance:</source>
@@ -5375,7 +5375,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Fade to Color</source>
-        <translation>Desvanecer a un color</translation>
+        <translation>Fundir a un color</translation>
     </message>
     <message>
         <source>              Color:</source>
@@ -5383,7 +5383,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Fade</source>
-        <translation>Desvanecer</translation>
+        <translation>Fundir</translation>
     </message>
     <message>
         <source>Blend</source>
@@ -5399,11 +5399,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Scale (%)</source>
-        <translation>Escala (%)</translation>
+        <translation>Escalar (%)</translation>
     </message>
     <message>
         <source>Shift (value)</source>
-        <translation>Desplazamiento (valor)</translation>
+        <translation>Desplazar (valor)</translation>
     </message>
     <message>
         <source>Value</source>
@@ -5818,7 +5818,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Viewer  Shrink</source>
-        <translation>Visor   Reducción</translation>
+        <translation>Visor     Reducción</translation>
     </message>
     <message>
         <source>Step</source>
@@ -5842,7 +5842,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Viewer Zoom Center</source>
-        <translation>Centro del zoom en visor</translation>
+        <translation>Centro de zoom en visor</translation>
     </message>
     <message>
         <source>Language *:</source>
@@ -5950,7 +5950,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Automatically Save Non-Scene Files</source>
-        <translation>Archivos que no pertenecen a la escena</translation>
+        <translation>Otros archivos</translation>
     </message>
     <message>
         <source>My Documents/OpenToonz*</source>
@@ -5994,7 +5994,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Interval(Minutes): </source>
-        <translation>Intervalo(minutos): </translation>
+        <translation>Intervalo (minutos): </translation>
     </message>
     <message>
         <source>Additional Project Locations</source>
@@ -6042,7 +6042,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>FFmpeg Timeout:</source>
-        <translation>Tiempor de espera por FFmpeg:</translation>
+        <translation>Tiempo de espera por FFmpeg:</translation>
     </message>
     <message>
         <source>Show Startup Window when OpenToonz Starts</source>
@@ -6072,7 +6072,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
-        <translation>Por favor indicar dónde se desea ubicar los archivos generados usando Procesar rápido a MP4.</translation>
+        <translation>Por favor indicar dónde se desea ubicar los archivos generados al usar Procesar rápido a MP4.</translation>
     </message>
     <message>
         <source>Fast Render Path: </source>
@@ -7384,11 +7384,11 @@ Are you sure to </source>
     </message>
     <message>
         <source>Step %1  : Level %2</source>
-        <translation>En %1: Nivel %2</translation>
+        <translation>Exposición x%1: Nivel %2</translation>
     </message>
     <message>
         <source>Each %1  : Level %2</source>
-        <translation>Cada %1: Nivel %2</translation>
+        <translation>Uno de cada %1: Nivel %2</translation>
     </message>
     <message>
         <source>Duplicate  : Level %1</source>
@@ -7440,15 +7440,15 @@ Are you sure to </source>
     </message>
     <message>
         <source>Step %1</source>
-        <translation>En %1</translation>
+        <translation>Exposición x%1</translation>
     </message>
     <message>
         <source>Each %1</source>
-        <translation>Cada %1</translation>
+        <translation>Conservar %1</translation>
     </message>
     <message>
         <source>Reframe to %1&apos;s</source>
-        <translation>Cambiar fotogramas a %1s</translation>
+        <translation>Cambiar exposición a %1s</translation>
     </message>
     <message>
         <source>Roll Up</source>
@@ -7472,7 +7472,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Palette Gizmo</source>
-        <translation>Control de paleta</translation>
+        <translation>Asistente de paleta</translation>
     </message>
     <message>
         <source>Create Level %1  at Column %2</source>
@@ -7616,7 +7616,7 @@ error no definido.</translation>
     </message>
     <message>
         <source>Palette Gizmo  %1</source>
-        <translation>Control de paleta  %1</translation>
+        <translation>Asistente de paleta  %1</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -7858,7 +7858,7 @@ El archivo de sonido no será incluido en el clip procesado.</translation>
     </message>
     <message>
         <source>Step:</source>
-        <translation>Fin:</translation>
+        <translation>Intervalo:</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -8943,11 +8943,11 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Safe Area Box 2:</source>
-        <translation>Área de seguridad marco 2:</translation>
+        <translation>Área de seguridad 2:</translation>
     </message>
     <message>
         <source>Safe Area Box 1:</source>
-        <translation>Área de seguridad marco 1:</translation>
+        <translation>Área de seguridad 1:</translation>
     </message>
     <message>
         <source>TLV Subsampling:</source>
@@ -8963,7 +8963,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Field Guide Size:</source>
-        <translation>Tamaño de guía de campo:</translation>
+        <translation>Tamaño de guía de campos:</translation>
     </message>
     <message>
         <source>Frame Rate:</source>
@@ -9081,11 +9081,11 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Safe Area (Right Click to Select)</source>
-        <translation>Área de seguridad (clic derecho para seleccionar)</translation>
+        <translation>Áreas de seguridad (clic derecho para seleccionar)</translation>
     </message>
     <message>
         <source>Field Guide</source>
-        <translation>Guía de campo</translation>
+        <translation>Guía de campos</translation>
     </message>
 </context>
 <context>
@@ -9331,15 +9331,15 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Reframe</source>
-        <translation>Cambiar fotogramas</translation>
+        <translation>Exposición de acetatos</translation>
     </message>
     <message>
         <source>Step</source>
-        <translation>En</translation>
+        <translation>Aumentar exposición</translation>
     </message>
     <message>
         <source>Each</source>
-        <translation>Cada</translation>
+        <translation>Uno de cada</translation>
     </message>
     <message>
         <source>File</source>
@@ -9434,7 +9434,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Create Scene</source>
-        <translation>Crear la escena</translation>
+        <translation>Crear escena</translation>
     </message>
     <message>
         <source>New Project...</source>
@@ -9623,15 +9623,15 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Step Count:</source>
-        <translation>Número de intervalos:</translation>
+        <translation>Cantidad de pasos:</translation>
     </message>
     <message>
         <source>Failed Steps:</source>
-        <translation>Intervalos fallidos:</translation>
+        <translation>Pasos fallidos:</translation>
     </message>
     <message>
         <source>Successfull Steps:</source>
-        <translation>Intervalos exitosos:</translation>
+        <translation>Pasos exitosos:</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -9671,19 +9671,19 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Fx Schematic Flows</source>
-        <translation>Flujos de diagramas de efectos</translation>
+        <translation>Flujos de diagrama de efectos</translation>
     </message>
     <message>
         <source>Fx Schematic Terminal Nodes</source>
-        <translation>Nodos terminales de diagramas de efectos</translation>
+        <translation>Nodos terminales de diagrama de efectos</translation>
     </message>
     <message>
         <source>Dedicated CPUs:</source>
-        <translation>CPUs dedicados:</translation>
+        <translation>Procesadores dedicados:</translation>
     </message>
     <message>
         <source>Single</source>
-        <translation>Sólo uno</translation>
+        <translation>Uno solo</translation>
     </message>
     <message>
         <source>Half</source>
@@ -9695,19 +9695,19 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Render Tile:</source>
-        <translation>Celda de procesamiento:</translation>
+        <translation>Celdas de procesamiento:</translation>
     </message>
     <message>
         <source>Large</source>
-        <translation>Grande</translation>
+        <translation>Grandes</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation>Mediana</translation>
+        <translation>Medianas</translation>
     </message>
     <message>
         <source>Small</source>
-        <translation>Pequeña</translation>
+        <translation>Pequeñas</translation>
     </message>
     <message>
         <source>Visible Only</source>
@@ -9739,7 +9739,7 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation>Apagado</translation>
+        <translation>Desactivado</translation>
     </message>
     <message>
         <source>Remove &gt;&gt;</source>
@@ -9796,7 +9796,7 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>&amp;Add Render Task</source>
-        <translation>&amp;Agregar tarea de procesamiento.</translation>
+        <translation>&amp;Agregar tarea de procesamiento</translation>
     </message>
     <message>
         <source>&amp;Add Cleanup Task</source>
@@ -9890,7 +9890,7 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Old Range:</source>
-        <translation>Antiguo rango:</translation>
+        <translation>Rango original:</translation>
     </message>
     <message>
         <source>Stretch</source>
@@ -10163,7 +10163,7 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
     <message>
         <source>Set the cycle of previous keyframes</source>
-        <translation>Definir el ciclo de los fotogramas clave ateriores</translation>
+        <translation>Hacer un ciclo con los fotogramas clave anteriores</translation>
     </message>
     <message>
         <source>Click and drag to move the selection</source>
@@ -10179,27 +10179,27 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
     <message>
         <source>Open Memo</source>
-        <translation>Abrir memorando</translation>
+        <translation>Abrir nota</translation>
     </message>
     <message>
         <source>Delete Memo</source>
-        <translation>Borrar memorando</translation>
+        <translation>Borrar nota</translation>
     </message>
     <message>
         <source>Reframe</source>
-        <translation>Cambiar fotogramas</translation>
+        <translation>Exposición de acetatos</translation>
     </message>
     <message>
         <source>Step</source>
-        <translation>En</translation>
+        <translation>Editar exposición</translation>
     </message>
     <message>
         <source>Each</source>
-        <translation>Cada</translation>
+        <translation>Conservar</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation>Reemplazar</translation>
+        <translation>Reemplazar por</translation>
     </message>
 </context>
 <context>
@@ -10347,7 +10347,7 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     <name>XsheetGUI::NotePopup</name>
     <message>
         <source>Memo</source>
-        <translation>Memorando</translation>
+        <translation>Nota</translation>
     </message>
     <message>
         <source>Post</source>
