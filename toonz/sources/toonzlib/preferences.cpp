@@ -317,6 +317,7 @@ Preferences::Preferences()
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
     , m_guidedDrawingType(0)
+    , m_animatedGuidedDrawing(true)
     , m_ignoreImageDpi(false)
     , m_watchFileSystem(true) {
   TCamera camera;
@@ -597,6 +598,7 @@ Preferences::Preferences()
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
   getValue(*m_settings, "guidedDrawingType", m_guidedDrawingType);
+  getValue(*m_settings, "animatedGuidedDrawing", m_animatedGuidedDrawing);
   getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
            m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
@@ -1432,6 +1434,13 @@ void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
 void Preferences::setGuidedDrawing(int status) {
   m_guidedDrawingType = status;
   m_settings->setValue("guidedDrawingType", status);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setAnimatedGuidedDrawing(bool status) {
+  m_animatedGuidedDrawing = status;
+  m_settings->setValue("animatedGuidedDrawing", status);
 }
 
 //-----------------------------------------------------------------

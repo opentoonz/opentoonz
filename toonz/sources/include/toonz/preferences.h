@@ -326,6 +326,8 @@ public:
 
   void setGuidedDrawing(int status);
   int getGuidedDrawing() { return m_guidedDrawingType; }
+  void setAnimatedGuidedDrawing(bool status);
+  bool getAnimatedGuidedDrawing() const { return m_animatedGuidedDrawing; }
 
   void enableNewLevelSizeToCameraSize(bool on);
   bool isNewLevelSizeToCameraSizeEnabled() const {
@@ -524,7 +526,7 @@ private:
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
       m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar,
-      m_expandFunctionHeader, m_showColumnNumbers;
+      m_expandFunctionHeader, m_showColumnNumbers, m_animatedGuidedDrawing;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,

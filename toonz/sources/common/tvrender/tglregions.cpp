@@ -142,51 +142,65 @@ void drawFirstControlPoint(const TVectorRenderData &rd, TStroke *stroke) {
   double modifier    = (msecs / 100) * 0.1;
   TPointD startPoint = stroke->getPointAtLength(length * modifier);
   TPointD endPoint   = stroke->getPointAtLength(length * 0.10);
+  double j           = 0.025;
 
   glPushMatrix();
   tglMultMatrix(rd.m_aff);
-  glColor3d(1.0, 0.0, 0.0);
 
   glBegin(GL_LINES);
+  glColor3d(0.0, 1.0, 0.0);
+  if (!rd.m_animatedGuidedDrawing) {
+    j          = 0.025;
+    startPoint = p;
+    for (int i = 0; i < 8; i++) {
+      endPoint = stroke->getPointAtLength(length * j);
+      glVertex2d(startPoint.x, startPoint.y);
+      glVertex2d(endPoint.x, endPoint.y);
+      startPoint = endPoint;
+      j += 0.025;
+    }
+  }
 
+  if (rd.m_animatedGuidedDrawing) {
+    j = 0.025 + modifier;
+    // draw the first animated section
+    for (int i = 0; i < 8; i++) {
+      endPoint = stroke->getPointAtLength(length * j);
+      glVertex2d(startPoint.x, startPoint.y);
+      glVertex2d(endPoint.x, endPoint.y);
+      startPoint = endPoint;
+      j += 0.025;
+      if (j > 1) {
+        j -= 1;
+        startPoint = stroke->getPointAtLength(length * j);
+      }
+    }
+
+    modifier = modifier + 0.5;
+    if (modifier >= 1) modifier -= 1;
+    startPoint = stroke->getPointAtLength(length * modifier);
+    j          = 0.025 + modifier;
+
+    // draw another animated section
+    for (int i = 0; i < 8; i++) {
+      endPoint = stroke->getPointAtLength(length * j);
+      glVertex2d(startPoint.x, startPoint.y);
+      glVertex2d(endPoint.x, endPoint.y);
+      startPoint = endPoint;
+      j += 0.025;
+      if (j > 1) {
+        j -= 1;
+        startPoint = stroke->getPointAtLength(length * j);
+      }
+    }
+  }
+
+  // Draw an X over the first point
+  glColor3d(1.0, 0.0, 0.0);
   glVertex2d(p.x - 5, p.y + 5);
   glVertex2d(p.x + 5, p.y - 5);
   glVertex2d(p.x + 5, p.y + 5);
   glVertex2d(p.x - 5, p.y - 5);
-
-  double j = 0.025;
-  glColor3d(0.0, 1.0, 0.0);
-
-  j = 0.025 + modifier;
-
-  for (int i = 0; i < 8; i++) {
-    endPoint = stroke->getPointAtLength(length * j);
-    glVertex2d(startPoint.x, startPoint.y);
-    glVertex2d(endPoint.x, endPoint.y);
-    startPoint = endPoint;
-    j += 0.025;
-    if (j > 1) {
-      j -= 1;
-      startPoint = stroke->getPointAtLength(length * j);
-    }
-  }
-
-  modifier = modifier + 0.5;
-  if (modifier >= 1) modifier -= 1;
-  startPoint = stroke->getPointAtLength(length * modifier);
-  j          = 0.025 + modifier;
-
-  for (int i = 0; i < 8; i++) {
-    endPoint = stroke->getPointAtLength(length * j);
-    glVertex2d(startPoint.x, startPoint.y);
-    glVertex2d(endPoint.x, endPoint.y);
-    startPoint = endPoint;
-    j += 0.025;
-    if (j > 1) {
-      j -= 1;
-      startPoint = stroke->getPointAtLength(length * j);
-    }
-  }
 
   glEnd();
   glPopMatrix();

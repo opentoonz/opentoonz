@@ -178,7 +178,7 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
     OnioniSkinMaskGUI::addOnionSkinCommand(this);
   QMenu *guidedDrawingMenu = addMenu(tr("Vector Guided Drawing"));
   int guidedDrawingStatus  = Preferences::instance()->getGuidedDrawing();
-  action = guidedDrawingMenu->addAction(tr("Off"));
+  action                   = guidedDrawingMenu->addAction(tr("Off"));
   action->setCheckable(true);
   action->setChecked(guidedDrawingStatus == 0);
   ret = ret &&
@@ -202,6 +202,12 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   ret = ret &&
         parent->connect(action, SIGNAL(triggered()), this,
                         SLOT(setGuidedDrawingAll()));
+  action = guidedDrawingMenu->addAction(tr("Show Animations"));
+  action->setCheckable(true);
+  action->setChecked(Preferences::instance()->getAnimatedGuidedDrawing());
+  ret = ret &&
+        parent->connect(action, SIGNAL(triggered()), this,
+                        SLOT(toggleAnimatedGuidedDrawing()));
   // Zero Thick
   if (!parent->isPreviewEnabled())
     ZeroThickToggleGui::addZeroThickCommand(this);
@@ -428,6 +434,12 @@ void SceneViewerContextMenu::setGuidedDrawingFarthest() {
 //-----------------------------------------------------------------------------
 void SceneViewerContextMenu::setGuidedDrawingAll() {
   Preferences::instance()->setGuidedDrawing(3);
+}
+
+//-----------------------------------------------------------------------------
+void SceneViewerContextMenu::toggleAnimatedGuidedDrawing() {
+  Preferences::instance()->setAnimatedGuidedDrawing(
+      !Preferences::instance()->getAnimatedGuidedDrawing());
 }
 
 //-----------------------------------------------------------------------------

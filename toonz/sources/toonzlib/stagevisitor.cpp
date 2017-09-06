@@ -830,14 +830,14 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
                        true  // alpha enabled
                        );
 
-  rd.m_drawRegions       = !inksOnly;
-  rd.m_inkCheckEnabled   = tc & ToonzCheck::eInk;
-  rd.m_paintCheckEnabled = tc & ToonzCheck::ePaint;
-  rd.m_blackBgEnabled    = tc & ToonzCheck::eBlackBg;
-  rd.m_colorCheckIndex   = ToonzCheck::instance()->getColorIndex();
-  rd.m_show0ThickStrokes = prefs.getShow0ThickLines();
-  rd.m_regionAntialias   = prefs.getRegionAntialias();
-
+  rd.m_drawRegions           = !inksOnly;
+  rd.m_inkCheckEnabled       = tc & ToonzCheck::eInk;
+  rd.m_paintCheckEnabled     = tc & ToonzCheck::ePaint;
+  rd.m_blackBgEnabled        = tc & ToonzCheck::eBlackBg;
+  rd.m_colorCheckIndex       = ToonzCheck::instance()->getColorIndex();
+  rd.m_show0ThickStrokes     = prefs.getShow0ThickLines();
+  rd.m_regionAntialias       = prefs.getRegionAntialias();
+  rd.m_animatedGuidedDrawing = prefs.getAnimatedGuidedDrawing();
   if (player.m_onionSkinDistance < 0 &&
       (player.m_isCurrentColumn || player.m_isCurrentXsheetLevel)) {
     if (player.m_isGuidedDrawingEnabled == 3         // show guides on all

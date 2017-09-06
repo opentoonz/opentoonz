@@ -86,6 +86,7 @@ public:
       m_showGuidedDrawing,  // Whether this image is being used for guided
                             // drawing
       m_highLightNow;       // Show highlight on active stroke
+  bool m_animatedGuidedDrawing = false;
   //!  \deprecated  Use the above individual options instead.
   //!  \todo  Remove it ASAP.
 public:
