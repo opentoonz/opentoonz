@@ -616,7 +616,7 @@ Preferences::Preferences()
   else if (savePath == loadPath) // Existing users with missing preference defaults to Classic. New users will be Compact
 	  m_xsheetLayoutPreference = QString("Classic");
   setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
-  m_loadedXsheetLayout = xsheetLayoutPreference;
+  m_loadedXsheetLayout = m_xsheetLayoutPreference;
 
   // in case there is no personal settings
   if (savePath != loadPath) {
