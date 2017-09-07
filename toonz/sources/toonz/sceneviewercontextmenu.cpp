@@ -202,13 +202,6 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   ret = ret &&
         parent->connect(action, SIGNAL(triggered()), this,
                         SLOT(setGuidedDrawingAll()));
-  guidedDrawingMenu->addSeparator();
-  action = guidedDrawingMenu->addAction(tr("Show Animations"));
-  action->setCheckable(true);
-  action->setChecked(Preferences::instance()->getAnimatedGuidedDrawing());
-  ret = ret &&
-        parent->connect(action, SIGNAL(triggered()), this,
-                        SLOT(toggleAnimatedGuidedDrawing()));
   // Zero Thick
   if (!parent->isPreviewEnabled())
     ZeroThickToggleGui::addZeroThickCommand(this);
@@ -435,12 +428,6 @@ void SceneViewerContextMenu::setGuidedDrawingFarthest() {
 //-----------------------------------------------------------------------------
 void SceneViewerContextMenu::setGuidedDrawingAll() {
   Preferences::instance()->setGuidedDrawing(3);
-}
-
-//-----------------------------------------------------------------------------
-void SceneViewerContextMenu::toggleAnimatedGuidedDrawing() {
-  Preferences::instance()->setAnimatedGuidedDrawing(
-      !Preferences::instance()->getAnimatedGuidedDrawing());
 }
 
 //-----------------------------------------------------------------------------

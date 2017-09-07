@@ -317,7 +317,7 @@ Preferences::Preferences()
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
     , m_guidedDrawingType(0)
-    , m_animatedGuidedDrawing(true)
+    , m_animatedGuidedDrawing(false)
     , m_ignoreImageDpi(false)
     , m_watchFileSystem(true) {
   TCamera camera;

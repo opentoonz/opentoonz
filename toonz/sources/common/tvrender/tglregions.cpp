@@ -136,192 +136,40 @@ void drawControlPoints(const TVectorRenderData &rd, TStroke *stroke,
 //-----------------------------------------------------------------------------
 
 void drawArrows(TStroke *stroke, bool onlyFirstPoint) {
-  // based on the points of a compass
-  enum directions {
-    sse,
-    se,
-    ese,
-    e,
-    ene,
-    ne,
-    nne,
-    n,
-    nnw,
-    nw,
-    wnw,
-    w,
-    wsw,
-    sw,
-    ssw,
-    s
-  };
-
-  double length          = stroke->getLength(0.0, 1.0);
-  int points             = length / 20;
-  if (points < 2) points = 2;
-  int direction;
+  double length = stroke->getLength(0.0, 1.0);
+  int points    = length / 20;
+  if (points < 2) points += 1;
   double currentPosition = 0.0;
 
   TPointD prePoint, point, postPoint;
-  prePoint  = stroke->getPointAtLength(0.0);
-  point     = stroke->getPointAtLength(0.0);
-  postPoint = stroke->getPointAtLength(length * 0.04);
   glColor3d(1.0, 0.0, 0.0);
-  for (int i = 0; i <= points;) {
-    bool isBackward = false;
-    if (prePoint.x != postPoint.x) {  // else divide by zero
-      double slope = (postPoint.y - prePoint.y) / (postPoint.x - prePoint.x);
-      if (prePoint.x > postPoint.x) {
-        isBackward = true;
-        // this is crazy
-        if (slope > 3)
-          direction = s;
-        else if (slope <= 3 && slope > 1.5)
-          direction = ssw;
-        else if (slope <= 1.5 && slope > 0.75)
-          direction = sw;
-        else if (slope <= 0.75 && slope > 0.25)
-          direction = wsw;
-        else if (slope <= 0.25 && slope > -0.25)
-          direction = w;
-        else if (slope <= -0.25 && slope > -0.75)
-          direction = wnw;
-        else if (slope <= -0.75 && slope > -1.5)
-          direction = nw;
-        else if (slope <= -1.5 && slope > -3)
-          direction = nnw;
-        else if (slope <= -3)
-          direction = n;
-      } else {
-        if (slope > 3)
-          direction = n;
-        else if (slope <= 3 && slope > 1.5)
-          direction = nne;
-        else if (slope <= 1.5 && slope > 0.75)
-          direction = ne;
-        else if (slope <= 0.75 && slope > 0.25)
-          direction = ene;
-        else if (slope <= 0.25 && slope > -0.25)
-          direction = e;
-        else if (slope <= -0.25 && slope > -0.75)
-          direction = ese;
-        else if (slope <= -0.75 && slope > -1.5)
-          direction = se;
-        else if (slope <= -1.5 && slope > -3)
-          direction = sse;
-        else if (slope <= -3)
-          direction = s;
-      }
-    } else {
-      if (prePoint.y < postPoint.y)
-        direction = n;
-      else
-        direction = s;
-    }
-    switch (direction) {
-    case n:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 3, point.y - 3);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 3, point.y - 3);
-      break;
-    case nne:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 4, point.y - 1);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 1, point.y - 4);
-      break;
-    case ne:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 5, point.y);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x, point.y - 5);
-      break;
-    case ene:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 4, point.y + 1);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 1, point.y - 4);
-      break;
-    case e:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 3, point.y + 3);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 3, point.y - 3);
-      break;
-    case ese:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 1, point.y + 4);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 4, point.y - 1);
-      break;
-    case se:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 5, point.y);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x, point.y + 5);
-      break;
-    case sse:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 4, point.y + 1);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 1, point.y + 4);
-      break;
-    case s:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 3, point.y + 3);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 3, point.y + 3);
-      break;
-    case ssw:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 4, point.y + 1);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 1, point.y + 4);
-      break;
-    case sw:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 5, point.y);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x, point.y + 5);
-      break;
-    case wsw:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 1, point.y + 4);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 4, point.y - 1);
-      break;
-    case w:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 3, point.y + 3);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 3, point.y - 3);
-      break;
-    case wnw:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 4, point.y + 1);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 1, point.y - 4);
-      break;
-    case nw:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 5, point.y);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x, point.y - 5);
-      break;
-    case nnw:
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x + 4, point.y - 1);
-      glVertex2d(point.x, point.y);
-      glVertex2d(point.x - 1, point.y - 4);
-      break;
-    }
-    if (onlyFirstPoint) break;
-    i++;
+  for (int i = 0; i <= points; i++) {
     currentPosition = i / (double)points;
-    prePoint  = stroke->getPointAtLength(length * (currentPosition - 0.02));
-    point     = stroke->getPointAtLength(length * currentPosition);
-    postPoint = stroke->getPointAtLength(length * (currentPosition + 0.02));
+    point           = stroke->getPointAtLength(length * currentPosition);
+    prePoint        = (i == 0) ? point : stroke->getPointAtLength(
+                                      length * (currentPosition - 0.02));
+    postPoint = (i == points) ? point : stroke->getPointAtLength(
+                                            length * (currentPosition + 0.02));
+
+    if (prePoint == postPoint) continue;
+
+    double radian =
+        std::atan2(postPoint.y - prePoint.y, postPoint.x - prePoint.x);
+    double degree = radian * 180.0 / 3.14159265;
+
+    glPushMatrix();
+    glTranslated(point.x, point.y, 0);
+    glRotated(degree, 0, 0, 1);
+    glBegin(GL_LINES);
+    glVertex2d(0, 0);
+    glVertex2d(-3, -3);
+    glVertex2d(0, 0);
+    glVertex2d(-3, 3);
+    glEnd();
+    glPopMatrix();
+
+    if (onlyFirstPoint) break;
+    // make the arrow blue from the second one
     glColor3d(0.0, 0.0, 1.0);
   }
 }
@@ -340,25 +188,16 @@ void drawFirstControlPoint(const TVectorRenderData &rd, TStroke *stroke) {
   glPushMatrix();
   tglMultMatrix(rd.m_aff);
   if (!rd.m_animatedGuidedDrawing) glLineWidth(2.0f);
-  glBegin(GL_LINES);
   glColor3d(0.0, 1.0, 0.0);
   if (!rd.m_animatedGuidedDrawing) {
     drawArrows(stroke, false);
-    j          = 0.025;
-    startPoint = p;
-    for (int i = 0; i < 8; i++) {
-      endPoint = stroke->getPointAtLength(length * j);
-      // glVertex2d(startPoint.x, startPoint.y);
-      // glVertex2d(endPoint.x, endPoint.y);
-      startPoint = endPoint;
-      j += 0.025;
-    }
   }
 
   if (rd.m_animatedGuidedDrawing) {
     drawArrows(stroke, true);
     glColor3d(0.0, 1.0, 0.0);
     j = 0.025 + modifier;
+    glBegin(GL_LINES);
     // draw the first animated section
     for (int i = 0; i < 8; i++) {
       endPoint = stroke->getPointAtLength(length * j);
@@ -389,18 +228,9 @@ void drawFirstControlPoint(const TVectorRenderData &rd, TStroke *stroke) {
         startPoint = stroke->getPointAtLength(length * j);
       }
     }
+    glEnd();
   }
 
-  // Draw an X over the first point
-  if (rd.m_animatedGuidedDrawing && false) {
-    glColor3d(1.0, 0.0, 0.0);
-    glVertex2d(p.x - 5, p.y + 5);
-    glVertex2d(p.x + 5, p.y - 5);
-    glVertex2d(p.x + 5, p.y + 5);
-    glVertex2d(p.x - 5, p.y - 5);
-  }
-
-  glEnd();
   glLineWidth(1.0f);
   glPopMatrix();
 }

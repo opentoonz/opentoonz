@@ -35,7 +35,7 @@ public slots:
   void setGuidedDrawingClosest();
   void setGuidedDrawingFarthest();
   void setGuidedDrawingAll();
-  void toggleAnimatedGuidedDrawing();
+
   void onShowHide();
   void onSetCurrent();
 };
