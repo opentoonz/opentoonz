@@ -731,7 +731,7 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
     // navigator pan
     // make sure the viewer is visible and that a toonz raster or raster level
     // is current
-    if (fid == getCurrentFrameId() &&
+    if (fid.getNumber() >= 0 && fid == getCurrentFrameId() &&
         (sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL) &&
         m_viewer && m_viewer->isVisible() && actualIconClicked &&
         (m_isGhibli != (event->button() == Qt::MiddleButton))) {
