@@ -327,11 +327,18 @@ Preferences::Preferences()
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
   TFilePath savePath  = layoutDir + TFilePath("preferences.ini");
 
-  // If no personal settings found, then try to load template settings
-  TFilePath loadPath = ToonzFolder::getModuleFile(TFilePath("preferences.ini"));
+  bool existingUser = true;
+
+  // If there is no personal settings file, this is the user's first time use.
+  if (!TFileStatus(savePath).doesExist())
+  {
+	  // create the user's settings directory if it isn't there already
+	  TSystem::touchParentDir(savePath);
+	  existingUser = false;
+  }
 
   m_settings.reset(new QSettings(
-      QString::fromStdWString(loadPath.getWideString()), QSettings::IniFormat));
+      QString::fromStdWString(savePath.getWideString()), QSettings::IniFormat));
 
   getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
   getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
@@ -607,16 +614,8 @@ Preferences::Preferences()
   getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
 
-  // in case there is no personal settings
-  if (savePath != loadPath) {
-    // copy the template settins to the personal one
-	// Save file to directory if it doesn't already exist.
-	if (!TFileStatus(loadPath).doesExist()) m_settings->sync();
-    TSystem::copyFile(savePath, loadPath);
-    m_settings.reset(
-        new QSettings(QString::fromStdWString(savePath.getWideString()),
-                      QSettings::IniFormat));
-  }
+  // Save settings to directory now, just in case
+  m_settings->sync();
 }
 
 //-----------------------------------------------------------------
