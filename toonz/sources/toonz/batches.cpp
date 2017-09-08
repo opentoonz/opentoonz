@@ -878,7 +878,7 @@ void BatchesController::saveas() {
 }
 
 void BatchesController::save() {
-  if (getListName() == "Tasks" || getListName() == "Tasks*")
+  if (m_filepath.isEmpty())
     saveas();
   else
     doSave();

@@ -379,6 +379,11 @@ public:
   void enableShowColumnNumbers(bool on);
   bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
 
+  void enableShortcutCommandsWhileRenamingCell(bool on);
+  bool isShortcutCommandsWhileRenamingCellEnabled() const {
+    return m_shortcutCommandsWhileRenamingCellEnabled;
+  }
+
   // Animation  tab
 
   void setKeyframeType(int s);
@@ -580,6 +585,9 @@ private:
 
   // enable to watch file system in order to update file browser automatically
   bool m_watchFileSystem;
+
+  // enable OT command shortcut keys while renaming xsheet cell
+  bool m_shortcutCommandsWhileRenamingCellEnabled;
 
 private:
   Preferences();

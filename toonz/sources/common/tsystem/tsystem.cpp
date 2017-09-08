@@ -362,6 +362,9 @@ void TSystem::copyFile(const TFilePath &dst, const TFilePath &src,
 
   if (dst == src) return;
 
+  // Create the containing folder before trying to copy or it will crash!
+  touchParentDir(dst);
+
   const QString &qDst = toQString(dst);
   if (overwrite && QFile::exists(qDst)) QFile::remove(qDst);
 
