@@ -565,29 +565,29 @@ void ColumnArea::DrawHeader::prepare() const {
 
 //-----------------------------------------------------------------------------
 const QPixmap &ColumnArea::Pixmaps::eye() {
-	static QPixmap eye = QPixmap(":Resources/x_prev_eye.png");
-	return eye;
+  static QPixmap eye = QPixmap(":Resources/x_prev_eye.png");
+  return eye;
 }
 const QPixmap &ColumnArea::Pixmaps::cameraStand() {
-	static QPixmap cameraStand = QPixmap(":Resources/x_table_view.png");
-	return cameraStand;
+  static QPixmap cameraStand = QPixmap(":Resources/x_table_view.png");
+  return cameraStand;
 }
 const QPixmap &ColumnArea::Pixmaps::cameraStandTransparent() {
-	static QPixmap cameraStandTransparent =
-		QPixmap(":Resources/x_table_view_transp.png");
-	return cameraStandTransparent;
+  static QPixmap cameraStandTransparent =
+      QPixmap(":Resources/x_table_view_transp.png");
+  return cameraStandTransparent;
 }
 const QPixmap &ColumnArea::Pixmaps::lock() {
-	static QPixmap lock = QPixmap(":Resources/x_lock.png");
-	return lock;
+  static QPixmap lock = svgToPixmap(":Resources/x_lock.svg");
+  return lock;
 }
 const QPixmap &ColumnArea::Pixmaps::sound() {
-	static QPixmap sound = QPixmap(":Resources/sound_header_off.png");
-	return sound;
+  static QPixmap sound = svgToPixmap(":Resources/sound_header_off.svg");
+  return sound;
 }
 const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
-	static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
-	return soundPlaying;
+  static QPixmap soundPlaying = svgToPixmap(":Resources/sound_header_on.svg");
+  return soundPlaying;
 }
 const QPixmap &ColumnArea::Pixmaps::activatorActive() {
   static QPixmap key = QPixmap(":Resources/timeline_key_active.png");
@@ -685,47 +685,47 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 void ColumnArea::DrawHeader::drawEye() const {
   if (col < 0 || isEmpty) return;
   if (!column->isPreviewVisible() || column->getPaletteColumn() ||
-	  column->getSoundTextColumn())
-	  return;
+      column->getSoundTextColumn())
+    return;
 
   QRect prevViewRect = o->rect(PredefinedRect::EYE_AREA).translated(orig);
-  QRect eyeRect = o->rect(PredefinedRect::EYE).translated(orig);
+  QRect eyeRect      = o->rect(PredefinedRect::EYE).translated(orig);
   // preview visible toggle
   p.fillRect(prevViewRect, PreviewVisibleColor);
   p.drawPixmap(eyeRect, Pixmaps::eye());
 }
 
 void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
-	if (col < 0 || isEmpty) return;
-	// camstand visible toggle
-	if (!column->isCamstandVisible() || column->getPaletteColumn() ||
-		column->getSoundTextColumn())
-		return;
+  if (col < 0 || isEmpty) return;
+  // camstand visible toggle
+  if (!column->isCamstandVisible() || column->getPaletteColumn() ||
+      column->getSoundTextColumn())
+    return;
 
-	QRect tableViewRect =
-		o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig);
-	QRect tableViewImgRect =
-		o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
+  QRect tableViewRect =
+      o->rect(PredefinedRect::PREVIEW_LAYER_AREA).translated(orig);
+  QRect tableViewImgRect =
+      o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
 
-	p.fillRect(tableViewRect, CamStandVisibleColor);
-	p.drawPixmap(tableViewImgRect, opacity < 255
-		? Pixmaps::cameraStandTransparent()
-		: Pixmaps::cameraStand());
+  p.fillRect(tableViewRect, CamStandVisibleColor);
+  p.drawPixmap(tableViewImgRect, opacity < 255
+                                     ? Pixmaps::cameraStandTransparent()
+                                     : Pixmaps::cameraStand());
 }
 
 void ColumnArea::DrawHeader::drawLock() const {
-	if (col < 0 || isEmpty) return;
+  if (col < 0 || isEmpty) return;
 
-	QRect lockModeRect = o->rect(PredefinedRect::LOCK_AREA).translated(orig);
-	QRect lockModeImgRect = o->rect(PredefinedRect::LOCK).translated(orig);
+  QRect lockModeRect    = o->rect(PredefinedRect::LOCK_AREA).translated(orig);
+  QRect lockModeImgRect = o->rect(PredefinedRect::LOCK).translated(orig);
 
-	// lock button
-	p.setPen(Qt::gray);
-	p.setBrush(QColor(255, 255, 255, 128));
-	p.drawRect(lockModeRect);
-	p.setBrush(Qt::NoBrush);
-	bool isLocked = column && column->isLocked();
-	if (isLocked) p.drawPixmap(lockModeImgRect, Pixmaps::lock());
+  // lock button
+  p.setPen(Qt::gray);
+  p.setBrush(QColor(255, 255, 255, 128));
+  p.drawRect(lockModeRect);
+  p.setBrush(Qt::NoBrush);
+  bool isLocked = column && column->isLocked();
+  if (isLocked) p.drawPixmap(lockModeImgRect, Pixmaps::lock());
 }
 
 void ColumnArea::DrawHeader::drawFoldUnfoldButton() const {
@@ -971,10 +971,10 @@ void ColumnArea::DrawHeader::drawNoSoundIcon() const {
 }
 */
 void ColumnArea::DrawHeader::drawSoundIcon(bool isPlaying) const {
-	QRect rect = m_viewer->orientation()
-		->rect(PredefinedRect::SOUND_ICON)
-		.translated(orig);
-	p.drawPixmap(rect, isPlaying ? Pixmaps::soundPlaying() : Pixmaps::sound());
+  QRect rect = m_viewer->orientation()
+                   ->rect(PredefinedRect::SOUND_ICON)
+                   .translated(orig);
+  p.drawPixmap(rect, isPlaying ? Pixmaps::soundPlaying() : Pixmaps::sound());
 }
 
 void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
@@ -1022,7 +1022,7 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
   QPoint cursor = o->frameLayerToXY(frameAxis, layerAxis);
   QPainterPath head =
       o->path(PredefinedPath::VOLUME_SLIDER_HEAD).translated(cursor);
-  p.setBrush(Qt::white);
+  p.fillPath(head, QBrush(Qt::white));
   p.setPen(m_viewer->getLightLineColor());
   p.drawPath(head);
 }
@@ -1314,7 +1314,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawFoldUnfoldButton();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
-  static QPixmap iconPixmap(":Resources/palette_header.png");
+  static QPixmap iconPixmap(svgToPixmap(":Resources/palette_header.svg"));
   drawHeader.drawThumbnail(iconPixmap);
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
@@ -1366,7 +1366,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawFoldUnfoldButton();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
-  static QPixmap iconPixmap(":Resources/magpie.png");
+  static QPixmap iconPixmap(svgToPixmap(":Resources/magpie.svg"));
   drawHeader.drawThumbnail(iconPixmap);
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
@@ -1412,7 +1412,7 @@ QPixmap ColumnArea::getColumnIcon(int columnIndex) {
 
 //-----------------------------------------------------------------------------
 
-void ColumnArea::paintEvent(QPaintEvent *event) {
+void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   QRect toBeUpdated = event->rect();
 
   QPainter p(this);

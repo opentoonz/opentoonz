@@ -304,4 +304,14 @@ void StylePickerTool::onImageChanged() {
   }
 }
 
+//-------------------------------------------------------------------------------------------------------
+
+void StylePickerTool::updateTranslation() {
+  m_colorType.setQStringName(tr("Mode:"));
+  m_passivePick.setQStringName(tr("Passive Pick"));
+  m_organizePalette.setQStringName(tr("Organize Palette"));
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 StylePickerTool stylePickerTool;

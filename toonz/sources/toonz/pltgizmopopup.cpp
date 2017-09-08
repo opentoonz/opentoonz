@@ -609,8 +609,8 @@ PltGizmoPopup::PltGizmoPopup()
   ValueShifter *hueShift         = new ValueShifter(true, this);
   ValueShifter *trasparancyShift = new ValueShifter(false, this);
 
-  QPushButton *fullMatteButton = new QPushButton(tr("Full Matte"), this);
-  QPushButton *zeroMatteButton = new QPushButton(tr("Zero Matte"), this);
+  QPushButton *fullMatteButton = new QPushButton(tr("Full Alpha"), this);
+  QPushButton *zeroMatteButton = new QPushButton(tr("Zero Alpha"), this);
 
   //----layout
   m_topLayout->setMargin(5);
@@ -635,7 +635,7 @@ PltGizmoPopup::PltGizmoPopup()
       // upperLay->addWidget(hueValue,3,1);
       upperLay->addWidget(hueShift, 3, 2, 1, 2);
 
-      upperLay->addWidget(new QLabel(tr("Matte"), this), 4, 0);
+      upperLay->addWidget(new QLabel(tr("Alpha"), this), 4, 0);
       upperLay->addWidget(trasparancyValue, 4, 1);
       upperLay->addWidget(trasparancyShift, 4, 2, 1, 2);
 

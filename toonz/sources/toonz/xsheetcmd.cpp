@@ -28,6 +28,7 @@
 #include "toonz/levelset.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/txshsoundtextlevel.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/tstageobjectkeyframe.h"
 #include "toonz/txshcolumn.h"
@@ -567,6 +568,7 @@ private:
   int m_direction, m_row, m_col;
   TCellSelection::Range m_range;
   bool m_selected;
+  std::vector<std::pair<int, int>> emptyCells;
 
 public:
   DrawingSubtitutionUndo(int dir, TCellSelection::Range range, int row, int col,
@@ -575,9 +577,28 @@ public:
       , m_range(range)
       , m_row(row)
       , m_col(col)
-      , m_selected(selected) {}
+      , m_selected(selected) {
+    TXsheet *xsh = TApp::instance()->getCurrentScene()->getScene()->getXsheet();
+    int tempCol, tempRow;
+    int c = m_range.m_c0;
+    int r = m_range.m_r0;
+    while (c <= m_range.m_c1) {
+      tempCol = c;
+      while (r <= m_range.m_r1) {
+        tempRow = r;
+        if (xsh->getCell(tempRow, tempCol).isEmpty()) {
+          emptyCells.push_back(std::make_pair(tempRow, tempCol));
+        }
+        r++;
+      }
+      r = m_range.m_r0;
+      c++;
+    }
+  }
 
   void undo() const override {
+    TXsheet *xsh = TApp::instance()->getCurrentScene()->getScene()->getXsheet();
+
     if (!m_selected) {
       changeDrawing(-m_direction, m_row, m_col);
       return;
@@ -588,7 +609,20 @@ public:
     while (c <= m_range.m_c1) {
       col = c;
       while (r <= m_range.m_r1) {
-        row = r;
+        row        = r;
+        bool found = false;
+        for (int i = 0; i < emptyCells.size(); i++) {
+          if (emptyCells[i].first == row && emptyCells[i].second == col) {
+            xsh->clearCells(row, col);
+            found = true;
+          }
+        }
+        if (found) {
+          r++;
+          TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+          TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+          continue;
+        }
         changeDrawing(-m_direction, row, col);
         r++;
       }
@@ -629,7 +663,8 @@ public:
 
 protected:
   static bool changeDrawing(int delta, int row, int col);
-  static void setDrawing(const TFrameId &fid, int row, int col, TXshCell cell);
+  static void setDrawing(const TFrameId &fid, int row, int col, TXshCell cell,
+                         TXshLevel *level);
   friend class DrawingSubtitutionGroupUndo;
 };
 
@@ -651,7 +686,10 @@ public:
                         ->getScene()
                         ->getXsheet()
                         ->getCell(m_row, m_col);
-    if (!cell.m_level || !cell.m_level->getSimpleLevel()) return;
+    if (!cell.m_level ||
+        !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel() ||
+          cell.m_level->getSoundTextLevel()))
+      return;
 
     TFrameId id = cell.m_frameId;
 
@@ -660,7 +698,11 @@ public:
                             ->getScene()
                             ->getXsheet()
                             ->getCell(m_row + m_count, m_col);
-    if (!nextCell.m_level || !nextCell.m_level->getSimpleLevel()) return;
+    if (!nextCell.m_level ||
+        !(nextCell.m_level->getSimpleLevel() ||
+          nextCell.m_level->getChildLevel() ||
+          nextCell.m_level->getSoundTextLevel()))
+      return;
 
     TFrameId nextId = nextCell.m_frameId;
 
@@ -709,34 +751,86 @@ bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col) {
   TTool::Application *app = TTool::getApplication();
   TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
   TXshCell cell           = xsh->getCell(row, col);
-
-  if (!cell.m_level || !cell.m_level->getSimpleLevel()) return false;
+  bool usePrevCell        = false;
+  if (cell.isEmpty()) {
+    TXshCell prevCell = xsh->getCell(row - 1, col);
+    if (prevCell.isEmpty() ||
+        !(prevCell.m_level->getSimpleLevel() ||
+          prevCell.m_level->getChildLevel() ||
+          prevCell.m_level->getSoundTextLevel()))
+      return false;
+    cell        = prevCell;
+    usePrevCell = true;
+  } else if (!cell.m_level ||
+             !(cell.m_level->getSimpleLevel() ||
+               cell.m_level->getChildLevel() ||
+               cell.m_level->getSoundTextLevel()))
+    return false;
+  TXshLevel *level  = cell.m_level->getSimpleLevel();
+  if (!level) level = cell.m_level->getChildLevel();
+  if (!level) level = cell.m_level->getSoundTextLevel();
 
   std::vector<TFrameId> fids;
-  cell.m_level->getSimpleLevel()->getFids(fids);
-  int n = fids.size();
+  int framesTextSize = 0;
+  int n, index;
+  bool usingSoundText = false;
+  TFrameId cellFrameId;
+  if (cell.m_level->getSimpleLevel())
+    cell.m_level->getSimpleLevel()->getFids(fids);
+  if (cell.m_level->getChildLevel())
+    cell.m_level->getChildLevel()->getFids(fids);
+  if (cell.m_level->getSoundTextLevel()) {
+    n              = cell.m_level->getSoundTextLevel()->m_framesText.size();
+    usingSoundText = true;
+  } else
+    n = fids.size();
 
   if (n < 2) return false;
 
-  std::vector<TFrameId>::iterator it;
-  it = std::find(fids.begin(), fids.end(), cell.m_frameId);
+  if (!usingSoundText) {
+    std::vector<TFrameId>::iterator it;
+    it = std::find(fids.begin(), fids.end(), cell.m_frameId);
 
-  if (it == fids.end()) return false;
+    if (it == fids.end()) return false;
 
-  int index = std::distance(fids.begin(), it);
+    index = std::distance(fids.begin(), it);
+  } else
+    index = cell.getFrameId().getNumber();
+
+  if (usePrevCell) {
+    index -= delta;
+    cell = xsh->getCell(row, col);
+  }
+
+  // if negative direction, add the size to the direction to avoid a negative
+  // modulo
   while (delta < 0) delta += n;
+  // the index is the remainder
   index = (index + delta) % n;
+  assert(index < n);
 
-  setDrawing(fids[index], row, col, cell);
+  // sound text levels can't have a 0 index frame id
+  // the index points to a qlist<qstring>
+  // reading 1 below the frameid number
+  // and you can't have a -1 index on a qlist
+  if (usingSoundText && index == 0) index = n;
+
+  if (!usingSoundText)
+    cellFrameId = fids[index];
+  else
+    cellFrameId = TFrameId(index);
+
+  setDrawing(cellFrameId, row, col, cell, level);
 
   return true;
 }
 
 void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col,
-                                        TXshCell cell) {
+                                        TXshCell cell, TXshLevel *level) {
   TTool::Application *app = TTool::getApplication();
   TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
   cell.m_frameId          = fid;
+  cell.m_level            = level;
   xsh->setCell(row, col, cell);
   TStageObject *pegbar = xsh->getStageObject(TStageObjectId::ColumnId(col));
   pegbar->setOffset(pegbar->getOffset());
@@ -748,9 +842,6 @@ void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col,
 //-----------------------------------------------------------------------------
 
 static void drawingSubstituion(int dir) {
-  // TTool::Application *app = TTool::getApplication();
-  // TCellSelection *selection = dynamic_cast<TCellSelection
-  // *>(app->getCurrentSelection()->getSelection());
   TCellSelection *selection = dynamic_cast<TCellSelection *>(
       TTool::getApplication()->getCurrentSelection()->getSelection());
   TCellSelection::Range range;
@@ -772,6 +863,11 @@ static void drawingSubstituion(int dir) {
 static void drawingSubstituionGroup(int dir) {
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+  TXshCell cell =
+      TApp::instance()->getCurrentScene()->getScene()->getXsheet()->getCell(
+          row, col);
+  bool isEmpty = cell.isEmpty();
+  if (isEmpty) return;
   DrawingSubtitutionGroupUndo *undo =
       new DrawingSubtitutionGroupUndo(dir, row, col);
   TUndoManager::manager()->add(undo);
@@ -829,6 +925,7 @@ public:
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
+    if (!selection) return;
     int row = app->getCurrentFrame()->getFrame();
 
     selection->selectNone();
@@ -862,7 +959,7 @@ public:
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
-
+    if (!selection) return;
     int col                 = app->getCurrentColumn()->getColumnIndex();
     TStageObjectId objectId = app->getCurrentObject()->getObjectId();
     if (app->getCurrentObject()->getObjectId() == TStageObjectId::CameraId(0)) {

@@ -238,6 +238,10 @@ public:
 
   void setIsLocator() { m_isLocator = true; }
   void setIsStyleShortcutSwitchable() { m_isStyleShortcutSwitchable = true; }
+  int getVGuideCount();
+  int getHGuideCount();
+  double getVGuide(int index);
+  double getHGuide(int index);
 
 public:
   // SceneViewer's gadget public functions

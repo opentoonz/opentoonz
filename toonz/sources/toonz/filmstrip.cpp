@@ -655,8 +655,13 @@ void FilmstripFrames::drawFrameIcon(QPainter &p, const QRect &r, int index,
       p.setPen(Qt::black);
       p.drawLine(x0 - 1, y0, x0 - 1, y1);
 
-      QPixmap inbetweenPixmap(":Resources/filmstrip_inbetween.png");
-      p.drawPixmap(x0 + 2, y1 - inbetweenPixmap.height() - 3, inbetweenPixmap);
+      QPixmap inbetweenPixmap(
+          svgToPixmap(":Resources/filmstrip_inbetween.svg"));
+      p.drawPixmap(
+          x0 + 2,
+          y1 - inbetweenPixmap.height() / inbetweenPixmap.devicePixelRatio() -
+              3,
+          inbetweenPixmap);
     }
   } else {
     // non riesco (per qualche ragione) a visualizzare l'icona

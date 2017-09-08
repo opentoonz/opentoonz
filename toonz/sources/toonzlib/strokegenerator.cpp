@@ -259,6 +259,10 @@ TRectD StrokeGenerator::getLastModifiedRegion() {
 
 //-------------------------------------------------------------------
 
+TPointD StrokeGenerator::getFirstPoint() { return m_points[0]; }
+
+//-------------------------------------------------------------------
+
 TStroke *StrokeGenerator::makeStroke(double error, UINT onlyLastPoints) const {
   if (onlyLastPoints == 0 || onlyLastPoints > m_points.size())
     return TStroke::interpolate(m_points, error);

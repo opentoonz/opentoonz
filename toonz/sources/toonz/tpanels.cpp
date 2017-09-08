@@ -14,6 +14,7 @@
 #include "xsheetviewer.h"
 #include "sceneviewer.h"
 #include "toolbar.h"
+#include "commandbar.h"
 #include "flipbook.h"
 #include "castviewer.h"
 #include "filebrowser.h"
@@ -453,8 +454,9 @@ void PaletteViewerPanel::reset() {
 
 void PaletteViewerPanel::initializeTitleBar() {
   m_isCurrentButton = new TPanelTitleBarButton(
-      getTitleBar(), ":Resources/switch.png", ":Resources/switch_over.png",
-      ":Resources/switch_on.png");
+      getTitleBar(), svgToPixmap(":Resources/switch.svg"),
+      svgToPixmap(":Resources/switch_over.svg"),
+      svgToPixmap(":Resources/switch_on.svg"));
   getTitleBar()->add(QPoint(-54, 2), m_isCurrentButton);
   m_isCurrentButton->setPressed(true);
   connect(m_isCurrentButton, SIGNAL(toggled(bool)),
@@ -859,6 +861,35 @@ public:
     panel->setWindowTitle(QString(""));
   }
 } toolbarFactory;
+
+//=========================================================
+// Command Bar Panel
+//---------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+CommandBarPanel::CommandBarPanel(QWidget *parent)
+    : TPanel(parent, 0, TDockWidget::horizontal) {
+  CommandBar *xsheetToolbar = new CommandBar();
+  setWidget(xsheetToolbar);
+  setIsMaximizable(false);
+  setFixedHeight(36);
+}
+
+class CommandBarFactory final : public TPanelFactory {
+public:
+  CommandBarFactory() : TPanelFactory("CommandBar") {}
+  TPanel *createPanel(QWidget *parent) override {
+    TPanel *panel = new CommandBarPanel(parent);
+    panel->setObjectName(getPanelType());
+    return panel;
+  }
+  void initialize(TPanel *panel) override {}
+} commandBarFactory;
+
+//=============================================================================
+OpenFloatingPanel openCommandBarCommand(MI_OpenCommandToolbar, "CommandBar",
+                                        QObject::tr("Command Bar"));
+//-----------------------------------------------------------------------------
 
 //=========================================================
 // ToolOptionPanel
