@@ -330,6 +330,8 @@ Preferences::Preferences()
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
   TFilePath prefPath  = layoutDir + TFilePath("preferences.ini");
 
+  bool existingUser = true;
+
   // In case the personal settings is not exist (for new users)
   if (!TFileStatus(prefPath).doesExist()) {
     TFilePath templatePath =
@@ -337,6 +339,8 @@ Preferences::Preferences()
     // If there is the template, copy it to the personal one
     if (TFileStatus(templatePath).doesExist())
       TSystem::copyFile(prefPath, templatePath);
+
+	existingUser = false;
   }
 
   m_settings.reset(new QSettings(
@@ -622,7 +626,7 @@ Preferences::Preferences()
   xsheetLayoutPreference = m_settings->value("xsheetLayoutPreference").toString();
   if (xsheetLayoutPreference != "")
 	  m_xsheetLayoutPreference = xsheetLayoutPreference;
-  else if (savePath == loadPath) // Existing users with missing preference defaults to Classic. New users will be Compact
+  else if (existingUser) // Existing users with missing preference defaults to Classic. New users will be Compact
 	  m_xsheetLayoutPreference = QString("Classic");
   setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
   m_loadedXsheetLayout = m_xsheetLayoutPreference;
