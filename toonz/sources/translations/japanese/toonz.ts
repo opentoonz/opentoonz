@@ -3465,7 +3465,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Matte Channel</source>
-        <translation>アルファチャンネル</translation>
+        <translation type="vanished">アルファチャンネル</translation>
     </message>
     <message>
         <source>Red Channel Greyscale</source>
@@ -4607,6 +4607,38 @@ Do you want to create it?</source>
         <source>SnapSensitivity</source>
         <translation>スナップ感度</translation>
     </message>
+    <message>
+        <source>&amp;New Vector Level</source>
+        <translation>新規ベクターレベル (&amp;N)</translation>
+    </message>
+    <message>
+        <source>New Vector Level</source>
+        <translation>新規ベクターレベル</translation>
+    </message>
+    <message>
+        <source>&amp;New Toonz Raster Level</source>
+        <translation>新規Toonzラスターレベル (&amp;N)</translation>
+    </message>
+    <message>
+        <source>New Toonz Raster Level</source>
+        <translation>新規Toonzラスターレベル</translation>
+    </message>
+    <message>
+        <source>&amp;New Raster Level</source>
+        <translation>新規ラスターレベル (&amp;N)</translation>
+    </message>
+    <message>
+        <source>New Raster Level</source>
+        <translation>新規ラスターレベル</translation>
+    </message>
+    <message>
+        <source>Alpha Channel</source>
+        <translation>アルファチャンネル</translation>
+    </message>
+    <message>
+        <source>&amp;Command Bar</source>
+        <translation>コマンドバー (&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5563,7 +5595,7 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     <message>
         <source>
 WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
-        <translation type="unfinished">
+        <translation>
 警告： 画像サイズの不一致。保存されている画像のサイズは %1 x %2 ピクセルです。</translation>
     </message>
 </context>
@@ -5702,11 +5734,11 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Full Matte</source>
-        <translation>不透明化</translation>
+        <translation type="vanished">不透明化</translation>
     </message>
     <message>
         <source>Zero Matte</source>
-        <translation>透明化</translation>
+        <translation type="vanished">透明化</translation>
     </message>
     <message>
         <source>Scale (%)</source>
@@ -5730,11 +5762,23 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Matte</source>
-        <translation>アルファチャンネル</translation>
+        <translation type="vanished">アルファチャンネル</translation>
     </message>
     <message>
         <source>Color</source>
         <translation>色</translation>
+    </message>
+    <message>
+        <source>Full Alpha</source>
+        <translation>不透明化</translation>
+    </message>
+    <message>
+        <source>Zero Alpha</source>
+        <translation>透明化</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>アルファチャンネル</translation>
     </message>
 </context>
 <context>
@@ -6465,6 +6509,14 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Vector Snapping:</source>
         <translation>ベクターのスナップ：</translation>
+    </message>
+    <message>
+        <source>New Levels Default to the Current Camera Size</source>
+        <translation>新しく作るレベルのサイズ・DPIの既定値を現在のカメラに合わせる</translation>
+    </message>
+    <message>
+        <source>Enable OpenToonz Commands&apos; Shortcut Keys While Renaming Cell</source>
+        <translation>タイムシートのコマ入力時にOpenToonzコマンドのショートカットキーを有効にする</translation>
     </message>
 </context>
 <context>
@@ -8178,6 +8230,10 @@ Are you sure?</source>
     <message>
         <source>Layer name</source>
         <translation>レイヤー名</translation>
+    </message>
+    <message>
+        <source>Command Bar</source>
+        <translation>コマンドバー</translation>
     </message>
 </context>
 <context>
@@ -10837,15 +10893,15 @@ Please refer to the user guide for details.</source>
     <name>XsheetGUI::Toolbar</name>
     <message>
         <source>New Vector Level</source>
-        <translation>新規ベクターレベル</translation>
+        <translation type="vanished">新規ベクターレベル</translation>
     </message>
     <message>
         <source>New Toonz Raster Level</source>
-        <translation>新規Toonzラスターレベル</translation>
+        <translation type="vanished">新規Toonzラスターレベル</translation>
     </message>
     <message>
         <source>New Raster Level</source>
-        <translation>新規ラスターレベル</translation>
+        <translation type="vanished">新規ラスターレベル</translation>
     </message>
 </context>
 <context>

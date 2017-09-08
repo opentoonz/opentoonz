@@ -549,8 +549,16 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   TXshCell cell = xsh->getCell(row, col);
   QPoint xy     = m_viewer->positionToXY(CellPosition(row, col)) - QPoint(1, 2);
   if (!cell.isEmpty()) {
-    setFixedSize(o->cellWidth(), o->cellHeight() + 2);
-    move(xy + QPoint(1, 1));
+    // Do not cover left side of the cell in order to enable grabbing the drag
+    // handle
+    if (o->isVerticalTimeline()) {
+      int dragHandleWidth = o->rect(PredefinedRect::DRAG_HANDLE_CORNER).width();
+      setFixedSize(o->cellWidth() - dragHandleWidth, o->cellHeight() + 2);
+      move(xy + QPoint(1 + dragHandleWidth, 1));
+    } else {
+      setFixedSize(o->cellWidth(), o->cellHeight() + 2);
+      move(xy + QPoint(1, 1));
+    }
 
     TFrameId fid           = cell.getFrameId();
     std::wstring levelName = cell.m_level->getName();
@@ -730,39 +738,45 @@ void RenameCellField::focusOutEvent(QFocusEvent *e) {
 // Override shortcut keys for cell selection commands
 
 bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
-  // We really shouldn't allow OT defined shortcuts to be checked and used while
-  // renaming a cell
-  // but if we must, we should only return true or false if we're executing our
-  // OT action;
-  // otherwise pass event forward in case another object is interested in it.
   if (e->type() != QEvent::ShortcutOverride)
-    return QObject::eventFilter(obj, e);  // return false;
+    return QLineEdit::eventFilter(obj, e);  // return false;
 
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
-  if (!cellSelection) return QObject::eventFilter(obj, e);  // return false;
+  if (!cellSelection) return QLineEdit::eventFilter(obj, e);
 
   QKeyEvent *ke = (QKeyEvent *)e;
   std::string keyStr =
       QKeySequence(ke->key() + ke->modifiers()).toString().toStdString();
   QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
-  if (!action) return QObject::eventFilter(obj, e);  // return false;
+  if (!action) return QLineEdit::eventFilter(obj, e);
 
   std::string actionId = CommandManager::instance()->getIdFromAction(action);
 
   // These are usally standard ctrl/command strokes for text editing.
   // Default to standard behavior and don't execute OT's action while renaming
-  // cell.
-  if (actionId == "MI_Undo" || actionId == "MI_Redo" ||
-      actionId == "MI_Clear" || actionId == "MI_Copy" ||
-      actionId == "MI_Paste" || actionId == "MI_Cut")
-    return QObject::eventFilter(obj, e);  // return true;
+  // cell if users prefer to do so.
+  // Or, always invoke OT's commands when renaming cell even the standard
+  // command strokes for text editing.
+  // The latter option is demanded by Japanese animation industry in order to
+  // gain efficiency for inputting xsheet.
+  if (!Preferences::instance()->isShortcutCommandsWhileRenamingCellEnabled() &&
+      (actionId == "MI_Undo" || actionId == "MI_Redo" ||
+       actionId == "MI_Clear" || actionId == "MI_Copy" ||
+       actionId == "MI_Paste" || actionId == "MI_Cut"))
+    return QLineEdit::eventFilter(obj, e);
+
   return TCellSelection::isEnabledCommand(actionId);
 }
 
 //-----------------------------------------------------------------------------
 
 void RenameCellField::keyPressEvent(QKeyEvent *event) {
+  if (event->key() == Qt::Key_Escape) {
+    clearFocus();
+    return;
+  }
+
   // move the cell selection
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
@@ -780,8 +794,16 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
   switch (int key = event->key()) {
   case Qt::Key_Up:
   case Qt::Key_Down:
+    offset = m_viewer->orientation()->arrowShift(key);
+    break;
   case Qt::Key_Left:
   case Qt::Key_Right:
+    // ctrl+left/right arrow for moving cursor to the end in the field
+    if (isCtrlPressed &&
+        !Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled()) {
+      QLineEdit::keyPressEvent(event);
+      return;
+    }
     offset = m_viewer->orientation()->arrowShift(key);
     break;
   default:
