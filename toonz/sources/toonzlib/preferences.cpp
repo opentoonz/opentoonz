@@ -317,7 +317,8 @@ Preferences::Preferences()
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
     , m_ignoreImageDpi(false)
-    , m_watchFileSystem(true) {
+    , m_watchFileSystem(true)
+    , m_shortcutCommandsWhileRenamingCellEnabled(false) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -325,13 +326,19 @@ Preferences::Preferences()
   m_defLevelDpi    = camera.getDpi().x;
 
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
-  TFilePath savePath  = layoutDir + TFilePath("preferences.ini");
+  TFilePath prefPath  = layoutDir + TFilePath("preferences.ini");
 
-  // If no personal settings found, then try to load template settings
-  TFilePath loadPath = ToonzFolder::getModuleFile(TFilePath("preferences.ini"));
+  // In case the personal settings is not exist (for new users)
+  if (!TFileStatus(prefPath).doesExist()) {
+    TFilePath templatePath =
+        ToonzFolder::getTemplateModuleDir() + TFilePath("preferences.ini");
+    // If there is the template, copy it to the personal one
+    if (TFileStatus(templatePath).doesExist())
+      TSystem::copyFile(prefPath, templatePath);
+  }
 
   m_settings.reset(new QSettings(
-      QString::fromStdWString(loadPath.getWideString()), QSettings::IniFormat));
+      QString::fromStdWString(prefPath.getWideString()), QSettings::IniFormat));
 
   getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
   getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
@@ -606,16 +613,8 @@ Preferences::Preferences()
            m_inputCellsWithoutDoubleClickingEnabled);
   getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
-
-  // in case there is no personal settings
-  if (savePath != loadPath) {
-    // copy the template settins to the personal one
-    if (TFileStatus(loadPath).doesExist())
-      TSystem::copyFile(savePath, loadPath);
-    m_settings.reset(
-        new QSettings(QString::fromStdWString(savePath.getWideString()),
-                      QSettings::IniFormat));
-  }
+  getValue(*m_settings, "shortcutCommandsWhileRenamingCellEnabled",
+           m_shortcutCommandsWhileRenamingCellEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -1471,4 +1470,12 @@ void Preferences::enableInputCellsWithoutDoubleClicking(bool on) {
 void Preferences::enableWatchFileSystem(bool on) {
   m_watchFileSystem = on;
   m_settings->setValue("watchFileSystemEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableShortcutCommandsWhileRenamingCell(bool on) {
+  m_shortcutCommandsWhileRenamingCellEnabled = on;
+  m_settings->setValue("shortcutCommandsWhileRenamingCellEnabled",
+                       on ? "1" : "0");
 }

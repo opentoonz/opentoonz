@@ -49,9 +49,7 @@ class EnvGlobals {  // singleton
   TFilePath *m_dllRelativeDir;
   bool m_isPortable = false;
 
-  EnvGlobals() : m_stuffDir(0) {
-    setWorkingDirectory();
-  }
+  EnvGlobals() : m_stuffDir(0) { setWorkingDirectory(); }
 
 public:
   ~EnvGlobals() { delete m_stuffDir; }
@@ -188,7 +186,10 @@ public:
   }
   std::string getRootVarName() { return m_rootVarName; }
 
-  void setSystemVarPrefix(std::string prefix) { m_systemVarPrefix = prefix; }
+  void setSystemVarPrefix(std::string prefix) {
+    m_systemVarPrefix = prefix;
+    updateEnvFile();
+  }
   std::string getSystemVarPrefix() {
     if (getIsPortable()) return "";
     return m_systemVarPrefix;
