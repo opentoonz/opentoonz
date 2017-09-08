@@ -968,6 +968,11 @@ public:
     // Renumero i frame con i vecchi fids
     if (m_setType == DrawingData::INSERT) {
       assert(m_sl->getFrameCount() == m_oldLevelFrameId.size());
+      std::vector<TFrameId> newFrames;
+      m_sl->getFids(newFrames);
+      TXsheet *xsh =
+          TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+      updateXSheet(m_sl.getPointer(), newFrames, m_oldLevelFrameId, xsh);
       m_sl->renumber(m_oldLevelFrameId);
       TApp::instance()
           ->getPaletteController()
@@ -1171,6 +1176,11 @@ public:
 
   void undo() const override {
     removeFramesWithoutUndo(m_level, m_insertedFids);
+    std::vector<TFrameId> newFrames;
+    m_level->getFids(newFrames);
+    TXsheet *xsh =
+        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+    updateXSheet(m_level.getPointer(), newFrames, m_oldFids, xsh);
     m_level->renumber(m_oldFids);
     invalidateIcons(m_level.getPointer(), m_oldFids);
     m_level->setDirtyFlag(true);
@@ -1271,6 +1281,11 @@ public:
     }
   }
   void renumber(std::vector<TFrameId> fids) const {
+    std::vector<TFrameId> oldFrames;
+    m_level->getFids(oldFrames);
+    TXsheet *xsh =
+        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+    updateXSheet(m_level.getPointer(), oldFrames, fids, xsh);
     m_level->renumber(fids);
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
@@ -1327,8 +1342,9 @@ void FilmstripCmd::renumber(
   }
 
   // tmp contains all the level fids that are not affected by the renumbering
-  std::vector<TFrameId> fids, rfids;
+  std::vector<TFrameId> fids, rfids, oldFrames;
   sl->getFids(fids);
+  sl->getFids(oldFrames);
   std::set<TFrameId> tmp;
   for (int i = 0; i < (int)fids.size(); i++) tmp.insert(fids[i]);
   for (it = table.begin(); it != table.end(); ++it) tmp.erase(it->first);
@@ -1359,6 +1375,9 @@ void FilmstripCmd::renumber(
   }
 
   TUndoManager::manager()->add(new RenumberUndo(sl, fids));
+  TXsheet *xsh =
+      TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+  updateXSheet(sl, oldFrames, fids, xsh);
   sl->renumber(fids);
   sl->setDirtyFlag(true);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -1386,6 +1405,8 @@ void FilmstripCmd::renumber(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
   if (startFrame <= 0 || stepFrame <= 0 || frames.empty()) return;
 
   std::vector<TFrameId> fids;
+  std::vector<TFrameId> oldFrames;
+  sl->getFids(oldFrames);
   sl->getFids(fids);
 
   std::set<TFrameId> modifiedFids;
@@ -1421,6 +1442,9 @@ void FilmstripCmd::renumber(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
     }
   }
   TUndoManager::manager()->add(new RenumberUndo(sl, fids));
+  TXsheet *xsh =
+      TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+  updateXSheet(sl, oldFrames, fids, xsh);
   sl->renumber(fids);
   sl->setDirtyFlag(true);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -1764,6 +1788,8 @@ void performReverse(const TXshSimpleLevelP &sl,
   if (!sl || frames.empty()) return;
 
   std::vector<TFrameId> fids;
+  std::vector<TFrameId> oldFrames;
+  sl->getFids(oldFrames);
   sl->getFids(fids);
   int i = 0, j = (int)fids.size() - 1;
   for (;;) {
@@ -1774,6 +1800,9 @@ void performReverse(const TXshSimpleLevelP &sl,
     i++;
     j--;
   }
+  TXsheet *xsh =
+      TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+  updateXSheet(sl.getPointer(), oldFrames, fids, xsh);
   sl->renumber(fids);
   sl->setDirtyFlag(true);
   //  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -1916,6 +1945,8 @@ void stepFilmstripFrames(const TXshSimpleLevelP &sl,
   std::vector<TFrameId> fids;
   std::set<TFrameId> changedFids;
   std::vector<int> insertIndices;
+  std::vector<TFrameId> oldFrames;
+  sl->getFids(oldFrames);
   sl->getFids(fids);
   int i, offset = 0;
   for (i = 0; i < (int)fids.size(); i++) {
@@ -1930,6 +1961,9 @@ void stepFilmstripFrames(const TXshSimpleLevelP &sl,
       offset += step - 1;
     }
   }
+  TXsheet *xsh =
+      TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+  updateXSheet(sl.getPointer(), oldFrames, fids, xsh);
   sl->renumber(fids);
   for (i = 0; i < (int)insertIndices.size(); i++) {
     int j        = insertIndices[i];
@@ -1971,6 +2005,11 @@ public:
   void undo() const override {
     removeFramesWithoutUndo(m_level, m_insertedFrames);
     std::set<TFrameId>::const_iterator it = m_frames.begin();
+    std::vector<TFrameId> newFrames;
+    m_level->getFids(newFrames);
+    TXsheet *xsh =
+        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+    updateXSheet(m_level.getPointer(), newFrames, m_oldFrames, xsh);
     m_level->renumber(m_oldFrames);
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
@@ -2130,6 +2169,11 @@ public:
   void undo() const override {
     assert(m_level);
     removeFramesWithoutUndo(m_level, m_frameInserted);
+    std::vector<TFrameId> newFrames;
+    m_level->getFids(newFrames);
+    TXsheet *xsh =
+        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+    updateXSheet(m_level.getPointer(), newFrames, m_oldFrames, xsh);
     m_level->renumber(m_oldFrames);
     invalidateIcons(m_level.getPointer(), m_oldFrames);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
@@ -2457,6 +2501,8 @@ void FilmstripCmd::renumberDrawing(TXshSimpleLevel *sl, const TFrameId &oldFid,
                                    const TFrameId &desiredNewFid) {
   if (oldFid == desiredNewFid) return;
   std::vector<TFrameId> fids;
+  std::vector<TFrameId> oldFrames;
+  sl->getFids(oldFrames);
   sl->getFids(fids);
   std::vector<TFrameId>::iterator it =
       std::find(fids.begin(), fids.end(), oldFid);
@@ -2472,28 +2518,32 @@ void FilmstripCmd::renumberDrawing(TXshSimpleLevel *sl, const TFrameId &oldFid,
     newFid = TFrameId(newFid.getNumber(), letter);
   }
   *it = newFid;
+
+  TXsheet *xsh =
+      TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+  updateXSheet(sl, oldFrames, fids, xsh);
   sl->renumber(fids);
 
-  TXshCell oldCell(sl, oldFid);
-  TXshCell newCell(sl, newFid);
+  // TXshCell oldCell(sl, oldFid);
+  // TXshCell newCell(sl, newFid);
 
-  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-  for (int c = 0; c < xsh->getColumnCount(); c++) {
-    int r0, r1;
-    int n = xsh->getCellRange(c, r0, r1);
-    if (n > 0) {
-      std::vector<TXshCell> cells(n);
-      xsh->getCells(r0, c, n, &cells[0]);
-      bool changed = false;
-      for (int i = 0; i < n; i++) {
-        if (cells[i] == oldCell) {
-          changed  = true;
-          cells[i] = newCell;
-        }
-      }
-      if (changed) xsh->setCells(r0, c, n, &cells[0]);
-    }
-  }
+  // TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  // for (int c = 0; c < xsh->getColumnCount(); c++) {
+  //  int r0, r1;
+  //  int n = xsh->getCellRange(c, r0, r1);
+  //  if (n > 0) {
+  //    std::vector<TXshCell> cells(n);
+  //    xsh->getCells(r0, c, n, &cells[0]);
+  //    bool changed = false;
+  //    for (int i = 0; i < n; i++) {
+  //      if (cells[i] == oldCell) {
+  //        changed  = true;
+  //        cells[i] = newCell;
+  //      }
+  //    }
+  //    if (changed) xsh->setCells(r0, c, n, &cells[0]);
+  //  }
+  //}
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
