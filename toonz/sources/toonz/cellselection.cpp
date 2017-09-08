@@ -38,6 +38,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txsheet.h"
 #include "toonz/txshsimplelevel.h"
+#include "toonz/txshchildlevel.h"
 #include "toonz/toonzscene.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/tcamera.h"
@@ -438,8 +439,8 @@ public:
       m_undoTable.insert(std::make_pair(it->second, it->first));
   }
 
-  void renumber(const std::map<TXshCell, TXshCell> &table) const {
-    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  void renumber(const std::map<TXshCell, TXshCell> &table, TXsheet *xsh) const {
+    std::vector<TXshChildLevel *> childLevels;
     for (int c = 0; c < xsh->getColumnCount(); ++c) {
       int r0, r1;
       int n = xsh->getCellRange(c, r0, r1);
@@ -448,6 +449,19 @@ public:
         std::vector<TXshCell> cells(n);
         xsh->getCells(r0, c, n, &cells[0]);
         for (int i = 0; i < n; i++) {
+          // check the sub xsheets too
+          if (!cells[i].isEmpty() &&
+              cells[i].m_level->getType() == CHILD_XSHLEVEL) {
+            TXshChildLevel *level = cells[i].m_level->getChildLevel();
+            // make sure we haven't already checked the level
+            if (level &&
+                std::find(childLevels.begin(), childLevels.end(), level) ==
+                    childLevels.end()) {
+              TXsheet *subXsh = level->getXsheet();
+              renumber(table, subXsh);
+              childLevels.push_back(level);
+            }
+          }
           std::map<TXshCell, TXshCell>::const_iterator it =
               table.find(cells[i]);
           if (it != table.end())
@@ -458,8 +472,16 @@ public:
     }
   }
 
-  void undo() const override { renumber(m_undoTable); }
-  void redo() const override { renumber(m_redoTable); }
+  void undo() const override {
+    TXsheet *xsh =
+        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+    renumber(m_undoTable, xsh);
+  }
+  void redo() const override {
+    TXsheet *xsh =
+        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+    renumber(m_redoTable, xsh);
+  }
 
   int getSize() const override {
     return (m_redoTable.size() << 2) * sizeof(TXshCell);
