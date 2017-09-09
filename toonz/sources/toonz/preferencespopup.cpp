@@ -1019,6 +1019,12 @@ void PreferencesPopup::onShowXSheetToolbarClicked(bool checked) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onSyncLevelRenumberWithXsheetChanged(int checked) {
+  m_pref->enableSyncLevelRenumberWithXsheet(checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onExpandFunctionHeaderClicked(bool checked) {
   m_pref->enableExpandFunctionHeader(checked);
 }
@@ -1249,14 +1255,16 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Arrow Key to Shift Cell Selection"), this);
   CheckBox *inputCellsWithoutDoubleClickingCB =
       new CheckBox(tr("Enable to Input Cells without Double Clicking"), this);
-  m_showXSheetToolbar = new QGroupBox(tr("Show Toolbar in the XSheet "), this);
+  m_showXSheetToolbar = new QGroupBox(tr("Show Toolbar in the Xsheet "), this);
   m_showXSheetToolbar->setCheckable(true);
   m_expandFunctionHeader = new CheckBox(
-      tr("Expand Function Editor Header to Match XSheet Toolbar Height "
+      tr("Expand Function Editor Header to Match Xsheet Toolbar Height "
          "(Requires Restart)"),
       this);
   CheckBox *showColumnNumbersCB =
       new CheckBox(tr("Show Column Numbers in Column Headers"), this);
+  m_syncLevelRenumberWithXsheet = new CheckBox(
+      tr("Sync Level Strip Drawing Number Changes with the Xsheet"));
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1534,6 +1542,8 @@ PreferencesPopup::PreferencesPopup()
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
+  m_syncLevelRenumberWithXsheet->setChecked(
+      m_pref->isSyncLevelRenumberWithXsheetEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -2003,11 +2013,12 @@ PreferencesPopup::PreferencesPopup()
 
       xsheetFrameLay->addWidget(m_showXSheetToolbar, 7, 0, 3, 3);
       xsheetFrameLay->addWidget(showColumnNumbersCB, 10, 0, 1, 2);
+      xsheetFrameLay->addWidget(m_syncLevelRenumberWithXsheet, 11, 0, 1, 2);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
     xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(11, 1);
+    xsheetFrameLay->setRowStretch(12, 1);
     xsheetBox->setLayout(xsheetFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
@@ -2364,6 +2375,8 @@ PreferencesPopup::PreferencesPopup()
 
   ret = ret && connect(showColumnNumbersCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onShowColumnNumbersChanged(int)));
+  ret = ret && connect(m_syncLevelRenumberWithXsheet, SIGNAL(stateChanged(int)),
+                       this, SLOT(onSyncLevelRenumberWithXsheetChanged(int)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

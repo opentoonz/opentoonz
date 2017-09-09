@@ -74,7 +74,8 @@ private:
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
-      *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB;
+      *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB,
+      *m_syncLevelRenumberWithXsheet;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -178,6 +179,7 @@ private slots:
   void onFastRenderPathChanged();
   void onUseNumpadForSwitchingStylesClicked(bool);
   void onShowXSheetToolbarClicked(bool);
+  void onSyncLevelRenumberWithXsheetChanged(int);
   void onExpandFunctionHeaderClicked(bool);
   void onShowColumnNumbersChanged(int);
   void onUseArrowKeyToShiftCellSelectionClicked(int);

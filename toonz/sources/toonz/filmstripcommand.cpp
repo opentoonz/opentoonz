@@ -35,6 +35,7 @@
 #include "toonz/toonzimageutils.h"
 #include "toonz/trasterimageutils.h"
 #include "toonz/tcamera.h"
+#include "toonz/preferences.h"
 #include "trop.h"
 
 #include "toonzqt/gutil.h"
@@ -54,6 +55,7 @@ TFrameId operator+(const TFrameId &fid, int d) {
 
 void updateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
                   std::vector<TFrameId> newFids, TXsheet *xsh) {
+  if (!Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) return;
   std::vector<TXshChildLevel *> childLevels;
   for (int c = 0; c < xsh->getColumnCount(); ++c) {
     int r0, r1;
@@ -2524,26 +2526,6 @@ void FilmstripCmd::renumberDrawing(TXshSimpleLevel *sl, const TFrameId &oldFid,
   updateXSheet(sl, oldFrames, fids, xsh);
   sl->renumber(fids);
 
-  // TXshCell oldCell(sl, oldFid);
-  // TXshCell newCell(sl, newFid);
-
-  // TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-  // for (int c = 0; c < xsh->getColumnCount(); c++) {
-  //  int r0, r1;
-  //  int n = xsh->getCellRange(c, r0, r1);
-  //  if (n > 0) {
-  //    std::vector<TXshCell> cells(n);
-  //    xsh->getCells(r0, c, n, &cells[0]);
-  //    bool changed = false;
-  //    for (int i = 0; i < n; i++) {
-  //      if (cells[i] == oldCell) {
-  //        changed  = true;
-  //        cells[i] = newCell;
-  //      }
-  //    }
-  //    if (changed) xsh->setCells(r0, c, n, &cells[0]);
-  //  }
-  //}
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);

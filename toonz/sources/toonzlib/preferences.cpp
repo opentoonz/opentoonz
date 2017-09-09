@@ -311,6 +311,7 @@ Preferences::Preferences()
     , m_useNumpadForSwitchingStyles(true)
     , m_newLevelSizeToCameraSizeEnabled(false)
     , m_showXSheetToolbar(false)
+    , m_syncLevelRenumberWithXsheet(false)
     , m_expandFunctionHeader(false)
     , m_showColumnNumbers(false)
     , m_useArrowKeyToShiftCellSelection(false)
@@ -598,6 +599,8 @@ Preferences::Preferences()
   getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
            m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
+  getValue(*m_settings, "syncLevelRenumberWithXsheet",
+           m_syncLevelRenumberWithXsheet);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
   getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
@@ -1437,6 +1440,13 @@ void Preferences::enableNewLevelSizeToCameraSize(bool on) {
 void Preferences::enableShowXSheetToolbar(bool on) {
   m_showXSheetToolbar = on;
   m_settings->setValue("showXSheetToolbar", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableSyncLevelRenumberWithXsheet(bool on) {
+  m_syncLevelRenumberWithXsheet = on;
+  m_settings->setValue("syncLevelRenumberWithXsheet", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

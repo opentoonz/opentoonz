@@ -379,6 +379,11 @@ public:
   void enableShowColumnNumbers(bool on);
   bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
 
+  void enableSyncLevelRenumberWithXsheet(bool on);
+  bool isSyncLevelRenumberWithXsheetEnabled() const {
+    return m_syncLevelRenumberWithXsheet;
+  }
+
   // Animation  tab
 
   void setKeyframeType(int s);
@@ -528,7 +533,8 @@ private:
       m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly,
       m_startupPopupEnabled;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
-  bool m_onionSkinDuringPlayback, m_ignoreImageDpi;
+  bool m_onionSkinDuringPlayback, m_ignoreImageDpi,
+      m_syncLevelRenumberWithXsheet;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,
