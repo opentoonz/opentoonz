@@ -383,6 +383,12 @@ public:
   bool isSyncLevelRenumberWithXsheetEnabled() const {
     return m_syncLevelRenumberWithXsheet;
   }
+  
+  void enableShortcutCommandsWhileRenamingCell(bool on);
+  bool isShortcutCommandsWhileRenamingCellEnabled() const {
+    return m_shortcutCommandsWhileRenamingCellEnabled;
+
+  }
 
   // Animation  tab
 
@@ -586,6 +592,9 @@ private:
 
   // enable to watch file system in order to update file browser automatically
   bool m_watchFileSystem;
+
+  // enable OT command shortcut keys while renaming xsheet cell
+  bool m_shortcutCommandsWhileRenamingCellEnabled;
 
 private:
   Preferences();

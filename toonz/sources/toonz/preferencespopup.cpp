@@ -1047,6 +1047,12 @@ void PreferencesPopup::onInputCellsWithoutDoubleClickingClicked(int on) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onShortcutCommandsWhileRenamingCellClicked(int on) {
+  m_pref->enableShortcutCommandsWhileRenamingCell(on);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onWatchFileSystemClicked(int on) {
   m_pref->enableWatchFileSystem(on);
   // emit signal to update behavior of the File browser
@@ -1256,6 +1262,9 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *inputCellsWithoutDoubleClickingCB =
       new CheckBox(tr("Enable to Input Cells without Double Clicking"), this);
   m_showXSheetToolbar = new QGroupBox(tr("Show Toolbar in the Xsheet "), this);
+  CheckBox *shortcutCommandsWhileRenamingCellCB = new CheckBox(
+      tr("Enable OpenToonz Commands' Shortcut Keys While Renaming Cell"), this);
+  m_showXSheetToolbar = new QGroupBox(tr("Show Toolbar in the XSheet "), this);
   m_showXSheetToolbar->setCheckable(true);
   m_expandFunctionHeader = new CheckBox(
       tr("Expand Function Editor Header to Match Xsheet Toolbar Height "
@@ -1539,6 +1548,8 @@ PreferencesPopup::PreferencesPopup()
       m_pref->isUseArrowKeyToShiftCellSelectionEnabled());
   inputCellsWithoutDoubleClickingCB->setChecked(
       m_pref->isInputCellsWithoutDoubleClickingEnabled());
+  shortcutCommandsWhileRenamingCellCB->setChecked(
+      m_pref->isShortcutCommandsWhileRenamingCellEnabled());
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
@@ -2002,6 +2013,8 @@ PreferencesPopup::PreferencesPopup()
       xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
       xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 5, 0, 1, 2);
       xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 6, 0, 1, 2);
+      xsheetFrameLay->addWidget(shortcutCommandsWhileRenamingCellCB, 7, 0, 1,
+                                2);
 
       QVBoxLayout *xSheetToolbarLay = new QVBoxLayout();
       xSheetToolbarLay->setMargin(10);
@@ -2011,14 +2024,14 @@ PreferencesPopup::PreferencesPopup()
       }
       m_showXSheetToolbar->setLayout(xSheetToolbarLay);
 
-      xsheetFrameLay->addWidget(m_showXSheetToolbar, 7, 0, 3, 3);
-      xsheetFrameLay->addWidget(showColumnNumbersCB, 10, 0, 1, 2);
-      xsheetFrameLay->addWidget(m_syncLevelRenumberWithXsheet, 11, 0, 1, 2);
+      xsheetFrameLay->addWidget(m_showXSheetToolbar, 8, 0, 3, 3);
+      xsheetFrameLay->addWidget(showColumnNumbersCB, 11, 0, 1, 2);
+      xsheetFrameLay->addWidget(m_syncLevelRenumberWithXsheet, 12, 0, 1, 2);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
     xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(12, 1);
+    xsheetFrameLay->setRowStretch(13, 1);
     xsheetBox->setLayout(xsheetFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
@@ -2368,6 +2381,9 @@ PreferencesPopup::PreferencesPopup()
   ret = ret &&
         connect(inputCellsWithoutDoubleClickingCB, SIGNAL(stateChanged(int)),
                 SLOT(onInputCellsWithoutDoubleClickingClicked(int)));
+  ret = ret &&
+        connect(shortcutCommandsWhileRenamingCellCB, SIGNAL(stateChanged(int)),
+                SLOT(onShortcutCommandsWhileRenamingCellClicked(int)));
   ret = ret && connect(m_showXSheetToolbar, SIGNAL(clicked(bool)),
                        SLOT(onShowXSheetToolbarClicked(bool)));
   ret = ret && connect(m_expandFunctionHeader, SIGNAL(clicked(bool)),

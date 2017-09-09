@@ -184,6 +184,7 @@ private slots:
   void onShowColumnNumbersChanged(int);
   void onUseArrowKeyToShiftCellSelectionClicked(int);
   void onInputCellsWithoutDoubleClickingClicked(int);
+  void onShortcutCommandsWhileRenamingCellClicked(int);
   void onWatchFileSystemClicked(int);
 };
 
