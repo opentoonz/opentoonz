@@ -73,7 +73,7 @@
     </message>
     <message>
         <source>Center Position</source>
-        <translation>Centrar posición</translation>
+        <translation>Posición centro</translation>
     </message>
 </context>
 <context>
@@ -192,11 +192,11 @@
     </message>
     <message>
         <source>Lock Center E/W</source>
-        <translation>Bloquear al centro en X</translation>
+        <translation>Bloquear centro X</translation>
     </message>
     <message>
         <source>Lock Center N/S</source>
-        <translation>Bloquear al centro en Y</translation>
+        <translation>Bloquear centro Y</translation>
     </message>
     <message>
         <source>Lock Position E/W</source>
@@ -260,7 +260,7 @@
     </message>
     <message>
         <source>Center Position</source>
-        <translation>Centrar posición</translation>
+        <translation>Posición centro</translation>
     </message>
     <message>
         <source>Active Axis</source>
@@ -534,7 +534,7 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Show Skeleton Onion Skin</source>
-        <translation>Mostrar esqueleto con piel de cebolla</translation>
+        <translation>Mostrar piel de cebolla del esqueleto</translation>
     </message>
     <message>
         <source>The previous vertex name will be discarded, and all associated keys will be lost.
@@ -854,7 +854,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Style Index:</source>
-        <translation>Índice de estilo:</translation>
+        <translation>Índice del estilo:</translation>
     </message>
     <message>
         <source>Opacity:</source>
@@ -911,7 +911,7 @@ Do you want to proceed?</source>
     <name>SkeletonTool</name>
     <message>
         <source>Show Only Active Skeleton</source>
-        <translation>Mostrar sólo el esqueleto activo</translation>
+        <translation>Mostrar sólo esqueleto activo</translation>
     </message>
     <message>
         <source>Global Key</source>

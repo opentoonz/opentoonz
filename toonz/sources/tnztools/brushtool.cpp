@@ -1572,7 +1572,7 @@ bool BrushTool::keyDown(int key, TUINT32 b, const TPoint &point) {
   if (key == TwConsts::TK_Esc) {
     resetFrameRange();
   }
-  return true;
+  return false;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1936,7 +1936,7 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   // locals.addMinMax(
   //  TToonzImageP(getImage(false, 1)) ? m_rasThickness : m_thickness, add);
   //} else
-  if (e.isCtrlPressed() && e.isAltPressed()) {
+  if (e.isCtrlPressed() && e.isAltPressed() && !e.isShiftPressed()) {
     const TPointD &diff = pos - m_mousePos;
     double max          = diff.x / 2;
     double min          = diff.y / 2;
@@ -2565,10 +2565,13 @@ void BrushData::saveData(TOStream &os) {
   os.closeChild();
   os.openChild("Miter");
   os << m_miter;
+  os.closeChild();
   os.openChild("Frame_Range");
   os << (int)m_frameRange;
+  os.closeChild();
   os.openChild("Snap");
   os << (int)m_snap;
+  os.closeChild();
   os.openChild("SnapSensitivity");
   os << (int)m_snapSensitivity;
   os.closeChild();

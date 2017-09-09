@@ -832,7 +832,8 @@ void PreferencesPopup::onDefLevelTypeChanged(int index) {
   if (0 <= index && index < m_defLevelType->count()) {
     int levelType = m_defLevelType->itemData(index).toInt();
     m_pref->setDefLevelType(levelType);
-    bool isRaster = levelType != PLI_XSHLEVEL;
+    bool isRaster =
+        levelType != PLI_XSHLEVEL && !m_newLevelToCameraSizeCB->isChecked();
     m_defLevelWidth->setEnabled(isRaster);
     m_defLevelHeight->setEnabled(isRaster);
     if (!m_pixelsOnlyCB->isChecked()) m_defLevelDpi->setEnabled(isRaster);
@@ -1004,6 +1005,13 @@ void PreferencesPopup::onUseNumpadForSwitchingStylesClicked(bool checked) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onNewLevelToCameraSizeChanged(bool checked) {
+  m_pref->enableNewLevelSizeToCameraSize(checked);
+  onDefLevelTypeChanged(m_defLevelType->currentIndex());
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onShowXSheetToolbarClicked(bool checked) {
   m_pref->enableShowXSheetToolbar(checked);
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XSheetToolbar");
@@ -1029,6 +1037,12 @@ void PreferencesPopup::onUseArrowKeyToShiftCellSelectionClicked(int on) {
 
 void PreferencesPopup::onInputCellsWithoutDoubleClickingClicked(int on) {
   m_pref->enableInputCellsWithoutDoubleClicking(on);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onShortcutCommandsWhileRenamingCellClicked(int on) {
+  m_pref->enableShortcutCommandsWhileRenamingCell(on);
 }
 
 //-----------------------------------------------------------------------------
@@ -1211,6 +1225,9 @@ PreferencesPopup::PreferencesPopup()
   m_autocreationType       = new QComboBox(this);
   m_dpiLabel               = new QLabel(tr("DPI:"), this);
   m_vectorSnappingTargetCB = new QComboBox(this);
+  m_newLevelToCameraSizeCB =
+      new CheckBox(tr("New Levels Default to the Current Camera Size"), this);
+
   CheckBox *keepOriginalCleanedUpCB =
       new CheckBox(tr("Keep Original Cleaned Up Drawings As Backup"), this);
   CheckBox *multiLayerStylePickerCB = new CheckBox(
@@ -1238,6 +1255,8 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Arrow Key to Shift Cell Selection"), this);
   CheckBox *inputCellsWithoutDoubleClickingCB =
       new CheckBox(tr("Enable to Input Cells without Double Clicking"), this);
+  CheckBox *shortcutCommandsWhileRenamingCellCB = new CheckBox(
+      tr("Enable OpenToonz Commands' Shortcut Keys While Renaming Cell"), this);
   m_showXSheetToolbar = new QGroupBox(tr("Show Toolbar in the XSheet "), this);
   m_showXSheetToolbar->setCheckable(true);
   m_expandFunctionHeader = new CheckBox(
@@ -1457,7 +1476,8 @@ PreferencesPopup::PreferencesPopup()
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
   m_useNumpadForSwitchingStyles->setChecked(
       m_pref->isUseNumpadForSwitchingStylesEnabled());
-
+  m_newLevelToCameraSizeCB->setChecked(
+      m_pref->isNewLevelSizeToCameraSizeEnabled());
   QStringList scanLevelTypes;
   scanLevelTypes << "tif"
                  << "png";
@@ -1519,6 +1539,8 @@ PreferencesPopup::PreferencesPopup()
       m_pref->isUseArrowKeyToShiftCellSelectionEnabled());
   inputCellsWithoutDoubleClickingCB->setChecked(
       m_pref->isInputCellsWithoutDoubleClickingEnabled());
+  shortcutCommandsWhileRenamingCellCB->setChecked(
+      m_pref->isShortcutCommandsWhileRenamingCellEnabled());
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
@@ -1921,21 +1943,21 @@ PreferencesPopup::PreferencesPopup()
         drawingTopLay->addWidget(new QLabel(tr("Default Level Type:")), 1, 0,
                                  Qt::AlignRight);
         drawingTopLay->addWidget(m_defLevelType, 1, 1, 1, 3);
-
-        drawingTopLay->addWidget(new QLabel(tr("Width:")), 2, 0,
+        drawingTopLay->addWidget(m_newLevelToCameraSizeCB, 2, 0, 1, 3);
+        drawingTopLay->addWidget(new QLabel(tr("Width:")), 3, 0,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_defLevelWidth, 2, 1);
-        drawingTopLay->addWidget(new QLabel(tr("  Height:")), 2, 2,
+        drawingTopLay->addWidget(m_defLevelWidth, 3, 1);
+        drawingTopLay->addWidget(new QLabel(tr("  Height:")), 3, 2,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_defLevelHeight, 2, 3);
-        drawingTopLay->addWidget(m_dpiLabel, 3, 0, Qt::AlignRight);
-        drawingTopLay->addWidget(m_defLevelDpi, 3, 1);
-        drawingTopLay->addWidget(new QLabel(tr("Autocreation:")), 4, 0,
+        drawingTopLay->addWidget(m_defLevelHeight, 3, 3);
+        drawingTopLay->addWidget(m_dpiLabel, 4, 0, Qt::AlignRight);
+        drawingTopLay->addWidget(m_defLevelDpi, 4, 1);
+        drawingTopLay->addWidget(new QLabel(tr("Autocreation:")), 5, 0,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_autocreationType, 4, 1, 1, 3);
-        drawingTopLay->addWidget(new QLabel(tr("Vector Snapping:")), 5, 0,
+        drawingTopLay->addWidget(m_autocreationType, 5, 1, 1, 3);
+        drawingTopLay->addWidget(new QLabel(tr("Vector Snapping:")), 6, 0,
                                  Qt::AlignRight);
-        drawingTopLay->addWidget(m_vectorSnappingTargetCB, 5, 1, 1, 3);
+        drawingTopLay->addWidget(m_vectorSnappingTargetCB, 6, 1, 1, 3);
       }
       drawingFrameLay->addLayout(drawingTopLay, 0);
 
@@ -1980,6 +2002,8 @@ PreferencesPopup::PreferencesPopup()
       xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
       xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 5, 0, 1, 2);
       xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 6, 0, 1, 2);
+      xsheetFrameLay->addWidget(shortcutCommandsWhileRenamingCellCB, 7, 0, 1,
+                                2);
 
       QVBoxLayout *xSheetToolbarLay = new QVBoxLayout();
       xSheetToolbarLay->setMargin(10);
@@ -1989,13 +2013,13 @@ PreferencesPopup::PreferencesPopup()
       }
       m_showXSheetToolbar->setLayout(xSheetToolbarLay);
 
-      xsheetFrameLay->addWidget(m_showXSheetToolbar, 7, 0, 3, 3);
-      xsheetFrameLay->addWidget(showColumnNumbersCB, 10, 0, 1, 2);
+      xsheetFrameLay->addWidget(m_showXSheetToolbar, 8, 0, 3, 3);
+      xsheetFrameLay->addWidget(showColumnNumbersCB, 11, 0, 1, 2);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
     xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(11, 1);
+    xsheetFrameLay->setRowStretch(12, 1);
     xsheetBox->setLayout(xsheetFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
@@ -2325,6 +2349,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_useNumpadForSwitchingStyles, SIGNAL(clicked(bool)),
                        SLOT(onUseNumpadForSwitchingStylesClicked(bool)));
+  ret = ret && connect(m_newLevelToCameraSizeCB, SIGNAL(clicked(bool)),
+                       SLOT(onNewLevelToCameraSizeChanged(bool)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),
@@ -2343,6 +2369,9 @@ PreferencesPopup::PreferencesPopup()
   ret = ret &&
         connect(inputCellsWithoutDoubleClickingCB, SIGNAL(stateChanged(int)),
                 SLOT(onInputCellsWithoutDoubleClickingClicked(int)));
+  ret = ret &&
+        connect(shortcutCommandsWhileRenamingCellCB, SIGNAL(stateChanged(int)),
+                SLOT(onShortcutCommandsWhileRenamingCellClicked(int)));
   ret = ret && connect(m_showXSheetToolbar, SIGNAL(clicked(bool)),
                        SLOT(onShowXSheetToolbarClicked(bool)));
   ret = ret && connect(m_expandFunctionHeader, SIGNAL(clicked(bool)),

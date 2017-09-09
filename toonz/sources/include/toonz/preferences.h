@@ -324,6 +324,11 @@ public:
     return m_useNumpadForSwitchingStyles;
   }
 
+  void enableNewLevelSizeToCameraSize(bool on);
+  bool isNewLevelSizeToCameraSizeEnabled() const {
+    return m_newLevelSizeToCameraSizeEnabled;
+  }
+
   void setVectorSnappingTarget(int target);
   int getVectorSnappingTarget() { return m_vectorSnappingTarget; }
 
@@ -373,6 +378,11 @@ public:
 
   void enableShowColumnNumbers(bool on);
   bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
+
+  void enableShortcutCommandsWhileRenamingCell(bool on);
+  bool isShortcutCommandsWhileRenamingCellEnabled() const {
+    return m_shortcutCommandsWhileRenamingCellEnabled;
+  }
 
   // Animation  tab
 
@@ -562,6 +572,10 @@ private:
   // whether to use numpad and tab key shortcut for selecting styles
   bool m_useNumpadForSwitchingStyles;
 
+  // whether to set the new level size to be the same as the camera size by
+  // default
+  bool m_newLevelSizeToCameraSizeEnabled;
+
   // use arrow key to shift cel selection, ctrl + arrow key to resize the
   // selection range.
   bool m_useArrowKeyToShiftCellSelection;
@@ -571,6 +585,9 @@ private:
 
   // enable to watch file system in order to update file browser automatically
   bool m_watchFileSystem;
+
+  // enable OT command shortcut keys while renaming xsheet cell
+  bool m_shortcutCommandsWhileRenamingCellEnabled;
 
 private:
   Preferences();

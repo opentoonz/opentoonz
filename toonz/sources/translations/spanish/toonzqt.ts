@@ -404,7 +404,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Unit:</source>
-        <translation>Unidad:</translation>
+        <translation>Unidades:</translation>
     </message>
 </context>
 <context>
@@ -609,7 +609,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Unit:</source>
-        <translation>Unidad:</translation>
+        <translation>Unidades:</translation>
     </message>
     <message>
         <source>There is a circular reference in the definition of the interpolation.</source>
@@ -692,19 +692,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>En 1</translation>
+        <translation>Exposición x1</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>En 2</translation>
+        <translation>Exposición x2</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>En 3</translation>
+        <translation>Exposición x3</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>En 4</translation>
+        <translation>Exposición x4</translation>
     </message>
     <message>
         <source>Function Curves</source>
@@ -712,7 +712,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation>Suavizar</translation>
+        <translation>Suave</translation>
     </message>
     <message>
         <source>Frame Based</source>
@@ -720,7 +720,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Curve Shape</source>
-        <translation>Forma de la curva</translation>
+        <translation>Visualización de curvas</translation>
     </message>
 </context>
 <context>
@@ -815,7 +815,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>????</source>
-        <translation>¿¿??</translation>
+        <translation>????</translation>
     </message>
 </context>
 <context>
@@ -869,19 +869,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>En 1</translation>
+        <translation>Exposición x1</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>En 2</translation>
+        <translation>Exposición x2</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>En 3</translation>
+        <translation>Exposición x3</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>En 4</translation>
+        <translation>Exposición x4</translation>
     </message>
 </context>
 <context>
@@ -892,7 +892,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Function Editor Toggle</source>
-        <translation>Alternar editor de curvas de &amp;función</translation>
+        <translation>Alternar editor de &amp;curvas</translation>
     </message>
 </context>
 <context>
@@ -1042,7 +1042,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>FxSchematicLink</name>
     <message>
         <source>&amp;Delete</source>
-        <translation>&amp;Borrar.</translation>
+        <translation>&amp;Borrar</translation>
     </message>
     <message>
         <source>&amp;Paste Insert</source>
@@ -1166,7 +1166,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <name>PageViewer</name>
     <message>
         <source>Toggle Link to Studio Palette</source>
-        <translation>Alternar vínculo con paleta de estudio</translation>
+        <translation>Vincular a paleta de estudio</translation>
     </message>
     <message>
         <source>Remove Reference to Studio Palette</source>
@@ -1225,7 +1225,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>&amp;Palette Gizmo</source>
-        <translation>Control de &amp;paleta</translation>
+        <translation>Asistente de &amp;paleta</translation>
     </message>
     <message>
         <source>New Page</source>
@@ -1245,7 +1245,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Cleanup Palette</source>
-        <translation>Paleta de limpieza</translation>
+        <translation>Limpiar paleta</translation>
     </message>
     <message>
         <source>Studio Palette</source>
@@ -1269,7 +1269,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Style Name</source>
-        <translation>Nombre del estilo</translation>
+        <translation>Nombre de estilo</translation>
     </message>
     <message>
         <source>StudioPalette Name</source>
@@ -1556,7 +1556,7 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>SaveBox:      </source>
-        <translation>Marco de seguridad: </translation>
+        <translation type="unfinished">Marco delimitador: </translation>
     </message>
     <message>
         <source>Bits/Sample:  </source>
@@ -1612,11 +1612,11 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>Camera Size:      </source>
-        <translation>Tamaño de la cámara: </translation>
+        <translation>Tamaño de cámara: </translation>
     </message>
     <message>
         <source>Camera Dpi:       </source>
-        <translation>PPP de la cámara: </translation>
+        <translation>PPP de cámara: </translation>
     </message>
     <message>
         <source>Number of Frames: </source>
@@ -1672,7 +1672,7 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>Sample Size:      </source>
-        <translation>Tamaño de la muestra:</translation>
+        <translation>Tamaño de las muestras:</translation>
     </message>
     <message>
         <source>The file %1 does not exist.</source>
@@ -1933,7 +1933,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>&amp;Swtich output port display mode</source>
-        <translation>&amp;Cambiar modo de visualización del puerto de salida</translation>
+        <translation>&amp;Cambiar visualización de puertos de salida</translation>
     </message>
 </context>
 <context>
@@ -2203,11 +2203,11 @@ Autom</translation>
     </message>
     <message>
         <source>Style Name</source>
-        <translation>Nombre del estilo</translation>
+        <translation>Nombre de estilo</translation>
     </message>
     <message>
         <source>Name Editor: # %1</source>
-        <translation>Editor de nombres: № %1</translation>
+        <translation>Editor de nombres:  Estilo № %1</translation>
     </message>
 </context>
 <context>

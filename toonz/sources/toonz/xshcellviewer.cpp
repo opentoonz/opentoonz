@@ -549,8 +549,16 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   TXshCell cell = xsh->getCell(row, col);
   QPoint xy     = m_viewer->positionToXY(CellPosition(row, col)) - QPoint(1, 2);
   if (!cell.isEmpty()) {
-    setFixedSize(o->cellWidth(), o->cellHeight() + 2);
-    move(xy + QPoint(1, 1));
+    // Do not cover left side of the cell in order to enable grabbing the drag
+    // handle
+    if (o->isVerticalTimeline()) {
+      int dragHandleWidth = o->rect(PredefinedRect::DRAG_HANDLE_CORNER).width();
+      setFixedSize(o->cellWidth() - dragHandleWidth, o->cellHeight() + 2);
+      move(xy + QPoint(1 + dragHandleWidth, 1));
+    } else {
+      setFixedSize(o->cellWidth(), o->cellHeight() + 2);
+      move(xy + QPoint(1, 1));
+    }
 
     TFrameId fid           = cell.getFrameId();
     std::wstring levelName = cell.m_level->getName();
@@ -730,27 +738,45 @@ void RenameCellField::focusOutEvent(QFocusEvent *e) {
 // Override shortcut keys for cell selection commands
 
 bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
-  if (e->type() != QEvent::ShortcutOverride) return false;
+  if (e->type() != QEvent::ShortcutOverride)
+    return QLineEdit::eventFilter(obj, e);  // return false;
 
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
-  if (!cellSelection) return false;
+  if (!cellSelection) return QLineEdit::eventFilter(obj, e);
 
   QKeyEvent *ke = (QKeyEvent *)e;
   std::string keyStr =
       QKeySequence(ke->key() + ke->modifiers()).toString().toStdString();
   QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
-  if (!action) return false;
+  if (!action) return QLineEdit::eventFilter(obj, e);
 
   std::string actionId = CommandManager::instance()->getIdFromAction(action);
 
-  if (actionId == "MI_Undo" || actionId == "MI_Redo") return true;
+  // These are usally standard ctrl/command strokes for text editing.
+  // Default to standard behavior and don't execute OT's action while renaming
+  // cell if users prefer to do so.
+  // Or, always invoke OT's commands when renaming cell even the standard
+  // command strokes for text editing.
+  // The latter option is demanded by Japanese animation industry in order to
+  // gain efficiency for inputting xsheet.
+  if (!Preferences::instance()->isShortcutCommandsWhileRenamingCellEnabled() &&
+      (actionId == "MI_Undo" || actionId == "MI_Redo" ||
+       actionId == "MI_Clear" || actionId == "MI_Copy" ||
+       actionId == "MI_Paste" || actionId == "MI_Cut"))
+    return QLineEdit::eventFilter(obj, e);
+
   return TCellSelection::isEnabledCommand(actionId);
 }
 
 //-----------------------------------------------------------------------------
 
 void RenameCellField::keyPressEvent(QKeyEvent *event) {
+  if (event->key() == Qt::Key_Escape) {
+    clearFocus();
+    return;
+  }
+
   // move the cell selection
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
@@ -768,8 +794,16 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
   switch (int key = event->key()) {
   case Qt::Key_Up:
   case Qt::Key_Down:
+    offset = m_viewer->orientation()->arrowShift(key);
+    break;
   case Qt::Key_Left:
   case Qt::Key_Right:
+    // ctrl+left/right arrow for moving cursor to the end in the field
+    if (isCtrlPressed &&
+        !Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled()) {
+      QLineEdit::keyPressEvent(event);
+      return;
+    }
     offset = m_viewer->orientation()->arrowShift(key);
     break;
   default:
@@ -1394,6 +1428,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 
   // if the same level & same fId with the previous cell,
   // draw continue line
+  QString fnum;
   if (sameLevel && prevCell.m_frameId == cell.m_frameId) {
     // not on line marker
     PredefinedLine which =
@@ -1411,17 +1446,17 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     // convert the last one digit of the frame number to alphabet
     // Ex.  12 -> 1B    21 -> 2A   30 -> 3
     if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
-      p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom,
-                 m_viewer->getFrameNumberWithLetters(fid.getNumber()));
+      fnum = m_viewer->getFrameNumberWithLetters(fid.getNumber());
     else {
       std::string frameNumber("");
       // set number
       if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
       // add letter
       if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
-      p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom,
-                 QString::fromStdString(frameNumber));
+      fnum = QString::fromStdString(frameNumber);
     }
+
+    p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom, fnum);
   }
 
   // draw level name
@@ -1430,11 +1465,14 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
        Preferences::instance()->isLevelNameOnEachMarkerEnabled())) {
     std::wstring levelName = cell.m_level->getName();
     QString text           = QString::fromStdWString(levelName);
-#if QT_VERSION >= 0x050500
     QFontMetrics fm(font);
-    QString elidaName = elideText(text, fm, nameRect.width(), QString("~"));
+#if QT_VERSION >= 0x050500
+    //    QFontMetrics fm(font);
+    QString elidaName =
+        elideText(text, fm, nameRect.width() - fm.width(fnum), QString("~"));
 #else
-    QString elidaName = elideText(text, font, nameRect.width());
+    QString elidaName =
+        elideText(text, font, nameRect.width() - fm.width(fnum));
 #endif
     p.drawText(nameRect, Qt::AlignLeft | Qt::AlignBottom, elidaName);
   }
@@ -1704,8 +1742,8 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
   c0                = visible.from().layer();
   c1                = visible.to().layer();
 
-  static QPixmap selectedKey = QPixmap(":Resources/selected_key.bmp");
-  static QPixmap key         = QPixmap(":Resources/key.bmp");
+  static QPixmap selectedKey = svgToPixmap(":Resources/selected_key.svg");
+  static QPixmap key         = svgToPixmap(":Resources/key.svg");
   const QRect &keyRect       = o->rect(PredefinedRect::KEY_ICON);
 
   TXsheet *xsh         = m_viewer->getXsheet();

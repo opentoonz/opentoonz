@@ -1,0 +1,455 @@
+/* -----------------------------------------------------------------------------
+   Core
+----------------------------------------------------------------------------- */
+
+QWidget {
+  background-color: @bg;
+  color: @text-color;
+  &:disabled {
+    color: @text-color-disabled;
+  }
+}
+
+QFrame {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Tooltip
+----------------------------------------------------------------------------- */
+
+QToolTip,
+#helpToolTip {
+  background-color: #ffffe1;
+  border: 1px solid #000;
+  color: #000;
+  padding: 1px 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Dock Separator
+----------------------------------------------------------------------------- */
+
+#DockSeparator,
+QMainWindow::separator,
+QSplitter::handle {
+  background-color: @dock-bg-color;
+  height: 4px;
+  width: 4px;
+}
+
+#TDockPlaceholder {
+  background-color: @dock-placeholder-color;
+}
+
+TPanel {
+  background-color: @window-border-color;
+}
+
+/* -----------------------------------------------------------------------------
+   Topbar
+----------------------------------------------------------------------------- */
+
+#TopBar {
+  background: @topbar-bg-color;
+  border: 0;
+  border-bottom: 1px solid @accent;
+  height: 21px;
+  & #EditToolLockButton {
+    background: @topbar-bg-color;
+    spacing: 0;
+    &::indicator {
+      // This inherits from #ToolOptions (layouts/toolbar)
+      background: none;
+      border: none;
+      height: 18px;
+      margin: 1px 2px 0 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}
+
+#TopBarTabContainer {
+  background-color: @topbar-bg-color;
+  margin-bottom: 1px; // Required for #TopBar border-bottom to show
+}
+
+#StackedMenuBar {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+QMenuBar {
+  background-color: @topbar-bg-color;
+  border: 0;
+  &::item {
+    background-color: @topbar-bg-color;
+    border-left: 1px solid @topbar-bg-color; // Helps to align with QMenu
+    margin: 0;
+    padding: 3px 5px;
+    &:selected {
+      .selected-secondary;
+    }
+    &:pressed {
+      .selected-primary;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Workspaces
+----------------------------------------------------------------------------- */
+
+#TopBarTab {
+  margin: 0;
+  padding: 0;
+  &::tab {
+    background-color: @rooms-tab-bg-color;
+    border-top: 1px solid @accent;
+    border-right: 1px solid @accent;
+    color: @rooms-tab-text-color;
+    margin: 0 0 0 0;
+    padding: 2px 8px 3px 8px;
+    &:hover {
+      background-color: @rooms-tab-bg-color-hover;
+      color: @rooms-text-color-hover;
+    }
+    &:selected {
+      background-color: @rooms-tab-bg-color-selected;
+      color: @rooms-tab-text-color-selected;
+    }
+    &:first {
+      border-left: 1px solid @accent;
+    }
+    &:last {
+      border-right: 1px solid @accent;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Menu
+----------------------------------------------------------------------------- */
+
+QMenu {
+  background-color: @menu-bg-color;
+  border: 1px solid @menu-border-color;
+  padding: 2px 0;
+  &::item {
+    padding: 3px 28px;
+    &:selected {
+      .selected-primary;
+    }
+    &:checked {
+      color: @menu-checkbox-text-color-selected;
+      &:selected {
+        .selected-primary;
+      }
+    }
+    &:disabled {
+      background: none;
+      color: @text-color-disabled;
+      &:selected {
+        border-color: transparent;
+      }
+    }
+  }
+  &::separator {
+    border-top: 1px solid @menu-separator-color;
+    height: 0;
+    margin: 2px 0;
+  }
+  &::icon {
+    border-radius: 2px;
+    margin: 0 0 0 3px;
+    padding: 1px;
+    &:checked {
+      background-color: @selected-bg-color;
+    }
+  }
+  &::indicator {
+    &:extend(.CheckBox::indicator all);
+    margin-left: 7px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Titlebars
+----------------------------------------------------------------------------- */
+
+TPanelTitleBar {
+  background-color: @title-bg-color;
+  border-color: @accent;
+  border-style: solid;
+  border-width: 0 0 1px 0;
+  height: 20px;
+  min-height: 20px;
+  qproperty-TitleColor: @title-text-color;
+  qproperty-ActiveTitleColor: @title-text-color-active;
+  // QSS only works when pixmaps are set as 'none'
+  qproperty-BorderPixmap: url('none');
+  qproperty-ActiveBorderPixmap: url('none');
+  qproperty-FloatBorderPixmap: url('none');
+  qproperty-FloatActiveBorderPixmap: url('none');
+}
+
+/* -----------------------------------------------------------------------------
+   Scrollbars
+----------------------------------------------------------------------------- */
+
+QAbstractScrollArea::corner {
+  background-color: @scrollbar-bg-color;
+}
+
+QScrollBar {
+  background-color: @scrollbar-bg-color;
+  border: 0;
+  &:horizontal {
+    height: 16px;
+    margin: 0;
+  }
+  &:vertical {
+    margin: 0;
+    width: 16px;
+  }
+
+  &::handle {
+    border: @scrollbar-handle-border-size solid @scrollbar-handle-border-color;
+    border-radius: @scrollbar-handle-radius;
+    &:horizontal,
+    &:vertical {
+      &:hover {
+        background-color: @scrollbar-handle-bg-color-hover;
+        border-color: @scrollbar-handle-border-color-hover;
+      }
+      &:pressed {
+        background-color: @scrollbar-handle-bg-color-pressed;
+        border-color: @scrollbar-handle-border-color-pressed;
+      }
+    }
+    &:horizontal {
+      background-color: @scrollbar-handle-bg-color;
+      margin: @scrollbar-handle-margin 16px;
+      min-width: 20px;
+    }
+    &:vertical {
+      background-color: @scrollbar-handle-bg-color;
+      margin: 16px @scrollbar-handle-margin;
+      min-height: 20px;
+    }
+  }
+
+  &::add-line {
+    subcontrol-origin: margin;
+    border: 0;
+    &:horizontal { // right
+      subcontrol-position: right;
+      background-color: @scrollbar-bg-color;
+      margin: 0;
+      width: 16px;
+    }
+    &:vertical { // down
+      subcontrol-position: bottom;
+      background-color: @scrollbar-bg-color;
+      margin: 0;
+      height: 16px;
+    }
+  }
+
+  &::sub-line {
+    border: 0;
+    subcontrol-origin: margin;
+    &:horizontal { // left
+      subcontrol-position: left;
+      background-color: @scrollbar-bg-color;
+      margin: 0;
+      width: 16px;
+    }
+    &:vertical { // up
+      subcontrol-position: top;
+      background-color: @scrollbar-bg-color;
+      margin: 0;
+      height: 16px;
+    }
+  }
+
+  &::up-arrow:vertical {
+    image: url('@{img-url}/scroll-up.svg');
+    image-position: center center;
+  }
+
+  &::down-arrow:vertical {
+    image: url('@{img-url}/scroll-down.svg');
+    image-position: center center;
+  }
+
+  &::left-arrow:horizontal {
+    image: url('@{img-url}/scroll-left.svg');
+    image-position: center center;
+  }
+
+  &::right-arrow:horizontal {
+    image: url('@{img-url}/scroll-right.svg');
+    image-position: center center;
+  }
+
+  &::sub-page,
+  &::add-page {
+    &:horizontal,
+    &:vertical {
+      background: none;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Tool Bars
+----------------------------------------------------------------------------- */
+
+// This applies to QToolBar (Qt).
+// This is not the #ToolBar widget window.
+// Look in [layouts/toolbar] if you're looking for the window.
+
+QToolBar {
+  padding: 0;
+  &::separator {
+    &:horizontal {
+      border-left: 1px solid @accent;
+      margin: 0 1px;
+      width: 0;
+    }
+    &:vertical {
+      border-top: 1px solid @accent;
+      height: 0;
+      margin: 1px 0;
+    }
+  }
+  QToolButton {
+    &:extend(.button-tool all);
+    &::menu-indicator {
+      image: none;
+    }
+    &::menu-button {
+      border-image: none;
+    }
+  }
+  & QLabel {
+    margin-top: 1px;
+  }
+  & QToolBar {
+    border: 0;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Scrollable QToolBar buttons.
+// This is a global style so pay attention to #ComboViewer and #PaletteViewer
+// versions when tweaking these as they use unique positioning.
+
+DvScrollWidget {
+  & QPushButton {
+    background-color: @button-bg-color;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    max-width: 16px;
+    min-width: 16px;
+    &:hover {
+      background-color: @button-bg-color-hover;
+    }
+    &:pressed {
+      background-color: @button-bg-color-pressed;
+    }
+  }
+}
+
+#ScrollLeftButton,
+#ScrollRightButton,
+#ScrollUpButton,
+#ScrollDownButton {
+  background-color: @bg;
+  background-clip: padding;
+  background-origin: padding;
+  max-width: 16px;
+  min-width: 16px;
+  padding: 0;
+  margin: 0;
+  &:hover {
+    background-color: @button-bg-color-hover;
+  }
+  &:pressed {
+    background-color: @button-bg-color-pressed;
+  }
+}
+#ScrollLeftButton {
+  image: url('@{img-url}/scroll-left.svg');
+  border-right: 1px solid @accent;
+}
+#ScrollRightButton {
+  image: url('@{img-url}/scroll-right.svg');
+  border-left: 1px solid @accent;
+  border-right: 1px solid @accent; // For FpsSlider only
+}
+#ScrollUpButton {
+  image: url('@{img-url}/scroll-up.svg');
+}
+#ScrollDownButton {
+  image: url('@{img-url}/scroll-down.svg');
+}
+
+/* -------------------------------------------------------------------------- */
+
+#keyFrameNavigator {
+  background: none;
+  margin: 0;
+  padding: 0;
+  & QToolButton {
+    min-width: 18px;
+  }
+  #PreviousKey {
+    image: url('@{img-url}/prevkey.svg');
+    &:hover {
+      image: url('@{img-url}/prevkey_over.svg');
+    }
+	  &:disabled {
+		  image: url('@{img-url}/prevkey_disabled.svg');
+	  }
+  }
+  #NextKey {
+    image: url('@{img-url}/nextkey.svg');
+    &:hover {
+      image: url('@{img-url}/nextkey_over.svg');
+    }
+	  &:disabled {
+		  image: url('@{img-url}/nextkey_disabled.svg');
+	  }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Tree Systems
+----------------------------------------------------------------------------- */
+
+QTreeWidget {
+  &:extend(.tree-list all);
+  background: @tree-bg-color;
+  alternate-background-color: @tree-bg-color-alt;
+}
+
+QListView {
+  outline: 0; // Hide focus border
+}
+
+/* -----------------------------------------------------------------------------
+   Tab Systems
+----------------------------------------------------------------------------- */
+
+#TabBarContainer {
+  &:extend(.tab-container all);
+  background-color: @tabbar-bg-color;
+}

@@ -20,7 +20,6 @@
 #include "toonz/toonzscene.h"
 #include "toutputproperties.h"
 #include "toonz/sceneproperties.h"
-#include "toonz/namebuilder.h"
 #include "toonz/levelset.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/toonzfolders.h"
@@ -36,6 +35,7 @@
 #include "tsystem.h"
 #include "tpixelutils.h"
 #include "tenv.h"
+#include "tlevel_io.h"
 
 #include <algorithm>
 
@@ -379,6 +379,90 @@ void openCaptureFilterSettings(const QWidget* parent,
 }
 #endif
 
+QString convertToFrameWithLetter(int value, int length = -1) {
+  QString str;
+  str.setNum((int)(value / 10));
+  while (str.length() < length) str.push_front("0");
+  QChar letter = numToLetter(value % 10);
+  if (!letter.isNull()) str.append(letter);
+  return str;
+}
+
+QString fidsToString(const std::vector<TFrameId>& fids,
+                     bool letterOptionEnabled) {
+  if (fids.empty()) return PencilTestPopup::tr("No", "frame id");
+  QString retStr("");
+  if (letterOptionEnabled) {
+    bool beginBlock = true;
+    for (int f = 0; f < fids.size() - 1; f++) {
+      int num      = fids[f].getNumber();
+      int next_num = fids[f + 1].getNumber();
+
+      if (num % 10 == 0 && num + 10 == next_num) {
+        if (beginBlock) {
+          retStr += convertToFrameWithLetter(num) + " - ";
+          beginBlock = false;
+        }
+      } else {
+        retStr += convertToFrameWithLetter(num) + ", ";
+        beginBlock = true;
+      }
+    }
+    retStr += convertToFrameWithLetter(fids.back().getNumber());
+  } else {
+    bool beginBlock = true;
+    for (int f = 0; f < fids.size() - 1; f++) {
+      int num      = fids[f].getNumber();
+      int next_num = fids[f + 1].getNumber();
+      if (num + 1 == next_num) {
+        if (beginBlock) {
+          retStr += QString::number(num) + " - ";
+          beginBlock = false;
+        }
+      } else {
+        retStr += QString::number(num) + ", ";
+        beginBlock = true;
+      }
+    }
+    retStr += QString::number(fids.back().getNumber());
+  }
+  return retStr;
+}
+
+bool findCell(TXsheet* xsh, int col, const TXshCell& targetCell,
+              int& bottomRowWithTheSameLevel) {
+  bottomRowWithTheSameLevel = -1;
+  TXshColumnP column        = const_cast<TXsheet*>(xsh)->getColumn(col);
+  if (!column) return false;
+
+  TXshCellColumn* cellColumn = column->getCellColumn();
+  if (!cellColumn) return false;
+
+  int r0, r1;
+  if (!cellColumn->getRange(r0, r1)) return false;
+
+  for (int r = r0; r <= r1; r++) {
+    TXshCell cell = cellColumn->getCell(r);
+    if (cell == targetCell) return true;
+    if (cell.m_level == targetCell.m_level) bottomRowWithTheSameLevel = r;
+  }
+
+  return false;
+}
+
+bool getRasterLevelSize(TXshLevel* level, TDimension& dim) {
+  std::vector<TFrameId> fids;
+  level->getFids(fids);
+  if (fids.empty()) return false;
+  TXshSimpleLevel* simpleLevel = level->getSimpleLevel();
+  if (!simpleLevel) return false;
+  TRasterImageP rimg = (TRasterImageP)simpleLevel->getFrame(fids[0], false);
+  if (!rimg || rimg->isEmpty()) return false;
+
+  dim = rimg->getRaster()->getSize();
+  return true;
+}
+
 }  // namespace
 
 //=============================================================================
@@ -495,10 +579,7 @@ void FrameNumberLineEdit::setValue(int value) {
 
   QString str;
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
-    str.setNum((int)(value / 10));
-    while (str.length() < 3) str.push_front("0");
-    QChar letter = numToLetter(value % 10);
-    if (!letter.isNull()) str.append(letter);
+    str = convertToFrameWithLetter(value, 3);
   } else {
     str.setNum(value);
     while (str.length() < 4) str.push_front("0");
@@ -525,7 +606,9 @@ int FrameNumberLineEdit::getValue() {
 
 //-----------------------------------------------------------------------------
 
-void FrameNumberLineEdit::focusOutEvent(QFocusEvent*) {}
+void FrameNumberLineEdit::focusOutEvent(QFocusEvent* e) {
+  LineEdit::focusOutEvent(e);
+}
 
 //=============================================================================
 
@@ -549,6 +632,46 @@ void LevelNameLineEdit::onEditingFinished() {
   if (text() == m_textOnFocusIn) return;
 
   emit levelNameEdited();
+}
+
+//=============================================================================
+
+std::wstring FlexibleNameCreator::getPrevious() {
+  if (m_s.empty() || (m_s[0] == 0 && m_s.size() == 1)) {
+    m_s.push_back('Z' - 'A');
+    m_s.push_back('Z' - 'A');
+    return L"ZZ";
+  }
+  int i = 0;
+  int n = m_s.size();
+  while (i < n) {
+    m_s[i]--;
+    if (m_s[i] >= 0) break;
+    m_s[i] = 'Z' - 'A';
+    i++;
+  }
+  if (i >= n) {
+    n--;
+    m_s.pop_back();
+  }
+  std::wstring s;
+  for (i = n - 1; i >= 0; i--) s.append(1, (wchar_t)(L'A' + m_s[i]));
+  return s;
+}
+
+//-------------------------------------------------------------------
+
+bool FlexibleNameCreator::setCurrent(std::wstring name) {
+  if (name.empty() || name.size() > 2) return false;
+  std::vector<int> newNameBuf;
+  for (std::wstring::iterator it = name.begin(); it != name.end(); ++it) {
+    int s = (int)((*it) - L'A');
+    if (s < 0 || s > 'Z' - 'A') return false;
+    newNameBuf.push_back(s);
+  }
+  m_s.clear();
+  for (int i = newNameBuf.size() - 1; i >= 0; i--) m_s.push_back(newNameBuf[i]);
+  return true;
 }
 
 //=============================================================================
@@ -907,12 +1030,15 @@ PencilTestPopup::PencilTestPopup()
   int startFrame =
       Preferences::instance()->isShowFrameNumberWithLettersEnabled() ? 10 : 1;
   m_frameNumberEdit        = new FrameNumberLineEdit(this, startFrame);
+  m_frameInfoLabel         = new QLabel("", this);
   m_fileTypeCombo          = new QComboBox(this);
   m_fileFormatOptionButton = new QPushButton(tr("Options"), this);
 
   m_saveInFileFld = new FileField(this, m_saveInFolderPopup->getParentPath());
 
   QToolButton* nextLevelButton = new QToolButton(this);
+  m_previousLevelButton        = new QToolButton(this);
+
   m_saveOnCaptureCB =
       new QCheckBox(tr("Save images as they are captured"), this);
 
@@ -959,9 +1085,13 @@ PencilTestPopup::PencilTestPopup()
 
   fileFrame->setObjectName("CleanupSettingsFrame");
   m_frameNumberEdit->setObjectName("LargeSizedText");
+  m_frameInfoLabel->setAlignment(Qt::AlignRight);
   nextLevelButton->setFixedSize(24, 24);
   nextLevelButton->setArrowType(Qt::RightArrow);
   nextLevelButton->setToolTip(tr("Next Level"));
+  m_previousLevelButton->setFixedSize(24, 24);
+  m_previousLevelButton->setArrowType(Qt::LeftArrow);
+  m_previousLevelButton->setToolTip(tr("Previous Level"));
   m_saveOnCaptureCB->setChecked(true);
 
   imageFrame->setObjectName("CleanupSettingsFrame");
@@ -1060,16 +1190,30 @@ PencilTestPopup::PencilTestPopup()
           {
             levelLay->addWidget(new QLabel(tr("Name:"), this), 0, 0,
                                 Qt::AlignRight);
-            levelLay->addWidget(m_levelNameEdit, 0, 1);
-            levelLay->addWidget(nextLevelButton, 0, 2);
+            QHBoxLayout* nameLay = new QHBoxLayout();
+            nameLay->setMargin(0);
+            nameLay->setSpacing(2);
+            {
+              nameLay->addWidget(m_previousLevelButton, 0);
+              nameLay->addWidget(m_levelNameEdit, 1);
+              nameLay->addWidget(nextLevelButton, 0);
+            }
+            levelLay->addLayout(nameLay, 0, 1);
 
             levelLay->addWidget(new QLabel(tr("Frame:"), this), 1, 0,
                                 Qt::AlignRight);
-            levelLay->addWidget(m_frameNumberEdit, 1, 1);
+
+            QHBoxLayout* frameLay = new QHBoxLayout();
+            frameLay->setMargin(0);
+            frameLay->setSpacing(2);
+            {
+              frameLay->addWidget(m_frameNumberEdit, 1);
+              frameLay->addWidget(m_frameInfoLabel, 1, Qt::AlignVCenter);
+            }
+            levelLay->addLayout(frameLay, 1, 1);
           }
           levelLay->setColumnStretch(0, 0);
           levelLay->setColumnStretch(1, 1);
-          levelLay->setColumnStretch(2, 0);
           fileLay->addLayout(levelLay, 0);
 
           QHBoxLayout* fileTypeLay = new QHBoxLayout();
@@ -1173,6 +1317,8 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(onLevelNameEdited()));
   ret = ret &&
         connect(nextLevelButton, SIGNAL(pressed()), this, SLOT(onNextName()));
+  ret = ret && connect(m_previousLevelButton, SIGNAL(pressed()), this,
+                       SLOT(onPreviousName()));
   ret = ret && connect(m_colorTypeCombo, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onColorTypeComboChanged(int)));
   ret = ret && connect(m_captureWhiteBGButton, SIGNAL(pressed()), this,
@@ -1200,6 +1346,12 @@ PencilTestPopup::PencilTestPopup()
                          SLOT(onCaptureFilterSettingsBtnPressed()));
   ret = ret && connect(subfolderButton, SIGNAL(clicked(bool)), this,
                        SLOT(openSaveInFolderPopup()));
+  ret = ret && connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
+                       SLOT(refreshFrameInfo()));
+  ret = ret && connect(m_fileTypeCombo, SIGNAL(activated(int)), this,
+                       SLOT(refreshFrameInfo()));
+  ret = ret && connect(m_frameNumberEdit, SIGNAL(editingFinished()), this,
+                       SLOT(refreshFrameInfo()));
   assert(ret);
 
   refreshCameraList();
@@ -1220,7 +1372,7 @@ PencilTestPopup::PencilTestPopup()
     }
   }
 
-  onNextName();
+  setToNextNewLevel();
 }
 
 //-----------------------------------------------------------------------------
@@ -1394,6 +1546,8 @@ void PencilTestPopup::onResolutionComboActivated(const QString& itemText) {
 
   // update env
   CamCapCameraResolution = itemText.toStdString();
+
+  refreshFrameInfo();
 }
 
 //-----------------------------------------------------------------------------
@@ -1411,17 +1565,52 @@ void PencilTestPopup::onFileFormatOptionButtonPressed() {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onLevelNameEdited() {
-  // set the start frame 10 if the option in preferences
-  // "Show ABC Appendix to the Frame Number in Xsheet Cell" is active.
-  // (frame 10 is displayed as "1" with this option)
-  int startFrame =
-      Preferences::instance()->isShowFrameNumberWithLettersEnabled() ? 10 : 1;
-  m_frameNumberEdit->setValue(startFrame);
+  updateLevelNameAndFrame(m_levelNameEdit->text().toStdWString());
+}
+
+//-----------------------------------------------------------------------------
+void PencilTestPopup::onNextName() {
+  std::unique_ptr<FlexibleNameCreator> nameCreator(new FlexibleNameCreator());
+  if (!nameCreator->setCurrent(m_levelNameEdit->text().toStdWString())) {
+    setToNextNewLevel();
+    return;
+  }
+
+  std::wstring levelName = nameCreator->getNext();
+
+  updateLevelNameAndFrame(levelName);
 }
 
 //-----------------------------------------------------------------------------
 
-void PencilTestPopup::onNextName() {
+void PencilTestPopup::onPreviousName() {
+  std::unique_ptr<FlexibleNameCreator> nameCreator(new FlexibleNameCreator());
+
+  std::wstring levelName;
+
+  // if the current level name is non-sequencial, then try to switch the last
+  // sequencial level in the scene.
+  if (!nameCreator->setCurrent(m_levelNameEdit->text().toStdWString())) {
+    TLevelSet* levelSet =
+        TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
+    nameCreator->setCurrent(L"ZZ");
+    for (;;) {
+      levelName = nameCreator->getPrevious();
+      if (levelSet->getLevel(levelName) != 0) break;
+      if (levelName == L"A") {
+        setToNextNewLevel();
+        return;
+      }
+    }
+  } else
+    levelName = nameCreator->getPrevious();
+
+  updateLevelNameAndFrame(levelName);
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::setToNextNewLevel() {
   const std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
 
   TLevelSet* levelSet =
@@ -1450,13 +1639,41 @@ void PencilTestPopup::onNextName() {
     break;
   }
 
-  m_levelNameEdit->setText(QString::fromStdWString(levelName));
+  updateLevelNameAndFrame(levelName);
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::updateLevelNameAndFrame(std::wstring levelName) {
+  if (levelName != m_levelNameEdit->text().toStdWString())
+    m_levelNameEdit->setText(QString::fromStdWString(levelName));
+  m_previousLevelButton->setDisabled(levelName == L"A");
+
   // set the start frame 10 if the option in preferences
   // "Show ABC Appendix to the Frame Number in Xsheet Cell" is active.
   // (frame 10 is displayed as "1" with this option)
-  int startFrame =
-      Preferences::instance()->isShowFrameNumberWithLettersEnabled() ? 10 : 1;
+  bool withLetter =
+      Preferences::instance()->isShowFrameNumberWithLettersEnabled();
+
+  TLevelSet* levelSet =
+      TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
+  TXshLevel* level_p = levelSet->getLevel(levelName);
+  int startFrame;
+  if (!level_p) {
+    startFrame = withLetter ? 10 : 1;
+  } else {
+    std::vector<TFrameId> fids;
+    level_p->getFids(fids);
+    if (fids.empty()) {
+      startFrame = withLetter ? 10 : 1;
+    } else {
+      int lastNum = fids.back().getNumber();
+      startFrame  = withLetter ? ((int)(lastNum / 10) + 1) * 10 : lastNum + 1;
+    }
+  }
   m_frameNumberEdit->setValue(startFrame);
+
+  refreshFrameInfo();
 }
 
 //-----------------------------------------------------------------------------
@@ -1489,6 +1706,11 @@ void PencilTestPopup::onImageCaptured(int id, const QImage& image) {
         m_frameNumberEdit->setValue(((int)(f / 10) + 1) * 10);
       } else
         m_frameNumberEdit->setValue(m_frameNumberEdit->getValue() + 1);
+
+      /* notify */
+      TApp::instance()->getCurrentScene()->notifySceneChanged();
+      TApp::instance()->getCurrentScene()->notifyCastChange();
+      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 
       // restart interval timer for capturing next frame (it is single shot)
       if (m_timerCB->isChecked() && m_captureButton->isChecked()) {
@@ -1539,6 +1761,11 @@ void PencilTestPopup::showEvent(QShowEvent* event) {
     if (m_currentCamera->state() == QCamera::LoadedState)
       m_currentCamera->start();
   }
+
+  TSceneHandle* sceneHandle = TApp::instance()->getCurrentScene();
+  connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(refreshFrameInfo()));
+  connect(sceneHandle, SIGNAL(castChanged()), this, SLOT(refreshFrameInfo()));
+  refreshFrameInfo();
 }
 
 //-----------------------------------------------------------------------------
@@ -1564,6 +1791,12 @@ void PencilTestPopup::hideEvent(QHideEvent* event) {
       m_currentCamera->unload();
   }
   Dialog::hideEvent(event);
+
+  TSceneHandle* sceneHandle = TApp::instance()->getCurrentScene();
+  disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
+             SLOT(refreshFrameInfo()));
+  disconnect(sceneHandle, SIGNAL(castChanged()), this,
+             SLOT(refreshFrameInfo()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1783,6 +2016,8 @@ bool PencilTestPopup::importImage(QImage& image) {
   TXshSimpleLevel* sl = 0;
 
   TXshLevel* level = scene->getLevelSet()->getLevel(levelName);
+  enum State { NEWLEVEL = 0, ADDFRAME, OVERWRITE } state;
+
   /* if the level already exists in the scene cast */
   if (level) {
     /* if the existing level is not a raster level, then return */
@@ -1815,7 +2050,9 @@ bool PencilTestPopup::importImage(QImage& image) {
       int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
                               QObject::tr("Cancel"));
       if (ret == 0 || ret == 2) return false;
-    }
+      state = OVERWRITE;
+    } else
+      state = ADDFRAME;
   }
   /* if the level does not exist in the scene cast */
   else {
@@ -1838,13 +2075,15 @@ bool PencilTestPopup::importImage(QImage& image) {
       }
 
       /* confirm overwrite */
-      QString question =
-          tr("File %1 does exist.\nDo you want to overwrite it?")
-              .arg(toQString(actualLevelFp.withFrame(frameNumber)));
-      int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
-                              QObject::tr("Cancel"));
-      if (ret == 0 || ret == 2) return false;
-
+      TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
+      if (TFileStatus(frameFp).doesExist()) {
+        QString question =
+            tr("File %1 does exist.\nDo you want to overwrite it?")
+                .arg(toQString(frameFp));
+        int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
+                                QObject::tr("Cancel"));
+        if (ret == 0 || ret == 2) return false;
+      }
     }
     /* if the file does not exist, then create a new level */
     else {
@@ -1859,6 +2098,8 @@ bool PencilTestPopup::importImage(QImage& image) {
       sl->getProperties()->setImageRes(
           TDimension(image.width(), image.height()));
     }
+
+    state = NEWLEVEL;
   }
 
   TFrameId fid(frameNumber);
@@ -1879,36 +2120,65 @@ bool PencilTestPopup::importImage(QImage& image) {
   if (m_saveOnCaptureCB->isChecked()) sl->save();
 
   /* placement in xsheet */
+
   int row = app->getCurrentFrame()->getFrame();
   int col = app->getCurrentColumn()->getColumnIndex();
 
-  /* try to find the vacant cell */
-  int tmpRow = row;
-  while (1) {
-    /* if the same cell is already in the column, then just replace the content
-     * and do not set a new cell */
-    if (xsh->getCell(tmpRow, col) == TXshCell(sl, fid)) break;
-    /* in case setting the same level as the the current column */
-    else if (xsh->getCell(tmpRow, col).isEmpty()) {
-      xsh->setCell(tmpRow, col, TXshCell(sl, fid));
-      break;
-    }
-    /* in case the level is different from the current column, then insert a new
-       column */
-    else if (xsh->getCell(tmpRow, col).m_level->getSimpleLevel() != sl) {
+  // if the level is newly created or imported, then insert a new column
+  if (state == NEWLEVEL) {
+    if (!xsh->isColumnEmpty(col)) {
       col += 1;
       xsh->insertColumn(col);
-      xsh->setCell(row, col, TXshCell(sl, fid));
-      app->getCurrentColumn()->setColumnIndex(col);
-      break;
     }
-    tmpRow++;
+    xsh->setCell(row, col, TXshCell(sl, fid));
+    app->getCurrentColumn()->setColumnIndex(col);
+    return true;
   }
 
-  /* notify */
-  app->getCurrentScene()->notifySceneChanged();
-  app->getCurrentScene()->notifyCastChange();
-  app->getCurrentXsheet()->notifyXsheetChanged();
+  // state == OVERWRITE, ADDFRAME
+
+  // if the same cell is already in the column, then just replace the content
+  // and do not set a new cell
+  int foundCol, foundRow = -1;
+  // most possibly, it's in the current column
+  int rowCheck;
+  if (findCell(xsh, col, TXshCell(sl, fid), rowCheck)) return true;
+  if (rowCheck >= 0) {
+    foundRow = rowCheck;
+    foundCol = col;
+  }
+  // search entire xsheet
+  for (int c = 0; c < xsh->getColumnCount(); c++) {
+    if (c == col) continue;
+    if (findCell(xsh, c, TXshCell(sl, fid), rowCheck)) return true;
+    if (rowCheck >= 0) {
+      foundRow = rowCheck;
+      foundCol = c;
+    }
+  }
+  // if there is a column containing the same level
+  if (foundRow >= 0) {
+    // put the cell at the bottom
+    int tmpRow = foundRow + 1;
+    while (1) {
+      if (xsh->getCell(tmpRow, foundCol).isEmpty()) {
+        xsh->setCell(tmpRow, foundCol, TXshCell(sl, fid));
+        app->getCurrentColumn()->setColumnIndex(foundCol);
+        break;
+      }
+      tmpRow++;
+    }
+  }
+  // if the level is registered in the scene, but is not placed in the xsheet,
+  // then insert a new column
+  else {
+    if (!xsh->isColumnEmpty(col)) {
+      col += 1;
+      xsh->insertColumn(col);
+    }
+    xsh->setCell(row, col, TXshCell(sl, fid));
+    app->getCurrentColumn()->setColumnIndex(col);
+  }
 
   return true;
 }
@@ -1935,8 +2205,260 @@ void PencilTestPopup::openSaveInFolderPopup() {
   if (m_saveInFolderPopup->exec()) {
     QString oldPath = m_saveInFileFld->getPath();
     m_saveInFileFld->setPath(m_saveInFolderPopup->getPath());
-    if (oldPath == m_saveInFileFld->getPath()) onNextName();
+    if (oldPath == m_saveInFileFld->getPath())
+      setToNextNewLevel();
+    else
+      refreshFrameInfo();
   }
+}
+
+//-----------------------------------------------------------------------------
+
+// Refresh information that how many & which frames are saved for the current
+// level
+void PencilTestPopup::refreshFrameInfo() {
+  if (!m_currentCamera || m_deviceName.isNull()) {
+    m_frameInfoLabel->setText("");
+    return;
+  }
+
+  QString tooltipStr, labelStr;
+  enum InfoType { NEW = 0, ADD, OVERWRITE, WARNING } infoType(WARNING);
+
+  static QColor infoColors[4] = {Qt::cyan, Qt::green, Qt::yellow, Qt::red};
+
+  ToonzScene* currentScene = TApp::instance()->getCurrentScene()->getScene();
+  TLevelSet* levelSet      = currentScene->getLevelSet();
+
+  std::wstring levelName = m_levelNameEdit->text().toStdWString();
+  int frameNumber        = m_frameNumberEdit->getValue();
+
+  QStringList texts = m_resolutionCombo->currentText().split(' ');
+  if (texts.size() != 3) return;
+  TDimension camRes(texts[0].toInt(), texts[2].toInt());
+
+  bool letterOptionEnabled =
+      Preferences::instance()->isShowFrameNumberWithLettersEnabled();
+
+  // level with the same name
+  TXshLevel* level_sameName = levelSet->getLevel(levelName);
+
+  TFilePath levelFp = TFilePath(m_saveInFileFld->getPath()) +
+                      TFilePath(levelName + L".." +
+                                m_fileTypeCombo->currentText().toStdWString());
+
+  // level with the same path
+  TXshLevel* level_samePath = levelSet->getLevel(*(currentScene), levelFp);
+
+  TFilePath actualLevelFp = currentScene->decodeFilePath(levelFp);
+
+  // level existence
+  bool levelExist = TSystem::doesExistFileOrLevel(actualLevelFp);
+
+  // frame existence
+  TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
+  bool frameExist            = false;
+  if (levelExist) frameExist = TFileStatus(frameFp).doesExist();
+
+  // ### CASE 1 ###
+  // If there is no same level registered in the scene cast
+  if (!level_sameName && !level_samePath) {
+    // If there is a level in the file system
+    if (levelExist) {
+      TLevelReaderP lr;
+      TLevelP level_p;
+      try {
+        lr = TLevelReaderP(actualLevelFp);
+      } catch (...) {
+        // TODO: output something
+        m_frameInfoLabel->setText(tr("UNDEFINED WARNING"));
+        return;
+      }
+      if (!lr) {
+        // TODO: output something
+        m_frameInfoLabel->setText(tr("UNDEFINED WARNING"));
+        return;
+      }
+      try {
+        level_p = lr->loadInfo();
+      } catch (...) {
+        // TODO: output something
+        m_frameInfoLabel->setText(tr("UNDEFINED WARNING"));
+        return;
+      }
+      if (!level_p) {
+        // TODO: output something
+        m_frameInfoLabel->setText(tr("UNDEFINED WARNING"));
+        return;
+      }
+      int frameCount      = level_p->getFrameCount();
+      TLevel::Iterator it = level_p->begin();
+      std::vector<TFrameId> fids;
+      for (int i = 0; it != level_p->end(); ++it, ++i)
+        fids.push_back(it->first);
+
+      tooltipStr +=
+          tr("The level is not registered in the scene, but exists in the file "
+             "system.");
+
+      // check resolution
+      const TImageInfo* ii;
+      try {
+        ii = lr->getImageInfo(fids[0]);
+      } catch (...) {
+        // TODO: output something
+        m_frameInfoLabel->setText(tr("UNDEFINED WARNING"));
+        return;
+      }
+      TDimension dim(ii->m_lx, ii->m_ly);
+      // if the saved images has not the same resolution as the current camera
+      // resolution
+      if (camRes != dim) {
+        tooltipStr += tr("\nWARNING : Image size mismatch. The saved image "
+                         "size is %1 x %2.")
+                          .arg(dim.lx)
+                          .arg(dim.ly);
+        labelStr += tr("WARNING");
+        infoType = WARNING;
+      }
+      // if the resolutions are matched
+      else {
+        if (frameCount == 1)
+          tooltipStr += tr("\nFrame %1 exists.")
+                            .arg(fidsToString(fids, letterOptionEnabled));
+        else
+          tooltipStr += tr("\nFrames %1 exist.")
+                            .arg(fidsToString(fids, letterOptionEnabled));
+        // if the frame exists, then it will be overwritten
+        if (frameExist) {
+          labelStr += tr("OVERWRITE 1 of");
+          infoType = OVERWRITE;
+        } else {
+          labelStr += tr("ADD to");
+          infoType = ADD;
+        }
+        if (frameCount == 1)
+          labelStr += tr(" %1 frame").arg(frameCount);
+        else
+          labelStr += tr(" %1 frames").arg(frameCount);
+      }
+    }
+    // If no level exists in the file system, then it will be a new level
+    else {
+      tooltipStr += tr("The level will be newly created.");
+      labelStr += tr("NEW");
+      infoType = NEW;
+    }
+  }
+  // ### CASE 2 ###
+  // If there is already the level registered in the scene cast
+  else if (level_sameName && level_samePath &&
+           level_sameName == level_samePath) {
+    tooltipStr += tr("The level is already registered in the scene.");
+    if (!levelExist) tooltipStr += tr("\nNOTE : The level is not saved.");
+
+    std::vector<TFrameId> fids;
+    level_sameName->getFids(fids);
+
+    // check resolution
+    TDimension dim;
+    bool ret = getRasterLevelSize(level_sameName, dim);
+    if (!ret) {
+      tooltipStr +=
+          tr("\nWARNING : Failed to get image size of the existing level %1.")
+              .arg(QString::fromStdWString(levelName));
+      labelStr += tr("WARNING");
+      infoType = WARNING;
+    }
+    // if the saved images has not the same resolution as the current camera
+    // resolution
+    else if (camRes != dim) {
+      tooltipStr += tr("\nWARNING : Image size mismatch. The existing level "
+                       "size is %1 x %2.")
+                        .arg(dim.lx)
+                        .arg(dim.ly);
+      labelStr += tr("WARNING");
+      infoType = WARNING;
+    }
+    // if the resolutions are matched
+    else {
+      int frameCount = fids.size();
+      if (fids.size() == 1)
+        tooltipStr += tr("\nFrame %1 exists.")
+                          .arg(fidsToString(fids, letterOptionEnabled));
+      else
+        tooltipStr += tr("\nFrames %1 exist.")
+                          .arg(fidsToString(fids, letterOptionEnabled));
+      // Check if the target frame already exist in the level
+      bool hasFrame = false;
+      for (int f = 0; f < frameCount; f++) {
+        if (fids.at(f).getNumber() == frameNumber) {
+          hasFrame = true;
+          break;
+        }
+      }
+      // If there is already the frame then it will be overwritten
+      if (hasFrame) {
+        labelStr += tr("OVERWRITE 1 of");
+        infoType = OVERWRITE;
+      }
+      // Or, the frame will be added to the level
+      else {
+        labelStr += tr("ADD to");
+        infoType = ADD;
+      }
+      if (frameCount == 1)
+        labelStr += tr(" %1 frame").arg(frameCount);
+      else
+        labelStr += tr(" %1 frames").arg(frameCount);
+    }
+  }
+  // ### CASE 3 ###
+  // If there are some conflicts with the existing level.
+  else {
+    if (level_sameName) {
+      TFilePath anotherPath = level_sameName->getPath();
+      tooltipStr +=
+          tr("WARNING : Level name conflicts. There already is a level %1 in the scene with the path\
+                        \n          %2.")
+              .arg(QString::fromStdWString(levelName))
+              .arg(toQString(anotherPath));
+      // check resolution
+      TDimension dim;
+      bool ret = getRasterLevelSize(level_sameName, dim);
+      if (ret && camRes != dim)
+        tooltipStr += tr("\nWARNING : Image size mismatch. The size of level "
+                         "with the same name is is %1 x %2.")
+                          .arg(dim.lx)
+                          .arg(dim.ly);
+    }
+    if (level_samePath) {
+      std::wstring anotherName = level_samePath->getName();
+      if (!tooltipStr.isEmpty()) tooltipStr += QString("\n");
+      tooltipStr +=
+          tr("WARNING : Level path conflicts. There already is a level with the path %1\
+                        \n          in the scene with the name %2.")
+              .arg(toQString(levelFp))
+              .arg(QString::fromStdWString(anotherName));
+      // check resolution
+      TDimension dim;
+      bool ret = getRasterLevelSize(level_samePath, dim);
+      if (ret && camRes != dim)
+        tooltipStr += tr("\nWARNING : Image size mismatch. The size of level "
+                         "with the same path is %1 x %2.")
+                          .arg(dim.lx)
+                          .arg(dim.ly);
+    }
+    labelStr += tr("WARNING");
+    infoType = WARNING;
+  }
+
+  QColor infoColor = infoColors[(int)infoType];
+  m_frameInfoLabel->setStyleSheet(QString("QLabel{color: %1;}\
+                                          QLabel QWidget{ color: black;}")
+                                      .arg(infoColor.name()));
+  m_frameInfoLabel->setText(labelStr);
+  m_frameInfoLabel->setToolTip(tooltipStr);
 }
 
 //-----------------------------------------------------------------------------

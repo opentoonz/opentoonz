@@ -659,16 +659,19 @@ void ParamFieldKeyToggle::paintEvent(QPaintEvent *e) {
 
   switch (m_status) {
   case NOT_ANIMATED:
-    p.drawPixmap(rect(), QPixmap(":Resources/keyframe_noanim.png"));
+    p.drawPixmap(rect(),
+                 QPixmap(svgToPixmap(":Resources/keyframe_noanim.svg")));
     break;
   case KEYFRAME:
-    p.drawPixmap(rect(), QPixmap(":Resources/keyframe_key.png"));
+    p.drawPixmap(rect(), QPixmap(svgToPixmap(":Resources/keyframe_key.svg")));
     break;
   case MODIFIED:
-    p.drawPixmap(rect(), QPixmap(":Resources/keyframe_modified.png"));
+    p.drawPixmap(rect(),
+                 QPixmap(svgToPixmap(":Resources/keyframe_modified.svg")));
     break;
   default:
-    p.drawPixmap(rect(), QPixmap(":Resources/keyframe_inbetween.png"));
+    p.drawPixmap(rect(),
+                 QPixmap(svgToPixmap(":Resources/keyframe_inbetween.svg")));
     break;
   }
   if (m_highlighted) {

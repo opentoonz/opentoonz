@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="tasklist.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60"
+	 style="enable-background:new 0 0 60 60;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#EBEBEB;}
+	.st1{fill:#404040;}
+	.st2{fill:#EBF8F7;}
+	.st3{fill:#1E1F69;}
+</style>
+<g id="g4">
+	<rect id="rect6" y="0" class="st0" width="60" height="60"/>
+	<path id="path8" inkscape:connector-curvature="0" class="st1" d="M60,60H0V0h60V60z M1,1v58h58V1H1z"/>
+</g>
+<g id="g10">
+	<rect id="rect12" x="13" y="7" class="st2" width="34" height="46"/>
+	<path id="path14" inkscape:connector-curvature="0" class="st1" d="M47,53H13V7h34V53z M14,8v44h32V8H14z"/>
+</g>
+<g id="g16">
+	<path id="path18" inkscape:connector-curvature="0" class="st2" d="M42,46h-7v-1h7V46z M34,46h-7v-1h7V46z M26,46h-3v-1h3V46z
+		 M30,38h-7v-1h7V38z M34,38h-3v-1h3V38z M42,38h-7v-1h7V38z M28,30h-5v-1h5V30z M42,30H29v-1h13V30z M42,22h-8v-1h8V22z M33,22h-7
+		v-1h7V22z M25,22h-2v-1h2V22z M29,14h-6v-1h6V14z M34,14h-4v-1h4V14z M42,14h-7v-1h7V14z"/>
+	<path id="path20" inkscape:connector-curvature="0" class="st1" d="M42,46h-7v-1h7V46z M34,46h-7v-1h7V46z M26,46h-3v-1h3V46z
+		 M30,38h-7v-1h7V38z M34,38h-3v-1h3V38z M42,38h-7v-1h7V38z M28,30h-5v-1h5V30z M42,30H29v-1h13V30z M42,22h-8v-1h8V22z M33,22h-7
+		v-1h7V22z M25,22h-2v-1h2V22z M42,14h-7v-1h7V14z M29,14h-6v-1h6V14z M34,14h-4v-1h4V14z"/>
+</g>
+<g id="g22">
+	<path id="path24" inkscape:connector-curvature="0" class="st2" d="M20,43v4h-4v-4H20z M20,39h-4v-4h4V39z M20,31h-4v-4h4V31z
+		 M20,23h-4v-4h4V23z M20,15h-4v-4h4V15z"/>
+	<path id="path26" inkscape:connector-curvature="0" class="st1" d="M20,47h-4v-4h4V47z M17,44v2h2v-2H17z M20,39h-4v-4h4V39z
+		 M17,36v2h2v-2H17z M20,31h-4v-4h4V31z M17,28v2h2v-2H17z M20,23h-4v-4h4V23z M17,20v2h2v-2H17z M20,15h-4v-4h4V15z M17,12v2h2v-2
+		H17z"/>
+</g>
+<path id="path28" inkscape:connector-curvature="0" class="st3" d="M21.5,17.8c0.1,0,0.2,0,0.3,0.1c0.3,0.2,0.4,0.5,0.3,0.9
+	c0,0.1-0.1,0.2-0.2,0.3c-1.2,1.2-2.3,2.4-3.6,3.6c-0.1,0-0.1,0.1-0.2,0.1c-0.2,0.1-0.4,0.1-0.5,0.1c-0.1,0-0.1-0.1-0.2-0.1
+	c-0.7-0.5-1.4-1-2.1-1.5c-0.1-0.1-0.2-0.2-0.2-0.3c-0.1-0.3,0-0.7,0.3-0.9c0.1,0,0.2-0.1,0.3-0.1s0.2,0,0.3,0c0.1,0,0.2,0.1,0.3,0.1
+	l1.5,1.1c1-1,2-2.1,3.1-3.1c0,0,0,0,0.1,0c0.1-0.1,0.2-0.1,0.4-0.1C21.5,17.8,21.5,17.7,21.5,17.8z M22,9.8c0.1,0,0.2,0,0.3,0.1
+	c0.3,0.2,0.4,0.5,0.3,0.9c0,0.1-0.1,0.2-0.2,0.3c-1.2,1.2-2.3,2.4-3.6,3.6c-0.1,0-0.1,0.1-0.2,0.1c-0.2,0.1-0.4,0.1-0.5,0.1
+	c-0.1,0-0.1-0.1-0.2-0.1c-0.7-0.5-1.4-1-2.1-1.5c-0.1-0.1-0.2-0.2-0.2-0.3c-0.1-0.3,0-0.7,0.3-0.9c0.1,0,0.2-0.1,0.3-0.1
+	s0.2,0,0.3,0c0.1,0,0.2,0.1,0.3,0.1l1.5,1.1c1-1,2-2.1,3.1-3.1c0,0,0,0,0.1-0.1c0.1-0.1,0.2-0.1,0.4-0.1C22,9.8,22,9.7,22,9.8z"/>
+</svg>

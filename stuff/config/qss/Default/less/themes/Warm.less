@@ -1,0 +1,76 @@
+// out: ../../../Warm/Warm.qss
+
+// Import Light Theme
+@import 'Light';
+
+@bg: #A8A7A5;
+@accent: darken(@bg, 26);
+
+@selected-bg-color: #607388;
+@selected-text-color: #fff;
+
+// -----------------------------------------------------------------------------
+// Menu
+// -----------------------------------------------------------------------------
+
+@menu-bg-color: lighten(@bg, 15);
+
+// -----------------------------------------------------------------------------
+// Titlebars
+// -----------------------------------------------------------------------------
+
+@title-bg-color: darken(@bg, 12);
+
+// -----------------------------------------------------------------------------
+// Trees
+// -----------------------------------------------------------------------------
+
+@tree-bg-color: lighten(@bg, 6);
+@tree-bg-color-alt: lighten(@tree-bg-color, 4);
+
+// -----------------------------------------------------------------------------
+// Button
+// -----------------------------------------------------------------------------
+
+@button-border-color: darken(@bg, 15);
+@button-bg-color-checked: #607388;
+
+// -----------------------------------------------------------------------------
+// Tool Buttons
+// -----------------------------------------------------------------------------
+
+@toolbutton-bg-color-checked: #607388;
+
+// -----------------------------------------------------------------------------
+// CheckBox
+// -----------------------------------------------------------------------------
+
+@checkbox-bg-color: #9EB895;
+@checkbox-border-color: @accent;
+
+@checkbox-bg-color-hover: lighten(@checkbox-bg-color, 8);
+@checkbox-border-color-hover: @checkbox-border-color;
+
+@checkbox-bg-color-checked: #9EB895;
+@checkbox-border-color-checked: @accent;
+
+// -----------------------------------------------------------------------------
+// File Browser
+// -----------------------------------------------------------------------------
+
+// All Panes
+@browser-folder-text-color: #6D2D2E;
+
+// Left Pane
+@browser-listview-bg-color: @bg;
+@browser-listview-bg-color-alt: @browser-listview-bg-color;
+
+// Right Pane
+@browser-itemview-bg-color: @tree-bg-color;
+@browser-itemview-bg-color-alt: @tree-bg-color-alt;
+
+// -----------------------------------------------------------------------------
+// XSheet
+// -----------------------------------------------------------------------------
+
+@xsheet-MarkerLine-color:                   #6D2D2E;

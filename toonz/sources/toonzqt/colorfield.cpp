@@ -364,7 +364,7 @@ ColorField::ColorField(QWidget *parent, bool isAlphaActive, TPixel32 color,
   m_blueChannel = new ChannelField(this, QString("B:"), m_color.b);
   connect(m_blueChannel, SIGNAL(valueChanged(int, bool)),
           SLOT(onBlueChannelChanged(int, bool)));
-  m_alphaChannel = new ChannelField(this, QString("M:"), m_color.m);
+  m_alphaChannel = new ChannelField(this, QString("A:"), m_color.m);
   connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
           SLOT(onAlphaChannelChanged(int, bool)));
 

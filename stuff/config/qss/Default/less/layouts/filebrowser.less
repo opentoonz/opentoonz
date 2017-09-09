@@ -1,0 +1,102 @@
+/* -----------------------------------------------------------------------------
+   File Browser
+----------------------------------------------------------------------------- */
+
+/* Left Pane
+----------------------------------------------------------------------------- */
+
+#DirTreeView {
+  &:extend(.tree-list all);
+  background-color: @browser-listview-bg-color;
+  alternate-background-color: @browser-listview-bg-color-alt;
+  border: 1px solid @accent;
+  border-right: 0;
+  &::branch {
+    &:extend(.branch-22 all);
+  }
+}
+
+/* Right Pane
+----------------------------------------------------------------------------- */
+
+DvItemViewerPanel {
+  qproperty-TextColor: @text-color;
+  qproperty-AlternateBackground: @browser-itemview-bg-color-alt;
+  qproperty-SelectedTextColor: @selected-text-color;
+  qproperty-FolderTextColor: @browser-folder-text-color;
+  qproperty-SelectedItemBackground: @selected-bg-color;
+}
+
+#FileBrowser {
+  & DvItemViewerPanel {
+    background-color: @browser-itemview-bg-color;
+  }
+  #castFrame {
+    border-top: 1px solid @accent;
+    border-right: 1px solid @accent;
+    border-bottom: 1px solid @accent;
+    margin: 0;
+  }
+  & QToolButton {
+    padding: 1px;
+  }
+}
+
+#DvItemViewerButtonBar {
+  // Placeholder
+}
+
+#LoadLevelFrame {
+  &:extend(.frame all);
+}
+
+#LoadLevelShowButton {
+  &:extend(.button-show all);
+}
+
+#PsdSettingsGroupBox {
+    &:extend(.frame all);
+}
+
+DvDirTreeView {
+  qproperty-TextColor: @text-color;
+  qproperty-SelectedTextColor: @selected-text-color;
+  qproperty-SelectedItemBackground: @selected-bg-color;
+  qproperty-FolderTextColor: @browser-folder-text-color;
+  qproperty-SelectedFolderTextColor: @browser-folder-text-color-selected;
+  alternate-background-color: @tree-bg-color-alt;
+  background-color: @tree-bg-color;
+  border: 1px solid @accent;
+}
+
+#FileDoesNotExistLabel {
+    color: @label-error;
+}
+
+/* -----------------------------------------------------------------------------
+   Scene Cast
+----------------------------------------------------------------------------- */
+
+#SceneCast {
+  &:extend(#FileBrowser all);
+  & QTreeView {
+    &:extend(.tree-list all);
+    background-color: @browser-listview-bg-color;
+    &::branch {
+      &:extend(.branch-17 all);
+    }
+  }
+  & QToolBar {
+    border-top: 1px solid @accent;
+  }
+  & QToolButton {
+    margin: 3px 1px 2px 1px;
+    padding: 1px;
+  }
+}
+
+// PR #1104
+#CastBrowser {
+  border: 0;
+  margin: 0;
+}

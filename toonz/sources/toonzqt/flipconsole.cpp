@@ -1063,7 +1063,7 @@ void FlipConsole::applyCustomizeMask() {
 
 void FlipConsole::createCustomizeMenu(bool withCustomWidget) {
   if (m_gadgetsMask & eCustomize) {
-    QIcon icon          = createQIconPNG("options");
+    QIcon icon          = createQIcon("options");
     QToolButton *button = new QToolButton();
     button->setIcon(icon);
     button->setPopupMode(QToolButton::MenuButtonPopup);
