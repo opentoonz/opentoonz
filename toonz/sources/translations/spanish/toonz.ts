@@ -4084,7 +4084,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Shift and Trace</source>
-        <translation>Desplazamiento y rastreo</translation>
+        <translation>Desplazar y trazar</translation>
     </message>
     <message>
         <source>Edit Shift</source>
@@ -4092,7 +4092,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>No Shift</source>
-        <translation>Sin desplazamiento</translation>
+        <translation>No mostrar desplazamiento</translation>
     </message>
     <message>
         <source>Reset Shift</source>
