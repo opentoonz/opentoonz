@@ -96,14 +96,7 @@ const char *applicationRevision = "3";
 const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 #endif
 
-#ifdef _WIN32
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Arial");
-#else
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Helvetica");
-#endif
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
-TEnv::StringVar EnvSoftwareCurrentFontWeight("SoftwareCurrentFontWeightIsBold",
-                                             "Yes");
 
 const char *applicationFullName = "OpenToonz 1.1.3";
 const char *rootVarName         = "TOONZROOT";
@@ -641,15 +634,9 @@ int main(int argc, char *argv[]) {
       Preferences::instance()->getInterfaceFont().toStdString();
   std::string isBold =
       Preferences::instance()->getInterfaceFontWeight() ? "Yes" : "No";
-  if (fontName != "") EnvSoftwareCurrentFont = fontName;
-  EnvSoftwareCurrentFontWeight               = isBold;
-  std::string family                         = EnvSoftwareCurrentFont;
-  myFont = new QFont(QString(family.c_str()));
-
+  myFont = new QFont(QString::fromStdString(fontName));
   myFont->setPixelSize(EnvSoftwareCurrentFontSize);
-  /*-- フォントのBoldの指定 --*/
-  std::string weight = EnvSoftwareCurrentFontWeight;
-  if (strcmp(weight.c_str(), "Yes") == 0)
+  if (strcmp(isBold.c_str(), "Yes") == 0)
     myFont->setBold(true);
   else
     myFont->setBold(false);
