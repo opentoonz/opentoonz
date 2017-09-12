@@ -6,6 +6,9 @@
 #include "tproperty.h"
 #include "tlevel_io.h"
 #include "tiio_ffmpeg.h"
+#include <QVector>
+#include <QStringList>
+#include <QtGui/QImage>
 //#include "tthreadmessage.h"
 
 //===========================================================
@@ -35,8 +38,19 @@ private:
   int m_frameCount, m_lx, m_ly;
   // double m_fps;
   int m_scale;
-  bool m_looping = false;
-  bool m_palette = false;
+  int m_padding      = 0;
+  bool m_looping     = false;
+  bool m_palette     = false;
+  bool m_trim        = false;
+  bool m_transparent = false;
+  bool m_dithered    = false;
+  int m_left = 0, m_right = 0, m_top = 0, m_bottom = 0;
+  std::vector<QImage *> m_images;
+  // std::vector<QImage> m_imagesResized;
+  bool m_firstPass = true;
+  bool checkImageMagick();
+  bool checkDithering();
+  QString m_imageMagickPath;
 };
 
 //===========================================================
@@ -75,8 +89,12 @@ namespace Tiio {
 class GifWriterProperties : public TPropertyGroup {
 public:
   TIntProperty m_scale;
+  TIntProperty m_padding;
   TBoolProperty m_looping;
   TBoolProperty m_palette;
+  TBoolProperty m_trim;
+  TBoolProperty m_transparent;
+  TBoolProperty m_dithered;
   GifWriterProperties();
 };
 

@@ -3,8 +3,13 @@
 #include "tiio_gif.h"
 #include "trasterimage.h"
 #include "timageinfo.h"
+#include "toonz/preferences.h"
 #include "toonz/stage.h"
 #include <QStringList>
+#include <QPainter>
+#include <QProcess>
+#include <QDir>
+#include "toonzqt/dvdialog.h"
 
 //===========================================================
 //
@@ -40,77 +45,185 @@ TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
   if (!m_properties) m_properties = new Tiio::GifWriterProperties();
   std::string scale = m_properties->getProperty("Scale")->getValueAsString();
   m_scale           = QString::fromStdString(scale).toInt();
+  std::string padding =
+      m_properties->getProperty("Image Padding for Trimmed Images")
+          ->getValueAsString();
+  m_padding = QString::fromStdString(padding).toInt();
   TBoolProperty *looping =
       (TBoolProperty *)m_properties->getProperty("Looping");
   m_looping = looping->getValue();
   TBoolProperty *palette =
       (TBoolProperty *)m_properties->getProperty("Generate Palette");
-  m_palette    = palette->getValue();
+  m_palette = palette->getValue();
+  TBoolProperty *trim =
+      (TBoolProperty *)m_properties->getProperty("Trim Unused Space");
+  m_trim = trim->getValue();
+  TBoolProperty *transparent =
+      (TBoolProperty *)m_properties->getProperty("Transparent");
+  m_transparent           = transparent->getValue();
+  TBoolProperty *dithered = (TBoolProperty *)m_properties->getProperty(
+      "Dither Semi-Transparent Areas");
+  m_dithered = dithered->getValue();
+
   ffmpegWriter = new Ffmpeg();
   ffmpegWriter->setPath(m_path);
-  // m_frameCount = 0;
+  m_frameCount = 0;
   if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
 }
 
 //-----------------------------------------------------------
 
 TLevelWriterGif::~TLevelWriterGif() {
-  QStringList preIArgs;
-  QStringList postIArgs;
-  QStringList palettePreIArgs;
-  QStringList palettePostIArgs;
-
-  int outLx = m_lx;
-  int outLy = m_ly;
-
-  // set scaling
-  outLx = m_lx * m_scale / 100;
-  outLy = m_ly * m_scale / 100;
-  // ffmpeg doesn't like resolutions that aren't divisible by 2.
-  if (outLx % 2 != 0) outLx++;
-  if (outLy % 2 != 0) outLy++;
-
-  QString palette;
-  QString filters = "scale=" + QString::number(outLx) + ":-1:flags=lanczos";
-  QString paletteFilters = filters + " [x]; [x][1:v] paletteuse";
-  if (m_palette) {
-    palette = ffmpegWriter->getFfmpegCache().getQString() + "//" +
-              QString::fromStdString(m_path.getName()) + "palette.png";
-    palettePreIArgs << "-v";
-    palettePreIArgs << "warning";
-
-    palettePostIArgs << "-vf";
-    palettePostIArgs << filters + ",palettegen";
-    palettePostIArgs << palette;
-
-    // write the palette
-    ffmpegWriter->runFfmpeg(palettePreIArgs, palettePostIArgs, false, true,
-                            true);
-    ffmpegWriter->addToCleanUp(palette);
+  if (m_transparent && !checkImageMagick()) {
+    QString msg(QObject::tr(
+        "ImageMagick is not configured correctly in  "
+        "preferences. \nThe file will be processed without transparency."));
+    DVGui::warning(msg);
+    m_transparent = false;
   }
+  if (m_trim) {
+    m_lx              = m_right - m_left + 1 + (m_padding * 2);
+    m_ly              = m_bottom - m_top + 1 + (m_padding * 2);
+    int resizedWidth  = m_lx * m_scale / 100;
+    int resizedHeight = m_ly * m_scale / 100;
+    int i             = 1;
+    for (QImage *image : m_images) {
+      // get only the trimmed area
+      QImage copy = image->copy(m_left, m_top, m_lx, m_ly);
+      // make a copy in order to be able to do non-transparent and padding
+      QImage newCopy = QImage(m_lx, m_ly, QImage::Format_ARGB32);
+      if (!m_transparent) {
+        newCopy.fill(qRgba(255, 255, 255, 255));
+      } else {
+        newCopy.fill(qRgba(0, 0, 0, 0));
+      }
+      QPainter painter;
+      painter.begin(&newCopy);
+      painter.drawImage(m_padding, m_padding, copy);
+      painter.end();
 
-  preIArgs << "-v";
-  preIArgs << "warning";
-  preIArgs << "-r";
-  preIArgs << QString::number(m_frameRate);
-  if (m_palette) {
-    postIArgs << "-i";
-    postIArgs << palette;
-    postIArgs << "-lavfi";
-    postIArgs << paletteFilters;
+      // do the scaling here if imagemagick is doing the work
+      if (m_scale != 100 && m_transparent) {
+        int width  = (newCopy.width() * m_scale) / 100;
+        int height = (newCopy.height() * m_scale) / 100;
+        newCopy    = newCopy.scaled(width, height);
+      }
+      QString tempPath = ffmpegWriter->getFfmpegCache().getQString() + "//" +
+                         QString::fromStdString(m_path.getName()) + "tempOut" +
+                         QString::number(i) + ".png";
+      ;
+      newCopy.save(tempPath, "PNG", -1);
+      ffmpegWriter->addToCleanUp(tempPath);
+      i++;
+    }
+    m_images.clear();
+  }
+  // use ImageMagick for Transparent Images
+  if (m_transparent) {
+    QString tempPath = ffmpegWriter->getFfmpegCache().getQString() + "//" +
+                       QString::fromStdString(m_path.getName()) + "tempOut";
+
+    QStringList imargs;
+    imargs << "-dispose";
+    imargs << "previous";
+    imargs << "-delay";
+    imargs << QString::number(qRound(100 / m_frameRate));
+    if (m_looping) {
+      imargs << "-loop";
+      imargs << "0";
+    } else {
+      imargs << "-loop";
+      imargs << "1";
+    }
+    if (m_dithered) {
+      if (!checkDithering()) {
+        QString msg(QObject::tr(
+            "thresholds.xml is not present in the ImageMagick folder.  "
+            "\nThe file will be processed without dithering."));
+        DVGui::warning(msg);
+        m_dithered = false;
+      } else {
+        imargs << "-channel";
+        imargs << "A";
+        imargs << "-ordered-dither";
+        imargs << "o8x8";
+      }
+    }
+    imargs << tempPath + "*.png";
+    imargs << m_path.getQString();
+    QString path = QDir::currentPath() + "/convert";
+#if defined(_WIN32)
+    path = path + ".exe";
+#endif
+    QProcess imageMagick;
+    QString currPath = QDir::currentPath();
+    QDir::setCurrent(m_imageMagickPath);
+    imageMagick.start(path, imargs);
+    imageMagick.waitForFinished(30000);
+    QDir::setCurrent(currPath);
+    QString results = imageMagick.readAllStandardError();
+    results += imageMagick.readAllStandardOutput();
+    int exitCode = imageMagick.exitCode();
+    imageMagick.close();
+    std::string strResults = results.toStdString();
   } else {
-    postIArgs << "-lavfi";
-    postIArgs << filters;
+    QStringList preIArgs;
+    QStringList postIArgs;
+    QStringList palettePreIArgs;
+    QStringList palettePostIArgs;
+
+    int outLx = m_lx;
+    int outLy = m_ly;
+
+    // set scaling
+    outLx = m_lx * m_scale / 100;
+    outLy = m_ly * m_scale / 100;
+    // ffmpeg doesn't like resolutions that aren't divisible by 2.
+    if (outLx % 2 != 0) outLx++;
+    if (outLy % 2 != 0) outLy++;
+
+    QString palette;
+    QString filters = "scale=" + QString::number(outLx) + ":-1:flags=lanczos";
+    QString paletteFilters = filters + " [x]; [x][1:v] paletteuse";
+    if (m_palette) {
+      palette = ffmpegWriter->getFfmpegCache().getQString() + "//" +
+                QString::fromStdString(m_path.getName()) + "palette.png";
+      palettePreIArgs << "-v";
+      palettePreIArgs << "warning";
+
+      palettePostIArgs << "-vf";
+      palettePostIArgs << filters + ",palettegen";
+      palettePostIArgs << palette;
+
+      // write the palette
+      ffmpegWriter->runFfmpeg(palettePreIArgs, palettePostIArgs, false, true,
+                              true);
+      ffmpegWriter->addToCleanUp(palette);
+    }
+
+    preIArgs << "-v";
+    preIArgs << "warning";
+    preIArgs << "-r";
+    preIArgs << QString::number(m_frameRate);
+    if (m_palette) {
+      postIArgs << "-i";
+      postIArgs << palette;
+      postIArgs << "-lavfi";
+      postIArgs << paletteFilters;
+    } else {
+      postIArgs << "-lavfi";
+      postIArgs << filters;
+    }
+
+    if (!m_looping) {
+      postIArgs << "-loop";
+      postIArgs << "-1";
+    }
+
+    std::string outPath = m_path.getQString().toStdString();
+
+    ffmpegWriter->runFfmpeg(preIArgs, postIArgs, false, false, true);
   }
-
-  if (!m_looping) {
-    postIArgs << "-loop";
-    postIArgs << "-1";
-  }
-
-  std::string outPath = m_path.getQString().toStdString();
-
-  ffmpegWriter->runFfmpeg(preIArgs, postIArgs, false, false, true);
   ffmpegWriter->cleanUpFiles();
 }
 
@@ -127,12 +240,68 @@ TImageWriterP TLevelWriterGif::getFrameWriter(TFrameId fid) {
 
 //-----------------------------------------------------------
 void TLevelWriterGif::setFrameRate(double fps) {
-  // m_fps = fps;
   m_frameRate = fps;
   ffmpegWriter->setFrameRate(fps);
 }
 
+//-----------------------------------------------------------
+
 void TLevelWriterGif::saveSoundTrack(TSoundTrack *st) { return; }
+
+//-----------------------------------------------------------
+
+bool TLevelWriterGif::checkImageMagick() {
+  // check the user defined path in preferences first
+  QString path = Preferences::instance()->getImageMagickPath() + "/convert";
+#if defined(_WIN32)
+  path = path + ".exe";
+#endif
+  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+    m_imageMagickPath = Preferences::instance()->getImageMagickPath();
+    return true;
+  }
+
+  // check the FFmpeg directory next
+  path = Preferences::instance()->getFfmpegPath() + "/convert";
+#if defined(_WIN32)
+  path = path + ".exe";
+#endif
+  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+    Preferences::instance()->setImageMagickPath(
+        Preferences::instance()->getFfmpegPath().toStdString());
+    m_imageMagickPath = Preferences::instance()->getFfmpegPath();
+    return true;
+  }
+
+  // check the OpenToonz root directory next
+  path = QDir::currentPath() + "/convert";
+#if defined(_WIN32)
+  path = path + ".exe";
+#endif
+  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+    Preferences::instance()->setImageMagickPath(
+        QDir::currentPath().toStdString());
+    m_imageMagickPath = QDir::currentPath();
+    return true;
+  }
+
+  // give up
+  return false;
+}
+
+//-----------------------------------------------------------
+
+bool TLevelWriterGif::checkDithering() {
+  // check the user defined path in preferences first
+  QString path =
+      Preferences::instance()->getImageMagickPath() + "/thresholds.xml";
+  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+    return true;
+  }
+
+  // give up
+  return false;
+}
 
 //-----------------------------------------------------------
 
@@ -140,7 +309,72 @@ void TLevelWriterGif::save(const TImageP &img, int frameIndex) {
   TRasterImageP image(img);
   m_lx = image->getRaster()->getLx();
   m_ly = image->getRaster()->getLy();
-  ffmpegWriter->createIntermediateImage(img, frameIndex);
+
+  if (m_trim) {
+    TRasterImageP tempImage(img);
+    TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
+
+    m_lx           = image->getRaster()->getLx();
+    m_ly           = image->getRaster()->getLy();
+    int m_bpp      = image->getRaster()->getPixelSize();
+    int totalBytes = m_lx * m_ly * m_bpp;
+    image->getRaster()->yMirror();
+
+    // lock raster to get data
+    image->getRaster()->lock();
+    void *buffin = image->getRaster()->getRawData();
+    assert(buffin);
+    void *buffer = malloc(totalBytes);
+    memcpy(buffer, buffin, totalBytes);
+
+    image->getRaster()->unlock();
+
+    // create QImage save format
+    // QString m_intermediateFormat = "png";
+    // QByteArray ba = m_intermediateFormat.toUpper().toLatin1();
+    // const char *format = ba.data();
+
+    QImage *qi =
+        new QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
+    m_images.push_back(qi);
+    delete image;
+
+    int l = qi->width(), r = 0, t = qi->height(), b = 0;
+    for (int y = 0; y < qi->height(); ++y) {
+      QRgb *row      = (QRgb *)qi->scanLine(y);
+      bool rowFilled = false;
+      for (int x = 0; x < qi->width(); ++x) {
+        if (qAlpha(row[x])) {
+          rowFilled = true;
+          r         = std::max(r, x);
+          if (l > x) {
+            l = x;
+            x = r;
+          }
+        }
+      }
+      if (rowFilled) {
+        t = std::min(t, y);
+        b = y;
+      }
+    }
+    if (m_firstPass) {
+      m_firstPass = false;
+      m_left      = l;
+      m_right     = r;
+      m_top       = t;
+      m_bottom    = b;
+    } else {
+      if (l < m_left) m_left     = l;
+      if (r > m_right) m_right   = r;
+      if (t < m_top) m_top       = t;
+      if (b > m_bottom) m_bottom = b;
+    }
+  } else {
+    ffmpegWriter->createIntermediateImage(img, frameIndex, m_transparent,
+                                          m_scale);
+  }
+  m_frameCount++;
 }
 
 //===========================================================
@@ -245,10 +479,18 @@ TImageP TLevelReaderGif::load(int frameIndex) {
 Tiio::GifWriterProperties::GifWriterProperties()
     : m_scale("Scale", 1, 100, 100)
     , m_looping("Looping", true)
-    , m_palette("Generate Palette", true) {
+    , m_palette("Generate Palette", true)
+    , m_trim("Trim Unused Space", false)
+    , m_padding("Image Padding for Trimmed Images", 0, 100, 0)
+    , m_transparent("Transparent", false)
+    , m_dithered("Dither Semi-Transparent Areas", false) {
   bind(m_scale);
   bind(m_looping);
   bind(m_palette);
+  bind(m_trim);
+  bind(m_padding);
+  bind(m_transparent);
+  bind(m_dithered);
 }
 
 // Tiio::Reader* Tiio::makeGifReader(){ return nullptr; }

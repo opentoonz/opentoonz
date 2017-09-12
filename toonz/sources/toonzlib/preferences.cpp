@@ -593,6 +593,9 @@ Preferences::Preferences()
   QString ffmpegPath = m_settings->value("ffmpegPath").toString();
   if (ffmpegPath != "") m_ffmpegPath = ffmpegPath;
   setFfmpegPath(m_ffmpegPath.toStdString());
+  QString imageMagickPath = m_settings->value("imageMagickPath").toString();
+  if (imageMagickPath != "") m_imageMagickPath = imageMagickPath;
+  setImageMagickPath(m_imageMagickPath.toStdString());
   QString fastRenderPath = m_settings->value("fastRenderPath").toString();
   if (fastRenderPath != "") m_fastRenderPath = fastRenderPath;
   setFastRenderPath(m_fastRenderPath.toStdString());
@@ -1332,6 +1335,14 @@ void Preferences::setFfmpegPath(std::string path) {
   m_ffmpegPath        = QString::fromStdString(path);
   std::string strPath = m_ffmpegPath.toStdString();
   m_settings->setValue("ffmpegPath", m_ffmpegPath);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setImageMagickPath(std::string path) {
+  m_imageMagickPath   = QString::fromStdString(path);
+  std::string strPath = m_imageMagickPath.toStdString();
+  m_settings->setValue("imageMagickPath", m_imageMagickPath);
 }
 
 //-----------------------------------------------------------------

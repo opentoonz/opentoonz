@@ -6,6 +6,7 @@
 #include <QProcess>
 #include <QDir>
 #include <QtGui/QImage>
+#include <QPainter>
 #include <QRegExp>
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
@@ -99,7 +100,8 @@ void Ffmpeg::setFrameRate(double fps) { m_frameRate = fps; }
 
 void Ffmpeg::setPath(TFilePath path) { m_path = path; }
 
-void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
+void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex,
+                                     bool keepTransparency, int scale) {
   m_frameCount++;
   if (m_frameNumberOffset == -1) m_frameNumberOffset = frameIndex - 1;
   QString tempPath = getFfmpegCache().getQString() + "//" +
@@ -129,12 +131,29 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   QByteArray ba      = m_intermediateFormat.toUpper().toLatin1();
   const char *format = ba.data();
 
-  QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
-  qi->save(tempPath, format, -1);
+  QImage qi = QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
+  // ffmpeg renders transparent gif areas as black
+  if (!keepTransparency) {
+    // will only get here for non-trimmed gif images
+    QImage nonTranspImage = QImage(m_lx, m_ly, QImage::Format_ARGB32);
+    nonTranspImage.fill(qRgba(255, 255, 255, 255));
+    QPainter painter;
+    painter.begin(&nonTranspImage);
+    painter.drawImage(0, 0, qi);
+    painter.end();
+
+    nonTranspImage.save(tempPath, format, -1);
+  } else {
+    // usually scaling is done by ffmpeg, but transparent gifs scale here
+    if (scale != 100) {
+      int width  = (qi.width() * scale) / 100;
+      int height = (qi.height() * scale) / 100;
+      qi         = qi.scaled(width, height);
+    }
+    qi.save(tempPath, format, -1);
+  }
   free(buffer);
   m_cleanUpList.push_back(tempPath);
-
-  delete qi;
   delete image;
 }
 
@@ -408,7 +427,7 @@ void Ffmpeg::getFramesFromMovie(int frame) {
 
 QString Ffmpeg::cleanPathSymbols() {
   return m_path.getQString().remove(QRegExp(
-      QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
+      QString::fromUtf8("[-`~!@#$%^&*()_Â—+=|:;<>Â«Â»,.?/{}\'\"\\[\\]\\\\]")));
 }
 
 int Ffmpeg::getGifFrameCount() {

@@ -78,7 +78,8 @@ private:
 
   DVGui::FileField *m_customProjectRootFileField;
 
-  DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField;
+  DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField,
+      *m_imageMagickPathFileField;
 
   QGroupBox *m_autoSaveGroup, *m_showXSheetToolbar;
 
@@ -175,6 +176,7 @@ private slots:
   void onShowKeyframesOnCellAreaChanged(int);
   void onFfmpegPathChanged();
   void onFfmpegTimeoutChanged();
+  void onImageMagickPathChanged();
   void onFastRenderPathChanged();
   void onUseNumpadForSwitchingStylesClicked(bool);
   void onShowXSheetToolbarClicked(bool);

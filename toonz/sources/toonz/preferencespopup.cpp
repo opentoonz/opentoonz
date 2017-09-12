@@ -951,6 +951,13 @@ void PreferencesPopup::onFfmpegPathChanged() {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onImageMagickPathChanged() {
+  QString text = m_imageMagickPathFileField->getPath();
+  m_pref->setImageMagickPath(text.toStdString());
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onFastRenderPathChanged() {
   QString text = m_fastRenderPathFileField->getPath();
   m_pref->setFastRenderPath(text.toStdString());
@@ -1212,7 +1219,8 @@ PreferencesPopup::PreferencesPopup()
   m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
   m_fastRenderPathFileField =
       new DVGui::FileField(this, QString("desktop"), false, true);
-  m_ffmpegTimeout = new DVGui::IntLineEdit(this, 30, 1);
+  m_ffmpegTimeout            = new DVGui::IntLineEdit(this, 30, 1);
+  m_imageMagickPathFileField = new DVGui::FileField(this, QString(""));
 
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
@@ -1464,6 +1472,8 @@ PreferencesPopup::PreferencesPopup()
   //--- Import/Export ------------------------------
   QString path = m_pref->getFfmpegPath();
   m_ffmpegPathFileFld->setPath(path);
+  path = m_pref->getImageMagickPath();
+  m_imageMagickPathFileField->setPath(path);
   path = m_pref->getFastRenderPath();
   m_fastRenderPathFileField->setPath(path);
   m_ffmpegTimeout->setValue(m_pref->getFfmpegTimeout());
@@ -1898,24 +1908,36 @@ PreferencesPopup::PreferencesPopup()
         ioGridLay->addWidget(m_ffmpegPathFileFld, 0, 1, 1, 3);
         ioGridLay->addWidget(new QLabel(" "), 1, 0);
         ioGridLay->addWidget(
-            new QLabel(tr("Number of seconds to wait for FFmpeg to complete "
-                          "processing the output:")),
+            new QLabel(tr("To export a transparent gif, ImageMagick "
+                          "must be present.")),
             2, 0, 1, 4);
         ioGridLay->addWidget(
-            new QLabel(tr("Note: FFmpeg begins working once all images "
-                          "have been processed.")),
+            new QLabel(tr("Please provide the path where "
+                          "ImageMagick is located on your computer.")),
             3, 0, 1, 4);
-        ioGridLay->addWidget(new QLabel(tr("FFmpeg Timeout:")), 4, 0,
+        ioGridLay->addWidget(new QLabel(tr("ImageMagick Path: ")), 4, 0,
                              Qt::AlignRight);
-        ioGridLay->addWidget(m_ffmpegTimeout, 4, 1, 1, 3);
+        ioGridLay->addWidget(m_imageMagickPathFileField, 4, 1, 1, 3);
         ioGridLay->addWidget(new QLabel(" "), 5, 0);
+        ioGridLay->addWidget(
+            new QLabel(tr("Number of seconds to wait for external programs "
+                          "to finish processing the output:")),
+            6, 0, 1, 4);
+        ioGridLay->addWidget(
+            new QLabel(tr("Note: These programs begin working once all images "
+                          "have been rendered.")),
+            7, 0, 1, 4);
+        ioGridLay->addWidget(new QLabel(tr("FFmpeg Timeout:")), 8, 0,
+                             Qt::AlignRight);
+        ioGridLay->addWidget(m_ffmpegTimeout, 8, 1, 1, 3);
+        ioGridLay->addWidget(new QLabel(" "), 9, 0);
         ioGridLay->addWidget(
             new QLabel(tr("Please indicate where you would like "
                           "exports from Fast Render(MP4) to go.")),
-            6, 0, 1, 4);
-        ioGridLay->addWidget(new QLabel(tr("Fast Render Path: ")), 7, 0,
+            10, 0, 1, 4);
+        ioGridLay->addWidget(new QLabel(tr("Fast Render Path: ")), 11, 0,
                              Qt::AlignRight);
-        ioGridLay->addWidget(m_fastRenderPathFileField, 7, 1, 1, 3);
+        ioGridLay->addWidget(m_fastRenderPathFileField, 11, 1, 1, 3);
       }
       ioLay->addLayout(ioGridLay);
       ioLay->addStretch(1);
@@ -2321,6 +2343,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onFastRenderPathChanged()));
   ret = ret && connect(m_ffmpegTimeout, SIGNAL(editingFinished()), this,
                        SLOT(onFfmpegTimeoutChanged()));
+  ret = ret && connect(m_imageMagickPathFileField, SIGNAL(pathChanged()), this,
+                       SLOT(onImageMagickPathChanged()));
 
   //--- Drawing ----------------------
   ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this,
