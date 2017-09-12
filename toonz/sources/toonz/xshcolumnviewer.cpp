@@ -103,11 +103,10 @@ bool containsRasterLevel(TColumnSelection *selection) {
   return false;
 }
 
-const QIcon getColorChipIcon(const int id) {
-  static QList<QColor> colors = {Qt::red,        Qt::green,    Qt::blue,
-                                 Qt::darkYellow, Qt::darkCyan, Qt::darkMagenta};
+const QIcon getColorChipIcon(TPixel32 color) {
+  QColor qCol((int)color.r, (int)color.g, (int)color.b, (int)color.m);
   QPixmap pixmap(12, 12);
-  pixmap.fill(colors.at(id - 1));
+  pixmap.fill(qCol);
   return QIcon(pixmap);
 }
 
@@ -898,7 +897,7 @@ void ColumnArea::DrawHeader::drawFilterColor() const {
   QRect filterColorRect =
       o->rect(PredefinedRect::FILTER_COLOR).translated(orig);
   p.drawPixmap(filterColorRect,
-               getColorChipIcon(column->getFilterColorId()).pixmap(12, 12));
+               getColorChipIcon(column->getFilterColor()).pixmap(12, 12));
 }
 
 void ColumnArea::DrawHeader::drawSoundIcon(bool isPlaying) const {
@@ -1431,20 +1430,16 @@ static QFont font("Helvetica", 7, QFont::Normal);
 m_value->setFont(font);*/
 
   m_filterColorCombo = new QComboBox(this);
-  m_filterColorCombo->addItem(tr("None"), 0);
-  m_filterColorCombo->addItem(getColorChipIcon(1), tr("Red"), 1);
-  m_filterColorCombo->addItem(getColorChipIcon(2), tr("Green"), 2);
-  m_filterColorCombo->addItem(getColorChipIcon(3), tr("Blue"), 3);
-  m_filterColorCombo->addItem(getColorChipIcon(4), tr("DarkYellow"), 4);
-  m_filterColorCombo->addItem(getColorChipIcon(5), tr("DarkCyan"), 5);
-  m_filterColorCombo->addItem(getColorChipIcon(6), tr("DarkMagenta"), 6);
-  // For now the color filter affects only for Raster and ToonzRaser levels.
-  // TODO: Make this property to affect vector levels as well.
-  m_filterColorCombo->setToolTip(
-      tr("N.B. Filter doesn't affect vector levels"));
+  for (int f = 0; f < (int)TXshColumn::FilterAmount; f++) {
+    QPair<QString, TPixel32> info =
+        TXshColumn::getFilterInfo((TXshColumn::FilterColor)f);
+    if ((TXshColumn::FilterColor)f == TXshColumn::FilterNone)
+      m_filterColorCombo->addItem(info.first, f);
+    else
+      m_filterColorCombo->addItem(getColorChipIcon(info.second), info.first, f);
+  }
 
   QLabel *filterLabel = new QLabel(tr("Filter:"), this);
-  filterLabel->setToolTip(tr("N.B. Filter doesn't affect vector levels"));
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
   mainLayout->setMargin(3);
@@ -1523,7 +1518,7 @@ void ColumnTransparencyPopup::onValueChanged(const QString &str) {
 //----------------------------------------------------------------
 
 void ColumnTransparencyPopup::onFilterColorChanged(int id) {
-  m_column->setFilterColorId(id);
+  m_column->setFilterColorId((TXshColumn::FilterColor)id);
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   ((ColumnArea *)parent())->update();

@@ -9442,6 +9442,10 @@ Please commit or revert changes first.</source>
         <source>  Start Frame:</source>
         <translation>開始フレーム：</translation>
     </message>
+    <message>
+        <source>Enable Column Color Filter and Transparency for Rendering</source>
+        <translation>列のメインビューア表示の不透明度とカラーフィルタの設定をレンダリングにも用いる</translation>
+    </message>
 </context>
 <context>
     <name>SceneViewerContextMenu</name>
@@ -10761,35 +10765,35 @@ Please refer to the user guide for details.</source>
     <name>XsheetGUI::ColumnTransparencyPopup</name>
     <message>
         <source>None</source>
-        <translation>なし</translation>
+        <translation type="vanished">なし</translation>
     </message>
     <message>
         <source>Red</source>
-        <translation>赤</translation>
+        <translation type="vanished">赤</translation>
     </message>
     <message>
         <source>Green</source>
-        <translation>緑</translation>
+        <translation type="vanished">緑</translation>
     </message>
     <message>
         <source>Blue</source>
-        <translation>青</translation>
+        <translation type="vanished">青</translation>
     </message>
     <message>
         <source>DarkYellow</source>
-        <translation>暗い黄色</translation>
+        <translation type="vanished">暗い黄色</translation>
     </message>
     <message>
         <source>DarkCyan</source>
-        <translation>暗いシアン</translation>
+        <translation type="vanished">暗いシアン</translation>
     </message>
     <message>
         <source>DarkMagenta</source>
-        <translation>暗いマゼンタ</translation>
+        <translation type="vanished">暗いマゼンタ</translation>
     </message>
     <message>
         <source>N.B. Filter doesn&apos;t affect vector levels</source>
-        <translation>※ カラーフィルタはベクターレベルには適用されません</translation>
+        <translation type="vanished">※ カラーフィルタはベクターレベルには適用されません</translation>
     </message>
     <message>
         <source>Filter:</source>
