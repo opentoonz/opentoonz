@@ -24,7 +24,12 @@ namespace {
 string escape(string v) {
   int i = 0;
   for (;;) {
+// Removing escaping of apostrophe from Windows and OSX as it's not needed and causes problems
+#ifdef LINUX
     i = v.find_first_of("\\\'\"", i);
+#else
+    i = v.find_first_of("\\\"", i);
+#endif
     if (i == (int)string::npos) break;
     string h = "\\" + v[i];
     v.insert(i, "\\");
