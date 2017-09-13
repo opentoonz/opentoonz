@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.0" language="zh_CN">
 <context>
     <name>AddFxContextMenu</name>
     <message>
@@ -62,23 +62,23 @@
     <name>CameraSettingsWidget</name>
     <message>
         <source>Width:</source>
-        <translation type="vanished">宽度:</translation>
+        <translation>宽度:</translation>
     </message>
     <message>
         <source>Height:</source>
-        <translation type="vanished">高度:</translation>
+        <translation>高度:</translation>
     </message>
     <message>
         <source>XPx:</source>
-        <translation type="vanished">XPx:</translation>
+        <translation>XPx:</translation>
     </message>
     <message>
         <source>XDpi:</source>
-        <translation type="vanished">XDpi:</translation>
+        <translation>XDpi:</translation>
     </message>
     <message>
         <source>YDpi:</source>
-        <translation type="vanished">YDpi:</translation>
+        <translation>YDpi:</translation>
     </message>
     <message>
         <source>Use Current Level Settings</source>
@@ -89,7 +89,7 @@
         <translation>不正确的摄影机预设</translation>
     </message>
     <message>
-        <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset. 
+        <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset.
 Possibly the preset file has been corrupted</source>
         <translation>“%1”不像是正确格式的摄影机预设。
 预设文件可能已经损坏了</translation>
@@ -100,15 +100,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Enter the name for %1</source>
-        <translation>请输入 %1 的名字</translation>
+        <translation>请给 %1 命名</translation>
     </message>
     <message>
         <source>YPx:</source>
-        <translation type="vanished">YPx:</translation>
+        <translation>YPx:</translation>
     </message>
     <message>
         <source>AR:</source>
-        <translation type="vanished">AR:</translation>
+        <translation>AR:</translation>
     </message>
     <message>
         <source>Add</source>
@@ -132,15 +132,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>DPI</source>
-        <translation type="unfinished"></translation>
+        <translation>DPI</translation>
     </message>
     <message>
         <source>Pixels</source>
-        <translation type="unfinished"></translation>
+        <translation>像素</translation>
     </message>
     <message>
         <source>x</source>
-        <translation type="unfinished"></translation>
+        <translation>x</translation>
     </message>
 </context>
 <context>
@@ -170,43 +170,43 @@ Possibly the preset file has been corrupted</source>
     <name>CleanupCameraSettingsWidget</name>
     <message>
         <source>Closest:</source>
-        <translation type="vanished">最靠近的:</translation>
+        <translation>最靠近的:</translation>
     </message>
     <message>
         <source>E/W:</source>
-        <translation type="vanished">左右:</translation>
+        <translation>左右:</translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation type="vanished">上下:</translation>
+        <translation>上下:</translation>
     </message>
     <message>
         <source>DPI:</source>
-        <translation type="vanished">DPI:</translation>
+        <translation>DPI:</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="vanished">名称:</translation>
+        <translation>名称:</translation>
     </message>
     <message>
         <source>Path:</source>
-        <translation type="vanished">路径:</translation>
+        <translation>路径:</translation>
     </message>
     <message>
         <source>Field settings</source>
-        <translation type="vanished">规格设置</translation>
+        <translation>规格设置</translation>
     </message>
     <message>
         <source>XPx:</source>
-        <translation type="vanished">XPx:</translation>
+        <translation>XPx:</translation>
     </message>
     <message>
         <source>YPx:</source>
-        <translation type="vanished">YPx:</translation>
+        <translation>YPx:</translation>
     </message>
     <message>
         <source>Resulting Level Info</source>
-        <translation type="vanished">结果层级信息</translation>
+        <translation>结果层级信息</translation>
     </message>
 </context>
 <context>
@@ -243,11 +243,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Color Threshold</source>
-        <translation type="vanished">颜色阈值:</translation>
+        <translation>颜色阈值</translation>
     </message>
     <message>
         <source>White Threshold</source>
-        <translation type="vanished">白场阈值:</translation>
+        <translation>白场阈值</translation>
     </message>
     <message>
         <source>H Range</source>
@@ -311,11 +311,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::ProgressDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="vanished">OpenToonz</translation>
+        <translation>OpenToonz</translation>
     </message>
     <message>
         <source>OpenToonz</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -351,27 +351,27 @@ Possibly the preset file has been corrupted</source>
     <name>DvTextEdit</name>
     <message>
         <source>Bold</source>
-        <translation type="vanished">粗体</translation>
+        <translation>粗体</translation>
     </message>
     <message>
         <source>Italic</source>
-        <translation type="vanished">斜体</translation>
+        <translation>斜体</translation>
     </message>
     <message>
         <source>Underline</source>
-        <translation type="vanished">下划线</translation>
+        <translation>下划线</translation>
     </message>
     <message>
         <source>Align Left</source>
-        <translation type="vanished">左对齐</translation>
+        <translation>左对齐</translation>
     </message>
     <message>
         <source>Align Center</source>
-        <translation type="vanished">居中对齐</translation>
+        <translation>居中对齐</translation>
     </message>
     <message>
         <source>Align Right</source>
-        <translation type="vanished">右对齐</translation>
+        <translation>右对齐</translation>
     </message>
 </context>
 <context>
@@ -389,7 +389,7 @@ Possibly the preset file has been corrupted</source>
     <name>FileField</name>
     <message>
         <source>...</source>
-        <translation type="vanished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -551,7 +551,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source> Frame  </source>
-        <translation type="vanished">帧</translation>
+        <translation>帧</translation>
     </message>
     <message>
         <source>Set the current frame</source>
@@ -587,7 +587,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Locator</source>
-        <translation type="unfinished"></translation>
+        <translation>定位器(&amp;L)</translation>
     </message>
 </context>
 <context>
@@ -759,7 +759,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="vanished">范围:</translation>
+        <translation>范围:</translation>
     </message>
     <message>
         <source>Interpolation:</source>
@@ -767,7 +767,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Step:</source>
-        <translation type="vanished">步长:</translation>
+        <translation>步长:</translation>
     </message>
     <message>
         <source>Similar Shape</source>
@@ -961,11 +961,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Output</source>
-        <translation type="vanished">输出</translation>
+        <translation>输出</translation>
     </message>
     <message>
         <source>Out</source>
-        <translation type="vanished">Out</translation>
+        <translation>Out</translation>
     </message>
 </context>
 <context>
@@ -1128,11 +1128,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>XSheet</source>
-        <translation type="vanished">摄影表</translation>
+        <translation>摄影表</translation>
     </message>
     <message>
         <source>X</source>
-        <translation type="vanished">X</translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -1175,26 +1175,26 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>LineEdit</name>
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation type="vanished">文件名能包含如下的任一字符: /\:*?&quot;&lt;&gt;|.</translation>
+        <translation>文件名能包含如下的任一字符: /\:*?&quot;&lt;&gt;|.</translation>
     </message>
 </context>
 <context>
     <name>PageViewer</name>
     <message>
         <source>Toggle Link to Studio Palette</source>
-        <translation type="vanished">切换是否链接到工作室调色板</translation>
+        <translation>切换是否链接到工作室调色板</translation>
     </message>
     <message>
         <source>Remove Reference to Studio Palette</source>
-        <translation type="vanished">移除工作室调色板的引用</translation>
+        <translation>移除工作室调色板的引用</translation>
     </message>
     <message>
         <source>New Style</source>
-        <translation type="vanished">新建样式</translation>
+        <translation>新建样式</translation>
     </message>
     <message>
         <source>New Page</source>
-        <translation type="vanished">新建页</translation>
+        <translation>新建页</translation>
     </message>
 </context>
 <context>
@@ -1237,7 +1237,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Color Model: </source>
-        <translation type="vanished">色彩模型:</translation>
+        <translation>色彩模型:</translation>
     </message>
     <message>
         <source>&amp;Palette Gizmo</source>
@@ -1269,7 +1269,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>&amp;Small Thumbnails With Name View</source>
-        <translation type="vanished">小缩略图和名称视图(&amp;S)</translation>
+        <translation>小缩略图和名称视图(&amp;S)</translation>
     </message>
     <message>
         <source>Lock Palette</source>
@@ -1305,11 +1305,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Update</source>
-        <translation type="vanished">更新</translation>
+        <translation>更新</translation>
     </message>
     <message>
         <source>Don&apos;t Update</source>
-        <translation type="vanished">不更新</translation>
+        <translation>不更新</translation>
     </message>
     <message>
         <source>     (Color Model: </source>
@@ -1328,7 +1328,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Remove Links</source>
-        <translation type="vanished">移除链接</translation>
+        <translation>移除链接</translation>
     </message>
     <message>
         <source>New Style</source>
@@ -1340,7 +1340,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Name Editor</source>
-        <translation type="unfinished">名称编辑器</translation>
+        <translation>名字编辑器</translation>
     </message>
 </context>
 <context>
@@ -1398,7 +1398,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>ProgressDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="vanished">OpenToonz</translation>
+        <translation>OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -1482,7 +1482,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Fx Schematic</source>
-        <translation type="vanished">特效示意图</translation>
+        <translation>特效示意图</translation>
     </message>
     <message>
         <source>Save Motion Path</source>
@@ -1522,7 +1522,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>For further information visit </source>
-        <translation type="vanished">更多信息访问</translation>
+        <translation>更多信息访问</translation>
     </message>
     <message>
         <source>Fullpath:     </source>
@@ -1682,7 +1682,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>It is not possible to assing a shortcut with modifiers to the visualization commands.</source>
-        <translation type="vanished">无法分配带修饰键的快捷键给可视化命令。</translation>
+        <translation>无法分配带修饰键的快捷键给可视化命令。</translation>
     </message>
     <message>
         <source>It is not possible to save the motion path.</source>
@@ -1698,7 +1698,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Toonz 7.1</source>
-        <translation type="vanished">OpenToonz</translation>
+        <translation>OpenToonz</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
@@ -1728,7 +1728,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Cut Style  from Palette : %1</source>
-        <translation>从调色板 %1 中剪切样式:</translation>
+        <translation>从调色板 %1 中剪切样式</translation>
     </message>
     <message>
         <source>  to Palette : %1</source>
@@ -1760,7 +1760,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Remove Link  in Palette : %1</source>
-        <translation type="vanished">移除调色板 %1 的链接</translation>
+        <translation>移除调色板 %1 的链接</translation>
     </message>
     <message>
         <source>Get Color from Studio Palette</source>
@@ -1866,15 +1866,15 @@ Are you sure?</source>
     </message>
     <message>
         <source>OpenToonz 1.1</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenToonz 1.1</translation>
     </message>
     <message>
         <source>Remove Reference  in Palette : %1</source>
-        <translation type="unfinished"></translation>
+        <translation>移除调色板%1中的引用</translation>
     </message>
     <message>
         <source>It is not possible to assign a shortcut with modifiers to the visualization commands.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法分配带修饰键的快捷键给可视化命令。</translation>
     </message>
 </context>
 <context>
@@ -1888,7 +1888,7 @@ Are you sure?</source>
     <name>RadioButtonDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="vanished">Toonz</translation>
+        <translation>Toonz</translation>
     </message>
 </context>
 <context>
@@ -1931,7 +1931,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>&amp;Schematic Toggle</source>
-        <translation type="vanished">切换示意图(&amp;S)</translation>
+        <translation>切换示意图(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Swtich output port display mode</source>
@@ -1975,11 +1975,11 @@ Are you sure?</source>
     <name>SpeedInOutSegmentPage</name>
     <message>
         <source>Speed in:</source>
-        <translation type="vanished">速入:</translation>
+        <translation>速入:</translation>
     </message>
     <message>
         <source>Speed out:</source>
-        <translation type="vanished">速出:</translation>
+        <translation>速出:</translation>
     </message>
     <message>
         <source>First Speed:</source>
@@ -2087,19 +2087,19 @@ Are you sure?</source>
     <name>StudioPaletteViewer</name>
     <message>
         <source>&amp;New Folder</source>
-        <translation type="vanished">新建文件夹(&amp;N)</translation>
+        <translation>新建文件夹(&amp;N)</translation>
     </message>
     <message>
         <source>&amp;New Palette</source>
-        <translation type="vanished">新建调色板(&amp;N)</translation>
+        <translation>新建调色板(&amp;N)</translation>
     </message>
     <message>
         <source>&amp;Search for Palettes</source>
-        <translation type="vanished">搜索调色板(&amp;S)</translation>
+        <translation>搜索调色板(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation type="vanished">删除(&amp;D)</translation>
+        <translation>删除(&amp;D)</translation>
     </message>
 </context>
 <context>
@@ -2114,7 +2114,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="vanished">自动</translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>Automatically update style changes</source>
@@ -2153,7 +2153,7 @@ Are you sure?</source>
         <translation>设置</translation>
     </message>
     <message>
-        <source>Auto  
+        <source>Auto
 Apply</source>
         <translation>自动
 应用</translation>
@@ -2189,7 +2189,7 @@ Apply</source>
     <name>StyleNameEditor</name>
     <message>
         <source>Name Editor</source>
-        <translation>名称编辑器</translation>
+        <translation>名字编辑器</translation>
     </message>
     <message>
         <source>OK</source>
@@ -2209,7 +2209,7 @@ Apply</source>
     </message>
     <message>
         <source>Name Editor: # %1</source>
-        <translation>名称编辑器: # %1</translation>
+        <translation>名字编辑器: # %1</translation>
     </message>
 </context>
 <context>
@@ -2242,7 +2242,7 @@ Apply</source>
     <name>ToneCurveField</name>
     <message>
         <source>Channel:</source>
-        <translation type="vanished">通道:</translation>
+        <translation>通道:</translation>
     </message>
 </context>
 <context>
