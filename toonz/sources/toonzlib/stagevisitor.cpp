@@ -822,6 +822,10 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
     c[3] = 0.0;
 
     cf = new TGenericColorFunction(m, c);
+  } else if (player.m_filterColor != TPixel::Black) {
+    TPixel32 colorScale = player.m_filterColor;
+    colorScale.m        = player.m_opacity;
+    cf                  = new TColumnColorFilterFunction(colorScale);
   } else if (player.m_opacity < 255)
     cf = new TTranspFader(player.m_opacity / 255.0);
 

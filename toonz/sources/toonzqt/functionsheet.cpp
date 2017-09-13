@@ -642,11 +642,15 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0,
           text.append("~");
         }
 
+        QString fontName = Preferences::instance()->getInterfaceFont();
+        if (fontName == "") {
 #ifdef _WIN32
-        static QFont font("Arial", -1, QFont::Bold);
+          fontName = "Arial";
 #else
-        static QFont font("Helvetica", -1, QFont::Bold);
+          fontName = "Helvetica";
 #endif
+        }
+        static QFont font(fontName, -1, QFont::Bold);
         font.setPixelSize(12);
         painter.setFont(font);
         painter.drawText(cellRect.adjusted(10, 0, 0, 0),
@@ -693,11 +697,15 @@ void FunctionSheetCellViewer::mouseDoubleClickEvent(QMouseEvent *e) {
   } else
     m_lineEdit->setText("");
 
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", 9, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", 9, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, 9, QFont::Normal);
   m_lineEdit->setFont(font);
 
   m_lineEdit->setGeometry(x0 - 2, y0 - 2, x1 - x0 + 1 + 4,

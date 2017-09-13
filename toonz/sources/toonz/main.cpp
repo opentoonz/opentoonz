@@ -96,14 +96,7 @@ const char *applicationRevision = "3";
 const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 #endif
 
-#ifdef _WIN32
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Arial");
-#else
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Hervetica");
-#endif
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
-TEnv::StringVar EnvSoftwareCurrentFontWeight("SoftwareCurrentFontWeightIsBold",
-                                             "Yes");
 
 const char *applicationFullName = "OpenToonz 1.1.3";
 const char *rootVarName         = "TOONZROOT";
@@ -371,11 +364,12 @@ int main(int argc, char *argv[]) {
   splashPixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());
 // QPixmap splashPixmap(":Resources/splash.png");
 #ifdef _WIN32
-  QFont font("Arial", -1);
+  QFont font("Segoe UI", -1);
 #else
   QFont font("Helvetica", -1);
 #endif
   font.setPixelSize(13);
+  font.setWeight(50);
   a.setFont(font);
 
   QString offsetStr("\n\n\n\n\n\n\n\n");
@@ -640,14 +634,13 @@ int main(int argc, char *argv[]) {
   }
 
   QFont *myFont;
-
-  std::string family = EnvSoftwareCurrentFont;
-  myFont             = new QFont(QString(family.c_str()));
-
+  std::string fontName =
+      Preferences::instance()->getInterfaceFont().toStdString();
+  std::string isBold =
+      Preferences::instance()->getInterfaceFontWeight() ? "Yes" : "No";
+  myFont = new QFont(QString::fromStdString(fontName));
   myFont->setPixelSize(EnvSoftwareCurrentFontSize);
-  /*-- フォントのBoldの指定 --*/
-  std::string weight = EnvSoftwareCurrentFontWeight;
-  if (strcmp(weight.c_str(), "Yes") == 0)
+  if (strcmp(isBold.c_str(), "Yes") == 0)
     myFont->setBold(true);
   else
     myFont->setBold(false);

@@ -37,4 +37,35 @@ public:
   std::string getPluginId() const override { return "Base"; }
 };
 
+//******************************************************************************
+//    ColumnColorFilterFx  declaration
+//******************************************************************************
+
+class ColumnColorFilterFx final : public TBaseRasterFx {
+  FX_DECLARATION(ColumnColorFilterFx)
+  TPixel32 m_colorFilter;
+
+protected:
+  TRasterFxPort m_port;
+
+public:
+  ColumnColorFilterFx();
+
+  ~ColumnColorFilterFx(){};
+
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
+
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
+
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
+
+  void setColorFilter(TPixel32 color) { m_colorFilter = color; }
+
+  std::string getAlias(double frame,
+                       const TRenderSettings &info) const override;
+};
+
 #endif  // TBASEFX_INCLUDED

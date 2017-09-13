@@ -75,3 +75,17 @@ bool TOnionFader::getParameters(Parameters &p) const {
   p.m_cM                   = m_color.m;
   return true;
 }
+
+//---------------------------------------
+
+TPixel32 TColumnColorFilterFunction::operator()(const TPixel32 &color) const {
+  int r = 255 - (255 - color.r) * (255 - m_colorScale.r) / 255;
+  int g = 255 - (255 - color.g) * (255 - m_colorScale.g) / 255;
+  int b = 255 - (255 - color.b) * (255 - m_colorScale.b) / 255;
+  return TPixel32(r, g, b, color.m * m_colorScale.m / 255);
+}
+
+bool TColumnColorFilterFunction::getParameters(Parameters &p) const {
+  assert(false);
+  return true;
+}
