@@ -996,7 +996,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
       if (!isColumn) continue;
       // Cells appearance depending on the type of column
       if (isSoundColumn)
-        drawSoundCell(p, row, col);
+        drawSoundCell(p, row, col, isReference);
       else if (isPaletteColumn)
         drawPaletteCell(p, row, col, isReference);
       else if (isSoundTextColumn)
@@ -1127,7 +1127,7 @@ void CellArea::drawExtenderHandles(QPainter &p) {
 
 //-----------------------------------------------------------------------------
 
-void CellArea::drawSoundCell(QPainter &p, int row, int col) {
+void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
   const Orientation *o = m_viewer->orientation();
   TXshSoundColumn *soundColumn =
       m_viewer->getXsheet()->getColumn(col)->getSoundColumn();
@@ -1164,8 +1164,14 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   // get cell colors
   QColor cellColor, sideColor;
   int levelType;
-  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
-                                 isSelected);
+  if (isReference) {
+	  cellColor = (isSelected) ? m_viewer->getSelectedReferenceColumnColor()
+		  : m_viewer->getReferenceColumnColor();
+	  sideColor = m_viewer->getReferenceColumnBorderColor();
+  }
+  else
+	  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
+		  isSelected);
 
   // cells background
   p.fillRect(rect, QBrush(cellColor));
