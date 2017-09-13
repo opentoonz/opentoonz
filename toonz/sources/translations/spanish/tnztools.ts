@@ -112,11 +112,11 @@
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremo</translation>
+        <translation>Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Unión</translation>
+        <translation>Uniones</translation>
     </message>
     <message>
         <source>Miter:</source>
@@ -644,11 +644,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremo</translation>
+        <translation>Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Unión</translation>
+        <translation>Uniones</translation>
     </message>
     <message>
         <source>Miter:</source>
@@ -1000,11 +1000,11 @@ movido hacia el final de la primera página de la paleta.</translation>
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremo</translation>
+        <translation>Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Unión</translation>
+        <translation>Uniones</translation>
     </message>
     <message>
         <source>Miter:</source>
