@@ -1395,8 +1395,8 @@ void searchAudioColumn(TXsheet *xsh, std::vector<TXshSoundColumn *> &sounds,
     TXshColumn *column = xsh->getColumn(i);
     if (column) {
       TXshSoundColumn *soundCol = column->getSoundColumn();
-      if (soundCol && ((isPreview && soundCol->isPreviewVisible()) ||
-                       (!isPreview && soundCol->isCamstandVisible()))) {
+      if (soundCol && ((isPreview && soundCol->isCamstandVisible()) ||
+                       (!isPreview && soundCol->isPreviewVisible()))) {
         sounds.push_back(soundCol);
         continue;
       }

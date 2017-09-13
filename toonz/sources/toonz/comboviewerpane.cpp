@@ -841,6 +841,7 @@ bool ComboViewerPanel::hasSoundtrack() {
   }
   TXsheetHandle *xsheetHandle    = TApp::instance()->getCurrentXsheet();
   TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
+  if(!m_sceneViewer->isPreviewEnabled()) prop->m_isPreview = true;
   m_sound                        = xsheetHandle->getXsheet()->makeSound(prop);
   if (m_sound == NULL) {
     m_hasSoundtrack = false;
