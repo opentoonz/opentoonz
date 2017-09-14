@@ -224,6 +224,12 @@ Preferences::Preferences()
     , m_cameraUnits("inch")
     , m_currentRoomChoice("Default")
     , m_scanLevelType("tif")
+#ifdef _WIN32
+    , m_interfaceFont("Segoe UI")
+#else
+    , m_interfaceFont("Helvetica")
+#endif
+    , m_interfaceFontWeight(0)
     , m_defLevelWidth(0.0)
     , m_defLevelHeight(0.0)
     , m_defLevelDpi(0.0)
@@ -600,6 +606,10 @@ Preferences::Preferences()
   QString shortcutPreset = m_settings->value("shortcutPreset").toString();
   if (shortcutPreset != "") m_shortcutPreset = shortcutPreset;
   setShortcutPreset(m_shortcutPreset.toStdString());
+  QString interfaceFont = m_settings->value("interfaceFont").toString();
+  if (interfaceFont != "") m_interfaceFont = interfaceFont;
+  setInterfaceFont(m_interfaceFont.toStdString());
+  getValue(*m_settings, "interfaceFontWeight", m_interfaceFontWeight);
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
   getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
@@ -1205,6 +1215,20 @@ QString Preferences::getCurrentStyleSheetName() const {
     return m_currentStyleSheet;
   // If no valid option selected, then return the first oprion
   return m_styleSheetList.isEmpty() ? QString() : m_styleSheetList[0];
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setInterfaceFont(std::string font) {
+  m_interfaceFont = QString::fromStdString(font);
+  m_settings->setValue("interfaceFont", m_interfaceFont);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setInterfaceFontWeight(int weight) {
+  m_interfaceFontWeight = weight;
+  m_settings->setValue("interfaceFontWeight", m_interfaceFontWeight);
 }
 
 //-----------------------------------------------------------------

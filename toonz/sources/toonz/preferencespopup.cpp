@@ -32,6 +32,7 @@
 
 // TnzCore includes
 #include "tsystem.h"
+#include "tfont.h"
 
 // Qt includes
 #include <QHBoxLayout>
@@ -335,6 +336,23 @@ void PreferencesPopup::onCameraUnitChanged(int index) {
 void PreferencesPopup::onRoomChoiceChanged(int index) {
   TApp::instance()->writeSettings();
   m_pref->setCurrentRoomChoice(index);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onInterfaceFontChanged(int index) {
+  QString font = m_interfaceFont->currentText();
+  m_pref->setInterfaceFont(font.toStdString());
+  if (font.contains("Comic Sans"))
+    DVGui::warning(tr("Life is too short for Comic Sans"));
+  if (font.contains("Wingdings"))
+    DVGui::warning(tr("Good luck.  You're on your own from here."));
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onInterfaceFontWeightChanged(int index) {
+  m_pref->setInterfaceFontWeight(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -1176,6 +1194,9 @@ PreferencesPopup::PreferencesPopup()
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_interface->setStyleSheet("font-size: 10px; font: italic;");
 
+  m_interfaceFont       = new QComboBox(this);
+  m_interfaceFontWeight = new QComboBox(this);
+
   //--- Visualization ------------------------------
   categoryList->addItem(tr("Visualization"));
   CheckBox *show0ThickLinesCB =
@@ -1418,6 +1439,33 @@ PreferencesPopup::PreferencesPopup()
   zoomCenters << tr("Mouse Cursor") << tr("Viewer Center");
   viewerZoomCenterComboBox->addItems(zoomCenters);
   viewerZoomCenterComboBox->setCurrentIndex(m_pref->getViewerZoomCenter());
+
+  TFontManager *instance = TFontManager::instance();
+  bool validFonts;
+  try {
+    instance->loadFontNames();
+    validFonts = true;
+  } catch (TFontLibraryLoadingError &) {
+    validFonts = false;
+    //    TMessage::error(toString(e.getMessage()));
+  }
+
+  if (validFonts) {
+    std::vector<std::wstring> names;
+    instance->getAllFamilies(names);
+
+    for (std::vector<std::wstring>::iterator it = names.begin();
+         it != names.end(); ++it)
+      m_interfaceFont->addItem(QString::fromStdWString(*it));
+
+    m_interfaceFont->setCurrentText(m_pref->getInterfaceFont());
+  }
+
+  QStringList fontStyles;
+  fontStyles << "Regular"
+             << "Bold";
+  m_interfaceFontWeight->addItems(fontStyles);
+  m_interfaceFontWeight->setCurrentIndex(m_pref->getInterfaceFontWeight());
 
   //--- Visualization ------------------------------
   show0ThickLinesCB->setChecked(m_pref->getShow0ThickLines());
@@ -1773,6 +1821,14 @@ PreferencesPopup::PreferencesPopup()
           bgColorsLay->addWidget(new QLabel(tr("Language *:")), 7, 0,
                                  Qt::AlignRight | Qt::AlignVCenter);
           bgColorsLay->addWidget(languageType, 7, 1, 1, 4);
+        }
+        if (m_interfaceFont->count() > 0) {
+          bgColorsLay->addWidget(new QLabel(tr("Font *:")), 8, 0,
+                                 Qt::AlignRight | Qt::AlignVCenter);
+          bgColorsLay->addWidget(m_interfaceFont, 8, 1, 1, 4);
+          bgColorsLay->addWidget(new QLabel(tr("Font Weight *:")), 9, 0,
+                                 Qt::AlignRight | Qt::AlignVCenter);
+          bgColorsLay->addWidget(m_interfaceFontWeight, 9, 1, 1, 4);
         }
       }
       bgColorsLay->setColumnStretch(0, 0);
@@ -2246,6 +2302,10 @@ PreferencesPopup::PreferencesPopup()
   ret =
       ret && connect(viewerZoomCenterComboBox, SIGNAL(currentIndexChanged(int)),
                      this, SLOT(onViewerZoomCenterChanged(int)));
+  ret = ret && connect(m_interfaceFont, SIGNAL(currentIndexChanged(int)), this,
+                       SLOT(onInterfaceFontChanged(int)));
+  ret = ret && connect(m_interfaceFontWeight, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onInterfaceFontWeightChanged(int)));
   ret = ret && connect(replaceAfterSaveLevelAsCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onReplaceAfterSaveLevelAsChanged(int)));
   ret =

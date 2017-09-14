@@ -339,11 +339,15 @@ void ChangeObjectParent::refresh() {
   for (i = 0; i < columnList.size(); i++) addItem(columnList.at(i));
   for (i = 0; i < pegbarList.size(); i++) addItem(pegbarList.at(i));
 
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Bold);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   // set font size in pixel
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
 
@@ -460,11 +464,15 @@ RenameColumnField::RenameColumnField(QWidget *parent, XsheetViewer *viewer)
 void RenameColumnField::show(const QRect &rect, int col) {
   move(rect.topLeft());
   setFixedSize(rect.size());
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   setFont(font);
   m_col = col;
@@ -550,12 +558,16 @@ ColumnArea::DrawHeader::DrawHeader(ColumnArea *nArea, QPainter &nP, int nCol)
 }
 
 void ColumnArea::DrawHeader::prepare() const {
-// Preparing painter
+  // Preparing painter
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  QFont font("Helvetica", -1, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
 
   p.setFont(font);
@@ -1112,12 +1124,16 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   TColumnSelection *selection = m_viewer->getColumnSelection();
   const Orientation *o        = m_viewer->orientation();
 
-// Preparing painter
+  // Preparing painter
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName       = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
 
   p.setFont(font);
@@ -1182,11 +1198,15 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
   int x = m_viewer->columnToLayerAxis(col);
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName       = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
@@ -1230,11 +1250,15 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
 
   QPoint orig = m_viewer->positionToXY(CellPosition(0, max(col, 0)));
 
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName       = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
 
   p.setFont(font);
@@ -1277,11 +1301,15 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   int x = m_viewer->columnToLayerAxis(col);
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName       = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
