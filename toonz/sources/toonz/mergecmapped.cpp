@@ -32,6 +32,8 @@
 #include "toonz/levelproperties.h"
 #include "toonz/toonzscene.h"
 #include "toonz/childstack.h"
+#include "toonz/toonzimageutils.h"
+#include "tpaletteutil.h"
 
 #include <algorithm>
 
@@ -73,6 +75,15 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels) {
         (TToonzImageP)matchingLevels[i].m_mcell->getImage(false);
     if (!img || !match)
       throw TRopException("Can merge only cmapped raster images!");
+
+	std::set<int> usedStyles;
+	ToonzImageUtils::getUsedStyles(usedStyles, match);
+	std::map<int, int> indexTable;
+	mergePalette(palette, indexTable, matchPalette, usedStyles);
+	ToonzImageUtils::scrambleStyles(match, indexTable);
+	match->setPalette(palette);
+	matchPalette = palette;
+
     // img->lock();
     TRasterCM32P ras      = img->getRaster();    // img->getCMapped(false);
     TRasterCM32P matchRas = match->getRaster();  // match->getCMapped(true);
@@ -129,7 +140,7 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels) {
 
     img->setSavebox(img->getSavebox() + (matchRas->getBounds() + offs));
   }
-
+/*
   std::map<int, int>::iterator it = usedColors.begin();
   for (; it != usedColors.end(); ++it)
     if (it->first != it->second) break;
@@ -158,6 +169,7 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels) {
     page->addStyle(it->second);
   }
   if (usedColors.size() > 0) palette->setDirtyFlag(true);
+*/
 }
 
 /*------------------------------------------------------------------------*/
@@ -486,9 +498,10 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath,
   TXshLevel *txl = level->getScene()->createNewLevel(
       level->getType(), fp.getWideName(), level->getResolution());
   TXshSimpleLevel *newLevel = txl->getSimpleLevel();
+  newLevel->setPath(fp);
   newLevel->setPalette(level->getPalette());
   newLevel->clonePropertiesFrom(level);
-  newLevel->setPath(fp);
+//  newLevel->setPath(fp);
 
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentScene()->notifyCastChange();
