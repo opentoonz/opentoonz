@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.0" language="zh_CN">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -57,11 +57,11 @@
     </message>
     <message>
         <source>Center</source>
-        <translation type="vanished">中心点</translation>
+        <translation>中心点</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation type="vanished">锁定</translation>
+        <translation>锁定</translation>
     </message>
     <message>
         <source>(</source>
@@ -80,7 +80,7 @@
     <name>BrushTool</name>
     <message>
         <source>Thickness</source>
-        <translation type="vanished">粗细</translation>
+        <translation>粗细</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -100,15 +100,15 @@
     </message>
     <message>
         <source>Break Sharp Angles</source>
-        <translation type="vanished">断开尖角</translation>
+        <translation>断开尖角</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation type="vanished">铅笔模式</translation>
+        <translation>铅笔模式</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation type="vanished">压力灵敏度</translation>
+        <translation>压力灵敏度</translation>
     </message>
     <message>
         <source>Cap</source>
@@ -334,31 +334,31 @@
     </message>
     <message>
         <source>Lines</source>
-        <translation type="vanished">线</translation>
+        <translation>线</translation>
     </message>
     <message>
         <source>Areas</source>
-        <translation type="vanished">区域</translation>
+        <translation>区域</translation>
     </message>
     <message>
         <source>Lines &amp;&amp; Areas</source>
-        <translation type="vanished">线和区域</translation>
+        <translation>线和区域</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="vanished">正常</translation>
+        <translation>正常</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation type="vanished">矩形</translation>
+        <translation>矩形</translation>
     </message>
     <message>
         <source>Freehand</source>
-        <translation type="vanished">手绘</translation>
+        <translation>手绘</translation>
     </message>
     <message>
         <source>Polyline</source>
-        <translation type="vanished">多边形</translation>
+        <translation>多边形</translation>
     </message>
 </context>
 <context>
@@ -393,6 +393,18 @@
     <message>
         <source>Preset:</source>
         <translation>预设:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>大小</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>压感</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>不透明度</translation>
     </message>
 </context>
 <context>
@@ -686,6 +698,10 @@ Do you want to proceed?</source>
         <source>Size:</source>
         <translation>大小:</translation>
     </message>
+    <message>
+        <source>Snap</source>
+        <translation>吸附</translation>
+    </message>
 </context>
 <context>
     <name>PumpTool</name>
@@ -726,7 +742,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation type="vanished">当前列在摄影机位中不可见。</translation>
+        <translation>当前列在摄影机位中不可见。</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>
@@ -958,15 +974,27 @@ Do you want to proceed?</source>
     <name>StylePickerTool</name>
     <message>
         <source>No current level.</source>
-        <translation type="unfinished"></translation>
+        <translation>没有当前层级。</translation>
     </message>
     <message>
         <source>Current level has no available palette.</source>
-        <translation type="unfinished"></translation>
+        <translation>当前层级没有可用色板。</translation>
     </message>
     <message>
         <source>Palette must have more than one palette to be organized.</source>
-        <translation type="unfinished"></translation>
+        <translation>必须要多个色板才能被组织。</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>模式:</translation>
+    </message>
+    <message>
+        <source>Passive Pick</source>
+        <translation>拾取光标位置颜色</translation>
+    </message>
+    <message>
+        <source>Organize Palette</source>
+        <translation>整理调色板</translation>
     </message>
 </context>
 <context>
@@ -974,7 +1002,7 @@ Do you want to proceed?</source>
     <message>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
-        <translation type="unfinished"></translation>
+        <translation>打开这个选项，选中的样式将被移到色板第一页的最后。</translation>
     </message>
 </context>
 <context>
