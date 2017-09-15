@@ -479,9 +479,7 @@ public:
       int index = *it;
       it++;
       mergeCmapped(destColumn, index - count,
-                   it == indices.end()
-                       ? QString::fromStdWString(newLevelPath.getWideString())
-                       : "",
+				   QString::fromStdWString(newLevelPath.getWideString()),
                    false);
       ColumnCmd::deleteColumn(index - count);
       progress.setValue(++count);
