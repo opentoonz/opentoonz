@@ -1018,8 +1018,8 @@ void BrushTool::updateTranslation() {
   m_capStyle.setQStringName(tr("Cap"));
   m_joinStyle.setQStringName(tr("Join"));
   m_miterJoinLimit.setQStringName(tr("Miter:"));
-  m_frameRange.setQStringName("Range:");
-  m_snap.setQStringName("Snap");
+  m_frameRange.setQStringName(tr("Range:"));
+  m_snap.setQStringName(tr("Snap"));
   m_snapSensitivity.setQStringName("");
 }
 
