@@ -2,6 +2,7 @@
 
 #include "toonzqt/spreadsheetviewer.h"
 #include "toonzqt/gutil.h"
+#include "toonz/preferences.h"
 
 #include "toonz/tframehandle.h"
 #include "orientation.h"
@@ -94,13 +95,18 @@ void adjustScrollbar(QScrollBar *scrollBar, int add);
 
 void FrameScroller::onScroll(const CellPositionRatio &ratio) {
   QPoint offset = orientation()->positionRatioToXY(ratio);
+  // scroll area should be resized before moving down the scroll bar.
+  // SpreadsheetViewer::onPrepareToScrollOffset() will be invoked immediately
+  // since the receiver is in the same thread.
+  // when moving up the scroll bar, resizing will be done in
+  // SpreadsheetViewer::onVSliderChanged().
+  if (offset.x() > 0 || offset.y() > 0) emit prepareToScrollOffset(offset);
   if (offset.x())
     adjustScrollbar(m_scrollArea->horizontalScrollBar(), offset.x());
   if (offset.y())
     adjustScrollbar(m_scrollArea->verticalScrollBar(), offset.y());
-
-  emit prepareToScrollOffset(offset);
 }
+
 void adjustScrollbar(QScrollBar *scrollBar, int add) {
   scrollBar->setValue(scrollBar->value() + add);
 }
@@ -286,11 +292,15 @@ DragTool *RowPanel::createDragTool(QMouseEvent *) {
 //-----------------------------------------------------------------------------
 
 void RowPanel::drawRows(QPainter &p, int r0, int r1) {
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Bold);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Bold);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Bold);
   font.setPixelSize(12);
   p.setFont(font);
 

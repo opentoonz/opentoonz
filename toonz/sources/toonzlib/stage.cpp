@@ -96,35 +96,6 @@ void updateOnionSkinSize(const PlayerSet &players) {
 bool descending(int i, int j) { return (i > j); }
 
 //----------------------------------------------------------------
-
-TPixel32 getFilterColorFromId(int id) {
-  switch (id) {
-  case 0:
-    return TPixel::Black;
-    break;
-  case 1:
-    return TPixel::Red;
-    break;
-  case 2:
-    return TPixel::Green;
-    break;
-  case 3:
-    return TPixel::Blue;
-    break;
-  case 4:
-    return TPixel(128, 128, 0);
-    break;
-  case 5:
-    return TPixel(0, 128, 128);
-    break;
-  case 6:
-    return TPixel(128, 0, 128);
-    break;
-  }
-  return TPixel::Black;
-}
-
-//----------------------------------------------------------------
 }
 
 //=============================================================================
@@ -396,7 +367,7 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
     player.m_ancestorColumnIndex = m_ancestorColumnIndex;
     player.m_masks               = m_masks;
     player.m_opacity             = column->getOpacity();
-    player.m_filterColor = getFilterColorFromId(column->getFilterColorId());
+    player.m_filterColor         = column->getFilterColor();
 
     if (m_subXSheetStack.empty()) {
       player.m_z         = columnZ;

@@ -1,0 +1,176 @@
+/* -----------------------------------------------------------------------------
+   Style Editor
+----------------------------------------------------------------------------- */
+
+#StyleEditor {
+  & QPushButton {
+    // Temporary fix for channel buttons
+    margin: 2px 1px;
+    padding: 0;
+  }
+  & #TabBarContainer {
+    margin-left: -4px; // Fix container margin
+  }
+  & #bottomWidget {
+    border-top: 1px solid @accent;
+    padding: 3px 2px 8px 3px;
+    & QPushButton {
+      // Override above container margin fix
+      padding: 3px 5px;
+    }
+  }
+}
+
+#StyleEditorTabBar {
+  &:extend(.tab-container all);
+  &::tab {
+    &:extend(.tab-flat all);
+  }
+}
+
+#HexagonalColorWheel {
+  qproperty-BGColor: @bg;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Horizontal QSlider */
+
+// NOTE: I don't know what #colorSlider does, it seems to have no effect.
+
+#colorSlider {
+  &::groove:horizontal {
+    height: 1px;
+    border-image: none;
+  }
+  &::handle:horizontal {
+    width: 8px;
+    margin: -8px -4px;
+  }
+}
+
+#colorSliderAddButton, 
+#colorSliderSubButton {
+  background: none;
+  border-color: transparent;
+  image-position: center center;
+  min-height: 16px;
+  padding: 0;
+  min-width: 18px;
+  &:hover {
+    &:extend(.button-tool:hover);
+  }
+  &:pressed {
+    &:extend(.button-tool:pressed);
+  }
+}
+
+#colorSliderAddButton {
+  image: url('@{img-url}/scroll-right.svg');
+}
+
+#colorSliderSubButton {
+  image: url('@{img-url}/scroll-left.svg');
+}
+
+#PlainColorPageParts {
+  border-top: 1px solid @accent;
+  & QLineEdit {
+    max-width: 35px;
+  }
+}
+
+#colorSliderLabel, 
+#colorSliderField {
+  // Placeholder
+}
+
+/* -----------------------------------------------------------------------------
+   Palette Viewer / Studio Palette
+----------------------------------------------------------------------------- */
+
+PaletteViewer {
+  & DvScrollWidget {
+    & QPushButton {
+      border-top: 0;
+      margin-bottom: 1px;
+      max-width: 15px;
+      min-width: 15px;
+    }
+    & #ScrollLeftButton {
+      border-left: 1px solid @accent;
+      max-width: 15px;
+      min-width: 15px;
+      margin-bottom: 1px;
+    }
+    & #ScrollRightButton {
+      border-right: 0;
+      margin-left: 1px;
+      max-width: 15px;
+      min-width: 15px;
+      margin-bottom: 1px;
+    }
+  }
+  & QToolBar {
+    background: none;
+    border-bottom: 1px solid @accent;
+    padding: 0;
+    margin: 0;
+    &::separator:horizontal {
+      margin: 0; // very compact space so remove margin
+    }
+    & QToolButton {
+      &:extend(.button-flat all); // use flat button style
+      margin: 0 0 1px 0; // adds height to QToolBar
+      padding: 1px 1px 2px 1px;
+    }
+  }
+}
+
+#StudioPalette {
+  & QTreeView {
+    &:extend(.tree-list all);
+    &::branch {
+      &:extend(.branch-17 all);
+    }
+  }
+}
+
+#PaletteTabBar {
+  &:extend(.tab-container all);
+  &::tab {
+    &:extend(.tab-flat all);
+  }
+}
+
+#PageViewer {
+  qproperty-TextColor: @text-color;
+}
+
+#PaletteLockButton {
+  border-radius: 0;
+  margin: 0 0 1px 1px;
+  &:checked {
+    background-color: @toolbutton-lock-bg-color-checked;
+    border-color: @toolbutton-lock-border-color-checked;
+    &:hover {
+      background-color: @toolbutton-lock-bg-color-checked-hover;
+      border-color: @toolbutton-lock-border-color-checked-hover;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Quick Renamer
+----------------------------------------------------------------------------- */
+
+#WordButton {
+  &:extend(.QPushButton all);
+  // Remove H padding else moderate length text gets clipped
+  padding-right: 0;
+  padding-left: 0;
+}
+
+#SolidLineFrame {
+  &:extend(.frame all);
+}

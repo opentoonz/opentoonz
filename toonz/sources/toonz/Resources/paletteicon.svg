@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="paletteicon.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60"
+	 style="enable-background:new 0 0 60 60;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#F2F2F2;}
+	.st2{fill:#8C8C8C;}
+	.st3{fill:#FFFFFF;}
+	.st4{fill:#A5A5A5;}
+	.st5{fill:#2B9396;}
+	.st6{fill:#79B2B3;}
+	.st7{fill:#4DA4A6;}
+	.st8{fill:#A7C4C5;}
+	.st9{fill:#DBEAEB;}
+	.st10{fill:#688586;}
+	.st11{fill:#007D80;}
+	.st12{fill:#207E80;}
+	.st13{fill:#607F80;}
+	.st14{fill:#407F80;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview64" inkscape:current-layer="svg2" inkscape:cx="30" inkscape:cy="30" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="500" inkscape:window-maximized="0" inkscape:window-width="1109" inkscape:window-x="63" inkscape:window-y="20" inkscape:zoom="3.9333333" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<rect id="rect4" y="0" class="st0" width="60" height="60"/>
+<g id="g6">
+	<rect id="rect8" x="1" y="8" class="st1" width="58" height="43"/>
+	<path id="path10" inkscape:connector-curvature="0" class="st2" d="M60,7v45H0V7H60z M1,8v43h58V8H1z"/>
+</g>
+<path id="path12_1_" inkscape:connector-curvature="0" class="st2" d="M14,21V8h2v13h13V8h2v13h13V8h2v13h13v2H46v13h13v2H46v13h-2
+	V38H31v13h-2V38H16v13h-2V38H1v-2h13V23H1v-2H14z M31,36h13V23H31V36z M16,36h13V23H16V36z"/>
+<rect id="rect16" x="3" y="10" class="st3" width="9" height="9"/>
+<path id="path18" inkscape:connector-curvature="0" class="st4" d="M13,20H2V9h11V20z M3,10v9h9v-9H3z"/>
+<rect id="rect20" x="18" y="10" width="9" height="9"/>
+<path id="path22" inkscape:connector-curvature="0" class="st4" d="M28,20H17V9h11V20z M18,10v9h9v-9H18z"/>
+<rect id="rect24" x="33" y="10" class="st5" width="9" height="9"/>
+<path id="path26" inkscape:connector-curvature="0" class="st4" d="M43,20H32V9h11V20z M33,10v9h9v-9H33z"/>
+<rect id="rect28" x="48" y="10" class="st6" width="9" height="9"/>
+<path id="path30" inkscape:connector-curvature="0" class="st4" d="M58,20H47V9h11V20z M48,10v9h9v-9H48z"/>
+<rect id="rect32" x="48" y="25" class="st7" width="9" height="9"/>
+<path id="path34" inkscape:connector-curvature="0" class="st4" d="M58,35H47V24h11V35z M48,25v9h9v-9H48z"/>
+<rect id="rect36" x="33" y="25" class="st8" width="9" height="9"/>
+<path id="path38" inkscape:connector-curvature="0" class="st4" d="M43,35H32V24h11V35z M33,25v9h9v-9H33z"/>
+<rect id="rect40" x="18" y="25" class="st9" width="9" height="9"/>
+<path id="path42" inkscape:connector-curvature="0" class="st4" d="M28,35H17V24h11V35z M18,25v9h9v-9H18z"/>
+<rect id="rect44" x="3" y="25" class="st10" width="9" height="9"/>
+<path id="path46" inkscape:connector-curvature="0" class="st4" d="M13,35H2V24h11V35z M3,25v9h9v-9H3z"/>
+<rect id="rect48" x="3" y="40" class="st11" width="9" height="9"/>
+<path id="path50" inkscape:connector-curvature="0" class="st4" d="M13,50H2V39h11V50z M3,40v9h9v-9H3z"/>
+<rect id="rect52" x="18" y="40" class="st12" width="9" height="9"/>
+<path id="path54" inkscape:connector-curvature="0" class="st4" d="M28,50H17V39h11V50z M18,40v9h9v-9H18z"/>
+<rect id="rect56" x="33" y="40" class="st13" width="9" height="9"/>
+<path id="path58" inkscape:connector-curvature="0" class="st4" d="M43,50H32V39h11V50z M33,40v9h9v-9H33z"/>
+<rect id="rect60" x="48" y="40" class="st14" width="9" height="9"/>
+<path id="path62" inkscape:connector-curvature="0" class="st4" d="M58,50H47V39h11V50z M48,40v9h9v-9H48z"/>
+</svg>

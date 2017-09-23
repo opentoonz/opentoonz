@@ -26,6 +26,9 @@
 #define MI_ClearRecentLevel "MI_ClearRecentLevel"
 #define MI_PrintXsheet "MI_PrintXsheet"
 #define MI_NewLevel "MI_NewLevel"
+#define MI_NewVectorLevel "MI_NewVectorLevel"
+#define MI_NewToonzRasterLevel "MI_NewToonzRasterLevel"
+#define MI_NewRasterLevel "MI_NewRasterLevel"
 #define MI_LoadLevel "MI_LoadLevel"
 #define MI_LoadFolder "MI_LoadFolder"
 #define MI_SaveLevel "MI_SaveLevel"
@@ -86,6 +89,7 @@
 #define MI_OpenFileBrowser2 "MI_OpenFileBrowser2"
 #define MI_OpenStyleControl "MI_OpenStyleControl"
 #define MI_OpenToolbar "MI_OpenToolbar"
+#define MI_OpenCommandToolbar "MI_OpenCommandToolbar"
 #define MI_OpenToolOptionBar "MI_OpenToolOptionBar"
 #define MI_OpenLevelView "MI_OpenLevelView"
 #ifdef LINETEST
@@ -316,4 +320,5 @@
 #define MI_PencilTest "MI_PencilTest"
 #define MI_AudioRecording "MI_AudioRecording"
 #define MI_LipSyncPopup "MI_LipSyncPopup"
+#define MI_AutoInputCellNumber "MI_AutoInputCellNumber"
 #endif

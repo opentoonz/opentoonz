@@ -292,9 +292,9 @@ CleanupPopup::CleanupPopup()
     , m_params(new CleanupParameters)
     , m_updater(new LevelUpdater)
     , m_originalLevelPath()
-    , m_originalPalette(0) {
+    , m_originalPalette(0)
+    , m_firstLevelFrame(true) {
   setWindowTitle(tr("Cleanup"));
-
   // Progress Bar
   m_progressLabel = new QLabel(tr("Cleanup in progress"));
   m_progressBar   = new QProgressBar;
@@ -1217,10 +1217,20 @@ void CleanupPopup::cleanupFrame() {
       IconGenerator::instance()->invalidate(sl, fid);
     } else {
       // Perform main processing
-      double dpix, dpiy;
-      original->getDpi(dpix, dpiy);
-      cl->setCustomDpi((dpix == 0 && dpiy == 0) ? sl->getProperties()->getDpi()
-                                                : TPointD());
+
+      // Obtain the source dpi. Changed it to be done once at the first frame of
+      // each level in order to avoid the following problem:
+      // If the original raster level has no dpi (such as TGA images), obtaining
+      // dpi in every frame causes dpi mismatch between the first frame and the
+      // following frames, since the value
+      // TXshSimpleLevel::m_properties->getDpi() will be changed to the
+      // dpi of cleanup camera (= TLV's dpi) after finishing the first frame.
+      if (m_firstLevelFrame) {
+        TPointD dpi;
+        original->getDpi(dpi.x, dpi.y);
+        if (dpi.x == 0 && dpi.y == 0) dpi = sl->getProperties()->getDpi();
+        cl->setSourceDpi(dpi);
+      }
 
       CleanupPreprocessedImage *cpi;
       {

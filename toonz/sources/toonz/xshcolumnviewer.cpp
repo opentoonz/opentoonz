@@ -103,11 +103,10 @@ bool containsRasterLevel(TColumnSelection *selection) {
   return false;
 }
 
-const QIcon getColorChipIcon(const int id) {
-  static QList<QColor> colors = {Qt::red,        Qt::green,    Qt::blue,
-                                 Qt::darkYellow, Qt::darkCyan, Qt::darkMagenta};
+const QIcon getColorChipIcon(TPixel32 color) {
+  QColor qCol((int)color.r, (int)color.g, (int)color.b, (int)color.m);
   QPixmap pixmap(12, 12);
-  pixmap.fill(colors.at(id - 1));
+  pixmap.fill(qCol);
   return QIcon(pixmap);
 }
 
@@ -340,11 +339,15 @@ void ChangeObjectParent::refresh() {
   for (i = 0; i < columnList.size(); i++) addItem(columnList.at(i));
   for (i = 0; i < pegbarList.size(); i++) addItem(pegbarList.at(i));
 
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Bold);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   // set font size in pixel
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
 
@@ -461,11 +464,15 @@ RenameColumnField::RenameColumnField(QWidget *parent, XsheetViewer *viewer)
 void RenameColumnField::show(const QRect &rect, int col) {
   move(rect.topLeft());
   setFixedSize(rect.size());
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   setFont(font);
   m_col = col;
@@ -551,12 +558,16 @@ ColumnArea::DrawHeader::DrawHeader(ColumnArea *nArea, QPainter &nP, int nCol)
 }
 
 void ColumnArea::DrawHeader::prepare() const {
-// Preparing painter
+  // Preparing painter
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  QFont font("Helvetica", -1, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
 
   p.setFont(font);
@@ -578,15 +589,15 @@ const QPixmap &ColumnArea::Pixmaps::cameraStandTransparent() {
   return cameraStandTransparent;
 }
 const QPixmap &ColumnArea::Pixmaps::lock() {
-  static QPixmap lock = QPixmap(":Resources/x_lock.png");
+  static QPixmap lock = svgToPixmap(":Resources/x_lock.svg");
   return lock;
 }
 const QPixmap &ColumnArea::Pixmaps::sound() {
-  static QPixmap sound = QPixmap(":Resources/sound_header_off.png");
+  static QPixmap sound = svgToPixmap(":Resources/sound_header_off.svg");
   return sound;
 }
 const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
-  static QPixmap soundPlaying = QPixmap(":Resources/sound_header_on.png");
+  static QPixmap soundPlaying = svgToPixmap(":Resources/sound_header_on.svg");
   return soundPlaying;
 }
 //-----------------------------------------------------------------------------
@@ -607,7 +618,7 @@ void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
 }
 void ColumnArea::DrawHeader::soundColors(QColor &columnColor,
                                          QColor &dragColor) const {
-  m_viewer->getColumnColor(columnColor, dragColor, col, xsh);
+    m_viewer->getColumnColor(columnColor, dragColor, col, xsh);
 }
 void ColumnArea::DrawHeader::paletteColors(QColor &columnColor,
                                            QColor &dragColor) const {
@@ -898,7 +909,7 @@ void ColumnArea::DrawHeader::drawFilterColor() const {
   QRect filterColorRect =
       o->rect(PredefinedRect::FILTER_COLOR).translated(orig);
   p.drawPixmap(filterColorRect,
-               getColorChipIcon(column->getFilterColorId()).pixmap(12, 12));
+               getColorChipIcon(column->getFilterColor()).pixmap(12, 12));
 }
 
 void ColumnArea::DrawHeader::drawSoundIcon(bool isPlaying) const {
@@ -1113,12 +1124,16 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   TColumnSelection *selection = m_viewer->getColumnSelection();
   const Orientation *o        = m_viewer->orientation();
 
-// Preparing painter
+  // Preparing painter
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName       = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
 
   p.setFont(font);
@@ -1183,11 +1198,15 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
   int x = m_viewer->columnToLayerAxis(col);
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName       = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
@@ -1207,7 +1226,8 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
   DrawHeader drawHeader(this, p, col);
   drawHeader.prepare();
   QColor columnColor, dragColor;
-  drawHeader.soundColors(columnColor, dragColor);
+//  drawHeader.soundColors(columnColor, dragColor);
+  drawHeader.levelColors(columnColor, dragColor);
   drawHeader.drawBaseFill(columnColor, dragColor);
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(255);
@@ -1231,11 +1251,15 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
 
   QPoint orig = m_viewer->positionToXY(CellPosition(0, max(col, 0)));
 
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName       = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
 
   p.setFont(font);
@@ -1262,7 +1286,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawLock();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
-  static QPixmap iconPixmap(":Resources/palette_header.png");
+  static QPixmap iconPixmap(svgToPixmap(":Resources/palette_header.svg"));
   drawHeader.drawThumbnail(iconPixmap);
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
@@ -1278,11 +1302,15 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   int x = m_viewer->columnToLayerAxis(col);
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName       = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
@@ -1313,7 +1341,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawLock();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
-  static QPixmap iconPixmap(":Resources/magpie.png");
+  static QPixmap iconPixmap(svgToPixmap(":Resources/magpie.svg"));
   drawHeader.drawThumbnail(iconPixmap);
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
@@ -1431,20 +1459,16 @@ static QFont font("Helvetica", 7, QFont::Normal);
 m_value->setFont(font);*/
 
   m_filterColorCombo = new QComboBox(this);
-  m_filterColorCombo->addItem(tr("None"), 0);
-  m_filterColorCombo->addItem(getColorChipIcon(1), tr("Red"), 1);
-  m_filterColorCombo->addItem(getColorChipIcon(2), tr("Green"), 2);
-  m_filterColorCombo->addItem(getColorChipIcon(3), tr("Blue"), 3);
-  m_filterColorCombo->addItem(getColorChipIcon(4), tr("DarkYellow"), 4);
-  m_filterColorCombo->addItem(getColorChipIcon(5), tr("DarkCyan"), 5);
-  m_filterColorCombo->addItem(getColorChipIcon(6), tr("DarkMagenta"), 6);
-  // For now the color filter affects only for Raster and ToonzRaser levels.
-  // TODO: Make this property to affect vector levels as well.
-  m_filterColorCombo->setToolTip(
-      tr("N.B. Filter doesn't affect vector levels"));
+  for (int f = 0; f < (int)TXshColumn::FilterAmount; f++) {
+    QPair<QString, TPixel32> info =
+        TXshColumn::getFilterInfo((TXshColumn::FilterColor)f);
+    if ((TXshColumn::FilterColor)f == TXshColumn::FilterNone)
+      m_filterColorCombo->addItem(info.first, f);
+    else
+      m_filterColorCombo->addItem(getColorChipIcon(info.second), info.first, f);
+  }
 
   QLabel *filterLabel = new QLabel(tr("Filter:"), this);
-  filterLabel->setToolTip(tr("N.B. Filter doesn't affect vector levels"));
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
   mainLayout->setMargin(3);
@@ -1523,7 +1547,7 @@ void ColumnTransparencyPopup::onValueChanged(const QString &str) {
 //----------------------------------------------------------------
 
 void ColumnTransparencyPopup::onFilterColorChanged(int id) {
-  m_column->setFilterColorId(id);
+  m_column->setFilterColorId((TXshColumn::FilterColor)id);
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   ((ColumnArea *)parent())->update();
@@ -1845,7 +1869,7 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
     if (m_doOnRelease == ToggleTransparency &&
         (!m_columnTransparencyPopup || m_columnTransparencyPopup->isHidden())) {
       column->setCamstandVisible(!column->isCamstandVisible());
-      app->getCurrentXsheet()->notifyXsheetSoundChanged();
+	  if (column->getSoundColumn()) app->getCurrentXsheet()->notifyXsheetSoundChanged();
     } else if (m_doOnRelease == TogglePreviewVisible)
       column->setPreviewVisible(!column->isPreviewVisible());
     else if (m_doOnRelease == ToggleLock)
@@ -2030,6 +2054,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe4));
       }
       menu.addMenu(reframeSubMenu);
+      menu.addAction(cmdManager->getAction(MI_AutoInputCellNumber));
     }
 
     if (containsRasterLevel(m_viewer->getColumnSelection())) {

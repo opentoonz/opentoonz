@@ -76,6 +76,8 @@ public:
                     header)     */
   };
 
+  enum SnappingTarge { SnapStrokes, SnapGuides, SnapAll };
+
 public:
   static Preferences *instance();
 
@@ -132,13 +134,14 @@ public:
 
   // Interface  tab
 
-  void setCurrentLanguage(int currentLanguage);
+  void setCurrentLanguage(const QString &currentLanguage);
   QString getCurrentLanguage() const;
   QString getLanguage(int index) const;
   int getLanguageCount() const;
 
-  void setCurrentStyleSheet(int currentStyleSheet);
-  QString getCurrentStyleSheet() const;
+  void setCurrentStyleSheet(const QString &currentStyleSheet);
+  QString getCurrentStyleSheetName() const;
+  QString getCurrentStyleSheetPath() const;
   QString getStyleSheet(int index) const;
   int getStyleSheetCount() const;
 
@@ -220,6 +223,11 @@ public:
   bool isMoveCurrentEnabled() const {
     return m_moveCurrentFrameByClickCellArea;
   }
+
+  void setInterfaceFont(std::string font);
+  QString getInterfaceFont() { return m_interfaceFont; }
+  void setInterfaceFontWeight(int weight);
+  int getInterfaceFontWeight() { return m_interfaceFontWeight; }
 
   // Visualization  tab
 
@@ -321,6 +329,14 @@ public:
     return m_useNumpadForSwitchingStyles;
   }
 
+  void enableNewLevelSizeToCameraSize(bool on);
+  bool isNewLevelSizeToCameraSizeEnabled() const {
+    return m_newLevelSizeToCameraSizeEnabled;
+  }
+
+  void setVectorSnappingTarget(int target);
+  int getVectorSnappingTarget() { return m_vectorSnappingTarget; }
+
   // Xsheet  tab
 
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
@@ -367,6 +383,11 @@ public:
 
   void enableShowColumnNumbers(bool on);
   bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
+
+  void enableShortcutCommandsWhileRenamingCell(bool on);
+  bool isShortcutCommandsWhileRenamingCellEnabled() const {
+    return m_shortcutCommandsWhileRenamingCellEnabled;
+  }
 
   // Animation  tab
 
@@ -477,13 +498,14 @@ Q_SIGNALS:
 private:
   std::unique_ptr<QSettings> m_settings;
 
-  QMap<int, QString> m_languageMaps, m_styleSheetMaps, m_roomMaps;
+  QStringList m_languageList, m_styleSheetList;
+  QMap<int, QString> m_roomMaps;
 
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
       m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
-      m_customProjectRoot;
+      m_customProjectRoot, m_interfaceFont;
   QString m_fastRenderPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
@@ -497,11 +519,11 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-  int m_projectRoot, m_importPolicy;
-  int m_currentLanguage, m_currentStyleSheet,
-      m_undoMemorySize,  // in megabytes
+  int m_projectRoot, m_importPolicy, m_interfaceFontWeight;
+  QString m_currentLanguage, m_currentStyleSheet;
+  int m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
-      m_shmmax, m_shmseg, m_shmall, m_shmmni;
+      m_shmmax, m_shmseg, m_shmall, m_shmmni, m_vectorSnappingTarget;
 
   bool m_autoExposeEnabled, m_autoCreateEnabled, m_subsceneFolderEnabled,
       m_generatedMovieViewEnabled, m_xsheetAutopanEnabled,
@@ -555,6 +577,10 @@ private:
   // whether to use numpad and tab key shortcut for selecting styles
   bool m_useNumpadForSwitchingStyles;
 
+  // whether to set the new level size to be the same as the camera size by
+  // default
+  bool m_newLevelSizeToCameraSizeEnabled;
+
   // use arrow key to shift cel selection, ctrl + arrow key to resize the
   // selection range.
   bool m_useArrowKeyToShiftCellSelection;
@@ -564,6 +590,9 @@ private:
 
   // enable to watch file system in order to update file browser automatically
   bool m_watchFileSystem;
+
+  // enable OT command shortcut keys while renaming xsheet cell
+  bool m_shortcutCommandsWhileRenamingCellEnabled;
 
 private:
   Preferences();

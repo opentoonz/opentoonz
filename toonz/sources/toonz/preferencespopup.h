@@ -53,7 +53,8 @@ private:
 
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
-      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy;
+      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
+      *m_interfaceFont, *m_interfaceFontWeight, *m_vectorSnappingTargetCB;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -73,7 +74,7 @@ private:
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
-      *m_ignoreImageDpiCB;
+      *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -124,8 +125,8 @@ private slots:
   void onTranspCheckDataChanged(const TPixel32 &, bool isDragging);
   void onOnionDataChanged(const TPixel32 &, bool isDragging);
   void onOnionDataChanged(int);
-  void onLanguageTypeChanged(int);
-  void onStyleSheetTypeChanged(int);
+  void onLanguageTypeChanged(const QString &);
+  void onStyleSheetTypeChanged(const QString &);
   void onUndoMemorySizeChanged();
   void onSVNEnabledChanged(int);
   void onAutomaticSVNRefreshChanged(int);
@@ -146,6 +147,8 @@ private slots:
   void onRegionAntialiasChanged(int);
   void onImportPolicyChanged(int);
   void onImportPolicyExternallyChanged(int policy);
+  void onNewLevelToCameraSizeChanged(bool checked);
+  void onVectorSnappingTargetChanged(int index);
 
 #ifdef LINETEST
   void onLineTestFpsCapture(int);
@@ -179,7 +182,10 @@ private slots:
   void onShowColumnNumbersChanged(int);
   void onUseArrowKeyToShiftCellSelectionClicked(int);
   void onInputCellsWithoutDoubleClickingClicked(int);
+  void onShortcutCommandsWhileRenamingCellClicked(int);
   void onWatchFileSystemClicked(int);
+  void onInterfaceFontChanged(int index);
+  void onInterfaceFontWeightChanged(int index);
 };
 
 //**********************************************************************************

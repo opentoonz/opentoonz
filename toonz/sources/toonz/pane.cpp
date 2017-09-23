@@ -144,6 +144,23 @@ TPanelTitleBarButton::TPanelTitleBarButton(QWidget *parent,
 
 //-----------------------------------------------------------------------------
 
+TPanelTitleBarButton::TPanelTitleBarButton(QWidget *parent,
+                                           const QPixmap &standardPixmap,
+                                           const QPixmap &rolloverPixmap,
+                                           const QPixmap &pressedPixmap)
+    : QWidget(parent)
+    , m_standardPixmap(standardPixmap)
+    , m_rolloverPixmap(rolloverPixmap)
+    , m_pressedPixmap(pressedPixmap)
+    , m_rollover(false)
+    , m_pressed(false)
+    , m_buttonSet(0)
+    , m_id(0) {
+  setFixedSize(m_standardPixmap.size() / m_standardPixmap.devicePixelRatio());
+}
+
+//-----------------------------------------------------------------------------
+
 void TPanelTitleBarButton::setButtonSet(TPanelTitleBarButtonSet *buttonSet,
                                         int id) {
   m_buttonSet = buttonSet;
@@ -355,16 +372,17 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
   }
 
   if (dw->isFloating()) {
-    const static QPixmap closeButtonPixmap(":/Resources/close_pane.png");
+    const static QPixmap closeButtonPixmap(
+        svgToPixmap(":/Resources/pane_close.svg", QSize(18, 18)));
     const static QPixmap closeButtonPixmapOver(
-        ":/Resources/close_pane_rollover.png");
+        svgToPixmap(":/Resources/pane_close_rollover.svg", QSize(18, 18)));
 
-    QRect closeRect(rect.right() - 17, rect.top() + 1, 16, 16);
+    QPoint closeButtonPos(rect.right() - 18, rect.top() + 1);
 
     if (m_closeButtonHighlighted)
-      painter.drawPixmap(closeRect, closeButtonPixmapOver);
+      painter.drawPixmap(closeButtonPos, closeButtonPixmapOver);
     else
-      painter.drawPixmap(closeRect, closeButtonPixmap);
+      painter.drawPixmap(closeButtonPos, closeButtonPixmap);
   }
 
   painter.end();
@@ -379,7 +397,7 @@ void TPanelTitleBar::mousePressEvent(QMouseEvent *event) {
 
   if (dw->isFloating()) {
     QRect rect = this->rect();
-    QRect closeButtonRect(rect.right() - 18, rect.top() + 2, 13, 13);
+    QRect closeButtonRect(rect.right() - 18, rect.top() + 1, 18, 18);
     if (closeButtonRect.contains(pos) && dw->isFloating()) {
       event->accept();
       dw->hide();
@@ -399,7 +417,7 @@ void TPanelTitleBar::mouseMoveEvent(QMouseEvent *event) {
   if (dw->isFloating()) {
     QPoint pos = event->pos();
     QRect rect = this->rect();
-    QRect closeButtonRect(rect.right() - 18, rect.top() + 2, 13, 13);
+    QRect closeButtonRect(rect.right() - 18, rect.top() + 1, 18, 18);
 
     if (closeButtonRect.contains(pos) && dw->isFloating())
       m_closeButtonHighlighted = true;

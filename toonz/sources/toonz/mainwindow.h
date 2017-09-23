@@ -118,6 +118,9 @@ public:
   /*-- StylepickerAreas,StylepickerLinesに直接切り替えるコマンド --*/
   void togglePickStyleAreas();
   void togglePickStyleLines();
+  void onNewVectorLevelButtonPressed();
+  void onNewToonzRasterLevelButtonPressed();
+  void onNewRasterLevelButtonPressed();
 
   QString getLayoutName() { return m_layoutName; }
 
