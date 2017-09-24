@@ -145,15 +145,15 @@ void XsheetViewer::getButton(int &btype, QColor &bgColor,
 				: getXsheetPreviewButtonOnImage();
 			break;
 		case PREVIEW_OFF_XSHBUTTON:
-			bgColor = (isTimeline) ? getTimelineCamstandButtonBgOffColor()
+			bgColor = (isTimeline) ? getTimelinePreviewButtonBgOffColor()
 				: getXsheetPreviewButtonBgOffColor();
-			iconImage = (isTimeline) ? getTimelineCamstandButtonOffImage()
+			iconImage = (isTimeline) ? getTimelinePreviewButtonOffImage()
 				: getXsheetPreviewButtonOffImage();
 			break;
 		case CAMSTAND_ON_XSHBUTTON:
-			bgColor = (isTimeline) ? getTimelineLockButtonBgOnColor()
+			bgColor = (isTimeline) ? getTimelineCamstandButtonBgOnColor()
 				: getXsheetCamstandButtonBgOnColor();
-			iconImage = (isTimeline) ? getTimelineLockButtonOnImage()
+			iconImage = (isTimeline) ? getTimelineCamstandButtonOnImage()
 				: getXsheetCamstandButtonOnImage();
 			break;
 		case CAMSTAND_TRANSP_XSHBUTTON:
