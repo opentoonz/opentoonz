@@ -1555,7 +1555,7 @@ using namespace DVGui;
 
 ColumnTransparencyPopup::ColumnTransparencyPopup(QWidget *parent)
     : QWidget(parent, Qt::Popup) {
-  setFixedWidth(8 + 30 + 8 + 100 + 8 + 8 + 8 - 4);
+  setFixedWidth(8 + 30 + 8 + 100 + 8 + 8 + 8 + 7);
 
   m_slider = new QSlider(Qt::Horizontal, this);
   m_slider->setMinimum(1);
@@ -1589,7 +1589,7 @@ m_value->setFont(font);*/
     QHBoxLayout *hlayout = new QHBoxLayout;
     // hlayout->setContentsMargins(0, 3, 0, 3);
     hlayout->setMargin(0);
-    hlayout->setSpacing(1);
+    hlayout->setSpacing(3);
     hlayout->addWidget(m_slider);
     hlayout->addWidget(m_value);
     hlayout->addWidget(new QLabel("%"));
