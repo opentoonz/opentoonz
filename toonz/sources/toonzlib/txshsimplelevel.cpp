@@ -1967,8 +1967,11 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i)
       im->rebind(getImageId(jt->first), "^" + std::to_string(i));
 
-    for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i)
-      im->rebind("^" + std::to_string(i), getImageId(jt->second));
+	for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i)
+	{
+		im->rebind("^" + std::to_string(i), getImageId(jt->second));
+		im->renumber(getImageId(jt->second), jt->second);
+	}
   }
 
   if (getType() == PLI_XSHLEVEL) {

@@ -231,6 +231,10 @@ void ImageLoader::buildAllIconsAndPutInCache(TXshSimpleLevel *level,
   }
 }
 
+void ImageLoader::setFid(const TFrameId &fid) {
+	m_fid = fid;
+}
+
 //***************************************************************************************
 //    ImageRasterizer  implementation
 //***************************************************************************************
