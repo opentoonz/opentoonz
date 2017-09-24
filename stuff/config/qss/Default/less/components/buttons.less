@@ -35,12 +35,18 @@
   background-color: @toolbutton-bg-color;
   border: 1px solid @toolbutton-border-color;
   border-radius: 2px;
+  color: @toolbutton-text-color;
   margin: 1px;
   padding: 0;
   &:hover {
     background-color: @toolbutton-bg-color-hover;
     border-color: @toolbutton-border-color-hover;
-    color: @button-text-color;
+    color: @toolbutton-text-color-hover;
+  }
+  &:pressed {
+    background-color: @toolbutton-bg-color-pressed;
+    border-color: @toolbutton-border-color-pressed;
+    color: @toolbutton-text-color-pressed;
   }
   &:checked {
     background-color: @toolbutton-bg-color-checked;

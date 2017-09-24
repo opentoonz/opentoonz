@@ -1068,10 +1068,6 @@ void FlipConsole::createCustomizeMenu(bool withCustomWidget) {
     button->setIcon(icon);
     button->setPopupMode(QToolButton::MenuButtonPopup);
     button->setObjectName("flipCustomize");
-    button->setStyleSheet(
-        "#flipCustomize { background-color: transparent; } "
-        "#flipCustomize::menu-button { background-color: transparent; image: "
-        "none; width: 34px; } #flipCustomize::menu-arrow { image: none; }");
 
     QMenu *menu = new QMenu();
     button->setMenu(menu);

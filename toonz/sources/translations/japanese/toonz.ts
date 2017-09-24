@@ -143,6 +143,85 @@ Please select a different device or check the microphone.</source>
     </message>
 </context>
 <context>
+    <name>AutoInputCellNumberPopup</name>
+    <message>
+        <source>Auto Input Cell Number</source>
+        <translation>セルの自動入力</translation>
+    </message>
+    <message>
+        <source>Overwrite</source>
+        <translation>上書き</translation>
+    </message>
+    <message>
+        <source>Insert</source>
+        <translation>挿入</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>with</source>
+        <translation> </translation>
+    </message>
+    <message>
+        <source>frames increment</source>
+        <translation>番ごとに</translation>
+    </message>
+    <message>
+        <source>inserting</source>
+        <translation> </translation>
+    </message>
+    <message>
+        <source>empty cell intervals</source>
+        <translation>フレームおいて</translation>
+    </message>
+    <message>
+        <source>cell steps</source>
+        <translation>フレームずつ配置</translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation>を</translation>
+    </message>
+    <message>
+        <source>times</source>
+        <translation>回繰り返す</translation>
+    </message>
+    <message>
+        <source>No available cells or columns are selected.</source>
+        <translation>入力可能なコマまたは列が選択されていません。</translation>
+    </message>
+    <message>
+        <source>Selected level has no frames between From and To.</source>
+        <translation>指定されたフレーム範囲に動画がありません。</translation>
+    </message>
+    <message>
+        <source>Setting this value 0 will automatically 
+pick up all frames in the selected level.</source>
+        <translation>この値を０にすると、選択されたレベルの
+全てのフレームを自動的に配置します。</translation>
+    </message>
+    <message>
+        <source>From frame</source>
+        <translation>セルの</translation>
+    </message>
+    <message>
+        <source> </source>
+        <comment>from frame</comment>
+        <translation>番から</translation>
+    </message>
+    <message>
+        <source>To frame</source>
+        <translation> </translation>
+    </message>
+    <message>
+        <source> </source>
+        <comment>to frame</comment>
+        <translation>番までを</translation>
+    </message>
+</context>
+<context>
     <name>AutocenterPopup</name>
     <message>
         <source>Autocenter</source>
@@ -4632,6 +4711,10 @@ Do you want to create it?</source>
         <translation>新規ラスターレベル</translation>
     </message>
     <message>
+        <source>Auto Input Cell Number...</source>
+        <translation>セルの自動入力...</translation>
+    </message>
+    <message>
         <source>Alpha Channel</source>
         <translation>アルファチャンネル</translation>
     </message>
@@ -6518,6 +6601,22 @@ Is it OK to release these shortcuts?</source>
         <source>Enable OpenToonz Commands&apos; Shortcut Keys While Renaming Cell</source>
         <translation>タイムシートのコマ入力時にOpenToonzコマンドのショートカットキーを有効にする</translation>
     </message>
+    <message>
+        <source>Life is too short for Comic Sans</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Good luck.  You&apos;re on your own from here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font *:</source>
+        <translation>フォント *：</translation>
+    </message>
+    <message>
+        <source>Font Weight *:</source>
+        <translation>文字の太さ *：</translation>
+    </message>
 </context>
 <context>
     <name>PreferencesPopup::FormatProperties</name>
@@ -8230,6 +8329,14 @@ Are you sure?</source>
     <message>
         <source>Layer name</source>
         <translation>レイヤー名</translation>
+    </message>
+    <message>
+        <source>Auto Input Cell Numbers : %1</source>
+        <translation>セルの自動入力：</translation>
+    </message>
+    <message>
+        <source>Insert</source>
+        <translation>挿入</translation>
     </message>
     <message>
         <source>Command Bar</source>

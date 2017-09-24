@@ -475,10 +475,12 @@ TXshColumn::ColumnType TXshColumn::toColumnType(int levelType) {
 }
 
 //-----------------------------------------------------------------------------
-
 bool TXshColumn::isRendered() const {
-  if (!getXsheet() || !getFx()) return false;
-  if (!isPreviewVisible()) return false;
+//  if (!getXsheet() || !getFx()) return false;
+//  if (!isPreviewVisible()) return false;
+  if (!getXsheet() || !isPreviewVisible()) return false;
+  if (getColumnType() == eSoundType) return true;
+  if (!getFx()) return false;
   return getXsheet()->getFxDag()->isRendered(getFx());
 }
 

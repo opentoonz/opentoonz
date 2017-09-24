@@ -42,6 +42,20 @@
 @scrollbar-bg-color: darken(@bg, 6);
 
 // -----------------------------------------------------------------------------
+// Textfield
+// -----------------------------------------------------------------------------
+
+@input-bg-color: darken(@bg, 8);
+@input-border-color: lighten(@bg, 5);
+
+// -----------------------------------------------------------------------------
+// CheckBox
+// -----------------------------------------------------------------------------
+
+@checkbox-border-color: @input-border-color;
+@checkbox-border-color-disabled: darken(@bg, 9);
+
+// -----------------------------------------------------------------------------
 // Slider
 // -----------------------------------------------------------------------------
 
@@ -74,7 +88,6 @@
 
 @xsheet-EmptyCell-color:                    @bg;
 @xsheet-NotEmptyColumn-color:               lighten(@bg, 3);
-@xsheet-SelectedEmptyCell-color:            lighten(@bg, 15);
 
 @xsheet-LightLightBG-color:                 @xsheet-EmptyCell-color;
 
