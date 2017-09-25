@@ -1091,7 +1091,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Unpainted tlv</source>
-        <translation>TLV no pintado</translation>
+        <translation>TLV sin pintar</translation>
     </message>
     <message>
         <source>Painted tlv from two images</source>
@@ -1139,7 +1139,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Unpainted tlv from non AA source</source>
-        <translation>TLV no pintado a partir de un original sin suavizado de bordes</translation>
+        <translation>TLV sin pintar a partir de un original sin suavizado de bordes</translation>
     </message>
     <message>
         <source>Remove dot before frame number</source>
@@ -1701,7 +1701,7 @@ de diseñar el color.</translation>
     </message>
     <message>
         <source>Convert to Unpainted TLV</source>
-        <translation>Convertir a TLV no pintado</translation>
+        <translation>Convertir a TLV sin pintar</translation>
     </message>
     <message>
         <source>Version Control</source>
@@ -1789,7 +1789,7 @@ de diseñar el color.</translation>
     </message>
     <message>
         <source>Convert To Unpainted Tlv</source>
-        <translation>Convertir a TLV no pintado</translation>
+        <translation>Convertir a TLV sin pintar</translation>
     </message>
     <message>
         <source>Convert To Painted Tlv</source>
@@ -2592,7 +2592,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>TLV Caching Behavior</source>
-        <translation>Comportamiento del caché de TLV</translation>
+        <translation>Caché de niveles TLV</translation>
     </message>
     <message>
         <source>Load Subsequence Level</source>
@@ -3320,7 +3320,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Ink Check</source>
-        <translation>Comprobación de ent&amp;intado</translation>
+        <translation>Comprobación de t&amp;inta</translation>
     </message>
     <message>
         <source>&amp;Paint Check</source>
@@ -3328,11 +3328,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Fill Check</source>
-        <translation>Comprobación de &amp;relleno</translation>
+        <translation>Comprobación de áreas &amp;rellenables</translation>
     </message>
     <message>
         <source>&amp;Black BG Check</source>
-        <translation>Compro&amp;bación de fondo negro</translation>
+        <translation>Ver con fondo &amp;negro</translation>
     </message>
     <message>
         <source>&amp;Gap Check</source>
@@ -3340,7 +3340,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Visualize Vector As Raster</source>
-        <translation>&amp;Visualizar vectorial como imagen</translation>
+        <translation>&amp;Ver vectorial como imagen</translation>
     </message>
     <message>
         <source>&amp;Histogram</source>
@@ -3716,7 +3716,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Paint Brush Tool</source>
-        <translation>Pincel de pintura</translation>
+        <translation>Brocha</translation>
     </message>
     <message>
         <source>Eraser Tool</source>
@@ -4084,7 +4084,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Shift and Trace</source>
-        <translation>Desplazamiento y rastreo</translation>
+        <translation>Desplazar y trazar</translation>
     </message>
     <message>
         <source>Edit Shift</source>
@@ -4092,7 +4092,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>No Shift</source>
-        <translation>Sin desplazamiento</translation>
+        <translation>Ver sin desplazamiento</translation>
     </message>
     <message>
         <source>Reset Shift</source>
@@ -4208,7 +4208,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Inks &amp;Only</source>
-        <translation>&amp;Sólo tintas</translation>
+        <translation>Ver sól&amp;o tinta</translation>
     </message>
     <message>
         <source>Next Step</source>
@@ -5682,7 +5682,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Use the TLV Savebox to Limit Filling Operations</source>
-        <translation>Rellenar usando el marco delimitador en niveles de imagen de Toonz</translation>
+        <translation>Limitar rellenado usando el marco delimitador de niveles TLV</translation>
     </message>
     <message>
         <source>Paper Thickness:</source>
@@ -5694,15 +5694,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Transparency Check</source>
-        <translation>Comprobación de transparencia</translation>
+        <translation>Comprobación transparencia</translation>
     </message>
     <message>
         <source>   Ink Color on White Bg: </source>
-        <translation>   Tinta sobre fondo blanco: </translation>
+        <translation>   Tinta (fondo blanco): </translation>
     </message>
     <message>
         <source>   Ink Color on Black Bg: </source>
-        <translation>   Tinta sobre fondo negro: </translation>
+        <translation>   Tinta (fondo negro): </translation>
     </message>
     <message>
         <source> Paint Color: </source>
@@ -5850,7 +5850,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Default TLV Caching Behavior</source>
-        <translation>Caché de niveles de imagen de Toonz</translation>
+        <translation>Caché de niveles TLV</translation>
     </message>
     <message>
         <source>Column Icon</source>
@@ -8931,7 +8931,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Image Subsampling:</source>
-        <translation>Submuestreo de imagen:</translation>
+        <translation>Submuestreo (imágenes):</translation>
     </message>
     <message>
         <source>      Marker Interval:</source>
@@ -8951,7 +8951,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>TLV Subsampling:</source>
-        <translation>Submuestreo de TLV:</translation>
+        <translation>Submuestreo (imágenes TLV):</translation>
     </message>
     <message>
         <source>Start Frame:</source>

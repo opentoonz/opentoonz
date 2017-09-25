@@ -32,6 +32,7 @@
 
 // TnzCore includes
 #include "tsystem.h"
+#include "tfont.h"
 
 // Qt includes
 #include <QHBoxLayout>
@@ -335,6 +336,23 @@ void PreferencesPopup::onCameraUnitChanged(int index) {
 void PreferencesPopup::onRoomChoiceChanged(int index) {
   TApp::instance()->writeSettings();
   m_pref->setCurrentRoomChoice(index);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onInterfaceFontChanged(int index) {
+  QString font = m_interfaceFont->currentText();
+  m_pref->setInterfaceFont(font.toStdString());
+  if (font.contains("Comic Sans"))
+    DVGui::warning(tr("Life is too short for Comic Sans"));
+  if (font.contains("Wingdings"))
+    DVGui::warning(tr("Good luck.  You're on your own from here."));
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onInterfaceFontWeightChanged(int index) {
+  m_pref->setInterfaceFontWeight(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -1047,6 +1065,12 @@ void PreferencesPopup::onInputCellsWithoutDoubleClickingClicked(int on) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onShortcutCommandsWhileRenamingCellClicked(int on) {
+  m_pref->enableShortcutCommandsWhileRenamingCell(on);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onWatchFileSystemClicked(int on) {
   m_pref->enableWatchFileSystem(on);
   // emit signal to update behavior of the File browser
@@ -1176,6 +1200,9 @@ PreferencesPopup::PreferencesPopup()
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_interface->setStyleSheet("font-size: 10px; font: italic;");
 
+  m_interfaceFont       = new QComboBox(this);
+  m_interfaceFontWeight = new QComboBox(this);
+
   //--- Visualization ------------------------------
   categoryList->addItem(tr("Visualization"));
   CheckBox *show0ThickLinesCB =
@@ -1255,6 +1282,8 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Arrow Key to Shift Cell Selection"), this);
   CheckBox *inputCellsWithoutDoubleClickingCB =
       new CheckBox(tr("Enable to Input Cells without Double Clicking"), this);
+  CheckBox *shortcutCommandsWhileRenamingCellCB = new CheckBox(
+      tr("Enable OpenToonz Commands' Shortcut Keys While Renaming Cell"), this);
   m_showXSheetToolbar = new QGroupBox(tr("Show Toolbar in the XSheet "), this);
   m_showXSheetToolbar->setCheckable(true);
   m_expandFunctionHeader = new CheckBox(
@@ -1418,6 +1447,33 @@ PreferencesPopup::PreferencesPopup()
   viewerZoomCenterComboBox->addItems(zoomCenters);
   viewerZoomCenterComboBox->setCurrentIndex(m_pref->getViewerZoomCenter());
 
+  TFontManager *instance = TFontManager::instance();
+  bool validFonts;
+  try {
+    instance->loadFontNames();
+    validFonts = true;
+  } catch (TFontLibraryLoadingError &) {
+    validFonts = false;
+    //    TMessage::error(toString(e.getMessage()));
+  }
+
+  if (validFonts) {
+    std::vector<std::wstring> names;
+    instance->getAllFamilies(names);
+
+    for (std::vector<std::wstring>::iterator it = names.begin();
+         it != names.end(); ++it)
+      m_interfaceFont->addItem(QString::fromStdWString(*it));
+
+    m_interfaceFont->setCurrentText(m_pref->getInterfaceFont());
+  }
+
+  QStringList fontStyles;
+  fontStyles << "Regular"
+             << "Bold";
+  m_interfaceFontWeight->addItems(fontStyles);
+  m_interfaceFontWeight->setCurrentIndex(m_pref->getInterfaceFontWeight());
+
   //--- Visualization ------------------------------
   show0ThickLinesCB->setChecked(m_pref->getShow0ThickLines());
   regionAntialiasCB->setChecked(m_pref->getRegionAntialias());
@@ -1538,6 +1594,8 @@ PreferencesPopup::PreferencesPopup()
       m_pref->isUseArrowKeyToShiftCellSelectionEnabled());
   inputCellsWithoutDoubleClickingCB->setChecked(
       m_pref->isInputCellsWithoutDoubleClickingEnabled());
+  shortcutCommandsWhileRenamingCellCB->setChecked(
+      m_pref->isShortcutCommandsWhileRenamingCellEnabled());
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
@@ -1775,6 +1833,14 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignRight | Qt::AlignVCenter);
           bgColorsLay->addWidget(languageType, 7, 1, 1, 4);
         }
+        if (m_interfaceFont->count() > 0) {
+          bgColorsLay->addWidget(new QLabel(tr("Font *:")), 8, 0,
+                                 Qt::AlignRight | Qt::AlignVCenter);
+          bgColorsLay->addWidget(m_interfaceFont, 8, 1, 1, 4);
+          bgColorsLay->addWidget(new QLabel(tr("Font Weight *:")), 9, 0,
+                                 Qt::AlignRight | Qt::AlignVCenter);
+          bgColorsLay->addWidget(m_interfaceFontWeight, 9, 1, 1, 4);
+        }
       }
       bgColorsLay->setColumnStretch(0, 0);
       bgColorsLay->setColumnStretch(1, 0);
@@ -2003,6 +2069,8 @@ PreferencesPopup::PreferencesPopup()
       xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
       xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 5, 0, 1, 2);
       xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 6, 0, 1, 2);
+      xsheetFrameLay->addWidget(shortcutCommandsWhileRenamingCellCB, 7, 0, 1,
+                                2);
 
       QVBoxLayout *xSheetToolbarLay = new QVBoxLayout();
       xSheetToolbarLay->setMargin(10);
@@ -2012,13 +2080,13 @@ PreferencesPopup::PreferencesPopup()
       }
       m_showXSheetToolbar->setLayout(xSheetToolbarLay);
 
-      xsheetFrameLay->addWidget(m_showXSheetToolbar, 7, 0, 3, 3);
-      xsheetFrameLay->addWidget(showColumnNumbersCB, 10, 0, 1, 2);
+      xsheetFrameLay->addWidget(m_showXSheetToolbar, 8, 0, 3, 3);
+      xsheetFrameLay->addWidget(showColumnNumbersCB, 11, 0, 1, 2);
     }
     xsheetFrameLay->setColumnStretch(0, 0);
     xsheetFrameLay->setColumnStretch(1, 0);
     xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(11, 1);
+    xsheetFrameLay->setRowStretch(12, 1);
     xsheetBox->setLayout(xsheetFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
@@ -2255,6 +2323,10 @@ PreferencesPopup::PreferencesPopup()
   ret =
       ret && connect(viewerZoomCenterComboBox, SIGNAL(currentIndexChanged(int)),
                      this, SLOT(onViewerZoomCenterChanged(int)));
+  ret = ret && connect(m_interfaceFont, SIGNAL(currentIndexChanged(int)), this,
+                       SLOT(onInterfaceFontChanged(int)));
+  ret = ret && connect(m_interfaceFontWeight, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onInterfaceFontWeightChanged(int)));
   ret = ret && connect(replaceAfterSaveLevelAsCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onReplaceAfterSaveLevelAsChanged(int)));
   ret =
@@ -2378,6 +2450,9 @@ PreferencesPopup::PreferencesPopup()
   ret = ret &&
         connect(inputCellsWithoutDoubleClickingCB, SIGNAL(stateChanged(int)),
                 SLOT(onInputCellsWithoutDoubleClickingClicked(int)));
+  ret = ret &&
+        connect(shortcutCommandsWhileRenamingCellCB, SIGNAL(stateChanged(int)),
+                SLOT(onShortcutCommandsWhileRenamingCellClicked(int)));
   ret = ret && connect(m_showXSheetToolbar, SIGNAL(clicked(bool)),
                        SLOT(onShowXSheetToolbarClicked(bool)));
   ret = ret && connect(m_expandFunctionHeader, SIGNAL(clicked(bool)),

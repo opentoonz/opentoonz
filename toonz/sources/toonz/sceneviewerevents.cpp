@@ -490,7 +490,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
   } else if (m_mouseButton == Qt::MidButton) {
     if ((event.buttons() & Qt::MidButton) == 0) m_mouseButton = Qt::NoButton;
     // scrub with shift and middle click
-    else if (event.isShiftPressed()) {
+    else if (event.isShiftPressed() && event.isCtrlPressed()) {
       if (curPos.x() > m_pos.x()) {
         CommandManager::instance()->execute("MI_NextFrame");
       } else if (curPos.x() < m_pos.x()) {
@@ -728,7 +728,10 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
   int delta = 0;
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
-    delta = event->angleDelta().y();
+    if (event->modifiers() & Qt::AltModifier)
+      delta = event->angleDelta().x();
+    else
+      delta = event->angleDelta().y();
     break;
   }
 
@@ -757,20 +760,23 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
 
   if (abs(delta) > 0) {
     // scrub with mouse wheel
-    if ((event->modifiers() & Qt::ControlModifier) &&
-        (event->modifiers() & Qt::ShiftModifier)) {
+    if ((event->modifiers() & Qt::AltModifier) &&
+        (event->modifiers() & Qt::ShiftModifier) &&
+        (event->modifiers() & Qt::ControlModifier)) {
       if (delta < 0) {
         CommandManager::instance()->execute("MI_NextStep");
       } else if (delta > 0) {
         CommandManager::instance()->execute("MI_PrevStep");
       }
-    } else if (event->modifiers() & Qt::ShiftModifier) {
+    } else if ((event->modifiers() & Qt::ControlModifier) &&
+               (event->modifiers() & Qt::ShiftModifier)) {
       if (delta < 0) {
         CommandManager::instance()->execute("MI_NextFrame");
       } else if (delta > 0) {
         CommandManager::instance()->execute("MI_PrevFrame");
       }
-    } else if (event->modifiers() & Qt::ControlModifier) {
+    } else if ((event->modifiers() & Qt::ShiftModifier) &&
+               (event->modifiers() & Qt::AltModifier)) {
       if (delta < 0) {
         CommandManager::instance()->execute("MI_NextDrawing");
       } else if (delta > 0) {

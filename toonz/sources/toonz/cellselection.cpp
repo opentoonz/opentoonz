@@ -1218,7 +1218,7 @@ bool TCellSelection::isEnabledCommand(
       MI_TimeStretch,  MI_CloneLevel, MI_SetKeyframes, MI_Copy,
       MI_Paste,        MI_PasteInto,  MI_Cut,          MI_Clear,
       MI_Insert,       MI_PasteInto,  MI_Reframe1,     MI_Reframe2,
-      MI_Reframe3,     MI_Reframe4};
+      MI_Reframe3,     MI_Reframe4,   MI_Undo,         MI_Redo};
   return commands.contains(commandId);
 }
 

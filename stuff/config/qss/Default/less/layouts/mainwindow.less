@@ -192,9 +192,9 @@ TPanelTitleBar {
   qproperty-ActiveTitleColor: @title-text-color-active;
   // QSS only works when pixmaps are set as 'none'
   qproperty-BorderPixmap: url('none');
-  qproperty-ActiveBorderPixmap: url('none');
+  qproperty-ActiveBorderPixmap: url('@{img-url}/@{title-active-border-pixmap}');
   qproperty-FloatBorderPixmap: url('none');
-  qproperty-FloatActiveBorderPixmap: url('none');
+  qproperty-FloatActiveBorderPixmap: url('@{img-url}/@{title-active-border-pixmap}');
 }
 
 /* -----------------------------------------------------------------------------
@@ -277,24 +277,38 @@ QScrollBar {
     }
   }
 
+  @arrow-pressed: 1px 0 0 0; // press effect shortcut
+
   &::up-arrow:vertical {
     image: url('@{img-url}/scroll-up.svg');
     image-position: center center;
+    &:pressed {
+      margin: @arrow-pressed;
+    }
   }
 
   &::down-arrow:vertical {
     image: url('@{img-url}/scroll-down.svg');
     image-position: center center;
+    &:pressed {
+      margin: @arrow-pressed;
+    }
   }
 
   &::left-arrow:horizontal {
     image: url('@{img-url}/scroll-left.svg');
     image-position: center center;
+    &:pressed {
+      margin: @arrow-pressed;
+    }
   }
 
   &::right-arrow:horizontal {
     image: url('@{img-url}/scroll-right.svg');
     image-position: center center;
+    &:pressed {
+      margin: @arrow-pressed;
+    }
   }
 
   &::sub-page,
@@ -328,20 +342,21 @@ QToolBar {
       margin: 1px 0;
     }
   }
-  QToolButton {
-    &:extend(.button-tool all);
-    &::menu-indicator {
-      image: none;
-    }
-    &::menu-button {
-      border-image: none;
-    }
-  }
   & QLabel {
     margin-top: 1px;
   }
   & QToolBar {
     border: 0;
+  }
+}
+
+QToolButton {
+  &:extend(.button-tool all);
+  &::menu-indicator {
+    image: none;
+  }
+  &::menu-button {
+    border-image: none;
   }
 }
 
@@ -442,7 +457,7 @@ QTreeWidget {
 }
 
 QListView {
-  outline: 0; // Hide focus border
+  outline: 0; // hide focus border
 }
 
 /* -----------------------------------------------------------------------------

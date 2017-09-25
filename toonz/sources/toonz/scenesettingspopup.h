@@ -8,6 +8,7 @@
 #include "toonzqt/intfield.h"
 #include "toonzqt/doublefield.h"
 #include "toonzqt/colorfield.h"
+#include "toonzqt/checkbox.h"
 
 // forward declaration
 class TSceneProperties;
@@ -31,6 +32,8 @@ class SceneSettingsPopup final : public QDialog {
 
   DVGui::IntLineEdit *m_markerIntervalFld;
   DVGui::IntLineEdit *m_startFrameFld;
+
+  DVGui::CheckBox *m_colorFilterOnRenderCB;
 
   TSceneProperties *getProperties() const;
 
@@ -56,6 +59,8 @@ public slots:
   void onStartFrameEditingFinished();
 
   void setBgColor(const TPixel32 &value, bool isDragging);
+
+  void onColorFilterOnRenderChanged();
 };
 
 #endif  // SCENESETTINGSPOPUP_H

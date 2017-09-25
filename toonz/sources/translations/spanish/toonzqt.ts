@@ -1556,7 +1556,7 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>SaveBox:      </source>
-        <translation type="unfinished">Marco delimitador: </translation>
+        <translation>Marco delimitador: </translation>
     </message>
     <message>
         <source>Bits/Sample:  </source>
@@ -1897,7 +1897,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>&amp;Focus on Current</source>
-        <translation>En&amp;focar en actual</translation>
+        <translation>En&amp;focar en nodo actual</translation>
     </message>
     <message>
         <source>&amp;Reorder Nodes</source>

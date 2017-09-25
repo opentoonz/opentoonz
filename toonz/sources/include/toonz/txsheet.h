@@ -12,6 +12,7 @@
 
 // TnzLib includes
 #include "toonz/txshcolumn.h"
+#include "toonz/txshlevel.h"
 
 #include "cellposition.h"
 
@@ -548,6 +549,11 @@ in TXsheetImp.
 
   //! Returns the xsheet content's \a camstand bbox at the specified row.
   TRectD getBBox(int row) const;
+
+  void autoInputCellNumbers(int increment, int interval, int step, int repeat,
+                            int from, int to, int r0, int r1, bool isOverwrite,
+                            std::vector<int> columnIndices,
+                            std::vector<TXshLevelP> levels, int rowsCount);
 
 protected:
   bool checkCircularReferences(TXsheet *childCandidate);

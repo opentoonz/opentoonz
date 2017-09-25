@@ -106,6 +106,7 @@ TFxP TFxUtil::makeAffine(const TFxP &arg, const TAffine &aff) {
     assert(!"Could not connect ports!");
   return fx;
 }
+
 //-------------------------------------------------------------------
 
 TFxP TFxUtil::makeBlur(const TFxP &arg, double blurValue) {
@@ -115,6 +116,17 @@ TFxP TFxUtil::makeBlur(const TFxP &arg, double blurValue) {
   if (!fx->connect("Source", arg.getPointer()))
     assert(!"Could not connect ports!");
   return fx;
+}
+
+//-------------------------------------------------------------------
+
+TFxP TFxUtil::makeColumnColorFilter(const TFxP &arg, TPixel32 colorScale) {
+  ColumnColorFilterFx *colorFilterfx = new ColumnColorFilterFx();
+  assert(colorFilterfx);
+  colorFilterfx->setColorFilter(colorScale);
+  if (!colorFilterfx->connect("source", arg.getPointer()))
+    assert(!"Could not connect ports!");
+  return colorFilterfx;
 }
 
 //-------------------------------------------------------------------

@@ -108,6 +108,7 @@ Toolbar::Toolbar(QWidget *parent, bool isVertical)
       addAction(CommandManager::instance()->getAction(T_Hand)) || actionAdded;
 
   m_expandButton = new QToolButton(this);
+  m_expandButton->setObjectName("expandButton");
   m_expandButton->setCheckable(true);
   m_expandButton->setChecked(m_isExpanded);
   m_expandButton->setArrowType((isVertical) ? Qt::DownArrow : Qt::RightArrow);
