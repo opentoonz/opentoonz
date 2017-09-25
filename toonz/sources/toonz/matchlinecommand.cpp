@@ -473,7 +473,8 @@ public:
 
     cloneColumn(cells, newLevelPath);
 
-	QString newLevelPathString = QString::fromStdWString(newLevelPath.getWideString());
+    QString newLevelPathString =
+        QString::fromStdWString(newLevelPath.getWideString());
 
     it = indices.begin();
     ++it;
@@ -481,7 +482,8 @@ public:
       int index = *it;
       it++;
       mergeCmapped(destColumn, index - count,
-				   it == indices.end() ? newLevelPathString : newLevelPathString + "_tmp",
+                   it == indices.end() ? newLevelPathString
+                                       : newLevelPathString + "_tmp",
                    false);
       ColumnCmd::deleteColumn(index - count);
       progress.setValue(++count);
