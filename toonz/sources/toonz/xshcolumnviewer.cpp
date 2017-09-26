@@ -748,6 +748,9 @@ void ColumnArea::DrawHeader::drawLock() const {
   QRect lockModeRect    = o->rect(PredefinedRect::LOCK_AREA).translated(orig);
   QRect lockModeImgRect = o->rect(PredefinedRect::LOCK).translated(orig);
 
+  if (o->isVerticalTimeline() && m_viewer->getXsheetLayout() == QString("Classic") && buttonType == LOCK_OFF_XSHBUTTON && !bgColor.alpha())
+	  bgColor = QColor(255, 255, 255, 128);
+
   // lock button
   p.setPen(m_viewer->getVerticalLineColor());
   p.fillRect(lockModeRect, bgColor);

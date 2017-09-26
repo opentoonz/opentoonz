@@ -570,12 +570,15 @@ TopToBottomOrientation::TopToBottomOrientation() {
 		  addRect(PredefinedRect::PREVIEW_LAYER_AREA, previewArea);
 		  addRect(PredefinedRect::PREVIEW_LAYER, previewArea.adjusted(previewArea.width() - ICON_WIDTH, 0, 0, 0));
 
-		  lockArea = QRect(INDENT, HDRROW2, ICON_WIDTH - 2, HDRROW_HEIGHT - 2);
+		  lockArea = QRect(INDENT, HDRROW2, ICON_WIDTH - 1, HDRROW_HEIGHT - 1);
 		  addRect(PredefinedRect::LOCK_AREA, lockArea);
+/*
 		  lock = QRect(lockArea.left() + ((lockArea.width() / 2) - ((ICON_WIDTH - 3) / 2)),
 			  lockArea.top() + ((lockArea.height() / 2) - ((ICON_HEIGHT - 3) / 2)),
 			  ICON_WIDTH - 3, ICON_HEIGHT - 3);
 		  addRect(PredefinedRect::LOCK, lock);
+*/
+		  addRect(PredefinedRect::LOCK, lockArea);
 
 		  addRect(PredefinedRect::CONFIG_AREA, QRect(0, 0, -1, -1));
 		  addRect(PredefinedRect::CONFIG, QRect(0, 0, -1, -1));
@@ -609,7 +612,8 @@ TopToBottomOrientation::TopToBottomOrientation() {
 		  addFlag(PredefinedFlag::LAYER_NUMBER_VISIBLE, false);
 		  addFlag(PredefinedFlag::EYE_AREA_BORDER, false);
 		  addFlag(PredefinedFlag::EYE_AREA_VISIBLE, true);
-		  addFlag(PredefinedFlag::LOCK_AREA_BORDER, true);
+//		  addFlag(PredefinedFlag::LOCK_AREA_BORDER, true);
+		  addFlag(PredefinedFlag::LOCK_AREA_BORDER, false);
 		  addFlag(PredefinedFlag::LOCK_AREA_VISIBLE, true);
 		  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER, false);
 		  addFlag(PredefinedFlag::PREVIEW_LAYER_AREA_VISIBLE, true);
