@@ -6225,11 +6225,11 @@ ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño de la imagen guardada
     </message>
     <message>
         <source>Following Frames Correction:</source>
-        <translation>Corrección de fotogramas siguientes:</translation>
+        <translation>Color de fotogramas siguientes:</translation>
     </message>
     <message>
         <source>Previous  Frames Correction:</source>
-        <translation>Corrección de fotogramas anteriores:</translation>
+        <translation>Color de fotogramas anteriores:</translation>
     </message>
     <message>
         <source>Ink Color on White Bg:</source>
