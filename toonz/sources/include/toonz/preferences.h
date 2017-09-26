@@ -329,6 +329,11 @@ public:
     return m_useNumpadForSwitchingStyles;
   }
 
+  void setGuidedDrawing(int status);
+  int getGuidedDrawing() { return m_guidedDrawingType; }
+  void setAnimatedGuidedDrawing(bool status);
+  bool getAnimatedGuidedDrawing() const { return m_animatedGuidedDrawing; }
+
   void enableNewLevelSizeToCameraSize(bool on);
   bool isNewLevelSizeToCameraSizeEnabled() const {
     return m_newLevelSizeToCameraSizeEnabled;
@@ -519,7 +524,7 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-  int m_projectRoot, m_importPolicy, m_interfaceFontWeight;
+  int m_projectRoot, m_importPolicy, m_interfaceFontWeight, m_guidedDrawingType;
   QString m_currentLanguage, m_currentStyleSheet;
   int m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
@@ -531,7 +536,7 @@ private:
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
       m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar,
-      m_expandFunctionHeader, m_showColumnNumbers;
+      m_expandFunctionHeader, m_showColumnNumbers, m_animatedGuidedDrawing;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,

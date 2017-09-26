@@ -725,6 +725,12 @@ void PreferencesPopup::onOnionSkinDuringPlaybackChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onGuidedDrawingStyleChanged(int index) {
+  m_pref->setAnimatedGuidedDrawing(index);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onActualPixelOnSceneModeChanged(int index) {
   m_pref->enableActualPixelViewOnSceneEditingMode(index == Qt::Checked);
 }
@@ -1320,6 +1326,7 @@ PreferencesPopup::PreferencesPopup()
 
   int thickness         = m_pref->getOnionPaperThickness();
   m_onionPaperThickness = new DVGui::IntLineEdit(this, thickness, 0, 100);
+  m_guidedDrawingStyle  = new QComboBox(this);
 
   //--- Transparency Check ------------------------------
   categoryList->addItem(tr("Transparency Check"));
@@ -1619,6 +1626,10 @@ PreferencesPopup::PreferencesPopup()
   m_frontOnionColor->setEnabled(m_pref->isOnionSkinEnabled());
   m_backOnionColor->setEnabled(m_pref->isOnionSkinEnabled());
   m_inksOnly->setEnabled(m_pref->isOnionSkinEnabled());
+  QStringList guidedDrawingStyles;
+  guidedDrawingStyles << tr("Arrow Markers") << tr("Animated Guide");
+  m_guidedDrawingStyle->addItems(guidedDrawingStyles);
+  m_guidedDrawingStyle->setCurrentIndex(m_pref->getAnimatedGuidedDrawing());
 
   //--- Version Control ------------------------------
   m_enableVersionControl->setChecked(m_pref->isSVNEnabled());
@@ -2167,7 +2178,17 @@ PreferencesPopup::PreferencesPopup()
       onionLay->addWidget(m_inksOnly, 0, Qt::AlignLeft | Qt::AlignVCenter);
       onionLay->addWidget(m_onionSkinDuringPlayback, 0,
                           Qt::AlignLeft | Qt::AlignVCenter);
-
+      QGridLayout *guidedDrawingLay = new QGridLayout();
+      {
+        guidedDrawingLay->addWidget(new QLabel(tr("Vector Guided Style:")), 0,
+                                    0, Qt::AlignLeft | Qt::AlignVCenter);
+        guidedDrawingLay->addWidget(m_guidedDrawingStyle, 0, 1,
+                                    Qt::AlignLeft | Qt::AlignVCenter);
+        guidedDrawingLay->setColumnStretch(0, 0);
+        guidedDrawingLay->setColumnStretch(1, 0);
+        guidedDrawingLay->setColumnStretch(2, 1);
+      }
+      onionLay->addLayout(guidedDrawingLay, 0);
       onionLay->addStretch(1);
     }
     onionBox->setLayout(onionLay);
@@ -2474,7 +2495,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onOnionSkinDuringPlaybackChanged(int)));
   ret = ret && connect(m_onionPaperThickness, SIGNAL(editingFinished()),
                        SLOT(onOnionPaperThicknessChanged()));
-
+  ret = ret && connect(m_guidedDrawingStyle, SIGNAL(currentIndexChanged(int)),
+                       SLOT(onGuidedDrawingStyleChanged(int)));
   //--- Transparency Check ----------------------
   ret = ret && connect(m_transpCheckBgColor,
                        SIGNAL(colorChanged(const TPixel32 &, bool)),

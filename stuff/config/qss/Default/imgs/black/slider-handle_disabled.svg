@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    id="svg4553"
    version="1.1"
-   viewBox="0 0 8 16"
+   viewBox="0 0 10 16"
    height="16"
-   width="8">
+   width="10">
   <defs
      id="defs4547" />
   <metadata
@@ -24,17 +24,22 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <g
-     transform="translate(0,-1106.5197)"
-     id="layer1">
-    <rect
-       rx="3.0000467"
-       ry="3.0000467"
-       y="1106.5197"
-       x="0"
-       height="15.999953"
-       width="8"
-       id="rect4557"
-       style="fill:#686868;fill-opacity:1;stroke:none;stroke-width:1.99999988;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill" />
-  </g>
+  <rect
+     rx="2"
+     ry="2"
+     y="1"
+     x="1"
+     height="14"
+     width="8"
+     id="rect4492"
+     style="fill:none;fill-opacity:1;stroke:#626262;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+  <rect
+     style="fill:#9d9d9d;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     id="rect4490"
+     width="8"
+     height="14"
+     x="1"
+     y="1"
+     ry="2"
+     rx="2" />
 </svg>

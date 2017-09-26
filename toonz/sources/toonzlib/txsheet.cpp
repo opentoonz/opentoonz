@@ -849,7 +849,7 @@ void TXsheet::eachCells(int r0, int c0, int r1, int c1, int type) {
 //-----------------------------------------------------------------------------
 /*! force cells order in n-steps. returns the row amount after process
  */
-int TXsheet::reframeCells(int r0, int r1, int col, int type) {
+int TXsheet::reframeCells(int r0, int r1, int col, int type, int withBlank) {
   // Row amount in the selection
   int nr = r1 - r0 + 1;
 
@@ -864,10 +864,25 @@ int TXsheet::reframeCells(int r0, int r1, int col, int type) {
       cells.push_back(getCell(CellPosition(r, col)));
   }
 
+  // if withBlank is greater than -1, remove empty cells from cell order
+  if (withBlank >= 0) {
+    auto itr = cells.begin();
+    while (itr != cells.end()) {
+      if ((*itr).isEmpty())
+        itr = cells.erase(itr);
+      else
+        itr++;
+    }
+  }
+
   if (cells.empty()) return 0;
 
   // row amount after n-step
   int nrows = cells.size() * type;
+
+  if (withBlank > 0) {
+    nrows += cells.size() * withBlank * type;
+  }
 
   // if needed, insert cells
   if (nr < nrows) {
@@ -886,6 +901,13 @@ int TXsheet::reframeCells(int r0, int r1, int col, int type) {
         setCell(i + i1, col, cells[k]);
     }
     i += type;  // dipende dal tipo di step (2 o 3 per ora)
+
+    if (withBlank > 0) {
+      for (int i1 = 0; i1 < withBlank * type; i1++) {
+        clearCells(i + i1, col);
+      }
+      i += withBlank * type;
+    }
   }
 
   return nrows;  // return row amount after process
@@ -1395,8 +1417,8 @@ void searchAudioColumn(TXsheet *xsh, std::vector<TXshSoundColumn *> &sounds,
     TXshColumn *column = xsh->getColumn(i);
     if (column) {
       TXshSoundColumn *soundCol = column->getSoundColumn();
-      if (soundCol && ((isPreview && soundCol->isPreviewVisible()) ||
-                       (!isPreview && soundCol->isCamstandVisible()))) {
+      if (soundCol && ((isPreview && soundCol->isCamstandVisible()) ||
+                       (!isPreview && soundCol->isPreviewVisible()))) {
         sounds.push_back(soundCol);
         continue;
       }
@@ -1610,4 +1632,112 @@ bool TXsheet::isRectEmpty(const CellPosition &pos0,
     for (int layer = pos0.layer(); layer <= pos1.layer(); layer++)
       if (!getCell(CellPosition(frame, layer)).isEmpty()) return false;
   return true;
+}
+
+//-----------------------------------------------------------------------
+// Function triggered by AutoInputCellNumberPopup.
+// executing this on column selection, set r1 = -1.
+// Here are the expected behaviors
+// 1. Cell Selection + Overwrite
+//    Cells will be input from the top of the selected range.
+//    New arrangement CANNOT run over the selected range.
+//    If the new arrangement is shorter than the selected range,
+//    excess cells will not be cleared but keep their contents.
+//    (It is the same behavior as Celsys' QuickChecker)
+// 2. Cell Selection + Insert
+//    New arrangement will be inserted before the selected range.
+//    If the selected range has multiple columns, then the inserted
+//    cells will be expanded to the longest arrangement with empty cells.
+// 3. Column Selection + Overwrite
+//    Cells will be input from the top of the columns.
+//    New arrangement CAN run over the existing column range.
+//    If the new arrangement is shorter than the selected range,
+//    excess cells will not be cleared but keep their contents.
+// 4. Column Selection + Insert
+//    New arrangement will be inserted at the top of the columns.
+//    If multiple columns are selected, then the inserted cells
+//    will be expanded to the longest arrangement with empty cells.
+//
+void TXsheet::autoInputCellNumbers(int increment, int interval, int step,
+                                   int repeat, int from, int to, int r0, int r1,
+                                   bool isOverwrite,
+                                   std::vector<int> columnIndices,
+                                   std::vector<TXshLevelP> levels,
+                                   int rowsCount) {
+  int rowUpTo = (r1 == -1) ? rowsCount - 1
+                           : ((isOverwrite) ? std::min(r1, r0 + rowsCount - 1)
+                                            : r0 + rowsCount - 1);
+  // for each column
+  for (int c = 0; c < columnIndices.size(); c++) {
+    int columnIndex  = columnIndices.at(c);
+    TXshLevelP level = levels.at(c);
+
+    // on insertion, insert empty cells first
+    if (!isOverwrite) insertCells(r0, columnIndex, rowsCount);
+
+    // obtain fids to be input
+    std::vector<TFrameId> fids;
+    if (increment == 0) {
+      std::vector<TFrameId> wholeFids;
+      level->getFids(wholeFids);
+      if (from <= to) {
+        for (auto itr = wholeFids.begin(); itr != wholeFids.end(); ++itr) {
+          if ((*itr).getNumber() >= from && (*itr).getNumber() <= to)
+            fids.push_back(*itr);
+          else if ((*itr).getNumber() > to)
+            break;
+        }
+      } else {  // from > to
+        for (auto itr = wholeFids.rbegin(); itr != wholeFids.rend(); ++itr) {
+          if ((*itr).getNumber() <= from && (*itr).getNumber() >= to)
+            fids.push_back(*itr);
+          else if ((*itr).getNumber() < to)
+            break;
+        }
+      }
+    } else {  // increment != 0
+      int f = from;
+      if (from <= to) {
+        while (f <= to) {
+          fids.push_back(TFrameId(f));
+          f += increment;
+        }
+      } else {  // from > to
+        while (f >= to) {
+          fids.push_back(TFrameId(f));
+          f -= increment;
+        }
+      }
+    }
+
+    // input cells
+    int row             = r0;
+    int repeat_itr      = 0;
+    int fid_itr         = 0;
+    int step_interv_itr = 0;
+    while (row <= rowUpTo) {
+      // input cell
+      if (step_interv_itr < step)
+        setCell(row, columnIndex, TXshCell(level, fids.at(fid_itr)));
+      // .. or set empty cell as interval
+      else
+        setCell(row, columnIndex, TXshCell());
+
+      // increment
+      step_interv_itr++;
+      // next frame
+      if (step_interv_itr == step + interval) {
+        fid_itr++;
+        step_interv_itr = 0;
+      }
+      // next repeat cycle
+      if (fid_itr == fids.size()) {
+        repeat_itr++;
+        fid_itr = 0;
+      }
+      if (repeat_itr == repeat) break;
+
+      row++;
+    }
+  }
 }

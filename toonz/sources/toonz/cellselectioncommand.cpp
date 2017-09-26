@@ -8,6 +8,7 @@
 #include "overwritepopup.h"
 #include "selectionutils.h"
 #include "columnselection.h"
+#include "reframepopup.h"
 
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
@@ -553,6 +554,7 @@ class ReframeUndo final : public TUndo {
   int m_r0, m_r1;
   int m_type;
   int m_nr;
+  int m_withBlank;
   std::unique_ptr<TXshCell[]> m_cells;
 
 public:
@@ -560,7 +562,8 @@ public:
 
   std::vector<int> m_columnIndeces;
 
-  ReframeUndo(int r0, int r1, std::vector<int> columnIndeces, int type);
+  ReframeUndo(int r0, int r1, std::vector<int> columnIndeces, int type,
+              int withBlank = -1);
   ~ReframeUndo();
   void undo() const override;
   void redo() const override;
@@ -569,7 +572,12 @@ public:
   int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
-    return QObject::tr("Reframe to %1's").arg(QString::number(m_type));
+    if (m_withBlank == -1)
+      return QObject::tr("Reframe to %1's").arg(QString::number(m_type));
+    else
+      return QObject::tr("Reframe to %1's with %2 blanks")
+          .arg(QString::number(m_type))
+          .arg(QString::number(m_withBlank));
   }
   int getHistoryType() override { return HistoryType::Xsheet; }
 };
@@ -577,12 +585,13 @@ public:
 //-----------------------------------------------------------------------------
 
 ReframeUndo::ReframeUndo(int r0, int r1, std::vector<int> columnIndeces,
-                         int type)
+                         int type, int withBlank)
     : m_r0(r0)
     , m_r1(r1)
     , m_type(type)
     , m_nr(0)
-    , m_columnIndeces(columnIndeces) {
+    , m_columnIndeces(columnIndeces)
+    , m_withBlank(withBlank) {
   m_nr = m_r1 - m_r0 + 1;
   assert(m_nr > 0);
   m_cells.reset(new TXshCell[m_nr * (int)m_columnIndeces.size()]);
@@ -641,7 +650,7 @@ void ReframeUndo::redo() const {
 
   for (int c = 0; c < m_columnIndeces.size(); c++)
     app->getCurrentXsheet()->getXsheet()->reframeCells(
-        m_r0, m_r1, m_columnIndeces[c], m_type);
+        m_r0, m_r1, m_columnIndeces[c], m_type, m_withBlank);
 
   app->getCurrentXsheet()->notifyXsheetChanged();
 }
@@ -691,6 +700,86 @@ void TColumnSelection::reframeCells(int count) {
     int nrows = TApp::instance()->getCurrentXsheet()->getXsheet()->reframeCells(
         0, rowCount - 1, colIndeces[c], count);
     undo->m_newRows.push_back(nrows);
+  }
+
+  TUndoManager::manager()->add(undo);
+
+  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+}
+
+//=============================================================================
+
+void TCellSelection::reframeWithEmptyInbetweens() {
+  if (isEmpty() || areAllColSelectedLocked()) return;
+
+  std::vector<int> colIndeces;
+  for (int c = m_range.m_c0; c <= m_range.m_c1; c++) colIndeces.push_back(c);
+
+  // destruction of m_reframePopup will be done along with the main window
+  if (!m_reframePopup) m_reframePopup = new ReframePopup();
+  int ret                             = m_reframePopup->exec();
+  if (ret == QDialog::Rejected) return;
+
+  int step, blank;
+  m_reframePopup->getValues(step, blank);
+
+  ReframeUndo *undo =
+      new ReframeUndo(m_range.m_r0, m_range.m_r1, colIndeces, step, blank);
+
+  int maximumRow = 0;
+  for (int c = m_range.m_c0; c <= m_range.m_c1; c++) {
+    int nrows = TApp::instance()->getCurrentXsheet()->getXsheet()->reframeCells(
+        m_range.m_r0, m_range.m_r1, c, step, blank);
+    undo->m_newRows.push_back(nrows);
+    if (maximumRow < nrows) maximumRow = nrows;
+  }
+
+  if (maximumRow == 0) {
+    delete undo;
+    return;
+  }
+
+  TUndoManager::manager()->add(undo);
+
+  // select reframed range
+  selectCells(m_range.m_r0, m_range.m_c0, m_range.m_r0 + maximumRow - 1,
+              m_range.m_c1);
+
+  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+}
+
+void TColumnSelection::reframeWithEmptyInbetweens() {
+  if (isEmpty()) return;
+
+  int rowCount =
+      TApp::instance()->getCurrentXsheet()->getXsheet()->getFrameCount();
+  std::vector<int> colIndeces;
+  std::set<int>::const_iterator it;
+  for (it = m_indices.begin(); it != m_indices.end(); it++)
+    colIndeces.push_back(*it);
+
+  if (!m_reframePopup) m_reframePopup = new ReframePopup();
+  int ret                             = m_reframePopup->exec();
+  if (ret == QDialog::Rejected) return;
+
+  int step, blank;
+  m_reframePopup->getValues(step, blank);
+
+  ReframeUndo *undo = new ReframeUndo(0, rowCount - 1, colIndeces, step, blank);
+
+  bool commandExecuted = false;
+  for (int c = 0; c < (int)colIndeces.size(); c++) {
+    int nrows = TApp::instance()->getCurrentXsheet()->getXsheet()->reframeCells(
+        0, rowCount - 1, colIndeces[c], step, blank);
+    undo->m_newRows.push_back(nrows);
+    if (nrows > 0) commandExecuted = true;
+  }
+
+  if (!commandExecuted) {
+    delete undo;
+    return;
   }
 
   TUndoManager::manager()->add(undo);

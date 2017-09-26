@@ -1000,7 +1000,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
       if (!isColumn) continue;
       // Cells appearance depending on the type of column
       if (isSoundColumn)
-        drawSoundCell(p, row, col);
+        drawSoundCell(p, row, col, isReference);
       else if (isPaletteColumn)
         drawPaletteCell(p, row, col, isReference);
       else if (isSoundTextColumn)
@@ -1131,7 +1131,7 @@ void CellArea::drawExtenderHandles(QPainter &p) {
 
 //-----------------------------------------------------------------------------
 
-void CellArea::drawSoundCell(QPainter &p, int row, int col) {
+void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
   const Orientation *o = m_viewer->orientation();
   TXshSoundColumn *soundColumn =
       m_viewer->getXsheet()->getColumn(col)->getSoundColumn();
@@ -1168,8 +1168,14 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   // get cell colors
   QColor cellColor, sideColor;
   int levelType;
-  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
-                                 isSelected);
+  if (isReference) {
+	  cellColor = (isSelected) ? m_viewer->getSelectedReferenceColumnColor()
+		  : m_viewer->getReferenceColumnColor();
+	  sideColor = m_viewer->getReferenceColumnBorderColor();
+  }
+  else
+	  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
+		  isSelected);
 
   // cells background
   p.fillRect(rect, QBrush(cellColor));
@@ -1424,7 +1430,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 #ifdef _WIN32
     fontName = "Arial";
 #else
-    fontName          = "Helvetica";
+    fontName = "Helvetica";
 #endif
   }
   static QFont font(fontName, -1, QFont::Normal);
@@ -2584,6 +2590,8 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe2));
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe3));
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe4));
+        reframeSubMenu->addAction(
+            cmdManager->getAction(MI_ReframeWithEmptyInbetweens));
       }
       menu.addMenu(reframeSubMenu);
 
@@ -2615,6 +2623,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
       menu.addAction(cmdManager->getAction(MI_Rollup));
       menu.addAction(cmdManager->getAction(MI_Rolldown));
       menu.addAction(cmdManager->getAction(MI_TimeStretch));
+      menu.addAction(cmdManager->getAction(MI_AutoInputCellNumber));
       menu.addSeparator();
       menu.addAction(cmdManager->getAction(MI_Autorenumber));
     }

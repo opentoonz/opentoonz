@@ -338,7 +338,7 @@ bool TFrameHandle::scrub(int r0, int r1, double framePerSecond) {
     m_audioColumn->scrub(r0, r1);
   else if (m_xsheet) {
     int i;
-    for (i = r0; i <= r1; i++) m_xsheet->scrub(i);
+    for (i = r0; i <= r1; i++) m_xsheet->scrub(i, true);
   }
 
   if (onlyOneFrame) return false;

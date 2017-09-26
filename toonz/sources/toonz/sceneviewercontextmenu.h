@@ -31,6 +31,10 @@ public slots:
 
   void enterVectorImageGroup();
   void exitVectorImageGroup();
+  void setGuidedDrawingOff();
+  void setGuidedDrawingClosest();
+  void setGuidedDrawingFarthest();
+  void setGuidedDrawingAll();
 
   void onShowHide();
   void onSetCurrent();
