@@ -8,6 +8,7 @@
 #include <set>
 
 class TimeStretchPopup;
+class ReframePopup;
 class TXshCell;
 
 //=============================================================================
@@ -16,6 +17,7 @@ class TXshCell;
 
 class TCellSelection final : public TSelection {
   TimeStretchPopup *m_timeStretchPopup;
+  ReframePopup *m_reframePopup;
 
 public:
   class Range {
@@ -98,6 +100,8 @@ public:
   void reframe2Cells() { reframeCells(2); }
   void reframe3Cells() { reframeCells(3); }
   void reframe4Cells() { reframeCells(4); }
+
+  void reframeWithEmptyInbetweens();
 
   void renameCells(TXshCell &cell);
   // rename cells for each columns with correspondent item in the list

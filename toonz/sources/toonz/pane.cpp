@@ -373,11 +373,11 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
 
   if (dw->isFloating()) {
     const static QPixmap closeButtonPixmap(
-        svgToPixmap(":/Resources/close_pane.svg", QSize(16, 16)));
+        svgToPixmap(":/Resources/pane_close.svg", QSize(18, 18)));
     const static QPixmap closeButtonPixmapOver(
-        svgToPixmap(":/Resources/close_pane_rollover.svg", QSize(16, 16)));
+        svgToPixmap(":/Resources/pane_close_rollover.svg", QSize(18, 18)));
 
-    QPoint closeButtonPos(rect.right() - 17, rect.top() + 1);
+    QPoint closeButtonPos(rect.right() - 18, rect.top() + 1);
 
     if (m_closeButtonHighlighted)
       painter.drawPixmap(closeButtonPos, closeButtonPixmapOver);
@@ -397,7 +397,7 @@ void TPanelTitleBar::mousePressEvent(QMouseEvent *event) {
 
   if (dw->isFloating()) {
     QRect rect = this->rect();
-    QRect closeButtonRect(rect.right() - 18, rect.top() + 2, 13, 13);
+    QRect closeButtonRect(rect.right() - 18, rect.top() + 1, 18, 18);
     if (closeButtonRect.contains(pos) && dw->isFloating()) {
       event->accept();
       dw->hide();
@@ -417,7 +417,7 @@ void TPanelTitleBar::mouseMoveEvent(QMouseEvent *event) {
   if (dw->isFloating()) {
     QPoint pos = event->pos();
     QRect rect = this->rect();
-    QRect closeButtonRect(rect.right() - 18, rect.top() + 2, 13, 13);
+    QRect closeButtonRect(rect.right() - 18, rect.top() + 1, 18, 18);
 
     if (closeButtonRect.contains(pos) && dw->isFloating())
       m_closeButtonHighlighted = true;

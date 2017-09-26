@@ -382,6 +382,7 @@ Returns true if on the machine there is an audio card installed correctly
 
   //! Set the value of volume , between [0,1]
   bool setVolume(double value);
+  void prepareVolume(double volume);
 #endif
 
   //! Open the device according to the features of soundtrack

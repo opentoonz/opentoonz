@@ -54,7 +54,8 @@ private:
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
-      *m_interfaceFont, *m_interfaceFontWeight, *m_vectorSnappingTargetCB;
+      *m_interfaceFont, *m_interfaceFontWeight, *m_vectorSnappingTargetCB,
+      *m_guidedDrawingStyle;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -163,6 +164,7 @@ private slots:
   void onReplaceAfterSaveLevelAsChanged(int index);
   void onOnionSkinVisibilityChanged(int);
   void onOnionSkinDuringPlaybackChanged(int);
+  void onGuidedDrawingStyleChanged(int);
   void onActualPixelOnSceneModeChanged(int);
   void onMultiLayerStylePickerChanged(int);
   void onLevelNameOnEachMarkerChanged(int);

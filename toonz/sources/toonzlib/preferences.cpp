@@ -322,6 +322,8 @@ Preferences::Preferences()
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
+    , m_guidedDrawingType(0)
+    , m_animatedGuidedDrawing(false)
     , m_ignoreImageDpi(false)
     , m_watchFileSystem(true)
     , m_shortcutCommandsWhileRenamingCellEnabled(false) {
@@ -612,6 +614,8 @@ Preferences::Preferences()
   getValue(*m_settings, "interfaceFontWeight", m_interfaceFontWeight);
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "guidedDrawingType", m_guidedDrawingType);
+  getValue(*m_settings, "animatedGuidedDrawing", m_animatedGuidedDrawing);
   getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
            m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
@@ -1446,6 +1450,20 @@ int Preferences::matchLevelFormat(const TFilePath &fp) const {
 void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
   m_useNumpadForSwitchingStyles = on;
   m_settings->setValue("useNumpadForSwitchingStyles", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setGuidedDrawing(int status) {
+  m_guidedDrawingType = status;
+  m_settings->setValue("guidedDrawingType", status);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setAnimatedGuidedDrawing(bool status) {
+  m_animatedGuidedDrawing = status;
+  m_settings->setValue("animatedGuidedDrawing", status);
 }
 
 //-----------------------------------------------------------------

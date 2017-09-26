@@ -19,8 +19,10 @@ using namespace Stage;
 //    Stage::Player  implementation
 //*****************************************************************************************
 
-double Player::m_onionSkinFrontSize = 0;
-double Player::m_onionSkinBackSize  = 0;
+double Player::m_onionSkinFrontSize  = 0;
+double Player::m_onionSkinBackSize   = 0;
+double Player::m_firstBackOnionSkin  = 0;
+double Player::m_lastBackVisibleSkin = 0;
 
 //-----------------------------------------------------------------------------
 
@@ -32,6 +34,8 @@ Stage::Player::Player()
     , m_ancestorColumnIndex(-1)
     , m_isCurrentColumn(false)
     , m_isCurrentXsheetLevel(false)
+    , m_isEditingLevel(false)
+    , m_isVisibleinOSM(false)
     , m_sl()
     , m_xsh()
     , m_column(-1)

@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg4553"
-   version="1.1"
-   viewBox="0 0 8 16"
+   width="10"
    height="16"
-   width="8">
+   viewBox="0 0 10 16"
+   version="1.1"
+   id="svg4553">
   <defs
      id="defs4547" />
   <metadata
@@ -25,16 +25,30 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(0,-1106.5197)"
-     id="layer1">
+     id="layer1"
+     transform="translate(1,-1106.5197)">
     <rect
-       rx="3.0000467"
-       ry="3.0000467"
-       y="1106.5197"
-       x="0"
-       height="15.999953"
-       width="8"
+       style="fill:#afafaf;fill-opacity:1;stroke:none;stroke-width:1.99999988;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
        id="rect4557"
-       style="fill:#afafaf;fill-opacity:1;stroke:none;stroke-width:1.99999988;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill" />
+       width="8"
+       height="15.999953"
+       x="0"
+       y="1106.5197"
+       ry="3.0000467"
+       rx="3.0000467" />
   </g>
+  <rect
+     style="fill:#000000;fill-opacity:0"
+     y="0"
+     x="0"
+     height="16"
+     width="1"
+     id="rect11" />
+  <rect
+     style="fill:#000000;fill-opacity:0"
+     y="0"
+     x="9"
+     height="16"
+     width="1"
+     id="rect13" />
 </svg>

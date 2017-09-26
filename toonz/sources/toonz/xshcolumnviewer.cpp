@@ -618,7 +618,7 @@ void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
 }
 void ColumnArea::DrawHeader::soundColors(QColor &columnColor,
                                          QColor &dragColor) const {
-  m_viewer->getColumnColor(columnColor, dragColor, col, xsh);
+    m_viewer->getColumnColor(columnColor, dragColor, col, xsh);
 }
 void ColumnArea::DrawHeader::paletteColors(QColor &columnColor,
                                            QColor &dragColor) const {
@@ -1226,7 +1226,8 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
   DrawHeader drawHeader(this, p, col);
   drawHeader.prepare();
   QColor columnColor, dragColor;
-  drawHeader.soundColors(columnColor, dragColor);
+//  drawHeader.soundColors(columnColor, dragColor);
+  drawHeader.levelColors(columnColor, dragColor);
   drawHeader.drawBaseFill(columnColor, dragColor);
   drawHeader.drawEye();
   drawHeader.drawPreviewToggle(255);
@@ -1868,7 +1869,7 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
     if (m_doOnRelease == ToggleTransparency &&
         (!m_columnTransparencyPopup || m_columnTransparencyPopup->isHidden())) {
       column->setCamstandVisible(!column->isCamstandVisible());
-      app->getCurrentXsheet()->notifyXsheetSoundChanged();
+	  if (column->getSoundColumn()) app->getCurrentXsheet()->notifyXsheetSoundChanged();
     } else if (m_doOnRelease == TogglePreviewVisible)
       column->setPreviewVisible(!column->isPreviewVisible());
     else if (m_doOnRelease == ToggleLock)
@@ -2051,8 +2052,11 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe2));
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe3));
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe4));
+        reframeSubMenu->addAction(
+            cmdManager->getAction(MI_ReframeWithEmptyInbetweens));
       }
       menu.addMenu(reframeSubMenu);
+      menu.addAction(cmdManager->getAction(MI_AutoInputCellNumber));
     }
 
     if (containsRasterLevel(m_viewer->getColumnSelection())) {
