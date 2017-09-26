@@ -225,8 +225,8 @@ int TColorCleanupStyle::getTagId() const { return 2001; }
 //-------------------------------------------------------------------
 
 QString TColorCleanupStyle::getParamNames(int index) const {
-  if (index == 2) "HRange";
-  if (index == 3) "Line Width";
+  if (index == 2) QObject::tr("HRange");
+  if (index == 3) QObject::tr("Line Width");
   return TCleanupStyle::getParamNames(index);
 }
 
