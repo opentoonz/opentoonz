@@ -326,7 +326,7 @@ Preferences::Preferences()
     , m_watchFileSystem(true)
     , m_shortcutCommandsWhileRenamingCellEnabled(false)
     , m_xsheetLayoutPreference("Compact")
-	, m_loadedXsheetLayout("Compact") {
+    , m_loadedXsheetLayout("Compact") {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -346,7 +346,7 @@ Preferences::Preferences()
     if (TFileStatus(templatePath).doesExist())
       TSystem::copyFile(prefPath, templatePath);
 
-	existingUser = false;
+    existingUser = false;
   }
 
   m_settings.reset(new QSettings(
@@ -633,11 +633,13 @@ Preferences::Preferences()
            m_shortcutCommandsWhileRenamingCellEnabled);
 
   QString xsheetLayoutPreference;
-  xsheetLayoutPreference = m_settings->value("xsheetLayoutPreference").toString();
+  xsheetLayoutPreference =
+      m_settings->value("xsheetLayoutPreference").toString();
   if (xsheetLayoutPreference != "")
-	  m_xsheetLayoutPreference = xsheetLayoutPreference;
-  else if (existingUser) // Existing users with missing preference defaults to Classic. New users will be Compact
-	  m_xsheetLayoutPreference = QString("Classic");
+    m_xsheetLayoutPreference = xsheetLayoutPreference;
+  else if (existingUser)  // Existing users with missing preference defaults to
+                          // Classic. New users will be Compact
+    m_xsheetLayoutPreference = QString("Classic");
   setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
   m_loadedXsheetLayout = m_xsheetLayoutPreference;
 }
@@ -1490,12 +1492,12 @@ void Preferences::enableShowColumnNumbers(bool on) {
 }
 
 void Preferences::setXsheetLayoutPreference(std::string layout) {
-	m_xsheetLayoutPreference = QString::fromStdString(layout);
-	m_settings->setValue("xsheetLayoutPreference", m_xsheetLayoutPreference);
+  m_xsheetLayoutPreference = QString::fromStdString(layout);
+  m_settings->setValue("xsheetLayoutPreference", m_xsheetLayoutPreference);
 }
 
 void Preferences::setLoadedXsheetLayout(std::string layout) {
-	m_loadedXsheetLayout = QString::fromStdString(layout);
+  m_loadedXsheetLayout = QString::fromStdString(layout);
 }
 
 //-----------------------------------------------------------------

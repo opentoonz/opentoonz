@@ -189,7 +189,7 @@ class ColumnArea final : public QWidget {
     ToggleAllPreviewVisible,
     ToggleLock,
     ToggleAllLock,
-	OpenSettings
+    OpenSettings
   };
 
   ColumnTransparencyPopup *m_columnTransparencyPopup;
@@ -250,8 +250,8 @@ class ColumnArea final : public QWidget {
     void drawEye() const;
     void drawPreviewToggle(int opacity) const;
     void drawLock() const;
-	void drawConfig() const;
-	void drawColumnNumber() const;
+    void drawConfig() const;
+    void drawColumnNumber() const;
     void drawColumnName() const;
     void drawThumbnail(QPixmap &iconPixmap) const;
     void drawPegbarName() const;
@@ -283,7 +283,7 @@ public:
 
   class Pixmaps {
   public:
-	static const QPixmap &sound();
+    static const QPixmap &sound();
     static const QPixmap &soundPlaying();
   };
 

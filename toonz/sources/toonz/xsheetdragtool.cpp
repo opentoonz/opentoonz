@@ -1761,16 +1761,17 @@ public:
   void onDrag(const QMouseEvent *event) override {
     if (!m_enabled) return;
 
-    const Orientation *o   = getViewer()->orientation();
-    QRect track            = o->rect(PredefinedRect::VOLUME_TRACK);
-    NumberRange range      = o->frameSide(track);
-    int frameAxis          = o->frameAxis(event->pos());
-	if (o->isVerticalTimeline() && !o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) {
-		range = o->layerSide(track);
-		frameAxis = o->layerAxis(event->pos());
-	}
+    const Orientation *o = getViewer()->orientation();
+    QRect track          = o->rect(PredefinedRect::VOLUME_TRACK);
+    NumberRange range    = o->frameSide(track);
+    int frameAxis        = o->frameAxis(event->pos());
+    if (o->isVerticalTimeline() &&
+        !o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) {
+      range     = o->layerSide(track);
+      frameAxis = o->layerAxis(event->pos());
+    }
 
-	double v               = range.ratio(frameAxis);
+    double v = range.ratio(frameAxis);
     if (o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) v = 1 - v;
 
     TXsheet *xsh       = getViewer()->getXsheet();

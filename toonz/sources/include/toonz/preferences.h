@@ -599,7 +599,8 @@ private:
   // enable OT command shortcut keys while renaming xsheet cell
   bool m_shortcutCommandsWhileRenamingCellEnabled;
 
-  QString m_xsheetLayoutPreference, m_loadedXsheetLayout; // Classic, Classic-revised, compact
+  QString m_xsheetLayoutPreference,
+      m_loadedXsheetLayout;  // Classic, Classic-revised, compact
 private:
   Preferences();
   ~Preferences();
