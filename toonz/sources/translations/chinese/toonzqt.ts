@@ -2005,7 +2005,7 @@ Are you sure?</source>
     <message>
         <source>Deletion of Lines and Areas from raster-based levels is not undoable.
 Are you sure?</source>
-        <translation>从栅格格式的层级删除线和区域，该操作将无法撤销。
+        <translation>从光栅层级删除线和区域，该操作将无法撤销。
 您确定吗？</translation>
     </message>
     <message>
@@ -2309,7 +2309,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Vector Brush</source>
-        <translation>矢量画笔</translation>
+        <translation>矢量笔刷</translation>
     </message>
     <message>
         <source>Settings</source>

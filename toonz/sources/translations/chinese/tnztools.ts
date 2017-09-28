@@ -854,11 +854,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Deform Raster</source>
-        <translation>变形栅格图</translation>
+        <translation>变形光栅图</translation>
     </message>
     <message>
         <source>Transform Raster</source>
-        <translation>变换栅格图</translation>
+        <translation>变换光栅图</translation>
     </message>
     <message>
         <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>

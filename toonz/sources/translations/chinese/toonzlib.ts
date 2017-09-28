@@ -70,7 +70,7 @@
     <name>ImageBuilder</name>
     <message>
         <source>Bad argument (%1): should be &apos;Raster&apos; or ToonzRaster&apos;</source>
-        <translation>不正确的参数(%1): 应当是“栅格”或者“Toonz 栅格”</translation>
+        <translation>不正确的参数(%1): 应当是“光栅”或者“Toonz 光栅”</translation>
     </message>
     <message>
         <source>ImageBuilder(%1 image)</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
         <source>Bad level type (%1): must be Vector,Raster or ToonzRaster</source>
-        <translation>不正确的层级类型(%1): 必须是矢量、栅格或者 Toonz 栅格</translation>
+        <translation>不正确的层级类型(%1): 必须是矢量、光栅或者 Toonz 光栅</translation>
     </message>
     <message>
         <source>Can&apos;t add the level: name(%1) is already used</source>
@@ -706,7 +706,7 @@
     <name>TScriptBinding::ImageBuilder</name>
     <message>
         <source>Bad argument (%1): should be &apos;Raster&apos; or ToonzRaster&apos;</source>
-        <translation>不正确的参数(%1): 应当是“栅格”或者“Toonz 栅格”</translation>
+        <translation>不正确的参数(%1): 应当是“光栅”或者“Toonz 光栅”</translation>
     </message>
     <message>
         <source>ImageBuilder(%1 image)</source>
@@ -842,7 +842,7 @@
     </message>
     <message>
         <source>Bad level type (%1): must be Vector,Raster or ToonzRaster</source>
-        <translation>不正确的层级类型(%1): 必须是矢量、栅格或者 Toonz 栅格</translation>
+        <translation>不正确的层级类型(%1): 必须是矢量、光栅或者 Toonz 光栅</translation>
     </message>
     <message>
         <source>Can&apos;t add the level: name(%1) is already used</source>
@@ -885,7 +885,7 @@
     </message>
     <message>
         <source>Bad argument (%1): should be a raster Level or a raster Image</source>
-        <translation>不正确的参数(%1): 应当是栅格层级或者栅格图像</translation>
+        <translation>不正确的参数(%1): 应当是光栅层级或者光栅图像</translation>
     </message>
 </context>
 <context>
@@ -931,7 +931,7 @@
     </message>
     <message>
         <source>Bad argument (%1): should be a raster Level or a raster Image</source>
-        <translation>不正确的参数(%1): 应当是栅格层级或者栅格图像</translation>
+        <translation>不正确的参数(%1): 应当是光栅层级或者光栅图像</translation>
     </message>
 </context>
 <context>

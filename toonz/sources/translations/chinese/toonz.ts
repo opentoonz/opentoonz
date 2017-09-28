@@ -362,7 +362,7 @@ Stop it or wait for its completion before removing it.</source>
     </message>
     <message>
         <source>No raster frames selected</source>
-        <translation>未选择栅格帧</translation>
+        <translation>未选择光栅帧</translation>
     </message>
     <message>
         <source>Binarizing images</source>
@@ -3561,7 +3561,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Visualize Vector As Raster</source>
-        <translation>以栅格显示矢量(&amp;V)</translation>
+        <translation>以光栅显示矢量(&amp;V)</translation>
     </message>
     <message>
         <source>&amp;Histogram</source>
@@ -4385,7 +4385,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Raster Bounding Box</source>
-        <translation>栅格边界框(&amp;R)</translation>
+        <translation>光栅边界框(&amp;R)</translation>
     </message>
     <message>
         <source>Link Flipbooks</source>
@@ -4761,19 +4761,19 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;New Toonz Raster Level</source>
-        <translation>新 Toonz 栅格层级(&amp;N)</translation>
+        <translation>新 Toonz 光栅层级(&amp;N)</translation>
     </message>
     <message>
         <source>New Toonz Raster Level</source>
-        <translation>新 Toonz 栅格层级</translation>
+        <translation>新 Toonz 光栅层级</translation>
     </message>
     <message>
         <source>&amp;New Raster Level</source>
-        <translation>新栅格层级(&amp;N)</translation>
+        <translation>新光栅层级(&amp;N)</translation>
     </message>
     <message>
         <source>New Raster Level</source>
-        <translation>新栅格层级</translation>
+        <translation>新光栅层级</translation>
     </message>
     <message>
         <source>Alpha Channel</source>
@@ -4990,7 +4990,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Rasterization DPI:</source>
-        <translation>栅格化 DPI:</translation>
+        <translation>光栅化 DPI:</translation>
     </message>
     <message>
         <source>Mesh Margin (pixels):</source>
@@ -5629,7 +5629,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>The selected image is not in a raster level.</source>
-        <translation>选中的图像不在栅格层级。</translation>
+        <translation>选中的图像不在光栅层级。</translation>
     </message>
     <message>
         <source>The selected image size does not match the current camera settings.</source>
@@ -5960,7 +5960,7 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Minimize Raster Memory Fragmentation*</source>
-        <translation>最小化栅格内存碎片*</translation>
+        <translation>最小化光栅内存碎片*</translation>
     </message>
     <message>
         <source>Save Automatically Every Minutes</source>
@@ -6200,11 +6200,11 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Toonz Raster Level</source>
-        <translation>Toonz 栅格层级</translation>
+        <translation>Toonz 光栅层级</translation>
     </message>
     <message>
         <source>Raster Level</source>
-        <translation>栅格层级</translation>
+        <translation>光栅层级</translation>
     </message>
     <message>
         <source>Autocreation:</source>
@@ -6280,7 +6280,7 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Minimize Raster Memory Fragmentation *</source>
-        <translation>最小化栅格内存碎片*</translation>
+        <translation>最小化光栅内存碎片*</translation>
     </message>
     <message>
         <source>Replace Level after SaveLevelAs command</source>
@@ -6304,7 +6304,7 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Show Raster Images Darken Blended in Camstand View</source>
-        <translation>在摄影机位视图中用“变暗”混合来显示栅格图像</translation>
+        <translation>在摄影机位视图中用“变暗”混合来显示光栅图像</translation>
     </message>
     <message>
         <source>Show &quot;ABC&quot; Appendix to the Frame Number in Xsheet Cell</source>
@@ -6436,7 +6436,7 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Palette Type on Loading Raster Image as Color Model</source>
-        <translation>将栅格图像加载为色彩模型的调色板类型</translation>
+        <translation>将光栅图像加载为色彩模型的调色板类型</translation>
     </message>
     <message>
         <source>Mouse Cursor</source>
@@ -6665,7 +6665,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Palette Type on Loading Raster Image as Color Model:</source>
-        <translation>加载栅格图像时把调色板类型当作颜色模型:</translation>
+        <translation>加载光栅图像时把调色板类型当作颜色模型:</translation>
     </message>
     <message>
         <source>Vector Snapping:</source>
@@ -7575,7 +7575,7 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>Match lines can be deleted from Toonz raster levels only</source>
-        <translation>适配线只能在 Toonz 栅格层级中删除</translation>
+        <translation>适配线只能在 Toonz 光栅层级中删除</translation>
     </message>
     <message>
         <source>Partially Edited</source>
@@ -7643,7 +7643,7 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>Match lines can be applied to Toonz raster levels only.</source>
-        <translation>适配线仅能应用到 Toonz 栅格层级。</translation>
+        <translation>适配线仅能应用到 Toonz 光栅层级。</translation>
     </message>
     <message>
         <source>The style index you specified is not available in the palette of the destination level.</source>
@@ -7667,7 +7667,7 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>Only raster levels can be merged to a raster level.</source>
-        <translation>只有栅格层级能被合并到栅格层级。</translation>
+        <translation>只有光栅层级能被合并到光栅层级。</translation>
     </message>
     <message>
         <source>Only vector levels can be merged to a vector level.</source>
@@ -7675,7 +7675,7 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>It is possible to merge only Toonz vector levels or standard raster levels.</source>
-        <translation>只能合并 Toonz 矢量层级或标准栅格层级。</translation>
+        <translation>只能合并 Toonz 矢量层级或标准光栅层级。</translation>
     </message>
     <message>
         <source>It is not possible to display the file %1: no player associated with its format</source>
@@ -8185,7 +8185,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Paste (Raster)</source>
-        <translation>粘贴(栅格)</translation>
+        <translation>粘贴(光栅)</translation>
     </message>
     <message>
         <source>Overwrite Paste Cells</source>
@@ -8243,7 +8243,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Merge Raster Levels</source>
-        <translation>合并栅格层级</translation>
+        <translation>合并光栅层级</translation>
     </message>
     <message>
         <source>Delete Matchline  : Level %1</source>
@@ -10829,7 +10829,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Raster Levels</source>
-        <translation>栅格层级</translation>
+        <translation>光栅层级</translation>
     </message>
     <message>
         <source>Toggle Swatch Preview</source>
@@ -11252,11 +11252,11 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>New Toonz Raster Level</source>
-        <translation>新Toonz栅格层级</translation>
+        <translation>新Toonz光栅层级</translation>
     </message>
     <message>
         <source>New Raster Level</source>
-        <translation>新栅格层级</translation>
+        <translation>新光栅层级</translation>
     </message>
 </context>
 <context>
