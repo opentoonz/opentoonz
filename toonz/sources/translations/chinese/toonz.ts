@@ -187,7 +187,7 @@ pick up all frames in the selected level.</source>
     </message>
     <message>
         <source>frames increment</source>
-        <translation>增加的帧数</translation>
+        <translation>增加的帧</translation>
     </message>
     <message>
         <source>To frame</source>
@@ -204,7 +204,7 @@ pick up all frames in the selected level.</source>
     </message>
     <message>
         <source>empty cell intervals</source>
-        <translation type="unfinished">空帧格的间隔</translation>
+        <translation>空帧格的间隔</translation>
     </message>
     <message>
         <source>cell steps</source>
@@ -723,7 +723,7 @@ when running the cleanup process.</source>
     <message>
         <source>File &quot;%1&quot; already exists.
 What do you want to do?</source>
-        <translation type="unfinished">文件“%1”已经存在。
+        <translation>文件“%1”已经存在。
 您要怎么做？</translation>
     </message>
     <message>
@@ -8434,7 +8434,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Auto Input Cell Numbers : %1</source>
-        <translation>自动s输入帧格编号: %1</translation>
+        <translation>自动输入帧格编号: %1</translation>
     </message>
     <message>
         <source>Insert</source>
