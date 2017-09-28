@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>AddFilmstripFramesPopup</name>
     <message>
@@ -140,6 +140,91 @@
 Please select a different device or check the microphone.</source>
         <translation>麦克风不可用:
 请选择不同的设备或者检查您的麦克风。</translation>
+    </message>
+    <message>
+        <source>The microphone is not available: 
+Please select a different device or check the microphone.</source>
+        <translation>麦克风不可用: 
+请选择其他设备或者检查该麦克风。</translation>
+    </message>
+</context>
+<context>
+    <name>AutoInputCellNumberPopup</name>
+    <message>
+        <source>Auto Input Cell Number</source>
+        <translation>自动输入帧格编号</translation>
+    </message>
+    <message>
+        <source>Overwrite</source>
+        <translation>覆盖</translation>
+    </message>
+    <message>
+        <source>Insert</source>
+        <translation>插入</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Setting this value 0 will automatically 
+pick up all frames in the selected level.</source>
+        <translation>设置此值为0将自动选上
+所选中层级里的所有帧。</translation>
+    </message>
+    <message>
+        <source>From frame</source>
+        <translation>起始帧</translation>
+    </message>
+    <message>
+        <source> </source>
+        <comment>from frame</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>with</source>
+        <translation type="unfinished">加入</translation>
+    </message>
+    <message>
+        <source>frames increment</source>
+        <translation>增加的帧数</translation>
+    </message>
+    <message>
+        <source>To frame</source>
+        <translation>结束帧</translation>
+    </message>
+    <message>
+        <source> </source>
+        <comment>to frame</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>inserting</source>
+        <translation>插入</translation>
+    </message>
+    <message>
+        <source>empty cell intervals</source>
+        <translation type="unfinished">空帧格的间隔</translation>
+    </message>
+    <message>
+        <source>cell steps</source>
+        <translation>帧格步长</translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation>重复</translation>
+    </message>
+    <message>
+        <source>times</source>
+        <translation>次数</translation>
+    </message>
+    <message>
+        <source>No available cells or columns are selected.</source>
+        <translation>无有效帧格或者列被选中。</translation>
+    </message>
+    <message>
+        <source>Selected level has no frames between From and To.</source>
+        <translation>选中的层级在起始和终点之间没有帧。</translation>
     </message>
 </context>
 <context>
@@ -638,7 +723,8 @@ when running the cleanup process.</source>
     <message>
         <source>File &quot;%1&quot; already exists.
 What do you want to do?</source>
-        <translation>文件“%1”已经存在。您要怎么做？</translation>
+        <translation type="unfinished">文件“%1”已经存在。
+您要怎么做？</translation>
     </message>
     <message>
         <source>Cleanup all selected drawings overwriting those previously cleaned up.*</source>
@@ -805,6 +891,22 @@ What do you want to do?</source>
     <message>
         <source>Field Guide</source>
         <translation>规格板</translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation>下</translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation>上</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation>左</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation>右</translation>
     </message>
 </context>
 <context>
@@ -1243,6 +1345,26 @@ contain the dpi information, then the current camera dpi will be used.
     <message>
         <source>Dpi:</source>
         <translation>DPI:</translation>
+    </message>
+    <message>
+        <source>When activated, styles of the default palette
+($TOONZSTUDIOPALETTE\cleanup_default.tpl) will 
+be appended to the palette after conversion in 
+order to save the effort of creating styles 
+before color designing.</source>
+        <translation>当启用时，默认调色板的样式
+($TOONZSTUDIOPALETTE\cleanup_default.tpl)
+将在转换后被打包到调色板中，
+以便在开始颜色设计前保存样式调整效果。</translation>
+    </message>
+    <message>
+        <source>Specify the policy for setting DPI of converted tlv. 
+If you select the &quot;Image DPI&quot; option and the source image does not 
+contain the dpi information, then the current camera dpi will be used.
+</source>
+        <translation>指定转换 TLV 的 DPI 设置策略。
+如果选择了“图像 DPI” 而源图像
+没包含 DPI 信息，则采用当前摄影机的 DPI。</translation>
     </message>
 </context>
 <context>
@@ -1951,6 +2073,13 @@ contain the dpi information, then the current camera dpi will be used.
     <message>
         <source>File Format:</source>
         <translation>文件格式:</translation>
+    </message>
+</context>
+<context>
+    <name>FileViewerPopup</name>
+    <message>
+        <source>Viewer</source>
+        <translation>查看器</translation>
     </message>
 </context>
 <context>
@@ -2733,6 +2862,13 @@ Do you want to create it?</source>
     <message>
         <source> does not exist.</source>
         <translation> 不存在。</translation>
+    </message>
+</context>
+<context>
+    <name>LoadScriptPopup</name>
+    <message>
+        <source>Load script</source>
+        <translation>加载脚本</translation>
     </message>
 </context>
 <context>
@@ -4647,6 +4783,14 @@ Do you want to create it?</source>
         <source>&amp;Command Bar</source>
         <translation>命令条(&amp;C)</translation>
     </message>
+    <message>
+        <source>Reframe with Empty Inbetweens...</source>
+        <translation>添加空中间画重排帧...</translation>
+    </message>
+    <message>
+        <source>Auto Input Cell Number...</source>
+        <translation>自动输入帧格编号...</translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5594,6 +5738,29 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
 WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
         <translation>警告: 图像大小不匹配。保存的图像大小是 %1 x %2。</translation>
     </message>
+    <message>
+        <source>Color</source>
+        <translation>彩色</translation>
+    </message>
+    <message>
+        <source>Grayscale</source>
+        <translation>灰度</translation>
+    </message>
+    <message>
+        <source>Black &amp; White</source>
+        <translation>黑白</translation>
+    </message>
+    <message>
+        <source>WARNING : Level name conflicts. There already is a level %1 in the scene with the path                        
+          %2.</source>
+        <translation>警告: 层级名字冲突。在下面路径的场景中已经有名为 %1 的层级
+         %2。</translation>
+    </message>
+    <message>
+        <source>WARNING : Level path conflicts. There already is a level with the path %1                        
+          in the scene with the name %2.</source>
+        <translation>警告: 层级路径冲突。在名为 %2 的场景中，已经有个层级位于路径 %1 上。</translation>
+    </message>
 </context>
 <context>
     <name>PencilTestSaveInFolderPopup</name>
@@ -5635,11 +5802,11 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Episode + Sequence + Scene</source>
-        <translation type="unfinished">片段 + 序列 + 场景</translation>
+        <translation>片段 + 序列 + 场景</translation>
     </message>
     <message>
         <source>Project + Episode + Sequence + Scene</source>
-        <translation type="unfinished">项目 + 片段 + 序列 + 场景</translation>
+        <translation>项目 + 片段 + 序列 + 场景</translation>
     </message>
     <message>
         <source>Save In:</source>
@@ -6511,6 +6678,34 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Enable OpenToonz Commands&apos; Shortcut Keys While Renaming Cell</source>
         <translation>重命名帧格时启用 OpenToonz 命令快捷键</translation>
+    </message>
+    <message>
+        <source>Font *:</source>
+        <translation>字体 *:</translation>
+    </message>
+    <message>
+        <source>Font Weight *:</source>
+        <translation>字体粗细 *:</translation>
+    </message>
+    <message>
+        <source>Life is too short for Comic Sans</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Good luck.  You&apos;re on your own from here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arrow Markers</source>
+        <translation>箭头标记</translation>
+    </message>
+    <message>
+        <source>Animated Guide</source>
+        <translation>动态指引</translation>
+    </message>
+    <message>
+        <source>Vector Guided Style:</source>
+        <translation>矢量绘制指引样式:</translation>
     </message>
 </context>
 <context>
@@ -8133,7 +8328,8 @@ Are you sure to </source>
     <message>
         <source>%1: the current scene has been modified.
 What would you like to do?</source>
-        <translation>%1: 当前场景已经被修改。您要怎么做？</translation>
+        <translation>%1: 当前场景已经被修改。
+您要怎么做？</translation>
     </message>
     <message>
         <source>Save All</source>
@@ -8158,7 +8354,8 @@ What would you like to do?</source>
     <message>
         <source>
 What would you like to do? </source>
-        <translation>您要怎么做？</translation>
+        <translation>
+您要怎么做？</translation>
     </message>
     <message>
         <source>Save Changes</source>
@@ -8226,6 +8423,75 @@ Are you sure?</source>
     <message>
         <source>Command Bar</source>
         <translation>命令条</translation>
+    </message>
+    <message>
+        <source>Stage Schematic</source>
+        <translation>舞台示意图</translation>
+    </message>
+    <message>
+        <source>Fx Schematic</source>
+        <translation>特效示意图</translation>
+    </message>
+    <message>
+        <source>Auto Input Cell Numbers : %1</source>
+        <translation>自动s输入帧格编号: %1</translation>
+    </message>
+    <message>
+        <source>Insert</source>
+        <translation>插入</translation>
+    </message>
+    <message>
+        <source>Cannot paste data 
+ Nothing to paste</source>
+        <translation>不能粘贴数据
+无内容可粘贴</translation>
+    </message>
+    <message>
+        <source>Reframe to %1&apos;s with %2 blanks</source>
+        <translation>用 %2 空白重排帧到 %1&apos;s</translation>
+    </message>
+    <message>
+        <source>File not found</source>
+        <translation>文件没找到</translation>
+    </message>
+    <message>
+        <source>Don&apos;t Save</source>
+        <translation>不保存</translation>
+    </message>
+</context>
+<context>
+    <name>ReframePopup</name>
+    <message>
+        <source>Reframe with Empty Inbetweens</source>
+        <translation>添加空的中间画重排帧</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>steps</source>
+        <translation>步长</translation>
+    </message>
+    <message>
+        <source>with</source>
+        <translation>加入</translation>
+    </message>
+    <message>
+        <source>empty inbetweens</source>
+        <translation>张空的中间画</translation>
+    </message>
+    <message>
+        <source>(</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source> blank cells will be inserted.)</source>
+        <translation> 张空白帧格将被插入。)</translation>
     </message>
 </context>
 <context>
@@ -9489,6 +9755,26 @@ Please commit or revert changes first.</source>
         <source>Select Column</source>
         <translation>选择列</translation>
     </message>
+    <message>
+        <source>Vector Guided Drawing</source>
+        <translation>矢量引导绘图</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Closest Drawing</source>
+        <translation>最靠近的笔画</translation>
+    </message>
+    <message>
+        <source>Farthest Drawing</source>
+        <translation>最远端的笔画</translation>
+    </message>
+    <message>
+        <source>All Drawings</source>
+        <translation>全部笔画</translation>
+    </message>
 </context>
 <context>
     <name>SceneViewerPanel</name>
@@ -10002,6 +10288,78 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>The height must be greater than zero.</source>
         <translation>高度必须大于零。</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; doesn&apos;t seem to be a well formed camera preset. 
+Possibly the preset file has been corrupted</source>
+        <translation>&apos;%1&apos; 不是格式完好的摄影机预设，
+可能该预设文件已经被损坏了。</translation>
+    </message>
+</context>
+<context>
+    <name>StudioPaletteTreeViewer</name>
+    <message>
+        <source>This folder is not empty. Delete anyway?</source>
+        <translation>文件夹不是空的，还要删除马？</translation>
+    </message>
+    <message>
+        <source>New Palette</source>
+        <translation>新建调色板</translation>
+    </message>
+    <message>
+        <source>New Folder</source>
+        <translation>新建文件夹</translation>
+    </message>
+    <message>
+        <source>New Cleanup Palette</source>
+        <translation>新建清稿调色板</translation>
+    </message>
+    <message>
+        <source>Delete Folder</source>
+        <translation>删除文件夹</translation>
+    </message>
+    <message>
+        <source>Load into Current Cleaunp Palette</source>
+        <translation>加载到当前清稿调色板中</translation>
+    </message>
+    <message>
+        <source>Replace with Current Cleaunp Palette</source>
+        <translation>用当前清稿调色板替换</translation>
+    </message>
+    <message>
+        <source>Load into Current Palette</source>
+        <translation>加载到当前调色板中</translation>
+    </message>
+    <message>
+        <source>Merge to Current Palette</source>
+        <translation>合并到当前调色板上</translation>
+    </message>
+    <message>
+        <source>Replace with Current Palette</source>
+        <translation>用当前调色板替换</translation>
+    </message>
+    <message>
+        <source>Delete Palette</source>
+        <translation>删除调色板</translation>
+    </message>
+    <message>
+        <source>Search for Palettes</source>
+        <translation>搜索调色板</translation>
+    </message>
+</context>
+<context>
+    <name>StudioPaletteViewer</name>
+    <message>
+        <source>&amp;New Folder</source>
+        <translation>新建文件夹(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;New Palette</source>
+        <translation>新建调色板(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation>删除(&amp;D)</translation>
     </message>
 </context>
 <context>

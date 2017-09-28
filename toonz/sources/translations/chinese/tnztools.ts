@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -141,6 +141,14 @@
     <message>
         <source>Smooth:</source>
         <translation>平滑:</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>范围:</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>吸附</translation>
     </message>
 </context>
 <context>
