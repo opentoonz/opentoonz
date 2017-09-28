@@ -246,6 +246,9 @@ bool ImageManager::rebind(const std::string &srcId, const std::string &dstId) {
   m_imp->m_builders.erase(st);
   m_imp->m_builders[dstId] = builder;
 
+  m_imp->m_builders[dstId]->m_cached = true;
+  m_imp->m_builders[dstId]->m_modified = true;
+
   TImageCache::instance()->remap(dstId, srcId);
 
   return true;
