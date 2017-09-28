@@ -1095,7 +1095,7 @@ PencilTestPopup::PencilTestPopup()
   m_saveOnCaptureCB->setChecked(true);
 
   imageFrame->setObjectName("CleanupSettingsFrame");
-  m_colorTypeCombo->addItems({"Color", "Grayscale", "Black & White"});
+  m_colorTypeCombo->addItems({tr("Color"), tr("Grayscale"), tr("Black & White")});
   m_colorTypeCombo->setCurrentIndex(0);
   m_upsideDownCB->setChecked(false);
 

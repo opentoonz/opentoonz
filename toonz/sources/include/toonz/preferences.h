@@ -224,6 +224,11 @@ public:
     return m_moveCurrentFrameByClickCellArea;
   }
 
+  void setInterfaceFont(std::string font);
+  QString getInterfaceFont() { return m_interfaceFont; }
+  void setInterfaceFontWeight(int weight);
+  int getInterfaceFontWeight() { return m_interfaceFontWeight; }
+
   // Visualization  tab
 
   void setShow0ThickLines(bool on);
@@ -323,6 +328,11 @@ public:
   bool isUseNumpadForSwitchingStylesEnabled() const {
     return m_useNumpadForSwitchingStyles;
   }
+
+  void setGuidedDrawing(int status);
+  int getGuidedDrawing() { return m_guidedDrawingType; }
+  void setAnimatedGuidedDrawing(bool status);
+  bool getAnimatedGuidedDrawing() const { return m_animatedGuidedDrawing; }
 
   void enableNewLevelSizeToCameraSize(bool on);
   bool isNewLevelSizeToCameraSizeEnabled() const {
@@ -500,7 +510,7 @@ private:
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
       m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
-      m_customProjectRoot;
+      m_customProjectRoot, m_interfaceFont;
   QString m_fastRenderPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
@@ -514,7 +524,7 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-  int m_projectRoot, m_importPolicy;
+  int m_projectRoot, m_importPolicy, m_interfaceFontWeight, m_guidedDrawingType;
   QString m_currentLanguage, m_currentStyleSheet;
   int m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
@@ -526,7 +536,7 @@ private:
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
       m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar,
-      m_expandFunctionHeader, m_showColumnNumbers;
+      m_expandFunctionHeader, m_showColumnNumbers, m_animatedGuidedDrawing;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,

@@ -993,13 +993,13 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent,
       upperLay->setSpacing(3);
       upperLay->setMargin(0);
       {
-        upperLay->addWidget(new QLabel("From", this), 0);
+        upperLay->addWidget(new QLabel(tr("From"), this), 0);
         upperLay->addWidget(m_fromFld, 1);
         upperLay->addSpacing(3);
-        upperLay->addWidget(new QLabel("To", this), 0);
+        upperLay->addWidget(new QLabel(tr("To"), this), 0);
         upperLay->addWidget(m_toFld, 1);
         upperLay->addSpacing(5);
-        upperLay->addWidget(new QLabel("Step", this), 0);
+        upperLay->addWidget(new QLabel(tr("Step"), this), 0);
         upperLay->addWidget(m_stepFld, 1);
       }
       topbarLayout->addLayout(upperLay, 0);

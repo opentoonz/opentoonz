@@ -61,6 +61,7 @@
     <command>MI_Swing</command>
     <command>MI_Random</command>
     <command>MI_TimeStretch</command>
+    <command>MI_AutoInputCellNumber</command>
     <separator/>
     <menu title="Reframe">
       <command>MI_Reframe1</command>

@@ -32,6 +32,7 @@
 
 // TnzCore includes
 #include "tsystem.h"
+#include "tfont.h"
 
 // Qt includes
 #include <QHBoxLayout>
@@ -335,6 +336,23 @@ void PreferencesPopup::onCameraUnitChanged(int index) {
 void PreferencesPopup::onRoomChoiceChanged(int index) {
   TApp::instance()->writeSettings();
   m_pref->setCurrentRoomChoice(index);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onInterfaceFontChanged(int index) {
+  QString font = m_interfaceFont->currentText();
+  m_pref->setInterfaceFont(font.toStdString());
+  if (font.contains("Comic Sans"))
+    DVGui::warning(tr("Life is too short for Comic Sans"));
+  if (font.contains("Wingdings"))
+    DVGui::warning(tr("Good luck.  You're on your own from here."));
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onInterfaceFontWeightChanged(int index) {
+  m_pref->setInterfaceFontWeight(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -703,6 +721,12 @@ void PreferencesPopup::onOnionSkinVisibilityChanged(int index) {
 
 void PreferencesPopup::onOnionSkinDuringPlaybackChanged(int index) {
   m_pref->setOnionSkinDuringPlayback(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onGuidedDrawingStyleChanged(int index) {
+  m_pref->setAnimatedGuidedDrawing(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -1176,6 +1200,9 @@ PreferencesPopup::PreferencesPopup()
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_interface->setStyleSheet("font-size: 10px; font: italic;");
 
+  m_interfaceFont       = new QComboBox(this);
+  m_interfaceFontWeight = new QComboBox(this);
+
   //--- Visualization ------------------------------
   categoryList->addItem(tr("Visualization"));
   CheckBox *show0ThickLinesCB =
@@ -1299,6 +1326,7 @@ PreferencesPopup::PreferencesPopup()
 
   int thickness         = m_pref->getOnionPaperThickness();
   m_onionPaperThickness = new DVGui::IntLineEdit(this, thickness, 0, 100);
+  m_guidedDrawingStyle  = new QComboBox(this);
 
   //--- Transparency Check ------------------------------
   categoryList->addItem(tr("Transparency Check"));
@@ -1418,6 +1446,33 @@ PreferencesPopup::PreferencesPopup()
   zoomCenters << tr("Mouse Cursor") << tr("Viewer Center");
   viewerZoomCenterComboBox->addItems(zoomCenters);
   viewerZoomCenterComboBox->setCurrentIndex(m_pref->getViewerZoomCenter());
+
+  TFontManager *instance = TFontManager::instance();
+  bool validFonts;
+  try {
+    instance->loadFontNames();
+    validFonts = true;
+  } catch (TFontLibraryLoadingError &) {
+    validFonts = false;
+    //    TMessage::error(toString(e.getMessage()));
+  }
+
+  if (validFonts) {
+    std::vector<std::wstring> names;
+    instance->getAllFamilies(names);
+
+    for (std::vector<std::wstring>::iterator it = names.begin();
+         it != names.end(); ++it)
+      m_interfaceFont->addItem(QString::fromStdWString(*it));
+
+    m_interfaceFont->setCurrentText(m_pref->getInterfaceFont());
+  }
+
+  QStringList fontStyles;
+  fontStyles << "Regular"
+             << "Bold";
+  m_interfaceFontWeight->addItems(fontStyles);
+  m_interfaceFontWeight->setCurrentIndex(m_pref->getInterfaceFontWeight());
 
   //--- Visualization ------------------------------
   show0ThickLinesCB->setChecked(m_pref->getShow0ThickLines());
@@ -1571,6 +1626,10 @@ PreferencesPopup::PreferencesPopup()
   m_frontOnionColor->setEnabled(m_pref->isOnionSkinEnabled());
   m_backOnionColor->setEnabled(m_pref->isOnionSkinEnabled());
   m_inksOnly->setEnabled(m_pref->isOnionSkinEnabled());
+  QStringList guidedDrawingStyles;
+  guidedDrawingStyles << tr("Arrow Markers") << tr("Animated Guide");
+  m_guidedDrawingStyle->addItems(guidedDrawingStyles);
+  m_guidedDrawingStyle->setCurrentIndex(m_pref->getAnimatedGuidedDrawing());
 
   //--- Version Control ------------------------------
   m_enableVersionControl->setChecked(m_pref->isSVNEnabled());
@@ -1773,6 +1832,14 @@ PreferencesPopup::PreferencesPopup()
           bgColorsLay->addWidget(new QLabel(tr("Language *:")), 7, 0,
                                  Qt::AlignRight | Qt::AlignVCenter);
           bgColorsLay->addWidget(languageType, 7, 1, 1, 4);
+        }
+        if (m_interfaceFont->count() > 0) {
+          bgColorsLay->addWidget(new QLabel(tr("Font *:")), 8, 0,
+                                 Qt::AlignRight | Qt::AlignVCenter);
+          bgColorsLay->addWidget(m_interfaceFont, 8, 1, 1, 4);
+          bgColorsLay->addWidget(new QLabel(tr("Font Weight *:")), 9, 0,
+                                 Qt::AlignRight | Qt::AlignVCenter);
+          bgColorsLay->addWidget(m_interfaceFontWeight, 9, 1, 1, 4);
         }
       }
       bgColorsLay->setColumnStretch(0, 0);
@@ -2111,7 +2178,17 @@ PreferencesPopup::PreferencesPopup()
       onionLay->addWidget(m_inksOnly, 0, Qt::AlignLeft | Qt::AlignVCenter);
       onionLay->addWidget(m_onionSkinDuringPlayback, 0,
                           Qt::AlignLeft | Qt::AlignVCenter);
-
+      QGridLayout *guidedDrawingLay = new QGridLayout();
+      {
+        guidedDrawingLay->addWidget(new QLabel(tr("Vector Guided Style:")), 0,
+                                    0, Qt::AlignLeft | Qt::AlignVCenter);
+        guidedDrawingLay->addWidget(m_guidedDrawingStyle, 0, 1,
+                                    Qt::AlignLeft | Qt::AlignVCenter);
+        guidedDrawingLay->setColumnStretch(0, 0);
+        guidedDrawingLay->setColumnStretch(1, 0);
+        guidedDrawingLay->setColumnStretch(2, 1);
+      }
+      onionLay->addLayout(guidedDrawingLay, 0);
       onionLay->addStretch(1);
     }
     onionBox->setLayout(onionLay);
@@ -2246,6 +2323,10 @@ PreferencesPopup::PreferencesPopup()
   ret =
       ret && connect(viewerZoomCenterComboBox, SIGNAL(currentIndexChanged(int)),
                      this, SLOT(onViewerZoomCenterChanged(int)));
+  ret = ret && connect(m_interfaceFont, SIGNAL(currentIndexChanged(int)), this,
+                       SLOT(onInterfaceFontChanged(int)));
+  ret = ret && connect(m_interfaceFontWeight, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onInterfaceFontWeightChanged(int)));
   ret = ret && connect(replaceAfterSaveLevelAsCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onReplaceAfterSaveLevelAsChanged(int)));
   ret =
@@ -2414,7 +2495,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onOnionSkinDuringPlaybackChanged(int)));
   ret = ret && connect(m_onionPaperThickness, SIGNAL(editingFinished()),
                        SLOT(onOnionPaperThicknessChanged()));
-
+  ret = ret && connect(m_guidedDrawingStyle, SIGNAL(currentIndexChanged(int)),
+                       SLOT(onGuidedDrawingStyleChanged(int)));
   //--- Transparency Check ----------------------
   ret = ret && connect(m_transpCheckBgColor,
                        SIGNAL(colorChanged(const TPixel32 &, bool)),
