@@ -54,10 +54,10 @@ CleanupCameraSettingsWidget::CleanupCameraSettingsWidget() {
     offsetLay->setVerticalSpacing(3);
     offsetLay->setMargin(3);
     {
-      offsetLay->addWidget(new QLabel("N/S"), 0, 0);
+      offsetLay->addWidget(new QLabel(tr("N/S")), 0, 0);
       offsetLay->addWidget(m_offsY, 0, 1);
       offsetLay->addWidget(m_offsy_lock, 0, 2);
-      offsetLay->addWidget(new QLabel("E/W"), 1, 0);
+      offsetLay->addWidget(new QLabel(tr("E/W")), 1, 0);
       offsetLay->addWidget(m_offsX, 1, 1);
       offsetLay->addWidget(m_offsx_lock, 1, 2);
     }

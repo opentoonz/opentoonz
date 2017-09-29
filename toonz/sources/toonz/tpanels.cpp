@@ -200,9 +200,9 @@ int SchematicScenePanel::getViewType() {
 
 void SchematicScenePanel::showEvent(QShowEvent *e) {
   if (m_schematicViewer->isStageSchematicViewed())
-    setWindowTitle("Stage Schematic");
+    setWindowTitle(QObject::tr("Stage Schematic"));
   else
-    setWindowTitle("Fx Schematic");
+    setWindowTitle(QObject::tr("Fx Schematic"));
 
   TApp *app = TApp::instance();
   connect(m_schematicViewer, SIGNAL(showPreview(TFxP)), this,

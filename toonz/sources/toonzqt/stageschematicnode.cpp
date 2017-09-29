@@ -678,7 +678,7 @@ void TablePainter::paint(QPainter *painter,
 
   // Draw the name
   QRectF rect(30, 0, 42, 18);
-  painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString("Table"));
+  painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString(tr("Table")));
 }
 
 //--------------------------------------------------------
