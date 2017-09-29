@@ -450,8 +450,8 @@ public:
         for (int i = 0; i < n; i++) {
           std::map<TXshCell, TXshCell>::const_iterator it =
               table.find(cells[i]);
-          if (it != table.end())
-            cells[i] = it->second, changed = it->first != it->second;
+          if (it != table.end() && it->first != it->second)
+            cells[i] = it->second, changed = true;
         }
         if (changed) xsh->setCells(r0, c, n, &cells[0]);
       }
