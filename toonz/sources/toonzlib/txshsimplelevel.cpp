@@ -1964,20 +1964,20 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
   std::map<TFrameId, TFrameId>::iterator jt;
 
   {
-	  for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i)
-	  {
-		  std::string Id = getImageId(jt->first);
-		  im->rebind(Id, "^" + std::to_string(i));
-		  TImageCache::instance()->remap("^icon:" + std::to_string(i), "icon:" + Id);
-	  }
+    for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
+      std::string Id = getImageId(jt->first);
+      im->rebind(Id, "^" + std::to_string(i));
+      TImageCache::instance()->remap("^icon:" + std::to_string(i),
+                                     "icon:" + Id);
+    }
 
-	for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i)
-	{
-		std::string Id = getImageId(jt->second);
-		im->rebind("^" + std::to_string(i), Id);
-		TImageCache::instance()->remap("icon:" + Id, "^icon:" + std::to_string(i));
-		im->renumber(Id, jt->second);
-	}
+    for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
+      std::string Id = getImageId(jt->second);
+      im->rebind("^" + std::to_string(i), Id);
+      TImageCache::instance()->remap("icon:" + Id,
+                                     "^icon:" + std::to_string(i));
+      im->renumber(Id, jt->second);
+    }
   }
 
   if (getType() == PLI_XSHLEVEL) {
@@ -2187,9 +2187,8 @@ TFilePath TXshSimpleLevel::getExistingHookFile(
   }
 
   assert(h >= 0);
-  return (h < 0) ? TFilePath()
-                 : decodedLevelPath.getParentDir() +
-                       TFilePath(hookFiles[h].toStdWString());
+  return (h < 0) ? TFilePath() : decodedLevelPath.getParentDir() +
+                                     TFilePath(hookFiles[h].toStdWString());
 }
 
 //-----------------------------------------------------------------------------

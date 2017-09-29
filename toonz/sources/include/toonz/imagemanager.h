@@ -288,7 +288,7 @@ protected:
                                           std::vector<TFrameId>,
                                           std::vector<std::string>, bool){};
 
-  virtual void setFid(const TFrameId &fid) {};
+  virtual void setFid(const TFrameId &fid){};
 
   //! Clears the builder's cached data.
   virtual void invalidate() {

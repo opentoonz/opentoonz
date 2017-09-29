@@ -1424,7 +1424,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 #ifdef _WIN32
     fontName = "Arial";
 #else
-    fontName          = "Helvetica";
+    fontName = "Helvetica";
 #endif
   }
   static QFont font(fontName, -1, QFont::Normal);
