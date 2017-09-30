@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>AddFxContextMenu</name>
     <message>
@@ -26,6 +26,29 @@
     <message>
         <source>Replace </source>
         <translation>Reemplazar</translation>
+    </message>
+</context>
+<context>
+    <name>AddWordButton</name>
+    <message>
+        <source>Character</source>
+        <translation>Personaje</translation>
+    </message>
+    <message>
+        <source>Part</source>
+        <translation>Parte</translation>
+    </message>
+    <message>
+        <source>Suffix</source>
+        <translation>Sufijo</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation>Nuevo</translation>
+    </message>
+    <message>
+        <source>Add New Word for %1</source>
+        <translation>Agregar nuevo término para %1</translation>
     </message>
 </context>
 <context>
@@ -62,7 +85,7 @@
     <name>CameraSettingsWidget</name>
     <message>
         <source>Width:</source>
-        <translation>Longitud:</translation>
+        <translation>Ancho:</translation>
     </message>
     <message>
         <source>Height:</source>
@@ -324,6 +347,10 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>Toonz</source>
         <translation>OpenToonz</translation>
     </message>
+    <message>
+        <source>OpenToonz</source>
+        <translation>OpenToonz</translation>
+    </message>
 </context>
 <context>
     <name>DVGui::ToneCurveField</name>
@@ -386,6 +413,17 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
 </context>
 <context>
+    <name>EasyInputArea</name>
+    <message>
+        <source>Warning</source>
+        <translation>Advertencia</translation>
+    </message>
+    <message>
+        <source>%1 is already registered</source>
+        <translation>%1 ya se encuentra registrado</translation>
+    </message>
+</context>
+<context>
     <name>FileField</name>
     <message>
         <source>...</source>
@@ -396,7 +434,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>FileSegmentPage</name>
     <message>
         <source>File Path:</source>
-        <translation>Ruta al archivo:</translation>
+        <translation>Ruta:</translation>
     </message>
     <message>
         <source>Column:</source>
@@ -404,7 +442,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Unit:</source>
-        <translation>Unidad:</translation>
+        <translation>Unidades:</translation>
     </message>
 </context>
 <context>
@@ -443,7 +481,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Definir clave</translation>
+        <translation>Marcar fotograma clave</translation>
     </message>
     <message>
         <source>Histogram</source>
@@ -609,7 +647,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Unit:</source>
-        <translation>Unidad:</translation>
+        <translation>Unidades:</translation>
     </message>
     <message>
         <source>There is a circular reference in the definition of the interpolation.</source>
@@ -636,7 +674,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Definir clave</translation>
+        <translation>Marcar fotograma clave</translation>
     </message>
     <message>
         <source>Activate Cycle</source>
@@ -652,15 +690,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Speed In / Speed Out Interpolation</source>
-        <translation>Interpolación con aceleraciones / desaceleraciones rápidas</translation>
+        <translation>Interpolación Bézier</translation>
     </message>
     <message>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation>Interpolación con aceleraciones / desaceleraciones suaves</translation>
+        <translation>Interpolación suave</translation>
     </message>
     <message>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation>Interpolación con aceleraciones / desaceleraciones suaves (%)</translation>
+        <translation>Interpolación suave (%)</translation>
     </message>
     <message>
         <source>Exponential Interpolation</source>
@@ -692,19 +730,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>En 1</translation>
+        <translation>Exposición x1</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>En 2</translation>
+        <translation>Exposición x2</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>En 3</translation>
+        <translation>Exposición x3</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>En 4</translation>
+        <translation>Exposición x4</translation>
     </message>
     <message>
         <source>Function Curves</source>
@@ -712,7 +750,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation>Suavizar</translation>
+        <translation>Suave</translation>
     </message>
     <message>
         <source>Frame Based</source>
@@ -720,7 +758,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Curve Shape</source>
-        <translation>Forma de la curva</translation>
+        <translation>Visualización de curvas</translation>
     </message>
 </context>
 <context>
@@ -731,15 +769,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Speed In / Speed Out</source>
-        <translation>Aceleración / desaceleración rápida</translation>
+        <translation>Bézier</translation>
     </message>
     <message>
         <source>Ease In / Ease Out</source>
-        <translation>Aceleración / desaceleración suave</translation>
+        <translation>Suave</translation>
     </message>
     <message>
         <source>Ease In / Ease Out %</source>
-        <translation>Aceleración / desaceleración suave %</translation>
+        <translation>Suave %</translation>
     </message>
     <message>
         <source>Exponential</source>
@@ -787,7 +825,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Speed</source>
-        <translation>Rápida</translation>
+        <translation>Bézier</translation>
     </message>
     <message>
         <source>Ease</source>
@@ -815,7 +853,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>????</source>
-        <translation>¿¿??</translation>
+        <translation>????</translation>
     </message>
 </context>
 <context>
@@ -829,11 +867,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>FunctionSheetCellViewer</name>
     <message>
         <source>Delete Key</source>
-        <translation>Borrar clave</translation>
+        <translation>Borrar fotograma clave</translation>
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Definir clave</translation>
+        <translation>Marcar fotograma clave</translation>
     </message>
     <message>
         <source>Linear Interpolation</source>
@@ -841,15 +879,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Speed In / Speed Out Interpolation</source>
-        <translation>Interpolación con desaceleración / aceleración rápida</translation>
+        <translation>Interpolación Bézier</translation>
     </message>
     <message>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation>Interpolación con aceleración / desaceleración suave</translation>
+        <translation>Interpolación suave</translation>
     </message>
     <message>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation>Interpolación con aceleración / desaceleración suave (%)</translation>
+        <translation>Interpolación suave (%)</translation>
     </message>
     <message>
         <source>Expression Interpolation</source>
@@ -869,19 +907,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>En 1</translation>
+        <translation>Exposición x1</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>En 2</translation>
+        <translation>Exposición x2</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>En 3</translation>
+        <translation>Exposición x3</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>En 4</translation>
+        <translation>Exposición x4</translation>
     </message>
 </context>
 <context>
@@ -892,7 +930,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Function Editor Toggle</source>
-        <translation>Alternar editor de curvas de &amp;función</translation>
+        <translation>Alternar editor de &amp;funciones</translation>
+    </message>
+    <message>
+        <source>&amp;Open Function Curve Editor</source>
+        <translation>&amp;Abrir editor de curvas de función</translation>
     </message>
 </context>
 <context>
@@ -958,6 +1000,14 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <message>
         <source>&amp;Activate</source>
         <translation>&amp;Activar</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Salida</translation>
+    </message>
+    <message>
+        <source>Out</source>
+        <translation>Sal</translation>
     </message>
 </context>
 <context>
@@ -1042,7 +1092,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>FxSchematicLink</name>
     <message>
         <source>&amp;Delete</source>
-        <translation>&amp;Borrar.</translation>
+        <translation>&amp;Borrar</translation>
     </message>
     <message>
         <source>&amp;Paste Insert</source>
@@ -1118,6 +1168,14 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
         <source>&amp;Preview</source>
         <translation>&amp;Previsualizar</translation>
     </message>
+    <message>
+        <source>XSheet</source>
+        <translation>Planilla</translation>
+    </message>
+    <message>
+        <source>X</source>
+        <translation>P</translation>
+    </message>
 </context>
 <context>
     <name>GroupPainter</name>
@@ -1148,7 +1206,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Definir clave</translation>
+        <translation>Marcar fotograma clave</translation>
     </message>
     <message>
         <source>Next Key</source>
@@ -1163,10 +1221,32 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
 </context>
 <context>
+    <name>MyPaintBrushStyleChooserPage</name>
+    <message>
+        <source>Plain color</source>
+        <translation>Color pleno</translation>
+    </message>
+</context>
+<context>
+    <name>NewWordDialog</name>
+    <message>
+        <source>OK</source>
+        <translation>Aceptar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>Enter new word</source>
+        <translation>Ingresar un nuevo término</translation>
+    </message>
+</context>
+<context>
     <name>PageViewer</name>
     <message>
         <source>Toggle Link to Studio Palette</source>
-        <translation>Alternar vínculo con paleta de estudio</translation>
+        <translation>Vincular a paleta de estudio</translation>
     </message>
     <message>
         <source>Remove Reference to Studio Palette</source>
@@ -1225,7 +1305,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>&amp;Palette Gizmo</source>
-        <translation>Control de &amp;paleta</translation>
+        <translation>Asistente de &amp;paleta</translation>
     </message>
     <message>
         <source>New Page</source>
@@ -1245,7 +1325,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Cleanup Palette</source>
-        <translation>Paleta de limpieza</translation>
+        <translation>Limpiar paleta</translation>
     </message>
     <message>
         <source>Studio Palette</source>
@@ -1269,7 +1349,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Style Name</source>
-        <translation>Nombre del estilo</translation>
+        <translation>Nombre de estilo</translation>
     </message>
     <message>
         <source>StudioPalette Name</source>
@@ -1505,16 +1585,6 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
         <translation>Aplicar</translation>
     </message>
     <message>
-        <source>This feature is not available in the demo version.
-For more information visit the %1 site:</source>
-        <translation>Esta característica no está disponible en la versión de demostración.
-Para más información visitar el sitio %1:</translation>
-    </message>
-    <message>
-        <source>To request a trial license please contact </source>
-        <translation>Para solicitar una licencia de prueba por favor contactarse </translation>
-    </message>
-    <message>
         <source>For further information visit </source>
         <translation>Por más información visitar </translation>
     </message>
@@ -1556,7 +1626,7 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>SaveBox:      </source>
-        <translation>Marco de seguridad: </translation>
+        <translation>Marco delimitador: </translation>
     </message>
     <message>
         <source>Bits/Sample:  </source>
@@ -1612,11 +1682,11 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>Camera Size:      </source>
-        <translation>Tamaño de la cámara: </translation>
+        <translation>Tamaño de cámara: </translation>
     </message>
     <message>
         <source>Camera Dpi:       </source>
-        <translation>PPP de la cámara: </translation>
+        <translation>PPP de cámara: </translation>
     </message>
     <message>
         <source>Number of Frames: </source>
@@ -1672,7 +1742,7 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>Sample Size:      </source>
-        <translation>Tamaño de la muestra:</translation>
+        <translation>Tamaño de las muestras:</translation>
     </message>
     <message>
         <source>The file %1 does not exist.</source>
@@ -1859,10 +1929,6 @@ Are you sure?</source>
         <translation>Conjunto</translation>
     </message>
     <message>
-        <source>OpenToonz 1.0</source>
-        <translation>OpenToonz 1.0</translation>
-    </message>
-    <message>
         <source>OpenToonz 1.1</source>
         <translation>OpenToonz 1.1</translation>
     </message>
@@ -1897,7 +1963,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>&amp;Focus on Current</source>
-        <translation>En&amp;focar en actual</translation>
+        <translation>En&amp;focar en nodo actual</translation>
     </message>
     <message>
         <source>&amp;Reorder Nodes</source>
@@ -1933,7 +1999,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>&amp;Swtich output port display mode</source>
-        <translation>&amp;Cambiar modo de visualización del puerto de salida</translation>
+        <translation>&amp;Cambiar visualización de puertos de salida</translation>
     </message>
 </context>
 <context>
@@ -1973,15 +2039,15 @@ Are you sure?</source>
     <name>SpeedInOutSegmentPage</name>
     <message>
         <source>Speed in:</source>
-        <translation>Desaceleración rápida:</translation>
+        <translation>Desaceleración Bézier:</translation>
     </message>
     <message>
         <source>Speed out:</source>
-        <translation>Aceleración rápida:</translation>
+        <translation>Aceleración Bézier:</translation>
     </message>
     <message>
         <source>First Speed:</source>
-        <translation>Rapidez inicial:</translation>
+        <translation>Velocidad inicial:</translation>
     </message>
     <message>
         <source>Handle:</source>
@@ -1993,7 +2059,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Last Speed:</source>
-        <translation>Rapidez final:</translation>
+        <translation>Velocidad final:</translation>
     </message>
     <message>
         <source>---</source>
@@ -2128,7 +2194,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Plain</source>
-        <translation>Pleno</translation>
+        <translation>Color</translation>
     </message>
     <message>
         <source>Texture</source>
@@ -2156,6 +2222,10 @@ Apply</source>
         <translation>Aplicar
 Autom</translation>
     </message>
+    <message>
+        <source>MyPaint Brush</source>
+        <translation>Pincel MyPaint</translation>
+    </message>
 </context>
 <context>
     <name>StyleEditorGUI::PlainColorPage</name>
@@ -2182,6 +2252,10 @@ Autom</translation>
         <source>Autopaint for Lines</source>
         <translation>Pintado automático de líneas</translation>
     </message>
+    <message>
+        <source>Reset to default</source>
+        <translation>Restablecer a predefinido</translation>
+    </message>
 </context>
 <context>
     <name>StyleNameEditor</name>
@@ -2207,7 +2281,15 @@ Autom</translation>
     </message>
     <message>
         <source>Name Editor: # %1</source>
-        <translation>Editor de nombres: № %1</translation>
+        <translation>Editor de nombres:  Estilo № %1</translation>
+    </message>
+    <message>
+        <source>Apply and Next</source>
+        <translation>Aplicar y siguiente</translation>
+    </message>
+    <message>
+        <source>Easy Inputs</source>
+        <translation>Nomenclatura</translation>
     </message>
 </context>
 <context>
@@ -2248,6 +2330,13 @@ Autom</translation>
     <message>
         <source>Plain color</source>
         <translation>Color pleno</translation>
+    </message>
+</context>
+<context>
+    <name>WordButton</name>
+    <message>
+        <source>Remove %1</source>
+        <translation>Eliminar %1</translation>
     </message>
 </context>
 </TS>

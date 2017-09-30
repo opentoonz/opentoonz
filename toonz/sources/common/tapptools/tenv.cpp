@@ -5,9 +5,7 @@
 #include "tconvert.h"
 #include "tfilepath_io.h"
 
-#ifdef LINUX
 #include <QDir>
-#endif
 #include <QSettings>
 
 #ifdef LEVO_MACOSX
@@ -44,12 +42,14 @@ class EnvGlobals {  // singleton
   std::string m_moduleName;
   std::string m_rootVarName;
   std::string m_systemVarPrefix;
+  std::string m_workingDirectory;
   TFilePath m_registryRoot;
   TFilePath m_envFile;
   TFilePath *m_stuffDir;
   TFilePath *m_dllRelativeDir;
+  bool m_isPortable = false;
 
-  EnvGlobals() : m_stuffDir(0) {}
+  EnvGlobals() : m_stuffDir(0) { setWorkingDirectory(); }
 
 public:
   ~EnvGlobals() { delete m_stuffDir; }
@@ -125,6 +125,9 @@ public:
 
   TFilePath getStuffDir() {
     if (m_stuffDir) return *m_stuffDir;
+    if (m_isPortable)
+      return TFilePath((getWorkingDirectory() + "\\portablestuff\\"));
+
     return TFilePath(getSystemVarValue(m_rootVarName));
   }
   void setStuffDir(const TFilePath &stuffDir) {
@@ -183,8 +186,30 @@ public:
   }
   std::string getRootVarName() { return m_rootVarName; }
 
-  void setSystemVarPrefix(std::string prefix) { m_systemVarPrefix = prefix; }
-  std::string getSystemVarPrefix() { return m_systemVarPrefix; }
+  void setSystemVarPrefix(std::string prefix) {
+    m_systemVarPrefix = prefix;
+    updateEnvFile();
+  }
+  std::string getSystemVarPrefix() {
+    if (getIsPortable()) return "";
+    return m_systemVarPrefix;
+  }
+
+  void setWorkingDirectory() {
+    QString workingDirectoryTmp  = QDir::currentPath();
+    QByteArray ba                = workingDirectoryTmp.toLatin1();
+    const char *workingDirectory = ba.data();
+    m_workingDirectory           = workingDirectory;
+
+    // check if portable
+    TFilePath portableCheck =
+        TFilePath(m_workingDirectory + "\\portablestuff\\");
+    TFileStatus portableStatus(portableCheck);
+    m_isPortable = portableStatus.doesExist();
+  }
+  std::string getWorkingDirectory() { return m_workingDirectory; }
+
+  bool getIsPortable() { return m_isPortable; }
 
   void setDllRelativeDir(const TFilePath &dllRelativeDir) {
     delete m_dllRelativeDir;
@@ -506,6 +531,8 @@ TFilePath TEnv::getStuffDir() {
   return EnvGlobals::instance()->getStuffDir();
   //#endif
 }
+
+bool TEnv::getIsPortable() { return EnvGlobals::instance()->getIsPortable(); }
 
 TFilePath TEnv::getConfigDir() {
   TFilePath configDir = getSystemVarPathValue(getSystemVarPrefix() + "CONFIG");

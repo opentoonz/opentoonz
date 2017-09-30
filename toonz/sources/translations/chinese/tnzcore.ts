@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.0" language="zh_CN">
 <context>
     <name>QObject</name>
     <message>
@@ -10,6 +10,14 @@
     <message>
         <source>Unidentified Action</source>
         <translation>未标识的动作</translation>
+    </message>
+    <message>
+        <source>Skipping frame.</source>
+        <translation>跳帧。</translation>
+    </message>
+    <message>
+        <source>Malformed frame name</source>
+        <translation>不合格的帧名</translation>
     </message>
 </context>
 <context>

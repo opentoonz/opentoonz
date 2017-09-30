@@ -65,6 +65,7 @@
 #include "tofflinegl.h"
 #include "tstopwatch.h"
 #include "trop.h"
+#include "tproperty.h"
 #include "timagecache.h"
 #include "trasterimage.h"
 #include "tstroke.h"
@@ -1592,6 +1593,9 @@ void SceneViewer::drawScene() {
   bool fillFullColorRaster = TXshSimpleLevel::m_fillFullColorRaster;
   TXshSimpleLevel::m_fillFullColorRaster = false;
 
+  // Guided Drawing Check
+  int useGuidedDrawing = Preferences::instance()->getGuidedDrawing();
+
   m_minZ = 0;
   if (is3DView()) {
     Stage::OpenGlPainter painter(getViewMatrix(), clipRect, m_visualSettings,
@@ -1615,6 +1619,14 @@ void SceneViewer::drawScene() {
     args.m_osm         = &osm;
     args.m_camera3d    = true;
     args.m_xsheetLevel = xsheetLevel;
+    args.m_currentFrameId =
+        app->getCurrentXsheet()
+            ->getXsheet()
+            ->getCell(app->getCurrentFrame()->getFrame(), args.m_col)
+            .getFrameId();
+    args.m_isGuidedDrawingEnabled = useGuidedDrawing;
+
+    // args.m_currentFrameId = app->getCurrentFrame()->getFid();
     Stage::visit(painter, args);
 
     m_minZ = painter.getMinZ();
@@ -1646,7 +1658,7 @@ void SceneViewer::drawScene() {
       Stage::visit(painter, app->getCurrentLevel()->getLevel(),
                    app->getCurrentFrame()->getFid(),
                    app->getCurrentOnionSkin()->getOnionSkinMask(),
-                   frameHandle->isPlaying());
+                   frameHandle->isPlaying(), useGuidedDrawing);
     } else {
       std::pair<TXsheet *, int> xr;
       int xsheetLevel = 0;
@@ -1665,6 +1677,12 @@ void SceneViewer::drawScene() {
       args.m_osm         = &osm;
       args.m_xsheetLevel = xsheetLevel;
       args.m_isPlaying   = frameHandle->isPlaying();
+      args.m_currentFrameId =
+          app->getCurrentXsheet()
+              ->getXsheet()
+              ->getCell(app->getCurrentFrame()->getFrame(), args.m_col)
+              .getFrameId();
+      args.m_isGuidedDrawingEnabled = useGuidedDrawing;
       Stage::visit(painter, args);
     }
 

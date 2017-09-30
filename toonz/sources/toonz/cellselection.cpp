@@ -1159,7 +1159,7 @@ int TCellSelection::Range::getColCount() const { return m_c1 - m_c0 + 1; }
 // TCellSelection
 //-----------------------------------------------------------------------------
 
-TCellSelection::TCellSelection() : m_timeStretchPopup(0) {}
+TCellSelection::TCellSelection() : m_timeStretchPopup(0), m_reframePopup(0) {}
 
 //-----------------------------------------------------------------------------
 
@@ -1213,6 +1213,8 @@ void TCellSelection::enableCommands() {
                 &TCellSelection::convertToToonzRaster);
   enableCommand(this, MI_ConvertVectorToVector,
                 &TCellSelection::convertVectortoVector);
+  enableCommand(this, MI_ReframeWithEmptyInbetweens,
+                &TCellSelection::reframeWithEmptyInbetweens);
 }
 //-----------------------------------------------------------------------------
 // Used in RenameCellField::eventFilter()
@@ -1249,7 +1251,10 @@ bool TCellSelection::isEnabledCommand(
                                         MI_Reframe2,
                                         MI_Reframe3,
                                         MI_Reframe4,
-                                        MI_ConvertVectorToVector};
+                                        MI_ConvertVectorToVector,
+                                        MI_ReframeWithEmptyInbetweens,
+                                        MI_Undo,
+                                        MI_Redo};
   return commands.contains(commandId);
 }
 
@@ -2321,14 +2326,14 @@ class VectorToVectorUndo final : public TUndo {
   TXshSimpleLevelP m_sl;
   std::vector<TFrameId> m_frameIds;
   // std::vector<TFrameId> m_newFrameIds;
-  std::vector<TImage *> m_oldImages;
-  std::vector<TImage *> m_newImages;
+  std::vector<TImageP> m_oldImages;
+  std::vector<TImageP> m_newImages;
   HookSet *m_oldLevelHooks;
 
 public:
   VectorToVectorUndo(TXshSimpleLevelP sl, std::vector<TFrameId> frameIds,
-                     std::vector<TImage *> oldImages,
-                     std::vector<TImage *> newImages, HookSet *oldLevelHooks)
+                     std::vector<TImageP> oldImages,
+                     std::vector<TImageP> newImages, HookSet *oldLevelHooks)
       : m_sl(sl)
       , m_frameIds(frameIds)
       , m_oldImages(oldImages)
@@ -2336,16 +2341,6 @@ public:
       , m_oldLevelHooks(oldLevelHooks) {}
 
   ~VectorToVectorUndo() {
-    // if (m_oldImages.size() > 0) {
-    //	for each (TImage* image in m_newImages) {
-    //		delete image;
-    //	}
-    //}
-    // if (m_newImages.size() > 0) {
-    //	for each (TImage *image in m_newImages) {
-    //		delete image;
-    //	}
-    //}
   }
 
   void undo() const override {
@@ -2547,7 +2542,7 @@ void TCellSelection::convertVectortoVector() {
   TFrameId frameId = firstCell.getFrameId();
   std::set<TFrameId> frameIdsSet;
   std::vector<TFrameId> frameIds;
-  std::vector<TImage *> oldImages;
+  std::vector<TImageP> oldImages;
   frameIds.push_back(frameId);
   oldImages.push_back(firstCell.getImage(false).getPointer()->cloneImage());
   for (i = r0 + 1; i <= r1; i++) {
@@ -2557,7 +2552,7 @@ void TCellSelection::convertVectortoVector() {
       if (std::find(frameIds.begin(), frameIds.end(), newCell.getFrameId()) ==
           frameIds.end()) {
         frameIds.push_back(newFrameId);
-        oldImages.push_back(newCell.getImage(false).getPointer()->cloneImage());
+        oldImages.push_back(newCell.getImage(false)->cloneImage());
       }
     }
   }
@@ -2606,10 +2601,10 @@ void TCellSelection::convertVectortoVector() {
                                    // question about the palette
 
   // get clones of the new images for undo
-  std::vector<TImage *> newImages;
+  std::vector<TImageP> newImages;
   for (i = 0; i < totalImages; i++) {
     newImages.push_back(
-        sourceSl->getFrame(frameIds[i], false).getPointer()->cloneImage());
+        sourceSl->getFrame(frameIds[i], false)->cloneImage());
   }
 
   HookSet *oldLevelHooks = new HookSet();

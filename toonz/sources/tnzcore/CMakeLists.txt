@@ -353,7 +353,7 @@ elseif(BUILD_ENV_UNIXLIKE)
 endif()
 
 target_link_libraries(tnzcore
-    Qt5::OpenGL Qt5::Network
+    Qt5::OpenGL Qt5::Network Qt5::Multimedia
     ${GL_LIB} ${GLUT_LIB} ${QT_LIB} ${Z_LIB} ${JPEG_LIB} ${LZ4_LIB}
     ${EXTRA_LIBS}
 )

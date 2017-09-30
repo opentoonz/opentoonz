@@ -390,8 +390,8 @@ void LineTestPane::initializeTitleBar(TPanelTitleBar *titleBar) {
   TPanelTitleBarButton *button;
 
   m_cameraStandButton = new TPanelTitleBarButton(
-      titleBar, ":Resources/standard.png", ":Resources/standard_over.png",
-      ":Resources/standard_on.png");
+      titleBar, ":Resources/pane_table_off.svg", ":Resources/pane_table_over.svg",
+      ":Resources/pane_table_on.svg");
   m_cameraStandButton->setToolTip("Camera Stand View");
   x += 18 + iconWidth;
   titleBar->add(QPoint(x, 2), m_cameraStandButton);
@@ -399,8 +399,8 @@ void LineTestPane::initializeTitleBar(TPanelTitleBar *titleBar) {
   m_cameraStandButton->setPressed(true);
 
   m_previewButton = new TPanelTitleBarButton(
-      titleBar, ":Resources/viewpreview.png", ":Resources/viewpreview_over.png",
-      ":Resources/viewpreview_on.png");
+      titleBar, ":Resources/pane_preview_off.svg", ":Resources/pane_preview_over.svg",
+      ":Resources/pane_preview_on.svg");
   m_previewButton->setToolTip(tr("Preview"));
   x += 5 + iconWidth;
   titleBar->add(QPoint(x, 2), m_previewButton);
