@@ -115,8 +115,10 @@ ExportSceneDvDirModelFileFolderNode::createExposeSceneNode(
 // ExportSceneDvDirModelProjectNode
 
 QPixmap ExportSceneDvDirModelProjectNode::getPixmap(bool isOpen) const {
-  static QPixmap openProjectPixmap(":Resources/browser_project_open.png");
-  static QPixmap closeProjectPixmap(":Resources/browser_project_close.png");
+  static QPixmap openProjectPixmap(
+      svgToPixmap(":Resources/browser_project_open.svg"));
+  static QPixmap closeProjectPixmap(
+      svgToPixmap(":Resources/browser_project_close.svg"));
   return isOpen ? openProjectPixmap : closeProjectPixmap;
 }
 
@@ -155,7 +157,7 @@ void ExportSceneDvDirModelRootNode::refreshChildren() {
     ExportSceneDvDirModelSpecialFileFolderNode *projectRootNode =
         new ExportSceneDvDirModelSpecialFileFolderNode(this, L"Project root",
                                                        projectRoot);
-    projectRootNode->setPixmap(QPixmap(":Resources/projects.png"));
+    projectRootNode->setPixmap(QPixmap(svgToPixmap(":Resources/projects.svg")));
     m_projectRootNodes.push_back(projectRootNode);
     addChild(projectRootNode);
   }
@@ -176,7 +178,7 @@ void ExportSceneDvDirModelRootNode::refreshChildren() {
         new ExportSceneDvDirModelSpecialFileFolderNode(
             this, repo.m_name.toStdWString(),
             TFilePath(repo.m_localPath.toStdWString()));
-    node->setPixmap(QPixmap(":Resources/vcroot.png"));
+    node->setPixmap(QPixmap(svgToPixmap(":Resources/vcroot.svg")));
     addChild(node);
   }
   //}

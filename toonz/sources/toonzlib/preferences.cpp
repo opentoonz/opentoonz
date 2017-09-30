@@ -224,6 +224,12 @@ Preferences::Preferences()
     , m_cameraUnits("inch")
     , m_currentRoomChoice("Default")
     , m_scanLevelType("tif")
+#ifdef _WIN32
+    , m_interfaceFont("Segoe UI")
+#else
+    , m_interfaceFont("Helvetica")
+#endif
+    , m_interfaceFontWeight(0)
     , m_defLevelWidth(0.0)
     , m_defLevelHeight(0.0)
     , m_defLevelDpi(0.0)
@@ -250,7 +256,7 @@ Preferences::Preferences()
     , m_shmmni(-1)
     , m_onionPaperThickness(50)
     , m_currentLanguage("English")
-    , m_currentStyleSheet("Astral_072_Dark")
+    , m_currentStyleSheet("Default")
     , m_undoMemorySize(100)
     , m_dragCellsBehaviour(0)
     , m_lineTestFpsCapture(25)
@@ -310,14 +316,18 @@ Preferences::Preferences()
     , m_ffmpegTimeout(60)
     , m_shortcutPreset("defopentoonz")
     , m_useNumpadForSwitchingStyles(true)
+    , m_newLevelSizeToCameraSizeEnabled(false)
     , m_showXSheetToolbar(false)
     , m_expandFunctionHeader(false)
     , m_showColumnNumbers(false)
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
+    , m_guidedDrawingType(0)
+    , m_animatedGuidedDrawing(false)
     , m_ignoreImageDpi(false)
-    , m_watchFileSystem(true) {
+    , m_watchFileSystem(true)
+    , m_shortcutCommandsWhileRenamingCellEnabled(false) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -325,13 +335,19 @@ Preferences::Preferences()
   m_defLevelDpi    = camera.getDpi().x;
 
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
-  TFilePath savePath  = layoutDir + TFilePath("preferences.ini");
+  TFilePath prefPath  = layoutDir + TFilePath("preferences.ini");
 
-  // If no personal settings found, then try to load template settings
-  TFilePath loadPath = ToonzFolder::getModuleFile(TFilePath("preferences.ini"));
+  // In case the personal settings is not exist (for new users)
+  if (!TFileStatus(prefPath).doesExist()) {
+    TFilePath templatePath =
+        ToonzFolder::getTemplateModuleDir() + TFilePath("preferences.ini");
+    // If there is the template, copy it to the personal one
+    if (TFileStatus(templatePath).doesExist())
+      TSystem::copyFile(prefPath, templatePath);
+  }
 
   m_settings.reset(new QSettings(
-      QString::fromStdWString(loadPath.getWideString()), QSettings::IniFormat));
+      QString::fromStdWString(prefPath.getWideString()), QSettings::IniFormat));
 
   getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
   getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
@@ -595,8 +611,16 @@ Preferences::Preferences()
   QString shortcutPreset = m_settings->value("shortcutPreset").toString();
   if (shortcutPreset != "") m_shortcutPreset = shortcutPreset;
   setShortcutPreset(m_shortcutPreset.toStdString());
+  QString interfaceFont = m_settings->value("interfaceFont").toString();
+  if (interfaceFont != "") m_interfaceFont = interfaceFont;
+  setInterfaceFont(m_interfaceFont.toStdString());
+  getValue(*m_settings, "interfaceFontWeight", m_interfaceFontWeight);
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "guidedDrawingType", m_guidedDrawingType);
+  getValue(*m_settings, "animatedGuidedDrawing", m_animatedGuidedDrawing);
+  getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
+           m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
   getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
@@ -606,16 +630,8 @@ Preferences::Preferences()
            m_inputCellsWithoutDoubleClickingEnabled);
   getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
-
-  // in case there is no personal settings
-  if (savePath != loadPath) {
-    // copy the template settins to the personal one
-    if (TFileStatus(loadPath).doesExist())
-      TSystem::copyFile(savePath, loadPath);
-    m_settings.reset(
-        new QSettings(QString::fromStdWString(savePath.getWideString()),
-                      QSettings::IniFormat));
-  }
+  getValue(*m_settings, "shortcutCommandsWhileRenamingCellEnabled",
+           m_shortcutCommandsWhileRenamingCellEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -1210,6 +1226,20 @@ QString Preferences::getCurrentStyleSheetName() const {
 
 //-----------------------------------------------------------------
 
+void Preferences::setInterfaceFont(std::string font) {
+  m_interfaceFont = QString::fromStdString(font);
+  m_settings->setValue("interfaceFont", m_interfaceFont);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setInterfaceFontWeight(int weight) {
+  m_interfaceFontWeight = weight;
+  m_settings->setValue("interfaceFontWeight", m_interfaceFontWeight);
+}
+
+//-----------------------------------------------------------------
+
 QString Preferences::getCurrentStyleSheetPath() const {
   if (m_currentStyleSheet.isEmpty()) return QString();
   TFilePath path(TEnv::getConfigDir() + "qss");
@@ -1434,6 +1464,27 @@ void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setGuidedDrawing(int status) {
+  m_guidedDrawingType = status;
+  m_settings->setValue("guidedDrawingType", status);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setAnimatedGuidedDrawing(bool status) {
+  m_animatedGuidedDrawing = status;
+  m_settings->setValue("animatedGuidedDrawing", status);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableNewLevelSizeToCameraSize(bool on) {
+  m_newLevelSizeToCameraSizeEnabled = on;
+  m_settings->setValue("newLevelSizeToCameraSizeEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableShowXSheetToolbar(bool on) {
   m_showXSheetToolbar = on;
   m_settings->setValue("showXSheetToolbar", on ? "1" : "0");
@@ -1471,4 +1522,12 @@ void Preferences::enableInputCellsWithoutDoubleClicking(bool on) {
 void Preferences::enableWatchFileSystem(bool on) {
   m_watchFileSystem = on;
   m_settings->setValue("watchFileSystemEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableShortcutCommandsWhileRenamingCell(bool on) {
+  m_shortcutCommandsWhileRenamingCellEnabled = on;
+  m_settings->setValue("shortcutCommandsWhileRenamingCellEnabled",
+                       on ? "1" : "0");
 }

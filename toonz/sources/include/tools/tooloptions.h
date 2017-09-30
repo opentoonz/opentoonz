@@ -373,6 +373,9 @@ class GeometricToolOptionsBox final : public ToolOptionsBox {
   ToolOptionCombo *m_shapeField;
   ToolOptionCheckbox *m_pencilMode;
   ToolOptionIntSlider *m_miterField;
+  ToolOptionCheckbox *m_snapCheckbox;
+  ToolOptionCombo *m_snapSensitivityCombo;
+  TTool *m_tool;
 
 public:
   GeometricToolOptionsBox(QWidget *parent, TTool *tool,

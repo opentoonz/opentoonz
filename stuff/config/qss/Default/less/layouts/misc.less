@@ -1,0 +1,56 @@
+/* -----------------------------------------------------------------------------
+   Misc 
+----------------------------------------------------------------------------- */
+
+PencilTestPopup {
+  min-height: 730px; /* Allow for using a 768 screen */
+  min-width: 512px;  /* some clipping will still occur on width, but this
+                        allows for filling half of a 1024 screen */
+}
+
+#HistoryPanel {
+  // Placeholder
+}
+
+#MatchLineButton {
+    background-color: lighten(@bg, 15%);
+    &::pressed {
+        background-color: lighten(@bg, 30%);
+    }
+}
+
+#LargeSizedText {
+    font-size: 17px;
+}
+
+/* -----------------------------------------------------------------------------
+   Unknowns
+----------------------------------------------------------------------------- */
+
+// Below are classes I couldn't locate in the app so I was not able to test
+// them - I left the properties as they were from v1.1.2.
+
+#StartupLabel {
+    padding: 3px;
+    &:hover {
+      background: lighten(@bg, 10%);
+    }
+}
+
+QStatusBar {
+  background-color: rgb(192,192,192);
+  &::item {
+    border: 0;
+  }
+  & QLabel {
+    background-color: rgb(192,192,192);
+  }
+  & #StatusBarLabel {
+    background-color: rgb(255,255,255);
+    padding: 1px 3px;
+  }
+}
+
+#TitleTxtLabel {
+  color: @label-title;
+}

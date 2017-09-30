@@ -90,9 +90,9 @@ void TCleanupStyle::setColorParamValue(int index, const TPixel32 &color) {
 QString TCleanupStyle::getParamNames(int index) const {
   switch (index) {
   case 0:
-    return "Brightness";
+    return QObject::tr("Brightness");
   case 1:
-    return "Contrast";
+    return QObject::tr("Contrast");
   default:
     return QString("");
   }
@@ -225,8 +225,8 @@ int TColorCleanupStyle::getTagId() const { return 2001; }
 //-------------------------------------------------------------------
 
 QString TColorCleanupStyle::getParamNames(int index) const {
-  if (index == 2) "HRange";
-  if (index == 3) "Line Width";
+  if (index == 2) QObject::tr("HRange");
+  if (index == 3) QObject::tr("Line Width");
   return TCleanupStyle::getParamNames(index);
 }
 
@@ -309,9 +309,9 @@ int TBlackCleanupStyle::getTagId() const { return 2002; }
 QString TBlackCleanupStyle::getParamNames(int index) const {
   switch (index) {
   case 2:
-    return "ColorThres";
+    return QObject::tr("ColorThres");
   case 3:
-    return "WhiteThres";
+    return QObject::tr("WhiteThres");
   default:
     return TCleanupStyle::getParamNames(index);
   }

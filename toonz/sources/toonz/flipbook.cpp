@@ -65,6 +65,7 @@
 // Other widgets
 #include "toonzqt/flipconsole.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/gutil.h"
 #include "filmstripselection.h"
 #include "castselection.h"
 #include "histogrampopup.h"
@@ -267,11 +268,11 @@ void FlipBook::addFreezeButtonToTitleBar() {
   TPanel *panel = qobject_cast<TPanel *>(parentWidget());
   if (panel) {
     TPanelTitleBar *titleBar = panel->getTitleBar();
-    m_freezeButton = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
-                                              ":Resources/freeze_over.png",
-                                              ":Resources/freeze_on.png");
+    m_freezeButton = new TPanelTitleBarButton(titleBar, ":Resources/pane_freeze_off.svg",
+                                              ":Resources/pane_freeze_over.svg",
+                                              ":Resources/pane_freeze_on.svg");
     m_freezeButton->setToolTip("Freeze");
-    titleBar->add(QPoint(-55, 1), m_freezeButton);
+    titleBar->add(QPoint(-55, 0), m_freezeButton);
     connect(m_freezeButton, SIGNAL(toggled(bool)), this, SLOT(freeze(bool)));
     QPoint p(titleBar->width() - 62, 1);
     m_freezeButton->move(p);
@@ -2078,8 +2079,8 @@ void FlipBook::onDoubleClick(QMouseEvent *me) {
   if (!img) return;
 
   TAffine toWidgetRef(m_imageViewer->getImgToWidgetAffine());
-  TRectD pixGeomD(TScale(1.0 / (double)m_imageViewer->getDevPixRatio()) *
-                  toWidgetRef * getImageBoundsD(img));
+  TRectD pixGeomD(TScale(1.0 / (double)getDevPixRatio()) * toWidgetRef *
+                  getImageBoundsD(img));
   // TRectD pixGeomD(toWidgetRef  * getImageBoundsD(img));
   TRect pixGeom(tceil(pixGeomD.x0), tceil(pixGeomD.y0), tfloor(pixGeomD.x1) - 1,
                 tfloor(pixGeomD.y1) - 1);

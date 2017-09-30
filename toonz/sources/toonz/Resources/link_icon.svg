@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="link_icon.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60"
+	 style="enable-background:new 0 0 60 60;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill-opacity:0.702;}
+	.st2{fill:#EFC64C;}
+	.st3{fill:#FFE96E;}
+	.st4{fill:#EBEBEB;}
+	.st5{fill:#484848;}
+	.st6{fill:#2F8ABA;}
+</style>
+<rect id="rect4" y="0" class="st0" width="60" height="60"/>
+<path id="path6" inkscape:connector-curvature="0" class="st1" d="M8,45l-6,1l6.5,7"/>
+<path class="st2" d="M9,52.5c-0.1,0-0.2,0-0.3-0.1c-0.1-0.1-0.2-0.2-0.2-0.4l-3-38c0-0.3,0.2-0.5,0.4-0.5l15-3c0,0,0.1,0,0.1,0
+	c0.2,0,0.3,0.1,0.4,0.2l1.6,2.8l24.3-4.4c0,0,0.1,0,0.1,0c0.1,0,0.2,0,0.3,0.1c0.1,0.1,0.2,0.2,0.2,0.4L48.5,41
+	c0,0.2-0.1,0.4-0.4,0.5l-39,11C9.1,52.5,9,52.5,9,52.5z"/>
+<path d="M47.4,9.7L48,41L9,52L6,14l15-3l1.8,3.1L47.4,9.7 M47.4,8.7c-0.1,0-0.1,0-0.2,0L23.3,13l-1.5-2.5C21.7,10.2,21.4,10,21,10
+	c-0.1,0-0.1,0-0.2,0l-15,3C5.3,13.1,5,13.6,5,14.1l3,38c0,0.3,0.2,0.6,0.4,0.7C8.6,52.9,8.8,53,9,53c0.1,0,0.2,0,0.3,0l39-11
+	c0.4-0.1,0.7-0.5,0.7-1L48.4,9.7c0-0.3-0.1-0.6-0.4-0.8C47.9,8.8,47.7,8.7,47.4,8.7L47.4,8.7z"/>
+<path class="st3" d="M9.5,52.5c-0.1,0-0.3-0.1-0.4-0.1C9,52.2,9,52.1,9,51.9l5.5-30c0-0.2,0.2-0.4,0.4-0.4l40-7c0,0,0.1,0,0.1,0
+	c0.1,0,0.3,0.1,0.4,0.2c0.1,0.1,0.2,0.3,0.1,0.5l-6.5,30c0,0.2-0.2,0.4-0.4,0.4L9.5,52.5C9.6,52.5,9.5,52.5,9.5,52.5z"/>
+<path d="M55,15l-6.5,30l-39,7L15,22L55,15 M55,14c-0.1,0-0.1,0-0.2,0l-40,7c-0.4,0.1-0.7,0.4-0.8,0.8l-5.5,30
+	c-0.1,0.3,0,0.7,0.3,0.9C9,52.9,9.2,53,9.5,53c0.1,0,0.1,0,0.2,0l39-7c0.4-0.1,0.7-0.4,0.8-0.8l6.5-30c0.1-0.3,0-0.7-0.3-0.9
+	C55.5,14.1,55.3,14,55,14L55,14z"/>
+<g id="g18">
+	<rect id="rect20" x="26" y="27" class="st4" width="26" height="26"/>
+	<path id="path22" inkscape:connector-curvature="0" class="st5" d="M53,54H25V26h28V54z M26,27v26h26V27H26z"/>
+</g>
+<path id="path24" inkscape:connector-curvature="0" class="st6" d="M39,33.5l-4.2-3.8l13.3,0l0,12.2l-4.6-4.2c-1.4,1.1-4,3.4-5.5,5
+	c-2.1,2.3-2,5.6-0.5,7.9c0,0-5.7-2.5-6.3-6.2C30.8,41.5,36.1,36.1,39,33.5z"/>
+</svg>

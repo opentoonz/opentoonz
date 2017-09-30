@@ -345,7 +345,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::RadioButtonDialog</name>
     <message>
         <source>Toonz</source>
-        <translation>OpenToonz</translation>
+        <translation type="vanished">OpenToonz</translation>
+    </message>
+    <message>
+        <source>OpenToonz</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -926,7 +930,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Function Editor Toggle</source>
-        <translation>パラメータ表示切り替え (&amp;F)</translation>
+        <translation type="vanished">パラメータ表示切り替え (&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Open Function Curve Editor</source>
+        <translation>グラフエディターを開く (&amp;O)</translation>
     </message>
 </context>
 <context>
@@ -1210,6 +1218,13 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
         <translation type="vanished">ファイル名は次の記号のどれかを含むことができません： --- \ / : ? &quot; | --- </translation>
+    </message>
+</context>
+<context>
+    <name>MyPaintBrushStyleChooserPage</name>
+    <message>
+        <source>Plain color</source>
+        <translation>通常の色</translation>
     </message>
 </context>
 <context>
@@ -2210,6 +2225,10 @@ Apply</source>
         <translation>自動で
 適用</translation>
     </message>
+    <message>
+        <source>MyPaint Brush</source>
+        <translation>MyPaint ブラシ</translation>
+    </message>
 </context>
 <context>
     <name>StyleEditorGUI::PlainColorPage</name>
@@ -2235,6 +2254,10 @@ Apply</source>
     <message>
         <source>Autopaint for Lines</source>
         <translation>色トレース線として、自動塗りつぶし</translation>
+    </message>
+    <message>
+        <source>Reset to default</source>
+        <translation>リセット</translation>
     </message>
 </context>
 <context>
@@ -2316,7 +2339,7 @@ Apply</source>
     <name>WordButton</name>
     <message>
         <source>Remove %1</source>
-        <translation type="unfinished">%1 を削除</translation>
+        <translation>%1 を削除</translation>
     </message>
 </context>
 </TS>

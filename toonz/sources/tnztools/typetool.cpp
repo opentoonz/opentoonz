@@ -29,6 +29,7 @@
 #include "trop.h"
 #include "toonz/ttileset.h"
 #include "toonz/glrasterpainter.h"
+#include "toonz/stage.h"
 
 #include "tfont.h"
 #include "tw/keycodes.h"
@@ -407,7 +408,7 @@ TypeTool::TypeTool()
     , m_textBox(TRectD(0, 0, 0, 0))
     , m_cursorPoint(TPointD(0, 0))
     , m_startPoint(TPointD(0, 0))
-    , m_dimension(70)
+    , m_dimension(1)      // to be set the m_size value on the first-click
     , m_validFonts(true)  // false)
     , m_fontYOffset(0)
     , m_cursorId(ToolCursor::CURSOR_NO)
@@ -423,11 +424,12 @@ TypeTool::TypeTool()
     , m_undo(0) {
   bind(TTool::CommonLevels | TTool::EmptyTarget);
   m_prop.bind(m_fontFamilyMenu);
-// Su mac non e' visibile il menu dello style perche' e' stato inserito nel nome
-// della font.
-#ifndef MACOSX
+  // Su mac non e' visibile il menu dello style perche' e' stato inserito nel
+  // nome
+  // della font.
+  //#ifndef MACOSX
   m_prop.bind(m_typeFaceMenu);
-#endif
+  //#endif
   m_prop.bind(m_size);
   m_prop.bind(m_vertical);
   m_vertical.setId("Orientation");
@@ -519,8 +521,10 @@ void TypeTool::loadFonts() {
     setFont(m_fontFamilyMenu.getValue());
   }
 
-  m_scale =
-      TScale(m_dimension / (double)(TFontManager::instance()->getMaxHeight()));
+  // not used for now
+  m_scale = TScale();
+  // m_scale = TScale(m_dimension /
+  // (double)(TFontManager::instance()->getHeight()));
 }
 
 //---------------------------------------------------------
@@ -595,19 +599,26 @@ void TypeTool::setTypeface(std::wstring typeface) {
 
 void TypeTool::setSize(std::wstring strSize) {
   // font e tool fields update
-
   double dimension = std::stod(strSize);
-  if (m_dimension == dimension) return;
 
-  TImageP img     = getImage(true);
-  TToonzImageP ti = img;
-  if (ti) TFontManager::instance()->setSize((int)dimension);
+  TImageP img      = getImage(true);
+  TToonzImageP ti  = img;
+  TVectorImageP vi = img;
+  // for vector levels, adjust size according to the ratio between
+  // the viewer dpi and the vector level's dpi
+  if (vi) dimension *= Stage::inch / Stage::standardDpi;
+
+  if (m_dimension == dimension) return;
+  TFontManager::instance()->setSize((int)dimension);
 
   assert(m_dimension != 0);
   double ratio = dimension / m_dimension;
   m_dimension  = dimension;
-  m_scale =
-      TScale(m_dimension / (double)(TFontManager::instance()->getMaxHeight()));
+
+  // not used for now
+  m_scale = TScale();
+  // m_scale = TScale(m_dimension /
+  // (double)(TFontManager::instance()->getHeight()));
 
   // text update
 
@@ -663,11 +674,11 @@ void TypeTool::stopEditing() {
 
 void TypeTool::updateStrokeChar() {
   TFontManager *instance = TFontManager::instance();
-  double ascend          = (double)(instance->getLineAscender());
-  double descend         = (double)(instance->getLineDescender());
-  m_fontYOffset = m_dimension * descend / (fabs(ascend) + fabs(descend));
 
-  m_scale         = TScale(m_dimension / (double)(instance->getMaxHeight()));
+  // not used for now
+  m_scale = TScale();
+  // m_scale = TScale(m_dimension / (double)(instance->getHeight()));
+
   bool hasKerning = instance->hasKerning();
   for (UINT i = 0; i < m_string.size(); i++) {
     if (hasKerning && i + 1 < m_string.size() && !m_string[i + 1].isReturn())
@@ -686,38 +697,53 @@ void TypeTool::updateCharPositions(int updateFrom) {
   UINT size                      = m_string.size();
   TPointD currentOffset;
   TFontManager *instance = TFontManager::instance();
+  m_fontYOffset          = (double)(instance->getLineSpacing()) * m_scale.a11;
+  double descent         = (double)(instance->getLineDescender()) * m_scale.a11;
+  double height          = (double)(instance->getHeight()) * m_scale.a11;
+  double vLineSpacing =
+      (double)(instance->getAverageCharWidth()) * 2.0 * m_scale.a11;
+
+  // Update from "updateFrom"
   if (updateFrom > 0) {
     if ((int)m_string.size() <= updateFrom - 1) return;
-
     currentOffset = m_string[updateFrom - 1].m_charPosition - m_startPoint;
+    // Vertical case
     if (m_isVertical && !instance->hasVertical()) {
       if (m_string[updateFrom - 1].isReturn())
-        currentOffset = TPointD(currentOffset.x - m_dimension,
-                                -m_dimension - m_fontYOffset);
+        currentOffset = TPointD(currentOffset.x - vLineSpacing, -height);
       else
-        currentOffset = currentOffset + TPointD(0, -m_dimension);
-    } else {
+        currentOffset = currentOffset + TPointD(0, -height);
+    }
+    // Horizontal case
+    else {
       if (m_string[updateFrom - 1].isReturn())
-        currentOffset = TPointD(0, currentOffset.y - m_dimension);
+        currentOffset = TPointD(0, currentOffset.y - m_fontYOffset);
       else
         currentOffset =
             currentOffset + TPointD(m_string[updateFrom - 1].m_offset, 0);
     }
-  } else if (m_isVertical && !instance->hasVertical())
-    currentOffset = currentOffset + TPointD(0, -m_dimension - m_fontYOffset);
+  }
+  // Update whole characters
+  else {
+    if (m_isVertical && !instance->hasVertical())
+      currentOffset = currentOffset + TPointD(0, -height);
+    else
+      currentOffset = currentOffset + TPointD(0, -descent);
+  }
 
   for (UINT j = updateFrom; j < size; j++) {
     m_string[j].m_charPosition = m_startPoint + currentOffset;
-
+    // Vertical case
     if (m_isVertical && !instance->hasVertical()) {
       if (m_string[j].isReturn() || m_string[j].m_key == ' ')
-        currentOffset = TPointD(currentOffset.x - m_dimension,
-                                -m_dimension - m_fontYOffset);
+        currentOffset = TPointD(currentOffset.x - vLineSpacing, -height);
       else
-        currentOffset = currentOffset + TPointD(0, -m_dimension);
-    } else {
+        currentOffset = currentOffset + TPointD(0, -height);
+    }
+    // Horizontal case
+    else {
       if (m_string[j].isReturn())
-        currentOffset = TPointD(0, currentOffset.y - m_dimension);
+        currentOffset = TPointD(0, currentOffset.y - m_fontYOffset);
       else
         currentOffset = currentOffset + TPointD(m_string[j].m_offset, 0);
     }
@@ -735,37 +761,45 @@ void TypeTool::updateCharPositions(int updateFrom) {
 void TypeTool::updateCursorPoint() {
   assert(0 <= m_cursorIndex && m_cursorIndex <= (int)m_string.size());
   TFontManager *instance = TFontManager::instance();
-  double ascend          = (double)(instance->getLineAscender());
-  double descend         = (double)(instance->getLineDescender());
-  m_fontYOffset = m_dimension * descend / (fabs(ascend) + fabs(descend));
+  double descent         = (double)(instance->getLineDescender()) * m_scale.a11;
+  double height          = (double)(instance->getHeight()) * m_scale.a11;
+  double vLineSpacing =
+      (double)(instance->getAverageCharWidth()) * 2.0 * m_scale.a11;
+  m_fontYOffset          = (double)(instance->getLineSpacing()) * m_scale.a11;
+  double scaledDimension = m_dimension * m_scale.a11;
 
   if (m_string.empty()) {
     if (!m_isVertical || instance->hasVertical())
-      m_cursorPoint = m_startPoint + TPointD(0, m_dimension + m_fontYOffset);
+      m_cursorPoint = m_startPoint + TPointD(0, scaledDimension);
     else
       m_cursorPoint = m_startPoint;
   } else if (m_cursorIndex == (int)m_string.size()) {
+    // Horizontal case
     if (!m_isVertical || instance->hasVertical()) {
       if (m_string.back().isReturn())
         m_cursorPoint = TPointD(
-            m_startPoint.x, m_string.back().m_charPosition.y + m_fontYOffset);
+            m_startPoint.x, m_string.back().m_charPosition.y - m_fontYOffset +
+                                scaledDimension + descent);
       else
         m_cursorPoint = m_string.back().m_charPosition +
                         TPointD(m_string.back().m_offset, 0) +
-                        TPointD(0, m_dimension + m_fontYOffset);
-    } else if (m_string.back().isReturn())
-      m_cursorPoint = TPointD(m_string.back().m_charPosition.x - m_dimension,
-                              m_startPoint.y);
-    else
-      m_cursorPoint =
-          m_string.back().m_charPosition + TPointD(0, m_fontYOffset);
+                        TPointD(0, scaledDimension + descent);
+    }
+    // Vertical case
+    else {
+      if (m_string.back().isReturn())
+        m_cursorPoint = TPointD(m_string.back().m_charPosition.x - vLineSpacing,
+                                m_startPoint.y);
+      else
+        m_cursorPoint = m_string.back().m_charPosition;
+    }
   } else {
     if (!m_isVertical || instance->hasVertical())
       m_cursorPoint = m_string[m_cursorIndex].m_charPosition +
-                      TPointD(0, m_dimension + m_fontYOffset);
+                      TPointD(0, scaledDimension + descent);
     else
-      m_cursorPoint = m_string[m_cursorIndex].m_charPosition +
-                      TPointD(0, m_dimension + m_fontYOffset);
+      m_cursorPoint =
+          m_string[m_cursorIndex].m_charPosition + TPointD(0, height);
   }
 }
 
@@ -778,9 +812,11 @@ void TypeTool::updateTextBox() {
   double maxXLength        = 0;
 
   TFontManager *instance = TFontManager::instance();
-  double ascend          = (double)(instance->getLineAscender());
-  double descend         = (double)(instance->getLineDescender());
-  m_fontYOffset = m_dimension * descend / (fabs(ascend) + fabs(descend));
+  double descent         = (double)(instance->getLineDescender()) * m_scale.a11;
+  double height          = (double)(instance->getHeight()) * m_scale.a11;
+  double vLineSpacing =
+      (double)(instance->getAverageCharWidth()) * 2.0 * m_scale.a11;
+  m_fontYOffset = (double)(instance->getLineSpacing()) * m_scale.a11;
 
   for (UINT j = 0; j < size; j++) {
     if (m_string[j].isReturn()) {
@@ -791,7 +827,7 @@ void TypeTool::updateTextBox() {
       returnNumber++;
     } else {
       currentLineLength += (m_isVertical && !instance->hasVertical())
-                               ? m_dimension
+                               ? height
                                : m_string[j].m_offset;
     }
   }
@@ -800,16 +836,15 @@ void TypeTool::updateTextBox() {
     maxXLength = currentLineLength;
 
   if (m_isVertical && !instance->hasVertical())
-    m_textBox = TRectD(m_startPoint.x - m_dimension * returnNumber,
+    m_textBox = TRectD(m_startPoint.x - vLineSpacing * returnNumber,
                        m_startPoint.y - maxXLength,
-                       m_startPoint.x + m_dimension, m_startPoint.y)
+                       m_startPoint.x + vLineSpacing, m_startPoint.y)
                     .enlarge(cBorderSize * m_pixelSize);
   else
     m_textBox =
         TRectD(m_startPoint.x,
-               m_startPoint.y - (m_dimension * returnNumber) + m_fontYOffset,
-               m_startPoint.x + maxXLength,
-               m_startPoint.y + m_dimension + m_fontYOffset)
+               m_startPoint.y - (m_fontYOffset * returnNumber + descent),
+               m_startPoint.x + maxXLength, m_startPoint.y + height)
             .enlarge(cBorderSize * m_pixelSize);
 }
 
@@ -869,7 +904,7 @@ glPushMatrix();
 
     double charWidth = 0;
     if (TVectorImageP vi = m_string[j].m_char) {
-      TTranslation transl(m_string[j].m_charPosition);
+      TTranslation transl(convert(descenderP) + m_string[j].m_charPosition);
       const TVectorRenderData rd(transl, TRect(), vPalette, 0, false);
       tglDraw(rd, vi.getPointer());
       charWidth = vi->getBBox().getLx();
@@ -878,7 +913,7 @@ glPushMatrix();
       ti->setPalette(vPalette);
 
       TPoint rasterCenter(dim.lx / 2, dim.ly / 2);
-      TTranslation transl1(convert(descenderP + rasterCenter));
+      TTranslation transl1(convert(rasterCenter));
       TTranslation transl2(m_string[j].m_charPosition);
       GLRasterPainter::drawRaster(transl2 * m_scale * transl1, ti, false);
 
@@ -908,9 +943,11 @@ glPushMatrix();
     // draw cursor
     tglColor(TPixel32::Black);
     if (!m_isVertical || instance->hasVertical())
-      tglDrawSegment(m_cursorPoint, m_cursorPoint + TPointD(0, -m_dimension));
+      tglDrawSegment(m_cursorPoint,
+                     m_cursorPoint + m_scale * TPointD(0, -m_dimension));
     else
-      tglDrawSegment(m_cursorPoint, m_cursorPoint + TPointD(m_dimension, 0));
+      tglDrawSegment(m_cursorPoint,
+                     m_cursorPoint + m_scale * TPointD(m_dimension, 0));
   }
 
   TPointD drawableCursor = m_cursorPoint;
@@ -971,24 +1008,23 @@ void TypeTool::addTextToToonzImage(const TToonzImageP &currentImage) {
   TRasterCM32P targetRaster = currentImage->getRaster();
   TRect changedArea;
 
-  TPoint descenderP(0, TFontManager::instance()->getLineDescender());
-
   UINT j;
   for (j = 0; j < size; j++) {
     if (m_string[j].isReturn()) continue;
 
     if (TToonzImageP ti = m_string[j].m_char) {
-      TRectD srcBBox = ti->getBBox() + m_string[j].m_charPosition;
-      changedArea +=
-          ToonzImageUtils::convertWorldToRaster(srcBBox, currentImage);
+      TRectD srcBBox  = ti->getBBox() + m_string[j].m_charPosition;
+      TDimensionD dim = srcBBox.getSize();
+      TDimensionD enlargeAmount(dim.lx * (m_scale.a11 - 1.0),
+                                dim.ly * (m_scale.a22 - 1.0));
+      changedArea += ToonzImageUtils::convertWorldToRaster(
+          srcBBox.enlarge(enlargeAmount), currentImage);
       /*
 if( instance->hasVertical() && m_isVertical)
 vi->transform( TRotation(m_startPoint,-90) );
 */
     }
   }
-
-  changedArea = changedArea + descenderP;
 
   if (!changedArea.isEmpty()) {
     TTileSetCM32 *beforeTiles = new TTileSetCM32(targetRaster->getSize());
@@ -999,10 +1035,9 @@ vi->transform( TRotation(m_startPoint,-90) );
 
       if (TToonzImageP srcTi = m_string[j].m_char) {
         TRasterCM32P srcRaster = srcTi->getRaster();
-        TTranslation transl1(convert(descenderP));
         TTranslation transl2(m_string[j].m_charPosition +
                              convert(targetRaster->getCenter()));
-        TRop::over(targetRaster, srcRaster, transl2 * m_scale * transl1);
+        TRop::over(targetRaster, srcRaster, transl2 * m_scale);
       }
     }
 
@@ -1047,8 +1082,10 @@ void TypeTool::addTextToImage() {
     for (j = 0; j < size; j++) {
       if (m_string[j].isReturn()) continue;
 
+      TPoint descenderP(0, TFontManager::instance()->getLineDescender());
       if (TVectorImageP vi = m_string[j].m_char) {
-        vi->transform(TTranslation(m_string[j].m_charPosition));
+        vi->transform(
+            TTranslation(convert(descenderP) + m_string[j].m_charPosition));
         if (instance->hasVertical() && m_isVertical)
           vi->transform(TRotation(m_startPoint, -90));
         images.push_back(vi.getPointer());
@@ -1167,9 +1204,9 @@ void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
   TVectorImageP vi = img;
   TToonzImageP ti  = img;
 
-  if (vi) setSize(m_size.getValue());
-
   if (!vi && !ti) return;
+
+  setSize(m_size.getValue());
 
   if (m_isFrameCreated) {
     if (vi)

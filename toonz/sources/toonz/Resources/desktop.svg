@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="desktop.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 21 17"
+	 style="enable-background:new 0 0 21 17;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:url(#rect8_1_);}
+	.st2{fill:#3F3F3F;}
+</style>
+<rect id="rect4" y="0" class="st0" width="21" height="17"/>
+<g id="g6">
+	
+		<radialGradient id="rect8_1_" cx="-421.2" cy="241.4371" r="1" gradientTransform="matrix(7.5 0 0 -7 3166.5 1695.0599)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#AAC1CC"/>
+		<stop  offset="1" style="stop-color:#187AAC"/>
+	</radialGradient>
+	<rect id="rect8" x="3" y="1" class="st1" width="15" height="14"/>
+	<path id="path10" inkscape:connector-curvature="0" class="st2" d="M19,16H2V0h17V16z M3,1v14h15V1H3z"/>
+</g>
+</svg>

@@ -3653,8 +3653,8 @@ Möchten Sie einen erstellen?</translation>
         <translation>Als Säuberungs-Aufgabe hinzufügen</translation>
     </message>
     <message>
-        <source>Select All Keys in this Row</source>
-        <translation>Alle Keys in dieser Reihe wählen</translation>
+        <source>Select All Keys in this Frame</source>
+        <translation>Alle Keys in dieser Frame</translation>
     </message>
     <message>
         <source>Select All Keys in this Column</source>
@@ -3681,12 +3681,12 @@ Möchten Sie einen erstellen?</translation>
         <translation>Alle nachfolgenden Keys in dieser Spalte wählen</translation>
     </message>
     <message>
-        <source>Select Previous Keys in this Row</source>
-        <translation>Alle vorherigen Keys in dieser Reihe wählen</translation>
+        <source>Select Previous Keys in this Frame</source>
+        <translation>Alle vorherigen Keys in dieser Frame</translation>
     </message>
     <message>
-        <source>Select Following Keys in this Row</source>
-        <translation>Alle nachfolgenden Keys in dieser Reihe wählen</translation>
+        <source>Select Following Keys in this Frame</source>
+        <translation>Alle nachfolgenden Keys in dieser Frame</translation>
     </message>
     <message>
         <source>Invert Key Selection</source>

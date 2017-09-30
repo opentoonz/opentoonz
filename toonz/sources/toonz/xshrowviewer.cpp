@@ -87,11 +87,15 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
     playR0       = 0;
   }
 
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Bold);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Bold);
   // set font size in pixel
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
 
@@ -517,6 +521,12 @@ void RowArea::paintEvent(QPaintEvent *event) {
     drawPinnedCenterKeys(p, r0, r1);
 
   drawPlayRange(p, r0, r1);
+  p.setPen(m_viewer->getVerticalLineColor());
+  p.setBrush(Qt::NoBrush);
+  if (m_viewer->orientation()->isVerticalTimeline())
+    p.drawRect(toBeUpdated.adjusted(0, -1, -1, 0));
+  else
+    p.drawRect(toBeUpdated.adjusted(-1, 0, 0, -1));
 }
 
 //-----------------------------------------------------------------------------

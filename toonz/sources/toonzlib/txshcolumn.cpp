@@ -18,6 +18,12 @@
 #include "toonz/preferences.h"
 #include "toonz/txshleveltypes.h"
 
+#include <QMap>
+
+namespace {
+QMap<int, QPair<QString, TPixel32>> filterColors;
+};
+
 //=============================================================================
 // TXshCellColumn
 
@@ -469,10 +475,12 @@ TXshColumn::ColumnType TXshColumn::toColumnType(int levelType) {
 }
 
 //-----------------------------------------------------------------------------
-
 bool TXshColumn::isRendered() const {
-  if (!getXsheet() || !getFx()) return false;
-  if (!isPreviewVisible()) return false;
+//  if (!getXsheet() || !getFx()) return false;
+//  if (!isPreviewVisible()) return false;
+  if (!getXsheet() || !isPreviewVisible()) return false;
+  if (getColumnType() == eSoundType) return true;
+  if (!getFx()) return false;
   return getXsheet()->getFxDag()->isRendered(getFx());
 }
 
@@ -604,4 +612,42 @@ void TXshColumn::setIsMask(bool on) {
     m_status |= mask;
   else
     m_status &= ~mask;
+}
+
+//-----------------------------------------------------------------------------
+
+void TXshColumn::initColorFilters() {
+  static bool _firstTime = true;
+  if (!_firstTime) return;
+  filterColors[TXshColumn::FilterNone] =
+      QPair<QString, TPixel32>(QObject::tr("None"), TPixel::Black);
+  filterColors[TXshColumn::FilterRed] =
+      QPair<QString, TPixel32>(QObject::tr("Red"), TPixel::Red);
+  filterColors[TXshColumn::FilterGreen] =
+      QPair<QString, TPixel32>(QObject::tr("Green"), TPixel::Green);
+  filterColors[TXshColumn::FilterBlue] =
+      QPair<QString, TPixel32>(QObject::tr("Blue"), TPixel::Blue);
+  filterColors[TXshColumn::FilterDarkYellow] =
+      QPair<QString, TPixel32>(QObject::tr("DarkYellow"), TPixel(128, 128, 0));
+  filterColors[TXshColumn::FilterDarkCyan] =
+      QPair<QString, TPixel32>(QObject::tr("DarkCyan"), TPixel(0, 128, 128));
+  filterColors[TXshColumn::FilterDarkMagenta] =
+      QPair<QString, TPixel32>(QObject::tr("DarkMagenta"), TPixel(128, 0, 128));
+  _firstTime = false;
+}
+
+//-----------------------------------------------------------------------------
+
+TPixel32 TXshColumn::getFilterColor() {
+  return TXshColumn::getFilterInfo(m_filterColorId).second;
+}
+
+//-----------------------------------------------------------------------------
+
+QPair<QString, TPixel32> TXshColumn::getFilterInfo(
+    TXshColumn::FilterColor key) {
+  TXshColumn::initColorFilters();
+  if (!filterColors.contains(key))
+    return QPair<QString, TPixel32>(QObject::tr("None"), TPixel::Black);
+  return filterColors.value(key);
 }
