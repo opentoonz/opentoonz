@@ -38,7 +38,6 @@ CommandBar::CommandBar(QWidget *parent, Qt::WFlags flags)
   setObjectName("cornerWidget");
   setObjectName("CommandBar");
   fillToolbar(this, isXsheetToolbar);
-  m_editInPlace->setCheckable(true);
 }
 
 //-----------------------------------------------------------------------------
