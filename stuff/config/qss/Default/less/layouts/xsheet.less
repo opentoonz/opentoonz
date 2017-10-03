@@ -15,6 +15,12 @@
   border: 0;
 }
 
+#cornerWidget {
+  & QToolButton {
+    padding: 0;
+  }
+}
+
 /* xsheetColumnHeader (Context Menus)
 ----------------------------------------------------------------------------- */
 
@@ -111,16 +117,17 @@ XsheetViewer {
 ----------------------------------------------------------------------------- */
 
 #XSheetToolbar {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	&::separator:horizontal {
-		margin-right: 3px;
-		margin-left: 3px;
-	}
-  & #XSheetToolbarLevelButton {
-    &:extend(.button-tool all);
-    padding: 2px; 
+  margin: 0;
+  padding: 0;
+  border: 0;
+  & QToolButton {
+    padding: 0;
+    margin: 4px 1px;
+    min-height: 19px;
+    height: 19px;
+  }
+  &::separator:horizontal {
+    margin: 0 4px;
   }
 }
 

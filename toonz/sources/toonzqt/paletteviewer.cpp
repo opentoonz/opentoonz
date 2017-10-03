@@ -500,7 +500,7 @@ void PaletteViewer::updateTabBar() {
   TPalette *palette = getPalette();
   if (!palette) return;
 
-  QIcon tabIcon(":Resources/palette_tabicon.png");
+  QIcon tabIcon(":Resources/palette_tabicon.svg");
   m_pagesBar->setIconSize(QSize(20, 15));
 
   // Aggiungo i tab in funzione delle pagine di m_palette

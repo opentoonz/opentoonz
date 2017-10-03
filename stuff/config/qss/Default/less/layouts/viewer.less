@@ -31,6 +31,19 @@ FlipBook {
   }
 }
 
+#flipCustomize {
+  // options menu
+  &:extend(.button-tool all);
+  margin-left: 3px;
+  &::menu-button {
+    background-color: transparent;
+    width: 35px;
+  }
+  &::menu-arrow {
+    image: none;
+  }
+}
+
 QToolBar#FlipConsolePlayToolBar {
   &::separator:horizontal {
     margin: 0 3px;

@@ -255,6 +255,7 @@ void DragSelectionTool::RasterDeformTool::applyTransform(FourPoints bbox) {
   FourPoints realBbox = bbox * selection->getTransformation().inv();
   RasterFreeDeformer *freeDeformer =
       (RasterFreeDeformer *)tool->getFreeDeformer();
+  if (!freeDeformer) return;
   freeDeformer->setNoAntialiasing(tool->getNoAntialiasingValue());
   freeDeformer->setPoints(realBbox.getP00(), realBbox.getP10(),
                           realBbox.getP11(), realBbox.getP01());

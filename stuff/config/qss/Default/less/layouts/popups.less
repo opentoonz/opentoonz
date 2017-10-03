@@ -8,7 +8,21 @@ QDialog {
     background-color: @dialogButtonFrame-bg-color;
     border-top: 1px solid @dialogButtonFrame-border-color;
     & QPushButton {
-      padding: 3px 15px;
+      border-color: @button-dialog-border-color;
+      outline: 0;
+      &:focus {
+        background-color: @button-bg-color-focus;
+        border-color: @button-border-color-focus;
+        color: @button-text-color-focus;
+        &:hover {
+          background-color: @button-bg-color-focus-hover;
+        }
+        &:pressed {
+          background-color: @button-bg-color-pressed;
+          border-color: @button-border-color-pressed;
+          color: @button-text-color-pressed;
+        }
+      }
     }
   }
 }
@@ -81,4 +95,19 @@ ProjectPopup {
         &:extend(.branch-22 all);
       }
     }
+}
+
+/* -----------------------------------------------------------------------------
+   PencilTestPopup / CameraCapture Window
+----------------------------------------------------------------------------- */
+
+PencilTestPopup {
+}
+
+#GearButton {
+  qproperty-icon: url('@{img-url}/gear.svg');
+}
+
+#SubfolderButton {
+  qproperty-icon: url('@{img-url}/subfolder.svg');
 }

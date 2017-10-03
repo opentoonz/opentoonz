@@ -24,7 +24,12 @@ namespace {
 string escape(string v) {
   int i = 0;
   for (;;) {
+// Removing escaping of apostrophe from Windows and OSX as it's not needed and causes problems
+#ifdef LINUX
     i = v.find_first_of("\\\'\"", i);
+#else
+    i = v.find_first_of("\\\"", i);
+#endif
     if (i == (int)string::npos) break;
     string h = "\\" + v[i];
     v.insert(i, "\\");
@@ -348,7 +353,10 @@ TOStream &TOStream::operator<<(string v) {
   }
   int i;
   for (i = 0; i < len; i++)
-    if (!iswalnum(v[i]) && v[i] != '_' && v[i] != '%') break;
+    if ((!iswalnum(v[i]) && v[i] != '_' && v[i] != '%')
+		|| v[i] < 32   // Less than ASCII for SPACE
+		|| v[i] > 126  // Greater than ASCII for ~
+		) break;
   if (i == len)
     os << v << " ";
   else {
@@ -373,7 +381,10 @@ TOStream &TOStream::operator<<(QString _v) {
   }
   int i;
   for (i = 0; i < len; i++)
-    if (!iswalnum(v[i]) && v[i] != '_' && v[i] != '%') break;
+	  if ((!iswalnum(v[i]) && v[i] != '_' && v[i] != '%')
+		  || v[i] < 32   // Less than ASCII for SPACE
+		  || v[i] > 126  // Greater than ASCII for ~
+		  ) break;
   if (i == len)
     os << v << " ";
   else {
