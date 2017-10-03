@@ -1083,7 +1083,7 @@ void ColumnArea::DrawHeader::drawVolumeControl(double volume) const {
   QPoint cursor = o->frameLayerToXY(frameAxis, layerAxis) + QPoint(1, 0);
   if (o->isVerticalTimeline() &&
       !o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) {
-    cursor = o->frameLayerToXY(layerAxis, frameAxis) + QPoint(-2, 0);
+    cursor = o->frameLayerToXY(layerAxis, frameAxis) + QPoint(1, 0);
   }
   QPainterPath head =
       o->path(PredefinedPath::VOLUME_SLIDER_HEAD).translated(cursor);
@@ -1978,7 +1978,7 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
   } else if (o->rect(PredefinedRect::LOCK_AREA).contains(mouseInCell)) {
     m_tooltip = tr("Lock Toggle");
   } else if (o->rect(PredefinedRect::CONFIG_AREA).contains(mouseInCell)) {
-    m_tooltip = tr("Additional level settings");
+    m_tooltip = tr("Additional column settings");
   } else if (o->rect(PredefinedRect::EYE_AREA).contains(mouseInCell)) {
     m_tooltip = tr("Preview Visibility Toggle");
   } else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA)
