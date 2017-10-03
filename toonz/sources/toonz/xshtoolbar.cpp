@@ -84,19 +84,6 @@ void XSheetToolbar::doCustomizeCommandBar() {
   delete cbPopup;
 }
 
-//-----------------------------------------------------------------------------
-
-void XSheetToolbar::updateEditInPlaceStatus() {
-  TApp *app         = TApp::instance();
-  ToonzScene *scene = app->getCurrentScene()->getScene();
-  int ancestorCount = scene->getChildStack()->getAncestorCount();
-  if (ancestorCount == 0) {
-    m_editInPlace->setChecked(false);
-    return;
-  }
-  m_editInPlace->setChecked(scene->getChildStack()->getEditInPlace());
-}
-
 //============================================================
 
 class ToggleXSheetToolbarCommand final : public MenuItemHandler {

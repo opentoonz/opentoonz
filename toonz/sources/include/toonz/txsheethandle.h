@@ -38,13 +38,11 @@ public:
   void notifyXsheetChanged() { emit xsheetChanged(); }
   void notifyXsheetSwitched() { emit xsheetSwitched(); }
   void notifyXsheetSoundChanged() { emit xsheetSoundChanged(); }
-  void notifyEditInPlaceChanged() { emit editInPlaceChanged(); }
 
 signals:
   void xsheetSwitched();
   void xsheetChanged();
   void xsheetSoundChanged();
-  void editInPlaceChanged();
 };
 
 #endif  // TXSHEETHANDLE_H

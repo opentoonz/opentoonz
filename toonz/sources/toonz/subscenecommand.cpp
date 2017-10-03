@@ -1031,7 +1031,6 @@ void openSubXsheet() {
     TUndoManager::manager()->add(new OpenChildUndo());
     app->getCurrentXsheet()->setXsheet(scene->getXsheet());
     app->getCurrentXsheet()->notifyXsheetChanged();
-    app->instance()->getCurrentXsheet()->notifyEditInPlaceChanged();
     app->getCurrentColumn()->setColumnIndex(0);
     app->getCurrentFrame()->setFrameIndex(0);
     changeSaveSubXsheetAsCommand();
@@ -1065,29 +1064,9 @@ void closeSubXsheet(int dlevel) {
   TUndoManager::manager()->add(new CloseChildUndo(cells));
   app->getCurrentXsheet()->setXsheet(scene->getXsheet());
   app->getCurrentXsheet()->notifyXsheetChanged();
-  app->instance()->getCurrentXsheet()->notifyEditInPlaceChanged();
   app->getCurrentColumn()->setColumnIndex(cells[0].second);
   app->getCurrentFrame()->setFrameIndex(cells[0].first);
   changeSaveSubXsheetAsCommand();
-}
-
-//=============================================================================
-
-void toggleEditInPlace() {
-  TApp *app         = TApp::instance();
-  ToonzScene *scene = app->getCurrentScene()->getScene();
-  int ancestorCount = scene->getChildStack()->getAncestorCount();
-
-  if (ancestorCount == 0) {
-    // put the signal here to keep the toolbar buttons from showing pressed
-    app->instance()->getCurrentXsheet()->notifyEditInPlaceChanged();
-    return;
-  }
-  scene->getChildStack()->setEditInPlace(
-      !scene->getChildStack()->getEditInPlace());
-  /*- Notify the change in order to update the viewer -*/
-  app->instance()->getCurrentXsheet()->notifyXsheetChanged();
-  app->instance()->getCurrentXsheet()->notifyEditInPlaceChanged();
 }
 
 //=============================================================================
@@ -2121,16 +2100,6 @@ public:
   CloseChildCommand() : MenuItemHandler(MI_CloseChild) {}
   void execute() override { closeSubXsheet(1); }
 } closeChildCommand;
-
-//=============================================================================
-// ToggleEditInPlaceCommand
-//-----------------------------------------------------------------------------
-
-class ToggleEditInPlaceCommand final : public MenuItemHandler {
-public:
-  ToggleEditInPlaceCommand() : MenuItemHandler(MI_ToggleEditInPlace) {}
-  void execute() override { toggleEditInPlace(); }
-} toggleEditInPlaceCommand;
 
 //=============================================================================
 // collapseColumns

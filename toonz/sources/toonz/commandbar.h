@@ -27,7 +27,6 @@ public:
 #if QT_VERSION >= 0x050500
   CommandBar(QWidget *parent = 0, Qt::WindowFlags flags = 0,
              bool isCollapsible = false, bool isXsheetToolbar = false);
-  QAction *m_editInPlace;
 #else
   CommandBar(QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
@@ -42,7 +41,6 @@ protected:
 
 protected slots:
   void doCustomizeCommandBar();
-  void updateEditInPlaceStatus();
 };
 
 #endif  // COMMANDBAR_H

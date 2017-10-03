@@ -49,7 +49,6 @@ protected:
 
 protected slots:
   void doCustomizeCommandBar();
-  void updateEditInPlaceStatus();
 };
 
 }  // namespace XsheetGUI;

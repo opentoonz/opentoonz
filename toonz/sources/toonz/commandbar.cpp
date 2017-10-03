@@ -42,22 +42,7 @@ CommandBar::CommandBar(QWidget *parent, Qt::WFlags flags)
 
 //-----------------------------------------------------------------------------
 
-void CommandBar::updateEditInPlaceStatus() {
-  TApp *app         = TApp::instance();
-  ToonzScene *scene = app->getCurrentScene()->getScene();
-  int ancestorCount = scene->getChildStack()->getAncestorCount();
-  if (ancestorCount == 0) {
-    m_editInPlace->setChecked(false);
-    return;
-  }
-  m_editInPlace->setChecked(scene->getChildStack()->getEditInPlace());
-}
-
-//-----------------------------------------------------------------------------
-
 void CommandBar::fillToolbar(CommandBar *toolbar, bool isXsheetToolbar) {
-  disconnect(TApp::instance()->getCurrentXsheet(), SIGNAL(editInPlaceChanged()),
-             toolbar, SLOT(updateEditInPlaceStatus()));
   toolbar->clear();
   TFilePath personalPath;
   if (isXsheetToolbar) {
@@ -90,24 +75,9 @@ void CommandBar::fillToolbar(CommandBar *toolbar, bool isXsheetToolbar) {
         if (reader.name() == "command") {
           QString cmdName    = reader.readElementText();
           std::string cmdStr = cmdName.toStdString();
-          if (cmdName == "MI_ToggleEditInPlace") {
-            toolbar->m_editInPlace =
-                CommandManager::instance()->getAction(cmdStr.c_str());
-            if (toolbar->m_editInPlace) {
-              toolbar->addAction(toolbar->m_editInPlace);
-              bool ret = true;
-              ret      = ret && connect(TApp::instance()->getCurrentXsheet(),
-                                   SIGNAL(editInPlaceChanged()), toolbar,
-                                   SLOT(updateEditInPlaceStatus()));
-              assert(ret);
-              toolbar->m_editInPlace->setCheckable(true);
-            }
-          } else {
-            std::string cmdStr = cmdName.toStdString();
-            QAction *action =
-                CommandManager::instance()->getAction(cmdStr.c_str());
-            if (action) toolbar->addAction(action);
-          }
+          QAction *action =
+              CommandManager::instance()->getAction(cmdStr.c_str());
+          if (action) toolbar->addAction(action);
         } else if (reader.name() == "separator") {
           toolbar->addSeparator();
           reader.skipCurrentElement();
@@ -163,15 +133,10 @@ void CommandBar::buildDefaultToolbar(CommandBar *toolbar) {
     toolbar->addAction(open);
     QAction *leave = CommandManager::instance()->getAction("MI_CloseChild");
     toolbar->addAction(leave);
-    toolbar->m_editInPlace =
+    QAction *editInPlace =
         CommandManager::instance()->getAction("MI_ToggleEditInPlace");
-    toolbar->m_editInPlace->setCheckable(true);
-    toolbar->addAction(toolbar->m_editInPlace);
+    toolbar->addAction(editInPlace);
   }
-  bool ret = true;
-  ret = ret && connect(app->getCurrentXsheet(), SIGNAL(editInPlaceChanged()),
-                       toolbar, SLOT(updateEditInPlaceStatus()));
-  assert(ret);
 }
 
 //-----------------------------------------------------------------------------
