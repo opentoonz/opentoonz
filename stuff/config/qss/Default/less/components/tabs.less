@@ -1,0 +1,77 @@
+/* -----------------------------------------------------------------------------
+   Component: Tabs
+----------------------------------------------------------------------------- */
+
+// Container
+// -----------------------------------------------------------------------------
+
+.tab-container {
+  background-color: transparent; // Allows below qproperty to show
+  qproperty-BottomAboveLineColor: @tabbar-bg-color;
+  qproperty-BottomBelowLineColor: @accent;
+}
+
+// Flat Tabs
+// -----------------------------------------------------------------------------
+
+// Flat angular tabs with no top border
+.tab-flat {
+  @horizontal-padding: 4px;
+  background-color: @tab-bg-color;
+  border-right: 1px solid @accent;
+  color: @tab-text-color;
+  margin: 0 0 1px 0;
+  padding: 3px @horizontal-padding 3px @horizontal-padding;
+  &:hover {
+    background-color: @tab-bg-color-hover;
+    color: @tab-text-color-hover;
+  }
+  &:selected {
+    background-color: @tab-bg-color-selected;
+    color: @tab-text-color-selected;
+    margin: 0;
+    padding: 1px @horizontal-padding 2px @horizontal-padding;
+  }
+  &:only-one {
+    margin: 0;
+    padding: 3px @horizontal-padding 4px @horizontal-padding;
+  }
+}
+
+// Rounded Tabs
+// -----------------------------------------------------------------------------
+
+// Classical rounded tabs
+.tab-round {
+  @horizontal-padding: 7px;
+  background-color: @tab-bg-color;
+  border-top: 1px solid @accent;
+  border-right: 1px solid @accent;
+  border-left: 1px solid @accent;
+  color: @tab-text-color;
+  margin: 3px -1px 1px 0;
+  padding: 2px @horizontal-padding 1px @horizontal-padding;
+  &:hover {
+    background-color: @tab-bg-color-hover;
+    color: @tab-text-color-hover;
+  }
+  &:selected {
+    background-color: @tab-bg-color-selected;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    color: @tab-text-color-selected;
+    margin: 1px -1px 0 0;
+    padding: 2px @horizontal-padding 2px @horizontal-padding;
+  }
+  &:only-one {
+    margin: 1px 0 0 0;
+    padding: 3px @horizontal-padding 3px @horizontal-padding;
+  }
+  &:last {
+    margin-right: 0;
+    border-top-right-radius: 2px;
+  }
+  &:first {
+    border-top-left-radius: 2px;
+  }
+}

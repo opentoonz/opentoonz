@@ -11,6 +11,14 @@
         <source>Unidentified Action</source>
         <translation>Acción no identificada</translation>
     </message>
+    <message>
+        <source>Skipping frame.</source>
+        <translation>Omitiendo fotograma.</translation>
+    </message>
+    <message>
+        <source>Malformed frame name</source>
+        <translation>Nombre de archivo malformado</translation>
+    </message>
 </context>
 <context>
     <name>TCenterLineStrokeStyle</name>

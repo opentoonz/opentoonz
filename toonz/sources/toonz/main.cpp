@@ -96,14 +96,7 @@ const char *applicationRevision = "3";
 const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 #endif
 
-#ifdef _WIN32
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Arial");
-#else
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Hervetica");
-#endif
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
-TEnv::StringVar EnvSoftwareCurrentFontWeight("SoftwareCurrentFontWeightIsBold",
-                                             "Yes");
 
 const char *applicationFullName = "OpenToonz 1.1.3";
 const char *rootVarName         = "TOONZROOT";
@@ -367,13 +360,16 @@ int main(int argc, char *argv[]) {
 #endif
 
   // splash screen
-  QPixmap splashPixmap(":Resources/splash.png");
+  QPixmap splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+  splashPixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());
+// QPixmap splashPixmap(":Resources/splash.png");
 #ifdef _WIN32
-  QFont font("Arial", -1);
+  QFont font("Segoe UI", -1);
 #else
   QFont font("Helvetica", -1);
 #endif
   font.setPixelSize(13);
+  font.setWeight(50);
   a.setFont(font);
 
   QString offsetStr("\n\n\n\n\n\n\n\n");
@@ -526,7 +522,7 @@ int main(int argc, char *argv[]) {
 
   loadShaderInterfaces(ToonzFolder::getLibraryFolder() + TFilePath("shaders"));
 
-  splash.showMessage(offsetStr + "Initializing Toonz application ...",
+  splash.showMessage(offsetStr + "Initializing OpenToonz ...",
                      Qt::AlignCenter, Qt::white);
   a.processEvents();
 
@@ -584,14 +580,18 @@ int main(int argc, char *argv[]) {
   a.processEvents();
 
   // Carico lo styleSheet
-  QString currentStyle = Preferences::instance()->getCurrentStyleSheet();
+  QString currentStyle = Preferences::instance()->getCurrentStyleSheetPath();
   a.setStyleSheet(currentStyle);
 
   TApp::instance()->setMainWindow(&w);
   w.setWindowTitle(applicationFullName);
-
-  splash.showMessage(offsetStr + "Starting main window ...", Qt::AlignCenter,
-                     Qt::white);
+  if (TEnv::getIsPortable()) {
+    splash.showMessage(offsetStr + "Starting OpenToonz Portable ...",
+                       Qt::AlignCenter, Qt::white);
+  } else {
+    splash.showMessage(offsetStr + "Starting main window ...", Qt::AlignCenter,
+                       Qt::white);
+  }
   a.processEvents();
 
   TFilePath fp = ToonzFolder::getModuleFile("mainwindow.ini");
@@ -634,14 +634,13 @@ int main(int argc, char *argv[]) {
   }
 
   QFont *myFont;
-
-  std::string family = EnvSoftwareCurrentFont;
-  myFont             = new QFont(QString(family.c_str()));
-
+  std::string fontName =
+      Preferences::instance()->getInterfaceFont().toStdString();
+  std::string isBold =
+      Preferences::instance()->getInterfaceFontWeight() ? "Yes" : "No";
+  myFont = new QFont(QString::fromStdString(fontName));
   myFont->setPixelSize(EnvSoftwareCurrentFontSize);
-  /*-- フォントのBoldの指定 --*/
-  std::string weight = EnvSoftwareCurrentFontWeight;
-  if (strcmp(weight.c_str(), "Yes") == 0)
+  if (strcmp(isBold.c_str(), "Yes") == 0)
     myFont->setBold(true);
   else
     myFont->setBold(false);

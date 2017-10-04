@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="bevel_join.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 16 16"
+	 style="enable-background:new 0 0 16 16;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#CCCCCC;}
+	.st2{fill:#404040;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview11" inkscape:current-layer="svg2" inkscape:cx="7.4999998" inkscape:cy="7.4999998" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="480" inkscape:window-maximized="0" inkscape:window-width="796" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="15.733333" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="Layer1" transform="translate(0,1)">
+	<rect id="rect5" y="0" class="st0" width="15" height="15"/>
+	<path id="path7" inkscape:connector-curvature="0" class="st1" d="M13,3H6.5L3,6.4V13h7v-3h3V3z"/>
+	<path id="path9" inkscape:connector-curvature="0" class="st2" d="M13,3H6.7L3,6.7V13H2V6.3L6.3,2H13V3z M5,5h3v1h5v1H8v1H7v5H6V8
+		H5V5z M13,11h-2v2h-1v-3h3V11z"/>
+</g>
+</svg>

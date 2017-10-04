@@ -109,9 +109,7 @@ FX_PLUGIN_IDENTIFIER(ino_hls_noise, "inohlsNoiseFx");
 //------------------------------------------------------------
 #include "igs_hls_noise.h"
 namespace {
-void fx_(TRasterP in_ras, const TRasterP refer_ras, const int ref_mode
-
-         ,
+void fx_(TRasterP in_ras, const TRasterP refer_ras, const int refer_mode,
          double hue_range, double lig_range, double sat_range, double alp_range,
          unsigned long random_seed, double near_blur, double effective,
          double center, int type, const int camera_x, const int camera_y,
@@ -134,11 +132,12 @@ void fx_(TRasterP in_ras, const TRasterP refer_ras, const int ref_mode
       ino::channels(), ino::bits(in_ras)
 
                            ,
-      (((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData()
-                                             : 0)  // BGRA
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
+                                                     : nullptr)  // BGRA
       ,
-      (((0 <= ref_mode) && (0 != refer_ras)) ? ino::bits(refer_ras) : 0),
-      ref_mode
+      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
+                                                     : 0),
+      refer_mode
 
       ,
       camera_x, camera_y, camera_w, camera_h
@@ -189,7 +188,7 @@ void ino_hls_noise::doCompute(TTile &tile, double frame,
   const double term_effective =
       this->m_term_effective->getValue(frame) / ino::param_range();
   const bool anti_alias_sw = this->m_anti_alias->getValue();
-  const int ref_mode       = this->m_ref_mode->getValue();
+  const int refer_mode     = this->m_ref_mode->getValue();
 
   /* ------ 画像生成 ---------------------------------------- */
   this->m_input->compute(tile, frame, rend_sets);
@@ -219,12 +218,12 @@ void ino_hls_noise::doCompute(TTile &tile, double frame,
     camera_h = tile.getRaster()->getLy();
   }
   /*------ 参照画像生成 --------------------------------------*/
-  TTile reference_tile;
-  bool reference_sw = false;
+  TTile refer_tile;
+  bool refer_sw = false;
   if (this->m_refer.isConnected()) {
-    reference_sw = true;
+    refer_sw = true;
     this->m_refer->allocateAndCompute(
-        reference_tile, tile.m_pos,
+        refer_tile, tile.m_pos,
         TDimensionI(/* Pixel単位 */
                     tile.getRaster()->getLx(), tile.getRaster()->getLy()),
         tile.getRaster(), frame, rend_sets);
@@ -239,36 +238,42 @@ void ino_hls_noise::doCompute(TTile &tile, double frame,
        << "  a " << mat_range << "  seed " << random_seed << "  nblur "
        << near_blur << "  effective " << term_effective << "  center "
        << term_center << "  type " << term_type << "  frame " << frame
-       << "  anti_alias " << anti_alias_sw << "  reference " << ref_mode
+       << "  anti_alias " << anti_alias_sw << "  reference " << refer_mode
        << "  pixbits " << ino::pixel_bits(tile.getRaster()) << "  tile.m_pos "
        << tile.m_pos << "  tile_getLx " << tile.getRaster()->getLx() << "  y "
        << tile.getRaster()->getLy() << "  rend_sets.m_cameraBox "
        << rend_sets.m_cameraBox << "  rend_sets.m_affine " << rend_sets.m_affine
        << "  camera x " << camera_x << "  y " << camera_y << "  w " << camera_w
        << "  h " << camera_h;
-    if (reference_sw) {
-      os << "  reference_tile.m_pos " << reference_tile.m_pos
-         << "  reference_tile_getLx " << reference_tile.getRaster()->getLx()
-         << "  y " << reference_tile.getRaster()->getLy();
+    if (refer_sw) {
+      os << "  refer_tile.m_pos " << refer_tile.m_pos << "  refer_tile_getLx "
+         << refer_tile.getRaster()->getLx() << "  y "
+         << refer_tile.getRaster()->getLy();
     }
   }
   /* ------ fx処理 ------------------------------------------ */
   try {
     tile.getRaster()->lock();
-    reference_tile.getRaster()->lock();
-    fx_(tile.getRaster(), reference_tile.getRaster(), ref_mode
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->lock();
+    }
+    fx_(tile.getRaster(), refer_tile.getRaster(), refer_mode
 
         ,
         hue_range, lig_range, sat_range, mat_range, random_seed, near_blur,
         term_effective, term_center, term_type, camera_x, camera_y, camera_w,
         camera_h, anti_alias_sw  // --> add_blend_sw, default is true
         );
-    reference_tile.getRaster()->unlock();
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
   }
   /* ------ error処理 --------------------------------------- */
   catch (std::bad_alloc &e) {
-    reference_tile.getRaster()->unlock();
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("std::bad_alloc <");
@@ -277,7 +282,9 @@ void ino_hls_noise::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (std::exception &e) {
-    reference_tile.getRaster()->unlock();
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("exception <");
@@ -286,7 +293,9 @@ void ino_hls_noise::doCompute(TTile &tile, double frame,
     }
     throw;
   } catch (...) {
-    reference_tile.getRaster()->unlock();
+    if (refer_tile.getRaster() != nullptr) {
+      refer_tile.getRaster()->unlock();
+    }
     tile.getRaster()->unlock();
     if (log_sw) {
       std::string str("other exception");

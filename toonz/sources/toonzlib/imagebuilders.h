@@ -59,6 +59,10 @@ public:
                                   std::vector<std::string> iconIds,
                                   bool cacheImagesAsWell) override;
 
+  /* Exposed to allow Fid to be updated due to a renumber operation
+  */
+  void setFid(const TFrameId &fid);
+
 protected:
   bool getInfo(TImageInfo &info, int imFlags, void *extData) override;
   TImageP build(int imFlags, void *extData) override;

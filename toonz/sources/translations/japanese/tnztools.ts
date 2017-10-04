@@ -348,15 +348,15 @@
     <name>FullColorBrushTool</name>
     <message>
         <source>Thickness</source>
-        <translation>太さ</translation>
+        <translation type="vanished">太さ</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>圧力感知</translation>
+        <translation type="vanished">圧力感知</translation>
     </message>
     <message>
         <source>Opacity:</source>
-        <translation>不透明度：</translation>
+        <translation type="vanished">不透明度：</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -365,6 +365,18 @@
     <message>
         <source>Preset:</source>
         <translation>プリセット：</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>サイズ</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>圧力感知</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>不透明度</translation>
     </message>
 </context>
 <context>
@@ -658,6 +670,10 @@ Do you want to proceed?</source>
         <source>Size:</source>
         <translation>サイズ：</translation>
     </message>
+    <message>
+        <source>Snap</source>
+        <translation>スナップ</translation>
+    </message>
 </context>
 <context>
     <name>PumpTool</name>
@@ -939,6 +955,18 @@ Do you want to proceed?</source>
     <message>
         <source>Palette must have more than one palette to be organized.</source>
         <translation>パレットの整理には２つ以上のページが必要です。</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>モード：</translation>
+    </message>
+    <message>
+        <source>Passive Pick</source>
+        <translation>マウス位置のスタイルを拾う</translation>
+    </message>
+    <message>
+        <source>Organize Palette</source>
+        <translation>パレットを整理</translation>
     </message>
 </context>
 <context>

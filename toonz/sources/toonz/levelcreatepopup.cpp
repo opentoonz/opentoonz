@@ -343,8 +343,8 @@ bool LevelCreatePopup::levelExists(std::wstring levelName) {
 
 //-----------------------------------------------------------------------------
 void LevelCreatePopup::showEvent(QShowEvent *) {
-  nextName();
   update();
+  nextName();
   m_nameFld->setFocus();
   if (Preferences::instance()->getUnits() == "pixel") {
     m_dpiFld->hide();
@@ -480,6 +480,7 @@ bool LevelCreatePopup::apply() {
     error(
         tr("The level name specified is already used: please choose a "
            "different level name"));
+    m_nameFld->selectAll();
     return false;
   }
 
@@ -492,6 +493,7 @@ bool LevelCreatePopup::apply() {
     error(
         tr("The level name specified is already used: please choose a "
            "different level name"));
+    m_nameFld->selectAll();
     return false;
   }
   parentDir = scene->decodeFilePath(parentDir);
@@ -596,10 +598,19 @@ bool LevelCreatePopup::apply() {
 void LevelCreatePopup::update() {
   updatePath();
   Preferences *pref = Preferences::instance();
+  if (pref->isNewLevelSizeToCameraSizeEnabled()) {
+    TCamera *currCamera =
+        TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
+    TDimensionD camSize = currCamera->getSize();
+    m_widthFld->setValue(camSize.lx);
+    m_heightFld->setValue(camSize.ly);
+    m_dpiFld->setValue(currCamera->getDpi().x);
+  } else {
+    m_widthFld->setValue(pref->getDefLevelWidth());
+    m_heightFld->setValue(pref->getDefLevelHeight());
+    m_dpiFld->setValue(pref->getDefLevelDpi());
+  }
 
-  m_widthFld->setValue(pref->getDefLevelWidth());
-  m_heightFld->setValue(pref->getDefLevelHeight());
-  m_dpiFld->setValue(pref->getDefLevelDpi());
   int levelType = pref->getDefLevelType();
   int index     = -1;
   switch (levelType) {
@@ -617,7 +628,7 @@ void LevelCreatePopup::update() {
     break;
   }
   if (index >= 0) m_levelTypeOm->setCurrentIndex(index);
-
+  
   /*
 (old behaviour)
 TCamera* camera = scene->getCurrentCamera();

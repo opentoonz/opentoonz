@@ -12,7 +12,12 @@
 #include "xshnoteviewer.h"
 #include "xshtoolbar.h"
 #include "cellkeyframeselection.h"
+#include "saveloadqsettings.h"
 #include "toonzqt/spreadsheetviewer.h"
+#include "orientation.h"
+#include <boost/optional.hpp>
+
+using boost::optional;
 
 #define XSHEET_FONT_PX_SIZE 12
 #define H_ADJUST 2
@@ -150,7 +155,7 @@ protected:
 //! Note: some refactoring is needed. XsheetViewer is going to derive from
 //! SpreadsheetViewer.
 
-class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
+class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   Q_OBJECT
 
   QColor m_lightLightBgColor;
@@ -320,9 +325,10 @@ class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
   XsheetGUI::RowArea *m_rowArea;
   XsheetGUI::CellArea *m_cellArea;
   XsheetGUI::NoteArea *m_noteArea;
-  XsheetGUI::Toolbar *m_toolbar;
+  XsheetGUI::XSheetToolbar *m_toolbar;
 
-  int m_x0, m_y0, m_toolbarHeight;
+  Spreadsheet::FrameScroller m_frameScroller;
+
   int m_timerId;
   QPoint m_autoPanSpeed;
   QPoint m_lastAutoPanPos;
@@ -343,6 +349,8 @@ class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
   int m_currentNoteIndex;
 
   Qt::KeyboardModifiers m_qtModifiers;
+
+  const Orientation *m_orientation;
 
 public:
   enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
@@ -417,7 +425,6 @@ public:
   void setCurrentRow(int row);
 
   void scroll(QPoint delta);
-  void onPrepareToScroll(int dy) override;
 
   void setAutoPanSpeed(const QPoint &speed);
   void setAutoPanSpeed(const QRect &widgetBounds, const QPoint &mousePos);
@@ -426,21 +433,32 @@ public:
     return m_autoPanSpeed.x() != 0 || m_autoPanSpeed.y() != 0;
   }
 
-  int xToColumn(int x) const;
-  int yToRow(int y) const;
-  int columnToX(int col) const;
-  int rowToY(int row) const;
+  //-------
+  const Orientation *orientation() const;
+  void flipOrientation();
+
+  CellPosition xyToPosition(const QPoint &point) const;
+  CellPosition xyToPosition(const TPoint &point) const;
+  CellPosition xyToPosition(const TPointD &point) const;
+  QPoint positionToXY(const CellPosition &pos) const;
+
+  int columnToLayerAxis(int layer) const;
+  int rowToFrameAxis(int frame) const;
+
+  CellRange xyRectToRange(const QRect &rect) const;
+  QRect rangeToXYRect(const CellRange &range) const;
+
+  void drawPredefinedPath(QPainter &p, PredefinedPath which,
+                          const CellPosition &pos, optional<QColor> fill,
+                          optional<QColor> outline) const;
+  //---------
 
   void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
   void updateRows() { m_rowArea->update(m_rowArea->visibleRegion()); }
   void updateColumns() { m_columnArea->update(m_columnArea->visibleRegion()); }
-  void updatePanelsSizes();
   bool refreshContentSize(int scrollDx, int scrollDy);
 
   void updateAreeSize();
-
-  // provvisorio
-  QScrollArea *getFrameScrollArea() const override { return m_cellScrollArea; }
 
   QList<XsheetGUI::NoteWidget *> getNotesWidget() const;
   void addNoteWidget(XsheetGUI::NoteWidget *w);
@@ -660,6 +678,10 @@ public:
   void setFrameDisplayStyle(FrameDisplayStyle style);
   FrameDisplayStyle getFrameDisplayStyle() { return m_frameDisplayStyle; }
 
+  // SaveLoadQSettings
+  virtual void save(QSettings &settings) const override;
+  virtual void load(QSettings &settings) override;
+
 protected:
   void scrollToColumn(int col);
   void scrollToHorizontalRange(int x0, int x1);
@@ -676,7 +698,16 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
   void timerEvent(QTimerEvent *) override;
 
+  void disconnectScrollBars();
+  void connectScrollBars();
+  void connectOrDisconnectScrollBars(bool toConnect);
+  void connectOrDisconnect(bool toConnect, QWidget *sender, const char *signal,
+                           QWidget *receiver, const char *slot);
+signals:
+  void orientationChanged(const Orientation *newOrientation);
+
 public slots:
+  void positionSections();
   void onSceneSwitched();
   void onXsheetChanged();
   void onCurrentFrameSwitched();
@@ -697,6 +728,9 @@ public slots:
   void changeWindowTitle();
 
   void resetXsheetNotes();
+
+  void onOrientationChanged(const Orientation *newOrientation);
+  void onPrepareToScrollOffset(const QPoint &offset);
 };
 
 #endif  // XSHEETVIEWER_H

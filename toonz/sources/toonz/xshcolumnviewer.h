@@ -6,6 +6,8 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QLineEdit>
+#include <QPoint>
+#include <QColor>
 
 // forward declaration
 class XsheetViewer;
@@ -14,6 +16,9 @@ class TXsheetHandle;
 class TStageObjectId;
 class TXshColumn;
 class QComboBox;
+class Orientation;
+class TApp;
+class TXsheet;
 
 //=============================================================================
 namespace XsheetGUI {
@@ -134,7 +139,7 @@ public:
     m_xsheetHandle = xsheetHandle;
   }
 
-  void show(QPoint pos, int col);
+  void show(const QRect &rect, int col);
 
 protected:
   void focusOutEvent(QFocusEvent *) override;
@@ -173,11 +178,18 @@ protected slots:
   void onFilterColorChanged(int id);
 };
 
-//! La classe si occupa della visualizzazione dell'area che gestisce le colonne.
+//! The class in charge of the region showing layer headers
 class ColumnArea final : public QWidget {
   Q_OBJECT
 
-  enum { ToggleTransparency = 1, TogglePreviewVisible, ToggleLock };
+  enum {
+    ToggleTransparency = 1,
+    ToggleAllTransparency,
+    TogglePreviewVisible,
+    ToggleAllPreviewVisible,
+    ToggleLock,
+    ToggleAllLock
+  };
 
   ColumnTransparencyPopup *m_columnTransparencyPopup;
   QTimer *m_transparencyPopupTimer;
@@ -188,9 +200,6 @@ class ColumnArea final : public QWidget {
   QRect m_tabBox;
   QRect m_nameBox;
   QRect m_linkBox;
-  QRect m_prevViewBox;
-  QRect m_tableViewBox;
-  QRect m_lockBox;
 
   bool m_isPanning;
 
@@ -214,6 +223,43 @@ class ColumnArea final : public QWidget {
   void setDragTool(DragTool *dragTool);
   void startTransparencyPopupTimer(QMouseEvent *e);
 
+  // extracted all variables of drawSomething methods
+  class DrawHeader {
+    ColumnArea *area;
+    QPainter &p;
+    int col;
+    XsheetViewer *m_viewer;
+    const Orientation *o;
+    TApp *app;
+    TXsheet *xsh;
+    bool isEmpty, isCurrent;
+    TXshColumn *column;
+    QPoint orig;
+
+  public:
+    DrawHeader(ColumnArea *area, QPainter &p, int col);
+
+    void prepare() const;
+
+    void levelColors(QColor &columnColor, QColor &dragColor) const;
+    void soundColors(QColor &columnColor, QColor &dragColor) const;
+    void paletteColors(QColor &columnColor, QColor &dragColor) const;
+
+    void drawBaseFill(const QColor &columnColor, const QColor &dragColor) const;
+    void drawEye() const;
+    void drawPreviewToggle(int opacity) const;
+    void drawLock() const;
+    void drawColumnNumber() const;
+    void drawColumnName() const;
+    void drawThumbnail(QPixmap &iconPixmap) const;
+    void drawPegbarName() const;
+    void drawParentHandleName() const;
+    void drawFilterColor() const;
+
+    void drawSoundIcon(bool isPlaying) const;
+    void drawVolumeControl(double volume) const;
+  };
+
 public:
 #if QT_VERSION >= 0x050500
   ColumnArea(XsheetViewer *parent, Qt::WindowFlags flags = 0);
@@ -222,12 +268,26 @@ public:
 #endif
   ~ColumnArea();
 
+  void onControlPressed(bool pressed);
+  const bool isControlPressed();
+
+  void drawFoldedColumnHead(QPainter &p, int col);
   void drawLevelColumnHead(QPainter &p, int col);
   void drawSoundColumnHead(QPainter &p, int col);
   void drawPaletteColumnHead(QPainter &p, int col);
   void drawSoundTextColumnHead(QPainter &p, int col);
 
   QPixmap getColumnIcon(int columnIndex);
+
+  class Pixmaps {
+  public:
+    static const QPixmap &eye();
+    static const QPixmap &cameraStand();
+    static const QPixmap &cameraStandTransparent();
+    static const QPixmap &lock();
+    static const QPixmap &sound();
+    static const QPixmap &soundPlaying();
+  };
 
 protected:
   void select(int columnIndex, QMouseEvent *event);
