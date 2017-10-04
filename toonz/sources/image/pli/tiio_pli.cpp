@@ -551,7 +551,7 @@ solo nel costruttore)
     tags.push_back((PliObjectTag *)tag);
   }
   // Store the auto close tolerance
-  {
+  if (!areAlmostEqual(tempVecImg->getAutocloseTolerance(), 1.15, 0.001)) {
     int tolerance =
         (int)((roundf(tempVecImg->getAutocloseTolerance() * 100) / 100) * 1000);
     PliTag *tag = new AutoCloseToleranceTag(tolerance);
