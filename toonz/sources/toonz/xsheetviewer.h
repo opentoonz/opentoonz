@@ -853,10 +853,14 @@ public:
     m_xsheetDragBarHighlightColor = color;
   }
   QColor getXsheetColumnNameBgColor() const {
-    return m_xsheetColumnNameBgColor.isValid() ? m_xsheetColumnNameBgColor : XsheetGUI::XsheetColumnNameBgColor;
+    return m_xsheetColumnNameBgColor.isValid()
+               ? m_xsheetColumnNameBgColor
+               : XsheetGUI::XsheetColumnNameBgColor;
   }
   QColor getXsheetDragBarHighlightColor() const {
-    return m_xsheetDragBarHighlightColor.isValid() ? m_xsheetDragBarHighlightColor : XsheetGUI::XsheetDragBarHighlightColor;
+    return m_xsheetDragBarHighlightColor.isValid()
+               ? m_xsheetDragBarHighlightColor
+               : XsheetGUI::XsheetDragBarHighlightColor;
   }
   // Xsheet Preview Button
   void setXsheetPreviewButtonBgOnColor(const QColor &color) {
@@ -872,11 +876,15 @@ public:
     m_xsheetPreviewButtonOffImage = image;
   }
   QColor getXsheetPreviewButtonBgOnColor() const {
-    return m_xsheetPreviewButtonBgOnColor.isValid() ? m_xsheetPreviewButtonBgOnColor : XsheetGUI::XsheetPreviewButtonBgOnColor;
+    return m_xsheetPreviewButtonBgOnColor.isValid()
+               ? m_xsheetPreviewButtonBgOnColor
+               : XsheetGUI::XsheetPreviewButtonBgOnColor;
   }
   QImage getXsheetPreviewButtonOnImage() const;
   QColor getXsheetPreviewButtonBgOffColor() const {
-    return m_xsheetPreviewButtonBgOffColor.isValid() ? m_xsheetPreviewButtonBgOffColor : XsheetGUI::XsheetPreviewButtonBgOffColor;
+    return m_xsheetPreviewButtonBgOffColor.isValid()
+               ? m_xsheetPreviewButtonBgOffColor
+               : XsheetGUI::XsheetPreviewButtonBgOffColor;
   }
   QImage getXsheetPreviewButtonOffImage() const {
     return m_xsheetPreviewButtonOffImage;
@@ -898,12 +906,16 @@ public:
     m_xsheetCamstandButtonOffImage = image;
   }
   QColor getXsheetCamstandButtonBgOnColor() const {
-    return m_xsheetCamstandButtonBgOnColor.isValid() ? m_xsheetCamstandButtonBgOnColor : XsheetGUI::XsheetCamstandButtonBgOnColor;
+    return m_xsheetCamstandButtonBgOnColor.isValid()
+               ? m_xsheetCamstandButtonBgOnColor
+               : XsheetGUI::XsheetCamstandButtonBgOnColor;
   }
   QImage getXsheetCamstandButtonOnImage() const;
   QImage getXsheetCamstandButtonTranspImage() const;
   QColor getXsheetCamstandButtonBgOffColor() const {
-    return m_xsheetCamstandButtonBgOffColor.isValid() ? m_xsheetCamstandButtonBgOffColor : XsheetGUI::XsheetCamstandButtonBgOffColor;
+    return m_xsheetCamstandButtonBgOffColor.isValid()
+               ? m_xsheetCamstandButtonBgOffColor
+               : XsheetGUI::XsheetCamstandButtonBgOffColor;
   }
   QImage getXsheetCamstandButtonOffImage() const {
     return m_xsheetCamstandButtonOffImage;
@@ -922,11 +934,15 @@ public:
     m_xsheetLockButtonOffImage = image;
   }
   QColor getXsheetLockButtonBgOnColor() const {
-    return m_xsheetLockButtonBgOnColor.isValid() ? m_xsheetLockButtonBgOnColor : XsheetGUI::XsheetLockButtonBgOnColor;
+    return m_xsheetLockButtonBgOnColor.isValid()
+               ? m_xsheetLockButtonBgOnColor
+               : XsheetGUI::XsheetLockButtonBgOnColor;
   }
   QImage getXsheetLockButtonOnImage() const;
   QColor getXsheetLockButtonBgOffColor() const {
-    return m_xsheetLockButtonBgOffColor.isValid() ? m_xsheetLockButtonBgOffColor : XsheetGUI::XsheetLockButtonBgOffColor;
+    return m_xsheetLockButtonBgOffColor.isValid()
+               ? m_xsheetLockButtonBgOffColor
+               : XsheetGUI::XsheetLockButtonBgOffColor;
   }
   QImage getXsheetLockButtonOffImage() const {
     return m_xsheetLockButtonOffImage;
@@ -939,7 +955,9 @@ public:
     m_xsheetConfigButtonImage = image;
   }
   QColor getXsheetConfigButtonBgColor() const {
-    return m_xsheetConfigButtonBgColor.isValid() ? m_xsheetConfigButtonBgColor : XsheetGUI::XsheetConfigButtonBgColor;
+    return m_xsheetConfigButtonBgColor.isValid()
+               ? m_xsheetConfigButtonBgColor
+               : XsheetGUI::XsheetConfigButtonBgColor;
   }
   QImage getXsheetConfigButtonImage() const;
   // Timeline Preview Button
@@ -956,18 +974,22 @@ public:
     m_timelinePreviewButtonOffImage = image;
   }
   QColor getTimelinePreviewButtonBgOnColor() const {
-	  return m_timelinePreviewButtonBgOnColor.isValid() ? m_timelinePreviewButtonBgOnColor : XsheetGUI::TimelineButtonBgOnColor;
+    return m_timelinePreviewButtonBgOnColor.isValid()
+               ? m_timelinePreviewButtonBgOnColor
+               : XsheetGUI::TimelineButtonBgOnColor;
   }
   QImage getTimelinePreviewButtonOnImage() const;
   QColor getTimelinePreviewButtonBgOffColor() const {
-	  return m_timelinePreviewButtonBgOffColor.isValid() ? m_timelinePreviewButtonBgOffColor : XsheetGUI::TimelineButtonBgOffColor;
+    return m_timelinePreviewButtonBgOffColor.isValid()
+               ? m_timelinePreviewButtonBgOffColor
+               : XsheetGUI::TimelineButtonBgOffColor;
   }
   QImage getTimelinePreviewButtonOffImage() const {
     return m_timelinePreviewButtonOffImage;
   }
   // Timeline Camstand Button
   void setTimelineCamstandButtonBgOnColor(const QColor &color) {
-	  m_timelineCamstandButtonBgOnColor = color;
+    m_timelineCamstandButtonBgOnColor = color;
   }
   void setTimelineCamstandButtonOnImage(const QImage &image) {
     m_timelineCamstandButtonOnImage = image;
@@ -976,18 +998,22 @@ public:
     m_timelineCamstandButtonTranspImage = image;
   }
   void setTimelineCamstandButtonBgOffColor(const QColor &color) {
-	  m_timelineCamstandButtonBgOffColor = color;
+    m_timelineCamstandButtonBgOffColor = color;
   }
   void setTimelineCamstandButtonOffImage(const QImage &image) {
     m_timelineCamstandButtonOffImage = image;
   }
   QColor getTimelineCamstandButtonBgOnColor() const {
-    return m_timelineCamstandButtonBgOnColor.isValid() ? m_timelineCamstandButtonBgOnColor : XsheetGUI::TimelineButtonBgOnColor;
+    return m_timelineCamstandButtonBgOnColor.isValid()
+               ? m_timelineCamstandButtonBgOnColor
+               : XsheetGUI::TimelineButtonBgOnColor;
   }
   QImage getTimelineCamstandButtonOnImage() const;
   QImage getTimelineCamstandButtonTranspImage() const;
   QColor getTimelineCamstandButtonBgOffColor() const {
-	  return m_timelineCamstandButtonBgOffColor.isValid() ? m_timelineCamstandButtonBgOffColor : XsheetGUI::TimelineButtonBgOffColor;
+    return m_timelineCamstandButtonBgOffColor.isValid()
+               ? m_timelineCamstandButtonBgOffColor
+               : XsheetGUI::TimelineButtonBgOffColor;
   }
   QImage getTimelineCamstandButtonOffImage() const {
     return m_timelineCamstandButtonOffImage;
@@ -1006,11 +1032,15 @@ public:
     m_timelineLockButtonOffImage = image;
   }
   QColor getTimelineLockButtonBgOnColor() const {
-	  return m_timelineLockButtonBgOnColor.isValid() ? m_timelineLockButtonBgOnColor : XsheetGUI::TimelineButtonBgOnColor;
+    return m_timelineLockButtonBgOnColor.isValid()
+               ? m_timelineLockButtonBgOnColor
+               : XsheetGUI::TimelineButtonBgOnColor;
   }
   QImage getTimelineLockButtonOnImage() const;
   QColor getTimelineLockButtonBgOffColor() const {
-	  return m_timelineLockButtonBgOffColor.isValid() ? m_timelineLockButtonBgOffColor : XsheetGUI::TimelineButtonBgOffColor;
+    return m_timelineLockButtonBgOffColor.isValid()
+               ? m_timelineLockButtonBgOffColor
+               : XsheetGUI::TimelineButtonBgOffColor;
   }
   QImage getTimelineLockButtonOffImage() const {
     return m_timelineLockButtonOffImage;
@@ -1023,7 +1053,9 @@ public:
     m_timelineConfigButtonImage = image;
   }
   QColor getTimelineConfigButtonBgColor() const {
-    return m_timelineConfigButtonBgColor.isValid() ? m_timelineConfigButtonBgColor : XsheetGUI::TimelineConfigButtonBgColor;
+    return m_timelineConfigButtonBgColor.isValid()
+               ? m_timelineConfigButtonBgColor
+               : XsheetGUI::TimelineConfigButtonBgColor;
   }
   QImage getTimelineConfigButtonImage() const;
   // Layer Header icons
