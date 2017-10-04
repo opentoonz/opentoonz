@@ -130,7 +130,7 @@ const QColor MaskColumnHeadColor(233, 118, 116);
 // const QColor PreviewVisibleColor(200, 200, 100);
 // const QColor CamStandVisibleColor(235, 144, 107);
 
-const QColor XsheetColumnNameBgColor(255, 255, 255, 90);
+const QColor XsheetColumnNameBgColor(255, 255, 255, 0);
 const QColor XsheetDragBarHighlightColor(255, 255, 187, 255);
 
 const QColor XsheetPreviewButtonBgOnColor(200, 200, 100, 255);
