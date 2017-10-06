@@ -61,8 +61,7 @@ TThickPoint computeLinearPoint(const TThickPoint &p1, const TThickPoint &p2,
 //-----------------------------------------------------------------------------
 
 ControlPointEditor::Replace::Replace(ControlPointEditorStroke *editor)
-  : m_editor(editor), m_from(-1), m_to(-1) {
-}
+    : m_editor(editor), m_from(-1), m_to(-1) {}
 
 void ControlPointEditor::Replace::fillToRemove() {
   TStroke *stroke = editor()->getStroke();
@@ -77,9 +76,10 @@ void ControlPointEditor::Replace::execute() {
 
   // snapshot at each other frame
   shared_ptr<PathAnimation> anim = pathAnimation();
-  set<double> keyframes = anim->getKeyframes();
-  for (set<double>::iterator it = keyframes.begin(); it != keyframes.end(); it++)
-    snapshot((int) *it);
+  set<double> keyframes          = anim->getKeyframes();
+  for (set<double>::iterator it = keyframes.begin(); it != keyframes.end();
+       it++)
+    snapshot((int)*it);
 
   // perform replace
   editor()->getStroke()->replaceChunks(m_from, m_to, m_toAdd);
@@ -92,8 +92,7 @@ void ControlPointEditor::Replace::snapshot(int frame) {
   // c is chunk number
   // i is control point base number
   for (int c = 0, i = 0; c < m_toAdd.size(); c++, i += 2)
-    for (int j = 0; j < 3; j++)
-      m_toAdd[c]->setThickP(j, points[i + j]);
+    for (int j = 0; j < 3; j++) m_toAdd[c]->setThickP(j, points[i + j]);
 
   // now copy curve information to PathAnimation
   shared_ptr<PathAnimation> anim = pathAnimation();
@@ -102,7 +101,8 @@ void ControlPointEditor::Replace::snapshot(int frame) {
 }
 
 shared_ptr<PathAnimation> ControlPointEditor::Replace::pathAnimation() const {
-  return PathAnimations::appStroke(TTool::getApplication(), editor()->getStroke());
+  return PathAnimations::appStroke(TTool::getApplication(),
+                                   editor()->getStroke());
 }
 
 TThickQuadratic ControlPointEditor::Replace::toRemove(int i, int frame) const {
@@ -111,7 +111,7 @@ TThickQuadratic ControlPointEditor::Replace::toRemove(int i, int frame) const {
   shared_ptr<PathAnimation> anim = pathAnimation();
   // interpolate chunk (from + i) to frame
   for (int j = 0; j < 3; j++)
-    result.setThickP(j, anim->pointParam(from() + i, j)->getValue (frame));
+    result.setThickP(j, anim->pointParam(from() + i, j)->getValue(frame));
   return result;
 }
 
@@ -122,14 +122,14 @@ TThickQuadratic ControlPointEditor::Replace::toRemove(int i, int frame) const {
 //! Remove 2 chunks and replace them with 4 chunks
 class ReplaceAddPoint final : public ControlPointEditor::Replace {
   double m_w;
-  int m_chunk; // chunk containing w
-  double m_t; // t parameter of curve within chunk corresponding to w
-  int m_oldCPCount; // control point count prior to replacement
-  int m_pointIndex; // index of control point after w
-  int m_major; // major index of segment start
-  int m_prevCP; // control point index
+  int m_chunk;       // chunk containing w
+  double m_t;        // t parameter of curve within chunk corresponding to w
+  int m_oldCPCount;  // control point count prior to replacement
+  int m_pointIndex;  // index of control point after w
+  int m_major;       // major index of segment start
+  int m_prevCP;      // control point index
 
-  static const int TO_ADD = 4; //! number of chunks added
+  static const int TO_ADD = 4;  //! number of chunks added
 
 protected:
   virtual void fillToAdd() override;
@@ -137,18 +137,16 @@ protected:
 
 public:
   ReplaceAddPoint(ControlPointEditorStroke *editor, double w);
-
 };
 
-ReplaceAddPoint::ReplaceAddPoint(ControlPointEditorStroke *editor, double w):
-  Replace (editor), m_w (w)
-{
+ReplaceAddPoint::ReplaceAddPoint(ControlPointEditorStroke *editor, double w)
+    : Replace(editor), m_w(w) {
   TStroke *stroke = editor->getStroke();
   stroke->getChunkAndT(w, m_chunk, m_t);
 
   m_pointIndex = stroke->getControlPointIndexAfterParameter(w);
-  m_major = editor->majorSegmentContaining(m_pointIndex);
-  m_prevCP = editor->cpIndex(m_major);
+  m_major      = editor->majorSegmentContaining(m_pointIndex);
+  m_prevCP     = editor->cpIndex(m_major);
   assert(m_prevCP >= 0);
 
   setFrom(m_major * 2);
@@ -159,25 +157,22 @@ ReplaceAddPoint::ReplaceAddPoint(ControlPointEditorStroke *editor, double w):
 
 void ReplaceAddPoint::fillToAdd() {
   m_toAdd.clear();
-  for (int i = 0; i < TO_ADD; i++)
-    m_toAdd.push_back(new TThickQuadratic());
+  for (int i = 0; i < TO_ADD; i++) m_toAdd.push_back(new TThickQuadratic());
   shared_ptr<PathAnimation> anim =
-    PathAnimations::appStroke(TTool::getApplication(), editor()->getStroke());
-  for (int i = 0; i < TO_ADD; i++)
-    anim->addChunk(m_toAdd[i]);
+      PathAnimations::appStroke(TTool::getApplication(), editor()->getStroke());
+  for (int i = 0; i < TO_ADD; i++) anim->addChunk(m_toAdd[i]);
 }
 
-
-
-vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
+vector<TThickPoint> ReplaceAddPoint::place(int frame) const {
   ControlPointEditorStroke *e = editor();
-  TStroke *stroke = e->getStroke();
+  TStroke *stroke             = e->getStroke();
 
   bool isBeforePointLinear = e->isSpeedOutLinear(m_major);
-  int nextIndex =
-    (e->isSelfLoop() && m_major == e->getControlPointCount() - 1) ? 0 : m_major + 1;
+  int nextIndex = (e->isSelfLoop() && m_major == e->getControlPointCount() - 1)
+                      ? 0
+                      : m_major + 1;
   bool isNextPointLinear =
-    nextIndex < e->getControlPointCount() && e->isSpeedInLinear(nextIndex);
+      nextIndex < e->getControlPointCount() && e->isSpeedInLinear(nextIndex);
 
   TThickPoint a[5];
   a[0] = toRemove(0, frame).getThickP0();
@@ -198,8 +193,7 @@ vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
     d[4] = computeLinearPoint(d[3], d[6], 0.01, false);  // SpeedOut
     d[1] = 0.5 * (d[0] + d[2]);
     d[5] = 0.5 * (d[4] + d[6]);
-  }
-  else if (dist2 < 32) {
+  } else if (dist2 < 32) {
     // a[2] and clicked point are very close
     TThickPoint b0 = 0.5 * (a[0] + a[1]);
     TThickPoint b1 = 0.5 * (a[2] + a[1]);
@@ -209,15 +203,14 @@ vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
     TThickPoint b3 = 0.5 * (a[3] + a[4]);
 
     TThickPoint c1 = 0.5 * (b2 + b3);
-    d[0] = b0;
-    d[1] = c0;
-    d[2] = b1;
-    d[3] = a[2];
-    d[4] = b2;
-    d[5] = c1;
-    d[6] = b3;
-  }
-  else {
+    d[0]           = b0;
+    d[1]           = c0;
+    d[2]           = b1;
+    d[3]           = a[2];
+    d[4]           = b2;
+    d[5]           = c1;
+    d[6]           = b3;
+  } else {
     bool isInFirstChunk = true;
     if (m_pointIndex > m_prevCP + 2) {
       // If they are in the second chunk, exchange points
@@ -226,24 +219,24 @@ vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
       isInFirstChunk = false;
     }
 
-    double w0 = (e->isSelfLoop() && m_prevCP + 4 == m_oldCPCount - 1 &&
-      !isInFirstChunk)
-      ? 1
-      : stroke->getW(a[0]);
+    double w0 =
+        (e->isSelfLoop() && m_prevCP + 4 == m_oldCPCount - 1 && !isInFirstChunk)
+            ? 1
+            : stroke->getW(a[0]);
     double w1 = stroke->getW(a[2]);
-    double t = (m_w - w0) / (w1 - w0);
+    double t  = (m_w - w0) / (w1 - w0);
 
-    TThickPoint p = stroke->getThickPoint(m_w);
+    TThickPoint p  = stroke->getThickPoint(m_w);
     TThickPoint b0 = TThickPoint((1 - t) * a[0] + t * a[1],
-      (1 - t) * a[0].thick + t * a[1].thick);
+                                 (1 - t) * a[0].thick + t * a[1].thick);
     TThickPoint b1 = TThickPoint((1 - t) * a[1] + t * a[2],
-      (1 - t) * a[1].thick + t * a[2].thick);
+                                 (1 - t) * a[1].thick + t * a[2].thick);
     TThickPoint c0 =
-      TThickPoint(0.5 * a[0] + 0.5 * b0, (1 - t) * a[0].thick + t * b0.thick);
+        TThickPoint(0.5 * a[0] + 0.5 * b0, (1 - t) * a[0].thick + t * b0.thick);
     TThickPoint c1 =
-      TThickPoint(0.5 * b0 + 0.5 * p, (1 - t) * b0.thick + t * p.thick);
+        TThickPoint(0.5 * b0 + 0.5 * p, (1 - t) * b0.thick + t * p.thick);
     TThickPoint c2 =
-      TThickPoint(0.5 * c0 + 0.5 * c1, (1 - t) * c0.thick + t * c1.thick);
+        TThickPoint(0.5 * c0 + 0.5 * c1, (1 - t) * c0.thick + t * c1.thick);
 
     d[0] = (isInFirstChunk) ? c0 : a[3];
     d[1] = (isInFirstChunk) ? c2 : a[2];
@@ -272,7 +265,6 @@ vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
   return points;
 }
 
-
 //=============================================================================
 // ControlPointEditorStroke
 //-----------------------------------------------------------------------------
@@ -283,7 +275,7 @@ vector<TThickPoint> ReplaceAddPoint::place (int frame) const {
 void ControlPointEditorStroke::insertPoint(int indexA, int indexB) {
   TStroke *stroke = getStroke();
   assert(stroke);
-  int j = 0;
+  int j          = 0;
   int chunkCount = indexB - indexA;
   if (chunkCount % 2 == 0) return;
   double maxLength = 0;
@@ -301,8 +293,8 @@ void ControlPointEditorStroke::insertPoint(int indexA, int indexB) {
     double length1 = stroke->getLength(w1);
     assert(length1 > length0);
     if (maxLength < length1 - length0) {
-      firstW = w0;
-      lastW = w1;
+      firstW    = w0;
+      lastW     = w1;
       maxLength = length1 - length0;
     }
   }
@@ -350,11 +342,13 @@ int ControlPointEditorStroke::prevIndex(int index) const {
 
 //! controlPointIndex is of 4x major point kind
 //! returns major point index
-int ControlPointEditorStroke::majorSegmentContaining(int controlPointIndex) const {
+int ControlPointEditorStroke::majorSegmentContaining(
+    int controlPointIndex) const {
   int index;
   for (int i = 0; i < getControlPointCount(); i++) {
     int majorPoint = m_controlPoints[i].m_pointIndex;
-    if (controlPointIndex >= majorPoint + 1 && controlPointIndex <= majorPoint + 4)
+    if (controlPointIndex >= majorPoint + 1 &&
+        controlPointIndex <= majorPoint + 4)
       index = i;
   }
   return index;
@@ -365,13 +359,13 @@ int ControlPointEditorStroke::majorSegmentContaining(int controlPointIndex) cons
 void ControlPointEditorStroke::adjustChunkParity() {
   TStroke *stroke = getStroke();
   if (!stroke) return;
-  
+
   int firstChunk;
   int secondChunk = stroke->getChunkCount();
   int i;
   for (i = stroke->getChunkCount() - 1; i > 0; i--) {
     if (tdistance(stroke->getChunk(i - 1)->getP0(),
-      stroke->getChunk(i)->getP2()) < 0.5)
+                  stroke->getChunk(i)->getP2()) < 0.5)
       continue;
     TPointD p0 = stroke->getChunk(i - 1)->getP1();
     TPointD p1 = stroke->getChunk(i - 1)->getP2();
@@ -406,7 +400,7 @@ void ControlPointEditorStroke::resetControlPoints() {
   for (i = 0; i < cpCount; i = i + 4) {
     TThickPoint speedIn, speedOut;
     bool isPickOut    = false;
-    TThickPoint p = stroke->getControlPoint(i);
+    TThickPoint p     = stroke->getControlPoint(i);
     TThickPoint precP = stroke->getControlPoint(i - 1);
     TThickPoint nextP = stroke->getControlPoint(i + 1);
     if (0 < i && i < cpCount - 1)  // calcola speedIn e speedOut
@@ -665,7 +659,7 @@ void ControlPointEditorStroke::moveSingleControlPoint(int index,
   int cpCount = selfLoop ? m_controlPoints.size() + 1 : m_controlPoints.size();
 
   TThickPoint p = stroke->getControlPoint(pointIndex);
-  p = TThickPoint(p + delta, p.thick);
+  p             = TThickPoint(p + delta, p.thick);
   stroke->setControlPoint(pointIndex, p);
   if (pointIndex == 0 && selfLoop)
     stroke->setControlPoint(stroke->getControlPointCount() - 1, p);
@@ -926,10 +920,10 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos) {
   }
 
   ControlPoint precCp = m_controlPoints[index];
-  int prevCPIndex = precCp.m_pointIndex;
+  int prevCPIndex     = precCp.m_pointIndex;
   assert(prevCPIndex >= 0);
-  
-  ReplaceAddPoint replace { this, w };
+
+  ReplaceAddPoint replace{this, w};
   replace.execute();
   resetControlPoints();
   takeSnapshot();

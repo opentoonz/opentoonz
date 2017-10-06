@@ -439,7 +439,7 @@ cleanup:
 
   if (m_inStroke) {
     m_inStroke->setStyle(
-      m_strokeStyleId);  // Make the image stroke visible again
+        m_strokeStyleId);  // Make the image stroke visible again
     PathAnimations::appSnapshot(TTool::getApplication(), m_inStroke);
   }
 

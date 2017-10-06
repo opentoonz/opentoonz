@@ -35,9 +35,7 @@ class TStrokeProp;
 class TSegment;
 class TFlash;
 
-enum class Reshape {
-  Recreated, Moved
-};
+enum class Reshape { Recreated, Moved };
 
 //===================================================================
 
@@ -175,7 +173,8 @@ The first method doesn't change the point thickness
   Reshape move(const TThickPoint pos[], int count);
   void countNegativeThickness(const TThickPoint pos[], int count);
   //! Cut out some chunks and add other in their place
-  void replaceChunks(int from, int to, const std::vector<TThickQuadratic *> &toAdd);
+  void replaceChunks(int from, int to,
+                     const std::vector<TThickQuadratic *> &toAdd);
 
   /*!
 Return chunk at position index

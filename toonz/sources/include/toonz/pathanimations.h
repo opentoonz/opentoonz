@@ -60,7 +60,7 @@ public:
 class Snapshotter {
 public:
   virtual void set(TThickPointParamP param, const TThickPoint &p) = 0;
-  virtual ~Snapshotter() { }
+  virtual ~Snapshotter() {}
 };
 
 //! Keyframe data for a particular TStroke
@@ -90,13 +90,13 @@ public:
 
   bool isActivated() const { return m_activated; }
   void toggleActivated();
-  
+
   set<double> getKeyframes() const;
   void clearKeyframes();
 
   int chunkCount() const;
   TParamSetP chunkParam(int i) const;
-  
+
   TThickPointParamP pointParam(int chunk, int point) const;
 
   void animate(int frame) const;
@@ -105,7 +105,8 @@ private:
   //! updates chunk animation info
   void snapshotCurrentChunks(int atFrame);
   //! remember position of specified thick point
-  void snapshotThickPoint(TThickPointParamP param, const TThickPoint &point, int frame);
+  void snapshotThickPoint(TThickPointParamP param, const TThickPoint &point,
+                          int frame);
 };
 
 //!----------------------------------------------------------------------
@@ -129,7 +130,8 @@ public:
 
   static PathAnimations *appAnimations(const TApplication *app);
   static StrokeId appStrokeId(const TApplication *app, TStroke *stroke);
-  static shared_ptr<PathAnimation> appStroke(const TApplication *app, TStroke *stroke);
+  static shared_ptr<PathAnimation> appStroke(const TApplication *app,
+                                             TStroke *stroke);
   static void appSnapshot(const TApplication *app, TStroke *stroke);
   static void appClearAndSnapshot(const TApplication *app, TStroke *stroke);
 };

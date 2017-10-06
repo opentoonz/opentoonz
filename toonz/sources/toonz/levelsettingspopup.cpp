@@ -1191,6 +1191,8 @@ public:
 
     if (!simpleLevels.size()) return;
     for (i = 0; i < simpleLevels.size(); i++) {
+      if (!(simpleLevels[i]->getType() & LEVELCOLUMN_XSHLEVEL)) continue;
+
       TFilePath path = simpleLevels[i]->getPath();
       path           = simpleLevels[i]->getScene()->decodeFilePath(path);
       FlipBook *fb;

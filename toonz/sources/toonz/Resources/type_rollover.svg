@@ -1,69 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 10.0, SVG Export Plug-In . SVG Version: 3.0.0 Build 76)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" [
-	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
-	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
-	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
-	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
-	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
-	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
-	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
-	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
-	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
-	<!ENTITY ns_svg "http://www.w3.org/2000/svg">
-	<!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
-]>
-<svg 
-	 xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" i:viewOrigin="387 312" i:rulerOrigin="0 0" i:pageBounds="0 600 800 0"
-	 xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" width="26" height="26"
-	 viewBox="0 0 26 26" overflow="visible" enable-background="new 0 0 26 26" xml:space="preserve">
-	<metadata>
-		<variableSets  xmlns="&ns_vars;">
-			<variableSet  varSetName="binding1" locked="none">
-				<variables></variables>
-				<v:sampleDataSets  xmlns="&ns_custom;" xmlns:v="&ns_vars;"></v:sampleDataSets>
-			</variableSet>
-		</variableSets>
-		<sfw  xmlns="&ns_sfw;">
-			<slices></slices>
-			<sliceSourceBounds  y="286" x="387" width="26" height="26" bottomLeftOrigin="true"></sliceSourceBounds>
-		</sfw>
-	</metadata>
-	<g id="Layer_1" i:layer="yes" i:dimmedPercent="50" i:rgbTrio="#4F008000FFFF">
-		<path i:knockout="Off" fill="#FFFFFF" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" d="M3.63,6.824
-			l4.763,11.791l14.687-4.131l-4.68-11.321L3.63,6.824z"/>
-		<path i:knockout="Off" fill="#DCE6FF" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" d="M23.079,14.484
-			L8.393,18.615v6.805l14.687-4.131V14.484z"/>
-		<path i:knockout="Off" fill="#62A2FF" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" d="M8.393,25.42
-			L3.63,13.628V6.824l4.763,11.791V25.42z"/>
-		<path i:knockout="Off" fill="#62A2FF" stroke="#000000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" d="
-			M10.315,2.756l3.537,7.979l-0.815,3.809L9.546,6.159L8.555,6.435C7.161,6.822,6.54,7.401,6.774,9.313L6.442,9.406L5.327,6.691
-			V3.73"/>
-		<path i:knockout="Off" fill="#62A2FF" stroke="#000000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" d="
-			M18.076,11.368v2.96l-6.368,1.773l-0.112-0.273v-2.96"/>
-		<path i:knockout="Off" fill="#62A2FF" stroke="#000000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" d="
-			M17.322,3.415v2.96l-0.329,0.092c-1.226-1.636-2.145-1.786-3.54-1.397l-0.99,0.276V2.121l2.568-0.592"/>
-		<path i:knockout="Off" fill="#DCE6FF" stroke="#000000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" d="
-			M12.463,2.385l3.11,7.567c0.504,1.229,0.666,1.624,2.391,1.143l0.112,0.273l-6.368,1.773l-0.112-0.273
-			c1.726-0.48,1.565-0.875,1.06-2.104L9.546,3.198L8.555,3.474C7.161,3.861,6.54,4.441,6.773,6.354L6.442,6.445L5.327,3.73
-			l10.881-3.029l1.114,2.714l-0.33,0.091c-1.225-1.636-2.144-1.786-3.539-1.396L12.463,2.385z"/>
-		<path i:knockout="Off" fill="#FFF2D4" stroke="#000000" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" d="
-			M3.63,6.824l4.763,11.791l14.687-4.131l-4.68-11.321L3.63,6.824z"/>
-		<path i:knockout="Off" fill="#DCCD74" stroke="#000000" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" d="
-			M23.079,14.484L8.393,18.615v6.805l14.687-4.131V14.484z"/>
-		<path i:knockout="Off" fill="#DE792D" stroke="#000000" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" d="
-			M8.393,25.42L3.63,13.628V6.824l4.763,11.791V25.42z"/>
-		<path i:knockout="Off" fill="#CCCCCC" stroke="#000000" stroke-width="0.3" stroke-linecap="round" stroke-linejoin="round" d="
-			M10.315,2.756l3.537,7.979l-0.815,3.809L9.546,6.159L8.555,6.435C7.161,6.822,6.54,7.401,6.774,9.313L6.442,9.406l-1.41-2.822
-			V3.623"/>
-		<path i:knockout="Off" fill="#CCCCCC" stroke="#000000" stroke-width="0.3" stroke-linecap="round" stroke-linejoin="round" d="
-			M18.264,11.368v2.96l-6.556,1.773l-0.327-0.273v-2.96"/>
-		<path i:knockout="Off" fill="#CCCCCC" stroke="#000000" stroke-width="0.3" stroke-linecap="round" stroke-linejoin="round" d="
-			M17.601,3.346v2.96l-0.607,0.161c-1.226-1.636-2.145-1.786-3.54-1.397l-0.99,0.276V2.121l2.568-0.592"/>
-		<path i:knockout="Off" stroke="#000000" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round" d="M12.463,2.385
-			l3.11,7.567c0.504,1.229,0.666,1.624,2.391,1.143l0.112,0.273l-6.368,1.773l-0.112-0.273c1.726-0.48,1.565-0.875,1.06-2.104
-			L9.546,3.198L8.555,3.474C7.161,3.861,6.54,4.441,6.773,6.354L6.442,6.445L5.327,3.73l10.881-3.029l1.114,2.714l-0.33,0.091
-			c-1.225-1.636-2.144-1.786-3.539-1.396L12.463,2.385z"/>
-		<path i:knockout="Off" fill="none" d="M26,26H0V0h26V26z"/>
-	</g>
-</svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:ns4="http://ns.adobe.com/SaveForWeb/1.0/"
+   xmlns:ns3="http://ns.adobe.com/Variables/1.0/"
+   xmlns:ns2="http://ns.adobe.com/AdobeIllustrator/10.0/"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   style="overflow:visible"
+   id="svg35"
+   version="1.1"
+   xml:space="preserve"
+   enable-background="new 0 0 26 26.08"
+   overflow="visible"
+   viewBox="0 0 23 23.08"
+   height="23.08"
+   width="23"
+   ns2:pageBounds="0 600 800 0"
+   ns2:rulerOrigin="0 0"
+   ns2:viewOrigin="387 313"><defs
+     id="defs39" /><metadata
+     id="metadata2"><ns3:variableSets><ns3:variableSet
+         locked="none"
+         varSetName="binding1"><ns3:variables /><ns3:sampleDataSets /></ns3:variableSet></ns3:variableSets><ns4:sfw><ns4:slices /><ns4:sliceSourceBounds
+         bottomLeftOrigin="true"
+         height="26.08"
+         width="26"
+         x="387"
+         y="286.92" /></ns4:sfw><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><g
+     aria-label="T"
+     transform="scale(0.99999021,1.0000098)"
+     style="font-style:normal;font-weight:normal;font-size:39.99960709px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:1.29999999;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     id="g903"><path
+       d="M 4.0000392,2.0799795 H 19.000186 v 4.999951 H 17.596554 C 17.386487,6.258758 17.176419,5.5938343 16.966351,5.1164083 16.765832,4.6389824 16.000157,4.0799599 16.000157,4.0799599 h -1.00001 -2.00002 v 13.9998631 0.99999 l 0.492012,0.492183 0.648645,0.278643 c 0,0 0.391485,0.12413 0.859363,0.229164 l 0,0.99999 H 8.0000783 l 0,-0.99999 c 0.2864556,-0.06684 0.5394913,-0.138454 0.7591072,-0.214842 0.219616,-0.07639 0.7486078,-0.26432 0.7486078,-0.26432 L 10.000098,19.079813 V 18.079823 4.0799599 H 8.0000783 7.0000685 c 0,0 -0.7990958,0.5876681 -1.0091632,1.0937395 -0.200519,0.496523 -0.3914893,1.1423497 -0.5729111,1.9062311 h -1.417955 z"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.33304787px;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';fill:#e6e6e6;fill-opacity:1;stroke-width:1.29999999;stroke:#000000;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path901" /></g><g
+     id="text888"
+     style="font-style:normal;font-weight:normal;font-size:39.99960709px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1"
+     transform="scale(0.99999021,1.0000098)"
+     aria-label="T"><path
+       id="path894"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.33304787px;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';fill:#cccccc;fill-opacity:1;stroke-width:1"
+       d="M 4.0000392,2.0799795 H 19.000186 v 4.999951 H 17.596554 C 17.386487,6.258758 17.176419,5.5938343 16.966351,5.1164083 16.765832,4.6389824 16.000157,4.0799599 16.000157,4.0799599 h -1.00001 -2.00002 v 13.9998631 0.99999 l 0.492012,0.492183 0.648645,0.278643 c 0,0 0.391485,0.12413 0.859363,0.229164 l 0,0.99999 H 8.0000783 l 0,-0.99999 c 0.2864556,-0.06684 0.5394913,-0.138454 0.7591072,-0.214842 0.219616,-0.07639 0.7486078,-0.26432 0.7486078,-0.26432 L 10.000098,19.079813 V 18.079823 4.0799599 H 8.0000783 7.0000685 c 0,0 -0.7990958,0.5876681 -1.0091632,1.0937395 -0.200519,0.496523 -0.3914893,1.1423497 -0.5729111,1.9062311 h -1.417955 z" /></g></svg>

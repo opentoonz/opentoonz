@@ -194,7 +194,8 @@ class ColumnArea final : public QWidget {
     TogglePreviewVisible,
     ToggleAllPreviewVisible,
     ToggleLock,
-    ToggleAllLock
+    ToggleAllLock,
+    OpenSettings
   };
 
   ColumnTransparencyPopup *m_columnTransparencyPopup;
@@ -255,6 +256,7 @@ class ColumnArea final : public QWidget {
     void drawEye() const;
     void drawPreviewToggle(int opacity) const;
     void drawLock() const;
+    void drawConfig() const;
     void drawFoldUnfoldButton() const;
     void drawColumnNumber() const;
     void drawColumnName() const;
@@ -263,7 +265,7 @@ class ColumnArea final : public QWidget {
     void drawParentHandleName() const;
     void drawFilterColor() const;
 
-//    void drawNoSoundIcon() const;
+    //    void drawNoSoundIcon() const;
     void drawSoundIcon(bool isPlaying) const;
     void drawVolumeControl(double volume) const;
 
@@ -297,10 +299,6 @@ public:
 
   class Pixmaps {
   public:
-    static const QPixmap &eye();
-    static const QPixmap &cameraStand();
-    static const QPixmap &cameraStandTransparent();
-    static const QPixmap &lock();
     static const QPixmap &sound();
     static const QPixmap &soundPlaying();
 

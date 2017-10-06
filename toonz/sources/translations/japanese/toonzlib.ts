@@ -352,6 +352,34 @@
         <source>Can&apos;t save</source>
         <translation>保存できません ：</translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation>なし</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>赤</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>緑</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>青</translation>
+    </message>
+    <message>
+        <source>DarkYellow</source>
+        <translation>暗い黄色</translation>
+    </message>
+    <message>
+        <source>DarkCyan</source>
+        <translation>暗いシアン</translation>
+    </message>
+    <message>
+        <source>DarkMagenta</source>
+        <translation>暗いマゼンタ</translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

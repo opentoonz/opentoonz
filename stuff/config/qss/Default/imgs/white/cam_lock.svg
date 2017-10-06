@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="100%"
-   height="100%"
-   viewBox="0 0 18 18"
+   id="svg4489"
    version="1.1"
-   id="svg4489">
+   viewBox="0 0 18 18"
+   height="100%"
+   width="100%">
   <defs
      id="defs4483" />
   <metadata
@@ -25,30 +25,43 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
-     transform="translate(0,-1106.5197)" />
+     transform="translate(0,-1106.5197)"
+     id="layer1" />
   <rect
-     id="rect2"
-     style="clip-rule:evenodd;fill:none;fill-rule:evenodd;stroke-width:0.05555556;stroke-linejoin:round;stroke-miterlimit:1.41420996"
-     height="1.0000001"
-     width="1.0000001"
+     x="0"
      y="17.000002"
-     x="0" />
+     width="1.0000001"
+     height="1.0000001"
+     style="clip-rule:evenodd;fill:none;fill-rule:evenodd;stroke-width:0.05555556;stroke-linejoin:round;stroke-miterlimit:1.41420996"
+     id="rect2" />
   <path
-     id="path4493"
-     d="m 9.5000008,3.0000001 c -1.9322341,-3e-7 -3.4989225,1.56386 -3.5000003,3.4960941 V 7.0000004 H 7.0000006 V 6.4960942 c 0.00108,-1.379949 1.1200512,-2.4960945 2.5000002,-2.496094 1.3799492,-5e-7 2.4989222,1.116145 2.5000002,2.496094 v 0.5039062 h 1 V 6.4960942 C 12.998923,4.5638601 11.432235,2.9999998 9.5000008,3.0000001 Z M 5.0000004,8.0000005 V 15.000001 H 14.000001 V 8.0000005 Z m 4.5000004,1.5000001 a 1.0000001,1.0000001 0 0 1 1.0000002,1.0000004 1.0000001,1.0000001 0 0 1 -0.5,0.863281 v 1.636719 H 9.0000007 v -1.638672 a 1.0000001,1.0000001 0 0 1 -0.5,-0.861328 1.0000001,1.0000001 0 0 1 1.0000001,-1.0000004 z"
-     style="clip-rule:evenodd;fill:#fbfbfb;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.00000024;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:0.54901961;paint-order:markers stroke fill" />
+     style="clip-rule:evenodd;fill:#fbfbfb;fill-opacity:1;fill-rule:evenodd;stroke:#303030;stroke-width:2.00000024;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+     d="m 9.5000008,3.0000001 c -1.9322341,-3e-7 -3.4989225,1.56386 -3.5000003,3.4960941 V 7.0000004 H 7.0000006 V 6.4960942 c 0.00108,-1.379949 1.1200512,-2.4960945 2.5000002,-2.496094 1.3799492,-5e-7 2.4989222,1.116145 2.5000002,2.496094 v 0.5039062 h 1 V 6.4960942 C 12.998923,4.5638601 11.432235,2.9999998 9.5000008,3.0000001 Z M 5.0000004,8.0000005 V 15.000001 H 14.000001 V 8.0000005 Z"
+     id="path4493" />
   <g
-     style="clip-rule:evenodd;fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41420996"
+     transform="scale(0.05555556)"
      id="g4491"
-     transform="scale(0.05555556)">
+     style="clip-rule:evenodd;fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41420996">
     <path
-       style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:36;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:0.27638191;paint-order:markers stroke fill"
-       d="M 90,144 V 270 H 252 V 144 Z m 81,27 a 18,18 0 0 1 18,18 18,18 0 0 1 -9,15.57421 V 234 H 162 V 204.53906 A 18,18 0 0 1 153,189 18,18 0 0 1 171,171 Z"
-       id="rect4488" />
+       id="rect4488"
+       d="M 90,144 V 270 H 252 V 144 Z"
+       style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:36;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:0.27638191;paint-order:markers stroke fill" />
     <path
-       style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:36;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:0.27638191;paint-order:markers stroke fill"
+       id="path4509"
        d="m 171,54 c -34.78021,-5e-6 -62.98059,28.18463 -63,62.96484 V 126 h 18 v -9.03516 C 126.01941,92.12576 146.16091,71.999992 171,72 c 24.83909,-8e-6 44.98059,20.12576 45,44.96484 V 126 h 18 v -9.03516 C 233.98059,82.18463 205.78021,53.999995 171,54 Z"
-       id="path4509" />
+       style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:36;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:0.27638191;paint-order:markers stroke fill" />
   </g>
+  <circle
+     r="1.5"
+     cy="10.500001"
+     cx="9.500001"
+     id="path820"
+     style="fill:#303030;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+  <rect
+     y="11"
+     x="8.75"
+     height="3"
+     width="1.5"
+     id="rect822"
+     style="fill:#303030;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
 </svg>

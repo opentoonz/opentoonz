@@ -46,10 +46,9 @@ int ScreenMapper::getCurrentFrame() const {
   return TApp::instance()->getCurrentFrame()->getFrame();
 }
 
-void ScreenMapper::setOrientation(const Orientation *o)
-{
-	m_orientation = o;
-	m_columnFan->setDimension(dimension(PredefinedDimension::LAYER));
+void ScreenMapper::setOrientation(const Orientation *o) {
+  m_orientation = o;
+  m_columnFan->setDimension(dimension(PredefinedDimension::LAYER));
 }
 
 void ScreenMapper::flipOrientation() {

@@ -2,6 +2,7 @@
 
 #include "toonzqt/spreadsheetviewer.h"
 #include "toonzqt/gutil.h"
+#include "toonz/preferences.h"
 
 #include "toonz/tframehandle.h"
 #include "orientation.h"
@@ -291,11 +292,15 @@ DragTool *RowPanel::createDragTool(QMouseEvent *) {
 //-----------------------------------------------------------------------------
 
 void RowPanel::drawRows(QPainter &p, int r0, int r1) {
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Bold);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Bold);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Bold);
   font.setPixelSize(12);
   p.setFont(font);
 

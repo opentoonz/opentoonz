@@ -12,6 +12,7 @@
 
 // TnzLib includes
 #include "toonz/txshcolumn.h"
+#include "toonz/txshlevel.h"
 
 #include "cellposition.h"
 
@@ -423,7 +424,9 @@ frame duplication.
   void timeStretch(int r0, int c0, int r1, int c1, int nr);
 
   // force cells order in n-steps. returns the row amount after process
-  int reframeCells(int r0, int r1, int col, int type);
+  // if withBlank is greater than -1, remove empty cell from its order and
+  // insert blank frames with type*withBlank length at each n-step.
+  int reframeCells(int r0, int r1, int col, int type, int withBlank = -1);
 
   /*! Exposes level \b \e xl in xsheet starting from cell identified by \b \e
      row and \b \e col.
@@ -553,6 +556,11 @@ in TXsheetImp.
 
   //! Returns the xsheet content's \a camstand bbox at the specified row.
   TRectD getBBox(int row) const;
+
+  void autoInputCellNumbers(int increment, int interval, int step, int repeat,
+                            int from, int to, int r0, int r1, bool isOverwrite,
+                            std::vector<int> columnIndices,
+                            std::vector<TXshLevelP> levels, int rowsCount);
 
   //! Access path animations storage
   PathAnimations *pathAnimations() const;

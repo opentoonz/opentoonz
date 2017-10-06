@@ -4,7 +4,7 @@
 
 #ToolBar {
   & QToolBar {
-    padding-left: 2px; // spacing for expand tools button
+    padding-left: 2px;
   }
 }
 
@@ -92,5 +92,20 @@ QToolBar#WidePaddingToolBar { //FrameNavigator
   &::separator:horizontal {
     margin-right: 3;
     margin-left: 3;
+  }
+}
+
+#expandButton {
+  &:checked {
+    background-color: transparent;
+    border-color: transparent;
+    &:hover {
+      background-color: @toolbutton-bg-color-hover;
+      border-color: @toolbutton-border-color-hover;
+    }
+    &:pressed {
+      background-color: @toolbutton-bg-color-pressed;
+      border-color: @toolbutton-border-color-pressed;
+    }
   }
 }

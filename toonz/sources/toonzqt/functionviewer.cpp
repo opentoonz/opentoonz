@@ -118,9 +118,13 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
     m_leftLayout->addWidget(m_toolbar);
     if (Preferences::instance()->isShowXSheetToolbarEnabled() &&
         Preferences::instance()->isExpandFunctionHeaderEnabled()) {
-      m_leftLayout->addSpacing(66);
+      m_leftLayout->addSpacing(65);
     } else
-      m_leftLayout->addSpacing(36);
+      m_leftLayout->addSpacing(35);
+
+    QString layout = Preferences::instance()->getLoadedXsheetLayout();
+    if (layout == QString("Compact")) m_leftLayout->addSpacing(-18);
+
     m_leftLayout->addWidget(m_numericalColumns);
   }
   leftPanel->setLayout(m_leftLayout);

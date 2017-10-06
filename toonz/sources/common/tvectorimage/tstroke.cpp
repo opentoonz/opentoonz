@@ -1484,8 +1484,7 @@ void TStroke::setControlPoint(int n, const TThickPoint &pos) {
 
 //! Recreate shape
 Reshape TStroke::reshape(const TThickPoint pos[], int count) {
-  if (count == getControlPointCount())
-    return move(pos, count);
+  if (count == getControlPointCount()) return move(pos, count);
 
   // count must be odd and at least 3
   assert(count >= 3);
@@ -1511,8 +1510,7 @@ Reshape TStroke::move(const TThickPoint pos[], int count) {
   QuadStrokeChunkArray &chunkArray = m_imp->m_centerLineArray;
   // i is offset within pos array
   for (int i = 0, chunk = 0; i + 2 < count; i += 2, chunk++)
-    for (int j = 0; j < 3; j++)
-      chunkArray[chunk]->setThickP(j, pos[i + j]);
+    for (int j = 0; j < 3; j++) chunkArray[chunk]->setThickP(j, pos[i + j]);
   countNegativeThickness(pos, count);
 
   invalidate();
@@ -1523,7 +1521,8 @@ Reshape TStroke::move(const TThickPoint pos[], int count) {
 
 //-----------------------------------------------------------------------------
 
-void TStroke::replaceChunks(int from, int to, const vector<TThickQuadratic *> &toAdd) {
+void TStroke::replaceChunks(int from, int to,
+                            const vector<TThickQuadratic *> &toAdd) {
   QuadStrokeChunkArray &chunks = m_imp->m_centerLineArray;
   for (int i = from; i <= to; i++) {
     TThickQuadratic *toRemove = chunks[from];
@@ -3138,9 +3137,9 @@ double NewtonRaphsonRootFind3D(const TThickCubic &cubic, const T3DPointD &p3D,
 
 //---------------------------------------------------------------------------
 int compareDouble(const void *e1, const void *e2) {
-  return (*(double *)e1 < *(double *)e2)
-             ? -1
-             : (*(double *)e1 == *(double *)e2) ? 0 : 1;
+  return (*(double *)e1 < *(double *)e2) ? -1 : (*(double *)e1 == *(double *)e2)
+                                                    ? 0
+                                                    : 1;
 }
 //---------------------------------------------------------------------------
 //! Ricalcola i valori di u[] sulla base del metodo di Newton Raphson

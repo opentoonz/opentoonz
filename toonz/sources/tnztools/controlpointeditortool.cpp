@@ -106,7 +106,6 @@ void getSegmentParameter(ControlPointEditorStroke *cpEditor, int beforeIndex,
 }  // namespace
 ControlPointEditorTool controlPointEditorTool;
 
-
 //=============================================================================
 // Spline Editor Tool
 //-----------------------------------------------------------------------------
@@ -135,18 +134,19 @@ ControlPointEditorTool::ControlPointEditorTool()
 //-----------------------------------------------------------------------------
 
 StrokeId ControlPointEditorTool::makeStrokeId(TVectorImageP vi, int index) {
-  return PathAnimations::appStrokeId(TTool::getApplication(), vi->getStroke(index));
+  return PathAnimations::appStrokeId(TTool::getApplication(),
+                                     vi->getStroke(index));
 }
 
 //-----------------------------------------------------------------------------
 
 void ControlPointEditorTool::subscribeFrameChanged() {
-  if (m_subscribedFrameChanged)
-    return;
+  if (m_subscribedFrameChanged) return;
 
   TTool::Application *app = TTool::getApplication();
-  TFrameHandle *handle = app->getCurrentFrame();
-  handle->connect(handle, &TFrameHandle::frameSwitched, this, &ControlPointEditorTool::frameSwitched);
+  TFrameHandle *handle    = app->getCurrentFrame();
+  handle->connect(handle, &TFrameHandle::frameSwitched, this,
+                  &ControlPointEditorTool::frameSwitched);
   m_subscribedFrameChanged = true;
 
   frameSwitched();
@@ -831,7 +831,7 @@ int ControlPointEditorTool::getCursorId() const {
 
 void ControlPointEditorTool::frameSwitched() {
   TTool::Application *app = TTool::getApplication();
-  int frame = app->getCurrentFrame()->getFrame();
+  int frame               = app->getCurrentFrame()->getFrame();
   m_controlPointEditorStroke.setFrame(frame);
   m_moveControlPointEditorStroke.setFrame(frame);
 }

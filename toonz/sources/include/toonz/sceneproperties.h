@@ -75,6 +75,9 @@ private:
   //! Xsheet Note Color, color number = 7.
   QList<TPixel32> m_notesColor;
 
+  bool m_columnColorFilterOnRender;
+  TFilePath m_camCapSaveInPath;
+
 public:
   /*!
           The constructor creates:
@@ -246,6 +249,25 @@ and height.
 \sa getFieldGuideAspectRatio()
   */
   void setFieldGuideAspectRatio(double ar);
+
+  /* Returns whether the column color filter and transparency is available also
+   * in render */
+  bool isColumnColorFilterOnRenderEnabled() const {
+    return m_columnColorFilterOnRender;
+  }
+
+  /* Activate / deactivate the column color filter in render */
+  void enableColumnColorFilterOnRender(bool on) {
+    m_columnColorFilterOnRender = on;
+  }
+
+  /* Returns initial save in path for the camera capture feature */
+  TFilePath cameraCaptureSaveInPath() const { return m_camCapSaveInPath; }
+
+  /* Set the initial save in path for the camera capture feature */
+  void setCameraCaptureSaveInPath(const TFilePath &fp) {
+    m_camCapSaveInPath = fp;
+  }
 
   //! Substitutes current cameras with those stored in the specified stage tree.
   void cloneCamerasFrom(TStageObjectTree *stageObjects);

@@ -37,7 +37,7 @@ class ControlPointEditorTool final : public QObject, public TTool {
 
   TPropertyGroup m_prop;
   TBoolProperty
-    m_autoSelectDrawing;  // Consente di scegliere se swichare tra i livelli.
+      m_autoSelectDrawing;  // Consente di scegliere se swichare tra i livelli.
 
   enum Action {
     NONE,
@@ -112,7 +112,6 @@ public:
 
 public slots:
   void frameSwitched();
-
 };
 
 #endif

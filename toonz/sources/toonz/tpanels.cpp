@@ -200,9 +200,9 @@ int SchematicScenePanel::getViewType() {
 
 void SchematicScenePanel::showEvent(QShowEvent *e) {
   if (m_schematicViewer->isStageSchematicViewed())
-    setWindowTitle("Stage Schematic");
+    setWindowTitle(QObject::tr("Stage Schematic"));
   else
-    setWindowTitle("Fx Schematic");
+    setWindowTitle(QObject::tr("Fx Schematic"));
 
   TApp *app = TApp::instance();
   connect(m_schematicViewer, SIGNAL(showPreview(TFxP)), this,
@@ -954,15 +954,15 @@ void FlipbookPanel::reset() { m_flipbook->reset(); }
 
 void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   bool ret      = true;
-  int x         = -87;
-  int iconWidth = 17;
+  int x         = -91;
+  int iconWidth = 20;
   // safe area button
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(titleBar, ":Resources/safearea.png",
-                                          ":Resources/safearea_over.png",
-                                          ":Resources/safearea_on.png");
+      new TPanelTitleBarButtonForSafeArea(titleBar, ":Resources/pane_safe_off.svg",
+                                          ":Resources/pane_safe_over.svg",
+                                          ":Resources/pane_safe_on.svg");
   safeAreaButton->setToolTip("Safe Area (Right Click to Select)");
-  titleBar->add(QPoint(x, 1), safeAreaButton);
+  titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
                        CommandManager::instance()->getAction(MI_SafeArea),
                        SLOT(trigger()));
@@ -975,9 +975,9 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   x += 33 + iconWidth;
   // minimize button
-  m_button = new TPanelTitleBarButton(titleBar, ":Resources/minimize.png",
-                                      ":Resources/minimize_over.png",
-                                      ":Resources/minimize_over.png");
+  m_button = new TPanelTitleBarButton(titleBar, ":Resources/pane_minimize.svg",
+                                      ":Resources/pane_minimize_over.svg",
+                                      ":Resources/pane_minimize_on.svg");
   m_button->setToolTip("Minimize");
   m_button->setPressed(false);
 

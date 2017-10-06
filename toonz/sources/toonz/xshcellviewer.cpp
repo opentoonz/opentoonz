@@ -515,11 +515,15 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   m_col = col;
 
   setFixedSize(m_viewer->screenMapper()->rect(PredefinedRect::CELL).size());
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   setFont(font);
   setAlignment(Qt::AlignRight | Qt::AlignBottom);
@@ -634,7 +638,7 @@ void RenameCellField::renameCell() {
         fid = TFrameId(fidRe.cap(1).toInt(),
                        fidRe.cap(2) == "" ? 0 : fidRe.cap(2).toLatin1()[0]);
 #else
-        fid = TFrameId(fidRe.cap(1).toInt(),
+        fid  = TFrameId(fidRe.cap(1).toInt(),
                        fidRe.cap(2) == "" ? 0 : fidRe.cap(2).toAscii()[0]);
 #endif
         FilmstripCmd::renumberDrawing(sl, cell.m_frameId, fid);
@@ -1006,7 +1010,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
       if (!isColumn) continue;
       // Cells appearance depending on the type of column
       if (isSoundColumn)
-        drawSoundCell(p, row, col);
+        drawSoundCell(p, row, col, isReference);
       else if (isPaletteColumn)
         drawPaletteCell(p, row, col, isReference);
       else if (isSoundTextColumn)
@@ -1137,7 +1141,7 @@ void CellArea::drawExtenderHandles(QPainter &p) {
 
 //-----------------------------------------------------------------------------
 
-void CellArea::drawSoundCell(QPainter &p, int row, int col) {
+void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
   const Orientation *o = m_viewer->orientation();
   TXshSoundColumn *soundColumn =
       m_viewer->getXsheet()->getColumn(col)->getSoundColumn();
@@ -1174,8 +1178,13 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col) {
   // get cell colors
   QColor cellColor, sideColor;
   int levelType;
-  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
-                                 isSelected);
+  if (isReference) {
+    cellColor = (isSelected) ? m_viewer->getSelectedReferenceColumnColor()
+                             : m_viewer->getReferenceColumnColor();
+    sideColor = m_viewer->getReferenceColumnBorderColor();
+  } else
+    m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
+                                   isSelected);
 
   // cells background
   p.fillRect(rect, QBrush(cellColor));
@@ -1422,14 +1431,19 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   TXshChildLevel *cl                          = cell.getChildLevel();
   if (cl && cell.getFrameId().getNumber() - 1 >= cl->getFrameCount())
     isRed = true;
-  p.setPen(isRed ? m_viewer->getSelectedColumnTextColor()
-                 : m_viewer->getTextColor());
+  p.setPen(
+      isRed ? QColor(230, 100, 100)  // m_viewer->getSelectedColumnTextColor()
+            : m_viewer->getTextColor());
 
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
@@ -1578,13 +1592,17 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   p.setPen(Qt::black);
   QRect nameRect = o->rect(PredefinedRect::CELL_NAME).translated(QPoint(x, y));
 
-// il nome va scritto se e' diverso dalla cella precedente oppure se
-// siamo su una marker line
+  // il nome va scritto se e' diverso dalla cella precedente oppure se
+  // siamo su una marker line
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
 #ifdef _WIN32
-  static QFont font("Arial", -1, QFont::Normal);
+    fontName = "Arial";
 #else
-  static QFont font("Helvetica", -1, QFont::Normal);
+    fontName          = "Helvetica";
 #endif
+  }
+  static QFont font(fontName, -1, QFont::Normal);
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
 
@@ -1607,7 +1625,7 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   QFontMetrics metric(font);
   QString elidaName = elideText(text, metric, nameRect.width(), "~");
 #else
-  QString elidaName = elideText(text, font, nameRect.width(), "~");
+  QString elidaName   = elideText(text, font, nameRect.width(), "~");
 #endif
 
   if (!sameLevel || prevCell.m_frameId != cell.m_frameId)
@@ -1713,15 +1731,20 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     bool isRed                         = false;
     TXshPaletteLevel *pl               = cell.getPaletteLevel();
     if (pl && !pl->getPalette()) isRed = true;
-    p.setPen(isRed ? m_viewer->getSelectedColumnTextColor()
-                   : m_viewer->getTextColor());
-// il nome va scritto se e' diverso dalla cella precedente oppure se
-// siamo su una marker line
+    p.setPen(
+        isRed ? QColor(230, 100, 100)  // m_viewer->getSelectedColumnTextColor()
+              : m_viewer->getTextColor());
+    // il nome va scritto se e' diverso dalla cella precedente oppure se
+    // siamo su una marker line
+    QString fontName = Preferences::instance()->getInterfaceFont();
+    if (fontName == "") {
 #ifdef _WIN32
-    static QFont font("Arial", -1, QFont::Normal);
+      fontName = "Arial";
 #else
-    static QFont font("Helvetica", -1, QFont::Normal);
+      fontName        = "Helvetica";
 #endif
+    }
+    static QFont font(fontName, -1, QFont::Normal);
     font.setPixelSize(XSHEET_FONT_PX_SIZE);
     p.setFont(font);
     QFontMetrics fm(font);
@@ -2597,6 +2620,8 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe2));
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe3));
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe4));
+        reframeSubMenu->addAction(
+            cmdManager->getAction(MI_ReframeWithEmptyInbetweens));
       }
       menu.addMenu(reframeSubMenu);
 
@@ -2628,6 +2653,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
       menu.addAction(cmdManager->getAction(MI_Rollup));
       menu.addAction(cmdManager->getAction(MI_Rolldown));
       menu.addAction(cmdManager->getAction(MI_TimeStretch));
+      menu.addAction(cmdManager->getAction(MI_AutoInputCellNumber));
       menu.addSeparator();
       menu.addAction(cmdManager->getAction(MI_Autorenumber));
     }

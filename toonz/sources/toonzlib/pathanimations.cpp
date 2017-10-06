@@ -95,13 +95,13 @@ void PathAnimation::updateChunks() {
 
 void PathAnimation::addChunk(const TThickQuadratic *chunk) {
   map<const TThickQuadratic *, TParamSetP>::iterator found =
-    m_lastChunks.find(chunk);
-  if (found != m_lastChunks.end()) // already present
+      m_lastChunks.find(chunk);
+  if (found != m_lastChunks.end())  // already present
     return;
   TParamSetP param = new TParamSet();
   m_lastChunks.insert(pair<const TThickQuadratic *, TParamSetP>(chunk, param));
 
-  m_params->addParam(param, "Chunk ?"); // reindex later
+  m_params->addParam(param, "Chunk ?");  // reindex later
   param->addParam(new TThickPointParam(chunk->getThickP0()), "point0");
   param->addParam(new TThickPointParam(chunk->getThickP1()), "point1");
   param->addParam(new TThickPointParam(chunk->getThickP2()), "point2");
@@ -120,7 +120,7 @@ void PathAnimation::snapshotCurrentChunks(int frame) {
 
 void PathAnimation::snapshotChunk(const TThickQuadratic *chunk, int frame) {
   map<const TThickQuadratic *, TParamSetP>::iterator found =
-    m_lastChunks.find(chunk);
+      m_lastChunks.find(chunk);
   assert(found != m_lastChunks.end());
 
   TParamSetP chunkParam = found->second;
@@ -129,8 +129,7 @@ void PathAnimation::snapshotChunk(const TThickQuadratic *chunk, int frame) {
 }
 
 void PathAnimation::snapshotThickPoint(TThickPointParamP param,
-                                       const TThickPoint &point,
-                                       int frame) {
+                                       const TThickPoint &point, int frame) {
   if (!param) return;
   if (m_activated)
     param->setValue(frame, point);
@@ -161,8 +160,7 @@ void PathAnimation::clearKeyframes() {
 
 set<double> PathAnimation::getKeyframes() const {
   set<double> result;
-  if (!m_lastChunks.size())
-    return result;
+  if (!m_lastChunks.size()) return result;
 
   TParamSetP anyParam = m_lastChunks.begin()->second;
   anyParam->getKeyframes(result);
@@ -210,7 +208,8 @@ shared_ptr<PathAnimation> PathAnimations::addStroke(const StrokeId &strokeId) {
 void PathAnimations::removeStroke(const TStroke *stroke) {
   // remove all mentions of the stroke
   for (map<StrokeId, shared_ptr<PathAnimation>>::iterator it =
-    m_shapeAnimation.begin(); it != m_shapeAnimation.end(); )
+           m_shapeAnimation.begin();
+       it != m_shapeAnimation.end();)
     if (it->first.stroke() == stroke)
       m_shapeAnimation.erase(it++);
     else
@@ -233,16 +232,17 @@ PathAnimations *PathAnimations::appAnimations(const TApplication *app) {
 }
 
 StrokeId PathAnimations::appStrokeId(const TApplication *app, TStroke *stroke) {
-  TXsheet *xsheet = app->getCurrentXsheet()->getXsheet();
+  TXsheet *xsheet  = app->getCurrentXsheet()->getXsheet();
   TXshLevelP level = app->getCurrentLevel()->getLevel();
-  int frame = app->getCurrentFrame()->getFrame();
-  int layer = app->getCurrentColumn()->getColumnIndex();
-  TXshCell cell = xsheet->getCell(CellPosition(frame, layer));
-  return StrokeId { xsheet, cell, stroke };
+  int frame        = app->getCurrentFrame()->getFrame();
+  int layer        = app->getCurrentColumn()->getColumnIndex();
+  TXshCell cell    = xsheet->getCell(CellPosition(frame, layer));
+  return StrokeId{xsheet, cell, stroke};
 }
 
-shared_ptr<PathAnimation> PathAnimations::appStroke(const TApplication *app, TStroke *stroke) {
-  return appAnimations(app)->addStroke(appStrokeId (app, stroke));
+shared_ptr<PathAnimation> PathAnimations::appStroke(const TApplication *app,
+                                                    TStroke *stroke) {
+  return appAnimations(app)->addStroke(appStrokeId(app, stroke));
 }
 
 void PathAnimations::appSnapshot(const TApplication *app, TStroke *stroke) {
@@ -250,7 +250,8 @@ void PathAnimations::appSnapshot(const TApplication *app, TStroke *stroke) {
   animation->takeSnapshot(app->getCurrentFrame()->getFrame());
 }
 
-void PathAnimations::appClearAndSnapshot(const TApplication *app, TStroke *stroke) {
+void PathAnimations::appClearAndSnapshot(const TApplication *app,
+                                         TStroke *stroke) {
   shared_ptr<PathAnimation> animation = appStroke(app, stroke);
   animation->clearKeyframes();
   animation->takeSnapshot(app->getCurrentFrame()->getFrame());

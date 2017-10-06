@@ -268,15 +268,18 @@ public:
         nundo = new UndoCutter(sl, id, oldStroke, strokeIndex,
                                vi->getStroke(strokeIndex)->getId(), -1,
                                fillInformation, sortedWRanges);
-        PathAnimations::appSnapshot(TTool::getApplication(), vi->getStroke(strokeIndex));
+        PathAnimations::appSnapshot(TTool::getApplication(),
+                                    vi->getStroke(strokeIndex));
       } else {
         assert(strokeIndex + 1 < vi->getStrokeCount());
         nundo = new UndoCutter(sl, id, oldStroke, strokeIndex,
                                vi->getStroke(strokeIndex)->getId(),
                                vi->getStroke(strokeIndex + 1)->getId(),
                                fillInformation, sortedWRanges);
-        PathAnimations::appSnapshot(TTool::getApplication(), vi->getStroke(strokeIndex));
-        PathAnimations::appSnapshot(TTool::getApplication(), vi->getStroke(strokeIndex + 1));
+        PathAnimations::appSnapshot(TTool::getApplication(),
+                                    vi->getStroke(strokeIndex));
+        PathAnimations::appSnapshot(TTool::getApplication(),
+                                    vi->getStroke(strokeIndex + 1));
       }
 
       TUndoManager::manager()->add(nundo);

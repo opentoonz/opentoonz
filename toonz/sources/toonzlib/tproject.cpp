@@ -1068,6 +1068,9 @@ void TProjectManager::saveTemplate(ToonzScene *scene) {
   props.assign(scene->getProperties());
   props.cloneCamerasFrom(scene->getXsheet()->getStageObjectTree());
 
+  // camera capture's "save in" path is saved in env, not in the project
+  props.setCameraCaptureSaveInPath(TFilePath());
+
   TProjectP currentProject = getCurrentProject();
   currentProject->setSceneProperties(props);
   currentProject->save();

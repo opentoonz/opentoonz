@@ -121,6 +121,8 @@ protected:
                                           std::vector<TFrameId>,
                                           std::vector<std::string>, bool){};
 
+  virtual void setFid(const TFrameId &fid){};
+
   //! Clears the builder's cached data.
   virtual void invalidate();
 
@@ -258,6 +260,8 @@ public:
   //! Rebinds to a different builder identifier, returning true if the operation
   //! succeeded.
   bool rebind(const std::string &srcId, const std::string &dstId);
+
+  bool renumber(const std::string &srcId, const TFrameId &fid);
 
   //! Unbinds all known identifiers, resetting the image manager to its empty
   //! state.

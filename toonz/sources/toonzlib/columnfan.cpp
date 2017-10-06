@@ -64,7 +64,7 @@ void ColumnFanFoldData::loadData(TIStream &is) {
 // ColumnFanGeometry
 
 namespace {
-  const int FOLDED_SIZE = 9;
+const int FOLDED_SIZE = 9;
 }
 
 int ColumnFanGeometry::Column::width(int unfolded) const {
@@ -87,21 +87,21 @@ void ColumnFanGeometry::setDimension(int unfolded) {
 //-----------------------------------------------------------------------------
 
 void ColumnFanGeometry::update() {
-//???  int lastPos     = -m_unfolded;
-//???  bool lastActive = true;
+  //???  int lastPos     = -m_unfolded;
+  //???  bool lastActive = true;
   int from = 0, to;
   int m    = m_columns.size();
   int i;
   for (i = 0; i < m; i++) {
-/*???
-    bool active = m_columns[i].m_active;
-    if (lastActive)
-      lastPos += m_unfolded;
-    else if (active)
-      lastPos += FOLDED_SIZE;
-    m_columns[i].m_pos = lastPos;
-    lastActive         = active;
-*/
+    /*???
+        bool active = m_columns[i].m_active;
+        if (lastActive)
+          lastPos += m_unfolded;
+        else if (active)
+          lastPos += FOLDED_SIZE;
+        m_columns[i].m_pos = lastPos;
+        lastActive         = active;
+    */
     m_columns[i].m_pos = from;
     to                 = from + m_columns[i].width(m_unfolded);
     if (m_columns[i].m_active)  // advance if this is unfolded
@@ -114,7 +114,7 @@ void ColumnFanGeometry::update() {
   m_table.clear();
   for (i = 0; i < m; i++)
     if (m_columns[i].m_active)
-//???      m_table[m_columns[i].m_pos + m_unfolded - 1] = i;
+      //???      m_table[m_columns[i].m_pos + m_unfolded - 1] = i;
       m_table[m_columns[i].m_pos + m_columns[i].width(m_unfolded) - 1] = i;
     else if (i + 1 < m && m_columns[i + 1].m_active)
       m_table[m_columns[i + 1].m_pos - 1] = i;
@@ -148,19 +148,19 @@ int ColumnFanGeometry::colToLayerAxis(int col) const {
 
 void ColumnFanGeometry::activate(int col) {
   int m = m_columns.size();
-  if (col < m) //{
+  if (col < m)  //{
     m_columns[col].m_active = true;
-/*???
-    int i;
-    for (i = m - 1; i >= 0 && m_columns[i].m_active; i--) {
+  /*???
+      int i;
+      for (i = m - 1; i >= 0 && m_columns[i].m_active; i--) {
+      }
+      i++;
+      if (i < m) {
+        m = i;
+        m_columns.erase(m_columns.begin() + i, m_columns.end());
+      }
     }
-    i++;
-    if (i < m) {
-      m = i;
-      m_columns.erase(m_columns.begin() + i, m_columns.end());
-    }
-  }
-*/
+  */
   update();
 }
 
@@ -185,19 +185,20 @@ bool ColumnFanGeometry::isActive(int col) const {
 
 //-----------------------------------------------------------------------------
 
-void ColumnFanGeometry::updateExtras(const ColumnFan *from, const vector<int> &extras) {
-/* ???
-  for (int i = 0, n = (int)from.m_columns.size(); i < n; i++)
-    if (!from.isActive(i)) deactivate(i);
-//???
-  m_columns = from->m_columns;
-  update();
-*/
+void ColumnFanGeometry::updateExtras(const ColumnFan *from,
+                                     const vector<int> &extras) {
+  /* ???
+    for (int i = 0, n = (int)from.m_columns.size(); i < n; i++)
+      if (!from.isActive(i)) deactivate(i);
+  //???
+    m_columns = from->m_columns;
+    update();
+  */
   m_columns.clear();
-/*???
-  for (int i = 0; i < from->count(); i++)
-  m_columns.push_back(Column(from->isActive(i)));
-*/
+  /*???
+    for (int i = 0; i < from->count(); i++)
+    m_columns.push_back(Column(from->isActive(i)));
+  */
   for (int i = 0; i < extras.size(); i++) {
     Column add(from->isActive(i), extras[i]);
     m_columns.push_back(add);

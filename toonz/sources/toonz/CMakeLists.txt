@@ -29,6 +29,7 @@ set(MOC_HEADERS
     columncommand.h
     columnselection.h
     commandbar.h
+    commandbarpopup.h
     convertpopup.h
     curveio.h
     drawingdata.h
@@ -151,6 +152,8 @@ set(MOC_HEADERS
     locatorpopup.h
     styleshortcutswitchablepanel.h
 	cameracapturelevelcontrol.h
+	reframepopup.h
+	autoinputcellnumberpopup.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -167,6 +170,7 @@ set(SOURCES
     floatingpanelcommand.cpp
     canvassizepopup.cpp
     commandbar.cpp
+    commandbarpopup.cpp
     history.cpp
     loadfoldercommand.cpp
     loadfolderpopup.cpp
@@ -321,6 +325,8 @@ set(SOURCES
     locatorpopup.cpp
     styleshortcutswitchablepanel.cpp
 	cameracapturelevelcontrol.cpp
+	reframepopup.cpp
+	autoinputcellnumberpopup.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp
