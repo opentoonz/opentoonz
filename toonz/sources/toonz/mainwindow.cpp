@@ -31,6 +31,7 @@
 #include "toonz/stylemanager.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
+#include "toonz/txshleveltypes.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -62,6 +63,7 @@ TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
 TEnv::IntVar FieldGuideToggleAction("FieldGuideToggleAction", 0);
 TEnv::IntVar ViewBBoxToggleAction("ViewBBoxToggleAction1", 1);
+TEnv::IntVar EditInPlaceToggleAction("EditInPlaceToggleAction", 0);
 #ifdef LINETEST
 TEnv::IntVar CapturePanelFieldGuideToggleAction(
     "CapturePanelFieldGuideToggleAction", 0);
@@ -1248,6 +1250,8 @@ void MainWindow::onMenuCheckboxChanged() {
     ViewCameraToggleAction = isChecked;
   else if (cm->getAction(MI_ViewTable) == action)
     ViewTableToggleAction = isChecked;
+  else if (cm->getAction(MI_ToggleEditInPlace) == action)
+    EditInPlaceToggleAction = isChecked;
   else if (cm->getAction(MI_ViewBBox) == action)
     ViewBBoxToggleAction = isChecked;
   else if (cm->getAction(MI_FieldGuide) == action)
@@ -1784,7 +1788,11 @@ void MainWindow::defineActions() {
   collapseAction->setIconText("Collapse");
   collapseAction->setIcon(createQIconOnOffPNG("collapse"));
 
-  createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
+  toggle = createToggle(MI_ToggleEditInPlace, tr("&Toggle Edit In Place"), "",
+                        EditInPlaceToggleAction ? 1 : 0, MenuViewCommandType);
+  toggle->setIconText(tr("Toggle Edit in Place"));
+  toggle->setIcon(QIcon(":Resources/edit_in_place.svg"));
+
   createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
   createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
   createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
@@ -2349,9 +2357,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2476,9 +2484,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2505,9 +2513,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene)
-            ? MI_ClearRecentScene
-            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
+                                                        ? MI_ClearRecentLevel
+                                                        : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

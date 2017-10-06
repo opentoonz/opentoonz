@@ -365,7 +365,7 @@ public:
 
   void updateField(TPixel32 value) override;
 
-  QSize getPreferedSize() override { return QSize(360, 40); }
+  QSize getPreferedSize() override { return QSize(480, 40); }
 
   /*-- RgbLinkButtonの実行のため --*/
   TPixel32 getColor();
@@ -413,7 +413,7 @@ public:
 
   void setParams();
 
-  QSize getPreferedSize() override { return QSize(390, 60); }
+  QSize getPreferedSize() override { return QSize(477, 60); }
 
 protected slots:
   void onKeyToggled();
@@ -462,7 +462,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(20, 10); }
+  QSize getPreferedSize() override { return QSize(20, 15); }
 
 protected slots:
   void onToggled(bool checked);
@@ -491,7 +491,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(50, 28); }
+  QSize getPreferedSize() override { return QSize(50, 20); }
 
 protected slots:
   void onChange(bool isDragging = false);

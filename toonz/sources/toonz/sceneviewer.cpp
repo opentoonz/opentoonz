@@ -278,6 +278,7 @@ void ToggleCommandHandler::execute() {
 //-----------------------------------------------------------------------------
 
 ToggleCommandHandler viewTableToggle(MI_ViewTable, false);
+ToggleCommandHandler editInPlaceToggle(MI_ToggleEditInPlace, false);
 ToggleCommandHandler fieldGuideToggle(MI_FieldGuide, false);
 ToggleCommandHandler safeAreaToggle(MI_SafeArea, false);
 ToggleCommandHandler rasterizePliToggle(MI_RasterizePli, false);
@@ -1587,8 +1588,8 @@ void SceneViewer::drawScene() {
   clipRect += TPoint(width() * 0.5, height() * 0.5);
 
   ChildStack *childStack = scene->getChildStack();
-  bool editInPlace =
-      childStack->getEditInPlace() && !app->getCurrentFrame()->isEditingLevel();
+  bool editInPlace       = editInPlaceToggle.getStatus() &&
+                     !app->getCurrentFrame()->isEditingLevel();
 
   bool fillFullColorRaster = TXshSimpleLevel::m_fillFullColorRaster;
   TXshSimpleLevel::m_fillFullColorRaster = false;

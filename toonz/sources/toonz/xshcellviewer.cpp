@@ -1169,13 +1169,12 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
   QColor cellColor, sideColor;
   int levelType;
   if (isReference) {
-	  cellColor = (isSelected) ? m_viewer->getSelectedReferenceColumnColor()
-		  : m_viewer->getReferenceColumnColor();
-	  sideColor = m_viewer->getReferenceColumnBorderColor();
-  }
-  else
-	  m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
-		  isSelected);
+    cellColor = (isSelected) ? m_viewer->getSelectedReferenceColumnColor()
+                             : m_viewer->getReferenceColumnColor();
+    sideColor = m_viewer->getReferenceColumnBorderColor();
+  } else
+    m_viewer->getCellTypeAndColors(levelType, cellColor, sideColor, cell,
+                                   isSelected);
 
   // cells background
   p.fillRect(rect, QBrush(cellColor));
@@ -1422,8 +1421,9 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   TXshChildLevel *cl                          = cell.getChildLevel();
   if (cl && cell.getFrameId().getNumber() - 1 >= cl->getFrameCount())
     isRed = true;
-  p.setPen(isRed ? m_viewer->getSelectedColumnTextColor()
-                 : m_viewer->getTextColor());
+  p.setPen(
+      isRed ? QColor(230, 100, 100)  // m_viewer->getSelectedColumnTextColor()
+            : m_viewer->getTextColor());
 
   QString fontName = Preferences::instance()->getInterfaceFont();
   if (fontName == "") {
@@ -1702,8 +1702,9 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     bool isRed                         = false;
     TXshPaletteLevel *pl               = cell.getPaletteLevel();
     if (pl && !pl->getPalette()) isRed = true;
-    p.setPen(isRed ? m_viewer->getSelectedColumnTextColor()
-                   : m_viewer->getTextColor());
+    p.setPen(
+        isRed ? QColor(230, 100, 100)  // m_viewer->getSelectedColumnTextColor()
+              : m_viewer->getTextColor());
     // il nome va scritto se e' diverso dalla cella precedente oppure se
     // siamo su una marker line
     QString fontName = Preferences::instance()->getInterfaceFont();

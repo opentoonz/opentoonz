@@ -188,6 +188,7 @@ private slots:
   void onWatchFileSystemClicked(int);
   void onInterfaceFontChanged(int index);
   void onInterfaceFontWeightChanged(int index);
+  void onXsheetLayoutChanged(const QString &text);
 };
 
 //**********************************************************************************

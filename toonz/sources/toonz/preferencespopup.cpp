@@ -1047,8 +1047,16 @@ void PreferencesPopup::onExpandFunctionHeaderClicked(bool checked) {
   m_pref->enableExpandFunctionHeader(checked);
 }
 
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onShowColumnNumbersChanged(int index) {
   m_pref->enableShowColumnNumbers(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onXsheetLayoutChanged(const QString &text) {
+  m_pref->setXsheetLayoutPreference(text.toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -1241,6 +1249,10 @@ PreferencesPopup::PreferencesPopup()
       new DVGui::FileField(this, QString("desktop"), false, true);
   m_ffmpegTimeout = new DVGui::IntLineEdit(this, 30, 1);
 
+  QLabel *note_io =
+      new QLabel(tr("* Changes will take effect the next time you run Toonz"));
+  note_io->setStyleSheet("font-size: 10px; font: italic;");
+
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
 
@@ -1292,6 +1304,16 @@ PreferencesPopup::PreferencesPopup()
       this);
   CheckBox *showColumnNumbersCB =
       new CheckBox(tr("Show Column Numbers in Column Headers"), this);
+  QStringList xsheetLayouts;
+  xsheetLayouts << tr("Classic") << tr("Classic-revised") << tr("Compact");
+  QComboBox *xsheetLayoutOptions = new QComboBox(this);
+  xsheetLayoutOptions->addItems(xsheetLayouts);
+  xsheetLayoutOptions->setCurrentIndex(
+      xsheetLayoutOptions->findText(m_pref->getXsheetLayoutPreference()));
+
+  QLabel *note_xsheet =
+      new QLabel(tr("* Changes will take effect the next time you run Toonz"));
+  note_xsheet->setStyleSheet("font-size: 10px; font: italic;");
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1987,7 +2009,7 @@ PreferencesPopup::PreferencesPopup()
       ioLay->addLayout(ioGridLay);
       ioLay->addStretch(1);
 
-      ioLay->addWidget(note_version, 0);
+      ioLay->addWidget(note_io, 0);
     }
     ioBox->setLayout(ioLay);
     stackedWidget->addWidget(ioBox);
@@ -2049,45 +2071,62 @@ PreferencesPopup::PreferencesPopup()
     }
 
     //--- Xsheet --------------------------
-    QWidget *xsheetBox          = new QWidget(this);
-    QGridLayout *xsheetFrameLay = new QGridLayout();
-    xsheetFrameLay->setMargin(15);
-    xsheetFrameLay->setHorizontalSpacing(15);
-    xsheetFrameLay->setVerticalSpacing(11);
+    QWidget *xsheetBox             = new QWidget(this);
+    QVBoxLayout *xsheetBoxFrameLay = new QVBoxLayout();
+    xsheetBoxFrameLay->setMargin(15);
+    xsheetBoxFrameLay->setSpacing(10);
     {
-      xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")), 0,
-                                0, Qt::AlignRight | Qt::AlignVCenter);
-      xsheetFrameLay->addWidget(m_xsheetStep, 0, 1);
-
-      xsheetFrameLay->addWidget(xsheetAutopanDuringPlaybackCB, 1, 0, 1, 2);
-
-      xsheetFrameLay->addWidget(new QLabel(tr("Cell-dragging Behaviour:")), 2,
-                                0, Qt::AlignRight | Qt::AlignVCenter);
-      xsheetFrameLay->addWidget(m_cellsDragBehaviour, 2, 1);
-
-      xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 3, 0, 1, 2);
-      xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
-      xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 5, 0, 1, 2);
-      xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 6, 0, 1, 2);
-      xsheetFrameLay->addWidget(shortcutCommandsWhileRenamingCellCB, 7, 0, 1,
-                                2);
-
-      QVBoxLayout *xSheetToolbarLay = new QVBoxLayout();
-      xSheetToolbarLay->setMargin(10);
+      QGridLayout *xsheetFrameLay = new QGridLayout();
+      xsheetFrameLay->setMargin(0);
+      xsheetFrameLay->setHorizontalSpacing(15);
+      xsheetFrameLay->setVerticalSpacing(10);
       {
-        xSheetToolbarLay->addWidget(m_expandFunctionHeader, 0,
-                                    Qt::AlignLeft | Qt::AlignVCenter);
-      }
-      m_showXSheetToolbar->setLayout(xSheetToolbarLay);
+        xsheetFrameLay->addWidget(new QLabel(tr("Layout Preference*:")), 0, 0,
+                                  Qt::AlignRight | Qt::AlignVCenter);
+        xsheetFrameLay->addWidget(xsheetLayoutOptions, 0, 1);
 
-      xsheetFrameLay->addWidget(m_showXSheetToolbar, 8, 0, 3, 3);
-      xsheetFrameLay->addWidget(showColumnNumbersCB, 11, 0, 1, 2);
+        xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")),
+                                  1, 0, Qt::AlignRight | Qt::AlignVCenter);
+        xsheetFrameLay->addWidget(m_xsheetStep, 1, 1);
+
+        xsheetFrameLay->addWidget(xsheetAutopanDuringPlaybackCB, 2, 0, 1, 2);
+
+        xsheetFrameLay->addWidget(new QLabel(tr("Cell-dragging Behaviour:")), 3,
+                                  0, Qt::AlignRight | Qt::AlignVCenter);
+        xsheetFrameLay->addWidget(m_cellsDragBehaviour, 3, 1);
+
+        xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 4, 0, 1, 2);
+        xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 5, 0, 1, 2);
+        xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 6, 0, 1,
+                                  2);
+        xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 7, 0, 1,
+                                  2);
+        xsheetFrameLay->addWidget(shortcutCommandsWhileRenamingCellCB, 8, 0, 1,
+                                  2);
+
+        QVBoxLayout *xSheetToolbarLay = new QVBoxLayout();
+        xSheetToolbarLay->setMargin(11);
+        {
+          xSheetToolbarLay->addWidget(m_expandFunctionHeader, 0,
+                                      Qt::AlignLeft | Qt::AlignVCenter);
+        }
+        m_showXSheetToolbar->setLayout(xSheetToolbarLay);
+
+        xsheetFrameLay->addWidget(m_showXSheetToolbar, 9, 0, 3, 3);
+        xsheetFrameLay->addWidget(showColumnNumbersCB, 12, 0, 1, 2);
+      }
+      xsheetFrameLay->setColumnStretch(0, 0);
+      xsheetFrameLay->setColumnStretch(1, 0);
+      xsheetFrameLay->setColumnStretch(2, 1);
+      xsheetFrameLay->setRowStretch(13, 1);
+
+      xsheetBoxFrameLay->addLayout(xsheetFrameLay);
+
+      xsheetBoxFrameLay->addStretch(1);
+
+      xsheetBoxFrameLay->addWidget(note_xsheet, 0);
     }
-    xsheetFrameLay->setColumnStretch(0, 0);
-    xsheetFrameLay->setColumnStretch(1, 0);
-    xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(12, 1);
-    xsheetBox->setLayout(xsheetFrameLay);
+    xsheetBox->setLayout(xsheetBoxFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
     //--- Animation --------------------------
@@ -2460,6 +2499,9 @@ PreferencesPopup::PreferencesPopup()
 
   ret = ret && connect(showColumnNumbersCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onShowColumnNumbersChanged(int)));
+  ret = ret && connect(xsheetLayoutOptions,
+                       SIGNAL(currentIndexChanged(const QString &)), this,
+                       SLOT(onXsheetLayoutChanged(const QString &)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),
