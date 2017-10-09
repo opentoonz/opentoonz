@@ -384,7 +384,7 @@ void FilmstripFrames::hideEvent(QHideEvent *) {
   TApp *app = TApp::instance();
 
   // cambiamenti al livello
-  disconnect(app->getCurrentLevel());
+  disconnect(app->getCurrentLevel(), 0, this, 0);
 
   // al frame corrente
   disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
@@ -1007,7 +1007,9 @@ void FilmstripFrames::onFrameSwitched() {
   if (index >= 0) {
     exponeFrame(index);
     // clear selection and select only the destination frame
-    select(index, ONLY_SELECT);
+    TFilmstripSelection *fsSelection =
+        dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
+    if (fsSelection) select(index, ONLY_SELECT);
   }
   update();
 }

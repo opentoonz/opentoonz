@@ -473,15 +473,17 @@ public:
 
     cloneColumn(cells, newLevelPath);
 
+    TFilePath tmpPath = newLevelPath.withName(
+        QString::fromStdString(newLevelPath.getName() + "_tmp").toStdWString());
+
     it = indices.begin();
     ++it;
     for (int count = 0; it != indices.end();) {
       int index = *it;
       it++;
       mergeCmapped(destColumn, index - count,
-                   it == indices.end()
-                       ? QString::fromStdWString(newLevelPath.getWideString())
-                       : "",
+                   it == indices.end() ? newLevelPath.getQString()
+                                       : tmpPath.getQString(),
                    false);
       ColumnCmd::deleteColumn(index - count);
       progress.setValue(++count);

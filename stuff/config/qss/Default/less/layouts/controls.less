@@ -2,14 +2,15 @@
    QT USER CONTROL CLASSES
 ----------------------------------------------------------------------------- */
 
-// Styling Qt controls is best done by extending to a mixin.
+// Styling Qt controls is best done by extending to a mixin placeholder.
 //
 // This is because if we style the Qt class directly, when we want to extend
-// the style to a different class the compiler will get confused because Qt
-// classes are unknown in LESS.
+// the style to a different class the compiler will get confused.
 //
-// In summary, when you want to use the style of a user control make sure to
-// extend to the mixin and not the Qt class.
+// Compiler doesn't understand QSS classes?
+//
+// Summary, when we want to use the style of a control somewhere else make sure
+// to extend to the mixin placeholder (.) and NOT the QSS class (Q).
 
 /* -----------------------------------------------------------------------------
    Button
@@ -28,7 +29,7 @@
     background-color: @button-bg-color-hover;
     border-color: @button-border-color-hover;
     color: @button-text-color-hover;
-  }
+  } 
   &:pressed {
     background-color: @button-bg-color-pressed;
     border-color: @button-border-color-pressed;
@@ -58,14 +59,6 @@ QPushButton { // Qt Class (do not extend to this)
 
 #PushButton_NoPadding {
   padding: 3px;
-}
-
-#GearButton { /* Camera Capture */
-    qproperty-icon: url('@{img-url}/gear.svg');
-}
-
-#SubfolderButton { /* Camera Capture */
-    qproperty-icon: url('@{img-url}/subfolder.svg');
 }
 
 /* -----------------------------------------------------------------------------
@@ -270,7 +263,7 @@ QGroupBox { // Qt Class (do not extend to this)
   }
   &::handle:horizontal {
     width: @slider-handle-width;
-    margin: -2px 0 -2px 0;
+    margin: @slider-handle-margin;
     image: url('@{img-url}/@{slider-handle-img}');
     &:disabled {
       image: url('@{img-url}/@{slider-handle-img-disabled}');

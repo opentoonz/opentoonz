@@ -224,6 +224,12 @@ Preferences::Preferences()
     , m_cameraUnits("inch")
     , m_currentRoomChoice("Default")
     , m_scanLevelType("tif")
+#ifdef _WIN32
+    , m_interfaceFont("Segoe UI")
+#else
+    , m_interfaceFont("Helvetica")
+#endif
+    , m_interfaceFontWeight(0)
     , m_defLevelWidth(0.0)
     , m_defLevelHeight(0.0)
     , m_defLevelDpi(0.0)
@@ -317,9 +323,13 @@ Preferences::Preferences()
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
+    , m_guidedDrawingType(0)
+    , m_animatedGuidedDrawing(false)
     , m_ignoreImageDpi(false)
     , m_watchFileSystem(true)
-    , m_shortcutCommandsWhileRenamingCellEnabled(false) {
+    , m_shortcutCommandsWhileRenamingCellEnabled(false)
+    , m_xsheetLayoutPreference("Classic-revised")
+    , m_loadedXsheetLayout("Classic-revised") {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -329,6 +339,8 @@ Preferences::Preferences()
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
   TFilePath prefPath  = layoutDir + TFilePath("preferences.ini");
 
+  bool existingUser = true;
+
   // In case the personal settings is not exist (for new users)
   if (!TFileStatus(prefPath).doesExist()) {
     TFilePath templatePath =
@@ -336,6 +348,8 @@ Preferences::Preferences()
     // If there is the template, copy it to the personal one
     if (TFileStatus(templatePath).doesExist())
       TSystem::copyFile(prefPath, templatePath);
+
+    existingUser = false;
   }
 
   m_settings.reset(new QSettings(
@@ -601,8 +615,14 @@ Preferences::Preferences()
   QString shortcutPreset = m_settings->value("shortcutPreset").toString();
   if (shortcutPreset != "") m_shortcutPreset = shortcutPreset;
   setShortcutPreset(m_shortcutPreset.toStdString());
+  QString interfaceFont = m_settings->value("interfaceFont").toString();
+  if (interfaceFont != "") m_interfaceFont = interfaceFont;
+  setInterfaceFont(m_interfaceFont.toStdString());
+  getValue(*m_settings, "interfaceFontWeight", m_interfaceFontWeight);
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "guidedDrawingType", m_guidedDrawingType);
+  getValue(*m_settings, "animatedGuidedDrawing", m_animatedGuidedDrawing);
   getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
            m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
@@ -618,6 +638,17 @@ Preferences::Preferences()
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
   getValue(*m_settings, "shortcutCommandsWhileRenamingCellEnabled",
            m_shortcutCommandsWhileRenamingCellEnabled);
+
+  QString xsheetLayoutPreference;
+  xsheetLayoutPreference =
+      m_settings->value("xsheetLayoutPreference").toString();
+  if (xsheetLayoutPreference != "")
+    m_xsheetLayoutPreference = xsheetLayoutPreference;
+  else if (existingUser)  // Existing users with missing preference defaults to
+                          // Classic. New users will be Classic-revised
+    m_xsheetLayoutPreference = QString("Classic");
+  setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
+  m_loadedXsheetLayout = m_xsheetLayoutPreference;
 }
 
 //-----------------------------------------------------------------
@@ -1212,6 +1243,20 @@ QString Preferences::getCurrentStyleSheetName() const {
 
 //-----------------------------------------------------------------
 
+void Preferences::setInterfaceFont(std::string font) {
+  m_interfaceFont = QString::fromStdString(font);
+  m_settings->setValue("interfaceFont", m_interfaceFont);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setInterfaceFontWeight(int weight) {
+  m_interfaceFontWeight = weight;
+  m_settings->setValue("interfaceFontWeight", m_interfaceFontWeight);
+}
+
+//-----------------------------------------------------------------
+
 QString Preferences::getCurrentStyleSheetPath() const {
   if (m_currentStyleSheet.isEmpty()) return QString();
   TFilePath path(TEnv::getConfigDir() + "qss");
@@ -1429,6 +1474,20 @@ void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setGuidedDrawing(int status) {
+  m_guidedDrawingType = status;
+  m_settings->setValue("guidedDrawingType", status);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setAnimatedGuidedDrawing(bool status) {
+  m_animatedGuidedDrawing = status;
+  m_settings->setValue("animatedGuidedDrawing", status);
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableNewLevelSizeToCameraSize(bool on) {
   m_newLevelSizeToCameraSizeEnabled = on;
   m_settings->setValue("newLevelSizeToCameraSizeEnabled", on ? "1" : "0");
@@ -1458,6 +1517,15 @@ void Preferences::enableExpandFunctionHeader(bool on) {
 void Preferences::enableShowColumnNumbers(bool on) {
   m_showColumnNumbers = on;
   m_settings->setValue("showColumnNumbers", on ? "1" : "0");
+}
+
+void Preferences::setXsheetLayoutPreference(std::string layout) {
+  m_xsheetLayoutPreference = QString::fromStdString(layout);
+  m_settings->setValue("xsheetLayoutPreference", m_xsheetLayoutPreference);
+}
+
+void Preferences::setLoadedXsheetLayout(std::string layout) {
+  m_loadedXsheetLayout = QString::fromStdString(layout);
 }
 
 //-----------------------------------------------------------------

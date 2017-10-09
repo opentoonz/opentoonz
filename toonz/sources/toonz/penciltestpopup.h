@@ -150,18 +150,25 @@ class PencilTestSaveInFolderPopup : public DVGui::Dialog {
   QLineEdit *m_projectField, *m_episodeField, *m_sequenceField, *m_sceneField,
       *m_subFolderNameField;
 
-  QCheckBox *m_subFolderCB, *m_autoSubNameCB;
+  QCheckBox *m_subFolderCB, *m_autoSubNameCB, *m_createSceneInFolderCB;
   QComboBox* m_subNameFormatCombo;
+
+  void createSceneInFolder();
 
 public:
   PencilTestSaveInFolderPopup(QWidget* parent = 0);
   QString getPath();
   QString getParentPath();
+  void updateParentFolder();
+
+protected:
+  void showEvent(QShowEvent* event);
 
 protected slots:
   void updateSubFolderName();
   void onAutoSubNameCBClicked(bool);
   void onShowPopupOnLaunchCBClicked(bool);
+  void onCreateSceneInFolderCBClicked(bool);
   void onSetAsDefaultBtnPressed();
   void onOkPressed();
 };
@@ -251,6 +258,9 @@ protected slots:
   void onCaptureFilterSettingsBtnPressed();
 
   void refreshFrameInfo();
+
+  void onSaveInPathEdited();
+  void onSceneSwitched();
 
 public slots:
   void openSaveInFolderPopup();

@@ -1141,13 +1141,13 @@ void LineTestCapturePane::initializeTitleBar(TPanelTitleBar *titleBar) {
   bool ret = true;
 
   int x         = -50;
-  int iconWidth = 17;
+  int iconWidth = 20;
   TPanelTitleBarButton *button;
-  button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
-                                    ":Resources/freeze_over.png",
-                                    ":Resources/freeze_on.png");
+  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_freeze_off.svg",
+                                    ":Resources/pane_freeze_over.svg",
+                                    ":Resources/pane_freeze_on.svg");
   button->setToolTip("Freeze");
-  titleBar->add(QPoint(x, 2), button);
+  titleBar->add(QPoint(x, 0), button);
   ret = ret && connect(button, SIGNAL(toggled(bool)), this, SLOT(freeze(bool)));
 
   assert(ret);

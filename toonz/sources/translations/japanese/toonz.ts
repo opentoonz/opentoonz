@@ -143,6 +143,85 @@ Please select a different device or check the microphone.</source>
     </message>
 </context>
 <context>
+    <name>AutoInputCellNumberPopup</name>
+    <message>
+        <source>Auto Input Cell Number</source>
+        <translation>セルの自動入力</translation>
+    </message>
+    <message>
+        <source>Overwrite</source>
+        <translation>上書き</translation>
+    </message>
+    <message>
+        <source>Insert</source>
+        <translation>挿入</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>with</source>
+        <translation> </translation>
+    </message>
+    <message>
+        <source>frames increment</source>
+        <translation>番ごとに</translation>
+    </message>
+    <message>
+        <source>inserting</source>
+        <translation> </translation>
+    </message>
+    <message>
+        <source>empty cell intervals</source>
+        <translation>フレームおいて</translation>
+    </message>
+    <message>
+        <source>cell steps</source>
+        <translation>フレームずつ配置</translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation>を</translation>
+    </message>
+    <message>
+        <source>times</source>
+        <translation>回繰り返す</translation>
+    </message>
+    <message>
+        <source>No available cells or columns are selected.</source>
+        <translation>入力可能なコマまたは列が選択されていません。</translation>
+    </message>
+    <message>
+        <source>Selected level has no frames between From and To.</source>
+        <translation>指定されたフレーム範囲に動画がありません。</translation>
+    </message>
+    <message>
+        <source>Setting this value 0 will automatically 
+pick up all frames in the selected level.</source>
+        <translation>この値を０にすると、選択されたレベルの
+全てのフレームを自動的に配置します。</translation>
+    </message>
+    <message>
+        <source>From frame</source>
+        <translation>セルの</translation>
+    </message>
+    <message>
+        <source> </source>
+        <comment>from frame</comment>
+        <translation>番から</translation>
+    </message>
+    <message>
+        <source>To frame</source>
+        <translation> </translation>
+    </message>
+    <message>
+        <source> </source>
+        <comment>to frame</comment>
+        <translation>番までを</translation>
+    </message>
+</context>
+<context>
     <name>AutocenterPopup</name>
     <message>
         <source>Autocenter</source>
@@ -804,6 +883,22 @@ What do you want to do?</source>
     <message>
         <source>Field Guide</source>
         <translation>フィールドガイド</translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation>下</translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation>上</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation>左</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation>右</translation>
     </message>
 </context>
 <context>
@@ -4632,12 +4727,20 @@ Do you want to create it?</source>
         <translation>新規ラスターレベル</translation>
     </message>
     <message>
+        <source>Auto Input Cell Number...</source>
+        <translation>セルの自動入力...</translation>
+    </message>
+    <message>
         <source>Alpha Channel</source>
         <translation>アルファチャンネル</translation>
     </message>
     <message>
         <source>&amp;Command Bar</source>
         <translation>コマンドバー (&amp;C)</translation>
+    </message>
+    <message>
+        <source>Reframe with Empty Inbetweens...</source>
+        <translation>空コマを入れてリフレーム...</translation>
     </message>
 </context>
 <context>
@@ -5598,6 +5701,18 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
         <translation>
 警告： 画像サイズの不一致。保存されている画像のサイズは %1 x %2 ピクセルです。</translation>
     </message>
+    <message>
+        <source>Color</source>
+        <translation>カラー</translation>
+    </message>
+    <message>
+        <source>Grayscale</source>
+        <translation>グレースケール</translation>
+    </message>
+    <message>
+        <source>Black &amp; White</source>
+        <translation>白黒二値</translation>
+    </message>
 </context>
 <context>
     <name>PencilTestSaveInFolderPopup</name>
@@ -5692,6 +5807,16 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     <message>
         <source>Set the current &quot;Save In&quot; path as the default.</source>
         <translation>現在の「作成場所」のパスを既定にします。</translation>
+    </message>
+    <message>
+        <source>Save Scene in Subfolder</source>
+        <translation>カットフォルダ内にシーンを保存する</translation>
+    </message>
+    <message>
+        <source>Save the current scene in the subfolder.
+          Set the output folder path to the subfolder as well.</source>
+        <translation>シーンをカットフォルダ内に保存します。
+出力設定の保存先のパスもカットフォルダ内に変更します。</translation>
     </message>
 </context>
 <context>
@@ -6517,6 +6642,34 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Enable OpenToonz Commands&apos; Shortcut Keys While Renaming Cell</source>
         <translation>タイムシートのコマ入力時にOpenToonzコマンドのショートカットキーを有効にする</translation>
+    </message>
+    <message>
+        <source>Life is too short for Comic Sans</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Good luck.  You&apos;re on your own from here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font *:</source>
+        <translation>フォント *：</translation>
+    </message>
+    <message>
+        <source>Font Weight *:</source>
+        <translation>文字の太さ *：</translation>
+    </message>
+    <message>
+        <source>Arrow Markers</source>
+        <translation>矢印マーカー</translation>
+    </message>
+    <message>
+        <source>Animated Guide</source>
+        <translation>アニメーションガイド</translation>
+    </message>
+    <message>
+        <source>Vector Guided Style:</source>
+        <translation>ベクターレベルの描き順のガイド：</translation>
     </message>
 </context>
 <context>
@@ -8232,8 +8385,63 @@ Are you sure?</source>
         <translation>レイヤー名</translation>
     </message>
     <message>
+        <source>Auto Input Cell Numbers : %1</source>
+        <translation>セルの自動入力：</translation>
+    </message>
+    <message>
+        <source>Insert</source>
+        <translation>挿入</translation>
+    </message>
+    <message>
         <source>Command Bar</source>
         <translation>コマンドバー</translation>
+    </message>
+    <message>
+        <source>Reframe to %1&apos;s with %2 blanks</source>
+        <translation>リフレーム： %1 コマ 中 %2</translation>
+    </message>
+    <message>
+        <source>Stage Schematic</source>
+        <translation>ステージスキマティック</translation>
+    </message>
+    <message>
+        <source>Fx Schematic</source>
+        <translation>エフェクトスキマティック</translation>
+    </message>
+</context>
+<context>
+    <name>ReframePopup</name>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>steps</source>
+        <translation>コマ</translation>
+    </message>
+    <message>
+        <source>with</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>(</source>
+        <translation>(</translation>
+    </message>
+    <message>
+        <source> blank cells will be inserted.)</source>
+        <translation>コマの空コマが挿入されます。)</translation>
+    </message>
+    <message>
+        <source>Reframe with Empty Inbetweens</source>
+        <translation>空コマを入れてリフレーム</translation>
+    </message>
+    <message>
+        <source>empty inbetweens</source>
+        <translation> </translation>
     </message>
 </context>
 <context>
@@ -9442,6 +9650,10 @@ Please commit or revert changes first.</source>
         <source>  Start Frame:</source>
         <translation>開始フレーム：</translation>
     </message>
+    <message>
+        <source>Enable Column Color Filter and Transparency for Rendering</source>
+        <translation>列のメインビューア表示の不透明度とカラーフィルタの設定をレンダリングにも用いる</translation>
+    </message>
 </context>
 <context>
     <name>SceneViewerContextMenu</name>
@@ -9492,6 +9704,26 @@ Please commit or revert changes first.</source>
     <message>
         <source>Select Column</source>
         <translation>列を選択</translation>
+    </message>
+    <message>
+        <source>Vector Guided Drawing</source>
+        <translation>ベクターレベルの描き順のガイド</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>オフ</translation>
+    </message>
+    <message>
+        <source>Closest Drawing</source>
+        <translation>直近の作画</translation>
+    </message>
+    <message>
+        <source>Farthest Drawing</source>
+        <translation>最も遠い作画</translation>
+    </message>
+    <message>
+        <source>All Drawings</source>
+        <translation>全ての作画</translation>
     </message>
 </context>
 <context>
@@ -10761,35 +10993,35 @@ Please refer to the user guide for details.</source>
     <name>XsheetGUI::ColumnTransparencyPopup</name>
     <message>
         <source>None</source>
-        <translation>なし</translation>
+        <translation type="vanished">なし</translation>
     </message>
     <message>
         <source>Red</source>
-        <translation>赤</translation>
+        <translation type="vanished">赤</translation>
     </message>
     <message>
         <source>Green</source>
-        <translation>緑</translation>
+        <translation type="vanished">緑</translation>
     </message>
     <message>
         <source>Blue</source>
-        <translation>青</translation>
+        <translation type="vanished">青</translation>
     </message>
     <message>
         <source>DarkYellow</source>
-        <translation>暗い黄色</translation>
+        <translation type="vanished">暗い黄色</translation>
     </message>
     <message>
         <source>DarkCyan</source>
-        <translation>暗いシアン</translation>
+        <translation type="vanished">暗いシアン</translation>
     </message>
     <message>
         <source>DarkMagenta</source>
-        <translation>暗いマゼンタ</translation>
+        <translation type="vanished">暗いマゼンタ</translation>
     </message>
     <message>
         <source>N.B. Filter doesn&apos;t affect vector levels</source>
-        <translation>※ カラーフィルタはベクターレベルには適用されません</translation>
+        <translation type="vanished">※ カラーフィルタはベクターレベルには適用されません</translation>
     </message>
     <message>
         <source>Filter:</source>

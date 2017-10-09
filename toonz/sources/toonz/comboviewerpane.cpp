@@ -432,16 +432,16 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   TPanelTitleBarButtonSet *viewModeButtonSet;
   m_referenceModeBs = viewModeButtonSet = new TPanelTitleBarButtonSet();
   int x                                 = -232;
-  int iconWidth                         = 17;
+  int iconWidth                         = 20;
   TPanelTitleBarButton *button;
 
   // buttons for show / hide toggle for the field guide and the safe area
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(titleBar, ":Resources/safearea.png",
-                                          ":Resources/safearea_over.png",
-                                          ":Resources/safearea_on.png");
+      new TPanelTitleBarButtonForSafeArea(titleBar, ":Resources/pane_safe_off.svg",
+                                          ":Resources/pane_safe_over.svg",
+                                          ":Resources/pane_safe_on.svg");
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
-  titleBar->add(QPoint(x, 1), safeAreaButton);
+  titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
                        CommandManager::instance()->getAction(MI_SafeArea),
                        SLOT(trigger()));
@@ -452,12 +452,12 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   safeAreaButton->setPressed(
       CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
 
-  button = new TPanelTitleBarButton(titleBar, ":Resources/fieldguide.png",
-                                    ":Resources/fieldguide_over.png",
-                                    ":Resources/fieldguide_on.png");
+  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_grid_off.svg",
+                                    ":Resources/pane_grid_over.svg",
+                                    ":Resources/pane_grid_on.svg");
   button->setToolTip(tr("Field Guide"));
-  x += 5 + iconWidth;
-  titleBar->add(QPoint(x, 1), button);
+  x += 1 + iconWidth;
+  titleBar->add(QPoint(x, 0), button);
   ret = ret && connect(button, SIGNAL(toggled(bool)),
                        CommandManager::instance()->getAction(MI_FieldGuide),
                        SLOT(trigger()));
@@ -468,61 +468,61 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
       CommandManager::instance()->getAction(MI_FieldGuide)->isChecked());
 
   // view mode toggles
-  button = new TPanelTitleBarButton(titleBar, ":Resources/standard.png",
-                                    ":Resources/standard_over.png",
-                                    ":Resources/standard_on.png");
+  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_table_off.svg",
+                                    ":Resources/pane_table_over.svg",
+                                    ":Resources/pane_table_on.svg");
   button->setToolTip(tr("Camera Stand View"));
   x += 10 + iconWidth;
-  titleBar->add(QPoint(x, 1), button);
+  titleBar->add(QPoint(x, 0), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::NORMAL_REFERENCE);
   button->setPressed(true);
 
-  button = new TPanelTitleBarButton(titleBar, ":Resources/3D.png",
-                                    ":Resources/3D_over.png",
-                                    ":Resources/3D_on.png");
+  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_3d_off.svg",
+                                    ":Resources/pane_3d_over.svg",
+                                    ":Resources/pane_3d_on.svg");
   button->setToolTip(tr("3D View"));
-  x += 19;  // width of standard.png = 18pixels
-  titleBar->add(QPoint(x, 1), button);
+  x += 21;  // width of pane_table_off.svg = 20px
+  titleBar->add(QPoint(x, 0), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA3D_REFERENCE);
 
-  button = new TPanelTitleBarButton(titleBar, ":Resources/view_camera.png",
-                                    ":Resources/view_camera_over.png",
-                                    ":Resources/view_camera_on.png");
+  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_cam_off.svg",
+                                    ":Resources/pane_cam_over.svg",
+                                    ":Resources/pane_cam_on.svg");
   button->setToolTip(tr("Camera View"));
-  x += 18;  // width of 3D.png = 18pixels
-  titleBar->add(QPoint(x, 1), button);
+  x += 21;  // width of pane_3d_off.svg = 20px
+  titleBar->add(QPoint(x, 0), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA_REFERENCE);
   ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer,
                        SLOT(setReferenceMode(int)));
 
   // freeze button
-  button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
-                                    ":Resources/freeze_over.png",
-                                    ":Resources/freeze_on.png");
-  x += 10 + 19;  // width of viewcamera.png = 18pixels
+  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_freeze_off.svg",
+                                    ":Resources/pane_freeze_over.svg",
+                                    ":Resources/pane_freeze_on.svg");
+  x += 10 + 20;  // width of pane_cam_off.svg = 20px
 
   button->setToolTip(tr("Freeze"));  // RC1
-  titleBar->add(QPoint(x, 1), button);
+  titleBar->add(QPoint(x, 0), button);
   ret = ret && connect(button, SIGNAL(toggled(bool)), m_sceneViewer,
                        SLOT(freeze(bool)));
 
   // preview toggles
   m_previewButton = new TPanelTitleBarButton(
-      titleBar, ":Resources/viewpreview.png", ":Resources/viewpreview_over.png",
-      ":Resources/viewpreview_on.png");
-  x += 5 + iconWidth;
-  titleBar->add(QPoint(x, 1), m_previewButton);
+      titleBar, ":Resources/pane_preview_off.svg", ":Resources/pane_preview_over.svg",
+      ":Resources/pane_preview_on.svg");
+  x += 10 + iconWidth;
+  titleBar->add(QPoint(x, 0), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
   ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)),
                        SLOT(enableFullPreview(bool)));
 
   m_subcameraPreviewButton =
-      new TPanelTitleBarButton(titleBar, ":Resources/subcamera_preview.png",
-                               ":Resources/subcamera_preview_over.png",
-                               ":Resources/subcamera_preview_on.png");
-  x += 28;  // width of viewpreview.png =28pixels
+      new TPanelTitleBarButton(titleBar, ":Resources/pane_subpreview_off.svg",
+                               ":Resources/pane_subpreview_over.svg",
+                               ":Resources/pane_subpreview_on.svg");
+  x += 26;  // width of pane_preview_off.svg = 25px
 
-  titleBar->add(QPoint(x, 1), m_subcameraPreviewButton);
+  titleBar->add(QPoint(x, 0), m_subcameraPreviewButton);
   m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));
   ret = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
                        SLOT(enableSubCameraPreview(bool)));
@@ -841,6 +841,7 @@ bool ComboViewerPanel::hasSoundtrack() {
   }
   TXsheetHandle *xsheetHandle    = TApp::instance()->getCurrentXsheet();
   TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
+  if(!m_sceneViewer->isPreviewEnabled()) prop->m_isPreview = true;
   m_sound                        = xsheetHandle->getXsheet()->makeSound(prop);
   if (m_sound == NULL) {
     m_hasSoundtrack = false;

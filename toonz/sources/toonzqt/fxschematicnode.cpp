@@ -1094,7 +1094,7 @@ void FxXSheetPainter::paint(QPainter *painter,
     // Draw the name
     QRectF rect(18, 0, 54, 18);
     painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter,
-                      QString("XSheet"));
+                      QString(tr("XSheet")));
   }
   // small scaled
   else {
@@ -1207,7 +1207,7 @@ void FxOutputPainter::paint(QPainter *painter,
     // Draw the name
     QRectF rect(18, 0, 72, 18);
     painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter,
-                      QString("Output"));
+                      QString(tr("Output")));
   }
   // small view
   else {
