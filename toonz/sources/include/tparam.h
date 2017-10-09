@@ -66,7 +66,7 @@ public:
     m_description = description;
   }
 
-  bool hasUILabel() const { return m_label != "" ? true : false; }
+  bool hasUILabel() const { /*return m_label != "" ? true : false; */ return false; }
   void setUILabel(const std::string &l) { m_label = l; };
   std::string getUILabel() const { return m_label; };
 

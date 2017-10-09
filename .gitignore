@@ -32,3 +32,10 @@ ipch/
 *.creator
 *.files
 *.includes
+
+# igonore build setting
+/thirdparty/boost
+/thirdparty/quicktime
+/toonz/build
+/toonz/build_32
+/toonz/build_qt

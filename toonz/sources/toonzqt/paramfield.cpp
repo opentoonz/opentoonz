@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QPainter>
 #include <QComboBox>
+#include <QDebug>
 
 using namespace DVGui;
 
@@ -597,12 +598,20 @@ ParamField::ParamField(QWidget *parent, QString paramName, const TParamP &param,
     , m_paramName(paramName)
     , m_interfaceName(param->hasUILabel()
                           ? QString::fromStdString(param->getUILabel())
-                          : paramName)
+                          : QString::fromStdWString(TStringTable::translate(paramName.toStdString()))== paramName
+								? QString(param->getUILabel().c_str())
+								: QString::fromStdWString(TStringTable::translate(paramName.toStdString())))
     , m_description(QString::fromStdString(param->getDescription())) {
   QString str;
   m_layout = new QHBoxLayout(this);
   m_layout->setMargin(0);
   m_layout->setSpacing(5);
+  qDebug() << (param->hasUILabel()
+	  ? QString::fromStdString(param->getUILabel())
+	  : QString::fromStdWString(TStringTable::translate(paramName.toStdString())) == paramName
+	  ? QString(param->getUILabel().c_str())
+	  : QString::fromStdWString(TStringTable::translate(paramName.toStdString())));
+
 }
 
 //-----------------------------------------------------------------------------

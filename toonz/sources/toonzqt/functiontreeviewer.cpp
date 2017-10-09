@@ -592,10 +592,21 @@ QVariant FunctionTreeModel::Channel::data(int role) const {
       return QString::fromStdString(m_param->getUILabel());
     }
     std::string name            = m_paramNamePref + m_param->getName();
-    std::wstring translatedName = TStringTable::translate(name);
+   /* std::wstring translatedName = TStringTable::translate(name);
     if (m_fxId.size() > 0)
       return QString::fromStdWString(translatedName + L" (" + m_fxId + L")");
     return QString::fromStdWString(translatedName);
+	*/
+
+
+	std::wstring translatedName = (QString::fromStdWString(TStringTable::translate(name)).toStdString() == name
+									? (QString::fromStdString(m_param->getUILabel())).toStdWString()
+									: (TStringTable::translate(name)));
+	
+	if (m_fxId.size() > 0)
+		translatedName += L" (" + m_fxId + L")";
+	return QString::fromStdWString(translatedName);
+
   } else if (role == Qt::ForegroundRole) {
     // 130221 iwasawa
     FunctionTreeView *view = dynamic_cast<FunctionTreeView *>(m_model->m_view);
@@ -617,8 +628,15 @@ QString FunctionTreeModel::Channel::getShortName() const {
     return QString::fromStdString(m_param->getUILabel());
   }
   std::string name            = m_paramNamePref + m_param->getName();
-  std::wstring translatedName = TStringTable::translate(name);
-  return QString::fromStdWString(translatedName);
+  //std::wstring translatedName = TStringTable::translate(name);
+  //return QString::fromStdWString(translatedName);
+
+
+  return (QString::fromStdWString(TStringTable::translate(name)).toStdString() == name
+	  ? QString(m_param->getUILabel().c_str())
+	  : QString::fromStdWString(TStringTable::translate(name)));
+
+  
 }
 
 //-----------------------------------------------------------------------------

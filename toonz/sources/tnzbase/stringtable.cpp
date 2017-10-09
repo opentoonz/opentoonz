@@ -249,6 +249,11 @@ void TStringTableImp::load(const TFilePath &fp) {
         }
       }
       Item &item  = m_table[id];
+
+	  name = QString::fromLocal8Bit(name.c_str()).toStdString();
+	  help = QString::fromLocal8Bit(help.c_str()).toStdString();
+	  tip = QString::fromLocal8Bit(tip.c_str()).toStdString();
+
       item.m_name = ::to_wstring(name);
       item.m_help = ::to_wstring(help);
       item.m_tip  = ::to_wstring(tip);
