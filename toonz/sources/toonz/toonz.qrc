@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>Resources/3D.png</file>
-        <file>Resources/3D_on.png</file>
-        <file>Resources/3D_over.png</file>
+        <file>Resources/pane_3d_off.svg</file>
+        <file>Resources/pane_3d_on.svg</file>
+        <file>Resources/pane_3d_over.svg</file>
         <file>Resources/3Dside_l.svg</file>
         <file>Resources/3Dside_r.svg</file>
         <file>Resources/3Dtop.svg</file>
@@ -51,8 +51,8 @@
         <file>Resources/cleanup_done_with_errors.svg</file>
         <file>Resources/cleanup_computing.svg</file>
         <file>Resources/cleanup_suspended.svg</file>
-        <file>Resources/close_pane.svg</file>
-        <file>Resources/close_pane_rollover.svg</file>
+        <file>Resources/pane_close.svg</file>
+        <file>Resources/pane_close_rollover.svg</file>
         <file>Resources/collapse.png</file>
         <file>Resources/collapse_click.png</file>
         <file>Resources/collapse_over.png</file>
@@ -72,6 +72,7 @@
         <file>Resources/desktop.svg</file>
         <file>Resources/downTitle.png</file>
         <file>Resources/edit.svg</file>
+        <file>Resources/edit_in_place.svg</file>
         <file>Resources/edit_rollover.svg</file>
         <file>Resources/emptychip.png</file>
         <file>Resources/eraser.png</file>
@@ -97,9 +98,9 @@
         <file>Resources/frameprev.svg</file>
         <file>Resources/frameprev_click.svg</file>
         <file>Resources/frameprev_over.svg</file>
-        <file>Resources/freeze.png</file>
-        <file>Resources/freeze_on.png</file>
-        <file>Resources/freeze_over.png</file>
+        <file>Resources/pane_freeze_off.svg</file>
+        <file>Resources/pane_freeze_on.svg</file>
+        <file>Resources/pane_freeze_over.svg</file>
         <file>Resources/fx.svg</file>
         <file>Resources/geometric.svg</file>
         <file>Resources/geometric_rollover.svg</file>
@@ -255,9 +256,9 @@
         <file>Resources/special_off.svg</file>
         <file>Resources/special_on.svg</file>
         <file>Resources/splash.svg</file>
-        <file>Resources/standard.png</file>
-        <file>Resources/standard_on.png</file>
-        <file>Resources/standard_over.png</file>
+        <file>Resources/pane_table_off.svg</file>
+        <file>Resources/pane_table_on.svg</file>
+        <file>Resources/pane_table_over.svg</file>
         <file>Resources/startup.png</file>
         <file>Resources/start_off.svg</file>
         <file>Resources/start_on.svg</file>
@@ -308,18 +309,18 @@
         <file>Resources/unknown.svg</file>
         <file>Resources/upTitle.png</file>
         <file>Resources/v_chandle.png</file>
-        <file>Resources/view_camera.png</file>
-        <file>Resources/view_camera_on.png</file>
-        <file>Resources/view_camera_over.png</file>
+        <file>Resources/pane_cam_off.svg</file>
+        <file>Resources/pane_cam_on.svg</file>
+        <file>Resources/pane_cam_over.svg</file>
         <file>Resources/viewicon_off.svg</file>
         <file>Resources/viewicon_on.svg</file>
         <file>Resources/viewicon_over.svg</file>
         <file>Resources/viewlist_off.svg</file>
         <file>Resources/viewlist_on.svg</file>
         <file>Resources/viewlist_over.svg</file>
-        <file>Resources/viewpreview.png</file>
-        <file>Resources/viewpreview_on.png</file>
-        <file>Resources/viewpreview_over.png</file>
+        <file>Resources/pane_preview_off.svg</file>
+        <file>Resources/pane_preview_on.svg</file>
+        <file>Resources/pane_preview_over.svg</file>
         <file>Resources/viewtable_off.svg</file>
         <file>Resources/viewtable_on.svg</file>
         <file>Resources/viewtable_over.svg</file>
@@ -385,9 +386,9 @@
         <file>Resources/use_subcamera_preview.svg</file>
         <file>Resources/use_subcamera_preview_over.svg</file>
         <file>Resources/use_subcamera_preview_click.svg</file>
-        <file>Resources/subcamera_preview.png</file>
-        <file>Resources/subcamera_preview_over.png</file>
-        <file>Resources/subcamera_preview_on.png</file>
+        <file>Resources/pane_subpreview_off.svg</file>
+        <file>Resources/pane_subpreview_over.svg</file>
+        <file>Resources/pane_subpreview_on.svg</file>
         <file>Resources/round_cap.svg</file>
         <file>Resources/butt_cap.svg</file>
         <file>Resources/projecting_cap.svg</file>
@@ -396,14 +397,15 @@
         <file>Resources/miter_join.svg</file>
         <file>Resources/init.js</file>
         <file>Resources/scripticon.png</file>
-        <file>Resources/safearea.png</file>
-        <file>Resources/safearea_over.png</file>
-        <file>Resources/safearea_on.png</file>
-        <file>Resources/minimize.png</file>
-        <file>Resources/minimize_over.png</file>    
-        <file>Resources/fieldguide.png</file>
-        <file>Resources/fieldguide_over.png</file>
-        <file>Resources/fieldguide_on.png</file>
+        <file>Resources/pane_safe_off.svg</file>
+        <file>Resources/pane_safe_over.svg</file>
+        <file>Resources/pane_safe_on.svg</file>
+        <file>Resources/pane_minimize.svg</file>
+        <file>Resources/pane_minimize_over.svg</file>   
+        <file>Resources/pane_minimize_on.svg</file> 
+        <file>Resources/pane_grid_off.svg</file>
+        <file>Resources/pane_grid_over.svg</file>
+        <file>Resources/pane_grid_on.svg</file>
         <file>Resources/folderup_icon.svg</file>      
         <file>Resources/link_icon.svg</file>
         <file>Resources/folder_icon.svg</file>

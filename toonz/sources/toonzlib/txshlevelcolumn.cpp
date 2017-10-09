@@ -116,7 +116,7 @@ void TXshLevelColumn::loadData(TIStream &is) {
     } else if (tagName == "filter_color_id") {
       int id;
       is >> id;
-      setFilterColorId(id);
+      setFilterColorId((TXshColumn::FilterColor)id);
     } else if (tagName == "cells") {
       while (is.openChild(tagName)) {
         if (tagName == "cell") {

@@ -1018,8 +1018,8 @@ void BrushTool::updateTranslation() {
   m_capStyle.setQStringName(tr("Cap"));
   m_joinStyle.setQStringName(tr("Join"));
   m_miterJoinLimit.setQStringName(tr("Miter:"));
-  m_frameRange.setQStringName("Range:");
-  m_snap.setQStringName("Snap");
+  m_frameRange.setQStringName(tr("Range:"));
+  m_snap.setQStringName(tr("Snap"));
   m_snapSensitivity.setQStringName("");
 }
 
@@ -2391,9 +2391,6 @@ void BrushTool::loadPreset() {
       m_capStyle.setIndex(preset.m_cap);
       m_joinStyle.setIndex(preset.m_join);
       m_miterJoinLimit.setValue(preset.m_miter);
-      m_frameRange.setIndex(preset.m_frameRange);
-      m_snap.setValue(preset.m_snap);
-      m_snapSensitivity.setIndex(preset.m_snapSensitivity);
     } else {
       m_rasThickness.setValue(TDoublePairProperty::Value(
           std::max(preset.m_min, 1.0), preset.m_max));
@@ -2433,9 +2430,6 @@ void BrushTool::addPreset(QString name) {
   preset.m_cap             = m_capStyle.getIndex();
   preset.m_join            = m_joinStyle.getIndex();
   preset.m_miter           = m_miterJoinLimit.getValue();
-  preset.m_frameRange      = m_frameRange.getIndex();
-  preset.m_snap            = m_snap.getValue();
-  preset.m_snapSensitivity = m_snapSensitivity.getIndex();
 
   // Pass the preset to the manager
   m_presetsManager.addPreset(preset);
@@ -2493,9 +2487,6 @@ BrushData::BrushData()
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
-    , m_frameRange(0)
-    , m_snap(false)
-    , m_snapSensitivity(0)
     , m_miter(0)
     , m_modifierSize(0.0)
     , m_modifierOpacity(0.0) {}
@@ -2517,9 +2508,6 @@ BrushData::BrushData(const std::wstring &name)
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
-    , m_frameRange(0)
-    , m_snap(false)
-    , m_snapSensitivity(0)
     , m_miter(0)
     , m_modifierSize(0.0)
     , m_modifierOpacity(0.0) {}
@@ -2566,15 +2554,6 @@ void BrushData::saveData(TOStream &os) {
   os.openChild("Miter");
   os << m_miter;
   os.closeChild();
-  os.openChild("Frame_Range");
-  os << (int)m_frameRange;
-  os.closeChild();
-  os.openChild("Snap");
-  os << (int)m_snap;
-  os.closeChild();
-  os.openChild("SnapSensitivity");
-  os << (int)m_snapSensitivity;
-  os.closeChild();
   os.openChild("Modifier_Size");
   os << m_modifierSize;
   os.closeChild();
@@ -2616,12 +2595,6 @@ void BrushData::loadData(TIStream &is) {
       is >> m_join, is.matchEndTag();
     else if (tagName == "Miter")
       is >> m_miter, is.matchEndTag();
-    else if (tagName == "Frame_Range")
-      is >> m_frameRange, is.matchEndTag();
-    else if (tagName == "Snap")
-      is >> m_snap, is.matchEndTag();
-    else if (tagName == "SnapSensitivity")
-      is >> m_snapSensitivity, is.matchEndTag();
     else if (tagName == "Modifier_Size")
       is >> m_modifierSize, is.matchEndTag();
     else if (tagName == "Modifier_Opacity")

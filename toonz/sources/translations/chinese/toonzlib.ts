@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.0" language="zh_CN">
 <context>
     <name>Preferences</name>
     <message>
         <source>Retas Level Format</source>
         <translation>RETAS 层级格式</translation>
+    </message>
+    <message>
+        <source>Adobe Photoshop</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>PNG</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -334,11 +342,43 @@
     </message>
     <message>
         <source>Set Picked Position of Style#%1 in Palette%2 : %3,%4</source>
-        <translation type="unfinished"></translation>
+        <translation>设定已经在调色板%2 : %3,%4中挑选的样式#%1位置</translation>
     </message>
     <message>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
-        <translation type="unfinished"></translation>
+        <translation>使用在调色板%1中已经挑选的位置更新颜色</translation>
+    </message>
+    <message>
+        <source>Can&apos;t save</source>
+        <translation>没法保存</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>无</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>红</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>绿</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>蓝</translation>
+    </message>
+    <message>
+        <source>DarkYellow</source>
+        <translation>暗黄</translation>
+    </message>
+    <message>
+        <source>DarkCyan</source>
+        <translation>暗青</translation>
+    </message>
+    <message>
+        <source>DarkMagenta</source>
+        <translation>暗红</translation>
     </message>
 </context>
 <context>

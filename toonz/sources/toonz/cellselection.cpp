@@ -450,8 +450,8 @@ public:
         for (int i = 0; i < n; i++) {
           std::map<TXshCell, TXshCell>::const_iterator it =
               table.find(cells[i]);
-          if (it != table.end())
-            cells[i] = it->second, changed = it->first != it->second;
+          if (it != table.end() && it->first != it->second)
+            cells[i] = it->second, changed = true;
         }
         if (changed) xsh->setCells(r0, c, n, &cells[0]);
       }
@@ -1154,7 +1154,7 @@ int TCellSelection::Range::getColCount() const { return m_c1 - m_c0 + 1; }
 // TCellSelection
 //-----------------------------------------------------------------------------
 
-TCellSelection::TCellSelection() : m_timeStretchPopup(0) {}
+TCellSelection::TCellSelection() : m_timeStretchPopup(0), m_reframePopup(0) {}
 
 //-----------------------------------------------------------------------------
 
@@ -1204,21 +1204,47 @@ void TCellSelection::enableCommands() {
   enableCommand(this, MI_Reframe2, &TCellSelection::reframe2Cells);
   enableCommand(this, MI_Reframe3, &TCellSelection::reframe3Cells);
   enableCommand(this, MI_Reframe4, &TCellSelection::reframe4Cells);
+  enableCommand(this, MI_ReframeWithEmptyInbetweens,
+                &TCellSelection::reframeWithEmptyInbetweens);
 }
 //-----------------------------------------------------------------------------
 // Used in RenameCellField::eventFilter()
 
 bool TCellSelection::isEnabledCommand(
     std::string commandId) {  // static function
-  static QList<std::string> commands = {
-      MI_Autorenumber, MI_Reverse,    MI_Swing,        MI_Random,
-      MI_Increment,    MI_ResetStep,  MI_IncreaseStep, MI_DecreaseStep,
-      MI_Step2,        MI_Step3,      MI_Step4,        MI_Each2,
-      MI_Each3,        MI_Each4,      MI_Rollup,       MI_Rolldown,
-      MI_TimeStretch,  MI_CloneLevel, MI_SetKeyframes, MI_Copy,
-      MI_Paste,        MI_PasteInto,  MI_Cut,          MI_Clear,
-      MI_Insert,       MI_PasteInto,  MI_Reframe1,     MI_Reframe2,
-      MI_Reframe3,     MI_Reframe4};
+  static QList<std::string> commands = {MI_Autorenumber,
+                                        MI_Reverse,
+                                        MI_Swing,
+                                        MI_Random,
+                                        MI_Increment,
+                                        MI_ResetStep,
+                                        MI_IncreaseStep,
+                                        MI_DecreaseStep,
+                                        MI_Step2,
+                                        MI_Step3,
+                                        MI_Step4,
+                                        MI_Each2,
+                                        MI_Each3,
+                                        MI_Each4,
+                                        MI_Rollup,
+                                        MI_Rolldown,
+                                        MI_TimeStretch,
+                                        MI_CloneLevel,
+                                        MI_SetKeyframes,
+                                        MI_Copy,
+                                        MI_Paste,
+                                        MI_PasteInto,
+                                        MI_Cut,
+                                        MI_Clear,
+                                        MI_Insert,
+                                        MI_PasteInto,
+                                        MI_Reframe1,
+                                        MI_Reframe2,
+                                        MI_Reframe3,
+                                        MI_Reframe4,
+                                        MI_ReframeWithEmptyInbetweens,
+                                        MI_Undo,
+                                        MI_Redo};
   return commands.contains(commandId);
 }
 

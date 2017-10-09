@@ -15,6 +15,12 @@
   border: 0;
 }
 
+#cornerWidget {
+  & QToolButton {
+    padding: 0;
+  }
+}
+
 /* xsheetColumnHeader (Context Menus)
 ----------------------------------------------------------------------------- */
 
@@ -105,22 +111,68 @@ XsheetViewer {
   qproperty-LightBGColor: @xsheet-LightBG-color;
   qproperty-DarkBGColor: @xsheet-DarkBG-color;
   qproperty-DarkLineColor: @xsheet-DarkLine-color;
+
+  qproperty-XsheetColumnNameBgColor: @xsheet-ColumnNameBg-color;
+  qproperty-XsheetDragBarHighlightColor: @xsheet-DragBarHighlight-color;
+
+  qproperty-XsheetPreviewButtonBgOnColor: @xsheet-PreviewButtonBgOn-color;
+  qproperty-XsheetPreviewButtonOnImage: url('@{img-url}/@{xsheet-PreviewButtonOnImage}');
+  qproperty-XsheetPreviewButtonBgOffColor: @xsheet-PreviewButtonBgOff-color;
+  qproperty-XsheetPreviewButtonOffImage: url('@{img-url}/@{xsheet-PreviewButtonOffImage}');
+
+  qproperty-XsheetCamstandButtonBgOnColor: @xsheet-CamstandButtonBgOn-color;
+  qproperty-XsheetCamstandButtonOnImage: url('@{img-url}/@{xsheet-CamstandButtonOnImage}');
+  qproperty-XsheetCamstandButtonTranspImage: url('@{img-url}/@{xsheet-CamstandButtonTranspImage}');
+  qproperty-XsheetCamstandButtonBgOffColor: @xsheet-CamstandButtonBgOff-color;
+  qproperty-XsheetCamstandButtonOffImage: url('@{img-url}/@{xsheet-CamstandButtonOffImage}');
+
+  qproperty-XsheetLockButtonBgOnColor: @xsheet-LockButtonBgOn-color;
+  qproperty-XsheetLockButtonOnImage: url('@{img-url}/@{xsheet-LockButtonOnImage}');
+  qproperty-XsheetLockButtonBgOffColor: @xsheet-LockButtonBgOff-color;
+  qproperty-XsheetLockButtonOffImage: url('@{img-url}/@{xsheet-LockButtonOffImage}');
+
+  qproperty-XsheetConfigButtonBgColor: @xsheet-ConfigButtonBg-color;
+  qproperty-XsheetConfigButtonImage: url('@{img-url}/@{xsheet-ConfigButtonImage}');
+
+  qproperty-TimelinePreviewButtonBgOnColor: @timeline-PreviewButtonBgOn-color;
+  qproperty-TimelinePreviewButtonOnImage: url('@{img-url}/@{timeline-PreviewButtonOnImage}');
+  qproperty-TimelinePreviewButtonBgOffColor: @timeline-PreviewButtonBgOff-color;
+  qproperty-TimelinePreviewButtonOffImage: url('@{img-url}/@{timeline-PreviewButtonOffImage}');
+
+  qproperty-TimelineCamstandButtonBgOnColor: @timeline-CamstandButtonBgOn-color;
+  qproperty-TimelineCamstandButtonOnImage: url('@{img-url}/@{timeline-CamstandButtonOnImage}');
+  qproperty-TimelineCamstandButtonTranspImage: url('@{img-url}/@{timeline-CamstandButtonTranspImage}');
+  qproperty-TimelineCamstandButtonBgOffColor: @timeline-CamstandButtonBgOff-color;
+  qproperty-TimelineCamstandButtonOffImage: url('@{img-url}/@{timeline-CamstandButtonOffImage}');
+
+  qproperty-TimelineLockButtonBgOnColor: @timeline-LockButtonBgOn-color;
+  qproperty-TimelineLockButtonOnImage: url('@{img-url}/@{timeline-LockButtonOnImage}');
+  qproperty-TimelineLockButtonBgOffColor: @timeline-LockButtonBgOff-color;
+  qproperty-TimelineLockButtonOffImage: url('@{img-url}/@{timeline-LockButtonOffImage}');
+
+  qproperty-TimelineConfigButtonBgColor: @timeline-ConfigButtonBg-color;
+  qproperty-TimelineConfigButtonImage: url('@{img-url}/@{timeline-ConfigButtonImage}');
+
+  qproperty-LayerHeaderPreviewImage: url('@{img-url}/@{layerheader-PreviewImage}');
+  qproperty-LayerHeaderCamstandImage: url('@{img-url}/@{layerheader-CamstandImage}');
+  qproperty-LayerHeaderLockImage: url('@{img-url}/@{layerheader-LockImage}');
 }
 
 /* XSheet Toolbar
 ----------------------------------------------------------------------------- */
 
 #XSheetToolbar {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	&::separator:horizontal {
-		margin-right: 3px;
-		margin-left: 3px;
-	}
-  & #XSheetToolbarLevelButton {
-    &:extend(.button-tool all);
-    padding: 2px; 
+  margin: 0;
+  padding: 0;
+  border: 0;
+  & QToolButton {
+    padding: 0;
+    margin: 4px 1px;
+    min-height: 19px;
+    height: 19px;
+  }
+  &::separator:horizontal {
+    margin: 0 4px;
   }
 }
 

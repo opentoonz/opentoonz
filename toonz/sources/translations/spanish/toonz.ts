@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>AddFilmstripFramesPopup</name>
     <message>
@@ -112,10 +112,6 @@
         <translation>No es posible aplicar las líneas de coincidencia porque no se ha seleccionado ninguna columna.</translation>
     </message>
     <message>
-        <source>It is not possible to apply the match lines because two columns have to be seleted.</source>
-        <translation type="obsolete">No es posible aplicar las líneas de coincidencia porque se deben seleccionar dos columnas.</translation>
-    </message>
-    <message>
         <source>It is not possible to apply the match lines because two columns have to be selected.</source>
         <translation>No es posible aplicar las líneas de coincidencia porque se deben seleccionar dos columnas.</translation>
     </message>
@@ -196,7 +192,7 @@ Por favor seleccionar un dispositivo diferente o comprobar el micrófono.</trans
     </message>
     <message>
         <source>Number of CPU:</source>
-        <translation>Cantidad de CPUs:</translation>
+        <translation>Cantidad de CPU:</translation>
     </message>
     <message>
         <source>Physical Memory:</source>
@@ -213,7 +209,7 @@ Por favor seleccionar un dispositivo diferente o comprobar el micrófono.</trans
     <message>
         <source>The Farm Global Root folder doesn&apos;t exist
 Please create this folder before using the render farm.</source>
-        <translation>La carpeta de la Raíz global de la granja no existe.
+        <translation>La carpeta raíz global de la granja no existe.
 Por favor crear esta carpeta antes de usar la granja de procesamiento.</translation>
     </message>
     <message>
@@ -319,6 +315,48 @@ Detenerla o esperar a su finalización antes de eliminarla.</translation>
     <message>
         <source>Path %1 doesn&apos;t exists.</source>
         <translation>La ruta %1 no existe.</translation>
+    </message>
+</context>
+<context>
+    <name>CameraCaptureLevelControl</name>
+    <message>
+        <source>Black Point Value</source>
+        <translation>Punto de negro</translation>
+    </message>
+    <message>
+        <source>White Point Value</source>
+        <translation>Punto de blanco</translation>
+    </message>
+    <message>
+        <source>Threshold Value</source>
+        <translation>Umbral</translation>
+    </message>
+    <message>
+        <source>Gamma Value</source>
+        <translation>Gama</translation>
+    </message>
+</context>
+<context>
+    <name>CameraCaptureLevelHistogram</name>
+    <message>
+        <source>Click to Update Histogram</source>
+        <translation>Clic para actualizar el histograma</translation>
+    </message>
+    <message>
+        <source>Drag to Move White Point</source>
+        <translation>Arrastrar para mover el punto de blanco</translation>
+    </message>
+    <message>
+        <source>Drag to Move Gamma</source>
+        <translation>Arrastrar para mover el gama</translation>
+    </message>
+    <message>
+        <source>Drag to Move Black Point</source>
+        <translation>Arrastrar para mover el punto de negro</translation>
+    </message>
+    <message>
+        <source>Drag to Move Threshold Point</source>
+        <translation>Arrastrar para mover el umbral</translation>
     </message>
 </context>
 <context>
@@ -1091,7 +1129,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Unpainted tlv</source>
-        <translation>TLV no pintado</translation>
+        <translation>TLV sin pintar</translation>
     </message>
     <message>
         <source>Painted tlv from two images</source>
@@ -1139,7 +1177,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Unpainted tlv from non AA source</source>
-        <translation>TLV no pintado a partir de un original sin suavizado de bordes</translation>
+        <translation>TLV sin pintar a partir de un original sin suavizado de bordes</translation>
     </message>
     <message>
         <source>Remove dot before frame number</source>
@@ -1184,6 +1222,32 @@ de diseñar el color.</translation>
     <message>
         <source>Remove Unused Styles from Input Palette</source>
         <translation>Remover estilos no usados de la paleta de origen</translation>
+    </message>
+    <message>
+        <source>Image DPI</source>
+        <translation>PPP de imagen</translation>
+    </message>
+    <message>
+        <source>Current Camera DPI</source>
+        <translation>PPP de cámara actual</translation>
+    </message>
+    <message>
+        <source>Custom DPI</source>
+        <translation>PPP personalizado</translation>
+    </message>
+    <message>
+        <source>Specify the policy for setting DPI of converted tlv. 
+If you select the &quot;Image DPI&quot; option and the source image does not 
+contain the dpi information, then the current camera dpi will be used.
+</source>
+        <translation>Especifica la política para definir los PPP del nivel TLV generado. 
+Si se selecciona la opción &quot;PPP de imagen&quot; y la imagen original no 
+contuviera información de PPP, entonces se usarán los de la cámara actual.
+</translation>
+    </message>
+    <message>
+        <source>Dpi:</source>
+        <translation>PPP:</translation>
     </message>
 </context>
 <context>
@@ -1701,7 +1765,7 @@ de diseñar el color.</translation>
     </message>
     <message>
         <source>Convert to Unpainted TLV</source>
-        <translation>Convertir a TLV no pintado</translation>
+        <translation>Convertir a TLV sin pintar</translation>
     </message>
     <message>
         <source>Version Control</source>
@@ -1789,7 +1853,7 @@ de diseñar el color.</translation>
     </message>
     <message>
         <source>Convert To Unpainted Tlv</source>
-        <translation>Convertir a TLV no pintado</translation>
+        <translation>Convertir a TLV sin pintar</translation>
     </message>
     <message>
         <source>Convert To Painted Tlv</source>
@@ -2168,6 +2232,21 @@ Do you want to overwrite it?</source>
     </message>
 </context>
 <context>
+    <name>LayerHeaderPanel</name>
+    <message>
+        <source>Preview Visbility Toggle All</source>
+        <translation>Visibilidad en previsualización todas</translation>
+    </message>
+    <message>
+        <source>Camera Stand Visibility Toggle All</source>
+        <translation>Visibilidad desde detrás de cámara todas</translation>
+    </message>
+    <message>
+        <source>Lock Toggle All</source>
+        <translation>Bloquear todas</translation>
+    </message>
+</context>
+<context>
     <name>LevelCreatePopup</name>
     <message>
         <source>New Level</source>
@@ -2477,7 +2556,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Fade:</source>
-        <translation>Fundir:</translation>
+        <translation>Color:</translation>
     </message>
     <message>
         <source>Intensity:</source>
@@ -2592,7 +2671,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>TLV Caching Behavior</source>
-        <translation>Comportamiento del caché de TLV</translation>
+        <translation>Caché de niveles TLV</translation>
     </message>
     <message>
         <source>Load Subsequence Level</source>
@@ -3036,7 +3115,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Remove Vector Overflow</source>
-        <translation>&amp;Eliminar desbordamiento de vectores</translation>
+        <translation>&amp;Corregir intersecciones de trazos</translation>
     </message>
     <message>
         <source>&amp;Define Scanner...</source>
@@ -3292,7 +3371,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Set Key</source>
-        <translation>&amp;Definir fotograma clave</translation>
+        <translation>&amp;Marcar fotograma clave</translation>
     </message>
     <message>
         <source>&amp;Camera Box</source>
@@ -3320,7 +3399,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Ink Check</source>
-        <translation>Comprobación de ent&amp;intado</translation>
+        <translation>Comprobación de t&amp;inta</translation>
     </message>
     <message>
         <source>&amp;Paint Check</source>
@@ -3328,11 +3407,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Fill Check</source>
-        <translation>Comprobación de &amp;relleno</translation>
+        <translation>Comprobación de áreas &amp;rellenables</translation>
     </message>
     <message>
         <source>&amp;Black BG Check</source>
-        <translation>Compro&amp;bación de fondo negro</translation>
+        <translation>Ver con fondo &amp;negro</translation>
     </message>
     <message>
         <source>&amp;Gap Check</source>
@@ -3340,7 +3419,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Visualize Vector As Raster</source>
-        <translation>&amp;Visualizar vectorial como imagen</translation>
+        <translation>&amp;Ver vectorial como imagen</translation>
     </message>
     <message>
         <source>&amp;Histogram</source>
@@ -3420,11 +3499,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Function Editor</source>
-        <translation>&amp;Editor de curvas</translation>
+        <translation>Editor de &amp;funciones</translation>
     </message>
     <message>
         <source>&amp;Level Strip</source>
-        <translation>&amp;Cinta de nivel</translation>
+        <translation>Cinta de &amp;nivel</translation>
     </message>
     <message>
         <source>&amp;Palette</source>
@@ -3444,11 +3523,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Batch Servers</source>
-        <translation>&amp;Servidores de tareas</translation>
+        <translation>Servidores de t&amp;areas</translation>
     </message>
     <message>
         <source>&amp;Color Model</source>
-        <translation>&amp;Modelo de color</translation>
+        <translation>Modelo de &amp;color</translation>
     </message>
     <message>
         <source>&amp;Studio Palette</source>
@@ -3468,7 +3547,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Style Editor</source>
-        <translation>&amp;Editor de estilo</translation>
+        <translation>&amp;Editor de estilos</translation>
     </message>
     <message>
         <source>&amp;Toolbar</source>
@@ -3536,7 +3615,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Tracking...</source>
-        <translation>Rastreo...</translation>
+        <translation>Rastrear...</translation>
     </message>
     <message>
         <source>Remove Level</source>
@@ -3716,7 +3795,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Paint Brush Tool</source>
-        <translation>Pincel de pintura</translation>
+        <translation>Brocha</translation>
     </message>
     <message>
         <source>Eraser Tool</source>
@@ -3744,7 +3823,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Control Point Editor Tool</source>
-        <translation>Editor de puntos de control</translation>
+        <translation>Edición de puntos de control</translation>
     </message>
     <message>
         <source>Pinch Tool</source>
@@ -3776,7 +3855,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Tracker Tool</source>
-        <translation>Rastreador</translation>
+        <translation>Punto de rastreo</translation>
     </message>
     <message>
         <source>Hook Tool</source>
@@ -4084,7 +4163,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Shift and Trace</source>
-        <translation>Desplazamiento y rastreo</translation>
+        <translation>Desplazar y trazar</translation>
     </message>
     <message>
         <source>Edit Shift</source>
@@ -4092,7 +4171,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>No Shift</source>
-        <translation>Sin desplazamiento</translation>
+        <translation>Ver sin desplazamiento</translation>
     </message>
     <message>
         <source>Reset Shift</source>
@@ -4208,7 +4287,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Inks &amp;Only</source>
-        <translation>&amp;Sólo tintas</translation>
+        <translation>Ver sól&amp;o tinta</translation>
     </message>
     <message>
         <source>Next Step</source>
@@ -4517,6 +4596,54 @@ Do you want to create it?</source>
     <message>
         <source>Record Audio</source>
         <translation>Grabación de sonido</translation>
+    </message>
+    <message>
+        <source>&amp;Pencil Test...</source>
+        <translation>&amp;Prueba de lápiz...</translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation>Actualizar</translation>
+    </message>
+    <message>
+        <source>Toggle XSheet Toolbar</source>
+        <translation>Barra de herramientas de planilla</translation>
+    </message>
+    <message>
+        <source>SnapSensitivity</source>
+        <translation>Sensibilidad de adherencia</translation>
+    </message>
+    <message>
+        <source>&amp;New Vector Level</source>
+        <translation>&amp;Nuevo nivel vectorial</translation>
+    </message>
+    <message>
+        <source>New Vector Level</source>
+        <translation>Nuevo nivel vectorial</translation>
+    </message>
+    <message>
+        <source>&amp;New Toonz Raster Level</source>
+        <translation>&amp;Nuevo nivel de imagen de Toonz</translation>
+    </message>
+    <message>
+        <source>New Toonz Raster Level</source>
+        <translation>Nuevo nivel de imagen de Toonz</translation>
+    </message>
+    <message>
+        <source>&amp;New Raster Level</source>
+        <translation>&amp;Nuevo nivel de imagen</translation>
+    </message>
+    <message>
+        <source>New Raster Level</source>
+        <translation>Nuevo nivel de imagen</translation>
+    </message>
+    <message>
+        <source>Alpha Channel</source>
+        <translation>Canal alfa</translation>
+    </message>
+    <message>
+        <source>&amp;Command Bar</source>
+        <translation>Barra de &amp;comandos</translation>
     </message>
 </context>
 <context>
@@ -5350,6 +5477,226 @@ Do you want to overwrite it?</source>
         <source>The selected image size does not match the current camera settings.</source>
         <translation>El tamaño de la imagen seleccionada no coincide con las opciones actuales de la cámara</translation>
     </message>
+    <message>
+        <source>Pencil Test</source>
+        <translation>Prueba de lápiz</translation>
+    </message>
+    <message>
+        <source>Capture</source>
+        <translation>Capturar</translation>
+    </message>
+    <message>
+        <source>Subfolder</source>
+        <translation>Subcarpeta</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <comment>frame id</comment>
+        <translation>No</translation>
+    </message>
+    <message>
+        <source>Previous Level</source>
+        <translation>Nivel anterior</translation>
+    </message>
+    <message>
+        <source>UNDEFINED WARNING</source>
+        <translation>ADVERTENCIA NO DEFINIDA</translation>
+    </message>
+    <message>
+        <source>The level is not registered in the scene, but exists in the file system.</source>
+        <translation>El nivel no se encuentra registrado en la escena, pero existe en el sistema de archivos.</translation>
+    </message>
+    <message>
+        <source>WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
+        <translation>ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño de la imagen guardada es de %1 x %2.</translation>
+    </message>
+    <message>
+        <source>WARNING</source>
+        <translation>ADVERTENCIA</translation>
+    </message>
+    <message>
+        <source>
+Frame %1 exists.</source>
+        <translation>
+El fotograma %1 ya existe.</translation>
+    </message>
+    <message>
+        <source>
+Frames %1 exist.</source>
+        <translation>
+Los fotogramas %1 ya existen.</translation>
+    </message>
+    <message>
+        <source>OVERWRITE 1 of</source>
+        <translation>SOBRESCRIBIR 1 de</translation>
+    </message>
+    <message>
+        <source>ADD to</source>
+        <translation>AGREGAR a</translation>
+    </message>
+    <message>
+        <source> %1 frame</source>
+        <translation> %1 fotograma</translation>
+    </message>
+    <message>
+        <source> %1 frames</source>
+        <translation> %1 fotogramas</translation>
+    </message>
+    <message>
+        <source>The level will be newly created.</source>
+        <translation>El nivel se creará desde el inicio.</translation>
+    </message>
+    <message>
+        <source>NEW</source>
+        <translation>NUEVO</translation>
+    </message>
+    <message>
+        <source>The level is already registered in the scene.</source>
+        <translation>El nivel ya se encuentra registrado en la escena.</translation>
+    </message>
+    <message>
+        <source>
+NOTE : The level is not saved.</source>
+        <translation>
+NOTA : El nivel no está guardado.</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Failed to get image size of the existing level %1.</source>
+        <translation>
+ADVERTENCIA : No se pudo obtener el tamaño de imagen del nivel %1 ya existente.</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The existing level size is %1 x %2.</source>
+        <translation>
+ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño del nivel ya existente es %1 x %2.</translation>
+    </message>
+    <message>
+        <source>WARNING : Level name conflicts. There already is a level %1 in the scene with the path                        
+          %2.</source>
+        <translation>ADVERTENCIA : Conflicto en el nombre del nivel. Ya existe un nivel %1 en la escena con la ruta                        
+          %2.</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The size of level with the same name is is %1 x %2.</source>
+        <translation>
+ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño del nivel con ese nombre es %1 x %2.</translation>
+    </message>
+    <message>
+        <source>WARNING : Level path conflicts. There already is a level with the path %1                        
+          in the scene with the name %2.</source>
+        <translation>ADVERTENCIA : Conflicto en la ruta del nivel. Ya existe un nivel con la ruta %1                        
+          en la escena llamada %2.</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The size of level with the same path is %1 x %2.</source>
+        <translation>
+ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño del nivel con esa ruta es %1 x %2.</translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
+        <translation>
+ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño de la imagen guardada es de %1 x %2.</translation>
+    </message>
+</context>
+<context>
+    <name>PencilTestSaveInFolderPopup</name>
+    <message>
+        <source>Create Subfolder</source>
+        <translation>Crear subcarpeta</translation>
+    </message>
+    <message>
+        <source>Infomation</source>
+        <translation>Información</translation>
+    </message>
+    <message>
+        <source>Subfolder Name</source>
+        <translation>Nombre de la subcarpeta</translation>
+    </message>
+    <message>
+        <source>Auto Format:</source>
+        <translation>Formato autom:</translation>
+    </message>
+    <message>
+        <source>Show This on Launch of the Camera Capture</source>
+        <translation>Mostrar esto al iniciar Capturar con cámara</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Aceptar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>C- + Sequence + Scene</source>
+        <translation>C- + secuencia + escena</translation>
+    </message>
+    <message>
+        <source>Sequence + Scene</source>
+        <translation>secuencia + escena</translation>
+    </message>
+    <message>
+        <source>Episode + Sequence + Scene</source>
+        <translation>episodio + secuencia + escena</translation>
+    </message>
+    <message>
+        <source>Project + Episode + Sequence + Scene</source>
+        <translation>proyecto + episodio + secuencia + escena</translation>
+    </message>
+    <message>
+        <source>Save In:</source>
+        <translation>Guardar en:</translation>
+    </message>
+    <message>
+        <source>Project:</source>
+        <translation>Proyecto:</translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation>Episodio:</translation>
+    </message>
+    <message>
+        <source>Sequence:</source>
+        <translation>Secuencia:</translation>
+    </message>
+    <message>
+        <source>Scene:</source>
+        <translation>Escena:</translation>
+    </message>
+    <message>
+        <source>Subfolder Name:</source>
+        <translation>Nombre de subcarpeta:</translation>
+    </message>
+    <message>
+        <source>Subfolder name should not be empty.</source>
+        <translation>El nombre de la subcarpeta no puede estar vacío.</translation>
+    </message>
+    <message>
+        <source>Subfolder name should not contain following characters:  * . &quot; / \ [ ] : ; | = , </source>
+        <translation>El nombre de la subcarpeta no puede contener los siguientes caracteres:  * . &quot; / \ [ ] : ; | = , </translation>
+    </message>
+    <message>
+        <source>Folder %1 already exists.</source>
+        <translation>La carpeta %1 ya existe.</translation>
+    </message>
+    <message>
+        <source>It is not possible to create the %1 folder.</source>
+        <translation>No es posible crear la carpeta %1.</translation>
+    </message>
+    <message>
+        <source>Set As Default</source>
+        <translation>Establecer como predefinida</translation>
+    </message>
+    <message>
+        <source>Set the current &quot;Save In&quot; path as the default.</source>
+        <translation>Establecer la ruta actual de &quot;Guardar en&quot; como ruta predefinida.</translation>
+    </message>
 </context>
 <context>
     <name>PltGizmoPopup</name>
@@ -5387,7 +5734,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Blend</source>
-        <translation>Mezclar</translation>
+        <translation>Degradar</translation>
     </message>
     <message>
         <source>Full Matte</source>
@@ -5424,6 +5771,18 @@ Do you want to overwrite it?</source>
     <message>
         <source>Color</source>
         <translation>Color</translation>
+    </message>
+    <message>
+        <source>Full Alpha</source>
+        <translation>Alfa 100%</translation>
+    </message>
+    <message>
+        <source>Zero Alpha</source>
+        <translation>Alfa 0%</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>Alfa</translation>
     </message>
 </context>
 <context>
@@ -5530,15 +5889,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Speed In / Speed Out</source>
-        <translation>Aceleraciones y desaceleraciones rápidas</translation>
+        <translation>Bézier</translation>
     </message>
     <message>
         <source>Ease In / Ease Out</source>
-        <translation>Aceleraciones y desaceleraciones suaves</translation>
+        <translation>Suave</translation>
     </message>
     <message>
         <source>Ease In / Ease Out %</source>
-        <translation>Aceleraciones y desaceleraciones suaves %</translation>
+        <translation>Suave %</translation>
     </message>
     <message>
         <source>Animation Step:</source>
@@ -5570,11 +5929,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>   Following Frames Correction: </source>
-        <translation>   Corrección de fotogramas siguientes: </translation>
+        <translation>   Color de fotogramas siguientes: </translation>
     </message>
     <message>
         <source>   Previous  Frames Correction: </source>
-        <translation>   Corrección de fotogramas anteriores: </translation>
+        <translation>   Color de fotogramas anteriores: </translation>
     </message>
     <message>
         <source>Display Lines Only </source>
@@ -5682,7 +6041,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Use the TLV Savebox to Limit Filling Operations</source>
-        <translation>Rellenar usando el marco delimitador en niveles de imagen de Toonz</translation>
+        <translation>Limitar rellenado usando el marco delimitador de niveles TLV</translation>
     </message>
     <message>
         <source>Paper Thickness:</source>
@@ -5694,15 +6053,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Transparency Check</source>
-        <translation>Comprobación de transparencia</translation>
+        <translation>Comprobación transparencia</translation>
     </message>
     <message>
         <source>   Ink Color on White Bg: </source>
-        <translation>   Tinta sobre fondo blanco: </translation>
+        <translation>   Tinta (fondo blanco): </translation>
     </message>
     <message>
         <source>   Ink Color on Black Bg: </source>
-        <translation>   Tinta sobre fondo negro: </translation>
+        <translation>   Tinta (fondo negro): </translation>
     </message>
     <message>
         <source> Paint Color: </source>
@@ -5818,7 +6177,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Viewer  Shrink</source>
-        <translation>Visor     Reducción</translation>
+        <translation>Visor       Reducción</translation>
     </message>
     <message>
         <source>Step</source>
@@ -5850,7 +6209,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Default TLV Caching Behavior</source>
-        <translation>Caché de niveles de imagen de Toonz</translation>
+        <translation>Caché de niveles TLV</translation>
     </message>
     <message>
         <source>Column Icon</source>
@@ -5866,19 +6225,19 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Following Frames Correction:</source>
-        <translation>Corrección de fotogramas siguientes:</translation>
+        <translation>Color de fotogramas siguientes:</translation>
     </message>
     <message>
         <source>Previous  Frames Correction:</source>
-        <translation>Corrección de fotogramas anteriores:</translation>
+        <translation>Color de fotogramas anteriores:</translation>
     </message>
     <message>
         <source>Ink Color on White Bg:</source>
-        <translation>Tinta sobre fondo blanco:</translation>
+        <translation>Tinta (fondo blanco):</translation>
     </message>
     <message>
         <source>Ink Color on Black Bg:</source>
-        <translation>Tinta sobre fondo negro:</translation>
+        <translation>Tinta (fondo negro):</translation>
     </message>
     <message>
         <source>Paint Color:</source>
@@ -6078,6 +6437,90 @@ Is it OK to release these shortcuts?</source>
         <source>Fast Render Path: </source>
         <translation>Ruta para procesamiento rápido: </translation>
     </message>
+    <message>
+        <source>Replace Level after SaveLevelAs command</source>
+        <translation>Remplazar nivel luego del comando Guardar nivel como</translation>
+    </message>
+    <message>
+        <source>Use Arrow Key to Shift Cell Selection</source>
+        <translation>Usar teclas de flechas para cambiar la selección de acetatos</translation>
+    </message>
+    <message>
+        <source>Enable to Input Cells without Double Clicking</source>
+        <translation>Habilitar el ingreso de acetatos sin hacer doble clic</translation>
+    </message>
+    <message>
+        <source>Watch File System and Update File Browser Automatically</source>
+        <translation>Actualizar el explorador de archivos de forma automática</translation>
+    </message>
+    <message>
+        <source>Use Camera DPI for All Imported Images</source>
+        <translation>Usar los PPP de la cámara para todas las imágenes importadas</translation>
+    </message>
+    <message>
+        <source>Show Toolbar in the XSheet </source>
+        <translation>Mostrar la barra de herramientas en la planilla</translation>
+    </message>
+    <message>
+        <source>Expand Function Editor Header to Match XSheet Toolbar Height (Requires Restart)</source>
+        <translation>Expandir editor de funciones para coincidir con la nueva altura de la planilla*</translation>
+    </message>
+    <message>
+        <source>Show Column Numbers in Column Headers</source>
+        <translation>Mostrar números de columna en encabezados de columnas</translation>
+    </message>
+    <message>
+        <source>Always ask before loading or importing</source>
+        <translation>Consultar antes de cargar o importar</translation>
+    </message>
+    <message>
+        <source>Always import the file to the current project</source>
+        <translation>Importar el archivo al proyecto actual</translation>
+    </message>
+    <message>
+        <source>Always load the file from the current location</source>
+        <translation>Cargar el archivo desde su ubicación original</translation>
+    </message>
+    <message>
+        <source>Strokes</source>
+        <translation>Trazos</translation>
+    </message>
+    <message>
+        <source>Guides</source>
+        <translation>Guías</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Todo</translation>
+    </message>
+    <message>
+        <source>Default File Import Behavior:</source>
+        <translation>Comportamiento al importar</translation>
+    </message>
+    <message>
+        <source>Default TLV Caching Behavior:</source>
+        <translation>Comportamiento de caché de imágenes de Toonz (TLV):</translation>
+    </message>
+    <message>
+        <source>Column Icon:</source>
+        <translation>Íconos de columna:</translation>
+    </message>
+    <message>
+        <source>Palette Type on Loading Raster Image as Color Model:</source>
+        <translation>Tipo de paleta al cargar una imagen como modelo de color:</translation>
+    </message>
+    <message>
+        <source>Vector Snapping:</source>
+        <translation>Adherencia (vectorial):</translation>
+    </message>
+    <message>
+        <source>New Levels Default to the Current Camera Size</source>
+        <translation>Los nuevos niveles usan el tamaño de la cámara actual</translation>
+    </message>
+    <message>
+        <source>Enable OpenToonz Commands&apos; Shortcut Keys While Renaming Cell</source>
+        <translation>Habilitar atajos de teclado de OpenToonz al renombrar acetatos</translation>
+    </message>
 </context>
 <context>
     <name>PreferencesPopup::FormatProperties</name>
@@ -6259,6 +6702,18 @@ Do you want to overwrite it?</source>
         <source>Expose layers in a group as frames in a column</source>
         <translation>Exponer capas de un grupo como fotogramas en una columna</translation>
     </message>
+    <message>
+        <source>FileName#LayerName</source>
+        <translation>NombreArchivo#NombreCapa</translation>
+    </message>
+    <message>
+        <source>LayerName</source>
+        <translation>Nombre de capa</translation>
+    </message>
+    <message>
+        <source>Level Name:</source>
+        <translation>Nombre de nivel:</translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>
@@ -6387,7 +6842,7 @@ What do you want to do? </source>
     </message>
     <message>
         <source>Style Editor</source>
-        <translation>Editor de estilo</translation>
+        <translation>Editor de estilos</translation>
     </message>
     <message>
         <source>Viewer</source>
@@ -6547,10 +7002,6 @@ algunas regiones son demasiado altas.</translation>
         <translation>Error de umbral de distancia</translation>
     </message>
     <message>
-        <source>Sensibility Error</source>
-        <translation>Error de sensibilidad</translation>
-    </message>
-    <message>
         <source>No Frame Found</source>
         <translation>No se encontraron fotogramas</translation>
     </message>
@@ -6571,12 +7022,6 @@ no se ha seleccionado un nivel.</translation>
 the level has to be saved first.</source>
         <translation>No es posible rastrear las regiones especificadas:
 el nivel tiene que ser guardado antes.</translation>
-    </message>
-    <message>
-        <source>It is not possible to track the level:
-undefinied error.</source>
-        <translation>No es posible rastrear el nivel:
-error no definido.</translation>
     </message>
     <message>
         <source>It is not possible to paste the columns: there is a circular reference.</source>
@@ -6785,12 +7230,6 @@ Are you sure you want to revert to previous version?</source>
         <translation>Los espacios de trabajo serán restablecidos la próxima vez que se ejecute OpenToonz.</translation>
     </message>
     <message>
-        <source>The license validation process was not able to confirm the right to use this software on this computer.
- Please contact [ support@toonz.com ] for assistance.</source>
-        <translation>El proceso de validación de la licencia no ha sido capaz de confirmar el derecho a usar este programa en esta computadora.
- Por favor contactar [ support@toonz.com ] para obtener asistencia.</translation>
-    </message>
-    <message>
         <source>Saving previewed frames....</source>
         <translation>Guardando fotogramas previsualizados...</translation>
     </message>
@@ -6952,7 +7391,7 @@ Algunos niveles no han sido cargados porque su versión no es soportada.</transl
     </message>
     <message>
         <source>Match lines can be deleted from Toonz raster levels only</source>
-        <translation>Sólo es posible borrar líneas de coincidencia de los niveles de imagen de OpenToonz.</translation>
+        <translation>Sólo es posible borrar líneas de coincidencia de los niveles de imagen de Toonz</translation>
     </message>
     <message>
         <source>Partially Edited</source>
@@ -7008,7 +7447,7 @@ Algunos niveles no han sido cargados porque su versión no es soportada.</transl
     </message>
     <message>
         <source>Match lines can be applied to Toonz raster levels only.</source>
-        <translation>Sólo es posible aplicar líneas de coincidencia a niveles de imagen de OpenToonz.</translation>
+        <translation>Sólo es posible aplicar líneas de coincidencia a niveles de imagen de Toonz.</translation>
     </message>
     <message>
         <source>The style index you specified is not available in the palette of the destination level.</source>
@@ -7269,7 +7708,7 @@ Are you sure ?</source>
     </message>
     <message>
         <source>Set Keyframe : %1</source>
-        <translation>Definir fotograma clave: %1</translation>
+        <translation>Marcar fotograma clave: %1</translation>
     </message>
     <message>
         <source>Close SubXsheet</source>
@@ -7771,6 +8210,30 @@ Are you sure?</source>
     <message>
         <source>Skipping frame.</source>
         <translation>Omitiendo fotograma.</translation>
+    </message>
+    <message>
+        <source>Toonz cannot Save this Level</source>
+        <translation>OpenToonz no puede guardar este nivel</translation>
+    </message>
+    <message>
+        <source>Set Keyframe  : %1  at Frame %2</source>
+        <translation>Marcar clave  : %1  en fotograma %2</translation>
+    </message>
+    <message>
+        <source>Always do this action.</source>
+        <translation>Siempre realizar esta acción.</translation>
+    </message>
+    <message>
+        <source>The selected scene could not be found.</source>
+        <translation>La escena seleccionada no pudo ser encontrada.</translation>
+    </message>
+    <message>
+        <source>Layer name</source>
+        <translation>Nombre de capa</translation>
+    </message>
+    <message>
+        <source>Command Bar</source>
+        <translation>Barra de comandos</translation>
     </message>
 </context>
 <context>
@@ -8872,7 +9335,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Paper Format:</source>
-        <translation>Formato del papel:</translation>
+        <translation>Formato de papel:</translation>
     </message>
     <message>
         <source>Reverse Order</source>
@@ -8880,7 +9343,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Paper Feeder</source>
-        <translation>Alimentación de papel</translation>
+        <translation>Alimentador de papel</translation>
     </message>
     <message>
         <source>Dpi: </source>
@@ -8931,7 +9394,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Image Subsampling:</source>
-        <translation>Submuestreo de imagen:</translation>
+        <translation>Submuestreo (imágenes):</translation>
     </message>
     <message>
         <source>      Marker Interval:</source>
@@ -8951,7 +9414,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>TLV Subsampling:</source>
-        <translation>Submuestreo de TLV:</translation>
+        <translation>Submuestreo (imágenes TLV):</translation>
     </message>
     <message>
         <source>Start Frame:</source>
@@ -8976,6 +9439,10 @@ Por favor enviar o revertir los cambios antes.</translation>
     <message>
         <source>  Start Frame:</source>
         <translation>  Fotograma inicial:</translation>
+    </message>
+    <message>
+        <source>Enable Column Color Filter and Transparency for Rendering</source>
+        <translation>Habilitar filtro de color y transparencia de columna durante el procesamiento</translation>
     </message>
 </context>
 <context>
@@ -9161,6 +9628,14 @@ Por favor enviar o revertir los cambios antes.</translation>
     <message>
         <source>Load from file...</source>
         <translation>Cargar desde archivo...</translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation>Cargar</translation>
+    </message>
+    <message>
+        <source>Shortcut Presets</source>
+        <translation>Ajustes de atajos</translation>
     </message>
 </context>
 <context>
@@ -9526,6 +10001,14 @@ Possibly the preset file has been corrupted</source>
         <translation>&apos;%1&apos; no parece ser un ajuste de cámara bien formado. 
 Es posible que el archivo del ajuste esté corrupto</translation>
     </message>
+    <message>
+        <source>The width must be greater than zero.</source>
+        <translation>El ancho debe ser mayor a cero.</translation>
+    </message>
+    <message>
+        <source>The height must be greater than zero.</source>
+        <translation>La altura debe ser mayor a cero.</translation>
+    </message>
 </context>
 <context>
     <name>SubSheetBar</name>
@@ -9628,10 +10111,6 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     <message>
         <source>Failed Steps:</source>
         <translation>Pasos fallidos:</translation>
-    </message>
-    <message>
-        <source>Successfull Steps:</source>
-        <translation>Pasos exitosos:</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -9930,12 +10409,8 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
         <translation>Umbral:</translation>
     </message>
     <message>
-        <source>Sensibility:</source>
-        <translation>Sensibilidad:</translation>
-    </message>
-    <message>
         <source>Variable Region Size</source>
-        <translation>Tamaño de la región variable</translation>
+        <translation>Tamaño variable de región</translation>
     </message>
     <message>
         <source>Include Background</source>
@@ -9966,19 +10441,19 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Centerline</source>
-        <translation>Línea central</translation>
+        <translation>Líneas centrales</translation>
     </message>
     <message>
         <source>Outline</source>
-        <translation>Contorno</translation>
+        <translation>Contornos</translation>
     </message>
     <message>
         <source>Preserve Painted Areas</source>
-        <translation>Preservar las áreas coloreadas</translation>
+        <translation>Preservar áreas pintadas</translation>
     </message>
     <message>
         <source>TLV Levels</source>
-        <translation>Niveles TLV</translation>
+        <translation>Niveles de imagen de Toonz</translation>
     </message>
     <message>
         <source>Convert</source>
@@ -10054,7 +10529,7 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Enhanced ink recognition</source>
-        <translation>Reconocimiento mejorado de tintas</translation>
+        <translation>Reconocimiento mejorado de tinta</translation>
     </message>
     <message>
         <source>Adherence</source>
@@ -10070,7 +10545,7 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Max Colors</source>
-        <translation>Colores máximos</translation>
+        <translation>Cantidad máx. de colores</translation>
     </message>
     <message>
         <source>Transparent Color</source>
@@ -10102,11 +10577,11 @@ Clic en el botón con una flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Save Vectorizer Parameters</source>
-        <translation>Guardar parámetros de vectorización</translation>
+        <translation>Guardar opciones de vectorización</translation>
     </message>
     <message>
         <source>Load Vectorizer Parameters</source>
-        <translation>Cargar parámetros de vectorización</translation>
+        <translation>Cargar opciones de vectorización</translation>
     </message>
 </context>
 <context>
@@ -10278,7 +10753,7 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
     <message>
         <source>Reframe</source>
-        <translation>Cambiar fotogramas</translation>
+        <translation>Exposición de acetatos</translation>
     </message>
     <message>
         <source>Subsampling</source>
@@ -10411,6 +10886,25 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     <message>
         <source>Pinned Center : Col%1%2</source>
         <translation>Centro fijo: Col%1%2</translation>
+    </message>
+    <message>
+        <source>Set Auto Markers</source>
+        <translation>Definir marcadores automáticamente</translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::Toolbar</name>
+    <message>
+        <source>New Vector Level</source>
+        <translation>Nuevo nivel vectorial</translation>
+    </message>
+    <message>
+        <source>New Toonz Raster Level</source>
+        <translation>Nuevo nivel de imagen de Toonz</translation>
+    </message>
+    <message>
+        <source>New Raster Level</source>
+        <translation>Nuevo nivel de imagen</translation>
     </message>
 </context>
 <context>

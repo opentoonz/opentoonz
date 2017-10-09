@@ -224,6 +224,11 @@ public:
     return m_moveCurrentFrameByClickCellArea;
   }
 
+  void setInterfaceFont(std::string font);
+  QString getInterfaceFont() { return m_interfaceFont; }
+  void setInterfaceFontWeight(int weight);
+  int getInterfaceFontWeight() { return m_interfaceFontWeight; }
+
   // Visualization  tab
 
   void setShow0ThickLines(bool on);
@@ -324,6 +329,11 @@ public:
     return m_useNumpadForSwitchingStyles;
   }
 
+  void setGuidedDrawing(int status);
+  int getGuidedDrawing() { return m_guidedDrawingType; }
+  void setAnimatedGuidedDrawing(bool status);
+  bool getAnimatedGuidedDrawing() const { return m_animatedGuidedDrawing; }
+
   void enableNewLevelSizeToCameraSize(bool on);
   bool isNewLevelSizeToCameraSizeEnabled() const {
     return m_newLevelSizeToCameraSizeEnabled;
@@ -333,7 +343,6 @@ public:
   int getVectorSnappingTarget() { return m_vectorSnappingTarget; }
 
   // Xsheet  tab
-
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
                                  //! step</I> commands.
   int getXsheetStep() const {
@@ -378,6 +387,17 @@ public:
 
   void enableShowColumnNumbers(bool on);
   bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
+
+  void enableShortcutCommandsWhileRenamingCell(bool on);
+  bool isShortcutCommandsWhileRenamingCellEnabled() const {
+    return m_shortcutCommandsWhileRenamingCellEnabled;
+  }
+
+  void setXsheetLayoutPreference(std::string layout);
+  QString getXsheetLayoutPreference() const { return m_xsheetLayoutPreference; }
+
+  void setLoadedXsheetLayout(std::string layout);
+  QString getLoadedXsheetLayout() const { return m_loadedXsheetLayout; }
 
   // Animation  tab
 
@@ -495,7 +515,7 @@ private:
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
       m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
-      m_customProjectRoot;
+      m_customProjectRoot, m_interfaceFont;
   QString m_fastRenderPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
@@ -509,7 +529,7 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-  int m_projectRoot, m_importPolicy;
+  int m_projectRoot, m_importPolicy, m_interfaceFontWeight, m_guidedDrawingType;
   QString m_currentLanguage, m_currentStyleSheet;
   int m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
@@ -521,7 +541,7 @@ private:
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
       m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar,
-      m_expandFunctionHeader, m_showColumnNumbers;
+      m_expandFunctionHeader, m_showColumnNumbers, m_animatedGuidedDrawing;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
@@ -581,6 +601,11 @@ private:
   // enable to watch file system in order to update file browser automatically
   bool m_watchFileSystem;
 
+  // enable OT command shortcut keys while renaming xsheet cell
+  bool m_shortcutCommandsWhileRenamingCellEnabled;
+
+  QString m_xsheetLayoutPreference,
+      m_loadedXsheetLayout;  // Classic, Classic-revised, compact
 private:
   Preferences();
   ~Preferences();

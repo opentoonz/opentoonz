@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -112,11 +112,11 @@
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremo</translation>
+        <translation>Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Unión</translation>
+        <translation>Uniones</translation>
     </message>
     <message>
         <source>Miter:</source>
@@ -366,6 +366,18 @@
         <source>Preset:</source>
         <translation>Ajuste:</translation>
     </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Presión</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>Opacidad</translation>
+    </message>
 </context>
 <context>
     <name>FullColorEraserTool</name>
@@ -514,11 +526,11 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Definir clave</translation>
+        <translation>Marcar clave</translation>
     </message>
     <message>
         <source>Set Rest Key</source>
-        <translation>Definir clave de reposo</translation>
+        <translation>Marcar clave de reposo</translation>
     </message>
     <message>
         <source>Show Mesh</source>
@@ -546,11 +558,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Set Global Key</source>
-        <translation>Definir clave global</translation>
+        <translation>Marcar clave global</translation>
     </message>
     <message>
         <source>Set Global Rest Key</source>
-        <translation>Definir clave global de reposo</translation>
+        <translation>Marcar clave global de reposo</translation>
     </message>
     <message>
         <source>Edit Mesh</source>
@@ -644,11 +656,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremo</translation>
+        <translation>Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Unión</translation>
+        <translation>Uniones</translation>
     </message>
     <message>
         <source>Miter:</source>
@@ -657,6 +669,10 @@ Do you want to proceed?</source>
     <message>
         <source>Size:</source>
         <translation>Tamaño:</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>Adherir</translation>
     </message>
 </context>
 <context>
@@ -940,6 +956,18 @@ Do you want to proceed?</source>
         <source>Palette must have more than one palette to be organized.</source>
         <translation>Es necesario que exista más de una paleta para poder organizarlas.</translation>
     </message>
+    <message>
+        <source>Mode:</source>
+        <translation>Modo:</translation>
+    </message>
+    <message>
+        <source>Passive Pick</source>
+        <translation>Selección pasiva</translation>
+    </message>
+    <message>
+        <source>Organize Palette</source>
+        <translation>Organizar paleta</translation>
+    </message>
 </context>
 <context>
     <name>StylePickerToolOptionsBox</name>
@@ -1000,11 +1028,11 @@ movido hacia el final de la primera página de la paleta.</translation>
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremo</translation>
+        <translation>Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Unión</translation>
+        <translation>Uniones</translation>
     </message>
     <message>
         <source>Miter:</source>

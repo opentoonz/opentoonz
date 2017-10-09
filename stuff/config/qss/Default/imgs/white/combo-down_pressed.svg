@@ -29,6 +29,6 @@
      id="layer1" />
   <path
      id="path2"
-     style="clip-rule:evenodd;fill:#ffffff;fill-opacity:0.60784314;fill-rule:evenodd;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:1.41420996"
-     d="M 9.722125,7 H 4.277875 3.5 L 7,11 10.5,7 Z" />
+     style="clip-rule:evenodd;fill:#ffffff;fill-opacity:0.78431373;fill-rule:evenodd;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:1.41420996"
+     d="M 10.722125,7 H 5.277875 4.5 L 8,11 11.5,7 Z" />
 </svg>
