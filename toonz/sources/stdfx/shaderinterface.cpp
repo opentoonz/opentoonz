@@ -8,8 +8,8 @@
 #include "tmsgcore.h"
 
 // Qt includes
-#include <QGLShaderProgram>
-#include <QGLShader>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLShader>
 #include <QDir>
 
 #include "stdfx/shaderinterface.h"
@@ -30,7 +30,7 @@ namespace {
 
 // Filescope declarations
 
-typedef std::pair<QGLShaderProgram *, QDateTime> CompiledShader;
+typedef std::pair<QOpenGLShaderProgram *, QDateTime> CompiledShader;
 
 struct CaselessCompare {
   const QString &m_str;
@@ -79,9 +79,9 @@ const static std::string l_names[NAMESCOUNT] = {
 
 // Filescope functions
 
-inline bool loadShader(QGLShader::ShaderType type, const TFilePath &fp,
+inline bool loadShader(QOpenGLShader::ShaderType type, const TFilePath &fp,
                        CompiledShader &cs) {
-  QGLShader *shader = new QGLShader(type, cs.first);
+  QOpenGLShader *shader = new QOpenGLShader(type, cs.first);
 
   const QString &qfp = QString::fromStdWString(fp.getWideString());
 
@@ -165,14 +165,14 @@ ShaderInterface::HandledWorldTransformsType ShaderInterface::hwtType() const {
 
 //---------------------------------------------------------
 
-std::pair<QGLShaderProgram *, QDateTime> ShaderInterface::makeProgram(
+std::pair<QOpenGLShaderProgram *, QDateTime> ShaderInterface::makeProgram(
     const ShaderData &sd, int varyingsCount,
     const GLchar **varyingNames) const {
   CompiledShader result;
 
   if (!isValid()) return result;
 
-  result.first = new QGLShaderProgram;
+  result.first = new QOpenGLShaderProgram;
 
   ::loadShader(sd.m_type, sd.m_path, result);
 
@@ -274,7 +274,7 @@ void ShaderInterface::loadData(TIStream &is) {
     while (is.openChild(tagName)) {
       if (tagName == l_names[MAIN_PROGRAM]) {
         is >> m_mainShader;
-        m_mainShader.m_type = QGLShader::Fragment;
+        m_mainShader.m_type = QOpenGLShader::Fragment;
         is.closeChild();
       } else if (tagName == l_names[INPUT_PORTS]) {
         while (is.openChild(tagName)) {
@@ -287,7 +287,7 @@ void ShaderInterface::loadData(TIStream &is) {
             is.closeChild();
           } else if (tagName == l_names[PORTS_PROGRAM]) {
             is >> m_portsShader;
-            m_portsShader.m_type = QGLShader::Vertex;
+            m_portsShader.m_type = QOpenGLShader::Vertex;
             is.closeChild();
           } else
             ::skipTag(is, tagName);
@@ -296,7 +296,7 @@ void ShaderInterface::loadData(TIStream &is) {
         is.closeChild();
       } else if (tagName == l_names[BBOX_PROGRAM]) {
         is >> m_bboxShader;
-        m_bboxShader.m_type = QGLShader::Vertex;
+        m_bboxShader.m_type = QOpenGLShader::Vertex;
         is.closeChild();
       } else if (tagName == l_names[HANDLED_WORLD_TRANSFORMS]) {
         QString hwtName;

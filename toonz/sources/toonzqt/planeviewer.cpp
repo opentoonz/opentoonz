@@ -189,7 +189,7 @@ void PlaneViewer::wheelEvent(QWheelEvent *event) {
 void PlaneViewer::keyPressEvent(QKeyEvent *event) {
   if (PlaneViewerZoomer(this).exec(event)) return;
 
-  QGLWidget::keyPressEvent(event);
+  QOpenGLWidget::keyPressEvent(event);
 }
 
 //------------------------------------------------------
