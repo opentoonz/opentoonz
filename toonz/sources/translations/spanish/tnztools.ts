@@ -714,7 +714,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation>La columna actual no se encuentra visible en la vista detrás de cámara.</translation>
+        <translation>La columna actual no se encuentra visible en la vista de mesa de trabajo.</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>

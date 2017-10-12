@@ -240,7 +240,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Abrir sub-planilla</translation>
+        <translation>&amp;Entrar en sub-planilla</translation>
     </message>
 </context>
 <context>
@@ -980,7 +980,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Abrir sub-planilla</translation>
+        <translation>&amp;Entrar en sub-planilla</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
