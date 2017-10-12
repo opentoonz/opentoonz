@@ -1777,7 +1777,10 @@ void PencilTestPopup::onImageCaptured(int id, const QImage& image) {
       m_cameraViewfinder->setPreviousImage(procImg);
       if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
         int f = m_frameNumberEdit->getValue();
-        m_frameNumberEdit->setValue(((int)(f / 10) + 1) * 10);
+        if (f % 10 == 0)  // next number
+          m_frameNumberEdit->setValue(((int)(f / 10) + 1) * 10);
+        else  // next alphabet
+          m_frameNumberEdit->setValue(f + 1);
       } else
         m_frameNumberEdit->setValue(m_frameNumberEdit->getValue() + 1);
 
