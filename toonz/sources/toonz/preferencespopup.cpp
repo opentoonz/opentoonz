@@ -1086,6 +1086,12 @@ void PreferencesPopup::onWatchFileSystemClicked(int on) {
       "WatchFileSystem");
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onShowCurrentTimelineChanged(int index) {
+  m_pref->enableCurrentTimelineIndicator(index == Qt::Checked);
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1310,6 +1316,8 @@ PreferencesPopup::PreferencesPopup()
   xsheetLayoutOptions->addItems(xsheetLayouts);
   xsheetLayoutOptions->setCurrentIndex(
       xsheetLayoutOptions->findText(m_pref->getXsheetLayoutPreference()));
+  CheckBox *showCurrentTimelineCB = new CheckBox(
+      tr("Show Current Time Indicator (Timeline Mode only)"), this);
 
   QLabel *note_xsheet =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
@@ -1621,6 +1629,8 @@ PreferencesPopup::PreferencesPopup()
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
+  showCurrentTimelineCB->setChecked(
+      m_pref->isCurrentTimelineIndicatorEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -2114,11 +2124,12 @@ PreferencesPopup::PreferencesPopup()
 
         xsheetFrameLay->addWidget(m_showXSheetToolbar, 9, 0, 3, 3);
         xsheetFrameLay->addWidget(showColumnNumbersCB, 12, 0, 1, 2);
+        xsheetFrameLay->addWidget(showCurrentTimelineCB, 13, 0, 1, 2);
       }
       xsheetFrameLay->setColumnStretch(0, 0);
       xsheetFrameLay->setColumnStretch(1, 0);
       xsheetFrameLay->setColumnStretch(2, 1);
-      xsheetFrameLay->setRowStretch(13, 1);
+      xsheetFrameLay->setRowStretch(14, 1);
 
       xsheetBoxFrameLay->addLayout(xsheetFrameLay);
 
@@ -2539,6 +2550,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onOnionPaperThicknessChanged()));
   ret = ret && connect(m_guidedDrawingStyle, SIGNAL(currentIndexChanged(int)),
                        SLOT(onGuidedDrawingStyleChanged(int)));
+  ret = ret && connect(showCurrentTimelineCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onShowCurrentTimelineChanged(int)));
+
   //--- Transparency Check ----------------------
   ret = ret && connect(m_transpCheckBgColor,
                        SIGNAL(colorChanged(const TPixel32 &, bool)),

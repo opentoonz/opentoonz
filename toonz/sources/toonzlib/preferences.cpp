@@ -328,7 +328,8 @@ Preferences::Preferences()
     , m_watchFileSystem(true)
     , m_shortcutCommandsWhileRenamingCellEnabled(false)
     , m_xsheetLayoutPreference("Classic-revised")
-    , m_loadedXsheetLayout("Classic-revised") {
+    , m_loadedXsheetLayout("Classic-revised")
+    , m_currentTimelineEnabled(false) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -646,6 +647,8 @@ Preferences::Preferences()
     m_xsheetLayoutPreference = QString("Classic");
   setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
   m_loadedXsheetLayout = m_xsheetLayoutPreference;
+
+  getValue(*m_settings, "currentTimelineEnabled", m_currentTimelineEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -1546,4 +1549,11 @@ void Preferences::enableShortcutCommandsWhileRenamingCell(bool on) {
   m_shortcutCommandsWhileRenamingCellEnabled = on;
   m_settings->setValue("shortcutCommandsWhileRenamingCellEnabled",
                        on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableCurrentTimelineIndicator(bool on) {
+  m_currentTimelineEnabled = on;
+  m_settings->setValue("currentTimelineEnabled", on ? "1" : "0");
 }
