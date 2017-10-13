@@ -799,8 +799,10 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
 
   CommandManager *cmdManager = CommandManager::instance();
 
-  menu->addAction(cmdManager->getAction(MI_ToggleCurrentTimeIndicator));
-  menu->addSeparator();
+  if (!m_viewer->orientation()->isVerticalTimeline()) {
+    menu->addAction(cmdManager->getAction(MI_ToggleCurrentTimeIndicator));
+    menu->addSeparator();
+  }
 
   menu->addAction(cmdManager->getAction(MI_InsertSceneFrame));
   menu->addAction(cmdManager->getAction(MI_RemoveSceneFrame));
