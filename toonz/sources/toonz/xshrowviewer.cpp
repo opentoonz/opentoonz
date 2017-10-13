@@ -413,6 +413,27 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 
 //-----------------------------------------------------------------------------
 
+void RowArea::drawCurrentTimeIndicator(QPainter &p) {
+	TApp *app = TApp::instance();
+	TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
+	assert(xsh);
+	int currentRow = m_viewer->getCurrentRow();
+
+	QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
+	QRect header = m_viewer->orientation()
+		->rect(PredefinedRect::FRAME_HEADER)
+		.translated(topLeft);
+
+	int frameMid = header.left() + (header.width()/2);
+	int frameTop = header.top();
+	int frameBottom = header.bottom();
+
+	p.setPen(Qt::red);
+	p.drawLine(frameMid, frameTop, frameMid, frameBottom);
+}
+
+//-----------------------------------------------------------------------------
+
 namespace {
 
 TStageObjectId getAncestor(TXsheet *xsh, TStageObjectId id) {
@@ -510,6 +531,12 @@ void RowArea::paintEvent(QPaintEvent *event) {
   if (TApp::instance()->getCurrentFrame()->isEditingScene())
     // current frame
     drawCurrentRowGadget(p, r0, r1);
+
+  if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+	  !m_viewer->orientation()->isVerticalTimeline() &&
+	  Preferences::instance()->isCurrentTimelineIndicatorEnabled()
+	 )
+	  drawCurrentTimeIndicator(p);
 
   drawRows(p, r0, r1);
 
