@@ -1132,7 +1132,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Unpainted File Folder:</source>
-        <translation>Carpeta de archivos no pintados:</translation>
+        <translation>Carpeta con archivos no pintados:</translation>
     </message>
     <message>
         <source> Unpainted File Suffix:</source>
@@ -1144,15 +1144,15 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Keep Original Antialiasing</source>
-        <translation>Mantener suavizado original de bordes</translation>
+        <translation>Mantener original</translation>
     </message>
     <message>
         <source>Add Antialiasing with Intensity:</source>
-        <translation>Agregar suavizado de bordes con intensidad:</translation>
+        <translation>Agregar suavizado de bordes usando  Intensidad:</translation>
     </message>
     <message>
         <source>Remove Antialiasing using Threshold:</source>
-        <translation>Eliminar suavizado de bordes mediante umbral:</translation>
+        <translation>Eliminar suavizado de bordes usando  Umbral:</translation>
     </message>
     <message>
         <source>                      Palette:</source>
@@ -1172,7 +1172,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Same as Painted</source>
-        <translation>Igual que pintado</translation>
+        <translation>La misma carpeta</translation>
     </message>
     <message>
         <source>No unpainted suffix specified: cannot convert.</source>
@@ -1224,15 +1224,15 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Unpainted tlv</source>
-        <translation>TLV sin pintar</translation>
+        <translation>TLV no pintado</translation>
     </message>
     <message>
         <source>Painted tlv from two images</source>
-        <translation>TLV pintado a partir de dos imágenes</translation>
+        <translation>TLV pintado (a partir de dos imágenes)</translation>
     </message>
     <message>
         <source>Painted tlv from non AA source</source>
-        <translation>TLV pintado a partir de un original sin suavizado de bordes</translation>
+        <translation>TLV pintado (original sin suavizado de bordes)</translation>
     </message>
     <message>
         <source>Create new palette</source>
@@ -1240,15 +1240,15 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Stroke Mode:</source>
-        <translation>Modo del trazo:</translation>
+        <translation>Modo de trazo:</translation>
     </message>
     <message>
         <source>Centerline</source>
-        <translation>Línea central</translation>
+        <translation>Líneas</translation>
     </message>
     <message>
         <source>Outline</source>
-        <translation>Contorno</translation>
+        <translation>Contornos</translation>
     </message>
     <message>
         <source>Mode:</source>
@@ -1272,11 +1272,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Unpainted tlv from non AA source</source>
-        <translation>TLV sin pintar a partir de un original sin suavizado de bordes</translation>
+        <translation>TLV no pintado (original sin suavizado de bordes)</translation>
     </message>
     <message>
         <source>Remove dot before frame number</source>
-        <translation>Eliminar el punto anterior al número de fotogramas</translation>
+        <translation>Eliminar el punto anterior al número de fotograma</translation>
     </message>
     <message>
         <source>  End:</source>
@@ -1521,7 +1521,7 @@ contuviera información de PPP, entonces se usarán los de la cámara actual.
     <name>DvItemViewerButtonBar</name>
     <message>
         <source>Up One Level</source>
-        <translation>A nivel superior</translation>
+        <translation>Subir un nivel</translation>
     </message>
     <message>
         <source>New Folder</source>
@@ -1557,11 +1557,11 @@ contuviera información de PPP, entonces se usarán los de la cámara actual.
     </message>
     <message>
         <source>New</source>
-        <translation>Nuevo</translation>
+        <translation>Nueva</translation>
     </message>
     <message>
         <source>Icon</source>
-        <translation>Ícono</translation>
+        <translation>Íconos</translation>
     </message>
     <message>
         <source>List</source>
@@ -1860,7 +1860,7 @@ contuviera información de PPP, entonces se usarán los de la cámara actual.
     </message>
     <message>
         <source>Convert to Unpainted TLV</source>
-        <translation>Convertir a TLV sin pintar</translation>
+        <translation>Convertir a TLV no pintado</translation>
     </message>
     <message>
         <source>Version Control</source>
@@ -1948,7 +1948,7 @@ contuviera información de PPP, entonces se usarán los de la cámara actual.
     </message>
     <message>
         <source>Convert To Unpainted Tlv</source>
-        <translation>Convertir a TLV sin pintar</translation>
+        <translation>Convertir a TLV no pintado</translation>
     </message>
     <message>
         <source>Convert To Painted Tlv</source>
@@ -4406,7 +4406,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>InknPaint</source>
-        <translation>EntintadoyPintura</translation>
+        <translation>TintayPintura</translation>
     </message>
     <message>
         <source>Xsheet</source>
@@ -4757,7 +4757,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Add Match Line Styles</source>
-        <translation>Agregar estilos de línea de coincidencia</translation>
+        <translation>Agregar estilos de líneas de coincidencia</translation>
     </message>
     <message>
         <source>Use Style: </source>
@@ -4765,7 +4765,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Line Prevalence</source>
-        <translation>Prevalencia de línea</translation>
+        <translation>Prevalencia de líneas</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -4781,15 +4781,15 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Add Match Line Inks</source>
-        <translation>Agregar tintas de línea de coincidencia</translation>
+        <translation>Agregar estilos de líneas de coincidencia</translation>
     </message>
     <message>
         <source>Use Ink: </source>
-        <translation>Usar tinta: </translation>
+        <translation>Usar estilo: </translation>
     </message>
     <message>
         <source>Ink Usage</source>
-        <translation>Uso de tinta</translation>
+        <translation>Uso de estilos</translation>
     </message>
     <message>
         <source>Line Stacking Order</source>
@@ -4797,11 +4797,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>L-Up R-Down</source>
-        <translation>I-arriba D-abajo</translation>
+        <translation>Izq-arriba  Der-abajo</translation>
     </message>
     <message>
         <source>L-Down R-Up</source>
-        <translation>I-abajo D-arriba</translation>
+        <translation>Izq-abajo  Der-arriba</translation>
     </message>
     <message>
         <source>Keep
@@ -4899,7 +4899,7 @@ Nota: Los comandos duplicados serán ignorados. Sólo el último aparecerá en l
     </message>
     <message>
         <source>File Name:</source>
-        <translation>Nombre de archivo:</translation>
+        <translation>Nuevo nombre:</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -5052,11 +5052,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Fx Schematic Flows</source>
-        <translation>Flujos de diagrama de efectos</translation>
+        <translation>Flujos del diagrama de efectos</translation>
     </message>
     <message>
         <source>Fx Schematic Terminal Nodes</source>
-        <translation>Nodos terminales de diagrama de efectos</translation>
+        <translation>Nodos terminales del diagrama de efectos</translation>
     </message>
     <message>
         <source>Multiple Rendering: </source>
@@ -5168,7 +5168,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Camera Shift:</source>
-        <translation>Desplazamiento de cámara:</translation>
+        <translation>Separación de cámaras:</translation>
     </message>
     <message>
         <source>Stereoscopic Render:</source>
@@ -10374,15 +10374,15 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>Ninguno</translation>
+        <translation>No</translation>
     </message>
     <message>
         <source>Fx Schematic Flows</source>
-        <translation>Flujos de diagrama de efectos</translation>
+        <translation>Flujos del diagrama de efectos</translation>
     </message>
     <message>
         <source>Fx Schematic Terminal Nodes</source>
-        <translation>Nodos terminales de diagrama de efectos</translation>
+        <translation>Nodos terminales del diagrama de efectos</translation>
     </message>
     <message>
         <source>Dedicated CPUs:</source>
@@ -10438,11 +10438,11 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Multimedia:</source>
-        <translation>Multimedios:</translation>
+        <translation>Procesamiento múltiple:</translation>
     </message>
     <message>
         <source>NoPaint</source>
-        <translation>Sin pintura</translation>
+        <translation>No pintados</translation>
     </message>
     <message>
         <source>Off</source>
@@ -10535,11 +10535,11 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Add Render</source>
-        <translation>Agregar procesamiento</translation>
+        <translation>Procesamiento</translation>
     </message>
     <message>
         <source>Add Cleanup</source>
-        <translation>Agregar limpieza</translation>
+        <translation>Limpieza</translation>
     </message>
     <message>
         <source>Save</source>
@@ -10665,11 +10665,11 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     <name>VectorizerPopup</name>
     <message>
         <source>Convert-to-Vector Settings</source>
-        <translation>Opciones de conversión a vectorial</translation>
+        <translation>Opciones de vectorización</translation>
     </message>
     <message>
         <source>Centerline</source>
-        <translation>Líneas centrales</translation>
+        <translation>Líneas</translation>
     </message>
     <message>
         <source>Outline</source>
@@ -10717,7 +10717,7 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Toggle Centerlines Check</source>
-        <translation>Comprobación de líneas centrales</translation>
+        <translation>Comprobación de líneas</translation>
     </message>
     <message>
         <source>Mode</source>
@@ -10761,7 +10761,7 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Adherence</source>
-        <translation>Adherencia</translation>
+        <translation>Respetar</translation>
     </message>
     <message>
         <source>Angle</source>
