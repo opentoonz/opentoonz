@@ -414,22 +414,22 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 //-----------------------------------------------------------------------------
 
 void RowArea::drawCurrentTimeIndicator(QPainter &p) {
-	TApp *app = TApp::instance();
-	TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
-	assert(xsh);
-	int currentRow = m_viewer->getCurrentRow();
+  TApp *app    = TApp::instance();
+  TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
+  assert(xsh);
+  int currentRow = m_viewer->getCurrentRow();
 
-	QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
-	QRect header = m_viewer->orientation()
-		->rect(PredefinedRect::FRAME_HEADER)
-		.translated(topLeft);
+  QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
+  QRect header   = m_viewer->orientation()
+                     ->rect(PredefinedRect::FRAME_HEADER)
+                     .translated(topLeft);
 
-	int frameMid = header.left() + (header.width()/2);
-	int frameTop = header.top();
-	int frameBottom = header.bottom();
+  int frameMid    = header.left() + (header.width() / 2);
+  int frameTop    = header.top();
+  int frameBottom = header.bottom();
 
-	p.setPen(Qt::red);
-	p.drawLine(frameMid, frameTop, frameMid, frameBottom);
+  p.setPen(Qt::red);
+  p.drawLine(frameMid, frameTop, frameMid, frameBottom);
 }
 
 //-----------------------------------------------------------------------------
@@ -533,10 +533,9 @@ void RowArea::paintEvent(QPaintEvent *event) {
     drawCurrentRowGadget(p, r0, r1);
 
   if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
-	  !m_viewer->orientation()->isVerticalTimeline() &&
-	  Preferences::instance()->isCurrentTimelineIndicatorEnabled()
-	 )
-	  drawCurrentTimeIndicator(p);
+      !m_viewer->orientation()->isVerticalTimeline() &&
+      Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+    drawCurrentTimeIndicator(p);
 
   drawRows(p, r0, r1);
 
@@ -799,6 +798,10 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
   }
 
   CommandManager *cmdManager = CommandManager::instance();
+
+  menu->addAction(cmdManager->getAction(MI_ToggleCurrentTimeIndicator));
+  menu->addSeparator();
+
   menu->addAction(cmdManager->getAction(MI_InsertSceneFrame));
   menu->addAction(cmdManager->getAction(MI_RemoveSceneFrame));
   menu->addAction(cmdManager->getAction(MI_InsertGlobalKeyframe));
