@@ -1442,13 +1442,13 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // paint cell
   p.fillRect(rect, QBrush(cellColor));
 
-  drawDragHandle(p, xy, sideColor);
-
   if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
       !m_viewer->orientation()->isVerticalTimeline() &&
       row == m_viewer->getCurrentRow() &&
       Preferences::instance()->isCurrentTimelineIndicatorEnabled())
     drawCurrentTimeIndicator(p, xy);
+
+  drawDragHandle(p, xy, sideColor);
 
   if (yetToCleanupCell)  // ORIENTATION: what's this?
   {

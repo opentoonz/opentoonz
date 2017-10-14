@@ -1075,6 +1075,14 @@ LeftToRightOrientation::LeftToRightOrientation() {
   head.lineTo(QPointF(0, 0));
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
 
+  QPainterPath timeIndicator(QPointF(0, 0));
+  timeIndicator.lineTo(QPointF(-9, -5));
+  timeIndicator.lineTo(QPointF(-9, -18));
+  timeIndicator.lineTo(QPointF(9, -18));
+  timeIndicator.lineTo(QPointF(9, -5));
+  timeIndicator.lineTo(QPointF(0, 0));
+  addPath(PredefinedPath::TIME_INDICATOR_HEAD, timeIndicator);
+
   //
   // Points
   //

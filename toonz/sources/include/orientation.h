@@ -134,7 +134,8 @@ enum class PredefinedPath {
   BEGIN_PLAY_RANGE,     //! play range markers
   END_PLAY_RANGE,
   VOLUME_SLIDER_TRACK,  //! slider track
-  VOLUME_SLIDER_HEAD    //! slider head
+  VOLUME_SLIDER_HEAD,   //! slider head
+  TIME_INDICATOR_HEAD   //! current time indicator head
 };
 enum class PredefinedPoint {
   KEY_HIDDEN,  //! move extender handle that much if key icons are disabled

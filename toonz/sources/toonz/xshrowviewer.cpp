@@ -414,9 +414,27 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 //-----------------------------------------------------------------------------
 
 void RowArea::drawCurrentTimeIndicator(QPainter &p) {
-  TApp *app    = TApp::instance();
-  TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
-  assert(xsh);
+  int currentRow = m_viewer->getCurrentRow();
+
+  QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
+  QRect header   = m_viewer->orientation()
+                     ->rect(PredefinedRect::FRAME_HEADER)
+                     .translated(topLeft);
+
+  int frameMid = header.left() + (header.width() / 2);
+  int frameTop = header.top() + 20;
+
+  QPainterPath markerHead = m_viewer->orientation()
+                                ->path(PredefinedPath::TIME_INDICATOR_HEAD)
+                                .translated(QPoint(frameMid, frameTop));
+
+  p.setBrush(QColor(0, 162, 232));
+  p.setPen(Qt::red);
+  p.drawPath(markerHead);
+  p.setBrush(Qt::NoBrush);
+}
+
+void RowArea::drawCurrentTimeLine(QPainter &p) {
   int currentRow = m_viewer->getCurrentRow();
 
   QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
@@ -429,7 +447,7 @@ void RowArea::drawCurrentTimeIndicator(QPainter &p) {
   int frameBottom = header.bottom();
 
   p.setPen(Qt::red);
-  p.drawLine(frameMid, frameTop, frameMid, frameBottom);
+  p.drawLine(frameMid, frameTop + 21, frameMid, frameBottom);
 }
 
 //-----------------------------------------------------------------------------
@@ -532,16 +550,19 @@ void RowArea::paintEvent(QPaintEvent *event) {
     // current frame
     drawCurrentRowGadget(p, r0, r1);
 
-  if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
-      !m_viewer->orientation()->isVerticalTimeline() &&
-      Preferences::instance()->isCurrentTimelineIndicatorEnabled())
-    drawCurrentTimeIndicator(p);
+  if (TApp::instance()->getCurrentFrame()->isEditingScene()) {
+    if (Preferences::instance()->isOnionSkinEnabled())
+      drawOnionSkinSelection(p);
+    else if (Preferences::instance()->isCurrentTimelineIndicatorEnabled() &&
+             !m_viewer->orientation()->isVerticalTimeline())
+      drawCurrentTimeIndicator(p);
+
+    if (Preferences::instance()->isCurrentTimelineIndicatorEnabled() &&
+        !m_viewer->orientation()->isVerticalTimeline())
+      drawCurrentTimeLine(p);
+  }
 
   drawRows(p, r0, r1);
-
-  if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
-      Preferences::instance()->isOnionSkinEnabled())
-    drawOnionSkinSelection(p);
 
   if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton)
     drawPinnedCenterKeys(p, r0, r1);
