@@ -1083,7 +1083,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   timeIndicator.lineTo(QPointF(-9, -5));
   timeIndicator.lineTo(QPointF(-9, -18));
   timeIndicator.lineTo(QPointF(9, -18));
-  timeIndicator.lineTo(QPointF(9, -5));
+  timeIndicator.lineTo(QPointF(9, -4));
   timeIndicator.lineTo(QPointF(0, 0));
   addPath(PredefinedPath::TIME_INDICATOR_HEAD, timeIndicator);
 
