@@ -82,7 +82,7 @@
 #include <QInputContext>
 #endif
 #include <QGLContext>
-
+#include <QOperatingSystemVersion>
 #include "sceneviewer.h"
 
 void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
@@ -1467,7 +1467,8 @@ void SceneViewer::paintGL() {
   }
 #ifdef WIN32
   // following line is necessary to solve a problem Windows 7
-  SetWindowRgn((HWND)winId(), 0, FALSE);
+  if (QOperatingSystemVersion::current() < QOperatingSystemVersion(QOperatingSystemVersion::Windows10))
+    SetWindowRgn((HWND)winId(), 0, FALSE);
 #else
   // followin lines are necessary to solve a problem on iMac20
   // It seems that for some errors in the openGl implementation, buffers are not
