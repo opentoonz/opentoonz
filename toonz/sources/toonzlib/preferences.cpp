@@ -329,7 +329,7 @@ Preferences::Preferences()
     , m_shortcutCommandsWhileRenamingCellEnabled(false)
     , m_xsheetLayoutPreference("Classic-revised")
     , m_loadedXsheetLayout("Classic-revised")
-    , m_currentTimelineEnabled(false) {
+    , m_currentTimelineEnabled(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
