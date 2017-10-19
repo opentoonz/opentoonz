@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru" sourcelanguage="en">
+<TS version="2.0" language="ru" sourcelanguage="en">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -105,7 +105,7 @@
     <message>
         <location filename="../../tnztools/brushtool.cpp" line="959"/>
         <source>Hardness:</source>
-        <translation>Твёрдость:</translation>
+        <translation>Жесткость:</translation>
     </message>
     <message>
         <location filename="../../tnztools/brushtool.cpp" line="960"/>
@@ -120,12 +120,12 @@
     <message>
         <location filename="../../tnztools/brushtool.cpp" line="962"/>
         <source>Selective</source>
-        <translation>Выборочный</translation>
+        <translation>Избирательно</translation>
     </message>
     <message>
         <location filename="../../tnztools/brushtool.cpp" line="964"/>
         <source>Preset:</source>
-        <translation>Пресет:</translation>
+        <translation>Предустановка:</translation>
     </message>
     <message>
         <location filename="../../tnztools/brushtool.cpp" line="965"/>
@@ -140,17 +140,17 @@
     <message>
         <location filename="../../tnztools/brushtool.cpp" line="967"/>
         <source>Pressure</source>
-        <translation>Нажим пера</translation>
+        <translation>Нажим</translation>
     </message>
     <message>
         <location filename="../../tnztools/brushtool.cpp" line="968"/>
         <source>Cap</source>
-        <translation>Край</translation>
+        <translation>Конец</translation>
     </message>
     <message>
         <location filename="../../tnztools/brushtool.cpp" line="969"/>
         <source>Join</source>
-        <translation>Объединить</translation>
+        <translation>Соединение</translation>
     </message>
     <message>
         <location filename="../../tnztools/brushtool.cpp" line="970"/>
@@ -163,7 +163,7 @@
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="1539"/>
         <source>Preset Name</source>
-        <translation>Имя пресета</translation>
+        <translation>Имя предустановки</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="1543"/>
@@ -181,7 +181,7 @@
     <message>
         <location filename="../../tnztools/controlpointeditortool.cpp" line="229"/>
         <source>Auto Select Drawing</source>
-        <translation>Автовыбор</translation>
+        <translation>Автовыбор рисунка</translation>
     </message>
 </context>
 <context>
@@ -189,12 +189,12 @@
     <message>
         <location filename="../../tnztools/controlpointselection.cpp" line="1005"/>
         <source>Set Linear Control Point</source>
-        <translation>Установить линейную контрольную точку</translation>
+        <translation>Задать линейную контрольную точку</translation>
     </message>
     <message>
         <location filename="../../tnztools/controlpointselection.cpp" line="1006"/>
         <source>Set Nonlinear Control Point</source>
-        <translation>Установить нелинейную контрольную точку</translation>
+        <translation>Задать нелинейную контрольную точку</translation>
     </message>
 </context>
 <context>
@@ -202,7 +202,7 @@
     <message>
         <location filename="../../tnztools/edittool.cpp" line="809"/>
         <source>Scale Constraint:</source>
-        <translation>Равномерный масштаб:</translation>
+        <translation>Ограничение масштаба:</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="810"/>
@@ -293,7 +293,7 @@
     <message>
         <location filename="../../tnztools/edittool.cpp" line="827"/>
         <source>Horizontal and Vertical Scale</source>
-        <translation>Горизонтальный и вертикальный масштаб</translation>
+        <translation>Горизонтальное и вертикальное масштабирование</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="828"/>
@@ -323,7 +323,7 @@
         <location filename="../../tnztools/vectorerasertool.cpp" line="401"/>
         <location filename="../../tnztools/rastererasertool.cpp" line="628"/>
         <source>Selective</source>
-        <translation>Выборочный</translation>
+        <translation>Избирательно</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="402"/>
@@ -346,7 +346,7 @@
     <message>
         <location filename="../../tnztools/rastererasertool.cpp" line="625"/>
         <source>Hardness:</source>
-        <translation>Твёрдость:</translation>
+        <translation>Жесткость:</translation>
     </message>
     <message>
         <location filename="../../tnztools/rastererasertool.cpp" line="627"/>
@@ -356,7 +356,7 @@
     <message>
         <location filename="../../tnztools/rastererasertool.cpp" line="631"/>
         <source>Pencil Mode</source>
-        <translation>Карандаш</translation>
+        <translation>Режим карандаша</translation>
     </message>
 </context>
 <context>
@@ -374,7 +374,7 @@
     <message>
         <location filename="../../tnztools/filltool.cpp" line="1827"/>
         <source>Selective</source>
-        <translation>Выборочный</translation>
+        <translation>Избирательно</translation>
     </message>
     <message>
         <location filename="../../tnztools/filltool.cpp" line="1828"/>
@@ -384,12 +384,12 @@
     <message>
         <location filename="../../tnztools/filltool.cpp" line="1829"/>
         <source>Onion Skin</source>
-        <translation>Луковая кожура</translation>
+        <translation>Калька</translation>
     </message>
     <message>
         <location filename="../../tnztools/filltool.cpp" line="1830"/>
         <source>Fill Depth</source>
-        <translation>Глубина заполнения</translation>
+        <translation>Глубина заливки</translation>
     </message>
     <message>
         <location filename="../../tnztools/filltool.cpp" line="1831"/>
@@ -420,22 +420,22 @@
     <message>
         <location filename="../../tnztools/fullcolorbrushtool.cpp" line="176"/>
         <source>Pressure</source>
-        <translation>Нажим пера</translation>
+        <translation>Нажим</translation>
     </message>
     <message>
         <location filename="../../tnztools/fullcolorbrushtool.cpp" line="177"/>
         <source>Opacity</source>
-        <translation>Прозрачность</translation>
+        <translation>Непрозрачность</translation>
     </message>
     <message>
         <location filename="../../tnztools/fullcolorbrushtool.cpp" line="178"/>
         <source>Hardness:</source>
-        <translation>Твёрдость:</translation>
+        <translation>Жесткость:</translation>
     </message>
     <message>
         <location filename="../../tnztools/fullcolorbrushtool.cpp" line="179"/>
         <source>Preset:</source>
-        <translation>Пресеты:</translation>
+        <translation>Предустановка:</translation>
     </message>
 </context>
 <context>
@@ -448,12 +448,12 @@
     <message>
         <location filename="../../tnztools/fullcolorerasertool.cpp" line="408"/>
         <source>Opacity:</source>
-        <translation>Прозрачность:</translation>
+        <translation>Непрозрачность:</translation>
     </message>
     <message>
         <location filename="../../tnztools/fullcolorerasertool.cpp" line="409"/>
         <source>Hardness:</source>
-        <translation>Твёрдость:</translation>
+        <translation>Жесткость:</translation>
     </message>
     <message>
         <location filename="../../tnztools/fullcolorerasertool.cpp" line="410"/>
@@ -463,7 +463,7 @@
     <message>
         <location filename="../../tnztools/fullcolorerasertool.cpp" line="411"/>
         <source>Invert</source>
-        <translation>Инвертировать</translation>
+        <translation>Обратить</translation>
     </message>
     <message>
         <location filename="../../tnztools/fullcolorerasertool.cpp" line="412"/>
@@ -502,7 +502,7 @@
     <message>
         <location filename="../../tnztools/paintbrushtool.cpp" line="350"/>
         <source>Selective</source>
-        <translation>Выборочный</translation>
+        <translation>Избирательно</translation>
     </message>
 </context>
 <context>
@@ -533,7 +533,7 @@
     <message>
         <location filename="../../tnztools/plastictool_meshedit.cpp" line="1130"/>
         <source>Collapse Edge</source>
-        <translation>Коллапс ребра</translation>
+        <translation>Убрать ребро</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool_meshedit.cpp" line="1135"/>
@@ -645,7 +645,7 @@
         <source>A group of skeletons already exists for current column. Replacing it will also substitute any existing vertex animation.
 
 Do you want to continue?</source>
-        <translation>Скелетная группа уже существует для текущего столбца. Замена его также заменит любую существующую анимацию вершин.
+        <translation>Группа скелетов уже существует для текущего столбца. Замена его также заменит любую существующую анимацию вершин.
 
 Вы хотите продолжить?</translation>
     </message>
@@ -683,12 +683,12 @@ Do you want to continue?</source>
         <location filename="../../tnztools/plastictool.cpp" line="1475"/>
         <source>Show SO</source>
         <translatorcomment>SO - порядок перекрытия</translatorcomment>
-        <translation>Показать SO</translation>
+        <translation>Показать ПР</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="1482"/>
         <source>Show Skeleton Onion Skin</source>
-        <translation>Показать луковую кожуру скелета</translation>
+        <translation>Показать кальку скелета</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="1560"/>
@@ -734,7 +734,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="370"/>
         <source>Shape:</source>
-        <translation>Форма:</translation>
+        <translation>Фигура:</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="371"/>
@@ -749,22 +749,22 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="373"/>
         <source>Opacity:</source>
-        <translation>Прозрачность:</translation>
+        <translation>Непрозрачность:</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="374"/>
         <source>Hardness:</source>
-        <translation>Твёрдость:</translation>
+        <translation>Жесткость:</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="375"/>
         <source>Polygon Sides:</source>
-        <translation>Стороны многоугольника:</translation>
+        <translation>Сторон многоугольника:</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="376"/>
         <source>Auto Group</source>
-        <translation>Автогруппировка</translation>
+        <translation>Автогруппировать</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="377"/>
@@ -774,7 +774,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="378"/>
         <source>Selective</source>
-        <translation>Выборочный</translation>
+        <translation>Избирательно</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="379"/>
@@ -784,12 +784,12 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="380"/>
         <source>Cap</source>
-        <translation>Край</translation>
+        <translation>Конец</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="381"/>
         <source>Join</source>
-        <translation>Объединить</translation>
+        <translation>Соединение</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="382"/>
@@ -839,22 +839,22 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/setsaveboxtool.cpp" line="57"/>
         <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
-        <translation>Установить Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</translation>
+        <translation>Задать окно сохранения : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8) </translation>
     </message>
     <message>
         <location filename="../../tnztools/selectiontool.cpp" line="320"/>
         <source>Move Center</source>
-        <translation>Переместить центр</translation>
+        <translation>Переместить Центр</translation>
     </message>
     <message>
         <location filename="../../tnztools/rgbpickertool.cpp" line="105"/>
         <source>RGB Picker (R%1, G%2, B%3)</source>
-        <translation>RGB Пикер (R%1, G%2, B%3)</translation>
+        <translation>RGB Пипетка (R%1, G%2, B%3)</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="1562"/>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation>ОК</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="1562"/>
@@ -864,7 +864,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="98"/>
         <source>Group</source>
-        <translation>Группировать</translation>
+        <translation>Сгруппировать</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="125"/>
@@ -967,7 +967,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../include/tools/toolutils.h" line="177"/>
         <source>%1   Level : %2  Frame : %3</source>
-        <translation>%1   Уровень : %2  Ячейка : %3</translation>
+        <translation>%1   Уровень : %2 Кадр : %3</translation>
     </message>
     <message>
         <location filename="../../include/tools/toolutils.h" line="266"/>
@@ -1040,12 +1040,12 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/rastertapetool.cpp" line="181"/>
         <source>Style Index:</source>
-        <translation>Индекс стиля:</translation>
+        <translation>Номер cтиля:</translation>
     </message>
     <message>
         <location filename="../../tnztools/rastertapetool.cpp" line="182"/>
         <source>Opacity:</source>
-        <translation>Прозрачность:</translation>
+        <translation>Непрозрачность:</translation>
     </message>
     <message>
         <location filename="../../tnztools/rastertapetool.cpp" line="183"/>
@@ -1142,7 +1142,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/stylepickertool.cpp" line="269"/>
         <source>Palette must have more than one palette to be organized.</source>
-        <translation>Для организации палитра должна иметь более одной палитры.</translation>
+        <translation>Палитра должна содержать более одной палитры.</translation>
     </message>
 </context>
 <context>
@@ -1151,8 +1151,7 @@ Do you want to proceed?</source>
         <location filename="../../tnztools/tooloptions.cpp" line="2191"/>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
-        <translation>При активации этой опции выбранный стиль будет
-перемещен в конец первой страницы палитры.</translation>
+        <translation>При активации этого параметра, выбранный стиль будет перемещен в конец первой страницы палитры.</translation>
     </message>
 </context>
 <context>
@@ -1211,17 +1210,17 @@ moved to the end of the first page of the palette.</source>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1291"/>
         <source>Preserve Thickness</source>
-        <translation>Сохранить толщину</translation>
+        <translation>Сохранять толщину</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1292"/>
         <source>Cap</source>
-        <translation>Край</translation>
+        <translation>Конец</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1293"/>
         <source>Join</source>
-        <translation>Объединить</translation>
+        <translation>Соединение</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1294"/>
@@ -1234,12 +1233,12 @@ moved to the end of the first page of the palette.</source>
     <message>
         <location filename="../../tnztools/vectortapetool.cpp" line="259"/>
         <source>Smooth</source>
-        <translation>Сглаживать</translation>
+        <translation>Плавность</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectortapetool.cpp" line="260"/>
         <source>Join Vectors</source>
-        <translation>Объединить векторы</translation>
+        <translation>Соединять векторы</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectortapetool.cpp" line="261"/>
