@@ -442,7 +442,9 @@ elseif(BUILD_ENV_UNIXLIKE)
         pkg_check_modules(FREETYPE REQUIRED freetype2)
         pkg_check_modules(SDL_LIB REQUIRED sdl2)
     endif()
-    pkg_check_modules(MYPAINT_LIB REQUIRED libmypaint)
+    
+	set(MYPAINT_LIB_INCLUDE_DIRS ${SDKROOT}/libmypaint/dist/${PLATFORM}/include/libmypaint)
+    set(MYPAINT_LIB_LDFLAGS ${SDKROOT}/libmypaint/dist/${PLATFORM}/libmypaint-2.0.so)
 endif()
 
 
