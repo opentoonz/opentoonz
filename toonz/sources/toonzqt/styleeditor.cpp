@@ -1509,7 +1509,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   m_hsvShowButton           = new QPushButton(tr("HSV"), this);
   m_alphaShowButton         = new QPushButton(tr("Alpha"), this);
   m_rgbShowButton           = new QPushButton(tr("RGB"), this);
-  m_toggleOrientationButton = new QPushButton(tr("↔"), this);
+  m_toggleOrientationButton = new QPushButton(QChar(0x2194), this);
   m_toggleOrientationButton->setFixedWidth(20);
 
   m_wheelFrame       = new QFrame(this);
@@ -1712,7 +1712,7 @@ void PlainColorPage::setVisibleParts(int settings) {
   if (m_visibleParts & 0x04)
     m_alphaShowButton->setChecked(true);
   else
-	  m_alphaShowButton->setChecked(false);
+    m_alphaShowButton->setChecked(false);
   if (m_visibleParts & 0x08)
     m_rgbShowButton->setChecked(true);
   else
@@ -1749,7 +1749,7 @@ void PlainColorPage::setIsVertical(bool isVertical) {
     m_vSplitter->setSizes(sectionSizes);
   } else {
     m_vSplitter->setOrientation(Qt::Horizontal);
-    m_toggleOrientationButton->setText("↕");
+    m_toggleOrientationButton->setText(QChar(0x2195));
     QList<int> sectionSizes;
     sectionSizes << width() / 2 << width() / 2;
     m_vSplitter->setSizes(sectionSizes);
@@ -3152,7 +3152,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   /* ------- initial conditions ------- */
   enable(false, false, false);
   // set to the empty page
-  m_styleChooser->setCurrentIndex(7);
+  m_styleChooser->setCurrentIndex(m_styleChooser->count() - 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -3248,7 +3248,7 @@ void StyleEditor::updateTabBar() {
     m_styleBar->addSimpleTab(tr("Color"));
     m_styleBar->addSimpleTab(tr("Settings"));
   } else {
-    m_styleChooser->setCurrentIndex(7);
+    m_styleChooser->setCurrentIndex(m_styleChooser->count() - 1);
     return;
   }
   m_tabBarContainer->layout()->update();
@@ -3295,7 +3295,7 @@ void StyleEditor::onStyleSwitched() {
 
   if (!palette) {
     // set the current page to empty
-    m_styleChooser->setCurrentIndex(7);
+    m_styleChooser->setCurrentIndex(m_styleChooser->count() - 1);
     enable(false);
     m_colorParameterSelector->clear();
     m_oldStyle    = TColorStyleP();
