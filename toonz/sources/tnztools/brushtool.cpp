@@ -2565,10 +2565,10 @@ void BrushData::saveData(TOStream &os) {
   os << m_modifierOpacity;
   os.closeChild();
   os.openChild("Modifier_Eraser");
-  os << m_modifierEraser;
+  os << (int)m_modifierEraser;
   os.closeChild();
   os.openChild("Modifier_LockAlpha");
-  os << m_modifierLockAlpha;
+  os << (int)m_modifierLockAlpha;
   os.closeChild();
 }
 
