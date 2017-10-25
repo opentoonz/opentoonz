@@ -2489,7 +2489,9 @@ BrushData::BrushData()
     , m_join(0)
     , m_miter(0)
     , m_modifierSize(0.0)
-    , m_modifierOpacity(0.0) {}
+    , m_modifierOpacity(0.0)
+    , m_modifierEraser(0.0)
+    , m_modifierLockAlpha(0.0) {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2510,7 +2512,9 @@ BrushData::BrushData(const std::wstring &name)
     , m_join(0)
     , m_miter(0)
     , m_modifierSize(0.0)
-    , m_modifierOpacity(0.0) {}
+    , m_modifierOpacity(0.0)
+    , m_modifierEraser(0.0)
+    , m_modifierLockAlpha(0.0) {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2560,6 +2564,12 @@ void BrushData::saveData(TOStream &os) {
   os.openChild("Modifier_Opacity");
   os << m_modifierOpacity;
   os.closeChild();
+  os.openChild("Modifier_Eraser");
+  os << (int)m_modifierEraser;
+  os.closeChild();
+  os.openChild("Modifier_LockAlpha");
+  os << (int)m_modifierLockAlpha;
+  os.closeChild();
 }
 
 //----------------------------------------------------------------------------------------------------------
@@ -2599,6 +2609,10 @@ void BrushData::loadData(TIStream &is) {
       is >> m_modifierSize, is.matchEndTag();
     else if (tagName == "Modifier_Opacity")
       is >> m_modifierOpacity, is.matchEndTag();
+    else if (tagName == "Modifier_Eraser")
+      is >> val, m_modifierEraser = val, is.matchEndTag();
+    else if (tagName == "Modifier_LockAlpha")
+      is >> val, m_modifierLockAlpha = val, is.matchEndTag();
     else
       is.skipCurrentTag();
   }
