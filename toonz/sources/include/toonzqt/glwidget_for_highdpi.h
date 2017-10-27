@@ -3,23 +3,21 @@
 #ifndef GLWIDGET_FOR_HIGHDPI_H
 #define GLWIDGET_FOR_HIGHDPI_H
 
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QOpenGLFunctions>
 #include "toonzqt/gutil.h"
 
-// use obsolete QGLWidget instead of QOpenGLWidget for now...
-// TODO: replace with the "modern" OpenGL source and transfer to QOpenGLWidget
-class GLWidgetForHighDpi : public QGLWidget {
+class GLWidgetForHighDpi : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
-  GLWidgetForHighDpi(QWidget *parent              = Q_NULLPTR,
-                     const QGLWidget *shareWidget = Q_NULLPTR,
-                     Qt::WindowFlags f            = Qt::WindowFlags())
-      : QGLWidget(parent, shareWidget, f) {}
+  GLWidgetForHighDpi(QWidget *parent   = Q_NULLPTR,
+                     Qt::WindowFlags f = Qt::WindowFlags())
+      : QOpenGLWidget(parent, f) {}
 
   //  modify sizes for high DPI monitors
-  int width() const { return QGLWidget::width() * getDevPixRatio(); }
-  int height() const { return QGLWidget::height() * getDevPixRatio(); }
+  int width() const { return QOpenGLWidget::width() * getDevPixRatio(); }
+  int height() const { return QOpenGLWidget::height() * getDevPixRatio(); }
   QRect rect() const { return QRect(0, 0, width(), height()); }
 };
 

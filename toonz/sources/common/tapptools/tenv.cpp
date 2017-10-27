@@ -171,6 +171,9 @@ public:
   }
 
   TFilePath getEnvFile() { return m_envFile; }
+  TFilePath getTemplateEnvFile() {
+    return m_envFile.getParentDir() + TFilePath("template.env");
+  }
 
   void setApplicationFullName(std::string applicationFullName) {
     m_applicationFullName = applicationFullName;
@@ -326,8 +329,11 @@ void VariableSet::load() {
 #endif
   TFilePath fp = EnvGlobals::instance()->getEnvFile();
   if (fp == TFilePath()) return;
+  // if the personal env is not found, then try to find the template
+  if (!TFileStatus(fp).doesExist())
+    fp = EnvGlobals::instance()->getTemplateEnvFile();
   Tifstream is(fp);
-  if (!is) return;
+  if (!is.isOpen()) return;
   char buffer[1024];
   while (is.getline(buffer, sizeof(buffer))) {
     char *s = buffer;
