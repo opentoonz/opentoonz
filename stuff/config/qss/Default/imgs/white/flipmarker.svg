@@ -1,45 +1,25 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   width="100%"
-   height="100%"
-   viewBox="0 0 22 17"
-   version="1.1"
-   id="svg4489">
-  <defs
-     id="defs4483" />
-  <metadata
-     id="metadata4486">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     id="layer1"
-     transform="translate(0,-1106.5197)" />
-  <rect
-     x="2"
-     y="2"
-     width="18"
-     height="13"
-     style="clip-rule:evenodd;fill:#ffffff;fill-opacity:0.17647101;fill-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"
-     id="rect2" />
-  <path
-     id="path4"
-     style="clip-rule:evenodd;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#161616;stroke-width:2px;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;stroke-opacity:1"
-     d="M 19.5,1 C 20.328,1 21,1.672 21,2.5 v 12 C 21,15.328 20.328,16 19.5,16 H 2.5 C 1.672,16 1,15.328 1,14.5 V 2.5 C 1,1.672 1.672,1 2.5,1 Z M 18.65,2 H 3.35 C 2.605,2 2,2.583 2,3.3 V 13.7 C 2,14.417 2.605,15 3.35,15 h 15.3 C 19.395,15 20,14.417 20,13.7 V 3.3 C 20,2.583 19.395,2 18.65,2 Z" />
-  <path
-     id="path6"
-     style="clip-rule:evenodd;fill:#717171;fill-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"
-     d="M 19.5,1 C 20.328,1 21,1.672 21,2.5 v 12 C 21,15.328 20.328,16 19.5,16 H 2.5 C 1.672,16 1,15.328 1,14.5 V 2.5 C 1,1.672 1.672,1 2.5,1 Z M 18.65,2 H 3.35 C 2.605,2 2,2.583 2,3.3 V 13.7 C 2,14.417 2.605,15 3.35,15 h 15.3 C 19.395,15 20,14.417 20,13.7 V 3.3 C 20,2.583 19.395,2 18.65,2 Z" />
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg4489" inkscape:version="0.91 r13725" sodipodi:docname="flipmarker.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22 17"
+	 style="enable-background:new 0 0 22 17;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;fill-opacity:0.1765;}
+	.st1{fill:none;stroke:#161616;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;}
+	.st2{fill:#717171;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview9" inkscape:current-layer="svg4489" inkscape:cx="11" inkscape:cy="8.5" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="480" inkscape:window-maximized="0" inkscape:window-width="796" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="13.882353" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="layer1" transform="translate(0,-1106.5197)">
+</g>
+<g>
+	<rect id="rect2" x="2" y="2" class="st0" width="18" height="13"/>
+	<path id="path4" inkscape:connector-curvature="0" class="st1" d="M19.5,1C20.3,1,21,1.7,21,2.5v12c0,0.8-0.7,1.5-1.5,1.5h-17
+		C1.7,16,1,15.3,1,14.5v-12C1,1.7,1.7,1,2.5,1H19.5z M18.6,2H3.3C2.6,2,2,2.6,2,3.3v10.4C2,14.4,2.6,15,3.3,15h15.3
+		c0.7,0,1.4-0.6,1.4-1.3V3.3C20,2.6,19.4,2,18.6,2z"/>
+	<path id="path6" inkscape:connector-curvature="0" class="st2" d="M19.5,1C20.3,1,21,1.7,21,2.5v12c0,0.8-0.7,1.5-1.5,1.5h-17
+		C1.7,16,1,15.3,1,14.5v-12C1,1.7,1.7,1,2.5,1H19.5z M18.6,2H3.3C2.6,2,2,2.6,2,3.3v10.4C2,14.4,2.6,15,3.3,15h15.3
+		c0.7,0,1.4-0.6,1.4-1.3V3.3C20,2.6,19.4,2,18.6,2z"/>
+</g>
 </svg>

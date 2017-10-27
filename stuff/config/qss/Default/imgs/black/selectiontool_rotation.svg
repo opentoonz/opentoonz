@@ -1,1 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="100%" height="100%" viewBox="0 0 21 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-miterlimit:1.5;"><path d="M13,1l-10.5,13.5l16.5,0" style="fill:none;stroke:#000;stroke-width:1px;"/><path d="M12.5,1.5c0,0 5.916,3.904 6,12.5" style="fill:none;stroke:#000;stroke-width:1.4px;stroke-miterlimit:1;stroke-dasharray:1.4,1.82,0,0;stroke-dashoffset:1.4;"/></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="selectiontool_rotation.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 21 17"
+	 style="enable-background:new 0 0 21 17;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#000000;stroke-miterlimit:1.5;}
+	.st1{fill:none;stroke:#000000;stroke-width:1.4;stroke-miterlimit:1;stroke-dasharray:1.4,1.82,0,0;stroke-dashoffset:1;}
+</style>
+<path id="path4" inkscape:connector-curvature="0" class="st0" d="M12.8,1L2.3,14.5h16.5"/>
+<path id="path6" inkscape:connector-curvature="0" class="st1" d="M12.3,1.5c0,0,5.9,3.9,6,12.5"/>
+</svg>

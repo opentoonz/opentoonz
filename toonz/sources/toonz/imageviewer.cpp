@@ -412,6 +412,7 @@ void ImageViewer::hideHistogram() {
 //-------------------------------------------------------------------
 
 void ImageViewer::initializeGL() {
+  initializeOpenGLFunctions();
   // glClearColor(1.0,1.0,1.0,1);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -424,6 +425,8 @@ void ImageViewer::initializeGL() {
 //-----------------------------------------------------------------------------
 
 void ImageViewer::resizeGL(int w, int h) {
+  w *= getDevPixRatio();
+  h *= getDevPixRatio();
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();

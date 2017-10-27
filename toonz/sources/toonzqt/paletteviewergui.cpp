@@ -844,7 +844,9 @@ void PageViewer::paintEvent(QPaintEvent *e) {
         p.drawChord(ssRect, 0, -180 * 16);
         tmpFont.setPointSize(6);
         p.setFont(tmpFont);
-        p.drawText(ssRect.adjusted(0, 10, 0, 0), Qt::AlignCenter,
+        // make sure the text is visible with any font
+        static int rectTopAdjust = 19 - QFontMetrics(tmpFont).overlinePos();
+        p.drawText(ssRect.adjusted(0, rectTopAdjust, 0, 0), Qt::AlignCenter,
                    QString().setNum(shortcut));
       }
 
