@@ -585,6 +585,7 @@ HexagonalColorWheel::~HexagonalColorWheel() {
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::initializeGL() {
+  initializeOpenGLFunctions();
   QColor const color = getBGColor();
   glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 
@@ -599,6 +600,8 @@ void HexagonalColorWheel::initializeGL() {
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::resizeGL(int w, int h) {
+  w *= getDevPixRatio();
+  h *= getDevPixRatio();
   float d                 = (w - 5.0f) / 2.5f;
   bool isHorizontallyLong = ((d * 1.732f) < h) ? false : true;
 

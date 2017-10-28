@@ -9,14 +9,14 @@
 - cmake
   - Version 3.2.2 confirmed to work.
 - Qt
-  - http://download.qt.io/official_releases/qt/5.6/5.6.2/
-    - qt-opensource-mac-x64-clang-5.6.2.dmg
+  - http://download.qt.io/official_releases/qt/5.9/5.9.2/
+    - qt-opensource-mac-x64-5.9.2.dmg
 - boost
   - http://www.boost.org/users/history/version_1_55_0.html (or later, though only 1.55.0 is supported)
 
 ## Building on MacOSX
 
-### 0. Install Qt 5.6 (Most recent is 5.6.2)
+### 0. Install Qt 5.9 (Most recent is 5.9.2)
 
 ### 1. Install Dependent Packages
 
@@ -61,8 +61,8 @@ $ mv ~/Downloads/boost_1_55_0.tar.bz2 .
 $ tar xjvf boost_1_55_0.tar.bz2
 ```
 
-### 5. Update the path to your Qt 5.6 install in opentoonz/toonz/sources/CMakeLists.txt line 160 or 172 
-If using Qt 5.6.2, this is unnecessary.
+### 5. Update the path to your Qt 5.9 install in opentoonz/toonz/sources/CMakeLists.txt line 160 or 172 
+If using Qt 5.9.2, this is unnecessary.
 
 ### 6. Copy the lzo header folder to the lzo driver directory
 
@@ -77,7 +77,7 @@ $ cp -r 2.03/include/lzo driver
 $ cd ../../toonz
 $ mkdir build
 $ cd build
-  CMAKE_PREFIX_PATH=~/Qt5.6.2/5.6/clang_64 cmake ../sources
+  CMAKE_PREFIX_PATH=~/Qt5.9.2/5.9.2/clang_64 cmake ../sources
 $ make
 ```
 

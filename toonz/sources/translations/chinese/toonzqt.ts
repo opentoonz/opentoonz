@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>AddFxContextMenu</name>
     <message>
@@ -165,6 +165,12 @@ Possibly the preset file has been corrupted</source>
         <translation>“%1”不像是正确格式的摄影机预设。
 预设文件可能已经损坏了</translation>
     </message>
+    <message>
+        <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset. 
+Possibly the preset file has been corrupted</source>
+        <translation>%1&apos; 不是格式完好的摄影机预设。
+可能预设文件已经被损坏了</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -230,6 +236,45 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Resulting Level Info</source>
         <translation>结果层级信息</translation>
+    </message>
+    <message>
+        <source>N/S</source>
+        <translation>上下</translation>
+    </message>
+    <message>
+        <source>E/W</source>
+        <translation>左右</translation>
+    </message>
+</context>
+<context>
+    <name>ColorChannelControl</name>
+    <message>
+        <source>R</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>G</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>H</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>V</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -855,6 +900,18 @@ Possibly the preset file has been corrupted</source>
         <source>????</source>
         <translation>????</translation>
     </message>
+    <message>
+        <source>From</source>
+        <translation>起点</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>终点</translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation>步长</translation>
+    </message>
 </context>
 <context>
     <name>FunctionSelection</name>
@@ -1260,6 +1317,14 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <source>New Page</source>
         <translation>新建页</translation>
     </message>
+    <message>
+        <source>- No Styles -</source>
+        <translation>- 无样式 -</translation>
+    </message>
+    <message>
+        <source>Name Editor</source>
+        <translation>名字编辑器</translation>
+    </message>
 </context>
 <context>
     <name>PaletteViewer</name>
@@ -1448,6 +1513,25 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
 </context>
 <context>
+    <name>PlainColorPage</name>
+    <message>
+        <source>Wheel</source>
+        <translation>色轮</translation>
+    </message>
+    <message>
+        <source>HSV</source>
+        <translation>HSV</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>Alpha</translation>
+    </message>
+    <message>
+        <source>RGB</source>
+        <translation>RGB</translation>
+    </message>
+</context>
+<context>
     <name>PointParamField</name>
     <message>
         <source>Y:</source>
@@ -1462,6 +1546,10 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>ProgressDialog</name>
     <message>
         <source>Toonz</source>
+        <translation>OpenToonz</translation>
+    </message>
+    <message>
+        <source>OpenToonz</source>
         <translation>OpenToonz</translation>
     </message>
 </context>
@@ -1917,7 +2005,7 @@ Are you sure?</source>
     <message>
         <source>Deletion of Lines and Areas from raster-based levels is not undoable.
 Are you sure?</source>
-        <translation>从栅格格式的层级删除线和区域，该操作将无法撤销。
+        <translation>从光栅层级删除线和区域，该操作将无法撤销。
 您确定吗？</translation>
     </message>
     <message>
@@ -1953,6 +2041,10 @@ Are you sure?</source>
     <message>
         <source>Toonz</source>
         <translation>Toonz</translation>
+    </message>
+    <message>
+        <source>OpenToonz</source>
+        <translation>OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -2007,6 +2099,13 @@ Are you sure?</source>
     <message>
         <source>&amp;Close Editor</source>
         <translation>关闭编辑器(&amp;C)</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Reset to default</source>
+        <translation>重新初始化</translation>
     </message>
 </context>
 <context>
@@ -2210,7 +2309,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Vector Brush</source>
-        <translation>矢量画笔</translation>
+        <translation>矢量笔刷</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -2225,6 +2324,32 @@ Apply</source>
     <message>
         <source>MyPaint Brush</source>
         <translation>MyPaint 笔刷</translation>
+    </message>
+    <message>
+        <source>Auto  
+Apply</source>
+        <translation>自动
+应用</translation>
+    </message>
+    <message>
+        <source>- Style not Selected -</source>
+        <translation>- 无样式被选中 -</translation>
+    </message>
+    <message>
+        <source>[CLEANUP]  </source>
+        <translation>[清稿]  </translation>
+    </message>
+    <message>
+        <source>[STUDIO]  </source>
+        <translation>[工作室]  </translation>
+    </message>
+    <message>
+        <source>[LEVEL]  </source>
+        <translation>[层级]  </translation>
+    </message>
+    <message>
+        <source>- Style is Not Valid -</source>
+        <translation>- 无效的样式 -</translation>
     </message>
 </context>
 <context>
@@ -2316,6 +2441,10 @@ Apply</source>
     <message>
         <source>&amp;Reset Center</source>
         <translation>重置中心点(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>动画台</translation>
     </message>
 </context>
 <context>

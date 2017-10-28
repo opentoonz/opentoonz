@@ -6,7 +6,7 @@ Building OpenToonz from source requires the following dependencies:
 - Git
 - GCC or Clang
 - CMake (3.4.1 or newer).
-- Qt5 (5.6 or newer)
+- Qt5 (5.9 or newer)
 - Boost (1.55 or newer)
 - SDL2
 - LibPNG

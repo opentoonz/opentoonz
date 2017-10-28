@@ -1,1 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="100%" height="100%" viewBox="0 0 21 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"><rect x="3" y="7" width="15" height="3"/><path d="M10.5,11l3,3.5l-6,0l3,-3.5Z" style="fill:#dbdbdb;stroke:#050505;stroke-width:1px;"/><path d="M10.5,6l3,-3.5l-6,0l3,3.5Z" style="fill:#dbdbdb;stroke:#000;stroke-width:1px;"/></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="selectiontool_thickness.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 21 17"
+	 style="enable-background:new 0 0 21 17;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#DBDBDB;stroke:#050505;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;}
+	.st1{fill:#DBDBDB;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;}
+</style>
+<rect id="rect4" x="3" y="7" width="15" height="3"/>
+<path id="path6" inkscape:connector-curvature="0" class="st0" d="M10.5,11l3,3.5h-6L10.5,11z"/>
+<path id="path8" inkscape:connector-curvature="0" class="st1" d="M10.5,6l3-3.5h-6L10.5,6z"/>
+</svg>

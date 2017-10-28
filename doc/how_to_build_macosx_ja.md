@@ -8,8 +8,8 @@
 - cmake
   - バージョン 3.2.2 で動作確認済みです。
 - Qt
-  - http://download.qt.io/official_releases/qt/5.6/5.6.0/
-    - qt-opensource-mac-x64-clang-5.6.0.dmg
+  - http://download.qt.io/official_releases/qt/5.9/5.9.2/
+    - qt-opensource-mac-x64-5.9.2.dmg
 - boost
   - http://www.boost.org/users/history/version_1_55_0.html
 

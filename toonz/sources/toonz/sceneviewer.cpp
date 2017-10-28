@@ -69,7 +69,6 @@
 #include "timagecache.h"
 #include "trasterimage.h"
 #include "tstroke.h"
-#include "tgldisplaylistsmanager.h"
 #include "ttoonzimage.h"
 
 // Qt includes
@@ -90,36 +89,6 @@ void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
 
 //-------------------------------------------------------------------------------
 namespace {
-//-------------------------------------------------------------------------------
-
-int l_displayListsSpaceId =
-    -1;  //!< Display lists space id associated with SceneViewers
-QGLWidget *l_proxy = 0;  //!< Proxy associated with the above
-std::set<TGlContext>
-    l_contexts;  //!< Stores every SceneViewer context (see ~SceneViewer)
-
-//-------------------------------------------------------------------------------
-
-QGLWidget *touchProxy() {
-  struct GLWidgetProxy final : public TGLDisplayListsProxy {
-    ~GLWidgetProxy() {
-      delete l_proxy;
-      l_proxy = 0;
-    }
-
-    void makeCurrent() override { l_proxy->makeCurrent(); }
-    void doneCurrent() override { l_proxy->doneCurrent(); }
-  };
-
-  // If it does not exist, create the viewer's display lists proxy
-  if (!l_proxy) {
-    l_proxy = new QGLWidget;
-    l_displayListsSpaceId =
-        TGLDisplayListsManager::instance()->storeProxy(new GLWidgetProxy);
-  }
-
-  return l_proxy;
-}
 
 //-------------------------------------------------------------------------------
 
@@ -469,7 +438,7 @@ public:
 //-----------------------------------------------------------------------------
 
 SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
-    : GLWidgetForHighDpi(parent, touchProxy())
+    : GLWidgetForHighDpi(parent)
     , m_pressure(0)
     , m_lastMousePos(0, 0)
     , m_mouseButton(Qt::NoButton)
@@ -532,14 +501,6 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   m_3DSideL = rasterFromQPixmap(svgToPixmap(":Resources/3Dside_l.svg"));
   m_3DTop   = rasterFromQPixmap(svgToPixmap(":Resources/3Dtop.svg"));
 
-  makeCurrent();
-  TGlContext context(tglGetCurrentContext());
-  doneCurrent();
-
-  TGLDisplayListsManager::instance()->attachContext(l_displayListsSpaceId,
-                                                    context);
-  l_contexts.insert(context);
-
   // iwsw commented out temporarily
   // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
   // Ghibli3DLutUtil::m_isValid)
@@ -561,23 +522,6 @@ void SceneViewer::setVisual(const ImagePainter::VisualSettings &settings) {
 //-----------------------------------------------------------------------------
 
 SceneViewer::~SceneViewer() {
-  // Due to a BUG on some old driver we've tested, it's necessary to remove the
-  // proxy first,
-  // before any QGLWidget which shares the context gets killed in turn. The bug
-  // caused a crash
-  // when the destruction order of the SceneViewer was inverted with respect to
-  // the (shared) creation.
-  if (l_proxy) {
-    std::set<TGlContext>::iterator ct, cEnd(l_contexts.end());
-    for (ct = l_contexts.begin(); ct != cEnd; ++ct)
-      TGLDisplayListsManager::instance()->releaseContext(*ct);
-    assert(!l_proxy);
-  }
-
-  makeCurrent();
-  if (m_tableDLId != -1) glDeleteLists(m_tableDLId, 1);
-  doneCurrent();
-
   // iwsw commented out temporarily
   /*
 if (m_ghibli3DLutUtil)
@@ -627,7 +571,7 @@ void SceneViewer::onRenderCompleted(int frame) {
 //-------------------------------------------------------------------------------
 
 void SceneViewer::onPreviewUpdate() {
-  updateGL();
+  update();
   emit previewStatusChanged();
 }
 
@@ -635,7 +579,8 @@ void SceneViewer::onPreviewUpdate() {
 
 void SceneViewer::startForegroundDrawing() {
   makeCurrent();
-  setAutoBufferSwap(false);
+  // setAutoBufferSwap(false);
+  update();  // needed?
   glPushMatrix();
   tglMultMatrix(getViewMatrix());
 
@@ -667,7 +612,8 @@ void SceneViewer::endForegroundDrawing() {
     assert(glGetError() == GL_NO_ERROR);
   }
 
-  setAutoBufferSwap(true);
+  // setAutoBufferSwap(true);
+  update();  // needed?
   m_foregroundDrawing = false;
 }
 
@@ -915,6 +861,7 @@ double SceneViewer::getHGuide(int index) { return m_hRuler->getGuide(index); }
 //-----------------------------------------------------------------------------
 
 void SceneViewer::initializeGL() {
+  initializeOpenGLFunctions();
   // glClearColor(1.0,1.0,1.0,1);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -927,11 +874,15 @@ void SceneViewer::initializeGL() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::resizeGL(int w, int h) {
+  w *= getDevPixRatio();
+  h *= getDevPixRatio();
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-
   glOrtho(0, w, 0, h, -4000, 4000);
+  m_projectionMatrix.setToIdentity();
+  m_projectionMatrix.ortho(0, w, 0, h, -4000, 4000);
+
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslatef(0.375, 0.375, 0.0);
@@ -1441,22 +1392,6 @@ static void drawFpsGraph(int t0, int t1) {
 
 //-----------------------------------------------------------------------------
 
-class Qt_GLContextManager final : public TGLContextManager {
-  QGLContext *m_context;
-
-public:
-  Qt_GLContextManager() : m_context(0) {}
-  void store() override {
-    // m_context = const_cast<QGLContext *>(QGLContext::currentContext());
-  }
-  void store(QGLContext *context) { m_context = context; }
-  void restore() override {
-    if (m_context) m_context->makeCurrent();
-  }
-};
-
-//-----------------------------------------------------------------------------
-
 //#define FPS_HISTOGRAM
 
 void SceneViewer::paintGL() {
@@ -1465,10 +1400,7 @@ void SceneViewer::paintGL() {
      * GL_FRAMEBUFFER_UNDEFINED の状態で paintGL() が呼ばれてしまうようだ */
     return;
   }
-#ifdef WIN32
-  // following line is necessary to solve a problem Windows 7
-  SetWindowRgn((HWND)winId(), 0, FALSE);
-#else
+#ifdef MACOSX
   // followin lines are necessary to solve a problem on iMac20
   // It seems that for some errors in the openGl implementation, buffers are not
   // set corretly.
@@ -1557,7 +1489,7 @@ void SceneViewer::paintGL() {
 
   // Il freezed e' attivo ed e' in stato "update": faccio il grab del viewer.
   if (m_freezedStatus == UPDATE_FREEZED) {
-    m_viewGrabImage = rasterFromQImage(grabFrameBuffer(false));
+    m_viewGrabImage = rasterFromQImage(grabFramebuffer());
     m_freezedStatus = NORMAL_FREEZED;
   }
 
@@ -1717,7 +1649,8 @@ double SceneViewer::projectToZ(const TPoint &delta) {
   GLint viewport[4];
   double modelview[16], projection[16];
   glGetIntegerv(GL_VIEWPORT, viewport);
-  glGetDoublev(GL_PROJECTION_MATRIX, projection);
+  for (int i      = 0; i < 16; i++)
+    projection[i] = (double)m_projectionMatrix.constData()[i];
   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
   double ax, ay, az, bx, by, bz;
@@ -1821,7 +1754,7 @@ void SceneViewer::navigatorPan(const QPoint &delta) {
 
 void SceneViewer::GLInvalidateAll() {
   m_clipRect.empty();
-  updateGL();
+  update();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();
 }
@@ -1830,7 +1763,7 @@ void SceneViewer::GLInvalidateAll() {
 
 void SceneViewer::GLInvalidateRect(const TRectD &rect) {
   m_clipRect = rect;
-  updateGL();
+  update();
   m_clipRect.empty();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();

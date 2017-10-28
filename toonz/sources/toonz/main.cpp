@@ -261,6 +261,9 @@ int main(int argc, char *argv[]) {
 #if QT_VERSION >= 0x050600
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
+  // Enables resource sharing between the OpenGL contexts used by classes like
+  // QOpenGLWidget and QQuickWidget.
+  QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
   QApplication a(argc, argv);
 
@@ -522,8 +525,8 @@ int main(int argc, char *argv[]) {
 
   loadShaderInterfaces(ToonzFolder::getLibraryFolder() + TFilePath("shaders"));
 
-  splash.showMessage(offsetStr + "Initializing OpenToonz ...",
-                     Qt::AlignCenter, Qt::white);
+  splash.showMessage(offsetStr + "Initializing OpenToonz ...", Qt::AlignCenter,
+                     Qt::white);
   a.processEvents();
 
   TTool::setApplication(TApp::instance());

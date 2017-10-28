@@ -1,6 +1,6 @@
 # ビルド手順（Windows）
 
-Visual Studio 2015 と Qt 5.6 でビルドできることを確認しています。
+Visual Studio 2015 と Qt 5.9 でビルドできることを確認しています。
 
 ## 必要なソフトウェアの導入
 
@@ -29,7 +29,7 @@ Visual Studio 2015 と Qt 5.6 でビルドできることを確認していま�
 ### Qt
 - https://www.qt.io/download-open-source/
 - クロスプラットフォームの GUI フレームワークです
-- 上記の URL から以下のファイルをダウンロードして Qt 5.6 (64 ビット版) を適当なフォルダにインストールします
+- 上記の URL から以下のファイルをダウンロードして Qt 5.9 (64 ビット版) を適当なフォルダにインストールします
   - [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe)
 
 ### boost
@@ -90,7 +90,7 @@ OpenToonz は QuickTime SDK を用いて mov 形式などへ対応していま�
 
 ### Qt
 - https://www.qt.io/download-open-source/
-- 64 ビット版と同じインストーラーで Qt 5.6 (32 ビット版) を適当なフォルダにインストールします
+- 64 ビット版と同じインストーラーで Qt 5.9 (32 ビット版) を適当なフォルダにインストールします
 
 ### QuickTime SDK
 1. Apple の開発者登録をして下記のURLから `QuickTime 7.3 SDK for Windows.zip` をダウンロードします
