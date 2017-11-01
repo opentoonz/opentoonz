@@ -21,12 +21,12 @@
         <location filename="../../tnztools/tooloptions.cpp" line="482"/>
         <source>SO:</source>
         <translatorcomment>порядок размещения:</translatorcomment>
-        <translation>SO:</translation>
+        <translation>Порядок:</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="603"/>
         <source>Position</source>
-        <translation>Позиция</translation>
+        <translation>Положение</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="622"/>
@@ -207,7 +207,7 @@
     <message>
         <location filename="../../tnztools/edittool.cpp" line="810"/>
         <source>Auto Select Column</source>
-        <translation>Автовыбор колонки</translation>
+        <translation>Автовыбор столбца</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="811"/>
@@ -227,12 +227,12 @@
     <message>
         <location filename="../../tnztools/edittool.cpp" line="814"/>
         <source>Lock Position E/W</source>
-        <translation>Блокировать позицию E/W</translation>
+        <translation>Блокировать положение E/W</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="815"/>
         <source>Lock Position N/S</source>
-        <translation>Блокировать позицию N/S</translation>
+        <translation>Блокировать положение N/S</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="816"/>
@@ -267,18 +267,18 @@
     <message>
         <location filename="../../tnztools/edittool.cpp" line="822"/>
         <source>E/W and N/S Positions</source>
-        <translation>E/W и N/S позиции</translation>
+        <translation>E/W и N/S положение</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="823"/>
         <source>Z Position</source>
-        <translation>Z позиция</translation>
+        <translation>Z положение</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="824"/>
         <source>SO</source>
         <translatorcomment>порядок размещения</translatorcomment>
-        <translation>SO</translation>
+        <translation>Порядок</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="825"/>
@@ -543,7 +543,7 @@
     <message>
         <location filename="../../tnztools/plastictool_meshedit.cpp" line="1141"/>
         <source>Cut Mesh</source>
-        <translation>Резать сетку</translation>
+        <translation>Резать полисетку</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool_build.cpp" line="642"/>
@@ -578,7 +578,7 @@
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="696"/>
         <source>Edit Mesh</source>
-        <translation>Редактировать сетку</translation>
+        <translation>Редактировать полисетку</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="697"/>
@@ -608,7 +608,7 @@
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="704"/>
         <source>Snap To Mesh</source>
-        <translation>Привязка к сетке</translation>
+        <translation>Привязка к полисетке</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="705"/>
@@ -633,7 +633,7 @@
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="713"/>
         <source>Keep Distance</source>
-        <translation>Держать дистанцию</translation>
+        <translation>Держать расстояние</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="714"/>
@@ -672,7 +672,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="1461"/>
         <source>Show Mesh</source>
-        <translation>Показать сетку</translation>
+        <translation>Показать полисетку</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="1468"/>
@@ -683,7 +683,7 @@ Do you want to continue?</source>
         <location filename="../../tnztools/plastictool.cpp" line="1475"/>
         <source>Show SO</source>
         <translatorcomment>SO - порядок перекрытия</translatorcomment>
-        <translation>Показать ПР</translation>
+        <translation>Показать порядок</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="1482"/>
@@ -705,7 +705,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="406"/>
         <source>Create Mesh</source>
-        <translation>Создать сетку</translation>
+        <translation>Создать полисетку</translation>
     </message>
     <message>
         <location filename="../../tnztools/plastictool.cpp" line="408"/>
@@ -726,7 +726,7 @@ Do you want to proceed?</source>
         <location filename="../../tnztools/plastictool.cpp" line="490"/>
         <source>SO</source>
         <translatorcomment>порядок перекрытия</translatorcomment>
-        <translation>SO</translation>
+        <translation>Порядок</translation>
     </message>
 </context>
 <context>
@@ -769,7 +769,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="377"/>
         <source>Auto Fill</source>
-        <translation>Автозаполнение</translation>
+        <translation>Автозаливка</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="378"/>
@@ -896,27 +896,27 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/tool.cpp" line="803"/>
         <source>The current column is locked.</source>
-        <translation>Текущая колонка на замке.</translation>
+        <translation>Текущий столбец на замке.</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="807"/>
         <source>It is not possible to edit the audio column.</source>
-        <translation>Невозможно редактировать колонку аудио.</translation>
+        <translation>Невозможно редактировать столбец аудио.</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="811"/>
         <source>It is not possible to edit the Magpie column.</source>
-        <translation>Редактировать колонку Magpie невозможно.</translation>
+        <translation>Редактировать столбец Magpie невозможно.</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="818"/>
         <source>The current tool cannot be used on a Level column.</source>
-        <translation>Текущий инструмент нельзя использовать в колонке уровня.</translation>
+        <translation>Текущий инструмент нельзя использовать в столбце уровня.</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="823"/>
         <source>The current tool cannot be used on a Mesh column.</source>
-        <translation>Текущий инструмент нельзя использовать в колонке меша.</translation>
+        <translation>Текущий инструмент нельзя использовать в столбце полисетки.</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="832"/>
@@ -926,7 +926,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/tool.cpp" line="844"/>
         <source>The current tool cannot be used to edit a motion path.</source>
-        <translation>Текущий инструмент не может использоваться для редактирования пути движения.</translation>
+        <translation>Текущий инструмент не может использоваться для редактирования траектории.</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="856"/>
@@ -952,12 +952,12 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/tool.cpp" line="880"/>
         <source>The current tool cannot be used on a Mesh Level.</source>
-        <translation>Текущий инструмент нельзя использовать в уровне меша.</translation>
+        <translation>Текущий инструмент нельзя использовать в уровне полисетки.</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="893"/>
         <source>The current tool cannot be used on a mesh-deformed level</source>
-        <translation>Текущий инструмент нельзя использовать в уровне меш деформации</translation>
+        <translation>Текущий инструмент нельзя использовать в уровне деформации полисетки</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="908"/>
