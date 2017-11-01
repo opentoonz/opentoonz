@@ -2629,9 +2629,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
       menu.addAction(cmdManager->getAction(MI_Autorenumber));
     }
     menu.addAction(cmdManager->getAction(MI_ReplaceLevel));
-
     menu.addAction(cmdManager->getAction(MI_ReplaceParentDirectory));
-
     {
       // replace with another level in scene cast
       std::vector<TXshLevel *> levels;
@@ -2693,6 +2691,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
   menu.addSeparator();
   if (!soundCellsSelected)
     menu.addAction(cmdManager->getAction(MI_ImportMagpieFile));
+  menu.addAction(cmdManager->getAction(MI_PasteNumbers));
 }
 //-----------------------------------------------------------------------------
 /*! replace level with another level in the cast

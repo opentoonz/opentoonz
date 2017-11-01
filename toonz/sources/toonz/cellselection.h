@@ -50,6 +50,8 @@ public:
 
   /*- セルの上書きペースト -*/
   void overWritePasteCells();
+  // paste cell numbers only
+  void overwritePasteNumbers();
 
   //! \note: puo' anche essere r0>r1 o c0>c1
   void selectCells(int r0, int c0, int r1, int c1);
