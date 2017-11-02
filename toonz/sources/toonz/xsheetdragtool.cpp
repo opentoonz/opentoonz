@@ -1608,9 +1608,10 @@ public:
     assert(m_lastCol == *indices.begin());
 
     if (col < 0) col = 0;
-    if (col == m_lastCol) return;
-    int dCol  = col - m_lastCol;
+    if (col == (m_lastCol - m_offset)) return;
+    int dCol  = col - (m_lastCol - m_offset);
     m_lastCol = col;
+    m_offset  = 0;
 
     assert(*indices.begin() + dCol >= 0);
 
@@ -1767,8 +1768,9 @@ public:
     int frameAxis        = o->frameAxis(event->pos());
     if (o->isVerticalTimeline() &&
         !o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) {
-      range     = o->layerSide(track);
-      frameAxis = o->layerAxis(event->pos()) - getViewer()->columnToLayerAxis(m_index);
+      range = o->layerSide(track);
+      frameAxis =
+          o->layerAxis(event->pos()) - getViewer()->columnToLayerAxis(m_index);
     }
 
     double v = range.ratio(frameAxis);
