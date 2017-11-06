@@ -85,6 +85,9 @@ Return \b TFx.
 */
   TFx *getFx() const override;
 
+  // Used in TCellData::getNumbers
+  bool setNumbers(int row, int rowCount, const TXshCell cells[]);
+
 private:
   // not implemented
   TXshLevelColumn(const TXshLevelColumn &);

@@ -24,6 +24,8 @@
 #include "pane.h"
 #include "previewer.h"
 
+#include <QMatrix4x4>
+
 //=====================================================================
 
 //  Forward declarations
@@ -140,6 +142,8 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_isStyleShortcutSwitchable;
 
   bool m_isBusyOnTabletMove;
+
+  QMatrix4x4 m_projectionMatrix;
 
   // iwsw commented out temporarily
   // Ghibli3DLutUtil * m_ghibli3DLutUtil;

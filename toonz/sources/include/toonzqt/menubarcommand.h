@@ -173,6 +173,9 @@ public:
                       const QString &offText);
 
   std::string getIdFromAction(QAction *action);
+
+  // load user defined shortcuts
+  void loadShortcuts();
 };
 
 //-----------------------------------------------------------------------------

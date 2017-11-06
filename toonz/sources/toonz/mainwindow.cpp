@@ -31,6 +31,7 @@
 #include "toonz/stylemanager.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
+#include "toonz/txshleveltypes.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -62,6 +63,7 @@ TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
 TEnv::IntVar FieldGuideToggleAction("FieldGuideToggleAction", 0);
 TEnv::IntVar ViewBBoxToggleAction("ViewBBoxToggleAction1", 1);
+TEnv::IntVar EditInPlaceToggleAction("EditInPlaceToggleAction", 0);
 #ifdef LINETEST
 TEnv::IntVar CapturePanelFieldGuideToggleAction(
     "CapturePanelFieldGuideToggleAction", 0);
@@ -378,6 +380,8 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent,
   m_toolsActionGroup->setExclusive(true);
   m_currentRoomsChoice = Preferences::instance()->getCurrentRoomChoice();
   defineActions();
+  // user defined shortcuts will be loaded here
+  CommandManager::instance()->loadShortcuts();
   TApp::instance()->getCurrentScene()->setDirtyFlag(false);
 
   // La menuBar altro non è che una toolbar
@@ -1248,6 +1252,8 @@ void MainWindow::onMenuCheckboxChanged() {
     ViewCameraToggleAction = isChecked;
   else if (cm->getAction(MI_ViewTable) == action)
     ViewTableToggleAction = isChecked;
+  else if (cm->getAction(MI_ToggleEditInPlace) == action)
+    EditInPlaceToggleAction = isChecked;
   else if (cm->getAction(MI_ViewBBox) == action)
     ViewBBoxToggleAction = isChecked;
   else if (cm->getAction(MI_FieldGuide) == action)
@@ -1784,7 +1790,11 @@ void MainWindow::defineActions() {
   collapseAction->setIconText("Collapse");
   collapseAction->setIcon(createQIconOnOffPNG("collapse"));
 
-  createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
+  toggle = createToggle(MI_ToggleEditInPlace, tr("&Toggle Edit In Place"), "",
+                        EditInPlaceToggleAction ? 1 : 0, MenuViewCommandType);
+  toggle->setIconText(tr("Toggle Edit in Place"));
+  toggle->setIcon(QIcon(":Resources/edit_in_place.svg"));
+
   createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
   createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
   createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
@@ -1861,6 +1871,7 @@ void MainWindow::defineActions() {
                         "");
 
   createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "Z");
+  createRightClickMenuAction(MI_PasteNumbers, tr("&Paste Numbers"), "");
 
   createToggle(MI_ViewCamera, tr("&Camera Box"), "",
                ViewCameraToggleAction ? 1 : 0, MenuViewCommandType);

@@ -135,6 +135,66 @@ void XsheetViewer::getColumnColor(QColor &color, QColor &sideColor, int index,
 
 //-----------------------------------------------------------------------------
 
+void XsheetViewer::getButton(int &btype, QColor &bgColor, QImage &iconImage,
+                             bool isTimeline) {
+  switch (btype) {
+  case PREVIEW_ON_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelinePreviewButtonBgOnColor()
+                           : getXsheetPreviewButtonBgOnColor();
+    iconImage = (isTimeline) ? getTimelinePreviewButtonOnImage()
+                             : getXsheetPreviewButtonOnImage();
+    break;
+  case PREVIEW_OFF_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelinePreviewButtonBgOffColor()
+                           : getXsheetPreviewButtonBgOffColor();
+    iconImage = (isTimeline) ? getTimelinePreviewButtonOffImage()
+                             : getXsheetPreviewButtonOffImage();
+    break;
+  case CAMSTAND_ON_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineCamstandButtonBgOnColor()
+                           : getXsheetCamstandButtonBgOnColor();
+    iconImage = (isTimeline) ? getTimelineCamstandButtonOnImage()
+                             : getXsheetCamstandButtonOnImage();
+    break;
+  case CAMSTAND_TRANSP_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineCamstandButtonBgOnColor()
+                           : getXsheetCamstandButtonBgOnColor();
+    iconImage = (isTimeline) ? getTimelineCamstandButtonTranspImage()
+                             : getXsheetCamstandButtonTranspImage();
+    break;
+  case CAMSTAND_OFF_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineCamstandButtonBgOffColor()
+                           : getXsheetCamstandButtonBgOffColor();
+    iconImage = (isTimeline) ? getTimelineCamstandButtonOffImage()
+                             : getXsheetCamstandButtonOffImage();
+    break;
+  case LOCK_ON_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineLockButtonBgOnColor()
+                           : getXsheetLockButtonBgOnColor();
+    iconImage = (isTimeline) ? getTimelineLockButtonOnImage()
+                             : getXsheetLockButtonOnImage();
+    break;
+  case LOCK_OFF_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineLockButtonBgOffColor()
+                           : getXsheetLockButtonBgOffColor();
+    iconImage = (isTimeline) ? getTimelineLockButtonOffImage()
+                             : getXsheetLockButtonOffImage();
+    break;
+  case CONFIG_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineConfigButtonBgColor()
+                           : getXsheetConfigButtonBgColor();
+    iconImage = (isTimeline) ? getTimelineConfigButtonImage()
+                             : getXsheetConfigButtonImage();
+    break;
+  default:
+    bgColor = grey210;
+    static QImage iconignored;
+    iconImage = iconignored;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 #if QT_VERSION >= 0x050500
 XsheetViewer::XsheetViewer(QWidget *parent, Qt::WindowFlags flags)
 #else
@@ -156,7 +216,10 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
-    , m_orientation(nullptr) {
+    , m_orientation(nullptr)
+    , m_xsheetLayout("Classic") {
+
+  m_xsheetLayout = Preferences::instance()->getLoadedXsheetLayout();
 
   setFocusPolicy(Qt::StrongFocus);
 

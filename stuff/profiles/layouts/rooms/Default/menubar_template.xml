@@ -125,6 +125,7 @@
     <command>MI_Resequence</command>
     <command>MI_CloneChild</command>
     <command>MI_ExplodeChild</command>
+    <command>MI_ToggleEditInPlace</command>
     <separator/>
     <command>MI_ApplyMatchLines</command>
     <command>MI_MergeCmapped</command>

@@ -884,6 +884,22 @@ What do you want to do?</source>
         <source>Field Guide</source>
         <translation>フィールドガイド</translation>
     </message>
+    <message>
+        <source>Bottom</source>
+        <translation>下</translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation>上</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation>左</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation>右</translation>
+    </message>
 </context>
 <context>
     <name>CleanupTab</name>
@@ -5685,6 +5701,18 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
         <translation>
 警告： 画像サイズの不一致。保存されている画像のサイズは %1 x %2 ピクセルです。</translation>
     </message>
+    <message>
+        <source>Color</source>
+        <translation>カラー</translation>
+    </message>
+    <message>
+        <source>Grayscale</source>
+        <translation>グレースケール</translation>
+    </message>
+    <message>
+        <source>Black &amp; White</source>
+        <translation>白黒二値</translation>
+    </message>
 </context>
 <context>
     <name>PencilTestSaveInFolderPopup</name>
@@ -5779,6 +5807,16 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     <message>
         <source>Set the current &quot;Save In&quot; path as the default.</source>
         <translation>現在の「作成場所」のパスを既定にします。</translation>
+    </message>
+    <message>
+        <source>Save Scene in Subfolder</source>
+        <translation>カットフォルダ内にシーンを保存する</translation>
+    </message>
+    <message>
+        <source>Save the current scene in the subfolder.
+          Set the output folder path to the subfolder as well.</source>
+        <translation>シーンをカットフォルダ内に保存します。
+出力設定の保存先のパスもカットフォルダ内に変更します。</translation>
     </message>
 </context>
 <context>
@@ -6620,6 +6658,18 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Font Weight *:</source>
         <translation>文字の太さ *：</translation>
+    </message>
+    <message>
+        <source>Arrow Markers</source>
+        <translation>矢印マーカー</translation>
+    </message>
+    <message>
+        <source>Animated Guide</source>
+        <translation>アニメーションガイド</translation>
+    </message>
+    <message>
+        <source>Vector Guided Style:</source>
+        <translation>ベクターレベルの描き順のガイド：</translation>
     </message>
 </context>
 <context>
@@ -8350,6 +8400,14 @@ Are you sure?</source>
         <source>Reframe to %1&apos;s with %2 blanks</source>
         <translation>リフレーム： %1 コマ 中 %2</translation>
     </message>
+    <message>
+        <source>Stage Schematic</source>
+        <translation>ステージスキマティック</translation>
+    </message>
+    <message>
+        <source>Fx Schematic</source>
+        <translation>エフェクトスキマティック</translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -9646,6 +9704,26 @@ Please commit or revert changes first.</source>
     <message>
         <source>Select Column</source>
         <translation>列を選択</translation>
+    </message>
+    <message>
+        <source>Vector Guided Drawing</source>
+        <translation>ベクターレベルの描き順のガイド</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>オフ</translation>
+    </message>
+    <message>
+        <source>Closest Drawing</source>
+        <translation>直近の作画</translation>
+    </message>
+    <message>
+        <source>Farthest Drawing</source>
+        <translation>最も遠い作画</translation>
+    </message>
+    <message>
+        <source>All Drawings</source>
+        <translation>全ての作画</translation>
     </message>
 </context>
 <context>

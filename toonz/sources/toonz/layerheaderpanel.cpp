@@ -67,12 +67,12 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
   QRect rect             = QRect(QPoint(0, 0), size());
   p.fillRect(rect.adjusted(0, 0, -3, 0), slightlyLighter);
 
-  drawIcon(p, PredefinedRect::EYE, XsheetGUI::PreviewVisibleColor,
-           ColumnArea::Pixmaps::eye());
+  drawIcon(p, PredefinedRect::EYE, boost::none,
+           m_viewer->getLayerHeaderPreviewImage());
   drawIcon(p, PredefinedRect::PREVIEW_LAYER, boost::none,
-           ColumnArea::Pixmaps::cameraStand());
-  drawIcon(p, PredefinedRect::LOCK, QColor(255, 255, 255, 128),
-           ColumnArea::Pixmaps::lock());
+           m_viewer->getLayerHeaderCamstandImage());
+  drawIcon(p, PredefinedRect::LOCK, boost::none,
+           m_viewer->getLayerHeaderLockImage());
 
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
 
@@ -93,18 +93,12 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 
 void LayerHeaderPanel::drawIcon(QPainter &p, PredefinedRect rect,
                                 optional<QColor> fill,
-                                const QPixmap &pixmap) const {
+                                const QImage &image) const {
   QRect iconRect =
       Orientations::leftToRight()->rect(rect).adjusted(-2, 0, -2, 0);
 
-  if (rect == PredefinedRect::LOCK) {
-    p.setPen(Qt::gray);
-    p.setBrush(QColor(255, 255, 255, 128));
-    p.drawRect(iconRect);
-    iconRect.adjust(1, 1, -1, -1);
-  } else if (fill)
-    p.fillRect(iconRect, *fill);
-  p.drawPixmap(iconRect, pixmap);
+  if (fill) p.fillRect(iconRect, *fill);
+  p.drawImage(iconRect, image);
 }
 
 void LayerHeaderPanel::drawLines(QPainter &p, const QRect &numberRect,
