@@ -22,8 +22,9 @@
 
 // Qt includes
 #include <QDir>
-#include <QGLShaderProgram>
+#include <QOpenGLShaderProgram>
 #include <QCoreApplication>
+#include <QOffscreenSurface>
 
 // Glew include
 #include <GL/glew.h>
@@ -81,11 +82,13 @@ public:
 };
 
 struct ProgramBinder {
-  QGLShaderProgram *m_prog;
+  QOpenGLShaderProgram *m_prog;
 
 public:
-  ProgramBinder(QGLShaderProgram *prog) : m_prog(prog) { m_prog->bind(); }
-  ~ProgramBinder() { m_prog->release(); }
+  ProgramBinder(QOpenGLShaderProgram *prog) : m_prog(prog) { m_prog->bind(); }
+  ~ProgramBinder() {
+    glUseProgram(0);  // m_prog->release();
+  }
 };
 
 struct RectF {
@@ -191,14 +194,13 @@ public:
   void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 
 private:
-  QGLShaderProgram *touchShaderProgram(const ShaderInterface::ShaderData &sd,
-                                       ShadingContext &context,
-                                       int varyingsCount       = 0,
-                                       const GLchar **varyings = 0);
+  QOpenGLShaderProgram *touchShaderProgram(
+      const ShaderInterface::ShaderData &sd, ShadingContext &context,
+      int varyingsCount = 0, const GLchar **varyings = 0);
 
-  void bindParameters(QGLShaderProgram *shaderProgram, double frame);
+  void bindParameters(QOpenGLShaderProgram *shaderProgram, double frame);
 
-  void bindWorldTransform(QGLShaderProgram *shaderProgram,
+  void bindWorldTransform(QOpenGLShaderProgram *shaderProgram,
                           const TAffine &worldToDst);
 
   void getInputData(const TRectD &rect, double frame, const TRenderSettings &ri,
@@ -230,8 +232,9 @@ public:
 class ShadingContextManager final : public QObject {
   mutable QMutex m_mutex;
 
-  ShadingContext m_shadingContext;
+  std::unique_ptr<ShadingContext> m_shadingContext;
   TAtomicVar m_activeRenderInstances;
+  std::unique_ptr<QOffscreenSurface> m_surface;
 
 public:
   ShadingContextManager() {
@@ -251,7 +254,10 @@ Suggestions are welcome as this is a tad beyond ridiculous...
     assert(thread() ==
            mainScopeBoundObject
                ->thread());  // Parent object must be in the same thread,
-    setParent(mainScopeBoundObject);  // otherwise reparenting fails
+    // setParent(mainScopeBoundObject);  // otherwise reparenting fails
+    m_surface.reset(new QOffscreenSurface());
+    m_surface->create();
+    m_shadingContext.reset(new ShadingContext(m_surface.get()));
   }
 
   static ShadingContextManager *instance() {
@@ -261,8 +267,8 @@ Suggestions are welcome as this is a tad beyond ridiculous...
 
   QMutex *mutex() const { return &m_mutex; }
 
-  const ShadingContext &shadingContext() const { return m_shadingContext; }
-  ShadingContext &shadingContext() { return m_shadingContext; }
+  const ShadingContext &shadingContext() const { return *m_shadingContext; }
+  ShadingContext &shadingContext() { return *m_shadingContext; }
 
   void onRenderInstanceStart() { ++m_activeRenderInstances; }
 
@@ -271,8 +277,8 @@ Suggestions are welcome as this is a tad beyond ridiculous...
       QMutexLocker mLocker(&m_mutex);
 
       // Release the shading context's output buffer
-      ::ContextLocker cLocker(m_shadingContext);
-      m_shadingContext.resize(0, 0);
+      ::ContextLocker cLocker(*m_shadingContext);
+      m_shadingContext->resize(0, 0);
 
 #ifdef DIAGNOSTICS
       DIAGNOSTICS_DUMP("ShaderLogs");
@@ -286,7 +292,7 @@ Suggestions are welcome as this is a tad beyond ridiculous...
       ShadingContextManager *m_this;
       ShadingContext::Support support() {
         QMutexLocker mLocker(&m_this->m_mutex);
-        ::ContextLocker cLocker(m_this->m_shadingContext);
+        ::ContextLocker cLocker(*m_this->m_shadingContext);
 
         return ShadingContext::support();
       }
@@ -298,13 +304,13 @@ Suggestions are welcome as this is a tad beyond ridiculous...
     if (!sentMsg) {
       switch (sup) {
       case ShadingContext::NO_PIXEL_BUFFER:
-        DVGui::warning(QGLShaderProgram::tr(
+        DVGui::warning(QOpenGLShaderProgram::tr(
             "This system configuration does not support OpenGL Pixel Buffers. "
             "Shader Fxs will not be able to render."));
         break;
 
       case ShadingContext::NO_SHADERS:
-        DVGui::warning(QGLShaderProgram::tr(
+        DVGui::warning(QOpenGLShaderProgram::tr(
             "This system configuration does not support OpenGL Shader "
             "Programs. Shader Fxs will not be able to render."));
         break;
@@ -315,6 +321,8 @@ Suggestions are welcome as this is a tad beyond ridiculous...
 
     return sup;
   }
+
+  QOffscreenSurface *getSurface() { return m_surface.get(); }
 };
 
 template class DV_EXPORT_API TFxDeclarationT<ShaderFx>;
@@ -603,13 +611,14 @@ bool ShaderFx::doGetBBox(double frame, TRectD &bbox,
   QMutexLocker mLocker(manager->mutex());
 
   // ShadingContext& context = manager->shadingContext();
-  std::shared_ptr<ShadingContext> shadingContextPtr(new ShadingContext);
+  std::shared_ptr<ShadingContext> shadingContextPtr(
+      new ShadingContext(manager->getSurface()));
   ShadingContext &context = *shadingContextPtr.get();
 
   ::ContextLocker cLocker(context);
 
   // Build the varyings data
-  QGLShaderProgram *prog = 0;
+  QOpenGLShaderProgram *prog = 0;
   {
     const GLchar *varyingNames[] = {"outputBBox"};
     prog = touchShaderProgram(sd, context, 1, &varyingNames[0]);
@@ -672,13 +681,13 @@ bool ShaderFx::canHandle(const TRenderSettings &info, double frame) {
 
 //-------------------------------------------------------------------
 
-QGLShaderProgram *ShaderFx::touchShaderProgram(
+QOpenGLShaderProgram *ShaderFx::touchShaderProgram(
     const ShaderInterface::ShaderData &sd, ShadingContext &context,
     int varyingsCount, const GLchar **varyings) {
-  typedef std::pair<QGLShaderProgram *, QDateTime> CompiledShader;
+  typedef std::pair<QOpenGLShaderProgram *, QDateTime> CompiledShader;
 
   struct locals {
-    inline static void logCompilation(QGLShaderProgram *program) {
+    inline static void logCompilation(QOpenGLShaderProgram *program) {
       // Log shaders - observe that we'll look into the program's *children*,
       // not its
       // shaders. This is necessary as uncompiled shaders are not added to the
@@ -687,7 +696,8 @@ QGLShaderProgram *ShaderFx::touchShaderProgram(
 
       int c, cCount = children.size();
       for (c = 0; c != cCount; ++c) {
-        if (QGLShader *shader = dynamic_cast<QGLShader *>(children[c])) {
+        if (QOpenGLShader *shader =
+                dynamic_cast<QOpenGLShader *>(children[c])) {
           const QString &log = shader->log();
           if (!log.isEmpty()) DVGui::info(log);
         }
@@ -716,7 +726,7 @@ QGLShaderProgram *ShaderFx::touchShaderProgram(
 
 //-------------------------------------------------------------------
 
-void ShaderFx::bindParameters(QGLShaderProgram *program, double frame) {
+void ShaderFx::bindParameters(QOpenGLShaderProgram *program, double frame) {
   // Bind fx parameters
   const std::vector<ShaderInterface::Parameter> &siParams =
       m_shaderInterface->parameters();
@@ -780,7 +790,7 @@ void ShaderFx::bindParameters(QGLShaderProgram *program, double frame) {
 
 //-------------------------------------------------------------------
 
-void ShaderFx::bindWorldTransform(QGLShaderProgram *program,
+void ShaderFx::bindWorldTransform(QOpenGLShaderProgram *program,
                                   const TAffine &worldToDst) {
 // Bind transformation affine
 #if QT_VERSION >= 0x050500
@@ -857,7 +867,7 @@ void ShaderFx::getInputData(const TRectD &rect, double frame,
   int pCount = getInputPortCount();
 
   // Build the varyings data
-  QGLShaderProgram *prog = 0;
+  QOpenGLShaderProgram *prog = 0;
   {
     // Unsubscripted varying arrays on transform feedback seems to be
     // unsupported
@@ -957,18 +967,18 @@ void ShaderFx::doCompute(TTile &tile, double frame,
       }
     };
 
-    inline static QGLFramebufferObjectFormat makeFormat(int bpp) {
-      QGLFramebufferObjectFormat fmt;
+    inline static QOpenGLFramebufferObjectFormat makeFormat(int bpp) {
+      QOpenGLFramebufferObjectFormat fmt;
       if (bpp == 64) fmt.setInternalTextureFormat(GL_RGBA16);
       return fmt;
     }
 
     inline static void touchOutputSize(ShadingContext &context,
                                        const TDimension &size, int bpp) {
-      const QGLFramebufferObjectFormat &fmt = makeFormat(bpp);
+      const QOpenGLFramebufferObjectFormat &fmt = makeFormat(bpp);
 
-      const TDimension &currentSize                = context.size();
-      const QGLFramebufferObjectFormat &currentFmt = context.format();
+      const TDimension &currentSize                    = context.size();
+      const QOpenGLFramebufferObjectFormat &currentFmt = context.format();
 
       if (currentSize.lx < size.lx || currentSize.ly < size.ly ||
           currentFmt != fmt)
@@ -983,8 +993,8 @@ void ShaderFx::doCompute(TTile &tile, double frame,
   QMutexLocker mLocker(
       manager->mutex());  // As GPU access can be considered sequential anyway,
                           // lock the full-scale mutex
-
-  std::shared_ptr<ShadingContext> shadingContextPtr(new ShadingContext);
+  std::shared_ptr<ShadingContext> shadingContextPtr(
+      new ShadingContext(manager->getSurface()));
   ShadingContext &context = *shadingContextPtr.get();
   // ShadingContext& context = manager->shadingContext();
 
@@ -1054,7 +1064,7 @@ void ShaderFx::doCompute(TTile &tile, double frame,
   {
     locals::touchOutputSize(context, tile.getRaster()->getSize(), info.m_bpp);
 
-    QGLShaderProgram *program =
+    QOpenGLShaderProgram *program =
         touchShaderProgram(m_shaderInterface->mainShader(), context);
     {
       ProgramBinder binder(program);
@@ -1142,7 +1152,8 @@ void ShaderFx::doDryCompute(TRectD &rect, double frame,
   QMutexLocker mLocker(manager->mutex());
 
   // ShadingContext& context = manager->shadingContext();
-  std::shared_ptr<ShadingContext> shadingContextPtr(new ShadingContext);
+  std::shared_ptr<ShadingContext> shadingContextPtr(
+      new ShadingContext(manager->getSurface()));
   ShadingContext &context = *shadingContextPtr.get();
 
   int pCount = getInputPortCount();

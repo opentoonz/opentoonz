@@ -110,4 +110,21 @@ public:
   bool getParameters(Parameters &p) const override;
 };
 
+//-----------------------------------------------------------------------------
+
+class DVAPI TColumnColorFilterFunction final : public TColorFunction {
+  TPixel32 m_colorScale;
+
+public:
+  TColumnColorFilterFunction() : m_colorScale() {}
+  TColumnColorFilterFunction(const TPixel32 &color) : m_colorScale(color) {}
+
+  TColorFunction *clone() const override {
+    return new TColumnColorFilterFunction(m_colorScale);
+  }
+
+  TPixel32 operator()(const TPixel32 &color) const override;
+  bool getParameters(Parameters &p) const override;
+};
+
 #endif

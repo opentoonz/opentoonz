@@ -844,7 +844,9 @@ void PageViewer::paintEvent(QPaintEvent *e) {
         p.drawChord(ssRect, 0, -180 * 16);
         tmpFont.setPointSize(6);
         p.setFont(tmpFont);
-        p.drawText(ssRect.adjusted(0, 10, 0, 0), Qt::AlignCenter,
+        // make sure the text is visible with any font
+        static int rectTopAdjust = 19 - QFontMetrics(tmpFont).overlinePos();
+        p.drawText(ssRect.adjusted(0, rectTopAdjust, 0, 0), Qt::AlignCenter,
                    QString().setNum(shortcut));
       }
 
@@ -1612,11 +1614,13 @@ void PaletteIconWidget::paintEvent(QPaintEvent *) {
   QPainter p(this);
 
   if (m_isOver) {
-    static QPixmap dragPaletteIconPixmapOver(":Resources/dragpalette_over.png");
-    p.drawPixmap(5, 2, dragPaletteIconPixmapOver);
+    static QPixmap dragPaletteIconPixmapOver(
+        svgToPixmap(":Resources/dragpalette_over.svg"));
+    p.drawPixmap(5, 1, dragPaletteIconPixmapOver);
   } else {
-    static QPixmap dragPaletteIconPixmap(":Resources/dragpalette.png");
-    p.drawPixmap(5, 2, dragPaletteIconPixmap);
+    static QPixmap dragPaletteIconPixmap(
+        svgToPixmap(":Resources/dragpalette.svg"));
+    p.drawPixmap(5, 1, dragPaletteIconPixmap);
   }
 }
 

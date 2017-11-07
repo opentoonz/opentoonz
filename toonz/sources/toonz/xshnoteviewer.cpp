@@ -479,7 +479,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_noteButton->setObjectName("ToolbarToolButton");
   m_noteButton->setFixedSize(44, 26);
   m_noteButton->setIconSize(QSize(38, 20));
-  QIcon addNoteIcon = createQIconPNG("newmemo");
+  QIcon addNoteIcon = createQIcon("newmemo");
   addNoteIcon.addFile(QString(":Resources/newmemo_disabled.svg"), QSize(),
                       QIcon::Disabled);
   m_noteButton->setIcon(addNoteIcon);
@@ -553,6 +553,11 @@ void NoteArea::createLayout() {
   QRect rect           = o->rect(PredefinedRect::NOTE_AREA);
 
   setFixedSize(rect.size());
+
+  if (o->isVerticalTimeline())
+    m_noteButton->setFixedSize(44, 26);
+  else
+    m_noteButton->setFixedSize(44, 22);
 
   // has two elements: main layout and header panel
   QVBoxLayout *panelLayout = new QVBoxLayout();

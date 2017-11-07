@@ -31,10 +31,12 @@
 #include "toonz/txsheethandle.h"
 #include "toonz/tstageobjectspline.h"
 #include "toonz/tframehandle.h"
+#include "toonz/tpalettehandle.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/preferences.h"
 #include "toonz/tstageobjecttree.h"
+#include "toonz/mypaintbrushstyle.h"
 
 // TnzCore includes
 #include "tproperty.h"
@@ -304,8 +306,10 @@ void ToolOptionControlBuilder::visit(TBoolProperty *p) {
     std::string actionName = "A_ToolOption_" + p->getId();
     QAction *a = CommandManager::instance()->getAction(actionName.c_str());
     if (a) {
+      a->setCheckable(true);
       control->addAction(a);
-      QObject::connect(a, SIGNAL(triggered()), control, SLOT(doClick()));
+      QObject::connect(a, SIGNAL(triggered(bool)), control,
+                       SLOT(doClick(bool)));
     }
   }
   hLayout()->addSpacing(5);
@@ -340,9 +344,10 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p) {
 
   case COMBOBOX:
   default: {
-    QLabel *label = addLabel(p);
-    m_panel->addLabel(p->getName(), label);
-
+    if (p->getQStringName() != "") {
+      QLabel *label = addLabel(p);
+      m_panel->addLabel(p->getName(), label);
+    }
     ToolOptionCombo *obj = new ToolOptionCombo(m_tool, p, m_toolHandle);
     control              = obj;
     widget               = obj;
@@ -566,10 +571,11 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
     m_lockNSCenterCheckbox =
         new ToolOptionCheckbox(m_tool, lockProp, toolHandle, this);
 
-  TBoolProperty *prop =
+  TBoolProperty *globalKeyProp =
       dynamic_cast<TBoolProperty *>(m_pg->getProperty("Global Key"));
-  if (prop)
-    m_globalKey = new ToolOptionCheckbox(m_tool, prop, toolHandle, this);
+  if (globalKeyProp)
+    m_globalKey =
+        new ToolOptionCheckbox(m_tool, globalKeyProp, toolHandle, this);
 
   m_lockEWPosCheckbox->setObjectName("EditToolLockButton");
   m_lockNSPosCheckbox->setObjectName("EditToolLockButton");
@@ -904,6 +910,16 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
           SLOT(receiveMouseMove(QMouseEvent *)));
   connect(m_nsCenterLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
           m_nsCenterField, SLOT(receiveMouseRelease(QMouseEvent *)));
+          
+  if (globalKeyProp) {
+    std::string actionName = "A_ToolOption_" + globalKeyProp->getId();
+    QAction *a = CommandManager::instance()->getAction(actionName.c_str());
+    if (a) {
+      a->setCheckable(true);
+      m_globalKey->addAction(a);
+      connect(a, SIGNAL(triggered(bool)), m_globalKey, SLOT(doClick(bool)));
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1363,6 +1379,9 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
     , m_hardnessField(0)
     , m_poligonSideField(0)
     , m_shapeField(0)
+    , m_snapCheckbox(0)
+    , m_snapSensitivityCombo(0)
+    , m_tool(tool)
     , m_pencilMode(0) {
   setFrameStyle(QFrame::StyledPanel);
   setFixedHeight(26);
@@ -1406,6 +1425,14 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
                          SLOT(onPencilModeToggled(bool)));
   }
 
+  if (tool->getTargetType() & TTool::Vectors) {
+    m_snapCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Snap"));
+    m_snapSensitivityCombo =
+        dynamic_cast<ToolOptionCombo *>(m_controls.value("Sensitivity:"));
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
+  }
+
   ToolOptionPopupButton *m_joinStyle =
       dynamic_cast<ToolOptionPopupButton *>(m_controls.value("Join"));
   m_miterField =
@@ -1426,6 +1453,9 @@ void GeometricToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
   for (it = m_controls.begin(); it != m_controls.end(); it++)
     it.value()->updateStatus();
+  if (m_tool->getTargetType() & TTool::Vectors) {
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1711,6 +1741,8 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
     , m_pencilMode(0)
     , m_hardnessLabel(0)
     , m_joinStyleCombo(0)
+    , m_snapCheckbox(0)
+    , m_snapSensitivityCombo(0)
     , m_miterField(0) {
   TPropertyGroup *props = tool->getProperties(0);
   assert(props->getPropertyCount() > 0);
@@ -1756,7 +1788,10 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
 
     addSeparator();
     if (tool && tool->getProperties(1)) tool->getProperties(1)->accept(builder);
-
+    m_snapCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Snap"));
+    m_snapSensitivityCombo =
+        dynamic_cast<ToolOptionCombo *>(m_controls.value("Sensitivity:"));
     m_joinStyleCombo =
         dynamic_cast<ToolOptionPopupButton *>(m_controls.value("Join"));
     m_miterField =
@@ -1765,11 +1800,45 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
                              TStroke::OutlineOptions::MITER_JOIN);
   }
   hLayout()->addStretch(1);
+  filterControls();
+}
+
+//-----------------------------------------------------------------------------
+
+void BrushToolOptionsBox::filterControls() {
+  // show or hide widgets which modify imported brush (mypaint)
+
+  bool showModifiers = false;
+  if (FullColorBrushTool *fullColorBrushTool =
+          dynamic_cast<FullColorBrushTool *>(m_tool))
+    showModifiers = fullColorBrushTool->getBrushStyle();
+
+  for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
+       it != m_labels.end(); it++) {
+    bool isModifier = (it.key().substr(0, 8) == "Modifier");
+    bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
+    it.value()->setVisible(visible);
+  }
+
+  for (QMap<std::string, ToolOptionControl *>::iterator it = m_controls.begin();
+       it != m_controls.end(); it++) {
+    bool isModifier = (it.key().substr(0, 8) == "Modifier");
+    bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
+    if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
+      widget->setVisible(visible);
+  }
+  if (m_tool->getTargetType() & TTool::Vectors) {
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void BrushToolOptionsBox::updateStatus() {
+  filterControls();
+
   QMap<std::string, ToolOptionControl *>::iterator it;
   for (it = m_controls.begin(); it != m_controls.end(); it++)
     it.value()->updateStatus();
@@ -1777,6 +1846,8 @@ void BrushToolOptionsBox::updateStatus() {
   if (m_miterField)
     m_miterField->setEnabled(m_joinStyleCombo->currentIndex() ==
                              TStroke::OutlineOptions::MITER_JOIN);
+  if (m_snapCheckbox)
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
 }
 
 //-----------------------------------------------------------------------------
@@ -2322,7 +2393,6 @@ StylePickerToolOptionsBox::StylePickerToolOptionsBox(
 
   m_layout->addWidget(m_currentStyleLabel, 0);
   m_layout->addStretch(1);
-
   // retrieve the "organize palette" checkbox from the layout and insert
   // into rightmost of the tool option bar
   ToolOptionCheckbox *organizePaletteCB =

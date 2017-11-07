@@ -294,6 +294,10 @@ DVAPI void depremultiply(const TRasterP &ras);
 //! all white pixels are set to transparent
 DVAPI void whiteTransp(const TRasterP &ras);
 
+//! apply color filter and semi-transparency of column to the render result
+//  implemented in toperators.cpp
+DVAPI void applyColorScale(const TRasterP &ras, const TPixel32 &colorScale);
+
 DVAPI TRasterP shrink(TRasterP rin, int shrink);
 
 //! Make a \b gamma correct in the \b raster

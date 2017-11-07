@@ -138,9 +138,9 @@ int SoundCastItem::getFrameCount() const {
 //-----------------------------------------------------------------------------
 
 QPixmap SoundCastItem::getPixmap(bool isSelected) const {
-  static QPixmap loudspeaker(":Resources/audio.png");
-  return scalePixmapKeepingAspectRatio(loudspeaker, m_itemPixmapSize,
-                                       Qt::transparent);
+  static QPixmap loudspeaker(svgToPixmap(
+      ":Resources/audio.svg", m_itemPixmapSize, Qt::KeepAspectRatio));
+  return loudspeaker;
 }
 
 //-----------------------------------------------------------------------------
@@ -174,9 +174,9 @@ int PaletteCastItem::getFrameCount() const {
 //-----------------------------------------------------------------------------
 
 QPixmap PaletteCastItem::getPixmap(bool isSelected) const {
-  static QPixmap palette(":Resources/paletteicon.png");
-  return scalePixmapKeepingAspectRatio(palette, m_itemPixmapSize,
-                                       Qt::transparent);
+  static QPixmap palette(svgToPixmap(":Resources/paletteicon.svg",
+                                     m_itemPixmapSize, Qt::KeepAspectRatio));
+  return palette;
 }
 
 bool PaletteCastItem::exists() const {

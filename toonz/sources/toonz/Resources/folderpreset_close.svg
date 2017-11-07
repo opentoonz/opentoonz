@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xml:space="preserve"
+   style="enable-background:new 0 0 21 17;"
+   viewBox="0 0 21 17"
+   y="0px"
+   x="0px"
+   id="svg2"
+   version="1.1"><metadata
+     id="metadata21"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs19" /><style
+     id="style2"
+     type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#FFFFFF;}
+	.st2{fill:#242424;}
+	.st3{fill:#DEE100;}
+	.st4{fill:#242424;fill-opacity:0.6941;}
+	.st5{fill:#404040;}
+</style><path
+     style="fill:none;fill-opacity:1;stroke:#303030;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     d="M 4,3 H 8.9999999 L 9.9999996,5.0000003 H 17 V 13.999999 H 4 Z"
+     id="path867" /><path
+     id="rect834-5"
+     d="M 4,3 H 8.9999999 L 9.9999996,5.0000003 H 17 V 13.999999 H 4 Z"
+     style="fill:#dee100;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" /><g
+     transform="translate(-2)"
+     id="g15"><rect
+       style="fill:#242424;fill-opacity:0.69409988;stroke-width:1"
+       height="1"
+       width="13"
+       class="st4"
+       y="9"
+       x="6"
+       id="rect16" /><path
+       style="fill:#ffffff"
+       id="path11"
+       d="M 9,10.5 C 8.7,10.5 8.5,10.3 8.5,10 V 9 C 8.5,8.7 8.7,8.5 9,8.5 h 1 c 0.3,0 0.5,0.2 0.5,0.5 v 1 c 0,0.3 -0.2,0.5 -0.5,0.5 z"
+       class="st1" /><path
+       style="fill:#404040"
+       id="path13"
+       d="m 10,9 v 1 H 9 V 9 h 1 M 10,8 H 9 C 8.4,8 8,8.4 8,9 v 1 c 0,0.6 0.4,1 1,1 h 1 c 0.6,0 1,-0.4 1,-1 V 9 C 11,8.4 10.6,8 10,8 Z"
+       class="st5" /></g></svg>

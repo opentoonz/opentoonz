@@ -111,10 +111,10 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
   // Autocenter
   m_autocenterBox->setCheckable(true);
   QStringList pegbarHoles;
-  pegbarHoles << "Bottom"
-              << "Top"
-              << "Left"
-              << "Right";
+  pegbarHoles << tr("Bottom")
+              << tr("Top")
+              << tr("Left")
+              << tr("Right");
   m_pegHolesOm->addItems(pegbarHoles);
   std::vector<std::string> fdgNames;
   CleanupParameters::getFdgNames(fdgNames);

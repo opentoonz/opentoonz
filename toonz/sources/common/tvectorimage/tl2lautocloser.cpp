@@ -3,11 +3,13 @@
 #include "tl2lautocloser.h"
 
 #include "tgl.h"
-
+#include "tenv.h"
 #include "tvectorimage.h"
 #include "tstroke.h"
 
 #include <QDebug>
+
+TEnv::DoubleVar VectorCloseValue("VectorCloseValue", 5);
 
 //=============================================================================
 #ifdef _WIN32
@@ -107,7 +109,7 @@ struct StrokePointSet {
   TStroke *stroke;
   std::vector<StrokePoint> points;
   StrokePointSet(TStroke *stroke_ = 0) : stroke(stroke_) {
-    const double inc = 5;
+    const double inc = VectorCloseValue;
     if (stroke_) {
       double length = stroke->getLength();
       double s      = 0;

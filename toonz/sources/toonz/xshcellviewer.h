@@ -86,7 +86,7 @@ class CellArea final : public QWidget {
 
   void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
   void drawSoundTextCell(QPainter &p, int row, int col);
-  void drawSoundCell(QPainter &p, int row, int col);
+  void drawSoundCell(QPainter &p, int row, int col, bool isReference = false);
   void drawPaletteCell(QPainter &p, int row, int col, bool isReference = false);
 
   void drawKeyframe(QPainter &p, const QRect toBeUpdated);

@@ -384,7 +384,7 @@ void FilmstripFrames::hideEvent(QHideEvent *) {
   TApp *app = TApp::instance();
 
   // cambiamenti al livello
-  disconnect(app->getCurrentLevel());
+  disconnect(app->getCurrentLevel(), 0, this, 0);
 
   // al frame corrente
   disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
@@ -655,8 +655,13 @@ void FilmstripFrames::drawFrameIcon(QPainter &p, const QRect &r, int index,
       p.setPen(Qt::black);
       p.drawLine(x0 - 1, y0, x0 - 1, y1);
 
-      QPixmap inbetweenPixmap(":Resources/filmstrip_inbetween.png");
-      p.drawPixmap(x0 + 2, y1 - inbetweenPixmap.height() - 3, inbetweenPixmap);
+      QPixmap inbetweenPixmap(
+          svgToPixmap(":Resources/filmstrip_inbetween.svg"));
+      p.drawPixmap(
+          x0 + 2,
+          y1 - inbetweenPixmap.height() / inbetweenPixmap.devicePixelRatio() -
+              3,
+          inbetweenPixmap);
     }
   } else {
     // non riesco (per qualche ragione) a visualizzare l'icona
@@ -1002,7 +1007,9 @@ void FilmstripFrames::onFrameSwitched() {
   if (index >= 0) {
     exponeFrame(index);
     // clear selection and select only the destination frame
-    select(index, ONLY_SELECT);
+    TFilmstripSelection *fsSelection =
+        dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
+    if (fsSelection) select(index, ONLY_SELECT);
   }
   update();
 }

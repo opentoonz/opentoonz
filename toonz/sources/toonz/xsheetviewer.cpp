@@ -135,6 +135,66 @@ void XsheetViewer::getColumnColor(QColor &color, QColor &sideColor, int index,
 
 //-----------------------------------------------------------------------------
 
+void XsheetViewer::getButton(int &btype, QColor &bgColor, QImage &iconImage,
+                             bool isTimeline) {
+  switch (btype) {
+  case PREVIEW_ON_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelinePreviewButtonBgOnColor()
+                           : getXsheetPreviewButtonBgOnColor();
+    iconImage = (isTimeline) ? getTimelinePreviewButtonOnImage()
+                             : getXsheetPreviewButtonOnImage();
+    break;
+  case PREVIEW_OFF_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelinePreviewButtonBgOffColor()
+                           : getXsheetPreviewButtonBgOffColor();
+    iconImage = (isTimeline) ? getTimelinePreviewButtonOffImage()
+                             : getXsheetPreviewButtonOffImage();
+    break;
+  case CAMSTAND_ON_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineCamstandButtonBgOnColor()
+                           : getXsheetCamstandButtonBgOnColor();
+    iconImage = (isTimeline) ? getTimelineCamstandButtonOnImage()
+                             : getXsheetCamstandButtonOnImage();
+    break;
+  case CAMSTAND_TRANSP_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineCamstandButtonBgOnColor()
+                           : getXsheetCamstandButtonBgOnColor();
+    iconImage = (isTimeline) ? getTimelineCamstandButtonTranspImage()
+                             : getXsheetCamstandButtonTranspImage();
+    break;
+  case CAMSTAND_OFF_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineCamstandButtonBgOffColor()
+                           : getXsheetCamstandButtonBgOffColor();
+    iconImage = (isTimeline) ? getTimelineCamstandButtonOffImage()
+                             : getXsheetCamstandButtonOffImage();
+    break;
+  case LOCK_ON_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineLockButtonBgOnColor()
+                           : getXsheetLockButtonBgOnColor();
+    iconImage = (isTimeline) ? getTimelineLockButtonOnImage()
+                             : getXsheetLockButtonOnImage();
+    break;
+  case LOCK_OFF_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineLockButtonBgOffColor()
+                           : getXsheetLockButtonBgOffColor();
+    iconImage = (isTimeline) ? getTimelineLockButtonOffImage()
+                             : getXsheetLockButtonOffImage();
+    break;
+  case CONFIG_XSHBUTTON:
+    bgColor = (isTimeline) ? getTimelineConfigButtonBgColor()
+                           : getXsheetConfigButtonBgColor();
+    iconImage = (isTimeline) ? getTimelineConfigButtonImage()
+                             : getXsheetConfigButtonImage();
+    break;
+  default:
+    bgColor = grey210;
+    static QImage iconignored;
+    iconImage = iconignored;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 #if QT_VERSION >= 0x050500
 XsheetViewer::XsheetViewer(QWidget *parent, Qt::WindowFlags flags)
 #else
@@ -156,7 +216,10 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_currentNoteIndex(0)
     , m_qtModifiers(0)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
-    , m_orientation(nullptr) {
+    , m_orientation(nullptr)
+    , m_xsheetLayout("Classic") {
+
+  m_xsheetLayout = Preferences::instance()->getLoadedXsheetLayout();
 
   setFocusPolicy(Qt::StrongFocus);
 
@@ -169,13 +232,9 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
       TApp::instance()->getCurrentXsheet());
 
   m_toolbarScrollArea = new XsheetScrollArea(this);
-  m_toolbarScrollArea->setFixedSize(m_orientation->cellWidth() * 12,
-                                    XsheetGUI::TOOLBAR_HEIGHT);
   m_toolbarScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_toolbarScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_toolbar = new XsheetGUI::Toolbar(this);
-  m_toolbar->setFixedSize(m_orientation->cellWidth() * 12,
-                          XsheetGUI::TOOLBAR_HEIGHT);
+  m_toolbar = new XsheetGUI::XSheetToolbar(this, 0, true);
   m_toolbarScrollArea->setWidget(m_toolbar);
 
   QRect noteArea(0, 0, 75, 120);
@@ -215,6 +274,8 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
 
   connect(this, &XsheetViewer::orientationChanged, this,
           &XsheetViewer::onOrientationChanged);
+  connect(m_toolbar, SIGNAL(updateVisibility()), this,
+          SLOT(positionSections()));
 
   emit orientationChanged(orientation());
 }
@@ -313,10 +374,9 @@ void XsheetViewer::positionSections() {
 
   if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
     m_toolbar->showToolbar(true);
-
-    int w = geometry().size().width();
+    int w = visibleRegion().boundingRect().width() - 5;
     m_toolbarScrollArea->setGeometry(0, 0, w, XsheetGUI::TOOLBAR_HEIGHT);
-
+    m_toolbar->setFixedWidth(w);
     if (o->isVerticalTimeline()) {
       headerFrame = headerFrame.adjusted(XsheetGUI::TOOLBAR_HEIGHT,
                                          XsheetGUI::TOOLBAR_HEIGHT);

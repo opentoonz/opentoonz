@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <map>
 #include <QDebug>
+#include <QPainter>
 
 namespace {
 
@@ -22,7 +23,7 @@ const struct {
     {ToolCursor::CutterCursor, "cutter", 6, 24},  // 12,20},
     {ToolCursor::EraserCursor, "eraser", 7, 21},  // 15,16},
     {ToolCursor::DistortCursor, "selection_distort", 11, 6},
-    {ToolCursor::FillCursor, "fill", 6, 23},
+    {ToolCursor::FillCursor, "fill", 3, 26},
     {ToolCursor::MoveCursor, "move", 15, 15},
     {ToolCursor::MoveEWCursor, "move_ew", 15, 15},
     {ToolCursor::MoveNSCursor, "move_ns", 15, 15},
@@ -54,7 +55,7 @@ const struct {
     {ToolCursor::ScaleGlobalCursor, "scale_global", 15, 15},
     {ToolCursor::ScaleHVCursor, "scale_hv", 15, 15},
     {ToolCursor::StrokeSelectCursor, "stroke_select", 11, 6},
-    {ToolCursor::TapeCursor, "tape", 9, 23},
+    {ToolCursor::TapeCursor, "tape", 4, 23},
     {ToolCursor::TrackerCursor, "tracker", 12, 15},
     {ToolCursor::TypeInCursor, "type_in", 16, 19},
     {ToolCursor::TypeOutCursor, "type_out", 16, 19},
@@ -65,41 +66,12 @@ const struct {
     {ToolCursor::SplineEditorCursor, "stroke_select", 11, 6},
     {ToolCursor::SplineEditorCursorAdd, "selection_add", 11, 6},
     {ToolCursor::SplineEditorCursorSelect, "selection_convert", 11, 6},
-    {ToolCursor::NormalEraserCursor, "normaleraser", 10, 21},
-    {ToolCursor::RectEraserCursor, "recteraser", 10, 21},
-    {ToolCursor::RectEraserCursorWhite, "recteraser_white", 10, 21},
-    {ToolCursor::FillCursorWhite, "fill_white", 6, 23},
-    {ToolCursor::TapeCursorWhite, "tape_white", 9, 23},
-    {ToolCursor::PickerCursorWhiteLine, "picker_style_white_line", 7, 22},
-    {ToolCursor::PickerCursorWhiteArea, "picker_style_white_area", 7, 22},
-    {ToolCursor::PickerCursorWhite, "picker_style_white", 7, 22},
+    {ToolCursor::NormalEraserCursor, "normaleraser", 3, 26},
+    {ToolCursor::RectEraserCursor, "recteraser", 3, 26},
     {ToolCursor::PickerCursorOrganize, "picker_style_organize", 7, 22},
-    {ToolCursor::PickerCursorWhiteOrganize, "picker_style_white_organize", 7,
-     22},
     {ToolCursor::PickerRGB, "picker_rgb", 7, 22},
     {ToolCursor::PickerRGBWhite, "picker_rgb_white", 7, 22},
-    {ToolCursor::FillCursorF, "fill_f", 6, 23},
-    {ToolCursor::FillCursorFWhite, "fill_f_white", 6, 23},
-    {ToolCursor::FillCursorP, "fill_p", 6, 23},
-    {ToolCursor::FillCursorPWhite, "fill_p_white", 6, 23},
-    {ToolCursor::FillCursorR, "fill_r", 6, 23},
-    {ToolCursor::FillCursorRWhite, "fill_r_white", 6, 23},
-    {ToolCursor::FillCursorA, "fill_a", 6, 23},
-    {ToolCursor::FillCursorAWhite, "fill_a_white", 6, 23},
-    {ToolCursor::FillCursorAF, "fill_a_f", 6, 23},
-    {ToolCursor::FillCursorAFWhite, "fill_a_f_white", 6, 23},
-    {ToolCursor::FillCursorAP, "fill_a_p", 6, 23},
-    {ToolCursor::FillCursorAPWhite, "fill_a_p_white", 6, 23},
-    {ToolCursor::FillCursorAR, "fill_a_r", 6, 23},
-    {ToolCursor::FillCursorARWhite, "fill_a_r_white", 6, 23},
-    {ToolCursor::FillCursorL, "karasu", 6, 23},
-    {ToolCursor::FillCursorLWhite, "karasu_white", 6, 23},
-    {ToolCursor::FillCursorLF, "karasu_f", 6, 23},
-    {ToolCursor::FillCursorLFWhite, "karasu_f_white", 6, 23},
-    {ToolCursor::FillCursorLP, "karasu_p", 6, 23},
-    {ToolCursor::FillCursorLPWhite, "karasu_p_white", 6, 23},
-    {ToolCursor::FillCursorLR, "karasu_r", 6, 23},
-    {ToolCursor::FillCursorLRWhite, "karasu_r_white", 6, 23},
+    {ToolCursor::FillCursorL, "karasu", 7, 25},
     {ToolCursor::RulerModifyCursor, "ruler_modify", 7, 7},
     {ToolCursor::RulerNewCursor, "ruler_new", 7, 7},
     {0, 0, 0, 0}};
@@ -108,6 +80,16 @@ struct CursorData {
   QPixmap pixmap;
   int x, y;
 };
+
+const struct {
+  int decorateType;
+  const char *pixmapFilename;
+} decorateInfo[] = {{ToolCursor::Ex_FreeHand, "ex_freehand"},
+                    {ToolCursor::Ex_PolyLine, "ex_polyline"},
+                    {ToolCursor::Ex_Rectangle, "ex_rectangle"},
+                    {ToolCursor::Ex_Line, "ex_line"},
+                    {ToolCursor::Ex_Area, "ex_area"},
+                    {0, 0}};
 };
 
 //=============================================================================
@@ -126,22 +108,47 @@ public:
     return &_instance;
   }
 
+  void doDecoration(QPixmap &pixmap, int decorationFlag) {
+    if (decorationFlag == 0) return;
+    if (decorationFlag > ToolCursor::Ex_Negate) {
+      QPainter p(&pixmap);
+      p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+      for (int i = 0; decorateInfo[i].pixmapFilename; i++)
+        if (decorationFlag & decorateInfo[i].decorateType) {
+          QString path =
+              QString(":Resources/") + decorateInfo[i].pixmapFilename + ".png";
+          p.drawPixmap(0, 0, QPixmap(path));
+        }
+    }
+    // negate
+    if (decorationFlag & ToolCursor::Ex_Negate) {
+      QImage img = pixmap.toImage();
+      img.invertPixels(QImage::InvertRgb);  // leave the alpha channel unchanged
+      pixmap = QPixmap::fromImage(img);
+    }
+  }
+
   const CursorData &getCursorData(int cursorType) {
     // se e' gia' in tabella lo restituisco
     std::map<int, CursorData>::iterator it;
     it = m_cursors.find(cursorType);
     if (it != m_cursors.end()) return it->second;
+
+    int decorationsFlag = cursorType & ~(0xFF);
+    int baseCursorType  = cursorType & 0xFF;
+
     // provo a cercarlo in cursorInfo[]
     int i;
     for (i = 0; cursorInfo[i].pixmapFilename; i++)
-      if (cursorType == cursorInfo[i].cursorType) {
+      if (baseCursorType == cursorInfo[i].cursorType) {
         QString path =
             QString(":Resources/") + cursorInfo[i].pixmapFilename + ".png";
         CursorData data;
         data.pixmap = QPixmap(path);
-        data.x      = cursorInfo[i].x;
-        data.y      = cursorInfo[i].y;
-        it          = m_cursors.insert(std::make_pair(cursorType, data)).first;
+        if (decorationsFlag != 0) doDecoration(data.pixmap, decorationsFlag);
+        data.x = cursorInfo[i].x;
+        data.y = cursorInfo[i].y;
+        it     = m_cursors.insert(std::make_pair(cursorType, data)).first;
         return it->second;
       }
     // niente da fare. uso un default

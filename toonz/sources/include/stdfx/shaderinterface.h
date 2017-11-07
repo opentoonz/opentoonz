@@ -17,7 +17,7 @@
 // Qt includes
 #include <QString>
 #include <QDateTime>
-#include <QGLShader>
+#include <QOpenGLShader>
 
 // STD includes
 #include <vector>
@@ -36,7 +36,7 @@
 
 //    Forward declarations
 
-class QGLShaderProgram;
+class QOpenGLShaderProgram;
 
 //=========================================================
 
@@ -173,9 +173,9 @@ public:  // Sub-classes
     PERSIST_DECLARATION(ShaderData)
 
   public:
-    QString m_name;                //!< A name associated to the shader action
-    TFilePath m_path;              //!< The shader program's file path
-    QGLShader::ShaderType m_type;  //!< The shader type
+    QString m_name;    //!< A name associated to the shader action
+    TFilePath m_path;  //!< The shader program's file path
+    QOpenGLShader::ShaderType m_type;  //!< The shader type
 
   public:
     bool isValid() const { return !m_path.isEmpty(); }
@@ -203,7 +203,7 @@ public:  // Public methods
 Returns a compiled shader program against current OpenGL context, and the
 last modified date of the associated shader file.
 */
-  std::pair<QGLShaderProgram *, QDateTime> makeProgram(
+  std::pair<QOpenGLShaderProgram *, QDateTime> makeProgram(
       const ShaderData &sd, int varyingsCount = 0,
       const GLchar **varyingNames = 0) const;
 
