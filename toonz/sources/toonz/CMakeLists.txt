@@ -30,6 +30,7 @@ set(MOC_HEADERS
     columncommand.h
     columnselection.h
     commandbar.h
+    commandbarpopup.h
     convertpopup.h
     curveio.h
     drawingdata.h
@@ -167,6 +168,7 @@ set(SOURCES
     floatingpanelcommand.cpp
     canvassizepopup.cpp
     commandbar.cpp
+    commandbarpopup.cpp
     history.cpp
     loadfoldercommand.cpp
     loadfolderpopup.cpp

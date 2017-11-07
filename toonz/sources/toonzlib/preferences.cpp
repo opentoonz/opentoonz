@@ -328,7 +328,9 @@ Preferences::Preferences()
     , m_animatedGuidedDrawing(false)
     , m_ignoreImageDpi(false)
     , m_watchFileSystem(true)
-    , m_shortcutCommandsWhileRenamingCellEnabled(false) {
+    , m_shortcutCommandsWhileRenamingCellEnabled(false)
+    , m_xsheetLayoutPreference("Classic-revised")
+    , m_loadedXsheetLayout("Classic-revised") {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -338,6 +340,8 @@ Preferences::Preferences()
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
   TFilePath prefPath  = layoutDir + TFilePath("preferences.ini");
 
+  bool existingUser = true;
+
   // In case the personal settings is not exist (for new users)
   if (!TFileStatus(prefPath).doesExist()) {
     TFilePath templatePath =
@@ -345,6 +349,8 @@ Preferences::Preferences()
     // If there is the template, copy it to the personal one
     if (TFileStatus(templatePath).doesExist())
       TSystem::copyFile(prefPath, templatePath);
+
+    existingUser = false;
   }
 
   m_settings.reset(new QSettings(
@@ -633,6 +639,17 @@ Preferences::Preferences()
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
   getValue(*m_settings, "shortcutCommandsWhileRenamingCellEnabled",
            m_shortcutCommandsWhileRenamingCellEnabled);
+
+  QString xsheetLayoutPreference;
+  xsheetLayoutPreference =
+      m_settings->value("xsheetLayoutPreference").toString();
+  if (xsheetLayoutPreference != "")
+    m_xsheetLayoutPreference = xsheetLayoutPreference;
+  else if (existingUser)  // Existing users with missing preference defaults to
+                          // Classic. New users will be Classic-revised
+    m_xsheetLayoutPreference = QString("Classic");
+  setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
+  m_loadedXsheetLayout = m_xsheetLayoutPreference;
 }
 
 //-----------------------------------------------------------------
@@ -1508,6 +1525,15 @@ void Preferences::enableExpandFunctionHeader(bool on) {
 void Preferences::enableShowColumnNumbers(bool on) {
   m_showColumnNumbers = on;
   m_settings->setValue("showColumnNumbers", on ? "1" : "0");
+}
+
+void Preferences::setXsheetLayoutPreference(std::string layout) {
+  m_xsheetLayoutPreference = QString::fromStdString(layout);
+  m_settings->setValue("xsheetLayoutPreference", m_xsheetLayoutPreference);
+}
+
+void Preferences::setLoadedXsheetLayout(std::string layout) {
+  m_loadedXsheetLayout = QString::fromStdString(layout);
 }
 
 //-----------------------------------------------------------------

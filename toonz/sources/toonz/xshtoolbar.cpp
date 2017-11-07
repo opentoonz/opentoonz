@@ -1,21 +1,18 @@
-
-
 #include "xshtoolbar.h"
 
 // Tnz6 includes
 #include "xsheetviewer.h"
 #include "tapp.h"
 #include "menubarcommandids.h"
-// TnzQt includes
-#include "toonzqt/gutil.h"
+#include "commandbarpopup.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
+#include "toonz/toonzscene.h"
 #include "toonz/tscenehandle.h"
-#include "toonzqt/menubarcommand.h"
+#include "toonz/childstack.h"
 
 // Qt includes
-#include <QPushButton>
 #include <QWidgetAction>
 
 //=============================================================================
@@ -32,60 +29,12 @@ XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WindowFlags flags,
 #else
 XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-    : QToolBar(parent), m_viewer(parent), m_isCollapsible(isCollapsible) {
+    : CommandBar(parent, flags, isCollapsible, true)
+    , m_viewer(parent)
+    , m_isCollapsible(isCollapsible) {
   setObjectName("cornerWidget");
   setFixedHeight(30);
   setObjectName("XSheetToolbar");
-
-  TApp *app        = TApp::instance();
-  m_keyFrameButton = new ViewerKeyframeNavigator(this, app->getCurrentFrame());
-  m_keyFrameButton->setObjectHandle(app->getCurrentObject());
-  m_keyFrameButton->setXsheetHandle(app->getCurrentXsheet());
-
-  QWidgetAction *keyFrameAction = new QWidgetAction(this);
-  keyFrameAction->setDefaultWidget(m_keyFrameButton);
-
-  {
-    QAction *newVectorLevel =
-        CommandManager::instance()->getAction("MI_NewVectorLevel");
-    addAction(newVectorLevel);
-    QAction *newToonzRasterLevel =
-        CommandManager::instance()->getAction("MI_NewToonzRasterLevel");
-    addAction(newToonzRasterLevel);
-    QAction *newRasterLevel =
-        CommandManager::instance()->getAction("MI_NewRasterLevel");
-    addAction(newRasterLevel);
-    addSeparator();
-    QAction *reframeOnes = CommandManager::instance()->getAction("MI_Reframe1");
-    addAction(reframeOnes);
-    QAction *reframeTwos = CommandManager::instance()->getAction("MI_Reframe2");
-    addAction(reframeTwos);
-    QAction *reframeThrees =
-        CommandManager::instance()->getAction("MI_Reframe3");
-    addAction(reframeThrees);
-
-    addSeparator();
-
-    QAction *repeat = CommandManager::instance()->getAction("MI_Dup");
-    addAction(repeat);
-
-    addSeparator();
-
-    QAction *collapse = CommandManager::instance()->getAction("MI_Collapse");
-    addAction(collapse);
-    QAction *open = CommandManager::instance()->getAction("MI_OpenChild");
-    addAction(open);
-    QAction *leave = CommandManager::instance()->getAction("MI_CloseChild");
-    addAction(leave);
-
-    addSeparator();
-    addAction(keyFrameAction);
-
-    if (!Preferences::instance()->isShowXSheetToolbarEnabled() &&
-        m_isCollapsible) {
-      hide();
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -111,6 +60,28 @@ void XSheetToolbar::showEvent(QShowEvent *e) {
   else
     hide();
   emit updateVisibility();
+}
+
+//-----------------------------------------------------------------------------
+
+void XSheetToolbar::contextMenuEvent(QContextMenuEvent *event) {
+  QMenu *menu = new QMenu(this);
+  QAction *customizeCommandBar =
+      menu->addAction(tr("Customize XSheet Toolbar"));
+  connect(customizeCommandBar, SIGNAL(triggered()),
+          SLOT(doCustomizeCommandBar()));
+  menu->exec(event->globalPos());
+}
+
+//-----------------------------------------------------------------------------
+
+void XSheetToolbar::doCustomizeCommandBar() {
+  CommandBarPopup *cbPopup = new CommandBarPopup(true);
+
+  if (cbPopup->exec()) {
+    fillToolbar(this, true);
+  }
+  delete cbPopup;
 }
 
 //============================================================

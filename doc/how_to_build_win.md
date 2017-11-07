@@ -1,6 +1,6 @@
 # Building on Windows
 
-This software can be built using Visual Studio 2015 and Qt 5.6
+This software can be built using Visual Studio 2015 and Qt 5.9
 
 ## Required Software
 
@@ -31,7 +31,7 @@ They will have to be installed seperately as follows.
 ### Qt
 - https://www.qt.io/download-open-source/
 - Qt is a cross-platform GUI framework.
-- Install Qt 5.6 (64-bit version) by [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
+- Install Qt 5.9 (64-bit version) by [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
 
 ### boost
 - Boost 1.55.0 or later is required (tested up to 1.60.0).
@@ -124,7 +124,7 @@ OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since
 
 ### Qt
 - https://www.qt.io/download-open-source/
-- Install Qt 5.6 (32-bit version) by the  by [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
+- Install Qt 5.9 (32-bit version) by the  by [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
 
 ### QuickTime SDK
 1. Sign in using your Apple developer ID and download `QuickTime 7.3 SDK for Windows.zip` from the following url.

@@ -141,6 +141,8 @@ Binding an id to 0 is equivalent to unbinding it.
   //! succeeded.
   bool rebind(const std::string &srcId, const std::string &dstId);
 
+  bool renumber(const std::string &srcId, const TFrameId &fid);
+
   //! Unbinds all known identifiers, resetting the image manager to its empty
   //! state.
   void clear();
@@ -285,6 +287,8 @@ protected:
   virtual void buildAllIconsAndPutInCache(TXshSimpleLevel *,
                                           std::vector<TFrameId>,
                                           std::vector<std::string>, bool){};
+
+  virtual void setFid(const TFrameId &fid){};
 
   //! Clears the builder's cached data.
   virtual void invalidate() {

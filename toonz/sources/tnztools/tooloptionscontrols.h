@@ -93,10 +93,7 @@ public:
                      ToolHandle *toolHandle = 0, QWidget *parent = 0);
   void updateStatus() override;
 public slots:
-  void doClick();
-
-protected:
-  void nextCheckState() override;
+  void doClick(bool);
 };
 
 //-----------------------------------------------------------------------------

@@ -350,7 +350,6 @@ public:
     return m_useHigherDpiOnVectorSimplify;
   }
   // Xsheet  tab
-
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
                                  //! step</I> commands.
   int getXsheetStep() const {
@@ -400,6 +399,12 @@ public:
   bool isShortcutCommandsWhileRenamingCellEnabled() const {
     return m_shortcutCommandsWhileRenamingCellEnabled;
   }
+
+  void setXsheetLayoutPreference(std::string layout);
+  QString getXsheetLayoutPreference() const { return m_xsheetLayoutPreference; }
+
+  void setLoadedXsheetLayout(std::string layout);
+  QString getLoadedXsheetLayout() const { return m_loadedXsheetLayout; }
 
   // Animation  tab
 
@@ -607,6 +612,8 @@ private:
   // enable OT command shortcut keys while renaming xsheet cell
   bool m_shortcutCommandsWhileRenamingCellEnabled;
 
+  QString m_xsheetLayoutPreference,
+      m_loadedXsheetLayout;  // Classic, Classic-revised, compact
 private:
   Preferences();
   ~Preferences();

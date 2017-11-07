@@ -77,8 +77,7 @@ QPixmap rasterToQPixmap(const TRaster32P &ras, bool premultiplied,
                         bool setDevPixRatio) {
   QPixmap pixmap = QPixmap::fromImage(rasterToQImage(ras, premultiplied));
   if (setDevPixRatio) {
-    static int devPixRatio = QApplication::desktop()->devicePixelRatio();
-    pixmap.setDevicePixelRatio(devPixRatio);
+    pixmap.setDevicePixelRatio(getDevPixRatio());
   }
   return pixmap;
 }
@@ -158,7 +157,7 @@ QPixmap scalePixmapKeepingAspectRatio(QPixmap pixmap, QSize size,
 
 QPixmap svgToPixmap(const QString &svgFilePath, const QSize &size,
                     Qt::AspectRatioMode aspectRatioMode, QColor bgColor) {
-  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
+  static int devPixRatio = getDevPixRatio();
   QSvgRenderer svgRenderer(svgFilePath);
   QSize pixmapSize;
   QRectF renderRect;

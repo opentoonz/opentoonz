@@ -72,6 +72,7 @@
         <file>Resources/desktop.svg</file>
         <file>Resources/downTitle.png</file>
         <file>Resources/edit.svg</file>
+        <file>Resources/edit_in_place.svg</file>
         <file>Resources/edit_rollover.svg</file>
         <file>Resources/emptychip.png</file>
         <file>Resources/eraser.png</file>
