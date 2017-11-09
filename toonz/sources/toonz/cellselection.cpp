@@ -2447,10 +2447,9 @@ TXshSimpleLevel *TCellSelection::getNewToonzRasterLevel(
   ToonzScene *scene       = TApp::instance()->getCurrentScene()->getScene();
   TFilePath sourcePath    = sourceSl->getPath();
   std::wstring sourceName = sourcePath.getWideName();
-  TFilePath parentDir("+drawings");
+  TFilePath parentDir = sourceSl->getPath().getParentDir();
   TFilePath fp = scene->getDefaultLevelPath(TZP_XSHLEVEL, sourceName)
                      .withParentDir(parentDir);
-
   TFilePath actualFp = scene->decodeFilePath(fp);
 
   int i                = 1;
@@ -2463,20 +2462,10 @@ TXshSimpleLevel *TCellSelection::getNewToonzRasterLevel(
     i++;
   }
   parentDir = scene->decodeFilePath(parentDir);
-  if (!TFileStatus(parentDir).doesExist()) {
-    try {
-      TSystem::mkDir(parentDir);
-      DvDirModel::instance()->refreshFolder(parentDir.getParentDir());
-    } catch (...) {
-      DVGui::error(QObject::tr("Unable to create") + toQString(parentDir));
-      return NULL;
-    }
-  }
 
   TXshLevel *level =
       scene->createNewLevel(TZP_XSHLEVEL, newName, TDimension(), 0, fp);
   TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(level);
-  sl->setPath(fp, true);
   return sl;
 }
 
@@ -2635,7 +2624,7 @@ void TCellSelection::convertToToonzRaster() {
   // expose the new frames in the column
   for (i = 0; i < totalImages; i++) {
     for (int k = r0; k <= r1; k++) {
-      TXshCell oldCell = xsh->getCell(k, col - 1);
+      TXshCell oldCell = xsh->getCell(k, c0);
       TXshCell newCell(sl, newFids[i]);
       if (oldCell.getFrameId() == frameIds[i]) {
         xsh->setCell(k, col, newCell);

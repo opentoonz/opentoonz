@@ -340,6 +340,12 @@ void PreferencesPopup::onRoomChoiceChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onDropdownShortcutsCycleOptionsChanged(int index) {
+	m_pref->setDropdownShortcutsCycleOptions(index);
+}
+
+  //-----------------------------------------------------------------------------
+
 void PreferencesPopup::onInterfaceFontChanged(int index) {
   QString font = m_interfaceFont->currentText();
   m_pref->setInterfaceFont(font.toStdString());
@@ -1293,6 +1299,12 @@ PreferencesPopup::PreferencesPopup()
       tr("Keep fill when using \"Replace Vectors\" command"), this);
   m_useHigherDpiOnVectorSimplifyCB = new CheckBox(
       tr("Use higher DPI for calculations - Slower but more accurate"), this);
+
+  //--- Tools -------------------------------
+  categoryList->addItem(tr("Tools"));
+
+  m_dropdownShortcutsCycleOptionsCB = new QComboBox(this);
+
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
 
@@ -1622,6 +1634,15 @@ PreferencesPopup::PreferencesPopup()
   vectorSnappingTargets << tr("Strokes") << tr("Guides") << tr("All");
   m_vectorSnappingTargetCB->addItems(vectorSnappingTargets);
   m_vectorSnappingTargetCB->setCurrentIndex(m_pref->getVectorSnappingTarget());
+
+  //--- Tools -------------------------------
+
+  QStringList dropdownBehaviorTypes;
+  dropdownBehaviorTypes << tr("Open the dropdown to display all options")
+                        << tr("Cycle through the available options");
+  m_dropdownShortcutsCycleOptionsCB->addItems(dropdownBehaviorTypes);
+  m_dropdownShortcutsCycleOptionsCB->setCurrentIndex(
+      m_pref->getDropdownShortcutsCycleOptions() ? 1 : 0);
 
   //--- Xsheet ------------------------------
   xsheetAutopanDuringPlaybackCB->setChecked(m_pref->isXsheetAutopanEnabled());
@@ -2099,6 +2120,26 @@ PreferencesPopup::PreferencesPopup()
       m_defLevelHeight->setDecimals(0);
     }
 
+    //--- Tools ---------------------------
+    QWidget *toolsBox          = new QWidget(this);
+    QGridLayout *toolsFrameLay = new QGridLayout();
+    toolsFrameLay->setMargin(15);
+    toolsFrameLay->setHorizontalSpacing(15);
+    toolsFrameLay->setVerticalSpacing(10);
+    {
+      toolsFrameLay->addWidget(new QLabel(tr("Dropdown Shortcuts:")), 0, 0,
+                               Qt::AlignRight | Qt::AlignVCenter);
+      toolsFrameLay->addWidget(m_dropdownShortcutsCycleOptionsCB, 0, 1);
+    }
+    toolsFrameLay->setColumnStretch(0, 0);
+    toolsFrameLay->setColumnStretch(1, 0);
+    toolsFrameLay->setColumnStretch(2, 1);
+    toolsFrameLay->setRowStretch(0, 0);
+    toolsFrameLay->setRowStretch(1, 0);
+    toolsFrameLay->setRowStretch(2, 1);
+    toolsBox->setLayout(toolsFrameLay);
+    stackedWidget->addWidget(toolsBox);
+
     //--- Xsheet --------------------------
     QWidget *xsheetBox             = new QWidget(this);
     QVBoxLayout *xsheetBoxFrameLay = new QVBoxLayout();
@@ -2505,6 +2546,12 @@ PreferencesPopup::PreferencesPopup()
                 SLOT(onUseHigherDpiOnVectorSimplifyChanged(int)));
   ret = ret && connect(m_newLevelToCameraSizeCB, SIGNAL(clicked(bool)),
                        SLOT(onNewLevelToCameraSizeChanged(bool)));
+
+  //--- Tools -----------------------
+
+  ret = ret && connect(m_dropdownShortcutsCycleOptionsCB,
+                       SIGNAL(currentIndexChanged(int)),
+                       SLOT(onDropdownShortcutsCycleOptionsChanged(int)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),

@@ -94,6 +94,9 @@ public:
   void updateStatus() override;
 public slots:
   void doClick(bool);
+
+protected:
+  void nextCheckState() override;
 };
 
 //-----------------------------------------------------------------------------

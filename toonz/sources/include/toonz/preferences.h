@@ -342,6 +342,7 @@ public:
   void setVectorSnappingTarget(int target);
   int getVectorSnappingTarget() { return m_vectorSnappingTarget; }
 
+
   void setKeepFillOnVectorSimplify(bool on);
   bool getKeepFillOnVectorSimplify() { return m_keepFillOnVectorSimplify; }
 
@@ -349,6 +350,13 @@ public:
   bool getUseHigherDpiOnVectorSimplify() {
     return m_useHigherDpiOnVectorSimplify;
   }
+
+  // Tools Tab
+  void setDropdownShortcutsCycleOptions(bool on);
+  bool getDropdownShortcutsCycleOptions() {
+    return m_dropdownShortcutsCycleOptions;
+  }
+
   // Xsheet  tab
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
                                  //! step</I> commands.
@@ -561,6 +569,7 @@ private:
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,
       m_actualPixelViewOnSceneEditingMode;
+  bool m_dropdownShortcutsCycleOptions;
   int m_viewerZoomCenter;  // MOUSE_CURSOR = 0, VIEWER_CENTER = 1
   // used in the load level popup. ON_DEMAND = 0, ALL_ICONS = 1,
   // ALL_ICONS_AND_IMAGES = 2

@@ -431,7 +431,7 @@ elseif(BUILD_ENV_UNIXLIKE)
     set(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${OPENBLAS_LIB})
 
     if(BUILD_TARGET_WIN)
-        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids)
+        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids -mwindows)
     endif()
 
     target_link_libraries(
