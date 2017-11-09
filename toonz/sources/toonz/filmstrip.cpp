@@ -250,7 +250,7 @@ void FilmstripFrames::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void FilmstripFrames::select(int index, SelectionMode mode) {
   TXshSimpleLevel *sl = getLevel();
-  bool outOfRange = !sl || index < 0 || index >= sl->getFrameCount();
+  bool outOfRange     = !sl || index < 0 || index >= sl->getFrameCount();
 
   TFrameId fid;
   if (!outOfRange) fid = index2fid(index);
@@ -412,9 +412,11 @@ void FilmstripFrames::hideEvent(QHideEvent *) {
 
 void FilmstripFrames::getViewer() {
   bool viewerChanged = false;
-  if (m_viewer && m_viewer != TApp::instance()->getActiveViewer()) {
-    disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
-    disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+  if (m_viewer != TApp::instance()->getActiveViewer()) {
+    if (m_viewer) {
+      disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
+      disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+    }
     viewerChanged = true;
   }
   ComboViewerPanel *inknPaintViewerPanel =
@@ -424,7 +426,7 @@ void FilmstripFrames::getViewer() {
   } else {
     m_viewer = TApp::instance()->getActiveViewer();
   }
-  if (m_viewer) {
+  if (m_viewer && viewerChanged) {
     connect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
     connect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
   }
@@ -1072,14 +1074,13 @@ void FilmstripFrames::onFrameSwitched() {
     showFrame(index);
 
     TFilmstripSelection *fsSelection =
-      dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
+        dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
 
     // don't select if already selected - may be part of a group selection
     if (!m_selection->isSelected(index2fid(index)) && fsSelection) {
       select(index, ONLY_SELECT);
       m_justStartedSelection = true;
     }
-
   }
   update();
 }
