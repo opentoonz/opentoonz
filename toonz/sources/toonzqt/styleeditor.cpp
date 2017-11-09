@@ -1745,7 +1745,7 @@ void PlainColorPage::setIsVertical(bool isVertical) {
   m_isVertical = isVertical;
   if (isVertical) {
     m_vSplitter->setOrientation(Qt::Vertical);
-    m_toggleOrientationButton->setText("↔");
+    m_toggleOrientationButton->setText(QChar(0x2194));
     QList<int> sectionSizes;
     // maximize color wheel space
     sectionSizes << height() - 1 << 1;
