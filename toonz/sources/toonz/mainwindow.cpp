@@ -31,6 +31,7 @@
 #include "toonz/stylemanager.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
+#include "toonz/txshleveltypes.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -62,6 +63,7 @@ TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
 TEnv::IntVar FieldGuideToggleAction("FieldGuideToggleAction", 0);
 TEnv::IntVar ViewBBoxToggleAction("ViewBBoxToggleAction1", 1);
+TEnv::IntVar EditInPlaceToggleAction("EditInPlaceToggleAction", 0);
 #ifdef LINETEST
 TEnv::IntVar CapturePanelFieldGuideToggleAction(
     "CapturePanelFieldGuideToggleAction", 0);
@@ -307,8 +309,9 @@ void Room::load(const TFilePath &fp) {
     QVariant name = settings.value("name");
     if (name.canConvert(QVariant::String)) {
       // Allocate panel
-      paneObjectName = name.toString();
-      pane           = TPanelFactory::createPanel(this, paneObjectName);
+      paneObjectName          = name.toString();
+      std::string paneStrName = paneObjectName.toStdString();
+      pane = TPanelFactory::createPanel(this, paneObjectName);
       if (SaveLoadQSettings *persistent =
               dynamic_cast<SaveLoadQSettings *>(pane->widget()))
         persistent->load(settings);
@@ -377,6 +380,8 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent,
   m_toolsActionGroup->setExclusive(true);
   m_currentRoomsChoice = Preferences::instance()->getCurrentRoomChoice();
   defineActions();
+  // user defined shortcuts will be loaded here
+  CommandManager::instance()->loadShortcuts();
   TApp::instance()->getCurrentScene()->setDirtyFlag(false);
 
   // La menuBar altro non è che una toolbar
@@ -445,6 +450,12 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
   setCommandHandler(MI_MaximizePanel, this, &MainWindow::maximizePanel);
   setCommandHandler(MI_FullScreenWindow, this, &MainWindow::fullScreenWindow);
+  setCommandHandler("MI_NewVectorLevel", this,
+                    &MainWindow::onNewVectorLevelButtonPressed);
+  setCommandHandler("MI_NewToonzRasterLevel", this,
+                    &MainWindow::onNewToonzRasterLevelButtonPressed);
+  setCommandHandler("MI_NewRasterLevel", this,
+                    &MainWindow::onNewRasterLevelButtonPressed);
   // remove ffmpegCache if still exists from crashed exit
   QString ffmpegCachePath =
       ToonzFolder::getCacheRootFolder().getQString() + "//ffmpeg";
@@ -1241,6 +1252,8 @@ void MainWindow::onMenuCheckboxChanged() {
     ViewCameraToggleAction = isChecked;
   else if (cm->getAction(MI_ViewTable) == action)
     ViewTableToggleAction = isChecked;
+  else if (cm->getAction(MI_ToggleEditInPlace) == action)
+    EditInPlaceToggleAction = isChecked;
   else if (cm->getAction(MI_ViewBBox) == action)
     ViewBBoxToggleAction = isChecked;
   else if (cm->getAction(MI_FieldGuide) == action)
@@ -1601,6 +1614,20 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_ClearRecentLevel, tr("&Clear Recent level File List"),
                        "");
   createMenuFileAction(MI_NewLevel, tr("&New Level..."), "Alt+N");
+
+  QAction *newVectorLevelAction =
+      createMenuFileAction(MI_NewVectorLevel, tr("&New Vector Level"), "");
+  newVectorLevelAction->setIconText(tr("New Vector Level"));
+  newVectorLevelAction->setIcon(createQIconPNG("new_vector_level"));
+  QAction *newToonzRasterLevelAction = createMenuFileAction(
+      MI_NewToonzRasterLevel, tr("&New Toonz Raster Level"), "");
+  newToonzRasterLevelAction->setIconText(tr("New Toonz Raster Level"));
+  newToonzRasterLevelAction->setIcon(createQIconPNG("new_toonz_raster_level"));
+  QAction *newRasterLevelAction =
+      createMenuFileAction(MI_NewRasterLevel, tr("&New Raster Level"), "");
+  newRasterLevelAction->setIconText(tr("New Raster Level"));
+  newRasterLevelAction->setIcon(createQIconPNG("new_raster_level"));
+
   createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
   createMenuFileAction(MI_SaveLevel, tr("&Save Level"), "");
   createMenuFileAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
@@ -1763,7 +1790,11 @@ void MainWindow::defineActions() {
   collapseAction->setIconText("Collapse");
   collapseAction->setIcon(createQIconOnOffPNG("collapse"));
 
-  createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
+  toggle = createToggle(MI_ToggleEditInPlace, tr("&Toggle Edit In Place"), "",
+                        EditInPlaceToggleAction ? 1 : 0, MenuViewCommandType);
+  toggle->setIconText(tr("Toggle Edit in Place"));
+  toggle->setIcon(QIcon(":Resources/edit_in_place.svg"));
+
   createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
   createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
   createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
@@ -1834,7 +1865,13 @@ void MainWindow::defineActions() {
 
   createMenuCellsAction(MI_Reframe4, tr("4's"), "");
 
+  createMenuCellsAction(MI_ReframeWithEmptyInbetweens,
+                        tr("Reframe with Empty Inbetweens..."), "");
+  createMenuCellsAction(MI_AutoInputCellNumber, tr("Auto Input Cell Number..."),
+                        "");
+
   createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "Z");
+  createRightClickMenuAction(MI_PasteNumbers, tr("&Paste Numbers"), "");
 
   createToggle(MI_ViewCamera, tr("&Camera Box"), "",
                ViewCameraToggleAction ? 1 : 0, MenuViewCommandType);
@@ -1957,6 +1994,7 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenStyleControl, tr("&Style Editor"), "");
   createMenuWindowsAction(MI_OpenToolbar, tr("&Toolbar"), "");
   createMenuWindowsAction(MI_OpenToolOptionBar, tr("&Tool Option Bar"), "");
+  createMenuWindowsAction(MI_OpenCommandToolbar, tr("&Command Bar"), "");
   createMenuWindowsAction(MI_OpenLevelView, tr("&Viewer"), "");
 #ifdef LINETEST
   createMenuWindowsAction(MI_OpenLineTestCapture, tr("&LineTest Capture"), "");
@@ -2259,6 +2297,33 @@ void MainWindow::togglePickStyleLines() {
 
 //-----------------------------------------------------------------------------
 
+void MainWindow::onNewVectorLevelButtonPressed() {
+  int defaultLevelType = Preferences::instance()->getDefLevelType();
+  Preferences::instance()->setDefLevelType(PLI_XSHLEVEL);
+  CommandManager::instance()->execute("MI_NewLevel");
+  Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onNewToonzRasterLevelButtonPressed() {
+  int defaultLevelType = Preferences::instance()->getDefLevelType();
+  Preferences::instance()->setDefLevelType(TZP_XSHLEVEL);
+  CommandManager::instance()->execute("MI_NewLevel");
+  Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onNewRasterLevelButtonPressed() {
+  int defaultLevelType = Preferences::instance()->getDefLevelType();
+  Preferences::instance()->setDefLevelType(OVL_XSHLEVEL);
+  CommandManager::instance()->execute("MI_NewLevel");
+  Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+
 class ReloadStyle final : public MenuItemHandler {
 public:
   ReloadStyle() : MenuItemHandler("MI_ReloadStyle") {}
@@ -2295,9 +2360,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene) ? m_recentScenes : (fileType == Level)
-                                                 ? m_recentLevels
-                                                 : m_recentFlipbookImages;
+      (fileType == Scene)
+          ? m_recentScenes
+          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2422,9 +2487,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene) ? m_recentScenes : (fileType == Level)
-                                                 ? m_recentLevels
-                                                 : m_recentFlipbookImages;
+      (fileType == Scene)
+          ? m_recentScenes
+          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2451,9 +2516,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
-                                                        ? MI_ClearRecentLevel
-                                                        : MI_ClearRecentImage;
+        (fileType == Scene)
+            ? MI_ClearRecentScene
+            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

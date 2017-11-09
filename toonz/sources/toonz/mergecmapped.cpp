@@ -32,6 +32,8 @@
 #include "toonz/levelproperties.h"
 #include "toonz/toonzscene.h"
 #include "toonz/childstack.h"
+#include "toonz/toonzimageutils.h"
+#include "tpaletteutil.h"
 
 #include <algorithm>
 
@@ -73,6 +75,15 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels) {
         (TToonzImageP)matchingLevels[i].m_mcell->getImage(false);
     if (!img || !match)
       throw TRopException("Can merge only cmapped raster images!");
+
+    std::set<int> usedStyles;
+    ToonzImageUtils::getUsedStyles(usedStyles, match);
+    std::map<int, int> indexTable;
+    mergePalette(palette, indexTable, matchPalette, usedStyles);
+    ToonzImageUtils::scrambleStyles(match, indexTable);
+    match->setPalette(palette);
+    matchPalette = palette;
+
     // img->lock();
     TRasterCM32P ras      = img->getRaster();    // img->getCMapped(false);
     TRasterCM32P matchRas = match->getRaster();  // match->getCMapped(true);
@@ -129,35 +140,36 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels) {
 
     img->setSavebox(img->getSavebox() + (matchRas->getBounds() + offs));
   }
+  /*
+    std::map<int, int>::iterator it = usedColors.begin();
+    for (; it != usedColors.end(); ++it)
+      if (it->first != it->second) break;
 
-  std::map<int, int>::iterator it = usedColors.begin();
-  for (; it != usedColors.end(); ++it)
-    if (it->first != it->second) break;
+    if (it == usedColors.end())  // this means that the merged palette does not
+                                 // differ from source palette.(all usedColors
+                                 // are not new color )
+      return;
 
-  if (it == usedColors.end())  // this means that the merged palette does not
-                               // differ from source palette.(all usedColors are
-                               // not new color )
-    return;
+    std::wstring pageName = L"merged palettes";
 
-  std::wstring pageName = L"merged palettes";
+    for (i = 0; i < palette->getPageCount(); i++)
+      if (palette->getPage(i)->getName() == pageName) {
+        page = palette->getPage(i);
+        break;
+      }
+    if (i == palette->getPageCount()) page = palette->addPage(pageName);
 
-  for (i = 0; i < palette->getPageCount(); i++)
-    if (palette->getPage(i)->getName() == pageName) {
-      page = palette->getPage(i);
-      break;
+    it        = usedColors.begin();
+    int count = 0;
+    for (; it != usedColors.end(); ++it) {
+      if (it->first == it->second) continue;
+      while (palette->getStyleCount() <= it->second)
+        palette->addStyle(TPixel32::Red);
+      palette->setStyle(it->second, matchPalette->getStyle(it->first)->clone());
+      page->addStyle(it->second);
     }
-  if (i == palette->getPageCount()) page = palette->addPage(pageName);
-
-  it        = usedColors.begin();
-  int count = 0;
-  for (; it != usedColors.end(); ++it) {
-    if (it->first == it->second) continue;
-    while (palette->getStyleCount() <= it->second)
-      palette->addStyle(TPixel32::Red);
-    palette->setStyle(it->second, matchPalette->getStyle(it->first)->clone());
-    page->addStyle(it->second);
-  }
-  if (usedColors.size() > 0) palette->setDirtyFlag(true);
+    if (usedColors.size() > 0) palette->setDirtyFlag(true);
+  */
 }
 
 /*------------------------------------------------------------------------*/
@@ -238,7 +250,7 @@ public:
     // assert(matchPalette);
     int i;
     for (i = 0; i < fids.size(); i++) {
-      QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t)this) +
+      QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) +
                    "-" + QString::number(i);
       TToonzImageP image = sl->getFrame(fids[i], false);
       assert(image);
@@ -251,7 +263,7 @@ public:
     // TPalette *palette = m_matchlinePalette->clone();
     // m_sl->setPalette(palette);
     for (i = 0; i < m_fids.size(); i++) {
-      QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t)this) +
+      QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) +
                    "-" + QString::number(i);
       TImageP img = TImageCache::instance()->get(id, false)->cloneImage();
 
@@ -286,7 +298,7 @@ public:
     int i;
     for (i = 0; i < m_fids.size(); i++)
       TImageCache::instance()->remove("DeleteMatchlineUndo" +
-                                      QString::number((uintptr_t)this) + "-" +
+                                      QString::number((uintptr_t) this) + "-" +
                                       QString::number(i));
   }
 };
@@ -402,8 +414,8 @@ public:
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();
     for (; it != m_images.end(); ++it)  //, ++mit)
     {
-      QString id = "MergeCmappedUndo" + QString::number((uintptr_t)this) + "-" +
-                   QString::number(it->first.getNumber());
+      QString id = "MergeCmappedUndo" + QString::number((uintptr_t) this) +
+                   "-" + QString::number(it->first.getNumber());
       TImageCache::instance()->remove(id);
     }
     delete m_palette;
@@ -486,9 +498,10 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath,
   TXshLevel *txl = level->getScene()->createNewLevel(
       level->getType(), fp.getWideName(), level->getResolution());
   TXshSimpleLevel *newLevel = txl->getSimpleLevel();
+  newLevel->setPath(fp);
   newLevel->setPalette(level->getPalette());
   newLevel->clonePropertiesFrom(level);
-  newLevel->setPath(fp);
+  //  newLevel->setPath(fp);
 
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentScene()->notifyCastChange();

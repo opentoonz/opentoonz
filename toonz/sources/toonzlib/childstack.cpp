@@ -32,7 +32,7 @@ public:
 // ChildStack
 
 ChildStack::ChildStack(ToonzScene *scene)
-    : m_scene(scene), m_xsheet(new TXsheet()), m_editInPlace(false) {
+    : m_scene(scene), m_xsheet(new TXsheet()) {
   m_xsheet->setScene(m_scene);
   m_xsheet->addRef();
 }
@@ -176,10 +176,4 @@ bool ChildStack::getAncestorAffine(TAffine &aff, int row) const {
     i--;
   }
   return true;
-}
-
-//-----------------------------------------------------------------------------
-
-void ChildStack::setEditInPlace(bool editInPlace) {
-  m_editInPlace = editInPlace;
 }

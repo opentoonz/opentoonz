@@ -1071,19 +1071,6 @@ void closeSubXsheet(int dlevel) {
 
 //=============================================================================
 
-void toggleEditInPlace() {
-  TApp *app         = TApp::instance();
-  ToonzScene *scene = app->getCurrentScene()->getScene();
-  int ancestorCount = scene->getChildStack()->getAncestorCount();
-  if (ancestorCount == 0) return;
-  scene->getChildStack()->setEditInPlace(
-      !scene->getChildStack()->getEditInPlace());
-  /*- Notify the change in order to update the viewer -*/
-  app->instance()->getCurrentXsheet()->notifyXsheetChanged();
-}
-
-//=============================================================================
-
 void bringPegbarsInsideChildXsheet(TXsheet *xsh, TXsheet *childXsh) {
   // retrieve all pegbars used from copied columns
   std::set<TStageObjectId> pegbarIds;
@@ -2113,16 +2100,6 @@ public:
   CloseChildCommand() : MenuItemHandler(MI_CloseChild) {}
   void execute() override { closeSubXsheet(1); }
 } closeChildCommand;
-
-//=============================================================================
-// ToggleEditInPlaceCommand
-//-----------------------------------------------------------------------------
-
-class ToggleEditInPlaceCommand final : public MenuItemHandler {
-public:
-  ToggleEditInPlaceCommand() : MenuItemHandler(MI_ToggleEditInPlace) {}
-  void execute() override { toggleEditInPlace(); }
-} toggleEditInPlaceCommand;
 
 //=============================================================================
 // collapseColumns

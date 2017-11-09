@@ -240,9 +240,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
       m_horizontalLayout->setMargin(0);
       m_horizontalLayout->setSpacing(5);
       setPageField(is, fx, false);
-      QWidget *tmpWidget = new QWidget(this);
-      tmpWidget->setLayout(m_horizontalLayout);
-      m_mainLayout->addWidget(tmpWidget, currentRow, 1, 1, 2);
+      m_mainLayout->addLayout(m_horizontalLayout, currentRow, 1, 1, 2);
     } else if (tagName == "vbox") {
       int shrink            = 0;
       std::string shrinkStr = is.getTagAttribute("shrink");
@@ -553,6 +551,37 @@ void ParamsPage::update(int frame) {
 
 namespace {
 
+QSize getItemSize(QLayoutItem *item) {
+  // layout case
+  QHBoxLayout *hLay = dynamic_cast<QHBoxLayout *>(item->layout());
+  if (hLay) {
+    int tmpWidth = 0, tmpHeight = 0;
+    for (int c = 0; c < hLay->count(); c++) {
+      QLayoutItem *subItem = hLay->itemAt(c);
+      if (!subItem) continue;
+      QSize subItemSize = getItemSize(subItem);
+      tmpWidth += subItemSize.width();
+      if (tmpHeight < subItemSize.height()) tmpHeight = subItemSize.height();
+    }
+    tmpWidth += (hLay->count() - 1) * 5;
+    return QSize(tmpWidth, tmpHeight);
+  }
+
+  ParamField *pF = dynamic_cast<ParamField *>(item->widget());
+  if (pF) return pF->getPreferedSize();
+
+  Separator *sep = dynamic_cast<Separator *>(item->widget());
+  if (sep) return QSize(0, 16);
+
+  Histogram *histo = dynamic_cast<Histogram *>(item->widget());
+  if (histo) return QSize(278, 162);
+
+  RgbLinkButton *linkBut = dynamic_cast<RgbLinkButton *>(item->widget());
+  if (linkBut) return QSize(0, 21);
+
+  return QSize();
+}
+
 void updateMaximumPageSize(QGridLayout *layout, int &maxLabelWidth,
                            int &maxWidgetWidth, int &fieldsHeight) {
   /*-- Label側の横幅の最大値を得る --*/
@@ -589,63 +618,10 @@ void updateMaximumPageSize(QGridLayout *layout, int &maxLabelWidth,
 
     QLayoutItem *item = layout->itemAtPosition(r, 1);
     if (!item) continue;
-    /*-- ParamFieldの場合 --*/
-    ParamField *pF = dynamic_cast<ParamField *>(item->widget());
-    if (pF) {
-      QSize fieldBestSize = pF->getPreferedSize();
-      /*-- 横幅の更新 --*/
-      if (maxWidgetWidth < fieldBestSize.width())
-        maxWidgetWidth = fieldBestSize.width();
-      /*-- 縦サイズの更新 --*/
-      fieldsHeight += fieldBestSize.height();
-    } else {
-      QHBoxLayout *hLay      = dynamic_cast<QHBoxLayout *>(item->layout());
-      Histogram *histo       = dynamic_cast<Histogram *>(item->widget());
-      Separator *sep         = dynamic_cast<Separator *>(item->widget());
-      RgbLinkButton *linkBut = dynamic_cast<RgbLinkButton *>(item->widget());
-      /*-- HLayoutの場合 --*/
-      if (hLay) {
-        int tmpSumWidth  = 0;
-        int tmpMaxHeight = 0;
-        for (int i = 0; i < hLay->count(); i++) {
-          QLabel *hLabel = dynamic_cast<QLabel *>(hLay->itemAt(i)->widget());
-          ParamField *hPF =
-              dynamic_cast<ParamField *>(hLay->itemAt(i)->widget());
-          if (hLabel) {
-            int tmpWidth = hLabel->fontMetrics().width(hLabel->text());
-            /*-- 横幅を足していく --*/
-            tmpSumWidth += tmpWidth;
-          } else if (hPF) {
-            tmpSumWidth += hPF->getPreferedSize().width();
-            if (tmpMaxHeight < hPF->getPreferedSize().height())
-              tmpMaxHeight = hPF->getPreferedSize().height();
-          } else
-            continue;
-        }
-        /*-- 横幅にSpacing値（=5）の分を足す --*/
-        if (hLay->count() > 1) tmpSumWidth += (hLay->count() - 1) * 5;
-        /*-- 横幅の更新 --*/
-        if (maxWidgetWidth < tmpSumWidth) maxWidgetWidth = tmpSumWidth;
-        /*-- 縦サイズの更新 --*/
-        fieldsHeight += tmpMaxHeight;
-      }
-      /*--- ヒストグラムの場合 : 最小サイズは 横278 × 縦162 ---*/
-      else if (histo) {
-        /*-- 横幅の更新 --*/
-        if (maxWidgetWidth < 278) maxWidgetWidth = 278;
-        /*-- 縦サイズの更新 --*/
-        fieldsHeight += 162;
-      }
-      /*-- セパレータの場合 : 高さ10 --*/
-      else if (sep) {
-        fieldsHeight += 10;
-      }
-      /*-- RgbLinkButtonの場合 : 高さ21 --*/
-      else if (linkBut) {
-        fieldsHeight += 21;
-      } else
-        continue;
-    }
+
+    QSize itemSize                                        = getItemSize(item);
+    if (maxWidgetWidth < itemSize.width()) maxWidgetWidth = itemSize.width();
+    fieldsHeight += itemSize.height();
   }
 
   if (layout->rowCount() > 1) fieldsHeight += (layout->rowCount() - 1) * 10;
@@ -659,10 +635,11 @@ QSize ParamsPage::getPreferedSize() {
 
   updateMaximumPageSize(m_mainLayout, maxLabelWidth, maxWidgetWidth,
                         fieldsHeight);
-
-  return QSize(
-      maxLabelWidth + maxWidgetWidth + 5 /* Spacing */ + 24 /* Margin２つ分 */,
-      fieldsHeight + 24 /* Margin２つ分 */ + 20 /* 余白 */);
+  return QSize(maxLabelWidth + maxWidgetWidth +
+                   m_mainLayout->horizontalSpacing() +
+                   2 * m_mainLayout->margin(),
+               fieldsHeight + 2 * m_mainLayout->margin() +
+                   31 /* spacing for the swatch */);
 }
 
 //=============================================================================

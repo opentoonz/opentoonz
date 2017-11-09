@@ -15,6 +15,7 @@
 #include "toonz/stage2.h"
 #include "toonz/stageobjectutil.h"
 #include "toonz/doubleparamcmd.h"
+#include "toonz/preferences.h"
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
@@ -102,6 +103,11 @@ ToolOptionCheckbox::ToolOptionCheckbox(TTool *tool, TBoolProperty *property,
 
 void ToolOptionCheckbox::updateStatus() {
   bool check = m_property->getValue();
+
+  if (!actions().isEmpty() && actions()[0]->isCheckable() &&
+      actions()[0]->isChecked() != check)
+    actions()[0]->setChecked(check);
+
   if (isChecked() == check) return;
 
   setCheckState(check ? Qt::Checked : Qt::Unchecked);
@@ -117,11 +123,16 @@ void ToolOptionCheckbox::nextCheckState() {
 
 //-----------------------------------------------------------------------------
 
-void ToolOptionCheckbox::doClick() {
+void ToolOptionCheckbox::doClick(bool checked) {
   if (m_toolHandle && m_toolHandle->getTool() != m_tool) return;
   // active only if the belonging combo-viewer is visible
   if (!isInVisibleViewer(this)) return;
-  click();
+
+  if (isChecked() == checked) return;
+
+  setChecked(checked);
+  m_property->setValue(checked);
+  notifyTool();
 }
 
 //=============================================================================
@@ -603,7 +614,14 @@ void ToolOptionCombo::onActivated(int index) {
 //-----------------------------------------------------------------------------
 
 void ToolOptionCombo::doShowPopup() {
-  if (isVisible()) showPopup();
+  if (Preferences::instance()->getDropdownShortcutsCycleOptions()) {
+    const TEnumProperty::Range &range           = m_property->getRange();
+    int theIndex                                = currentIndex() + 1;
+    if (theIndex >= (int)range.size()) theIndex = 0;
+    doOnActivated(theIndex);
+  } else {
+    if (isVisible()) showPopup();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -612,7 +630,8 @@ void ToolOptionCombo::doOnActivated(int index) {
   if (m_toolHandle && m_toolHandle->getTool() != m_tool) return;
   // active only if the belonging combo-viewer is visible
   if (!isInVisibleViewer(this)) return;
-
+  bool cycleOptions =
+      Preferences::instance()->getDropdownShortcutsCycleOptions();
   // Just move the index if the first item is not "Normal"
   if (itemText(0) != "Normal") {
     onActivated(index);

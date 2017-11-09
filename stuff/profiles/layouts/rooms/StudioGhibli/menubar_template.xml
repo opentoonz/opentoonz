@@ -159,6 +159,7 @@
     <command>MI_Rollup</command>
     <command>MI_Rolldown</command>
     <command>MI_TimeStretch</command>
+    <command>MI_AutoInputCellNumber</command>
     <separator/>
     <command>MI_Autorenumber</command>
     <command>MI_Duplicate</command>

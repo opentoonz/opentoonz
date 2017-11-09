@@ -47,6 +47,11 @@ If skipEmptyCells == false do not skip setting empty cells in data*/
                 bool insert = true, bool doZeraryClone = true,
                 bool skipEmptyCells = true) const;
 
+  // Paste only cell numbers.
+  // As a special behavior, enable to copy one column and paste into
+  // multiple columns.
+  bool getNumbers(TXsheet *xsh, int r0, int c0, int &r1, int &c1) const;
+
   //! Return true if cell in TCellData can be set in \b xsh xsheet.
   bool canChange(TXsheet *xsh, int c0) const;
 

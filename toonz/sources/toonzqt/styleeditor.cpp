@@ -585,6 +585,7 @@ HexagonalColorWheel::~HexagonalColorWheel() {
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::initializeGL() {
+  initializeOpenGLFunctions();
   QColor const color = getBGColor();
   glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 
@@ -599,6 +600,8 @@ void HexagonalColorWheel::initializeGL() {
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::resizeGL(int w, int h) {
+  w *= getDevPixRatio();
+  h *= getDevPixRatio();
   float d                 = (w - 5.0f) / 2.5f;
   bool isHorizontallyLong = ((d * 1.732f) < h) ? false : true;
 
@@ -3301,7 +3304,7 @@ void StyleEditor::onStyleSwitched() {
     m_oldStyle    = TColorStyleP();
     m_editedStyle = TColorStyleP();
 
-    m_statusLabel->setText("- Style not Selected -");
+    m_statusLabel->setText(tr("- Style not Selected -"));
     return;
   }
 
@@ -3318,11 +3321,11 @@ void StyleEditor::onStyleSwitched() {
     QString statusText;
     // palette type
     if (isCleanUpPalette)
-      statusText = "[CLEANUP]  ";
+      statusText = tr("[CLEANUP]  ");
     else if (palette->getGlobalName() != L"")
-      statusText = "[STUDIO]  ";
+      statusText = tr("[STUDIO]  ");
     else
-      statusText = "[LEVEL]  ";
+      statusText = tr("[LEVEL]  ");
 
     // palette name
     statusText +=
@@ -3339,7 +3342,7 @@ void StyleEditor::onStyleSwitched() {
 
     m_statusLabel->setText(statusText);
   } else
-    m_statusLabel->setText("- Style is Not Valid -");
+    m_statusLabel->setText(tr("- Style is Not Valid -"));
   enable(!isStyleNull && isValidIndex, isColorInField, isCleanUpPalette);
 }
 

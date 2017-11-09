@@ -1141,6 +1141,7 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
         filler.rectFill(appRas->getBounds(), params, false);
         ras = appRas;
       }
+
     } else if (ti) {
       // Colormap case
 
@@ -1215,6 +1216,7 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
         int prevFrame = palette->getFrame();
 
         palette->setFrame((int)frame);
+
         TTile auxtile(TRaster32P(inTile.getRaster()->getSize()), inTile.m_pos);
         TRop::convert(auxtile, inTile, palette, false, true);
         palette->setFrame(prevFrame);

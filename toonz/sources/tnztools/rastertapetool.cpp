@@ -671,10 +671,19 @@ public:
   //----------------------------------------------------------------------
 
   int getCursorId() const override {
+    int ret = ToolCursor::TapeCursor;
+
+    if (m_closeType.getValue() == FREEHAND_CLOSE)
+      ret = ret | ToolCursor::Ex_FreeHand;
+    else if (m_closeType.getValue() == POLYLINE_CLOSE)
+      ret = ret | ToolCursor::Ex_PolyLine;
+    else if (m_closeType.getValue() == RECT_CLOSE)
+      ret = ret | ToolCursor::Ex_Rectangle;
+
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
-      return ToolCursor::TapeCursorWhite;
-    else
-      return ToolCursor::TapeCursor;
+      ret = ret | ToolCursor::Ex_Negate;
+
+    return ret;
   }
 
   //----------------------------------------------------------------------
