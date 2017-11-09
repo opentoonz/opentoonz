@@ -619,14 +619,25 @@ bool XsheetViewer::refreshContentSize(int dx, int dy) {
   TXsheet *xsh    = getXsheet();
   int frameCount  = xsh ? xsh->getFrameCount() : 0;
   int columnCount = xsh ? xsh->getColumnCount() : 0;
-  QPoint contentSize =
-      positionToXY(CellPosition(frameCount + 1, columnCount + 1));
+  QPoint contentSize;
+
+  if (m_orientation->isVerticalTimeline())
+    contentSize = positionToXY(CellPosition(frameCount + 1, columnCount + 1));
+  else {
+    contentSize = positionToXY(CellPosition(frameCount + 1, 0));
+
+    ColumnFan *fan = xsh->getColumnFan(m_orientation);
+    contentSize.setY(contentSize.y() + (fan->isActive(0)
+                                            ? m_orientation->cellHeight()
+                                            : m_orientation->foldedCellSize()));
+  }
 
   QSize actualSize(contentSize.x(), contentSize.y());
   int x = viewportSize.width() - offset.x();  // wtf is going on
   int y = viewportSize.height() - offset.y();
   if (x > actualSize.width()) actualSize.setWidth(x);
-  if (y > actualSize.height()) actualSize.setHeight(y);
+  if (m_orientation->isVerticalTimeline() && y > actualSize.height())
+    actualSize.setHeight(y);
 
   if (actualSize == m_cellArea->size())
     return false;
@@ -659,11 +670,23 @@ void XsheetViewer::updateAreeSize() {
 
   QPoint areaFilled(0, 0);
   TXsheet *xsh = getXsheet();
-  if (xsh)
-    areaFilled = positionToXY(
-        CellPosition(xsh->getFrameCount() + 1, xsh->getColumnCount() + 1));
+  if (xsh) {
+    if (o->isVerticalTimeline())
+      areaFilled = positionToXY(
+          CellPosition(xsh->getFrameCount() + 1, xsh->getColumnCount() + 1));
+    else {
+      areaFilled = positionToXY(CellPosition(xsh->getFrameCount() + 1, 0));
+
+      ColumnFan *fan = xsh->getColumnFan(m_orientation);
+      areaFilled.setY(areaFilled.y() + (fan->isActive(0)
+                                            ? o->cellHeight()
+                                            : o->foldedCellSize()));
+    }
+  }
   if (viewArea.right() < areaFilled.x()) viewArea.setRight(areaFilled.x());
-  if (viewArea.bottom() < areaFilled.y()) viewArea.setBottom(areaFilled.y());
+  if (viewArea.bottom() < areaFilled.y() ||
+      (!o->isVerticalTimeline() && viewArea.bottom() != areaFilled.y()))
+    viewArea.setBottom(areaFilled.y());
 
   NumberRange allLayer    = o->layerSide(viewArea);
   NumberRange allFrame    = o->frameSide(viewArea);
@@ -677,9 +700,44 @@ void XsheetViewer::updateAreeSize() {
 
 //-----------------------------------------------------------------------------
 
+int XsheetViewer::colToTimelineLayerAxis(int layer) const {
+  const Orientation *o = orientation();
+  TXsheet *xsh         = getXsheet();
+  if (!xsh) return 0;
+  ColumnFan *fan = xsh->getColumnFan(o);
+
+  int yBottom =
+      o->colToLayerAxis(layer, fan) +
+      (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize() - 1);
+  int columnCount       = qMax(1, xsh->getColumnCount());
+  int layerHeightActual = o->colToLayerAxis(columnCount, fan);
+
+  return layerHeightActual - yBottom;
+}
+
+//-----------------------------------------------------------------------------
+
 CellPosition XsheetViewer::xyToPosition(const QPoint &point) const {
   const Orientation *o = orientation();
-  return o->xyToPosition(point, getXsheet()->getColumnFan(o));
+  TXsheet *xsh         = getXsheet();
+  if (!xsh) return CellPosition(0, 0);
+
+  if (o->isVerticalTimeline())
+    return o->xyToPosition(point, xsh->getColumnFan(o));
+
+  // For timeline mode, we need to base the Y axis on the bottom of the column
+  // area
+  // since the layers are flipped
+  QPoint usePoint   = point;
+  int columnCount   = qMax(1, xsh->getColumnCount());
+  ColumnFan *fan    = xsh->getColumnFan(o);
+  int colAreaHeight = o->colToLayerAxis(columnCount, fan);
+
+  usePoint.setY(colAreaHeight - usePoint.y());
+
+  CellPosition resultCP = o->xyToPosition(usePoint, xsh->getColumnFan(o));
+  if (point.y() > colAreaHeight) resultCP.setLayer(-3);
+  return resultCP;
 }
 CellPosition XsheetViewer::xyToPosition(const TPoint &point) const {
   return xyToPosition(QPoint(point.x, point.y));
@@ -692,12 +750,39 @@ CellPosition XsheetViewer::xyToPosition(const TPointD &point) const {
 
 QPoint XsheetViewer::positionToXY(const CellPosition &pos) const {
   const Orientation *o = orientation();
-  return o->positionToXY(pos, getXsheet()->getColumnFan(o));
+  TXsheet *xsh         = getXsheet();
+  if (!xsh) return QPoint(0, 0);
+  ColumnFan *fan  = xsh->getColumnFan(o);
+  QPoint usePoint = o->positionToXY(pos, fan);
+
+  if (o->isVerticalTimeline()) return usePoint;
+
+  // For timeline mode, we need to base the Y axis on the bottom of the column
+  // area
+  // since the layers are flipped
+
+  usePoint.setY(usePoint.y() + (fan->isActive(pos.layer())
+                                    ? o->cellHeight()
+                                    : o->foldedCellSize()));
+  int columnCount = qMax(1, xsh->getColumnCount());
+  int colsHeight  = o->colToLayerAxis(columnCount, fan);
+
+  if (colsHeight)
+    usePoint.setY(colsHeight - usePoint.y());
+  else
+    usePoint.setY(0);
+
+  return usePoint;
 }
 
 int XsheetViewer::columnToLayerAxis(int layer) const {
   const Orientation *o = orientation();
-  return o->colToLayerAxis(layer, getXsheet()->getColumnFan(o));
+  TXsheet *xsh         = getXsheet();
+  if (!xsh) return 0;
+  if (o->isVerticalTimeline())
+    return o->colToLayerAxis(layer, xsh->getColumnFan(o));
+  else
+    return colToTimelineLayerAxis(layer);
 }
 int XsheetViewer::rowToFrameAxis(int frame) const {
   return orientation()->rowToFrameAxis(frame);
@@ -728,6 +813,19 @@ void XsheetViewer::drawPredefinedPath(QPainter &p, PredefinedPath which,
                                       optional<QColor> fill,
                                       optional<QColor> outline) const {
   QPoint xy         = positionToXY(pos);
+  QPainterPath path = orientation()->path(which).translated(xy);
+  if (fill) p.fillPath(path, QBrush(*fill));
+  if (outline) {
+    p.setPen(*outline);
+    p.drawPath(path);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::drawPredefinedPath(QPainter &p, PredefinedPath which,
+                                      QPoint xy, optional<QColor> fill,
+                                      optional<QColor> outline) const {
   QPainterPath path = orientation()->path(which).translated(xy);
   if (fill) p.fillPath(path, QBrush(*fill));
   if (outline) {
@@ -994,13 +1092,19 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
   struct Locals {
     XsheetViewer *m_this;
 
-    void scrollTo(double y, const QRect &visibleRect) {
+    void scrollVertTo(double y, const QRect &visibleRect) {
       int deltaY = (y < visibleRect.top()) ? y - visibleRect.top()
                                            : y - visibleRect.bottom();
 
       m_this->scroll(QPoint(0, deltaY));
     }
 
+    void scrollHorizTo(double x, const QRect &visibleRect) {
+      int deltaX = (x < visibleRect.left()) ? x - visibleRect.left()
+                                            : x - visibleRect.right();
+
+      m_this->scroll(QPoint(deltaX, 0));
+    }
   } locals = {this};
 
   if (changeFrameSkippingHolds(event)) return;
@@ -1060,21 +1164,29 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
 
     switch (key) {
     case Qt::Key_PageUp:
-      locals.scrollTo(
+      locals.scrollVertTo(
           visibleRect.top() - visibleRowCount * orientation()->cellHeight(),
           visibleRect);
       break;
     case Qt::Key_PageDown:
-      locals.scrollTo(
+      locals.scrollVertTo(
           visibleRect.bottom() + visibleRowCount * orientation()->cellHeight(),
           visibleRect);
       break;
     case Qt::Key_Home:
-      locals.scrollTo(0, visibleRect);
+      if (orientation()->isVerticalTimeline())
+        locals.scrollVertTo(0, visibleRect);
+      else
+        locals.scrollHorizTo(0, visibleRect);
+
       break;
     case Qt::Key_End:
-      locals.scrollTo((frameCount + 1) * orientation()->cellHeight(),
-                      visibleRect);
+      if (orientation()->isVerticalTimeline())
+        locals.scrollVertTo((frameCount + 1) * orientation()->cellHeight(),
+                            visibleRect);
+      else
+        locals.scrollHorizTo((frameCount + 1) * orientation()->cellWidth(),
+                             visibleRect);
       break;
     }
     break;
@@ -1186,7 +1298,8 @@ void XsheetViewer::onCurrentColumnSwitched() {
 
 void XsheetViewer::scrollToColumn(int col) {
   int x0 = columnToLayerAxis(col);
-  int x1 = columnToLayerAxis(col + 1);
+  int x1 =
+      columnToLayerAxis(col + (m_orientation->isVerticalTimeline() ? 1 : -1));
 
   if (orientation()->isVerticalTimeline())
     scrollToHorizontalRange(x0, x1);

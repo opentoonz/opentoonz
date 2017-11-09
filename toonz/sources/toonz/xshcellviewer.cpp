@@ -906,14 +906,14 @@ void CellArea::setDragTool(DragTool *dragTool) {
 
 void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   TXsheet *xsh         = m_viewer->getXsheet();
-  ColumnFan *columnFan = xsh->getColumnFan(m_viewer->orientation());
+  const Orientation *o = m_viewer->orientation();
+  ColumnFan *columnFan = xsh->getColumnFan(o);
 
   // selected cells range
   TCellSelection *cellSelection = m_viewer->getCellSelection();
   int rS0, cS0, rS1, cS1;
   if (!cellSelection->isEmpty())
     cellSelection->getSelectedCells(rS0, cS0, rS1, cS1);
-
   // visible cells range
   CellRange visible = m_viewer->xyRectToRange(toBeUpdated);
   int r0, r1, c0, c1;  // range of visible rows and columns
@@ -921,6 +921,10 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   r1 = visible.to().frame();
   c0 = visible.from().layer();
   c1 = visible.to().layer();
+  if (!m_viewer->orientation()->isVerticalTimeline()) {
+    int colCount = qMax(1, xsh->getColumnCount());
+    c1           = qMin(c1, colCount - 1);
+  }
 
   drawNonEmptyBackground(p);
 
@@ -974,6 +978,10 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
 
     NumberRange layerAxisRange(layerAxis + 1,
                                m_viewer->columnToLayerAxis(col + 1));
+    if (!m_viewer->orientation()->isVerticalTimeline()) {
+      int adjY       = m_viewer->orientation()->cellHeight() - 1;
+      layerAxisRange = NumberRange(layerAxis + 1, layerAxis + adjY);
+    }
 
     // draw vertical line
     if (layerAxis > 0) {
@@ -1027,9 +1035,21 @@ void CellArea::drawNonEmptyBackground(QPainter &p) const {
     if (!currentColumn) continue;
     if (!currentColumn->isEmpty()) break;
   }
-  QPoint xy =
-      m_viewer->positionToXY(CellPosition(totalFrames, lastNonEmptyCol + 1));
-  p.fillRect(1, 0, xy.x(), xy.y(), QBrush(m_viewer->getNotEmptyColumnColor()));
+  QPoint xyTop, xyBottom;
+  const Orientation *o = m_viewer->orientation();
+  if (o->isVerticalTimeline()) {
+    xyTop = QPoint(1, 0);
+    xyBottom =
+        m_viewer->positionToXY(CellPosition(totalFrames, lastNonEmptyCol + 1));
+  } else {
+    xyTop          = m_viewer->positionToXY(CellPosition(0, lastNonEmptyCol));
+    xyBottom       = m_viewer->positionToXY(CellPosition(totalFrames, 0));
+    ColumnFan *fan = xsh->getColumnFan(o);
+    xyBottom.setY(xyBottom.y() +
+                  ((fan ? fan->isActive(0) : true) ? o->cellHeight() : 9));
+  }
+  p.fillRect(xyTop.x(), xyTop.y(), xyBottom.x(), xyBottom.y(),
+             QBrush(m_viewer->getNotEmptyColumnColor()));
 }
 
 void CellArea::drawFoldedColumns(QPainter &p, int layerAxis,
@@ -1057,8 +1077,20 @@ void CellArea::drawSelectionBackground(QPainter &p) const {
 
   int selRow0, selCol0, selRow1, selCol1;
   cellSelection->getSelectedCells(selRow0, selCol0, selRow1, selCol1);
-  QRect selectionRect = m_viewer->rangeToXYRect(CellRange(
-      CellPosition(selRow0, selCol0), CellPosition(selRow1 + 1, selCol1 + 1)));
+  QRect selectionRect;
+  const Orientation *o = m_viewer->orientation();
+  if (o->isVerticalTimeline())
+    selectionRect = m_viewer->rangeToXYRect(
+        CellRange(CellPosition(selRow0, selCol0),
+                  CellPosition(selRow1 + 1, selCol1 + 1)));
+  else {
+    int newSelCol0 = qMax(selCol0, selCol1);
+    int newSelCol1 = qMin(selCol0, selCol1);
+    selectionRect  = m_viewer->rangeToXYRect(
+        CellRange(CellPosition(selRow0, newSelCol0),
+                  CellPosition(selRow1 + 1, newSelCol1 - 1)));
+  }
+
   p.fillRect(selectionRect, QBrush(m_viewer->getSelectedEmptyCellColor()));
 }
 
@@ -1074,8 +1106,16 @@ void CellArea::drawExtenderHandles(QPainter &p) {
 
   int selRow0, selCol0, selRow1, selCol1;
   cellSelection->getSelectedCells(selRow0, selCol0, selRow1, selCol1);
-  QRect selected = m_viewer->rangeToXYRect(CellRange(
+  QRect selected;
+  selected = m_viewer->rangeToXYRect(CellRange(
       CellPosition(selRow0, selCol0), CellPosition(selRow1 + 1, selCol1 + 1)));
+  if (!o->isVerticalTimeline()) {
+    TXsheet *xsh         = m_viewer->getXsheet();
+    ColumnFan *columnFan = xsh->getColumnFan(o);
+    int topAdj           = columnFan->isActive(selCol0) ? o->cellHeight() : 9;
+    int bottomAdj        = columnFan->isActive(selCol1) ? o->cellHeight() : 9;
+    selected.adjust(0, topAdj, 0, bottomAdj);
+  }
 
   int x0, y0, x1, y1;
   x0 = selected.left();

@@ -1515,12 +1515,16 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   QPainter p(this);
   p.setClipRect(toBeUpdated);
 
+  TXsheet *xsh        = m_viewer->getXsheet();
   CellRange cellRange = m_viewer->xyRectToRange(toBeUpdated);
   int c0, c1;  // range of visible columns
   c0 = cellRange.from().layer();
   c1 = cellRange.to().layer();
+  if (!m_viewer->orientation()->isVerticalTimeline()) {
+    int colCount = qMax(1, xsh->getColumnCount());
+    c1           = qMin(c1, colCount - 1);
+  }
 
-  TXsheet *xsh         = m_viewer->getXsheet();
   ColumnFan *columnFan = xsh->getColumnFan(m_viewer->orientation());
   int col;
   for (col = c0; col <= c1; col++) {

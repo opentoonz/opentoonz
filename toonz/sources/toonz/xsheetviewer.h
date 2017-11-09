@@ -615,6 +615,8 @@ public:
   CellPosition xyToPosition(const TPointD &point) const;
   QPoint positionToXY(const CellPosition &pos) const;
 
+  int colToTimelineLayerAxis(int layer) const;
+
   int columnToLayerAxis(int layer) const;
   int rowToFrameAxis(int frame) const;
 
@@ -623,6 +625,10 @@ public:
 
   void drawPredefinedPath(QPainter &p, PredefinedPath which,
                           const CellPosition &pos, optional<QColor> fill,
+                          optional<QColor> outline) const;
+
+  void drawPredefinedPath(QPainter &p, PredefinedPath which, QPoint xy,
+                          optional<QColor> fill,
                           optional<QColor> outline) const;
   //---------
 

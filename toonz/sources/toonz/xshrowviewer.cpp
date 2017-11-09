@@ -139,7 +139,8 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
       p.setPen(m_viewer->getTextColor());
 
     QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
-    QRect labelRect  = m_viewer->orientation()
+    if (!m_viewer->orientation()->isVerticalTimeline()) basePoint.setY(0);
+    QRect labelRect = m_viewer->orientation()
                           ->rect(PredefinedRect::FRAME_LABEL)
                           .translated(basePoint);
     int align = m_viewer->orientation()->dimension(
@@ -228,6 +229,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
 
 void RowArea::drawPlayRange(QPainter &p, int r0, int r1) {
   bool playRangeEnabled = XsheetGUI::isPlayRangeEnabled();
+  TXsheet *xsh          = m_viewer->getXsheet();
 
   // Update the play range internal fields
   if (playRangeEnabled) {
@@ -237,8 +239,7 @@ void RowArea::drawPlayRange(QPainter &p, int r0, int r1) {
   // if the preview range is not set, then put markers at the first and the last
   // frames of the scene
   else {
-    TXsheet *xsh = m_viewer->getXsheet();
-    m_r1         = xsh->getFrameCount() - 1;
+    m_r1 = xsh->getFrameCount() - 1;
     if (m_r1 == -1) return;
     m_r0 = 0;
   }
@@ -246,15 +247,21 @@ void RowArea::drawPlayRange(QPainter &p, int r0, int r1) {
   QColor ArrowColor = (playRangeEnabled) ? QColor(255, 255, 255) : grey150;
   p.setBrush(QBrush(ArrowColor));
 
-  if (m_r0 > r0 - 1 && r1 + 1 > m_r0)
-    m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_PLAY_RANGE,
-                                 CellPosition(m_r0, 0), ArrowColor,
-                                 QColor(Qt::black));
+  int topOrLeftCol =
+      m_viewer->orientation()->isVerticalTimeline() ? 0 : xsh->getColumnCount();
+  if (m_r0 > r0 - 1 && r1 + 1 > m_r0) {
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(m_r0, 0));
+    if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+    m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_PLAY_RANGE, topLeft,
+                                 ArrowColor, QColor(Qt::black));
+  }
 
-  if (m_r1 > r0 - 1 && r1 + 1 > m_r1)
-    m_viewer->drawPredefinedPath(p, PredefinedPath::END_PLAY_RANGE,
-                                 CellPosition(m_r1, 0), ArrowColor,
-                                 QColor(Qt::black));
+  if (m_r1 > r0 - 1 && r1 + 1 > m_r1) {
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(m_r1, 0));
+    if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+    m_viewer->drawPredefinedPath(p, PredefinedPath::END_PLAY_RANGE, topLeft,
+                                 ArrowColor, QColor(Qt::black));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -264,7 +271,8 @@ void RowArea::drawCurrentRowGadget(QPainter &p, int r0, int r1) {
   if (currentRow < r0 || r1 < currentRow) return;
 
   QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
-  QRect header   = m_viewer->orientation()
+  if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+  QRect header = m_viewer->orientation()
                      ->rect(PredefinedRect::FRAME_HEADER)
                      .translated(topLeft)
                      .adjusted(1, 1, 0, 0);
@@ -351,8 +359,9 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 
   // Draw onion skin main handle
   QPoint handleTopLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
-  QRect handleRect     = onionRect.translated(handleTopLeft);
-  int angle180         = 16 * 180;
+  if (!m_viewer->orientation()->isVerticalTimeline()) handleTopLeft.setY(0);
+  QRect handleRect = onionRect.translated(handleTopLeft);
+  int angle180     = 16 * 180;
   int turn =
       m_viewer->orientation()->dimension(PredefinedDimension::ONION_TURN) * 16;
   p.setBrush(QBrush(backColor));
@@ -373,7 +382,8 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     else
       p.setBrush(Qt::NoBrush);
     QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow + mos, 0));
-    QRect dotRect  = m_viewer->orientation()
+    if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+    QRect dotRect = m_viewer->orientation()
                         ->rect(PredefinedRect::ONION_DOT)
                         .translated(topLeft);
     p.drawEllipse(dotRect);
@@ -391,7 +401,8 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     else
       p.setBrush(Qt::NoBrush);
     QPoint topLeft = m_viewer->positionToXY(CellPosition(fos, 0));
-    QRect dotRect  = m_viewer->orientation()
+    if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+    QRect dotRect = m_viewer->orientation()
                         ->rect(PredefinedRect::ONION_DOT_FIXED)
                         .translated(topLeft);
     p.drawEllipse(dotRect);
@@ -402,6 +413,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     p.setPen(QColor(255, 128, 0));
     p.setBrush(QBrush(QColor(255, 255, 0)));
     QPoint topLeft = m_viewer->positionToXY(CellPosition(m_row, 0));
+    if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
     QRect dotRect =
         m_viewer->orientation()
             ->rect(m_showOnionToSet == Fos ? PredefinedRect::ONION_DOT_FIXED
@@ -467,13 +479,14 @@ void RowArea::drawPinnedCenterKeys(QPainter &p, int r0, int r1) {
     if (tmp_pinnedCol != prev_pinnedCol) {
       prev_pinnedCol = tmp_pinnedCol;
       if (r != r0 - 1) {
-        QPoint mouseInCell = m_pos - m_viewer->positionToXY(CellPosition(r, 0));
+        QPoint topLeft = m_viewer->positionToXY(CellPosition(r, 0));
+        if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+        QPoint mouseInCell = m_pos - topLeft;
         if (keyRect.contains(mouseInCell))
           p.setBrush(QColor(30, 210, 255));
         else
           p.setBrush(QColor(0, 175, 255));
 
-        QPoint topLeft = m_viewer->positionToXY(CellPosition(r, 0));
         QRect adjusted = keyRect.translated(topLeft);
         p.drawRect(adjusted);
 
@@ -543,8 +556,9 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
     TPoint pos(event->pos().x(), event->pos().y());
     int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
 
-    int row            = m_viewer->xyToPosition(pos).frame();
-    QPoint topLeft     = m_viewer->positionToXY(CellPosition(row, 0));
+    int row        = m_viewer->xyToPosition(pos).frame();
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(row, 0));
+    if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
     QPoint mouseInCell = event->pos() - topLeft;
 
     if (Preferences::instance()->isOnionSkinEnabled() &&
@@ -657,8 +671,9 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
 
   int currentRow = TApp::instance()->getCurrentFrame()->getFrame();
   int row        = m_viewer->xyToPosition(m_pos).frame();
-  QPoint mouseInCell =
-      event->pos() - m_viewer->positionToXY(CellPosition(row, 0));
+  QPoint topLeft = m_viewer->positionToXY(CellPosition(row, 0));
+  if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+  QPoint mouseInCell = event->pos() - topLeft;
   if (row < 0) return;
   // whether to show ability to set onion marks
   if (Preferences::instance()->isOnionSkinEnabled() && row != currentRow) {
@@ -697,7 +712,9 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   update();
 
   QPoint base0 = m_viewer->positionToXY(CellPosition(m_r0, 0));
+  if (!m_viewer->orientation()->isVerticalTimeline()) base0.setY(0);
   QPoint base1 = m_viewer->positionToXY(CellPosition(m_r1, 0));
+  if (!m_viewer->orientation()->isVerticalTimeline()) base1.setY(0);
   QPainterPath startArrow =
       o->path(PredefinedPath::BEGIN_PLAY_RANGE).translated(base0);
   QPainterPath endArrow =
@@ -818,8 +835,9 @@ int RowArea::getNonEmptyCell(int row, int column, Direction direction) {
 void RowArea::mouseDoubleClickEvent(QMouseEvent *event) {
   int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
   int row          = m_viewer->xyToPosition(event->pos()).frame();
-  QPoint mouseInCell =
-      event->pos() - m_viewer->positionToXY(CellPosition(row, 0));
+  QPoint topLeft   = m_viewer->positionToXY(CellPosition(row, 0));
+  if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+  QPoint mouseInCell = event->pos() - topLeft;
   if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
       event->buttons() & Qt::LeftButton &&
       Preferences::instance()->isOnionSkinEnabled() && row == currentFrame &&
