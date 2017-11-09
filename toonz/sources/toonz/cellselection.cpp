@@ -1033,6 +1033,118 @@ public:
   int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
+//=============================================================================
+
+bool pasteNumbersWithoutUndo(int &r0, int &c0, int &r1, int &c1) {
+  TXsheet *xsh              = TApp::instance()->getCurrentXsheet()->getXsheet();
+  QClipboard *clipboard     = QApplication::clipboard();
+  const QMimeData *mimeData = clipboard->mimeData();
+  const TCellData *cellData = dynamic_cast<const TCellData *>(mimeData);
+
+  if (!cellData) return false;
+
+  if (r0 < 0 || c0 < 0) return false;
+
+  bool ret = cellData->getNumbers(xsh, r0, c0, r1, c1);
+  if (!ret) return false;
+
+  // Se la selezione corrente e' TCellSelection selezione le celle copiate
+  TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+      TApp::instance()->getCurrentSelection()->getSelection());
+  if (cellSelection) cellSelection->selectCells(r0, c0, r1, c1);
+  return true;
+}
+
+//=============================================================================
+
+class OverwritePasteNumbersUndo final : public TUndo {
+  TCellSelection *m_oldSelection;
+  TCellSelection *m_newSelection;
+  QMimeData *m_data;
+  QMimeData *m_beforeData;
+
+public:
+  OverwritePasteNumbersUndo(int r0, int c0, int r1, int c1, int oldR0,
+                            int oldC0, int oldR1, int oldC1,
+                            TCellData *beforeData) {
+    QClipboard *clipboard = QApplication::clipboard();
+    // keep the pasted data
+    TCellData *data = new TCellData();
+    TXsheet *xsh    = TApp::instance()->getCurrentXsheet()->getXsheet();
+    data->setCells(xsh, r0, c0, r1, c1);
+    m_data         = data->clone();
+    m_newSelection = new TCellSelection();
+    m_newSelection->selectCells(r0, c0, r1, c1);
+    m_oldSelection = new TCellSelection();
+    m_oldSelection->selectCells(oldR0, oldC0, oldR1, oldC1);
+    // keep the cells before pasting
+    m_beforeData = beforeData->clone();
+  }
+
+  ~OverwritePasteNumbersUndo() {
+    delete m_newSelection;
+    delete m_oldSelection;
+    delete m_data;
+    delete m_beforeData;
+  }
+
+  void undo() const override {
+    int r0, c0, r1, c1;
+    m_newSelection->getSelectedCells(r0, c0, r1, c1);
+
+    int oldR0, oldC0, oldR1, oldC1;
+    m_oldSelection->getSelectedCells(oldR0, oldC0, oldR1, oldC1);
+
+    QClipboard *clipboard = QApplication::clipboard();
+    int c0BeforeCut       = c0;
+    int c1BeforeCut       = c1;
+    cutCellsWithoutUndo(r0, c0, r1, c1);
+
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+
+    // keep the clipboard content
+    QMimeData *mimeData = cloneData(clipboard->mimeData());
+
+    // execute pasting
+    clipboard->setMimeData(cloneData(m_beforeData), QClipboard::Clipboard);
+    pasteCellsWithoutUndo(r0, c0, r1, c1, true, false, false);
+
+    // restore clipboard
+    clipboard->setMimeData(mimeData, QClipboard::Clipboard);
+
+    // revert old cell selection
+    TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+        TApp::instance()->getCurrentSelection()->getSelection());
+    if (cellSelection && oldR0 != -1 && oldC0 != -1)
+      cellSelection->selectCells(oldR0, oldC0, oldR1, oldC1);
+
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  void redo() const override {
+    int r0, c0, r1, c1;
+    m_newSelection->getSelectedCells(r0, c0, c1, r1);
+    QClipboard *clipboard = QApplication::clipboard();
+
+    // keep the clipboard content
+    QMimeData *mimeData = cloneData(clipboard->mimeData());
+
+    clipboard->setMimeData(cloneData(m_data), QClipboard::Clipboard);
+    // Cut delle celle che sono in newSelection
+    pasteCellsWithoutUndo(r0, c0, c1, r1, false, false);
+
+    // restore clipboard
+    clipboard->setMimeData(mimeData, QClipboard::Clipboard);
+
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override { return QObject::tr("Paste Numbers"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
+};
+
 //-----------------------------------------------------------------------------
 // if at least one of the cell in the range, return false
 bool checkIfCellsHaveTheSameContent(const int &r0, const int &c0, const int &r1,
@@ -1206,45 +1318,26 @@ void TCellSelection::enableCommands() {
   enableCommand(this, MI_Reframe4, &TCellSelection::reframe4Cells);
   enableCommand(this, MI_ReframeWithEmptyInbetweens,
                 &TCellSelection::reframeWithEmptyInbetweens);
+
+  enableCommand(this, MI_PasteNumbers, &TCellSelection::overwritePasteNumbers);
 }
 //-----------------------------------------------------------------------------
 // Used in RenameCellField::eventFilter()
 
 bool TCellSelection::isEnabledCommand(
     std::string commandId) {  // static function
-  static QList<std::string> commands = {MI_Autorenumber,
-                                        MI_Reverse,
-                                        MI_Swing,
-                                        MI_Random,
-                                        MI_Increment,
-                                        MI_ResetStep,
-                                        MI_IncreaseStep,
-                                        MI_DecreaseStep,
-                                        MI_Step2,
-                                        MI_Step3,
-                                        MI_Step4,
-                                        MI_Each2,
-                                        MI_Each3,
-                                        MI_Each4,
-                                        MI_Rollup,
-                                        MI_Rolldown,
-                                        MI_TimeStretch,
-                                        MI_CloneLevel,
-                                        MI_SetKeyframes,
-                                        MI_Copy,
-                                        MI_Paste,
-                                        MI_PasteInto,
-                                        MI_Cut,
-                                        MI_Clear,
-                                        MI_Insert,
-                                        MI_PasteInto,
-                                        MI_Reframe1,
-                                        MI_Reframe2,
-                                        MI_Reframe3,
-                                        MI_Reframe4,
-                                        MI_ReframeWithEmptyInbetweens,
-                                        MI_Undo,
-                                        MI_Redo};
+  static QList<std::string> commands = {
+      MI_Autorenumber, MI_Reverse,      MI_Swing,
+      MI_Random,       MI_Increment,    MI_ResetStep,
+      MI_IncreaseStep, MI_DecreaseStep, MI_Step2,
+      MI_Step3,        MI_Step4,        MI_Each2,
+      MI_Each3,        MI_Each4,        MI_Rollup,
+      MI_Rolldown,     MI_TimeStretch,  MI_CloneLevel,
+      MI_SetKeyframes, MI_Copy,         MI_Paste,
+      MI_PasteInto,    MI_Cut,          MI_Clear,
+      MI_Insert,       MI_Reframe1,     MI_Reframe2,
+      MI_Reframe3,     MI_Reframe4,     MI_ReframeWithEmptyInbetweens,
+      MI_Undo,         MI_Redo,         MI_PasteNumbers};
   return commands.contains(commandId);
 }
 
@@ -2085,6 +2178,75 @@ void TCellSelection::overWritePasteCells() {
     TUndoManager::manager()->add(
         new OverwritePasteCellsUndo(r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1,
                                     areColumnsEmpty, beforeData));
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+
+    delete beforeData;
+  } else
+    DVGui::error(QObject::tr("Cannot paste data \n Nothing to paste"));
+
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+}
+
+//-----------------------------------------------------------------------------
+// special paste command - overwrite paste cell numbers only
+
+void TCellSelection::overwritePasteNumbers() {
+  int r0, c0, r1, c1;
+  getSelectedCells(r0, c0, r1, c1);
+
+  QClipboard *clipboard     = QApplication::clipboard();
+  const QMimeData *mimeData = clipboard->mimeData();
+
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  if (const TCellData *cellData = dynamic_cast<const TCellData *>(mimeData)) {
+    if (isEmpty()) return;
+
+    if (cellData->getCellCount() == 0) {
+      DVGui::error(QObject::tr("No data to paste."));
+      return;
+    }
+
+    int oldR0 = r0;
+    int oldC0 = c0;
+    int oldR1 = r1;
+    int oldC1 = c1;
+
+    // Check if the copied cells are the same type as the target columns
+    if (!cellData->canChange(xsh, c0)) {
+      DVGui::error(
+          QObject::tr("It is not possible to paste the cells: "
+                      "Some column is locked or column type is not match."));
+      return;
+    }
+
+    // Check Circular References
+    int i;
+    for (i = 0; i < cellData->getCellCount(); i++) {
+      if (!xsh->checkCircularReferences(cellData->getCell(i))) continue;
+      DVGui::error(
+          QObject::tr("It is not possible to paste the cells: there is a "
+                      "circular reference."));
+      return;
+    }
+
+    // store celldata for undo
+    r1 = r0 + cellData->getRowCount() - 1;
+    if (cellData->getColCount() != 1 || c0 == c1)
+      c1                  = c0 + cellData->getColCount() - 1;
+    TCellData *beforeData = new TCellData();
+    beforeData->setCells(xsh, r0, c0, r1, c1);
+
+    bool isPaste = pasteNumbersWithoutUndo(r0, c0, r1, c1);
+
+    if (!isPaste) {
+      delete beforeData;
+      return;
+    }
+
+    // r0,c0,r1,c1 : pasted region  oldR0,oldC0,oldR1,oldC1 : selected area
+    // before pasting
+    TUndoManager::manager()->add(new OverwritePasteNumbersUndo(
+        r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1, beforeData));
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 
     delete beforeData;

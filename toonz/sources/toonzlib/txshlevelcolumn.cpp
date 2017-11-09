@@ -209,5 +209,103 @@ void TXshLevelColumn::saveData(TOStream &os) {
 }
 
 //-----------------------------------------------------------------------------
+// Used in TCellData::getNumbers
+bool TXshLevelColumn::setNumbers(int row, int rowCount,
+                                 const TXshCell cells[]) {
+  if (m_cells.empty()) return false;
+  // Check availability.
+  // - if source cells are all empty, do nothing
+  // - also, if source or target cells contain NO_FRAME, do nothing
+  bool isSrcAllEmpty = true;
+  for (int i = 0; i < rowCount; i++) {
+    // checking target cells
+    int currentTgtIndex = row + i - m_first;
+    if (currentTgtIndex < m_cells.size()) {
+      TXshCell tgtCell = m_cells[currentTgtIndex];
+      if (!tgtCell.isEmpty() && tgtCell.m_frameId == TFrameId::NO_FRAME)
+        return false;
+    }
+    // checking source cells
+    TXshCell srcCell = cells[i];
+    if (!srcCell.isEmpty()) {
+      if (srcCell.m_frameId == TFrameId::NO_FRAME) return false;
+      isSrcAllEmpty = false;
+    }
+  }
+  if (isSrcAllEmpty) return false;
+
+  // Find a level to input.
+  // If the first target cell is empty, search the upper cells, and lower cells
+  // and use a level of firsty-found ocupied neighbor cell.
+  TXshLevelP currentLevel;
+  int tmpIndex = std::min(row - m_first, (int)m_cells.size() - 1);
+  // search upper cells
+  while (tmpIndex >= 0) {
+    TXshCell tmpCell = m_cells[tmpIndex];
+    if (!tmpCell.isEmpty() && tmpCell.m_frameId != TFrameId::NO_FRAME) {
+      currentLevel = tmpCell.m_level;
+      break;
+    }
+    tmpIndex--;
+  }
+  // if not found any level in upper cells, then search the lower cells
+  if (!currentLevel) {
+    tmpIndex = std::max(row - m_first, 0);
+    while (tmpIndex < (int)m_cells.size()) {
+      TXshCell tmpCell = m_cells[tmpIndex];
+      if (!tmpCell.isEmpty() && tmpCell.m_frameId != TFrameId::NO_FRAME) {
+        currentLevel = tmpCell.m_level;
+        break;
+      }
+      tmpIndex++;
+    }
+    // in the case any level for input could not be found
+    if (!currentLevel) return false;
+  }
+
+  // Resize the cell container
+  int ra   = row;
+  int rb   = row + rowCount - 1;
+  int c_rb = m_first + m_cells.size() - 1;
+  if (row > c_rb) {
+    int newCellCount = row - m_first + rowCount;
+    m_cells.resize(newCellCount);
+  } else if (row < m_first) {
+    int delta = m_first - row;
+    m_cells.insert(m_cells.begin(), delta, TXshCell());
+    m_first = row;
+  }
+  if (rb > c_rb) {
+    for (int i = 0; i < rb - c_rb; ++i) m_cells.push_back(TXshCell());
+  }
+
+  // Paste numbers.
+  for (int i = 0; i < rowCount; i++) {
+    int dstIndex     = row - m_first + i;
+    TXshCell dstCell = m_cells[dstIndex];
+    TXshCell srcCell = cells[i];
+    if (srcCell.isEmpty()) {
+      m_cells[dstIndex] = TXshCell();
+    } else {
+      if (!dstCell.isEmpty()) currentLevel = dstCell.m_level;
+      m_cells[dstIndex] = TXshCell(currentLevel, srcCell.m_frameId);
+    }
+  }
+
+  // Update the cell container.
+  while (!m_cells.empty() && m_cells.back().isEmpty()) {
+    m_cells.pop_back();
+  }
+  while (!m_cells.empty() && m_cells.front().isEmpty()) {
+    m_cells.erase(m_cells.begin());
+    m_first++;
+  }
+  if (m_cells.empty()) {
+    m_first = 0;
+  }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
 
 PERSIST_IDENTIFIER(TXshLevelColumn, "levelColumn")

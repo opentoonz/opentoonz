@@ -2582,9 +2582,9 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
 
   if (isCellSelected) {
     menu.addAction(cmdManager->getAction(MI_LevelSettings));
+    menu.addSeparator();
 
     if (!soundCellsSelected) {
-      //- force reframe
       QMenu *reframeSubMenu = new QMenu(tr("Reframe"), this);
       {
         reframeSubMenu->addAction(cmdManager->getAction(MI_Reframe1));
@@ -2614,23 +2614,31 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
       }
       menu.addMenu(eachSubMenu);
 
-      menu.addSeparator();
+      QMenu *editCellNumbersMenu = new QMenu(tr("Edit Cell Numbers"), this);
+      {
+        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Reverse));
+        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Swing));
+        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Random));
+        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Dup));
+        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Rollup));
+        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Rolldown));
+        editCellNumbersMenu->addAction(cmdManager->getAction(MI_TimeStretch));
+        editCellNumbersMenu->addAction(
+            cmdManager->getAction(MI_AutoInputCellNumber));
+      }
+      menu.addMenu(editCellNumbersMenu);
 
-      menu.addAction(cmdManager->getAction(MI_Reverse));
-      menu.addAction(cmdManager->getAction(MI_Swing));
-      menu.addAction(cmdManager->getAction(MI_Random));
-      menu.addAction(cmdManager->getAction(MI_Dup));
-
-      menu.addAction(cmdManager->getAction(MI_Rollup));
-      menu.addAction(cmdManager->getAction(MI_Rolldown));
-      menu.addAction(cmdManager->getAction(MI_TimeStretch));
-      menu.addAction(cmdManager->getAction(MI_AutoInputCellNumber));
       menu.addSeparator();
       menu.addAction(cmdManager->getAction(MI_Autorenumber));
     }
-    menu.addAction(cmdManager->getAction(MI_ReplaceLevel));
 
-    menu.addAction(cmdManager->getAction(MI_ReplaceParentDirectory));
+    QMenu *replaceLevelMenu = new QMenu(tr("Replace Level"), this);
+    menu.addMenu(replaceLevelMenu);
+
+    replaceLevelMenu->addAction(cmdManager->getAction(MI_ReplaceLevel));
+
+    replaceLevelMenu->addAction(
+        cmdManager->getAction(MI_ReplaceParentDirectory));
 
     {
       // replace with another level in scene cast
@@ -2641,7 +2649,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
           ->getLevelSet()
           ->listLevels(levels);
       if (!levels.empty()) {
-        QMenu *replaceMenu = menu.addMenu(tr("Replace"));
+        QMenu *replaceMenu = replaceLevelMenu->addMenu(tr("Replace with"));
         connect(replaceMenu, SIGNAL(triggered(QAction *)), this,
                 SLOT(onReplaceByCastedLevel(QAction *)));
         for (int i = 0; i < (int)levels.size(); i++) {
@@ -2664,12 +2672,29 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
     if (!soundCellsSelected) {
       if (selectionContainTlvImage(m_viewer->getCellSelection(),
                                    m_viewer->getXsheet()))
-        menu.addAction(cmdManager->getAction(MI_RevertToCleanedUp));
+        replaceLevelMenu->addAction(
+            cmdManager->getAction(MI_RevertToCleanedUp));
       if (selectionContainLevelImage(m_viewer->getCellSelection(),
                                      m_viewer->getXsheet()))
-        menu.addAction(cmdManager->getAction(MI_RevertToLastSaved));
+        replaceLevelMenu->addAction(
+            cmdManager->getAction(MI_RevertToLastSaved));
       menu.addAction(cmdManager->getAction(MI_SetKeyframes));
     }
+    menu.addSeparator();
+
+    menu.addAction(cmdManager->getAction(MI_Cut));
+    menu.addAction(cmdManager->getAction(MI_Copy));
+    menu.addAction(cmdManager->getAction(MI_Paste));
+
+    QMenu *pasteSpecialMenu = new QMenu(tr("Paste Special"), this);
+    {
+      pasteSpecialMenu->addAction(cmdManager->getAction(MI_PasteInto));
+      pasteSpecialMenu->addAction(cmdManager->getAction(MI_PasteNumbers));
+    }
+    menu.addMenu(pasteSpecialMenu);
+
+    menu.addAction(cmdManager->getAction(MI_Clear));
+    menu.addAction(cmdManager->getAction(MI_Insert));
     menu.addSeparator();
 
     TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
@@ -2681,11 +2706,17 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
     menu.addSeparator();
     if (selectionContainRasterImage(m_viewer->getCellSelection(),
                                     m_viewer->getXsheet())) {
-      menu.addAction(cmdManager->getAction(MI_AdjustLevels));
-      menu.addAction(cmdManager->getAction(MI_LinesFade));
-      menu.addAction(cmdManager->getAction(MI_BrightnessAndContrast));
-      menu.addAction(cmdManager->getAction(MI_Antialias));
-      menu.addAction(cmdManager->getAction(MI_CanvasSize));
+      QMenu *editImageMenu = new QMenu(tr("Edit Image"), this);
+      {
+        editImageMenu->addAction(cmdManager->getAction(MI_AdjustLevels));
+        editImageMenu->addAction(cmdManager->getAction(MI_LinesFade));
+        editImageMenu->addAction(
+            cmdManager->getAction(MI_BrightnessAndContrast));
+        editImageMenu->addAction(cmdManager->getAction(MI_Antialias));
+        editImageMenu->addAction(cmdManager->getAction(MI_CanvasSize));
+      }
+      menu.addMenu(editImageMenu);
+
     } else if (selectionContainTlvImage(m_viewer->getCellSelection(),
                                         m_viewer->getXsheet()))
       menu.addAction(cmdManager->getAction(MI_CanvasSize));

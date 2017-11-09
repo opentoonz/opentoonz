@@ -1,1 +1,20 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="100%" height="100%" viewBox="0 0 21 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><rect x="2" y="1" width="1" height="15" style="fill:#c0c0c0;"/><rect x="1" y="14" width="18" height="1" style="fill:#c0c0c0;"/><rect x="4" y="5" width="1" height="1" style="fill:#c0c0c0;"/><rect x="6" y="5" width="1" height="1" style="fill:#c0c0c0;"/><rect x="8" y="5" width="1" height="1" style="fill:#c0c0c0;"/><rect x="13" y="8" width="1" height="1" style="fill:#c0c0c0;"/><rect x="13" y="10" width="1" height="1" style="fill:#c0c0c0;"/><rect x="13" y="12" width="1" height="1" style="fill:#c0c0c0;"/><path d="M15,4l0,3l-3,0l0,-3l3,0Zm-1,2l0,-1l-1,0l0,1l1,0Z" style="fill:#c0c0c0;"/><rect x="10" y="5" width="1" height="1" style="fill:#c0c0c0;"/></g></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="selectiontool_position.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 21 17"
+	 style="enable-background:new 0 0 21 17;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#C0C0C0;}
+</style>
+<rect id="rect6" x="2.5" y="1" class="st0" width="1" height="15"/>
+<rect id="rect8" x="1.5" y="14" class="st0" width="18" height="1"/>
+<rect id="rect10" x="4.5" y="5" class="st0" width="1" height="1"/>
+<rect id="rect12" x="6.5" y="5" class="st0" width="1" height="1"/>
+<rect id="rect14" x="8.5" y="5" class="st0" width="1" height="1"/>
+<rect id="rect16" x="13.5" y="8" class="st0" width="1" height="1"/>
+<rect id="rect18" x="13.5" y="10" class="st0" width="1" height="1"/>
+<rect id="rect20" x="13.5" y="12" class="st0" width="1" height="1"/>
+<path id="path22" inkscape:connector-curvature="0" class="st0" d="M15.5,4v3h-3V4H15.5z M14.5,6V5h-1v1H14.5z"/>
+<rect id="rect24" x="10.5" y="5" class="st0" width="1" height="1"/>
+</svg>

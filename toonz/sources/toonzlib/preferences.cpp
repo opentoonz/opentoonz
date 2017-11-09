@@ -305,6 +305,7 @@ Preferences::Preferences()
     , m_moveCurrentFrameByClickCellArea(true)
     , m_onionSkinEnabled(true)
     , m_onionSkinDuringPlayback(false)
+    , m_dropdownShortcutsCycleOptions(false)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
@@ -379,6 +380,8 @@ Preferences::Preferences()
   getValue(*m_settings, "autosaveOtherFilesEnabled",
            m_autosaveOtherFilesEnabled);
   getValue(*m_settings, "startupPopupEnabled", m_startupPopupEnabled);
+  getValue(*m_settings, "dropdownShortcutsCycleOptions",
+           m_dropdownShortcutsCycleOptions);
   getValue(*m_settings, "defaultViewerEnabled", m_defaultViewerEnabled);
   getValue(*m_settings, "rasterOptimizedMemory", m_rasterOptimizedMemory);
   getValue(*m_settings, "saveUnpaintedInCleanup", m_saveUnpaintedInCleanup);
@@ -1320,6 +1323,13 @@ void Preferences::enableLevelsBackup(bool enabled) {
 void Preferences::enableSceneNumbering(bool enabled) {
   m_sceneNumberingEnabled = enabled;
   m_settings->setValue("sceneNumberingEnabled", enabled ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setDropdownShortcutsCycleOptions(bool on) {
+  m_dropdownShortcutsCycleOptions = on;
+  m_settings->setValue("dropdownShortcutsCycleOptions", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

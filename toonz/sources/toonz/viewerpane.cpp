@@ -320,7 +320,7 @@ void SceneViewerPanel::hideEvent(QHideEvent *event) {
 void SceneViewerPanel::resizeEvent(QResizeEvent *e) {
   QWidget::resizeEvent(e);
   repaint();
-  m_sceneViewer->updateGL();
+  m_sceneViewer->update();
 }
 
 //-----------------------------------------------------------------------------
@@ -336,9 +336,9 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   // buttons for show / hide toggle for the field guide and the safe area
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(titleBar, ":Resources/pane_safe_off.svg",
-                                          ":Resources/pane_safe_over.svg",
-                                          ":Resources/pane_safe_on.svg");
+      new TPanelTitleBarButtonForSafeArea(
+          titleBar, ":Resources/pane_safe_off.svg",
+          ":Resources/pane_safe_over.svg", ":Resources/pane_safe_on.svg");
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
@@ -407,8 +407,8 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   // preview toggles
   m_previewButton = new TPanelTitleBarButton(
-      titleBar, ":Resources/pane_preview_off.svg", ":Resources/pane_preview_over.svg",
-      ":Resources/pane_preview_on.svg");
+      titleBar, ":Resources/pane_preview_off.svg",
+      ":Resources/pane_preview_over.svg", ":Resources/pane_preview_on.svg");
   x += 10 + iconWidth;
   titleBar->add(QPoint(x, 0), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
@@ -717,7 +717,7 @@ bool SceneViewerPanel::hasSoundtrack() {
   TXsheetHandle *xsheetHandle    = TApp::instance()->getCurrentXsheet();
   TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
   if (!m_sceneViewer->isPreviewEnabled()) prop->m_isPreview = true;
-  m_sound                        = xsheetHandle->getXsheet()->makeSound(prop);
+  m_sound = xsheetHandle->getXsheet()->makeSound(prop);
   if (m_sound == NULL) {
     m_hasSoundtrack = false;
     return false;

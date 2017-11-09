@@ -343,7 +343,7 @@ void SceneViewer::enterEvent(QEvent *) {
   }
 
   setFocus();
-  updateGL();
+  update();
 }
 
 //-----------------------------------------------------------------------------
@@ -864,7 +864,7 @@ bool SceneViewer::event(QEvent *e) {
   }
   */
 
-  return QGLWidget::event(e);
+  return QOpenGLWidget::event(e);
 }
 
 //-----------------------------------------------------------------------------

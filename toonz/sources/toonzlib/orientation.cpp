@@ -5,6 +5,7 @@
 #include <QPainterPath>
 #include <QBoxLayout>
 #include <math.h>
+#include <stdexcept>
 
 using std::pair;
 
