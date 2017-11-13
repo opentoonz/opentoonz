@@ -1745,8 +1745,7 @@ void MainWindow::defineActions() {
   createMenuLevelAction(MI_Renumber, tr("&Renumber..."), "");
   createMenuLevelAction(MI_ReplaceLevel, tr("&Replace Level..."), "");
   createMenuLevelAction(MI_RevertToCleanedUp, tr("&Revert to Cleaned Up"), "");
-  createMenuLevelAction(MI_RevertToLastSaved,
-                        tr("&Revert to Last Saved Version"), "");
+  createMenuLevelAction(MI_RevertToLastSaved, tr("&Reload"), "");
   createMenuLevelAction(MI_ExposeResource, tr("&Expose in Xsheet"), "");
   createMenuLevelAction(MI_EditLevel, tr("&Display in Level Strip"), "");
   createMenuLevelAction(MI_LevelSettings, tr("&Level Settings..."), "");

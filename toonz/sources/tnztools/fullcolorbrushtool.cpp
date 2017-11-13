@@ -51,6 +51,8 @@ TEnv::DoubleVar FullcolorMinOpacity("FullcolorMinOpacity", 100);
 TEnv::DoubleVar FullcolorMaxOpacity("FullcolorMaxOpacity", 100);
 TEnv::DoubleVar FullcolorModifierSize("FullcolorModifierSize", 0);
 TEnv::DoubleVar FullcolorModifierOpacity("FullcolorModifierOpacity", 100);
+TEnv::IntVar FullcolorModifierEraser("FullcolorModifierEraser", 0);
+TEnv::IntVar FullcolorModifierLockAlpha("FullcolorModifierLockAlpha", 0);
 
 //----------------------------------------------------------------------------------
 
@@ -115,6 +117,8 @@ FullColorBrushTool::FullColorBrushTool(std::string name)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_modifierSize("ModifierSize", -3, 3, 0, true)
     , m_modifierOpacity("ModifierOpacity", 0, 100, 100, true)
+    , m_modifierEraser("ModifierEraser", false)
+    , m_modifierLockAlpha("ModifierLockAlpha", false)
     , m_preset("Preset:")
     , m_minCursorThick(0)
     , m_maxCursorThick(0)
@@ -132,6 +136,8 @@ FullColorBrushTool::FullColorBrushTool(std::string name)
   m_prop.bind(m_opacity);
   m_prop.bind(m_modifierSize);
   m_prop.bind(m_modifierOpacity);
+  m_prop.bind(m_modifierEraser);
+  m_prop.bind(m_modifierLockAlpha);
   m_prop.bind(m_pressure);
   m_prop.bind(m_preset);
 
@@ -172,6 +178,8 @@ void FullColorBrushTool::updateTranslation() {
   m_preset.setQStringName(tr("Preset:"));
   m_modifierSize.setQStringName(tr("Size"));
   m_modifierOpacity.setQStringName(tr("Opacity"));
+  m_modifierEraser.setQStringName(tr("Eraser"));
+  m_modifierLockAlpha.setQStringName(tr("Lock Alpha"));
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -191,6 +199,8 @@ void FullColorBrushTool::onActivate() {
     m_hardness.setValue(FullcolorBrushHardness);
     m_modifierSize.setValue(FullcolorModifierSize);
     m_modifierOpacity.setValue(FullcolorModifierOpacity);
+    m_modifierEraser.setValue(FullcolorModifierEraser ? true : false);
+    m_modifierLockAlpha.setValue(FullcolorModifierLockAlpha ? true : false);
   }
 
   setWorkAndBackupImages();
@@ -566,6 +576,8 @@ bool FullColorBrushTool::onPropertyChanged(std::string propertyName) {
   FullcolorMaxOpacity          = m_opacity.getValue().second;
   FullcolorModifierSize        = m_modifierSize.getValue();
   FullcolorModifierOpacity     = m_modifierOpacity.getValue();
+  FullcolorModifierEraser      = m_modifierEraser.getValue() ? 1 : 0;
+  FullcolorModifierLockAlpha   = m_modifierLockAlpha.getValue() ? 1 : 0;
 
   updateCurrentStyle();
 
@@ -623,6 +635,8 @@ void FullColorBrushTool::loadPreset() {
     m_pressure.setValue(preset.m_pressure);
     m_modifierSize.setValue(preset.m_modifierSize);
     m_modifierOpacity.setValue(preset.m_modifierOpacity);
+    m_modifierEraser.setValue(preset.m_modifierEraser);
+    m_modifierLockAlpha.setValue(preset.m_modifierLockAlpha);
   } catch (...) {
   }
 }
@@ -633,14 +647,16 @@ void FullColorBrushTool::addPreset(QString name) {
   // Build the preset
   BrushData preset(name.toStdWString());
 
-  preset.m_min             = m_thickness.getValue().first;
-  preset.m_max             = m_thickness.getValue().second;
-  preset.m_hardness        = m_hardness.getValue();
-  preset.m_opacityMin      = m_opacity.getValue().first;
-  preset.m_opacityMax      = m_opacity.getValue().second;
-  preset.m_pressure        = m_pressure.getValue();
-  preset.m_modifierSize    = m_modifierSize.getValue();
-  preset.m_modifierOpacity = m_modifierOpacity.getValue();
+  preset.m_min               = m_thickness.getValue().first;
+  preset.m_max               = m_thickness.getValue().second;
+  preset.m_hardness          = m_hardness.getValue();
+  preset.m_opacityMin        = m_opacity.getValue().first;
+  preset.m_opacityMax        = m_opacity.getValue().second;
+  preset.m_pressure          = m_pressure.getValue();
+  preset.m_modifierSize      = m_modifierSize.getValue();
+  preset.m_modifierOpacity   = m_modifierOpacity.getValue();
+  preset.m_modifierEraser    = m_modifierEraser.getValue();
+  preset.m_modifierLockAlpha = m_modifierLockAlpha.getValue();
 
   // Pass the preset to the manager
   m_presetsManager.addPreset(preset);
@@ -826,8 +842,10 @@ void FullColorBrushTool::applyToonzBrushSettings(mypaint::Brush &mypaintBrush) {
   if (mypaintStyle) {
     const double precision = 1e-5;
 
-    double modifierSize    = m_modifierSize.getValue()*log(2.0);
-    double modifierOpacity = 0.01*m_modifierOpacity.getValue();
+    double modifierSize      = m_modifierSize.getValue()*log(2.0);
+    double modifierOpacity   = 0.01*m_modifierOpacity.getValue();
+    bool   modifierEraser    = m_modifierEraser.getValue();
+    bool   modifierLockAlpha = m_modifierLockAlpha.getValue();
 
     TPixelD color  = PixelConverter<TPixelD>::from(m_currentColor);
     double  colorH = 0.0;
@@ -845,6 +863,14 @@ void FullColorBrushTool::applyToonzBrushSettings(mypaint::Brush &mypaintBrush) {
     mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_H,  colorH/360.0);
     mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S,  colorS);
     mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V,  colorV);
+
+    if (modifierEraser) {
+      mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_ERASER, 1.0);
+      mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_LOCK_ALPHA, 0.0);
+    } else if (modifierLockAlpha) {
+      // lock-alpha already disables eraser
+      mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_LOCK_ALPHA, 1.0);
+    }
   } else {
     applyClassicToonzBrushSettings(mypaintBrush);
   }

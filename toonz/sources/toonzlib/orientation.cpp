@@ -1,10 +1,11 @@
 #include "orientation.h"
 #include "toonz/columnfan.h"
+#include "toonz/preferences.h"
 
 #include <QPainterPath>
 #include <QBoxLayout>
 #include <math.h>
-#include "toonz/preferences.h"
+#include <stdexcept>
 
 using std::pair;
 
@@ -82,7 +83,6 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_HEIGHT      = 12;
   const int SOUND_PREVIEW_HEIGHT = 6;
   const int FRAME_HEADER_HEIGHT  = 50;
-  //  const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = 0;
   const int ONION_X = 0, ONION_Y = 0;
   const int PLAY_RANGE_Y       = ONION_SIZE;
   const int ICON_WIDTH         = 20;

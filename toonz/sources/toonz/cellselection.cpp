@@ -1326,40 +1326,18 @@ void TCellSelection::enableCommands() {
 
 bool TCellSelection::isEnabledCommand(
     std::string commandId) {  // static function
-  static QList<std::string> commands = {MI_Autorenumber,
-                                        MI_Reverse,
-                                        MI_Swing,
-                                        MI_Random,
-                                        MI_Increment,
-                                        MI_ResetStep,
-                                        MI_IncreaseStep,
-                                        MI_DecreaseStep,
-                                        MI_Step2,
-                                        MI_Step3,
-                                        MI_Step4,
-                                        MI_Each2,
-                                        MI_Each3,
-                                        MI_Each4,
-                                        MI_Rollup,
-                                        MI_Rolldown,
-                                        MI_TimeStretch,
-                                        MI_CloneLevel,
-                                        MI_SetKeyframes,
-                                        MI_Copy,
-                                        MI_Paste,
-                                        MI_PasteInto,
-                                        MI_Cut,
-                                        MI_Clear,
-                                        MI_Insert,
-                                        MI_PasteInto,
-                                        MI_Reframe1,
-                                        MI_Reframe2,
-                                        MI_Reframe3,
-                                        MI_Reframe4,
-                                        MI_ReframeWithEmptyInbetweens,
-                                        MI_Undo,
-                                        MI_Redo,
-                                        MI_PasteNumbers};
+  static QList<std::string> commands = {
+      MI_Autorenumber, MI_Reverse,      MI_Swing,
+      MI_Random,       MI_Increment,    MI_ResetStep,
+      MI_IncreaseStep, MI_DecreaseStep, MI_Step2,
+      MI_Step3,        MI_Step4,        MI_Each2,
+      MI_Each3,        MI_Each4,        MI_Rollup,
+      MI_Rolldown,     MI_TimeStretch,  MI_CloneLevel,
+      MI_SetKeyframes, MI_Copy,         MI_Paste,
+      MI_PasteInto,    MI_Cut,          MI_Clear,
+      MI_Insert,       MI_Reframe1,     MI_Reframe2,
+      MI_Reframe3,     MI_Reframe4,     MI_ReframeWithEmptyInbetweens,
+      MI_Undo,         MI_Redo,         MI_PasteNumbers};
   return commands.contains(commandId);
 }
 

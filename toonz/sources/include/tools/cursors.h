@@ -60,42 +60,12 @@ enum {
 
   NormalEraserCursor,
   RectEraserCursor,
-  RectEraserCursorWhite,
-  FillCursorWhite,
-  TapeCursorWhite,
-  PickerCursorWhite,
-  PickerCursorWhiteLine,
-  PickerCursorWhiteArea,
   PickerCursorOrganize,
-  PickerCursorWhiteOrganize,
 
   PickerRGB,
   PickerRGBWhite,
 
-  FillCursorF,
-  FillCursorFWhite,
-  FillCursorP,
-  FillCursorPWhite,
-  FillCursorR,
-  FillCursorRWhite,
-
-  FillCursorA,
-  FillCursorAWhite,
-  FillCursorAF,
-  FillCursorAFWhite,
-  FillCursorAP,
-  FillCursorAPWhite,
-  FillCursorAR,
-  FillCursorARWhite,
-
   FillCursorL,
-  FillCursorLWhite,
-  FillCursorLF,
-  FillCursorLFWhite,
-  FillCursorLP,
-  FillCursorLPWhite,
-  FillCursorLR,
-  FillCursorLRWhite,
 
   MoveEWCursor,
   MoveNSCursor,
@@ -105,7 +75,15 @@ enum {
   ScaleHVCursor,
   FxGadgetCursor,
   RulerModifyCursor,
-  RulerNewCursor
+  RulerNewCursor,
+
+  // extra options for decorating the cursor
+  Ex_Negate    = 0x100,  // used for black bg
+  Ex_FreeHand  = 0x200,
+  Ex_PolyLine  = 0x400,
+  Ex_Rectangle = 0x800,
+  Ex_Line      = 0x1000,
+  Ex_Area      = 0x2000
 };
 
 }  // namespace
