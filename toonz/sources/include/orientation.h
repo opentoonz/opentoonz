@@ -107,8 +107,10 @@ enum class PredefinedRect {
   PEGBAR_NAME,         //! where to display pegbar name
   PARENT_HANDLE_NAME,  //! where to display parent handle number
   FILTER_COLOR,        //! where to show layer's filter color
-  CONFIG_AREA,  //! clickable area larger than the config icon, containing it
-  CONFIG        //! the config icon itself
+  CONFIG_AREA,     //! clickable area larger than the config icon, containing it
+  CONFIG,          //! the config icon itself
+  FRAME_DOT,       //! Cell's frame indicator
+  FRAME_INDICATOR  //! Row # indicator
 };
 enum class PredefinedLine {
   LOCKED,              //! dotted vertical line when cell is locked

@@ -525,6 +525,9 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
 
   QString m_xsheetLayout;
 
+  int m_frameZoomFactor;
+  QSlider *m_frameZoomSlider;
+
 public:
   enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
 
@@ -624,6 +627,11 @@ public:
   void drawPredefinedPath(QPainter &p, PredefinedPath which,
                           const CellPosition &pos, optional<QColor> fill,
                           optional<QColor> outline) const;
+
+  void XsheetViewer::drawPredefinedPath(QPainter &p, PredefinedPath which,
+                                        QPoint xy, optional<QColor> fill,
+                                        optional<QColor> outline) const;
+
   //---------
 
   void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
@@ -1128,6 +1136,13 @@ public slots:
 
   void onOrientationChanged(const Orientation *newOrientation);
   void onPrepareToScrollOffset(const QPoint &offset);
+
+  void setFrameZoomFactor(int f) { m_frameZoomFactor = f; }
+  int getFrameZoomFactor() const { return m_frameZoomFactor; }
+  int getFrameZoomAdjustment();
+
+  void onFrameZoomSliderValueChanged(int val);
+  void onFrameZoomSliderReleased();
 };
 
 #endif  // XSHEETVIEWER_H
