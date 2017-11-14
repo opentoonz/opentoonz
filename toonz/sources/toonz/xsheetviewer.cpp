@@ -706,11 +706,11 @@ int XsheetViewer::colToTimelineLayerAxis(int layer) const {
   if (!xsh) return 0;
   ColumnFan *fan = xsh->getColumnFan(o);
 
-  int yBottom =
-      o->colToLayerAxis(layer, fan) +
-      (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize() - 1);
+  int yBottom = o->colToLayerAxis(layer, fan) +
+                (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize()) -
+                1;
   int columnCount       = qMax(1, xsh->getColumnCount());
-  int layerHeightActual = o->colToLayerAxis(columnCount, fan);
+  int layerHeightActual = o->colToLayerAxis(columnCount, fan) - 1;
 
   return layerHeightActual - yBottom;
 }
@@ -1297,9 +1297,10 @@ void XsheetViewer::onCurrentColumnSwitched() {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::scrollToColumn(int col) {
-  int x0 = columnToLayerAxis(col);
-  int x1 =
-      columnToLayerAxis(col + (m_orientation->isVerticalTimeline() ? 1 : -1));
+  int colNext = col + (m_orientation->isVerticalTimeline() ? 1 : -1);
+  if (colNext < 0) colNext = 0;
+  int x0                   = columnToLayerAxis(col);
+  int x1                   = columnToLayerAxis(colNext);
 
   if (orientation()->isVerticalTimeline())
     scrollToHorizontalRange(x0, x1);
