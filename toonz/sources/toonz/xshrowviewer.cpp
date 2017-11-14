@@ -473,14 +473,16 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 //-----------------------------------------------------------------------------
 
 void RowArea::drawCurrentTimeIndicator(QPainter &p) {
+  int frameAdj   = m_viewer->getFrameZoomAdjustment();
   int currentRow = m_viewer->getCurrentRow();
 
   QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
   QRect header   = m_viewer->orientation()
                      ->rect(PredefinedRect::FRAME_HEADER)
+                     .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
                      .translated(topLeft);
 
-  int frameMid = header.left() + (header.width() / 2);
+  int frameMid = header.left() + (header.width() / 2) - 1;
   int frameTop = header.top() + 22;
 
   QPainterPath markerHead = m_viewer->orientation()
@@ -494,14 +496,16 @@ void RowArea::drawCurrentTimeIndicator(QPainter &p) {
 }
 
 void RowArea::drawCurrentTimeLine(QPainter &p) {
+  int frameAdj   = m_viewer->getFrameZoomAdjustment();
   int currentRow = m_viewer->getCurrentRow();
 
   QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
   QRect header   = m_viewer->orientation()
                      ->rect(PredefinedRect::FRAME_HEADER)
+                     .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
                      .translated(topLeft);
 
-  int frameMid    = header.left() + (header.width() / 2);
+  int frameMid    = header.left() + (header.width() / 2) - 1;
   int frameTop    = header.top();
   int frameBottom = header.bottom();
 
@@ -611,6 +615,8 @@ void RowArea::paintEvent(QPaintEvent *event) {
     // current frame
     drawCurrentRowGadget(p, r0, r1);
 
+  drawRows(p, r0, r1);
+
   if (TApp::instance()->getCurrentFrame()->isEditingScene()) {
     if (Preferences::instance()->isOnionSkinEnabled())
       drawOnionSkinSelection(p);
@@ -623,7 +629,7 @@ void RowArea::paintEvent(QPaintEvent *event) {
       drawCurrentTimeLine(p);
   }
 
-  drawRows(p, r0, r1);
+  //  drawRows(p, r0, r1);
 
   if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton)
     drawPinnedCenterKeys(p, r0, r1);

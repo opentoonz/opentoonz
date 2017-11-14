@@ -1365,10 +1365,12 @@ void CellArea::drawLockedDottedLine(QPainter &p, bool isLocked,
 }
 
 void CellArea::drawCurrentTimeIndicator(QPainter &p, const QPoint &xy) {
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
   QRect cell =
       m_viewer->orientation()->rect(PredefinedRect::CELL).translated(xy);
+  cell.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
 
-  int cellMid    = cell.left() + (cell.width() / 2);
+  int cellMid    = cell.left() + (cell.width() / 2) - 1;
   int cellTop    = cell.top();
   int cellBottom = cell.bottom();
 
@@ -1638,7 +1640,6 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   }
   TXshCell nextCell;
   nextCell = xsh->getCell(row + 1, col);
-
 
   int frameAdj   = m_viewer->getFrameZoomAdjustment();
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
