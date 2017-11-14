@@ -628,9 +628,9 @@ public:
                           const CellPosition &pos, optional<QColor> fill,
                           optional<QColor> outline) const;
 
-  void XsheetViewer::drawPredefinedPath(QPainter &p, PredefinedPath which,
-                                        QPoint xy, optional<QColor> fill,
-                                        optional<QColor> outline) const;
+  void drawPredefinedPath(QPainter &p, PredefinedPath which, QPoint xy,
+                          optional<QColor> fill,
+                          optional<QColor> outline) const;
 
   //---------
 
@@ -1092,6 +1092,8 @@ protected:
   void scrollToHorizontalRange(int x0, int x1);
   void scrollToRow(int row);
   void scrollToVerticalRange(int y0, int y1);
+
+  void paintEvent(QPaintEvent *) override;
 
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;

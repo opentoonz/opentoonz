@@ -416,7 +416,7 @@ void XsheetViewer::positionSections() {
     QRect sliderRect = QRect(0, 0, XsheetGUI::ZOOM_SLIDER_WIDTH,
                              XsheetGUI::SCROLLBAR_WIDTH - 2)
                            .translated(m_columnScrollArea->rect().right() -
-                                           XsheetGUI::ZOOM_SLIDER_WIDTH - 15,
+                                           XsheetGUI::ZOOM_SLIDER_WIDTH - 17,
                                        m_noteScrollArea->height() +
                                            m_columnScrollArea->height());
     m_frameZoomSlider->setGeometry(sliderRect);
@@ -964,12 +964,20 @@ void XsheetViewer::hideEvent(QHideEvent *) {
 
 //-----------------------------------------------------------------------------
 
-/*
-void XsheetViewer::paintEvent(QPaintEvent*)
-{
+void XsheetViewer::paintEvent(QPaintEvent *) {
   QPainter p(this);
-  //p.fillRect(visibleRegion().boundingRect().adjusted(1,1,-1,-1),QBrush(grey150));
-}*/
+
+  static QPixmap zoomIn  = svgToPixmap(":Resources/zoom_in.svg");
+  const QRect zoomInRect = QRect(m_frameZoomSlider->geometry().right() + 2,
+                                 m_frameZoomSlider->geometry().top(), 14, 14);
+  static QPixmap zoomOut  = svgToPixmap(":Resources/zoom_out.svg");
+  const QRect zoomOutRect = QRect(m_frameZoomSlider->geometry().left() - 16,
+                                  m_frameZoomSlider->geometry().top(), 14, 14);
+
+  p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+  p.drawPixmap(zoomInRect, zoomIn);
+  p.drawPixmap(zoomOutRect, zoomOut);
+}
 
 //-----------------------------------------------------------------------------
 
