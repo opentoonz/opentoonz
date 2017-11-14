@@ -1628,6 +1628,8 @@ public:
       col++;
       m_lastCol++;
       m_firstCol++;
+	  int currentIndx = app->getCurrentColumn()->getColumnIndex();
+	  app->getCurrentColumn()->setColumnIndex(currentIndx + 1);
     } else {
       int colCount = xsh->getColumnCount();
       if (origCol >= colCount) {
