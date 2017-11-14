@@ -173,8 +173,6 @@ public:
   void onRenderCompleted(int frame) override;
   void onPreviewUpdate() override;
 
-  void startForegroundDrawing() override;
-  void endForegroundDrawing() override;
   bool isPreviewEnabled() const { return m_previewMode != NO_PREVIEW; }
   int getPreviewMode() const { return m_previewMode; }
 

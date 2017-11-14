@@ -321,14 +321,16 @@ TopToBottomOrientation::TopToBottomOrientation() {
           QRect(PLAY_RANGE_X, 0, PLAY_MARKER_SIZE, CELL_HEIGHT));
   addRect(PredefinedRect::ONION,
           QRect(ONION_X + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2, ONION_Y,
-                ONION_SIZE, ONION_SIZE));
+                ONION_SIZE, ONION_SIZE)
+              .adjusted(2, 1, 2, 1));
   int adjustOnion = (ONION_SIZE - ONION_DOT_SIZE) / 2;
   addRect(PredefinedRect::ONION_DOT,
           QRect(ONION_X + ONION_DOT_SIZE, ONION_Y + adjustOnion, ONION_DOT_SIZE,
-                ONION_DOT_SIZE));
-  addRect(
-      PredefinedRect::ONION_DOT_FIXED,
-      QRect(ONION_X, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE));
+                ONION_DOT_SIZE)
+              .adjusted(1, 1, 1, 1));
+  addRect(PredefinedRect::ONION_DOT_FIXED,
+          QRect(ONION_X, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE)
+              .adjusted(1, 1, 1, 1));
   addRect(PredefinedRect::ONION_AREA,
           QRect(ONION_X, ONION_Y, PLAY_RANGE_X, CELL_HEIGHT));
   addRect(PredefinedRect::ONION_FIXED_DOT_AREA,
@@ -915,15 +917,19 @@ LeftToRightOrientation::LeftToRightOrientation() {
           QRect(0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
   addRect(PredefinedRect::ONION,
           QRect(ONION_X + (CELL_WIDTH - ONION_SIZE) / 2,
-                ONION_Y + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2, ONION_SIZE,
-                ONION_SIZE));
+			    ONION_Y + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2,
+                ONION_SIZE, ONION_SIZE)
+              .adjusted(1, 2, 1, 2));
   int adjustOnion = (ONION_SIZE - ONION_DOT_SIZE) / 2;
   addRect(PredefinedRect::ONION_DOT,
-          QRect(ONION_X + adjustOnion + (CELL_WIDTH - ONION_SIZE) / 2,
-                ONION_Y + ONION_DOT_SIZE, ONION_DOT_SIZE, ONION_DOT_SIZE));
+          QRect(ONION_X + adjustOnion + (CELL_WIDTH - ONION_SIZE) / 2, 
+			    ONION_Y + ONION_DOT_SIZE, ONION_DOT_SIZE,
+                ONION_DOT_SIZE)
+              .adjusted(1, 1, 1, 1));
   addRect(PredefinedRect::ONION_DOT_FIXED,
-          QRect(ONION_X + adjustOnion + (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y,
-                ONION_DOT_SIZE, ONION_DOT_SIZE));
+          QRect(ONION_X + adjustOnion + (CELL_WIDTH - ONION_SIZE) / 2,
+			    ONION_Y, ONION_DOT_SIZE, ONION_DOT_SIZE)
+              .adjusted(1, 1, 1, 1));
   addRect(PredefinedRect::ONION_AREA,
           QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_SIZE));
   addRect(PredefinedRect::ONION_FIXED_DOT_AREA,
@@ -1088,6 +1094,14 @@ LeftToRightOrientation::LeftToRightOrientation() {
   head.lineTo(QPointF(-4, -4));
   head.lineTo(QPointF(0, 0));
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
+
+  QPainterPath timeIndicator(QPointF(0, 0));
+  timeIndicator.lineTo(QPointF(-9, -5));
+  timeIndicator.lineTo(QPointF(-9, -18));
+  timeIndicator.lineTo(QPointF(9, -18));
+  timeIndicator.lineTo(QPointF(9, -4));
+  timeIndicator.lineTo(QPointF(0, 0));
+  addPath(PredefinedPath::TIME_INDICATOR_HEAD, timeIndicator);
 
   //
   // Points

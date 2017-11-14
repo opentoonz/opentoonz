@@ -191,6 +191,7 @@ private slots:
   void onInterfaceFontChanged(int index);
   void onInterfaceFontWeightChanged(int index);
   void onXsheetLayoutChanged(const QString &text);
+  void onShowCurrentTimelineChanged(int);
 };
 
 //**********************************************************************************

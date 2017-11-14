@@ -393,6 +393,7 @@ protected:
 
   void drawPolylineSelection();
   void drawRectSelection(const TImage *image);
+  void drawFreehandSelection();
   void drawCommandHandle(const TImage *image);
 
 public:

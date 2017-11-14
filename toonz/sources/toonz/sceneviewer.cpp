@@ -577,48 +577,6 @@ void SceneViewer::onPreviewUpdate() {
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::startForegroundDrawing() {
-  makeCurrent();
-  // setAutoBufferSwap(false);
-  update();  // needed?
-  glPushMatrix();
-  tglMultMatrix(getViewMatrix());
-
-  if (is3DView()) {
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_ALWAYS);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPushMatrix();
-    mult3DMatrix();
-  }
-
-  glDrawBuffer(GL_FRONT);
-
-  assert(glGetError() == GL_NO_ERROR);
-  m_foregroundDrawing = true;
-}
-
-//-----------------------------------------------------------------------------
-
-void SceneViewer::endForegroundDrawing() {
-  makeCurrent();
-  glFlush();
-  glDrawBuffer(GL_BACK);
-  glPopMatrix();
-
-  if (is3DView()) {
-    glDisable(GL_DEPTH_TEST);
-    glPopMatrix();
-    assert(glGetError() == GL_NO_ERROR);
-  }
-
-  // setAutoBufferSwap(true);
-  update();  // needed?
-  m_foregroundDrawing = false;
-}
-
-//-----------------------------------------------------------------------------
-
 void SceneViewer::setReferenceMode(int referenceMode) {
   if (m_referenceMode == referenceMode) return;
 
@@ -800,6 +758,7 @@ void SceneViewer::showEvent(QShowEvent *) {
     fitToCamera();
     m_shownOnce = true;
   }
+  TApp::instance()->setActiveViewer(this);
 }
 
 //-----------------------------------------------------------------------------

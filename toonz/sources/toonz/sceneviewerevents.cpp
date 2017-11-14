@@ -322,7 +322,8 @@ void SceneViewer::enterEvent(QEvent *) {
 
   m_isMouseEntered = true;
 
-  TApp *app        = TApp::instance();
+  TApp *app = TApp::instance();
+  app->setActiveViewer(this);
   modifiers        = 0;
   TTool *tool      = app->getCurrentTool()->getTool();
   TXshLevel *level = app->getCurrentLevel()->getLevel();

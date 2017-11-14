@@ -70,6 +70,7 @@
 #include "toonz/txshcell.h"
 #include "toonz/cleanupcolorstyles.h"
 #include "toonz/palettecmd.h"
+#include "toonz/preferences.h"
 #include "tw/stringtable.h"
 
 // TnzBase includes

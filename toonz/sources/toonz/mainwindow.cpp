@@ -2021,6 +2021,9 @@ void MainWindow::defineActions() {
   createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false,
                RightClickMenuCommandType);
 
+  createRightClickMenuAction(MI_ToggleCurrentTimeIndicator,
+                             tr("Toggle Current Time Indicator"), "");
+
   // createRightClickMenuAction(MI_LoadSubSceneFile,     tr("Load As
   // Sub-xsheet"),   "");
   // createRightClickMenuAction(MI_LoadResourceFile,     tr("Load"),

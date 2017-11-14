@@ -460,6 +460,11 @@ public:
     paint = m_transpCheckPaint;
   }
 
+  void enableCurrentTimelineIndicator(bool on);
+  bool isCurrentTimelineIndicatorEnabled() const {
+    return m_currentTimelineEnabled;
+  }
+
   // Version Control  tab
 
   void enableSVN(bool on);
@@ -614,6 +619,9 @@ private:
 
   QString m_xsheetLayoutPreference,
       m_loadedXsheetLayout;  // Classic, Classic-revised, compact
+
+  bool m_currentTimelineEnabled;
+
 private:
   Preferences();
   ~Preferences();

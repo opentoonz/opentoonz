@@ -1180,6 +1180,17 @@ void SelectionTool::drawPolylineSelection() {
 
 //-----------------------------------------------------------------------------
 
+void SelectionTool::drawFreehandSelection() {
+  if (m_track.isEmpty()) return;
+  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+                     ? TPixel32::White
+                     : TPixel32::Black;
+  tglColor(color);
+  m_track.drawAllFragments();
+}
+
+//-----------------------------------------------------------------------------
+
 void SelectionTool::drawRectSelection(const TImage *image) {
   const TVectorImage *vi   = dynamic_cast<const TVectorImage *>(image);
   unsigned short stipple   = 0x3F33;
@@ -1269,45 +1280,14 @@ void SelectionTool::startFreehand(const TPointD &pos) {
   m_firstPos       = pos;
   double pixelSize = getPixelSize();
   m_track.add(TThickPoint(pos, 0), pixelSize * pixelSize);
-  TPointD dpiScale = m_viewer->getDpiScale();
-#if defined(MACOSX)
-//			m_viewer->prepareForegroundDrawing();
-#endif
-  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                     ? TPixel32::White
-                     : TPixel32::Black;
-  tglColor(color);
-  m_viewer->startForegroundDrawing();
-  glPushMatrix();
-  tglMultMatrix(getMatrix());
-  glScaled(dpiScale.x, dpiScale.y, 1);
-  m_track.drawLastFragments();
-  glPopMatrix();
-  m_viewer->endForegroundDrawing();
 }
 
 //-----------------------------------------------------------------------------
 
 //! Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
 void SelectionTool::freehandDrag(const TPointD &pos) {
-#if defined(MACOSX)
-//		m_viewer->enableRedraw(false);
-#endif
-
   double pixelSize = getPixelSize();
-  m_viewer->startForegroundDrawing();
-  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                     ? TPixel32::White
-                     : TPixel32::Black;
-  tglColor(color);
-  glPushMatrix();
-  tglMultMatrix(getMatrix());
-  TPointD dpiScale = m_viewer->getDpiScale();
-  glScaled(dpiScale.x, dpiScale.y, 1);
   m_track.add(TThickPoint(pos, 0), pixelSize * pixelSize);
-  m_track.drawLastFragments();
-  glPopMatrix();
-  m_viewer->endForegroundDrawing();
 }
 
 //-----------------------------------------------------------------------------
@@ -1315,9 +1295,6 @@ void SelectionTool::freehandDrag(const TPointD &pos) {
 //! Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato
 //! lo stroke rappresentante il lazzo.
 void SelectionTool::closeFreehand(const TPointD &pos) {
-#if defined(MACOSX)
-//		m_viewer->enableRedraw(true);
-#endif
   if (m_track.isEmpty()) return;
   double pixelSize = getPixelSize();
   m_track.add(TThickPoint(m_firstPos, 0), pixelSize * pixelSize);
@@ -1333,28 +1310,7 @@ void SelectionTool::closeFreehand(const TPointD &pos) {
 void SelectionTool::addPointPolyline(const TPointD &pos) {
   m_firstPos      = pos;
   m_mousePosition = pos;
-
-  TPointD dpiScale = m_viewer->getDpiScale();
-
-#if defined(MACOSX)
-//		 m_viewer->prepareForegroundDrawing();
-#endif
-  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                     ? TPixel32::White
-                     : TPixel32::Black;
-  tglColor(color);
-  m_viewer->startForegroundDrawing();
-
-#if defined(MACOSX)
-//  		m_viewer->enableRedraw(m_strokeSelectionType.getValue() ==
-//  POLYLINE_SELECTION);
-#endif
-
-  glPushMatrix();
-  glScaled(dpiScale.x, dpiScale.y, 1);
   m_polyline.push_back(pos);
-  glPopMatrix();
-  m_viewer->endForegroundDrawing();
 }
 
 //-----------------------------------------------------------------------------
