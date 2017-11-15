@@ -342,6 +342,13 @@ public:
   void setVectorSnappingTarget(int target);
   int getVectorSnappingTarget() { return m_vectorSnappingTarget; }
 
+  // Tools Tab
+
+  void setDropdownShortcutsCycleOptions(bool on);
+  bool getDropdownShortcutsCycleOptions() {
+    return m_dropdownShortcutsCycleOptions;
+  }
+
   // Xsheet  tab
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
                                  //! step</I> commands.
@@ -459,6 +466,11 @@ public:
     paint = m_transpCheckPaint;
   }
 
+  void enableCurrentTimelineIndicator(bool on);
+  bool isCurrentTimelineIndicatorEnabled() const {
+    return m_currentTimelineEnabled;
+  }
+
   // Version Control  tab
 
   void enableSVN(bool on);
@@ -510,6 +522,7 @@ Q_SIGNALS:
 
   void stopAutoSave();
   void startAutoSave();
+  void autoSavePeriodChanged();
 
 private:
   std::unique_ptr<QSettings> m_settings;
@@ -560,6 +573,7 @@ private:
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,
       m_actualPixelViewOnSceneEditingMode;
+  bool m_dropdownShortcutsCycleOptions;
   int m_viewerZoomCenter;  // MOUSE_CURSOR = 0, VIEWER_CENTER = 1
   // used in the load level popup. ON_DEMAND = 0, ALL_ICONS = 1,
   // ALL_ICONS_AND_IMAGES = 2
@@ -613,6 +627,9 @@ private:
 
   QString m_xsheetLayoutPreference,
       m_loadedXsheetLayout;  // Classic, Classic-revised, compact
+
+  bool m_currentTimelineEnabled;
+
 private:
   Preferences();
   ~Preferences();

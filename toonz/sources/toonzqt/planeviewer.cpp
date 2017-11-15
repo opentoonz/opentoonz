@@ -130,9 +130,11 @@ void PlaneViewer::drawBackground() {
 
 //=========================================================================================
 
-void PlaneViewer::initializeGL() {}
+void PlaneViewer::initializeGL() { initializeOpenGLFunctions(); }
 
 void PlaneViewer::resizeGL(int width, int height) {
+  width *= getDevPixRatio();
+  height *= getDevPixRatio();
   glViewport(0, 0, width, height);
 
   glMatrixMode(GL_PROJECTION);
@@ -189,7 +191,7 @@ void PlaneViewer::wheelEvent(QWheelEvent *event) {
 void PlaneViewer::keyPressEvent(QKeyEvent *event) {
   if (PlaneViewerZoomer(this).exec(event)) return;
 
-  QGLWidget::keyPressEvent(event);
+  QOpenGLWidget::keyPressEvent(event);
 }
 
 //------------------------------------------------------

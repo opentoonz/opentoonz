@@ -188,7 +188,7 @@ Please select a different device or check the microphone.</source>
     <message>
         <location filename="../../toonz/scanpopup.cpp" line="542"/>
         <source>Field Guide:</source>
-        <translation>Гид поля:</translation>
+        <translation>Направляющая сетка:</translation>
     </message>
 </context>
 <context>
@@ -952,7 +952,7 @@ What do you want to do?</source>
     <message>
         <location filename="../../toonz/cleanupsettingspopup.cpp" line="93"/>
         <source>Field Guide:</source>
-        <translation>Гид поля:</translation>
+        <translation>Направляющая сетка:</translation>
     </message>
     <message>
         <location filename="../../toonz/cleanupsettingspopup.cpp" line="111"/>
@@ -1070,7 +1070,7 @@ What do you want to do?</source>
     <message>
         <location filename="../../toonz/comboviewerpane.cpp" line="458"/>
         <source>Field Guide</source>
-        <translation>Гид поля</translation>
+        <translation>Направляющая сетка</translation>
     </message>
     <message>
         <location filename="../../toonz/comboviewerpane.cpp" line="474"/>
@@ -1359,7 +1359,7 @@ before color designing.</source>
     <message>
         <location filename="../../toonz/convertpopup.cpp" line="612"/>
         <source>Tolerance:</source>
-        <translation>Толерантность:</translation>
+        <translation>Допуск:</translation>
     </message>
     <message>
         <location filename="../../toonz/convertpopup.cpp" line="766"/>
@@ -2629,7 +2629,7 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../../toonz/levelcreatepopup.cpp" line="237"/>
         <source>Increment:</source>
-        <translation>Инкремент:</translation>
+        <translation>Прирост:</translation>
     </message>
     <message>
         <location filename="../../toonz/levelcreatepopup.cpp" line="242"/>
@@ -2654,7 +2654,7 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../../toonz/levelcreatepopup.cpp" line="450"/>
         <source>Invalid increment value</source>
-        <translation>Недопустимое значение инкремента</translation>
+        <translation>Недопустимое значение прироста</translation>
     </message>
     <message>
         <location filename="../../toonz/levelcreatepopup.cpp" line="454"/>
@@ -2809,7 +2809,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/linetestcapturepane.cpp" line="891"/>
         <source>Increment:</source>
-        <translation>Инкремент:</translation>
+        <translation>Прирост:</translation>
     </message>
     <message>
         <location filename="../../toonz/linetestcapturepane.cpp" line="903"/>
@@ -4157,7 +4157,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1797"/>
         <source>&amp;Field Guide</source>
-        <translation>&amp;Гид поля</translation>
+        <translation>&amp;Направляющая сетка</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1799"/>
@@ -4167,7 +4167,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1802"/>
         <source>&amp;Field Guide in Capture Window</source>
-        <translation>&amp;Гид поля в окне захвата</translation>
+        <translation>&amp;Направляющая сетка в окне захвата</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1806"/>
@@ -4363,7 +4363,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1880"/>
         <source>Toggle Autofill on Current Palette Color</source>
-        <translation>Переключить автозаполнение на текущий цвет палитры</translation>
+        <translation>Переключить автозаливку на текущий цвет палитры</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1883"/>
@@ -4603,7 +4603,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1964"/>
         <source>Select All Keys in this Column</source>
-        <translation>Выделить все ключи в этой колонке</translation>
+        <translation>Выделить все ключи в этом столбце</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1965"/>
@@ -4623,12 +4623,12 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1971"/>
         <source>Select Previous Keys in this Column</source>
-        <translation>Выделить предыдущие ключи в этой колонке</translation>
+        <translation>Выделить предыдущие ключи в этом столбце</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1973"/>
         <source>Select Following Keys in this Column</source>
-        <translation>Выделить все следующие ключи в этой колонке</translation>
+        <translation>Выделить все следующие ключи в этом столбце</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1975"/>
@@ -4668,7 +4668,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1987"/>
         <source>Fold Column</source>
-        <translation>Свернуть колонки</translation>
+        <translation>Свернуть столбцы</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1989"/>
@@ -4763,7 +4763,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2018"/>
         <source>Hide Upper Columns</source>
-        <translation>Скрыть верхние колонки</translation>
+        <translation>Скрыть верхние столбцы</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2020"/>
@@ -4818,7 +4818,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2030"/>
         <source>RGB Picker Tool</source>
-        <translation>Инструмент RGB Picker</translation>
+        <translation>Инструмент RGB пипетка</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2032"/>
@@ -4828,7 +4828,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2033"/>
         <source>Pinch Tool</source>
-        <translation>Пинч</translation>
+        <translation>Щипок</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2034"/>
@@ -5068,7 +5068,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2100"/>
         <source>Auto Fill</source>
-        <translation>Автозаполнение</translation>
+        <translation>Автозаливка</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2101"/>
@@ -5163,7 +5163,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2131"/>
         <source>Active Axis - Position</source>
-        <translation>Активная ось - позиция</translation>
+        <translation>Активная ось - расположение</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2133"/>
@@ -5208,7 +5208,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2150"/>
         <source>Column Pick Mode</source>
-        <translation>Режим выбора колонки</translation>
+        <translation>Режим выбора столбца</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2152"/>
@@ -5223,7 +5223,7 @@ Do you want to create it?</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2154"/>
         <source>Create Mesh</source>
-        <translation>Создать сетку</translation>
+        <translation>Создать полисетку</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2157"/>
@@ -5383,12 +5383,12 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="424"/>
         <source>It is not possible to merge tlv columns because no column was selected.</source>
-        <translation>Невозможно объединить колонки tlv, потому что не была выбрана колонка.</translation>
+        <translation>Невозможно объединить столбцы tlv, потому что не выбран столбец.</translation>
     </message>
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="433"/>
         <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
-        <translation>Невозможно объединить колонки tlv, потому что нужно выбрать как минимум две колонки.</translation>
+        <translation>Невозможно объединить столбцы tlv, потому что нужно выбрать как минимум два столбца.</translation>
     </message>
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="462"/>
@@ -5436,12 +5436,12 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="116"/>
         <source>It is not possible to execute the merge column command because no column was selected.</source>
-        <translation>Невозможно выполнить команду слияния колонок, потому что не была выбрана колонка.</translation>
+        <translation>Невозможно выполнить команду слияния столбцов, потому что не выбран столбец.</translation>
     </message>
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="123"/>
         <source>It is not possible to execute the merge column command  because only one columns is  selected.</source>
-        <translation>Невозможно выполнить команду слияния, поскольку выбрана только одна колонка.</translation>
+        <translation>Невозможно выполнить команду слияния столбцов, потому что выбран только один столбец.</translation>
     </message>
 </context>
 <context>
@@ -5471,12 +5471,12 @@ What do you want to do?</source>
     <message>
         <location filename="../../toonz/meshifypopup.cpp" line="604"/>
         <source>Create Mesh</source>
-        <translation>Создать сетку</translation>
+        <translation>Создать полисетку</translation>
     </message>
     <message>
         <location filename="../../toonz/meshifypopup.cpp" line="640"/>
         <source>Mesh Edges Length:</source>
-        <translation>Длина кромки сетки:</translation>
+        <translation>Длина кромки полисетки:</translation>
     </message>
     <message>
         <location filename="../../toonz/meshifypopup.cpp" line="651"/>
@@ -5486,7 +5486,7 @@ What do you want to do?</source>
     <message>
         <location filename="../../toonz/meshifypopup.cpp" line="661"/>
         <source>Mesh Margin (pixels):</source>
-        <translation>Край сетки (пиксели):</translation>
+        <translation>Край полисетки (пиксели):</translation>
     </message>
     <message>
         <location filename="../../toonz/meshifypopup.cpp" line="692"/>
@@ -5496,17 +5496,17 @@ What do you want to do?</source>
     <message>
         <location filename="../../toonz/meshifypopup.cpp" line="941"/>
         <source>Mesh Creation in progress...</source>
-        <translation>Создание сетки выполняется...</translation>
+        <translation>Создание полисетки выполняется...</translation>
     </message>
     <message>
         <location filename="../../toonz/meshifypopup.cpp" line="1286"/>
         <source>Current selection contains mixed image and mesh level types</source>
-        <translation>Текущий выбор содержит смешанные изображения и типы уровней сетки</translation>
+        <translation>Текущий выбор содержит смешанные изображения и типы уровней полисетки</translation>
     </message>
     <message>
         <location filename="../../toonz/meshifypopup.cpp" line="1291"/>
         <source>Current selection contains no image or mesh level types</source>
-        <translation>Текущий выбор не содержит типов изображений или типов сетки</translation>
+        <translation>Текущий выбор не содержит типов изображений или типов полисетки</translation>
     </message>
 </context>
 <context>
@@ -6259,7 +6259,7 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../../toonz/penciltestpopup.cpp" line="607"/>
         <source>Show This on Launch of the Camera Capture</source>
-        <translation>Показать это при запуске захвата камеры</translation>
+        <translation>Показать это окно при запуске захвата камеры</translation>
     </message>
     <message>
         <location filename="../../toonz/penciltestpopup.cpp" line="609"/>
@@ -6482,7 +6482,7 @@ Is it OK to release these shortcuts?</source>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1032"/>
         <source>Show Startup Window when OpenToonz Starts</source>
-        <translation>Показать окно запуска при запуске OpenToonz</translation>
+        <translation>Показывать стартовое окно при запуске OpenToonz</translation>
     </message>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1035"/>
@@ -6621,7 +6621,7 @@ Is it OK to release these shortcuts?</source>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1144"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Правка</translation>
     </message>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1149"/>
@@ -6646,7 +6646,7 @@ Is it OK to release these shortcuts?</source>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1168"/>
         <source>Multi Layer Style Picker : Switch Levels by Picking</source>
-        <translation>Multi Layer Style Picker: Переключение уровней путем выбора</translation>
+        <translation>Многоуровневая пипетка: Переключение уровней путем выбора</translation>
     </message>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1170"/>
@@ -6656,7 +6656,7 @@ Is it OK to release these shortcuts?</source>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1172"/>
         <source>Minimize Savebox after Editing</source>
-        <translation>Минимизировать Savebox после редактирования</translation>
+        <translation>Минимизировать Savebox после правки</translation>
     </message>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1174"/>
@@ -6676,7 +6676,7 @@ Is it OK to release these shortcuts?</source>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1185"/>
         <source>Ignore Alpha Channel on Levels in Column 1</source>
-        <translation>Игнорировать альфа-канал на уровнях в колонке 1</translation>
+        <translation>Игнорировать альфа-канал на уровнях в столбце 1</translation>
     </message>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1187"/>
@@ -6768,7 +6768,7 @@ Is it OK to release these shortcuts?</source>
         <location filename="../../toonz/preferencespopup.cpp" line="1262"/>
         <location filename="../../toonz/preferencespopup.cpp" line="1442"/>
         <source>Cells and Column Data</source>
-        <translation>Ячейки и данные колонок</translation>
+        <translation>Ячейки и данные столбцов</translation>
     </message>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1301"/>
@@ -6998,7 +6998,7 @@ Is it OK to release these shortcuts?</source>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1732"/>
         <source>Column Icon</source>
-        <translation>Иконка колонки</translation>
+        <translation>Иконка столбца</translation>
     </message>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1736"/>
@@ -7364,12 +7364,12 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../../toonz/psdsettingspopup.cpp" line="191"/>
         <source>Expose layers in a group as columns in a sub-xsheet</source>
-        <translation>Выставлять слои в группе в виде колонок в sub-xsheet</translation>
+        <translation>Выставлять слои в группе в виде столбцов в sub-xsheet</translation>
     </message>
     <message>
         <location filename="../../toonz/psdsettingspopup.cpp" line="193"/>
         <source>Expose layers in a group as frames in a column</source>
-        <translation>Выставлять слои в группе в виде кадров в колонке</translation>
+        <translation>Выставлять слои в группе в виде кадров в столбце</translation>
     </message>
 </context>
 <context>
@@ -7887,7 +7887,7 @@ Are you sure ?</source>
         <location filename="../../toonz/subscenecommand.cpp" line="2138"/>
         <location filename="../../toonz/subscenecommand.cpp" line="2243"/>
         <source>Collapsing columns: what you want to do?</source>
-        <translation>Коллапс колонок: что вы хотите сделать?</translation>
+        <translation>Коллапс столбцов: что вы хотите сделать?</translation>
     </message>
     <message>
         <location filename="../../toonz/subscenecommand.cpp" line="2142"/>
@@ -7899,7 +7899,7 @@ Are you sure ?</source>
         <location filename="../../toonz/subscenecommand.cpp" line="2143"/>
         <location filename="../../toonz/subscenecommand.cpp" line="2247"/>
         <source>Include only selected columns in the sub-xsheet.</source>
-        <translation>Включите только выбранные колонки в под-xsheet.</translation>
+        <translation>Включите только выбранные столбцы в под-xsheet.</translation>
     </message>
     <message>
         <location filename="../../toonz/subscenecommand.cpp" line="2316"/>
@@ -7914,7 +7914,7 @@ Are you sure ?</source>
     <message>
         <location filename="../../toonz/subscenecommand.cpp" line="2319"/>
         <source>Bring only columns in the main xsheet.</source>
-        <translation>Поместить только колонки в основной xsheet.</translation>
+        <translation>Поместить только столбцы в основной xsheet.</translation>
     </message>
     <message>
         <location filename="../../toonz/levelcommand.cpp" line="58"/>
@@ -8300,22 +8300,22 @@ Are you sure you want to revert to previous version?</source>
     <message>
         <location filename="../../toonz/columncommand.cpp" line="259"/>
         <source>It is not possible to paste the columns: there is a circular reference.</source>
-        <translation>Вставить колонки невозможно: имеется круговой референс.</translation>
+        <translation>Вставить столбцы невозможно: имеется круговой референс.</translation>
     </message>
     <message>
         <location filename="../../toonz/columncommand.cpp" line="518"/>
         <source>Paste Column :  </source>
-        <translation>Всавить колонку :  </translation>
+        <translation>Всавить столбец :  </translation>
     </message>
     <message>
         <location filename="../../toonz/columncommand.cpp" line="615"/>
         <source>Delete Column :  </source>
-        <translation>Удалить колонку :  </translation>
+        <translation>Удалить столбец :  </translation>
     </message>
     <message>
         <location filename="../../toonz/columncommand.cpp" line="662"/>
         <source>Insert Column :  </source>
-        <translation>Вставить колонку :  </translation>
+        <translation>Вставить столбец :  </translation>
     </message>
     <message>
         <location filename="../../toonz/columncommand.cpp" line="906"/>
@@ -8350,7 +8350,7 @@ Are you sure you want to revert to previous version?</source>
     <message>
         <location filename="../../toonz/cellselectioncommand.cpp" line="234"/>
         <source>Invalid selection: each selected column must contain one single level with increasing frame numbering.</source>
-        <translation>Недопустимый выбор: каждая выбранная колонка должна содержать один единственный уровень с увеличением нумерации кадров.</translation>
+        <translation>Недопустимый выбор: каждый выбранный столбец должен содержать один единственный уровень с увеличением нумерации кадров.</translation>
     </message>
     <message>
         <location filename="../../toonz/cellselectioncommand.cpp" line="266"/>
@@ -8621,7 +8621,7 @@ Are you sure?</source>
     <message>
         <location filename="../../toonz/levelcreatepopup.cpp" line="145"/>
         <source>Create Level %1  at Column %2</source>
-        <translation>Создать уровень %1 в колонке %2</translation>
+        <translation>Создать уровень %1 в столбце %2</translation>
     </message>
     <message>
         <location filename="../../toonz/filebrowserpopup.cpp" line="224"/>
@@ -8882,7 +8882,7 @@ The operation cannot be undone: are you sure?</source>
         <location filename="../../toonz/cellselection.cpp" line="1121"/>
         <location filename="../../toonz/xshcellviewer.cpp" line="477"/>
         <source>Rename Cell  at Column %1  Frame %2</source>
-        <translation>Переименовать ячейку в колонке %1 Кадр %2</translation>
+        <translation>Переименовать ячейку в столбце %1 Кадр %2</translation>
     </message>
     <message>
         <location filename="../../toonz/cellselection.cpp" line="1388"/>
@@ -8952,7 +8952,7 @@ The operation cannot be undone: are you sure?</source>
     <message>
         <location filename="../../toonz/xsheetdragtool.cpp" line="1546"/>
         <source>Move Columns</source>
-        <translation>Переместить колонки</translation>
+        <translation>Переместить столбцы</translation>
     </message>
     <message>
         <location filename="../../toonz/xsheetdragtool.cpp" line="1647"/>
@@ -9080,7 +9080,7 @@ The operation cannot be undone: are you sure?</source>
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="198"/>
         <source>It is not possible to merge tlv columns containing more than one level</source>
-        <translation>Невозможно объединить колонки tlv, содержащие более одного уровня</translation>
+        <translation>Невозможно объединить столбцы tlv, содержащие более одного уровня</translation>
     </message>
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="208"/>
@@ -9092,7 +9092,7 @@ The operation cannot be undone: are you sure?</source>
         <location filename="../../toonz/matchlinecommand.cpp" line="523"/>
         <location filename="../../toonz/matchlinecommand.cpp" line="553"/>
         <source>It is not possible to delete lines because no column, cell or level strip frame was selected.</source>
-        <translation>Невозможно удалить строки, потому что не выбрана ни одна колонка, ячейка или кадр Level Strip.</translation>
+        <translation>Невозможно удалить строки, потому что не выбран ни один столбец, ячейка или кадр Level Strip.</translation>
     </message>
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="531"/>
@@ -9102,7 +9102,7 @@ The operation cannot be undone: are you sure?</source>
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="541"/>
         <source>Selected cells must be in the same column.</source>
-        <translation>Выбранные ячейки должны находиться в однй колонке.</translation>
+        <translation>Выбранные ячейки должны находиться в одном столбце.</translation>
     </message>
     <message>
         <location filename="../../toonz/matchlinecommand.cpp" line="558"/>
@@ -9189,7 +9189,7 @@ The operation cannot be undone: are you sure?</source>
         <location filename="../../toonz/mergecolumns.cpp" line="310"/>
         <location filename="../../toonz/mergecolumns.cpp" line="319"/>
         <source>It is not possible to perform a merging involving more than one level per column.</source>
-        <translation>Невозможно выполнить слияние, включающее более одного уровня в колонке.</translation>
+        <translation>Невозможно выполнить слияние, включающее более одного уровня в столбце.</translation>
     </message>
     <message>
         <location filename="../../toonz/mergecolumns.cpp" line="338"/>
@@ -9249,17 +9249,17 @@ The operation cannot be undone: are you sure?</source>
         <location filename="../../toonz/matchline.cpp" line="631"/>
         <source>Apply Matchline  : Column%1 &lt; Column%2</source>
         <translatorcomment>что за за наклон??</translatorcomment>
-        <translation>Применить Matchline: Колонка %1 &lt; Колонка %2</translation>
+        <translation>Применить Matchline: Столбец %1 &lt; Столбец %2</translation>
     </message>
     <message>
         <location filename="../../toonz/matchline.cpp" line="699"/>
         <source>It is not possible to apply match lines to a column containing more than one level.</source>
-        <translation>Невозможно применить Match lines к колонке, содержащему более одного уровня.</translation>
+        <translation>Невозможно применить Match lines к столбцу, содержащему более одного уровня.</translation>
     </message>
     <message>
         <location filename="../../toonz/matchline.cpp" line="718"/>
         <source>It is not possible to use a match lines column containing more than one level.</source>
-        <translation>Невозможно использовать колонку Match lines, содержащий более одного уровня.</translation>
+        <translation>Невозможно использовать столбец Match lines, содержащий более одного уровня.</translation>
     </message>
     <message>
         <location filename="../../toonz/matchline.cpp" line="819"/>
@@ -9483,7 +9483,7 @@ The audio file will not be included in the rendered clip.</source>
     <message>
         <location filename="../../toonz/filebrowserpopup.cpp" line="1843"/>
         <source>Nothing to replace: no cells or columns selected.</source>
-        <translation>Нечего заменить: не выбраны ни ячейки, ни колонки.</translation>
+        <translation>Нечего заменить: не выбраны ни ячейки, ни столбцы.</translation>
     </message>
 </context>
 <context>
@@ -9859,7 +9859,7 @@ The audio file will not be included in the rendered clip.</source>
     <message>
         <location filename="../../toonz/svnlockdialog.cpp" line="144"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Правка</translation>
     </message>
     <message>
         <location filename="../../toonz/svnlockdialog.cpp" line="146"/>
@@ -9934,7 +9934,7 @@ The audio file will not be included in the rendered clip.</source>
     <message>
         <location filename="../../toonz/svnlockframerangedialog.cpp" line="118"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Правка</translation>
     </message>
     <message>
         <location filename="../../toonz/svnlockframerangedialog.cpp" line="121"/>
@@ -10754,7 +10754,7 @@ Please commit or revert changes first.</source>
     <message>
         <location filename="../../toonz/scenesettingspopup.cpp" line="135"/>
         <source>Field Guide Size:</source>
-        <translation>Размер гида поля:</translation>
+        <translation>Размер направляющей сетки:</translation>
     </message>
     <message>
         <location filename="../../toonz/scenesettingspopup.cpp" line="138"/>
@@ -10842,7 +10842,7 @@ Please commit or revert changes first.</source>
     <message>
         <location filename="../../toonz/sceneviewercontextmenu.cpp" line="312"/>
         <source>Select Column</source>
-        <translation>Выбрать колонку</translation>
+        <translation>Выбрать столбец</translation>
     </message>
 </context>
 <context>
@@ -10855,7 +10855,7 @@ Please commit or revert changes first.</source>
     <message>
         <location filename="../../toonz/viewerpane.cpp" line="354"/>
         <source>Field Guide</source>
-        <translation>Гид поля</translation>
+        <translation>Направляющая сетка</translation>
     </message>
     <message>
         <location filename="../../toonz/viewerpane.cpp" line="370"/>
@@ -11290,7 +11290,7 @@ Assign to &apos;%3&apos;?</source>
     <message>
         <location filename="../../toonz/menubar.cpp" line="881"/>
         <source>Reframe</source>
-        <translation>Рреструктурировать</translation>
+        <translation>Перестроить</translation>
     </message>
     <message>
         <location filename="../../toonz/menubar.cpp" line="888"/>
@@ -11398,7 +11398,7 @@ Assign to &apos;%3&apos;?</source>
     <message>
         <location filename="../../toonz/startuppopup.cpp" line="108"/>
         <source>Show this at startup</source>
-        <translation>Показывать это при запуске</translation>
+        <translation>Показывать это окно при запуске</translation>
     </message>
     <message>
         <location filename="../../toonz/startuppopup.cpp" line="109"/>
@@ -12267,7 +12267,7 @@ Please refer to the user guide for details.</source>
     <message>
         <location filename="../../toonz/xshcellviewer.cpp" line="2269"/>
         <source>Reframe</source>
-        <translation>Рреструктурировать</translation>
+        <translation>Перестроить</translation>
     </message>
     <message>
         <location filename="../../toonz/xshcellviewer.cpp" line="2278"/>
@@ -12360,7 +12360,7 @@ Please refer to the user guide for details.</source>
     <message>
         <location filename="../../toonz/xshcolumnviewer.cpp" line="1883"/>
         <source>Reframe</source>
-        <translation>Рреструктурировать</translation>
+        <translation>Перестроить</translation>
     </message>
     <message>
         <location filename="../../toonz/xshcolumnviewer.cpp" line="1894"/>
@@ -12567,12 +12567,12 @@ Please refer to the user guide for details.</source>
     <message>
         <location filename="../../toonz/xsheetviewer.cpp" line="1195"/>
         <source> column</source>
-        <translation>колонка</translation>
+        <translation>столбец</translation>
     </message>
     <message>
         <location filename="../../toonz/xsheetviewer.cpp" line="1195"/>
         <source> columns</source>
-        <translation>колонки</translation>
+        <translation>столбцы</translation>
     </message>
 </context>
 </TS>

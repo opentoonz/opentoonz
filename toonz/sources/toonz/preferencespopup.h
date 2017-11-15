@@ -43,7 +43,7 @@ private:
 
 private:
   Preferences *m_pref;
-
+  
   FormatProperties *m_formatProperties;
 
   DVGui::ColorField *m_blankColor, *m_frontOnionColor, *m_backOnionColor,
@@ -54,8 +54,9 @@ private:
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
-      *m_interfaceFont, *m_interfaceFontWeight, *m_vectorSnappingTargetCB,
-      *m_guidedDrawingStyle;
+      *m_vectorSnappingTargetCB, *m_dropdownShortcutsCycleOptionsCB,
+      *m_interfaceFont, *m_interfaceFontWeight, *m_guidedDrawingStyle;
+
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -94,6 +95,8 @@ private slots:
   void onProjectRootChanged();
   void onCustomProjectRootChanged();
   void onPixelUnitExternallySelected(bool on);
+  void onAutoSaveExternallyChanged();
+  void onAutoSavePeriodExternallyChanged();
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
   void onRoomChoiceChanged(int index);
@@ -140,6 +143,7 @@ private slots:
   void onDefLevelParameterChanged();
   void onGetFillOnlySavebox(int index);
   void onFitToFlipbook(int);
+  void onDropdownShortcutsCycleOptionsChanged(int);
   void onAddLevelFormat();
   void onRemoveLevelFormat();
   void onEditLevelFormat();
@@ -191,6 +195,7 @@ private slots:
   void onInterfaceFontChanged(int index);
   void onInterfaceFontWeightChanged(int index);
   void onXsheetLayoutChanged(const QString &text);
+  void onShowCurrentTimelineChanged(int);
 };
 
 //**********************************************************************************

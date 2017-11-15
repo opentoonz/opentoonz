@@ -340,6 +340,12 @@ void PreferencesPopup::onRoomChoiceChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onDropdownShortcutsCycleOptionsChanged(int index) {
+	m_pref->setDropdownShortcutsCycleOptions(index);
+}
+
+  //-----------------------------------------------------------------------------
+
 void PreferencesPopup::onInterfaceFontChanged(int index) {
   QString font = m_interfaceFont->currentText();
   m_pref->setInterfaceFont(font.toStdString());
@@ -377,7 +383,8 @@ void PreferencesPopup::onScanLevelTypeChanged(const QString &text) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onMinuteChanged() {
-  m_pref->setAutosavePeriod(m_minuteFld->getValue());
+  if (m_minuteFld->getValue() != m_pref->getAutosavePeriod())
+    m_pref->setAutosavePeriod(m_minuteFld->getValue());
 }
 
 //-----------------------------------------------------------------------------
@@ -593,12 +600,25 @@ void PreferencesPopup::onDefaultViewerChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onAutoSaveChanged(bool on) {
-  m_pref->enableAutosave(on);
+  if (m_autoSaveGroup->isChecked() != m_pref->isAutosaveEnabled())
+    m_pref->enableAutosave(on);
   if (on && !m_autoSaveSceneCB->isChecked() &&
       !m_autoSaveOtherFilesCB->isChecked()) {
     m_autoSaveSceneCB->setChecked(true);
     m_autoSaveOtherFilesCB->setChecked(true);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveExternallyChanged() {
+  m_autoSaveGroup->setChecked(Preferences::instance()->isAutosaveEnabled());
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSavePeriodExternallyChanged() {
+  m_minuteFld->setValue(m_pref->getAutosavePeriod());
 }
 
 //-----------------------------------------------------------------------------
@@ -1092,6 +1112,12 @@ void PreferencesPopup::onWatchFileSystemClicked(int on) {
       "WatchFileSystem");
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onShowCurrentTimelineChanged(int index) {
+  m_pref->enableCurrentTimelineIndicator(index == Qt::Checked);
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1284,6 +1310,11 @@ PreferencesPopup::PreferencesPopup()
   m_useNumpadForSwitchingStyles =
       new CheckBox(tr("Use Numpad and Tab keys for Switching Styles"), this);
 
+  //--- Tools -------------------------------
+  categoryList->addItem(tr("Tools"));
+
+  m_dropdownShortcutsCycleOptionsCB = new QComboBox(this);
+
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
 
@@ -1319,6 +1350,8 @@ PreferencesPopup::PreferencesPopup()
   xsheetLayoutOptions->addItems(xsheetLayouts);
   xsheetLayoutOptions->setCurrentIndex(
       xsheetLayoutOptions->findText(m_pref->getXsheetLayoutPreference()));
+  CheckBox *showCurrentTimelineCB = new CheckBox(
+      tr("Show Current Time Indicator (Timeline Mode only)"), this);
 
   QLabel *note_xsheet =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
@@ -1613,6 +1646,15 @@ PreferencesPopup::PreferencesPopup()
   m_vectorSnappingTargetCB->addItems(vectorSnappingTargets);
   m_vectorSnappingTargetCB->setCurrentIndex(m_pref->getVectorSnappingTarget());
 
+  //--- Tools -------------------------------
+
+  QStringList dropdownBehaviorTypes;
+  dropdownBehaviorTypes << tr("Open the dropdown to display all options")
+                        << tr("Cycle through the available options");
+  m_dropdownShortcutsCycleOptionsCB->addItems(dropdownBehaviorTypes);
+  m_dropdownShortcutsCycleOptionsCB->setCurrentIndex(
+      m_pref->getDropdownShortcutsCycleOptions() ? 1 : 0);
+
   //--- Xsheet ------------------------------
   xsheetAutopanDuringPlaybackCB->setChecked(m_pref->isXsheetAutopanEnabled());
   m_cellsDragBehaviour->addItem(tr("Cells Only"));
@@ -1632,6 +1674,8 @@ PreferencesPopup::PreferencesPopup()
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
   m_syncLevelRenumberWithXsheet->setChecked(
       m_pref->isSyncLevelRenumberWithXsheetEnabled());
+  showCurrentTimelineCB->setChecked(
+      m_pref->isCurrentTimelineIndicatorEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -2081,6 +2125,26 @@ PreferencesPopup::PreferencesPopup()
       m_defLevelHeight->setDecimals(0);
     }
 
+    //--- Tools ---------------------------
+    QWidget *toolsBox          = new QWidget(this);
+    QGridLayout *toolsFrameLay = new QGridLayout();
+    toolsFrameLay->setMargin(15);
+    toolsFrameLay->setHorizontalSpacing(15);
+    toolsFrameLay->setVerticalSpacing(10);
+    {
+      toolsFrameLay->addWidget(new QLabel(tr("Dropdown Shortcuts:")), 0, 0,
+                               Qt::AlignRight | Qt::AlignVCenter);
+      toolsFrameLay->addWidget(m_dropdownShortcutsCycleOptionsCB, 0, 1);
+    }
+    toolsFrameLay->setColumnStretch(0, 0);
+    toolsFrameLay->setColumnStretch(1, 0);
+    toolsFrameLay->setColumnStretch(2, 1);
+    toolsFrameLay->setRowStretch(0, 0);
+    toolsFrameLay->setRowStretch(1, 0);
+    toolsFrameLay->setRowStretch(2, 1);
+    toolsBox->setLayout(toolsFrameLay);
+    stackedWidget->addWidget(toolsBox);
+
     //--- Xsheet --------------------------
     QWidget *xsheetBox             = new QWidget(this);
     QVBoxLayout *xsheetBoxFrameLay = new QVBoxLayout();
@@ -2126,11 +2190,12 @@ PreferencesPopup::PreferencesPopup()
         xsheetFrameLay->addWidget(m_showXSheetToolbar, 9, 0, 3, 3);
         xsheetFrameLay->addWidget(showColumnNumbersCB, 12, 0, 1, 2);
         xsheetFrameLay->addWidget(m_syncLevelRenumberWithXsheet, 13, 0, 1, 2);
+        xsheetFrameLay->addWidget(showCurrentTimelineCB, 14, 0, 1, 2);
       }
       xsheetFrameLay->setColumnStretch(0, 0);
       xsheetFrameLay->setColumnStretch(1, 0);
       xsheetFrameLay->setColumnStretch(2, 1);
-      xsheetFrameLay->setRowStretch(14, 1);
+      xsheetFrameLay->setRowStretch(15, 1);
 
       xsheetBoxFrameLay->addLayout(xsheetFrameLay);
       xsheetBoxFrameLay->addStretch(1);
@@ -2307,6 +2372,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onRasterOptimizedMemoryChanged(int)));
   ret = ret && connect(m_autoSaveGroup, SIGNAL(toggled(bool)),
                        SLOT(onAutoSaveChanged(bool)));
+  ret = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
+                       SLOT(onAutoSaveExternallyChanged()));
+  ret = ret && connect(m_pref, SIGNAL(startAutoSave()), this,
+                       SLOT(onAutoSaveExternallyChanged()));
+  ret = ret && connect(m_pref, SIGNAL(autoSavePeriodChanged()), this,
+                       SLOT(onAutoSavePeriodExternallyChanged()));
   ret = ret && connect(m_autoSaveSceneCB, SIGNAL(stateChanged(int)),
                        SLOT(onAutoSaveSceneChanged(int)));
   ret = ret && connect(m_autoSaveOtherFilesCB, SIGNAL(stateChanged(int)),
@@ -2483,6 +2554,12 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_newLevelToCameraSizeCB, SIGNAL(clicked(bool)),
                        SLOT(onNewLevelToCameraSizeChanged(bool)));
 
+  //--- Tools -----------------------
+
+  ret = ret && connect(m_dropdownShortcutsCycleOptionsCB,
+                       SIGNAL(currentIndexChanged(int)),
+                       SLOT(onDropdownShortcutsCycleOptionsChanged(int)));
+
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onXsheetAutopanChanged(int)));
@@ -2554,6 +2631,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onOnionPaperThicknessChanged()));
   ret = ret && connect(m_guidedDrawingStyle, SIGNAL(currentIndexChanged(int)),
                        SLOT(onGuidedDrawingStyleChanged(int)));
+  ret = ret && connect(showCurrentTimelineCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onShowCurrentTimelineChanged(int)));
+
   //--- Transparency Check ----------------------
   ret = ret && connect(m_transpCheckBgColor,
                        SIGNAL(colorChanged(const TPixel32 &, bool)),

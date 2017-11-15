@@ -1,33 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   id="svg6"
-   style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"
-   xml:space="preserve"
-   version="1.1"
-   viewBox="0 0 17 17"
-   height="100%"
-   width="100%"><metadata
-     id="metadata12"><rdf:RDF><cc:Work
-         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
-     id="defs10" /><rect
-     id="rect2"
-     style="clip-rule:evenodd;fill:none;fill-rule:evenodd;stroke-width:0.05555556;stroke-linejoin:round;stroke-miterlimit:1.41420996"
-     height="1.0000001"
-     width="1.0000001"
-     y="16.000004"
-     x="-1.0000007" /><g
-     style="clip-rule:evenodd;fill:#bbbbbb;fill-opacity:0.44705883;fill-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41420996"
-     id="g4491"
-     transform="matrix(0.05555556,0,0,0.05555556,-1.0000008,-1.000001)"><path
-       style="fill:#bbbbbb;fill-opacity:0.44705883;stroke:none;stroke-width:36;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.41420996;stroke-dasharray:none;stroke-opacity:0.27638191;paint-order:markers stroke fill"
-       d="m 171,54 c -34.78021,-5e-6 -62.98059,28.18463 -63,62.96484 V 126 h 18 v -9.03516 C 126.01941,92.12576 146.16091,71.999992 171,72 c 24.83909,-8e-6 44.98059,20.12576 45,44.96484 V 126 h 18 v -9.03516 C 233.98059,82.18463 205.78021,53.999995 171,54 Z"
-       id="path4509" /></g><path
-     id="rect845"
-     d="m 4,7 v 7 h 9 V 7 Z M 8.5,8 A 1.5,1.5 0 0 1 10,9.5 1.5,1.5 0 0 1 9.25,10.796875 V 13 H 7.75 V 10.796875 A 1.5,1.5 0 0 1 7,9.5 1.5,1.5 0 0 1 8.5,8 Z"
-     style="fill:#bbbbbb;fill-opacity:0.44705883;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" /></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg6" inkscape:version="0.91 r13725" sodipodi:docname="x_lock_off.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 17 17"
+	 style="enable-background:new 0 0 17 17;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#BBBBBB;fill-opacity:0.4471;}
+</style>
+<rect id="rect2" x="1.5" y="16" class="st0" width="1" height="1"/>
+<g id="g4491" transform="matrix(0.05555556,0,0,0.05555556,-1.0000008,-1.000001)">
+	<path id="path4509" inkscape:connector-curvature="0" class="st1" d="M216,54c-34.8,0-63,28.2-63,63v9h18v-9c0-24.8,20.2-45,45-45
+		c24.8,0,45,20.1,45,45v9h18v-9C279,82.2,250.8,54,216,54z"/>
+</g>
+<path id="rect845" inkscape:connector-curvature="0" class="st1" d="M6.5,7v7h9V7H6.5z M11,8c0.8,0,1.5,0.7,1.5,1.5
+	c0,0.5-0.3,1-0.8,1.3V13h-1.5v-2.2C9.8,10.5,9.5,10,9.5,9.5C9.5,8.7,10.2,8,11,8z"/>
+</svg>

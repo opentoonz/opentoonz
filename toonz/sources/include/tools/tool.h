@@ -580,9 +580,6 @@ public:
   virtual double getPixelSize()
       const = 0;  //!< Returns the length of a pixel in current OpenGL
                   //!< coordinates
-  virtual void startForegroundDrawing() = 0;  //!< Marks the beginning of an
-                                              //! OpenGL drawing block
-  virtual void endForegroundDrawing() = 0;  //!< Closes an OpenGL drawing block
 
   virtual void invalidateAll() = 0;    //!< Redraws the entire viewer, passing
                                        //! through Qt's event system

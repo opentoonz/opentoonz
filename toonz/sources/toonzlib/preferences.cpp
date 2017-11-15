@@ -305,6 +305,7 @@ Preferences::Preferences()
     , m_moveCurrentFrameByClickCellArea(true)
     , m_onionSkinEnabled(true)
     , m_onionSkinDuringPlayback(false)
+    , m_dropdownShortcutsCycleOptions(false)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
@@ -329,7 +330,8 @@ Preferences::Preferences()
     , m_watchFileSystem(true)
     , m_shortcutCommandsWhileRenamingCellEnabled(false)
     , m_xsheetLayoutPreference("Classic-revised")
-    , m_loadedXsheetLayout("Classic-revised") {
+    , m_loadedXsheetLayout("Classic-revised")
+    , m_currentTimelineEnabled(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -380,6 +382,8 @@ Preferences::Preferences()
   getValue(*m_settings, "autosaveOtherFilesEnabled",
            m_autosaveOtherFilesEnabled);
   getValue(*m_settings, "startupPopupEnabled", m_startupPopupEnabled);
+  getValue(*m_settings, "dropdownShortcutsCycleOptions",
+           m_dropdownShortcutsCycleOptions);
   getValue(*m_settings, "defaultViewerEnabled", m_defaultViewerEnabled);
   getValue(*m_settings, "rasterOptimizedMemory", m_rasterOptimizedMemory);
   getValue(*m_settings, "saveUnpaintedInCleanup", m_saveUnpaintedInCleanup);
@@ -649,6 +653,8 @@ Preferences::Preferences()
     m_xsheetLayoutPreference = QString("Classic");
   setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
   m_loadedXsheetLayout = m_xsheetLayoutPreference;
+
+  getValue(*m_settings, "currentTimelineEnabled", m_currentTimelineEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -816,6 +822,7 @@ void Preferences::setAutosavePeriod(int minutes) {
   m_settings->setValue("autosavePeriod", QString::number(minutes));
   emit stopAutoSave();
   emit startAutoSave();
+  emit autoSavePeriodChanged();
 }
 
 //-----------------------------------------------------------------
@@ -1327,6 +1334,13 @@ void Preferences::enableSceneNumbering(bool enabled) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setDropdownShortcutsCycleOptions(bool on) {
+  m_dropdownShortcutsCycleOptions = on;
+  m_settings->setValue("dropdownShortcutsCycleOptions", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::setDefLevelType(int levelType) {
   m_defLevelType = levelType;
   m_settings->setValue("DefLevelType", levelType);
@@ -1556,4 +1570,11 @@ void Preferences::enableShortcutCommandsWhileRenamingCell(bool on) {
   m_shortcutCommandsWhileRenamingCellEnabled = on;
   m_settings->setValue("shortcutCommandsWhileRenamingCellEnabled",
                        on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableCurrentTimelineIndicator(bool on) {
+  m_currentTimelineEnabled = on;
+  m_settings->setValue("currentTimelineEnabled", on ? "1" : "0");
 }

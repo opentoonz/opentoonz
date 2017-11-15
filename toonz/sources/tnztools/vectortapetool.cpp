@@ -752,10 +752,11 @@ public:
   }
 
   int getCursorId() const override {
+    int ret                            = ToolCursor::TapeCursor;
+    if (m_type.getValue() == RECT) ret = ret | ToolCursor::Ex_Rectangle;
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
-      return ToolCursor::TapeCursorWhite;
-    else
-      return ToolCursor::TapeCursor;
+      ret = ret | ToolCursor::Ex_Negate;
+    return ret;
   }
 
 } vectorTapeTool;
