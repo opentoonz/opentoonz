@@ -1779,7 +1779,6 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   drawLockedDottedLine(p, xsh->getColumn(col)->isLocked(), xy, cellColor);
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
-
   TFrameId fid = cell.m_frameId;
   if (fid.getNumber() - 1 < 0) return;
   int distance, offset;
@@ -2831,7 +2830,6 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
   if (!soundCellsSelected) {
     menu.addAction(cmdManager->getAction(MI_LoadLevel));
     menu.addAction(cmdManager->getAction(MI_NewLevel));
-    menu.addAction(cmdManager->getAction(MI_NewNoteLevel));
     menu.addSeparator();
   }
 
