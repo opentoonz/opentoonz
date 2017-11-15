@@ -2841,10 +2841,13 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
     } else if (selectionContainTlvImage(m_viewer->getCellSelection(),
                                         m_viewer->getXsheet()))
       menu.addAction(cmdManager->getAction(MI_CanvasSize));
+      if (sl || TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel())
+      menu.addAction(cmdManager->getAction(MI_LipSyncPopup));
   }
   menu.addSeparator();
   if (!soundCellsSelected)
     menu.addAction(cmdManager->getAction(MI_ImportMagpieFile));
+  
 }
 //-----------------------------------------------------------------------------
 /*! replace level with another level in the cast

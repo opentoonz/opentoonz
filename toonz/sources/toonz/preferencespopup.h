@@ -75,6 +75,7 @@ private:
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
+      *m_useHigherDpiOnVectorSimplifyCB, *m_keepFillOnVectorSimplifyCB,
       *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB,
       *m_syncLevelRenumberWithXsheet;
 
@@ -149,6 +150,8 @@ private slots:
   void onLevelFormatEdited();
   void onIgnoreImageDpiChanged(int index);
   void onShow0ThickLinesChanged(int);
+  void onKeepFillOnVectorSimplifyChanged(int);
+  void onUseHigherDpiOnVectorSimplifyChanged(int);
   void onRegionAntialiasChanged(int);
   void onImportPolicyChanged(int);
   void onImportPolicyExternallyChanged(int policy);
