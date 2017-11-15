@@ -399,11 +399,10 @@ public:
   bool isSyncLevelRenumberWithXsheetEnabled() const {
     return m_syncLevelRenumberWithXsheet;
   }
-  
+
   void enableShortcutCommandsWhileRenamingCell(bool on);
   bool isShortcutCommandsWhileRenamingCellEnabled() const {
     return m_shortcutCommandsWhileRenamingCellEnabled;
-
   }
 
   void setXsheetLayoutPreference(std::string layout);

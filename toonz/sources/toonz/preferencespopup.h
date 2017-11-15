@@ -43,7 +43,7 @@ private:
 
 private:
   Preferences *m_pref;
-  
+
   FormatProperties *m_formatProperties;
 
   DVGui::ColorField *m_blankColor, *m_frontOnionColor, *m_backOnionColor,
@@ -56,7 +56,6 @@ private:
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
       *m_vectorSnappingTargetCB, *m_dropdownShortcutsCycleOptionsCB,
       *m_interfaceFont, *m_interfaceFontWeight, *m_guidedDrawingStyle;
-
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 

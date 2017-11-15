@@ -341,10 +341,10 @@ void PreferencesPopup::onRoomChoiceChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onDropdownShortcutsCycleOptionsChanged(int index) {
-	m_pref->setDropdownShortcutsCycleOptions(index);
+  m_pref->setDropdownShortcutsCycleOptions(index);
 }
 
-  //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 void PreferencesPopup::onInterfaceFontChanged(int index) {
   QString font = m_interfaceFont->currentText();
