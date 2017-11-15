@@ -564,6 +564,12 @@ void XsheetViewer::scroll(QPoint delta) {
   else if (!notUpdateSizeH && notUpdateSizeV)  // Resize orizzontale
     refreshContentSize(x, 0);
 
+  // Recheck in case refreshContentSize changed the max
+  if (!notUpdateSizeH)
+    maxValueH = m_cellScrollArea->horizontalScrollBar()->maximum();
+  if (!notUpdateSizeV)
+    maxValueV = m_cellScrollArea->verticalScrollBar()->maximum();
+
   if (valueH > maxValueH && x > 0)  // Se il valore e' maggiore del max e x>0
                                     // scrollo al massimo valore orizzontale
     valueH = m_cellScrollArea->horizontalScrollBar()->maximum();
@@ -998,13 +1004,19 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
   case Qt::MouseEventNotSynthesized: {
     if (0 != (event->modifiers() & Qt::ControlModifier) &&
         event->angleDelta().y() != 0) {
+      QPoint pos(event->pos().x() - m_columnArea->geometry().width() +
+                     m_cellArea->visibleRegion().boundingRect().left(),
+                 event->pos().y());
+      int targetFrame = xyToPosition(pos).frame();
+
       int newFactor =
           getFrameZoomFactor() + ((event->angleDelta().y() > 0 ? 1 : -1) * 10);
       if (newFactor > m_frameZoomSlider->maximum())
         newFactor = m_frameZoomSlider->maximum();
       else if (newFactor < m_frameZoomSlider->minimum())
         newFactor = m_frameZoomSlider->minimum();
-      onFrameZoomSliderValueChanged(newFactor);
+
+      zoomOnFrame(targetFrame, newFactor);
       event->accept();
       return;
     }
@@ -1617,10 +1629,25 @@ int XsheetViewer::getFrameZoomAdjustment() {
   return qMax(0, adj);
 }
 
-void XsheetViewer::onFrameZoomSliderValueChanged(int val) {
-  m_frameZoomFactor = val;
-  m_frameZoomSlider->setValue(val);
+void XsheetViewer::zoomOnFrame(int frame, int factor) {
+  QPoint xyOrig = positionToXY(CellPosition(frame, 0));
+
+  m_frameZoomFactor = factor;
+  m_frameZoomSlider->blockSignals(true);
+  m_frameZoomSlider->setValue(factor);
+  m_frameZoomSlider->blockSignals(false);
+
+  QPoint xyNew = positionToXY(CellPosition(frame, 0));
+
+  int viewShift = xyNew.x() - xyOrig.x();
+
+  scroll(QPoint(viewShift, 0));
+
   onFrameZoomSliderReleased();
+}
+
+void XsheetViewer::onFrameZoomSliderValueChanged(int val) {
+  zoomOnFrame(getCurrentRow(), val);
 }
 
 void XsheetViewer::onFrameZoomSliderReleased() {

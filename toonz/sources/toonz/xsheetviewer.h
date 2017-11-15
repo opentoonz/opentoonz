@@ -1143,6 +1143,8 @@ public slots:
   int getFrameZoomFactor() const { return m_frameZoomFactor; }
   int getFrameZoomAdjustment();
 
+  void zoomOnFrame(int frame, int factor);
+
   void onFrameZoomSliderValueChanged(int val);
   void onFrameZoomSliderReleased();
 };
