@@ -1866,8 +1866,12 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
     int i;
 
     for (i = 0; i < 2; i++) {
-      TAffine &viewAff = m_viewAff[i];
-      double scale2    = viewAff.det();
+      TAffine &viewAff          = m_viewAff[i];
+      if (m_isFlippedX) viewAff = viewAff * TScale(-1, 1);
+      if (m_isFlippedX) viewAff = viewAff * TScale(1, -1);
+      double scale2             = abs(viewAff.det());
+      if (m_isFlippedX) viewAff = viewAff * TScale(-1, 1);
+      if (m_isFlippedX) viewAff = viewAff * TScale(1, -1);
       if (reset || ((scale2 < 100000 || !forward) &&
                     (scale2 > 0.001 * 0.05 || forward))) {
         double oldZoomScale = sqrt(scale2) * dpiFactor;
@@ -2036,21 +2040,21 @@ void SceneViewer::zoom(const TPointD &center, double factor) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::flipX() {
-  int x;
-  x = m_isFlippedX ? 1 : -1;
-  setViewMatrix(TScale(-1, 1) * m_viewAff[m_viewMode], m_viewMode);
+  m_viewAff[0] = m_viewAff[0] * TScale(-1, 1);
+  m_viewAff[1] = m_viewAff[1] * TScale(-1, 1);
   m_isFlippedX = !m_isFlippedX;
   invalidateAll();
+  emit onZoomChanged();
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneViewer::flipY() {
-  int y;
-  y = m_isFlippedY ? 1 : -1;
-  setViewMatrix(TScale(1, -1) * m_viewAff[m_viewMode], m_viewMode);
+  m_viewAff[0] = m_viewAff[0] * TScale(1, -1);
+  m_viewAff[1] = m_viewAff[1] * TScale(1, -1);
   m_isFlippedY = !m_isFlippedY;
   invalidateAll();
+  emit onZoomChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -2157,9 +2161,9 @@ void SceneViewer::resetSceneViewer() {
   m_zoomScale3D = 0.1;
   m_theta3D     = 20;
   m_phi3D       = 30;
+  m_isFlippedX  = false;
+  m_isFlippedY  = false;
   emit onZoomChanged();
-  m_isFlippedX = false;
-  m_isFlippedY = false;
   invalidateAll();
 }
 
