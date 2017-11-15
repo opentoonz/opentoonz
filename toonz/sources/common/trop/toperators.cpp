@@ -1621,6 +1621,67 @@ void TRop::whiteTransp(const TRasterP &ras) {
 
 //-----------------------------------------------------------------------------
 
+void TRop::applyColorScale(const TRasterP &ras, const TPixel32 &colorScale) {
+  ras->lock();
+
+  TRop::depremultiply(ras);
+
+  TRaster32P ras32 = ras;
+  int maxCh        = TPixel32::maxChannelValue;
+  if (ras32) {
+    TPixel32 *endPix, *upPix = 0, *upRow = ras32->pixels();
+    TPixel32 *lastPix =
+        upRow + ras32->getWrap() * (ras32->getLy() - 1) + ras32->getLx();
+
+    while (upPix < lastPix) {
+      upPix  = upRow;
+      endPix = upPix + ras32->getLx();
+      while (upPix < endPix) {
+        int maxCh = TPixel32::maxChannelValue;
+        int r  = maxCh - (maxCh - (*upPix).r) * (maxCh - colorScale.r) / maxCh;
+        int g  = maxCh - (maxCh - (*upPix).g) * (maxCh - colorScale.g) / maxCh;
+        int b  = maxCh - (maxCh - (*upPix).b) * (maxCh - colorScale.b) / maxCh;
+        int m  = (*upPix).m * colorScale.m / maxCh;
+        *upPix = TPixel32(r, g, b, m);
+        ++upPix;
+      }
+      upRow += ras32->getWrap();
+    }
+  } else {
+    TRaster64P ras64 = ras;
+    if (ras64) {
+      TPixel64 *endPix, *upPix = 0, *upRow = ras64->pixels();
+      TPixel64 *lastPix =
+          upRow + ras64->getWrap() * (ras64->getLy() - 1) + ras64->getLx();
+
+      int maxCh64 = TPixel64::maxChannelValue;
+      while (upPix < lastPix) {
+        upPix  = upRow;
+        endPix = upPix + ras64->getLx();
+        while (upPix < endPix) {
+          int r =
+              maxCh64 - (maxCh64 - (*upPix).r) * (maxCh - colorScale.r) / maxCh;
+          int g =
+              maxCh64 - (maxCh64 - (*upPix).g) * (maxCh - colorScale.g) / maxCh;
+          int b =
+              maxCh64 - (maxCh64 - (*upPix).b) * (maxCh - colorScale.b) / maxCh;
+          int m  = (*upPix).m * colorScale.m / maxCh;
+          *upPix = TPixel64(r, g, b, m);
+          ++upPix;
+        }
+        upRow += ras64->getWrap();
+      }
+    } else {
+      ras->unlock();
+      throw TException("TRop::premultiply invalid raster type");
+    }
+  }
+  TRop::premultiply(ras);
+  ras->unlock();
+}
+
+//-----------------------------------------------------------------------------
+
 template <typename Chan>
 const double *premultiplyTable() {
   static double *table = 0;

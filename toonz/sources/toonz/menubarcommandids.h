@@ -26,6 +26,9 @@
 #define MI_ClearRecentLevel "MI_ClearRecentLevel"
 #define MI_PrintXsheet "MI_PrintXsheet"
 #define MI_NewLevel "MI_NewLevel"
+#define MI_NewVectorLevel "MI_NewVectorLevel"
+#define MI_NewToonzRasterLevel "MI_NewToonzRasterLevel"
+#define MI_NewRasterLevel "MI_NewRasterLevel"
 #define MI_LoadLevel "MI_LoadLevel"
 #define MI_LoadFolder "MI_LoadFolder"
 #define MI_SaveLevel "MI_SaveLevel"
@@ -87,6 +90,7 @@
 #define MI_OpenFileBrowser2 "MI_OpenFileBrowser2"
 #define MI_OpenStyleControl "MI_OpenStyleControl"
 #define MI_OpenToolbar "MI_OpenToolbar"
+#define MI_OpenCommandToolbar "MI_OpenCommandToolbar"
 #define MI_OpenToolOptionBar "MI_OpenToolOptionBar"
 #define MI_OpenLevelView "MI_OpenLevelView"
 #ifdef LINETEST
@@ -285,6 +289,7 @@
 #define MI_ToggleColumnLocks "MI_ToggleColumnLocks"
 #define MI_ToggleXSheetToolbar "MI_ToggleXSheetToolbar"
 #define MI_FoldColumns "MI_FoldColumns"
+#define MI_ToggleCurrentTimeIndicator "MI_ToggleCurrentTimeIndicator"
 
 #define MI_LoadIntoCurrentPalette "MI_LoadIntoCurrentPalette"
 #define MI_AdjustCurrentLevelToPalette "MI_AdjustCurrentLevelToPalette"
@@ -302,6 +307,7 @@
 #define MI_Reframe2 "MI_Reframe2"
 #define MI_Reframe3 "MI_Reframe3"
 #define MI_Reframe4 "MI_Reframe4"
+#define MI_ReframeWithEmptyInbetweens "MI_ReframeWithEmptyInbetweens"
 
 #define MI_FillAreas "MI_FillAreas"
 #define MI_FillLines "MI_FillLines"
@@ -316,4 +322,5 @@
 #define MI_StartupPopup "MI_StartupPopup"
 #define MI_PencilTest "MI_PencilTest"
 #define MI_AudioRecording "MI_AudioRecording"
+#define MI_AutoInputCellNumber "MI_AutoInputCellNumber"
 #endif

@@ -7,6 +7,9 @@
 #include "tpersist.h"
 #include "traster.h"
 
+#include <QPair>
+#include <QString>
+
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -64,7 +67,20 @@ class DVAPI TXshColumn : public TColumnHeader, public TPersist {
   int m_colorTag;  // Usato solo in tabkids
   UCHAR m_opacity;
 
-  int m_filterColorId;
+public:
+  enum FilterColor {
+    FilterNone = 0,
+    FilterRed,
+    FilterGreen,
+    FilterBlue,
+    FilterDarkYellow,
+    FilterDarkCyan,
+    FilterDarkMagenta,
+    FilterAmount
+  };
+
+private:
+  FilterColor m_filterColorId;
 
 protected:
   enum {
@@ -97,7 +113,7 @@ Constructs a TXshColumn with default value.
       , m_xsheet(0)
       , m_colorTag(0)
       , m_opacity(255)
-      , m_filterColorId(0) {}
+      , m_filterColorId(FilterNone) {}
 
   enum ColumnType {
     eLevelType = 0,
@@ -244,8 +260,11 @@ Set column color tag to \b colorTag.
     m_colorTag = colorTag;
   }  // Usato solo in tabkids
 
-  int getFilterColorId() const { return m_filterColorId; }
-  void setFilterColorId(int id) { m_filterColorId = id; }
+  FilterColor getFilterColorId() const { return m_filterColorId; }
+  void setFilterColorId(FilterColor id) { m_filterColorId = id; }
+  TPixel32 getFilterColor();
+  static QPair<QString, TPixel32> getFilterInfo(FilterColor key);
+  static void initColorFilters();
 };
 
 #ifdef _WIN32

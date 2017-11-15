@@ -10,6 +10,7 @@
 #include "toonz/txshzeraryfxlevel.h"
 #include "toonz/tcolumnfx.h"
 #include "toonz/fxdag.h"
+#include "toonz/txshlevelcolumn.h"
 
 //-----------------------------------------------------------------------------
 
@@ -95,6 +96,42 @@ bool TCellData::getCells(TXsheet *xsh, int r0, int c0, int &r1, int &c1,
     if (insert) xsh->insertCells(r0, c, m_rowCount);
     cellSet = xsh->setCells(r0, c, m_rowCount, &cells[index * m_rowCount]);
   }
+  return cellSet;
+}
+
+//-----------------------------------------------------------------------------
+// Paste only cell numbers.
+// As a special behavior, enable to copy one column and paste into
+// multiple columns.
+
+bool TCellData::getNumbers(TXsheet *xsh, int r0, int c0, int &r1,
+                           int &c1) const {
+  r1                  = r0 + m_rowCount - 1;
+  bool oneToMulti     = m_colCount == 1 && c0 < c1;
+  if (!oneToMulti) c1 = c0 + m_colCount - 1;
+
+  bool cellSet = false;
+
+  for (int c = c0; c <= c1; c++) {
+    TXshColumn *column = xsh->getColumn(c);
+    if (!column || column->isEmpty()) continue;
+    TXshLevelColumn *levelColumn = column->getLevelColumn();
+    if (!levelColumn) continue;
+
+    std::vector<TXshCell> cells = m_cells;
+
+    int sourceColIndex  = (oneToMulti) ? 0 : c - c0;
+    int sourceCellIndex = sourceColIndex * m_rowCount;
+
+    if (!canChange(column, sourceColIndex)) continue;
+
+    bool isSet = levelColumn->setNumbers(r0, m_rowCount,
+                                         &cells[sourceColIndex * m_rowCount]);
+
+    cellSet = cellSet || isSet;
+  }
+  xsh->updateFrameCount();
+
   return cellSet;
 }
 

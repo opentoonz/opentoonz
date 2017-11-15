@@ -14,6 +14,7 @@
 #include "xsheetviewer.h"
 #include "sceneviewer.h"
 #include "toolbar.h"
+#include "commandbar.h"
 #include "flipbook.h"
 #include "castviewer.h"
 #include "filebrowser.h"
@@ -69,6 +70,7 @@
 #include "toonz/txshcell.h"
 #include "toonz/cleanupcolorstyles.h"
 #include "toonz/palettecmd.h"
+#include "toonz/preferences.h"
 #include "tw/stringtable.h"
 
 // TnzBase includes
@@ -199,9 +201,9 @@ int SchematicScenePanel::getViewType() {
 
 void SchematicScenePanel::showEvent(QShowEvent *e) {
   if (m_schematicViewer->isStageSchematicViewed())
-    setWindowTitle("Stage Schematic");
+    setWindowTitle(QObject::tr("Stage Schematic"));
   else
-    setWindowTitle("Fx Schematic");
+    setWindowTitle(QObject::tr("Fx Schematic"));
 
   TApp *app = TApp::instance();
   connect(m_schematicViewer, SIGNAL(showPreview(TFxP)), this,
@@ -669,14 +671,14 @@ void ColorFieldEditorController::edit(DVGui::ColorField *colorField) {
 
   connect(m_currentColorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
           SLOT(onColorChanged(const TPixel32 &, bool)));
-  connect(m_colorFieldHandle, SIGNAL(colorStyleChanged()),
+  connect(m_colorFieldHandle, SIGNAL(colorStyleChanged(bool)),
           SLOT(onColorStyleChanged()));
 }
 
 //-----------------------------------------------------------------------------
 
 void ColorFieldEditorController::hide() {
-  disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged()), this,
+  disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged(bool)), this,
              SLOT(onColorStyleChanged()));
 }
 
@@ -748,14 +750,14 @@ void CleanupColorFieldEditorController::edit(
   TApp::instance()->getPaletteController()->setCurrentPalette(
       m_colorFieldHandle);
 
-  connect(m_colorFieldHandle, SIGNAL(colorStyleChanged()),
+  connect(m_colorFieldHandle, SIGNAL(colorStyleChanged(bool)),
           SLOT(onColorStyleChanged()));
 }
 
 //-----------------------------------------------------------------------------
 
 void CleanupColorFieldEditorController::hide() {
-  disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged()), this,
+  disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged(bool)), this,
              SLOT(onColorStyleChanged()));
 }
 
@@ -794,7 +796,7 @@ StyleEditorPanel::StyleEditorPanel(QWidget *parent) : TPanel(parent) {
   setWidget(m_styleEditor);
 
   m_styleEditor->setLevelHandle(TApp::instance()->getCurrentLevel());
-
+  setMinimumWidth(200);
   resize(340, 630);
 }
 
@@ -862,6 +864,35 @@ public:
 } toolbarFactory;
 
 //=========================================================
+// Command Bar Panel
+//---------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+CommandBarPanel::CommandBarPanel(QWidget *parent)
+    : TPanel(parent, 0, TDockWidget::horizontal) {
+  CommandBar *xsheetToolbar = new CommandBar();
+  setWidget(xsheetToolbar);
+  setIsMaximizable(false);
+  setFixedHeight(36);
+}
+
+class CommandBarFactory final : public TPanelFactory {
+public:
+  CommandBarFactory() : TPanelFactory("CommandBar") {}
+  TPanel *createPanel(QWidget *parent) override {
+    TPanel *panel = new CommandBarPanel(parent);
+    panel->setObjectName(getPanelType());
+    return panel;
+  }
+  void initialize(TPanel *panel) override {}
+} commandBarFactory;
+
+//=============================================================================
+OpenFloatingPanel openCommandBarCommand(MI_OpenCommandToolbar, "CommandBar",
+                                        QObject::tr("Command Bar"));
+//-----------------------------------------------------------------------------
+
+//=========================================================
 // ToolOptionPanel
 //---------------------------------------------------------
 
@@ -924,15 +955,15 @@ void FlipbookPanel::reset() { m_flipbook->reset(); }
 
 void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   bool ret      = true;
-  int x         = -87;
-  int iconWidth = 17;
+  int x         = -91;
+  int iconWidth = 20;
   // safe area button
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(titleBar, ":Resources/safearea.png",
-                                          ":Resources/safearea_over.png",
-                                          ":Resources/safearea_on.png");
+      new TPanelTitleBarButtonForSafeArea(
+          titleBar, ":Resources/pane_safe_off.svg",
+          ":Resources/pane_safe_over.svg", ":Resources/pane_safe_on.svg");
   safeAreaButton->setToolTip("Safe Area (Right Click to Select)");
-  titleBar->add(QPoint(x, 1), safeAreaButton);
+  titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
                        CommandManager::instance()->getAction(MI_SafeArea),
                        SLOT(trigger()));
@@ -945,9 +976,9 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   x += 33 + iconWidth;
   // minimize button
-  m_button = new TPanelTitleBarButton(titleBar, ":Resources/minimize.png",
-                                      ":Resources/minimize_over.png",
-                                      ":Resources/minimize_over.png");
+  m_button = new TPanelTitleBarButton(titleBar, ":Resources/pane_minimize.svg",
+                                      ":Resources/pane_minimize_over.svg",
+                                      ":Resources/pane_minimize_on.svg");
   m_button->setToolTip("Minimize");
   m_button->setPressed(false);
 

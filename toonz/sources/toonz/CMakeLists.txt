@@ -29,6 +29,8 @@ set(MOC_HEADERS
     colormodelviewer.h
     columncommand.h
     columnselection.h
+    commandbar.h
+    commandbarpopup.h
     convertpopup.h
     curveio.h
     drawingdata.h
@@ -150,6 +152,8 @@ set(MOC_HEADERS
     locatorpopup.h
     styleshortcutswitchablepanel.h
 	cameracapturelevelcontrol.h
+	reframepopup.h
+	autoinputcellnumberpopup.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -163,6 +167,8 @@ set(HEADERS ${MOC_HEADERS})
 set(SOURCES
     floatingpanelcommand.cpp
     canvassizepopup.cpp
+    commandbar.cpp
+    commandbarpopup.cpp
     history.cpp
     loadfoldercommand.cpp
     loadfolderpopup.cpp
@@ -315,6 +321,8 @@ set(SOURCES
     locatorpopup.cpp
     styleshortcutswitchablepanel.cpp
 	cameracapturelevelcontrol.cpp
+	reframepopup.cpp
+	autoinputcellnumberpopup.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp
@@ -423,7 +431,7 @@ elseif(BUILD_ENV_UNIXLIKE)
     set(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${OPENBLAS_LIB})
 
     if(BUILD_TARGET_WIN)
-        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids)
+        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids -mwindows)
     endif()
 
     target_link_libraries(
