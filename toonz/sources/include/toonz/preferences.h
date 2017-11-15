@@ -342,8 +342,16 @@ public:
   void setVectorSnappingTarget(int target);
   int getVectorSnappingTarget() { return m_vectorSnappingTarget; }
 
-  // Tools Tab
 
+  void setKeepFillOnVectorSimplify(bool on);
+  bool getKeepFillOnVectorSimplify() { return m_keepFillOnVectorSimplify; }
+
+  void setUseHigherDpiOnVectorSimplify(bool on);
+  bool getUseHigherDpiOnVectorSimplify() {
+    return m_useHigherDpiOnVectorSimplify;
+  }
+
+  // Tools Tab
   void setDropdownShortcutsCycleOptions(bool on);
   bool getDropdownShortcutsCycleOptions() {
     return m_dropdownShortcutsCycleOptions;
@@ -562,6 +570,7 @@ private:
       m_startupPopupEnabled;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
   bool m_onionSkinDuringPlayback, m_ignoreImageDpi;
+  bool m_keepFillOnVectorSimplify, m_useHigherDpiOnVectorSimplify;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,

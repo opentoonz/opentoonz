@@ -247,6 +247,8 @@
 #define MI_RevertToCleanedUp "MI_RevertToCleanedUp"
 #define MI_RevertToLastSaved "MI_RevertToLastSaved"
 #define MI_ConvertToVectors "MI_ConvertToVectors"
+#define MI_ConvertToToonzRaster "MI_ConvertToToonzRaster"
+#define MI_ConvertVectorToVector "MI_ConvertVectorToVector"
 #define MI_Tracking "MI_Tracking"
 #define MI_RemoveLevel "MI_RemoveLevel"
 #define MI_CollectAssets "MI_CollectAssets"
@@ -322,5 +324,6 @@
 #define MI_StartupPopup "MI_StartupPopup"
 #define MI_PencilTest "MI_PencilTest"
 #define MI_AudioRecording "MI_AudioRecording"
+#define MI_LipSyncPopup "MI_LipSyncPopup"
 #define MI_AutoInputCellNumber "MI_AutoInputCellNumber"
 #endif

@@ -289,6 +289,8 @@ Preferences::Preferences()
     , m_fillOnlySavebox(false)
     , m_show0ThickLines(true)
     , m_regionAntialias(false)
+    , m_keepFillOnVectorSimplify(true)
+    , m_useHigherDpiOnVectorSimplify(false)
     , m_viewerBGColor(128, 128, 128, 255)
     , m_previewBGColor(64, 64, 64, 255)
     , m_chessboardColor1(180, 180, 180)
@@ -568,7 +570,9 @@ Preferences::Preferences()
   if (!currentStyleSheet.isEmpty() &&
       m_styleSheetList.contains(currentStyleSheet))
     m_currentStyleSheet = currentStyleSheet;
-
+  getValue(*m_settings, "useHigherDpiOnVectorSimplify",
+           m_useHigherDpiOnVectorSimplify);
+  getValue(*m_settings, "keepFillOnVectorSimplify", m_keepFillOnVectorSimplify);
   getValue(*m_settings, "DragCellsBehaviour", m_dragCellsBehaviour);
 
   getValue(*m_settings, "LineTestFpsCapture", m_lineTestFpsCapture);
@@ -1313,6 +1317,20 @@ void Preferences::setLineTestFpsCapture(int lineTestFpsCapture) {
 void Preferences::setFillOnlySavebox(bool on) {
   m_fillOnlySavebox = on;
   m_settings->setValue("FillOnlysavebox", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setKeepFillOnVectorSimplify(bool on) {
+  m_keepFillOnVectorSimplify = on;
+  m_settings->setValue("keepFillOnVectorSimplify", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setUseHigherDpiOnVectorSimplify(bool on) {
+  m_useHigherDpiOnVectorSimplify = on;
+  m_settings->setValue("useHigherDpiOnVectorSimplify", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

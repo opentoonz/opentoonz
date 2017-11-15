@@ -1184,6 +1184,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(levelMenu, MI_RevertToCleanedUp);
   addMenuItem(levelMenu, MI_RevertToLastSaved);
   addMenuItem(levelMenu, MI_ConvertToVectors);
+  addMenuItem(levelMenu, MI_ConvertToToonzRaster);
+  addMenuItem(levelMenu, MI_ConvertVectorToVector);
   addMenuItem(levelMenu, MI_Tracking);
   levelMenu->addSeparator();
   addMenuItem(levelMenu, MI_ExposeResource);
@@ -1245,6 +1247,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(xsheetMenu, MI_PrevDrawing);
   addMenuItem(xsheetMenu, MI_NextStep);
   addMenuItem(xsheetMenu, MI_PrevStep);
+  addMenuItem(xsheetMenu, MI_LipSyncPopup);
 
   // Menu' CELLS
   QMenu *cellsMenu = addMenu(tr("Cells"), fullMenuBar);

@@ -96,6 +96,8 @@
     <command>MI_RevertToCleanedUp</command>
     <command>MI_RevertToLastSaved</command>
     <command>MI_ConvertToVectors</command>
+    <command>MI_ConvertToToonzRaster</command>
+    <command>MI_ConvertVectorToVector</command>
     <command>MI_Tracking</command>
     <separator/>
     <command>MI_ExposeResource</command>
@@ -151,6 +153,8 @@
     <command>MI_PrevDrawing</command>
     <command>MI_NextStep</command>
     <command>MI_PrevStep</command>
+    <separator/>
+    <command>MI_LipSyncPopup</command>
   </menu>
   <menu title="Cells">
     <command>MI_Reverse</command>

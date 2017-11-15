@@ -1812,6 +1812,8 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
   createMenuXsheetAction(MI_NewNoteLevel, tr("New Note Level"), "");
+  createMenuXsheetAction(MI_LipSyncPopup, tr("&Apply Lip Sync Data to Column"),
+                         "Alt+L");
   createRightClickMenuAction(MI_ToggleXSheetToolbar,
                              tr("Toggle XSheet Toolbar"), "");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
@@ -2010,6 +2012,7 @@ void MainWindow::defineActions() {
                           "Ctrl+`");
   createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
   createMenuWindowsAction(MI_StartupPopup, tr("&Startup Popup..."), "Alt+S");
+
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
   createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "/", false,
@@ -2035,6 +2038,10 @@ void MainWindow::defineActions() {
   // createRightClickMenuAction(MI_PremultiplyFile,      tr("Premultiply"),
   // "");
   createMenuLevelAction(MI_ConvertToVectors, tr("Convert to Vectors..."), "");
+  createMenuLevelAction(MI_ConvertToToonzRaster, tr("Vectors to Toonz Raster"),
+                        "");
+  createMenuLevelAction(MI_ConvertVectorToVector,
+                        tr("Replace Vectors with Simplified Vectors"), "");
   createMenuLevelAction(MI_Tracking, tr("Tracking..."), "");
   createRightClickMenuAction(MI_RemoveLevel, tr("Remove Level"), "");
   createRightClickMenuAction(MI_AddToBatchRenderList, tr("Add As Render Task"),
