@@ -413,10 +413,11 @@
       <file>Resources/fb_history_back_disable.svg</file>
       <file>Resources/fb_history_fwd_enable.svg</file>
       <file>Resources/fb_history_fwd_disable.svg</file>
-      <file>Resources/x_prev_eye.png</file>
-      <file>Resources/x_table_view.png</file>
-      <file>Resources/x_table_view_transp.png</file>
+      <file>Resources/x_prev_eye.svg</file>
+      <file>Resources/x_table_view.svg</file>
+      <file>Resources/x_table_view_transp.svg</file>
       <file>Resources/x_lock.svg</file>
+      <file>Resources/x_config.svg</file>
       <file>Resources/filmstrip_inbetween.svg</file>
       <file>Resources/history_normal.png</file>
       <file>Resources/history_brush.png</file>

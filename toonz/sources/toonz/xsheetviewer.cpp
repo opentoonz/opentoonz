@@ -1533,6 +1533,93 @@ TPanel *createXsheetViewer(QWidget *parent)
 */
 
 //=============================================================================
+// XSheet icons
+//-----------------------------------------------------------------------------
+QImage XsheetViewer::getXsheetPreviewButtonOnImage() const {
+  static QImage iconImage = svgToPixmap(":Resources/x_prev_eye.svg").toImage();
+
+  if (m_xsheetPreviewButtonOnImage.isNull()) return iconImage;
+
+  return m_xsheetPreviewButtonOnImage;
+}
+QImage XsheetViewer::getXsheetCamstandButtonOnImage() const {
+  static QImage iconImage =
+      svgToPixmap(":Resources/x_table_view.svg").toImage();
+
+  if (m_xsheetCamstandButtonOnImage.isNull()) return iconImage;
+
+  return m_xsheetCamstandButtonOnImage;
+}
+QImage XsheetViewer::getXsheetCamstandButtonTranspImage() const {
+  static QImage iconImage =
+      svgToPixmap(":Resources/x_table_view_transp.svg").toImage();
+
+  if (m_xsheetCamstandButtonTranspImage.isNull()) return iconImage;
+
+  return m_xsheetCamstandButtonTranspImage;
+}
+QImage XsheetViewer::getXsheetLockButtonOnImage() const {
+  static QImage iconImage = svgToPixmap(":Resources/x_lock.svg").toImage();
+
+  if (m_xsheetLockButtonOnImage.isNull()) return iconImage;
+
+  return m_xsheetLockButtonOnImage;
+}
+
+QImage XsheetViewer::getXsheetConfigButtonImage() const {
+  static QImage iconImage = svgToPixmap(":Resources/x_config.svg").toImage();
+
+  if (m_xsheetConfigButtonImage.isNull()) return iconImage;
+
+  return m_xsheetConfigButtonImage;
+}
+
+QImage XsheetViewer::getTimelinePreviewButtonOnImage() const {
+  if (m_timelinePreviewButtonOnImage.isNull())
+    return getXsheetPreviewButtonOnImage();
+  return m_timelinePreviewButtonOnImage;
+}
+
+QImage XsheetViewer::getTimelineCamstandButtonOnImage() const {
+  if (m_timelineCamstandButtonOnImage.isNull())
+    return getXsheetCamstandButtonOnImage();
+  return m_timelineCamstandButtonOnImage;
+}
+
+QImage XsheetViewer::getTimelineCamstandButtonTranspImage() const {
+  if (m_timelineCamstandButtonTranspImage.isNull())
+    return getXsheetCamstandButtonTranspImage();
+  return m_timelineCamstandButtonTranspImage;
+}
+
+QImage XsheetViewer::getTimelineLockButtonOnImage() const {
+  if (m_timelineLockButtonOnImage.isNull()) return getXsheetLockButtonOnImage();
+  return m_timelineLockButtonOnImage;
+}
+
+QImage XsheetViewer::getTimelineConfigButtonImage() const {
+  if (m_timelineConfigButtonImage.isNull()) return getXsheetConfigButtonImage();
+  return m_timelineConfigButtonImage;
+}
+
+QImage XsheetViewer::getLayerHeaderPreviewImage() const {
+  if (m_layerHeaderPreviewImage.isNull())
+    return getXsheetPreviewButtonOnImage();
+  return m_layerHeaderPreviewImage;
+}
+
+QImage XsheetViewer::getLayerHeaderCamstandImage() const {
+  if (m_layerHeaderCamstandImage.isNull())
+    return getXsheetCamstandButtonOnImage();
+  return m_layerHeaderCamstandImage;
+}
+
+QImage XsheetViewer::getLayerHeaderLockImage() const {
+  if (m_layerHeaderLockImage.isNull()) return getXsheetLockButtonOnImage();
+  return m_layerHeaderLockImage;
+}
+
+//=============================================================================
 // XSheetViewerCommand
 //-----------------------------------------------------------------------------
 
