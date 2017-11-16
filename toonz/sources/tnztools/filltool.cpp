@@ -1139,12 +1139,11 @@ void AreaFillTool::draw() {
     tglVertex(m_mousePosition);
     glEnd();
     glPopMatrix();
-  }
-  else if (m_type == FREEHAND && !m_track.isEmpty()) {
-	  tglColor(TPixel::Red);
-	  glPushMatrix();
-	  m_track.drawAllFragments();
-	  glPopMatrix();
+  } else if (m_type == FREEHAND && !m_track.isEmpty()) {
+    tglColor(TPixel::Red);
+    glPushMatrix();
+    m_track.drawAllFragments();
+    glPopMatrix();
   }
 }
 
@@ -1199,11 +1198,10 @@ void AreaFillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &,
     } else
       m_track.add(TThickPoint(pos, m_thick), pixelSize2);
 
-    
-	if (m_type == POLYLINE) {
-		if (m_polyline.empty() || m_polyline.back() != pos)
-			m_polyline.push_back(pos);
-	}
+    if (m_type == POLYLINE) {
+      if (m_polyline.empty() || m_polyline.back() != pos)
+        m_polyline.push_back(pos);
+    }
   }
   m_isLeftButtonPressed = true;
 }
@@ -1288,10 +1286,9 @@ void AreaFillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   } else if (m_type == FREEHAND) {
     if (!m_enabled || !m_active) return;
 
-
     double pixelSize2 = m_parent->getPixelSize() * m_parent->getPixelSize();
     m_track.add(TThickPoint(pos, m_thick), pixelSize2);
-	m_parent->invalidate();
+    m_parent->invalidate();
   }
 }
 
@@ -1658,24 +1655,23 @@ FillTool::FillTool(int targetType)
 //-----------------------------------------------------------------------------
 
 int FillTool::getCursorId() const {
-	int ret;
-	if (m_colorType.getValue() == LINES)
-		 ret = ToolCursor::FillCursorL;
-	else {
-		ret = ToolCursor::FillCursor;
-		if (m_colorType.getValue() == AREAS) ret = ret | ToolCursor::Ex_Area;
-		
-	}
-	if (m_fillType.getValue() == FREEHANDFILL)
-		 ret = ret | ToolCursor::Ex_FreeHand;
-	else if (m_fillType.getValue() == POLYLINEFILL)
-		 ret = ret | ToolCursor::Ex_PolyLine;
-	else if (m_fillType.getValue() == RECTFILL)
-		 ret = ret | ToolCursor::Ex_Rectangle;
-	
-		if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
-		 ret = ret | ToolCursor::Ex_Negate;
-	return ret;
+  int ret;
+  if (m_colorType.getValue() == LINES)
+    ret = ToolCursor::FillCursorL;
+  else {
+    ret                                      = ToolCursor::FillCursor;
+    if (m_colorType.getValue() == AREAS) ret = ret | ToolCursor::Ex_Area;
+  }
+  if (m_fillType.getValue() == FREEHANDFILL)
+    ret = ret | ToolCursor::Ex_FreeHand;
+  else if (m_fillType.getValue() == POLYLINEFILL)
+    ret = ret | ToolCursor::Ex_PolyLine;
+  else if (m_fillType.getValue() == RECTFILL)
+    ret = ret | ToolCursor::Ex_Rectangle;
+
+  if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
+    ret = ret | ToolCursor::Ex_Negate;
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
