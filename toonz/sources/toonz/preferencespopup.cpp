@@ -340,6 +340,12 @@ void PreferencesPopup::onRoomChoiceChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onDropdownShortcutsCycleOptionsChanged(int index) {
+	m_pref->setDropdownShortcutsCycleOptions(index);
+}
+
+  //-----------------------------------------------------------------------------
+
 void PreferencesPopup::onInterfaceFontChanged(int index) {
   QString font = m_interfaceFont->currentText();
   m_pref->setInterfaceFont(font.toStdString());
@@ -377,7 +383,8 @@ void PreferencesPopup::onScanLevelTypeChanged(const QString &text) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onMinuteChanged() {
-  m_pref->setAutosavePeriod(m_minuteFld->getValue());
+  if (m_minuteFld->getValue() != m_pref->getAutosavePeriod())
+    m_pref->setAutosavePeriod(m_minuteFld->getValue());
 }
 
 //-----------------------------------------------------------------------------
@@ -502,6 +509,18 @@ void PreferencesPopup::onIgnoreImageDpiChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onKeepFillOnVectorSimplifyChanged(int index) {
+  m_pref->setKeepFillOnVectorSimplify(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onUseHigherDpiOnVectorSimplifyChanged(int index) {
+  m_pref->setUseHigherDpiOnVectorSimplify(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onSubsceneFolderChanged(int index) {
   m_pref->enableSubsceneFolder(index == Qt::Checked);
 }
@@ -593,12 +612,25 @@ void PreferencesPopup::onDefaultViewerChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onAutoSaveChanged(bool on) {
-  m_pref->enableAutosave(on);
+  if (m_autoSaveGroup->isChecked() != m_pref->isAutosaveEnabled())
+    m_pref->enableAutosave(on);
   if (on && !m_autoSaveSceneCB->isChecked() &&
       !m_autoSaveOtherFilesCB->isChecked()) {
     m_autoSaveSceneCB->setChecked(true);
     m_autoSaveOtherFilesCB->setChecked(true);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveExternallyChanged() {
+  m_autoSaveGroup->setChecked(Preferences::instance()->isAutosaveEnabled());
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSavePeriodExternallyChanged() {
+  m_minuteFld->setValue(m_pref->getAutosavePeriod());
 }
 
 //-----------------------------------------------------------------------------
@@ -1047,8 +1079,16 @@ void PreferencesPopup::onExpandFunctionHeaderClicked(bool checked) {
   m_pref->enableExpandFunctionHeader(checked);
 }
 
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onShowColumnNumbersChanged(int index) {
   m_pref->enableShowColumnNumbers(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onXsheetLayoutChanged(const QString &text) {
+  m_pref->setXsheetLayoutPreference(text.toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -1076,6 +1116,12 @@ void PreferencesPopup::onWatchFileSystemClicked(int on) {
   // emit signal to update behavior of the File browser
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
       "WatchFileSystem");
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onShowCurrentTimelineChanged(int index) {
+  m_pref->enableCurrentTimelineIndicator(index == Qt::Checked);
 }
 
 //**********************************************************************************
@@ -1241,6 +1287,10 @@ PreferencesPopup::PreferencesPopup()
       new DVGui::FileField(this, QString("desktop"), false, true);
   m_ffmpegTimeout = new DVGui::IntLineEdit(this, 30, 1);
 
+  QLabel *note_io =
+      new QLabel(tr("* Changes will take effect the next time you run Toonz"));
+  note_io->setStyleSheet("font-size: 10px; font: italic;");
+
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
 
@@ -1265,6 +1315,15 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Minimize Savebox after Editing"), this);
   m_useNumpadForSwitchingStyles =
       new CheckBox(tr("Use Numpad and Tab keys for Switching Styles"), this);
+  m_keepFillOnVectorSimplifyCB = new CheckBox(
+      tr("Keep fill when using \"Replace Vectors\" command"), this);
+  m_useHigherDpiOnVectorSimplifyCB = new CheckBox(
+      tr("Use higher DPI for calculations - Slower but more accurate"), this);
+
+  //--- Tools -------------------------------
+  categoryList->addItem(tr("Tools"));
+
+  m_dropdownShortcutsCycleOptionsCB = new QComboBox(this);
 
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
@@ -1292,6 +1351,18 @@ PreferencesPopup::PreferencesPopup()
       this);
   CheckBox *showColumnNumbersCB =
       new CheckBox(tr("Show Column Numbers in Column Headers"), this);
+  QStringList xsheetLayouts;
+  xsheetLayouts << tr("Classic") << tr("Classic-revised") << tr("Compact");
+  QComboBox *xsheetLayoutOptions = new QComboBox(this);
+  xsheetLayoutOptions->addItems(xsheetLayouts);
+  xsheetLayoutOptions->setCurrentIndex(
+      xsheetLayoutOptions->findText(m_pref->getXsheetLayoutPreference()));
+  CheckBox *showCurrentTimelineCB = new CheckBox(
+      tr("Show Current Time Indicator (Timeline Mode only)"), this);
+
+  QLabel *note_xsheet =
+      new QLabel(tr("* Changes will take effect the next time you run Toonz"));
+  note_xsheet->setStyleSheet("font-size: 10px; font: italic;");
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1531,6 +1602,10 @@ PreferencesPopup::PreferencesPopup()
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
   m_useNumpadForSwitchingStyles->setChecked(
       m_pref->isUseNumpadForSwitchingStylesEnabled());
+  m_keepFillOnVectorSimplifyCB->setChecked(
+      m_pref->getKeepFillOnVectorSimplify());
+  m_useHigherDpiOnVectorSimplifyCB->setChecked(
+      m_pref->getUseHigherDpiOnVectorSimplify());
   m_newLevelToCameraSizeCB->setChecked(
       m_pref->isNewLevelSizeToCameraSizeEnabled());
   QStringList scanLevelTypes;
@@ -1582,6 +1657,15 @@ PreferencesPopup::PreferencesPopup()
   m_vectorSnappingTargetCB->addItems(vectorSnappingTargets);
   m_vectorSnappingTargetCB->setCurrentIndex(m_pref->getVectorSnappingTarget());
 
+  //--- Tools -------------------------------
+
+  QStringList dropdownBehaviorTypes;
+  dropdownBehaviorTypes << tr("Open the dropdown to display all options")
+                        << tr("Cycle through the available options");
+  m_dropdownShortcutsCycleOptionsCB->addItems(dropdownBehaviorTypes);
+  m_dropdownShortcutsCycleOptionsCB->setCurrentIndex(
+      m_pref->getDropdownShortcutsCycleOptions() ? 1 : 0);
+
   //--- Xsheet ------------------------------
   xsheetAutopanDuringPlaybackCB->setChecked(m_pref->isXsheetAutopanEnabled());
   m_cellsDragBehaviour->addItem(tr("Cells Only"));
@@ -1599,6 +1683,8 @@ PreferencesPopup::PreferencesPopup()
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
+  showCurrentTimelineCB->setChecked(
+      m_pref->isCurrentTimelineIndicatorEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -1987,7 +2073,7 @@ PreferencesPopup::PreferencesPopup()
       ioLay->addLayout(ioGridLay);
       ioLay->addStretch(1);
 
-      ioLay->addWidget(note_version, 0);
+      ioLay->addWidget(note_io, 0);
     }
     ioBox->setLayout(ioLay);
     stackedWidget->addWidget(ioBox);
@@ -2038,6 +2124,16 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(m_useNumpadForSwitchingStyles, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      QGroupBox *replaceVectorGroupBox = new QGroupBox(
+          tr("Replace Vectors with Simplified Vectors Command"), this);
+      QVBoxLayout *replaceVectorsLay = new QVBoxLayout();
+      replaceVectorsLay->setMargin(10);
+      replaceVectorsLay->setSpacing(10);
+      replaceVectorsLay->addWidget(m_keepFillOnVectorSimplifyCB);
+      replaceVectorsLay->addWidget(m_useHigherDpiOnVectorSimplifyCB);
+      replaceVectorGroupBox->setLayout(replaceVectorsLay);
+      drawingFrameLay->addWidget(replaceVectorGroupBox, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addStretch(1);
     }
     drawingBox->setLayout(drawingFrameLay);
@@ -2048,46 +2144,84 @@ PreferencesPopup::PreferencesPopup()
       m_defLevelHeight->setDecimals(0);
     }
 
-    //--- Xsheet --------------------------
-    QWidget *xsheetBox          = new QWidget(this);
-    QGridLayout *xsheetFrameLay = new QGridLayout();
-    xsheetFrameLay->setMargin(15);
-    xsheetFrameLay->setHorizontalSpacing(15);
-    xsheetFrameLay->setVerticalSpacing(11);
+    //--- Tools ---------------------------
+    QWidget *toolsBox          = new QWidget(this);
+    QGridLayout *toolsFrameLay = new QGridLayout();
+    toolsFrameLay->setMargin(15);
+    toolsFrameLay->setHorizontalSpacing(15);
+    toolsFrameLay->setVerticalSpacing(10);
     {
-      xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")), 0,
-                                0, Qt::AlignRight | Qt::AlignVCenter);
-      xsheetFrameLay->addWidget(m_xsheetStep, 0, 1);
-
-      xsheetFrameLay->addWidget(xsheetAutopanDuringPlaybackCB, 1, 0, 1, 2);
-
-      xsheetFrameLay->addWidget(new QLabel(tr("Cell-dragging Behaviour:")), 2,
-                                0, Qt::AlignRight | Qt::AlignVCenter);
-      xsheetFrameLay->addWidget(m_cellsDragBehaviour, 2, 1);
-
-      xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 3, 0, 1, 2);
-      xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
-      xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 5, 0, 1, 2);
-      xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 6, 0, 1, 2);
-      xsheetFrameLay->addWidget(shortcutCommandsWhileRenamingCellCB, 7, 0, 1,
-                                2);
-
-      QVBoxLayout *xSheetToolbarLay = new QVBoxLayout();
-      xSheetToolbarLay->setMargin(10);
-      {
-        xSheetToolbarLay->addWidget(m_expandFunctionHeader, 0,
-                                    Qt::AlignLeft | Qt::AlignVCenter);
-      }
-      m_showXSheetToolbar->setLayout(xSheetToolbarLay);
-
-      xsheetFrameLay->addWidget(m_showXSheetToolbar, 8, 0, 3, 3);
-      xsheetFrameLay->addWidget(showColumnNumbersCB, 11, 0, 1, 2);
+      toolsFrameLay->addWidget(new QLabel(tr("Dropdown Shortcuts:")), 0, 0,
+                               Qt::AlignRight | Qt::AlignVCenter);
+      toolsFrameLay->addWidget(m_dropdownShortcutsCycleOptionsCB, 0, 1);
     }
-    xsheetFrameLay->setColumnStretch(0, 0);
-    xsheetFrameLay->setColumnStretch(1, 0);
-    xsheetFrameLay->setColumnStretch(2, 1);
-    xsheetFrameLay->setRowStretch(12, 1);
-    xsheetBox->setLayout(xsheetFrameLay);
+    toolsFrameLay->setColumnStretch(0, 0);
+    toolsFrameLay->setColumnStretch(1, 0);
+    toolsFrameLay->setColumnStretch(2, 1);
+    toolsFrameLay->setRowStretch(0, 0);
+    toolsFrameLay->setRowStretch(1, 0);
+    toolsFrameLay->setRowStretch(2, 1);
+    toolsBox->setLayout(toolsFrameLay);
+    stackedWidget->addWidget(toolsBox);
+
+    //--- Xsheet --------------------------
+    QWidget *xsheetBox             = new QWidget(this);
+    QVBoxLayout *xsheetBoxFrameLay = new QVBoxLayout();
+    xsheetBoxFrameLay->setMargin(15);
+    xsheetBoxFrameLay->setSpacing(10);
+    {
+      QGridLayout *xsheetFrameLay = new QGridLayout();
+      xsheetFrameLay->setMargin(0);
+      xsheetFrameLay->setHorizontalSpacing(15);
+      xsheetFrameLay->setVerticalSpacing(10);
+      {
+        xsheetFrameLay->addWidget(new QLabel(tr("Layout Preference*:")), 0, 0,
+                                  Qt::AlignRight | Qt::AlignVCenter);
+        xsheetFrameLay->addWidget(xsheetLayoutOptions, 0, 1);
+
+        xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")),
+                                  1, 0, Qt::AlignRight | Qt::AlignVCenter);
+        xsheetFrameLay->addWidget(m_xsheetStep, 1, 1);
+
+        xsheetFrameLay->addWidget(xsheetAutopanDuringPlaybackCB, 2, 0, 1, 2);
+
+        xsheetFrameLay->addWidget(new QLabel(tr("Cell-dragging Behaviour:")), 3,
+                                  0, Qt::AlignRight | Qt::AlignVCenter);
+        xsheetFrameLay->addWidget(m_cellsDragBehaviour, 3, 1);
+
+        xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 4, 0, 1, 2);
+        xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 5, 0, 1, 2);
+        xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 6, 0, 1,
+                                  2);
+        xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 7, 0, 1,
+                                  2);
+        xsheetFrameLay->addWidget(shortcutCommandsWhileRenamingCellCB, 8, 0, 1,
+                                  2);
+
+        QVBoxLayout *xSheetToolbarLay = new QVBoxLayout();
+        xSheetToolbarLay->setMargin(11);
+        {
+          xSheetToolbarLay->addWidget(m_expandFunctionHeader, 0,
+                                      Qt::AlignLeft | Qt::AlignVCenter);
+        }
+        m_showXSheetToolbar->setLayout(xSheetToolbarLay);
+
+        xsheetFrameLay->addWidget(m_showXSheetToolbar, 9, 0, 3, 3);
+        xsheetFrameLay->addWidget(showColumnNumbersCB, 12, 0, 1, 2);
+        xsheetFrameLay->addWidget(showCurrentTimelineCB, 13, 0, 1, 2);
+      }
+      xsheetFrameLay->setColumnStretch(0, 0);
+      xsheetFrameLay->setColumnStretch(1, 0);
+      xsheetFrameLay->setColumnStretch(2, 1);
+      xsheetFrameLay->setRowStretch(14, 1);
+
+      xsheetBoxFrameLay->addLayout(xsheetFrameLay);
+
+      xsheetBoxFrameLay->addStretch(1);
+
+      xsheetBoxFrameLay->addWidget(note_xsheet, 0);
+    }
+    xsheetBox->setLayout(xsheetBoxFrameLay);
     stackedWidget->addWidget(xsheetBox);
 
     //--- Animation --------------------------
@@ -2257,6 +2391,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onRasterOptimizedMemoryChanged(int)));
   ret = ret && connect(m_autoSaveGroup, SIGNAL(toggled(bool)),
                        SLOT(onAutoSaveChanged(bool)));
+  ret = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
+                       SLOT(onAutoSaveExternallyChanged()));
+  ret = ret && connect(m_pref, SIGNAL(startAutoSave()), this,
+                       SLOT(onAutoSaveExternallyChanged()));
+  ret = ret && connect(m_pref, SIGNAL(autoSavePeriodChanged()), this,
+                       SLOT(onAutoSavePeriodExternallyChanged()));
   ret = ret && connect(m_autoSaveSceneCB, SIGNAL(stateChanged(int)),
                        SLOT(onAutoSaveSceneChanged(int)));
   ret = ret && connect(m_autoSaveOtherFilesCB, SIGNAL(stateChanged(int)),
@@ -2430,8 +2570,19 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefLevelParameterChanged()));
   ret = ret && connect(m_useNumpadForSwitchingStyles, SIGNAL(clicked(bool)),
                        SLOT(onUseNumpadForSwitchingStylesClicked(bool)));
+  ret = ret && connect(m_keepFillOnVectorSimplifyCB, SIGNAL(stateChanged(int)),
+                       SLOT(onKeepFillOnVectorSimplifyChanged(int)));
+  ret = ret &&
+        connect(m_useHigherDpiOnVectorSimplifyCB, SIGNAL(stateChanged(int)),
+                SLOT(onUseHigherDpiOnVectorSimplifyChanged(int)));
   ret = ret && connect(m_newLevelToCameraSizeCB, SIGNAL(clicked(bool)),
                        SLOT(onNewLevelToCameraSizeChanged(bool)));
+
+  //--- Tools -----------------------
+
+  ret = ret && connect(m_dropdownShortcutsCycleOptionsCB,
+                       SIGNAL(currentIndexChanged(int)),
+                       SLOT(onDropdownShortcutsCycleOptionsChanged(int)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),
@@ -2460,6 +2611,9 @@ PreferencesPopup::PreferencesPopup()
 
   ret = ret && connect(showColumnNumbersCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onShowColumnNumbersChanged(int)));
+  ret = ret && connect(xsheetLayoutOptions,
+                       SIGNAL(currentIndexChanged(const QString &)), this,
+                       SLOT(onXsheetLayoutChanged(const QString &)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),
@@ -2497,6 +2651,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onOnionPaperThicknessChanged()));
   ret = ret && connect(m_guidedDrawingStyle, SIGNAL(currentIndexChanged(int)),
                        SLOT(onGuidedDrawingStyleChanged(int)));
+  ret = ret && connect(showCurrentTimelineCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onShowCurrentTimelineChanged(int)));
+
   //--- Transparency Check ----------------------
   ret = ret && connect(m_transpCheckBgColor,
                        SIGNAL(colorChanged(const TPixel32 &, bool)),

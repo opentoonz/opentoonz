@@ -40,6 +40,7 @@
 #include "toonz/fxcommand.h"
 #include "toonz/tfxhandle.h"
 #include "toonz/scenefx.h"
+#include "toonz/preferences.h"
 
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
@@ -210,6 +211,20 @@ static void insertSceneFrame(int frame) {
 
   undo->redo();
 }
+
+//=============================================================================
+
+class ToggleCurrentTimeIndicatorCommand final : public MenuItemHandler {
+public:
+  ToggleCurrentTimeIndicatorCommand()
+      : MenuItemHandler(MI_ToggleCurrentTimeIndicator) {}
+  void execute() override {
+    bool currentTimeIndEnabled =
+        Preferences::instance()->isCurrentTimelineIndicatorEnabled();
+    Preferences::instance()->enableCurrentTimelineIndicator(
+        !currentTimeIndEnabled);
+  }
+} toggleCurrentTimeIndicatorComman;
 
 //=============================================================================
 

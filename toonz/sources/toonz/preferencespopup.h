@@ -43,7 +43,7 @@ private:
 
 private:
   Preferences *m_pref;
-
+  
   FormatProperties *m_formatProperties;
 
   DVGui::ColorField *m_blankColor, *m_frontOnionColor, *m_backOnionColor,
@@ -54,8 +54,9 @@ private:
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
-      *m_interfaceFont, *m_interfaceFontWeight, *m_vectorSnappingTargetCB,
-      *m_guidedDrawingStyle;
+      *m_vectorSnappingTargetCB, *m_dropdownShortcutsCycleOptionsCB,
+      *m_interfaceFont, *m_interfaceFontWeight, *m_guidedDrawingStyle;
+
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -75,6 +76,7 @@ private:
       *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
+      *m_useHigherDpiOnVectorSimplifyCB, *m_keepFillOnVectorSimplifyCB,
       *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB;
 
   DVGui::FileField *m_customProjectRootFileField;
@@ -93,6 +95,8 @@ private slots:
   void onProjectRootChanged();
   void onCustomProjectRootChanged();
   void onPixelUnitExternallySelected(bool on);
+  void onAutoSaveExternallyChanged();
+  void onAutoSavePeriodExternallyChanged();
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
   void onRoomChoiceChanged(int index);
@@ -139,12 +143,15 @@ private slots:
   void onDefLevelParameterChanged();
   void onGetFillOnlySavebox(int index);
   void onFitToFlipbook(int);
+  void onDropdownShortcutsCycleOptionsChanged(int);
   void onAddLevelFormat();
   void onRemoveLevelFormat();
   void onEditLevelFormat();
   void onLevelFormatEdited();
   void onIgnoreImageDpiChanged(int index);
   void onShow0ThickLinesChanged(int);
+  void onKeepFillOnVectorSimplifyChanged(int);
+  void onUseHigherDpiOnVectorSimplifyChanged(int);
   void onRegionAntialiasChanged(int);
   void onImportPolicyChanged(int);
   void onImportPolicyExternallyChanged(int policy);
@@ -188,6 +195,8 @@ private slots:
   void onWatchFileSystemClicked(int);
   void onInterfaceFontChanged(int index);
   void onInterfaceFontWeightChanged(int index);
+  void onXsheetLayoutChanged(const QString &text);
+  void onShowCurrentTimelineChanged(int);
 };
 
 //**********************************************************************************

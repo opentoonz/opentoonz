@@ -37,7 +37,8 @@ TSceneProperties::TSceneProperties()
     , m_tlvSubsampling(1)
     , m_fieldGuideSize(16)
     , m_fieldGuideAspectRatio(1.77778)
-    , m_columnColorFilterOnRender(false) {
+    , m_columnColorFilterOnRender(false)
+    , m_camCapSaveInPath() {
   // Default color
   m_notesColor.push_back(TPixel32(255, 235, 140));
   m_notesColor.push_back(TPixel32(255, 160, 120));
@@ -298,6 +299,8 @@ void TSceneProperties::saveData(TOStream &os) const {
   os.child("subsampling") << m_fullcolorSubsampling << m_tlvSubsampling;
   os.child("fieldguide") << m_fieldGuideSize << m_fieldGuideAspectRatio;
   if (m_columnColorFilterOnRender) os.child("columnColorFilterOnRender") << 1;
+  if (!m_camCapSaveInPath.isEmpty())
+    os.child("cameraCaputureSaveInPath") << m_camCapSaveInPath;
 
   os.openChild("noteColors");
   for (i = 0; i < m_notesColor.size(); i++) os << m_notesColor.at(i);
@@ -673,6 +676,8 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
         i++;
       }
       assert(i == 7);
+    } else if (tagName == "cameraCaputureSaveInPath") {
+      is >> m_camCapSaveInPath;
     } else {
       throw TException("unexpected property tag: " + tagName);
     }

@@ -25,6 +25,7 @@ class QMainWindow;
 
 class TMainWindow;
 class ComboViewerPanel;
+class SceneViewer;
 
 //=============================================================================
 // TXsheeHandle
@@ -82,6 +83,7 @@ class TApp final : public QObject,
   // keep a pointer of the inknpaint viewer in order to enable navigator pan in
   // the filmstrip
   ComboViewerPanel *m_inknPaintViewerPanel;
+  SceneViewer *m_activeViewer;
 
   int m_autosavePeriod;  // minutes
   bool m_autosaveSuspended;
@@ -194,6 +196,10 @@ public:
   ComboViewerPanel *getInknPaintViewerPanel() const {
     return m_inknPaintViewerPanel;
   }
+
+  void setActiveViewer(SceneViewer *viewer) { m_activeViewer = viewer; }
+
+  SceneViewer *getActiveViewer() const { return m_activeViewer; }
 
   bool isApplicationStarting() { return m_isStarting; }
 

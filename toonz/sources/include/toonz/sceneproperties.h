@@ -76,6 +76,7 @@ private:
   QList<TPixel32> m_notesColor;
 
   bool m_columnColorFilterOnRender;
+  TFilePath m_camCapSaveInPath;
 
 public:
   /*!
@@ -258,6 +259,14 @@ and height.
   /* Activate / deactivate the column color filter in render */
   void enableColumnColorFilterOnRender(bool on) {
     m_columnColorFilterOnRender = on;
+  }
+
+  /* Returns initial save in path for the camera capture feature */
+  TFilePath cameraCaptureSaveInPath() const { return m_camCapSaveInPath; }
+
+  /* Set the initial save in path for the camera capture feature */
+  void setCameraCaptureSaveInPath(const TFilePath &fp) {
+    m_camCapSaveInPath = fp;
   }
 
   //! Substitutes current cameras with those stored in the specified stage tree.

@@ -98,8 +98,8 @@ void PreviewToggleCommand::enable() {
 
   TPaletteHandle *ph =
       TApp::instance()->getPaletteController()->getCurrentCleanupPalette();
-  ret =
-      ret && connect(ph, SIGNAL(colorStyleChanged()), &m_timer, SLOT(start()));
+  ret = ret &&
+        connect(ph, SIGNAL(colorStyleChanged(bool)), &m_timer, SLOT(start()));
   ret = ret && connect(ph, SIGNAL(paletteChanged()), &m_timer, SLOT(start()));
   assert(ret);
 
@@ -129,8 +129,8 @@ void PreviewToggleCommand::disable() {
   // involve the model.
   TPaletteHandle *ph =
       TApp::instance()->getPaletteController()->getCurrentCleanupPalette();
-  ret = ret &&
-        disconnect(ph, SIGNAL(colorStyleChanged()), &m_timer, SLOT(start()));
+  ret = ret && disconnect(ph, SIGNAL(colorStyleChanged(bool)), &m_timer,
+                          SLOT(start()));
   ret =
       ret && disconnect(ph, SIGNAL(paletteChanged()), &m_timer, SLOT(start()));
   assert(ret);

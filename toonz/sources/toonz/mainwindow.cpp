@@ -31,6 +31,7 @@
 #include "toonz/stylemanager.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
+#include "toonz/txshleveltypes.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -62,6 +63,7 @@ TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
 TEnv::IntVar FieldGuideToggleAction("FieldGuideToggleAction", 0);
 TEnv::IntVar ViewBBoxToggleAction("ViewBBoxToggleAction1", 1);
+TEnv::IntVar EditInPlaceToggleAction("EditInPlaceToggleAction", 0);
 #ifdef LINETEST
 TEnv::IntVar CapturePanelFieldGuideToggleAction(
     "CapturePanelFieldGuideToggleAction", 0);
@@ -378,6 +380,8 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent,
   m_toolsActionGroup->setExclusive(true);
   m_currentRoomsChoice = Preferences::instance()->getCurrentRoomChoice();
   defineActions();
+  // user defined shortcuts will be loaded here
+  CommandManager::instance()->loadShortcuts();
   TApp::instance()->getCurrentScene()->setDirtyFlag(false);
 
   // La menuBar altro non è che una toolbar
@@ -1092,12 +1096,7 @@ void MainWindow::onAbout() {
 
 void MainWindow::autofillToggle() {
   TPaletteHandle *h = TApp::instance()->getCurrentPalette();
-  int index         = h->getStyleIndex();
-  if (index > 0) {
-    TColorStyle *s = h->getPalette()->getStyle(index);
-    s->setFlags(s->getFlags() == 0 ? 1 : 0);
-    h->notifyColorStyleChanged();
-  }
+  h->toggleAutopaint();
 }
 
 void MainWindow::resetRoomsLayout() {
@@ -1248,6 +1247,8 @@ void MainWindow::onMenuCheckboxChanged() {
     ViewCameraToggleAction = isChecked;
   else if (cm->getAction(MI_ViewTable) == action)
     ViewTableToggleAction = isChecked;
+  else if (cm->getAction(MI_ToggleEditInPlace) == action)
+    EditInPlaceToggleAction = isChecked;
   else if (cm->getAction(MI_ViewBBox) == action)
     ViewBBoxToggleAction = isChecked;
   else if (cm->getAction(MI_FieldGuide) == action)
@@ -1739,8 +1740,7 @@ void MainWindow::defineActions() {
   createMenuLevelAction(MI_Renumber, tr("&Renumber..."), "");
   createMenuLevelAction(MI_ReplaceLevel, tr("&Replace Level..."), "");
   createMenuLevelAction(MI_RevertToCleanedUp, tr("&Revert to Cleaned Up"), "");
-  createMenuLevelAction(MI_RevertToLastSaved,
-                        tr("&Revert to Last Saved Version"), "");
+  createMenuLevelAction(MI_RevertToLastSaved, tr("&Reload"), "");
   createMenuLevelAction(MI_ExposeResource, tr("&Expose in Xsheet"), "");
   createMenuLevelAction(MI_EditLevel, tr("&Display in Level Strip"), "");
   createMenuLevelAction(MI_LevelSettings, tr("&Level Settings..."), "");
@@ -1784,7 +1784,11 @@ void MainWindow::defineActions() {
   collapseAction->setIconText("Collapse");
   collapseAction->setIcon(createQIconOnOffPNG("collapse"));
 
-  createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
+  toggle = createToggle(MI_ToggleEditInPlace, tr("&Toggle Edit In Place"), "",
+                        EditInPlaceToggleAction ? 1 : 0, MenuViewCommandType);
+  toggle->setIconText(tr("Toggle Edit in Place"));
+  toggle->setIcon(QIcon(":Resources/edit_in_place.svg"));
+
   createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
   createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
   createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
@@ -1807,6 +1811,8 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
+  createMenuXsheetAction(MI_LipSyncPopup, tr("&Apply Lip Sync Data to Column"),
+                         "Alt+L");
   createRightClickMenuAction(MI_ToggleXSheetToolbar,
                              tr("Toggle XSheet Toolbar"), "");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
@@ -1861,6 +1867,7 @@ void MainWindow::defineActions() {
                         "");
 
   createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "Z");
+  createRightClickMenuAction(MI_PasteNumbers, tr("&Paste Numbers"), "");
 
   createToggle(MI_ViewCamera, tr("&Camera Box"), "",
                ViewCameraToggleAction ? 1 : 0, MenuViewCommandType);
@@ -2004,12 +2011,16 @@ void MainWindow::defineActions() {
                           "Ctrl+`");
   createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
   createMenuWindowsAction(MI_StartupPopup, tr("&Startup Popup..."), "Alt+S");
+
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
   createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "/", false,
                RightClickMenuCommandType);
   createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false,
                RightClickMenuCommandType);
+
+  createRightClickMenuAction(MI_ToggleCurrentTimeIndicator,
+                             tr("Toggle Current Time Indicator"), "");
 
   // createRightClickMenuAction(MI_LoadSubSceneFile,     tr("Load As
   // Sub-xsheet"),   "");
@@ -2026,6 +2037,10 @@ void MainWindow::defineActions() {
   // createRightClickMenuAction(MI_PremultiplyFile,      tr("Premultiply"),
   // "");
   createMenuLevelAction(MI_ConvertToVectors, tr("Convert to Vectors..."), "");
+  createMenuLevelAction(MI_ConvertToToonzRaster, tr("Vectors to Toonz Raster"),
+                        "");
+  createMenuLevelAction(MI_ConvertVectorToVector,
+                        tr("Replace Vectors with Simplified Vectors"), "");
   createMenuLevelAction(MI_Tracking, tr("Tracking..."), "");
   createRightClickMenuAction(MI_RemoveLevel, tr("Remove Level"), "");
   createRightClickMenuAction(MI_AddToBatchRenderList, tr("Add As Render Task"),

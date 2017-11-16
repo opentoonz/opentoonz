@@ -246,6 +246,8 @@
 #define MI_RevertToCleanedUp "MI_RevertToCleanedUp"
 #define MI_RevertToLastSaved "MI_RevertToLastSaved"
 #define MI_ConvertToVectors "MI_ConvertToVectors"
+#define MI_ConvertToToonzRaster "MI_ConvertToToonzRaster"
+#define MI_ConvertVectorToVector "MI_ConvertVectorToVector"
 #define MI_Tracking "MI_Tracking"
 #define MI_RemoveLevel "MI_RemoveLevel"
 #define MI_CollectAssets "MI_CollectAssets"
@@ -288,6 +290,7 @@
 #define MI_ToggleColumnLocks "MI_ToggleColumnLocks"
 #define MI_ToggleXSheetToolbar "MI_ToggleXSheetToolbar"
 #define MI_FoldColumns "MI_FoldColumns"
+#define MI_ToggleCurrentTimeIndicator "MI_ToggleCurrentTimeIndicator"
 
 #define MI_LoadIntoCurrentPalette "MI_LoadIntoCurrentPalette"
 #define MI_AdjustCurrentLevelToPalette "MI_AdjustCurrentLevelToPalette"
@@ -320,5 +323,6 @@
 #define MI_StartupPopup "MI_StartupPopup"
 #define MI_PencilTest "MI_PencilTest"
 #define MI_AudioRecording "MI_AudioRecording"
+#define MI_LipSyncPopup "MI_LipSyncPopup"
 #define MI_AutoInputCellNumber "MI_AutoInputCellNumber"
 #endif
