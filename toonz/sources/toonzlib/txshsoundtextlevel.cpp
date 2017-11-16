@@ -29,7 +29,9 @@ TXshSoundTextLevel *TXshSoundTextLevel::clone() const {
 //-----------------------------------------------------------------------------
 
 void TXshSoundTextLevel::setFrameText(int frameIndex, QString text) {
-  while (frameIndex >= m_framesText.size()) m_framesText.append(QString());
+  while (frameIndex >= m_framesText.size()) {
+    m_framesText.append(QString(" "));
+  }
   m_framesText.replace(frameIndex, text);
 }
 

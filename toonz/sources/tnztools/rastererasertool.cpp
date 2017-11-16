@@ -684,6 +684,14 @@ void EraserTool::draw() {
     for (UINT i = 0; i < m_polyline.size(); i++) tglVertex(m_polyline[i]);
     tglVertex(m_mousePos);
     glEnd();
+  } else if (m_eraseType.getValue() == FREEHANDERASE && !m_track.isEmpty()) {
+    TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+                       ? TPixel32::White
+                       : TPixel32::Black;
+    tglColor(color);
+    glPushMatrix();
+    m_track.drawAllFragments();
+    glPopMatrix();
   }
 }
 
@@ -925,24 +933,12 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       m_firstPos        = pos;
       double pixelSize2 = getPixelSize() * getPixelSize();
       m_track.add(TThickPoint(pos, m_thick), pixelSize2);
-      TPointD dpiScale = m_viewer->getDpiScale();
 
-      TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                         ? TPixel32::White
-                         : TPixel32::Black;
-      tglColor(color);
-
-      getViewer()->startForegroundDrawing();
-
-      glPushMatrix();
-      glScaled(dpiScale.x, dpiScale.y, 1);
       if (m_eraseType.getValue() == POLYLINEERASE) {
         if (m_polyline.empty() || m_polyline.back() != pos)
           m_polyline.push_back(pos);
-      } else
-        m_track.drawLastFragments();
-      glPopMatrix();
-      getViewer()->endForegroundDrawing();
+      }
+
       int maxThick = 2 * m_thick;
       TPointD halfThick(maxThick * 0.5, maxThick * 0.5);
       invalidateRect = TRectD(pos - halfThick, pos + halfThick);
@@ -1059,20 +1055,8 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     }
     if (m_eraseType.getValue() == FREEHANDERASE) {
       if (!m_enabled || !m_active) return;
-
-      getViewer()->startForegroundDrawing();
-      TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                         ? TPixel32::White
-                         : TPixel32::Black;
-      tglColor(color);
-      glPushMatrix();
-      tglMultMatrix(getMatrix());
-      TPointD dpiScale = m_viewer->getDpiScale();
-      glScaled(dpiScale.x, dpiScale.y, 1);
       m_track.add(TThickPoint(pos, m_thick), pixelSize2);
-      m_track.drawLastFragments();
-      glPopMatrix();
-      getViewer()->endForegroundDrawing();
+      invalidate(m_track.getModifiedRegion());
     }
   }
 }

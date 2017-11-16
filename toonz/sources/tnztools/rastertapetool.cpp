@@ -194,6 +194,7 @@ public:
       invalidate();
     } else if (m_closeType.getValue() == FREEHAND_CLOSE) {
       freehandDrag(pos);
+      invalidate();
     }
   }
 
@@ -431,6 +432,7 @@ public:
         multiAutocloseRegion(m_stroke, e);
       else
         applyAutoclose(ti, TRectD(), m_stroke);
+      m_track.clear();
       invalidate();
     }
     if (m_stroke) {
@@ -473,6 +475,12 @@ public:
       for (UINT i = 0; i < m_polyline.size(); i++) tglVertex(m_polyline[i]);
       tglVertex(m_mousePosition);
       glEnd();
+    } else if (m_closeType.getValue() == FREEHAND_CLOSE && !m_track.isEmpty()) {
+      TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+                         ? TPixel32::White
+                         : TPixel32::Black;
+      tglColor(color);
+      m_track.drawAllFragments();
     } else if (m_multi.getValue() && m_firstFrameSelected)
       drawCross(m_firstPoint, 5);
   }
@@ -695,21 +703,6 @@ public:
     m_firstPos        = pos;
     double pixelSize2 = getPixelSize() * getPixelSize();
     m_track.add(TThickPoint(pos, m_thick), pixelSize2);
-    TPointD dpiScale = m_viewer->getDpiScale();
-#if defined(MACOSX)
-// getViewer()->prepareForegroundDrawing();
-#endif
-    //			getViewer()->makeCurrent();
-    TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                       ? TPixel32::White
-                       : TPixel32::Black;
-    tglColor(color);
-    m_viewer->startForegroundDrawing();
-    glPushMatrix();
-    glScaled(dpiScale.x, dpiScale.y, 1);
-    m_track.drawLastFragments();
-    glPopMatrix();
-    getViewer()->endForegroundDrawing();
   }
 
   //------------------------------------------------------------------
@@ -717,24 +710,8 @@ public:
   //! Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del
   //! lazzo.
   void freehandDrag(const TPointD &pos) {
-#if defined(MACOSX)
-// getViewer()->enableRedraw(false);
-#endif
-
-    getViewer()->startForegroundDrawing();
-    TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                       ? TPixel32::White
-                       : TPixel32::Black;
-    tglColor(color);
-    glPushMatrix();
-    tglMultMatrix(getMatrix());
-    TPointD dpiScale = m_viewer->getDpiScale();
-    glScaled(dpiScale.x, dpiScale.y, 1);
     double pixelSize2 = getPixelSize() * getPixelSize();
     m_track.add(TThickPoint(pos, m_thick), pixelSize2);
-    m_track.drawLastFragments();
-    glPopMatrix();
-    getViewer()->endForegroundDrawing();
   }
 
   //------------------------------------------------------------------
@@ -742,9 +719,6 @@ public:
   //! Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene
   //! creato lo stroke rappresentante il lazzo.
   void closeFreehand(const TPointD &pos) {
-#if defined(MACOSX)
-// getViewer()->enableRedraw(true);
-#endif
     if (m_track.isEmpty()) return;
     double pixelSize2 = getPixelSize() * getPixelSize();
     m_track.add(TThickPoint(m_firstPos, m_thick), pixelSize2);
@@ -759,29 +733,7 @@ public:
   //! Viene aggiunto un punto al vettore m_polyline.
   void addPointPolyline(const TPointD &pos) {
     m_firstPos = pos;
-    // m_mousePosition = pos;
-
-    TPointD dpiScale = m_viewer->getDpiScale();
-
-#if defined(MACOSX)
-// getViewer()->prepareForegroundDrawing();
-#endif
-    //				getViewer()->makeCurrent();
-    TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                       ? TPixel32::White
-                       : TPixel32::Black;
-    tglColor(color);
-    getViewer()->startForegroundDrawing();
-
-#if defined(MACOSX)
-// getViewer()->enableRedraw(m_closeType.getValue() == POLYLINE_CLOSE);
-#endif
-
-    glPushMatrix();
-    glScaled(dpiScale.x, dpiScale.y, 1);
     m_polyline.push_back(pos);
-    glPopMatrix();
-    getViewer()->endForegroundDrawing();
   }
 
   //------------------------------------------------------------------

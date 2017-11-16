@@ -25,6 +25,7 @@
 #include "tools/toolhandle.h"
 #include "tools/cursormanager.h"
 #include "tools/toolcommandids.h"
+#include "toonzqt/viewcommandids.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
@@ -60,6 +61,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QMimeData>
+#include <QGestureEvent>
 
 // definito - per ora - in tapp.cpp
 extern QString updateToolEnableStatus(TTool *tool);
@@ -322,7 +324,8 @@ void SceneViewer::enterEvent(QEvent *) {
 
   m_isMouseEntered = true;
 
-  TApp *app        = TApp::instance();
+  TApp *app = TApp::instance();
+  app->setActiveViewer(this);
   modifiers        = 0;
   TTool *tool      = app->getCurrentTool()->getTool();
   TXshLevel *level = app->getCurrentLevel()->getLevel();
@@ -350,7 +353,9 @@ void SceneViewer::enterEvent(QEvent *) {
 void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) return;
-
+  if (m_gestureActive) {
+    return;
+  }
   // there are three cases to come here :
   // 1. on mouse is moved (no tablet is used)
   // 2. on tablet is moved, with middle or right button is pressed
@@ -509,9 +514,15 @@ void SceneViewer::onMove(const TMouseEvent &event) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::mousePressEvent(QMouseEvent *event) {
+  // source can be useful for detecting touch vs mouse,
+  // but has reports of being unreliable on mac
+  // so m_gestureActive is the marker for rejecting touch events
+  int source = event->source();
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) return;
-
+  if (m_gestureActive) {
+    return;
+  }
   // For now OSX has a critical problem that mousePressEvent is called just
   // after releasing the stylus, which causes the irregular stroke while
   // float-moving.
@@ -616,6 +627,15 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) {
     m_tabletEvent = false;
+    return;
+  }
+  if (m_gestureActive) {
+    m_gestureActive = false;
+    m_rotating      = false;
+    m_zooming       = false;
+    m_panning       = false;
+    m_scaleFactor   = 0.0;
+    m_rotationDelta = 0.0;
     return;
   }
 
@@ -791,7 +811,132 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::gestureEvent(QGestureEvent *e) {
+  m_gestureActive = false;
+  if (QGesture *swipe = e->gesture(Qt::SwipeGesture)) {
+    m_gestureActive = true;
+  } else if (QGesture *pan = e->gesture(Qt::PanGesture)) {
+    m_gestureActive = true;
+  }
+  if (QGesture *pinch = e->gesture(Qt::PinchGesture)) {
+    QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    QPoint firstCenter                     = gesture->centerPoint().toPoint();
+
+    if (gesture->state() == Qt::GestureStarted) {
+      m_gestureActive = true;
+    } else if (gesture->state() == Qt::GestureFinished) {
+      m_gestureActive = false;
+      m_rotating      = false;
+      m_zooming       = false;
+      m_scaleFactor   = 0.0;
+      m_rotationDelta = 0.0;
+    } else {
+      if (changeFlags & QPinchGesture::RotationAngleChanged) {
+        qreal rotationDelta =
+            gesture->rotationAngle() - gesture->lastRotationAngle();
+        TAffine aff    = getViewMatrix().inv();
+        TPointD center = aff * TPointD(0, 0);
+        if (!m_rotating && !m_zooming) {
+          m_rotationDelta += rotationDelta;
+          double absDelta = abs(m_rotationDelta);
+          if (absDelta >= 10) {
+            m_rotating = true;
+          }
+        }
+        if (m_rotating) {
+          rotate(center, -rotationDelta);
+        }
+      }
+      if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        double scaleFactor = gesture->scaleFactor();
+        // the scale factor makes for too sensitive scaling
+        // divide the change in half
+        if (scaleFactor > 1) {
+          double decimalValue = scaleFactor - 1;
+          decimalValue /= 3;
+          scaleFactor = 1 + decimalValue;
+        } else if (scaleFactor < 1) {
+          double decimalValue = 1 - scaleFactor;
+          decimalValue /= 3;
+          scaleFactor = 1 - decimalValue;
+        }
+        if (!m_rotating && !m_zooming) {
+          double delta = scaleFactor - 1;
+          m_scaleFactor += delta;
+          if (m_scaleFactor > .2 || m_scaleFactor < -.2) {
+            m_zooming = true;
+          }
+        }
+        if (m_zooming) {
+          zoomQt(firstCenter * getDevPixRatio(), scaleFactor);
+        }
+        m_gestureActive = true;
+      }
+      if (changeFlags & QPinchGesture::CenterPointChanged) {
+        QPointF centerDelta = (gesture->centerPoint() * getDevPixRatio()) -
+                              (gesture->lastCenterPoint() * getDevPixRatio());
+        if (centerDelta.manhattanLength() > 1) {
+          // panQt(centerDelta.toPoint());
+        }
+        m_gestureActive = true;
+      }
+    }
+  }
+  e->accept();
+}
+
+void SceneViewer::touchEvent(QTouchEvent *e, int type) {
+  if (type == QEvent::TouchBegin) {
+    m_touchActive   = true;
+    m_firstPanPoint = e->touchPoints().at(0).pos();
+    m_undoPoint     = m_firstPanPoint;
+  }
+  if (e->touchPoints().count() == 1 && m_touchActive) {
+    QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+    if (!m_panning) {
+      QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+      if (deltaPoint.manhattanLength() > 100) {
+        m_panning = true;
+      }
+    }
+    if (m_panning) {
+      QPointF centerDelta = (panPoint.pos() * getDevPixRatio()) -
+                            (panPoint.lastPos() * getDevPixRatio());
+      panQt(centerDelta.toPoint());
+    }
+  }
+  if (e->touchPoints().count() == 3 && m_touchActive) {
+    QPointF newPoint = e->touchPoints().at(0).pos();
+    if (m_undoPoint.x() - newPoint.x() > 100) {
+      CommandManager::instance()->execute("MI_Undo");
+      m_undoPoint = newPoint;
+    }
+    if (m_undoPoint.x() - newPoint.x() < -100) {
+      CommandManager::instance()->execute("MI_Redo");
+      m_undoPoint = newPoint;
+    }
+  }
+  if (type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
+    m_touchActive = false;
+    m_panning     = false;
+  }
+  e->accept();
+}
+
+//-----------------------------------------------------------------------------
+
 bool SceneViewer::event(QEvent *e) {
+  if (e->type() == QEvent::Gesture) {
+    gestureEvent(static_cast<QGestureEvent *>(e));
+    return true;
+  }
+  if (e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
+      e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) {
+    touchEvent(static_cast<QTouchEvent *>(e), e->type());
+    m_gestureActive = true;
+    return true;
+  }
   if (e->type() == QEvent::ShortcutOverride || e->type() == QEvent::KeyPress) {
     if (!((QKeyEvent *)e)->isAutoRepeat()) {
       TApp::instance()->getCurrentTool()->storeTool();
@@ -1155,6 +1300,11 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::mouseDoubleClickEvent(QMouseEvent *event) {
+  if (m_gestureActive) {
+    fitToCamera();
+    m_gestureActive = false;
+    return;
+  }
   if (m_freezedStatus != NO_FREEZED) return;
 
   int frame = TApp::instance()->getCurrentFrame()->getFrame();

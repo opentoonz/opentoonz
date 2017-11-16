@@ -71,6 +71,7 @@ set(MOC_HEADERS
     linetestcapturepane.h
     linetestpane.h
     linetestviewer.h
+    lipsyncpopup.h
     loadfolderpopup.h
     magpiefileimportpopup.h
     mainwindow.h
@@ -234,6 +235,7 @@ set(SOURCES
     linetestcapturepane.cpp
     linetestpane.cpp
     linetestviewer.cpp
+    lipsyncpopup.cpp
     magpiefileimportpopup.cpp
     outputsettingspopup.cpp
     overwritepopup.cpp
@@ -431,7 +433,7 @@ elseif(BUILD_ENV_UNIXLIKE)
     set(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${OPENBLAS_LIB})
 
     if(BUILD_TARGET_WIN)
-        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids)
+        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids -mwindows)
     endif()
 
     target_link_libraries(

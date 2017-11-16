@@ -505,6 +505,10 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
   // Ghibli3DLutUtil::m_isValid)
   //  m_ghibli3DLutUtil = new Ghibli3DLutUtil();
+  setAttribute(Qt::WA_AcceptTouchEvents);
+  grabGesture(Qt::SwipeGesture);
+  grabGesture(Qt::PanGesture);
+  grabGesture(Qt::PinchGesture);
 }
 
 //-----------------------------------------------------------------------------
@@ -573,48 +577,6 @@ void SceneViewer::onRenderCompleted(int frame) {
 void SceneViewer::onPreviewUpdate() {
   update();
   emit previewStatusChanged();
-}
-
-//-----------------------------------------------------------------------------
-
-void SceneViewer::startForegroundDrawing() {
-  makeCurrent();
-  // setAutoBufferSwap(false);
-  update();  // needed?
-  glPushMatrix();
-  tglMultMatrix(getViewMatrix());
-
-  if (is3DView()) {
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_ALWAYS);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPushMatrix();
-    mult3DMatrix();
-  }
-
-  glDrawBuffer(GL_FRONT);
-
-  assert(glGetError() == GL_NO_ERROR);
-  m_foregroundDrawing = true;
-}
-
-//-----------------------------------------------------------------------------
-
-void SceneViewer::endForegroundDrawing() {
-  makeCurrent();
-  glFlush();
-  glDrawBuffer(GL_BACK);
-  glPopMatrix();
-
-  if (is3DView()) {
-    glDisable(GL_DEPTH_TEST);
-    glPopMatrix();
-    assert(glGetError() == GL_NO_ERROR);
-  }
-
-  // setAutoBufferSwap(true);
-  update();  // needed?
-  m_foregroundDrawing = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -755,7 +717,7 @@ void SceneViewer::showEvent(QShowEvent *) {
 
   TPaletteHandle *paletteHandle =
       app->getPaletteController()->getCurrentLevelPalette();
-  connect(paletteHandle, SIGNAL(colorStyleChanged()), this, SLOT(update()));
+  connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this, SLOT(update()));
 
   connect(app->getCurrentObject(), SIGNAL(objectSwitched()), this,
           SLOT(onObjectSwitched()));
@@ -800,6 +762,7 @@ void SceneViewer::showEvent(QShowEvent *) {
     fitToCamera();
     m_shownOnce = true;
   }
+  TApp::instance()->setActiveViewer(this);
 }
 
 //-----------------------------------------------------------------------------

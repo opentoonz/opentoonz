@@ -226,9 +226,9 @@ void FullColorBrushTool::updateWorkAndBackupRasters(const TRect &rect) {
   TRasterP ras = ri->getRaster();
 
   const int denominator = 8;
-  TRect enlargedRect = rect + m_lastRect;
-  int dx = (enlargedRect.getLx()-1)/denominator+1;
-  int dy = (enlargedRect.getLy()-1)/denominator+1;
+  TRect enlargedRect    = rect + m_lastRect;
+  int dx                = (enlargedRect.getLx() - 1) / denominator + 1;
+  int dy                = (enlargedRect.getLy() - 1) / denominator + 1;
 
   if (m_lastRect.isEmpty()) {
     enlargedRect.x0 -= dx;
@@ -236,7 +236,7 @@ void FullColorBrushTool::updateWorkAndBackupRasters(const TRect &rect) {
     enlargedRect.x1 += dx;
     enlargedRect.y1 += dy;
 
-    TRect _rect = enlargedRect*ras->getBounds();
+    TRect _rect = enlargedRect * ras->getBounds();
     if (_rect.isEmpty()) return;
 
     m_workRaster->extract(_rect)->copy(ras->extract(_rect));
@@ -247,10 +247,10 @@ void FullColorBrushTool::updateWorkAndBackupRasters(const TRect &rect) {
     if (enlargedRect.x1 > m_lastRect.x1) enlargedRect.x1 += dx;
     if (enlargedRect.y1 > m_lastRect.y1) enlargedRect.y1 += dy;
 
-    TRect _rect = enlargedRect*ras->getBounds();
+    TRect _rect = enlargedRect * ras->getBounds();
     if (_rect.isEmpty()) return;
 
-    TRect _lastRect = m_lastRect * ras->getBounds();
+    TRect _lastRect    = m_lastRect * ras->getBounds();
     QList<TRect> rects = ToolUtils::splitRect(_rect, _lastRect);
     for (int i = 0; i < rects.size(); i++) {
       m_workRaster->extract(rects[i])->copy(ras->extract(rects[i]));
@@ -263,9 +263,7 @@ void FullColorBrushTool::updateWorkAndBackupRasters(const TRect &rect) {
 
 //--------------------------------------------------------------------------------------------------
 
-bool FullColorBrushTool::askRead(const TRect &rect) {
-  return askWrite(rect);
-}
+bool FullColorBrushTool::askRead(const TRect &rect) { return askWrite(rect); }
 
 //--------------------------------------------------------------------------------------------------
 
@@ -316,10 +314,11 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos,
 
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
-  double pressure = m_enabledPressure && e.isTablet() ? e.m_pressure/255.0 : 0.5;
+  double pressure =
+      m_enabledPressure && e.isTablet() ? e.m_pressure / 255.0 : 0.5;
 
-  m_tileSet       = new TTileSetFullColor(ras->getSize());
-  m_tileSaver     = new TTileSaverFullColor(ras, m_tileSet);
+  m_tileSet   = new TTileSetFullColor(ras->getSize());
+  m_tileSaver = new TTileSaverFullColor(ras, m_tileSet);
 
   mypaint::Brush mypaintBrush;
   applyToonzBrushSettings(mypaintBrush);
@@ -329,14 +328,15 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos,
   m_strokeSegmentRect.empty();
   m_toonz_brush->beginStroke();
   m_toonz_brush->strokeTo(point, pressure, restartBrushTimer());
-  TRect updateRect = m_strokeSegmentRect*ras->getBounds();
+  TRect updateRect = m_strokeSegmentRect * ras->getBounds();
   if (!updateRect.isEmpty())
     ras->extract(updateRect)->copy(m_workRaster->extract(updateRect));
 
-  TPointD thickOffset(m_maxCursorThick*0.5, m_maxCursorThick*0.5);
+  TPointD thickOffset(m_maxCursorThick * 0.5, m_maxCursorThick * 0.5);
   TRectD invalidateRect = convert(m_strokeSegmentRect) - rasCenter;
   invalidateRect += TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
-  invalidateRect += TRectD(previousBrushPos - thickOffset, previousBrushPos + thickOffset);
+  invalidateRect +=
+      TRectD(previousBrushPos - thickOffset, previousBrushPos + thickOffset);
   invalidate(invalidateRect.enlarge(2.0));
 }
 
@@ -350,21 +350,23 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos,
   TRasterImageP ri        = (TRasterImageP)getImage(true);
   if (!ri) return;
 
-  TRasterP ras = ri->getRaster();
+  TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
-  double pressure = m_enabledPressure && e.isTablet() ? e.m_pressure/255.0 : 0.5;
+  double pressure =
+      m_enabledPressure && e.isTablet() ? e.m_pressure / 255.0 : 0.5;
 
   m_strokeSegmentRect.empty();
   m_toonz_brush->strokeTo(point, pressure, restartBrushTimer());
-  TRect updateRect = m_strokeSegmentRect*ras->getBounds();
+  TRect updateRect = m_strokeSegmentRect * ras->getBounds();
   if (!updateRect.isEmpty())
     ras->extract(updateRect)->copy(m_workRaster->extract(updateRect));
 
-  TPointD thickOffset(m_maxCursorThick*0.5, m_maxCursorThick*0.5);
+  TPointD thickOffset(m_maxCursorThick * 0.5, m_maxCursorThick * 0.5);
   TRectD invalidateRect = convert(m_strokeSegmentRect) - rasCenter;
   invalidateRect += TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
-  invalidateRect += TRectD(previousBrushPos - thickOffset, previousBrushPos + thickOffset);
+  invalidateRect +=
+      TRectD(previousBrushPos - thickOffset, previousBrushPos + thickOffset);
   invalidate(invalidateRect.enlarge(2.0));
 }
 
@@ -378,22 +380,24 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos,
   TRasterImageP ri = (TRasterImageP)getImage(true);
   if (!ri) return;
 
-  TRasterP ras = ri->getRaster();
+  TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
-  double pressure = m_enabledPressure && e.isTablet() ? e.m_pressure/255.0 : 0.5;
+  double pressure =
+      m_enabledPressure && e.isTablet() ? e.m_pressure / 255.0 : 0.5;
 
   m_strokeSegmentRect.empty();
   m_toonz_brush->strokeTo(point, pressure, restartBrushTimer());
   m_toonz_brush->endStroke();
-  TRect updateRect = m_strokeSegmentRect*ras->getBounds();
+  TRect updateRect = m_strokeSegmentRect * ras->getBounds();
   if (!updateRect.isEmpty())
     ras->extract(updateRect)->copy(m_workRaster->extract(updateRect));
 
-  TPointD thickOffset(m_maxCursorThick*0.5, m_maxCursorThick*0.5);
+  TPointD thickOffset(m_maxCursorThick * 0.5, m_maxCursorThick * 0.5);
   TRectD invalidateRect = convert(m_strokeSegmentRect) - rasCenter;
   invalidateRect += TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
-  invalidateRect += TRectD(previousBrushPos - thickOffset, previousBrushPos + thickOffset);
+  invalidateRect +=
+      TRectD(previousBrushPos - thickOffset, previousBrushPos + thickOffset);
   invalidate(invalidateRect.enlarge(2.0));
 
   if (m_toonz_brush) {
@@ -411,9 +415,9 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos,
     TXshSimpleLevelP simLevel = level->getSimpleLevel();
     TFrameId frameId          = getCurrentFid();
     TRasterP subras           = ras->extract(m_strokeRect)->clone();
-    TUndoManager::manager()->add(
-        new FullColorBrushUndo(m_tileSet, simLevel.getPointer(), frameId,
-                               m_isFrameCreated, subras, m_strokeRect.getP00()));
+    TUndoManager::manager()->add(new FullColorBrushUndo(
+        m_tileSet, simLevel.getPointer(), frameId, m_isFrameCreated, subras,
+        m_strokeRect.getP00()));
   }
 
   notifyImageChanged();
@@ -488,16 +492,16 @@ void FullColorBrushTool::draw() {
   if (TRasterImageP ri = TRasterImageP(getImage(false))) {
     TRasterP ras = ri->getRaster();
 
-    double alpha = 1.0;
+    double alpha       = 1.0;
     double alphaRadius = 3.0;
-    double pixelSize = sqrt(tglGetPixelSize2());
+    double pixelSize   = sqrt(tglGetPixelSize2());
 
     // circles with lesser radius looks more bold
     // to avoid these effect we'll reduce alpha for small radiuses
-    double minX = m_minCursorThick/(alphaRadius*pixelSize);
-    double maxX = m_maxCursorThick/(alphaRadius*pixelSize);
-    double minAlpha = alpha*(1.0 - 1.0/(1.0 + minX));
-    double maxAlpha = alpha*(1.0 - 1.0/(1.0 + maxX));
+    double minX     = m_minCursorThick / (alphaRadius * pixelSize);
+    double maxX     = m_maxCursorThick / (alphaRadius * pixelSize);
+    double minAlpha = alpha * (1.0 - 1.0 / (1.0 + minX));
+    double maxAlpha = alpha * (1.0 - 1.0 / (1.0 + maxX));
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     tglEnableBlending();
@@ -505,15 +509,15 @@ void FullColorBrushTool::draw() {
 
     if (m_minCursorThick < m_maxCursorThick - pixelSize) {
       glColor4d(1.0, 1.0, 1.0, minAlpha);
-      tglDrawCircle(m_brushPos, (m_minCursorThick + 1)*0.5 - pixelSize);
+      tglDrawCircle(m_brushPos, (m_minCursorThick + 1) * 0.5 - pixelSize);
       glColor4d(0.0, 0.0, 0.0, minAlpha);
-      tglDrawCircle(m_brushPos, (m_minCursorThick + 1)*0.5);
+      tglDrawCircle(m_brushPos, (m_minCursorThick + 1) * 0.5);
     }
 
     glColor4d(1.0, 1.0, 1.0, maxAlpha);
-    tglDrawCircle(m_brushPos, (m_maxCursorThick + 1)*0.5 - pixelSize);
+    tglDrawCircle(m_brushPos, (m_maxCursorThick + 1) * 0.5 - pixelSize);
     glColor4d(0.0, 0.0, 0.0, maxAlpha);
-    tglDrawCircle(m_brushPos, (m_maxCursorThick + 1)*0.5);
+    tglDrawCircle(m_brushPos, (m_maxCursorThick + 1) * 0.5);
 
     glPopAttrib();
   }
@@ -521,9 +525,7 @@ void FullColorBrushTool::draw() {
 
 //--------------------------------------------------------------------------------------------------------------
 
-void FullColorBrushTool::onEnter() {
-  updateCurrentStyle();
-}
+void FullColorBrushTool::onEnter() { updateCurrentStyle(); }
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -688,8 +690,7 @@ void FullColorBrushTool::updateCurrentStyle() {
   if (TTool::Application *app = getApplication()) {
     if (app->getCurrentObject()->isSpline()) {
       m_currentColor = TPixel32::Red;
-    } else
-    if (TPalette *plt = app->getCurrentPalette()->getPalette()) {
+    } else if (TPalette *plt = app->getCurrentPalette()->getPalette()) {
       int style               = app->getCurrentLevelStyleIndex();
       TColorStyle *colorStyle = plt->getStyle(style);
       m_currentColor          = colorStyle->getMainColor();
@@ -701,25 +702,29 @@ void FullColorBrushTool::updateCurrentStyle() {
 
   m_enabledPressure = m_pressure.getValue();
   if (TMyPaintBrushStyle *brushStyle = getBrushStyle()) {
-    double radiusLog = brushStyle->getBrush().getBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC)
-                     + m_modifierSize.getValue()*log(2.0);
-    double radius = exp(radiusLog);
-    m_minCursorThick = m_maxCursorThick = (int)round(2.0*radius);
+    double radiusLog = brushStyle->getBrush().getBaseValue(
+                           MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC) +
+                       m_modifierSize.getValue() * log(2.0);
+    double radius    = exp(radiusLog);
+    m_minCursorThick = m_maxCursorThick = (int)round(2.0 * radius);
   } else {
     m_minCursorThick = std::max(m_thickness.getValue().first, 1);
-    m_maxCursorThick = std::max(m_thickness.getValue().second, m_minCursorThick);
+    m_maxCursorThick =
+        std::max(m_thickness.getValue().second, m_minCursorThick);
     if (!m_enabledPressure) {
-      double minRadiusLog = log(0.5*m_minCursorThick);
-      double maxRadiusLog = log(0.5*m_maxCursorThick);
-      double avgRadiusLog = 0.5*(minRadiusLog + maxRadiusLog);
-      double avgRadius = exp(avgRadiusLog);
-      m_minCursorThick = m_maxCursorThick = (int)round(2.0*avgRadius);
+      double minRadiusLog = log(0.5 * m_minCursorThick);
+      double maxRadiusLog = log(0.5 * m_maxCursorThick);
+      double avgRadiusLog = 0.5 * (minRadiusLog + maxRadiusLog);
+      double avgRadius    = exp(avgRadiusLog);
+      m_minCursorThick = m_maxCursorThick = (int)round(2.0 * avgRadius);
     }
   }
 
-  if (m_minCursorThick != prevMinCursorThick || m_maxCursorThick != prevMaxCursorThick) {
-    TRectD rect(m_brushPos - TPointD(m_maxCursorThick + 2, m_maxCursorThick + 2),
-                m_brushPos + TPointD(m_maxCursorThick + 2, m_maxCursorThick + 2));
+  if (m_minCursorThick != prevMinCursorThick ||
+      m_maxCursorThick != prevMaxCursorThick) {
+    TRectD rect(
+        m_brushPos - TPointD(m_maxCursorThick + 2, m_maxCursorThick + 2),
+        m_brushPos + TPointD(m_maxCursorThick + 2, m_maxCursorThick + 2));
     invalidate(rect);
   }
 }
@@ -727,112 +732,100 @@ void FullColorBrushTool::updateCurrentStyle() {
 //------------------------------------------------------------------
 
 double FullColorBrushTool::restartBrushTimer() {
-  double dtime = m_brushTimer.nsecsElapsed()*1e-9;
+  double dtime = m_brushTimer.nsecsElapsed() * 1e-9;
   m_brushTimer.restart();
   return dtime;
 }
 
 //------------------------------------------------------------------
 
-TMyPaintBrushStyle* FullColorBrushTool::getBrushStyle() {
+TMyPaintBrushStyle *FullColorBrushTool::getBrushStyle() {
   if (TTool::Application *app = getApplication())
-      return dynamic_cast<TMyPaintBrushStyle*>( app->getCurrentLevelStyle() );
+    return dynamic_cast<TMyPaintBrushStyle *>(app->getCurrentLevelStyle());
   return 0;
 }
 
 //------------------------------------------------------------------
 
-void FullColorBrushTool::applyClassicToonzBrushSettings(mypaint::Brush &mypaintBrush) {
-  const double precision = 1e-5;
+void FullColorBrushTool::applyClassicToonzBrushSettings(
+    mypaint::Brush &mypaintBrush) {
+  const double precision       = 1e-5;
   const double hardnessOpacity = 0.1;
 
-  double minThickness = 0.5*m_thickness.getValue().first;
-  double maxThickness = 0.5*m_thickness.getValue().second;
-  double minOpacity   = 0.01*m_opacity.getValue().first;
-  double maxOpacity   = 0.01*m_opacity.getValue().second;
-  double hardness     = 0.01*m_hardness.getValue();
+  double minThickness = 0.5 * m_thickness.getValue().first;
+  double maxThickness = 0.5 * m_thickness.getValue().second;
+  double minOpacity   = 0.01 * m_opacity.getValue().first;
+  double maxOpacity   = 0.01 * m_opacity.getValue().second;
+  double hardness     = 0.01 * m_hardness.getValue();
 
-  TPixelD color  = PixelConverter<TPixelD>::from(m_currentColor);
-  double  colorH = 0.0;
-  double  colorS = 0.0;
-  double  colorV = 0.0;
+  TPixelD color = PixelConverter<TPixelD>::from(m_currentColor);
+  double colorH = 0.0;
+  double colorS = 0.0;
+  double colorV = 0.0;
   RGB2HSV(color.r, color.g, color.b, &colorH, &colorS, &colorV);
 
   // avoid log(0)
-  if (minThickness < precision)
-    minThickness = precision;
-  if (maxThickness < precision)
-    maxThickness = precision;
+  if (minThickness < precision) minThickness = precision;
+  if (maxThickness < precision) maxThickness = precision;
 
   // tune hardness opacity for better visual softness
   hardness *= hardness;
-  double opacityAmplifier = 1.0 - hardnessOpacity + hardness*hardnessOpacity;
+  double opacityAmplifier = 1.0 - hardnessOpacity + hardness * hardnessOpacity;
   minOpacity *= opacityAmplifier;
   maxOpacity *= opacityAmplifier;
 
   // reset
   mypaintBrush.fromDefaults();
   mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_OPAQUE_MULTIPLY, 1.0);
-  mypaintBrush.setMappingN(
-      MYPAINT_BRUSH_SETTING_OPAQUE_MULTIPLY,
-      MYPAINT_BRUSH_INPUT_PRESSURE,
-      0 );
+  mypaintBrush.setMappingN(MYPAINT_BRUSH_SETTING_OPAQUE_MULTIPLY,
+                           MYPAINT_BRUSH_INPUT_PRESSURE, 0);
 
-  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_HARDNESS, 0.5*hardness + 0.5);
-  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_H,  colorH/360.0);
-  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S,  colorS);
-  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V,  colorV);
-  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_DABS_PER_ACTUAL_RADIUS, 5.0 + hardness*10.0);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_HARDNESS,
+                            0.5 * hardness + 0.5);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_H, colorH / 360.0);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S, colorS);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V, colorV);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_DABS_PER_ACTUAL_RADIUS,
+                            5.0 + hardness * 10.0);
   mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_DABS_PER_BASIC_RADIUS, 0.0);
   mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_DABS_PER_SECOND, 0.0);
 
   // thickness may be dynamic
   if (minThickness + precision >= maxThickness) {
-    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC, log(maxThickness));
-    mypaintBrush.setMappingN(
-        MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
-        MYPAINT_BRUSH_INPUT_PRESSURE,
-        0 );
+    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                              log(maxThickness));
+    mypaintBrush.setMappingN(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                             MYPAINT_BRUSH_INPUT_PRESSURE, 0);
   } else {
-    double minThicknessLog = log(minThickness);
-    double maxThicknessLog = log(maxThickness);
-    double baseThicknessLog = 0.5*(minThicknessLog + maxThicknessLog);
-    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC, baseThicknessLog);
-    mypaintBrush.setMappingN(
-        MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
-        MYPAINT_BRUSH_INPUT_PRESSURE,
-        2 );
-    mypaintBrush.setMappingPoint(
-        MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
-        MYPAINT_BRUSH_INPUT_PRESSURE,
-        0, 0.0, minThicknessLog - baseThicknessLog);
-    mypaintBrush.setMappingPoint(
-        MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
-        MYPAINT_BRUSH_INPUT_PRESSURE,
-        1, 1.0, maxThicknessLog - baseThicknessLog);
+    double minThicknessLog  = log(minThickness);
+    double maxThicknessLog  = log(maxThickness);
+    double baseThicknessLog = 0.5 * (minThicknessLog + maxThicknessLog);
+    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                              baseThicknessLog);
+    mypaintBrush.setMappingN(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                             MYPAINT_BRUSH_INPUT_PRESSURE, 2);
+    mypaintBrush.setMappingPoint(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                                 MYPAINT_BRUSH_INPUT_PRESSURE, 0, 0.0,
+                                 minThicknessLog - baseThicknessLog);
+    mypaintBrush.setMappingPoint(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                                 MYPAINT_BRUSH_INPUT_PRESSURE, 1, 1.0,
+                                 maxThicknessLog - baseThicknessLog);
   }
 
   // opacity may be dynamic
   if (minOpacity + precision >= maxOpacity) {
     mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_OPAQUE, maxOpacity);
-    mypaintBrush.setMappingN(
-        MYPAINT_BRUSH_SETTING_OPAQUE,
-        MYPAINT_BRUSH_INPUT_PRESSURE,
-        0 );
+    mypaintBrush.setMappingN(MYPAINT_BRUSH_SETTING_OPAQUE,
+                             MYPAINT_BRUSH_INPUT_PRESSURE, 0);
   } else {
     mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_OPAQUE, minOpacity);
-    mypaintBrush.setMappingN(
-        MYPAINT_BRUSH_SETTING_OPAQUE,
-        MYPAINT_BRUSH_INPUT_PRESSURE,
-        2 );
-    mypaintBrush.setMappingPoint(
-        MYPAINT_BRUSH_SETTING_OPAQUE,
-        MYPAINT_BRUSH_INPUT_PRESSURE,
-        0, 0.0, 0.0);
-    mypaintBrush.setMappingPoint(
-        MYPAINT_BRUSH_SETTING_OPAQUE,
-        MYPAINT_BRUSH_INPUT_PRESSURE,
-        1, 1.0, maxOpacity - minOpacity);
+    mypaintBrush.setMappingN(MYPAINT_BRUSH_SETTING_OPAQUE,
+                             MYPAINT_BRUSH_INPUT_PRESSURE, 2);
+    mypaintBrush.setMappingPoint(MYPAINT_BRUSH_SETTING_OPAQUE,
+                                 MYPAINT_BRUSH_INPUT_PRESSURE, 0, 0.0, 0.0);
+    mypaintBrush.setMappingPoint(MYPAINT_BRUSH_SETTING_OPAQUE,
+                                 MYPAINT_BRUSH_INPUT_PRESSURE, 1, 1.0,
+                                 maxOpacity - minOpacity);
   }
 }
 
@@ -842,27 +835,30 @@ void FullColorBrushTool::applyToonzBrushSettings(mypaint::Brush &mypaintBrush) {
   if (mypaintStyle) {
     const double precision = 1e-5;
 
-    double modifierSize      = m_modifierSize.getValue()*log(2.0);
-    double modifierOpacity   = 0.01*m_modifierOpacity.getValue();
-    bool   modifierEraser    = m_modifierEraser.getValue();
-    bool   modifierLockAlpha = m_modifierLockAlpha.getValue();
+    double modifierSize    = m_modifierSize.getValue() * log(2.0);
+    double modifierOpacity = 0.01 * m_modifierOpacity.getValue();
+    bool modifierEraser    = m_modifierEraser.getValue();
+    bool modifierLockAlpha = m_modifierLockAlpha.getValue();
 
-    TPixelD color  = PixelConverter<TPixelD>::from(m_currentColor);
-    double  colorH = 0.0;
-    double  colorS = 0.0;
-    double  colorV = 0.0;
+    TPixelD color = PixelConverter<TPixelD>::from(m_currentColor);
+    double colorH = 0.0;
+    double colorS = 0.0;
+    double colorV = 0.0;
     RGB2HSV(color.r, color.g, color.b, &colorH, &colorS, &colorV);
 
     mypaintBrush.fromBrush(mypaintStyle->getBrush());
 
-    float baseSize    = mypaintBrush.getBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
+    float baseSize =
+        mypaintBrush.getBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
     float baseOpacity = mypaintBrush.getBaseValue(MYPAINT_BRUSH_SETTING_OPAQUE);
 
-    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC, baseSize + modifierSize);
-    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_OPAQUE, baseOpacity*modifierOpacity);
-    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_H,  colorH/360.0);
-    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S,  colorS);
-    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V,  colorV);
+    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                              baseSize + modifierSize);
+    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_OPAQUE,
+                              baseOpacity * modifierOpacity);
+    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_H, colorH / 360.0);
+    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S, colorS);
+    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V, colorV);
 
     if (modifierEraser) {
       mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_ERASER, 1.0);
@@ -876,7 +872,6 @@ void FullColorBrushTool::applyToonzBrushSettings(mypaint::Brush &mypaintBrush) {
   }
 }
 
-
 //==========================================================================================================
 
 FullColorBrushToolNotifier::FullColorBrushToolNotifier(FullColorBrushTool *tool)
@@ -889,7 +884,7 @@ FullColorBrushToolNotifier::FullColorBrushToolNotifier(FullColorBrushTool *tool)
     }
     if (TPaletteHandle *paletteHandle = app->getCurrentPalette()) {
       bool ret;
-      ret = connect(paletteHandle, SIGNAL(colorStyleChanged()), this,
+      ret = connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
                     SLOT(onColorStyleChanged()));
       assert(ret);
       ret = connect(paletteHandle, SIGNAL(colorStyleSwitched()), this,

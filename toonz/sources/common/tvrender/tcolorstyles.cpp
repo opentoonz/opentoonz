@@ -104,6 +104,7 @@ bool TColorStyle::operator==(const TColorStyle &cs) const {
   if (m_globalName != cs.getGlobalName()) return false;
   if (m_isEditedFromOriginal != cs.getIsEditedFlag()) return false;
   if (m_pickedPosition != cs.getPickedPosition()) return false;
+  if (m_flags != cs.getFlags()) return false;
 
   for (int p = 0; p < colorParamCount; ++p)
     if (getColorParamValue(p) != cs.getColorParamValue(p)) return false;

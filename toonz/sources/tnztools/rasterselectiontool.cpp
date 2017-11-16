@@ -624,8 +624,10 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos,
       m_selectingRect = rectD;
       m_bboxs.clear();
       invalidate();
-    } else if (m_strokeSelectionType.getValue() == FREEHAND_SELECTION)
+    } else if (m_strokeSelectionType.getValue() == FREEHAND_SELECTION) {
       freehandDrag(pos);
+      invalidate();
+    }
     return;
   }
 
@@ -637,9 +639,10 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos,
 
   m_curPos = pos;
 
-  if (m_strokeSelectionType.getValue() == FREEHAND_SELECTION)
+  if (m_strokeSelectionType.getValue() == FREEHAND_SELECTION) {
     freehandDrag(pos);
-  else if (m_strokeSelectionType.getValue() == RECT_SELECTION) {
+    invalidate();
+  } else if (m_strokeSelectionType.getValue() == RECT_SELECTION) {
     bool selectOverlappingStroke = (m_firstPos.x > pos.x);
     TRectD rect(m_firstPos, pos);
     m_selectingRect = rect;
@@ -689,6 +692,7 @@ void RasterSelectionTool::leftButtonUp(const TPointD &pos,
         m_rasterSelection.setFrameId(getCurrentFid());
         m_rasterSelection.makeCurrent();
       }
+      m_track.clear();
     }
   }
   m_selecting    = false;
@@ -782,6 +786,9 @@ void RasterSelectionTool::draw() {
   if (m_strokeSelectionType.getValue() == POLYLINE_SELECTION &&
       !m_rasterSelection.isFloating())
     drawPolylineSelection();
+  else if (m_strokeSelectionType.getValue() == FREEHAND_SELECTION &&
+           !m_rasterSelection.isFloating())
+    drawFreehandSelection();
   if (m_rasterSelection.isEmpty()) m_bboxs.clear();
 
   /*-- 選択範囲の変形ハンドルの描画 --*/

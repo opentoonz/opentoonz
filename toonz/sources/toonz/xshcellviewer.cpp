@@ -52,6 +52,7 @@
 #include "toonz/tcolumnfx.h"
 #include "toonz/txshchildlevel.h"
 #include "toonz/txshzeraryfxcolumn.h"
+#include "toonz/txshsoundtextcolumn.h"
 #include "toonz/txshsoundtextlevel.h"
 #include "toonz/txshpalettelevel.h"
 #include "toonz/doubleparamcmd.h"
@@ -482,6 +483,55 @@ public:
   int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
+//-----------------------------------------------------------------------------
+
+class RenameTextCellUndo final : public TUndo {
+  int m_row;
+  int m_col;
+  const TXshCell m_oldCell;
+  const TXshCell m_newCell;
+  QString m_oldText, m_newText;
+  TXshSoundTextLevel *m_level;
+
+public:
+  RenameTextCellUndo(int row, int col, TXshCell oldCell, TXshCell newCell,
+                     QString oldText, QString newText,
+                     TXshSoundTextLevel *level)
+      : m_row(row)
+      , m_col(col)
+      , m_oldCell(oldCell)
+      , m_newCell(newCell)
+      , m_oldText(oldText)
+      , m_newText(newText)
+      , m_level(level) {}
+
+  void setcell(const TXshCell cell, QString text = "") const {
+    TApp *app    = TApp::instance();
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    assert(xsh);
+    if (cell.isEmpty())
+      xsh->clearCells(m_row, m_col);
+    else {
+      xsh->setCell(m_row, m_col, cell);
+      m_level->setFrameText(cell.getFrameId().getNumber() - 1, text);
+    }
+    app->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  void undo() const override { setcell(m_oldCell, m_oldText); }
+
+  void redo() const override { setcell(m_newCell, m_newText); }
+
+  int getSize() const override { return sizeof *this; }
+
+  QString getHistoryString() override {
+    return QObject::tr("Change Text at Column %1  Frame %2")
+        .arg(QString::number(m_col + 1))
+        .arg(QString::number(m_row + 1));
+  }
+  int getHistoryType() override { return HistoryType::Xsheet; }
+};
+
 // display upper-directional smart tab only when pressing ctrl key
 bool isCtrlPressed = false;
 
@@ -569,7 +619,8 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
 
     // convert the last one digit of the frame number to alphabet
     // Ex.  12 -> 1B    21 -> 2A   30 -> 3
-    if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
+    if (Preferences::instance()->isShowFrameNumberWithLettersEnabled() &&
+        cell.m_level->getType() != TXshLevelType::SND_TXT_XSHLEVEL)
       setText(
           (fid.isEmptyFrame() || fid.isNoFrame())
               ? QString::fromStdWString(levelName)
@@ -581,12 +632,25 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
       std::string frameNumber("");
       if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
       if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
-      setText((frameNumber.empty())
-                  ? QString::fromStdWString(levelName)
-                  : (multiColumnSelected)
-                        ? QString::fromStdString(frameNumber)
-                        : QString::fromStdWString(levelName) + QString(" ") +
-                              QString::fromStdString(frameNumber));
+
+      // get text from sound text level
+      if (cell.m_level->getType() == TXshLevelType::SND_TXT_XSHLEVEL) {
+        TXshSoundTextLevelP textLevel = cell.m_level->getSoundTextLevel();
+        if (textLevel) {
+          std::string frameText =
+              textLevel->getFrameText(fid.getNumber() - 1).toStdString();
+          setText(textLevel->getFrameText(fid.getNumber() - 1));
+        }
+      }
+      // other level types
+      else {
+        setText((frameNumber.empty())
+                    ? QString::fromStdWString(levelName)
+                    : (multiColumnSelected)
+                          ? QString::fromStdString(frameNumber)
+                          : QString::fromStdWString(levelName) + QString(" ") +
+                                QString::fromStdString(frameNumber));
+      }
     }
     selectAll();
   }
@@ -613,13 +677,80 @@ void RenameCellField::renameCell() {
   std::wstring levelName;
   TFrameId fid;
 
+  TXsheet *xsheet = m_viewer->getXsheet();
+  TXshSoundTextColumn *sndTextCol =
+      xsheet->getColumn(m_col)->getSoundTextColumn();
+  if (sndTextCol) {
+    QString oldText  = "changeMe";  // text for undo - changed later
+    TXshCell cell    = xsheet->getCell(m_row, m_col);
+    TXshCell oldCell = cell;
+    // the text index is always one less than the frame number
+    int textIndex = cell.getFrameId().getNumber() - 1;
+    if (!cell.m_level) {  // cell not part of a level
+      oldText       = "";
+      int lastFrame = sndTextCol->getMaxFrame();
+      TXshSoundTextLevel *sndTextLevel;
+      TXshCell lastCell;
+      TFrameId newId;
+      if (lastFrame < 0) {  // no level on column
+        sndTextLevel = new TXshSoundTextLevel();
+        sndTextLevel->setType(SND_TXT_XSHLEVEL);
+        newId = TFrameId(1);
+        cell  = TXshCell(sndTextLevel, newId);
+        sndTextCol->setCell(m_row, cell);
+        textIndex = 0;
+      } else {
+        TXshCell lastCell = xsheet->getCell(lastFrame, m_col);
+        TXshSoundTextLevel *sndTextLevel =
+            lastCell.m_level->getSoundTextLevel();
+        int textSize = sndTextLevel->m_framesText.size();
+        textIndex    = textSize;
+        newId        = TFrameId(textSize + 1);
+        cell         = TXshCell(sndTextLevel, newId);
+        sndTextCol->setCell(m_row, cell);
+      }
+    }
+
+    TXshCell prevCell             = xsheet->getCell(m_row - 1, m_col);
+    TXshSoundTextLevel *textLevel = cell.m_level->getSoundTextLevel();
+    if (oldText == "changeMe")
+      oldText = textLevel->getFrameText(cell.getFrameId().getNumber() - 1);
+    if (!prevCell.isEmpty()) {
+      // check if the previous cell had the same content as the entered text
+      // just extend the frame if so
+      if (textLevel->getFrameText(prevCell.getFrameId().getNumber() - 1) == s) {
+        sndTextCol->setCell(m_row, prevCell);
+        RenameTextCellUndo *undo = new RenameTextCellUndo(
+            m_row, m_col, oldCell, prevCell, oldText, s, textLevel);
+        TUndoManager::manager()->add(undo);
+        return;
+      }
+      // check if the cell was part of an extended frame, but now has different
+      // text
+      else if (textLevel->getFrameText(textIndex) ==
+                   textLevel->getFrameText(prevCell.getFrameId().getNumber() -
+                                           1) &&
+               textLevel->getFrameText(textIndex) != s) {
+        int textSize   = textLevel->m_framesText.size();
+        textIndex      = textSize;
+        TFrameId newId = TFrameId(textSize + 1);
+        cell           = TXshCell(textLevel, newId);
+        sndTextCol->setCell(m_row, cell);
+      }
+    }
+    RenameTextCellUndo *undo = new RenameTextCellUndo(
+        m_row, m_col, oldCell, cell, oldText, s, textLevel);
+    TUndoManager::manager()->add(undo);
+    textLevel->setFrameText(textIndex, s);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    return;
+  }
   // convert the last one digit of the frame number to alphabet
   // Ex.  12 -> 1B    21 -> 2A   30 -> 3
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
     parse_with_letter(QString::fromStdWString(newName), levelName, fid);
   else
     parse(QString::fromStdWString(newName), levelName, fid);
-  TXsheet *xsheet = m_viewer->getXsheet();
 
   bool animationSheetEnabled =
       Preferences::instance()->isAnimationSheetEnabled();
@@ -951,6 +1082,21 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
 
     if (!columnFan->isActive(col)) {  // folded column
       drawFoldedColumns(p, layerAxis, frameSide);
+
+      if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+          !m_viewer->orientation()->isVerticalTimeline() &&
+          Preferences::instance()->isCurrentTimelineIndicatorEnabled()) {
+        QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
+        int x     = xy.x();
+        int y     = xy.y();
+        if (row == 0) {
+          if (m_viewer->orientation()->isVerticalTimeline())
+            xy.setY(xy.y() + 1);
+          else
+            xy.setX(xy.x() + 1);
+        }
+        drawCurrentTimeIndicator(p, xy);
+      }
       continue;
     }
 
@@ -997,7 +1143,24 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
           m_viewer->orientation()->horizontalLine(frameAxis, layerAxisRange);
       p.drawLine(horizontalLine);
 
-      if (!isColumn) continue;
+      if (!isColumn) {
+        if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+            !m_viewer->orientation()->isVerticalTimeline() &&
+            row == m_viewer->getCurrentRow() &&
+            Preferences::instance()->isCurrentTimelineIndicatorEnabled()) {
+          QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
+          int x     = xy.x();
+          int y     = xy.y();
+          if (row == 0) {
+            if (m_viewer->orientation()->isVerticalTimeline())
+              xy.setY(xy.y() + 1);
+            else
+              xy.setX(xy.x() + 1);
+          }
+          drawCurrentTimeIndicator(p, xy);
+        }
+        continue;
+      }
       // Cells appearance depending on the type of column
       if (isSoundColumn)
         drawSoundCell(p, row, col, isReference);
@@ -1150,8 +1313,14 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
   int startFrame  = soundColumn->getFirstRow();
   TXshCell cell   = soundColumn->getCell(row);
   if (soundColumn->isCellEmpty(row) || cell.isEmpty() || row > maxNumFrame ||
-      row < startFrame)
+      row < startFrame) {
+    if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+        !m_viewer->orientation()->isVerticalTimeline() &&
+        row == m_viewer->getCurrentRow() &&
+        Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+      drawCurrentTimeIndicator(p, xy);
     return;
+  }
 
   TXshSoundLevelP soundLevel = cell.getSoundLevel();
 
@@ -1178,6 +1347,12 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
 
   // cells background
   p.fillRect(rect, QBrush(cellColor));
+
+  if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+      !m_viewer->orientation()->isVerticalTimeline() &&
+      row == m_viewer->getCurrentRow() &&
+      Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+    drawCurrentTimeIndicator(p, xy);
 
   drawDragHandle(p, xy, sideColor);
   drawEndOfDragHandle(p, isLastRow, xy, cellColor);
@@ -1305,6 +1480,18 @@ void CellArea::drawLockedDottedLine(QPainter &p, bool isLocked,
   p.drawLine(dottedLine);
 }
 
+void CellArea::drawCurrentTimeIndicator(QPainter &p, const QPoint &xy) {
+  QRect cell =
+      m_viewer->orientation()->rect(PredefinedRect::CELL).translated(xy);
+
+  int cellMid    = cell.left() + (cell.width() / 2);
+  int cellTop    = cell.top();
+  int cellBottom = cell.bottom();
+
+  p.setPen(Qt::red);
+  p.drawLine(cellMid, cellTop, cellMid, cellBottom);
+}
+
 //-----------------------------------------------------------------------------
 
 void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
@@ -1320,10 +1507,6 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
                     columnSelection->isColumnSelected(col);
 
   if (row > 0) prevCell = xsh->getCell(row - 1, col);  // cell in previous frame
-  // nothing to draw
-  if (cell.isEmpty() && prevCell.isEmpty()) return;
-  TXshCell nextCell;
-  nextCell = xsh->getCell(row + 1, col);  // cell in next frame
 
   QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
   int x     = xy.x();
@@ -1334,6 +1517,19 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     else
       xy.setX(xy.x() + 1);
   }
+
+  // nothing to draw
+  if (cell.isEmpty() && prevCell.isEmpty()) {
+    if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+        !m_viewer->orientation()->isVerticalTimeline() &&
+        row == m_viewer->getCurrentRow() &&
+        Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+      drawCurrentTimeIndicator(p, xy);
+    return;
+  }
+  TXshCell nextCell;
+  nextCell = xsh->getCell(row + 1, col);  // cell in next frame
+
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
   QRect rect     = cellRect.adjusted(1, 1, 0, 0);
   if (cell.isEmpty()) {  // it means previous is not empty
@@ -1343,6 +1539,13 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     p.setPen(levelEndColor);
     p.drawLine(rect.topLeft(), rect.bottomRight());
     p.drawLine(rect.topRight(), rect.bottomLeft());
+
+    if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+        !m_viewer->orientation()->isVerticalTimeline() &&
+        row == m_viewer->getCurrentRow() &&
+        Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+      drawCurrentTimeIndicator(p, xy);
+
     return;
   }
 
@@ -1369,6 +1572,12 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 
   // paint cell
   p.fillRect(rect, QBrush(cellColor));
+
+  if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+      !m_viewer->orientation()->isVerticalTimeline() &&
+      row == m_viewer->getCurrentRow() &&
+      Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+    drawCurrentTimeIndicator(p, xy);
 
   drawDragHandle(p, xy, sideColor);
 
@@ -1507,10 +1716,6 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
 
   if (row > 0) prevCell = xsh->getCell(row - 1, col);  // cell in previous frame
                                                        // nothing to draw
-  if (cell.isEmpty() && prevCell.isEmpty()) return;
-  TXshCell nextCell;
-  nextCell = xsh->getCell(row + 1, col);
-
   QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
   int x     = xy.x();
   int y     = xy.y();
@@ -1520,6 +1725,19 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
     else
       xy.setX(xy.x() + 1);
   }
+
+  if (cell.isEmpty() && prevCell.isEmpty()) {
+    if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+        !m_viewer->orientation()->isVerticalTimeline() &&
+        row == m_viewer->getCurrentRow() &&
+        Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+      drawCurrentTimeIndicator(p, xy);
+
+    return;
+  }
+  TXshCell nextCell;
+  nextCell = xsh->getCell(row + 1, col);
+
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
   QRect rect     = cellRect.adjusted(1, 1, 0, 0);
   if (cell.isEmpty()) {  // diagonal cross meaning end of level
@@ -1528,6 +1746,13 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
     p.setPen(levelEndColor);
     p.drawLine(rect.topLeft(), rect.bottomRight());
     p.drawLine(rect.topRight(), rect.bottomLeft());
+
+    if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+        !m_viewer->orientation()->isVerticalTimeline() &&
+        row == m_viewer->getCurrentRow() &&
+        Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+      drawCurrentTimeIndicator(p, xy);
+
     return;
   }
 
@@ -1539,6 +1764,12 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   // paint cell
   p.fillRect(rect, QBrush(cellColor));
 
+  if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+      !m_viewer->orientation()->isVerticalTimeline() &&
+      row == m_viewer->getCurrentRow() &&
+      Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+    drawCurrentTimeIndicator(p, xy);
+
   drawDragHandle(p, xy, sideColor);
 
   bool isLastRow = nextCell.isEmpty() ||
@@ -1548,6 +1779,8 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   drawLockedDottedLine(p, xsh->getColumn(col)->isLocked(), xy, cellColor);
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
+  TFrameId fid = cell.m_frameId;
+  if (fid.getNumber() - 1 < 0) return;
   int distance, offset;
   TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
       distance, offset);
@@ -1619,7 +1852,6 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   if (row > 0) prevCell = xsh->getCell(row - 1, col);
   TXshCell nextCell     = xsh->getCell(row + 1, col);
 
-  if (cell.isEmpty() && prevCell.isEmpty()) return;
   QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
   int x     = xy.x();
   int y     = xy.y();
@@ -1629,6 +1861,15 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     else
       xy.setX(xy.x() + 1);
   }
+  if (cell.isEmpty() && prevCell.isEmpty()) {
+    if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+        !m_viewer->orientation()->isVerticalTimeline() &&
+        row == m_viewer->getCurrentRow() &&
+        Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+      drawCurrentTimeIndicator(p, xy);
+
+    return;
+  }
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
   QRect rect     = cellRect.adjusted(1, 1, 0, 0);
   if (cell.isEmpty()) {  // this means the former is not empty
@@ -1637,6 +1878,13 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     p.setPen(levelEndColor);
     p.drawLine(rect.topLeft(), rect.bottomRight());
     p.drawLine(rect.topRight(), rect.bottomLeft());
+
+    if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+        !m_viewer->orientation()->isVerticalTimeline() &&
+        row == m_viewer->getCurrentRow() &&
+        Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+      drawCurrentTimeIndicator(p, xy);
+
     return;
   }
 
@@ -1652,6 +1900,12 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   }
 
   p.fillRect(rect, QBrush(cellColor));
+
+  if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+      !m_viewer->orientation()->isVerticalTimeline() &&
+      row == m_viewer->getCurrentRow() &&
+      Preferences::instance()->isCurrentTimelineIndicatorEnabled())
+    drawCurrentTimeIndicator(p, xy);
 
   drawDragHandle(p, xy, sideColor);
   bool isLastRow = nextCell.isEmpty() ||
@@ -2343,8 +2597,7 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   int col                   = cellPosition.layer();
   // Se la colonna e' sound non devo fare nulla
   TXshColumn *column = m_viewer->getXsheet()->getColumn(col);
-  if (column && (column->getSoundColumn() || column->getSoundTextColumn()))
-    return;
+  if (column && column->getSoundColumn()) return;
 
   // Se ho cliccato su una nota devo aprire il popup
   TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
@@ -2720,10 +2973,13 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
     } else if (selectionContainTlvImage(m_viewer->getCellSelection(),
                                         m_viewer->getXsheet()))
       menu.addAction(cmdManager->getAction(MI_CanvasSize));
+      if (sl || TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel())
+      menu.addAction(cmdManager->getAction(MI_LipSyncPopup));
   }
   menu.addSeparator();
   if (!soundCellsSelected)
     menu.addAction(cmdManager->getAction(MI_ImportMagpieFile));
+  
 }
 //-----------------------------------------------------------------------------
 /*! replace level with another level in the cast
