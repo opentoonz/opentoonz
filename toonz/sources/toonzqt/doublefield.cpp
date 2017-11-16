@@ -508,7 +508,8 @@ void MeasuredDoubleLineEdit::mousePressEvent(QMouseEvent *e) {
 
 void MeasuredDoubleLineEdit::mouseMoveEvent(QMouseEvent *e) {
   if ((e->buttons() == Qt::MiddleButton) || m_labelClicked) {
-    m_value->modifyValue((e->x() - m_xMouse) / 2);
+    int precision = (m_maxValue > 100) ? 0 : ((m_maxValue > 10) ? 1 : 2);
+    m_value->modifyValue((e->x() - m_xMouse) / 2, precision);
     m_xMouse = e->x();
     valueToText();
     m_modified = false;
@@ -523,6 +524,7 @@ void MeasuredDoubleLineEdit::mouseReleaseEvent(QMouseEvent *e) {
     m_xMouse   = -1;
     m_modified = true;
     onEditingFinished();
+    clearFocus();
     m_mouseDragEditing = false;
     m_labelClicked     = false;
 
