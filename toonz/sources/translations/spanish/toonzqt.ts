@@ -240,7 +240,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Abrir sub-planilla</translation>
+        <translation>&amp;Entrar en sub-planilla</translation>
     </message>
 </context>
 <context>
@@ -601,19 +601,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Define Loading Box</source>
-        <translation>Definir marco de visualización</translation>
+        <translation>Definir región</translation>
     </message>
     <message>
         <source>Use Loading Box</source>
-        <translation>Usar marco de visualización</translation>
+        <translation>Usar región</translation>
     </message>
     <message>
         <source>&amp;Define Loading Box</source>
-        <translation>&amp;Definir marco de visualización</translation>
+        <translation>&amp;Definir región</translation>
     </message>
     <message>
         <source>&amp;Use Loading Box</source>
-        <translation>&amp;Usar marco de visualización</translation>
+        <translation>&amp;Usar región</translation>
     </message>
     <message>
         <source>Display Areas as Filled</source>
@@ -980,7 +980,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Abrir sub-planilla</translation>
+        <translation>&amp;Entrar en sub-planilla</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>

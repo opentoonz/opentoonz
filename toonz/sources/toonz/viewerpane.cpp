@@ -205,7 +205,7 @@ void SceneViewerPanel::onDrawFrame(
     }
   }
 
-  assert(frame >= 0);
+  // assert(frame >= 0); // frame can be negative in rare cases
   if (frame != frameHandle->getFrameIndex() + 1) {
     int oldFrame = frameHandle->getFrame();
     frameHandle->setCurrentFrame(frame);

@@ -1767,8 +1767,9 @@ public:
     int frameAxis        = o->frameAxis(event->pos());
     if (o->isVerticalTimeline() &&
         !o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) {
-      range     = o->layerSide(track);
-      frameAxis = o->layerAxis(event->pos()) - getViewer()->columnToLayerAxis(m_index);
+      range = o->layerSide(track);
+      frameAxis =
+          o->layerAxis(event->pos()) - getViewer()->columnToLayerAxis(m_index);
     }
 
     double v = range.ratio(frameAxis);

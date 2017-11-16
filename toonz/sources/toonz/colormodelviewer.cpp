@@ -350,7 +350,7 @@ void ColorModelViewer::hideEvent(QHideEvent *e) {
              SLOT(showCurrentImage()));
   disconnect(paletteHandle, SIGNAL(paletteChanged()), this,
              SLOT(showCurrentImage()));
-  disconnect(paletteHandle, SIGNAL(colorStyleChanged()), this,
+  disconnect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
              SLOT(showCurrentImage()));
 
   disconnect(toolHandle, SIGNAL(toolSwitched()), this, SLOT(changePickType()));
@@ -370,7 +370,7 @@ void ColorModelViewer::showEvent(QShowEvent *e) {
                      SLOT(showCurrentImage()));
   ret = ret && connect(paletteHandle, SIGNAL(paletteChanged()), this,
                        SLOT(showCurrentImage()));
-  ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged()), this,
+  ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
                        SLOT(showCurrentImage()));
   /*- ツールのTypeに合わせてPickのタイプも変え、カーソルも切り替える -*/
   ret = ret && connect(toolHandle, SIGNAL(toolSwitched()), this,

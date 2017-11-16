@@ -434,6 +434,11 @@ bool LevelCreatePopup::apply() {
   ToonzScene *scene = app->getCurrentScene()->getScene();
   TXsheet *xsh      = scene->getXsheet();
 
+  bool validColumn = true;
+  if (xsh->getColumn(col))
+    validColumn =
+        xsh->getColumn(col)->getColumnType() == TXshColumn::eLevelType;
+
   int from   = (int)m_fromFld->getValue();
   int to     = (int)m_toFld->getValue();
   int inc    = (int)m_incFld->getValue();
@@ -539,6 +544,10 @@ bool LevelCreatePopup::apply() {
     }
     cell = xsh->getCell(i, col);
   }
+  if (!validColumn) {
+    isInRange = false;
+  }
+
   /*-- 別のLevelに占有されていた場合、Columnを1つ右に移動 --*/
   if (!isInRange) {
     col += 1;
@@ -628,7 +637,7 @@ void LevelCreatePopup::update() {
     break;
   }
   if (index >= 0) m_levelTypeOm->setCurrentIndex(index);
-  
+
   /*
 (old behaviour)
 TCamera* camera = scene->getCurrentCamera();

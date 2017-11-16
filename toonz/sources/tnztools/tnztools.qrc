@@ -44,39 +44,16 @@
       <file>Resources/scale_hv.png</file>
       <file>Resources/normaleraser.png</file>
       <file>Resources/recteraser.png</file>
-      <file>Resources/recteraser_white.png</file>
-      <file>Resources/fill_white.png</file>
-      <file>Resources/tape_white.png</file>
-      <file>Resources/picker_style_white_line.png</file>
-      <file>Resources/picker_style_white_area.png</file>
-      <file>Resources/picker_style_white.png</file>
       <file>Resources/picker_style_organize.png</file>
-      <file>Resources/picker_style_white_organize.png</file>
       <file>Resources/picker_rgb.png</file>
-      <file>Resources/picker_rgb_white.png</file>      
-      <file>Resources/fill_f.png</file>
-      <file>Resources/fill_f_white.png</file>
-      <file>Resources/fill_p.png</file>
-      <file>Resources/fill_p_white.png</file>
-      <file>Resources/fill_r.png</file>
-      <file>Resources/fill_r_white.png</file>
-      <file>Resources/fill_a.png</file>
-      <file>Resources/fill_a_white.png</file>
-      <file>Resources/fill_a_f.png</file>
-      <file>Resources/fill_a_f_white.png</file>
-      <file>Resources/fill_a_p.png</file>
-      <file>Resources/fill_a_p_white.png</file>
-      <file>Resources/fill_a_r.png</file>
-      <file>Resources/fill_a_r_white.png</file>      
+      <file>Resources/picker_rgb_white.png</file>
       <file>Resources/karasu.png</file>
-      <file>Resources/karasu_white.png</file>
-      <file>Resources/karasu_f.png</file>
-      <file>Resources/karasu_f_white.png</file>
-      <file>Resources/karasu_p.png</file>
-      <file>Resources/karasu_p_white.png</file>
-      <file>Resources/karasu_r.png</file>
-      <file>Resources/karasu_r_white.png</file>
       <file>Resources/ruler_modify.png</file>
       <file>Resources/ruler_new.png</file>
+      <file>Resources/ex_freehand.png</file>
+      <file>Resources/ex_polyline.png</file>
+      <file>Resources/ex_rectangle.png</file>
+      <file>Resources/ex_line.png</file>
+      <file>Resources/ex_area.png</file>
     </qresource>
 </RCC>

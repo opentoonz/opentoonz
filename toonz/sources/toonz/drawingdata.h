@@ -22,6 +22,7 @@ public:
       m_imageSet;  // images are in the cache, the QString is the cache id
   HookSet m_levelHooks;
   TXshSimpleLevelP m_level;
+  bool m_keepVectorFills = false;
 
   /*! Define possible level image setting.
   *  \li INSERT Insert images before first selected;
@@ -58,10 +59,13 @@ public:
   // Return frameId contained in m_imageSet.
   void getFrames(std::set<TFrameId> &frameId) const;
   TXshSimpleLevel *getLevel() const { return m_level.getPointer(); }
+  void setKeepVectorFills(bool keep) { m_keepVectorFills = keep; }
+  bool getKeepVectorFills() { return m_keepVectorFills; }
 
 protected:
   TImageP getImage(QString imageId, TXshSimpleLevel *sl,
-                   const std::map<int, int> &styleTable) const;
+                   const std::map<int, int> &styleTable,
+                   bool keepVectorFills = false) const;
 };
 
 #endif  // DRAWINGDATA_INCLUDED

@@ -40,9 +40,11 @@ class StartupPopup final : public DVGui::Dialog {
   DVGui::DoubleLineEdit *m_fpsFld;
   DVGui::DoubleLineEdit *m_resXFld;
   DVGui::DoubleLineEdit *m_resYFld;
+  DVGui::IntLineEdit *m_autoSaveTimeFld;
   QList<QString> m_sceneNames;
   QList<TFilePath> m_projectPaths;
   QCheckBox *m_showAtStartCB;
+  QCheckBox *m_autoSaveOnCB;
   QComboBox *m_projectsCB;
   QComboBox *m_unitsCB;
   QPushButton *m_loadOtherSceneButton;
@@ -91,6 +93,8 @@ public slots:
   void removePreset();
   void onPresetSelected(const QString &str);
   void onCameraUnitChanged(int index);
+  void onAutoSaveOnChanged(int index);
+  void onAutoSaveTimeChanged();
 };
 
 class StartupLabel : public QLabel {
