@@ -53,9 +53,9 @@ TFrameId operator+(const TFrameId &fid, int d) {
 
 //-----------------------------------------------------------------------------
 
-void updateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
-                  std::vector<TFrameId> newFids, TXsheet *xsh) {
-  std::vector<TXshChildLevel *> childLevels;
+void updateSubXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
+                     std::vector<TFrameId> newFids, TXsheet *xsh,
+                     std::vector<TXshChildLevel *> *childLevels) {
   for (int c = 0; c < xsh->getColumnCount(); ++c) {
     int r0, r1;
     int n = xsh->getCellRange(c, r0, r1);
@@ -71,11 +71,60 @@ void updateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
           TXshChildLevel *level = cells[i].m_level->getChildLevel();
           // make sure we haven't already checked the level
           if (level &&
-              std::find(childLevels.begin(), childLevels.end(), level) ==
-                  childLevels.end()) {
+              std::find(childLevels->begin(), childLevels->end(), level) ==
+                  childLevels->end()) {
+            childLevels->push_back(level);
             TXsheet *subXsh = level->getXsheet();
-            updateXSheet(sl, oldFids, newFids, subXsh);
-            childLevels.push_back(level);
+            updateSubXSheet(sl, oldFids, newFids, subXsh, childLevels);
+          }
+        }
+        for (int j = 0; j < oldFids.size(); j++) {
+          if (oldFids.at(j) == newFids.at(j)) continue;
+          TXshCell tempCell(sl, oldFids.at(j));
+          bool sameSl  = tempCell.getSimpleLevel() == currCell.getSimpleLevel();
+          bool sameFid = tempCell.getFrameId() == currCell.getFrameId();
+          if (sameSl && sameFid) {
+            TXshCell newCell(sl, newFids.at(j));
+            cells[i] = newCell;
+            changed  = true;
+            break;
+          }
+        }
+      }
+      if (changed) {
+        xsh->setCells(r0, c, n, &cells[0]);
+        TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void updateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
+                  std::vector<TFrameId> newFids, TXsheet *xsh) {
+  std::vector<TXshChildLevel *> *childLevels =
+      new std::vector<TXshChildLevel *>();
+  for (int c = 0; c < xsh->getColumnCount(); ++c) {
+    int r0, r1;
+    int n = xsh->getCellRange(c, r0, r1);
+    if (n > 0) {
+      bool changed = false;
+      std::vector<TXshCell> cells(n);
+      xsh->getCells(r0, c, n, &cells[0]);
+      for (int i = 0; i < n; i++) {
+        TXshCell currCell = cells[i];
+        // check the sub xsheets too
+        if (!cells[i].isEmpty() &&
+            cells[i].m_level->getType() == CHILD_XSHLEVEL) {
+          TXshChildLevel *level = cells[i].m_level->getChildLevel();
+          // make sure we haven't already checked the level
+          if (level &&
+              std::find(childLevels->begin(), childLevels->end(), level) ==
+                  childLevels->end()) {
+            childLevels->push_back(level);
+            TXsheet *subXsh = level->getXsheet();
+            updateSubXSheet(sl, oldFids, newFids, subXsh, childLevels);
           }
         }
         for (int j = 0; j < oldFids.size(); j++) {
