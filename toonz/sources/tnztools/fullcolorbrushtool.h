@@ -88,6 +88,8 @@ protected:
   TDoubleProperty m_hardness;
   TDoubleProperty m_modifierSize;
   TDoubleProperty m_modifierOpacity;
+  TBoolProperty m_modifierEraser;
+  TBoolProperty m_modifierLockAlpha;
   TEnumProperty m_preset;
 
   TPixel32 m_currentColor;

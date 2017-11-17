@@ -212,22 +212,20 @@ void StylePickerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 }
 
 int StylePickerTool::getCursorId() const {
-  bool isBlackBG = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg;
-
+  int ret;
   /* in case the "organize palette" option is active */
   if (m_organizePalette.getValue())
-    return (isBlackBG) ? ToolCursor::PickerCursorWhiteOrganize
-                       : ToolCursor::PickerCursorOrganize;
-
-  if (m_colorType.getValue() == LINES)
-    return (isBlackBG) ? ToolCursor::PickerCursorWhiteLine
-                       : ToolCursor::PickerCursorLine;
+    ret = ToolCursor::PickerCursorOrganize;
+  else if (m_colorType.getValue() == LINES)
+    ret = ToolCursor::PickerCursorLine;
   else if (m_colorType.getValue() == AREAS)
-    return (isBlackBG) ? ToolCursor::PickerCursorWhiteArea
-                       : ToolCursor::PickerCursorArea;
+    ret = ToolCursor::PickerCursorArea;
   else  // line&areas
-    return (isBlackBG) ? ToolCursor::PickerCursorWhite
-                       : ToolCursor::PickerCursor;
+    ret = ToolCursor::PickerCursor;
+
+  if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
+    ret = ret | ToolCursor::Ex_Negate;
+  return ret;
 }
 
 bool StylePickerTool::onPropertyChanged(std::string propertyName) {

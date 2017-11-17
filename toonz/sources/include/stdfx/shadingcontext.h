@@ -13,7 +13,8 @@
 
 // Qt includes
 #include <QDateTime>
-#include <QGLFramebufferObjectFormat>
+#include <QOpenGLFramebufferObjectFormat>
+#include <QOpenGLWidget>
 
 #undef DVAPI
 #undef DVVAR
@@ -30,8 +31,9 @@
 //    Forward declarations
 
 class QObject;
-class QGLShaderProgram;
+class QOpenGLShaderProgram;
 class QDateTime;
+class QOffscreenSurface;
 
 //=========================================================
 
@@ -40,7 +42,7 @@ public:
   enum Support { OK, NO_PIXEL_BUFFER, NO_SHADERS };
 
 public:
-  ShadingContext();
+  ShadingContext(QOffscreenSurface *);
   ~ShadingContext();
 
   //! Returns the status of OpenGL shading support.
@@ -56,23 +58,25 @@ Resizes the output buffer to the specified size. Requires that
 the contex is made current before invocation. In case lx or ly are 0,
 the context's output buffer is destroyed.
 */
-  void resize(int lx, int ly, const QGLFramebufferObjectFormat &fmt =
-                                  QGLFramebufferObjectFormat());
+  void resize(int lx, int ly, const QOpenGLFramebufferObjectFormat &fmt =
+                                  QOpenGLFramebufferObjectFormat());
 
-  QGLFramebufferObjectFormat format() const;
+  QOpenGLFramebufferObjectFormat format() const;
   TDimension size() const;
 
   //! Surrenders ownership of the supplied shader program to the shading
   //! context.
-  void addShaderProgram(const QString &shaderName, QGLShaderProgram *program);
-  void addShaderProgram(const QString &shaderName, QGLShaderProgram *program,
+  void addShaderProgram(const QString &shaderName,
+                        QOpenGLShaderProgram *program);
+  void addShaderProgram(const QString &shaderName,
+                        QOpenGLShaderProgram *program,
                         const QDateTime &lastModified);
   bool removeShaderProgram(const QString &shaderName);
 
-  QGLShaderProgram *shaderProgram(const QString &shaderName) const;
+  QOpenGLShaderProgram *shaderProgram(const QString &shaderName) const;
   QDateTime lastModified(const QString &shaderName) const;
 
-  std::pair<QGLShaderProgram *, QDateTime> shaderData(
+  std::pair<QOpenGLShaderProgram *, QDateTime> shaderData(
       const QString &shaderName) const;
 
   GLuint loadTexture(const TRasterP &src, GLuint texUnit);  //!< Loads a texture
@@ -97,6 +101,12 @@ private:
   // Not copyable
   ShadingContext(const ShadingContext &);
   ShadingContext &operator=(const ShadingContext &);
+};
+
+class TQOpenGLWidget : public QOpenGLWidget {
+public:
+  TQOpenGLWidget();
+  void initializeGL() override;
 };
 
 #endif  // SHADINGCONTEXT_H

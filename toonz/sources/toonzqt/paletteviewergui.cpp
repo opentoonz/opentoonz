@@ -163,11 +163,11 @@ void PageViewer::setPaletteHandle(TPaletteHandle *paletteHandle) {
   if (previousPalette == paletteHandle) return;
 
   if (previousPalette)
-    disconnect(previousPalette, SIGNAL(colorStyleChanged()), this,
+    disconnect(previousPalette, SIGNAL(colorStyleChanged(bool)), this,
                SLOT(update()));
 
   m_styleSelection->setPaletteHandle(paletteHandle);
-  connect(paletteHandle, SIGNAL(colorStyleChanged()), SLOT(update()));
+  connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), SLOT(update()));
 
   if (m_styleNameEditor) m_styleNameEditor->setPaletteHandle(paletteHandle);
 }
@@ -844,7 +844,9 @@ void PageViewer::paintEvent(QPaintEvent *e) {
         p.drawChord(ssRect, 0, -180 * 16);
         tmpFont.setPointSize(6);
         p.setFont(tmpFont);
-        p.drawText(ssRect.adjusted(0, 10, 0, 0), Qt::AlignCenter,
+        // make sure the text is visible with any font
+        static int rectTopAdjust = 19 - QFontMetrics(tmpFont).overlinePos();
+        p.drawText(ssRect.adjusted(0, rectTopAdjust, 0, 0), Qt::AlignCenter,
                    QString().setNum(shortcut));
       }
 
@@ -1279,7 +1281,7 @@ void PageViewer::keyPressEvent(QKeyEvent *e) {
 void PageViewer::showEvent(QShowEvent *) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   if (!paletteHandle) return;
-  connect(paletteHandle, SIGNAL(colorStyleChanged()), SLOT(update()),
+  connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), SLOT(update()),
           Qt::UniqueConnection);
 }
 
@@ -1288,7 +1290,8 @@ void PageViewer::showEvent(QShowEvent *) {
 void PageViewer::hideEvent(QHideEvent *) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   if (!paletteHandle) return;
-  disconnect(paletteHandle, SIGNAL(colorStyleChanged()), this, SLOT(update()));
+  disconnect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
+             SLOT(update()));
 }
 
 //-----------------------------------------------------------------------------

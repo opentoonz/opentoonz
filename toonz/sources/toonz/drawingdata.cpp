@@ -186,7 +186,7 @@ void DrawingData::setLevelFrames(TXshSimpleLevel *sl,
 
     // Clone the image and store it in the image cache
     QString id = makeCacheId(
-        (uintptr_t)this,
+        (uintptr_t) this,
         it->getNumber());  // Cloning is necessary since the user may
     TImageCache::instance()->add(
         id, img->cloneImage());  // modify and save the original AFTER the copy
@@ -313,7 +313,7 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
   // Merge Image
   for (auto const &image : usedImageSet) {
     QString imageId = image.second;
-    TImageP img     = getImage(imageId, sl, styleTable);
+    TImageP img     = getImage(imageId, sl, styleTable, m_keepVectorFills);
     if (!cloneImages) TImageCache::instance()->remove(imageId);
     sl->setFrame(image.first, cloneImages ? img->cloneImage() : img);
   }
@@ -356,7 +356,8 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 //-----------------------------------------------------------------------------
 
 TImageP DrawingData::getImage(QString imageId, TXshSimpleLevel *sl,
-                              const std::map<int, int> &styleTable) const {
+                              const std::map<int, int> &styleTable,
+                              bool keepVectorFills) const {
   TImageP img = TImageCache::instance()->get(imageId, false);
   int slType  = m_level->getType();
   if (TToonzImageP ti = img) {
@@ -389,9 +390,11 @@ TImageP DrawingData::getImage(QString imageId, TXshSimpleLevel *sl,
           scene->getProperties()
               ->getVectorizerParameters()
               ->getCurrentConfiguration(0.0));
+      bool leaveUnpainted                           = config->m_leaveUnpainted;
+      if (keepVectorFills) config->m_leaveUnpainted = false;
       vectorize(slVi, ti, styleTable, *config);
-
-      img = slVi;
+      config->m_leaveUnpainted = leaveUnpainted;
+      img                      = slVi;
     }
   } else if (TVectorImageP vi = img) {
     assert(slType == PLI_XSHLEVEL || slType == TZP_XSHLEVEL);

@@ -24,6 +24,8 @@
 #include "pane.h"
 #include "previewer.h"
 
+#include <QMatrix4x4>
+
 //=====================================================================
 
 //  Forward declarations
@@ -32,6 +34,8 @@ class Ruler;
 class QMenu;
 class SceneViewer;
 class LocatorPopup;
+class QGestureEvent;
+class QTouchEvent;
 
 namespace ImageUtils {
 class FullScreenWidget;
@@ -64,13 +68,21 @@ class SceneViewer final : public GLWidgetForHighDpi,
   QPoint m_lastMousePos;
   QPoint m_pos;
   Qt::MouseButton m_mouseButton;
-
   bool m_foregroundDrawing;
   bool m_tabletEvent, m_tabletPressed, m_tabletReleased, m_tabletMove,
       m_tabletActive;
   // used to handle wrong mouse drag events!
   bool m_buttonClicked, m_toolSwitched;
-  bool m_shownOnce = false;
+  bool m_shownOnce     = false;
+  bool m_gestureActive = false;
+  bool m_touchActive   = false;
+  bool m_rotating      = false;
+  bool m_zooming       = false;
+  bool m_panning       = false;
+  QPointF m_firstPanPoint;
+  QPointF m_undoPoint;
+  double m_scaleFactor;    // used for zoom gesture
+  double m_rotationDelta;  // used for rotate gesture
   int m_referenceMode;
   int m_previewMode;
   bool m_isMouseEntered, m_forceGlFlush;
@@ -141,6 +153,8 @@ class SceneViewer final : public GLWidgetForHighDpi,
 
   bool m_isBusyOnTabletMove;
 
+  QMatrix4x4 m_projectionMatrix;
+
   // iwsw commented out temporarily
   // Ghibli3DLutUtil * m_ghibli3DLutUtil;
 public:
@@ -169,8 +183,6 @@ public:
   void onRenderCompleted(int frame) override;
   void onPreviewUpdate() override;
 
-  void startForegroundDrawing() override;
-  void endForegroundDrawing() override;
   bool isPreviewEnabled() const { return m_previewMode != NO_PREVIEW; }
   int getPreviewMode() const { return m_previewMode; }
 
@@ -283,6 +295,8 @@ protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
 
+  void gestureEvent(QGestureEvent *e);
+  void touchEvent(QTouchEvent *e, int type);
   void tabletEvent(QTabletEvent *) override;
   void leaveEvent(QEvent *) override;
   void enterEvent(QEvent *) override;

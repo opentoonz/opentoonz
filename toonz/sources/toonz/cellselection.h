@@ -10,6 +10,7 @@
 class TimeStretchPopup;
 class ReframePopup;
 class TXshCell;
+class TXshSimpleLevel;
 
 //=============================================================================
 // TCellSelection
@@ -50,6 +51,8 @@ public:
 
   /*- セルの上書きペースト -*/
   void overWritePasteCells();
+  // paste cell numbers only
+  void overwritePasteNumbers();
 
   //! \note: puo' anche essere r0>r1 o c0>c1
   void selectCells(int r0, int c0, int r1, int c1);
@@ -64,6 +67,8 @@ public:
   bool isColSelected(int col) const;
 
   bool areAllColSelectedLocked() const;
+  bool areOnlyVectorCellsSelected();
+  TXshSimpleLevel *getNewToonzRasterLevel(TXshSimpleLevel *sl);
 
   // commands
   void reverseCells();
@@ -100,6 +105,8 @@ public:
   void reframe2Cells() { reframeCells(2); }
   void reframe3Cells() { reframeCells(3); }
   void reframe4Cells() { reframeCells(4); }
+  void convertToToonzRaster();
+  void convertVectortoVector();
 
   void reframeWithEmptyInbetweens();
 

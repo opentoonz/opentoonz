@@ -270,8 +270,6 @@ TImageP ImageRasterizer::build(int imFlags, void *extData) {
       TVectorRenderData rd(TTranslation(-off.x, -off.y), TRect(TPoint(0, 0), d),
                            vpalette, 0, true, true);
 
-      TGlContext oldContext = tglGetCurrentContext();
-
       // this is too slow.
       {
         QSurfaceFormat format;
@@ -279,11 +277,9 @@ TImageP ImageRasterizer::build(int imFlags, void *extData) {
 
         std::unique_ptr<QOffscreenSurface> surface(new QOffscreenSurface());
         surface->setFormat(format);
+        // Enabling Qt::AA_ShareOpenGLContexts attribute in main()
+        surface->setScreen(QOpenGLContext::globalShareContext()->screen());
         surface->create();
-
-        std::unique_ptr<QOpenGLContext> context(new QOpenGLContext());
-        context->create();
-        context->makeCurrent(surface.get());
 
         TRaster32P ras(d);
 
@@ -335,9 +331,6 @@ TImageP ImageRasterizer::build(int imFlags, void *extData) {
         glMatrixMode(GL_PROJECTION), glPopMatrix();
 
         glPopAttrib();
-
-        context->doneCurrent();
-        tglMakeCurrent(oldContext);
 
         TRasterImageP ri = TRasterImageP(ras);
         ri->setOffset(off + ras->getCenter());
