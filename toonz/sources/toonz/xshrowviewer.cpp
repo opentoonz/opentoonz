@@ -428,6 +428,7 @@ void RowArea::drawCurrentTimeIndicator(QPainter &p) {
   int currentRow = m_viewer->getCurrentRow();
 
   QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
+  if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
   QRect header   = m_viewer->orientation()
                      ->rect(PredefinedRect::FRAME_HEADER)
                      .translated(topLeft);
@@ -449,6 +450,7 @@ void RowArea::drawCurrentTimeLine(QPainter &p) {
   int currentRow = m_viewer->getCurrentRow();
 
   QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
+  if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
   QRect header   = m_viewer->orientation()
                      ->rect(PredefinedRect::FRAME_HEADER)
                      .translated(topLeft);
