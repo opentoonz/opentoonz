@@ -33,7 +33,7 @@ class DVAPI LineEdit : public QLineEdit {
 
   bool m_isReturnPressed;
   bool m_forbiddenSpecialChars;
-  bool m_mouseDragEditing;
+  bool m_mouseDragEditing = false;
 
 public:
   LineEdit(QWidget *parent = 0, bool forbiddenSpecialChars = false);
