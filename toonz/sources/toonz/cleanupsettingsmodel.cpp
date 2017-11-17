@@ -250,7 +250,7 @@ void CleanupSettingsModel::connectSignals() {
                        SLOT(onCellChanged()), Qt::QueuedConnection);
   ret = ret && connect(columnHandle, SIGNAL(columnIndexSwitched()),
                        SLOT(onCellChanged()), Qt::QueuedConnection);
-  ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged()),
+  ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged(bool)),
                        SLOT(onPaletteChanged()), Qt::QueuedConnection);
   ret = ret && connect(paletteHandle, SIGNAL(paletteChanged()),
                        SLOT(onPaletteChanged()), Qt::QueuedConnection);

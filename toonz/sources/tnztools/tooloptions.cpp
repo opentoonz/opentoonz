@@ -306,8 +306,10 @@ void ToolOptionControlBuilder::visit(TBoolProperty *p) {
     std::string actionName = "A_ToolOption_" + p->getId();
     QAction *a = CommandManager::instance()->getAction(actionName.c_str());
     if (a) {
+      a->setCheckable(true);
       control->addAction(a);
-      QObject::connect(a, SIGNAL(triggered()), control, SLOT(doClick()));
+      QObject::connect(a, SIGNAL(triggered(bool)), control,
+                       SLOT(doClick(bool)));
     }
   }
   hLayout()->addSpacing(5);
@@ -553,10 +555,11 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
     m_lockNSCenterCheckbox =
         new ToolOptionCheckbox(m_tool, lockProp, toolHandle, this);
 
-  TBoolProperty *prop =
+  TBoolProperty *globalKeyProp =
       dynamic_cast<TBoolProperty *>(m_pg->getProperty("Global Key"));
-  if (prop)
-    m_globalKey = new ToolOptionCheckbox(m_tool, prop, toolHandle, this);
+  if (globalKeyProp)
+    m_globalKey =
+        new ToolOptionCheckbox(m_tool, globalKeyProp, toolHandle, this);
 
   m_lockEWPosCheckbox->setObjectName("EditToolLockButton");
   m_lockNSPosCheckbox->setObjectName("EditToolLockButton");
@@ -811,6 +814,16 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
             SLOT(onScaleTypeChanged(int)));
     connect(m_maintainCombo, SIGNAL(currentIndexChanged(int)), m_scaleVField,
             SLOT(onScaleTypeChanged(int)));
+  }
+
+  if (globalKeyProp) {
+    std::string actionName = "A_ToolOption_" + globalKeyProp->getId();
+    QAction *a = CommandManager::instance()->getAction(actionName.c_str());
+    if (a) {
+      a->setCheckable(true);
+      m_globalKey->addAction(a);
+      connect(a, SIGNAL(triggered(bool)), m_globalKey, SLOT(doClick(bool)));
+    }
   }
 }
 

@@ -72,7 +72,7 @@
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="689"/>
         <source>Tolerance</source>
-        <translation>Толерантность</translation>
+        <translation type="unfinished">Допуск</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="692"/>
@@ -382,7 +382,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="694"/>
         <source>Column:</source>
-        <translation>Колонка:</translation>
+        <translation>Столбец:</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="697"/>
@@ -596,7 +596,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1254"/>
         <source>&amp;Display Areas as Filled</source>
-        <translation>&amp;Отобразить область заполненной</translation>
+        <translation>&amp;Отобразить область заливкой</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1460"/>
@@ -2039,7 +2039,7 @@ Are you sure?</source>
     <message>
         <location filename="../../toonzqt/imageutils.cpp" line="197"/>
         <source>Cannot premultiply a vector-based level.</source>
-        <translation>Невозможени premultiply векторного уровня.</translation>
+        <translation>Невозможен premultiply векторного уровня.</translation>
     </message>
     <message>
         <location filename="../../toonzqt/imageutils.cpp" line="268"/>
@@ -2474,7 +2474,7 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2442"/>
         <source>Autopaint for Lines</source>
-        <translation>Автозаполнение линий</translation>
+        <translation>Автозаливка линий</translation>
     </message>
 </context>
 <context>

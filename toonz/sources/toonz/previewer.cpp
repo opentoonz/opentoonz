@@ -1139,6 +1139,7 @@ void Previewer::saveRenderedFrames() {
 /*! Restituisce un puntatore al raster randerizzato se il frame e' disponibile,
     altrimenti comincia a calcolarlo*/
 TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const {
+  if (frame < 0) return TRasterP();
   std::map<int, Imp::FrameInfo>::iterator it = m_imp->m_frames.find(frame);
   if (it != m_imp->m_frames.end()) {
     if (frame < m_imp->m_pbStatus.size()) {
@@ -1183,7 +1184,7 @@ TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const {
 
 //! Verifica se \b frame e' nella cache, cioe' se il frame e' disponibile
 bool Previewer::isFrameReady(int frame) const {
-  if (frame >= (int)m_imp->m_pbStatus.size()) return false;
+  if (frame < 0 || frame >= (int)m_imp->m_pbStatus.size()) return false;
 
   return m_imp->m_pbStatus[frame] == FlipSlider::PBFrameFinished;
 }

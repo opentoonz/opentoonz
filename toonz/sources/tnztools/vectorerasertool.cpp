@@ -443,6 +443,12 @@ void EraserTool::draw() {
       for (UINT i = 0; i < m_polyline.size(); i++) tglVertex(m_polyline[i]);
       tglVertex(m_mousePos);
       glEnd();
+    } else if (m_eraseType.getValue() == FREEHAND_ERASE && !m_track.isEmpty()) {
+      TPixel color = blackBg ? TPixel32::White : TPixel32::Black;
+      tglColor(color);
+      glPushMatrix();
+      m_track.drawAllFragments();
+      glPopMatrix();
     }
   }
 }
@@ -962,6 +968,7 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       invalidate();
       notifyImageChanged();
     }
+    m_track.clear();
   }
   m_active = false;
 }
@@ -1112,22 +1119,6 @@ void EraserTool::startFreehand(const TPointD &pos) {
   m_track.clear();
   m_firstPos = pos;
   m_track.add(TThickPoint(pos, m_thick), getPixelSize() * getPixelSize());
-  TPointD dpiScale = m_viewer->getDpiScale();
-#if defined(MACOSX)
-//			m_viewer->prepareForegroundDrawing();
-#endif
-  //	m_viewer->makeCurrent();
-  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                     ? TPixel32::White
-                     : TPixel32::Black;
-  tglColor(color);
-  m_viewer->startForegroundDrawing();
-  glPushMatrix();
-  tglMultMatrix(getMatrix());
-  glScaled(dpiScale.x, dpiScale.y, 1);
-  m_track.drawLastFragments();
-  glPopMatrix();
-  m_viewer->endForegroundDrawing();
 }
 
 //-----------------------------------------------------------------------------
@@ -1137,20 +1128,8 @@ void EraserTool::freehandDrag(const TPointD &pos) {
 #if defined(MACOSX)
 //		m_viewer->enableRedraw(false);
 #endif
-
-  m_viewer->startForegroundDrawing();
-  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                     ? TPixel32::White
-                     : TPixel32::Black;
-  tglColor(color);
-  glPushMatrix();
-  tglMultMatrix(getMatrix());
-  TPointD dpiScale = m_viewer->getDpiScale();
-  glScaled(dpiScale.x, dpiScale.y, 1);
   m_track.add(TThickPoint(pos, m_thick), getPixelSize() * getPixelSize());
-  m_track.drawLastFragments();
-  glPopMatrix();
-  m_viewer->endForegroundDrawing();
+  invalidate(m_track.getModifiedRegion());
 }
 
 //-----------------------------------------------------------------------------
@@ -1175,29 +1154,7 @@ void EraserTool::closeFreehand(const TPointD &pos) {
 //! Viene aggiunto un punto al vettore m_polyline.
 void EraserTool::addPointPolyline(const TPointD &pos) {
   m_firstPos = pos;
-
-  TPointD dpiScale = m_viewer->getDpiScale();
-
-#if defined(MACOSX)
-//		 m_viewer->prepareForegroundDrawing();
-#endif
-  //      m_viewer->makeCurrent();
-  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                     ? TPixel32::White
-                     : TPixel32::Black;
-  tglColor(color);
-//	  m_viewer->startForegroundDrawing();
-
-#if defined(MACOSX)
-//		m_viewer->enableRedraw(m_eraseType.getValue() ==
-// POLYLINE_ERASE);
-#endif
-
-  glPushMatrix();
-  glScaled(dpiScale.x, dpiScale.y, 1);
   m_polyline.push_back(pos);
-  glPopMatrix();
-  //	  m_viewer->endForegroundDrawing();
 }
 
 //-----------------------------------------------------------------------------

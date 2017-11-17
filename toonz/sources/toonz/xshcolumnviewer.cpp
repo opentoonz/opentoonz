@@ -1891,6 +1891,9 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       // synchronize the current column and the current fx
       TApp::instance()->getCurrentFx()->setFx(column->getFx());
     } else if (m_col >= 0) {
+		if (m_viewer->getColumnSelection()->isColumnSelected(m_col) &&
+			event->button() == Qt::RightButton)
+			return;
       setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
       TApp::instance()->getCurrentFx()->setFx(0);
     }
@@ -2199,6 +2202,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     menu.addAction(cmdManager->getAction(MI_Insert));
     menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_InsertFx));
+    menu.addAction(cmdManager->getAction(MI_NewNoteLevel));
     menu.addSeparator();
     if (m_viewer->getXsheet()->isColumnEmpty(col) ||
         (cell.m_level && cell.m_level->getChildLevel()))

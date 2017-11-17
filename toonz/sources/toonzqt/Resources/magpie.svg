@@ -1,19 +1,42 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1"
-	 id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="magpie.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60"
-	 style="enable-background:new 0 0 60 60;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#EBEBEB;}
-	.st1{fill:#404040;}
-	.st2{fill:#FFFFFF;}
-</style>
-<rect id="rect6" y="0" class="st0" width="60" height="60"/>
-<path id="path8" inkscape:connector-curvature="0" class="st1" d="M60,60H0V0h60V60z M1,1v58h58V1H1z"/>
-<path class="st2" d="M26.9,39.6H14c-2.6,0-4.6-2.1-4.6-4.6V17c0-2.6,2.1-4.6,4.6-4.6h32c2.5,0,4.6,2.1,4.6,4.6v18
-	c0,2.5-2.1,4.6-4.6,4.6H32.5l-5.6,11.7V39.6z"/>
-<path class="st1" d="M46,12.7c2.3,0,4.3,1.9,4.3,4.3v18c0,2.3-1.9,4.3-4.3,4.3H32.8h-0.5l-0.2,0.4l-4.8,10V40v-0.8h-0.8H14
-	c-2.3,0-4.3-1.9-4.3-4.3V17c0-2.4,1.9-4.3,4.3-4.3H46 M46,12c-8.1,0-23.9,0-32,0c-2.8,0-5,2.3-5,5c0,5.1,0,12.9,0,18
-	c0,2.8,2.2,5,5,5h12.5v13l6.3-13H46c2.8,0,5-2.2,5-5c0-5.1,0-12.9,0-18C51,14.2,48.8,12,46,12L46,12z"/>
-</svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg2"
+   style="clip-rule:evenodd;fill-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"
+   xml:space="preserve"
+   version="1.1"
+   viewBox="0 0 74 44"
+   height="44"
+   width="74"><metadata
+     id="metadata21"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs19" /><rect
+     style="fill:#ebebeb"
+     height="44"
+     width="74"
+     y="0"
+     x="0"
+     id="rect6" /><path
+     style="fill:#404040;fill-rule:nonzero"
+     d="M 74,44 0,44 0,0 74,0 74,44 Z M 1.2333333,0.733333 l 0,42.533334 71.5333337,0 0,-42.533334 -71.5333337,0 z"
+     id="path8" /><path
+     id="path6"
+     style="fill:none;stroke:#000000;stroke-width:2px"
+     d="m 53.218644,3.6271191 9,6.4999999 -16.7,24.2 -10.9,5.8 1.7,-12.3 16.9,-24.1999999 z" /><path
+     id="path9"
+     style="fill:none;stroke:#000000;stroke-width:2px"
+     d="m 12.118644,4.6271191 35,0" /><path
+     id="path11"
+     style="fill:none;stroke:#000000;stroke-width:2px"
+     d="m 12.118644,16.627119 26,0" /><path
+     id="path13"
+     style="fill:none;stroke:#000000;stroke-width:2px"
+     d="m 12.118644,27.627119 19,0" /><path
+     id="path15"
+     style="fill:none;stroke:#000000;stroke-width:2px"
+     d="m 12.118644,38.627119 16,0" /></svg>

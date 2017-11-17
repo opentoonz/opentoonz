@@ -94,6 +94,8 @@ class CellArea final : public QWidget {
 
   void drawNotes(QPainter &p, const QRect toBeUpdated);
 
+  void drawCurrentTimeIndicator(QPainter &p, const QPoint &xy);
+
   // Restistusce true
   bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);
 
