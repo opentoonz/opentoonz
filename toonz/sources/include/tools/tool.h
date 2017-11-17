@@ -441,6 +441,11 @@ return true if the method execution can have changed the current tool
     return 0;
   }  //!< Returns the type of cursor used by the tool.
 
+  // returns true if the pressed key is recognized and processed.
+  // used in SceneViewer::event(), reimplemented in SelectionTool
+  // and ControlPointEditorTool
+  virtual bool isEventAcceptable(QEvent *e) { return false; }
+
   TXsheet *getXsheet() const;  //!< Returns a pointer to the actual Xsheet.
 
   int getFrame();        //!< Returns the actual frame in use.

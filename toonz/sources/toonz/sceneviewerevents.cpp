@@ -947,6 +947,11 @@ bool SceneViewer::event(QEvent *e) {
     if (tool && tool->isEnabled() && tool->getName() == T_Type &&
         tool->isActive())
       e->accept();
+    // for other tools, check if the pressed keys should be catched instead of
+    // triggering the shortcut command actions
+    else if (tool && tool->isEventAcceptable(e)) {
+      e->accept();
+    }
     return true;
   }
   if (e->type() == QEvent::KeyRelease) {

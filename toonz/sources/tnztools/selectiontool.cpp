@@ -12,6 +12,8 @@
 #include "toonz/tobjecthandle.h"
 #include "tw/keycodes.h"
 
+#include <QKeyEvent>
+
 using namespace ToolUtils;
 using namespace DragSelectionTool;
 
@@ -1334,4 +1336,18 @@ void SelectionTool::closePolyline(const TPointD &pos) {
   m_stroke = new TStroke(strokePoints);
   assert(m_stroke->getPoint(0) == m_stroke->getPoint(1));
   invalidate();
+}
+
+//-----------------------------------------------------------------------------
+
+// returns true if the pressed key is recognized and processed in the tool
+// instead of triggering the shortcut command.
+bool SelectionTool::isEventAcceptable(QEvent *e) {
+  if (!isEnabled()) return false;
+  if (isSelectionEmpty()) return false;
+  // arrow keys will be used for moving the selected region
+  QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+  int key             = keyEvent->key();
+  return (key == Qt::Key_Up || key == Qt::Key_Down || key == Qt::Key_Left ||
+          key == Qt::Key_Right);
 }
