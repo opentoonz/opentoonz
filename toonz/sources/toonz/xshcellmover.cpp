@@ -31,6 +31,7 @@
 #include "toonz/fxdag.h"
 #include "toonz/tcolumnfxset.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/tcolumnhandle.h"
 
 // TnzBase includes
 #include "tfx.h"
@@ -501,43 +502,62 @@ void LevelMoverTool::onCellChange(int row, int col) {
   if (pos.y < 0) pos.y = 0;
   if (pos.x < 0) pos.x = 0;
 
-  TPoint delta                       = m_aimedPos - m_lastPos;
-  int dCol                           = delta.x;
-  if (!o->isVerticalTimeline()) dCol = delta.y;
-
+  TPoint delta = pos - m_aimedPos;
+  int dCol;
+  if (o->isVerticalTimeline()) {
+    dCol = delta.x;
+    if (origX < 0) dCol += origX;
+  } else {
+    dCol = delta.y;
+    if (origY < 0) dCol += origY;
+  }
+  qDebug() << "onCellChange: pos=(" << pos.x << "," << pos.y << ") m_aimedPos=("
+           << m_aimedPos.x << "," << m_aimedPos.y << ") m_lastPos=("
+           << m_lastPos.x << "," << m_lastPos.y << ") dCol=" << dCol;
   CellsMover *cellsMover = m_undo->getCellsMover();
   std::set<int> ii;
+  TRect currSelection(m_aimedPos, m_range);
   if (o->isVerticalTimeline()) {
-    if (origX < 0 || (m_aimedPos.x == 0 && dCol < 0)) {
-      ii.insert(0);
+    int newBegin = currSelection.x0 + dCol;
+    if (newBegin < 0) {
+      newBegin *= -1;
+      for (int x = 0; x < newBegin; x++) ii.insert(x);
       ColumnCmd::insertEmptyColumns(ii);
-      m_lastPos += TPoint(1, 0);
-      m_startPos += TPoint(1, 0);
-      m_aimedPos += TPoint(1, 0);
-      cellsMover->setStartPos(cellsMover->getStartPos() + TPoint(1, 0));
-      cellsMover->setPos(cellsMover->getPos() + TPoint(1, 0));
-      getViewer()->setCurrentColumn(getViewer()->getCurrentColumn() + 1);
+      m_lastPos += TPoint(newBegin, 0);
+      m_startPos += TPoint(newBegin, 0);
+      m_aimedPos += TPoint(newBegin, 0);
+      cellsMover->setStartPos(cellsMover->getStartPos() + TPoint(newBegin, 0));
+      cellsMover->setPos(cellsMover->getPos() + TPoint(newBegin, 0));
+      //      getViewer()->setCurrentColumn(getViewer()->getCurrentColumn() +
+      //      newBegin);
+      pos.x = origX + newBegin;
     } else {
-      int colCount = xsh->getColumnCount();
-      if (origX >= colCount) {
-        ii.insert(colCount);
+      int maxX   = xsh->getColumnCount() - 1;
+      int newEnd = currSelection.x1 + dCol;
+      if (newEnd > maxX) {
+        for (int x = maxX + 1; x <= newEnd; x++) ii.insert(x);
         ColumnCmd::insertEmptyColumns(ii);
       }
     }
   } else {
-    if (origY < 0 || (m_aimedPos.y == 0 && dCol < 0)) {
-      ii.insert(0);
+    int newBegin = currSelection.y0 + dCol;
+    if (newBegin < 0) {
+      newBegin *= -1;
+      for (int y = 0; y < newBegin; y++) ii.insert(y);
       ColumnCmd::insertEmptyColumns(ii);
-      m_lastPos += TPoint(0, 1);
-      m_startPos += TPoint(0, 1);
-      m_aimedPos += TPoint(0, 1);
-      cellsMover->setStartPos(cellsMover->getStartPos() + TPoint(0, 1));
-      cellsMover->setPos(cellsMover->getPos() + TPoint(0, 1));
-      getViewer()->setCurrentColumn(getViewer()->getCurrentColumn() + 1);
+      m_lastPos += TPoint(0, newBegin);
+      m_startPos += TPoint(0, newBegin);
+      m_aimedPos += TPoint(0, newBegin);
+      cellsMover->setStartPos(cellsMover->getStartPos() + TPoint(0, newBegin));
+      cellsMover->setPos(cellsMover->getPos() + TPoint(0, newBegin));
+      //	  getViewer()->setCurrentColumn(getViewer()->getCurrentColumn()
+      //+ newBegin);
+      pos.x = origY + newBegin;
     } else {
-      int colCount = xsh->getColumnCount();
-      if (origY >= colCount) {
-        ii.insert(colCount);
+      int maxY   = xsh->getColumnCount() - 1;
+      int newEnd = currSelection.y1 + dCol;
+      if (newEnd > maxY) {
+        for (int y = maxY + 1; y <= newEnd; y++) ii.insert(y);
         ColumnCmd::insertEmptyColumns(ii);
       }
     }
