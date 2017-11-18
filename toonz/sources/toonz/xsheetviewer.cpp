@@ -736,7 +736,10 @@ CellPosition XsheetViewer::xyToPosition(const QPoint &point) const {
   usePoint.setY(colAreaHeight - usePoint.y());
 
   CellPosition resultCP = o->xyToPosition(usePoint, xsh->getColumnFan(o));
-  if (point.y() > colAreaHeight) resultCP.setLayer(-3);
+  if (point.y() > colAreaHeight) {
+    int colsBelow = ((point.y() - colAreaHeight) / o->cellHeight()) + 1;
+    resultCP.setLayer(-colsBelow);
+  }
   return resultCP;
 }
 CellPosition XsheetViewer::xyToPosition(const TPoint &point) const {

@@ -1615,31 +1615,35 @@ public:
     int origCol      = col;
     if (col < 0) col = 0;
     int dCol         = col - (m_lastCol - m_offset);
+    if (origCol < 0) dCol += origCol;
 
     std::set<int> ii;
-    if (origCol < 0 || (*indices.begin() == 0 && dCol < 0)) {
-      ii.insert(0);
+    int newBegin = *indices.begin() + dCol;
+    if (newBegin < 0) {
+      newBegin *= -1;
+      for (int x = 0; x < newBegin; x++) ii.insert(x);
       ColumnCmd::insertEmptyColumns(ii);
       selection->selectNone();
       for (std::set<int>::const_iterator it = indices.begin();
            it != indices.end(); it++)
-        selection->selectColumn(*it + 1, true);
+        selection->selectColumn(*it + newBegin, true);
       indices = selection->getIndices();
-      col++;
-      m_lastCol++;
-      m_firstCol++;
-	  int currentIndx = app->getCurrentColumn()->getColumnIndex();
-	  app->getCurrentColumn()->setColumnIndex(currentIndx + 1);
+      col     = origCol + newBegin;
+      m_lastCol += newBegin;
+      m_firstCol += newBegin;
+      int currentIndx = app->getCurrentColumn()->getColumnIndex();
+      app->getCurrentColumn()->setColumnIndex(currentIndx + newBegin);
     } else {
-      int colCount = xsh->getColumnCount();
-      if (origCol >= colCount) {
-        ii.insert(colCount);
+      int currEnd = xsh->getColumnCount() - 1;
+      int newEnd  = *indices.rbegin() + dCol;
+      if (newEnd > currEnd) {
+        for (int x = currEnd + 1; x <= newEnd; x++) ii.insert(x);
         ColumnCmd::insertEmptyColumns(ii);
       }
     }
+
     if (col == (m_lastCol - m_offset)) return;
-    m_lastCol = col;
-    m_offset  = 0;
+    m_lastCol = col + m_offset;
 
     assert(*indices.begin() + dCol >= 0);
 
@@ -1651,7 +1655,7 @@ public:
       selection->selectColumn(*it + dCol, true);
   }
   void onRelease(const CellPosition &pos) override {
-    int delta = (m_lastCol + m_origOffset) - m_firstCol;
+    int delta = m_lastCol - m_firstCol;
     if (delta == 0) return;
     TColumnSelection *selection = getViewer()->getColumnSelection();
     std::set<int> indices       = selection->getIndices();
