@@ -1209,6 +1209,8 @@ void XsheetViewer::keyReleaseEvent(QKeyEvent *event) {
 void XsheetViewer::enterEvent(QEvent *) {
   m_cellArea->onControlPressed(false);
   m_columnArea->onControlPressed(false);
+  TApp *app = TApp::instance();
+  app->setCurrentXsheetViewer(this);
 }
 
 //-----------------------------------------------------------------------------

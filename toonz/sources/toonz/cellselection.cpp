@@ -12,6 +12,7 @@
 #include "menubarcommandids.h"
 #include "timestretchpopup.h"
 #include "tapp.h"
+#include "xsheetviewer.h"
 
 // TnzTools includes
 #include "tools/toolutils.h"
@@ -1335,19 +1336,41 @@ void TCellSelection::enableCommands() {
 
 bool TCellSelection::isEnabledCommand(
     std::string commandId) {  // static function
-  static QList<std::string> commands = {
-      MI_Autorenumber, MI_Reverse,      MI_Swing,
-      MI_Random,       MI_Increment,    MI_ResetStep,
-      MI_IncreaseStep, MI_DecreaseStep, MI_Step2,
-      MI_Step3,        MI_Step4,        MI_Each2,
-      MI_Each3,        MI_Each4,        MI_Rollup,
-      MI_Rolldown,     MI_TimeStretch,  MI_CloneLevel,
-      MI_SetKeyframes, MI_Copy,         MI_Paste,
-      MI_PasteInto,    MI_Cut,          MI_Clear,
-      MI_Insert,       MI_Reframe1,     MI_Reframe2,
-      MI_Reframe3,     MI_Reframe4,     MI_ReframeWithEmptyInbetweens,
-      MI_Undo,         MI_Redo,         MI_PasteNumbers,
-      MI_ConvertToToonzRaster, MI_ConvertVectorToVector};
+  static QList<std::string> commands = {MI_Autorenumber,
+                                        MI_Reverse,
+                                        MI_Swing,
+                                        MI_Random,
+                                        MI_Increment,
+                                        MI_ResetStep,
+                                        MI_IncreaseStep,
+                                        MI_DecreaseStep,
+                                        MI_Step2,
+                                        MI_Step3,
+                                        MI_Step4,
+                                        MI_Each2,
+                                        MI_Each3,
+                                        MI_Each4,
+                                        MI_Rollup,
+                                        MI_Rolldown,
+                                        MI_TimeStretch,
+                                        MI_CloneLevel,
+                                        MI_SetKeyframes,
+                                        MI_Copy,
+                                        MI_Paste,
+                                        MI_PasteInto,
+                                        MI_Cut,
+                                        MI_Clear,
+                                        MI_Insert,
+                                        MI_Reframe1,
+                                        MI_Reframe2,
+                                        MI_Reframe3,
+                                        MI_Reframe4,
+                                        MI_ReframeWithEmptyInbetweens,
+                                        MI_Undo,
+                                        MI_Redo,
+                                        MI_PasteNumbers,
+                                        MI_ConvertToToonzRaster,
+                                        MI_ConvertVectorToVector};
   return commands.contains(commandId);
 }
 
@@ -1504,6 +1527,7 @@ void TCellSelection::pasteCells() {
   QClipboard *clipboard     = QApplication::clipboard();
   const QMimeData *mimeData = clipboard->mimeData();
   TXsheet *xsh              = TApp::instance()->getCurrentXsheet()->getXsheet();
+  XsheetViewer *viewer      = TApp::instance()->getCurrentXsheetViewer();
 
   bool initUndo = false;
   const TCellKeyframeData *cellKeyframeData =
@@ -1519,6 +1543,13 @@ void TCellSelection::pasteCells() {
       DVGui::error(QObject::tr("No data to paste."));
       return;
     }
+
+    if (viewer && !viewer->orientation()->isVerticalTimeline()) {
+      int cAdj = cellData->getColCount() - 1;
+      c0 -= cAdj;
+      c1 -= cAdj;
+    }
+
     int oldR0 = r0;
     int oldC0 = c0;
     int oldR1 = r1;
@@ -2447,8 +2478,8 @@ TXshSimpleLevel *TCellSelection::getNewToonzRasterLevel(
   ToonzScene *scene       = TApp::instance()->getCurrentScene()->getScene();
   TFilePath sourcePath    = sourceSl->getPath();
   std::wstring sourceName = sourcePath.getWideName();
-  TFilePath parentDir = sourceSl->getPath().getParentDir();
-  TFilePath fp = scene->getDefaultLevelPath(TZP_XSHLEVEL, sourceName)
+  TFilePath parentDir     = sourceSl->getPath().getParentDir();
+  TFilePath fp            = scene->getDefaultLevelPath(TZP_XSHLEVEL, sourceName)
                      .withParentDir(parentDir);
   TFilePath actualFp = scene->decodeFilePath(fp);
 
@@ -2491,8 +2522,7 @@ public:
       , m_newImages(newImages)
       , m_oldLevelHooks(oldLevelHooks) {}
 
-  ~VectorToVectorUndo() {
-  }
+  ~VectorToVectorUndo() {}
 
   void undo() const override {
     for (int i = 0; i < m_frameIds.size(); i++) {
@@ -2754,8 +2784,7 @@ void TCellSelection::convertVectortoVector() {
   // get clones of the new images for undo
   std::vector<TImageP> newImages;
   for (i = 0; i < totalImages; i++) {
-    newImages.push_back(
-        sourceSl->getFrame(frameIds[i], false)->cloneImage());
+    newImages.push_back(sourceSl->getFrame(frameIds[i], false)->cloneImage());
   }
 
   HookSet *oldLevelHooks = new HookSet();

@@ -26,6 +26,7 @@ class QMainWindow;
 class TMainWindow;
 class ComboViewerPanel;
 class SceneViewer;
+class XsheetViewer;
 
 //=============================================================================
 // TXsheeHandle
@@ -84,6 +85,7 @@ class TApp final : public QObject,
   // the filmstrip
   ComboViewerPanel *m_inknPaintViewerPanel;
   SceneViewer *m_activeViewer;
+  XsheetViewer *m_xsheetViewer;
 
   int m_autosavePeriod;  // minutes
   bool m_autosaveSuspended;
@@ -206,6 +208,10 @@ public:
   bool isPenCloseToTablet() const { return m_isPenCloseToTablet; }
 
   void writeSettings();
+
+  void setCurrentXsheetViewer(XsheetViewer *viewer) { m_xsheetViewer = viewer; }
+
+  XsheetViewer *getCurrentXsheetViewer() const { return m_xsheetViewer; }
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event) override;
