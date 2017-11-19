@@ -259,9 +259,8 @@ void CellsMover::emptyColumns(int c) const {
   std::set<int> ii;
   for (int i = 0; i < m_colCount; i++) ii.insert(c + i);
   ColumnCmd::deleteColumns(ii, false, true);
-  //  TXsheet *xsh = getXsheet();
-  //  for (int i = 0; i < m_colCount; i++) xsh->insertColumn(c);
-  ColumnCmd::insertEmptyColumns(ii);
+  TXsheet *xsh = getXsheet();
+  for (int i = 0; i < m_colCount; i++) xsh->insertColumn(c);
 }
 
 TXshColumn::ColumnType CellsMover::getColumnTypeFromCell(int index) const {
@@ -511,9 +510,7 @@ void LevelMoverTool::onCellChange(int row, int col) {
     dCol = delta.y;
     if (origY < 0) dCol += origY;
   }
-  qDebug() << "onCellChange: pos=(" << pos.x << "," << pos.y << ") m_aimedPos=("
-           << m_aimedPos.x << "," << m_aimedPos.y << ") m_lastPos=("
-           << m_lastPos.x << "," << m_lastPos.y << ") dCol=" << dCol;
+
   CellsMover *cellsMover = m_undo->getCellsMover();
   std::set<int> ii;
   TRect currSelection(m_aimedPos, m_range);
