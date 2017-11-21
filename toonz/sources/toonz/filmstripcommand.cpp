@@ -1283,10 +1283,11 @@ class RenumberUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::vector<TFrameId> m_fids;
   std::map<TFrameId, TFrameId> m_mapOldFrameId;
-  bool m_updateXSheet;
+  bool m_updateXSheet = false;
 
 public:
-  RenumberUndo(const TXshSimpleLevelP &level, const std::vector<TFrameId> &fids)
+  RenumberUndo(const TXshSimpleLevelP &level, const std::vector<TFrameId> &fids,
+               bool forceCallUpdateXSheet = false)
       : m_level(level), m_fids(fids) {
     assert(m_level);
     std::vector<TFrameId> oldFids;
@@ -1297,7 +1298,8 @@ public:
       if (m_fids[i] != oldFids[i]) m_mapOldFrameId[m_fids[i]] = oldFids[i];
     }
     m_updateXSheet =
-        Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled();
+        Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled() ||
+        forceCallUpdateXSheet;
   }
   void renumber(std::vector<TFrameId> fids) const {
     if (m_updateXSheet) {
@@ -1346,7 +1348,8 @@ public:
 
 void FilmstripCmd::renumber(
     TXshSimpleLevel *sl,
-    const std::vector<std::pair<TFrameId, TFrameId>> &table) {
+    const std::vector<std::pair<TFrameId, TFrameId>> &table,
+    bool forceCallUpdateXSheet) {
   if (!sl || sl->isSubsequence() || sl->isReadOnly()) return;
   if (table.empty()) return;
 
@@ -1393,8 +1396,10 @@ void FilmstripCmd::renumber(
     }
   }
 
-  TUndoManager::manager()->add(new RenumberUndo(sl, fids));
-  if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) {
+  TUndoManager::manager()->add(
+      new RenumberUndo(sl, fids, forceCallUpdateXSheet));
+  if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled() ||
+      forceCallUpdateXSheet) {
     updateXSheet(sl, oldFrames, fids);
   }
   sl->renumber(fids);

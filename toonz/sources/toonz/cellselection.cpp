@@ -428,70 +428,10 @@ public:
 //  RenumberUndo
 //-----------------------------------------------------------------------------
 
-class RenumberUndo final : public TUndo {
-  std::map<TXshCell, TXshCell> m_undoTable, m_redoTable;
-  std::vector<TXshChildLevel *> *m_childLevels;
-
+class RenumberUndo {
 public:
   class RedoNotifier;
   class UndoNotifier;
-
-public:
-  RenumberUndo(const std::map<TXshCell, TXshCell> &cellsMap)
-      : m_redoTable(cellsMap) {
-    m_childLevels = new std::vector<TXshChildLevel *>();
-    // Invert the redo table to obtain the undo table
-    std::map<TXshCell, TXshCell>::iterator it, end = m_redoTable.end();
-    for (it = m_redoTable.begin(); it != end; ++it)
-      m_undoTable.insert(std::make_pair(it->second, it->first));
-  }
-
-  void renumber(const std::map<TXshCell, TXshCell> &table, TXsheet *xsh) const {
-    for (int c = 0; c < xsh->getColumnCount(); ++c) {
-      int r0, r1;
-      int n = xsh->getCellRange(c, r0, r1);
-      if (n > 0) {
-        bool changed = false;
-        std::vector<TXshCell> cells(n);
-        xsh->getCells(r0, c, n, &cells[0]);
-        for (int i = 0; i < n; i++) {
-          // check the sub xsheets too
-          if (!cells[i].isEmpty() &&
-              cells[i].m_level->getType() == CHILD_XSHLEVEL) {
-            TXshChildLevel *level = cells[i].m_level->getChildLevel();
-            // make sure we haven't already checked the level
-            if (level &&
-                std::find(m_childLevels->begin(), m_childLevels->end(),
-                          level) == m_childLevels->end()) {
-              m_childLevels->push_back(level);
-              TXsheet *subXsh = level->getXsheet();
-              renumber(table, subXsh);
-            }
-          }
-          std::map<TXshCell, TXshCell>::const_iterator it =
-              table.find(cells[i]);
-          if (it != table.end() && it->first != it->second)
-            cells[i] = it->second, changed = true;
-        }
-        if (changed) xsh->setCells(r0, c, n, &cells[0]);
-      }
-    }
-  }
-
-  void undo() const override {
-    TXsheet *xsh =
-        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-    renumber(m_undoTable, xsh);
-  }
-  void redo() const override {
-    TXsheet *xsh =
-        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-    renumber(m_redoTable, xsh);
-  }
-
-  int getSize() const override {
-    return (m_redoTable.size() << 2) * sizeof(TXshCell);
-  }
 };
 
 class RenumberUndo::RedoNotifier final : public TUndo {
@@ -1919,13 +1859,8 @@ static void dRenumberCells(int col, int r0, int r1) {
   {
     LevelsTable::iterator it, end = levelsTable.end();
     for (it = levelsTable.begin(); it != end; ++it)
-      FilmstripCmd::renumber(it->first, it->second);
+      FilmstripCmd::renumber(it->first, it->second, true);
   }
-
-  // Finally, renumber the xsheet cells
-  RenumberUndo *undo = new RenumberUndo(cellsMap);
-  undo->redo();
-  TUndoManager::manager()->add(undo);
 }
 
 //-----------------------------------------------------------------------------
