@@ -9,5 +9,7 @@
 #define V_ZoomFit "T_ZoomFit"
 #define V_ShowHideFullScreen "T_ShowHideFullScreen"
 #define V_ActualPixelSize "T_ActualPixelSize"
+#define V_FlipX "T_FlipX"
+#define V_FlipY "T_FlipY"
 
 #endif  // VIEWCOMMANDIDS_H

@@ -66,6 +66,11 @@ class FunctionSheetCellViewer final : public Spreadsheet::CellPanel {
   DVGui::LineEdit *m_lineEdit;
   int m_editRow, m_editCol;
 
+  // for mouse dragging to adjust the value
+  double m_currentValue = 0.0;
+  double m_updatedValue = 0.0;
+  int m_mouseXPosition;
+
 public:
   FunctionSheetCellViewer(FunctionSheet *parent);
 
@@ -83,6 +88,10 @@ protected:
 
 private slots:
   void onCellEditorEditingFinished();
+
+  // double clicking opens the line edit where mouse dragging
+  // can change the value.  It sends a signal to this slot.
+  void onMouseMovedInLineEdit(QMouseEvent *event);
 };
 
 class FunctionSheet final : public SpreadsheetViewer {

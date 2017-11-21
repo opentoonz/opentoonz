@@ -635,7 +635,9 @@ public:
 
   virtual void rotate(const TPointD &center, double angle) = 0;
   virtual void rotate3D(double dPhi, double dTheta)        = 0;
-  virtual bool is3DView() const = 0;
+  virtual bool is3DView() const      = 0;
+  virtual bool getIsFlippedX() const = 0;
+  virtual bool getIsFlippedY() const = 0;
 
   virtual double projectToZ(const TPoint &delta) = 0;
 

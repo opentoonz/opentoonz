@@ -2973,7 +2973,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
     } else if (selectionContainTlvImage(m_viewer->getCellSelection(),
                                         m_viewer->getXsheet()))
       menu.addAction(cmdManager->getAction(MI_CanvasSize));
-      if (sl || TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel())
+      if (sl || (TApp::instance()->getCurrentLevel()->getLevel() && TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel()))
       menu.addAction(cmdManager->getAction(MI_LipSyncPopup));
   }
   menu.addSeparator();

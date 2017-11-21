@@ -63,3 +63,10 @@ void LineEdit::keyPressEvent(QKeyEvent *event) {
       QLineEdit::keyPressEvent(event);
   }
 }
+
+//-----------------------------------------------------------------------------
+
+void LineEdit::mouseMoveEvent(QMouseEvent *event) {
+  emit(mouseMoved(event));
+  QLineEdit::mouseMoveEvent(event);
+}

@@ -33,6 +33,7 @@ class DVAPI LineEdit : public QLineEdit {
 
   bool m_isReturnPressed;
   bool m_forbiddenSpecialChars;
+  bool m_mouseDragEditing = false;
 
 public:
   LineEdit(QWidget *parent = 0, bool forbiddenSpecialChars = false);
@@ -43,13 +44,22 @@ public:
 
   ~LineEdit() {}
 
+  // In the function editor, ctrl + dragging on the lineedit
+  // can adjust the value.
+  bool getMouseDragEditing() { return m_mouseDragEditing; }
+  void setMouseDragEditing(bool status) { m_mouseDragEditing = status; }
+
 protected:
   void focusInEvent(QFocusEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *) override;
 
 signals:
   void focusIn();
   void returnPressedNow();
+  // this signal is only used for mouse drag value editing in the function
+  // panel.
+  void mouseMoved(QMouseEvent *);
 };
 
 //-----------------------------------------------------------------------------

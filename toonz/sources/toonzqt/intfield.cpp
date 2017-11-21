@@ -205,6 +205,38 @@ void IntLineEdit::setLineEditBackgroundColor(QColor color) {
   setStyleSheet(sheet);
 }
 
+//-----------------------------------------------------------------------------
+
+void IntLineEdit::mousePressEvent(QMouseEvent *e) {
+  if (e->buttons() == Qt::MiddleButton) {
+    m_xMouse           = e->x();
+    m_mouseDragEditing = true;
+  } else
+    QLineEdit::mousePressEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+
+void IntLineEdit::mouseMoveEvent(QMouseEvent *e) {
+  if (e->buttons() == Qt::MiddleButton) {
+    setValue(getValue() + ((e->x() - m_xMouse) / 2));
+    m_xMouse = e->x();
+  } else
+    QLineEdit::mouseMoveEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+
+void IntLineEdit::mouseReleaseEvent(QMouseEvent *e) {
+  if ((e->buttons() == Qt::NoButton && m_mouseDragEditing)) {
+    m_mouseDragEditing = false;
+    clearFocus();
+  } else {
+    if (!hasSelectedText()) selectAll();
+    QLineEdit::mouseReleaseEvent(e);
+  }
+}
+
 //=============================================================================
 // IntField
 //-----------------------------------------------------------------------------
