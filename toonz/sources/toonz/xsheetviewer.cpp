@@ -415,12 +415,12 @@ void XsheetViewer::positionSections() {
     m_frameZoomSlider->hide();
   else {
     if (m_frameZoomSlider->isHidden()) m_frameZoomSlider->show();
-    QRect sliderRect = QRect(0, 0, XsheetGUI::ZOOM_SLIDER_WIDTH,
-                             XsheetGUI::SCROLLBAR_WIDTH - 2)
-                           .translated(m_columnScrollArea->rect().right() -
-                                           XsheetGUI::ZOOM_SLIDER_WIDTH - 17,
-                                       m_noteScrollArea->height() +
-                                           m_columnScrollArea->height());
+    QRect sliderRect =
+        QRect(0, 0, XsheetGUI::ZOOM_SLIDER_WIDTH,
+              XsheetGUI::SCROLLBAR_WIDTH - 2)
+            .translated(m_columnScrollArea->rect().right() -
+                            XsheetGUI::ZOOM_SLIDER_WIDTH - 17,
+                        height() - XsheetGUI::SCROLLBAR_WIDTH + 1);
     m_frameZoomSlider->setGeometry(sliderRect);
   }
 }
