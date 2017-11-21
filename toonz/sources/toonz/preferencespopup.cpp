@@ -1162,7 +1162,6 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *replaceAfterSaveLevelAsCB =
       new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
 
-  m_cellsDragBehaviour = new QComboBox();
   m_undoMemorySize =
       new DVGui::IntLineEdit(this, m_pref->getUndoMemorySize(), 0, 2000);
   m_levelsBackup = new CheckBox(tr("Backup Animation Levels when Saving"));
@@ -1433,10 +1432,6 @@ PreferencesPopup::PreferencesPopup()
   replaceAfterSaveLevelAsCB->setChecked(
       m_pref->isReplaceAfterSaveLevelAsEnabled());
 
-  QStringList dragCellsBehaviourList;
-  dragCellsBehaviourList << tr("Cells Only") << tr("Cells and Column Data");
-  m_cellsDragBehaviour->addItems(dragCellsBehaviourList);
-  m_cellsDragBehaviour->setCurrentIndex(m_pref->getDragCellsBehaviour());
   m_levelsBackup->setChecked(m_pref->isLevelsBackupEnabled());
   sceneNumberingCB->setChecked(m_pref->isSceneNumberingEnabled());
   watchFileSystemCB->setChecked(m_pref->isWatchFileSystemEnabled());

@@ -283,11 +283,12 @@ void ViewerDraw::drawGridAndGuides(SceneViewer *viewer, double sc, Ruler *vr,
   double ymin = std::min({p00.y, p01.y, p10.y, p11.y});
   double ymax = std::max({p00.y, p01.y, p10.y, p11.y});
 
-  double step = 10;
-  if (sc * step < 4)
-    while (sc * step < 4) step *= 5;
-  else if (sc * step > 20)
-    while (sc * step > 20) step *= 0.2;
+  double step  = 10;
+  double absSc = abs(sc);
+  if (absSc * step < 4)
+    while (absSc * step < 4) step *= 5;
+  else if (absSc * step > 20)
+    while (absSc * step > 20) step *= 0.2;
 
   int i0 = findLowerIndex(xmin, step);
   int i1 = findUpperIndex(xmax, step);

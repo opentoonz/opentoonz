@@ -532,6 +532,20 @@ std::wstring TMeasuredValue::toWideString(int decimals) const {
   return ::to_wstring(s) + L" " + measure;
 }
 
+//-------------------------------------------------------------------
+
+void TMeasuredValue::modifyValue(double direction, int precision) {
+  for (int i = 0; i < precision; i++) {
+    direction /= 10;
+  }
+  std::wstring currExtension =
+      getMeasure()->getCurrentUnit()->getDefaultExtension();
+  // use a smaller value for inches and cm
+  if (currExtension == L"\"" || currExtension == L"cm") direction /= 10;
+  double v = getValue(CurrentUnit);
+  setValue(CurrentUnit, v + direction);
+}
+
 //===================================================================
 
 namespace {

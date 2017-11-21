@@ -218,6 +218,12 @@ protected:
   virtual bool setActualPixelSize() {
     return false;
   }  //!< Handler for 'use actual pixel size' commands.
+  virtual bool setFlipX() {
+    return false;
+  }  //!< Handler for 'flip viewer vertically' commands.
+  virtual bool setFlipY() {
+    return false;
+  }  //!< Handler for 'flip viewer horizontally' commands.
   virtual bool toggleFullScreen(
       bool quit = false)  //!  Handler for 'toggle fullscreen' commands.
   {

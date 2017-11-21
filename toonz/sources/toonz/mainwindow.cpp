@@ -2142,6 +2142,8 @@ void MainWindow::defineActions() {
   createViewerAction(V_ZoomReset, tr("Reset View"), "Alt+0");
   createViewerAction(V_ZoomFit, tr("Fit to Window"), "Alt+9");
   createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
+  createViewerAction(V_FlipX, tr("Flip Viewer Horiontally"), "");
+  createViewerAction(V_FlipY, tr("Flip Viewer Vertically"), "");
   createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"),
                      "Alt+F");
   CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen,

@@ -81,6 +81,11 @@ void Ruler::getIndices(double origin, double iunit, int size, int &i0, int &i1,
     i1 = i0 + tfloor(size * iunit);
     ic = 0;
   }
+  if (m_viewer->getIsFlippedX()) {
+    i0 = i0 + i1;
+    i1 = i0 - i1;
+    i0 = i0 - i1;
+  }
   // assert(i0>=0);
   // assert((ic%10)==0);
 }
@@ -126,6 +131,9 @@ void Ruler::drawVertical(QPainter &p) {
   int count = guides.size();
   if (m_hiding) count--;
   double zoom = getZoomScale();
+  if (m_viewer->getIsFlippedX() != m_viewer->getIsFlippedY()) {
+    zoom = -zoom;
+  }
   for (i = 0; i < count; i++) {
     QColor color =
         (m_moving && count - 1 == i ? QColor(0, 255, 255) : QColor(0, 0, 255));
@@ -228,7 +236,10 @@ void Ruler::paintEvent(QPaintEvent *) {
 double Ruler::posToValue(const QPoint &p) const {
   double v;
   if (m_vertical)
-    v = (-p.y() + height() / 2 - getPan()) / getZoomScale();
+    if (m_viewer->getIsFlippedX() != m_viewer->getIsFlippedY()) {
+      v = (-p.y() + height() / 2 - getPan()) / -getZoomScale();
+    } else
+      v = (-p.y() + height() / 2 - getPan()) / getZoomScale();
   else
     v = (p.x() - width() / 2 - getPan()) / getZoomScale();
   return v;

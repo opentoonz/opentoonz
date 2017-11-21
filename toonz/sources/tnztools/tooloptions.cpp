@@ -469,8 +469,12 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   m_zField = new PegbarChannelField(m_tool, TStageObject::T_Z, "field",
                                     frameHandle, objHandle, xshHandle, this);
   m_noScaleZField = new NoScaleField(m_tool, "field");
-  m_ewPosLabel    = new QLabel(tr("E/W:"), this);
-  m_nsPosLabel    = new QLabel(tr("N/S:"), this);
+
+  m_zLabel             = new ClickableLabel(tr("Z:"), this);
+  m_motionPathPosLabel = new ClickableLabel(tr("Position:"), this);
+  m_ewPosLabel         = new ClickableLabel(tr("E/W:"), this);
+  m_nsPosLabel         = new ClickableLabel(tr("N/S:"), this);
+
   // Lock E/W
   TBoolProperty *lockProp =
       dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Position E/W"));
@@ -484,11 +488,12 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
     m_lockNSPosCheckbox =
         new ToolOptionCheckbox(m_tool, lockProp, toolHandle, this);
   // stacking order
-  m_soLabel = new QLabel(tr("SO:"), this);
+  m_soLabel = new ClickableLabel(tr("SO:"), this);
   m_soField = new PegbarChannelField(m_tool, TStageObject::T_SO, "field",
                                      frameHandle, objHandle, xshHandle, this);
 
   /* --- Rotation --- */
+  m_rotationLabel = new ClickableLabel(tr("Rotation:"), this);
   m_rotationField =
       new PegbarChannelField(m_tool, TStageObject::T_Angle, "field",
                              frameHandle, objHandle, xshHandle, this);
@@ -503,6 +508,11 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   m_scaleVField =
       new PegbarChannelField(m_tool, TStageObject::T_ScaleY, "field",
                              frameHandle, objHandle, xshHandle, this);
+
+  m_globalScaleLabel = new ClickableLabel(tr("Global:"), this);
+  m_scaleHLabel      = new ClickableLabel(tr("H:"), this);
+  m_scaleVLabel      = new ClickableLabel(tr("V:"), this);
+
   TEnumProperty *scaleConstraintProp =
       dynamic_cast<TEnumProperty *>(m_pg->getProperty("Scale Constraint:"));
   if (scaleConstraintProp)
@@ -526,6 +536,9 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   m_shearVField =
       new PegbarChannelField(m_tool, TStageObject::T_ShearY, "field",
                              frameHandle, objHandle, xshHandle, this);
+  m_shearHLabel = new ClickableLabel(tr("H:"), this);
+  m_shearVLabel = new ClickableLabel(tr("V:"), this);
+
   // Lock Shear H
   lockProp = dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Shear H"));
   if (lockProp)
@@ -542,6 +555,9 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       new PegbarCenterField(m_tool, 0, "field", objHandle, xshHandle, this);
   m_nsCenterField =
       new PegbarCenterField(m_tool, 1, "field", objHandle, xshHandle, this);
+  m_ewCenterLabel = new ClickableLabel(tr("E/W:"), this);
+  m_nsCenterLabel = new ClickableLabel(tr("N/S:"), this);
+
   // Lock E/W Center
   lockProp =
       dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Center E/W"));
@@ -606,7 +622,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       posFrame->setLayout(posLay);
       m_mainStackedWidget->addWidget(posFrame);
       {
-        posLay->addWidget(new QLabel(tr("Position"), this), 0);
+        posLay->addWidget(m_motionPathPosLabel, 0);
         posLay->addSpacing(ITEM_SPACING);
 
         posLay->addWidget(m_motionPathPosField, 0);
@@ -625,7 +641,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
 
         posLay->addSpacing(ITEM_SPACING);
 
-        posLay->addWidget(new QLabel(tr("Z:"), this), 0);
+        posLay->addWidget(m_zLabel, 0);
         posLay->addSpacing(LABEL_SPACING);
         posLay->addWidget(m_zField, 10);
         posLay->addSpacing(LABEL_SPACING);
@@ -649,7 +665,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       rotFrame->setLayout(rotLay);
       m_mainStackedWidget->addWidget(rotFrame);
       {
-        rotLay->addWidget(new QLabel(tr("Rotation"), this), 0);
+        rotLay->addWidget(m_rotationLabel, 0);
         rotLay->addSpacing(ITEM_SPACING);
 
         rotLay->addWidget(m_rotationField, 10);
@@ -668,20 +684,20 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         scaleLay->addWidget(new QLabel(tr("Scale"), this), 0);
         scaleLay->addSpacing(ITEM_SPACING);
 
-        scaleLay->addWidget(new QLabel(tr("Global:"), this), 0);
+        scaleLay->addWidget(m_globalScaleLabel, 0);
         scaleLay->addSpacing(LABEL_SPACING);
         scaleLay->addWidget(m_globalScaleField, 10);
 
         scaleLay->addSpacing(ITEM_SPACING);
 
-        scaleLay->addWidget(new QLabel(tr("H:"), this), 0);
+        scaleLay->addWidget(m_scaleHLabel, 0);
         scaleLay->addSpacing(LABEL_SPACING);
         scaleLay->addWidget(m_scaleHField, 10);
         scaleLay->addWidget(m_lockScaleHCheckbox, 0);
 
         scaleLay->addSpacing(ITEM_SPACING);
 
-        scaleLay->addWidget(new QLabel(tr("V:"), this), 0);
+        scaleLay->addWidget(m_scaleVLabel, 0);
         scaleLay->addSpacing(LABEL_SPACING);
         scaleLay->addWidget(m_scaleVField, 10);
         scaleLay->addWidget(m_lockScaleVCheckbox, 0);
@@ -706,14 +722,14 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         shearLay->addWidget(new QLabel(tr("Shear"), this), 0);
         shearLay->addSpacing(ITEM_SPACING);
 
-        shearLay->addWidget(new QLabel(tr("H:"), this), 0);
+        shearLay->addWidget(m_shearHLabel, 0);
         shearLay->addSpacing(LABEL_SPACING);
         shearLay->addWidget(m_shearHField, 10);
         shearLay->addWidget(m_lockShearHCheckbox, 0);
 
         shearLay->addSpacing(ITEM_SPACING);
 
-        shearLay->addWidget(new QLabel(tr("V:"), this), 0);
+        shearLay->addWidget(m_shearVLabel, 0);
         shearLay->addSpacing(LABEL_SPACING);
         shearLay->addWidget(m_shearVField, 10);
         shearLay->addWidget(m_lockShearVCheckbox, 0);
@@ -734,14 +750,14 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         centerPosLay->addWidget(new QLabel(tr("Center Position"), this), 0);
         centerPosLay->addSpacing(ITEM_SPACING);
 
-        centerPosLay->addWidget(new QLabel(tr("E/W:"), this), 0);
+        centerPosLay->addWidget(m_ewCenterLabel, 0);
         centerPosLay->addSpacing(LABEL_SPACING);
         centerPosLay->addWidget(m_ewCenterField, 10);
         centerPosLay->addWidget(m_lockEWCenterCheckbox, 0);
 
         centerPosLay->addSpacing(ITEM_SPACING);
 
-        centerPosLay->addWidget(new QLabel(tr("N/S:"), this), 0);
+        centerPosLay->addWidget(m_nsCenterLabel, 0);
         centerPosLay->addSpacing(LABEL_SPACING);
         centerPosLay->addWidget(m_nsCenterField, 10);
         centerPosLay->addWidget(m_lockNSCenterCheckbox, 0);
@@ -816,6 +832,85 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
             SLOT(onScaleTypeChanged(int)));
   }
 
+  connect(m_motionPathPosLabel, SIGNAL(onMousePress(QMouseEvent *)),
+          m_motionPathPosField, SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_motionPathPosLabel, SIGNAL(onMouseMove(QMouseEvent *)),
+          m_motionPathPosField, SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_motionPathPosLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
+          m_motionPathPosField, SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_ewPosLabel, SIGNAL(onMousePress(QMouseEvent *)), m_ewPosField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_ewPosLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_ewPosField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_ewPosLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_ewPosField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_nsPosLabel, SIGNAL(onMousePress(QMouseEvent *)), m_nsPosField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_nsPosLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_nsPosField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_nsPosLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_nsPosField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_zLabel, SIGNAL(onMousePress(QMouseEvent *)), m_zField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_zLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_zField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_zLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_zField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_soLabel, SIGNAL(onMousePress(QMouseEvent *)), m_soField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_soLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_soField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_soLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_soField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_rotationLabel, SIGNAL(onMousePress(QMouseEvent *)), m_rotationField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_rotationLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_rotationField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_rotationLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
+          m_rotationField, SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_globalScaleLabel, SIGNAL(onMousePress(QMouseEvent *)),
+          m_globalScaleField, SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_globalScaleLabel, SIGNAL(onMouseMove(QMouseEvent *)),
+          m_globalScaleField, SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_globalScaleLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
+          m_globalScaleField, SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_scaleHLabel, SIGNAL(onMousePress(QMouseEvent *)), m_scaleHField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_scaleHLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_scaleHField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_scaleHLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_scaleHField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_scaleVLabel, SIGNAL(onMousePress(QMouseEvent *)), m_scaleVField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_scaleVLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_scaleVField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_scaleVLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_scaleVField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_shearHLabel, SIGNAL(onMousePress(QMouseEvent *)), m_shearHField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_shearHLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_shearHField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_shearHLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_shearHField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_shearVLabel, SIGNAL(onMousePress(QMouseEvent *)), m_shearVField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_shearVLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_shearVField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_shearVLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_shearVField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_ewCenterLabel, SIGNAL(onMousePress(QMouseEvent *)), m_ewCenterField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_ewCenterLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_ewCenterField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_ewCenterLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
+          m_ewCenterField, SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_nsCenterLabel, SIGNAL(onMousePress(QMouseEvent *)), m_nsCenterField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_nsCenterLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_nsCenterField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_nsCenterLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
+          m_nsCenterField, SLOT(receiveMouseRelease(QMouseEvent *)));
+          
   if (globalKeyProp) {
     std::string actionName = "A_ToolOption_" + globalKeyProp->getId();
     QAction *a = CommandManager::instance()->getAction(actionName.c_str());
@@ -1006,6 +1101,18 @@ void IconViewField::paintEvent(QPaintEvent *e) {
   p.drawPixmap(QRect(0, 3, 21, 17), m_pm[m_iconType]);
 }
 
+void IconViewField::mousePressEvent(QMouseEvent *event) {
+  emit onMousePress(event);
+}
+
+void IconViewField::mouseMoveEvent(QMouseEvent *event) {
+  emit onMouseMove(event);
+}
+
+void IconViewField::mouseReleaseEvent(QMouseEvent *event) {
+  emit onMouseRelease(event);
+}
+
 //-----------------------------------------------------------------------------
 
 SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
@@ -1028,9 +1135,9 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
   IconViewField *iconView =
       new IconViewField(this, IconViewField::Icon_ScalePeg);
-  m_scaleXLabel = new QLabel(tr("H:"), this);
+  m_scaleXLabel = new ClickableLabel(tr("H:"), this);
   m_scaleXField = new SelectionScaleField(selectionTool, 0, "Scale X");
-  m_scaleYLabel = new QLabel(tr("V:"), this);
+  m_scaleYLabel = new ClickableLabel(tr("V:"), this);
   m_scaleYField = new SelectionScaleField(selectionTool, 1, "Scale Y");
   m_scaleLink   = new DVGui::CheckBox(tr("Link"), this);
 
@@ -1040,9 +1147,9 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
   IconViewField *moveIconView =
       new IconViewField(this, IconViewField::Icon_Position);
-  m_moveXLabel = new QLabel(tr("E/W:"), this);
+  m_moveXLabel = new ClickableLabel(tr("E/W:"), this);
   m_moveXField = new SelectionMoveField(selectionTool, 0, "Move X");
-  m_moveYLabel = addLabel(tr("N/S:"));
+  m_moveYLabel = new ClickableLabel(tr("N/S:"), this);
   m_moveYField = new SelectionMoveField(selectionTool, 1, "Move Y");
 
   if (rasterSelectionTool) {
@@ -1097,6 +1204,13 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
         new IconViewField(this, IconViewField::Icon_Thickness);
     m_thickChangeField = new ThickChangeField(selectionTool, tr("Thickness"));
 
+    connect(thicknessIconView, SIGNAL(onMousePress(QMouseEvent *)),
+            m_thickChangeField, SLOT(receiveMousePress(QMouseEvent *)));
+    connect(thicknessIconView, SIGNAL(onMouseMove(QMouseEvent *)),
+            m_thickChangeField, SLOT(receiveMouseMove(QMouseEvent *)));
+    connect(thicknessIconView, SIGNAL(onMouseRelease(QMouseEvent *)),
+            m_thickChangeField, SLOT(receiveMouseRelease(QMouseEvent *)));
+
     addSeparator();
     hLayout()->addWidget(thicknessIconView, 0);
     hLayout()->addWidget(m_thickChangeField, 10);
@@ -1123,14 +1237,43 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
   hLayout()->addStretch(1);
   // assert(ret);
-  bool ret = connect(m_scaleXField, SIGNAL(valueChange()),
-                     SLOT(onScaleXValueChanged()));
-  ret = ret && connect(m_scaleYField, SIGNAL(valueChange()),
-                       SLOT(onScaleYValueChanged()));
+  bool ret = connect(m_scaleXField, SIGNAL(valueChange(bool)),
+                     SLOT(onScaleXValueChanged(bool)));
+  ret = ret && connect(m_scaleYField, SIGNAL(valueChange(bool)),
+                       SLOT(onScaleYValueChanged(bool)));
   if (m_setSaveboxCheckbox)
     ret = ret && connect(m_setSaveboxCheckbox, SIGNAL(toggled(bool)),
                          SLOT(onSetSaveboxCheckboxChanged(bool)));
-
+  connect(m_scaleXLabel, SIGNAL(onMousePress(QMouseEvent *)), m_scaleXField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_scaleXLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_scaleXField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_scaleXLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_scaleXField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_scaleYLabel, SIGNAL(onMousePress(QMouseEvent *)), m_scaleYField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_scaleYLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_scaleYField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_scaleYLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_scaleYField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(rotIconView, SIGNAL(onMousePress(QMouseEvent *)), m_rotationField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(rotIconView, SIGNAL(onMouseMove(QMouseEvent *)), m_rotationField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(rotIconView, SIGNAL(onMouseRelease(QMouseEvent *)), m_rotationField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_moveXLabel, SIGNAL(onMousePress(QMouseEvent *)), m_moveXField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_moveXLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_moveXField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_moveXLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_moveXField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
+  connect(m_moveYLabel, SIGNAL(onMousePress(QMouseEvent *)), m_moveYField,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(m_moveYLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_moveYField,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(m_moveYLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_moveYField,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
   // assert(ret);
 
   updateStatus();
@@ -1170,22 +1313,22 @@ void SelectionToolOptionsBox::updateStatus() {
 
 //-----------------------------------------------------------------------------
 
-void SelectionToolOptionsBox::onScaleXValueChanged() {
+void SelectionToolOptionsBox::onScaleXValueChanged(bool addToUndo) {
   if (!m_scaleLink->isChecked() ||
       m_scaleXField->getValue() == m_scaleYField->getValue())
     return;
   m_scaleYField->setValue(m_scaleXField->getValue());
-  m_scaleYField->applyChange();
+  m_scaleYField->applyChange(addToUndo);
 }
 
 //-----------------------------------------------------------------------------
 
-void SelectionToolOptionsBox::onScaleYValueChanged() {
+void SelectionToolOptionsBox::onScaleYValueChanged(bool addToUndo) {
   if (!m_scaleLink->isChecked() ||
       m_scaleXField->getValue() == m_scaleYField->getValue())
     return;
   m_scaleXField->setValue(m_scaleYField->getValue());
-  m_scaleXField->applyChange();
+  m_scaleXField->applyChange(addToUndo);
 }
 
 //-----------------------------------------------------------------------------

@@ -13,7 +13,6 @@
 #include "toonz/tpalettehandle.h"
 #include "toonz/tobjecthandle.h"
 #include "toonz/stage2.h"
-#include "toonz/stageobjectutil.h"
 #include "toonz/doubleparamcmd.h"
 #include "toonz/preferences.h"
 
@@ -992,6 +991,13 @@ void MeasuredValueField::setMeasure(std::string name) {
 
 void MeasuredValueField::commit() {
   if (!m_modified && !isReturnPressed()) return;
+  // commit is called when the field comes out of focus.
+  // mouse drag will call this - return if coming from mouse drag.
+  // else undo is set twice
+  if (m_mouseEdit) {
+    m_mouseEdit = false;
+    return;
+  }
   int err    = 1;
   bool isSet = m_value->setValue(text().toStdWString(), &err);
   m_modified = false;
@@ -1054,6 +1060,65 @@ void MeasuredValueField::setPrecision(int precision) {
   setText(QString::fromStdWString(m_value->toWideString(m_precision)));
 }
 
+//-----------------------------------------------------------------------------
+
+void MeasuredValueField::mousePressEvent(QMouseEvent *e) {
+  if (!isEnabled()) return;
+  if ((e->buttons() == Qt::MiddleButton) || m_labelClicked) {
+    m_xMouse        = e->x();
+    m_mouseEdit     = true;
+    m_originalValue = m_value->getValue(TMeasuredValue::CurrentUnit);
+  } else
+    QLineEdit::mousePressEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+
+void MeasuredValueField::mouseMoveEvent(QMouseEvent *e) {
+  if (!isEnabled()) return;
+  if ((e->buttons() == Qt::MiddleButton) || m_labelClicked) {
+    m_value->modifyValue((e->x() - m_xMouse) / 2);
+    setText(QString::fromStdWString(m_value->toWideString(m_precision)));
+    m_xMouse = e->x();
+    // measuredValueChanged to update the UI, but don't add to undo
+    emit measuredValueChanged(m_value, false);
+  } else
+    QLineEdit::mouseMoveEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+
+void MeasuredValueField::mouseReleaseEvent(QMouseEvent *e) {
+  if (!isEnabled()) return;
+  // m_mouseEdit will be set false in commit
+  if (m_mouseEdit) {
+    // This seems redundant, but this is necessary for undo to work
+    double valueToRestore = m_value->getValue(TMeasuredValue::CurrentUnit);
+    m_value->setValue(TMeasuredValue::CurrentUnit, m_originalValue);
+    setText(QString::fromStdWString(m_value->toWideString(m_precision)));
+    emit measuredValueChanged(m_value, false);
+    // add this to undo
+    m_value->setValue(TMeasuredValue::CurrentUnit, valueToRestore);
+    setText(QString::fromStdWString(m_value->toWideString(m_precision)));
+    emit measuredValueChanged(m_value, true);
+    clearFocus();
+  } else {
+    if (!hasSelectedText()) selectAll();
+  }
+}
+
+void MeasuredValueField::receiveMousePress(QMouseEvent *e) {
+  m_labelClicked = true;
+  mousePressEvent(e);
+}
+
+void MeasuredValueField::receiveMouseMove(QMouseEvent *e) { mouseMoveEvent(e); }
+
+void MeasuredValueField::receiveMouseRelease(QMouseEvent *e) {
+  mouseReleaseEvent(e);
+  m_labelClicked = false;
+}
+
 //=============================================================================
 
 namespace {
@@ -1077,8 +1142,8 @@ PegbarChannelField::PegbarChannelField(TTool *tool,
     , m_objHandle(objHandle)
     , m_xshHandle(xshHandle)
     , m_scaleType(eNone) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *, bool)),
+                     SLOT(onChange(TMeasuredValue *, bool)));
   assert(ret);
   // NOTA: per le unita' di misura controlla anche tpegbar.cpp
   switch (actionId) {
@@ -1118,7 +1183,7 @@ PegbarChannelField::PegbarChannelField(TTool *tool,
 
 //-----------------------------------------------------------------------------
 
-void PegbarChannelField::onChange(TMeasuredValue *fld) {
+void PegbarChannelField::onChange(TMeasuredValue *fld, bool addToUndo) {
   if (!m_tool->isEnabled()) return;
 
   // the camera will crash with a value of 0
@@ -1128,38 +1193,42 @@ void PegbarChannelField::onChange(TMeasuredValue *fld) {
       fld->setValue(TMeasuredValue::MainUnit, 0.0001);
     }
   }
-  TUndoManager::manager()->beginBlock();
-  TStageObjectValues before;
-  before.setFrameHandle(m_frameHandle);
-  before.setObjectHandle(m_objHandle);
-  before.setXsheetHandle(m_xshHandle);
-  before.add(m_actionId);
   bool modifyConnectedActionId = false;
-  if (m_scaleType != eNone) {
-    modifyConnectedActionId = true;
-    if (m_actionId == TStageObject::T_ScaleX)
-      before.add(TStageObject::T_ScaleY);
-    else if (m_actionId == TStageObject::T_ScaleY)
-      before.add(TStageObject::T_ScaleX);
-    else
-      modifyConnectedActionId = false;
+  if (addToUndo) TUndoManager::manager()->beginBlock();
+  // m_firstMouseDrag is set to true only if addToUndo is false
+  // and only for the first drag
+  // This should always fire if addToUndo is true
+  if (!m_firstMouseDrag) {
+    m_before.setFrameHandle(m_frameHandle);
+    m_before.setObjectHandle(m_objHandle);
+    m_before.setXsheetHandle(m_xshHandle);
+    m_before.add(m_actionId);
+    if (m_scaleType != eNone) {
+      modifyConnectedActionId = true;
+      if (m_actionId == TStageObject::T_ScaleX)
+        m_before.add(TStageObject::T_ScaleY);
+      else if (m_actionId == TStageObject::T_ScaleY)
+        m_before.add(TStageObject::T_ScaleX);
+      else
+        modifyConnectedActionId = false;
+    }
+    if (m_isGlobalKeyframe) {
+      m_before.add(TStageObject::T_Angle);
+      m_before.add(TStageObject::T_X);
+      m_before.add(TStageObject::T_Y);
+      m_before.add(TStageObject::T_Z);
+      m_before.add(TStageObject::T_SO);
+      m_before.add(TStageObject::T_ScaleX);
+      m_before.add(TStageObject::T_ScaleY);
+      m_before.add(TStageObject::T_Scale);
+      m_before.add(TStageObject::T_Path);
+      m_before.add(TStageObject::T_ShearX);
+      m_before.add(TStageObject::T_ShearY);
+    }
+    m_before.updateValues();
   }
-  if (m_isGlobalKeyframe) {
-    before.add(TStageObject::T_Angle);
-    before.add(TStageObject::T_X);
-    before.add(TStageObject::T_Y);
-    before.add(TStageObject::T_Z);
-    before.add(TStageObject::T_SO);
-    before.add(TStageObject::T_ScaleX);
-    before.add(TStageObject::T_ScaleY);
-    before.add(TStageObject::T_Scale);
-    before.add(TStageObject::T_Path);
-    before.add(TStageObject::T_ShearX);
-    before.add(TStageObject::T_ShearY);
-  }
-  before.updateValues();
   TStageObjectValues after;
-  after    = before;
+  after    = m_before;
   double v = fld->getValue(TMeasuredValue::MainUnit);
   if (modifyConnectedActionId) {
     double oldv1 = after.getValue(0);
@@ -1178,10 +1247,14 @@ void PegbarChannelField::onChange(TMeasuredValue *fld) {
   if (viewer) m_tool->invalidate();
   setCursorPosition(0);
 
-  UndoStageObjectMove *undo = new UndoStageObjectMove(before, after);
-  undo->setObjectHandle(m_objHandle);
-  TUndoManager::manager()->add(undo);
-  TUndoManager::manager()->endBlock();
+  if (addToUndo) {
+    UndoStageObjectMove *undo = new UndoStageObjectMove(m_before, after);
+    undo->setObjectHandle(m_objHandle);
+    TUndoManager::manager()->add(undo);
+    TUndoManager::manager()->endBlock();
+    m_firstMouseDrag = false;
+  }
+  if (!addToUndo && !m_firstMouseDrag) m_firstMouseDrag = true;
   m_objHandle->notifyObjectIdChanged(false);
 }
 
@@ -1219,15 +1292,15 @@ PegbarCenterField::PegbarCenterField(TTool *tool, int index, QString name,
     , m_xshHandle(xshHandle) {
   TStageObjectId objId = m_tool->getObjectId();
   setMeasure(m_index == 0 ? "length.x" : "length.y");
-  connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-          SLOT(onChange(TMeasuredValue *)));
+  connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *, bool)),
+          SLOT(onChange(TMeasuredValue *, bool)));
   updateStatus();
   setMaximumWidth(getMaximumWidthForEditToolField(this));
 }
 
 //-----------------------------------------------------------------------------
 
-void PegbarCenterField::onChange(TMeasuredValue *fld) {
+void PegbarCenterField::onChange(TMeasuredValue *fld, bool addToUndo) {
   if (!m_tool->isEnabled()) return;
   TXsheet *xsh         = m_tool->getXsheet();
   int frame            = m_tool->getFrame();
@@ -1235,9 +1308,9 @@ void PegbarCenterField::onChange(TMeasuredValue *fld) {
 
   TStageObject *obj = xsh->getStageObject(objId);
 
-  double v          = fld->getValue(TMeasuredValue::MainUnit);
-  TPointD center    = obj->getCenter(frame);
-  TPointD oldCenter = center;
+  double v                           = fld->getValue(TMeasuredValue::MainUnit);
+  TPointD center                     = obj->getCenter(frame);
+  if (!m_firstMouseDrag) m_oldCenter = center;
   if (m_index == 0)
     center.x = v;
   else
@@ -1245,12 +1318,15 @@ void PegbarCenterField::onChange(TMeasuredValue *fld) {
   obj->setCenter(frame, center);
   m_tool->invalidate();
 
-  UndoStageObjectCenterMove *undo =
-      new UndoStageObjectCenterMove(objId, frame, oldCenter, center);
-  undo->setObjectHandle(m_objHandle);
-  undo->setXsheetHandle(m_xshHandle);
-  TUndoManager::manager()->add(undo);
-
+  if (addToUndo) {
+    UndoStageObjectCenterMove *undo =
+        new UndoStageObjectCenterMove(objId, frame, m_oldCenter, center);
+    undo->setObjectHandle(m_objHandle);
+    undo->setXsheetHandle(m_xshHandle);
+    TUndoManager::manager()->add(undo);
+    m_firstMouseDrag = false;
+  }
+  if (!addToUndo && !m_firstMouseDrag) m_firstMouseDrag = true;
   m_objHandle->notifyObjectIdChanged(false);
 }
 
@@ -1274,15 +1350,17 @@ NoScaleField::NoScaleField(TTool *tool, QString name)
     : MeasuredValueField(0, name), ToolOptionControl(tool, "") {
   TStageObjectId objId = m_tool->getObjectId();
   setMeasure("zdepth");
-  connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-          SLOT(onChange(TMeasuredValue *)));
+  connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *, bool)),
+          SLOT(onChange(TMeasuredValue *, bool)));
   updateStatus();
   setMaximumWidth(getMaximumWidthForEditToolField(this));
 }
 
 //-----------------------------------------------------------------------------
 
-void NoScaleField::onChange(TMeasuredValue *fld) {
+void NoScaleField::onChange(TMeasuredValue *fld, bool addToUndo) {
+  // addToUndo isn't needed here as the field denominator
+  // doesn't have an undo
   if (!m_tool->isEnabled()) return;
   TXsheet *xsh         = m_tool->getXsheet();
   int frame            = m_tool->getFrame();
@@ -1392,8 +1470,8 @@ int getMaximumWidthForSelectionToolField(QWidget *widget) {
 SelectionScaleField::SelectionScaleField(SelectionTool *tool, int id,
                                          QString name)
     : MeasuredValueField(0, name), m_tool(tool), m_id(id) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *, bool)),
+                     SLOT(onChange(TMeasuredValue *, bool)));
   assert(ret);
   setMeasure("scale");
   updateStatus();
@@ -1403,7 +1481,7 @@ SelectionScaleField::SelectionScaleField(SelectionTool *tool, int id,
 
 //-----------------------------------------------------------------------------
 
-bool SelectionScaleField::applyChange() {
+bool SelectionScaleField::applyChange(bool addToUndo) {
   if (!m_tool || (m_tool->isSelectionEmpty() && !m_tool->isLevelType()))
     return false;
   DragSelectionTool::DragTool *scaleTool = createNewScaleTool(m_tool, 0);
@@ -1444,17 +1522,17 @@ bool SelectionScaleField::applyChange() {
   scaleTool->transform(pointIndex,
                        newPos);  // This line invokes GUI update using the
                                  // value set above
-  if (!m_tool->isLevelType()) scaleTool->addTransformUndo();
+  if (!m_tool->isLevelType() && addToUndo) scaleTool->addTransformUndo();
   setCursorPosition(0);
   return true;
 }
 
 //-----------------------------------------------------------------------------
 
-void SelectionScaleField::onChange(TMeasuredValue *fld) {
+void SelectionScaleField::onChange(TMeasuredValue *fld, bool addToUndo) {
   if (!m_tool->isEnabled()) return;
-  if (!applyChange()) return;
-  emit valueChange();
+  if (!applyChange(addToUndo)) return;
+  emit valueChange(addToUndo);
 }
 
 //-----------------------------------------------------------------------------
@@ -1478,8 +1556,8 @@ void SelectionScaleField::updateStatus() {
 SelectionRotationField::SelectionRotationField(SelectionTool *tool,
                                                QString name)
     : MeasuredValueField(0, name), m_tool(tool) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *, bool)),
+                     SLOT(onChange(TMeasuredValue *, bool)));
   assert(ret);
   setMeasure("angle");
   updateStatus();
@@ -1489,7 +1567,7 @@ SelectionRotationField::SelectionRotationField(SelectionTool *tool,
 
 //-----------------------------------------------------------------------------
 
-void SelectionRotationField::onChange(TMeasuredValue *fld) {
+void SelectionRotationField::onChange(TMeasuredValue *fld, bool addToUndo) {
   if (!m_tool || !m_tool->isEnabled() ||
       (m_tool->isSelectionEmpty() && !m_tool->isLevelType()))
     return;
@@ -1505,7 +1583,7 @@ void SelectionRotationField::onChange(TMeasuredValue *fld) {
   deformValues.m_rotationAngle = p;  // Instruction order is relevant here
   rotationTool->transform(aff, p - deformValues.m_rotationAngle);  //
 
-  if (!m_tool->isLevelType()) rotationTool->addTransformUndo();
+  if (!m_tool->isLevelType() && addToUndo) rotationTool->addTransformUndo();
 
   setCursorPosition(0);
 }
@@ -1529,8 +1607,8 @@ void SelectionRotationField::updateStatus() {
 SelectionMoveField::SelectionMoveField(SelectionTool *tool, int id,
                                        QString name)
     : MeasuredValueField(0, name), m_tool(tool), m_id(id) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *, bool)),
+                     SLOT(onChange(TMeasuredValue *, bool)));
   assert(ret);
   if (m_id == 0)
     setMeasure("length.x");
@@ -1545,7 +1623,7 @@ SelectionMoveField::SelectionMoveField(SelectionTool *tool, int id,
 
 //-----------------------------------------------------------------------------
 
-void SelectionMoveField::onChange(TMeasuredValue *fld) {
+void SelectionMoveField::onChange(TMeasuredValue *fld, bool addToUndo) {
   if (!m_tool || !m_tool->isEnabled() ||
       (m_tool->isSelectionEmpty() && !m_tool->isLevelType()))
     return;
@@ -1566,7 +1644,7 @@ void SelectionMoveField::onChange(TMeasuredValue *fld) {
       1 / Stage::inch * newMove;  // Instruction order relevant here
   moveTool->transform(aff);       //
 
-  if (!m_tool->isLevelType()) moveTool->addTransformUndo();
+  if (!m_tool->isLevelType() && addToUndo) moveTool->addTransformUndo();
 
   setCursorPosition(0);
 }
@@ -1593,8 +1671,8 @@ void SelectionMoveField::updateStatus() {
 
 ThickChangeField::ThickChangeField(SelectionTool *tool, QString name)
     : MeasuredValueField(0, name), m_tool(tool) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *, bool)),
+                     SLOT(onChange(TMeasuredValue *, bool)));
   assert(ret);
   setMeasure("");
   updateStatus();
@@ -1604,7 +1682,7 @@ ThickChangeField::ThickChangeField(SelectionTool *tool, QString name)
 
 //-----------------------------------------------------------------------------
 
-void ThickChangeField::onChange(TMeasuredValue *fld) {
+void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
   if (!m_tool || (m_tool->isSelectionEmpty() && !m_tool->isLevelType())) return;
 
   DragSelectionTool::VectorChangeThicknessTool *changeThickTool =
@@ -1624,7 +1702,9 @@ void ThickChangeField::onChange(TMeasuredValue *fld) {
   // deformValues.m_maxSelectionThickness = p;
   // // Seems that the actual update is performed inside
   // the above change..() instruction...   >_<
-  changeThickTool->addUndo();
+  if (addToUndo) {
+    changeThickTool->addUndo();
+  }
   m_tool->computeBBox();
   m_tool->invalidate();
   m_tool->notifyImageChanged(m_tool->getCurrentFid());
@@ -1643,4 +1723,32 @@ void ThickChangeField::updateStatus() {
   setDisabled(false);
   setValue(2 * m_tool->m_deformValues.m_maxSelectionThickness);
   setCursorPosition(0);
+}
+
+//=============================================================================
+
+ClickableLabel::ClickableLabel(const QString &text, QWidget *parent,
+                               Qt::WindowFlags f)
+    : QLabel(text, parent, f) {}
+
+//-----------------------------------------------------------------------------
+
+ClickableLabel::~ClickableLabel() {}
+
+//-----------------------------------------------------------------------------
+
+void ClickableLabel::mousePressEvent(QMouseEvent *event) {
+  emit onMousePress(event);
+}
+
+//-----------------------------------------------------------------------------
+
+void ClickableLabel::mouseMoveEvent(QMouseEvent *event) {
+  emit onMouseMove(event);
+}
+
+//-----------------------------------------------------------------------------
+
+void ClickableLabel::mouseReleaseEvent(QMouseEvent *event) {
+  emit onMouseRelease(event);
 }
