@@ -1138,6 +1138,7 @@ public slots:
 
   void onOrientationChanged(const Orientation *newOrientation);
   void onPrepareToScrollOffset(const QPoint &offset);
+  void onZoomScrollAdjust(QPoint &offset, bool toZoom);
 
   void setFrameZoomFactor(int f) { m_frameZoomFactor = f; }
   int getFrameZoomFactor() const;

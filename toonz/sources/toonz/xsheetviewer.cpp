@@ -270,6 +270,8 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_frameScroller.setFrameScrollArea(m_cellScrollArea);
   connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset,
           this, &XsheetViewer::onPrepareToScrollOffset);
+  connect(&m_frameScroller, &Spreadsheet::FrameScroller::zoomScrollAdjust, this,
+          &XsheetViewer::onZoomScrollAdjust);
 
   m_frameZoomSlider = new QSlider(Qt::Horizontal, this);
   m_frameZoomSlider->setMinimum(20);
@@ -586,6 +588,22 @@ void XsheetViewer::scroll(QPoint delta) {
 
 void XsheetViewer::onPrepareToScrollOffset(const QPoint &offset) {
   refreshContentSize(offset.x(), offset.y());
+}
+
+//-----------------------------------------------------------------------------
+
+void XsheetViewer::onZoomScrollAdjust(QPoint &offset, bool toZoom) {
+  int frameZoomFactor = getFrameZoomFactor();
+
+  // toZoom = true: Adjust standardized offset down to zoom factor
+  // toZoom = false: Adjust zoomed offset up to standardized offset
+  int newX;
+  if (toZoom)
+    newX = (offset.x() * frameZoomFactor) / 100;
+  else
+    newX = (offset.x() * 100) / frameZoomFactor;
+
+  offset.setX(newX);
 }
 
 //-----------------------------------------------------------------------------
@@ -1620,9 +1638,9 @@ TPanel *createXsheetViewer(QWidget *parent)
 
 //----------------------------------------------------------------
 int XsheetViewer::getFrameZoomFactor() const {
-	if (orientation()->isVerticalTimeline()) return 100;
+  if (orientation()->isVerticalTimeline()) return 100;
 
-	return m_frameZoomFactor; 
+  return m_frameZoomFactor;
 }
 
 int XsheetViewer::getFrameZoomAdjustment() {
