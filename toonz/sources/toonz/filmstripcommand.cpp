@@ -53,9 +53,9 @@ TFrameId operator+(const TFrameId &fid, int d) {
 
 //-----------------------------------------------------------------------------
 
-void updateSubXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
-                     std::vector<TFrameId> newFids, TXsheet *xsh,
-                     std::vector<TXshChildLevel *> *childLevels) {
+void doUpdateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
+                    std::vector<TFrameId> newFids, TXsheet *xsh,
+                    std::vector<TXshChildLevel *> &childLevels) {
   for (int c = 0; c < xsh->getColumnCount(); ++c) {
     int r0, r1;
     int n = xsh->getCellRange(c, r0, r1);
@@ -71,11 +71,11 @@ void updateSubXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
           TXshChildLevel *level = cells[i].m_level->getChildLevel();
           // make sure we haven't already checked the level
           if (level &&
-              std::find(childLevels->begin(), childLevels->end(), level) ==
-                  childLevels->end()) {
-            childLevels->push_back(level);
+              std::find(childLevels.begin(), childLevels.end(), level) ==
+                  childLevels.end()) {
+            childLevels.push_back(level);
             TXsheet *subXsh = level->getXsheet();
-            updateSubXSheet(sl, oldFids, newFids, subXsh, childLevels);
+            doUpdateXSheet(sl, oldFids, newFids, subXsh, childLevels);
           }
         }
         for (int j = 0; j < oldFids.size(); j++) {
@@ -102,50 +102,11 @@ void updateSubXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
 //-----------------------------------------------------------------------------
 
 void updateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
-                  std::vector<TFrameId> newFids, TXsheet *xsh) {
-  std::vector<TXshChildLevel *> *childLevels =
-      new std::vector<TXshChildLevel *>();
-  for (int c = 0; c < xsh->getColumnCount(); ++c) {
-    int r0, r1;
-    int n = xsh->getCellRange(c, r0, r1);
-    if (n > 0) {
-      bool changed = false;
-      std::vector<TXshCell> cells(n);
-      xsh->getCells(r0, c, n, &cells[0]);
-      for (int i = 0; i < n; i++) {
-        TXshCell currCell = cells[i];
-        // check the sub xsheets too
-        if (!cells[i].isEmpty() &&
-            cells[i].m_level->getType() == CHILD_XSHLEVEL) {
-          TXshChildLevel *level = cells[i].m_level->getChildLevel();
-          // make sure we haven't already checked the level
-          if (level &&
-              std::find(childLevels->begin(), childLevels->end(), level) ==
-                  childLevels->end()) {
-            childLevels->push_back(level);
-            TXsheet *subXsh = level->getXsheet();
-            updateSubXSheet(sl, oldFids, newFids, subXsh, childLevels);
-          }
-        }
-        for (int j = 0; j < oldFids.size(); j++) {
-          if (oldFids.at(j) == newFids.at(j)) continue;
-          TXshCell tempCell(sl, oldFids.at(j));
-          bool sameSl  = tempCell.getSimpleLevel() == currCell.getSimpleLevel();
-          bool sameFid = tempCell.getFrameId() == currCell.getFrameId();
-          if (sameSl && sameFid) {
-            TXshCell newCell(sl, newFids.at(j));
-            cells[i] = newCell;
-            changed  = true;
-            break;
-          }
-        }
-      }
-      if (changed) {
-        xsh->setCells(r0, c, n, &cells[0]);
-        TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-      }
-    }
-  }
+                  std::vector<TFrameId> newFids) {
+  std::vector<TXshChildLevel *> childLevels;
+  TXsheet *xsh =
+      TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
+  doUpdateXSheet(sl, oldFids, newFids, xsh, childLevels);
 }
 
 //=============================================================================
@@ -181,10 +142,8 @@ void makeSpaceForFids(TXshSimpleLevel *sl,
     }
   }
   if (!touchedFids.empty()) {
-    TXsheet *xsh =
-        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
     if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled())
-      updateXSheet(sl, oldFids, fids, xsh);
+      updateXSheet(sl, oldFids, fids);
     sl->renumber(fids);
     invalidateIcons(sl, touchedFids);
     sl->setDirtyFlag(true);
@@ -1024,9 +983,7 @@ public:
       if (m_updateXSheet) {
         std::vector<TFrameId> newFrames;
         m_sl->getFids(newFrames);
-        TXsheet *xsh =
-            TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-        updateXSheet(m_sl.getPointer(), newFrames, m_oldLevelFrameId, xsh);
+        updateXSheet(m_sl.getPointer(), newFrames, m_oldLevelFrameId);
       }
       m_sl->renumber(m_oldLevelFrameId);
       TApp::instance()
@@ -1238,9 +1195,7 @@ public:
     if (m_updateXSheet) {
       std::vector<TFrameId> newFrames;
       m_level->getFids(newFrames);
-      TXsheet *xsh =
-          TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-      updateXSheet(m_level.getPointer(), newFrames, m_oldFids, xsh);
+      updateXSheet(m_level.getPointer(), newFrames, m_oldFids);
     }
     m_level->renumber(m_oldFids);
     invalidateIcons(m_level.getPointer(), m_oldFids);
@@ -1348,9 +1303,7 @@ public:
     if (m_updateXSheet) {
       std::vector<TFrameId> oldFrames;
       m_level->getFids(oldFrames);
-      TXsheet *xsh =
-          TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-      updateXSheet(m_level.getPointer(), oldFrames, fids, xsh);
+      updateXSheet(m_level.getPointer(), oldFrames, fids);
     }
     m_level->renumber(fids);
     TSelection *selection = TSelection::getCurrent();
@@ -1442,9 +1395,7 @@ void FilmstripCmd::renumber(
 
   TUndoManager::manager()->add(new RenumberUndo(sl, fids));
   if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) {
-    TXsheet *xsh =
-        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-    updateXSheet(sl, oldFrames, fids, xsh);
+    updateXSheet(sl, oldFrames, fids);
   }
   sl->renumber(fids);
   sl->setDirtyFlag(true);
@@ -1511,9 +1462,7 @@ void FilmstripCmd::renumber(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
   }
   TUndoManager::manager()->add(new RenumberUndo(sl, fids));
   if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) {
-    TXsheet *xsh =
-        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-    updateXSheet(sl, oldFrames, fids, xsh);
+    updateXSheet(sl, oldFrames, fids);
   }
   sl->renumber(fids);
   sl->setDirtyFlag(true);
@@ -1794,9 +1743,7 @@ public:
     if (m_updateXSheet) {
       std::vector<TFrameId> newFrames;
       m_level->getFids(newFrames);
-      TXsheet *xsh =
-          TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-      updateXSheet(m_level.getPointer(), newFrames, m_oldFrames, xsh);
+      updateXSheet(m_level.getPointer(), newFrames, m_oldFrames);
     }
     m_level->renumber(m_oldFrames);
     invalidateIcons(m_level.getPointer(), m_oldFrames);
@@ -1876,9 +1823,7 @@ void performReverse(const TXshSimpleLevelP &sl,
     j--;
   }
   if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) {
-    TXsheet *xsh =
-        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-    updateXSheet(sl.getPointer(), oldFrames, fids, xsh);
+    updateXSheet(sl.getPointer(), oldFrames, fids);
   }
   sl->renumber(fids);
   sl->setDirtyFlag(true);
@@ -2039,9 +1984,7 @@ void stepFilmstripFrames(const TXshSimpleLevelP &sl,
     }
   }
   if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) {
-    TXsheet *xsh =
-        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-    updateXSheet(sl.getPointer(), oldFrames, fids, xsh);
+    updateXSheet(sl.getPointer(), oldFrames, fids);
   }
   sl->renumber(fids);
   for (i = 0; i < (int)insertIndices.size(); i++) {
@@ -2090,9 +2033,7 @@ public:
     if (m_updateXSheet) {
       std::vector<TFrameId> newFrames;
       m_level->getFids(newFrames);
-      TXsheet *xsh =
-          TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-      updateXSheet(m_level.getPointer(), newFrames, m_oldFrames, xsh);
+      updateXSheet(m_level.getPointer(), newFrames, m_oldFrames);
     }
     m_level->renumber(m_oldFrames);
     TSelection *selection = TSelection::getCurrent();
@@ -2260,9 +2201,7 @@ public:
     if (m_updateXSheet) {
       std::vector<TFrameId> newFrames;
       m_level->getFids(newFrames);
-      TXsheet *xsh =
-          TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-      updateXSheet(m_level.getPointer(), newFrames, m_oldFrames, xsh);
+      updateXSheet(m_level.getPointer(), newFrames, m_oldFrames);
     }
     m_level->renumber(m_oldFrames);
     invalidateIcons(m_level.getPointer(), m_oldFrames);
@@ -2609,9 +2548,7 @@ void FilmstripCmd::renumberDrawing(TXshSimpleLevel *sl, const TFrameId &oldFid,
   }
   *it = newFid;
   if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) {
-    TXsheet *xsh =
-        TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
-    updateXSheet(sl, oldFrames, fids, xsh);
+    updateXSheet(sl, oldFrames, fids);
   }
   sl->renumber(fids);
 
