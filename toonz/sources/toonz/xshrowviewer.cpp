@@ -78,6 +78,7 @@ void RowArea::setDragTool(DragTool *dragTool) {
 //-----------------------------------------------------------------------------
 
 void RowArea::drawRows(QPainter &p, int r0, int r1) {
+  const Orientation *o = m_viewer->orientation();
   int playR0, playR1, step;
   XsheetGUI::getPlayRange(playR0, playR1, step);
 
@@ -115,7 +116,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
   int x1                = visibleRect.right();
   int y0                = visibleRect.top();
   int y1                = visibleRect.bottom();
-  NumberRange layerSide = m_viewer->orientation()->layerSide(visibleRect);
+  NumberRange layerSide = o->layerSide(visibleRect);
 
   int frameAdj = m_viewer->getFrameZoomAdjustment();
 
@@ -127,15 +128,13 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
                        ? m_viewer->getMarkerLineColor()
                        : m_viewer->getLightLineColor();
     p.setPen(color);
-    QLine horizontalLine =
-        m_viewer->orientation()->horizontalLine(frameAxis, layerSide);
+    QLine horizontalLine = o->horizontalLine(frameAxis, layerSide);
     p.drawLine(horizontalLine);
 
-    if (m_viewer->getFrameZoomFactor() <= 50) {
+    if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
       QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
-      QRect indRect    = m_viewer->orientation()
-                          ->rect(PredefinedRect::FRAME_INDICATOR)
-                          .translated(basePoint);
+      QRect indRect =
+          o->rect(PredefinedRect::FRAME_INDICATOR).translated(basePoint);
       indRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
       QColor useColor;
       if (playR0 <= r && r <= playR1) {
@@ -162,13 +161,11 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
       p.setPen(m_viewer->getTextColor());
 
     QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
-    QRect labelRect  = m_viewer->orientation()
-                          ->rect(PredefinedRect::FRAME_LABEL)
-                          .translated(basePoint);
+    QRect labelRect =
+        o->rect(PredefinedRect::FRAME_LABEL).translated(basePoint);
     labelRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
 
-    int align = m_viewer->orientation()->dimension(
-        PredefinedDimension::FRAME_LABEL_ALIGN);
+    int align = o->dimension(PredefinedDimension::FRAME_LABEL_ALIGN);
     // display time and/or frame number
     z++;
     switch (m_viewer->getFrameDisplayStyle()) {
@@ -190,7 +187,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
                   .arg(QString::number(koma).rightJustified(2, '0'));
         z = 0;
       } else {
-        if (m_viewer->getFrameZoomFactor() <= 50) {
+        if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
           if ((z + 1) % zz) break;
           if (r % frameRate == 1 || (r + 2) % frameRate == 1) break;
         }
@@ -204,7 +201,9 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
     }
 
     case XsheetViewer::Frame: {
-      if (m_viewer->getFrameZoomFactor() <= 50 && r > 0 && (r + 1) % 5) break;
+      if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50 &&
+          r > 0 && (r + 1) % 5)
+        break;
       QString number = QString::number(r + 1);
       p.drawText(labelRect, align, number);
       break;
@@ -229,7 +228,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
                   .arg(QString::number(koma).rightJustified(3, '0'));
         z = 0;
       } else {
-        if (m_viewer->getFrameZoomFactor() <= 50) {
+        if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
           if ((z + 1) % zz) break;
           if (r % frameRate == 1 || (r + 2) % frameRate == 1) break;
         }
@@ -258,7 +257,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
                   .arg(QString::number(koma).rightJustified(2, '0'));
         z = 0;
       } else {
-        if (m_viewer->getFrameZoomFactor() <= 50) {
+        if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
           if ((z + 1) % zz) break;
           if (r % frameRate == 1 || (r + 2) % frameRate == 1) break;
         }
@@ -731,7 +730,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
     m_viewer->dragToolClick(event);
     event->accept();
   }  // left-click
-  // pan by middle-drag
+     // pan by middle-drag
   else if (event->button() == Qt::MidButton) {
     m_pos       = event->pos();
     m_isPanning = true;
