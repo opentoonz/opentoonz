@@ -1140,7 +1140,7 @@ public slots:
   void onPrepareToScrollOffset(const QPoint &offset);
 
   void setFrameZoomFactor(int f) { m_frameZoomFactor = f; }
-  int getFrameZoomFactor() const { return m_frameZoomFactor; }
+  int getFrameZoomFactor() const;
   int getFrameZoomAdjustment();
 
   void zoomOnFrame(int frame, int factor);

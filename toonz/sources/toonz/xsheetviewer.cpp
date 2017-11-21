@@ -1619,6 +1619,12 @@ TPanel *createXsheetViewer(QWidget *parent)
 */
 
 //----------------------------------------------------------------
+int XsheetViewer::getFrameZoomFactor() const {
+	if (orientation()->isVerticalTimeline()) return 100;
+
+	return m_frameZoomFactor; 
+}
+
 int XsheetViewer::getFrameZoomAdjustment() {
   if (orientation()->isVerticalTimeline()) return 0;
 
