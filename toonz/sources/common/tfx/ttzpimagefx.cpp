@@ -10,7 +10,7 @@
 //**********************************************************************************************
 
 void parseIndexes(std::string indexes, std::vector<std::string> &items) {
-#ifdef _WIN32
+#ifdef _MSC_VER
   char seps[] = " ,;";
   char *token;
   if (indexes == "all" || indexes == "All" || indexes == "ALL")
@@ -38,7 +38,7 @@ void parseIndexes(std::string indexes, std::vector<std::string> &items) {
 
 void insertIndexes(std::vector<std::string> items,
                    PaletteFilterFxRenderData *t) {
-#ifdef _WIN32
+#ifdef _MSC_VER
   for (int i = 0; i < (int)items.size(); i++) {
     char *starttoken, *endtoken;
     char subseps[]  = "-";
