@@ -59,6 +59,7 @@
 #include "tapp.h"
 #include "duplicatepopup.h"
 #include "menubarcommandids.h"
+#include "columncommand.h"
 
 // Qt includes
 #include <QClipboard>
@@ -1014,6 +1015,29 @@ public:
   NewNoteLevelCommand() : MenuItemHandler(MI_NewNoteLevel) {}
   void execute() override { XshCmd::newNoteLevel(); }
 } NewNoteLevelCommand;
+
+//============================================================
+
+static void removeEmptyColumns() {
+  TTool::Application *app = TTool::getApplication();
+  TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
+  std::set<int> indices;
+
+  for (int i = 0; i < xsh->getColumnCount(); i++) {
+    TXshColumn *column = xsh->getColumn(i);
+    if (!column || column->isEmpty()) indices.insert(i);
+  }
+
+  if (indices.size()) ColumnCmd::deleteColumns(indices, false, false);
+
+  app->getCurrentXsheet()->notifyXsheetChanged();
+}
+
+class RemoveEmptyColumnsCommand final : public MenuItemHandler {
+public:
+  RemoveEmptyColumnsCommand() : MenuItemHandler(MI_RemoveEmptyColumns) {}
+  void execute() override { XshCmd::removeEmptyColumns(); }
+} RemoveEmptyColumnsCommand;
 
 //============================================================
 
