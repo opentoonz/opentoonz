@@ -1002,6 +1002,9 @@ static void newNoteLevel() {
   obj->setName(str.toStdString());
 
   TUndoManager::manager()->add(new NewNoteLevelUndo(textSoundCol, col, str));
+
+  TXsheetHandle *xshHandle = app->getCurrentXsheet();
+  xshHandle->notifyXsheetChanged();
 }
 
 //============================================================
