@@ -96,8 +96,8 @@ class FillTool final : public QObject, public TTool {
   std::vector<TRect> m_rects;
 #endif
 
-// For the raster fill tool, autopaint lines is optional and can be temporary
-// disabled
+  // For the raster fill tool, autopaint lines is optional and can be temporary
+  // disabled
   TBoolProperty m_autopaintLines;
 
 public:

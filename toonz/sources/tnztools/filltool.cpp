@@ -744,10 +744,10 @@ void fillAreaWithUndo(const TImageP &img, const TRectD &area, TStroke *stroke,
       filler.strokeFill(stroke, cs, onlyUnfilled, colorType != LINES,
                         colorType != AREAS);
 
-                        TPalette *plt = ti->getPalette();
-                        
-                            // !autopaintLines will temporary disable autopaint line feature
-                            if ((plt && !hasAutoInks(plt)) || !autopaintLines) plt = 0;
+    TPalette *plt = ti->getPalette();
+
+    // !autopaintLines will temporary disable autopaint line feature
+    if ((plt && !hasAutoInks(plt)) || !autopaintLines) plt = 0;
 
     std::set<int> autoInks;
     autoInks.insert(3);
@@ -854,7 +854,7 @@ void doFill(const TImageP &img, const TPointD &pos, FillParameters &params,
     }
 
     // !autoPaintLines will temporary disable autopaint line feature
-     if (plt && hasAutoInks(plt) && autopaintLines) params.m_palette = plt;
+    if (plt && hasAutoInks(plt) && autopaintLines) params.m_palette = plt;
 
     if (params.m_fillType == ALL || params.m_fillType == AREAS) {
       if (isShiftFill) {
@@ -994,8 +994,8 @@ public:
       , m_colorType(colorType)
       , m_firstImage()
       , m_lastImage()
-      , m_styleIndex(styleIndex) 
-      , m_autopaintLines(autopaintLines){}
+      , m_styleIndex(styleIndex)
+      , m_autopaintLines(autopaintLines) {}
 
   ~MultiAreaFiller() {
     if (m_firstImage) {
@@ -1011,7 +1011,7 @@ public:
       , m_lastRect()
       , m_unfilledOnly(unfilledOnly)
       , m_colorType(colorType)
-      , m_styleIndex(styleIndex) 
+      , m_styleIndex(styleIndex)
       , m_autopaintLines(autopaintLines) {
     m_firstImage = new TVectorImage();
     m_lastImage  = new TVectorImage();
@@ -1290,8 +1290,7 @@ void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
     } else
       fillAreaWithUndo(m_parent->getImage(true), TRectD(), stroke,
                        m_onlyUnfilled, m_colorType, m_level.getPointer(),
-                       m_parent->getCurrentFid(), styleIndex,
-                       m_autopaintLines);
+                       m_parent->getCurrentFid(), styleIndex, m_autopaintLines);
     TTool *t = app->getCurrentTool()->getTool();
     if (t) t->notifyImageChanged();
   }
@@ -1430,10 +1429,10 @@ void AreaFillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
                          osMask, m_level.getPointer(),
                          m_parent->getCurrentFid());
       } else
-        fillAreaWithUndo(m_parent->getImage(true), TRectD(),
-                         stroke /*, imageLocation*/, m_onlyUnfilled,
-                         m_colorType, m_level.getPointer(),
-                         m_parent->getCurrentFid(), styleIndex, m_autopaintLines);
+        fillAreaWithUndo(
+            m_parent->getImage(true), TRectD(), stroke /*, imageLocation*/,
+            m_onlyUnfilled, m_colorType, m_level.getPointer(),
+            m_parent->getCurrentFid(), styleIndex, m_autopaintLines);
       delete stroke;
       TTool *t = app->getCurrentTool()->getTool();
       if (t) t->notifyImageChanged();
@@ -1466,12 +1465,13 @@ void AreaFillTool::onImageChanged() {
 
 /*--Normal以外のTypeが選択された場合に呼ばれる--*/
 bool AreaFillTool::onPropertyChanged(bool multi, bool onlyUnfilled, bool onion,
-                                     Type type, std::wstring colorType, bool autopaintLines) {
-  m_frameRange   = multi;
-  m_onlyUnfilled = onlyUnfilled;
-  m_colorType    = colorType;
-  m_type         = type;
-  m_onion        = onion;
+                                     Type type, std::wstring colorType,
+                                     bool autopaintLines) {
+  m_frameRange     = multi;
+  m_onlyUnfilled   = onlyUnfilled;
+  m_colorType      = colorType;
+  m_type           = type;
+  m_onion          = onion;
   m_autopaintLines = autopaintLines;
 
   if (m_frameRange) resetMulti();
@@ -1639,7 +1639,7 @@ FillTool::FillTool(int targetType)
     , m_onionStyleId(0)
     , m_currCell(-1, -1)
     , m_maxGapDistance("Maximum Gap", 0.01, 10.0, 1.15)
-    , m_firstTime(true) 
+    , m_firstTime(true)
     , m_autopaintLines("Autopaint Lines", true) {
   m_rectFill           = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
@@ -1762,7 +1762,7 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       // SECONDO CLICK
       TFrameId fid = getCurrentFid();
       MultiFiller filler(m_firstPoint, pos, params,
-        m_autopaintLines.getValue());
+                         m_autopaintLines.getValue());
       filler.processSequence(m_level.getPointer(), m_firstFrameId, fid);
       if (e.isShiftPressed()) {
         m_firstPoint   = pos;
@@ -1935,8 +1935,8 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
 
   // Autopaint
   else if (propertyName == m_autopaintLines.getName()) {
-      rectPropChangedflag = true;
-    }
+    rectPropChangedflag = true;
+  }
 
   else if (propertyName == m_maxGapDistance.getName()) {
     if (TVectorImageP vi = getImage(true)) {
@@ -1964,9 +1964,9 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
     else
       assert(false);
 
-    m_rectFill->onPropertyChanged(m_frameRange.getValue(),
-                                  m_selective.getValue(), m_onion.getValue(),
-                                  type, m_colorType.getValue(), m_autopaintLines.getValue());
+    m_rectFill->onPropertyChanged(
+        m_frameRange.getValue(), m_selective.getValue(), m_onion.getValue(),
+        type, m_colorType.getValue(), m_autopaintLines.getValue());
   }
 
   return true;
@@ -2119,9 +2119,9 @@ void FillTool::onActivate() {
       else
         assert(false);
 
-      m_rectFill->onPropertyChanged(m_frameRange.getValue(),
-                                    m_selective.getValue(), m_onion.getValue(),
-                                    type, m_colorType.getValue(), m_autopaintLines.getValue());
+      m_rectFill->onPropertyChanged(
+          m_frameRange.getValue(), m_selective.getValue(), m_onion.getValue(),
+          type, m_colorType.getValue(), m_autopaintLines.getValue());
     }
   }
 
