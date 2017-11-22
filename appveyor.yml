@@ -25,7 +25,7 @@ install:
 
     mkdir %PLATFORM% && cd %PLATFORM%
 
-    cmake ..\sources -G "Visual Studio 14 2015 Win64" -DQT_PATH="C:\Qt\5.9.1\msvc2015_64" -DBOOST_ROOT="C:\Libraries\boost_1_60_0"
+    cmake ..\sources -G "Visual Studio 14 2015 Win64" -DQT_PATH="C:\Qt\5.9.2\msvc2015_64" -DBOOST_ROOT="C:\Libraries\boost_1_60_0"
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
   parallel: true

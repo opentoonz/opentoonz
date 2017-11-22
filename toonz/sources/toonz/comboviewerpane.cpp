@@ -634,12 +634,20 @@ void ComboViewerPanel::changeWindowTitle() {
           name + tr("   ::   Frame: ") + tr(std::to_string(frame + 1).c_str());
     int col = app->getCurrentColumn()->getColumnIndex();
     if (col < 0) {
+      if ((m_sceneViewer->getIsFlippedX() || m_sceneViewer->getIsFlippedY()) &&
+          !m_sceneViewer->is3DView()) {
+        name = name + tr(" (Flipped)");
+      }
       setWindowTitle(name);
       return;
     }
     TXsheet *xsh  = app->getCurrentXsheet()->getXsheet();
     TXshCell cell = xsh->getCell(frame, col);
     if (cell.isEmpty()) {
+      if ((m_sceneViewer->getIsFlippedX() || m_sceneViewer->getIsFlippedY()) &&
+          !m_sceneViewer->is3DView()) {
+        name = name + tr(" (Flipped)");
+      }
       setWindowTitle(name);
       return;
     }
@@ -649,10 +657,12 @@ void ComboViewerPanel::changeWindowTitle() {
         QString::fromStdWString(fp.withFrame(cell.m_frameId).getWideString());
     name = name + tr("   ::   Level: ") + imageName;
 
-    if (m_sceneViewer->isPreviewEnabled()) {
-      name = name + "  ::  Zoom : " +
-             QString::number((int)(100.0 *
-                                   sqrt(m_sceneViewer->getViewMatrix().det()) *
+    if (m_sceneViewer->isPreviewEnabled() && !m_sceneViewer->is3DView()) {
+      TAffine aff                             = m_sceneViewer->getViewMatrix();
+      if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
+      if (m_sceneViewer->getIsFlippedY()) aff = aff * TScale(1, -1);
+      name                                    = name + "  ::  Zoom : " +
+             QString::number((int)(100.0 * sqrt(aff.det()) *
                                    m_sceneViewer->getDpiFactor())) +
              "%";
     }
@@ -665,12 +675,15 @@ void ComboViewerPanel::changeWindowTitle() {
              !CleanupPreviewCheck::instance()
                   ->isEnabled()  // cleanup preview must be OFF
              &&
-             !CameraTestCheck::instance()
-                  ->isEnabled())  // camera test mode must be OFF neither
-    {
-      name = name + "  ::  Zoom : " +
-             QString::number((int)(100.0 *
-                                   sqrt(m_sceneViewer->getViewMatrix().det()) *
+             !CameraTestCheck::instance()  // camera test mode must be OFF
+                                           // neither
+                                               ->isEnabled() &&
+             !m_sceneViewer->is3DView()) {
+      TAffine aff                             = m_sceneViewer->getViewMatrix();
+      if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
+      if (m_sceneViewer->getIsFlippedY()) aff = aff * TScale(1, -1);
+      name                                    = name + "  ::  Zoom : " +
+             QString::number((int)(100.0 * sqrt(aff.det()) *
                                    m_sceneViewer->getDpiFactor())) +
              "%";
     }
@@ -685,13 +698,20 @@ void ComboViewerPanel::changeWindowTitle() {
           fp.withFrame(app->getCurrentFrame()->getFid()).getWideString());
 
       name = name + tr("Level: ") + imageName;
-
-      name = name + "  ::  Zoom : " +
-             QString::number((int)(100.0 *
-                                   sqrt(m_sceneViewer->getViewMatrix().det()) *
-                                   m_sceneViewer->getDpiFactor())) +
-             "%";
+      if (!m_sceneViewer->is3DView()) {
+        TAffine aff = m_sceneViewer->getViewMatrix();
+        if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
+        if (m_sceneViewer->getIsFlippedY()) aff = aff * TScale(1, -1);
+        name                                    = name + "  ::  Zoom : " +
+               QString::number((int)(100.0 * sqrt(aff.det()) *
+                                     m_sceneViewer->getDpiFactor())) +
+               "%";
+      }
     }
+  }
+  if ((m_sceneViewer->getIsFlippedX() || m_sceneViewer->getIsFlippedY()) &&
+      !m_sceneViewer->is3DView()) {
+    name = name + tr(" (Flipped)");
   }
   setWindowTitle(name);
 }

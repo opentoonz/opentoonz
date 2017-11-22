@@ -89,6 +89,7 @@ const struct {
                     {ToolCursor::Ex_Rectangle, "ex_rectangle"},
                     {ToolCursor::Ex_Line, "ex_line"},
                     {ToolCursor::Ex_Area, "ex_area"},
+                    {ToolCursor::Ex_Fill_NoAutopaint, "ex_fill_no_autopaint"},
                     {0, 0}};
 };
 

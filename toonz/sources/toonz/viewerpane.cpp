@@ -205,7 +205,7 @@ void SceneViewerPanel::onDrawFrame(
     }
   }
 
-  assert(frame >= 0);
+  // assert(frame >= 0); // frame can be negative in rare cases
   if (frame != frameHandle->getFrameIndex() + 1) {
     int oldFrame = frameHandle->getFrame();
     frameHandle->setCurrentFrame(frame);
@@ -537,10 +537,17 @@ void SceneViewerPanel::changeWindowTitle() {
     TXsheet *xsh  = app->getCurrentXsheet()->getXsheet();
     TXshCell cell = xsh->getCell(frame, col);
     if (cell.isEmpty()) {
-      TAffine aff = m_sceneViewer->getViewMatrix() *
-                    m_sceneViewer->getNormalZoomScale().inv();
-      name = name + tr("  ::  Zoom : ") +
-             QString::number(tround(100.0 * sqrt(aff.det()))) + "%";
+      if (!m_sceneViewer->is3DView()) {
+        TAffine aff = m_sceneViewer->getViewMatrix() *
+                      m_sceneViewer->getNormalZoomScale().inv();
+        if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
+        if (m_sceneViewer->getIsFlippedY()) aff = aff * TScale(1, -1);
+        name                                    = name + tr("  ::  Zoom : ") +
+               QString::number(tround(100.0 * sqrt(aff.det()))) + "%";
+        if (m_sceneViewer->getIsFlippedX() || m_sceneViewer->getIsFlippedY()) {
+          name = name + tr(" (Flipped)");
+        }
+      }
       setWindowTitle(name);
       return;
     }
@@ -561,8 +568,13 @@ void SceneViewerPanel::changeWindowTitle() {
   if (!m_sceneViewer->is3DView()) {
     TAffine aff = m_sceneViewer->getSceneMatrix() *
                   m_sceneViewer->getNormalZoomScale().inv();
-    name = name + tr("  ::  Zoom : ") +
+    if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
+    if (m_sceneViewer->getIsFlippedY()) aff = aff * TScale(1, -1);
+    name                                    = name + tr("  ::  Zoom : ") +
            QString::number(tround(100.0 * sqrt(aff.det()))) + "%";
+    if (m_sceneViewer->getIsFlippedX() || m_sceneViewer->getIsFlippedY()) {
+      name = name + tr(" (Flipped)");
+    }
   }
 
   setWindowTitle(name);

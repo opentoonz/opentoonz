@@ -1,0 +1,12 @@
+<fxlayout help_command="iexplore" help_file="BokehRefIwa.html">
+	<page name="Bokeh Ref Iwa">
+ 	<vbox>
+		<control>on_focus_distance</control>
+		<control>bokeh_amount</control>
+		<control>hardness</control>
+		<control>distance_precision</control>
+		<control>fill_gap</control>
+		<control>fill_gap_with_median_filter</control>
+  	</vbox>
+	</page>
+</fxlayout>

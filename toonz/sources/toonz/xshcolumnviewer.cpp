@@ -2198,6 +2198,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     menu.addAction(cmdManager->getAction(MI_Insert));
     menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_InsertFx));
+    menu.addAction(cmdManager->getAction(MI_NewNoteLevel));
     menu.addSeparator();
     if (m_viewer->getXsheet()->isColumnEmpty(col) ||
         (cell.m_level && cell.m_level->getChildLevel()))

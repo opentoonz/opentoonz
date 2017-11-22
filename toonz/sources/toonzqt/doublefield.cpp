@@ -39,6 +39,39 @@ void DoubleValueLineEdit::focusOutEvent(QFocusEvent *e) {
   QLineEdit::focusOutEvent(e);
 }
 
+//-----------------------------------------------------------------------------
+
+void DoubleValueLineEdit::mousePressEvent(QMouseEvent *e) {
+  if (e->buttons() == Qt::MiddleButton) {
+    m_xMouse           = e->x();
+    m_mouseDragEditing = true;
+  } else
+    QLineEdit::mousePressEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+
+void DoubleValueLineEdit::mouseMoveEvent(QMouseEvent *e) {
+  if (e->buttons() == Qt::MiddleButton) {
+    setValue(getValue() + ((e->x() - m_xMouse) / 2));
+    m_xMouse = e->x();
+    emit valueChanged();
+  } else
+    QLineEdit::mouseMoveEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+
+void DoubleValueLineEdit::mouseReleaseEvent(QMouseEvent *e) {
+  if ((e->buttons() == Qt::NoButton && m_mouseDragEditing)) {
+    m_mouseDragEditing = false;
+    clearFocus();
+  } else {
+    if (!hasSelectedText()) selectAll();
+    QLineEdit::mouseReleaseEvent(e);
+  }
+}
+
 //=============================================================================
 // DoubleValueField
 //-----------------------------------------------------------------------------
@@ -459,6 +492,60 @@ void MeasuredDoubleLineEdit::timerEvent(QTimerEvent *) {
     setStyleSheet(QString("#ValueLineEdit {background-color:#%1}")
                       .arg(c, 6, 16, QLatin1Char('0')));
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void MeasuredDoubleLineEdit::mousePressEvent(QMouseEvent *e) {
+  if ((e->buttons() == Qt::MiddleButton) || m_labelClicked) {
+    m_xMouse           = e->x();
+    m_mouseDragEditing = true;
+  } else
+    QLineEdit::mousePressEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+
+void MeasuredDoubleLineEdit::mouseMoveEvent(QMouseEvent *e) {
+  if ((e->buttons() == Qt::MiddleButton) || m_labelClicked) {
+    int precision = (m_maxValue > 100) ? 0 : ((m_maxValue > 10) ? 1 : 2);
+    m_value->modifyValue((e->x() - m_xMouse) / 2, precision);
+    m_xMouse = e->x();
+    valueToText();
+    m_modified = false;
+  } else
+    QLineEdit::mouseMoveEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+
+void MeasuredDoubleLineEdit::mouseReleaseEvent(QMouseEvent *e) {
+  if ((e->buttons() == Qt::NoButton && m_mouseDragEditing) || m_labelClicked) {
+    m_xMouse   = -1;
+    m_modified = true;
+    onEditingFinished();
+    clearFocus();
+    m_mouseDragEditing = false;
+    m_labelClicked     = false;
+
+  } else {
+    if (!hasSelectedText()) selectAll();
+    QLineEdit::mouseReleaseEvent(e);
+  }
+}
+
+void MeasuredDoubleLineEdit::receiveMousePress(QMouseEvent *e) {
+  m_labelClicked = true;
+  mousePressEvent(e);
+}
+
+void MeasuredDoubleLineEdit::receiveMouseMove(QMouseEvent *e) {
+  mouseMoveEvent(e);
+}
+
+void MeasuredDoubleLineEdit::receiveMouseRelease(QMouseEvent *e) {
+  mouseReleaseEvent(e);
+  m_labelClicked = false;
 }
 
 //=============================================================================

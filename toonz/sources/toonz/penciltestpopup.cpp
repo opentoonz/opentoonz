@@ -682,7 +682,7 @@ bool FlexibleNameCreator::setCurrent(std::wstring name) {
 
 PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
     : Dialog(parent, true, false, "PencilTestSaveInFolder") {
-  setWindowTitle("Create the Destination Subfolder to Save");
+  setWindowTitle(tr("Create the Destination Subfolder to Save"));
 
   m_parentFolderField = new FileField(this);
 

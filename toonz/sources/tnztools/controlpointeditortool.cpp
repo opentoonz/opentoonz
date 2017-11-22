@@ -25,6 +25,7 @@
 
 // For Qt translation support
 #include <QCoreApplication>
+#include <QKeyEvent>
 
 using namespace ToolUtils;
 
@@ -196,6 +197,9 @@ public:
   void onDeactivate() override;
   void onImageChanged() override;
   int getCursorId() const override;
+
+  // returns true if the pressed key is recognized and processed.
+  bool isEventAcceptable(QEvent *e) override;
 
 } controlPointEditorTool;
 
@@ -888,6 +892,23 @@ int ControlPointEditorTool::getCursorId() const {
   default:
     return ToolCursor::SplineEditorCursor;
   }
+}
+
+//-----------------------------------------------------------------------------
+
+// returns true if the pressed key is recognized and processed in the tool
+// instead of triggering the shortcut command.
+bool ControlPointEditorTool::isEventAcceptable(QEvent *e) {
+  if (!isEnabled()) return false;
+  TVectorImageP vi(getImage(false));
+  if (!vi || (vi && m_selection.isEmpty())) return false;
+  // arrow keys will be used for moving the selected points
+  QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+  // shift + arrow will not be recognized for now
+  if (keyEvent->modifiers() & Qt::ShiftModifier) return false;
+  int key = keyEvent->key();
+  return (key == Qt::Key_Up || key == Qt::Key_Down || key == Qt::Key_Left ||
+          key == Qt::Key_Right);
 }
 
 //=============================================================================

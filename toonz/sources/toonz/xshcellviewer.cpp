@@ -52,6 +52,7 @@
 #include "toonz/tcolumnfx.h"
 #include "toonz/txshchildlevel.h"
 #include "toonz/txshzeraryfxcolumn.h"
+#include "toonz/txshsoundtextcolumn.h"
 #include "toonz/txshsoundtextlevel.h"
 #include "toonz/txshpalettelevel.h"
 #include "toonz/doubleparamcmd.h"
@@ -482,6 +483,55 @@ public:
   int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
+//-----------------------------------------------------------------------------
+
+class RenameTextCellUndo final : public TUndo {
+  int m_row;
+  int m_col;
+  const TXshCell m_oldCell;
+  const TXshCell m_newCell;
+  QString m_oldText, m_newText;
+  TXshSoundTextLevel *m_level;
+
+public:
+  RenameTextCellUndo(int row, int col, TXshCell oldCell, TXshCell newCell,
+                     QString oldText, QString newText,
+                     TXshSoundTextLevel *level)
+      : m_row(row)
+      , m_col(col)
+      , m_oldCell(oldCell)
+      , m_newCell(newCell)
+      , m_oldText(oldText)
+      , m_newText(newText)
+      , m_level(level) {}
+
+  void setcell(const TXshCell cell, QString text = "") const {
+    TApp *app    = TApp::instance();
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    assert(xsh);
+    if (cell.isEmpty())
+      xsh->clearCells(m_row, m_col);
+    else {
+      xsh->setCell(m_row, m_col, cell);
+      m_level->setFrameText(cell.getFrameId().getNumber() - 1, text);
+    }
+    app->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  void undo() const override { setcell(m_oldCell, m_oldText); }
+
+  void redo() const override { setcell(m_newCell, m_newText); }
+
+  int getSize() const override { return sizeof *this; }
+
+  QString getHistoryString() override {
+    return QObject::tr("Change Text at Column %1  Frame %2")
+        .arg(QString::number(m_col + 1))
+        .arg(QString::number(m_row + 1));
+  }
+  int getHistoryType() override { return HistoryType::Xsheet; }
+};
+
 // display upper-directional smart tab only when pressing ctrl key
 bool isCtrlPressed = false;
 
@@ -569,7 +619,8 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
 
     // convert the last one digit of the frame number to alphabet
     // Ex.  12 -> 1B    21 -> 2A   30 -> 3
-    if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
+    if (Preferences::instance()->isShowFrameNumberWithLettersEnabled() &&
+        cell.m_level->getType() != TXshLevelType::SND_TXT_XSHLEVEL)
       setText(
           (fid.isEmptyFrame() || fid.isNoFrame())
               ? QString::fromStdWString(levelName)
@@ -581,12 +632,25 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
       std::string frameNumber("");
       if (fid.getNumber() > 0) frameNumber = std::to_string(fid.getNumber());
       if (fid.getLetter() != 0) frameNumber.append(1, fid.getLetter());
-      setText((frameNumber.empty())
-                  ? QString::fromStdWString(levelName)
-                  : (multiColumnSelected)
-                        ? QString::fromStdString(frameNumber)
-                        : QString::fromStdWString(levelName) + QString(" ") +
-                              QString::fromStdString(frameNumber));
+
+      // get text from sound text level
+      if (cell.m_level->getType() == TXshLevelType::SND_TXT_XSHLEVEL) {
+        TXshSoundTextLevelP textLevel = cell.m_level->getSoundTextLevel();
+        if (textLevel) {
+          std::string frameText =
+              textLevel->getFrameText(fid.getNumber() - 1).toStdString();
+          setText(textLevel->getFrameText(fid.getNumber() - 1));
+        }
+      }
+      // other level types
+      else {
+        setText((frameNumber.empty())
+                    ? QString::fromStdWString(levelName)
+                    : (multiColumnSelected)
+                          ? QString::fromStdString(frameNumber)
+                          : QString::fromStdWString(levelName) + QString(" ") +
+                                QString::fromStdString(frameNumber));
+      }
     }
     selectAll();
   }
@@ -613,13 +677,80 @@ void RenameCellField::renameCell() {
   std::wstring levelName;
   TFrameId fid;
 
+  TXsheet *xsheet = m_viewer->getXsheet();
+  TXshSoundTextColumn *sndTextCol =
+      xsheet->getColumn(m_col)->getSoundTextColumn();
+  if (sndTextCol) {
+    QString oldText  = "changeMe";  // text for undo - changed later
+    TXshCell cell    = xsheet->getCell(m_row, m_col);
+    TXshCell oldCell = cell;
+    // the text index is always one less than the frame number
+    int textIndex = cell.getFrameId().getNumber() - 1;
+    if (!cell.m_level) {  // cell not part of a level
+      oldText       = "";
+      int lastFrame = sndTextCol->getMaxFrame();
+      TXshSoundTextLevel *sndTextLevel;
+      TXshCell lastCell;
+      TFrameId newId;
+      if (lastFrame < 0) {  // no level on column
+        sndTextLevel = new TXshSoundTextLevel();
+        sndTextLevel->setType(SND_TXT_XSHLEVEL);
+        newId = TFrameId(1);
+        cell  = TXshCell(sndTextLevel, newId);
+        sndTextCol->setCell(m_row, cell);
+        textIndex = 0;
+      } else {
+        TXshCell lastCell = xsheet->getCell(lastFrame, m_col);
+        TXshSoundTextLevel *sndTextLevel =
+            lastCell.m_level->getSoundTextLevel();
+        int textSize = sndTextLevel->m_framesText.size();
+        textIndex    = textSize;
+        newId        = TFrameId(textSize + 1);
+        cell         = TXshCell(sndTextLevel, newId);
+        sndTextCol->setCell(m_row, cell);
+      }
+    }
+
+    TXshCell prevCell             = xsheet->getCell(m_row - 1, m_col);
+    TXshSoundTextLevel *textLevel = cell.m_level->getSoundTextLevel();
+    if (oldText == "changeMe")
+      oldText = textLevel->getFrameText(cell.getFrameId().getNumber() - 1);
+    if (!prevCell.isEmpty()) {
+      // check if the previous cell had the same content as the entered text
+      // just extend the frame if so
+      if (textLevel->getFrameText(prevCell.getFrameId().getNumber() - 1) == s) {
+        sndTextCol->setCell(m_row, prevCell);
+        RenameTextCellUndo *undo = new RenameTextCellUndo(
+            m_row, m_col, oldCell, prevCell, oldText, s, textLevel);
+        TUndoManager::manager()->add(undo);
+        return;
+      }
+      // check if the cell was part of an extended frame, but now has different
+      // text
+      else if (textLevel->getFrameText(textIndex) ==
+                   textLevel->getFrameText(prevCell.getFrameId().getNumber() -
+                                           1) &&
+               textLevel->getFrameText(textIndex) != s) {
+        int textSize   = textLevel->m_framesText.size();
+        textIndex      = textSize;
+        TFrameId newId = TFrameId(textSize + 1);
+        cell           = TXshCell(textLevel, newId);
+        sndTextCol->setCell(m_row, cell);
+      }
+    }
+    RenameTextCellUndo *undo = new RenameTextCellUndo(
+        m_row, m_col, oldCell, cell, oldText, s, textLevel);
+    TUndoManager::manager()->add(undo);
+    textLevel->setFrameText(textIndex, s);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    return;
+  }
   // convert the last one digit of the frame number to alphabet
   // Ex.  12 -> 1B    21 -> 2A   30 -> 3
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
     parse_with_letter(QString::fromStdWString(newName), levelName, fid);
   else
     parse(QString::fromStdWString(newName), levelName, fid);
-  TXsheet *xsheet = m_viewer->getXsheet();
 
   bool animationSheetEnabled =
       Preferences::instance()->isAnimationSheetEnabled();
@@ -1648,6 +1779,8 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   drawLockedDottedLine(p, xsh->getColumn(col)->isLocked(), xy, cellColor);
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
+  TFrameId fid = cell.m_frameId;
+  if (fid.getNumber() - 1 < 0) return;
   int distance, offset;
   TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
       distance, offset);
@@ -2464,8 +2597,7 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   int col                   = cellPosition.layer();
   // Se la colonna e' sound non devo fare nulla
   TXshColumn *column = m_viewer->getXsheet()->getColumn(col);
-  if (column && (column->getSoundColumn() || column->getSoundTextColumn()))
-    return;
+  if (column && column->getSoundColumn()) return;
 
   // Se ho cliccato su una nota devo aprire il popup
   TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
@@ -2841,7 +2973,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
     } else if (selectionContainTlvImage(m_viewer->getCellSelection(),
                                         m_viewer->getXsheet()))
       menu.addAction(cmdManager->getAction(MI_CanvasSize));
-      if (sl || TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel())
+      if (sl || (TApp::instance()->getCurrentLevel()->getLevel() && TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel()))
       menu.addAction(cmdManager->getAction(MI_LipSyncPopup));
   }
   menu.addSeparator();

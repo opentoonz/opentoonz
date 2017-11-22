@@ -52,6 +52,7 @@ private:
   TPointD m_mousePosition;
   bool m_onion;
   bool m_isLeftButtonPressed;
+  bool m_autopaintLines;
 
 public:
   AreaFillTool(TTool *Parent);
@@ -64,7 +65,7 @@ public:
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
   void onImageChanged();
   bool onPropertyChanged(bool multi, bool onlyUnfilled, bool onion, Type type,
-                         std::wstring colorType);
+                         std::wstring colorType, bool autopaintLines);
   void onActivate();
   void onEnter();
 };
@@ -94,6 +95,10 @@ class FillTool final : public QObject, public TTool {
 #ifdef _DEBUG
   std::vector<TRect> m_rects;
 #endif
+
+// For the raster fill tool, autopaint lines is optional and can be temporary
+// disabled
+  TBoolProperty m_autopaintLines;
 
 public:
   FillTool(int targetType);

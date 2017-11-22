@@ -138,6 +138,7 @@
     <separator/>
     <command>MI_InsertFx</command>
     <command>MI_NewOutputFx</command>
+    <command>MI_NewNoteLevel</command>
     <separator/>
     <command>MI_InsertSceneFrame</command>
     <command>MI_RemoveSceneFrame</command>

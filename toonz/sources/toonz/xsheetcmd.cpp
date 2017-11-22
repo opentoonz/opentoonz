@@ -24,10 +24,12 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txsheet.h"
 #include "toonz/txshcell.h"
+#include "toonz/txshcolumn.h"
 #include "toonz/toonzscene.h"
 #include "toonz/levelset.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/txshsoundtextcolumn.h"
 #include "toonz/txshsoundtextlevel.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/tstageobjectkeyframe.h"
@@ -923,6 +925,92 @@ public:
       : MenuItemHandler(MI_DrawingSubGroupBackward) {}
   void execute() override { XshCmd::drawingSubstituionGroup(-1); }
 } DrawingSubstitutionGroupBackwardCommand;
+
+//============================================================
+
+class NewNoteLevelUndo final : public TUndo {
+  TXshSoundTextColumnP m_soundtextColumn;
+  int m_col;
+  QString m_columnName;
+
+public:
+  NewNoteLevelUndo(TXshSoundTextColumn *soundtextColumn, int col,
+                   QString columnName)
+      : m_soundtextColumn(soundtextColumn)
+      , m_col(col)
+      , m_columnName(columnName) {}
+
+  void undo() const override {
+    TApp *app    = TApp::instance();
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    xsh->removeColumn(m_col);
+    app->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  void redo() const override {
+    TApp *app    = TApp::instance();
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    xsh->insertColumn(m_col, m_soundtextColumn.getPointer());
+
+    TStageObject *obj = xsh->getStageObject(TStageObjectId::ColumnId(m_col));
+    std::string str   = m_columnName.toStdString();
+    obj->setName(str);
+
+    app->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override { return QObject::tr("New Note Level"); }
+
+  int getHistoryType() override { return HistoryType::Xsheet; }
+};
+
+//============================================================
+
+static void newNoteLevel() {
+  TTool::Application *app = TTool::getApplication();
+  TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
+  int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+  TXshSoundTextColumn *textSoundCol = new TXshSoundTextColumn();
+
+  textSoundCol->setXsheet(xsh);
+  QList<QString> textList;
+  textList << " ";
+  textSoundCol->createSoundTextLevel(0, textList);
+  xsh->insertColumn(col, textSoundCol);
+
+  // name the level a unique NoteLevel number
+  TStageObjectTree *objects = xsh->getStageObjectTree();
+  int objectCount           = objects->getStageObjectCount();
+  int maxTextColumns        = 1;
+  for (int i = 0; i < objectCount; i++) {
+    TStageObject *object = objects->getStageObject(i);
+    std::string objName  = object->getName();
+    int pos              = objName.find("NoteLevel");
+    if (pos != std::string::npos && pos == 0) {
+      std::string currStrCount = objName.substr(9);
+      bool ok;
+      int currCount = QString::fromStdString(currStrCount).toInt(&ok);
+      if (ok && currCount >= maxTextColumns) {
+        maxTextColumns = currCount + 1;
+      }
+    }
+  }
+  TStageObject *obj = xsh->getStageObject(TStageObjectId::ColumnId(col));
+  QString str       = "NoteLevel" + QString::number(maxTextColumns);
+  obj->setName(str.toStdString());
+
+  TUndoManager::manager()->add(new NewNoteLevelUndo(textSoundCol, col, str));
+}
+
+//============================================================
+
+class NewNoteLevelCommand final : public MenuItemHandler {
+public:
+  NewNoteLevelCommand() : MenuItemHandler(MI_NewNoteLevel) {}
+  void execute() override { XshCmd::newNoteLevel(); }
+} NewNoteLevelCommand;
 
 //============================================================
 
