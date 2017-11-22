@@ -501,42 +501,15 @@ void LevelMoverTool::onCellChange(int row, int col) {
   if (pos.y < 0) pos.y = 0;
   if (pos.x < 0) pos.x = 0;
 
-  TPoint delta = pos - m_aimedPos;
-  int dCol;
-  if (o->isVerticalTimeline()) {
-    dCol = delta.x;
-    if (origX < 0) dCol += origX;
-  } else {
-    dCol = delta.y;
-    if (origY < 0) dCol += origY;
-  }
+  TPoint delta                       = pos - m_aimedPos;
+  int dCol                           = delta.x;
+  if (!o->isVerticalTimeline()) dCol = delta.y;
 
   CellsMover *cellsMover = m_undo->getCellsMover();
   std::set<int> ii;
   TRect currSelection(m_aimedPos, m_range);
-  if (o->isVerticalTimeline()) {
-    int newBegin = currSelection.x0 + dCol;
-    if (newBegin < 0) {
-      newBegin *= -1;
-      for (int x = 0; x < newBegin; x++) ii.insert(x);
-      ColumnCmd::insertEmptyColumns(ii);
-      m_lastPos += TPoint(newBegin, 0);
-      m_startPos += TPoint(newBegin, 0);
-      m_aimedPos += TPoint(newBegin, 0);
-      cellsMover->setStartPos(cellsMover->getStartPos() + TPoint(newBegin, 0));
-      cellsMover->setPos(cellsMover->getPos() + TPoint(newBegin, 0));
-      //      getViewer()->setCurrentColumn(getViewer()->getCurrentColumn() +
-      //      newBegin);
-      pos.x = origX + newBegin;
-    } else {
-      int maxX   = xsh->getColumnCount() - 1;
-      int newEnd = currSelection.x1 + dCol;
-      if (newEnd > maxX) {
-        for (int x = maxX + 1; x <= newEnd; x++) ii.insert(x);
-        ColumnCmd::insertEmptyColumns(ii);
-      }
-    }
-  } else {
+  if (!o->isVerticalTimeline()) {
+    if (origY < 0) dCol += origY;
     int newBegin = currSelection.y0 + dCol;
     if (newBegin < 0) {
       newBegin *= -1;

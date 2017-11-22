@@ -1615,30 +1615,32 @@ public:
     int origCol      = col;
     if (col < 0) col = 0;
     int dCol         = col - (m_lastCol - m_offset);
-    if (origCol < 0) dCol += origCol;
 
-    std::set<int> ii;
-    int newBegin = *indices.begin() + dCol;
-    if (newBegin < 0) {
-      newBegin *= -1;
-      for (int x = 0; x < newBegin; x++) ii.insert(x);
-      ColumnCmd::insertEmptyColumns(ii);
-      selection->selectNone();
-      for (std::set<int>::const_iterator it = indices.begin();
-           it != indices.end(); it++)
-        selection->selectColumn(*it + newBegin, true);
-      indices = selection->getIndices();
-      col     = origCol + newBegin;
-      m_lastCol += newBegin;
-      m_firstCol += newBegin;
-      int currentIndx = app->getCurrentColumn()->getColumnIndex();
-      app->getCurrentColumn()->setColumnIndex(currentIndx + newBegin);
-    } else {
-      int currEnd = xsh->getColumnCount() - 1;
-      int newEnd  = *indices.rbegin() + dCol;
-      if (newEnd > currEnd) {
-        for (int x = currEnd + 1; x <= newEnd; x++) ii.insert(x);
+    if (!getViewer()->orientation()->isVerticalTimeline()) {
+      if (origCol < 0) dCol += origCol;
+      std::set<int> ii;
+      int newBegin = *indices.begin() + dCol;
+      if (newBegin < 0) {
+        newBegin *= -1;
+        for (int x = 0; x < newBegin; x++) ii.insert(x);
         ColumnCmd::insertEmptyColumns(ii);
+        selection->selectNone();
+        for (std::set<int>::const_iterator it = indices.begin();
+             it != indices.end(); it++)
+          selection->selectColumn(*it + newBegin, true);
+        indices = selection->getIndices();
+        col     = origCol + newBegin;
+        m_lastCol += newBegin;
+        m_firstCol += newBegin;
+        int currentIndx = app->getCurrentColumn()->getColumnIndex();
+        app->getCurrentColumn()->setColumnIndex(currentIndx + newBegin);
+      } else {
+        int currEnd = xsh->getColumnCount() - 1;
+        int newEnd  = *indices.rbegin() + dCol;
+        if (newEnd > currEnd) {
+          for (int x = currEnd + 1; x <= newEnd; x++) ii.insert(x);
+          ColumnCmd::insertEmptyColumns(ii);
+        }
       }
     }
 
