@@ -142,6 +142,14 @@
         <source>Smooth:</source>
         <translation>Suavizado:</translation>
     </message>
+    <message>
+        <source>Range:</source>
+        <translation>Rango:</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>Adherencia</translation>
+    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>
