@@ -2247,9 +2247,13 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_PickScreen", tr("Pick Screen"), "");
   createToolOptionsAction("A_ToolOption_Meshify", tr("Create Mesh"), "");
 
+  createToolOptionsAction("A_ToolOption_AutopaintLines",
+                          tr("Fill Tool - Autopaint Lines"), "");
+
   /*-- FillAreas, FillLinesにキー1つで切り替えるためのコマンド --*/
   createAction(MI_FillAreas, tr("Fill Tool - Areas"), "", ToolCommandType);
   createAction(MI_FillLines, tr("Fill Tool - Lines"), "", ToolCommandType);
+
   /*-- Style picker Area, Style picker Lineににキー1つで切り替えるためのコマンド
    * --*/
   createAction(MI_PickStyleAreas, tr("Style Picker Tool - Areas"), "",

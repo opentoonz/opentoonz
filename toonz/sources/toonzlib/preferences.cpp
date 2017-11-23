@@ -332,6 +332,7 @@ Preferences::Preferences()
     , m_shortcutCommandsWhileRenamingCellEnabled(false)
     , m_xsheetLayoutPreference("Classic-revised")
     , m_loadedXsheetLayout("Classic-revised")
+    , m_pathAliasPriority(ProjectFolderOnly)
     , m_currentTimelineEnabled(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -643,6 +644,9 @@ Preferences::Preferences()
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
   getValue(*m_settings, "shortcutCommandsWhileRenamingCellEnabled",
            m_shortcutCommandsWhileRenamingCellEnabled);
+  int pathAliasPriority = static_cast<int>(m_pathAliasPriority);
+  getValue(*m_settings, "pathAliasPriority", pathAliasPriority);
+  m_pathAliasPriority = static_cast<PathAliasPriority>(pathAliasPriority);
 
   QString xsheetLayoutPreference;
   xsheetLayoutPreference =
@@ -1578,6 +1582,13 @@ void Preferences::enableShortcutCommandsWhileRenamingCell(bool on) {
   m_shortcutCommandsWhileRenamingCellEnabled = on;
   m_settings->setValue("shortcutCommandsWhileRenamingCellEnabled",
                        on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setPathAliasPriority(PathAliasPriority priority) {
+  m_pathAliasPriority = priority;
+  m_settings->setValue("pathAliasPriority", static_cast<int>(priority));
 }
 
 //-----------------------------------------------------------------

@@ -55,5 +55,6 @@
       <file>Resources/ex_rectangle.png</file>
       <file>Resources/ex_line.png</file>
       <file>Resources/ex_area.png</file>
+      <file>Resources/ex_fill_no_autopaint.png</file>
     </qresource>
 </RCC>

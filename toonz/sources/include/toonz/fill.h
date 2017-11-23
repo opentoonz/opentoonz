@@ -27,6 +27,7 @@ public:
   bool m_shiftFill;
   TPoint m_p;
   TPalette *m_palette;
+  bool m_prevailing;
 
   FillParameters()
       : m_styleId(0)
@@ -37,7 +38,8 @@ public:
       , m_maxFillDepth(0)
       , m_p()
       , m_shiftFill(false)
-      , m_palette(0) {}
+      , m_palette(0)
+      , m_prevailing(true) {}
   FillParameters(const FillParameters &params)
       : m_styleId(params.m_styleId)
       , m_fillType(params.m_fillType)
@@ -47,7 +49,8 @@ public:
       , m_maxFillDepth(params.m_maxFillDepth)
       , m_p(params.m_p)
       , m_shiftFill(params.m_shiftFill)
-      , m_palette(params.m_palette) {}
+      , m_palette(params.m_palette)
+      , m_prevailing(params.m_prevailing) {}
 };
 
 //=============================================================================

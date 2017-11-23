@@ -69,6 +69,8 @@ void fillArea(const TRasterCM32P &ras, TRegion *r, int colorId,
 void restoreColors(const TRasterCM32P &r,
                    const std::vector<std::pair<TPoint, int>> &seeds) {
   FillParameters params;
+  // in order to make the paint to protlude behind the line
+  params.m_prevailing = false;
   for (UINT i = 0; i < seeds.size(); i++) {
     params.m_p       = seeds[i].first;
     params.m_styleId = seeds[i].second;
@@ -232,6 +234,8 @@ void AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   // fillate.
   count1 = 0;
   FillParameters params;
+  // in order to make the paint to protlude behind the line
+  params.m_prevailing = false;
   if (r.x0 > 0)
     for (y = r.y0; y <= r.y1; y++) {
       params.m_p       = TPoint(r.x0, y);
