@@ -78,6 +78,12 @@ public:
 
   enum SnappingTarge { SnapStrokes, SnapGuides, SnapAll };
 
+  enum PathAliasPriority {
+    ProjectFolderAliases = 0,
+    SceneFolderAlias,
+    ProjectFolderOnly
+  };
+
 public:
   static Preferences *instance();
 
@@ -131,6 +137,9 @@ public:
 
   void enableWatchFileSystem(bool on);
   bool isWatchFileSystemEnabled() { return m_watchFileSystem; }
+
+  void setPathAliasPriority(PathAliasPriority priority);
+  PathAliasPriority getPathAliasPriority() const { return m_pathAliasPriority; }
 
   // Interface  tab
 
@@ -629,6 +638,9 @@ private:
 
   QString m_xsheetLayoutPreference,
       m_loadedXsheetLayout;  // Classic, Classic-revised, compact
+
+  // defines which alias to be used if both are possible on coding file path
+  PathAliasPriority m_pathAliasPriority;
 
   bool m_currentTimelineEnabled;
 

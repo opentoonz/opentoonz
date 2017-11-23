@@ -470,7 +470,7 @@ class FillToolOptionsBox final : public ToolOptionsBox {
   QLabel *m_fillDepthLabel;
   ToolOptionCombo *m_colorMode, *m_toolType;
   ToolOptionCheckbox *m_selectiveMode, *m_segmentMode, *m_onionMode,
-      *m_multiFrameMode;
+      *m_multiFrameMode, *m_autopaintMode;
   ToolOptionPairSlider *m_fillDepthField;
 
 public:

@@ -78,12 +78,13 @@ enum {
   RulerNewCursor,
 
   // extra options for decorating the cursor
-  Ex_Negate    = 0x100,  // used for black bg
-  Ex_FreeHand  = 0x200,
-  Ex_PolyLine  = 0x400,
-  Ex_Rectangle = 0x800,
-  Ex_Line      = 0x1000,
-  Ex_Area      = 0x2000
+  Ex_Negate           = 0x100,  // used for black bg
+  Ex_FreeHand         = 0x200,
+  Ex_PolyLine         = 0x400,
+  Ex_Rectangle        = 0x800,
+  Ex_Line             = 0x1000,
+  Ex_Area             = 0x2000,
+  Ex_Fill_NoAutopaint = 0x4000
 };
 
 }  // namespace

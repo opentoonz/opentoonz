@@ -1618,6 +1618,8 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Onion Skin"));
   m_multiFrameMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Frame Range"));
+  m_autopaintMode =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Autopaint Lines"));
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged()));
@@ -1637,6 +1639,7 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
     if (m_toolType->currentText() == QString("Normal") ||
         m_multiFrameMode->isChecked())
       m_onionMode->setEnabled(false);
+    m_autopaintMode->setEnabled(false);
   }
   if (m_toolType->currentText().toStdWString() != L"Normal") {
     if (m_segmentMode) m_segmentMode->setEnabled(false);
@@ -1660,6 +1663,7 @@ void FillToolOptionsBox::updateStatus() {
 void FillToolOptionsBox::onColorModeChanged() {
   bool enabled = m_colorMode->currentText() != QString("Lines");
   m_selectiveMode->setEnabled(enabled);
+  m_autopaintMode->setEnabled(enabled);
   if (m_fillDepthLabel && m_fillDepthField) {
     m_fillDepthLabel->setEnabled(enabled);
     m_fillDepthField->setEnabled(enabled);

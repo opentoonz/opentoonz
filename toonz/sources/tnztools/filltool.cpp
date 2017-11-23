@@ -720,7 +720,8 @@ bool inline hasAutoInks(const TPalette *plt) {
 
 void fillAreaWithUndo(const TImageP &img, const TRectD &area, TStroke *stroke,
                       bool onlyUnfilled, std::wstring colorType,
-                      TXshSimpleLevel *sl, const TFrameId &fid, int cs) {
+                      TXshSimpleLevel *sl, const TFrameId &fid, int cs,
+                      bool autopaintLines) {
   TRectD selArea = stroke ? stroke->getBBox() : area;
 
   if (TToonzImageP ti = img) {
@@ -744,8 +745,10 @@ void fillAreaWithUndo(const TImageP &img, const TRectD &area, TStroke *stroke,
       filler.strokeFill(stroke, cs, onlyUnfilled, colorType != LINES,
                         colorType != AREAS);
 
-    TPalette *plt                     = ti->getPalette();
-    if (plt && !hasAutoInks(plt)) plt = 0;
+    TPalette *plt = ti->getPalette();
+
+    // !autopaintLines will temporary disable autopaint line feature
+    if ((plt && !hasAutoInks(plt)) || !autopaintLines) plt = 0;
 
     std::set<int> autoInks;
     autoInks.insert(3);
@@ -809,7 +812,8 @@ void fillAreaWithUndo(const TImageP &img, const TRectD &area, TStroke *stroke,
 //-----------------------------------------------------------------------------
 
 void doFill(const TImageP &img, const TPointD &pos, FillParameters &params,
-            bool isShiftFill, TXshSimpleLevel *sl, const TFrameId &fid) {
+            bool isShiftFill, TXshSimpleLevel *sl, const TFrameId &fid,
+            bool autopaintLines) {
   TTool::Application *app = TTool::getApplication();
   if (!app) return;
 
@@ -850,7 +854,8 @@ void doFill(const TImageP &img, const TPointD &pos, FillParameters &params,
       return;
     }
 
-    if (plt && hasAutoInks(plt)) params.m_palette = plt;
+    // !autoPaintLines will temporary disable autopaint line feature
+    if (plt && hasAutoInks(plt) && autopaintLines) params.m_palette = plt;
 
     if (params.m_fillType == ALL || params.m_fillType == AREAS) {
       if (isShiftFill) {
@@ -978,17 +983,20 @@ class MultiAreaFiller final : public SequencePainter {
   std::wstring m_colorType;
   TVectorImageP m_firstImage, m_lastImage;
   int m_styleIndex;
+  bool m_autopaintLines;
 
 public:
   MultiAreaFiller(const TRectD &firstRect, const TRectD &lastRect,
-                  bool unfilledOnly, std::wstring colorType, int styleIndex)
+                  bool unfilledOnly, std::wstring colorType, int styleIndex,
+                  bool autopaintLines)
       : m_firstRect(firstRect)
       , m_lastRect(lastRect)
       , m_unfilledOnly(unfilledOnly)
       , m_colorType(colorType)
       , m_firstImage()
       , m_lastImage()
-      , m_styleIndex(styleIndex) {}
+      , m_styleIndex(styleIndex)
+      , m_autopaintLines(autopaintLines) {}
 
   ~MultiAreaFiller() {
     if (m_firstImage) {
@@ -998,12 +1006,14 @@ public:
   }
 
   MultiAreaFiller(TStroke *&firstStroke, TStroke *&lastStroke,
-                  bool unfilledOnly, std::wstring colorType, int styleIndex)
+                  bool unfilledOnly, std::wstring colorType, int styleIndex,
+                  bool autopaintLines)
       : m_firstRect()
       , m_lastRect()
       , m_unfilledOnly(unfilledOnly)
       , m_colorType(colorType)
-      , m_styleIndex(styleIndex) {
+      , m_styleIndex(styleIndex)
+      , m_autopaintLines(autopaintLines) {
     m_firstImage = new TVectorImage();
     m_lastImage  = new TVectorImage();
     m_firstImage->addStroke(firstStroke);
@@ -1017,14 +1027,16 @@ public:
       TPointD p1 = m_firstRect.getP11() * (1 - t) + m_lastRect.getP11() * t;
       TRectD rect(p0.x, p0.y, p1.x, p1.y);
       fillAreaWithUndo(img, rect, 0, m_unfilledOnly, m_colorType, sl, fid,
-                       m_styleIndex);
+                       m_styleIndex, m_autopaintLines);
     } else {
       if (t == 0)
         fillAreaWithUndo(img, TRectD(), m_firstImage->getStroke(0),
-                         m_unfilledOnly, m_colorType, sl, fid, m_styleIndex);
+                         m_unfilledOnly, m_colorType, sl, fid, m_styleIndex,
+                         m_autopaintLines);
       else if (t == 1)
         fillAreaWithUndo(img, TRectD(), m_lastImage->getStroke(0),
-                         m_unfilledOnly, m_colorType, sl, fid, m_styleIndex);
+                         m_unfilledOnly, m_colorType, sl, fid, m_styleIndex,
+                         m_autopaintLines);
       else
       // if(t>1)
       {
@@ -1037,7 +1049,8 @@ public:
         assert(vi->getStrokeCount() == 1);
 
         fillAreaWithUndo(img, TRectD(), vi->getStroke(0) /*, imgloc*/,
-                         m_unfilledOnly, m_colorType, sl, fid, m_styleIndex);
+                         m_unfilledOnly, m_colorType, sl, fid, m_styleIndex,
+                         m_autopaintLines);
       }
     }
   }
@@ -1050,15 +1063,19 @@ public:
 class MultiFiller final : public SequencePainter {
   TPointD m_firstPoint, m_lastPoint;
   FillParameters m_params;
+  bool m_autopaintLines;
 
 public:
   MultiFiller(const TPointD &firstPoint, const TPointD &lastPoint,
-              const FillParameters &params)
-      : m_firstPoint(firstPoint), m_lastPoint(lastPoint), m_params(params) {}
+              const FillParameters &params, bool autopaintLines)
+      : m_firstPoint(firstPoint)
+      , m_lastPoint(lastPoint)
+      , m_params(params)
+      , m_autopaintLines(autopaintLines) {}
   void process(TImageP img, double t, TXshSimpleLevel *sl,
                const TFrameId &fid) override {
     TPointD p = m_firstPoint * (1 - t) + m_lastPoint * t;
-    doFill(img, p, m_params, false, sl, fid);
+    doFill(img, p, m_params, false, sl, fid, m_autopaintLines);
   }
 };
 
@@ -1126,6 +1143,7 @@ private:
   TPointD m_mousePosition;
   bool m_onion;
   bool m_isLeftButtonPressed;
+  bool m_autopaintLines;
 
 public:
   AreaFillTool(TTool *parent)
@@ -1147,7 +1165,8 @@ public:
       , m_thick(0.5)
       , m_mousePosition()
       , m_onion(false)
-      , m_isLeftButtonPressed(false) {}
+      , m_isLeftButtonPressed(false)
+      , m_autopaintLines(true) {}
 
   void draw() {
     m_thick = m_parent->getPixelSize() / 2.0;
@@ -1272,7 +1291,7 @@ public:
     {
       if (m_firstFrameSelected) {
         MultiAreaFiller filler(m_firstStroke, stroke, m_onlyUnfilled,
-                               m_colorType, styleIndex);
+                               m_colorType, styleIndex, m_autopaintLines);
         filler.processSequence(m_level.getPointer(), m_firstFrameId,
                                m_parent->getCurrentFid());
         m_parent->invalidate(m_selectingRect.enlarge(2));
@@ -1304,7 +1323,8 @@ public:
       } else
         fillAreaWithUndo(m_parent->getImage(true), TRectD(), stroke,
                          m_onlyUnfilled, m_colorType, m_level.getPointer(),
-                         m_parent->getCurrentFid(), styleIndex);
+                         m_parent->getCurrentFid(), styleIndex,
+                         m_autopaintLines);
       TTool *t = app->getCurrentTool()->getTool();
       if (t) t->notifyImageChanged();
     }
@@ -1355,7 +1375,7 @@ public:
       if (m_frameRange) {
         if (m_firstFrameSelected) {
           MultiAreaFiller filler(m_firstRect, m_selectingRect, m_onlyUnfilled,
-                                 m_colorType, styleIndex);
+                                 m_colorType, styleIndex, m_autopaintLines);
           filler.processSequence(m_level.getPointer(), m_firstFrameId,
                                  m_parent->getCurrentFid());
           m_parent->invalidate(m_selectingRect.enlarge(2));
@@ -1385,7 +1405,8 @@ public:
         } else
           fillAreaWithUndo(m_parent->getImage(true), m_selectingRect, 0,
                            m_onlyUnfilled, m_colorType, m_level.getPointer(),
-                           m_parent->getCurrentFid(), styleIndex);
+                           m_parent->getCurrentFid(), styleIndex,
+                           m_autopaintLines);
         m_parent->invalidate();
         m_selectingRect.empty();
         TTool *t = app->getCurrentTool()->getTool();
@@ -1412,7 +1433,7 @@ public:
       {
         if (m_firstFrameSelected) {
           MultiAreaFiller filler(m_firstStroke, stroke, m_onlyUnfilled,
-                                 m_colorType, styleIndex);
+                                 m_colorType, styleIndex, m_autopaintLines);
           filler.processSequence(m_level.getPointer(), m_firstFrameId,
                                  m_parent->getCurrentFid());
           m_parent->invalidate(m_selectingRect.enlarge(2));
@@ -1445,10 +1466,10 @@ public:
                            osMask, m_level.getPointer(),
                            m_parent->getCurrentFid());
         } else
-          fillAreaWithUndo(m_parent->getImage(true), TRectD(),
-                           stroke /*, imageLocation*/, m_onlyUnfilled,
-                           m_colorType, m_level.getPointer(),
-                           m_parent->getCurrentFid(), styleIndex);
+          fillAreaWithUndo(
+              m_parent->getImage(true), TRectD(), stroke /*, imageLocation*/,
+              m_onlyUnfilled, m_colorType, m_level.getPointer(),
+              m_parent->getCurrentFid(), styleIndex, m_autopaintLines);
         delete stroke;
         TTool *t = app->getCurrentTool()->getTool();
         if (t) t->notifyImageChanged();
@@ -1481,12 +1502,13 @@ public:
 
   /*--Normal以外のTypeが選択された場合に呼ばれる--*/
   bool onPropertyChanged(bool multi, bool onlyUnfilled, bool onion, Type type,
-                         std::wstring colorType) {
-    m_frameRange   = multi;
-    m_onlyUnfilled = onlyUnfilled;
-    m_colorType    = colorType;
-    m_type         = type;
-    m_onion        = onion;
+                         std::wstring colorType, bool autopaintLines) {
+    m_frameRange     = multi;
+    m_onlyUnfilled   = onlyUnfilled;
+    m_colorType      = colorType;
+    m_type           = type;
+    m_onion          = onion;
+    m_autopaintLines = autopaintLines;
 
     if (m_frameRange) resetMulti();
 
@@ -1593,7 +1615,7 @@ public:
         TPixelCM32 pix = ras->pixels(ipos.y)[ipos.x];
         if (pix.getInk() == styleId || pix.isPurePaint()) continue;
         doFill(img, tmpPos, params, e.isShiftPressed(), sl,
-               m_parent->getCurrentFid());
+               m_parent->getCurrentFid(), true);
       }
     } else /*-- 縦長の線分の場合 --*/
     {
@@ -1618,7 +1640,7 @@ public:
         TPixelCM32 pix = ras->pixels(ipos.y)[ipos.x];
         if (pix.getInk() == styleId || pix.isPurePaint()) continue;
         doFill(img, tmpPos, params, e.isShiftPressed(), sl,
-               m_parent->getCurrentFid());
+               m_parent->getCurrentFid(), true);
       }
     }
     m_isEditing = false;
@@ -1666,6 +1688,10 @@ class FillTool final : public TTool {
 #ifdef _DEBUG
   std::vector<TRect> m_rects;
 #endif
+
+  // For the raster fill tool, autopaint lines is optional and can be temporary
+  // disabled
+  TBoolProperty m_autopaintLines;
 
 public:
   FillTool(int targetType);
@@ -1716,7 +1742,8 @@ FillTool::FillTool(int targetType)
     , m_segment("Segment", false)
     , m_onionStyleId(0)
     , m_currCell(-1, -1)
-    , m_firstTime(true) {
+    , m_firstTime(true)
+    , m_autopaintLines("Autopaint Lines", true) {
   m_rectFill           = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
 
@@ -1740,12 +1767,15 @@ FillTool::FillTool(int targetType)
   m_prop.bind(m_onion);
   m_prop.bind(m_frameRange);
 
+  if (targetType == TTool::ToonzImage) m_prop.bind(m_autopaintLines);
+
   m_selective.setId("Selective");
   m_onion.setId("OnionSkin");
   m_frameRange.setId("FrameRange");
   m_segment.setId("SegmentInk");
   m_fillType.setId("Type");
   m_colorType.setId("Mode");
+  m_autopaintLines.setId("AutopaintLines");
 }
 //-----------------------------------------------------------------------------
 
@@ -1756,6 +1786,8 @@ int FillTool::getCursorId() const {
   else {
     ret                                      = ToolCursor::FillCursor;
     if (m_colorType.getValue() == AREAS) ret = ret | ToolCursor::Ex_Area;
+    if (!m_autopaintLines.getValue())
+      ret = ret | ToolCursor::Ex_Fill_NoAutopaint;
   }
   if (m_fillType.getValue() == FREEHANDFILL)
     ret = ret | ToolCursor::Ex_FreeHand;
@@ -1779,6 +1811,7 @@ void FillTool::updateTranslation() {
   m_onion.setQStringName(tr("Onion Skin"));
   m_fillDepth.setQStringName(tr("Fill Depth"));
   m_segment.setQStringName(tr("Segment"));
+  m_autopaintLines.setQStringName(tr("Autopaint Lines"));
 }
 
 //-----------------------------------------------------------------------------
@@ -1828,7 +1861,8 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     } else {
       // SECONDO CLICK
       TFrameId fid = getCurrentFid();
-      MultiFiller filler(m_firstPoint, pos, params);
+      MultiFiller filler(m_firstPoint, pos, params,
+                         m_autopaintLines.getValue());
       filler.processSequence(m_level.getPointer(), m_firstFrameId, fid);
       if (e.isShiftPressed()) {
         m_firstPoint   = pos;
@@ -1852,7 +1886,8 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       TXshLevel *xl = app->getCurrentLevel()->getLevel();
       m_level       = xl ? xl->getSimpleLevel() : 0;
       doFill(getImage(true), pos, params, e.isShiftPressed(),
-             m_level.getPointer(), getCurrentFid());
+             m_level.getPointer(), getCurrentFid(),
+             m_autopaintLines.getValue());
       invalidate();
     }
   }
@@ -1901,7 +1936,7 @@ void FillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     } else
       return;
     doFill(img, pos, params, e.isShiftPressed(), m_level.getPointer(),
-           getCurrentFid());
+           getCurrentFid(), m_autopaintLines.getValue());
     invalidate();
   }
 }
@@ -1915,7 +1950,7 @@ void FillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     else if (m_onionStyleId > 0) {
       FillParameters tmp = getFillParameters();
       doFill(getImage(true), pos, tmp, e.isShiftPressed(), m_level.getPointer(),
-             getCurrentFid());
+             getCurrentFid(), m_autopaintLines.getValue());
       invalidate();
     }
   } else if (m_fillType.getValue() != NORMALFILL) {
@@ -1997,6 +2032,10 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
     if (m_segment.getValue()) FillType = ::to_string(m_fillType.getValue());
     FillSegment                        = (int)(m_segment.getValue());
   }
+  // Autopaint
+  else if (propertyName == m_autopaintLines.getName()) {
+    rectPropChangedflag = true;
+  }
 
   /*--- fillType, frameRange, selective, colorTypeが変わったとき ---*/
   if (rectPropChangedflag && m_fillType.getValue() != NORMALFILL) {
@@ -2010,9 +2049,9 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
     else
       assert(false);
 
-    m_rectFill->onPropertyChanged(m_frameRange.getValue(),
-                                  m_selective.getValue(), m_onion.getValue(),
-                                  type, m_colorType.getValue());
+    m_rectFill->onPropertyChanged(
+        m_frameRange.getValue(), m_selective.getValue(), m_onion.getValue(),
+        type, m_colorType.getValue(), m_autopaintLines.getValue());
   }
 
   return true;
@@ -2154,9 +2193,9 @@ void FillTool::onActivate() {
       else
         assert(false);
 
-      m_rectFill->onPropertyChanged(m_frameRange.getValue(),
-                                    m_selective.getValue(), m_onion.getValue(),
-                                    type, m_colorType.getValue());
+      m_rectFill->onPropertyChanged(
+          m_frameRange.getValue(), m_selective.getValue(), m_onion.getValue(),
+          type, m_colorType.getValue(), m_autopaintLines.getValue());
     }
   }
 

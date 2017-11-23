@@ -132,6 +132,9 @@ void ToolOptionCheckbox::doClick(bool checked) {
   setChecked(checked);
   m_property->setValue(checked);
   notifyTool();
+
+  // for updating a cursor without any effect to the tool options
+  m_toolHandle->notifyToolCursorTypeChanged();
 }
 
 //=============================================================================

@@ -341,10 +341,10 @@ void PreferencesPopup::onRoomChoiceChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onDropdownShortcutsCycleOptionsChanged(int index) {
-	m_pref->setDropdownShortcutsCycleOptions(index);
+  m_pref->setDropdownShortcutsCycleOptions(index);
 }
 
-  //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 void PreferencesPopup::onInterfaceFontChanged(int index) {
   QString font = m_interfaceFont->currentText();
@@ -1120,6 +1120,15 @@ void PreferencesPopup::onWatchFileSystemClicked(int on) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onPathAliasPriorityChanged(int index) {
+  m_pref->setPathAliasPriority(
+      static_cast<Preferences::PathAliasPriority>(index));
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "PathAliasPriority");
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onShowCurrentTimelineChanged(int index) {
   m_pref->enableCurrentTimelineIndicator(index == Qt::Checked);
 }
@@ -1179,6 +1188,8 @@ PreferencesPopup::PreferencesPopup()
   m_customProjectRootLabel     = new QLabel(tr("Custom Project Path(s): "));
   m_projectRootDirections      = new QLabel(
       tr("Advanced: Multiple paths can be separated by ** (No Spaces)"));
+
+  QComboBox *pathAliasPriority = new QComboBox();
 
   QLabel *note_general =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
@@ -1351,7 +1362,10 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *showColumnNumbersCB =
       new CheckBox(tr("Show Column Numbers in Column Headers"), this);
   QStringList xsheetLayouts;
-  xsheetLayouts << tr("Classic") << tr("Classic-revised") << tr("Compact");
+  // options should not be translatable as they are used as key strings
+  xsheetLayouts << "Classic"
+                << "Classic-revised"
+                << "Compact";
   QComboBox *xsheetLayoutOptions = new QComboBox(this);
   xsheetLayoutOptions->addItems(xsheetLayouts);
   xsheetLayoutOptions->setCurrentIndex(
@@ -1450,6 +1464,19 @@ PreferencesPopup::PreferencesPopup()
     m_customProjectRootLabel->hide();
     m_projectRootDirections->hide();
   }
+
+  QStringList pathAliasPriorityList;
+  pathAliasPriorityList
+      << tr("Project Folder Aliases (+drawings, +scenes, etc.)")
+      << tr("Scene Folder Alias ($scenefolder)")
+      << tr("Use Project Folder Aliases Only");
+  pathAliasPriority->addItems(pathAliasPriorityList);
+  pathAliasPriority->setCurrentIndex(
+      static_cast<int>(m_pref->getPathAliasPriority()));
+  pathAliasPriority->setToolTip(
+      tr("This option defines which alias to be used\nif both are possible on "
+         "coding file path."));
+
   //--- Interface ------------------------------
   QStringList styleSheetList;
   currentIndex = 0;
@@ -1814,6 +1841,18 @@ PreferencesPopup::PreferencesPopup()
       }
       projectGroupBox->setLayout(projectRootLay);
       generalFrameLay->addWidget(projectGroupBox, 0);
+
+      QHBoxLayout *pathAliasLay = new QHBoxLayout();
+      pathAliasLay->setMargin(0);
+      pathAliasLay->setSpacing(5);
+      {
+        QLabel *PAPLabel = new QLabel(tr("Path Alias Priority:"), this);
+        PAPLabel->setToolTip(pathAliasPriority->toolTip());
+        pathAliasLay->addWidget(PAPLabel, 0);
+        pathAliasLay->addWidget(pathAliasPriority, 0);
+        pathAliasLay->addStretch(1);
+      }
+      generalFrameLay->addLayout(pathAliasLay, 0);
       generalFrameLay->addStretch(1);
 
       generalFrameLay->addWidget(note_general, 0);
@@ -2422,6 +2461,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onProjectRootChanged()));
   ret = ret && connect(m_projectRootCustom, SIGNAL(stateChanged(int)),
                        SLOT(onProjectRootChanged()));
+  ret = ret && connect(pathAliasPriority, SIGNAL(currentIndexChanged(int)),
+                       SLOT(onPathAliasPriorityChanged(int)));
+
   //--- Interface ----------------------
   ret = ret &&
         connect(styleSheetType, SIGNAL(currentIndexChanged(const QString &)),

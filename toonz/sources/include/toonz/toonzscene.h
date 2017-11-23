@@ -256,6 +256,9 @@ If \b scene is in +scenes/name.tnz return name,
   void setVersionNumber(VersionNumber version) { m_versionNumber = version; }
   VersionNumber getVersionNumber() { return m_versionNumber; }
 
+  // if the path is codable with $scenefolder alias, replace it and return true
+  bool codeFilePathWithSceneFolder(TFilePath &path) const;
+
 private:
   TFilePath m_scenePath;  //!< Full path to the scene file (.tnz).
 
