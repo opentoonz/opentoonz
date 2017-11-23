@@ -126,11 +126,11 @@ that will be available as long as the rendering context exists.</li>
 <li>Define a macro or function called <tt>glewGetContext()</tt> that
 returns a pointer to the <tt>GLEWContext</tt> object associated with
 the rendering context from which OpenGL/WGL/GLX calls are issued. This
-dispatch mechanism is primitive, but generic.
+dispatch mechanism is primitive, but generic.</li>
 <li>Make sure that you call <tt>glewInit()</tt> after creating the
 <tt>GLEWContext</tt> object in each rendering context.  Note, that the
 <tt>GLEWContext</tt> pointer returned by <tt>glewGetContext()</tt> has
-to reside in global or thread-local memory.
+to reside in global or thread-local memory.</li>
 </ol>
 
 <p>Note that according to the <a
