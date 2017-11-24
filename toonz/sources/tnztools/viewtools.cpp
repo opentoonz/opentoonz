@@ -207,9 +207,11 @@ public:
     if (m_cameraCentered.getValue())
       m_center = TPointD(0, 0);
     else {
-      TAffine aff = m_viewer->getViewMatrix().inv();
-      u           = u * sqrt(aff.det());
-      m_center    = aff * TPointD(0, 0);
+      TAffine aff                        = m_viewer->getViewMatrix().inv();
+      if (m_viewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
+      if (m_viewer->getIsFlippedY()) aff = aff * TScale(1, -1);
+      u                                  = u * sqrt(aff.det());
+      m_center                           = aff * TPointD(0, 0);
     }
     tglDrawSegment(TPointD(-u + m_center.x, m_center.y),
                    TPointD(u + m_center.x, m_center.y));

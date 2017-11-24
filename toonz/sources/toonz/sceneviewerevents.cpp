@@ -1041,6 +1041,16 @@ public:
     return true;
   }
 
+  bool setFlipX() override {
+    static_cast<SceneViewer *>(getWidget())->flipX();
+    return true;
+  }
+
+  bool setFlipY() override {
+    static_cast<SceneViewer *>(getWidget())->flipY();
+    return true;
+  }
+
   bool toggleFullScreen(bool quit) override {
     if (ImageUtils::FullScreenWidget *fsWidget =
             dynamic_cast<ImageUtils::FullScreenWidget *>(

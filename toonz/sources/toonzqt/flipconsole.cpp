@@ -1486,6 +1486,8 @@ void FlipConsole::doButtonPressed(UINT button) {
     return;
 
   case ePause:
+    if (!m_playbackExecutor.isRunning() && !m_isLinkedPlaying) return;
+
     m_isLinkedPlaying = false;
 
     if (m_playbackExecutor.isRunning()) m_playbackExecutor.abort();

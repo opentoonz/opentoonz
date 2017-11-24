@@ -341,10 +341,10 @@ void PreferencesPopup::onRoomChoiceChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onDropdownShortcutsCycleOptionsChanged(int index) {
-	m_pref->setDropdownShortcutsCycleOptions(index);
+  m_pref->setDropdownShortcutsCycleOptions(index);
 }
 
-  //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 void PreferencesPopup::onInterfaceFontChanged(int index) {
   QString font = m_interfaceFont->currentText();
@@ -1075,6 +1075,12 @@ void PreferencesPopup::onShowXSheetToolbarClicked(bool checked) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onSyncLevelRenumberWithXsheetChanged(int checked) {
+  m_pref->enableSyncLevelRenumberWithXsheet(checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onExpandFunctionHeaderClicked(bool checked) {
   m_pref->enableExpandFunctionHeader(checked);
 }
@@ -1116,6 +1122,15 @@ void PreferencesPopup::onWatchFileSystemClicked(int on) {
   // emit signal to update behavior of the File browser
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
       "WatchFileSystem");
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onPathAliasPriorityChanged(int index) {
+  m_pref->setPathAliasPriority(
+      static_cast<Preferences::PathAliasPriority>(index));
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "PathAliasPriority");
 }
 
 //-----------------------------------------------------------------------------
@@ -1162,7 +1177,6 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *replaceAfterSaveLevelAsCB =
       new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
 
-  m_cellsDragBehaviour = new QComboBox();
   m_undoMemorySize =
       new DVGui::IntLineEdit(this, m_pref->getUndoMemorySize(), 0, 2000);
   m_levelsBackup = new CheckBox(tr("Backup Animation Levels when Saving"));
@@ -1180,6 +1194,8 @@ PreferencesPopup::PreferencesPopup()
   m_customProjectRootLabel     = new QLabel(tr("Custom Project Path(s): "));
   m_projectRootDirections      = new QLabel(
       tr("Advanced: Multiple paths can be separated by ** (No Spaces)"));
+
+  QComboBox *pathAliasPriority = new QComboBox();
 
   QLabel *note_general =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
@@ -1346,13 +1362,19 @@ PreferencesPopup::PreferencesPopup()
   m_showXSheetToolbar = new QGroupBox(tr("Show Toolbar in the XSheet "), this);
   m_showXSheetToolbar->setCheckable(true);
   m_expandFunctionHeader = new CheckBox(
-      tr("Expand Function Editor Header to Match XSheet Toolbar Height "
+      tr("Expand Function Editor Header to Match Xsheet Toolbar Height "
          "(Requires Restart)"),
       this);
   CheckBox *showColumnNumbersCB =
       new CheckBox(tr("Show Column Numbers in Column Headers"), this);
+  m_syncLevelRenumberWithXsheet = new CheckBox(
+      tr("Sync Level Strip Drawing Number Changes with the Xsheet"));
+
   QStringList xsheetLayouts;
-  xsheetLayouts << tr("Classic") << tr("Classic-revised") << tr("Compact");
+  // options should not be translatable as they are used as key strings
+  xsheetLayouts << "Classic"
+                << "Classic-revised"
+                << "Compact";
   QComboBox *xsheetLayoutOptions = new QComboBox(this);
   xsheetLayoutOptions->addItems(xsheetLayouts);
   xsheetLayoutOptions->setCurrentIndex(
@@ -1433,10 +1455,6 @@ PreferencesPopup::PreferencesPopup()
   replaceAfterSaveLevelAsCB->setChecked(
       m_pref->isReplaceAfterSaveLevelAsEnabled());
 
-  QStringList dragCellsBehaviourList;
-  dragCellsBehaviourList << tr("Cells Only") << tr("Cells and Column Data");
-  m_cellsDragBehaviour->addItems(dragCellsBehaviourList);
-  m_cellsDragBehaviour->setCurrentIndex(m_pref->getDragCellsBehaviour());
   m_levelsBackup->setChecked(m_pref->isLevelsBackupEnabled());
   sceneNumberingCB->setChecked(m_pref->isSceneNumberingEnabled());
   watchFileSystemCB->setChecked(m_pref->isWatchFileSystemEnabled());
@@ -1455,6 +1473,19 @@ PreferencesPopup::PreferencesPopup()
     m_customProjectRootLabel->hide();
     m_projectRootDirections->hide();
   }
+
+  QStringList pathAliasPriorityList;
+  pathAliasPriorityList
+      << tr("Project Folder Aliases (+drawings, +scenes, etc.)")
+      << tr("Scene Folder Alias ($scenefolder)")
+      << tr("Use Project Folder Aliases Only");
+  pathAliasPriority->addItems(pathAliasPriorityList);
+  pathAliasPriority->setCurrentIndex(
+      static_cast<int>(m_pref->getPathAliasPriority()));
+  pathAliasPriority->setToolTip(
+      tr("This option defines which alias to be used\nif both are possible on "
+         "coding file path."));
+
   //--- Interface ------------------------------
   QStringList styleSheetList;
   currentIndex = 0;
@@ -1683,6 +1714,8 @@ PreferencesPopup::PreferencesPopup()
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
+  m_syncLevelRenumberWithXsheet->setChecked(
+      m_pref->isSyncLevelRenumberWithXsheetEnabled());
   showCurrentTimelineCB->setChecked(
       m_pref->isCurrentTimelineIndicatorEnabled());
 
@@ -1819,6 +1852,18 @@ PreferencesPopup::PreferencesPopup()
       }
       projectGroupBox->setLayout(projectRootLay);
       generalFrameLay->addWidget(projectGroupBox, 0);
+
+      QHBoxLayout *pathAliasLay = new QHBoxLayout();
+      pathAliasLay->setMargin(0);
+      pathAliasLay->setSpacing(5);
+      {
+        QLabel *PAPLabel = new QLabel(tr("Path Alias Priority:"), this);
+        PAPLabel->setToolTip(pathAliasPriority->toolTip());
+        pathAliasLay->addWidget(PAPLabel, 0);
+        pathAliasLay->addWidget(pathAliasPriority, 0);
+        pathAliasLay->addStretch(1);
+      }
+      generalFrameLay->addLayout(pathAliasLay, 0);
       generalFrameLay->addStretch(1);
 
       generalFrameLay->addWidget(note_general, 0);
@@ -2208,15 +2253,15 @@ PreferencesPopup::PreferencesPopup()
 
         xsheetFrameLay->addWidget(m_showXSheetToolbar, 9, 0, 3, 3);
         xsheetFrameLay->addWidget(showColumnNumbersCB, 12, 0, 1, 2);
-        xsheetFrameLay->addWidget(showCurrentTimelineCB, 13, 0, 1, 2);
+        xsheetFrameLay->addWidget(m_syncLevelRenumberWithXsheet, 13, 0, 1, 2);
+        xsheetFrameLay->addWidget(showCurrentTimelineCB, 14, 0, 1, 2);
       }
       xsheetFrameLay->setColumnStretch(0, 0);
       xsheetFrameLay->setColumnStretch(1, 0);
       xsheetFrameLay->setColumnStretch(2, 1);
-      xsheetFrameLay->setRowStretch(14, 1);
+      xsheetFrameLay->setRowStretch(15, 1);
 
       xsheetBoxFrameLay->addLayout(xsheetFrameLay);
-
       xsheetBoxFrameLay->addStretch(1);
 
       xsheetBoxFrameLay->addWidget(note_xsheet, 0);
@@ -2427,6 +2472,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onProjectRootChanged()));
   ret = ret && connect(m_projectRootCustom, SIGNAL(stateChanged(int)),
                        SLOT(onProjectRootChanged()));
+  ret = ret && connect(pathAliasPriority, SIGNAL(currentIndexChanged(int)),
+                       SLOT(onPathAliasPriorityChanged(int)));
+
   //--- Interface ----------------------
   ret = ret &&
         connect(styleSheetType, SIGNAL(currentIndexChanged(const QString &)),
@@ -2611,6 +2659,10 @@ PreferencesPopup::PreferencesPopup()
 
   ret = ret && connect(showColumnNumbersCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onShowColumnNumbersChanged(int)));
+
+  ret = ret && connect(m_syncLevelRenumberWithXsheet, SIGNAL(stateChanged(int)),
+                       this, SLOT(onSyncLevelRenumberWithXsheetChanged(int)));
+
   ret = ret && connect(xsheetLayoutOptions,
                        SIGNAL(currentIndexChanged(const QString &)), this,
                        SLOT(onXsheetLayoutChanged(const QString &)));

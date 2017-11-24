@@ -320,6 +320,7 @@ Preferences::Preferences()
     , m_useNumpadForSwitchingStyles(true)
     , m_newLevelSizeToCameraSizeEnabled(false)
     , m_showXSheetToolbar(false)
+    , m_syncLevelRenumberWithXsheet(false)
     , m_expandFunctionHeader(false)
     , m_showColumnNumbers(false)
     , m_useArrowKeyToShiftCellSelection(false)
@@ -332,6 +333,7 @@ Preferences::Preferences()
     , m_shortcutCommandsWhileRenamingCellEnabled(false)
     , m_xsheetLayoutPreference("Classic-revised")
     , m_loadedXsheetLayout("Classic-revised")
+    , m_pathAliasPriority(ProjectFolderOnly)
     , m_currentTimelineEnabled(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -633,6 +635,8 @@ Preferences::Preferences()
   getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
            m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
+  getValue(*m_settings, "syncLevelRenumberWithXsheet",
+           m_syncLevelRenumberWithXsheet);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
   getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
@@ -643,6 +647,9 @@ Preferences::Preferences()
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
   getValue(*m_settings, "shortcutCommandsWhileRenamingCellEnabled",
            m_shortcutCommandsWhileRenamingCellEnabled);
+  int pathAliasPriority = static_cast<int>(m_pathAliasPriority);
+  getValue(*m_settings, "pathAliasPriority", pathAliasPriority);
+  m_pathAliasPriority = static_cast<PathAliasPriority>(pathAliasPriority);
 
   QString xsheetLayoutPreference;
   xsheetLayoutPreference =
@@ -1531,6 +1538,13 @@ void Preferences::enableShowXSheetToolbar(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::enableSyncLevelRenumberWithXsheet(bool on) {
+  m_syncLevelRenumberWithXsheet = on;
+  m_settings->setValue("syncLevelRenumberWithXsheet", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableExpandFunctionHeader(bool on) {
   m_expandFunctionHeader = on;
   m_settings->setValue("expandFunctionHeader", on ? "1" : "0");
@@ -1578,6 +1592,13 @@ void Preferences::enableShortcutCommandsWhileRenamingCell(bool on) {
   m_shortcutCommandsWhileRenamingCellEnabled = on;
   m_settings->setValue("shortcutCommandsWhileRenamingCellEnabled",
                        on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setPathAliasPriority(PathAliasPriority priority) {
+  m_pathAliasPriority = priority;
+  m_settings->setValue("pathAliasPriority", static_cast<int>(priority));
 }
 
 //-----------------------------------------------------------------

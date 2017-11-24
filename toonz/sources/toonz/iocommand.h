@@ -252,6 +252,13 @@ bool exposeComment(int row, int &col, QList<QString> commentList,
 bool importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
                    QList<QString> commentList, QString fileName);
 
+// If the scene will be saved in the different folder, check out the scene
+// cast.
+// if the cast contains the level specified with $scenefolder alias,
+// open a warning popup notifying that such level will lose link.
+bool takeCareSceneFolderItemsOnSaveSceneAs(ToonzScene *scene,
+                                           const TFilePath &newPath);
+
 }  // namespace IoCmd
 
 #endif  // IOCOMMAND_H

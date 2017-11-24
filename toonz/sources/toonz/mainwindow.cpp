@@ -2143,6 +2143,8 @@ void MainWindow::defineActions() {
   createViewerAction(V_ZoomReset, tr("Reset View"), "Alt+0");
   createViewerAction(V_ZoomFit, tr("Fit to Window"), "Alt+9");
   createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
+  createViewerAction(V_FlipX, tr("Flip Viewer Horiontally"), "");
+  createViewerAction(V_FlipY, tr("Flip Viewer Vertically"), "");
   createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"),
                      "Alt+F");
   CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen,
@@ -2246,9 +2248,13 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_PickScreen", tr("Pick Screen"), "");
   createToolOptionsAction("A_ToolOption_Meshify", tr("Create Mesh"), "");
 
+  createToolOptionsAction("A_ToolOption_AutopaintLines",
+                          tr("Fill Tool - Autopaint Lines"), "");
+
   /*-- FillAreas, FillLinesにキー1つで切り替えるためのコマンド --*/
   createAction(MI_FillAreas, tr("Fill Tool - Areas"), "", ToolCommandType);
   createAction(MI_FillLines, tr("Fill Tool - Lines"), "", ToolCommandType);
+
   /*-- Style picker Area, Style picker Lineににキー1つで切り替えるためのコマンド
    * --*/
   createAction(MI_PickStyleAreas, tr("Style Picker Tool - Areas"), "",

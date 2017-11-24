@@ -40,6 +40,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txsheet.h"
 #include "toonz/txshsimplelevel.h"
+#include "toonz/txshchildlevel.h"
 #include "toonz/toonzscene.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/tcamera.h"
@@ -428,48 +429,10 @@ public:
 //  RenumberUndo
 //-----------------------------------------------------------------------------
 
-class RenumberUndo final : public TUndo {
-  std::map<TXshCell, TXshCell> m_undoTable, m_redoTable;
-
+class RenumberUndo {
 public:
   class RedoNotifier;
   class UndoNotifier;
-
-public:
-  RenumberUndo(const std::map<TXshCell, TXshCell> &cellsMap)
-      : m_redoTable(cellsMap) {
-    // Invert the redo table to obtain the undo table
-    std::map<TXshCell, TXshCell>::iterator it, end = m_redoTable.end();
-    for (it = m_redoTable.begin(); it != end; ++it)
-      m_undoTable.insert(std::make_pair(it->second, it->first));
-  }
-
-  void renumber(const std::map<TXshCell, TXshCell> &table) const {
-    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-    for (int c = 0; c < xsh->getColumnCount(); ++c) {
-      int r0, r1;
-      int n = xsh->getCellRange(c, r0, r1);
-      if (n > 0) {
-        bool changed = false;
-        std::vector<TXshCell> cells(n);
-        xsh->getCells(r0, c, n, &cells[0]);
-        for (int i = 0; i < n; i++) {
-          std::map<TXshCell, TXshCell>::const_iterator it =
-              table.find(cells[i]);
-          if (it != table.end() && it->first != it->second)
-            cells[i] = it->second, changed = true;
-        }
-        if (changed) xsh->setCells(r0, c, n, &cells[0]);
-      }
-    }
-  }
-
-  void undo() const override { renumber(m_undoTable); }
-  void redo() const override { renumber(m_redoTable); }
-
-  int getSize() const override {
-    return (m_redoTable.size() << 2) * sizeof(TXshCell);
-  }
 };
 
 class RenumberUndo::RedoNotifier final : public TUndo {
@@ -1905,13 +1868,8 @@ static void dRenumberCells(int col, int r0, int r1) {
   {
     LevelsTable::iterator it, end = levelsTable.end();
     for (it = levelsTable.begin(); it != end; ++it)
-      FilmstripCmd::renumber(it->first, it->second);
+      FilmstripCmd::renumber(it->first, it->second, true);
   }
-
-  // Finally, renumber the xsheet cells
-  RenumberUndo *undo = new RenumberUndo(cellsMap);
-  undo->redo();
-  TUndoManager::manager()->add(undo);
 }
 
 //-----------------------------------------------------------------------------

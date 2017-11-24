@@ -471,7 +471,7 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
   distanceField->setGlobalKey(&l_plasticTool.m_globalKey,
                               &l_plasticTool.m_relayGroup);
 
-  QLabel *distanceLabel = new QLabel(tr("Distance"));
+  ClickableLabel *distanceLabel = new ClickableLabel(tr("Distance"));
   distanceLabel->setFixedHeight(20);
 
   // Angle
@@ -480,7 +480,7 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
   angleField->setGlobalKey(&l_plasticTool.m_globalKey,
                            &l_plasticTool.m_relayGroup);
 
-  QLabel *angleLabel = new QLabel(tr("Angle"));
+  ClickableLabel *angleLabel = new ClickableLabel(tr("Angle"));
   angleLabel->setFixedHeight(20);
 
   // SO
@@ -489,7 +489,7 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
   soField->setGlobalKey(&l_plasticTool.m_globalKey,
                         &l_plasticTool.m_relayGroup);
 
-  QLabel *soLabel = new QLabel(tr("SO"));
+  ClickableLabel *soLabel = new ClickableLabel(tr("SO"));
   soLabel->setFixedHeight(20);
 
   QHBoxLayout *animateLayout = animateOptionsBox->hLayout();
@@ -499,6 +499,26 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
   animateLayout->insertWidget(0, angleLabel);
   animateLayout->insertWidget(0, distanceField);
   animateLayout->insertWidget(0, distanceLabel);
+
+  ret = ret && connect(distanceLabel, SIGNAL(onMousePress(QMouseEvent *)),
+                       distanceField, SLOT(receiveMousePress(QMouseEvent *)));
+  ret = ret && connect(distanceLabel, SIGNAL(onMouseMove(QMouseEvent *)),
+                       distanceField, SLOT(receiveMouseMove(QMouseEvent *)));
+  ret = ret && connect(distanceLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
+                       distanceField, SLOT(receiveMouseRelease(QMouseEvent *)));
+  ret = ret && connect(angleLabel, SIGNAL(onMousePress(QMouseEvent *)),
+                       angleField, SLOT(receiveMousePress(QMouseEvent *)));
+  ret = ret && connect(angleLabel, SIGNAL(onMouseMove(QMouseEvent *)),
+                       angleField, SLOT(receiveMouseMove(QMouseEvent *)));
+  ret = ret && connect(angleLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
+                       angleField, SLOT(receiveMouseRelease(QMouseEvent *)));
+  ret = ret && connect(soLabel, SIGNAL(onMousePress(QMouseEvent *)), soField,
+                       SLOT(receiveMousePress(QMouseEvent *)));
+  ret = ret && connect(soLabel, SIGNAL(onMouseMove(QMouseEvent *)), soField,
+                       SLOT(receiveMouseMove(QMouseEvent *)));
+  ret = ret && connect(soLabel, SIGNAL(onMouseRelease(QMouseEvent *)), soField,
+                       SLOT(receiveMouseRelease(QMouseEvent *)));
+  assert(ret);
 
   onPropertyChanged();
 }
