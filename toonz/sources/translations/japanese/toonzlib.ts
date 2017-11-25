@@ -7,6 +7,14 @@
         <source>Retas Level Format</source>
         <translation>RETAS レベル形式</translation>
     </message>
+    <message>
+        <source>Adobe Photoshop</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>PNG</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -339,6 +347,62 @@
     <message>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
         <translation>パレット%1　サンプル位置を用いて色を更新</translation>
+    </message>
+    <message>
+        <source>Can&apos;t save</source>
+        <translation>保存できません ：</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>なし</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>赤</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>緑</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>青</translation>
+    </message>
+    <message>
+        <source>DarkYellow</source>
+        <translation>暗い黄色</translation>
+    </message>
+    <message>
+        <source>DarkCyan</source>
+        <translation>暗いシアン</translation>
+    </message>
+    <message>
+        <source>DarkMagenta</source>
+        <translation>暗いマゼンタ</translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation>明るさ</translation>
+    </message>
+    <message>
+        <source>Contrast</source>
+        <translation>コントラスト</translation>
+    </message>
+    <message>
+        <source>HRange</source>
+        <translation>色相の範囲</translation>
+    </message>
+    <message>
+        <source>Line Width</source>
+        <translation>線の太さ</translation>
+    </message>
+    <message>
+        <source>ColorThres</source>
+        <translation>色のしきい値</translation>
+    </message>
+    <message>
+        <source>WhiteThres</source>
+        <translation>明るさのしきい値</translation>
     </message>
 </context>
 <context>

@@ -684,18 +684,42 @@ void EraserTool::draw() {
     for (UINT i = 0; i < m_polyline.size(); i++) tglVertex(m_polyline[i]);
     tglVertex(m_mousePos);
     glEnd();
+  } else if (m_eraseType.getValue() == FREEHANDERASE && !m_track.isEmpty()) {
+    TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+                       ? TPixel32::White
+                       : TPixel32::Black;
+    tglColor(color);
+    glPushMatrix();
+    m_track.drawAllFragments();
+    glPopMatrix();
   }
 }
 
 //----------------------------------------------------------------------
 
 int EraserTool::getCursorId() const {
+  int ret;
   if (m_eraseType.getValue() == NORMALERASE)
-    return ToolCursor::NormalEraserCursor;
-  else if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
-    return ToolCursor::RectEraserCursorWhite;
-  else
-    return ToolCursor::RectEraserCursor;
+    ret = ToolCursor::NormalEraserCursor;
+  else {
+    ret = ToolCursor::RectEraserCursor;
+
+    if (m_eraseType.getValue() == FREEHANDERASE)
+      ret = ret | ToolCursor::Ex_FreeHand;
+    else if (m_eraseType.getValue() == POLYLINEERASE)
+      ret = ret | ToolCursor::Ex_PolyLine;
+    else if (m_eraseType.getValue() == RECTERASE)
+      ret = ret | ToolCursor::Ex_Rectangle;
+  }
+
+  if (m_colorType.getValue() == LINES)
+    ret = ret | ToolCursor::Ex_Line;
+  else if (m_colorType.getValue() == AREAS)
+    ret = ret | ToolCursor::Ex_Area;
+
+  if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
+    ret = ret | ToolCursor::Ex_Negate;
+  return ret;
 }
 
 //----------------------------------------------------------------------
@@ -909,24 +933,12 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       m_firstPos        = pos;
       double pixelSize2 = getPixelSize() * getPixelSize();
       m_track.add(TThickPoint(pos, m_thick), pixelSize2);
-      TPointD dpiScale = m_viewer->getDpiScale();
 
-      TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                         ? TPixel32::White
-                         : TPixel32::Black;
-      tglColor(color);
-
-      getViewer()->startForegroundDrawing();
-
-      glPushMatrix();
-      glScaled(dpiScale.x, dpiScale.y, 1);
       if (m_eraseType.getValue() == POLYLINEERASE) {
         if (m_polyline.empty() || m_polyline.back() != pos)
           m_polyline.push_back(pos);
-      } else
-        m_track.drawLastFragments();
-      glPopMatrix();
-      getViewer()->endForegroundDrawing();
+      }
+
       int maxThick = 2 * m_thick;
       TPointD halfThick(maxThick * 0.5, maxThick * 0.5);
       invalidateRect = TRectD(pos - halfThick, pos + halfThick);
@@ -1043,20 +1055,8 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     }
     if (m_eraseType.getValue() == FREEHANDERASE) {
       if (!m_enabled || !m_active) return;
-
-      getViewer()->startForegroundDrawing();
-      TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                         ? TPixel32::White
-                         : TPixel32::Black;
-      tglColor(color);
-      glPushMatrix();
-      tglMultMatrix(getMatrix());
-      TPointD dpiScale = m_viewer->getDpiScale();
-      glScaled(dpiScale.x, dpiScale.y, 1);
       m_track.add(TThickPoint(pos, m_thick), pixelSize2);
-      m_track.drawLastFragments();
-      glPopMatrix();
-      getViewer()->endForegroundDrawing();
+      invalidate(m_track.getModifiedRegion());
     }
   }
 }

@@ -393,6 +393,7 @@ protected:
 
   void drawPolylineSelection();
   void drawRectSelection(const TImage *image);
+  void drawFreehandSelection();
   void drawCommandHandle(const TImage *image);
 
 public:
@@ -453,6 +454,9 @@ public:
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   bool onPropertyChanged(std::string propertyName) override;
+
+  // returns true if the pressed key is recognized and processed.
+  bool isEventAcceptable(QEvent *e) override;
 };
 
 #endif  // SELECTIONTOOL_INCLUDED

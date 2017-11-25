@@ -76,6 +76,14 @@ public:
                     header)     */
   };
 
+  enum SnappingTarge { SnapStrokes, SnapGuides, SnapAll };
+
+  enum PathAliasPriority {
+    ProjectFolderAliases = 0,
+    SceneFolderAlias,
+    ProjectFolderOnly
+  };
+
 public:
   static Preferences *instance();
 
@@ -130,15 +138,19 @@ public:
   void enableWatchFileSystem(bool on);
   bool isWatchFileSystemEnabled() { return m_watchFileSystem; }
 
+  void setPathAliasPriority(PathAliasPriority priority);
+  PathAliasPriority getPathAliasPriority() const { return m_pathAliasPriority; }
+
   // Interface  tab
 
-  void setCurrentLanguage(int currentLanguage);
+  void setCurrentLanguage(const QString &currentLanguage);
   QString getCurrentLanguage() const;
   QString getLanguage(int index) const;
   int getLanguageCount() const;
 
-  void setCurrentStyleSheet(int currentStyleSheet);
-  QString getCurrentStyleSheet() const;
+  void setCurrentStyleSheet(const QString &currentStyleSheet);
+  QString getCurrentStyleSheetName() const;
+  QString getCurrentStyleSheetPath() const;
   QString getStyleSheet(int index) const;
   int getStyleSheetCount() const;
 
@@ -220,6 +232,11 @@ public:
   bool isMoveCurrentEnabled() const {
     return m_moveCurrentFrameByClickCellArea;
   }
+
+  void setInterfaceFont(std::string font);
+  QString getInterfaceFont() { return m_interfaceFont; }
+  void setInterfaceFontWeight(int weight);
+  int getInterfaceFontWeight() { return m_interfaceFontWeight; }
 
   // Visualization  tab
 
@@ -321,8 +338,35 @@ public:
     return m_useNumpadForSwitchingStyles;
   }
 
-  // Xsheet  tab
+  void setGuidedDrawing(int status);
+  int getGuidedDrawing() { return m_guidedDrawingType; }
+  void setAnimatedGuidedDrawing(bool status);
+  bool getAnimatedGuidedDrawing() const { return m_animatedGuidedDrawing; }
 
+  void enableNewLevelSizeToCameraSize(bool on);
+  bool isNewLevelSizeToCameraSizeEnabled() const {
+    return m_newLevelSizeToCameraSizeEnabled;
+  }
+
+  void setVectorSnappingTarget(int target);
+  int getVectorSnappingTarget() { return m_vectorSnappingTarget; }
+
+
+  void setKeepFillOnVectorSimplify(bool on);
+  bool getKeepFillOnVectorSimplify() { return m_keepFillOnVectorSimplify; }
+
+  void setUseHigherDpiOnVectorSimplify(bool on);
+  bool getUseHigherDpiOnVectorSimplify() {
+    return m_useHigherDpiOnVectorSimplify;
+  }
+
+  // Tools Tab
+  void setDropdownShortcutsCycleOptions(bool on);
+  bool getDropdownShortcutsCycleOptions() {
+    return m_dropdownShortcutsCycleOptions;
+  }
+
+  // Xsheet  tab
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
                                  //! step</I> commands.
   int getXsheetStep() const {
@@ -367,6 +411,22 @@ public:
 
   void enableShowColumnNumbers(bool on);
   bool isShowColumnNumbersEnabled() const { return m_showColumnNumbers; }
+
+  void enableSyncLevelRenumberWithXsheet(bool on);
+  bool isSyncLevelRenumberWithXsheetEnabled() const {
+    return m_syncLevelRenumberWithXsheet;
+  }
+
+  void enableShortcutCommandsWhileRenamingCell(bool on);
+  bool isShortcutCommandsWhileRenamingCellEnabled() const {
+    return m_shortcutCommandsWhileRenamingCellEnabled;
+  }
+
+  void setXsheetLayoutPreference(std::string layout);
+  QString getXsheetLayoutPreference() const { return m_xsheetLayoutPreference; }
+
+  void setLoadedXsheetLayout(std::string layout);
+  QString getLoadedXsheetLayout() const { return m_loadedXsheetLayout; }
 
   // Animation  tab
 
@@ -422,6 +482,11 @@ public:
     paint = m_transpCheckPaint;
   }
 
+  void enableCurrentTimelineIndicator(bool on);
+  bool isCurrentTimelineIndicatorEnabled() const {
+    return m_currentTimelineEnabled;
+  }
+
   // Version Control  tab
 
   void enableSVN(bool on);
@@ -473,17 +538,19 @@ Q_SIGNALS:
 
   void stopAutoSave();
   void startAutoSave();
+  void autoSavePeriodChanged();
 
 private:
   std::unique_ptr<QSettings> m_settings;
 
-  QMap<int, QString> m_languageMaps, m_styleSheetMaps, m_roomMaps;
+  QStringList m_languageList, m_styleSheetList;
+  QMap<int, QString> m_roomMaps;
 
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
       m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
-      m_customProjectRoot;
+      m_customProjectRoot, m_interfaceFont;
   QString m_fastRenderPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
@@ -497,11 +564,11 @@ private:
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
       m_ffmpegTimeout;  // seconds
-  int m_projectRoot, m_importPolicy;
-  int m_currentLanguage, m_currentStyleSheet,
-      m_undoMemorySize,  // in megabytes
+  int m_projectRoot, m_importPolicy, m_interfaceFontWeight, m_guidedDrawingType;
+  QString m_currentLanguage, m_currentStyleSheet;
+  int m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,
-      m_shmmax, m_shmseg, m_shmall, m_shmmni;
+      m_shmmax, m_shmseg, m_shmall, m_shmmni, m_vectorSnappingTarget;
 
   bool m_autoExposeEnabled, m_autoCreateEnabled, m_subsceneFolderEnabled,
       m_generatedMovieViewEnabled, m_xsheetAutopanEnabled,
@@ -509,18 +576,21 @@ private:
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
       m_autosaveSceneEnabled, m_autosaveOtherFilesEnabled,
       m_defaultViewerEnabled, m_pixelsOnly, m_showXSheetToolbar,
-      m_expandFunctionHeader, m_showColumnNumbers;
+      m_expandFunctionHeader, m_showColumnNumbers, m_animatedGuidedDrawing;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
       m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly,
       m_startupPopupEnabled;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
-  bool m_onionSkinDuringPlayback, m_ignoreImageDpi;
+  bool m_onionSkinDuringPlayback, m_ignoreImageDpi,
+      m_syncLevelRenumberWithXsheet;
+  bool m_keepFillOnVectorSimplify, m_useHigherDpiOnVectorSimplify;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,
       m_actualPixelViewOnSceneEditingMode;
+  bool m_dropdownShortcutsCycleOptions;
   int m_viewerZoomCenter;  // MOUSE_CURSOR = 0, VIEWER_CENTER = 1
   // used in the load level popup. ON_DEMAND = 0, ALL_ICONS = 1,
   // ALL_ICONS_AND_IMAGES = 2
@@ -555,6 +625,10 @@ private:
   // whether to use numpad and tab key shortcut for selecting styles
   bool m_useNumpadForSwitchingStyles;
 
+  // whether to set the new level size to be the same as the camera size by
+  // default
+  bool m_newLevelSizeToCameraSizeEnabled;
+
   // use arrow key to shift cel selection, ctrl + arrow key to resize the
   // selection range.
   bool m_useArrowKeyToShiftCellSelection;
@@ -564,6 +638,17 @@ private:
 
   // enable to watch file system in order to update file browser automatically
   bool m_watchFileSystem;
+
+  // enable OT command shortcut keys while renaming xsheet cell
+  bool m_shortcutCommandsWhileRenamingCellEnabled;
+
+  QString m_xsheetLayoutPreference,
+      m_loadedXsheetLayout;  // Classic, Classic-revised, compact
+
+  // defines which alias to be used if both are possible on coding file path
+  PathAliasPriority m_pathAliasPriority;
+
+  bool m_currentTimelineEnabled;
 
 private:
   Preferences();

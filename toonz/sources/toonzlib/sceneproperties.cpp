@@ -36,7 +36,9 @@ TSceneProperties::TSceneProperties()
     , m_fullcolorSubsampling(1)
     , m_tlvSubsampling(1)
     , m_fieldGuideSize(16)
-    , m_fieldGuideAspectRatio(1.77778) {
+    , m_fieldGuideAspectRatio(1.77778)
+    , m_columnColorFilterOnRender(false)
+    , m_camCapSaveInPath() {
   // Default color
   m_notesColor.push_back(TPixel32(255, 235, 140));
   m_notesColor.push_back(TPixel32(255, 160, 120));
@@ -80,13 +82,14 @@ void TSceneProperties::assign(const TSceneProperties *sprop) {
     for (int i     = 0; i < (int)m_cameras.size(); i++)
       m_cameras[i] = new TCamera(*m_cameras[i]);
   }
-  m_bgColor               = sprop->m_bgColor;
-  m_markerDistance        = sprop->m_markerDistance;
-  m_markerOffset          = sprop->m_markerOffset;
-  m_fullcolorSubsampling  = sprop->m_fullcolorSubsampling;
-  m_tlvSubsampling        = sprop->m_tlvSubsampling;
-  m_fieldGuideSize        = sprop->m_fieldGuideSize;
-  m_fieldGuideAspectRatio = sprop->m_fieldGuideAspectRatio;
+  m_bgColor                   = sprop->m_bgColor;
+  m_markerDistance            = sprop->m_markerDistance;
+  m_markerOffset              = sprop->m_markerOffset;
+  m_fullcolorSubsampling      = sprop->m_fullcolorSubsampling;
+  m_tlvSubsampling            = sprop->m_tlvSubsampling;
+  m_fieldGuideSize            = sprop->m_fieldGuideSize;
+  m_fieldGuideAspectRatio     = sprop->m_fieldGuideAspectRatio;
+  m_columnColorFilterOnRender = sprop->m_columnColorFilterOnRender;
   int i;
   for (i = 0; i < m_notesColor.size(); i++)
     m_notesColor.replace(i, sprop->getNoteColor(i));
@@ -295,6 +298,9 @@ void TSceneProperties::saveData(TOStream &os) const {
   os.child("markers") << m_markerDistance << m_markerOffset;
   os.child("subsampling") << m_fullcolorSubsampling << m_tlvSubsampling;
   os.child("fieldguide") << m_fieldGuideSize << m_fieldGuideAspectRatio;
+  if (m_columnColorFilterOnRender) os.child("columnColorFilterOnRender") << 1;
+  if (!m_camCapSaveInPath.isEmpty())
+    os.child("cameraCaputureSaveInPath") << m_camCapSaveInPath;
 
   os.openChild("noteColors");
   for (i = 0; i < m_notesColor.size(); i++) os << m_notesColor.at(i);
@@ -339,6 +345,10 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
       is >> m_fullcolorSubsampling >> m_tlvSubsampling;
     } else if (tagName == "fieldguide") {
       is >> m_fieldGuideSize >> m_fieldGuideAspectRatio;
+    } else if (tagName == "columnColorFilterOnRender") {
+      int val;
+      is >> val;
+      enableColumnColorFilterOnRender(val == 1);
     } else if (tagName == "safearea") {
       double dummy1, dummy2;
       is >> dummy1 >> dummy2;
@@ -666,6 +676,8 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
         i++;
       }
       assert(i == 7);
+    } else if (tagName == "cameraCaputureSaveInPath") {
+      is >> m_camCapSaveInPath;
     } else {
       throw TException("unexpected property tag: " + tagName);
     }

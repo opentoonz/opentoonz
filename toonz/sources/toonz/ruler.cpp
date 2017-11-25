@@ -81,6 +81,11 @@ void Ruler::getIndices(double origin, double iunit, int size, int &i0, int &i1,
     i1 = i0 + tfloor(size * iunit);
     ic = 0;
   }
+  if (m_viewer->getIsFlippedX()) {
+    i0 = i0 + i1;
+    i1 = i0 - i1;
+    i0 = i0 - i1;
+  }
   // assert(i0>=0);
   // assert((ic%10)==0);
 }
@@ -102,10 +107,10 @@ double Ruler::getPan() const {
     if (m_viewer->is3DView())  // Vertical   3D
       return m_viewer->getPan3D().y;
     else  // Vertical   2D
-      return aff.a23 / m_viewer->getDevPixRatio();
+      return aff.a23 / getDevPixRatio();
   else if (m_viewer->is3DView())  // Horizontal 3D
     return m_viewer->getPan3D().x;
-  return aff.a13 / m_viewer->getDevPixRatio();  // Horizontal 2D
+  return aff.a13 / getDevPixRatio();  // Horizontal 2D
 }
 
 //-----------------------------------------------------------------------------
@@ -126,10 +131,13 @@ void Ruler::drawVertical(QPainter &p) {
   int count = guides.size();
   if (m_hiding) count--;
   double zoom = getZoomScale();
+  if (m_viewer->getIsFlippedX() != m_viewer->getIsFlippedY()) {
+    zoom = -zoom;
+  }
   for (i = 0; i < count; i++) {
     QColor color =
         (m_moving && count - 1 == i ? QColor(0, 255, 255) : QColor(0, 0, 255));
-    double v = guides[i] / (double)m_viewer->getDevPixRatio();
+    double v = guides[i] / (double)getDevPixRatio();
     int y    = (int)(origin - zoom * v);
     p.fillRect(QRect(x0, y - 1, x1 - x0, 2), QBrush(color));
   }
@@ -184,7 +192,7 @@ void Ruler::drawHorizontal(QPainter &p) {
   for (i = 0; i < count; i++) {
     QColor color =
         (m_moving && count - 1 == i ? QColor(0, 255, 255) : QColor(0, 0, 255));
-    double v = guides[i] / (double)m_viewer->getDevPixRatio();
+    double v = guides[i] / (double)getDevPixRatio();
     int x    = (int)(origin + zoom * v);
     p.fillRect(QRect(x - 1, y0, 2, y1 - y0), QBrush(color));
   }
@@ -228,7 +236,10 @@ void Ruler::paintEvent(QPaintEvent *) {
 double Ruler::posToValue(const QPoint &p) const {
   double v;
   if (m_vertical)
-    v = (-p.y() + height() / 2 - getPan()) / getZoomScale();
+    if (m_viewer->getIsFlippedX() != m_viewer->getIsFlippedY()) {
+      v = (-p.y() + height() / 2 - getPan()) / -getZoomScale();
+    } else
+      v = (-p.y() + height() / 2 - getPan()) / getZoomScale();
   else
     v = (p.x() - width() / 2 - getPan()) / getZoomScale();
   return v;
@@ -247,7 +258,7 @@ void Ruler::mousePressEvent(QMouseEvent *e) {
     int i;
     int count = guides.size();
     for (i = 0; i < count; i++) {
-      double g     = guides[i] / (double)m_viewer->getDevPixRatio();
+      double g     = guides[i] / (double)getDevPixRatio();
       double dist2 = (g - v) * (g - v);
       if (selected < 0 || dist2 < minDist2) {
         minDist2 = dist2;
@@ -256,7 +267,7 @@ void Ruler::mousePressEvent(QMouseEvent *e) {
     }
     if (selected < 0 || minDist2 > 25) {
       // crea una nuova guida
-      guides.push_back(v * m_viewer->getDevPixRatio());
+      guides.push_back(v * getDevPixRatio());
       m_viewer->update();
       // aggiorna sprop!!!!
     } else {
@@ -275,7 +286,7 @@ void Ruler::mousePressEvent(QMouseEvent *e) {
 void Ruler::mouseMoveEvent(QMouseEvent *e) {
   if (m_moving) {
     m_hiding           = m_vertical ? (e->pos().x() < 0) : (e->pos().y() < 0);
-    getGuides().back() = posToValue(e->pos()) * m_viewer->getDevPixRatio();
+    getGuides().back() = posToValue(e->pos()) * getDevPixRatio();
     // aggiorna sprop!!!!
     update();
     m_viewer->update();
@@ -290,7 +301,7 @@ void Ruler::mouseMoveEvent(QMouseEvent *e) {
   int i;
   int count = guides.size();
   for (i = 0; i < count; i++) {
-    double g     = guides[i] / (double)m_viewer->getDevPixRatio();
+    double g     = guides[i] / (double)getDevPixRatio();
     double dist2 = (g - v) * (g - v);
     if (dist2 < minDist2)
       setToolTip(tr("Click and drag to move guide"));

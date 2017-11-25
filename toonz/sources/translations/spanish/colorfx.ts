@@ -39,7 +39,7 @@
     <name>OutlineViewerStyle</name>
     <message>
         <source>OutlineViewer(OnlyDebug)</source>
-        <translation>Visor de contornos (SoloDepuración)</translation>
+        <translation>Visor de contornos (sólo depuración)</translation>
     </message>
     <message>
         <source>Control Point</source>
@@ -412,7 +412,7 @@
     </message>
     <message>
         <source>Distance</source>
-        <translation></translation>
+        <translation>Distancia</translation>
     </message>
 </context>
 <context>

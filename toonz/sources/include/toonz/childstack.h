@@ -43,7 +43,6 @@ class DVAPI ChildStack {
   std::vector<Node *> m_stack;
   TXsheet *m_xsheet;
   ToonzScene *m_scene;
-  bool m_editInPlace;
 
 public:
   /*!
@@ -114,9 +113,6 @@ Set aff to ancestor affine in \b row. Return true if all ancestors are
 visibile in \b row.
 */
   bool getAncestorAffine(TAffine &aff, int row) const;
-
-  bool getEditInPlace() const { return m_editInPlace; }
-  void setEditInPlace(bool editInPlace);
 
 private:
   // not implemented

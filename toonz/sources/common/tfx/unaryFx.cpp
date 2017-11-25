@@ -7,6 +7,7 @@
 #include "trasterfx.h"
 #include "tflash.h"
 #include "tfxparam.h"
+#include "tparamset.h"
 
 //#define ALLOW_SHEAR
 
@@ -159,6 +160,58 @@ void TRasterFx::compute(TFlash &flash, int frame) {
 //--------------------------------------------------
 
 FX_IDENTIFIER_IS_HIDDEN(NaAffineFx, "naAffineFx")
+
+//==================================================================
+//  ColumnColorFilterFx
+//==================================================================
+
+ColumnColorFilterFx::ColumnColorFilterFx() : m_colorFilter(TPixel::Black) {
+  setName(L"ColumnColorFilterFx");
+  addInputPort("source", m_port);
+}
+
+bool ColumnColorFilterFx::doGetBBox(double frame, TRectD &bBox,
+                                    const TRenderSettings &info) {
+  if (!m_port.isConnected()) return false;
+  TRasterFxP fx = m_port.getFx();
+  assert(fx);
+  bool ret = fx->doGetBBox(frame, bBox, info);
+  return ret;
+}
+
+void ColumnColorFilterFx::doCompute(TTile &tile, double frame,
+                                    const TRenderSettings &ri) {
+  if (!m_port.isConnected()) return;
+
+  if (!TRaster32P(tile.getRaster()) && !TRaster64P(tile.getRaster()))
+    throw TException("AffineFx unsupported pixel type");
+
+  TRasterFxP src = m_port.getFx();
+  src->compute(tile, frame, ri);
+
+  TRop::applyColorScale(tile.getRaster(), m_colorFilter);
+}
+
+std::string ColumnColorFilterFx::getAlias(double frame,
+                                          const TRenderSettings &info) const {
+  std::string alias = getFxType();
+  alias += "[";
+  if (m_port.isConnected()) {
+    TRasterFxP ifx = m_port.getFx();
+    assert(ifx);
+    alias += ifx->getAlias(frame, info);
+  }
+  alias += ",";
+
+  return alias + std::to_string(m_colorFilter.r) + "," +
+         std::to_string(m_colorFilter.g) + "," +
+         std::to_string(m_colorFilter.b) + "," +
+         std::to_string(m_colorFilter.m) + "]";
+}
+
+//--------------------------------------------------
+
+FX_IDENTIFIER_IS_HIDDEN(ColumnColorFilterFx, "columnColorFilterFx")
 
 //==================================================================
 //  Geometric Fx

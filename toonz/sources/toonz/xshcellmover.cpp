@@ -157,7 +157,9 @@ bool CellsMover::canMoveCells(const TPoint &pos) {
       TXshColumn::ColumnType srcType = getColumnTypeFromCell(i);
       int dstIndex                   = pos.x + i;
       TXshColumn *dstColumn          = xsh->getColumn(dstIndex);
-      if (srcType == TXshColumn::eZeraryFxType) return false;
+      if (srcType == TXshColumn::eZeraryFxType ||
+          srcType == TXshColumn::eSoundTextType)
+        return false;
       if (dstColumn && !dstColumn->isEmpty() &&
           dstColumn->getColumnType() != srcType)
         return false;

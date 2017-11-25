@@ -25,6 +25,7 @@ class QMainWindow;
 
 class TMainWindow;
 class ComboViewerPanel;
+class SceneViewer;
 
 //=============================================================================
 // TXsheeHandle
@@ -82,6 +83,7 @@ class TApp final : public QObject,
   // keep a pointer of the inknpaint viewer in order to enable navigator pan in
   // the filmstrip
   ComboViewerPanel *m_inknPaintViewerPanel;
+  SceneViewer *m_activeViewer;
 
   int m_autosavePeriod;  // minutes
   bool m_autosaveSuspended;
@@ -195,6 +197,10 @@ public:
     return m_inknPaintViewerPanel;
   }
 
+  void setActiveViewer(SceneViewer *viewer) { m_activeViewer = viewer; }
+
+  SceneViewer *getActiveViewer() const { return m_activeViewer; }
+
   bool isApplicationStarting() { return m_isStarting; }
 
   bool isPenCloseToTablet() const { return m_isPenCloseToTablet; }
@@ -232,6 +238,16 @@ protected slots:
   void onToolEditingFinished();
   void onStartAutoSave();
   void onStopAutoSave();
+
+signals:
+  // on OSX, there is a critical bug that SceneViewer::mousePressEvent is called
+  // when leaving the stylus and it causes unwanted stroke drawn while
+  // hover-moving of the pen.
+  // This signal is to detect tablet leave and force initializing such irregular
+  // mouse press.
+  // NOTE: For now QEvent::TabletLeaveProximity is NOT detected on Windows. See
+  // QTBUG-53628.
+  void tabletLeft();
 };
 
 #endif  // TAPP_H

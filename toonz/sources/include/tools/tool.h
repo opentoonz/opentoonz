@@ -16,6 +16,7 @@
 
 // Qt includes
 #include <QString>
+#include <QPoint>
 
 #undef DVAPI
 #undef DVVAR
@@ -91,16 +92,29 @@ public:
   ModifierMask m_modifiersMask;  //!< Bitmask specifying key modifiers applying
                                  //! on the event.
 
-  bool m_leftButtonPressed;
+  Qt::MouseButtons m_buttons;
+  Qt::MouseButton m_button;
+  QPoint m_mousePos;  // mouse position obtained with QMouseEvent::pos() or
+                      // QTabletEvent::pos()
+  bool m_isTablet;
 
 public:
   TMouseEvent()
-      : m_pressure(255), m_modifiersMask(NO_KEY), m_leftButtonPressed(false) {}
+      : m_pressure(255)
+      , m_modifiersMask(NO_KEY)
+      , m_buttons(Qt::NoButton)
+      , m_button(Qt::NoButton)
+      , m_isTablet(false) {}
 
   bool isShiftPressed() const { return (m_modifiersMask & SHIFT_KEY); }
   bool isAltPressed() const { return (m_modifiersMask & ALT_KEY); }
   bool isCtrlPressed() const { return (m_modifiersMask & CTRL_KEY); }
-  bool isLeftButtonPressed() const { return m_leftButtonPressed; }
+
+  bool isLeftButtonPressed() const { return (m_buttons & Qt::LeftButton) != 0; }
+  Qt::MouseButtons buttons() const { return m_buttons; }
+  Qt::MouseButton button() const { return m_button; }
+  QPoint mousePos() const { return m_mousePos; }
+  bool isTablet() const { return m_isTablet; }
 
   void setModifiers(bool shiftPressed, bool altPressed, bool ctrlPressed) {
     m_modifiersMask = ModifierMask((shiftPressed << SHIFT_BITSHIFT) |
@@ -427,6 +441,11 @@ return true if the method execution can have changed the current tool
     return 0;
   }  //!< Returns the type of cursor used by the tool.
 
+  // returns true if the pressed key is recognized and processed.
+  // used in SceneViewer::event(), reimplemented in SelectionTool
+  // and ControlPointEditorTool
+  virtual bool isEventAcceptable(QEvent *e) { return false; }
+
   TXsheet *getXsheet() const;  //!< Returns a pointer to the actual Xsheet.
 
   int getFrame();        //!< Returns the actual frame in use.
@@ -566,9 +585,6 @@ public:
   virtual double getPixelSize()
       const = 0;  //!< Returns the length of a pixel in current OpenGL
                   //!< coordinates
-  virtual void startForegroundDrawing() = 0;  //!< Marks the beginning of an
-                                              //! OpenGL drawing block
-  virtual void endForegroundDrawing() = 0;  //!< Closes an OpenGL drawing block
 
   virtual void invalidateAll() = 0;    //!< Redraws the entire viewer, passing
                                        //! through Qt's event system
@@ -619,11 +635,17 @@ public:
 
   virtual void rotate(const TPointD &center, double angle) = 0;
   virtual void rotate3D(double dPhi, double dTheta)        = 0;
-  virtual bool is3DView() const = 0;
+  virtual bool is3DView() const      = 0;
+  virtual bool getIsFlippedX() const = 0;
+  virtual bool getIsFlippedY() const = 0;
 
   virtual double projectToZ(const TPoint &delta) = 0;
 
   virtual TPointD getDpiScale() const = 0;
+  virtual int getVGuideCount()        = 0;
+  virtual int getHGuideCount()        = 0;
+  virtual double getHGuide(int index) = 0;
+  virtual double getVGuide(int index) = 0;
 
   virtual void
   resetInputMethod() = 0;  // Intended to call QWidget->resetInputContext()

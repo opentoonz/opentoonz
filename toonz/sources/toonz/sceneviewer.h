@@ -24,6 +24,8 @@
 #include "pane.h"
 #include "previewer.h"
 
+#include <QMatrix4x4>
+
 //=====================================================================
 
 //  Forward declarations
@@ -32,6 +34,8 @@ class Ruler;
 class QMenu;
 class SceneViewer;
 class LocatorPopup;
+class QGestureEvent;
+class QTouchEvent;
 
 namespace ImageUtils {
 class FullScreenWidget;
@@ -64,16 +68,25 @@ class SceneViewer final : public GLWidgetForHighDpi,
   QPoint m_lastMousePos;
   QPoint m_pos;
   Qt::MouseButton m_mouseButton;
-
   bool m_foregroundDrawing;
-  bool m_tabletEvent;
+  bool m_tabletEvent, m_tabletPressed, m_tabletReleased, m_tabletMove,
+      m_tabletActive;
   // used to handle wrong mouse drag events!
   bool m_buttonClicked, m_toolSwitched;
-  bool m_shownOnce = false;
+  bool m_shownOnce     = false;
+  bool m_gestureActive = false;
+  bool m_touchActive   = false;
+  bool m_rotating      = false;
+  bool m_zooming       = false;
+  bool m_panning       = false;
+  QPointF m_firstPanPoint;
+  QPointF m_undoPoint;
+  double m_scaleFactor;    // used for zoom gesture
+  double m_rotationDelta;  // used for rotate gesture
   int m_referenceMode;
   int m_previewMode;
   bool m_isMouseEntered, m_forceGlFlush;
-
+  bool m_isFlippedX = false, m_isFlippedY = false;
   /*!  FreezedStatus:
 *  \li NO_FREEZED freezed is not active;
 *  \li NORMAL_FREEZED freezed is active: show grab image;
@@ -138,6 +151,10 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_isLocator;
   bool m_isStyleShortcutSwitchable;
 
+  bool m_isBusyOnTabletMove;
+
+  QMatrix4x4 m_projectionMatrix;
+
   // iwsw commented out temporarily
   // Ghibli3DLutUtil * m_ghibli3DLutUtil;
 public:
@@ -166,8 +183,6 @@ public:
   void onRenderCompleted(int frame) override;
   void onPreviewUpdate() override;
 
-  void startForegroundDrawing() override;
-  void endForegroundDrawing() override;
   bool isPreviewEnabled() const { return m_previewMode != NO_PREVIEW; }
   int getPreviewMode() const { return m_previewMode; }
 
@@ -215,6 +230,8 @@ public:
   bool canSwapCompared() const;
 
   bool isEditPreviewSubcamera() const { return m_editPreviewSubCamera; }
+  bool getIsFlippedX() const { return m_isFlippedX; }
+  bool getIsFlippedY() const { return m_isFlippedY; }
   void setEditPreviewSubcamera(bool enabled) {
     m_editPreviewSubCamera = enabled;
   }
@@ -235,6 +252,10 @@ public:
 
   void setIsLocator() { m_isLocator = true; }
   void setIsStyleShortcutSwitchable() { m_isStyleShortcutSwitchable = true; }
+  int getVGuideCount();
+  int getHGuideCount();
+  double getVGuide(int index);
+  double getHGuide(int index);
 
 public:
   // SceneViewer's gadget public functions
@@ -276,6 +297,8 @@ protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
 
+  void gestureEvent(QGestureEvent *e);
+  void touchEvent(QTouchEvent *e, int type);
   void tabletEvent(QTabletEvent *) override;
   void leaveEvent(QEvent *) override;
   void enterEvent(QEvent *) override;
@@ -283,6 +306,11 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
   void mouseDoubleClickEvent(QMouseEvent *event) override;
+
+  void onPress(const TMouseEvent &event);
+  void onMove(const TMouseEvent &event);
+  void onRelease(const TMouseEvent &event);
+
   void wheelEvent(QWheelEvent *) override;
   void keyPressEvent(QKeyEvent *event) override;
   void keyReleaseEvent(QKeyEvent *event) override;
@@ -302,7 +330,6 @@ protected:
 
   // overriden from TTool::Viewer
   void zoom(const TPointD &center, double factor) override;
-
   void rotate(const TPointD &center, double angle) override;
   void rotate3D(double dPhi, double dTheta) override;
 
@@ -341,6 +368,8 @@ public slots:
 
   void resetSceneViewer();
   void setActualPixelSize();
+  void flipX();
+  void flipY();
   void onXsheetChanged();
   void onObjectSwitched();
   // when tool options are changed, update tooltip immediately
@@ -365,6 +394,10 @@ public slots:
 
   // delete preview-subcamera executed from context menu
   void doDeleteSubCamera();
+
+  void resetTabletStatus();
+
+  void releaseBusyOnTabletMove() { m_isBusyOnTabletMove = false; }
 
 signals:
 

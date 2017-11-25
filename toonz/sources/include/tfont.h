@@ -26,18 +26,6 @@
 class TVectorImageP;
 class TFont;
 
-//-----------------------------------------------------
-
-// TFont declaration. The class is currently not directly available under 64-bit
-// MAC OSX.
-
-#if !defined(__LP64__) || !defined(MACOSX)
-
-#ifdef MACOSX
-#include <ApplicationServices/ApplicationServices.h>
-#include <Carbon/Carbon.h>
-#endif
-
 //=================================================================================================
 
 //! Class to manage loading and rendering of fonts.
@@ -50,20 +38,14 @@ private:
   friend class TFontManager;
   Impl *m_pimpl;
 
-#ifdef _WIN32
-  TFont(const LOGFONTW &, HDC hdc);
-#elif defined(MACOSX)
-  TFont(ATSUFontID, int size);
-#else
   TFont(const std::wstring family, const std::wstring face, int size);
-#endif
 
 public:
   ~TFont();
 
   TPoint drawChar(TVectorImageP &outImage, wchar_t charcode,
                   wchar_t nextCode = 0) const;
-  TPoint drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_t charcode,
+  TPoint drawChar(QImage &outImage, TPoint &glyphOrigin, wchar_t charcode,
                   wchar_t nextCode = 0) const;
   TPoint drawChar(TRasterCM32P &outImage, TPoint &glyphOrigin, int inkId,
                   wchar_t charcode, wchar_t nextCode = 0) const;
@@ -71,13 +53,15 @@ public:
   // brief  get kerning distance between two characters
   TPoint getDistance(wchar_t firstChar, wchar_t secondChar) const;
 
-  int getMaxHeight() const;
   int getMaxWidth() const;
   // void disableKerning();
   // void enableKerning();
   bool hasKerning() const;
   int getLineAscender() const;
   int getLineDescender() const;
+  int getLineSpacing() const;
+  int getHeight() const;
+  int getAverageCharWidth() const;
   bool hasVertical() const;
   std::wstring getFamily() const;
   std::wstring getTypeface() const;
@@ -88,8 +72,6 @@ private:
   TFont(const TFont &);
   TFont &operator=(const TFont &);
 };
-
-#endif  //!__LP64__ || !MACOSX
 
 //-----------------------------------------------------------------------------
 
@@ -138,16 +120,17 @@ public:
   void setVertical(bool vertical);
   void setSize(int size);
 
-// --------- TFont methods  called on curren font -----------
+  bool isBold(const QString &family, const QString &style);
+  bool isItalic(const QString &family, const QString &style);
 
-#if !defined(__LP64__) || defined(LINUX)
+  // --------- TFont methods  called on curren font -----------
 
   TPoint drawChar(TVectorImageP &outImage, wchar_t charcode,
                   wchar_t nextCode = 0) {
     return getCurrentFont()->drawChar(outImage, charcode, nextCode);
   }
 
-  TPoint drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_t charcode,
+  TPoint drawChar(QImage &outImage, TPoint &glyphOrigin, wchar_t charcode,
                   wchar_t nextCode = 0) {
     return getCurrentFont()->drawChar(outImage, glyphOrigin, charcode,
                                       nextCode);
@@ -163,32 +146,14 @@ public:
     return getCurrentFont()->getDistance(firstChar, secondChar);
   }
 
-  int getMaxHeight() { return getCurrentFont()->getMaxHeight(); }
   int getMaxWidth() { return getCurrentFont()->getMaxWidth(); }
   bool hasKerning() { return getCurrentFont()->hasKerning(); }
   int getLineAscender() { return getCurrentFont()->getLineAscender(); }
   int getLineDescender() { return getCurrentFont()->getLineDescender(); }
+  int getLineSpacing() { return getCurrentFont()->getLineSpacing(); }
+  int getHeight() { return getCurrentFont()->getHeight(); }
+  int getAverageCharWidth() { return getCurrentFont()->getAverageCharWidth(); }
   bool hasVertical() { return getCurrentFont()->hasVertical(); }
-
-#else  //__LP64__
-
-  TPoint drawChar(TVectorImageP &outImage, wchar_t charcode,
-                  wchar_t nextCode = 0);
-  TPoint drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_t charcode,
-                  wchar_t nextCode = 0);
-  TPoint drawChar(TRasterCM32P &outImage, TPoint &glyphOrigin, int inkId,
-                  wchar_t charcode, wchar_t nextCode = 0);
-
-  TPoint getDistance(wchar_t firstChar, wchar_t secondChar);
-
-  int getMaxHeight();
-  int getMaxWidth();
-  bool hasKerning();
-  int getLineAscender();
-  int getLineDescender();
-  bool hasVertical();
-
-#endif  //__LP64__
 };
 
 //-----------------------------------------------------------------------------

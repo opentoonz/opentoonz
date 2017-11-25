@@ -246,7 +246,20 @@ bool ImageManager::rebind(const std::string &srcId, const std::string &dstId) {
   m_imp->m_builders.erase(st);
   m_imp->m_builders[dstId] = builder;
 
+  m_imp->m_builders[dstId]->m_cached   = true;
+  m_imp->m_builders[dstId]->m_modified = true;
+
   TImageCache::instance()->remap(dstId, srcId);
+
+  return true;
+}
+
+bool ImageManager::renumber(const std::string &srcId, const TFrameId &fid) {
+  std::map<std::string, ImageBuilderP>::iterator st =
+      m_imp->m_builders.find(srcId);
+  if (st == m_imp->m_builders.end()) return false;
+
+  m_imp->m_builders[srcId]->setFid(fid);
 
   return true;
 }

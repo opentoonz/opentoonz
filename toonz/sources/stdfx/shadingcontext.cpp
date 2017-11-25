@@ -11,10 +11,11 @@
 #include <QThread>
 #include <QDateTime>
 
-#include <QGLPixelBuffer>
-#include <QGLFramebufferObject>
-#include <QGLShaderProgram>
+#include <QOpenGLFramebufferObject>
+#include <QOpenGLShaderProgram>
 #include <QOpenGLContext>
+#include <QOffscreenSurface>
+#include <QOpenGLWidget>
 
 // STD includes
 #include <map>
@@ -28,12 +29,12 @@
 
 namespace {
 
-typedef std::unique_ptr<QGLPixelBuffer> QGLPixelBufferP;
-typedef std::unique_ptr<QGLFramebufferObject> QGLFramebufferObjectP;
-typedef std::unique_ptr<QGLShaderProgram> QGLShaderProgramP;
+typedef std::unique_ptr<QOpenGLContext> QOpenGLContextP;
+typedef std::unique_ptr<QOpenGLFramebufferObject> QOpenGLFramebufferObjectP;
+typedef std::unique_ptr<QOpenGLShaderProgram> QOpenGLShaderProgramP;
 
 struct CompiledShader {
-  QGLShaderProgramP m_program;
+  QOpenGLShaderProgramP m_program;
   QDateTime m_lastModified;
 
 public:
@@ -43,13 +44,22 @@ public:
 
 }  // namespace
 
+TQOpenGLWidget::TQOpenGLWidget() {}
+
+void TQOpenGLWidget::initializeGL() {
+  QOffscreenSurface *surface = new QOffscreenSurface();
+  // context()->create();
+  // context()->makeCurrent(surface);
+}
+
 //*****************************************************************
 //    ShadingContext::Imp  definition
 //*****************************************************************
 
 struct ShadingContext::Imp {
-  QGLPixelBufferP m_pixelBuffer;  //!< OpenGL context.
-  QGLFramebufferObjectP m_fbo;    //!< Output buffer.
+  QOpenGLContextP m_context;        //!< OpenGL context.
+  QOpenGLFramebufferObjectP m_fbo;  //!< Output buffer.
+  QOffscreenSurface *m_surface;
 
   std::map<QString,
            CompiledShader>
@@ -58,7 +68,7 @@ struct ShadingContext::Imp {
 public:
   Imp();
 
-  static QGLFormat format();
+  static QSurfaceFormat format();
 
   void initMatrix(int lx, int ly);
 
@@ -70,17 +80,16 @@ private:
 
 //--------------------------------------------------------
 
-ShadingContext::Imp::Imp()
-    : m_pixelBuffer(new QGLPixelBuffer(1, 1, format())) {}
+ShadingContext::Imp::Imp() : m_context(new QOpenGLContext()), m_surface() {}
 
 //--------------------------------------------------------
 
-QGLFormat ShadingContext::Imp::format() {
-  QGLFormat fmt;
+QSurfaceFormat ShadingContext::Imp::format() {
+  QSurfaceFormat fmt;
 
 #ifdef MACOSX
   fmt.setVersion(3, 2);
-  fmt.setProfile(QGLFormat::CompatibilityProfile);
+  fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
 #endif
 
   return fmt;
@@ -101,7 +110,16 @@ void ShadingContext::Imp::initMatrix(int lx, int ly) {
 //    ShadingContext  implementation
 //*****************************************************************
 
-ShadingContext::ShadingContext() : m_imp(new Imp) {
+ShadingContext::ShadingContext(QOffscreenSurface *surface) : m_imp(new Imp) {
+  m_imp->m_surface = surface;
+  m_imp->m_surface->create();
+  QSurfaceFormat format;
+  m_imp->m_context->setFormat(format);
+  m_imp->m_context->create();
+  m_imp->m_context->makeCurrent(m_imp->m_surface);
+
+  // m_imp->m_pixelBuffer->context()->create();
+  // m_imp->m_fbo(new QOpenGLFramebufferObject(1, 1));
   makeCurrent();
   glewExperimental = GL_TRUE;
   glewInit();
@@ -111,28 +129,26 @@ ShadingContext::ShadingContext() : m_imp(new Imp) {
 //--------------------------------------------------------
 
 ShadingContext::~ShadingContext() {
-#ifdef MACOSX
   // Destructor of QGLPixelBuffer calls QOpenGLContext::makeCurrent()
   // internally,
   // so the current thread must be the owner of QGLPixelBuffer context,
   // when the destructor of m_imp->m_context is called.
-
-  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(
-      QThread::currentThread());
-#endif
+  m_imp->m_context->moveToThread(QThread::currentThread());
 }
 
 //--------------------------------------------------------
 
 ShadingContext::Support ShadingContext::support() {
-  return !QGLPixelBuffer::hasOpenGLPbuffers()
-             ? NO_PIXEL_BUFFER
-             : !QGLShaderProgram::hasOpenGLShaderPrograms() ? NO_SHADERS : OK;
+  // return !QGLPixelBuffer::hasOpenGLPbuffers()
+  //           ? NO_PIXEL_BUFFER
+  //           : !QOpenGLShaderProgram::hasOpenGLShaderPrograms() ? NO_SHADERS :
+  //           OK;
+  return !QOpenGLShaderProgram::hasOpenGLShaderPrograms() ? NO_SHADERS : OK;
 }
 
 //--------------------------------------------------------
 
-bool ShadingContext::isValid() const { return m_imp->m_pixelBuffer->isValid(); }
+bool ShadingContext::isValid() const { return m_imp->m_context->isValid(); }
 
 //--------------------------------------------------------
 /*
@@ -166,26 +182,25 @@ USE HARDWARE ACCELERATION
 //--------------------------------------------------------
 
 void ShadingContext::makeCurrent() {
-#ifdef MACOSX
-  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(
-      QThread::currentThread());
-#endif
-  m_imp->m_pixelBuffer->makeCurrent();
+  m_imp->m_context->moveToThread(QThread::currentThread());
+  m_imp->m_context.reset(new QOpenGLContext());
+  QSurfaceFormat format;
+  m_imp->m_context->setFormat(format);
+  m_imp->m_context->create();
+  m_imp->m_context->makeCurrent(m_imp->m_surface);
 }
 
 //--------------------------------------------------------
 
 void ShadingContext::doneCurrent() {
-#ifdef MACOSX
-  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(0);
-#endif
-  m_imp->m_pixelBuffer->doneCurrent();
+  m_imp->m_context->moveToThread(0);
+  m_imp->m_context->doneCurrent();
 }
 
 //--------------------------------------------------------
 
 void ShadingContext::resize(int lx, int ly,
-                            const QGLFramebufferObjectFormat &fmt) {
+                            const QOpenGLFramebufferObjectFormat &fmt) {
   if (m_imp->m_fbo.get() && m_imp->m_fbo->width() == lx &&
       m_imp->m_fbo->height() == ly && m_imp->m_fbo->format() == fmt)
     return;
@@ -193,7 +208,12 @@ void ShadingContext::resize(int lx, int ly,
   if (lx == 0 || ly == 0) {
     m_imp->m_fbo.reset(0);
   } else {
-    m_imp->m_fbo.reset(new QGLFramebufferObject(lx, ly, fmt));
+    bool get                         = m_imp->m_fbo.get();
+    QOpenGLContext *currContext      = m_imp->m_context->currentContext();
+    bool yes                         = false;
+    if (currContext) bool yes        = true;
+    while (!currContext) currContext = m_imp->m_context->currentContext();
+    m_imp->m_fbo.reset(new QOpenGLFramebufferObject(lx, ly, fmt));
     assert(m_imp->m_fbo->isValid());
 
     m_imp->m_fbo->bind();
@@ -202,22 +222,22 @@ void ShadingContext::resize(int lx, int ly,
 
 //--------------------------------------------------------
 
-QGLFramebufferObjectFormat ShadingContext::format() const {
-  QGLFramebufferObject *fbo = m_imp->m_fbo.get();
-  return fbo ? m_imp->m_fbo->format() : QGLFramebufferObjectFormat();
+QOpenGLFramebufferObjectFormat ShadingContext::format() const {
+  QOpenGLFramebufferObject *fbo = m_imp->m_fbo.get();
+  return fbo ? m_imp->m_fbo->format() : QOpenGLFramebufferObjectFormat();
 }
 
 //--------------------------------------------------------
 
 TDimension ShadingContext::size() const {
-  QGLFramebufferObject *fbo = m_imp->m_fbo.get();
+  QOpenGLFramebufferObject *fbo = m_imp->m_fbo.get();
   return fbo ? TDimension(fbo->width(), fbo->height()) : TDimension();
 }
 
 //--------------------------------------------------------
 
 void ShadingContext::addShaderProgram(const QString &shaderName,
-                                      QGLShaderProgram *program) {
+                                      QOpenGLShaderProgram *program) {
   std::map<QString, CompiledShader>::iterator st =
       m_imp->m_shaderPrograms
           .insert(std::make_pair(shaderName, CompiledShader()))
@@ -229,7 +249,7 @@ void ShadingContext::addShaderProgram(const QString &shaderName,
 //--------------------------------------------------------
 
 void ShadingContext::addShaderProgram(const QString &shaderName,
-                                      QGLShaderProgram *program,
+                                      QOpenGLShaderProgram *program,
                                       const QDateTime &lastModified) {
   std::map<QString, CompiledShader>::iterator st =
       m_imp->m_shaderPrograms
@@ -248,7 +268,7 @@ bool ShadingContext::removeShaderProgram(const QString &shaderName) {
 
 //--------------------------------------------------------
 
-QGLShaderProgram *ShadingContext::shaderProgram(
+QOpenGLShaderProgram *ShadingContext::shaderProgram(
     const QString &shaderName) const {
   std::map<QString, CompiledShader>::iterator st =
       m_imp->m_shaderPrograms.find(shaderName);
@@ -268,7 +288,7 @@ QDateTime ShadingContext::lastModified(const QString &shaderName) const {
 
 //--------------------------------------------------------
 
-std::pair<QGLShaderProgram *, QDateTime> ShadingContext::shaderData(
+std::pair<QOpenGLShaderProgram *, QDateTime> ShadingContext::shaderData(
     const QString &shaderName) const {
   std::map<QString, CompiledShader>::iterator st =
       m_imp->m_shaderPrograms.find(shaderName);
@@ -276,7 +296,7 @@ std::pair<QGLShaderProgram *, QDateTime> ShadingContext::shaderData(
   return (st != m_imp->m_shaderPrograms.end())
              ? std::make_pair(st->second.m_program.get(),
                               st->second.m_lastModified)
-             : std::make_pair((QGLShaderProgram *)0, QDateTime());
+             : std::make_pair((QOpenGLShaderProgram *)0, QDateTime());
 }
 
 //--------------------------------------------------------

@@ -250,7 +250,7 @@ void CleanupSettingsModel::connectSignals() {
                        SLOT(onCellChanged()), Qt::QueuedConnection);
   ret = ret && connect(columnHandle, SIGNAL(columnIndexSwitched()),
                        SLOT(onCellChanged()), Qt::QueuedConnection);
-  ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged()),
+  ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged(bool)),
                        SLOT(onPaletteChanged()), Qt::QueuedConnection);
   ret = ret && connect(paletteHandle, SIGNAL(paletteChanged()),
                        SLOT(onPaletteChanged()), Qt::QueuedConnection);
@@ -420,10 +420,10 @@ void CleanupSettingsModel::processFrame(TXshSimpleLevel *sl, TFrameId fid) {
   bool doCameraTest = (m_cameraTestsCount > 0);
 
   // Retrieve new image dpi
-  double dpix, dpiy;
-  imageToCleanup->getDpi(dpix, dpiy);
-  cl->setCustomDpi((dpix == 0 && dpiy == 0) ? sl->getProperties()->getDpi()
-                                            : TPointD());
+  TPointD dpi;
+  imageToCleanup->getDpi(dpi.x, dpi.y);
+  if (dpi.x == 0 && dpi.y == 0) dpi = sl->getProperties()->getDpi();
+  cl->setSourceDpi(dpi);
 
   // Perform primary cleanup processing
   if (doProcessing) {

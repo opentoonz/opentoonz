@@ -200,7 +200,7 @@ void PaletteViewer::setPaletteHandle(TPaletteHandle *paletteHandle) {
                          SLOT(changeWindowTitle()));
     ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
                          SLOT(onColorStyleSwitched()));
-    ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
+    ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
                          SLOT(changeWindowTitle()));
     ret = ret && connect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()),
                          this, SLOT(changeWindowTitle()));
@@ -500,7 +500,7 @@ void PaletteViewer::updateTabBar() {
   TPalette *palette = getPalette();
   if (!palette) return;
 
-  QIcon tabIcon(":Resources/palette_tabicon.png");
+  QIcon tabIcon(":Resources/palette_tabicon.svg");
   m_pagesBar->setIconSize(QSize(20, 15));
 
   // Aggiungo i tab in funzione delle pagine di m_palette
@@ -635,7 +635,7 @@ void PaletteViewer::showEvent(QShowEvent *) {
           SLOT(changeWindowTitle()));
   connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
           SLOT(onColorStyleSwitched()));
-  connect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
+  connect(m_paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
           SLOT(changeWindowTitle()));
   connect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()), this,
           SLOT(changeWindowTitle()));
@@ -657,7 +657,7 @@ void PaletteViewer::hideEvent(QHideEvent *) {
              SLOT(changeWindowTitle()));
   disconnect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
              SLOT(onColorStyleSwitched()));
-  disconnect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
+  disconnect(m_paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
              SLOT(changeWindowTitle()));
   disconnect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()), this,
              SLOT(changeWindowTitle()));

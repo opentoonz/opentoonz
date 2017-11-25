@@ -34,6 +34,7 @@
 
 // For Qt translation support
 #include <QCoreApplication>
+#include <QKeyEvent>
 
 using namespace ToolUtils;
 
@@ -216,6 +217,9 @@ public:
   bool pick(int &hookIndex, const TPointD &pos);
 
   int getCursorId() const override;
+
+  // returns true if the pressed key is recognized and processed.
+  bool isEventAcceptable(QEvent *e) override;
 
 } trackerTool;
 
@@ -845,6 +849,29 @@ void TrackerTool::onActivate() {}
 void TrackerTool::onDeactivate() {
   // m_selection.selectNone();
   // TSelection::setCurrent(0);
+}
+
+//-----------------------------------------------------------------------------
+
+// returns true if the pressed key is recognized and processed in the tool
+// instead of triggering the shortcut command.
+bool TrackerTool::isEventAcceptable(QEvent *e) {
+  if (!isEnabled()) return false;
+  TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
+  if (!xl) return false;
+  HookSet *hookSet = xl->getHookSet();
+  if (!hookSet) return false;
+  Hook *hook = hookSet->getHook(m_hookSelectedIndex);
+  if (!hook || hook->isEmpty()) return false;
+
+  QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+  // shift + arrow will not be recognized for now
+  if (keyEvent->modifiers() & Qt::ShiftModifier) return false;
+  int key = keyEvent->key();
+  return (key == Qt::Key_Up || key == Qt::Key_Down || key == Qt::Key_Left ||
+          key == Qt::Key_Right);
+  // no need to override page up & down keys since they cannot be
+  // used as shortcut key for now
 }
 
 //=============================================================================

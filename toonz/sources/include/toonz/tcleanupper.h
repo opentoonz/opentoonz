@@ -57,7 +57,7 @@ public:
 
 class DVAPI TCleanupper {
   CleanupParameters *m_parameters;
-  TPointD m_customDpi;
+  TPointD m_sourceDpi;
 
 private:
   TCleanupper()
@@ -101,8 +101,8 @@ time, to unlock a possibly useful memory block.
   TRasterImageP autocenterOnly(const TRasterImageP &image, bool isCameraTest,
                                bool &autocentered);
 
-  TPointD getCustomDpi() const { return m_customDpi; }
-  void setCustomDpi(const TPointD &dpi) { m_customDpi = dpi; }
+  TPointD getSourceDpi() const { return m_sourceDpi; }
+  void setSourceDpi(const TPointD &dpi) { m_sourceDpi = dpi; }
 
 private:
   // process phase

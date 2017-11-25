@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:ns2="http://ns.adobe.com/AdobeIllustrator/10.0/"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   height="18"
+   width="18"
+   xml:space="preserve"
+   viewBox="0 0 18 18"
+   y="0px"
+   x="0px"
+   ns2:viewOrigin="393.7725 305.4199"
+   ns2:rulerOrigin="0 0"
+   ns2:pageBounds="0 600 800 0"
+   id="svg2"
+   version="1.1"><metadata
+     id="metadata34"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs32"><pattern
+       id="EMFhbasepattern"
+       patternUnits="userSpaceOnUse"
+       width="6"
+       height="6"
+       x="0"
+       y="0" /></defs><style
+     id="style2"
+     type="text/css">
+	.st0{fill:url(#path14_1_);}
+	.st1{fill:url(#path29_1_);}
+	.st2{fill:none;stroke:#6C767A;stroke-linecap:round;stroke-miterlimit:10;}
+</style><path
+     style="fill:#e25e5e;fill-opacity:1;fill-rule:nonzero;stroke:none"
+     d="M 9.0399999,2 C 5.1200289,2 2.000052,5.119977 2.000052,9.039948 c 0,3.839971 3.1199769,6.959948 7.0399479,6.959948 3.8399711,0 6.9599481,-3.119977 6.9599481,-6.959948 C 15.999948,5.119977 12.879971,2 9.0399999,2 Z M 5.5200259,5.519974 H 6.720017 L 9.0399999,7.759957 11.279983,5.519974 h 1.199991 v 1.199991 l -2.239983,2.319983 2.239983,2.239983 v 1.199991 H 11.279983 L 9.0399999,10.239939 6.720017,12.479922 H 5.5200259 V 11.279931 L 7.7600093,9.039948 5.5200259,6.719965 Z"
+     id="path820" /></svg>

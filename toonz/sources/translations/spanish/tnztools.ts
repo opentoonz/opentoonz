@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -13,11 +13,11 @@
     </message>
     <message>
         <source>E/W:</source>
-        <translation>E/O:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation>N/S:</translation>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Z:</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>SO:</source>
-        <translation>OS:</translation>
+        <translation>Orden:</translation>
     </message>
     <message>
         <source>Rotation</source>
@@ -57,7 +57,7 @@
     </message>
     <message>
         <source>Center</source>
-        <translation>Centrar</translation>
+        <translation>Centro</translation>
     </message>
     <message>
         <source>Lock</source>
@@ -73,7 +73,7 @@
     </message>
     <message>
         <source>Center Position</source>
-        <translation>Centrar posición</translation>
+        <translation>Posición centro</translation>
     </message>
 </context>
 <context>
@@ -104,19 +104,19 @@
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>Modo de pluma</translation>
+        <translation>Modo lápiz</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>Sensibilidad a la presión</translation>
+        <translation>Sensibilidad a presión</translation>
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremo</translation>
+        <translation>Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Unión</translation>
+        <translation>Uniones</translation>
     </message>
     <message>
         <source>Miter:</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
         <source>Pencil</source>
-        <translation>Pluma</translation>
+        <translation>Lápiz</translation>
     </message>
     <message>
         <source>Pressure</source>
@@ -141,6 +141,14 @@
     <message>
         <source>Smooth:</source>
         <translation>Suavizado:</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Rango:</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>Adherencia</translation>
     </message>
 </context>
 <context>
@@ -192,19 +200,19 @@
     </message>
     <message>
         <source>Lock Center E/W</source>
-        <translation>Bloquear al centro E/O</translation>
+        <translation>Bloquear centro X</translation>
     </message>
     <message>
         <source>Lock Center N/S</source>
-        <translation>Bloquear al centro N/S</translation>
+        <translation>Bloquear centro Y</translation>
     </message>
     <message>
         <source>Lock Position E/W</source>
-        <translation>Bloquear posición E/O</translation>
+        <translation>Bloquear posición X</translation>
     </message>
     <message>
         <source>Lock Position N/S</source>
-        <translation>Bloquear posición N/S</translation>
+        <translation>Bloquear posición Y</translation>
     </message>
     <message>
         <source>Lock Rotation</source>
@@ -232,7 +240,7 @@
     </message>
     <message>
         <source>E/W and N/S Positions</source>
-        <translation>Posiciones E/O y N/S</translation>
+        <translation>Posiciones X e Y</translation>
     </message>
     <message>
         <source>Z Position</source>
@@ -240,7 +248,7 @@
     </message>
     <message>
         <source>SO</source>
-        <translation>OS</translation>
+        <translation>Orden</translation>
     </message>
     <message>
         <source>Rotation</source>
@@ -260,7 +268,7 @@
     </message>
     <message>
         <source>Center Position</source>
-        <translation>Centrar posición</translation>
+        <translation>Posición centro</translation>
     </message>
     <message>
         <source>Active Axis</source>
@@ -299,7 +307,7 @@
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>Modo de la pluma</translation>
+        <translation>Modo lápiz</translation>
     </message>
 </context>
 <context>
@@ -352,7 +360,7 @@
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>Sensibilidad a la presión</translation>
+        <translation>Sensibilidad a presión</translation>
     </message>
     <message>
         <source>Opacity:</source>
@@ -365,6 +373,18 @@
     <message>
         <source>Preset:</source>
         <translation>Ajuste:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Presión</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>Opacidad</translation>
     </message>
 </context>
 <context>
@@ -514,11 +534,11 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Definir clave</translation>
+        <translation>Marcar clave</translation>
     </message>
     <message>
         <source>Set Rest Key</source>
-        <translation>Definir clave de reposo</translation>
+        <translation>Marcar clave de reposo</translation>
     </message>
     <message>
         <source>Show Mesh</source>
@@ -530,11 +550,11 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Show SO</source>
-        <translation>Mostrar orden de superposición</translation>
+        <translation>Mostrar orden</translation>
     </message>
     <message>
         <source>Show Skeleton Onion Skin</source>
-        <translation>Mostrar esqueleto con piel de cebolla</translation>
+        <translation>Mostrar piel de cebolla del esqueleto</translation>
     </message>
     <message>
         <source>The previous vertex name will be discarded, and all associated keys will be lost.
@@ -546,11 +566,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Set Global Key</source>
-        <translation>Definir clave global</translation>
+        <translation>Marcar clave global</translation>
     </message>
     <message>
         <source>Set Global Rest Key</source>
-        <translation>Definir clave global de reposo</translation>
+        <translation>Marcar clave global de reposo</translation>
     </message>
     <message>
         <source>Edit Mesh</source>
@@ -593,7 +613,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>SO</source>
-        <translation>OS</translation>
+        <translation>Orden</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -640,15 +660,15 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>Modo de la pluma</translation>
+        <translation>Modo lápiz</translation>
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremo</translation>
+        <translation>Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Unión</translation>
+        <translation>Uniones</translation>
     </message>
     <message>
         <source>Miter:</source>
@@ -657,6 +677,10 @@ Do you want to proceed?</source>
     <message>
         <source>Size:</source>
         <translation>Tamaño:</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>Adherir</translation>
     </message>
 </context>
 <context>
@@ -698,7 +722,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation>La columna actual no se encuentra visible en la vista de cámara.</translation>
+        <translation>La columna actual no se encuentra visible en la vista de mesa de trabajo.</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>
@@ -734,7 +758,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current tool cannot be used on a Toonz Level.</source>
-        <translation>No es posible usar la herramienta actual en un nivel de Toonz.</translation>
+        <translation>No es posible usar la herramienta actual en un nivel de imagen de Toonz.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Raster Level.</source>
@@ -746,7 +770,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current tool cannot be used on a mesh-deformed level</source>
-        <translation>No es posible usar la herramienta actual en un nivel deformado por una malla.</translation>
+        <translation>No es posible usar la herramienta actual en un nivel de malla deformada.</translation>
     </message>
     <message>
         <source>The current frame is locked: any editing is forbidden.</source>
@@ -794,7 +818,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Modify Stroke Tool</source>
-        <translation>Herramienta Modificar trazo</translation>
+        <translation>Modificar trazo</translation>
     </message>
     <message>
         <source>Modify Spline</source>
@@ -810,7 +834,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
-        <translation>Definir marco de seguridad : (X%1,Y%2,An%3,Al%4)-&gt;(X%5,Y%6,An%7,Al%8)</translation>
+        <translation>Definir marco delimitador : (X%1,Y%2,An%3,Al%4)-&gt;(X%5,Y%6,An%7,Al%8)</translation>
     </message>
 </context>
 <context>
@@ -835,7 +859,7 @@ Do you want to proceed?</source>
     <name>RasterSelectionTool</name>
     <message>
         <source>Modify Savebox</source>
-        <translation>Modificar marco de seguridad</translation>
+        <translation>Modificar marco delimitador</translation>
     </message>
     <message>
         <source>No Antialiasing</source>
@@ -854,7 +878,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Style Index:</source>
-        <translation>Índice de estilo:</translation>
+        <translation>Índice del estilo:</translation>
     </message>
     <message>
         <source>Opacity:</source>
@@ -892,11 +916,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>E/W:</source>
-        <translation>E/O:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation>N/S:</translation>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Thickness</source>
@@ -904,14 +928,14 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Link</source>
-        <translation>Vínculo</translation>
+        <translation>Vincular</translation>
     </message>
 </context>
 <context>
     <name>SkeletonTool</name>
     <message>
         <source>Show Only Active Skeleton</source>
-        <translation>Mostrar solo el esqueleto activo</translation>
+        <translation>Mostrar sólo esqueleto activo</translation>
     </message>
     <message>
         <source>Global Key</source>
@@ -923,22 +947,34 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Reset Pinned Center</source>
-        <translation>Restablecer el centro fijado</translation>
+        <translation>Restablecer centro fijado</translation>
     </message>
 </context>
 <context>
     <name>StylePickerTool</name>
     <message>
         <source>No current level.</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay nivel actual.</translation>
     </message>
     <message>
         <source>Current level has no available palette.</source>
-        <translation type="unfinished"></translation>
+        <translation>El nivel actual no tiene una paleta disponible.</translation>
     </message>
     <message>
         <source>Palette must have more than one palette to be organized.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es necesario que exista más de una paleta para poder organizarlas.</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>Modo:</translation>
+    </message>
+    <message>
+        <source>Passive Pick</source>
+        <translation>Selección pasiva</translation>
+    </message>
+    <message>
+        <source>Organize Palette</source>
+        <translation>Organizar paleta</translation>
     </message>
 </context>
 <context>
@@ -946,7 +982,8 @@ Do you want to proceed?</source>
     <message>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
-        <translation type="unfinished"></translation>
+        <translation>Con esta opción activa, el estilo escogido será
+movido hacia el final de la primera página de la paleta.</translation>
     </message>
 </context>
 <context>
@@ -999,11 +1036,11 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremo</translation>
+        <translation>Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Unión</translation>
+        <translation>Uniones</translation>
     </message>
     <message>
         <source>Miter:</source>
@@ -1022,7 +1059,7 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Distance</source>
-        <translation></translation>
+        <translation>Distancia</translation>
     </message>
     <message>
         <source>Mode:</source>

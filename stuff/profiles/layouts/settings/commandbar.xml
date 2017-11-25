@@ -1,0 +1,19 @@
+  <commandbar>
+
+    <command>MI_NewVectorLevel</command>
+    <command>MI_NewToonzRasterLevel</command>
+    <command>MI_NewRasterLevel</command>
+    <separator/>	
+    <command>MI_Reframe1</command>
+    <command>MI_Reframe2</command>
+    <command>MI_Reframe3</command>
+    <separator/>
+    <command>MI_Dup</command>
+    <separator/>
+    <command>MI_Collapse</command> 
+    <command>MI_OpenChild</command>
+    <command>MI_CloseChild</command>
+    <command>MI_ToggleEditInPlace</command>    
+    
+  </commandbar>
+

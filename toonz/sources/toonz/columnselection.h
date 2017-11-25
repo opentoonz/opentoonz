@@ -7,12 +7,15 @@
 #include "tgeometry.h"
 #include <set>
 
+class ReframePopup;
+
 //=============================================================================
 // TColumnSelection
 //-----------------------------------------------------------------------------
 
 class TColumnSelection final : public TSelection {
   std::set<int> m_indices;
+  ReframePopup *m_reframePopup;
 
 public:
   TColumnSelection();
@@ -46,6 +49,8 @@ public:
   void reframe2Cells() { reframeCells(2); }
   void reframe3Cells() { reframeCells(3); }
   void reframe4Cells() { reframeCells(4); }
+
+  void reframeWithEmptyInbetweens();
 };
 
 #endif  // TCELLSELECTION_H

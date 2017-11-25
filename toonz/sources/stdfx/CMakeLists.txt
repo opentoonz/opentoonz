@@ -74,6 +74,7 @@ set(HEADERS
     iwa_soapbubblefx.h
 	iwa_bokehfx.h
 	iwa_timecodefx.h
+	iwa_bokehreffx.h
 )
 
 set(SOURCES
@@ -252,6 +253,7 @@ set(SOURCES
 	${SDKROOT}/kiss_fft130/tools/kiss_fftnd.c
 	iwa_bokehfx.cpp
 	iwa_timecodefx.cpp
+	iwa_bokehreffx.cpp
 )
 
 set(OBJCSOURCES
@@ -265,6 +267,7 @@ add_definitions(
 
 if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzstdfx.dylib")
+    add_dependencies(tnzstdfx tnzcore tnzbase toonzlib)
 endif()
 
 message("subdir: tnzstdfx")

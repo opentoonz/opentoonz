@@ -35,6 +35,9 @@ set(MOC_HEADERS
     ../include/toonz/logger.h
     ../include/toonz/movierenderer.h
     ../include/toonz/multimediarenderer.h
+    ../include/toonz/mypaint.h
+    ../include/toonz/mypainthelpers.hpp
+    ../include/toonz/mypaintbrushstyle.h
     ../include/toonz/namebuilder.h
     ../include/toonz/Naa2TlvConverter.h
     ../include/toonz/observer.h
@@ -191,6 +194,7 @@ set(SOURCES
     logger.cpp
     movierenderer.cpp
     multimediarenderer.cpp
+    mypaintbrushstyle.cpp
     namebuilder.cpp
     Naa2TlvConverter.cpp
     observer.cpp
@@ -328,6 +332,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 add_library(toonzlib SHARED ${HEADERS} ${SOURCES})
 if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzlib.dylib")
+    add_dependencies(toonzlib tnzcore tnzbase tnzext)
 endif()
 
 add_definitions(
@@ -347,8 +352,8 @@ include_directories(
 
 if(BUILD_ENV_MSVC)
     target_link_libraries(toonzlib
-        Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script
-        ${GLUT_LIB} ${GL_LIB} vfw32.lib
+        Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script Qt5::Multimedia
+        ${GLUT_LIB} ${GL_LIB} ${MYPAINT_LIB_LDFLAGS} vfw32.lib
         tnzcore tnzbase tnzext
     )
 elseif(BUILD_ENV_APPLE)
@@ -357,9 +362,10 @@ elseif(BUILD_ENV_APPLE)
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.dylib
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzext/libtnzext.dylib
         ${USB_LIB}
+        ${MYPAINT_LIB_LDFLAGS}
     )
 
-    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
+    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script Qt5::Multimedia ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
 elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext")
 
@@ -367,5 +373,5 @@ elseif(BUILD_ENV_UNIXLIKE)
         set(EXTRA_LIBS ${EXTRA_LIBS} -lvfw32)
     endif()
 
-    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
+    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script Qt5::Multimedia ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS} ${MYPAINT_LIB_LDFLAGS})
 endif()

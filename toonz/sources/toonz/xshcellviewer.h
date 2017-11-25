@@ -86,13 +86,15 @@ class CellArea final : public QWidget {
 
   void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
   void drawSoundTextCell(QPainter &p, int row, int col);
-  void drawSoundCell(QPainter &p, int row, int col);
+  void drawSoundCell(QPainter &p, int row, int col, bool isReference = false);
   void drawPaletteCell(QPainter &p, int row, int col, bool isReference = false);
 
   void drawKeyframe(QPainter &p, const QRect toBeUpdated);
   void drawKeyframeLine(QPainter &p, int col, const NumberRange &rows) const;
 
   void drawNotes(QPainter &p, const QRect toBeUpdated);
+
+  void drawCurrentTimeIndicator(QPainter &p, const QPoint &xy);
 
   // Restistusce true
   bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);

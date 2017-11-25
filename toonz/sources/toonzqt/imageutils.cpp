@@ -41,6 +41,9 @@
 
 // TnzQt includes
 #include <QApplication>
+#ifdef _WIN32
+#include <QtPlatformHeaders/QWindowsWindowFunctions>
+#endif
 
 // boost includes
 #include <boost/iterator/transform_iterator.hpp>
@@ -742,7 +745,8 @@ double getQuantizedZoomFactor(double zf, bool forward) {
 namespace {
 
 void getViewerShortcuts(int &zoomIn, int &zoomOut, int &zoomReset, int &zoomFit,
-                        int &showHideFullScreen, int &actualPixelSize) {
+                        int &showHideFullScreen, int &actualPixelSize,
+                        int &flipX, int &flipY) {
   CommandManager *cManager = CommandManager::instance();
 
   zoomIn = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomIn));
@@ -756,6 +760,8 @@ void getViewerShortcuts(int &zoomIn, int &zoomOut, int &zoomReset, int &zoomFit,
       cManager->getShortcutFromId(V_ShowHideFullScreen));
   actualPixelSize = cManager->getKeyFromShortcut(
       cManager->getShortcutFromId(V_ActualPixelSize));
+  flipX = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_FlipX));
+  flipY = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_FlipY));
 }
 
 }  // namespace
@@ -771,9 +777,9 @@ ShortcutZoomer::ShortcutZoomer(QWidget *zoomingWidget)
 
 bool ShortcutZoomer::exec(QKeyEvent *event) {
   int zoomInKey, zoomOutKey, zoomResetKey, zoomFitKey, showHideFullScreenKey,
-      actualPixelSize;
+      actualPixelSize, flipX, flipY;
   getViewerShortcuts(zoomInKey, zoomOutKey, zoomResetKey, zoomFitKey,
-                     showHideFullScreenKey, actualPixelSize);
+                     showHideFullScreenKey, actualPixelSize, flipX, flipY);
 
   int key = event->key();
   if (key == Qt::Key_Control || key == Qt::Key_Shift || key == Qt::Key_Alt)
@@ -795,7 +801,10 @@ bool ShortcutZoomer::exec(QKeyEvent *event) {
                                   key == zoomResetKey)
                                      ? zoom(key == zoomInKey,
                                             key == zoomResetKey)
-                                     : false;
+                                     : (key == flipX)
+                                           ? setFlipX()
+                                           : (key == flipY) ? setFlipY()
+                                                            : false;
 }
 
 //*********************************************************************************************
@@ -808,6 +817,12 @@ FullScreenWidget::FullScreenWidget(QWidget *parent) : QWidget(parent) {
   layout->setSpacing(0);
 
   setLayout(layout);
+
+#ifdef _WIN32
+  // http://doc.qt.io/qt-5/windows-issues.html#fullscreen-opengl-based-windows
+  winId();
+  QWindowsWindowFunctions::setHasBorderInFullScreen(windowHandle(), true);
+#endif
 }
 
 //---------------------------------------------------------------------------------
@@ -826,13 +841,9 @@ bool FullScreenWidget::toggleFullScreen(bool quit) {
     hide();
     setWindowFlags(windowFlags() & ~(Qt::Window | Qt::WindowStaysOnTopHint));
     showNormal();
-
-    setContentsMargins(0, 0, 0, 0);  // ...
     m_widget->setFocus();
     return true;
   } else if (!quit) {
-    setContentsMargins(0, 0, 1, 1);  // QTBUG #7556
-
     setWindowFlags(windowFlags() | Qt::Window | Qt::WindowStaysOnTopHint);
     showFullScreen();
 
