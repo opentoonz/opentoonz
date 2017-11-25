@@ -525,6 +525,9 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
 
   QString m_xsheetLayout;
 
+  int m_frameZoomFactor;
+  QSlider *m_frameZoomSlider;
+
 public:
   enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
 
@@ -624,6 +627,11 @@ public:
   void drawPredefinedPath(QPainter &p, PredefinedPath which,
                           const CellPosition &pos, optional<QColor> fill,
                           optional<QColor> outline) const;
+
+  void drawPredefinedPath(QPainter &p, PredefinedPath which, QPoint xy,
+                          optional<QColor> fill,
+                          optional<QColor> outline) const;
+
   //---------
 
   void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
@@ -1085,6 +1093,8 @@ protected:
   void scrollToRow(int row);
   void scrollToVerticalRange(int y0, int y1);
 
+  void paintEvent(QPaintEvent *) override;
+
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
   void resizeEvent(QResizeEvent *event) override;
@@ -1128,6 +1138,16 @@ public slots:
 
   void onOrientationChanged(const Orientation *newOrientation);
   void onPrepareToScrollOffset(const QPoint &offset);
+  void onZoomScrollAdjust(QPoint &offset, bool toZoom);
+
+  void setFrameZoomFactor(int f) { m_frameZoomFactor = f; }
+  int getFrameZoomFactor() const;
+  int getFrameZoomAdjustment();
+
+  void zoomOnFrame(int frame, int factor);
+
+  void onFrameZoomSliderValueChanged(int val);
+  void onFrameZoomSliderReleased();
 };
 
 #endif  // XSHEETVIEWER_H

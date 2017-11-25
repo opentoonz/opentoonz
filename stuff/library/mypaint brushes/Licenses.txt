@@ -1,4 +1,4 @@
-Files: classic/*, experemental/*
+﻿Files: classic/*, experimental/*
 Copyright: Copyright 2011-2013 Martin Renold and the MyPaint Development Team
   By policy, MyPaint's brush settings are released into the public domain.
   See: https://github.com/mypaint/mypaint/wiki/Licensing-policy
@@ -19,6 +19,10 @@ License: CC0-1.0
 Files: kaerhon_v1/*
 Copyright: Author: Guillaume Loussarévian
 License: CC0-1.0
+
+Files: Mojo/*
+Copyright: Author: Saeger Ryman
+License:  CC0-1.0
 
 See also CC0-1.0 license at creativecommons.org
 https://creativecommons.org/publicdomain/zero/1.0/

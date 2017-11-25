@@ -1096,12 +1096,7 @@ void MainWindow::onAbout() {
 
 void MainWindow::autofillToggle() {
   TPaletteHandle *h = TApp::instance()->getCurrentPalette();
-  int index         = h->getStyleIndex();
-  if (index > 0) {
-    TColorStyle *s = h->getPalette()->getStyle(index);
-    s->setFlags(s->getFlags() == 0 ? 1 : 0);
-    h->notifyColorStyleChanged();
-  }
+  h->toggleAutopaint();
 }
 
 void MainWindow::resetRoomsLayout() {
@@ -1745,8 +1740,7 @@ void MainWindow::defineActions() {
   createMenuLevelAction(MI_Renumber, tr("&Renumber..."), "");
   createMenuLevelAction(MI_ReplaceLevel, tr("&Replace Level..."), "");
   createMenuLevelAction(MI_RevertToCleanedUp, tr("&Revert to Cleaned Up"), "");
-  createMenuLevelAction(MI_RevertToLastSaved,
-                        tr("&Revert to Last Saved Version"), "");
+  createMenuLevelAction(MI_RevertToLastSaved, tr("&Reload"), "");
   createMenuLevelAction(MI_ExposeResource, tr("&Expose in Xsheet"), "");
   createMenuLevelAction(MI_EditLevel, tr("&Display in Level Strip"), "");
   createMenuLevelAction(MI_LevelSettings, tr("&Level Settings..."), "");
@@ -1817,6 +1811,9 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
+  createMenuXsheetAction(MI_NewNoteLevel, tr("New Note Level"), "");
+  createMenuXsheetAction(MI_LipSyncPopup, tr("&Apply Lip Sync Data to Column"),
+                         "Alt+L");
   createRightClickMenuAction(MI_ToggleXSheetToolbar,
                              tr("Toggle XSheet Toolbar"), "");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
@@ -2015,12 +2012,16 @@ void MainWindow::defineActions() {
                           "Ctrl+`");
   createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
   createMenuWindowsAction(MI_StartupPopup, tr("&Startup Popup..."), "Alt+S");
+
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
   createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "/", false,
                RightClickMenuCommandType);
   createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false,
                RightClickMenuCommandType);
+
+  createRightClickMenuAction(MI_ToggleCurrentTimeIndicator,
+                             tr("Toggle Current Time Indicator"), "");
 
   // createRightClickMenuAction(MI_LoadSubSceneFile,     tr("Load As
   // Sub-xsheet"),   "");
@@ -2037,6 +2038,10 @@ void MainWindow::defineActions() {
   // createRightClickMenuAction(MI_PremultiplyFile,      tr("Premultiply"),
   // "");
   createMenuLevelAction(MI_ConvertToVectors, tr("Convert to Vectors..."), "");
+  createMenuLevelAction(MI_ConvertToToonzRaster, tr("Vectors to Toonz Raster"),
+                        "");
+  createMenuLevelAction(MI_ConvertVectorToVector,
+                        tr("Replace Vectors with Simplified Vectors"), "");
   createMenuLevelAction(MI_Tracking, tr("Tracking..."), "");
   createRightClickMenuAction(MI_RemoveLevel, tr("Remove Level"), "");
   createRightClickMenuAction(MI_AddToBatchRenderList, tr("Add As Render Task"),
@@ -2137,6 +2142,8 @@ void MainWindow::defineActions() {
   createViewerAction(V_ZoomReset, tr("Reset View"), "Alt+0");
   createViewerAction(V_ZoomFit, tr("Fit to Window"), "Alt+9");
   createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
+  createViewerAction(V_FlipX, tr("Flip Viewer Horiontally"), "");
+  createViewerAction(V_FlipY, tr("Flip Viewer Vertically"), "");
   createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"),
                      "Alt+F");
   CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen,
@@ -2240,9 +2247,13 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_PickScreen", tr("Pick Screen"), "");
   createToolOptionsAction("A_ToolOption_Meshify", tr("Create Mesh"), "");
 
+  createToolOptionsAction("A_ToolOption_AutopaintLines",
+                          tr("Fill Tool - Autopaint Lines"), "");
+
   /*-- FillAreas, FillLinesにキー1つで切り替えるためのコマンド --*/
   createAction(MI_FillAreas, tr("Fill Tool - Areas"), "", ToolCommandType);
   createAction(MI_FillLines, tr("Fill Tool - Lines"), "", ToolCommandType);
+
   /*-- Style picker Area, Style picker Lineににキー1つで切り替えるためのコマンド
    * --*/
   createAction(MI_PickStyleAreas, tr("Style Picker Tool - Areas"), "",

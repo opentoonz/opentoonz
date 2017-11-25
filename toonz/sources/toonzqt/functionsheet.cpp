@@ -501,6 +501,8 @@ FunctionSheetCellViewer::FunctionSheetCellViewer(FunctionSheet *parent)
   m_lineEdit->hide();
   bool ret = connect(m_lineEdit, SIGNAL(editingFinished()), this,
                      SLOT(onCellEditorEditingFinished()));
+  ret = ret && connect(m_lineEdit, SIGNAL(mouseMoved(QMouseEvent *)), this,
+                       SLOT(onMouseMovedInLineEdit(QMouseEvent *)));
   assert(ret);
   setMouseTracking(true);
 
@@ -689,7 +691,7 @@ void FunctionSheetCellViewer::mouseDoubleClickEvent(QMouseEvent *e) {
     TMeasure *measure = curve->getMeasure();
     const TUnit *unit = measure ? measure->getCurrentUnit() : 0;
     if (unit) v       = unit->convertTo(v);
-
+    m_currentValue    = v;
     m_lineEdit->setText(QString::number(v, 'f', 4));
     // in order to put the cursor to the left end
     m_lineEdit->setSelection(m_lineEdit->text().length(),
@@ -719,7 +721,8 @@ void FunctionSheetCellViewer::mouseDoubleClickEvent(QMouseEvent *e) {
 
 void FunctionSheetCellViewer::onCellEditorEditingFinished() {
   QString text = m_lineEdit->text();
-  if (!text.isEmpty() && m_lineEdit->isReturnPressed()) {
+  if (!text.isEmpty() &&
+      (m_lineEdit->isReturnPressed() || m_lineEdit->getMouseDragEditing())) {
     double value        = text.toDouble();
     TDoubleParam *curve = m_sheet->getCurve(m_editCol);
     if (curve) {
@@ -744,8 +747,22 @@ void FunctionSheetCellViewer::mousePressEvent(QMouseEvent *e) {
     m_lineEdit->clearFocus();
     m_sheet->setFocus();
   }
-
-  if (e->button() == Qt::LeftButton || e->button() == Qt::MidButton)
+  if (e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier) {
+    mouseDoubleClickEvent(e);
+    if (m_lineEdit->text() != "") {
+      m_lineEdit->setMouseDragEditing(true);
+      m_mouseXPosition = e->x();
+    }
+  } else if (e->button() == Qt::LeftButton &&
+             e->modifiers() == Qt::AltModifier) {
+    CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+    int row                   = cellPosition.frame();
+    int col                   = cellPosition.layer();
+    TDoubleParam *curve       = m_sheet->getCurve(col);
+    if (curve) {
+      KeyframeSetter::removeKeyframeAt(curve, row);
+    }
+  } else if (e->button() == Qt::LeftButton || e->button() == Qt::MidButton)
     Spreadsheet::CellPanel::mousePressEvent(e);
   else if (e->button() == Qt::RightButton) {
     update();
@@ -756,7 +773,12 @@ void FunctionSheetCellViewer::mousePressEvent(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void FunctionSheetCellViewer::mouseReleaseEvent(QMouseEvent *e) {
-  Spreadsheet::CellPanel::mouseReleaseEvent(e);
+  if (m_lineEdit->getMouseDragEditing()) {
+    std::string textValue = m_lineEdit->text().toStdString();
+    onCellEditorEditingFinished();
+    m_lineEdit->setMouseDragEditing(false);
+  } else
+    Spreadsheet::CellPanel::mouseReleaseEvent(e);
   /*
   CellPosition cellPosition = getViewer ()->xyToPosition (e->pos ());
 int row = cellPosition.frame ();
@@ -770,7 +792,18 @@ m_sheet->setDragTool(0);
 //-----------------------------------------------------------------------------
 
 void FunctionSheetCellViewer::mouseMoveEvent(QMouseEvent *e) {
-  Spreadsheet::CellPanel::mouseMoveEvent(e);
+  if (m_lineEdit->getMouseDragEditing()) {
+    double newValue = m_currentValue + ((e->x() - m_mouseXPosition) / 2);
+    m_lineEdit->setText(QString::number(newValue, 'f', 4));
+    m_updatedValue = newValue;
+  } else
+    Spreadsheet::CellPanel::mouseMoveEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+
+void FunctionSheetCellViewer::onMouseMovedInLineEdit(QMouseEvent *event) {
+  if (m_lineEdit->getMouseDragEditing()) mouseMoveEvent(event);
 }
 
 //-----------------------------------------------------------------------------

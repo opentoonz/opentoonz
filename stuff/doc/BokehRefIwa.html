@@ -1,0 +1,59 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Bokeh Fx Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_bokeh_ref.png" width = 30 height = 30 >   Bokeh Ref Fx Iwa</h1>
+
+<h4>● 概要</h4>
+レンズのボケを再現するエフェクトです。入力画像をデプス参照画像の階調を元に数枚のレイヤーに分割し、
+分割された各レイヤーのRGB値を露光値に変換して、絞り形状でボカし、合成します。離散フーリエ変換を使って、高速化を図っています。
+ボカし処理を行う前に、各レイヤーの、前景で隠れている部分をメディアンフィルタで延ばす処理を行っています。
+
+<h4>● 入力ポート</h4>
+<UL>
+<LI><b>Iris</b> : 絞り画像を接続します。入力された画像の輝度値がフィルタに用いられます。Irisポートに何も接続されていない場合は、計算が行われません。RGBA8bit又はRGBA16bit画像が入力できます。
+<LI><b>Source</b> : 入力画像を接続します。Sourceポートに何も接続されていない場合は、計算が行われません。
+<LI><b>Depth</b> : Depth参照画像を接続します。各ピクセルの輝度がデプスに対応します。値が大きい（明るい）ほど、カメラから遠い位置になります。
+</UL>
+
+<h4>● パラメータ</h4>
+<UL>
+<LI><b>On-Focus Distance</b> : フォーカス位置。この位置にレイヤーがあると、
+そのレイヤーはボカされず、通常合成されます。0がカメラ位置です。(範囲 0.0～1.0)
+<LI><b>Bokeh Amount</b> : ボケの最大サイズ（単位 Unit）。フォーカス位置とレイヤー位置が 1.0 離れているとき、絞り画像の横幅がこの値になるまで拡大されて用いられます。
+<LI><b>Hardness</b> : フィルムのガンマ値。RGB値と露光量の変換に用います。露光量が10倍増えた時の、RGB値（0.0～1.0）の増加量に相当します。この値が小さいほど、ハイライトが強調されます。(範囲 0.05～3.0)
+<LI><b>Distance Precision</b> : デプス参照画像の分割数。この値が大きいほど、ボケサイズの階調が細かくなりますが、処理は遅くなります。(範囲 3～128)
+</UL>
+
+<h4>● 注意点</h4>
+<UL>
+<LI>複数フレームをレンダリングする際、レイヤーだけでなくIrisの素材も、レンダリングされるすべてのフレームの範囲に入っている必要があります。
+<LI>メモリを多く使います。
+</UL>
+
+<h4>● ライセンス情報</h4>
+<UL>
+<LI>このエフェクトは、フーリエ変換にKiss FFTというオープンソース・ライブラリを用いています。<br>
+</UL>
+<font size = "-1">
+<blockquote>
+This is the BSD-style license for the KissFFT.<br>
+<br>
+Copyright (c) 2003-2010 Mark Borgerding<br>
+<br>
+All rights reserved.<br>
+<br>
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:<br>
+<br>
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.<br>
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.<br>
+    * Neither the author nor the names of any contributors may be used to endorse or promote products derived from this software without specific prior written permission.<br>
+<br>
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</blockquote>
+</font>
+</body>
+
+</html>

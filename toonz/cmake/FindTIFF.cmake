@@ -19,7 +19,7 @@ endif()
 find_library(
     TIFF_LIBRARY
     NAMES
-        libtiff.a
+        libtiff.dylib
     HINTS
         ${SDKROOT}
     PATH_SUFFIXES

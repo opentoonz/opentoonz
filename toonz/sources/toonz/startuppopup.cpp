@@ -120,6 +120,8 @@ StartupPopup::StartupPopup()
   m_addPresetBtn            = new QPushButton(tr("Add"), this);
   m_removePresetBtn         = new QPushButton(tr("Remove"), this);
   m_showAtStartCB           = new QCheckBox(tr("Show this at startup"), this);
+  m_autoSaveOnCB            = new QCheckBox(tr("Automatically Save Every "));
+  m_autoSaveTimeFld         = new IntLineEdit(this, 10);
   QPushButton *createButton = new QPushButton(tr("Create Scene"), this);
   QPushButton *newProjectButton = new QPushButton(tr("New Project..."), this);
   QPushButton *loadOtherSceneButton =
@@ -143,6 +145,11 @@ StartupPopup::StartupPopup()
   m_dpiFld->setRange(1.0, (std::numeric_limits<double>::max)());
   m_resXFld->setRange(0.1, (std::numeric_limits<double>::max)());
   m_resYFld->setRange(0.1, (std::numeric_limits<double>::max)());
+  m_autoSaveTimeFld->setRange(1, (std::numeric_limits<int>::max)());
+  m_autoSaveOnCB->setChecked(Preferences::instance()->isAutosaveEnabled());
+  m_autoSaveOnCB->setStyleSheet("QCheckBox{ background-color: none; }");
+  m_autoSaveTimeFld->setEnabled(m_autoSaveOnCB->isChecked());
+  m_autoSaveTimeFld->setValue(Preferences::instance()->getAutosavePeriod());
   m_showAtStartCB->setChecked(Preferences::instance()->isStartupPopupEnabled());
   m_showAtStartCB->setStyleSheet("QCheckBox{ background-color: none; }");
   m_addPresetBtn->setStyleSheet(
@@ -248,7 +255,15 @@ StartupPopup::StartupPopup()
 
   m_buttonLayout->setMargin(0);
   m_buttonLayout->setSpacing(10);
-  { m_buttonLayout->addWidget(m_showAtStartCB, Qt::AlignLeft); }
+  {
+    m_buttonLayout->addWidget(m_showAtStartCB, Qt::AlignLeft);
+    m_buttonLayout->addStretch();
+    m_buttonLayout->addWidget(m_autoSaveOnCB);
+    m_buttonLayout->addWidget(m_autoSaveTimeFld);
+    QLabel *minutesLabel = new QLabel(tr("Minutes"), this);
+    minutesLabel->setStyleSheet("QLabel{ background-color: none; }");
+    m_buttonLayout->addWidget(minutesLabel);
+  }
 
   TApp *app                 = TApp::instance();
   TSceneHandle *sceneHandle = app->getCurrentScene();
@@ -288,6 +303,10 @@ StartupPopup::StartupPopup()
         connect(m_removePresetBtn, SIGNAL(clicked()), SLOT(removePreset()));
   ret = ret && connect(m_nameFld, SIGNAL(returnPressedNow()), createButton,
                        SLOT(animateClick()));
+  ret = ret && connect(m_autoSaveOnCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onAutoSaveOnChanged(int)));
+  ret = ret && connect(m_autoSaveTimeFld, SIGNAL(editingFinished()), this,
+                       SLOT(onAutoSaveTimeChanged()));
   assert(ret);
 }
 
@@ -357,7 +376,9 @@ void StartupPopup::showEvent(QShowEvent *) {
   m_sceneBox->setFixedWidth(boxWidth);
   m_projectBox->setFixedWidth(boxWidth);
   m_recentBox->setMinimumHeight(boxHeight);
-
+  m_autoSaveOnCB->setChecked(Preferences::instance()->isAutosaveEnabled());
+  m_autoSaveTimeFld->setEnabled(m_autoSaveOnCB->isChecked());
+  m_autoSaveTimeFld->setValue(Preferences::instance()->getAutosavePeriod());
   // update recent scenes
   // clear items if they exist first
   refreshRecentScenes();
@@ -890,6 +911,19 @@ void StartupPopup::onCameraUnitChanged(int index) {
 
 void StartupPopup::onShowAtStartChanged(int index) {
   Preferences::instance()->enableStartupPopup(index);
+}
+
+//-----------------------------------------------------------------------------
+
+void StartupPopup::onAutoSaveOnChanged(int index) {
+  Preferences::instance()->enableAutosave(index);
+  m_autoSaveTimeFld->setEnabled(index);
+}
+
+//-----------------------------------------------------------------------------
+
+void StartupPopup::onAutoSaveTimeChanged() {
+  Preferences::instance()->setAutosavePeriod(m_autoSaveTimeFld->getValue());
 }
 
 //-----------------------------------------------------------------------------

@@ -1057,6 +1057,62 @@ What do you want to do?</source>
     </message>
 </context>
 <context>
+    <name>CommandBar</name>
+    <message>
+        <source>Customize Command Bar</source>
+        <translation>コマンドバーをカスタマイズ</translation>
+    </message>
+</context>
+<context>
+    <name>CommandBarListTree</name>
+    <message>
+        <source>----Separator----</source>
+        <translation>----セパレータ----</translation>
+    </message>
+</context>
+<context>
+    <name>CommandBarPopup</name>
+    <message>
+        <source>XSheet Toolbar</source>
+        <translation>タイムシートツールバー</translation>
+    </message>
+    <message>
+        <source>Customize XSheet Toolbar</source>
+        <translation>タイムシートツールバーをカスタマイズ</translation>
+    </message>
+    <message>
+        <source>Command Bar</source>
+        <translation>コマンドバー</translation>
+    </message>
+    <message>
+        <source>Customize Command Bar</source>
+        <translation>コマンドバーをカスタマイズ</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>Toolbar Items</source>
+        <translation>ツールバーの項目</translation>
+    </message>
+    <message>
+        <source>Duplicated commands will be ignored. Only the last one will appear in the menu bar.</source>
+        <translation>重複したコマンドは無視され、最後に追加されたものだけがツールバーに表示されます。</translation>
+    </message>
+</context>
+<context>
+    <name>CommandBarTree</name>
+    <message>
+        <source>Remove &quot;%1&quot;</source>
+        <translation>&quot;%1&quot;を削除</translation>
+    </message>
+</context>
+<context>
     <name>CommandListTree</name>
     <message>
         <source>----Separator----</source>
@@ -1504,11 +1560,11 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>There was an error copying %1 to %2</source>
-        <translation>%2 に　%1 をコピーする時、エラーが発生しました。</translation>
+        <translation>%2 に　%1 をコピーする時、エラーが発生しました</translation>
     </message>
     <message>
         <source>The local path does not exist:</source>
-        <translation>ローカルパスは存在しません。</translation>
+        <translation>ローカルパスは存在しません：</translation>
     </message>
 </context>
 <context>
@@ -1966,7 +2022,7 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>The input folder path was invalid.</source>
-        <translation>入力されたフォルダパスは無効です</translation>
+        <translation>入力されたフォルダパスは無効です。</translation>
     </message>
 </context>
 <context>
@@ -2391,7 +2447,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>No level name specified: please choose a valid level name</source>
-        <translation>レベル名は指定されていません。有効なレベル名を指定して下さい。</translation>
+        <translation>レベル名は指定されていません。有効なレベル名を指定して下さい</translation>
     </message>
     <message>
         <source>Invalid frame range</source>
@@ -2413,7 +2469,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Unable to create</source>
-        <translation>作成できません。</translation>
+        <translation>作成できません </translation>
     </message>
     <message>
         <source>Invalid increment value</source>
@@ -3028,11 +3084,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Save Palette As...</source>
-        <translation>パレットを保存 (&amp;S)...</translation>
+        <translation>パレットを別名で保存 (&amp;S)...</translation>
     </message>
     <message>
         <source>&amp;Save Palette</source>
-        <translation>.</translation>
+        <translation>パレットを保存 (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Load Color Model...</source>
@@ -3448,19 +3504,19 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Drawing Substitution Forward</source>
-        <translation></translation>
+        <translation>動画番号を１つ進める</translation>
     </message>
     <message>
         <source>Drawing Substitution Backward</source>
-        <translation></translation>
+        <translation>動画番号を１つ戻す</translation>
     </message>
     <message>
         <source>Similar Drawing Substitution Forward</source>
-        <translation></translation>
+        <translation>連続コマの動画番号を１つ進める</translation>
     </message>
     <message>
         <source>Similar Drawing Substitution Backward</source>
-        <translation></translation>
+        <translation>連続コマの動画番号を１つ戻す</translation>
     </message>
     <message>
         <source>&amp;Set Key</source>
@@ -4742,6 +4798,10 @@ Do you want to create it?</source>
         <source>Reframe with Empty Inbetweens...</source>
         <translation>空コマを入れてリフレーム...</translation>
     </message>
+    <message>
+        <source>&amp;Toggle Edit In Place</source>
+        <translation>親シートの内容をビューアに表示 (&amp;T)</translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5051,7 +5111,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Do stereoscopy</source>
-        <translation>: </translation>
+        <translation>立体視レンダリング</translation>
     </message>
     <message>
         <source>Standard</source>
@@ -5815,8 +5875,18 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     <message>
         <source>Save the current scene in the subfolder.
           Set the output folder path to the subfolder as well.</source>
-        <translation>シーンをカットフォルダ内に保存します。
+        <translation type="vanished">シーンをカットフォルダ内に保存します。
 出力設定の保存先のパスもカットフォルダ内に変更します。</translation>
+    </message>
+    <message>
+        <source>Create the Destination Subfolder to Save</source>
+        <translation>カットフォルダの作成</translation>
+    </message>
+    <message>
+        <source>Save the current scene in the subfolder.
+Set the output folder path to the subfolder as well.</source>
+        <translation>カットフォルダ内にシーンファイルを保存します。同時に、
+出力設定の保存先をカットフォルダのパスに設定します。</translation>
     </message>
 </context>
 <context>
@@ -6670,6 +6740,10 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Vector Guided Style:</source>
         <translation>ベクターレベルの描き順のガイド：</translation>
+    </message>
+    <message>
+        <source>Layout Preference*:</source>
+        <translation>列ヘッダのレイアウト*：</translation>
     </message>
 </context>
 <context>
@@ -8386,7 +8460,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Auto Input Cell Numbers : %1</source>
-        <translation>セルの自動入力：</translation>
+        <translation>セルの自動入力：%1</translation>
     </message>
     <message>
         <source>Insert</source>
@@ -8407,6 +8481,10 @@ Are you sure?</source>
     <message>
         <source>Fx Schematic</source>
         <translation>エフェクトスキマティック</translation>
+    </message>
+    <message>
+        <source>Cannot Read XML File</source>
+        <translation>XMLファイルを読み込めません</translation>
     </message>
 </context>
 <context>
@@ -10988,6 +11066,22 @@ Please refer to the user guide for details.</source>
         <source>Subsampling</source>
         <translation>離散サンプリング</translation>
     </message>
+    <message>
+        <source>Click to select column</source>
+        <translation>[クリック] 列を選択</translation>
+    </message>
+    <message>
+        <source>Click to select column, drag to move it, double-click to edit</source>
+        <translation>［クリック］列を選択 ［ドラッグ］列を移動 [ダブルクリック]列の名前を変更</translation>
+    </message>
+    <message>
+        <source>Click to select column, double-click to edit</source>
+        <translation>［クリック］列を選択 [ダブルクリック]列の名前を変更</translation>
+    </message>
+    <message>
+        <source>Additional column settings</source>
+        <translation>列の表示オプション</translation>
+    </message>
 </context>
 <context>
     <name>XsheetGUI::ColumnTransparencyPopup</name>
@@ -11134,6 +11228,13 @@ Please refer to the user guide for details.</source>
     <message>
         <source>New Raster Level</source>
         <translation type="vanished">新規ラスターレベル</translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::XSheetToolbar</name>
+    <message>
+        <source>Customize XSheet Toolbar</source>
+        <translation>タイムシートツールバーをカスタマイズ</translation>
     </message>
 </context>
 <context>

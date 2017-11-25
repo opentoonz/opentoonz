@@ -452,5 +452,7 @@
       <file>Resources/locator_over.svg</file>
       <file>Resources/refresh.svg</file>
       <file>Resources/refresh_over.svg</file>
+      <file>Resources/zoom_in.svg</file>
+      <file>Resources/zoom_out.svg</file>
     </qresource>
 </RCC>
