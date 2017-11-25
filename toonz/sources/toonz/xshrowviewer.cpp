@@ -816,7 +816,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   int pinnedCenterColumnId = -1;
   if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton &&
       o->rect(PredefinedRect::PINNED_CENTER_KEY)
-          .adjusted(-frameAdj, 0, -frameAdj, 0)
+          .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
           .contains(mouseInCell)) {
     int col      = m_viewer->getCurrentColumn();
     TXsheet *xsh = m_viewer->getXsheet();
@@ -859,7 +859,9 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
                     .arg((isRootBonePinned) ? " (Root)" : "");
   else if (row == currentRow) {
     if (Preferences::instance()->isOnionSkinEnabled() &&
-        o->rect(PredefinedRect::ONION).contains(mouseInCell))
+        o->rect(PredefinedRect::ONION)
+            .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+            .contains(mouseInCell))
       m_tooltip = tr("Double Click to Toggle Onion Skin");
     else
       m_tooltip = tr("Current Frame");
@@ -970,6 +972,7 @@ int RowArea::getNonEmptyCell(int row, int column, Direction direction) {
 void RowArea::mouseDoubleClickEvent(QMouseEvent *event) {
   int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
   int row          = m_viewer->xyToPosition(event->pos()).frame();
+  int frameAdj     = m_viewer->getFrameZoomAdjustment();
   QPoint topLeft   = m_viewer->positionToXY(CellPosition(row, 0));
   if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
   QPoint mouseInCell = event->pos() - topLeft;
@@ -978,6 +981,7 @@ void RowArea::mouseDoubleClickEvent(QMouseEvent *event) {
       Preferences::instance()->isOnionSkinEnabled() && row == currentFrame &&
       m_viewer->orientation()
           ->rect(PredefinedRect::ONION)
+          .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
           .contains(mouseInCell)) {
     TOnionSkinMaskHandle *osmh = TApp::instance()->getCurrentOnionSkin();
     OnionSkinMask osm          = osmh->getOnionSkinMask();
