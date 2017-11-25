@@ -1600,6 +1600,9 @@ public:
     m_origOffset = m_offset = m_firstCol - col;
     assert(m_lastCol == *indices.begin());
     getViewer()->update();
+
+    if (!getViewer()->orientation()->isVerticalTimeline())
+      TUndoManager::manager()->beginBlock();
   }
   void onDrag(const CellPosition &pos) override {
     int col                     = pos.layer();
@@ -1616,10 +1619,10 @@ public:
     if (col < 0) col = 0;
     int dCol         = col - (m_lastCol - m_offset);
 
+    int newBegin = *indices.begin() + dCol;
     if (!getViewer()->orientation()->isVerticalTimeline()) {
       if (origCol < 0) dCol += origCol;
       std::set<int> ii;
-      int newBegin = *indices.begin() + dCol;
       if (newBegin < 0) {
         newBegin *= -1;
         for (int x = 0; x < newBegin; x++) ii.insert(x);
@@ -1642,7 +1645,8 @@ public:
           ColumnCmd::insertEmptyColumns(ii);
         }
       }
-    }
+    } else if (newBegin < 0)
+      return;
 
     if (col == (m_lastCol - m_offset)) return;
     m_lastCol = col + m_offset;
@@ -1658,14 +1662,18 @@ public:
   }
   void onRelease(const CellPosition &pos) override {
     int delta = m_lastCol - m_firstCol;
-    if (delta == 0) return;
-    TColumnSelection *selection = getViewer()->getColumnSelection();
-    std::set<int> indices       = selection->getIndices();
-    if (!indices.empty()) {
-      TUndoManager::manager()->add(new ColumnMoveUndo(indices, delta));
-      TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (delta != 0) {
+      TColumnSelection *selection = getViewer()->getColumnSelection();
+      std::set<int> indices       = selection->getIndices();
+      if (!indices.empty()) {
+        TUndoManager::manager()->add(new ColumnMoveUndo(indices, delta));
+        TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+        TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      }
     }
+
+    if (!getViewer()->orientation()->isVerticalTimeline())
+      TUndoManager::manager()->endBlock();
   }
 };
 

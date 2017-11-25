@@ -1496,6 +1496,18 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
     if (r1 != r1WithoutOff) p.fillRect(modifierRect, SoundColumnExtenderColor);
     m_soundLevelModifyRects.append(modifierRect);
   }
+
+  int distance, markerOffset;
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+      distance, markerOffset);
+  bool isAfterMarkers =
+      (row - markerOffset) % distance == 0 && distance != 0 && row != 0;
+
+  // draw marker interval
+  if (isAfterMarkers) {
+    p.setPen(m_viewer->getMarkerLineColor());
+    p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -2501,7 +2513,9 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       m_viewer->getKeyframeSelection()->selectNone();
       setDragTool(XsheetGUI::DragTool::makeLevelExtenderTool(m_viewer, true));
     } else if ((!xsh->getCell(row, col).isEmpty()) &&
-               o->rect(PredefinedRect::DRAG_AREA).contains(mouseInCell)) {
+               o->rect(PredefinedRect::DRAG_AREA)
+                   .adjusted(0, 0, -frameAdj, 0)
+                   .contains(mouseInCell)) {
       TXshColumn *column = xsh->getColumn(col);
       if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
         int r0, r1;
@@ -2527,7 +2541,9 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     } else {
       m_viewer->getKeyframeSelection()->selectNone();
       if (isSoundColumn &&
-          o->rect(PredefinedRect::PREVIEW_TRACK).contains(mouseInCell))
+          o->rect(PredefinedRect::PREVIEW_TRACK)
+              .adjusted(0, 0, -frameAdj, 0)
+              .contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeSoundScrubTool(
             m_viewer, column->getSoundColumn()));
       else if (isSoundColumn &&
@@ -2599,10 +2615,11 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
   bool isKeyframeFrame =
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
       pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
-  bool isKeyFrameArea =
-      isKeyframeFrame &&
-      o->rect(PredefinedRect::KEYFRAME_AREA).contains(mouseInCell) &&
-      row < k1 + 1;
+  bool isKeyFrameArea = isKeyframeFrame &&
+                        o->rect(PredefinedRect::KEYFRAME_AREA)
+                            .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+                            .contains(mouseInCell) &&
+                        row < k1 + 1;
 
   if (isKeyFrameArea) {
     if (pegbar->isKeyframe(row))  // key frame
@@ -2626,7 +2643,9 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
                  .contains(mouseInCell))  // cycle toggle of key frames
     m_tooltip = tr("Set the cycle of previous keyframes");
   else if ((!xsh->getCell(row, col).isEmpty()) &&
-           o->rect(PredefinedRect::DRAG_AREA).contains(mouseInCell))
+           o->rect(PredefinedRect::DRAG_AREA)
+               .adjusted(0, 0, -frameAdj, 0)
+               .contains(mouseInCell))
     m_tooltip = tr("Click and drag to move the selection");
   else if (isZeraryColumn)
     m_tooltip = QString::fromStdWString(column->getZeraryFxColumn()
@@ -2658,7 +2677,9 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
                             QString::fromStdString(frameNumber));
     }
   } else if (isSoundColumn &&
-             o->rect(PredefinedRect::PREVIEW_TRACK).contains(mouseInCell))
+             o->rect(PredefinedRect::PREVIEW_TRACK)
+                 .adjusted(0, 0, -frameAdj, 0)
+                 .contains(mouseInCell))
     m_tooltip = tr("Click and drag to play");
   else if (m_levelExtenderRect.contains(pos))
     m_tooltip = tr("Click and drag to repeat selected cells");
@@ -2686,6 +2707,7 @@ void CellArea::mouseReleaseEvent(QMouseEvent *event) {
 
 void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   const Orientation *o = m_viewer->orientation();
+  int frameAdj         = m_viewer->getFrameZoomAdjustment();
   TPoint pos(event->pos().x(), event->pos().y());
   CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
   int row                   = cellPosition.frame();
@@ -2720,10 +2742,11 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
     int k0, k1;
     bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
                            k0 <= row && row <= k1 + 1;
-    bool isKeyFrameArea =
-        isKeyframeFrame &&
-        o->rect(PredefinedRect::KEYFRAME_AREA).contains(mouseInCell) &&
-        row < k1 + 1;
+    bool isKeyFrameArea = isKeyframeFrame &&
+                          o->rect(PredefinedRect::KEYFRAME_AREA)
+                              .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+                              .contains(mouseInCell) &&
+                          row < k1 + 1;
 
     // If you are in the keyframe area, open a function editor
     if (isKeyFrameArea) {
@@ -2751,6 +2774,7 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   const Orientation *o = m_viewer->orientation();
+  int frameAdj         = m_viewer->getFrameZoomAdjustment();
   TPoint pos(event->pos().x(), event->pos().y());
   CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
   int row                   = cellPosition.frame();
@@ -2787,10 +2811,11 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   bool isKeyframeFrame =
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
       pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
-  bool isKeyFrameArea =
-      isKeyframeFrame &&
-      o->rect(PredefinedRect::KEYFRAME_AREA).contains(mouseInCell) &&
-      row < k1 + 1;
+  bool isKeyFrameArea = isKeyframeFrame &&
+                        o->rect(PredefinedRect::KEYFRAME_AREA)
+                            .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+                            .contains(mouseInCell) &&
+                        row < k1 + 1;
 
   if (isKeyFrameArea) {
     TStageObjectId objectId;

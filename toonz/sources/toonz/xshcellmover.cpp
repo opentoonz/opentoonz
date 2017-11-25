@@ -488,6 +488,9 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   m_validPos                      = true;
   m_lastPos                       = m_startPos;
   m_undo->getCellsMover()->m_uffa = 0;
+
+  if (!getViewer()->orientation()->isVerticalTimeline())
+    TUndoManager::manager()->beginBlock();
 }
 
 void LevelMoverTool::onCellChange(int row, int col) {
@@ -638,6 +641,9 @@ void LevelMoverTool::onRelease(const CellPosition &pos) {
   int posY              = cellMover->getPos().y;
   if (m_lastPos != m_startPos) TUndoManager::manager()->add(m_undo);
   m_undo = 0;
+
+  if (!getViewer()->orientation()->isVerticalTimeline())
+    TUndoManager::manager()->endBlock();
 }
 
 void LevelMoverTool::drawCellsArea(QPainter &p) {

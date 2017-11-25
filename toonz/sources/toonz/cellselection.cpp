@@ -2123,6 +2123,14 @@ void TCellSelection::overWritePasteCells() {
       DVGui::error(QObject::tr("No data to paste."));
       return;
     }
+
+    XsheetViewer *viewer = TApp::instance()->getCurrentXsheetViewer();
+    if (viewer && !viewer->orientation()->isVerticalTimeline()) {
+      int cAdj = cellData->getColCount() - 1;
+      c0 -= cAdj;
+      c1 -= cAdj;
+    }
+
     int oldR0 = r0;
     int oldC0 = c0;
     int oldR1 = r1;
@@ -2203,6 +2211,13 @@ void TCellSelection::overwritePasteNumbers() {
     if (cellData->getCellCount() == 0) {
       DVGui::error(QObject::tr("No data to paste."));
       return;
+    }
+
+    XsheetViewer *viewer = TApp::instance()->getCurrentXsheetViewer();
+    if (viewer && !viewer->orientation()->isVerticalTimeline()) {
+      int cAdj = cellData->getColCount() - 1;
+      c0 -= cAdj;
+      c1 -= cAdj;
     }
 
     int oldR0 = r0;

@@ -629,6 +629,11 @@ void RowArea::paintEvent(QPaintEvent *event) {
     // current frame
     drawCurrentRowGadget(p, r0, r1);
 
+  if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
+      Preferences::instance()->isCurrentTimelineIndicatorEnabled() &&
+      !m_viewer->orientation()->isVerticalTimeline())
+    drawCurrentTimeLine(p);
+
   drawRows(p, r0, r1);
 
   if (TApp::instance()->getCurrentFrame()->isEditingScene()) {
@@ -637,13 +642,7 @@ void RowArea::paintEvent(QPaintEvent *event) {
     else if (Preferences::instance()->isCurrentTimelineIndicatorEnabled() &&
              !m_viewer->orientation()->isVerticalTimeline())
       drawCurrentTimeIndicator(p);
-
-    if (Preferences::instance()->isCurrentTimelineIndicatorEnabled() &&
-        !m_viewer->orientation()->isVerticalTimeline())
-      drawCurrentTimeLine(p);
   }
-
-  //  drawRows(p, r0, r1);
 
   if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton)
     drawPinnedCenterKeys(p, r0, r1);
