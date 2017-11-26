@@ -625,74 +625,88 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh) {
                            "scene.\n All resources have been saved.");
 
   TFilePath scenePath = decodeFilePath(fp);
+  TFilePath scenePathTemp(scenePath.getWideString() +
+                          QString(".tmp").toStdWString());
 
   // if(TFileStatus(scenePath).doesExist()) saveBackup(scenePath);
 
-  TSystem::touchFile(scenePath);
+  if (TFileStatus(scenePathTemp).doesExist())
+    TSystem::removeFileOrLevel(scenePathTemp);
+
+  //  TSystem::touchFile(scenePath);
+  TSystem::touchFile(scenePathTemp);
   makeSceneIcon(this);
 
   // TOStream os(scenePath, compressionEnabled);
-  TOStream os(scenePath, false);
-  if (!os.checkStatus()) throw TException("Could not open file");
+  //  TOStream os(scenePath, false);
+  {
+    TOStream os(scenePathTemp, false);
+    if (!os.checkStatus())
+      throw TException("Could not open temporary save file");
 
-  TXsheet *xsh      = subxsh;
-  if (xsh == 0) xsh = m_childStack->getTopXsheet();
+    TXsheet *xsh      = subxsh;
+    if (xsh == 0) xsh = m_childStack->getTopXsheet();
 
-  std::map<std::string, std::string> attr;
-  attr["version"] =
-      (QString::number(l_currentVersion.first) +
-       "."  // From now on, version numbers in saved files will have
-       + QString::number(
-             l_currentVersion.second))  // the signature "MAJOR.MINOR", where:
-          .toStdString();               //
-  attr["framecount"] =
-      QString::number(  //    MAJOR = Toonz version number * 10 (eg 7.0 => 70)
-          xsh->getFrameCount())
-          .toStdString();  //    MINOR = Reset to 0 after each major increment,
-                           //    and
-                           //            advancing on its own when fixing bugs.
-  os.openChild("tnz", attr);
+    std::map<std::string, std::string> attr;
+    attr["version"] =
+        (QString::number(l_currentVersion.first) +
+         "."  // From now on, version numbers in saved files will have
+         + QString::number(
+               l_currentVersion.second))  // the signature "MAJOR.MINOR", where:
+            .toStdString();               //
+    attr["framecount"] =
+        QString::number(  //    MAJOR = Toonz version number * 10 (eg 7.0 => 70)
+            xsh->getFrameCount())
+            .toStdString();  //    MINOR = Reset to 0 after each major
+                             //    increment,
+                             //    and
+    //            advancing on its own when fixing bugs.
+    os.openChild("tnz", attr);
 
-  os.child("generator") << TEnv::getApplicationFullName();
-  os.openChild("properties");
-  m_properties->saveData(os);
-  os.closeChild();
-
-  if (subxsh) {
-    std::set<TXshLevel *> saveSet;
-    subxsh->getUsedLevels(saveSet);
-    m_levelSet->setSaveSet(saveSet);
-  }
-  os.openChild("levelSet");
-  m_levelSet->saveData(os);
-  os.closeChild();
-  std::set<TXshLevel *> emptySaveSet;
-  m_levelSet->setSaveSet(emptySaveSet);
-
-  os.openChild("xsheet");
-  os << *xsh;
-  os.closeChild();
-
-  if (getContentHistory()) {
-    os.openChild("history");
-    QString data = getContentHistory()->serialize();
-    int i        = 0, j;
-    // non scrivo tutta la std::string di seguito per evitare problemi se
-    // diventa
-    // troppo lunga. Cerco di spezzarla in modo che sia "bella da leggere" nel
-    // tnz
-    while ((j = data.indexOf("||", i)) >= i) {
-      os << data.mid(i, j - i + 1).toStdWString();
-      os.cr();
-      i = j + 1;
-    }
-    os << data.mid(i).toStdWString();
+    os.child("generator") << TEnv::getApplicationFullName();
+    os.openChild("properties");
+    m_properties->saveData(os);
     os.closeChild();
+
+    if (subxsh) {
+      std::set<TXshLevel *> saveSet;
+      subxsh->getUsedLevels(saveSet);
+      m_levelSet->setSaveSet(saveSet);
+    }
+    os.openChild("levelSet");
+    m_levelSet->saveData(os);
+    os.closeChild();
+    std::set<TXshLevel *> emptySaveSet;
+    m_levelSet->setSaveSet(emptySaveSet);
+
+    os.openChild("xsheet");
+    os << *xsh;
+    os.closeChild();
+
+    if (getContentHistory()) {
+      os.openChild("history");
+      QString data = getContentHistory()->serialize();
+      int i        = 0, j;
+      // non scrivo tutta la std::string di seguito per evitare problemi se
+      // diventa
+      // troppo lunga. Cerco di spezzarla in modo che sia "bella da leggere" nel
+      // tnz
+      while ((j = data.indexOf("||", i)) >= i) {
+        os << data.mid(i, j - i + 1).toStdWString();
+        os.cr();
+        i = j + 1;
+      }
+      os << data.mid(i).toStdWString();
+      os.closeChild();
+    }
+
+    os.closeChild();
+    bool status = os.checkStatus();
+    if (!status) throw TException("Could not complete the temporary save");
   }
 
-  os.closeChild();
-  bool status = os.checkStatus();
-  if (!status) throw TException("Could not complete the save");
+  if (TFileStatus(scenePathTemp).doesExist())
+    TSystem::renameFile(scenePath, scenePathTemp, true);
 
   if (subxsh) {
     setScenePath(oldScenePath);
