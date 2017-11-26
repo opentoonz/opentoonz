@@ -1621,7 +1621,10 @@ public:
 
     int newBegin = *indices.begin() + dCol;
     if (!getViewer()->orientation()->isVerticalTimeline()) {
-      if (origCol < 0) dCol += origCol;
+      if (origCol < 0) {
+        dCol += origCol;
+        newBegin = *indices.begin() + dCol;
+      }
       std::set<int> ii;
       if (newBegin < 0) {
         newBegin *= -1;
