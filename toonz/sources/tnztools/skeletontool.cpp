@@ -54,7 +54,9 @@ using namespace SkeletonSubtools;
 
 TEnv::IntVar SkeletonGlobalKeyFrame("SkeletonToolGlobalKeyFrame", 0);
 TEnv::IntVar SkeletonInverseKinematics("SkeletonToolInverseKinematics", 0);
-
+TEnv::DoubleVar SkeletonUIScale("SkeletonUIScale", 1.0);
+TEnv::IntVar SkeletonMode("SkeletonMode", 0);
+TEnv::IntVar SkeletonShowOnlyActive("SkeletonShowOnlyActive", 0);
 #define BUILD_SKELETON L"Build Skeleton"
 #define ANIMATE L"Animate"
 #define INVERSE_KINEMATICS L"Inverse Kinematics"
@@ -239,6 +241,7 @@ SkeletonTool::SkeletonTool()
     , m_mode("Mode:")
     , m_showOnlyActiveSkeleton("Show Only Active Skeleton", false)
     , m_globalKeyframes("Global Key", false)
+    , m_UIScale("UI Scale", 0.01, 2.0, 1)
     , m_dragTool(0)
     , m_firstTime(true)
     , m_currentFrame(-1)
@@ -253,8 +256,10 @@ SkeletonTool::SkeletonTool()
   m_prop.bind(m_mode);
   m_prop.bind(m_globalKeyframes);
   m_prop.bind(m_showOnlyActiveSkeleton);
+  m_prop.bind(m_UIScale);
   m_mode.setId("SkeletonMode");
   m_globalKeyframes.setId("GlobalKey");
+  m_UIScale.setId("UIScale");
   m_showOnlyActiveSkeleton.setId("ShowOnlyActiveSkeleton");
 
   m_mode.addValue(BUILD_SKELETON);
@@ -273,6 +278,9 @@ SkeletonTool::~SkeletonTool() { delete m_dragTool; }
 
 bool SkeletonTool::onPropertyChanged(std::string propertyName) {
   SkeletonGlobalKeyFrame = (int)(m_globalKeyframes.getValue());
+  SkeletonUIScale        = (double)(m_UIScale.getValue());
+  SkeletonMode           = (int)(m_mode.getIndex());
+  SkeletonShowOnlyActive = (int)(m_showOnlyActiveSkeleton.getValue());
   // SkeletonInverseKinematics=(int)(m_ikEnabled.getValue());
   invalidate();
   return false;
@@ -291,6 +299,7 @@ void SkeletonTool::updateTranslation() {
   m_showOnlyActiveSkeleton.setQStringName(tr("Show Only Active Skeleton"));
   m_globalKeyframes.setQStringName(tr("Global Key"));
   m_mode.setQStringName(tr("Mode:"));
+  m_UIScale.setQStringName(tr("UI Scale"));
 }
 
 //-------------------------------------------------------------------
@@ -380,7 +389,7 @@ void SkeletonTool::leftButtonDown(const TPointD &ppos, const TMouseEvent &e) {
   if (m_device < 0) {
     // nessun gadget cliccato. Eventualmente seleziono la colonna
     std::vector<int> columnIndexes;
-    getViewer()->posToColumnIndexes(e.m_pos, columnIndexes, getPixelSize() * 5,
+    getViewer()->posToColumnIndexes(e.m_pos, columnIndexes, getUIScale() * 5,
                                     false);
     if (!columnIndexes.empty()) {
       int columnIndex;
@@ -747,7 +756,7 @@ void SkeletonTool::drawSkeleton(const Skeleton &skeleton, int row) {
       if (bone->getParent())
         drawIKBone(bone->getCenter(), bone->getParent()->getCenter());
     } else if (bone->getParent() || isCurrent) {
-      double pixelSize = getPixelSize();
+      double pixelSize = getUIScale();
       TPointD a        = bone->getCenter();
       TPointD b, pm;
       if (bone->getParent()) {
@@ -829,6 +838,14 @@ void SkeletonTool::getImageBoundingBox(TRectD &bbox, TAffine &aff, int frame,
 
 //-------------------------------------------------------------------
 
+double SkeletonTool::getUIScale() {
+  double size = getPixelSize();
+  size *= m_UIScale.getValue();
+  return size;
+}
+
+//-------------------------------------------------------------------
+
 void SkeletonTool::drawLevelBoundingBox(int frame, int columnIndex) {
   TAffine affine   = getCurrentColumnMatrix();
   TXshCell cell    = getXsheet()->getCell(frame, columnIndex);
@@ -856,7 +873,7 @@ void SkeletonTool::drawLevelBoundingBox(int frame, int columnIndex) {
 
 void SkeletonTool::drawIKJoint(const Skeleton::Bone *bone) {
   TPointD pos     = bone->getCenter();
-  const double r0 = 6 * getPixelSize(), r1 = r0 / 3;
+  const double r0 = 6 * getUIScale(), r1 = r0 / 3;
   int code = TD_LockStageObject + bone->getColumnIndex();
   glPushName(code);
   glColor3d(0.8, 0.5, 0.05);
@@ -893,7 +910,7 @@ void SkeletonTool::drawIKJoint(const Skeleton::Bone *bone) {
     tglFillRect(pos.x - r1, pos.y - r1, pos.x + r1, pos.y + r1);
   } else {
     glColor3d(0.2, 0.1, 0.05);
-    const double r3 = 2 * getPixelSize();
+    const double r3 = 2 * getUIScale();
     tglDrawCircle(pos, r3);
   }
   glPopName();
@@ -903,7 +920,7 @@ void SkeletonTool::drawIKJoint(const Skeleton::Bone *bone) {
 
 void SkeletonTool::drawJoint(const TPointD &pos, bool current) {
   const double alpha = 0.8, ialpha = 1 - alpha;
-  double r0 = 4 * getPixelSize();
+  double r0 = 4 * getUIScale();
   if (current) {
     glPushName(TD_Center);
     if (m_device == TD_Center) {
@@ -937,7 +954,7 @@ void SkeletonTool::drawBone(const TPointD &a, const TPointD &b, bool selected) {
   // se sono troppo vicini niente da fare
   TPointD delta = b - a;
   if (norm2(delta) < 0.001) return;
-  TPointD u = getPixelSize() * 2.5 * normalize(rotate90(delta));
+  TPointD u = getUIScale() * 2.5 * normalize(rotate90(delta));
   if (selected)
     glColor4d(0.9 * alpha, 0.9 * alpha, 0.9 * alpha, alpha);
   else
@@ -961,7 +978,7 @@ void SkeletonTool::drawIKBone(const TPointD &a, const TPointD &b) {
   // se sono troppo vicini niente da fare
   TPointD delta = b - a;
   if (norm2(delta) < 0.001) return;
-  TPointD u = getPixelSize() * 2.5 * normalize(rotate90(delta));
+  TPointD u = getUIScale() * 2.5 * normalize(rotate90(delta));
   glColor3d(0.58, 0.58, 0.58);
   glBegin(GL_POLYGON);
   tglVertex(a + u);
@@ -1039,8 +1056,8 @@ void SkeletonTool::drawHooks() {
     // otherColumn = "picked" column not connected
     TPoint parentProbePos = getViewer()->worldToPos(m_parentProbe);
     std::vector<int> indexes;
-    getViewer()->posToColumnIndexes(parentProbePos, indexes,
-                                    getPixelSize() * 10, false);
+    getViewer()->posToColumnIndexes(parentProbePos, indexes, getUIScale() * 10,
+                                    false);
     for (int i = (int)indexes.size() - 1; i >= 0; i--) {
       if (connectedColumns.count(indexes[i]) == 0) {
         otherColumn = indexes[i];
@@ -1097,7 +1114,7 @@ qDebug("
     else if (code == m_device)
       color = TPixel32(185, 255, 255);
     ToolUtils::drawBalloon(pos, hook.m_name, color, TPoint(20, 20),
-                           getPixelSize(), isPicking(), &balloons);
+                           getUIScale(), isPicking(), &balloons);
     glPopName();
   }
 
@@ -1109,7 +1126,7 @@ qDebug("
 
   // search for magic links
   double minDist2       = 0;
-  double snapRadius2    = 100 * getPixelSize() * getPixelSize();
+  double snapRadius2    = 100 * getUIScale() * getUIScale();
   double snapRadius2bis = 100;
 
   if (!m_parentProbeEnabled) {
@@ -1202,7 +1219,7 @@ glPopMatrix();
                      255 * (191 - ialfa) / alfa, alfa);
       ToolUtils::drawBalloon(otherColumnsHooks[j].m_pos,
                              otherColumnsHooks[j].m_name,  // getHandle(),
-                             color, TPoint(20, 20), getPixelSize(), false,
+                             color, TPoint(20, 20), getUIScale(), false,
                              &balloons);
 
       HookData baseHook = currentColumnHooks[0];
@@ -1229,7 +1246,7 @@ glPopMatrix();
     TPixel32 color(100, 255, 100, 100);
     if (code == m_device) color = TPixel32(185, 255, 255);
     ToolUtils::drawBalloon(magicLink.m_h0.m_pos, name, color, TPoint(20, -20),
-                           getPixelSize(), isPicking(), &balloons);
+                           getUIScale(), isPicking(), &balloons);
     glPopName();
   }
 }
@@ -1239,7 +1256,7 @@ glPopMatrix();
 void SkeletonTool::drawDrawingBrowser(const TXshCell &cell,
                                       const TPointD &center) {
   if (!cell.m_level || cell.m_level->getFrameCount() <= 1) return;
-  double pixelSize = getPixelSize();
+  double pixelSize = getUIScale();
 
   std::string name = ::to_string(cell.m_level->getName()) + "." +
                      std::to_string(cell.m_frameId.getNumber());
@@ -1353,7 +1370,7 @@ void SkeletonTool::drawDrawingBrowser(const TXshCell &cell,
 void SkeletonTool::drawMainGadget(const TPointD &center) {
   assert(glGetError() == GL_NO_ERROR);
 
-  double r  = 10 * getPixelSize();
+  double r  = 10 * getUIScale();
   double cx = center.x + r * 1.1;
   double cy = center.y - r * 1.1;
 
@@ -1361,7 +1378,7 @@ void SkeletonTool::drawMainGadget(const TPointD &center) {
 
   if (isPicking()) {
     glPushName(TD_Translation);
-    tglDrawDisk(TPointD(cx, cy), getPixelSize() * 9);
+    tglDrawDisk(TPointD(cx, cy), getUIScale() * 9);
     glPopName();
     return;
   }
@@ -1417,7 +1434,7 @@ void SkeletonTool::draw() {
 
   if (m_label != "")
     ToolUtils::drawBalloon(m_labelPos, m_label, TPixel32::Red, TPoint(20, -20),
-                           getPixelSize(), false);
+                           getUIScale(), false);
 
   bool ikEnabled = m_mode.getValue() == INVERSE_KINEMATICS;
   assert(glGetError() == GL_NO_ERROR);
@@ -1502,7 +1519,10 @@ void SkeletonTool::onActivate() {
   TTool::Application *app = TTool::getApplication();
   if (m_firstTime) {
     m_globalKeyframes.setValue(SkeletonGlobalKeyFrame ? 1 : 0);
-    m_mode.setValue(BUILD_SKELETON);
+    // m_mode.setValue(BUILD_SKELETON);
+    m_mode.setIndex(SkeletonMode);
+    m_UIScale.setValue(SkeletonUIScale);
+    m_showOnlyActiveSkeleton.setValue(SkeletonShowOnlyActive);
     // m_ikEnabled.setValue(SkeletonInverseKinematics ? 1 : 0);
     m_firstTime = false;
   }

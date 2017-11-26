@@ -56,7 +56,7 @@ class SkeletonTool : public TTool {
   TEnumProperty m_mode;
   TBoolProperty m_showOnlyActiveSkeleton;
   TBoolProperty m_globalKeyframes;
-
+  TDoubleProperty m_UIScale;
   TPropertyGroup m_prop;
 
   std::vector<SkeletonSubtools::MagicLink> m_magicLinks;
@@ -109,7 +109,7 @@ public:
   void drawIKBone(const TPointD &a, const TPointD &b);
   void drawMainGadget(const TPointD &center);
   void drawDrawingBrowser(const TXshCell &cell, const TPointD &center);
-
+  double getUIScale();
   void setParentProbe(const TPointD &parentProbe) {
     m_parentProbe        = parentProbe;
     m_parentProbeEnabled = true;
