@@ -166,6 +166,7 @@ add_library(tnzbase SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
 if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzbase.dylib")
+    add_dependencies(tnzbase tnzcore)
 endif()
 
 add_definitions(

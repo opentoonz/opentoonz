@@ -1075,6 +1075,12 @@ void PreferencesPopup::onShowXSheetToolbarClicked(bool checked) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onSyncLevelRenumberWithXsheetChanged(int checked) {
+  m_pref->enableSyncLevelRenumberWithXsheet(checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onExpandFunctionHeaderClicked(bool checked) {
   m_pref->enableExpandFunctionHeader(checked);
 }
@@ -1356,11 +1362,14 @@ PreferencesPopup::PreferencesPopup()
   m_showXSheetToolbar = new QGroupBox(tr("Show Toolbar in the XSheet "), this);
   m_showXSheetToolbar->setCheckable(true);
   m_expandFunctionHeader = new CheckBox(
-      tr("Expand Function Editor Header to Match XSheet Toolbar Height "
+      tr("Expand Function Editor Header to Match Xsheet Toolbar Height "
          "(Requires Restart)"),
       this);
   CheckBox *showColumnNumbersCB =
       new CheckBox(tr("Show Column Numbers in Column Headers"), this);
+  m_syncLevelRenumberWithXsheet = new CheckBox(
+      tr("Sync Level Strip Drawing Number Changes with the Xsheet"));
+
   QStringList xsheetLayouts;
   // options should not be translatable as they are used as key strings
   xsheetLayouts << "Classic"
@@ -1705,6 +1714,8 @@ PreferencesPopup::PreferencesPopup()
   m_showXSheetToolbar->setChecked(m_pref->isShowXSheetToolbarEnabled());
   m_expandFunctionHeader->setChecked(m_pref->isExpandFunctionHeaderEnabled());
   showColumnNumbersCB->setChecked(m_pref->isShowColumnNumbersEnabled());
+  m_syncLevelRenumberWithXsheet->setChecked(
+      m_pref->isSyncLevelRenumberWithXsheetEnabled());
   showCurrentTimelineCB->setChecked(
       m_pref->isCurrentTimelineIndicatorEnabled());
 
@@ -2242,15 +2253,15 @@ PreferencesPopup::PreferencesPopup()
 
         xsheetFrameLay->addWidget(m_showXSheetToolbar, 9, 0, 3, 3);
         xsheetFrameLay->addWidget(showColumnNumbersCB, 12, 0, 1, 2);
-        xsheetFrameLay->addWidget(showCurrentTimelineCB, 13, 0, 1, 2);
+        xsheetFrameLay->addWidget(m_syncLevelRenumberWithXsheet, 13, 0, 1, 2);
+        xsheetFrameLay->addWidget(showCurrentTimelineCB, 14, 0, 1, 2);
       }
       xsheetFrameLay->setColumnStretch(0, 0);
       xsheetFrameLay->setColumnStretch(1, 0);
       xsheetFrameLay->setColumnStretch(2, 1);
-      xsheetFrameLay->setRowStretch(14, 1);
+      xsheetFrameLay->setRowStretch(15, 1);
 
       xsheetBoxFrameLay->addLayout(xsheetFrameLay);
-
       xsheetBoxFrameLay->addStretch(1);
 
       xsheetBoxFrameLay->addWidget(note_xsheet, 0);
@@ -2648,6 +2659,10 @@ PreferencesPopup::PreferencesPopup()
 
   ret = ret && connect(showColumnNumbersCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onShowColumnNumbersChanged(int)));
+
+  ret = ret && connect(m_syncLevelRenumberWithXsheet, SIGNAL(stateChanged(int)),
+                       this, SLOT(onSyncLevelRenumberWithXsheetChanged(int)));
+
   ret = ret && connect(xsheetLayoutOptions,
                        SIGNAL(currentIndexChanged(const QString &)), this,
                        SLOT(onXsheetLayoutChanged(const QString &)));

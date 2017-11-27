@@ -39,6 +39,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txsheet.h"
 #include "toonz/txshsimplelevel.h"
+#include "toonz/txshchildlevel.h"
 #include "toonz/toonzscene.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/tcamera.h"
@@ -427,48 +428,10 @@ public:
 //  RenumberUndo
 //-----------------------------------------------------------------------------
 
-class RenumberUndo final : public TUndo {
-  std::map<TXshCell, TXshCell> m_undoTable, m_redoTable;
-
+class RenumberUndo {
 public:
   class RedoNotifier;
   class UndoNotifier;
-
-public:
-  RenumberUndo(const std::map<TXshCell, TXshCell> &cellsMap)
-      : m_redoTable(cellsMap) {
-    // Invert the redo table to obtain the undo table
-    std::map<TXshCell, TXshCell>::iterator it, end = m_redoTable.end();
-    for (it = m_redoTable.begin(); it != end; ++it)
-      m_undoTable.insert(std::make_pair(it->second, it->first));
-  }
-
-  void renumber(const std::map<TXshCell, TXshCell> &table) const {
-    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-    for (int c = 0; c < xsh->getColumnCount(); ++c) {
-      int r0, r1;
-      int n = xsh->getCellRange(c, r0, r1);
-      if (n > 0) {
-        bool changed = false;
-        std::vector<TXshCell> cells(n);
-        xsh->getCells(r0, c, n, &cells[0]);
-        for (int i = 0; i < n; i++) {
-          std::map<TXshCell, TXshCell>::const_iterator it =
-              table.find(cells[i]);
-          if (it != table.end() && it->first != it->second)
-            cells[i] = it->second, changed = true;
-        }
-        if (changed) xsh->setCells(r0, c, n, &cells[0]);
-      }
-    }
-  }
-
-  void undo() const override { renumber(m_undoTable); }
-  void redo() const override { renumber(m_redoTable); }
-
-  int getSize() const override {
-    return (m_redoTable.size() << 2) * sizeof(TXshCell);
-  }
 };
 
 class RenumberUndo::RedoNotifier final : public TUndo {
@@ -1335,19 +1298,41 @@ void TCellSelection::enableCommands() {
 
 bool TCellSelection::isEnabledCommand(
     std::string commandId) {  // static function
-  static QList<std::string> commands = {
-      MI_Autorenumber, MI_Reverse,      MI_Swing,
-      MI_Random,       MI_Increment,    MI_ResetStep,
-      MI_IncreaseStep, MI_DecreaseStep, MI_Step2,
-      MI_Step3,        MI_Step4,        MI_Each2,
-      MI_Each3,        MI_Each4,        MI_Rollup,
-      MI_Rolldown,     MI_TimeStretch,  MI_CloneLevel,
-      MI_SetKeyframes, MI_Copy,         MI_Paste,
-      MI_PasteInto,    MI_Cut,          MI_Clear,
-      MI_Insert,       MI_Reframe1,     MI_Reframe2,
-      MI_Reframe3,     MI_Reframe4,     MI_ReframeWithEmptyInbetweens,
-      MI_Undo,         MI_Redo,         MI_PasteNumbers,
-      MI_ConvertToToonzRaster, MI_ConvertVectorToVector};
+  static QList<std::string> commands = {MI_Autorenumber,
+                                        MI_Reverse,
+                                        MI_Swing,
+                                        MI_Random,
+                                        MI_Increment,
+                                        MI_ResetStep,
+                                        MI_IncreaseStep,
+                                        MI_DecreaseStep,
+                                        MI_Step2,
+                                        MI_Step3,
+                                        MI_Step4,
+                                        MI_Each2,
+                                        MI_Each3,
+                                        MI_Each4,
+                                        MI_Rollup,
+                                        MI_Rolldown,
+                                        MI_TimeStretch,
+                                        MI_CloneLevel,
+                                        MI_SetKeyframes,
+                                        MI_Copy,
+                                        MI_Paste,
+                                        MI_PasteInto,
+                                        MI_Cut,
+                                        MI_Clear,
+                                        MI_Insert,
+                                        MI_Reframe1,
+                                        MI_Reframe2,
+                                        MI_Reframe3,
+                                        MI_Reframe4,
+                                        MI_ReframeWithEmptyInbetweens,
+                                        MI_Undo,
+                                        MI_Redo,
+                                        MI_PasteNumbers,
+                                        MI_ConvertToToonzRaster,
+                                        MI_ConvertVectorToVector};
   return commands.contains(commandId);
 }
 
@@ -1874,13 +1859,8 @@ static void dRenumberCells(int col, int r0, int r1) {
   {
     LevelsTable::iterator it, end = levelsTable.end();
     for (it = levelsTable.begin(); it != end; ++it)
-      FilmstripCmd::renumber(it->first, it->second);
+      FilmstripCmd::renumber(it->first, it->second, true);
   }
-
-  // Finally, renumber the xsheet cells
-  RenumberUndo *undo = new RenumberUndo(cellsMap);
-  undo->redo();
-  TUndoManager::manager()->add(undo);
 }
 
 //-----------------------------------------------------------------------------
@@ -2447,8 +2427,8 @@ TXshSimpleLevel *TCellSelection::getNewToonzRasterLevel(
   ToonzScene *scene       = TApp::instance()->getCurrentScene()->getScene();
   TFilePath sourcePath    = sourceSl->getPath();
   std::wstring sourceName = sourcePath.getWideName();
-  TFilePath parentDir = sourceSl->getPath().getParentDir();
-  TFilePath fp = scene->getDefaultLevelPath(TZP_XSHLEVEL, sourceName)
+  TFilePath parentDir     = sourceSl->getPath().getParentDir();
+  TFilePath fp            = scene->getDefaultLevelPath(TZP_XSHLEVEL, sourceName)
                      .withParentDir(parentDir);
   TFilePath actualFp = scene->decodeFilePath(fp);
 
@@ -2491,8 +2471,7 @@ public:
       , m_newImages(newImages)
       , m_oldLevelHooks(oldLevelHooks) {}
 
-  ~VectorToVectorUndo() {
-  }
+  ~VectorToVectorUndo() {}
 
   void undo() const override {
     for (int i = 0; i < m_frameIds.size(); i++) {
@@ -2754,8 +2733,7 @@ void TCellSelection::convertVectortoVector() {
   // get clones of the new images for undo
   std::vector<TImageP> newImages;
   for (i = 0; i < totalImages; i++) {
-    newImages.push_back(
-        sourceSl->getFrame(frameIds[i], false)->cloneImage());
+    newImages.push_back(sourceSl->getFrame(frameIds[i], false)->cloneImage());
   }
 
   HookSet *oldLevelHooks = new HookSet();

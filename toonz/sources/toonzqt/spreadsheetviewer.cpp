@@ -75,12 +75,17 @@ void FrameScroller::onHScroll(int x) {
 
 static QList<FrameScroller *> frameScrollers;
 
-void FrameScroller::handleScroll(const QPoint &offset) const {
-  CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
+void FrameScroller::handleScroll(QPoint &offset) {
   if ((m_orientation->isVerticalTimeline() && offset.x()) ||
       (!m_orientation->isVerticalTimeline() &&
        offset.y()))  // only synchronize changes by frames axis
     return;
+
+  // In case of a zoomed viewer is sending this out, adjust the
+  // zoomed offset back to a standardized offset
+  emit zoomScrollAdjust(offset, false);
+
+  CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
 
   for (int i = 0; i < frameScrollers.size(); i++)
     if (frameScrollers[i] != this) {
@@ -95,6 +100,11 @@ void adjustScrollbar(QScrollBar *scrollBar, int add);
 
 void FrameScroller::onScroll(const CellPositionRatio &ratio) {
   QPoint offset = orientation()->positionRatioToXY(ratio);
+
+  // In case of a zoomed viewer is receiving this, adjust the
+  // standardized offset to zoomed offset
+  emit zoomScrollAdjust(offset, true);
+
   // scroll area should be resized before moving down the scroll bar.
   // SpreadsheetViewer::onPrepareToScrollOffset() will be invoked immediately
   // since the receiver is in the same thread.

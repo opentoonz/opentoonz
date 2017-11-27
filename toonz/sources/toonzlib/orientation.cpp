@@ -17,6 +17,8 @@ const int PLAY_MARKER_SIZE   = 10;
 const int ONION_SIZE         = 19;
 const int ONION_DOT_SIZE     = 8;
 const int PINNED_SIZE        = 10;
+const int FRAME_DOT_SIZE     = 8;
+const int FRAME_IND_SIZE     = 3;
 }
 
 class TopToBottomOrientation : public Orientation {
@@ -81,7 +83,7 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_HEIGHT      = 12;
   const int SOUND_PREVIEW_HEIGHT = 6;
   const int FRAME_HEADER_HEIGHT  = 50;
-  const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = 0;
+  const int ONION_X = 0, ONION_Y = 0;
   const int PLAY_RANGE_Y       = ONION_SIZE;
   const int ICON_WIDTH         = 20;
   const int ICON_HEIGHT        = 20;
@@ -300,6 +302,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
       PredefinedRect::END_SOUND_EDIT,
       QRect(CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect(PredefinedRect::LOOP_ICON, QRect(keyRect.left(), 0, 10, 11));
+  addRect(PredefinedRect::FRAME_DOT, QRect(0, 0, -1, -1));  // hide
 
   // Note viewer
   addRect(
@@ -338,6 +341,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::PINNED_CENTER_KEY,
           QRect((FRAME_HEADER_WIDTH - PINNED_SIZE) / 2,
                 (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
+  addRect(PredefinedRect::FRAME_INDICATOR, QRect(0, 0, -1, -1));  // hide
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
@@ -889,6 +893,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
           QRect(CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2,
                 CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LOOP_ICON, QRect(0, keyRect.top(), 10, 11));
+  addRect(
+      PredefinedRect::FRAME_DOT,
+      QRect((CELL_WIDTH - FRAME_DOT_SIZE) / 2 - 1,
+            CELL_HEIGHT - FRAME_DOT_SIZE - 6, FRAME_DOT_SIZE, FRAME_DOT_SIZE));
 
   // Notes viewer
   addRect(
@@ -908,16 +916,18 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::PLAY_RANGE,
           QRect(0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
   addRect(PredefinedRect::ONION,
-          QRect(ONION_X, ONION_Y + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2,
-                ONION_SIZE, ONION_SIZE)
+          QRect(ONION_X + (CELL_WIDTH - ONION_SIZE) / 2 - 1,
+                ONION_Y + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2, ONION_SIZE,
+                ONION_SIZE)
               .adjusted(1, 2, 1, 2));
   int adjustOnion = (ONION_SIZE - ONION_DOT_SIZE) / 2;
   addRect(PredefinedRect::ONION_DOT,
-          QRect(ONION_X + adjustOnion, ONION_Y + ONION_DOT_SIZE, ONION_DOT_SIZE,
-                ONION_DOT_SIZE)
+          QRect(ONION_X + adjustOnion + (CELL_WIDTH - ONION_SIZE) / 2,
+                ONION_Y + ONION_DOT_SIZE, ONION_DOT_SIZE, ONION_DOT_SIZE)
               .adjusted(1, 1, 1, 1));
   addRect(PredefinedRect::ONION_DOT_FIXED,
-          QRect(ONION_X + adjustOnion, ONION_Y, ONION_DOT_SIZE, ONION_DOT_SIZE)
+          QRect(ONION_X + adjustOnion + (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y,
+                ONION_DOT_SIZE, ONION_DOT_SIZE)
               .adjusted(1, 1, 1, 1));
   addRect(PredefinedRect::ONION_AREA,
           QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_SIZE));
@@ -929,6 +939,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
       PredefinedRect::PINNED_CENTER_KEY,
       QRect((CELL_WIDTH - PINNED_SIZE) / 2,
             (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
+  addRect(PredefinedRect::FRAME_INDICATOR,
+          QRect((CELL_WIDTH - FRAME_IND_SIZE) / 2,
+                FRAME_HEADER_HEIGHT - FRAME_IND_SIZE, FRAME_IND_SIZE,
+                FRAME_IND_SIZE));
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,

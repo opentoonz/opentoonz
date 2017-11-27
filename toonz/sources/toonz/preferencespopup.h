@@ -43,7 +43,7 @@ private:
 
 private:
   Preferences *m_pref;
-  
+
   FormatProperties *m_formatProperties;
 
   DVGui::ColorField *m_blankColor, *m_frontOnionColor, *m_backOnionColor,
@@ -76,7 +76,8 @@ private:
       *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
       *m_useHigherDpiOnVectorSimplifyCB, *m_keepFillOnVectorSimplifyCB,
-      *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB;
+      *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB,
+      *m_syncLevelRenumberWithXsheet;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -186,6 +187,7 @@ private slots:
   void onFastRenderPathChanged();
   void onUseNumpadForSwitchingStylesClicked(bool);
   void onShowXSheetToolbarClicked(bool);
+  void onSyncLevelRenumberWithXsheetChanged(int);
   void onExpandFunctionHeaderClicked(bool);
   void onShowColumnNumbersChanged(int);
   void onUseArrowKeyToShiftCellSelectionClicked(int);

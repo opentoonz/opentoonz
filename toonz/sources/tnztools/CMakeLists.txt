@@ -111,6 +111,7 @@ add_definitions(
 
 if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnztools.dylib")
+    add_dependencies(tnztools tnzcore tnzbase tnzext toonzlib toonzqt)
 endif()
 
 message("subdir: tnztools")

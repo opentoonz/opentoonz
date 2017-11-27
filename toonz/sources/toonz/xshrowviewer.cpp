@@ -78,6 +78,7 @@ void RowArea::setDragTool(DragTool *dragTool) {
 //-----------------------------------------------------------------------------
 
 void RowArea::drawRows(QPainter &p, int r0, int r1) {
+  const Orientation *o = m_viewer->orientation();
   int playR0, playR1, step;
   XsheetGUI::getPlayRange(playR0, playR1, step);
 
@@ -115,7 +116,9 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
   int x1                = visibleRect.right();
   int y0                = visibleRect.top();
   int y1                = visibleRect.bottom();
-  NumberRange layerSide = m_viewer->orientation()->layerSide(visibleRect);
+  NumberRange layerSide = o->layerSide(visibleRect);
+
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
 
   for (int r = r0; r <= r1; r++) {
     int frameAxis = m_viewer->rowToFrameAxis(r);
@@ -125,10 +128,29 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
                        ? m_viewer->getMarkerLineColor()
                        : m_viewer->getLightLineColor();
     p.setPen(color);
-    QLine horizontalLine =
-        m_viewer->orientation()->horizontalLine(frameAxis, layerSide);
+    QLine horizontalLine = o->horizontalLine(frameAxis, layerSide);
     p.drawLine(horizontalLine);
 
+    if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
+      QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
+      QRect indRect =
+          o->rect(PredefinedRect::FRAME_INDICATOR).translated(basePoint);
+      indRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
+      QColor useColor;
+      if (playR0 <= r && r <= playR1) {
+        useColor = ((r - m_r0) % step == 0)
+                       ? m_viewer->getPreviewFrameTextColor()
+                       : m_viewer->getTextColor();
+      }
+      // not in preview range
+      else
+        useColor = m_viewer->getTextColor();
+      p.fillRect(indRect, useColor);
+    }
+  }
+
+  int z = 0;
+  for (int r = r0; r <= r1; r++) {
     // draw frame text
     if (playR0 <= r && r <= playR1) {
       p.setPen(((r - m_r0) % step == 0) ? m_viewer->getPreviewFrameTextColor()
@@ -139,12 +161,13 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
       p.setPen(m_viewer->getTextColor());
 
     QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
-    QRect labelRect  = m_viewer->orientation()
-                          ->rect(PredefinedRect::FRAME_LABEL)
-                          .translated(basePoint);
-    int align = m_viewer->orientation()->dimension(
-        PredefinedDimension::FRAME_LABEL_ALIGN);
+    QRect labelRect =
+        o->rect(PredefinedRect::FRAME_LABEL).translated(basePoint);
+    labelRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
+
+    int align = o->dimension(PredefinedDimension::FRAME_LABEL_ALIGN);
     // display time and/or frame number
+    z++;
     switch (m_viewer->getFrameDisplayStyle()) {
     case XsheetViewer::SecAndFrame: {
       int frameRate = TApp::instance()
@@ -153,6 +176,8 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
                           ->getProperties()
                           ->getOutputProperties()
                           ->getFrameRate();
+      int zz = frameRate / 5;
+      zz     = frameRate / zz;
       QString str;
       int koma = (r + 1) % frameRate;
       if (koma == 1) {
@@ -160,7 +185,12 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
         str     = QString("%1' %2\"")
                   .arg(QString::number(sec).rightJustified(2, '0'))
                   .arg(QString::number(koma).rightJustified(2, '0'));
+        z = 0;
       } else {
+        if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
+          if ((z + 1) % zz) break;
+          if (r % frameRate == 1 || (r + 2) % frameRate == 1) break;
+        }
         if (koma == 0) koma = frameRate;
         str = QString("%1\"").arg(QString::number(koma).rightJustified(2, '0'));
       }
@@ -171,6 +201,9 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
     }
 
     case XsheetViewer::Frame: {
+      if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50 &&
+          r > 0 && (r + 1) % 5)
+        break;
       QString number = QString::number(r + 1);
       p.drawText(labelRect, align, number);
       break;
@@ -184,6 +217,8 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
                           ->getProperties()
                           ->getOutputProperties()
                           ->getFrameRate();
+      int zz = frameRate / 5;
+      zz     = frameRate / zz;
       QString str;
       int koma = (r + 1) % (frameRate * 6);
       if ((r + 1) % frameRate == 1) {
@@ -191,7 +226,12 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
         str      = QString("p%1 %2")
                   .arg(QString::number(page))
                   .arg(QString::number(koma).rightJustified(3, '0'));
+        z = 0;
       } else {
+        if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
+          if ((z + 1) % zz) break;
+          if (r % frameRate == 1 || (r + 2) % frameRate == 1) break;
+        }
         if (koma == 0) koma = frameRate * 6;
         str = QString("%1").arg(QString::number(koma).rightJustified(3, '0'));
       }
@@ -206,6 +246,8 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
                           ->getProperties()
                           ->getOutputProperties()
                           ->getFrameRate();
+      int zz = frameRate / 5;
+      zz     = frameRate / zz;
       QString str;
       int koma = (r + 1) % (frameRate * 3);
       if ((r + 1) % frameRate == 1) {
@@ -213,7 +255,12 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
         str      = QString("p%1 %2")
                   .arg(QString::number(page))
                   .arg(QString::number(koma).rightJustified(2, '0'));
+        z = 0;
       } else {
+        if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
+          if ((z + 1) % zz) break;
+          if (r % frameRate == 1 || (r + 2) % frameRate == 1) break;
+        }
         if (koma == 0) koma = frameRate * 3;
         str = QString("%1").arg(QString::number(koma).rightJustified(2, '0'));
       }
@@ -228,6 +275,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
 
 void RowArea::drawPlayRange(QPainter &p, int r0, int r1) {
   bool playRangeEnabled = XsheetGUI::isPlayRangeEnabled();
+  int frameAdj          = m_viewer->getFrameZoomAdjustment();
 
   // Update the play range internal fields
   if (playRangeEnabled) {
@@ -246,15 +294,18 @@ void RowArea::drawPlayRange(QPainter &p, int r0, int r1) {
   QColor ArrowColor = (playRangeEnabled) ? QColor(255, 255, 255) : grey150;
   p.setBrush(QBrush(ArrowColor));
 
-  if (m_r0 > r0 - 1 && r1 + 1 > m_r0)
-    m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_PLAY_RANGE,
-                                 CellPosition(m_r0, 0), ArrowColor,
-                                 QColor(Qt::black));
+  if (m_r0 > r0 - 1 && r1 + 1 > m_r0) {
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(m_r0, 0));
+    m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_PLAY_RANGE, topLeft,
+                                 ArrowColor, QColor(Qt::black));
+  }
 
-  if (m_r1 > r0 - 1 && r1 + 1 > m_r1)
-    m_viewer->drawPredefinedPath(p, PredefinedPath::END_PLAY_RANGE,
-                                 CellPosition(m_r1, 0), ArrowColor,
-                                 QColor(Qt::black));
+  if (m_r1 > r0 - 1 && r1 + 1 > m_r1) {
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(m_r1, 0));
+    topLeft.setX(topLeft.x() - frameAdj);
+    m_viewer->drawPredefinedPath(p, PredefinedPath::END_PLAY_RANGE, topLeft,
+                                 ArrowColor, QColor(Qt::black));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -266,8 +317,9 @@ void RowArea::drawCurrentRowGadget(QPainter &p, int r0, int r1) {
   QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
   QRect header   = m_viewer->orientation()
                      ->rect(PredefinedRect::FRAME_HEADER)
-                     .translated(topLeft)
-                     .adjusted(1, 1, 0, 0);
+                     .translated(topLeft);
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
+  header.adjust(1, 1, -frameAdj, 0);
   p.fillRect(header, m_viewer->getCurrentRowBgColor());
 }
 
@@ -280,6 +332,8 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
   assert(xsh);
   int currentRow = m_viewer->getCurrentRow();
+
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
 
   // get onion colors
   TPixel frontPixel, backPixel;
@@ -319,10 +373,11 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   p.setBrush(Qt::NoBrush);
   if (minMos < 0)  // previous frames
   {
-    int layerAxis = onionCenter_layer;
-    int fromFrameAxis =
-        m_viewer->rowToFrameAxis(currentRow + minMos) + onionCenter_frame;
-    int toFrameAxis = m_viewer->rowToFrameAxis(currentRow) + onionCenter_frame;
+    int layerAxis     = onionCenter_layer;
+    int fromFrameAxis = m_viewer->rowToFrameAxis(currentRow + minMos) +
+                        onionCenter_frame - (frameAdj / 2);
+    int toFrameAxis = m_viewer->rowToFrameAxis(currentRow) + onionCenter_frame -
+                      (frameAdj / 2);
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
     if (m_viewer->orientation()->isVerticalTimeline())
@@ -334,11 +389,11 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   }
   if (maxMos > 0)  // forward frames
   {
-    int layerAxis = onionCenter_layer;
-    int fromFrameAxis =
-        m_viewer->rowToFrameAxis(currentRow) + onionCenter_frame;
-    int toFrameAxis =
-        m_viewer->rowToFrameAxis(currentRow + maxMos) + onionCenter_frame;
+    int layerAxis     = onionCenter_layer;
+    int fromFrameAxis = m_viewer->rowToFrameAxis(currentRow) +
+                        onionCenter_frame - (frameAdj / 2);
+    int toFrameAxis = m_viewer->rowToFrameAxis(currentRow + maxMos) +
+                      onionCenter_frame - (frameAdj / 2);
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
     if (m_viewer->orientation()->isVerticalTimeline())
@@ -351,7 +406,8 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   // Draw onion skin main handle
   QPoint handleTopLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
   QRect handleRect     = onionRect.translated(handleTopLeft);
-  int angle180         = 16 * 180;
+  handleRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
+  int angle180 = 16 * 180;
   int turn =
       m_viewer->orientation()->dimension(PredefinedDimension::ONION_TURN) * 16;
   p.setBrush(QBrush(backColor));
@@ -375,6 +431,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     QRect dotRect  = m_viewer->orientation()
                         ->rect(PredefinedRect::ONION_DOT)
                         .translated(topLeft);
+    dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
     p.drawEllipse(dotRect);
   }
 
@@ -393,6 +450,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     QRect dotRect  = m_viewer->orientation()
                         ->rect(PredefinedRect::ONION_DOT_FIXED)
                         .translated(topLeft);
+    dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
     p.drawEllipse(dotRect);
   }
 
@@ -406,6 +464,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
             ->rect(m_showOnionToSet == Fos ? PredefinedRect::ONION_DOT_FIXED
                                            : PredefinedRect::ONION_DOT)
             .translated(topLeft);
+    dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
     p.drawEllipse(dotRect);
   }
 }
@@ -413,14 +472,16 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 //-----------------------------------------------------------------------------
 
 void RowArea::drawCurrentTimeIndicator(QPainter &p) {
+  int frameAdj   = m_viewer->getFrameZoomAdjustment();
   int currentRow = m_viewer->getCurrentRow();
 
   QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
   QRect header   = m_viewer->orientation()
                      ->rect(PredefinedRect::FRAME_HEADER)
+                     .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
                      .translated(topLeft);
 
-  int frameMid = header.left() + (header.width() / 2);
+  int frameMid = header.left() + (header.width() / 2) - 1;
   int frameTop = header.top() + 22;
 
   QPainterPath markerHead = m_viewer->orientation()
@@ -434,14 +495,16 @@ void RowArea::drawCurrentTimeIndicator(QPainter &p) {
 }
 
 void RowArea::drawCurrentTimeLine(QPainter &p) {
+  int frameAdj   = m_viewer->getFrameZoomAdjustment();
   int currentRow = m_viewer->getCurrentRow();
 
   QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
   QRect header   = m_viewer->orientation()
                      ->rect(PredefinedRect::FRAME_HEADER)
+                     .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
                      .translated(topLeft);
 
-  int frameMid    = header.left() + (header.width() / 2);
+  int frameMid    = header.left() + (header.width() / 2) - 1;
   int frameTop    = header.top();
   int frameBottom = header.bottom();
 
@@ -489,9 +552,11 @@ void RowArea::drawPinnedCenterKeys(QPainter &p, int r0, int r1) {
 
   int columnCount    = xsh->getColumnCount();
   int prev_pinnedCol = -2;
+  int frameAdj       = m_viewer->getFrameZoomAdjustment();
 
-  QRect keyRect =
-      m_viewer->orientation()->rect(PredefinedRect::PINNED_CENTER_KEY);
+  QRect keyRect = m_viewer->orientation()
+                      ->rect(PredefinedRect::PINNED_CENTER_KEY)
+                      .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0);
   p.setPen(Qt::black);
 
   r1 = (r1 < xsh->getFrameCount() - 1) ? xsh->getFrameCount() - 1 : r1;
@@ -549,6 +614,8 @@ void RowArea::paintEvent(QPaintEvent *event) {
     // current frame
     drawCurrentRowGadget(p, r0, r1);
 
+  drawRows(p, r0, r1);
+
   if (TApp::instance()->getCurrentFrame()->isEditingScene()) {
     if (Preferences::instance()->isOnionSkinEnabled())
       drawOnionSkinSelection(p);
@@ -561,7 +628,7 @@ void RowArea::paintEvent(QPaintEvent *event) {
       drawCurrentTimeLine(p);
   }
 
-  drawRows(p, r0, r1);
+  //  drawRows(p, r0, r1);
 
   if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton)
     drawPinnedCenterKeys(p, r0, r1);
@@ -592,18 +659,24 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
     int row            = m_viewer->xyToPosition(pos).frame();
     QPoint topLeft     = m_viewer->positionToXY(CellPosition(row, 0));
     QPoint mouseInCell = event->pos() - topLeft;
+    int frameAdj       = m_viewer->getFrameZoomAdjustment();
 
     if (Preferences::instance()->isOnionSkinEnabled() &&
-        o->rect(PredefinedRect::ONION_AREA).contains(mouseInCell)) {
+        o->rect(PredefinedRect::ONION_AREA)
+            .adjusted(0, 0, -frameAdj, 0)
+            .contains(mouseInCell)) {
       if (row == currentFrame) {
         setDragTool(
             XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
         frameAreaIsClicked = true;
       } else if (o->rect(PredefinedRect::ONION_FIXED_DOT_AREA)
+                     .adjusted(0, 0, -frameAdj, 0)
                      .contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeKeyOnionSkinMaskModifierTool(
             m_viewer, true));
-      else if (o->rect(PredefinedRect::ONION_DOT_AREA).contains(mouseInCell))
+      else if (o->rect(PredefinedRect::ONION_DOT_AREA)
+                   .adjusted(0, 0, -frameAdj, 0)
+                   .contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeKeyOnionSkinMaskModifierTool(
             m_viewer, false));
       else {
@@ -626,7 +699,9 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
         setDragTool(
             XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
         frameAreaIsClicked = true;
-      } else if (o->rect(PredefinedRect::PLAY_RANGE).contains(mouseInCell) &&
+      } else if (o->rect(PredefinedRect::PLAY_RANGE)
+                     .adjusted(0, 0, -frameAdj, 0)
+                     .contains(mouseInCell) &&
                  (row == playR0 || row == playR1)) {
         if (!playRangeEnabled) XsheetGUI::setPlayRange(playR0, playR1, step);
         setDragTool(XsheetGUI::DragTool::makePlayRangeModifierTool(m_viewer));
@@ -655,7 +730,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
     m_viewer->dragToolClick(event);
     event->accept();
   }  // left-click
-  // pan by middle-drag
+     // pan by middle-drag
   else if (event->button() == Qt::MidButton) {
     m_pos       = event->pos();
     m_isPanning = true;
@@ -703,14 +778,19 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
 
   int currentRow = TApp::instance()->getCurrentFrame()->getFrame();
   int row        = m_viewer->xyToPosition(m_pos).frame();
+  int frameAdj   = m_viewer->getFrameZoomAdjustment();
   QPoint mouseInCell =
       event->pos() - m_viewer->positionToXY(CellPosition(row, 0));
   if (row < 0) return;
   // whether to show ability to set onion marks
   if (Preferences::instance()->isOnionSkinEnabled() && row != currentRow) {
-    if (o->rect(PredefinedRect::ONION_FIXED_DOT_AREA).contains(mouseInCell))
+    if (o->rect(PredefinedRect::ONION_FIXED_DOT_AREA)
+            .adjusted(0, 0, -frameAdj, 0)
+            .contains(mouseInCell))
       m_showOnionToSet = Fos;
-    else if (o->rect(PredefinedRect::ONION_DOT_AREA).contains(mouseInCell))
+    else if (o->rect(PredefinedRect::ONION_DOT_AREA)
+                 .adjusted(0, 0, -frameAdj, 0)
+                 .contains(mouseInCell))
       m_showOnionToSet = Mos;
   }
 
@@ -719,7 +799,9 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   bool isRootBonePinned;
   int pinnedCenterColumnId = -1;
   if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton &&
-      o->rect(PredefinedRect::PINNED_CENTER_KEY).contains(mouseInCell)) {
+      o->rect(PredefinedRect::PINNED_CENTER_KEY)
+          .adjusted(-frameAdj, 0, -frameAdj, 0)
+          .contains(mouseInCell)) {
     int col      = m_viewer->getCurrentColumn();
     TXsheet *xsh = m_viewer->getXsheet();
     if (col >= 0 && xsh && !xsh->isColumnEmpty(col)) {

@@ -1071,8 +1071,13 @@ void MeasuredValueField::mousePressEvent(QMouseEvent *e) {
     m_xMouse        = e->x();
     m_mouseEdit     = true;
     m_originalValue = m_value->getValue(TMeasuredValue::CurrentUnit);
-  } else
+  } else {
     QLineEdit::mousePressEvent(e);
+    if (!m_isTyping) {  // only the first click will select all
+      selectAll();
+      m_isTyping = true;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1105,10 +1110,18 @@ void MeasuredValueField::mouseReleaseEvent(QMouseEvent *e) {
     setText(QString::fromStdWString(m_value->toWideString(m_precision)));
     emit measuredValueChanged(m_value, true);
     clearFocus();
-  } else {
-    if (!hasSelectedText()) selectAll();
-  }
+  } else
+    QLineEdit::mouseReleaseEvent(e);
 }
+
+//-----------------------------------------------------------------------------
+
+void MeasuredValueField::focusOutEvent(QFocusEvent *e) {
+  DVGui::LineEdit::focusOutEvent(e);
+  m_isTyping = false;
+}
+
+//-----------------------------------------------------------------------------
 
 void MeasuredValueField::receiveMousePress(QMouseEvent *e) {
   m_labelClicked = true;
