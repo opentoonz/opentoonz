@@ -1395,15 +1395,28 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
                             QObject::tr("Cancel"), 0);
     if (ret == 2 || ret == 0) return false;
   }
+
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+
+  // If the scene will be saved in the different folder, check out the scene
+  // cast.
+  // if the cast contains the level specified with $scenefolder alias,
+  // open a warning popup notifying that such level will lose link.
+  if (!overwrite) {
+    bool ret = takeCareSceneFolderItemsOnSaveSceneAs(scene, scenePath);
+    if (!ret) return false;
+  }
+
+  TFilePath oldFullPath = scene->decodeFilePath(scene->getScenePath());
+  TFilePath newFullPath = scene->decodeFilePath(scenePath);
+
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  ToonzScene *scene         = TApp::instance()->getCurrentScene()->getScene();
   TXsheet *xsheet           = 0;
   if (saveSubxsheet) xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
   if (app->getCurrentScene()->getDirtyFlag())
     scene->getContentHistory(true)->modifiedNow();
 
-  if (scene->decodeFilePath(scene->getScenePath()) !=
-      scene->decodeFilePath(scenePath)) {
+  if (oldFullPath != newFullPath) {
     IconGenerator::instance()->clearRequests();
     IconGenerator::instance()->clearSceneIcons();
 
@@ -2522,6 +2535,119 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
                      .arg(toQString(levelPath)));
     return false;
   }
+
+  return true;
+}
+
+//===========================================================================
+// If the scene will be saved in the different folder, check out the scene
+// cast.
+// if the cast contains the level specified with $scenefolder alias,
+// open a warning popup notifying that such level will lose link.
+// return false if cancelled.
+bool IoCmd::takeCareSceneFolderItemsOnSaveSceneAs(ToonzScene *scene,
+                                                  const TFilePath &newPath) {
+  TFilePath oldFullPath = scene->decodeFilePath(scene->getScenePath());
+  TFilePath newFullPath = scene->decodeFilePath(newPath);
+  // in case of saving in the same folder
+  if (oldFullPath.getParentDir() == newFullPath.getParentDir()) return true;
+
+  TLevelSet *levelSet = scene->getLevelSet();
+  std::vector<TXshLevel *> levels;
+  QList<TXshLevel *> sceneFolderLevels;
+  levelSet->listLevels(levels);
+  QString str;
+  for (int i = 0; i < levels.size(); i++) {
+    TXshLevel *level = levels.at(i);
+    if (!level->getPath().isEmpty() &&
+        TFilePath("$scenefolder").isAncestorOf(level->getPath())) {
+      sceneFolderLevels.append(level);
+      str.append("    " + QString::fromStdWString(level->getName()) + " (" +
+                 level->getPath().getQString() + ")\n");
+    }
+  }
+
+  // in case there is no items with $scenefolder
+  if (sceneFolderLevels.isEmpty()) return true;
+
+  str = QObject::tr(
+            "The following level(s) use path with $scenefolder alias.\n\n") +
+        str + QObject::tr(
+                  "\nThey will not be opened properly when you load the "
+                  "scene next time.\nWhat do you want to do?");
+
+  int ret = DVGui::MsgBox(
+      str, QObject::tr("Copy the levels to correspondent paths"),
+      QObject::tr("Decode all $scenefolder aliases"),
+      QObject::tr("Save the scene only"), QObject::tr("Cancel"), 0);
+  if (ret == 4 || ret == 0) return false;
+
+  if (ret == 1) {  // copy the levels case
+    enum OVERWRITEPOLICY { ASK, YES_FOR_ALL, NO_FOR_ALL } policy = ASK;
+    for (int i = 0; i < sceneFolderLevels.size(); i++) {
+      TXshLevel *level = sceneFolderLevels.at(i);
+      TFilePath fp     = level->getPath() - TFilePath("$scenefolder");
+      fp               = fp.withParentDir(newFullPath.getParentDir());
+      // check the level existence
+      if (TSystem::doesExistFileOrLevel(fp)) {
+        bool overwrite = (policy == YES_FOR_ALL);
+        if (policy == ASK) {
+          QString question =
+              QObject::tr(
+                  "File %1 already exists.\nDo you want to overwrite it?")
+                  .arg(fp.getQString());
+          int ret_overwrite = DVGui::MsgBox(
+              question, QObject::tr("Overwrite"),
+              QObject::tr("Overwrite for All"), QObject::tr("Don't Overwrite"),
+              QObject::tr("Don't Overwrite for All"), 0);
+          if (ret_overwrite == 0) return false;
+          if (ret_overwrite == 1)
+            overwrite = true;
+          else if (ret_overwrite == 2) {
+            overwrite = true;
+            policy    = YES_FOR_ALL;
+          } else if (ret_overwrite == 4)
+            policy = NO_FOR_ALL;
+        }
+        if (!overwrite) continue;
+      }
+
+      TFilePath srcFp = scene->decodeFilePath(level->getPath());
+      if (!TSystem::copyFileOrLevel(fp, srcFp))
+        warning(QObject::tr("Failed to overwrite %1").arg(fp.getQString()));
+      // copy the palette as well
+      if (level->getType() == TZP_XSHLEVEL) {
+        if (!TSystem::copyFileOrLevel(fp.withType("tpl"),
+                                      srcFp.withType("tpl")))
+          warning(QObject::tr("Failed to overwrite %1")
+                      .arg(fp.withType("tpl").getQString()));
+      }
+    }
+  } else if (ret == 2) {  // decode $scenefolder aliases case
+    Preferences::PathAliasPriority oldPriority =
+        Preferences::instance()->getPathAliasPriority();
+    Preferences::instance()->setPathAliasPriority(
+        Preferences::ProjectFolderOnly);
+    for (int i = 0; i < sceneFolderLevels.size(); i++) {
+      TXshLevel *level = sceneFolderLevels.at(i);
+
+      // decode and code again
+      TFilePath fp =
+          scene->codeFilePath(scene->decodeFilePath(level->getPath()));
+      TXshSimpleLevel *sil  = level->getSimpleLevel();
+      TXshPaletteLevel *pal = level->getPaletteLevel();
+      TXshSoundLevel *sol   = level->getSoundLevel();
+      if (sil)
+        sil->setPath(fp);
+      else if (pal)
+        pal->setPath(fp);
+      else if (sol)
+        sol->setPath(fp);
+    }
+    Preferences::instance()->setPathAliasPriority(oldPriority);
+  }
+
+  // Save the scene only case (ret == 3), do nothing
 
   return true;
 }

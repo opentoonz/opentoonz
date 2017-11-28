@@ -56,6 +56,8 @@
 #include <QPolygon>
 #include <QThreadStorage>
 #include <QMatrix>
+#include <QThread>
+#include <QGuiApplication>
 
 #include "toonz/stagevisitor.h"
 
@@ -743,8 +745,13 @@ void RasterPainter::onImage(const Stage::Player &player) {
   if (m_singleColumnEnabled && !player.m_isCurrentColumn) return;
 
   // Attempt Plastic-deformed drawing
-  if (TStageObject *obj =
-          ::plasticDeformedObj(player, m_vs.m_plasticVisualSettings)) {
+  // For now generating icons of plastic-deformed image causes crash as
+  // QOffscreenSurface is created outside the gui thread.
+  // As a quick workaround, ignore the deformation if this is called from
+  // non-gui thread (i.e. icon generator thread)
+  TStageObject *obj =
+      ::plasticDeformedObj(player, m_vs.m_plasticVisualSettings);
+  if (obj && QThread::currentThread() == qGuiApp->thread()) {
     flushRasterImages();
     ::onPlasticDeformedImage(obj, player, m_vs, m_viewAff);
   } else {

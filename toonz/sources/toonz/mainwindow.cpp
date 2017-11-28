@@ -1642,6 +1642,7 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_Render, tr("&Render"), "Ctrl+Shift+R");
   createMenuFileAction(MI_FastRender, tr("&Fast Render to MP4"), "Alt+R");
   createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
+  createMenuFileAction(MI_SoundTrack, tr("&Export Soundtrack"), "");
   createRightClickMenuAction(MI_SavePreviewedFrames,
                              tr("&Save Previewed Frames"), "");
   createRightClickMenuAction(MI_RegeneratePreview, tr("&Regenerate Preview"),
@@ -1812,6 +1813,7 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
   createMenuXsheetAction(MI_NewNoteLevel, tr("New Note Level"), "");
+  createMenuXsheetAction(MI_RemoveEmptyColumns, tr("Remove Empty Columns"), "");
   createMenuXsheetAction(MI_LipSyncPopup, tr("&Apply Lip Sync Data to Column"),
                          "Alt+L");
   createRightClickMenuAction(MI_ToggleXSheetToolbar,
@@ -2108,14 +2110,14 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_DeactivateUpperColumns,
                              tr("Hide Upper Columns"), "");
 
-  createToolAction(T_Edit, "edit", tr("Edit Tool"), "E");
+  createToolAction(T_Edit, "edit", tr("Animate Tool"), "A");
   createToolAction(T_Selection, "selection", tr("Selection Tool"), "S");
   createToolAction(T_Brush, "brush", tr("Brush Tool"), "B");
   createToolAction(T_Geometric, "geometric", tr("Geometric Tool"), "G");
   createToolAction(T_Type, "type", tr("Type Tool"), "Y");
   createToolAction(T_Fill, "fill", tr("Fill Tool"), "F");
   createToolAction(T_PaintBrush, "paintbrush", tr("Paint Brush Tool"), "");
-  createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "A");
+  createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "E");
   createToolAction(T_Tape, "tape", tr("Tape Tool"), "T");
   createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "K");
   createToolAction(T_RGBPicker, "RGBpicker", tr("RGB Picker Tool"), "R");
@@ -2371,9 +2373,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2498,9 +2500,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2527,9 +2529,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene)
-            ? MI_ClearRecentScene
-            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
+                                                        ? MI_ClearRecentLevel
+                                                        : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

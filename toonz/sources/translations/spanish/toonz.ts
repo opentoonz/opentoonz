@@ -1059,6 +1059,62 @@ What do you want to do?</source>
     </message>
 </context>
 <context>
+    <name>CommandBar</name>
+    <message>
+        <source>Customize Command Bar</source>
+        <translation>Personalizar barra de comandos</translation>
+    </message>
+</context>
+<context>
+    <name>CommandBarListTree</name>
+    <message>
+        <source>----Separator----</source>
+        <translation>----Separador----</translation>
+    </message>
+</context>
+<context>
+    <name>CommandBarPopup</name>
+    <message>
+        <source>XSheet Toolbar</source>
+        <translation>Barra de herramientas de planilla</translation>
+    </message>
+    <message>
+        <source>Customize XSheet Toolbar</source>
+        <translation>Personalizar barra de herramientas de planilla</translation>
+    </message>
+    <message>
+        <source>Command Bar</source>
+        <translation>Barra de comandos</translation>
+    </message>
+    <message>
+        <source>Customize Command Bar</source>
+        <translation>Personalizar barra de comandos</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Aceptar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>Toolbar Items</source>
+        <translation>Elementos de la barra de herramientas</translation>
+    </message>
+    <message>
+        <source>Duplicated commands will be ignored. Only the last one will appear in the menu bar.</source>
+        <translation>Los comandos duplicados serán ignorados. Sólo el último aparecerá en la barra.</translation>
+    </message>
+</context>
+<context>
+    <name>CommandBarTree</name>
+    <message>
+        <source>Remove &quot;%1&quot;</source>
+        <translation>Remover &quot;%1&quot;</translation>
+    </message>
+</context>
+<context>
     <name>CommandListTree</name>
     <message>
         <source>----Separator----</source>
@@ -3530,7 +3586,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Loop</source>
-        <translation>Ciclo</translation>
+        <translation>Reproducir en ciclo</translation>
     </message>
     <message>
         <source>Pause</source>
@@ -4748,6 +4804,10 @@ Do you want to create it?</source>
         <source>Reframe with Empty Inbetweens...</source>
         <translation>Reexponer con intermedios vacíos...</translation>
     </message>
+    <message>
+        <source>&amp;Toggle Edit In Place</source>
+        <translation>Editar en &amp;contexto</translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5822,6 +5882,16 @@ ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño de la imagen guardada
         <translation>Guarda la escena actual en la subcarpeta.
           También establece la carpeta de salida a la subcarpeta.</translation>
     </message>
+    <message>
+        <source>Create the Destination Subfolder to Save</source>
+        <translation>Crear la subcarpeta de destino donde guardar</translation>
+    </message>
+    <message>
+        <source>Save the current scene in the subfolder.
+Set the output folder path to the subfolder as well.</source>
+        <translation>Guardar la escena actual en la subcarpeta.
+También establecer la ruta de salida a esa carpeta.</translation>
+    </message>
 </context>
 <context>
     <name>PltGizmoPopup</name>
@@ -6673,6 +6743,10 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Vector Guided Style:</source>
         <translation>Estilo de asistencia vectorial:</translation>
+    </message>
+    <message>
+        <source>Layout Preference*:</source>
+        <translation>Presentación en pantalla*:</translation>
     </message>
 </context>
 <context>
@@ -8408,6 +8482,10 @@ Are you sure?</source>
         <source>Fx Schematic</source>
         <translation>Diagrama de efectos</translation>
     </message>
+    <message>
+        <source>Cannot Read XML File</source>
+        <translation>No es posible leer el archivo XML</translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -9610,7 +9688,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>A/R:</source>
-        <translation>Prop:</translation>
+        <translation>Proporción:</translation>
     </message>
     <message>
         <source>Safe Area Box 2:</source>
@@ -9622,7 +9700,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>TLV Subsampling:</source>
-        <translation>Submuestreo (imágenes TLV):</translation>
+        <translation>Submuestreo (imágenes Toonz):</translation>
     </message>
     <message>
         <source>Start Frame:</source>
@@ -9650,7 +9728,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Enable Column Color Filter and Transparency for Rendering</source>
-        <translation>Habilitar filtro de color y transparencia de columna durante el procesamiento</translation>
+        <translation>Habilitar filtros de color y transparencia de las columnas durante el procesamiento</translation>
     </message>
 </context>
 <context>
@@ -10987,6 +11065,22 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
         <source>Subsampling</source>
         <translation>Submuestreo</translation>
     </message>
+    <message>
+        <source>Click to select column</source>
+        <translation>Clic para seleccionar la columna</translation>
+    </message>
+    <message>
+        <source>Click to select column, drag to move it, double-click to edit</source>
+        <translation>Clic para seleccionar la columna, arrastrar para moverla, doble clic para editar</translation>
+    </message>
+    <message>
+        <source>Click to select column, double-click to edit</source>
+        <translation>Clic para seleccionar la columna, doble clic para editar</translation>
+    </message>
+    <message>
+        <source>Additional column settings</source>
+        <translation>Opciones adicionales de la columna</translation>
+    </message>
 </context>
 <context>
     <name>XsheetGUI::ColumnTransparencyPopup</name>
@@ -11133,6 +11227,13 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     <message>
         <source>New Raster Level</source>
         <translation>Nuevo nivel de imagen</translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::XSheetToolbar</name>
+    <message>
+        <source>Customize XSheet Toolbar</source>
+        <translation>Personalizar barra de herramientas de planilla</translation>
     </message>
 </context>
 <context>

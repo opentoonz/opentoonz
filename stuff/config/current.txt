@@ -288,6 +288,8 @@
   <item>"STD_noiseFx.Black_White"	"Black & White"	</item>
   <item>"STD_noiseFx.Animate"	"Random Animation"	</item>
 
+  <item>"STD_nothingFx"		"Pass Through"		</item>
+
   <item>"STD_paletteFilterFx"	"Palette Filter"	</item>
   <item>"STD_paletteFilterFx.keep"	"Action"	</item>
   <item>"STD_paletteFilterFx.type"	"Apply To"	</item>

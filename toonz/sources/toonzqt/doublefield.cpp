@@ -37,6 +37,7 @@ void DoubleValueLineEdit::focusOutEvent(QFocusEvent *e) {
     emit editingFinished();
   }
   QLineEdit::focusOutEvent(e);
+  m_isTyping = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -45,8 +46,13 @@ void DoubleValueLineEdit::mousePressEvent(QMouseEvent *e) {
   if (e->buttons() == Qt::MiddleButton) {
     m_xMouse           = e->x();
     m_mouseDragEditing = true;
-  } else
+  } else {
     QLineEdit::mousePressEvent(e);
+    if (!m_isTyping) {  // only the first click will select all
+      selectAll();
+      m_isTyping = true;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -66,10 +72,8 @@ void DoubleValueLineEdit::mouseReleaseEvent(QMouseEvent *e) {
   if ((e->buttons() == Qt::NoButton && m_mouseDragEditing)) {
     m_mouseDragEditing = false;
     clearFocus();
-  } else {
-    if (!hasSelectedText()) selectAll();
+  } else
     QLineEdit::mouseReleaseEvent(e);
-  }
 }
 
 //=============================================================================
@@ -500,8 +504,13 @@ void MeasuredDoubleLineEdit::mousePressEvent(QMouseEvent *e) {
   if ((e->buttons() == Qt::MiddleButton) || m_labelClicked) {
     m_xMouse           = e->x();
     m_mouseDragEditing = true;
-  } else
+  } else {
     QLineEdit::mousePressEvent(e);
+    if (!m_isTyping) {  // only the first click will select all
+      selectAll();
+      m_isTyping = true;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -528,10 +537,8 @@ void MeasuredDoubleLineEdit::mouseReleaseEvent(QMouseEvent *e) {
     m_mouseDragEditing = false;
     m_labelClicked     = false;
 
-  } else {
-    if (!hasSelectedText()) selectAll();
+  } else
     QLineEdit::mouseReleaseEvent(e);
-  }
 }
 
 void MeasuredDoubleLineEdit::receiveMousePress(QMouseEvent *e) {

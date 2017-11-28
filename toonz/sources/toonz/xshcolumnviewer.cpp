@@ -1515,12 +1515,16 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   QPainter p(this);
   p.setClipRect(toBeUpdated);
 
+  TXsheet *xsh        = m_viewer->getXsheet();
   CellRange cellRange = m_viewer->xyRectToRange(toBeUpdated);
   int c0, c1;  // range of visible columns
   c0 = cellRange.from().layer();
   c1 = cellRange.to().layer();
+  if (!m_viewer->orientation()->isVerticalTimeline()) {
+    int colCount = qMax(1, xsh->getColumnCount());
+    c1           = qMin(c1, colCount - 1);
+  }
 
-  TXsheet *xsh         = m_viewer->getXsheet();
   ColumnFan *columnFan = xsh->getColumnFan(m_viewer->orientation());
   int col;
   for (col = c0; col <= c1; col++) {
@@ -1887,9 +1891,9 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       // synchronize the current column and the current fx
       TApp::instance()->getCurrentFx()->setFx(column->getFx());
     } else if (m_col >= 0) {
-		if (m_viewer->getColumnSelection()->isColumnSelected(m_col) &&
-			event->button() == Qt::RightButton)
-			return;
+      if (m_viewer->getColumnSelection()->isColumnSelected(m_col) &&
+          event->button() == Qt::RightButton)
+        return;
       setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
       TApp::instance()->getCurrentFx()->setFx(0);
     }
@@ -2199,6 +2203,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_InsertFx));
     menu.addAction(cmdManager->getAction(MI_NewNoteLevel));
+    menu.addAction(cmdManager->getAction(MI_RemoveEmptyColumns));
     menu.addSeparator();
     if (m_viewer->getXsheet()->isColumnEmpty(col) ||
         (cell.m_level && cell.m_level->getChildLevel()))

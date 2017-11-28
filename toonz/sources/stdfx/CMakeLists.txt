@@ -113,6 +113,7 @@ set(SOURCES
     motionblurfx.cpp
     multitonefx.cpp
     noisefx.cpp
+    nothingfx.cpp
     palettefilterfx.cpp
     particles.cpp
     particlesengine.cpp
@@ -267,6 +268,7 @@ add_definitions(
 
 if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzstdfx.dylib")
+    add_dependencies(tnzstdfx tnzcore tnzbase toonzlib)
 endif()
 
 message("subdir: tnzstdfx")

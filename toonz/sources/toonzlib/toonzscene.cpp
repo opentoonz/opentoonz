@@ -1225,35 +1225,43 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const {
 
   std::string h;
   std::wstring s;
-  if (head != L"" && head[0] == L'+') {
-    if (TProjectManager::instance()->isTabModeEnabled()) {
-      return m_scenePath.getParentDir() +
-             (m_scenePath.getWideName() + L"_files") + tail;
-    }
+  if (head != L"") {
+    // in case of the project folder aliases
+    if (head[0] == L'+') {
+      if (TProjectManager::instance()->isTabModeEnabled()) {
+        return m_scenePath.getParentDir() +
+               (m_scenePath.getWideName() + L"_files") + tail;
+      }
 
-    if (TProjectManager::instance()->isTabKidsModeEnabled()) {
-      return m_scenePath.getParentDir() + m_scenePath.getWideName() + tail;
-    }
+      if (TProjectManager::instance()->isTabKidsModeEnabled()) {
+        return m_scenePath.getParentDir() + m_scenePath.getWideName() + tail;
+      }
 
-    if (projectIsEmpty) {
+      if (projectIsEmpty) {
+        TFilePath dir = m_scenePath.getParentDir();
+        if (dir.getName() == "scenes")
+          return dir.withName(head.substr(1)) + tail;
+        else
+          return dir + tail;
+      }
+      if (project) {
+        h                       = ::to_string(head.substr(1));
+        TFilePath f             = project->getFolder(h);
+        if (f != TFilePath()) s = f.getWideString();
+      }
+    }
+    // in case of the scene folder alias
+    else if (head == L"$scenefolder") {
       TFilePath dir = m_scenePath.getParentDir();
-      if (dir.getName() == "scenes")
-        return dir.withName(head.substr(1)) + tail;
-      else
-        return dir + tail;
-    }
-    if (project) {
-      h                       = ::to_string(head.substr(1));
-      TFilePath f             = project->getFolder(h);
-      if (f != TFilePath()) s = f.getWideString();
+      return dir + tail;
     }
   }
   if (s != L"") {
     std::map<std::wstring, std::wstring> table;
 
-    // se la scena e' untitled e l'espansione del path
-    // dipende dalla scena (o perche' l'espansione contiene
-    // $scenename, $scenepath o perche' si usa il savepath)
+    // if the scene is untitled and path expansion depends on the scene
+    // (because the expansion contains $ scenename, $ scenepath, or it uses the
+    // savepath)
     if (m_isUntitled &&
         (s.find(L"$scene") != std::wstring::npos ||
          project->getUseScenePath(h) ||
@@ -1307,6 +1315,13 @@ TFilePath ToonzScene::codeFilePath(const TFilePath &path) const {
   TFilePath fp(path);
   TProject *project = getProject();
 
+  Preferences::PathAliasPriority priority =
+      Preferences::instance()->getPathAliasPriority();
+  if (priority == Preferences::SceneFolderAlias &&
+      codeFilePathWithSceneFolder(fp)) {
+    return fp;
+  }
+
   if (project)
     for (int i = 0; i < project->getFolderCount(); i++) {
       TFilePath folderName("+" + project->getFolderName(i));
@@ -1316,7 +1331,25 @@ TFilePath ToonzScene::codeFilePath(const TFilePath &path) const {
         return fp;
       }
     }
+
+  if (priority == Preferences::ProjectFolderAliases)
+    codeFilePathWithSceneFolder(fp);
+
   return fp;
+}
+
+//-----------------------------------------------------------------------------
+// if the path is codable with $scenefolder alias, replace it and return true
+
+bool ToonzScene::codeFilePathWithSceneFolder(TFilePath &path) const {
+  // if the scene is untitled, then do nothing and return false
+  if (isUntitled()) return false;
+  TFilePath sceneFolderPath = m_scenePath.getParentDir();
+  if (sceneFolderPath.isAncestorOf(path)) {
+    path = TFilePath("$scenefolder") + (path - sceneFolderPath);
+    return true;
+  }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1390,6 +1423,11 @@ TFilePath ToonzScene::decodeSavePath(TFilePath path) const {
   if (i != (int)std::wstring::npos) {
     TFilePath savePath = getSavePath();
     s.replace(i, savePathString.length(), savePath.getWideString());
+    return TFilePath(s);
+  }
+  // in case of the scene folder alias (start with "$scenefolder")
+  else if (s.find(L"$scenefolder") == 0) {
+    s.replace(0, 12, m_scenePath.getParentDir().getWideString());
     return TFilePath(s);
   } else
     return path;

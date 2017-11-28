@@ -35,6 +35,7 @@
     <command>MI_OutputSettings</command>
     <command>MI_Render</command>
     <command>MI_FastRender</command>
+    <command>MI_SoundTrack</command>
     <separator/>
     <command>MI_PrintXsheet</command>
     <command>MI_Print</command>

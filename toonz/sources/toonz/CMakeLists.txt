@@ -108,6 +108,7 @@ set(MOC_HEADERS
     selectionutils.h
     shifttracetool.h
     shortcutpopup.h
+    soundtrackexport.h
     startuppopup.h
     subcameramanager.h
     subscenecommand.h
@@ -252,6 +253,7 @@ set(SOURCES
     scriptconsolepanel.cpp
     shifttracetool.cpp
     shortcutpopup.cpp
+    soundtrackexport.cpp
     startuppopup.cpp
     subcameramanager.cpp
     timestretchpopup.cpp
@@ -416,6 +418,7 @@ elseif(BUILD_ENV_APPLE)
     # 変なところにライブラリ生成するカスども
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
+    add_dependencies(OpenToonz_${VERSION} tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm)
 
     target_link_libraries(OpenToonz_${VERSION}
         Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml

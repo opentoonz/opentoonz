@@ -332,6 +332,7 @@ class DVAPI MeasuredValueField : public DVGui::LineEdit {
   bool m_mouseEdit    = false;
   bool m_labelClicked = false;
   double m_originalValue;
+  bool m_isTyping = false;
 
 protected:
   bool m_isGlobalKeyframe;
@@ -340,6 +341,7 @@ protected:
   void mousePressEvent(QMouseEvent *) override;
   void mouseMoveEvent(QMouseEvent *) override;
   void mouseReleaseEvent(QMouseEvent *) override;
+  void focusOutEvent(QFocusEvent *) override;
 
 public:
   MeasuredValueField(QWidget *parent, QString name = "numfield");

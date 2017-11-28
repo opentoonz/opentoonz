@@ -864,7 +864,15 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
 QString PencilTestSaveInFolderPopup::getPath() {
   if (!m_subFolderCB->isChecked()) return m_parentFolderField->getPath();
 
-  return m_parentFolderField->getPath() + "\\" + m_subFolderNameField->text();
+  // re-code filepath
+  TFilePath path(m_parentFolderField->getPath() + "\\" +
+                 m_subFolderNameField->text());
+  ToonzScene* scene = TApp::instance()->getCurrentScene()->getScene();
+  if (scene) {
+    path = scene->decodeFilePath(path);
+    path = scene->codeFilePath(path);
+  }
+  return path.getQString();
 }
 
 //-----------------------------------------------------------------------------

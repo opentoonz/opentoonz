@@ -49,13 +49,13 @@ elseif(BUILD_ENV_APPLE)
         ${CMAKE_CURRENT_BINARY_DIR}/../../tnzbase/libtnzbase.dylib
         ${CMAKE_CURRENT_BINARY_DIR}/../../toonzlib/libtoonzlib.dylib
     )
+    add_dependencies(tfarm tnzcore tnzbase toonzlib tnzext)
 elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;tnzext")
     if(BUILD_TARGET_WIN)
         set(EXTRA_LIBS ${EXTRA_LIBS} -lws2_32)
     endif()
 endif()
-
 target_link_libraries(tfarm
     Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
     ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS}

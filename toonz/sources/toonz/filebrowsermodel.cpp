@@ -13,6 +13,10 @@
 #include "history.h"
 #include "iocommand.h"
 
+#include "tapp.h"
+#include "toonz/tscenehandle.h"
+#include "toonz/toonzscene.h"
+
 #include <QFileInfo>
 #include <QDir>
 
@@ -307,6 +311,7 @@ void DvDirModelFileFolderNode::refreshChildren() {
 
 void DvDirModelFileFolderNode::getChildrenNames(
     std::vector<std::wstring> &names) const {
+  if (m_path.isEmpty()) return;
   TFileStatus folderPathStatus(m_path);
   if (folderPathStatus.isLink()) return;
 
@@ -356,139 +361,6 @@ QPixmap DvDirModelFileFolderNode::getPixmap(bool isOpen) const {
   static QPixmap closeFolderPixmap(
       svgToPixmap(":Resources/browser_folder_close.svg"));
   return isOpen ? openFolderPixmap : closeFolderPixmap;
-}
-
-//=============================================================================
-//
-// DvDirModelSceneFolderNode
-//
-//-----------------------------------------------------------------------------
-
-DvDirModelSceneFolderNode::DvDirModelSceneFolderNode(DvDirModelNode *parent,
-                                                     std::wstring name,
-                                                     const TFilePath &scenePath)
-    : DvDirModelFileFolderNode(parent, name, scenePath) {}
-
-//-----------------------------------------------------------------------------
-
-DvDirModelSceneFolderNode::DvDirModelSceneFolderNode(DvDirModelNode *parent,
-                                                     const TFilePath &path)
-    : DvDirModelFileFolderNode(parent, path.withoutParentDir().getWideString(),
-                               path) {
-  try {
-    ToonzScene scene;
-    scene.setScenePath(path);
-    TProjectP project = TProjectManager::instance()->loadSceneProject(path);
-    if (!project) return;
-    scene.setProject(project.getPointer());
-    for (int i = 0; i < project->getFolderCount(); i++) {
-      std::string folderName = project->getFolderName(i);
-      TFilePath folderPath   = project->getFolder(i);
-      if (folderPath.isAbsolute() && !project->isConstantFolder(i)) {
-        std::wstring alias         = L"+" + ::to_wstring(folderName);
-        TFilePath folderActualPath = scene.decodeFilePath(TFilePath(alias));
-        m_folders[alias]           = folderActualPath;
-      }
-    }
-  } catch (...) {
-  }
-}
-
-//-----------------------------------------------------------------------------
-
-DvDirModelSceneFolderNode::~DvDirModelSceneFolderNode() {}
-
-//-----------------------------------------------------------------------------
-
-bool DvDirModelSceneFolderNode::setName(std::wstring newName) {
-  m_name = newName;
-  return true;
-}
-
-//-----------------------------------------------------------------------------
-
-QPixmap DvDirModelSceneFolderNode::getPixmap(bool isOpen) const {
-  static QPixmap openFolderPixmap(
-      svgToPixmap(":Resources/browser_scene_open.svg"));
-  static QPixmap closeFolderPixmap(
-      svgToPixmap(":Resources/browser_scene_close.svg"));
-  return isOpen ? openFolderPixmap : closeFolderPixmap;
-}
-
-//-----------------------------------------------------------------------------
-
-DvDirModelNode *DvDirModelSceneFolderNode::makeChild(std::wstring name) {
-  TFilePath actualFolderPath = m_folders[name];
-  DvDirModelFileFolderNode *node =
-      new DvDirModelFileFolderNode(this, name, actualFolderPath);
-  node->enableRename(false);
-  return node;
-}
-
-//-----------------------------------------------------------------------------
-
-void DvDirModelSceneFolderNode::getChildrenNames(
-    std::vector<std::wstring> &names) const {
-  std::map<std::wstring, TFilePath>::const_iterator it;
-  for (it = m_folders.begin(); it != m_folders.end(); ++it)
-    names.push_back(it->first);
-}
-
-//-----------------------------------------------------------------------------
-
-void DvDirModelSceneFolderNode::refreshChildren() {
-  m_childrenValid = true;
-  std::vector<std::wstring> names;
-  getChildrenNames(names);
-
-  std::vector<DvDirModelNode *> oldChildren;
-  oldChildren.swap(m_children);
-
-  std::vector<DvDirModelNode *>::iterator j;
-  int i;
-  for (i = 0; i < (int)names.size(); i++) {
-    std::wstring name = names[i];
-    for (j = oldChildren.begin();
-         j != oldChildren.end() && (*j)->getName() != name; ++j) {
-    }
-    DvDirModelNode *child = 0;
-    if (j != oldChildren.end()) {
-      child = *j;
-      oldChildren.erase(j);
-    } else {
-      child = makeChild(name);
-    }
-    addChild(child);
-  }
-  for (j = oldChildren.begin(); j != oldChildren.end(); ++j) {
-    DvDirModelNode *child = *j;
-    if (!!child && child->hasChildren())
-      child->removeChildren(0, child->getChildCount());
-    delete *j;
-  }
-}
-
-//-----------------------------------------------------------------------------
-
-DvDirModelFileFolderNode *DvDirModelSceneFolderNode::createNode(
-    DvDirModelNode *parent, const TFilePath &path) {
-  DvDirModelFileFolderNode *node = new DvDirModelFileFolderNode(parent, path);
-  if (path.getName().find("_files") == std::string::npos)
-    node->enableRename(true);
-  return node;
-}
-
-//-----------------------------------------------------------------------------
-
-int DvDirModelSceneFolderNode::rowByName(const std::wstring &name) {
-  std::vector<std::wstring> names;
-  getChildrenNames(names);
-  std::vector<std::wstring>::iterator it =
-      std::find(names.begin(), names.end(), name);
-  if (it == names.end())
-    return -1;
-  else
-    return std::distance(names.begin(), it);
 }
 
 //=============================================================================
@@ -1240,11 +1112,15 @@ void DvDirModelRootNode::refreshChildren() {
       m_versionControlNodes.push_back(node);
       addChild(node);
     }
+
+    // scenefolder node (access to the parent folder of the current scene file)
+    m_sceneFolderNode =
+        new DvDirModelSceneFolderNode(this, L"Scene Folder", TFilePath());
+    m_sceneFolderNode->setPixmap(QPixmap(":Resources/clapboard.png"));
   }
 }
 
 //-----------------------------------------------------------------------------
-
 DvDirModelNode *DvDirModelRootNode::getNodeByPath(const TFilePath &path) {
   // Check first for version control nodes
   DvDirModelNode *node = 0;
@@ -1252,6 +1128,15 @@ DvDirModelNode *DvDirModelRootNode::getNodeByPath(const TFilePath &path) {
 
   // search in #1 the project folders, #2 sandbox, #3 other folders in file
   // system
+
+  // check for the scene folder if it is the first priority
+  Preferences::PathAliasPriority priority =
+      Preferences::instance()->getPathAliasPriority();
+  if (priority == Preferences::SceneFolderAlias &&
+      !m_sceneFolderNode->getPath().isEmpty()) {
+    node = m_sceneFolderNode->getNodeByPath(path);
+    if (node) return node;
+  }
 
   // path could be a project, under some project root
   for (i = 0; i < (int)m_projectRootNodes.size(); i++) {
@@ -1299,6 +1184,13 @@ DvDirModelNode *DvDirModelRootNode::getNodeByPath(const TFilePath &path) {
     }
   }
 
+  // check for the scene folder if it is the second priority
+  if (priority == Preferences::ProjectFolderAliases &&
+      !m_sceneFolderNode->getPath().isEmpty()) {
+    node = m_sceneFolderNode->getNodeByPath(path);
+    if (node) return node;
+  }
+
   // it could be a regular folder, somewhere in the file system
   if (m_myComputerNode) {
     for (i = 0; i < m_myComputerNode->getChildCount(); i++) {
@@ -1318,6 +1210,39 @@ DvDirModelNode *DvDirModelRootNode::getNodeByPath(const TFilePath &path) {
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+// update the path of sceneLocationNode
+
+void DvDirModelRootNode::setSceneLocation(const TFilePath &path) {
+  if (path == m_sceneFolderNode->getPath()) return;
+  m_sceneFolderNode->setPath(path);
+
+  Preferences::PathAliasPriority priority =
+      Preferences::instance()->getPathAliasPriority();
+  if (priority == Preferences::ProjectFolderOnly) return;
+
+  updateSceneFolderNodeVisibility();
+}
+
+//-----------------------------------------------------------------------------
+
+void DvDirModelRootNode::updateSceneFolderNodeVisibility(bool forceHide) {
+  bool show = (forceHide) ? false : !m_sceneFolderNode->getPath().isEmpty();
+  if (show && m_sceneFolderNode->getRow() == -1) {
+    int row = getChildCount();
+    DvDirModel::instance()->notifyBeginInsertRows(QModelIndex(), row, row + 1);
+    addChild(m_sceneFolderNode);
+    DvDirModel::instance()->notifyEndInsertRows();
+  } else if (!show && m_sceneFolderNode->getRow() != -1) {
+    int row = m_sceneFolderNode->getRow();
+    DvDirModel::instance()->notifyBeginRemoveRows(QModelIndex(), row, row + 1);
+    // remove the last child of the root node
+    m_children.erase(m_children.begin() + row, m_children.begin() + row + 1);
+    DvDirModel::instance()->notifyEndRemoveRows();
+    m_sceneFolderNode->setRow(-1);
+  }
+}
+
 //=============================================================================
 //
 // DvDirModel
@@ -1327,6 +1252,19 @@ DvDirModelNode *DvDirModelRootNode::getNodeByPath(const TFilePath &path) {
 DvDirModel::DvDirModel() {
   m_root = new DvDirModelRootNode();
   m_root->refreshChildren();
+
+  // when the scene switched, update the path of the scene location node
+  TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
+  bool ret                  = true;
+  ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                       SLOT(onSceneSwitched()));
+  ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+                       SLOT(onSceneSwitched()));
+  ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+                       this, SLOT(onPreferenceChanged(const QString &)));
+  assert(ret);
+
+  onSceneSwitched();
 }
 
 //-----------------------------------------------------------------------------
@@ -1520,4 +1458,32 @@ QModelIndex DvDirModel::getCurrentProjectIndex() const {
 DvDirModel *DvDirModel::instance() {
   static DvDirModel _instance;
   return &_instance;
+}
+
+//-----------------------------------------------------------------------------
+
+void DvDirModel::onSceneSwitched() {
+  DvDirModelRootNode *rootNode = dynamic_cast<DvDirModelRootNode *>(m_root);
+  if (rootNode) {
+    ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+    if (scene) {
+      if (scene->isUntitled())
+        rootNode->setSceneLocation(TFilePath());
+      else
+        rootNode->setSceneLocation(scene->getScenePath().getParentDir());
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void DvDirModel::onPreferenceChanged(const QString &prefName) {
+  if (prefName != "PathAliasPriority") return;
+
+  Preferences::PathAliasPriority priority =
+      Preferences::instance()->getPathAliasPriority();
+  DvDirModelRootNode *rootNode = dynamic_cast<DvDirModelRootNode *>(m_root);
+  if (rootNode)
+    rootNode->updateSceneFolderNodeVisibility(priority ==
+                                              Preferences::ProjectFolderOnly);
 }

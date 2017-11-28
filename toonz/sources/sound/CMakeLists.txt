@@ -23,6 +23,7 @@ add_definitions(
 
 if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libsound.dylib")
+    add_dependencies(sound tnzcore tnzbase toonzlib)
 endif()
 
 message("subdir: sound")
