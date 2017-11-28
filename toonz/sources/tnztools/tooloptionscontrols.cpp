@@ -52,8 +52,11 @@ ToolOptionControl::ToolOptionControl(TTool *tool, std::string propertyName,
 
 //-----------------------------------------------------------------------------
 
-void ToolOptionControl::notifyTool() {
-  m_tool->onPropertyChanged(m_propertyName);
+void ToolOptionControl::notifyTool(bool addToUndo) {
+  std::string tempPropertyName = m_propertyName;
+  if (addToUndo && m_propertyName == "Maximum Gap")
+    tempPropertyName = tempPropertyName + "withUndo";
+  m_tool->onPropertyChanged(tempPropertyName);
 }
 
 //-----------------------------------------------------------------------------
@@ -183,7 +186,7 @@ void ToolOptionSlider::updateStatus() {
 
 void ToolOptionSlider::onValueChanged(bool isDragging) {
   m_property->setValue(getValue());
-  notifyTool();
+  notifyTool(!isDragging);
 }
 
 //-----------------------------------------------------------------------------

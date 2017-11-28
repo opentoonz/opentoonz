@@ -76,6 +76,8 @@ class FillTool final : public QObject, public TTool {
   bool m_firstTime;
   TPointD m_firstPoint, m_clickPoint;
   bool m_firstClick;
+  bool m_frameSwitched             = false;
+  double m_changedGapOriginalValue = -1.0;
   TXshSimpleLevelP m_level;
   TFrameId m_firstFrameId, m_veryFirstFrameId;
   int m_onionStyleId;
@@ -92,6 +94,7 @@ class FillTool final : public QObject, public TTool {
 
   TPropertyGroup m_prop;
   std::pair<int, int> m_currCell;
+  std::vector<TFilledRegionInf> m_oldFillInformation;
 #ifdef _DEBUG
   std::vector<TRect> m_rects;
 #endif

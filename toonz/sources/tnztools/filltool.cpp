@@ -253,6 +253,99 @@ public:
 };
 
 //=============================================================================
+// VectorGapSizeChangeUndo
+//-----------------------------------------------------------------------------
+
+class VectorGapSizeChangeUndo final : public TToolUndo {
+  double m_oldGapSize;
+  double m_newGapSize;
+  int m_row;
+  int m_column;
+  TVectorImageP m_vi;
+  std::vector<TFilledRegionInf> m_oldFillInformation;
+
+public:
+  VectorGapSizeChangeUndo(double oldGapSize, double newGapSize,
+                          TXshSimpleLevel *sl, const TFrameId &fid,
+                          TVectorImageP vi,
+                          std::vector<TFilledRegionInf> oldFillInformation)
+      : TToolUndo(sl, fid)
+      , m_oldGapSize(oldGapSize)
+      , m_newGapSize(newGapSize)
+      , m_oldFillInformation(oldFillInformation)
+      , m_vi(vi) {
+    TTool::Application *app = TTool::getApplication();
+    if (app) {
+      m_row    = app->getCurrentFrame()->getFrame();
+      m_column = app->getCurrentColumn()->getColumnIndex();
+    }
+    ImageUtils::getFillingInformationInArea(vi, m_oldFillInformation,
+                                            vi->getBBox());
+  }
+
+  void undo() const override {
+    TTool::Application *app = TTool::getApplication();
+    if (!app || !m_level) return;
+    app->getCurrentLevel()->setLevel(m_level.getPointer());
+    TVectorImageP img = m_level->getFrame(m_frameId, true);
+    if (app->getCurrentFrame()->isEditingScene()) {
+      app->getCurrentFrame()->setFrame(m_row);
+      app->getCurrentColumn()->setColumnIndex(m_column);
+    } else
+      app->getCurrentFrame()->setFid(m_frameId);
+
+    m_vi->setAutocloseTolerance(m_oldGapSize);
+    int count = m_vi->getStrokeCount();
+    std::vector<int> v(count);
+    int i;
+    for (i = 0; i < (int)count; i++) v[i] = i;
+    m_vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
+    if (m_vi->isComputedRegionAlmostOnce()) m_vi->findRegions();
+    if (m_oldFillInformation.size()) {
+      for (UINT j = 0; j < m_oldFillInformation.size(); j++) {
+        TRegion *reg = m_vi->getRegion(m_oldFillInformation[j].m_regionId);
+        if (reg) reg->setStyle(m_oldFillInformation[j].m_styleId);
+      }
+    }
+    app->getCurrentXsheet()->notifyXsheetChanged();
+    app->getCurrentTool()->notifyToolChanged();
+    notifyImageChanged();
+  }
+
+  void redo() const override {
+    TTool::Application *app = TTool::getApplication();
+    if (!app || !m_level) return;
+
+    app->getCurrentLevel()->setLevel(m_level.getPointer());
+    TVectorImageP img = m_level->getFrame(m_frameId, true);
+    if (app->getCurrentFrame()->isEditingScene()) {
+      app->getCurrentFrame()->setFrame(m_row);
+      app->getCurrentColumn()->setColumnIndex(m_column);
+    } else
+      app->getCurrentFrame()->setFid(m_frameId);
+
+    m_vi->setAutocloseTolerance(m_newGapSize);
+    int count = m_vi->getStrokeCount();
+    std::vector<int> v(count);
+    int i;
+    for (i = 0; i < (int)count; i++) v[i] = i;
+    m_vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
+    app->getCurrentXsheet()->notifyXsheetChanged();
+    app->getCurrentTool()->notifyToolChanged();
+    notifyImageChanged();
+  }
+
+  void onAdd() override {}
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getToolName() override {
+    return QString("Fill Tool: Set Gap Size ") + QString::number(m_newGapSize);
+  }
+  int getHistoryType() override { return HistoryType::FillTool; }
+};
+
+//=============================================================================
 // RasterFillUndo
 //-----------------------------------------------------------------------------
 
@@ -1938,16 +2031,32 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
     rectPropChangedflag = true;
   }
 
-  else if (propertyName == m_maxGapDistance.getName()) {
+  else if (propertyName == m_maxGapDistance.getName() ||
+           propertyName == m_maxGapDistance.getName() + "withUndo") {
     if (TVectorImageP vi = getImage(true)) {
-      if (m_maxGapDistance.getValue() != vi->getAutocloseTolerance()) {
-        vi->setAutocloseTolerance(m_maxGapDistance.getValue());
-        int count = vi->getStrokeCount();
-        std::vector<int> v(count);
-        int i;
-        for (i = 0; i < (int)count; i++) v[i] = i;
-        vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
-        if (m_level) m_level->setDirtyFlag(true);
+      if (m_changedGapOriginalValue == -1.0) {
+        ImageUtils::getFillingInformationInArea(vi, m_oldFillInformation,
+                                                vi->getBBox());
+        m_changedGapOriginalValue = vi->getAutocloseTolerance();
+      }
+      TFrameId fid = getCurrentFid();
+      vi->setAutocloseTolerance(m_maxGapDistance.getValue());
+      int count = vi->getStrokeCount();
+      std::vector<int> v(count);
+      int i;
+      for (i = 0; i < (int)count; i++) v[i] = i;
+      vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
+      if (m_level && !m_frameSwitched) {
+        m_level->setDirtyFlag(true);
+        TTool::getApplication()->getCurrentLevel()->notifyLevelChange();
+        if (propertyName == m_maxGapDistance.getName() + "withUndo" &&
+            m_changedGapOriginalValue != -1.0) {
+          TUndoManager::manager()->add(new VectorGapSizeChangeUndo(
+              m_changedGapOriginalValue, m_maxGapDistance.getValue(),
+              m_level.getPointer(), fid, vi, m_oldFillInformation));
+          m_changedGapOriginalValue = -1.0;
+          m_oldFillInformation.clear();
+        }
       }
     }
   }
@@ -1985,18 +2094,26 @@ void FillTool::onImageChanged() {
     m_rectFill->onImageChanged();
     return;
   }
-  if (!m_level) resetMulti();
-}
-
-//-----------------------------------------------------------------------------
-
-void FillTool::onFrameSwitched() {
   if (TVectorImageP vi = getImage(true)) {
     if (m_maxGapDistance.getValue() != vi->getAutocloseTolerance()) {
       m_maxGapDistance.setValue(vi->getAutocloseTolerance());
       getApplication()->getCurrentTool()->notifyToolChanged();
     }
   }
+  if (!m_level) resetMulti();
+}
+
+//-----------------------------------------------------------------------------
+
+void FillTool::onFrameSwitched() {
+  m_frameSwitched = true;
+  if (TVectorImageP vi = getImage(true)) {
+    if (m_maxGapDistance.getValue() != vi->getAutocloseTolerance()) {
+      m_maxGapDistance.setValue(vi->getAutocloseTolerance());
+      getApplication()->getCurrentTool()->notifyToolChanged();
+    }
+  }
+  m_frameSwitched = false;
 }
 
 //-----------------------------------------------------------------------------
