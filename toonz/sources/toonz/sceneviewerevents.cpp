@@ -1260,7 +1260,8 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
       // If on a level frame pass the frame id after the last frame to allow
       // creating a new frame with the down arrow key
       TFrameId newId = 0;
-      if (fh->getFrameType() == TFrameHandle::LevelFrame) {
+      if (Preferences::instance()->getDownArrowLevelStripNewFrame() &&
+          fh->getFrameType() == TFrameHandle::LevelFrame) {
         TXshSimpleLevel *level =
             TApp::instance()->getCurrentLevel()->getLevel()->getSimpleLevel();
         if (level) {

@@ -521,6 +521,12 @@ void PreferencesPopup::onUseHigherDpiOnVectorSimplifyChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onDownArrowInLevelStripCreatesNewFrame(int index) {
+  m_pref->setDownArrowLevelStripNewFrame(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onSubsceneFolderChanged(int index) {
   m_pref->enableSubsceneFolder(index == Qt::Checked);
 }
@@ -1335,6 +1341,8 @@ PreferencesPopup::PreferencesPopup()
       tr("Keep fill when using \"Replace Vectors\" command"), this);
   m_useHigherDpiOnVectorSimplifyCB = new CheckBox(
       tr("Use higher DPI for calculations - Slower but more accurate"), this);
+  m_downArrowInLevelStripCreatesNewFrame = new CheckBox(
+      tr("Down arrow at end of level strip creates a new frame"), this);
 
   //--- Tools -------------------------------
   categoryList->addItem(tr("Tools"));
@@ -1637,6 +1645,8 @@ PreferencesPopup::PreferencesPopup()
       m_pref->getKeepFillOnVectorSimplify());
   m_useHigherDpiOnVectorSimplifyCB->setChecked(
       m_pref->getUseHigherDpiOnVectorSimplify());
+  m_downArrowInLevelStripCreatesNewFrame->setChecked(
+      m_pref->getDownArrowLevelStripNewFrame());
   m_newLevelToCameraSizeCB->setChecked(
       m_pref->isNewLevelSizeToCameraSizeEnabled());
   QStringList scanLevelTypes;
@@ -2169,6 +2179,8 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(m_useNumpadForSwitchingStyles, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      drawingFrameLay->addWidget(m_downArrowInLevelStripCreatesNewFrame, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
       QGroupBox *replaceVectorGroupBox = new QGroupBox(
           tr("Replace Vectors with Simplified Vectors Command"), this);
       QVBoxLayout *replaceVectorsLay = new QVBoxLayout();
@@ -2623,6 +2635,9 @@ PreferencesPopup::PreferencesPopup()
   ret = ret &&
         connect(m_useHigherDpiOnVectorSimplifyCB, SIGNAL(stateChanged(int)),
                 SLOT(onUseHigherDpiOnVectorSimplifyChanged(int)));
+  ret = ret && connect(m_downArrowInLevelStripCreatesNewFrame,
+                       SIGNAL(stateChanged(int)),
+                       SLOT(onDownArrowInLevelStripCreatesNewFrame(int)));
   ret = ret && connect(m_newLevelToCameraSizeCB, SIGNAL(clicked(bool)),
                        SLOT(onNewLevelToCameraSizeChanged(bool)));
 

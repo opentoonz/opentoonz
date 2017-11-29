@@ -930,7 +930,8 @@ void FilmstripFrames::keyPressEvent(QKeyEvent *event) {
   // If on a level frame pass the frame id after the last frame to allow
   // creating a new frame with the down arrow key
   TFrameId newId = 0;
-  if (fh->getFrameType() == TFrameHandle::LevelFrame) {
+  if (Preferences::instance()->getDownArrowLevelStripNewFrame() &&
+      fh->getFrameType() == TFrameHandle::LevelFrame) {
     int frameCount = (int)fids.size();
     newId          = index2fid(frameCount);
   }
