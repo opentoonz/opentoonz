@@ -1921,11 +1921,8 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
 
   QFontMetrics metric(font);
 
-  if (text.size() && text != "" && m_viewer->getFrameZoomFactor() <= 50) {
-    text          = text[0];
-    int charWidth = metric.width(text, 1);
-    if (charWidth > nameRect.width()) nameRect.adjust(-2, 0, 4, 0);
-  }
+  int charWidth = metric.width(text, 1);
+  if ((charWidth * 2) > nameRect.width()) nameRect.adjust(-2, 0, 4, 0);
 
 #if QT_VERSION >= 0x050500
   QString elidaName = elideText(text, metric, nameRect.width(), "~");
