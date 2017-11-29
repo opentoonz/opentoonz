@@ -1151,7 +1151,7 @@ void DvItemViewerPanel::paintTableItem(QPainter &p, int index) {
     x += lx;
   }
   if (n > 1) {
-    p.setPen(QColor(210, 210, 210));
+    p.setPen(QColor(0, 0, 0, 100));  // column line
     if ((m_columns[0].second.second))
       x = rect.left() + m_columns[0].second.first;
     else
@@ -1732,12 +1732,12 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *) {
 
   QBrush nb = QBrush(Qt::NoBrush);
   QPalette pal =
-      QPalette(nb, nb, QBrush(QColor(Qt::white)), QBrush(QColor(Qt::black)),
+      QPalette(nb, nb, QBrush(QColor(255, 255, 255, 30)), QBrush(QColor(0, 0, 0, 110)),
                QBrush(QColor(Qt::gray)), nb, nb, nb, nb);
 
-  p.fillRect(rect, QColor(192, 192, 192));
+  p.fillRect(rect, QColor(0, 0, 0, 90));  // bg color
 
-  p.setPen(Qt::black);
+  p.setPen(QColor(200, 200, 200, 255));  // text color
   int h  = 0;  // fontMetrics().descent();
   int y  = rect.top();
   int ly = rect.height();
@@ -1754,9 +1754,9 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *) {
     // paint background
     QColor bgColor;
     if (dataType == model->getCurrentOrderType())
-      bgColor = QColor(230, 230, 230);
+      bgColor = QColor(255, 255, 255, 30);
     else
-      bgColor = QColor(192, 192, 192);
+      bgColor = QColor(0, 0, 0, 0);
 
     QRect typeRect(x, y, columnLx, ly);
     QBrush brush(bgColor);

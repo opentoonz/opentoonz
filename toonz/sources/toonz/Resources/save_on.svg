@@ -1,27 +1,60 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 17 17" style="enable-background:new 0 0 17 17;" xml:space="preserve">
-<style type="text/css">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   id="レイヤー_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 17 17"
+   style="enable-background:new 0 0 17 17;"
+   xml:space="preserve"><metadata
+     id="metadata15"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs13" /><style
+     type="text/css"
+     id="style2">
 	.st0{fill:#FFFFFF;}
 	.st1{fill:#242424;}
-	.st2{fill:#FFA200;}
-	.st3{fill:#80DC64;}
-</style>
-<g id="svg2" inkscape:version="0.91 r13725" sodipodi:docname="save_on.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg">
-	
-		<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview18" inkscape:current-layer="svg2" inkscape:cx="10.5" inkscape:cy="8.5" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="480" inkscape:window-maximized="0" inkscape:window-width="796" inkscape:window-x="0" inkscape:window-y="0" inkscape:zoom="13.882353" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
-		</sodipodi:namedview>
-	<path id="path6" inkscape:connector-curvature="0" class="st0" d="M1.5,5.4h4.2l0.2,1.8h5l0.8,7.2H2.4L1.5,5.4
-		C1.5,5.4,1.5,5.4,1.5,5.4z"/>
-	<path id="path8" inkscape:connector-curvature="0" class="st1" d="M6.1,7h6l0.9,8H2L0.9,5h5L6.1,7z M2,6l0.9,8h9l-0.7-6h-6L5,6H2
-		C2,6,2,6,2,6z"/>
-	<path id="path10" inkscape:connector-curvature="0" class="st2" d="M15,7.6H6l-2.2,6.9h9.6L15,7.6C15,7.6,15,7.6,15,7.6z"/>
-	<path id="path12" inkscape:connector-curvature="0" class="st1" d="M13.5,15H3l2.5-8h9.9L13.5,15z M6.2,8l-1.9,6h8.4l1.5-6H6.2z"/>
-	<path class="st1" d="M11,8h-1C9.7,8,9.5,7.9,9.3,7.7l-2-2C7.1,5.5,7,5.3,7,5V4c0-0.6,0.4-1,1-1h1V1c0-0.6,0.4-1,1-1h1
-		c0.6,0,1,0.4,1,1v2h1c0.6,0,1,0.4,1,1v1c0,0.3-0.1,0.5-0.3,0.7l-2,2C11.5,7.9,11.3,8,11,8z"/>
-	<path id="path14" inkscape:connector-curvature="0" class="st3" d="M13,4h-2V1h-1v3H8v1l2,2h1l0.5-0.5L12,6l1-1v0V4z"/>
-</g>
-<g id="レイヤー_2">
-</g>
-</svg>
+	.st2{fill:#C8C8C8;}
+	.st3{fill:#E6E6E6;}
+	.st4{display:none;}
+</style><g
+     id="レイヤー_2"
+     class="st4" /><path
+     id="path855"
+     d="m 2,3 v 12 h 3 9 V 8 5 L 12,3 H 5 Z"
+     style="clip-rule:evenodd;opacity:1;fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#303030;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" /><rect
+     style="clip-rule:evenodd;opacity:1;fill:#303030;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     id="rect852"
+     width="6"
+     height="5"
+     x="5"
+     y="3" /><path
+     style="clip-rule:evenodd;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     d="m 2,3 v 12 h 3 9 V 8 5 L 12,3 H 11 V 8 H 5 V 3 Z M 6,3 V 6 H 8 V 3 Z"
+     id="rect839" /><rect
+     y="10"
+     x="3.9999998"
+     height="5"
+     width="1"
+     id="rect819"
+     style="fill:#303030;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" /><rect
+     transform="rotate(90)"
+     style="fill:#303030;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     id="rect821"
+     width="1"
+     height="6"
+     x="10"
+     y="-11" /><rect
+     y="-15"
+     x="-12"
+     height="5"
+     width="1"
+     id="rect823"
+     style="fill:#303030;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     transform="scale(-1)" /></svg>

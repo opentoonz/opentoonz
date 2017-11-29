@@ -1,0 +1,88 @@
+/* -----------------------------------------------------------------------------
+   Cleanup Settings
+----------------------------------------------------------------------------- */
+
+#CleanupSettings {
+  & QLabel {}
+  // Space out the boxes vertically
+  & #CleanupSettingsFrame {
+    // Needs margin for good placement
+    margin-top: 2px;
+    margin-bottom: 4px;
+  }
+  & QGroupBox {
+    margin-bottom: 3px;
+  }
+}
+
+#CleanupSettingsFrame {
+  &:extend(.frame all);
+}
+
+#CleanupSettingsShowButton {
+  &:extend(.button-show all);
+}
+
+ParamsPage {
+  qproperty-TextColor: @text-color;
+}
+
+/* -----------------------------------------------------------------------------
+   Camera Settings
+----------------------------------------------------------------------------- */
+
+#CameraSettingsButton {
+  padding: 2px;
+}
+
+#CameraSettingsRadioButton {
+  &:hover {
+    background: none;
+  }
+  &::indicator {
+    &:extend(.button-tool all); // Apply a button style
+    .icon-lock;                 // Apply an icon
+  }
+}
+
+#CameraSettingsDPI {
+  color: @label-title;
+}
+
+#CameraSettingsRadioButton_Small {
+  padding: 0;
+  &::indicator {
+    &:extend(.RadioButton::indicator all);
+    background-color: transparent;
+    border: 0;
+    height: 21px;
+    margin: 0;
+    width: 11px;
+  }
+}
+
+#ForceSquaredPixelButton {
+  &:extend(.button-tool all); // Apply a button style
+  .icon-fsp;                  // Apply an icon
+  margin: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Output Settings
+----------------------------------------------------------------------------- */
+
+#OutputSettingsLabel {
+  color: @label-title;
+}
+
+#OutputSettingsBox {
+  &:extend(.frame all);
+}
+
+#OutputSettingsCameraBox {
+  &:extend(.frame all);
+}
+
+#OutputSettingsShowButton {
+  &:extend(.button-show all);
+}

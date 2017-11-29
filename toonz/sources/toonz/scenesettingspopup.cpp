@@ -117,6 +117,13 @@ SceneSettingsPopup::SceneSettingsPopup()
   m_markerIntervalFld = new DVGui::IntLineEdit(this, distance, 0);
   m_startFrameFld     = new DVGui::IntLineEdit(this, offset);
 
+  // Whether the column color filter and transparency is available also in
+  // render
+  m_colorFilterOnRenderCB = new DVGui::CheckBox(
+      tr("Enable Column Color Filter and Transparency for Rendering"), this);
+  m_colorFilterOnRenderCB->setChecked(
+      sprop->isColumnColorFilterOnRenderEnabled());
+
   // layout
   QGridLayout *mainLayout = new QGridLayout();
   mainLayout->setMargin(10);
@@ -154,13 +161,16 @@ SceneSettingsPopup::SceneSettingsPopup()
     mainLayout->addWidget(new QLabel(tr("  Start Frame:"), this), 5, 2,
                           Qt::AlignRight | Qt::AlignVCenter);
     mainLayout->addWidget(m_startFrameFld, 5, 3);
+
+    // Use Color Filter and Transparency for Rendering
+    mainLayout->addWidget(m_colorFilterOnRenderCB, 6, 0, 1, 4);
   }
   mainLayout->setColumnStretch(0, 0);
   mainLayout->setColumnStretch(1, 0);
   mainLayout->setColumnStretch(2, 0);
   mainLayout->setColumnStretch(3, 0);
   mainLayout->setColumnStretch(4, 1);
-  mainLayout->setRowStretch(6, 1);
+  mainLayout->setRowStretch(7, 1);
   setLayout(mainLayout);
 
   // signal-slot connections
@@ -188,6 +198,9 @@ SceneSettingsPopup::SceneSettingsPopup()
                        SLOT(onMakerIntervalEditingFinished()));
   ret = ret && connect(m_startFrameFld, SIGNAL(editingFinished()), this,
                        SLOT(onStartFrameEditingFinished()));
+  // Use Color Filter and Transparency for Rendering
+  ret = ret && connect(m_colorFilterOnRenderCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onColorFilterOnRenderChanged()));
   assert(ret);
 }
 
@@ -342,6 +355,14 @@ void SceneSettingsPopup::setBgColor(const TPixel32 &bgColor, bool isDragging) {
   sprop->setBgColor(bgColor);
   // TODO: forse sarebbe meglio usare una notifica piu' specifica
   if (!isDragging) Previewer::clearAll();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneSettingsPopup::onColorFilterOnRenderChanged() {
+  TSceneProperties *sprop = getProperties();
+  sprop->enableColumnColorFilterOnRender(m_colorFilterOnRenderCB->isChecked());
   TApp::instance()->getCurrentScene()->notifySceneChanged();
 }
 

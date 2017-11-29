@@ -13,7 +13,7 @@
 #include "toonz/tframehandle.h"
 #include "toonz/doubleparamcmd.h"
 #include "toonz/toonzfolders.h"
-
+#include "toonz/preferences.h"
 // TnzBase includes
 #include "tdoubleparam.h"
 #include "tdoublekeyframe.h"
@@ -1067,8 +1067,17 @@ void FunctionPanel::drawGroupKeyframes(QPainter &painter) {
 void FunctionPanel::paintEvent(QPaintEvent *e) {
   m_gadgets.clear();
 
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
+#ifdef _WIN32
+    fontName = "Arial";
+#else
+    fontName = "Helvetica";
+#endif
+  }
+
   QPainter painter(this);
-  QFont font("Arial", 8);
+  QFont font(fontName, 8);
   painter.setFont(font);
   QFontMetrics fm(font);
 

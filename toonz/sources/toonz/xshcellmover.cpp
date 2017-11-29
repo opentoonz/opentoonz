@@ -7,6 +7,7 @@
 #include "xsheetviewer.h"
 #include "cellselection.h"
 #include "columncommand.h"
+#include "columnselection.h"
 
 // TnzTools includes
 #include "tools/cursors.h"
@@ -30,6 +31,7 @@
 #include "toonz/fxdag.h"
 #include "toonz/tcolumnfxset.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/tcolumnhandle.h"
 
 // TnzBase includes
 #include "tfx.h"
@@ -48,7 +50,8 @@ CellsMover::CellsMover()
     , m_startPos(0, 0)
     , m_columnsData(0)
     , m_qualifiers(0)
-    , m_uffa(0) {}
+    , m_uffa(0)
+    , m_orientation(nullptr) {}
 
 CellsMover::~CellsMover() {
   delete m_columnsData;
@@ -58,13 +61,16 @@ CellsMover::~CellsMover() {
 //
 // initialize the mover: allocate memory, get cells and column data
 //
-void CellsMover::start(int r0, int c0, int r1, int c1, int qualifiers) {
+void CellsMover::start(int r0, int c0, int r1, int c1, int qualifiers,
+                       const Orientation *o) {
   m_rowCount = r1 - r0 + 1;
   m_colCount = c1 - c0 + 1;
   assert(m_rowCount > 0);
   assert(m_colCount > 0);
-  m_startPos = m_pos = TPoint(c0, r0);
-  m_qualifiers       = qualifiers;
+  m_orientation = o;
+  m_startPos    = m_pos =
+      (o->isVerticalTimeline() ? TPoint(c0, r0) : TPoint(r0, c0));
+  m_qualifiers = qualifiers;
   m_cells.resize(m_rowCount * m_colCount, TXshCell());
   m_oldCells.resize(m_rowCount * m_colCount, TXshCell());
   getCells(m_cells, r0, c0);
@@ -112,6 +118,10 @@ void CellsMover::setCells(const std::vector<TXshCell> &cells, int r,
 void CellsMover::saveCells() {
   int r = m_pos.y;
   int c = m_pos.x;
+  if (!getOrientation()->isVerticalTimeline()) {
+    r = m_pos.x;
+    c = m_pos.y;
+  }
   getCells(m_oldCells, r, c);
 }
 
@@ -119,8 +129,12 @@ void CellsMover::saveCells() {
 // xsheet <- m_cells; insert cells if qualifiers contain eInsertCells
 //
 void CellsMover::moveCells(const TPoint &pos) const {
-  int r        = pos.y;
-  int c        = pos.x;
+  int r = pos.y;
+  int c = pos.x;
+  if (!getOrientation()->isVerticalTimeline()) {
+    r = pos.x;
+    c = pos.y;
+  }
   TXsheet *xsh = getXsheet();
   if (m_qualifiers & eInsertCells) {
     for (int i = 0; i < m_colCount; i++) {
@@ -138,6 +152,10 @@ void CellsMover::undoMoveCells(const TPoint &pos) const {
   TXsheet *xsh = getXsheet();
   int r        = pos.y;
   int c        = pos.x;
+  if (!m_orientation->isVerticalTimeline()) {
+    r = pos.x;
+    c = pos.y;
+  }
   if (m_qualifiers & eInsertCells) {
     for (int i = 0; i < m_colCount; i++) xsh->removeCells(r, c + i, m_rowCount);
   } else {
@@ -148,16 +166,26 @@ void CellsMover::undoMoveCells(const TPoint &pos) const {
 
 bool CellsMover::canMoveCells(const TPoint &pos) {
   TXsheet *xsh = getXsheet();
-  if (pos.x < 0) return false;
-  if (pos.x != m_startPos.x) {
+  int r        = pos.y;
+  int c        = pos.x;
+  int cStart   = m_startPos.x;
+  if (!m_orientation->isVerticalTimeline()) {
+    r      = pos.x;
+    c      = pos.y;
+    cStart = m_startPos.y;
+  }
+  if (c < 0) return false;
+  if (c != cStart) {
     int count = 0;
     // controlla il tipo
     int i = 0;
     while (i < m_rowCount * m_colCount) {
       TXshColumn::ColumnType srcType = getColumnTypeFromCell(i);
-      int dstIndex                   = pos.x + i;
+      int dstIndex                   = c + i;
       TXshColumn *dstColumn          = xsh->getColumn(dstIndex);
-      if (srcType == TXshColumn::eZeraryFxType) return false;
+      if (srcType == TXshColumn::eZeraryFxType ||
+          srcType == TXshColumn::eSoundTextType)
+        return false;
       if (dstColumn && !dstColumn->isEmpty() &&
           dstColumn->getColumnType() != srcType)
         return false;
@@ -172,7 +200,7 @@ bool CellsMover::canMoveCells(const TPoint &pos) {
   int count = 0;
   for (int i = 0; i < m_colCount; i++) {
     for (int j = 0; j < m_rowCount; j++) {
-      if (!xsh->getCell(pos.y + j, pos.x + i).isEmpty()) return false;
+      if (!xsh->getCell(r + j, c + i).isEmpty()) return false;
       count++;
     }
   }
@@ -253,17 +281,34 @@ public:
   CellsMover *getCellsMover() { return &m_cellsMover; }
 
   void undo() const override {
-    m_cellsMover.undoMoveCells();
+    if (m_cellsMover.getOrientation()->isVerticalTimeline())
+      m_cellsMover.undoMoveCells();
+    else {
+      int r = m_cellsMover.getPos().y;
+      int c = m_cellsMover.getPos().x;
+      m_cellsMover.undoMoveCells(TPoint(c, r));
+    }
 
     int ca       = m_cellsMover.getStartPos().x;
     int cb       = m_cellsMover.getPos().x;
     int colCount = m_cellsMover.getColumnCount();
+    if (!m_cellsMover.getOrientation()->isVerticalTimeline()) {
+      ca = m_cellsMover.getStartPos().y;
+      cb = m_cellsMover.getPos().y;
+    }
 
     if (ca != cb) {
       if (m_cellsMover.m_uffa & 2) m_cellsMover.emptyColumns(cb);
       if (m_cellsMover.m_uffa & 1) m_cellsMover.restoreColumns(ca);
     }
-    m_cellsMover.moveCells(m_cellsMover.getStartPos());
+    if (m_cellsMover.getOrientation()->isVerticalTimeline())
+      m_cellsMover.moveCells(m_cellsMover.getStartPos());
+    else {
+      int rStart = m_cellsMover.getStartPos().x;
+      int cStart = m_cellsMover.getStartPos().y;
+      const TPoint useStart(rStart, cStart);
+      m_cellsMover.moveCells(useStart);
+    }
     TApp::instance()->getCurrentXsheet()->getXsheet()->updateFrameCount();
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     if (m_cellsMover.getColumnTypeFromCell(0) == TXshColumn::eSoundType)
@@ -273,6 +318,10 @@ public:
     int ca       = m_cellsMover.getStartPos().x;
     int cb       = m_cellsMover.getPos().x;
     int colCount = m_cellsMover.getColumnCount();
+    if (!m_cellsMover.getOrientation()->isVerticalTimeline()) {
+      int ca = m_cellsMover.getStartPos().y;
+      int cb = m_cellsMover.getPos().y;
+    }
 
     if (ca != cb) {
       if (m_cellsMover.m_uffa & 1) m_cellsMover.emptyColumns(ca);
@@ -286,7 +335,9 @@ public:
         CellsMover::eOverwriteCells) {  // rimuove le celle vecchie
       int c, ra = m_cellsMover.getStartPos().y,
              rowCount = m_cellsMover.getRowCount();
-      TXsheet *xsh    = TApp::instance()->getCurrentXsheet()->getXsheet();
+      if (!m_cellsMover.getOrientation()->isVerticalTimeline())
+        ra         = m_cellsMover.getStartPos().x;
+      TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
       for (c = ca; c < ca + colCount; c++) xsh->clearCells(ra, c, rowCount);
     }
     m_cellsMover.moveCells();
@@ -336,14 +387,23 @@ bool LevelMoverTool::canMove(const TPoint &pos) {
 }
 
 bool LevelMoverTool::canMoveColumns(const TPoint &pos) {
-  TXsheet *xsh = getViewer()->getXsheet();
-  if (pos.x < 0) return false;
-  if (pos.x != m_lastPos.x) {
+  const Orientation *o = getViewer()->orientation();
+  TXsheet *xsh         = getViewer()->getXsheet();
+  int c                = pos.x;
+  int cLast            = m_lastPos.x;
+  int cRange           = m_range.lx;
+  if (!o->isVerticalTimeline()) {
+    c      = pos.y;
+    cLast  = m_lastPos.y;
+    cRange = m_range.ly;
+  }
+  if (c < 0) return false;
+  if (c != cLast) {
     int count = 0;
     // controlla il tipo
-    for (int i = 0; i < m_range.lx; i++) {
-      int srcIndex          = m_lastPos.x + i;
-      int dstIndex          = pos.x + i;
+    for (int i = 0; i < cRange; i++) {
+      int srcIndex          = cLast + i;
+      int dstIndex          = c + i;
       TXshColumn *srcColumn = xsh->getColumn(srcIndex);
       if (srcColumn && srcColumn->isLocked()) continue;
       TXshColumn *dstColumn          = xsh->getColumn(dstIndex);
@@ -351,11 +411,11 @@ bool LevelMoverTool::canMoveColumns(const TPoint &pos) {
       if (srcColumn) srcType         = srcColumn->getColumnType();
       if (srcType == TXshColumn::eZeraryFxType) return false;
       /*
-qDebug() << "check: " << srcIndex << ":" <<
-(srcColumn ? QString::number(srcType) : "empty") <<
-" => " << dstIndex << ":" <<
-(dstColumn ? QString::number(dstColumn->getColumnType()) : "empty");
-*/
+      qDebug() << "check: " << srcIndex << ":" <<
+      (srcColumn ? QString::number(srcType) : "empty") <<
+      " => " << dstIndex << ":" <<
+      (dstColumn ? QString::number(dstColumn->getColumnType()) : "empty");
+      */
 
       if (dstColumn && !dstColumn->isEmpty() &&
           dstColumn->getColumnType() != srcType) {
@@ -371,6 +431,7 @@ qDebug() << "check: " << srcIndex << ":" <<
 }
 
 void LevelMoverTool::onClick(const QMouseEvent *e) {
+  const Orientation *o      = getViewer()->orientation();
   QPoint pos                = e->pos();
   CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
   int row                   = cellPosition.frame();
@@ -397,7 +458,8 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   m_validPos             = true;
   m_undo                 = new LevelMoverUndo();
   CellsMover *cellsMover = m_undo->getCellsMover();
-  cellsMover->start(r0, c0, r1, c1, m_qualifiers);
+  XsheetViewer *viewer   = getViewer();
+  cellsMover->start(r0, c0, r1, c1, m_qualifiers, o);
   m_undo->m_columnsChanges.resize(c1 - c0 + 1, 0);
 
   m_moved = true;
@@ -412,12 +474,13 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
 
   int colCount = c1 - c0 + 1;
   int rowCount = r1 - r0 + 1;
-  m_range.lx   = colCount;
-  m_range.ly   = rowCount;
-  m_startPos.x = c0;
-  m_startPos.y = r0;
+  m_range.lx   = o->isVerticalTimeline() ? colCount : rowCount;
+  m_range.ly   = o->isVerticalTimeline() ? rowCount : colCount;
+  m_startPos.x = o->isVerticalTimeline() ? c0 : r0;
+  m_startPos.y = o->isVerticalTimeline() ? r0 : c0;
   m_lastPos = m_aimedPos = m_startPos;
-  m_grabOffset           = m_startPos - TPoint(col, row);
+  m_grabOffset = m_startPos - (o->isVerticalTimeline() ? TPoint(col, row)
+                                                       : TPoint(row, col));
 
   TXsheet *xsh = getViewer()->getXsheet();
 
@@ -425,35 +488,80 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   m_validPos                      = true;
   m_lastPos                       = m_startPos;
   m_undo->getCellsMover()->m_uffa = 0;
+
+  if (!getViewer()->orientation()->isVerticalTimeline())
+    TUndoManager::manager()->beginBlock();
 }
 
 void LevelMoverTool::onCellChange(int row, int col) {
-  TXsheet *xsh = getViewer()->getXsheet();
+  const Orientation *o = getViewer()->orientation();
+  TXsheet *xsh         = getViewer()->getXsheet();
 
-  TPoint pos           = TPoint(col, row) + m_grabOffset;
+  TPoint pos = (o->isVerticalTimeline() ? TPoint(col, row) : TPoint(row, col)) +
+               m_grabOffset;
+  int origX            = pos.x;
+  int origY            = pos.y;
   if (pos.y < 0) pos.y = 0;
-  if (pos.x < 0) return;
+  if (pos.x < 0) pos.x = 0;
+
+  TPoint delta                       = pos - m_aimedPos;
+  int dCol                           = delta.x;
+  if (!o->isVerticalTimeline()) dCol = delta.y;
+
+  CellsMover *cellsMover = m_undo->getCellsMover();
+  std::set<int> ii;
+  TRect currSelection(m_aimedPos, m_range);
+  if (!o->isVerticalTimeline()) {
+    if (origY < 0) dCol += origY;
+    int newBegin = currSelection.y0 + dCol;
+    if (newBegin < 0) {
+      newBegin *= -1;
+      for (int y = 0; y < newBegin; y++) ii.insert(y);
+      ColumnCmd::insertEmptyColumns(ii);
+      m_lastPos += TPoint(0, newBegin);
+      m_startPos += TPoint(0, newBegin);
+      m_aimedPos += TPoint(0, newBegin);
+      cellsMover->setStartPos(cellsMover->getStartPos() + TPoint(0, newBegin));
+      cellsMover->setPos(cellsMover->getPos() + TPoint(0, newBegin));
+      //	  getViewer()->setCurrentColumn(getViewer()->getCurrentColumn()
+      //+ newBegin);
+      pos.x = origY + newBegin;
+    } else {
+      int maxY   = xsh->getColumnCount() - 1;
+      int newEnd = currSelection.y1 + dCol;
+      if (newEnd > maxY) {
+        for (int y = maxY + 1; y <= newEnd; y++) ii.insert(y);
+        ColumnCmd::insertEmptyColumns(ii);
+      }
+    }
+  }
   if (pos == m_aimedPos) return;
 
-  m_aimedPos   = pos;
-  TPoint delta = m_aimedPos - m_lastPos;
+  m_aimedPos = pos;
 
   m_validPos = canMoveColumns(pos);
   if (!m_validPos) return;
-
-  CellsMover *cellsMover = m_undo->getCellsMover();
   if (m_moved) cellsMover->undoMoveCells();
   m_validPos = canMove(pos);
 
   if (m_validPos) {
     //----------------------
-    if (delta.x != 0 && (m_qualifiers & CellsMover::eMoveColumns)) {
+    if (dCol != 0 && (m_qualifiers & CellsMover::eMoveColumns)) {
       // spostamento di colonne
       int colCount = m_range.lx;
+      int colLast  = m_lastPos.x;
+      int colPos   = pos.x;
+      int colStart = m_startPos.x;
+      if (!o->isVerticalTimeline()) {
+        colCount = m_range.ly;
+        colLast  = m_lastPos.y;
+        colPos   = pos.y;
+        colStart = m_startPos.y;
+      }
 
       bool emptySrc = true;
       for (int i = 0; i < colCount; i++) {
-        TXshColumn *column = xsh->getColumn(m_lastPos.x + i);
+        TXshColumn *column = xsh->getColumn(colLast + i);
         if (column && !column->isEmpty()) {
           emptySrc = false;
           break;
@@ -463,26 +571,26 @@ void LevelMoverTool::onCellChange(int row, int col) {
       bool lockedDst = false;
       bool emptyDst  = true;
       for (int i = 0; i < colCount; i++) {
-        if (!isTotallyEmptyColumn(pos.x + i)) emptyDst = false;
-        TXshColumn *column                          = xsh->getColumn(pos.x + i);
+        if (!isTotallyEmptyColumn(colPos + i)) emptyDst = false;
+        TXshColumn *column = xsh->getColumn(colPos + i);
         if (column && column->isLocked()) lockedDst = true;
       }
 
       if (emptySrc) {
-        if (m_lastPos.x == m_startPos.x)
+        if (colLast == colStart)
           m_undo->getCellsMover()->m_uffa |=
               1;  // first column(s) has/have been cleared
-        cellsMover->emptyColumns(m_lastPos.x);
+        cellsMover->emptyColumns(colLast);
       }
 
       if (emptyDst && !lockedDst) {
-        if (pos.x == m_startPos.x)
+        if (colPos == colStart)
           m_undo->getCellsMover()->m_uffa &=
               ~1;  // first column(s) has/have been restored
         else
           m_undo->getCellsMover()->m_uffa |=
               2;  // columns data have been copied on the current position
-        cellsMover->restoreColumns(pos.x);
+        cellsMover->restoreColumns(colPos);
       } else {
         m_undo->getCellsMover()->m_uffa &=
             ~2;  // no columns data have been copied on the current position
@@ -505,8 +613,12 @@ void LevelMoverTool::onCellChange(int row, int col) {
   if (cellsMover->getColumnTypeFromCell(0) == TXshColumn::eSoundType)
     TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   TRect selection(m_aimedPos, m_range);
-  getViewer()->getCellSelection()->selectCells(selection.y0, selection.x0,
-                                               selection.y1, selection.x1);
+  if (o->isVerticalTimeline())
+    getViewer()->getCellSelection()->selectCells(selection.y0, selection.x0,
+                                                 selection.y1, selection.x1);
+  else
+    getViewer()->getCellSelection()->selectCells(selection.x0, selection.y0,
+                                                 selection.x1, selection.y1);
 }
 
 void LevelMoverTool::onDrag(const QMouseEvent *e) {
@@ -522,11 +634,20 @@ void LevelMoverTool::onRelease(const CellPosition &pos) {
   m_range.ly = 0;
   setToolCursor(getViewer(), ToolCursor::CURSOR_ARROW);
   refreshCellsArea();
+  CellsMover *cellMover = m_undo->getCellsMover();
+  int startX            = cellMover->getStartPos().x;
+  int startY            = cellMover->getStartPos().y;
+  int posX              = cellMover->getPos().x;
+  int posY              = cellMover->getPos().y;
   if (m_lastPos != m_startPos) TUndoManager::manager()->add(m_undo);
   m_undo = 0;
+
+  if (!getViewer()->orientation()->isVerticalTimeline())
+    TUndoManager::manager()->endBlock();
 }
 
 void LevelMoverTool::drawCellsArea(QPainter &p) {
+  const Orientation *o = getViewer()->orientation();
   TRect rect(m_aimedPos, m_range);
   // voglio visualizzare il rettangolo nella posizione desiderata
   // che potrebbe anche non essere possibile, ad esempio perche' fuori
@@ -536,8 +657,17 @@ void LevelMoverTool::drawCellsArea(QPainter &p) {
   if (rect.x0 < 0) rect.x0 = 0;
   if (rect.y0 < 0) rect.y0 = 0;
 
-  QRect screen = getViewer()->rangeToXYRect(CellRange(
-      CellPosition(rect.y0, rect.x0), CellPosition(rect.y1 + 1, rect.x1 + 1)));
+  QRect screen;
+  if (o->isVerticalTimeline())
+    screen = getViewer()->rangeToXYRect(
+        CellRange(CellPosition(rect.y0, rect.x0),
+                  CellPosition(rect.y1 + 1, rect.x1 + 1)));
+  else {
+    int newY0 = qMax(rect.y0, rect.y1);
+    int newY1 = qMin(rect.y0, rect.y1);
+    screen    = getViewer()->rangeToXYRect(CellRange(
+        CellPosition(rect.x0, newY0), CellPosition(rect.x1 + 1, newY1 - 1)));
+  }
   p.setPen((m_aimedPos == m_lastPos && m_validPos) ? QColor(190, 220, 255)
                                                    : QColor(255, 0, 0));
   int i;

@@ -6,7 +6,7 @@ Building OpenToonz from source requires the following dependencies:
 - Git
 - GCC or Clang
 - CMake (3.4.1 or newer).
-- Qt5 (5.6 or newer)
+- Qt5 (5.9 or newer)
 - Boost (1.55 or newer)
 - SDL2
 - LibPNG
@@ -106,7 +106,7 @@ Note the generated file must not actually contain `$HOME`, this expands to an ab
 ### Building LibTIFF
 
 TODO: make sure we can use the system libtiff instead and remove this section.
-Features from the modified libtiff and needed currently, so this isn't a simple switch.
+Features from the modified libtiff are needed currently, so this isn't a simple switch.
 
 ```
 $ cd opentoonz/thirdparty/tiff-4.0.3
@@ -143,7 +143,6 @@ If you need to debug the application, you should be able to use `cmake -DCMAKE_B
 You can now run the application:
 
 ```
-$ cd bin
 $ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz_1.1
 ```
 

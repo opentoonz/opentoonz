@@ -86,6 +86,9 @@ class DVAPI IntLineEdit : public LineEdit {
   //! If digits is less than 1 the line edit show the natural number without
   //! prepend zeros.
   int m_showedDigits;
+  int m_xMouse;
+  bool m_mouseDragEditing = false;
+  bool m_isTyping         = false;
 
 public:
   IntLineEdit(QWidget *parent = 0, int value = 1,
@@ -119,6 +122,11 @@ protected:
   /*! If focus is lost and current text value is out of range emit signal
                   \b editingFinished.*/
   void focusOutEvent(QFocusEvent *) override;
+
+  // for dragging the mouse to set the value
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
 };
 
 //=============================================================================

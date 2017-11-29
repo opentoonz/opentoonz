@@ -126,12 +126,13 @@ struct DVAPI VisitArgs {
 
   const OnionSkinMask *m_osm;
   int m_xsheetLevel;
-
+  TFrameId m_currentFrameId;
   bool m_camera3d;
   bool m_isPlaying;
   bool m_onlyVisible;
   bool m_checkPreviewVisibility;
   bool m_rasterizePli;
+  int m_isGuidedDrawingEnabled;
 
 public:
   VisitArgs()
@@ -145,6 +146,7 @@ public:
       , m_isPlaying(false)
       , m_onlyVisible(false)
       , m_checkPreviewVisibility(false)
+      , m_isGuidedDrawingEnabled(0)
       , m_rasterizePli(false) {}
 };
 

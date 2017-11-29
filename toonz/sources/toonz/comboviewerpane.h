@@ -89,9 +89,6 @@ public:
   void onDrawFrame(int frame,
                    const ImagePainter::VisualSettings &settings) override;
 
-  // reimplementation of FlipConsoleOwner::isFrameAlreadyCached
-  bool isFrameAlreadyCached(int frame) override;
-
 protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;

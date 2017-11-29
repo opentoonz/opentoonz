@@ -16,6 +16,7 @@
 #include "tconvert.h"
 #include "tcurves.h"
 #include "tstrokeoutline.h"
+#include <QTime>
 
 #ifndef _WIN32
 #define CALLBACK
@@ -131,6 +132,108 @@ void drawControlPoints(const TVectorRenderData &rd, TStroke *stroke,
 }
 
 #endif
+
+//-----------------------------------------------------------------------------
+
+void drawArrows(TStroke *stroke, bool onlyFirstPoint) {
+  double length = stroke->getLength(0.0, 1.0);
+  int points    = length / 20;
+  if (points < 2) points += 1;
+  double currentPosition = 0.0;
+
+  TPointD prePoint, point, postPoint;
+  glColor3d(1.0, 0.0, 0.0);
+  for (int i = 0; i <= points; i++) {
+    currentPosition = i / (double)points;
+    point           = stroke->getPointAtLength(length * currentPosition);
+    prePoint        = (i == 0) ? point : stroke->getPointAtLength(
+                                      length * (currentPosition - 0.02));
+    postPoint = (i == points) ? point : stroke->getPointAtLength(
+                                            length * (currentPosition + 0.02));
+
+    if (prePoint == postPoint) continue;
+
+    double radian =
+        std::atan2(postPoint.y - prePoint.y, postPoint.x - prePoint.x);
+    double degree = radian * 180.0 / 3.14159265;
+
+    glPushMatrix();
+    glTranslated(point.x, point.y, 0);
+    glRotated(degree, 0, 0, 1);
+    glBegin(GL_LINES);
+    glVertex2d(0, 0);
+    glVertex2d(-3, -3);
+    glVertex2d(0, 0);
+    glVertex2d(-3, 3);
+    glEnd();
+    glPopMatrix();
+
+    if (onlyFirstPoint) break;
+    // make the arrow blue from the second one
+    glColor3d(0.0, 0.0, 1.0);
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Used for Guided Drawing
+void drawFirstControlPoint(const TVectorRenderData &rd, TStroke *stroke) {
+  TPointD p          = stroke->getPoint(0.0);
+  double length      = stroke->getLength(0.0, 1.0);
+  int msecs          = QTime::currentTime().msec();
+  double modifier    = (msecs / 100) * 0.1;
+  TPointD startPoint = stroke->getPointAtLength(length * modifier);
+  TPointD endPoint   = stroke->getPointAtLength(length * 0.10);
+  double j           = 0.025;
+
+  glPushMatrix();
+  tglMultMatrix(rd.m_aff);
+  if (!rd.m_animatedGuidedDrawing) glLineWidth(2.0f);
+  glColor3d(0.0, 1.0, 0.0);
+  if (!rd.m_animatedGuidedDrawing) {
+    drawArrows(stroke, false);
+  }
+
+  if (rd.m_animatedGuidedDrawing) {
+    drawArrows(stroke, true);
+    glColor3d(0.0, 1.0, 0.0);
+    j = 0.025 + modifier;
+    glBegin(GL_LINES);
+    // draw the first animated section
+    for (int i = 0; i < 8; i++) {
+      endPoint = stroke->getPointAtLength(length * j);
+      glVertex2d(startPoint.x, startPoint.y);
+      glVertex2d(endPoint.x, endPoint.y);
+      startPoint = endPoint;
+      j += 0.025;
+      if (j > 1) {
+        j -= 1;
+        startPoint = stroke->getPointAtLength(length * j);
+      }
+    }
+
+    modifier = modifier + 0.5;
+    if (modifier >= 1) modifier -= 1;
+    startPoint = stroke->getPointAtLength(length * modifier);
+    j          = 0.025 + modifier;
+
+    // draw another animated section
+    for (int i = 0; i < 8; i++) {
+      endPoint = stroke->getPointAtLength(length * j);
+      glVertex2d(startPoint.x, startPoint.y);
+      glVertex2d(endPoint.x, endPoint.y);
+      startPoint = endPoint;
+      j += 0.025;
+      if (j > 1) {
+        j -= 1;
+        startPoint = stroke->getPointAtLength(length * j);
+      }
+    }
+    glEnd();
+  }
+
+  glLineWidth(1.0f);
+  glPopMatrix();
+}
 
 //=============================================================================
 
@@ -483,11 +586,20 @@ static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
       if (color.m != 0) visible = true;
     }
   }
-#if DISEGNO_OUTLINE == 0
-  if (visible)
-#endif
-    tglDraw(rd, s, false);
 
+  if (visible) {
+    // Change stroke color to blue if guided drawing
+    if (rd.m_showGuidedDrawing && rd.m_highLightNow) {
+      TVectorRenderData *newRd = new TVectorRenderData(
+          rd, rd.m_aff, rd.m_clippingRect, rd.m_palette, rd.m_guidedCf);
+      tglDraw(*newRd, s, false);
+      delete newRd;
+      TStroke *new_s = (TStroke *)s;
+      drawFirstControlPoint(rd, new_s);
+    } else {
+      tglDraw(rd, s, false);
+    }
+  }
 #ifdef _DEBUG
 // drawControlPoints(rd, vim->getStroke(i), sqrt(tglGetPixelSize2()), true);
 // assert(checkQuadraticDistance(vim->getStroke(i),true));
@@ -542,6 +654,11 @@ rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
           tglDoDraw(rdRegions, vim->getRegion(regionIndex));
     while (strokeIndex < vim->getStrokeCount() &&
            vim->sameGroup(strokeIndex, currStrokeIndex)) {
+      if (rd.m_indexToHighlight != strokeIndex) {
+        rd.m_highLightNow = false;
+      } else {
+        rd.m_highLightNow = true;
+      }
 #if DISEGNO_OUTLINE == 1
       CurrStrokeIndex = strokeIndex;
       CurrVimg        = vim;

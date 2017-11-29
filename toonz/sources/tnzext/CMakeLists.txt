@@ -81,6 +81,7 @@ add_library(tnzext SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
 if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzext.dylib")
+    add_dependencies(tnzext tnzcore tnzbase)
 endif()
 
 add_definitions(

@@ -69,7 +69,7 @@ private:
   void connectScrollbars();
   void disconnectScrollbars();
 
-  void handleScroll(const QPoint &offset) const;
+  void handleScroll(QPoint &offset);
   void onScroll(const CellPositionRatio &offset);
 
   void prepareToScrollRatio(const CellPositionRatio &offset);
@@ -79,6 +79,7 @@ private slots:
   void onHScroll(int value);
 signals:
   void prepareToScrollOffset(const QPoint &offset);
+  void zoomScrollAdjust(QPoint &offset, bool toZoom);
 };
 
 //-------------------------------------------------------------------

@@ -224,6 +224,12 @@ Preferences::Preferences()
     , m_cameraUnits("inch")
     , m_currentRoomChoice("Default")
     , m_scanLevelType("tif")
+#ifdef _WIN32
+    , m_interfaceFont("Segoe UI")
+#else
+    , m_interfaceFont("Helvetica")
+#endif
+    , m_interfaceFontWeight(0)
     , m_defLevelWidth(0.0)
     , m_defLevelHeight(0.0)
     , m_defLevelDpi(0.0)
@@ -249,12 +255,13 @@ Preferences::Preferences()
     , m_shmall(-1)
     , m_shmmni(-1)
     , m_onionPaperThickness(50)
-    , m_currentLanguage(0)
-    , m_currentStyleSheet(0)
+    , m_currentLanguage("English")
+    , m_currentStyleSheet("Default")
     , m_undoMemorySize(100)
     , m_dragCellsBehaviour(0)
     , m_lineTestFpsCapture(25)
     , m_defLevelType(0)
+    , m_vectorSnappingTarget(SnapAll)
     , m_autocreationType(1)
     , m_autoExposeEnabled(true)
     , m_autoCreateEnabled(true)
@@ -282,6 +289,8 @@ Preferences::Preferences()
     , m_fillOnlySavebox(false)
     , m_show0ThickLines(true)
     , m_regionAntialias(false)
+    , m_keepFillOnVectorSimplify(true)
+    , m_useHigherDpiOnVectorSimplify(false)
     , m_viewerBGColor(128, 128, 128, 255)
     , m_previewBGColor(64, 64, 64, 255)
     , m_chessboardColor1(180, 180, 180)
@@ -298,6 +307,7 @@ Preferences::Preferences()
     , m_moveCurrentFrameByClickCellArea(true)
     , m_onionSkinEnabled(true)
     , m_onionSkinDuringPlayback(false)
+    , m_dropdownShortcutsCycleOptions(false)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
@@ -308,13 +318,23 @@ Preferences::Preferences()
     , m_ffmpegTimeout(60)
     , m_shortcutPreset("defopentoonz")
     , m_useNumpadForSwitchingStyles(true)
+    , m_newLevelSizeToCameraSizeEnabled(false)
     , m_showXSheetToolbar(false)
+    , m_syncLevelRenumberWithXsheet(false)
     , m_expandFunctionHeader(false)
     , m_showColumnNumbers(false)
     , m_useArrowKeyToShiftCellSelection(false)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
-    , m_watchFileSystem(true) {
+    , m_guidedDrawingType(0)
+    , m_animatedGuidedDrawing(false)
+    , m_ignoreImageDpi(false)
+    , m_watchFileSystem(true)
+    , m_shortcutCommandsWhileRenamingCellEnabled(false)
+    , m_xsheetLayoutPreference("Classic-revised")
+    , m_loadedXsheetLayout("Classic-revised")
+    , m_pathAliasPriority(ProjectFolderOnly)
+    , m_currentTimelineEnabled(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -322,10 +342,23 @@ Preferences::Preferences()
   m_defLevelDpi    = camera.getDpi().x;
 
   TFilePath layoutDir = ToonzFolder::getMyModuleDir();
-  TFilePath savePath  = layoutDir + TFilePath("preferences.ini");
+  TFilePath prefPath  = layoutDir + TFilePath("preferences.ini");
+
+  bool existingUser = true;
+
+  // In case the personal settings is not exist (for new users)
+  if (!TFileStatus(prefPath).doesExist()) {
+    TFilePath templatePath =
+        ToonzFolder::getTemplateModuleDir() + TFilePath("preferences.ini");
+    // If there is the template, copy it to the personal one
+    if (TFileStatus(templatePath).doesExist())
+      TSystem::copyFile(prefPath, templatePath);
+
+    existingUser = false;
+  }
 
   m_settings.reset(new QSettings(
-      QString::fromStdWString(savePath.getWideString()), QSettings::IniFormat));
+      QString::fromStdWString(prefPath.getWideString()), QSettings::IniFormat));
 
   getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
   getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
@@ -352,13 +385,15 @@ Preferences::Preferences()
   getValue(*m_settings, "autosaveOtherFilesEnabled",
            m_autosaveOtherFilesEnabled);
   getValue(*m_settings, "startupPopupEnabled", m_startupPopupEnabled);
+  getValue(*m_settings, "dropdownShortcutsCycleOptions",
+           m_dropdownShortcutsCycleOptions);
   getValue(*m_settings, "defaultViewerEnabled", m_defaultViewerEnabled);
   getValue(*m_settings, "rasterOptimizedMemory", m_rasterOptimizedMemory);
   getValue(*m_settings, "saveUnpaintedInCleanup", m_saveUnpaintedInCleanup);
   getValue(*m_settings, "autosavePeriod", m_autosavePeriod);
   getValue(*m_settings, "taskchunksize", m_chunkSize);
   getValue(*m_settings, "xsheetStep", m_xsheetStep);
-
+  getValue(*m_settings, "vectorSnappingTarget", m_vectorSnappingTarget);
   int r = 0, g = 255, b = 0;
   getValue(*m_settings, "frontOnionColor.r", r);
   getValue(*m_settings, "frontOnionColor.g", g);
@@ -458,7 +493,7 @@ Preferences::Preferences()
   // load languages
   TFilePath lang_path = TEnv::getConfigDir() + "loc";
   TFilePathSet lang_fpset;
-  m_languageMaps[0] = "English";
+  m_languageList.append("English");
   // m_currentLanguage=0;
   try {
     TFileStatus langPathFs(lang_path);
@@ -472,8 +507,8 @@ Preferences::Preferences()
       ++i;
       if (newPath == lang_path) continue;
       if (TFileStatus(newPath).isDirectory()) {
-        QString string    = QString::fromStdWString(newPath.getWideName());
-        m_languageMaps[i] = string;
+        QString string = QString::fromStdWString(newPath.getWideName());
+        m_languageList.append(string);
       }
     }
   } catch (...) {
@@ -489,13 +524,7 @@ Preferences::Preferences()
       ++i;
       if (newPath == path) continue;
       QString fpName = QString::fromStdWString(newPath.getWideName());
-#ifdef MACOSX
-      QString string = fpName + QString("/") + fpName + QString("_mac.qss");
-#else
-      QString string = fpName + QString("/") + fpName + QString(".qss");
-#endif
-      if (fpName == QString("standard")) m_currentStyleSheet = i;
-      m_styleSheetMaps[i] = "file:///" + path.getQString() + "/" + string;
+      m_styleSheetList.append(fpName);
     }
   } catch (...) {
   }
@@ -534,9 +563,18 @@ Preferences::Preferences()
     setCurrentRoomChoice(0);
   }
 
-  getValue(*m_settings, "CurrentLanguage", m_currentLanguage);
-  getValue(*m_settings, "CurrentStyleSheet", m_currentStyleSheet);
-
+  QString currentLanguage;
+  currentLanguage = m_settings->value("CurrentLanguageName").toString();
+  if (!currentLanguage.isEmpty() && m_languageList.contains(currentLanguage))
+    m_currentLanguage = currentLanguage;
+  QString currentStyleSheet;
+  currentStyleSheet = m_settings->value("CurrentStyleSheetName").toString();
+  if (!currentStyleSheet.isEmpty() &&
+      m_styleSheetList.contains(currentStyleSheet))
+    m_currentStyleSheet = currentStyleSheet;
+  getValue(*m_settings, "useHigherDpiOnVectorSimplify",
+           m_useHigherDpiOnVectorSimplify);
+  getValue(*m_settings, "keepFillOnVectorSimplify", m_keepFillOnVectorSimplify);
   getValue(*m_settings, "DragCellsBehaviour", m_dragCellsBehaviour);
 
   getValue(*m_settings, "LineTestFpsCapture", m_lineTestFpsCapture);
@@ -546,7 +584,7 @@ Preferences::Preferences()
   getValue(*m_settings, "DefLevelWidth", m_defLevelWidth);
   getValue(*m_settings, "DefLevelHeight", m_defLevelHeight);
   getValue(*m_settings, "DefLevelDpi", m_defLevelDpi);
-
+  getValue(*m_settings, "IgnoreImageDpi", m_ignoreImageDpi);
   getValue(*m_settings, "viewerBGColor", m_viewerBGColor);
   getValue(*m_settings, "previewBGColor", m_previewBGColor);
   getValue(*m_settings, "chessboardColor1", m_chessboardColor1);
@@ -586,9 +624,19 @@ Preferences::Preferences()
   QString shortcutPreset = m_settings->value("shortcutPreset").toString();
   if (shortcutPreset != "") m_shortcutPreset = shortcutPreset;
   setShortcutPreset(m_shortcutPreset.toStdString());
+  QString interfaceFont = m_settings->value("interfaceFont").toString();
+  if (interfaceFont != "") m_interfaceFont = interfaceFont;
+  setInterfaceFont(m_interfaceFont.toStdString());
+  getValue(*m_settings, "interfaceFontWeight", m_interfaceFontWeight);
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
+  getValue(*m_settings, "guidedDrawingType", m_guidedDrawingType);
+  getValue(*m_settings, "animatedGuidedDrawing", m_animatedGuidedDrawing);
+  getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
+           m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
+  getValue(*m_settings, "syncLevelRenumberWithXsheet",
+           m_syncLevelRenumberWithXsheet);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
   getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
@@ -597,6 +645,24 @@ Preferences::Preferences()
            m_inputCellsWithoutDoubleClickingEnabled);
   getValue(*m_settings, "importPolicy", m_importPolicy);
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
+  getValue(*m_settings, "shortcutCommandsWhileRenamingCellEnabled",
+           m_shortcutCommandsWhileRenamingCellEnabled);
+  int pathAliasPriority = static_cast<int>(m_pathAliasPriority);
+  getValue(*m_settings, "pathAliasPriority", pathAliasPriority);
+  m_pathAliasPriority = static_cast<PathAliasPriority>(pathAliasPriority);
+
+  QString xsheetLayoutPreference;
+  xsheetLayoutPreference =
+      m_settings->value("xsheetLayoutPreference").toString();
+  if (xsheetLayoutPreference != "")
+    m_xsheetLayoutPreference = xsheetLayoutPreference;
+  else if (existingUser)  // Existing users with missing preference defaults to
+                          // Classic. New users will be Classic-revised
+    m_xsheetLayoutPreference = QString("Classic");
+  setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
+  m_loadedXsheetLayout = m_xsheetLayoutPreference;
+
+  getValue(*m_settings, "currentTimelineEnabled", m_currentTimelineEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -764,6 +830,7 @@ void Preferences::setAutosavePeriod(int minutes) {
   m_settings->setValue("autosavePeriod", QString::number(minutes));
   emit stopAutoSave();
   emit startAutoSave();
+  emit autoSavePeriodChanged();
 }
 
 //-----------------------------------------------------------------
@@ -1158,49 +1225,78 @@ void Preferences::setUndoMemorySize(int memorySize) {
 //-----------------------------------------------------------------
 
 QString Preferences::getCurrentLanguage() const {
-  return m_languageMaps[m_currentLanguage];
+  if (m_languageList.contains(m_currentLanguage)) return m_currentLanguage;
+  // If no valid option selected, then return English
+  return m_languageList[0];
 }
 
 //-----------------------------------------------------------------
 
 QString Preferences::getLanguage(int index) const {
-  return m_languageMaps[index];
+  return m_languageList[index];
 }
 
 //-----------------------------------------------------------------
 
-int Preferences::getLanguageCount() const { return (int)m_languageMaps.size(); }
+int Preferences::getLanguageCount() const { return (int)m_languageList.size(); }
 
 //-----------------------------------------------------------------
 
-void Preferences::setCurrentLanguage(int currentLanguage) {
+void Preferences::setCurrentLanguage(const QString &currentLanguage) {
   m_currentLanguage = currentLanguage;
-  m_settings->setValue("CurrentLanguage", m_currentLanguage);
+  m_settings->setValue("CurrentLanguageName", m_currentLanguage);
 }
 
 //-----------------------------------------------------------------
 
-QString Preferences::getCurrentStyleSheet() const {
-  return m_styleSheetMaps[m_currentStyleSheet];
+QString Preferences::getCurrentStyleSheetName() const {
+  if (m_styleSheetList.contains(m_currentStyleSheet))
+    return m_currentStyleSheet;
+  // If no valid option selected, then return the first oprion
+  return m_styleSheetList.isEmpty() ? QString() : m_styleSheetList[0];
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setInterfaceFont(std::string font) {
+  m_interfaceFont = QString::fromStdString(font);
+  m_settings->setValue("interfaceFont", m_interfaceFont);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setInterfaceFontWeight(int weight) {
+  m_interfaceFontWeight = weight;
+  m_settings->setValue("interfaceFontWeight", m_interfaceFontWeight);
+}
+
+//-----------------------------------------------------------------
+
+QString Preferences::getCurrentStyleSheetPath() const {
+  if (m_currentStyleSheet.isEmpty()) return QString();
+  TFilePath path(TEnv::getConfigDir() + "qss");
+  QString string = m_currentStyleSheet + QString("/") + m_currentStyleSheet +
+                   QString(".qss");
+  return QString("file:///" + path.getQString() + "/" + string);
 }
 
 //-----------------------------------------------------------------
 
 QString Preferences::getStyleSheet(int index) const {
-  return m_styleSheetMaps[index];
+  return m_styleSheetList[index];
 }
 
 //-----------------------------------------------------------------
 
 int Preferences::getStyleSheetCount() const {
-  return (int)m_styleSheetMaps.size();
+  return (int)m_styleSheetList.size();
 }
 
 //-----------------------------------------------------------------
 
-void Preferences::setCurrentStyleSheet(int currentStyleSheet) {
+void Preferences::setCurrentStyleSheet(const QString &currentStyleSheet) {
   m_currentStyleSheet = currentStyleSheet;
-  m_settings->setValue("CurrentStyleSheet", m_currentStyleSheet);
+  m_settings->setValue("CurrentStyleSheetName", m_currentStyleSheet);
 }
 //-----------------------------------------------------------------
 
@@ -1232,6 +1328,20 @@ void Preferences::setFillOnlySavebox(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setKeepFillOnVectorSimplify(bool on) {
+  m_keepFillOnVectorSimplify = on;
+  m_settings->setValue("keepFillOnVectorSimplify", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setUseHigherDpiOnVectorSimplify(bool on) {
+  m_useHigherDpiOnVectorSimplify = on;
+  m_settings->setValue("useHigherDpiOnVectorSimplify", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableLevelsBackup(bool enabled) {
   m_levelsBackupEnabled = enabled;
   m_settings->setValue("levelsBackupEnabled", enabled ? "1" : "0");
@@ -1242,6 +1352,13 @@ void Preferences::enableLevelsBackup(bool enabled) {
 void Preferences::enableSceneNumbering(bool enabled) {
   m_sceneNumberingEnabled = enabled;
   m_settings->setValue("sceneNumberingEnabled", enabled ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setDropdownShortcutsCycleOptions(bool on) {
+  m_dropdownShortcutsCycleOptions = on;
+  m_settings->setValue("dropdownShortcutsCycleOptions", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
@@ -1270,6 +1387,20 @@ void Preferences::setDefLevelHeight(double height) {
 void Preferences::setDefLevelDpi(double dpi) {
   m_defLevelDpi = dpi;
   m_settings->setValue("DefLevelDpi", dpi);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setIgnoreImageDpi(bool on) {
+  m_ignoreImageDpi = on;
+  m_settings->setValue("IgnoreImageDpi", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setVectorSnappingTarget(int target) {
+  m_vectorSnappingTarget = target;
+  m_settings->setValue("vectorSnappingTarget", target);
 }
 
 //-----------------------------------------------------------------
@@ -1379,9 +1510,37 @@ void Preferences::enableUseNumpadForSwitchingStyles(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setGuidedDrawing(int status) {
+  m_guidedDrawingType = status;
+  m_settings->setValue("guidedDrawingType", status);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setAnimatedGuidedDrawing(bool status) {
+  m_animatedGuidedDrawing = status;
+  m_settings->setValue("animatedGuidedDrawing", status);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableNewLevelSizeToCameraSize(bool on) {
+  m_newLevelSizeToCameraSizeEnabled = on;
+  m_settings->setValue("newLevelSizeToCameraSizeEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableShowXSheetToolbar(bool on) {
   m_showXSheetToolbar = on;
   m_settings->setValue("showXSheetToolbar", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableSyncLevelRenumberWithXsheet(bool on) {
+  m_syncLevelRenumberWithXsheet = on;
+  m_settings->setValue("syncLevelRenumberWithXsheet", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
@@ -1394,6 +1553,15 @@ void Preferences::enableExpandFunctionHeader(bool on) {
 void Preferences::enableShowColumnNumbers(bool on) {
   m_showColumnNumbers = on;
   m_settings->setValue("showColumnNumbers", on ? "1" : "0");
+}
+
+void Preferences::setXsheetLayoutPreference(std::string layout) {
+  m_xsheetLayoutPreference = QString::fromStdString(layout);
+  m_settings->setValue("xsheetLayoutPreference", m_xsheetLayoutPreference);
+}
+
+void Preferences::setLoadedXsheetLayout(std::string layout) {
+  m_loadedXsheetLayout = QString::fromStdString(layout);
 }
 
 //-----------------------------------------------------------------
@@ -1416,4 +1584,26 @@ void Preferences::enableInputCellsWithoutDoubleClicking(bool on) {
 void Preferences::enableWatchFileSystem(bool on) {
   m_watchFileSystem = on;
   m_settings->setValue("watchFileSystemEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableShortcutCommandsWhileRenamingCell(bool on) {
+  m_shortcutCommandsWhileRenamingCellEnabled = on;
+  m_settings->setValue("shortcutCommandsWhileRenamingCellEnabled",
+                       on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setPathAliasPriority(PathAliasPriority priority) {
+  m_pathAliasPriority = priority;
+  m_settings->setValue("pathAliasPriority", static_cast<int>(priority));
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableCurrentTimelineIndicator(bool on) {
+  m_currentTimelineEnabled = on;
+  m_settings->setValue("currentTimelineEnabled", on ? "1" : "0");
 }

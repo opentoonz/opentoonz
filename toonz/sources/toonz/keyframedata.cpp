@@ -4,6 +4,7 @@
 #include "tapp.h"
 #include "toonzqt/tselectionhandle.h"
 #include "keyframeselection.h"
+#include "xsheetviewer.h"
 
 #include "toonz/txsheet.h"
 #include "toonz/tstageobjecttree.h"
@@ -38,10 +39,17 @@ void TKeyframeData::setKeyframes(std::set<Position> positions, TXsheet *xsh) {
   std::set<Position>::iterator it = positions.begin();
   int r0                          = it->first;
   int c0                          = it->second;
+  int r1                          = it->first;
+  int c1                          = it->second;
   for (++it; it != positions.end(); ++it) {
     r0 = std::min(r0, it->first);
     c0 = std::min(c0, it->second);
+    r1 = std::max(r1, it->first);
+    c1 = std::max(c1, it->second);
   }
+
+  m_columnSpanCount = c1 - c0 + 1;
+  m_rowSpanCount    = r1 - r0 + 1;
 
   for (it = positions.begin(); it != positions.end(); ++it) {
     int row              = it->first;
@@ -70,6 +78,11 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions,
     r0 = std::min(r0, it2->first);
     c0 = std::min(c0, it2->second);
   }
+
+  XsheetViewer *viewer = TApp::instance()->getCurrentXsheetViewer();
+  if (viewer && !viewer->orientation()->isVerticalTimeline())
+    c0 -= m_columnSpanCount - 1;
+
   positions.clear();
   TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
   Iterator it;

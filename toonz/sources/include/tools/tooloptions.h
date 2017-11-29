@@ -19,6 +19,7 @@
 #include <QList>
 #include <QToolBar>
 #include <QMap>
+#include <QLabel>
 
 // STD includes
 #include <map>
@@ -63,6 +64,7 @@ class PegbarCenterField;
 class RGBLabel;
 class MeasuredValueField;
 class PaletteController;
+class ClickableLabel;
 
 class QLabel;
 class QPushButton;
@@ -200,21 +202,28 @@ class ArrowToolOptionsBox final : public ToolOptionsBox {
   PegbarChannelField *m_motionPathPosField;
   PegbarChannelField *m_ewPosField;
   PegbarChannelField *m_nsPosField;
-  QLabel *m_ewPosLabel;
-  QLabel *m_nsPosLabel;
   PegbarChannelField *m_zField;
   NoScaleField *m_noScaleZField;
+  ClickableLabel *m_motionPathPosLabel;
+  ClickableLabel *m_ewPosLabel;
+  ClickableLabel *m_nsPosLabel;
+  ClickableLabel *m_zLabel;
+
   ToolOptionCheckbox *m_lockEWPosCheckbox;
   ToolOptionCheckbox *m_lockNSPosCheckbox;
 
   // SO = Stacked Order
-  QLabel *m_soLabel;
+  ClickableLabel *m_soLabel;
   PegbarChannelField *m_soField;
 
   // Rotation
+  ClickableLabel *m_rotationLabel;
   PegbarChannelField *m_rotationField;
 
   // Scale
+  ClickableLabel *m_globalScaleLabel;
+  ClickableLabel *m_scaleHLabel;
+  ClickableLabel *m_scaleVLabel;
   PegbarChannelField *m_globalScaleField;
   PegbarChannelField *m_scaleHField;
   PegbarChannelField *m_scaleVField;
@@ -223,12 +232,16 @@ class ArrowToolOptionsBox final : public ToolOptionsBox {
   ToolOptionCombo *m_maintainCombo;
 
   // Shear
+  ClickableLabel *m_shearHLabel;
+  ClickableLabel *m_shearVLabel;
   PegbarChannelField *m_shearHField;
   PegbarChannelField *m_shearVField;
   ToolOptionCheckbox *m_lockShearHCheckbox;
   ToolOptionCheckbox *m_lockShearVCheckbox;
 
   // Center Position
+  ClickableLabel *m_ewCenterLabel;
+  ClickableLabel *m_nsCenterLabel;
   PegbarCenterField *m_ewCenterField;
   PegbarCenterField *m_nsCenterField;
   ToolOptionCheckbox *m_lockEWCenterCheckbox;
@@ -315,6 +328,16 @@ public:
 
 protected:
   void paintEvent(QPaintEvent *e);
+  // these are used for dragging on the icon to
+  // change the value of the field
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+
+signals:
+  void onMousePress(QMouseEvent *event);
+  void onMouseMove(QMouseEvent *event);
+  void onMouseRelease(QMouseEvent *event);
 };
 
 //-----------------------------------------------------------------------------
@@ -351,8 +374,10 @@ public:
   void onPropertyChanged();
 
 protected slots:
-  void onScaleXValueChanged();
-  void onScaleYValueChanged();
+  // addToUndo is only set to false when dragging with the mouse
+  // to set the value.  It is set to true on mouse release.
+  void onScaleXValueChanged(bool addToUndo = true);
+  void onScaleYValueChanged(bool addToUndo = true);
   void onSetSaveboxCheckboxChanged(bool);
 };
 
@@ -373,6 +398,9 @@ class GeometricToolOptionsBox final : public ToolOptionsBox {
   ToolOptionCombo *m_shapeField;
   ToolOptionCheckbox *m_pencilMode;
   ToolOptionIntSlider *m_miterField;
+  ToolOptionCheckbox *m_snapCheckbox;
+  ToolOptionCombo *m_snapSensitivityCombo;
+  TTool *m_tool;
 
 public:
   GeometricToolOptionsBox(QWidget *parent, TTool *tool,
@@ -442,7 +470,7 @@ class FillToolOptionsBox final : public ToolOptionsBox {
   QLabel *m_fillDepthLabel;
   ToolOptionCombo *m_colorMode, *m_toolType;
   ToolOptionCheckbox *m_selectiveMode, *m_segmentMode, *m_onionMode,
-      *m_multiFrameMode;
+      *m_multiFrameMode, *m_autopaintMode;
   ToolOptionPairSlider *m_fillDepthField;
 
 public:
@@ -475,12 +503,15 @@ class BrushToolOptionsBox final : public ToolOptionsBox {
   ToolOptionPopupButton *m_joinStyleCombo;
   ToolOptionIntSlider *m_miterField;
   ToolOptionCombo *m_presetCombo;
+  ToolOptionCheckbox *m_snapCheckbox;
+  ToolOptionCombo *m_snapSensitivityCombo;
   QPushButton *m_addPresetButton;
   QPushButton *m_removePresetButton;
 
 private:
   class PresetNamePopup;
   PresetNamePopup *m_presetNamePopup;
+  void filterControls();
 
 public:
   BrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,

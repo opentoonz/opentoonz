@@ -5,6 +5,7 @@
 
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/lineedit.h"
+#include "toonz/namebuilder.h"
 
 #include <QFrame>
 
@@ -22,11 +23,16 @@ class QTimer;
 class QIntValidator;
 class QRegExpValidator;
 class QPushButton;
+#ifdef MACOSX
+class QCameraViewfinder;
+#endif
 
 namespace DVGui {
 class FileField;
 class IntField;
 }
+
+class CameraCaptureLevelControl;
 
 //=============================================================================
 // MyViewFinder
@@ -122,6 +128,18 @@ signals:
 };
 
 //=============================================================================
+// FlexibleNameCreator
+// Inherits NameCreator, added function for obtaining the previous name and
+// setting the current name.
+
+class FlexibleNameCreator final : public NameCreator {
+public:
+  FlexibleNameCreator() {}
+  std::wstring getPrevious();
+  bool setCurrent(std::wstring name);
+};
+
+//=============================================================================
 // PencilTestSaveInFolderPopup
 //-----------------------------------------------------------------------------
 
@@ -132,17 +150,26 @@ class PencilTestSaveInFolderPopup : public DVGui::Dialog {
   QLineEdit *m_projectField, *m_episodeField, *m_sequenceField, *m_sceneField,
       *m_subFolderNameField;
 
-  QCheckBox *m_subFolderCB, *m_autoSubNameCB;
+  QCheckBox *m_subFolderCB, *m_autoSubNameCB, *m_createSceneInFolderCB;
   QComboBox* m_subNameFormatCombo;
+
+  void createSceneInFolder();
 
 public:
   PencilTestSaveInFolderPopup(QWidget* parent = 0);
   QString getPath();
+  QString getParentPath();
+  void updateParentFolder();
+
+protected:
+  void showEvent(QShowEvent* event);
 
 protected slots:
   void updateSubFolderName();
   void onAutoSubNameCBClicked(bool);
   void onShowPopupOnLaunchCBClicked(bool);
+  void onCreateSceneInFolderCBClicked(bool);
+  void onSetAsDefaultBtnPressed();
   void onOkPressed();
 };
 
@@ -166,8 +193,7 @@ class PencilTestPopup : public DVGui::Dialog {
       *m_captureButton, *m_loadImageButton;
   DVGui::FileField* m_saveInFileFld;
   FrameNumberLineEdit* m_frameNumberEdit;
-  DVGui::IntField *m_thresholdFld, *m_contrastFld, *m_brightnessFld,
-      *m_bgReductionFld, *m_onionOpacityFld, *m_timerIntervalFld;
+  DVGui::IntField *m_bgReductionFld, *m_onionOpacityFld, *m_timerIntervalFld;
 
   QTimer *m_captureTimer, *m_countdownTimer;
 
@@ -178,6 +204,16 @@ class PencilTestPopup : public DVGui::Dialog {
 
   PencilTestSaveInFolderPopup* m_saveInFolderPopup;
 
+  CameraCaptureLevelControl* m_camCapLevelControl;
+
+  QLabel* m_frameInfoLabel;
+
+  QToolButton* m_previousLevelButton;
+
+#ifdef MACOSX
+  QCameraViewfinder* m_dummyViewFinder;
+#endif
+
   int m_timerId;
   QString m_cacheImagePath;
   bool m_captureWhiteBGCue;
@@ -185,6 +221,9 @@ class PencilTestPopup : public DVGui::Dialog {
 
   void processImage(QImage& procImage);
   bool importImage(QImage& image);
+
+  void setToNextNewLevel();
+  void updateLevelNameAndFrame(std::wstring levelName);
 
 public:
   PencilTestPopup();
@@ -204,6 +243,7 @@ protected slots:
   void onFileFormatOptionButtonPressed();
   void onLevelNameEdited();
   void onNextName();
+  void onPreviousName();
   void onColorTypeComboChanged(int index);
   void onImageCaptured(int, const QImage&);
   void onCaptureWhiteBGButtonPressed();
@@ -216,6 +256,11 @@ protected slots:
 
   void onCaptureButtonClicked(bool);
   void onCaptureFilterSettingsBtnPressed();
+
+  void refreshFrameInfo();
+
+  void onSaveInPathEdited();
+  void onSceneSwitched();
 
 public slots:
   void openSaveInFolderPopup();

@@ -726,6 +726,7 @@ bool TApp::eventFilter(QObject *watched, QEvent *e) {
     qApp->processEvents();
 
     m_isPenCloseToTablet = false;
+    emit tabletLeft();
   }
 
   return false;  // I want just peek at the event. It must be processed anyway.

@@ -215,6 +215,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS} OPTIONS ${incs})
 add_library(toonzqt SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
 if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzqt.dylib")
+    add_dependencies(toonzqt tnzcore tnzbase tnzext toonzlib sound)
 endif()
 
 add_definitions(
@@ -240,4 +241,4 @@ elseif(BUILD_ENV_UNIXLIKE)
     endif()
 endif()
 
-target_link_libraries(toonzqt Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::OpenGL ${EXTRA_LIBS} ${GL_LIB})
+target_link_libraries(toonzqt Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::OpenGL Qt5::Svg ${EXTRA_LIBS} ${GL_LIB})

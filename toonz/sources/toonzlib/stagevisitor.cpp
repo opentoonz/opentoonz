@@ -48,6 +48,7 @@
 #include "toonz/autoclose.h"
 #include "toonz/txshleveltypes.h"
 #include "imagebuilders.h"
+#include "toonz/tframehandle.h"
 
 // Qt includes
 #include <QImage>
@@ -55,6 +56,8 @@
 #include <QPolygon>
 #include <QThreadStorage>
 #include <QMatrix>
+#include <QThread>
+#include <QGuiApplication>
 
 #include "toonz/stagevisitor.h"
 
@@ -742,8 +745,13 @@ void RasterPainter::onImage(const Stage::Player &player) {
   if (m_singleColumnEnabled && !player.m_isCurrentColumn) return;
 
   // Attempt Plastic-deformed drawing
-  if (TStageObject *obj =
-          ::plasticDeformedObj(player, m_vs.m_plasticVisualSettings)) {
+  // For now generating icons of plastic-deformed image causes crash as
+  // QOffscreenSurface is created outside the gui thread.
+  // As a quick workaround, ignore the deformation if this is called from
+  // non-gui thread (i.e. icon generator thread)
+  TStageObject *obj =
+      ::plasticDeformedObj(player, m_vs.m_plasticVisualSettings);
+  if (obj && QThread::currentThread() == qGuiApp->thread()) {
     flushRasterImages();
     ::onPlasticDeformedImage(obj, player, m_vs, m_viewAff);
   } else {
@@ -789,7 +797,7 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
 
   const Preferences &prefs = *Preferences::instance();
 
-  TColorFunction *cf = 0;
+  TColorFunction *cf = 0, *guidedCf = 0;
   TPalette *vPalette = vi->getPalette();
   TPixel32 bgColor   = TPixel32::White;
 
@@ -822,6 +830,10 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
     c[3] = 0.0;
 
     cf = new TGenericColorFunction(m, c);
+  } else if (player.m_filterColor != TPixel::Black) {
+    TPixel32 colorScale = player.m_filterColor;
+    colorScale.m        = player.m_opacity;
+    cf                  = new TColumnColorFilterFunction(colorScale);
   } else if (player.m_opacity < 255)
     cf = new TTranspFader(player.m_opacity / 255.0);
 
@@ -829,13 +841,55 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
                        true  // alpha enabled
                        );
 
-  rd.m_drawRegions       = !inksOnly;
-  rd.m_inkCheckEnabled   = tc & ToonzCheck::eInk;
-  rd.m_paintCheckEnabled = tc & ToonzCheck::ePaint;
-  rd.m_blackBgEnabled    = tc & ToonzCheck::eBlackBg;
-  rd.m_colorCheckIndex   = ToonzCheck::instance()->getColorIndex();
-  rd.m_show0ThickStrokes = prefs.getShow0ThickLines();
-  rd.m_regionAntialias   = prefs.getRegionAntialias();
+  rd.m_drawRegions           = !inksOnly;
+  rd.m_inkCheckEnabled       = tc & ToonzCheck::eInk;
+  rd.m_paintCheckEnabled     = tc & ToonzCheck::ePaint;
+  rd.m_blackBgEnabled        = tc & ToonzCheck::eBlackBg;
+  rd.m_colorCheckIndex       = ToonzCheck::instance()->getColorIndex();
+  rd.m_show0ThickStrokes     = prefs.getShow0ThickLines();
+  rd.m_regionAntialias       = prefs.getRegionAntialias();
+  rd.m_animatedGuidedDrawing = prefs.getAnimatedGuidedDrawing();
+  if (player.m_onionSkinDistance < 0 &&
+      (player.m_isCurrentColumn || player.m_isCurrentXsheetLevel)) {
+    if (player.m_isGuidedDrawingEnabled == 3         // show guides on all
+        || (player.m_isGuidedDrawingEnabled == 1 &&  // show guides on closest
+            player.m_onionSkinDistance == player.m_firstBackOnionSkin) ||
+        (player.m_isGuidedDrawingEnabled == 2 &&  // show guides on farthest
+         player.m_onionSkinDistance == player.m_onionSkinBackSize) ||
+        (player.m_isEditingLevel &&  // fix for level editing mode sending extra
+                                     // players
+         player.m_isGuidedDrawingEnabled == 2 &&
+         player.m_onionSkinDistance == player.m_lastBackVisibleSkin)) {
+      rd.m_showGuidedDrawing = player.m_isGuidedDrawingEnabled > 0;
+      int currentStrokeCount = 0;
+      int totalStrokes       = vi->getStrokeCount();
+      TXshSimpleLevel *sl    = player.m_sl;
+
+      if (sl) {
+        TImageP image          = sl->getFrame(player.m_currentFrameId, false);
+        TVectorImageP vecImage = image;
+        if (vecImage) currentStrokeCount = vecImage->getStrokeCount();
+        if (currentStrokeCount < totalStrokes)
+          rd.m_indexToHighlight = currentStrokeCount;
+
+        double guidedM[4] = {1.0, 1.0, 1.0, 1.0}, guidedC[4];
+        TPixel32 bgColor  = TPixel32::Blue;
+        guidedM[3] =
+            1.0 -
+            ((player.m_onionSkinDistance == 0)
+                 ? 0.1
+                 : OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
+
+        guidedC[0] = (1.0 - guidedM[3]) * bgColor.r,
+        guidedC[1] = (1.0 - guidedM[3]) * bgColor.g,
+        guidedC[2] = (1.0 - guidedM[3]) * bgColor.b;
+        guidedC[3] = 0.0;
+
+        guidedCf      = new TGenericColorFunction(guidedM, guidedC);
+        rd.m_guidedCf = guidedCf;
+      }
+    }
+  }
 
   if (tc & (ToonzCheck::eTransparency | ToonzCheck::eGap)) {
     TPixel dummy;
@@ -870,6 +924,7 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   vPalette->setFrame(oldFrame);
 
   delete cf;
+  delete guidedCf;
 }
 
 //-----------------------------------------------------

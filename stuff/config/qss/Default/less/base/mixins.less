@@ -1,0 +1,25 @@
+// -----------------------------------------------------------------------------
+// Mixins & Functions
+// -----------------------------------------------------------------------------
+
+// Common Typography
+// -----------------------------------------------------------------------------
+
+// Calls the code font
+.text-code() {
+  font-family: 'Courier New', monospace;
+}
+
+// Selected Objects and Hover States
+// -----------------------------------------------------------------------------
+
+// Calls the primary selected object style
+.selected-primary() {
+  background-color: @selected-bg-color;
+  color: @selected-text-color;
+}
+// Calls the secondary selected object style
+.selected-secondary() {
+  background-color: @selected-bg-color-secondary;
+  color: @selected-text-color-secondary;
+}

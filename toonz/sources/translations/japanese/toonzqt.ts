@@ -151,7 +151,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
-        <translation>プリセット名に &quot;,&quot; (カンマ)を使用できません</translation>
+        <translation>プリセット名に &quot;,&quot; (カンマ)を使用できません。</translation>
     </message>
     <message>
         <source>DPI</source>
@@ -230,6 +230,14 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Resulting Level Info</source>
         <translation type="vanished">完成レベルの情報</translation>
+    </message>
+    <message>
+        <source>N/S</source>
+        <translation>Y</translation>
+    </message>
+    <message>
+        <source>E/W</source>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -345,7 +353,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::RadioButtonDialog</name>
     <message>
         <source>Toonz</source>
-        <translation>OpenToonz</translation>
+        <translation type="vanished">OpenToonz</translation>
+    </message>
+    <message>
+        <source>OpenToonz</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -851,6 +863,18 @@ Possibly the preset file has been corrupted</source>
         <source>????</source>
         <translation>????</translation>
     </message>
+    <message>
+        <source>From</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation>ステップ</translation>
+    </message>
 </context>
 <context>
     <name>FunctionSelection</name>
@@ -926,7 +950,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Function Editor Toggle</source>
-        <translation>パラメータ表示切り替え (&amp;F)</translation>
+        <translation type="vanished">パラメータ表示切り替え (&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Open Function Curve Editor</source>
+        <translation>グラフエディターを開く (&amp;O)</translation>
     </message>
 </context>
 <context>
@@ -995,7 +1023,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Output</source>
-        <translation type="vanished">Output</translation>
+        <translation>Output</translation>
     </message>
     <message>
         <source>Out</source>
@@ -1162,7 +1190,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>XSheet</source>
-        <translation type="vanished">XSheet</translation>
+        <translation>XSheet</translation>
     </message>
     <message>
         <source>X</source>
@@ -1210,6 +1238,13 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
         <translation type="vanished">ファイル名は次の記号のどれかを含むことができません： --- \ / : ? &quot; | --- </translation>
+    </message>
+</context>
+<context>
+    <name>MyPaintBrushStyleChooserPage</name>
+    <message>
+        <source>Plain color</source>
+        <translation>通常の色</translation>
     </message>
 </context>
 <context>
@@ -2210,6 +2245,61 @@ Apply</source>
         <translation>自動で
 適用</translation>
     </message>
+    <message>
+        <source>MyPaint Brush</source>
+        <translation>MyPaint ブラシ</translation>
+    </message>
+    <message>
+        <source>- Style not Selected -</source>
+        <translation>- スタイルが選択されていません -</translation>
+    </message>
+    <message>
+        <source>[CLEANUP]  </source>
+        <translation>[トレース]  </translation>
+    </message>
+    <message>
+        <source>[STUDIO]  </source>
+        <translation>[スタジオ]  </translation>
+    </message>
+    <message>
+        <source>[LEVEL]  </source>
+        <translation>[レベル]  </translation>
+    </message>
+    <message>
+        <source>- Style is Not Valid -</source>
+        <translation>- スタイルが無効です -</translation>
+    </message>
+</context>
+<context>
+    <name>StyleEditorGUI::ColorChannelControl</name>
+    <message>
+        <source>R</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>G</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>H</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>V</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>StyleEditorGUI::PlainColorPage</name>
@@ -2223,11 +2313,15 @@ Apply</source>
     </message>
     <message>
         <source>Matte</source>
-        <translation>アルファ</translation>
+        <translation type="vanished">アルファ</translation>
     </message>
     <message>
         <source>RGB</source>
         <translation>RGB</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>アルファ</translation>
     </message>
 </context>
 <context>
@@ -2235,6 +2329,10 @@ Apply</source>
     <message>
         <source>Autopaint for Lines</source>
         <translation>色トレース線として、自動塗りつぶし</translation>
+    </message>
+    <message>
+        <source>Reset to default</source>
+        <translation>リセット</translation>
     </message>
 </context>
 <context>
@@ -2297,6 +2395,10 @@ Apply</source>
         <source>&amp;Reset Center</source>
         <translation>基準点をリセット (&amp;R)</translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation>テーブル</translation>
+    </message>
 </context>
 <context>
     <name>ToneCurveField</name>
@@ -2316,7 +2418,7 @@ Apply</source>
     <name>WordButton</name>
     <message>
         <source>Remove %1</source>
-        <translation type="unfinished">%1 を削除</translation>
+        <translation>%1 を削除</translation>
     </message>
 </context>
 </TS>

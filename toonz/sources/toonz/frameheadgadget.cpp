@@ -53,6 +53,7 @@ FrameHeadGadget::~FrameHeadGadget() {}
 
 void FrameHeadGadget::draw(QPainter &p, const QColor &lightColor,
                            const QColor &darkColor) {
+  // drawPlayingHead(p, lightColor, darkColor);
   if (!Preferences::instance()->isOnionSkinEnabled()) return;
   drawOnionSkinSelection(p, lightColor, darkColor);
 }

@@ -9,6 +9,7 @@
 #include "tundo.h"
 #include <QMap>
 #include "xsheetdragtool.h"
+#include "orientation.h"
 
 #include <set>
 
@@ -29,6 +30,8 @@ class CellsMover {
 
   // bitmask of qualifiers that change the behaviour of the Mover
   int m_qualifiers;
+
+  const Orientation *m_orientation;
 
   // helper method
   TXsheet *getXsheet() const;
@@ -58,7 +61,8 @@ public:
   int m_uffa;
 
   // initialize the Mover
-  void start(int r0, int c0, int r1, int c1, int qualifiers);
+  void start(int r0, int c0, int r1, int c1, int qualifiers,
+             const Orientation *o);
 
   int getQualifiers() const { return m_qualifiers; }
   TPoint getStartPos() const { return m_startPos; }
@@ -66,6 +70,8 @@ public:
   int getColumnCount() const { return m_colCount; }
   int getRowCount() const { return m_rowCount; }
 
+  void setStartPos(const TPoint &p) { m_startPos = p; }
+  void setStartPos(int r, int c) { setStartPos(TPoint(c, r)); }
   void setPos(const TPoint &p) { m_pos = p; }
   void setPos(int r, int c) { setPos(TPoint(c, r)); }
 
@@ -79,6 +85,8 @@ public:
   void restoreColumns(int c) const;
   void emptyColumns(int c) const;
   TXshColumn::ColumnType getColumnTypeFromCell(int index) const;
+
+  const Orientation *getOrientation() const { return m_orientation; }
 
 private:
   // not implemented

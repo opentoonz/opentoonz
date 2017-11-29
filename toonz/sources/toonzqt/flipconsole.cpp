@@ -443,6 +443,7 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask,
     , m_framesCount(1)
     , m_settings()
     , m_fps(24)
+    , m_sceneFps(24)
     , m_isPlay(false)
     , m_reverse(false)
     , m_doubleRed(0)
@@ -841,10 +842,13 @@ void FlipConsole::updateCurrentFPS(int val) {
 
 //-----------------------------------------------------------------------------
 
-void FlipConsole::setFrameRate(int val) {
-  if (!m_fpsSlider) return;
-  m_fpsSlider->setValue(val);
-  setCurrentFPS(val);
+void FlipConsole::setFrameRate(int val, bool forceUpdate) {
+  if (m_sceneFps != val || forceUpdate) {
+    if (!m_fpsSlider) return;
+    m_fpsSlider->setValue(val);
+    setCurrentFPS(val);
+  }
+  m_sceneFps = val;
 }
 
 //-----------------------------------------------------------------------------
@@ -1059,15 +1063,11 @@ void FlipConsole::applyCustomizeMask() {
 
 void FlipConsole::createCustomizeMenu(bool withCustomWidget) {
   if (m_gadgetsMask & eCustomize) {
-    QIcon icon          = createQIconPNG("options");
+    QIcon icon          = createQIcon("options");
     QToolButton *button = new QToolButton();
     button->setIcon(icon);
     button->setPopupMode(QToolButton::MenuButtonPopup);
     button->setObjectName("flipCustomize");
-    button->setStyleSheet(
-        "#flipCustomize { background-color: transparent; } "
-        "#flipCustomize::menu-button { background-color: transparent; image: "
-        "none; width: 34px; } #flipCustomize::menu-arrow { image: none; }");
 
     QMenu *menu = new QMenu();
     button->setMenu(menu);
@@ -1486,6 +1486,8 @@ void FlipConsole::doButtonPressed(UINT button) {
     return;
 
   case ePause:
+    if (!m_playbackExecutor.isRunning() && !m_isLinkedPlaying) return;
+
     m_isLinkedPlaying = false;
 
     if (m_playbackExecutor.isRunning()) m_playbackExecutor.abort();
