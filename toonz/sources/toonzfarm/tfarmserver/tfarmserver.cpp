@@ -408,6 +408,13 @@ void Task::run() {
     QStringList l = m_cmdline.split(" ");
     // assert(!"CONTROLLARE QUI");
     QString appName = l.at(1);
+
+    m_log->info(appName);
+
+    m_isComposerTask = l.at(1).contains("tcomposer");
+    appName          = getExeName(m_isComposerTask);
+    m_log->info(appName);
+
     int i;
     for (i = 2; i < l.size(); i++) cmdline += l.at(i);
 
