@@ -463,13 +463,15 @@ class PlainColorPage final : public StyleEditorPage {
   QPushButton *m_toggleOrientationButton;
   // QGridLayout *m_mainLayout;
   QFrame *m_slidersContainer;
-  QFrame *m_wheelFrame;
   QSplitter *m_vSplitter;
 
 public:
   PlainColorPage(QWidget *parent = 0);
   ~PlainColorPage() {}
-
+  QFrame *m_wheelFrame;
+  QFrame *m_hsvFrame;
+  QFrame *m_alphaFrame;
+  QFrame *m_rgbFrame;
   void setColor(const TColorStyle &style, int colorParameterIndex);
   void setVisibleParts(int settings);
   int getVisibleParts();
@@ -607,7 +609,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   PaletteController *m_paletteController;
   TPaletteHandle *m_paletteHandle;
   TPaletteHandle *m_cleanupPaletteHandle;
-
+  QWidget *m_parent;
   TXshLevelHandle
       *m_levelHandle;  //!< for clearing the level cache when the color changed
 
@@ -630,7 +632,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
 
   TabBarContainter *m_tabBarContainer;  //!< Tabs container for style types.
 
-  QLabel *m_statusLabel;  //!< showing the information of the current palette
+  //QLabel *m_statusLabel;  //!< showing the information of the current palette
                           //! and style.
 
   PlainColorPage *m_plainColorPage;
@@ -641,6 +643,10 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   StyleChooserPage *m_mypaintBrushesStylePage;
   SettingsPage *m_settingsPage;
   QScrollArea *m_vectorArea;
+  QAction *m_wheelAction;
+  QAction *m_hsvAction;
+  QAction *m_alphaAction;
+  QAction *m_rgbAction;
 
   TColorStyleP
       m_oldStyle;  //!< A copy of current style \a before the last change.

@@ -53,6 +53,7 @@
 #include <QStyleOptionSlider>
 #include <QToolTip>
 #include <QSplitter>
+#include <QMenu>
 
 using namespace StyleEditorGUI;
 
@@ -1516,9 +1517,9 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   m_toggleOrientationButton->setFixedWidth(20);
 
   m_wheelFrame       = new QFrame(this);
-  QFrame *hsvFrame   = new QFrame(this);
-  QFrame *alphaFrame = new QFrame(this);
-  QFrame *rgbFrame   = new QFrame(this);
+  m_hsvFrame   = new QFrame(this);
+  m_alphaFrame = new QFrame(this);
+  m_rgbFrame   = new QFrame(this);
 
   m_slidersContainer = new QFrame(this);
   m_vSplitter        = new QSplitter(this);
@@ -1535,9 +1536,9 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   m_rgbShowButton->setMinimumWidth(30);
 
   m_wheelFrame->setObjectName("PlainColorPageParts");
-  hsvFrame->setObjectName("PlainColorPageParts");
-  alphaFrame->setObjectName("PlainColorPageParts");
-  rgbFrame->setObjectName("PlainColorPageParts");
+  m_hsvFrame->setObjectName("PlainColorPageParts");
+  m_alphaFrame->setObjectName("PlainColorPageParts");
+  m_rgbFrame->setObjectName("PlainColorPageParts");
 
   m_wheelShowButton->setChecked(true);
   m_wheelShowButton->setFocusPolicy(Qt::NoFocus);
@@ -1592,15 +1593,15 @@ PlainColorPage::PlainColorPage(QWidget *parent)
         hsvLayout->addWidget(m_channelControls[eSaturation]);
         hsvLayout->addWidget(m_channelControls[eValue]);
       }
-      hsvFrame->setLayout(hsvLayout);
-      slidersLayout->addWidget(hsvFrame, 3);
+      m_hsvFrame->setLayout(hsvLayout);
+      slidersLayout->addWidget(m_hsvFrame, 3);
 
       QVBoxLayout *alphaLayout = new QVBoxLayout();
       alphaLayout->setMargin(4);
       alphaLayout->setSpacing(4);
       { alphaLayout->addWidget(m_channelControls[eAlpha]); }
-      alphaFrame->setLayout(alphaLayout);
-      slidersLayout->addWidget(alphaFrame, 1);
+      m_alphaFrame->setLayout(alphaLayout);
+      slidersLayout->addWidget(m_alphaFrame, 1);
 
       QVBoxLayout *rgbLayout = new QVBoxLayout();
       rgbLayout->setMargin(4);
@@ -1610,8 +1611,8 @@ PlainColorPage::PlainColorPage(QWidget *parent)
         rgbLayout->addWidget(m_channelControls[eGreen]);
         rgbLayout->addWidget(m_channelControls[eBlue]);
       }
-      rgbFrame->setLayout(rgbLayout);
-      slidersLayout->addWidget(rgbFrame, 3);
+      m_rgbFrame->setLayout(rgbLayout);
+      slidersLayout->addWidget(m_rgbFrame, 3);
     }
     m_slidersContainer->setLayout(slidersLayout);
     m_vSplitter->addWidget(m_slidersContainer);
@@ -1642,11 +1643,11 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   // Show/Hideトグルボタン
   connect(m_wheelShowButton, SIGNAL(toggled(bool)), m_wheelFrame,
           SLOT(setVisible(bool)));
-  connect(m_hsvShowButton, SIGNAL(toggled(bool)), hsvFrame,
+  connect(m_hsvShowButton, SIGNAL(toggled(bool)), m_hsvFrame,
           SLOT(setVisible(bool)));
-  connect(m_alphaShowButton, SIGNAL(toggled(bool)), alphaFrame,
+  connect(m_alphaShowButton, SIGNAL(toggled(bool)), m_alphaFrame,
           SLOT(setVisible(bool)));
-  connect(m_rgbShowButton, SIGNAL(toggled(bool)), rgbFrame,
+  connect(m_rgbShowButton, SIGNAL(toggled(bool)), m_rgbFrame,
           SLOT(setVisible(bool)));
   connect(m_toggleOrientationButton, SIGNAL(clicked()), this,
           SLOT(toggleOrientation()));
@@ -2991,6 +2992,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
     , m_enabledOnlyFirstTab(false)
     , m_enabledFirstAndLastTab(false)
     , m_oldStyle(0)
+	, m_parent(parent)
     , m_editedStyle(0) {
   setFocusPolicy(Qt::NoFocus);
   // TOGLIERE
@@ -3018,7 +3020,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
 
   QWidget *emptyPage = new StyleEditorPage(0);
 
-  m_statusLabel = new QLabel("", this);
+  //m_statusLabel = new QLabel("", this);
 
   // For the plainColorPage and the settingsPage
   // I create a "fake" QScrollArea (without ScrollingBar
@@ -3095,6 +3097,28 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   m_colorParameterSelector->setMinimumWidth(200);
   m_colorParameterSelector->setFixedHeight(22);
 
+  QMenu *menu = new QMenu();
+  m_wheelAction = new QAction("Wheel", this);
+  m_hsvAction = new QAction("HSV", this);
+  m_alphaAction = new QAction("Alpha", this);
+  m_rgbAction = new QAction("RGB", this);
+  
+  m_wheelAction->setCheckable(true);
+  m_hsvAction->setCheckable(true);
+  m_alphaAction->setCheckable(true);
+  m_rgbAction->setCheckable(true);
+
+  menu->addAction(m_wheelAction);
+  menu->addAction(m_hsvAction);
+  menu->addAction(m_alphaAction);
+  menu->addAction(m_rgbAction);
+
+  QToolButton* toolButton = new QToolButton(this);
+  toolButton->setText(tr("Show"));
+  toolButton->setMenu(menu);
+  toolButton->setPopupMode(QToolButton::InstantPopup);
+  //m_toolBar->addWidget(toolButton);
+
   /* ------- layout ------- */
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->setMargin(0);
@@ -3112,8 +3136,9 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
     mainLayout->addWidget(m_tabBarContainer, 0, 0, 1, 2, 0);
     mainLayout->addWidget(m_styleChooser, 1, 0, 1, 2);
     mainLayout->addWidget(bottomWidget, 2, 0, 1, 2, 0);
-    mainLayout->addWidget(m_statusLabel, 3, 0, 1, 2, 0);
-    mainLayout->addWidget(m_toolBar, 4, 0, 1, 2, 0);
+    //mainLayout->addWidget(m_statusLabel, 3, 0, 1, 2, 0);
+    mainLayout->addWidget(m_toolBar, 3, 0, 1, 1, 0);
+	mainLayout->addWidget(toolButton, 3, 1, 1, 1, 0);
   }
   setLayout(mainLayout);
 
@@ -3150,8 +3175,11 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
                        SLOT(onCustomButtonToggled(bool)));
   ret = ret && connect(vectorBrushButton, SIGNAL(toggled(bool)), this,
                        SLOT(onVectorBrushButtonToggled(bool)));
+  ret = ret && connect(m_wheelAction, SIGNAL(toggled(bool)), m_plainColorPage->m_wheelFrame, SLOT(setVisible(bool)));
+  ret = ret && connect(m_hsvAction, SIGNAL(toggled(bool)), m_plainColorPage->m_hsvFrame, SLOT(setVisible(bool)));
+  ret = ret && connect(m_alphaAction, SIGNAL(toggled(bool)), m_plainColorPage->m_alphaFrame, SLOT(setVisible(bool)));
+  ret = ret && connect(m_rgbAction, SIGNAL(toggled(bool)), m_plainColorPage->m_rgbFrame, SLOT(setVisible(bool)));
   assert(ret);
-
   /* ------- initial conditions ------- */
   enable(false, false, false);
   // set to the empty page
@@ -3175,7 +3203,7 @@ void StyleEditor::setPaletteHandle(TPaletteHandle* paletteHandle)
 
 QFrame *StyleEditor::createBottomWidget() {
   QFrame *bottomWidget = new QFrame(this);
-  m_autoButton         = new QPushButton(tr("Auto  \nApply"));
+  m_autoButton         = new QPushButton(tr("Auto"));
   m_oldColor           = new DVGui::StyleSample(this, 42, 20);
   m_newColor           = new DVGui::StyleSample(this, 42, 20);
   m_applyButton        = new QPushButton(tr("Apply"));
@@ -3200,7 +3228,7 @@ QFrame *StyleEditor::createBottomWidget() {
 
   /* ------ layout ------ */
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->setMargin(4);
+  mainLayout->setMargin(2);
   mainLayout->setSpacing(1);
   {
     QHBoxLayout *hLayout = new QHBoxLayout;
@@ -3208,17 +3236,18 @@ QFrame *StyleEditor::createBottomWidget() {
     hLayout->setSpacing(0);
     {
       hLayout->addWidget(m_autoButton);
+	  hLayout->addWidget(m_applyButton);
       hLayout->addSpacing(2);
       hLayout->addWidget(m_newColor, 1);
       hLayout->addWidget(m_oldColor, 1);
     }
     mainLayout->addLayout(hLayout);
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->setMargin(0);
-    buttonsLayout->setSpacing(5);
-    { buttonsLayout->addWidget(m_applyButton); }
-    mainLayout->addLayout(buttonsLayout);
+    //QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    //buttonsLayout->setMargin(0);
+    //buttonsLayout->setSpacing(5);
+    //{ buttonsLayout->addWidget(m_applyButton); }
+    //mainLayout->addLayout(buttonsLayout);
   }
   bottomWidget->setLayout(mainLayout);
 
@@ -3305,7 +3334,8 @@ void StyleEditor::onStyleSwitched() {
     m_oldStyle    = TColorStyleP();
     m_editedStyle = TColorStyleP();
 
-    m_statusLabel->setText(tr("- Style not Selected -"));
+    //m_statusLabel->setText(tr("- Style not Selected -"));
+	m_parent->setWindowTitle(tr("No Style Selected"));
     return;
   }
 
@@ -3341,9 +3371,13 @@ void StyleEditor::onStyleSwitched() {
       statusText +=
           QString(" (Picked from %1,%2)").arg(pickedPos.x).arg(pickedPos.y);
 
-    m_statusLabel->setText(statusText);
-  } else
-    m_statusLabel->setText(tr("- Style is Not Valid -"));
+    //m_statusLabel->setText(statusText);
+	m_parent->setWindowTitle(statusText);
+  }
+  else {
+	  //m_statusLabel->setText(tr("Style Editor - No Valid Style Selected"));
+	  m_parent->setWindowTitle(tr("Style Editor - No Valid Style Selected"));
+  }
   enable(!isStyleNull && isValidIndex, isColorInField, isCleanUpPalette);
 }
 
@@ -3738,4 +3772,8 @@ void StyleEditor::load(QSettings &settings) {
   QVariant splitterState = settings.value("splitterState");
   if (splitterState.canConvert(QVariant::ByteArray))
     m_plainColorPage->setSplitterState(splitterState.toByteArray());
+  m_wheelAction->setChecked(m_plainColorPage->m_wheelFrame->isVisible());
+  m_hsvAction->setChecked(m_plainColorPage->m_hsvFrame->isVisible());
+  m_alphaAction->setChecked(m_plainColorPage->m_alphaFrame->isVisible());
+  m_rgbAction->setChecked(m_plainColorPage->m_rgbFrame->isVisible());
 }
