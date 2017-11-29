@@ -1919,13 +1919,15 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   QString text =
       cell.getSoundTextLevel()->getFrameText(cell.m_frameId.getNumber() - 1);
 
+  QFontMetrics metric(font);
+
   if (text.size() && text != "" && m_viewer->getFrameZoomFactor() <= 50) {
-    drawFrameDot(p, xy, false);
-    return;
+    text          = text[0];
+    int charWidth = metric.width(text, 1);
+    if (charWidth > nameRect.width()) nameRect.adjust(-2, 0, 4, 0);
   }
 
 #if QT_VERSION >= 0x050500
-  QFontMetrics metric(font);
   QString elidaName = elideText(text, metric, nameRect.width(), "~");
 #else
   QString elidaName   = elideText(text, font, nameRect.width(), "~");
