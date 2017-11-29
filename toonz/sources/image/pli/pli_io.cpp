@@ -29,7 +29,7 @@ typedef TVectorImage::IntersectionBranch IntersectionBranch;
 TNZ_LITTLE_ENDIAN undefined !!
 #endif
 
-    static const int c_majorVersionNumber = 71;
+    static const int c_majorVersionNumber = 120;
 static const int c_minorVersionNumber     = 0;
 
 /*=====================================================================*/
@@ -2629,6 +2629,13 @@ void ParsedPli::getVersion(UINT &majorVersionNumber,
                            UINT &minorVersionNumber) const {
   majorVersionNumber = imp->m_majorVersionNumber;
   minorVersionNumber = imp->m_minorVersionNumber;
+}
+
+/*=====================================================================*/
+
+void ParsedPli::setVersion(UINT majorVersionNumber, UINT minorVersionNumber) {
+  imp->m_majorVersionNumber = majorVersionNumber;
+  imp->m_minorVersionNumber = minorVersionNumber;
 }
 
 /*=====================================================================*/

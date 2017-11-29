@@ -279,8 +279,6 @@ public:
       m_row    = app->getCurrentFrame()->getFrame();
       m_column = app->getCurrentColumn()->getColumnIndex();
     }
-    ImageUtils::getFillingInformationInArea(vi, m_oldFillInformation,
-                                            vi->getBBox());
   }
 
   void undo() const override {

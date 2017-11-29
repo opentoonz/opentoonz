@@ -556,6 +556,8 @@ solo nel costruttore)
         (int)((roundf(tempVecImg->getAutocloseTolerance() * 100) / 100) * 1000);
     PliTag *tag = new AutoCloseToleranceTag(tolerance);
     tags.push_back((PliObjectTag *)tag);
+  } else {
+    pli->setVersion(71, 0);
   }
   // recupero il numero di stroke dall'immagine
   int numStrokes = tempVecImg->getStrokeCount();

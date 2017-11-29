@@ -469,7 +469,7 @@ public:
   void setCreator(const QString &creator);
 
   void getVersion(UINT &majorVersionNumber, UINT &minorVersionNumber) const;
-
+  void setVersion(UINT majorVersionNumber, UINT minorVersionNumber);
   bool addTag(PliTag *tag, bool addFront = false);
 
   void loadInfo(bool readPalette, TPalette *&palette,
