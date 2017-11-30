@@ -2045,7 +2045,7 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
       int i;
       for (i = 0; i < (int)count; i++) v[i] = i;
       vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
-      if (m_level && !m_frameSwitched) {
+      if (m_level) {
         m_level->setDirtyFlag(true);
         TTool::getApplication()->getCurrentLevel()->notifyLevelChange();
         if (propertyName == m_maxGapDistance.getName() + "withUndo" &&
