@@ -398,33 +398,35 @@ QString getExeName(bool isComposer) {
 void Task::run() {
   QString cmdline;
 
-  QString logMsg("Starting task at ");
-  logMsg += QDateTime::currentDateTime().toString();
-  logMsg += "\n";
-  logMsg += "\"" + m_cmdline + "\"";
-  logMsg += "\n\n";
-
-  m_log->info(logMsg);
-
   // ===========
   // remap commandLine to local executable
 
-  m_log->info("remap commandLine to local executable");
   QStringList l   = m_cmdline.split(" ");
   QString appName = l.at(1);
-  m_log->info(appName);
+  // m_log->info(appName);
 
   if (l.at(1).contains("tcomposer") || l.at(1).contains("tcleanup")) {
     appName = l.at(1);
-    m_log->info(appName);
+    // m_log->info(appName);
     bool m_isComposerTask = l.at(1).contains("tcomposer");
     appName               = getExeName(m_isComposerTask);
-    m_log->info(appName);
+    // m_log->info(appName);
 
     int i   = 0;
     cmdline = appName;
     for (i = 2; i < l.size(); i++) cmdline += " " + l.at(i);
+    // m_log->info("remap commandLine to local executable");
+    // m_log->info(appName);
   }
+
+  // ===========
+  QString logMsg("Starting task at ");
+  logMsg += QDateTime::currentDateTime().toString();
+  logMsg += "\n";
+  logMsg += "\"" + cmdline + "\"";
+  logMsg += "\n\n";
+
+  m_log->info(logMsg);
 
 // ===========
 
