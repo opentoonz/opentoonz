@@ -2029,8 +2029,9 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
     rectPropChangedflag = true;
   }
 
-  else if (propertyName == m_maxGapDistance.getName() ||
-           propertyName == m_maxGapDistance.getName() + "withUndo") {
+  else if (!m_frameSwitched &&
+           (propertyName == m_maxGapDistance.getName() ||
+            propertyName == m_maxGapDistance.getName() + "withUndo")) {
     if (TVectorImageP vi = getImage(true)) {
       if (m_changedGapOriginalValue == -1.0) {
         ImageUtils::getFillingInformationInArea(vi, m_oldFillInformation,
@@ -2093,10 +2094,12 @@ void FillTool::onImageChanged() {
     return;
   }
   if (TVectorImageP vi = getImage(true)) {
+    m_frameSwitched = true;
     if (m_maxGapDistance.getValue() != vi->getAutocloseTolerance()) {
       m_maxGapDistance.setValue(vi->getAutocloseTolerance());
       getApplication()->getCurrentTool()->notifyToolChanged();
     }
+    m_frameSwitched = false;
   }
   if (!m_level) resetMulti();
 }
@@ -2258,6 +2261,7 @@ void FillTool::onActivate() {
       TImageP img = getImage(true);
       if (TVectorImageP vi = img) {
         double tolerance = vi->getAutocloseTolerance();
+        tolerance += 0.000001;
         m_maxGapDistance.setValue(tolerance);
       }
     }
