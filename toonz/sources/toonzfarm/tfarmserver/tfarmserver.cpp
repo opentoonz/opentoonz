@@ -396,6 +396,8 @@ QString getExeName(bool isComposer) {
 //------------------------------------------------------------------------------
 
 void Task::run() {
+  QString cmdline;
+
   QString logMsg("Starting task at ");
   logMsg += QDateTime::currentDateTime().toString();
   logMsg += "\n";
@@ -420,7 +422,8 @@ void Task::run() {
     m_log->info(appName);
 
     int i   = 0;
-    cmdline = appName for (i = 2; i < l.size(); i++) cmdline += " " + l.at(i);
+    cmdline = appName;
+    for (i = 2; i < l.size(); i++) cmdline += " " + l.at(i);
   }
 
 // ===========
@@ -428,8 +431,6 @@ void Task::run() {
 #ifdef _WIN32
   if (m_cmdline.contains("runcasm")) service.mountDisks();
 #endif
-
-  QString cmdline;
 
   if (m_cmdline.contains(".bat"))
     cmdline = "cmd /C " + m_cmdline;
