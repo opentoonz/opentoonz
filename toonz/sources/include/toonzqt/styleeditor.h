@@ -456,11 +456,7 @@ class PlainColorPage final : public StyleEditorPage {
   bool m_isVertical = true;
   int m_visibleParts;
   void updateControls();
-  QPushButton *m_wheelShowButton;
-  QPushButton *m_hsvShowButton;
-  QPushButton *m_alphaShowButton;
-  QPushButton *m_rgbShowButton;
-  QPushButton *m_toggleOrientationButton;
+
   // QGridLayout *m_mainLayout;
   QFrame *m_slidersContainer;
   QSplitter *m_vSplitter;
@@ -468,13 +464,13 @@ class PlainColorPage final : public StyleEditorPage {
 public:
   PlainColorPage(QWidget *parent = 0);
   ~PlainColorPage() {}
+
   QFrame *m_wheelFrame;
   QFrame *m_hsvFrame;
   QFrame *m_alphaFrame;
   QFrame *m_rgbFrame;
   void setColor(const TColorStyle &style, int colorParameterIndex);
-  void setVisibleParts(int settings);
-  int getVisibleParts();
+
   void setIsVertical(bool isVertical);
   bool getIsVertical() { return m_isVertical; }
   QByteArray getSplitterState();
@@ -490,11 +486,11 @@ protected slots:
   void onWheelChanged(const ColorModel &color, bool isDragging);
   // void onWheelSliderChanged(int value);
   // void onWheelSliderReleased();
-  void toggleOrientation();
 
 public slots:
   // void setWheelChannel(int channel);
   void onControlChanged(const ColorModel &color, bool isDragging);
+  void toggleOrientation();
 };
 
 //=============================================================================
@@ -620,7 +616,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
       *m_newColor;  //!< New style viewer (lower-right panel side).
   DVGui::StyleSample
       *m_oldColor;  //!< Old style viewer (lower-right panel side).
-
+  QPushButton *m_toggleOrientationButton;
   QPushButton
       *m_autoButton;  //!< "Auto Apply" checkbox on the right panel side.
   QPushButton *m_applyButton;  //!< "Apply" button on the right panel side.
@@ -632,8 +628,8 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
 
   TabBarContainter *m_tabBarContainer;  //!< Tabs container for style types.
 
-  //QLabel *m_statusLabel;  //!< showing the information of the current palette
-                          //! and style.
+  // QLabel *m_statusLabel;  //!< showing the information of the current palette
+  //! and style.
 
   PlainColorPage *m_plainColorPage;
   StyleChooserPage *m_textureStylePage;
@@ -721,7 +717,7 @@ protected slots:
   void onStyleChanged(bool isDragging);
   void onCleanupStyleChanged(bool isDragging);
   void onOldStyleClicked(const TColorStyle &);
-
+  void updateOrientationButton();
   // called (e.g.) by PaletteController when an other StyleEditor change the
   // toggle
   void enableColorAutoApply(bool enabled);
