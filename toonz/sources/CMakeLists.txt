@@ -442,7 +442,8 @@ elseif(BUILD_ENV_UNIXLIKE)
         pkg_check_modules(FREETYPE REQUIRED freetype2)
         pkg_check_modules(SDL_LIB REQUIRED sdl2)
     endif()
-    pkg_check_modules(MYPAINT_LIB REQUIRED libmypaint)
+    # Can be 'libmypaint' or 'libmypaint-1.x'
+    pkg_search_module(MYPAINT_LIB REQUIRED libmypaint libmypaint-1.3>=1.3)
 endif()
 
 

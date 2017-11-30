@@ -236,8 +236,9 @@ public:
   }
   const bool &flag(PredefinedFlag which) const { return _flags.at(which); }
 
-  virtual int cellWidth() const  = 0;
-  virtual int cellHeight() const = 0;
+  virtual int cellWidth() const      = 0;
+  virtual int cellHeight() const     = 0;
+  virtual int foldedCellSize() const = 0;
 
 protected:
   void addRect(PredefinedRect which, const QRect &rect);

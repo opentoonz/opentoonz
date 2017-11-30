@@ -122,7 +122,7 @@ void TFrameHandle::setFid(const TFrameId &fid) {
 
 //-----------------------------------------------------------------------------
 
-void TFrameHandle::nextFrame() {
+void TFrameHandle::nextFrame(TFrameId id) {
   if (m_frameType == LevelFrame) {
     // std::vector<TFrameId> fids;
     // if(!getCurrentLevelFids(fids)) return;
@@ -134,8 +134,12 @@ void TFrameHandle::nextFrame() {
       // frame dopo l'ultimo.
       // TXshSimpleLevel *sl =
       // TApp::instance()->getCurrentLevel()->getSimpleLevel();
-      TFrameId fid = m_fids.back();  // sl->index2fid(sl->getFrameCount());
-      setFid(fid);
+      if (id != 0) {
+        setFid(id);
+      } else {
+        TFrameId fid = m_fids.back();  // sl->index2fid(sl->getFrameCount());
+        setFid(fid);
+      }
     } else
       setFid(*it);
   } else {

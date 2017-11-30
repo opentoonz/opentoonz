@@ -5,6 +5,7 @@
 // Tnz6 includes
 #include "xsheetviewer.h"
 #include "cellselection.h"
+#include "columncommand.h"
 #include "keyframeselection.h"
 #include "cellkeyframeselection.h"
 #include "tapp.h"
@@ -1574,14 +1575,15 @@ public:
 //-----------------------------------------------------------------------------
 
 class ColumnMoveDragTool final : public XsheetGUI::DragTool {
-  int m_offset, m_firstCol, m_lastCol;
+  int m_offset, m_firstCol, m_lastCol, m_origOffset;
 
 public:
   ColumnMoveDragTool(XsheetViewer *viewer)
       : XsheetGUI::DragTool(viewer)
       , m_firstCol(-1)
       , m_lastCol(-1)
-      , m_offset(0) {}
+      , m_offset(0)
+      , m_origOffset(0) {}
 
   void onClick(const CellPosition &pos) override {
     int col                     = pos.layer();
@@ -1595,22 +1597,62 @@ public:
     if (indices.empty()) return;
     m_firstCol = m_lastCol = *indices.begin();
     assert(m_firstCol >= 0);
-    m_offset = m_firstCol - col;
+    m_origOffset = m_offset = m_firstCol - col;
     assert(m_lastCol == *indices.begin());
     getViewer()->update();
+
+    if (!getViewer()->orientation()->isVerticalTimeline())
+      TUndoManager::manager()->beginBlock();
   }
   void onDrag(const CellPosition &pos) override {
     int col                     = pos.layer();
     TColumnSelection *selection = getViewer()->getColumnSelection();
-    std::set<int> indices       = selection->getIndices();
+    TApp *app                   = TApp::instance();
+    TXsheet *xsh                = app->getCurrentXsheet()->getXsheet();
+
+    std::set<int> indices = selection->getIndices();
     if (indices.empty()) return;
 
     assert(m_lastCol == *indices.begin());
 
+    int origCol      = col;
     if (col < 0) col = 0;
-    if (col == m_lastCol) return;
-    int dCol  = col - m_lastCol;
-    m_lastCol = col;
+    int dCol         = col - (m_lastCol - m_offset);
+
+    int newBegin = *indices.begin() + dCol;
+    if (!getViewer()->orientation()->isVerticalTimeline()) {
+      if (origCol < 0) {
+        dCol += origCol;
+        newBegin = *indices.begin() + dCol;
+      }
+      std::set<int> ii;
+      if (newBegin < 0) {
+        newBegin *= -1;
+        for (int x = 0; x < newBegin; x++) ii.insert(x);
+        ColumnCmd::insertEmptyColumns(ii);
+        selection->selectNone();
+        for (std::set<int>::const_iterator it = indices.begin();
+             it != indices.end(); it++)
+          selection->selectColumn(*it + newBegin, true);
+        indices = selection->getIndices();
+        col     = origCol + newBegin;
+        m_lastCol += newBegin;
+        m_firstCol += newBegin;
+        int currentIndx = app->getCurrentColumn()->getColumnIndex();
+        app->getCurrentColumn()->setColumnIndex(currentIndx + newBegin);
+      } else {
+        int currEnd = xsh->getColumnCount() - 1;
+        int newEnd  = *indices.rbegin() + dCol;
+        if (newEnd > currEnd) {
+          for (int x = currEnd + 1; x <= newEnd; x++) ii.insert(x);
+          ColumnCmd::insertEmptyColumns(ii);
+        }
+      }
+    } else if (newBegin < 0)
+      return;
+
+    if (col == (m_lastCol - m_offset)) return;
+    m_lastCol = col + m_offset;
 
     assert(*indices.begin() + dCol >= 0);
 
@@ -1623,14 +1665,18 @@ public:
   }
   void onRelease(const CellPosition &pos) override {
     int delta = m_lastCol - m_firstCol;
-    if (delta == 0) return;
-    TColumnSelection *selection = getViewer()->getColumnSelection();
-    std::set<int> indices       = selection->getIndices();
-    if (!indices.empty()) {
-      TUndoManager::manager()->add(new ColumnMoveUndo(indices, delta));
-      TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (delta != 0) {
+      TColumnSelection *selection = getViewer()->getColumnSelection();
+      std::set<int> indices       = selection->getIndices();
+      if (!indices.empty()) {
+        TUndoManager::manager()->add(new ColumnMoveUndo(indices, delta));
+        TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+        TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      }
     }
+
+    if (!getViewer()->orientation()->isVerticalTimeline())
+      TUndoManager::manager()->endBlock();
   }
 };
 
@@ -2019,6 +2065,7 @@ public:
     refreshCellsArea();
   }
   void drawCellsArea(QPainter &p) override {
+    const Orientation *o           = getViewer()->orientation();
     CellPosition beginDragPosition = getViewer()->xyToPosition(m_curPos);
     TPoint pos(beginDragPosition.layer(),
                beginDragPosition.frame());     // row and cell coordinates
@@ -2028,9 +2075,17 @@ public:
     if (rect.x1 < 0 || rect.y1 < 0) return;
     if (rect.x0 < 0) rect.x0 = 0;
     if (rect.y0 < 0) rect.y0 = 0;
-    QRect screenCell         = getViewer()->rangeToXYRect(
-        CellRange(CellPosition(rect.y0, rect.x0),
-                  CellPosition(rect.y1 + 1, rect.x1 + 1)));
+    QRect screenCell;
+    if (o->isVerticalTimeline())
+      screenCell = getViewer()->rangeToXYRect(
+          CellRange(CellPosition(rect.y0, rect.x0),
+                    CellPosition(rect.y1 + 1, rect.x1 + 1)));
+    else {
+      int newY0  = qMax(rect.y0, rect.y1);
+      int newY1  = qMin(rect.y0, rect.y1);
+      screenCell = getViewer()->rangeToXYRect(CellRange(
+          CellPosition(rect.x0, newY0), CellPosition(rect.x1 + 1, newY1 - 1)));
+    }
     p.setPen(m_valid ? QColor(190, 220, 255) : QColor(255, 0, 0));
     int i;
     for (i = 0; i < 3; i++)  // thick border within cell

@@ -304,10 +304,10 @@ public:
       TParam *param         = fx->getParams()->getParam(i);
       std::string paramName = ::to_string(
           TStringTable::translate(fx->getFxType() + "." + param->getName()));
-      int i = paramName.find(" ");
+      int i = paramName.find_first_of(" -");
       while (i != std::string::npos) {
         paramName.erase(i, 1);
-        i = paramName.find(" ");
+        i = paramName.find_first_of(" -");
       }
       std::string paramNameToCheck = token.getText();
       if (paramName == paramNameToCheck ||

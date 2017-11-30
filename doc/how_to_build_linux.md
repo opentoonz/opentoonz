@@ -13,6 +13,7 @@ Building OpenToonz from source requires the following dependencies:
 - SuperLU
 - Lzo2
 - FreeType
+- LibMyPaint (1.3 or newer)
 
 ### Installing Dependencies on Debian / Ubuntu
 
@@ -23,12 +24,9 @@ $ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5
 Notes:
 * It's possible we also need `libgsl2` (or maybe `libopenblas-dev`)
 
-### Installing Dependencies on RedHat / CentOS
+TODO:
 
-TODO
-```
-$ rpm ...
-```
+- `libmypaint` package
 
 ### Installing Dependencies on Fedora
 (it may include some useless packages)
@@ -36,6 +34,10 @@ $ rpm ...
 ```
 $ dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-devel lz4-devel lzma libusb-devel lzo-devel libjpeg-turbo-devel libGLEW glew-devel freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel qt5-qtmultimedia-devel blas blas-devel
 ```
+
+TODO:
+
+- `libmypaint` package
 
 ### Installing Dependencies on ArchLinux
 
@@ -45,7 +47,7 @@ $ sudo pacman -S blas cblas
 ```
 From AUR, using eg. yaourt:
 ```
-$ yaourt -S superlu
+$ yaourt -S superlu libmypaint
 ```
 
 Notes:
@@ -56,6 +58,10 @@ Notes:
 ```
 $ zypper in boost-devel cmake freeglut-devel freetype2-devel gcc-c++ glew-devel libQt5OpenGL-devel libSDL2-devel libjpeg-devel liblz4-devel libpng16-compat-devel libqt5-linguist-devel libqt5-qtbase-devel libqt5-qtmultimedia-devel libqt5-qtscript-devel libqt5-qtsvg-devel libtiff-devel libusb-devel lzo-devel openblas-devel pkgconfig sed superlu-devel zlib-devel
 ```
+
+TODO:
+
+- `libmypaint` package
 
 ## Build instructions
 

@@ -113,6 +113,7 @@ set(SOURCES
     motionblurfx.cpp
     multitonefx.cpp
     noisefx.cpp
+    nothingfx.cpp
     palettefilterfx.cpp
     particles.cpp
     particlesengine.cpp

@@ -168,9 +168,6 @@ public:
   void setCameraUnits(std::string s);
   QString getCameraUnits() const { return m_cameraUnits; }
 
-  // void setRoomChoice(std::string s);
-  // QString getRoomChoice() const { return m_roomChoice; }
-
   void setCurrentRoomChoice(int currentRoomChoice);
   void setCurrentRoomChoice(QString currentRoomChoice);
   QString getCurrentRoomChoice() const;
@@ -351,13 +348,17 @@ public:
   void setVectorSnappingTarget(int target);
   int getVectorSnappingTarget() { return m_vectorSnappingTarget; }
 
-
   void setKeepFillOnVectorSimplify(bool on);
   bool getKeepFillOnVectorSimplify() { return m_keepFillOnVectorSimplify; }
 
   void setUseHigherDpiOnVectorSimplify(bool on);
   bool getUseHigherDpiOnVectorSimplify() {
     return m_useHigherDpiOnVectorSimplify;
+  }
+
+  void setDownArrowLevelStripNewFrame(bool on);
+  bool getDownArrowLevelStripNewFrame() {
+    return m_downArrowInLevelStripCreatesNewFrame;
   }
 
   // Tools Tab
@@ -586,6 +587,7 @@ private:
   bool m_onionSkinDuringPlayback, m_ignoreImageDpi,
       m_syncLevelRenumberWithXsheet;
   bool m_keepFillOnVectorSimplify, m_useHigherDpiOnVectorSimplify;
+  bool m_downArrowInLevelStripCreatesNewFrame;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,
