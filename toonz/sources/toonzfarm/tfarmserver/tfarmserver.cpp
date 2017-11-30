@@ -378,6 +378,22 @@ private:
 };
 
 //-------------------------------------------------------------------
+QString getExeName(bool isComposer) {
+  QString name = isComposer ? "tcomposer" : "tcleanup";
+
+#ifdef _WIN32
+  return name + ".exe ";
+#elif MACOSX
+  TVER::ToonzVersion tver;
+  return "\"./" + QString::fromStdString(tver.getAppName()) + "_" +
+         QString::fromStdString(tver.getAppVersionString()) +
+         ".app/Contents/MacOS/" + name + "\" ";
+#else
+  return name;
+#endif
+}
+
+//------------------------------------------------------------------------------
 
 void Task::run() {
   QString logMsg("Starting task at ");
@@ -397,12 +413,13 @@ void Task::run() {
   m_log->info(appName);
 
   if (l.at(1).contains("tcomposer") || l.at(1).contains("tcleanup")) {
-    QString appName = l.at(1);
+    appName = l.at(1);
     m_log->info(appName);
-    m_isComposerTask = l.at(1).contains("tcomposer");
-    appName          = getExeName(m_isComposerTask);
+    bool m_isComposerTask = l.at(1).contains("tcomposer");
+    appName               = getExeName(m_isComposerTask);
     m_log->info(appName);
 
+    int i   = 0;
     cmdline = appName for (i = 2; i < l.size(); i++) cmdline += " " + l.at(i);
   }
 
