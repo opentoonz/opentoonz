@@ -391,7 +391,11 @@ void Task::run() {
   // ===========
   // remap commandLine to local executable
 
-  QStringList l = m_cmdline.split(" ");
+  m_log->info("remap commandLine to local executable");
+  QStringList l   = m_cmdline.split(" ");
+  QString appName = l.at(1);
+  m_log->info(appName);
+
   if (l.at(1).contains("tcomposer") || l.at(1).contains("tcleanup")) {
     QString appName = l.at(1);
     m_log->info(appName);
