@@ -414,7 +414,10 @@ void Task::run() {
 
     int i   = 0;
     cmdline = appName;
-    for (i = 2; i < l.size(); i++) cmdline += " " + l.at(i);
+    for (i = 2; i < l.size(); i++) {
+      cmdline += " ";
+      cmdline += l.at(i);
+    }
     // m_log->info("remap commandLine to local executable");
     // m_log->info(appName);
   }
