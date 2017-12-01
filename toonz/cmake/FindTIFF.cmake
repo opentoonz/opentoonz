@@ -28,7 +28,8 @@ find_library(
 )
 
 if (NOT TIFF_FOUND AND BUILD_ENV_UNIXLIKE)
-    exec_program(./configure ${TIFF_INCLUDE_DIR}/..)
+    exec_program(./configure ${TIFF_INCLUDE_DIR}/..
+        ARGS "--with-pic --disable-jbig" )
     exec_program(make ${TIFF_INCLUDE_DIR}/..)
     find_library(
         TIFF_LIBRARY
