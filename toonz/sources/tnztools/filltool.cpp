@@ -285,7 +285,6 @@ public:
     TTool::Application *app = TTool::getApplication();
     if (!app || !m_level) return;
     app->getCurrentLevel()->setLevel(m_level.getPointer());
-    TVectorImageP img = m_level->getFrame(m_frameId, true);
     if (app->getCurrentFrame()->isEditingScene()) {
       app->getCurrentFrame()->setFrame(m_row);
       app->getCurrentColumn()->setColumnIndex(m_column);
@@ -2032,6 +2031,8 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
   else if (!m_frameSwitched &&
            (propertyName == m_maxGapDistance.getName() ||
             propertyName == m_maxGapDistance.getName() + "withUndo")) {
+    TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
+    m_level       = xl ? xl->getSimpleLevel() : 0;
     if (TVectorImageP vi = getImage(true)) {
       if (m_changedGapOriginalValue == -1.0) {
         ImageUtils::getFillingInformationInArea(vi, m_oldFillInformation,
@@ -2045,6 +2046,7 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
       int i;
       for (i = 0; i < (int)count; i++) v[i] = i;
       vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
+
       if (m_level) {
         m_level->setDirtyFlag(true);
         TTool::getApplication()->getCurrentLevel()->notifyLevelChange();
@@ -2055,6 +2057,9 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
               m_level.getPointer(), fid, vi, m_oldFillInformation));
           m_changedGapOriginalValue = -1.0;
           m_oldFillInformation.clear();
+          TTool::Application *app = TTool::getApplication();
+          app->getCurrentXsheet()->notifyXsheetChanged();
+          notifyImageChanged();
         }
       }
     }
@@ -2114,7 +2119,8 @@ void FillTool::onFrameSwitched() {
       getApplication()->getCurrentTool()->notifyToolChanged();
     }
   }
-  m_frameSwitched = false;
+  m_frameSwitched           = false;
+  m_changedGapOriginalValue = -1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -2261,7 +2267,7 @@ void FillTool::onActivate() {
       TImageP img = getImage(true);
       if (TVectorImageP vi = img) {
         double tolerance = vi->getAutocloseTolerance();
-        tolerance += 0.000001;
+        if (tolerance < 9.9) tolerance += 0.000001;
         m_maxGapDistance.setValue(tolerance);
       }
     }
