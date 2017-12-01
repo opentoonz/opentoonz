@@ -1152,6 +1152,10 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(editMenu, MI_BringForward);
   addMenuItem(editMenu, MI_SendBack);
   addMenuItem(editMenu, MI_SendBackward);
+
+  editMenu->addSeparator();
+  addMenuItem(editMenu, MI_TouchGestureControl);
+
 // Menu' SCAN CLEANUP
 #ifdef LINETEST
   QMenu *scanCleanupMenu = addMenu(tr("Scan"));

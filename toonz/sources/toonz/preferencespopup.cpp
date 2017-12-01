@@ -1892,7 +1892,7 @@ PreferencesPopup::PreferencesPopup()
       styleLay->setHorizontalSpacing(5);
       styleLay->setVerticalSpacing(10);
       {
-        styleLay->addWidget(new QLabel(tr("Style:")), 0, 0,
+        styleLay->addWidget(new QLabel(tr("Theme:")), 0, 0,
                             Qt::AlignRight | Qt::AlignVCenter);
         styleLay->addWidget(styleSheetType, 0, 1,
                             Qt::AlignLeft | Qt::AlignVCenter);

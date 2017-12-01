@@ -927,15 +927,19 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
 //-----------------------------------------------------------------------------
 
 bool SceneViewer::event(QEvent *e) {
-  if (e->type() == QEvent::Gesture) {
-    gestureEvent(static_cast<QGestureEvent *>(e));
-    return true;
-  }
-  if (e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
-      e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) {
-    touchEvent(static_cast<QTouchEvent *>(e), e->type());
-    m_gestureActive = true;
-    return true;
+  if (CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
+    if (e->type() == QEvent::Gesture) {
+      gestureEvent(static_cast<QGestureEvent *>(e));
+      return true;
+    }
+    if (e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
+        e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) {
+      touchEvent(static_cast<QTouchEvent *>(e), e->type());
+      m_gestureActive = true;
+      return true;
+    }
   }
   if (e->type() == QEvent::ShortcutOverride || e->type() == QEvent::KeyPress) {
     if (!((QKeyEvent *)e)->isAutoRepeat()) {

@@ -162,7 +162,7 @@ TMessageViewer::TMessageViewer(QWidget *parent) : QFrame(parent) {
                        SLOT(refreshFilter(int)));
   hLayout->addWidget(m_yellowCheck);
 
-  m_greenCheck = new QCheckBox(tr("Infos"));
+  m_greenCheck = new QCheckBox(tr("Info"));
   m_greenCheck->setChecked(true);
   ret = ret && connect(m_greenCheck, SIGNAL(stateChanged(int)),
                        SLOT(refreshFilter(int)));
