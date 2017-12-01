@@ -381,6 +381,9 @@ private:
 QString getExeName(bool isComposer) {
   QString name = isComposer ? "tcomposer" : "tcleanup";
 
+  m_log->info("getExeName");
+  m_log->info(name);
+
 #ifdef _WIN32
   return name + ".exe ";
 #elif MACOSX
