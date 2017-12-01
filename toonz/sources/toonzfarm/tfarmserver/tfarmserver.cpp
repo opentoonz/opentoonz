@@ -409,7 +409,7 @@ void Task::run() {
     appName = l.at(0);
     m_log->info(appName);
     bool m_isComposerTask = l.at(1).contains("tcomposer");
-    m_log->info(m_isComposerTask);
+    m_log->info(QString::number(m_isComposerTask));
     appName = getExeName(m_isComposerTask);
     m_log->info(appName);
 
