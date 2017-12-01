@@ -406,11 +406,11 @@ void Task::run() {
   // remap commandLine to local executable
 
   QStringList l   = m_cmdline.split(" ");
-  QString appName = l.at(1);
+  QString appName = l.at(0);
   m_log->info(appName);
 
-  if (l.at(1).contains("tcomposer") || l.at(1).contains("tcleanup")) {
-    appName = l.at(1);
+  if (l.at(0).contains("tcomposer") || l.at(0).contains("tcleanup")) {
+    appName = l.at(0);
     m_log->info(appName);
     bool m_isComposerTask = l.at(1).contains("tcomposer");
     appName               = getExeName(m_isComposerTask);
@@ -419,13 +419,15 @@ void Task::run() {
     int i   = 0;
     cmdline = appName;
     m_log->info(cmdline);
-    for (i = 2; i < l.size(); i++) {
+    for (i = 1; i < l.size(); i++) {
       cmdline += " ";
       cmdline += l.at(i);
       m_log->info(cmdline);
     }
     m_log->info("remap commandLine to local executable");
     m_log->info(appName);
+  } else {
+    cmdline = m_cmdline;
   }
 
   // ===========
@@ -444,9 +446,9 @@ void Task::run() {
 #endif
 
   if (m_cmdline.contains(".bat"))
-    cmdline = "cmd /C " + m_cmdline;
+    cmdline = "cmd /C " + cmdline;
   else
-    cmdline = m_cmdline;
+    cmdline = cmdline;
 #ifdef LEVO
   else {
     // metto da parte il primo token della command line che e' il nome
