@@ -556,6 +556,7 @@ solo nel costruttore)
         (int)((roundf(tempVecImg->getAutocloseTolerance() * 100) / 100) * 1000);
     PliTag *tag = new AutoCloseToleranceTag(tolerance);
     tags.push_back((PliObjectTag *)tag);
+    pli->setVersion(120, 0);
   } else {
     pli->setVersion(71, 0);
   }

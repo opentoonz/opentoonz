@@ -317,6 +317,7 @@ class ParsedPliImp {
 public:
   UCHAR m_majorVersionNumber;
   UCHAR m_minorVersionNumber;
+  bool m_versionLocked = false;
   USHORT m_framesNumber;
   double m_thickRatio;
   double m_maxThickness;
@@ -2634,8 +2635,10 @@ void ParsedPli::getVersion(UINT &majorVersionNumber,
 /*=====================================================================*/
 
 void ParsedPli::setVersion(UINT majorVersionNumber, UINT minorVersionNumber) {
-  imp->m_majorVersionNumber = majorVersionNumber;
-  imp->m_minorVersionNumber = minorVersionNumber;
+  if (imp->m_versionLocked) return;
+  if (majorVersionNumber >= 120) imp->m_versionLocked = true;
+  imp->m_majorVersionNumber                           = majorVersionNumber;
+  imp->m_minorVersionNumber                           = minorVersionNumber;
 }
 
 /*=====================================================================*/
