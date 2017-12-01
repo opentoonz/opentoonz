@@ -404,11 +404,8 @@ void Task::run() {
   QStringList l   = m_cmdline.split(" ");
   QString appName = l.at(0);
   m_log->info(appName);
-
-  if (l.at(0).contains("composer") || l.at(0).contains("cleanup")) {
-    appName = l.at(0);
-    m_log->info(appName);
-    bool m_isComposerTask = l.at(1).contains("composer");
+  if (appName.contains("tcomposer") || appName.contains("tcleanup")) {
+    bool m_isComposerTask = appName.contains("tcomposer");
     m_log->info(QString::number(m_isComposerTask));
     appName = getExeName(m_isComposerTask);
     m_log->info(appName);
