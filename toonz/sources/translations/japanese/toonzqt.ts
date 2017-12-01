@@ -2217,7 +2217,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Plain</source>
-        <translation>標準</translation>
+        <translation type="vanished">標準</translation>
     </message>
     <message>
         <source>Texture</source>
@@ -2225,11 +2225,11 @@ Are you sure?</source>
     </message>
     <message>
         <source>Special</source>
-        <translation>特殊</translation>
+        <translation type="vanished">特殊</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation>カスタム</translation>
+        <translation type="vanished">カスタム</translation>
     </message>
     <message>
         <source>Vector Brush</source>
@@ -2247,7 +2247,7 @@ Apply</source>
     </message>
     <message>
         <source>MyPaint Brush</source>
-        <translation>MyPaint ブラシ</translation>
+        <translation type="vanished">MyPaint ブラシ</translation>
     </message>
     <message>
         <source>- Style not Selected -</source>
@@ -2268,6 +2268,26 @@ Apply</source>
     <message>
         <source>- Style is Not Valid -</source>
         <translation>- スタイルが無効です -</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Raster</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

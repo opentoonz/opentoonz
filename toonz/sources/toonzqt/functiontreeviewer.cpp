@@ -680,9 +680,12 @@ QString FunctionTreeModel::Channel::getExprRefName() const {
     return stageGroup->getIdName() + QString(".") + tmpName;
   }
 
-  /*--- Fxパラメータの場合 ---*/
+  // expression for fx parameters
+  // see txsheetexpr.cpp for generation of actual tokens
+
   tmpName.remove(QChar(' '), Qt::CaseInsensitive);
   tmpName.remove(QChar('/'));
+  tmpName.remove(QChar('-'));
   tmpName = tmpName.toLower();
 
   FunctionTreeModel::ChannelGroup *parentGroup =

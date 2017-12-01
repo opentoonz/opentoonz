@@ -1055,6 +1055,10 @@ What do you want to do?</source>
         <source>Level: </source>
         <translation>レベル：</translation>
     </message>
+    <message>
+        <source> (Flipped)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CommandBar</name>
@@ -2713,6 +2717,99 @@ Do you want to create it?</source>
     </message>
 </context>
 <context>
+    <name>LipSyncPopup</name>
+    <message>
+        <source>Apply Lip Sync Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished">適用</translation>
+    </message>
+    <message>
+        <source>A I Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>U Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>L Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W Q Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M B P Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F V Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rest Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C D G K N R S Th Y Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extend Rest Drawing to End Marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Drawing</source>
+        <translation type="unfinished">次の画像</translation>
+    </message>
+    <message>
+        <source>Insert at Frame: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lip Sync Data File: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thumbnails are not available for sub-Xsheets.
+Please use the frame numbers for reference.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to apply lip sync data to this column type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SubXSheet Frame </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to open the file: 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LoadColorModelPopup</name>
     <message>
         <source>Load Color Model</source>
@@ -3316,7 +3413,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Revert to Last Saved Version</source>
-        <translation>最後に保存したバージョンに戻す (&amp;R)</translation>
+        <translation type="vanished">最後に保存したバージョンに戻す (&amp;R)</translation>
     </message>
     <message>
         <source>&amp;Expose in Xsheet</source>
@@ -4801,6 +4898,46 @@ Do you want to create it?</source>
     <message>
         <source>&amp;Toggle Edit In Place</source>
         <translation>親シートの内容をビューアに表示 (&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Note Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Apply Lip Sync Data to Column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste Numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Current Time Indicator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vectors to Toonz Raster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace Vectors with Simplified Vectors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip Viewer Horiontally</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip Viewer Vertically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fill Tool - Autopaint Lines</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6655,7 +6792,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Expand Function Editor Header to Match XSheet Toolbar Height (Requires Restart)</source>
-        <translation>パラメータエディタのヘッダの余白を、タイムシートツールバーに揃えて調整する (再起動が必要です)</translation>
+        <translation type="vanished">パラメータエディタのヘッダの余白を、タイムシートツールバーに揃えて調整する (再起動が必要です)</translation>
     </message>
     <message>
         <source>Show Column Numbers in Column Headers</source>
@@ -6744,6 +6881,67 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Layout Preference*:</source>
         <translation>列ヘッダのレイアウト*：</translation>
+    </message>
+    <message>
+        <source>Keep fill when using &quot;Replace Vectors&quot; command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use higher DPI for calculations - Slower but more accurate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="unfinished">ツール</translation>
+    </message>
+    <message>
+        <source>Expand Function Editor Header to Match Xsheet Toolbar Height (Requires Restart)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync Level Strip Drawing Number Changes with the Xsheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Current Time Indicator (Timeline Mode only)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project Folder Aliases (+drawings, +scenes, etc.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scene Folder Alias ($scenefolder)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Project Folder Aliases Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option defines which alias to be used
+if both are possible on coding file path.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open the dropdown to display all options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle through the available options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path Alias Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace Vectors with Simplified Vectors Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dropdown Shortcuts:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8486,6 +8684,78 @@ Are you sure?</source>
         <source>Cannot Read XML File</source>
         <translation>XMLファイルを読み込めません</translation>
     </message>
+    <message>
+        <source>New Note Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following level(s) use path with $scenefolder alias.
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+They will not be opened properly when you load the scene next time.
+What do you want to do?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy the levels to correspondent paths</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decode all $scenefolder aliases</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save the scene only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite for All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Overwrite for All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to overwrite %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply Lip Sync Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to paste the cells: Some column is locked or column type is not match.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This command only works on vector cells.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select only one column for this command.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All selected cells must belong to the same level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simplify Vectors : Level %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Text at Column %1  Frame %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -9862,6 +10132,10 @@ Please commit or revert changes first.</source>
         <source>Field Guide</source>
         <translation>フィールドガイド</translation>
     </message>
+    <message>
+        <source> (Flipped)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ShortcutPopup</name>
@@ -10316,6 +10590,14 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>The height must be greater than zero.</source>
         <translation>高さは1以上でなくてはいけません。</translation>
+    </message>
+    <message>
+        <source>Automatically Save Every </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minutes</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10981,7 +11263,27 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Replace</source>
-        <translation>置き換える</translation>
+        <translation type="vanished">置き換える</translation>
+    </message>
+    <message>
+        <source>Edit Cell Numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace Level</source>
+        <translation type="unfinished">レベルを置き換え</translation>
+    </message>
+    <message>
+        <source>Replace with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Special</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11278,6 +11580,10 @@ Please refer to the user guide for details.</source>
     <message>
         <source> columns</source>
         <translation> 列</translation>
+    </message>
+    <message>
+        <source>Zoom in/out of timeline</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

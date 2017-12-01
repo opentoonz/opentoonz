@@ -77,7 +77,7 @@ private:
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
       *m_useHigherDpiOnVectorSimplifyCB, *m_keepFillOnVectorSimplifyCB,
       *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB,
-      *m_syncLevelRenumberWithXsheet;
+      *m_syncLevelRenumberWithXsheet, *m_downArrowInLevelStripCreatesNewFrame;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -144,6 +144,7 @@ private slots:
   void onGetFillOnlySavebox(int index);
   void onFitToFlipbook(int);
   void onDropdownShortcutsCycleOptionsChanged(int);
+  void onDownArrowInLevelStripCreatesNewFrame(int);
   void onAddLevelFormat();
   void onRemoveLevelFormat();
   void onEditLevelFormat();

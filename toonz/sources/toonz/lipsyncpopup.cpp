@@ -518,7 +518,6 @@ void LipSyncPopup::paintEvent(QPaintEvent *) {
       m_pixmaps[i] = QPixmap::fromImage(placeHolder);
       m_imageLabels[i]->setPixmap(m_pixmaps[i]);
     }
-    hide();
   }
 }
 

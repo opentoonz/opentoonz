@@ -39,6 +39,7 @@
 #define MI_LoadColorModel "MI_LoadColorModel"
 #define MI_ImportMagpieFile "MI_ImportMagpieFile"
 #define MI_NewNoteLevel "MI_NewNoteLevel"
+#define MI_RemoveEmptyColumns "MI_RemoveEmptyColumns"
 #define MI_NewProject "MI_NewProject"
 #define MI_ProjectSettings "MI_ProjectSettings"
 #define MI_SaveDefaultSettings "MI_SaveDefaultSettings"
@@ -47,6 +48,7 @@
 #define MI_Render "MI_Render"
 #define MI_FastRender "MI_FastRender"
 #define MI_Preview "MI_Preview"
+#define MI_SoundTrack "MI_SoundTrack"
 #define MI_RegeneratePreview "MI_RegeneratePreview"
 #define MI_RegenerateFramePr "MI_RegenerateFramePr"
 #define MI_ClonePreview "MI_ClonePreview"
@@ -326,4 +328,6 @@
 #define MI_AudioRecording "MI_AudioRecording"
 #define MI_LipSyncPopup "MI_LipSyncPopup"
 #define MI_AutoInputCellNumber "MI_AutoInputCellNumber"
+#define MI_TouchGestureControl "MI_TouchGestureControl"
+
 #endif

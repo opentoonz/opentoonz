@@ -145,8 +145,7 @@ void makeSpaceForFids(TXshSimpleLevel *sl,
     if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled())
       updateXSheet(sl, oldFids, fids);
     sl->renumber(fids);
-    invalidateIcons(sl, touchedFids);
-    sl->setDirtyFlag(true);
+	sl->setDirtyFlag(true);
   }
 }
 
@@ -986,6 +985,7 @@ public:
         updateXSheet(m_sl.getPointer(), newFrames, m_oldLevelFrameId);
       }
       m_sl->renumber(m_oldLevelFrameId);
+	  m_sl->setDirtyFlag(true);
       TApp::instance()
           ->getPaletteController()
           ->getCurrentLevelPalette()
@@ -1198,7 +1198,6 @@ public:
       updateXSheet(m_level.getPointer(), newFrames, m_oldFids);
     }
     m_level->renumber(m_oldFids);
-    invalidateIcons(m_level.getPointer(), m_oldFids);
     m_level->setDirtyFlag(true);
 
     TApp *app = TApp::instance();
@@ -1310,8 +1309,8 @@ public:
     m_level->renumber(fids);
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
-    invalidateIcons(m_level.getPointer(), fids);
-    TApp::instance()->getCurrentLevel()->notifyLevelChange();
+	m_level->setDirtyFlag(true);
+	TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
   void undo() const override {
     std::vector<TFrameId> fids;
@@ -1403,9 +1402,7 @@ void FilmstripCmd::renumber(
     updateXSheet(sl, oldFrames, fids);
   }
   sl->renumber(fids);
-  sl->setDirtyFlag(true);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-  invalidateIcons(sl, fids);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 
   /*
@@ -1481,7 +1478,6 @@ void FilmstripCmd::renumber(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
   assert(frames.size() == newFrames.size());
   frames.swap(newFrames);
 
-  invalidateIcons(sl, fids);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 }
 
@@ -1751,7 +1747,7 @@ public:
       updateXSheet(m_level.getPointer(), newFrames, m_oldFrames);
     }
     m_level->renumber(m_oldFrames);
-    invalidateIcons(m_level.getPointer(), m_oldFrames);
+	m_level->setDirtyFlag(true);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
@@ -1833,7 +1829,6 @@ void performReverse(const TXshSimpleLevelP &sl,
   sl->renumber(fids);
   sl->setDirtyFlag(true);
   //  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-  invalidateIcons(sl.getPointer(), frames);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 }
 
@@ -2005,6 +2000,7 @@ void stepFilmstripFrames(const TXshSimpleLevelP &sl,
     }
   }
   invalidateIcons(sl.getPointer(), changedFids);
+  sl->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 }
 
@@ -2043,7 +2039,7 @@ public:
     m_level->renumber(m_oldFrames);
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
-    invalidateIcons(m_level.getPointer(), m_oldFrames);
+	m_level->setDirtyFlag(true);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
   void redo() const override {
@@ -2209,7 +2205,7 @@ public:
       updateXSheet(m_level.getPointer(), newFrames, m_oldFrames);
     }
     m_level->renumber(m_oldFrames);
-    invalidateIcons(m_level.getPointer(), m_oldFrames);
+	m_level->setDirtyFlag(true);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
   void redo() const override {
@@ -2556,6 +2552,7 @@ void FilmstripCmd::renumberDrawing(TXshSimpleLevel *sl, const TFrameId &oldFid,
     updateXSheet(sl, oldFrames, fids);
   }
   sl->renumber(fids);
+  sl->setDirtyFlag(true);
 
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   TApp::instance()->getCurrentLevel()->notifyLevelChange();

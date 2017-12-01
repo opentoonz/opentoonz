@@ -7,6 +7,14 @@
         <source>Retas Level Format</source>
         <translation>RETAS Ebenen-Format</translation>
     </message>
+    <message>
+        <source>Adobe Photoshop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PNG</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -342,6 +350,66 @@ Wahrscheinlich funktioniert der Codec nicht korrekt.</translation>
     </message>
     <message>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Autopaint Option  Palette : %1  Style#%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkYellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkCyan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkMagenta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contrast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HRange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Line Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ColorThres</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WhiteThres</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

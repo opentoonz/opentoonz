@@ -102,7 +102,8 @@ public:
   MyListView() : QListView() {
     setObjectName("SuggestionPopup");
     setStyleSheet(
-        "#SuggestionPopup {background-color:#FFFFFF; border:1px solid black;}");
+        "#SuggestionPopup {background-color:#FFFFFF; border:1px solid black; "
+        "color: black;}");
     setWindowFlags(Qt::Popup);
     setMouseTracking(true);
     m_tooltip = new QLabel(0, Qt::ToolTip);

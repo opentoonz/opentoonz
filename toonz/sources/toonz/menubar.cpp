@@ -1100,6 +1100,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(fileMenu, MI_OutputSettings);
   addMenuItem(fileMenu, MI_Render);
   addMenuItem(fileMenu, MI_FastRender);
+  addMenuItem(fileMenu, MI_SoundTrack);
   //  addMenuItem(fileMenu, MI_SavePreviewedFrames);
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_PrintXsheet);
@@ -1151,6 +1152,10 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(editMenu, MI_BringForward);
   addMenuItem(editMenu, MI_SendBack);
   addMenuItem(editMenu, MI_SendBackward);
+
+  editMenu->addSeparator();
+  addMenuItem(editMenu, MI_TouchGestureControl);
+
 // Menu' SCAN CLEANUP
 #ifdef LINETEST
   QMenu *scanCleanupMenu = addMenu(tr("Scan"));
@@ -1233,6 +1238,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(xsheetMenu, MI_InsertFx);
   addMenuItem(xsheetMenu, MI_NewOutputFx);
   addMenuItem(xsheetMenu, MI_NewNoteLevel);
+  addMenuItem(xsheetMenu, MI_RemoveEmptyColumns);
   xsheetMenu->addSeparator();
   addMenuItem(xsheetMenu, MI_InsertSceneFrame);
   addMenuItem(xsheetMenu, MI_RemoveSceneFrame);

@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Position</source>
-        <translation>Posición</translation>
+        <translation type="vanished">Posición</translation>
     </message>
     <message>
         <source>E/W:</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Rotation</source>
-        <translation>Rotación</translation>
+        <translation type="vanished">Rotación</translation>
     </message>
     <message>
         <source>Scale</source>
@@ -57,11 +57,11 @@
     </message>
     <message>
         <source>Center</source>
-        <translation>Centro</translation>
+        <translation type="vanished">Centro</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation>Bloquear</translation>
+        <translation type="vanished">Bloquear</translation>
     </message>
     <message>
         <source>(</source>
@@ -75,12 +75,20 @@
         <source>Center Position</source>
         <translation>Posición centro</translation>
     </message>
+    <message>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotation:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
     <message>
         <source>Thickness</source>
-        <translation>Grosor</translation>
+        <translation type="vanished">Grosor</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -100,15 +108,15 @@
     </message>
     <message>
         <source>Break Sharp Angles</source>
-        <translation>Quebrar ángulos agudos</translation>
+        <translation type="vanished">Quebrar ángulos agudos</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>Modo lápiz</translation>
+        <translation type="vanished">Modo lápiz</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>Sensibilidad a presión</translation>
+        <translation type="vanished">Sensibilidad a presión</translation>
     </message>
     <message>
         <source>Cap</source>
@@ -340,6 +348,10 @@
         <source>Segment</source>
         <translation>Segmento</translation>
     </message>
+    <message>
+        <source>Autopaint Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FingerTool</name>
@@ -356,15 +368,15 @@
     <name>FullColorBrushTool</name>
     <message>
         <source>Thickness</source>
-        <translation>Grosor</translation>
+        <translation type="vanished">Grosor</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>Sensibilidad a presión</translation>
+        <translation type="vanished">Sensibilidad a presión</translation>
     </message>
     <message>
         <source>Opacity:</source>
-        <translation>Opacidad:</translation>
+        <translation type="vanished">Opacidad:</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -385,6 +397,14 @@
     <message>
         <source>Opacity</source>
         <translation>Opacidad</translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -722,7 +742,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation>La columna actual no se encuentra visible en la vista de mesa de trabajo.</translation>
+        <translation type="vanished">La columna actual no se encuentra visible en la vista de mesa de trabajo.</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>

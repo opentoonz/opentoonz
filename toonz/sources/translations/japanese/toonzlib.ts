@@ -404,6 +404,10 @@
         <source>WhiteThres</source>
         <translation>明るさのしきい値</translation>
     </message>
+    <message>
+        <source>Toggle Autopaint Option  Palette : %1  Style#%2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>
