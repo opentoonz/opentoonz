@@ -379,11 +379,7 @@ private:
 
 //-------------------------------------------------------------------
 QString getExeName(bool isComposer) {
-  TUserLog *m_log;
   QString name = isComposer ? "tcomposer" : "tcleanup";
-
-  m_log->info("getExeName");
-  m_log->info(name);
 
 #ifdef _WIN32
   return name + ".exe ";
