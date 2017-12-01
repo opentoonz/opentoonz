@@ -403,11 +403,11 @@ void Task::run() {
 
   QStringList l   = m_cmdline.split(" ");
   QString appName = l.at(1);
-  // m_log->info(appName);
+  m_log->info(appName);
 
   if (l.at(1).contains("tcomposer") || l.at(1).contains("tcleanup")) {
     appName = l.at(1);
-    // m_log->info(appName);
+    m_log->info(appName);
     bool m_isComposerTask = l.at(1).contains("tcomposer");
     appName               = getExeName(m_isComposerTask);
     m_log->info(appName);
@@ -420,8 +420,8 @@ void Task::run() {
       cmdline += l.at(i);
       m_log->info(cmdline);
     }
-    // m_log->info("remap commandLine to local executable");
-    // m_log->info(appName);
+    m_log->info("remap commandLine to local executable");
+    m_log->info(appName);
   }
 
   // ===========
