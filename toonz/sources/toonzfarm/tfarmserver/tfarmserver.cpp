@@ -379,7 +379,7 @@ private:
 
 //-------------------------------------------------------------------
 QString getExeName(bool isComposer) {
-  QString name = isComposer ? "tcomposer" : "tcleanup";
+  QString name = isComposer ? "tcleanup" : "tcomposer";
 
 #ifdef _WIN32
   return name + ".exe ";
@@ -409,7 +409,8 @@ void Task::run() {
     appName = l.at(0);
     m_log->info(appName);
     bool m_isComposerTask = l.at(1).contains("tcomposer");
-    appName               = getExeName(m_isComposerTask);
+    m_log->info(m_isComposerTask);
+    appName = getExeName(m_isComposerTask);
     m_log->info(appName);
 
     int i   = 0;
