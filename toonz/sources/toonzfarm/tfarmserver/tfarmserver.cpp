@@ -379,6 +379,7 @@ private:
 
 //-------------------------------------------------------------------
 QString getExeName(bool isComposer) {
+  TUserLog *m_log;
   QString name = isComposer ? "tcomposer" : "tcleanup";
 
   m_log->info("getExeName");
