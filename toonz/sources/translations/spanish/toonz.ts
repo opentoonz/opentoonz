@@ -1059,7 +1059,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source> (Flipped)</source>
-        <translation type="unfinished"></translation>
+        <translation> (Invertido)</translation>
     </message>
 </context>
 <context>
@@ -2726,93 +2726,95 @@ Do you want to create it?</source>
     <name>LipSyncPopup</name>
     <message>
         <source>Apply Lip Sync Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Aplicar datos de sincronización labial</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">Aplicar</translation>
+        <translation>Aplicar</translation>
     </message>
     <message>
         <source>A I Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo para A I</translation>
     </message>
     <message>
         <source>O Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo para O</translation>
     </message>
     <message>
         <source>E Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo para E</translation>
     </message>
     <message>
         <source>U Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo para U</translation>
     </message>
     <message>
         <source>L Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo para L</translation>
     </message>
     <message>
         <source>W Q Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo para W Q</translation>
     </message>
     <message>
         <source>M B P Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo para M B P</translation>
     </message>
     <message>
         <source>F V Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo para F V</translation>
     </message>
     <message>
         <source>Rest Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo de reposo</translation>
     </message>
     <message>
         <source>C D G K N R S Th Y Z</source>
-        <translation type="unfinished"></translation>
+        <translation>C D G K N R S Th Y Z</translation>
     </message>
     <message>
         <source>Extend Rest Drawing to End Marker</source>
-        <translation type="unfinished"></translation>
+        <translation>Extender dibujo de reposo hasta el marcador de fin</translation>
     </message>
     <message>
         <source>Previous Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo anterior</translation>
     </message>
     <message>
         <source>Next Drawing</source>
-        <translation type="unfinished">Dibujo siguiente</translation>
+        <translation>Dibujo siguiente</translation>
     </message>
     <message>
         <source>Insert at Frame: </source>
-        <translation type="unfinished"></translation>
+        <translation>Insertar en fotograma: </translation>
     </message>
     <message>
         <source>Lip Sync Data File: </source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo de datos de sincronización labial:</translation>
     </message>
     <message>
         <source>Thumbnails are not available for sub-Xsheets.
 Please use the frame numbers for reference.</source>
-        <translation type="unfinished"></translation>
+        <translation>No se muestran miniaturas para sub-planillas.
+Usar los números de fotograma como referencia.</translation>
     </message>
     <message>
         <source>Unable to apply lip sync data to this column type</source>
-        <translation type="unfinished"></translation>
+        <translation>No es posible aplicar datos de sincronización labial a este tipo de columna</translation>
     </message>
     <message>
         <source>SubXSheet Frame </source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo en sub-planilla </translation>
     </message>
     <message>
         <source>Unable to open the file: 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>No es posible abrir el archivo: 
+</translation>
     </message>
     <message>
         <source>Invalid data file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo de datos inválido.</translation>
     </message>
 </context>
 <context>
@@ -3315,7 +3317,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Paste Into</source>
-        <translation>&amp;Pegar en</translation>
+        <translation>&amp;Pegar dentro</translation>
     </message>
     <message>
         <source>Paste RGBA Values</source>
@@ -3603,19 +3605,19 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Drawing Substitution Forward</source>
-        <translation>Sustituir dibujos hacia adelante</translation>
+        <translation>Sustituir dibujo hacia adelante</translation>
     </message>
     <message>
         <source>Drawing Substitution Backward</source>
-        <translation>Sustituir dibujos hacia atrás</translation>
+        <translation>Sustituir dibujo hacia atrás</translation>
     </message>
     <message>
         <source>Similar Drawing Substitution Forward</source>
-        <translation>Sustituir dibujos similares hacia adelante</translation>
+        <translation>Sustituir dibujo similar hacia adelante</translation>
     </message>
     <message>
         <source>Similar Drawing Substitution Backward</source>
-        <translation>Sustituir dibujos similares hacia atrás</translation>
+        <translation>Sustituir dibujo similar hacia atrás</translation>
     </message>
     <message>
         <source>&amp;Set Key</source>
@@ -4907,43 +4909,43 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Reload</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Recargar</translation>
     </message>
     <message>
         <source>New Note Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuevo nivel de notas</translation>
     </message>
     <message>
         <source>&amp;Apply Lip Sync Data to Column</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Aplicar datos de sincro labial a columna</translation>
     </message>
     <message>
         <source>&amp;Paste Numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Pegar números</translation>
     </message>
     <message>
         <source>Toggle Current Time Indicator</source>
-        <translation type="unfinished"></translation>
+        <translation>Indicador de tiempo actual</translation>
     </message>
     <message>
         <source>Vectors to Toonz Raster</source>
-        <translation type="unfinished"></translation>
+        <translation>Vectorial a imagen de Toonz</translation>
     </message>
     <message>
         <source>Replace Vectors with Simplified Vectors</source>
-        <translation type="unfinished"></translation>
+        <translation>Reemplazar trazos con trazos simplificados</translation>
     </message>
     <message>
         <source>Flip Viewer Horiontally</source>
-        <translation type="unfinished"></translation>
+        <translation>Invertir visor horizontalmente</translation>
     </message>
     <message>
         <source>Flip Viewer Vertically</source>
-        <translation type="unfinished"></translation>
+        <translation>Invertir visor verticalmente</translation>
     </message>
     <message>
         <source>Fill Tool - Autopaint Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Rellenar - Pintar líneas autom.</translation>
     </message>
 </context>
 <context>
@@ -6887,64 +6889,65 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Keep fill when using &quot;Replace Vectors&quot; command</source>
-        <translation type="unfinished"></translation>
+        <translation>Mantener los rellenos al usar el comando &quot;Reemplazar trazos&quot;</translation>
     </message>
     <message>
         <source>Use higher DPI for calculations - Slower but more accurate</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar PPP más altos para los cálculos - Más lento pero más preciso</translation>
     </message>
     <message>
         <source>Tools</source>
-        <translation type="unfinished">Herramientas</translation>
+        <translation>Herramientas</translation>
     </message>
     <message>
         <source>Expand Function Editor Header to Match Xsheet Toolbar Height (Requires Restart)</source>
-        <translation type="unfinished"></translation>
+        <translation>Expandir altura del editor de funciones para coincidir con la de la planilla*</translation>
     </message>
     <message>
         <source>Sync Level Strip Drawing Number Changes with the Xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronizar cambios de número en cinta de nivel con la planilla</translation>
     </message>
     <message>
         <source>Show Current Time Indicator (Timeline Mode only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar indicador de tiempo actual (sólo en modo Línea de tiempo)</translation>
     </message>
     <message>
         <source>Project Folder Aliases (+drawings, +scenes, etc.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobrenombres para carpeta de proyecto (+drawings, +scenes, etc.)</translation>
     </message>
     <message>
         <source>Scene Folder Alias ($scenefolder)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobrenombres para carpeta de escenas ($scenefolder)</translation>
     </message>
     <message>
         <source>Use Project Folder Aliases Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Sólo usar sobrenombres para la carpeta del proyecto</translation>
     </message>
     <message>
         <source>This option defines which alias to be used
 if both are possible on coding file path.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta opción define cuál sobrenombre usar si ambos
+fueran posibles, al resolver la ruta de un archvo.</translation>
     </message>
     <message>
         <source>Open the dropdown to display all options</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir menú para desplegar todas las opciones</translation>
     </message>
     <message>
         <source>Cycle through the available options</source>
-        <translation type="unfinished"></translation>
+        <translation>Recorrer opciones cíclicamente</translation>
     </message>
     <message>
         <source>Path Alias Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioridad de sobrenombres de rutas:</translation>
     </message>
     <message>
         <source>Replace Vectors with Simplified Vectors Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando Reemplazar trazos con trazos simplificados</translation>
     </message>
     <message>
         <source>Dropdown Shortcuts:</source>
-        <translation type="unfinished"></translation>
+        <translation>Atajos de menúes desplegables:</translation>
     </message>
 </context>
 <context>
@@ -8686,75 +8689,79 @@ Are you sure?</source>
     </message>
     <message>
         <source>New Note Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuevo nivel de notas</translation>
     </message>
     <message>
         <source>The following level(s) use path with $scenefolder alias.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Los siguientes niveles usan una ruta con sobrenombre para $scenefolder.
+
+</translation>
     </message>
     <message>
         <source>
 They will not be opened properly when you load the scene next time.
 What do you want to do?</source>
-        <translation type="unfinished"></translation>
+        <translation>
+No volverán a ser abiertos correctamente la siguiente vez que se cargue la escena.
+¿Qué hacer?</translation>
     </message>
     <message>
         <source>Copy the levels to correspondent paths</source>
-        <translation type="unfinished"></translation>
+        <translation>Copiar los niveles a las rutas correspondientes</translation>
     </message>
     <message>
         <source>Decode all $scenefolder aliases</source>
-        <translation type="unfinished"></translation>
+        <translation>Decodificar todos los sobrenombres de $scenefolder</translation>
     </message>
     <message>
         <source>Save the scene only</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar sólo la escena</translation>
     </message>
     <message>
         <source>Overwrite for All</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobrescribir todos</translation>
     </message>
     <message>
         <source>Don&apos;t Overwrite for All</source>
-        <translation type="unfinished"></translation>
+        <translation>No sobrescribir ninguno</translation>
     </message>
     <message>
         <source>Failed to overwrite %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Falla al sobrescribir %1</translation>
     </message>
     <message>
         <source>Apply Lip Sync Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Aplicar datos de sincronización labial</translation>
     </message>
     <message>
         <source>Paste Numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pegar números</translation>
     </message>
     <message>
         <source>It is not possible to paste the cells: Some column is locked or column type is not match.</source>
-        <translation type="unfinished"></translation>
+        <translation>No es posible pegar los acetatos: Alguna columna está bloqueada o su tipo no concuerda.</translation>
     </message>
     <message>
         <source>This command only works on vector cells.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este comando sólo funciona sobre acetatos vectoriales.</translation>
     </message>
     <message>
         <source>Please select only one column for this command.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor seleccionar sólo una columna para usar este comando.</translation>
     </message>
     <message>
         <source>All selected cells must belong to the same level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Todos los acetatos seleccionados deben pertenecer al mismo nivel.</translation>
     </message>
     <message>
         <source>Simplify Vectors : Level %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Simplificar trazos : Nivel %1</translation>
     </message>
     <message>
         <source>Change Text at Column %1  Frame %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar el texto en columna %1  fotograma %2</translation>
     </message>
 </context>
 <context>
@@ -10061,15 +10068,15 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Closest Drawing</source>
-        <translation>En dibujo más próximo</translation>
+        <translation>Dibujo más próximo</translation>
     </message>
     <message>
         <source>Farthest Drawing</source>
-        <translation>En dibujo más lejano</translation>
+        <translation>Dibujo más lejano</translation>
     </message>
     <message>
         <source>All Drawings</source>
-        <translation>En todos los dibujos</translation>
+        <translation>Todos los dibujos</translation>
     </message>
 </context>
 <context>
@@ -10132,7 +10139,7 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source> (Flipped)</source>
-        <translation type="unfinished"></translation>
+        <translation> (Invertido)</translation>
     </message>
 </context>
 <context>
@@ -10465,7 +10472,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>X</source>
-        <translation>X</translation>
+        <translation>x</translation>
     </message>
     <message>
         <source>Resolution:</source>
@@ -10591,11 +10598,11 @@ Es posible que el archivo del ajuste esté corrupto</translation>
     </message>
     <message>
         <source>Automatically Save Every </source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar atomáticamente cada </translation>
     </message>
     <message>
         <source>Minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minutos</translation>
     </message>
 </context>
 <context>
@@ -11254,7 +11261,7 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
     <message>
         <source>Step</source>
-        <translation>Editar exposición</translation>
+        <translation>Editar exposición de acetatos</translation>
     </message>
     <message>
         <source>Each</source>
@@ -11266,23 +11273,23 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
     <message>
         <source>Edit Cell Numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar números de acetatos</translation>
     </message>
     <message>
         <source>Replace Level</source>
-        <translation type="unfinished">Reemplazar nivel</translation>
+        <translation>Reemplazar nivel</translation>
     </message>
     <message>
         <source>Replace with</source>
-        <translation type="unfinished"></translation>
+        <translation>Reemplazar con</translation>
     </message>
     <message>
         <source>Paste Special</source>
-        <translation type="unfinished"></translation>
+        <translation>Pegar especial</translation>
     </message>
     <message>
         <source>Edit Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar imagen</translation>
     </message>
 </context>
 <context>
@@ -11582,7 +11589,7 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
     <message>
         <source>Zoom in/out of timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Ampliar/reducir el tiempo</translation>
     </message>
 </context>
 </TS>
