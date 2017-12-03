@@ -164,10 +164,11 @@ elseif(BUILD_ENV_APPLE)
         message("CMAKE_PREFIX_PATH:" ${CMAKE_PREFIX_PATH})
         add_definitions(
             -DMACOSX
-            -Di386
+            -DI386
         )
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++11 -stdlib=libc++ -fno-implicit-templates")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++11 -stdlib=libc++ -fno-implicit-templates -D HAS_QUICKDRAW")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
+        set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -m64")
     elseif(PLATFORM EQUAL 32)
         set(QT_PATH "~/Qt5.9.2/5.9.2/clang_32/lib" CACHE PATH "Qt instlattion directory")
         set(QT_LIB_PATH "${QT_PATH}/")
