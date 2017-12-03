@@ -416,7 +416,7 @@ void StartupPopup::refreshRecentScenes() {
               ->getProjectNameByScenePath(TFilePath(name))
               .getName());
       if (projectName.length() > 0)
-        justName             = justName + " (" + projectName + ")";
+        justName             = justName + " - " + projectName;
       m_recentNamesLabels[i] = new StartupLabel(justName, this, i);
       m_recentNamesLabels[i]->setToolTip(
           name.remove(0, name.indexOf(" ") + 1));  // remove "#. " prefix
