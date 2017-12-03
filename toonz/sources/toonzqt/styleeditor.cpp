@@ -3021,7 +3021,10 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   m_hsvAction->setCheckable(true);
   m_alphaAction->setCheckable(true);
   m_rgbAction->setCheckable(true);
-
+  m_wheelAction->setChecked(true);
+  m_hsvAction->setChecked(true);
+  m_alphaAction->setChecked(true);
+  m_rgbAction->setChecked(true);
   menu->addAction(m_wheelAction);
   menu->addAction(m_hsvAction);
   menu->addAction(m_alphaAction);
