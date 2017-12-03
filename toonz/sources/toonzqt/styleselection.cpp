@@ -91,7 +91,7 @@ bool pasteStylesDataWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle,
       break;
     }
 
-    if (palette->getStylePage(styleId) < 0) {
+    if (palette->getStylePage(styleId) != NULL) {
       // styleId non e' utilizzato: uso quello
       // (cut/paste utilizzato per spostare stili)
       palette->setStyle(styleId, style);
@@ -174,7 +174,7 @@ void deleteStylesWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle,
                              int pageIndex, std::set<int> *styleIndicesInPage,
                              int fir = 0) {
   if (!palette) palette = pltHandle->getPalette();
-  int n                 = styleIndicesInPage->size();
+  int n = styleIndicesInPage->size();
   if (n == 0) return;
   TPalette::Page *page = palette->getPage(pageIndex);
   assert(page);
@@ -1441,7 +1441,7 @@ void TStyleSelection::toggleLink() {
       name[0] = name[0] == L'-' ? L'+' : L'-';
       cs->setGlobalName(name);
       if (name[0] == L'+') somethingHasBeenLinked = true;
-      somethingChanged                            = true;
+      somethingChanged = true;
     }
     undo->setColorStyle(index, oldCs, name);
 
@@ -1599,7 +1599,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! remove link from studio palette. Delete the global and the orginal names.
  * return true if something changed
-*/
+ */
 void TStyleSelection::removeLink() {
   TPalette *palette = getPalette();
   if (!palette || m_pageIndex < 0) return;
@@ -1714,7 +1714,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! get the color from the linked style of the studio palette
-*/
+ */
 void TStyleSelection::getBackOriginalStyle() {
   TPalette *palette = getPalette();
   if (!palette || m_pageIndex < 0) return;
@@ -1797,7 +1797,7 @@ void TStyleSelection::getBackOriginalStyle() {
 
 //-----------------------------------------------------------------------------
 /*! return true if there is at least one linked style in the selection
-*/
+ */
 
 bool TStyleSelection::hasLinkedStyle() {
   TPalette *palette = getPalette();
