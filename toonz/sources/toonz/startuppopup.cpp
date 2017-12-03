@@ -398,7 +398,8 @@ void StartupPopup::refreshRecentScenes() {
   removeAll(m_recentSceneLay);
 
   m_sceneNames.clear();
-  m_sceneNames = RecentFiles::instance()->getFilesNameList(RecentFiles::Scene);
+  m_sceneNames =
+      RecentFiles::instance()->getFilesNameList(RecentFiles::Scene, false);
   m_recentNamesLabels.clear();
   m_recentNamesLabels = QVector<StartupLabel *>(m_sceneNames.count());
 
@@ -409,7 +410,13 @@ void StartupPopup::refreshRecentScenes() {
     int i = 0;
     for (QString name : m_sceneNames) {
       if (i > 9) break;  // box can hold 10 scenes
-      QString justName = QString::fromStdString(TFilePath(name).getName());
+      QString justName    = QString::fromStdString(TFilePath(name).getName());
+      QString projectName = QString::fromStdString(
+          TProjectManager::instance()
+              ->getProjectNameByScenePath(TFilePath(name))
+              .getName());
+      if (projectName.length() > 0)
+        justName             = justName + " (" + projectName + ")";
       m_recentNamesLabels[i] = new StartupLabel(justName, this, i);
       m_recentNamesLabels[i]->setToolTip(
           name.remove(0, name.indexOf(" ") + 1));  // remove "#. " prefix

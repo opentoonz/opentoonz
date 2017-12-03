@@ -942,12 +942,20 @@ TProjectP TProjectManager::getCurrentProject() {
 }
 
 //-------------------------------------------------------------------
-/*! Returns the TProjectP in which the specified \b scenePath is saved.\n
-        Returns 0 if \b scenePath isn't a valid scene, or isn't saved in a valid
-   folder of a project root.
-        \note \b scenePath must be an absolute path.\n
-        Creates a new TProject. The caller gets ownership.*/
-TProjectP TProjectManager::loadSceneProject(const TFilePath &scenePath) {
+
+TFilePath TProjectManager::getProjectNameByScenePath(
+    const TFilePath &scenePath) {
+  TFilePath projectPath = getProjectPathByScenePath(scenePath);
+  if (projectPath.isEmpty())
+    return TFilePath();
+  else
+    return projectPathToProjectName(projectPath);
+}
+
+//-------------------------------------------------------------------
+
+TFilePath TProjectManager::getProjectPathByScenePath(
+    const TFilePath &scenePath) {
   // cerca il file scenes.xml nella stessa directory della scena
   // oppure in una
   // directory superiore
@@ -992,7 +1000,7 @@ TProjectP TProjectManager::loadSceneProject(const TFilePath &scenePath) {
 
     } catch (...) {
     }
-    if (projectPath == TFilePath()) return 0;
+    if (projectPath == TFilePath()) return TFilePath();
   } else
     projectPath = getSandboxProjectPath();
 
@@ -1001,10 +1009,21 @@ TProjectP TProjectManager::loadSceneProject(const TFilePath &scenePath) {
     if (!projectPath.isAbsolute())
       projectPath = getProjectPathByName(projectPath);
     else
-      return 0;
+      return TFilePath();
   }
-  if (!TFileStatus(projectPath).doesExist()) return 0;
+  if (!TFileStatus(projectPath).doesExist()) return TFilePath();
+  return projectPath;
+}
 
+//-------------------------------------------------------------------
+/*! Returns the TProjectP in which the specified \b scenePath is saved.\n
+        Returns 0 if \b scenePath isn't a valid scene, or isn't saved in a valid
+   folder of a project root.
+        \note \b scenePath must be an absolute path.\n
+        Creates a new TProject. The caller gets ownership.*/
+TProjectP TProjectManager::loadSceneProject(const TFilePath &scenePath) {
+  TFilePath projectPath = getProjectPathByScenePath(scenePath);
+  if (projectPath == TFilePath()) return 0;
   TProject *project = new TProject();
   project->load(projectPath);
   return project;
