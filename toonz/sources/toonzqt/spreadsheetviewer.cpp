@@ -3,7 +3,7 @@
 #include "toonzqt/spreadsheetviewer.h"
 #include "toonzqt/gutil.h"
 #include "toonz/preferences.h"
-
+#include "toonz/toonzfolders.h"
 #include "toonz/tframehandle.h"
 #include "orientation.h"
 
@@ -19,6 +19,7 @@
 
 #include <QMainWindow>
 #include <QDockWidget>
+#include <QSettings>
 
 namespace Spreadsheet {
 
@@ -447,7 +448,7 @@ void CellPanel::paintEvent(QPaintEvent *e) {
 //=============================================================================
 
 SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
-    : QFrame(parent)
+    : QDialog(parent)
     , m_columnScrollArea(0)
     , m_rowScrollArea(0)
     , m_cellScrollArea(0)
@@ -468,7 +469,7 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
 
   setFocusPolicy(Qt::NoFocus);
 
-  setFrameStyle(QFrame::StyledPanel);
+  // setFrameStyle(QFrame::StyledPanel);
   setObjectName("Viewer");
 
   // column header
@@ -750,7 +751,7 @@ void SpreadsheetViewer::hideEvent(QHideEvent *) {
 }
 
 void SpreadsheetViewer::resizeEvent(QResizeEvent *e) {
-  QFrame::resizeEvent(e);
+  QDialog::resizeEvent(e);
   refreshContentSize(0, 0);
   /*
   int w = width();

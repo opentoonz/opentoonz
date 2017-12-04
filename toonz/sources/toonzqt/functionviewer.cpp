@@ -75,16 +75,29 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
   // Prepare local timeline
   m_localFrame.setFrame(0);
   setFocusPolicy(Qt::NoFocus);
+  m_toggleStart = Preferences::instance()->getFunctionEditorToggle();
+  if (m_toggleStart ==
+      Preferences::FunctionEditorToggle::ShowFunctionSpreadsheetInPopup) {
+    m_functionGraph    = new FunctionPanel(this, false);
+    m_numericalColumns = new FunctionSheet(this, true);
+  } else if (m_toggleStart == Preferences::FunctionEditorToggle::
+                                  ToggleBetweenGraphAndSpreadsheet) {
+    m_functionGraph    = new FunctionPanel(this, false);
+    m_numericalColumns = new FunctionSheet(this, false);
+  } else {
+    // default values are graph is floating
+    // and spreadsheet is not floating
+    m_functionGraph    = new FunctionPanel(this);
+    m_numericalColumns = new FunctionSheet(this);
+  }
+  m_treeView = new FunctionTreeView(this);
 
-  m_treeView         = new FunctionTreeView(this);
-  m_functionGraph    = new FunctionPanel(this);
-  m_numericalColumns = new FunctionSheet();
-  m_toolbar          = new FunctionToolbar;
+  m_toolbar = new FunctionToolbar;
   m_segmentViewer =
       new FunctionSegmentViewer(this, m_numericalColumns, m_functionGraph);
   QWidget *leftPanel  = new QWidget();
   QWidget *rightPanel = new QWidget();
-  m_toggleStart       = Preferences::instance()->getFunctionEditorToggle();
+
   //----
   m_treeView->resize(150, m_treeView->size().height());
   m_treeView->setMinimumWidth(0);
@@ -195,8 +208,10 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
 
   assert(ret);
   if (m_toggleStart ==
-      Preferences::FunctionEditorToggle::ShowGraphEditorInPopup)
+      Preferences::FunctionEditorToggle::ShowGraphEditorInPopup) {
     m_functionGraph->hide();
+    m_leftLayout->setSpacing(m_spacing);
+  }
   if (m_toggleStart ==
       Preferences::FunctionEditorToggle::ShowFunctionSpreadsheetInPopup)
     m_numericalColumns->hide();
@@ -271,14 +286,14 @@ void FunctionViewer::showEvent(QShowEvent *) {
 
   if (m_fxHandle) ftm->setCurrentFx(m_fxHandle->getFx());
   if (m_toggleStart ==
-      Preferences::FunctionEditorToggle::ShowGraphEditorInPopup) {
+      Preferences::FunctionEditorToggle::ToggleBetweenGraphAndSpreadsheet) {
     if (m_toggleStatus == 1) {
       m_numericalColumns->hide();
       m_functionGraph->show();
       m_leftLayout->setSpacing(0);
     } else {
-      m_numericalColumns->show();
       m_functionGraph->hide();
+      m_numericalColumns->show();
       m_leftLayout->setSpacing(m_spacing);
     }
   }
@@ -292,8 +307,14 @@ void FunctionViewer::hideEvent(QHideEvent *) {
   if (m_objectHandle) m_objectHandle->disconnect(this);
   if (m_fxHandle) m_fxHandle->disconnect(this);
   if (m_sceneHandle) m_sceneHandle->disconnect(this);
-
-  if (m_functionGraph->isVisible()) m_functionGraph->hide();
+  if (m_toggleStart ==
+      Preferences::FunctionEditorToggle::ShowGraphEditorInPopup) {
+    if (m_functionGraph->isVisible()) m_functionGraph->hide();
+  }
+  if (m_toggleStart ==
+      Preferences::FunctionEditorToggle::ShowFunctionSpreadsheetInPopup) {
+    if (m_numericalColumns->isVisible()) m_numericalColumns->hide();
+  }
 }
 
 //-----------------------------------------------------------------------------
