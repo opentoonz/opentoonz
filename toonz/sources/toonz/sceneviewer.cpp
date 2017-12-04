@@ -1819,29 +1819,31 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
 */
 double SceneViewer::getDpiFactor() {
   // When the current unit is "pixels", always use a standard dpi
+  double cameraDpi = TApp::instance()
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getCurrentCamera()
+                         ->getDpi()
+                         .x;
   if (Preferences::instance()->getPixelsOnly()) {
     return Stage::inch / Stage::standardDpi;
   }
+
   // When preview mode, use a camera DPI
   else if (isPreviewEnabled()) {
-    return Stage::inch /
-           TApp::instance()
-               ->getCurrentScene()
-               ->getScene()
-               ->getCurrentCamera()
-               ->getDpi()
-               .x;
+    return Stage::inch / cameraDpi;
   }
   // When level editing mode, use an image DPI
   else if (TApp::instance()->getCurrentFrame()->isEditingLevel()) {
     TXshSimpleLevel *sl;
     sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-    if (!sl) return Stage::inch / Stage::standardDpi;
-    if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / Stage::standardDpi;
+    if (!sl) return Stage::inch / cameraDpi;
+    if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / cameraDpi;
     if (sl->getImageDpi() != TPointD())
       return Stage::inch / sl->getImageDpi().x;
     if (sl->getDpi() != TPointD()) return Stage::inch / sl->getDpi().x;
-    return Stage::inch / sl->getDpi().x;
+    // no valid dpi, use camera dpi
+    return Stage::inch / cameraDpi;
   }
   // When the special case in the scene editing mode:
   // If the option "ActualPixelViewOnSceneEditingMode" is ON,
@@ -1852,16 +1854,16 @@ double SceneViewer::getDpiFactor() {
            !CameraTestCheck::instance()->isEnabled()) {
     TXshSimpleLevel *sl;
     sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-    if (!sl) return Stage::inch / Stage::standardDpi;
-    if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / Stage::standardDpi;
-    if (sl->getDpi() == TPointD()) return Stage::inch / Stage::standardDpi;
+    if (!sl) return Stage::inch / cameraDpi;
+    if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / cameraDpi;
+    if (sl->getDpi() == TPointD()) return Stage::inch / cameraDpi;
     // use default value for the argument of getDpi() (=TFrameId::NO_FRAME）
     // so that the dpi of the first frame in the level will be returned.
     return Stage::inch / sl->getDpi().x;
   }
-  // When the scene editing mode without any option, don't think about DPI
+  // When the scene editing mode without any option, use the camera dpi
   else {
-    return Stage::inch / Stage::standardDpi;
+    return Stage::inch / cameraDpi;
   }
 }
 
