@@ -84,6 +84,12 @@ public:
     ProjectFolderOnly
   };
 
+  enum FunctionEditorToggle {
+    ShowGraphEditorInPopup = 0,
+    ShowFunctionSpreadsheetInPopup,
+    ToggleBetweenGraphAndSpreadsheet
+  };
+
 public:
   static Preferences *instance();
 
@@ -234,6 +240,11 @@ public:
   QString getInterfaceFont() { return m_interfaceFont; }
   void setInterfaceFontWeight(int weight);
   int getInterfaceFontWeight() { return m_interfaceFontWeight; }
+
+  void setFunctionEditorToggle(FunctionEditorToggle status);
+  FunctionEditorToggle getFunctionEditorToggle() {
+    return m_functionEditorToggle;
+  }
 
   // Visualization  tab
 
@@ -649,6 +660,9 @@ private:
 
   // defines which alias to be used if both are possible on coding file path
   PathAliasPriority m_pathAliasPriority;
+
+  // defines behavior of toggle switch in function editor
+  FunctionEditorToggle m_functionEditorToggle;
 
   bool m_currentTimelineEnabled;
 

@@ -5,15 +5,18 @@
 
 // TnzCore includes
 #include "tcommon.h"
+#include "saveloadqsettings.h"
 
 // TnzLib includes
 #include "toonz/tframehandle.h"
+#include "toonz/preferences.h"
 
 // TnzQt includes
 #include "toonzqt/treemodel.h"
 
 // Qt includes
 #include <QSplitter>
+#include <QSettings>
 
 #undef DVAPI
 #undef DVVAR
@@ -64,7 +67,7 @@ class ValueField;
 //************************************************************************
 
 // Function editor widget
-class DVAPI FunctionViewer final : public QSplitter {
+class DVAPI FunctionViewer final : public QSplitter, public SaveLoadQSettings {
   Q_OBJECT
 
 public:
@@ -117,6 +120,9 @@ public:
   void clearFocusColumnsAndGraph();
   bool columnsOrGraphHasFocus();
   void setSceneHandle(TSceneHandle *sceneHandle);
+  // SaveLoadQSettings
+  virtual void save(QSettings &settings) const override;
+  virtual void load(QSettings &settings) override;
 
 signals:
 
@@ -156,6 +162,9 @@ private:
   TColumnHandle *m_columnHandle;
   TSceneHandle *m_sceneHandle;
   QVBoxLayout *m_leftLayout;
+  int m_spacing;
+  int m_toggleStatus = 0;
+  Preferences::FunctionEditorToggle m_toggleStart;
   TFrameHandle
       m_localFrame;  //!< Internal timeline - which is attached to m_frameHandle
                      //!  <I>in case</I> it is not zero.

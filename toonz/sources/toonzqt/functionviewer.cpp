@@ -26,11 +26,11 @@
 #include "toonz/tproject.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/sceneproperties.h"
-#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tparamcontainer.h"
 #include "tunit.h"
+#include "tenv.h"
 
 // TnzCore includes
 #include "tstopwatch.h"
@@ -47,6 +47,8 @@
 #include <QAction>
 
 using namespace DVGui;
+
+TEnv::IntVar FunctionEditorToggleStatus("FunctionEditorToggleStatus", 0);
 
 //=============================================================================
 //
@@ -82,7 +84,7 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
       new FunctionSegmentViewer(this, m_numericalColumns, m_functionGraph);
   QWidget *leftPanel  = new QWidget();
   QWidget *rightPanel = new QWidget();
-
+  m_toggleStart       = Preferences::instance()->getFunctionEditorToggle();
   //----
   m_treeView->resize(150, m_treeView->size().height());
   m_treeView->setMinimumWidth(0);
@@ -118,15 +120,21 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
     m_leftLayout->addWidget(m_toolbar);
     if (Preferences::instance()->isShowXSheetToolbarEnabled() &&
         Preferences::instance()->isExpandFunctionHeaderEnabled()) {
-      m_leftLayout->addSpacing(65);
+      m_spacing = 65;
     } else
-      m_leftLayout->addSpacing(35);
+      m_spacing = 35;
 
     QString layout = Preferences::instance()->getLoadedXsheetLayout();
-    if (layout == QString("Compact")) m_leftLayout->addSpacing(-18);
+    if (layout == QString("Compact")) m_spacing -= 18;
 
-    m_leftLayout->addWidget(m_numericalColumns);
+    if (m_toggleStart !=
+        Preferences::FunctionEditorToggle::ShowGraphEditorInPopup)
+      m_leftLayout->addWidget(m_functionGraph);
+    if (m_toggleStart !=
+        Preferences::FunctionEditorToggle::ShowFunctionSpreadsheetInPopup)
+      m_leftLayout->addWidget(m_numericalColumns);
   }
+
   leftPanel->setLayout(m_leftLayout);
 
   addWidget(leftPanel);
@@ -186,8 +194,12 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
                 SLOT(onCurrentChannelChanged(FunctionTreeModel::Channel *)));
 
   assert(ret);
-
-  m_functionGraph->hide();
+  if (m_toggleStart ==
+      Preferences::FunctionEditorToggle::ShowGraphEditorInPopup)
+    m_functionGraph->hide();
+  if (m_toggleStart ==
+      Preferences::FunctionEditorToggle::ShowFunctionSpreadsheetInPopup)
+    m_numericalColumns->hide();
 }
 
 //-----------------------------------------------------------------------------
@@ -258,6 +270,18 @@ void FunctionViewer::showEvent(QShowEvent *) {
   }
 
   if (m_fxHandle) ftm->setCurrentFx(m_fxHandle->getFx());
+  if (m_toggleStart ==
+      Preferences::FunctionEditorToggle::ShowGraphEditorInPopup) {
+    if (m_toggleStatus == 1) {
+      m_numericalColumns->hide();
+      m_functionGraph->show();
+      m_leftLayout->setSpacing(0);
+    } else {
+      m_numericalColumns->show();
+      m_functionGraph->hide();
+      m_leftLayout->setSpacing(m_spacing);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -429,11 +453,34 @@ void FunctionViewer::onFrameSwitched() {
 
 void FunctionViewer::toggleMode() {
   if (isHidden()) return;
-
-  if (m_functionGraph->isVisible())
-    m_functionGraph->hide();
-  else
-    m_functionGraph->show();
+  if (m_toggleStart ==
+      Preferences::FunctionEditorToggle::ShowGraphEditorInPopup) {
+    if (m_functionGraph->isVisible()) {
+      m_functionGraph->hide();
+    } else {
+      m_functionGraph->show();
+    }
+  } else if (m_toggleStart == Preferences::FunctionEditorToggle::
+                                  ShowFunctionSpreadsheetInPopup) {
+    if (m_numericalColumns->isVisible()) {
+      m_numericalColumns->hide();
+    } else {
+      m_numericalColumns->show();
+    }
+  } else if (m_toggleStart == Preferences::FunctionEditorToggle::
+                                  ToggleBetweenGraphAndSpreadsheet) {
+    if (m_functionGraph->isVisible()) {
+      m_functionGraph->hide();
+      m_numericalColumns->show();
+      m_leftLayout->setSpacing(m_spacing);
+      m_toggleStatus = 0;
+    } else {
+      m_functionGraph->show();
+      m_numericalColumns->hide();
+      m_leftLayout->setSpacing(0);
+      m_toggleStatus = 1;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -638,4 +685,19 @@ void FunctionViewer::setSceneHandle(TSceneHandle *sceneHandle) {
 
 bool FunctionViewer::isExpressionPageActive() {
   return m_segmentViewer->isExpressionPageActive();
+}
+
+//----------------------------------------------------------------------------
+
+void FunctionViewer::save(QSettings &settings) const {
+  settings.setValue("toggleStatus", m_toggleStatus);
+}
+
+//----------------------------------------------------------------------------
+
+void FunctionViewer::load(QSettings &settings) {
+  QVariant toggleStatus = settings.value("toggleStatus");
+  if (toggleStatus.canConvert(QVariant::Int)) {
+    m_toggleStatus = toggleStatus.toInt();
+  }
 }
