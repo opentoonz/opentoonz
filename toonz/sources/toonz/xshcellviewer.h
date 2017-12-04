@@ -11,6 +11,7 @@
 class XsheetViewer;
 class QMenu;
 class TXsheetHandle;
+class TXshSoundTextColumn;
 
 namespace XsheetGUI {
 
@@ -41,6 +42,7 @@ protected:
   void hideEvent(QHideEvent *) override;
 
   void renameCell();
+  void renameSoundTextColumn(TXshSoundTextColumn *sndTextCol, const QString &s);
 
 protected slots:
   void onReturnPressed();

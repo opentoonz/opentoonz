@@ -668,6 +668,74 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
 
 //-----------------------------------------------------------------------------
 
+void RenameCellField::renameSoundTextColumn(TXshSoundTextColumn *sndTextCol,
+                                            const QString &s) {
+  TXsheet *xsheet  = m_viewer->getXsheet();
+  QString oldText  = "changeMe";  // text for undo - changed later
+  TXshCell cell    = xsheet->getCell(m_row, m_col);
+  TXshCell oldCell = cell;
+  // the text index is always one less than the frame number
+  int textIndex = cell.getFrameId().getNumber() - 1;
+  if (!cell.m_level) {  // cell not part of a level
+    oldText       = "";
+    int lastFrame = sndTextCol->getMaxFrame();
+    TXshSoundTextLevel *sndTextLevel;
+    TXshCell lastCell;
+    TFrameId newId;
+    if (lastFrame < 0) {  // no level on column
+      sndTextLevel = new TXshSoundTextLevel();
+      sndTextLevel->setType(SND_TXT_XSHLEVEL);
+      newId = TFrameId(1);
+      cell  = TXshCell(sndTextLevel, newId);
+      sndTextCol->setCell(m_row, cell);
+      textIndex = 0;
+    } else {
+      TXshCell lastCell                = xsheet->getCell(lastFrame, m_col);
+      TXshSoundTextLevel *sndTextLevel = lastCell.m_level->getSoundTextLevel();
+      int textSize                     = sndTextLevel->m_framesText.size();
+      textIndex                        = textSize;
+      newId                            = TFrameId(textSize + 1);
+      cell                             = TXshCell(sndTextLevel, newId);
+      sndTextCol->setCell(m_row, cell);
+    }
+  }
+
+  TXshCell prevCell             = xsheet->getCell(m_row - 1, m_col);
+  TXshSoundTextLevel *textLevel = cell.m_level->getSoundTextLevel();
+  if (oldText == "changeMe")
+    oldText = textLevel->getFrameText(cell.getFrameId().getNumber() - 1);
+  if (!prevCell.isEmpty()) {
+    // check if the previous cell had the same content as the entered text
+    // just extend the frame if so
+    if (textLevel->getFrameText(prevCell.getFrameId().getNumber() - 1) == s) {
+      sndTextCol->setCell(m_row, prevCell);
+      RenameTextCellUndo *undo = new RenameTextCellUndo(
+          m_row, m_col, oldCell, prevCell, oldText, s, textLevel);
+      TUndoManager::manager()->add(undo);
+      return;
+    }
+    // check if the cell was part of an extended frame, but now has different
+    // text
+    else if (textLevel->getFrameText(textIndex) ==
+                 textLevel->getFrameText(prevCell.getFrameId().getNumber() -
+                                         1) &&
+             textLevel->getFrameText(textIndex) != s) {
+      int textSize   = textLevel->m_framesText.size();
+      textIndex      = textSize;
+      TFrameId newId = TFrameId(textSize + 1);
+      cell           = TXshCell(textLevel, newId);
+      sndTextCol->setCell(m_row, cell);
+    }
+  }
+  RenameTextCellUndo *undo = new RenameTextCellUndo(m_row, m_col, oldCell, cell,
+                                                    oldText, s, textLevel);
+  TUndoManager::manager()->add(undo);
+  textLevel->setFrameText(textIndex, s);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+}
+
+//-----------------------------------------------------------------------------
+
 void RenameCellField::renameCell() {
   QString s            = text();
   std::wstring newName = s.toStdWString();
@@ -678,73 +746,16 @@ void RenameCellField::renameCell() {
   TFrameId fid;
 
   TXsheet *xsheet = m_viewer->getXsheet();
-  TXshSoundTextColumn *sndTextCol =
-      xsheet->getColumn(m_col)->getSoundTextColumn();
-  if (sndTextCol) {
-    QString oldText  = "changeMe";  // text for undo - changed later
-    TXshCell cell    = xsheet->getCell(m_row, m_col);
-    TXshCell oldCell = cell;
-    // the text index is always one less than the frame number
-    int textIndex = cell.getFrameId().getNumber() - 1;
-    if (!cell.m_level) {  // cell not part of a level
-      oldText       = "";
-      int lastFrame = sndTextCol->getMaxFrame();
-      TXshSoundTextLevel *sndTextLevel;
-      TXshCell lastCell;
-      TFrameId newId;
-      if (lastFrame < 0) {  // no level on column
-        sndTextLevel = new TXshSoundTextLevel();
-        sndTextLevel->setType(SND_TXT_XSHLEVEL);
-        newId = TFrameId(1);
-        cell  = TXshCell(sndTextLevel, newId);
-        sndTextCol->setCell(m_row, cell);
-        textIndex = 0;
-      } else {
-        TXshCell lastCell = xsheet->getCell(lastFrame, m_col);
-        TXshSoundTextLevel *sndTextLevel =
-            lastCell.m_level->getSoundTextLevel();
-        int textSize = sndTextLevel->m_framesText.size();
-        textIndex    = textSize;
-        newId        = TFrameId(textSize + 1);
-        cell         = TXshCell(sndTextLevel, newId);
-        sndTextCol->setCell(m_row, cell);
-      }
-    }
 
-    TXshCell prevCell             = xsheet->getCell(m_row - 1, m_col);
-    TXshSoundTextLevel *textLevel = cell.m_level->getSoundTextLevel();
-    if (oldText == "changeMe")
-      oldText = textLevel->getFrameText(cell.getFrameId().getNumber() - 1);
-    if (!prevCell.isEmpty()) {
-      // check if the previous cell had the same content as the entered text
-      // just extend the frame if so
-      if (textLevel->getFrameText(prevCell.getFrameId().getNumber() - 1) == s) {
-        sndTextCol->setCell(m_row, prevCell);
-        RenameTextCellUndo *undo = new RenameTextCellUndo(
-            m_row, m_col, oldCell, prevCell, oldText, s, textLevel);
-        TUndoManager::manager()->add(undo);
-        return;
-      }
-      // check if the cell was part of an extended frame, but now has different
-      // text
-      else if (textLevel->getFrameText(textIndex) ==
-                   textLevel->getFrameText(prevCell.getFrameId().getNumber() -
-                                           1) &&
-               textLevel->getFrameText(textIndex) != s) {
-        int textSize   = textLevel->m_framesText.size();
-        textIndex      = textSize;
-        TFrameId newId = TFrameId(textSize + 1);
-        cell           = TXshCell(textLevel, newId);
-        sndTextCol->setCell(m_row, cell);
-      }
-    }
-    RenameTextCellUndo *undo = new RenameTextCellUndo(
-        m_row, m_col, oldCell, cell, oldText, s, textLevel);
-    TUndoManager::manager()->add(undo);
-    textLevel->setFrameText(textIndex, s);
-    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  // renaming note level column
+  if (xsheet->getColumn(m_col) &&
+      xsheet->getColumn(m_col)->getSoundTextColumn()) {
+    TXshSoundTextColumn *sndTextCol =
+        xsheet->getColumn(m_col)->getSoundTextColumn();
+    renameSoundTextColumn(sndTextCol, s);
     return;
   }
+
   // convert the last one digit of the frame number to alphabet
   // Ex.  12 -> 1B    21 -> 2A   30 -> 3
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
