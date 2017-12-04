@@ -2230,7 +2230,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Vector Brush</source>
-        <translation>Pincel vectorial</translation>
+        <translation>Patrón vectorial</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -2268,23 +2268,23 @@ Autom</translation>
     </message>
     <message>
         <source>Generated</source>
-        <translation type="unfinished"></translation>
+        <translation>Generado</translation>
     </message>
     <message>
         <source>Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Rastro</translation>
     </message>
     <message>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Color</translation>
     </message>
     <message>
         <source>Vector</source>
-        <translation type="unfinished"></translation>
+        <translation>Vectorial</translation>
     </message>
     <message>
         <source>Raster</source>
-        <translation type="unfinished"></translation>
+        <translation>Imagen</translation>
     </message>
 </context>
 <context>
