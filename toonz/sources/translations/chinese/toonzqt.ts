@@ -2453,11 +2453,19 @@ Apply</source>
     </message>
     <message>
         <source>Infos</source>
-        <translation>信息</translation>
+        <translation type="vanished">信息</translation>
     </message>
     <message>
         <source> Clear </source>
         <translation> 清除 </translation>
+    </message>
+    <message>
+        <source>Display:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

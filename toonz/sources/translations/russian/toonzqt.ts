@@ -1029,28 +1029,28 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FunctionTreeView</name>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1573"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1576"/>
         <source>Save Curve</source>
         <translation>Сохранить кривую</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1574"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1577"/>
         <source>Load Curve</source>
         <translation>Загрузить кривую</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1575"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1578"/>
         <source>Export Data</source>
         <translation>Экспорт данных</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1601"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1604"/>
         <location filename="../../toonzqt/functionsheet.cpp" line="458"/>
         <source>Show Animated Only</source>
         <translation>Показать только анимированные</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1602"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1605"/>
         <location filename="../../toonzqt/functionsheet.cpp" line="459"/>
         <source>Show All</source>
         <translation>Показать все</translation>
@@ -2666,6 +2666,11 @@ Apply</source>
 <context>
     <name>TMessageViewer</name>
     <message>
+        <location filename="../../toonzqt/tmessageviewer.cpp" line="151"/>
+        <source>Display:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../toonzqt/tmessageviewer.cpp" line="153"/>
         <source>Errors</source>
         <translation>Ошибки</translation>
@@ -2677,8 +2682,12 @@ Apply</source>
     </message>
     <message>
         <location filename="../../toonzqt/tmessageviewer.cpp" line="165"/>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Infos</source>
-        <translation>Информация</translation>
+        <translation type="vanished">Информация</translation>
     </message>
     <message>
         <location filename="../../toonzqt/tmessageviewer.cpp" line="173"/>

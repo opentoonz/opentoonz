@@ -2402,11 +2402,19 @@ Apply</source>
     </message>
     <message>
         <source>Infos</source>
-        <translation>情報</translation>
+        <translation type="vanished">情報</translation>
     </message>
     <message>
         <source> Clear </source>
         <translation>クリア</translation>
+    </message>
+    <message>
+        <source>Display:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

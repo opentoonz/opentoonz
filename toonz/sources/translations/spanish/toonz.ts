@@ -4013,7 +4013,7 @@ Usar los números de fotograma como referencia.</translation>
     </message>
     <message>
         <source>Edit Tool</source>
-        <translation>Edición</translation>
+        <translation type="vanished">Edición</translation>
     </message>
     <message>
         <source>Selection Tool</source>
@@ -4946,6 +4946,22 @@ Usar los números de fotograma como referencia.</translation>
     <message>
         <source>Fill Tool - Autopaint Lines</source>
         <translation>Rellenar - Pintar líneas autom.</translation>
+    </message>
+    <message>
+        <source>&amp;Export Soundtrack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Touch Gesture Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Empty Columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animate Tool</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6163,7 +6179,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
     </message>
     <message>
         <source>Style:</source>
-        <translation>Estilo:</translation>
+        <translation type="vanished">Estilo:</translation>
     </message>
     <message>
         <source>Open Flipbook after Rendering</source>
@@ -6427,7 +6443,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
     </message>
     <message>
         <source>Antialiased region boundaries</source>
-        <translation>Límites de región con suavizado de bordes</translation>
+        <translation type="vanished">Límites de región con suavizado de bordes</translation>
     </message>
     <message>
         <source>Level Settings by File Format:</source>
@@ -6471,7 +6487,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
     </message>
     <message>
         <source>Show Raster Images Darken Blended in Camstand View</source>
-        <translation>Mostrar imágenes oscurecidas en vista de mesa de trabajo</translation>
+        <translation type="vanished">Mostrar imágenes oscurecidas en vista de mesa de trabajo</translation>
     </message>
     <message>
         <source>Show &quot;ABC&quot; Appendix to the Frame Number in Xsheet Cell</source>
@@ -6703,19 +6719,19 @@ También establecer la ruta de salida a esa carpeta.</translation>
     </message>
     <message>
         <source>OpenToonz can use FFmpeg for additional file formats.</source>
-        <translation>OpenToonz es capaz de usar FFmpeg para producir formatos de archivo adicionales.</translation>
+        <translation type="vanished">OpenToonz es capaz de usar FFmpeg para producir formatos de archivo adicionales.</translation>
     </message>
     <message>
         <source>FFmpeg is not bundled with OpenToonz</source>
-        <translation>FFmpeg no se incluye con OpenToonz</translation>
+        <translation type="vanished">FFmpeg no se incluye con OpenToonz</translation>
     </message>
     <message>
         <source>NOTE: This is an experimental feature.</source>
-        <translation>NOTA: Esta es una característica experimental.</translation>
+        <translation type="vanished">NOTA: Esta es una característica experimental.</translation>
     </message>
     <message>
         <source>Please SAVE YOUR WORK before exporting in MP4, WEBM, or GIF format.</source>
-        <translation>Por favor GUARDAR EL TRABAJO antes de exportar en formatos MP4, WEBM o GIF.</translation>
+        <translation type="vanished">Por favor GUARDAR EL TRABAJO antes de exportar en formatos MP4, WEBM o GIF.</translation>
     </message>
     <message>
         <source>Please provide the path where FFmpeg is located on your computer.</source>
@@ -6869,7 +6885,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Font Weight *:</source>
-        <translation>Estilo de tipografía *:</translation>
+        <translation type="vanished">Estilo de tipografía *:</translation>
     </message>
     <message>
         <source>Arrow Markers</source>
@@ -6885,7 +6901,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Layout Preference*:</source>
-        <translation>Presentación en pantalla*:</translation>
+        <translation type="vanished">Presentación en pantalla*:</translation>
     </message>
     <message>
         <source>Keep fill when using &quot;Replace Vectors&quot; command</source>
@@ -6901,7 +6917,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Expand Function Editor Header to Match Xsheet Toolbar Height (Requires Restart)</source>
-        <translation>Expandir altura del editor de funciones para coincidir con la de la planilla*</translation>
+        <translation type="vanished">Expandir altura del editor de funciones para coincidir con la de la planilla*</translation>
     </message>
     <message>
         <source>Sync Level Strip Drawing Number Changes with the Xsheet</source>
@@ -6948,6 +6964,48 @@ fueran posibles, al resolver la ruta de un archvo.</translation>
     <message>
         <source>Dropdown Shortcuts:</source>
         <translation>Atajos de menúes desplegables:</translation>
+    </message>
+    <message>
+        <source>Show Raster Images Darken Blended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Antialiased Region Boundaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Down Arrow at End of Level Strip Creates a New Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand Function Editor Header to Match Xsheet Toolbar Height*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weight *:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenToonz can use FFmpeg for additional file formats.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg is not bundled with OpenToonz.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column Header Layout*:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

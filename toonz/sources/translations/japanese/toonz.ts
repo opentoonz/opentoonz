@@ -4005,7 +4005,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Edit Tool</source>
-        <translation>編集ツール</translation>
+        <translation type="vanished">編集ツール</translation>
     </message>
     <message>
         <source>Selection Tool</source>
@@ -4937,6 +4937,22 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Fill Tool - Autopaint Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Export Soundtrack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Touch Gesture Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Empty Columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animate Tool</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6149,7 +6165,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Style:</source>
-        <translation>スタイル：</translation>
+        <translation type="vanished">スタイル：</translation>
     </message>
     <message>
         <source>Open Flipbook after Rendering</source>
@@ -6432,11 +6448,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>太さ0の線を表示</translation>
     </message>
     <message>
-        <source>Antialiased region boundaries</source>
-        <translatorcomment>元訳：アンチエイリアス範囲の境界線</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Next/Previous Step Frames:</source>
         <translation>次の/前のステップのフレーム</translation>
     </message>
@@ -6474,7 +6485,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Show Raster Images Darken Blended in Camstand View</source>
-        <translation>カメラスタンド表示時、ラスター画像を「比較暗」合成して表示する</translation>
+        <translation type="vanished">カメラスタンド表示時、ラスター画像を「比較暗」合成して表示する</translation>
     </message>
     <message>
         <source>Show &quot;ABC&quot; Appendix to the Frame Number in Xsheet Cell</source>
@@ -6706,19 +6717,19 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>OpenToonz can use FFmpeg for additional file formats.</source>
-        <translation>OpenToonzは、FFmpegを用いて入出力可能なファイル形式を追加することができます。</translation>
+        <translation type="vanished">OpenToonzは、FFmpegを用いて入出力可能なファイル形式を追加することができます。</translation>
     </message>
     <message>
         <source>FFmpeg is not bundled with OpenToonz</source>
-        <translation>FFmpegはOpenToonzパッケージには含まれていません</translation>
+        <translation type="vanished">FFmpegはOpenToonzパッケージには含まれていません</translation>
     </message>
     <message>
         <source>NOTE: This is an experimental feature.</source>
-        <translation>注意：本機能は試験的に導入しています。</translation>
+        <translation type="vanished">注意：本機能は試験的に導入しています。</translation>
     </message>
     <message>
         <source>Please SAVE YOUR WORK before exporting in MP4, WEBM, or GIF format.</source>
-        <translation>MP4/WEBM/GIF形式で出力する前に、データのバックアップを保存しておくことをお勧めします。</translation>
+        <translation type="vanished">MP4/WEBM/GIF形式で出力する前に、データのバックアップを保存しておくことをお勧めします。</translation>
     </message>
     <message>
         <source>Please provide the path where FFmpeg is located on your computer.</source>
@@ -6864,7 +6875,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Font Weight *:</source>
-        <translation>文字の太さ *：</translation>
+        <translation type="vanished">文字の太さ *：</translation>
     </message>
     <message>
         <source>Arrow Markers</source>
@@ -6880,7 +6891,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Layout Preference*:</source>
-        <translation>列ヘッダのレイアウト*：</translation>
+        <translation type="vanished">列ヘッダのレイアウト*：</translation>
     </message>
     <message>
         <source>Keep fill when using &quot;Replace Vectors&quot; command</source>
@@ -6893,10 +6904,6 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Tools</source>
         <translation type="unfinished">ツール</translation>
-    </message>
-    <message>
-        <source>Expand Function Editor Header to Match Xsheet Toolbar Height (Requires Restart)</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sync Level Strip Drawing Number Changes with the Xsheet</source>
@@ -6941,6 +6948,48 @@ if both are possible on coding file path.</source>
     </message>
     <message>
         <source>Dropdown Shortcuts:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Raster Images Darken Blended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Antialiased Region Boundaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Down Arrow at End of Level Strip Creates a New Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand Function Editor Header to Match Xsheet Toolbar Height*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weight *:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenToonz can use FFmpeg for additional file formats.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg is not bundled with OpenToonz.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column Header Layout*:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
