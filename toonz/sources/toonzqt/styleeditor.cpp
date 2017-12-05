@@ -3045,7 +3045,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   m_toggleOrientationButton->setFocusPolicy(Qt::NoFocus);
   displayToolbar->addWidget(m_toggleOrientationButton);
   displayToolbar->addWidget(toolButton);
-  displayToolbar->setMaximumWidth(45);
+  displayToolbar->setFixedWidth(45);
   /* ------- layout ------- */
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->setMargin(0);
