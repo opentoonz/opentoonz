@@ -1561,6 +1561,17 @@ void CellArea::drawCurrentTimeIndicator(QPainter &p, const QPoint &xy) {
   p.drawLine(cellMid, cellTop, cellMid, cellBottom);
 }
 
+void CellArea::drawFrameDot(QPainter &p, const QPoint &xy, bool isValid) {
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
+  QRect dotRect =
+      m_viewer->orientation()->rect(PredefinedRect::FRAME_DOT).translated(xy);
+  p.setPen(Qt::black);
+  p.setBrush(isValid ? QColor(230, 100, 100) : m_viewer->getTextColor());
+  dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
+  p.drawEllipse(dotRect);
+  p.setBrush(Qt::NoBrush);
+}
+
 //-----------------------------------------------------------------------------
 
 void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
@@ -1739,14 +1750,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // draw frame number
   else {
     if (m_viewer->getFrameZoomFactor() <= 50) {
-      p.setPen(Qt::black);
-      p.setBrush(isRed ? QColor(230, 100, 100) : m_viewer->getTextColor());
-      QRect dotRect = m_viewer->orientation()
-                          ->rect(PredefinedRect::FRAME_DOT)
-                          .translated(QPoint(x, y));
-      dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
-      p.drawEllipse(dotRect);
-      p.setBrush(Qt::NoBrush);
+      drawFrameDot(p, QPoint(x, y), isRed);
       return;
     }
 
@@ -1915,8 +1919,12 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   QString text =
       cell.getSoundTextLevel()->getFrameText(cell.m_frameId.getNumber() - 1);
 
-#if QT_VERSION >= 0x050500
   QFontMetrics metric(font);
+
+  int charWidth = metric.width(text, 1);
+  if ((charWidth * 2) > nameRect.width()) nameRect.adjust(-2, 0, 4, 0);
+
+#if QT_VERSION >= 0x050500
   QString elidaName = elideText(text, metric, nameRect.width(), "~");
 #else
   QString elidaName   = elideText(text, font, nameRect.width(), "~");
@@ -2600,14 +2608,17 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
   TXsheet *xsh = m_viewer->getXsheet();
 
   // Verifico se e' una colonna sound
-  TXshColumn *column  = xsh->getColumn(col);
-  bool isSoundColumn  = false;
-  bool isZeraryColumn = false;
+  TXshColumn *column     = xsh->getColumn(col);
+  bool isSoundColumn     = false;
+  bool isZeraryColumn    = false;
+  bool isSoundTextColumn = false;
   if (column) {
-    TXshSoundColumn *soundColumn     = column->getSoundColumn();
-    isSoundColumn                    = (!soundColumn) ? false : true;
-    TXshZeraryFxColumn *zeraryColumn = column->getZeraryFxColumn();
-    isZeraryColumn                   = (!zeraryColumn) ? false : true;
+    TXshSoundColumn *soundColumn         = column->getSoundColumn();
+    isSoundColumn                        = (!soundColumn) ? false : true;
+    TXshZeraryFxColumn *zeraryColumn     = column->getZeraryFxColumn();
+    isZeraryColumn                       = (!zeraryColumn) ? false : true;
+    TXshSoundTextColumn *soundTextColumn = column->getSoundTextColumn();
+    isSoundTextColumn                    = (!soundTextColumn) ? false : true;
   }
 
   TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
@@ -2660,7 +2671,10 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
 
     // convert the last one digit of the frame number to alphabet
     // Ex.  12 -> 1B    21 -> 2A   30 -> 3
-    if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
+    if (isSoundTextColumn)
+      m_tooltip = cell.getSoundTextLevel()->getFrameText(
+          cell.m_frameId.getNumber() - 1);
+    else if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
       m_tooltip =
           (fid.isEmptyFrame() || fid.isNoFrame())
               ? QString::fromStdWString(levelName)
