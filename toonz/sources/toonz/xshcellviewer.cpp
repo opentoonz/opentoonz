@@ -2778,7 +2778,7 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   if ((Preferences::instance()->isAnimationSheetEnabled() &&
        m_viewer->getXsheet()->getCell(row, col).isEmpty()))
     return;
-
+  if (m_viewer->getXsheet()->isColumnEmpty(col)) return;
   int colCount = m_viewer->getCellSelection()->getSelectedCells().getColCount();
 
   m_renameCell->showInRowCol(row, col, colCount > 1);
