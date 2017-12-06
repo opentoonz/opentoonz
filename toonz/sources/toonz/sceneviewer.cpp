@@ -444,10 +444,7 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
     , m_mouseButton(Qt::NoButton)
     , m_foregroundDrawing(false)
     , m_tabletEvent(false)
-    , m_tabletActive(false)
     , m_tabletMove(false)
-    , m_tabletPressed(false)
-    , m_tabletReleased(false)
     , m_buttonClicked(false)
     , m_referenceMode(NORMAL_REFERENCE)
     , m_previewMode(NO_PREVIEW)
@@ -491,8 +488,10 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   setFocusPolicy(Qt::StrongFocus);
   setAcceptDrops(true);
   this->setMouseTracking(true);
-  // to be introduced from Qt 5.9
-  // this->setTabletTracking(true);
+// introduced from Qt 5.9
+#if QT_VERSION >= 0x050900
+  this->setTabletTracking(true);
+#endif
 
   for (int i = 0; i < tArrayCount(m_viewAff); i++)
     setViewMatrix(getNormalZoomScale(), i);

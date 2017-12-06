@@ -484,8 +484,7 @@ void EraserTool::startErase(
   m_indexes.resize(size);
   for (UINT i = 0; i < size; i++) m_indexes[i] = i;
 
-  assert(m_undo == 0);
-  delete m_undo;
+  if (m_undo) delete m_undo;
   TXshSimpleLevel *level =
       TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
   m_undo        = new UndoEraser(level, getCurrentFid());
