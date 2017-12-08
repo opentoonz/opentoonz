@@ -2407,11 +2407,11 @@ Autom</translation>
     </message>
     <message>
         <source>Display:  </source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar:  </translation>
     </message>
     <message>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Información</translation>
     </message>
 </context>
 <context>

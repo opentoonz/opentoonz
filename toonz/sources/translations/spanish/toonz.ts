@@ -4017,7 +4017,7 @@ Usar los números de fotograma como referencia.</translation>
     </message>
     <message>
         <source>Selection Tool</source>
-        <translation>Selección</translation>
+        <translation>Seleccionar</translation>
     </message>
     <message>
         <source>Brush Tool</source>
@@ -4949,19 +4949,19 @@ Usar los números de fotograma como referencia.</translation>
     </message>
     <message>
         <source>&amp;Export Soundtrack</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Exportar pista de sonido</translation>
     </message>
     <message>
         <source>&amp;Touch Gesture Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Control mediante gestos &amp;táctiles</translation>
     </message>
     <message>
         <source>Remove Empty Columns</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar columnas vacías</translation>
     </message>
     <message>
         <source>Animate Tool</source>
-        <translation type="unfinished"></translation>
+        <translation>Animar</translation>
     </message>
 </context>
 <context>
@@ -6523,7 +6523,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
     </message>
     <message>
         <source>X</source>
-        <translation>X</translation>
+        <translation>x</translation>
     </message>
     <message>
         <source>Viewer  Shrink</source>
@@ -6967,45 +6967,47 @@ fueran posibles, al resolver la ruta de un archvo.</translation>
     </message>
     <message>
         <source>Show Raster Images Darken Blended</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar imágenes oscurecidas</translation>
     </message>
     <message>
         <source>Antialiased Region Boundaries</source>
-        <translation type="unfinished"></translation>
+        <translation>Límites de región con suavizado de bordes</translation>
     </message>
     <message>
         <source>Down Arrow at End of Level Strip Creates a New Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Flecha abajo al final de cinta de nivel para crear nuevo fotograma</translation>
     </message>
     <message>
         <source>Expand Function Editor Header to Match Xsheet Toolbar Height*</source>
-        <translation type="unfinished"></translation>
+        <translation>Expandir altura del editor de funciones para coincidir con la de la planilla*</translation>
     </message>
     <message>
         <source>Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>Colores</translation>
     </message>
     <message>
         <source>Theme:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema:</translation>
     </message>
     <message>
         <source>Weight *:</source>
-        <translation type="unfinished"></translation>
+        <translation>Grosor *:</translation>
     </message>
     <message>
         <source>OpenToonz can use FFmpeg for additional file formats.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>OpenToonz puede usar FFmpeg para acceder a formatos de archivo adicionales.
+</translation>
     </message>
     <message>
         <source>FFmpeg is not bundled with OpenToonz.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>FFmpeg no viene incluido con OpenToonz.
+</translation>
     </message>
     <message>
         <source>Column Header Layout*:</source>
-        <translation type="unfinished"></translation>
+        <translation>Disposición de encabezado de columnas*:</translation>
     </message>
 </context>
 <context>
@@ -11492,19 +11494,19 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     <name>XsheetGUI::NoteArea</name>
     <message>
         <source>Frame</source>
-        <translation>fot</translation>
+        <translation>fotogr</translation>
     </message>
     <message>
         <source>Sec Frame</source>
-        <translation>seg / fot</translation>
+        <translation>seg-fotogr</translation>
     </message>
     <message>
         <source>6sec Sheet</source>
-        <translation>hoja 6&quot;</translation>
+        <translation>pág de 6&quot;</translation>
     </message>
     <message>
         <source>3sec Sheet</source>
-        <translation>hoja 3&quot;</translation>
+        <translation>pág de 3&quot;</translation>
     </message>
 </context>
 <context>
