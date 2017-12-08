@@ -639,18 +639,16 @@ public:
         }
         if (found) {
           r++;
-          TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-          TApp::instance()->getCurrentScene()->setDirtyFlag(true);
           continue;
         }
         changeDrawing(-m_direction, row, col);
-        TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-		TApp::instance()->getCurrentScene()->setDirtyFlag(true);
         r++;
       }
       r = m_range.m_r0;
       c++;
     }
+	TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+	TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
   void redo() const override {
