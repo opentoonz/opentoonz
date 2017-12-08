@@ -77,11 +77,11 @@
     </message>
     <message>
         <source>Position:</source>
-        <translation type="unfinished"></translation>
+        <translation>位置:</translation>
     </message>
     <message>
         <source>Rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>旋转:</translation>
     </message>
 </context>
 <context>
@@ -378,7 +378,7 @@
     </message>
     <message>
         <source>Autopaint Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>自动填充线</translation>
     </message>
 </context>
 <context>
@@ -428,11 +428,11 @@
     </message>
     <message>
         <source>Eraser</source>
-        <translation type="unfinished"></translation>
+        <translation>橡皮差</translation>
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished"></translation>
+        <translation>锁定透明度</translation>
     </message>
 </context>
 <context>
@@ -858,7 +858,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Modify Fx Gadget  </source>
-        <translation>修改特效小工具</translation>
+        <translation>修改特效小工具  </translation>
     </message>
     <message>
         <source>%1   Level : %2  Frame : %3</source>

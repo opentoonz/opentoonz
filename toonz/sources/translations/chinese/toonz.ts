@@ -183,7 +183,7 @@ pick up all frames in the selected level.</source>
     </message>
     <message>
         <source>with</source>
-        <translation type="unfinished">加入</translation>
+        <translation>加入</translation>
     </message>
     <message>
         <source>frames increment</source>
@@ -1065,63 +1065,63 @@ What do you want to do?</source>
     </message>
     <message>
         <source> (Flipped)</source>
-        <translation type="unfinished"></translation>
+        <translation> (已翻转)</translation>
     </message>
 </context>
 <context>
     <name>CommandBar</name>
     <message>
         <source>Customize Command Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>定制命令条</translation>
     </message>
 </context>
 <context>
     <name>CommandBarListTree</name>
     <message>
         <source>----Separator----</source>
-        <translation type="unfinished">----分隔条----</translation>
+        <translation>----分隔条----</translation>
     </message>
 </context>
 <context>
     <name>CommandBarPopup</name>
     <message>
         <source>XSheet Toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>摄影表工具条</translation>
     </message>
     <message>
         <source>Customize XSheet Toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>定制摄影表工具条</translation>
     </message>
     <message>
         <source>Command Bar</source>
-        <translation type="unfinished">命令条</translation>
+        <translation>命令条</translation>
     </message>
     <message>
         <source>Customize Command Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>定制命令条</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">确定</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <source>Toolbar Items</source>
-        <translation type="unfinished"></translation>
+        <translation>工具条项目</translation>
     </message>
     <message>
         <source>Duplicated commands will be ignored. Only the last one will appear in the menu bar.</source>
-        <translation type="unfinished"></translation>
+        <translation>重复的命令将被忽略。只有最后的一个会出现在菜单条上。</translation>
     </message>
 </context>
 <context>
     <name>CommandBarTree</name>
     <message>
         <source>Remove &quot;%1&quot;</source>
-        <translation type="unfinished">删除“%1”</translation>
+        <translation>删除“%1”</translation>
     </message>
 </context>
 <context>
@@ -2762,93 +2762,95 @@ Do you want to create it?</source>
     <name>LipSyncPopup</name>
     <message>
         <source>Apply Lip Sync Data</source>
-        <translation type="unfinished"></translation>
+        <translation>应用口型同步数据</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">应用</translation>
+        <translation>应用</translation>
     </message>
     <message>
         <source>A I Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>A I 图</translation>
     </message>
     <message>
         <source>O Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>O 图</translation>
     </message>
     <message>
         <source>E Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>E 图</translation>
     </message>
     <message>
         <source>U Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>U 图</translation>
     </message>
     <message>
         <source>L Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>L 图</translation>
     </message>
     <message>
         <source>W Q Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>W Q 图</translation>
     </message>
     <message>
         <source>M B P Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>M B P 图</translation>
     </message>
     <message>
         <source>F V Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>F V 图</translation>
     </message>
     <message>
         <source>Rest Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>其余图</translation>
     </message>
     <message>
         <source>C D G K N R S Th Y Z</source>
-        <translation type="unfinished"></translation>
+        <translation>C D G K N R S Th Y Z</translation>
     </message>
     <message>
         <source>Extend Rest Drawing to End Marker</source>
-        <translation type="unfinished"></translation>
+        <translation>扩展其余图直至结束标记</translation>
     </message>
     <message>
         <source>Previous Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>前一张图</translation>
     </message>
     <message>
         <source>Next Drawing</source>
-        <translation type="unfinished">下一张图</translation>
+        <translation>下一张图</translation>
     </message>
     <message>
         <source>Insert at Frame: </source>
-        <translation type="unfinished"></translation>
+        <translation>在帧中插入: </translation>
     </message>
     <message>
         <source>Lip Sync Data File: </source>
-        <translation type="unfinished"></translation>
+        <translation>口型同步数据文件: </translation>
     </message>
     <message>
         <source>Thumbnails are not available for sub-Xsheets.
 Please use the frame numbers for reference.</source>
-        <translation type="unfinished"></translation>
+        <translation>无省略图可用于子摄影表。
+请用帧编号作为参考。</translation>
     </message>
     <message>
         <source>Unable to apply lip sync data to this column type</source>
-        <translation type="unfinished"></translation>
+        <translation>不能应用口型同步数据到该列类型</translation>
     </message>
     <message>
         <source>SubXSheet Frame </source>
-        <translation type="unfinished"></translation>
+        <translation>子摄影表 帧 </translation>
     </message>
     <message>
         <source>Unable to open the file: 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>不能打开文件: 
+</translation>
     </message>
     <message>
         <source>Invalid data file.</source>
-        <translation type="unfinished"></translation>
+        <translation>无效的数据文件。</translation>
     </message>
 </context>
 <context>
@@ -4946,63 +4948,63 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Reload</source>
-        <translation type="unfinished"></translation>
+        <translation>重新加载(&amp;R)</translation>
     </message>
     <message>
         <source>&amp;Toggle Edit In Place</source>
-        <translation type="unfinished"></translation>
+        <translation>开关原位编辑</translation>
     </message>
     <message>
         <source>New Note Level</source>
-        <translation type="unfinished"></translation>
+        <translation>新建备注层级</translation>
     </message>
     <message>
         <source>&amp;Apply Lip Sync Data to Column</source>
-        <translation type="unfinished"></translation>
+        <translation>应用口型同步数据到列(&amp;A)</translation>
     </message>
     <message>
         <source>&amp;Paste Numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴编号(&amp;P)</translation>
     </message>
     <message>
         <source>Toggle Current Time Indicator</source>
-        <translation type="unfinished"></translation>
+        <translation>开关当前时间指示器</translation>
     </message>
     <message>
         <source>Vectors to Toonz Raster</source>
-        <translation type="unfinished"></translation>
+        <translation>矢量到 Toonz 光栅</translation>
     </message>
     <message>
         <source>Replace Vectors with Simplified Vectors</source>
-        <translation type="unfinished"></translation>
+        <translation>用简化矢量替换矢量</translation>
     </message>
     <message>
         <source>Flip Viewer Horiontally</source>
-        <translation type="unfinished"></translation>
+        <translation>水平翻转查看器</translation>
     </message>
     <message>
         <source>Flip Viewer Vertically</source>
-        <translation type="unfinished"></translation>
+        <translation>垂直翻转查看器</translation>
     </message>
     <message>
         <source>Fill Tool - Autopaint Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>填充工具 - 自动填充线</translation>
     </message>
     <message>
         <source>&amp;Export Soundtrack</source>
-        <translation type="unfinished"></translation>
+        <translation>导出音轨(&amp;E)</translation>
     </message>
     <message>
         <source>&amp;Touch Gesture Control</source>
-        <translation type="unfinished"></translation>
+        <translation>触控手势控制(&amp;T)</translation>
     </message>
     <message>
         <source>Remove Empty Columns</source>
-        <translation type="unfinished"></translation>
+        <translation>删除空列</translation>
     </message>
     <message>
         <source>Animate Tool</source>
-        <translation type="unfinished"></translation>
+        <translation>动画工具</translation>
     </message>
 </context>
 <context>
@@ -5885,7 +5887,7 @@ Frames %1 exist.</source>
     </message>
     <message>
         <source>OVERWRITE 1 of</source>
-        <translation type="unfinished">覆盖 1</translation>
+        <translation>覆盖 1</translation>
     </message>
     <message>
         <source>ADD to</source>
@@ -6071,16 +6073,17 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Create the Destination Subfolder to Save</source>
-        <translation type="unfinished"></translation>
+        <translation>创建保存目的地子文件夹</translation>
     </message>
     <message>
         <source>Save Scene in Subfolder</source>
-        <translation type="unfinished"></translation>
+        <translation>保存场景到子文件夹</translation>
     </message>
     <message>
         <source>Save the current scene in the subfolder.
 Set the output folder path to the subfolder as well.</source>
-        <translation type="unfinished"></translation>
+        <translation>保存当前场景在子文件夹中。
+同时设定输出文件夹路径到子文件夹。</translation>
     </message>
 </context>
 <context>
@@ -6915,11 +6918,11 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Life is too short for Comic Sans</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Good luck.  You&apos;re on your own from here.</source>
-        <translation type="unfinished"></translation>
+        <translation>祝好运。你正从这里开启你的精彩。</translation>
     </message>
     <message>
         <source>Arrow Markers</source>
@@ -6935,102 +6938,104 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Keep fill when using &quot;Replace Vectors&quot; command</source>
-        <translation type="unfinished"></translation>
+        <translation>使用“替换矢量”命令时保留填充</translation>
     </message>
     <message>
         <source>Use higher DPI for calculations - Slower but more accurate</source>
-        <translation type="unfinished"></translation>
+        <translation>使用更高的 DPI 值进行计算 - 更慢但更精确</translation>
     </message>
     <message>
         <source>Tools</source>
-        <translation type="unfinished">工具</translation>
+        <translation>工具</translation>
     </message>
     <message>
         <source>Sync Level Strip Drawing Number Changes with the Xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>与摄影表同步层级条绘图编号的变动</translation>
     </message>
     <message>
         <source>Show Current Time Indicator (Timeline Mode only)</source>
-        <translation type="unfinished"></translation>
+        <translation>显示当前时间指示器(仅时间轴模式)</translation>
     </message>
     <message>
         <source>Project Folder Aliases (+drawings, +scenes, etc.)</source>
-        <translation type="unfinished"></translation>
+        <translation>项目文件夹别名(+drawings， + scenes，等)</translation>
     </message>
     <message>
         <source>Scene Folder Alias ($scenefolder)</source>
-        <translation type="unfinished"></translation>
+        <translation>场景文件夹别名($scenefolder)</translation>
     </message>
     <message>
         <source>Use Project Folder Aliases Only</source>
-        <translation type="unfinished"></translation>
+        <translation>仅使用方案文件夹别名</translation>
     </message>
     <message>
         <source>This option defines which alias to be used
 if both are possible on coding file path.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果两个别名皆可以编码文件路径，本选项定义要采用哪一个</translation>
     </message>
     <message>
         <source>Open the dropdown to display all options</source>
-        <translation type="unfinished"></translation>
+        <translation>打开下拉菜单显示全部选择</translation>
     </message>
     <message>
         <source>Cycle through the available options</source>
-        <translation type="unfinished"></translation>
+        <translation>重复可用的选项</translation>
     </message>
     <message>
         <source>Path Alias Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>路径别名优先级:</translation>
     </message>
     <message>
         <source>Replace Vectors with Simplified Vectors Command</source>
-        <translation type="unfinished"></translation>
+        <translation>用简化矢量替换矢量的命令</translation>
     </message>
     <message>
         <source>Dropdown Shortcuts:</source>
-        <translation type="unfinished"></translation>
+        <translation>下拉菜单的快捷键:</translation>
     </message>
     <message>
         <source>Show Raster Images Darken Blended</source>
-        <translation type="unfinished"></translation>
+        <translation>显示光栅图像“变暗”混合</translation>
     </message>
     <message>
         <source>Antialiased Region Boundaries</source>
-        <translation type="unfinished"></translation>
+        <translation>抗锯齿范围边界线</translation>
     </message>
     <message>
         <source>Down Arrow at End of Level Strip Creates a New Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>在层级条末端时，按“向下方向键”创建一个新帧</translation>
     </message>
     <message>
         <source>Expand Function Editor Header to Match Xsheet Toolbar Height*</source>
-        <translation type="unfinished"></translation>
+        <translation>展开功能编辑器头以适配摄影表工具条的高度*</translation>
     </message>
     <message>
         <source>Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>色彩</translation>
     </message>
     <message>
         <source>Theme:</source>
-        <translation type="unfinished"></translation>
+        <translation>主题:</translation>
     </message>
     <message>
         <source>Weight *:</source>
-        <translation type="unfinished"></translation>
+        <translation>粗细 *:</translation>
     </message>
     <message>
         <source>OpenToonz can use FFmpeg for additional file formats.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>OpenToonz可以使用 FFmpeg 处理额外的文件格式。
+</translation>
     </message>
     <message>
         <source>FFmpeg is not bundled with OpenToonz.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>FFmpeg 并没有和 OpenToonz 一起打包。
+</translation>
     </message>
     <message>
         <source>Column Header Layout*:</source>
-        <translation type="unfinished"></translation>
+        <translation>列头的布局*:</translation>
     </message>
 </context>
 <context>
@@ -8785,79 +8790,83 @@ Are you sure?</source>
     </message>
     <message>
         <source>New Note Level</source>
-        <translation type="unfinished"></translation>
+        <translation>新建备注层级</translation>
     </message>
     <message>
         <source>The following level(s) use path with $scenefolder alias.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>如下层级使用了$scenefolder 别名的路径。
+
+</translation>
     </message>
     <message>
         <source>
 They will not be opened properly when you load the scene next time.
 What do you want to do?</source>
-        <translation type="unfinished"></translation>
+        <translation>
+它们下一次将不能正确打开。
+你要如何处理？</translation>
     </message>
     <message>
         <source>Copy the levels to correspondent paths</source>
-        <translation type="unfinished"></translation>
+        <translation>拷贝层级到对应的路径</translation>
     </message>
     <message>
         <source>Decode all $scenefolder aliases</source>
-        <translation type="unfinished"></translation>
+        <translation>解码全部$scenefolder 别名</translation>
     </message>
     <message>
         <source>Save the scene only</source>
-        <translation type="unfinished"></translation>
+        <translation>仅保存层级</translation>
     </message>
     <message>
         <source>Overwrite for All</source>
-        <translation type="unfinished"></translation>
+        <translation>覆盖全部</translation>
     </message>
     <message>
         <source>Don&apos;t Overwrite for All</source>
-        <translation type="unfinished"></translation>
+        <translation>全部不覆盖</translation>
     </message>
     <message>
         <source>Failed to overwrite %1</source>
-        <translation type="unfinished"></translation>
+        <translation>覆盖 %1 失败</translation>
     </message>
     <message>
         <source>Apply Lip Sync Data</source>
-        <translation type="unfinished"></translation>
+        <translation>应用口型同步数据</translation>
     </message>
     <message>
         <source>Paste Numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴编号</translation>
     </message>
     <message>
         <source>It is not possible to paste the cells: Some column is locked or column type is not match.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法粘贴帧格: 某些列被锁定或者列的类型不匹配。</translation>
     </message>
     <message>
         <source>This command only works on vector cells.</source>
-        <translation type="unfinished"></translation>
+        <translation>该命令只对矢量帧格有效。</translation>
     </message>
     <message>
         <source>Please select only one column for this command.</source>
-        <translation type="unfinished"></translation>
+        <translation>请只选一列情况下来用该命令。</translation>
     </message>
     <message>
         <source>All selected cells must belong to the same level.</source>
-        <translation type="unfinished"></translation>
+        <translation>所有选中的帧格必须属于同一层级。</translation>
     </message>
     <message>
         <source>Simplify Vectors : Level %1</source>
-        <translation type="unfinished"></translation>
+        <translation>简化矢量 : 层级 %1</translation>
     </message>
     <message>
         <source>Change Text at Column %1  Frame %2</source>
-        <translation type="unfinished"></translation>
+        <translation>在列 %1 帧 %2 更改文字</translation>
     </message>
     <message>
         <source>Cannot Read XML File</source>
-        <translation type="unfinished"></translation>
+        <translation>不能读取 XML 文件</translation>
     </message>
 </context>
 <context>
@@ -10237,7 +10246,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source> (Flipped)</source>
-        <translation type="unfinished"></translation>
+        <translation> (已翻转)</translation>
     </message>
 </context>
 <context>
@@ -10702,11 +10711,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Automatically Save Every </source>
-        <translation type="unfinished"></translation>
+        <translation>自动保存间隔</translation>
     </message>
     <message>
         <source>Minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>分钟</translation>
     </message>
 </context>
 <context>
@@ -11443,23 +11452,23 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Edit Cell Numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑帧格编号</translation>
     </message>
     <message>
         <source>Replace Level</source>
-        <translation type="unfinished">替换层级</translation>
+        <translation>替换层级</translation>
     </message>
     <message>
         <source>Replace with</source>
-        <translation type="unfinished"></translation>
+        <translation>替换源</translation>
     </message>
     <message>
         <source>Paste Special</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴特定内容</translation>
     </message>
     <message>
         <source>Edit Image</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑图像</translation>
     </message>
 </context>
 <context>
@@ -11546,19 +11555,19 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Click to select column</source>
-        <translation type="unfinished"></translation>
+        <translation>点击选择列</translation>
     </message>
     <message>
         <source>Click to select column, drag to move it, double-click to edit</source>
-        <translation type="unfinished"></translation>
+        <translation>点击选择列，拖曳移动，双击编辑</translation>
     </message>
     <message>
         <source>Click to select column, double-click to edit</source>
-        <translation type="unfinished"></translation>
+        <translation>点击选择列，双击编辑</translation>
     </message>
     <message>
         <source>Additional column settings</source>
-        <translation type="unfinished"></translation>
+        <translation>附加列设定</translation>
     </message>
 </context>
 <context>
@@ -11712,7 +11721,7 @@ Please refer to the user guide for details.</source>
     <name>XsheetGUI::XSheetToolbar</name>
     <message>
         <source>Customize XSheet Toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>定制摄影表工具条</translation>
     </message>
 </context>
 <context>
@@ -11759,7 +11768,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Zoom in/out of timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>放大/缩小时间轴</translation>
     </message>
 </context>
 </TS>
