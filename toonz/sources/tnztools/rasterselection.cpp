@@ -1242,6 +1242,4 @@ TRectD RasterSelection::getSelectionBbox() const {
 
 void RasterSelection::setSelectionBbox(const TRectD &rect) {
   m_selectionBbox = rect;
-  if (m_currentImage)
-    m_selectionBbox = intersection(m_selectionBbox, m_currentImage);
 }

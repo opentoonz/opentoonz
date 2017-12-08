@@ -77,11 +77,11 @@
     </message>
     <message>
         <source>Position:</source>
-        <translation type="unfinished"></translation>
+        <translation>Posición:</translation>
     </message>
     <message>
         <source>Rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotación:</translation>
     </message>
 </context>
 <context>
@@ -350,7 +350,7 @@
     </message>
     <message>
         <source>Autopaint Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Pintar autom. líneas</translation>
     </message>
 </context>
 <context>
@@ -400,11 +400,11 @@
     </message>
     <message>
         <source>Eraser</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrador</translation>
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished"></translation>
+        <translation>Respetar alfa</translation>
     </message>
 </context>
 <context>
