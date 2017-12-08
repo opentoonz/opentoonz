@@ -22,7 +22,12 @@
 class DVAPI TXshMeshColumn final : public TXshCellColumn {
   PERSIST_DECLARATION(TXshMeshColumn)
 
+  bool m_iconVisible;
+
 public:
+  bool isIconVisible() { return m_iconVisible; }
+  void setIconVisible(bool visible) { m_iconVisible = visible; }
+
   TXshMeshColumn();
 
   TXshColumn::ColumnType getColumnType() const override { return eMeshType; }

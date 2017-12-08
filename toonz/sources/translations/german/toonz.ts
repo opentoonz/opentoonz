@@ -4137,7 +4137,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Edit Tool</source>
-        <translation>Bearbeitungstool</translation>
+        <translation type="vanished">Bearbeitungstool</translation>
     </message>
     <message>
         <source>Selection Tool</source>
@@ -5085,6 +5085,22 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Fill Tool - Autopaint Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Export Soundtrack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Touch Gesture Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Empty Columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animate Tool</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6259,7 +6275,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Style:</source>
-        <translation>Stil:</translation>
+        <translation type="vanished">Stil:</translation>
     </message>
     <message>
         <source>Open FlipboOk after Rendering</source>
@@ -6542,11 +6558,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Linien mit Dicke 0 anzeigen</translation>
     </message>
     <message>
-        <source>Antialiased region boundaries</source>
-        <translatorcomment>Kantenglättung an Bereichsrändern</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Next/Previous Step Frames:</source>
         <translation>Nächster/Vorheriger Schritt-Frame</translation>
     </message>
@@ -6584,7 +6595,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Show Raster Images Darken Blended in Camstand View</source>
-        <translation>In der Kamera-Stand-Ansicht die Raster-Bilder (dunkel gemischt) anzeigen</translation>
+        <translation type="vanished">In der Kamera-Stand-Ansicht die Raster-Bilder (dunkel gemischt) anzeigen</translation>
     </message>
     <message>
         <source>Show &quot;ABC&quot;  to the Frame Number in Xsheet Cell</source>
@@ -6827,22 +6838,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OpenToonz can use FFmpeg for additional file formats.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FFmpeg is not bundled with OpenToonz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>NOTE: This is an experimental feature.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please SAVE YOUR WORK before exporting in MP4, WEBM, or GIF format.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please provide the path where FFmpeg is located on your computer.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6932,10 +6927,6 @@ Is it OK to release these shortcuts?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Expand Function Editor Header to Match Xsheet Toolbar Height (Requires Restart)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show Column Numbers in Column Headers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7013,10 +7004,6 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Font Weight *:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Default File Import Behavior:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7053,11 +7040,49 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Layout Preference*:</source>
+        <source>Vector Guided Style:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Vector Guided Style:</source>
+        <source>Show Raster Images Darken Blended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Antialiased Region Boundaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Down Arrow at End of Level Strip Creates a New Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand Function Editor Header to Match Xsheet Toolbar Height*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weight *:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenToonz can use FFmpeg for additional file formats.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg is not bundled with OpenToonz.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column Header Layout*:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -51,7 +51,7 @@ TFrameId qstringToFrameId(QString str) {
 //    TXshMeshColumn  implementation
 //*******************************************************************************
 
-TXshMeshColumn::TXshMeshColumn() : TXshCellColumn() {}
+TXshMeshColumn::TXshMeshColumn() : TXshCellColumn(), m_iconVisible(false) {}
 
 //------------------------------------------------------------------
 

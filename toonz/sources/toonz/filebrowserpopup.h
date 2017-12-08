@@ -398,9 +398,10 @@ class ReplaceParentDirectoryPopup final : public FileBrowserPopup {
 
 public:
   ReplaceParentDirectoryPopup();
-  void show();
   bool execute() override;
   void initFolder() override;
+  void setRange(TCellSelection::Range &range, std::set<int> &columnRange,
+                bool &replaceCells);
 };
 
 //-----------------------------------------------------------------------------

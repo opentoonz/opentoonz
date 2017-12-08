@@ -2271,23 +2271,23 @@ Apply</source>
     </message>
     <message>
         <source>Generated</source>
-        <translation type="unfinished"></translation>
+        <translation>自動生成</translation>
     </message>
     <message>
         <source>Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>スタンプ</translation>
     </message>
     <message>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>色</translation>
     </message>
     <message>
         <source>Vector</source>
-        <translation type="unfinished"></translation>
+        <translation>ベクター</translation>
     </message>
     <message>
         <source>Raster</source>
-        <translation type="unfinished"></translation>
+        <translation>ラスター</translation>
     </message>
 </context>
 <context>
@@ -2348,7 +2348,7 @@ Apply</source>
     <name>StyleEditorGUI::SettingsPage</name>
     <message>
         <source>Autopaint for Lines</source>
-        <translation>色トレース線として、自動塗りつぶし</translation>
+        <translation>色トレース線として、含め塗りを行う</translation>
     </message>
     <message>
         <source>Reset to default</source>
@@ -2402,11 +2402,19 @@ Apply</source>
     </message>
     <message>
         <source>Infos</source>
-        <translation>情報</translation>
+        <translation type="vanished">情報</translation>
     </message>
     <message>
         <source> Clear </source>
         <translation>クリア</translation>
+    </message>
+    <message>
+        <source>Display:  </source>
+        <translation>表示：</translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation>情報</translation>
     </message>
 </context>
 <context>
