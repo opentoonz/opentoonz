@@ -1215,6 +1215,7 @@ void PegbarChannelField::onChange(TMeasuredValue *fld, bool addToUndo) {
   // and only for the first drag
   // This should always fire if addToUndo is true
   if (!m_firstMouseDrag) {
+    m_before = TStageObjectValues();
     m_before.setFrameHandle(m_frameHandle);
     m_before.setObjectHandle(m_objHandle);
     m_before.setXsheetHandle(m_xshHandle);

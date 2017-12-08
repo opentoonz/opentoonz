@@ -406,7 +406,7 @@
     </message>
     <message>
         <source>Toggle Autopaint Option  Palette : %1  Style#%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Pintado automático  Paleta : %1  Estilo#%2</translation>
     </message>
 </context>
 <context>

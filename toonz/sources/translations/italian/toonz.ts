@@ -4006,7 +4006,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Edit Tool</source>
-        <translation>Strumento Animazione</translation>
+        <translation type="vanished">Strumento Animazione</translation>
     </message>
     <message>
         <source>Selection Tool</source>
@@ -4935,6 +4935,22 @@ Decrementa lo spessore minimo del pennello</translation>
     </message>
     <message>
         <source>Fill Tool - Autopaint Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Export Soundtrack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Touch Gesture Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Empty Columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animate Tool</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6105,7 +6121,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Style:</source>
-        <translation>Stile:</translation>
+        <translation type="vanished">Stile:</translation>
     </message>
     <message>
         <source>Open Flipbook after Rendering</source>
@@ -6369,7 +6385,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Antialiased region boundaries</source>
-        <translation>Limiti Regioni Antialiasate</translation>
+        <translation type="vanished">Limiti Regioni Antialiasate</translation>
     </message>
     <message>
         <source>Level Settings by File Format:</source>
@@ -6409,10 +6425,6 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Display Level Name on Each Marker</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Raster Images Darken Blended in Camstand View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6632,22 +6644,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OpenToonz can use FFmpeg for additional file formats.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FFmpeg is not bundled with OpenToonz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>NOTE: This is an experimental feature.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please SAVE YOUR WORK before exporting in MP4, WEBM, or GIF format.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please provide the path where FFmpeg is located on your computer.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6737,10 +6733,6 @@ Is it OK to release these shortcuts?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Expand Function Editor Header to Match Xsheet Toolbar Height (Requires Restart)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show Column Numbers in Column Headers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6818,10 +6810,6 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Font Weight *:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Default File Import Behavior:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6858,11 +6846,49 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Layout Preference*:</source>
+        <source>Vector Guided Style:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Vector Guided Style:</source>
+        <source>Show Raster Images Darken Blended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Antialiased Region Boundaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Down Arrow at End of Level Strip Creates a New Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand Function Editor Header to Match Xsheet Toolbar Height*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weight *:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenToonz can use FFmpeg for additional file formats.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg is not bundled with OpenToonz.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column Header Layout*:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

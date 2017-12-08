@@ -101,6 +101,7 @@ void ToolUtils::updateSaveBox(const TXshSimpleLevelP &sl, const TFrameId &fid) {
 
   TImageP img = sl->getFrame(fid, true);  // The image will be modified (it
                                           // should already have been, though)
+  if (!img) return;
   // Observe that the returned image will forcedly have subsampling 1
   ::updateSaveBox(img);
 

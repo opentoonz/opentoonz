@@ -4054,7 +4054,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Edit Tool</source>
-        <translation>编辑工具</translation>
+        <translation type="vanished">编辑工具</translation>
     </message>
     <message>
         <source>Selection Tool</source>
@@ -4986,6 +4986,22 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Fill Tool - Autopaint Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Export Soundtrack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Touch Gesture Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Empty Columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animate Tool</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6190,7 +6206,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Style:</source>
-        <translation>界面样式:</translation>
+        <translation type="vanished">界面样式:</translation>
     </message>
     <message>
         <source>Open Flipbook after Rendering</source>
@@ -6474,7 +6490,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Antialiased region boundaries</source>
-        <translation>抗锯齿范围边界线</translation>
+        <translation type="vanished">抗锯齿范围边界线</translation>
     </message>
     <message>
         <source>Next/Previous Step Frames:</source>
@@ -6514,7 +6530,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Show Raster Images Darken Blended in Camstand View</source>
-        <translation>在摄影机位视图中用“变暗”混合来显示光栅图像</translation>
+        <translation type="vanished">在摄影机位视图中用“变暗”混合来显示光栅图像</translation>
     </message>
     <message>
         <source>Show &quot;ABC&quot; Appendix to the Frame Number in Xsheet Cell</source>
@@ -6746,19 +6762,19 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>OpenToonz can use FFmpeg for additional file formats.</source>
-        <translation>OpenToonz可以使用 FFmpeg 处理附加文件格式。</translation>
+        <translation type="vanished">OpenToonz可以使用 FFmpeg 处理附加文件格式。</translation>
     </message>
     <message>
         <source>FFmpeg is not bundled with OpenToonz</source>
-        <translation>FFmpeg 并没有和 OpenToonz 一起打包。</translation>
+        <translation type="vanished">FFmpeg 并没有和 OpenToonz 一起打包。</translation>
     </message>
     <message>
         <source>NOTE: This is an experimental feature.</source>
-        <translation>注: 这是体验版的功能。</translation>
+        <translation type="vanished">注: 这是体验版的功能。</translation>
     </message>
     <message>
         <source>Please SAVE YOUR WORK before exporting in MP4, WEBM, or GIF format.</source>
-        <translation>请在导出 MP4，WEBM 或 GIF 格式之前保存您的工作。</translation>
+        <translation type="vanished">请在导出 MP4，WEBM 或 GIF 格式之前保存您的工作。</translation>
     </message>
     <message>
         <source>Please provide the path where FFmpeg is located on your computer.</source>
@@ -6895,7 +6911,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Font Weight *:</source>
-        <translation>字体粗细 *:</translation>
+        <translation type="vanished">字体粗细 *:</translation>
     </message>
     <message>
         <source>Life is too short for Comic Sans</source>
@@ -6928,10 +6944,6 @@ Is it OK to release these shortcuts?</source>
     <message>
         <source>Tools</source>
         <translation type="unfinished">工具</translation>
-    </message>
-    <message>
-        <source>Expand Function Editor Header to Match Xsheet Toolbar Height (Requires Restart)</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sync Level Strip Drawing Number Changes with the Xsheet</source>
@@ -6979,7 +6991,45 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Layout Preference*:</source>
+        <source>Show Raster Images Darken Blended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Antialiased Region Boundaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Down Arrow at End of Level Strip Creates a New Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand Function Editor Header to Match Xsheet Toolbar Height*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weight *:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenToonz can use FFmpeg for additional file formats.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg is not bundled with OpenToonz.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column Header Layout*:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
