@@ -1101,6 +1101,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
       if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
           !m_viewer->orientation()->isVerticalTimeline() &&
           Preferences::instance()->isCurrentTimelineIndicatorEnabled()) {
+        row       = m_viewer->getCurrentRow();
         QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
         int x     = xy.x();
         int y     = xy.y();
@@ -1110,7 +1111,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
           else
             xy.setX(xy.x() + 1);
         }
-        drawCurrentTimeIndicator(p, xy);
+        drawCurrentTimeIndicator(p, xy, true);
       }
       continue;
     }
@@ -1558,7 +1559,8 @@ void CellArea::drawLockedDottedLine(QPainter &p, bool isLocked,
   p.drawLine(dottedLine);
 }
 
-void CellArea::drawCurrentTimeIndicator(QPainter &p, const QPoint &xy) {
+void CellArea::drawCurrentTimeIndicator(QPainter &p, const QPoint &xy,
+                                        bool isFolded) {
   int frameAdj = m_viewer->getFrameZoomAdjustment();
   QRect cell =
       m_viewer->orientation()->rect(PredefinedRect::CELL).translated(xy);
@@ -1567,6 +1569,12 @@ void CellArea::drawCurrentTimeIndicator(QPainter &p, const QPoint &xy) {
   int cellMid    = cell.left() + (cell.width() / 2) - 1;
   int cellTop    = cell.top();
   int cellBottom = cell.bottom();
+
+  // Adjust left for 1st row
+  if (xy.x() <= 1) cellMid -= 1;
+
+  if (isFolded)
+    cellBottom = cell.top() + m_viewer->orientation()->foldedCellSize() - 1;
 
   p.setPen(Qt::red);
   p.drawLine(cellMid, cellTop, cellMid, cellBottom);

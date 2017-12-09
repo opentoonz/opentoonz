@@ -96,7 +96,8 @@ class CellArea final : public QWidget {
 
   void drawNotes(QPainter &p, const QRect toBeUpdated);
 
-  void drawCurrentTimeIndicator(QPainter &p, const QPoint &xy);
+  void drawCurrentTimeIndicator(QPainter &p, const QPoint &xy,
+                                bool isFolded = false);
 
   void drawFrameDot(QPainter &p, const QPoint &xy, bool isValid);
 
