@@ -618,6 +618,8 @@ public:
   CellPosition xyToPosition(const TPointD &point) const;
   QPoint positionToXY(const CellPosition &pos) const;
 
+  int colToTimelineLayerAxis(int layer) const;
+
   int columnToLayerAxis(int layer) const;
   int rowToFrameAxis(int frame) const;
 

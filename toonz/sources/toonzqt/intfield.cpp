@@ -191,6 +191,7 @@ void IntLineEdit::focusOutEvent(QFocusEvent *e) {
   if (e->lostFocus()) setValue(value);
 
   QLineEdit::focusOutEvent(e);
+  m_isTyping = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -211,8 +212,13 @@ void IntLineEdit::mousePressEvent(QMouseEvent *e) {
   if (e->buttons() == Qt::MiddleButton) {
     m_xMouse           = e->x();
     m_mouseDragEditing = true;
-  } else
+  } else {
     QLineEdit::mousePressEvent(e);
+    if (!m_isTyping) {  // only the first click will select all
+      selectAll();
+      m_isTyping = true;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -231,10 +237,8 @@ void IntLineEdit::mouseReleaseEvent(QMouseEvent *e) {
   if ((e->buttons() == Qt::NoButton && m_mouseDragEditing)) {
     m_mouseDragEditing = false;
     clearFocus();
-  } else {
-    if (!hasSelectedText()) selectAll();
+  } else
     QLineEdit::mouseReleaseEvent(e);
-  }
 }
 
 //=============================================================================

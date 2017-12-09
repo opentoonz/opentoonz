@@ -117,6 +117,108 @@
     </message>
 </context>
 <context>
+    <name>AudioRecordingPopup</name>
+    <message>
+        <source>Audio Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save and Insert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync with XSheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The microphone is not available: 
+Please select a different device or check the microphone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AutoInputCellNumberPopup</name>
+    <message>
+        <source>Auto Input Cell Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite</source>
+        <translation type="unfinished">Sovrascrivi</translation>
+    </message>
+    <message>
+        <source>Insert</source>
+        <translation type="unfinished">Inserisci</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annullare</translation>
+    </message>
+    <message>
+        <source>Setting this value 0 will automatically 
+pick up all frames in the selected level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> </source>
+        <comment>from frame</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>frames increment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> </source>
+        <comment>to frame</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>inserting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>empty cell intervals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cell steps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation type="unfinished">Ripeti</translation>
+    </message>
+    <message>
+        <source>times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No available cells or columns are selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected level has no frames between From and To.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AutocenterPopup</name>
     <message>
         <source>Autocenter</source>
@@ -289,6 +391,48 @@ Stop it or wait for its completion before removing it.</source>
     <message>
         <source>Path %1 doesn&apos;t exists.</source>
         <translation>Il percorso %1 non esiste.</translation>
+    </message>
+</context>
+<context>
+    <name>CameraCaptureLevelControl</name>
+    <message>
+        <source>Black Point Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>White Point Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threshold Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gamma Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CameraCaptureLevelHistogram</name>
+    <message>
+        <source>Click to Update Histogram</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag to Move White Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag to Move Gamma</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag to Move Black Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drag to Move Threshold Point</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -740,6 +884,22 @@ Cosa vuoi fare?</translation>
         <source>Field Guide</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CleanupTab</name>
@@ -895,6 +1055,66 @@ Cosa vuoi fare?</translation>
         <source>Level: </source>
         <translation type="unfinished">Livello:</translation>
     </message>
+    <message>
+        <source> (Flipped)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CommandBar</name>
+    <message>
+        <source>Customize Command Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CommandBarListTree</name>
+    <message>
+        <source>----Separator----</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CommandBarPopup</name>
+    <message>
+        <source>XSheet Toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customize XSheet Toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customize Command Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annullare</translation>
+    </message>
+    <message>
+        <source>Toolbar Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicated commands will be ignored. Only the last one will appear in the menu bar.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CommandBarTree</name>
+    <message>
+        <source>Remove &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CommandListTree</name>
@@ -1002,7 +1222,7 @@ Cosa vuoi fare?</translation>
     </message>
     <message>
         <source>File to convert:</source>
-        <translation type="vanished">Immagine da Convertire:</translation>
+        <translation>Immagine da Convertire:</translation>
     </message>
     <message>
         <source>Output Name:</source>
@@ -1151,6 +1371,29 @@ before color designing.</source>
     </message>
     <message>
         <source>Remove Unused Styles from Input Palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image DPI</source>
+        <translation type="unfinished">DPI dell&apos; Immagine</translation>
+    </message>
+    <message>
+        <source>Current Camera DPI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom DPI</source>
+        <translation type="unfinished">DPI Personalizzato</translation>
+    </message>
+    <message>
+        <source>Specify the policy for setting DPI of converted tlv. 
+If you select the &quot;Image DPI&quot; option and the source image does not 
+contain the dpi information, then the current camera dpi will be used.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dpi:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2139,6 +2382,21 @@ Vuoi sovrascriverlo?</translation>
     </message>
 </context>
 <context>
+    <name>LayerHeaderPanel</name>
+    <message>
+        <source>Preview Visbility Toggle All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Stand Visibility Toggle All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock Toggle All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LevelCreatePopup</name>
     <message>
         <source>New Level</source>
@@ -2457,6 +2715,99 @@ Vuoi crearla?</translation>
     <message>
         <source>Apply</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>LipSyncPopup</name>
+    <message>
+        <source>Apply Lip Sync Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished">Applica</translation>
+    </message>
+    <message>
+        <source>A I Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>U Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>L Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W Q Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M B P Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F V Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rest Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C D G K N R S Th Y Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extend Rest Drawing to End Marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Drawing</source>
+        <translation type="unfinished">Disegno Successivo</translation>
+    </message>
+    <message>
+        <source>Insert at Frame: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lip Sync Data File: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thumbnails are not available for sub-Xsheets.
+Please use the frame numbers for reference.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to apply lip sync data to this column type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SubXSheet Frame </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to open the file: 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data file.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3063,7 +3414,7 @@ Vuoi crearla?</translation>
     </message>
     <message>
         <source>&amp;Revert to Last Saved Version</source>
-        <translation>&amp;Ricarica l&apos;Ultima Versione Salvata</translation>
+        <translation type="vanished">&amp;Ricarica l&apos;Ultima Versione Salvata</translation>
     </message>
     <message>
         <source>&amp;Expose in Xsheet</source>
@@ -3363,7 +3714,7 @@ Vuoi crearla?</translation>
     </message>
     <message>
         <source>Matte Channel</source>
-        <translation>Canale Alfa</translation>
+        <translation type="vanished">Canale Alfa</translation>
     </message>
     <message>
         <source>Red Channel Greyscale</source>
@@ -3655,7 +4006,7 @@ Vuoi crearla?</translation>
     </message>
     <message>
         <source>Edit Tool</source>
-        <translation>Strumento Animazione</translation>
+        <translation type="vanished">Strumento Animazione</translation>
     </message>
     <message>
         <source>Selection Tool</source>
@@ -4482,6 +4833,126 @@ Decrementa lo spessore minimo del pennello</translation>
         <source>&amp;Startup Popup...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&amp;New Vector Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Vector Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;New Toonz Raster Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Toonz Raster Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;New Raster Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Raster Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Fast Render to MP4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Toggle Edit In Place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Note Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Apply Lip Sync Data to Column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle XSheet Toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reframe with Empty Inbetweens...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Input Cell Number...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste Numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alpha Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Command Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Current Time Indicator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vectors to Toonz Raster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace Vectors with Simplified Vectors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip Viewer Horiontally</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip Viewer Vertically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished">Aggiorna</translation>
+    </message>
+    <message>
+        <source>SnapSensitivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fill Tool - Autopaint Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Export Soundtrack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Touch Gesture Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Empty Columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animate Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5041,6 +5512,10 @@ Cosa vuoi fare?</translation>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Render</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OverwriteDialog</name>
@@ -5208,15 +5683,15 @@ Cosa vuoi fare?</translation>
     </message>
     <message>
         <source>Threshold:</source>
-        <translation type="unfinished">Soglia:</translation>
+        <translation type="obsolete">Soglia:</translation>
     </message>
     <message>
         <source>Contrast:</source>
-        <translation type="unfinished">Contrasto:</translation>
+        <translation type="obsolete">Contrasto:</translation>
     </message>
     <message>
         <source>Brightness:</source>
-        <translation type="unfinished">Luminosità:</translation>
+        <translation type="obsolete">Luminosità:</translation>
     </message>
     <message>
         <source>BG reduction:</source>
@@ -5287,6 +5762,245 @@ Do you want to overwrite it?</source>
         <source>Video Capture Filter Settings...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No</source>
+        <comment>frame id</comment>
+        <translation type="unfinished">No</translation>
+    </message>
+    <message>
+        <source>Load Selected Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subfolder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished">A Colori</translation>
+    </message>
+    <message>
+        <source>Grayscale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Black &amp; White</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No image selected.  Please select an image in the Xsheet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected image is not in a raster level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected image size does not match the current camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UNDEFINED WARNING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The level is not registered in the scene, but exists in the file system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+Frame %1 exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+Frames %1 exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OVERWRITE 1 of</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ADD to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> %1 frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> %1 frames</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The level will be newly created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NEW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The level is already registered in the scene.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+NOTE : The level is not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+WARNING : Failed to get image size of the existing level %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The existing level size is %1 x %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING : Level name conflicts. There already is a level %1 in the scene with the path                        
+          %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The size of level with the same name is is %1 x %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING : Level path conflicts. There already is a level with the path %1                        
+          in the scene with the name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+WARNING : Image size mismatch. The size of level with the same path is %1 x %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PencilTestSaveInFolderPopup</name>
+    <message>
+        <source>Create the Destination Subfolder to Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set As Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the current &quot;Save In&quot; path as the default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Subfolder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Infomation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subfolder Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show This on Launch of the Camera Capture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Scene in Subfolder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annullare</translation>
+    </message>
+    <message>
+        <source>C- + Sequence + Scene</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sequence + Scene</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode + Sequence + Scene</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project + Episode + Sequence + Scene</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save the current scene in the subfolder.
+Set the output folder path to the subfolder as well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save In:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sequence:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scene:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subfolder Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subfolder name should not be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subfolder name should not contain following characters:  * . &quot; / \ [ ] : ; | = , </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder %1 already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to create the %1 folder.</source>
+        <translation type="unfinished">Impossibile creare la cartella %1.</translation>
+    </message>
 </context>
 <context>
     <name>PltGizmoPopup</name>
@@ -5327,14 +6041,6 @@ Do you want to overwrite it?</source>
         <translation>Miscelare</translation>
     </message>
     <message>
-        <source>Full Matte</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zero Matte</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Scale (%)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5355,12 +6061,20 @@ Do you want to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Matte</source>
+        <source>Color</source>
+        <translation type="unfinished">A Colori</translation>
+    </message>
+    <message>
+        <source>Full Alpha</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Color</source>
-        <translation type="unfinished">A Colori</translation>
+        <source>Zero Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation type="unfinished">Alfa</translation>
     </message>
 </context>
 <context>
@@ -5407,7 +6121,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Style:</source>
-        <translation>Stile:</translation>
+        <translation type="vanished">Stile:</translation>
     </message>
     <message>
         <source>Open Flipbook after Rendering</source>
@@ -5671,7 +6385,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Antialiased region boundaries</source>
-        <translation>Limiti Regioni Antialiasate</translation>
+        <translation type="vanished">Limiti Regioni Antialiasate</translation>
     </message>
     <message>
         <source>Level Settings by File Format:</source>
@@ -5711,10 +6425,6 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Display Level Name on Each Marker</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Raster Images Darken Blended in Camstand View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5783,14 +6493,6 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Language *:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default TLV Caching Behavior</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Column Icon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5874,10 +6576,6 @@ Do you want to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Palette Type on Loading Raster Image as Color Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Save Automatically</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5946,22 +6644,6 @@ Do you want to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OpenToonz can use FFmpeg for additional file formats.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FFmpeg is not bundled with OpenToonz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>NOTE: This is an experimental feature.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please SAVE YOUR WORK before exporting in MP4, WEBM, or GIF format.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please provide the path where FFmpeg is located on your computer.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5983,6 +6665,230 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Show Startup Window when OpenToonz Starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Life is too short for Comic Sans</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Good luck.  You&apos;re on your own from here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Numpad keys are assigned to the following commands.
+Is it OK to release these shortcuts?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annullare</translation>
+    </message>
+    <message>
+        <source>Watch File System and Update File Browser Automatically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Camera DPI for All Imported Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Levels Default to the Current Camera Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Numpad and Tab keys for Switching Styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep fill when using &quot;Replace Vectors&quot; command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use higher DPI for calculations - Slower but more accurate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="unfinished">Strumenti</translation>
+    </message>
+    <message>
+        <source>Use Arrow Key to Shift Cell Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable to Input Cells without Double Clicking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable OpenToonz Commands&apos; Shortcut Keys While Renaming Cell</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Toolbar in the XSheet </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Column Numbers in Column Headers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync Level Strip Drawing Number Changes with the Xsheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Current Time Indicator (Timeline Mode only)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project Folder Aliases (+drawings, +scenes, etc.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scene Folder Alias ($scenefolder)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Project Folder Aliases Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option defines which alias to be used
+if both are possible on coding file path.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always ask before loading or importing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always import the file to the current project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always load the file from the current location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Strokes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guides</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Tutte</translation>
+    </message>
+    <message>
+        <source>Open the dropdown to display all options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle through the available options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arrow Markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animated Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path Alias Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font *:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default File Import Behavior:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default TLV Caching Behavior:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column Icon:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Type on Loading Raster Image as Color Model:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Render Path: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector Snapping:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace Vectors with Simplified Vectors Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dropdown Shortcuts:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector Guided Style:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Raster Images Darken Blended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Antialiased Region Boundaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Down Arrow at End of Level Strip Creates a New Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand Function Editor Header to Match Xsheet Toolbar Height*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weight *:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenToonz can use FFmpeg for additional file formats.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg is not bundled with OpenToonz.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column Header Layout*:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6166,6 +7072,18 @@ Vuoi sovrascriverlo?</translation>
     <message>
         <source>Expose layers in a group as frames in a column</source>
         <translation>Esponi i livelli appartenenti ad un gruppo come fotogrammi in una colonna</translation>
+    </message>
+    <message>
+        <source>FileName#LayerName</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LayerName</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Level Name:</source>
+        <translation type="unfinished">Nome del Livello:</translation>
     </message>
 </context>
 <context>
@@ -7634,6 +8552,161 @@ Do you want to overwrite it?</source>
 Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Auto Input Cell Numbers : %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert</source>
+        <translation type="unfinished">Inserisci</translation>
+    </message>
+    <message>
+        <source>FFmpeg not found, please set the location in the Preferences and restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Note Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always do this action.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following level(s) use path with $scenefolder alias.
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+They will not be opened properly when you load the scene next time.
+What do you want to do?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy the levels to correspondent paths</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decode all $scenefolder aliases</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save the scene only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite for All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Overwrite for All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to overwrite %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reframe to %1&apos;s with %2 blanks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected scene could not be found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply Lip Sync Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layer name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to paste the cells: Some column is locked or column type is not match.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This command only works on vector cells.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select only one column for this command.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All selected cells must belong to the same level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simplify Vectors : Level %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Text at Column %1  Frame %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stage Schematic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fx Schematic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skipping frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot Read XML File</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ReframePopup</name>
+    <message>
+        <source>Reframe with Empty Inbetweens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annullare</translation>
+    </message>
+    <message>
+        <source>steps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>empty inbetweens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> blank cells will be inserted.)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RenameAsToonzPopup</name>
@@ -8840,6 +9913,10 @@ Per favore sottometti o ripristina i cambiamenti prima di proseguire.</translati
         <source>  Start Frame:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enable Column Color Filter and Transparency for Rendering</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SceneViewerContextMenu</name>
@@ -8889,6 +9966,26 @@ Per favore sottometti o ripristina i cambiamenti prima di proseguire.</translati
     </message>
     <message>
         <source>Select Column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector Guided Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Closest Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Farthest Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Drawings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8950,6 +10047,10 @@ Per favore sottometti o ripristina i cambiamenti prima di proseguire.</translati
         <source>Field Guide</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source> (Flipped)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ShortcutPopup</name>
@@ -8979,7 +10080,7 @@ Per favore sottometti o ripristina i cambiamenti prima di proseguire.</translati
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">Applica</translation>
+        <translation type="obsolete">Applica</translation>
     </message>
     <message>
         <source>Use selected preset as shortcuts</source>
@@ -9023,6 +10124,14 @@ Per favore sottometti o ripristina i cambiamenti prima di proseguire.</translati
     </message>
     <message>
         <source>Load from file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation type="unfinished">Carica</translation>
+    </message>
+    <message>
+        <source>Shortcut Presets</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9352,14 +10461,6 @@ Lo assegno a %3?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The width must be 1 or more.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The height must be 1 or more.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The frame rate must be 1 or more.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9386,6 +10487,22 @@ Lo assegno a %3?</translation>
     <message>
         <source>&apos;%1&apos; doesn&apos;t seem to be a well formed camera preset. 
 Possibly the preset file has been corrupted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Save Every </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The width must be greater than zero.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The height must be greater than zero.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9435,10 +10552,6 @@ Clicca la freccia per creare un nuovo sub-xsheet</translation>
     <message>
         <source>It is not possible to save automatically an untitled scene.</source>
         <translation type="vanished">Impossibile salvare automaticamente una scena senza nome.</translation>
-    </message>
-    <message>
-        <source>It is not possible to automatically save an untitled scene.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10053,7 +11166,27 @@ Per favore fai riferimento alla Guida utente per i dettagli.</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation type="unfinished">Rimpiazza</translation>
+        <translation type="obsolete">Rimpiazza</translation>
+    </message>
+    <message>
+        <source>Edit Cell Numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace Level</source>
+        <translation type="unfinished">Rimpiazza il Livello</translation>
+    </message>
+    <message>
+        <source>Replace with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Special</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10138,6 +11271,29 @@ Per favore fai riferimento alla Guida utente per i dettagli.</translation>
         <source>Subsampling</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Click to select column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to select column, drag to move it, double-click to edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to select column, double-click to edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional column settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::ColumnTransparencyPopup</name>
+    <message>
+        <source>Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XsheetGUI::NoteArea</name>
@@ -10181,7 +11337,7 @@ Per favore fai riferimento alla Guida utente per i dettagli.</translation>
     </message>
     <message>
         <source>Current Frame</source>
-        <translation type="vanished">Fotogramma Corrente</translation>
+        <translation>Fotogramma Corrente</translation>
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
@@ -10212,10 +11368,6 @@ Per favore fai riferimento alla Guida utente per i dettagli.</translation>
         <translation>Rimuovi i Marcatori</translation>
     </message>
     <message>
-        <source>Curren Frame</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Preview This</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10225,6 +11377,17 @@ Per favore fai riferimento alla Guida utente per i dettagli.</translation>
     </message>
     <message>
         <source>Pinned Center : Col%1%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Auto Markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::XSheetToolbar</name>
+    <message>
+        <source>Customize XSheet Toolbar</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10268,6 +11431,10 @@ Per favore fai riferimento alla Guida utente per i dettagli.</translation>
     </message>
     <message>
         <source> columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom in/out of timeline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

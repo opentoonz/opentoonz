@@ -108,6 +108,7 @@ set(MOC_HEADERS
     selectionutils.h
     shifttracetool.h
     shortcutpopup.h
+    soundtrackexport.h
     startuppopup.h
     subcameramanager.h
     subscenecommand.h
@@ -252,6 +253,7 @@ set(SOURCES
     scriptconsolepanel.cpp
     shifttracetool.cpp
     shortcutpopup.cpp
+    soundtrackexport.cpp
     startuppopup.cpp
     subcameramanager.cpp
     timestretchpopup.cpp

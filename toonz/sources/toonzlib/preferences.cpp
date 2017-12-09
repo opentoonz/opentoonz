@@ -291,6 +291,7 @@ Preferences::Preferences()
     , m_regionAntialias(false)
     , m_keepFillOnVectorSimplify(true)
     , m_useHigherDpiOnVectorSimplify(false)
+    , m_downArrowInLevelStripCreatesNewFrame(false)
     , m_viewerBGColor(128, 128, 128, 255)
     , m_previewBGColor(64, 64, 64, 255)
     , m_chessboardColor1(180, 180, 180)
@@ -575,6 +576,8 @@ Preferences::Preferences()
   getValue(*m_settings, "useHigherDpiOnVectorSimplify",
            m_useHigherDpiOnVectorSimplify);
   getValue(*m_settings, "keepFillOnVectorSimplify", m_keepFillOnVectorSimplify);
+  getValue(*m_settings, "downArrowInLevelStripCreatesNewFrame",
+           m_downArrowInLevelStripCreatesNewFrame);
   getValue(*m_settings, "DragCellsBehaviour", m_dragCellsBehaviour);
 
   getValue(*m_settings, "LineTestFpsCapture", m_lineTestFpsCapture);
@@ -1338,6 +1341,13 @@ void Preferences::setKeepFillOnVectorSimplify(bool on) {
 void Preferences::setUseHigherDpiOnVectorSimplify(bool on) {
   m_useHigherDpiOnVectorSimplify = on;
   m_settings->setValue("useHigherDpiOnVectorSimplify", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setDownArrowLevelStripNewFrame(bool on) {
+  m_downArrowInLevelStripCreatesNewFrame = on;
+  m_settings->setValue("downArrowInLevelStripCreatesNewFrame", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

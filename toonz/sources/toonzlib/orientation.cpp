@@ -19,6 +19,7 @@ const int ONION_DOT_SIZE     = 8;
 const int PINNED_SIZE        = 10;
 const int FRAME_DOT_SIZE     = 8;
 const int FRAME_IND_SIZE     = 3;
+const int FOLDED_CELL_SIZE   = 9;
 }
 
 class TopToBottomOrientation : public Orientation {
@@ -73,6 +74,7 @@ public:
 
   virtual int cellWidth() const override { return CELL_WIDTH; }
   virtual int cellHeight() const override { return CELL_HEIGHT; }
+  virtual int foldedCellSize() const override { return FOLDED_CELL_SIZE; }
 };
 
 class LeftToRightOrientation : public Orientation {
@@ -132,6 +134,7 @@ public:
 
   virtual int cellWidth() const override { return CELL_WIDTH; }
   virtual int cellHeight() const override { return CELL_HEIGHT; }
+  virtual int foldedCellSize() const override { return FOLDED_CELL_SIZE; }
 };
 
 /// -------------------------------------------------------------------------------
@@ -1167,9 +1170,9 @@ QPoint LeftToRightOrientation::topRightCorner(const QRect &area) const {
 CellPosition LeftToRightOrientation::arrowShift(int direction) const {
   switch (direction) {
   case Qt::Key_Up:
-    return CellPosition(0, -1);
-  case Qt::Key_Down:
     return CellPosition(0, 1);
+  case Qt::Key_Down:
+    return CellPosition(0, -1);
   case Qt::Key_Left:
     return CellPosition(-1, 0);
   case Qt::Key_Right:

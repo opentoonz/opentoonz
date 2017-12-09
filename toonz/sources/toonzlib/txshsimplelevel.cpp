@@ -1960,22 +1960,26 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
   }
 
   ImageManager *im = ImageManager::instance();
+  TImageCache *ic = TImageCache::instance();
 
   std::map<TFrameId, TFrameId>::iterator jt;
 
   {
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
       std::string Id = getImageId(jt->first);
-      im->rebind(Id, "^" + std::to_string(i));
-      TImageCache::instance()->remap("^icon:" + std::to_string(i),
-                                     "icon:" + Id);
+	  ImageLoader::BuildExtData extData(this, jt->first);
+	  TImageP img = im->getImage(Id, ImageManager::none, &extData);
+	  ic->add(getIconId(jt->first), img, false);
+	  im->rebind(Id, "^" + std::to_string(i));
+	  ic->remap("^icon:" + std::to_string(i),
+                                     getIconId(jt->first));
     }
 
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
       std::string Id = getImageId(jt->second);
       im->rebind("^" + std::to_string(i), Id);
-      TImageCache::instance()->remap("icon:" + Id,
-                                     "^icon:" + std::to_string(i));
+	  ic->remap(getIconId(jt->second),
+                                    "^icon:" + std::to_string(i));
       im->renumber(Id, jt->second);
     }
   }

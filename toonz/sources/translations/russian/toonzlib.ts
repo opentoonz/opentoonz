@@ -8,6 +8,16 @@
         <source>Retas Level Format</source>
         <translation>Формат уровней Retas</translation>
     </message>
+    <message>
+        <location filename="../../toonzlib/preferences.cpp" line="116"/>
+        <source>Adobe Photoshop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/preferences.cpp" line="121"/>
+        <source>PNG</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -430,6 +440,77 @@
         <location filename="../../include/toonz/stageobjectutil.h" line="212"/>
         <source>Move Center   %1  Frame %2</source>
         <translation>Переместить центр   %1 кадр %2</translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/tpalettehandle.cpp" line="40"/>
+        <source>Toggle Autopaint Option  Palette : %1  Style#%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="623"/>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="651"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="625"/>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="627"/>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="629"/>
+        <source>Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="631"/>
+        <source>DarkYellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="633"/>
+        <source>DarkCyan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="635"/>
+        <source>DarkMagenta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="93"/>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="95"/>
+        <source>Contrast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="228"/>
+        <source>HRange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="229"/>
+        <source>Line Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="312"/>
+        <source>ColorThres</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="314"/>
+        <source>WhiteThres</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

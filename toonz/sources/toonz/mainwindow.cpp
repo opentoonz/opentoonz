@@ -86,6 +86,7 @@ TEnv::IntVar DockingCheckToggleAction("DockingCheckToggleAction", 0);
 TEnv::IntVar ShiftTraceToggleAction("ShiftTraceToggleAction", 0);
 TEnv::IntVar EditShiftToggleAction("EditShiftToggleAction", 0);
 TEnv::IntVar NoShiftToggleAction("NoShiftToggleAction", 0);
+TEnv::IntVar TouchGestureControl("TouchGestureControl", 0);
 
 //=============================================================================
 namespace {
@@ -1294,6 +1295,8 @@ void MainWindow::onMenuCheckboxChanged() {
     EditShiftToggleAction = isChecked;
   else if (cm->getAction(MI_NoShift) == action)
     NoShiftToggleAction = isChecked;
+  else if (cm->getAction(MI_TouchGestureControl) == action)
+    TouchGestureControl = isChecked;
 }
 
 //-----------------------------------------------------------------------------
@@ -1642,6 +1645,7 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_Render, tr("&Render"), "Ctrl+Shift+R");
   createMenuFileAction(MI_FastRender, tr("&Fast Render to MP4"), "Alt+R");
   createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
+  createMenuFileAction(MI_SoundTrack, tr("&Export Soundtrack"), "");
   createRightClickMenuAction(MI_SavePreviewedFrames,
                              tr("&Save Previewed Frames"), "");
   createRightClickMenuAction(MI_RegeneratePreview, tr("&Regenerate Preview"),
@@ -1702,6 +1706,10 @@ void MainWindow::defineActions() {
   createMenuEditAction(MI_EnterGroup, tr("&Enter Group"), "");
   createMenuEditAction(MI_ExitGroup, tr("&Exit Group"), "");
   createMenuEditAction(MI_RemoveEndpoints, tr("&Remove Vector Overflow"), "");
+
+  createToggle(MI_TouchGestureControl, tr("&Touch Gesture Control"), "",
+               TouchGestureControl ? 1 : 0, MenuEditCommandType)
+      ->setEnabled(true);
 
   createMenuScanCleanupAction(MI_DefineScanner, tr("&Define Scanner..."), "");
   createMenuScanCleanupAction(MI_ScanSettings, tr("&Scan Settings..."), "");
@@ -1812,6 +1820,7 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
   createMenuXsheetAction(MI_NewNoteLevel, tr("New Note Level"), "");
+  createMenuXsheetAction(MI_RemoveEmptyColumns, tr("Remove Empty Columns"), "");
   createMenuXsheetAction(MI_LipSyncPopup, tr("&Apply Lip Sync Data to Column"),
                          "Alt+L");
   createRightClickMenuAction(MI_ToggleXSheetToolbar,
@@ -2108,14 +2117,14 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_DeactivateUpperColumns,
                              tr("Hide Upper Columns"), "");
 
-  createToolAction(T_Edit, "edit", tr("Edit Tool"), "E");
+  createToolAction(T_Edit, "edit", tr("Animate Tool"), "A");
   createToolAction(T_Selection, "selection", tr("Selection Tool"), "S");
   createToolAction(T_Brush, "brush", tr("Brush Tool"), "B");
   createToolAction(T_Geometric, "geometric", tr("Geometric Tool"), "G");
   createToolAction(T_Type, "type", tr("Type Tool"), "Y");
   createToolAction(T_Fill, "fill", tr("Fill Tool"), "F");
   createToolAction(T_PaintBrush, "paintbrush", tr("Paint Brush Tool"), "");
-  createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "A");
+  createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "E");
   createToolAction(T_Tape, "tape", tr("Tape Tool"), "T");
   createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "K");
   createToolAction(T_RGBPicker, "RGBpicker", tr("RGB Picker Tool"), "R");

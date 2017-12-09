@@ -668,6 +668,74 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
 
 //-----------------------------------------------------------------------------
 
+void RenameCellField::renameSoundTextColumn(TXshSoundTextColumn *sndTextCol,
+                                            const QString &s) {
+  TXsheet *xsheet  = m_viewer->getXsheet();
+  QString oldText  = "changeMe";  // text for undo - changed later
+  TXshCell cell    = xsheet->getCell(m_row, m_col);
+  TXshCell oldCell = cell;
+  // the text index is always one less than the frame number
+  int textIndex = cell.getFrameId().getNumber() - 1;
+  if (!cell.m_level) {  // cell not part of a level
+    oldText       = "";
+    int lastFrame = sndTextCol->getMaxFrame();
+    TXshSoundTextLevel *sndTextLevel;
+    TXshCell lastCell;
+    TFrameId newId;
+    if (lastFrame < 0) {  // no level on column
+      sndTextLevel = new TXshSoundTextLevel();
+      sndTextLevel->setType(SND_TXT_XSHLEVEL);
+      newId = TFrameId(1);
+      cell  = TXshCell(sndTextLevel, newId);
+      sndTextCol->setCell(m_row, cell);
+      textIndex = 0;
+    } else {
+      TXshCell lastCell                = xsheet->getCell(lastFrame, m_col);
+      TXshSoundTextLevel *sndTextLevel = lastCell.m_level->getSoundTextLevel();
+      int textSize                     = sndTextLevel->m_framesText.size();
+      textIndex                        = textSize;
+      newId                            = TFrameId(textSize + 1);
+      cell                             = TXshCell(sndTextLevel, newId);
+      sndTextCol->setCell(m_row, cell);
+    }
+  }
+
+  TXshCell prevCell             = xsheet->getCell(m_row - 1, m_col);
+  TXshSoundTextLevel *textLevel = cell.m_level->getSoundTextLevel();
+  if (oldText == "changeMe")
+    oldText = textLevel->getFrameText(cell.getFrameId().getNumber() - 1);
+  if (!prevCell.isEmpty()) {
+    // check if the previous cell had the same content as the entered text
+    // just extend the frame if so
+    if (textLevel->getFrameText(prevCell.getFrameId().getNumber() - 1) == s) {
+      sndTextCol->setCell(m_row, prevCell);
+      RenameTextCellUndo *undo = new RenameTextCellUndo(
+          m_row, m_col, oldCell, prevCell, oldText, s, textLevel);
+      TUndoManager::manager()->add(undo);
+      return;
+    }
+    // check if the cell was part of an extended frame, but now has different
+    // text
+    else if (textLevel->getFrameText(textIndex) ==
+                 textLevel->getFrameText(prevCell.getFrameId().getNumber() -
+                                         1) &&
+             textLevel->getFrameText(textIndex) != s) {
+      int textSize   = textLevel->m_framesText.size();
+      textIndex      = textSize;
+      TFrameId newId = TFrameId(textSize + 1);
+      cell           = TXshCell(textLevel, newId);
+      sndTextCol->setCell(m_row, cell);
+    }
+  }
+  RenameTextCellUndo *undo = new RenameTextCellUndo(m_row, m_col, oldCell, cell,
+                                                    oldText, s, textLevel);
+  TUndoManager::manager()->add(undo);
+  textLevel->setFrameText(textIndex, s);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+}
+
+//-----------------------------------------------------------------------------
+
 void RenameCellField::renameCell() {
   QString s            = text();
   std::wstring newName = s.toStdWString();
@@ -678,73 +746,16 @@ void RenameCellField::renameCell() {
   TFrameId fid;
 
   TXsheet *xsheet = m_viewer->getXsheet();
-  TXshSoundTextColumn *sndTextCol =
-      xsheet->getColumn(m_col)->getSoundTextColumn();
-  if (sndTextCol) {
-    QString oldText  = "changeMe";  // text for undo - changed later
-    TXshCell cell    = xsheet->getCell(m_row, m_col);
-    TXshCell oldCell = cell;
-    // the text index is always one less than the frame number
-    int textIndex = cell.getFrameId().getNumber() - 1;
-    if (!cell.m_level) {  // cell not part of a level
-      oldText       = "";
-      int lastFrame = sndTextCol->getMaxFrame();
-      TXshSoundTextLevel *sndTextLevel;
-      TXshCell lastCell;
-      TFrameId newId;
-      if (lastFrame < 0) {  // no level on column
-        sndTextLevel = new TXshSoundTextLevel();
-        sndTextLevel->setType(SND_TXT_XSHLEVEL);
-        newId = TFrameId(1);
-        cell  = TXshCell(sndTextLevel, newId);
-        sndTextCol->setCell(m_row, cell);
-        textIndex = 0;
-      } else {
-        TXshCell lastCell = xsheet->getCell(lastFrame, m_col);
-        TXshSoundTextLevel *sndTextLevel =
-            lastCell.m_level->getSoundTextLevel();
-        int textSize = sndTextLevel->m_framesText.size();
-        textIndex    = textSize;
-        newId        = TFrameId(textSize + 1);
-        cell         = TXshCell(sndTextLevel, newId);
-        sndTextCol->setCell(m_row, cell);
-      }
-    }
 
-    TXshCell prevCell             = xsheet->getCell(m_row - 1, m_col);
-    TXshSoundTextLevel *textLevel = cell.m_level->getSoundTextLevel();
-    if (oldText == "changeMe")
-      oldText = textLevel->getFrameText(cell.getFrameId().getNumber() - 1);
-    if (!prevCell.isEmpty()) {
-      // check if the previous cell had the same content as the entered text
-      // just extend the frame if so
-      if (textLevel->getFrameText(prevCell.getFrameId().getNumber() - 1) == s) {
-        sndTextCol->setCell(m_row, prevCell);
-        RenameTextCellUndo *undo = new RenameTextCellUndo(
-            m_row, m_col, oldCell, prevCell, oldText, s, textLevel);
-        TUndoManager::manager()->add(undo);
-        return;
-      }
-      // check if the cell was part of an extended frame, but now has different
-      // text
-      else if (textLevel->getFrameText(textIndex) ==
-                   textLevel->getFrameText(prevCell.getFrameId().getNumber() -
-                                           1) &&
-               textLevel->getFrameText(textIndex) != s) {
-        int textSize   = textLevel->m_framesText.size();
-        textIndex      = textSize;
-        TFrameId newId = TFrameId(textSize + 1);
-        cell           = TXshCell(textLevel, newId);
-        sndTextCol->setCell(m_row, cell);
-      }
-    }
-    RenameTextCellUndo *undo = new RenameTextCellUndo(
-        m_row, m_col, oldCell, cell, oldText, s, textLevel);
-    TUndoManager::manager()->add(undo);
-    textLevel->setFrameText(textIndex, s);
-    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  // renaming note level column
+  if (xsheet->getColumn(m_col) &&
+      xsheet->getColumn(m_col)->getSoundTextColumn()) {
+    TXshSoundTextColumn *sndTextCol =
+        xsheet->getColumn(m_col)->getSoundTextColumn();
+    renameSoundTextColumn(sndTextCol, s);
     return;
   }
+
   // convert the last one digit of the frame number to alphabet
   // Ex.  12 -> 1B    21 -> 2A   30 -> 3
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
@@ -1037,14 +1048,14 @@ void CellArea::setDragTool(DragTool *dragTool) {
 
 void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   TXsheet *xsh         = m_viewer->getXsheet();
-  ColumnFan *columnFan = xsh->getColumnFan(m_viewer->orientation());
+  const Orientation *o = m_viewer->orientation();
+  ColumnFan *columnFan = xsh->getColumnFan(o);
 
   // selected cells range
   TCellSelection *cellSelection = m_viewer->getCellSelection();
   int rS0, cS0, rS1, cS1;
   if (!cellSelection->isEmpty())
     cellSelection->getSelectedCells(rS0, cS0, rS1, cS1);
-
   // visible cells range
   CellRange visible = m_viewer->xyRectToRange(toBeUpdated);
   int r0, r1, c0, c1;  // range of visible rows and columns
@@ -1052,6 +1063,10 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   r1 = visible.to().frame();
   c0 = visible.from().layer();
   c1 = visible.to().layer();
+  if (!m_viewer->orientation()->isVerticalTimeline()) {
+    int colCount = qMax(1, xsh->getColumnCount());
+    c1           = qMin(c1, colCount - 1);
+  }
 
   drawNonEmptyBackground(p);
 
@@ -1120,6 +1135,10 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
 
     NumberRange layerAxisRange(layerAxis + 1,
                                m_viewer->columnToLayerAxis(col + 1));
+    if (!m_viewer->orientation()->isVerticalTimeline()) {
+      int adjY       = m_viewer->orientation()->cellHeight() - 1;
+      layerAxisRange = NumberRange(layerAxis + 1, layerAxis + adjY);
+    }
 
     // draw vertical line
     if (layerAxis > 0) {
@@ -1190,9 +1209,21 @@ void CellArea::drawNonEmptyBackground(QPainter &p) const {
     if (!currentColumn) continue;
     if (!currentColumn->isEmpty()) break;
   }
-  QPoint xy =
-      m_viewer->positionToXY(CellPosition(totalFrames, lastNonEmptyCol + 1));
-  p.fillRect(1, 0, xy.x(), xy.y(), QBrush(m_viewer->getNotEmptyColumnColor()));
+  QPoint xyTop, xyBottom;
+  const Orientation *o = m_viewer->orientation();
+  if (o->isVerticalTimeline()) {
+    xyTop = QPoint(1, 0);
+    xyBottom =
+        m_viewer->positionToXY(CellPosition(totalFrames, lastNonEmptyCol + 1));
+  } else {
+    xyTop          = m_viewer->positionToXY(CellPosition(0, lastNonEmptyCol));
+    xyBottom       = m_viewer->positionToXY(CellPosition(totalFrames, 0));
+    ColumnFan *fan = xsh->getColumnFan(o);
+    xyBottom.setY(xyBottom.y() +
+                  ((fan ? fan->isActive(0) : true) ? o->cellHeight() : 9));
+  }
+  p.fillRect(xyTop.x(), xyTop.y(), xyBottom.x(), xyBottom.y(),
+             QBrush(m_viewer->getNotEmptyColumnColor()));
 }
 
 void CellArea::drawFoldedColumns(QPainter &p, int layerAxis,
@@ -1220,8 +1251,20 @@ void CellArea::drawSelectionBackground(QPainter &p) const {
 
   int selRow0, selCol0, selRow1, selCol1;
   cellSelection->getSelectedCells(selRow0, selCol0, selRow1, selCol1);
-  QRect selectionRect = m_viewer->rangeToXYRect(CellRange(
-      CellPosition(selRow0, selCol0), CellPosition(selRow1 + 1, selCol1 + 1)));
+  QRect selectionRect;
+  const Orientation *o = m_viewer->orientation();
+  if (o->isVerticalTimeline())
+    selectionRect = m_viewer->rangeToXYRect(
+        CellRange(CellPosition(selRow0, selCol0),
+                  CellPosition(selRow1 + 1, selCol1 + 1)));
+  else {
+    int newSelCol0 = qMax(selCol0, selCol1);
+    int newSelCol1 = qMin(selCol0, selCol1);
+    selectionRect  = m_viewer->rangeToXYRect(
+        CellRange(CellPosition(selRow0, newSelCol0),
+                  CellPosition(selRow1 + 1, newSelCol1 - 1)));
+  }
+
   p.fillRect(selectionRect, QBrush(m_viewer->getSelectedEmptyCellColor()));
 }
 
@@ -1237,8 +1280,16 @@ void CellArea::drawExtenderHandles(QPainter &p) {
 
   int selRow0, selCol0, selRow1, selCol1;
   cellSelection->getSelectedCells(selRow0, selCol0, selRow1, selCol1);
-  QRect selected = m_viewer->rangeToXYRect(CellRange(
+  QRect selected;
+  selected = m_viewer->rangeToXYRect(CellRange(
       CellPosition(selRow0, selCol0), CellPosition(selRow1 + 1, selCol1 + 1)));
+  if (!o->isVerticalTimeline()) {
+    TXsheet *xsh         = m_viewer->getXsheet();
+    ColumnFan *columnFan = xsh->getColumnFan(o);
+    int topAdj           = columnFan->isActive(selCol0) ? o->cellHeight() : 9;
+    int bottomAdj        = columnFan->isActive(selCol1) ? o->cellHeight() : 9;
+    selected.adjust(0, topAdj, 0, bottomAdj);
+  }
 
   int x0, y0, x1, y1;
   x0 = selected.left();
@@ -1456,6 +1507,18 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
     if (r1 != r1WithoutOff) p.fillRect(modifierRect, SoundColumnExtenderColor);
     m_soundLevelModifyRects.append(modifierRect);
   }
+
+  int distance, markerOffset;
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+      distance, markerOffset);
+  bool isAfterMarkers =
+      (row - markerOffset) % distance == 0 && distance != 0 && row != 0;
+
+  // draw marker interval
+  if (isAfterMarkers) {
+    p.setPen(m_viewer->getMarkerLineColor());
+    p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1507,6 +1570,17 @@ void CellArea::drawCurrentTimeIndicator(QPainter &p, const QPoint &xy) {
 
   p.setPen(Qt::red);
   p.drawLine(cellMid, cellTop, cellMid, cellBottom);
+}
+
+void CellArea::drawFrameDot(QPainter &p, const QPoint &xy, bool isValid) {
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
+  QRect dotRect =
+      m_viewer->orientation()->rect(PredefinedRect::FRAME_DOT).translated(xy);
+  p.setPen(Qt::black);
+  p.setBrush(isValid ? QColor(230, 100, 100) : m_viewer->getTextColor());
+  dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
+  p.drawEllipse(dotRect);
+  p.setBrush(Qt::NoBrush);
 }
 
 //-----------------------------------------------------------------------------
@@ -1687,14 +1761,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // draw frame number
   else {
     if (m_viewer->getFrameZoomFactor() <= 50) {
-      p.setPen(Qt::black);
-      p.setBrush(isRed ? QColor(230, 100, 100) : m_viewer->getTextColor());
-      QRect dotRect = m_viewer->orientation()
-                          ->rect(PredefinedRect::FRAME_DOT)
-                          .translated(QPoint(x, y));
-      dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
-      p.drawEllipse(dotRect);
-      p.setBrush(Qt::NoBrush);
+      drawFrameDot(p, QPoint(x, y), isRed);
       return;
     }
 
@@ -1863,8 +1930,12 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   QString text =
       cell.getSoundTextLevel()->getFrameText(cell.m_frameId.getNumber() - 1);
 
-#if QT_VERSION >= 0x050500
   QFontMetrics metric(font);
+
+  int charWidth = metric.width(text, 1);
+  if ((charWidth * 2) > nameRect.width()) nameRect.adjust(-2, 0, 4, 0);
+
+#if QT_VERSION >= 0x050500
   QString elidaName = elideText(text, metric, nameRect.width(), "~");
 #else
   QString elidaName   = elideText(text, font, nameRect.width(), "~");
@@ -2461,7 +2532,9 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       m_viewer->getKeyframeSelection()->selectNone();
       setDragTool(XsheetGUI::DragTool::makeLevelExtenderTool(m_viewer, true));
     } else if ((!xsh->getCell(row, col).isEmpty()) &&
-               o->rect(PredefinedRect::DRAG_AREA).contains(mouseInCell)) {
+               o->rect(PredefinedRect::DRAG_AREA)
+                   .adjusted(0, 0, -frameAdj, 0)
+                   .contains(mouseInCell)) {
       TXshColumn *column = xsh->getColumn(col);
       if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
         int r0, r1;
@@ -2487,7 +2560,9 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     } else {
       m_viewer->getKeyframeSelection()->selectNone();
       if (isSoundColumn &&
-          o->rect(PredefinedRect::PREVIEW_TRACK).contains(mouseInCell))
+          o->rect(PredefinedRect::PREVIEW_TRACK)
+              .adjusted(0, 0, -frameAdj, 0)
+              .contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeSoundScrubTool(
             m_viewer, column->getSoundColumn()));
       else if (isSoundColumn &&
@@ -2544,14 +2619,17 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
   TXsheet *xsh = m_viewer->getXsheet();
 
   // Verifico se e' una colonna sound
-  TXshColumn *column  = xsh->getColumn(col);
-  bool isSoundColumn  = false;
-  bool isZeraryColumn = false;
+  TXshColumn *column     = xsh->getColumn(col);
+  bool isSoundColumn     = false;
+  bool isZeraryColumn    = false;
+  bool isSoundTextColumn = false;
   if (column) {
-    TXshSoundColumn *soundColumn     = column->getSoundColumn();
-    isSoundColumn                    = (!soundColumn) ? false : true;
-    TXshZeraryFxColumn *zeraryColumn = column->getZeraryFxColumn();
-    isZeraryColumn                   = (!zeraryColumn) ? false : true;
+    TXshSoundColumn *soundColumn         = column->getSoundColumn();
+    isSoundColumn                        = (!soundColumn) ? false : true;
+    TXshZeraryFxColumn *zeraryColumn     = column->getZeraryFxColumn();
+    isZeraryColumn                       = (!zeraryColumn) ? false : true;
+    TXshSoundTextColumn *soundTextColumn = column->getSoundTextColumn();
+    isSoundTextColumn                    = (!soundTextColumn) ? false : true;
   }
 
   TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
@@ -2559,10 +2637,11 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
   bool isKeyframeFrame =
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
       pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
-  bool isKeyFrameArea =
-      isKeyframeFrame &&
-      o->rect(PredefinedRect::KEYFRAME_AREA).contains(mouseInCell) &&
-      row < k1 + 1;
+  bool isKeyFrameArea = isKeyframeFrame &&
+                        o->rect(PredefinedRect::KEYFRAME_AREA)
+                            .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+                            .contains(mouseInCell) &&
+                        row < k1 + 1;
 
   if (isKeyFrameArea) {
     if (pegbar->isKeyframe(row))  // key frame
@@ -2586,7 +2665,9 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
                  .contains(mouseInCell))  // cycle toggle of key frames
     m_tooltip = tr("Set the cycle of previous keyframes");
   else if ((!xsh->getCell(row, col).isEmpty()) &&
-           o->rect(PredefinedRect::DRAG_AREA).contains(mouseInCell))
+           o->rect(PredefinedRect::DRAG_AREA)
+               .adjusted(0, 0, -frameAdj, 0)
+               .contains(mouseInCell))
     m_tooltip = tr("Click and drag to move the selection");
   else if (isZeraryColumn)
     m_tooltip = QString::fromStdWString(column->getZeraryFxColumn()
@@ -2601,7 +2682,10 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
 
     // convert the last one digit of the frame number to alphabet
     // Ex.  12 -> 1B    21 -> 2A   30 -> 3
-    if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
+    if (isSoundTextColumn)
+      m_tooltip = cell.getSoundTextLevel()->getFrameText(
+          cell.m_frameId.getNumber() - 1);
+    else if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
       m_tooltip =
           (fid.isEmptyFrame() || fid.isNoFrame())
               ? QString::fromStdWString(levelName)
@@ -2618,7 +2702,9 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
                             QString::fromStdString(frameNumber));
     }
   } else if (isSoundColumn &&
-             o->rect(PredefinedRect::PREVIEW_TRACK).contains(mouseInCell))
+             o->rect(PredefinedRect::PREVIEW_TRACK)
+                 .adjusted(0, 0, -frameAdj, 0)
+                 .contains(mouseInCell))
     m_tooltip = tr("Click and drag to play");
   else if (m_levelExtenderRect.contains(pos))
     m_tooltip = tr("Click and drag to repeat selected cells");
@@ -2646,6 +2732,7 @@ void CellArea::mouseReleaseEvent(QMouseEvent *event) {
 
 void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   const Orientation *o = m_viewer->orientation();
+  int frameAdj         = m_viewer->getFrameZoomAdjustment();
   TPoint pos(event->pos().x(), event->pos().y());
   CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
   int row                   = cellPosition.frame();
@@ -2680,10 +2767,11 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
     int k0, k1;
     bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
                            k0 <= row && row <= k1 + 1;
-    bool isKeyFrameArea =
-        isKeyframeFrame &&
-        o->rect(PredefinedRect::KEYFRAME_AREA).contains(mouseInCell) &&
-        row < k1 + 1;
+    bool isKeyFrameArea = isKeyframeFrame &&
+                          o->rect(PredefinedRect::KEYFRAME_AREA)
+                              .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+                              .contains(mouseInCell) &&
+                          row < k1 + 1;
 
     // If you are in the keyframe area, open a function editor
     if (isKeyFrameArea) {
@@ -2711,6 +2799,7 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   const Orientation *o = m_viewer->orientation();
+  int frameAdj         = m_viewer->getFrameZoomAdjustment();
   TPoint pos(event->pos().x(), event->pos().y());
   CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
   int row                   = cellPosition.frame();
@@ -2747,10 +2836,11 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   bool isKeyframeFrame =
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
       pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
-  bool isKeyFrameArea =
-      isKeyframeFrame &&
-      o->rect(PredefinedRect::KEYFRAME_AREA).contains(mouseInCell) &&
-      row < k1 + 1;
+  bool isKeyFrameArea = isKeyframeFrame &&
+                        o->rect(PredefinedRect::KEYFRAME_AREA)
+                            .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+                            .contains(mouseInCell) &&
+                        row < k1 + 1;
 
   if (isKeyFrameArea) {
     TStageObjectId objectId;
@@ -3028,13 +3118,14 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
     } else if (selectionContainTlvImage(m_viewer->getCellSelection(),
                                         m_viewer->getXsheet()))
       menu.addAction(cmdManager->getAction(MI_CanvasSize));
-      if (sl || (TApp::instance()->getCurrentLevel()->getLevel() && TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel()))
+    if (sl ||
+        (TApp::instance()->getCurrentLevel()->getLevel() &&
+         TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel()))
       menu.addAction(cmdManager->getAction(MI_LipSyncPopup));
   }
   menu.addSeparator();
   if (!soundCellsSelected)
     menu.addAction(cmdManager->getAction(MI_ImportMagpieFile));
-  
 }
 //-----------------------------------------------------------------------------
 /*! replace level with another level in the cast

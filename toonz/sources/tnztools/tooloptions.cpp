@@ -1663,7 +1663,7 @@ void FillToolOptionsBox::updateStatus() {
 void FillToolOptionsBox::onColorModeChanged() {
   bool enabled = m_colorMode->currentText() != QString("Lines");
   m_selectiveMode->setEnabled(enabled);
-  m_autopaintMode->setEnabled(enabled);
+  if(m_autopaintMode) m_autopaintMode->setEnabled(enabled);
   if (m_fillDepthLabel && m_fillDepthField) {
     m_fillDepthLabel->setEnabled(enabled);
     m_fillDepthField->setEnabled(enabled);

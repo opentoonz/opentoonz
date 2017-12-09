@@ -457,7 +457,7 @@ void TMeasuredValue::setMeasure(std::string measureName) {
 //-------------------------------------------------------------------
 
 bool TMeasuredValue::setValue(std::wstring s, int *pErr) {
-  if (s == L"") {
+  if (s == L"" || s == L"-") {
     if (pErr) *pErr = -1;
     return false;
   }

@@ -88,6 +88,7 @@ class DVAPI IntLineEdit : public LineEdit {
   int m_showedDigits;
   int m_xMouse;
   bool m_mouseDragEditing = false;
+  bool m_isTyping         = false;
 
 public:
   IntLineEdit(QWidget *parent = 0, int value = 1,

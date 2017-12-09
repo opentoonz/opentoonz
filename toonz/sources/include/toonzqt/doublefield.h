@@ -33,7 +33,10 @@ class DVAPI DoubleValueLineEdit : public LineEdit {
   Q_OBJECT
 
   int m_xMouse;
+
+protected:
   bool m_mouseDragEditing = false;
+  bool m_isTyping         = false;
 
 public:
   DoubleValueLineEdit(QWidget *parent = 0) : LineEdit(parent) {}
@@ -227,8 +230,7 @@ class DVAPI MeasuredDoubleLineEdit : public DoubleValueLineEdit {
   int m_errorHighlightingTimerId;
   int m_decimals;
   int m_xMouse;
-  bool m_labelClicked     = false;
-  bool m_mouseDragEditing = false;
+  bool m_labelClicked = false;
 
 public:
   MeasuredDoubleLineEdit(QWidget *parent = 0);
