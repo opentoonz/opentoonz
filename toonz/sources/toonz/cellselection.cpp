@@ -1583,7 +1583,7 @@ void TCellSelection::pasteCells() {
       // Retrieves all keyframe positions from mime data and translates them by
       // (r0,c0)
       std::set<TKeyframeSelection::Position> positions;
-      int newC0;
+      int newC0 = c0;
       if (viewer && !viewer->orientation()->isVerticalTimeline())
         newC0 = c0 - keyframeData->getColumnSpanCount() + 1;
       positions.insert(TKeyframeSelection::Position(r0, newC0));
@@ -1792,7 +1792,7 @@ void TCellSelection::pasteKeyframesInto() {
       // (r0,c0)
       XsheetViewer *viewer = TApp::instance()->getCurrentXsheetViewer();
       std::set<TKeyframeSelection::Position> positions;
-      int newC0;
+      int newC0 = c0;
       if (viewer && !viewer->orientation()->isVerticalTimeline())
         newC0 = c0 - keyframeData->getColumnSpanCount() + 1;
       positions.insert(TKeyframeSelection::Position(r0, newC0));
