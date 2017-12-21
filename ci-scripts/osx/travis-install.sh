@@ -1,6 +1,6 @@
 #!/bin/bash
 brew update
-brew install glew lz4 lzo libusb libmypaint
+brew install glew lz4 lzo libusb libmypaint ninja
 brew tap tcr/tcr
 brew install clang-format
 # obtain qt5.9.2 from the previous version of the formula
