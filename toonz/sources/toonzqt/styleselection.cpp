@@ -91,7 +91,7 @@ bool pasteStylesDataWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle,
       break;
     }
 
-    if (palette->getStylePage(styleId) < 0) {
+    if (palette->getStylePage(styleId) != nullptr) {
       // styleId non e' utilizzato: uso quello
       // (cut/paste utilizzato per spostare stili)
       palette->setStyle(styleId, style);
