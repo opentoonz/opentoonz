@@ -77,7 +77,8 @@ private:
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
       *m_useHigherDpiOnVectorSimplifyCB, *m_keepFillOnVectorSimplifyCB,
       *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB,
-      *m_syncLevelRenumberWithXsheet, *m_downArrowInLevelStripCreatesNewFrame;
+      *m_syncLevelRenumberWithXsheet, *m_downArrowInLevelStripCreatesNewFrame,
+      *m_disableAutoStretch;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -200,6 +201,7 @@ private slots:
   void onXsheetLayoutChanged(const QString &text);
   void onPathAliasPriorityChanged(int index);
   void onShowCurrentTimelineChanged(int);
+  void onDisableAutoStretch(int index);
 };
 
 //**********************************************************************************

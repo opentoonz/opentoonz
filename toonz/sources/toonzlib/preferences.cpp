@@ -335,7 +335,8 @@ Preferences::Preferences()
     , m_xsheetLayoutPreference("Classic-revised")
     , m_loadedXsheetLayout("Classic-revised")
     , m_pathAliasPriority(ProjectFolderOnly)
-    , m_currentTimelineEnabled(true) {
+    , m_currentTimelineEnabled(true)
+    , m_disableAutoStretch(false) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -666,6 +667,8 @@ Preferences::Preferences()
   m_loadedXsheetLayout = m_xsheetLayoutPreference;
 
   getValue(*m_settings, "currentTimelineEnabled", m_currentTimelineEnabled);
+
+  getValue(*m_settings, "DisableAutoStretch", m_disableAutoStretch);
 }
 
 //-----------------------------------------------------------------
@@ -1616,4 +1619,11 @@ void Preferences::setPathAliasPriority(PathAliasPriority priority) {
 void Preferences::enableCurrentTimelineIndicator(bool on) {
   m_currentTimelineEnabled = on;
   m_settings->setValue("currentTimelineEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableDisableAutoStretch(bool on) {
+  m_disableAutoStretch = on;
+  m_settings->setValue("DisableAutoStretch", on ? "1" : "0");
 }

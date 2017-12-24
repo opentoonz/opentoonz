@@ -312,6 +312,9 @@ public:
   bool isAutoCreateEnabled() const { return m_autocreationType > 0; }
   bool isAnimationSheetEnabled() const { return m_autocreationType == 2; }
 
+  void enableDisableAutoStretch(bool on);
+  bool isDisableAutoStretch() const { return m_disableAutoStretch; }
+
   void enableSaveUnpaintedInCleanup(bool on);
   bool isSaveUnpaintedInCleanupEnable() const {
     return m_saveUnpaintedInCleanup;
@@ -651,6 +654,7 @@ private:
   PathAliasPriority m_pathAliasPriority;
 
   bool m_currentTimelineEnabled;
+  bool m_disableAutoStretch;
 
 private:
   Preferences();
