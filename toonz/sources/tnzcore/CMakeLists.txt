@@ -252,11 +252,11 @@ if(BUILD_TARGET_WIN)
     )
 elseif(BUILD_TARGET_APPLE)
     set(SOURCES ${SOURCES}
-        ../common/tsound/tsound_mac.cpp
+        ../common/tsound/tsound_qt.cpp
     )
 elseif(BUILD_TARGET_UNIX)
     set(SOURCES ${SOURCES}
-        ../common/tsound/tsound_mac.cpp
+        ../common/tsound/tsound_qt.cpp
     )
 endif()
 
