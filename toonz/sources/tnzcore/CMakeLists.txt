@@ -255,15 +255,9 @@ elseif(BUILD_TARGET_APPLE)
         ../common/tsound/tsound_mac.cpp
     )
 elseif(BUILD_TARGET_UNIX)
-    if(SDL_LIB_FOUND)
-        set(SOURCES ${SOURCES}
-            ../common/tsound/tsound_sdl.cpp
-        )
-    else()
-        set(SOURCES ${SOURCES}
-            ../common/tsound/tsound_x.cpp
-        )
-    endif()
+    set(SOURCES ${SOURCES}
+        ../common/tsound/tsound_mac.cpp
+    )
 endif()
 
 add_translation(tnzcore ${HEADERS} ${SOURCES})

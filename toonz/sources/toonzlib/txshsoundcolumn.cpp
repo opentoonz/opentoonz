@@ -788,7 +788,7 @@ void TXshSoundColumn::updateFrameRate(double fps) {
 void TXshSoundColumn::setVolume(double value) {
   m_volume = tcrop<double>(value, 0.0, 1.0);
   if (m_player && m_player->isPlaying())
-#ifdef MACOSX
+#ifndef _WIN32
     m_player->setVolume(m_volume);
 #else
     stop();
@@ -808,7 +808,7 @@ void TXshSoundColumn::play(TSoundTrackP soundtrack, int s0, int s1, bool loop) {
 
   if (m_player) {
     try {
-#ifdef MACOSX
+#ifndef _WIN32
       m_player->prepareVolume(m_volume);
       TSoundTrackP mixedTrack = soundtrack;
 #else
@@ -818,7 +818,7 @@ void TXshSoundColumn::play(TSoundTrackP soundtrack, int s0, int s1, bool loop) {
 #endif
       m_player->play(mixedTrack, s0, s1, loop);
       m_currentPlaySoundTrack = mixedTrack;
-#ifndef MACOSX
+#ifdef _WIN32
       m_timer.start();
 #endif
     } catch (TSoundDeviceException &) {
@@ -934,7 +934,7 @@ void TXshSoundColumn::clear() {
 //-----------------------------------------------------------------------------
 
 void TXshSoundColumn::onTimerOut() {
-#ifndef MACOSX
+#ifdef _WIN32
   if (m_player && m_player->isAllQueuedItemsPlayed()) stop();
 #endif
 }
@@ -1002,7 +1002,7 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
 
 // We prefer to have 22050 as a maximum sampleRate (to avoid crashes or
 // another issues)
-#ifndef MACOSX
+#ifdef _WIN32
   if (format.m_sampleRate >= 44100) format.m_sampleRate = 22050;
 #else
   QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
