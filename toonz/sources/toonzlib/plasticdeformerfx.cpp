@@ -28,7 +28,7 @@
 #include "tconvert.h"
 #include "trop.h"
 
-#include <QOpenGLFrameBufferObject>
+#include <QOpenGLFramebufferObject>
 #include <QOffscreenSurface>
 #include <QSurfaceFormat>
 #include <QOpenGLContext>
