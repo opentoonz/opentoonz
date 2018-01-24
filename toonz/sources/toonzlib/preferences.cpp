@@ -289,6 +289,8 @@ Preferences::Preferences()
     , m_fillOnlySavebox(false)
     , m_show0ThickLines(true)
     , m_regionAntialias(false)
+    , m_keepFillOnVectorSimplify(true)
+    , m_useHigherDpiOnVectorSimplify(false)
     , m_viewerBGColor(128, 128, 128, 255)
     , m_previewBGColor(64, 64, 64, 255)
     , m_chessboardColor1(180, 180, 180)
@@ -305,6 +307,7 @@ Preferences::Preferences()
     , m_moveCurrentFrameByClickCellArea(true)
     , m_onionSkinEnabled(true)
     , m_onionSkinDuringPlayback(false)
+    , m_dropdownShortcutsCycleOptions(false)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
@@ -317,6 +320,7 @@ Preferences::Preferences()
     , m_useNumpadForSwitchingStyles(true)
     , m_newLevelSizeToCameraSizeEnabled(false)
     , m_showXSheetToolbar(false)
+    , m_syncLevelRenumberWithXsheet(false)
     , m_expandFunctionHeader(false)
     , m_showColumnNumbers(false)
     , m_useArrowKeyToShiftCellSelection(false)
@@ -328,7 +332,9 @@ Preferences::Preferences()
     , m_watchFileSystem(true)
     , m_shortcutCommandsWhileRenamingCellEnabled(false)
     , m_xsheetLayoutPreference("Classic-revised")
-    , m_loadedXsheetLayout("Classic-revised") {
+    , m_loadedXsheetLayout("Classic-revised")
+    , m_pathAliasPriority(ProjectFolderOnly)
+    , m_currentTimelineEnabled(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -379,6 +385,8 @@ Preferences::Preferences()
   getValue(*m_settings, "autosaveOtherFilesEnabled",
            m_autosaveOtherFilesEnabled);
   getValue(*m_settings, "startupPopupEnabled", m_startupPopupEnabled);
+  getValue(*m_settings, "dropdownShortcutsCycleOptions",
+           m_dropdownShortcutsCycleOptions);
   getValue(*m_settings, "defaultViewerEnabled", m_defaultViewerEnabled);
   getValue(*m_settings, "rasterOptimizedMemory", m_rasterOptimizedMemory);
   getValue(*m_settings, "saveUnpaintedInCleanup", m_saveUnpaintedInCleanup);
@@ -564,7 +572,9 @@ Preferences::Preferences()
   if (!currentStyleSheet.isEmpty() &&
       m_styleSheetList.contains(currentStyleSheet))
     m_currentStyleSheet = currentStyleSheet;
-
+  getValue(*m_settings, "useHigherDpiOnVectorSimplify",
+           m_useHigherDpiOnVectorSimplify);
+  getValue(*m_settings, "keepFillOnVectorSimplify", m_keepFillOnVectorSimplify);
   getValue(*m_settings, "DragCellsBehaviour", m_dragCellsBehaviour);
 
   getValue(*m_settings, "LineTestFpsCapture", m_lineTestFpsCapture);
@@ -625,6 +635,8 @@ Preferences::Preferences()
   getValue(*m_settings, "newLevelSizeToCameraSizeEnabled",
            m_newLevelSizeToCameraSizeEnabled);
   getValue(*m_settings, "showXSheetToolbar", m_showXSheetToolbar);
+  getValue(*m_settings, "syncLevelRenumberWithXsheet",
+           m_syncLevelRenumberWithXsheet);
   getValue(*m_settings, "expandFunctionHeader", m_expandFunctionHeader);
   getValue(*m_settings, "showColumnNumbers", m_showColumnNumbers);
   getValue(*m_settings, "useArrowKeyToShiftCellSelection",
@@ -635,6 +647,9 @@ Preferences::Preferences()
   getValue(*m_settings, "watchFileSystemEnabled", m_watchFileSystem);
   getValue(*m_settings, "shortcutCommandsWhileRenamingCellEnabled",
            m_shortcutCommandsWhileRenamingCellEnabled);
+  int pathAliasPriority = static_cast<int>(m_pathAliasPriority);
+  getValue(*m_settings, "pathAliasPriority", pathAliasPriority);
+  m_pathAliasPriority = static_cast<PathAliasPriority>(pathAliasPriority);
 
   QString xsheetLayoutPreference;
   xsheetLayoutPreference =
@@ -646,6 +661,8 @@ Preferences::Preferences()
     m_xsheetLayoutPreference = QString("Classic");
   setXsheetLayoutPreference(m_xsheetLayoutPreference.toStdString());
   m_loadedXsheetLayout = m_xsheetLayoutPreference;
+
+  getValue(*m_settings, "currentTimelineEnabled", m_currentTimelineEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -813,6 +830,7 @@ void Preferences::setAutosavePeriod(int minutes) {
   m_settings->setValue("autosavePeriod", QString::number(minutes));
   emit stopAutoSave();
   emit startAutoSave();
+  emit autoSavePeriodChanged();
 }
 
 //-----------------------------------------------------------------
@@ -1310,6 +1328,20 @@ void Preferences::setFillOnlySavebox(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setKeepFillOnVectorSimplify(bool on) {
+  m_keepFillOnVectorSimplify = on;
+  m_settings->setValue("keepFillOnVectorSimplify", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setUseHigherDpiOnVectorSimplify(bool on) {
+  m_useHigherDpiOnVectorSimplify = on;
+  m_settings->setValue("useHigherDpiOnVectorSimplify", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableLevelsBackup(bool enabled) {
   m_levelsBackupEnabled = enabled;
   m_settings->setValue("levelsBackupEnabled", enabled ? "1" : "0");
@@ -1320,6 +1352,13 @@ void Preferences::enableLevelsBackup(bool enabled) {
 void Preferences::enableSceneNumbering(bool enabled) {
   m_sceneNumberingEnabled = enabled;
   m_settings->setValue("sceneNumberingEnabled", enabled ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setDropdownShortcutsCycleOptions(bool on) {
+  m_dropdownShortcutsCycleOptions = on;
+  m_settings->setValue("dropdownShortcutsCycleOptions", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
@@ -1499,6 +1538,13 @@ void Preferences::enableShowXSheetToolbar(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::enableSyncLevelRenumberWithXsheet(bool on) {
+  m_syncLevelRenumberWithXsheet = on;
+  m_settings->setValue("syncLevelRenumberWithXsheet", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableExpandFunctionHeader(bool on) {
   m_expandFunctionHeader = on;
   m_settings->setValue("expandFunctionHeader", on ? "1" : "0");
@@ -1546,4 +1592,18 @@ void Preferences::enableShortcutCommandsWhileRenamingCell(bool on) {
   m_shortcutCommandsWhileRenamingCellEnabled = on;
   m_settings->setValue("shortcutCommandsWhileRenamingCellEnabled",
                        on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setPathAliasPriority(PathAliasPriority priority) {
+  m_pathAliasPriority = priority;
+  m_settings->setValue("pathAliasPriority", static_cast<int>(priority));
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableCurrentTimelineIndicator(bool on) {
+  m_currentTimelineEnabled = on;
+  m_settings->setValue("currentTimelineEnabled", on ? "1" : "0");
 }

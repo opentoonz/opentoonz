@@ -142,6 +142,14 @@
         <source>Smooth:</source>
         <translation>平滑化：</translation>
     </message>
+    <message>
+        <source>Range:</source>
+        <translation>中割り：</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>スナップ</translation>
+    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>

@@ -25,6 +25,8 @@ class QMainWindow;
 
 class TMainWindow;
 class ComboViewerPanel;
+class SceneViewer;
+class XsheetViewer;
 
 //=============================================================================
 // TXsheeHandle
@@ -82,6 +84,8 @@ class TApp final : public QObject,
   // keep a pointer of the inknpaint viewer in order to enable navigator pan in
   // the filmstrip
   ComboViewerPanel *m_inknPaintViewerPanel;
+  SceneViewer *m_activeViewer;
+  XsheetViewer *m_xsheetViewer;
 
   int m_autosavePeriod;  // minutes
   bool m_autosaveSuspended;
@@ -195,11 +199,19 @@ public:
     return m_inknPaintViewerPanel;
   }
 
+  void setActiveViewer(SceneViewer *viewer) { m_activeViewer = viewer; }
+
+  SceneViewer *getActiveViewer() const { return m_activeViewer; }
+
   bool isApplicationStarting() { return m_isStarting; }
 
   bool isPenCloseToTablet() const { return m_isPenCloseToTablet; }
 
   void writeSettings();
+
+  void setCurrentXsheetViewer(XsheetViewer *viewer) { m_xsheetViewer = viewer; }
+
+  XsheetViewer *getCurrentXsheetViewer() const { return m_xsheetViewer; }
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event) override;

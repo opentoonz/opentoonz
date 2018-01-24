@@ -48,6 +48,8 @@ class RowArea final : public QWidget {
   void drawCurrentRowGadget(QPainter &p, int r0, int r1);
   void drawOnionSkinSelection(QPainter &p);
   void drawPinnedCenterKeys(QPainter &p, int r0, int r1);
+  void drawCurrentTimeIndicator(QPainter &p);
+  void drawCurrentTimeLine(QPainter &p);
 
   DragTool *getDragTool() const;
   void setDragTool(DragTool *dragTool);

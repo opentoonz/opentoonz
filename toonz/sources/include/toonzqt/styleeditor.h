@@ -8,6 +8,7 @@
 #include "tfilepath.h"
 #include "tpixel.h"
 #include "tpalette.h"
+#include "saveloadqsettings.h"
 
 // TnzLib includes
 #include "toonz/tpalettehandle.h"
@@ -35,6 +36,8 @@
 #include <QScrollArea>
 #include <QMouseEvent>
 #include <QPointF>
+#include <QSettings>
+#include <QSplitter>
 
 // iwsw commented out temporarily
 //#include "ghibli_3dlut_util.h"
@@ -450,14 +453,30 @@ class PlainColorPage final : public StyleEditorPage {
 
   ColorModel m_color;
   bool m_signalEnabled;
-
+  bool m_isVertical = true;
+  int m_visibleParts;
   void updateControls();
+  QPushButton *m_wheelShowButton;
+  QPushButton *m_hsvShowButton;
+  QPushButton *m_alphaShowButton;
+  QPushButton *m_rgbShowButton;
+  QPushButton *m_toggleOrientationButton;
+  // QGridLayout *m_mainLayout;
+  QFrame *m_slidersContainer;
+  QFrame *m_wheelFrame;
+  QSplitter *m_vSplitter;
 
 public:
   PlainColorPage(QWidget *parent = 0);
   ~PlainColorPage() {}
 
   void setColor(const TColorStyle &style, int colorParameterIndex);
+  void setVisibleParts(int settings);
+  int getVisibleParts();
+  void setIsVertical(bool isVertical);
+  bool getIsVertical() { return m_isVertical; }
+  QByteArray getSplitterState();
+  void setSplitterState(QByteArray state);
 
 protected:
   void resizeEvent(QResizeEvent *) override;
@@ -469,6 +488,7 @@ protected slots:
   void onWheelChanged(const ColorModel &color, bool isDragging);
   // void onWheelSliderChanged(int value);
   // void onWheelSliderReleased();
+  void toggleOrientation();
 
 public slots:
   // void setWheelChannel(int channel);
@@ -581,7 +601,7 @@ using namespace StyleEditorGUI;
 // StyleEditor
 //-----------------------------------------------------------------------------
 
-class DVAPI StyleEditor final : public QWidget {
+class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   Q_OBJECT
 
   PaletteController *m_paletteController;
@@ -620,6 +640,7 @@ class DVAPI StyleEditor final : public QWidget {
   StyleChooserPage *m_vectorBrushesStylePage;
   StyleChooserPage *m_mypaintBrushesStylePage;
   SettingsPage *m_settingsPage;
+  QScrollArea *m_vectorArea;
 
   TColorStyleP
       m_oldStyle;  //!< A copy of current style \a before the last change.
@@ -630,6 +651,7 @@ class DVAPI StyleEditor final : public QWidget {
   bool m_enabled;
   bool m_enabledOnlyFirstTab;
   bool m_enabledFirstAndLastTab;
+  bool m_colorPageIsVertical = true;
 
 public:
   StyleEditor(PaletteController *, QWidget *parent = 0);
@@ -654,6 +676,10 @@ public:
   void enableAutopaintToggle(bool enabled) {
     m_settingsPage->enableAutopaintToggle(enabled);
   }
+
+  // SaveLoadQSettings
+  virtual void save(QSettings &settings) const override;
+  virtual void load(QSettings &settings) override;
 
 protected:
   /*! Return false if style is linked and style must be set to null.*/
@@ -686,8 +712,8 @@ protected:
 protected slots:
 
   void onStyleSwitched();
-  void onStyleChanged();
-  void onCleanupStyleChanged();
+  void onStyleChanged(bool isDragging);
+  void onCleanupStyleChanged(bool isDragging);
   void onOldStyleClicked(const TColorStyle &);
 
   // called (e.g.) by PaletteController when an other StyleEditor change the
@@ -711,6 +737,10 @@ protected slots:
   void onColorParamChanged();
 
   void onParamStyleChanged(bool isDragging);
+
+  void onSpecialButtonToggled(bool on);
+  void onCustomButtonToggled(bool on);
+  void onVectorBrushButtonToggled(bool on);
 
 private:
   QFrame *createBottomWidget();

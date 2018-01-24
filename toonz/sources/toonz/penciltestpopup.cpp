@@ -682,7 +682,7 @@ bool FlexibleNameCreator::setCurrent(std::wstring name) {
 
 PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
     : Dialog(parent, true, false, "PencilTestSaveInFolder") {
-  setWindowTitle("Create the Destination Subfolder to Save");
+  setWindowTitle(tr("Create the Destination Subfolder to Save"));
 
   m_parentFolderField = new FileField(this);
 
@@ -864,7 +864,15 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
 QString PencilTestSaveInFolderPopup::getPath() {
   if (!m_subFolderCB->isChecked()) return m_parentFolderField->getPath();
 
-  return m_parentFolderField->getPath() + "\\" + m_subFolderNameField->text();
+  // re-code filepath
+  TFilePath path(m_parentFolderField->getPath() + "\\" +
+                 m_subFolderNameField->text());
+  ToonzScene* scene = TApp::instance()->getCurrentScene()->getScene();
+  if (scene) {
+    path = scene->decodeFilePath(path);
+    path = scene->codeFilePath(path);
+  }
+  return path.getQString();
 }
 
 //-----------------------------------------------------------------------------

@@ -200,7 +200,7 @@ void PaletteViewer::setPaletteHandle(TPaletteHandle *paletteHandle) {
                          SLOT(changeWindowTitle()));
     ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
                          SLOT(onColorStyleSwitched()));
-    ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
+    ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
                          SLOT(changeWindowTitle()));
     ret = ret && connect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()),
                          this, SLOT(changeWindowTitle()));
@@ -635,7 +635,7 @@ void PaletteViewer::showEvent(QShowEvent *) {
           SLOT(changeWindowTitle()));
   connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
           SLOT(onColorStyleSwitched()));
-  connect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
+  connect(m_paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
           SLOT(changeWindowTitle()));
   connect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()), this,
           SLOT(changeWindowTitle()));
@@ -657,7 +657,7 @@ void PaletteViewer::hideEvent(QHideEvent *) {
              SLOT(changeWindowTitle()));
   disconnect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
              SLOT(onColorStyleSwitched()));
-  disconnect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
+  disconnect(m_paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
              SLOT(changeWindowTitle()));
   disconnect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()), this,
              SLOT(changeWindowTitle()));

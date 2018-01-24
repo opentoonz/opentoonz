@@ -380,6 +380,30 @@
         <source>DarkMagenta</source>
         <translation>暗いマゼンタ</translation>
     </message>
+    <message>
+        <source>Brightness</source>
+        <translation>明るさ</translation>
+    </message>
+    <message>
+        <source>Contrast</source>
+        <translation>コントラスト</translation>
+    </message>
+    <message>
+        <source>HRange</source>
+        <translation>色相の範囲</translation>
+    </message>
+    <message>
+        <source>Line Width</source>
+        <translation>線の太さ</translation>
+    </message>
+    <message>
+        <source>ColorThres</source>
+        <translation>色のしきい値</translation>
+    </message>
+    <message>
+        <source>WhiteThres</source>
+        <translation>明るさのしきい値</translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

@@ -457,7 +457,7 @@ void TMeasuredValue::setMeasure(std::string measureName) {
 //-------------------------------------------------------------------
 
 bool TMeasuredValue::setValue(std::wstring s, int *pErr) {
-  if (s == L"") {
+  if (s == L"" || s == L"-") {
     if (pErr) *pErr = -1;
     return false;
   }
@@ -530,6 +530,20 @@ std::wstring TMeasuredValue::toWideString(int decimals) const {
   std::wstring measure = m_measure->getCurrentUnit()->getDefaultExtension();
   if (measure.empty()) return ::to_wstring(s);
   return ::to_wstring(s) + L" " + measure;
+}
+
+//-------------------------------------------------------------------
+
+void TMeasuredValue::modifyValue(double direction, int precision) {
+  for (int i = 0; i < precision; i++) {
+    direction /= 10;
+  }
+  std::wstring currExtension =
+      getMeasure()->getCurrentUnit()->getDefaultExtension();
+  // use a smaller value for inches and cm
+  if (currExtension == L"\"" || currExtension == L"cm") direction /= 10;
+  double v = getValue(CurrentUnit);
+  setValue(CurrentUnit, v + direction);
 }
 
 //===================================================================

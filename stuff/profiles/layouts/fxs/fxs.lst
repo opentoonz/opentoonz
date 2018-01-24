@@ -21,6 +21,7 @@
     STD_rotationalBlurFx
     STD_inoSpinBlurFx
     STD_iwa_BokehFx
+    STD_iwa_BokehRefFx
   </Blur>
   <Distort>
     STD_freeDistortFx
@@ -175,4 +176,7 @@
   SHADER_radialblurGPU
   SHADER_spinblurGPU
 </Shaders>
+  <Utility>
+    STD_nothingFx
+  </Utility>
 </fxs>

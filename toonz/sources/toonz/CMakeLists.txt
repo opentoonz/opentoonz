@@ -70,6 +70,7 @@ set(MOC_HEADERS
     linetestcapturepane.h
     linetestpane.h
     linetestviewer.h
+    lipsyncpopup.h
     loadfolderpopup.h
     magpiefileimportpopup.h
     mainwindow.h
@@ -106,6 +107,7 @@ set(MOC_HEADERS
     selectionutils.h
     shifttracetool.h
     shortcutpopup.h
+    soundtrackexport.h
     startuppopup.h
     subcameramanager.h
 	sublayers.h
@@ -236,6 +238,7 @@ set(SOURCES
     linetestcapturepane.cpp
     linetestpane.cpp
     linetestviewer.cpp
+    lipsyncpopup.cpp
     magpiefileimportpopup.cpp
     outputsettingspopup.cpp
     overwritepopup.cpp
@@ -252,6 +255,7 @@ set(SOURCES
     scriptconsolepanel.cpp
     shifttracetool.cpp
     shortcutpopup.cpp
+    soundtrackexport.cpp
     startuppopup.cpp
     subcameramanager.cpp
 	sublayers.cpp
@@ -418,6 +422,7 @@ elseif(BUILD_ENV_APPLE)
     # 変なところにライブラリ生成するカスども
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
+    add_dependencies(OpenToonz_${VERSION} tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm)
 
     target_link_libraries(OpenToonz_${VERSION}
         Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
@@ -435,7 +440,7 @@ elseif(BUILD_ENV_UNIXLIKE)
     set(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${OPENBLAS_LIB})
 
     if(BUILD_TARGET_WIN)
-        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids)
+        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids -mwindows)
     endif()
 
     target_link_libraries(

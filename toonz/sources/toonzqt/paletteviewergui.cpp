@@ -163,11 +163,11 @@ void PageViewer::setPaletteHandle(TPaletteHandle *paletteHandle) {
   if (previousPalette == paletteHandle) return;
 
   if (previousPalette)
-    disconnect(previousPalette, SIGNAL(colorStyleChanged()), this,
+    disconnect(previousPalette, SIGNAL(colorStyleChanged(bool)), this,
                SLOT(update()));
 
   m_styleSelection->setPaletteHandle(paletteHandle);
-  connect(paletteHandle, SIGNAL(colorStyleChanged()), SLOT(update()));
+  connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), SLOT(update()));
 
   if (m_styleNameEditor) m_styleNameEditor->setPaletteHandle(paletteHandle);
 }
@@ -1281,7 +1281,7 @@ void PageViewer::keyPressEvent(QKeyEvent *e) {
 void PageViewer::showEvent(QShowEvent *) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   if (!paletteHandle) return;
-  connect(paletteHandle, SIGNAL(colorStyleChanged()), SLOT(update()),
+  connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), SLOT(update()),
           Qt::UniqueConnection);
 }
 
@@ -1290,7 +1290,8 @@ void PageViewer::showEvent(QShowEvent *) {
 void PageViewer::hideEvent(QHideEvent *) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   if (!paletteHandle) return;
-  disconnect(paletteHandle, SIGNAL(colorStyleChanged()), this, SLOT(update()));
+  disconnect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
+             SLOT(update()));
 }
 
 //-----------------------------------------------------------------------------

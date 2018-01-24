@@ -1517,9 +1517,10 @@ void VectorSelectionTool::leftButtonDrag(const TPointD &pos,
 
   m_curPos = pos;
 
-  if (m_strokeSelectionType.getIndex() == FREEHAND_SELECTION_IDX)
+  if (m_strokeSelectionType.getIndex() == FREEHAND_SELECTION_IDX) {
     freehandDrag(pos);
-  else if (m_strokeSelectionType.getIndex() == RECT_SELECTION_IDX) {
+    invalidate();
+  } else if (m_strokeSelectionType.getIndex() == RECT_SELECTION_IDX) {
     bool selectOverlappingStroke = (m_firstPos.x > pos.x);
 
     TRectD rect(m_firstPos, pos);
@@ -1590,6 +1591,7 @@ void VectorSelectionTool::leftButtonUp(const TPointD &pos,
 
       delete m_stroke;  // >:(
       m_stroke = 0;
+      m_track.clear();
     }
   }
 
@@ -1702,6 +1704,8 @@ void VectorSelectionTool::draw() {
 
   if (m_strokeSelectionType.getIndex() == POLYLINE_SELECTION_IDX)
     drawPolylineSelection();
+  else if (m_strokeSelectionType.getIndex() == FREEHAND_SELECTION_IDX)
+    drawFreehandSelection();
 
   if (m_levelSelection.isEmpty()) drawGroup(*vi);
 

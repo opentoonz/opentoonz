@@ -23,7 +23,8 @@ void addFrames(TXshSimpleLevel *sl, int start, int end, int step);
 void renumber(TXshSimpleLevel *sl, std::set<TFrameId> &frames, int startFrame,
               int stepFrame);
 void renumber(TXshSimpleLevel *sl,
-              const std::vector<std::pair<TFrameId, TFrameId>> &table);
+              const std::vector<std::pair<TFrameId, TFrameId>> &table,
+              bool forceCallUpdateXSheet = false);
 
 void copy(TXshSimpleLevel *sl, std::set<TFrameId> &frames);
 void paste(TXshSimpleLevel *sl, std::set<TFrameId> &frames);

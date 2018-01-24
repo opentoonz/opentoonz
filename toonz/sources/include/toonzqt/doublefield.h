@@ -32,6 +32,12 @@ namespace DVGui {
 class DVAPI DoubleValueLineEdit : public LineEdit {
   Q_OBJECT
 
+  int m_xMouse;
+
+protected:
+  bool m_mouseDragEditing = false;
+  bool m_isTyping         = false;
+
 public:
   DoubleValueLineEdit(QWidget *parent = 0) : LineEdit(parent) {}
   ~DoubleValueLineEdit() {}
@@ -48,6 +54,12 @@ protected:
   /*! If focus is lost and current value is out of range emit signal \b
    * lostFocus. */
   void focusOutEvent(QFocusEvent *) override;
+
+  // these are only used for mouse dragging
+  // to set the value of the field.
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
 
 signals:
   /*! To emit when value change. */
@@ -217,6 +229,8 @@ class DVAPI MeasuredDoubleLineEdit : public DoubleValueLineEdit {
   double m_errorHighlighting;
   int m_errorHighlightingTimerId;
   int m_decimals;
+  int m_xMouse;
+  bool m_labelClicked = false;
 
 public:
   MeasuredDoubleLineEdit(QWidget *parent = 0);
@@ -241,11 +255,21 @@ private:
 
 protected:
   void timerEvent(QTimerEvent *e) override;
+  // these are only used for mouse dragging
+  // to set the value of the field.
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
 
 protected slots:
 
   void onEditingFinished();
   void onTextChanged(const QString &);
+
+  // This allows the field to be set by dragging on the label
+  void receiveMouseMove(QMouseEvent *event);
+  void receiveMousePress(QMouseEvent *event);
+  void receiveMouseRelease(QMouseEvent *event);
 };
 
 //=============================================================================

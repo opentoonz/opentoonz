@@ -636,11 +636,18 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   // check if the column is reference
   bool isEditingSpline = app->getCurrentObject()->isSpline();
 
-  QRect baseRect = o->rect(PredefinedRect::LAYER_HEADER).translated(orig);
-  NumberRange frameRange = o->frameSide(baseRect);
-  NumberRange layerRange = m_viewer->screenMapper()->colsToLayerAxis(
-      NumberRange(col, col + 1));  // to include unfolded sublayers
-  QRect rect = o->frameLayerRect(frameRange, layerRange);
+  QRect rect = o->rect(PredefinedRect::LAYER_HEADER).translated(orig);
+  if (!o->isVerticalTimeline()) {
+    bool showSubLayers =
+        !m_viewer->screenMapper()->subLayers()->layer(column)->isFolded();
+    if (showSubLayers) {
+      vector<shared_ptr<SubLayer>> subLayers = m_viewer->screenMapper()
+                                                   ->subLayers()
+                                                   ->layer(column)
+                                                   ->childrenFlatTree();
+      rect.setBottom(rect.bottom() + (o->cellHeight() * subLayers.size()));
+    }
+  }
 
   int x0 = rect.left();
   int x1 = rect.right();
@@ -1183,7 +1190,7 @@ void ColumnArea::DrawHeader::drawSubLayers() const {
 
   for (int i = 0; i < subLayers.size(); i++) {
     shared_ptr<SubLayer> subLayer = subLayers[i];
-    SubLayerOffsets offsets       = mapper->subLayerOffsets(column, i);
+    SubLayerOffsets offsets       = m_viewer->subLayerOffsets(column, i);
 
     QRect rect = {mapper->rect(PredefinedRect::LAYER_HEADER)
                       .translated(offsets.topLeft())};
@@ -1263,37 +1270,89 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
   const ScreenMapper *mapper = m_viewer->screenMapper();
   const Orientation *o       = mapper->orientation();
 
-  int layerAxis      = mapper->columnToLayerAxis(col);
-  QPoint xy          = {mapper->positionToXY(CellPosition(0, col))};
-  QRect columnHeader = {
-      mapper->rect(PredefinedRect::LAYER_HEADER).translated(xy)};
-  NumberRange frameAxis = {o->frameSide(columnHeader)};
+  QPoint xy  = {m_viewer->positionToXY(CellPosition(0, col))};
+  QRect rect = {
+      mapper->rect(PredefinedRect::FOLDED_LAYER_HEADER).translated(xy)};
 
-  p.fillRect(columnHeader, m_viewer->getDarkBGColor());
-  frameAxis = frameAxis.adjusted(20, 0);
+  int x0, y0, x, y;
 
-  p.setPen(m_viewer->getDarkLineColor());
-  p.setBrush(QBrush(m_viewer->getLightLightBGColor()));
-  for (int i = 0; i < 3; i++)
-    p.drawRect(o->foldedHeader(layerAxis, frameAxis, i));
+  if (o->isVerticalTimeline()) {
+    x0 = rect.topLeft().x() + 1;
+    y0 = 0;
 
-  // triangles
-  p.setPen(Qt::black);
-  layerAxis++;
-  int f = frameAxis.from() - 6;
-  p.drawLine(o->verticalLine(layerAxis, NumberRange(f, f)));
-  layerAxis++;
-  p.drawLine(o->verticalLine(layerAxis, NumberRange(f - 1, f + 1)));
-  layerAxis++;
-  p.drawLine(o->verticalLine(layerAxis, NumberRange(f - 2, f + 2)));
-  layerAxis += 3;
-  p.drawLine(o->verticalLine(layerAxis, NumberRange(f - 2, f + 2)));
-  layerAxis++;
-  p.drawLine(o->verticalLine(layerAxis, NumberRange(f - 1, f + 1)));
-  layerAxis++;
-  p.drawLine(o->verticalLine(layerAxis, NumberRange(f, f)));
+    p.setPen(m_viewer->getDarkLineColor());
+    p.fillRect(x0, y0 + 1, rect.width(), 18,
+               QBrush(m_viewer->getDarkBGColor()));
+    p.fillRect(x0, y0 + 17, 2, rect.height() - 34,
+               QBrush(m_viewer->getLightLightBGColor()));
+    p.fillRect(x0 + 3, y0 + 20, 2, rect.height() - 36,
+               QBrush(m_viewer->getLightLightBGColor()));
+    p.fillRect(x0 + 6, y0 + 17, 2, rect.height() - 34,
+               QBrush(m_viewer->getLightLightBGColor()));
 
-  p.setBrush(Qt::NoBrush);
+    p.setPen(m_viewer->getVerticalLineColor());
+    p.drawLine(x0 - 1, y0 + 17, x0 - 1, rect.height());
+    p.setPen(m_viewer->getDarkLineColor());
+    p.drawLine(x0 + 2, y0 + 17, x0 + 2, rect.height());
+    p.drawLine(x0 + 5, y0 + 17, x0 + 5, rect.height());
+    p.drawLine(x0, y0 + 17, x0 + 1, 17);
+    p.drawLine(x0 + 3, y0 + 20, x0 + 4, 20);
+    p.drawLine(x0 + 6, y0 + 17, x0 + 7, 17);
+
+    // triangolini
+    p.setPen(Qt::black);
+    x = x0;
+    y = 12;
+    p.drawPoint(QPointF(x, y));
+    x++;
+    p.drawLine(x, y - 1, x, y + 1);
+    x++;
+    p.drawLine(x, y - 2, x, y + 2);
+    x += 3;
+    p.drawLine(x, y - 2, x, y + 2);
+    x++;
+    p.drawLine(x, y - 1, x, y + 1);
+    x++;
+    p.drawPoint(x, y);
+  } else {
+    x0 = 0;
+    y0 = rect.topLeft().y() + 1;
+
+    p.setPen(m_viewer->getDarkLineColor());
+    p.fillRect(x0 + 1, y0, 18, rect.height(),
+               QBrush(m_viewer->getDarkBGColor()));
+    p.fillRect(x0 + 17, y0, rect.width() - 34, 2,
+               QBrush(m_viewer->getLightLightBGColor()));
+    p.fillRect(x0 + 20, y0 + 3, rect.width() - 36, 2,
+               QBrush(m_viewer->getLightLightBGColor()));
+    p.fillRect(x0 + 17, y0 + 6, rect.width() - 34, 2,
+               QBrush(m_viewer->getLightLightBGColor()));
+
+    p.setPen(m_viewer->getVerticalLineColor());
+    p.drawLine(x0 + 17, y0 - 1, rect.width(), y0 - 1);
+    p.setPen(m_viewer->getDarkLineColor());
+    p.drawLine(x0 + 17, y0 + 2, rect.width(), y0 + 2);
+    p.drawLine(x0 + 17, y0 + 5, rect.width(), y0 + 5);
+    p.drawLine(x0 + 17, y0, 17, y0 + 1);
+    p.drawLine(x0 + 20, y0 + 3, 20, y0 + 4);
+    p.drawLine(x0 + 17, y0 + 6, 17, y0 + 7);
+
+    // triangolini
+    p.setPen(Qt::black);
+    x = 12;
+    y = y0;
+    p.drawPoint(QPointF(x, y));
+    y++;
+    p.drawLine(x - 1, y, x + 1, y);
+    y++;
+    p.drawLine(x - 2, y, x + 2, y);
+    y += 3;
+    p.drawLine(x - 2, y, x + 2, y);
+    y++;
+    p.drawLine(x - 1, y, x + 1, y);
+    y++;
+    p.drawPoint(x, y);
+  }
 }
 
 void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
@@ -1366,7 +1425,8 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
   drawHeader.drawFilterColor();
-  drawHeader.drawSubLayers();
+  if (!o->isVerticalTimeline())
+	  drawHeader.drawSubLayers();
 }
 
 //-----------------------------------------------------------------------------
@@ -1574,12 +1634,16 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   QPainter p(this);
   p.setClipRect(toBeUpdated);
 
+  TXsheet *xsh        = m_viewer->getXsheet();
   CellRange cellRange = m_viewer->xyRectToRange(toBeUpdated);
   int c0, c1;  // range of visible columns
   c0 = cellRange.from().layer();
   c1 = cellRange.to().layer();
+  if (!m_viewer->orientation()->isVerticalTimeline()) {
+    int colCount = qMax(1, xsh->getColumnCount());
+    c1           = qMin(c1, colCount - 1);
+  }
 
-  TXsheet *xsh         = m_viewer->getXsheet();
   ColumnFan *columnFan = m_viewer->screenMapper()->columnFan();
   int col;
   for (col = c0; col <= c1; col++) {
@@ -1920,6 +1984,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
                    .contains(mouseInCell) &&
                event->button() == Qt::LeftButton) {
       m_viewer->screenMapper()->subLayers()->layer(column)->foldUnfold();
+      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
       update();
     }
     // sound column
@@ -1969,6 +2034,9 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     // synchronize the current column and the current fx
     TApp::instance()->getCurrentFx()->setFx(column->getFx());
   } else if (m_col >= 0) {
+    if (m_viewer->getColumnSelection()->isColumnSelected(m_col) &&
+        event->button() == Qt::RightButton)
+      return;
     setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
     TApp::instance()->getCurrentFx()->setFx(0);
   }
@@ -2272,6 +2340,8 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     menu.addAction(cmdManager->getAction(MI_Insert));
     menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_InsertFx));
+    menu.addAction(cmdManager->getAction(MI_NewNoteLevel));
+    menu.addAction(cmdManager->getAction(MI_RemoveEmptyColumns));
     menu.addSeparator();
     if (m_viewer->getXsheet()->isColumnEmpty(col) ||
         (cell.m_level && cell.m_level->getChildLevel()))

@@ -12,6 +12,8 @@
 #include "toonz/tobjecthandle.h"
 #include "tw/keycodes.h"
 
+#include <QKeyEvent>
+
 using namespace ToolUtils;
 using namespace DragSelectionTool;
 
@@ -1180,6 +1182,17 @@ void SelectionTool::drawPolylineSelection() {
 
 //-----------------------------------------------------------------------------
 
+void SelectionTool::drawFreehandSelection() {
+  if (m_track.isEmpty()) return;
+  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+                     ? TPixel32::White
+                     : TPixel32::Black;
+  tglColor(color);
+  m_track.drawAllFragments();
+}
+
+//-----------------------------------------------------------------------------
+
 void SelectionTool::drawRectSelection(const TImage *image) {
   const TVectorImage *vi   = dynamic_cast<const TVectorImage *>(image);
   unsigned short stipple   = 0x3F33;
@@ -1269,45 +1282,14 @@ void SelectionTool::startFreehand(const TPointD &pos) {
   m_firstPos       = pos;
   double pixelSize = getPixelSize();
   m_track.add(TThickPoint(pos, 0), pixelSize * pixelSize);
-  TPointD dpiScale = m_viewer->getDpiScale();
-#if defined(MACOSX)
-//			m_viewer->prepareForegroundDrawing();
-#endif
-  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                     ? TPixel32::White
-                     : TPixel32::Black;
-  tglColor(color);
-  m_viewer->startForegroundDrawing();
-  glPushMatrix();
-  tglMultMatrix(getMatrix());
-  glScaled(dpiScale.x, dpiScale.y, 1);
-  m_track.drawLastFragments();
-  glPopMatrix();
-  m_viewer->endForegroundDrawing();
 }
 
 //-----------------------------------------------------------------------------
 
 //! Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
 void SelectionTool::freehandDrag(const TPointD &pos) {
-#if defined(MACOSX)
-//		m_viewer->enableRedraw(false);
-#endif
-
   double pixelSize = getPixelSize();
-  m_viewer->startForegroundDrawing();
-  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                     ? TPixel32::White
-                     : TPixel32::Black;
-  tglColor(color);
-  glPushMatrix();
-  tglMultMatrix(getMatrix());
-  TPointD dpiScale = m_viewer->getDpiScale();
-  glScaled(dpiScale.x, dpiScale.y, 1);
   m_track.add(TThickPoint(pos, 0), pixelSize * pixelSize);
-  m_track.drawLastFragments();
-  glPopMatrix();
-  m_viewer->endForegroundDrawing();
 }
 
 //-----------------------------------------------------------------------------
@@ -1315,9 +1297,6 @@ void SelectionTool::freehandDrag(const TPointD &pos) {
 //! Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato
 //! lo stroke rappresentante il lazzo.
 void SelectionTool::closeFreehand(const TPointD &pos) {
-#if defined(MACOSX)
-//		m_viewer->enableRedraw(true);
-#endif
   if (m_track.isEmpty()) return;
   double pixelSize = getPixelSize();
   m_track.add(TThickPoint(m_firstPos, 0), pixelSize * pixelSize);
@@ -1333,28 +1312,7 @@ void SelectionTool::closeFreehand(const TPointD &pos) {
 void SelectionTool::addPointPolyline(const TPointD &pos) {
   m_firstPos      = pos;
   m_mousePosition = pos;
-
-  TPointD dpiScale = m_viewer->getDpiScale();
-
-#if defined(MACOSX)
-//		 m_viewer->prepareForegroundDrawing();
-#endif
-  TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-                     ? TPixel32::White
-                     : TPixel32::Black;
-  tglColor(color);
-  m_viewer->startForegroundDrawing();
-
-#if defined(MACOSX)
-//  		m_viewer->enableRedraw(m_strokeSelectionType.getValue() ==
-//  POLYLINE_SELECTION);
-#endif
-
-  glPushMatrix();
-  glScaled(dpiScale.x, dpiScale.y, 1);
   m_polyline.push_back(pos);
-  glPopMatrix();
-  m_viewer->endForegroundDrawing();
 }
 
 //-----------------------------------------------------------------------------
@@ -1378,4 +1336,18 @@ void SelectionTool::closePolyline(const TPointD &pos) {
   m_stroke = new TStroke(strokePoints);
   assert(m_stroke->getPoint(0) == m_stroke->getPoint(1));
   invalidate();
+}
+
+//-----------------------------------------------------------------------------
+
+// returns true if the pressed key is recognized and processed in the tool
+// instead of triggering the shortcut command.
+bool SelectionTool::isEventAcceptable(QEvent *e) {
+  if (!isEnabled()) return false;
+  if (isSelectionEmpty()) return false;
+  // arrow keys will be used for moving the selected region
+  QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+  int key             = keyEvent->key();
+  return (key == Qt::Key_Up || key == Qt::Key_Down || key == Qt::Key_Left ||
+          key == Qt::Key_Right);
 }

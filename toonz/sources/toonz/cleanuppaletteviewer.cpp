@@ -87,8 +87,8 @@ CleanupPaletteViewer::CleanupPaletteViewer(QWidget *parent)
   bool ret = true;
   ret      = ret && connect(m_ph, SIGNAL(paletteSwitched()), SLOT(buildGUI()));
   ret      = ret && connect(m_ph, SIGNAL(paletteChanged()), SLOT(buildGUI()));
-  ret      = ret &&
-        connect(m_ph, SIGNAL(colorStyleChanged()), SLOT(onColorStyleChanged()));
+  ret      = ret && connect(m_ph, SIGNAL(colorStyleChanged(bool)),
+                       SLOT(onColorStyleChanged()));
 
   ret = ret && connect(m_add, SIGNAL(clicked(bool)), SLOT(onAddClicked(bool)));
   ret = ret &&

@@ -44,6 +44,9 @@ public:
 
   virtual bool isEmpty() const = 0;
   virtual int count() const    = 0;
+
+  virtual void saveData(TOStream &os) = 0;
+  virtual void loadData(TIStream &is) = 0;
 };
 
 //! Knows which columns are folded and which are unfolded
@@ -55,12 +58,12 @@ public:
   virtual void activate(int col) override;
   virtual void deactivate(int col) override;
   virtual bool isActive(int col) const override;
-  virtual bool isEmpty() const override { return m_columns.size() != 0; }
+  virtual bool isEmpty() const override { return m_columns.size() == 0; }
   virtual int count() const override { return m_columns.size(); }
+  virtual void saveData(TOStream &os) override;
+  virtual void loadData(TIStream &is) override;
 
   void trim();
-  void saveData(TOStream &os);
-  void loadData(TIStream &is);
 };
 
 //! Knows how much each column occupies
@@ -102,6 +105,8 @@ public:
   virtual bool isActive(int col) const override;
   virtual bool isEmpty() const override { return m_columns.empty(); }
   virtual int count() const override { return m_columns.size(); }
+  virtual void saveData(TOStream &os) override;
+  virtual void loadData(TIStream &is) override;
 
   //! Adjust column sizes when switching orientation
   void setDimension(int unfolded);

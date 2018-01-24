@@ -183,7 +183,7 @@ int SubLayer::ownDimension(const Orientation *o) const {
 }
 
 int SubLayer::childrenDimension(const Orientation *o) const {
-  if (isFolded()) return 0;
+  if (isFolded() || o->isVerticalTimeline()) return 0;
   int sum = 0;
   for (shared_ptr<SubLayer> child : children())
     sum += child->ownDimension(o) + child->childrenDimension(o);

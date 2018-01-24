@@ -286,6 +286,7 @@ public:
 
       invalidate();
       notifyImageChanged();
+	  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     }
     invalidate();
   }

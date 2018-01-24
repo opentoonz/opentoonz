@@ -35,6 +35,7 @@
     <command>MI_OutputSettings</command>
     <command>MI_Render</command>
     <command>MI_FastRender</command>
+    <command>MI_SoundTrack</command>
     <separator/>
     <command>MI_PrintXsheet</command>
     <command>MI_Print</command>
@@ -96,6 +97,8 @@
     <command>MI_RevertToCleanedUp</command>
     <command>MI_RevertToLastSaved</command>
     <command>MI_ConvertToVectors</command>
+    <command>MI_ConvertToToonzRaster</command>
+    <command>MI_ConvertVectorToVector</command>
     <command>MI_Tracking</command>
     <separator/>
     <command>MI_ExposeResource</command>
@@ -136,6 +139,7 @@
     <separator/>
     <command>MI_InsertFx</command>
     <command>MI_NewOutputFx</command>
+    <command>MI_NewNoteLevel</command>
     <separator/>
     <command>MI_InsertSceneFrame</command>
     <command>MI_RemoveSceneFrame</command>
@@ -150,6 +154,8 @@
     <command>MI_PrevDrawing</command>
     <command>MI_NextStep</command>
     <command>MI_PrevStep</command>
+    <separator/>
+    <command>MI_LipSyncPopup</command>
   </menu>
   <menu title="Cells">
     <command>MI_Reverse</command>

@@ -77,7 +77,7 @@ class CellArea final : public QWidget {
   void drawSelectionBackground(QPainter &p) const;
   void drawExtenderHandles(QPainter &p);
 
-  void drawSubLayers(QPainter &p, const CellPosition &pos) const;
+  void drawSubLayers(QPainter &p, const CellPosition &pos);
 
   void drawDragHandle(QPainter &p, const QPoint &xy,
                       const QColor &sideColor) const;
@@ -95,6 +95,8 @@ class CellArea final : public QWidget {
   void drawKeyframeLine(QPainter &p, int col, const NumberRange &rows) const;
 
   void drawNotes(QPainter &p, const QRect toBeUpdated);
+
+  void drawCurrentTimeIndicator(QPainter &p, const QPoint &xy, int adjLength = 0);
 
   // Restistusce true
   bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);

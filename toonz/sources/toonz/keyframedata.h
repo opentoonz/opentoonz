@@ -22,6 +22,8 @@ public:
   typedef std::map<Position, TStageObject::Keyframe>::const_iterator Iterator;
 
   KeyData m_keyData;
+  int m_columnSpanCount;
+  int m_rowSpanCount;
 
   // Numero di colonna della pegbar associato al booleano isCycleEnabled della
   // pegbar
@@ -47,6 +49,9 @@ public:
     TKeyframeData *data = new TKeyframeData(this);
     return data;
   }
+
+  int getColumnSpanCount() const { return m_columnSpanCount; }
+  int getRowSpanCount() const { return m_rowSpanCount; }
 };
 
 #endif  // KEYFRAMEDATA_INCLUDED

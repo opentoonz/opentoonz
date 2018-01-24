@@ -27,6 +27,7 @@ add_definitions(
 
 if(BUILD_ENV_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libcolorfx.dylib")
+    add_dependencies(colorfx tnzcore tnzbase)
 endif()
 
 message("subdir: colorfx")

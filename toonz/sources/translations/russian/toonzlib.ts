@@ -66,12 +66,12 @@
     <message>
         <location filename="../../toonzlib/tstageobjectcmd.cpp" line="291"/>
         <source>New Motion Path  %1</source>
-        <translation>Новый путь движения  %1</translation>
+        <translation>Новая траектория  %1</translation>
     </message>
     <message>
         <location filename="../../toonzlib/tstageobjectcmd.cpp" line="334"/>
         <source>Link Motion Path  %1 &gt; %2</source>
-        <translation>Путь движения линии  %1 &gt; %2</translation>
+        <translation>Траектория линии  %1 &gt; %2</translation>
     </message>
     <message>
         <location filename="../../toonzlib/tstageobjectcmd.cpp" line="459"/>
@@ -81,7 +81,7 @@
     <message>
         <location filename="../../toonzlib/tstageobjectcmd.cpp" line="544"/>
         <source>Remove Column  </source>
-        <translation>Удалить колонку</translation>
+        <translation>Удалить столбец</translation>
     </message>
     <message>
         <location filename="../../toonzlib/studiopalettecmd.cpp" line="67"/>
@@ -171,12 +171,12 @@
     <message>
         <location filename="../../toonzlib/palettecmd.cpp" line="1212"/>
         <source>Set Picked Position of Style#%1 in Palette%2 : %3,%4</source>
-        <translation>Установить выбранную позицию стиля#%1 в палитре%2 :%3,%4</translation>
+        <translation>Установить выбранное расположение стиля#%1 в палитре%2 :%3,%4</translation>
     </message>
     <message>
         <location filename="../../toonzlib/palettecmd.cpp" line="1290"/>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
-        <translation>Обновление цветов с использованием выбранных позиций в палитре %1</translation>
+        <translation>Обновление цветов с использованием выбранных расположений в палитре %1</translation>
     </message>
     <message>
         <location filename="../../toonzlib/fxcommand.cpp" line="906"/>

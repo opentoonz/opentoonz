@@ -231,6 +231,14 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>Resulting Level Info</source>
         <translation>Información del nivel</translation>
     </message>
+    <message>
+        <source>N/S</source>
+        <translation>Y</translation>
+    </message>
+    <message>
+        <source>E/W</source>
+        <translation>X</translation>
+    </message>
 </context>
 <context>
     <name>ColumnPainter</name>
@@ -240,7 +248,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Abrir sub-planilla</translation>
+        <translation>&amp;Entrar en sub-planilla</translation>
     </message>
 </context>
 <context>
@@ -601,19 +609,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Define Loading Box</source>
-        <translation>Definir marco de visualización</translation>
+        <translation>Definir región</translation>
     </message>
     <message>
         <source>Use Loading Box</source>
-        <translation>Usar marco de visualización</translation>
+        <translation>Usar región</translation>
     </message>
     <message>
         <source>&amp;Define Loading Box</source>
-        <translation>&amp;Definir marco de visualización</translation>
+        <translation>&amp;Definir región</translation>
     </message>
     <message>
         <source>&amp;Use Loading Box</source>
-        <translation>&amp;Usar marco de visualización</translation>
+        <translation>&amp;Usar región</translation>
     </message>
     <message>
         <source>Display Areas as Filled</source>
@@ -855,6 +863,18 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>????</source>
         <translation>????</translation>
     </message>
+    <message>
+        <source>From</source>
+        <translation>Desde</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Hasta</translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation>Intervalo</translation>
+    </message>
 </context>
 <context>
     <name>FunctionSelection</name>
@@ -980,7 +1000,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Abrir sub-planilla</translation>
+        <translation>&amp;Entrar en sub-planilla</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -2226,12 +2246,63 @@ Autom</translation>
         <source>MyPaint Brush</source>
         <translation>Pincel MyPaint</translation>
     </message>
+    <message>
+        <source>- Style not Selected -</source>
+        <translation>- Estilo no seleccionado -</translation>
+    </message>
+    <message>
+        <source>[CLEANUP]  </source>
+        <translation>[LIMPIEZA]  </translation>
+    </message>
+    <message>
+        <source>[STUDIO]  </source>
+        <translation>[ESTUDIO]  </translation>
+    </message>
+    <message>
+        <source>[LEVEL]  </source>
+        <translation>[NIVEL]  </translation>
+    </message>
+    <message>
+        <source>- Style is Not Valid -</source>
+        <translation>- Estilo no válido -</translation>
+    </message>
+</context>
+<context>
+    <name>StyleEditorGUI::ColorChannelControl</name>
+    <message>
+        <source>R</source>
+        <translation>R</translation>
+    </message>
+    <message>
+        <source>G</source>
+        <translation>V</translation>
+    </message>
+    <message>
+        <source>B</source>
+        <translation>A</translation>
+    </message>
+    <message>
+        <source>A</source>
+        <translation>α</translation>
+    </message>
+    <message>
+        <source>H</source>
+        <translation>T</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation>S</translation>
+    </message>
+    <message>
+        <source>V</source>
+        <translation>V</translation>
+    </message>
 </context>
 <context>
     <name>StyleEditorGUI::PlainColorPage</name>
     <message>
         <source>Wheel</source>
-        <translation>Rueda</translation>
+        <translation>Muestra</translation>
     </message>
     <message>
         <source>HSV</source>
@@ -2244,6 +2315,10 @@ Autom</translation>
     <message>
         <source>RGB</source>
         <translation>RVA</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>Alfa</translation>
     </message>
 </context>
 <context>
@@ -2316,6 +2391,10 @@ Autom</translation>
     <message>
         <source>&amp;Reset Center</source>
         <translation>&amp;Restablecer centro</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>Mesa</translation>
     </message>
 </context>
 <context>

@@ -125,27 +125,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirModelSceneFolderNode final : public DvDirModelFileFolderNode {
-  std::map<std::wstring, TFilePath> m_folders;
-
-public:
-  DvDirModelSceneFolderNode(DvDirModelNode *parent, std::wstring name,
-                            const TFilePath &scenePath);
-  DvDirModelSceneFolderNode(DvDirModelNode *parent, const TFilePath &path);
-  ~DvDirModelSceneFolderNode();
-  bool setName(std::wstring newName) override;
-  QPixmap getPixmap(bool isOpen) const override;
-  DvDirModelNode *makeChild(std::wstring name) override;
-  void getChildrenNames(std::vector<std::wstring> &names) const override;
-  void refreshChildren() override;
-  static DvDirModelFileFolderNode *createNode(DvDirModelNode *parent,
-                                              const TFilePath &path);
-  int rowByName(const std::wstring &name);
-};
-
-//-----------------------------------------------------------------------------
-
-class DvDirModelSpecialFileFolderNode final : public DvDirModelFileFolderNode {
+class DvDirModelSpecialFileFolderNode : public DvDirModelFileFolderNode {
   QPixmap m_pixmap;
 
 public:
@@ -153,6 +133,19 @@ public:
                                   const TFilePath &localPath);
   QPixmap getPixmap(bool isOpen) const override;
   void setPixmap(const QPixmap &pixmap);
+};
+
+//-----------------------------------------------------------------------------
+
+class DvDirModelSceneFolderNode final : public DvDirModelSpecialFileFolderNode {
+public:
+  DvDirModelSceneFolderNode(DvDirModelNode *parent, std::wstring name,
+                            const TFilePath &localPath)
+      : DvDirModelSpecialFileFolderNode(parent, name, localPath) {}
+  void setPath(const TFilePath &path) {
+    m_path = path;
+    refreshChildren();
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -317,6 +310,7 @@ class DvDirModelRootNode final : public DvDirModelNode {
   DvDirModelMyComputerNode *m_myComputerNode;
   DvDirModelNetworkNode *m_networkNode;
   DvDirModelProjectNode *m_sandboxProjectNode;
+  DvDirModelSceneFolderNode *m_sceneFolderNode;
 
   void add(std::wstring name, const TFilePath &path);
 
@@ -326,6 +320,10 @@ public:
 
   DvDirModelNode *getNodeByPath(const TFilePath &path) override;
   // QPixmap getPixmap(bool isOpen) const;
+
+  // set the path of sceneLocationNode
+  void setSceneLocation(const TFilePath &path);
+  void updateSceneFolderNodeVisibility(bool forceHide = false);
 };
 
 //=============================================================================
@@ -333,6 +331,8 @@ public:
 // singleton
 class DvDirModel final : public QAbstractItemModel,
                          public FolderListenerManager::Listener {
+  Q_OBJECT
+
   DvDirModelNode *m_root;
 
 public:
@@ -371,6 +371,20 @@ public:
                   const QModelIndex &parent = QModelIndex()) override;
 
   QModelIndex getCurrentProjectIndex() const;
+
+  void notifyBeginRemoveRows(const QModelIndex &parent, int first, int last) {
+    emit beginRemoveRows(parent, first, last);
+  }
+  void notifyEndRemoveRows() { emit endRemoveRows(); }
+  void notifyBeginInsertRows(const QModelIndex &parent, int first, int last) {
+    emit beginInsertRows(parent, first, last);
+  }
+  void notifyEndInsertRows() { emit endInsertRows(); }
+
+protected slots:
+  // when the scene switched, update the path of the scene location node
+  void onSceneSwitched();
+  void onPreferenceChanged(const QString &);
 };
 
 #endif

@@ -550,6 +550,9 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
 
   QString m_xsheetLayout;
 
+  int m_frameZoomFactor;
+  QSlider *m_frameZoomSlider;
+
 public:
   enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
 
@@ -642,14 +645,24 @@ public:
   CellPosition xyToPosition(const TPointD &point) const;
   QPoint positionToXY(const CellPosition &pos) const;
 
+  int colToTimelineLayerAxis(int layer) const;
+  NumberRange colsToTimelineLayerAxis(const NumberRange &layers) const;
+  SubLayerOffsets subLayerTimelineOffsets(const TXshColumn *column, int subLayerIndex) const;
+
   int columnToLayerAxis(int layer) const;
+  NumberRange colsToLayerAxis(const NumberRange &layers) const;
   int rowToFrameAxis(int frame) const;
+  SubLayerOffsets subLayerOffsets(const TXshColumn *column, int subLayerIndex) const;
 
   CellRange xyRectToRange(const QRect &rect) const;
   QRect rangeToXYRect(const CellRange &range) const;
 
   void drawPredefinedPath(QPainter &p, PredefinedPath which,
                           const CellPosition &pos, optional<QColor> fill,
+                          optional<QColor> outline) const;
+
+  void drawPredefinedPath(QPainter &p, PredefinedPath which, QPoint xy,
+                          optional<QColor> fill,
                           optional<QColor> outline) const;
 
   //---------
@@ -1124,6 +1137,8 @@ public:
   void setFrameDisplayStyle(FrameDisplayStyle style);
   FrameDisplayStyle getFrameDisplayStyle() { return m_frameDisplayStyle; }
 
+  void onColumnFanFoldedUnfolded();
+
   // SaveLoadQSettings
   virtual void save(QSettings &settings) const override;
   virtual void load(QSettings &settings) override;
@@ -1135,6 +1150,8 @@ protected:
   void scrollToHorizontalRange(int x0, int x1);
   void scrollToRow(int row);
   void scrollToVerticalRange(int y0, int y1);
+
+  void paintEvent(QPaintEvent *) override;
 
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
@@ -1180,7 +1197,16 @@ public slots:
 
   void onOrientationChanged(const Orientation *newOrientation);
   void onPrepareToScrollOffset(const QPoint &offset);
-  void onColumnFanFoldedUnfolded();
+  void onZoomScrollAdjust(QPoint &offset, bool toZoom);
+
+  void setFrameZoomFactor(int f) { m_frameZoomFactor = f; }
+  int getFrameZoomFactor() const;
+  int getFrameZoomAdjustment();
+
+  void zoomOnFrame(int frame, int factor);
+
+  void onFrameZoomSliderValueChanged(int val);
+  void onFrameZoomSliderReleased();
 };
 
 #endif  // XSHEETVIEWER_H

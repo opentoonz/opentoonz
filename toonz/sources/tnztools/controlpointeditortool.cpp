@@ -25,6 +25,7 @@
 
 // For Qt translation support
 #include <QCoreApplication>
+#include <QKeyEvent>
 
 using namespace ToolUtils;
 
@@ -104,6 +105,7 @@ void getSegmentParameter(ControlPointEditorStroke *cpEditor, int beforeIndex,
 }
 
 }  // namespace
+
 ControlPointEditorTool controlPointEditorTool;
 
 //=============================================================================

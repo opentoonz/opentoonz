@@ -207,33 +207,9 @@ void ColumnFanGeometry::updateExtras(const ColumnFan *from,
 }
 
 //-----------------------------------------------------------------------------
-/*??? old
-void ColumnFan::saveData(
-    TOStream &os) {  // only saves indices of folded columns
-  int index, n = (int)m_columns.size();
-  for (index = 0; index < n;) {
-    while (index < n && m_columns[index].m_active) index++;
-    if (index < n) {
-      int firstIndex = index;
-      os << index;
-      index++;
-      while (index < n && !m_columns[index].m_active) index++;
-      os << index - firstIndex;
-    }
-  }
-}
+
+void ColumnFanGeometry::saveData(TOStream &os) {}
 
 //-----------------------------------------------------------------------------
 
-void ColumnFan::loadData(TIStream &is) {
-  m_columns.clear();
-  m_table.clear();
-  m_firstFreePos = 0;
-  while (!is.eos()) {
-    int index = 0, count = 0;
-    is >> index >> count;
-    int j;
-    for (j = 0; j < count; j++) deactivate(index + j);
-  }
-}
-*/
+void ColumnFanGeometry::loadData(TIStream &is) {}

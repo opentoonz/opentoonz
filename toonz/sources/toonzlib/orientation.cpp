@@ -5,6 +5,7 @@
 #include <QPainterPath>
 #include <QBoxLayout>
 #include <math.h>
+#include <stdexcept>
 
 using std::pair;
 
@@ -16,6 +17,9 @@ const int PLAY_MARKER_SIZE   = 10;
 const int ONION_SIZE         = 19;
 const int ONION_DOT_SIZE     = 8;
 const int PINNED_SIZE        = 10;
+const int FRAME_DOT_SIZE     = 8;
+const int FRAME_IND_SIZE     = 3;
+const int FOLDED_CELL_SIZE   = 9;
 }
 
 class TopToBottomOrientation : public Orientation {
@@ -72,6 +76,7 @@ public:
 
   virtual int cellWidth() const override { return CELL_WIDTH; }
   virtual int cellHeight() const override { return CELL_HEIGHT; }
+  virtual int foldedCellSize() const override { return FOLDED_CELL_SIZE; }
 };
 
 class LeftToRightOrientation : public Orientation {
@@ -82,7 +87,7 @@ class LeftToRightOrientation : public Orientation {
   const int EXTENDER_HEIGHT      = 12;
   const int SOUND_PREVIEW_HEIGHT = 6;
   const int FRAME_HEADER_HEIGHT  = 50;
-  const int ONION_X = (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y = 0;
+  const int ONION_X = 0, ONION_Y = 0;
   const int PLAY_RANGE_Y       = ONION_SIZE;
   const int ICON_WIDTH         = 20;
   const int ICON_HEIGHT        = 20;
@@ -133,6 +138,7 @@ public:
 
   virtual int cellWidth() const override { return CELL_WIDTH; }
   virtual int cellHeight() const override { return CELL_HEIGHT; }
+  virtual int foldedCellSize() const override { return FOLDED_CELL_SIZE; }
 };
 
 /// -------------------------------------------------------------------------------
@@ -311,6 +317,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
       PredefinedRect::END_SOUND_EDIT,
       QRect(CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect(PredefinedRect::LOOP_ICON, QRect(keyRect.left(), 0, 10, 11));
+  addRect(PredefinedRect::FRAME_DOT, QRect(0, 0, -1, -1));  // hide
 
   // Note viewer
   addRect(
@@ -329,14 +336,16 @@ TopToBottomOrientation::TopToBottomOrientation() {
           QRect(PLAY_RANGE_X, 0, PLAY_MARKER_SIZE, CELL_HEIGHT));
   addRect(PredefinedRect::ONION,
           QRect(ONION_X + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2, ONION_Y,
-                ONION_SIZE, ONION_SIZE));
+                ONION_SIZE, ONION_SIZE)
+              .adjusted(2, 1, 2, 1));
   int adjustOnion = (ONION_SIZE - ONION_DOT_SIZE) / 2;
   addRect(PredefinedRect::ONION_DOT,
           QRect(ONION_X + ONION_DOT_SIZE, ONION_Y + adjustOnion, ONION_DOT_SIZE,
-                ONION_DOT_SIZE));
-  addRect(
-      PredefinedRect::ONION_DOT_FIXED,
-      QRect(ONION_X, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE));
+                ONION_DOT_SIZE)
+              .adjusted(1, 1, 1, 1));
+  addRect(PredefinedRect::ONION_DOT_FIXED,
+          QRect(ONION_X, ONION_Y + adjustOnion, ONION_DOT_SIZE, ONION_DOT_SIZE)
+              .adjusted(1, 1, 1, 1));
   addRect(PredefinedRect::ONION_AREA,
           QRect(ONION_X, ONION_Y, PLAY_RANGE_X, CELL_HEIGHT));
   addRect(PredefinedRect::ONION_FIXED_DOT_AREA,
@@ -347,6 +356,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::PINNED_CENTER_KEY,
           QRect((FRAME_HEADER_WIDTH - PINNED_SIZE) / 2,
                 (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
+  addRect(PredefinedRect::FRAME_INDICATOR, QRect(0, 0, -1, -1));  // hide
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
@@ -941,6 +951,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
           QRect(CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2,
                 CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LOOP_ICON, QRect(0, keyRect.top(), 10, 11));
+  addRect(
+      PredefinedRect::FRAME_DOT,
+      QRect((CELL_WIDTH - FRAME_DOT_SIZE) / 2 - 1,
+            CELL_HEIGHT - FRAME_DOT_SIZE - 6, FRAME_DOT_SIZE, FRAME_DOT_SIZE));
 
   // Notes viewer
   addRect(
@@ -960,15 +974,19 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::PLAY_RANGE,
           QRect(0, PLAY_RANGE_Y, CELL_WIDTH, PLAY_MARKER_SIZE));
   addRect(PredefinedRect::ONION,
-          QRect(ONION_X, ONION_Y + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2,
-                ONION_SIZE, ONION_SIZE));
+          QRect(ONION_X + (CELL_WIDTH - ONION_SIZE) / 2 - 1,
+                ONION_Y + (3 * ONION_DOT_SIZE - ONION_SIZE) / 2, ONION_SIZE,
+                ONION_SIZE)
+              .adjusted(1, 2, 1, 2));
   int adjustOnion = (ONION_SIZE - ONION_DOT_SIZE) / 2;
   addRect(PredefinedRect::ONION_DOT,
-          QRect(ONION_X + adjustOnion, ONION_Y + ONION_DOT_SIZE, ONION_DOT_SIZE,
-                ONION_DOT_SIZE));
-  addRect(
-      PredefinedRect::ONION_DOT_FIXED,
-      QRect(ONION_X + adjustOnion, ONION_Y, ONION_DOT_SIZE, ONION_DOT_SIZE));
+          QRect(ONION_X + adjustOnion + (CELL_WIDTH - ONION_SIZE) / 2,
+                ONION_Y + ONION_DOT_SIZE, ONION_DOT_SIZE, ONION_DOT_SIZE)
+              .adjusted(1, 1, 1, 1));
+  addRect(PredefinedRect::ONION_DOT_FIXED,
+          QRect(ONION_X + adjustOnion + (CELL_WIDTH - ONION_SIZE) / 2, ONION_Y,
+                ONION_DOT_SIZE, ONION_DOT_SIZE)
+              .adjusted(1, 1, 1, 1));
   addRect(PredefinedRect::ONION_AREA,
           QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_SIZE));
   addRect(PredefinedRect::ONION_FIXED_DOT_AREA,
@@ -979,6 +997,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
       PredefinedRect::PINNED_CENTER_KEY,
       QRect((CELL_WIDTH - PINNED_SIZE) / 2,
             (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
+  addRect(PredefinedRect::FRAME_INDICATOR,
+          QRect((CELL_WIDTH - FRAME_IND_SIZE) / 2,
+                FRAME_HEADER_HEIGHT - FRAME_IND_SIZE, FRAME_IND_SIZE,
+                FRAME_IND_SIZE));
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
@@ -1140,6 +1162,14 @@ LeftToRightOrientation::LeftToRightOrientation() {
   head.lineTo(QPointF(0, 0));
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
 
+  QPainterPath timeIndicator(QPointF(0, 0));
+  timeIndicator.lineTo(QPointF(-9, -5));
+  timeIndicator.lineTo(QPointF(-9, -18));
+  timeIndicator.lineTo(QPointF(9, -18));
+  timeIndicator.lineTo(QPointF(9, -4));
+  timeIndicator.lineTo(QPointF(0, 0));
+  addPath(PredefinedPath::TIME_INDICATOR_HEAD, timeIndicator);
+
   /*
     int size = 4;
     QPainterPath folded(QPointF(size, 0));  // triangle right
@@ -1246,9 +1276,9 @@ QPoint LeftToRightOrientation::topRightCorner(const QRect &area) const {
 CellPosition LeftToRightOrientation::arrowShift(int direction) const {
   switch (direction) {
   case Qt::Key_Up:
-    return CellPosition(0, -1);
-  case Qt::Key_Down:
     return CellPosition(0, 1);
+  case Qt::Key_Down:
+    return CellPosition(0, -1);
   case Qt::Key_Left:
     return CellPosition(-1, 0);
   case Qt::Key_Right:

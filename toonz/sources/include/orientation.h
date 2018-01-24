@@ -108,8 +108,10 @@ enum class PredefinedRect {
   PEGBAR_NAME,         //! where to display pegbar name
   PARENT_HANDLE_NAME,  //! where to display parent handle number
   FILTER_COLOR,        //! where to show layer's filter color
-  CONFIG_AREA,    //! clickable area larger than the config icon, containing it
-  CONFIG,         //! the config icon itself
+  CONFIG_AREA,     //! clickable area larger than the config icon, containing it
+  CONFIG,          //! the config icon itself
+  FRAME_DOT,       //! Cell's frame indicator
+  FRAME_INDICATOR, //! Row # indicator
   SUBLAYER_NAME,  //! area to draw sublayer name
   SUBLAYER_ACTIVATOR  //! activator key icon placement
 };
@@ -140,6 +142,7 @@ enum class PredefinedPath {
   END_PLAY_RANGE,
   VOLUME_SLIDER_TRACK,  //! slider track
   VOLUME_SLIDER_HEAD,   //! slider head
+  TIME_INDICATOR_HEAD,  //! current time indicator head
   FOLDED,               //! layer contains some sublayers (folded)
   UNFOLDED              //! unfolded
 };
@@ -243,8 +246,9 @@ public:
   }
   const bool &flag(PredefinedFlag which) const { return _flags.at(which); }
 
-  virtual int cellWidth() const  = 0;
-  virtual int cellHeight() const = 0;
+  virtual int cellWidth() const      = 0;
+  virtual int cellHeight() const     = 0;
+  virtual int foldedCellSize() const = 0;
 
 protected:
   void addRect(PredefinedRect which, const QRect &rect);
