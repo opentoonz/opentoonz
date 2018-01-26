@@ -408,7 +408,6 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
 
   application->getCurrentTool()->getTool()->notifyImageChanged();
   application->getCurrentXsheet()->notifyXsheetChanged();
-
 }
 
 //-------------------------------------------------------------------

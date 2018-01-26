@@ -682,7 +682,7 @@ public:
       break;
     }
 
-	TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 
     return type;
   }

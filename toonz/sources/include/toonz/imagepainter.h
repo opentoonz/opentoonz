@@ -66,6 +66,7 @@ public:
   bool m_recomputeIfNeeded;
   bool m_drawBlankFrame;
   bool m_useChecks;  //!< whether to consider  paint check and ink check
+  bool m_forSceneIcon = false;  // whether it is redered for the scene icons
 public:
   VisualSettings();
 

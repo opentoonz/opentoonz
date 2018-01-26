@@ -797,8 +797,8 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img) {
   }
 
   ImageManager::instance()->setImage(imageId, img);  // Invalidates if !img
-// Added but causes crash when loading images.  Not sure why this is needed
-//  emit ImageManager::instance()->updatedFrame(TXshCell(this, fid));
+  // Added but causes crash when loading images.  Not sure why this is needed
+  //  emit ImageManager::instance()->updatedFrame(TXshCell(this, fid));
 
   if (frameStatus == Normal) {
     // Only a normal frame can have these. Justified since:
@@ -1963,26 +1963,24 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
   }
 
   ImageManager *im = ImageManager::instance();
-  TImageCache *ic = TImageCache::instance();
+  TImageCache *ic  = TImageCache::instance();
 
   std::map<TFrameId, TFrameId>::iterator jt;
 
   {
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
       std::string Id = getImageId(jt->first);
-	  ImageLoader::BuildExtData extData(this, jt->first);
-	  TImageP img = im->getImage(Id, ImageManager::none, &extData);
-	  ic->add(getIconId(jt->first), img, false);
-	  im->rebind(Id, "^" + std::to_string(i));
-	  ic->remap("^icon:" + std::to_string(i),
-                                     getIconId(jt->first));
+      ImageLoader::BuildExtData extData(this, jt->first);
+      TImageP img = im->getImage(Id, ImageManager::none, &extData);
+      ic->add(getIconId(jt->first), img, false);
+      im->rebind(Id, "^" + std::to_string(i));
+      ic->remap("^icon:" + std::to_string(i), getIconId(jt->first));
     }
 
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
       std::string Id = getImageId(jt->second);
       im->rebind("^" + std::to_string(i), Id);
-	  ic->remap(getIconId(jt->second),
-                                    "^icon:" + std::to_string(i));
+      ic->remap(getIconId(jt->second), "^icon:" + std::to_string(i));
       im->renumber(Id, jt->second);
     }
   }

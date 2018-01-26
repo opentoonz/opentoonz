@@ -9,6 +9,7 @@
 // TnzBase includes
 #include "tfx.h"
 #include "trasterfxrenderdata.h"
+#include <QOffscreenSurface>
 
 #undef DVAPI
 #undef DVVAR
@@ -150,6 +151,12 @@ public:
   TRectD m_cameraBox;
   /*-- 途中でPreview計算がキャンセルされたときのフラグ --*/
   int *m_isCanceled;
+
+  // pointer to QOffscreenSurface which is created on
+  // TRendererImp::startRendering()
+  // for offscreen rendering to be done in non-GUI thread.
+  // For now it is used only in the plasticDeformerFx.
+  std::shared_ptr<QOffscreenSurface> m_offScreenSurface;
 
 public:
   TRenderSettings();

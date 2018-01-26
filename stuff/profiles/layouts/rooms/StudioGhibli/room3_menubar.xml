@@ -74,6 +74,8 @@
     <command>MI_ResetShift</command>
     <separator/>
     <command>MI_RasterizePli</command>
+    <separator/>
+    <command>MI_TouchGestureControl</command>
   </menu>
   <menu title="Edit">
     <command>MI_Undo</command>

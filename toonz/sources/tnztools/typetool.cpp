@@ -118,7 +118,7 @@ public:
     TStroke *s = new TStroke(*stroke);
     s->setId(stroke->getId());
     m_strokes.push_back(s);
-	TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
   void undo() const override {

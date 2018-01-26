@@ -286,7 +286,6 @@ TImageP ImageRasterizer::build(int imFlags, BuildExtData *data) {
               new QOpenGLFramebufferObject(d.lx, d.ly));
 
           fb->bind();
-          assert(glGetError() == 0);
 
           glViewport(0, 0, d.lx, d.ly);
           glClearColor(0, 0, 0, 0);
@@ -300,13 +299,9 @@ TImageP ImageRasterizer::build(int imFlags, BuildExtData *data) {
           glLoadIdentity();
           glTranslatef(0.375, 0.375, 0.0);
 
-          assert(glGetError() == 0);
           tglDraw(rd, vi.getPointer());
-          assert(glGetError() == 0);
 
-          assert(glGetError() == 0);
           glFlush();
-          assert(glGetError() == 0);
 
           QImage img =
               fb->toImage().scaled(QSize(d.lx, d.ly), Qt::IgnoreAspectRatio,
@@ -329,6 +324,8 @@ TImageP ImageRasterizer::build(int imFlags, BuildExtData *data) {
 
         TRasterImageP ri = TRasterImageP(ras);
         ri->setOffset(off + ras->getCenter());
+
+        assert(glGetError() == 0);
 
         return ri;
       }

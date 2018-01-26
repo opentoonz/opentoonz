@@ -11,6 +11,7 @@
 class XsheetViewer;
 class QMenu;
 class TXsheetHandle;
+class TXshSoundTextColumn;
 
 namespace XsheetGUI {
 
@@ -41,6 +42,7 @@ protected:
   void hideEvent(QHideEvent *) override;
 
   void renameCell();
+  void renameSoundTextColumn(TXshSoundTextColumn *sndTextCol, const QString &s);
 
 protected slots:
   void onReturnPressed();
@@ -96,7 +98,10 @@ class CellArea final : public QWidget {
 
   void drawNotes(QPainter &p, const QRect toBeUpdated);
 
-  void drawCurrentTimeIndicator(QPainter &p, const QPoint &xy, int adjLength = 0);
+  void drawCurrentTimeIndicator(QPainter &p, const QPoint &xy,
+                                bool isFolded = false, int adjLength = 0);
+
+  void drawFrameDot(QPainter &p, const QPoint &xy, bool isValid);
 
   // Restistusce true
   bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);

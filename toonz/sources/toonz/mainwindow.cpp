@@ -86,6 +86,7 @@ TEnv::IntVar DockingCheckToggleAction("DockingCheckToggleAction", 0);
 TEnv::IntVar ShiftTraceToggleAction("ShiftTraceToggleAction", 0);
 TEnv::IntVar EditShiftToggleAction("EditShiftToggleAction", 0);
 TEnv::IntVar NoShiftToggleAction("NoShiftToggleAction", 0);
+TEnv::IntVar TouchGestureControl("TouchGestureControl", 0);
 
 //=============================================================================
 namespace {
@@ -1294,6 +1295,8 @@ void MainWindow::onMenuCheckboxChanged() {
     EditShiftToggleAction = isChecked;
   else if (cm->getAction(MI_NoShift) == action)
     NoShiftToggleAction = isChecked;
+  else if (cm->getAction(MI_TouchGestureControl) == action)
+    TouchGestureControl = isChecked;
 }
 
 //-----------------------------------------------------------------------------
@@ -1703,6 +1706,10 @@ void MainWindow::defineActions() {
   createMenuEditAction(MI_EnterGroup, tr("&Enter Group"), "");
   createMenuEditAction(MI_ExitGroup, tr("&Exit Group"), "");
   createMenuEditAction(MI_RemoveEndpoints, tr("&Remove Vector Overflow"), "");
+
+  createToggle(MI_TouchGestureControl, tr("&Touch Gesture Control"), "",
+               TouchGestureControl ? 1 : 0, MenuEditCommandType)
+      ->setEnabled(true);
 
   createMenuScanCleanupAction(MI_DefineScanner, tr("&Define Scanner..."), "");
   createMenuScanCleanupAction(MI_ScanSettings, tr("&Scan Settings..."), "");

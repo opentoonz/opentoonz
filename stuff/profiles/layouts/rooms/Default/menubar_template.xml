@@ -75,6 +75,8 @@
     <command>MI_BringForward</command>
     <command>MI_SendBack</command>
     <command>MI_SendBackward</command>
+    <separator/>
+    <command>MI_TouchGestureControl</command>
   </menu>
   <menu title="Scan &amp;&amp; Cleanup">
     <command>MI_DefineScanner</command>

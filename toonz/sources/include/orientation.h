@@ -108,11 +108,11 @@ enum class PredefinedRect {
   PEGBAR_NAME,         //! where to display pegbar name
   PARENT_HANDLE_NAME,  //! where to display parent handle number
   FILTER_COLOR,        //! where to show layer's filter color
-  CONFIG_AREA,     //! clickable area larger than the config icon, containing it
-  CONFIG,          //! the config icon itself
-  FRAME_DOT,       //! Cell's frame indicator
-  FRAME_INDICATOR, //! Row # indicator
-  SUBLAYER_NAME,  //! area to draw sublayer name
+  CONFIG_AREA,  //! clickable area larger than the config icon, containing it
+  CONFIG,       //! the config icon itself
+  FRAME_DOT,    //! Cell's frame indicator
+  FRAME_INDICATOR,    //! Row # indicator
+  SUBLAYER_NAME,      //! area to draw sublayer name
   SUBLAYER_ACTIVATOR  //! activator key icon placement
 };
 enum class PredefinedLine {

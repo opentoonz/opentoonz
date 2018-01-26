@@ -39,10 +39,10 @@ git lfs pull
 
 ### (Optional) Create the stuff Directory
 
-If the directory `/Applications/OpenToonz/OpenToonz_1.1_stuff` does not exist, enter the following command:
+If the directory `/Applications/OpenToonz/OpenToonz_1.2_stuff` does not exist, enter the following command:
 
 ```
-$ sudo cp -r stuff /Applications/OpenToonz/OpenToonz_1.1_stuff
+$ sudo cp -r stuff /Applications/OpenToonz/OpenToonz_1.2_stuff
 ```
 
 ### 3. Build tiff in thirdparty
@@ -86,5 +86,5 @@ Please be patient as the install will take a while.
 ### After Building
 
 ```
-$ open ./toonz/OpenToonz_1.1.app
+$ open ./toonz/OpenToonz_1.2.app
 ```

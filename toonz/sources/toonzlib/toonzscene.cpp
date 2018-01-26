@@ -741,6 +741,7 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 
     ImagePainter::VisualSettings vs;
     vs.m_plasticVisualSettings.m_drawMeshesWireframe = false;
+    vs.m_forSceneIcon                                = true;
 
     Stage::RasterPainter painter(ras->getSize(), viewAff, clipRect, vs,
                                  checkFlags);

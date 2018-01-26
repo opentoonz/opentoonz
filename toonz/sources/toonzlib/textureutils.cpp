@@ -100,7 +100,7 @@ TRasterImageP getTexture(const TXshSimpleLevel *sl, const TFrameId &fid,
   TRasterImageP ri(ImageManager::instance()->getImage(
       id, ImageManager::dontPutInCache, &extData));
 
-  return ri;
+  return convert32(ri);
 }
 
 }  // namespace

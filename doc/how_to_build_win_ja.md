@@ -64,12 +64,12 @@ Visual Studio 2015 と Qt 5.9 でビルドできることを確認していま�
 ## 実行
 ### 実行可能ファイルなどの配置
 1. `$oepntoonz/toonz/build/Release` の中身を適当なフォルダにコピーします
-2. `OpenToonz_1.1.exe` のパスを引数にして Qt に付属の `windeployqt.exe` を実行します
-  - 必要な Qt のライブラリなどが `OpenToonz_1.1.exe` と同じフォルダに集められます
-3. 下記のファイルを `OpenToonz_1.1.exe` と同じフォルダにコピーします
+2. `OpenToonz_1.2.exe` のパスを引数にして Qt に付属の `windeployqt.exe` を実行します
+  - 必要な Qt のライブラリなどが `OpenToonz_1.2.exe` と同じフォルダに集められます
+3. 下記のファイルを `OpenToonz_1.2.exe` と同じフォルダにコピーします
   - `$opentoonz/thirdparty/glut/3.7.6/lib/glut64.dll`
   - `$opentoonz/thirdparty/glew/glew-1.9.0/bin/64bit/glew32.dll`
-4. バイナリ版の OpenToonz のインストール先にある `srv` フォルダを `OpenToonz_1.1.exe` と同じフォルダにコピーします
+4. バイナリ版の OpenToonz のインストール先にある `srv` フォルダを `OpenToonz_1.2.exe` と同じフォルダにコピーします
   - `srv` が無くても OpenToonz は動作しますが、 mov 形式などに対応できません
   - `srv` 内のファイルの生成方法は後述します
 
@@ -80,10 +80,10 @@ Visual Studio 2015 と Qt 5.9 でビルドできることを確認していま�
 
 ### レジストリキーの作成
 1. レジストリエディタで下記のキーを作成し、 Stuff フォルダの作成でコピーした stuff フォルダのパスを記載します
-  - HKEY_LOCAL_MACHINE\SOFTWARE\OpenToonz\OpenToonz\1.1\TOONZROOT
+  - HKEY_LOCAL_MACHINE\SOFTWARE\OpenToonz\OpenToonz\1.2\TOONZROOT
 
 ### 実行
-OpenToonz_1.1.exe を実行して動作すれば成功です。おめでとうございます。
+OpenToonz_1.2.exe を実行して動作すれば成功です。おめでとうございます。
 
 ## `srv` フォルダ内のファイルの生成
 OpenToonz は QuickTime SDK を用いて mov 形式などへ対応しています。 QuickTime SDK は 32 ビット版しかないため、 `t32bitsrv.exe` という 32 ビット版の実行可能ファイルにQuickTime SDKを組み込み、64ビット版の OpenToonz は `t32bitsrv.exe` を経由して QuickTime SDK の機能を使用しています。以下の手順では `t32bitsrv.exe` などと合わせて、 32 ビット版の OpenToonz も生成されます。

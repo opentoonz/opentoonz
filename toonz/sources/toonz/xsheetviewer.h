@@ -647,12 +647,14 @@ public:
 
   int colToTimelineLayerAxis(int layer) const;
   NumberRange colsToTimelineLayerAxis(const NumberRange &layers) const;
-  SubLayerOffsets subLayerTimelineOffsets(const TXshColumn *column, int subLayerIndex) const;
+  SubLayerOffsets subLayerTimelineOffsets(const TXshColumn *column,
+                                          int subLayerIndex) const;
 
   int columnToLayerAxis(int layer) const;
   NumberRange colsToLayerAxis(const NumberRange &layers) const;
   int rowToFrameAxis(int frame) const;
-  SubLayerOffsets subLayerOffsets(const TXshColumn *column, int subLayerIndex) const;
+  SubLayerOffsets subLayerOffsets(const TXshColumn *column,
+                                  int subLayerIndex) const;
 
   CellRange xyRectToRange(const QRect &rect) const;
   QRect rangeToXYRect(const CellRange &range) const;

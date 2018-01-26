@@ -91,14 +91,14 @@ const char *rootVarName         = "LINETESTROOT";
 const char *systemVarPrefix     = "LINETEST";
 #else
 const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.1";
-const char *applicationRevision = "3";
+const char *applicationVersion  = "1.2";
+const char *applicationRevision = "0";
 const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 #endif
 
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 
-const char *applicationFullName = "OpenToonz 1.1.3";
+const char *applicationFullName = "OpenToonz 1.2";  // to be 1.2.n from 1.2.1
 const char *rootVarName         = "TOONZROOT";
 const char *systemVarPrefix     = "TOONZ";
 

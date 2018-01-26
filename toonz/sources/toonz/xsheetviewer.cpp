@@ -674,8 +674,8 @@ void XsheetViewer::timerEvent(QTimerEvent *) {
 // adjust sizes after scrolling event
 bool XsheetViewer::refreshContentSize(int dx, int dy) {
   const Orientation *o = orientation();
-  QSize viewportSize = m_cellScrollArea->viewport()->size();
-  QPoint offset      = m_cellArea->pos();
+  QSize viewportSize   = m_cellScrollArea->viewport()->size();
+  QPoint offset        = m_cellArea->pos();
   offset = QPoint(qMin(0, offset.x() - dx), qMin(0, offset.y() - dy));  // what?
 
   TXsheet *xsh    = getXsheet();
@@ -689,21 +689,22 @@ bool XsheetViewer::refreshContentSize(int dx, int dy) {
     contentSize = positionToXY(CellPosition(frameCount + 1, 0));
 
     ColumnFanGeometry *fan = screenMapper()->columnFan();
-	int newY = contentSize.y();
-	if (!fan->isActive(0))
-		newY += o->foldedCellSize();
-	else {
-		newY += o->cellHeight();
+    int newY               = contentSize.y();
+    if (!fan->isActive(0))
+      newY += o->foldedCellSize();
+    else {
+      newY += o->cellHeight();
 
-		// Account for Col1 sublayers being exposed
-		TXshColumn *column = xsh->getColumn(0);
-		bool showSubLayers = !screenMapper()->subLayers()->layer(column)->isFolded();
-		if (showSubLayers) {
-			vector<shared_ptr<SubLayer>> subLayers =
-				screenMapper()->subLayers()->layer(column)->childrenFlatTree();
-			newY += (o->cellHeight() * subLayers.size());
-		}
-	}
+      // Account for Col1 sublayers being exposed
+      TXshColumn *column = xsh->getColumn(0);
+      bool showSubLayers =
+          !screenMapper()->subLayers()->layer(column)->isFolded();
+      if (showSubLayers) {
+        vector<shared_ptr<SubLayer>> subLayers =
+            screenMapper()->subLayers()->layer(column)->childrenFlatTree();
+        newY += (o->cellHeight() * subLayers.size());
+      }
+    }
     contentSize.setY(newY);
   }
 
@@ -781,23 +782,25 @@ int XsheetViewer::colToTimelineLayerAxis(int layer) const {
   if (!xsh) return 0;
   ColumnFanGeometry *fan = screenMapper()->columnFan();
 
-  int columnCount = qMax(1, xsh->getColumnCount());
+  int columnCount       = qMax(1, xsh->getColumnCount());
   int layerHeightActual = o->colToLayerAxis(columnCount, fan) - 1;
-  int yBottom = o->colToLayerAxis(layer, fan) +
+  int yBottom           = o->colToLayerAxis(layer, fan) +
                 (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize()) -
                 1;
   if (layer < 0)
-	  yBottom = (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize()) - layerHeightActual;
+    yBottom = (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize()) -
+              layerHeightActual;
 
   int subLayerHeight = 0;
   if (fan->isActive(layer)) {
-	  TXshColumn *column = xsh->getColumn(layer);
-	  bool showSubLayers = !screenMapper()->subLayers()->layer(column)->isFolded();
-	  if (showSubLayers) {
-		  vector<shared_ptr<SubLayer>> subLayers =
-			  screenMapper()->subLayers()->layer(column)->childrenFlatTree();
-		  subLayerHeight = o->cellHeight() * subLayers.size();
-	  }
+    TXshColumn *column = xsh->getColumn(layer);
+    bool showSubLayers =
+        !screenMapper()->subLayers()->layer(column)->isFolded();
+    if (showSubLayers) {
+      vector<shared_ptr<SubLayer>> subLayers =
+          screenMapper()->subLayers()->layer(column)->childrenFlatTree();
+      subLayerHeight = o->cellHeight() * subLayers.size();
+    }
   }
 
   return layerHeightActual - subLayerHeight - yBottom;
@@ -889,25 +892,26 @@ QPoint XsheetViewer::positionToXY(const CellPosition &pos) const {
   // since the layers are flipped
 
   int columnCount = qMax(1, xsh->getColumnCount());
-  int colsHeight = o->colToLayerAxis(columnCount, fan);
-  if(pos.layer() < 0)
-	  usePoint.setY((fan->isActive(pos.layer())
-		  ? o->cellHeight()
-		  : o->foldedCellSize()) - colsHeight);
+  int colsHeight  = o->colToLayerAxis(columnCount, fan);
+  if (pos.layer() < 0)
+    usePoint.setY(
+        (fan->isActive(pos.layer()) ? o->cellHeight() : o->foldedCellSize()) -
+        colsHeight);
   else
-	  usePoint.setY(usePoint.y() + (fan->isActive(pos.layer())
-                                    ? o->cellHeight()
-                                    : o->foldedCellSize()));
+    usePoint.setY(usePoint.y() + (fan->isActive(pos.layer())
+                                      ? o->cellHeight()
+                                      : o->foldedCellSize()));
 
   int subLayerHeight = 0;
   if (fan->isActive(pos.layer())) {
-	  TXshColumn *column = xsh->getColumn(pos.layer());
-	  bool showSubLayers = !screenMapper()->subLayers()->layer(column)->isFolded();
-	  if (showSubLayers) {
-		  vector<shared_ptr<SubLayer>> subLayers =
-			  screenMapper()->subLayers()->layer(column)->childrenFlatTree();
-		  subLayerHeight = o->cellHeight() * subLayers.size();
-	  }
+    TXshColumn *column = xsh->getColumn(pos.layer());
+    bool showSubLayers =
+        !screenMapper()->subLayers()->layer(column)->isFolded();
+    if (showSubLayers) {
+      vector<shared_ptr<SubLayer>> subLayers =
+          screenMapper()->subLayers()->layer(column)->childrenFlatTree();
+      subLayerHeight = o->cellHeight() * subLayers.size();
+    }
   }
 
   if (colsHeight)

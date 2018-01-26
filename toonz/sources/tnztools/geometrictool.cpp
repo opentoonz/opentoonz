@@ -1110,7 +1110,7 @@ public:
             vi->exitGroup();
         }
       }
-	  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+      TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     }
     /*-- RasterImageの場合 --*/
     else if (ri) {
