@@ -276,7 +276,7 @@ void ImageManager::clear() {
 //-----------------------------------------------------------------------------
 
 TImageInfo *ImageManager::getInfo(const std::string &id, int imFlags,
-                                  void *extData) {
+                                  void *extData, TFrameId::FrameFormat format) {
   // Lock for table read and try to find data in the cache
   QReadLocker tableLocker(&m_imp->m_tableLock);
 
@@ -285,7 +285,7 @@ TImageInfo *ImageManager::getInfo(const std::string &id, int imFlags,
   if (it == m_imp->m_builders.end()) return 0;
 
   ImageBuilderP &builder = it->second;
-
+  builder->m_frameFormat = format;
   assert(!((imFlags & ImageManager::toBeModified) && !builder->m_modified));
 
   // Check cached data
@@ -308,7 +308,7 @@ TImageInfo *ImageManager::getInfo(const std::string &id, int imFlags,
 //-----------------------------------------------------------------------------
 
 TImageP ImageManager::getImage(const std::string &id, int imFlags,
-                               void *extData) {
+                               void *extData, TFrameId::FrameFormat format) {
   assert(!((imFlags & ImageManager::toBeModified) &&
            (imFlags & ImageManager::dontPutInCache)));
   assert(!((imFlags & ImageManager::toBeModified) &&
@@ -323,7 +323,7 @@ TImageP ImageManager::getImage(const std::string &id, int imFlags,
 
   ImageBuilderP &builder = it->second;
   bool modified          = builder->m_modified;
-
+  builder->m_frameFormat = format;
   // Analyze imFlags
   bool _putInCache =
       TImageCache::instance()->isEnabled() && !(bool)(imFlags & dontPutInCache);

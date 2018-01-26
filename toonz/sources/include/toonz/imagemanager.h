@@ -8,7 +8,7 @@
 // TnzCore includes
 #include "timage.h"
 #include "timageinfo.h"
-
+#include "tfilepath.h"
 // STD includes
 #include <string>
 
@@ -165,7 +165,8 @@ changes.
 only when imFlags
 contains the \c toBeModified bit.
 */
-  TImageP getImage(const std::string &id, int imFlags, void *extData);
+  TImageP getImage(const std::string &id, int imFlags, void *extData,
+                   TFrameId::FrameFormat format = TFrameId::FOUR_ZEROS);
 
   /*!
 Returns the image info associated to the specified identifier.
@@ -178,7 +179,8 @@ Like in getImage(), users take responsibility in modifying the returned data \b
 only when imFlags
 contains the \c toBeModified bit.
 */
-  TImageInfo *getInfo(const std::string &id, int imFlags, void *extData);
+  TImageInfo *getInfo(const std::string &id, int imFlags, void *extData,
+                      TFrameId::FrameFormat = TFrameId::FOUR_ZEROS);
 
   //! Invalidates cached data associated to the specified id, forcing the next
   //! getInfo() or
@@ -238,7 +240,7 @@ class DVAPI ImageBuilder : public TSmartObject {
 public:
   ImageBuilder();
   virtual ~ImageBuilder();
-
+  TFrameId::FrameFormat m_frameFormat;
   bool imageCached() { return m_cached; }
   bool imageModified() { return m_modified; }
 

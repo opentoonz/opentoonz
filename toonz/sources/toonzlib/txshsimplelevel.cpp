@@ -565,10 +565,11 @@ TImageP TXshSimpleLevel::getFrame(const TFrameId &fid, UCHAR imFlags,
   // If the required frame is not in range, quit
   if (m_frames.count(fid) == 0) return TImageP();
 
-  const std::string &imgId = getImageId(fid);
+  const std::string &imgId = getImageId(fid, -1, m_frameFormat);
 
   ImageLoader::BuildExtData extData(this, fid, subsampling);
-  TImageP img = ImageManager::instance()->getImage(imgId, imFlags, &extData);
+  TImageP img = ImageManager::instance()->getImage(imgId, imFlags, &extData,
+                                                   m_frameFormat);
 
   if (imFlags & ImageManager::toBeModified) {
     // The image will be modified. Perform any related invalidation.
@@ -609,9 +610,9 @@ TImageP TXshSimpleLevel::getFrameIcon(const TFrameId &fid) const {
   ImageLoader::BuildExtData extData(this, fid);
   extData.m_subs = 1, extData.m_icon = true;
 
-  const std::string &imgId = getImageId(fid);
+  const std::string &imgId = getImageId(fid, -1, m_frameFormat);
   TImageP img              = ImageManager::instance()->getImage(
-      imgId, ImageManager::dontPutInCache, &extData);
+      imgId, ImageManager::dontPutInCache, &extData, m_frameFormat);
 
   TToonzImageP timg = (TToonzImageP)img;
   if (timg && m_palette) timg->setPalette(m_palette);
@@ -646,7 +647,7 @@ TRasterImageP TXshSimpleLevel::getFrameToCleanup(const TFrameId &fid) const {
   if (ft == m_frames.end()) return TImageP();
 
   bool flag           = (m_scannedPath != TFilePath());
-  std::string imageId = getImageId(fid, flag ? Scanned : 0);
+  std::string imageId = getImageId(fid, flag ? Scanned : 0, m_frameFormat);
 
   ImageLoader::BuildExtData extData(this, fid, 1);
   TRasterImageP img = ImageManager::instance()->getImage(
@@ -672,7 +673,7 @@ TImageP TXshSimpleLevel::getFullsampledFrame(const TFrameId &fid,
   FramesSet::const_iterator it = m_frames.find(fid);
   if (it == m_frames.end()) return TRasterImageP();
 
-  std::string imageId = getImageId(fid);
+  std::string imageId = getImageId(fid, -1, m_frameFormat);
 
   ImageLoader::BuildExtData extData(this, fid, 1);
   TImageP img = ImageManager::instance()->getImage(imageId, imFlags, &extData);
@@ -690,15 +691,15 @@ TImageP TXshSimpleLevel::getFullsampledFrame(const TFrameId &fid,
 
 std::string TXshSimpleLevel::getIconId(const TFrameId &fid,
                                        int frameStatus) const {
-  return "icon:" + getImageId(fid, frameStatus);
+  return "icon:" + getImageId(fid, frameStatus, m_frameFormat);
 }
 
 //-----------------------------------------------------------------------------
 
 std::string TXshSimpleLevel::getIconId(const TFrameId &fid,
                                        const TDimension &size) const {
-  return getImageId(fid) + ":" + std::to_string(size.lx) + "x" +
-         std::to_string(size.ly);
+  return getImageId(fid, -1, m_frameFormat) + ":" + std::to_string(size.lx) +
+         "x" + std::to_string(size.ly);
 }
 
 //-----------------------------------------------------------------------------
@@ -788,7 +789,7 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img) {
 
   // Deal with the ImageManger: ensure the identifiers are bound, and the
   // associated image is either modified to img or (if !img) invalidated.
-  const std::string &imageId = getImageId(fid);
+  const std::string &imageId = getImageId(fid, -1, m_frameFormat);
 
   if (!ImageManager::instance()->isBound(imageId)) {
     const TFilePath &decodedPath = getScene()->decodeFilePath(path);
@@ -1145,6 +1146,7 @@ void TXshSimpleLevel::load() {
       }
 
       if (info) set16BitChannelLevel(info->m_bitsPerSample == 16);
+      m_frameFormat = lr->getFrameFormat();
     }
     if ((getType() & FULLCOLOR_TYPE) && !is16BitChannelLevel())
       setPalette(FullColorPalette::instance()->getPalette(getScene()));
@@ -1174,10 +1176,10 @@ void TXshSimpleLevel::load() {
       TPointD imageDpi;
 
       const TFrameId &firstFid = getFirstFid();
-      std::string imageId      = getImageId(firstFid);
+      std::string imageId      = getImageId(firstFid, -1, m_frameFormat);
 
-      const TImageInfo *imageInfo =
-          ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
+      const TImageInfo *imageInfo = ImageManager::instance()->getInfo(
+          imageId, ImageManager::none, 0, m_frameFormat);
       if (imageInfo) {
         imageRes.lx = imageInfo->m_lx;
         imageRes.ly = imageInfo->m_ly;
@@ -1751,15 +1753,15 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
 
 //-----------------------------------------------------------------------------
 
-std::string TXshSimpleLevel::getImageId(const TFrameId &fid,
-                                        int frameStatus) const {
+std::string TXshSimpleLevel::getImageId(const TFrameId &fid, int frameStatus,
+                                        TFrameId::FrameFormat format) const {
   if (frameStatus < 0) frameStatus = getFrameStatus(fid);
   std::string prefix               = "L";
   if (frameStatus & CleanupPreview)
     prefix = "P";
   else if ((frameStatus & (Scanned | Cleanupped)) == Scanned)
     prefix            = "S";
-  std::string imageId = m_idBase + "_" + prefix + fid.expand();
+  std::string imageId = m_idBase + "_" + prefix + fid.expand(format);
   return imageId;
 }
 
@@ -1892,7 +1894,7 @@ TPointD TXshSimpleLevel::getImageDpi(const TFrameId &fid, int frameStatus) {
 
   const TFrameId &theFid =
       (fid == TFrameId::NO_FRAME || !isFid(fid)) ? getFirstFid() : fid;
-  const std::string &imageId = getImageId(theFid, frameStatus);
+  const std::string &imageId = getImageId(theFid, frameStatus, m_frameFormat);
 
   const TImageInfo *imageInfo =
       ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
@@ -1960,26 +1962,24 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
   }
 
   ImageManager *im = ImageManager::instance();
-  TImageCache *ic = TImageCache::instance();
+  TImageCache *ic  = TImageCache::instance();
 
   std::map<TFrameId, TFrameId>::iterator jt;
 
   {
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
       std::string Id = getImageId(jt->first);
-	  ImageLoader::BuildExtData extData(this, jt->first);
-	  TImageP img = im->getImage(Id, ImageManager::none, &extData);
-	  ic->add(getIconId(jt->first), img, false);
-	  im->rebind(Id, "^" + std::to_string(i));
-	  ic->remap("^icon:" + std::to_string(i),
-                                     getIconId(jt->first));
+      ImageLoader::BuildExtData extData(this, jt->first);
+      TImageP img = im->getImage(Id, ImageManager::none, &extData);
+      ic->add(getIconId(jt->first), img, false);
+      im->rebind(Id, "^" + std::to_string(i));
+      ic->remap("^icon:" + std::to_string(i), getIconId(jt->first));
     }
 
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
       std::string Id = getImageId(jt->second);
       im->rebind("^" + std::to_string(i), Id);
-	  ic->remap(getIconId(jt->second),
-                                    "^icon:" + std::to_string(i));
+      ic->remap(getIconId(jt->second), "^icon:" + std::to_string(i));
       im->renumber(Id, jt->second);
     }
   }

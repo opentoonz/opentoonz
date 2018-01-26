@@ -24,7 +24,7 @@ TAffine getDpiAffine(TXshSimpleLevel *level, const TFrameId &fid,
   LevelProperties *prop = level->getProperties();
   TAffine aff;
 
-  std::string imageId = level->getImageId(fid);
+  std::string imageId = level->getImageId(fid, -1, level->getFrameFormat());
   int frameStatus     = level->getFrameStatus(fid);
   if (frameStatus & TXshSimpleLevel::CleanupPreview) {
     TRasterImageP ri = TImageCache::instance()->get(imageId, false);

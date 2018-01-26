@@ -49,7 +49,7 @@ Stage::Player::Player()
 TImageP Stage::Player::image() const {
   if (!m_sl) return TImageP();
 
-  std::string id = m_sl->getImageId(m_fid);
+  std::string id = m_sl->getImageId(m_fid, -1, m_sl->getFrameFormat());
   int slType     = m_sl->getType();
 
   if (slType == PLI_XSHLEVEL && TXshSimpleLevel::m_rasterizePli) {
@@ -61,7 +61,8 @@ TImageP Stage::Player::image() const {
     id = id + "_filled";
 
   ImageLoader::BuildExtData extData(m_sl, m_fid);
-  return ImageManager::instance()->getImage(id, ImageManager::none, &extData);
+  return ImageManager::instance()->getImage(id, ImageManager::none, &extData,
+                                            m_sl->getFrameFormat());
 }
 
 //-----------------------------------------------------------------------------

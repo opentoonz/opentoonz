@@ -71,7 +71,8 @@ public:
   virtual const TImageInfo *getImageInfo();
 
   TImageReaderP getFrameReader(int f) { return getFrameReader(TFrameId(f)); };
-
+  TFrameId::FrameFormat getFrameFormat() { return m_frameFormat; };
+  void setFrameFormat(TFrameId::FrameFormat format) { m_frameFormat = format; }
   virtual TSoundTrack *loadSoundTrack();
 
   TFilePath getFilePath() const { return m_path; }

@@ -52,6 +52,7 @@ ImageLoader::ImageLoader(const TFilePath &path, const TFrameId &fid)
 bool ImageLoader::getInfo(TImageInfo &info, int imFlags, void *extData) {
   try {
     TLevelReaderP lr(m_path);
+    lr->setFrameFormat(this->m_frameFormat);
     TImageReaderP fr = lr->getFrameReader(m_fid);
 
     // NOTE: Currently not changing imageInfo's bpp stuff...
@@ -92,7 +93,10 @@ TImageP ImageLoader::build(int imFlags, void *extData) {
     // Initialize level reader
     TLevelReaderP lr(m_path);
     if (!lr) return TImageP();
+    lr->setFrameFormat(m_frameFormat);
+    // if (m_frameFormat != data->m_sl->getFrameFormat()) {
 
+    //}
     // Load info in cases where it's required first
     lr->doReadPalette(false);
 
