@@ -429,7 +429,7 @@ namespace {
 void addStrokeToImage(TTool::Application *application, const TVectorImageP &vi,
                       TStroke *stroke, bool breakAngles, bool frameCreated,
                       bool levelCreated, TXshSimpleLevel *sLevel = NULL,
-                      TFrameId id = -2) {
+                      TFrameId id = TFrameId::NO_FRAME) {
   QMutexLocker lock(vi->getMutex());
   addStroke(application, vi.getPointer(), stroke, breakAngles, frameCreated,
             levelCreated, sLevel, id);
