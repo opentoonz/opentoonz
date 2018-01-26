@@ -341,7 +341,7 @@ static void findMaxCurvPoints(TStroke *stroke, const float &angoloLim,
 static void addStroke(TTool::Application *application, const TVectorImageP &vi,
                       TStroke *stroke, bool breakAngles, bool frameCreated,
                       bool levelCreated, TXshSimpleLevel *sLevel = NULL,
-                      TFrameId fid = -2) {
+                      TFrameId fid = TFrameId::NO_FRAME) {
   QMutexLocker lock(vi->getMutex());
 
   if (application->getCurrentObject()->isSpline()) {
@@ -366,7 +366,7 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
     sl = sLevel;
   }
   TFrameId id = application->getCurrentTool()->getTool()->getCurrentFid();
-  if (id == -2 && fid != -2) id = fid;
+  if (id == TFrameId::NO_FRAME && fid != TFrameId::NO_FRAME) id = fid;
   if (!corners.empty()) {
     if (breakAngles)
       split(stroke, corners, strokes);
