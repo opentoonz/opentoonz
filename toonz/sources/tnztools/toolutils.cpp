@@ -32,6 +32,7 @@
 #include "toonz/toonzscene.h"
 #include "toonz/preferences.h"
 #include "toonz/palettecontroller.h"
+#include "toonz/pathanimations.h"
 
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
@@ -791,6 +792,8 @@ void ToolUtils::UndoModifyStroke::undo() const {
   TStroke *oldStroke = new TStroke(*stroke);
   stroke->reshape(&m_before[0], m_before.size());
   stroke->setSelfLoop(m_selfLoopBefore);
+//  PathAnimations::appAnimations(TTool::getApplication())->removeStroke(stroke);
+  PathAnimations::appSnapshot(TTool::getApplication(), stroke);
   image->notifyChangedStrokes(m_strokeIndex, oldStroke);
   notifyImageChanged();
   delete oldStroke;
@@ -825,6 +828,7 @@ void ToolUtils::UndoModifyStroke::redo() const {
   TStroke *oldStroke = new TStroke(*stroke);
   stroke->reshape(&m_after[0], m_after.size());
   stroke->setSelfLoop(m_selfLoopAfter);
+  PathAnimations::appSnapshot(TTool::getApplication(), stroke);
   image->notifyChangedStrokes(m_strokeIndex, oldStroke);
   delete oldStroke;
   app->getCurrentXsheet()->notifyXsheetChanged();

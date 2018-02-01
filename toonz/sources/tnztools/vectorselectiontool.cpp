@@ -374,6 +374,8 @@ void DragSelectionTool::UndoChangeStrokes::transform(
     int cp, cpCount = stroke->getControlPointCount();
     for (cp = 0; cp != cpCount; ++cp)
       stroke->setControlPoint(cp, sourcesStroke->getControlPoint(cp));
+
+	PathAnimations::appSnapshot(TTool::getApplication(), stroke);
   }
 
   image->notifyChangedStrokes(m_indexes, strokes, m_flip);
