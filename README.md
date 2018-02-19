@@ -4,6 +4,7 @@
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
 [![](https://travis-ci.org/opentoonz/opentoonz.svg?branch=master)](https://travis-ci.org/opentoonz/opentoonz)
+[![Open Source Helpers](https://www.codetriage.com/opentoonz/opentoonz/badges/users.svg)](https://www.codetriage.com/opentoonz/opentoonz)
 
 ## What is OpenToonz?
 
