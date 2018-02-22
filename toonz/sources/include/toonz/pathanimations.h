@@ -52,6 +52,7 @@ public:
 
   PathAnimations *pathAnimations() const;
   TStroke *stroke() const { return m_stroke; }
+  TXshCell cell() const { return m_cellId; }
 
   QString name() const;
 };
@@ -134,6 +135,14 @@ public:
                                              TStroke *stroke);
   static void appSnapshot(const TApplication *app, TStroke *stroke);
   static void appClearAndSnapshot(const TApplication *app, TStroke *stroke);
+
+  map<StrokeId, shared_ptr<PathAnimation>> shapeAnimations() {
+    return m_shapeAnimation;
+  }
+  bool hasActivatedAnimations();
+
+  void loadData(TIStream &is);
+  void saveData(TOStream &os, int occupiedColumnCount);
 };
 
 #endif

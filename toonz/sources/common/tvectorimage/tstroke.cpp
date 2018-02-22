@@ -2483,7 +2483,10 @@ int TStroke::getId() const { return m_imp->m_id; }
 
 //-----------------------------------------------------------------------------
 
-void TStroke::setId(int id) { m_imp->m_id = id; }
+void TStroke::setId(int id) {
+  m_imp->m_id = id;
+  maxStrokeId = max(id, maxStrokeId);
+}
 
 //-----------------------------------------------------------------------------
 

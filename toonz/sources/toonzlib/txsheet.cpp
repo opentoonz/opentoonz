@@ -1191,6 +1191,8 @@ void TXsheet::loadData(TIStream &is) {
     } else if (tagName == "pegbars") {
       TPersist *p = m_imp->m_pegTree;
       is >> *p;
+    } else if (tagName == "pathanimations") {
+      m_imp->m_pathAnimations->loadData(is);
     } else if (tagName == "fxnodes") {
       m_imp->m_fxDag->loadData(is);
       std::vector<TFx *> fxs;
@@ -1266,6 +1268,13 @@ void TXsheet::saveData(TOStream &os) {
   if (notes->getCount() > 0) {
     os.openChild("noteSet");
     notes->saveData(os);
+    os.closeChild();
+  }
+
+  PathAnimations *animations = m_imp->m_pathAnimations;
+  if (animations->hasActivatedAnimations()) {
+    os.openChild("pathanimations");
+    animations->saveData(os, getFirstFreeColumnIndex());
     os.closeChild();
   }
 }

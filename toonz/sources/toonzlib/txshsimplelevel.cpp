@@ -1064,6 +1064,8 @@ static TFilePath getLevelPathAndSetNameWithPsdLevelName(
 // Nota: load() NON fa clearFrames(). si limita ad aggiungere le informazioni
 // relative ai frames su disco
 void TXshSimpleLevel::load() {
+  if (!getDirtyFlag()) return;  // Already loaded
+
   getProperties()->setCreator("");
   QString creator;
 

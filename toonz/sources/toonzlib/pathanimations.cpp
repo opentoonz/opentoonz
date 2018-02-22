@@ -6,8 +6,15 @@
 #include "toonz/txshcell.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/txshlevelhandle.h"
+#include "toonz/txshlevelcolumn.h"
 #include "toonz/tframehandle.h"
 #include "toonz/tcolumnhandle.h"
+#include "toonz/tobjecthandle.h"
+#include "toonz/tstageobject.h"
+#include "toonz/txshsimplelevel.h"
+#include "toonz/levelset.h"
+#include "toonz/toonzscene.h"
+#include "toonz/tscenehandle.h"
 #include "tstroke.h"
 
 //-----------------------------------------------------------------------------
@@ -255,4 +262,200 @@ void PathAnimations::appClearAndSnapshot(const TApplication *app,
   shared_ptr<PathAnimation> animation = appStroke(app, stroke);
   animation->clearKeyframes();
   animation->takeSnapshot(app->getCurrentFrame()->getFrame());
+}
+
+bool PathAnimations::hasActivatedAnimations() {
+  for (map<StrokeId, shared_ptr<PathAnimation>>::iterator it =
+           m_shapeAnimation.begin();
+       it != m_shapeAnimation.end(); it++) {
+    shared_ptr<PathAnimation> animation = it->second;
+    if (animation->isActivated()) return true;
+  }
+
+  return false;
+}
+void PathAnimations::loadData(TIStream &is) {
+  if (!m_xsheet) return;
+
+  std::string tagName;
+
+  while (is.matchTag(tagName)) {
+    if (tagName == "pathanimation") {
+      std::string levelName, strokeName;
+      int frameNum, frameLtrStr, strokeID, strokeIdx;
+      char frameLetter;
+      ToonzScene *scene   = m_xsheet->getScene();
+      TLevelSet *levelSet = scene->getLevelSet();
+      TFrameId frameId;
+      TXshLevel *level;
+      std::shared_ptr<PathAnimation> animation;
+
+      while (is.matchTag(tagName)) {
+        if (tagName == "frame") {
+          is >> levelName >> frameNum >> frameLtrStr;
+          frameLetter = frameLtrStr;
+          std::wstring levelNameWide(levelName.length(), L' ');
+          std::copy(levelName.begin(), levelName.end(), levelNameWide.begin());
+          frameId = TFrameId(frameNum, frameLetter);
+          level   = levelSet->getLevel(levelNameWide);
+        } else if (tagName == "stroke") {
+          strokeID   = stoi(is.getTagAttribute("id"));
+          strokeIdx  = stoi(is.getTagAttribute("idx")) - 1;
+          strokeName = is.getTagAttribute("name");
+          if (level && !frameId.isEmptyFrame()) {
+            TXshSimpleLevel *simpleLevel = level->getSimpleLevel();
+            if (simpleLevel) {
+              simpleLevel->setScene(scene);
+              if (!simpleLevel->getFrameCount()) {
+                // Try and load level now because we need the actual stroke
+                // information
+                try {
+                  simpleLevel->load();
+                } catch (...) {
+                }
+              }
+              TImageP image = simpleLevel->getFrame(frameId, false);
+              if (image) {
+                TXshCell cell = TXshCell(level, frameId);
+                emit ImageManager::instance()->updatedFrame(cell);
+                TVectorImageP vi = image.getPointer();
+                if (vi) {
+                  vi->getStroke(strokeIdx)->setId(strokeID);
+                  if (strokeName.length())
+                    vi->getStroke(strokeIdx)->setName(
+                        QString::fromStdString(strokeName));
+                  StrokeId strokeId(m_xsheet, cell, vi->getStroke(strokeIdx));
+                  animation = addStroke(strokeId);
+                  animation->updateChunks();
+                }
+              }
+            }
+          }
+
+          int chunkId;
+          while (is.matchTag(tagName)) {
+            if (tagName == "chunk") {
+              if (!animation->isActivated()) animation->toggleActivated();
+              chunkId          = stoi(is.getTagAttribute("id")) - 1;
+              TParamSetP chunk = animation->chunkParam(chunkId);
+              while (is.matchTag(tagName)) {
+                if (tagName == "p0") {
+                  chunk->getParam(0)->loadData(is);
+                } else if (tagName == "p1") {
+                  chunk->getParam(1)->loadData(is);
+                } else if (tagName == "p2") {
+                  chunk->getParam(2)->loadData(is);
+                } else
+                  throw TException("Chunk. unexpeced tag: " + tagName);
+                is.matchEndTag();
+              }
+            } else
+              throw TException("Stroke. unexpeced tag: " + tagName);
+            is.matchEndTag();
+          }
+        } else
+          throw TException("Animation. unexpeced tag: " + tagName);
+        is.matchEndTag();
+      }
+    } else
+      throw TException("PathAnimation. unexpeced tag: " + tagName);
+    is.matchEndTag();
+  }
+}
+
+void PathAnimations::saveData(TOStream &os, int occupiedColumnCount) {
+  if (!m_xsheet) return;
+
+  int strokeIdx = 0;
+  TXshLevelP prevLevel;
+  TFrameId prevFrame;
+  bool animationOpen = false;
+  bool levelChanged  = false;
+  std::map<std::string, std::string> attr;
+
+  for (int x = 0; x < m_xsheet->getColumnCount(); x++) {
+    TXshColumn *column = m_xsheet->getColumn(x);
+    if (!column) continue;
+    TXshLevelColumn *levelColumn = column->getLevelColumn();
+    if (!levelColumn || levelColumn->isEmpty()) continue;
+
+    vector<TXshCell> cells;
+    int f0, f1;
+    levelColumn->getRange(f0, f1);
+    for (int f = f0; f <= f1; f++) {
+      const TXshCell &cell = levelColumn->getCell(f);
+      if (std::find(cells.begin(), cells.end(), cell) != cells.end()) continue;
+      cells.push_back(cell);
+
+      TFrameId frame         = cell.getFrameId();
+      TXshSimpleLevel *level = cell.getSimpleLevel();
+      if (!level) continue;
+      TImageP image = level->getFrame(frame, false);
+      if (!image) continue;
+      TVectorImageP vectorImage = {
+          dynamic_cast<TVectorImage *>(image.getPointer())};
+      if (!vectorImage) continue;
+
+      for (int i = 0; i < vectorImage->getStrokeCount(); i++) {
+        StrokeId strokeKey{m_xsheet, cell, vectorImage->getStroke(i)};
+
+        map<StrokeId, shared_ptr<PathAnimation>>::iterator animation =
+            m_shapeAnimation.find(strokeKey);
+        if (animation == m_shapeAnimation.end()) continue;
+        shared_ptr<PathAnimation> shapeAnimation = animation->second;
+        TStroke *stroke                          = strokeKey.stroke();
+        TXshLevelP level                         = cell.m_level;
+
+        if (!level || level != prevLevel || frame != prevFrame) {
+          prevLevel    = level;
+          prevFrame    = frame;
+          levelChanged = true;
+          strokeIdx    = 0;
+        }
+
+        strokeIdx++;
+
+        if (levelChanged) {
+          levelChanged = false;
+
+          // Processing a new cell, start a new animation
+          if (animationOpen) os.closeChild();  // animation
+
+          os.openChild("pathanimation");
+          animationOpen = true;
+
+          os.child("frame") << level->getName() << frame.getNumber()
+                            << std::to_string(frame.getLetter());
+        }
+
+        attr.clear();
+        attr["id"]   = std::to_string(stroke->getId());
+        attr["name"] = stroke->name().toStdString();
+        attr["idx"]  = std::to_string(strokeIdx);
+        os.openChild("stroke", attr);
+        if (shapeAnimation->isActivated()) {
+          for (int n = 0; n < shapeAnimation->chunkCount(); n++) {
+            attr.clear();
+            attr["id"] = std::to_string(n + 1);
+            os.openChild("chunk", attr);
+            TParamSetP chunk = shapeAnimation->chunkParam(n);
+
+            for (int p = 0; p < 3; p++) {
+              TThickPointParamP point = chunk->getParam(p);
+              os.openChild("p" + std::to_string(p));
+              os.child("x") << *point->getX();
+              os.child("y") << *point->getY();
+              os.child("thickness") << *point->getThickness();
+              os.closeChild();  // p#
+            }
+            os.closeChild();  // chunk
+          }
+        }
+
+        os.closeChild();  // stroke
+      }
+    }
+  }
+
+  if (animationOpen) os.closeChild();  // animation
 }
