@@ -22,6 +22,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/txsheethandle.h"
 
 #include "toonz/tcenterlinevectorizer.h"
 #include "toonz/stage.h"
@@ -487,6 +488,7 @@ void StrokeSelection::deleteStrokes() {
     assert(undo);
     if (undo) TUndoManager::manager()->add(undo);
   }
+  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
 //=============================================================================
@@ -555,6 +557,7 @@ void StrokeSelection::paste() {
       ->notifyPaletteChanged();
   m_updateSelectionBBox = false;
   tool->invalidate();
+  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
 //=============================================================================
@@ -587,6 +590,7 @@ void StrokeSelection::cut() {
     assert(undo);
     if (undo) TUndoManager::manager()->add(undo);
   }
+  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
 //=============================================================================
