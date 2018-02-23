@@ -1616,15 +1616,15 @@ void MainWindow::defineActions() {
   QAction *newVectorLevelAction =
       createMenuFileAction(MI_NewVectorLevel, tr("&New Vector Level"), "");
   newVectorLevelAction->setIconText(tr("New Vector Level"));
-  newVectorLevelAction->setIcon(createQIconPNG("new_vector_level"));
+  newVectorLevelAction->setIcon(QIcon(":Resources/new_vector_level.svg"));
   QAction *newToonzRasterLevelAction = createMenuFileAction(
       MI_NewToonzRasterLevel, tr("&New Toonz Raster Level"), "");
   newToonzRasterLevelAction->setIconText(tr("New Toonz Raster Level"));
-  newToonzRasterLevelAction->setIcon(createQIconPNG("new_toonz_raster_level"));
+  newToonzRasterLevelAction->setIcon(QIcon(":Resources/new_toonz_raster_level.svg"));
   QAction *newRasterLevelAction =
       createMenuFileAction(MI_NewRasterLevel, tr("&New Raster Level"), "");
   newRasterLevelAction->setIconText(tr("New Raster Level"));
-  newRasterLevelAction->setIcon(createQIconPNG("new_raster_level"));
+  newRasterLevelAction->setIcon(QIcon(":Resources/new_raster_level.svg"));
   QAction *loadLevelAction =
       createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
   loadLevelAction->setIcon(QIcon(":Resources/load_level.svg"));
