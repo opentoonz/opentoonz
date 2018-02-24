@@ -744,6 +744,8 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
 
     m_viewer->dragToolClick(event);
     event->accept();
+
+	app->getCurrentXsheet()->notifyXsheetChanged();
   }  // left-click
      // pan by middle-drag
   else if (event->button() == Qt::MidButton) {
