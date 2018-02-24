@@ -87,7 +87,7 @@ TRectD PreviewSubCameraManager::getEditingCameraInterestStageRect() const {
 //-----------------------------------------------------------------------------
 
 TPointD PreviewSubCameraManager::winToCamera(SceneViewer *viewer,
-                                             const QPoint &pos) const {
+                                             const QPointF &pos) const {
   TPointD worldPos(viewer->winToWorld(pos));
 
   TApp *app = TApp::instance();
@@ -100,8 +100,8 @@ TPointD PreviewSubCameraManager::winToCamera(SceneViewer *viewer,
 
 //-----------------------------------------------------------------------------
 
-TPoint PreviewSubCameraManager::cameraToWin(SceneViewer *viewer,
-                                            const TPointD &cameraPos) const {
+TPointD PreviewSubCameraManager::cameraToWin(SceneViewer *viewer,
+                                             const TPointD &cameraPos) const {
   TApp *app = TApp::instance();
   TAffine stageToWorldRef(app->getCurrentXsheet()->getXsheet()->getCameraAff(
       app->getCurrentFrame()->getFrame()));
@@ -133,7 +133,7 @@ bool PreviewSubCameraManager::mousePressEvent(SceneViewer *viewer,
 bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer,
                                              const TMouseEvent &event) {
   if (viewer->is3DView()) return true;
-  QPoint curPos(event.mousePos() * getDevPixRatio());
+  QPointF curPos(event.mousePos() * getDevPixRatio());
   if (event.buttons() == Qt::LeftButton) {
     if (!bitwiseContains(m_dragType, INNER)) {
       if (abs(curPos.x() - m_mousePressPos.x()) > 10 ||
@@ -261,17 +261,17 @@ bool PreviewSubCameraManager::mouseReleaseEvent(SceneViewer *viewer) {
 
 //! Builds the drag enum and camera distance for subcamera refinement drags.
 UCHAR PreviewSubCameraManager::getSubCameraDragEnum(SceneViewer *viewer,
-                                                    const QPoint &mousePos) {
+                                                    const QPointF &mousePos) {
   TCamera *camera =
       TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
   TRect subCamera = camera->getInterestRect();
 
   if (subCamera.getLx() <= 0 || subCamera.getLy() <= 0) return NODRAG;
 
-  TPointD cameraPosL(winToCamera(viewer, mousePos - QPoint(10, 0)));
-  TPointD cameraPosR(winToCamera(viewer, mousePos + QPoint(10, 0)));
-  TPointD cameraPosT(winToCamera(viewer, mousePos - QPoint(0, 10)));
-  TPointD cameraPosB(winToCamera(viewer, mousePos + QPoint(0, 10)));
+  TPointD cameraPosL(winToCamera(viewer, mousePos - QPointF(10, 0)));
+  TPointD cameraPosR(winToCamera(viewer, mousePos + QPointF(10, 0)));
+  TPointD cameraPosT(winToCamera(viewer, mousePos - QPointF(0, 10)));
+  TPointD cameraPosB(winToCamera(viewer, mousePos + QPointF(0, 10)));
 
   TRectD cameraPosBox(
       std::min({cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x}),
@@ -302,7 +302,7 @@ UCHAR PreviewSubCameraManager::getSubCameraDragEnum(SceneViewer *viewer,
 //-----------------------------------------------------------------------------
 
 TPoint PreviewSubCameraManager::getSubCameraDragDistance(
-    SceneViewer *viewer, const QPoint &mousePos) {
+    SceneViewer *viewer, const QPointF &mousePos) {
   // Build the camera drag distance
   if (m_clickAndDrag) return TPoint();
 

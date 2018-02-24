@@ -22,14 +22,12 @@
 
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/lutcalibrator.h"
 
 #include "tools/toolhandle.h"
 #include "tools/stylepicker.h"
 #include "tools/toolutils.h"
 #include "tools/RGBpicker.h"
-
-// iwsw  commented out temporarily
-//#include "toonzqt/ghibli_3dlut_util.h"
 
 #define NORMAL_PICK L"Normal"
 #define RECT_PICK L"Rectangular"
@@ -330,10 +328,10 @@ void RGBPickerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     invalidate();
     return;
   } else if (m_pickType.getValue() == FREEHAND_PICK) {
-    startFreehand(pos, convert(e.m_pos));
+    startFreehand(pos, e.m_pos);
     return;
   } else if (m_pickType.getValue() == POLYLINE_PICK) {
-    addPointPolyline(pos, convert(e.m_pos));
+    addPointPolyline(pos, e.m_pos);
     return;
   } else {  // NORMAL_PICK
     m_mousePixelPosition = e.m_pos;
@@ -354,7 +352,7 @@ void RGBPickerTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     invalidate();
     return;
   } else if (m_pickType.getValue() == FREEHAND_PICK) {
-    freehandDrag(pos, convert(e.m_pos));
+    freehandDrag(pos, e.m_pos);
     invalidate();
   }
 }
@@ -380,7 +378,7 @@ void RGBPickerTool::leftButtonDoubleClick(const TPointD &pos,
                                           const TMouseEvent &e) {
   if (m_currentStyleId == 0) return;
   if (m_pickType.getValue() == POLYLINE_PICK) {
-    closePolyline(pos, convert(e.m_pos));
+    closePolyline(pos, e.m_pos);
     std::vector<TThickPoint> strokePoints;
     for (UINT i = 0; i < m_workingPolyline.size() - 1; i++) {
       strokePoints.push_back(TThickPoint(m_workingPolyline[i], 1));
@@ -420,7 +418,11 @@ void RGBPickerTool::passivePick() {
 
   StylePicker picker(image);
 
+  if (LutCalibrator::instance()->isValid()) m_viewer->bindFBO();
+
   TPixel32 pix = picker.pickColor(area);
+
+  if (LutCalibrator::instance()->isValid()) m_viewer->releaseFBO();
 
   QColor col((int)pix.r, (int)pix.g, (int)pix.b);
 
@@ -444,7 +446,11 @@ void RGBPickerTool::pick() {
                        m_mousePixelPosition.x + 1, m_mousePixelPosition.y + 1);
   StylePicker picker(image, palette);
 
+  if (LutCalibrator::instance()->isValid()) m_viewer->bindFBO();
+
   m_currentValue = picker.pickColor(area);
+
+  if (LutCalibrator::instance()->isValid()) m_viewer->releaseFBO();
 
   TXshSimpleLevel *level = app->getCurrentLevel()->getSimpleLevel();
   UndoPickRGBM *cmd = new UndoPickRGBM(palette, styleId, m_currentValue, level);
@@ -485,7 +491,11 @@ void RGBPickerTool::pickRect() {
   if (area.getLx() <= 1 || area.getLy() <= 1) return;
   StylePicker picker(image, palette);
 
+  if (LutCalibrator::instance()->isValid()) m_viewer->bindFBO();
+
   m_currentValue = picker.pickColor(area);
+
+  if (LutCalibrator::instance()->isValid()) m_viewer->releaseFBO();
 }
 
 //---------------------------------------------------------
@@ -502,7 +512,11 @@ void RGBPickerTool::pickStroke() {
   StylePicker picker(image, palette);
   TStroke *stroke = new TStroke(*m_stroke);
 
+  if (LutCalibrator::instance()->isValid()) m_viewer->bindFBO();
+
   m_currentValue = picker.pickColor(stroke);
+
+  if (LutCalibrator::instance()->isValid()) m_viewer->releaseFBO();
 
   if (!(m_pickType.getValue() == POLYLINE_PICK)) {
     TXshSimpleLevel *level = app->getCurrentLevel()->getSimpleLevel();

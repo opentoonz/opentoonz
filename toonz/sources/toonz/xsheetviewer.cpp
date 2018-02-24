@@ -376,6 +376,7 @@ void XsheetViewer::onOrientationChanged(const Orientation *newOrientation) {
 }
 
 void XsheetViewer::positionSections() {
+  if (!isVisible()) return;
   const Orientation *o = orientation();
   QRect size           = QRect(QPoint(0, 0), geometry().size());
   NumberRange allLayer = o->layerSide(size);

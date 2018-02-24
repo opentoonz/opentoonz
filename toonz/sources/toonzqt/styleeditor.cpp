@@ -6,6 +6,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/filefield.h"
 #include "historytypes.h"
+#include "toonzqt/lutcalibrator.h"
 
 // TnzLib includes
 #include "toonz/txshlevel.h"
@@ -53,6 +54,7 @@
 #include <QStyleOptionSlider>
 #include <QToolTip>
 #include <QSplitter>
+#include <QOpenGLFramebufferObject>
 
 using namespace StyleEditorGUI;
 
@@ -557,44 +559,24 @@ HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setFocusPolicy(Qt::NoFocus);
   m_currentWheel = none;
-
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  Ghibli3DLutUtil::m_isValid)
-  {
-  m_ghibli3DLutUtil = new Ghibli3DLutUtil();
-  m_ghibli3DLutUtil->setInvert();
-  }
-  */
 }
 
 //-----------------------------------------------------------------------------
 
 HexagonalColorWheel::~HexagonalColorWheel() {
-  // iwsw commented out temporarily
-  /*
-  if(m_ghibli3DLutUtil)
-  {
-  m_ghibli3DLutUtil->onEnd();
-  delete m_ghibli3DLutUtil;
-  }
-  */
+  if (m_fbo) delete m_fbo;
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::initializeGL() {
   initializeOpenGLFunctions();
+
+  // to be computed once through the software
+  LutCalibrator::instance()->initialize();
+
   QColor const color = getBGColor();
   glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
-
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  m_ghibli3DLutUtil)
-  m_ghibli3DLutUtil->onInit();
-  */
 }
 
 //-----------------------------------------------------------------------------
@@ -646,12 +628,11 @@ void HexagonalColorWheel::resizeGL(int w, int h) {
   glLoadIdentity();
   glOrtho(0.0, (GLdouble)w, (GLdouble)h, 0.0, 1.0, -1.0);
 
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  m_ghibli3DLutUtil)
-  m_ghibli3DLutUtil->onResize(w,h);
-  */
+  // remake fbo with new size
+  if (LutCalibrator::instance()->isValid()) {
+    if (m_fbo) delete m_fbo;
+    m_fbo = new QOpenGLFramebufferObject(w, h);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -664,12 +645,7 @@ void HexagonalColorWheel::paintGL() {
 
   glMatrixMode(GL_MODELVIEW);
 
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  m_ghibli3DLutUtil)
-  m_ghibli3DLutUtil->startDraw();
-  */
+  if (LutCalibrator::instance()->isValid()) m_fbo->bind();
 
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -716,12 +692,8 @@ void HexagonalColorWheel::paintGL() {
 
   glPopMatrix();
 
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  m_ghibli3DLutUtil)
-  m_ghibli3DLutUtil->endDraw();
-  */
+  if (LutCalibrator::instance()->isValid())
+    LutCalibrator::instance()->onEndDraw(m_fbo);
 }
 
 //-----------------------------------------------------------------------------
@@ -3027,53 +2999,8 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   QScrollArea *textureArea = makeChooserPage(m_textureStylePage);
   QScrollArea *mypaintBrushesArea = makeChooserPage(m_mypaintBrushesStylePage);
   QScrollArea *settingsArea = makeChooserPageWithoutScrollBar(m_settingsPage);
-
-  QVBoxLayout *vectorLayout = new QVBoxLayout(this);
-  vectorLayout->setMargin(0);
-  vectorLayout->setSpacing(0);
-  vectorLayout->setSizeConstraint(QLayout::SetNoConstraint);
-
-  QVBoxLayout *vectorOutsideLayout = new QVBoxLayout(this);
-  vectorOutsideLayout->setMargin(0);
-  vectorOutsideLayout->setSpacing(0);
-  vectorOutsideLayout->setSizeConstraint(QLayout::SetNoConstraint);
-
-  QPushButton *specialButton     = new QPushButton(tr("Generated"), this);
-  QPushButton *customButton      = new QPushButton(tr("Trail"), this);
-  QPushButton *vectorBrushButton = new QPushButton(tr("Vector Brush"), this);
-  specialButton->setCheckable(true);
-  customButton->setCheckable(true);
-  vectorBrushButton->setCheckable(true);
-  specialButton->setChecked(true);
-  customButton->setChecked(true);
-  vectorBrushButton->setChecked(true);
-
-  QHBoxLayout *vectorButtonLayout = new QHBoxLayout(this);
-  vectorButtonLayout->setSizeConstraint(QLayout::SetNoConstraint);
-
-  QFrame *vectorFrame = new QFrame(this);
-  vectorFrame->setMinimumWidth(50);
-
-  QFrame *vectorOutsideFrame = new QFrame(this);
-  vectorOutsideFrame->setMinimumWidth(50);
-
-  vectorButtonLayout->addWidget(specialButton);
-  vectorButtonLayout->addWidget(customButton);
-  vectorButtonLayout->addWidget(vectorBrushButton);
-
-  vectorOutsideLayout->addLayout(vectorButtonLayout);
-  vectorLayout->addWidget(m_specialStylePage);
-  vectorLayout->addWidget(m_customStylePage);
-  vectorLayout->addWidget(m_vectorBrushesStylePage);
-
-  vectorFrame->setLayout(vectorLayout);
-  m_vectorArea = makeChooserPage(vectorFrame);
-  m_vectorArea->setMinimumWidth(50);
-  vectorOutsideLayout->addWidget(m_vectorArea);
-
-  vectorOutsideFrame->setLayout(vectorOutsideLayout);
   QScrollArea *vectorOutsideArea =
-      makeChooserPageWithoutScrollBar(vectorOutsideFrame);
+      makeChooserPageWithoutScrollBar(createVectorPage());
   vectorOutsideArea->setMinimumWidth(50);
 
   m_styleChooser = new QStackedWidget(this);
@@ -3144,12 +3071,6 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   ret = ret && connect(m_plainColorPage,
                        SIGNAL(colorChanged(const ColorModel &, bool)), this,
                        SLOT(onColorChanged(const ColorModel &, bool)));
-  ret = ret && connect(specialButton, SIGNAL(toggled(bool)), this,
-                       SLOT(onSpecialButtonToggled(bool)));
-  ret = ret && connect(customButton, SIGNAL(toggled(bool)), this,
-                       SLOT(onCustomButtonToggled(bool)));
-  ret = ret && connect(vectorBrushButton, SIGNAL(toggled(bool)), this,
-                       SLOT(onVectorBrushButtonToggled(bool)));
   assert(ret);
 
   /* ------- initial conditions ------- */
@@ -3233,6 +3154,68 @@ QFrame *StyleEditor::createBottomWidget() {
   assert(ret);
 
   return bottomWidget;
+}
+
+//-----------------------------------------------------------------------------
+
+QFrame *StyleEditor::createVectorPage() {
+  QFrame *vectorOutsideFrame = new QFrame(this);
+  vectorOutsideFrame->setMinimumWidth(50);
+
+  QPushButton *specialButton     = new QPushButton(tr("Generated"), this);
+  QPushButton *customButton      = new QPushButton(tr("Trail"), this);
+  QPushButton *vectorBrushButton = new QPushButton(tr("Vector Brush"), this);
+
+  specialButton->setCheckable(true);
+  customButton->setCheckable(true);
+  vectorBrushButton->setCheckable(true);
+  specialButton->setChecked(true);
+  customButton->setChecked(true);
+  vectorBrushButton->setChecked(true);
+
+  /* ------ layout ------ */
+  QVBoxLayout *vectorOutsideLayout = new QVBoxLayout();
+  vectorOutsideLayout->setMargin(0);
+  vectorOutsideLayout->setSpacing(0);
+  vectorOutsideLayout->setSizeConstraint(QLayout::SetNoConstraint);
+  {
+    QHBoxLayout *vectorButtonLayout = new QHBoxLayout();
+    vectorButtonLayout->setSizeConstraint(QLayout::SetNoConstraint);
+    {
+      vectorButtonLayout->addWidget(specialButton);
+      vectorButtonLayout->addWidget(customButton);
+      vectorButtonLayout->addWidget(vectorBrushButton);
+    }
+    vectorOutsideLayout->addLayout(vectorButtonLayout);
+
+    QVBoxLayout *vectorLayout = new QVBoxLayout();
+    vectorLayout->setMargin(0);
+    vectorLayout->setSpacing(0);
+    vectorLayout->setSizeConstraint(QLayout::SetNoConstraint);
+    {
+      vectorLayout->addWidget(m_specialStylePage);
+      vectorLayout->addWidget(m_customStylePage);
+      vectorLayout->addWidget(m_vectorBrushesStylePage);
+    }
+    QFrame *vectorFrame = new QFrame(this);
+    vectorFrame->setMinimumWidth(50);
+    vectorFrame->setLayout(vectorLayout);
+    m_vectorArea = makeChooserPage(vectorFrame);
+    m_vectorArea->setMinimumWidth(50);
+    vectorOutsideLayout->addWidget(m_vectorArea);
+  }
+  vectorOutsideFrame->setLayout(vectorOutsideLayout);
+
+  /* ------ signal-slot connections ------ */
+  bool ret = true;
+  ret      = ret && connect(specialButton, SIGNAL(toggled(bool)), this,
+                       SLOT(onSpecialButtonToggled(bool)));
+  ret = ret && connect(customButton, SIGNAL(toggled(bool)), this,
+                       SLOT(onCustomButtonToggled(bool)));
+  ret = ret && connect(vectorBrushButton, SIGNAL(toggled(bool)), this,
+                       SLOT(onVectorBrushButtonToggled(bool)));
+  assert(ret);
+  return vectorOutsideFrame;
 }
 
 //-----------------------------------------------------------------------------

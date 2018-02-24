@@ -32,7 +32,6 @@
 #include "toonz/stage.h"
 
 #include "tfont.h"
-#include "tw/keycodes.h"
 
 // For Qt translation support
 #include <QCoreApplication>
@@ -42,7 +41,6 @@
 //#include "tw/ime.h"
 
 using namespace ToolUtils;
-using namespace TwConsts;
 
 namespace {
 
@@ -256,7 +254,7 @@ public:
       , m_key(key)
       , m_styleId(styleId) {}
 
-  bool isReturn() const { return m_key == TK_Return; }
+  bool isReturn() const { return m_key == (int)(QChar('\r').unicode()); }
 
   void update(TAffine scale, int nextCode = 0) {
     if (!isReturn()) {
@@ -359,8 +357,8 @@ public:
   void mouseMove(const TPointD &pos, const TMouseEvent &) override;
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
   void rightButtonDown(const TPointD &pos, const TMouseEvent &) override;
-  bool keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
-               const TPoint &pos) override;
+  bool keyDown(QKeyEvent *event) override;
+
   void onInputText(std::wstring preedit, std::wstring commit,
                    int replacementStart, int replacementLen) override;
 
@@ -1352,10 +1350,10 @@ void TypeTool::replaceText(std::wstring text, int from, int to) {
 void TypeTool::addReturn() {
   TVectorImageP vi(new TVectorImage);
   if ((UINT)m_cursorIndex == m_string.size())
-    m_string.push_back(StrokeChar(vi, -1., (int)(TK_Return), 0));
+    m_string.push_back(StrokeChar(vi, -1., (int)(QChar('\r').unicode()), 0));
   else
     m_string.insert(m_string.begin() + m_cursorIndex,
-                    StrokeChar(vi, -1., TK_Return, 0));
+                    StrokeChar(vi, -1., (int)(QChar('\r').unicode()), 0));
 
   m_cursorIndex++;
   m_preeditRange = std::make_pair(m_cursorIndex, m_cursorIndex);
@@ -1505,31 +1503,35 @@ void TypeTool::deleteKey() {
 
 //---------------------------------------------------------
 
-bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
-                       const TPoint &pos) {
+bool TypeTool::keyDown(QKeyEvent *event) {
+  QString text = event->text();
+  if ((event->modifiers() & Qt::ShiftModifier)) text.toUpper();
+  std::wstring unicodeChar = text.toStdWString();
+
   // per sicurezza
   m_preeditRange = std::make_pair(0, 0);
 
   if (!m_validFonts || !m_active) return true;
 
   // Se ho premuto solo i tasti ALT, SHIFT e CTRL (da soli) esco
-  if (flags && (unicodeChar.empty())) return true;
-
-  switch (key) {
-  case TK_Insert:
-  case TK_CapsLock:
+  if (event->modifiers() != Qt::NoModifier && (unicodeChar.empty()))
     return true;
 
-  case TK_Home:
-  case TK_PageUp:
+  switch (event->key()) {
+  case Qt::Key_Insert:
+  case Qt::Key_CapsLock:
+    return true;
+
+  case Qt::Key_Home:
+  case Qt::Key_PageUp:
     m_cursorIndex  = 0;
     m_preeditRange = std::make_pair(m_cursorIndex, m_cursorIndex);
     updateCursorPoint();
     invalidate();
     break;
 
-  case TK_End:
-  case TK_PageDown:
+  case Qt::Key_End:
+  case Qt::Key_PageDown:
     m_cursorIndex  = (int)m_string.size();
     m_preeditRange = std::make_pair(m_cursorIndex, m_cursorIndex);
     updateCursorPoint();
@@ -1537,7 +1539,7 @@ bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
     break;
 
   /////////////////// cursors
-  case TK_UpArrow:
+  case Qt::Key_Up:
     if (!m_isVertical)
       cursorUp();
     else if (m_cursorIndex > 0) {
@@ -1548,7 +1550,7 @@ bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
     invalidate();
     break;
 
-  case TK_DownArrow:
+  case Qt::Key_Down:
     if (!m_isVertical)
       cursorDown();
     else if ((UINT)m_cursorIndex < m_string.size()) {
@@ -1559,7 +1561,7 @@ bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
     invalidate();
     break;
 
-  case TK_LeftArrow:
+  case Qt::Key_Left:
     if (m_isVertical)
       cursorLeft();
     else if (m_cursorIndex > 0) {
@@ -1570,7 +1572,7 @@ bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
     invalidate();
     break;
 
-  case TK_RightArrow:
+  case Qt::Key_Right:
     if (m_isVertical)
       cursorRight();
     else if ((UINT)m_cursorIndex < m_string.size()) {
@@ -1583,7 +1585,7 @@ bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
 
   /////////////////// end cursors
 
-  case TK_Esc:
+  case Qt::Key_Escape:
     resetInputMethod();
     if (!m_string.empty())
       addTextToImage();
@@ -1591,11 +1593,11 @@ bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
       stopEditing();
     break;
 
-  case TK_Delete:
+  case Qt::Key_Delete:
     deleteKey();
     break;
 
-  case TK_Backspace:
+  case Qt::Key_Backspace:
     if (m_cursorIndex > 0) {
       m_cursorIndex--;
       m_preeditRange = std::make_pair(m_cursorIndex, m_cursorIndex);
@@ -1603,7 +1605,8 @@ bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
     }
     break;
 
-  case TK_Return:
+  case Qt::Key_Return:
+  case Qt::Key_Enter:
     addReturn();
     break;
 

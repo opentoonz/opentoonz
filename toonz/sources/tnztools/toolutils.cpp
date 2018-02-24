@@ -1531,7 +1531,7 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
       double d  = pixelSize * 5;
       glRectd(x0 - d, y0 - d, x1 + d, y1 + d);
     } else {
-      TPoint posBalloon = viewer->worldToPos(pos);
+      TPointD posBalloon = viewer->worldToPos(pos);
 
       double d  = 5;
       double x0 = posBalloon.x + textRect.left() - d;
@@ -1539,10 +1539,10 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
       double x1 = x0 + textRect.width() + d;
       double y1 = y0 + textRect.height() + d;
 
-      TPoint p1(x0, y0);
-      TPoint p2(x1, y0);
-      TPoint p3(x0, y1);
-      TPoint p4(x1, y1);
+      TPointD p1(x0, y0);
+      TPointD p2(x1, y0);
+      TPointD p3(x0, y1);
+      TPointD p4(x1, y1);
 
       TPointD w1(viewer->winToWorld(p1));
       TPointD w2(viewer->winToWorld(p2));

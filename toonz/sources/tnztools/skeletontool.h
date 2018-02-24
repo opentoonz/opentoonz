@@ -120,7 +120,7 @@ public:
 
   void computeMagicLinks();
 
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos);
+  bool keyDown(QKeyEvent *event) override;
 
   void onActivate();
   void onDeactivate();

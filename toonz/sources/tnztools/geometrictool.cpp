@@ -27,7 +27,6 @@
 #include "toonzqt/dvdialog.h"
 #include "toonz/trasterimageutils.h"
 #include "toonz/preferences.h"
-#include "tw/keycodes.h"
 #include "historytypes.h"
 
 // For Qt translation support
@@ -446,7 +445,7 @@ public:
   virtual void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e){};
   virtual void rightButtonDown(const TPointD &p, const TMouseEvent &e){};
   virtual void mouseMove(const TPointD &p, const TMouseEvent &e){};
-  virtual bool keyDown(int key, const TPoint &point) { return false; }
+  virtual bool keyDown(QKeyEvent *event) { return false; }
   virtual void onEnter(){};
   virtual void draw(){};
   virtual void onActivate(){};
@@ -614,7 +613,7 @@ public:
   void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) override;
   void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
-  bool keyDown(int key, const TPoint &point) override;
+  bool keyDown(QKeyEvent *event) override;
   TStroke *makeStroke() const override;
   void endLine();
   void onActivate() override;
@@ -854,8 +853,8 @@ public:
     invalidate();
   }
 
-  bool keyDown(int key, TUINT32 b, const TPoint &point) override {
-    return m_primitive->keyDown(key, point);
+  bool keyDown(QKeyEvent *event) override {
+    return m_primitive->keyDown(event);
   }
 
   void onImageChanged() override {
@@ -1454,8 +1453,8 @@ void CirclePrimitive::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (!m_isEditing) return;
 
   m_pos    = pos;
-  m_pos = calculateSnap(pos);
-  m_pos = checkGuideSnapping(pos);
+  m_pos    = calculateSnap(pos);
+  m_pos    = checkGuideSnapping(pos);
   m_radius = tdistance(m_centre, m_pos);
 }
 
@@ -1750,13 +1749,13 @@ void MultiLinePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
 //-----------------------------------------------------------------------------
 
-bool MultiLinePrimitive::keyDown(int key, const TPoint &point) {
-  if (key == TwConsts::TK_Return) {
+bool MultiLinePrimitive::keyDown(QKeyEvent *event) {
+  if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
     endLine();
     return true;
   }
 
-  if (key != TwConsts::TK_Esc || !m_isEditing) return false;
+  if (event->key() != Qt::Key_Escape || !m_isEditing) return false;
 
   UINT size = m_vertex.size();
   if (size <= 1) return 0;
@@ -2285,8 +2284,8 @@ void PolygonPrimitive::leftButtonDrag(const TPointD &pos,
                                       const TMouseEvent &e) {
   if (!m_isEditing) return;
   TPointD newPos = calculateSnap(pos);
-  newPos = checkGuideSnapping(pos);
-  m_radius = tdistance(m_centre, newPos);
+  newPos         = checkGuideSnapping(pos);
+  m_radius       = tdistance(m_centre, newPos);
 }
 
 //-----------------------------------------------------------------------------

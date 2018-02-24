@@ -22,8 +22,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvscrollwidget.h"
-// iwsw commented out temporarily
-//#include "toonzqt/ghibli_3dlut_converter.h"
+#include "toonzqt/lutcalibrator.h"
 
 // TnzLib includes
 #include "toonz/tobjecthandle.h"
@@ -910,7 +909,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
           SLOT(receiveMouseMove(QMouseEvent *)));
   connect(m_nsCenterLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
           m_nsCenterField, SLOT(receiveMouseRelease(QMouseEvent *)));
-          
+
   if (globalKeyProp) {
     std::string actionName = "A_ToolOption_" + globalKeyProp->getId();
     QAction *a = CommandManager::instance()->getAction(actionName.c_str());
@@ -1639,7 +1638,7 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
     if (m_toolType->currentText() == QString("Normal") ||
         m_multiFrameMode->isChecked())
       m_onionMode->setEnabled(false);
-    m_autopaintMode->setEnabled(false);
+    if (m_autopaintMode) m_autopaintMode->setEnabled(false);
   }
   if (m_toolType->currentText().toStdWString() != L"Normal") {
     if (m_segmentMode) m_segmentMode->setEnabled(false);
@@ -1663,7 +1662,7 @@ void FillToolOptionsBox::updateStatus() {
 void FillToolOptionsBox::onColorModeChanged() {
   bool enabled = m_colorMode->currentText() != QString("Lines");
   m_selectiveMode->setEnabled(enabled);
-  if(m_autopaintMode) m_autopaintMode->setEnabled(enabled);
+  if (m_autopaintMode) m_autopaintMode->setEnabled(enabled);
   if (m_fillDepthLabel && m_fillDepthField) {
     m_fillDepthLabel->setEnabled(enabled);
     m_fillDepthField->setEnabled(enabled);
@@ -2279,18 +2278,12 @@ protected:
     QPainter p(this);
     p.setPen(Qt::NoPen);
 
-    // iwsw commented out temporarily
-    /*
-    if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
-    {
-            QColor convertedColor(m_color);
-            Ghibli3DLutConverter::instance()->convert(convertedColor);
-            p.setBrush(convertedColor);
-    }
-    else
-    */
-    p.setBrush(m_color);
-    p.setBrush(m_color);
+    if (LutCalibrator::instance()->isValid()) {
+      QColor convertedColor(m_color);
+      LutCalibrator::instance()->convert(convertedColor);
+      p.setBrush(convertedColor);
+    } else
+      p.setBrush(m_color);
 
     p.drawRect(rect());
 

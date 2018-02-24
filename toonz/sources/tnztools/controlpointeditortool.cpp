@@ -21,8 +21,6 @@
 #include "toonz/stage2.h"
 #include "toonz/tstageobject.h"
 
-#include "tw/keycodes.h"
-
 // For Qt translation support
 #include <QCoreApplication>
 #include <QKeyEvent>
@@ -188,7 +186,7 @@ public:
   void linkSpeedInOut(int index);
   void unlinkSpeedInOut(int pointIndex);
 
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos) override;
+  bool keyDown(QKeyEvent *event) override;
   void onEnter() override;
   void onLeave() override;
   bool onPropertyChanged(std::string propertyName) override;
@@ -783,8 +781,7 @@ void ControlPointEditorTool::unlinkSpeedInOut(int pointIndex) {
 
 //---------------------------------------------------------------------------
 
-bool ControlPointEditorTool::keyDown(int key, TUINT32 flags,
-                                     const TPoint &pos) {
+bool ControlPointEditorTool::keyDown(QKeyEvent *event) {
   TVectorImageP vi(getImage(true));
   if (!vi || (vi && m_selection.isEmpty())) return false;
 
@@ -792,16 +789,23 @@ bool ControlPointEditorTool::keyDown(int key, TUINT32 flags,
   initUndo();
 
   TPointD delta;
-  if (key == TwConsts::TK_UpArrow)
+  switch (event->key()) {
+  case Qt::Key_Up:
     delta.y = 1;
-  else if (key == TwConsts::TK_DownArrow)
+    break;
+  case Qt::Key_Down:
     delta.y = -1;
-  else if (key == TwConsts::TK_LeftArrow)
+    break;
+  case Qt::Key_Left:
     delta.x = -1;
-  else if (key == TwConsts::TK_RightArrow)
+    break;
+  case Qt::Key_Right:
     delta.x = 1;
-  else
+    break;
+  default:
     return false;
+    break;
+  }
   moveControlPoints(delta);
 
   invalidate();

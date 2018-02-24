@@ -15,6 +15,8 @@
 #include "tcg/tcg_list.h"
 #include "tcg/tcg_misc.h"
 
+#include "trop.h"
+
 #define COPIED_BORDER 1  // Amount of tile border from the original image
 #define TRANSP_BORDER 1  // Amount of transparent tile border
 #define NONPREM_BORDER                                                         \
@@ -28,6 +30,17 @@ TCG_STATIC_ASSERT(COPIED_BORDER >
 TCG_STATIC_ASSERT(TRANSP_BORDER > 0);  // Due to GL_CLAMP beyond tile limits
 TCG_STATIC_ASSERT(NONPREM_BORDER <=
                   TRANSP_BORDER);  // The nonpremultiplied border is transparent
+
+namespace {
+int getMaxTextureTileSize() {
+  static int maxTexSize = -1;
+  if (maxTexSize == -1) {
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
+    maxTexSize = std::min(maxTexSize, 1 << 11);
+  }
+  return maxTexSize;
+}
+};
 
 //******************************************************************************************
 //    MeshTexturizer::Imp  definition
@@ -58,7 +71,15 @@ public:
 //---------------------------------------------------------------------------------
 
 bool MeshTexturizer::Imp::testTextureAlloc(int lx, int ly) {
+  GLuint texName;
+  glEnable(GL_TEXTURE_2D);
+  glGenTextures(1, &texName);
+  glBindTexture(GL_TEXTURE_2D, texName);
+
   lx += TOTAL_BORDER_2, ly += TOTAL_BORDER_2;  // Add border
+
+  int max_texture_size;
+  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
 
   glTexImage2D(GL_PROXY_TEXTURE_2D,
                0,                 // one level only
@@ -73,6 +94,8 @@ bool MeshTexturizer::Imp::testTextureAlloc(int lx, int ly) {
   int outLx;
   glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &outLx);
 
+  glDeleteTextures(1, &texName);
+  assert(glGetError() == GL_NO_ERROR);
   return (lx == outLx);
 }
 
@@ -106,6 +129,7 @@ GLuint MeshTexturizer::Imp::textureAlloc(const TRaster32P &ras,
       clearMatte(ras, ras->getLx() - border1, border1, ras->getLx() - border0,
                  ras->getLy() - border1);
     }
+
   };  // locals
 
   // Prepare the texture tile
@@ -125,9 +149,11 @@ GLuint MeshTexturizer::Imp::textureAlloc(const TRaster32P &ras,
   tex->clear();
   aux->extract(auxRect)->copy(ras->extract(rasRect));
 
-  if (!premultiplied && NONPREM_BORDER > 0)
-    locals::clearMatte_border(aux, TRANSP_BORDER - NONPREM_BORDER,
+  if (!premultiplied && NONPREM_BORDER > 0) {
+    locals::clearMatte_border(tex, TRANSP_BORDER - NONPREM_BORDER,
                               TRANSP_BORDER);
+    TRop::expandColor(tex, true);  // precise is always true for now
+  }
 
   // Pass the raster into VRAM
   GLuint texId;
@@ -155,6 +181,7 @@ GLuint MeshTexturizer::Imp::textureAlloc(const TRaster32P &ras,
                TGL_FMT,           // pixel format
                GL_UNSIGNED_BYTE,  // pixel data type
                (GLvoid *)tex->getRawData());
+  assert(glGetError() == GL_NO_ERROR);
 
   return texId;
 }
@@ -183,6 +210,7 @@ void MeshTexturizer::Imp::allocateTextures(int groupIdx, const TRaster32P &ras,
     TextureData::TileData td = {texId, tileGeom};
     data->m_tileDatas.push_back(td);
 
+    assert(glGetError() == GL_NO_ERROR);
     return;
   }
 
@@ -246,9 +274,10 @@ int MeshTexturizer::bindTexture(const TRaster32P &ras, const TRectD &geom,
   int textureLy =
       tcg::numeric_ops::GE_2Power((unsigned int)ras->getLy() + TOTAL_BORDER_2);
 
-  // We'll assume a strict granularity max of 512 x 512 textures
-  textureLx = std::min(textureLx, 1 << 9);
-  textureLy = std::min(textureLy, 1 << 9);
+  // We'll assume a strict granularity max of 2048 x 2048 textures, if it is
+  // possible.
+  textureLx = std::min(textureLx, getMaxTextureTileSize());
+  textureLy = std::min(textureLy, getMaxTextureTileSize());
 
   // Allocate a suitable texture raster. The texture will include a transparent
   // 1-pix border

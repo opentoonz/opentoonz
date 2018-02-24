@@ -235,6 +235,15 @@ public:
   void setInterfaceFontWeight(int weight);
   int getInterfaceFontWeight() { return m_interfaceFontWeight; }
 
+  // color calibration using 3DLUT
+  void enableColorCalibration(bool on);
+  bool isColorCalibrationEnabled() const { return m_colorCalibrationEnabled; }
+  void setColorCalibrationLutPath(QString monitorName, QString path);
+  QMap<QString, QString> &getColorCalibrationLutPathMap() {
+    return m_colorCalibrationLutPaths;
+  }
+  QString getColorCalibrationLutPath(QString &monitorName) const;
+
   // Visualization  tab
 
   void setShow0ThickLines(bool on);
@@ -655,6 +664,12 @@ private:
 
   bool m_currentTimelineEnabled;
   bool m_disableAutoStretch;
+
+  // color calibration using 3DLUT
+  bool m_colorCalibrationEnabled = false;
+  // map of [monitor name]-[path to the lut file].
+  // for now non-Windows accepts only one lut path for all kinds of monitors
+  QMap<QString, QString> m_colorCalibrationLutPaths;
 
 private:
   Preferences();

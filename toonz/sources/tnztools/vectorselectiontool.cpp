@@ -789,8 +789,8 @@ void DragSelectionTool::VectorMoveSelectionTool::transform(TAffine aff) {
   int i;
   for (i = 0; i < (int)tool->getBBoxsCount(); i++)
     tool->setBBox(tool->getBBox(i) * aff, i);
-  applyTransform(tool->getBBox());
   getTool()->setCenter(aff * tool->getCenter());
+  applyTransform(tool->getBBox());
 }
 
 //-----------------------------------------------------------------------------
@@ -805,8 +805,11 @@ void DragSelectionTool::VectorMoveSelectionTool::leftButtonDown(
 
 void DragSelectionTool::VectorMoveSelectionTool::leftButtonDrag(
     const TPointD &pos, const TMouseEvent &e) {
-  if (norm2(pos - getStartPos()) > l_dragThreshold * getTool()->getPixelSize())
+  if (e.isCtrlPressed() ||
+      norm2(pos - getStartPos()) > l_dragThreshold * getTool()->getPixelSize())
     m_moveSelection->leftButtonDrag(pos, e);
+  else  // snap to the original position
+    m_moveSelection->leftButtonDrag(getStartPos(), e);
 }
 
 //=============================================================================

@@ -80,8 +80,6 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions,
   }
 
   XsheetViewer *viewer = TApp::instance()->getCurrentXsheetViewer();
-  if (viewer && !viewer->orientation()->isVerticalTimeline())
-    c0 -= m_columnSpanCount - 1;
 
   positions.clear();
   TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();

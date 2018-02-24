@@ -417,12 +417,12 @@ void EraserTool::draw() {
   if (vi) {
     bool blackBg = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg;
     if (m_eraseType.getValue() == RECT_ERASE) {
-      TPixel color = blackBg ? TPixel32::White : TPixel32::Black;
+      TPixel color = blackBg ? TPixel32::White : TPixel32::Red;
       if (m_multi.getValue() && m_firstFrameSelected)
         drawRect(m_firstRect, color, 0x3F33, true);
 
       if (m_active || (m_multi.getValue() && !m_firstFrameSelected))
-        drawRect(m_selectingRect, color, 0x3F33, true);
+        drawRect(m_selectingRect, color, 0xFFFF, true);
     }
     if (m_eraseType.getValue() == NORMAL_ERASE) {
       tglColor(TPixel32(255, 0, 255));
@@ -430,10 +430,18 @@ void EraserTool::draw() {
     }
     if ((m_eraseType.getValue() == FREEHAND_ERASE ||
          m_eraseType.getValue() == POLYLINE_ERASE) &&
-        m_multi.getValue()) {
-      TPixel color = blackBg ? TPixel32::White : TPixel32::Black;
+        m_multi.getValue() && m_firstStroke) {
+      TPixel color = blackBg ? TPixel32::White : TPixel32::Red;
       tglColor(color);
-      if (m_firstStroke) drawStrokeCenterline(*m_firstStroke, 1);
+      glPushAttrib(GL_ALL_ATTRIB_BITS);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+      if (m_firstFrameSelected) {
+        glLineStipple(1, 0x3F33);
+        glEnable(GL_LINE_STIPPLE);
+      }
+      drawStrokeCenterline(*m_firstStroke, 1);
+      glPopAttrib();
     }
     if (m_eraseType.getValue() == POLYLINE_ERASE && !m_polyline.empty()) {
       TPixel color = blackBg ? TPixel32::White : TPixel32::Black;
@@ -915,6 +923,7 @@ void EraserTool::onImageChanged() {
 
 void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   if (!m_active) return;
+  m_active = false;
   TImageP image(getImage(true));
   TVectorImageP vi = image;
 
@@ -932,7 +941,6 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       if (m_firstFrameSelected) {
         multiEraseRect(m_firstFrameId, getCurrentFid(), m_firstRect,
                        m_selectingRect, m_invertOption.getValue());
-        invalidate();  // invalidate(m_selectingRect.enlarge(2));
         if (e.isShiftPressed()) {
           m_firstRect    = m_selectingRect;
           m_firstFrameId = getCurrentFid();
@@ -944,6 +952,7 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
             application->getCurrentFrame()->setFid(m_veryFirstFrameId);
           resetMulti();
         }
+        invalidate();  // invalidate(m_selectingRect.enlarge(2));
       } else {
         if (application->getCurrentFrame()->isEditingScene())
           m_currCell = std::pair<int, int>(
@@ -953,7 +962,6 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       return;
     } else {
       erase(vi, m_selectingRect);
-      invalidate();
       notifyImageChanged();
       m_selectingRect.empty();
     }
@@ -969,7 +977,6 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     }
     m_track.clear();
   }
-  m_active = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -999,6 +1006,7 @@ void EraserTool::leftButtonDoubleClick(const TPointD &pos,
       multiEreserRegion(stroke, e);
     else {
       eraseRegion(vi, stroke);
+      m_active = false;
       notifyImageChanged();
     }
     invalidate();
@@ -1107,6 +1115,7 @@ void EraserTool::onLeave() {
 
 void EraserTool::onActivate() {
   resetMulti();
+  m_polyline.clear();
   onEnter();
 }
 
