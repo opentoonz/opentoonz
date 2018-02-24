@@ -10,6 +10,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
+#include "toonz/txsheethandle.h"
 
 using namespace ToolUtils;
 
@@ -944,6 +945,7 @@ void ControlPointEditorStroke::deleteControlPoint(int index) {
       (isSelfLoop() && stroke->getControlPointCount() <= 5)) {
     m_controlPoints.clear();
     m_vi->deleteStroke(m_strokeIndex);
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     return;
   }
 

@@ -155,6 +155,7 @@ void deleteStrokesWithoutUndo(TVectorImageP image, std::set<int> &indexes) {
 
   indexes.clear();
 
+  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
   TTool::getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
   StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
       TTool::getApplication()->getCurrentSelection()->getSelection());
@@ -243,6 +244,7 @@ public:
     clipboard->setMimeData(cloneData(m_oldData), QClipboard::Clipboard);
 
     pasteStrokesWithoutUndo(image, indexes, m_sceneHandle);
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     TTool::getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
 
     clipboard->setMimeData(data, QClipboard::Clipboard);
@@ -284,6 +286,7 @@ public:
         TTool::getApplication()->getCurrentSelection()->getSelection());
     if (selection) selection->selectNone();
 
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     TTool::getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
   }
 
@@ -295,6 +298,7 @@ public:
       delete s;
       // assert(s==m_strokes[i].second);
     }
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     TTool::getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
   }
 
@@ -332,6 +336,7 @@ public:
     std::set<int> indexes = m_indexes;
     TVectorImageP image   = m_level->getFrame(m_frameId, true);
     pasteStrokesWithoutUndo(image, indexes, m_sceneHandle, false);
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     TTool::getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
 
     clipboard->setMimeData(oldData, QClipboard::Clipboard);
