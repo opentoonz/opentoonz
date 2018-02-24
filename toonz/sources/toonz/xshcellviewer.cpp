@@ -1161,10 +1161,12 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
 
     // for each frame
     for (row = r0; row <= r1; row++) {
-      if (hasSubLayers &&
-          currentSubLayer ==
-              screenMapper->subLayers()->cell(CellPosition(row, col)))
-        drawSubLayers(p, CellPosition(row, col));
+      if (hasSubLayers) {
+        bool isCurrentSubLayer =
+            currentSubLayer ==
+            screenMapper->subLayers()->cell(CellPosition(row, col));
+        drawSubLayers(p, CellPosition(row, col), isCurrentSubLayer);
+      }
       // draw horizontal lines
       // hide top-most marker line
       QColor color = ((row - offset) % distance == 0 && row != 0)
@@ -1826,7 +1828,8 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 
 //-----------------------------------------------------------------------------
 
-void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos) {
+void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos,
+                             bool isCurrentSubLayer) {
   const Orientation *o       = m_viewer->orientation();
   const ScreenMapper *mapper = m_viewer->screenMapper();
 
@@ -1852,7 +1855,22 @@ void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos) {
       m_viewer->colsToLayerAxis(layers).adjusted(layerOffset, 0);
 
   cellRect.adjust(1, 1, -frameAdj, layerAxis.length() - layerOffset + 1);
-  p.fillRect(cellRect, QBrush(m_viewer->getSubLayerColor()));
+  if (isCurrentSubLayer)
+    p.fillRect(cellRect, QBrush(m_viewer->getSubLayerColor()));
+
+  TXshColumn *column = col >= 0 ? m_viewer->getXsheet()->getColumn(col) : 0;
+  vector<shared_ptr<SubLayer>> subLayers =
+      mapper->subLayers()->layer(column)->childrenFlatTree();
+
+  for (int i = 0; i < subLayers.size(); i++) {
+    shared_ptr<SubLayer> subLayer = subLayers[i];
+    SubLayerOffsets offsets       = m_viewer->subLayerOffsets(column, i);
+
+    p.setPen(m_viewer->getVerticalLineColor());
+    QLine vertical =
+        o->verticalLine(offsets.topLeft().y(), o->frameSide(cellRect));
+    p.drawLine(vertical);
+  }
 
   if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
       !m_viewer->orientation()->isVerticalTimeline() &&

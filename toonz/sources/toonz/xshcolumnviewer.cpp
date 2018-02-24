@@ -1201,6 +1201,10 @@ void ColumnArea::DrawHeader::drawSubLayers() const {
                       .translated(offsets.topLeft())};
     p.fillRect(rect, QBrush(m_viewer->getSubLayerColor()));
 
+    p.setPen(m_viewer->getVerticalLineColor());
+    QLine vertical = o->verticalLine(offsets.topLeft().y(), o->frameSide(rect));
+    p.drawLine(vertical);
+
     drawSubLayerFoldUnfoldButton(subLayer, offsets);
     drawSubLayerName(subLayer, offsets);
     drawSubLayerActivator(subLayer, offsets);
