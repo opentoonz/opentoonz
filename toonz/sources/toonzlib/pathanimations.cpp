@@ -17,6 +17,30 @@
 #include "toonz/tscenehandle.h"
 #include "tstroke.h"
 
+namespace {
+TFrameId qstringToFrameId(QString str) {
+  if (str.isEmpty() || str == "-1")
+    return TFrameId::EMPTY_FRAME;
+  else if (str == "-" || str == "-2")
+    return TFrameId::NO_FRAME;
+  TFrameId fid;
+  int s = 0;
+  QString number;
+  char letter(0);
+  for (s = 0; s < str.size(); s++) {
+    QChar c = str.at(s);
+    if (c.isNumber()) number.append(c);
+#if QT_VERSION >= 0x050500
+    else
+      letter = c.toLatin1();
+#else
+    else
+      letter = c.toAscii();
+#endif
+  }
+  return TFrameId(number.toInt(), letter);
+}
+}
 //-----------------------------------------------------------------------------
 // StrokeId
 
@@ -282,22 +306,21 @@ void PathAnimations::loadData(TIStream &is) {
   while (is.matchTag(tagName)) {
     if (tagName == "pathanimation") {
       std::string levelName, strokeName;
-      int frameNum, frameLtrStr, strokeID, strokeIdx;
+      int strokeID, strokeIdx;
       char frameLetter;
       ToonzScene *scene   = m_xsheet->getScene();
       TLevelSet *levelSet = scene->getLevelSet();
       TFrameId frameId;
       TXshLevel *level;
       std::shared_ptr<PathAnimation> animation;
+      QString frameStr;
 
       while (is.matchTag(tagName)) {
         if (tagName == "frame") {
-          is >> levelName >> frameNum >> frameLtrStr;
-          frameLetter = frameLtrStr;
-          std::wstring levelNameWide(levelName.length(), L' ');
-          std::copy(levelName.begin(), levelName.end(), levelNameWide.begin());
-          frameId = TFrameId(frameNum, frameLetter);
-          level   = levelSet->getLevel(levelNameWide);
+          TPersist *p = 0;
+          is >> p >> frameStr;
+          level   = dynamic_cast<TXshLevel *>(p);
+          frameId = qstringToFrameId(frameStr);
         } else if (tagName == "stroke") {
           strokeID   = stoi(is.getTagAttribute("id"));
           strokeIdx  = stoi(is.getTagAttribute("idx")) - 1;
@@ -331,31 +354,32 @@ void PathAnimations::loadData(TIStream &is) {
               }
             }
           }
-
-          int chunkId;
-          while (is.matchTag(tagName)) {
-            if (tagName == "chunk") {
-              if (!animation->isActivated()) animation->toggleActivated();
-              chunkId          = stoi(is.getTagAttribute("id")) - 1;
-              TParamSetP chunk = animation->chunkParam(chunkId);
-              while (is.matchTag(tagName)) {
-                if (tagName == "p0") {
-                  chunk->getParam(0)->loadData(is);
-                } else if (tagName == "p1") {
-                  chunk->getParam(1)->loadData(is);
-                } else if (tagName == "p2") {
-                  chunk->getParam(2)->loadData(is);
-                } else
-                  throw TException("Chunk. unexpeced tag: " + tagName);
-                is.matchEndTag();
-              }
-            } else
-              throw TException("Stroke. unexpeced tag: " + tagName);
-            is.matchEndTag();
+          if (!is.isBeginEndTag()) {
+            int chunkId;
+            while (is.matchTag(tagName)) {
+              if (tagName == "chunk") {
+                if (!animation->isActivated()) animation->toggleActivated();
+                chunkId          = stoi(is.getTagAttribute("id")) - 1;
+                TParamSetP chunk = animation->chunkParam(chunkId);
+                while (is.matchTag(tagName)) {
+                  if (tagName == "p0") {
+                    chunk->getParam(0)->loadData(is);
+                  } else if (tagName == "p1") {
+                    chunk->getParam(1)->loadData(is);
+                  } else if (tagName == "p2") {
+                    chunk->getParam(2)->loadData(is);
+                  } else
+                    throw TException("Chunk. unexpeced tag: " + tagName);
+                  is.matchEndTag();
+                }
+              } else
+                throw TException("Stroke. unexpeced tag: " + tagName);
+              is.matchEndTag();
+            }
           }
         } else
           throw TException("Animation. unexpeced tag: " + tagName);
-        is.matchEndTag();
+        if (!is.isBeginEndTag()) is.matchEndTag();
       }
     } else
       throw TException("PathAnimation. unexpeced tag: " + tagName);
@@ -424,16 +448,15 @@ void PathAnimations::saveData(TOStream &os, int occupiedColumnCount) {
           os.openChild("pathanimation");
           animationOpen = true;
 
-          os.child("frame") << level->getName() << frame.getNumber()
-                            << std::to_string(frame.getLetter());
+          os.child("frame") << cell.m_level.getPointer() << frame.expand();
         }
 
         attr.clear();
         attr["id"]   = std::to_string(stroke->getId());
         attr["name"] = stroke->name().toStdString();
         attr["idx"]  = std::to_string(strokeIdx);
-        os.openChild("stroke", attr);
         if (shapeAnimation->isActivated()) {
+          os.openChild("stroke", attr);
           for (int n = 0; n < shapeAnimation->chunkCount(); n++) {
             attr.clear();
             attr["id"] = std::to_string(n + 1);
@@ -450,9 +473,9 @@ void PathAnimations::saveData(TOStream &os, int occupiedColumnCount) {
             }
             os.closeChild();  // chunk
           }
-        }
-
-        os.closeChild();  // stroke
+          os.closeChild();  // stroke
+        } else
+          os.openCloseChild("stroke", attr);
       }
     }
   }
