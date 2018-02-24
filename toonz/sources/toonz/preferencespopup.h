@@ -81,9 +81,10 @@ private:
 
   DVGui::FileField *m_customProjectRootFileField;
 
-  DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField;
+  DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField,
+      *m_lutPathFileField;
 
-  QGroupBox *m_autoSaveGroup, *m_showXSheetToolbar;
+  QGroupBox *m_autoSaveGroup, *m_showXSheetToolbar, *m_colorCalibration;
 
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
@@ -200,6 +201,8 @@ private slots:
   void onXsheetLayoutChanged(const QString &text);
   void onPathAliasPriorityChanged(int index);
   void onShowCurrentTimelineChanged(int);
+  void onColorCalibrationChanged(bool);
+  void onLutPathChanged();
 };
 
 //**********************************************************************************

@@ -100,7 +100,7 @@ public:
   void linkSpeedInOut(int index);
   void unlinkSpeedInOut(int pointIndex);
 
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos) override;
+  bool keyDown(QKeyEvent *event) override;
   void onEnter() override;
   void onLeave() override;
   bool onPropertyChanged(std::string propertyName) override;
@@ -109,6 +109,9 @@ public:
   void onDeactivate() override;
   void onImageChanged() override;
   int getCursorId() const override;
+
+  // returns true if the pressed key is recognized and processed.
+  bool isEventAcceptable(QEvent *e) override;
 
 public slots:
   void frameSwitched();

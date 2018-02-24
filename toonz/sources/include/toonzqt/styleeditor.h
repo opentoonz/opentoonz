@@ -14,7 +14,6 @@
 #include "toonz/tpalettehandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txshlevel.h"
-//#include "toonz/preferences.h" //iwsw commented out temporarily
 
 // TnzQt includes
 #include "toonzqt/checkbox.h"
@@ -23,9 +22,6 @@
 #include "toonzqt/colorfield.h"
 #include "toonzqt/tabbar.h"
 #include "toonzqt/glwidget_for_highdpi.h"
-
-// Toonz includes
-//#include "../toonz/tapp.h" //iwsw commented out temporarily
 
 // Qt includes
 #include <QWidget>
@@ -38,9 +34,6 @@
 #include <QPointF>
 #include <QSettings>
 #include <QSplitter>
-
-// iwsw commented out temporarily
-//#include "ghibli_3dlut_util.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -71,6 +64,7 @@ class QButtonGroup;
 class QPushButton;
 class QTabWidget;
 class QToolBar;
+class QOpenGLFramebufferObject;
 
 class ColorSquaredWheel;
 class TabBarContainter;
@@ -153,8 +147,8 @@ class DVAPI HexagonalColorWheel final : public GLWidgetForHighDpi {
 
   CurrentWheel m_currentWheel;
 
-  // iwsw commented out temporarily  about 3DLUT
-  // Ghibli3DLutUtil * m_ghibli3DLutUtil;
+  // used for color calibration with 3DLUT
+  QOpenGLFramebufferObject *m_fbo = NULL;
 
 private:
   void drawCurrentColorMark();
@@ -744,6 +738,7 @@ protected slots:
 
 private:
   QFrame *createBottomWidget();
+  QFrame *createVectorPage();
   void updateTabBar();
 
   void copyEditedStyleToPalette(bool isDragging);

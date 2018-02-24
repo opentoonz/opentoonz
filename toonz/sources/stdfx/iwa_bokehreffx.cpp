@@ -285,10 +285,10 @@ void Iwa_BokehRefFx::defineSegemntDepth(
         continue;
       }
       // error amount at the current registered layers
-      int tmpError = abs(h - histo[h].belongingSegmentValue);
+      int tmpError = std::abs(h - histo[h].belongingSegmentValue);
       if (tmpError == 0) break;
       // new error amount
-      int newError = abs(h - segmentValues.values().at(seg));
+      int newError = std::abs(h - segmentValues.values().at(seg));
       // compare the two and update
       if (newError < tmpError)
         histo[h].belongingSegmentValue = segmentValues.values().at(seg);
@@ -313,11 +313,11 @@ void Iwa_BokehRefFx::defineSegemntDepth(
         // compare the current segment value and h and take the nearest value
         // if h is near (from i), then accumulate the estimated error reduction
         // amount
-        if (abs(i - histo[i].belongingSegmentValue) >
-            abs(i - h))  // the current segment value has
-                         // proirity, if the distance is the same
+        if (std::abs(i - histo[i].belongingSegmentValue) >
+            std::abs(i - h))  // the current segment value has
+                              // proirity, if the distance is the same
           errorModAmount +=
-              (abs(i - histo[i].belongingSegmentValue) - abs(i - h)) *
+              (std::abs(i - histo[i].belongingSegmentValue) - std::abs(i - h)) *
               histo[i].pix_amount;
       }
 
@@ -340,9 +340,9 @@ void Iwa_BokehRefFx::defineSegemntDepth(
       // compare the current segment value and h and take the nearest value
       // if tmpBestNewSegVal is near (from h), then update the
       // belongingSegmentValue
-      if (abs(h - histo[h].belongingSegmentValue) >
-          abs(h - tmpBestNewSegVal))  // the current segment value has
-                                      // proirity, if the distance is the same
+      if (std::abs(h - histo[h].belongingSegmentValue) >
+          std::abs(h - tmpBestNewSegVal))  // the current segment value has
+        // proirity, if the distance is the same
         histo[h].belongingSegmentValue = tmpBestNewSegVal;
     }
   }
@@ -461,8 +461,8 @@ void Iwa_BokehRefFx::convertIris(const float irisSize, const TRectD& irisBBox,
   double irisSizeResampleRatio = irisSize / irisOrgSize.lx;
 
   // create the raster for resizing
-  TDimensionD resizedIrisSize(abs(irisSizeResampleRatio) * irisOrgSize.lx,
-                              abs(irisSizeResampleRatio) * irisOrgSize.ly);
+  TDimensionD resizedIrisSize(std::abs(irisSizeResampleRatio) * irisOrgSize.lx,
+                              std::abs(irisSizeResampleRatio) * irisOrgSize.ly);
   TDimensionI filterSize((int)std::ceil(resizedIrisSize.lx),
                          (int)std::ceil(resizedIrisSize.ly));
   TPointD resizeOffset((double)filterSize.lx - resizedIrisSize.lx,

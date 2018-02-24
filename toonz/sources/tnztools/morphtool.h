@@ -29,7 +29,7 @@ public:
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
 
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos);
+  bool keyDown(QKeyEvent *event);
 
   void draw();
 };

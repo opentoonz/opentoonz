@@ -62,7 +62,7 @@ public:
   void draw() override {
     if (!m_dragging) return;
 
-    TPointD center   = m_viewer->winToWorld(TPoint(m_center.x, m_center.y));
+    TPointD center   = m_viewer->winToWorld(m_center);
     double pixelSize = getPixelSize();
     double unit      = pixelSize;
     glPushMatrix();
@@ -91,7 +91,7 @@ public:
 
 class HandTool final : public TTool {
   TStopWatch m_sw;
-  TPoint m_oldPos;
+  TPointD m_oldPos;
 
 public:
   HandTool() : TTool("T_Hand") { bind(TTool::AllTargets); }
@@ -111,8 +111,8 @@ public:
     if (m_sw.getTotalTime() < 10) return;
     m_sw.stop();
     m_sw.start(true);
-    TPoint delta = e.m_pos - m_oldPos;
-    delta.y      = -delta.y;
+    TPointD delta = e.m_pos - m_oldPos;
+    delta.y       = -delta.y;
     m_viewer->pan(delta);
     m_oldPos = e.m_pos;
   }
@@ -136,7 +136,7 @@ class RotateTool final : public TTool {
   TPointD m_center;
   bool m_dragging;
   double m_angle;
-  TPoint m_oldMousePos;
+  TPointD m_oldMousePos;
   TBoolProperty m_cameraCentered;
   TPropertyGroup m_prop;
 
@@ -179,7 +179,7 @@ public:
     m_sw.start(true);
     TPointD p = pos;
     if (m_viewer->is3DView()) {
-      TPoint d      = e.m_pos - m_oldMousePos;
+      TPointD d     = e.m_pos - m_oldMousePos;
       m_oldMousePos = e.m_pos;
       double factor = 0.5;
       m_viewer->rotate3D(factor * d.x, -factor * d.y);

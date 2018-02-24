@@ -1140,7 +1140,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
     if (!m_viewer->orientation()->isVerticalTimeline()) {
       //      int adjY       = m_viewer->orientation()->cellHeight() - 1;
       //		layerAxisRange = NumberRange(layerAxis + 1, layerAxis +
-      //adjY);
+      // adjY);
       layerAxisRange =
           NumberRange(layerAxis + 1, m_viewer->columnToLayerAxis(col - 1) - 1);
     }

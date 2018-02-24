@@ -2320,57 +2320,6 @@ Apply</source>
         <source>V</source>
         <translation></translation>
     </message>
-    <message>
-        <source>- Style not Selected -</source>
-        <translation>- スタイルが選択されていません -</translation>
-    </message>
-    <message>
-        <source>[CLEANUP]  </source>
-        <translation>[トレース]  </translation>
-    </message>
-    <message>
-        <source>[STUDIO]  </source>
-        <translation>[スタジオ]  </translation>
-    </message>
-    <message>
-        <source>[LEVEL]  </source>
-        <translation>[レベル]  </translation>
-    </message>
-    <message>
-        <source>- Style is Not Valid -</source>
-        <translation>- スタイルが無効です -</translation>
-    </message>
-</context>
-<context>
-    <name>StyleEditorGUI::ColorChannelControl</name>
-    <message>
-        <source>R</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>G</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>B</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>A</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>H</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>V</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>StyleEditorGUI::PlainColorPage</name>

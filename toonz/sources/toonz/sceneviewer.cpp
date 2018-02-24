@@ -23,6 +23,7 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/lutcalibrator.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -81,6 +82,7 @@
 #include <QInputContext>
 #endif
 #include <QGLContext>
+#include <QOpenGLFramebufferObject>
 
 #include "sceneviewer.h"
 
@@ -500,10 +502,6 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   m_3DSideL = rasterFromQPixmap(svgToPixmap(":Resources/3Dside_l.svg"));
   m_3DTop   = rasterFromQPixmap(svgToPixmap(":Resources/3Dtop.svg"));
 
-  // iwsw commented out temporarily
-  // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // Ghibli3DLutUtil::m_isValid)
-  //  m_ghibli3DLutUtil = new Ghibli3DLutUtil();
   setAttribute(Qt::WA_AcceptTouchEvents);
   grabGesture(Qt::SwipeGesture);
   grabGesture(Qt::PanGesture);
@@ -525,14 +523,7 @@ void SceneViewer::setVisual(const ImagePainter::VisualSettings &settings) {
 //-----------------------------------------------------------------------------
 
 SceneViewer::~SceneViewer() {
-  // iwsw commented out temporarily
-  /*
-if (m_ghibli3DLutUtil)
-{
-    m_ghibli3DLutUtil->onEnd();
-    delete m_ghibli3DLutUtil;
-}
-*/
+  if (m_fbo) delete m_fbo;
 }
 
 //-------------------------------------------------------------------------------
@@ -645,10 +636,11 @@ void SceneViewer::enablePreview(int previewMode) {
 
 //-----------------------------------------------------------------------------
 
-TPointD SceneViewer::winToWorld(const QPoint &pos) const {
+TPointD SceneViewer::winToWorld(const QPointF &pos) const {
   // coordinate window (origine in alto a sinistra) -> coordinate colonna
   // (origine al centro dell'immagine)
-  TPointD pp(pos.x() - width() / 2, -pos.y() + height() / 2);
+  TPointD pp(pos.x() - (double)width() / 2.0,
+             -pos.y() + (double)height() / 2.0);
   if (is3DView()) {
     TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
@@ -684,15 +676,15 @@ TPointD SceneViewer::winToWorld(const QPoint &pos) const {
 
 //-----------------------------------------------------------------------------
 
-TPointD SceneViewer::winToWorld(const TPoint &winPos) const {
-  return winToWorld(QPoint(winPos.x, height() - winPos.y));
+TPointD SceneViewer::winToWorld(const TPointD &winPos) const {
+  return winToWorld(QPointF(winPos.x, height() - winPos.y));
 }
 
 //-----------------------------------------------------------------------------
 
-TPoint SceneViewer::worldToPos(const TPointD &worldPos) const {
+TPointD SceneViewer::worldToPos(const TPointD &worldPos) const {
   TPointD p = getViewMatrix() * worldPos;
-  return TPoint(width() / 2 + p.x, height() / 2 + p.y);
+  return TPointD(width() / 2 + p.x, height() / 2 + p.y);
 }
 
 //-----------------------------------------------------------------------------
@@ -824,13 +816,12 @@ double SceneViewer::getHGuide(int index) { return m_hRuler->getGuide(index); }
 
 void SceneViewer::initializeGL() {
   initializeOpenGLFunctions();
+
+  // to be computed once through the software
+  LutCalibrator::instance()->initialize();
+
   // glClearColor(1.0,1.0,1.0,1);
   glClear(GL_COLOR_BUFFER_BIT);
-
-  // iwsw commented out temporarily
-  // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // m_ghibli3DLutUtil)
-  //	  m_ghibli3DLutUtil->onInit();
 }
 
 //-----------------------------------------------------------------------------
@@ -855,12 +846,14 @@ void SceneViewer::resizeGL(int w, int h) {
 
   if (m_previewMode != NO_PREVIEW) requestTimedRefresh();
 
+  // remake fbo with new size
+  if (LutCalibrator::instance()->isValid()) {
+    if (m_fbo) delete m_fbo;
+    m_fbo = new QOpenGLFramebufferObject(w, h);
+  }
+
   // for updating the navigator in levelstrip
   emit refreshNavi();
-  // iwsw commented out temporarily
-  // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // m_ghibli3DLutUtil)
-  //	m_ghibli3DLutUtil->onResize(w, h);
 }
 
 //-----------------------------------------------------------------------------
@@ -1380,11 +1373,7 @@ void SceneViewer::paintGL() {
   time.start();
 #endif
 
-  // iwsw commented out temporarily
-  // if (!m_isPicking &&
-  //	Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // m_ghibli3DLutUtil)
-  //	m_ghibli3DLutUtil->startDraw();
+  if (!m_isPicking && LutCalibrator::instance()->isValid()) m_fbo->bind();
 
   if (m_hRuler && m_vRuler) {
     if (!viewRulerToggle.getStatus() &&
@@ -1414,11 +1403,8 @@ void SceneViewer::paintGL() {
     glPopMatrix();
     m_viewGrabImage->unlock();
 
-    // iwsw commented out temporarily
-    // if (!m_isPicking &&
-    //	Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-    // m_ghibli3DLutUtil)
-    //	m_ghibli3DLutUtil->endDraw();
+    if (!m_isPicking && LutCalibrator::instance()->isValid())
+      LutCalibrator::instance()->onEndDraw(m_fbo);
 
     return;
   }
@@ -1426,11 +1412,8 @@ void SceneViewer::paintGL() {
   drawBuildVars();
 
   check_framebuffer_status();
-  // iwsw commented out temporarily
-  // if (!m_isPicking &&
-  //	  !Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() ||
-  //! m_ghibli3DLutUtil)
   copyFrontBufferToBackBuffer();
+
   check_framebuffer_status();
   drawEnableScissor();
   check_framebuffer_status();
@@ -1464,11 +1447,8 @@ void SceneViewer::paintGL() {
 #endif
   // TOfflineGL::setContextManager(0);
 
-  // iwsw commented out temporarily
-  // if (!m_isPicking &&
-  //	Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // m_ghibli3DLutUtil)
-  //	m_ghibli3DLutUtil->endDraw();
+  if (!m_isPicking && LutCalibrator::instance()->isValid())
+    LutCalibrator::instance()->onEndDraw(m_fbo);
 }
 
 //-----------------------------------------------------------------------------
@@ -1605,7 +1585,7 @@ void SceneViewer::mult3DMatrix() {
 
 //-----------------------------------------------------------------------------
 
-double SceneViewer::projectToZ(const TPoint &delta) {
+double SceneViewer::projectToZ(const TPointD &delta) {
   glPushMatrix();
   mult3DMatrix();
   GLint viewport[4];
@@ -1623,7 +1603,7 @@ double SceneViewer::projectToZ(const TPoint &delta) {
   TPointD zdir(bx - ax, by - ay);
   double zdirLength2 = norm2(zdir);
   if (zdirLength2 > 0.0) {
-    double dz = (TPointD(delta.x, delta.y) * zdir) / zdirLength2;
+    double dz = (delta * zdir) / zdirLength2;
     return dz;
   } else
     return 0.0;
@@ -1632,25 +1612,25 @@ double SceneViewer::projectToZ(const TPoint &delta) {
 //-----------------------------------------------------------------------------
 
 TRect SceneViewer::getActualClipRect(const TAffine &aff) {
-  TDimension viewerSize(width(), height());
-  TRect clipRect(viewerSize);
+  TDimensionD viewerSize(width(), height());
+  TRectD clipRect(viewerSize);
 
   if (is3DView()) {
     TPointD p00 = winToWorld(clipRect.getP00());
     TPointD p01 = winToWorld(clipRect.getP01());
     TPointD p10 = winToWorld(clipRect.getP10());
     TPointD p11 = winToWorld(clipRect.getP11());
-    clipRect    = TRect(TPoint(std::min(p00.x, p01.x), std::min(p00.y, p10.y)),
-                     TPoint(std::max(p11.x, p10.x), std::max(p11.y, p01.y)));
+    clipRect = TRectD(TPointD(std::min(p00.x, p01.x), std::min(p00.y, p10.y)),
+                      TPointD(std::max(p11.x, p10.x), std::max(p11.y, p01.y)));
   } else if (m_clipRect.isEmpty())
-    clipRect -= TPoint(viewerSize.lx / 2, viewerSize.ly / 2);
+    clipRect -= TPointD(viewerSize.lx / 2, viewerSize.ly / 2);
   else {
     TRectD app = aff * (m_clipRect.enlarge(3));
     clipRect =
-        TRect(tceil(app.x0), tceil(app.y0), tfloor(app.x1), tfloor(app.y1));
+        TRectD(tceil(app.x0), tceil(app.y0), tfloor(app.x1), tfloor(app.y1));
   }
 
-  return clipRect;
+  return convert(clipRect);
 }
 
 //-----------------------------------------------------------------------------
@@ -1734,8 +1714,8 @@ void SceneViewer::GLInvalidateRect(const TRectD &rect) {
 //-----------------------------------------------------------------------------
 
 // delta.x: right panning, pixel; delta.y: down panning, pixel
-void SceneViewer::panQt(const QPoint &delta) {
-  if (delta == QPoint()) return;
+void SceneViewer::panQt(const QPointF &delta) {
+  if (delta == QPointF()) return;
   if (is3DView())
     m_pan3D += TPointD(delta.x(), -delta.y());
   else {
@@ -2208,7 +2188,7 @@ void SceneViewer::onToolChanged() {
 
 //-----------------------------------------------------------------------------
 
-int SceneViewer::pick(const TPoint &point) {
+int SceneViewer::pick(const TPointD &point) {
   // pick is typically called in a mouse event handler.
   // QGLWidget::makeCurrent() is not automatically called in these events.
   // (to exploit the bug: open the FxEditor preview and then select the edit
@@ -2296,7 +2276,7 @@ int SceneViewer::pick(const TPoint &point) {
 
 //-----------------------------------------------------------------------------
 
-int SceneViewer::posToColumnIndex(const TPoint &p, double distance,
+int SceneViewer::posToColumnIndex(const TPointD &p, double distance,
                                   bool includeInvisible) const {
   std::vector<int> ret;
   posToColumnIndexes(p, ret, distance, includeInvisible);
@@ -2305,8 +2285,8 @@ int SceneViewer::posToColumnIndex(const TPoint &p, double distance,
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::posToColumnIndexes(const TPoint &p, std::vector<int> &indexes,
-                                     double distance,
+void SceneViewer::posToColumnIndexes(const TPointD &p,
+                                     std::vector<int> &indexes, double distance,
                                      bool includeInvisible) const {
   int oldRasterizePli    = TXshSimpleLevel::m_rasterizePli;
   TApp *app              = TApp::instance();
@@ -2349,7 +2329,7 @@ includeInvisible);
 
 //-----------------------------------------------------------------------------
 
-int SceneViewer::posToRow(const TPoint &p, double distance,
+int SceneViewer::posToRow(const TPointD &p, double distance,
                           bool includeInvisible) const {
   int oldRasterizePli    = TXshSimpleLevel::m_rasterizePli;
   TApp *app              = TApp::instance();
@@ -2554,4 +2534,16 @@ TRectD SceneViewer::getGeometry() const {
 */
 void SceneViewer::doDeleteSubCamera() {
   PreviewSubCameraManager::instance()->deleteSubCamera(this);
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::bindFBO() {
+  if (m_fbo) m_fbo->bind();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::releaseFBO() {
+  if (m_fbo) m_fbo->release();
 }

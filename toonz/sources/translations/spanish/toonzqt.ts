@@ -239,14 +239,6 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>E/W</source>
         <translation>X</translation>
     </message>
-    <message>
-        <source>N/S</source>
-        <translation>Y</translation>
-    </message>
-    <message>
-        <source>E/W</source>
-        <translation>X</translation>
-    </message>
 </context>
 <context>
     <name>ColumnPainter</name>
@@ -2293,57 +2285,6 @@ Autom</translation>
     <message>
         <source>Raster</source>
         <translation>Imagen</translation>
-    </message>
-</context>
-<context>
-    <name>StyleEditorGUI::ColorChannelControl</name>
-    <message>
-        <source>R</source>
-        <translation>R</translation>
-    </message>
-    <message>
-        <source>G</source>
-        <translation>V</translation>
-    </message>
-    <message>
-        <source>B</source>
-        <translation>A</translation>
-    </message>
-    <message>
-        <source>A</source>
-        <translation>α</translation>
-    </message>
-    <message>
-        <source>H</source>
-        <translation>T</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
-    </message>
-    <message>
-        <source>V</source>
-        <translation>V</translation>
-    </message>
-    <message>
-        <source>- Style not Selected -</source>
-        <translation>- Estilo no seleccionado -</translation>
-    </message>
-    <message>
-        <source>[CLEANUP]  </source>
-        <translation>[LIMPIEZA]  </translation>
-    </message>
-    <message>
-        <source>[STUDIO]  </source>
-        <translation>[ESTUDIO]  </translation>
-    </message>
-    <message>
-        <source>[LEVEL]  </source>
-        <translation>[NIVEL]  </translation>
-    </message>
-    <message>
-        <source>- Style is Not Valid -</source>
-        <translation>- Estilo no válido -</translation>
     </message>
 </context>
 <context>

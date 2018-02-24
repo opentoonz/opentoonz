@@ -17,6 +17,7 @@
 #include "toonzqt/doublefield.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/filefield.h"
+#include "toonzqt/lutcalibrator.h"
 
 // TnzLib includes
 #include "toonz/txsheethandle.h"
@@ -1145,6 +1146,20 @@ void PreferencesPopup::onShowCurrentTimelineChanged(int index) {
   m_pref->enableCurrentTimelineIndicator(index == Qt::Checked);
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onColorCalibrationChanged(bool on) {
+  m_pref->enableColorCalibration(on);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onLutPathChanged() {
+  m_pref->setColorCalibrationLutPath(
+      LutCalibrator::instance()->getMonitorName(),
+      m_lutPathFileField->getPath());
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1258,6 +1273,11 @@ PreferencesPopup::PreferencesPopup()
 
   m_interfaceFont       = new QComboBox(this);
   m_interfaceFontWeight = new QComboBox(this);
+
+  m_colorCalibration =
+      new QGroupBox(tr("Color Calibration using 3D Look-up Table *"));
+  m_lutPathFileField = new DVGui::FileField(
+      this, QString("- Please specify 3DLUT file (.3dl) -"), false, true);
 
   //--- Visualization ------------------------------
   categoryList->addItem(tr("Visualization"));
@@ -1582,6 +1602,16 @@ PreferencesPopup::PreferencesPopup()
              << "Bold";
   m_interfaceFontWeight->addItems(fontStyles);
   m_interfaceFontWeight->setCurrentIndex(m_pref->getInterfaceFontWeight());
+
+  m_colorCalibration->setCheckable(true);
+  m_colorCalibration->setChecked(m_pref->isColorCalibrationEnabled());
+  QString lutPath = m_pref->getColorCalibrationLutPath(
+      LutCalibrator::instance()->getMonitorName());
+  if (!lutPath.isEmpty()) m_lutPathFileField->setPath(lutPath);
+  m_lutPathFileField->setFileMode(QFileDialog::ExistingFile);
+  QStringList lutFileTypes;
+  lutFileTypes << "3dl";
+  m_lutPathFileField->setFilters(lutFileTypes);
 
   //--- Visualization ------------------------------
   show0ThickLinesCB->setChecked(m_pref->getShow0ThickLines());
@@ -1984,6 +2014,20 @@ PreferencesPopup::PreferencesPopup()
       interfaceBottomLay->setColumnStretch(4, 0);
       interfaceBottomLay->setColumnStretch(5, 1);
       userInterfaceFrameLay->addLayout(interfaceBottomLay, 0);
+
+      QHBoxLayout *lutLayout = new QHBoxLayout();
+      lutLayout->setMargin(10);
+      lutLayout->setSpacing(5);
+      {
+        lutLayout->addWidget(
+            new QLabel(tr("3DLUT File for [%1] *:")
+                           .arg(LutCalibrator::instance()->getMonitorName()),
+                       this),
+            0);
+        lutLayout->addWidget(m_lutPathFileField, 1);
+      }
+      m_colorCalibration->setLayout(lutLayout);
+      userInterfaceFrameLay->addWidget(m_colorCalibration);
 
       userInterfaceFrameLay->addStretch(1);
 
@@ -2561,6 +2605,11 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onActualPixelOnSceneModeChanged(int)));
   ret = ret && connect(levelNameOnEachMarkerCB, SIGNAL(stateChanged(int)),
                        SLOT(onLevelNameOnEachMarkerChanged(int)));
+
+  ret = ret && connect(m_colorCalibration, SIGNAL(clicked(bool)), this,
+                       SLOT(onColorCalibrationChanged(bool)));
+  ret = ret && connect(m_lutPathFileField, SIGNAL(pathChanged()), this,
+                       SLOT(onLutPathChanged()));
 
   //--- Visualization ---------------------
   ret = ret && connect(show0ThickLinesCB, SIGNAL(stateChanged(int)), this,

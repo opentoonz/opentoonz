@@ -6,6 +6,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/filefield.h"
 #include "historytypes.h"
+#include "toonzqt/lutcalibrator.h"
 
 // TnzLib includes
 #include "toonz/txshlevel.h"
@@ -53,6 +54,7 @@
 #include <QStyleOptionSlider>
 #include <QToolTip>
 #include <QSplitter>
+#include <QOpenGLFramebufferObject>
 
 using namespace StyleEditorGUI;
 
@@ -557,44 +559,24 @@ HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setFocusPolicy(Qt::NoFocus);
   m_currentWheel = none;
-
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  Ghibli3DLutUtil::m_isValid)
-  {
-  m_ghibli3DLutUtil = new Ghibli3DLutUtil();
-  m_ghibli3DLutUtil->setInvert();
-  }
-  */
 }
 
 //-----------------------------------------------------------------------------
 
 HexagonalColorWheel::~HexagonalColorWheel() {
-  // iwsw commented out temporarily
-  /*
-  if(m_ghibli3DLutUtil)
-  {
-  m_ghibli3DLutUtil->onEnd();
-  delete m_ghibli3DLutUtil;
-  }
-  */
+  if (m_fbo) delete m_fbo;
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::initializeGL() {
   initializeOpenGLFunctions();
+
+  // to be computed once through the software
+  LutCalibrator::instance()->initialize();
+
   QColor const color = getBGColor();
   glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
-
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  m_ghibli3DLutUtil)
-  m_ghibli3DLutUtil->onInit();
-  */
 }
 
 //-----------------------------------------------------------------------------
@@ -646,12 +628,11 @@ void HexagonalColorWheel::resizeGL(int w, int h) {
   glLoadIdentity();
   glOrtho(0.0, (GLdouble)w, (GLdouble)h, 0.0, 1.0, -1.0);
 
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  m_ghibli3DLutUtil)
-  m_ghibli3DLutUtil->onResize(w,h);
-  */
+  // remake fbo with new size
+  if (LutCalibrator::instance()->isValid()) {
+    if (m_fbo) delete m_fbo;
+    m_fbo = new QOpenGLFramebufferObject(w, h);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -664,12 +645,7 @@ void HexagonalColorWheel::paintGL() {
 
   glMatrixMode(GL_MODELVIEW);
 
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  m_ghibli3DLutUtil)
-  m_ghibli3DLutUtil->startDraw();
-  */
+  if (LutCalibrator::instance()->isValid()) m_fbo->bind();
 
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -716,12 +692,8 @@ void HexagonalColorWheel::paintGL() {
 
   glPopMatrix();
 
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  m_ghibli3DLutUtil)
-  m_ghibli3DLutUtil->endDraw();
-  */
+  if (LutCalibrator::instance()->isValid())
+    LutCalibrator::instance()->onEndDraw(m_fbo);
 }
 
 //-----------------------------------------------------------------------------

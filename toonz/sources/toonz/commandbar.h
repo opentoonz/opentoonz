@@ -21,6 +21,7 @@ class QAction;
 
 class CommandBar : public QToolBar {
   Q_OBJECT
+protected:
   bool m_isCollapsible;
 
 public:

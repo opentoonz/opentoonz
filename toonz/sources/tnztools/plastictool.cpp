@@ -3,7 +3,6 @@
 #include "plastictool.h"
 
 // TnzTools includes
-#include "tw/keycodes.h"  // Obsolete by now... still currently used though
 #include "tooloptionscontrols.h"
 #include "tools/toolcommandids.h"
 

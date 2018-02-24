@@ -37,7 +37,7 @@ class RGBPickerTool final : public TTool {
   std::vector<TPointD> m_workingPolyline;
   bool m_makePick;
 
-  TPoint m_mousePixelPosition;
+  TPointD m_mousePixelPosition;
 
 public:
   RGBPickerTool();

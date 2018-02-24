@@ -35,7 +35,6 @@
 #include "tools/tool.h"
 #include "tools/cursors.h"
 #include "tools/toolutils.h"
-#include "tw/keycodes.h"
 
 // Qt includes
 #include <QCoreApplication>  // Qt translation support
@@ -46,6 +45,7 @@
 #include <QImage>
 #include <QFont>
 #include <QFontMetrics>
+#include <QKeyEvent>
 
 #include "skeletonsubtools.h"
 #include "skeletontool.h"
@@ -481,14 +481,19 @@ void SkeletonTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
 //-------------------------------------------------------------------
 
-bool SkeletonTool::keyDown(int key, TUINT32 flags, const TPoint &pos) {
+bool SkeletonTool::keyDown(QKeyEvent *event) {
   ChangeDrawingTool tool(this, 0);
-  if (key == TwConsts::TK_UpArrow)
+  switch (event->key()) {
+  case Qt::Key_Up:
     tool.changeDrawing(1);
-  else if (key == TwConsts::TK_DownArrow)
+    break;
+  case Qt::Key_Down:
     tool.changeDrawing(-1);
-  else
+    break;
+  default:
     return false;
+    break;
+  }
   invalidate();
   return true;
 }
@@ -1037,7 +1042,7 @@ void SkeletonTool::drawHooks() {
     currentColumnHooks.push_back(HookData(xsh, col, hookId, m_parentProbe));
 
     // otherColumn = "picked" column not connected
-    TPoint parentProbePos = getViewer()->worldToPos(m_parentProbe);
+    TPointD parentProbePos = getViewer()->worldToPos(m_parentProbe);
     std::vector<int> indexes;
     getViewer()->posToColumnIndexes(parentProbePos, indexes,
                                     getPixelSize() * 10, false);

@@ -29,9 +29,7 @@ XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WindowFlags flags,
 #else
 XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-    : CommandBar(parent, flags, isCollapsible, true)
-    , m_viewer(parent)
-    , m_isCollapsible(isCollapsible) {
+    : CommandBar(parent, flags, isCollapsible, true), m_viewer(parent) {
   setObjectName("cornerWidget");
   setFixedHeight(30);
   setObjectName("XSheetToolbar");

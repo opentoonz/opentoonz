@@ -21,8 +21,6 @@
 #include "toonz/txsheet.h"
 #include "toonz/pathanimations.h"
 
-#include "tw/keycodes.h"
-
 // For Qt translation support
 #include <QCoreApplication>
 #include <QKeyEvent>
@@ -717,8 +715,7 @@ void ControlPointEditorTool::unlinkSpeedInOut(int pointIndex) {
 
 //---------------------------------------------------------------------------
 
-bool ControlPointEditorTool::keyDown(int key, TUINT32 flags,
-                                     const TPoint &pos) {
+bool ControlPointEditorTool::keyDown(QKeyEvent *event) {
   TVectorImageP vi(getImage(true));
   if (!vi || (vi && m_selection.isEmpty())) return false;
 
@@ -726,16 +723,23 @@ bool ControlPointEditorTool::keyDown(int key, TUINT32 flags,
   initUndo();
 
   TPointD delta;
-  if (key == TwConsts::TK_UpArrow)
+  switch (event->key()) {
+  case Qt::Key_Up:
     delta.y = 1;
-  else if (key == TwConsts::TK_DownArrow)
+    break;
+  case Qt::Key_Down:
     delta.y = -1;
-  else if (key == TwConsts::TK_LeftArrow)
+    break;
+  case Qt::Key_Left:
     delta.x = -1;
-  else if (key == TwConsts::TK_RightArrow)
+    break;
+  case Qt::Key_Right:
     delta.x = 1;
-  else
+    break;
+  default:
     return false;
+    break;
+  }
   moveControlPoints(delta);
 
   invalidate();
@@ -827,6 +831,23 @@ int ControlPointEditorTool::getCursorId() const {
   default:
     return ToolCursor::SplineEditorCursor;
   }
+}
+
+//-----------------------------------------------------------------------------
+
+// returns true if the pressed key is recognized and processed in the tool
+// instead of triggering the shortcut command.
+bool ControlPointEditorTool::isEventAcceptable(QEvent *e) {
+  if (!isEnabled()) return false;
+  TVectorImageP vi(getImage(false));
+  if (!vi || (vi && m_selection.isEmpty())) return false;
+  // arrow keys will be used for moving the selected points
+  QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+  // shift + arrow will not be recognized for now
+  if (keyEvent->modifiers() & Qt::ShiftModifier) return false;
+  int key = keyEvent->key();
+  return (key == Qt::Key_Up || key == Qt::Key_Down || key == Qt::Key_Left ||
+          key == Qt::Key_Right);
 }
 
 //---------------------------------------------------------------------------

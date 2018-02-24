@@ -25,8 +25,6 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/pluginloader.h"
-// iwsw commented out temporarily
-//#include "toonzqt/ghibli_3dlut_util.h"
 
 // TnzStdfx includes
 #include "stdfx/shaderfx.h"
@@ -531,32 +529,6 @@ int main(int argc, char *argv[]) {
 
   TTool::setApplication(TApp::instance());
   TApp::instance()->init();
-
-// iwsw commented out temporarily
-#if 0
-  QStringList monitorNames;
-  /*-- 接続モニタがPVM-2541の場合のみLUTを読み込む --*/
-  if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
-  {
-	  /*-- 接続モニタがPVM-2541の場合のみLUTを読み込む --*/
-	  monitorNames = Ghibli3DLutUtil::getMonitorName();
-	  if (monitorNames.contains(QString::fromStdWString(L"PVM-2541")))
-		  /*-- 3DLUTファイルを読み込む --*/
-		  Ghibli3DLutUtil::loadLutFile(Preferences::instance()->get3DLutPath());
-  }
-  /*-- 接続モニタをスプラッシュ画面にも表示 --*/
-  if (!monitorNames.isEmpty())
-  {
-	  lastUpdateStr += QString("Monitor Name : ");
-	  for (int mn = 0; mn < monitorNames.size(); mn++)
-	  {
-		  if (mn != 0)
-			  lastUpdateStr += QString(", ");
-		  lastUpdateStr += monitorNames.at(mn);
-	  }
-	  lastUpdateStr += QString("\n");
-  }
-#endif
 
   splash.showMessage(offsetStr + "Loading Plugins...", Qt::AlignCenter,
                      Qt::white);
