@@ -1076,6 +1076,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
                 SUBLAYER_HEIGHT));
   addRect(PredefinedRect::SUBLAYER_ACTIVATOR,
           QRect(ICONS_WIDTH, 0, ICON_WIDTH, CELL_HEIGHT));
+  QRect sublayerKeyRect((CELL_WIDTH - KEY_ICON_WIDTH) / 2,
+                        (CELL_HEIGHT - KEY_ICON_HEIGHT) / 2, KEY_ICON_WIDTH,
+                        KEY_ICON_HEIGHT);
+  addRect(PredefinedRect::SUBLAYER_KEY_ICON, sublayerKeyRect);
 
   //
   // Lines

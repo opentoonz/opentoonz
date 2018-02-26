@@ -17,6 +17,8 @@
 #include "toonz/txshcolumn.h"
 #include "cellposition.h"
 
+#include "tstroke.h"
+
 using std::map;
 using std::shared_ptr;
 using std::vector;
@@ -94,6 +96,7 @@ public:
   virtual bool hasActivator() const { return false; }
   virtual bool isActivated() const { return false; }
   virtual void toggleActivator() {}
+  virtual TStroke *getStroke() const { return 0; }
 
   virtual QString name() const { return ""; }
 

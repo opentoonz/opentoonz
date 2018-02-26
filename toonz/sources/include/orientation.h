@@ -111,9 +111,10 @@ enum class PredefinedRect {
   CONFIG_AREA,  //! clickable area larger than the config icon, containing it
   CONFIG,       //! the config icon itself
   FRAME_DOT,    //! Cell's frame indicator
-  FRAME_INDICATOR,    //! Row # indicator
-  SUBLAYER_NAME,      //! area to draw sublayer name
-  SUBLAYER_ACTIVATOR  //! activator key icon placement
+  FRAME_INDICATOR,     //! Row # indicator
+  SUBLAYER_NAME,       //! area to draw sublayer name
+  SUBLAYER_ACTIVATOR,  //! activator key icon placement
+  SUBLAYER_KEY_ICON    //! cell key icon for sublayers
 };
 enum class PredefinedLine {
   LOCKED,              //! dotted vertical line when cell is locked

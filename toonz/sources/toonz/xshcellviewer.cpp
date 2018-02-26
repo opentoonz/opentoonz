@@ -57,6 +57,7 @@
 #include "toonz/txshpalettelevel.h"
 #include "toonz/doubleparamcmd.h"
 #include "toonz/preferences.h"
+#include "toonz/pathanimations.h"
 
 // TnzBase includes
 #include "tdoublekeyframe.h"
@@ -1832,6 +1833,7 @@ void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos,
                              bool isCurrentSubLayer) {
   const Orientation *o       = m_viewer->orientation();
   const ScreenMapper *mapper = m_viewer->screenMapper();
+  static QPixmap key         = svgToPixmap(":Resources/sublayer_key.svg");
 
   int row         = pos.frame();
   int col         = pos.layer();
@@ -1878,6 +1880,30 @@ void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos,
       Preferences::instance()->isCurrentTimelineIndicatorEnabled())
     drawCurrentTimeIndicator(p, xy, false,
                              (layerAxis.length() - layerOffset + 1));
+
+  // Display sublayer keyframes
+  TXsheet *xsheet = m_viewer->getXsheet();
+  for (int i = 0; i < subLayers.size(); i++) {
+    shared_ptr<SubLayer> subLayer = subLayers[i];
+    SubLayerOffsets offsets       = m_viewer->subLayerOffsets(column, i);
+
+    shared_ptr<PathAnimation> animation = xsheet->pathAnimations()->appStroke(
+        TTool::getApplication(), subLayer->getStroke());
+
+    if (!animation || !animation->isActivated()) continue;
+
+    animation->updateChunks();
+    set<double> keyframes = animation->getKeyframes();
+    if (keyframes.find(double(row)) == keyframes.end()) continue;
+
+    QRect &keyRect = o->rect(PredefinedRect::SUBLAYER_KEY_ICON)
+                         .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0);
+
+    keyRect.translate(QPoint(cellRect.left(), 0));
+    keyRect.translate(offsets.topLeft());
+
+    p.drawPixmap(keyRect, key);
+  }
 }
 
 //-----------------------------------------------------------------------------
