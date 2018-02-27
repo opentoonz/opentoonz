@@ -35,11 +35,43 @@ namespace {
  * toSeg位置は含まず、それらの間に挟まれている文字列が「数字4ケタ」ならtrueを返す
  * --*/
 bool isNumbers(std::wstring str, int fromSeg, int toSeg) {
+/*
   if (toSeg - fromSeg != 5) return false;
   for (int pos = fromSeg + 1; pos < toSeg; pos++) {
     if (str[pos] < '0' || str[pos] > '9') return false;
   }
-  return true;
+*/
+	// Let's check if it follows the format ####A (i.e 00001 or 00001a)
+	int numDigits = 0, numLetters = 0;
+	for (int pos = fromSeg + 1; pos < toSeg; pos++) {
+
+		if ((str[pos] >= 'A' && str[pos] <= 'Z')
+			|| (str[pos] >= 'a' && str[pos] <= 'z')) {
+
+			// Not the right format if we ran into a letter without first finding a number
+			if (!numDigits) return false;
+			
+			// We'll keep track of the number of letters we find.
+			// NOTE: From here on out we should only see letters
+			numLetters++;
+		}
+		else if (str[pos] >= '0' && str[pos] <= '9') {
+			// Not the right format if we ran into a number that followed a letter.
+			// This format is not something we expect currently
+			if (numLetters) return false; // not right format
+
+			// We'll keep track of the number of digits we find.
+			numDigits++;
+		}
+		else // Not the right format if we found something we didn't expect
+			return false;
+	}
+
+	// Not the right format if we see too many letters.
+	// At the time of this logic, we only expect 1 letter.  Can expand to 2 or more later, if we want.
+	if (numLetters > 1) return false;
+
+	return true; // We're good!
 }
 };
 
