@@ -35,43 +35,46 @@ namespace {
  * toSeg位置は含まず、それらの間に挟まれている文字列が「数字4ケタ」ならtrueを返す
  * --*/
 bool isNumbers(std::wstring str, int fromSeg, int toSeg) {
-/*
-  if (toSeg - fromSeg != 5) return false;
+  /*
+    if (toSeg - fromSeg != 5) return false;
+    for (int pos = fromSeg + 1; pos < toSeg; pos++) {
+      if (str[pos] < '0' || str[pos] > '9') return false;
+    }
+  */
+  // Let's check if it follows the format ####A (i.e 00001 or 00001a)
+  int numDigits = 0, numLetters = 0;
   for (int pos = fromSeg + 1; pos < toSeg; pos++) {
-    if (str[pos] < '0' || str[pos] > '9') return false;
+    if ((str[pos] >= 'A' && str[pos] <= 'Z') ||
+        (str[pos] >= 'a' && str[pos] <= 'z')) {
+      // Not the right format if we ran into a letter without first finding a
+      // number
+      if (!numDigits) return false;
+
+      // We'll keep track of the number of letters we find.
+      // NOTE: From here on out we should only see letters
+      numLetters++;
+    } else if (str[pos] >= '0' && str[pos] <= '9') {
+      // Not the right format if we ran into a number that followed a letter.
+      // This format is not something we expect currently
+      if (numLetters) return false;  // not right format
+
+      // We'll keep track of the number of digits we find.
+      numDigits++;
+    } else  // Not the right format if we found something we didn't expect
+      return false;
   }
-*/
-	// Let's check if it follows the format ####A (i.e 00001 or 00001a)
-	int numDigits = 0, numLetters = 0;
-	for (int pos = fromSeg + 1; pos < toSeg; pos++) {
 
-		if ((str[pos] >= 'A' && str[pos] <= 'Z')
-			|| (str[pos] >= 'a' && str[pos] <= 'z')) {
+  // Not the right format if we see too many letters.
+  // At the time of this logic, we only expect 1 letter.  Can expand to 2 or
+  // more later, if we want.
+  if (numLetters > 1) return false;
 
-			// Not the right format if we ran into a letter without first finding a number
-			if (!numDigits) return false;
-			
-			// We'll keep track of the number of letters we find.
-			// NOTE: From here on out we should only see letters
-			numLetters++;
-		}
-		else if (str[pos] >= '0' && str[pos] <= '9') {
-			// Not the right format if we ran into a number that followed a letter.
-			// This format is not something we expect currently
-			if (numLetters) return false; // not right format
+  return true;  // We're good!
+}
 
-			// We'll keep track of the number of digits we find.
-			numDigits++;
-		}
-		else // Not the right format if we found something we didn't expect
-			return false;
-	}
-
-	// Not the right format if we see too many letters.
-	// At the time of this logic, we only expect 1 letter.  Can expand to 2 or more later, if we want.
-	if (numLetters > 1) return false;
-
-	return true; // We're good!
+bool checkForSeqNum(QString type) {
+  if (type == "myb") return false;
+  return true;
 }
 };
 
@@ -515,6 +518,7 @@ bool TFilePath::isRoot() const {
 // ritorna ""(niente tipo, niente punto), "." (file con tipo) o ".." (file con
 // tipo e frame)
 std::string TFilePath::getDots() const {
+  QString type = QString::fromStdString(getType()).toLower();
   if (isFfmpegType()) return ".";
   int i            = getLastSlash(m_path);
   std::wstring str = m_path.substr(i + 1);
@@ -528,7 +532,7 @@ std::string TFilePath::getDots() const {
     int j = str.substr(0, i).rfind(L"_");
     /*-- j == i-1は、フレーム番号を抜いて"A_.tga"のような場合の条件 --*/
     return (j != (int)std::wstring::npos &&
-            (j == i - 1 || isNumbers(str, j, i)))
+            (j == i - 1 || (checkForSeqNum(type) && isNumbers(str, j, i))))
                ? ".."
                : ".";
   } else
@@ -564,6 +568,7 @@ std::string TFilePath::getUndottedType()
 
 std::wstring TFilePath::getWideName() const  // noDot! noSlash!
 {
+  QString type     = QString::fromStdString(getType()).toLower();
   int i            = getLastSlash(m_path);  // cerco l'ultimo slash
   std::wstring str = m_path.substr(i + 1);
   i                = str.rfind(L".");
@@ -572,8 +577,11 @@ std::wstring TFilePath::getWideName() const  // noDot! noSlash!
   if (j != (int)std::wstring::npos)
     i = j;
   else if (m_underscoreFormatAllowed) {
-    j = str.substr(0, i).rfind(L"_");
-    if (j != (int)std::wstring::npos && isNumbers(str, j, i)) i = j;
+    j            = str.substr(0, i).rfind(L"_");
+    QString type = QString::fromStdString(getType()).toLower();
+    if (j != (int)std::wstring::npos && checkForSeqNum(type) &&
+        isNumbers(str, j, i))
+      i = j;
   }
   return str.substr(0, i);
 }
@@ -597,6 +605,7 @@ std::string TFilePath::getLevelName() const {
 std::wstring TFilePath::getLevelNameW() const {
   int i            = getLastSlash(m_path);  // cerco l'ultimo slash
   std::wstring str = m_path.substr(i + 1);  // str e' m_path senza directory
+  QString type     = QString::fromStdString(getType()).toLower();
   if (isFfmpegType()) return str;
   int j = str.rfind(L".");                       // str[j..] = ".type"
   if (j == (int)std::wstring::npos) return str;  // no frame; no type
@@ -607,7 +616,7 @@ std::wstring TFilePath::getLevelNameW() const {
   if (j == i || j - i == 1)  // prova.tif o prova..tif
     return str;
 
-  if (!isNumbers(str, i, j)) return str;
+  if (checkForSeqNum(type) && !isNumbers(str, i, j)) return str;
   // prova.0001.tif
   return str.erase(i + 1, j - i - 1);
 }
@@ -633,7 +642,8 @@ TFilePath TFilePath::getParentDir() const  // noSlash!
 //-----------------------------------------------------------------------------
 
 bool TFilePath::isLevelName() const {
-  if (isFfmpegType()) return false;
+  QString type = QString::fromStdString(getType()).toLower();
+  if (isFfmpegType() || type == "myb") return false;
   try {
     return getFrame() == TFrameId(TFrameId::EMPTY_FRAME);
   }
@@ -646,6 +656,7 @@ bool TFilePath::isLevelName() const {
 TFrameId TFilePath::getFrame() const {
   int i            = getLastSlash(m_path);  // cerco l'ultimo slash
   std::wstring str = m_path.substr(i + 1);  // str e' il path senza parentdir
+  QString type     = QString::fromStdString(getType()).toLower();
   i                = str.rfind(L'.');
   if (i == (int)std::wstring::npos || str == L"." || str == L"..")
     return TFrameId(TFrameId::NO_FRAME);
@@ -660,7 +671,8 @@ TFrameId TFilePath::getFrame() const {
 
   /*-- 間が数字でない場合（ファイル名にまぎれた"_" や "."がある場合）を除外する
    * --*/
-  if (!isNumbers(str, j, i)) return TFrameId(TFrameId::NO_FRAME);
+  if (checkForSeqNum(type) && !isNumbers(str, j, i))
+    return TFrameId(TFrameId::NO_FRAME);
 
   int k, number = 0;
   for (k = j + 1; k < i && iswdigit(str[k]); k++)
@@ -724,6 +736,7 @@ TFilePath TFilePath::withName(const std::string &name) const {
 TFilePath TFilePath::withName(const std::wstring &name) const {
   int i            = getLastSlash(m_path);  // cerco l'ultimo slash
   std::wstring str = m_path.substr(i + 1);  // str e' il path senza parentdir
+  QString type     = QString::fromStdString(getType()).toLower();
   int j;
   j = str.rfind(L'.');
 
@@ -743,7 +756,7 @@ TFilePath TFilePath::withName(const std::wstring &name) const {
 
   if (k == (int)(std::wstring::npos))
     k = j;
-  else if (k != j - 1 && !isNumbers(str, k, j))
+  else if (k != j - 1 && checkForSeqNum(type) && !isNumbers(str, k, j))
     k = j;
 
   return TFilePath(m_path.substr(0, i + 1) + name + str.substr(k));
@@ -763,6 +776,7 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
   const std::wstring dot = L".", dotDot = L"..";
   int i            = getLastSlash(m_path);  // cerco l'ultimo slash
   std::wstring str = m_path.substr(i + 1);  // str e' il path senza parentdir
+  QString type     = QString::fromStdString(getType()).toLower();
   assert(str != dot && str != dotDot);
   int j          = str.rfind(L'.');
   const char *ch = ".";
@@ -791,7 +805,9 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
     k = str.substr(0, j).rfind(L'_');
     if (k != (int)std::wstring::npos &&
         (k == j - 1 ||
-         isNumbers(str, k, j))) /*-- "_." の並びか、"_[数字]."の並びのとき --*/
+         (checkForSeqNum(type) &&
+          isNumbers(str, k,
+                    j)))) /*-- "_." の並びか、"_[数字]."の並びのとき --*/
       return TFilePath(m_path.substr(0, k + i + 1) +
                        ((frame.isNoFrame())
                             ? L""
