@@ -616,7 +616,7 @@ std::wstring TFilePath::getLevelNameW() const {
   if (j == i || j - i == 1)  // prova.tif o prova..tif
     return str;
 
-  if (checkForSeqNum(type) && !isNumbers(str, i, j)) return str;
+  if (!checkForSeqNum(type) || !isNumbers(str, i, j)) return str;
   // prova.0001.tif
   return str.erase(i + 1, j - i - 1);
 }
@@ -671,7 +671,7 @@ TFrameId TFilePath::getFrame() const {
 
   /*-- 間が数字でない場合（ファイル名にまぎれた"_" や "."がある場合）を除外する
    * --*/
-  if (checkForSeqNum(type) && !isNumbers(str, j, i))
+  if (!checkForSeqNum(type) || !isNumbers(str, j, i))
     return TFrameId(TFrameId::NO_FRAME);
 
   int k, number = 0;
@@ -756,7 +756,7 @@ TFilePath TFilePath::withName(const std::wstring &name) const {
 
   if (k == (int)(std::wstring::npos))
     k = j;
-  else if (k != j - 1 && checkForSeqNum(type) && !isNumbers(str, k, j))
+  else if (k != j - 1 && (!checkForSeqNum(type) || !isNumbers(str, k, j)))
     k = j;
 
   return TFilePath(m_path.substr(0, i + 1) + name + str.substr(k));
