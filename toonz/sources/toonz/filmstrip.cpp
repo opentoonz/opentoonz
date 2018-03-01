@@ -605,7 +605,9 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
       }
       // for sequencial frame
       else {
-        text = QString::number(fid.getNumber()).rightJustified(4, '0');
+        char letter = fid.getLetter();
+        text        = QString::number(fid.getNumber()).rightJustified(4, '0') +
+               (letter != '\0' ? QString(letter) : "");
       }
       p.drawText(tmp_frameRect.adjusted(0, 0, -3, 2), text,
                  QTextOption(Qt::AlignRight | Qt::AlignBottom));
