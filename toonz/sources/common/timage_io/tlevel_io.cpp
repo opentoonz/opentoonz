@@ -139,6 +139,11 @@ TLevelP TLevelReader::loadInfo() {
         m_frameFormat = TFrameId::FOUR_ZEROS;
       else
         m_frameFormat = TFrameId::UNDERSCORE_FOUR_ZEROS;
+    } else if (ws.rfind(L'0') == 1) {  // leads with any number of zeros
+      if (ws.rfind(L'_') == (int)wstring::npos)
+        m_frameFormat = TFrameId::CUSTOM_PAD;
+      else
+        m_frameFormat = TFrameId::UNDERSCORE_CUSTOM_PAD;
     } else {
       if (ws.rfind(L'_') == (int)wstring::npos)
         m_frameFormat = TFrameId::NO_PAD;

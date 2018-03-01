@@ -30,6 +30,8 @@ class DVAPI TFrameId {
   int m_frame;
   char m_letter;  // serve per i frame "aggiunti" del tipo pippo.0001a.tzp =>
                   // f=1 c='a'
+  int m_zeroPadding;
+  char m_startSeqInd;
 
 public:
   enum {
@@ -41,11 +43,20 @@ public:
     FOUR_ZEROS,
     NO_PAD,
     UNDERSCORE_FOUR_ZEROS,  // pippo_0001.tif
-    UNDERSCORE_NO_PAD
+    UNDERSCORE_NO_PAD,
+    CUSTOM_PAD,
+    UNDERSCORE_CUSTOM_PAD,
+    USE_CURRENT_FORMAT
   };  // pippo_1.tif
 
-  TFrameId(int f = EMPTY_FRAME) : m_frame(f), m_letter(0) {}
-  TFrameId(int f, char c) : m_frame(f), m_letter(c) {}
+  TFrameId(int f = EMPTY_FRAME)
+      : m_frame(f), m_letter(0), m_zeroPadding(4), m_startSeqInd('.') {}
+  TFrameId(int f, char c)
+      : m_frame(f), m_letter(c), m_zeroPadding(4), m_startSeqInd('.') {}
+  TFrameId(int f, char c, int p)
+      : m_frame(f), m_letter(c), m_zeroPadding(p), m_startSeqInd('.') {}
+  TFrameId(int f, char c, int p, char s)
+      : m_frame(f), m_letter(c), m_zeroPadding(p), m_startSeqInd(s) {}
 
   inline bool operator==(const TFrameId &f) const {
     return f.m_frame == m_frame && f.m_letter == m_letter;
@@ -77,6 +88,25 @@ public:
   std::string expand(FrameFormat format = FOUR_ZEROS) const;
   int getNumber() const { return m_frame; }
   char getLetter() const { return m_letter; }
+
+  void setZeroPadding(int p) { m_zeroPadding = p; }
+  int getZeroPadding() const { return m_zeroPadding; }
+
+  void setStartSeqInd(char c) { m_startSeqInd = c; }
+  char getStartSeqInd() const { return m_startSeqInd; }
+
+  FrameFormat getCurrentFormat() const {
+    switch (m_zeroPadding) {
+    case 0:
+      return (m_startSeqInd == '.' ? NO_PAD : UNDERSCORE_NO_PAD);
+    case 4:
+      return (m_startSeqInd == '.' ? FOUR_ZEROS : UNDERSCORE_FOUR_ZEROS);
+    default:
+      break;
+    }
+
+    return (m_startSeqInd == '.' ? CUSTOM_PAD : UNDERSCORE_CUSTOM_PAD);
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -196,8 +226,9 @@ type is a string that indicate the filename extension(ex:. bmp or .bmp)*/
   /*!Return a TFilePath without parent directory */
   TFilePath withoutParentDir() const { return withParentDir(TFilePath()); }
   /*!Return a TFilePath with frame "frame".*/
-  TFilePath withFrame(const TFrameId &frame, TFrameId::FrameFormat format =
-                                                 TFrameId::FOUR_ZEROS) const;
+  TFilePath withFrame(
+      const TFrameId &frame,
+      TFrameId::FrameFormat format = TFrameId::USE_CURRENT_FORMAT) const;
   /*!Return a TFilePath with a frame identified by an integer number "f".*/
   TFilePath withFrame(int f) const { return withFrame(TFrameId(f)); }
   /*!Return a TFilePath with a frame identified by an integer and by a

@@ -90,6 +90,11 @@ std::string TFrameId::expand(FrameFormat format) const {
     o_buff.width(4);
     o_buff << m_frame;
     o_buff.width(0);
+  } else if (format == CUSTOM_PAD || format == UNDERSCORE_CUSTOM_PAD) {
+    o_buff.fill('0');
+    o_buff.width(m_zeroPadding);
+    o_buff << m_frame;
+    o_buff.width(0);
   } else {
     o_buff << m_frame;
   }
@@ -674,9 +679,11 @@ TFrameId TFilePath::getFrame() const {
   if (!checkForSeqNum(type) || !isNumbers(str, j, i))
     return TFrameId(TFrameId::NO_FRAME);
 
-  int k, number = 0;
-  for (k = j + 1; k < i && iswdigit(str[k]); k++)
-    number                     = number * 10 + str[k] - L'0';
+  int k, number = 0, digits = 0;
+  for (k = j + 1; k < i && iswdigit(str[k]); k++) {
+    digits++;
+    number = number * 10 + str[k] - L'0';
+  }
   char letter                  = '\0';
   if (iswalpha(str[k])) letter = str[k++] + ('a' - L'a');
 
@@ -685,7 +692,11 @@ TFrameId TFilePath::getFrame() const {
         *this,
         str + L": " + QObject::tr("Malformed frame name").toStdWString());
 
-  return TFrameId(number, letter);
+  int padding = 0;
+
+  if (str[j + 1] == '0') padding = digits;
+
+  return TFrameId(number, letter, padding, str[j]);
 }
 
 //-----------------------------------------------------------------------------
@@ -780,8 +791,11 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
   assert(str != dot && str != dotDot);
   int j          = str.rfind(L'.');
   const char *ch = ".";
+  // Override format input because it may be wrong.
+  format = frame.getCurrentFormat();
   if (m_underscoreFormatAllowed && (format == TFrameId::UNDERSCORE_FOUR_ZEROS ||
-                                    format == TFrameId::UNDERSCORE_NO_PAD))
+                                    format == TFrameId::UNDERSCORE_NO_PAD ||
+                                    format == TFrameId::UNDERSCORE_CUSTOM_PAD))
     ch = "_";
   if (j == (int)std::wstring::npos) {
     if (frame.isEmptyFrame() || frame.isNoFrame())
