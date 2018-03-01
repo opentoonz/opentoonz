@@ -139,6 +139,12 @@ TLevelP TLevelReader::loadInfo() {
         m_frameFormat = TFrameId::FOUR_ZEROS;
       else
         m_frameFormat = TFrameId::UNDERSCORE_FOUR_ZEROS;
+    }
+    if (ws.length() == 6) {
+      if (ws.rfind(L'_') == (int)wstring::npos)
+        m_frameFormat = TFrameId::FIVE_ZEROS;
+      else
+        m_frameFormat = TFrameId::UNDERSCORE_FIVE_ZEROS;
     } else {
       if (ws.rfind(L'_') == (int)wstring::npos)
         m_frameFormat = TFrameId::NO_PAD;

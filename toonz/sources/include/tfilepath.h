@@ -41,7 +41,9 @@ public:
     FOUR_ZEROS,
     NO_PAD,
     UNDERSCORE_FOUR_ZEROS,  // pippo_0001.tif
-    UNDERSCORE_NO_PAD
+    UNDERSCORE_NO_PAD,
+    FIVE_ZEROS,
+    UNDERSCORE_FIVE_ZEROS
   };  // pippo_1.tif
 
   TFrameId(int f = EMPTY_FRAME) : m_frame(f), m_letter(0) {}

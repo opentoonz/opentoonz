@@ -204,7 +204,8 @@ table) it returns the proper insertion index
 
   TRasterImageP getFrameToCleanup(const TFrameId &fid) const;
 
-  std::string getImageId(const TFrameId &fid, int frameStatus = -1) const;
+  std::string getImageId(const TFrameId &fid, int frameStatus = -1,
+                         TFrameId::FrameFormat = TFrameId::FOUR_ZEROS) const;
   std::string getIconId(const TFrameId &fid, int frameStatus = -1) const;
   std::string getIconId(const TFrameId &fid, const TDimension &size) const;
 
@@ -315,7 +316,7 @@ public:
 
   //! Get the auxiliary files list: hooks, tpl, etc.
   static void getFiles(const TFilePath &fp, TFilePathSet &fpset);
-
+  const TFrameId::FrameFormat getFrameFormat() { return m_frameFormat; };
   /*!
 Translates a level path into the corresponding hook path (no check for
 the existence of said hook file).
@@ -356,7 +357,7 @@ private:
 private:
   std::unique_ptr<LevelProperties> m_properties;
   std::unique_ptr<TContentHistory> m_contentHistory;
-
+  TFrameId::FrameFormat m_frameFormat;
   TPalette *m_palette;
 
   FramesSet m_frames;
