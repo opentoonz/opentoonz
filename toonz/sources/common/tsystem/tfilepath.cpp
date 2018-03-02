@@ -793,7 +793,8 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
   int j          = str.rfind(L'.');
   const char *ch = ".";
   // Override format input because it may be wrong.
-  if (!isFfmpegType() && !checkForSeqNum(type)) format = frame.getCurrentFormat();
+  if (!isFfmpegType() && checkForSeqNum(type))
+    format = frame.getCurrentFormat();
   if (m_underscoreFormatAllowed && (format == TFrameId::UNDERSCORE_FOUR_ZEROS ||
                                     format == TFrameId::UNDERSCORE_NO_PAD ||
                                     format == TFrameId::UNDERSCORE_CUSTOM_PAD))
