@@ -73,7 +73,8 @@ bool isNumbers(std::wstring str, int fromSeg, int toSeg) {
 }
 
 bool checkForSeqNum(QString type) {
-  if (type == "myb") return false;
+  if (type == "myb" || type == "tlv" || type == "pli" || type == "tpl")
+    return false;
   return true;
 }
 };
@@ -792,7 +793,7 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
   int j          = str.rfind(L'.');
   const char *ch = ".";
   // Override format input because it may be wrong.
-  format = frame.getCurrentFormat();
+  if (!isFfmpegType() && !checkForSeqNum(type)) format = frame.getCurrentFormat();
   if (m_underscoreFormatAllowed && (format == TFrameId::UNDERSCORE_FOUR_ZEROS ||
                                     format == TFrameId::UNDERSCORE_NO_PAD ||
                                     format == TFrameId::UNDERSCORE_CUSTOM_PAD))
