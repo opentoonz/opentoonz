@@ -580,11 +580,10 @@ std::wstring TFilePath::getWideName() const  // noDot! noSlash!
   i                = str.rfind(L".");
   if (i == (int)std::wstring::npos) return str;
   int j = str.substr(0, i).rfind(L".");
-  if (j != (int)std::wstring::npos)
-    i = j;
-  else if (m_underscoreFormatAllowed) {
-    j            = str.substr(0, i).rfind(L"_");
-    QString type = QString::fromStdString(getType()).toLower();
+  if (j != (int)std::wstring::npos) {
+    if (checkForSeqNum(type) && isNumbers(str, j, i)) i = j;
+  } else if (m_underscoreFormatAllowed) {
+    j = str.substr(0, i).rfind(L"_");
     if (j != (int)std::wstring::npos && checkForSeqNum(type) &&
         isNumbers(str, j, i))
       i = j;
@@ -649,7 +648,7 @@ TFilePath TFilePath::getParentDir() const  // noSlash!
 
 bool TFilePath::isLevelName() const {
   QString type = QString::fromStdString(getType()).toLower();
-  if (isFfmpegType() || type == "myb") return false;
+  if (isFfmpegType() || !checkForSeqNum(type)) return false;
   try {
     return getFrame() == TFrameId(TFrameId::EMPTY_FRAME);
   }
@@ -806,13 +805,21 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
       return TFilePath(m_path + ::to_wstring(ch + frame.expand(format)));
   }
 
-  std::string frameString;
-  if (frame.isNoFrame())
-    frameString = "";
-  else
-    frameString = ch + frame.expand(format);
-
   int k = str.substr(0, j).rfind(L'.');
+
+  bool hasValidFrameNum = false;
+  if (!isFfmpegType() && checkForSeqNum(type) && isNumbers(str, k, j))
+    hasValidFrameNum = true;
+  std::string frameString;
+  if (frame.isNoFrame() || !hasValidFrameNum) {
+    if (k != (int)std::wstring::npos) {
+      std::wstring wstr = str.substr(k, j - k);
+      std::string str2(wstr.begin(), wstr.end());
+      frameString = str2;
+    } else
+      frameString = "";
+  } else
+    frameString = ch + frame.expand(format);
 
   if (k != (int)std::wstring::npos)
     return TFilePath(m_path.substr(0, k + i + 1) + ::to_wstring(frameString) +
