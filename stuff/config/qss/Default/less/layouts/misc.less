@@ -14,8 +14,10 @@ PencilTestPopup {
 
 #MatchLineButton {
     background-color: lighten(@bg, 15%);
-    &::pressed {
+    &:checked {
         background-color: lighten(@bg, 30%);
+        border: 2px solid @selected-bg-color;
+        border-radius: 2px;
     }
 }
 
