@@ -37,6 +37,7 @@
 #include "tundo.h"
 #include "tropcm.h"
 #include "ttoonzimage.h"
+#include "tenv.h"
 
 // Qt includes
 #include <QRadioButton>
@@ -52,6 +53,10 @@
 #include <map>
 
 using namespace DVGui;
+
+TEnv::IntVar MatchlineStyleIndex("MatchlineStyleIndex", -1);
+TEnv::IntVar MatchlinePrevalence("MatchlinePrevalence", 0);
+TEnv::IntVar MatchlineInkUsagePolicy("MatchlineInkUsagePolicy", -1);
 
 namespace {
 
@@ -140,8 +145,8 @@ void doMatchlines(const std::vector<MergeCmappedPair> &matchingLevels,
     TRect raux = matchRas->getBounds() + offs;
     TRasterP r = ras->extract(raux);
 
-    TRop::applyMatchLines(r, matchRas, palette, inkIndex, inkPrevalence,
-                          usedInks);
+    TRop::applyMatchLines(r, matchRas, palette, matchPalette, inkIndex,
+                          inkPrevalence, usedInks);
 
     ras->unlock();
     matchRas->unlock();
@@ -149,8 +154,18 @@ void doMatchlines(const std::vector<MergeCmappedPair> &matchingLevels,
     img->setSavebox(img->getSavebox() + (matchRas->getBounds() + offs));
   }
 
+  if (inkIndex == -2) {
+    std::map<int, int>::iterator it = usedInks.begin();
+    while (it != usedInks.end()) {
+      if (it->second < palette->getStyleCount())
+        usedInks.erase(it++);
+      else
+        ++it;
+    }
+  }
+
   /*- UseMatchlinedInkの場合はここでreturnする -*/
-  if (inkIndex != -1) return;
+  if (usedInks.empty()) return;
 
   std::wstring pageName = L"match lines";
 
@@ -231,9 +246,11 @@ void MatchlinesDialog::accept() {
   bool ok;
   int value = m_inkIndex->text().toInt(&ok);
 
-  settings.setValue("matchlineStyleIndex", ok ? m_inkIndex->text() : "-1");
-  settings.setValue("matchlinePrevalence", QString::number(getInkPrevalence()));
-  settings.setValue("doUseStyle", m_button2->isChecked() ? "1" : "0");
+  MatchlineStyleIndex = (ok) ? value : -1;
+  MatchlinePrevalence = getInkPrevalence();
+  MatchlineInkUsagePolicy =
+      m_button1->isChecked() ? 0 : (m_button2->isChecked() ? 1 : 2);
+
   QDialog::accept();
 }
 
@@ -242,22 +259,27 @@ void MatchlinesDialog::accept() {
 int MatchlinesDialog::exec(TPalette *plt) {
   m_pltHandle->setPalette(plt);
 
-  QSettings settings;
-  QString _styleIndex = settings.value("matchlineStyleIndex").toString();
-  QString _prevalence = settings.value("matchlinePrevalence").toString();
-  bool doUseStyle     = (settings.value("doUseStyle").toString() == "1");
-
-  int styleIndex = _styleIndex.isEmpty() ? -1 : _styleIndex.toInt();
-  int prevalence = _prevalence.isEmpty() ? 0 : _prevalence.toInt();
-
+  int styleIndex                                    = MatchlineStyleIndex;
   if (styleIndex > plt->getStyleCount()) styleIndex = 1;
-
   if (styleIndex != -1) m_inkIndex->setText(QString::number(styleIndex));
 
-  m_button1->setChecked(!doUseStyle);
-  m_button2->setChecked(doUseStyle);
-  m_inkIndex->setEnabled(doUseStyle);
+  int prevalence = MatchlinePrevalence;
   m_inkPrevalence->setValue(prevalence);
+
+  int inkUsagePolicy = MatchlineInkUsagePolicy;
+  switch (inkUsagePolicy) {
+  case 0:
+    m_button1->setChecked(true);
+    break;
+  case -1:
+  case 1:
+    m_button2->setChecked(true);
+    break;
+  case 2:
+    m_button3->setChecked(true);
+    break;
+  }
+  m_inkIndex->setEnabled(inkUsagePolicy == 1);
 
   return QDialog::exec();
 }
@@ -277,6 +299,8 @@ int MatchlinesDialog::getInkPrevalence() { return m_inkPrevalence->getValue(); }
 int MatchlinesDialog::getInkIndex() {
   if (m_button1->isChecked())
     return -1;
+  else if (m_button3->isChecked())
+    return -2;
   else {
     if (QString("current").contains(m_inkIndex->text()))
       return TApp::instance()
@@ -302,6 +326,7 @@ MatchlinesDialog::MatchlinesDialog()
 
   m_button1       = new QRadioButton(tr("Add Match Line Inks"), this);
   m_button2       = new QRadioButton(tr("Use Ink: "), this);
+  m_button3       = new QRadioButton(tr("Merge Inks"), this);
   m_inkIndex      = new StyleIndexLineEdit();
   m_inkPrevalence = new IntField(this);
 
@@ -318,7 +343,15 @@ MatchlinesDialog::MatchlinesDialog()
 
   m_button1->setCheckable(true);
   m_button2->setCheckable(true);
+  m_button3->setCheckable(true);
   m_button2->setChecked(true);
+
+  m_button3->setToolTip(
+      tr("Merge Inks : If the target level has the same style as the match "
+         "line ink\n"
+         "(i.e. with the same index and the same color), the existing style "
+         "will be used.\n"
+         "Otherwise, a new style will be added to \"match lines\" page."));
 
   m_inkIndex->setPaletteHandle(m_pltHandle);
 
@@ -373,6 +406,7 @@ MatchlinesDialog::MatchlinesDialog()
       inkUsageLay->addWidget(m_button1, 0, 0, 1, 2);
       inkUsageLay->addWidget(m_button2, 1, 0);
       inkUsageLay->addWidget(m_inkIndex, 1, 1, Qt::AlignLeft);
+      inkUsageLay->addWidget(m_button3, 2, 0, 1, 2);
     }
     inkUsageLay->setColumnStretch(0, 0);
     inkUsageLay->setColumnStretch(1, 1);
