@@ -1,7 +1,5 @@
 
 
-//#include "tutil.h"
-//#include "tgl.h"
 #include "colorfxutils.h"
 #include "drawutil.h"
 #include "tregion.h"
@@ -152,8 +150,6 @@ void SFlashUtils::PointVector2QuadsArray(const std::vector<T3DPointD> &pv,
                                          std::vector<TQuadratic *> &quadArray,
                                          std::vector<TQuadratic *> &toBeDeleted,
                                          const bool isRounded) const {
-  std::vector<T3DPointD>::const_iterator ipv  = pv.begin();
-  std::vector<T3DPointD>::const_iterator ipve = pv.end();
   int nbPv                                    = pv.size();
   quadArray.clear();
 
@@ -235,17 +231,14 @@ void SFlashUtils::drawRegionOutline(TFlash &flash, const bool isRounded) const {
 
 int SFlashUtils::nbDiffVerts(const std::vector<TPointD> &pv) const {
   std::vector<TPointD> lpv;
-  bool isMissing[4] = {true, true, true, true};
   if (pv.size() == 0) return 0;
   lpv.push_back(pv[0]);
-  isMissing[0] = false;
   for (int i = 1; i < (int)pv.size(); i++) {
     bool isDiff = true;
     for (int j = 0; j < (int)lpv.size() && isDiff; j++)
       isDiff = lpv[j] == pv[i] ? false : isDiff;
     if (isDiff) {
       lpv.push_back(pv[i]);
-      isMissing[i] = false;
     }
   }
   return lpv.size();
