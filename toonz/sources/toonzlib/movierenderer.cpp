@@ -404,6 +404,9 @@ std::pair<bool, int> MovieRenderer::Imp::saveFrame(
 
     // Flush images
     try {
+      if (m_fp.getType() == "spritesheet") {
+        TRop::depremultiply(rasterA);
+      }
       TRasterImageP imgA(rasterA);
       postProcessImage(imgA, has64bitOutputSupport, m_renderSettings.m_mark,
                        fid.getNumber());
