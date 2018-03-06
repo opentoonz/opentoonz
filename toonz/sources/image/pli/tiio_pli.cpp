@@ -551,15 +551,12 @@ solo nel costruttore)
     tags.push_back((PliObjectTag *)tag);
   }
   // Store the auto close tolerance
-  if (!areAlmostEqual(tempVecImg->getAutocloseTolerance(), 1.15, 0.001)) {
-    int tolerance =
-        (int)((roundf(tempVecImg->getAutocloseTolerance() * 100) / 100) * 1000);
-    PliTag *tag = new AutoCloseToleranceTag(tolerance);
-    tags.push_back((PliObjectTag *)tag);
-    pli->setVersion(120, 0);
-  } else {
-    pli->setVersion(71, 0);
-  }
+  int tolerance =
+      (int)((roundf(tempVecImg->getAutocloseTolerance() * 100) / 100) * 1000);
+  PliTag *tag = new AutoCloseToleranceTag(tolerance);
+  tags.push_back((PliObjectTag *)tag);
+  pli->setVersion(120, 0);
+
   // recupero il numero di stroke dall'immagine
   int numStrokes = tempVecImg->getStrokeCount();
 
