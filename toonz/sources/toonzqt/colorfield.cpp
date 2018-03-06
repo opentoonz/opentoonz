@@ -9,6 +9,7 @@
 #include "tconvert.h"
 #include "tcolorstyles.h"
 #include "trop.h"
+#include "toonzqt/lutcalibrator.h"
 
 #include <QLayout>
 #include <QPainter>
@@ -95,9 +96,9 @@ void StyleSample::setStyle(TColorStyle &style) {
 */
 void StyleSample::setColor(const TPixel32 &pixel) {
   QColor color(pixel.r, pixel.g, pixel.b, pixel.m);
-  // iwsw commented out temporarily
-  // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
-  //	Ghibli3DLutConverter::instance()->convert(color);
+  if (LutCalibrator::instance()->isValid())
+    LutCalibrator::instance()->convert(color);
+
   m_samplePixmap.fill(color.rgba());
   update();
 }

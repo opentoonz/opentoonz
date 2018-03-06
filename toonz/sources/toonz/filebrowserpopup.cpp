@@ -1859,29 +1859,63 @@ void LoadColorModelPopup::showEvent(QShowEvent *e) {
 //=============================================================================
 /*! replace the parent folder path of the levels in the selected cells
 */
+
+class OpenReplaceParentDirectoryPopupHandler final : public MenuItemHandler {
+  ReplaceParentDirectoryPopup *m_popup;
+
+public:
+  OpenReplaceParentDirectoryPopupHandler()
+      : MenuItemHandler(MI_ReplaceParentDirectory), m_popup(0) {}
+
+  // The current selection is cleared on the construction of FileBrowser
+  // ( by calling makeCurrent() in DvDirTreeView::currentChanged() ).
+  // Thus checking the selection must be done BEFORE making the browser
+  // or it fails to get the selection on the first call of this command.
+  bool initialize(TCellSelection::Range &range, std::set<int> &columnRange,
+                  bool &replaceCells) {
+    TSelection *sel = TApp::instance()->getCurrentSelection()->getSelection();
+    if (!sel) return false;
+    TCellSelection *cellSel     = dynamic_cast<TCellSelection *>(sel);
+    TColumnSelection *columnSel = dynamic_cast<TColumnSelection *>(sel);
+    if ((!cellSel && !columnSel) || sel->isEmpty()) {
+      DVGui::error(tr("Nothing to replace: no cells or columns selected."));
+      return false;
+    }
+    if (cellSel) {
+      range        = cellSel->getSelectedCells();
+      replaceCells = true;
+    } else if (columnSel) {
+      columnRange  = columnSel->getIndices();
+      replaceCells = false;
+    }
+    return true;
+  }
+
+  void execute() override {
+    TCellSelection::Range range;
+    std::set<int> columnRange;
+    bool replaceCells;
+    if (!initialize(range, columnRange, replaceCells)) return;
+    if (!m_popup) m_popup = new ReplaceParentDirectoryPopup();
+    m_popup->setRange(range, columnRange, replaceCells);
+    m_popup->show();
+    m_popup->raise();
+    m_popup->activateWindow();
+  }
+} openReplaceParentDirectoryPopupHandler;
+
 ReplaceParentDirectoryPopup::ReplaceParentDirectoryPopup()
     : FileBrowserPopup(tr("Replace Parent Directory")) {
   setOkText(tr("Replace"));
   setFileMode(true);  // isDirectoryOnly
 }
 
-void ReplaceParentDirectoryPopup::show() {
-  TSelection *sel = TApp::instance()->getCurrentSelection()->getSelection();
-  if (!sel) return;
-  TCellSelection *cellSel     = dynamic_cast<TCellSelection *>(sel);
-  TColumnSelection *columnSel = dynamic_cast<TColumnSelection *>(sel);
-  if ((!cellSel && !columnSel) || sel->isEmpty()) {
-    DVGui::error(tr("Nothing to replace: no cells or columns selected."));
-    return;
-  }
-  if (cellSel) {
-    m_range        = cellSel->getSelectedCells();
-    m_replaceCells = true;
-  } else if (columnSel) {
-    m_columnRange  = columnSel->getIndices();
-    m_replaceCells = false;
-  }
-  QDialog::show();
+void ReplaceParentDirectoryPopup::setRange(TCellSelection::Range &range,
+                                           std::set<int> &columnRange,
+                                           bool &replaceCells) {
+  m_range        = range;
+  m_columnRange  = columnRange;
+  m_replaceCells = replaceCells;
 }
 
 bool ReplaceParentDirectoryPopup::execute() {
@@ -2134,7 +2168,8 @@ OpenPopupCommandHandler<SavePaletteAsPopup> savePalettePopupCommand(
     MI_SavePaletteAs);
 OpenPopupCommandHandler<LoadColorModelPopup> loadColorModelPopupCommand(
     MI_LoadColorModel);
-OpenPopupCommandHandler<ReplaceParentDirectoryPopup>
-    replaceParentDirectoryPopupCommand(MI_ReplaceParentDirectory);
 OpenPopupCommandHandler<ImportMagpieFilePopup> importMagpieFilePopupCommand(
     MI_ImportMagpieFile);
+
+// Note: MI_ReplaceParentDirectory uses the original hadler in order to obtain
+// the selection information before making the browser.

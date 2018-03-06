@@ -60,7 +60,7 @@ class PreviewSubCameraManager final : public SceneViewerInteractiveGadget {
   UCHAR m_dragType;
   bool m_clickAndDrag;
 
-  QPoint m_mousePressPos;
+  QPointF m_mousePressPos;
   TPointD m_cameraMousePressPos;
   bool m_mousePressed;
 
@@ -106,11 +106,11 @@ public:
   void deleteSubCamera(SceneViewer *viewer);
 
 private:
-  TPointD winToCamera(SceneViewer *viewer, const QPoint &pos) const;
-  TPoint cameraToWin(SceneViewer *viewer, const TPointD &cameraPos) const;
+  TPointD winToCamera(SceneViewer *viewer, const QPointF &pos) const;
+  TPointD cameraToWin(SceneViewer *viewer, const TPointD &cameraPos) const;
 
-  UCHAR getSubCameraDragEnum(SceneViewer *viewer, const QPoint &mousePos);
-  TPoint getSubCameraDragDistance(SceneViewer *viewer, const QPoint &mousePos);
+  UCHAR getSubCameraDragEnum(SceneViewer *viewer, const QPointF &mousePos);
+  TPoint getSubCameraDragDistance(SceneViewer *viewer, const QPointF &mousePos);
 };
 
 #endif  // SUBCAMERAMANAGER_INCLUDED

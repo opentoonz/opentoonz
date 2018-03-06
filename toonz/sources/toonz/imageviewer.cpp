@@ -20,6 +20,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/viewcommandids.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/lutcalibrator.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -36,6 +37,7 @@
 #include <QAction>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QOpenGLFramebufferObject>
 
 //===================================================================================
 
@@ -226,11 +228,6 @@ ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook,
 
   if (m_isHistogramEnable)
     m_histogramPopup = new HistogramPopup(tr("Flipbook Histogram"));
-
-  // iwsw commented out 2 lines temporarily
-  // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // Ghibli3DLutUtil::m_isValid)
-  //	m_ghibli3DLutUtil = new Ghibli3DLutUtil();
 }
 
 //-----------------------------------------------------------------------------
@@ -365,6 +362,7 @@ ImageViewer::~ImageViewer() {
           delete m_ghibli3DLutUtil;
   }
   */
+  if (m_fbo) delete m_fbo;
 }
 
 //-----------------------------------------------------------------------------
@@ -413,13 +411,12 @@ void ImageViewer::hideHistogram() {
 
 void ImageViewer::initializeGL() {
   initializeOpenGLFunctions();
+
+  // to be computed once through the software
+  LutCalibrator::instance()->initialize();
+
   // glClearColor(1.0,1.0,1.0,1);
   glClear(GL_COLOR_BUFFER_BIT);
-
-  // iwsw commented out temporarily
-  // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // m_ghibli3DLutUtil)
-  //  m_ghibli3DLutUtil->onInit();
 }
 
 //-----------------------------------------------------------------------------
@@ -439,19 +436,17 @@ void ImageViewer::resizeGL(int w, int h) {
   glTranslatef(0.375, 0.375, 0.0);
   glTranslated(w * 0.5, h * 0.5, 0);
 
-  // iwsw commented out temporarily
-  // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // m_ghibli3DLutUtil)
-  //	m_ghibli3DLutUtil->onResize(w, h);
+  // remake fbo with new size
+  if (LutCalibrator::instance()->isValid()) {
+    if (m_fbo) delete m_fbo;
+    m_fbo = new QOpenGLFramebufferObject(w, h);
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void ImageViewer::paintGL() {
-  // iwsw commented out temporarily
-  // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // m_ghibli3DLutUtil)
-  //	m_ghibli3DLutUtil->startDraw();
+  if (LutCalibrator::instance()->isValid()) m_fbo->bind();
 
   TDimension viewerSize(width(), height());
   TAffine aff = m_viewAff;
@@ -508,11 +503,8 @@ void ImageViewer::paintGL() {
   }
 
   if (!m_image) {
-    // iwsw commented out temporarily
-    // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-    // m_ghibli3DLutUtil)
-    //	m_ghibli3DLutUtil->endDraw();
-
+    if (LutCalibrator::instance()->isValid())
+      LutCalibrator::instance()->onEndDraw(m_fbo);
     return;
   }
 
@@ -590,10 +582,8 @@ void ImageViewer::paintGL() {
     }
   }
 
-  // iwsw commented out temporarily
-  // if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
-  // m_ghibli3DLutUtil)
-  //  m_ghibli3DLutUtil->endDraw();
+  if (LutCalibrator::instance()->isValid())
+    LutCalibrator::instance()->onEndDraw(m_fbo);
 }
 
 //------------------------------------------------------------------------------
@@ -851,17 +841,11 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
   TPoint mousePos = TPoint(curPos.x(), height() - 1 - curPos.y());
   TRectD area     = TRectD(mousePos.x, mousePos.y, mousePos.x, mousePos.y);
 
-  // iwsw commented out temporarily
-  // if (get3DLutUtil() &&
-  // Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
-  //	get3DLutUtil()->bindFBO();
+  if (LutCalibrator::instance()->isValid()) m_fbo->bind();
 
   const TPixel32 pix = picker.pickColor(area);
 
-  // iwsw commented out temporarily
-  // if (get3DLutUtil() &&
-  // Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
-  //	get3DLutUtil()->releaseFBO();
+  if (LutCalibrator::instance()->isValid()) m_fbo->release();
 
   QPoint viewP = mapFrom(this, curPos);
   TPointD pos  = getViewAff().inv() *
@@ -899,17 +883,11 @@ void ImageViewer::rectPickColor(bool putValueToStyleEditor) {
     return;
   }
 
-  // iwsw commented out temporarily
-  // if (get3DLutUtil() &&
-  // Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
-  //	get3DLutUtil()->bindFBO();
+  if (LutCalibrator::instance()->isValid() && m_fbo) m_fbo->bind();
 
   const TPixel32 pix = picker.pickColor(area.enlarge(-1, -1));
 
-  // iwsw commented out temporarily
-  // if (get3DLutUtil() &&
-  // Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
-  //	get3DLutUtil()->releaseFBO();
+  if (LutCalibrator::instance()->isValid() && m_fbo) m_fbo->release();
 
   // throw the picked color to the histogram
   m_histogramPopup->updateAverageColor(pix);

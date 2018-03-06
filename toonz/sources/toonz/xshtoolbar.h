@@ -29,7 +29,6 @@ class XSheetToolbar final : public CommandBar {
   Q_OBJECT
 
   XsheetViewer *m_viewer;
-  bool m_isCollapsible;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -40,8 +39,6 @@ public:
 #endif
   static void toggleXSheetToolbar();
   void showToolbar(bool show);
-signals:
-  void updateVisibility();
 
 protected:
   void showEvent(QShowEvent *e) override;

@@ -14,6 +14,7 @@
 #include "png.h"
 
 #include "tpixel.h"
+#include "tpixelutils.h"
 
 using namespace std;
 //------------------------------------------------------------
@@ -876,7 +877,11 @@ void PngWriter::writeLine(short *buffer) {
     tmp = (unsigned short *)malloc((m_info.m_lx + 1) * 3);
     // unsigned short tmp[10000];
     int k = 0;
-    for (int j = 0; j < m_info.m_lx; j++) {
+    for (int j = 0; j < m_info.m_lx; j++, pix++) {
+      // depremultiply here
+      TPixel64 depremult_pix(*pix);
+      if (m_matte && depremult_pix.m != 0) depremult(depremult_pix);
+
 #if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
     defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
       tmp[k++] = mySwap(pix->r);
@@ -890,8 +895,8 @@ void PngWriter::writeLine(short *buffer) {
 #else
 #error "unknown channel order"
 #endif
-      if (m_matte) tmp[k++] = mySwap(pix->m);
-      ++pix;
+      if (m_matte)
+        tmp[k++] = mySwap(pix->m);  // ?? does it take care MRGB or MBGR case?
     }
     png_write_row(m_png_ptr, (unsigned char *)tmp);
   }
@@ -903,14 +908,43 @@ void PngWriter::writeLine(char *buffer) {
   // TBoolProperty* alphaProp =
   // (TBoolProperty*)(m_properties->getProperty("Alpha Channel"));
   if (m_matte || m_colormap) {
-    png_bytep row_pointer = (unsigned char *)buffer;
-    png_write_row(m_png_ptr, row_pointer);
-  } else {
-    unsigned char *tmp = 0;
+    unsigned char *tmp = new unsigned char[(m_info.m_lx + 1) * 4];
     TPixel32 *pix      = (TPixel32 *)buffer;
-    tmp                = (unsigned char *)malloc((m_info.m_lx + 1) * 3);
+    int k              = 0;
+    for (int j = 0; j < m_info.m_lx; j++, pix++) {
+      // depremultiply here
+      TPixel32 depremult_pix(*pix);
+      if (depremult_pix.m != 0) depremult(depremult_pix);
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
+      tmp[k++] = depremult_pix.m;
+      tmp[k++] = depremult_pix.r;
+      tmp[k++] = depremult_pix.g;
+      tmp[k++] = depremult_pix.b;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+      tmp[k++] = depremult_pix.r;
+      tmp[k++] = depremult_pix.g;
+      tmp[k++] = depremult_pix.b;
+      tmp[k++] = depremult_pix.m;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
+      tmp[k++] = depremult_pix.m;
+      tmp[k++] = depremult_pix.b;
+      tmp[k++] = depremult_pix.g;
+      tmp[k++] = depremult_pix.r;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+      tmp[k++]                     = depremult_pix.b;
+      tmp[k++]                     = depremult_pix.g;
+      tmp[k++]                     = depremult_pix.r;
+      tmp[k++]                     = depremult_pix.m;
+#else
+#error "unknown channel order"
+#endif
+    }
+    png_write_row(m_png_ptr, tmp);
+    delete[] tmp;
+  } else {
+    TPixel32 *pix      = (TPixel32 *)buffer;
+    unsigned char *tmp = new unsigned char[(m_info.m_lx + 1) * 3];
 
-    //     unsigned char tmp[10000];
     int k = 0;
     for (int j = 0; j < m_info.m_lx; j++) {
 // tmp = (pix->r&0xe0)|((pix->g&0xe0)>>3) | ((pix->b&0xc0)>>6);
@@ -932,6 +966,7 @@ void PngWriter::writeLine(char *buffer) {
       ++pix;
     }
     png_write_row(m_png_ptr, tmp);
+    delete[] tmp;
   }
 }
 

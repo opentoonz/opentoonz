@@ -10,7 +10,6 @@
 #include "tools/cursors.h"
 #include "toonz/stage2.h"
 #include "toonz/tobjecthandle.h"
-#include "tw/keycodes.h"
 
 #include <QKeyEvent>
 
@@ -1106,28 +1105,36 @@ void SelectionTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
 //-----------------------------------------------------------------------------
 
-bool SelectionTool::keyDown(int key, TUINT32 flags, const TPoint &pos) {
+bool SelectionTool::keyDown(QKeyEvent *event) {
   if (isSelectionEmpty()) return false;
 
   TPointD delta;
-  if (key == TwConsts::TK_UpArrow)
+
+  switch (event->key()) {
+  case Qt::Key_Up:
     delta.y = 1;
-  else if (key == TwConsts::TK_DownArrow)
+    break;
+  case Qt::Key_Down:
     delta.y = -1;
-  else if (key == TwConsts::TK_LeftArrow)
+    break;
+  case Qt::Key_Left:
     delta.x = -1;
-  else if (key == TwConsts::TK_RightArrow)
+    break;
+  case Qt::Key_Right:
     delta.x = 1;
-  else if (key == TwConsts::TK_ShiftUpArrow)
-    delta.y = 10;
-  else if (key == TwConsts::TK_ShiftDownArrow)
-    delta.y = -10;
-  else if (key == TwConsts::TK_ShiftLeftArrow)
-    delta.x = -10;
-  else if (key == TwConsts::TK_ShiftRightArrow)
-    delta.x = 10;
-  else
+    break;
+  default:
     return false;
+    break;
+  }
+
+  if (event->modifiers() & Qt::ShiftModifier) {
+    delta.x *= 10.0;
+    delta.y *= 10.0;
+  } else if (event->modifiers() & Qt::ControlModifier) {
+    delta.x *= 0.1;
+    delta.y *= 0.1;
+  }
 
   TImageP image = getImage(true);
 
@@ -1138,7 +1145,6 @@ bool SelectionTool::keyDown(int key, TUINT32 flags, const TPoint &pos) {
   if (!ti && !vi && !ri) return false;
 
   DragTool *dragTool = createNewMoveSelectionTool(this);
-  TPointD p          = convert(pos);
   TAffine aff        = TTranslation(delta);
   dragTool->transform(aff);
   double factor = 1.0 / Stage::inch;

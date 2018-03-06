@@ -87,6 +87,7 @@ set(MOC_HEADERS
     ../include/toonzqt/combohistogram.h
     ../include/toonzqt/fxiconmanager.h
     ../include/toonzqt/glwidget_for_highdpi.h
+    ../include/toonzqt/lutcalibrator.h
     pluginhost.h
 )
 
@@ -193,6 +194,7 @@ set(SOURCES
     plugin_param_view_interface.cpp
     plugin_ui_page_interface.cpp
     toonz_params.cpp
+	lutcalibrator.cpp
 )
 
 set(RESOURCES toonzqt.qrc)

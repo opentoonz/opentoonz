@@ -28,6 +28,12 @@
 #include "tconvert.h"
 #include "trop.h"
 
+#include <QOpenGLFramebufferObject>
+#include <QOffscreenSurface>
+#include <QSurfaceFormat>
+#include <QOpenGLContext>
+#include <QImage>
+
 FX_IDENTIFIER_IS_HIDDEN(PlasticDeformerFx, "plasticDeformerFx")
 
 //***************************************************************************************************
@@ -345,7 +351,7 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame,
   TTile inTile;
   m_port->allocateAndCompute(inTile, bbox.getP00(), tileSize, TRasterP(), frame,
                              texInfo);
-
+  QOpenGLContext *context;
   // Draw the textured mesh
   {
     // Prepare texture
@@ -356,16 +362,33 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame,
     const std::string &texId = "render_tex " + std::to_string(++var);
 
     // Prepare an OpenGL context
-    std::unique_ptr<TOfflineGL> context(
-        new TOfflineGL(tile.getRaster()->getSize()));
-    context->makeCurrent();
+    context = new QOpenGLContext();
+    if (QOpenGLContext::currentContext())
+      context->setShareContext(QOpenGLContext::currentContext());
+    context->setFormat(QSurfaceFormat::defaultFormat());
+    context->create();
+    context->makeCurrent(info.m_offScreenSurface.get());
+
+    TDimension d = tile.getRaster()->getSize();
+    QOpenGLFramebufferObject fb(d.lx, d.ly);
+
+    fb.bind();
 
     // Load texture into the context
     TTexturesStorage *ts                = TTexturesStorage::instance();
     const DrawableTextureDataP &texData = ts->loadTexture(texId, tex, bbox);
 
     // Draw
-    glPushMatrix();
+    glViewport(0, 0, d.lx, d.ly);
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, d.lx, 0, d.ly);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     tglMultMatrix(TTranslation(-tile.m_pos) * info.m_affine *
                   meshToWorldMeshAff);
 
@@ -375,16 +398,32 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame,
     tglDraw(*mi, *texData, meshToTextureAff, *dataGroup);
 
     // Retrieve drawing and copy to output tile
-    context->getRaster(tile.getRaster());
 
+    QImage img = fb.toImage().scaled(QSize(d.lx, d.ly), Qt::IgnoreAspectRatio,
+                                     Qt::SmoothTransformation);
+    int wrap      = tile.getRaster()->getLx() * sizeof(TPixel32);
+    uchar *srcPix = img.bits();
+    uchar *dstPix = tile.getRaster()->getRawData() + wrap * (d.ly - 1);
+    for (int y = 0; y < d.ly; y++) {
+      memcpy(dstPix, srcPix, wrap);
+      dstPix -= wrap;
+      srcPix += wrap;
+    }
+    fb.release();
+
+    // context->getRaster(tile.getRaster());
+    glFlush();
+    glFinish();
     // Cleanup
 
     // No need to disable stuff - the context dies here
 
     // ts->unloadTexture(texId);                                // Auto-released
     // due to display list destruction
-    context->doneCurrent();
+    context->deleteLater();
+    // context->doneCurrent();
   }
+  assert(glGetError() == GL_NO_ERROR);
 }
 
 //-----------------------------------------------------------------------------------

@@ -149,7 +149,7 @@ If you need to debug the application, you should be able to use `cmake -DCMAKE_B
 You can now run the application:
 
 ```
-$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz_1.1
+$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz_1.2
 ```
 
 ### Performing a System Installation

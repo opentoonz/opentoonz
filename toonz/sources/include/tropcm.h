@@ -40,8 +40,8 @@ DVAPI void convert(const TTile &dst, const TTile &src, const TPaletteP plt,
 // matchlinePrevalence ==0->always ink down; matchlinePrevalence == 100 always
 // ink up;
 DVAPI void applyMatchLines(TRasterCM32P rasOut, const TRasterCM32P &rasUp,
-                           const TPaletteP &pltOut, int inkIndex,
-                           int matchlinePrevalence,
+                           const TPaletteP &pltOut, const TPaletteP &matchPlt,
+                           int inkIndex, int matchlinePrevalence,
                            std::map<int, int> &usedInks);
 DVAPI void mergeCmapped(TRasterCM32P rasOut, const TRasterCM32P &rasUp,
                         const TPaletteP &pltOut, int matchlinePrevalence,

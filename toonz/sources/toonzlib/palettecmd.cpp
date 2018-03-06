@@ -975,7 +975,10 @@ int PaletteCmd::loadReferenceImage(TPaletteHandle *paletteHandle,
 
   // when choosing replace(Keep the destination palette), dirty flag is
   // unchanged
-  if (pltBehavior != ReplaceColorModelPlt) levelPalette->setDirtyFlag(true);
+  if (pltBehavior != ReplaceColorModelPlt) {
+    levelPalette->setDirtyFlag(true);
+    paletteHandle->notifyPaletteDirtyFlagChanged();
+  }
 
   return 0;
 }

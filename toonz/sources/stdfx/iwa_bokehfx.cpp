@@ -790,10 +790,8 @@ float Iwa_BokehFx::getBokehPixelAmount(const double frame,
   vect.x = m_bokehAmount->getValue(frame);
   vect.y = 0.0;
   /*--- Apply geometrical transformation ---*/
-  /* à»â∫ÇÕÅA
-  N:/admin/toonzsrc/m-inoue/tnz6100sp1_ino0011/ghibli/toonz/main/sources/stdfx/motionblurfx.cpp
-  586-592çsÇéQè∆ÇµÇƒèëÇ¢ÇΩ
-  */
+  // For the following lines I referred to lines 586-592 of
+  // sources/stdfx/motionblurfx.cpp
   TAffine aff(affine);
   aff.a13 = aff.a23 = 0; /* ignore translation */
   vect              = aff * vect;
@@ -852,8 +850,8 @@ void Iwa_BokehFx::convertIris(const float irisSize,
   double irisSizeResampleRatio = irisSize / irisOrgSize.x;
 
   // Create the raster for resized iris
-  double2 resizedIrisSize = {abs(irisSizeResampleRatio) * irisOrgSize.x,
-                             abs(irisSizeResampleRatio) * irisOrgSize.y};
+  double2 resizedIrisSize = {std::abs(irisSizeResampleRatio) * irisOrgSize.x,
+                             std::abs(irisSizeResampleRatio) * irisOrgSize.y};
   int2 filterSize = {tceil(resizedIrisSize.x), tceil(resizedIrisSize.y)};
   TPointD resizeOffset((double)filterSize.x - resizedIrisSize.x,
                        (double)filterSize.y - resizedIrisSize.y);

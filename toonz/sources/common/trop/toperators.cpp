@@ -1547,7 +1547,7 @@ void TRop::depremultiply(const TRasterP &ras) {
       upPix  = upRow;
       endPix = upPix + ras32->getLx();
       while (upPix < endPix) {
-        depremult(*upPix);
+        if (upPix->m != 0) depremult(*upPix);
         ++upPix;
       }
       upRow += ras32->getWrap();
@@ -1563,7 +1563,7 @@ void TRop::depremultiply(const TRasterP &ras) {
         upPix  = upRow;
         endPix = upPix + ras64->getLx();
         while (upPix < endPix) {
-          depremult(*upPix);
+          if (upPix->m != 0) depremult(*upPix);
           ++upPix;
         }
         upRow += ras64->getWrap();
@@ -1574,6 +1574,68 @@ void TRop::depremultiply(const TRasterP &ras) {
     }
   }
   ras->unlock();
+}
+
+//-----------------------------------------------------------------------------
+
+void TRop::expandColor(const TRaster32P &ras32, bool precise) {
+  struct locals {
+    static void copyRGB(TPixel32 *dst, TPixel32 *src) {
+      dst->r = src->r;
+      dst->g = src->g;
+      dst->b = src->b;
+    }
+  };  // locals
+  ras32->lock();
+  TPixel32 *endPix, *upPix = 0, *upRow = ras32->pixels();
+  TPixel32 *lastPix =
+      upRow + ras32->getWrap() * (ras32->getLy() - 1) + ras32->getLx();
+  int currentRow = 0;
+  while (upPix < lastPix) {
+    upPix  = upRow;
+    endPix = upPix + ras32->getLx();
+    while (upPix < endPix) {
+      if (upPix->m == 0) {
+        // search 4-neighbor pixels
+        // left
+        if (upPix != upRow && (upPix - 1)->m != 0)
+          locals::copyRGB(upPix, upPix - 1);
+        // right
+        else if (upPix != endPix - 1 && (upPix + 1)->m != 0)
+          locals::copyRGB(upPix, upPix + 1);
+        // up
+        else if (currentRow != 0 && (upPix - ras32->getWrap())->m != 0)
+          locals::copyRGB(upPix, upPix - ras32->getWrap());
+        // down
+        else if (currentRow != ras32->getLy() - 1 &&
+                 (upPix + ras32->getWrap())->m != 0)
+          locals::copyRGB(upPix, upPix + ras32->getWrap());
+        // search 8-neighbor pixels
+        else if (precise) {
+          // upper left
+          if (currentRow != 0 && upPix != upRow &&
+              (upPix - ras32->getWrap() - 1)->m != 0)
+            locals::copyRGB(upPix, upPix - ras32->getWrap() - 1);
+          // upper right
+          else if (currentRow != 0 && upPix != endPix - 1 &&
+                   (upPix - ras32->getWrap() + 1)->m != 0)
+            locals::copyRGB(upPix, upPix - ras32->getWrap() + 1);
+          // lower left
+          else if (currentRow != ras32->getLy() - 1 && upPix != upRow &&
+                   (upPix + ras32->getWrap() - 1)->m != 0)
+            locals::copyRGB(upPix, upPix + ras32->getWrap() - 1);
+          // lower right
+          else if (currentRow != ras32->getLy() - 1 && upPix != endPix - 1 &&
+                   (upPix + ras32->getWrap() + 1)->m != 0)
+            locals::copyRGB(upPix, upPix + ras32->getWrap() + 1);
+        }
+      }
+      ++upPix;
+    }
+    upRow += ras32->getWrap();
+    currentRow++;
+  }
+  ras32->unlock();
 }
 
 //-----------------------------------------------------------------------------

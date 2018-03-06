@@ -330,10 +330,18 @@ void KeyframeMoverTool::rectSelect(int row, int col) {
 //-----------------------------------------------------------------------------
 
 bool KeyframeMoverTool::canMove(const TPoint &pos) {
-  TXsheet *xsh = getViewer()->getXsheet();
-  if (pos.x < 0) return false;
+  const Orientation *o = getViewer()->orientation();
+  TXsheet *xsh         = getViewer()->getXsheet();
 
-  int col      = pos.x;
+  TPoint usePos = pos;
+  if (!o->isVerticalTimeline()) {
+    usePos.x = pos.y;
+    usePos.y = pos.x;
+  }
+
+  if (usePos.x < 0) return false;
+
+  int col      = usePos.x;
   int startCol = getViewer()->xyToPosition(m_startPos).layer();
   if (col != startCol) return false;
 

@@ -106,11 +106,12 @@ TLevelWriterSprite::~TLevelWriterSprite() {
     totalHorizPadding = horizDim * horizPadding;
     spriteSheetWidth  = horizDim * resizedWidth + totalHorizPadding;
     vertDim           = horizDim;
-    // Figure out if there is one row too many (Such as 6 images needs 3 x 2 grid)
+    // Figure out if there is one row too many
+    // (Such as 6 images needs 3 x 2 grid)
     if (vertDim * vertDim - vertDim >= m_imagesResized.size()) {
-      vertDim          = vertDim - 1;
+      vertDim = vertDim - 1;
     }
-    totalVertPadding = vertDim * vertPadding;
+    totalVertPadding  = vertDim * vertPadding;
     spriteSheetHeight = vertDim * resizedHeight + totalVertPadding;
   } else if (m_format == "Vertical") {
     spriteSheetWidth  = resizedWidth + horizPadding;
@@ -119,62 +120,70 @@ TLevelWriterSprite::~TLevelWriterSprite() {
   } else if (m_format == "Horizontal") {
     spriteSheetWidth  = m_imagesResized.size() * (resizedWidth + horizPadding);
     spriteSheetHeight = resizedHeight + vertPadding;
-    horizDim = m_imagesResized.size();
+    horizDim          = m_imagesResized.size();
+  } else if (m_format == "Individual") {
+    for (int i = 0; i < m_imagesResized.size(); i++) {
+      QString path      = m_path.getQString();
+      QString newEnding = "_" + QString::number(i) + ".png";
+      path              = path.replace(".spritesheet", newEnding);
+      m_imagesResized[i].save(path, "PNG", -1);
+    }
   }
-
-  QImage spriteSheet =
-      QImage(spriteSheetWidth, spriteSheetHeight, QImage::Format_ARGB32);
-  spriteSheet.fill(qRgba(0, 0, 0, 0));
-  QPainter painter;
-  painter.begin(&spriteSheet);
-  int row    = 0;
-  int column = 0;
-  int rowPadding;
-  int columnPadding;
-  int currentImage = 0;
-  while (row < vertDim) {
-    while (column < horizDim) {
-      rowPadding    = m_topPadding;
-      columnPadding = m_leftPadding;
-      rowPadding += row * vertPadding;
-      columnPadding += column * horizPadding;
-      painter.drawImage(column * resizedWidth + columnPadding,
-                        row * resizedHeight + rowPadding,
-                        m_imagesResized[currentImage]);
-      currentImage++;
-      column++;
+  if (m_format != "Individual") {
+    QImage spriteSheet = QImage(spriteSheetWidth, spriteSheetHeight,
+                                QImage::Format_ARGB32_Premultiplied);
+    spriteSheet.fill(qRgba(0, 0, 0, 0));
+    QPainter painter;
+    painter.begin(&spriteSheet);
+    int row    = 0;
+    int column = 0;
+    int rowPadding;
+    int columnPadding;
+    int currentImage = 0;
+    while (row < vertDim) {
+      while (column < horizDim) {
+        rowPadding    = m_topPadding;
+        columnPadding = m_leftPadding;
+        rowPadding += row * vertPadding;
+        columnPadding += column * horizPadding;
+        painter.drawImage(column * resizedWidth + columnPadding,
+                          row * resizedHeight + rowPadding,
+                          m_imagesResized[currentImage]);
+        currentImage++;
+        column++;
+        if (currentImage >= m_imagesResized.size()) break;
+      }
+      column = 0;
+      row++;
       if (currentImage >= m_imagesResized.size()) break;
     }
-    column = 0;
-    row++;
-    if (currentImage >= m_imagesResized.size()) break;
+    painter.end();
+    QString path = m_path.getQString();
+    path         = path.replace(".spritesheet", ".png");
+    spriteSheet.save(path, "PNG", -1);
+
+    path = path.replace(".png", ".txt");
+    QFile file(path);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << "Total Images: " << m_imagesResized.size() << "\n";
+    out << "Individual Image Width: " << resizedWidth << "\n";
+    out << "Individual Image Height: " << resizedHeight << "\n";
+    out << "Individual Image Width with Padding: "
+        << resizedWidth + horizPadding << "\n";
+    out << "Individual Image Height with Padding: "
+        << resizedHeight + vertPadding << "\n";
+    out << "Images Across: " << horizDim << "\n";
+    out << "Images Down : " << vertDim << "\n";
+    out << "Top Padding: " << m_topPadding << "\n";
+    out << "Bottom Padding: " << m_bottomPadding << "\n";
+    out << "Left Padding: " << m_leftPadding << "\n";
+    out << "Right Padding: " << m_rightPadding << "\n";
+    out << "Horizontal Space Between Images: " << horizPadding << "\n";
+    out << "Vertical Space Between Images: " << vertPadding << "\n";
+
+    file.close();
   }
-  painter.end();
-  QString path = m_path.getQString();
-  path         = path.replace(".spritesheet", ".png");
-  spriteSheet.save(path, "PNG", -1);
-
-  path = path.replace(".png", ".txt");
-  QFile file(path);
-  file.open(QIODevice::WriteOnly | QIODevice::Text);
-  QTextStream out(&file);
-  out << "Total Images: " << m_imagesResized.size() << "\n";
-  out << "Individual Image Width: " << resizedWidth << "\n";
-  out << "Individual Image Height: " << resizedHeight << "\n";
-  out << "Individual Image Width with Padding: " << resizedWidth + horizPadding
-      << "\n";
-  out << "Individual Image Height with Padding: " << resizedHeight + vertPadding
-      << "\n";
-  out << "Images Across: " << horizDim << "\n";
-  out << "Images Down : " << vertDim << "\n";
-  out << "Top Padding: " << m_topPadding << "\n";
-  out << "Bottom Padding: " << m_bottomPadding << "\n";
-  out << "Left Padding: " << m_leftPadding << "\n";
-  out << "Right Padding: " << m_rightPadding << "\n";
-  out << "Horizontal Space Between Images: " << horizPadding << "\n";
-  out << "Vertical Space Between Images: " << vertPadding << "\n";
-
-  file.close();
   m_imagesResized.clear();
 }
 
@@ -220,7 +229,8 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
   QByteArray ba                = m_intermediateFormat.toUpper().toLatin1();
   const char *format           = ba.data();
 
-  QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
+  QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly,
+                          QImage::Format_ARGB32_Premultiplied);
 
   int l = qi->width(), r = 0, t = qi->height(), b = 0;
   if (m_trim) {
@@ -260,7 +270,7 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
     if (t < m_top) m_top       = t;
     if (b > m_bottom) m_bottom = b;
   }
-  QImage *newQi = new QImage(m_lx, m_ly, QImage::Format_ARGB32);
+  QImage *newQi = new QImage(m_lx, m_ly, QImage::Format_ARGB32_Premultiplied);
   newQi->fill(qRgba(0, 0, 0, 0));
   QPainter painter(newQi);
   painter.drawImage(QPoint(0, 0), *qi);
@@ -288,6 +298,7 @@ Tiio::SpriteWriterProperties::SpriteWriterProperties()
   m_format.addValue(L"Grid");
   m_format.addValue(L"Vertical");
   m_format.addValue(L"Horizontal");
+  m_format.addValue(L"Individual");
   m_format.setValue(L"Grid");
   bind(m_format);
   bind(m_topPadding);

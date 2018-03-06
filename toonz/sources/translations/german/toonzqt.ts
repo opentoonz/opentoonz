@@ -2422,11 +2422,19 @@ anwenden</translation>
     </message>
     <message>
         <source>Infos</source>
-        <translation>Information</translation>
+        <translation type="vanished">Information</translation>
     </message>
     <message>
         <source> Clear </source>
         <translation>Leeren</translation>
+    </message>
+    <message>
+        <source>Display:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

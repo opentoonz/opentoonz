@@ -568,7 +568,7 @@ public:
 //-----------------------------------------------------------------------------
 
 class DragZTool final : public DragChannelTool {
-  TPoint m_lastPos;
+  TPointD m_lastPos;
   TTool::Viewer *m_viewer;
   double m_dz;
 

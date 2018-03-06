@@ -245,6 +245,15 @@ public:
   FunctionEditorToggle getFunctionEditorToggle() {
     return m_functionEditorToggle;
   }
+  
+  // color calibration using 3DLUT
+  void enableColorCalibration(bool on);
+  bool isColorCalibrationEnabled() const { return m_colorCalibrationEnabled; }
+  void setColorCalibrationLutPath(QString monitorName, QString path);
+  QMap<QString, QString> &getColorCalibrationLutPathMap() {
+    return m_colorCalibrationLutPaths;
+  }
+  QString getColorCalibrationLutPath(QString &monitorName) const;
 
   // Visualization  tab
 
@@ -665,6 +674,12 @@ private:
   FunctionEditorToggle m_functionEditorToggle;
 
   bool m_currentTimelineEnabled;
+
+  // color calibration using 3DLUT
+  bool m_colorCalibrationEnabled = false;
+  // map of [monitor name]-[path to the lut file].
+  // for now non-Windows accepts only one lut path for all kinds of monitors
+  QMap<QString, QString> m_colorCalibrationLutPaths;
 
 private:
   Preferences();

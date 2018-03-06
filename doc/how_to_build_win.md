@@ -71,8 +71,8 @@ Rename the following files:
 ### Setting Up the Program's Path
 1. Copy the entire contents of `$opentoonz/toonz/build/Release` to an appropriate folder.
 
-2. In the path for `OpenToonz_1.1.exe`, append the Qt program `windeployqt.exe` as an argument.
-  - The necessary Qt library files should be in the same folder as `OpenToonz_1.1.exe`
+2. In the path for `OpenToonz_1.2.exe`, append the Qt program `windeployqt.exe` as an argument.
+  - The necessary Qt library files should be in the same folder as `OpenToonz_1.2.exe`
   - These include:
     - `Qt5Core.dll`
     - `Qt5Gui.dll`
@@ -83,7 +83,7 @@ Rename the following files:
     - `Qt5Svg.dll`
     - `Qt5Widgets.dll`
     - `Qt5Multimedia.dll`
-  - These files should be in the corresponding folders in the same folder `OpenToonz_1.1.exe`
+  - These files should be in the corresponding folders in the same folder `OpenToonz_1.2.exe`
     - `/bearer/qgenericbearer.dll`
     - `/bearer/qnativewifibearer.dll`
     - `/iconengines/qsvgicon.dll`
@@ -99,11 +99,11 @@ Rename the following files:
     - `/imageformats/qwebp.dll`
     - `/platforms/qwindows.dll`
 
-3. Copy the following files to the same folder as `OpenToonz_1.1.exe`
+3. Copy the following files to the same folder as `OpenToonz_1.2.exe`
   - `$opentoonz/thirdparty/glut/3.7.6/lib/glut64.dll`
   - `$opentoonz/thirdparty/glew/glew-1.9.0/bin/64bit/glew32.dll`
 
-4. Copy the `srv` folder from the previous OpenToonz installation to the same folder as `OpenToonz_1.1.exe`
+4. Copy the `srv` folder from the previous OpenToonz installation to the same folder as `OpenToonz_1.2.exe`
   - If there is no `srv` folder, OpenToonz can still be used.  However, various file formats such as `mov` cannot be used.
   - Creating the files for `srv` is discussed later.
 
@@ -114,10 +114,10 @@ If a previous binary of OpenToonz was already installed, this step and the follo
 
 ### Creating Registry Keys
 1. Using the registry editor, create the following key and copy the path of the `$opentoonz/stuff` folder from above to it.
-  - HKEY_LOCAL_MACHINE\SOFTWARE\OpenToonz\OpenToonz\1.1\TOONZROOT
+  - HKEY_LOCAL_MACHINE\SOFTWARE\OpenToonz\OpenToonz\1.2\TOONZROOT
 
 ### Running
-`OpenToonz_1.1.exe` can now be run.  Congratulations!
+`OpenToonz_1.2.exe` can now be run.  Congratulations!
 
 ## Creating the Files for the `srv` Folder
 OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since the QuickTime SDK only comes in 32-bit versions, the 32-bit file `t32bitsrv.exe` from the QuickTime SDK is used in both the 64-bit and 32-bit versions of OpenToonz.  As a result, the following instructions apply to both the 32 and 64-bit versions of OpenToonz.
