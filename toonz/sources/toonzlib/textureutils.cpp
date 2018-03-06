@@ -100,7 +100,7 @@ TRasterImageP getTexture(const TXshSimpleLevel *sl, const TFrameId &fid,
   TRasterImageP ri(ImageManager::instance()->getImage(
       id, ImageManager::dontPutInCache, &extData));
 
-  return ri;
+  return convert32(ri);
 }
 
 }  // namespace
@@ -191,8 +191,10 @@ DrawableTextureDataP texture_utils::getTextureData(const TXsheet *xsh,
       xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), frame);
   bbox = (cameraAff.inv() * bbox).enlarge(1.0);
 
-  // Render the xsheet on the specified bbox
-
+// Render the xsheet on the specified bbox
+#ifdef MACOSX
+  xsh->getScene()->renderFrame(tex, frame, xsh, bbox, TAffine());
+#else
   // The call below will change context (I know, it's a shame :( )
   TGlContext currentContext = tglGetCurrentContext();
   {
@@ -200,6 +202,7 @@ DrawableTextureDataP texture_utils::getTextureData(const TXsheet *xsh,
     xsh->getScene()->renderFrame(tex, frame, xsh, bbox, TAffine());
     tglMakeCurrent(currentContext);
   }
+#endif
 
   TRop::depremultiply(tex);  // Stored textures are rendered nonpremultiplied
 

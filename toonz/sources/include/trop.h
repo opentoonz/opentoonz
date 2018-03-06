@@ -291,6 +291,14 @@ DVAPI void premultiply(const TRasterP &ras);
 //! Make a depremultiply of all raster pixels
 DVAPI void depremultiply(const TRasterP &ras);
 
+// called from meshtexturizer in order to remove unwanted black contour
+// appears at the border of the plastic-deformed texture.
+// this function will "expand" color channels of the border pixels to
+// neighbor full-transparent pixels.
+// by doing this the linear interpolation at the border pixels will not
+// decay color info and can get ideal antialiased result
+DVAPI void expandColor(const TRaster32P &ras32, bool precise);
+
 //! all white pixels are set to transparent
 DVAPI void whiteTransp(const TRasterP &ras);
 

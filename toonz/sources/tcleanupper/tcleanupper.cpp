@@ -63,8 +63,8 @@ inline ostream &operator<<(ostream &out, const TFilePath &fp) {
 namespace {
 
 const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.1";
-const char *applicationFullName = "OpenToonz 1.1";
+const char *applicationVersion  = "1.2";
+const char *applicationFullName = "OpenToonz 1.2";
 const char *rootVarName         = "TOONZROOT";
 const char *systemVarPrefix     = "TOONZ";
 

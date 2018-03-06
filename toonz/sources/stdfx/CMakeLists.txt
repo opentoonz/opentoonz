@@ -255,6 +255,7 @@ set(SOURCES
 	iwa_bokehfx.cpp
 	iwa_timecodefx.cpp
 	iwa_bokehreffx.cpp
+	iwa_barreldistortfx.cpp
 )
 
 set(OBJCSOURCES

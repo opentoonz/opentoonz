@@ -749,9 +749,12 @@ void RasterPainter::onImage(const Stage::Player &player) {
   // QOffscreenSurface is created outside the gui thread.
   // As a quick workaround, ignore the deformation if this is called from
   // non-gui thread (i.e. icon generator thread)
+  // 12/1/2018 Now the scene icon is rendered without deformation either
+  // since it causes unknown error with opengl contexts..
   TStageObject *obj =
       ::plasticDeformedObj(player, m_vs.m_plasticVisualSettings);
-  if (obj && QThread::currentThread() == qGuiApp->thread()) {
+  if (obj && QThread::currentThread() == qGuiApp->thread() &&
+      !m_vs.m_forSceneIcon) {
     flushRasterImages();
     ::onPlasticDeformedImage(obj, player, m_vs, m_viewAff);
   } else {
@@ -1540,6 +1543,7 @@ void onPlasticDeformedImage(TStageObject *playerObj,
 
   glDisable(GL_LINE_SMOOTH);
   glDisable(GL_BLEND);
+  assert(glGetError() == GL_NO_ERROR);
 }
 
 }  // namespace

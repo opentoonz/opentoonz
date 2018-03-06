@@ -429,9 +429,10 @@ public:
     // Modal dialogs seem to be preventing the execution of
     // Qt::BlockingQueuedConnections on MAC...!
     setModal(false);
+#else
+    setWindowModality(Qt::ApplicationModal);
 #endif
-    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint |
-                   Qt::WindowStaysOnTopHint);
+    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     m_progressBarString =
         QString::number(steps) + ((isPreview) ? "" : " of " + toQString(path));
     // setMinimumDuration (0);
@@ -566,8 +567,7 @@ void RenderCommand::rasterRender(bool isPreview) {
   QProgressBar *buildSceneProgressBar =
       new QProgressBar(TApp::instance()->getMainWindow());
   buildSceneProgressBar->setAttribute(Qt::WA_DeleteOnClose);
-  buildSceneProgressBar->setWindowFlags(Qt::SubWindow | Qt::Dialog |
-                                        Qt::WindowStaysOnTopHint);
+  buildSceneProgressBar->setWindowFlags(Qt::SubWindow | Qt::Dialog);
   buildSceneProgressBar->setMinimum(0);
   buildSceneProgressBar->setMaximum(m_numFrames - 1);
   buildSceneProgressBar->setValue(0);
@@ -675,9 +675,10 @@ public:
     // Modal dialogs seem to be preventing the execution of
     // Qt::BlockingQueuedConnections on MAC...!
     setModal(false);
+#else
+    setWindowModality(Qt::ApplicationModal);
 #endif
-    setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint |
-                   Qt::WindowStaysOnTopHint);
+    setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     m_progressBarString = QString::number(m_renderer->getFrameCount()) +
                           " of " + toQString(m_renderer->getFilePath());
     show();

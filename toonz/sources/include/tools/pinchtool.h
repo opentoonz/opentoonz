@@ -86,7 +86,7 @@ public:
 
   bool moveCursor(const TPointD &pos);
 
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos);
+  bool keyDown(QKeyEvent *) override;
 
   void onActivate();
   void onDeactivate();

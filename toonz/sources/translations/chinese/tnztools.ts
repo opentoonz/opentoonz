@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Position</source>
-        <translation>位置</translation>
+        <translation type="vanished">位置</translation>
     </message>
     <message>
         <source>E/W:</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Rotation</source>
-        <translation>旋转</translation>
+        <translation type="vanished">旋转</translation>
     </message>
     <message>
         <source>Scale</source>
@@ -57,11 +57,11 @@
     </message>
     <message>
         <source>Center</source>
-        <translation>中心点</translation>
+        <translation type="vanished">中心点</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation>锁定</translation>
+        <translation type="vanished">锁定</translation>
     </message>
     <message>
         <source>(</source>
@@ -75,12 +75,20 @@
         <source>Center Position</source>
         <translation>中心位置</translation>
     </message>
+    <message>
+        <source>Position:</source>
+        <translation>位置:</translation>
+    </message>
+    <message>
+        <source>Rotation:</source>
+        <translation>旋转:</translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
     <message>
         <source>Thickness</source>
-        <translation>粗细</translation>
+        <translation type="vanished">粗细</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -100,15 +108,15 @@
     </message>
     <message>
         <source>Break Sharp Angles</source>
-        <translation>断开尖角</translation>
+        <translation type="vanished">断开尖角</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>铅笔模式</translation>
+        <translation type="vanished">铅笔模式</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>压力灵敏度</translation>
+        <translation type="vanished">压力灵敏度</translation>
     </message>
     <message>
         <source>Cap</source>
@@ -342,31 +350,35 @@
     </message>
     <message>
         <source>Lines</source>
-        <translation>线</translation>
+        <translation type="vanished">线</translation>
     </message>
     <message>
         <source>Areas</source>
-        <translation>区域</translation>
+        <translation type="vanished">区域</translation>
     </message>
     <message>
         <source>Lines &amp;&amp; Areas</source>
-        <translation>线和区域</translation>
+        <translation type="vanished">线和区域</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation>正常</translation>
+        <translation type="vanished">正常</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation>矩形</translation>
+        <translation type="vanished">矩形</translation>
     </message>
     <message>
         <source>Freehand</source>
-        <translation>手绘</translation>
+        <translation type="vanished">手绘</translation>
     </message>
     <message>
         <source>Polyline</source>
-        <translation>多边形</translation>
+        <translation type="vanished">多边形</translation>
+    </message>
+    <message>
+        <source>Autopaint Lines</source>
+        <translation>自动填充线</translation>
     </message>
 </context>
 <context>
@@ -384,15 +396,15 @@
     <name>FullColorBrushTool</name>
     <message>
         <source>Thickness</source>
-        <translation>粗细</translation>
+        <translation type="vanished">粗细</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>压力灵敏度</translation>
+        <translation type="vanished">压力灵敏度</translation>
     </message>
     <message>
         <source>Opacity:</source>
-        <translation>不透明度:</translation>
+        <translation type="vanished">不透明度:</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -413,6 +425,14 @@
     <message>
         <source>Opacity</source>
         <translation>不透明度</translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation>橡皮差</translation>
+    </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation>锁定透明度</translation>
     </message>
 </context>
 <context>
@@ -750,7 +770,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation>当前列在摄影机位中不可见。</translation>
+        <translation type="vanished">当前列在摄影机位中不可见。</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>
@@ -838,7 +858,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Modify Fx Gadget  </source>
-        <translation>修改特效小工具</translation>
+        <translation>修改特效小工具  </translation>
     </message>
     <message>
         <source>%1   Level : %2  Frame : %3</source>

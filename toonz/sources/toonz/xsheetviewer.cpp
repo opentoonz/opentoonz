@@ -376,6 +376,7 @@ void XsheetViewer::onOrientationChanged(const Orientation *newOrientation) {
 }
 
 void XsheetViewer::positionSections() {
+  if (!isVisible()) return;
   const Orientation *o = orientation();
   QRect size           = QRect(QPoint(0, 0), geometry().size());
   NumberRange allLayer = o->layerSide(size);
@@ -675,9 +676,9 @@ bool XsheetViewer::refreshContentSize(int dx, int dy) {
     contentSize = positionToXY(CellPosition(frameCount + 1, 0));
 
     ColumnFan *fan = xsh->getColumnFan(m_orientation);
-    contentSize.setY(contentSize.y() + (fan->isActive(0)
-                                            ? m_orientation->cellHeight()
-                                            : m_orientation->foldedCellSize()));
+    contentSize.setY(contentSize.y() + 1 +
+                     (fan->isActive(0) ? m_orientation->cellHeight()
+                                       : m_orientation->foldedCellSize()));
   }
 
   QSize actualSize(contentSize.x(), contentSize.y());
@@ -726,9 +727,9 @@ void XsheetViewer::updateAreeSize() {
       areaFilled = positionToXY(CellPosition(xsh->getFrameCount() + 1, 0));
 
       ColumnFan *fan = xsh->getColumnFan(m_orientation);
-      areaFilled.setY(areaFilled.y() + (fan->isActive(0)
-                                            ? o->cellHeight()
-                                            : o->foldedCellSize()));
+      areaFilled.setY(areaFilled.y() + 1 + (fan->isActive(0)
+                                                ? o->cellHeight()
+                                                : o->foldedCellSize()));
     }
   }
   if (viewArea.right() < areaFilled.x()) viewArea.setRight(areaFilled.x());
@@ -757,8 +758,9 @@ int XsheetViewer::colToTimelineLayerAxis(int layer) const {
   int yBottom = o->colToLayerAxis(layer, fan) +
                 (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize()) -
                 1;
-  int columnCount       = qMax(1, xsh->getColumnCount());
-  int layerHeightActual = o->colToLayerAxis(columnCount, fan) - 1;
+  int columnCount = qMax(1, xsh->getColumnCount());
+  int layerHeightActual =
+      m_columnArea->height() - 2;  // o->colToLayerAxis(columnCount, fan) - 1;
 
   return layerHeightActual - yBottom;
 }

@@ -498,7 +498,7 @@ void TTool::invalidate(const TRectD &rect) {
 
 //-----------------------------------------------------------------------------
 
-int TTool::pick(const TPoint &p) {
+int TTool::pick(const TPointD &p) {
   if (!m_viewer) return 0;
 
   m_picking = true;
@@ -802,13 +802,18 @@ QString TTool::updateEnabled() {
     if (column->isLocked())
       return (enable(false), QObject::tr("The current column is locked."));
 
+    else if (!column->isCamstandVisible())
+      return (enable(false), QObject::tr("The current column is hidden."));
+
     else if (column->getSoundColumn())
       return (enable(false),
               QObject::tr("It is not possible to edit the audio column."));
 
     else if (column->getSoundTextColumn())
-      return (enable(false),
-              QObject::tr("It is not possible to edit the Magpie column."));
+      return (
+          enable(false),
+          QObject::tr(
+              "Note columns can only be edited in the xsheet or timeline."));
 
     if (toolType == TTool::ColumnTool) {
       // Check column target

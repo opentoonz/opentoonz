@@ -1762,6 +1762,25 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   }
   if (!TSystem::doesExistFileOrLevel(scenePath)) return false;
 
+  TFilePath scenePathTemp(scenePath.getWideString() +
+                          QString(".tmp").toStdWString());
+  if (TSystem::doesExistFileOrLevel(scenePathTemp)) {
+    QString question =
+        QObject::tr(
+            "A prior save of Scene '%1' was critically interupted. \n\
+\nA partial save file was generated and changes may be manually salvaged from '%2'.\n\
+\nDo you wish to continue loading the last good save or stop and try to salvage the prior save?")
+            .arg(QString::fromStdWString(scenePath.getWideString()))
+            .arg(QString::fromStdWString(scenePathTemp.getWideString()));
+    QString continueAnswer = QObject::tr("Continue");
+    QString cancelAnswer   = QObject::tr("Cancel");
+    int ret = DVGui::MsgBox(question, continueAnswer, cancelAnswer, 0);
+    if (ret == 2)
+      return false;
+    else
+      TSystem::removeFileOrLevel(scenePathTemp);
+  }
+
   TProjectManager *pm    = TProjectManager::instance();
   TProjectP sceneProject = pm->loadSceneProject(scenePath);
   if (!sceneProject) {

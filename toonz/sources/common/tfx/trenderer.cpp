@@ -36,6 +36,12 @@
 #include <queue>
 #include <functional>
 
+#include <QOffscreenSurface>
+#include <QSurfaceFormat>
+#include <QOpenGLContext>
+#include <QThread>
+#include <QGuiApplication>
+
 using namespace TThread;
 
 std::vector<const TFx *> calculateSortedFxs(TRasterFxP rootFx);
@@ -1410,6 +1416,16 @@ void TRendererImp::startRendering(
     if (renderData.m_fxRoot.m_frameB)
       alias = alias +
               renderData.m_fxRoot.m_frameB->getAlias(frame, renderData.m_info);
+
+    // If the render contains offscreen render, then prepare the
+    // QOffscreenSurface
+    // in main (GUI) thread. For now it is used only in the plasticDeformerFx.
+    if (alias.find("plasticDeformerFx") != std::string::npos &&
+        QThread::currentThread() == qGuiApp->thread()) {
+      rs.m_offScreenSurface.reset(new QOffscreenSurface());
+      rs.m_offScreenSurface->setFormat(QSurfaceFormat::defaultFormat());
+      rs.m_offScreenSurface->create();
+    }
 
     // Search the alias among stored clusters - and store the frame
     jt = clusters.find(alias);

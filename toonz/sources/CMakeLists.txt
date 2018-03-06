@@ -442,7 +442,8 @@ elseif(BUILD_ENV_UNIXLIKE)
         pkg_check_modules(FREETYPE REQUIRED freetype2)
         pkg_check_modules(SDL_LIB REQUIRED sdl2)
     endif()
-    pkg_check_modules(MYPAINT_LIB REQUIRED libmypaint)
+    # Can be 'libmypaint' or 'libmypaint-1.x'
+    pkg_search_module(MYPAINT_LIB REQUIRED libmypaint libmypaint-1.3>=1.3)
 endif()
 
 
@@ -540,7 +541,7 @@ if(BUILD_ENV_MSVC AND MSVC_VERSION EQUAL 1800)
 endif()
 
 # generate Qt translations and messages
-set(LANGUAGES japanese italian french spanish chinese german russian)
+set(LANGUAGES japanese italian french spanish chinese german russian korean)
 
 function(add_translation module)
     set(translation)
@@ -598,5 +599,5 @@ if(BUILD_ENV_APPLE)
         $<TARGET_FILE:executable>
     )
     # add capability for retina displays
-    set_target_properties(OpenToonz_1.1 PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
+    set_target_properties(OpenToonz_1.2 PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
 endif()

@@ -3,9 +3,6 @@
 #ifndef IMAGEVIEWER_INCLUDE
 #define IMAGEVIEWER_INCLUDE
 
-// iwsw commented out temporarily
-//#include "toonzqt/ghibli_3dlut_util.h"
-
 #include "toonz/imagepainter.h"
 #include "toonzqt/glwidget_for_highdpi.h"
 
@@ -14,6 +11,7 @@
 //  Forward declarations
 class FlipBook;
 class HistogramPopup;
+class QOpenGLFramebufferObject;
 
 //-----------------------------------------------------------------------------
 
@@ -57,8 +55,8 @@ class ImageViewer final : public GLWidgetForHighDpi {
   // a flipbook shows a red border line before the rendered result is shown.
   bool m_isRemakingPreviewFx;
 
-  // iwsw commented out temporarily
-  // Ghibli3DLutUtil * m_ghibli3DLutUtil;
+  // used for color calibration with 3DLUT
+  QOpenGLFramebufferObject *m_fbo = NULL;
 
   int getDragType(const TPoint &pos, const TRect &loadBox);
   void updateLoadbox(const TPoint &curPos);
@@ -108,9 +106,6 @@ public:
 
   void doSwapBuffers();
   void changeSwapBehavior(bool enable);
-
-  // iwsw commented out temporarily
-  // Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
 
 protected:
   void contextMenuEvent(QContextMenuEvent *event) override;

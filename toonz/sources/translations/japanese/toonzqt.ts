@@ -2217,7 +2217,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Plain</source>
-        <translation>標準</translation>
+        <translation type="vanished">標準</translation>
     </message>
     <message>
         <source>Texture</source>
@@ -2225,11 +2225,11 @@ Are you sure?</source>
     </message>
     <message>
         <source>Special</source>
-        <translation>特殊</translation>
+        <translation type="vanished">特殊</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation>カスタム</translation>
+        <translation type="vanished">カスタム</translation>
     </message>
     <message>
         <source>Vector Brush</source>
@@ -2247,7 +2247,7 @@ Apply</source>
     </message>
     <message>
         <source>MyPaint Brush</source>
-        <translation>MyPaint ブラシ</translation>
+        <translation type="vanished">MyPaint ブラシ</translation>
     </message>
     <message>
         <source>- Style not Selected -</source>
@@ -2268,6 +2268,26 @@ Apply</source>
     <message>
         <source>- Style is Not Valid -</source>
         <translation>- スタイルが無効です -</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>自動生成</translation>
+    </message>
+    <message>
+        <source>Trail</source>
+        <translation>スタンプ</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>色</translation>
+    </message>
+    <message>
+        <source>Vector</source>
+        <translation>ベクター</translation>
+    </message>
+    <message>
+        <source>Raster</source>
+        <translation>ラスター</translation>
     </message>
 </context>
 <context>
@@ -2328,7 +2348,7 @@ Apply</source>
     <name>StyleEditorGUI::SettingsPage</name>
     <message>
         <source>Autopaint for Lines</source>
-        <translation>色トレース線として、自動塗りつぶし</translation>
+        <translation>色トレース線として、含め塗りを行う</translation>
     </message>
     <message>
         <source>Reset to default</source>
@@ -2382,11 +2402,19 @@ Apply</source>
     </message>
     <message>
         <source>Infos</source>
-        <translation>情報</translation>
+        <translation type="vanished">情報</translation>
     </message>
     <message>
         <source> Clear </source>
         <translation>クリア</translation>
+    </message>
+    <message>
+        <source>Display:  </source>
+        <translation>表示：</translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation>情報</translation>
     </message>
 </context>
 <context>

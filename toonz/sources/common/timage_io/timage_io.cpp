@@ -631,6 +631,7 @@ void TImageWriter::save(const TImageP &img) {
     writer->open(file, info);
 
     ras->lock();
+
     if (writer->getRowOrder() == Tiio::BOTTOM2TOP) {
       if (bpp == 1 || bpp == 8 || bpp == 24 || bpp == 32 || bpp == 16)
         for (int i = 0; i < ras->getLy(); i++)

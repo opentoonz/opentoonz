@@ -619,6 +619,8 @@ public:
 
     if (!m_selected) {
       changeDrawing(-m_direction, m_row, m_col);
+      TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
       return;
     }
     int col, row;
@@ -637,8 +639,6 @@ public:
         }
         if (found) {
           r++;
-          TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-          TApp::instance()->getCurrentScene()->setDirtyFlag(true);
           continue;
         }
         changeDrawing(-m_direction, row, col);
@@ -647,11 +647,15 @@ public:
       r = m_range.m_r0;
       c++;
     }
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
   void redo() const override {
     if (!m_selected) {
       changeDrawing(m_direction, m_row, m_col);
+      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      TApp::instance()->getCurrentScene()->setDirtyFlag(true);
       return;
     }
 
@@ -668,6 +672,8 @@ public:
       r = m_range.m_r0;
       c++;
     }
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
   int getSize() const override { return sizeof(*this); }
@@ -742,6 +748,8 @@ public:
       DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row + n, m_col);
       n++;
     }
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
   void redo() const override {
@@ -751,6 +759,8 @@ public:
       DrawingSubtitutionUndo::changeDrawing(m_direction, m_row + n, m_col);
       n++;
     }
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
   int getSize() const override { return sizeof(*this); }
@@ -852,9 +862,6 @@ void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col,
   xsh->setCell(row, col, cell);
   TStageObject *pegbar = xsh->getStageObject(TStageObjectId::ColumnId(col));
   pegbar->setOffset(pegbar->getOffset());
-
-  app->getCurrentXsheet()->notifyXsheetChanged();
-  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 }
 
 //-----------------------------------------------------------------------------

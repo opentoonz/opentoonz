@@ -37,7 +37,7 @@ typedef QualifierT<TFilePath> FilePathQualifier;
 
 #define RENDER_LICENSE_NOT_FOUND 888
 
-const char *applicationVersion = "1.1";
+const char *applicationVersion = "1.2";
 const char *applicationName    = "OpenToonz";
 const char *rootVarName        = "TOONZROOT";
 const char *systemVarPrefix    = "TOONZ";

@@ -435,7 +435,7 @@ public:
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDoubleClick(const TPointD &,
                              const TMouseEvent &e) override = 0;
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos) override;
+  bool keyDown(QKeyEvent *) override;
 
   int getCursorId() const override;
 

@@ -1934,7 +1934,7 @@ public:
     m_levels = levels;
   }
 
-  TRect getLevelFrameRect() {
+  TRect getLevelFrameRect(bool isVertical) {
     if (!m_paths.empty()) return TRect();
     int maxRow      = 0;
     int columnCount = m_levels.size();
@@ -1944,6 +1944,8 @@ public:
       int size                   = fids.size();
       if (maxRow < size) maxRow  = size;
     }
+    if (!isVertical) return TRect(0, 0, maxRow - 1, columnCount - 1);
+
     return TRect(0, 0, columnCount - 1, maxRow - 1);
   }
 
@@ -1968,7 +1970,8 @@ protected:
     int c        = col;
     int r        = row;
     TXsheet *xsh = getViewer()->getXsheet();
-    TRect rect   = m_data->getLevelFrameRect();
+    TRect rect   = m_data->getLevelFrameRect(
+        getViewer()->orientation()->isVerticalTimeline());
     for (c = col; c < rect.getLx() + col; c++) {
       for (r = row; r < rect.getLy() + row; r++)
         if (!xsh->getCell(r, c).isEmpty()) return false;
@@ -2068,8 +2071,14 @@ public:
     const Orientation *o           = getViewer()->orientation();
     CellPosition beginDragPosition = getViewer()->xyToPosition(m_curPos);
     TPoint pos(beginDragPosition.layer(),
-               beginDragPosition.frame());     // row and cell coordinates
-    TRect rect = m_data->getLevelFrameRect();  // row and cell coordinates
+               beginDragPosition.frame());  // row and cell coordinates
+    bool isVertical = getViewer()->orientation()->isVerticalTimeline();
+    if (!isVertical) {
+      pos.x = beginDragPosition.frame();
+      pos.y = beginDragPosition.layer();
+    }
+    TRect rect =
+        m_data->getLevelFrameRect(isVertical);  // row and cell coordinates
     if (rect.isEmpty()) return;
     rect += pos;
     if (rect.x1 < 0 || rect.y1 < 0) return;

@@ -13,6 +13,8 @@
 #include "toonz/tframehandle.h"
 #include "toonz/txshsimplelevel.h"
 
+#include <QKeyEvent>
+
 class Deformation {
 public:
   std::vector<TPointD> m_controlPoints;
@@ -221,8 +223,8 @@ glEnd();
 */
 }
 
-bool MorphTool::keyDown(int key, TUINT32 flags, const TPoint &pos) {
-  if (key == 'A')
+bool MorphTool::keyDown(QKeyEvent *event) {
+  if (event->key() == Qt::Key_A)
     deformation.updateLevel();
   else
     return false;

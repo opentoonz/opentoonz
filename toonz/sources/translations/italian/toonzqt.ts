@@ -29,6 +29,29 @@
     </message>
 </context>
 <context>
+    <name>AddWordButton</name>
+    <message>
+        <source>Character</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Part</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Suffix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add New Word for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AdjustPaletteDialog</name>
     <message>
         <source>Adjust Current Level to This Palette</source>
@@ -208,6 +231,14 @@ E&apos; possibile che il file sia corrotto.</translation>
         <source>Resulting Level Info</source>
         <translation type="vanished">Informazioni sul Livello</translation>
     </message>
+    <message>
+        <source>N/S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E/W</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ColumnPainter</name>
@@ -322,7 +353,11 @@ E&apos; possibile che il file sia corrotto.</translation>
     <name>DVGui::RadioButtonDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="unfinished">Toonz</translation>
+        <translation type="obsolete">Toonz</translation>
+    </message>
+    <message>
+        <source>OpenToonz</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -383,6 +418,17 @@ E&apos; possibile che il file sia corrotto.</translation>
     <message>
         <source>Ease Out:</source>
         <translation>Ease Out:</translation>
+    </message>
+</context>
+<context>
+    <name>EasyInputArea</name>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Attenzione</translation>
+    </message>
+    <message>
+        <source>%1 is already registered</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -817,6 +863,18 @@ E&apos; possibile che il file sia corrotto.</translation>
         <source>????</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>From</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Step</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FunctionSelection</name>
@@ -892,7 +950,11 @@ E&apos; possibile che il file sia corrotto.</translation>
     </message>
     <message>
         <source>&amp;Function Editor Toggle</source>
-        <translation>&amp;Editor delle Funzioni</translation>
+        <translation type="vanished">&amp;Editor delle Funzioni</translation>
+    </message>
+    <message>
+        <source>&amp;Open Function Curve Editor</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -958,6 +1020,10 @@ E&apos; possibile che il file sia corrotto.</translation>
     <message>
         <source>&amp;Activate</source>
         <translation>&amp;Attiva</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1118,6 +1184,10 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
         <source>&amp;Preview</source>
         <translation>&amp;Anteprima</translation>
     </message>
+    <message>
+        <source>XSheet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GroupPainter</name>
@@ -1160,6 +1230,28 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
         <translation type="vanished">Il nome di un file non può contenere i seguenti caratteri: /\:*?&quot;|.</translation>
+    </message>
+</context>
+<context>
+    <name>MyPaintBrushStyleChooserPage</name>
+    <message>
+        <source>Plain color</source>
+        <translation type="unfinished">Colore Piatto</translation>
+    </message>
+</context>
+<context>
+    <name>NewWordDialog</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annulla</translation>
+    </message>
+    <message>
+        <source>Enter new word</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2097,7 +2189,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Plain</source>
-        <translation>Piatto</translation>
+        <translation type="vanished">Piatto</translation>
     </message>
     <message>
         <source>Texture</source>
@@ -2105,11 +2197,11 @@ Are you sure?</source>
     </message>
     <message>
         <source>Special</source>
-        <translation>Speciale</translation>
+        <translation type="vanished">Speciale</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation>Personalizzato</translation>
+        <translation type="vanished">Personalizzato</translation>
     </message>
     <message>
         <source>Vector Brush</source>
@@ -2124,6 +2216,77 @@ Are you sure?</source>
 Apply</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Generated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Raster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>- Style not Selected -</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[CLEANUP]  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[STUDIO]  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[LEVEL]  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>- Style is Not Valid -</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StyleEditorGUI::ColorChannelControl</name>
+    <message>
+        <source>R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>G</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>H</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>V</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StyleEditorGUI::PlainColorPage</name>
@@ -2136,11 +2299,11 @@ Apply</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Matte</source>
+        <source>RGB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>RGB</source>
+        <source>Alpha</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2149,6 +2312,10 @@ Apply</source>
     <message>
         <source>Autopaint for Lines</source>
         <translation>Colorazione Automatica per le Linee</translation>
+    </message>
+    <message>
+        <source>Reset to default</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2167,7 +2334,7 @@ Apply</source>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">Applica</translation>
+        <translation type="obsolete">Applica</translation>
     </message>
     <message>
         <source>Style Name</source>
@@ -2175,6 +2342,14 @@ Apply</source>
     </message>
     <message>
         <source>Name Editor: # %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply and Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Easy Inputs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2190,11 +2365,19 @@ Apply</source>
     </message>
     <message>
         <source>Infos</source>
-        <translation>Informazioni</translation>
+        <translation type="vanished">Informazioni</translation>
     </message>
     <message>
         <source> Clear </source>
         <translation>Pulire</translation>
+    </message>
+    <message>
+        <source>Display:  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2202,6 +2385,10 @@ Apply</source>
     <message>
         <source>&amp;Reset Center</source>
         <translation>&amp;Ripristina il centro</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2216,6 +2403,13 @@ Apply</source>
     <message>
         <source>Plain color</source>
         <translation>Colore Piatto</translation>
+    </message>
+</context>
+<context>
+    <name>WordButton</name>
+    <message>
+        <source>Remove %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
