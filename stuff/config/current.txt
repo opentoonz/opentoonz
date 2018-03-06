@@ -1244,6 +1244,17 @@
   <item>"STD_iwa_TimeCodeFx.showBox"	"Show Box"</item>
   <item>"STD_iwa_TimeCodeFx.boxColor"	"Box Color"</item>
 
+  <item>"STD_iwa_BarrelDistortFx"	"Barrel Distort Iwa"</item>
+  <item>"STD_iwa_BarrelDistortFx.center" "Center"</item>
+  <item>"STD_iwa_BarrelDistortFx.distortion" "Distortion"</item>
+  <item>"STD_iwa_BarrelDistortFx.distortionAspect" "Distortion Aspect Ratio"</item>
+  <item>"STD_iwa_BarrelDistortFx.precision" "Source Precision"</item>
+  <item>"STD_iwa_BarrelDistortFx.chromaticAberration" "Chromatic Aberration"</item>
+  <item>"STD_iwa_BarrelDistortFx.vignetteAmount" "Vignetting Amount"</item>
+  <item>"STD_iwa_BarrelDistortFx.vignetteGamma" "Vignetting Gamma"</item>
+  <item>"STD_iwa_BarrelDistortFx.vignetteMidpoint" "Vignetting Midpoint"</item>
+  <item>"STD_iwa_BarrelDistortFx.scale" "Scale"</item>
+
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>

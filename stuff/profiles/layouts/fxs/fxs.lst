@@ -33,6 +33,7 @@
     STD_rippleFx
     STD_warpFx
     STD_inoWarphvFx
+    STD_iwa_BarrelDistortFx
   </Distort>
   <Gradient>
     STD_diamondGradientFx

@@ -10,8 +10,7 @@
 #include <QString>
 
 #include "toonz/preferences.h"
-// iwsw commented out temporarily
-//#include "toonzqt/ghibli_3dlut_converter.h"
+#include "toonzqt/lutcalibrator.h"
 #include <QPushButton>
 #include <QDialog>
 
@@ -323,17 +322,12 @@ void ComboHistoRGBLabel::paintEvent(QPaintEvent *pe) {
     return;
   }
 
-  // iwsw commented out temporarily
-  /*
-  if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
-  {
-          QColor convertedColor(m_color);
-          Ghibli3DLutConverter::instance()->convert(convertedColor);
-          p.setBrush(convertedColor);
-  }
-  else
-  */
-  p.setBrush(m_color);
+  if (LutCalibrator::instance()->isValid()) {
+    QColor convertedColor(m_color);
+    LutCalibrator::instance()->convert(convertedColor);
+    p.setBrush(convertedColor);
+  } else
+    p.setBrush(m_color);
 
   p.drawRect(bgRect);
 

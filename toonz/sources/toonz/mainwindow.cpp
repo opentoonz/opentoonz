@@ -86,6 +86,7 @@ TEnv::IntVar DockingCheckToggleAction("DockingCheckToggleAction", 0);
 TEnv::IntVar ShiftTraceToggleAction("ShiftTraceToggleAction", 0);
 TEnv::IntVar EditShiftToggleAction("EditShiftToggleAction", 0);
 TEnv::IntVar NoShiftToggleAction("NoShiftToggleAction", 0);
+TEnv::IntVar TouchGestureControl("TouchGestureControl", 0);
 
 //=============================================================================
 namespace {
@@ -1294,6 +1295,8 @@ void MainWindow::onMenuCheckboxChanged() {
     EditShiftToggleAction = isChecked;
   else if (cm->getAction(MI_NoShift) == action)
     NoShiftToggleAction = isChecked;
+  else if (cm->getAction(MI_TouchGestureControl) == action)
+    TouchGestureControl = isChecked;
 }
 
 //-----------------------------------------------------------------------------
@@ -1613,17 +1616,18 @@ void MainWindow::defineActions() {
   QAction *newVectorLevelAction =
       createMenuFileAction(MI_NewVectorLevel, tr("&New Vector Level"), "");
   newVectorLevelAction->setIconText(tr("New Vector Level"));
-  newVectorLevelAction->setIcon(createQIconPNG("new_vector_level"));
+  newVectorLevelAction->setIcon(QIcon(":Resources/new_vector_level.svg"));
   QAction *newToonzRasterLevelAction = createMenuFileAction(
       MI_NewToonzRasterLevel, tr("&New Toonz Raster Level"), "");
   newToonzRasterLevelAction->setIconText(tr("New Toonz Raster Level"));
-  newToonzRasterLevelAction->setIcon(createQIconPNG("new_toonz_raster_level"));
+  newToonzRasterLevelAction->setIcon(QIcon(":Resources/new_toonz_raster_level.svg"));
   QAction *newRasterLevelAction =
       createMenuFileAction(MI_NewRasterLevel, tr("&New Raster Level"), "");
   newRasterLevelAction->setIconText(tr("New Raster Level"));
-  newRasterLevelAction->setIcon(createQIconPNG("new_raster_level"));
-
-  createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
+  newRasterLevelAction->setIcon(QIcon(":Resources/new_raster_level.svg"));
+  QAction *loadLevelAction =
+      createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
+  loadLevelAction->setIcon(QIcon(":Resources/load_level.svg"));
   createMenuFileAction(MI_SaveLevel, tr("&Save Level"), "");
   createMenuFileAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
   createMenuFileAction(MI_SaveLevelAs, tr("&Save Level As..."), "");
@@ -1656,7 +1660,9 @@ void MainWindow::defineActions() {
       MI_FreezePreview, tr("Freeze Preview"), tr("Unfreeze Preview"));
   // createAction(MI_SavePreview,         "&Save Preview",		"");
   createRightClickMenuAction(MI_SavePreset, tr("&Save As Preset"), "");
-  createMenuFileAction(MI_Preferences, tr("&Preferences..."), "Ctrl+U");
+  QAction *preferencesAction =
+      createMenuFileAction(MI_Preferences, tr("&Preferences..."), "Ctrl+U");
+  preferencesAction->setIcon(QIcon(":Resources/preferences.svg"));
   createMenuFileAction(MI_ShortcutPopup, tr("&Configure Shortcuts..."), "");
   createMenuFileAction(MI_PrintXsheet, tr("&Print Xsheet"), "");
   createMenuFileAction("MI_RunScript", tr("Run Script..."), "");
@@ -1675,8 +1681,10 @@ void MainWindow::defineActions() {
 
   createMenuEditAction(MI_SelectAll, tr("&Select All"), "Ctrl+A");
   createMenuEditAction(MI_InvertSelection, tr("&Invert Selection"), "");
-  createMenuEditAction(MI_Undo, tr("&Undo"), "Ctrl+Z");
-  createMenuEditAction(MI_Redo, tr("&Redo"), "Ctrl+Y");
+  QAction *undoAction = createMenuEditAction(MI_Undo, tr("&Undo"), "Ctrl+Z");
+  undoAction->setIcon(QIcon(":Resources/undo.svg"));
+  QAction *redoAction = createMenuEditAction(MI_Redo, tr("&Redo"), "Ctrl+Y");
+  redoAction->setIcon(QIcon(":Resources/redo.svg"));
   createMenuEditAction(MI_Cut, tr("&Cut"), "Ctrl+X");
   createMenuEditAction(MI_Copy, tr("&Copy"), "Ctrl+C");
   createMenuEditAction(MI_Paste, tr("&Insert Paste"), "Ctrl+V");
@@ -1703,6 +1711,11 @@ void MainWindow::defineActions() {
   createMenuEditAction(MI_EnterGroup, tr("&Enter Group"), "");
   createMenuEditAction(MI_ExitGroup, tr("&Exit Group"), "");
   createMenuEditAction(MI_RemoveEndpoints, tr("&Remove Vector Overflow"), "");
+  QAction *touchToggle =
+      createToggle(MI_TouchGestureControl, tr("&Touch Gesture Control"), "",
+                   TouchGestureControl ? 1 : 0, MenuEditCommandType);
+  touchToggle->setEnabled(true);
+  touchToggle->setIcon(QIcon(":Resources/touch.svg"));
 
   createMenuScanCleanupAction(MI_DefineScanner, tr("&Define Scanner..."), "");
   createMenuScanCleanupAction(MI_ScanSettings, tr("&Scan Settings..."), "");
@@ -1758,6 +1771,7 @@ void MainWindow::defineActions() {
   QAction *action =
       createMenuLevelAction(MI_CanvasSize, tr("&Canvas Size..."), "");
   if (action) action->setDisabled(true);
+  action->setIcon(QIcon(":Resources/canvas.svg"));
   createMenuLevelAction(MI_FileInfo, tr("&Info..."), "");
   createRightClickMenuAction(MI_ViewFile, tr("&View..."), "");
   createMenuLevelAction(MI_RemoveUnused, tr("&Remove All Unused Levels"), "");
@@ -1792,13 +1806,16 @@ void MainWindow::defineActions() {
 
   createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
   createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
-  createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
-
+  QAction *cloneAction =
+      createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
+  cloneAction->setIcon(QIcon(":Resources/clone.svg"));
   createMenuXsheetAction(MI_ApplyMatchLines, tr("&Apply Match Lines..."), "");
   createMenuXsheetAction(MI_MergeCmapped, tr("&Merge Tlv Levels..."), "");
   createMenuXsheetAction(MI_DeleteMatchLines, tr("&Delete Match Lines"), "");
   createMenuXsheetAction(MI_DeleteInk, tr("&Delete Lines..."), "");
-  createMenuXsheetAction(MI_MergeColumns, tr("&Merge Levels"), "");
+  QAction *mergeLevelsAction =
+      createMenuXsheetAction(MI_MergeColumns, tr("&Merge Levels"), "");
+  mergeLevelsAction->setIcon(QIcon(":Resources/merge.svg"));
   createMenuXsheetAction(MI_InsertFx, tr("&New FX..."), "Ctrl+F");
   QAction *newOutputAction =
       createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
@@ -1838,7 +1855,9 @@ void MainWindow::defineActions() {
   createMenuCellsAction(MI_Each4, tr("&Each 4"), "");
   createMenuCellsAction(MI_Rollup, tr("&Roll Up"), "");
   createMenuCellsAction(MI_Rolldown, tr("&Roll Down"), "");
-  createMenuCellsAction(MI_TimeStretch, tr("&Time Stretch..."), "");
+  QAction *timeStretchAction =
+      createMenuCellsAction(MI_TimeStretch, tr("&Time Stretch..."), "");
+  timeStretchAction->setIcon(QIcon(":Resources/timestretch.svg"));
   createMenuCellsAction(MI_Duplicate, tr("&Duplicate Drawing  "), "D");
   createMenuCellsAction(MI_Autorenumber, tr("&Autorenumber"), "");
   createMenuCellsAction(MI_CloneLevel, tr("&Clone"), "");

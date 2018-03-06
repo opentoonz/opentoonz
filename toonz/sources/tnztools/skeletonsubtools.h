@@ -112,7 +112,7 @@ public:
 
 class ParentChangeTool final : public DragTool {
   TTool::Viewer *m_viewer;
-  TPoint m_firstWinPos;
+  TPointD m_firstWinPos;
   TPointD m_lastPos, m_lastPos2;
   TPointD m_center;
   int m_index;

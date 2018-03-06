@@ -11,6 +11,7 @@
 #include "toonzqt/stylenameeditor.h"
 #include "toonzqt/viewcommandids.h"
 #include "palettedata.h"
+#include "toonzqt/lutcalibrator.h"
 
 // TnzLib includes
 #include "toonz/palettecmd.h"
@@ -681,10 +682,8 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       // and TBlackCleanupStyle(2002)
       if (style->getTagId() == 3 || style->getTagId() == 2001 ||
           style->getTagId() == 2002) {
-        // iwsw commented out temporaly
-        // if
-        // (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
-        //	Ghibli3DLutConverter::instance()->convert(styleColor);
+        if (LutCalibrator::instance()->isValid())
+          LutCalibrator::instance()->convert(styleColor);
 
         p.fillRect(chipRect, QBrush(styleColor));
 

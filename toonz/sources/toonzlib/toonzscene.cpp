@@ -49,6 +49,13 @@
 TOfflineGL *currentOfflineGL = 0;
 
 #include <QProgressDialog>
+
+#ifdef MACOSX
+#include <QSurfaceFormat>
+#include <QOffscreenSurface>
+#include <QOpenGLContext>
+#include <QOpenGLFramebufferObject>
+#endif
 //=============================================================================
 // Utility functions
 //=============================================================================
@@ -625,74 +632,88 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh) {
                            "scene.\n All resources have been saved.");
 
   TFilePath scenePath = decodeFilePath(fp);
+  TFilePath scenePathTemp(scenePath.getWideString() +
+                          QString(".tmp").toStdWString());
 
   // if(TFileStatus(scenePath).doesExist()) saveBackup(scenePath);
 
-  TSystem::touchFile(scenePath);
+  if (TFileStatus(scenePathTemp).doesExist())
+    TSystem::removeFileOrLevel(scenePathTemp);
+
+  //  TSystem::touchFile(scenePath);
+  TSystem::touchFile(scenePathTemp);
   makeSceneIcon(this);
 
   // TOStream os(scenePath, compressionEnabled);
-  TOStream os(scenePath, false);
-  if (!os.checkStatus()) throw TException("Could not open file");
+  //  TOStream os(scenePath, false);
+  {
+    TOStream os(scenePathTemp, false);
+    if (!os.checkStatus())
+      throw TException("Could not open temporary save file");
 
-  TXsheet *xsh      = subxsh;
-  if (xsh == 0) xsh = m_childStack->getTopXsheet();
+    TXsheet *xsh      = subxsh;
+    if (xsh == 0) xsh = m_childStack->getTopXsheet();
 
-  std::map<std::string, std::string> attr;
-  attr["version"] =
-      (QString::number(l_currentVersion.first) +
-       "."  // From now on, version numbers in saved files will have
-       + QString::number(
-             l_currentVersion.second))  // the signature "MAJOR.MINOR", where:
-          .toStdString();               //
-  attr["framecount"] =
-      QString::number(  //    MAJOR = Toonz version number * 10 (eg 7.0 => 70)
-          xsh->getFrameCount())
-          .toStdString();  //    MINOR = Reset to 0 after each major increment,
-                           //    and
-                           //            advancing on its own when fixing bugs.
-  os.openChild("tnz", attr);
+    std::map<std::string, std::string> attr;
+    attr["version"] =
+        (QString::number(l_currentVersion.first) +
+         "."  // From now on, version numbers in saved files will have
+         + QString::number(
+               l_currentVersion.second))  // the signature "MAJOR.MINOR", where:
+            .toStdString();               //
+    attr["framecount"] =
+        QString::number(  //    MAJOR = Toonz version number * 10 (eg 7.0 => 70)
+            xsh->getFrameCount())
+            .toStdString();  //    MINOR = Reset to 0 after each major
+                             //    increment,
+                             //    and
+    //            advancing on its own when fixing bugs.
+    os.openChild("tnz", attr);
 
-  os.child("generator") << TEnv::getApplicationFullName();
-  os.openChild("properties");
-  m_properties->saveData(os);
-  os.closeChild();
-
-  if (subxsh) {
-    std::set<TXshLevel *> saveSet;
-    subxsh->getUsedLevels(saveSet);
-    m_levelSet->setSaveSet(saveSet);
-  }
-  os.openChild("levelSet");
-  m_levelSet->saveData(os);
-  os.closeChild();
-  std::set<TXshLevel *> emptySaveSet;
-  m_levelSet->setSaveSet(emptySaveSet);
-
-  os.openChild("xsheet");
-  os << *xsh;
-  os.closeChild();
-
-  if (getContentHistory()) {
-    os.openChild("history");
-    QString data = getContentHistory()->serialize();
-    int i        = 0, j;
-    // non scrivo tutta la std::string di seguito per evitare problemi se
-    // diventa
-    // troppo lunga. Cerco di spezzarla in modo che sia "bella da leggere" nel
-    // tnz
-    while ((j = data.indexOf("||", i)) >= i) {
-      os << data.mid(i, j - i + 1).toStdWString();
-      os.cr();
-      i = j + 1;
-    }
-    os << data.mid(i).toStdWString();
+    os.child("generator") << TEnv::getApplicationFullName();
+    os.openChild("properties");
+    m_properties->saveData(os);
     os.closeChild();
+
+    if (subxsh) {
+      std::set<TXshLevel *> saveSet;
+      subxsh->getUsedLevels(saveSet);
+      m_levelSet->setSaveSet(saveSet);
+    }
+    os.openChild("levelSet");
+    m_levelSet->saveData(os);
+    os.closeChild();
+    std::set<TXshLevel *> emptySaveSet;
+    m_levelSet->setSaveSet(emptySaveSet);
+
+    os.openChild("xsheet");
+    os << *xsh;
+    os.closeChild();
+
+    if (getContentHistory()) {
+      os.openChild("history");
+      QString data = getContentHistory()->serialize();
+      int i        = 0, j;
+      // non scrivo tutta la std::string di seguito per evitare problemi se
+      // diventa
+      // troppo lunga. Cerco di spezzarla in modo che sia "bella da leggere" nel
+      // tnz
+      while ((j = data.indexOf("||", i)) >= i) {
+        os << data.mid(i, j - i + 1).toStdWString();
+        os.cr();
+        i = j + 1;
+      }
+      os << data.mid(i).toStdWString();
+      os.closeChild();
+    }
+
+    os.closeChild();
+    bool status = os.checkStatus();
+    if (!status) throw TException("Could not complete the temporary save");
   }
 
-  os.closeChild();
-  bool status = os.checkStatus();
-  if (!status) throw TException("Could not complete the save");
+  if (TFileStatus(scenePathTemp).doesExist())
+    TSystem::renameFile(scenePath, scenePathTemp, true);
 
   if (subxsh) {
     setScenePath(oldScenePath);
@@ -741,6 +762,7 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 
     ImagePainter::VisualSettings vs;
     vs.m_plasticVisualSettings.m_drawMeshesWireframe = false;
+    vs.m_forSceneIcon                                = true;
 
     Stage::RasterPainter painter(ras->getSize(), viewAff, clipRect, vs,
                                  checkFlags);
@@ -763,6 +785,7 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 //! placedRect,
 //! with known world/placed reference change - and returns the result in a
 //! 32-bit raster.
+
 void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
                              const TRectD &placedRect,
                              const TAffine &worldToPlacedAff) const {
@@ -781,11 +804,40 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 
   TRect clipRect(ras->getBounds());
 
+// fix for plastic tool applied to subxsheet
+#ifdef MACOSX
+  QSurfaceFormat format;
+  format.setProfile(QSurfaceFormat::CompatibilityProfile);
+
+  std::unique_ptr<QOffscreenSurface> surface(new QOffscreenSurface());
+  surface->setFormat(format);
+  surface->create();
+
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+  glMatrixMode(GL_MODELVIEW), glPushMatrix();
+  glMatrixMode(GL_PROJECTION), glPushMatrix();
+#else
   TOfflineGL ogl(ras->getSize());
   currentOfflineGL = &ogl;
-
   ogl.makeCurrent();
+#endif
   {
+#ifdef MACOSX
+    std::unique_ptr<QOpenGLFramebufferObject> fb(
+        new QOpenGLFramebufferObject(ras->getLx(), ras->getLy()));
+
+    fb->bind();
+    assert(glGetError() == GL_NO_ERROR);
+
+    glViewport(0, 0, ras->getLx(), ras->getLy());
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, ras->getLx(), 0, ras->getLy());
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+#endif
     glTranslated(0.5 * ras->getLx(), 0.5 * ras->getLy(), 0.0);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -801,12 +853,34 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 
     painter.flushRasterImages();
     glFlush();
+#ifdef MACOSX
+    QImage img =
+        fb->toImage().scaled(QSize(ras->getLx(), ras->getLy()),
+                             Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
+    int wrap      = ras->getLx() * sizeof(TPixel32);
+    uchar *srcPix = img.bits();
+    uchar *dstPix = ras->getRawData() + wrap * (ras->getLy() - 1);
+    for (int y = 0; y < ras->getLy(); y++) {
+      memcpy(dstPix, srcPix, wrap);
+      dstPix -= wrap;
+      srcPix += wrap;
+    }
+    fb->release();
+    assert(glGetError() == GL_NO_ERROR);
+#else
     TRop::over(ras, ogl.getRaster());
+#endif
   }
-  ogl.doneCurrent();
+#ifdef MACOSX
+  glMatrixMode(GL_MODELVIEW), glPopMatrix();
+  glMatrixMode(GL_PROJECTION), glPopMatrix();
 
+  glPopAttrib();
+#else
+  ogl.doneCurrent();
   currentOfflineGL = 0;
+#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -927,11 +927,20 @@ void FilmstripFrames::keyPressEvent(QKeyEvent *event) {
   level->getFids(fids);
   if (fids.empty()) return;
 
+  // If on a level frame pass the frame id after the last frame to allow
+  // creating a new frame with the down arrow key
+  TFrameId newId = 0;
+  if (Preferences::instance()->getDownArrowLevelStripNewFrame() &&
+      fh->getFrameType() == TFrameHandle::LevelFrame) {
+    int frameCount = (int)fids.size();
+    newId          = index2fid(frameCount);
+  }
+
   fh->setFrameIds(fids);
   if (event->key() == Qt::Key_Up)
     fh->prevFrame();
   else if (event->key() == Qt::Key_Down)
-    fh->nextFrame();
+    fh->nextFrame(newId);
   else if (event->key() == Qt::Key_Home)
     fh->firstFrame();
   else if (event->key() == Qt::Key_End)

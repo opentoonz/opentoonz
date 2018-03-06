@@ -58,9 +58,7 @@ class TFxHandle;
 class ToolOptionsBox;
 
 class QMenu;
-
-// iwsw commented out
-// class Ghibli3DLutUtil;
+class QKeyEvent;
 
 //===================================================================
 
@@ -86,21 +84,22 @@ public:
   };
 
 public:
-  TPoint m_pos;  //!< Mouse position in window coordinates, bottom-left origin.
-  int m_pressure;  //!< Pressure of the tablet pen, or 255 for pure mouse
-                   //! events.
+  TPointD m_pos;  //!< Mouse position in window coordinates, bottom-left origin.
+  double m_pressure;  //!< Pressure of the tablet pen (0.0 - 1.0) , or 1.0 for
+                      //! pure mouse events.
+
   ModifierMask m_modifiersMask;  //!< Bitmask specifying key modifiers applying
                                  //! on the event.
 
   Qt::MouseButtons m_buttons;
   Qt::MouseButton m_button;
-  QPoint m_mousePos;  // mouse position obtained with QMouseEvent::pos() or
-                      // QTabletEvent::pos()
+  QPointF m_mousePos;  // mouse position obtained with QMouseEvent::pos() or
+                       // QTabletEvent::pos()
   bool m_isTablet;
 
 public:
   TMouseEvent()
-      : m_pressure(255)
+      : m_pressure(1.0)
       , m_modifiersMask(NO_KEY)
       , m_buttons(Qt::NoButton)
       , m_button(Qt::NoButton)
@@ -113,7 +112,7 @@ public:
   bool isLeftButtonPressed() const { return (m_buttons & Qt::LeftButton) != 0; }
   Qt::MouseButtons buttons() const { return m_buttons; }
   Qt::MouseButton button() const { return m_button; }
-  QPoint mousePos() const { return m_mousePos; }
+  QPointF mousePos() const { return m_mousePos; }
   bool isTablet() const { return m_isTablet; }
 
   void setModifiers(bool shiftPressed, bool altPressed, bool ctrlPressed) {
@@ -368,7 +367,7 @@ public:
           restrict drawing to a small regionaround \p p of the viewport.
           Retuns -1 if no object's view has been changed.
   */
-  int pick(const TPoint &p);
+  int pick(const TPointD &p);
   bool isPicking() const { return m_picking; }
 
   virtual void updateTranslation(){};
@@ -386,12 +385,7 @@ return true if the method execution can have changed the current tool
   virtual void leftButtonUp(const TPointD &, const TMouseEvent &) {}
   virtual void leftButtonDoubleClick(const TPointD &, const TMouseEvent &) {}
   virtual void rightButtonDown(const TPointD &, const TMouseEvent &) {}
-
-  //! For keycodes list, \see keycodes.h.
-  virtual bool keyDown(int, TUINT32, const TPoint &) { return false; }
-  virtual bool keyDown(int, std::wstring, TUINT32, const TPoint &) {
-    return false;
-  }
+  virtual bool keyDown(QKeyEvent *) { return false; }
 
   virtual void onInputText(std::wstring, std::wstring, int, int){};
 
@@ -603,32 +597,32 @@ public:
 
   //! return the column index of the drawing intersecting point \b p
   //! (window coordinate, pixels, bottom-left origin)
-  virtual int posToColumnIndex(const TPoint &p, double distance,
+  virtual int posToColumnIndex(const TPointD &p, double distance,
                                bool includeInvisible = true) const = 0;
-  virtual void posToColumnIndexes(const TPoint &p, std::vector<int> &indexes,
+  virtual void posToColumnIndexes(const TPointD &p, std::vector<int> &indexes,
                                   double distance,
                                   bool includeInvisible = true) const = 0;
 
   //! return the row of the drawing intersecting point \b p (used with
   //! onionskins)
   //! (window coordinate, pixels, bottom-left origin)
-  virtual int posToRow(const TPoint &p, double distance,
+  virtual int posToRow(const TPointD &p, double distance,
                        bool includeInvisible = true) const = 0;
 
   //! return pos in pixel, bottom-left origin
-  virtual TPoint worldToPos(const TPointD &worldPos) const = 0;
+  virtual TPointD worldToPos(const TPointD &worldPos) const = 0;
 
   //! return the OpenGL nameId of the object intersecting point \b p
   //! (window coordinate, pixels, bottom-left origin)
-  virtual int pick(const TPoint &point) = 0;
+  virtual int pick(const TPointD &point) = 0;
 
   // note: winPos in pixel, top-left origin;
   // when no camera movements have been defined then worldPos = 0 at camera
   // center
-  virtual TPointD winToWorld(const TPoint &winPos) const = 0;
+  virtual TPointD winToWorld(const TPointD &winPos) const = 0;
 
   // delta.x: right panning, pixels; delta.y: down panning, pixels
-  virtual void pan(const TPoint &delta) = 0;
+  virtual void pan(const TPointD &delta) = 0;
 
   // center: window coordinates, pixels, bottomleft origin
   virtual void zoom(const TPointD &center, double scaleFactor) = 0;
@@ -639,7 +633,7 @@ public:
   virtual bool getIsFlippedX() const = 0;
   virtual bool getIsFlippedY() const = 0;
 
-  virtual double projectToZ(const TPoint &delta) = 0;
+  virtual double projectToZ(const TPointD &delta) = 0;
 
   virtual TPointD getDpiScale() const = 0;
   virtual int getVGuideCount()        = 0;
@@ -655,8 +649,8 @@ public:
   /*-- Toolで画面の内外を判断するため --*/
   virtual TRectD getGeometry() const = 0;
 
-  // iwsw commented out
-  // virtual Ghibli3DLutUtil* get3DLutUtil(){ return 0; }
+  virtual void bindFBO() {}
+  virtual void releaseFBO() {}
 };
 
 #endif

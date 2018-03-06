@@ -291,6 +291,7 @@ Preferences::Preferences()
     , m_regionAntialias(false)
     , m_keepFillOnVectorSimplify(true)
     , m_useHigherDpiOnVectorSimplify(false)
+    , m_downArrowInLevelStripCreatesNewFrame(false)
     , m_viewerBGColor(128, 128, 128, 255)
     , m_previewBGColor(64, 64, 64, 255)
     , m_chessboardColor1(180, 180, 180)
@@ -534,7 +535,7 @@ Preferences::Preferences()
   bool roomsExist = false;
   rooms           = m_settings->value("CurrentRoomChoice").toString();
 
-  TFilePath room_path(TEnv::getStuffDir() + "profiles/layouts/rooms");
+  TFilePath room_path(ToonzFolder::getRoomsDir());
   TFilePathSet room_fpset;
   try {
     TSystem::readDirectory(room_fpset, room_path, true, false);
@@ -575,6 +576,8 @@ Preferences::Preferences()
   getValue(*m_settings, "useHigherDpiOnVectorSimplify",
            m_useHigherDpiOnVectorSimplify);
   getValue(*m_settings, "keepFillOnVectorSimplify", m_keepFillOnVectorSimplify);
+  getValue(*m_settings, "downArrowInLevelStripCreatesNewFrame",
+           m_downArrowInLevelStripCreatesNewFrame);
   getValue(*m_settings, "DragCellsBehaviour", m_dragCellsBehaviour);
 
   getValue(*m_settings, "LineTestFpsCapture", m_lineTestFpsCapture);
@@ -663,6 +666,18 @@ Preferences::Preferences()
   m_loadedXsheetLayout = m_xsheetLayoutPreference;
 
   getValue(*m_settings, "currentTimelineEnabled", m_currentTimelineEnabled);
+
+  getValue(*m_settings, "colorCalibrationEnabled", m_colorCalibrationEnabled);
+  QVariant val = m_settings->value("colorCalibrationLutPaths");
+  if (val.canConvert<QVariantMap>()) {
+    QAssociativeIterable iterable           = val.value<QAssociativeIterable>();
+    QAssociativeIterable::const_iterator it = iterable.begin();
+    const QAssociativeIterable::const_iterator end = iterable.end();
+    for (; it != end; ++it) {
+      m_colorCalibrationLutPaths.insert(it.key().toString(),
+                                        it.value().toString());
+    }
+  }
 }
 
 //-----------------------------------------------------------------
@@ -1342,6 +1357,13 @@ void Preferences::setUseHigherDpiOnVectorSimplify(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setDownArrowLevelStripNewFrame(bool on) {
+  m_downArrowInLevelStripCreatesNewFrame = on;
+  m_settings->setValue("downArrowInLevelStripCreatesNewFrame", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableLevelsBackup(bool enabled) {
   m_levelsBackupEnabled = enabled;
   m_settings->setValue("levelsBackupEnabled", enabled ? "1" : "0");
@@ -1607,3 +1629,30 @@ void Preferences::enableCurrentTimelineIndicator(bool on) {
   m_currentTimelineEnabled = on;
   m_settings->setValue("currentTimelineEnabled", on ? "1" : "0");
 }
+
+//-----------------------------------------------------------------
+// color calibration using 3DLUT
+
+void Preferences::enableColorCalibration(bool on) {
+  m_colorCalibrationEnabled = on;
+  m_settings->setValue("colorCalibrationEnabled", on ? "1" : "0");
+}
+
+void Preferences::setColorCalibrationLutPath(QString monitorName,
+                                             QString path) {
+  m_colorCalibrationLutPaths.insert(monitorName, path);
+  QMap<QString, QVariant> map;
+  QMap<QString, QString>::const_iterator i =
+      m_colorCalibrationLutPaths.constBegin();
+  while (i != m_colorCalibrationLutPaths.constEnd()) {
+    map.insert(i.key(), i.value());
+    i++;
+  }
+  m_settings->setValue("colorCalibrationLutPaths", map);
+}
+
+QString Preferences::getColorCalibrationLutPath(QString &monitorName) const {
+  return m_colorCalibrationLutPaths.value(monitorName);
+}
+
+//-----------------------------------------------------------------

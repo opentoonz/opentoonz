@@ -949,10 +949,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
-          QRect(1, 0, LAYER_HEADER_WIDTH - 3, CELL_HEIGHT));
+          QRect(1, 0, LAYER_HEADER_WIDTH - 2, CELL_HEIGHT));
   addRect(
       PredefinedRect::FOLDED_LAYER_HEADER,
-      QRect(1, 0, FOLDED_LAYER_HEADER_WIDTH - 3, FOLDED_LAYER_HEADER_HEIGHT));
+      QRect(1, 0, FOLDED_LAYER_HEADER_WIDTH - 2, FOLDED_LAYER_HEADER_HEIGHT));
   QRect columnName(ICONS_WIDTH + 2, 1,
                    LAYER_NAME_WIDTH + LAYER_NUMBER_WIDTH - 4, CELL_HEIGHT - 1);
   addRect(PredefinedRect::RENAME_COLUMN, columnName);

@@ -34,13 +34,13 @@ class BluredBrush;
 struct BrushData final : public TPersist {
   PERSIST_DECLARATION(BrushData)
   // frameRange, snapSensitivity and snap are not included
-  // Those options are not really a part of the brush settings, 
-  //just the overall tool.
+  // Those options are not really a part of the brush settings,
+  // just the overall tool.
 
   std::wstring m_name;
   double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
-  bool m_selective, m_pencil, m_breakAngles, m_pressure; 
-  int m_cap, m_join, m_miter; 
+  bool m_selective, m_pencil, m_breakAngles, m_pressure;
+  int m_cap, m_join, m_miter;
   double m_modifierSize, m_modifierOpacity;
   bool m_modifierEraser, m_modifierLockAlpha;
 
@@ -131,7 +131,7 @@ public:
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
-  bool keyDown(int key, TUINT32 b, const TPoint &point) override;
+  bool keyDown(QKeyEvent *event) override;
 
   void draw() override;
 
@@ -152,7 +152,7 @@ public:
   void addPreset(QString name);
   void removePreset();
 
-  void finishRasterBrush(const TPointD &pos, int pressureVal);
+  void finishRasterBrush(const TPointD &pos, double pressureVal);
   // return true if the pencil mode is active in the Brush / PaintBrush / Eraser
   // Tools.
   bool isPencilModeActive() override;

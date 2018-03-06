@@ -28,6 +28,7 @@
         <file>Resources/camera.png</file>
         <file>Resources/camera_selected.png</file>
         <file>Resources/camerastand_toggle.png</file>
+        <file>Resources/canvas.svg</file>
         <file>Resources/center.png</file>
         <file>Resources/centerHTitle.png</file>
         <file>Resources/centerHTitle_inactive.png</file>
@@ -51,6 +52,7 @@
         <file>Resources/cleanup_done_with_errors.svg</file>
         <file>Resources/cleanup_computing.svg</file>
         <file>Resources/cleanup_suspended.svg</file>
+        <file>Resources/clone.svg</file>
         <file>Resources/pane_close.svg</file>
         <file>Resources/pane_close_rollover.svg</file>
         <file>Resources/collapse.png</file>
@@ -127,6 +129,7 @@
         <file>Resources/link_closed.bmp</file>
         <file>Resources/link_closed_rollover.bmp</file>
         <file>Resources/link_parent.bmp</file>
+        <file>Resources/load_level.svg</file>
         <file>Resources/lock.png</file>
         <file>Resources/lock_over.png</file>
         <file>Resources/loop.svg</file>
@@ -136,6 +139,7 @@
         <file>Resources/magnet.png</file>
         <file>Resources/magnet.svg</file>
         <file>Resources/magnet_rollover.svg</file>
+        <file>Resources/merge.svg</file>
         <file>Resources/motionpath_fileicon.svg</file>
         <file>Resources/motionpath.svg</file>
         <file>Resources/motionpath_delete.svg</file>
@@ -144,15 +148,9 @@
         <file>Resources/my_computer.svg</file>
         <file>Resources/my_documents.svg</file>
         <file>Resources/network.svg</file>
-        <file>Resources/new_raster_level.png</file>
-        <file>Resources/new_raster_level_over.png</file>
-        <file>Resources/new_raster_level_click.png</file>
-        <file>Resources/new_toonz_raster_level.png</file>
-        <file>Resources/new_toonz_raster_level_click.png</file>
-        <file>Resources/new_toonz_raster_level_over.png</file>
-        <file>Resources/new_vector_level.png</file>
-        <file>Resources/new_vector_level_click.png</file>
-        <file>Resources/new_vector_level_over.png</file>
+        <file>Resources/new_raster_level.svg</file>
+        <file>Resources/new_toonz_raster_level.svg</file>
+        <file>Resources/new_vector_level.svg</file>
         <file>Resources/newmemo.svg</file>
         <file>Resources/newmemo_disabled.svg</file>
         <file>Resources/newstyle.png</file>
@@ -197,6 +195,7 @@
         <file>Resources/play_click.svg</file>
         <file>Resources/play_disabled.svg</file>
         <file>Resources/play_over.svg</file>
+        <file>Resources/preferences.svg</file>
         <file>Resources/preview_toggle.png</file>
         <file>Resources/previuos_folder.png</file>
         <file>Resources/projects.svg</file>
@@ -208,6 +207,7 @@
         <file>Resources/record_click.svg</file>
         <file>Resources/record_disabled.svg</file>
         <file>Resources/record_over.svg</file>
+        <file>Resources/redo.svg</file>
         <file>Resources/render_failed.svg</file>
         <file>Resources/render_done.svg</file>
         <file>Resources/render_done_with_errors.svg</file>
@@ -294,10 +294,12 @@
         <file>Resources/texture_off.svg</file>
         <file>Resources/texture_on.svg</file>
         <file>Resources/thumbnails_view_act.png</file>
+        <file>Resources/timestretch.svg</file>
         <file>Resources/toggle_audibility_click.png</file>
         <file>Resources/toggle_audibility_over.png</file>
         <file>Resources/toggle_lock.png</file>
         <file>Resources/toolbar_arrow.png</file>
+        <file>Resources/touch.svg</file>
         <file>Resources/tracker.svg</file>
         <file>Resources/tracker_rollover.svg</file>
         <file>Resources/type.svg</file>
@@ -321,6 +323,7 @@
         <file>Resources/pane_preview_off.svg</file>
         <file>Resources/pane_preview_on.svg</file>
         <file>Resources/pane_preview_over.svg</file>
+        <file>Resources/undo.svg</file>
         <file>Resources/viewtable_off.svg</file>
         <file>Resources/viewtable_on.svg</file>
         <file>Resources/viewtable_over.svg</file>

@@ -47,7 +47,7 @@ protected slots:
 class MatchlinesDialog final : public DVGui::Dialog {
   Q_OBJECT
 
-  QRadioButton *m_button1, *m_button2;
+  QRadioButton *m_button1, *m_button2, *m_button3;
   DVGui::StyleIndexLineEdit *m_inkIndex;
   DVGui::IntField *m_inkPrevalence;
   TPaletteHandle *m_pltHandle;

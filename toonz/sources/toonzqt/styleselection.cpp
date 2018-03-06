@@ -91,18 +91,13 @@ bool pasteStylesDataWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle,
       break;
     }
 
-    if (palette->getStylePage(styleId) < 0) {
-      // styleId non e' utilizzato: uso quello
-      // (cut/paste utilizzato per spostare stili)
+    // For now styles will be inserted regardless the styleId of copied styles
+    // are already used in the target palette or not.
+    styleId = palette->getFirstUnpagedStyle();
+    if (styleId >= 0)
       palette->setStyle(styleId, style);
-    } else {
-      // styleId e' gia' utilizzato. ne devo prendere un altro
-      styleId = palette->getFirstUnpagedStyle();
-      if (styleId >= 0)
-        palette->setStyle(styleId, style);
-      else
-        styleId = palette->addStyle(style);
-    }
+    else
+      styleId = palette->addStyle(style);
 
     // check the type of the original(copied) style
     // If the original is NormalStyle

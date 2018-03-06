@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Position</source>
-        <translation>Position</translation>
+        <translation type="vanished">Position</translation>
     </message>
     <message>
         <source>E/W:</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Rotation</source>
-        <translation>Rotation</translation>
+        <translation type="vanished">Rotation</translation>
     </message>
     <message>
         <source>Scale</source>
@@ -74,6 +74,14 @@
     <message>
         <source>Center Position</source>
         <translation type="unfinished">Position du Centre</translation>
+    </message>
+    <message>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -141,6 +149,14 @@
     <message>
         <source>Smooth:</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation type="unfinished">Magnétisme</translation>
     </message>
 </context>
 <context>
@@ -332,6 +348,10 @@
         <source>Segment</source>
         <translation>Segment</translation>
     </message>
+    <message>
+        <source>Autopaint Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FingerTool</name>
@@ -348,15 +368,15 @@
     <name>FullColorBrushTool</name>
     <message>
         <source>Thickness</source>
-        <translation>Épaisseur</translation>
+        <translation type="vanished">Épaisseur</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>Sensibilité à la Pression</translation>
+        <translation type="vanished">Sensibilité à la Pression</translation>
     </message>
     <message>
         <source>Opacity:</source>
-        <translation>Opacité:</translation>
+        <translation type="vanished">Opacité:</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -365,6 +385,26 @@
     <message>
         <source>Preset:</source>
         <translation>Paramètre Prédéfini:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -659,6 +699,10 @@ Voulez-vous continuer?</translation>
         <source>Size:</source>
         <translation type="unfinished">Taille:</translation>
     </message>
+    <message>
+        <source>Snap</source>
+        <translation type="unfinished">Magnétisme</translation>
+    </message>
 </context>
 <context>
     <name>PumpTool</name>
@@ -939,6 +983,18 @@ Voulez-vous continuer?</translation>
     </message>
     <message>
         <source>Palette must have more than one palette to be organized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation type="unfinished">Mode:</translation>
+    </message>
+    <message>
+        <source>Passive Pick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Organize Palette</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
