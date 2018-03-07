@@ -717,7 +717,7 @@ void Iwa_SoapBubbleFx::processNoise(float* thickness_map_p, float* depth_map_p,
   float* ph_p         = noise_phases;
 
   srand(0);
-  /* Set the phase differences (0-2ƒÎ) */
+  /* Set the phase differences (0-2) */
   for (int i = 0; i < whole_noise_amount; i++, ph_p++) {
     *ph_p = (float)rand() / (float)RAND_MAX * 2.0f * PI;
   }
