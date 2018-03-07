@@ -476,8 +476,11 @@ void TSystem::readDirectory(TFilePathSet &groupFpSet, TFilePathSet &allFpSet,
 
   QStringList fil =
       QDir(toQString(path))
+#ifdef Q_OS_WIN 
           .entryList(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
-
+#else
+          .entryList(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable | QDir::NoSymLinks);
+#endif
   if (fil.size() == 0) return;
 
   for (int i = 0; i < fil.size(); i++) {
