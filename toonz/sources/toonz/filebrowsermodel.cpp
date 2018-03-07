@@ -255,10 +255,10 @@ bool DvDirModelFileFolderNode::hasChildren() {
     // DvDirModelFileFolderNode::refreshChildren() due to
     // performance issues
     QDir dir(QString::fromStdWString(m_path.getWideString()));
-#ifdef MACOSX
-    dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-#else
+#ifdef Q_OS_WIN
     dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
+#else
+    dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 #endif
 
     return (dir.count() > 0);
@@ -323,11 +323,11 @@ void DvDirModelFileFolderNode::getChildrenNames(
   if (folderPathStatus.isDirectory()) {
     QDir dir(toQString(m_path));
 
-#ifdef MACOSX
-    entries = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks,
+#ifdef Q_OS_WIN
+    entries = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot,
                             QDir::Name | QDir::LocaleAware);
 #else
-    entries = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot,
+    entries = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks,
                             QDir::Name | QDir::LocaleAware);
 #endif
   }
