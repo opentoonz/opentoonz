@@ -383,6 +383,10 @@
 @xsheet-SoundColumnHL-color:                #34FE5E;
 @xsheet-SoundColumnTrack-color:             #B6C29D;
 
+@xsheet-SoundTextColumn-color:              #C8C8C8;
+@xsheet-SoundTextColumnBorder-color:        #8C8C8C;
+@xsheet-SelectedSoundTextColumn-color:      lighten(desaturate(@xsheet-SoundTextColumn-color, 5), 10);
+
 @xsheet-ColumnHeadPastelizer-color:         #000;
 @xsheet-SelectedColumnHead-color:           #506082;
 
@@ -436,6 +440,11 @@
 @layerheader-PreviewImage:                  'layer_header_prev_eye.svg';
 @layerheader-CamstandImage:                 'layer_header_table_view.svg';
 @layerheader-LockImage:                     'layer_header_lock.svg';
+
+@timeline-FoldUnfoldButtonColor-color:      rgba(203, 203, 203, 255);
+@timeline-SubLayerColor-color:              darken(desaturate(@xsheet-VectorColumn-color, 5), 10);
+@timeline-SubLayerBorderColor-color:        darken(desaturate(@xsheet-VectorColumn-color, 5), 7);
+@timeline-SelectedSubLayerColor-color:      darken(desaturate(@xsheet-VectorColumn-color, 5), 5);  
 
 // -----------------------------------------------------------------------------
 // Function Editor

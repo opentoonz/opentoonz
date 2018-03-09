@@ -54,54 +54,70 @@ extern const int RowHeight;
 const int NoteWidth  = 70;
 const int NoteHeight = 18;
 
+// Basic Xsheet/Timeline
+const QColor ColumnHeadPastelizerColor(0, 0, 0);
+const QColor DarkLineColor(150, 150, 150);
+const QColor LightLineColor(44, 44, 44);
+const QColor MarkerLineColor(30, 150, 196);
+const QColor PreviewFrameTextColor(159, 218, 255);
+const QColor SelectedColumnTextColor(255, 0, 0);
+const QColor TextColor(204, 204, 204);
+const QColor VerticalLineColor(34, 34, 34);
+const QColor VerticalLineHeadColor(128, 128, 128);
+const QColor DarkBGColor(225, 225, 225);
+const QColor EmptyCellColor(64, 64, 64);
+const QColor LightBGColor(240, 240, 240);
+const QColor LightLightBGColor(64, 64, 64);
+const QColor SelectedColumnHeadColor(80, 96, 130);
+
 // TZP column
-const QColor LevelColumnColor(127, 219, 127);
-const QColor LevelColumnBorderColor(47, 82, 47);
-const QColor SelectedLevelColumnColor(191, 237, 191);
+const QColor LevelColumnColor(76, 110, 76);
+const QColor LevelColumnBorderColor(143, 179, 143);
+const QColor SelectedLevelColumnColor(103, 134, 103);
 
 // PLI column
-const QColor VectorColumnColor(212, 212, 133);
-const QColor VectorColumnBorderColor(79, 79, 49);
-const QColor SelectedVectorColumnColor(234, 234, 194);
+const QColor VectorColumnColor(123, 123, 76);
+const QColor VectorColumnBorderColor(187, 187, 154);
+const QColor SelectedVectorColumnColor(148, 148, 102);
 const QColor FoldUnfoldButtonColor(203, 203, 203);
 
 // SubLayers
-const QColor SubLayerColor(0, 194, 211);
-const QColor SubLayerBorderColor(0, 94, 138);
-const QColor SelectedSubLayerColor(0, 240, 255);
+const QColor SubLayerColor(88, 88, 60);
+const QColor SubLayerBorderColor(97, 97, 66);
+const QColor SelectedSubLayerColor(103, 103, 71);
 
 // SubXsheet column
-const QColor ChildColumnColor(214, 154, 219);
-const QColor ChildColumnBorderColor(80, 57, 82);
-const QColor SelectedChildColumnColor(235, 205, 237);
+const QColor ChildColumnColor(160, 82, 107);
+const QColor ChildColumnBorderColor(177, 163, 179);
+const QColor SelectedChildColumnColor(129, 110, 130);
 
 // Raster image column
-const QColor FullcolorColumnColor(154, 214, 219);
-const QColor FullcolorColumnBorderColor(57, 80, 82);
-const QColor SelectedFullcolorColumnColor(205, 235, 237);
+const QColor FullcolorColumnColor(101, 122, 150);
+const QColor FullcolorColumnBorderColor(158, 184, 187);
+const QColor SelectedFullcolorColumnColor(136, 149, 166);
 
 // Palette column
-const QColor PaletteColumnColor(42, 171, 154);
-const QColor PaletteColumnBorderColor(15, 62, 56);
-const QColor SelectedPaletteColumnColor(146, 221, 202);
+const QColor PaletteColumnColor(58, 101, 95);
+const QColor PaletteColumnBorderColor(134, 172, 167);
+const QColor SelectedPaletteColumnColor(82, 128, 122);
 
 // Fx column
-const QColor FxColumnColor(130, 129, 93);
-const QColor FxColumnBorderColor(48, 48, 35);
-const QColor SelectedFxColumnColor(193, 192, 174);
+const QColor FxColumnColor(86, 85, 60);
+const QColor FxColumnBorderColor(149, 149, 138);
+const QColor SelectedFxColumnColor(111, 110, 86);
 
 // Reference column
-const QColor ReferenceColumnColor(171, 171, 171);
-const QColor ReferenceColumnBorderColor(62, 62, 62);
-const QColor SelectedReferenceColumnColor(213, 213, 213);
+const QColor ReferenceColumnColor(97, 97, 97);
+const QColor ReferenceColumnBorderColor(162, 162, 162);
+const QColor SelectedReferenceColumnColor(122, 122, 122);
 
 // Sound column
-const QColor SoundColumnColor(175, 185, 115);
-const QColor SoundColumnBorderColor(110, 130, 90);
-const QColor SelectedSoundColumnColor(215, 215, 180);
+const QColor SoundColumnColor(101, 116, 86);
+const QColor SoundColumnBorderColor(160, 175, 125);
+const QColor SelectedSoundColumnColor(126, 139, 114);
 
-const QColor SoundColumnHlColor(245, 255, 230);
-const QColor SoundColumnTrackColor(90, 100, 45);
+const QColor SoundColumnHlColor(52, 254, 94);
+const QColor SoundColumnTrackColor(182, 194, 157);
 
 const QColor SoundColumnExtenderColor(235, 255, 115);
 
@@ -109,35 +125,36 @@ const QColor EmptySoundColumnColor(240, 255, 240);
 
 const QColor ColorSelection(190, 210, 240, 170);
 
+// SoundText column
 const QColor SoundTextColumnColor(200, 200, 200);
 const QColor SoundTextColumnBorderColor(140, 140, 140);
+const QColor SelectedSoundTextColumn(226, 226, 226);
 
-const QColor MeshColumnColor(200, 130, 255);
-const QColor MeshColumnBorderColor(105, 70, 135);
-const QColor SelectedMeshColumnColor(216, 180, 245);
+// Mesh column
+const QColor MeshColumnColor(104, 77, 134);
+const QColor MeshColumnBorderColor(186, 146, 239);
+const QColor SelectedMeshColumnColor(130, 104, 158);
 
 // Empty column
 const QColor EmptyColumnColor(124, 124, 124);
 // Occupied column
-const QColor NotEmptyColumnColor(164, 164, 164);
+const QColor NotEmptyColumnColor(72, 72, 72);
 
-const QColor TimelineIconBackground(25, 25, 25);
-
-const QColor SelectedEmptyCellColor(210, 210, 210);
+const QColor SelectedEmptyCellColor(108, 108, 108);
 const QColor SmartTabColor(255, 255, 255, 150);
 
-const QColor XsheetBGColor(212, 208, 200);
+const QColor XsheetBGColor(59, 59, 59);
 // Xsheet horizontal lines
 const QColor NormalHLineColor(146, 144, 146);
 const QColor IntervalHLineColor(0, 255, 246);
 
 // column header
-const QColor EmptyColumnHeadColor(200, 200, 200);
+const QColor EmptyColumnHeadColor(98, 98, 98);
 const QColor MaskColumnHeadColor(233, 118, 116);
 // const QColor PreviewVisibleColor(200, 200, 100);
 // const QColor CamStandVisibleColor(235, 144, 107);
 
-const QColor XsheetColumnNameBgColor(255, 255, 255, 90);
+const QColor XsheetColumnNameBgColor(255, 255, 255, 0);
 const QColor XsheetDragBarHighlightColor(255, 255, 187, 255);
 
 const QColor XsheetPreviewButtonBgOnColor(200, 200, 100, 255);
@@ -146,19 +163,19 @@ const QColor XsheetPreviewButtonBgOffColor(255, 255, 255, 0);
 const QColor XsheetCamstandButtonBgOnColor(235, 144, 107, 255);
 const QColor XsheetCamstandButtonBgOffColor(255, 255, 255, 0);
 
-const QColor XsheetLockButtonBgOnColor(255, 255, 255, 0);
+const QColor XsheetLockButtonBgOnColor(197, 84, 84, 255);
 const QColor XsheetLockButtonBgOffColor(255, 255, 255, 0);
 
 const QColor XsheetConfigButtonBgColor(255, 255, 255, 0);
 
-const QColor TimelineButtonBgOnColor(255, 255, 255, 0);
-const QColor TimelineButtonBgOffColor(255, 255, 255, 0);
+// const QColor TimelineButtonBgOnColor(255, 255, 255, 0);
+// const QColor TimelineButtonBgOffColor(255, 255, 255, 0);
 
 const QColor TimelineConfigButtonBgColor(255, 255, 255, 0);
 
 // RowArea
 const QColor RowAreaBGColor(164, 164, 164);
-const QColor CurrentFrameBGColor(210, 210, 210);
+const QColor CurrentFrameBGColor(80, 96, 130);
 
 }  // namespace XsheetGUI;
 
@@ -233,13 +250,10 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   // Column
   QColor m_emptyColumnHeadColor;     // empty column header (200,200,200)
   QColor m_selectedColumnTextColor;  // selected column text (red)
-  QColor m_timelineIconColor;        // background for icons (25, 25, 25)
   Q_PROPERTY(QColor EmptyColumnHeadColor READ getEmptyColumnHeadColor WRITE
                  setEmptyColumnHeadColor)
   Q_PROPERTY(QColor SelectedColumnTextColor READ getSelectedColumnTextColor
                  WRITE setSelectedColumnTextColor)
-  Q_PROPERTY(QColor TimelineIconColor READ getTimelineIconColor WRITE
-                 setTimelineIconColor)
   // Cell
   QColor m_emptyCellColor;          // empty cell (124,124,124)
   QColor m_notEmptyColumnColor;     // occupied column (164,164,164)
@@ -360,6 +374,16 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   Q_PROPERTY(QColor SelectedSoundColumnColor MEMBER m_selectedSoundColumnColor)
   Q_PROPERTY(QColor SoundColumnHlColor MEMBER m_soundColumnHlColor)
   Q_PROPERTY(QColor SoundColumnTrackColor MEMBER m_soundColumnTrackColor)
+
+  // SoundText column
+  QColor m_soundTextColumnBorderColor;
+  QColor m_soundTextColumnColor;
+  QColor m_selectedSoundTextColumnColor;
+  Q_PROPERTY(QColor SoundTextColumnColor MEMBER m_soundTextColumnColor)
+  Q_PROPERTY(
+      QColor SoundTextColumnBorderColor MEMBER m_soundTextColumnBorderColor)
+  Q_PROPERTY(
+      QColor SelectedSoundTextColumnColor MEMBER m_selectedSoundTextColumnColor)
 
   // for making the column head lighter (255,255,255,50);
   QColor m_columnHeadPastelizer;
@@ -743,10 +767,6 @@ public:
   QColor getSelectedColumnTextColor() const {
     return m_selectedColumnTextColor;
   }
-  void setTimelineIconColor(const QColor &color) {
-    m_timelineIconColor = color;
-  }
-  QColor getTimelineIconColor() const { return m_timelineIconColor; }
   // Cell
   void setEmptyCellColor(const QColor &color) { m_emptyCellColor = color; }
   QColor getEmptyCellColor() const { return m_emptyCellColor; }
@@ -895,6 +915,20 @@ public:
   // Sound column
   QColor getSoundColumnHlColor() const { return m_soundColumnHlColor; }
   QColor getSoundColumnTrackColor() const { return m_soundColumnTrackColor; }
+  QColor getSoundColumnColor() const { return m_soundColumnColor; }
+  QColor getSoundColumnBorderColor() const { return m_soundColumnBorderColor; }
+  QColor getSelectedSoundColumnColor() const {
+    return m_selectedSoundColumnColor;
+  }
+
+  // SoundText column
+  QColor getSoundTextColumnColor() const { return m_soundTextColumnColor; }
+  QColor getSoundTextColumnBorderColor() const {
+    return m_soundTextColumnBorderColor;
+  }
+  QColor getSelectedSoundTextColumnColor() const {
+    return m_selectedSoundTextColumnColor;
+  }
 
   void setColumnHeadPastelizer(const QColor &color) {
     m_columnHeadPastelizer = color;

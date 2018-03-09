@@ -95,12 +95,13 @@ void XsheetViewer::getCellTypeAndColors(int &ltype, QColor &cellColor,
       break;
     case SND_XSHLEVEL:
       cellColor =
-          (isSelected) ? m_selectedSoundColumnColor : m_soundColumnColor;
-      sideColor = m_soundColumnBorderColor;
+          (isSelected) ? getSelectedSoundColumnColor() : getSoundColumnColor();
+      sideColor = getSoundColumnBorderColor();
       break;
     case SND_TXT_XSHLEVEL:
-      cellColor = XsheetGUI::SoundTextColumnColor;
-      sideColor = XsheetGUI::SoundTextColumnBorderColor;
+      cellColor = (isSelected) ? getSelectedSoundTextColumnColor()
+                               : getSoundTextColumnColor();
+      sideColor = getSoundTextColumnBorderColor();
       break;
     case MESH_XSHLEVEL:
       cellColor =
@@ -218,8 +219,7 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
     , m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
     , m_xsheetLayout("Classic")
     , m_frameZoomFactor(100)
-    , m_screenMapper(nullptr)
-    , m_timelineIconColor(XsheetGUI::TimelineIconBackground) {
+    , m_screenMapper(nullptr) {
   m_xsheetLayout = Preferences::instance()->getLoadedXsheetLayout();
 
   m_screenMapper = new ScreenMapper(this);
@@ -306,12 +306,55 @@ XsheetViewer::~XsheetViewer() {
 
 //-----------------------------------------------------------------------------
 
-// in case the colors are missing from .qss file
+// in case the colors/images are missing from .qss file, this is the basic
+// minimum settings
+// To show something.  Most other things will appear black.
 void XsheetViewer::setDefaultColors() {
-  m_foldUnfoldButtonColor = XsheetGUI::FoldUnfoldButtonColor;
-  m_subLayerColor         = XsheetGUI::SubLayerColor;
-  m_subLayerBorderColor   = XsheetGUI::SubLayerBorderColor;
-  m_selectedSubLayerColor = XsheetGUI::SelectedSubLayerColor;
+  m_bgColor                    = XsheetGUI::XsheetBGColor;
+  m_childColumnBorderColor     = XsheetGUI::ChildColumnBorderColor;
+  m_columnHeadPastelizer       = XsheetGUI::ColumnHeadPastelizerColor;
+  m_darkLineColor              = XsheetGUI::DarkLineColor;
+  m_foldUnfoldButtonColor      = XsheetGUI::FoldUnfoldButtonColor;
+  m_fullcolorColumnBorderColor = XsheetGUI::FullcolorColumnBorderColor;
+  m_fxColumnBorderColor        = XsheetGUI::FxColumnBorderColor;
+  m_levelColumnBorderColor     = XsheetGUI::LevelColumnBorderColor;
+  m_lightLineColor             = XsheetGUI::LightLineColor;
+  m_markerLineColor            = XsheetGUI::MarkerLineColor;
+  m_meshColumnBorderColor      = XsheetGUI::MeshColumnBorderColor;
+  m_paletteColumnBorderColor   = XsheetGUI::PaletteColumnBorderColor;
+  m_previewFrameTextColor      = XsheetGUI::PreviewFrameTextColor;
+  m_referenceColumnBorderColor = XsheetGUI::ReferenceColumnBorderColor;
+  m_selectedColumnTextColor    = XsheetGUI::SelectedColumnTextColor;
+  m_soundColumnBorderColor     = XsheetGUI::SoundColumnBorderColor;
+  m_soundColumnHlColor         = XsheetGUI::SoundColumnHlColor;
+  m_soundColumnTrackColor      = XsheetGUI::SoundColumnTrackColor;
+  m_soundTextColumnBorderColor = XsheetGUI::SoundTextColumnBorderColor;
+  m_subLayerBorderColor        = XsheetGUI::SubLayerBorderColor;
+  m_textColor                  = XsheetGUI::TextColor;
+  m_vectorColumnBorderColor    = XsheetGUI::VectorColumnBorderColor;
+  m_verticalLineColor          = XsheetGUI::VerticalLineColor;
+  m_verticalLineHeadColor      = XsheetGUI::VerticalLineHeadColor;
+  m_xsheetLockButtonBgOnColor  = XsheetGUI::XsheetLockButtonBgOnColor;
+
+  m_layerHeaderCamstandImage =
+      QPixmap(":Resources/timeline_camstand.png").toImage();
+  m_layerHeaderLockImage    = QPixmap(":Resources/timeline_lock.png").toImage();
+  m_layerHeaderPreviewImage = QPixmap(":Resources/timeline_eye.png").toImage();
+  m_timelineCamstandButtonOnImage =
+      QPixmap(":Resources/timeline_camstand.png").toImage();
+  m_timelineCamstandButtonTranspImage =
+      QPixmap(":Resources/timeline_camstand_transparent.png").toImage();
+  m_timelineLockButtonOnImage =
+      QPixmap(":Resources/timeline_lock.png").toImage();
+  m_timelinePreviewButtonOnImage =
+      QPixmap(":Resources/timeline_eye.png").toImage();
+  m_xsheetCamstandButtonOnImage =
+      QPixmap(":Resources/x_table_view.png").toImage();
+  m_xsheetCamstandButtonTranspImage =
+      QPixmap(":Resources/x_table_view_transp.png").toImage();
+  m_xsheetLockButtonOnImage =
+      QPixmap(svgToPixmap(":Resources/x_lock.svg")).toImage();
+  m_xsheetPreviewButtonOnImage = QPixmap(":Resources/x_prev_eye.png").toImage();
 }
 
 //-----------------------------------------------------------------------------

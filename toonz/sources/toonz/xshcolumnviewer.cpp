@@ -61,6 +61,7 @@
 #include <QComboBox>
 
 #include <QBitmap>
+
 //=============================================================================
 
 namespace {
@@ -1041,11 +1042,12 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
 void ColumnArea::DrawHeader::drawSubLayerName(
     const shared_ptr<SubLayer> &subLayer,
     const SubLayerOffsets &offsets) const {
-  p.setPen(Qt::black);
+  p.setPen(m_viewer->getTextColor());
 
   QRect nameRect = o->rect(PredefinedRect::SUBLAYER_NAME)
                        .translated(offsets.name())
                        .adjusted(2, 0, -2, 0);
+
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              subLayer->name());
 }
@@ -1088,15 +1090,6 @@ void ColumnArea::DrawHeader::drawFilterColor() const {
                getColorChipIcon(column->getFilterColor()).pixmap(12, 12));
 }
 
-/*
-void ColumnArea::DrawHeader::drawNoSoundIcon() const {
-  if (col < 0 || isEmpty) return;
-  QRect rect = m_viewer->orientation()
-                   ->rect(PredefinedRect::SOUND_ICON)
-                   .translated(orig);
-  if (o->isTimeline()) p.fillRect(rect, m_viewer->getTimelineIconColor());
-}
-*/
 void ColumnArea::DrawHeader::drawSoundIcon(bool isPlaying) const {
   QRect rect = m_viewer->orientation()
                    ->rect(PredefinedRect::SOUND_ICON)
@@ -1422,7 +1415,6 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   drawHeader.levelColors(columnColor, dragColor);
   drawHeader.drawBaseFill(columnColor, dragColor);
   drawHeader.drawEye();
-  //  drawHeader.drawNoSoundIcon();
   drawHeader.drawPreviewToggle(column ? column->getOpacity() : 0);
   drawHeader.drawLock();
   drawHeader.drawConfig();
