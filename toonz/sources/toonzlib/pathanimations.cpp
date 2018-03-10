@@ -254,6 +254,7 @@ void PathAnimations::setFrame(TVectorImage *vi, const TXshCell &cell,
 
     shared_ptr<PathAnimation> animation = addStroke(strokeId);
     animation->animate(frame);
+	vi->notifyChangedStrokes(i, vi->getStroke(i));
   }
 }
 
