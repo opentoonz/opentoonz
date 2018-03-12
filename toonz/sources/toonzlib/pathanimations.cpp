@@ -254,7 +254,7 @@ void PathAnimations::setFrame(TVectorImage *vi, const TXshCell &cell,
 
     shared_ptr<PathAnimation> animation = addStroke(strokeId);
     animation->animate(frame);
-	vi->notifyChangedStrokes(i, vi->getStroke(i));
+    vi->notifyChangedStrokes(i, vi->getStroke(i));
   }
 }
 
@@ -358,7 +358,7 @@ void PathAnimations::loadData(TIStream &is) {
           if (!is.isBeginEndTag()) {
             int chunkId;
             while (is.matchTag(tagName)) {
-              if (tagName == "chunk") {
+              if (tagName == "handle") {
                 if (!animation->isActivated()) animation->toggleActivated();
                 chunkId          = stoi(is.getTagAttribute("id")) - 1;
                 TParamSetP chunk = animation->chunkParam(chunkId);
@@ -461,7 +461,7 @@ void PathAnimations::saveData(TOStream &os, int occupiedColumnCount) {
           for (int n = 0; n < shapeAnimation->chunkCount(); n++) {
             attr.clear();
             attr["id"] = std::to_string(n + 1);
-            os.openChild("chunk", attr);
+            os.openChild("handle", attr);
             TParamSetP chunk = shapeAnimation->chunkParam(n);
 
             for (int p = 0; p < 3; p++) {

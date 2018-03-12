@@ -685,10 +685,14 @@ optional<CellChannelGroup *> CellChannelGroup::buildAndAdd(
   CellChannelGroup *cellGroup = new CellChannelGroup(parent, cell);
   parent->appendChild(cellGroup);
   for (int i = 0; i < vectorImage->getStrokeCount(); i++) {
-    StrokeId strokeId{parent->xsheet(), cell, vectorImage->getStroke(i)};
+    TStroke *stroke = vectorImage->getStroke(i);
+    StrokeId strokeId{parent->xsheet(), cell, stroke};
     shared_ptr<PathAnimation> animation =
         parent->pathAnimations()->addStroke(strokeId);
     StrokeChannelGroup *strokeGroup = new StrokeChannelGroup(animation);
+    strokeGroup->setName(
+        strokeGroup->getShortName() + " " +
+        QString::fromStdString(std::to_string(stroke->getId())));
     cellGroup->appendChild(strokeGroup);
     strokeGroup->build();
   }
@@ -700,7 +704,9 @@ optional<CellChannelGroup *> CellChannelGroup::buildAndAdd(
 //-----------------------------------------------------------------------------
 
 StrokeChannelGroup::StrokeChannelGroup(shared_ptr<PathAnimation> animation)
-    : ChannelGroup(animation->name()), m_animation(animation) {}
+    : ChannelGroup(animation->name()), m_animation(animation) {
+  if (!getShortName().length()) setName("Shape");
+}
 
 void StrokeChannelGroup::build() {
   clear();
@@ -719,7 +725,7 @@ void StrokeChannelGroup::build() {
 ChunkChannelGroup::ChunkChannelGroup(shared_ptr<PathAnimation> animation,
                                      int index)
     : m_animation(animation), m_index(index) {
-  setName("Chunk" + QString::number(m_index + 1));
+  setName("Handle " + QString::number(m_index + 1));
 }
 
 void ChunkChannelGroup::build() {
