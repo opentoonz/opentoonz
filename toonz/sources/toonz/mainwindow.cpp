@@ -1424,6 +1424,9 @@ QAction *MainWindow::createAction(const char *id, const QString &name,
   if (strcmp(id, MI_ShortcutPopup) == 0) {
     action->setMenuRole(QAction::NoRole);
   }
+  if (strcmp(id,MI_ExitGroup) == 0) {
+    action->setMenuRole(QAction::NoRole);
+  }
 #endif
   CommandManager::instance()->define(id, type, defaultShortcut.toStdString(),
                                      action);
