@@ -51,6 +51,7 @@
 #include "toonz/preferences.h"
 #include "toonz/dpiscale.h"
 #include "imagebuilders.h"
+#include "toonz/pathanimations.h"
 
 // 4.6 compatibility - sandor fxs
 #include "toonz4.6/raster.h"
@@ -1056,7 +1057,10 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
       if (!m_isCachable) vpalette->mutex()->lock();
 
       vpalette->setFrame((int)frame);
-      m_offlineContext->draw(vectorImage, rd, true);
+      TVectorImage *vi = vectorImage.getPointer();
+      TXsheet *xsh     = m_levelColumn->getLevelColumn()->getXsheet();
+      xsh->pathAnimations()->setFrame(vi, cell, frame);
+      m_offlineContext->draw(vi, rd, true);
       vpalette->setFrame(oldFrame);
 
       if (!m_isCachable) vpalette->mutex()->unlock();
