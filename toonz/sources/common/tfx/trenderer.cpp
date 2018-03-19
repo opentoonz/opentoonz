@@ -1424,8 +1424,6 @@ void TRendererImp::startRendering(
         QThread::currentThread() == qGuiApp->thread()) {
       rs.m_offScreenSurface.reset(new QOffscreenSurface());
       rs.m_offScreenSurface->setFormat(QSurfaceFormat::defaultFormat());
-      rs.m_offScreenSurface->setScreen(
-          QOpenGLContext::globalShareContext()->screen());
       rs.m_offScreenSurface->create();
     }
 

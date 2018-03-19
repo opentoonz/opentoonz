@@ -35,6 +35,7 @@ class LocatorPopup;
 class QGestureEvent;
 class QTouchEvent;
 class QOpenGLFramebufferObject;
+class LutCalibrator;
 
 namespace ImageUtils {
 class FullScreenWidget;
@@ -148,6 +149,7 @@ class SceneViewer final : public GLWidgetForHighDpi,
 
   // used for color calibration with 3DLUT
   QOpenGLFramebufferObject *m_fbo = NULL;
+  LutCalibrator *m_lutCalibrator  = NULL;
 
   enum Device3D {
     NONE,
@@ -412,6 +414,7 @@ public slots:
 
   void releaseBusyOnTabletMove() { m_isBusyOnTabletMove = false; }
 
+  void onContextAboutToBeDestroyed();
 signals:
 
   void onZoomChanged();

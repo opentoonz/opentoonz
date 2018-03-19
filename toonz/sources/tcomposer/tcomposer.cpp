@@ -564,7 +564,6 @@ static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
 DV_IMPORT_API void initStdFx();
 DV_IMPORT_API void initColorFx();
 int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
   QApplication app(argc, argv);
 
   // Create a QObject destroyed just before app - see Tnz6's main.cpp for

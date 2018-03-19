@@ -322,9 +322,9 @@ void ComboHistoRGBLabel::paintEvent(QPaintEvent *pe) {
     return;
   }
 
-  if (LutCalibrator::instance()->isValid()) {
+  if (LutManager::instance()->isValid()) {
     QColor convertedColor(m_color);
-    LutCalibrator::instance()->convert(convertedColor);
+    LutManager::instance()->convert(convertedColor);
     p.setBrush(convertedColor);
   } else
     p.setBrush(m_color);

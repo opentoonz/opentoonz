@@ -8,6 +8,7 @@
 #include "tcurves.h"
 #include <QPainter>
 #include <QImage>
+#include <QSet>
 
 //=======================================================
 //
@@ -24,6 +25,8 @@ class BluredBrush {
   double m_oldOpacity;
   bool m_enableDinamicOpacity;
 
+  QSet<int> m_aboveStyleIds;
+
   double getNextPadPosition(const TThickQuadratic &q, double t) const;
 
 public:
@@ -37,10 +40,12 @@ public:
   TRect getBoundFromPoints(const std::vector<TThickPoint> &points) const;
   // colormapped
   void updateDrawing(const TRasterCM32P rasCM, const TRasterCM32P rasBackupCM,
-                     const TRect &bbox, int styleId, bool selective) const;
+                     const TRect &bbox, int styleId, int drawOrderMode) const;
   void eraseDrawing(const TRasterCM32P rasCM, const TRasterCM32P rasBackupCM,
                     const TRect &bbox, bool selective, int selectedStyleId,
                     const std::wstring &mode) const;
+
+  void setAboveStyleIds(QSet<int> &ids) { m_aboveStyleIds = ids; }
 
   // fullcolor
   void updateDrawing(const TRasterP ras, const TRasterP rasBackup,

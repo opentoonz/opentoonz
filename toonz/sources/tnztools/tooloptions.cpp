@@ -2278,9 +2278,9 @@ protected:
     QPainter p(this);
     p.setPen(Qt::NoPen);
 
-    if (LutCalibrator::instance()->isValid()) {
+    if (LutManager::instance()->isValid()) {
       QColor convertedColor(m_color);
-      LutCalibrator::instance()->convert(convertedColor);
+      LutManager::instance()->convert(convertedColor);
       p.setBrush(convertedColor);
     } else
       p.setBrush(m_color);

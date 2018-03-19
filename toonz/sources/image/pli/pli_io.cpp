@@ -29,7 +29,7 @@ typedef TVectorImage::IntersectionBranch IntersectionBranch;
 TNZ_LITTLE_ENDIAN undefined !!
 #endif
 
-    static const int c_majorVersionNumber = 71;
+    static const int c_majorVersionNumber = 120;
 static const int c_minorVersionNumber     = 0;
 
 /*=====================================================================*/
@@ -317,6 +317,7 @@ class ParsedPliImp {
 public:
   UCHAR m_majorVersionNumber;
   UCHAR m_minorVersionNumber;
+  bool m_versionLocked = false;
   USHORT m_framesNumber;
   double m_thickRatio;
   double m_maxThickness;
@@ -345,6 +346,7 @@ public:
   PliTag *readIntersectionDataTag();
   PliTag *readOutlineOptionsTag();
   PliTag *readPrecisionScaleTag();
+  PliTag *readAutoCloseToleranceTag();
 
   inline void readDinamicData(TUINT32 &val, TUINT32 &bufOffs);
   inline bool readDinamicData(TINT32 &val, TUINT32 &bufOffs);
@@ -370,6 +372,7 @@ public:
   TUINT32 writeIntersectionDataTag(IntersectionDataTag *tag);
   TUINT32 writeOutlineOptionsTag(StrokeOutlineOptionsTag *tag);
   TUINT32 writePrecisionScaleTag(PrecisionScaleTag *tag);
+  TUINT32 writeAutoCloseToleranceTag(AutoCloseToleranceTag *tag);
 
   inline void writeDinamicData(TUINT32 val);
   inline void writeDinamicData(TINT32 val, bool isNegative);
@@ -956,6 +959,9 @@ TagElem *ParsedPliImp::readTag() {
   case PliTag::PRECISION_SCALE_GOBJ:
     newTag = readPrecisionScaleTag();
     break;
+  case PliTag::AUTOCLOSE_TOLERANCE_GOBJ:
+    newTag = readAutoCloseToleranceTag();
+    break;
   case PliTag::END_CNTRL:
     return 0;
   }
@@ -1410,6 +1416,17 @@ PliTag *ParsedPliImp::readPrecisionScaleTag() {
 
 /*=====================================================================*/
 
+PliTag *ParsedPliImp::readAutoCloseToleranceTag() {
+  TUINT32 bufOffs = 0;
+
+  TINT32 d;
+  readDinamicData(d, bufOffs);
+
+  return new AutoCloseToleranceTag(d);
+}
+
+/*=====================================================================*/
+
 void ParsedPliImp::readFloatData(double &val, TUINT32 &bufOffs) {
   // UCHAR currDinamicTypeBytesNumSaved = m_currDinamicTypeBytesNum;
   // m_currDinamicTypeBytesNum = 2;
@@ -1807,6 +1824,10 @@ void ParsedPliImp::writeTag(TagElem *elem) {
     break;
   case PliTag::PRECISION_SCALE_GOBJ:
     elem->m_offset = writePrecisionScaleTag((PrecisionScaleTag *)elem->m_tag);
+    break;
+  case PliTag::AUTOCLOSE_TOLERANCE_GOBJ:
+    elem->m_offset =
+        writeAutoCloseToleranceTag((AutoCloseToleranceTag *)elem->m_tag);
     break;
   default:
     assert(false);
@@ -2357,6 +2378,20 @@ TUINT32 ParsedPliImp::writePrecisionScaleTag(PrecisionScaleTag *tag) {
 
 /*=====================================================================*/
 
+TUINT32 ParsedPliImp::writeAutoCloseToleranceTag(AutoCloseToleranceTag *tag) {
+  assert(m_oChan);
+  setDinamicTypeBytesNum(0, 10000);
+
+  int tagLength = m_currDinamicTypeBytesNum;
+  int offset =
+      (int)writeTagHeader((UCHAR)PliTag::AUTOCLOSE_TOLERANCE_GOBJ, tagLength);
+
+  writeDinamicData((TINT32)tag->m_autoCloseTolerance);
+  return offset;
+}
+
+/*=====================================================================*/
+
 TUINT32 ParsedPliImp::writeGeometricTransformationTag(
     GeometricTransformationTag *tag) {
   assert(m_oChan);
@@ -2509,7 +2544,7 @@ bool ParsedPliImp::writePli(const TFilePath &filename) {
   double absAutoClose = fabs(m_autocloseTolerance);
   s                   = tsign(m_autocloseTolerance) + 1;
   i                   = (UCHAR)((int)absAutoClose);
-  d                   = (UCHAR)((int)((absAutoClose - i) * 100));
+  d                   = (UCHAR)((int)round((absAutoClose - i) * 100));
   *m_oChan << s;
   *m_oChan << i;
   *m_oChan << d;
@@ -2599,6 +2634,15 @@ void ParsedPli::getVersion(UINT &majorVersionNumber,
 
 /*=====================================================================*/
 
+void ParsedPli::setVersion(UINT majorVersionNumber, UINT minorVersionNumber) {
+  if (imp->m_versionLocked) return;
+  if (majorVersionNumber >= 120) imp->m_versionLocked = true;
+  imp->m_majorVersionNumber                           = majorVersionNumber;
+  imp->m_minorVersionNumber                           = minorVersionNumber;
+}
+
+/*=====================================================================*/
+
 bool ParsedPli::writePli(const TFilePath &filename) {
   return imp->writePli(filename);
 }
@@ -2663,6 +2707,14 @@ int ParsedPliImp::getFrameCount() { return m_framesNumber; }
 
 double ParsedPli::getAutocloseTolerance() const {
   return imp->m_autocloseTolerance;
+}
+
+/*=====================================================================*/
+
+/*=====================================================================*/
+
+void ParsedPli::setAutocloseTolerance(int tolerance) {
+  imp->m_autocloseTolerance = tolerance;
 }
 
 /*=====================================================================*/

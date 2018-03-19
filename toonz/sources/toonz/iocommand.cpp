@@ -156,7 +156,7 @@ public:
               << QObject::tr("Cancel");
       DVGui::MessageAndCheckboxDialog *importDialog =
           DVGui::createMsgandCheckbox(DVGui::QUESTION, label, checkBoxLabel,
-                                      buttons, 0);
+                                      buttons, 0, Qt::Unchecked);
       int ret     = importDialog->exec();
       int checked = importDialog->getChecked();
       importDialog->deleteLater();

@@ -203,6 +203,7 @@ private slots:
   void onShowCurrentTimelineChanged(int);
   void onColorCalibrationChanged(bool);
   void onLutPathChanged();
+  void onCheckLatestVersionChanged(bool);
 };
 
 //**********************************************************************************

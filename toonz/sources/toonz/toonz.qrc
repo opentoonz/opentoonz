@@ -148,15 +148,9 @@
         <file>Resources/my_computer.svg</file>
         <file>Resources/my_documents.svg</file>
         <file>Resources/network.svg</file>
-        <file>Resources/new_raster_level.png</file>
-        <file>Resources/new_raster_level_over.png</file>
-        <file>Resources/new_raster_level_click.png</file>
-        <file>Resources/new_toonz_raster_level.png</file>
-        <file>Resources/new_toonz_raster_level_click.png</file>
-        <file>Resources/new_toonz_raster_level_over.png</file>
-        <file>Resources/new_vector_level.png</file>
-        <file>Resources/new_vector_level_click.png</file>
-        <file>Resources/new_vector_level_over.png</file>
+        <file>Resources/new_raster_level.svg</file>
+        <file>Resources/new_toonz_raster_level.svg</file>
+        <file>Resources/new_vector_level.svg</file>
         <file>Resources/newmemo.svg</file>
         <file>Resources/newmemo_disabled.svg</file>
         <file>Resources/newstyle.png</file>

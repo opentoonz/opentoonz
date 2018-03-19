@@ -19,6 +19,7 @@
 #include "toonz/txshsimplelevel.h"  //iwsw
 #include "toonz/levelproperties.h"  //iwsw
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tconvert.h"
@@ -559,6 +560,8 @@ HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setFocusPolicy(Qt::NoFocus);
   m_currentWheel = none;
+  if (Preferences::instance()->isColorCalibrationEnabled())
+    m_lutCalibrator = new LutCalibrator();
 }
 
 //-----------------------------------------------------------------------------
@@ -573,7 +576,11 @@ void HexagonalColorWheel::initializeGL() {
   initializeOpenGLFunctions();
 
   // to be computed once through the software
-  LutCalibrator::instance()->initialize();
+  if (m_lutCalibrator) {
+    m_lutCalibrator->initialize();
+    connect(context(), SIGNAL(aboutToBeDestroyed()), this,
+            SLOT(onContextAboutToBeDestroyed()));
+  }
 
   QColor const color = getBGColor();
   glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
@@ -629,7 +636,7 @@ void HexagonalColorWheel::resizeGL(int w, int h) {
   glOrtho(0.0, (GLdouble)w, (GLdouble)h, 0.0, 1.0, -1.0);
 
   // remake fbo with new size
-  if (LutCalibrator::instance()->isValid()) {
+  if (m_lutCalibrator && m_lutCalibrator->isValid()) {
     if (m_fbo) delete m_fbo;
     m_fbo = new QOpenGLFramebufferObject(w, h);
   }
@@ -645,7 +652,7 @@ void HexagonalColorWheel::paintGL() {
 
   glMatrixMode(GL_MODELVIEW);
 
-  if (LutCalibrator::instance()->isValid()) m_fbo->bind();
+  if (m_lutCalibrator && m_lutCalibrator->isValid()) m_fbo->bind();
 
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -692,8 +699,8 @@ void HexagonalColorWheel::paintGL() {
 
   glPopMatrix();
 
-  if (LutCalibrator::instance()->isValid())
-    LutCalibrator::instance()->onEndDraw(m_fbo);
+  if (m_lutCalibrator && m_lutCalibrator->isValid())
+    m_lutCalibrator->onEndDraw(m_fbo);
 }
 
 //-----------------------------------------------------------------------------
@@ -842,6 +849,15 @@ void HexagonalColorWheel::clickRightTriangle(const QPoint &pos) {
   }
   m_color.setValues(eHue, s, v);
   emit colorChanged(m_color, true);
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::onContextAboutToBeDestroyed() {
+  if (!m_lutCalibrator) return;
+  makeCurrent();
+  m_lutCalibrator->cleanup();
+  doneCurrent();
 }
 
 //*****************************************************************************

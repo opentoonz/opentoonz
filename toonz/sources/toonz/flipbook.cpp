@@ -268,9 +268,9 @@ void FlipBook::addFreezeButtonToTitleBar() {
   TPanel *panel = qobject_cast<TPanel *>(parentWidget());
   if (panel) {
     TPanelTitleBar *titleBar = panel->getTitleBar();
-    m_freezeButton = new TPanelTitleBarButton(titleBar, ":Resources/pane_freeze_off.svg",
-                                              ":Resources/pane_freeze_over.svg",
-                                              ":Resources/pane_freeze_on.svg");
+    m_freezeButton           = new TPanelTitleBarButton(
+        titleBar, ":Resources/pane_freeze_off.svg",
+        ":Resources/pane_freeze_over.svg", ":Resources/pane_freeze_on.svg");
     m_freezeButton->setToolTip("Freeze");
     titleBar->add(QPoint(-55, 0), m_freezeButton);
     connect(m_freezeButton, SIGNAL(toggled(bool)), this, SLOT(freeze(bool)));
@@ -1136,6 +1136,15 @@ void FlipBook::setLevel(const TFilePath &fp, TPalette *palette, int from,
       Level levelToPush(level, fp, fromIndex, toIndex, step);
       levelToPush.m_randomAccessRead    = randomAccessRead;
       levelToPush.m_incrementalIndexing = incrementalIndexing;
+
+      int formatIdx = Preferences::instance()->matchLevelFormat(fp);
+      if (formatIdx >= 0 &&
+          Preferences::instance()
+              ->levelFormat(formatIdx)
+              .m_options.m_premultiply) {
+        levelToPush.m_premultiply = true;
+      }
+
       m_levels.push_back(levelToPush);
 
       // Get the frames count to be shown in this flipbook level
@@ -1498,7 +1507,7 @@ TImageP FlipBook::getCurrentImage(int frame) {
 
   bool randomAccessRead    = false;
   bool incrementalIndexing = false;
-
+  bool premultiply         = false;
   if (m_xl)  // is an xsheet level
   {
     if (m_xl->getFrameCount() <= 0) return 0;
@@ -1533,6 +1542,7 @@ TImageP FlipBook::getCurrentImage(int frame) {
     incrementalIndexing = m_levels[i].m_incrementalIndexing;
     levelName           = m_levelNames[i];
     fid                 = m_levels[i].flipbookIndexToLevelFrame(frameIndex);
+    premultiply         = m_levels[i].m_premultiply;
     if (fid == TFrameId()) return 0;
     id = levelName.toStdString() + fid.expand(TFrameId::NO_PAD) +
          ((m_isPreviewFx) ? "" : ::to_string(this));
@@ -1587,6 +1597,13 @@ TImageP FlipBook::getCurrentImage(int frame) {
     if (img) {
       TRasterImageP ri = ((TRasterImageP)img);
       TToonzImageP ti  = ((TToonzImageP)img);
+      if (premultiply) {
+        if (ri)
+          TRop::premultiply(ri->getRaster());
+        else if (ti)
+          TRop::premultiply(ti->getRaster());
+      }
+
       // se e' stata caricata una sottoimmagine alcuni formati in realta'
       // caricano tutto il raster e fanno extract, non si ha quindi alcun
       // risparmio di occupazione di memoria; alloco un raster grande

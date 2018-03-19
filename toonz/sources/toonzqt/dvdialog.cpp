@@ -806,11 +806,11 @@ void Dialog::addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third,
 
 //=============================================================================
 
-MessageAndCheckboxDialog::MessageAndCheckboxDialog(QWidget *parent,
-                                                   bool hasButton,
-                                                   bool hasFixedSize,
-                                                   const QString &name)
-    : Dialog(parent, hasButton, hasFixedSize, name) {}
+MessageAndCheckboxDialog::MessageAndCheckboxDialog(
+    QWidget *parent, bool hasButton, bool hasFixedSize, const QString &name,
+    Qt::CheckState checkButtonState)
+    : Dialog(parent, hasButton, hasFixedSize, name)
+    , m_checked(checkButtonState) {}
 
 //=============================================================================
 
@@ -1275,8 +1275,10 @@ Dialog *DVGui::createMsgBox(MsgType type, const QString &text,
 
 MessageAndCheckboxDialog *DVGui::createMsgandCheckbox(
     MsgType type, const QString &text, const QString &checkBoxText,
-    const QStringList &buttons, int defaultButtonIndex, QWidget *parent) {
-  MessageAndCheckboxDialog *dialog = new MessageAndCheckboxDialog(parent, true);
+    const QStringList &buttons, int defaultButtonIndex,
+    Qt::CheckState defaultCheckBoxState, QWidget *parent) {
+  MessageAndCheckboxDialog *dialog = new MessageAndCheckboxDialog(
+      parent, true, true, "", defaultCheckBoxState);
   dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
   dialog->setAlignment(Qt::AlignLeft);
   QString msgBoxTitle = getMsgBoxTitle(type);
@@ -1312,14 +1314,13 @@ MessageAndCheckboxDialog *DVGui::createMsgandCheckbox(
     buttonGroup->addButton(button, i + 1);
   }
 
-  QCheckBox *dialogCheckBox   = new QCheckBox(dialog);
+  QCheckBox *dialogCheckBox   = new QCheckBox(checkBoxText, dialog);
   QHBoxLayout *checkBoxLayout = new QHBoxLayout;
-  QLabel *checkBoxLabel       = new QLabel(checkBoxText, dialog);
   checkBoxLayout->addWidget(dialogCheckBox);
-  checkBoxLayout->addWidget(checkBoxLabel);
   checkBoxLayout->addStretch(0);
-
   dialog->addLayout(checkBoxLayout);
+
+  dialogCheckBox->setCheckState(defaultCheckBoxState);
 
   QObject::connect(dialogCheckBox, SIGNAL(stateChanged(int)), dialog,
                    SLOT(onCheckboxChanged(int)));

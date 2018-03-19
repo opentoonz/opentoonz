@@ -31,24 +31,42 @@
 
 namespace {
 
+enum FxCanGenerateState {
+  NoInput = 0,  // This fx has input port, but no connected fx - state will not
+                // transmit to parents and leave the decision up to another
+                // input fx
+  CanGenerate,  // This fx can generate only from fxsSet input
+  CanNotGenerate  // This fx contains input fx other than fxsSet - state will
+                  // transmit to parents
+};
+
 //! Returns whether ALL input chains from fx pass through fxsSet - ie if
 //! fxsSet can completely generate fx's input.
 //! \note Columns are assumed to be generated only if they are in fxsSet.
-bool canGenerate(const std::set<TFx *> &fxsSet, TFx *fx) {
+FxCanGenerateState canGenerate(const std::set<TFx *> &fxsSet, TFx *fx) {
   assert(fx);
 
-  if (fxsSet.count(fx) > 0) return true;
+  if (fxsSet.count(fx) > 0) return CanGenerate;
 
   int p, pCount = fx->getInputPortCount();
+
+  if (pCount == 0) return CanNotGenerate;
+
+  bool found = false;
   for (p = 0; p != pCount; ++p) {
     TFx *inputFx = fx->getInputPort(p)->getFx();
     if (!inputFx) continue;
 
+    FxCanGenerateState tmpState = canGenerate(fxsSet, inputFx);
     // Inability to generate transmits to parents
-    if (!canGenerate(fxsSet, inputFx)) return false;
+    if (tmpState == CanNotGenerate)
+      return CanNotGenerate;
+    else if (tmpState == CanGenerate)
+      found = true;
   }
 
-  return (pCount != 0);  // Columns return false, the others checked ports
+  return (found) ? CanGenerate
+                 : NoInput;  // Columns return false, the others checked ports
 }
 
 //------------------------------------------------------------------------------
@@ -79,7 +97,7 @@ bool hasTerminalUpstream(TFx *fx, TFxSet *terminalFxs) {
 //! parent.
 bool isColumnSelectionTerminalFx(TFx *fx, TFxSet *terminalFxs,
                                  const std::set<TFx *> &columnFxs) {
-  assert(canGenerate(columnFxs, fx));
+  assert(canGenerate(columnFxs, fx) == CanGenerate);
 
   if (terminalFxs->containsFx(fx)) return true;
 
@@ -91,7 +109,7 @@ bool isColumnSelectionTerminalFx(TFx *fx, TFxSet *terminalFxs,
       parentFx = zfx->getColumnFx();
 
     if (parentFx && hasTerminalUpstream(parentFx, terminalFxs) &&
-        !canGenerate(columnFxs, parentFx))
+        canGenerate(columnFxs, parentFx) != CanGenerate)
       return true;
   }
 
@@ -770,8 +788,8 @@ void StageObjectsData::storeColumnFxs(const std::set<int> &columnIndexes,
     if (m_fxTable.find(fx) != m_fxTable.end())  // If already treated
       continue;
 
-    if (!canGenerate(m_originalColumnFxs,
-                     fx))  // If not completely in the upstream
+    if (canGenerate(m_originalColumnFxs,
+                    fx) != CanGenerate)  // If not completely in the upstream
       continue;
 
     if (doClone) {
@@ -798,7 +816,8 @@ void StageObjectsData::storeColumnFxs(const std::set<int> &columnIndexes,
 
     if (fxOrig->getLinkedFx() != fxOrig)  // Linked fx
     {
-      if (!canGenerate(m_originalColumnFxs, fxOrig->getLinkedFx()))
+      if (canGenerate(m_originalColumnFxs, fxOrig->getLinkedFx()) !=
+          CanGenerate)
         fx->linkParams(fxOrig->getLinkedFx());
       else {
         // Insert the linked fx directly here
@@ -988,7 +1007,10 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(
       if (resetFxDagPositions)
         fx->getAttributes()->setDagNodePos(TConst::nowhere);
 
-      xsh->getFxDag()->assignUniqueId(fx);
+      xsh->getFxDag()->assignUniqueId(
+          fx);  // For now, dragging columns always increment fxid.
+                // Could it be more adaptive, avoiding increment
+                // if it is not necessary?
     }
 
     fxTable[fxOrig] = fx;

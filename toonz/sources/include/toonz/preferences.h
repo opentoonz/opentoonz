@@ -506,6 +506,12 @@ public:
   bool isAutomaticSVNFolderRefreshEnabled() const {
     return m_automaticSVNFolderRefreshEnabled;
   }
+
+  void enableLatestVersionCheck(bool on);
+  bool isLatestVersionCheckEnabled() const {
+    return m_latestVersionCheckEnabled;
+  }
+
   // Import Export Tab
 
   void setFfmpegPath(std::string path);
@@ -666,6 +672,9 @@ private:
   // map of [monitor name]-[path to the lut file].
   // for now non-Windows accepts only one lut path for all kinds of monitors
   QMap<QString, QString> m_colorCalibrationLutPaths;
+
+  // release version check
+  bool m_latestVersionCheckEnabled = true;
 
 private:
   Preferences();

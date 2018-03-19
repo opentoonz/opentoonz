@@ -5,9 +5,11 @@ This software can be built using Visual Studio 2015 and Qt 5.9
 ## Required Software
 
 ### Visual Studio Express 2015 for Windows Desktop
-- https://www.visualstudio.com/ja-jp/products/visual-studio-express-vs.aspx
-- Make sure that the target platform is "for Windows Desktop" not "for Windows".
+- https://www.visualstudio.com/vs/older-downloads/
+- Make sure that the version is "2015" and that the target platform is "for Windows Desktop", not "for Windows".
 - Community and Professional versions of Visual Studio 2015 for Windows Desktop also work.
+- Visual Studio 2017 is currently unsupported.
+- During the installation, make sure to select all the Visual C++ packages.
 
 ### CMake
 - https://cmake.org/download/
@@ -31,10 +33,10 @@ They will have to be installed seperately as follows.
 ### Qt
 - https://www.qt.io/download-open-source/
 - Qt is a cross-platform GUI framework.
-- Install Qt 5.9 (64-bit version) by [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
+- Install Qt 5.9 (64-bit version, tested up to 5.9.4) with the [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
 
 ### boost
-- Boost 1.55.0 or later is required (tested up to 1.60.0).
+- Boost 1.55.0 or later is required (tested up to 1.61.0).
 - http://www.boost.org/users/history/version_1_61_0.html
 - Download boost_1_61_0.zip from the above link.  Extract all contents to the '$opentoonz/thirdparty/boost' directory.
 - Install the following patch (Make the changes listed in the patch file), if you use Boost 1.55.0 with Visual Studio 2013.
@@ -51,7 +53,8 @@ They will have to be installed seperately as follows.
   - If the build directory is in the git repository, be sure to add the directory to .gitignore
   - If the build directory is different from the one above, be sure to change to the specified directory where appropriate below.
 4. Click on Configure and select Visual Studio 14 2015 Win64.
-5. If Qt was installed to a directory other than the default, and the error `Specify QT_PATH properly` appears, navigate to the `QT_DIR` install folder and specify the path to `msvc2015_64`. Rerun Configure. 
+5. If Qt was installed to a directory other than the default, and the error `Specify QT_PATH properly` appears, navigate to the `QT_DIR` install folder and specify the path to `msvc2015_64`. Rerun Configure.
+  - If red lines appear in the bottom box, you can safely ignore them.
 6. Click Generate
   - Should the CMakeLists.txt file change, such as during automatic build cleanup, there is no need to rerun CMake.
 
@@ -64,14 +67,14 @@ Rename the following files:
     - Note that the destination is a different folder for the last file.
 
 ## Building
-1. Open `$opentoonz/toonz/build/OpenToonz.sln` and change to `Release`
-2. The output will be in `$opentoonz/toonz/build/Release`
+1. Open `$opentoonz/toonz/build/OpenToonz.sln` and change to `Debug` or `Release` in the top bar.
+2. The output will be in the corresponding folder in `$opentoonz/toonz/build/`
 
 ## Running the Program
 ### Setting Up the Program's Path
 1. Copy the entire contents of `$opentoonz/toonz/build/Release` to an appropriate folder.
 
-2. In the path for `OpenToonz_1.2.exe`, append the Qt program `windeployqt.exe` as an argument.
+2. Open a Command Prompt and navigate to `QT_DIR/msvc2015_64/bin`. Run the Qt program `windeployqt.exe` with the path for `OpenToonz_1.2.exe` as an argument.
   - The necessary Qt library files should be in the same folder as `OpenToonz_1.2.exe`
   - These include:
     - `Qt5Core.dll`
@@ -118,6 +121,10 @@ If a previous binary of OpenToonz was already installed, this step and the follo
 
 ### Running
 `OpenToonz_1.2.exe` can now be run.  Congratulations!
+
+## Debugging
+1. In the Solution Explorer, select the OpenToonz_1.2 project within the OpenToonz solution.
+2. In the Project menu, choose Set as StartUp Project.
 
 ## Creating the Files for the `srv` Folder
 OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since the QuickTime SDK only comes in 32-bit versions, the 32-bit file `t32bitsrv.exe` from the QuickTime SDK is used in both the 64-bit and 32-bit versions of OpenToonz.  As a result, the following instructions apply to both the 32 and 64-bit versions of OpenToonz.

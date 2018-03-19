@@ -72,7 +72,7 @@ public:
   const std::string &propertyName() const { return m_propertyName; }
 
   void onPropertyChanged() override { updateStatus(); }
-  void notifyTool();
+  void notifyTool(bool addToUndo = false);
   // return true if the control is belonging to the visible viewer
   bool isInVisibleViewer(QWidget *widget);
 

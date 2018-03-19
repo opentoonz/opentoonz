@@ -322,6 +322,16 @@ PrecisionScaleTag::PrecisionScaleTag(int precisionScale)
     : PliObjectTag(PRECISION_SCALE_GOBJ), m_precisionScale(precisionScale) {}
 
 /*=====================================================================*/
+
+AutoCloseToleranceTag::AutoCloseToleranceTag()
+    : PliObjectTag(AUTOCLOSE_TOLERANCE_GOBJ) {}
+
+/*=====================================================================*/
+
+AutoCloseToleranceTag::AutoCloseToleranceTag(int tolerance)
+    : PliObjectTag(AUTOCLOSE_TOLERANCE_GOBJ), m_autoCloseTolerance(tolerance) {}
+
+/*=====================================================================*/
 /*=====================================================================*/
 
 /*=====================================================================*/

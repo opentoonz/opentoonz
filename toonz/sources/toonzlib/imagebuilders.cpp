@@ -272,8 +272,6 @@ TImageP ImageRasterizer::build(int imFlags, BuildExtData *data) {
 
         std::unique_ptr<QOffscreenSurface> surface(new QOffscreenSurface());
         surface->setFormat(format);
-        // Enabling Qt::AA_ShareOpenGLContexts attribute in main()
-        surface->setScreen(QOpenGLContext::globalShareContext()->screen());
         surface->create();
 
         TRaster32P ras(d);
