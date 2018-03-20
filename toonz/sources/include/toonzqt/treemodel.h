@@ -58,7 +58,7 @@ public:
     // be deleted by endRefresh()
     void setChildren(QList<Item *> &children);
 
-    void clear() { setChildren(QList<Item *>()); }
+    void clear();
 
     // called by setChildren on "used" old child
     virtual void refresh() {}

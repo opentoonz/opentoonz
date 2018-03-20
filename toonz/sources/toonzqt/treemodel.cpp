@@ -143,6 +143,13 @@ void TreeModel::Item::setChildren(QList<Item *> &newChildren) {
 
 //------------------------------------------------------------------------------------------------------------------
 
+void TreeModel::Item::clear() {
+  QList<Item *> empty;
+  setChildren(empty);
+}
+
+//------------------------------------------------------------------------------------------------------------------
+
 QVariant TreeModel::Item::data(int role) const {
   if (role == Qt::DecorationRole)
     return QIcon(isOpen() ? ":Resources/folder_open.png"
