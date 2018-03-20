@@ -1336,14 +1336,19 @@ void MainWindow::onUpdateCheckerDone(bool error) {
   int const latest_version =
       get_version_code_from(m_updateChecker->getLatestVersion().toStdString());
   if (software_version < latest_version) {
-    std::vector<QString> buttons;
+    QStringList buttons;
     buttons.push_back(QObject::tr("Visit Web Site"));
     buttons.push_back(QObject::tr("Cancel"));
-    int ret = DVGui::MsgBox(
+    DVGui::MessageAndCheckboxDialog *dialog = DVGui::createMsgandCheckbox(
         DVGui::INFORMATION,
         QObject::tr("An update is available for this software.\nVisit the Web "
                     "site for more information."),
-        buttons);
+        QObject::tr("Check for the latest version on launch."), buttons, 0,
+        Qt::Checked);
+    int ret = dialog->exec();
+    if (dialog->getChecked() == Qt::Unchecked)
+      Preferences::instance()->enableLatestVersionCheck(false);
+    dialog->deleteLater();
     if (ret == 1) {
       // Write the new last date to file
       QDesktopServices::openUrl(QObject::tr("https://opentoonz.github.io/e/"));
@@ -1616,15 +1621,16 @@ void MainWindow::defineActions() {
   QAction *newVectorLevelAction =
       createMenuFileAction(MI_NewVectorLevel, tr("&New Vector Level"), "");
   newVectorLevelAction->setIconText(tr("New Vector Level"));
-  newVectorLevelAction->setIcon(createQIconPNG("new_vector_level"));
+  newVectorLevelAction->setIcon(QIcon(":Resources/new_vector_level.svg"));
   QAction *newToonzRasterLevelAction = createMenuFileAction(
       MI_NewToonzRasterLevel, tr("&New Toonz Raster Level"), "");
   newToonzRasterLevelAction->setIconText(tr("New Toonz Raster Level"));
-  newToonzRasterLevelAction->setIcon(createQIconPNG("new_toonz_raster_level"));
+  newToonzRasterLevelAction->setIcon(
+      QIcon(":Resources/new_toonz_raster_level.svg"));
   QAction *newRasterLevelAction =
       createMenuFileAction(MI_NewRasterLevel, tr("&New Raster Level"), "");
   newRasterLevelAction->setIconText(tr("New Raster Level"));
-  newRasterLevelAction->setIcon(createQIconPNG("new_raster_level"));
+  newRasterLevelAction->setIcon(QIcon(":Resources/new_raster_level.svg"));
   QAction *loadLevelAction =
       createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
   loadLevelAction->setIcon(QIcon(":Resources/load_level.svg"));
@@ -2208,6 +2214,8 @@ void MainWindow::defineActions() {
                           tr("Pressure Sensitivity"), "Shift+P");
   createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "F8");
   createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "F7");
+  createToolOptionsAction("A_ToolOption_DrawOrder",
+                          tr("Brush Tool - Draw Order"), "");
   createToolOptionsAction("A_ToolOption_Smooth", tr("Smooth"), "");
   createToolOptionsAction("A_ToolOption_Snap", tr("Snap"), "");
   createToolOptionsAction("A_ToolOption_AutoSelectDrawing",
@@ -2392,9 +2400,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene) ? m_recentScenes : (fileType == Level)
-                                                 ? m_recentLevels
-                                                 : m_recentFlipbookImages;
+      (fileType == Scene)
+          ? m_recentScenes
+          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2519,9 +2527,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene) ? m_recentScenes : (fileType == Level)
-                                                 ? m_recentLevels
-                                                 : m_recentFlipbookImages;
+      (fileType == Scene)
+          ? m_recentScenes
+          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2548,9 +2556,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
-                                                        ? MI_ClearRecentLevel
-                                                        : MI_ClearRecentImage;
+        (fileType == Scene)
+            ? MI_ClearRecentScene
+            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

@@ -216,7 +216,15 @@ public:
 
   int getSize() const override { return sizeof(*this); }
 
-  QString getToolName() override { return QObject::tr("Move Group"); }
+  QString getToolName() override {
+    static QMap<int, QString> commandTypeStrMap{
+        {TGroupCommand::FRONT, QObject::tr(" to Front")},
+        {TGroupCommand::FORWARD, QObject::tr(" to Forward")},
+        {TGroupCommand::BACK, QObject::tr(" to Back")},
+        {TGroupCommand::BACKWARD, QObject::tr(" to Backward")}};
+
+    return QObject::tr("Move Group") + commandTypeStrMap.value(m_moveType);
+  }
 };
 
 //-----------------------------------------------------------------------------

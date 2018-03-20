@@ -3,6 +3,7 @@ set(MOC_HEADERS
     controlpointselection.h
     ../include/tools/imagegrouping.h
     edittoolgadgets.h
+    filltool.h
     skeletonsubtools.h
     tooloptionscontrols.h
     plastictool.h

@@ -429,6 +429,12 @@ void PreferencesPopup::onAutomaticSVNRefreshChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onCheckLatestVersionChanged(bool on) {
+  m_pref->enableLatestVersionCheck(on);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onSVNEnabledChanged(int index) {
   bool enabled = index == Qt::Checked;
   if (enabled) {
@@ -1159,9 +1165,8 @@ void PreferencesPopup::onColorCalibrationChanged(bool on) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onLutPathChanged() {
-  m_pref->setColorCalibrationLutPath(
-      LutCalibrator::instance()->getMonitorName(),
-      m_lutPathFileField->getPath());
+  m_pref->setColorCalibrationLutPath(LutManager::instance()->getMonitorName(),
+                                     m_lutPathFileField->getPath());
 }
 
 //-----------------------------------------------------------------------------
@@ -1475,6 +1480,9 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *autoRefreshFolderContentsCB =
       new CheckBox(tr("Automatically Refresh Folder Contents"), this);
 
+  CheckBox *checkForTheLatestVersionCB = new CheckBox(
+      tr("Check for the Latest Version of OpenToonz on Launch"), this);
+
   QLabel *note_version =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_version->setStyleSheet("font-size: 10px; font: italic;");
@@ -1617,7 +1625,7 @@ PreferencesPopup::PreferencesPopup()
   m_colorCalibration->setCheckable(true);
   m_colorCalibration->setChecked(m_pref->isColorCalibrationEnabled());
   QString lutPath = m_pref->getColorCalibrationLutPath(
-      LutCalibrator::instance()->getMonitorName());
+      LutManager::instance()->getMonitorName());
   if (!lutPath.isEmpty()) m_lutPathFileField->setPath(lutPath);
   m_lutPathFileField->setFileMode(QFileDialog::ExistingFile);
   QStringList lutFileTypes;
@@ -1807,6 +1815,7 @@ PreferencesPopup::PreferencesPopup()
   m_enableVersionControl->setChecked(m_pref->isSVNEnabled());
   autoRefreshFolderContentsCB->setChecked(
       m_pref->isAutomaticSVNFolderRefreshEnabled());
+  checkForTheLatestVersionCB->setChecked(m_pref->isLatestVersionCheckEnabled());
 
   /*--- layout ---*/
 
@@ -2034,7 +2043,7 @@ PreferencesPopup::PreferencesPopup()
       {
         lutLayout->addWidget(
             new QLabel(tr("3DLUT File for [%1] *:")
-                           .arg(LutCalibrator::instance()->getMonitorName()),
+                           .arg(LutManager::instance()->getMonitorName()),
                        this),
             0);
         lutLayout->addWidget(m_lutPathFileField, 1);
@@ -2500,6 +2509,8 @@ PreferencesPopup::PreferencesPopup()
                        Qt::AlignLeft | Qt::AlignVCenter);
       vcLay->addWidget(autoRefreshFolderContentsCB, 0,
                        Qt::AlignLeft | Qt::AlignVCenter);
+      vcLay->addWidget(checkForTheLatestVersionCB, 0,
+                       Qt::AlignLeft | Qt::AlignVCenter);
 
       vcLay->addStretch(1);
 
@@ -2821,7 +2832,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onSVNEnabledChanged(int)));
   ret = ret && connect(autoRefreshFolderContentsCB, SIGNAL(stateChanged(int)),
                        SLOT(onAutomaticSVNRefreshChanged(int)));
-
+  ret = ret && connect(checkForTheLatestVersionCB, SIGNAL(clicked(bool)),
+                       SLOT(onCheckLatestVersionChanged(bool)));
   assert(ret);
 }
 

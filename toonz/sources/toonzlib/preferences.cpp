@@ -679,6 +679,8 @@ Preferences::Preferences()
                                         it.value().toString());
     }
   }
+  getValue(*m_settings, "latestVersionCheckEnabled",
+           m_latestVersionCheckEnabled);
 
   getValue(*m_settings, "DisableAutoStretch", m_disableAutoStretch);
 }
@@ -832,6 +834,13 @@ void Preferences::enableAutomaticSVNFolderRefresh(bool on) {
 void Preferences::enableSVN(bool on) {
   m_SVNEnabled = on;
   m_settings->setValue("SVNEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableLatestVersionCheck(bool on) {
+  m_latestVersionCheckEnabled = on;
+  m_settings->setValue("latestVersionCheckEnabled", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

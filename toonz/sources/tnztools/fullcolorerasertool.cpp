@@ -428,6 +428,12 @@ void FullColorEraserTool::onActivate() {
   }
 
   m_brushPad = getBrushPad(m_size.getValue(), m_hardness.getValue() * 0.01);
+
+  // setting m_level in resetMulti() will take care when the tool is switched
+  // via shortcut ( i.e. the case skipping onEnter() )
+  resetMulti();
+  // clear previous polyline when the tool is activated
+  m_polyline.clear();
 }
 
 //--------------------------------------------------------------------------------------------------

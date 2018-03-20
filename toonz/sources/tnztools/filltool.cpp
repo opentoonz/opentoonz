@@ -1,14 +1,13 @@
 
+#include "filltool.h"
 
-#include "tools/tool.h"
-#include "tools/toolutils.h"
-#include "toonz/txshlevelhandle.h"
 #include "toonz/tframehandle.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/preferences.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/tobjecthandle.h"
+#include "toonz/tscenehandle.h"
 #include "tools/toolhandle.h"
 #include "tools/toolutils.h"
 #include "toonz/tonionskinmaskhandle.h"
@@ -22,7 +21,7 @@
 #include "tproperty.h"
 #include "tenv.h"
 #include "tools/stylepicker.h"
-#include "toonz/fill.h"
+
 #include "toonz/stage2.h"
 #include "tstroke.h"
 #include "drawutil.h"
@@ -31,13 +30,13 @@
 #include "tregion.h"
 #include "tgl.h"
 #include "trop.h"
-#include "toonz/txshsimplelevel.h"
+
 #include "toonz/onionskinmask.h"
 #include "toonz/ttileset.h"
 #include "toonz/ttilesaver.h"
 #include "toonz/toonzimageutils.h"
 #include "toonz/levelproperties.h"
-#include "toonz/strokegenerator.h"
+
 #include "toonz/txshcell.h"
 #include "toonzqt/imageutils.h"
 #include "autofill.h"
@@ -51,9 +50,9 @@
 
 using namespace ToolUtils;
 
-#define LINES L"Lines"
-#define AREAS L"Areas"
-#define ALL L"Lines & Areas"
+//#define LINES L"Lines"
+//#define AREAS L"Areas"
+//#define ALL L"Lines & Areas"
 
 #define NORMALFILL L"Normal"
 #define RECTFILL L"Rectangular"
@@ -250,6 +249,96 @@ public:
   }
 
   QString getToolName() override { return QString("Fill Tool : "); }
+  int getHistoryType() override { return HistoryType::FillTool; }
+};
+
+//=============================================================================
+// VectorGapSizeChangeUndo
+//-----------------------------------------------------------------------------
+
+class VectorGapSizeChangeUndo final : public TToolUndo {
+  double m_oldGapSize;
+  double m_newGapSize;
+  int m_row;
+  int m_column;
+  TVectorImageP m_vi;
+  std::vector<TFilledRegionInf> m_oldFillInformation;
+
+public:
+  VectorGapSizeChangeUndo(double oldGapSize, double newGapSize,
+                          TXshSimpleLevel *sl, const TFrameId &fid,
+                          TVectorImageP vi,
+                          std::vector<TFilledRegionInf> oldFillInformation)
+      : TToolUndo(sl, fid)
+      , m_oldGapSize(oldGapSize)
+      , m_newGapSize(newGapSize)
+      , m_oldFillInformation(oldFillInformation)
+      , m_vi(vi) {
+    TTool::Application *app = TTool::getApplication();
+    if (app) {
+      m_row    = app->getCurrentFrame()->getFrame();
+      m_column = app->getCurrentColumn()->getColumnIndex();
+    }
+  }
+
+  void undo() const override {
+    TTool::Application *app = TTool::getApplication();
+    if (!app || !m_level) return;
+    app->getCurrentLevel()->setLevel(m_level.getPointer());
+    if (app->getCurrentFrame()->isEditingScene()) {
+      app->getCurrentFrame()->setFrame(m_row);
+      app->getCurrentColumn()->setColumnIndex(m_column);
+    } else
+      app->getCurrentFrame()->setFid(m_frameId);
+
+    m_vi->setAutocloseTolerance(m_oldGapSize);
+    int count = m_vi->getStrokeCount();
+    std::vector<int> v(count);
+    int i;
+    for (i = 0; i < (int)count; i++) v[i] = i;
+    m_vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
+    if (m_vi->isComputedRegionAlmostOnce()) m_vi->findRegions();
+    if (m_oldFillInformation.size()) {
+      for (UINT j = 0; j < m_oldFillInformation.size(); j++) {
+        TRegion *reg = m_vi->getRegion(m_oldFillInformation[j].m_regionId);
+        if (reg) reg->setStyle(m_oldFillInformation[j].m_styleId);
+      }
+    }
+    app->getCurrentXsheet()->notifyXsheetChanged();
+    app->getCurrentTool()->notifyToolChanged();
+    notifyImageChanged();
+  }
+
+  void redo() const override {
+    TTool::Application *app = TTool::getApplication();
+    if (!app || !m_level) return;
+
+    app->getCurrentLevel()->setLevel(m_level.getPointer());
+    TVectorImageP img = m_level->getFrame(m_frameId, true);
+    if (app->getCurrentFrame()->isEditingScene()) {
+      app->getCurrentFrame()->setFrame(m_row);
+      app->getCurrentColumn()->setColumnIndex(m_column);
+    } else
+      app->getCurrentFrame()->setFid(m_frameId);
+
+    m_vi->setAutocloseTolerance(m_newGapSize);
+    int count = m_vi->getStrokeCount();
+    std::vector<int> v(count);
+    int i;
+    for (i = 0; i < (int)count; i++) v[i] = i;
+    m_vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
+    app->getCurrentXsheet()->notifyXsheetChanged();
+    app->getCurrentTool()->notifyToolChanged();
+    notifyImageChanged();
+  }
+
+  void onAdd() override {}
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getToolName() override {
+    return QString("Fill Tool: Set Gap Size ") + QString::number(m_newGapSize);
+  }
   int getHistoryType() override { return HistoryType::FillTool; }
 };
 
@@ -1113,180 +1202,286 @@ void drawPolyline(const std::vector<TPointD> &points) {
 
 //-----------------------------------------------------------------------------
 
-class AreaFillTool {
-public:
-  enum Type { RECT, FREEHAND, POLYLINE };
+AreaFillTool::AreaFillTool(TTool *parent)
+    : m_frameRange(false)
+    , m_onlyUnfilled(false)
+    , m_selecting(false)
+    , m_selectingRect(TRectD())
+    , m_firstRect(TRectD())
+    , m_firstFrameSelected(false)
+    , m_level(0)
+    , m_parent(parent)
+    , m_colorType(AREAS)
+    , m_currCell(-1, -1)
+    , m_type(RECT)
+    , m_isPath(false)
+    , m_enabled(false)
+    , m_active(false)
+    , m_firstStroke(0)
+    , m_thick(0.5)
+    , m_mousePosition()
+    , m_onion(false)
+    , m_isLeftButtonPressed(false)
+    , m_autopaintLines(true) {}
 
-private:
-  bool m_frameRange;
-  bool m_onlyUnfilled;
-  Type m_type;
+void AreaFillTool::draw() {
+  m_thick = m_parent->getPixelSize() / 2.0;
 
-  bool m_selecting;
-  TRectD m_selectingRect;
-
-  TRectD m_firstRect;
-  bool m_firstFrameSelected;
-  TXshSimpleLevelP m_level;
-  TFrameId m_firstFrameId, m_veryFirstFrameId;
-  TTool *m_parent;
-  std::wstring m_colorType;
-  std::pair<int, int> m_currCell;
-  StrokeGenerator m_track;
-  std::vector<TPointD> m_polyline;
-  bool m_isPath;
-  bool m_active;
-  bool m_enabled;
-  double m_thick;
-  TPointD m_firstPos;
-  TStroke *m_firstStroke;
-  TPointD m_mousePosition;
-  bool m_onion;
-  bool m_isLeftButtonPressed;
-  bool m_autopaintLines;
-
-public:
-  AreaFillTool(TTool *parent)
-      : m_frameRange(false)
-      , m_onlyUnfilled(false)
-      , m_selecting(false)
-      , m_selectingRect(TRectD())
-      , m_firstRect(TRectD())
-      , m_firstFrameSelected(false)
-      , m_level(0)
-      , m_parent(parent)
-      , m_colorType(AREAS)
-      , m_currCell(-1, -1)
-      , m_type(RECT)
-      , m_isPath(false)
-      , m_enabled(false)
-      , m_active(false)
-      , m_firstStroke(0)
-      , m_thick(0.5)
-      , m_mousePosition()
-      , m_onion(false)
-      , m_isLeftButtonPressed(false)
-      , m_autopaintLines(true) {}
-
-  void draw() {
-    m_thick = m_parent->getPixelSize() / 2.0;
-
-    TPixel color = TPixel32::Red;
-    if (m_type == RECT) {
-      if (m_frameRange && m_firstFrameSelected)
-        drawRect(m_firstRect, color, 0x3F33, true);
-      if (m_selecting || (m_frameRange && !m_firstFrameSelected))
-        drawRect(m_selectingRect, color, 0xFFFF, true);
-    } else if ((m_type == FREEHAND || m_type == POLYLINE) && m_frameRange) {
-      tglColor(color);
-      if (m_firstStroke) drawStrokeCenterline(*m_firstStroke, 1);
-    }
-
-    if (m_type == POLYLINE && !m_polyline.empty()) {
-      glPushMatrix();
-      tglColor(TPixel::Red);
-      tglDrawCircle(m_polyline[0], 2);
-      glBegin(GL_LINE_STRIP);
-      for (UINT i = 0; i < m_polyline.size(); i++) tglVertex(m_polyline[i]);
-      tglVertex(m_mousePosition);
-      glEnd();
-      glPopMatrix();
-    } else if (m_type == FREEHAND && !m_track.isEmpty()) {
-      tglColor(TPixel::Red);
-      glPushMatrix();
-      m_track.drawAllFragments();
-      glPopMatrix();
-    }
+  TPixel color = TPixel32::Red;
+  if (m_type == RECT) {
+    if (m_frameRange && m_firstFrameSelected)
+      drawRect(m_firstRect, color, 0x3F33, true);
+    if (m_selecting || (m_frameRange && !m_firstFrameSelected))
+      drawRect(m_selectingRect, color, 0xFFFF, true);
+  } else if ((m_type == FREEHAND || m_type == POLYLINE) && m_frameRange) {
+    tglColor(color);
+    if (m_firstStroke) drawStrokeCenterline(*m_firstStroke, 1);
   }
 
-  void resetMulti() {
-    m_firstFrameSelected = false;
-    m_firstRect.empty();
-    m_selectingRect.empty();
-    TTool::Application *app = TTool::getApplication();
-    TXshLevel *xl           = app->getCurrentLevel()->getLevel();
-    m_level                 = xl ? xl->getSimpleLevel() : 0;
-    m_firstFrameId = m_veryFirstFrameId = m_parent->getCurrentFid();
-    if (m_firstStroke) {
-      delete m_firstStroke;
-      m_firstStroke = 0;
-    }
+  if (m_type == POLYLINE && !m_polyline.empty()) {
+    glPushMatrix();
+    tglColor(TPixel::Red);
+    tglDrawCircle(m_polyline[0], 2);
+    glBegin(GL_LINE_STRIP);
+    for (UINT i = 0; i < m_polyline.size(); i++) tglVertex(m_polyline[i]);
+    tglVertex(m_mousePosition);
+    glEnd();
+    glPopMatrix();
+  } else if (m_type == FREEHAND && !m_track.isEmpty()) {
+    tglColor(TPixel::Red);
+    glPushMatrix();
+    m_track.drawAllFragments();
+    glPopMatrix();
+  }
+}
+
+void AreaFillTool::resetMulti() {
+  m_firstFrameSelected = false;
+  m_firstRect.empty();
+  m_selectingRect.empty();
+  TTool::Application *app = TTool::getApplication();
+  TXshLevel *xl           = app->getCurrentLevel()->getLevel();
+  m_level                 = xl ? xl->getSimpleLevel() : 0;
+  m_firstFrameId = m_veryFirstFrameId = m_parent->getCurrentFid();
+  if (m_firstStroke) {
+    delete m_firstStroke;
+    m_firstStroke = 0;
+  }
+}
+
+void AreaFillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &,
+                                  TImage *img) {
+  TVectorImageP vi = TImageP(img);
+  TToonzImageP ti  = TToonzImageP(img);
+
+  if (!vi && !ti) {
+    m_selecting = false;
+    return;
   }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &, TImage *img) {
-    TVectorImageP vi = TImageP(img);
-    TToonzImageP ti  = TToonzImageP(img);
+  m_selecting = true;
+  if (m_type == RECT) {
+    m_selectingRect.x0 = pos.x;
+    m_selectingRect.y0 = pos.y;
+    m_selectingRect.x1 = pos.x + 1;
+    m_selectingRect.y1 = pos.y + 1;
+  } else if (m_type == FREEHAND || m_type == POLYLINE) {
+    int col  = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+    m_isPath = TTool::getApplication()
+                   ->getCurrentObject()
+                   ->isSpline();  // getApplication()->isEditingSpline();
+    m_enabled = col >= 0 || m_isPath;
 
-    if (!vi && !ti) {
-      m_selecting = false;
-      return;
-    }
+    if (!m_enabled) return;
+    m_active = true;
 
-    m_selecting = true;
-    if (m_type == RECT) {
-      m_selectingRect.x0 = pos.x;
-      m_selectingRect.y0 = pos.y;
-      m_selectingRect.x1 = pos.x + 1;
-      m_selectingRect.y1 = pos.y + 1;
-    } else if (m_type == FREEHAND || m_type == POLYLINE) {
-      int col  = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-      m_isPath = TTool::getApplication()
-                     ->getCurrentObject()
-                     ->isSpline();  // getApplication()->isEditingSpline();
-      m_enabled = col >= 0 || m_isPath;
-
-      if (!m_enabled) return;
-      m_active = true;
-
-      m_track.clear();
-      m_firstPos        = pos;
-      double pixelSize2 = m_parent->getPixelSize() * m_parent->getPixelSize();
+    m_track.clear();
+    m_firstPos        = pos;
+    double pixelSize2 = m_parent->getPixelSize() * m_parent->getPixelSize();
+    m_track.add(TThickPoint(pos, m_thick), pixelSize2);
+    if (m_type == POLYLINE) {
+      if (m_polyline.empty() || m_polyline.back() != pos)
+        m_polyline.push_back(pos);
+      m_mousePosition = pos;
+    } else
       m_track.add(TThickPoint(pos, m_thick), pixelSize2);
-      if (m_type == POLYLINE) {
-        if (m_polyline.empty() || m_polyline.back() != pos)
-          m_polyline.push_back(pos);
-        m_mousePosition = pos;
-      } else
-        m_track.add(TThickPoint(pos, m_thick), pixelSize2);
 
-      if (m_type == POLYLINE) {
-        if (m_polyline.empty() || m_polyline.back() != pos)
-          m_polyline.push_back(pos);
-      }
+    if (m_type == POLYLINE) {
+      if (m_polyline.empty() || m_polyline.back() != pos)
+        m_polyline.push_back(pos);
     }
-    m_isLeftButtonPressed = true;
+  }
+  m_isLeftButtonPressed = true;
+}
+
+/*-- PolyLineFillを閉じる時に呼ばれる --*/
+void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
+                                         const TMouseEvent &e) {
+  TStroke *stroke;
+
+  TTool::Application *app = TTool::getApplication();
+  if (!app) return;
+
+  if (m_polyline.size() <= 1) {
+    resetMulti();
+    return;
   }
 
-  /*-- PolyLineFillを閉じる時に呼ばれる --*/
-  void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) {
-    TStroke *stroke;
+  if (m_polyline.back() != pos) m_polyline.push_back(pos);
+  if (m_polyline.back() != m_polyline.front())
+    m_polyline.push_back(m_polyline.front());
+  std::vector<TThickPoint> strokePoints;
+  for (UINT i = 0; i < m_polyline.size() - 1; i++) {
+    strokePoints.push_back(TThickPoint(m_polyline[i], 1));
+    strokePoints.push_back(
+        TThickPoint(0.5 * (m_polyline[i] + m_polyline[i + 1]), 1));
+  }
+  strokePoints.push_back(TThickPoint(m_polyline.back(), 1));
+  m_polyline.clear();
+  stroke = new TStroke(strokePoints);
+  assert(stroke->getPoint(0) == stroke->getPoint(1));
 
-    TTool::Application *app = TTool::getApplication();
-    if (!app) return;
-
-    if (m_polyline.size() <= 1) {
-      resetMulti();
-      return;
+  //    if (m_type==POLYLINE)
+  //      m_polyline.push_back(pos);
+  // drawPolyline(m_polyline);
+  int styleIndex = app->getCurrentLevelStyleIndex();
+  if (m_frameRange)  // stroke multi
+  {
+    if (m_firstFrameSelected) {
+      MultiAreaFiller filler(m_firstStroke, stroke, m_onlyUnfilled, m_colorType,
+                             styleIndex, m_autopaintLines);
+      filler.processSequence(m_level.getPointer(), m_firstFrameId,
+                             m_parent->getCurrentFid());
+      m_parent->invalidate(m_selectingRect.enlarge(2));
+      if (e.isShiftPressed()) {
+        m_firstStroke  = stroke;
+        m_firstFrameId = m_parent->getCurrentFid();
+      } else {
+        if (app->getCurrentFrame()->isEditingScene()) {
+          app->getCurrentColumn()->setColumnIndex(m_currCell.first);
+          app->getCurrentFrame()->setFrame(m_currCell.second);
+        } else
+          app->getCurrentFrame()->setFid(m_veryFirstFrameId);
+        resetMulti();
+      }
+    } else  // primo frame
+    {
+      m_firstStroke = stroke;
+      // if (app->getCurrentFrame()->isEditingScene())
+      m_currCell =
+          std::pair<int, int>(app->getCurrentColumn()->getColumnIndex(),
+                              app->getCurrentFrame()->getFrame());
     }
+  } else {
+    if (m_onion) {
+      OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
+      doStrokeAutofill(m_parent->getImage(true), stroke, m_onlyUnfilled, osMask,
+                       m_level.getPointer(), m_parent->getCurrentFid());
+    } else
+      fillAreaWithUndo(m_parent->getImage(true), TRectD(), stroke,
+                       m_onlyUnfilled, m_colorType, m_level.getPointer(),
+                       m_parent->getCurrentFid(), styleIndex, m_autopaintLines);
+    TTool *t = app->getCurrentTool()->getTool();
+    if (t) t->notifyImageChanged();
+  }
+}
 
-    if (m_polyline.back() != pos) m_polyline.push_back(pos);
-    if (m_polyline.back() != m_polyline.front())
-      m_polyline.push_back(m_polyline.front());
-    std::vector<TThickPoint> strokePoints;
-    for (UINT i = 0; i < m_polyline.size() - 1; i++) {
-      strokePoints.push_back(TThickPoint(m_polyline[i], 1));
-      strokePoints.push_back(
-          TThickPoint(0.5 * (m_polyline[i] + m_polyline[i + 1]), 1));
+void AreaFillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  if (m_type == RECT) {
+    m_selectingRect.x1 = pos.x;
+    m_selectingRect.y1 = pos.y;
+    m_parent->invalidate();
+  } else if (m_type == FREEHAND) {
+    if (!m_enabled || !m_active) return;
+
+    double pixelSize2 = m_parent->getPixelSize() * m_parent->getPixelSize();
+    m_track.add(TThickPoint(pos, m_thick), pixelSize2);
+    m_parent->invalidate();
+  }
+}
+
+void AreaFillTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
+  if (m_type != POLYLINE || m_polyline.empty()) return;
+  if (!m_enabled || !m_active) return;
+  m_mousePosition = pos;
+  m_parent->invalidate();
+}
+
+void AreaFillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
+  if (!m_isLeftButtonPressed) return;
+  m_isLeftButtonPressed = false;
+
+  TTool::Application *app = TTool::getApplication();
+  if (!app) return;
+
+  TXshLevel *xl = app->getCurrentLevel()->getLevel();
+  m_level       = xl ? xl->getSimpleLevel() : 0;
+
+  int styleIndex = app->getCurrentLevelStyleIndex();
+  m_selecting    = false;
+  if (m_type == RECT) {
+    if (m_selectingRect.x0 > m_selectingRect.x1)
+      tswap(m_selectingRect.x0, m_selectingRect.x1);
+    if (m_selectingRect.y0 > m_selectingRect.y1)
+      tswap(m_selectingRect.y0, m_selectingRect.y1);
+
+    if (m_frameRange) {
+      if (m_firstFrameSelected) {
+        MultiAreaFiller filler(m_firstRect, m_selectingRect, m_onlyUnfilled,
+                               m_colorType, styleIndex, m_autopaintLines);
+        filler.processSequence(m_level.getPointer(), m_firstFrameId,
+                               m_parent->getCurrentFid());
+        m_parent->invalidate(m_selectingRect.enlarge(2));
+        if (e.isShiftPressed()) {
+          m_firstRect    = m_selectingRect;
+          m_firstFrameId = m_parent->getCurrentFid();
+        } else {
+          if (app->getCurrentFrame()->isEditingScene()) {
+            app->getCurrentColumn()->setColumnIndex(m_currCell.first);
+            app->getCurrentFrame()->setFrame(m_currCell.second);
+          } else
+            app->getCurrentFrame()->setFid(m_veryFirstFrameId);
+          resetMulti();
+        }
+      } else {
+        // if (app->getCurrentFrame()->isEditingScene())
+        m_currCell =
+            std::pair<int, int>(app->getCurrentColumn()->getColumnIndex(),
+                                app->getCurrentFrame()->getFrame());
+      }
+    } else {
+      if (m_onion) {
+        OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
+        doRectAutofill(m_parent->getImage(true), m_selectingRect,
+                       m_onlyUnfilled, osMask, m_level.getPointer(),
+                       m_parent->getCurrentFid());
+      } else
+        fillAreaWithUndo(m_parent->getImage(true), m_selectingRect, 0,
+                         m_onlyUnfilled, m_colorType, m_level.getPointer(),
+                         m_parent->getCurrentFid(), styleIndex,
+                         m_autopaintLines);
+      m_parent->invalidate();
+      m_selectingRect.empty();
+      TTool *t = app->getCurrentTool()->getTool();
+      if (t) t->notifyImageChanged();
     }
-    strokePoints.push_back(TThickPoint(m_polyline.back(), 1));
-    m_polyline.clear();
-    stroke = new TStroke(strokePoints);
-    assert(stroke->getPoint(0) == stroke->getPoint(1));
+  } else if (m_type == FREEHAND) {
+#if defined(MACOSX)
+// m_parent->m_viewer->enableRedraw(true);
+#endif
 
-    //    if (m_type==POLYLINE)
-    //      m_polyline.push_back(pos);
-    // drawPolyline(m_polyline);
-    int styleIndex = app->getCurrentLevelStyleIndex();
+    bool isValid = m_enabled && m_active;
+    m_enabled = m_active = false;
+    if (!isValid || m_track.isEmpty()) return;
+    double pixelSize2 = m_parent->getPixelSize() * m_parent->getPixelSize();
+    m_track.add(TThickPoint(m_firstPos, m_thick), pixelSize2);
+    m_track.filterPoints();
+    double error    = (m_isPath ? 20.0 : 30.0 / 11) * sqrt(pixelSize2);
+    TStroke *stroke = m_track.makeStroke(error);
+
+    stroke->setStyle(1);
+    m_track.clear();
+
     if (m_frameRange)  // stroke multi
     {
       if (m_firstFrameSelected) {
@@ -1314,225 +1509,82 @@ public:
             std::pair<int, int>(app->getCurrentColumn()->getColumnIndex(),
                                 app->getCurrentFrame()->getFrame());
       }
-    } else {
+
+    } else  // stroke non multi
+    {
+      if (!m_parent->getImage(true)) return;
       if (m_onion) {
         OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
         doStrokeAutofill(m_parent->getImage(true), stroke, m_onlyUnfilled,
                          osMask, m_level.getPointer(),
                          m_parent->getCurrentFid());
       } else
-        fillAreaWithUndo(m_parent->getImage(true), TRectD(), stroke,
-                         m_onlyUnfilled, m_colorType, m_level.getPointer(),
-                         m_parent->getCurrentFid(), styleIndex,
-                         m_autopaintLines);
+        fillAreaWithUndo(
+            m_parent->getImage(true), TRectD(), stroke /*, imageLocation*/,
+            m_onlyUnfilled, m_colorType, m_level.getPointer(),
+            m_parent->getCurrentFid(), styleIndex, m_autopaintLines);
+      delete stroke;
       TTool *t = app->getCurrentTool()->getTool();
       if (t) t->notifyImageChanged();
-    }
-  }
-
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
-    if (m_type == RECT) {
-      m_selectingRect.x1 = pos.x;
-      m_selectingRect.y1 = pos.y;
-      m_parent->invalidate();
-    } else if (m_type == FREEHAND) {
-      if (!m_enabled || !m_active) return;
-
-#if defined(MACOSX)
-// m_parent->m_viewer->enableRedraw(false);
-#endif
-      double pixelSize2 = m_parent->getPixelSize() * m_parent->getPixelSize();
-      m_track.add(TThickPoint(pos, m_thick), pixelSize2);
       m_parent->invalidate();
     }
   }
+}
 
-  void mouseMove(const TPointD &pos, const TMouseEvent &e) {
-    if (m_type != POLYLINE || m_polyline.empty()) return;
-    if (!m_enabled || !m_active) return;
-    m_mousePosition = pos;
-    m_parent->invalidate();
-  }
+void AreaFillTool::onImageChanged() {
+  if (!m_frameRange) return;
+  TTool::Application *app = TTool::getApplication();
+  if (!app) return;
+  TXshLevel *xshl = app->getCurrentLevel()->getLevel();
 
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
-    if (!m_isLeftButtonPressed) return;
-    m_isLeftButtonPressed = false;
-
-    TTool::Application *app = TTool::getApplication();
-    if (!app) return;
-
-    TXshLevel *xl = app->getCurrentLevel()->getLevel();
-    m_level       = xl ? xl->getSimpleLevel() : 0;
-
-    int styleIndex = app->getCurrentLevelStyleIndex();
-    m_selecting    = false;
-    if (m_type == RECT) {
-      if (m_selectingRect.x0 > m_selectingRect.x1)
-        tswap(m_selectingRect.x0, m_selectingRect.x1);
-      if (m_selectingRect.y0 > m_selectingRect.y1)
-        tswap(m_selectingRect.y0, m_selectingRect.y1);
-
-      if (m_frameRange) {
-        if (m_firstFrameSelected) {
-          MultiAreaFiller filler(m_firstRect, m_selectingRect, m_onlyUnfilled,
-                                 m_colorType, styleIndex, m_autopaintLines);
-          filler.processSequence(m_level.getPointer(), m_firstFrameId,
-                                 m_parent->getCurrentFid());
-          m_parent->invalidate(m_selectingRect.enlarge(2));
-          if (e.isShiftPressed()) {
-            m_firstRect    = m_selectingRect;
-            m_firstFrameId = m_parent->getCurrentFid();
-          } else {
-            if (app->getCurrentFrame()->isEditingScene()) {
-              app->getCurrentColumn()->setColumnIndex(m_currCell.first);
-              app->getCurrentFrame()->setFrame(m_currCell.second);
-            } else
-              app->getCurrentFrame()->setFid(m_veryFirstFrameId);
-            resetMulti();
-          }
-        } else {
-          // if (app->getCurrentFrame()->isEditingScene())
-          m_currCell =
-              std::pair<int, int>(app->getCurrentColumn()->getColumnIndex(),
-                                  app->getCurrentFrame()->getFrame());
-        }
-      } else {
-        if (m_onion) {
-          OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
-          doRectAutofill(m_parent->getImage(true), m_selectingRect,
-                         m_onlyUnfilled, osMask, m_level.getPointer(),
-                         m_parent->getCurrentFid());
-        } else
-          fillAreaWithUndo(m_parent->getImage(true), m_selectingRect, 0,
-                           m_onlyUnfilled, m_colorType, m_level.getPointer(),
-                           m_parent->getCurrentFid(), styleIndex,
-                           m_autopaintLines);
-        m_parent->invalidate();
-        m_selectingRect.empty();
-        TTool *t = app->getCurrentTool()->getTool();
-        if (t) t->notifyImageChanged();
-      }
-    } else if (m_type == FREEHAND) {
-#if defined(MACOSX)
-// m_parent->m_viewer->enableRedraw(true);
-#endif
-
-      bool isValid = m_enabled && m_active;
-      m_enabled = m_active = false;
-      if (!isValid || m_track.isEmpty()) return;
-      double pixelSize2 = m_parent->getPixelSize() * m_parent->getPixelSize();
-      m_track.add(TThickPoint(m_firstPos, m_thick), pixelSize2);
-      m_track.filterPoints();
-      double error    = (m_isPath ? 20.0 : 30.0 / 11) * sqrt(pixelSize2);
-      TStroke *stroke = m_track.makeStroke(error);
-
-      stroke->setStyle(1);
-      m_track.clear();
-
-      if (m_frameRange)  // stroke multi
-      {
-        if (m_firstFrameSelected) {
-          MultiAreaFiller filler(m_firstStroke, stroke, m_onlyUnfilled,
-                                 m_colorType, styleIndex, m_autopaintLines);
-          filler.processSequence(m_level.getPointer(), m_firstFrameId,
-                                 m_parent->getCurrentFid());
-          m_parent->invalidate(m_selectingRect.enlarge(2));
-          if (e.isShiftPressed()) {
-            m_firstStroke  = stroke;
-            m_firstFrameId = m_parent->getCurrentFid();
-          } else {
-            if (app->getCurrentFrame()->isEditingScene()) {
-              app->getCurrentColumn()->setColumnIndex(m_currCell.first);
-              app->getCurrentFrame()->setFrame(m_currCell.second);
-            } else
-              app->getCurrentFrame()->setFid(m_veryFirstFrameId);
-            resetMulti();
-          }
-        } else  // primo frame
-        {
-          m_firstStroke = stroke;
-          // if (app->getCurrentFrame()->isEditingScene())
-          m_currCell =
-              std::pair<int, int>(app->getCurrentColumn()->getColumnIndex(),
-                                  app->getCurrentFrame()->getFrame());
-        }
-
-      } else  // stroke non multi
-      {
-        if (!m_parent->getImage(true)) return;
-        if (m_onion) {
-          OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
-          doStrokeAutofill(m_parent->getImage(true), stroke, m_onlyUnfilled,
-                           osMask, m_level.getPointer(),
-                           m_parent->getCurrentFid());
-        } else
-          fillAreaWithUndo(
-              m_parent->getImage(true), TRectD(), stroke /*, imageLocation*/,
-              m_onlyUnfilled, m_colorType, m_level.getPointer(),
-              m_parent->getCurrentFid(), styleIndex, m_autopaintLines);
-        delete stroke;
-        TTool *t = app->getCurrentTool()->getTool();
-        if (t) t->notifyImageChanged();
-        m_parent->invalidate();
-      }
+  if (!xshl || m_level.getPointer() != xshl ||
+      (m_selectingRect.isEmpty() && !m_firstStroke))
+    resetMulti();
+  else if (m_firstFrameId == m_parent->getCurrentFid())
+    m_firstFrameSelected = false;  // nel caso sono passato allo stato 1 e
+                                   // torno all'immagine iniziale, torno allo
+                                   // stato iniziale
+  else {                           // cambio stato.
+    m_firstFrameSelected = true;
+    if (m_type != FREEHAND && m_type != POLYLINE) {
+      assert(!m_selectingRect.isEmpty());
+      m_firstRect = m_selectingRect;
     }
   }
+}
 
-  void onImageChanged() {
-    if (!m_frameRange) return;
-    TTool::Application *app = TTool::getApplication();
-    if (!app) return;
-    TXshLevel *xshl = app->getCurrentLevel()->getLevel();
+/*--Normal以外のTypeが選択された場合に呼ばれる--*/
+bool AreaFillTool::onPropertyChanged(bool multi, bool onlyUnfilled, bool onion,
+                                     Type type, std::wstring colorType,
+                                     bool autopaintLines) {
+  m_frameRange     = multi;
+  m_onlyUnfilled   = onlyUnfilled;
+  m_colorType      = colorType;
+  m_type           = type;
+  m_onion          = onion;
+  m_autopaintLines = autopaintLines;
 
-    if (!xshl || m_level.getPointer() != xshl ||
-        (m_selectingRect.isEmpty() && !m_firstStroke))
-      resetMulti();
-    else if (m_firstFrameId == m_parent->getCurrentFid())
-      m_firstFrameSelected = false;  // nel caso sono passato allo stato 1 e
-                                     // torno all'immagine iniziale, torno allo
-                                     // stato iniziale
-    else {                           // cambio stato.
-      m_firstFrameSelected = true;
-      if (m_type != FREEHAND && m_type != POLYLINE) {
-        assert(!m_selectingRect.isEmpty());
-        m_firstRect = m_selectingRect;
-      }
-    }
-  }
+  if (m_frameRange) resetMulti();
 
-  /*--Normal以外のTypeが選択された場合に呼ばれる--*/
-  bool onPropertyChanged(bool multi, bool onlyUnfilled, bool onion, Type type,
-                         std::wstring colorType, bool autopaintLines) {
-    m_frameRange     = multi;
-    m_onlyUnfilled   = onlyUnfilled;
-    m_colorType      = colorType;
-    m_type           = type;
-    m_onion          = onion;
-    m_autopaintLines = autopaintLines;
+  /*--動作中にプロパティが変わったら、現在の動作を無効にする--*/
+  if (m_isLeftButtonPressed) m_isLeftButtonPressed = false;
 
-    if (m_frameRange) resetMulti();
+  if (m_type == POLYLINE && !m_polyline.empty()) m_polyline.clear();
 
-    /*--動作中にプロパティが変わったら、現在の動作を無効にする--*/
-    if (m_isLeftButtonPressed) m_isLeftButtonPressed = false;
+  return true;
+}
 
-    if (m_type == POLYLINE && !m_polyline.empty()) m_polyline.clear();
+void AreaFillTool::onActivate() {
+  // getApplication()->editImage();
 
-    return true;
-  }
+  if (m_frameRange) resetMulti();
 
-  void onActivate() {
-    // getApplication()->editImage();
+  if (TVectorImageP vi = TImageP(m_parent->getImage(false))) vi->findRegions();
+}
 
-    if (m_frameRange) resetMulti();
-
-    if (TVectorImageP vi = TImageP(m_parent->getImage(false)))
-      vi->findRegions();
-  }
-
-  void onEnter() {
-    // getApplication()->editImage();
-  }
-};
+void AreaFillTool::onEnter() {
+  // getApplication()->editImage();
+}
 
 }  // namespace
 
@@ -1663,72 +1715,6 @@ public:
 // Fill Tool
 //-----------------------------------------------------------------------------
 
-class FillTool final : public TTool {
-  Q_DECLARE_TR_FUNCTIONS(FillTool)
-
-  bool m_firstTime;
-  TPointD m_firstPoint, m_clickPoint;
-  bool m_firstClick;
-  TXshSimpleLevelP m_level;
-  TFrameId m_firstFrameId, m_veryFirstFrameId;
-  int m_onionStyleId;
-  TEnumProperty m_colorType;  // Line, Area
-  TEnumProperty m_fillType;   // Rect, Polyline etc.
-  TBoolProperty m_onion;
-  TBoolProperty m_frameRange;
-  TBoolProperty m_selective;
-  TDoublePairProperty m_fillDepth;
-  TBoolProperty m_segment;
-
-  AreaFillTool *m_rectFill;
-  NormalLineFillTool *m_normalLineFillTool;
-
-  TPropertyGroup m_prop;
-  std::pair<int, int> m_currCell;
-#ifdef _DEBUG
-  std::vector<TRect> m_rects;
-#endif
-
-  // For the raster fill tool, autopaint lines is optional and can be temporary
-  // disabled
-  TBoolProperty m_autopaintLines;
-
-public:
-  FillTool(int targetType);
-
-  ToolType getToolType() const override { return TTool::LevelWriteTool; }
-
-  void updateTranslation() override;
-
-  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
-
-  FillParameters getFillParameters() const;
-
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
-  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
-  void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) override;
-  void resetMulti();
-
-  bool onPropertyChanged(std::string propertyName) override;
-  void onImageChanged() override;
-
-  void draw() override;
-
-  int pick(const TImageP &image, const TPointD &pos);
-  int pickOnionColor(const TPointD &pos);
-
-  void onEnter() override;
-
-  void onActivate() override;
-  void onDeactivate() override;
-
-  int getCursorId() const override;
-
-  int getColorClass() const { return 2; }
-};
-
 //-----------------------------------------------------------------------------
 
 FillTool::FillTool(int targetType)
@@ -1742,6 +1728,7 @@ FillTool::FillTool(int targetType)
     , m_segment("Segment", false)
     , m_onionStyleId(0)
     , m_currCell(-1, -1)
+    , m_maxGapDistance("Maximum Gap", 0.01, 10.0, 1.15)
     , m_firstTime(true)
     , m_autopaintLines("Autopaint Lines", true) {
   m_rectFill           = new AreaFillTool(this);
@@ -1766,9 +1753,11 @@ FillTool::FillTool(int targetType)
   }
   m_prop.bind(m_onion);
   m_prop.bind(m_frameRange);
-
+  if (targetType == TTool::VectorImage) {
+    m_prop.bind(m_maxGapDistance);
+    m_maxGapDistance.setId("MaxGapDistance");
+  }
   if (targetType == TTool::ToonzImage) m_prop.bind(m_autopaintLines);
-
   m_selective.setId("Selective");
   m_onion.setId("OnionSkin");
   m_frameRange.setId("FrameRange");
@@ -1811,6 +1800,7 @@ void FillTool::updateTranslation() {
   m_onion.setQStringName(tr("Onion Skin"));
   m_fillDepth.setQStringName(tr("Fill Depth"));
   m_segment.setQStringName(tr("Segment"));
+  m_maxGapDistance.setQStringName("Maximum Gap");
   m_autopaintLines.setQStringName(tr("Autopaint Lines"));
 }
 
@@ -2032,9 +2022,47 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
     if (m_segment.getValue()) FillType = ::to_string(m_fillType.getValue());
     FillSegment                        = (int)(m_segment.getValue());
   }
+
   // Autopaint
   else if (propertyName == m_autopaintLines.getName()) {
     rectPropChangedflag = true;
+  }
+
+  else if (!m_frameSwitched &&
+           (propertyName == m_maxGapDistance.getName() ||
+            propertyName == m_maxGapDistance.getName() + "withUndo")) {
+    TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
+    m_level       = xl ? xl->getSimpleLevel() : 0;
+    if (TVectorImageP vi = getImage(true)) {
+      if (m_changedGapOriginalValue == -1.0) {
+        ImageUtils::getFillingInformationInArea(vi, m_oldFillInformation,
+                                                vi->getBBox());
+        m_changedGapOriginalValue = vi->getAutocloseTolerance();
+      }
+      TFrameId fid = getCurrentFid();
+      vi->setAutocloseTolerance(m_maxGapDistance.getValue());
+      int count = vi->getStrokeCount();
+      std::vector<int> v(count);
+      int i;
+      for (i = 0; i < (int)count; i++) v[i] = i;
+      vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
+
+      if (m_level) {
+        m_level->setDirtyFlag(true);
+        TTool::getApplication()->getCurrentLevel()->notifyLevelChange();
+        if (propertyName == m_maxGapDistance.getName() + "withUndo" &&
+            m_changedGapOriginalValue != -1.0) {
+          TUndoManager::manager()->add(new VectorGapSizeChangeUndo(
+              m_changedGapOriginalValue, m_maxGapDistance.getValue(),
+              m_level.getPointer(), fid, vi, m_oldFillInformation));
+          m_changedGapOriginalValue = -1.0;
+          m_oldFillInformation.clear();
+          TTool::Application *app = TTool::getApplication();
+          app->getCurrentXsheet()->notifyXsheetChanged();
+          notifyImageChanged();
+        }
+      }
+    }
   }
 
   /*--- fillType, frameRange, selective, colorTypeが変わったとき ---*/
@@ -2070,7 +2098,29 @@ void FillTool::onImageChanged() {
     m_rectFill->onImageChanged();
     return;
   }
+  if (TVectorImageP vi = getImage(true)) {
+    m_frameSwitched = true;
+    if (m_maxGapDistance.getValue() != vi->getAutocloseTolerance()) {
+      m_maxGapDistance.setValue(vi->getAutocloseTolerance());
+      getApplication()->getCurrentTool()->notifyToolChanged();
+    }
+    m_frameSwitched = false;
+  }
   if (!m_level) resetMulti();
+}
+
+//-----------------------------------------------------------------------------
+
+void FillTool::onFrameSwitched() {
+  m_frameSwitched = true;
+  if (TVectorImageP vi = getImage(true)) {
+    if (m_maxGapDistance.getValue() != vi->getAutocloseTolerance()) {
+      m_maxGapDistance.setValue(vi->getAutocloseTolerance());
+      getApplication()->getCurrentTool()->notifyToolChanged();
+    }
+  }
+  m_frameSwitched           = false;
+  m_changedGapOriginalValue = -1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -2212,11 +2262,37 @@ void FillTool::onActivate() {
   TVectorImageP vi = TImageP(getImage(false));
   if (!vi) return;
   vi->findRegions();
+  if (m_targetType == TTool::VectorImage) {
+    if (m_level) {
+      TImageP img = getImage(true);
+      if (TVectorImageP vi = img) {
+        double tolerance = vi->getAutocloseTolerance();
+        if (tolerance < 9.9) tolerance += 0.000001;
+        m_maxGapDistance.setValue(tolerance);
+      }
+    }
+  }
+  bool ret = true;
+  ret      = ret && connect(TTool::m_application->getCurrentFrame(),
+                       SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
+  ret = ret && connect(TTool::m_application->getCurrentScene(),
+                       SIGNAL(sceneSwitched()), this, SLOT(onFrameSwitched()));
+  ret = ret &&
+        connect(TTool::m_application->getCurrentColumn(),
+                SIGNAL(columnIndexSwitched()), this, SLOT(onFrameSwitched()));
+  assert(ret);
 }
 
 //-----------------------------------------------------------------------------
 
-void FillTool::onDeactivate() {}
+void FillTool::onDeactivate() {
+  disconnect(TTool::m_application->getCurrentFrame(), SIGNAL(frameSwitched()),
+             this, SLOT(onFrameSwitched()));
+  disconnect(TTool::m_application->getCurrentScene(), SIGNAL(sceneSwitched()),
+             this, SLOT(onFrameSwitched()));
+  disconnect(TTool::m_application->getCurrentColumn(),
+             SIGNAL(columnIndexSwitched()), this, SLOT(onColumnSwitched()));
+}
 
 //-----------------------------------------------------------------------------
 

@@ -12,6 +12,7 @@
 class FlipBook;
 class HistogramPopup;
 class QOpenGLFramebufferObject;
+class LutCalibrator;
 
 //-----------------------------------------------------------------------------
 
@@ -57,6 +58,7 @@ class ImageViewer final : public GLWidgetForHighDpi {
 
   // used for color calibration with 3DLUT
   QOpenGLFramebufferObject *m_fbo = NULL;
+  LutCalibrator *m_lutCalibrator  = NULL;
 
   int getDragType(const TPoint &pos, const TRect &loadBox);
   void updateLoadbox(const TPoint &curPos);
@@ -132,6 +134,7 @@ public slots:
   void fitView();
   void showHistogram();
   void swapCompared();
+  void onContextAboutToBeDestroyed();
 };
 
 #endif  // IMAGEVIEWER_INCLUDE

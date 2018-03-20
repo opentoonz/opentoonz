@@ -96,8 +96,7 @@ void StyleSample::setStyle(TColorStyle &style) {
 */
 void StyleSample::setColor(const TPixel32 &pixel) {
   QColor color(pixel.r, pixel.g, pixel.b, pixel.m);
-  if (LutCalibrator::instance()->isValid())
-    LutCalibrator::instance()->convert(color);
+  if (LutManager::instance()->isValid()) LutManager::instance()->convert(color);
 
   m_samplePixmap.fill(color.rgba());
   update();

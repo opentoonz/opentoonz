@@ -4,6 +4,7 @@
 #include "ttilesaver.h"
 #include "tstopwatch.h"
 #include <fstream>
+#include <QSet>
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -34,6 +35,9 @@ class DVAPI RasterStrokeGenerator {
   int m_selectedStyle;
   bool m_keepAntiAlias;
   bool m_doAnArc;
+  bool m_isPaletteOrder;  // Used in the Draw Order option of Brush Tool,
+                          // use style order to define line stacking order
+  QSet<int> m_aboveStyleIds;
 
   // Ricalcola i punti in un nuovo sistema di riferimento
   void translatePoints(std::vector<TThickPoint> &points,
@@ -46,12 +50,16 @@ class DVAPI RasterStrokeGenerator {
 public:
   RasterStrokeGenerator(const TRasterCM32P &raster, Tasks task,
                         ColorType colorType, int styleId, const TThickPoint &p,
-                        bool selective, int selectedStyle, bool keepAntialias);
+                        bool selective, int selectedStyle, bool keepAntialias,
+                        bool isPaletteOrder = false);
   ~RasterStrokeGenerator();
   void setRaster(const TRasterCM32P &ras) { m_raster = ras; }
   void setStyle(int styleId) { m_styleId = styleId; }
   int getStyleId() const { return m_styleId; }
   bool isSelective() { return m_selective; }
+
+  bool isPaletteOrder() { return m_isPaletteOrder; }
+  void setAboveStyleIds(QSet<int> &ids) { m_aboveStyleIds = ids; }
 
   // Inserisce un punto in "m_points"
   bool add(const TThickPoint &p);

@@ -24,11 +24,11 @@ class QOpenGLShader;
 class QOpenGLShaderProgram;
 class QOpenGLFramebufferObject;
 class QOpenGLTexture;
+class QOpenGLContext;
 
 class QColor;
 
-class DVAPI LutCalibrator : public QOpenGLFunctions  // sigleton
-{
+class DVAPI LutCalibrator : public QOpenGLFunctions {
   bool m_isValid = false;
 
   struct LutTextureShader {
@@ -42,37 +42,57 @@ class DVAPI LutCalibrator : public QOpenGLFunctions  // sigleton
     int texCoordAttrib            = -1;
   } m_shader;
 
-  struct Lut {
-    int meshSize;
-    float* data         = NULL;
-    QOpenGLTexture* tex = NULL;
-  } m_lut;
+  QOpenGLTexture* m_lutTex = NULL;
 
   QOpenGLBuffer m_viewerVBO;
-  LutCalibrator() {}
 
   bool initializeLutTextureShader();
   void createViewerVBO();
-  bool loadLutFile(const QString& path);
   void assignLutTexture();
 
 public:
-  static LutCalibrator* instance();
+  // static LutCalibrator* instance();
+  LutCalibrator() {}
 
   // to be computed once through the software
   void initialize();
-  void finalize();
+
   bool isValid() { return m_isValid; }
 
-  ~LutCalibrator() { finalize(); }
+  ~LutCalibrator() {}
 
   void onEndDraw(QOpenGLFramebufferObject*);
 
-  QString& getMonitorName() const;
+  void cleanup();
+};
+
+class DVAPI LutManager  // singleton
+{
+  bool m_isValid = false;
+
+  LutManager();
+
+  struct Lut {
+    int meshSize;
+    float* data = NULL;
+  } m_lut;
+
+public:
+  static LutManager* instance();
+
+  ~LutManager();
+
+  bool isValid() { return m_isValid; }
+  int meshSize() const { return m_lut.meshSize; }
+  float* data() const { return m_lut.data; }
+
+  bool loadLutFile(const QString& fp);
 
   void convert(float&, float&, float&);
   void convert(QColor&);
   void convert(TPixel32&);
+
+  QString& getMonitorName() const;
 };
 
 #endif

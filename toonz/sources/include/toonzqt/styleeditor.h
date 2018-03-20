@@ -70,6 +70,7 @@ class ColorSquaredWheel;
 class TabBarContainter;
 class StyleChooser;
 class StyleEditor;
+class LutCalibrator;
 
 //=============================================
 
@@ -149,6 +150,7 @@ class DVAPI HexagonalColorWheel final : public GLWidgetForHighDpi {
 
   // used for color calibration with 3DLUT
   QOpenGLFramebufferObject *m_fbo = NULL;
+  LutCalibrator *m_lutCalibrator  = NULL;
 
 private:
   void drawCurrentColorMark();
@@ -176,6 +178,9 @@ protected:
 
 signals:
   void colorChanged(const ColorModel &color, bool isDragging);
+
+public slots:
+  void onContextAboutToBeDestroyed();
 };
 
 //=============================================================================

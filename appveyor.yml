@@ -8,6 +8,7 @@ configuration:
 - Release
 platform: x64
 clone_depth: 1
+# C:\Qt\5.9 is mapped to C:\Qt\5.9.n for backward compatibility
 install:
 - cmd: >-
     cd thirdparty
@@ -25,14 +26,14 @@ install:
 
     mkdir %PLATFORM% && cd %PLATFORM%
 
-    cmake ..\sources -G "Visual Studio 14 2015 Win64" -DQT_PATH="C:\Qt\5.9.3\msvc2015_64" -DBOOST_ROOT="C:\Libraries\boost_1_60_0"
+    cmake ..\sources -G "Visual Studio 14 2015 Win64" -DQT_PATH="C:\Qt\5.9\msvc2015_64" -DBOOST_ROOT="C:\Libraries\boost_1_60_0"
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
   parallel: true
   verbosity: minimal
 after_build:
 - cmd: >-
-    C:\Qt\5.9.3\msvc2015_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz_1.2.exe
+    C:\Qt\5.9\msvc2015_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz_1.2.exe
 
     copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
 

@@ -338,6 +338,7 @@ private:
     void selectNone() override {
       LevelSelection::selectNone(), m_strokeSelection.selectNone();
     }
+    void enableCommands() override { m_strokeSelection.enableCommands(); }
   };
 
 private:

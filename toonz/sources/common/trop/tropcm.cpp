@@ -12,6 +12,7 @@
 #include "tpalette.h"
 #include "timage_io.h"
 #include "trasterimage.h"
+#include "tsimplecolorstyles.h"
 
 //#include "tlevel.h"
 //#include "ttoonzimage.h"
@@ -554,11 +555,31 @@ void addColor(TPaletteP plt, int index, std::map<int, int> &usedInks) {
   plt->getPage(0)->addStyle(TPixel32::Red);
 }
 
+// Check if the downPlt has the same style (same color, same index) and use it.
+// If the same style is not found, then add it as a new style.
+void tryMergeInkOrAddColor(TPaletteP downPlt, const TPaletteP matchPlt,
+                           int index, std::map<int, int> &usedInks) {
+  if (0 <= index && index < downPlt->getStyleCount() &&
+      index < matchPlt->getStyleCount()) {
+    TSolidColorStyle *solidDownStyle =
+        dynamic_cast<TSolidColorStyle *>(downPlt->getStyle(index));
+    TSolidColorStyle *solidMatchStyle =
+        dynamic_cast<TSolidColorStyle *>(matchPlt->getStyle(index));
+    if (solidDownStyle && solidMatchStyle &&
+        solidDownStyle->getMainColor() == solidMatchStyle->getMainColor()) {
+      usedInks[index] = index;
+      return;
+    }
+  }
+  addColor(downPlt, index, usedInks);
+}
+
 //------------------------------------------------------------
 // std::map<int,int>& usedInk  upInkId -> downInkId
 void doMergeCmapped(TRasterCM32P rasOut, const TRasterCM32P &rasUp,
-                    const TPaletteP &pltOut, bool onlyInks,
-                    int matchlinePrevalence, std::map<int, int> &usedInks) {
+                    const TPaletteP &pltOut, const TPaletteP &matchPlt,
+                    bool onlyInks, int matchlinePrevalence,
+                    std::map<int, int> &usedInks, bool mergePalette) {
   double val = matchlinePrevalence / 100.0;  // matchlinePrevalence ==0 always
                                              // ink down; matchlinePrevalence ==
                                              // 100 always ink up;
@@ -579,8 +600,12 @@ void doMergeCmapped(TRasterCM32P rasOut, const TRasterCM32P &rasUp,
       if (!pixUp->isPurePaint()) {
         int toneDown = pixDown->getTone();
         int toneUp   = pixUp->getTone();
-        if (usedInks.find(pixUp->getInk()) == usedInks.end())
-          addColor(downPlt, pixUp->getInk(), usedInks);
+        if (usedInks.find(pixUp->getInk()) == usedInks.end()) {
+          if (mergePalette)
+            tryMergeInkOrAddColor(downPlt, matchPlt, pixUp->getInk(), usedInks);
+          else
+            addColor(downPlt, pixUp->getInk(), usedInks);
+        }
 
         if (val == 1) {  // Matchline is on top, with gap
           pixDown->setTone(toneUp);
@@ -771,12 +796,16 @@ doMergeCmapped(rasOut, rasUp, pltOut, false, matchlinePrevalence, usedColors);
 //-----------------------------------------------------------------
 
 void TRop::applyMatchLines(TRasterCM32P rasOut, const TRasterCM32P &rasUp,
-                           const TPaletteP &pltOut, int inkIndex,
-                           int matchlinePrevalence,
+                           const TPaletteP &pltOut, const TPaletteP &matchPlt,
+                           int inkIndex, int matchlinePrevalence,
                            std::map<int, int> &usedInks) {
   assert(matchlinePrevalence >= 0);
   if (inkIndex == -1)
-    doMergeCmapped(rasOut, rasUp, pltOut, true, matchlinePrevalence, usedInks);
+    doMergeCmapped(rasOut, rasUp, pltOut, matchPlt, true, matchlinePrevalence,
+                   usedInks, false);
+  else if (inkIndex == -2)
+    doMergeCmapped(rasOut, rasUp, pltOut, matchPlt, true, matchlinePrevalence,
+                   usedInks, true);
   else
     doApplyMatchLines(rasOut, rasUp, inkIndex, matchlinePrevalence);
 }

@@ -46,7 +46,7 @@ TFilePath TSystem::toUNC(const TFilePath &fp) {
 
       switch (dwResult) {
       case NO_ERROR:
-        return TFilePath(::to_string(puni->lpUniversalName));
+        return TFilePath(::to_string(std::wstring(puni->lpUniversalName)));
 
       case ERROR_NOT_CONNECTED:
         // The network connection does not exists.

@@ -259,9 +259,6 @@ int main(int argc, char *argv[]) {
 #if QT_VERSION >= 0x050600
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-  // Enables resource sharing between the OpenGL contexts used by classes like
-  // QOpenGLWidget and QQuickWidget.
-  QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
   QApplication a(argc, argv);
 
@@ -591,7 +588,8 @@ int main(int argc, char *argv[]) {
 
   a.setQuitOnLastWindowClosed(false);
   // a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
-  w.checkForUpdates();
+  if (Preferences::instance()->isLatestVersionCheckEnabled())
+    w.checkForUpdates();
 
   w.show();
 

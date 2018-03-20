@@ -811,8 +811,6 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 
   std::unique_ptr<QOffscreenSurface> surface(new QOffscreenSurface());
   surface->setFormat(format);
-  // Enabling Qt::AA_ShareOpenGLContexts attribute in main()
-  surface->setScreen(QOpenGLContext::globalShareContext()->screen());
   surface->create();
 
   glPushAttrib(GL_ALL_ATTRIB_BITS);

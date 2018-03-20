@@ -25,13 +25,13 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied = false) {
 }
 
 //----------------------------------------------------------------------------------
-
+// drawOrderMode : 0=OverAll, 1=UnderAll, 2=PaletteOrder
 void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
-                   bool selective) {
+                   int drawOrderMode, const QSet<int> &aboveStyleIds) {
   if (!out.getPointer() || !in.getPointer()) return;
   assert(out->getSize() == in->getSize());
   int x, y;
-  if (!selective) {
+  if (drawOrderMode == 0) {  // OverAll
     for (y = 0; y < out->getLy(); y++) {
       for (x = 0; x < out->getLx(); x++) {
 #ifdef _DEBUG
@@ -44,16 +44,17 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
         if (inPix->m == 0) continue;
         TPixelCM32 *outPix = &out->pixels(y)[x];
         bool sameStyleId   = styleId == outPix->getInk();
+        // line with the same style : multiply tones
+        // line with different style : pick darker tone
         int tone = sameStyleId ? outPix->getTone() * (255 - inPix->m) / 255
-                               : outPix->getTone();
+                               : std::min(255 - inPix->m, outPix->getTone());
         int ink = !sameStyleId && outPix->getTone() < 255 - inPix->m
                       ? outPix->getInk()
                       : styleId;
-        *outPix =
-            TPixelCM32(ink, outPix->getPaint(), std::min(255 - inPix->m, tone));
+        *outPix = TPixelCM32(ink, outPix->getPaint(), tone);
       }
     }
-  } else {
+  } else if (drawOrderMode == 1) {  // UnderAll
     for (y = 0; y < out->getLy(); y++) {
       for (x = 0; x < out->getLx(); x++) {
 #ifdef _DEBUG
@@ -66,14 +67,32 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
         if (inPix->m == 0) continue;
         TPixelCM32 *outPix = &out->pixels(y)[x];
         bool sameStyleId   = styleId == outPix->getInk();
+        // line with the same style : multiply tones
+        // line with different style : pick darker tone
         int tone = sameStyleId ? outPix->getTone() * (255 - inPix->m) / 255
-                               : outPix->getTone();
-        int ink = outPix->getTone() < 255 && !sameStyleId &&
-                          outPix->getTone() <= 255 - inPix->m
+                               : std::min(255 - inPix->m, outPix->getTone());
+        int ink = !sameStyleId && outPix->getTone() <= 255 - inPix->m
                       ? outPix->getInk()
                       : styleId;
-        *outPix =
-            TPixelCM32(ink, outPix->getPaint(), std::min(255 - inPix->m, tone));
+        *outPix = TPixelCM32(ink, outPix->getPaint(), tone);
+      }
+    }
+  } else {  // PaletteOrder
+    for (y = 0; y < out->getLy(); y++) {
+      for (x = 0; x < out->getLx(); x++) {
+        TPixel32 *inPix = &in->pixels(y)[x];
+        if (inPix->m == 0) continue;
+        TPixelCM32 *outPix = &out->pixels(y)[x];
+        bool sameStyleId   = styleId == outPix->getInk();
+        // line with the same style : multiply tones
+        // line with different style : pick darker tone
+        int tone = sameStyleId ? outPix->getTone() * (255 - inPix->m) / 255
+                               : std::min(255 - inPix->m, outPix->getTone());
+        bool chooseOutPixInk = outPix->getTone() < 255 - inPix->m ||
+                               (outPix->getTone() == 255 - inPix->m &&
+                                aboveStyleIds.contains(outPix->getInk()));
+        int ink = !sameStyleId && chooseOutPixInk ? outPix->getInk() : styleId;
+        *outPix = TPixelCM32(ink, outPix->getPaint(), tone);
       }
     }
   }
@@ -346,7 +365,7 @@ void BluredBrush::eraseDrawing(const TRasterP ras, const TRasterP rasBackup,
 void BluredBrush::updateDrawing(const TRasterCM32P rasCM,
                                 const TRasterCM32P rasBackupCM,
                                 const TRect &bbox, int styleId,
-                                bool selective) const {
+                                int drawOrderMode) const {
   if (!rasCM) return;
 
   TRect rasRect    = rasCM->getBounds();
@@ -355,7 +374,7 @@ void BluredBrush::updateDrawing(const TRasterCM32P rasCM,
 
   rasCM->copy(rasBackupCM->extract(targetRect), targetRect.getP00());
   putOnRasterCM(rasCM->extract(targetRect), m_ras->extract(targetRect), styleId,
-                selective);
+                drawOrderMode, m_aboveStyleIds);
 }
 
 //----------------------------------------------------------------------------------

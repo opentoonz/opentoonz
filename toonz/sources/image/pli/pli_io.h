@@ -79,6 +79,7 @@ public:
     THICK_QUADRATIC_LOOP_GOBJ,
     OUTLINE_OPTIONS_GOBJ,
     PRECISION_SCALE_GOBJ,
+    AUTOCLOSE_TOLERANCE_GOBJ,
     // ...
     HOW_MANY_TAG_TYPES
   };
@@ -429,6 +430,16 @@ public:
 
 //=====================================================================
 
+class AutoCloseToleranceTag final : public PliObjectTag {
+public:
+  int m_autoCloseTolerance;
+
+  AutoCloseToleranceTag();
+  AutoCloseToleranceTag(int tolerance);
+};
+
+//=====================================================================
+
 /*!
 The class which will store the parsed info in reading.
 (reading is realized by means of the constructor)
@@ -458,7 +469,7 @@ public:
   void setCreator(const QString &creator);
 
   void getVersion(UINT &majorVersionNumber, UINT &minorVersionNumber) const;
-
+  void setVersion(UINT majorVersionNumber, UINT minorVersionNumber);
   bool addTag(PliTag *tag, bool addFront = false);
 
   void loadInfo(bool readPalette, TPalette *&palette,
@@ -471,6 +482,7 @@ public:
   double getMaxThickness() const;
   void setMaxThickness(double maxThickness);
   double getAutocloseTolerance() const;
+  void setAutocloseTolerance(int tolerance);
   int &precisionScale();
   // aggiuti questi 2 membri per salvare la paletta globale
 

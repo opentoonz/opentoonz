@@ -91,7 +91,8 @@ Dialog DVAPI *createMsgBox(MsgType type, const QString &text,
 
 MessageAndCheckboxDialog DVAPI *createMsgandCheckbox(
     MsgType type, const QString &text, const QString &checkBoxText,
-    const QStringList &buttons, int defaultButtonIndex, QWidget *parent = 0);
+    const QStringList &buttons, int defaultButtonIndex,
+    Qt::CheckState defaultCheckBoxState, QWidget *parent = 0);
 
 // void DVAPI error(const QString &msg);
 // void DVAPI info(const QString &msg);
@@ -261,8 +262,9 @@ class DVAPI MessageAndCheckboxDialog final : public DVGui::Dialog {
 
 public:
   MessageAndCheckboxDialog(QWidget *parent = 0, bool hasButton = false,
-                           bool hasFixedSize   = true,
-                           const QString &name = QString());
+                           bool hasFixedSize               = true,
+                           const QString &name             = QString(),
+                           Qt::CheckState checkButtonState = Qt::Unchecked);
   int getChecked() { return m_checked; }
 
 public slots:

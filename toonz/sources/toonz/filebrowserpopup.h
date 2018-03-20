@@ -332,9 +332,10 @@ public:
   ReplaceLevelPopup();
 
   bool execute() override;
-  void show();
 
   void initFolder() override;
+  void setRange(TCellSelection::Range &range, std::set<int> &columnRange,
+                bool &replaceCells);
 
 protected slots:
   void onSelectionChanged(TSelection *selection);

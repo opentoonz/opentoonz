@@ -134,11 +134,20 @@ protected:
         , m_toIndex(toIndex)
         , m_step(step)
         , m_randomAccessRead(false)
-        , m_incrementalIndexing(false) {}
+        , m_incrementalIndexing(false)
+        , m_premultiply(false) {}
     TLevelP m_level;
     int m_fromIndex, m_toIndex, m_step;
     bool m_incrementalIndexing;
     bool m_randomAccessRead;
+
+    // Specified if the level is needed to be premultiplied on display.
+    // It will be true for the files of which the "premultiply" option is
+    // activated in the Preferences > Loading > "Level Settings by File Format".
+    // By default, PNG will be loaded with being premultiplied so that it will
+    // be displayed properly.
+    bool m_premultiply;
+
     TFilePath m_fp;
 
     TFrameId flipbookIndexToLevelFrame(int index);

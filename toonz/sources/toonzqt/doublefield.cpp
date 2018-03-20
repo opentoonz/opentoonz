@@ -145,8 +145,8 @@ void DoubleValueField::setRange(double minValue, double maxValue) {
   m_roller->setRange(minValue, maxValue);
 
   int dicimal   = m_lineEdit->getDecimals();
-  int sliderMax = maxValue * pow(10., dicimal);
-  int sliderMin = minValue * pow(10., dicimal);
+  int sliderMax = (int)round(maxValue * pow(10., dicimal));
+  int sliderMin = (int)round(minValue * pow(10., dicimal));
 
   m_slider->setRange(sliderMin, sliderMax);
 
@@ -161,7 +161,7 @@ void DoubleValueField::setValue(double value) {
   m_roller->setValue(value);
 
   int dicimal     = m_lineEdit->getDecimals();
-  int sliderValue = value * pow(10., dicimal);
+  int sliderValue = (int)round(value * pow(10., dicimal));
 
   m_slider->setValue(sliderValue);
   // forzo il repaint... non sempre si aggiorna e l'update non sembra risolvere
@@ -237,12 +237,12 @@ void DoubleValueField::onSliderChanged(int value) {
 //-----------------------------------------------------------------------------
 
 void DoubleValueField::onLineEditValueChanged() {
-  double value       = m_lineEdit->getValue();
-  int dicimal        = m_lineEdit->getDecimals();
-  double sliderValue = value * pow(10., dicimal);
+  double value    = m_lineEdit->getValue();
+  int dicimal     = m_lineEdit->getDecimals();
+  int sliderValue = (int)round(value * pow(10., dicimal));
 
-  // Controllo necessario per evitare che il segnale di cambiamento venga emesso
-  // piu' volte.
+  // Control necessary to prevent the change signal from being emitted more than
+  // once.
   if ((m_slider->value() == sliderValue && m_slider->isVisible()) ||
       (m_roller->getValue() == value && m_roller->isVisible()))
     return;

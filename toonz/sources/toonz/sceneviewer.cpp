@@ -506,6 +506,9 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   grabGesture(Qt::SwipeGesture);
   grabGesture(Qt::PanGesture);
   grabGesture(Qt::PinchGesture);
+
+  if (Preferences::instance()->isColorCalibrationEnabled())
+    m_lutCalibrator = new LutCalibrator();
 }
 
 //-----------------------------------------------------------------------------
@@ -818,7 +821,11 @@ void SceneViewer::initializeGL() {
   initializeOpenGLFunctions();
 
   // to be computed once through the software
-  LutCalibrator::instance()->initialize();
+  if (m_lutCalibrator) {
+    m_lutCalibrator->initialize();
+    connect(context(), SIGNAL(aboutToBeDestroyed()), this,
+            SLOT(onContextAboutToBeDestroyed()));
+  }
 
   // glClearColor(1.0,1.0,1.0,1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -847,7 +854,7 @@ void SceneViewer::resizeGL(int w, int h) {
   if (m_previewMode != NO_PREVIEW) requestTimedRefresh();
 
   // remake fbo with new size
-  if (LutCalibrator::instance()->isValid()) {
+  if (m_lutCalibrator && m_lutCalibrator->isValid()) {
     if (m_fbo) delete m_fbo;
     m_fbo = new QOpenGLFramebufferObject(w, h);
   }
@@ -1373,7 +1380,8 @@ void SceneViewer::paintGL() {
   time.start();
 #endif
 
-  if (!m_isPicking && LutCalibrator::instance()->isValid()) m_fbo->bind();
+  if (!m_isPicking && m_lutCalibrator && m_lutCalibrator->isValid())
+    m_fbo->bind();
 
   if (m_hRuler && m_vRuler) {
     if (!viewRulerToggle.getStatus() &&
@@ -1403,8 +1411,8 @@ void SceneViewer::paintGL() {
     glPopMatrix();
     m_viewGrabImage->unlock();
 
-    if (!m_isPicking && LutCalibrator::instance()->isValid())
-      LutCalibrator::instance()->onEndDraw(m_fbo);
+    if (!m_isPicking && m_lutCalibrator && m_lutCalibrator->isValid())
+      m_lutCalibrator->onEndDraw(m_fbo);
 
     return;
   }
@@ -1447,8 +1455,8 @@ void SceneViewer::paintGL() {
 #endif
   // TOfflineGL::setContextManager(0);
 
-  if (!m_isPicking && LutCalibrator::instance()->isValid())
-    LutCalibrator::instance()->onEndDraw(m_fbo);
+  if (!m_isPicking && m_lutCalibrator && m_lutCalibrator->isValid())
+    m_lutCalibrator->onEndDraw(m_fbo);
 }
 
 //-----------------------------------------------------------------------------
@@ -2546,4 +2554,13 @@ void SceneViewer::bindFBO() {
 
 void SceneViewer::releaseFBO() {
   if (m_fbo) m_fbo->release();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::onContextAboutToBeDestroyed() {
+  if (!m_lutCalibrator) return;
+  makeCurrent();
+  m_lutCalibrator->cleanup();
+  doneCurrent();
 }

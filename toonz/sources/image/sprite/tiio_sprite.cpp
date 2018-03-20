@@ -106,7 +106,7 @@ TLevelWriterSprite::~TLevelWriterSprite() {
     totalHorizPadding = horizDim * horizPadding;
     spriteSheetWidth  = horizDim * resizedWidth + totalHorizPadding;
     vertDim           = horizDim;
-    // Figure out if there is one row too many 
+    // Figure out if there is one row too many
     // (Such as 6 images needs 3 x 2 grid)
     if (vertDim * vertDim - vertDim >= m_imagesResized.size()) {
       vertDim = vertDim - 1;
@@ -130,8 +130,8 @@ TLevelWriterSprite::~TLevelWriterSprite() {
     }
   }
   if (m_format != "Individual") {
-    QImage spriteSheet =
-        QImage(spriteSheetWidth, spriteSheetHeight, QImage::Format_ARGB32);
+    QImage spriteSheet = QImage(spriteSheetWidth, spriteSheetHeight,
+                                QImage::Format_ARGB32_Premultiplied);
     spriteSheet.fill(qRgba(0, 0, 0, 0));
     QPainter painter;
     painter.begin(&spriteSheet);
@@ -229,7 +229,8 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
   QByteArray ba                = m_intermediateFormat.toUpper().toLatin1();
   const char *format           = ba.data();
 
-  QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
+  QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly,
+                          QImage::Format_ARGB32_Premultiplied);
 
   int l = qi->width(), r = 0, t = qi->height(), b = 0;
   if (m_trim) {
@@ -269,7 +270,7 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
     if (t < m_top) m_top       = t;
     if (b > m_bottom) m_bottom = b;
   }
-  QImage *newQi = new QImage(m_lx, m_ly, QImage::Format_ARGB32);
+  QImage *newQi = new QImage(m_lx, m_ly, QImage::Format_ARGB32_Premultiplied);
   newQi->fill(qRgba(0, 0, 0, 0));
   QPainter painter(newQi);
   painter.drawImage(QPoint(0, 0), *qi);

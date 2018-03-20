@@ -363,7 +363,8 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame,
 
     // Prepare an OpenGL context
     context = new QOpenGLContext();
-    context->setShareContext(QOpenGLContext::globalShareContext());
+    if (QOpenGLContext::currentContext())
+      context->setShareContext(QOpenGLContext::currentContext());
     context->setFormat(QSurfaceFormat::defaultFormat());
     context->create();
     context->makeCurrent(info.m_offScreenSurface.get());

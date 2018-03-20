@@ -166,35 +166,10 @@ QStringList getMonitorNames() {
 
 //-----------------------------------------------------------------------------
 
-LutCalibrator* LutCalibrator::instance() {
-  static LutCalibrator _instance;
-  return &_instance;
-}
-
-//-----------------------------------------------------------------------------
-
 void LutCalibrator::initialize() {
-  static bool hasInitialized = false;
-  if (hasInitialized) return;
-  hasInitialized = true;
-
   initializeOpenGLFunctions();
 
-  // check whether preference enables color calibration
-  if (!Preferences::instance()->isColorCalibrationEnabled()) return;
-
-  // obtain current monitor name
-  QString monitorName = getMonitorName();
-
-  // obtain 3dlut path associated to the monitor name
-  QString lutPath =
-      Preferences::instance()->getColorCalibrationLutPath(monitorName);
-
-  if (lutPath.isEmpty()) return;
-
-  // check existence of the 3dlut file
-  // load 3dlut data
-  if (!loadLutFile(lutPath)) return;
+  if (!LutManager::instance()->isValid()) return;
 
   // create shader
   if (!initializeLutTextureShader()) {
@@ -209,25 +184,35 @@ void LutCalibrator::initialize() {
   assignLutTexture();
 
   m_isValid = true;
+
   return;
 }
 
 //-----------------------------------------------------------------------------
 
-void LutCalibrator::finalize() {
-  if (!m_isValid) return;
+void LutCalibrator::cleanup() {
+  if (!isValid()) return;
   // release shader
-  if (m_shader.program) delete m_shader.program;
-  if (m_shader.vert) delete m_shader.vert;
-  if (m_shader.frag) delete m_shader.frag;
+  if (m_shader.program) {
+    delete m_shader.program;
+    m_shader.program = NULL;
+  }
+  if (m_shader.vert) {
+    delete m_shader.vert;
+    m_shader.vert = NULL;
+  }
+  if (m_shader.frag) {
+    delete m_shader.frag;
+    m_shader.frag = NULL;
+  }
   // release VBO
   if (m_viewerVBO.isCreated()) m_viewerVBO.destroy();
   // release LUT texture
-  if (m_lut.tex && m_lut.tex->isCreated()) {
-    m_lut.tex->destroy();
-    delete m_lut.tex;
+  if (m_lutTex && m_lutTex->isCreated()) {
+    m_lutTex->destroy();
+    delete m_lutTex;
+    m_lutTex = NULL;
   }
-  if (m_lut.data) delete[] m_lut.data;
 }
 
 //-----------------------------------------------------------------------------
@@ -340,7 +325,7 @@ void LutCalibrator::onEndDraw(QOpenGLFramebufferObject* fbo) {
   glBindTexture(GL_TEXTURE_2D, textureId);
 
   glActiveTexture(GL_TEXTURE5);
-  m_lut.tex->bind();
+  m_lutTex->bind();
 
   glPushMatrix();
   glLoadIdentity();
@@ -350,7 +335,7 @@ void LutCalibrator::onEndDraw(QOpenGLFramebufferObject* fbo) {
                                     4);  // use texture unit 4
   m_shader.program->setUniformValue(m_shader.lutUniform,
                                     5);  // use texture unit 5
-  GLfloat size = (GLfloat)m_lut.meshSize;
+  GLfloat size = (GLfloat)LutManager::instance()->meshSize();
   m_shader.program->setUniformValue(m_shader.lutSizeUniform, size, size, size);
 
   m_shader.program->enableAttributeArray(m_shader.vertexAttrib);
@@ -377,7 +362,62 @@ void LutCalibrator::onEndDraw(QOpenGLFramebufferObject* fbo) {
 
 //-----------------------------------------------------------------------------
 
-QString& LutCalibrator::getMonitorName() const {
+void LutCalibrator::assignLutTexture() {
+  assert(glGetError() == GL_NO_ERROR);
+  int meshSize = LutManager::instance()->meshSize();
+  m_lutTex     = new QOpenGLTexture(QOpenGLTexture::Target3D);
+  m_lutTex->setSize(meshSize, meshSize, meshSize);
+  m_lutTex->setFormat(QOpenGLTexture::RGB32F);
+  // m_lutTex->setLayers(1);
+  m_lutTex->setMipLevels(1);
+  m_lutTex->allocateStorage();
+  m_lutTex->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+  m_lutTex->setWrapMode(QOpenGLTexture::ClampToEdge);
+
+  m_lutTex->setData(QOpenGLTexture::RGB, QOpenGLTexture::Float32,
+                    LutManager::instance()->data());
+
+  assert(glGetError() == GL_NO_ERROR);
+}
+
+//=============================================================================
+
+LutManager* LutManager::instance() {
+  static LutManager _instance;
+  return &_instance;
+}
+
+//-----------------------------------------------------------------------------
+
+LutManager::LutManager() {
+  // check whether preference enables color calibration
+  if (!Preferences::instance()->isColorCalibrationEnabled()) return;
+
+  // obtain current monitor name
+  QString monitorName = getMonitorName();
+
+  // obtain 3dlut path associated to the monitor name
+  QString lutPath =
+      Preferences::instance()->getColorCalibrationLutPath(monitorName);
+
+  if (lutPath.isEmpty()) return;
+
+  // check existence of the 3dlut file
+  // load 3dlut data
+  if (!loadLutFile(lutPath)) return;
+
+  m_isValid = true;
+}
+
+//-----------------------------------------------------------------------------
+
+LutManager::~LutManager() {
+  if (m_lut.data) delete[] m_lut.data;
+}
+
+//-----------------------------------------------------------------------------
+
+QString& LutManager::getMonitorName() const {
   static QString monitorName;
   if (!monitorName.isEmpty()) return monitorName;
 
@@ -396,7 +436,7 @@ QString& LutCalibrator::getMonitorName() const {
 
 //-----------------------------------------------------------------------------
 
-bool LutCalibrator::loadLutFile(const QString& fp) {
+bool LutManager::loadLutFile(const QString& fp) {
   struct locals {
     // skip empty or comment lines
     static inline QString readDataLine(QTextStream& stream) {
@@ -484,30 +524,10 @@ bool LutCalibrator::loadLutFile(const QString& fp) {
   file.close();
   return true;
 }
-
-//-----------------------------------------------------------------------------
-
-void LutCalibrator::assignLutTexture() {
-  assert(glGetError() == GL_NO_ERROR);
-
-  m_lut.tex = new QOpenGLTexture(QOpenGLTexture::Target3D);
-  m_lut.tex->setSize(m_lut.meshSize, m_lut.meshSize, m_lut.meshSize);
-  m_lut.tex->setFormat(QOpenGLTexture::RGB32F);
-  m_lut.tex->setLayers(1);
-  m_lut.tex->setMipLevels(1);
-  m_lut.tex->allocateStorage();
-  m_lut.tex->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
-  m_lut.tex->setWrapMode(QOpenGLTexture::ClampToEdge);
-
-  m_lut.tex->setData(QOpenGLTexture::RGB, QOpenGLTexture::Float32, m_lut.data);
-
-  assert(glGetError() == GL_NO_ERROR);
-}
-
 //-----------------------------------------------------------------------------
 
 // input : 0-1
-void LutCalibrator::convert(float& r, float& g, float& b) {
+void LutManager::convert(float& r, float& g, float& b) {
   struct locals {
     static inline float lerp(float val1, float val2, float ratio) {
       return val1 * (1.0f - ratio) + val2 * ratio;
@@ -565,7 +585,7 @@ void LutCalibrator::convert(float& r, float& g, float& b) {
 
 //-----------------------------------------------------------------------------
 
-void LutCalibrator::convert(QColor& col) {
+void LutManager::convert(QColor& col) {
   if (!m_isValid) return;
   float r = col.redF();
   float g = col.greenF();
@@ -578,7 +598,7 @@ void LutCalibrator::convert(QColor& col) {
 
 //-----------------------------------------------------------------------------
 
-void LutCalibrator::convert(TPixel32& col) {
+void LutManager::convert(TPixel32& col) {
   if (!m_isValid) return;
   float r = (float)col.r / 255.0;
   float g = (float)col.g / 255.0;

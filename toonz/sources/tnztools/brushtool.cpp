@@ -54,7 +54,7 @@ TEnv::DoubleVar RasterBrushMinSize("InknpaintRasterBrushMinSize", 1);
 TEnv::DoubleVar RasterBrushMaxSize("InknpaintRasterBrushMaxSize", 5);
 TEnv::DoubleVar BrushAccuracy("InknpaintBrushAccuracy", 20);
 TEnv::DoubleVar BrushSmooth("InknpaintBrushSmooth", 0);
-TEnv::IntVar BrushSelective("InknpaintBrushSelective", 0);
+TEnv::IntVar BrushDrawOrder("InknpaintBrushDrawOrder", 0);
 TEnv::IntVar BrushBreakSharpAngles("InknpaintBrushBreakSharpAngles", 0);
 TEnv::IntVar RasterBrushPencilMode("InknpaintRasterBrushPencilMode", 0);
 TEnv::IntVar BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
@@ -436,31 +436,56 @@ void addStrokeToImage(TTool::Application *application, const TVectorImageP &vi,
   // getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
 }
 
+//---------------------------------------------------------------------------------------------------------
+
+enum DrawOrder { OverAll = 0, UnderAll, PaletteOrder };
+
+void getAboveStyleIdSet(int styleId, TPaletteP palette,
+                        QSet<int> &aboveStyles) {
+  if (!palette) return;
+  for (int p = 0; p < palette->getPageCount(); p++) {
+    TPalette::Page *page = palette->getPage(p);
+    for (int s = 0; s < page->getStyleCount(); s++) {
+      int tmpId = page->getStyleId(s);
+      if (tmpId == styleId) return;
+      if (tmpId != 0) aboveStyles.insert(tmpId);
+    }
+  }
+}
+
 //=========================================================================================================
 
 class RasterBrushUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
   bool m_selective;
+  bool m_isPaletteOrder;
   bool m_isPencil;
 
 public:
   RasterBrushUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
                   int styleId, bool selective, TXshSimpleLevel *level,
                   const TFrameId &frameId, bool isPencil, bool isFrameCreated,
-                  bool isLevelCreated)
+                  bool isLevelCreated, bool isPaletteOrder)
       : TRasterUndo(tileSet, level, frameId, isFrameCreated, isLevelCreated, 0)
       , m_points(points)
       , m_styleId(styleId)
       , m_selective(selective)
-      , m_isPencil(isPencil) {}
+      , m_isPencil(isPencil)
+      , m_isPaletteOrder(isPaletteOrder) {}
 
   void redo() const override {
     insertLevelAndFrameIfNeeded();
     TToonzImageP image = getImage();
     TRasterCM32P ras   = image->getRaster();
-    RasterStrokeGenerator m_rasterTrack(
-        ras, BRUSH, NONE, m_styleId, m_points[0], m_selective, 0, !m_isPencil);
+    RasterStrokeGenerator m_rasterTrack(ras, BRUSH, NONE, m_styleId,
+                                        m_points[0], m_selective, 0,
+                                        !m_isPencil, m_isPaletteOrder);
+    if (m_isPaletteOrder) {
+      QSet<int> aboveStyleIds;
+      getAboveStyleIdSet(m_styleId, image->getPalette(), aboveStyleIds);
+      m_rasterTrack.setAboveStyleIds(aboveStyleIds);
+    }
     m_rasterTrack.setPointsSequence(m_points);
     m_rasterTrack.generateStroke(m_isPencil);
     image->setSavebox(image->getSavebox() +
@@ -482,20 +507,20 @@ public:
 class RasterBluredBrushUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
-  bool m_selective;
+  DrawOrder m_drawOrder;
   int m_maxThick;
   double m_hardness;
 
 public:
   RasterBluredBrushUndo(TTileSetCM32 *tileSet,
                         const std::vector<TThickPoint> &points, int styleId,
-                        bool selective, TXshSimpleLevel *level,
+                        DrawOrder drawOrder, TXshSimpleLevel *level,
                         const TFrameId &frameId, int maxThick, double hardness,
                         bool isFrameCreated, bool isLevelCreated)
       : TRasterUndo(tileSet, level, frameId, isFrameCreated, isLevelCreated, 0)
       , m_points(points)
       , m_styleId(styleId)
-      , m_selective(selective)
+      , m_drawOrder(drawOrder)
       , m_maxThick(maxThick)
       , m_hardness(hardness) {}
 
@@ -510,11 +535,17 @@ public:
     workRaster->clear();
     BluredBrush brush(workRaster, m_maxThick, brushPad, false);
 
+    if (m_drawOrder == PaletteOrder) {
+      QSet<int> aboveStyleIds;
+      getAboveStyleIdSet(m_styleId, image->getPalette(), aboveStyleIds);
+      brush.setAboveStyleIds(aboveStyleIds);
+    }
+
     std::vector<TThickPoint> points;
     points.push_back(m_points[0]);
     TRect bbox = brush.getBoundFromPoints(points);
     brush.addPoint(m_points[0], 1);
-    brush.updateDrawing(ras, ras, bbox, m_styleId, m_selective);
+    brush.updateDrawing(ras, ras, bbox, m_styleId, (int)m_drawOrder);
     if (m_points.size() > 1) {
       points.clear();
       points.push_back(m_points[0]);
@@ -522,7 +553,7 @@ public:
       bbox = brush.getBoundFromPoints(points);
       brush.addArc(m_points[0], (m_points[1] + m_points[0]) * 0.5, m_points[1],
                    1, 1);
-      brush.updateDrawing(ras, backupRas, bbox, m_styleId, m_selective);
+      brush.updateDrawing(ras, backupRas, bbox, m_styleId, (int)m_drawOrder);
       int i;
       for (i = 1; i + 2 < (int)m_points.size(); i = i + 2) {
         points.clear();
@@ -531,7 +562,7 @@ public:
         points.push_back(m_points[i + 2]);
         bbox = brush.getBoundFromPoints(points);
         brush.addArc(m_points[i], m_points[i + 1], m_points[i + 2], 1, 1);
-        brush.updateDrawing(ras, backupRas, bbox, m_styleId, m_selective);
+        brush.updateDrawing(ras, backupRas, bbox, m_styleId, (int)m_drawOrder);
       }
     }
     ToolUtils::updateSaveBox();
@@ -768,7 +799,7 @@ BrushTool::BrushTool(std::string name, int targetType)
     , m_smooth("Smooth:", 0, 50, 0)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_preset("Preset:")
-    , m_selective("Selective", false)
+    , m_drawOrder("Draw Order:")
     , m_breakAngles("Break", true)
     , m_pencil("Pencil", false)
     , m_pressure("Pressure", true)
@@ -804,10 +835,14 @@ BrushTool::BrushTool(std::string name, int targetType)
     m_prop[0].bind(m_rasThickness);
     m_prop[0].bind(m_hardness);
     m_prop[0].bind(m_smooth);
-    m_prop[0].bind(m_selective);
+    m_prop[0].bind(m_drawOrder);
     m_prop[0].bind(m_pencil);
     m_pencil.setId("PencilMode");
-    m_selective.setId("Selective");
+
+    m_drawOrder.addValue(tr("Over All").toStdWString());
+    m_drawOrder.addValue(tr("Under All").toStdWString());
+    m_drawOrder.addValue(tr("Palette Order").toStdWString());
+    m_drawOrder.setId("DrawOrder");
   }
 
   m_prop[0].bind(m_pressure);
@@ -1013,7 +1048,7 @@ void BrushTool::updateTranslation() {
   m_hardness.setQStringName(tr("Hardness:"));
   m_accuracy.setQStringName(tr("Accuracy:"));
   m_smooth.setQStringName(tr("Smooth:"));
-  m_selective.setQStringName(tr("Selective"));
+  m_drawOrder.setQStringName(tr("Draw Order:"));
   // m_filled.setQStringName(tr("Filled"));
   m_preset.setQStringName(tr("Preset:"));
   m_breakAngles.setQStringName(tr("Break"));
@@ -1064,7 +1099,7 @@ void BrushTool::onActivate() {
     m_capStyle.setIndex(VectorCapStyle);
     m_joinStyle.setIndex(VectorJoinStyle);
     m_miterJoinLimit.setValue(VectorMiterValue);
-    m_selective.setValue(BrushSelective ? 1 : 0);
+    if (m_targetType & TTool::ToonzImage) m_drawOrder.setIndex(BrushDrawOrder);
     m_breakAngles.setValue(BrushBreakSharpAngles ? 1 : 0);
     m_pencil.setValue(RasterBrushPencilMode ? 1 : 0);
     m_pressure.setValue(BrushPressureSensitivity ? 1 : 0);
@@ -1188,6 +1223,15 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
       TPointD halfThick(maxThick * 0.5, maxThick * 0.5);
       TRectD invalidateRect(pos - halfThick, pos + halfThick);
+
+      // if the drawOrder mode = "Palette Order",
+      // get styleId list which is above the current style in the palette
+      DrawOrder drawOrder = (DrawOrder)m_drawOrder.getIndex();
+      QSet<int> aboveStyleIds;
+      if (drawOrder == PaletteOrder) {
+        getAboveStyleIdSet(m_styleId, ri->getPalette(), aboveStyleIds);
+      }
+
       if (m_hardness.getValue() == 100 || m_pencil.getValue()) {
         /*-- Pencilモードでなく、Hardness=100 の場合のブラシサイズを1段階下げる
          * --*/
@@ -1195,8 +1239,12 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
         TThickPoint thickPoint(pos + convert(ras->getCenter()), thickness);
         m_rasterTrack = new RasterStrokeGenerator(
-            ras, BRUSH, NONE, m_styleId, thickPoint, m_selective.getValue(), 0,
-            !m_pencil.getValue());
+            ras, BRUSH, NONE, m_styleId, thickPoint, drawOrder != OverAll, 0,
+            !m_pencil.getValue(), drawOrder == PaletteOrder);
+
+        if (drawOrder == PaletteOrder)
+          m_rasterTrack->setAboveStyleIds(aboveStyleIds);
+
         m_tileSaver->save(m_rasterTrack->getLastRect());
         m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue());
 
@@ -1211,12 +1259,15 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
         m_points.push_back(point);
         m_bluredBrush = new BluredBrush(m_workRas, maxThick, m_brushPad, false);
 
+        if (drawOrder == PaletteOrder)
+          m_bluredBrush->setAboveStyleIds(aboveStyleIds);
+
         m_strokeRect = m_bluredBrush->getBoundFromPoints(m_points);
         updateWorkAndBackupRasters(m_strokeRect);
         m_tileSaver->save(m_strokeRect);
         m_bluredBrush->addPoint(point, 1);
         m_bluredBrush->updateDrawing(ri->getRaster(), m_backupRas, m_strokeRect,
-                                     m_styleId, m_selective.getValue());
+                                     m_styleId, drawOrder);
         m_lastRect = m_strokeRect;
 
         m_smoothStroke.beginStroke(m_smooth.getValue());
@@ -1356,7 +1407,7 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
         }
 
         m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
-                                     m_styleId, m_selective.getValue());
+                                     m_styleId, m_drawOrder.getIndex());
         m_strokeRect += bbox;
       }
     }
@@ -1773,7 +1824,7 @@ void BrushTool::finishRasterBrush(const TPointD &pos, double pressureVal) {
           m_tileSet, m_rasterTrack->getPointsSequence(),
           m_rasterTrack->getStyleId(), m_rasterTrack->isSelective(),
           simLevel.getPointer(), frameId, m_pencil.getValue(), m_isFrameCreated,
-          m_isLevelCreated));
+          m_isLevelCreated, m_rasterTrack->isPaletteOrder()));
     }
     delete m_rasterTrack;
     m_rasterTrack = 0;
@@ -1834,7 +1885,7 @@ void BrushTool::finishRasterBrush(const TPointD &pos, double pressureVal) {
         }
 
         m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
-                                     m_styleId, m_selective.getValue());
+                                     m_styleId, m_drawOrder.getIndex());
         m_strokeRect += bbox;
       }
       if (pts.size() > 0) {
@@ -1850,7 +1901,7 @@ void BrushTool::finishRasterBrush(const TPointD &pos, double pressureVal) {
         m_tileSaver->save(bbox);
         m_bluredBrush->addArc(points[0], points[1], points[2], 1, 1);
         m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
-                                     m_styleId, m_selective.getValue());
+                                     m_styleId, m_drawOrder.getIndex());
 
         if (!rectUpdated) {
           invalidateRect =
@@ -1870,7 +1921,7 @@ void BrushTool::finishRasterBrush(const TPointD &pos, double pressureVal) {
 
     if (m_tileSet->getTileCount() > 0) {
       TUndoManager::manager()->add(new RasterBluredBrushUndo(
-          m_tileSet, m_points, m_styleId, m_selective.getValue(),
+          m_tileSet, m_points, m_styleId, (DrawOrder)m_drawOrder.getIndex(),
           simLevel.getPointer(), frameId, m_rasThickness.getValue().second,
           m_hardness.getValue() * 0.01, m_isFrameCreated, m_isLevelCreated));
     }
@@ -2288,8 +2339,8 @@ bool BrushTool::onPropertyChanged(std::string propertyName) {
   } else if (propertyName == m_preset.getName()) {
     loadPreset();
     notifyTool = true;
-  } else if (propertyName == m_selective.getName()) {
-    BrushSelective = m_selective.getValue();
+  } else if (propertyName == m_drawOrder.getName()) {
+    BrushDrawOrder = m_drawOrder.getIndex();
   } else if (propertyName == m_breakAngles.getName()) {
     BrushBreakSharpAngles = m_breakAngles.getValue();
   } else if (propertyName == m_pencil.getName()) {
@@ -2402,7 +2453,7 @@ void BrushTool::loadPreset() {
           ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
       m_smooth.setValue(preset.m_smooth, true);
       m_hardness.setValue(preset.m_hardness, true);
-      m_selective.setValue(preset.m_selective);
+      m_drawOrder.setIndex(preset.m_drawOrder);
       m_pencil.setValue(preset.m_pencil);
       m_pressure.setValue(preset.m_pressure);
     }
@@ -2427,7 +2478,7 @@ void BrushTool::addPreset(QString name) {
   preset.m_acc         = m_accuracy.getValue();
   preset.m_smooth      = m_smooth.getValue();
   preset.m_hardness    = m_hardness.getValue();
-  preset.m_selective   = m_selective.getValue();
+  preset.m_drawOrder   = m_drawOrder.getIndex();
   preset.m_pencil      = m_pencil.getValue();
   preset.m_breakAngles = m_breakAngles.getValue();
   preset.m_pressure    = m_pressure.getValue();
@@ -2485,7 +2536,7 @@ BrushData::BrushData()
     , m_hardness(0.0)
     , m_opacityMin(0.0)
     , m_opacityMax(0.0)
-    , m_selective(false)
+    , m_drawOrder(0)
     , m_pencil(false)
     , m_breakAngles(false)
     , m_pressure(false)
@@ -2508,7 +2559,7 @@ BrushData::BrushData(const std::wstring &name)
     , m_hardness(0.0)
     , m_opacityMin(0.0)
     , m_opacityMax(0.0)
-    , m_selective(false)
+    , m_drawOrder(0)
     , m_pencil(false)
     , m_breakAngles(false)
     , m_pressure(false)
@@ -2541,8 +2592,8 @@ void BrushData::saveData(TOStream &os) {
   os.openChild("Opacity");
   os << m_opacityMin << m_opacityMax;
   os.closeChild();
-  os.openChild("Selective");
-  os << (int)m_selective;
+  os.openChild("Draw_Order");
+  os << m_drawOrder;
   os.closeChild();
   os.openChild("Pencil");
   os << (int)m_pencil;
@@ -2595,8 +2646,10 @@ void BrushData::loadData(TIStream &is) {
       is >> m_hardness, is.matchEndTag();
     else if (tagName == "Opacity")
       is >> m_opacityMin >> m_opacityMax, is.matchEndTag();
-    else if (tagName == "Selective")
-      is >> val, m_selective = val, is.matchEndTag();
+    else if (tagName == "Selective" ||
+             tagName == "Draw_Order")  // "Selective" is left to keep backward
+                                       // compatibility
+      is >> m_drawOrder, is.matchEndTag();
     else if (tagName == "Pencil")
       is >> val, m_pencil = val, is.matchEndTag();
     else if (tagName == "Break_Sharp_Angles")

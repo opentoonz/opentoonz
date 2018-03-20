@@ -400,6 +400,14 @@ TImageP TImageReaderPli::doLoad() {
       strokeData.m_options =
           ((StrokeOutlineOptionsTag *)imageTag->m_object[i])->m_options;
       break;
+    case PliTag::AUTOCLOSE_TOLERANCE_GOBJ:
+      // aggiunge curve quadratiche con spessore costante
+      AutoCloseToleranceTag *toleranceTag =
+          (AutoCloseToleranceTag *)imageTag->m_object[i];
+      assert(toleranceTag->m_autoCloseTolerance >= 0);
+      outVectImage->setAutocloseTolerance(
+          ((double)toleranceTag->m_autoCloseTolerance) / 1000);
+      break;
     }  // switch(groupTag->m_object[j]->m_type)
   }    // for (i=0; i<imageTag->m_numObjects; i++)
 
@@ -500,13 +508,13 @@ GroupTag *makeGroup(TVectorImageP &vi, int &currStyleId, int &index,
                     int currDepth);
 
 void TImageWriterPli::save(const TImageP &img) {
-  // alloco un'immagine
+  // Allocate an image
   TVectorImageP tempVecImg = img;
   int currStyleId          = -1;
   if (!tempVecImg) throw TImageException(m_path, "No data to save");
 
-  // controllo che il frame che sto per inserire non sia gia' presente
-  //  in modo da non incrementare il numero di frame correnti
+  //  Check that the frame about to insert is not already present
+  //   So you do not increase the number of current frames
   ++m_lwp->m_frameNumber;
 
   std::unique_ptr<IntersectionBranch[]> v;
@@ -519,6 +527,7 @@ void TImageWriterPli::save(const TImageP &img) {
                                      tempVecImg->getAutocloseTolerance()));
     m_lwp->m_pli->setCreator(m_lwp->m_creator);
   }
+
   buildPalette(m_lwp->m_pli.get(), img);
 
   ParsedPli *pli = m_lwp->m_pli.get();
@@ -541,7 +550,21 @@ solo nel costruttore)
     PliTag *tag = new PrecisionScaleTag(precisionScale);
     tags.push_back((PliObjectTag *)tag);
   }
-
+  // Store the auto close tolerance
+  double pliTolerance = m_lwp->m_pli->getAutocloseTolerance();
+  // write the tag if the frame's tolerance has been changed or
+  // if the first frame's tolerance (and therefore the level's tolerance)
+  // has been changed.
+  if (!areAlmostEqual(tempVecImg->getAutocloseTolerance(), 1.15, 0.001) ||
+      !areAlmostEqual(pliTolerance, 1.15, 0.001)) {
+    int tolerance =
+        (int)((roundf(tempVecImg->getAutocloseTolerance() * 100) / 100) * 1000);
+    PliTag *tag = new AutoCloseToleranceTag(tolerance);
+    tags.push_back((PliObjectTag *)tag);
+    pli->setVersion(120, 0);
+  } else {
+    pli->setVersion(71, 0);
+  }
   // recupero il numero di stroke dall'immagine
   int numStrokes = tempVecImg->getStrokeCount();
 
