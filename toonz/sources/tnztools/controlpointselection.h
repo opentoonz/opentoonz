@@ -129,7 +129,7 @@ public:
   /*! Modify stroke: between two linear or cusp point must be a pair chunk
 number.
 PAY ATTENTION: Can add control point in the stroke. */
-  void setStroke(const TVectorImageP &vi, int strokeIndex,
+  void setStroke(TVectorImageP vi, int strokeIndex,
                  const optional<StrokeId> &strokeId);
   TStroke *getStroke() const {
     return m_vi ? m_vi->getStroke(m_strokeIndex) : 0;

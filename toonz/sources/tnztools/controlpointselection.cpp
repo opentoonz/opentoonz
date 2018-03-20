@@ -688,8 +688,7 @@ void ControlPointEditorStroke::moveSingleControlPoint(int index,
 
 //-----------------------------------------------------------------------------
 
-void ControlPointEditorStroke::setStroke(const TVectorImageP &vi,
-                                         int strokeIndex,
+void ControlPointEditorStroke::setStroke(TVectorImageP vi, int strokeIndex,
                                          const optional<StrokeId> &strokeId) {
   m_strokeIndex = strokeIndex;
   m_vi          = vi;
