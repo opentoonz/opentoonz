@@ -1896,13 +1896,12 @@ void CellArea::drawSubLayers(QPainter &p, const CellPosition &pos,
     set<double> keyframes = animation->getKeyframes();
     if (keyframes.find(double(row)) == keyframes.end()) continue;
 
-    QRect &keyRect = o->rect(PredefinedRect::SUBLAYER_KEY_ICON)
-                         .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0);
+    const QRect &keyRect = o->rect(PredefinedRect::SUBLAYER_KEY_ICON)
+                               .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0);
 
-    keyRect.translate(QPoint(cellRect.left(), 0));
-    keyRect.translate(offsets.topLeft());
-
-    p.drawPixmap(keyRect, key);
+    p.drawPixmap(keyRect.translated(QPoint(cellRect.left(), 0))
+                     .translated(offsets.topLeft()),
+                 key);
   }
 }
 
