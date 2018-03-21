@@ -1051,7 +1051,7 @@ void FunctionTreeModel::refreshData(TXsheet *xsh) {
         getRootItem()->appendChild(m_stageObjects =
                                        new TopLevelChannelGroup("Stage"));
         getRootItem()->appendChild(
-            m_pathAnimations = new TopLevelChannelGroup("PathAnimation"));
+            m_pathAnimations = new TopLevelChannelGroup("Curve Animation"));
         getRootItem()->appendChild(m_fxs = new TopLevelChannelGroup("FX"));
 
         assert(getRootItem()->getChildCount() == 3);
