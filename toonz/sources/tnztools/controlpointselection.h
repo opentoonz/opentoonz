@@ -134,7 +134,10 @@ PAY ATTENTION: Can add control point in the stroke. */
   TStroke *getStroke() const {
     return m_vi ? m_vi->getStroke(m_strokeIndex) : 0;
   }
-  void unsetStroke() { setStroke(0, -1, boost::none); }
+  void unsetStroke() {
+    TVectorImageP noImage;
+    setStroke(noImage, -1, boost::none);
+  }
 
   void setStrokeIndex(int strokeIndex) { m_strokeIndex = strokeIndex; }
   int getStrokeIndex() const { return m_strokeIndex; }

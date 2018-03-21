@@ -182,7 +182,7 @@ public:
   }
 
   operator TSmartPointerT<BASE>() const {
-    return TSmartPointerT<BASE>(getPointer());
+    return TSmartPointerT<BASE>(TSmartPointerT<DERIVED>::getPointer());
   }
 };
 
