@@ -1518,8 +1518,8 @@ std::string TLevelColumnFx::getAlias(double frame,
       rdata += "animatedPlt" + std::to_string(frame);
   }
 
+  TXsheet *xsh = m_levelColumn->getLevelColumn()->getXsheet();
   if (Preferences::instance()->isIgnoreAlphaonColumn1Enabled()) {
-    TXsheet *xsh  = m_levelColumn->getLevelColumn()->getXsheet();
     TXsheet *txsh = sl->getScene()->getTopXsheet();
 
     if (m_levelColumn->getIndex() == 0 &&
@@ -1527,8 +1527,14 @@ std::string TLevelColumnFx::getAlias(double frame,
       rdata += "column_0";
   }
 
+  // Check for path animation. If found, alter alias so it's different,
+  // for each frame.
+  std::string paData = "";
+  if (xsh->pathAnimations()->hasActivatedAnimations(cell))
+    paData = ",pathAnimated[" + std::to_string(frame) + "]";
+
   return getFxType() + "[" + ::to_string(fp.getWideString()) + "," + rdata +
-         "]";
+         "]" + paData;
 }
 
 //-------------------------------------------------------------------

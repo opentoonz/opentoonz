@@ -299,6 +299,17 @@ bool PathAnimations::hasActivatedAnimations() {
 
   return false;
 }
+bool PathAnimations::hasActivatedAnimations(const TXshCell cell) {
+  for (map<StrokeId, shared_ptr<PathAnimation>>::iterator it =
+           m_shapeAnimation.begin();
+       it != m_shapeAnimation.end(); it++) {
+    StrokeId animationKey = it->first;
+    if (animationKey.cell() != cell) continue;
+    shared_ptr<PathAnimation> animation = it->second;
+    if (animation->isActivated()) return true;
+  }
+  return false;
+}
 void PathAnimations::loadData(TIStream &is) {
   if (!m_xsheet) return;
 

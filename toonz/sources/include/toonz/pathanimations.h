@@ -140,6 +140,7 @@ public:
     return m_shapeAnimation;
   }
   bool hasActivatedAnimations();
+  bool hasActivatedAnimations(const TXshCell cell);
 
   void loadData(TIStream &is);
   void saveData(TOStream &os, int occupiedColumnCount);
