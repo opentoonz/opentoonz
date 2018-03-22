@@ -274,11 +274,13 @@ bool CellSubLayer::hasChildren() const {
 }
 
 TVectorImageP CellSubLayer::vectorImage() const {
+  TVectorImageP noImage = (TImage *)0;
+
   TXshSimpleLevel *level = m_cellId.getSimpleLevel();
-  if (!level) return nullptr;
+  if (!level) return noImage;
 
   TImageP image = level->getFrame(m_cellId.getFrameId(), false);
-  if (!image) return nullptr;
+  if (!image) return noImage;
 
   TVectorImageP vectorImage = {
       dynamic_cast<TVectorImage *>(image.getPointer())};
