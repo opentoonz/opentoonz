@@ -1671,7 +1671,7 @@ TAffine SceneViewer::getSceneMatrix() const {
 
 void SceneViewer::setViewMatrix(const TAffine &aff, int viewMode) {
   m_viewAff[viewMode] = aff;
-
+  if (aff.a11 == 0.0) std::cout << "STOP" << std::endl;
   // In case the previewer is on, request a delayed update
   if (m_previewMode != NO_PREVIEW) requestTimedRefresh();
 }
@@ -2040,6 +2040,7 @@ void SceneViewer::fitToCamera() {
   double xratio = (double)viewRect.width() / cameraRect.getLx();
   double yratio = (double)viewRect.height() / cameraRect.getLy();
   double ratio  = std::min(xratio, yratio);
+  if (ratio == 0.0) return;
   if (tempIsFlippedX)
     setViewMatrix(TScale(-1, 1) * m_viewAff[m_viewMode], m_viewMode);
   if (tempIsFlippedY)

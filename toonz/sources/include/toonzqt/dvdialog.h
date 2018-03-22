@@ -146,7 +146,7 @@ class DVAPI Separator final : public QFrame {
   bool m_isHorizontal;
 
 public:
-  Separator(QString name = "", QWidget *parent = 0);
+  Separator(QString name = "", QWidget *parent = 0, bool isHorizontal = true);
   ~Separator();
 
   /*!	Set dialog saparator \b name to name, if name is empty dialog separator

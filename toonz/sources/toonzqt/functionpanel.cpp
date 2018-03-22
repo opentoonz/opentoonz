@@ -234,7 +234,7 @@ FunctionPanel::Gadget::Gadget(FunctionPanel::Handle handle, int kIndex,
 //
 //-----------------------------------------------------------------------------
 
-FunctionPanel::FunctionPanel(QWidget *parent)
+FunctionPanel::FunctionPanel(QWidget *parent, bool isFloating)
     : QDialog(parent)
     , m_functionTreeModel(0)
     , m_viewTransform()
@@ -245,7 +245,8 @@ FunctionPanel::FunctionPanel(QWidget *parent)
     , m_dragTool(0)
     , m_currentFrameStatus(0)
     , m_selection(0)
-    , m_curveShape(SMOOTH) {
+    , m_curveShape(SMOOTH)
+    , m_isFloating(isFloating) {
   setWindowTitle(tr("Function Curves"));
 
   m_viewTransform.translate(50, 200);
@@ -260,26 +261,30 @@ FunctionPanel::FunctionPanel(QWidget *parent)
   m_curveLabel.text               = "";
   m_curveLabel.curve              = 0;
 
-  // load the dialog size
-  TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-  QSettings mySettings(toQString(fp), QSettings::IniFormat);
+  if (m_isFloating) {
+    // load the dialog size
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
+    QSettings mySettings(toQString(fp), QSettings::IniFormat);
 
-  mySettings.beginGroup("Dialogs");
-  setGeometry(
-      mySettings.value("FunctionCurves", QRect(500, 500, 400, 300)).toRect());
-  mySettings.endGroup();
+    mySettings.beginGroup("Dialogs");
+    setGeometry(
+        mySettings.value("FunctionCurves", QRect(500, 500, 400, 300)).toRect());
+    mySettings.endGroup();
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 FunctionPanel::~FunctionPanel() {
-  // save the dialog size
-  TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-  QSettings mySettings(toQString(fp), QSettings::IniFormat);
+  if (m_isFloating) {
+    // save the dialog size
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
+    QSettings mySettings(toQString(fp), QSettings::IniFormat);
 
-  mySettings.beginGroup("Dialogs");
-  mySettings.setValue("FunctionCurves", geometry());
-  mySettings.endGroup();
+    mySettings.beginGroup("Dialogs");
+    mySettings.setValue("FunctionCurves", geometry());
+    mySettings.endGroup();
+  }
 
   delete m_dragTool;
 }

@@ -108,7 +108,7 @@ protected:
   QHBoxLayout *m_layout;
 
 public:
-  ToolOptionsBox(QWidget *parent);
+  ToolOptionsBox(QWidget *parent, bool isScrollable = false);
   ~ToolOptionsBox();
 
   virtual void
@@ -183,6 +183,8 @@ public:
 class ArrowToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
+  enum AXIS { Position = 0, Rotation, Scale, Shear, CenterPosition, AllAxis };
+
   TPropertyGroup *m_pg;
   bool m_splined;
   TTool *m_tool;
@@ -190,7 +192,8 @@ class ArrowToolOptionsBox final : public ToolOptionsBox {
   TObjectHandle *m_objHandle;
   TXsheetHandle *m_xshHandle;
 
-  QStackedWidget *m_mainStackedWidget;
+  QWidget **m_axisOptionWidgets;
+  QWidget *m_pickWidget;
 
   // General
   ToolOptionCombo *m_chooseActiveAxisCombo;
@@ -249,6 +252,9 @@ class ArrowToolOptionsBox final : public ToolOptionsBox {
 
   ToolOptionCheckbox *m_globalKey;
 
+  // enables adjusting value by dragging on the label
+  void connectLabelAndField(ClickableLabel *label, MeasuredValueField *field);
+
 public:
   ArrowToolOptionsBox(QWidget *parent, TTool *tool, TPropertyGroup *pg,
                       TFrameHandle *frameHandle, TObjectHandle *objHandle,
@@ -272,6 +278,8 @@ protected slots:
   void syncCurrentStageObjectComboItem();
   // change the current stage object when user changes it via combobox by hand
   void onCurrentStageObjectComboActivated(int index);
+
+  void onCurrentAxisChanged(int);
 };
 
 //=============================================================================

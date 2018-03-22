@@ -2260,6 +2260,8 @@ void MainWindow::defineActions() {
                           tr("Active Axis - Shear"), "");
   createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Center",
                           tr("Active Axis - Center"), "");
+  createToolOptionsAction("A_ToolOption_EditToolActiveAxis:All",
+                          tr("Active Axis - All"), "");
 
   createToolOptionsAction("A_ToolOption_SkeletonMode:Build Skeleton",
                           tr("Build Skeleton Mode"), "");

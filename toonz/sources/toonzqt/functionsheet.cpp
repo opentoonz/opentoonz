@@ -10,6 +10,7 @@
 #include "toonz/tframehandle.h"
 #include "toonz/doubleparamcmd.h"
 #include "toonz/preferences.h"
+#include "toonz/toonzfolders.h"
 
 // TnzBase includes
 #include "tunit.h"
@@ -960,18 +961,45 @@ public:
 //    FunctionSheet  implementation
 //********************************************************************************
 
-FunctionSheet::FunctionSheet(QWidget *parent)
-    : SpreadsheetViewer(parent), m_selectedCells(), m_selection(0) {
+FunctionSheet::FunctionSheet(QWidget *parent, bool isFloating)
+    : SpreadsheetViewer(parent)
+    , m_selectedCells()
+    , m_selection(0)
+    , m_isFloating(isFloating) {
   setColumnsPanel(m_columnHeadViewer = new FunctionSheetColumnHeadViewer(this));
   setRowsPanel(m_rowViewer = new FunctionSheetRowViewer(this));
   setCellsPanel(m_cellViewer = new FunctionSheetCellViewer(this));
 
+  setWindowFlag(Qt::Window);
   setColumnCount(20);
+  setWindowTitle(tr("Function Editor"));
+  setFocusPolicy(Qt::ClickFocus);
+
+  if (m_isFloating) {
+    // load the dialog size
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
+    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+
+    mySettings.beginGroup("Dialogs");
+    setGeometry(
+        mySettings.value("FunctionSpreadsheet", QRect(500, 500, 400, 300))
+            .toRect());
+    mySettings.endGroup();
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-FunctionSheet::~FunctionSheet() {}
+FunctionSheet::~FunctionSheet() {
+  if (m_isFloating) {
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
+    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+
+    mySettings.beginGroup("Dialogs");
+    mySettings.setValue("FunctionSpreadsheet", geometry());
+    mySettings.endGroup();
+  }
+}
 
 //-----------------------------------------------------------------------------
 

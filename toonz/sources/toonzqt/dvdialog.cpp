@@ -99,8 +99,8 @@ QString getMsgBoxTitle(MsgType type) {
 // Separator
 //-----------------------------------------------------------------------------
 
-Separator::Separator(QString name, QWidget *parent)
-    : QFrame(parent), m_name(name), m_isHorizontal(true) {
+Separator::Separator(QString name, QWidget *parent, bool isHorizontal)
+    : QFrame(parent), m_name(name), m_isHorizontal(isHorizontal) {
   //	if(m_name.isEmpty())
   //		setMinimumSize(1,1);
   //	else

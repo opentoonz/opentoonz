@@ -55,7 +55,8 @@ private:
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
       *m_vectorSnappingTargetCB, *m_dropdownShortcutsCycleOptionsCB,
-      *m_interfaceFont, *m_interfaceFontWeight, *m_guidedDrawingStyle;
+      *m_interfaceFont, *m_interfaceFontWeight, *m_guidedDrawingStyle,
+      *m_functionEditorToggle;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -102,6 +103,7 @@ private slots:
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
   void onRoomChoiceChanged(int index);
+  void onFunctionEditorToggleChanged(int index);
   void onScanLevelTypeChanged(const QString &text);
   void onMinuteChanged();
   void onIconSizeChanged();

@@ -82,7 +82,8 @@ void ToolOptionToolBar::addSpacing(int width) {
 //=============================================================================
 // ToolOptionsBox
 
-ToolOptionsBox::ToolOptionsBox(QWidget *parent) : QFrame(parent) {
+ToolOptionsBox::ToolOptionsBox(QWidget *parent, bool isScrollable)
+    : QFrame(parent) {
   setObjectName("toolOptionsPanel");
   setStyleSheet("#toolOptionsPanel {border: 0px; margin: 1px;}");
 
@@ -93,7 +94,30 @@ ToolOptionsBox::ToolOptionsBox(QWidget *parent) : QFrame(parent) {
   m_layout->setMargin(0);
   m_layout->setSpacing(5);
   m_layout->addSpacing(5);
-  setLayout(m_layout);
+
+  if (isScrollable) {
+    QHBoxLayout *hLayout = new QHBoxLayout;
+    hLayout->setMargin(0);
+    hLayout->setSpacing(0);
+    setLayout(hLayout);
+
+    // Build the scroll widget vin which the toolbar will be placed
+    DvScrollWidget *scrollWidget = new DvScrollWidget;
+    hLayout->addWidget(scrollWidget);
+
+    // In the scrollable layout we add a widget of 24 height
+    // which contains the tooloptionBar. This is necessary
+    // to make the hboxlayout adjust the bar's vertical position.
+    QWidget *toolContainer = new QWidget;
+    scrollWidget->setWidget(toolContainer);
+
+    toolContainer->setSizePolicy(QSizePolicy::MinimumExpanding,
+                                 QSizePolicy::Fixed);
+    toolContainer->setFixedHeight(24);
+
+    toolContainer->setLayout(m_layout);
+  } else
+    setLayout(m_layout);
 }
 
 //-----------------------------------------------------------------------------
@@ -424,10 +448,31 @@ GenericToolOptionsBox::GenericToolOptionsBox(QWidget *parent, TTool *tool,
 
 //-----------------------------------------------------------------------------
 
+// show 17x17 icon without style dependency
+class SimpleIconViewField : public QWidget {
+  QIcon m_icon;
+
+public:
+  SimpleIconViewField(const QString &iconName, const QString &toolTipStr = "",
+                      QWidget *parent = 0)
+      : QWidget(parent), m_icon(createQIcon(iconName.toUtf8())) {
+    setMinimumSize(17, 25);
+    setToolTip(toolTipStr);
+  }
+
+protected:
+  void paintEvent(QPaintEvent *e) {
+    QPainter p(this);
+    p.drawPixmap(QRect(0, 4, 17, 17), m_icon.pixmap(17, 17));
+  }
+};
+
+//-----------------------------------------------------------------------------
+
 ArrowToolOptionsBox::ArrowToolOptionsBox(
     QWidget *parent, TTool *tool, TPropertyGroup *pg, TFrameHandle *frameHandle,
     TObjectHandle *objHandle, TXsheetHandle *xshHandle, ToolHandle *toolHandle)
-    : ToolOptionsBox(parent)
+    : ToolOptionsBox(parent, true)
     , m_pg(pg)
     , m_splined(false)
     , m_tool(tool)
@@ -438,7 +483,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   setObjectName("toolOptionsPanel");
   setFixedHeight(26);
 
-  m_mainStackedWidget = new QStackedWidget(this);
+  m_axisOptionWidgets = new QWidget *[AllAxis];
 
   /* --- General Parts --- */
 
@@ -454,6 +499,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       dynamic_cast<TEnumProperty *>(m_pg->getProperty("Auto Select Column"));
   if (autoSelectProp)
     m_pickCombo = new ToolOptionCombo(m_tool, autoSelectProp, toolHandle);
+
+  m_pickWidget = new QWidget(this);
 
   /* --- Position --- */
   m_motionPathPosField =
@@ -603,15 +650,25 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   const int ITEM_SPACING  = 10;
   const int LABEL_SPACING = 3;
   /* --- Layout --- */
-  /* --- Layout --- */
   QHBoxLayout *mainLay = m_layout;
   {
     mainLay->addWidget(m_currentStageObjectCombo, 0);
     mainLay->addWidget(m_chooseActiveAxisCombo, 0);
 
+    // Pick combobox only available on "All" axis mode
+    QHBoxLayout *pickLay = new QHBoxLayout();
+    pickLay->setMargin(0);
+    pickLay->setSpacing(0);
+    {
+      pickLay->addSpacing(5);
+      pickLay->addWidget(new QLabel(tr("Pick:"), this), 0);
+      pickLay->addWidget(m_pickCombo, 0);
+    }
+    m_pickWidget->setLayout(pickLay);
+    mainLay->addWidget(m_pickWidget, 0);
+
     addSeparator();
 
-    mainLay->addWidget(m_mainStackedWidget, 1);
     {
       // Position
       QFrame *posFrame    = new QFrame(this);
@@ -619,11 +676,11 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       posLay->setMargin(0);
       posLay->setSpacing(0);
       posFrame->setLayout(posLay);
-      m_mainStackedWidget->addWidget(posFrame);
       {
+        posLay->addWidget(
+            new SimpleIconViewField("edit_position", tr("Position"), this), 0);
+        posLay->addSpacing(LABEL_SPACING * 2);
         posLay->addWidget(m_motionPathPosLabel, 0);
-        posLay->addSpacing(ITEM_SPACING);
-
         posLay->addWidget(m_motionPathPosField, 0);
 
         posLay->addWidget(m_ewPosLabel, 0);
@@ -653,8 +710,13 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         posLay->addWidget(m_soLabel, 0);
         posLay->addWidget(m_soField, 10);
 
+        posLay->addSpacing(ITEM_SPACING);
+        posLay->addWidget(new DVGui::Separator("", this, false));
+
         posLay->addStretch(1);
       }
+      m_axisOptionWidgets[Position] = posFrame;
+      mainLay->addWidget(m_axisOptionWidgets[Position], 0);
 
       // Rotation
       QFrame *rotFrame    = new QFrame(this);
@@ -662,15 +724,21 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       rotLay->setMargin(0);
       rotLay->setSpacing(0);
       rotFrame->setLayout(rotLay);
-      m_mainStackedWidget->addWidget(rotFrame);
       {
+        rotLay->addWidget(
+            new SimpleIconViewField("edit_rotation", tr("Rotation"), this), 0);
+        rotLay->addSpacing(LABEL_SPACING * 2);
         rotLay->addWidget(m_rotationLabel, 0);
-        rotLay->addSpacing(ITEM_SPACING);
-
+        rotLay->addSpacing(LABEL_SPACING);
         rotLay->addWidget(m_rotationField, 10);
+
+        rotLay->addSpacing(ITEM_SPACING);
+        rotLay->addWidget(new DVGui::Separator("", this, false));
 
         rotLay->addStretch(1);
       }
+      m_axisOptionWidgets[Rotation] = rotFrame;
+      mainLay->addWidget(m_axisOptionWidgets[Rotation], 0);
 
       // Scale
       QFrame *scaleFrame    = new QFrame(this);
@@ -678,10 +746,10 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       scaleLay->setMargin(0);
       scaleLay->setSpacing(0);
       scaleFrame->setLayout(scaleLay);
-      m_mainStackedWidget->addWidget(scaleFrame);
       {
-        scaleLay->addWidget(new QLabel(tr("Scale"), this), 0);
-        scaleLay->addSpacing(ITEM_SPACING);
+        scaleLay->addWidget(
+            new SimpleIconViewField("edit_scale", tr("Scale"), this), 0);
+        scaleLay->addSpacing(LABEL_SPACING * 2);
 
         scaleLay->addWidget(m_globalScaleLabel, 0);
         scaleLay->addSpacing(LABEL_SPACING);
@@ -707,8 +775,13 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         scaleLay->addSpacing(LABEL_SPACING);
         scaleLay->addWidget(m_maintainCombo, 0);
 
+        scaleLay->addSpacing(ITEM_SPACING);
+        scaleLay->addWidget(new DVGui::Separator("", this, false));
+
         scaleLay->addStretch(1);
       }
+      m_axisOptionWidgets[Scale] = scaleFrame;
+      mainLay->addWidget(m_axisOptionWidgets[Scale], 0);
 
       // Shear
       QFrame *shearFrame    = new QFrame(this);
@@ -716,10 +789,10 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       shearLay->setMargin(0);
       shearLay->setSpacing(0);
       shearFrame->setLayout(shearLay);
-      m_mainStackedWidget->addWidget(shearFrame);
       {
-        shearLay->addWidget(new QLabel(tr("Shear"), this), 0);
-        shearLay->addSpacing(ITEM_SPACING);
+        shearLay->addWidget(
+            new SimpleIconViewField("edit_shear", tr("Shear"), this), 0);
+        shearLay->addSpacing(LABEL_SPACING * 2);
 
         shearLay->addWidget(m_shearHLabel, 0);
         shearLay->addSpacing(LABEL_SPACING);
@@ -735,8 +808,12 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
 
         shearLay->addSpacing(ITEM_SPACING);
 
+        shearLay->addWidget(new DVGui::Separator("", this, false));
+
         shearLay->addStretch(1);
       }
+      m_axisOptionWidgets[Shear] = shearFrame;
+      mainLay->addWidget(m_axisOptionWidgets[Shear], 0);
 
       // Center Position
       QFrame *centerPosFrame    = new QFrame(this);
@@ -744,10 +821,11 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       centerPosLay->setMargin(0);
       centerPosLay->setSpacing(0);
       centerPosFrame->setLayout(centerPosLay);
-      m_mainStackedWidget->addWidget(centerPosFrame);
       {
-        centerPosLay->addWidget(new QLabel(tr("Center Position"), this), 0);
-        centerPosLay->addSpacing(ITEM_SPACING);
+        centerPosLay->addWidget(
+            new SimpleIconViewField("edit_center", tr("Center Position"), this),
+            0);
+        centerPosLay->addSpacing(LABEL_SPACING * 2);
 
         centerPosLay->addWidget(m_ewCenterLabel, 0);
         centerPosLay->addSpacing(LABEL_SPACING);
@@ -761,30 +839,24 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         centerPosLay->addWidget(m_nsCenterField, 10);
         centerPosLay->addWidget(m_lockNSCenterCheckbox, 0);
 
+        centerPosLay->addSpacing(ITEM_SPACING);
+        centerPosLay->addWidget(new DVGui::Separator("", this, false));
+
         centerPosLay->addStretch(1);
       }
+      m_axisOptionWidgets[CenterPosition] = centerPosFrame;
+      mainLay->addWidget(m_axisOptionWidgets[CenterPosition], 0);
     }
-
-    addSeparator();
 
     mainLay->addWidget(m_globalKey, 0);
 
-    mainLay->addSpacing(5);
-
-    QHBoxLayout *pickLay = new QHBoxLayout();
-    pickLay->setMargin(0);
-    pickLay->setSpacing(0);
-    mainLay->addLayout(pickLay, 0);
-    {
-      pickLay->addWidget(new QLabel(tr("Pick:"), this), 0);
-      pickLay->addWidget(m_pickCombo, 0);
-    }
+    mainLay->addSpacing(ITEM_SPACING);
   }
 
   /* --- signal-slot connections --- */
   // swap page when the active axis is changed
-  connect(m_chooseActiveAxisCombo, SIGNAL(currentIndexChanged(int)),
-          m_mainStackedWidget, SLOT(setCurrentIndex(int)));
+  connect(m_chooseActiveAxisCombo, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(onCurrentAxisChanged(int)));
   // when the current stage object is changed via combo box, then switch the
   // current stage object in the scene
   connect(m_currentStageObjectCombo, SIGNAL(activated(int)), this,
@@ -831,84 +903,20 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
             SLOT(onScaleTypeChanged(int)));
   }
 
-  connect(m_motionPathPosLabel, SIGNAL(onMousePress(QMouseEvent *)),
-          m_motionPathPosField, SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_motionPathPosLabel, SIGNAL(onMouseMove(QMouseEvent *)),
-          m_motionPathPosField, SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_motionPathPosLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
-          m_motionPathPosField, SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_ewPosLabel, SIGNAL(onMousePress(QMouseEvent *)), m_ewPosField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_ewPosLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_ewPosField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_ewPosLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_ewPosField,
-          SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_nsPosLabel, SIGNAL(onMousePress(QMouseEvent *)), m_nsPosField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_nsPosLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_nsPosField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_nsPosLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_nsPosField,
-          SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_zLabel, SIGNAL(onMousePress(QMouseEvent *)), m_zField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_zLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_zField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_zLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_zField,
-          SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_soLabel, SIGNAL(onMousePress(QMouseEvent *)), m_soField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_soLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_soField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_soLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_soField,
-          SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_rotationLabel, SIGNAL(onMousePress(QMouseEvent *)), m_rotationField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_rotationLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_rotationField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_rotationLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
-          m_rotationField, SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_globalScaleLabel, SIGNAL(onMousePress(QMouseEvent *)),
-          m_globalScaleField, SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_globalScaleLabel, SIGNAL(onMouseMove(QMouseEvent *)),
-          m_globalScaleField, SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_globalScaleLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
-          m_globalScaleField, SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_scaleHLabel, SIGNAL(onMousePress(QMouseEvent *)), m_scaleHField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_scaleHLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_scaleHField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_scaleHLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_scaleHField,
-          SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_scaleVLabel, SIGNAL(onMousePress(QMouseEvent *)), m_scaleVField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_scaleVLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_scaleVField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_scaleVLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_scaleVField,
-          SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_shearHLabel, SIGNAL(onMousePress(QMouseEvent *)), m_shearHField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_shearHLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_shearHField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_shearHLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_shearHField,
-          SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_shearVLabel, SIGNAL(onMousePress(QMouseEvent *)), m_shearVField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_shearVLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_shearVField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_shearVLabel, SIGNAL(onMouseRelease(QMouseEvent *)), m_shearVField,
-          SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_ewCenterLabel, SIGNAL(onMousePress(QMouseEvent *)), m_ewCenterField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_ewCenterLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_ewCenterField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_ewCenterLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
-          m_ewCenterField, SLOT(receiveMouseRelease(QMouseEvent *)));
-  connect(m_nsCenterLabel, SIGNAL(onMousePress(QMouseEvent *)), m_nsCenterField,
-          SLOT(receiveMousePress(QMouseEvent *)));
-  connect(m_nsCenterLabel, SIGNAL(onMouseMove(QMouseEvent *)), m_nsCenterField,
-          SLOT(receiveMouseMove(QMouseEvent *)));
-  connect(m_nsCenterLabel, SIGNAL(onMouseRelease(QMouseEvent *)),
-          m_nsCenterField, SLOT(receiveMouseRelease(QMouseEvent *)));
+  // enables adjusting value by dragging on the label
+  connectLabelAndField(m_motionPathPosLabel, m_motionPathPosField);
+  connectLabelAndField(m_ewPosLabel, m_ewPosField);
+  connectLabelAndField(m_nsPosLabel, m_nsPosField);
+  connectLabelAndField(m_zLabel, m_zField);
+  connectLabelAndField(m_soLabel, m_soField);
+  connectLabelAndField(m_rotationLabel, m_rotationField);
+  connectLabelAndField(m_globalScaleLabel, m_globalScaleField);
+  connectLabelAndField(m_scaleHLabel, m_scaleHField);
+  connectLabelAndField(m_scaleVLabel, m_scaleVField);
+  connectLabelAndField(m_shearHLabel, m_shearHField);
+  connectLabelAndField(m_shearVLabel, m_shearVField);
+  connectLabelAndField(m_ewCenterLabel, m_ewCenterField);
+  connectLabelAndField(m_nsCenterLabel, m_nsCenterField);
 
   if (globalKeyProp) {
     std::string actionName = "A_ToolOption_" + globalKeyProp->getId();
@@ -919,6 +927,21 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       connect(a, SIGNAL(triggered(bool)), m_globalKey, SLOT(doClick(bool)));
     }
   }
+
+  onCurrentAxisChanged(activeAxisProp->getIndex());
+}
+
+//-----------------------------------------------------------------------------
+// enables adjusting value by dragging on the label
+
+void ArrowToolOptionsBox::connectLabelAndField(ClickableLabel *label,
+                                               MeasuredValueField *field) {
+  connect(label, SIGNAL(onMousePress(QMouseEvent *)), field,
+          SLOT(receiveMousePress(QMouseEvent *)));
+  connect(label, SIGNAL(onMouseMove(QMouseEvent *)), field,
+          SLOT(receiveMouseMove(QMouseEvent *)));
+  connect(label, SIGNAL(onMouseRelease(QMouseEvent *)), field,
+          SLOT(receiveMouseRelease(QMouseEvent *)));
 }
 
 //-----------------------------------------------------------------------------
@@ -958,6 +981,7 @@ void ArrowToolOptionsBox::hideEvent(QShowEvent *) {
 void ArrowToolOptionsBox::setSplined(bool on) {
   m_splined = on;
   // Activate on selecting spline
+  m_motionPathPosLabel->setVisible(on);
   m_motionPathPosField->setVisible(on);
   // DEactivate on selecting spline
   m_ewPosField->setVisible(!on);
@@ -1081,6 +1105,16 @@ void ArrowToolOptionsBox::onCurrentStageObjectComboActivated(int index) {
   }
   // switch the current object
   m_objHandle->setObjectId(id);
+}
+
+//------------------------------------------------------------------------------
+
+void ArrowToolOptionsBox::onCurrentAxisChanged(int axisId) {
+  // Show the specified axis options, hide all the others
+  for (int a = 0; a != AllAxis; ++a)
+    m_axisOptionWidgets[a]->setVisible(a == axisId || axisId == AllAxis);
+
+  m_pickWidget->setVisible(axisId == AllAxis);
 }
 
 //=============================================================================

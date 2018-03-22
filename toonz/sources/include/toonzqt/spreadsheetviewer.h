@@ -7,7 +7,8 @@
 #include "cellposition.h"
 #include "toonz/cellpositionratio.h"
 // #include "orientation.h"
-#include <QFrame>
+
+#include <QDialog>
 #include <QScrollArea>
 
 #undef DVAPI
@@ -223,7 +224,7 @@ protected:
 
 //-------------------------------------------------------------------
 
-class DVAPI SpreadsheetViewer : public QFrame {
+class DVAPI SpreadsheetViewer : public QDialog {
   Q_OBJECT
 
   QColor m_lightLightBgColor;  // RowPanel background (124,124,124)

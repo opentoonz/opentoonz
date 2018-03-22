@@ -335,6 +335,7 @@ Preferences::Preferences()
     , m_xsheetLayoutPreference("Classic-revised")
     , m_loadedXsheetLayout("Classic-revised")
     , m_pathAliasPriority(ProjectFolderOnly)
+    , m_functionEditorToggle(ShowGraphEditorInPopup)
     , m_currentTimelineEnabled(true)
     , m_disableAutoStretch(false) {
   TCamera camera;
@@ -654,6 +655,11 @@ Preferences::Preferences()
   int pathAliasPriority = static_cast<int>(m_pathAliasPriority);
   getValue(*m_settings, "pathAliasPriority", pathAliasPriority);
   m_pathAliasPriority = static_cast<PathAliasPriority>(pathAliasPriority);
+
+  int functionEditorToggle = static_cast<int>(m_functionEditorToggle);
+  getValue(*m_settings, "functionEditorToggle", functionEditorToggle);
+  m_functionEditorToggle =
+      static_cast<FunctionEditorToggle>(functionEditorToggle);
 
   QString xsheetLayoutPreference;
   xsheetLayoutPreference =
@@ -1633,6 +1639,13 @@ void Preferences::enableShortcutCommandsWhileRenamingCell(bool on) {
 void Preferences::setPathAliasPriority(PathAliasPriority priority) {
   m_pathAliasPriority = priority;
   m_settings->setValue("pathAliasPriority", static_cast<int>(priority));
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setFunctionEditorToggle(FunctionEditorToggle status) {
+  m_functionEditorToggle = status;
+  m_settings->setValue("functionEditorToggle", static_cast<int>(status));
 }
 
 //-----------------------------------------------------------------

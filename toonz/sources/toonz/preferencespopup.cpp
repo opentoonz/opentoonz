@@ -334,6 +334,13 @@ void PreferencesPopup::onCameraUnitChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onFunctionEditorToggleChanged(int index) {
+  m_pref->setFunctionEditorToggle(
+      static_cast<Preferences::FunctionEditorToggle>(index));
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onRoomChoiceChanged(int index) {
   TApp::instance()->writeSettings();
   m_pref->setCurrentRoomChoice(index);
@@ -1257,8 +1264,9 @@ PreferencesPopup::PreferencesPopup()
   QComboBox *styleSheetType = new QComboBox(this);
   m_pixelsOnlyCB =
       new CheckBox(tr("All imported images will use the same DPI"), this);
-  m_unitOm       = new QComboBox(this);
-  m_cameraUnitOm = new QComboBox(this);
+  m_unitOm               = new QComboBox(this);
+  m_cameraUnitOm         = new QComboBox(this);
+  m_functionEditorToggle = new QComboBox(this);
 
   // Choose between standard and Studio Ghibli rooms
   QComboBox *roomChoice = new QComboBox(this);
@@ -1563,6 +1571,13 @@ PreferencesPopup::PreferencesPopup()
         ::units;
   m_cameraUnitOm->setCurrentIndex((idx < ::unitsCount) ? idx : ::inchIdx);
 
+  QStringList functionEditorList;
+  functionEditorList << tr("Graph Editor Opens in Popup")
+                     << tr("Spreadsheet Opens in Popup")
+                     << tr("Toggle Between Graph Editor and Spreadsheet");
+  m_functionEditorToggle->addItems(functionEditorList);
+  m_functionEditorToggle->setCurrentIndex(
+      static_cast<int>(m_pref->getFunctionEditorToggle()));
   QStringList roomList;
   int currentRoomIndex = 0;
   for (int i = 0; i < m_pref->getRoomChoiceCount(); i++) {
@@ -1965,6 +1980,11 @@ PreferencesPopup::PreferencesPopup()
         styleLay->addWidget(new QLabel(tr("Rooms*:"), this), 4, 0,
                             Qt::AlignRight | Qt::AlignVCenter);
         styleLay->addWidget(roomChoice, 4, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+        styleLay->addWidget(new QLabel(tr("Function Editor*:"), this), 5, 0,
+                            Qt::AlignRight | Qt::AlignVCenter);
+        styleLay->addWidget(m_functionEditorToggle, 5, 1,
+                            Qt::AlignLeft | Qt::AlignVCenter);
       }
       styleLay->setColumnStretch(0, 0);
       styleLay->setColumnStretch(1, 0);
@@ -2590,6 +2610,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onUnitChanged(int)));
   ret = ret && connect(m_cameraUnitOm, SIGNAL(currentIndexChanged(int)),
                        SLOT(onCameraUnitChanged(int)));
+  ret = ret && connect(m_functionEditorToggle, SIGNAL(currentIndexChanged(int)),
+                       SLOT(onFunctionEditorToggleChanged(int)));
   ret = ret && connect(roomChoice, SIGNAL(currentIndexChanged(int)),
                        SLOT(onRoomChoiceChanged(int)));
   ret = ret && connect(m_iconSizeLx, SIGNAL(editingFinished()),
