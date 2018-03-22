@@ -337,7 +337,7 @@ Preferences::Preferences()
     , m_pathAliasPriority(ProjectFolderOnly)
     , m_functionEditorToggle(ShowGraphEditorInPopup)
     , m_currentTimelineEnabled(true)
-    , m_disableAutoStretch(false) {
+    , m_enableAutoStretch(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -688,7 +688,7 @@ Preferences::Preferences()
   getValue(*m_settings, "latestVersionCheckEnabled",
            m_latestVersionCheckEnabled);
 
-  getValue(*m_settings, "DisableAutoStretch", m_disableAutoStretch);
+  getValue(*m_settings, "EnableAutoStretch", m_enableAutoStretch);
 }
 
 //-----------------------------------------------------------------
@@ -1682,7 +1682,7 @@ QString Preferences::getColorCalibrationLutPath(QString &monitorName) const {
 
 //-----------------------------------------------------------------
 
-void Preferences::enableDisableAutoStretch(bool on) {
-  m_disableAutoStretch = on;
-  m_settings->setValue("DisableAutoStretch", on ? "1" : "0");
+void Preferences::enableAutoStretch(bool on) {
+  m_enableAutoStretch = on;
+  m_settings->setValue("EnableAutoStretch", on ? "1" : "0");
 }

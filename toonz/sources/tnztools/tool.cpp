@@ -266,7 +266,7 @@ TImage *TTool::touchImage() {
 
   bool isAutoCreateEnabled   = pref->isAutoCreateEnabled();
   bool animationSheetEnabled = pref->isAnimationSheetEnabled();
-  bool isDisableAutoStretch  = pref->isDisableAutoStretch();
+  bool isAutoStretchEnabled  = pref->isAutoStretchEnabled();
 
   TFrameHandle *currentFrame    = m_application->getCurrentFrame();
   TXshLevelHandle *currentLevel = m_application->getCurrentLevel();
@@ -319,7 +319,7 @@ TImage *TTool::touchImage() {
         // create a new drawing.
         // measure the hold length (starting from the current row) : r0-r1
         int r0 = row, r1 = row;
-        if (!isDisableAutoStretch)
+        if (isAutoStretchEnabled)
           while (xsh->getCell(r1 + 1, col) == cell) r1++;
         // find the proper frameid (possibly addisng suffix, in order to avoid a
         // fid already used)
@@ -389,7 +389,7 @@ TImage *TTool::touchImage() {
         xsh->setCell(row, col, cell);
 
         // create holds
-        if (isDisableAutoStretch) {
+        if (!isAutoStretchEnabled) {
           m_cellsData.push_back(row);
           m_cellsData.push_back(row);
           m_cellsData.push_back(2);  // vuoto => nuovo

@@ -687,9 +687,9 @@ void PreferencesPopup::onKeyframeTypeChanged(int index) {
 void PreferencesPopup::onAutocreationTypeChanged(int index) {
   m_pref->setAutocreationType(index);
   if (index == 2)
-    m_disableAutoStretch->setDisabled(false);
+    m_enableAutoStretch->setDisabled(false);
   else
-    m_disableAutoStretch->setDisabled(true);
+    m_enableAutoStretch->setDisabled(true);
 }
 //-----------------------------------------------------------------------------
 
@@ -1178,8 +1178,8 @@ void PreferencesPopup::onLutPathChanged() {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onDisableAutoStretch(int index) {
-  m_pref->enableDisableAutoStretch(index == Qt::Checked);
+void PreferencesPopup::onEnableAutoStretch(int index) {
+  m_pref->enableAutoStretch(index == Qt::Checked);
 }
 
 //**********************************************************************************
@@ -1370,7 +1370,7 @@ PreferencesPopup::PreferencesPopup()
       tr("Use higher DPI for calculations - Slower but more accurate"), this);
   m_downArrowInLevelStripCreatesNewFrame = new CheckBox(
       tr("Down Arrow at End of Level Strip Creates a New Frame"), this);
-  m_disableAutoStretch = new CheckBox(tr("Disable auto-stretch frame"), this);
+  m_enableAutoStretch = new CheckBox(tr("Enable auto-stretch frame"), this);
 
   //--- Tools -------------------------------
   categoryList->addItem(tr("Tools"));
@@ -1753,8 +1753,8 @@ PreferencesPopup::PreferencesPopup()
   m_autocreationType->addItems(autocreationTypes);
   int autocreationType = m_pref->getAutocreationType();
   m_autocreationType->setCurrentIndex(autocreationType);
-  m_disableAutoStretch->setChecked(m_pref->isDisableAutoStretch());
-  if (autocreationType != 2) m_disableAutoStretch->setDisabled(true);
+  m_enableAutoStretch->setChecked(m_pref->isAutoStretchEnabled());
+  if (autocreationType != 2) m_enableAutoStretch->setDisabled(true);
 
   QStringList vectorSnappingTargets;
   vectorSnappingTargets << tr("Strokes") << tr("Guides") << tr("All");
@@ -2237,7 +2237,7 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignRight);
         drawingTopLay->addWidget(m_autocreationType, 5, 1, 1, 3,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-        drawingTopLay->addWidget(m_disableAutoStretch, 5, 3);
+        drawingTopLay->addWidget(m_enableAutoStretch, 5, 3);
         drawingTopLay->addWidget(new QLabel(tr("Vector Snapping:")), 6, 0,
                                  Qt::AlignRight);
         drawingTopLay->addWidget(m_vectorSnappingTargetCB, 6, 1, 1, 3,
@@ -2734,8 +2734,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDownArrowInLevelStripCreatesNewFrame(int)));
   ret = ret && connect(m_newLevelToCameraSizeCB, SIGNAL(clicked(bool)),
                        SLOT(onNewLevelToCameraSizeChanged(bool)));
-  ret = ret && connect(m_disableAutoStretch, SIGNAL(stateChanged(int)), this,
-                       SLOT(onDisableAutoStretch(int)));
+  ret = ret && connect(m_enableAutoStretch, SIGNAL(stateChanged(int)), this,
+                       SLOT(onEnableAutoStretch(int)));
 
   //--- Tools -----------------------
 
