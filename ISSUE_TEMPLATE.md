@@ -9,7 +9,7 @@
 
 ### Description
 
-[Description of the bug or feature]
+[Description of the bug]
 
 ### Steps to Reproduce
 
