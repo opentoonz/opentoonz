@@ -24,7 +24,9 @@
 ### Environment
 
 **OpenToonz version:**
+
 **Operating system:**
+
 **Computer specifications:** [Try to include your CPU, GPU, RAM, and remaining hard disk space, as well as graphic tablet model if applicable.]
 
 ### Screenshot, Screencast, or Crash Logs
