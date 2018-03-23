@@ -249,13 +249,19 @@ void PathAnimations::removeStroke(const TStroke *stroke) {
 
 void PathAnimations::setFrame(TVectorImage *vi, const TXshCell &cell,
                               int frame) {
+  std::vector<int> indexArray;
+  std::vector<TStroke *> strokeArray;
   for (int i = 0; i < vi->getStrokeCount(); i++) {
     StrokeId strokeId{m_xsheet, cell, vi->getStroke(i)};
 
     shared_ptr<PathAnimation> animation = addStroke(strokeId);
-    animation->animate(frame);
-    vi->notifyChangedStrokes(i, vi->getStroke(i));
+    if (animation->isActivated()) {
+      animation->animate(frame);
+      indexArray.push_back(i);
+      strokeArray.push_back(vi->getStroke(i));
+    }
   }
+  if (indexArray.size()) vi->notifyChangedStrokes(indexArray, strokeArray);
 }
 
 PathAnimations *PathAnimations::appAnimations(const TApplication *app) {
