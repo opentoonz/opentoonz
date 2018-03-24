@@ -222,11 +222,16 @@ public:
       ControlPointEditorStroke *controlPointEditorStroke) {
     m_controlPointEditorStroke = controlPointEditorStroke;
   }
+  ControlPointEditorStroke *getControlPointEditorStroke() {
+    return m_controlPointEditorStroke;
+  }
 
   bool isEmpty() const override { return m_selectedPoints.empty(); }
 
   void selectNone() override { m_selectedPoints.clear(); }
-  bool isSelected(int index) const;
+  bool isSelected(int index) const {
+    return m_selectedPoints.find(index) != m_selectedPoints.end();
+  }
   void select(int index);
   void unselect(int index);
 

@@ -273,7 +273,8 @@ class ColumnArea final : public QWidget {
     void drawSubLayerFoldUnfoldButton(const shared_ptr<SubLayer> &subLayer,
                                       const SubLayerOffsets &offsets) const;
     void drawSubLayerName(const shared_ptr<SubLayer> &subLayer,
-                          const SubLayerOffsets &offsets) const;
+                          const SubLayerOffsets &offsets, bool isSelected,
+                          bool isCurrent) const;
     void drawSubLayerActivator(const shared_ptr<SubLayer> &subLayer,
                                const SubLayerOffsets &offsets) const;
   };

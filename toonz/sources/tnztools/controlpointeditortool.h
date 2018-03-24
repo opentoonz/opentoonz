@@ -113,6 +113,8 @@ public:
   // returns true if the pressed key is recognized and processed.
   bool isEventAcceptable(QEvent *e) override;
 
+  ControlPointSelection *getSelection() { return &m_selection; }
+
 public slots:
   void frameSwitched();
 };

@@ -12,6 +12,9 @@
 // TnzTools includes
 #include "tools/toolhandle.h"
 #include "tools/toolcommandids.h"
+#include "tools/strokeselection.h"
+
+#include "../tnztools/controlpointselection.h"
 
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
@@ -1040,10 +1043,10 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
              QString(parentId.toString().c_str()));
 }
 void ColumnArea::DrawHeader::drawSubLayerName(
-    const shared_ptr<SubLayer> &subLayer,
-    const SubLayerOffsets &offsets) const {
-  p.setPen(m_viewer->getTextColor());
-
+    const shared_ptr<SubLayer> &subLayer, const SubLayerOffsets &offsets,
+    bool isSelected, bool isCurrent) const {
+  p.setPen((isSelected) ? m_viewer->getSelectedColumnTextColor()
+                        : isCurrent ? Qt::white : m_viewer->getTextColor());
   QRect nameRect = o->rect(PredefinedRect::SUBLAYER_NAME)
                        .translated(offsets.name())
                        .adjusted(2, 0, -2, 0);
@@ -1186,6 +1189,19 @@ void ColumnArea::DrawHeader::drawSubLayers() const {
   vector<shared_ptr<SubLayer>> subLayers =
       mapper->subLayers()->layer(column)->childrenFlatTree();
 
+  if (!subLayers.size()) return;
+
+  TTool *currentTool = TTool::getApplication()->getCurrentTool()->getTool();
+
+  StrokeSelection *sSelection        = nullptr;
+  ControlPointSelection *cpSelection = nullptr;
+
+  if (currentTool->getName() == T_ControlPointEditor)
+    cpSelection =
+        dynamic_cast<ControlPointSelection *>(currentTool->getSelection());
+  else
+    sSelection = dynamic_cast<StrokeSelection *>(currentTool->getSelection());
+
   for (int i = 0; i < subLayers.size(); i++) {
     shared_ptr<SubLayer> subLayer = subLayers[i];
     SubLayerOffsets offsets       = m_viewer->subLayerOffsets(column, i);
@@ -1198,8 +1214,17 @@ void ColumnArea::DrawHeader::drawSubLayers() const {
     QLine vertical = o->verticalLine(offsets.topLeft().y(), o->frameSide(rect));
     p.drawLine(vertical);
 
+    bool isSelected = false;
+    if ((sSelection && !sSelection->isEmpty() && sSelection->isSelected(i)) ||
+        (cpSelection &&
+         cpSelection->getControlPointEditorStroke()->getStroke() ==
+             subLayer->getStroke()))
+      isSelected = true;
+
+    bool isCurrent = rect.contains(area->m_pos);
+
     drawSubLayerFoldUnfoldButton(subLayer, offsets);
-    drawSubLayerName(subLayer, offsets);
+    drawSubLayerName(subLayer, offsets, isSelected, isCurrent);
     drawSubLayerActivator(subLayer, offsets);
   }
 }

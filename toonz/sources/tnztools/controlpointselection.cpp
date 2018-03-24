@@ -1149,11 +1149,11 @@ ControlPointEditorStroke::PointType ControlPointEditorStroke::getPointTypeAt(
 //=============================================================================
 // ControlPointSelection
 //-----------------------------------------------------------------------------
-
+/*
 bool ControlPointSelection::isSelected(int index) const {
   return m_selectedPoints.find(index) != m_selectedPoints.end();
 }
-
+*/
 //-----------------------------------------------------------------------------
 
 void ControlPointSelection::select(int index) {
