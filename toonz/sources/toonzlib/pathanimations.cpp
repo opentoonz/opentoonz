@@ -205,6 +205,7 @@ void PathAnimation::animate(int frame) const {
     assert(chunk);
 
     TThickQuadratic *quad = const_cast<TThickQuadratic *>(stroke->getChunk(i));
+    if (!quad) continue;
     for (int j = 0; j < 3; j++) {
       TThickPointParamP pointParam = chunk->getParam(j);
       quad->setThickP(j, pointParam->getValue(frame));

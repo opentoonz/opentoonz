@@ -17,6 +17,7 @@
 #include "toonz/strokegenerator.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/stage2.h"
+#include "toonz/pathanimations.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -562,6 +563,8 @@ void EraserTool::erase(TVectorImageP vi, const TPointD &pos) {
                                                 // circonferenza
       if (*it != -1) m_undo->addOldStroke(*it, vi->getVIStroke(i));
       oneStrokeIndex[0] = i;
+      PathAnimations::appAnimations(TTool::getApplication())
+          ->removeStroke(oldStroke);
       vi->removeStrokes(oneStrokeIndex, true, true);
 
       it = m_indexes.erase(it);
@@ -594,6 +597,8 @@ intersect( *oldStroke, pos, m_pointSize, intersections );
               pointSize2) {  // stroke tutta contenuta nella circonferenxa
         if (*it != -1) m_undo->addOldStroke(*it, vi->getVIStroke(i));
         oneStrokeIndex[0] = i;
+        PathAnimations::appAnimations(TTool::getApplication())
+            ->removeStroke(oldStroke);
         vi->removeStrokes(oneStrokeIndex, true, true);
         it = m_indexes.erase(it);
       } else {  // non colpita
@@ -659,7 +664,10 @@ intersect( *oldStroke, pos, m_pointSize, intersections );
         }
       }
 
+      PathAnimations::appAnimations(TTool::getApplication())
+          ->removeStroke(oldStroke);
       oldStroke->reshape(&(points[0]), points.size());
+      PathAnimations::appSnapshot(TTool::getApplication(), oldStroke);
 
       vi->notifyChangedStrokes(i);  // per adesso cosi', pero' e' lento
 
