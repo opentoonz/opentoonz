@@ -1,7 +1,6 @@
 language: cpp
 sudo: required
 dist: trusty
-group: deprecated-2017Q4 # temporary uses the previous version
 install:
     - if [[ $TRAVIS_OS_NAME == "osx" ]];   then bash ci-scripts/osx/travis-install.sh; fi
     - if [[ $TRAVIS_OS_NAME == "linux" ]]; then bash ci-scripts/linux/travis-install.sh; fi

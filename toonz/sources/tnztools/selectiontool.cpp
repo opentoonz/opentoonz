@@ -13,8 +13,6 @@
 
 #include <QKeyEvent>
 
-#include <QKeyEvent>
-
 using namespace ToolUtils;
 using namespace DragSelectionTool;
 

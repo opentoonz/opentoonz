@@ -1723,10 +1723,6 @@ void MainWindow::defineActions() {
   touchToggle->setEnabled(true);
   touchToggle->setIcon(QIcon(":Resources/touch.svg"));
 
-  createToggle(MI_TouchGestureControl, tr("&Touch Gesture Control"), "",
-               TouchGestureControl ? 1 : 0, MenuEditCommandType)
-      ->setEnabled(true);
-
   createMenuScanCleanupAction(MI_DefineScanner, tr("&Define Scanner..."), "");
   createMenuScanCleanupAction(MI_ScanSettings, tr("&Scan Settings..."), "");
   createMenuScanCleanupAction(MI_Scan, tr("&Scan"), "");

@@ -135,7 +135,7 @@ PAY ATTENTION: Can add control point in the stroke. */
     return m_vi ? m_vi->getStroke(m_strokeIndex) : 0;
   }
   void unsetStroke() {
-    TVectorImageP noImage = (TImage *)0;
+    TVectorImageP noImage = (TVectorImage *)0;
     setStroke(noImage, -1, boost::none);
   }
 
