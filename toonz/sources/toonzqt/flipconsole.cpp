@@ -672,9 +672,6 @@ protected:
 //-----------------------------------------------------------------------------
 
 void FlipConsole::enableButton(UINT button, bool enable, bool doShowHide) {
-#if defined(MACOSX)  // on mac, the sound playback in flip is broken..
-  if (button == eSound) enable = false;
-#endif
 
   if (!m_playToolBar) return;
 
