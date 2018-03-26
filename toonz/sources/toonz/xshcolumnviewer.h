@@ -298,6 +298,8 @@ public:
 
   QPixmap getColumnIcon(int columnIndex);
 
+  void clearHighlights();
+
   class Pixmaps {
   public:
     static const QPixmap &sound();

@@ -74,6 +74,8 @@ public:
   virtual bool hasActivator() const override { return true; }
   virtual bool isActivated() const override;
   virtual void toggleActivator() override;
+  virtual bool isHighlighted() const override;
+  virtual void setHighlight(bool lit) override;
   virtual TStroke *getStroke() const override { return m_stroke; }
 
   virtual QString name() const override;
@@ -163,6 +165,19 @@ vector<int> SubLayers::childrenDimensions(const Orientation *o) {
     result.push_back(root->childrenDimension(o));
   }
   return result;
+}
+
+void SubLayers::clearAllHighlights() {
+  map<const TXshColumn *, shared_ptr<SubLayer>>::iterator it;
+
+  for (it = m_layers.begin(); it != m_layers.end(); it++) {
+    shared_ptr<SubLayer> rootlayer         = it->second;
+    vector<shared_ptr<SubLayer>> subLayers = rootlayer->childrenFlatTree();
+    for (int i = 0; i < subLayers.size(); i++) {
+      shared_ptr<SubLayer> subLayer = subLayers[i];
+      subLayer->setHighlight(false);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -347,6 +362,17 @@ void StrokeSubLayer::toggleActivator() {
   animation->toggleActivated();
   animation->takeSnapshot(subLayers()->screenMapper()->getCurrentFrame());
   if (!animation->isActivated()) animation->clearKeyframes();
+}
+
+bool StrokeSubLayer::isHighlighted() const {
+  shared_ptr<PathAnimation> animation =
+      xsheet()->pathAnimations()->addStroke(strokeId());
+  return animation->isHighlighted();
+}
+void StrokeSubLayer::setHighlight(bool lit) {
+  shared_ptr<PathAnimation> animation =
+      xsheet()->pathAnimations()->addStroke(strokeId());
+  animation->setHighlight(lit);
 }
 
 StrokeId StrokeSubLayer::strokeId() const {

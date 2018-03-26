@@ -2133,6 +2133,26 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
+  bool updateHighlight = false;
+  if (!o->isVerticalTimeline() && column && column->getLevelColumn()) {
+    const ScreenMapper *mapper           = m_viewer->screenMapper();
+    const shared_ptr<SubLayer> rootLayer = mapper->subLayers()->layer(column);
+    if (!rootLayer->isFolded()) {
+      vector<shared_ptr<SubLayer>> subLayers = rootLayer->childrenFlatTree();
+      if (subLayers.size()) {
+        for (int i = 0; i < subLayers.size(); i++) {
+          shared_ptr<SubLayer> subLayer = subLayers[i];
+          SubLayerOffsets offsets       = mapper->subLayerOffsets(column, i);
+          QRect rect = {mapper->rect(PredefinedRect::LAYER_HEADER)
+                            .translated(offsets.topLeft())};
+          subLayer->setHighlight(false);
+          if (rect.contains(mouseInCell)) subLayer->setHighlight(true);
+        }
+        updateHighlight = true;
+      }
+    }
+  }
+
   // Setto i toolTip
   TStageObjectId columnId = m_viewer->getObjectId(col);
   TStageObjectId parentId = xsh->getStageObjectParent(columnId);
@@ -2181,11 +2201,17 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
       m_tooltip = tr("");
   }
   update();
+
+  if (updateHighlight)
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
 //-----------------------------------------------------------------------------
 
 bool ColumnArea::event(QEvent *event) {
+  if (event->type() == QEvent::Leave) {
+    clearHighlights();
+  }
   if (event->type() == QEvent::ToolTip) {
     if (!m_tooltip.isEmpty())
       QToolTip::showText(mapToGlobal(m_pos), m_tooltip);
@@ -2480,6 +2506,18 @@ void ColumnArea::onSubSampling(QAction *action) {
       ->getStageObjectTree()
       ->invalidateAll();
   TApp::instance()->getCurrentScene()->notifySceneChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void ColumnArea::clearHighlights() {
+  const Orientation *o = m_viewer->orientation();
+
+  if (!o->isVerticalTimeline()) {
+    const ScreenMapper *mapper = m_viewer->screenMapper();
+    mapper->subLayers()->clearAllHighlights();
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
 }
 
 }  // namespace XsheetGUI

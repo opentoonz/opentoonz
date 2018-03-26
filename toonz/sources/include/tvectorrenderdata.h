@@ -66,6 +66,9 @@ public:
                            //! check</I> mode.
   int m_indexToHighlight;  // for guided vector drawing
 
+  const TColorFunction *m_sublayerCf;
+  int m_sublayerIndexToHighlight;  // for highlighting sublayers
+
   bool m_alphaChannel,      //!< Whether alpha channel is enabled.
       m_antiAliasing,       //!< Whether antialiasing must be applied.
       m_isImagePattern,     //!< \internal  Seems like a bad bug-patch - inquire
@@ -85,7 +88,9 @@ public:
                             //! camera-stand (preview) mode.
       m_showGuidedDrawing,  // Whether this image is being used for guided
                             // drawing
-      m_highLightNow;       // Show highlight on active stroke
+      m_showHighlightedSublayer,  // Whether this image will show a highlighted
+                                  // sublayer
+      m_highLightNow;             // Show highlight on active stroke
   bool m_animatedGuidedDrawing = false;
   //!  \deprecated  Use the above individual options instead.
   //!  \todo  Remove it ASAP.
@@ -121,7 +126,10 @@ public:
       , m_indexToHighlight(-1)
       , m_highLightNow(false)
       , m_guidedCf(0)
-      , m_showGuidedDrawing(false) {}
+      , m_showGuidedDrawing(false)
+      , m_showHighlightedSublayer(false)
+      , m_sublayerIndexToHighlight(-1)
+      , m_sublayerCf(0) {}
 
   TVectorRenderData(ProductionSettings, const TAffine &aff,
                     const TRect &clippingRect, const TPalette *palette,
@@ -151,7 +159,10 @@ public:
       , m_indexToHighlight(-1)
       , m_highLightNow(false)
       , m_guidedCf(0)
-      , m_showGuidedDrawing(false) {}
+      , m_showGuidedDrawing(false)
+      , m_showHighlightedSublayer(false)
+      , m_sublayerIndexToHighlight(-1)
+      , m_sublayerCf(0) {}
 
   TVectorRenderData(const TVectorRenderData &other, const TAffine &aff,
                     const TRect &clippingRect, const TPalette *palette,
@@ -179,7 +190,10 @@ public:
       , m_indexToHighlight(other.m_indexToHighlight)
       , m_highLightNow(other.m_highLightNow)
       , m_guidedCf(other.m_guidedCf)
-      , m_showGuidedDrawing(other.m_showGuidedDrawing) {
+      , m_showGuidedDrawing(other.m_showGuidedDrawing)
+      , m_showHighlightedSublayer(other.m_showHighlightedSublayer)
+      , m_sublayerIndexToHighlight(other.m_sublayerIndexToHighlight)
+      , m_sublayerCf(other.m_sublayerCf) {
   }  //!< Constructs from explicit primary context settings while
      //!  copying the rest from another instance.
 
@@ -210,7 +224,10 @@ public:
       , m_indexToHighlight(-1)
       , m_highLightNow(false)
       , m_guidedCf(0)
-      , m_showGuidedDrawing(false) {
+      , m_showGuidedDrawing(false)
+      , m_showHighlightedSublayer(false)
+      , m_sublayerIndexToHighlight(-1)
+      , m_sublayerCf(0) {
   }  //!< Constructs settings with default ViewerSettings.
      //!  \deprecated   Use constructors with explicit settings type tag.
 };

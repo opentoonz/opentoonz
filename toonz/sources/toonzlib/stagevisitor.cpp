@@ -801,7 +801,7 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
 
   const Preferences &prefs = *Preferences::instance();
 
-  TColorFunction *cf = 0, *guidedCf = 0;
+  TColorFunction *cf = 0, *guidedCf = 0, *sublayerCf = 0;
   TPalette *vPalette = vi->getPalette();
   TPixel32 bgColor   = TPixel32::White;
 
@@ -899,6 +899,28 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
     }
   }
 
+  if (player.m_xsh && player.m_isCurrentColumn) {
+    PathAnimations *animations = player.m_xsh->pathAnimations();
+    for (int i = 0; i < vi->getStrokeCount(); i++) {
+      StrokeId strokeId{player.m_xsh, TXshCell(player.m_sl, player.m_fid),
+                        vi->getStroke(i)};
+      shared_ptr<PathAnimation> animation = animations->addStroke(strokeId);
+      if (animation->isHighlighted()) {
+        rd.m_showHighlightedSublayer  = true;
+        rd.m_sublayerIndexToHighlight = i;
+        double sublayerM[4]           = {1.0, 1.0, 1.0, 1.0}, sublayerC[4];
+        TPixel32 highlightColor       = TPixel32::Red;
+        sublayerC[0]                  = 1.0 * highlightColor.r;
+        sublayerC[1]                  = 1.0 * highlightColor.g;
+        sublayerC[2]                  = 1.0 * highlightColor.b;
+        sublayerC[3]                  = 0.0;
+
+        sublayerCf      = new TGenericColorFunction(sublayerM, sublayerC);
+        rd.m_sublayerCf = sublayerCf;
+      }
+    }
+  }
+
   if (tc & (ToonzCheck::eTransparency | ToonzCheck::eGap)) {
     TPixel dummy;
     rd.m_tcheckEnabled = true;
@@ -933,6 +955,7 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
 
   delete cf;
   delete guidedCf;
+  delete sublayerCf;
 }
 
 //-----------------------------------------------------

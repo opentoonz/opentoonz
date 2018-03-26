@@ -56,6 +56,8 @@ public:
 
   vector<int> childrenDimensions(const Orientation *o);
 
+  void clearAllHighlights();
+
 private:
   optional<TXshCell> findCell(const CellPosition &pos) const;
   SubLayer *build(const TXshCell &cellId);
@@ -96,6 +98,8 @@ public:
   virtual bool hasActivator() const { return false; }
   virtual bool isActivated() const { return false; }
   virtual void toggleActivator() {}
+  virtual bool isHighlighted() const { return false; }
+  virtual void setHighlight(bool lit) {}
   virtual TStroke *getStroke() const { return 0; }
 
   virtual QString name() const { return ""; }

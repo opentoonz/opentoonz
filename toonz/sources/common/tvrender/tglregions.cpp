@@ -589,13 +589,21 @@ static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
 
   if (visible) {
     // Change stroke color to blue if guided drawing
-    if (rd.m_showGuidedDrawing && rd.m_highLightNow) {
-      TVectorRenderData *newRd = new TVectorRenderData(
-          rd, rd.m_aff, rd.m_clippingRect, rd.m_palette, rd.m_guidedCf);
-      tglDraw(*newRd, s, false);
-      delete newRd;
-      TStroke *new_s = (TStroke *)s;
-      drawFirstControlPoint(rd, new_s);
+    if (rd.m_highLightNow) {
+      if (rd.m_showGuidedDrawing) {
+        TVectorRenderData *newRd = new TVectorRenderData(
+            rd, rd.m_aff, rd.m_clippingRect, rd.m_palette, rd.m_guidedCf);
+        tglDraw(*newRd, s, false);
+        delete newRd;
+        TStroke *new_s = (TStroke *)s;
+        drawFirstControlPoint(rd, new_s);
+      }
+      if (rd.m_showHighlightedSublayer) {
+        TVectorRenderData *newRd = new TVectorRenderData(
+            rd, rd.m_aff, rd.m_clippingRect, rd.m_palette, rd.m_sublayerCf);
+        tglDraw(*newRd, s, false);
+        delete newRd;
+      }
     } else {
       tglDraw(rd, s, false);
     }
@@ -654,7 +662,8 @@ rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
           tglDoDraw(rdRegions, vim->getRegion(regionIndex));
     while (strokeIndex < vim->getStrokeCount() &&
            vim->sameGroup(strokeIndex, currStrokeIndex)) {
-      if (rd.m_indexToHighlight != strokeIndex) {
+      if (rd.m_indexToHighlight != strokeIndex &&
+          rd.m_sublayerIndexToHighlight != strokeIndex) {
         rd.m_highLightNow = false;
       } else {
         rd.m_highLightNow = true;

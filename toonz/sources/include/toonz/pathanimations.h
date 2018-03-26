@@ -73,6 +73,7 @@ class DVAPI PathAnimation final {
   PathAnimations *m_animations;
   StrokeId m_strokeId;
   bool m_activated;
+  bool m_highlighted;
   map<const TThickQuadratic *, TParamSetP> m_lastChunks;
   TParamSetP m_params;  //! chunk nodes
 public:
@@ -91,6 +92,9 @@ public:
 
   bool isActivated() const { return m_activated; }
   void toggleActivated();
+
+  bool isHighlighted() const { return m_highlighted; }
+  void setHighlight(bool lit) { m_highlighted = lit; }
 
   set<double> getKeyframes() const;
   void clearKeyframes();
