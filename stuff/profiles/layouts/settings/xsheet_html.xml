@@ -1,0 +1,6 @@
+<xsheet_html>
+  <page rows="50">
+ <page columns="10">
+  <info name="Company" value="Company name"/>
+  <info name="Name" value="Value"/>
+</xsheet_html>
