@@ -449,8 +449,12 @@ void TSystem::readDirectory_Dir_ReadExe(TFilePathSet &dst,
 
   QStringList fil =
       QDir(toQString(path))
+#ifdef Q_OS_WIN
           .entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable);
-
+#else
+          .entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable | QDir::NoSymLinks);
+#endif
+  
   int i;
   for (i = 0; i < fil.size(); i++) {
     QString fi = fil.at(i);
@@ -510,8 +514,11 @@ void TSystem::readDirectory(TFilePathSet &dst, const QDir &dir,
   if (!(dir.exists() && QFileInfo(dir.path()).isDir()))
     throw TSystemException(TFilePath(dir.path().toStdWString()),
                            " is not a directory");
-
+#ifdef Q_OS_WIN
   QStringList entries(dir.entryList(dir.filter() | QDir::NoDotAndDotDot));
+#else
+  QStringList entries(dir.entryList(dir.filter() | QDir::NoDotAndDotDot | QDir::NoSymLinks));
+#endif
   TFilePath dirPath(dir.path().toStdWString());
 
   std::set<TFilePath, CaselessFilepathLess> fpSet;
