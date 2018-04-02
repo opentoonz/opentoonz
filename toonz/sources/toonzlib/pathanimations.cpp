@@ -320,6 +320,7 @@ bool PathAnimations::hasActivatedAnimations(const TXshCell cell) {
   }
   return false;
 }
+
 void PathAnimations::loadData(TIStream &is) {
   if (!m_xsheet) return;
 
@@ -364,7 +365,7 @@ void PathAnimations::loadData(TIStream &is) {
                 TXshCell cell = TXshCell(level, frameId);
                 emit ImageManager::instance()->updatedFrame(cell);
                 TVectorImageP vi = image.getPointer();
-                if (vi) {
+                if (vi && strokeIdx < vi->getStrokeCount()) {
                   vi->getStroke(strokeIdx)->setId(strokeID);
                   if (strokeName.length())
                     vi->getStroke(strokeIdx)->setName(
