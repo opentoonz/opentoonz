@@ -884,6 +884,31 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
       m_scaleFactor   = 0.0;
       m_rotationDelta = 0.0;
     } else {
+      if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        double scaleFactor = gesture->scaleFactor();
+        // the scale factor makes for too sensitive scaling
+        // divide the change in half
+        if (scaleFactor > 1) {
+          double decimalValue = scaleFactor - 1;
+          decimalValue /= 1.5;
+          scaleFactor = 1 + decimalValue;
+        } else if (scaleFactor < 1) {
+          double decimalValue = 1 - scaleFactor;
+          decimalValue /= 1.5;
+          scaleFactor = 1 - decimalValue;
+        }
+        if (!m_rotating && !m_zooming) {
+          double delta = scaleFactor - 1;
+          m_scaleFactor += delta;
+          if (m_scaleFactor > .2 || m_scaleFactor < -.2) {
+            m_zooming = true;
+          }
+        }
+        if (m_zooming) {
+          zoomQt(firstCenter * getDevPixRatio(), scaleFactor);
+        }
+        m_gestureActive = true;
+      }
       if (changeFlags & QPinchGesture::RotationAngleChanged) {
         qreal rotationDelta =
             gesture->rotationAngle() - gesture->lastRotationAngle();
@@ -900,31 +925,7 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
           rotate(center, -rotationDelta);
         }
       }
-      if (changeFlags & QPinchGesture::ScaleFactorChanged) {
-        double scaleFactor = gesture->scaleFactor();
-        // the scale factor makes for too sensitive scaling
-        // divide the change in half
-        if (scaleFactor > 1) {
-          double decimalValue = scaleFactor - 1;
-          decimalValue /= 3;
-          scaleFactor = 1 + decimalValue;
-        } else if (scaleFactor < 1) {
-          double decimalValue = 1 - scaleFactor;
-          decimalValue /= 3;
-          scaleFactor = 1 - decimalValue;
-        }
-        if (!m_rotating && !m_zooming) {
-          double delta = scaleFactor - 1;
-          m_scaleFactor += delta;
-          if (m_scaleFactor > .2 || m_scaleFactor < -.2) {
-            m_zooming = true;
-          }
-        }
-        if (m_zooming) {
-          zoomQt(firstCenter * getDevPixRatio(), scaleFactor);
-        }
-        m_gestureActive = true;
-      }
+
       if (changeFlags & QPinchGesture::CenterPointChanged) {
         QPointF centerDelta = (gesture->centerPoint() * getDevPixRatio()) -
                               (gesture->lastCenterPoint() * getDevPixRatio());
