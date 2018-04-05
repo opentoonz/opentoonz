@@ -18,11 +18,14 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/pathanimations.h"
+#include "toonz/txsheethandle.h"
 
 // TnzTools includes
 #include "tools/tool.h"
 #include "tools/toolutils.h"
 #include "tools/cursors.h"
+
+#include "ext/Selector.h"
 
 // Qt includes
 #include <QCoreApplication>  // For Qt translation support
@@ -69,6 +72,8 @@ class PumpTool final : public TTool {
   TIntProperty m_accuracy;
   TPropertyGroup m_prop;
 
+  ToonzExt::Selector m_selector;
+
 public:
   PumpTool()
       : TTool("T_Pump")
@@ -86,7 +91,8 @@ public:
       , m_undo(0)
       , m_toolSize("Size:", 1, 100, 20)
       , m_accuracy("Accuracy:", 0, 100, 40)
-      , m_enabled(false) {
+      , m_enabled(false)
+      , m_selector(500, 10, 1000) {
     bind(TTool::VectorImage);
 
     m_splitPars.resize(2);
@@ -120,6 +126,10 @@ public:
   void invalidateCursorArea();
 
   void onDeactivate() override;
+
+  ToonzExt::Selector *getSelector() {
+    return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
+  }
 
 private:
   double actionRadius(double strokeLength);
@@ -178,10 +188,14 @@ void PumpTool::draw() {
       tglDrawCircle(m_cursor, m_cursor.thick + 4 * getPixelSize());
     }
 
+    m_selector.setStroke(0);
+
     if (vi->getNearestStroke(m_cursor, w, index, dist, true)) {
       TStroke *stroke  = vi->getStroke(index);
       double totalLen  = stroke->getLength();
       double actionLen = actionRadius(totalLen);
+
+      m_selector.setStroke(stroke);
 
       tglColor(TPixel32::Red);
 
@@ -253,6 +267,7 @@ void PumpTool::draw() {
         glEnd();
       }
     }
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
   }
 }
 
@@ -564,10 +579,10 @@ double PumpTool::actionRadius(double strokeLength) {
 //----------------------------------------------------------------------
 
 /*
-  Edited strokes are split near the corresponding editing position, in order
-  to localize stroke manipulation.
-  Only the localized part of the stroke will receive CP increase and thickness
-  tuning needed for the tool action.
+Edited strokes are split near the corresponding editing position, in order
+to localize stroke manipulation.
+Only the localized part of the stroke will receive CP increase and thickness
+tuning needed for the tool action.
 */
 void PumpTool::splitStroke(TStroke *s) {
   assert(m_splitStrokes.empty());
@@ -701,9 +716,9 @@ void PumpTool::splitStroke(TStroke *s) {
 //----------------------------------------------------------------------
 
 /*
-  A split stroke must be reassembled before it is output.
-  In particular, it must be ensured that the merge does not add additional CPS
-  at split points, leaving the output seamless.
+A split stroke must be reassembled before it is output.
+In particular, it must be ensured that the merge does not add additional CPS
+at split points, leaving the output seamless.
 */
 TStroke *PumpTool::mergeStrokes(const std::vector<TStroke *> &strokes) {
   assert(strokes.size() > 0);

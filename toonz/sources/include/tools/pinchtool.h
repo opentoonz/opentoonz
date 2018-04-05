@@ -98,6 +98,10 @@ public:
 
   int getCursorId() const { return updateCursor(); }
   TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+
+  ToonzExt::Selector *getSelector() {
+    return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
+  }
 };
 
 #endif  // PINCHTOOL_H

@@ -21,6 +21,9 @@
 #include "tools/toolhandle.h"
 #include "toonz/stage2.h"
 #include "tenv.h"
+
+#include "ext/Selector.h"
+
 // For Qt translation support
 #include <QCoreApplication>
 
@@ -193,6 +196,8 @@ class VectorTapeTool final : public TTool {
   TDoubleProperty m_autocloseFactor;
   TEnumProperty m_type;
 
+  ToonzExt::Selector m_selector;
+
 public:
   VectorTapeTool()
       : TTool("T_Tape")
@@ -210,7 +215,8 @@ public:
       , m_autocloseFactor("Distance", 0.1, 100, 0.5)
       , m_firstTime(true)
       , m_selectionRect()
-      , m_startRect() {
+      , m_startRect()
+      , m_selector(500, 10, 1000) {
     bind(TTool::Vectors);
 
     m_prop.bind(m_type);
@@ -318,11 +324,26 @@ public:
     TVectorImageP vi(getImage(false));
     if (!vi) return;
 
+    m_selector.setStroke(0);
+    if (!m_draw) m_draw = true;
+    // select nearest stroke and finds its parameter
+    double dist, pW;
+    UINT strokeIdx;
+
+    if (vi->getNearestStroke(pos, pW, strokeIdx, dist)) {
+      TStroke *strokeRef = vi->getStroke(strokeIdx);
+      m_selector.setStroke(strokeRef);
+    }
+
     // BUTTA e rimetti (Dava problemi con la penna)
-    if (!m_draw) return;  // Questa riga potrebbe non essere messa
+    // if (!m_draw) return;  // Questa riga potrebbe non essere messa
     // m_draw=true;   //Perche'??? Non basta dargli true in onEnter??
 
-    if (m_type.getValue() == RECT) return;
+    if (m_type.getValue() == RECT) {
+      invalidate();
+      TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+      return;
+    }
 
     double minDistance2 = 10000000000.;
 
@@ -370,6 +391,7 @@ public:
       }
     }
     invalidate();
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
   //-----------------------------------------------------------------------------
@@ -760,6 +782,10 @@ public:
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
       ret = ret | ToolCursor::Ex_Negate;
     return ret;
+  }
+
+  ToonzExt::Selector *getSelector() {
+    return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
   }
 
 } vectorTapeTool;

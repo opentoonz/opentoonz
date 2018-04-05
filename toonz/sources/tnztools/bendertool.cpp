@@ -13,6 +13,9 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
 #include "toonz/pathanimations.h"
+#include "toonz/txsheethandle.h"
+
+#include "ext/Selector.h"
 
 using namespace ToolUtils;
 
@@ -160,6 +163,9 @@ private:
 
   bool m_enableDragSelection;
 
+  ToonzExt::Selector m_selector;
+  bool m_draw;  //!< Should be removed...?
+
   void findCurves(TVectorImageP &);
   void findVersus(const TPointD &p);
   double computeRotationVersus(const TPointD &, const TPointD &);
@@ -178,6 +184,8 @@ public:
   void leftButtonDrag(const TPointD &, const TMouseEvent &) override;
   void leftButtonUp(const TPointD &, const TMouseEvent &) override;
   void onEnter() override;
+  void onLeave() override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 
   void onActivate() override {
     m_buttonDownCounter = 1;
@@ -190,6 +198,10 @@ public:
   }
 
   int getCursorId() const override { return m_cursor; }
+
+  ToonzExt::Selector *getSelector() {
+    return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
+  }
 } BenderTool;
 
 //-----------------------------------------------------------------------------
@@ -201,7 +213,9 @@ BenderTool::BenderTool()
     , m_rotationVersus(0.0)
     , m_enableDragSelection(false)
     , m_undo(0)
-    , m_cursor(ToolCursor::BenderCursor) {
+    , m_cursor(ToolCursor::BenderCursor)
+    , m_draw(false)
+    , m_selector(500, 10, 1000) {
   bind(TTool::Vectors);
   m_prevPoint = TConsts::napd;
   m_benderSegment.setP0(TConsts::napd);
@@ -213,8 +227,31 @@ BenderTool::BenderTool()
 BenderTool::~BenderTool() {}
 
 //-----------------------------------------------------------------------------
+void BenderTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
+  TVectorImageP vi = TImageP(getImage(true));
+  if (!vi) return;
+
+  // select nearest stroke and finds its parameter
+  double dist, pW;
+  UINT stroke;
+
+  if (!m_draw) m_draw = true;
+
+  m_selector.setStroke(0);
+
+  if (vi->getNearestStroke(pos, pW, stroke, dist)) {
+    TStroke *strokeRef = vi->getStroke(stroke);
+    m_selector.setStroke(strokeRef);
+  }
+
+  invalidate();
+  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+}
+
+void BenderTool::onLeave() { m_draw = false; }
 
 void BenderTool::onEnter() {
+  m_draw = true;
   if ((TVectorImageP)getImage(false))
     m_cursor = ToolCursor::BenderCursor;
   else

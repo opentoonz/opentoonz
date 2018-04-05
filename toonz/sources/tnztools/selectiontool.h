@@ -8,6 +8,8 @@
 #include "tools/toolutils.h"
 #include "toonz/strokegenerator.h"
 
+#include "ext/Selector.h"
+
 // For Qt translation support
 #include <QCoreApplication>
 #include <QSet>
@@ -372,6 +374,9 @@ protected:
   TEnumProperty m_strokeSelectionType;
   TPropertyGroup m_prop;
 
+  ToonzExt::Selector m_selector;
+  bool m_draw;
+
   virtual void updateAction(TPointD pos, const TMouseEvent &e);
 
   virtual void modifySelectionOnClick(TImageP image, const TPointD &pos,
@@ -451,12 +456,19 @@ public:
   void onImageChanged() override = 0;
   void onSelectionChanged() override;
 
+  void SelectionTool::onEnter() override;
+  void SelectionTool::onLeave() override;
+
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   bool onPropertyChanged(std::string propertyName) override;
 
   // returns true if the pressed key is recognized and processed.
   bool isEventAcceptable(QEvent *e) override;
+
+  ToonzExt::Selector *getSelector() {
+    return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
+  }
 };
 
 #endif  // SELECTIONTOOL_INCLUDED

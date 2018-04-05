@@ -13,6 +13,9 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
 #include "toonz/pathanimations.h"
+#include "toonz/txsheethandle.h"
+
+#include "ext/Selector.h"
 
 #ifdef _DEBUG
 #include "tcolorstyles.h"
@@ -62,6 +65,8 @@ class IronTool final : public TTool {
   bool m_active;
   int m_cursorId;
 
+  ToonzExt::Selector m_selector;
+
 public:
   IronTool()
       : TTool("T_Iron")
@@ -73,7 +78,8 @@ public:
       , m_cpIndexMin(-1)
       , m_cpIndexMax(-1)
       , m_oldStroke(0)
-      , m_cursorId(ToolCursor::IronCursor) {
+      , m_cursorId(ToolCursor::IronCursor)
+      , m_selector(500, 10, 1000) {
     bind(TTool::Vectors);
   }
 
@@ -363,11 +369,11 @@ public:
     if ((m_cpIndexMin == 0 && (UINT)m_cpIndexMax == cpCount - 1) ||
         (m_cpIndexMin == m_cpIndexMax && m_strokeRef->isSelfLoop())) {
       /*
-e' meglio rilevarli i corners.
-Tanto se hai appiattito abbastanza, se ne vanno da soli,
-senza lasciare ingrati compiti alla reuceControlPoints
-Altrimenti non si fa altro che aumentarli i punti di controllo
-*/
+      e' meglio rilevarli i corners.
+      Tanto se hai appiattito abbastanza, se ne vanno da soli,
+      senza lasciare ingrati compiti alla reuceControlPoints
+      Altrimenti non si fa altro che aumentarli i punti di controllo
+      */
       std::vector<int> corners;
       corners.push_back(0);
       detectCorners(m_strokeRef, 45, corners);
@@ -488,15 +494,20 @@ Altrimenti non si fa altro che aumentarli i punti di controllo
     double dist, pW;
     UINT stroke;
 
+    m_selector.setStroke(0);
+
     if (vi->getNearestStroke(pos, pW, stroke, dist)) {
       m_draw             = true;
       TStroke *strokeRef = vi->getStroke(stroke);
       m_cursor           = strokeRef->getThickPoint(pW);
+
+      m_selector.setStroke(strokeRef);
     } else {
       m_draw = false;
     }
 
     invalidate();
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
   bool moveCursor(const TPointD &pos) { return false; }
@@ -514,6 +525,10 @@ Altrimenti non si fa altro che aumentarli i punti di controllo
       m_cursorId = ToolCursor::IronCursor;
     else
       m_cursorId = ToolCursor::CURSOR_NO;
+  }
+
+  ToonzExt::Selector *getSelector() {
+    return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
   }
 
 } ironTool;

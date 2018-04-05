@@ -38,6 +38,7 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
 #include "toonz/pathanimations.h"
+#include "toonz/txsheethandle.h"
 
 #include "ext/StrokeDeformation.h"
 #include "ext/SmoothDeformation.h"
@@ -382,7 +383,7 @@ void PinchTool::onImageChanged() {
   m_deformation->reset();
 
   double w        = 0;
-  TStroke *stroke = getClosestStroke(m_lastMouseEvent.m_pos, w);
+  TStroke *stroke = getClosestStroke(m_curr, w);
   if (stroke) {
     // set parameters from sliders
     updateInterfaceStatus(m_lastMouseEvent);
@@ -473,6 +474,7 @@ void PinchTool::mouseMove(const TPointD &pos, const TMouseEvent &event) {
   } else {
     m_status.stroke2change_ = 0;
     m_selector.setStroke(0);
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     return;
   }
 
@@ -480,6 +482,7 @@ void PinchTool::mouseMove(const TPointD &pos, const TMouseEvent &event) {
   m_cursorEnabled = moveCursor(pos);
 
   if (m_cursorEnabled) invalidate();
+  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 
   //  TNotifier::instance()->notify(TToolChange());
 }

@@ -16,6 +16,9 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
 #include "toonz/pathanimations.h"
+#include "toonz/txsheethandle.h"
+
+#include "ext/Selector.h"
 
 using namespace ToolUtils;
 
@@ -27,11 +30,11 @@ using namespace ToolUtils;
 namespace {
 
 /*
- Controlla se il primo punto della prima sotto_stroke
- e' interno al cerchio, nel caso la stroke successiva
- deve essere quella esterna e cosi' via, basta allora
- fissare un contatore in modo da prendere le stroke
- alternativamente (interne/esterne).
+Controlla se il primo punto della prima sotto_stroke
+e' interno al cerchio, nel caso la stroke successiva
+deve essere quella esterna e cosi' via, basta allora
+fissare un contatore in modo da prendere le stroke
+alternativamente (interne/esterne).
 */
 void selectStrokeToMove(const ArrayOfStroke &v, const TPointD &center,
                         double radius, ArrayOfStroke &toMove) {
@@ -52,14 +55,14 @@ void selectStrokeToMove(const ArrayOfStroke &v, const TPointD &center,
 /*
 inline  double computeStep(const TQuadratic& quad, double invOfPixelSize)
 {
-  double step = std::numeric_limits<double>::max();
+double step = std::numeric_limits<double>::max();
 
-  TPointD A = quad.getP0() - 2.0*quad.getP1() + quad.getP2(); // 2*A is the
+TPointD A = quad.getP0() - 2.0*quad.getP1() + quad.getP2(); // 2*A is the
 acceleration of the curve
-  double  A_len = norm(A);
-  if (A_len > 0)  step = sqrt(2 * invOfPixelSize / A_len);
+double  A_len = norm(A);
+if (A_len > 0)  step = sqrt(2 * invOfPixelSize / A_len);
 
-  return  step;
+return  step;
 }
 */
 //-----------------------------------------------------------------------------
@@ -139,6 +142,9 @@ class MagnetTool final : public TTool {
   TDoubleProperty m_toolSize;
   TPropertyGroup m_prop;
 
+  ToonzExt::Selector m_selector;
+  bool m_draw;  //!< Should be removed...?
+
 public:
   MagnetTool()
       : TTool("T_Magnet")
@@ -146,7 +152,8 @@ public:
       , m_pointSize(-1)
       , m_oldStrokesArray()
       , m_toolSize("Size:", 0, 100, 20)  // W_ToolOptions_MagnetTool
-  {
+      , m_draw(false)
+      , m_selector(500, 10, 1000) {
     bind(TTool::Vectors);
     m_prop.bind(m_toolSize);
   }
@@ -156,6 +163,8 @@ public:
   void updateTranslation() override { m_toolSize.setQStringName(tr("Size:")); }
 
   void onEnter() override {
+    m_draw = true;
+
     if ((TVectorImageP)getImage(false))
       m_cursorId = ToolCursor::MagnetCursor;
     else
@@ -173,7 +182,10 @@ public:
         (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
   }
 
-  void onLeave() override { m_pointSize = -1; }
+  void onLeave() override {
+    m_draw      = false;
+    m_pointSize = -1;
+  }
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     TPointD p(pos);
@@ -292,12 +304,13 @@ public:
     TPointD offset = p - m_pointAtMove;
 
     /*
-if( tdistance2(m_pointAtMouseDown, p ) > sq(m_pointSize * 0.5) ) // reincremento
-{
-leftButtonUp(p);
-lefrightButtonDown(p);
-}
-*/
+    if( tdistance2(m_pointAtMouseDown, p ) > sq(m_pointSize * 0.5) ) //
+    reincremento
+    {
+    leftButtonUp(p);
+    lefrightButtonDown(p);
+    }
+    */
     UINT i, j;
 
     for (i = 0; i < m_strokeHit.size(); ++i)
@@ -323,8 +336,23 @@ lefrightButtonDown(p);
     double pixelSize = getPixelSize();
     if (tdistance2(p, m_oldPos) < 9.0 * pixelSize * pixelSize) return;
 
+    m_selector.setStroke(0);
+    if (!m_draw) m_draw = true;
+    TVectorImageP vi    = TImageP(getImage(true));
+    if (vi) {
+      // select nearest stroke and finds its parameter
+      double dist, pW;
+      UINT stroke;
+
+      if (vi->getNearestStroke(p, pW, stroke, dist)) {
+        TStroke *strokeRef = vi->getStroke(stroke);
+        m_selector.setStroke(strokeRef);
+      }
+    }
+
     m_oldPos = p;
     invalidate();
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
   void leftButtonUp(const TPointD &, const TMouseEvent &) override {
@@ -449,6 +477,10 @@ lefrightButtonDown(p);
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   int getCursorId() const override { return m_cursorId; }
+
+  ToonzExt::Selector *getSelector() {
+    return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
+  }
 
 } magnetTool;
 

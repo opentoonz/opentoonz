@@ -10,6 +10,7 @@
 #include "tools/cursors.h"
 #include "toonz/stage2.h"
 #include "toonz/tobjecthandle.h"
+#include "toonz/txsheethandle.h"
 
 #include <QKeyEvent>
 
@@ -837,7 +838,9 @@ SelectionTool::SelectionTool(int targetType)
     , m_justSelected(false)
     , m_strokeSelectionType("Type:")
     , m_deformValues()
-    , m_cursorId(ToolCursor::CURSOR_ARROW) {
+    , m_cursorId(ToolCursor::CURSOR_ARROW)
+    , m_draw(false)
+    , m_selector(500, 10, 1000) {
   bind(targetType);
   m_prop.bind(m_strokeSelectionType);
 
@@ -923,6 +926,22 @@ void SelectionTool::updateAction(TPointD pos, const TMouseEvent &e) {
   m_cursorId = ToolCursor::StrokeSelectCursor;
 
   if (!ti && !vi && !ri) return;
+
+  m_selector.setStroke(0);
+  if (!m_draw) m_draw = true;
+  if (vi) {
+    // select nearest stroke and finds its parameter
+    double dist, pW;
+    UINT stroke;
+
+    if (vi->getNearestStroke(pos, pW, stroke, dist)) {
+      TStroke *strokeRef = vi->getStroke(stroke);
+      m_selector.setStroke(strokeRef);
+    }
+
+    invalidate();
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+  }
 
   bool shift = e.isShiftPressed();
 
@@ -1102,6 +1121,14 @@ void SelectionTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
     invalidate();
   }
 }
+
+//-----------------------------------------------------------------------------
+
+void SelectionTool::onEnter() { m_draw = true; }
+
+//-----------------------------------------------------------------------------
+
+void SelectionTool::onLeave() { m_draw = false; }
 
 //-----------------------------------------------------------------------------
 

@@ -53,6 +53,8 @@
 // TnzCore includes
 #include "tconvert.h"
 
+#include "ext/Selector.h"
+
 #include <QApplication>
 #include <QMainWindow>
 #include <QPainter>
@@ -1199,8 +1201,11 @@ void ColumnArea::DrawHeader::drawSubLayers() const {
   if (currentTool->getName() == T_ControlPointEditor)
     cpSelection =
         dynamic_cast<ControlPointSelection *>(currentTool->getSelection());
-  else
+  else if (currentTool->getName() == T_Selection)
     sSelection = dynamic_cast<StrokeSelection *>(currentTool->getSelection());
+
+  ToonzExt::Selector *extSelector = extSelector =
+      dynamic_cast<ToonzExt::Selector *>(currentTool->getSelector());
 
   for (int i = 0; i < subLayers.size(); i++) {
     shared_ptr<SubLayer> subLayer = subLayers[i];
@@ -1218,7 +1223,8 @@ void ColumnArea::DrawHeader::drawSubLayers() const {
     if ((sSelection && !sSelection->isEmpty() && sSelection->isSelected(i)) ||
         (cpSelection &&
          cpSelection->getControlPointEditorStroke()->getStroke() ==
-             subLayer->getStroke()))
+             subLayer->getStroke()) ||
+        (extSelector && extSelector->getStroke() == subLayer->getStroke()))
       isSelected = true;
 
     bool isCurrent = rect.contains(area->m_pos);
@@ -1733,10 +1739,10 @@ ColumnTransparencyPopup::ColumnTransparencyPopup(QWidget *parent)
 
   m_value = new DVGui::IntLineEdit(this, 1, 1, 100);
   /*m_value->setValidator(new QIntValidator (1, 100, m_value));
-m_value->setFixedHeight(16);
-m_value->setFixedWidth(30);
-static QFont font("Helvetica", 7, QFont::Normal);
-m_value->setFont(font);*/
+  m_value->setFixedHeight(16);
+  m_value->setFixedWidth(30);
+  static QFont font("Helvetica", 7, QFont::Normal);
+  m_value->setFont(font);*/
 
   m_filterColorCombo = new QComboBox(this);
   for (int f = 0; f < (int)TXshColumn::FilterAmount; f++) {
@@ -1850,9 +1856,9 @@ void ColumnTransparencyPopup::setColumn(TXshColumn *column) {
 
 /*void ColumnTransparencyPopup::mouseMoveEvent ( QMouseEvent * e )
 {
-        int val = tcrop((e->pos().x()+10)/(this->width()/(99-1+1)), 1, 99);
-        m_value->setText(QString::number(val));
-        m_slider->setValue(val);
+int val = tcrop((e->pos().x()+10)/(this->width()/(99-1+1)), 1, 99);
+m_value->setText(QString::number(val));
+m_slider->setValue(val);
 }*/
 
 void ColumnTransparencyPopup::mouseReleaseEvent(QMouseEvent *e) {
@@ -2146,7 +2152,7 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
           QRect rect = {mapper->rect(PredefinedRect::LAYER_HEADER)
                             .translated(offsets.topLeft())};
           subLayer->setHighlight(false);
-          if (rect.contains(mouseInCell)) subLayer->setHighlight(true);
+          if (rect.contains(pos)) subLayer->setHighlight(true);
         }
         updateHighlight = true;
       }
@@ -2334,8 +2340,8 @@ void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
 void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
 #ifndef _WIN32
   /* On windows the widget receive the release event before the menu
-     is shown, on linux and osx the release event is lost, never
-     received by the widget */
+  is shown, on linux and osx the release event is lost, never
+  received by the widget */
   QMouseEvent fakeRelease(QEvent::MouseButtonRelease, event->pos(),
                           Qt::RightButton, Qt::NoButton, Qt::NoModifier);
 

@@ -33,6 +33,8 @@
 #include "tinbetween.h"
 #include "drawutil.h"
 
+#include "ext/Selector.h"
+
 // Qt includes
 #include <QCoreApplication>  // For Qt translation support
 
@@ -286,6 +288,10 @@ public:
   /*-- ドラッグ中にツールが切り替わった場合、Eraseの終了処理を行う --*/
   void onDeactivate() override;
 
+  ToonzExt::Selector *getSelector() {
+    return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
+  }
+
 private:
   TPropertyGroup m_prop;
 
@@ -324,6 +330,9 @@ private:
   double m_thick;
 
   bool m_firstTime, m_active, m_firstFrameSelected;
+
+  ToonzExt::Selector m_selector;
+  bool m_draw;  //!< Should be removed...?
 
 private:
   void resetMulti();
@@ -368,7 +377,9 @@ EraserTool::EraserTool()
     , m_stroke(0)
     , m_thick(5)
     , m_active(false)
-    , m_firstTime(true) {
+    , m_firstTime(true)
+    , m_draw(false)
+    , m_selector(500, 10, 1000) {
   bind(TTool::VectorImage);
 
   m_prop.bind(m_toolSize);
@@ -1044,6 +1055,20 @@ void EraserTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
   } locals = {this};
 
+  m_selector.setStroke(0);
+  if (!m_draw) m_draw = true;
+  TVectorImageP vi    = TImageP(getImage(true));
+  if (vi) {
+    // select nearest stroke and finds its parameter
+    double dist, pW;
+    UINT stroke;
+
+    if (vi->getNearestStroke(pos, pW, stroke, dist)) {
+      TStroke *strokeRef = vi->getStroke(stroke);
+      m_selector.setStroke(strokeRef);
+    }
+  }
+
   switch (e.getModifiersMask()) {
   case TMouseEvent::ALT_KEY: {
     // User wants to alter the maximum brush size
@@ -1061,6 +1086,7 @@ void EraserTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
   m_oldMousePos = m_mousePos = pos;
   invalidate();
+  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
 //----------------------------------------------------------------------
@@ -1091,6 +1117,8 @@ bool EraserTool::onPropertyChanged(std::string propertyName) {
 //-----------------------------------------------------------------------------
 
 void EraserTool::onEnter() {
+  m_draw = true;
+
   if (m_firstTime) {
     m_toolSize.setValue(EraseVectorSize);
     m_eraseType.setValue(::to_wstring(EraseVectorType.getValue()));
@@ -1118,6 +1146,7 @@ void EraserTool::onEnter() {
 //-----------------------------------------------------------------------------
 
 void EraserTool::onLeave() {
+  m_draw = false;
   draw();
   m_pointSize = -1;
 }

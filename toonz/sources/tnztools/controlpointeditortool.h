@@ -55,6 +55,8 @@ class ControlPointEditorTool final : public QObject, public TTool {
   TUndo *m_undo;
   bool m_subscribedFrameChanged;
 
+  ToonzExt::Selector m_selector;
+
   StrokeId makeStrokeId(TVectorImageP vi, int index);
   void subscribeFrameChanged();
 
@@ -114,6 +116,7 @@ public:
   bool isEventAcceptable(QEvent *e) override;
 
   ControlPointSelection *getSelection() { return &m_selection; }
+  ToonzExt::Selector *getSelector() override;
 
 public slots:
   void frameSwitched();

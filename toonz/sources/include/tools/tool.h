@@ -14,6 +14,8 @@
 #include "tgeometry.h"
 #include "tfilepath.h"
 
+#include "ext/Selector.h"
+
 // Qt includes
 #include <QString>
 #include <QPoint>
@@ -129,126 +131,126 @@ public:
 //*****************************************************************************************
 
 /*!
-  \brief    TTool is the abstract base class defining the interface for Toonz
+\brief    TTool is the abstract base class defining the interface for Toonz
 tools - the ones
-            accessible from the Toolbar panel that users can activate to edit
+accessible from the Toolbar panel that users can activate to edit
 the scene contents
-            interactively.
+interactively.
 
-  \details  Toonz implements a number of interactive tools, like the <I>Brush
+\details  Toonz implements a number of interactive tools, like the <I>Brush
 Tool</I>, <I>Fill
-            Tool</I>, <I>Zoom Tool</I> and others. They all inherit from this
+Tool</I>, <I>Zoom Tool</I> and others. They all inherit from this
 class, which provides
-            the necessary interface and framework to implement a generic
+the necessary interface and framework to implement a generic
 interactive tool in Toonz.
 
-            A Toonz Tool should re-implement the following key functionalities:
- <UL>
-              <LI> The abstract getToolType() method, which classifies the tool,
-and
-                   eventually getTargetType()</LI>
-              <LI> The draw() method, used to draw the tool on screen</LI>
-              <LI> The mouse-related methods, to grant user interaction</LI>
-              <LI> The getProperties() and onPropertyChanged() methods, to
-define and track
-                   a tool's TProperty members</LI>
-              <LI> The addContextMenuItems() method, to insert actions in
-right-click menus</LI>
- </UL>
-              \par Tool classification
-            Toonz enforces a strict classification of its tools that is used to
-enable or disable them
-            in the appropriate contexts:
+A Toonz Tool should re-implement the following key functionalities:
 <UL>
-              <LI> <B>Generic Tools:</B> the tool is always enabled, since it
-does not need to access
-                    specific scene contents. Hidden tools typically prefer to
-select this type since they
-                    should handle disablements silently.</LI>
-              <LI> <B>Column Tools:</B> the tool is used to alter or define the
-placement of a column's
-                    content. It is disabled in Filmstrip view mode, since that's
-a strictly level-related view.</LI>
-              <LI> <B>LevelRead Tools:</B> the tool is used to \a read a level's
-images data. It is therefore
-                    enabled on all view modes. The tool is disabled in camera
-stand or 3D view modes if the
-                    level's host column has sustained a placement which makes it
-impossible to access image
-                    data (as is the case with Plastic-deformed columns).</LI>
-              <LI> <B>LevelWrite Tools:</B> the tool is used to \a write a
-level's images data. It is
-                    disabled in all contexts where a LevelRead Tool would be
-disabled. It is also disabled in
-                    case the current level is of a type unsupported for write,
-\a or the level is read-only
-                    on disk.</LI>
+<LI> The abstract getToolType() method, which classifies the tool,
+and
+eventually getTargetType()</LI>
+<LI> The draw() method, used to draw the tool on screen</LI>
+<LI> The mouse-related methods, to grant user interaction</LI>
+<LI> The getProperties() and onPropertyChanged() methods, to
+define and track
+a tool's TProperty members</LI>
+<LI> The addContextMenuItems() method, to insert actions in
+right-click menus</LI>
 </UL>
-            Furthermore, tools define a bitwise combination of <I>Target
+\par Tool classification
+Toonz enforces a strict classification of its tools that is used to
+enable or disable them
+in the appropriate contexts:
+<UL>
+<LI> <B>Generic Tools:</B> the tool is always enabled, since it
+does not need to access
+specific scene contents. Hidden tools typically prefer to
+select this type since they
+should handle disablements silently.</LI>
+<LI> <B>Column Tools:</B> the tool is used to alter or define the
+placement of a column's
+content. It is disabled in Filmstrip view mode, since that's
+a strictly level-related view.</LI>
+<LI> <B>LevelRead Tools:</B> the tool is used to \a read a level's
+images data. It is therefore
+enabled on all view modes. The tool is disabled in camera
+stand or 3D view modes if the
+level's host column has sustained a placement which makes it
+impossible to access image
+data (as is the case with Plastic-deformed columns).</LI>
+<LI> <B>LevelWrite Tools:</B> the tool is used to \a write a
+level's images data. It is
+disabled in all contexts where a LevelRead Tool would be
+disabled. It is also disabled in
+case the current level is of a type unsupported for write,
+\a or the level is read-only
+on disk.</LI>
+</UL>
+Furthermore, tools define a bitwise combination of <I>Target
 Types</I>, which are the category
-            of level types it can work on (including every image type and the
+of level types it can work on (including every image type and the
 motion path type).
-            The Target Type is used only associated with LevelRead and
+The Target Type is used only associated with LevelRead and
 LevelWrite tool types.
- \n\n
-            There are a number of additional generic rules that define whenever
+\n\n
+There are a number of additional generic rules that define whenever
 a tool is disabled:
- <UL>
-              <LI> Every tool is disabled when a viewer is in playback.</LI>
-              <LI> Every non-Generic tool is disabled on level/columns that do
+<UL>
+<LI> Every tool is disabled when a viewer is in playback.</LI>
+<LI> Every non-Generic tool is disabled on level/columns that do
 not host a
-                   placeable image type (eg sound or magpie data).</LI>
-              <LI> Every non-Generic tool is disabled when working on
+placeable image type (eg sound or magpie data).</LI>
+<LI> Every non-Generic tool is disabled when working on
 columns/levels that have
-                   been hidden.</LI>
-              <LI> Every non-Generic tool is disabled when working on columns
+been hidden.</LI>
+<LI> Every non-Generic tool is disabled when working on columns
 that have been locked
-                   (the lock icon on a column header).</LI>
- </UL>
-              \par Drawing
-            Tools use OpenGL to draw in their currently associated Viewer
+(the lock icon on a column header).</LI>
+</UL>
+\par Drawing
+Tools use OpenGL to draw in their currently associated Viewer
 instance, which can be retrieved
-            through the getViewer() accessor function. The viewer is assigned to
+through the getViewer() accessor function. The viewer is assigned to
 the tool just before it
-            invokes the tool's draw() function - use the onSetViewer() virtual
+invokes the tool's draw() function - use the onSetViewer() virtual
 method to access viewer data
-            \a before the viewer starts drawing (observe the tool is typically
+\a before the viewer starts drawing (observe the tool is typically
 drawn as an overlay, on top
-            of other stuff).
- \n\n
-            Just before draw() is invoked by the viewer, the \p GL_MODELVIEW
+of other stuff).
+\n\n
+Just before draw() is invoked by the viewer, the \p GL_MODELVIEW
 matrix is automatically pushed
-            by the viewer with the tool-to-window affine returned by getMatrix()
+by the viewer with the tool-to-window affine returned by getMatrix()
 (multiplied by the viewer's
-            view affine). Use glGetDoublev() to retrieve the effective
+view affine). Use glGetDoublev() to retrieve the effective
 tool-to-window reference change
-            affine, and in case reimplement updateMatrix() to specify the affine
+affine, and in case reimplement updateMatrix() to specify the affine
 returned by getMatrix().
- \n\n
-            The default implementation for updateMatrix() sets the tool
+\n\n
+The default implementation for updateMatrix() sets the tool
 reference to current object's
-            world one.
+world one.
 
-              \par Tool Properties
-            A tool's properties must be implemented by defining one or more
+\par Tool Properties
+A tool's properties must be implemented by defining one or more
 TPropertyGroup containers,
-            and adding them the TProperty specializations corresponding to the
+and adding them the TProperty specializations corresponding to the
 required parameters.
- \n\n
-            Every TProperty instance in group 0 is automatically added to the
+\n\n
+Every TProperty instance in group 0 is automatically added to the
 Tool Options panel
-            in Toonz's GUI. Further groups or special toolbar options must be
+in Toonz's GUI. Further groups or special toolbar options must be
 currently hard-coded
-            elsewhere. Tool Options panel construction will probably be
+elsewhere. Tool Options panel construction will probably be
 redirected to the tool in
-            future Toonz versions.
+future Toonz versions.
 
-              \par Context Menu Items
-            The addContextMenuItems() is used to insert context menu actions \a
+\par Context Menu Items
+The addContextMenuItems() is used to insert context menu actions \a
 before the standard
-            actions provided by the tool viewer. Remember to insert separators
+actions provided by the tool viewer. Remember to insert separators
 to isolate commands
-            of different type (such as view, editing, etc).
+of different type (such as view, editing, etc).
 */
 
 class DVAPI TTool {
@@ -301,32 +303,32 @@ public:
   }
 
   /*! \warning  In case there is no level currently selected, <I>or the
-          object to be edited is a spline path</I>, the xsheet cell
-          returned by getImageCell() is empty. */
+  object to be edited is a spline path</I>, the xsheet cell
+  returned by getImageCell() is empty. */
 
   static TXshCell
   getImageCell();  //!< Returns the level-frame pair to be edited by the tool.
 
   /*! \details  The image returned by getImage() is either the one
-          associated to getImageCell(), or the vector image
-          corresponding to currently edited spline path. */
+  associated to getImageCell(), or the vector image
+  corresponding to currently edited spline path. */
 
   static TImage *getImage(
       bool toBeModified,
       int subsampling = 0);  //!< Returns the image to be edited by the tool.
 
   static TImage *touchImage();  //!< Returns a pointer to the actual image - the
-                                //!  one of the frame that has been selected.
+  //!  one of the frame that has been selected.
 
   /*! \details      This function is necessary since tools are created before
-the main
-              application (TAB or Toonz) starts, and hence tr() calls have no
-effect
-              (the translation is not yet installed - to install one you need at
-least
-              an instance of QApplication / QCoreApplication).
+  the main
+  application (TAB or Toonz) starts, and hence tr() calls have no
+  effect
+  (the translation is not yet installed - to install one you need at
+  least
+  an instance of QApplication / QCoreApplication).
 
-\deprecated   This so much stinks of a bug turned into design choice... */
+  \deprecated   This so much stinks of a bug turned into design choice... */
 
   static void updateToolsPropertiesTranslation();  //!< Updates translation of
                                                    //! the bound properties of
@@ -342,8 +344,8 @@ public:
   std::string getName() const { return m_name; }
 
   /*! \details  The default returns a generic box containing the options
-          for property group 0).
-\sa       See tooloptions.h for more details. */
+  for property group 0).
+  \sa       See tooloptions.h for more details. */
 
   virtual ToolOptionsBox *
   createOptionsBox();  //!< Factory function returning a newly created
@@ -363,9 +365,9 @@ public:
   void invalidate(const TRectD &rect = TRectD());
 
   /*!
-          Picks a region of the scene, using an OpenGL projection matrix to
-          restrict drawing to a small regionaround \p p of the viewport.
-          Retuns -1 if no object's view has been changed.
+  Picks a region of the scene, using an OpenGL projection matrix to
+  restrict drawing to a small regionaround \p p of the viewport.
+  Retuns -1 if no object's view has been changed.
   */
   int pick(const TPointD &p);
   bool isPicking() const { return m_picking; }
@@ -373,10 +375,11 @@ public:
   virtual void updateTranslation(){};
 
   /*!
-This method is called before leftButtonDown() and can be used e.g. to create the
-image if needed.
-return true if the method execution can have changed the current tool
-*/
+  This method is called before leftButtonDown() and can be used e.g. to create
+  the
+  image if needed.
+  return true if the method execution can have changed the current tool
+  */
   virtual bool preLeftButtonDown() { return false; }
 
   virtual void mouseMove(const TPointD &, const TMouseEvent &) {}
@@ -404,7 +407,7 @@ return true if the method execution can have changed the current tool
   }  //!< Callback for the mouse leaving the viewer area.
 
   /*-- rasterSelectionTool
-   * のフローティング選択が残った状態でフレームが移動したときの挙動を決める --*/
+  * のフローティング選択が残った状態でフレームが移動したときの挙動を決める --*/
   virtual void onFrameSwitched() {}
 
   virtual void reset() {}
@@ -419,8 +422,8 @@ return true if the method execution can have changed the current tool
   virtual TPropertyGroup *getProperties(int) { return 0; }
 
   /*!
-          Does the tasks associated to changes in \p propertyName and returns \p
-     true;
+  Does the tasks associated to changes in \p propertyName and returns \p
+  true;
   */
   virtual bool onPropertyChanged(std::string propertyName) {
     return false;
@@ -429,6 +432,8 @@ return true if the method execution can have changed the current tool
   virtual TSelection *getSelection() {
     return 0;
   }  //!< Returns a pointer to the tool selection.
+
+  virtual ToonzExt::Selector *getSelector() { return 0; }
 
   //! \sa    For a list of cursor ids cursor.h
   virtual int getCursorId() const {
@@ -450,14 +455,14 @@ return true if the method execution can have changed the current tool
 
   void notifyImageChanged();  //!< Notifies changes on the actual image; used to
                               //! update
-  //!  images on the level view.
+                              //!  images on the level view.
   void notifyImageChanged(const TFrameId &fid);  //!< Notifies changes on the
   //! frame \p fid; used to update
   //!  images on the level view.
 
   /*! \details   It can depend on the actual frame and the actual cell or
-            on the current fid (editing level). In editing scene if
-            the current cell is empty the method returns TFrameId::NO_FRAME. */
+  on the current fid (editing level). In editing scene if
+  the current cell is empty the method returns TFrameId::NO_FRAME. */
 
   TFrameId getCurrentFid()
       const;  //!< Returns the number of the actual editing frame.
@@ -476,25 +481,25 @@ return true if the method execution can have changed the current tool
   TAffine getCurrentObjectParentMatrix2() const;
 
   /*!
-          Returns the matrix transformation of the stage object with column
+  Returns the matrix transformation of the stage object with column
   index equal to \p index
-          and frame as the current frame.
+  and frame as the current frame.
   \sa TXsheet::getPlacement.
   */
   TAffine getColumnMatrix(int index) const;
 
   /*!
-   Updates the current matrix transformation with the actual column matrix
-transformation.
-\sa getCurrentColumnMatrix().
-*/
+  Updates the current matrix transformation with the actual column matrix
+  transformation.
+  \sa getCurrentColumnMatrix().
+  */
   virtual void updateMatrix();
 
   /*!
-   Add a context menu to the actual tool, as for example pressing right mouse
-   button
-   with the stroke selection tool.
-*/
+  Add a context menu to the actual tool, as for example pressing right mouse
+  button
+  with the stroke selection tool.
+  */
   virtual void addContextMenuItems(QMenu *menu) {}
 
   void enable(bool on) { m_enabled = on; }
@@ -518,8 +523,8 @@ transformation.
 public:
   static std::vector<int> m_cellsData;  //!< \deprecated  brutto brutto. fix
                                         //! quick & dirty del baco #6213 (undo
-  //! con animation sheet) spiegazioni in
-  //! tool.cpp
+                                        //! con animation sheet) spiegazioni in
+                                        //! tool.cpp
   static bool m_isLevelCreated;  //!< \deprecated  Shouldn't expose global
                                  //! static variables.
   static bool m_isFrameCreated;  //!< \deprecated  Shouldn't expose global
@@ -556,10 +561,10 @@ protected:
 //*****************************************************************************************
 
 /*!
-  \brief    The TTool::Viewer class is the abstract base class that provides an
-  interface for
-            TTool viewer widgets (it is required that such widgets support
-  OpenGL).
+\brief    The TTool::Viewer class is the abstract base class that provides an
+interface for
+TTool viewer widgets (it is required that such widgets support
+OpenGL).
 */
 
 class TTool::Viewer {
@@ -586,8 +591,8 @@ public:
                                        //! Qt's event system
   virtual void GLInvalidateRect(const TRectD &rect) = 0;  //!< Same as
                                                           //! GLInvalidateAll(),
-  //! for a specific
-  //! clipping rect
+                                                          //! for a specific
+                                                          //! clipping rect
   virtual void invalidateToolStatus() = 0;  //!< Forces the viewer to update the
                                             //! perceived status of tools
   virtual TAffine getViewMatrix() const {

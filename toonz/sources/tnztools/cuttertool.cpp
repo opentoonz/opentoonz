@@ -23,6 +23,8 @@
 
 #include "tgl.h"
 
+#include "ext/Selector.h"
+
 using namespace ToolUtils;
 
 //=============================================================================
@@ -163,10 +165,15 @@ public:
   int m_cursorId;
   double m_pW;
 
+  ToonzExt::Selector m_selector;
+  bool m_draw;  //!< Should be removed...?
+
   CutterTool()
       : TTool("T_Cutter")
       , m_mouseDown(false)
-      , m_cursorId(ToolCursor::CutterCursor) {
+      , m_cursorId(ToolCursor::CutterCursor)
+      , m_draw(false)
+      , m_selector(500, 10, 1000) {
     bind(TTool::VectorImage);
   }
 
@@ -302,21 +309,32 @@ public:
     double dist, pW;
     UINT stroke;
 
+    if (!m_draw) m_draw = true;
+
+    m_selector.setStroke(0);
+
     if (vi->getNearestStroke(pos, pW, stroke, dist)) {
       TStroke *strokeRef = vi->getStroke(stroke);
       m_speed            = strokeRef->getSpeed(pW);
       m_cursor           = strokeRef->getThickPoint(pW);
       m_pW               = pW;
+
+      m_selector.setStroke(strokeRef);
     } else {
       m_speed = TPointD(0, 0);
     }
     invalidate();
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void onLeave() override { m_speed = TPointD(0, 0); }
+  void onLeave() override {
+    m_draw  = false;
+    m_speed = TPointD(0, 0);
+  }
 
   void onActivate() override {}
   void onEnter() override {
+    m_draw = true;
     if ((TVectorImageP)getImage(false))
       m_cursorId = ToolCursor::CutterCursor;
     else
@@ -324,6 +342,10 @@ public:
   }
 
   int getCursorId() const override { return m_cursorId; }
+
+  ToonzExt::Selector *getSelector() {
+    return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
+  }
 
 } cutterTool;
 

@@ -25,6 +25,8 @@
 #include <QCoreApplication>
 #include <QKeyEvent>
 
+#include "ext/Selector.h"
+
 using namespace ToolUtils;
 
 TEnv::IntVar AutoSelectDrawing("ControlPointEditorToolAutoSelectDrawing", 1);
@@ -123,7 +125,8 @@ ControlPointEditorTool::ControlPointEditorTool()
     , m_isMenuViewed(false)
     , m_moveControlPointEditorStroke()
     , m_moveSegmentLimitation()
-    , m_subscribedFrameChanged(false) {
+    , m_subscribedFrameChanged(false)
+    , m_selector(500, 10, 1000) {
   bind(TTool::Vectors);
   m_prop.bind(m_autoSelectDrawing);
   m_selection.setControlPointEditorStroke(&m_controlPointEditorStroke);
@@ -334,7 +337,23 @@ void ControlPointEditorTool::mouseMove(const TPointD &pos,
 
   m_pos = pos;
 
-  if (!m_draw || m_controlPointEditorStroke.getStrokeIndex() == -1) return;
+  m_selector.setStroke(0);
+  if (!m_draw) m_draw = true;
+  // select nearest stroke and finds its parameter
+  double dist, pW;
+  UINT stroke;
+
+  if (vi->getNearestStroke(m_pos, pW, stroke, dist)) {
+    TStroke *strokeRef = vi->getStroke(stroke);
+    m_selector.setStroke(strokeRef);
+  }
+
+  if (!m_draw || m_controlPointEditorStroke.getStrokeIndex() == -1) {
+    invalidate();
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    return;
+  }
+
   if (e.isAltPressed())
     m_cursorType = EDIT_SPEED;
   else {
@@ -351,6 +370,7 @@ void ControlPointEditorTool::mouseMove(const TPointD &pos,
       m_cursorType = NORMAL;
   }
   invalidate();
+  TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
 //---------------------------------------------------------------------------
@@ -752,14 +772,14 @@ bool ControlPointEditorTool::keyDown(QKeyEvent *event) {
 //---------------------------------------------------------------------------
 
 void ControlPointEditorTool::onEnter() {
+  m_draw = true;
   TVectorImageP vi(getImage(false));
   int currentStroke = m_controlPointEditorStroke.getStrokeIndex();
   if (m_isMenuViewed) {
     m_isMenuViewed = false;
     return;
   }
-  /*m_draw=true;
-  if(currentStroke==-1 || !vi)
+  /*if(currentStroke==-1 || !vi)
           return;
 
   m_controlPointEditorStroke.unsetStroke();
@@ -771,8 +791,8 @@ if(TTool::getApplication()->getCurrentObject()->isSpline())
 //---------------------------------------------------------------------------
 
 void ControlPointEditorTool::onLeave() {
+  m_draw = false;
   if (m_isMenuViewed) return;
-  // m_draw=false;
 }
 
 //-----------------------------------------------------------------------------
@@ -831,6 +851,10 @@ int ControlPointEditorTool::getCursorId() const {
   default:
     return ToolCursor::SplineEditorCursor;
   }
+}
+
+ToonzExt::Selector *ControlPointEditorTool::getSelector() {
+  return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
 }
 
 //-----------------------------------------------------------------------------
