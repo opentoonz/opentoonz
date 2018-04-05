@@ -162,8 +162,8 @@ public:
   bool doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
                            TFrameId lastFrameId, TStroke *lastStroke,
                            bool drawFirstStroke = true);
-  void checkGuideSnapping(bool beforeMousePress);
-  void checkStrokeSnapping(bool beforeMousePress);
+  void checkGuideSnapping(bool beforeMousePress, bool invertCheck);
+  void checkStrokeSnapping(bool beforeMousePress, bool invertCheck);
 
 protected:
   TPropertyGroup m_prop[2];
