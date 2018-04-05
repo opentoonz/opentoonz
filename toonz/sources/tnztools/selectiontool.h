@@ -456,8 +456,8 @@ public:
   void onImageChanged() override = 0;
   void onSelectionChanged() override;
 
-  void SelectionTool::onEnter() override;
-  void SelectionTool::onLeave() override;
+  void onEnter() override;
+  void onLeave() override;
 
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
@@ -466,7 +466,7 @@ public:
   // returns true if the pressed key is recognized and processed.
   bool isEventAcceptable(QEvent *e) override;
 
-  ToonzExt::Selector *getSelector() {
+  ToonzExt::Selector *getSelector() override {
     return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
   }
 };
