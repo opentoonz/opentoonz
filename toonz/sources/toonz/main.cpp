@@ -166,15 +166,16 @@ static void initToonzEnv() {
 
   /*-- TOONZROOTのPathの確認 --*/
   // controllo se la xxxroot e' definita e corrisponde ad un folder esistente
+  
+  /*-- ENGLISH: Confirm TOONZROOT Path 
+  	Check if the xxxroot is defined and corresponds to an existing folder
+  --*/
+  
   TFilePath stuffDir = TEnv::getStuffDir();
-  if (stuffDir == TFilePath() || !TFileStatus(stuffDir).isDirectory()) {
-    if (stuffDir == TFilePath())
-      fatalError("Undefined or empty: \"" + toQString(TEnv::getRootVarPath()) +
-                 "\"");
-    else
-      fatalError("Folder \"" + toQString(stuffDir) +
-                 "\" not found or not readable");
-  }
+  if (stuffDir == TFilePath())
+      fatalError("Undefined or empty: \"" + toQString(TEnv::getRootVarPath()) + "\"");
+  else if (!TFileStatus(stuffDir).isDirectory())
+      fatalError("Folder \"" + toQString(stuffDir) + "\" not found or not readable");
 
   Tiio::defineStd();
   initImageIo();
