@@ -1436,11 +1436,13 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 
     m_currThickness = thickness;
 
-    m_mousePos      = pos;
-    m_lastSnapPoint = pos;
-    m_foundLastSnap = false;
-    checkStrokeSnapping(false, e.isAltPressed());
-    checkGuideSnapping(false, e.isAltPressed());
+    m_mousePos       = pos;
+    m_lastSnapPoint  = pos;
+    m_foundLastSnap  = false;
+    m_foundFirstSnap = false;
+    m_altPressed     = e.isAltPressed() && !e.isCtrlPressed();
+    checkStrokeSnapping(false, m_altPressed);
+    checkGuideSnapping(false, m_altPressed);
     m_brushPos = m_lastSnapPoint;
 
     if (e.isShiftPressed()) {
@@ -1520,7 +1522,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       return;
     }
 
-    if (vi && m_snap.getValue() && m_foundLastSnap) {
+    if (vi && (m_snap.getValue() != m_altPressed) && m_foundLastSnap) {
       addTrackPoint(TThickPoint(m_lastSnapPoint, m_currThickness),
                     getPixelSize() * getPixelSize());
     }
@@ -1631,7 +1633,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     }
     assert(stroke);
     m_track.clear();
-
+    m_altPressed = false;
   } else if (TToonzImageP ti = image) {
     finishRasterBrush(pos, e.m_pressure);
   }
@@ -2022,9 +2024,9 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
     if (m_targetType & TTool::Vectors) {
       m_firstSnapPoint = pos;
       m_foundFirstSnap = false;
-
-      checkStrokeSnapping(true, e.isAltPressed());
-      checkGuideSnapping(true, e.isAltPressed());
+      m_altPressed     = e.isAltPressed() && !e.isCtrlPressed();
+      checkStrokeSnapping(true, m_altPressed);
+      checkGuideSnapping(true, m_altPressed);
       m_brushPos = m_firstSnapPoint;
     }
   }
@@ -2086,15 +2088,15 @@ void BrushTool::checkStrokeSnapping(bool beforeMousePress, bool invertCheck) {
       m_firstSnapPoint = TPointD(point1.x, point1.y);
       m_foundFirstSnap = true;
     } else if (!beforeMousePress) {
-      TPointD tempPoint        = m_track.getFirstPoint();
-      double distanceFromStart = tdistance(m_mousePos, tempPoint);
-      if (snapFound &&
-          distanceFromStart < tdistance(m_mousePos, (TPointD)point1)) {
-        point1 = tempPoint;
-      } else if (distanceFromStart < m_minDistance2) {
-        point1    = tempPoint;
-        distance2 = distanceFromStart;
-        snapFound = true;
+      if (!snapFound) {
+        TPointD tempPoint        = m_track.getFirstPoint();
+        double distanceFromStart = tdistance2(m_mousePos, tempPoint);
+
+        if (distanceFromStart < m_minDistance2) {
+          point1    = tempPoint;
+          distance2 = distanceFromStart;
+          snapFound = true;
+        }
       }
       if (snapFound) {
         m_lastSnapPoint                 = TPointD(point1.x, point1.y);
@@ -2199,7 +2201,7 @@ void BrushTool::draw() {
   // snapping
   TVectorImageP vi = img;
   if (m_targetType & TTool::Vectors) {
-    if (m_snap.getValue()) {
+    if (m_snap.getValue() != m_altPressed) {
       m_pixelSize  = getPixelSize();
       double thick = 6.0 * m_pixelSize;
       if (m_foundFirstSnap) {

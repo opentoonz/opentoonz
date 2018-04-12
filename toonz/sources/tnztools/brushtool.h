@@ -200,7 +200,8 @@ protected:
   int m_strokeIndex1, m_strokeIndex2, m_col, m_firstFrame, m_veryFirstFrame,
       m_veryFirstCol, m_targetType;
   double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
-  bool m_foundFirstSnap = false, m_foundLastSnap = false, m_dragDraw = true;
+  bool m_foundFirstSnap = false, m_foundLastSnap = false, m_dragDraw = true,
+       m_altPressed = false;
   TRectD m_modifiedRegion;
   TPointD m_dpiScale,
       m_mousePos,  //!< Current mouse position, in world coordinates.
