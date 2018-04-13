@@ -201,7 +201,7 @@ protected:
       m_veryFirstCol, m_targetType;
   double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
   bool m_foundFirstSnap = false, m_foundLastSnap = false, m_dragDraw = true,
-       m_altPressed = false;
+       m_altPressed = false, m_snapSelf = false;
   TRectD m_modifiedRegion;
   TPointD m_dpiScale,
       m_mousePos,  //!< Current mouse position, in world coordinates.

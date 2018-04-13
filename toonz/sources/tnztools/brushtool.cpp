@@ -1440,6 +1440,7 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     m_lastSnapPoint  = pos;
     m_foundLastSnap  = false;
     m_foundFirstSnap = false;
+    m_snapSelf       = false;
     m_altPressed     = e.isAltPressed() && !e.isCtrlPressed();
     checkStrokeSnapping(false, m_altPressed);
     checkGuideSnapping(false, m_altPressed);
@@ -1626,6 +1627,10 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
         }
       }
     } else {
+      if (m_snapSelf) {
+        stroke->setSelfLoop(true);
+        m_snapSelf = false;
+      }
       addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                        m_isFrameCreated, m_isLevelCreated);
       TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
@@ -2093,9 +2098,10 @@ void BrushTool::checkStrokeSnapping(bool beforeMousePress, bool invertCheck) {
         double distanceFromStart = tdistance2(m_mousePos, tempPoint);
 
         if (distanceFromStart < m_minDistance2) {
-          point1    = tempPoint;
-          distance2 = distanceFromStart;
-          snapFound = true;
+          point1     = tempPoint;
+          distance2  = distanceFromStart;
+          snapFound  = true;
+          m_snapSelf = true;
         }
       }
       if (snapFound) {
