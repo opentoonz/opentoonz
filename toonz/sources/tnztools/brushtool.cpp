@@ -2167,9 +2167,10 @@ void BrushTool::checkGuideSnapping(bool beforeMousePress, bool invertCheck) {
       double hypotenuse =
           sqrt(pow(currYDistance, 2.0) + pow(currXDistance, 2.0));
       if ((distanceToVGuide >= 0 && distanceToVGuide < hypotenuse) ||
-          (distanceToHGuide >= 0 && distanceToHGuide < hypotenuse))
-        useGuides = true;
-      else
+          (distanceToHGuide >= 0 && distanceToHGuide < hypotenuse)) {
+        useGuides  = true;
+        m_snapSelf = false;
+      } else
         useGuides = false;
     }
     if (useGuides) {
