@@ -431,9 +431,16 @@ void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
       // notifier... I wonder why...
       TStroke *oldStroke = new TStroke(*m_inStroke);
 
+      PathAnimations::copyAnimation(TTool::getApplication(), m_inStroke,
+                                    oldStroke);
+      m_outStroke->setName(m_inStroke->name());
+
       m_outStroke->swap(*m_inStroke);
 
       m_inStroke->invalidate();
+
+      PathAnimations::copyAnimation(TTool::getApplication(), oldStroke,
+                                    m_inStroke);
 
       delete m_outStroke;
       m_outStroke = 0;
@@ -446,6 +453,8 @@ void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
       emit vi->strokeListChanged();
       notifyImageChanged();
 
+      PathAnimations::appAnimations(TTool::getApplication())
+          ->removeStroke(oldStroke);
       delete oldStroke;
     }
   }

@@ -26,6 +26,9 @@
 
 using namespace ToolUtils;
 
+// Qt includes
+#include <QCoreApplication>  // For Qt translation support
+
 namespace {
 
 const int MY_ERROR = -1;
@@ -115,7 +118,10 @@ public:
       m_strokeRef      = vi->getStroke(stroke);
       m_selectedStroke = stroke;
       m_beginPoint     = m_strokeRef->getPoint(m_range.first);
-      m_oldStroke      = new TStroke(*vi->getStroke(stroke));
+
+      m_oldStroke = new TStroke(*m_strokeRef);
+      PathAnimations::copyAnimation(TTool::getApplication(), m_strokeRef,
+                                    m_oldStroke);
 
       m_range.second = m_range.first;
 
@@ -332,6 +338,8 @@ public:
       }
     }
 
+    PathAnimations::appSnapshot(TTool::getApplication(), m_strokeRef);
+
     m_strokeRef->invalidate();
     invalidate();
     notifyImageChanged();
@@ -350,6 +358,10 @@ public:
       m_undo = 0;
       return;
     }
+
+    shared_ptr<PathAnimation> animation =
+        PathAnimations::appStroke(TTool::getApplication(), m_strokeRef);
+
     QMutexLocker lock(vi->getMutex());
 
     // TStroke *oldStroke = new TStroke(*(vi->getStroke(m_selectedStroke)));
@@ -378,7 +390,8 @@ public:
       corners.push_back(0);
       detectCorners(m_strokeRef, 45, corners);
       corners.push_back(m_strokeRef->getChunkCount());
-      m_strokeRef->reduceControlPoints(2.0 * getPixelSize(), corners);
+      if (!animation->isActivated())
+        m_strokeRef->reduceControlPoints(2.0 * getPixelSize(), corners);
     } else {
       if (m_cpIndexMin < m_cpIndexMax) {
         std::vector<TThickPoint> hitPoints(m_cpIndexMax - m_cpIndexMin + 1);
@@ -392,7 +405,8 @@ public:
         corners.push_back(0);
         detectCorners(newStroke, 45, corners);
         corners.push_back(newStroke->getChunkCount());
-        newStroke->reduceControlPoints(2.0 * getPixelSize(), corners);
+        if (!animation->isActivated())
+          newStroke->reduceControlPoints(2.0 * getPixelSize(), corners);
 
         hitPoints.resize(m_cpIndexMin + newStroke->getControlPointCount() +
                          cpCount - 1 - m_cpIndexMax);
@@ -411,7 +425,8 @@ public:
           hitPoints[count++] = m_strokeRef->getControlPoint(i);
         }
 
-        m_strokeRef->reshape(&hitPoints[0], hitPoints.size());
+        if (!animation->isActivated())
+          m_strokeRef->reshape(&hitPoints[0], hitPoints.size());
         delete newStroke;
       } else {
         assert(m_cpIndexMin != m_cpIndexMax);
@@ -457,13 +472,13 @@ public:
           hitPoints[count++] = newStroke1->getControlPoint(i);
         }
 
-        m_strokeRef->reshape(&hitPoints[0], hitPoints.size());
+        if (!animation->isActivated())
+          m_strokeRef->reshape(&hitPoints[0], hitPoints.size());
         delete newStroke1;
         delete newStroke2;
       }
     }
 
-    PathAnimations::appClearAndSnapshot(TTool::getApplication(), m_strokeRef);
     invalidate();
 
     m_dragged = false;
@@ -474,6 +489,9 @@ public:
 
     TUndoManager::manager()->add(m_undo);
     m_undo = 0;
+
+    PathAnimations::appAnimations(TTool::getApplication())
+        ->removeStroke(m_oldStroke);
     delete m_oldStroke;
   }
 
@@ -499,7 +517,8 @@ public:
     if (vi->getNearestStroke(pos, pW, stroke, dist)) {
       m_draw             = true;
       TStroke *strokeRef = vi->getStroke(stroke);
-      m_cursor           = strokeRef->getThickPoint(pW);
+
+      m_cursor = strokeRef->getThickPoint(pW);
 
       m_selector.setStroke(strokeRef);
     } else {

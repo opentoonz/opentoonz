@@ -55,6 +55,8 @@
 using namespace ToolUtils;
 using namespace ToonzExt;
 
+#include <QApplication>
+
 // viene usato??
 class TGlobalChange;
 
@@ -325,6 +327,9 @@ void PinchTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
   TStroke *deactivateStroke          = m_deformation->deactivate();
   deactivateStroke->outlineOptions() = status->stroke2change_->outlineOptions();
+  deactivateStroke->setName(status->stroke2change_->name());
+  PathAnimations::copyAnimation(TTool::getApplication(), status->stroke2change_,
+                                deactivateStroke);
   PathAnimations::appAnimations(TTool::getApplication())
       ->removeStroke(status->stroke2change_);
   replaceStroke(status->stroke2change_, deactivateStroke, m_n, vi);

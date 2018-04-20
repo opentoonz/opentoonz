@@ -19,6 +19,9 @@
 
 using namespace ToolUtils;
 
+// Qt includes
+#include <QCoreApplication>  // For Qt translation support
+
 //=============================================================================
 namespace {
 
@@ -271,8 +274,12 @@ void BenderTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   std::vector<TStroke *> oldStrokesArray(m_changedStrokes.size());
 
   int i;
-  for (i               = 0; i < (int)m_changedStrokes.size(); i++)
-    oldStrokesArray[i] = new TStroke(*(vi->getStroke(m_changedStrokes[i])));
+  for (i = 0; i < (int)m_changedStrokes.size(); i++) {
+    TStroke *stroke    = vi->getStroke(m_changedStrokes[i]);
+    oldStrokesArray[i] = new TStroke(*stroke);
+    PathAnimations::copyAnimation(TTool::getApplication(), stroke,
+                                  oldStrokesArray[i]);
+  }
 
   if (3 == m_buttonDownCounter) {
     m_rotationVersus = 0.0;
@@ -342,7 +349,16 @@ void BenderTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
       } else {
         stroke->setSelfLoop(false);
       }
+      PathAnimations::copyAnimation(TTool::getApplication(), oldStrokesArray[i],
+                                    stroke);
+
+      if (m_directionIsChanged[i])
+        PathAnimations::changeChunkDirection(TTool::getApplication(), stroke);
+
       PathAnimations::appSnapshot(TTool::getApplication(), stroke);
+
+      PathAnimations::appAnimations(TTool::getApplication())
+          ->removeStroke(oldStrokesArray[i]);
     }
 
     vi->notifyChangedStrokes(m_changedStrokes, oldStrokesArray);

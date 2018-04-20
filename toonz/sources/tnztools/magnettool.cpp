@@ -403,7 +403,21 @@ public:
         ref->setSelfLoop(true);
       }
 
+      TStroke *oldStroke = new TStroke(*sc.m_parent);
+
+      PathAnimations::copyAnimation(TTool::getApplication(), sc.m_parent,
+                                    oldStroke);
+      ref->setName(sc.m_parent->name());
+
       sc.m_parent->swapGeometry(*ref);
+
+      PathAnimations::copyAnimation(TTool::getApplication(), oldStroke,
+                                    sc.m_parent);
+
+      PathAnimations::appAnimations(TTool::getApplication())
+          ->removeStroke(oldStroke);
+      delete oldStroke;
+
       PathAnimations::appSnapshot(TTool::getApplication(), sc.m_parent);
 
       delete ref;  // delete temporary curve

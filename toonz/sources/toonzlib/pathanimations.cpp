@@ -141,6 +141,33 @@ void PathAnimation::addChunk(const TThickQuadratic *chunk) {
   param->addParam(new TThickPointParam(chunk->getThickP2()), "point2");
 }
 
+bool PathAnimation::hasChunk(const TThickQuadratic *chunk) {
+  map<const TThickQuadratic *, TParamSetP>::iterator found =
+      m_lastChunks.find(chunk);
+
+  return (found != m_lastChunks.end());
+}
+
+void PathAnimation::setParams(TThickQuadratic *chunk, TParamSetP newParams) {
+  map<const TThickQuadratic *, TParamSetP>::iterator found =
+      m_lastChunks.find(chunk);
+
+  if (found == m_lastChunks.end()) return;
+
+  m_params->removeParam(found->second);
+  found->second = newParams;
+  m_params->addParam(newParams, "Chunk ?");
+}
+
+TParamSetP PathAnimation::getParams(TThickQuadratic *chunk) {
+  map<const TThickQuadratic *, TParamSetP>::iterator found =
+      m_lastChunks.find(chunk);
+
+  if (found == m_lastChunks.end()) return 0;
+
+  return found->second;
+}
+
 // while activated: sets a keyframe at current frame to match current curve
 // while deactivated: updates the curve to match current state
 void PathAnimation::snapshotCurrentChunks(int frame) {
@@ -319,6 +346,218 @@ bool PathAnimations::hasActivatedAnimations(const TXshCell cell) {
     if (animation->isActivated()) return true;
   }
   return false;
+}
+
+void PathAnimations::syncChunkCount(const TApplication *app, TStroke *lStroke,
+                                    TStroke *rStroke, bool switched) {
+  int lChunkCount = lStroke->getChunkCount();
+  int rChunkCount = rStroke->getChunkCount();
+
+  // No difference, do nothing
+  if (lChunkCount == rChunkCount) return;
+
+  // Let's call this function with the strokes switched
+  if (lChunkCount < rChunkCount) {
+    syncChunkCount(app, rStroke, lStroke, true);
+    return;
+  }
+
+  // Left stroke is the master and we want to add to the right stroke.
+
+  shared_ptr<PathAnimation> lAnimation = appStroke(app, lStroke);
+  shared_ptr<PathAnimation> rAnimation = appStroke(app, rStroke);
+
+  // Let's build a list of the right strokes at the different keyframes
+  std::vector<std::pair<TStroke *, int>> strokeList;
+
+  // Add what the stroke looks like at each keyframe
+  set<double> keyframes = rAnimation->getKeyframes();
+
+  TStroke *tmpStroke;
+
+  if (!switched && !keyframes.size()) {
+    tmpStroke = new TStroke(*rStroke);
+    std::pair<TStroke *, int> strokeAtkeyframe(tmpStroke, -1);
+    strokeList.push_back(strokeAtkeyframe);
+    keyframes.clear();
+  }
+
+  set<double>::iterator itf;
+  for (itf = keyframes.begin(); itf != keyframes.end(); itf++) {
+    tmpStroke = new TStroke(*rStroke);
+
+    // Take the original stroke and adjust control points per keyframe
+    // information
+    for (int i = 0; i < tmpStroke->getChunkCount(); i++) {
+      TParamSetP chunk = rAnimation->chunkParam(i);
+      if (!chunk) continue;
+      TThickQuadratic *quad = (TThickQuadratic *)tmpStroke->getChunk(i);
+      if (!quad) continue;
+      for (int j = 0; j < 3; j++) {
+        TThickPointParamP pointParam = chunk->getParam(j);
+        quad->setThickP(j, pointParam->getValue(*itf));
+      }
+    }
+    tmpStroke->invalidate();
+
+    std::pair<TStroke *, int> strokeAtkeyframe(tmpStroke, int(*itf));
+    strokeList.push_back(strokeAtkeyframe);
+  }
+
+  // Go through each stroke in the list and add missing chunks
+  double lMaxDist = lStroke->getLength();
+  double lDist, lDistPct;
+  for (int i = 0; i < strokeList.size(); i++) {
+    std::vector<double> newChunkPositions;
+    double rMaxDist = strokeList[i].first->getLength();
+    double rDist, rDistPct;
+    int lIdx = 0, rIdx = 0;
+
+    // Determine where the new chunks need to go on the right stroke
+    // relative to where chunks appear on the left stroke
+    rChunkCount   = strokeList[i].first->getChunkCount();
+    int insertCnt = 0;
+    for (rIdx = 0; rIdx < (rChunkCount + 1); rIdx++) {
+      const TThickQuadratic *rChunk = rStroke->getChunk(rIdx);
+
+      lDist          = lStroke->getLength(lIdx, 0.0);
+      lDistPct       = (lDist / lMaxDist) * 100.0;
+      rDist          = strokeList[i].first->getLength(rIdx, 0.0);
+      rDistPct       = (rDist / rMaxDist) * 100.0;
+      double pctDiff = rDistPct - lDistPct;
+
+      if (int(pctDiff) <= 3 && int(rDistPct) != 100) {
+        if (lIdx < lChunkCount) lIdx++;
+        continue;
+      }
+
+      while (insertCnt < (lChunkCount - rChunkCount) && lIdx < lChunkCount &&
+             (int(pctDiff) > 3 || int(rDistPct) == 100)) {
+        insertCnt++;
+        newChunkPositions.push_back((rMaxDist * (lDistPct / 100.0)));
+
+        lIdx++;
+        if (lIdx == lChunkCount) break;
+
+        lDist    = lStroke->getLength(lIdx, 0.0);
+        lDistPct = (lDist / lMaxDist) * 100.0;
+        pctDiff  = rDistPct - lDistPct;
+      }
+      if (lIdx < lChunkCount) lIdx++;
+    }
+
+    // Add the missing chunks to the right stroke now
+    for (int c = 0; c < newChunkPositions.size(); c++) {
+      strokeList[i].first->insertControlPointsAtLength(newChunkPositions[c]);
+      if (!i) rStroke->insertControlPointsAtLength(newChunkPositions[c]);
+    }
+    strokeList[i].first->invalidate();
+    if (!i) rStroke->invalidate();
+    rChunkCount = strokeList[i].first->getChunkCount();
+
+    // Rebuild right chunk params
+    for (int r = 0; r < rChunkCount; r++) {
+      const TThickQuadratic *rChunk  = rStroke->getChunk(r);
+      const TThickQuadratic *slChunk = strokeList[i].first->getChunk(r);
+
+      if (!rAnimation->hasChunk(rChunk)) rAnimation->addChunk(rChunk);
+
+      TParamSetP rParams = rAnimation->getParams((TThickQuadratic *)rChunk);
+      TParamSetP nParams = new TParamSet();
+      nParams->addParam(new TThickPointParam(slChunk->getThickP0()), "point0");
+      nParams->addParam(new TThickPointParam(slChunk->getThickP1()), "point1");
+      nParams->addParam(new TThickPointParam(slChunk->getThickP2()), "point2");
+
+      TThickPointParamP param0 = nParams->getParam(0);
+      TThickPointParamP param1 = nParams->getParam(1);
+      TThickPointParamP param2 = nParams->getParam(2);
+
+      if (strokeList[i].second >= 0) {
+        param0->setValue(strokeList[i].second, slChunk->getThickP0());
+        param1->setValue(strokeList[i].second, slChunk->getThickP1());
+        param2->setValue(strokeList[i].second, slChunk->getThickP2());
+      }
+
+      for (int p = 0; p < 3; p++) {
+        TThickPointParamP rParam = rParams->getParam(p);
+        TThickPointParamP nParam = nParams->getParam(p);
+        if (!rParam) continue;
+
+        if (!i) rParam->setDefaultValue(nParam->getDefaultValue());
+        if (strokeList[i].second >= 0)
+          rParam->setValue(strokeList[i].second,
+                           nParam->getValue(strokeList[i].second));
+      }
+
+      rAnimation->setParams((TThickQuadratic *)rChunk, rParams);
+    }
+
+    delete strokeList[i].first;
+  }
+}
+
+void PathAnimations::copyAnimation(const TApplication *app, TStroke *oStroke,
+                                   TStroke *cStroke) {
+  shared_ptr<PathAnimation> oAnimation = appStroke(app, oStroke);
+  shared_ptr<PathAnimation> cAnimation = appStroke(app, cStroke);
+
+  if (!oAnimation->isActivated()) return;
+
+  oAnimation->updateChunks();
+  cAnimation->updateChunks();
+
+  if (!cAnimation->isActivated()) cAnimation->toggleActivated();
+
+  int oChunkCount = oStroke->getChunkCount();
+  int cChunkCount = cStroke->getChunkCount();
+
+  if (oChunkCount != cChunkCount) {
+    syncChunkCount(app, oStroke, cStroke);
+
+    oChunkCount = oStroke->getChunkCount();
+    cChunkCount = cStroke->getChunkCount();
+  }
+
+  if (oChunkCount != cChunkCount) return;
+
+  cAnimation->clearKeyframes();
+
+  for (int i = 0; i < oChunkCount; i++) {
+    const TThickQuadratic *oChunk = oStroke->getChunk(i);
+    const TThickQuadratic *cChunk = cStroke->getChunk(i);
+    if (!oChunk) continue;
+
+    if (!cChunk) cAnimation->addChunk(cChunk);
+
+    TParamSetP oParams = oAnimation->getParams((TThickQuadratic *)oChunk);
+    cAnimation->setParams((TThickQuadratic *)cChunk, oParams);
+  }
+}
+
+void PathAnimations::changeChunkDirection(const TApplication *app,
+                                          TStroke *stroke) {
+  shared_ptr<PathAnimation> animation = appStroke(app, stroke);
+
+  if (!animation->isActivated()) return;
+
+  int chunkCount = stroke->getChunkCount();
+
+  std::vector<TParamSetP> paramSet;
+
+  for (int i = 0; i < chunkCount; i++) {
+    const TThickQuadratic *chunk = stroke->getChunk(i);
+    TParamSetP params = animation->getParams((TThickQuadratic *)chunk);
+    paramSet.push_back(params);
+  }
+
+  std::reverse(paramSet.begin(), paramSet.end());
+
+  for (int i = 0; i < chunkCount; i++) {
+    const TThickQuadratic *chunk = stroke->getChunk(i);
+    animation->setParams((TThickQuadratic *)chunk, paramSet[i]);
+  }
+
+  animation->updateChunks();
 }
 
 void PathAnimations::loadData(TIStream &is) {

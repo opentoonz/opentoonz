@@ -87,6 +87,11 @@ public:
   void updateChunks();
   //! add chunk to collection, only if not present yet
   void addChunk(const TThickQuadratic *chunk);
+  bool hasChunk(const TThickQuadratic *chunk);
+
+  void setParams(TThickQuadratic *chunk, TParamSetP newParams);
+  TParamSetP getParams(TThickQuadratic *chunk);
+
   //! remember position of specified chunk
   void snapshotChunk(const TThickQuadratic *chunk, int frame);
 
@@ -106,7 +111,7 @@ public:
 
   void animate(int frame) const;
 
-private:
+  // private:
   //! updates chunk animation info
   void snapshotCurrentChunks(int atFrame);
   //! remember position of specified thick point
@@ -129,6 +134,12 @@ public:
   shared_ptr<PathAnimation> stroke(const StrokeId &strokeId) const;
   shared_ptr<PathAnimation> addStroke(const StrokeId &strokeId);
   void removeStroke(const TStroke *stroke);
+
+  static void syncChunkCount(const TApplication *app, TStroke *lStroke,
+                             TStroke *rStroke, bool switched = false);
+  static void copyAnimation(const TApplication *app, TStroke *oStroke,
+                            TStroke *cStroke);
+  static void changeChunkDirection(const TApplication *app, TStroke *stroke);
 
   //! update all animatied strokes to match specified frame
   void setFrame(TVectorImage *vi, const TXshCell &cell, int frame);
