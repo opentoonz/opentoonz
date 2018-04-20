@@ -27,6 +27,9 @@
 
 using namespace ToolUtils;
 
+// Qt includes
+#include <QCoreApplication>  // For Qt translation support
+
 //=============================================================================
 namespace {
 
@@ -167,13 +170,15 @@ public:
 
   ToonzExt::Selector m_selector;
   bool m_draw;  //!< Should be removed...?
+  bool m_strokeLocked;
 
   CutterTool()
       : TTool("T_Cutter")
       , m_mouseDown(false)
       , m_cursorId(ToolCursor::CutterCursor)
       , m_draw(false)
-      , m_selector(500, 10, 1000) {
+      , m_selector(500, 10, 1000)
+      , m_strokeLocked(false) {
     bind(TTool::VectorImage);
   }
 
@@ -204,6 +209,7 @@ public:
   }
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
+    if (m_strokeLocked) return;
     TVectorImageP vi = TImageP(getImage(true));
     if (!vi) return;
     QMutexLocker sl(vi->getMutex());
@@ -313,11 +319,19 @@ public:
 
     m_selector.setStroke(0);
 
+    m_strokeLocked = false;
     if (vi->getNearestStroke(pos, pW, stroke, dist)) {
       TStroke *strokeRef = vi->getStroke(stroke);
-      m_speed            = strokeRef->getSpeed(pW);
-      m_cursor           = strokeRef->getThickPoint(pW);
-      m_pW               = pW;
+
+      shared_ptr<PathAnimation> animation =
+          PathAnimations::appStroke(TTool::getApplication(), strokeRef);
+      if (animation->isActivated()) {
+        m_strokeLocked = true;
+      }
+
+      m_speed  = strokeRef->getSpeed(pW);
+      m_cursor = strokeRef->getThickPoint(pW);
+      m_pW     = pW;
 
       m_selector.setStroke(strokeRef);
     } else {
@@ -341,7 +355,10 @@ public:
       m_cursorId = ToolCursor::CURSOR_NO;
   }
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (m_strokeLocked) return ToolCursor::ForbiddenCursor;
+    return m_cursorId;
+  }
 
   ToonzExt::Selector *getSelector() {
     return (m_draw ? &m_selector : (ToonzExt::Selector *)0);

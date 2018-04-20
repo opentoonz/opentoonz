@@ -282,7 +282,12 @@ public:
 
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const override { return ToolCursor::EraserCursor; }
+  int getCursorId() const override {
+    if (m_strokeLocked) return ToolCursor::ForbiddenCursor;
+    return ToolCursor::EraserCursor;
+    ;
+  }
+
   void onImageChanged() override;
 
   /*-- ドラッグ中にツールが切り替わった場合、Eraseの終了処理を行う --*/
@@ -334,6 +339,8 @@ private:
   ToonzExt::Selector m_selector;
   bool m_draw;  //!< Should be removed...?
 
+  bool m_strokeLocked;
+
 private:
   void resetMulti();
 
@@ -379,7 +386,8 @@ EraserTool::EraserTool()
     , m_active(false)
     , m_firstTime(true)
     , m_draw(false)
-    , m_selector(500, 10, 1000) {
+    , m_selector(500, 10, 1000)
+    , m_strokeLocked(false) {
   bind(TTool::VectorImage);
 
   m_prop.bind(m_toolSize);
@@ -810,6 +818,8 @@ void EraserTool::stopErase(TVectorImageP vi) {
 //-----------------------------------------------------------------------------
 
 void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  if (m_strokeLocked) return;
+
   m_brushPos = m_mousePos = pos;
 
   m_active = true;
@@ -1057,6 +1067,7 @@ void EraserTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
   m_selector.setStroke(0);
   if (!m_draw) m_draw = true;
+  m_strokeLocked      = false;
   TVectorImageP vi    = TImageP(getImage(true));
   if (vi) {
     // select nearest stroke and finds its parameter
@@ -1065,6 +1076,12 @@ void EraserTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
     if (vi->getNearestStroke(pos, pW, stroke, dist)) {
       TStroke *strokeRef = vi->getStroke(stroke);
+
+      shared_ptr<PathAnimation> animation =
+          PathAnimations::appStroke(TTool::getApplication(), strokeRef);
+      if (m_eraseType.getValue() == NORMAL_ERASE && animation->isActivated()) {
+        m_strokeLocked = true;
+      }
       m_selector.setStroke(strokeRef);
     }
   }

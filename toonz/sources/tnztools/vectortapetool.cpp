@@ -20,6 +20,8 @@
 #include "toonz/tstageobject.h"
 #include "tools/toolhandle.h"
 #include "toonz/stage2.h"
+#include "toonz/pathanimations.h"
+
 #include "tenv.h"
 
 #include "ext/Selector.h"
@@ -198,6 +200,9 @@ class VectorTapeTool final : public TTool {
 
   ToonzExt::Selector m_selector;
 
+  bool m_stroke1Locked;
+  bool m_stroke2Locked;
+
 public:
   VectorTapeTool()
       : TTool("T_Tape")
@@ -216,7 +221,9 @@ public:
       , m_firstTime(true)
       , m_selectionRect()
       , m_startRect()
-      , m_selector(500, 10, 1000) {
+      , m_selector(500, 10, 1000)
+      , m_stroke1Locked(false)
+      , m_stroke2Locked(false) {
     bind(TTool::Vectors);
 
     m_prop.bind(m_type);
@@ -326,12 +333,25 @@ public:
 
     m_selector.setStroke(0);
     if (!m_draw) m_draw = true;
+    if (!m_secondPoint) {
+      m_stroke1Locked = false;
+      m_stroke2Locked = false;
+    }
     // select nearest stroke and finds its parameter
     double dist, pW;
     UINT strokeIdx;
 
     if (vi->getNearestStroke(pos, pW, strokeIdx, dist)) {
       TStroke *strokeRef = vi->getStroke(strokeIdx);
+
+      if (!m_secondPoint) {
+        shared_ptr<PathAnimation> animation =
+            PathAnimations::appStroke(TTool::getApplication(), strokeRef);
+        if (animation->isActivated() && m_mode.getValue() != LINE2LINE &&
+            m_joinStrokes.getValue() == true) {
+          m_stroke1Locked = true;
+        }
+      }
       m_selector.setStroke(strokeRef);
     }
 
@@ -399,6 +419,8 @@ public:
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     if (!(TVectorImageP)getImage(false)) return;
 
+    if (m_stroke1Locked) return;
+
     if (m_type.getValue() == RECT) {
       m_startRect = pos;
     } else if (m_strokeIndex1 != -1)
@@ -435,6 +457,7 @@ public:
     for (i = 0; i < strokeNumber; i++) {
       if (!vi->sameGroup(m_strokeIndex1, i)) continue;
       stroke = vi->getStroke(i);
+
       if (m_mode.getValue() != POINT2POINT) {
         if (stroke->getNearestW(pos, outW, distance2) &&
             distance2 < minDistance2) {
@@ -468,6 +491,21 @@ public:
             m_w2           = 1.0;
           }
         }
+      }
+    }
+
+    if (m_strokeIndex2 != -1) {
+      TStroke *strokeRef = vi->getStroke(m_strokeIndex2);
+
+      m_stroke2Locked                      = false;
+      shared_ptr<PathAnimation> animation1 = PathAnimations::appStroke(
+          TTool::getApplication(), vi->getStroke(m_strokeIndex1));
+      shared_ptr<PathAnimation> animation2 =
+          PathAnimations::appStroke(TTool::getApplication(), strokeRef);
+      if ((animation1->isActivated() || animation2->isActivated()) &&
+          m_joinStrokes.getValue() == true &&
+          ((m_w1 == 0.0 || m_w1 == 1.0) && (m_w2 == 0.0 || m_w2 == 1.0))) {
+        m_stroke2Locked = true;
       }
     }
 
@@ -634,6 +672,15 @@ public:
     getClosingPoints(rect, m_autocloseFactor.getValue(), vi, startPoints,
                      endPoints);
 
+    std::vector<std::pair<int, double>> startPointsTmp, endPointsTmp;
+    for (UINT i = 0; i < startPoints.size(); i++)
+      startPointsTmp.push_back(startPoints[i]);
+    startPoints = startPointsTmp;
+
+    for (UINT i = 0; i < endPoints.size(); i++)
+      endPointsTmp.push_back(endPoints[i]);
+    endPoints = endPointsTmp;
+
     assert(startPoints.size() == endPoints.size());
 
     std::vector<TPointD> startP(startPoints.size()), endP(startPoints.size());
@@ -653,7 +700,17 @@ public:
       m_strokeIndex2 = endPoints[i].first;
       m_w1           = startPoints[i].second;
       m_w2           = endPoints[i].second;
-      int type       = doTape(vi, fillInformation, m_joinStrokes.getValue());
+
+      shared_ptr<PathAnimation> animation1 = PathAnimations::appStroke(
+          TTool::getApplication(), vi->getStroke(m_strokeIndex1));
+      shared_ptr<PathAnimation> animation2 = PathAnimations::appStroke(
+          TTool::getApplication(), vi->getStroke(m_strokeIndex2));
+      if ((animation1->isActivated() || animation2->isActivated()) &&
+          m_joinStrokes.getValue() == true &&
+          ((m_w1 == 0.0 || m_w1 == 1.0) && (m_w2 == 0.0 || m_w2 == 1.0)))
+        continue;
+
+      int type = doTape(vi, fillInformation, m_joinStrokes.getValue());
       if (type == p2p && m_strokeIndex1 != m_strokeIndex2) {
         for (UINT j = i + 1; j < startPoints.size(); j++) {
           rearrangeClosingPoints(vi, startPoints[j], startP[j]);
@@ -712,6 +769,8 @@ public:
 
   void leftButtonUp(const TPointD &, const TMouseEvent &) override {
     TVectorImageP vi(getImage(true));
+
+    if (m_stroke1Locked || m_stroke2Locked) return;
 
     if (vi && m_type.getValue() == RECT) {
       tapeRect(vi, m_selectionRect);
@@ -777,6 +836,8 @@ public:
   }
 
   int getCursorId() const override {
+    if (m_stroke1Locked || m_stroke2Locked) return ToolCursor::ForbiddenCursor;
+
     int ret                            = ToolCursor::TapeCursor;
     if (m_type.getValue() == RECT) ret = ret | ToolCursor::Ex_Rectangle;
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
