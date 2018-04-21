@@ -532,16 +532,14 @@ std::string TFilePath::getDots() const {
   i = str.rfind(L".");
   if (i == (int)std::wstring::npos || str == L"..") return "";
 
-  if (str.substr(0, i).rfind(L".") != std::wstring::npos)
-    return "..";
-  else if (m_underscoreFormatAllowed) {
-    int j = str.substr(0, i).rfind(L"_");
-    /*-- j == i-1は、フレーム番号を抜いて"A_.tga"のような場合の条件 --*/
-    return (j != (int)std::wstring::npos &&
-            (j == i - 1 || (checkForSeqNum(type) && isNumbers(str, j, i))))
-               ? ".."
-               : ".";
-  } else
+  int j = str.substr(0, i).rfind(L".");
+  if (j == (int)std::wstring::npos && m_underscoreFormatAllowed)
+    j = str.substr(0, i).rfind(L"_");
+
+  if (j != (int)std::wstring::npos)
+    return (j == i - 1 || (checkForSeqNum(type) && isNumbers(str, j, i))) ? ".."
+                                                                          : ".";
+  else
     return ".";
 }
 
@@ -811,7 +809,8 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
   if (!isFfmpegType() && checkForSeqNum(type) && isNumbers(str, k, j))
     hasValidFrameNum = true;
   std::string frameString;
-  if (frame.isNoFrame() || (!frame.isEmptyFrame() && !hasValidFrameNum)) {
+  if (frame.isNoFrame() ||
+      (!frame.isEmptyFrame() && getDots() != "." && !hasValidFrameNum)) {
     if (k != (int)std::wstring::npos) {
       std::wstring wstr = str.substr(k, j - k);
       std::string str2(wstr.begin(), wstr.end());
