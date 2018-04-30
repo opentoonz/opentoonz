@@ -13,6 +13,11 @@ Please use the SEARCH function before opening a new issue!
 ### --Steps to reproduce--
 <!-- Describe the steps to reproduce the problem, more steps are better. -->
 
+### --Actual Results--
+<!-- Explain what you actually got. -->
+
+### --Expected Results--
+<!-- Explain how the program should behave in the context you're using it. -->
 
 ### --System Information--
 + OpenToonz Version:
@@ -21,17 +26,14 @@ Please use the SEARCH function before opening a new issue!
 + Operating System:
 <!-- (e.g., Windows10, macOS 10.12, Ubuntu 16.04, Debian Stretch) -->
 
-+ RAM Size:
-<!-- (4GB, 8GB etc.) -->
 
-+ Graphics Tablet:
++ Other Device Info (Optional):
+
+* RAM Size  4GB, 8GB, 16GB:
+
+* Graphics Tablet:
 <!-- (Optional) (Write your MODEL, e.g., WACOM Intuos 2) -->
 
-### --Actual Results--
-<!-- Explain what you actually got. -->
-
-### --Expected Results--
-<!-- Explain how the program should behave in the context you're using it. -->
 
 
 ---
