@@ -226,7 +226,7 @@ Preferences::Preferences()
     , m_scanLevelType("tif")
 #ifdef _WIN32
     , m_interfaceFont("Segoe UI")
-#elif Q_OS_MACOS
+#elif defined Q_OS_MACOS
     , m_interfaceFont("Helvetica Neue")
 #else
     , m_interfaceFont("Helvetica")
