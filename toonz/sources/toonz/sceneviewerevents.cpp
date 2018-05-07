@@ -796,6 +796,9 @@ void SceneViewer::resetTabletStatus() {
 
 void SceneViewer::wheelEvent(QWheelEvent *event) {
   if (m_freezedStatus != NO_FREEZED) return;
+  // Trackpad invokes wheel event by two finger scrolling and may conflict with
+  // OT's touch gestures. So reject wheel event if gesture is active.
+  if (m_gestureActive) return;
 
   int delta = 0;
   switch (event->source()) {
