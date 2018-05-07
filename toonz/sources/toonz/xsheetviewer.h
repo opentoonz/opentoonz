@@ -11,6 +11,7 @@
 #include "xshrowviewer.h"
 #include "xshnoteviewer.h"
 #include "xshtoolbar.h"
+#include "layerfooterpanel.h"
 #include "cellkeyframeselection.h"
 #include "saveloadqsettings.h"
 #include "toonzqt/spreadsheetviewer.h"
@@ -497,6 +498,7 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   XsheetGUI::CellArea *m_cellArea;
   XsheetGUI::NoteArea *m_noteArea;
   XsheetGUI::XSheetToolbar *m_toolbar;
+  LayerFooterPanel *m_layerFooterPanel;
 
   Spreadsheet::FrameScroller m_frameScroller;
 
@@ -526,7 +528,6 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   QString m_xsheetLayout;
 
   int m_frameZoomFactor;
-  QSlider *m_frameZoomSlider;
 
 public:
   enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
@@ -1095,8 +1096,6 @@ protected:
   void scrollToRow(int row);
   void scrollToVerticalRange(int y0, int y1);
 
-  void paintEvent(QPaintEvent *) override;
-
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
   void resizeEvent(QResizeEvent *event) override;
@@ -1147,9 +1146,6 @@ public slots:
   int getFrameZoomAdjustment();
 
   void zoomOnFrame(int frame, int factor);
-
-  void onFrameZoomSliderValueChanged(int val);
-  void onFrameZoomSliderReleased();
 };
 
 #endif  // XSHEETVIEWER_H

@@ -457,5 +457,7 @@
       <file>Resources/refresh_over.svg</file>
       <file>Resources/zoom_in.svg</file>
       <file>Resources/zoom_out.svg</file>
+      <file>Resources/zoom_in_rollover.svg</file>
+      <file>Resources/zoom_out_rollover.svg</file>
     </qresource>
 </RCC>

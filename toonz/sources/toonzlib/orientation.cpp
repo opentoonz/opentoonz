@@ -676,6 +676,12 @@ TopToBottomOrientation::TopToBottomOrientation() {
             QRect(soundTopLeft, QSize(TRACKLEN, 3)));
   }
 
+  // Layer footer panel
+  addRect(PredefinedRect::LAYER_FOOTER_PANEL, QRect(0, 0, -1, -1));  // hide
+  addRect(PredefinedRect::ZOOM_SLIDER, QRect(0, 0, -1, -1));
+  addRect(PredefinedRect::ZOOM_IN, QRect(0, 0, -1, -1));
+  addRect(PredefinedRect::ZOOM_OUT, QRect(0, 0, -1, -1));
+
   //
   // Lines
   //
@@ -992,6 +998,25 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::VOLUME_TRACK,
           QRect(soundTopLeft, QSize(TRACKLEN, 3)));
 
+  // Layer footer panel
+  QRect layerFooterPanel(QRect(0, 0, LAYER_HEADER_WIDTH + 2, 16));
+  addRect(PredefinedRect::LAYER_FOOTER_PANEL, layerFooterPanel);
+
+  QRect zoomSlider, zoomIn, zoomOut;
+
+  zoomSlider = QRect(layerFooterPanel.width() - 100, 0, 81, 16);
+  addRect(PredefinedRect::ZOOM_SLIDER_AREA, zoomSlider);
+  addRect(PredefinedRect::ZOOM_SLIDER, zoomSlider.adjusted(1, 0, 0, 0));
+
+  zoomIn = QRect(zoomSlider.right() + 1, 0, 16, 16);
+  addRect(PredefinedRect::ZOOM_IN_AREA, zoomIn);
+  addRect(PredefinedRect::ZOOM_IN, zoomIn.adjusted(1, 1, 0, 0));
+
+  zoomOut = QRect(zoomSlider.left() - 16, 0, 16, 16);
+  addRect(PredefinedRect::ZOOM_OUT_AREA, zoomOut);
+  addRect(PredefinedRect::ZOOM_OUT, zoomOut.adjusted(1, 1, 0, 0));
+
+  // Flags
   addFlag(PredefinedFlag::DRAG_LAYER_BORDER, false);
   addFlag(PredefinedFlag::DRAG_LAYER_VISIBLE, true);
   addFlag(PredefinedFlag::LAYER_NAME_BORDER, false);
