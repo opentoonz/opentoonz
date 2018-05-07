@@ -39,6 +39,11 @@
 #include <string>
 
 std::map<std::string, PluginInformation *> plugin_dict_;
+const int RECENT_FXS_CAPACITY = 10;
+QString recentFxs[RECENT_FXS_CAPACITY];
+QMenu* insertFxRecentMenu;
+QMenu* addFxRecentMenu;
+QMenu* replaceFxRecentMenu;
 
 namespace {
 
@@ -158,6 +163,23 @@ AddFxContextMenu::AddFxContextMenu()
     : QObject(), m_app(0), m_currentCursorScenePos(0, 0), m_againCommand(0) {
   m_fxListPath = TFilePath(ToonzFolder::getProfileFolder() + "layouts" + "fxs" +
                            "fxs.lst");
+  m_usrFxListPath = TFilePath(ToonzFolder::getMyModuleDir() + "recentFxs.lst");
+
+  if (!TFileStatus(m_usrFxListPath).doesExist()) {
+	  TOStream os(m_usrFxListPath, false);
+	  os.openChild("fxs");
+	  os.openChild("Recent");
+	  for (int i = 0; i < RECENT_FXS_CAPACITY; i++);
+	  os << std::string("");
+	  os.closeChild();
+	  os.openChild("Favorites");
+	  os << std::string("");
+	  os.closeChild();
+	  os.closeChild();
+  }
+  
+  std::fill_n(recentFxs, 10, QString(""));
+
   m_presetPath = TFilePath(ToonzFolder::getFxPresetFolder() + "presets");
 
   m_insertMenu         = new QMenu(tr("Insert FX"), 0);
@@ -204,7 +226,8 @@ void AddFxContextMenu::setApplication(TApplication *app) {
 //---------------------------------------------------
 
 void AddFxContextMenu::fillMenus() {
-  loadFxs();
+  loadFxs(m_usrFxListPath);
+  loadFxs(m_fxListPath);
   loadMacro();
 }
 
@@ -228,8 +251,8 @@ void AddFxContextMenu::result(PluginInformation *pi) {
 
 void AddFxContextMenu::fixup() { loadFxPluginGroup(); }
 
-void AddFxContextMenu::loadFxs() {
-  TIStream is(m_fxListPath);
+void AddFxContextMenu::loadFxs(TFilePath fxList) {
+  TIStream is(fxList);
 
   try {
     std::string tagName;
@@ -261,6 +284,9 @@ void AddFxContextMenu::loadFxPluginGroup() {
 }
 
 void AddFxContextMenu::loadFxGroup(TIStream *is) {
+  bool hasRecentFxs = false;
+  bool hasFavoriteFxs = false;
+	
   while (!is->eos()) {
     std::string tagName;
     if (is->matchTag(tagName)) {
@@ -271,13 +297,45 @@ void AddFxContextMenu::loadFxGroup(TIStream *is) {
       std::unique_ptr<QMenu> replaceFxGroup(
           new QMenu(groupName, m_replaceMenu));
 
-      loadFx(is, insertFxGroup.get(), addFxGroup.get(), replaceFxGroup.get());
+	  if (tagName == "Recent") {
+          createDefaultAction(insertFxGroup.get(), addFxGroup.get(),
+                              replaceFxGroup.get());
+		  insertFxRecentMenu = insertFxGroup.get();
+		  addFxRecentMenu = addFxGroup.get();
+		  replaceFxRecentMenu = replaceFxGroup.get();
+		  hasRecentFxs = true;
+	  }
+	  if (tagName == "Favorites") {
+		  createDefaultAction(insertFxGroup.get(), addFxGroup.get(),
+                              replaceFxGroup.get());
+		  hasFavoriteFxs = true;
+	  }
 
-      if (!insertFxGroup->isEmpty())
-        m_insertMenu->addMenu(insertFxGroup.release());
-      if (!addFxGroup->isEmpty()) m_addMenu->addMenu(addFxGroup.release());
-      if (!replaceFxGroup->isEmpty())
-        m_replaceMenu->addMenu(replaceFxGroup.release());
+      loadFx(is, insertFxGroup.get(), addFxGroup.get(), replaceFxGroup.get(), 
+		  hasRecentFxs, hasFavoriteFxs);
+
+	  hasRecentFxs = false;
+	  hasFavoriteFxs = false;
+
+	  if (!insertFxGroup->isEmpty()) {
+		  m_insertMenu->addMenu(insertFxGroup.release());
+    //      QAction* insertFxRecentGroup = m_insertMenu->addMenu(
+    //                                     insertFxGroup.release());
+		  //insertFxRecentMenu = insertFxRecentGroup->menu();
+	  }
+        
+	  if (!addFxGroup->isEmpty()) {
+		  m_addMenu->addMenu(addFxGroup.release());
+		  //QAction* addFxRecentGroup = m_addMenu->addMenu(addFxGroup.release());
+		  //addFxRecentMenu = addFxRecentGroup->menu();
+	  }
+
+	  if (!replaceFxGroup->isEmpty()) {
+		  m_replaceMenu->addMenu(replaceFxGroup.release());
+		  //QAction* replaceFxRecentGroup = m_replaceMenu->addMenu(
+    //                                      replaceFxGroup.release());
+		  //replaceFxRecentMenu = replaceFxRecentGroup->menu();
+	  }
 
       is->closeChild();
     }
@@ -364,13 +422,28 @@ void AddFxContextMenu::loadFxPlugins(QMenu *insertFxGroup, QMenu *addFxGroup,
 }
 
 void AddFxContextMenu::loadFx(TIStream *is, QMenu *insertFxGroup,
-                              QMenu *addFxGroup, QMenu *replaceFxGroup) {
+                              QMenu *addFxGroup, QMenu *replaceFxGroup,
+                              bool hasRecentFxs, bool hasFavoriteFxs) {
+  int i = 0;
+  
+  if (hasRecentFxs) {
+	insertFxGroup->clear();
+	addFxGroup->clear();
+	replaceFxGroup->clear();
+  }
+  if (hasFavoriteFxs) {
+	insertFxGroup->clear();
+	addFxGroup->clear();
+	replaceFxGroup->clear();
+	hasFavoriteFxs = false;
+  }
   while (!is->eos()) {
     std::string fxName;
     *is >> fxName;
 
     if (!fxName.empty()) {
       if (!loadPreset(fxName, insertFxGroup, addFxGroup, replaceFxGroup)) {
+
         QString translatedName =
             QString::fromStdWString(TStringTable::translate(fxName));
 
@@ -389,9 +462,59 @@ void AddFxContextMenu::loadFx(TIStream *is, QMenu *insertFxGroup,
         m_insertActionGroup->addAction(insertAction);
         m_addActionGroup->addAction(addAction);
         m_replaceActionGroup->addAction(replaceAction);
+
+		if (hasRecentFxs && i < RECENT_FXS_CAPACITY) {
+			recentFxs[i] = QString::fromStdString(fxName);
+			i++;
+		}
       }
     }
   }
+}
+
+void AddFxContextMenu::loadRecentFxs(QString fxArray[], QMenu *insertFxGroup,
+                                     QMenu *addFxGroup, QMenu *replaceFxGroup,
+                                     bool hasRecentFxs, bool hasFavoriteFxs) {
+	for (int i = 0; i < RECENT_FXS_CAPACITY; i++) {
+		QString recentFxName = fxArray[i];
+		std::string fxName = recentFxName.toStdString();
+
+		if (!recentFxName.isEmpty() && !recentFxName.isNull()
+			&& recentFxName != QString("")) {
+			if (!loadPreset(fxName, insertFxGroup, addFxGroup, replaceFxGroup)) {
+				if (hasRecentFxs) {
+					insertFxGroup->clear();
+					addFxGroup->clear();
+					replaceFxGroup->clear();
+					hasRecentFxs = false;
+				}
+				if (hasFavoriteFxs) {
+					insertFxGroup->clear();
+					addFxGroup->clear();
+					replaceFxGroup->clear();
+					hasFavoriteFxs = false;
+				}
+				QString translatedName =
+					QString::fromStdWString(TStringTable::translate(fxName));
+
+				QAction *insertAction = new QAction(translatedName, insertFxGroup);
+				QAction *addAction = new QAction(translatedName, addFxGroup);
+				QAction *replaceAction = new QAction(translatedName, replaceFxGroup);
+
+				insertAction->setData(QVariant(recentFxName));
+				addAction->setData(QVariant(recentFxName));
+				replaceAction->setData(QVariant(recentFxName));
+
+				insertFxGroup->addAction(insertAction);
+				addFxGroup->addAction(addAction);
+				replaceFxGroup->addAction(replaceAction);
+
+				m_insertActionGroup->addAction(insertAction);
+				m_addActionGroup->addAction(addAction);
+				m_replaceActionGroup->addAction(replaceAction);
+			}
+		}
+	}
 }
 
 //---------------------------------------------------
@@ -535,9 +658,14 @@ void AddFxContextMenu::onInsertFx(QAction *action) {
                          m_app->getCurrentColumn()->getColumnIndex(),
                          m_app->getCurrentFrame()->getFrameIndex());
     m_app->getCurrentXsheet()->notifyXsheetChanged();
+
     // memorize the latest operation
-    m_app->getCurrentFx()->setPreviousActionString(QString("I ") +
-                                                   action->data().toString());
+	QString actionName = action->data().toString();
+
+	refreshRecentFxs(actionName);
+
+	m_app->getCurrentFx()->setPreviousActionString(QString("I ") +
+		actionName);
   }
 }
 
@@ -574,9 +702,14 @@ void AddFxContextMenu::onAddFx(QAction *action) {
     }
 
     m_app->getCurrentXsheet()->notifyXsheetChanged();
+
     // memorize the latest operation
+	QString actionName = action->data().toString();
+
+	refreshRecentFxs(actionName);
+
     m_app->getCurrentFx()->setPreviousActionString(QString("A ") +
-                                                   action->data().toString());
+                                                   actionName);
   }
 }
 
@@ -590,9 +723,14 @@ void AddFxContextMenu::onReplaceFx(QAction *action) {
     TFxCommand::replaceFx(fx, fxs, m_app->getCurrentXsheet(),
                           m_app->getCurrentFx());
     m_app->getCurrentXsheet()->notifyXsheetChanged();
+
     // memorize the latest operation
-    m_app->getCurrentFx()->setPreviousActionString(QString("R ") +
-                                                   action->data().toString());
+	QString actionName = action->data().toString();
+
+	refreshRecentFxs(actionName);
+
+	m_app->getCurrentFx()->setPreviousActionString(QString("R ") +
+		actionName);
   }
 }
 
@@ -668,4 +806,63 @@ void AddFxContextMenu::onAgainCommand() {
   } else if (m_againCommand->text().startsWith("Replace")) {
     onReplaceFx(m_againCommand);
   }
+}
+
+//---------------------------------------------------
+
+void AddFxContextMenu::createDefaultAction(QMenu *insertFxGroup, QMenu *addFxGroup,
+                         QMenu *replaceFxGroup) {
+	QString noFxsFound = QString::fromStdWString(TStringTable::translate(
+		"No FXs found."));
+
+	QAction *insertAction = new QAction(noFxsFound);
+	QAction *addAction = new QAction(noFxsFound);
+	QAction *replaceAction = new QAction(noFxsFound);
+
+	insertAction->setEnabled(false);
+	addAction->setEnabled(false);
+	replaceAction->setEnabled(false);
+
+	insertFxGroup->addAction(insertAction);
+	addFxGroup->addAction(addAction);
+	replaceFxGroup->addAction(replaceAction);
+}
+
+void AddFxContextMenu::saveUsrFxList() {
+	//if (!TFileStatus(m_usrFxListPath).doesExist()) {
+	//	TOStream os(m_usrFxListPath, false);
+	//	os.openChild("fxs");
+	//	os.openChild("Recent");
+	//	for (int i = 0; i < RECENT_FXS_CAPACITY; i++);
+	//	os << std::string("");
+	//	os.closeChild();
+	//	os.openChild("Favorites");
+	//	os << std::string("");
+	//	os.closeChild();
+	//	os.closeChild();
+	//}
+
+
+}
+
+void AddFxContextMenu::refreshRecentFxs(QString actionName) {
+	for (int i = 0; i < (RECENT_FXS_CAPACITY - 1); i++) {
+		if (recentFxs[i] == actionName) {
+			for (int j = i; j < (RECENT_FXS_CAPACITY - i - 1); j++) {
+				recentFxs[j] = recentFxs[j + 1];
+			}
+			recentFxs[(RECENT_FXS_CAPACITY - i - 1)] = QString("");
+		}
+	}
+	
+	QString a[RECENT_FXS_CAPACITY] = {actionName};
+
+	for (int j = 0; j < (RECENT_FXS_CAPACITY - 1); j++) {
+		a[j + 1] = recentFxs[j];
+	}
+
+	std::copy(a, a + RECENT_FXS_CAPACITY, recentFxs);
+
+	loadRecentFxs(recentFxs, insertFxRecentMenu, addFxRecentMenu,
+                  replaceFxRecentMenu, true, false);
 }

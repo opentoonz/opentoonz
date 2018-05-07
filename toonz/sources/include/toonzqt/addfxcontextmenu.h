@@ -28,14 +28,16 @@ class AddFxContextMenu final : public QObject {
   Q_OBJECT
 
   QMenu *m_insertMenu, *m_addMenu, *m_replaceMenu;
-  TFilePath m_fxListPath, m_presetPath;
+  TFilePath m_fxListPath, m_usrFxListPath, m_presetPath;
   QActionGroup *m_insertActionGroup, *m_addActionGroup, *m_replaceActionGroup;
   TApplication *m_app;
   FxSelection *m_selection;
   // in order to add fx at the cursor position
   QPointF m_currentCursorScenePos;
-  // for reproduce the last added fx
+  // to reproduce the last added fx
   QAction *m_againCommand;
+  // to save recently-used FXs
+  QList<QString> m_recentFxsNames;
 
 public:
   AddFxContextMenu();
@@ -57,16 +59,23 @@ public:
 
 private:
   void fillMenus();
-  void loadFxs();
+  void loadFxs(TFilePath fxList);
   void loadFxGroup(TIStream *is);
   void loadFx(TIStream *is, QMenu *insertFxGroup, QMenu *addFxGroup,
-              QMenu *replaceFxGroup);
+              QMenu *replaceFxGroup, bool hasRecentFxs, bool hasFavoriteFxs);
+  void loadRecentFxs(QString fxArray[], QMenu *insertFxGroup,
+                     QMenu *addFxGroup, QMenu *replaceFxGroup,
+                     bool hasRecentFxs, bool hasFavoriteFxs);
   bool loadPreset(const std::string &name, QMenu *insertFxGroup,
                   QMenu *addFxGroup, QMenu *replaceFxGroup);
   void loadMacro();
   void loadFxPluginGroup();
   void loadFxPlugins(QMenu *insertFxGroup, QMenu *addFxGroup,
                      QMenu *replaceFxGroup);
+  void createDefaultAction(QMenu *insertFxGroup, QMenu *addFxGroup,
+	                       QMenu *replaceFxGroup);
+  void saveUsrFxList();
+  void refreshRecentFxs(QString actionName);
 
 private slots:
   void onInsertFx(QAction *);
