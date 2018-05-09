@@ -239,7 +239,7 @@ public:
 
 protected:
   void refreshRecentFilesMenu(FileType fileType);
-  QList<QString> getFilesNameList(FileType fileType);
+  QList<QString> getFilesNameList(FileType fileType, bool withNumber = true);
 };
 
 #endif  // TESTCUSTOMTAB_H
