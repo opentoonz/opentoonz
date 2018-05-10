@@ -1424,7 +1424,7 @@ QAction *MainWindow::createAction(const char *id, const QString &name,
   if (strcmp(id, MI_ShortcutPopup) == 0) {
     action->setMenuRole(QAction::NoRole);
   }
-  if (strcmp(id,MI_ExitGroup) == 0) {
+  if (strcmp(id, MI_ExitGroup) == 0) {
     action->setMenuRole(QAction::NoRole);
   }
 #endif
@@ -1696,7 +1696,9 @@ void MainWindow::defineActions() {
   redoAction->setIcon(QIcon(":Resources/redo.svg"));
   createMenuEditAction(MI_Cut, tr("&Cut"), "Ctrl+X");
   createMenuEditAction(MI_Copy, tr("&Copy"), "Ctrl+C");
-  createMenuEditAction(MI_Paste, tr("&Insert Paste"), "Ctrl+V");
+  createMenuEditAction(MI_Paste, tr("&Paste Insert"), "Ctrl+V");
+  createMenuEditAction(MI_PasteAbove, tr("&Paste Insert Above/After"),
+                       "Ctrl+Shift+V");
   // createMenuEditAction(MI_PasteNew,     tr("&Paste New"),  "");
   createMenuCellsAction(MI_MergeFrames, tr("&Merge"), "");
   createMenuEditAction(MI_PasteInto, tr("&Paste Into"), "");
@@ -1711,6 +1713,7 @@ void MainWindow::defineActions() {
                              tr("Remove Reference to Studio Palette"), "");
   createMenuEditAction(MI_Clear, tr("&Delete"), "Del");
   createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
+  createMenuEditAction(MI_InsertAbove, tr("&Insert Above/After"), "Shift+Ins");
   createMenuEditAction(MI_Group, tr("&Group"), "Ctrl+G");
   createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "Ctrl+Shift+G");
   createMenuEditAction(MI_BringToFront, tr("&Bring to Front"), "Ctrl+]");
@@ -2405,9 +2408,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2532,9 +2535,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2561,9 +2564,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene)
-            ? MI_ClearRecentScene
-            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
+                                                        ? MI_ClearRecentLevel
+                                                        : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

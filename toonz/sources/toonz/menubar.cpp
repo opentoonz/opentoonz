@@ -408,10 +408,12 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
 
@@ -554,10 +556,12 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
 
@@ -733,10 +737,12 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
 
@@ -906,10 +912,12 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
   editMenu->addSeparator();
@@ -1131,11 +1139,13 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   // addMenuItem(editMenu, MI_PasteNew);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);

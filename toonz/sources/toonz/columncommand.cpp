@@ -244,7 +244,8 @@ void cloneXsheetTStageObjectTree(TXsheet *xsh, TXsheet *newXsh) {
 //-----------------------------------------------------------------------------
 
 bool pasteColumnsWithoutUndo(std::set<int> *indices, bool doClone,
-                             const StageObjectsData *data) {
+                             const StageObjectsData *data,
+                             bool pasteAfter = false) {
   if (!data)
     data = dynamic_cast<const StageObjectsData *>(
         QApplication::clipboard()->mimeData());
@@ -263,7 +264,8 @@ bool pasteColumnsWithoutUndo(std::set<int> *indices, bool doClone,
 
   std::list<int> restoredSplineIds;
   data->restoreObjects(*indices, restoredSplineIds, xsh,
-                       doClone ? StageObjectsData::eDoClone : 0);
+                       doClone ? StageObjectsData::eDoClone : 0,
+                       TConst::nowhere, pasteAfter);
   app->getCurrentXsheet()->notifyXsheetChanged();
   app->getCurrentObject()->notifyObjectIdSwitched();
   return true;
@@ -647,8 +649,8 @@ class InsertEmptyColumnsUndo final : public ColumnCommandUndo {
   std::vector<std::pair<int, int>> m_columnBlocks;
 
 public:
-  InsertEmptyColumnsUndo(const std::vector<int> &indices) {
-    initialize(indices);
+  InsertEmptyColumnsUndo(const std::vector<int> &indices, bool insertAfter) {
+    initialize(indices, insertAfter);
   }
 
   bool isConsistent() const override { return true; }
@@ -672,12 +674,13 @@ public:
   int getHistoryType() override { return HistoryType::Xsheet; }
 
 private:
-  void initialize(const std::vector<int> &indices);
+  void initialize(const std::vector<int> &indices, bool insertAfter = false);
 };
 
 //------------------------------------------------------
 
-void InsertEmptyColumnsUndo::initialize(const std::vector<int> &indices) {
+void InsertEmptyColumnsUndo::initialize(const std::vector<int> &indices,
+                                        bool insertAfter) {
   TApp *app    = TApp::instance();
   TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 
@@ -690,7 +693,8 @@ void InsertEmptyColumnsUndo::initialize(const std::vector<int> &indices) {
          (ce != cEnd) && (*ce == c);)  // by iterating as long as the next
       ++ce, ++c;                       // column index is the previous one + 1
 
-    m_columnBlocks.push_back(std::make_pair(*cb, c - *cb));
+    int insertAt = (insertAfter ? c : *cb);
+    m_columnBlocks.push_back(std::make_pair(insertAt, c - *cb));
   }
 
   assert(!m_columnBlocks.empty());
@@ -734,14 +738,15 @@ void InsertEmptyColumnsUndo::undo() const {
 
 //======================================================
 
-void ColumnCmd::insertEmptyColumns(const std::set<int> &indices) {
+void ColumnCmd::insertEmptyColumns(const std::set<int> &indices,
+                                   bool insertAfter) {
   // Filter out all less than 0 indices (in particular, the 'camera' column
   // in the Toonz derivative product "Tab")
   std::vector<int> positiveIndices(indices.lower_bound(0), indices.end());
   if (positiveIndices.empty()) return;
 
   std::unique_ptr<ColumnCommandUndo> undo(
-      new InsertEmptyColumnsUndo(positiveIndices));
+      new InsertEmptyColumnsUndo(positiveIndices, insertAfter));
   if (undo->isConsistent()) {
     undo->redo();
     TUndoManager::manager()->add(undo.release());
@@ -789,8 +794,8 @@ void ColumnCmd::copyColumns(const std::set<int> &indices) {
 //*************************************************************************
 
 void ColumnCmd::pasteColumns(std::set<int> &indices,
-                             const StageObjectsData *data) {
-  bool isPaste = pasteColumnsWithoutUndo(&indices, true, data);
+                             const StageObjectsData *data, bool pasteAfter) {
+  bool isPaste = pasteColumnsWithoutUndo(&indices, true, data, pasteAfter);
   if (!isPaste) return;
   TUndoManager::manager()->add(new PasteColumnsUndo(indices));
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);

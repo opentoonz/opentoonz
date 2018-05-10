@@ -883,7 +883,7 @@ void StageObjectsData::storeSplines(const std::list<int> &splineIds,
 
 std::vector<TStageObjectId> StageObjectsData::restoreObjects(
     std::set<int> &columnIndices, std::list<int> &restoredSpline, TXsheet *xsh,
-    int fxFlags, const TPointD &pos) const {
+    int fxFlags, const TPointD &pos, bool restoreAfter) const {
   bool doClone             = (fxFlags & eDoClone);
   bool resetFxDagPositions = (fxFlags & eResetFxDagPositions);
 
@@ -913,10 +913,12 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(
       restoredId = cameraElement->restoreCamera(xsh, pos != TConst::nowhere);
     else if (columnElement) {
       // Build the column insertion index
-      if (idxt != columnIndices.end())
+      if (idxt != columnIndices.end()) {
         index = *idxt++;
-      else {
+        if (restoreAfter) index++;
+      } else {
         ++index;
+        if (restoreAfter) index++;
         columnIndices.insert(index);
       }
 

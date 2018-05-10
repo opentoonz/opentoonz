@@ -127,7 +127,8 @@ public:
   //! Additional flags support TXshColumn cloning before insertion.
   std::vector<TStageObjectId> restoreObjects(
       std::set<int> &columnIndices, std::list<int> &restoredSplinIds,
-      TXsheet *xsheet, int fxFlags, const TPointD &pos = TConst::nowhere) const;
+      TXsheet *xsheet, int fxFlags, const TPointD &pos = TConst::nowhere,
+      bool restoreAfter = false) const;
 };
 
 #endif  // STAGEOBJECT_DATA_H

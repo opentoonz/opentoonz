@@ -9,7 +9,7 @@ class StageObjectsData;
 
 namespace ColumnCmd {
 
-void insertEmptyColumns(const std::set<int> &indices);
+void insertEmptyColumns(const std::set<int> &indices, bool insertAfter = false);
 void insertEmptyColumn(int index);
 
 void copyColumns(const std::set<int> &indices);
@@ -22,7 +22,8 @@ void deleteColumns(std::set<int> &indices, bool onlyColumns, bool withoutUndo);
 //! helper function: deletes a single column, with undo
 void deleteColumn(int index);
 //! if data==0 then uses clipboard
-void pasteColumns(std::set<int> &indices, const StageObjectsData *data = 0);
+void pasteColumns(std::set<int> &indices, const StageObjectsData *data = 0,
+                  bool pasteAfter = false);
 //! helper function: copies srcIndex column and pastes it before dstIndex. Does
 //! not affect the clipboard
 void copyColumn(int dstIndex, int srcIndex);

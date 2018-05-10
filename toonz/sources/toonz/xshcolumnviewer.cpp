@@ -2216,8 +2216,10 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     menu.addAction(cmdManager->getAction(MI_Cut));
     menu.addAction(cmdManager->getAction(MI_Copy));
     menu.addAction(cmdManager->getAction(MI_Paste));
+    menu.addAction(cmdManager->getAction(MI_PasteAbove));
     menu.addAction(cmdManager->getAction(MI_Clear));
     menu.addAction(cmdManager->getAction(MI_Insert));
+    menu.addAction(cmdManager->getAction(MI_InsertAbove));
     menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_InsertFx));
     menu.addAction(cmdManager->getAction(MI_NewNoteLevel));
@@ -2278,7 +2280,32 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     }
   }
 
+  QAction *act  = cmdManager->getAction(MI_Insert),
+          *act2 = cmdManager->getAction(MI_InsertAbove),
+          *act3 = cmdManager->getAction(MI_Paste),
+          *act4 = cmdManager->getAction(MI_PasteAbove);
+
+  QString actText = act->text(), act2Text = act2->text(),
+          act3Text = act3->text(), act4Text = act4->text();
+
+  if (o->isVerticalTimeline()) {
+    act->setText(tr("&Insert Before"));
+    act2->setText(tr("&Insert After"));
+    act3->setText(tr("&Paste Insert Before"));
+    act4->setText(tr("&Paste Insert After"));
+  } else {
+    act->setText(tr("&Insert Below"));
+    act2->setText(tr("&Insert Above"));
+    act3->setText(tr("&Paste Insert Below"));
+    act4->setText(tr("&Paste Insert Above"));
+  }
+
   menu.exec(event->globalPos());
+
+  act->setText(tr(actText.toLatin1().data()));
+  act2->setText(tr(act2Text.toLatin1().data()));
+  act3->setText(tr(act3Text.toLatin1().data()));
+  act4->setText(tr(act4Text.toLatin1().data()));
 }
 
 //-----------------------------------------------------------------------------
@@ -2323,5 +2350,4 @@ void ColumnArea::onSubSampling(QAction *action) {
       ->invalidateAll();
   TApp::instance()->getCurrentScene()->notifySceneChanged();
 }
-
 }  // namespace XsheetGUI
