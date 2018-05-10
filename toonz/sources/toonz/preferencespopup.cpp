@@ -1182,6 +1182,12 @@ void PreferencesPopup::onEnableAutoStretch(int index) {
   m_pref->enableAutoStretch(index == Qt::Checked);
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onHideBrushOutlineChanged(int index) {
+  m_pref->enableHideBrushOutline(index == Qt::Checked);
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1371,6 +1377,8 @@ PreferencesPopup::PreferencesPopup()
   m_downArrowInLevelStripCreatesNewFrame = new CheckBox(
       tr("Down Arrow at End of Level Strip Creates a New Frame"), this);
   m_enableAutoStretch = new CheckBox(tr("Enable auto-stretch frame"), this);
+  CheckBox *hideBrushOutlineCB =
+      new CheckBox(tr("Hide brush size outline"), this);
 
   //--- Tools -------------------------------
   categoryList->addItem(tr("Tools"));
@@ -1760,6 +1768,8 @@ PreferencesPopup::PreferencesPopup()
   vectorSnappingTargets << tr("Strokes") << tr("Guides") << tr("All");
   m_vectorSnappingTargetCB->addItems(vectorSnappingTargets);
   m_vectorSnappingTargetCB->setCurrentIndex(m_pref->getVectorSnappingTarget());
+
+  hideBrushOutlineCB->setChecked(m_pref->isHideBrushOutlineEnabled());
 
   //--- Tools -------------------------------
 
@@ -2253,6 +2263,8 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(m_downArrowInLevelStripCreatesNewFrame, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+      drawingFrameLay->addWidget(hideBrushOutlineCB, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
       QGroupBox *replaceVectorGroupBox = new QGroupBox(
           tr("Replace Vectors with Simplified Vectors Command"), this);
       QVBoxLayout *replaceVectorsLay = new QVBoxLayout();
@@ -2736,6 +2748,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onNewLevelToCameraSizeChanged(bool)));
   ret = ret && connect(m_enableAutoStretch, SIGNAL(stateChanged(int)), this,
                        SLOT(onEnableAutoStretch(int)));
+  ret = ret && connect(hideBrushOutlineCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onHideBrushOutlineChanged(int)));
 
   //--- Tools -----------------------
 

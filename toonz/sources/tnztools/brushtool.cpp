@@ -2177,8 +2177,8 @@ void BrushTool::checkGuideSnapping(bool beforeMousePress) {
         snapPoint.x = hGuide;
       }
       beforeMousePress ? m_foundFirstSnap = true : m_foundLastSnap = true;
-      beforeMousePress ? m_firstSnapPoint                          = snapPoint
-                       : m_lastSnapPoint                           = snapPoint;
+      beforeMousePress ? m_firstSnapPoint = snapPoint : m_lastSnapPoint =
+                                                            snapPoint;
     }
   }
 }
@@ -2232,6 +2232,9 @@ void BrushTool::draw() {
   }
 
   if (getApplication()->getCurrentObject()->isSpline()) return;
+
+  // If toggled off, don't draw brush outline
+  if (Preferences::instance()->isHideBrushOutlineEnabled() == 1) return;
 
   // Draw the brush outline - change color when the Ink / Paint check is
   // activated

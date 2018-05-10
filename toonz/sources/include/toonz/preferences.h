@@ -384,6 +384,9 @@ public:
     return m_downArrowInLevelStripCreatesNewFrame;
   }
 
+  void enableHideBrushOutline(bool on);
+  bool isHideBrushOutlineEnabled() const { return m_hideBrushOutlineEnabled; }
+
   // Tools Tab
   void setDropdownShortcutsCycleOptions(bool on);
   bool getDropdownShortcutsCycleOptions() {
@@ -693,6 +696,9 @@ private:
 
   // release version check
   bool m_latestVersionCheckEnabled = true;
+
+  // Hide brush outline
+  bool m_hideBrushOutlineEnabled = false;
 
 private:
   Preferences();

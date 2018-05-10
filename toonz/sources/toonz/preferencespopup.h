@@ -208,6 +208,7 @@ private slots:
   void onLutPathChanged();
   void onCheckLatestVersionChanged(bool);
   void onEnableAutoStretch(int index);
+  void onHideBrushOutlineChanged(int);
 };
 
 //**********************************************************************************

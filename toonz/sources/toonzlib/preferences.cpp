@@ -337,7 +337,8 @@ Preferences::Preferences()
     , m_pathAliasPriority(ProjectFolderOnly)
     , m_functionEditorToggle(ShowGraphEditorInPopup)
     , m_currentTimelineEnabled(true)
-    , m_enableAutoStretch(true) {
+    , m_enableAutoStretch(true)
+    , m_hideBrushOutlineEnabled(false) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -689,6 +690,8 @@ Preferences::Preferences()
            m_latestVersionCheckEnabled);
 
   getValue(*m_settings, "EnableAutoStretch", m_enableAutoStretch);
+
+  getValue(*m_settings, "hideBrushOutlineEnabled", m_hideBrushOutlineEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -1685,4 +1688,9 @@ QString Preferences::getColorCalibrationLutPath(QString &monitorName) const {
 void Preferences::enableAutoStretch(bool on) {
   m_enableAutoStretch = on;
   m_settings->setValue("EnableAutoStretch", on ? "1" : "0");
+}
+
+void Preferences::enableHideBrushOutline(bool on) {
+  m_hideBrushOutlineEnabled = on;
+  m_settings->setValue("hideBrushOutlineEnabled", on ? "1" : "0");
 }

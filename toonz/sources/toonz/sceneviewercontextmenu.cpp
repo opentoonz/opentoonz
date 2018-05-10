@@ -206,6 +206,9 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   if (!parent->isPreviewEnabled())
     ZeroThickToggleGui::addZeroThickCommand(this);
 
+  // Brush size outline
+  HideBrushOutlineToggleGui::addHideBrushOutlineCommand(this);
+
   // preview
   if (parent->isPreviewEnabled()) {
     addSeparator();
@@ -475,4 +478,43 @@ void ZeroThickToggleGui::ZeroThickToggleHandler::activate() {
 
 void ZeroThickToggleGui::ZeroThickToggleHandler::deactivate() {
   ZeroThickToggle::enableZeroThick(false);
+}
+
+class HideBrushOutlineToggle : public MenuItemHandler {
+public:
+  HideBrushOutlineToggle() : MenuItemHandler(MI_HideBrushOutline) {}
+  void execute() {
+    QAction *action =
+        CommandManager::instance()->getAction(MI_HideBrushOutline);
+    if (!action) return;
+    bool checked = action->isChecked();
+    enableHideBrushOutline(checked);
+  }
+
+  static void enableHideBrushOutline(bool enable = true) {
+    Preferences::instance()->enableHideBrushOutline(enable);
+  }
+} HideBrushOutlineToggle;
+
+void HideBrushOutlineToggleGui::addHideBrushOutlineCommand(QMenu *menu) {
+  static HideBrushOutlineToggleHandler switcher;
+  if (!Preferences::instance()->isHideBrushOutlineEnabled()) {
+    QAction *hideBrushOutline =
+        menu->addAction(QString(QObject::tr("Hide brush size outline")));
+    menu->connect(hideBrushOutline, SIGNAL(triggered()), &switcher,
+                  SLOT(activate()));
+  } else {
+    QAction *showBrushOutline =
+        menu->addAction(QString(QObject::tr("Show brush size outline")));
+    menu->connect(showBrushOutline, SIGNAL(triggered()), &switcher,
+                  SLOT(deactivate()));
+  }
+}
+
+void HideBrushOutlineToggleGui::HideBrushOutlineToggleHandler::activate() {
+  HideBrushOutlineToggle::enableHideBrushOutline(true);
+}
+
+void HideBrushOutlineToggleGui::HideBrushOutlineToggleHandler::deactivate() {
+  HideBrushOutlineToggle::enableHideBrushOutline(false);
 }

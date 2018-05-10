@@ -53,4 +53,17 @@ public slots:
 
 }  // Namespace ZeroThickToggleGui
 
+namespace HideBrushOutlineToggleGui {
+void addHideBrushOutlineCommand(QMenu *menu);
+
+class HideBrushOutlineToggleHandler : public QObject {
+  Q_OBJECT
+
+public slots:
+  void activate();
+  void deactivate();
+};
+
+}  // Namespace HideBrushOutlineToggleGui
+
 #endif
