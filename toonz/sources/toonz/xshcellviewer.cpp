@@ -2440,7 +2440,9 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       int c       = notes->getNoteCol(i);
       QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
       TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
-      QRect rect(pos.x, pos.y, NoteWidth, NoteHeight);
+      QRect rect(pos.x, pos.y,
+                 (!o->isVerticalTimeline() ? NoteWidthTimeline : NoteWidth),
+                 NoteHeight);
       if (!rect.contains(event->pos())) continue;
       setDragTool(XsheetGUI::DragTool::makeNoteMoveTool(m_viewer));
       m_viewer->setCurrentNoteIndex(i);
@@ -2757,7 +2759,9 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
     int c       = notes->getNoteCol(i);
     QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
     TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
-    QRect rect(pos.x, pos.y, NoteWidth, NoteHeight);
+    QRect rect(pos.x, pos.y,
+               (!o->isVerticalTimeline() ? NoteWidthTimeline : NoteWidth),
+               NoteHeight);
     if (!rect.contains(event->pos())) continue;
     m_viewer->setCurrentNoteIndex(i);
     m_viewer->getNotesWidget().at(i)->openNotePopup();
@@ -2823,7 +2827,9 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
     int c       = notes->getNoteCol(i);
     QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
     TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
-    QRect rect(pos.x, pos.y, NoteWidth, NoteHeight);
+    QRect rect(pos.x, pos.y,
+               (!o->isVerticalTimeline() ? NoteWidthTimeline : NoteWidth),
+               NoteHeight);
     if (!rect.contains(event->pos())) continue;
     m_viewer->setCurrentNoteIndex(i);
     createNoteMenu(menu);
