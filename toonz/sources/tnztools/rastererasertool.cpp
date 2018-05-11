@@ -709,21 +709,22 @@ void EraserTool::draw() {
 
 int EraserTool::getCursorId() const {
   int ret = ToolCursor::PenCursor;
+  /*
+    if (m_eraseType.getValue() == FREEHANDERASE)
+      ret = ret | ToolCursor::Ex_FreeHand;
+    else if (m_eraseType.getValue() == POLYLINEERASE)
+      ret = ret | ToolCursor::Ex_PolyLine;
+    else if (m_eraseType.getValue() == RECTERASE)
+      ret = ret | ToolCursor::Ex_Rectangle;
 
-  if (m_eraseType.getValue() == FREEHANDERASE)
-    ret = ret | ToolCursor::Ex_FreeHand;
-  else if (m_eraseType.getValue() == POLYLINEERASE)
-    ret = ret | ToolCursor::Ex_PolyLine;
-  else if (m_eraseType.getValue() == RECTERASE)
-    ret = ret | ToolCursor::Ex_Rectangle;
+    if (m_colorType.getValue() == LINES)
+      ret = ret | ToolCursor::Ex_Line;
+    else if (m_colorType.getValue() == AREAS)
+      ret = ret | ToolCursor::Ex_Area;
 
-  if (m_colorType.getValue() == LINES)
-    ret = ret | ToolCursor::Ex_Line;
-  else if (m_colorType.getValue() == AREAS)
-    ret = ret | ToolCursor::Ex_Area;
-
-  if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
-    ret = ret | ToolCursor::Ex_Negate;
+    if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
+      ret = ret | ToolCursor::Ex_Negate;
+  */
   return ret;
 }
 
