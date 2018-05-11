@@ -708,19 +708,14 @@ void EraserTool::draw() {
 //----------------------------------------------------------------------
 
 int EraserTool::getCursorId() const {
-  int ret;
-  if (m_eraseType.getValue() == NORMALERASE)
-    ret = ToolCursor::NormalEraserCursor;
-  else {
-    ret = ToolCursor::RectEraserCursor;
+  int ret = ToolCursor::PenCursor;
 
-    if (m_eraseType.getValue() == FREEHANDERASE)
-      ret = ret | ToolCursor::Ex_FreeHand;
-    else if (m_eraseType.getValue() == POLYLINEERASE)
-      ret = ret | ToolCursor::Ex_PolyLine;
-    else if (m_eraseType.getValue() == RECTERASE)
-      ret = ret | ToolCursor::Ex_Rectangle;
-  }
+  if (m_eraseType.getValue() == FREEHANDERASE)
+    ret = ret | ToolCursor::Ex_FreeHand;
+  else if (m_eraseType.getValue() == POLYLINEERASE)
+    ret = ret | ToolCursor::Ex_PolyLine;
+  else if (m_eraseType.getValue() == RECTERASE)
+    ret = ret | ToolCursor::Ex_Rectangle;
 
   if (m_colorType.getValue() == LINES)
     ret = ret | ToolCursor::Ex_Line;
@@ -1654,11 +1649,10 @@ void EraserTool::storeUndoAndRefresh() {
     TUndoManager::manager()->add(new RasterBluredEraserUndo(
         m_tileSet, m_points,
         TTool::getApplication()->getCurrentLevelStyleIndex(),
-        m_currentStyle.getValue(),
-        TTool::getApplication()
-            ->getCurrentLevel()
-            ->getLevel()
-            ->getSimpleLevel(),
+        m_currentStyle.getValue(), TTool::getApplication()
+                                       ->getCurrentLevel()
+                                       ->getLevel()
+                                       ->getSimpleLevel(),
         m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId,
         m_toolSize.getValue(), m_hardness.getValue() * 0.01,
         m_colorType.getValue()));
