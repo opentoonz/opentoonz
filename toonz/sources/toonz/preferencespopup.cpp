@@ -1184,8 +1184,16 @@ void PreferencesPopup::onEnableAutoStretch(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onHideBrushOutlineChanged(int index) {
-  m_pref->enableHideBrushOutline(index == Qt::Checked);
+void PreferencesPopup::onSimpleCursorChanged(int index) {
+  m_pref->enableSimpleCursor(index == Qt::Checked);
+}
+
+void PreferencesPopup::onCursorLeftHandedChanged(int index) {
+  m_pref->enableCursorLeftHanded(index == Qt::Checked);
+}
+
+void PreferencesPopup::onCursorOutlineChanged(int index) {
+  m_pref->enableCursorOutline(index == Qt::Checked);
 }
 
 //**********************************************************************************
@@ -1377,8 +1385,6 @@ PreferencesPopup::PreferencesPopup()
   m_downArrowInLevelStripCreatesNewFrame = new CheckBox(
       tr("Down Arrow at End of Level Strip Creates a New Frame"), this);
   m_enableAutoStretch = new CheckBox(tr("Enable auto-stretch frame"), this);
-  CheckBox *hideBrushOutlineCB =
-      new CheckBox(tr("Hide brush size outline"), this);
 
   //--- Tools -------------------------------
   categoryList->addItem(tr("Tools"));
@@ -1388,6 +1394,12 @@ PreferencesPopup::PreferencesPopup()
       tr("Multi Layer Style Picker : Switch Levels by Picking"), this);
   CheckBox *useSaveboxToLimitFillingOpCB =
       new CheckBox(tr("Use the TLV Savebox to Limit Filling Operations"), this);
+
+  CheckBox *simpleCursorCB = new CheckBox(tr("Use Simple Cursors"), this);
+  CheckBox *cursorLeftHandedCB =
+      new CheckBox(tr("Use Left-Handed Cursors"), this);
+  CheckBox *cursorOutlineCB =
+      new CheckBox(tr("Show Cursor Size Outlines"), this);
 
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
@@ -1769,8 +1781,6 @@ PreferencesPopup::PreferencesPopup()
   m_vectorSnappingTargetCB->addItems(vectorSnappingTargets);
   m_vectorSnappingTargetCB->setCurrentIndex(m_pref->getVectorSnappingTarget());
 
-  hideBrushOutlineCB->setChecked(m_pref->isHideBrushOutlineEnabled());
-
   //--- Tools -------------------------------
 
   QStringList dropdownBehaviorTypes;
@@ -1781,6 +1791,10 @@ PreferencesPopup::PreferencesPopup()
       m_pref->getDropdownShortcutsCycleOptions() ? 1 : 0);
   multiLayerStylePickerCB->setChecked(m_pref->isMultiLayerStylePickerEnabled());
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
+
+  simpleCursorCB->setChecked(m_pref->isSimpleCursorEnabled());
+  cursorLeftHandedCB->setChecked(m_pref->isCursorLeftHandedEnabled());
+  cursorOutlineCB->setChecked(m_pref->isCursorOutlineEnabled());
 
   //--- Xsheet ------------------------------
   xsheetAutopanDuringPlaybackCB->setChecked(m_pref->isXsheetAutopanEnabled());
@@ -2263,8 +2277,6 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       drawingFrameLay->addWidget(m_downArrowInLevelStripCreatesNewFrame, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-      drawingFrameLay->addWidget(hideBrushOutlineCB, 0,
-                                 Qt::AlignLeft | Qt::AlignVCenter);
       QGroupBox *replaceVectorGroupBox = new QGroupBox(
           tr("Replace Vectors with Simplified Vectors Command"), this);
       QVBoxLayout *replaceVectorsLay = new QVBoxLayout();
@@ -2286,26 +2298,40 @@ PreferencesPopup::PreferencesPopup()
 
     //--- Tools ---------------------------
     QWidget *toolsBox          = new QWidget(this);
-    QGridLayout *toolsFrameLay = new QGridLayout();
+    QVBoxLayout *toolsFrameLay = new QVBoxLayout();
     toolsFrameLay->setMargin(15);
-    toolsFrameLay->setHorizontalSpacing(15);
-    toolsFrameLay->setVerticalSpacing(10);
+    toolsFrameLay->setSpacing(10);
     {
-      toolsFrameLay->addWidget(new QLabel(tr("Dropdown Shortcuts:")), 0, 0,
+      QGridLayout *ToolsTopLay = new QGridLayout();
+      ToolsTopLay->setVerticalSpacing(10);
+      ToolsTopLay->setHorizontalSpacing(15);
+      ToolsTopLay->setMargin(0);
+      {
+        ToolsTopLay->addWidget(new QLabel(tr("Dropdown Shortcuts:")), 0, 0,
                                Qt::AlignRight | Qt::AlignVCenter);
-      toolsFrameLay->addWidget(m_dropdownShortcutsCycleOptionsCB, 0, 1);
-      toolsFrameLay->addWidget(useSaveboxToLimitFillingOpCB, 1, 0, 1, 3,
+        ToolsTopLay->addWidget(m_dropdownShortcutsCycleOptionsCB, 0, 1);
+        ToolsTopLay->addWidget(useSaveboxToLimitFillingOpCB, 1, 0, 1, 3,
                                Qt::AlignLeft | Qt::AlignVCenter);
-      toolsFrameLay->addWidget(multiLayerStylePickerCB, 2, 0, 1, 3,
+        ToolsTopLay->addWidget(multiLayerStylePickerCB, 2, 0, 1, 3,
                                Qt::AlignLeft | Qt::AlignVCenter);
+      }
+      toolsFrameLay->addLayout(ToolsTopLay, 0);
+
+      QGroupBox *cursorStyleGroupBox =
+          new QGroupBox(tr("Cursor Options"), this);
+      QVBoxLayout *cursorStylesLay = new QVBoxLayout();
+      cursorStylesLay->setMargin(10);
+      cursorStylesLay->setSpacing(10);
+      cursorStylesLay->addWidget(simpleCursorCB, 0,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
+      cursorStylesLay->addWidget(cursorLeftHandedCB, 1,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
+      cursorStylesLay->addWidget(cursorOutlineCB, 2,
+                                 Qt::AlignLeft | Qt::AlignVCenter);
+      cursorStyleGroupBox->setLayout(cursorStylesLay);
+      toolsFrameLay->addWidget(cursorStyleGroupBox, 0);
+      toolsFrameLay->addStretch(1);
     }
-    toolsFrameLay->setColumnStretch(0, 0);
-    toolsFrameLay->setColumnStretch(1, 0);
-    toolsFrameLay->setColumnStretch(2, 1);
-    toolsFrameLay->setRowStretch(0, 0);
-    toolsFrameLay->setRowStretch(1, 0);
-    toolsFrameLay->setRowStretch(2, 0);
-    toolsFrameLay->setRowStretch(3, 1);
     toolsBox->setLayout(toolsFrameLay);
     stackedWidget->addWidget(toolsBox);
 
@@ -2748,8 +2774,6 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onNewLevelToCameraSizeChanged(bool)));
   ret = ret && connect(m_enableAutoStretch, SIGNAL(stateChanged(int)), this,
                        SLOT(onEnableAutoStretch(int)));
-  ret = ret && connect(hideBrushOutlineCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onHideBrushOutlineChanged(int)));
 
   //--- Tools -----------------------
 
@@ -2760,6 +2784,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onMultiLayerStylePickerChanged(int)));
   ret = ret && connect(useSaveboxToLimitFillingOpCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onGetFillOnlySavebox(int)));
+  ret = ret && connect(simpleCursorCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onSimpleCursorChanged(int)));
+  ret = ret && connect(cursorLeftHandedCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onCursorLeftHandedChanged(int)));
+  ret = ret && connect(cursorOutlineCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onCursorOutlineChanged(int)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),

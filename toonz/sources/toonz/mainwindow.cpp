@@ -2049,8 +2049,8 @@ void MainWindow::defineActions() {
                RightClickMenuCommandType);
   createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false,
                RightClickMenuCommandType);
-  createToggle(MI_HideBrushOutline, tr("Hide Brush Size Outline Toggle"), "",
-               false, RightClickMenuCommandType);
+  createToggle(MI_CursorOutline, tr("Toggle Cursor Size Outline"), "", false,
+               RightClickMenuCommandType);
 
   createRightClickMenuAction(MI_ToggleCurrentTimeIndicator,
                              tr("Toggle Current Time Indicator"), "");

@@ -207,7 +207,7 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
     ZeroThickToggleGui::addZeroThickCommand(this);
 
   // Brush size outline
-  HideBrushOutlineToggleGui::addHideBrushOutlineCommand(this);
+  CursorOutlineToggleGui::addCursorOutlineCommand(this);
 
   // preview
   if (parent->isPreviewEnabled()) {
@@ -480,41 +480,40 @@ void ZeroThickToggleGui::ZeroThickToggleHandler::deactivate() {
   ZeroThickToggle::enableZeroThick(false);
 }
 
-class HideBrushOutlineToggle : public MenuItemHandler {
+class CursorOutlineToggle : public MenuItemHandler {
 public:
-  HideBrushOutlineToggle() : MenuItemHandler(MI_HideBrushOutline) {}
+  CursorOutlineToggle() : MenuItemHandler(MI_CursorOutline) {}
   void execute() {
-    QAction *action =
-        CommandManager::instance()->getAction(MI_HideBrushOutline);
+    QAction *action = CommandManager::instance()->getAction(MI_CursorOutline);
     if (!action) return;
     bool checked = action->isChecked();
-    enableHideBrushOutline(checked);
+    enableCursorOutline(checked);
   }
 
-  static void enableHideBrushOutline(bool enable = true) {
-    Preferences::instance()->enableHideBrushOutline(enable);
+  static void enableCursorOutline(bool enable = true) {
+    Preferences::instance()->enableCursorOutline(enable);
   }
-} HideBrushOutlineToggle;
+} CursorOutlineToggle;
 
-void HideBrushOutlineToggleGui::addHideBrushOutlineCommand(QMenu *menu) {
-  static HideBrushOutlineToggleHandler switcher;
-  if (!Preferences::instance()->isHideBrushOutlineEnabled()) {
-    QAction *hideBrushOutline =
-        menu->addAction(QString(QObject::tr("Hide brush size outline")));
-    menu->connect(hideBrushOutline, SIGNAL(triggered()), &switcher,
-                  SLOT(activate()));
-  } else {
-    QAction *showBrushOutline =
-        menu->addAction(QString(QObject::tr("Show brush size outline")));
-    menu->connect(showBrushOutline, SIGNAL(triggered()), &switcher,
+void CursorOutlineToggleGui::addCursorOutlineCommand(QMenu *menu) {
+  static CursorOutlineToggleHandler switcher;
+  if (Preferences::instance()->isCursorOutlineEnabled()) {
+    QAction *hideCursorOutline =
+        menu->addAction(QString(QObject::tr("Hide cursor size outline")));
+    menu->connect(hideCursorOutline, SIGNAL(triggered()), &switcher,
                   SLOT(deactivate()));
+  } else {
+    QAction *showCursorOutline =
+        menu->addAction(QString(QObject::tr("Show cursor size outline")));
+    menu->connect(showCursorOutline, SIGNAL(triggered()), &switcher,
+                  SLOT(activate()));
   }
 }
 
-void HideBrushOutlineToggleGui::HideBrushOutlineToggleHandler::activate() {
-  HideBrushOutlineToggle::enableHideBrushOutline(true);
+void CursorOutlineToggleGui::CursorOutlineToggleHandler::activate() {
+  CursorOutlineToggle::enableCursorOutline(true);
 }
 
-void HideBrushOutlineToggleGui::HideBrushOutlineToggleHandler::deactivate() {
-  HideBrushOutlineToggle::enableHideBrushOutline(false);
+void CursorOutlineToggleGui::CursorOutlineToggleHandler::deactivate() {
+  CursorOutlineToggle::enableCursorOutline(false);
 }

@@ -338,7 +338,9 @@ Preferences::Preferences()
     , m_functionEditorToggle(ShowGraphEditorInPopup)
     , m_currentTimelineEnabled(true)
     , m_enableAutoStretch(true)
-    , m_hideBrushOutlineEnabled(false) {
+    , m_simpleCursorEnabled(false)
+    , m_cursorLeftHandedEnabled(false)
+    , m_cursorOutlineEnabled(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -691,7 +693,9 @@ Preferences::Preferences()
 
   getValue(*m_settings, "EnableAutoStretch", m_enableAutoStretch);
 
-  getValue(*m_settings, "hideBrushOutlineEnabled", m_hideBrushOutlineEnabled);
+  getValue(*m_settings, "simpleCursorEnabled", m_simpleCursorEnabled);
+  getValue(*m_settings, "cursorLeftHandedEnabled", m_cursorLeftHandedEnabled);
+  getValue(*m_settings, "cursorOutlineEnabled", m_cursorOutlineEnabled);
 }
 
 //-----------------------------------------------------------------
@@ -1690,7 +1694,17 @@ void Preferences::enableAutoStretch(bool on) {
   m_settings->setValue("EnableAutoStretch", on ? "1" : "0");
 }
 
-void Preferences::enableHideBrushOutline(bool on) {
-  m_hideBrushOutlineEnabled = on;
-  m_settings->setValue("hideBrushOutlineEnabled", on ? "1" : "0");
+void Preferences::enableSimpleCursor(bool on) {
+  m_simpleCursorEnabled = on;
+  m_settings->setValue("simpleCursorEnabled", on ? "1" : "0");
+}
+
+void Preferences::enableCursorLeftHanded(bool on) {
+  m_cursorLeftHandedEnabled = on;
+  m_settings->setValue("cursorLeftHandedEnabled", on ? "1" : "0");
+}
+
+void Preferences::enableCursorOutline(bool on) {
+  m_cursorOutlineEnabled = on;
+  m_settings->setValue("cursorOutlineEnabled", on ? "1" : "0");
 }

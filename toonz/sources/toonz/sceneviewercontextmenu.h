@@ -53,10 +53,10 @@ public slots:
 
 }  // Namespace ZeroThickToggleGui
 
-namespace HideBrushOutlineToggleGui {
-void addHideBrushOutlineCommand(QMenu *menu);
+namespace CursorOutlineToggleGui {
+void addCursorOutlineCommand(QMenu *menu);
 
-class HideBrushOutlineToggleHandler : public QObject {
+class CursorOutlineToggleHandler : public QObject {
   Q_OBJECT
 
 public slots:
@@ -64,6 +64,6 @@ public slots:
   void deactivate();
 };
 
-}  // Namespace HideBrushOutlineToggleGui
+}  // Namespace CursorOutlineToggleGui
 
 #endif

@@ -384,14 +384,20 @@ public:
     return m_downArrowInLevelStripCreatesNewFrame;
   }
 
-  void enableHideBrushOutline(bool on);
-  bool isHideBrushOutlineEnabled() const { return m_hideBrushOutlineEnabled; }
-
   // Tools Tab
   void setDropdownShortcutsCycleOptions(bool on);
   bool getDropdownShortcutsCycleOptions() {
     return m_dropdownShortcutsCycleOptions;
   }
+
+  void enableSimpleCursor(bool on);
+  bool isSimpleCursorEnabled() const { return m_simpleCursorEnabled; }
+
+  void enableCursorLeftHanded(bool on);
+  bool isCursorLeftHandedEnabled() const { return m_cursorLeftHandedEnabled; }
+
+  void enableCursorOutline(bool on);
+  bool isCursorOutlineEnabled() const { return m_cursorOutlineEnabled; }
 
   // Xsheet  tab
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
@@ -697,8 +703,10 @@ private:
   // release version check
   bool m_latestVersionCheckEnabled = true;
 
-  // Hide brush outline
-  bool m_hideBrushOutlineEnabled = false;
+  // Cursor settings
+  bool m_simpleCursorEnabled     = false;
+  bool m_cursorLeftHandedEnabled = false;
+  bool m_cursorOutlineEnabled    = false;
 
 private:
   Preferences();

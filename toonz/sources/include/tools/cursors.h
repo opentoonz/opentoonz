@@ -84,7 +84,13 @@ enum {
   Ex_Rectangle        = 0x800,
   Ex_Line             = 0x1000,
   Ex_Area             = 0x2000,
-  Ex_Fill_NoAutopaint = 0x4000
+  Ex_Fill_NoAutopaint = 0x4000,
+  Ex_FX               = 0x8000,
+  Ex_Z                = 0x10000,
+  Ex_StyleLine        = 0x20000,
+  Ex_StyleArea        = 0x40000,
+  Ex_RGB              = 0x80000,
+  Ex_HV               = 0x100000
 };
 
 }  // namespace

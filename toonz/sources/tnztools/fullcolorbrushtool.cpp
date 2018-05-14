@@ -488,7 +488,7 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
 void FullColorBrushTool::draw() {
   // If toggled off, don't draw brush outline
-  if (Preferences::instance()->isHideBrushOutlineEnabled() == 1) return;
+  if (!Preferences::instance()->isCursorOutlineEnabled()) return;
 
   if (TRasterImageP ri = TRasterImageP(getImage(false))) {
     TRasterP ras = ri->getRaster();
