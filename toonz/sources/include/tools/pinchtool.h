@@ -9,6 +9,8 @@
 #include "ext/ContextStatus.h"
 #include "ext/Selector.h"
 
+#include "toonz/preferences.h"
+
 // For Qt translation support
 #include <QCoreApplication>
 
@@ -96,7 +98,11 @@ public:
 
   void onImageChanged();
 
-  int getCursorId() const { return updateCursor(); }
+  int getCursorId() const {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return updateCursor();
+  }
   TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 };
 

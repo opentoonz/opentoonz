@@ -127,6 +127,9 @@ int SetSaveboxTool::getDragType(const TPointD &pos) {
 //-----------------------------------------------------------------------------
 
 int SetSaveboxTool::getCursorId(const TPointD &pos) {
+  if (Preferences::instance()->isSimpleCursorEnabled())
+    return ToolCursor::PenCursor;
+
   int dragType = getDragType(pos);
   switch (dragType) {
   case eMoveRect:

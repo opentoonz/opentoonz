@@ -27,6 +27,7 @@
 #include "toonz/txshsimplelevel.h"
 #include "toonz/levelproperties.h"
 #include "toonz/txsheethandle.h"
+#include "toonz/preferences.h"
 
 #include <QMessageBox>
 #include <math.h>
@@ -759,6 +760,9 @@ bool TrackerTool::onPropertyChanged(std::string propertyName) {
 }
 void TrackerTool::reset() { m_hookSelectedIndex = -1; }
 int TrackerTool::getCursorId() const {
+  if (Preferences::instance()->isSimpleCursorEnabled())
+    return ToolCursor::PenCursor;
+
   switch (m_what) {
   case Outside:
     return ToolCursor::TrackerCursor;

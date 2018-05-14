@@ -32,6 +32,7 @@
 #include "toonz/dpiscale.h"
 #include "toonz/onionskinmask.h"
 #include "toonz/tonionskinmaskhandle.h"
+#include "toonz/preferences.h"
 #include <math.h>
 
 // For Qt translation support
@@ -119,7 +120,11 @@ public:
 
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const override { return ToolCursor::MoveCursor; }
+  int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return ToolCursor::MoveCursor;
+  }
 
   void onSelectionChanged() { invalidate(); }
   bool select(const TSelection *) { return false; }
@@ -337,9 +342,11 @@ void HookTool::draw() {
     TPixel32 balloonColor(200, 220, 205, 200);
     TPoint balloonOffset(20, 20);
     std::string hookName = std::to_string(i + 1);
-    drawBalloon(p0, hookName, balloonColor, balloonOffset, getPixelSize(), false, &balloons);
+    drawBalloon(p0, hookName, balloonColor, balloonOffset, getPixelSize(),
+                false, &balloons);
     if (!linked)
-      drawBalloon(p1, hookName, balloonColor, balloonOffset, getPixelSize(), false, &balloons);
+      drawBalloon(p1, hookName, balloonColor, balloonOffset, getPixelSize(),
+                  false, &balloons);
   }
   // draw snapped hook balloon
   if (m_snappedReason != "") {

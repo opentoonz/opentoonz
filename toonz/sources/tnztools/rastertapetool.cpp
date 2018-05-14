@@ -27,6 +27,7 @@
 #include "toonz/tpalettehandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "tools/toolhandle.h"
+#include "toonz/preferences.h"
 
 // For Qt translation support
 #include <QCoreApplication>
@@ -684,6 +685,9 @@ public:
   //----------------------------------------------------------------------
 
   int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+
     int ret = ToolCursor::TapeCursor;
 
     if (m_closeType.getValue() == FREEHAND_CLOSE)

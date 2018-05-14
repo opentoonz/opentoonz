@@ -28,6 +28,7 @@
 #include "toonz/tpalettehandle.h"
 #include "toonz/tobjecthandle.h"
 #include "toonz/tcolumnhandle.h"
+#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -708,6 +709,9 @@ void EraserTool::draw() {
 //----------------------------------------------------------------------
 
 int EraserTool::getCursorId() const {
+  if (Preferences::instance()->isSimpleCursorEnabled())
+    return ToolCursor::PenCursor;
+
   int ret;
   if (m_eraseType.getValue() == NORMALERASE)
     ret = ToolCursor::NormalEraserCursor;
@@ -1654,11 +1658,10 @@ void EraserTool::storeUndoAndRefresh() {
     TUndoManager::manager()->add(new RasterBluredEraserUndo(
         m_tileSet, m_points,
         TTool::getApplication()->getCurrentLevelStyleIndex(),
-        m_currentStyle.getValue(),
-        TTool::getApplication()
-            ->getCurrentLevel()
-            ->getLevel()
-            ->getSimpleLevel(),
+        m_currentStyle.getValue(), TTool::getApplication()
+                                       ->getCurrentLevel()
+                                       ->getLevel()
+                                       ->getSimpleLevel(),
         m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId,
         m_toolSize.getValue(), m_hardness.getValue() * 0.01,
         m_colorType.getValue()));

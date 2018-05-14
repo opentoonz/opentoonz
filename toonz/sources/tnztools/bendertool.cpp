@@ -13,6 +13,8 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
 
+#include "toonz/preferences.h"
+
 using namespace ToolUtils;
 
 //=============================================================================
@@ -188,7 +190,11 @@ public:
     m_hitStrokeCorners.clear();
   }
 
-  int getCursorId() const override { return m_cursor; }
+  int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return m_cursor;
+  }
 } BenderTool;
 
 //-----------------------------------------------------------------------------

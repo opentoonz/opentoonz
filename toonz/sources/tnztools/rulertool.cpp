@@ -17,6 +17,7 @@
 
 #include "tconst.h"
 #include "toonz/tframehandle.h"
+#include "toonz/preferences.h"
 
 //----------------------------------------------------------------------------------------------
 
@@ -164,6 +165,9 @@ void RulerTool::onActivate() {
 //----------------------------------------------------------------------------------------------
 
 int RulerTool::getCursorId() const {
+  if (Preferences::instance()->isSimpleCursorEnabled())
+    return ToolCursor::PenCursor;
+
   if (m_dragMode == MakeNewRuler)
     return ToolCursor::RulerNewCursor;
   else

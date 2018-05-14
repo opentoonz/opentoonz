@@ -182,24 +182,23 @@ public:
       break;
     }
 
-	if (baseCursorType == ToolCursor::CURSOR_ARROW) {
-		CursorData data;
-		QCursor leftArrow(Qt::ArrowCursor);
-		data.pixmap = leftArrow.pixmap();
-		data.x = leftArrow.hotSpot().x();
-		data.y = leftArrow.hotSpot().y();
+    if (baseCursorType == ToolCursor::CURSOR_ARROW) {
+      CursorData data;
+      QCursor leftArrow(Qt::ArrowCursor);
+      data.pixmap = leftArrow.pixmap();
+      data.x      = leftArrow.hotSpot().x();
+      data.y      = leftArrow.hotSpot().y();
 
-		if (useLeft) {
-			QImage target = (&data.pixmap)->toImage();
-			(&data.pixmap)->convertFromImage(target.mirrored(true, false));
-			data.x = data.pixmap.width() - data.x - 1;
-			it = m_cursorsLeft.insert(std::make_pair(cursorType, data)).first;
-		}
-		else
-			it = m_cursors.insert(std::make_pair(cursorType, data)).first;
+      if (useLeft) {
+        QImage target = (&data.pixmap)->toImage();
+        (&data.pixmap)->convertFromImage(target.mirrored(true, false));
+        data.x = data.pixmap.width() - data.x - 1;
+        it     = m_cursorsLeft.insert(std::make_pair(cursorType, data)).first;
+      } else
+        it = m_cursors.insert(std::make_pair(cursorType, data)).first;
 
-		return it->second;
-	}
+      return it->second;
+    }
 
     // provo a cercarlo in cursorInfo[]
     int i;

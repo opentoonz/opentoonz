@@ -21,6 +21,7 @@
 #include "toonz/stage2.h"
 #include "toonz/ttileset.h"
 #include "toonz/rasterstrokegenerator.h"
+#include "toonz/preferences.h"
 #include "tgl.h"
 #include "tenv.h"
 
@@ -288,7 +289,11 @@ public:
 
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
-  int getCursorId() const override { return m_cursor; }
+  int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return m_cursor;
+  }
 
   int getColorClass() const { return 2; }
 

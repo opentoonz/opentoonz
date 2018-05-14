@@ -20,6 +20,7 @@
 #include "toonz/tstageobject.h"
 #include "tools/toolhandle.h"
 #include "toonz/stage2.h"
+#include "toonz/preferences.h"
 #include "tenv.h"
 // For Qt translation support
 #include <QCoreApplication>
@@ -717,9 +718,8 @@ public:
     std::vector<TFilledRegionInf> *fillInformation =
         new std::vector<TFilledRegionInf>;
     ImageUtils::getFillingInformationOverlappingArea(
-        vi, *fillInformation,
-        vi->getStroke(m_strokeIndex1)->getBBox() +
-            vi->getStroke(m_strokeIndex2)->getBBox());
+        vi, *fillInformation, vi->getStroke(m_strokeIndex1)->getBBox() +
+                                  vi->getStroke(m_strokeIndex2)->getBBox());
 
     doTape(vi, fillInformation, m_joinStrokes.getValue());
 
@@ -760,6 +760,9 @@ public:
   }
 
   int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+
     int ret                            = ToolCursor::TapeCursor;
     if (m_type.getValue() == RECT) ret = ret | ToolCursor::Ex_Rectangle;
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)

@@ -563,6 +563,9 @@ TPropertyGroup *RGBPickerTool::getProperties(int targetType) { return &m_prop; }
 //---------------------------------------------------------
 
 int RGBPickerTool::getCursorId() const {
+  if (Preferences::instance()->isSimpleCursorEnabled())
+    return ToolCursor::PenCursor;
+
   int currentStyleId = getApplication()
                            ->getPaletteController()
                            ->getCurrentPalette()

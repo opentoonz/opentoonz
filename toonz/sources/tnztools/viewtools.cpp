@@ -6,6 +6,8 @@
 #include "tgeometry.h"
 #include "tproperty.h"
 
+#include "toonz/preferences.h"
+
 #include <math.h>
 
 #include "tgl.h"
@@ -81,7 +83,11 @@ public:
     glPopMatrix();
   }
 
-  int getCursorId() const override { return ToolCursor::ZoomCursor; }
+  int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return ToolCursor::ZoomCursor;
+  }
 
 } zoomTool;
 
@@ -122,7 +128,11 @@ public:
     m_sw.stop();
   }
 
-  int getCursorId() const override { return ToolCursor::PanCursor; }
+  int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return ToolCursor::PanCursor;
+  }
 
 } handTool;
 
@@ -219,7 +229,11 @@ public:
                    TPointD(m_center.x, u + m_center.y));
   }
 
-  int getCursorId() const override { return ToolCursor::RotateCursor; }
+  int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return ToolCursor::RotateCursor;
+  }
 
 } rotateTool;
 

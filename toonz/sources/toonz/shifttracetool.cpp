@@ -15,6 +15,7 @@
 #include "toonz/tframehandle.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/dpiscale.h"
+#include "toonz/preferences.h"
 #include "tapp.h"
 #include "tpixel.h"
 #include "toonzqt/menubarcommand.h"
@@ -541,6 +542,9 @@ void ShiftTraceTool::draw() {
 }
 
 int ShiftTraceTool::getCursorId() const {
+  if (Preferences::instance()->isSimpleCursorEnabled())
+    return ToolCursor::PenCursor;
+
   if (m_highlightedGadget == RotateGadget)
     return ToolCursor::RotateCursor;
   else if (isCurveGadget(m_highlightedGadget))

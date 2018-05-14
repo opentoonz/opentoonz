@@ -15,6 +15,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
+#include "toonz/preferences.h"
 
 using namespace ToolUtils;
 
@@ -446,7 +447,11 @@ lefrightButtonDown(p);
 
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return m_cursorId;
+  }
 
 } magnetTool;
 

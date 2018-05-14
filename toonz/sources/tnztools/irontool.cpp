@@ -12,6 +12,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tstageobject.h"
+#include "toonz/preferences.h"
 
 #ifdef _DEBUG
 #include "tcolorstyles.h"
@@ -505,7 +506,11 @@ Altrimenti non si fa altro che aumentarli i punti di controllo
 
   void onLeave() override { m_draw = false; }
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return m_cursorId;
+  }
   void onEnter() override {
     m_draw = true;
     if ((TVectorImageP)getImage(false))

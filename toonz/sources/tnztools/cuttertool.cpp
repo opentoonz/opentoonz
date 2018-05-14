@@ -20,6 +20,8 @@
 #include "toonzqt/imageutils.h"
 #include "toonzqt/tselectionhandle.h"
 
+#include "toonz/preferences.h"
+
 #include "tgl.h"
 
 using namespace ToolUtils;
@@ -315,7 +317,11 @@ public:
       m_cursorId = ToolCursor::CURSOR_NO;
   }
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+    return m_cursorId;
+  }
 
 } cutterTool;
 

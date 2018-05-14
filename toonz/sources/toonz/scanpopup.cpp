@@ -1147,6 +1147,9 @@ public:
   //-----------------------------------------------------------------------------
 
   int getCursorId() const override {
+    if (Preferences::instance()->isSimpleCursorEnabled())
+      return ToolCursor::PenCursor;
+
     switch (m_scaling) {
     case eNone:
       return ToolCursor::StrokeSelectCursor;

@@ -212,6 +212,9 @@ void StylePickerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 }
 
 int StylePickerTool::getCursorId() const {
+  if (Preferences::instance()->isSimpleCursorEnabled())
+    return ToolCursor::PenCursor;
+
   int ret;
   /* in case the "organize palette" option is active */
   if (m_organizePalette.getValue())

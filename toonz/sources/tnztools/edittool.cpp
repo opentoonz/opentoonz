@@ -24,6 +24,7 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/tfxhandle.h"
 #include "toonz/tstageobjectcmd.h"
+#include "toonz/preferences.h"
 
 #include "edittoolgadgets.h"
 
@@ -1207,7 +1208,7 @@ void EditTool::drawMainHandle() {
   TAffine parentAff    = xsh->getParentPlacement(objId, frame);
   TAffine aff          = xsh->getPlacement(objId, frame);
   TPointD center       = Stage::inch * xsh->getCenter(objId, frame);
-  int devPixRatio = getDevPixRatio();
+  int devPixRatio      = getDevPixRatio();
   // the gadget appears on the center of the level. orientation and dimension
   // are independent of the movement of the level
   glPushMatrix();
@@ -1643,6 +1644,9 @@ bool EditTool::onPropertyChanged(std::string propertyName) {
 //-----------------------------------------------------------------------------
 
 int EditTool::getCursorId() const {
+  if (Preferences::instance()->isSimpleCursorEnabled())
+    return ToolCursor::PenCursor;
+
   /*--- FxParameter操作中のカーソル ---*/
   if (m_highlightedDevice >= 1000) return ToolCursor::FxGadgetCursor;
 
