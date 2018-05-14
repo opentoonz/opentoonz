@@ -487,10 +487,10 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 //-------------------------------------------------------------------------------------------------------------
 
 void FullColorBrushTool::draw() {
-  // If toggled off, don't draw brush outline
-  if (!Preferences::instance()->isCursorOutlineEnabled()) return;
-
   if (TRasterImageP ri = TRasterImageP(getImage(false))) {
+    // If toggled off, don't draw brush outline
+    if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
     TRasterP ras = ri->getRaster();
 
     double alpha       = 1.0;

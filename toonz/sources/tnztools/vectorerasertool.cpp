@@ -434,6 +434,9 @@ void EraserTool::draw() {
         drawRect(m_selectingRect, color, 0xFFFF, true);
     }
     if (m_eraseType.getValue() == NORMAL_ERASE) {
+      // If toggled off, don't draw brush outline
+      if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
       tglColor(TPixel32(255, 0, 255));
       tglDrawCircle(m_brushPos, m_pointSize);
     }

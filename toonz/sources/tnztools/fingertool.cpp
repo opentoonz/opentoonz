@@ -344,6 +344,9 @@ void FingerTool::draw() {
     return;
   }
 
+  // If toggled off, don't draw brush outline
+  if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
   TToonzImageP ti = (TToonzImageP)getImage(false);
   if (!ti) return;
   TRasterP ras = ti->getRaster();

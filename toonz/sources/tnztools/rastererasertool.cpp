@@ -663,6 +663,9 @@ void EraserTool::draw() {
       drawRect(m_selectingRect, color, 0xFFFF, true);
   }
   if (m_eraseType.getValue() == NORMALERASE) {
+    // If toggled off, don't draw brush outline
+    if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
     TToonzImageP image(img);
     TRasterP ras = image->getRaster();
     int lx       = ras->getLx();
