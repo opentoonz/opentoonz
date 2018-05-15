@@ -146,6 +146,8 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
   col++;
   QPushButton *discardNoteButton = new QPushButton(tr("Discard"));
   discardNoteButton->setMinimumSize(50, 20);
+  discardNoteButton->setStyleSheet("padding-left: 0;"
+                                   "padding-right: 0;");
   ret = ret && connect(discardNoteButton, SIGNAL(pressed()), this,
                        SLOT(onNoteDiscarded()));
   layout->addWidget(discardNoteButton, row, col, 1, 1);
