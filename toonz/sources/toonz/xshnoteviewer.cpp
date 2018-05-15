@@ -140,6 +140,8 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
 
   QPushButton *addNoteButton = new QPushButton(tr("Post"));
   addNoteButton->setMinimumSize(50, 20);
+  addNoteButton->setStyleSheet("padding-left: 0;"
+                               "padding-right: 0;");
   ret = ret &&
         connect(addNoteButton, SIGNAL(pressed()), this, SLOT(onNoteAdded()));
   layout->addWidget(addNoteButton, row, col, 1, 1);
