@@ -140,16 +140,14 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
 
   QPushButton *addNoteButton = new QPushButton(tr("Post"));
   addNoteButton->setMinimumSize(50, 20);
-  addNoteButton->setStyleSheet("padding-left: 0;"
-                               "padding-right: 0;");
+  addNoteButton->setObjectName("PushButton_NoPadding");
   ret = ret &&
         connect(addNoteButton, SIGNAL(pressed()), this, SLOT(onNoteAdded()));
   layout->addWidget(addNoteButton, row, col, 1, 1);
   col++;
   QPushButton *discardNoteButton = new QPushButton(tr("Discard"));
   discardNoteButton->setMinimumSize(50, 20);
-  discardNoteButton->setStyleSheet("padding-left: 0;"
-                                   "padding-right: 0;");
+  discardNoteButton->setObjectName("PushButton_NoPadding");
   ret = ret && connect(discardNoteButton, SIGNAL(pressed()), this,
                        SLOT(onNoteDiscarded()));
   layout->addWidget(discardNoteButton, row, col, 1, 1);
