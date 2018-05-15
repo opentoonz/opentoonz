@@ -2842,7 +2842,9 @@ void TCellSelection::extendPrevCell() {
 
   for (c = c0; c <= c1; c++) {
     TXshColumn *column = xsh->getColumn(c);
-    if (!column || column->getSoundColumn()) continue;
+    if (!column || column->isEmpty() || column->isLocked() ||
+        column->getSoundColumn())
+      continue;
 
     for (r = r1; r >= r0; r--) {
       int fillCount = 0;
