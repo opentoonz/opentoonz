@@ -146,6 +146,7 @@
 
 #define MI_PasteNew "MI_PasteNew"
 #define MI_Autorenumber "MI_Autorenumber"
+#define MI_ExtendPrevCell "MI_ExtendPrevCell"
 
 #define MI_MergeFrames "MI_MergeFrames"
 #define MI_Reverse "MI_Reverse"
