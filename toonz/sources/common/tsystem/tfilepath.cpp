@@ -73,7 +73,8 @@ bool isNumbers(std::wstring str, int fromSeg, int toSeg) {
 }
 
 bool checkForSeqNum(QString type) {
-  if (type == "myb" || type == "tlv" || type == "pli" || type == "tpl")
+  if (type == "myb" || type == "tlv" || type == "pli" || type == "tpl" ||
+      type == "tnz")
     return false;
   return true;
 }

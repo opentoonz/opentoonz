@@ -1287,11 +1287,14 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
         m_tileSaver->save(m_rasterTrack->getLastRect());
         m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue());
 
-        m_smoothStroke.beginStroke(m_smooth.getValue());
-        m_smoothStroke.addPoint(thickPoint);
         std::vector<TThickPoint> pts;
-        m_smoothStroke.getSmoothPoints(
-            pts);  // skip first point because it has been outputted
+        if (m_smooth.getValue() == 0) {
+          pts.push_back(thickPoint);
+        } else {
+          m_smoothStroke.beginStroke(m_smooth.getValue());
+          m_smoothStroke.addPoint(thickPoint);
+          m_smoothStroke.getSmoothPoints(pts);
+        }
       } else {
         m_points.clear();
         TThickPoint point(pos + rasCenter, thickness);
@@ -1309,11 +1312,14 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
                                      m_styleId, drawOrder);
         m_lastRect = m_strokeRect;
 
-        m_smoothStroke.beginStroke(m_smooth.getValue());
-        m_smoothStroke.addPoint(point);
         std::vector<TThickPoint> pts;
-        m_smoothStroke.getSmoothPoints(
-            pts);  // skip first point because it has been outputted
+        if (m_smooth.getValue() == 0) {
+          pts.push_back(point);
+        } else {
+          m_smoothStroke.beginStroke(m_smooth.getValue());
+          m_smoothStroke.addPoint(point);
+          m_smoothStroke.getSmoothPoints(pts);
+        }
       }
       /*-- 作業中のFidを登録 --*/
       m_workingFrameId = getFrameId();
@@ -1366,9 +1372,13 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
       if (!m_pencil.getValue()) thickness -= 1.0;
 
       TThickPoint thickPoint(pos + rasCenter, thickness);
-      m_smoothStroke.addPoint(thickPoint);
       std::vector<TThickPoint> pts;
-      m_smoothStroke.getSmoothPoints(pts);
+      if (m_smooth.getValue() == 0) {
+        pts.push_back(thickPoint);
+      } else {
+        m_smoothStroke.addPoint(thickPoint);
+        m_smoothStroke.getSmoothPoints(pts);
+      }
       for (size_t i = 0; i < pts.size(); ++i) {
         const TThickPoint &thickPoint = pts[i];
         isAdded                       = m_rasterTrack->add(thickPoint);
@@ -1400,9 +1410,13 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
       // antialiased brush
       assert(m_workRas.getPointer() && m_backupRas.getPointer());
       TThickPoint thickPoint(pos + rasCenter, thickness);
-      m_smoothStroke.addPoint(thickPoint);
       std::vector<TThickPoint> pts;
-      m_smoothStroke.getSmoothPoints(pts);
+      if (m_smooth.getValue() == 0) {
+        pts.push_back(thickPoint);
+      } else {
+        m_smoothStroke.addPoint(thickPoint);
+        m_smoothStroke.getSmoothPoints(pts);
+      }
       bool rectUpdated = false;
       for (size_t i = 0; i < pts.size(); ++i) {
         TThickPoint old = m_points.back();
@@ -1823,10 +1837,14 @@ void BrushTool::finishRasterBrush(const TPointD &pos, double pressureVal) {
 
     TRectD invalidateRect;
     TThickPoint thickPoint(pos + rasCenter, thickness);
-    m_smoothStroke.addPoint(thickPoint);
-    m_smoothStroke.endStroke();
     std::vector<TThickPoint> pts;
-    m_smoothStroke.getSmoothPoints(pts);
+    if (m_smooth.getValue() == 0) {
+      pts.push_back(thickPoint);
+    } else {
+      m_smoothStroke.addPoint(thickPoint);
+      m_smoothStroke.endStroke();
+      m_smoothStroke.getSmoothPoints(pts);
+    }
     for (size_t i = 0; i < pts.size(); ++i) {
       const TThickPoint &thickPoint = pts[i];
       bool isAdded                  = m_rasterTrack->add(thickPoint);
@@ -1878,10 +1896,14 @@ void BrushTool::finishRasterBrush(const TPointD &pos, double pressureVal) {
       TRectD invalidateRect;
       bool rectUpdated = false;
       TThickPoint thickPoint(pos + rasCenter, thickness);
-      m_smoothStroke.addPoint(thickPoint);
-      m_smoothStroke.endStroke();
       std::vector<TThickPoint> pts;
-      m_smoothStroke.getSmoothPoints(pts);
+      if (m_smooth.getValue() == 0) {
+        pts.push_back(thickPoint);
+      } else {
+        m_smoothStroke.addPoint(thickPoint);
+        m_smoothStroke.endStroke();
+        m_smoothStroke.getSmoothPoints(pts);
+      }
       for (size_t i = 0; i < pts.size() - 1; ++i) {
         TThickPoint old = m_points.back();
         if (norm2(pos - old) < 4) continue;

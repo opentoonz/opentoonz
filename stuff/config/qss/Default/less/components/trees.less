@@ -5,8 +5,6 @@
 // Tree List
 // -----------------------------------------------------------------------------
 
-// List text-items
-
 .tree-list {
   background-color: @tree-bg-color;
   alternate-background-color: @tree-bg-color-alt;
@@ -16,7 +14,7 @@
   &::item {
     color: @text-color;
     &:selected {
-      .selected-primary;
+      .hl-color;
     }
     &:focus {
       border: 0;
@@ -25,11 +23,8 @@
   }
 }
 
-// Branch Icon Size
+// Branch Icon
 // -----------------------------------------------------------------------------
-
-// DO NOT EXTEND TO THIS MIXIN - IT IS A FUNCTION PLACEHOLDER
-// There are multiple branch sizes to choose from, see below for options
 
 .branch-base(@size: 17) {
   &:adjoins-item {
@@ -69,9 +64,9 @@
 
 // -----------------------------------------------------------------------------
 
-// Branch size options
-// I used a mixin placeholder above and created the options below in their own
-// classes because we cannot extend to a mixin, extend to any class below
+// there are two branch sizes in OpenToonz, extend to required size using the
+// mixins below by calling:
+// &:extend(.branch(17); or &:extend(.branch(22);
 
 // Branch icon size 17
 

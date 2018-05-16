@@ -4,19 +4,20 @@
 
 #ComboViewerPanel {
   & Toolbar {
-    border-bottom: 1px solid @accent; // accent line against viewport
+    border-bottom: 1 solid @accent; // accent line against viewport
     &::separator:horizontal {
-      // workaround for first tool button which adds spacing
-      margin: 0 0 0 2px;
+      // workaround for first tool button
+      // which helps with alignment
+      margin: 0 0 0 2;
     }
     & QToolButton {
-      margin: 2px 0 3px 2px;
+      margin: 2 0 3 2;
     }
   }
 }
 
 #ComboViewerToolOptions {
-  border-bottom: 1px solid @accent; // accent line against viewport & ToolBar
+  border-bottom: 1 solid @accent; // accent line against viewport & ToolBar
 }
 
 #ComboViewer,
@@ -24,20 +25,20 @@
 FlipBook {
   & #ToolBarContainer {
     background-color: transparent;
-    border-top: 2px solid @accent;
-    border-bottom: 1px solid @accent;
-    padding-right: -1px; // hides right border on #ScrollRightButton when
-                         // FPS Slider is turned off
+    border-top: 2 solid @accent;
+    border-bottom: 1 solid @accent;
+    padding-right: -1; // hides right border on #ScrollRightButton when
+                       // fps slider is disabled
   }
 }
 
 #flipCustomize {
   // options menu
   &:extend(.button-tool all);
-  margin-left: 3px;
+  margin-left: 3;
   &::menu-button {
     background-color: transparent;
-    width: 35px;
+    width: 35;
   }
   &::menu-arrow {
     image: none;
@@ -46,14 +47,14 @@ FlipBook {
 
 QToolBar#FlipConsolePlayToolBar {
   &::separator:horizontal {
-    margin: 0 3px;
+    margin: 0 3;
   }
   & QToolButton {
-    margin-top: 2px;
-    margin-bottom: 2px;
-    height: 16px;
-    padding-left: 3px;
-    padding-right: 3px;
+    margin-top: 2;
+    margin-bottom: 2;
+    height: 16;
+    padding-left: 1;
+    padding-right: 1;
   }
 }
 
@@ -63,30 +64,30 @@ QToolBar#FlipConsolePlayToolBar {
   background-position: center center;
   background-repeat: repeat-x;
   border: 0;
-  height: 19px;
-  margin: 0 3px 0 37px;
-  max-width: 300px;
-  min-width: 0px;
+  height: 19;
+  margin: 0 3 0 37;
+  max-width: 300;
+  min-width: 0;
   &::sub-line:horizontal {
     subcontrol-origin: absolute;
     background-color: @button-bg-color;
-    border: 1px solid @button-border-color;
-    border-top-left-radius: 2px;
-    border-bottom-left-radius: 2px;
-    height: 16px;
-    left: -33px;
-    width: 14px;
+    border: 1 solid @button-border-color;
+    border-top-left-radius: 2;
+    border-bottom-left-radius: 2;
+    height: 16;
+    left: -33;
+    width: 14;
   }
   &::add-line:horizontal {
     subcontrol-position: left;
     background-color: @button-bg-color;
-    border: 1px solid @button-border-color;
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-    left: 18px;
-    height: 16px;
+    border: 1 solid @button-border-color;
+    border-top-right-radius: 2;
+    border-bottom-right-radius: 2;
+    left: 18;
+    height: 16;
     image-position: center center;
-    width: 13px;
+    width: 13;
   }
   &::sub-line:horizontal,
   &::add-line:horizontal {
@@ -102,11 +103,11 @@ QToolBar#FlipConsolePlayToolBar {
   }
   &::handle {
     &::horizontal {
-      @size: 9px;
+      @size: 9;
       background-color: @slider-handle-bg-color;
-      border: 1px solid @slider-handle-border-color;
-      border-radius: 2px;
-      margin: 2px 0 3px 0;
+      border: 1 solid @slider-handle-border-color;
+      border-radius: 2;
+      margin: 2 0 3 0;
       min-width: @size;
       width: @size;
       max-width: @size;

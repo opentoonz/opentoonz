@@ -4,15 +4,15 @@
 
 // Show (+/-) Button
 // -----------------------------------------------------------------------------
+// a button style for the show more options button
 
-// A button style for the show more options button
 .button-show {
   image: url('@{img-url}/plus.svg');
   image-position: center center;
   margin: 0;
-  padding: 1px;
-  min-width: 10px;
-  min-height: 10px;
+  padding: 1;
+  min-width: 10;
+  min-height: 10;
   &:checked {
     background-color: @button-bg-color-checked;
     border-color: @button-border-color-checked;
@@ -29,14 +29,14 @@
 
 // Tool Button
 // -----------------------------------------------------------------------------
+// ideal for use on toolbar buttons and console buttons
 
-// A button style intended for highlighting selected tools
 .button-tool {
   background-color: @toolbutton-bg-color;
-  border: 1px solid @toolbutton-border-color;
-  border-radius: 2px;
+  border: 1 solid @toolbutton-border-color;
+  border-radius: 2;
   color: @toolbutton-text-color;
-  margin: 1px;
+  margin: 1;
   padding: 0;
   &:hover {
     background-color: @toolbutton-bg-color-hover;
@@ -64,8 +64,9 @@
 
 // Flat Button
 // -----------------------------------------------------------------------------
+// this is a flat button style with no border and no margin
+// ideal for use in palette tool bars and tight areas
 
-// A flat button style with no border and no margin
 .button-flat {
   background-color: none;
   border: 0;
