@@ -33,8 +33,6 @@ enum {
   MagnetCursor,
   PanCursor,
   PickerCursor,
-  PickerCursorLine,
-  PickerCursorArea,
   PumpCursor,
   RotCursor,
   RotTopLeft,
@@ -58,13 +56,11 @@ enum {
   SplineEditorCursorAdd,
   TrackerCursor,
   ForbiddenCursor,
-  EditFxCursor,
 
   NormalEraserCursor,
   RectEraserCursor,
   PickerCursorOrganize,
 
-  PickerRGB,
   PickerRGBWhite,
 
   FillCursorL,
@@ -72,12 +68,18 @@ enum {
   MoveEWCursor,
   MoveNSCursor,
   DisableCursor,
-  MoveZCursor,
   ScaleGlobalCursor,
-  ScaleHVCursor,
-  FxGadgetCursor,
   RulerModifyCursor,
   RulerNewCursor,
+
+  // Base cursors with fixed set of decorations. See below
+  FxGadgetCursorBase,
+  EditFxCursorBase,
+  MoveZCursorBase,
+  PickerCursorLineBase,
+  PickerCursorAreaBase,
+  PickerRGBBase,
+  ScaleHVCursorBase,
 
   // extra options for decorating the cursor
   Ex_Negate           = 0x100,  // used for black bg
@@ -92,7 +94,19 @@ enum {
   Ex_StyleLine        = 0x20000,
   Ex_StyleArea        = 0x40000,
   Ex_RGB              = 0x80000,
-  Ex_HV               = 0x100000
+  Ex_HV               = 0x100000,
+
+  // This section is for cursors that have fixed text that needs to
+  // be handled separately when flipping for left-handed cursors.
+  // The base gets flipped, but a left-handed version of text will be
+  // used instead of flipped.
+  FxGadgetCursor   = FxGadgetCursorBase | Ex_FX,
+  EditFxCursor     = EditFxCursorBase | Ex_FX,
+  MoveZCursor      = MoveZCursorBase | Ex_Z,
+  PickerCursorLine = PickerCursorLineBase | Ex_StyleLine,
+  PickerCursorArea = PickerCursorAreaBase | Ex_StyleArea,
+  PickerRGB        = PickerRGBBase | Ex_RGB,
+  ScaleHVCursor    = ScaleHVCursorBase | Ex_HV
 };
 
 }  // namespace

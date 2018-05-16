@@ -33,8 +33,10 @@ const struct {
     {ToolCursor::MoveEWCursor, "move_ew", 15, 15, false},
     {ToolCursor::MoveNSCursor, "move_ns", 15, 15, false},
     {ToolCursor::DisableCursor, "disable", 15, 15, false},
-    {ToolCursor::MoveZCursor, "move_z_notext", 15, 15, false},
-    {ToolCursor::FxGadgetCursor, "edit_FX_notext", 11, 6, true},
+    {ToolCursor::MoveZCursor, "", 0, 0, false},
+    {ToolCursor::MoveZCursorBase, "move_z_notext", 15, 15, false},
+    {ToolCursor::FxGadgetCursor, "", 0, 0, false},
+    {ToolCursor::FxGadgetCursorBase, "edit_FX_notext", 11, 6, true},
     {ToolCursor::FlipHCursor, "flip_h", 15, 15, false},
     {ToolCursor::FlipVCursor, "flip_v", 15, 15, false},
     {ToolCursor::IronCursor, "iron", 15, 15, true},
@@ -42,8 +44,10 @@ const struct {
     {ToolCursor::MagnetCursor, "magnet", 18, 18, true},
     {ToolCursor::PanCursor, "pan", 17, 17, true},
 
-    {ToolCursor::PickerCursorLine, "picker_style", 7, 22, true},
-    {ToolCursor::PickerCursorArea, "picker_style", 7, 22, true},
+    {ToolCursor::PickerCursorLine, "", 0, 0, false},
+    {ToolCursor::PickerCursorLineBase, "picker_style", 7, 22, true},
+    {ToolCursor::PickerCursorArea, "", 0, 0, false},
+    {ToolCursor::PickerCursorAreaBase, "picker_style", 7, 22, true},
     {ToolCursor::PickerCursor, "picker_style", 7, 22, true},
 
     {ToolCursor::PumpCursor, "pump", 16, 23, false},
@@ -56,9 +60,11 @@ const struct {
     {ToolCursor::ScaleInvCursor, "scale_inv", 15, 15, false},
     {ToolCursor::ScaleHCursor, "scale_h", 15, 15, false},
     {ToolCursor::ScaleVCursor, "scale_v", 15, 15, false},
-    {ToolCursor::EditFxCursor, "edit_FX_notext", 11, 6, true},
+    {ToolCursor::EditFxCursor, "", 0, 0, false},
+    {ToolCursor::EditFxCursorBase, "edit_FX_notext", 11, 6, true},
     {ToolCursor::ScaleGlobalCursor, "scale_global", 15, 15, false},
-    {ToolCursor::ScaleHVCursor, "scale_hv", 15, 15, false},
+    {ToolCursor::ScaleHVCursor, "", 0, 0, false},
+    {ToolCursor::ScaleHVCursorBase, "scale_hv_notext", 15, 15, false},
     {ToolCursor::StrokeSelectCursor, "stroke_select", 11, 6, true},
     {ToolCursor::TapeCursor, "tape", 4, 23, true},
     {ToolCursor::TrackerCursor, "tracker", 16, 15, false},
@@ -74,7 +80,8 @@ const struct {
     {ToolCursor::NormalEraserCursor, "normaleraser", 7, 19, true},
     {ToolCursor::RectEraserCursor, "recteraser", 3, 26, true},
     {ToolCursor::PickerCursorOrganize, "picker_style_organize", 7, 22, true},
-    {ToolCursor::PickerRGB, "picker_style", 7, 22, true},
+    {ToolCursor::PickerRGB, "", 0, 0, false},
+    {ToolCursor::PickerRGBBase, "picker_style", 7, 22, true},
     {ToolCursor::PickerRGBWhite, "picker_rgb_white", 7, 22, true},
     {ToolCursor::FillCursorL, "karasu", 7, 25, true},
     {ToolCursor::RulerModifyCursor, "ruler_modify", 7, 7, true},
@@ -170,32 +177,6 @@ public:
 
     int decorationsFlag = cursorType & ~(0xFF);
     int baseCursorType  = cursorType & 0xFF;
-
-    switch (baseCursorType) {
-    case ToolCursor::FxGadgetCursor:
-      decorationsFlag |= ToolCursor::Ex_FX;
-      break;
-    case ToolCursor::EditFxCursor:
-      decorationsFlag |= ToolCursor::Ex_FX;
-      break;
-    case ToolCursor::MoveZCursor:
-      decorationsFlag |= ToolCursor::Ex_Z;
-      break;
-    case ToolCursor::PickerCursorLine:
-      decorationsFlag |= ToolCursor::Ex_StyleLine;
-      break;
-    case ToolCursor::PickerCursorArea:
-      decorationsFlag |= ToolCursor::Ex_StyleArea;
-      break;
-    case ToolCursor::PickerRGB:
-      decorationsFlag |= ToolCursor::Ex_RGB;
-      break;
-    case ToolCursor::ScaleHVCursor:
-      decorationsFlag |= ToolCursor::Ex_HV;
-      break;
-    default:
-      break;
-    }
 
     if (baseCursorType == ToolCursor::CURSOR_ARROW) {
       CursorData data;
