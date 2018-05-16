@@ -167,12 +167,12 @@ XsheetViewer {
   border: 0;
   & QToolButton {
     padding: 0;
-    margin: 4px 1px;
-    min-height: 19px;
-    height: 19px;
+    margin: 4 1;
+    min-height: 19;
+    height: 19;
   }
   &::separator:horizontal {
-    margin: 0 4px;
+    margin: 0 4;
   }
 }
 
@@ -182,15 +182,15 @@ XsheetViewer {
 
 #FunctionEditor {
   & QToolBar {
-    border-bottom: 1px solid @accent;
+    border-bottom: 1 solid @accent;
     & QToolBar {
       border: 0;
     }
     & QLabel {
-      margin-left: 5px;
+      margin-left: 5;
     }
     & QToolButton {
-      height: 18px; // gives the key button increased active space
+      height: 18; // gives the key button increased active space
     }
   }
 }
@@ -204,7 +204,7 @@ XsheetViewer {
   &:extend(.tree-list);
   background-color: @tree-bg-color;
   alternate-background-color: @tree-bg-color;
-  border-top: 1px solid @accent;
+  border-top: 1 solid @accent;
   &::branch { //
     &:extend(.branch-17 all);
   }
@@ -213,8 +213,8 @@ XsheetViewer {
 /* Function Editor Spreadsheet
 ----------------------------------------------------------------------------- */
 
-// If a property shares likeness with XSheet then pair them
-// XSheet should be considered the master
+// if a q_property shares likeness with XSheet then pair them
+// XSheet should be considered the parent
 
 FunctionTreeView {
   qproperty-TextColor: @function-treeview-text-color;
@@ -258,7 +258,7 @@ SpreadsheetViewer {
 
 #ExpressionField {
   background-color: @function-ExpressionFieldBG-color;
-	border: 1px solid @function-ExpressionFieldBorder-color;
+	border: 1 solid @function-ExpressionFieldBorder-color;
 	margin: 0;
 }
 
@@ -279,7 +279,8 @@ SpreadsheetViewer {
   }
 }
 
-// This fixes a Mac specific issue with text clipping and may be temporary
+// this fixes a Mac specific issue with text clipping
+// and may be temporary
 #flipOrientationButton {
-  padding: 2px 12px;
+  padding: 2 12;
 }

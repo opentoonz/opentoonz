@@ -13,15 +13,15 @@
 
 // Flat Tabs
 // -----------------------------------------------------------------------------
+// these are flat tabs with no top border ideal for palette widget etc
 
-// Flat angular tabs with no top border
 .tab-flat {
-  @horizontal-padding: 4px;
+  @horizontal-padding: 4;
   background-color: @tab-bg-color;
-  border-right: 1px solid @accent;
+  border-right: 1 solid @accent;
+  border-bottom: 1 solid @accent;
   color: @tab-text-color;
-  margin: 0 0 1px 0;
-  padding: 3px @horizontal-padding 3px @horizontal-padding;
+  padding: 3 @horizontal-padding 3 @horizontal-padding;
   &:hover {
     background-color: @tab-bg-color-hover;
     color: @tab-text-color-hover;
@@ -29,49 +29,49 @@
   &:selected {
     background-color: @tab-bg-color-selected;
     color: @tab-text-color-selected;
-    margin: 0;
-    padding: 1px @horizontal-padding 2px @horizontal-padding;
+    border-bottom-color: @tab-bg-color-selected;
   }
   &:only-one {
     margin: 0;
-    padding: 3px @horizontal-padding 4px @horizontal-padding;
   }
 }
 
 // Rounded Tabs
 // -----------------------------------------------------------------------------
+// these are rounded tabs with top border ideal for fx panels etc
 
-// Classical rounded tabs
 .tab-round {
-  @horizontal-padding: 7px;
+  @horizontal-padding: 7;
   background-color: @tab-bg-color;
-  border-top: 1px solid @accent;
-  border-right: 1px solid @accent;
-  border-left: 1px solid @accent;
+  border-top: 1 solid @accent;
+  border-right: 1 solid @accent;
+  border-left: 1 solid @accent;
+  border-bottom: 1 solid @accent;
   color: @tab-text-color;
-  margin: 3px -1px 1px 0;
-  padding: 2px @horizontal-padding 1px @horizontal-padding;
+  margin: 3 -1 0 0;
+  padding: 2 @horizontal-padding 1 @horizontal-padding;
   &:hover {
     background-color: @tab-bg-color-hover;
     color: @tab-text-color-hover;
   }
   &:selected {
     background-color: @tab-bg-color-selected;
-    border-top-right-radius: 2px;
-    border-top-left-radius: 2px;
+    border-top-right-radius: 2;
+    border-top-left-radius: 2;
+    border-bottom-color: @tab-bg-color-selected;
     color: @tab-text-color-selected;
-    margin: 1px -1px 0 0;
-    padding: 2px @horizontal-padding 2px @horizontal-padding;
+    margin: 1 -1 -1 0;
+    padding: 2 @horizontal-padding 2 @horizontal-padding;
   }
   &:only-one {
-    margin: 1px 0 0 0;
-    padding: 3px @horizontal-padding 3px @horizontal-padding;
+    margin: 1 0 0 0;
+    padding: 3 @horizontal-padding 3 @horizontal-padding;
   }
   &:last {
     margin-right: 0;
-    border-top-right-radius: 2px;
+    border-top-right-radius: 2;
   }
   &:first {
-    border-top-left-radius: 2px;
+    border-top-left-radius: 2;
   }
 }

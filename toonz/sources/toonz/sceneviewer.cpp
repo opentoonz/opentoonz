@@ -928,7 +928,11 @@ void SceneViewer::drawEnableScissor() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::drawDisableScissor() {
-  if (!m_clipRect.isEmpty() && !m_draw3DMode) glDisable(GL_SCISSOR_TEST);
+  if (!m_clipRect.isEmpty() && !m_draw3DMode) {
+    glDisable(GL_SCISSOR_TEST);
+    // clear the clipping rect
+    m_clipRect.empty();
+  }
 }
 
 //-----------------------------------------------------------------------------
