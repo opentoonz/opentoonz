@@ -976,29 +976,34 @@ void openSubXsheet() {
   TColumnSelection *columnSelection =
       dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
 
-  bool ret          = false;
-  ToonzScene *scene = app->getCurrentScene()->getScene();
-  int row           = app->getCurrentFrame()->getFrame();
-  int col           = app->getCurrentColumn()->getColumnIndex();
-  bool jumpToFrame  = false;
+  bool ret               = false;
+  ToonzScene *scene      = app->getCurrentScene()->getScene();
+  int row                = app->getCurrentFrame()->getFrame();
+  int col                = app->getCurrentColumn()->getColumnIndex();
+  TXsheet *currentXsheet = app->getCurrentXsheet()->getXsheet();
+  TXshCell targetCell;
 
   /*- For column selection -*/
   if (columnSelection && !columnSelection->isEmpty()) {
-    TXsheet *currentXsheet = app->getCurrentXsheet()->getXsheet();
-    int sceneLength        = currentXsheet->getFrameCount();
+    int sceneLength = currentXsheet->getFrameCount();
 
     std::set<int> columnIndices = columnSelection->getIndices();
     std::set<int>::iterator it;
     /*- Try openChild on each cell for each Column -*/
     for (it = columnIndices.begin(); it != columnIndices.end(); ++it) {
       int c = *it;
+      // See if the current row indicator is on an exposed sub-xsheet frame
+      // If so, use that.
+      targetCell = currentXsheet->getCell(row, c);
+      if (!targetCell.isEmpty() &&
+          (ret = scene->getChildStack()->openChild(row, c)))
+        break;
+
       /*- For each Cell in the Column, if contents are found break -*/
       for (int r = 0; r < sceneLength; r++) {
         ret = scene->getChildStack()->openChild(r, c);
         if (ret) {
-          // If our current frame is in this column, we'll jump to the specific
-          // frame
-          if (c == col) jumpToFrame = true;
+          targetCell = currentXsheet->getCell(r, c);
           break;
         }
       }
@@ -1025,9 +1030,9 @@ void openSubXsheet() {
       for (int r = selectedArea.y0; r <= selectedArea.y1; r++) {
         ret = scene->getChildStack()->openChild(r, c);
         if (ret) {
-          // If our current frame is this column, we'll jump to the specific
-          // frame
-          if (c == col) jumpToFrame = true;
+          // When opening based on cell selection use the 1st
+          // exposed frame in the sub-xsheet it finds
+          targetCell = currentXsheet->getCell(r, c);
           break;
         }
       }
@@ -1037,12 +1042,10 @@ void openSubXsheet() {
 
   /*- When subXsheet Level is found -*/
   if (ret) {
-    int jumpToFrameIdx = 0;
+    int subXsheetFrame = 0;
 
-    if (jumpToFrame) {
-      TXshCell cell = app->getCurrentXsheet()->getXsheet()->getCell(row, col);
-      if (!cell.isEmpty()) jumpToFrameIdx = cell.getFrameId().getNumber() - 1;
-    }
+    if (!targetCell.isEmpty())
+      subXsheetFrame = targetCell.getFrameId().getNumber() - 1;
 
     if (TSelection::getCurrent()) TSelection::getCurrent()->selectNone();
 
@@ -1050,7 +1053,7 @@ void openSubXsheet() {
     app->getCurrentXsheet()->setXsheet(scene->getXsheet());
     app->getCurrentXsheet()->notifyXsheetChanged();
     app->getCurrentColumn()->setColumnIndex(0);
-    app->getCurrentFrame()->setFrameIndex(jumpToFrameIdx);
+    app->getCurrentFrame()->setFrameIndex(subXsheetFrame);
     changeSaveSubXsheetAsCommand();
   } else
     DVGui::error(QObject::tr("Select a sub-xsheet cell."));

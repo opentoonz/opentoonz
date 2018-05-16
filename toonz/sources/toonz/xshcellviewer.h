@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include "orientation.h"
 
+#include "toonz/txshcell.h"
+
 // forward declaration
 class XsheetViewer;
 class QMenu;
@@ -144,7 +146,7 @@ protected:
   /*!Crea il menu' del tasto destro che si visualizza quando si clicca sulla
 cella,
 distinguendo i due casi: cella piena, cella vuota.*/
-  void createCellMenu(QMenu &menu, bool isCellSelected);
+  void createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell);
   //! Crea il menu' del tasto destro che si visualizza si clicca su un key
   //! frame.
   void createKeyMenu(QMenu &menu);
