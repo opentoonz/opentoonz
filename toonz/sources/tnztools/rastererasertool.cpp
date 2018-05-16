@@ -712,9 +712,6 @@ void EraserTool::draw() {
 //----------------------------------------------------------------------
 
 int EraserTool::getCursorId() const {
-  if (Preferences::instance()->isSimpleCursorEnabled())
-    return ToolCursor::PenCursor;
-
   int ret;
   if (m_eraseType.getValue() == NORMALERASE)
     ret = ToolCursor::NormalEraserCursor;

@@ -24,7 +24,6 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/tfxhandle.h"
 #include "toonz/tstageobjectcmd.h"
-#include "toonz/preferences.h"
 
 #include "edittoolgadgets.h"
 
@@ -1644,9 +1643,6 @@ bool EditTool::onPropertyChanged(std::string propertyName) {
 //-----------------------------------------------------------------------------
 
 int EditTool::getCursorId() const {
-  if (Preferences::instance()->isSimpleCursorEnabled())
-    return ToolCursor::PenCursor;
-
   /*--- FxParameter操作中のカーソル ---*/
   if (m_highlightedDevice >= 1000) return ToolCursor::FxGadgetCursor;
 

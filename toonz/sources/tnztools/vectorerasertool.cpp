@@ -280,11 +280,7 @@ public:
 
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const override {
-    if (Preferences::instance()->isSimpleCursorEnabled())
-      return ToolCursor::PenCursor;
-    return ToolCursor::EraserCursor;
-  }
+  int getCursorId() const override { return ToolCursor::EraserCursor; }
   void onImageChanged() override;
 
   /*-- ドラッグ中にツールが切り替わった場合、Eraseの終了処理を行う --*/

@@ -10,7 +10,6 @@
 #include "tools/cursors.h"
 #include "toonz/stage2.h"
 #include "toonz/tobjecthandle.h"
-#include "toonz/preferences.h"
 
 #include <QKeyEvent>
 
@@ -1165,9 +1164,6 @@ bool SelectionTool::keyDown(QKeyEvent *event) {
 //-----------------------------------------------------------------------------
 
 int SelectionTool::getCursorId() const {
-  if (Preferences::instance()->isSimpleCursorEnabled())
-    return ToolCursor::PenCursor;
-
   TImageP image    = getImage(false);
   TToonzImageP ti  = (TToonzImageP)image;
   TRasterImageP ri = (TRasterImageP)image;

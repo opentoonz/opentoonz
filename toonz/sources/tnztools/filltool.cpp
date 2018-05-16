@@ -1769,9 +1769,6 @@ FillTool::FillTool(int targetType)
 //-----------------------------------------------------------------------------
 
 int FillTool::getCursorId() const {
-  if (Preferences::instance()->isSimpleCursorEnabled())
-    return ToolCursor::PenCursor;
-
   int ret;
   if (m_colorType.getValue() == LINES)
     ret = ToolCursor::FillCursorL;

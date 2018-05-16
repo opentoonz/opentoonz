@@ -18,6 +18,8 @@ enum {
   CURSOR_QUESTION,
 #endif
   PenCursor,
+  PenLargeCursor,
+  PenCrosshairCursor,
   BenderCursor,
   CutterCursor,
   DistortCursor,

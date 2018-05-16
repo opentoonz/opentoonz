@@ -32,7 +32,6 @@
 #include "toonz/dpiscale.h"
 #include "toonz/onionskinmask.h"
 #include "toonz/tonionskinmaskhandle.h"
-#include "toonz/preferences.h"
 #include <math.h>
 
 // For Qt translation support
@@ -120,11 +119,7 @@ public:
 
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const override {
-    if (Preferences::instance()->isSimpleCursorEnabled())
-      return ToolCursor::PenCursor;
-    return ToolCursor::MoveCursor;
-  }
+  int getCursorId() const override { return ToolCursor::MoveCursor; }
 
   void onSelectionChanged() { invalidate(); }
   bool select(const TSelection *) { return false; }

@@ -15,7 +15,6 @@
 #include "toonz/imagemanager.h"
 
 #include "toonz/tscenehandle.h"
-#include "toonz/preferences.h"
 
 // TnzTools includes
 #include "tools/toolutils.h"
@@ -833,9 +832,6 @@ void CameraTestTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //--------------------------------------------------------------------------
 
 int CameraTestTool::getCursorId() const {
-  if (Preferences::instance()->isSimpleCursorEnabled())
-    return ToolCursor::PenCursor;
-
   switch (m_scaling) {
   case eNoScale: {
     CleanupParameters *cp =

@@ -22,6 +22,8 @@ const struct {
   bool flippable;
 } cursorInfo[] = {
     {ToolCursor::PenCursor, "brush", 16, 15, false},
+    {ToolCursor::PenLargeCursor, "brush_large", 16, 15, false},
+    {ToolCursor::PenCrosshairCursor, "brush_crosshair", 16, 15, false},
     {ToolCursor::BenderCursor, "bender", 9, 7, true},
     {ToolCursor::CutterCursor, "cutter", 6, 24, true},  // 12,20, ???},
     {ToolCursor::EraserCursor, "eraser", 7, 21, true},  // 15,16, ???},
@@ -144,7 +146,20 @@ public:
   const CursorData &getCursorData(int cursorType) {
     // se e' gia' in tabella lo restituisco
     std::map<int, CursorData>::iterator it;
-    bool useLeft = Preferences::instance()->isCursorLeftHandedEnabled();
+
+    if (Preferences::instance()->getCursorBrushStyle() == "Simple")
+      cursorType = ToolCursor::PenCursor;
+
+    if (cursorType == ToolCursor::PenCursor) {
+      QString brushType = Preferences::instance()->getCursorBrushType();
+      if (brushType == "Large")
+        cursorType = ToolCursor::PenLargeCursor;
+      else if (brushType == "Crosshair")
+        cursorType = ToolCursor::PenCrosshairCursor;
+    }
+
+    bool useLeft =
+        (Preferences::instance()->getCursorBrushStyle() == "Left-Handed");
     if (useLeft) {
       it = m_cursorsLeft.find(cursorType);
       if (it != m_cursorsLeft.end()) return it->second;
@@ -208,15 +223,19 @@ public:
             QString(":Resources/") + cursorInfo[i].pixmapFilename + ".png";
         CursorData data;
         data.pixmap = QPixmap(path);
-        data.x      = cursorInfo[i].x;
-        data.y      = cursorInfo[i].y;
-        if (useLeft && cursorInfo[i].flippable) {
-          QImage target = (&data.pixmap)->toImage();
-          (&data.pixmap)->convertFromImage(target.mirrored(true, false));
-          data.x = data.pixmap.width() - cursorInfo[i].x - 1;
+        if (data.pixmap.isNull())
+          data = getCursorData(ToolCursor::CURSOR_ARROW);
+        else {
+          data.x = cursorInfo[i].x;
+          data.y = cursorInfo[i].y;
+          if (useLeft && cursorInfo[i].flippable) {
+            QImage target = (&data.pixmap)->toImage();
+            (&data.pixmap)->convertFromImage(target.mirrored(true, false));
+            data.x = data.pixmap.width() - cursorInfo[i].x - 1;
+          }
+          if (decorationsFlag != 0)
+            doDecoration(data.pixmap, decorationsFlag, useLeft);
         }
-        if (decorationsFlag != 0)
-          doDecoration(data.pixmap, decorationsFlag, useLeft);
         if (useLeft)
           it = m_cursorsLeft.insert(std::make_pair(cursorType, data)).first;
         else

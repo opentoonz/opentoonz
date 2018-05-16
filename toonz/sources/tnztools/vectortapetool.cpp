@@ -20,7 +20,6 @@
 #include "toonz/tstageobject.h"
 #include "tools/toolhandle.h"
 #include "toonz/stage2.h"
-#include "toonz/preferences.h"
 #include "tenv.h"
 // For Qt translation support
 #include <QCoreApplication>
@@ -760,9 +759,6 @@ public:
   }
 
   int getCursorId() const override {
-    if (Preferences::instance()->isSimpleCursorEnabled())
-      return ToolCursor::PenCursor;
-
     int ret                            = ToolCursor::TapeCursor;
     if (m_type.getValue() == RECT) ret = ret | ToolCursor::Ex_Rectangle;
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)

@@ -24,9 +24,6 @@
 #include "tools/cursors.h"
 #include "tools/tooloptions.h"
 
-// Toonz includes
-#include "toonz/preferences.h"
-
 // STD includes
 #include <memory>
 
@@ -187,11 +184,7 @@ public:
   ~PlasticTool();
 
   ToolType getToolType() const override;
-  int getCursorId() const override {
-    if (Preferences::instance()->isSimpleCursorEnabled())
-      return ToolCursor::PenCursor;
-    return ToolCursor::SplineEditorCursor;
-  }
+  int getCursorId() const override { return ToolCursor::SplineEditorCursor; }
 
   ToolOptionsBox *createOptionsBox() override;
 

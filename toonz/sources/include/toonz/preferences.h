@@ -390,11 +390,11 @@ public:
     return m_dropdownShortcutsCycleOptions;
   }
 
-  void enableSimpleCursor(bool on);
-  bool isSimpleCursorEnabled() const { return m_simpleCursorEnabled; }
+  void setCursorBrushType(std::string brushType);
+  QString getCursorBrushType() const { return m_cursorBrushType; }
 
-  void enableCursorLeftHanded(bool on);
-  bool isCursorLeftHandedEnabled() const { return m_cursorLeftHandedEnabled; }
+  void setCursorBrushStyle(std::string brushStyle);
+  QString getCursorBrushStyle() const { return m_cursorBrushStyle; }
 
   void enableCursorOutline(bool on);
   bool isCursorOutlineEnabled() const { return m_cursorOutlineEnabled; }
@@ -704,9 +704,9 @@ private:
   bool m_latestVersionCheckEnabled = true;
 
   // Cursor settings
-  bool m_simpleCursorEnabled     = false;
-  bool m_cursorLeftHandedEnabled = false;
-  bool m_cursorOutlineEnabled    = false;
+  QString m_cursorBrushType;
+  QString m_cursorBrushStyle;
+  bool m_cursorOutlineEnabled = false;
 
 private:
   Preferences();

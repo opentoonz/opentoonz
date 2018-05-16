@@ -338,8 +338,8 @@ Preferences::Preferences()
     , m_functionEditorToggle(ShowGraphEditorInPopup)
     , m_currentTimelineEnabled(true)
     , m_enableAutoStretch(true)
-    , m_simpleCursorEnabled(false)
-    , m_cursorLeftHandedEnabled(false)
+    , m_cursorBrushType("Small")
+    , m_cursorBrushStyle("Default")
     , m_cursorOutlineEnabled(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -693,8 +693,16 @@ Preferences::Preferences()
 
   getValue(*m_settings, "EnableAutoStretch", m_enableAutoStretch);
 
-  getValue(*m_settings, "simpleCursorEnabled", m_simpleCursorEnabled);
-  getValue(*m_settings, "cursorLeftHandedEnabled", m_cursorLeftHandedEnabled);
+  QString brushType;
+  brushType = m_settings->value("cursorBrushType").toString();
+  if (brushType != "") m_cursorBrushType = brushType;
+  setCursorBrushType(m_cursorBrushType.toStdString());
+
+  QString brushStyle;
+  brushStyle = m_settings->value("cursorBrushStyle").toString();
+  if (brushStyle != "") m_cursorBrushStyle = brushStyle;
+  setCursorBrushStyle(m_cursorBrushStyle.toStdString());
+
   getValue(*m_settings, "cursorOutlineEnabled", m_cursorOutlineEnabled);
 }
 
@@ -1694,14 +1702,14 @@ void Preferences::enableAutoStretch(bool on) {
   m_settings->setValue("EnableAutoStretch", on ? "1" : "0");
 }
 
-void Preferences::enableSimpleCursor(bool on) {
-  m_simpleCursorEnabled = on;
-  m_settings->setValue("simpleCursorEnabled", on ? "1" : "0");
+void Preferences::setCursorBrushType(std::string brushType) {
+  m_cursorBrushType = QString::fromStdString(brushType);
+  m_settings->setValue("cursorBrushType", m_cursorBrushType);
 }
 
-void Preferences::enableCursorLeftHanded(bool on) {
-  m_cursorLeftHandedEnabled = on;
-  m_settings->setValue("cursorLeftHandedEnabled", on ? "1" : "0");
+void Preferences::setCursorBrushStyle(std::string brushStyle) {
+  m_cursorBrushStyle = QString::fromStdString(brushStyle);
+  m_settings->setValue("cursorBrushStyle", m_cursorBrushStyle);
 }
 
 void Preferences::enableCursorOutline(bool on) {

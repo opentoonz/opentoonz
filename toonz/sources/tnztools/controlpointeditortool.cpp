@@ -20,7 +20,6 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/stage2.h"
 #include "toonz/tstageobject.h"
-#include "toonz/preferences.h"
 
 // For Qt translation support
 #include <QCoreApplication>
@@ -883,9 +882,6 @@ void ControlPointEditorTool::onImageChanged() {
 //---------------------------------------------------------------------------
 
 int ControlPointEditorTool::getCursorId() const {
-  if (Preferences::instance()->isSimpleCursorEnabled())
-    return ToolCursor::PenCursor;
-
   switch (m_cursorType) {
   case NORMAL:
     return ToolCursor::SplineEditorCursor;

@@ -17,7 +17,6 @@
 // Toonz includes
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
-#include "toonz/preferences.h"
 
 // TnzTools includes
 #include "tools/tool.h"
@@ -116,11 +115,7 @@ public:
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
   bool moveCursor(const TPointD &pos);
 
-  int getCursorId() const override {
-    if (Preferences::instance()->isSimpleCursorEnabled())
-      return ToolCursor::PenCursor;
-    return m_cursorId;
-  }
+  int getCursorId() const override { return m_cursorId; }
   void invalidateCursorArea();
 
   void onDeactivate() override;

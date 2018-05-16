@@ -26,7 +26,6 @@
 #include "toonz/tcolumnhandle.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/stageobjectutil.h"
-#include "toonz/preferences.h"
 
 // TnzQt includes
 #include "toonzqt/selection.h"
@@ -1571,9 +1570,6 @@ void SkeletonTool::magicLink(int index) {
 //-------------------------------------------------------------------
 
 int SkeletonTool::getCursorId() const {
-  if (Preferences::instance()->isSimpleCursorEnabled())
-    return ToolCursor::PenCursor;
-
   switch (m_device) {
   case TD_None:
     if (m_mode.getValue() == BUILD_SKELETON)
