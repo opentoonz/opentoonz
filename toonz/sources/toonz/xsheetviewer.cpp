@@ -405,7 +405,8 @@ void XsheetViewer::positionSections() {
   m_rowScrollArea->setGeometry(o->frameLayerRect(
       bodyFrame.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
 
-  m_layerFooterPanel->setGeometry(0, m_columnScrollArea->height() + 50,
+  m_layerFooterPanel->setGeometry(0,
+                                  m_columnScrollArea->geometry().bottom() + 1,
                                   m_columnScrollArea->width(), 14);
 
   m_layerFooterPanel->showOrHide(o);
