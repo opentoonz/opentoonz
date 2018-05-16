@@ -2302,10 +2302,10 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
 
   menu.exec(event->globalPos());
 
-  act->setText(tr(actText.toLatin1().data()));
-  act2->setText(tr(act2Text.toLatin1().data()));
-  act3->setText(tr(act3Text.toLatin1().data()));
-  act4->setText(tr(act4Text.toLatin1().data()));
+  act->setText(actText);
+  act2->setText(act2Text);
+  act3->setText(act3Text);
+  act4->setText(act4Text);
 }
 
 //-----------------------------------------------------------------------------

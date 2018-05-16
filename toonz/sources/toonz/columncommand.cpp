@@ -244,8 +244,7 @@ void cloneXsheetTStageObjectTree(TXsheet *xsh, TXsheet *newXsh) {
 //-----------------------------------------------------------------------------
 
 bool pasteColumnsWithoutUndo(std::set<int> *indices, bool doClone,
-                             const StageObjectsData *data,
-                             bool pasteAfter = false) {
+                             const StageObjectsData *data) {
   if (!data)
     data = dynamic_cast<const StageObjectsData *>(
         QApplication::clipboard()->mimeData());
@@ -265,7 +264,7 @@ bool pasteColumnsWithoutUndo(std::set<int> *indices, bool doClone,
   std::list<int> restoredSplineIds;
   data->restoreObjects(*indices, restoredSplineIds, xsh,
                        doClone ? StageObjectsData::eDoClone : 0,
-                       TConst::nowhere, pasteAfter);
+                       TConst::nowhere);
   app->getCurrentXsheet()->notifyXsheetChanged();
   app->getCurrentObject()->notifyObjectIdSwitched();
   return true;
@@ -794,8 +793,8 @@ void ColumnCmd::copyColumns(const std::set<int> &indices) {
 //*************************************************************************
 
 void ColumnCmd::pasteColumns(std::set<int> &indices,
-                             const StageObjectsData *data, bool pasteAfter) {
-  bool isPaste = pasteColumnsWithoutUndo(&indices, true, data, pasteAfter);
+                             const StageObjectsData *data) {
+  bool isPaste = pasteColumnsWithoutUndo(&indices, true, data);
   if (!isPaste) return;
   TUndoManager::manager()->add(new PasteColumnsUndo(indices));
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);

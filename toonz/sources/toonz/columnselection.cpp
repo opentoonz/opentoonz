@@ -71,7 +71,15 @@ void TColumnSelection::pasteColumns() { ColumnCmd::pasteColumns(m_indices); }
 //-----------------------------------------------------------------------------
 
 void TColumnSelection::pasteColumnsAbove() {
-  ColumnCmd::pasteColumns(m_indices, 0, true);
+  std::set<int> indices;
+  std::set<int>::iterator it;
+
+  for (it = m_indices.begin(); it != m_indices.end(); it++) {
+    int newIdx = *it + 1;
+    indices.insert(newIdx);
+  }
+
+  ColumnCmd::pasteColumns(indices, 0);
 }
 
 //-----------------------------------------------------------------------------
