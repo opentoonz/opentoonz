@@ -51,9 +51,8 @@ namespace XsheetGUI {
 extern const int ColumnWidth;
 extern const int RowHeight;
 
-const int NoteWidth         = 72;
-const int NoteWidthTimeline = 48;
-const int NoteHeight        = 18;
+const int NoteWidth  = 70;
+const int NoteHeight = 18;
 
 // TZP column
 const QColor LevelColumnColor(127, 219, 127);
