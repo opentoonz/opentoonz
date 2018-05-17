@@ -274,7 +274,7 @@ void FlipBook::addFreezeButtonToTitleBar() {
     m_freezeButton->setToolTip("Freeze");
     titleBar->add(QPoint(-64, 0), m_freezeButton);
     connect(m_freezeButton, SIGNAL(toggled(bool)), this, SLOT(freeze(bool)));
-    QPoint p(titleBar->width() - 62, 0);
+    QPoint p(titleBar->width() - 64, 0);
     m_freezeButton->move(p);
     m_freezeButton->show();
   }
