@@ -3033,7 +3033,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
             cmdManager->getAction(MI_AutoInputCellNumber));
       }
       menu.addMenu(editCellNumbersMenu);
-      menu.addAction(cmdManager->getAction(MI_ExtendPrevCell));
+      menu.addAction(cmdManager->getAction(MI_FillEmptyCell));
 
       menu.addSeparator();
       menu.addAction(cmdManager->getAction(MI_Autorenumber));
@@ -3132,7 +3132,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
          TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel()))
       menu.addAction(cmdManager->getAction(MI_LipSyncPopup));
   } else {
-    menu.addAction(cmdManager->getAction(MI_ExtendPrevCell));
+    menu.addAction(cmdManager->getAction(MI_FillEmptyCell));
   }
   menu.addSeparator();
   if (!soundCellsSelected)

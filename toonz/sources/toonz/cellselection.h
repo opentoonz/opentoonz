@@ -116,7 +116,7 @@ public:
 
   static bool isEnabledCommand(std::string commandId);
 
-  void extendPrevCell();
+  void fillEmptyCell();
 };
 
 #endif  // TCELLSELECTION_H

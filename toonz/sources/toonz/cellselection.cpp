@@ -1211,17 +1211,17 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class ExtendCellsUndo final : public TUndo {
+class FillEmptyCellUndo final : public TUndo {
   TCellSelection *m_selection;
   TXshCell m_cell;
 
 public:
-  ExtendCellsUndo(int r0, int r1, int c, TXshCell &cell) : m_cell(cell) {
+  FillEmptyCellUndo(int r0, int r1, int c, TXshCell &cell) : m_cell(cell) {
     m_selection = new TCellSelection();
     m_selection->selectCells(r0, c, r1, c);
   }
 
-  ~ExtendCellsUndo() { delete m_selection; }
+  ~FillEmptyCellUndo() { delete m_selection; }
 
   void undo() const override {
     int r0, c0, r1, c1;
@@ -1244,7 +1244,7 @@ public:
   int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
-    return QObject::tr("Extend Previous Cells To Selection");
+    return QObject::tr("Fill In Empty Cells");
   }
 
   int getHistoryType() override { return HistoryType::Xsheet; }
@@ -1322,7 +1322,7 @@ void TCellSelection::enableCommands() {
 
   enableCommand(this, MI_PasteInto, &TCellSelection::overWritePasteCells);
 
-  enableCommand(this, MI_ExtendPrevCell, &TCellSelection::extendPrevCell);
+  enableCommand(this, MI_FillEmptyCell, &TCellSelection::fillEmptyCell);
   enableCommand(this, MI_Reframe1, &TCellSelection::reframe1Cells);
   enableCommand(this, MI_Reframe2, &TCellSelection::reframe2Cells);
   enableCommand(this, MI_Reframe3, &TCellSelection::reframe3Cells);
@@ -1376,7 +1376,7 @@ bool TCellSelection::isEnabledCommand(
                                         MI_PasteNumbers,
                                         MI_ConvertToToonzRaster,
                                         MI_ConvertVectorToVector,
-                                        MI_ExtendPrevCell};
+                                        MI_FillEmptyCell};
   return commands.contains(commandId);
 }
 
@@ -2830,7 +2830,7 @@ void TCellSelection::convertVectortoVector() {
       (TImage::Type)app->getCurrentImageType());
 }
 
-void TCellSelection::extendPrevCell() {
+void TCellSelection::fillEmptyCell() {
   if (isEmpty()) return;
 
   // set up basics
@@ -2877,7 +2877,7 @@ void TCellSelection::extendPrevCell() {
         TUndoManager::manager()->beginBlock();
       }
 
-      ExtendCellsUndo *undo = new ExtendCellsUndo(startR, endR, c, cell);
+      FillEmptyCellUndo *undo = new FillEmptyCellUndo(startR, endR, c, cell);
       TUndoManager::manager()->add(undo);
       undo->redo();
 
