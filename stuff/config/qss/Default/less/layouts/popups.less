@@ -69,10 +69,6 @@ QDialog {
   &::item {
     padding: 1 0;
   }
-  &:extend(.tree-list all);
-  &::branch {
-    &:extend(.branch-17 all);
-  }
   border: 1 solid @accent;
   & QScrollBar {
     &:vertical {
@@ -89,12 +85,6 @@ QDialog {
 ProjectPopup {
     & QLabel {
       color: @label-title;
-    }
-    & QTreeView {
-      &:extend(.tree-list all);
-      &::branch {
-        &:extend(.branch-22 all);
-      }
     }
 }
 

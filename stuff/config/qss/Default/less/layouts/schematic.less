@@ -30,7 +30,12 @@
 
 #FxSettingsTabBar {
   &::tab {
-    &:extend(.tab-round all); // use rounded tabs
+    &:extend(.tab-flat all);
+    border-top: 1 solid @accent;
+    &::first,
+    &::only-one {
+      border-left: 1 solid @accent;
+    }
   }
 }
 

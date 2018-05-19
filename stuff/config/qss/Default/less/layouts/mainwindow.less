@@ -438,13 +438,67 @@ DvScrollWidget {
 }
 
 /* -----------------------------------------------------------------------------
-   Tree Systems
+   Trees
 ----------------------------------------------------------------------------- */
 
-QTreeWidget {
-  &:extend(.tree-list all);
-  background: @tree-bg-color;
+.treeview {
+  background-color: @tree-bg-color;
   alternate-background-color: @tree-bg-color-alt;
+  border: 0;
+  margin: 0;
+  outline: 0;
+  
+  &::item {
+    &:selected {
+      .hl-color;
+    }
+  }
+  
+  &::branch {
+    &:adjoins-item {
+      // Adding a blank URL hides in-built branch design
+      // where it is not wanted.
+      border-image: url('');
+    }
+    &:has-siblings {
+      border-image: url('');
+      &:adjoins-item {
+        border-image: url('');
+      }
+    }
+    &:has-children {
+      &:closed {
+        background: url('@{img-url}/treebranch-closed.svg') no-repeat;
+        background-position: center center;
+        border-image: none;
+        image: none;
+      }
+      &:open {
+        background: url('@{img-url}/treebranch-open.svg') no-repeat;
+        background-position: center center;
+        image: none;
+      }
+      &:has-siblings {
+        &:closed {
+          background: url('@{img-url}/treebranch-closed.svg') no-repeat;
+          background-position: center center;
+          border-image: none;
+          image: none;
+        }
+        &:open {
+          background: url('@{img-url}/treebranch-open.svg') no-repeat;
+          background-position: center center;
+          border-image: none;
+          image: none;
+        }
+      }
+    }
+  }
+}
+
+QTreeWidget,
+QTreeView {
+  &:extend(.treeview all);
 }
 
 QListView {
