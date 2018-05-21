@@ -15,6 +15,7 @@
 #include "toutputproperties.h"
 #include "pluginhost.h"
 #include "tenv.h"
+#include "tsystem.h"
 
 #include "toonz/tcamera.h"
 #include "toonz/toonzfolders.h"
@@ -822,8 +823,13 @@ void ParamsPageSet::createControls(const TFxP &fx, int index) {
 
   TFilePath fp = ToonzFolder::getProfileFolder() + "layouts" + "fxs" +
                  (fx->getFxType() + ".xml");
+
+  // Verify XML file exists
+  if (!TFileStatus(fp).doesExist()) {
+	  return;
+  }
+  
   TIStream is(fp);
-  if (!is) return;
 
   if (fx->getParams()->getParamCount()) {
     try {
@@ -904,8 +910,19 @@ void ParamsPageSet::openHelpFile() {
   // if (m_helpCommand != "")
   //	commandString += m_helpCommand + " ";
 
+  // Get UI language as set in "Preferences"
+  QString currentLanguage = Preferences::instance()->getCurrentLanguage();
+  std::string helpDocLang = currentLanguage.toStdString();
+
+  // Assume associated language subdir exists
   TFilePath helpFp =
-      TEnv::getStuffDir() + TFilePath("doc") + TFilePath(m_helpFilePath);
+      TEnv::getStuffDir() + TFilePath("doc") + TFilePath(helpDocLang) + TFilePath(m_helpFilePath);
+  
+  // Verify subdir exists; if not, default to standard doc dir
+  if (!TFileStatus(helpFp).doesExist()) {
+	  helpFp = TEnv::getStuffDir() + TFilePath("doc") + TFilePath(m_helpFilePath);
+  }
+
   // commandString +=
   // QString::fromStdWString(helpFp.getWideString()).toStdString();
   // QString command = QString::fromStdString(m_helpFilePath);
