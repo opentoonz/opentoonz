@@ -17,8 +17,7 @@ const int PLAY_MARKER_SIZE   = 10;
 const int ONION_SIZE         = 19;
 const int ONION_DOT_SIZE     = 8;
 const int PINNED_SIZE        = 10;
-const int FRAME_DOT_SIZE     = 8;
-const int FRAME_IND_SIZE     = 3;
+const int FRAME_MARKER_SIZE  = 6;
 const int FOLDED_CELL_SIZE   = 9;
 }
 
@@ -305,7 +304,7 @@ TopToBottomOrientation::TopToBottomOrientation() {
       PredefinedRect::END_SOUND_EDIT,
       QRect(CELL_DRAG_WIDTH, CELL_HEIGHT - 2, CELL_WIDTH - CELL_DRAG_WIDTH, 2));
   addRect(PredefinedRect::LOOP_ICON, QRect(keyRect.left(), 0, 10, 11));
-  addRect(PredefinedRect::FRAME_DOT, QRect(0, 0, -1, -1));  // hide
+  addRect(PredefinedRect::FRAME_MARKER_AREA, QRect(0, 0, -1, -1));  // hide
 
   // Note viewer
   addRect(
@@ -344,7 +343,9 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::PINNED_CENTER_KEY,
           QRect((FRAME_HEADER_WIDTH - PINNED_SIZE) / 2,
                 (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
-  addRect(PredefinedRect::FRAME_INDICATOR, QRect(0, 0, -1, -1));  // hide
+  addRect(
+      PredefinedRect::PREVIEW_FRAME_AREA,
+      QRect(PLAY_RANGE_X, 0, (FRAME_HEADER_WIDTH - PLAY_RANGE_X), CELL_HEIGHT));
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
@@ -896,10 +897,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
           QRect(CELL_WIDTH - 2, CELL_DRAG_HEIGHT, 2,
                 CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LOOP_ICON, QRect(0, keyRect.top(), 10, 11));
-  addRect(
-      PredefinedRect::FRAME_DOT,
-      QRect((CELL_WIDTH - FRAME_DOT_SIZE) / 2 - 1,
-            CELL_HEIGHT - FRAME_DOT_SIZE - 6, FRAME_DOT_SIZE, FRAME_DOT_SIZE));
+  QRect frameMarker((CELL_WIDTH - FRAME_MARKER_SIZE) / 2 - 1,
+                    CELL_HEIGHT - FRAME_MARKER_SIZE - 5, FRAME_MARKER_SIZE,
+                    FRAME_MARKER_SIZE);
+  addRect(PredefinedRect::FRAME_MARKER_AREA, frameMarker);
 
   // Notes viewer
   addRect(
@@ -942,10 +943,9 @@ LeftToRightOrientation::LeftToRightOrientation() {
       PredefinedRect::PINNED_CENTER_KEY,
       QRect((CELL_WIDTH - PINNED_SIZE) / 2,
             (FRAME_HEADER_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
-  addRect(PredefinedRect::FRAME_INDICATOR,
-          QRect((CELL_WIDTH - FRAME_IND_SIZE) / 2,
-                FRAME_HEADER_HEIGHT - FRAME_IND_SIZE, FRAME_IND_SIZE,
-                FRAME_IND_SIZE));
+  addRect(
+      PredefinedRect::PREVIEW_FRAME_AREA,
+      QRect(0, PLAY_RANGE_Y, CELL_WIDTH, (FRAME_HEADER_HEIGHT - PLAY_RANGE_Y)));
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
@@ -1018,7 +1018,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   // Lines
   //
   addLine(PredefinedLine::LOCKED,
-          verticalLine(CELL_DRAG_HEIGHT / 2, NumberRange(0, CELL_WIDTH)));
+          verticalLine((CELL_DRAG_HEIGHT + 1) / 2, NumberRange(0, CELL_WIDTH)));
   addLine(PredefinedLine::SEE_MARKER_THROUGH,
           horizontalLine(0, NumberRange(0, CELL_DRAG_HEIGHT)));
   addLine(PredefinedLine::CONTINUE_LEVEL,
@@ -1051,6 +1051,13 @@ LeftToRightOrientation::LeftToRightOrientation() {
   corner.lineTo(QPointF(CELL_WIDTH, 0));
   addPath(PredefinedPath::DRAG_HANDLE_CORNER, corner);
 
+  QPainterPath diamond(QPointF(0, -4));
+  diamond.lineTo(4, 0);
+  diamond.lineTo(0, 4);
+  diamond.lineTo(-4, 0);
+  diamond.lineTo(0, -4);
+  addPath(PredefinedPath::FRAME_MARKER_DIAMOND, diamond);
+
   QPainterPath fromTriangle(QPointF(EASE_TRIANGLE_SIZE / 2, 0));
   fromTriangle.lineTo(QPointF(-EASE_TRIANGLE_SIZE / 2, EASE_TRIANGLE_SIZE));
   fromTriangle.lineTo(QPointF(-EASE_TRIANGLE_SIZE / 2, -EASE_TRIANGLE_SIZE));
@@ -1076,7 +1083,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   playTo.lineTo(QPointF(-PLAY_MARKER_SIZE, 0));
   playTo.lineTo(QPointF(0, PLAY_MARKER_SIZE));
   playTo.lineTo(QPointF(0, 0));
-  playTo.translate(CELL_WIDTH - 1, PLAY_RANGE_Y);
+  playTo.translate(CELL_WIDTH - 2, PLAY_RANGE_Y);
   addPath(PredefinedPath::END_PLAY_RANGE, playTo);
 
   QPainterPath track(QPointF(0, 0));

@@ -44,6 +44,7 @@ class RowArea final : public QWidget {
   bool m_isPanning;
 
   void drawRows(QPainter &p, int r0, int r1);
+  void drawPlayRangeBackground(QPainter &p, int r0, int r1);
   void drawPlayRange(QPainter &p, int r0, int r1);
   void drawCurrentRowGadget(QPainter &p, int r0, int r1);
   void drawOnionSkinSelection(QPainter &p);

@@ -1158,9 +1158,10 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
                          : m_viewer->getLightLineColor();
 
       p.setPen(color);
-      int frameAxis = m_viewer->rowToFrameAxis(row);
-      QLine horizontalLine =
-          m_viewer->orientation()->horizontalLine(frameAxis, layerAxisRange);
+      int frameAxis        = m_viewer->rowToFrameAxis(row);
+      QLine horizontalLine = m_viewer->orientation()->horizontalLine(
+          frameAxis,
+          layerAxisRange.adjusted((o->isVerticalTimeline() ? 0 : -1), 0));
       p.drawLine(horizontalLine);
 
       if (!isColumn) {
@@ -1360,11 +1361,18 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
       xy.setX(xy.x() + 1);
   }
 
+  int distance, markerOffset;
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+      distance, markerOffset);
+  if (distance == 0) distance = 6;
+  bool isAfterMarkers = (row - markerOffset) % distance == 0 && row != 0;
+
   int frameAdj   = m_viewer->getFrameZoomAdjustment();
   int frameZoomF = m_viewer->getFrameZoomFactor();
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
   cellRect.adjust(0, 0, -frameAdj, 0);
-  QRect rect      = cellRect.adjusted(1, 1, 0, 0);
+  QRect rect = cellRect;
+  if (o->isVerticalTimeline() || !row) rect.adjust(1, 1, 0, 0);
   int maxNumFrame = soundColumn->getMaxFrame() + 1;
   int startFrame  = soundColumn->getFirstRow();
   TXshCell cell   = soundColumn->getCell(row);
@@ -1472,7 +1480,7 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
       QLine stroke = o->horizontalLine(i, previewBounds.adjusted(-1, -1));
       p.drawLine(stroke);
     }
-    if (i != begin) {
+    if (!o->isVerticalTimeline() || i != begin) {
       // "audio track" in the middle of the column
       p.setPen(m_viewer->getSoundColumnTrackColor());
       QLine minLine = o->horizontalLine(i, NumberRange(lastMin, min));
@@ -1509,14 +1517,8 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
     m_soundLevelModifyRects.append(modifierRect);
   }
 
-  int distance, markerOffset;
-  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
-      distance, markerOffset);
-  bool isAfterMarkers =
-      (row - markerOffset) % distance == 0 && distance != 0 && row != 0;
-
   // draw marker interval
-  if (isAfterMarkers) {
+  if (o->isVerticalTimeline() && isAfterMarkers) {
     p.setPen(m_viewer->getMarkerLineColor());
     p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
   }
@@ -1580,15 +1582,25 @@ void CellArea::drawCurrentTimeIndicator(QPainter &p, const QPoint &xy,
   p.drawLine(cellMid, cellTop, cellMid, cellBottom);
 }
 
-void CellArea::drawFrameDot(QPainter &p, const QPoint &xy, bool isValid) {
-  int frameAdj = m_viewer->getFrameZoomAdjustment();
-  QRect dotRect =
-      m_viewer->orientation()->rect(PredefinedRect::FRAME_DOT).translated(xy);
-  p.setPen(Qt::black);
-  p.setBrush(isValid ? QColor(230, 100, 100) : m_viewer->getTextColor());
+void CellArea::drawFrameMarker(QPainter &p, const QPoint &xy, QColor color,
+                               bool isKeyFrame) {
+  QColor outlineColor = Qt::black;
+  int frameAdj        = m_viewer->getFrameZoomAdjustment();
+  QRect dotRect       = m_viewer->orientation()
+                      ->rect(PredefinedRect::FRAME_MARKER_AREA)
+                      .translated(xy);
   dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
-  p.drawEllipse(dotRect);
-  p.setBrush(Qt::NoBrush);
+
+  if (isKeyFrame)
+    m_viewer->drawPredefinedPath(p, PredefinedPath::FRAME_MARKER_DIAMOND,
+                                 dotRect.adjusted(1, 1, 1, 1).center(), color,
+                                 outlineColor);
+  else {
+    p.setPen(outlineColor);
+    p.setBrush(color);
+    p.drawEllipse(dotRect);
+    p.setBrush(Qt::NoBrush);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1606,6 +1618,14 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
                     columnSelection->isColumnSelected(col);
 
   if (row > 0) prevCell = xsh->getCell(row - 1, col);  // cell in previous frame
+
+  int distance, offset;
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+      distance, offset);
+  if (distance == 0) distance = 6;
+  bool isAfterMarkers         = (row - offset) % distance == 0 && row != 0;
+
+  bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
   QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
   int x     = xy.x();
@@ -1632,7 +1652,10 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   int frameAdj   = m_viewer->getFrameZoomAdjustment();
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
   cellRect.adjust(0, 0, -frameAdj, 0);
-  QRect rect = cellRect.adjusted(1, 1, 0, 0);
+  QRect rect = cellRect;
+  if (o->isVerticalTimeline() || !sameLevel ||
+      prevCell.m_frameId != cell.m_frameId)
+    rect.adjust(1, 1, 0, 0);
   if (cell.isEmpty()) {  // it means previous is not empty
     // diagonal cross meaning end of level
     QColor levelEndColor = m_viewer->getTextColor();
@@ -1700,16 +1723,8 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 
   drawLockedDottedLine(p, xsh->getColumn(col)->isLocked(), xy, cellColor);
 
-  bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
-
-  int distance, offset;
-  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
-      distance, offset);
-  bool isAfterMarkers =
-      (row - offset) % distance == 0 && distance != 0 && row != 0;
-
   // draw marker interval
-  if (isAfterMarkers) {
+  if (o->isVerticalTimeline() && isAfterMarkers) {
     p.setPen(m_viewer->getMarkerLineColor());
     p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
   }
@@ -1733,9 +1748,10 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   TXshChildLevel *cl                          = cell.getChildLevel();
   if (cl && cell.getFrameId().getNumber() - 1 >= cl->getFrameCount())
     isRed = true;
-  p.setPen(
+  QColor penColor =
       isRed ? QColor(230, 100, 100)  // m_viewer->getSelectedColumnTextColor()
-            : m_viewer->getTextColor());
+            : m_viewer->getTextColor();
+  p.setPen(penColor);
 
   QString fontName = Preferences::instance()->getInterfaceFont();
   if (fontName == "") {
@@ -1756,6 +1772,8 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // draw continue line
   QString fnum;
   if (sameLevel && prevCell.m_frameId == cell.m_frameId) {
+    if (!o->isVerticalTimeline()) return;
+
     // not on line marker
     PredefinedLine which =
         Preferences::instance()->isLevelNameOnEachMarkerEnabled()
@@ -1769,7 +1787,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // draw frame number
   else {
     if (m_viewer->getFrameZoomFactor() <= 50) {
-      drawFrameDot(p, QPoint(x, y), isRed);
+      drawFrameMarker(p, QPoint(x, y), (isRed ? Qt::red : Qt::black));
       return;
     }
 
@@ -1825,6 +1843,15 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
 
   if (row > 0) prevCell = xsh->getCell(row - 1, col);  // cell in previous frame
                                                        // nothing to draw
+
+  bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
+
+  int distance, offset;
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+      distance, offset);
+  if (distance == 0) distance = 6;
+  bool isAfterMarkers         = (row - offset) % distance == 0 && row != 0;
+
   QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
   int x     = xy.x();
   int y     = xy.y();
@@ -1850,7 +1877,10 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   int frameAdj   = m_viewer->getFrameZoomAdjustment();
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
   cellRect.adjust(0, 0, -frameAdj, 0);
-  QRect rect = cellRect.adjusted(1, 1, 0, 0);
+  QRect rect = cellRect;
+  if (o->isVerticalTimeline() || !sameLevel ||
+      prevCell.m_frameId != cell.m_frameId)
+    rect.adjust(1, 1, 0, 0);
   if (cell.isEmpty()) {  // diagonal cross meaning end of level
     QColor levelEndColor = m_viewer->getTextColor();
     levelEndColor.setAlphaF(0.3);
@@ -1888,18 +1918,12 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   drawEndOfDragHandle(p, isLastRow, xy, cellColor);
 
   drawLockedDottedLine(p, xsh->getColumn(col)->isLocked(), xy, cellColor);
-  bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
   TFrameId fid = cell.m_frameId;
   if (fid.getNumber() - 1 < 0) return;
-  int distance, offset;
-  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
-      distance, offset);
-  bool isAfterMarkers =
-      (row - offset) % distance == 0 && distance != 0 && row != 0;
 
   // draw marker interval
-  if (isAfterMarkers) {
+  if (o->isVerticalTimeline() && isAfterMarkers) {
     p.setPen(m_viewer->getMarkerLineColor());
     p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
   }
@@ -1925,6 +1949,7 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   // if the same level & same fId with the previous cell,
   // draw continue line
   if (sameLevel && prevCell.m_frameId == cell.m_frameId) {
+    if (!o->isVerticalTimeline()) return;
     // not on line marker
     PredefinedLine which =
         Preferences::instance()->isLevelNameOnEachMarkerEnabled()
@@ -1969,6 +1994,18 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   if (row > 0) prevCell = xsh->getCell(row - 1, col);
   TXshCell nextCell     = xsh->getCell(row + 1, col);
 
+  bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
+
+  int distance, offset;
+  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
+      distance, offset);
+  if (distance == 0) distance = 6;
+  bool isAfterMarkers         = (row - offset) % distance == 0 && row != 0;
+
+  bool isRed                         = false;
+  TXshPaletteLevel *pl               = cell.getPaletteLevel();
+  if (pl && !pl->getPalette()) isRed = true;
+
   QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
   int x     = xy.x();
   int y     = xy.y();
@@ -1991,7 +2028,10 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   int frameAdj   = m_viewer->getFrameZoomAdjustment();
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
   cellRect.adjust(0, 0, -frameAdj, 0);
-  QRect rect = cellRect.adjusted(1, 1, 0, 0);
+  QRect rect = cellRect;
+  if (o->isVerticalTimeline() || !sameLevel || isAfterMarkers ||
+      prevCell.m_frameId != cell.m_frameId)
+    rect.adjust(1, 1, 0, 0);
   if (cell.isEmpty()) {  // this means the former is not empty
     QColor levelEndColor = m_viewer->getTextColor();
     levelEndColor.setAlphaF(0.3);
@@ -2033,15 +2073,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   drawEndOfDragHandle(p, isLastRow, xy, cellColor);
   drawLockedDottedLine(p, xsh->getColumn(col)->isLocked(), xy, cellColor);
 
-  bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
-
-  int distance, offset;
-  TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
-      distance, offset);
-  if (distance == 0) distance = 6;
-  bool isAfterMarkers         = (row - offset) % distance == 0 && row != 0;
-
-  if (isAfterMarkers) {
+  if (o->isVerticalTimeline() && isAfterMarkers) {
     p.setPen(m_viewer->getMarkerLineColor());
     p.drawLine(o->line(PredefinedLine::SEE_MARKER_THROUGH).translated(xy));
   }
@@ -2049,6 +2081,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   if (sameLevel && prevCell.m_frameId == cell.m_frameId &&
       !isAfterMarkers) {  // cell equal to previous one (not on marker line):
                           // do not write anything and draw a vertical line
+    if (!o->isVerticalTimeline()) return;
     QPen oldPen = p.pen();
     p.setPen(QPen(m_viewer->getTextColor(), 1));
     QLine continueLine = o->line(PredefinedLine::CONTINUE_LEVEL).translated(xy);
@@ -2056,6 +2089,11 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     p.drawLine(continueLine);
     p.setPen(oldPen);
   } else {
+    if (m_viewer->getFrameZoomFactor() <= 50) {
+      drawFrameMarker(p, QPoint(x, y), (isRed ? Qt::red : Qt::black));
+      return;
+    }
+
     TFrameId fid = cell.m_frameId;
 
     std::wstring levelName = cell.m_level->getName();
@@ -2075,12 +2113,10 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     }
 
     nameRect.adjust(0, 0, -frameAdj, 0);
-    bool isRed                         = false;
-    TXshPaletteLevel *pl               = cell.getPaletteLevel();
-    if (pl && !pl->getPalette()) isRed = true;
-    p.setPen(
+    QColor penColor =
         isRed ? QColor(230, 100, 100)  // m_viewer->getSelectedColumnTextColor()
-              : m_viewer->getTextColor());
+              : m_viewer->getTextColor();
+    p.setPen(penColor);
     // il nome va scritto se e' diverso dalla cella precedente oppure se
     // siamo su una marker line
     QString fontName = Preferences::instance()->getInterfaceFont();
@@ -2183,12 +2219,18 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
                              handleRow1)) {
             QPoint topLeft =
                 m_viewer->positionToXY(CellPosition(handleRow0, col));
+            if (!o->isVerticalTimeline() &&
+                m_viewer->getFrameZoomFactor() <= 50)
+              topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
                                          m_viewer->getLightLineColor(),
                                          m_viewer->getTextColor());
 
             topLeft = m_viewer->positionToXY(CellPosition(handleRow1, col));
+            if (!o->isVerticalTimeline() &&
+                m_viewer->getFrameZoomFactor() <= 50)
+              topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::END_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
                                          m_viewer->getLightLineColor(),
@@ -2208,11 +2250,27 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
     for (row = row0; row <= row1; row++) {
       p.setPen(m_viewer->getTextColor());
       if (pegbar->isKeyframe(row)) {
-        QPoint target =
-            keyRect.translated(m_viewer->positionToXY(CellPosition(row, col)))
-                .topLeft();
-        if (m_viewer->getKeyframeSelection() &&
-            m_viewer->getKeyframeSelection()->isSelected(row, col)) {
+        QPoint xy     = m_viewer->positionToXY(CellPosition(row, col));
+        QPoint target = keyRect.translated(xy).topLeft();
+        if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
+          QColor color = Qt::white;
+          int x        = xy.x();
+          int y        = xy.y();
+          if (row == 0) {
+            if (o->isVerticalTimeline())
+              xy.setY(xy.y() + 1);
+            else
+              xy.setX(xy.x() + 1);
+          }
+
+          if (m_viewer->getKeyframeSelection() &&
+              m_viewer->getKeyframeSelection()->isSelected(row, col))
+            color = QColor(85, 157, 255);
+
+          drawFrameMarker(p, QPoint(x, y), color, true);
+
+        } else if (m_viewer->getKeyframeSelection() &&
+                   m_viewer->getKeyframeSelection()->isSelected(row, col)) {
           // keyframe selected
           p.drawPixmap(target, selectedKey);
         } else {
@@ -2273,6 +2331,12 @@ void CellArea::drawKeyframeLine(QPainter &p, int col,
       keyRect.center() + m_viewer->positionToXY(CellPosition(rows.from(), col));
   QPoint end =
       keyRect.center() + m_viewer->positionToXY(CellPosition(rows.to(), col));
+
+  if (!m_viewer->orientation()->isVerticalTimeline() &&
+      m_viewer->getFrameZoomFactor() <= 50) {
+    begin.setY(begin.y() - 1);
+    end.setY(end.y() - 1);
+  }
 
   p.setPen(m_viewer->getTextColor());
   p.drawLine(QLine(begin, end));
@@ -2383,7 +2447,7 @@ void CellArea::paintEvent(QPaintEvent *event) {
   QRect rect   = m_viewer->orientation()
                    ->rect(PredefinedRect::CELL)
                    .translated(xy)
-                   .adjusted(1, 1, -1 - frameAdj, -1);
+                   .adjusted(0, 0, -1 - frameAdj, 0);
   p.setPen(Qt::black);
   p.setBrush(Qt::NoBrush);
   p.drawRect(rect);
@@ -2485,11 +2549,18 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
                              (k1 > k0 || k0 == row) && k0 <= row &&
                              row <= k1 + 1;
 
-      bool isKeyFrameArea = isKeyframeFrame &&
-                            o->rect(PredefinedRect::KEYFRAME_AREA)
-                                .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                                .contains(mouseInCell) &&
-                            row < k1 + 1;
+      bool isKeyFrameArea =
+          isKeyframeFrame &&
+          ((o->isVerticalTimeline() &&
+            o->rect(PredefinedRect::KEYFRAME_AREA)
+                .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+                .contains(mouseInCell))
+
+           || (!o->isVerticalTimeline() &&
+               o->rect(PredefinedRect::FRAME_MARKER_AREA)
+                   .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+                   .contains(mouseInCell))) &&
+          row < k1 + 1;
       bool accept = false;
 
       if (isKeyFrameArea) {           // They are in the keyframe selection
