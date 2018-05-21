@@ -255,7 +255,11 @@ bool DvDirModelFileFolderNode::hasChildren() {
     // DvDirModelFileFolderNode::refreshChildren() due to
     // performance issues
     QDir dir(QString::fromStdWString(m_path.getWideString()));
+#ifdef Q_OS_WIN
     dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
+#else
+    dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+#endif
 
     return (dir.count() > 0);
   } else
@@ -319,8 +323,13 @@ void DvDirModelFileFolderNode::getChildrenNames(
   if (folderPathStatus.isDirectory()) {
     QDir dir(toQString(m_path));
 
+#ifdef Q_OS_WIN
     entries = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot,
                             QDir::Name | QDir::LocaleAware);
+#else
+    entries = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks,
+                            QDir::Name | QDir::LocaleAware);
+#endif
   }
 
   int e, eCount = entries.size();
