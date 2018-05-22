@@ -17,7 +17,7 @@ const int PLAY_MARKER_SIZE   = 10;
 const int ONION_SIZE         = 19;
 const int ONION_DOT_SIZE     = 8;
 const int PINNED_SIZE        = 10;
-const int FRAME_MARKER_SIZE  = 6;
+const int FRAME_MARKER_SIZE  = 5;
 const int FOLDED_CELL_SIZE   = 9;
 }
 
@@ -904,7 +904,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
                 CELL_HEIGHT - CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LOOP_ICON, QRect(0, keyRect.top(), 10, 11));
   QRect frameMarker((CELL_WIDTH - FRAME_MARKER_SIZE) / 2 - 1,
-                    CELL_HEIGHT - FRAME_MARKER_SIZE - 5, FRAME_MARKER_SIZE,
+                    CELL_HEIGHT - FRAME_MARKER_SIZE - 6, FRAME_MARKER_SIZE,
                     FRAME_MARKER_SIZE);
   addRect(PredefinedRect::FRAME_MARKER_AREA, frameMarker);
 
