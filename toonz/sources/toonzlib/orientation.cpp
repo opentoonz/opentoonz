@@ -959,8 +959,8 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(
       PredefinedRect::FOLDED_LAYER_HEADER,
       QRect(1, 0, FOLDED_LAYER_HEADER_WIDTH - 2, FOLDED_LAYER_HEADER_HEIGHT));
-  QRect columnName(ICONS_WIDTH + 2, 1,
-                   LAYER_NAME_WIDTH + LAYER_NUMBER_WIDTH - 4, CELL_HEIGHT - 1);
+  QRect columnName(ICONS_WIDTH + 1, 0,
+                   LAYER_NAME_WIDTH + LAYER_NUMBER_WIDTH - 4, CELL_HEIGHT);
   addRect(PredefinedRect::RENAME_COLUMN, columnName);
   QRect eye(1, 0, ICON_WIDTH, ICON_HEIGHT);
   addRect(PredefinedRect::EYE_AREA, eye);
@@ -1019,9 +1019,9 @@ LeftToRightOrientation::LeftToRightOrientation() {
   // Flags
   addFlag(PredefinedFlag::DRAG_LAYER_BORDER, false);
   addFlag(PredefinedFlag::DRAG_LAYER_VISIBLE, true);
-  addFlag(PredefinedFlag::LAYER_NAME_BORDER, false);
+  addFlag(PredefinedFlag::LAYER_NAME_BORDER, true);
   addFlag(PredefinedFlag::LAYER_NAME_VISIBLE, true);
-  addFlag(PredefinedFlag::LAYER_NUMBER_BORDER, false);
+  addFlag(PredefinedFlag::LAYER_NUMBER_BORDER, true);
   addFlag(PredefinedFlag::LAYER_NUMBER_VISIBLE, true);
   addFlag(PredefinedFlag::EYE_AREA_BORDER, true);
   addFlag(PredefinedFlag::EYE_AREA_VISIBLE, true);

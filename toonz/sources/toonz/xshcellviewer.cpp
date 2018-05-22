@@ -1158,14 +1158,6 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
         isReference = false;
     }
 
-    // draw vertical line
-    if (layerAxis > 0) {
-      p.setPen(m_viewer->getVerticalLineColor());
-      QLine verticalLine =
-          m_viewer->orientation()->verticalLine(layerAxis, frameSide);
-      p.drawLine(verticalLine);
-    }
-
     // for each frame
     for (row = r0; row <= r1; row++) {
       if (!isColumn) {
@@ -1196,6 +1188,14 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
         drawSoundTextCell(p, row, col);
       else
         drawLevelCell(p, row, col, isReference);
+    }
+
+    // draw vertical line
+    if (layerAxis > 0) {
+      p.setPen(m_viewer->getVerticalLineColor());
+      QLine verticalLine =
+          m_viewer->orientation()->verticalLine(layerAxis, frameSide);
+      p.drawLine(verticalLine);
     }
   }
 
