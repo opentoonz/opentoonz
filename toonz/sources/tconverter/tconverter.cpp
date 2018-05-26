@@ -29,6 +29,10 @@
 #include "tvectorrenderdata.h"
 #include "tofflinegl.h"
 
+#if defined(LINUX)
+#include <QGuiApplication>
+#endif
+
 using namespace std;
 using namespace TCli;
 
@@ -357,6 +361,10 @@ void convert(const TFilePath &source, const TFilePath &dest,
 //------------------------------------------------------------------------
 
 int main(int argc, char *argv[]) {
+#if defined(LINUX)
+  QGuiApplication app(argc, argv);
+#endif
+
   TEnv::setApplication(applicationName, applicationVersion);
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
