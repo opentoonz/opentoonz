@@ -478,14 +478,25 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
                  WRITE setTimelineConfigButtonImage)
   // Layer Header icons
   QImage m_layerHeaderPreviewImage;
+  QImage m_layerHeaderPreviewOverImage;
   QImage m_layerHeaderCamstandImage;
+  QImage m_layerHeaderCamstandOverImage;
   QImage m_layerHeaderLockImage;
+  QImage m_layerHeaderLockOverImage;
   Q_PROPERTY(QImage LayerHeaderPreviewImage READ getLayerHeaderPreviewImage
                  WRITE setLayerHeaderPreviewImage)
+  Q_PROPERTY(
+      QImage LayerHeaderPreviewOverImage READ getLayerHeaderPreviewOverImage
+          WRITE setLayerHeaderPreviewOverImage)
   Q_PROPERTY(QImage LayerHeaderCamstandImage READ getLayerHeaderCamstandImage
                  WRITE setLayerHeaderCamstandImage)
+  Q_PROPERTY(
+      QImage LayerHeaderCamstandOverImage READ getLayerHeaderCamstandOverImage
+          WRITE setLayerHeaderCamstandOverImage)
   Q_PROPERTY(QImage LayerHeaderLockImage READ getLayerHeaderLockImage WRITE
                  setLayerHeaderLockImage)
+  Q_PROPERTY(QImage LayerHeaderLockOverImage READ getLayerHeaderLockOverImage
+                 WRITE setLayerHeaderLockOverImage)
 
   XsheetScrollArea *m_cellScrollArea;
   XsheetScrollArea *m_columnScrollArea;
@@ -1059,19 +1070,37 @@ public:
   void setLayerHeaderPreviewImage(const QImage &image) {
     m_layerHeaderPreviewImage = image;
   }
+  void setLayerHeaderPreviewOverImage(const QImage &image) {
+    m_layerHeaderPreviewOverImage = image;
+  }
   void setLayerHeaderCamstandImage(const QImage &image) {
     m_layerHeaderCamstandImage = image;
+  }
+  void setLayerHeaderCamstandOverImage(const QImage &image) {
+    m_layerHeaderCamstandOverImage = image;
   }
   void setLayerHeaderLockImage(const QImage &image) {
     m_layerHeaderLockImage = image;
   }
+  void setLayerHeaderLockOverImage(const QImage &image) {
+    m_layerHeaderLockOverImage = image;
+  }
   QImage getLayerHeaderPreviewImage() const {
     return m_layerHeaderPreviewImage;
+  }
+  QImage getLayerHeaderPreviewOverImage() const {
+    return m_layerHeaderPreviewOverImage;
   }
   QImage getLayerHeaderCamstandImage() const {
     return m_layerHeaderCamstandImage;
   }
+  QImage getLayerHeaderCamstandOverImage() const {
+    return m_layerHeaderCamstandOverImage;
+  }
   QImage getLayerHeaderLockImage() const { return m_layerHeaderLockImage; }
+  QImage getLayerHeaderLockOverImage() const {
+    return m_layerHeaderLockOverImage;
+  }
 
   void getButton(int &btype, QColor &bgColor, QImage &iconImage,
                  bool isTimeline = false);
