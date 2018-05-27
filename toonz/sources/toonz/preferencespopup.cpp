@@ -1202,9 +1202,6 @@ void PreferencesPopup::onCurrentColumnDataChanged(const TPixel32 &,
                                                   bool isDragging) {
   if (isDragging) return;
   m_pref->setCurrentColumnData(m_currentColumnColor->getColor());
-
-  TApp::instance()->getCurrentScene()->notifySceneChanged();
-  TApp::instance()->getCurrentLevel()->notifyLevelViewChange();
 }
 
 //**********************************************************************************
