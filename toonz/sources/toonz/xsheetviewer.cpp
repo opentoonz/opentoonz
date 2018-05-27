@@ -1750,6 +1750,16 @@ void XsheetViewer::zoomOnFrame(int frame, int factor) {
   m_rowArea->update();
 }
 
+QColor XsheetViewer::getSelectedColumnTextColor() const {
+  // get colors
+  TPixel currentColumnPixel;
+  Preferences::instance()->getCurrentColumnData(currentColumnPixel);
+  QColor currentColumnColor((int)currentColumnPixel.r,
+                            (int)currentColumnPixel.g,
+                            (int)currentColumnPixel.b, 255);
+  return currentColumnColor;
+}
+
 //=============================================================================
 // XSheetViewerCommand
 //-----------------------------------------------------------------------------

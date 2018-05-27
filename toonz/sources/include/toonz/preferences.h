@@ -461,6 +461,11 @@ public:
   void setLoadedXsheetLayout(std::string layout);
   QString getLoadedXsheetLayout() const { return m_loadedXsheetLayout; }
 
+  void setCurrentColumnData(const TPixel &currentColumnColor);
+  void getCurrentColumnData(TPixel &currentColumnColor) const {
+    currentColumnColor = m_currentColumnColor;
+  }
+
   // Animation  tab
 
   void setKeyframeType(int s);
@@ -707,6 +712,8 @@ private:
   QString m_cursorBrushType;
   QString m_cursorBrushStyle;
   bool m_cursorOutlineEnabled = false;
+
+  TPixel32 m_currentColumnColor;
 
 private:
   Preferences();

@@ -88,6 +88,8 @@ private:
 
   QGroupBox *m_autoSaveGroup, *m_showXSheetToolbar, *m_colorCalibration;
 
+  DVGui::ColorField *m_currentColumnColor;
+
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
   void rebuildFormatsList();
@@ -211,6 +213,7 @@ private slots:
   void onCursorBrushTypeChanged(const QString &text);
   void onCursorBrushStyleChanged(const QString &text);
   void onCursorOutlineChanged(int);
+  void onCurrentColumnDataChanged(const TPixel32 &, bool isDragging);
 };
 
 //**********************************************************************************

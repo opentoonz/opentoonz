@@ -704,9 +704,8 @@ public:
   void setSelectedColumnTextColor(const QColor &color) {
     m_selectedColumnTextColor = color;
   }
-  QColor getSelectedColumnTextColor() const {
-    return m_selectedColumnTextColor;
-  }
+  QColor getSelectedColumnTextColor() const;
+
   // Cell
   void setEmptyCellColor(const QColor &color) { m_emptyCellColor = color; }
   QColor getEmptyCellColor() const { return m_emptyCellColor; }
