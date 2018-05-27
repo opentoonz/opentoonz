@@ -5,34 +5,27 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xml:space="preserve"
-   style="enable-background:new 0 0 14 17;"
-   viewBox="0 0 14 17"
-   y="0px"
-   x="0px"
+   version="1.1"
    id="svg2"
-   version="1.1"><metadata
-   id="metadata10"><rdf:RDF><cc:Work
+   x="0px"
+   y="0px"
+   viewBox="0 0 5 7"
+   xml:space="preserve"
+   width="5"
+   height="7"><metadata
+   id="metadata11"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
-   id="defs8" />
+   id="defs9" />
 <style
-   id="style2"
-   type="text/css">
-	.st0{fill:#000000;}
+   type="text/css"
+   id="style2">
+	.st0{fill:#C0C0C0;}
 	.st1{fill:#FFFFFF;}
 </style>
 
+
 <path
-   d="M7,5h4v4h3v1h-3v4H2V5h4V0h1V5z M3,6v7h7V6C7.7,6,5.3,6,3,6z"
-   class="st0"
-   id="path4" />
-<rect
-   style="fill:#000000;fill-opacity:1"
-   height="1"
-   width="5"
-   class="st1"
-   y="9"
-   x="4"
-   id="rect6" />
-</svg>
+   style="fill:#000000;fill-opacity:0.82412058;stroke:none;stroke-width:1.58040619;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:3.30999994;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+   d="M 0,0 5,3.5 0,7 Z"
+   id="rect4523" /></svg>

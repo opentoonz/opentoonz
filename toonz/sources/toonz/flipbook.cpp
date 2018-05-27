@@ -272,9 +272,9 @@ void FlipBook::addFreezeButtonToTitleBar() {
         titleBar, ":Resources/pane_freeze_off.svg",
         ":Resources/pane_freeze_over.svg", ":Resources/pane_freeze_on.svg");
     m_freezeButton->setToolTip("Freeze");
-    titleBar->add(QPoint(-55, 0), m_freezeButton);
+    titleBar->add(QPoint(-64, 0), m_freezeButton);
     connect(m_freezeButton, SIGNAL(toggled(bool)), this, SLOT(freeze(bool)));
-    QPoint p(titleBar->width() - 62, 1);
+    QPoint p(titleBar->width() - 64, 0);
     m_freezeButton->move(p);
     m_freezeButton->show();
   }

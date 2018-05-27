@@ -298,11 +298,6 @@ public:
     return m_removeSceneNumberFromLoadedLevelName;
   }
 
-  void setPaletteTypeOnLoadRasterImageAsColorModel(int type);
-  int getPaletteTypeOnLoadRasterImageAsColorModel() const {
-    return m_paletteTypeOnLoadRasterImageAsColorModel;
-  }
-
   void setDefaultImportPolicy(int policy);
   int getDefaultImportPolicy() { return m_importPolicy; }
 
@@ -656,12 +651,6 @@ private:
   bool m_onionSkinEnabled;
   bool m_multiLayerStylePickerEnabled;
   bool m_precompute;
-  /*--
-  Color Modelにラスタ画像を読み込んだとき、パレットをどのように作るか
-  0 : 全ての異なるピクセルの色を別のStyleにする, 1 :
-似ている色をまとめて1つのStyleにする
---*/
-  int m_paletteTypeOnLoadRasterImageAsColorModel;
 
   bool m_showKeyframesOnXsheetCellArea;
   std::string m_layerNameEncoding = "SJIS";  // Fixed to SJIS for now. You can

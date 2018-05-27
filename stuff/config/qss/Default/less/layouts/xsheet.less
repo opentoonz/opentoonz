@@ -7,7 +7,7 @@
 
 #xsheetArea,
 #ScrollArea {
-  background-color: @scrollbar-bg-color;
+  background-color: @xsheet-empty-bg-color;
   border: 0;
 }
 
@@ -203,26 +203,20 @@ XsheetViewer {
 }
 
 #FunctionEditorTree {
-  // don't extend all else FunctionTreeView qproperties won't work
-  &:extend(.tree-list);
-  background-color: @tree-bg-color;
-  alternate-background-color: @tree-bg-color;
+  &:extend(.treeview all);
   border-top: 1 solid @accent;
-  &::branch { //
-    &:extend(.branch-17 all);
-  }
 }
-
-/* Function Editor Spreadsheet
------------------------------------------------------------------------------ */
-
-// if a q_property shares likeness with XSheet then pair them
-// XSheet should be considered the parent
 
 FunctionTreeView {
   qproperty-TextColor: @function-treeview-text-color;
   qproperty-CurrentTextColor: @function-treeview-text-color-selected;
 }
+
+/* Function Editor Spreadsheet
+----------------------------------------------------------------------------- */
+
+// If a qproperty shares the same likeness with XSheet then pair the variables.
+// XSheet should be considered as parent.
 
 FunctionPanel {
   qproperty-BGColor: @function-panel-bg-color;

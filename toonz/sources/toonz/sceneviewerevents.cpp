@@ -1046,7 +1046,7 @@ bool SceneViewer::event(QEvent *e) {
   if (e->type() == QEvent::MouseButtonPress)
     clock.start();
   else if (e->type() == QEvent::MouseMove) {
-    if (clock.elapsed() < 10) {
+    if (clock.isValid() && clock.elapsed() < 10) {
       e->accept();
       return true;
     }

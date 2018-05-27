@@ -465,7 +465,7 @@ void PageViewer::drawColorName(QPainter &p, QRect &nameRect, TColorStyle *style,
       name += "  " + toQString(g.first) + ":" + QString::number(g.second);
     if (style->getFlags() != 0) name += "(autopaint)";
 
-    TPoint pickedPos = style->getPickedPosition();
+    TPoint pickedPos = style->getPickedPosition().pos;
     if (pickedPos != TPoint())
       name += QString(" (%1,%2)").arg(pickedPos.x).arg(pickedPos.y);
 
@@ -833,7 +833,8 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       }
 
       // draw "Picked Position" indicator (not show on small chip mode)
-      if (style->getPickedPosition() != TPoint() && m_viewMode != SmallChips) {
+      if (style->getPickedPosition().pos != TPoint() &&
+          m_viewMode != SmallChips) {
         QRect ppRect(chipRect.bottomLeft() + QPoint(offset, -14),
                      QSize(12, 15));
         p.drawRect(ppRect);

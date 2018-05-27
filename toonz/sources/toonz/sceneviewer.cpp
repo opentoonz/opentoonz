@@ -522,7 +522,7 @@ void SceneViewer::setVisual(const ImagePainter::VisualSettings &settings) {
   m_visualSettings = settings;
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
-  if (repaint) update();
+  if (repaint) GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -602,7 +602,7 @@ void SceneViewer::freeze(bool on) {
     setCursor(Qt::ForbiddenCursor);
     m_freezedStatus = UPDATE_FREEZED;
   }
-  update();
+  GLInvalidateAll();
 }
 
 //-------------------------------------------------------------------------------
@@ -633,7 +633,7 @@ void SceneViewer::enablePreview(int previewMode) {
 
   m_previewMode = previewMode;
 
-  update();
+  GLInvalidateAll();
 
   // for updating the title bar
   emit previewToggled();
@@ -1715,7 +1715,12 @@ void SceneViewer::GLInvalidateAll() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::GLInvalidateRect(const TRectD &rect) {
-  m_clipRect = rect;
+  // there is a case that this function is called more than once before
+  // paintGL() is called
+  if (!m_clipRect.isEmpty())
+    m_clipRect += rect;
+  else
+    m_clipRect = rect;
   update();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();
@@ -1808,29 +1813,31 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
  */
 double SceneViewer::getDpiFactor() {
   // When the current unit is "pixels", always use a standard dpi
+  double cameraDpi = TApp::instance()
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getCurrentCamera()
+                         ->getDpi()
+                         .x;
   if (Preferences::instance()->getPixelsOnly()) {
     return Stage::inch / Stage::standardDpi;
   }
+
   // When preview mode, use a camera DPI
   else if (isPreviewEnabled()) {
-    return Stage::inch /
-           TApp::instance()
-               ->getCurrentScene()
-               ->getScene()
-               ->getCurrentCamera()
-               ->getDpi()
-               .x;
+    return Stage::inch / cameraDpi;
   }
   // When level editing mode, use an image DPI
   else if (TApp::instance()->getCurrentFrame()->isEditingLevel()) {
     TXshSimpleLevel *sl;
     sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-    if (!sl) return 1.;
-    if (sl->getType() == PLI_XSHLEVEL) return 1.;
+    if (!sl) return Stage::inch / cameraDpi;
+    if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / cameraDpi;
     if (sl->getImageDpi() != TPointD())
       return Stage::inch / sl->getImageDpi().x;
     if (sl->getDpi() != TPointD()) return Stage::inch / sl->getDpi().x;
-    return 1.;
+    // no valid dpi, use camera dpi
+    return Stage::inch / cameraDpi;
   }
   // When the special case in the scene editing mode:
   // If the option "ActualPixelViewOnSceneEditingMode" is ON,
@@ -1841,16 +1848,16 @@ double SceneViewer::getDpiFactor() {
            !CameraTestCheck::instance()->isEnabled()) {
     TXshSimpleLevel *sl;
     sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-    if (!sl) return 1.;
-    if (sl->getType() == PLI_XSHLEVEL) return 1.;
-    if (sl->getDpi() == TPointD()) return 1.;
+    if (!sl) return Stage::inch / cameraDpi;
+    if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / cameraDpi;
+    if (sl->getDpi() == TPointD()) return Stage::inch / cameraDpi;
     // use default value for the argument of getDpi() (=TFrameId::NO_FRAME）
     // so that the dpi of the first frame in the level will be returned.
     return Stage::inch / sl->getDpi().x;
   }
-  // When the scene editing mode without any option, don't think about DPI
+  // When the scene editing mode without any option, use the camera dpi
   else {
-    return 1.;
+    return Stage::inch / cameraDpi;
   }
 }
 
@@ -2154,7 +2161,7 @@ void SceneViewer::onXsheetChanged() {
   TTool *tool    = TApp::instance()->getCurrentTool()->getTool();
   if (tool && tool->isEnabled()) tool->updateMatrix();
   onLevelChanged();
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -2163,14 +2170,14 @@ void SceneViewer::onObjectSwitched() {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (tool && tool->isEnabled()) tool->updateMatrix();
   onLevelChanged();
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneViewer::onSceneChanged() {
   onLevelChanged();
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -2185,7 +2192,7 @@ void SceneViewer::onFrameSwitched() {
     tool->onEnter();
   }
 
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -2194,7 +2201,7 @@ void SceneViewer::onFrameSwitched() {
 void SceneViewer::onToolChanged() {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (tool) setToolCursor(this, tool->getCursorId());
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------

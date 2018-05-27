@@ -721,6 +721,10 @@ void FullColorBrushTool::updateCurrentStyle() {
     }
   }
 
+  // if this function is called from onEnter(), the clipping rect will not be
+  // set in order to update whole viewer.
+  if (prevMinCursorThick == 0 && prevMaxCursorThick == 0) return;
+
   if (m_minCursorThick != prevMinCursorThick ||
       m_maxCursorThick != prevMaxCursorThick) {
     TRectD rect(

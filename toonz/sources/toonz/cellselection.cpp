@@ -1210,6 +1210,47 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+
+class FillEmptyCellUndo final : public TUndo {
+  TCellSelection *m_selection;
+  TXshCell m_cell;
+
+public:
+  FillEmptyCellUndo(int r0, int r1, int c, TXshCell &cell) : m_cell(cell) {
+    m_selection = new TCellSelection();
+    m_selection->selectCells(r0, c, r1, c);
+  }
+
+  ~FillEmptyCellUndo() { delete m_selection; }
+
+  void undo() const override {
+    int r0, c0, r1, c1;
+    m_selection->getSelectedCells(r0, c0, r1, c1);
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    for (int c = c0; c <= c1; c++) {
+      xsh->clearCells(r0, c, r1 - r0 + 1);
+    }
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  void redo() const override {
+    int r0, c0, r1, c1;
+    m_selection->getSelectedCells(r0, c0, r1, c1);
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    for (int i = r0; i <= r1; i++) xsh->setCell(i, c0, m_cell);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override {
+    return QObject::tr("Fill In Empty Cells");
+  }
+
+  int getHistoryType() override { return HistoryType::Xsheet; }
+  //-----------------------------------------------------------------------------
+};
+
 }  // namespace
 //-----------------------------------------------------------------------------
 
@@ -1281,6 +1322,7 @@ void TCellSelection::enableCommands() {
 
   enableCommand(this, MI_PasteInto, &TCellSelection::overWritePasteCells);
 
+  enableCommand(this, MI_FillEmptyCell, &TCellSelection::fillEmptyCell);
   enableCommand(this, MI_Reframe1, &TCellSelection::reframe1Cells);
   enableCommand(this, MI_Reframe2, &TCellSelection::reframe2Cells);
   enableCommand(this, MI_Reframe3, &TCellSelection::reframe3Cells);
@@ -1333,7 +1375,8 @@ bool TCellSelection::isEnabledCommand(
                                         MI_Redo,
                                         MI_PasteNumbers,
                                         MI_ConvertToToonzRaster,
-                                        MI_ConvertVectorToVector};
+                                        MI_ConvertVectorToVector,
+                                        MI_FillEmptyCell};
   return commands.contains(commandId);
 }
 
@@ -2785,4 +2828,65 @@ void TCellSelection::convertVectortoVector() {
 
   app->getCurrentTool()->onImageChanged(
       (TImage::Type)app->getCurrentImageType());
+}
+
+void TCellSelection::fillEmptyCell() {
+  if (isEmpty()) return;
+
+  // set up basics
+  bool initUndo = false;
+  TXsheet *xsh  = TApp::instance()->getCurrentXsheet()->getXsheet();
+  int r, r0, c0, c, r1, c1;
+
+  getSelectedCells(r0, c0, r1, c1);
+
+  for (c = c0; c <= c1; c++) {
+    TXshColumn *column = xsh->getColumn(c);
+    if (!column || column->isEmpty() || column->isLocked() ||
+        column->getSoundColumn())
+      continue;
+
+    for (r = r1; r >= r0; r--) {
+      int fillCount = 0;
+      TXshCell cell = xsh->getCell(r, c);
+
+      if (cell.isEmpty()) fillCount++;
+
+      int prevR = r - 1;
+      while (prevR >= 0) {
+        cell = xsh->getCell(prevR, c);
+        if (!cell.isEmpty()) break;
+
+        prevR--;
+        fillCount++;
+      }
+
+      // We've gone past the beginning of timeline without finding a cell.
+      // Do nothing, and end current column processing immediately.
+      if (prevR < 0) break;
+
+      // Adjacent cell is filled.  Move to next one.
+      if (!fillCount) continue;
+
+      // Ok, time fill
+      int startR = prevR + 1;
+      int endR   = startR + fillCount - 1;
+
+      if (!initUndo) {
+        initUndo = true;
+        TUndoManager::manager()->beginBlock();
+      }
+
+      FillEmptyCellUndo *undo = new FillEmptyCellUndo(startR, endR, c, cell);
+      TUndoManager::manager()->add(undo);
+      undo->redo();
+
+      // Let's skip cells we just filled
+      r = prevR;
+    }
+  }
+
+  if (initUndo) TUndoManager::manager()->endBlock();
+
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 }

@@ -622,15 +622,6 @@ int main(int argc, char *argv[]) {
   }
   if (i == argc) TMsgCore::instance()->connectTo("");
 
-// TODO: non va qui. Bisognerebbe semmai modificare l'implementazione
-// delle TEnv:: precedenti. Discutiamone
-#ifdef MACOSX
-  // StuffDir
-  QFileInfo infoStuff(QString("Toonz 7.1 stuff"));
-  TFilePath stuffDirPath(infoStuff.absoluteFilePath().toStdString());
-  TEnv::setStuffDir(stuffDirPath);
-#endif
-
   // controllo se la xxxroot e' definita e corrisponde ad un file esistente
   TFilePath fp = TEnv::getStuffDir();
   if (fp == TFilePath())

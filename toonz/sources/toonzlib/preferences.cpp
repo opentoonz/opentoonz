@@ -312,7 +312,6 @@ Preferences::Preferences()
     , m_onionSkinDuringPlayback(false)
     , m_dropdownShortcutsCycleOptions(false)
     , m_multiLayerStylePickerEnabled(false)
-    , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
     , m_projectRoot(0x08)
     , m_customProjectRoot("")
@@ -621,8 +620,6 @@ Preferences::Preferences()
   getValue(*m_settings, "onionSkinDuringPlayback", m_onionSkinDuringPlayback);
   getValue(*m_settings, "multiLayerStylePickerEnabled",
            m_multiLayerStylePickerEnabled);
-  getValue(*m_settings, "paletteTypeOnLoadRasterImageAsColorModel",
-           m_paletteTypeOnLoadRasterImageAsColorModel);
   getValue(*m_settings, "showKeyframesOnXsheetCellArea",
            m_showKeyframesOnXsheetCellArea);
   QString ffmpegPath = m_settings->value("ffmpegPath").toString();
@@ -1465,13 +1462,6 @@ void Preferences::setIgnoreImageDpi(bool on) {
 void Preferences::setVectorSnappingTarget(int target) {
   m_vectorSnappingTarget = target;
   m_settings->setValue("vectorSnappingTarget", target);
-}
-
-//-----------------------------------------------------------------
-
-void Preferences::setPaletteTypeOnLoadRasterImageAsColorModel(int type) {
-  m_paletteTypeOnLoadRasterImageAsColorModel = type;
-  m_settings->setValue("paletteTypeOnLoadRasterImageAsColorModel", type);
 }
 
 //-----------------------------------------------------------------

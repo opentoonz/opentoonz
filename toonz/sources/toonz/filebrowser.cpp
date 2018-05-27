@@ -689,7 +689,8 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode,
 
   refreshCurrentFolderItems();
 
-  m_folderTreeView->setCurrentNode(fp, expandNode);
+  if (!TFileStatus(fp).isLink())
+    m_folderTreeView->setCurrentNode(fp, expandNode);
 }
 
 //-----------------------------------------------------------------------------

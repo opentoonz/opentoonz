@@ -187,7 +187,6 @@ private slots:
   void onRemoveSceneNumberFromLoadedLevelNameChanged(int index);
   void onShowRasterImageDarkenBlendedInViewerChanged(int index);
   void onShowFrameNumberWithLettersChanged(int index);
-  void onPaletteTypeForRasterColorModelChanged(int index);
   void onShowKeyframesOnCellAreaChanged(int);
   void onFfmpegPathChanged();
   void onFfmpegTimeoutChanged();

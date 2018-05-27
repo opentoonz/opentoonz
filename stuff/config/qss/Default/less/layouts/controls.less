@@ -166,6 +166,9 @@ QCheckBox {
 ----------------------------------------------------------------------------- */
 
 .RadioButton {
+  &:hover {
+    &:extend(.CheckBox:hover);
+  }
   &::indicator {
     &:unchecked {
       image: url('@{img-url}/radiobutton_unchecked.svg');

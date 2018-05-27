@@ -859,6 +859,7 @@ void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex,
   double w  = stroke->getW(pos);
   double w0 = stroke->getParameterAtControlPoint(beforePointIndex);
   double w4 = stroke->getParameterAtControlPoint(nextPointIndex);
+  if (w0 > w) return;
   assert(w0 <= w && w <= w4);
 
   double t = 1;

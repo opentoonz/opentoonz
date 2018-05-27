@@ -29,21 +29,29 @@ DEFINE_CLASS_CODE(TPalette, 30)
 
 namespace {
 
-const int maxStyleIndex = 32765;
-
-const std::string pointToString(const TPoint &point) {
-  return std::to_string(point.x) + "," + std::to_string(point.y);
+const std::string pointToString(const TColorStyle::PickedPosition &point) {
+  if (point.frame == 0)
+    return std::to_string(point.pos.x) + "," + std::to_string(point.pos.y);
+  else
+    return std::to_string(point.pos.x) + "," + std::to_string(point.pos.y) +
+           "," + std::to_string(point.frame);
 }
 
 // splitting string with ','
-const TPoint stringToPoint(const std::string &string) {
+const TColorStyle::PickedPosition stringToPoint(const std::string &string) {
   std::string buffer;
   std::stringstream ss(string);
-  std::getline(ss, buffer, ',');  // getting the first part of string
-  int x = std::stoi(buffer);
-  std::getline(ss, buffer);  // getting the second part of string
-  int y = std::stoi(buffer);
-  return TPoint(x, y);
+  std::vector<std::string> result;
+  while (std::getline(ss, buffer, ','))  // split with comma
+    result.push_back(buffer);
+
+  int x     = std::stoi(result[0]);
+  int y     = std::stoi(result[1]);
+  int frame = 0;
+  if (result.size() == 3)  // getting the third part of string - if any.
+    frame = std::stoi(result[2]);
+
+  return {TPoint(x, y), frame};
 }
 
 }  // namespace
@@ -581,7 +589,7 @@ void TPalette::saveData(TOStream &os) {
   {
     for (int i = 0; i < getStyleCount(); ++i) {
       TColorStyleP style = m_styles[i].second;
-      if (style->getPickedPosition() == TPoint())
+      if (style->getPickedPosition().pos == TPoint())
         os.openChild("style");
       else {
         std::map<std::string, std::string> attr;
@@ -1129,7 +1137,7 @@ void TPalette::setShortcutValue(int key, int styleId) {
 bool TPalette::hasPickedPosStyle() {
   for (int i = 0; i < getStyleCount(); ++i) {
     TColorStyleP style = m_styles[i].second;
-    if (style->getPickedPosition() != TPoint()) return true;
+    if (style->getPickedPosition().pos != TPoint()) return true;
   }
   return false;
 }

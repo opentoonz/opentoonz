@@ -1451,6 +1451,12 @@ TFilePath ToonzScene::getDefaultLevelPath(int levelType,
   default:
     levelPath = TFilePath(levelName + L"..png");
   }
+
+  if (!isUntitled() &&
+      Preferences::instance()->getPathAliasPriority() ==
+          Preferences::SceneFolderAlias)
+    return TFilePath("$scenefolder") + levelPath;
+
   std::string folderName = getFolderName(levelType);
   if (project->getUseScenePath(folderName))
     return TFilePath("+" + folderName) + getSavePath() + levelPath;

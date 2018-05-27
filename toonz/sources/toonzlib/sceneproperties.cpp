@@ -9,6 +9,7 @@
 #include "toonz/tcamera.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/preferences.h"
 #include "cleanuppalette.h"
 
 // TnzBase includes
@@ -98,6 +99,15 @@ void TSceneProperties::assign(const TSceneProperties *sprop) {
 //-----------------------------------------------------------------------------
 
 void TSceneProperties::onInitialize() {
+  // set initial output folder to $scenefolder when the scene folder mode is set
+  // in user preferences
+  if (Preferences::instance()->getPathAliasPriority() ==
+          Preferences::SceneFolderAlias &&
+      !TFilePath("$scenefolder").isAncestorOf(m_outputProp->getPath())) {
+    std::string ext = m_outputProp->getPath().getDottedType();
+    m_outputProp->setPath(TFilePath("$scenefolder/") + ext);
+  }
+
   //  m_scanParameters->adaptToCurrentScanner();
 }
 

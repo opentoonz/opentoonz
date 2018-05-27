@@ -59,7 +59,8 @@
 // Right-Click Menu
 // -----------------------------------------------------------------------------
 
-@menu-bg-color: lighten(@bg, 15);
+@menu-bg-color: lighten(@bg, 8);
+@menu-separator-color: darken(@menu-bg-color, 15);
 
 // -----------------------------------------------------------------------------
 // Titlebars
@@ -74,14 +75,13 @@
 // -----------------------------------------------------------------------------
 
 // Container
-@scrollbar-bg-color: lighten(@bg, 8);
+@scrollbar-bg-color: darken(@bg, 7);
 
 // Handle
-@scrollbar-handle-border-size: 1;
 @scrollbar-handle-radius: 2;
-@scrollbar-handle-margin: 1;
-@scrollbar-handle-bg-color: lighten(@bg, 18);
-@scrollbar-handle-border-color: @accent;
+@scrollbar-handle-margin: 2;
+@scrollbar-handle-bg-color: lighten(@bg, 12);
+@scrollbar-handle-border-color: darken(@scrollbar-bg-color, 10);
 @scrollbar-handle-border-color-hover: @accent;
 @scrollbar-handle-border-color-pressed: @accent;
 
@@ -91,9 +91,8 @@
 
 // Trees
 @tree-bg-color: lighten(@bg, 8);
-@tree-bg-color-alt: lighten(@tree-bg-color, 3);
-@prefs-tree-bg-color: @tree-bg-color;
-@prefs-tree-hl-color: lighten(@prefs-tree-bg-color, 10);
+@tree-bg-color-alt: darken(@tree-bg-color, 4);
+@prefs-tree-hl-color: lighten(@tree-bg-color, 8);
 
 // All Panes
 @browser-folder-text-color: rgb(7, 27, 155);
@@ -187,21 +186,24 @@
 // Slider
 // -----------------------------------------------------------------------------
 
-@slider-groove-color: darken(@bg, 25);
-@slider-handle-width: 10;
-
 // This one is used only for #ViewerFpsSlider
 @slider-handle-margin: -2 0;
 @slider-handle-bg-color: lighten(@bg, 15);
 @slider-handle-border-color: @accent;
+
+// DoublePairField, IntPairField
+@slider-groove-color: darken(@bg, 22);
 
 // -----------------------------------------------------------------------------
 // Viewer Window
 // -----------------------------------------------------------------------------
 
 // FlipSlider
-@flipslider-notstarted-color: rgb(146, 81, 81);
-@flipslider-started-color: rgb(40, 133, 61);
+@flipslider-notstarted-color: rgb(139, 37, 37);
+@flipslider-started-color: rgb(0, 168, 8);
+
+// Ruler
+@viewer-ruler-bg-color: lighten(@bg, 25);
 
 // -----------------------------------------------------------------------------
 // Schematic Viewer

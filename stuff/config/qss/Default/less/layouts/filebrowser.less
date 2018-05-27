@@ -6,14 +6,10 @@
 ----------------------------------------------------------------------------- */
 
 #DirTreeView {
-  &:extend(.tree-list all);
   background-color: @browser-listview-bg-color;
   alternate-background-color: @browser-listview-bg-color-alt;
   border: 1 solid @accent;
   border-right: 0;
-  &::branch {
-    &:extend(.branch-22 all);
-  }
 }
 
 /* Right Pane
@@ -79,13 +75,6 @@ DvDirTreeView {
 
 #SceneCast {
   &:extend(#FileBrowser all);
-  & QTreeView {
-    &:extend(.tree-list all);
-    background-color: @browser-listview-bg-color;
-    &::branch {
-      &:extend(.branch-17 all);
-    }
-  }
   & QToolBar {
     border-top: 1 solid @accent;
   }

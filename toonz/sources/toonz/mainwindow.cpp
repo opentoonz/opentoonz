@@ -1418,15 +1418,19 @@ QAction *MainWindow::createAction(const char *id, const QString &name,
   QAction *action = new DVAction(name, this);
   addAction(action);
 #ifdef MACOSX
-  if (strcmp(id, MI_Preferences) == 0) {
+  // To prevent the wrong menu items (due to MacOS menu naming conventions),
+  // from
+  // taking Preferences, Quit, or About roles (sometimes happens unexpectedly in
+  // translations) - all menu items should have "NoRole"
+  //  except for Preferences, Quit, and About
+  if (strcmp(id, MI_Preferences) == 0)
     action->setMenuRole(QAction::PreferencesRole);
-  }
-  if (strcmp(id, MI_ShortcutPopup) == 0) {
+  else if (strcmp(id, MI_Quit) == 0)
+    action->setMenuRole(QAction::QuitRole);
+  else if (strcmp(id, MI_About) == 0)
+    action->setMenuRole(QAction::AboutRole);
+  else
     action->setMenuRole(QAction::NoRole);
-  }
-  if (strcmp(id, MI_ExitGroup) == 0) {
-    action->setMenuRole(QAction::NoRole);
-  }
 #endif
   CommandManager::instance()->define(id, type, defaultShortcut.toStdString(),
                                      action);
@@ -1899,6 +1903,7 @@ void MainWindow::defineActions() {
                         tr("Reframe with Empty Inbetweens..."), "");
   createMenuCellsAction(MI_AutoInputCellNumber, tr("Auto Input Cell Number..."),
                         "");
+  createMenuCellsAction(MI_FillEmptyCell, tr("&Fill In Empty Cells"), "");
 
   createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "Z");
   createRightClickMenuAction(MI_PasteNumbers, tr("&Paste Numbers"), "");
@@ -2410,9 +2415,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene) ? m_recentScenes : (fileType == Level)
-                                                 ? m_recentLevels
-                                                 : m_recentFlipbookImages;
+      (fileType == Scene)
+          ? m_recentScenes
+          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2537,9 +2542,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene) ? m_recentScenes : (fileType == Level)
-                                                 ? m_recentLevels
-                                                 : m_recentFlipbookImages;
+      (fileType == Scene)
+          ? m_recentScenes
+          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2566,9 +2571,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
-                                                        ? MI_ClearRecentLevel
-                                                        : MI_ClearRecentImage;
+        (fileType == Scene)
+            ? MI_ClearRecentScene
+            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

@@ -5,28 +5,27 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xml:space="preserve"
-   style="enable-background:new 0 0 14 17;"
-   viewBox="0 0 14 17"
-   y="0px"
-   x="0px"
+   version="1.1"
    id="svg2"
-   version="1.1"><metadata
+   x="0px"
+   y="0px"
+   viewBox="0 0 7 5"
+   xml:space="preserve"
+   width="7"
+   height="5"><metadata
    id="metadata11"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
    id="defs9" />
 <style
-   id="style2"
-   type="text/css">
-	.st0{fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;}
+   type="text/css"
+   id="style2">
+	.st0{fill:#C0C0C0;}
+	.st1{fill:#FFFFFF;}
 </style>
 
 
-<rect
-   y="0"
-   x="6"
-   height="17"
-   width="1"
-   id="rect15"
-   style="fill:#000000;fill-opacity:1" /></svg>
+<path
+   style="fill:#000000;fill-opacity:0.82412058;stroke:none;stroke-width:1.58040619;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:3.30999994;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+   d="M 7,0 3.5,5 0,0 Z"
+   id="rect4523" /></svg>

@@ -19,7 +19,15 @@
 // MACOSX includes
 #ifdef _WIN32
 #include <winsock.h>
+#elif MACOSX
+#include "tversion.h"
+using namespace TVER;
+#include <netdb.h>      // gethostbyname
+#include <arpa/inet.h>  // inet_ntoa
 #else
+// these were included for OSX, i'm not sure if they are required for linux or
+// not? leaving them in as linux was building sucessfully already. damies13 -
+// 2017-04-15.
 #include <netdb.h>      // gethostbyname
 #include <arpa/inet.h>  // inet_ntoa
 #endif
@@ -358,16 +366,21 @@ QString getExeName(bool isComposer) {
 
 #ifdef _WIN32
   return name + ".exe ";
+#elif MACOSX
+  TVER::ToonzVersion tver;
+  return "\"./" + QString::fromStdString(tver.getAppName()) + "_" +
+         QString::fromStdString(tver.getAppVersionString()) +
+         ".app/Contents/MacOS/" + name + "\" ";
 #else
-  return "\"./Toonz 7.1.app/Contents/MacOS/" + name + "\" ";
+  return name;
 #endif
 }
 
 //------------------------------------------------------------------------------
 
 QString toString(int value, int w, char c = ' ') {
-  QString s              = QString::number(value);
-  while (s.size() < w) s = c + s;
+  QString s = QString::number(value);
+  while (s.size() < w) s= c + s;
   return s;
 }
 
@@ -471,8 +484,9 @@ QString TFarmTask::getCommandLine(bool isFarmTask) const {
   QString cmdline = getExeName(m_isComposerTask);
 
   if (!m_taskFilePath.isEmpty())
-    cmdline += " \"" + QString::fromStdWString(
-                           TSystem::toUNC(m_taskFilePath).getWideString()) +
+    cmdline += " \"" +
+               QString::fromStdWString(
+                   TSystem::toUNC(m_taskFilePath).getWideString()) +
                "\"";
 
   if (m_callerMachineName != "") {
@@ -627,8 +641,8 @@ TFarmTaskGroup::TFarmTaskGroup(const QString &id, const QString &name,
                 outputPath, from, to, step, shrink, multimedia, chunksize,
                 threadsIndex, maxTileSizeIndex, Overwrite_Off, false)
     , m_imp(new Imp()) {
-  int subCount                = 0;
-  if (chunksize > 0) subCount = tceil((to - from + 1) / (double)chunksize);
+  int subCount = 0;
+  if (chunksize > 0) subCount= tceil((to - from + 1) / (double)chunksize);
 
   int ra = from;
   if (subCount > 1) {
