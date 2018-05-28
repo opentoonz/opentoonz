@@ -1335,7 +1335,7 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
     /*--- ストロークの最初にMaxサイズの円が描かれてしまう不具合を防止する ---*/
     if (m_pressure.getValue() && e.m_pressure == 1.0)
-      thickness     = m_thickness.getValue().first;
+      thickness     = m_thickness.getValue().first * 0.5;
     m_currThickness = thickness;
     m_smoothStroke.beginStroke(m_smooth.getValue());
 
