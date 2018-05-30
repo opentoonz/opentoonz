@@ -9,4 +9,4 @@ cmake ../sources -G Ninja\
 ninja
 cd ../../
 ccache --show-stats > ccache_post
-diff -U100 ccache_pre ccache_post # report ccache's efficiency
+diff -U100 ccache_pre ccache_post || true # report ccache's efficiency
