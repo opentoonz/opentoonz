@@ -7,3 +7,5 @@ sudo apt-get install -y liblzo2-dev liblz4-dev libfreetype6-dev libpng-dev libeg
 wget http://mirrors.kernel.org/ubuntu/pool/main/l/lz4/liblz4-1_0.0~r131-2ubuntu2_amd64.deb -O liblz4.deb
 wget http://mirrors.kernel.org/ubuntu/pool/main/l/lz4/liblz4-dev_0.0~r131-2ubuntu2_amd64.deb -O liblz4-dev.deb
 sudo dpkg -i liblz4.deb liblz4-dev.deb
+
+ccache --show-stats > ccache_pre

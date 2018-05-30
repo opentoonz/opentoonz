@@ -9,3 +9,6 @@ cmake ../sources \
 # according to https://docs.travis-ci.com/user/ci-environment/#Virtualization-environments
 # travis can offer up to 2 cores in burst, try using that
 make -j 2
+cd ../../
+ccache --show-stats > ccache_post
+diff -U100 ccache_pre ccache_post # report ccache's efficiency
