@@ -7,7 +7,7 @@ install:
 script:
     - if [[ $TRAVIS_OS_NAME == "osx" ]];   then bash ci-scripts/osx/travis-build.sh; fi
     - if [[ $TRAVIS_OS_NAME == "linux" ]]; then bash ci-scripts/linux/travis-build.sh; fi
-
+cache: ccache
 matrix:
     include:
         - os: linux
