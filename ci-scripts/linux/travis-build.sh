@@ -6,7 +6,7 @@ cd toonz && mkdir build && cd build
 source /opt/qt59/bin/qt59-env.sh
 cmake ../sources -G Ninja\
     -DWITH_SYSTEM_SUPERLU:BOOL=OFF
-ninja
+ninja | gzip -9 | base64
 cd ../../
 ccache --show-stats > ccache_post
 diff -U100 ccache_pre ccache_post || true # report ccache's efficiency
