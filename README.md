@@ -6,7 +6,7 @@
 [![](https://travis-ci.org/opentoonz/opentoonz.svg?branch=master)](https://travis-ci.org/opentoonz/opentoonz)
 
 ## What is OpenToonz?
-
+ 
 OpenToonz is a 2D animation software published by 
 [DWANGO](http://dwango.co.jp/english/). It is based on **Toonz Studio
 Ghibli Version**, originally developed in Italy by
