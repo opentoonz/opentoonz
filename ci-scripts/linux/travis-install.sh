@@ -8,4 +8,8 @@ wget http://mirrors.kernel.org/ubuntu/pool/main/l/lz4/liblz4-1_0.0~r131-2ubuntu2
 wget http://mirrors.kernel.org/ubuntu/pool/main/l/lz4/liblz4-dev_0.0~r131-2ubuntu2_amd64.deb -O liblz4-dev.deb
 sudo dpkg -i liblz4.deb liblz4-dev.deb
 
+# ccache doesn't come with symlink for clang, create them manually
+sudo ln -sf $(which clang) /usr/lib/ccache/clang
+sudo ln -sf $(which clang++) /usr/lib/ccache/clang++
+
 ccache --show-stats > ccache_pre
