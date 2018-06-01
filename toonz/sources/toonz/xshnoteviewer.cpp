@@ -465,8 +465,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("cornerWidget");
 
-  m_flipOrientationButton =
-      new QPushButton(m_viewer->orientation()->name(), this);
+  m_flipOrientationButton  = new QToolButton(this);
   m_noteButton             = new QToolButton(this);
   m_precNoteButton         = new QToolButton(this);
   m_nextNoteButton         = new QToolButton(this);
@@ -477,6 +476,13 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
   m_flipOrientationButton->setObjectName("flipOrientationButton");
   m_flipOrientationButton->setFocusPolicy(Qt::FocusPolicy::NoFocus);
+  m_flipOrientationButton->setFixedSize(25, 25);
+  m_flipOrientationButton->setIconSize(QSize(20, 20));
+  QIcon flipOrientationIcon = createQIcon("fliporientation");
+  flipOrientationIcon.addFile(QString(":Resources/xsheet2timeline.svg"),
+                              QSize(), QIcon::Normal);
+  m_flipOrientationButton->setIcon(flipOrientationIcon);
+  m_flipOrientationButton->setToolTip(tr("Xsheet/Timeline Toggle"));
 
   m_noteButton->setObjectName("ToolbarToolButton");
   m_noteButton->setFixedSize(44, 26);
@@ -485,6 +491,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   addNoteIcon.addFile(QString(":Resources/newmemo_disabled.svg"), QSize(),
                       QIcon::Disabled);
   m_noteButton->setIcon(addNoteIcon);
+  m_noteButton->setToolTip(tr("Add New Memo"));
 
   m_precNoteButton->setObjectName("ToolbarToolButton");
   m_precNoteButton->setFixedSize(22, 22);
@@ -493,6 +500,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   precNoteIcon.addFile(QString(":Resources/prevkey_disabled.svg"), QSize(),
                        QIcon::Disabled);
   m_precNoteButton->setIcon(precNoteIcon);
+  m_precNoteButton->setToolTip(tr("Previous Memo"));
 
   m_nextNoteButton->setObjectName("ToolbarToolButton");
   m_nextNoteButton->setFixedSize(22, 22);
@@ -501,6 +509,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   nextNoteIcon.addFile(QString(":Resources/nextkey_disabled.svg"), QSize(),
                        QIcon::Disabled);
   m_nextNoteButton->setIcon(nextNoteIcon);
+  m_nextNoteButton->setToolTip(tr("Next Memo"));
 
   QStringList frameDisplayStyles;
   frameDisplayStyles << tr("Frame") << tr("Sec Frame") << tr("6sec Sheet")
@@ -626,7 +635,15 @@ void NoteArea::updateButtons() {
 void NoteArea::flipOrientation() { m_viewer->flipOrientation(); }
 
 void NoteArea::onXsheetOrientationChanged(const Orientation *newOrientation) {
-  m_flipOrientationButton->setText(newOrientation->caption());
+  //  m_flipOrientationButton->setText(newOrientation->caption());
+
+  QIcon flipOrientationIcon = createQIcon("fliporientation");
+  QString iconFile          = newOrientation->isVerticalTimeline()
+                         ? QString(":Resources/xsheet2timeline.svg")
+                         : QString(":Resources/timeline2xsheet.svg");
+  flipOrientationIcon.addFile(iconFile, QSize(), QIcon::Normal);
+  m_flipOrientationButton->setIcon(flipOrientationIcon);
+
   removeLayout();
   createLayout();
 }

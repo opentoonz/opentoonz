@@ -120,7 +120,7 @@ class NoteArea final : public QFrame {
   std::unique_ptr<NotePopup> m_newNotePopup;  // Popup used to create new note
   XsheetViewer *m_viewer;
 
-  QPushButton *m_flipOrientationButton;
+  QToolButton *m_flipOrientationButton;
 
   QToolButton *m_noteButton;
   QToolButton *m_nextNoteButton;
