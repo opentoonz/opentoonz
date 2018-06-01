@@ -101,6 +101,21 @@ public:
 } xsheetViewerFactory;
 
 //=============================================================================
+// XsheetViewer - Timeline mode
+//-----------------------------------------------------------------------------
+
+class TimelineViewerFactory final : public TPanelFactory {
+public:
+  TimelineViewerFactory() : TPanelFactory("Timeline") {}
+  void initialize(TPanel *panel) override {
+    panel->setWidget(new XsheetViewer(panel));
+    XsheetViewer *xsh = (XsheetViewer *)panel->widget();
+    xsh->flipOrientation();
+    panel->resize(500, 300);
+  }
+} timelineViewerFactory;
+
+//=============================================================================
 // SchematicSceneViewer
 //-----------------------------------------------------------------------------
 

@@ -1766,3 +1766,6 @@ QColor XsheetViewer::getSelectedColumnTextColor() const {
 
 OpenFloatingPanel openXsheetViewerCommand(MI_OpenXshView, "Xsheet",
                                           QObject::tr("Xsheet"));
+
+OpenFloatingPanel openTimelineViewerCommand(MI_OpenTimelineView, "Timeline",
+                                            QObject::tr("Timeline"));

@@ -241,6 +241,7 @@
     <command>MI_OpenLevelView</command>
     <command>MI_OpenComboViewer</command>
     <command>MI_OpenXshView</command>
+    <command>MI_OpenTimelineView</command>
     <command>MI_OpenHistoryPanel</command>
     <command>MI_AudioRecording</command>
     <separator/>
