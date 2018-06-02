@@ -465,7 +465,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("cornerWidget");
 
-  m_flipOrientationButton  = new QToolButton(this);
+  m_flipOrientationButton  = new QPushButton(this);
   m_noteButton             = new QToolButton(this);
   m_precNoteButton         = new QToolButton(this);
   m_nextNoteButton         = new QToolButton(this);
@@ -476,7 +476,6 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
   m_flipOrientationButton->setObjectName("flipOrientationButton");
   m_flipOrientationButton->setFocusPolicy(Qt::FocusPolicy::NoFocus);
-  m_flipOrientationButton->setFixedSize(25, 25);
   m_flipOrientationButton->setIconSize(QSize(20, 20));
   QIcon flipOrientationIcon = createQIcon("fliporientation");
   flipOrientationIcon.addFile(QString(":Resources/xsheet2timeline.svg"),
