@@ -476,16 +476,17 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
   m_flipOrientationButton->setObjectName("flipOrientationButton");
   m_flipOrientationButton->setFocusPolicy(Qt::FocusPolicy::NoFocus);
-  m_flipOrientationButton->setIconSize(QSize(20, 20));
+  m_flipOrientationButton->setFixedSize(70, 23);
+  m_flipOrientationButton->setIconSize(QSize(40, 20));
   QIcon flipOrientationIcon = createQIcon("fliporientation");
   flipOrientationIcon.addFile(QString(":Resources/xsheet2timeline.svg"),
                               QSize(), QIcon::Normal);
   m_flipOrientationButton->setIcon(flipOrientationIcon);
-  m_flipOrientationButton->setToolTip(tr("Xsheet/Timeline Toggle"));
+  m_flipOrientationButton->setToolTip(tr("Toggle Xsheet/Timeline"));
 
   m_noteButton->setObjectName("ToolbarToolButton");
-  m_noteButton->setFixedSize(44, 26);
-  m_noteButton->setIconSize(QSize(38, 20));
+  m_noteButton->setFixedSize(34, 25);
+  m_noteButton->setIconSize(QSize(30, 20));
   QIcon addNoteIcon = createQIcon("newmemo");
   addNoteIcon.addFile(QString(":Resources/newmemo_disabled.svg"), QSize(),
                       QIcon::Disabled);
@@ -493,7 +494,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_noteButton->setToolTip(tr("Add New Memo"));
 
   m_precNoteButton->setObjectName("ToolbarToolButton");
-  m_precNoteButton->setFixedSize(22, 22);
+  m_precNoteButton->setFixedSize(18, 25);
   m_precNoteButton->setIconSize(QSize(17, 17));
   QIcon precNoteIcon = createQIcon("prevkey");
   precNoteIcon.addFile(QString(":Resources/prevkey_disabled.svg"), QSize(),
@@ -502,7 +503,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_precNoteButton->setToolTip(tr("Previous Memo"));
 
   m_nextNoteButton->setObjectName("ToolbarToolButton");
-  m_nextNoteButton->setFixedSize(22, 22);
+  m_nextNoteButton->setFixedSize(18, 25);
   m_nextNoteButton->setIconSize(QSize(17, 17));
   QIcon nextNoteIcon = createQIcon("nextkey");
   nextNoteIcon.addFile(QString(":Resources/nextkey_disabled.svg"), QSize(),
@@ -564,11 +565,6 @@ void NoteArea::createLayout() {
 
   setFixedSize(rect.size());
 
-  if (o->isVerticalTimeline())
-    m_noteButton->setFixedSize(44, 26);
-  else
-    m_noteButton->setFixedSize(44, 22);
-
   // has two elements: main layout and header panel
   QVBoxLayout *panelLayout = new QVBoxLayout();
   panelLayout->setMargin(1);
@@ -585,16 +581,13 @@ void NoteArea::createLayout() {
 
       mainLayout->addStretch(1);
 
-      mainLayout->addWidget(m_noteButton, 0, centerAlign);
-
       QHBoxLayout *buttonsLayout = new QHBoxLayout();
       buttonsLayout->setMargin(0);
       buttonsLayout->setSpacing(0);
       {
-        buttonsLayout->addStretch(1);
         buttonsLayout->addWidget(m_precNoteButton, 0);
+        buttonsLayout->addWidget(m_noteButton, 0, centerAlign);
         buttonsLayout->addWidget(m_nextNoteButton, 0);
-        buttonsLayout->addStretch(1);
       }
       mainLayout->addLayout(buttonsLayout, 0);
 
