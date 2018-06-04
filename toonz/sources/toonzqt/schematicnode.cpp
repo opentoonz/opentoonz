@@ -159,28 +159,67 @@ void SchematicThumbnailToggle::mousePressEvent(QGraphicsSceneMouseEvent *me) {
 //
 //========================================================
 
-SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmap,
-                                 int flags, bool isLargeScaled)
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmapOn,
+                                 QColor colorOn, int flags, bool isLargeScaled)
     : QGraphicsItem(parent)
-    , m_pixmap1(pixmap)
-    , m_pixmap2()
+    , m_pixmapOn(pixmapOn)
+    , m_pixmapOn2()
+    , m_pixmapOff()
     , m_state(0)
     , m_flags(flags)
     , m_width(isLargeScaled ? 18 : 30)
-    , m_height(isLargeScaled ? 7 : 5) {}
+    , m_height(isLargeScaled ? 7 : 5)
+    , m_colorOn(colorOn)
+    , m_colorOff(QColor(0, 0, 0, 0)) {}
 
 //--------------------------------------------------------
 
-SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmap1,
-                                 const QPixmap &pixmap2, int flags,
-                                 bool isLargeScaled)
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmapOn,
+                                 QColor colorOn, const QPixmap &pixmapOff,
+                                 QColor colorOff, int flags, bool isLargeScaled)
     : QGraphicsItem(parent)
-    , m_pixmap1(pixmap1)
-    , m_pixmap2(pixmap2)
+    , m_pixmapOn(pixmapOn)
+    , m_pixmapOn2()
+    , m_pixmapOff(pixmapOff)
     , m_state(0)
     , m_flags(flags)
     , m_width(isLargeScaled ? 18 : 30)
-    , m_height(isLargeScaled ? 7 : 5) {}
+    , m_height(isLargeScaled ? 7 : 5)
+    , m_colorOn(colorOn)
+    , m_colorOff(colorOff) {}
+
+//--------------------------------------------------------
+
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmapOn,
+                                 const QPixmap &pixmapOn2, QColor colorOn,
+                                 int flags, bool isLargeScaled)
+    : QGraphicsItem(parent)
+    , m_pixmapOn(pixmapOn)
+    , m_pixmapOn2(pixmapOn2)
+    , m_pixmapOff()
+    , m_state(0)
+    , m_flags(flags)
+    , m_width(isLargeScaled ? 18 : 30)
+    , m_height(isLargeScaled ? 7 : 5)
+    , m_colorOn(colorOn)
+    , m_colorOff(QColor(0, 0, 0, 0)) {}
+
+//--------------------------------------------------------
+
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmapOn,
+                                 const QPixmap &pixmapOn2, QColor colorOn,
+                                 const QPixmap &pixmapOff, QColor colorOff,
+                                 int flags, bool isLargeScaled)
+    : QGraphicsItem(parent)
+    , m_pixmapOn(pixmapOn)
+    , m_pixmapOn2(pixmapOn2)
+    , m_pixmapOff(pixmapOff)
+    , m_state(0)
+    , m_flags(flags)
+    , m_width(isLargeScaled ? 18 : 30)
+    , m_height(isLargeScaled ? 7 : 5)
+    , m_colorOn(colorOn)
+    , m_colorOff(colorOff) {}
 
 //--------------------------------------------------------
 
@@ -197,10 +236,24 @@ QRectF SchematicToggle::boundingRect() const {
 void SchematicToggle::paint(QPainter *painter,
                             const QStyleOptionGraphicsItem *option,
                             QWidget *widget) {
+  int rectHeight = boundingRect().height();
+  int rectWidth  = boundingRect().width();
+  int rectX      = boundingRect().left();
+  int rectY      = boundingRect().top();
+
+  QRect rect =
+      QRect(0, 0, rectHeight, rectHeight)
+          .translated(rectX + (rectWidth / 2) - (rectHeight / 2), rectY);
+
   if (m_state != 0) {
     QPixmap &pix =
-        (m_state == 2 && !m_pixmap2.isNull()) ? m_pixmap2 : m_pixmap1;
-    painter->drawPixmap(boundingRect().toRect(), pix);
+        (m_state == 2 && !m_pixmapOn2.isNull()) ? m_pixmapOn2 : m_pixmapOn;
+    painter->fillRect(boundingRect().toRect(), m_colorOn);
+    painter->drawImage(rect, pix.toImage());
+
+  } else if (!m_pixmapOff.isNull()) {
+    painter->fillRect(boundingRect().toRect(), m_colorOff);
+    painter->drawImage(rect, m_pixmapOff.toImage());
   }
 }
 
@@ -208,7 +261,7 @@ void SchematicToggle::paint(QPainter *painter,
 
 void SchematicToggle::mousePressEvent(QGraphicsSceneMouseEvent *me) {
   if (me->button() == Qt::LeftButton) {
-    if (m_pixmap2.isNull()) {
+    if (m_pixmapOn2.isNull()) {
       m_state = 1 - m_state;
       emit(toggled(m_state != 0));
     } else if (m_flags & eEnableNullState) {
@@ -228,7 +281,7 @@ void SchematicToggle::mousePressEvent(QGraphicsSceneMouseEvent *me) {
 
 void SchematicToggle::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   if (!(m_flags & eIsParentColumn)) return;
-  if (m_pixmap2.isNull()) {
+  if (m_pixmapOn2.isNull()) {
     QMenu *menu                = new QMenu(0);
     CommandManager *cmdManager = CommandManager::instance();
     menu->addAction(cmdManager->getAction("MI_EnableThisColumnOnly"));
@@ -262,7 +315,7 @@ void SchematicToggle_SplineOptions::paint(
   painter->fillRect(rect, Qt::white);
   if (m_state != 0) {
     QPixmap &pix =
-        (m_state == 2 && !m_pixmap2.isNull()) ? m_pixmap2 : m_pixmap1;
+        (m_state == 2 && !m_pixmapOn2.isNull()) ? m_pixmapOn2 : m_pixmapOn;
     painter->drawPixmap(boundingRect().toRect(), pix);
   }
   painter->setBrush(Qt::NoBrush);

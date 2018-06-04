@@ -726,7 +726,9 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
 
   p.setPen(m_viewer->getVerticalLineColor());
 
-  if (column->getPaletteColumn() || column->getSoundTextColumn()) {
+  TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+
+  if (zColumn || column->getPaletteColumn() || column->getSoundTextColumn()) {
     if (o->flag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER))
       p.drawRect(tableViewRect);
     return;
@@ -1853,7 +1855,10 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       // config button
       else if (o->rect(PredefinedRect::CONFIG_AREA).contains(mouseInCell) &&
                event->button() == Qt::LeftButton) {
-        if (column->getSoundColumn() || column->getPaletteColumn() ||
+        TXshZeraryFxColumn *zColumn =
+            dynamic_cast<TXshZeraryFxColumn *>(column);
+
+        if (zColumn || column->getSoundColumn() || column->getPaletteColumn() ||
             column->getSoundTextColumn()) {
           // do nothing
         } else

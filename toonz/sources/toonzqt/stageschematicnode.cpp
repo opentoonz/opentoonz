@@ -71,6 +71,10 @@ void drawCamera(QPainter *painter, const QColor &color, const QPen &pen,
   painter->setBrush(QColor(235, 235, 235, 255));
   painter->drawRect(0, -14, width, 14);
 }
+
+QColor prevEyeBGColor(200, 200, 100);
+QColor camstandBGColor(235, 144, 107);
+
 }  // namespace
 
 //========================================================
@@ -678,7 +682,8 @@ void TablePainter::paint(QPainter *painter,
 
   // Draw the name
   QRectF rect(30, 0, 42, 18);
-  painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString(tr("Table")));
+  painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter,
+                    QString(tr("Table")));
 }
 
 //--------------------------------------------------------
@@ -1773,7 +1778,19 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
   bool ret = true;
 
   assert(pegbar && pegbar->getId().isColumn());
+
+  TXshColumn *column =
+      scene->getXsheet()->getColumn(pegbar->getId().getIndex());
+
   std::string name = m_stageObject->getName();
+
+  if (column) {
+    // ZeraryFx columns store name elsewhere
+    TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+    if (zColumn)
+      name =
+          ::to_string(zColumn->getZeraryColumnFx()->getZeraryFx()->getName());
+  }
 
   m_name       = QString::fromStdString(name);
   m_resizeItem = new SchematicThumbnailToggle(this, m_stageObject->isOpened());
@@ -1790,22 +1807,22 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
         connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
   m_nameItem->hide();
 
-  m_renderToggle =
-      new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"),
-                          SchematicToggle::eIsParentColumn);
+  m_renderToggle = new SchematicToggle(
+      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
+      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor,
+      SchematicToggle::eIsParentColumn);
   ret = ret && connect(m_renderToggle, SIGNAL(toggled(bool)), this,
                        SLOT(onRenderToggleClicked(bool)));
   if (scene) {
-    TXshColumn *column =
-        scene->getXsheet()->getColumn(pegbar->getId().getIndex());
     if (column) m_renderToggle->setIsActive(column->isPreviewVisible());
 
     m_renderToggle->setPos(72, 0);
     m_renderToggle->setZValue(2);
 
     m_cameraStandToggle = new SchematicToggle(
-        this, QPixmap(":Resources/schematic_table_view.png"),
-        QPixmap(":Resources/schematic_table_view_transp.png"),
+        this, QPixmap(":Resources/schematic_table_view_on.svg"),
+        QPixmap(":Resources/schematic_table_view_transp.svg"), camstandBGColor,
+        QPixmap(":Resources/schematic_table_view_off.svg"), camstandBGColor,
         SchematicToggle::eIsParentColumn | SchematicToggle::eEnableNullState);
     ret = ret && connect(m_cameraStandToggle, SIGNAL(stateChanged(int)), this,
                          SLOT(onCameraStandToggleClicked(int)));
@@ -1833,8 +1850,10 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
   onChangedSize(m_stageObject->isOpened());
   assert(ret);
 
-  if (levelType == ZERARYFX_XSHLEVEL || levelType == PLT_XSHLEVEL)
+  if (levelType == ZERARYFX_XSHLEVEL || levelType == PLT_XSHLEVEL) {
     m_resizeItem->hide();
+    m_cameraStandToggle->hide();
+  }
 }
 
 //--------------------------------------------------------
@@ -1977,18 +1996,20 @@ void StageSchematicColumnNode::mouseDoubleClickEvent(
   StageSchematicScene *stageScene =
       dynamic_cast<StageSchematicScene *>(scene());
   if (!stageScene) return;
-
-  // do nothing for double-clicking a zerary Fx node
-  TStageObjectId id  = m_stageObject->getId();
-  TXshColumn *column = stageScene->getXsheet()->getColumn(id.getIndex());
-  TXshZeraryFxColumn *fxColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
-  if (fxColumn) {
-    return;
-  }
-
   QRectF nameArea(14, 0, m_width - 15, 14);
   if (nameArea.contains(me->pos())) {
-    m_name = QString::fromStdString(m_stageObject->getName());
+    std::string name = m_stageObject->getName();
+
+    TStageObjectId id  = m_stageObject->getId();
+    TXshColumn *column = stageScene->getXsheet()->getColumn(id.getIndex());
+    if (column) {
+      TXshZeraryFxColumn *fxColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+      if (fxColumn)
+        name = ::to_string(
+            fxColumn->getZeraryColumnFx()->getZeraryFx()->getName());
+    }
+
+    m_name = QString::fromStdString(name);
     m_nameItem->setPlainText(m_name);
     m_nameItem->show();
     m_nameItem->setFocus();

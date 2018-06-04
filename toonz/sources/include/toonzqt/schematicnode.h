@@ -83,7 +83,8 @@ class SchematicToggle : public QObject, public QGraphicsItem {
   Q_INTERFACES(QGraphicsItem)
 #endif
 protected:
-  QPixmap m_pixmap1, m_pixmap2;
+  QPixmap m_pixmapOn, m_pixmapOn2, m_pixmapOff;
+  QColor m_colorOn, m_colorOff;
   int m_state;
   int m_flags;
   int m_width, m_height;
@@ -91,12 +92,22 @@ protected:
 public:
   enum { eIsParentColumn = 0x01, eEnableNullState = 0x02 };
 
-  SchematicToggle(SchematicNode *parent, const QPixmap &pixmap, int flags,
-                  bool isLargeScaled = true);
+  SchematicToggle(SchematicNode *parent, const QPixmap &pixmapOn,
+                  QColor colorOn, int flags, bool isLargeScaled = true);
+
+  SchematicToggle(SchematicNode *parent, const QPixmap &pixmapOn,
+                  QColor colorOn, const QPixmap &pixmapOff, QColor colorOff,
+                  int flags, bool isLargeScaled = true);
 
   //! the schematic toggle can be a 3-state or a 2-state toggle!
-  SchematicToggle(SchematicNode *parent, const QPixmap &pixmap1,
-                  const QPixmap &pixmap2, int flags, bool isLargeScaled = true);
+  SchematicToggle(SchematicNode *parent, const QPixmap &pixmapOn,
+                  const QPixmap &pixmapOn2, QColor colorOn, int flags,
+                  bool isLargeScaled = true);
+
+  SchematicToggle(SchematicNode *parent, const QPixmap &pixmapOn,
+                  const QPixmap &pixmapOn2, QColor colorOn,
+                  const QPixmap &pixmapOff, QColor colorOff, int flags,
+                  bool isLargeScaled = true);
 
   ~SchematicToggle();
 
@@ -136,10 +147,10 @@ class SchematicToggle_SplineOptions final : public SchematicToggle {
 public:
   SchematicToggle_SplineOptions(SchematicNode *parent, const QPixmap &pixmap,
                                 int flags)
-      : SchematicToggle(parent, pixmap, flags) {}
+      : SchematicToggle(parent, pixmap, QColor(0, 0, 0, 0), flags) {}
   SchematicToggle_SplineOptions(SchematicNode *parent, const QPixmap &pixmap1,
                                 const QPixmap &pixmap2, int flags)
-      : SchematicToggle(parent, pixmap1, pixmap2, flags) {}
+      : SchematicToggle(parent, pixmap1, pixmap2, QColor(0, 0, 0, 0), flags) {}
 
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = 0) override;

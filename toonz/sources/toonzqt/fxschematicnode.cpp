@@ -110,6 +110,10 @@ int getInputPortIndex(TFxPort *port, TFx *fx) {
   }
   return -1;
 }
+
+QColor prevEyeBGColor(200, 200, 100);
+QColor camstandBGColor(235, 144, 107);
+
 }  // namespace
 
 //*****************************************************
@@ -2530,7 +2534,8 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
   m_linkDock = new FxSchematicDock(this, "", 0, eFxLinkPort);
 
   m_renderToggle = new SchematicToggle(
-      this, QPixmap(":Resources/schematic_prev_eye.png"), 0);
+      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
+      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor, 0);
 
   m_painter =
       new FxPainter(this, m_width, m_height, m_name, m_type, fx->getFxType());
@@ -2716,17 +2721,29 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
 
   m_columnIndex = fx->getColumnIndex();
 
+  TXshColumn *column = scene->getXsheet()->getColumn(m_columnIndex);
+
   TFx *zeraryFx     = fx->getZeraryFx();
   TStageObjectId id = TStageObjectId::ColumnId(m_columnIndex);
   std::string name  = scene->getXsheet()->getStageObject(id)->getName();
-  m_name            = QString::fromStdString(name);
 
-  m_nameItem = new SchematicName(this, 72, 20);  // for rename
-  m_outDock  = new FxSchematicDock(this, "", 0, eFxOutputPort);
-  m_linkDock = new FxSchematicDock(this, "", 0, eFxLinkPort);
-  m_renderToggle =
-      new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"),
-                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
+  if (column) {
+    // ZeraryFx columns store name elsewhere
+    TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+    if (zColumn)
+      name =
+          ::to_string(zColumn->getZeraryColumnFx()->getZeraryFx()->getName());
+  }
+
+  m_name = QString::fromStdString(name);
+
+  m_nameItem     = new SchematicName(this, 72, 20);  // for rename
+  m_outDock      = new FxSchematicDock(this, "", 0, eFxOutputPort);
+  m_linkDock     = new FxSchematicDock(this, "", 0, eFxLinkPort);
+  m_renderToggle = new SchematicToggle(
+      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
+      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor,
+      SchematicToggle::eIsParentColumn, m_isLargeScaled);
 
   // get the fx icons according to the fx type
   m_painter = new FxPainter(this, m_width, m_height, m_name, m_type,
@@ -2741,7 +2758,6 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
   addPort(0, m_outDock->getPort());
   addPort(-1, m_linkDock->getPort());
 
-  TXshColumn *column = scene->getXsheet()->getColumn(m_columnIndex);
   if (column) m_renderToggle->setIsActive(column->isPreviewVisible());
 
   // define positions
@@ -2901,12 +2917,14 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
       this, fx->getAttributes()->isOpened());    //サムネイル矢印
   m_nameItem = new SchematicName(this, 54, 20);  //リネーム部分
   m_outDock  = new FxSchematicDock(this, "", 0, eFxOutputPort);  // Outポート
-  m_renderToggle =
-      new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"),
-                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
+  m_renderToggle = new SchematicToggle(
+      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
+      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor,
+      SchematicToggle::eIsParentColumn, m_isLargeScaled);
   m_cameraStandToggle = new SchematicToggle(
-      this, QPixmap(":Resources/schematic_table_view.png"),
-      QPixmap(":Resources/schematic_table_view_transp.png"),
+      this, QPixmap(":Resources/schematic_table_view_on.svg"),
+      QPixmap(":Resources/schematic_table_view_transp.svg"), camstandBGColor,
+      QPixmap(":Resources/schematic_table_view_off.svg"), camstandBGColor,
       SchematicToggle::eIsParentColumn | SchematicToggle::eEnableNullState,
       m_isLargeScaled);
   m_columnPainter = new FxColumnPainter(this, m_width, m_height, m_name);
@@ -3144,13 +3162,14 @@ FxSchematicPaletteNode::FxSchematicPaletteNode(FxSchematicScene *scene,
   std::string name  = scene->getXsheet()->getStageObject(id)->getFullName();
   m_name            = QString::fromStdString(name);
 
-  m_linkedNode = 0;
-  m_linkDock   = 0;
-  m_nameItem   = new SchematicName(this, 54, 20);  // for rename
-  m_outDock    = new FxSchematicDock(this, "", 0, eFxOutputPort);
-  m_renderToggle =
-      new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"),
-                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
+  m_linkedNode   = 0;
+  m_linkDock     = 0;
+  m_nameItem     = new SchematicName(this, 54, 20);  // for rename
+  m_outDock      = new FxSchematicDock(this, "", 0, eFxOutputPort);
+  m_renderToggle = new SchematicToggle(
+      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
+      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor,
+      SchematicToggle::eIsParentColumn, m_isLargeScaled);
   m_palettePainter = new FxPalettePainter(this, m_width, m_height, m_name);
 
   //----
@@ -3314,10 +3333,11 @@ FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx,
   m_name  = QString::fromStdWString(groupName);
   m_roots = roots;
 
-  m_nameItem = new SchematicName(this, 72, 20);  // for rename
-  m_renderToggle =
-      new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"),
-                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
+  m_nameItem     = new SchematicName(this, 72, 20);  // for rename
+  m_renderToggle = new SchematicToggle(
+      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
+      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor,
+      SchematicToggle::eIsParentColumn, m_isLargeScaled);
   m_outDock               = new FxSchematicDock(this, "", 0, eFxGroupedOutPort);
   FxSchematicDock *inDock = new FxSchematicDock(
       this, "Source", (m_isLargeScaled) ? m_width - 18 : 10, eFxGroupedInPort);
