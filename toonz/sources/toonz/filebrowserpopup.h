@@ -393,6 +393,8 @@ protected:
 */
 
 class ReplaceParentDirectoryPopup final : public FileBrowserPopup {
+  Q_OBJECT
+
   TCellSelection::Range m_range;
   bool m_replaceCells;  // true : cell selection, false : column selection
   std::set<int> m_columnRange;

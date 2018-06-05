@@ -605,7 +605,7 @@ void ToolOptionCombo::loadEntries() {
                       }");
       }
     }
-    int tmpWidth = fontMetrics().width(items[i].UIName);
+    int tmpWidth                      = fontMetrics().width(items[i].UIName);
     if (tmpWidth > maxWidth) maxWidth = tmpWidth;
   }
 
@@ -639,8 +639,8 @@ void ToolOptionCombo::onActivated(int index) {
 
 void ToolOptionCombo::doShowPopup() {
   if (Preferences::instance()->getDropdownShortcutsCycleOptions()) {
-    const TEnumProperty::Range &range = m_property->getRange();
-    int theIndex                      = currentIndex() + 1;
+    const TEnumProperty::Range &range           = m_property->getRange();
+    int theIndex                                = currentIndex() + 1;
     if (theIndex >= (int)range.size()) theIndex = 0;
     doOnActivated(theIndex);
   } else {
@@ -805,7 +805,9 @@ void StyleIndexFieldAndChip::updateStatus() {
 void StyleIndexFieldAndChip::onValueChanged(const QString &changedText) {
   QString style;
 
-  if (!QString("current").contains(changedText)) {
+  // Aware of both "current" and translated string
+  if (!QString("current").contains(changedText) &&
+      !StyleIndexLineEdit::tr("current").contains(changedText)) {
     int index      = changedText.toInt();
     TPalette *plt  = m_pltHandle->getPalette();
     int indexCount = plt->getStyleCount();
@@ -1344,8 +1346,8 @@ void PegbarCenterField::onChange(TMeasuredValue *fld, bool addToUndo) {
 
   TStageObject *obj = xsh->getStageObject(objId);
 
-  double v       = fld->getValue(TMeasuredValue::MainUnit);
-  TPointD center = obj->getCenter(frame);
+  double v                           = fld->getValue(TMeasuredValue::MainUnit);
+  TPointD center                     = obj->getCenter(frame);
   if (!m_firstMouseDrag) m_oldCenter = center;
   if (m_index == 0)
     center.x = v;
@@ -1436,7 +1438,7 @@ PropertyMenuButton::PropertyMenuButton(QWidget *parent, TTool *tool,
   setIcon(icon);
   setToolTip(tooltip);
 
-  QMenu *menu = new QMenu(tooltip, this);
+  QMenu *menu                     = new QMenu(tooltip, this);
   if (!tooltip.isEmpty()) tooltip = tooltip + " ";
 
   QActionGroup *actiongroup = new QActionGroup(this);
@@ -1522,13 +1524,13 @@ bool SelectionScaleField::applyChange(bool addToUndo) {
     return false;
   DragSelectionTool::DragTool *scaleTool = createNewScaleTool(m_tool, 0);
   double p                               = getValue();
-  if (p == 0) p = 0.00001;
-  DragSelectionTool::FourPoints points = m_tool->getBBox();
-  TPointD center                       = m_tool->getCenter();
-  TPointD p0M                          = points.getPoint(7);
-  TPointD p1M                          = points.getPoint(5);
-  TPointD pM1                          = points.getPoint(6);
-  TPointD pM0                          = points.getPoint(4);
+  if (p == 0) p                          = 0.00001;
+  DragSelectionTool::FourPoints points   = m_tool->getBBox();
+  TPointD center                         = m_tool->getCenter();
+  TPointD p0M                            = points.getPoint(7);
+  TPointD p1M                            = points.getPoint(5);
+  TPointD pM1                            = points.getPoint(6);
+  TPointD pM0                            = points.getPoint(4);
   int pointIndex;
   TPointD sign(1, 1);
   TPointD scaleFactor = m_tool->m_deformValues.m_scaleValue;

@@ -1178,6 +1178,11 @@ Tiio::AviWriterProperties::AviWriterProperties() : m_codec("Codec") {
   bind(m_codec);
 }
 
+void Tiio::AviWriterProperties::updateTranslation() {
+  m_codec.setQStringName(tr("Codec"));
+  m_codec.setItemUIName(L"Uncompressed", tr("Uncompressed"));
+}
+
 TEnumProperty Tiio::AviWriterProperties::m_defaultCodec =
     TEnumProperty("Codec");
 

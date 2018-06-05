@@ -184,6 +184,7 @@ public:
 
     m_distance.setQStringName(tr("Distance:"));
     m_inkIndex.setQStringName(tr("Style Index:"));
+    m_inkIndex.setValue(tr("current").toStdWString());
     m_opacity.setQStringName(tr("Opacity:"));
     m_multi.setQStringName(tr("Frame Range"));
     m_angle.setQStringName(tr("Angle:"));

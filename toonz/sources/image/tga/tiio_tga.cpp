@@ -519,6 +519,14 @@ Tiio::TgaWriterProperties::TgaWriterProperties()
   bind(m_compressed);
 }
 
+void Tiio::TgaWriterProperties::updateTranslation() {
+  m_pixelSize.setQStringName(tr("Bits Per Pixel"));
+  m_pixelSize.setItemUIName(L"16 bits", tr("16 bits"));
+  m_pixelSize.setItemUIName(L"24 bits", tr("24 bits"));
+  m_pixelSize.setItemUIName(L"32 bits", tr("32 bits"));
+  m_compressed.setQStringName(tr("Compression"));
+}
+
 //============================================================
 
 class TgaWriter final : public Tiio::Writer {

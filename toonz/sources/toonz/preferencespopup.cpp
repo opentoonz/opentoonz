@@ -1111,8 +1111,9 @@ void PreferencesPopup::onShowColumnNumbersChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onXsheetLayoutChanged(const QString &text) {
-  m_pref->setXsheetLayoutPreference(text.toStdString());
+void PreferencesPopup::onXsheetLayoutChanged(int index) {
+  m_pref->setXsheetLayoutPreference(
+      m_xsheetLayout->itemData(index).toString().toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -1178,12 +1179,14 @@ void PreferencesPopup::onEnableAutoStretch(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onCursorBrushTypeChanged(const QString &text) {
-  m_pref->setCursorBrushType(text.toStdString());
+void PreferencesPopup::onCursorBrushTypeChanged(int index) {
+  m_pref->setCursorBrushType(
+      m_cursorBrushType->itemData(index).toString().toStdString());
 }
 
-void PreferencesPopup::onCursorBrushStyleChanged(const QString &text) {
-  m_pref->setCursorBrushStyle(text.toStdString());
+void PreferencesPopup::onCursorBrushStyleChanged(int index) {
+  m_pref->setCursorBrushStyle(
+      m_cursorBrushStyle->itemData(index).toString().toStdString());
 }
 
 void PreferencesPopup::onCursorOutlineChanged(int index) {
@@ -1389,18 +1392,20 @@ PreferencesPopup::PreferencesPopup()
 
   QStringList brushTypes;
   // options should not be translatable as they are used as key strings
-  brushTypes << "Small"
-             << "Large"
-             << "Crosshair";
-  QComboBox *cursorBrushTypeOptions = new QComboBox(this);
-  cursorBrushTypeOptions->addItems(brushTypes);
+  brushTypes << tr("Small") << tr("Large") << tr("Crosshair");
+  m_cursorBrushType = new QComboBox(this);
+  m_cursorBrushType->addItems(brushTypes);
+  m_cursorBrushType->setItemData(0, "Small");
+  m_cursorBrushType->setItemData(1, "Large");
+  m_cursorBrushType->setItemData(2, "Crosshair");
 
   QStringList brushStyles;
-  brushStyles << "Default"
-              << "Left-Handed"
-              << "Simple";
-  QComboBox *cursorBrushStyleOptions = new QComboBox(this);
-  cursorBrushStyleOptions->addItems(brushStyles);
+  brushStyles << tr("Default") << tr("Left-Handed") << tr("Simple");
+  m_cursorBrushStyle = new QComboBox(this);
+  m_cursorBrushStyle->addItems(brushStyles);
+  m_cursorBrushStyle->setItemData(0, "Default");
+  m_cursorBrushStyle->setItemData(1, "Left-Handed");
+  m_cursorBrushStyle->setItemData(2, "Simple");
 
   CheckBox *cursorOutlineCB =
       new CheckBox(tr("Show Cursor Size Outlines"), this);
@@ -1435,13 +1440,15 @@ PreferencesPopup::PreferencesPopup()
 
   QStringList xsheetLayouts;
   // options should not be translatable as they are used as key strings
-  xsheetLayouts << "Classic"
-                << "Classic-revised"
-                << "Compact";
-  QComboBox *xsheetLayoutOptions = new QComboBox(this);
-  xsheetLayoutOptions->addItems(xsheetLayouts);
-  xsheetLayoutOptions->setCurrentIndex(
-      xsheetLayoutOptions->findText(m_pref->getXsheetLayoutPreference()));
+  xsheetLayouts << tr("Classic") << tr("Classic-revised") << tr("Compact");
+  m_xsheetLayout = new QComboBox(this);
+  m_xsheetLayout->addItems(xsheetLayouts);
+  m_xsheetLayout->setItemData(0, "Classic");
+  m_xsheetLayout->setItemData(1, "Classic-revised");
+  m_xsheetLayout->setItemData(2, "Compact");
+
+  m_xsheetLayout->setCurrentIndex(
+      m_xsheetLayout->findData(m_pref->getXsheetLayoutPreference()));
   CheckBox *showCurrentTimelineCB = new CheckBox(
       tr("Show Current Time Indicator (Timeline Mode only)"), this);
 
@@ -1797,10 +1804,10 @@ PreferencesPopup::PreferencesPopup()
   multiLayerStylePickerCB->setChecked(m_pref->isMultiLayerStylePickerEnabled());
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
 
-  cursorBrushTypeOptions->setCurrentIndex(
-      cursorBrushTypeOptions->findText(m_pref->getCursorBrushType()));
-  cursorBrushStyleOptions->setCurrentIndex(
-      cursorBrushStyleOptions->findText(m_pref->getCursorBrushStyle()));
+  m_cursorBrushType->setCurrentIndex(
+      m_cursorBrushType->findData(m_pref->getCursorBrushType()));
+  m_cursorBrushStyle->setCurrentIndex(
+      m_cursorBrushStyle->findData(m_pref->getCursorBrushStyle()));
   cursorOutlineCB->setChecked(m_pref->isCursorOutlineEnabled());
 
   //--- Xsheet ------------------------------
@@ -2332,12 +2339,12 @@ PreferencesPopup::PreferencesPopup()
             cursorStylesGridLay->addWidget(new QLabel(tr("Basic Cursor Type:")),
                                            0, 0,
                                            Qt::AlignRight | Qt::AlignVCenter);
-            cursorStylesGridLay->addWidget(cursorBrushTypeOptions, 0, 1);
+            cursorStylesGridLay->addWidget(m_cursorBrushType, 0, 1);
 
             cursorStylesGridLay->addWidget(new QLabel(tr("Cursor Style:")), 1,
                                            0,
                                            Qt::AlignRight | Qt::AlignVCenter);
-            cursorStylesGridLay->addWidget(cursorBrushStyleOptions, 1, 1);
+            cursorStylesGridLay->addWidget(m_cursorBrushStyle, 1, 1);
 
             cursorStylesGridLay->addWidget(cursorOutlineCB, 2, 0, 1, 3,
                                            Qt::AlignLeft | Qt::AlignVCenter);
@@ -2368,7 +2375,7 @@ PreferencesPopup::PreferencesPopup()
       {
         xsheetFrameLay->addWidget(new QLabel(tr("Column Header Layout*:")), 0,
                                   0, Qt::AlignRight | Qt::AlignVCenter);
-        xsheetFrameLay->addWidget(xsheetLayoutOptions, 0, 1, 1, 2,
+        xsheetFrameLay->addWidget(m_xsheetLayout, 0, 1, 1, 2,
                                   Qt::AlignLeft | Qt::AlignVCenter);
 
         xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")),
@@ -2801,12 +2808,10 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onMultiLayerStylePickerChanged(int)));
   ret = ret && connect(useSaveboxToLimitFillingOpCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onGetFillOnlySavebox(int)));
-  ret = ret && connect(cursorBrushTypeOptions,
-                       SIGNAL(currentIndexChanged(const QString &)), this,
-                       SLOT(onCursorBrushTypeChanged(const QString &)));
-  ret = ret && connect(cursorBrushStyleOptions,
-                       SIGNAL(currentIndexChanged(const QString &)), this,
-                       SLOT(onCursorBrushStyleChanged(const QString &)));
+  ret = ret && connect(m_cursorBrushType, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onCursorBrushTypeChanged(int)));
+  ret = ret && connect(m_cursorBrushStyle, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onCursorBrushStyleChanged(int)));
   ret = ret && connect(cursorOutlineCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onCursorOutlineChanged(int)));
 
@@ -2841,9 +2846,8 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_syncLevelRenumberWithXsheet, SIGNAL(stateChanged(int)),
                        this, SLOT(onSyncLevelRenumberWithXsheetChanged(int)));
 
-  ret = ret && connect(xsheetLayoutOptions,
-                       SIGNAL(currentIndexChanged(const QString &)), this,
-                       SLOT(onXsheetLayoutChanged(const QString &)));
+  ret = ret && connect(m_xsheetLayout, SIGNAL(currentIndexChanged(int)), this,
+                       SLOT(onXsheetLayoutChanged(int)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

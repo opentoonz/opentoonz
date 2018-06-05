@@ -849,6 +849,7 @@ void EditTool::updateTranslation() {
   m_activeAxis.setItemUIName(L"Scale", tr("Scale"));
   m_activeAxis.setItemUIName(L"Shear", tr("Shear"));
   m_activeAxis.setItemUIName(L"Center", tr("Center"));
+  m_activeAxis.setItemUIName(L"All", tr("All"));
 }
 
 //-----------------------------------------------------------------------------

@@ -1341,7 +1341,7 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
     /*--- ストロークの最初にMaxサイズの円が描かれてしまう不具合を防止する ---*/
     if (m_pressure.getValue() && e.m_pressure == 1.0)
-      thickness     = m_rasThickness.getValue().first;
+      thickness     = m_thickness.getValue().first * 0.5;
     m_currThickness = thickness;
     m_smoothStroke.beginStroke(m_smooth.getValue());
 
@@ -2258,8 +2258,8 @@ void BrushTool::checkGuideSnapping(bool beforeMousePress, bool invertCheck) {
         snapPoint.x = hGuide;
       }
       beforeMousePress ? m_foundFirstSnap = true : m_foundLastSnap = true;
-      beforeMousePress ? m_firstSnapPoint = snapPoint : m_lastSnapPoint =
-                                                            snapPoint;
+      beforeMousePress ? m_firstSnapPoint                          = snapPoint
+                       : m_lastSnapPoint                           = snapPoint;
     }
   }
 }
@@ -2548,6 +2548,7 @@ void BrushTool::initPresets() {
 
   m_preset.deleteAllValues();
   m_preset.addValue(CUSTOM_WSTR);
+  m_preset.setItemUIName(CUSTOM_WSTR, tr("<custom>"));
 
   std::set<BrushData>::const_iterator it, end = presets.end();
   for (it = presets.begin(); it != end; ++it) m_preset.addValue(it->m_name);

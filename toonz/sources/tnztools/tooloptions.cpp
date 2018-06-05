@@ -1442,12 +1442,12 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
   m_pencilMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Pencil Mode"));
 
-  if (m_shapeField->currentText().toStdWString() != L"Polygon") {
+  if (m_shapeField->getProperty()->getValue() != L"Polygon") {
     m_poligonSideLabel->setEnabled(false);
     m_poligonSideField->setEnabled(false);
   }
   bool ret = connect(m_shapeField, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onShapeValueChanged()));
+                     SLOT(onShapeValueChanged(int)));
 
   if (m_pencilMode) {
     if (m_pencilMode->isChecked()) {
@@ -1493,8 +1493,9 @@ void GeometricToolOptionsBox::updateStatus() {
 
 //-----------------------------------------------------------------------------
 
-void GeometricToolOptionsBox::onShapeValueChanged() {
-  bool enabled = m_shapeField->currentText() == QString("Polygon");
+void GeometricToolOptionsBox::onShapeValueChanged(int index) {
+  const TEnumProperty::Range &range = m_shapeField->getProperty()->getRange();
+  bool enabled                      = range[index] == L"Polygon";
   m_poligonSideLabel->setEnabled(enabled);
   m_poligonSideField->setEnabled(enabled);
 }
@@ -1592,11 +1593,11 @@ PaintbrushToolOptionsBox::PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
   m_selectiveMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Selective"));
 
-  if (m_colorMode->currentText().toStdWString() == L"Lines")
+  if (m_colorMode->getProperty()->getValue() == L"Lines")
     m_selectiveMode->setEnabled(false);
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onColorModeChanged()));
+                     SLOT(onColorModeChanged(int)));
   assert(ret);
 }
 
@@ -1610,8 +1611,9 @@ void PaintbrushToolOptionsBox::updateStatus() {
 
 //-----------------------------------------------------------------------------
 
-void PaintbrushToolOptionsBox::onColorModeChanged() {
-  bool enabled = m_colorMode->currentText() != QString("Lines");
+void PaintbrushToolOptionsBox::onColorModeChanged(int index) {
+  const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
+  bool enabled                      = range[index] != L"Lines";
   m_selectiveMode->setEnabled(enabled);
 }
 
@@ -1655,28 +1657,28 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Autopaint Lines"));
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onColorModeChanged()));
+                     SLOT(onColorModeChanged(int)));
   ret = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolTypeChanged()));
+                       SLOT(onToolTypeChanged(int)));
   ret = ret && connect(m_onionMode, SIGNAL(toggled(bool)), this,
                        SLOT(onOnionModeToggled(bool)));
   ret = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
                        SLOT(onMultiFrameModeToggled(bool)));
   assert(ret);
-  if (m_colorMode->currentText().toStdWString() == L"Lines") {
+  if (m_colorMode->getProperty()->getValue() == L"Lines") {
     m_selectiveMode->setEnabled(false);
     if (m_fillDepthLabel && m_fillDepthField) {
       m_fillDepthLabel->setEnabled(false);
       m_fillDepthField->setEnabled(false);
     }
-    if (m_toolType->currentText() == QString("Normal") ||
+    if (m_toolType->getProperty()->getValue() == L"Normal" ||
         m_multiFrameMode->isChecked())
       m_onionMode->setEnabled(false);
     if (m_autopaintMode) m_autopaintMode->setEnabled(false);
   }
-  if (m_toolType->currentText().toStdWString() != L"Normal") {
+  if (m_toolType->getProperty()->getValue() != L"Normal") {
     if (m_segmentMode) m_segmentMode->setEnabled(false);
-    if (m_colorMode->currentText() == QString("Lines") ||
+    if (m_colorMode->getProperty()->getValue() == L"Lines" ||
         m_multiFrameMode->isChecked())
       m_onionMode->setEnabled(false);
   }
@@ -1693,8 +1695,9 @@ void FillToolOptionsBox::updateStatus() {
 
 //-----------------------------------------------------------------------------
 
-void FillToolOptionsBox::onColorModeChanged() {
-  bool enabled = m_colorMode->currentText() != QString("Lines");
+void FillToolOptionsBox::onColorModeChanged(int index) {
+  const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
+  bool enabled                      = range[index] != L"Lines";
   m_selectiveMode->setEnabled(enabled);
   if (m_autopaintMode) m_autopaintMode->setEnabled(enabled);
   if (m_fillDepthLabel && m_fillDepthField) {
@@ -1702,23 +1705,23 @@ void FillToolOptionsBox::onColorModeChanged() {
     m_fillDepthField->setEnabled(enabled);
   }
   if (m_segmentMode) {
-    enabled = m_colorMode->currentText() != QString("Areas");
+    enabled = range[index] != L"Areas";
     m_segmentMode->setEnabled(
-        enabled ? m_toolType->currentText() == QString("Normal") : false);
+        enabled ? m_toolType->getProperty()->getValue() == L"Normal" : false);
   }
-  enabled = m_colorMode->currentText() != QString("Lines") &&
-            !m_multiFrameMode->isChecked();
+  enabled = range[index] != L"Lines" && !m_multiFrameMode->isChecked();
   m_onionMode->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
 
-void FillToolOptionsBox::onToolTypeChanged() {
-  bool enabled = m_toolType->currentText() == QString("Normal");
+void FillToolOptionsBox::onToolTypeChanged(int index) {
+  const TEnumProperty::Range &range = m_toolType->getProperty()->getRange();
+  bool enabled                      = range[index] == L"Normal";
   if (m_segmentMode)
     m_segmentMode->setEnabled(
-        enabled ? m_colorMode->currentText() != QString("Areas") : false);
-  enabled = enabled || (m_colorMode->currentText() != QString("Lines") &&
+        enabled ? m_colorMode->getProperty()->getValue() != L"Areas" : false);
+  enabled = enabled || (m_colorMode->getProperty()->getValue() != L"Lines" &&
                         !m_multiFrameMode->isChecked());
   m_onionMode->setEnabled(enabled);
 }
@@ -1979,11 +1982,11 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
     ret = ret && connect(m_pencilMode, SIGNAL(toggled(bool)), this,
                          SLOT(onPencilModeToggled(bool)));
     ret = ret && connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-                         SLOT(onColorModeChanged()));
+                         SLOT(onColorModeChanged(int)));
   }
 
   ret = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolTypeChanged()));
+                       SLOT(onToolTypeChanged(int)));
 
   if (m_pencilMode && m_pencilMode->isChecked()) {
     assert(m_hardnessField && m_hardnessLabel);
@@ -1991,12 +1994,12 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
     m_hardnessLabel->setEnabled(false);
   }
 
-  if (m_toolType && m_toolType->currentText() == QString("Normal")) {
+  if (m_toolType && m_toolType->getProperty()->getValue() == L"Normal") {
     m_invertMode->setEnabled(false);
     m_multiFrameMode->setEnabled(false);
   }
 
-  if (m_colorMode && m_colorMode->currentText() == QString("Areas")) {
+  if (m_colorMode && m_colorMode->getProperty()->getValue() == L"Areas") {
     assert(m_hardnessField && m_hardnessLabel && m_pencilMode);
     m_pencilMode->setEnabled(false);
     m_hardnessField->setEnabled(false);
@@ -2023,16 +2026,18 @@ void EraserToolOptionsBox::onPencilModeToggled(bool value) {
 
 //-----------------------------------------------------------------------------
 
-void EraserToolOptionsBox::onToolTypeChanged() {
-  bool value = m_toolType && m_toolType->currentText() != QString("Normal");
+void EraserToolOptionsBox::onToolTypeChanged(int index) {
+  const TEnumProperty::Range &range = m_toolType->getProperty()->getRange();
+  bool value                        = range[index] != L"Normal";
   m_invertMode->setEnabled(value);
   m_multiFrameMode->setEnabled(value);
 }
 
 //-----------------------------------------------------------------------------
 
-void EraserToolOptionsBox::onColorModeChanged() {
-  bool enabled = m_colorMode->currentText() != QString("Areas");
+void EraserToolOptionsBox::onColorModeChanged(int index) {
+  const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
+  bool enabled                      = range[index] != L"Areas";
   if (m_pencilMode && m_hardnessField && m_hardnessLabel) {
     m_pencilMode->setEnabled(enabled);
     m_hardnessField->setEnabled(enabled ? !m_pencilMode->isChecked() : false);
@@ -2115,13 +2120,13 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
   lay->setMargin(0);
   lay->setSpacing(3);
   {
-    lay->addWidget(new QLabel("X:", this), 0);
+    lay->addWidget(new QLabel(tr("X:", "ruler tool option"), this), 0);
     lay->addWidget(m_Xfld, 0);
     lay->addWidget(m_XpixelFld, 0);
 
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("Y:", this), 0);
+    lay->addWidget(new QLabel(tr("Y:", "ruler tool option"), this), 0);
     lay->addWidget(m_Yfld, 0);
     lay->addWidget(m_YpixelFld, 0);
 
@@ -2129,13 +2134,13 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
     lay->addWidget(new ToolOptionsBarSeparator(this), 0);
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("W:", this), 0);
+    lay->addWidget(new QLabel(tr("W:", "ruler tool option"), this), 0);
     lay->addWidget(m_Wfld, 0);
     lay->addWidget(m_WpixelFld, 0);
 
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("H:", this), 0);
+    lay->addWidget(new QLabel(tr("H:", "ruler tool option"), this), 0);
     lay->addWidget(m_Hfld, 0);
     lay->addWidget(m_HpixelFld, 0);
 
@@ -2143,12 +2148,12 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
     lay->addWidget(new ToolOptionsBarSeparator(this), 0);
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("A:", this), 0);
+    lay->addWidget(new QLabel(tr("A:", "ruler tool option"), this), 0);
     lay->addWidget(m_Afld, 0);
 
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("L:", this), 0);
+    lay->addWidget(new QLabel(tr("L:", "ruler tool option"), this), 0);
     lay->addWidget(m_Lfld, 0);
   }
   m_layout->addLayout(lay, 0);
@@ -2230,21 +2235,22 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool,
   if (m_autocloseField)
     m_autocloseLabel = m_labels.value(m_autocloseField->propertyName());
 
-  bool isNormalType = m_typeMode->currentText() == "Normal";
+  bool isNormalType = m_typeMode->getProperty()->getValue() == L"Normal";
   m_toolMode->setEnabled(isNormalType);
   m_autocloseField->setEnabled(!isNormalType);
   m_autocloseLabel->setEnabled(!isNormalType);
 
-  bool isLineToLineMode = m_toolMode->currentText() == "Line to Line";
+  bool isLineToLineMode =
+      m_toolMode->getProperty()->getValue() == L"Line to Line";
   m_joinStrokesMode->setEnabled(!isLineToLineMode);
 
   bool isJoinStrokes = m_joinStrokesMode->isChecked();
   m_smoothMode->setEnabled(!isLineToLineMode && isJoinStrokes);
 
   bool ret = connect(m_typeMode, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onToolTypeChanged()));
+                     SLOT(onToolTypeChanged(int)));
   ret = ret && connect(m_toolMode, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolModeChanged()));
+                       SLOT(onToolModeChanged(int)));
   ret = ret && connect(m_joinStrokesMode, SIGNAL(toggled(bool)), this,
                        SLOT(onJoinStrokesModeChanged()));
   assert(ret);
@@ -2260,8 +2266,9 @@ void TapeToolOptionsBox::updateStatus() {
 
 //-----------------------------------------------------------------------------
 
-void TapeToolOptionsBox::onToolTypeChanged() {
-  bool isNormalType = m_typeMode->currentText() == "Normal";
+void TapeToolOptionsBox::onToolTypeChanged(int index) {
+  const TEnumProperty::Range &range = m_typeMode->getProperty()->getRange();
+  bool isNormalType                 = range[index] == L"Normal";
   m_toolMode->setEnabled(isNormalType);
   m_autocloseField->setEnabled(!isNormalType);
   m_autocloseLabel->setEnabled(!isNormalType);
@@ -2269,8 +2276,9 @@ void TapeToolOptionsBox::onToolTypeChanged() {
 
 //-----------------------------------------------------------------------------
 
-void TapeToolOptionsBox::onToolModeChanged() {
-  bool isLineToLineMode = m_toolMode->currentText() == "Line to Line";
+void TapeToolOptionsBox::onToolModeChanged(int index) {
+  const TEnumProperty::Range &range = m_toolMode->getProperty()->getRange();
+  bool isLineToLineMode             = range[index] == L"Line to Line";
   m_joinStrokesMode->setEnabled(!isLineToLineMode);
   bool isJoinStrokes = m_joinStrokesMode->isChecked();
   m_smoothMode->setEnabled(!isLineToLineMode && isJoinStrokes);
@@ -2279,8 +2287,9 @@ void TapeToolOptionsBox::onToolModeChanged() {
 //-----------------------------------------------------------------------------
 
 void TapeToolOptionsBox::onJoinStrokesModeChanged() {
-  bool isLineToLineMode = m_toolMode->currentText() == "Line to Line";
-  bool isJoinStrokes    = m_joinStrokesMode->isChecked();
+  bool isLineToLineMode =
+      m_toolMode->getProperty()->getValue() == L"Line to Line";
+  bool isJoinStrokes = m_joinStrokesMode->isChecked();
   m_smoothMode->setEnabled(!isLineToLineMode && isJoinStrokes);
 }
 

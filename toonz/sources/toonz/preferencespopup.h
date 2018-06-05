@@ -56,7 +56,8 @@ private:
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
       *m_vectorSnappingTargetCB, *m_dropdownShortcutsCycleOptionsCB,
       *m_interfaceFont, *m_interfaceFontWeight, *m_guidedDrawingStyle,
-      *m_functionEditorToggle;
+      *m_functionEditorToggle, *m_cursorBrushType, *m_cursorBrushStyle,
+      *m_xsheetLayout;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -200,15 +201,15 @@ private slots:
   void onWatchFileSystemClicked(int);
   void onInterfaceFontChanged(int index);
   void onInterfaceFontWeightChanged(int index);
-  void onXsheetLayoutChanged(const QString &text);
+  void onXsheetLayoutChanged(int index);
   void onPathAliasPriorityChanged(int index);
   void onShowCurrentTimelineChanged(int);
   void onColorCalibrationChanged(bool);
   void onLutPathChanged();
   void onCheckLatestVersionChanged(bool);
   void onEnableAutoStretch(int index);
-  void onCursorBrushTypeChanged(const QString &text);
-  void onCursorBrushStyleChanged(const QString &text);
+  void onCursorBrushTypeChanged(int index);
+  void onCursorBrushStyleChanged(int index);
   void onCursorOutlineChanged(int);
 };
 

@@ -1581,7 +1581,8 @@ public:
     TCellSelection *cellSel     = dynamic_cast<TCellSelection *>(sel);
     TColumnSelection *columnSel = dynamic_cast<TColumnSelection *>(sel);
     if ((!cellSel && !columnSel) || sel->isEmpty()) {
-      DVGui::error(tr("Nothing to replace: no cells or columns selected."));
+      DVGui::error(
+          QObject::tr("Nothing to replace: no cells or columns selected."));
       return false;
     }
     if (cellSel) {

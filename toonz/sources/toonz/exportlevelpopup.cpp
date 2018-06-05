@@ -744,8 +744,8 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
         m_dpiLabel    = new QLabel;
         m_widthLabel  = new QLabel;
         m_heightLabel = new QLabel;
-        m_widthLabel->setText("Width: ");
-        m_heightLabel->setText("Height: ");
+        m_widthLabel->setText(tr("Width: "));
+        m_heightLabel->setText(tr("Height: "));
         m_resScale = new DVGui::MeasuredDoubleLineEdit;
 
         m_widthFld->setRange(0, dmax);

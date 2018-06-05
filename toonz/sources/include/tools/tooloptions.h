@@ -417,7 +417,7 @@ public:
   void updateStatus();
 
 protected slots:
-  void onShapeValueChanged();
+  void onShapeValueChanged(int);
   void onPencilModeToggled(bool);
   void onJoinStyleChanged(int);
 };
@@ -462,7 +462,7 @@ public:
   void updateStatus();
 
 protected slots:
-  void onColorModeChanged();
+  void onColorModeChanged(int);
 };
 
 //=============================================================================
@@ -488,8 +488,8 @@ public:
   void updateStatus();
 
 protected slots:
-  void onColorModeChanged();
-  void onToolTypeChanged();
+  void onColorModeChanged(int);
+  void onToolTypeChanged(int);
   void onOnionModeToggled(bool);
   void onMultiFrameModeToggled(bool);
 };
@@ -556,8 +556,8 @@ public:
 
 protected slots:
   void onPencilModeToggled(bool);
-  void onToolTypeChanged();
-  void onColorModeChanged();
+  void onToolTypeChanged(int);
+  void onColorModeChanged(int);
 };
 
 //=============================================================================
@@ -614,8 +614,8 @@ public:
   void updateStatus();
 
 protected slots:
-  void onToolTypeChanged();
-  void onToolModeChanged();
+  void onToolTypeChanged(int);
+  void onToolModeChanged(int);
   void onJoinStrokesModeChanged();
 };
 

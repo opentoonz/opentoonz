@@ -227,5 +227,10 @@ Tiio::WebmWriterProperties::WebmWriterProperties()
   bind(m_scale);
 }
 
+void Tiio::WebmWriterProperties::updateTranslation() {
+  m_vidQuality.setQStringName(tr("Quality"));
+  m_scale.setQStringName(tr("Scale"));
+}
+
 // Tiio::Reader* Tiio::makeWebmReader(){ return nullptr; }
 // Tiio::Writer* Tiio::makeWebmWriter(){ return nullptr; }

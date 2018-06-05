@@ -2812,6 +2812,7 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
+  TXshCell cell             = m_viewer->getXsheet()->getCell(row, col);
 
   QMenu menu(this);
 
@@ -2887,7 +2888,7 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
         }
       if (areCellsEmpty) break;
     }
-    createCellMenu(menu, areCellsEmpty);
+    createCellMenu(menu, areCellsEmpty, cell);
   } else {
     if (col >= 0) {
       m_viewer->getCellSelection()->makeCurrent();
@@ -2895,9 +2896,9 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
       m_viewer->setCurrentColumn(col);
     }
     if (!xsh->getCell(row, col).isEmpty())
-      createCellMenu(menu, true);
+      createCellMenu(menu, true, cell);
     else
-      createCellMenu(menu, false);
+      createCellMenu(menu, false, cell);
   }
 
   if (!menu.isEmpty()) menu.exec(event->globalPos());
@@ -2971,7 +2972,7 @@ void CellArea::onControlPressed(bool pressed) {
 const bool CellArea::isControlPressed() { return isCtrlPressed; }
 
 //-----------------------------------------------------------------------------
-void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
+void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
   CommandManager *cmdManager = CommandManager::instance();
 
   bool soundCellsSelected = m_viewer->areSoundCellsSelected();
@@ -3111,6 +3112,13 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
       menu.addAction(cmdManager->getAction(MI_ViewFile));
 
     menu.addSeparator();
+
+    if (!cell.isEmpty() && cell.m_level && cell.m_level->getChildLevel()) {
+      menu.addAction(cmdManager->getAction(MI_OpenChild));
+
+      menu.addSeparator();
+    }
+
     if (selectionContainRasterImage(m_viewer->getCellSelection(),
                                     m_viewer->getXsheet())) {
       QMenu *editImageMenu = new QMenu(tr("Edit Image"), this);

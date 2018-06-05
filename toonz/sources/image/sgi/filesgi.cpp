@@ -1220,3 +1220,16 @@ Tiio::SgiWriterProperties::SgiWriterProperties()
   m_endianess.addValue(L"Little Endian");
   bind(m_endianess);
 }
+
+void Tiio::SgiWriterProperties::updateTranslation() {
+  m_pixelSize.setQStringName(tr("Bits Per Pixel"));
+  m_pixelSize.setItemUIName(L"24 bits", tr("24 bits"));
+  m_pixelSize.setItemUIName(L"32 bits", tr("32 bits"));
+  m_pixelSize.setItemUIName(L"48 bits", tr("48 bits"));
+  m_pixelSize.setItemUIName(L"64 bits", tr("64 bits"));
+  m_pixelSize.setItemUIName(L"8 bits (Greyscale)", tr("8 bits (Greyscale)"));
+  m_endianess.setQStringName(tr("Endianess"));
+  m_endianess.setItemUIName(L"Big Endian", tr("Big Endian"));
+  m_endianess.setItemUIName(L"Little Endian", tr("Little Endian"));
+  m_compressed.setQStringName(tr("RLE-Compressed"));
+}

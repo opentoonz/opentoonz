@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Position</source>
-        <translation type="vanished">位置</translation>
+        <translation>位置</translation>
     </message>
     <message>
         <source>E/W:</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Rotation</source>
-        <translation type="vanished">回転</translation>
+        <translation>回転</translation>
     </message>
     <message>
         <source>Scale</source>
@@ -100,7 +100,7 @@
     </message>
     <message>
         <source>Selective</source>
-        <translation>塗りの保護</translation>
+        <translation type="vanished">塗りの保護</translation>
     </message>
     <message>
         <source>Preset:</source>
@@ -218,6 +218,22 @@
         <source>Bevel join</source>
         <translation>ベベル結合</translation>
     </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation>線の重ね順:</translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation>上に描く</translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation>下に描く</translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation>パレット順</translation>
+    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>
@@ -250,6 +266,13 @@
     <message>
         <source>Set Nonlinear Control Point</source>
         <translation>スムーズポイントに変更</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation>選択色</translation>
     </message>
 </context>
 <context>
@@ -374,6 +397,10 @@
         <source>Center</source>
         <translation>基準点</translation>
     </message>
+    <message>
+        <source>All</source>
+        <translation>全て</translation>
+    </message>
 </context>
 <context>
     <name>EraserTool</name>
@@ -470,7 +497,7 @@
     </message>
     <message>
         <source>Autopaint Lines</source>
-        <translation>含め塗り</translation>
+        <translation>含み塗り</translation>
     </message>
     <message>
         <source>Normal</source>
@@ -499,6 +526,10 @@
     <message>
         <source>Lines &amp; Areas</source>
         <translation>線と塗り</translation>
+    </message>
+    <message>
+        <source>Maximum Gap</source>
+        <translation>隙間の判定</translation>
     </message>
 </context>
 <context>
@@ -553,6 +584,10 @@
     <message>
         <source>Lock Alpha</source>
         <translation>透明部分の保護</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;カスタム&gt;</translation>
     </message>
 </context>
 <context>
@@ -1070,7 +1105,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Modify Fx Gadget  </source>
-        <translation>エフェクト・ガジェットでパラメータを変更</translation>
+        <translation>エフェクト・ガジェットでパラメータを変更  </translation>
     </message>
     <message>
         <source>%1   Level : %2  Frame : %3</source>
@@ -1104,6 +1139,22 @@ Do you want to proceed?</source>
         <source>Note columns can only be edited in the xsheet or timeline.</source>
         <translation>ノートレベルはタイムシート又はタイムライン上でのみ編集できます。</translation>
     </message>
+    <message>
+        <source> to Front</source>
+        <translation> 最前面へ</translation>
+    </message>
+    <message>
+        <source> to Forward</source>
+        <translation> 前面へ</translation>
+    </message>
+    <message>
+        <source> to Back</source>
+        <translation> 最背面へ</translation>
+    </message>
+    <message>
+        <source> to Backward</source>
+        <translation> 背面へ</translation>
+    </message>
 </context>
 <context>
     <name>RGBPickerTool</name>
@@ -1136,7 +1187,7 @@ Do you want to proceed?</source>
     <name>RGBPickerToolOptionsBox</name>
     <message>
         <source>Pick Screen</source>
-        <translation>画面を選択</translation>
+        <translation>スクリーン上から拾う</translation>
     </message>
 </context>
 <context>
@@ -1191,6 +1242,50 @@ Do you want to proceed?</source>
     <message>
         <source>Polyline</source>
         <translation>多角形</translation>
+    </message>
+    <message>
+        <source>current</source>
+        <translation>選択色</translation>
+    </message>
+</context>
+<context>
+    <name>RotateTool</name>
+    <message>
+        <source>Rotate On Camera Center</source>
+        <translation>カメラ中心点を基準にする</translation>
+    </message>
+</context>
+<context>
+    <name>RulerToolOptionsBox</name>
+    <message>
+        <source>X:</source>
+        <comment>ruler tool option</comment>
+        <translation>X：</translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <comment>ruler tool option</comment>
+        <translation>Y：</translation>
+    </message>
+    <message>
+        <source>W:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>H:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>L:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1271,7 +1366,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Inverse Kinematics</source>
-        <translation>インバースキネマティクス</translation>
+        <translation>逆運動学（IK)</translation>
     </message>
 </context>
 <context>
@@ -1455,7 +1550,7 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Distance</source>
-        <translation></translation>
+        <translation>距離：</translation>
     </message>
     <message>
         <source>Mode:</source>

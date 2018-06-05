@@ -962,7 +962,7 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
       new TPanelTitleBarButtonForSafeArea(
           titleBar, ":Resources/pane_safe_off.svg",
           ":Resources/pane_safe_over.svg", ":Resources/pane_safe_on.svg");
-  safeAreaButton->setToolTip("Safe Area (Right Click to Select)");
+  safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
                        CommandManager::instance()->getAction(MI_SafeArea),
@@ -979,7 +979,7 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   m_button = new TPanelTitleBarButton(titleBar, ":Resources/pane_minimize.svg",
                                       ":Resources/pane_minimize_over.svg",
                                       ":Resources/pane_minimize_on.svg");
-  m_button->setToolTip("Minimize");
+  m_button->setToolTip(tr("Minimize"));
   m_button->setPressed(false);
 
   titleBar->add(QPoint(x, 1), m_button);
@@ -1302,6 +1302,7 @@ public:
   void initialize(TPanel *panel) override {
     HistoryPane *historyPane = new HistoryPane(panel);
     panel->setWidget(historyPane);
+    panel->setWindowTitle(QObject::tr("History"));
     panel->setIsMaximizable(false);
   }
 } historyPanelFactory;

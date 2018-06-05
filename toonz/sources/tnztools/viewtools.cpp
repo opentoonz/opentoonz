@@ -130,7 +130,7 @@ public:
 // Rotate Tool
 //-----------------------------------------------------------------------------
 
-class RotateTool final : public TTool {
+class RotateTool final : public QObject, public TTool {
   TStopWatch m_sw;
   TPointD m_oldPos;
   TPointD m_center;
@@ -220,6 +220,10 @@ public:
   }
 
   int getCursorId() const override { return ToolCursor::RotateCursor; }
+
+  void updateTranslation() {
+    m_cameraCentered.setQStringName(tr("Rotate On Camera Center"));
+  }
 
 } rotateTool;
 

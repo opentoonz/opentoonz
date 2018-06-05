@@ -466,7 +466,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   setObjectName("cornerWidget");
 
   m_flipOrientationButton =
-      new QPushButton(m_viewer->orientation()->name(), this);
+      new QPushButton(m_viewer->orientation()->caption(), this);
   m_noteButton             = new QToolButton(this);
   m_precNoteButton         = new QToolButton(this);
   m_nextNoteButton         = new QToolButton(this);
@@ -475,8 +475,9 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
   //-----
 
-  m_flipOrientationButton->setObjectName("flipOrientationButton");
+  m_flipOrientationButton->setObjectName("PushButton_NoPadding");
   m_flipOrientationButton->setFocusPolicy(Qt::FocusPolicy::NoFocus);
+  m_flipOrientationButton->setFixedSize(QSize(70, 23));
 
   m_noteButton->setObjectName("ToolbarToolButton");
   m_noteButton->setFixedSize(44, 26);
