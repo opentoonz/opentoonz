@@ -136,7 +136,10 @@ StageSchematicScene::StageSchematicScene(QWidget *parent)
     , m_sceneHandle(0)
     , m_frameHandle(0)
     , m_gridDimension(eSmall)
-    , m_showLetterOnPortFlag(ShowLetterOnOutputPortOfStageNode != 0) {
+    , m_showLetterOnPortFlag(ShowLetterOnOutputPortOfStageNode != 0)
+    , m_viewer() {
+  m_viewer = (SchematicViewer *)parent;
+
   QPointF sceneCenter = sceneRect().center();
   m_firstPos          = TPointD(sceneCenter.x(), sceneCenter.y());
 

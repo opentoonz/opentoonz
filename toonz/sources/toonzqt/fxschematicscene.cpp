@@ -302,7 +302,10 @@ FxSchematicScene::FxSchematicScene(QWidget *parent)
     , m_lastPos(0, 0)
     , m_currentFxNode(0)
     , m_gridDimension(eSmall)
-    , m_isLargeScaled(true) {
+    , m_isLargeScaled(true)
+    , m_viewer() {
+  m_viewer = (SchematicViewer *)parent;
+
   m_selection = new FxSelection();
   m_selection->setFxSchematicScene(this);
 

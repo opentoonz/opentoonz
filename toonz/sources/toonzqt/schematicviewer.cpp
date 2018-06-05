@@ -27,6 +27,7 @@
 #include "toonz/fxdag.h"
 #include "toonz/tapplication.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/txshleveltypes.h"
 
 // Qt includes
 #include <QGraphicsSceneMouseEvent>
@@ -505,6 +506,72 @@ SchematicViewer::SchematicViewer(QWidget *parent)
 //------------------------------------------------------------------
 
 SchematicViewer::~SchematicViewer() {}
+
+//------------------------------------------------------------------
+
+void SchematicViewer::getNodeColor(int ltype, QColor &nodeColor) {
+  enum eFxType {
+    eNormalFx              = 100,
+    eZeraryFx              = 101,
+    eMacroFx               = 102,
+    eColumnFx              = 103,
+    eOutpuFx               = 104,
+    eXSheetFx              = 106,
+    eGroupedFx             = 107,
+    eNormalImageAdjustFx   = 108,
+    eNormalLayerBlendingFx = 109,
+    eNormalMatteFx         = 110
+  };
+
+  switch (ltype) {
+  case TZI_XSHLEVEL:
+  case OVL_XSHLEVEL:
+    nodeColor = getFullcolorColumnColor();
+    break;
+  case PLI_XSHLEVEL:
+    nodeColor = getVectorColumnColor();
+    break;
+  case TZP_XSHLEVEL:
+    nodeColor = getLevelColumnColor();
+    break;
+  case ZERARYFX_XSHLEVEL:
+    nodeColor = getFxColumnColor();
+    break;
+  case CHILD_XSHLEVEL:
+    nodeColor = getChildColumnColor();
+    break;
+  case MESH_XSHLEVEL:
+    nodeColor = getMeshColumnColor();
+    break;
+  case PLT_XSHLEVEL:
+    nodeColor = getPaletteColumnColor();
+    break;
+  case eNormalFx:
+    nodeColor = getNormalFxColor();
+    break;
+  case eZeraryFx:
+    nodeColor = getFxColumnColor();
+    break;
+  case eMacroFx:
+    nodeColor = getMacroFxColor();
+    break;
+  case eGroupedFx:
+    nodeColor = getGroupColor();
+    break;
+  case eNormalImageAdjustFx:
+    nodeColor = getImageAdjustFxColor();
+    break;
+  case eNormalLayerBlendingFx:
+    nodeColor = getLayerBlendingFxColor();
+    break;
+  case eNormalMatteFx:
+    nodeColor = getMatteFxColor();
+    break;
+  default:
+    nodeColor = grey210;
+    break;
+  }
+}
 
 //------------------------------------------------------------------
 

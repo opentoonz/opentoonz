@@ -102,6 +102,8 @@ class FxSchematicScene final : public SchematicScene {
 
   QMap<TFx *, QList<FxSchematicNode *>> m_nodesToPlace;
 
+  SchematicViewer *m_viewer;
+
 public:
   FxSchematicScene(QWidget *parent);
   ~FxSchematicScene();
@@ -146,6 +148,8 @@ public:
   }
   void selectNodes(QList<TFxP> &fxs);
   bool isLargeScaled() { return m_isLargeScaled; }
+
+  SchematicViewer *getSchematicViewer() { return m_viewer; }
 
 protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) override;

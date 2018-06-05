@@ -1,4 +1,49 @@
 /* -----------------------------------------------------------------------------
+   Schematic Viewer
+----------------------------------------------------------------------------- */
+
+// SchematicViewer will mostly use the same settings as the XsheetViewer by default
+SchematicViewer {
+  qproperty-TextColor: @xsheet-text-color;
+  qproperty-VerticalLineColor: @xsheet-VerticalLine-color;
+
+  qproperty-LevelColumnColor: @xsheet-LevelColumn-color;
+  qproperty-VectorColumnColor: @xsheet-VectorColumn-color;
+  qproperty-ChildColumnColor: @xsheet-ChildColumn-color;
+  qproperty-FullcolorColumnColor: @xsheet-FullColorColumn-color;
+  qproperty-FxColumnColor: @xsheet-FxColumn-color;
+  qproperty-PaletteColumnColor: @xsheet-PaletteColumn-color;
+  qproperty-MeshColumnColor: @xsheet-MeshColumn-color;
+
+  qproperty-TableColor: @schematic-TableColor;
+  qproperty-ActiveCameraColor: @schematic-ActiveCameraColor;
+  qproperty-OtherCameraColor: @schematic-OtherCameraColor;
+  qproperty-GroupColor: @schematic-GroupColor;
+  qproperty-PegColor: @schematic-PegColor;
+  qproperty-SplineColor: @schematic-SplineColor;
+  qproperty-ActiveOutputColor: @schematic-ActiveOutputcolor;
+  qproperty-OtherOutputColor: @schematic-OtherOutputcolor;
+  qproperty-XsheetColor: @schematic-XsheetColor;
+  qproperty-NormalFxColor: @schematic-NormalFxColor;
+  qproperty-MacroFxColor: @schematic-MacroFxColor;
+  qproperty-ImageAdjustFxColor: @schematic-ImageAdjustFxColor;
+  qproperty-LayerBlendingFxColor: @schematic-LayerBlendingFxColor;
+  qproperty-MatteFxColor: @schematic-MatteFxColor;
+
+  // For now the BG OFF color needs to be the same as the BG ON color until the UI is redesigned
+  qproperty-SchematicPreviewButtonBgOnColor: @xsheet-PreviewButtonBgOn-color;
+  qproperty-SchematicPreviewButtonOnImage: url('@{img-url}/@{xsheet-PreviewButtonOnImage}');
+  qproperty-SchematicPreviewButtonBgOffColor: @xsheet-PreviewButtonBgOn-color;
+  qproperty-SchematicPreviewButtonOffImage: url('@{img-url}/@{xsheet-PreviewButtonOffImage}');
+
+  qproperty-SchematicCamstandButtonBgOnColor: @xsheet-CamstandButtonBgOn-color;
+  qproperty-SchematicCamstandButtonOnImage: url('@{img-url}/@{xsheet-CamstandButtonOnImage}');
+  qproperty-SchematicCamstandButtonTranspImage: url('@{img-url}/@{xsheet-CamstandButtonTranspImage}');
+  qproperty-SchematicCamstandButtonBgOffColor: @xsheet-CamstandButtonBgOn-color;
+  qproperty-SchematicCamstandButtonOffImage: url('@{img-url}/@{xsheet-CamstandButtonOffImage}');
+}
+
+/* -----------------------------------------------------------------------------
    Schematic Node Viewer
 ----------------------------------------------------------------------------- */
 

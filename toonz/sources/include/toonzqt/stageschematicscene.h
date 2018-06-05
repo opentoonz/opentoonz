@@ -101,6 +101,8 @@ class StageSchematicScene final : public SchematicScene {
 
   bool m_showLetterOnPortFlag;
 
+  SchematicViewer *m_viewer;
+
 public:
   StageSchematicScene(QWidget *parent);
   ~StageSchematicScene();
@@ -134,6 +136,8 @@ public:
   void resizeNodes(bool maximizedNode);
 
   bool isShowLetterOnPortFlagEnabled() { return m_showLetterOnPortFlag; }
+
+  SchematicViewer *getSchematicViewer() { return m_viewer; }
 
 private:
   StageSchematicNode *addStageSchematicNode(TStageObject *pegbar);

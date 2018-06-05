@@ -178,11 +178,9 @@
       <file>Resources/spline_child_port.svg</file>
       <file>Resources/spline_child_port_disconnect.svg</file>
       <file>Resources/spline_parent_port.svg</file>
-      <file>Resources/schematic_prev_eye_on.svg</file>
-      <file>Resources/schematic_prev_eye_off.svg</file>
-      <file>Resources/schematic_table_view_on.svg</file>
-      <file>Resources/schematic_table_view_transp.svg</file>
-      <file>Resources/schematic_table_view_off.svg</file>
+      <file>Resources/schematic_prev_eye.png</file>
+      <file>Resources/schematic_table_view.png</file>
+      <file>Resources/schematic_table_view_transp.png</file>
       <file>Resources/fxport_red.svg</file>
       <file>Resources/fxport_blue.svg</file>
       <file>Resources/cachefx.png</file>

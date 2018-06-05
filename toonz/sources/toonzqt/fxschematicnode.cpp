@@ -110,10 +110,6 @@ int getInputPortIndex(TFxPort *port, TFx *fx) {
   }
   return -1;
 }
-
-QColor prevEyeBGColor(200, 200, 100);
-QColor camstandBGColor(235, 144, 107);
-
 }  // namespace
 
 //*****************************************************
@@ -135,22 +131,13 @@ FxColumnPainter::FxColumnPainter(FxSchematicColumnNode *parent, double width,
   connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
           SLOT(onIconGenerated()));
 
-  TLevelColumnFx *lcfx = dynamic_cast<TLevelColumnFx *>(parent->getFx());
-  if (lcfx) {
-    int index  = lcfx->getColumnIndex();
-    QString id = QString("Col");
-    setToolTip(id + QString::number(index + 1));
+  int levelType;
+  QString levelName;
+  m_parent->getLevelTypeAndName(levelType, levelName);
 
-    FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
-    if (!fxScene) return;
+  setToolTip(QString("%1 : %2").arg(m_name, levelName));
 
-    TXsheet *xsh = fxScene->getXsheet();
-    int r0, r1;
-    xsh->getCellRange(index, r0, r1);
-    if (r0 > r1) return;
-    TXshCell firstCell = xsh->getCell(r0, index);
-    m_type             = firstCell.m_level->getType();
-  }
+  m_type = levelType;
 }
 
 //-----------------------------------------------------
@@ -171,15 +158,17 @@ QRectF FxColumnPainter::boundingRect() const {
 void FxColumnPainter::paint(QPainter *painter,
                             const QStyleOptionGraphicsItem *option,
                             QWidget *widget) {
+  FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
+  if (!sceneFx) return;
   int levelType;
   QString levelName;
   m_parent->getLevelTypeAndName(levelType, levelName);
 
-  QLinearGradient linearGrad = getGradientByLevelType(levelType);
+  QColor nodeColor;
+  SchematicViewer *viewer = sceneFx->getSchematicViewer();
+  viewer->getNodeColor(levelType, nodeColor);
 
-  if (!m_parent->isLargeScaled()) linearGrad.setFinalStop(0, 50);
-
-  painter->setBrush(QBrush(linearGrad));
+  painter->setBrush(nodeColor);
   painter->setPen(Qt::NoPen);
   painter->drawRect(0, 0, m_width, m_height);
 
@@ -197,7 +186,7 @@ void FxColumnPainter::paint(QPainter *painter,
     }
   }
 
-  painter->setPen(Qt::white);
+  painter->setPen(viewer->getTextColor());
   painter->setBrush(Qt::NoBrush);
 
   QRectF columnNameRect;
@@ -216,9 +205,6 @@ void FxColumnPainter::paint(QPainter *painter,
 
   // column name
   if (!m_parent->isNameEditing()) {
-    FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
-    if (!sceneFx) return;
-
     // if this is a current object
     if (sceneFx->getCurrentFx() == m_parent->getFx())
       painter->setPen(Qt::yellow);
@@ -233,75 +219,6 @@ void FxColumnPainter::paint(QPainter *painter,
       elideText(levelName, painter->font(), levelNameRect.width());
   painter->drawText(levelNameRect, Qt::AlignLeft | Qt::AlignVCenter,
                     elidedName);
-}
-
-//-----------------------------------------------------
-
-QLinearGradient FxColumnPainter::getGradientByLevelType(int type) {
-  QColor col1, col2, col3, col4, col5;
-  int alpha = 200;
-  switch (type) {
-  case TZI_XSHLEVEL:
-  case OVL_XSHLEVEL:
-    col1 = QColor(209, 232, 234, alpha);
-    col2 = QColor(121, 171, 181, alpha);
-    col3 = QColor(98, 143, 165, alpha);
-    col4 = QColor(33, 90, 118, alpha);
-    col5 = QColor(122, 172, 173, alpha);
-    break;
-  case PLI_XSHLEVEL:
-    col1 = QColor(236, 226, 182, alpha);
-    col2 = QColor(199, 187, 95, alpha);
-    col3 = QColor(180, 180, 67, alpha);
-    col4 = QColor(130, 125, 15, alpha);
-    col5 = QColor(147, 150, 28, alpha);
-    break;
-  case TZP_XSHLEVEL:
-    col1 = QColor(196, 245, 196, alpha);
-    col2 = QColor(111, 192, 105, alpha);
-    col3 = QColor(63, 146, 99, alpha);
-    col4 = QColor(32, 113, 86, alpha);
-    col5 = QColor(117, 187, 166, alpha);
-    break;
-  case ZERARYFX_XSHLEVEL:
-    col1 = QColor(232, 245, 196, alpha);
-    col2 = QColor(130, 129, 93, alpha);
-    col3 = QColor(113, 115, 81, alpha);
-    col4 = QColor(55, 59, 25, alpha);
-    col5 = QColor(144, 154, 111, alpha);
-    break;
-  case CHILD_XSHLEVEL:
-    col1 = QColor(247, 208, 241, alpha);
-    col2 = QColor(214, 154, 219, alpha);
-    col3 = QColor(170, 123, 169, alpha);
-    col4 = QColor(92, 52, 98, alpha);
-    col5 = QColor(132, 111, 154, alpha);
-    break;
-  case MESH_XSHLEVEL:
-    col1 = QColor(210, 140, 255, alpha);
-    col2 = QColor(200, 130, 255, alpha);
-    col3 = QColor(150, 80, 180, alpha);
-    col4 = QColor(150, 80, 180, alpha);
-    col5 = QColor(180, 120, 220, alpha);
-    break;
-  case UNKNOWN_XSHLEVEL:
-  case NO_XSHLEVEL:
-  default:
-    col1 = QColor(227, 227, 227, alpha);
-    col2 = QColor(174, 174, 174, alpha);
-    col3 = QColor(123, 123, 123, alpha);
-    col4 = QColor(61, 61, 61, alpha);
-    col5 = QColor(127, 138, 137, alpha);
-  }
-
-  QLinearGradient linearGrad(QPointF(0, 0), QPointF(0, 32));
-  linearGrad.setColorAt(0, col1);
-  linearGrad.setColorAt(0.08, col2);
-  linearGrad.setColorAt(0.20, col3);
-  linearGrad.setColorAt(0.23, col4);
-  linearGrad.setColorAt(0.9, col4);
-  linearGrad.setColorAt(1, col5);
-  return linearGrad;
 }
 
 //-----------------------------------------------------
@@ -429,9 +346,11 @@ void FxColumnPainter::onIconGenerated() {
 
   TLevelColumnFx *lcfx = dynamic_cast<TLevelColumnFx *>(m_parent->getFx());
   if (lcfx) {
-    int index  = lcfx->getColumnIndex();
-    QString id = QString("Col");
-    setToolTip(id + QString::number(index + 1));
+    int index = lcfx->getColumnIndex();
+    int levelType;
+    QString levelName;
+    m_parent->getLevelTypeAndName(levelType, levelName);
+    setToolTip(QString("%1 : %2").arg(m_name, levelName));
 
     FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
     if (!fxScene) return;
@@ -465,12 +384,6 @@ FxPalettePainter::FxPalettePainter(FxSchematicPaletteNode *parent, double width,
   setFlag(QGraphicsItem::ItemIsMovable, false);
   setFlag(QGraphicsItem::ItemIsSelectable, false);
   setFlag(QGraphicsItem::ItemIsFocusable, false);
-  TLevelColumnFx *lcfx = dynamic_cast<TLevelColumnFx *>(parent->getFx());
-  if (lcfx) {
-    int index  = lcfx->getColumnIndex() + 1;
-    QString id = QString("Col");
-    setToolTip(id + QString::number(index));
-  }
 }
 
 //-----------------------------------------------------
@@ -488,18 +401,16 @@ QRectF FxPalettePainter::boundingRect() const {
 void FxPalettePainter::paint(QPainter *painter,
                              const QStyleOptionGraphicsItem *option,
                              QWidget *widget) {
+  FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
+  if (!sceneFx) return;
+
   QPixmap palettePm = QPixmap(":Resources/schematic_palette.png");
 
   int alpha = 200;
 
-  QLinearGradient paletteLinearGrad(
-      QPointF(0, 0), QPointF(0, (m_parent->isLargeScaled()) ? 32 : 50));
-  paletteLinearGrad.setColorAt(0, QColor(42, 171, 154, alpha));
-  paletteLinearGrad.setColorAt(0.2, QColor(15, 62, 56, alpha));
-  paletteLinearGrad.setColorAt(0.9, QColor(15, 62, 56, alpha));
-  paletteLinearGrad.setColorAt(1, QColor(33, 95, 90, alpha));
+  SchematicViewer *viewer = sceneFx->getSchematicViewer();
 
-  painter->setBrush(QBrush(paletteLinearGrad));
+  painter->setBrush(viewer->getPaletteColumnColor());
 
   painter->setPen(Qt::NoPen);
 
@@ -529,11 +440,9 @@ void FxPalettePainter::paint(QPainter *painter,
   painter->drawPixmap(paletteRect, palettePm);
 
   //! draw the name only if it is not editing
-  painter->setPen(Qt::white);
+  painter->setPen(viewer->getTextColor());
 
   if (!m_parent->isNameEditing()) {
-    FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
-    if (!sceneFx) return;
     if (sceneFx->getCurrentFx() == m_parent->getFx())
       painter->setPen(Qt::yellow);
 
@@ -632,7 +541,8 @@ FxPainter::FxPainter(FxSchematicNode *parent, double width, double height,
       if (zeraryFx) {
         m_label = QString::fromStdWString(
             TStringTable::translate(zeraryFx->getFxType()));
-        setToolTip(QString::fromStdWString(zeraryFx->getFxId()));
+        setToolTip(QString("%1 : %2").arg(
+            m_name, QString::fromStdWString(zeraryFx->getFxId())));
       }
     }
     break;
@@ -660,6 +570,9 @@ QRectF FxPainter::boundingRect() const {
 
 void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                       QWidget *widget) {
+  FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
+  if (!sceneFx) return;
+
   // if the scale is small, display with fx icons
   if (!m_parent->isLargeScaled()) {
     paint_small(painter);
@@ -680,10 +593,11 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     painter->restore();
   }
 
-  // draw base rect
-  QLinearGradient linearGrad = getGradientByLevelType(m_type);
+  QColor nodeColor;
+  SchematicViewer *viewer = sceneFx->getSchematicViewer();
+  viewer->getNodeColor(m_type, nodeColor);
 
-  painter->setBrush(QBrush(linearGrad));
+  painter->setBrush(nodeColor);
   painter->setPen(Qt::NoPen);
   painter->drawRect(0, 0, m_width, m_height);
 
@@ -702,7 +616,7 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   painter->setFont(columnFont);
 
   // draw fxId in the bottom part
-  painter->setPen(Qt::white);
+  painter->setPen(viewer->getTextColor());
   if (m_type != eGroupedFx) {
     // for zerary fx
     QString label;
@@ -730,84 +644,6 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     QString elidedName = elideText(m_name, painter->font(), w);
     painter->drawText(rect, elidedName);
   }
-}
-//-----------------------------------------------------
-/*! return the gradient pattern according to the type of Fx
-*/
-QLinearGradient FxPainter::getGradientByLevelType(eFxType type) {
-  QColor col1, col2, col3, col4, col5;
-  int alpha = 200;
-  switch (type) {
-  case eNormalFx:
-    col1 = QColor(129, 162, 188, alpha);
-    col2 = QColor(109, 138, 166, alpha);
-    col3 = QColor(94, 120, 150, alpha);
-    col4 = QColor(94, 120, 150, alpha);
-    col5 = QColor(52, 63, 104, alpha);
-    break;
-  case eZeraryFx:
-    col1 = QColor(232, 245, 196, alpha);
-    col2 = QColor(130, 129, 93, alpha);
-    col3 = QColor(113, 115, 81, alpha);
-    col4 = QColor(55, 59, 25, alpha);
-    col5 = QColor(144, 154, 111, alpha);
-    break;
-  case eMacroFx:
-    col1 = QColor(165, 117, 161, alpha);
-    col2 = QColor(146, 99, 139, alpha);
-    col3 = QColor(132, 86, 123, alpha);
-    col4 = QColor(132, 86, 123, alpha);
-    col5 = QColor(89, 46, 92, alpha);
-    break;
-  case eGroupedFx:
-    col1 = QColor(104, 191, 211, alpha);
-    col2 = QColor(91, 168, 192, alpha);
-    col3 = QColor(76, 148, 177, alpha);
-    col4 = QColor(76, 148, 177, alpha);
-    col5 = QColor(43, 91, 139, alpha);
-    break;
-  case eNormalImageAdjustFx:
-    col1 = QColor(97, 95, 143, alpha);
-    col2 = QColor(95, 92, 140, alpha);
-    col3 = QColor(88, 84, 131, alpha);
-    col4 = QColor(88, 84, 131, alpha);
-    col5 = QColor(69, 56, 100, alpha);
-    break;
-  case eNormalLayerBlendingFx:
-    col1 = QColor(75, 127, 133, alpha);
-    col2 = QColor(65, 112, 122, alpha);
-    col3 = QColor(60, 108, 118, alpha);
-    col4 = QColor(60, 108, 118, alpha);
-    col5 = QColor(38, 71, 91, alpha);
-    break;
-  case eNormalMatteFx:
-    col1 = QColor(195, 117, 116, alpha);
-    col2 = QColor(188, 111, 109, alpha);
-    col3 = QColor(181, 103, 103, alpha);
-    col4 = QColor(181, 103, 103, alpha);
-    col5 = QColor(161, 86, 84, alpha);
-    break;
-  default:
-    break;
-  }
-
-  QLinearGradient linearGrad(QPointF(0, 0), QPointF(0, 32));
-  linearGrad.setColorAt(0, col1);
-  linearGrad.setColorAt(0.08, col2);
-  linearGrad.setColorAt(0.20, col3);
-  linearGrad.setColorAt(0.23, col4);
-  linearGrad.setColorAt(0.9, col4);
-  linearGrad.setColorAt(1, col5);
-
-  if (type == eGroupedFx) {
-    linearGrad.setColorAt(0.6, col4);
-    linearGrad.setColorAt(0.699, col5);
-    linearGrad.setColorAt(0.7, col4);
-    linearGrad.setColorAt(0.799, col5);
-    linearGrad.setColorAt(0.8, col4);
-    linearGrad.setColorAt(0.899, col5);
-  }
-  return linearGrad;
 }
 
 //-----------------------------------------------------
@@ -975,6 +811,9 @@ void FxPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 /*! for small-scaled display
 */
 void FxPainter::paint_small(QPainter *painter) {
+  FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
+  if (!sceneFx) return;
+
   if (m_type == eGroupedFx) {
     painter->save();
     QPen pen;
@@ -989,11 +828,11 @@ void FxPainter::paint_small(QPainter *painter) {
     painter->restore();
   }
 
-  QLinearGradient linearGrad = getGradientByLevelType(m_type);
+  QColor nodeColor;
+  SchematicViewer *viewer = sceneFx->getSchematicViewer();
+  viewer->getNodeColor(m_type, nodeColor);
 
-  linearGrad.setFinalStop(QPointF(0, 50));
-
-  painter->setBrush(QBrush(linearGrad));
+  painter->setBrush(nodeColor);
   painter->setPen(Qt::NoPen);
   painter->drawRect(0, 0, m_width, m_height);
 
@@ -1001,7 +840,7 @@ void FxPainter::paint_small(QPainter *painter) {
     QFont fnt = painter->font();
     fnt.setPixelSize(fnt.pixelSize() * 2);
     painter->setFont(fnt);
-    painter->setPen(Qt::white);
+    painter->setPen(viewer->getTextColor());
     FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
     if (!sceneFx) return;
     if (sceneFx->getCurrentFx() == m_parent->getFx())
@@ -1079,21 +918,16 @@ QRectF FxXSheetPainter::boundingRect() const {
 void FxXSheetPainter::paint(QPainter *painter,
                             const QStyleOptionGraphicsItem *option,
                             QWidget *widget) {
-  int alpha = 200;
-  QLinearGradient xsheetLinearGrad(
-      QPointF(0, 0), QPointF(0, (m_parent->isLargeScaled()) ? 18 : 36));
-  xsheetLinearGrad.setColorAt(0, QColor(152, 146, 188, alpha));
-  xsheetLinearGrad.setColorAt(0.14, QColor(107, 106, 148, alpha));
-  xsheetLinearGrad.setColorAt(0.35, QColor(96, 96, 138, alpha));
-  xsheetLinearGrad.setColorAt(0.4, QColor(63, 67, 99, alpha));
-  xsheetLinearGrad.setColorAt(0.8, QColor(63, 67, 99, alpha));
-  xsheetLinearGrad.setColorAt(1, QColor(101, 105, 143, alpha));
+  FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
+  if (!sceneFx) return;
 
-  painter->setBrush(QBrush(xsheetLinearGrad));
+  SchematicViewer *viewer = sceneFx->getSchematicViewer();
+
+  painter->setBrush(viewer->getXsheetColor());
   painter->setPen(Qt::NoPen);
   painter->drawRect(QRectF(0, 0, m_width, m_height));
 
-  painter->setPen(Qt::white);
+  painter->setPen(viewer->getTextColor());
   if (m_parent->isLargeScaled()) {
     // Draw the name
     QRectF rect(18, 0, 54, 18);
@@ -1183,30 +1017,18 @@ QRectF FxOutputPainter::boundingRect() const {
 void FxOutputPainter::paint(QPainter *painter,
                             const QStyleOptionGraphicsItem *option,
                             QWidget *widget) {
-  int alpha = 200;
-  QLinearGradient outputLinearGrad(
-      QPointF(0, 0), QPointF(0, (m_parent->isLargeScaled()) ? 18 : 36));
-  if (m_isActive) {
-    outputLinearGrad.setColorAt(0, QColor(115, 190, 224, alpha));
-    outputLinearGrad.setColorAt(0.14, QColor(51, 132, 208, alpha));
-    outputLinearGrad.setColorAt(0.35, QColor(39, 118, 196, alpha));
-    outputLinearGrad.setColorAt(0.4, QColor(18, 82, 153, alpha));
-    outputLinearGrad.setColorAt(0.8, QColor(18, 82, 153, alpha));
-    outputLinearGrad.setColorAt(1, QColor(68, 119, 169, alpha));
-  } else {
-    outputLinearGrad.setColorAt(0, QColor(183, 197, 196, alpha));
-    outputLinearGrad.setColorAt(0.14, QColor(138, 157, 160, alpha));
-    outputLinearGrad.setColorAt(0.35, QColor(125, 144, 146, alpha));
-    outputLinearGrad.setColorAt(0.4, QColor(80, 94, 97, alpha));
-    outputLinearGrad.setColorAt(0.8, QColor(80, 94, 97, alpha));
-    outputLinearGrad.setColorAt(1, QColor(128, 140, 142, alpha));
-  }
+  FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
+  if (!sceneFx) return;
 
-  painter->setBrush(QBrush(outputLinearGrad));
+  SchematicViewer *viewer = sceneFx->getSchematicViewer();
+  QColor outputColor      = m_isActive ? viewer->getActiveOutputColor()
+                                  : viewer->getOtherOutputColor();
+
+  painter->setBrush(outputColor);
   painter->setPen(Qt::NoPen);
   painter->drawRect(QRectF(0, 0, m_width, m_height));
 
-  painter->setPen(Qt::white);
+  painter->setPen(viewer->getTextColor());
   if (m_parent->isLargeScaled()) {
     // Draw the name
     QRectF rect(18, 0, 72, 18);
@@ -2352,6 +2174,8 @@ FxSchematicOutputNode::FxSchematicOutputNode(FxSchematicScene *scene,
   addPort(0, inDock->getPort());
   m_outputPainter = new FxOutputPainter(this, m_width, m_height);
   m_outputPainter->setZValue(1);
+
+  setToolTip(tr("Output"));
 }
 
 //-----------------------------------------------------
@@ -2418,6 +2242,8 @@ FxSchematicXSheetNode::FxSchematicXSheetNode(FxSchematicScene *scene,
   m_outDock->setZValue(2);
   inDock->setZValue(2);
   m_xsheetPainter->setZValue(1);
+
+  setToolTip(tr("XSheet"));
 }
 
 //-----------------------------------------------------
@@ -2499,6 +2325,8 @@ bool isMatteFx(std::string id) {
 FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
                                                  TFx *fx)
     : FxSchematicNode(scene, fx, 90, 32, eNormalFx) {
+  SchematicViewer *viewer = scene->getSchematicViewer();
+
   checkDynamicInputPortSize();
 
   // resize if small scaled
@@ -2533,9 +2361,11 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
   m_outDock  = new FxSchematicDock(this, "", 0, eFxOutputPort);
   m_linkDock = new FxSchematicDock(this, "", 0, eFxLinkPort);
 
-  m_renderToggle = new SchematicToggle(
-      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
-      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor, 0);
+  m_renderToggle =
+      new SchematicToggle(this, viewer->getSchematicPreviewButtonOnImage(),
+                          viewer->getSchematicPreviewButtonBgOnColor(),
+                          viewer->getSchematicPreviewButtonOffImage(),
+                          viewer->getSchematicPreviewButtonBgOffColor(), 0);
 
   m_painter =
       new FxPainter(this, m_width, m_height, m_name, m_type, fx->getFxType());
@@ -2712,6 +2542,8 @@ void FxSchematicNormalFxNode::resize(bool maximized) {}
 FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
                                              TZeraryColumnFx *fx)
     : FxSchematicNode(scene, fx, 90, 32, eZeraryFx) {
+  SchematicViewer *viewer = scene->getSchematicViewer();
+
   checkDynamicInputPortSize();
 
   if (!m_isLargeScaled) {
@@ -2737,13 +2569,15 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
 
   m_name = QString::fromStdString(name);
 
-  m_nameItem     = new SchematicName(this, 72, 20);  // for rename
-  m_outDock      = new FxSchematicDock(this, "", 0, eFxOutputPort);
-  m_linkDock     = new FxSchematicDock(this, "", 0, eFxLinkPort);
-  m_renderToggle = new SchematicToggle(
-      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
-      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor,
-      SchematicToggle::eIsParentColumn, m_isLargeScaled);
+  m_nameItem = new SchematicName(this, 72, 20);  // for rename
+  m_outDock  = new FxSchematicDock(this, "", 0, eFxOutputPort);
+  m_linkDock = new FxSchematicDock(this, "", 0, eFxLinkPort);
+  m_renderToggle =
+      new SchematicToggle(this, viewer->getSchematicPreviewButtonOnImage(),
+                          viewer->getSchematicPreviewButtonBgOnColor(),
+                          viewer->getSchematicPreviewButtonOffImage(),
+                          viewer->getSchematicPreviewButtonBgOffColor(),
+                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
 
   // get the fx icons according to the fx type
   m_painter = new FxPainter(this, m_width, m_height, m_name, m_type,
@@ -2904,6 +2738,8 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
     : FxSchematicNode(scene, fx, 90, 32, eColumnFx)
     , m_isOpened(false)  // iwasawa
 {
+  SchematicViewer *viewer = scene->getSchematicViewer();
+
   if (!m_isLargeScaled) {
     setWidth(90);
     setHeight(50);
@@ -2917,14 +2753,18 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
       this, fx->getAttributes()->isOpened());    //サムネイル矢印
   m_nameItem = new SchematicName(this, 54, 20);  //リネーム部分
   m_outDock  = new FxSchematicDock(this, "", 0, eFxOutputPort);  // Outポート
-  m_renderToggle = new SchematicToggle(
-      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
-      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor,
-      SchematicToggle::eIsParentColumn, m_isLargeScaled);
+  m_renderToggle =
+      new SchematicToggle(this, viewer->getSchematicPreviewButtonOnImage(),
+                          viewer->getSchematicPreviewButtonBgOnColor(),
+                          viewer->getSchematicPreviewButtonOffImage(),
+                          viewer->getSchematicPreviewButtonBgOffColor(),
+                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
   m_cameraStandToggle = new SchematicToggle(
-      this, QPixmap(":Resources/schematic_table_view_on.svg"),
-      QPixmap(":Resources/schematic_table_view_transp.svg"), camstandBGColor,
-      QPixmap(":Resources/schematic_table_view_off.svg"), camstandBGColor,
+      this, viewer->getSchematicCamstandButtonOnImage(),
+      viewer->getSchematicCamstandButtonTranspImage(),
+      viewer->getSchematicCamstandButtonBgOnColor(),
+      viewer->getSchematicCamstandButtonOffImage(),
+      viewer->getSchematicCamstandButtonBgOffColor(),
       SchematicToggle::eIsParentColumn | SchematicToggle::eEnableNullState,
       m_isLargeScaled);
   m_columnPainter = new FxColumnPainter(this, m_width, m_height, m_name);
@@ -2935,7 +2775,11 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
 
   //-----
   m_nameItem->setName(m_name);
-  setToolTip(m_name);
+
+  int levelType;
+  QString levelName;
+  getLevelTypeAndName(levelType, levelName);
+  setToolTip(QString("%1 : %2").arg(m_name, levelName));
 
   addPort(0, m_outDock->getPort());
 
@@ -3072,6 +2916,17 @@ void FxSchematicColumnNode::getLevelTypeAndName(int &ltype,
       if (xl) {
         ltype = cell.m_level->getType();
 
+        // for Zerary Fx, display FxId
+        if (ltype == ZERARYFX_XSHLEVEL) {
+          TXshZeraryFxColumn *zColumn =
+              dynamic_cast<TXshZeraryFxColumn *>(xsh->getColumn(m_columnIndex));
+          if (zColumn) {
+            TFx *fx   = zColumn->getZeraryColumnFx()->getZeraryFx();
+            levelName = QString::fromStdWString(fx->getFxId());
+            return;
+          }
+        }
+
         levelName = QString::fromStdWString(xl->getName());
         return;
       }
@@ -3153,6 +3008,8 @@ void FxSchematicColumnNode::renameObject(const TStageObjectId &id,
 FxSchematicPaletteNode::FxSchematicPaletteNode(FxSchematicScene *scene,
                                                TPaletteColumnFx *fx)
     : FxSchematicNode(scene, fx, 90, 32, eColumnFx) {
+  SchematicViewer *viewer = scene->getSchematicViewer();
+
   if (!m_isLargeScaled) {
     setWidth(90);
     setHeight(50);
@@ -3162,14 +3019,16 @@ FxSchematicPaletteNode::FxSchematicPaletteNode(FxSchematicScene *scene,
   std::string name  = scene->getXsheet()->getStageObject(id)->getFullName();
   m_name            = QString::fromStdString(name);
 
-  m_linkedNode   = 0;
-  m_linkDock     = 0;
-  m_nameItem     = new SchematicName(this, 54, 20);  // for rename
-  m_outDock      = new FxSchematicDock(this, "", 0, eFxOutputPort);
-  m_renderToggle = new SchematicToggle(
-      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
-      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor,
-      SchematicToggle::eIsParentColumn, m_isLargeScaled);
+  m_linkedNode = 0;
+  m_linkDock   = 0;
+  m_nameItem   = new SchematicName(this, 54, 20);  // for rename
+  m_outDock    = new FxSchematicDock(this, "", 0, eFxOutputPort);
+  m_renderToggle =
+      new SchematicToggle(this, viewer->getSchematicPreviewButtonOnImage(),
+                          viewer->getSchematicPreviewButtonBgOnColor(),
+                          viewer->getSchematicPreviewButtonOffImage(),
+                          viewer->getSchematicPreviewButtonBgOffColor(),
+                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
   m_palettePainter = new FxPalettePainter(this, m_width, m_height, m_name);
 
   //----
@@ -3325,6 +3184,8 @@ FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx,
     : FxSchematicNode(scene, roots[0].getPointer(), 90, 32, eGroupedFx)
     , m_groupId(groupId)
     , m_groupedFxs(groupedFx) {
+  SchematicViewer *viewer = scene->getSchematicViewer();
+
   if (!m_isLargeScaled) {
     setWidth(90);
     setHeight(50);
@@ -3333,11 +3194,13 @@ FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx,
   m_name  = QString::fromStdWString(groupName);
   m_roots = roots;
 
-  m_nameItem     = new SchematicName(this, 72, 20);  // for rename
-  m_renderToggle = new SchematicToggle(
-      this, QPixmap(":Resources/schematic_prev_eye_on.svg"), prevEyeBGColor,
-      QPixmap(":Resources/schematic_prev_eye_off.svg"), prevEyeBGColor,
-      SchematicToggle::eIsParentColumn, m_isLargeScaled);
+  m_nameItem = new SchematicName(this, 72, 20);  // for rename
+  m_renderToggle =
+      new SchematicToggle(this, viewer->getSchematicPreviewButtonOnImage(),
+                          viewer->getSchematicPreviewButtonBgOnColor(),
+                          viewer->getSchematicPreviewButtonOffImage(),
+                          viewer->getSchematicPreviewButtonBgOffColor(),
+                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
   m_outDock               = new FxSchematicDock(this, "", 0, eFxGroupedOutPort);
   FxSchematicDock *inDock = new FxSchematicDock(
       this, "Source", (m_isLargeScaled) ? m_width - 18 : 10, eFxGroupedInPort);
