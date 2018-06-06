@@ -3,6 +3,7 @@
 #include "toonzqt/fxschematicscene.h"
 
 // TnzQt includes
+#include "toonzqt/fxtypes.h"
 #include "toonzqt/fxschematicnode.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvdialog.h"

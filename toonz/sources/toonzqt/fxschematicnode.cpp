@@ -3,6 +3,7 @@
 #include "toonzqt/fxschematicnode.h"
 
 // TnzQt includes
+#include "toonzqt/fxtypes.h"
 #include "toonzqt/fxschematicscene.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/gutil.h"

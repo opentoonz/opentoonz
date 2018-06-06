@@ -3,6 +3,7 @@
 #include "toonzqt/schematicviewer.h"
 
 // TnzQt includes
+#include "toonzqt/fxtypes.h"
 #include "toonzqt/schematicnode.h"
 #include "toonzqt/fxschematicnode.h"
 #include "toonzqt/schematicgroupeditor.h"
@@ -510,19 +511,6 @@ SchematicViewer::~SchematicViewer() {}
 //------------------------------------------------------------------
 
 void SchematicViewer::getNodeColor(int ltype, QColor &nodeColor) {
-  enum eFxType {
-    eNormalFx              = 100,
-    eZeraryFx              = 101,
-    eMacroFx               = 102,
-    eColumnFx              = 103,
-    eOutpuFx               = 104,
-    eXSheetFx              = 106,
-    eGroupedFx             = 107,
-    eNormalImageAdjustFx   = 108,
-    eNormalLayerBlendingFx = 109,
-    eNormalMatteFx         = 110
-  };
-
   switch (ltype) {
   case TZI_XSHLEVEL:
   case OVL_XSHLEVEL:

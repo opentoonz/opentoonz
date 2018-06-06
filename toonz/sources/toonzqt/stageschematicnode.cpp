@@ -1779,7 +1779,7 @@ void StageSchematicColumnNode::paint(QPainter *painter,
   QFont font("Verdana", 8);
   painter->setFont(font);
   StageSchematicScene *scene = dynamic_cast<StageSchematicScene *>(m_scene);
-  if (scene && scene->getCurrentObject() == id) painter->setPen(Qt::red);
+  if (scene && scene->getCurrentObject() == id) painter->setPen(Qt::yellow);
   QFontMetrics metrix(font);
   int srcWidth  = metrix.width(colNumber);
   int srcHeight = metrix.height();
