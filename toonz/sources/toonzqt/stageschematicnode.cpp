@@ -203,7 +203,7 @@ void ColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   QAction *resetCenter = new QAction(tr("&Reset Center"), &menu);
   connect(resetCenter, SIGNAL(triggered()), stageScene, SLOT(onResetCenter()));
   QAction *collapse   = CommandManager::instance()->getAction("MI_Collapse");
-  QAction *openSubxsh = new QAction(tr("&Open Subxsheet"), &menu);
+  QAction *openSubxsh = new QAction(tr("&Open Sub-xsheet"), &menu);
   QAction *explodeChild =
       CommandManager::instance()->getAction("MI_ExplodeChild");
   connect(openSubxsh, SIGNAL(triggered()), stageScene, SLOT(onOpenSubxsheet()));

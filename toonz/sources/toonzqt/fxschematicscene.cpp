@@ -28,6 +28,7 @@
 #include "toonz/tcolumnhandle.h"
 #include "toonz/tframehandle.h"
 #include "toonz/tobjecthandle.h"
+#include "toonz/childstack.h"
 
 // TnzBase includes
 #include "tmacrofx.h"
@@ -912,6 +913,15 @@ void FxSchematicScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 
   menu.addMenu(m_addFxContextMenu.getAddMenu());
   if (addOutputFx) menu.addAction(addOutputFx);
+
+  // Close sub xsheet and move to parent sheet
+  ToonzScene *scene      = getXsheet()->getScene();
+  ChildStack *childStack = scene->getChildStack();
+  if (childStack && childStack->getAncestorCount() > 0) {
+    menu.addSeparator();
+    menu.addAction(CommandManager::instance()->getAction("MI_CloseChild"));
+  }
+
   menu.addSeparator();
   menu.addAction(copy);
   menu.addAction(cut);

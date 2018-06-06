@@ -279,7 +279,7 @@ void FxColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 
   QAction *collapse = CommandManager::instance()->getAction("MI_Collapse");
 
-  QAction *openSubxsh = new QAction(tr("&Open Subxsheet"), &menu);
+  QAction *openSubxsh = new QAction(tr("&Open Sub-xsheet"), &menu);
   connect(openSubxsh, SIGNAL(triggered()), fxScene, SLOT(onOpenSubxsheet()));
 
   QAction *explodeChild =

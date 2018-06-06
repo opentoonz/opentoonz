@@ -24,6 +24,7 @@
 #include "toonz/tcamera.h"
 #include "toonz/tstageobjectcmd.h"
 #include "toonz/tproject.h"
+#include "toonz/childstack.h"
 
 // TnzCore includes
 #include "tconst.h"
@@ -1140,6 +1141,15 @@ void StageSchematicScene::contextMenuEvent(
   menu.addAction(addPegbar);
   menu.addAction(addCamera);
   menu.addAction(addSpline);
+
+  // Close sub xsheet and move to parent sheet
+  ToonzScene *scene      = m_sceneHandle->getScene();
+  ChildStack *childStack = scene->getChildStack();
+  if (childStack && childStack->getAncestorCount() > 0) {
+    menu.addSeparator();
+    menu.addAction(CommandManager::instance()->getAction("MI_CloseChild"));
+  }
+
   menu.addSeparator();
   menu.addAction(paste);
   m_selection->setPastePosition(TPointD(scenePos.x(), scenePos.y()));
