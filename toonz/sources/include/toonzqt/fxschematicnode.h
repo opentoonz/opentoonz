@@ -77,8 +77,6 @@ public:
              QWidget *widget = 0) override;
   void setName(const QString &name) { m_name = name; }
 
-  QLinearGradient getGradientByLevelType(int type);
-
 public slots:
 
   void onIconGenerated();
@@ -126,7 +124,6 @@ class FxPainter final : public QObject, public QGraphicsItem {
   // to obtain the fx icons for zoom out view of the schematic
   std::string m_fxType;
 
-  QLinearGradient getGradientByLevelType(eFxType);
   void paint_small(QPainter *painter);
 
 public:
