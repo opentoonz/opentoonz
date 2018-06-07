@@ -2768,12 +2768,35 @@ bool FxSchematicZeraryNode::isCached() const {
 
 void FxSchematicZeraryNode::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *me) {
-  QAction *fxEditorPopup =
-      CommandManager::instance()->getAction("MI_FxParamEditor");
-  fxEditorPopup->trigger();
+  QRectF nameArea(0, 0, m_width, 14);
+  if (nameArea.contains(me->pos()) && me->modifiers() == Qt::ControlModifier) {
+    FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
+    TXshColumn *column        = fxScene->getXsheet()->getColumn(m_columnIndex);
+    TStageObjectId id         = TStageObjectId::ColumnId(m_columnIndex);
+    std::string name = fxScene->getXsheet()->getStageObject(id)->getName();
 
-  // this signal cause the update the contents of the FxSettings
-  emit fxNodeDoubleClicked();
+    if (column) {
+      // ZeraryFx columns store name elsewhere
+      TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+      if (zColumn)
+        name =
+            ::to_string(zColumn->getZeraryColumnFx()->getZeraryFx()->getName());
+    }
+
+    m_name = QString::fromStdString(name);
+
+    m_nameItem->setPlainText(m_name);
+    m_nameItem->show();
+    m_nameItem->setFocus();
+    setFlag(QGraphicsItem::ItemIsSelectable, false);
+  } else {
+    QAction *fxEditorPopup =
+        CommandManager::instance()->getAction("MI_FxParamEditor");
+    fxEditorPopup->trigger();
+
+    // this signal cause the update the contents of the FxSettings
+    emit fxNodeDoubleClicked();
+  }
 }
 
 //-----------------------------------------------------
