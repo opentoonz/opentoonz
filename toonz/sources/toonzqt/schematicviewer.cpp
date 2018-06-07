@@ -620,7 +620,7 @@ void SchematicViewer::createToolbars() {
 void SchematicViewer::createActions() {
   // Create all actions
   QAction *addPegbar = 0, *addSpline = 0, *addCamera = 0, *insertFx = 0,
-          *addOutputFx = 0, *switchPort = 0;
+          *addOutputFx = 0, *switchPort = 0, *iconifyNodes = 0;
   {
     // Fit schematic
     QIcon fitSchematicIcon = createQIconOnOff("fit", false);
@@ -695,6 +695,15 @@ void SchematicViewer::createActions() {
       // AddOutputFx
       addOutputFx = CommandManager::instance()->getAction("MI_NewOutputFx");
 
+      // Iconify Fx nodes
+      iconifyNodes = new QAction(tr("&Toggle node icons"), m_fxToolbar);
+      iconifyNodes->setCheckable(true);
+      iconifyNodes->setChecked(!m_fxScene->isLargeScaled());
+      QIcon iconifyNodesIcon = createQIconOnOff("iconifynodes");
+      iconifyNodes->setIcon(iconifyNodesIcon);
+      connect(iconifyNodes, SIGNAL(toggled(bool)), m_fxScene,
+              SLOT(onIconifyNodesToggled(bool)));
+
       // Swap fx/stage schematic
       QIcon changeSchematicIcon = createQIconOnOff("swap", false);
       m_changeScene =
@@ -725,6 +734,8 @@ void SchematicViewer::createActions() {
     m_stageToolbar->addAction(addCamera);
     m_stageToolbar->addAction(addPegbar);
 
+    m_fxToolbar->addSeparator();
+    m_fxToolbar->addAction(iconifyNodes);
     m_fxToolbar->addSeparator();
     m_fxToolbar->addAction(addOutputFx);
     m_fxToolbar->addAction(insertFx);

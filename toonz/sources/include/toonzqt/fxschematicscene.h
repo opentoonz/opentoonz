@@ -147,6 +147,7 @@ public:
     m_addFxContextMenu.setCurrentCursorScenePos(QPointF(0, 0));
   }
   void selectNodes(QList<TFxP> &fxs);
+  void toggleLargeScaled() { m_isLargeScaled = !m_isLargeScaled; }
   bool isLargeScaled() { return m_isLargeScaled; }
 
   SchematicViewer *getSchematicViewer() { return m_viewer; }
@@ -225,6 +226,8 @@ protected slots:
   void onReplacePaste();
   void onAltModifierChanged(bool);
   void onEditGroup();
+
+  void onIconifyNodesToggled(bool iconified);
 
 private:
   void setEnableCache(bool toggle);

@@ -313,5 +313,8 @@
       <file>Resources/switchport_off.svg</file>
       <file>Resources/switchport_over.svg</file>
       <file>Resources/plus.svg</file>
+      <file>Resources/iconifynodes_on.svg</file>
+      <file>Resources/iconifynodes_off.svg</file>
+      <file>Resources/iconifynodes_over.svg</file>
     </qresource>
 </RCC>

@@ -336,6 +336,7 @@ public:
   virtual bool isCached() const;
   virtual void resize(bool maximizeNode) {}
 
+  void toggleLargeScaled() { m_isLargeScaled = !m_isLargeScaled; }
   bool isLargeScaled() { return m_isLargeScaled; }
 signals:
 

@@ -350,13 +350,7 @@ void FxSchematicScene::setApplication(TApplication *app) {
 //------------------------------------------------------------------
 
 void FxSchematicScene::updateScene() {
-  if (!views().empty())
-#if QT_VERSION >= 0x050000
-    m_isLargeScaled = views().at(0)->matrix().determinant() >= 1.0;
-#else
-    m_isLargeScaled = views().at(0)->matrix().det() >= 1.0;
-#endif
-  m_disconnectionLinks.clearAll();
+  if (!views().empty()) m_disconnectionLinks.clearAll();
   m_connectionLinks.clearAll();
   m_selectionOldPos.clear();
 
@@ -960,7 +954,7 @@ QPointF FxSchematicScene::nearestPoint(const QPointF &point) {
   if (item) return rect.bottomRight();
   item = itemAt(rect.topLeft());
   if (item) return rect.topLeft();
-  item                    = itemAt(rect.topRight());
+  item = itemAt(rect.topRight());
 #endif
   if (item) return rect.topRight();
   return QPointF();
@@ -1456,6 +1450,13 @@ void FxSchematicScene::onCurrentFxSwitched() {
 void FxSchematicScene::onCurrentColumnChanged(int index) {
   m_app->getCurrentColumn()->setColumnIndex(index);
   m_app->getCurrentObject()->setObjectId(TStageObjectId::ColumnId(index));
+}
+
+//------------------------------------------------------------------
+
+void FxSchematicScene::onIconifyNodesToggled(bool iconified) {
+  m_isLargeScaled = !iconified;
+  updateScene();
 }
 
 //------------------------------------------------------------------
