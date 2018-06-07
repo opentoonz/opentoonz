@@ -38,11 +38,14 @@
 
 // TnzCore includes
 #include "tconst.h"
+#include "tenv.h"
 
 // Qt includes
 #include <QMenu>
 #include <QApplication>
 #include <QGraphicsSceneContextMenuEvent>
+
+TEnv::IntVar IconifyFxSchematicNodes("IconifyFxSchematicNodes", 0);
 
 namespace {
 
@@ -304,7 +307,7 @@ FxSchematicScene::FxSchematicScene(QWidget *parent)
     , m_lastPos(0, 0)
     , m_currentFxNode(0)
     , m_gridDimension(eSmall)
-    , m_isLargeScaled(true)
+    , m_isLargeScaled(!IconifyFxSchematicNodes)
     , m_viewer() {
   m_viewer = (SchematicViewer *)parent;
 
@@ -1455,7 +1458,8 @@ void FxSchematicScene::onCurrentColumnChanged(int index) {
 //------------------------------------------------------------------
 
 void FxSchematicScene::onIconifyNodesToggled(bool iconified) {
-  m_isLargeScaled = !iconified;
+  m_isLargeScaled         = !iconified;
+  IconifyFxSchematicNodes = (iconified) ? 1 : 0;
   updateScene();
 }
 
