@@ -3124,7 +3124,7 @@ FxSchematicPaletteNode::FxSchematicPaletteNode(FxSchematicScene *scene,
   }
   m_columnIndex     = fx->getColumnIndex();
   TStageObjectId id = TStageObjectId::ColumnId(m_columnIndex);
-  std::string name  = scene->getXsheet()->getStageObject(id)->getFullName();
+  std::string name  = scene->getXsheet()->getStageObject(id)->getName();
   m_name            = QString::fromStdString(name);
 
   m_linkedNode = 0;
