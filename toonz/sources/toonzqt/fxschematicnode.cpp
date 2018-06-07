@@ -132,13 +132,20 @@ FxColumnPainter::FxColumnPainter(FxSchematicColumnNode *parent, double width,
   connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
           SLOT(onIconGenerated()));
 
-  int levelType;
-  QString levelName;
-  m_parent->getLevelTypeAndName(levelType, levelName);
+  TLevelColumnFx *lcfx = dynamic_cast<TLevelColumnFx *>(parent->getFx());
+  if (lcfx) {
+    int index = lcfx->getColumnIndex();
 
-  setToolTip(QString("%1 : %2").arg(m_name, levelName));
+    FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
+    if (!fxScene) return;
 
-  m_type = levelType;
+    TXsheet *xsh = fxScene->getXsheet();
+    int r0, r1;
+    xsh->getCellRange(index, r0, r1);
+    if (r0 > r1) return;
+    TXshCell firstCell = xsh->getCell(r0, index);
+    m_type             = firstCell.m_level->getType();
+  }
 }
 
 //-----------------------------------------------------
@@ -348,10 +355,6 @@ void FxColumnPainter::onIconGenerated() {
   TLevelColumnFx *lcfx = dynamic_cast<TLevelColumnFx *>(m_parent->getFx());
   if (lcfx) {
     int index = lcfx->getColumnIndex();
-    int levelType;
-    QString levelName;
-    m_parent->getLevelTypeAndName(levelType, levelName);
-    setToolTip(QString("%1 : %2").arg(m_name, levelName));
 
     FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
     if (!fxScene) return;
@@ -533,7 +536,6 @@ FxPainter::FxPainter(FxSchematicNode *parent, double width, double height,
   case eNormalImageAdjustFx:
     m_label = QString::fromStdWString(
         TStringTable::translate(parent->getFx()->getFxType()));
-    setToolTip(QString::fromStdWString(parent->getFx()->getFxId()));
     break;
   case eZeraryFx: {
     TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(parent->getFx());
@@ -542,18 +544,10 @@ FxPainter::FxPainter(FxSchematicNode *parent, double width, double height,
       if (zeraryFx) {
         m_label = QString::fromStdWString(
             TStringTable::translate(zeraryFx->getFxType()));
-        setToolTip(QString("%1 : %2").arg(
-            m_name, QString::fromStdWString(zeraryFx->getFxId())));
       }
     }
     break;
   }
-
-  case eGroupedFx:
-    m_label = QString("Group ") +
-              QString::number(parent->getFx()->getAttributes()->getGroupId());
-    setToolTip(m_label);
-    break;
   }
 }
 
@@ -2358,6 +2352,39 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
   else if (isMatteFx(id))
     m_type = eNormalMatteFx;
 
+  switch (m_type) {
+  case eNormalFx:
+  case eMacroFx:
+  case eNormalLayerBlendingFx:
+  case eNormalMatteFx:
+  case eNormalImageAdjustFx: {
+    QString fxId = QString::fromStdWString(getFx()->getFxId());
+    if (m_name != fxId)
+      setToolTip(QString("%1 : %2").arg(m_name, fxId));
+    else
+      setToolTip(m_name);
+  } break;
+  case eZeraryFx: {
+    TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(getFx());
+    if (zfx) {
+      TFx *zeraryFx = zfx->getZeraryFx();
+      if (zeraryFx) {
+        setToolTip(QString("%1 : %2").arg(
+            m_name, QString::fromStdWString(zeraryFx->getFxId())));
+      }
+    }
+    break;
+  }
+  case eGroupedFx: {
+    QString fxId =
+        "Group " + QString::number(getFx()->getAttributes()->getGroupId());
+    if (m_name != fxId)
+      setToolTip(QString("%1 (%2)").arg(m_name, fxId));
+    else
+      setToolTip(m_name);
+  }
+  }
+
   m_nameItem = new SchematicName(this, 72, 20);  // for rename
   m_outDock  = new FxSchematicDock(this, "", 0, eFxOutputPort);
   m_linkDock = new FxSchematicDock(this, "", 0, eFxLinkPort);
@@ -2484,7 +2511,40 @@ void FxSchematicNormalFxNode::onNameChanged() {
   m_nameItem->hide();
   m_name = m_nameItem->toPlainText();
   m_painter->setName(m_name);
-  setToolTip(m_name);
+
+  switch (m_type) {
+  case eNormalFx:
+  case eMacroFx:
+  case eNormalLayerBlendingFx:
+  case eNormalMatteFx:
+  case eNormalImageAdjustFx: {
+    QString fxId = QString::fromStdWString(getFx()->getFxId());
+    if (m_name != fxId)
+      setToolTip(QString("%1 : %2").arg(m_name, fxId));
+    else
+      setToolTip(m_name);
+  } break;
+  case eZeraryFx: {
+    TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(getFx());
+    if (zfx) {
+      TFx *zeraryFx = zfx->getZeraryFx();
+      if (zeraryFx) {
+        setToolTip(QString("%1 : %2").arg(
+            m_name, QString::fromStdWString(zeraryFx->getFxId())));
+      }
+    }
+    break;
+  }
+  case eGroupedFx: {
+    QString fxId =
+        "Group " + QString::number(getFx()->getAttributes()->getGroupId());
+    if (m_name != fxId)
+      setToolTip(QString("%1 (%2)").arg(m_name, fxId));
+    else
+      setToolTip(m_name);
+  }
+  }
+
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
   if (!fxScene) return;
@@ -2569,6 +2629,9 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
   }
 
   m_name = QString::fromStdString(name);
+
+  setToolTip(QString("%1 : %2").arg(
+      m_name, QString::fromStdWString(zeraryFx->getFxId())));
 
   m_nameItem = new SchematicName(this, 72, 20);  // for rename
   m_outDock  = new FxSchematicDock(this, "", 0, eFxOutputPort);
@@ -2713,10 +2776,19 @@ void FxSchematicZeraryNode::onNameChanged() {
   m_nameItem->hide();
   m_name = m_nameItem->toPlainText();
   m_painter->setName(m_name);
-  setToolTip(m_name);
+
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
   if (!fxScene) return;
+
+  TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(
+      fxScene->getXsheet()->getColumn(m_columnIndex));
+  if (zColumn) {
+    TFx *fx = zColumn->getZeraryColumnFx()->getZeraryFx();
+    setToolTip(
+        QString("%1 : %2").arg(m_name, QString::fromStdWString(fx->getFxId())));
+  }
+
   TFxCommand::renameFx(m_fx.getPointer(), m_name.toStdWString(),
                        fxScene->getXsheetHandle());
   updateOutputDockToolTips(m_name);
@@ -2779,7 +2851,7 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
 
   int levelType;
   QString levelName;
-  getLevelTypeAndName(levelType, levelName);
+  FxSchematicColumnNode::getLevelTypeAndName(levelType, levelName);
   setToolTip(QString("%1 : %2").arg(m_name, levelName));
 
   addPort(0, m_outDock->getPort());
@@ -2956,7 +3028,13 @@ void FxSchematicColumnNode::onNameChanged() {
   m_nameItem->hide();
   m_name = m_nameItem->toPlainText();
   m_columnPainter->setName(m_name);
-  setToolTip(m_name);
+
+  int levelType;
+  QString levelName;
+  getLevelTypeAndName(levelType, levelName);
+
+  setToolTip(QString("%1 : %2").arg(m_name, levelName));
+
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   TStageObjectId id = TStageObjectId::ColumnId(m_columnIndex);
@@ -3137,7 +3215,8 @@ void FxSchematicPaletteNode::onNameChanged() {
   m_nameItem->hide();
   m_name = m_nameItem->toPlainText();
   m_palettePainter->setName(m_name);
-  setToolTip(m_name);
+  QString paletteName = getPaletteName();
+  setToolTip(QString("%1 : %2").arg(m_name, paletteName));
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   TStageObjectId id = TStageObjectId::ColumnId(m_columnIndex);
@@ -3194,6 +3273,12 @@ FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx,
 
   m_name  = QString::fromStdWString(groupName);
   m_roots = roots;
+
+  QString fxId = "Group " + QString::number(m_groupId);
+  if (m_name != fxId)
+    setToolTip(QString("%1 (%2)").arg(m_name, fxId));
+  else
+    setToolTip(m_name);
 
   m_nameItem = new SchematicName(this, 72, 20);  // for rename
   m_renderToggle =
@@ -3337,7 +3422,11 @@ void FxGroupNode::onNameChanged() {
   m_nameItem->hide();
   m_name = m_nameItem->toPlainText();
   m_painter->setName(m_name);
-  setToolTip(m_name);
+  QString fxId = "Group " + QString::number(m_groupId);
+  if (m_name != fxId)
+    setToolTip(QString("%1 (%2)").arg(m_name, fxId));
+  else
+    setToolTip(m_name);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
   if (!fxScene) return;

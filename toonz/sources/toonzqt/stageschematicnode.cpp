@@ -2214,7 +2214,11 @@ StageSchematicGroupNode::StageSchematicGroupNode(
   m_painter = new GroupPainter(this, m_width, m_height, m_name);
   m_painter->setZValue(1);
 
-  setToolTip(m_name);
+  QString id = "Group " + QString::number(getGroupId());
+  if (m_name != id)
+    setToolTip(QString("%1 (%2)").arg(m_name, id));
+  else
+    setToolTip(m_name);
 
   assert(ret);
 }
@@ -2261,7 +2265,11 @@ void StageSchematicGroupNode::onNameChanged() {
   m_nameItem->hide();
   m_name = m_nameItem->toPlainText();
   m_painter->setName(m_name);
-  setToolTip(m_name);
+  QString id = "Group " + QString::number(getGroupId());
+  if (m_name != id)
+    setToolTip(QString("%1 (%2)").arg(m_name, id));
+  else
+    setToolTip(m_name);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   TStageObjectCmd::renameGroup(m_groupedObj, m_name.toStdWString(), false,
