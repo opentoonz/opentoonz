@@ -612,9 +612,12 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
   // draw fxId in the bottom part
   painter->setPen(viewer->getTextColor());
-  if (m_type != eGroupedFx) {
+  QString label;
+  if (m_type == eGroupedFx)
+    label = "Group " +
+            QString::number(m_parent->getFx()->getAttributes()->getGroupId());
+  else {
     // for zerary fx
-    QString label;
     if (m_type == eZeraryFx) {
       TZeraryColumnFx *zcFx =
           dynamic_cast<TZeraryColumnFx *>(m_parent->getFx());
@@ -622,7 +625,10 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
       label = QString::fromStdWString(zcFx->getZeraryFx()->getFxId());
     } else
       label = QString::fromStdWString(m_parent->getFx()->getFxId());
-    label   = elideText(label, painter->font(), m_width - 21);
+  }
+
+  if (label != m_name) {
+    label = elideText(label, painter->font(), m_width - 21);
     painter->drawText(QRectF(3, 16, m_width - 21, 14),
                       Qt::AlignLeft | Qt::AlignVCenter, label);
   }
