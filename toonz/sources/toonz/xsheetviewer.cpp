@@ -718,10 +718,10 @@ void XsheetViewer::updateAreeSize() {
                                                 : o->foldedCellSize()));
     }
   }
-  if (viewArea.right() < areaFilled.x()) viewArea.setRight(areaFilled.x());
-  if (viewArea.bottom() < areaFilled.y() ||
-      (!o->isVerticalTimeline() && viewArea.bottom() != areaFilled.y()))
-    viewArea.setBottom(areaFilled.y());
+  if (viewArea.width() < areaFilled.x()) viewArea.setWidth(areaFilled.x());
+  if (viewArea.height() < areaFilled.y() ||
+      (!o->isVerticalTimeline() && viewArea.height() != areaFilled.y()))
+    viewArea.setHeight(areaFilled.y());
 
   NumberRange allLayer    = o->layerSide(viewArea);
   NumberRange allFrame    = o->frameSide(viewArea);
