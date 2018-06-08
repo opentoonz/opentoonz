@@ -7,6 +7,8 @@
 #include "tlevel_io.h"
 #include "tiio_ffmpeg.h"
 
+#include <QCoreApplication>
+
 //===========================================================
 //
 //  TLevelWriterMp4
@@ -70,12 +72,14 @@ namespace Tiio {
 //===========================================================================
 
 class Mp4WriterProperties : public TPropertyGroup {
+  Q_DECLARE_TR_FUNCTIONS(Mp4WriterProperties)
 public:
   // TEnumProperty m_pixelSize;
   // TBoolProperty m_matte;
   TIntProperty m_vidQuality;
   TIntProperty m_scale;
   Mp4WriterProperties();
+  void updateTranslation() override;
 };
 
 //===========================================================================

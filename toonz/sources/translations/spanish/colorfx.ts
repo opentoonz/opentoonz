@@ -626,7 +626,7 @@
     <name>TSprayStrokeStyle</name>
     <message>
         <source>Circlets</source>
-        <translation>Anillos</translation>
+        <translation>Aros</translation>
     </message>
     <message>
         <source>Border Fade</source>

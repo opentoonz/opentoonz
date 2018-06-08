@@ -375,10 +375,10 @@ ShortcutPopup::ShortcutPopup()
   m_dialog             = NULL;
   m_exportButton       = new QPushButton(tr("Export Current Shortcuts"), this);
   m_exportButton->setToolTip(tr("Export Current Shortcuts"));
-  m_deletePresetButton = new QPushButton("Delete", this);
+  m_deletePresetButton = new QPushButton(tr("Delete"), this);
   m_deletePresetButton->setToolTip(tr("Delete Current Preset"));
   m_deletePresetButton->setIcon(QIcon(":Resources/delete_on.svg"));
-  m_savePresetButton = new QPushButton("Save As", this);
+  m_savePresetButton = new QPushButton(tr("Save As"), this);
   m_savePresetButton->setToolTip(tr("Save Current Shortcuts as New Preset"));
   m_savePresetButton->setIcon(QIcon(":Resources/saveas_on.svg"));
   m_loadPresetButton = new QPushButton(tr("Load"));
@@ -400,7 +400,7 @@ ShortcutPopup::ShortcutPopup()
     searchLay->setMargin(0);
     searchLay->setSpacing(5);
     {
-      searchLay->addWidget(new QLabel("Search:", this), 0);
+      searchLay->addWidget(new QLabel(tr("Search:"), this), 0);
       searchLay->addWidget(searchEdit);
     }
     m_topLayout->addLayout(searchLay, 0);
@@ -428,7 +428,7 @@ ShortcutPopup::ShortcutPopup()
     presetLay->setMargin(5);
     presetLay->setSpacing(5);
     {
-      presetLay->addWidget(new QLabel("Preset:", this), 0);
+      presetLay->addWidget(new QLabel(tr("Preset:"), this), 0);
       presetLay->addWidget(m_presetChoiceCB, 1);
       presetLay->addWidget(m_loadPresetButton, 0);
       presetLay->addWidget(m_savePresetButton, 0);
@@ -597,7 +597,7 @@ void ShortcutPopup::onExportButton(TFilePath fp) {
     fp = m_saveShortcutsPopup->getPath();
     if (fp == TFilePath()) return;
   }
-  showDialog("Saving Shortcuts");
+  showDialog(tr("Saving Shortcuts"));
   QString shortcutString = "[shortcuts]\n";
   for (int commandType = UndefinedCommandType; commandType <= MenuCommandType;
        commandType++) {
@@ -696,7 +696,7 @@ void ShortcutPopup::onLoadPreset() {
   }
 
   if (!showConfirmDialog()) return;
-  showDialog("Setting Shortcuts");
+  showDialog(tr("Setting Shortcuts"));
   if (preset == "OpenToonz") {
     clearAllShortcuts(false);
     TFilePath fp = defaultPresetDir + TFilePath("defopentoonz.ini");
@@ -759,7 +759,8 @@ QStringList ShortcutPopup::buildPresets() {
 //-----------------------------------------------------------------------------
 
 void ShortcutPopup::onSavePreset() {
-  QString presetName = DVGui::getText("Enter Preset Name", "Preset Name:", "");
+  QString presetName =
+      DVGui::getText(tr("Enter Preset Name"), tr("Preset Name:"), "");
   if (presetName == "") return;
   TFilePath presetDir =
       ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");

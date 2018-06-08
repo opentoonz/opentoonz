@@ -4,17 +4,17 @@
 <context>
     <name>ArtisticSolidColor</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2255"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2244"/>
         <source>Horiz Offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2258"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2247"/>
         <source>Vert Offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2261"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2250"/>
         <source>Noise</source>
         <translation type="unfinished"></translation>
     </message>
@@ -27,12 +27,12 @@
 <context>
     <name>MovingSolidColor</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="113"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="105"/>
         <source>Horiz Offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="114"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="106"/>
         <source>Vert Offset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -78,17 +78,17 @@
 <context>
     <name>ShadowStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="235"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="227"/>
         <source>Angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="237"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="229"/>
         <source>Density</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="239"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="231"/>
         <source>Length</source>
         <translation type="unfinished"></translation>
     </message>
@@ -101,12 +101,12 @@
 <context>
     <name>ShadowStyle2</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="630"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="622"/>
         <source>Angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="631"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="623"/>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
@@ -200,12 +200,12 @@
 <context>
     <name>TChalkFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2406"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2395"/>
         <source>Density</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2409"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2398"/>
         <source>Dot Size</source>
         <translation type="unfinished"></translation>
     </message>
@@ -251,27 +251,27 @@
 <context>
     <name>TCheckedFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1835"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1824"/>
         <source>Horiz Dist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1838"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1827"/>
         <source>Horiz Angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1841"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1830"/>
         <source>Vert Dist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1844"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1833"/>
         <source>Vert Angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1847"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1836"/>
         <source>Thickness</source>
         <translation type="unfinished"></translation>
     </message>
@@ -284,17 +284,17 @@
 <context>
     <name>TChessFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2682"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2671"/>
         <source>Horiz Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2685"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2674"/>
         <source>Vert Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2688"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2677"/>
         <source>Angle</source>
         <translation type="unfinished"></translation>
     </message>
@@ -307,22 +307,22 @@
 <context>
     <name>TCircleStripeFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3985"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3974"/>
         <source>X Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3988"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3977"/>
         <source>Y Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3991"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3980"/>
         <source>Distance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3994"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3983"/>
         <source>Thickness</source>
         <translation type="unfinished"></translation>
     </message>
@@ -353,12 +353,12 @@
 <context>
     <name>TDottedFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1609"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1598"/>
         <source>Dot Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1610"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1599"/>
         <source>Dot Distance</source>
         <translation type="unfinished"></translation>
     </message>
@@ -461,22 +461,22 @@
 <context>
     <name>TLinGradFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3380"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3369"/>
         <source>Angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3383"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3372"/>
         <source>X Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3386"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3375"/>
         <source>Y Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3389"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3378"/>
         <source>Smoothness</source>
         <translation type="unfinished"></translation>
     </message>
@@ -515,22 +515,22 @@
 <context>
     <name>TMosaicFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4312"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="4301"/>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4315"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="4304"/>
         <source>Distortion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4318"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="4307"/>
         <source>Min Thick</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4321"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="4310"/>
         <source>Max Thick</source>
         <translation type="unfinished"></translation>
     </message>
@@ -608,17 +608,17 @@
 <context>
     <name>TPatchFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4633"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="4622"/>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4636"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="4625"/>
         <source>Distortion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4639"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="4628"/>
         <source>Thickness</source>
         <translation type="unfinished"></translation>
     </message>
@@ -631,22 +631,22 @@
 <context>
     <name>TPointShadowFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1194"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1183"/>
         <source>Angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1197"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1186"/>
         <source>Density</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1200"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1189"/>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1203"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1192"/>
         <source>Point Size</source>
         <translation type="unfinished"></translation>
     </message>
@@ -659,22 +659,22 @@
 <context>
     <name>TRadGradFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3728"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3717"/>
         <source>X Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3731"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3720"/>
         <source>Y Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3734"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3723"/>
         <source>Radius</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3737"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3726"/>
         <source>Smoothness</source>
         <translation type="unfinished"></translation>
     </message>
@@ -700,7 +700,7 @@
 <context>
     <name>TRubberFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1082"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1071"/>
         <source>Intensity</source>
         <translation type="unfinished"></translation>
     </message>
@@ -775,17 +775,17 @@
 <context>
     <name>TStripeFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2972"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2961"/>
         <source>Distance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2975"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2964"/>
         <source>Angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2978"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2967"/>
         <source>Thickness</source>
         <translation type="unfinished"></translation>
     </message>

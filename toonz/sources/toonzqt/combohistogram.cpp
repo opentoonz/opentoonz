@@ -339,7 +339,7 @@ void ComboHistoRGBLabel::paintEvent(QPaintEvent *pe) {
     p.setPen(Qt::black);
   p.setBrush(Qt::NoBrush);
 
-  p.drawText(rect(), Qt::AlignCenter, QString("R:%1 G:%2 B:%3")
+  p.drawText(rect(), Qt::AlignCenter, tr("R:%1 G:%2 B:%3")
                                           .arg(m_color.red())
                                           .arg(m_color.green())
                                           .arg(m_color.blue()));
@@ -372,23 +372,23 @@ ComboHistogram::ComboHistogram(QWidget *parent)
   {
     mainLayout->addWidget(m_histograms[4]);  // RGB
 
-    mainLayout->addWidget(new QLabel("Picked Color", this), 0,
+    mainLayout->addWidget(new QLabel(tr("Picked Color"), this), 0,
                           Qt::AlignLeft | Qt::AlignVCenter);
     mainLayout->addWidget(m_rgbLabel, 0, Qt::AlignCenter);
 
-    mainLayout->addWidget(new QLabel("Average Color (Ctrl + Drag)", this), 0,
-                          Qt::AlignLeft | Qt::AlignVCenter);
+    mainLayout->addWidget(new QLabel(tr("Average Color (Ctrl + Drag)"), this),
+                          0, Qt::AlignLeft | Qt::AlignVCenter);
     mainLayout->addWidget(m_rectAverageRgbLabel, 0, Qt::AlignCenter);
 
     QGridLayout *infoParamLay = new QGridLayout();
     infoParamLay->setHorizontalSpacing(3);
     infoParamLay->setVerticalSpacing(5);
     {
-      infoParamLay->addWidget(new QLabel("X:", this), 0, 0,
+      infoParamLay->addWidget(new QLabel(tr("X:"), this), 0, 0,
                               Qt::AlignRight | Qt::AlignVCenter);
       infoParamLay->addWidget(m_xPosLabel, 0, 1,
                               Qt::AlignLeft | Qt::AlignVCenter);
-      infoParamLay->addWidget(new QLabel("Y:", this), 1, 0,
+      infoParamLay->addWidget(new QLabel(tr("Y:"), this), 1, 0,
                               Qt::AlignRight | Qt::AlignVCenter);
       infoParamLay->addWidget(m_yPosLabel, 1, 1,
                               Qt::AlignLeft | Qt::AlignVCenter);

@@ -726,6 +726,27 @@ Tiio::TifWriterProperties::TifWriterProperties()
   bind(m_orientation);
 }
 
+void Tiio::TifWriterProperties::updateTranslation() {
+  m_byteOrdering.setQStringName(tr("Byte Ordering"));
+  m_compressionType.setQStringName(tr("Compression Type"));
+  m_bitsPerPixel.setQStringName(tr("Bits Per Pixel"));
+  m_bitsPerPixel.setItemUIName(L"24(RGB)", tr("24(RGB)"));
+  m_bitsPerPixel.setItemUIName(L"48(RGB)", tr("48(RGB)"));
+  m_bitsPerPixel.setItemUIName(L" 1(BW)", tr(" 1(BW)"));
+  m_bitsPerPixel.setItemUIName(L" 8(GREYTONES)", tr(" 8(GREYTONES)"));
+  m_bitsPerPixel.setItemUIName(L"32(RGBM)", tr("32(RGBM)"));
+  m_bitsPerPixel.setItemUIName(L"64(RGBM)", tr("64(RGBM)"));
+  m_orientation.setQStringName(tr("Orientation"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_TOPLEFT, tr("Top Left"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_TOPRIGHT, tr("Top Right"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_BOTRIGHT, tr("Bottom Right"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_BOTLEFT, tr("Bottom Left"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_LEFTTOP, tr("Left Top"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_RIGHTTOP, tr("Left Bottom"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_RIGHTBOT, tr("Right Top"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_LEFTBOT, tr("Right Bottom"));
+}
+
 //============================================================
 
 class TifWriter final : public Tiio::Writer {

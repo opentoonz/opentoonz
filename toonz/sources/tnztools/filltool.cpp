@@ -1811,7 +1811,7 @@ void FillTool::updateTranslation() {
   m_onion.setQStringName(tr("Onion Skin"));
   m_fillDepth.setQStringName(tr("Fill Depth"));
   m_segment.setQStringName(tr("Segment"));
-  m_maxGapDistance.setQStringName("Maximum Gap");
+  m_maxGapDistance.setQStringName(tr("Maximum Gap"));
   m_autopaintLines.setQStringName(tr("Autopaint Lines"));
 }
 

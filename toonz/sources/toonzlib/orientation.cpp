@@ -63,7 +63,7 @@ public:
   virtual CellPosition arrowShift(int direction) const override;
 
   virtual QString name() const override { return "TopToBottom"; }
-  virtual QString caption() const override { return "Xsheet"; }
+  virtual QString caption() const override { return QObject::tr("Xsheet"); }
   virtual const Orientation *next() const override {
     return Orientations::leftToRight();
   }
@@ -123,7 +123,7 @@ public:
   virtual CellPosition arrowShift(int direction) const override;
 
   virtual QString name() const override { return "LeftToRight"; }
-  virtual QString caption() const override { return "Timeline"; }
+  virtual QString caption() const override { return QObject::tr("Timeline"); }
   virtual const Orientation *next() const override {
     return Orientations::topToBottom();
   }

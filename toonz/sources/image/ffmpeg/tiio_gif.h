@@ -8,6 +8,8 @@
 #include "tiio_ffmpeg.h"
 //#include "tthreadmessage.h"
 
+#include <QCoreApplication>
+
 //===========================================================
 //
 //  TLevelWriterGif
@@ -73,11 +75,15 @@ namespace Tiio {
 //===========================================================================
 
 class GifWriterProperties : public TPropertyGroup {
+  Q_DECLARE_TR_FUNCTIONS(GifWriterProperties)
+
 public:
   TIntProperty m_scale;
   TBoolProperty m_looping;
   TBoolProperty m_palette;
   GifWriterProperties();
+
+  void updateTranslation() override;
 };
 
 //===========================================================================

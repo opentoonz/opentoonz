@@ -21,6 +21,7 @@
 #include "tstream.h"
 #include "tpalette.h"
 #include "tproperty.h"
+#include "tiio.h"
 
 //=============================================================================
 
@@ -641,6 +642,14 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
                       throw TException();
                   } else
                     pg->loadData(is);
+
+                  ////////ここだ！
+                  {
+                    TPropertyGroup *refPg = Tiio::makeWriterProperties(ext);
+                    pg->assignUINames(refPg);
+                    delete refPg;
+                  }
+
                   is.closeChild();
                 } else
                   throw TException("unexpected tag: " + tagName);

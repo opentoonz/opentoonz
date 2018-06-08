@@ -1178,68 +1178,65 @@ bool changeFrameSkippingHolds(QKeyEvent *e) {
 
 void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (m_freezedStatus != NO_FREEZED) return;
-
   int key = event->key();
 
-  if (changeFrameSkippingHolds(event)) {
-    return;
-  }
-  TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-  if (!tool) return;
+  // resolving priority and tool-specific key events in this lambda
+  auto ret = [&]() -> bool {
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return false;
 
-  bool isTextToolActive = tool->getName() == T_Type && tool->isActive();
+    bool isTextToolActive = tool->getName() == T_Type && tool->isActive();
 
-  if (!isTextToolActive && ViewerZoomer(this).exec(event)) return;
-
-  if (!isTextToolActive && SceneViewerShortcutReceiver(this).exec(event))
-    return;
-
-  if (!tool->isEnabled()) return;
-
-  tool->setViewer(this);
-
-  // If this object is child of Viewer or ComboViewer
-  // (m_isStyleShortcutSelective = true),
-  // then consider about shortcut for the current style selection.
-  if (m_isStyleShortcutSwitchable &&
-      Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
-      (!isTextToolActive) && (event->modifiers() == Qt::NoModifier ||
-                              event->modifiers() == Qt::KeypadModifier) &&
-      ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
-       key == Qt::Key_Backtab)) {
-    event->ignore();
-    return;
-  }
-
-  if (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
-      key == Qt::Key_AltGr) {
-    // quando l'utente preme shift/ctrl ecc. alcuni tool (es. pinch) devono
-    // cambiare subito la forma del cursore, senza aspettare il prossimo move
-    TMouseEvent toonzEvent;
-    initToonzEvent(toonzEvent, event);
-    toonzEvent.m_pos = TPointD(m_lastMousePos.x(),
-                               (double)(height() - 1) - m_lastMousePos.y());
-
-    TPointD pos = tool->getMatrix().inv() * winToWorld(m_lastMousePos);
-
-    TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-    if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
-      pos.x /= m_dpiScale.x;
-      pos.y /= m_dpiScale.y;
+    if (!isTextToolActive) {
+      if (ViewerZoomer(this).exec(event)) return true;
+      if (SceneViewerShortcutReceiver(this).exec(event)) return true;
+      // If this object is child of Viewer or ComboViewer
+      // (m_isStyleShortcutSelective = true),
+      // then consider about shortcut for the current style selection.
+      if (m_isStyleShortcutSwitchable &&
+          Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+          (event->modifiers() == Qt::NoModifier ||
+           event->modifiers() == Qt::KeypadModifier) &&
+          ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
+           key == Qt::Key_Backtab)) {
+        event->ignore();
+        return true;
+      }
     }
 
-    tool->mouseMove(pos, toonzEvent);
-    setToolCursor(this, tool->getCursorId());
-  }
+    if (!tool->isEnabled()) return false;
 
-  bool shiftButton = QApplication::keyboardModifiers() == Qt::ShiftModifier;
+    tool->setViewer(this);
 
-  if (key == Qt::Key_Menu || key == Qt::Key_Meta) return;
+    if (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
+        key == Qt::Key_AltGr) {
+      // quando l'utente preme shift/ctrl ecc. alcuni tool (es. pinch) devono
+      // cambiare subito la forma del cursore, senza aspettare il prossimo move
+      TMouseEvent toonzEvent;
+      initToonzEvent(toonzEvent, event);
+      toonzEvent.m_pos = TPointD(m_lastMousePos.x(),
+                                 (double)(height() - 1) - m_lastMousePos.y());
 
-  bool ret = false;
-  if (tool)  // && m_toolEnabled)
-    ret = tool->keyDown(event);
+      TPointD pos = tool->getMatrix().inv() * winToWorld(m_lastMousePos);
+
+      TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
+      if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
+        pos.x /= m_dpiScale.x;
+        pos.y /= m_dpiScale.y;
+      }
+
+      tool->mouseMove(pos, toonzEvent);
+      setToolCursor(this, tool->getCursorId());
+    }
+
+    if (key == Qt::Key_Menu || key == Qt::Key_Meta) return false;
+
+    return tool->keyDown(event);
+  }();
+
   if (!ret) {
+    if (changeFrameSkippingHolds(event)) return;
+
     TFrameHandle *fh = TApp::instance()->getCurrentFrame();
 
     if (key == Qt::Key_Up || key == Qt::Key_Left)

@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Position</source>
-        <translation type="vanished">Posizione</translation>
+        <translation>Posizione</translation>
     </message>
     <message>
         <source>E/W:</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Rotation</source>
-        <translation type="vanished">Ruotazione</translation>
+        <translation>Ruotazione</translation>
     </message>
     <message>
         <source>Scale</source>
@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
@@ -100,7 +104,7 @@
     </message>
     <message>
         <source>Selective</source>
-        <translation>Selettivo</translation>
+        <translation type="vanished">Selettivo</translation>
     </message>
     <message>
         <source>Preset:</source>
@@ -218,6 +222,22 @@
         <source>Med</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>
@@ -250,6 +270,13 @@
     <message>
         <source>Set Nonlinear Control Point</source>
         <translation>Imposta un punto di Controllo Non Lineare</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -373,6 +400,10 @@
     <message>
         <source>Center</source>
         <translation type="unfinished">Centro</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -500,6 +531,10 @@
         <source>Lines &amp; Areas</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Maximum Gap</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FingerTool</name>
@@ -552,6 +587,10 @@
     </message>
     <message>
         <source>Lock Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1103,6 +1142,22 @@ Procedere?</translation>
         <source>Note columns can only be edited in the xsheet or timeline.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source> to Front</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> to Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> to Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> to Backward</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RGBPickerTool</name>
@@ -1189,6 +1244,50 @@ Procedere?</translation>
     </message>
     <message>
         <source>Polyline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>current</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RotateTool</name>
+    <message>
+        <source>Rotate On Camera Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RulerToolOptionsBox</name>
+    <message>
+        <source>X:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished">X:</translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished">Y:</translation>
+    </message>
+    <message>
+        <source>W:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>H:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished">O:</translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>L:</source>
+        <comment>ruler tool option</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

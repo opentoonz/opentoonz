@@ -476,7 +476,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
   m_flipOrientationButton->setObjectName("flipOrientationButton");
   m_flipOrientationButton->setFocusPolicy(Qt::FocusPolicy::NoFocus);
-  m_flipOrientationButton->setFixedSize(70, 23);
+  m_flipOrientationButton->setFixedSize(QSize(70, 23));
   m_flipOrientationButton->setIconSize(QSize(40, 20));
   QIcon flipOrientationIcon = createQIcon("fliporientation");
   flipOrientationIcon.addFile(QString(":Resources/xsheet2timeline.svg"),

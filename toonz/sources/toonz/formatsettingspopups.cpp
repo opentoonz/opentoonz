@@ -79,7 +79,8 @@ FormatSettingsPopup::FormatSettingsPopup(QWidget *parent,
     m_codecRestriction->setStyleSheet("border: 1px solid rgb(200,200,200);");
     m_mainLayout->addWidget(m_codecRestriction, m_mainLayout->rowCount(), 0, 1,
                             2);
-    m_configureCodec = new QPushButton("Configure Codec", this);
+    m_configureCodec = new QPushButton(tr("Configure Codec"), this);
+    m_configureCodec->setObjectName("PushButton_NoPadding");
     m_configureCodec->setFixedSize(100, DVGui::WidgetHeight);
     m_mainLayout->addWidget(m_configureCodec, m_mainLayout->rowCount(), 0, 1,
                             2);
@@ -109,13 +110,18 @@ void FormatSettingsPopup::setFormatProperties(TPropertyGroup *props) {
 void FormatSettingsPopup::buildPropertyComboBox(int index,
                                                 TPropertyGroup *props) {
   TEnumProperty *prop = (TEnumProperty *)(props->getProperty(index));
+
   assert(prop);
 
   DVGui::PropertyComboBox *comboBox = new DVGui::PropertyComboBox(this, prop);
   m_widgets[prop->getName()]        = comboBox;
-  connect(comboBox, SIGNAL(currentIndexChanged(const QString)), this,
-          SLOT(onComboBoxIndexChanged(const QString)));
+
+#ifdef _WIN32
+  connect(comboBox, SIGNAL(currentIndexChanged(const QString &)), this,
+          SLOT(onComboBoxIndexChanged(const QString &)));
+#endif
   TEnumProperty::Range range = prop->getRange();
+  TEnumProperty::Items items = prop->getItems();
   int currIndex              = -1;
   std::wstring defaultVal    = prop->getValue();
 
@@ -130,13 +136,13 @@ compressioni non vanno..scive male il file
 break;*/
 
     if (nameProp == defaultVal) currIndex = comboBox->count();
-    comboBox->addItem(QString::fromStdWString(nameProp));
+    comboBox->addItem(items[i].UIName, QString::fromStdWString(nameProp));
   }
   if (currIndex >= 0) comboBox->setCurrentIndex(currIndex);
 
   int row = m_mainLayout->rowCount();
-  m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this),
-                          row, 0, Qt::AlignRight | Qt::AlignVCenter);
+  m_mainLayout->addWidget(new QLabel(prop->getQStringName() + ":", this), row,
+                          0, Qt::AlignRight | Qt::AlignVCenter);
   m_mainLayout->addWidget(comboBox, row, 1);
 
 #ifdef _WIN32
@@ -154,8 +160,8 @@ void FormatSettingsPopup::buildValueField(int index, TPropertyGroup *props) {
   m_widgets[prop->getName()] = v;
 
   int row = m_mainLayout->rowCount();
-  m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this),
-                          row, 0, Qt::AlignRight | Qt::AlignVCenter);
+  m_mainLayout->addWidget(new QLabel(prop->getQStringName() + ":", this), row,
+                          0, Qt::AlignRight | Qt::AlignVCenter);
   m_mainLayout->addWidget(v, row, 1);
   // get value here - bug loses value if the range doesn't start with 0
   double value = prop->getValue();
@@ -174,7 +180,7 @@ void FormatSettingsPopup::buildPropertyCheckBox(int index,
   assert(prop);
 
   DVGui::PropertyCheckBox *v =
-      new DVGui::PropertyCheckBox(tr(prop->getName().c_str()), this, prop);
+      new DVGui::PropertyCheckBox(prop->getQStringName(), this, prop);
   m_widgets[prop->getName()] = v;
 
   m_mainLayout->addWidget(v, m_mainLayout->rowCount(), 1);
@@ -194,8 +200,8 @@ void FormatSettingsPopup::buildPropertyLineEdit(int index,
   lineEdit->setText(tr(::to_string(prop->getValue()).c_str()));
 
   int row = m_mainLayout->rowCount();
-  m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this),
-                          row, 0, Qt::AlignRight | Qt::AlignVCenter);
+  m_mainLayout->addWidget(new QLabel(prop->getQStringName() + ":", this), row,
+                          0, Qt::AlignRight | Qt::AlignVCenter);
   m_mainLayout->addWidget(lineEdit, row, 1);
 }
 
@@ -203,7 +209,7 @@ void FormatSettingsPopup::buildPropertyLineEdit(int index,
 
 #ifdef _WIN32
 
-void FormatSettingsPopup::onComboBoxIndexChanged(const QString codecName) {
+void FormatSettingsPopup::onComboBoxIndexChanged(const QString &codecName) {
   if (!m_codecRestriction) return;
   QString msg;
   AviCodecRestrictions::getRestrictions(codecName.toStdWString(), msg);
@@ -217,6 +223,18 @@ void FormatSettingsPopup::onAviCodecConfigure() {
   std::wstring wCodecName = codecName.toStdWString();
   if (AviCodecRestrictions::canBeConfigured(wCodecName))
     AviCodecRestrictions::openConfiguration(wCodecName, (HWND)winId());
+}
+
+#else
+
+void FormatSettingsPopup::onComboBoxIndexChanged(const QString &codecName) {
+  // do nothing
+}
+
+//-----------------------------------------------------------------------------
+
+void FormatSettingsPopup::onAviCodecConfigure() {
+  // do nothing
 }
 
 #endif

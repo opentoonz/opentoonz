@@ -512,6 +512,26 @@ Do you want to crop the canvas?</source>
         <source>Crop</source>
         <translation>裁切</translation>
     </message>
+    <message>
+        <source>pixel</source>
+        <translation type="unfinished">像素</translation>
+    </message>
+    <message>
+        <source>mm</source>
+        <translation type="unfinished">mm</translation>
+    </message>
+    <message>
+        <source>cm</source>
+        <translation type="unfinished">cm</translation>
+    </message>
+    <message>
+        <source>field</source>
+        <translation type="unfinished">field</translation>
+    </message>
+    <message>
+        <source>inch</source>
+        <translation type="unfinished">inch</translation>
+    </message>
 </context>
 <context>
     <name>CaptureSettingsPopup</name>
@@ -960,6 +980,75 @@ What do you want to do?</source>
     <message>
         <source>Level Name:</source>
         <translation>层级名称:</translation>
+    </message>
+</context>
+<context>
+    <name>ColorModelBehaviorPopup</name>
+    <message>
+        <source>Select the Palette Operation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite the destination palette.</source>
+        <translation type="unfinished">覆盖目标调色板。</translation>
+    </message>
+    <message>
+        <source>Keep the destination palette and apply it to the color model.</source>
+        <translation type="unfinished">保留目标调色板，并应用到色彩模型。</translation>
+    </message>
+    <message>
+        <source>The color model palette is different from the destination palette.
+What do you want to do? </source>
+        <translation type="unfinished">色彩模型的调色板和目标调色板不同。
+要怎么处理？</translation>
+    </message>
+    <message>
+        <source>Add color model&apos;s palette to the destination palette.</source>
+        <translation type="unfinished">将色彩模型的调色板添加到目标调色板。</translation>
+    </message>
+    <message>
+        <source>Picking Colors from Raster Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick Every Colors as Different Styles</source>
+        <translation type="unfinished">将每个颜色拾取为不同的样式</translation>
+    </message>
+    <message>
+        <source>Integrate Similar Colors as One Style</source>
+        <translation type="unfinished">将近似颜色整合为同一样式</translation>
+    </message>
+    <message>
+        <source>Pick Colors in Color Chip Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal - Top to bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal - Bottom to top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical - Left to right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid Line Color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid Line Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chip Order:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1817,6 +1906,14 @@ contain the dpi information, then the current camera dpi will be used.
         <source>Scale:</source>
         <translation>缩放:</translation>
     </message>
+    <message>
+        <source>Width: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ExportPanel</name>
@@ -2230,10 +2327,25 @@ Do you want to overwrite it?</source>
     </message>
 </context>
 <context>
+    <name>FlipbookPanel</name>
+    <message>
+        <source>Safe Area (Right Click to Select)</source>
+        <translation type="unfinished">安全区域(右键单击可选择)</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FormatSettingsPopup</name>
     <message>
         <source>File Settings</source>
         <translation>文件设置</translation>
+    </message>
+    <message>
+        <source>Configure Codec</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2423,6 +2535,21 @@ Do you want to overwrite it?</source>
     </message>
 </context>
 <context>
+    <name>LayerFooterPanel</name>
+    <message>
+        <source>Zoom in/out of timeline</source>
+        <translation type="unfinished">放大/缩小时间轴</translation>
+    </message>
+    <message>
+        <source>Zoom in (Ctrl-click to zoom in all the way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom out (Ctrl-click to zoom out all the way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LayerHeaderPanel</name>
     <message>
         <source>Preview Visbility Toggle All</source>
@@ -2533,6 +2660,22 @@ Do you want to create it?</source>
         <source>Save In:</source>
         <translation>保存位置:</translation>
     </message>
+    <message>
+        <source>Toonz Vector Level</source>
+        <translation type="unfinished">Toonz 矢量层级</translation>
+    </message>
+    <message>
+        <source>Toonz Raster Level</source>
+        <translation type="unfinished">Toonz 光栅层级</translation>
+    </message>
+    <message>
+        <source>Raster Level</source>
+        <translation type="unfinished">光栅层级</translation>
+    </message>
+    <message>
+        <source>Scan Level</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LevelSettingsPopup</name>
@@ -2627,6 +2770,42 @@ Do you want to create it?</source>
     <message>
         <source>Resolution</source>
         <translation>分辨率</translation>
+    </message>
+    <message>
+        <source>Image DPI</source>
+        <translation type="unfinished">图像 DPI</translation>
+    </message>
+    <message>
+        <source>Custom DPI</source>
+        <translation type="unfinished">自定 DPI</translation>
+    </message>
+    <message>
+        <source>Scan level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Raster level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mesh level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sound Column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toonz Vector level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toonz Raster level</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4624,7 +4803,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Insert Paste</source>
-        <translation>插入粘贴(&amp;I)</translation>
+        <translation type="vanished">插入粘贴(&amp;I)</translation>
     </message>
     <message>
         <source>&amp;Paste Color &amp;&amp; Name</source>
@@ -5006,6 +5185,34 @@ Please use the frame numbers for reference.</source>
         <source>Animate Tool</source>
         <translation>动画工具</translation>
     </message>
+    <message>
+        <source>&amp;Paste Insert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste Insert Above/After</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Insert Above/After</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Fill In Empty Cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Cursor Size Outline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Tool - Draw Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active Axis - All</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5072,6 +5279,16 @@ Halftone</source>
 Gaps</source>
         <translation>填充
 空隙</translation>
+    </message>
+    <message>
+        <source>Merge Inks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merge Inks : If the target level has the same style as the match line ink
+(i.e. with the same index and the same color), the existing style will be used.
+Otherwise, a new style will be added to &quot;match lines&quot; page.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6657,11 +6874,11 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Pick Every Colors as Different Styles</source>
-        <translation>将每个颜色拾取为不同的样式</translation>
+        <translation type="vanished">将每个颜色拾取为不同的样式</translation>
     </message>
     <message>
         <source>Integrate Similar Colors as One Style</source>
-        <translation>将近似颜色整合为同一样式</translation>
+        <translation type="vanished">将近似颜色整合为同一样式</translation>
     </message>
     <message>
         <source>Palette Type on Loading Raster Image as Color Model</source>
@@ -6894,7 +7111,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Palette Type on Loading Raster Image as Color Model:</source>
-        <translation>加载光栅图像时把调色板类型当作颜色模型:</translation>
+        <translation type="vanished">加载光栅图像时把调色板类型当作颜色模型:</translation>
     </message>
     <message>
         <source>Vector Snapping:</source>
@@ -7036,6 +7253,95 @@ if both are possible on coding file path.</source>
     <message>
         <source>Column Header Layout*:</source>
         <translation>列头的布局*:</translation>
+    </message>
+    <message>
+        <source>Color Calibration using 3D Look-up Table *</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable auto-stretch frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Cursor Size Outlines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for the Latest Version of OpenToonz on Launch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choosing this option will set initial location of all file browsers to $scenefolder.
+Also the initial output destination for new scenes will be set to $scenefolder as well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Graph Editor Opens in Popup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spreadsheet Opens in Popup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Between Graph Editor and Spreadsheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Function Editor*:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3DLUT File for [%1] *:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursor Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Basic Cursor Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursor Style:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Small</source>
+        <translation type="unfinished">小</translation>
+    </message>
+    <message>
+        <source>Large</source>
+        <translation type="unfinished">大</translation>
+    </message>
+    <message>
+        <source>Crosshair</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left-Handed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Classic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Classic-revised</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compact</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7280,16 +7586,16 @@ Do you want to overwrite it?</source>
     <message>
         <source>The color model palette is different from the destination palette.
 What do you want to do? </source>
-        <translation>色彩模型的调色板和目标调色板不同。
+        <translation type="vanished">色彩模型的调色板和目标调色板不同。
 要怎么处理？</translation>
     </message>
     <message>
         <source>Overwrite the destination palette.</source>
-        <translation>覆盖目标调色板。</translation>
+        <translation type="vanished">覆盖目标调色板。</translation>
     </message>
     <message>
         <source>Keep the destination palette and apply it to the color model.</source>
-        <translation>保留目标调色板，并应用到色彩模型。</translation>
+        <translation type="vanished">保留目标调色板，并应用到色彩模型。</translation>
     </message>
     <message>
         <source>It is not possible to paste the columns: there is a circular reference.</source>
@@ -8649,7 +8955,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Add color model&apos;s palette to the destination palette.</source>
-        <translation>将色彩模型的调色板添加到目标调色板。</translation>
+        <translation type="vanished">将色彩模型的调色板添加到目标调色板。</translation>
     </message>
     <message>
         <source>Change current drawing %1</source>
@@ -8868,6 +9174,65 @@ What do you want to do?</source>
         <source>Cannot Read XML File</source>
         <translation>不能读取 XML 文件</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished">应用</translation>
+    </message>
+    <message>
+        <source>The scene is not yet saved and the output destination is set to $scenefolder.
+Save the scene first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+
+A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
+
+Do you wish to continue loading the last good save or stop and try to salvage the prior save?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished">继续</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; will reload level &apos;%2&apos; as a duplicate column in the xsheet.
+
+Allow duplicate?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow All Dups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No to All Dups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide cursor size outline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show cursor size outline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fill In Empty Cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for the latest version on launch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing to replace: no cells or columns selected.</source>
+        <translation type="unfinished">没有可替换的: 没有帧格或者列被选中。</translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -9009,7 +9374,7 @@ The audio file will not be included in the rendered clip.</source>
     </message>
     <message>
         <source>Nothing to replace: no cells selected.</source>
-        <translation>没有可替换的: 没有帧格被选中。</translation>
+        <translation type="vanished">没有可替换的: 没有帧格被选中。</translation>
     </message>
     <message>
         <source>File not found
@@ -9030,7 +9395,7 @@ The audio file will not be included in the rendered clip.</source>
     </message>
     <message>
         <source>Nothing to replace: no cells or columns selected.</source>
-        <translation>没有可替换的: 没有帧格或者列被选中。</translation>
+        <translation type="vanished">没有可替换的: 没有帧格或者列被选中。</translation>
     </message>
 </context>
 <context>
@@ -10135,15 +10500,15 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Select </source>
-        <translation>选择 </translation>
+        <translation type="vanished">选择 </translation>
     </message>
     <message>
         <source>Show </source>
-        <translation>显示 </translation>
+        <translation type="vanished">显示 </translation>
     </message>
     <message>
         <source>Hide </source>
-        <translation>隐藏 </translation>
+        <translation type="vanished">隐藏 </translation>
     </message>
     <message>
         <source>Show / Hide</source>
@@ -10184,6 +10549,22 @@ Please commit or revert changes first.</source>
     <message>
         <source>All Drawings</source>
         <translation>全部笔画</translation>
+    </message>
+    <message>
+        <source>Show %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10330,6 +10711,38 @@ Please commit or revert changes first.</source>
     <message>
         <source>Shortcut Presets</source>
         <translation>快捷键预设</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">删除</translation>
+    </message>
+    <message>
+        <source>Save As</source>
+        <translation type="unfinished">另存为</translation>
+    </message>
+    <message>
+        <source>Search:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving Shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Setting Shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Preset Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset Name:</source>
+        <translation type="unfinished">预设名称:</translation>
     </message>
 </context>
 <context>
@@ -10822,6 +11235,13 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
 </context>
 <context>
+    <name>T</name>
+    <message>
+        <source>Nothing to replace: no cells or columns selected.</source>
+        <translation type="obsolete">没有可替换的: 没有帧格或者列被选中。</translation>
+    </message>
+</context>
+<context>
     <name>TApp</name>
     <message>
         <source>Error allocating memory: not enough memory.</source>
@@ -11005,6 +11425,30 @@ Click the arrow button to create a new sub-xsheet</source>
     <message>
         <source>&lt;&lt; Add</source>
         <translation>&lt;&lt; 添加</translation>
+    </message>
+    <message>
+        <source>Suspended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TaskUnknown</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11569,6 +12013,38 @@ Please refer to the user guide for details.</source>
         <source>Additional column settings</source>
         <translation>附加列设定</translation>
     </message>
+    <message>
+        <source>&amp;Insert Before</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Insert After</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste Insert Before</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste Insert After</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Insert Below</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Insert Above</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste Insert Below</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste Insert Above</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XsheetGUI::ColumnTransparencyPopup</name>
@@ -11768,7 +12244,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Zoom in/out of timeline</source>
-        <translation>放大/缩小时间轴</translation>
+        <translation type="vanished">放大/缩小时间轴</translation>
     </message>
 </context>
 </TS>

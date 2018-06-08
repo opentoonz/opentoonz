@@ -2955,10 +2955,10 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   m_colorParameterSelector->setFixedHeight(22);
 
   QMenu *menu   = new QMenu();
-  m_wheelAction = new QAction("Wheel", this);
-  m_hsvAction   = new QAction("HSV", this);
-  m_alphaAction = new QAction("Alpha", this);
-  m_rgbAction   = new QAction("RGB", this);
+  m_wheelAction = new QAction(tr("Wheel"), this);
+  m_hsvAction   = new QAction(tr("HSV"), this);
+  m_alphaAction = new QAction(tr("Alpha"), this);
+  m_rgbAction   = new QAction(tr("RGB"), this);
 
   m_wheelAction->setCheckable(true);
   m_hsvAction->setCheckable(true);
@@ -3306,8 +3306,8 @@ void StyleEditor::onStyleSwitched() {
       statusText = tr("[LEVEL]  ");
 
     // palette name
-    statusText +=
-        QString::fromStdWString(L" Palette : " + palette->getPaletteName());
+    statusText += tr("Palette") + " : " +
+                  QString::fromStdWString(palette->getPaletteName());
 
     // style name
     statusText += QString::fromStdWString(L" | #");

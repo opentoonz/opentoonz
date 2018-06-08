@@ -408,6 +408,34 @@
         <source>Toggle Autopaint Option  Palette : %1  Style#%2</source>
         <translation>含め塗りの切り替え : パレット %1  スタイル#%2</translation>
     </message>
+    <message>
+        <source>Can&apos;t undo rename palette</source>
+        <translation>パレットのリネーム操作を元に戻せません</translation>
+    </message>
+    <message>
+        <source>Can&apos;t undo move palette</source>
+        <translation>パレットの移動操作を元に戻せません</translation>
+    </message>
+    <message>
+        <source>Can&apos;t redo rename palette</source>
+        <translation>パレットのリネーム操作をやり直せません</translation>
+    </message>
+    <message>
+        <source>Can&apos;t redo move palette</source>
+        <translation>パレットの移動操作をやり直せません</translation>
+    </message>
+    <message>
+        <source>Rename Studio Palette : %1 &gt; %2</source>
+        <translation>スタジオパレットをリネーム : %1 &gt; %2</translation>
+    </message>
+    <message>
+        <source>Xsheet</source>
+        <translation>タイムシート</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation>タイムライン</translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

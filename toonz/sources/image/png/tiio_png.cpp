@@ -734,6 +734,10 @@ Tiio::PngWriterProperties::PngWriterProperties()
   bind(m_matte);
 }
 
+void Tiio::PngWriterProperties::updateTranslation() {
+  m_matte.setQStringName(tr("Alpha Channel"));
+}
+
 //=========================================================
 
 class PngWriter final : public Tiio::Writer {

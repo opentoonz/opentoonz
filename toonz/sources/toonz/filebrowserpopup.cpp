@@ -1581,7 +1581,8 @@ public:
     TCellSelection *cellSel     = dynamic_cast<TCellSelection *>(sel);
     TColumnSelection *columnSel = dynamic_cast<TColumnSelection *>(sel);
     if ((!cellSel && !columnSel) || sel->isEmpty()) {
-      DVGui::error(tr("Nothing to replace: no cells or columns selected."));
+      DVGui::error(
+          QObject::tr("Nothing to replace: no cells or columns selected."));
       return false;
     }
     if (cellSel) {
@@ -2142,12 +2143,13 @@ void BrowserPopupController::openPopup(QStringList filters,
     m_isExecute = false;
 }
 
-QString BrowserPopupController::getPath() {
+// codePath is set to true by default
+QString BrowserPopupController::getPath(bool codePath) {
   m_isExecute = false;
   if (!m_browserPopup) return QString();
-  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-  TFilePath fp      = m_browserPopup->getPath();
-  if (scene) fp     = scene->codeFilePath(fp);
+  ToonzScene *scene         = TApp::instance()->getCurrentScene()->getScene();
+  TFilePath fp              = m_browserPopup->getPath();
+  if (scene && codePath) fp = scene->codeFilePath(fp);
   std::cout << ::to_string(fp) << std::endl;
   return toQString(fp);
 }

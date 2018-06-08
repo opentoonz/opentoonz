@@ -94,37 +94,62 @@
         <translation>Удалить столбец</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="67"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="68"/>
         <source>Load into Current Palette  &gt; %1</source>
         <translation>Загрузка в текущую палитру  &gt; %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="110"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="111"/>
         <source>Replace with Current Palette  &gt; %1</source>
         <translation>Заменить текущую палитру  &gt; %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="137"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="138"/>
         <source>Delete Studio Palette  : %1</source>
         <translation>Удалить палитру Studio  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="164"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="165"/>
         <source>Create Studio Palette  : %1</source>
         <translation>Создать палитру Studio  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="209"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="210"/>
         <source>Delete Studio Palette Folder  : %1</source>
         <translation>Удалить папку палитры Studio  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="233"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="234"/>
         <source>Create Studio Palette Folder  : %1</source>
         <translation>Создать папку палитры Studio  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="257"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="254"/>
+        <source>Can&apos;t undo rename palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="255"/>
+        <source>Can&apos;t undo move palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="267"/>
+        <source>Can&apos;t redo rename palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="268"/>
+        <source>Can&apos;t redo move palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="281"/>
+        <source>Rename Studio Palette : %1 &gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="285"/>
         <source>Move Studio Palette Folder  : %1 : %2 &gt; %3</source>
         <translation>Изменить папку палитры Studio  : %1 : %2 &gt; %3</translation>
     </message>
@@ -159,32 +184,32 @@
         <translation>Загрузить цветовую %1 модель в палитру %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="910"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="891"/>
         <source>color model</source>
         <translation>Цветовая модель</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1032"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1059"/>
         <source>Move Page</source>
         <translation>Переместить страницу</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1083"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1110"/>
         <source>Rename Page  %1 &gt; %2</source>
         <translation>Переименовать страницу  %1 &gt; %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1147"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1174"/>
         <source>Rename Style#%1 in Palette%2  : %3 &gt; %4</source>
         <translation>Переименование стиля#%1 в палитре%2 : %3&gt;%4</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1212"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1239"/>
         <source>Set Picked Position of Style#%1 in Palette%2 : %3,%4</source>
         <translation>Установить выбранное расположение стиля#%1 в палитре%2 :%3,%4</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1290"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1318"/>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
         <translation>Обновление цветов с использованием выбранных расположений в палитре %1</translation>
     </message>
@@ -510,6 +535,16 @@
     <message>
         <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="314"/>
         <source>WhiteThres</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/orientation.cpp" line="67"/>
+        <source>Xsheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/orientation.cpp" line="127"/>
+        <source>Timeline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
