@@ -689,7 +689,11 @@ void SceneViewer::onPress(const TMouseEvent &event) {
 void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) {
-    m_tabletEvent = false;
+    // mouseRelease should not clear flag if we are starting or in middle of
+    // stroke
+    // initiated by tableEvent. All other cases, it's ok to clear flag
+    if (m_tabletState == Released || m_tabletState == None)
+      m_tabletEvent = false;
     return;
   }
   // for touchscreens but not touchpads...
@@ -771,11 +775,16 @@ void SceneViewer::onRelease(const TMouseEvent &event) {
 
 quit:
   m_mouseButton = Qt::NoButton;
-  m_tabletState = None;
-  m_tabletMove  = false;
-  m_pressure    = 0;
+  // If m_tabletState is "Touched", we've been called by tabletPress event.
+  // Don't clear it out table state so the tablePress event will process
+  // correctly.
+  if (m_tabletState != Touched) m_tabletState = None;
+  m_tabletMove                                = false;
+  m_pressure                                  = 0;
   // Leave m_tabletEvent as-is in order to check whether the onRelease is called
   // from tabletEvent or not in mouseReleaseEvent.
+  if (m_tabletState == Released)  // only clear if tabletRelease event
+    m_tabletEvent = false;
 }
 
 //-----------------------------------------------------------------------------
