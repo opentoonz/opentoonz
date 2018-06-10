@@ -2485,8 +2485,6 @@ void CellArea::paintEvent(QPaintEvent *event) {
     drawKeyframe(p, toBeUpdated);
   drawNotes(p, toBeUpdated);
 
-  if (getDragTool()) getDragTool()->drawCellsArea(p);
-
   // focus cell border
   int frameAdj = m_viewer->getFrameZoomAdjustment();
   int row      = m_viewer->getCurrentRow();
@@ -2498,7 +2496,11 @@ void CellArea::paintEvent(QPaintEvent *event) {
                    .adjusted(0, 0, -1 - frameAdj, 0);
   p.setPen(Qt::black);
   p.setBrush(Qt::NoBrush);
-  p.drawRect(rect);
+  for (int i = 0; i < 2; i++)  // thick border within cell
+    p.drawRect(QRect(rect.topLeft() + QPoint(i, i),
+                     rect.size() - QSize(2 * i, 2 * i)));
+
+  if (getDragTool()) getDragTool()->drawCellsArea(p);
 }
 
 //-----------------------------------------------------------------------------
