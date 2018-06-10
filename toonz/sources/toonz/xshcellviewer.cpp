@@ -2068,8 +2068,9 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     return;
   }
 
-  drawFrameSeparator(p, row, col, (!o->isVerticalTimeline() && sameLevel &&
-                                   prevCell.m_frameId == cell.m_frameId));
+  drawFrameSeparator(
+      p, row, col, (!o->isVerticalTimeline() && !isAfterMarkers && sameLevel &&
+                    prevCell.m_frameId == cell.m_frameId));
 
   int frameAdj   = m_viewer->getFrameZoomAdjustment();
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
