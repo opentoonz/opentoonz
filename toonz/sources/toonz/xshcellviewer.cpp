@@ -1812,6 +1812,10 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   // draw frame number
   else {
     if (m_viewer->getFrameZoomFactor() <= 50) {
+      // Lets not draw normal marker if there is a keyframe here
+      TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
+      if (pegbar->isKeyframe(row)) return;
+
       drawFrameMarker(p, QPoint(x, y), (isRed ? Qt::red : Qt::black));
       return;
     }
@@ -2131,6 +2135,9 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     p.setPen(oldPen);
   } else {
     if (m_viewer->getFrameZoomFactor() <= 50) {
+      // Lets not draw normal marker if there is a keyframe here
+      TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
+      if (pegbar->isKeyframe(row)) return;
       drawFrameMarker(p, QPoint(x, y), (isRed ? Qt::red : Qt::black));
       return;
     }
