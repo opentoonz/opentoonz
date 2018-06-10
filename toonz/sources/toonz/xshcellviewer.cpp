@@ -1045,7 +1045,8 @@ void CellArea::setDragTool(DragTool *dragTool) {
 }
 
 //-----------------------------------------------------------------------------
-void CellArea::drawFrameSeparator(QPainter &p, int row, int col) {
+void CellArea::drawFrameSeparator(QPainter &p, int row, int col,
+                                  bool shortSeparator) {
   int layerAxis = m_viewer->columnToLayerAxis(col);
 
   NumberRange layerAxisRange(layerAxis + 1,
@@ -1071,6 +1072,11 @@ void CellArea::drawFrameSeparator(QPainter &p, int row, int col) {
       frameAxis,
       layerAxisRange.adjusted(
           (m_viewer->orientation()->isVerticalTimeline() ? 0 : -1), 0));
+  if (shortSeparator) {
+    int x = horizontalLine.x1();
+    int y = horizontalLine.y2() - 1;
+    horizontalLine.setP1(QPoint(x, y));
+  }
   p.drawLine(horizontalLine);
 }
 
@@ -1659,9 +1665,8 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     return;
   }
 
-  if (o->isVerticalTimeline() || !sameLevel ||
-      prevCell.m_frameId != cell.m_frameId)
-    drawFrameSeparator(p, row, col);
+  drawFrameSeparator(p, row, col, (!o->isVerticalTimeline() && sameLevel &&
+                                   prevCell.m_frameId == cell.m_frameId));
 
   TXshCell nextCell;
   nextCell = xsh->getCell(row + 1, col);  // cell in next frame
@@ -1896,9 +1901,8 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
     return;
   }
 
-  if (o->isVerticalTimeline() || !sameLevel ||
-      prevCell.m_frameId != cell.m_frameId)
-    drawFrameSeparator(p, row, col);
+  drawFrameSeparator(p, row, col, (!o->isVerticalTimeline() && sameLevel &&
+                                   prevCell.m_frameId == cell.m_frameId));
 
   TXshCell nextCell;
   nextCell = xsh->getCell(row + 1, col);
@@ -2064,9 +2068,8 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     return;
   }
 
-  if (o->isVerticalTimeline() || isAfterMarkers || !sameLevel ||
-      prevCell.m_frameId != cell.m_frameId)
-    drawFrameSeparator(p, row, col);
+  drawFrameSeparator(p, row, col, (!o->isVerticalTimeline() && sameLevel &&
+                                   prevCell.m_frameId == cell.m_frameId));
 
   int frameAdj   = m_viewer->getFrameZoomAdjustment();
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
