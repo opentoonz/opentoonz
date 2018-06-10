@@ -2223,11 +2223,12 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
   const Orientation *o = m_viewer->orientation();
   int r0, r1, c0, c1;  // range of visible rows and columns
-  CellRange visible = m_viewer->xyRectToRange(toBeUpdated);
-  r0                = visible.from().frame();
-  r1                = visible.to().frame();
-  c0                = visible.from().layer();
-  c1                = visible.to().layer();
+  CellRange visible    = m_viewer->xyRectToRange(toBeUpdated);
+  QColor keyFrameColor = Qt::white, outline = Qt::black;
+  r0 = visible.from().frame();
+  r1 = visible.to().frame();
+  c0 = visible.from().layer();
+  c1 = visible.to().layer();
 
   static QPixmap selectedKey = svgToPixmap(":Resources/selected_key.svg");
   static QPixmap key         = svgToPixmap(":Resources/key.svg");
@@ -2276,8 +2277,7 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
               topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
-                                         m_viewer->getLightLineColor(),
-                                         m_viewer->getTextColor());
+                                         keyFrameColor, outline);
 
             topLeft = m_viewer->positionToXY(CellPosition(handleRow1, col));
             if (!o->isVerticalTimeline() &&
@@ -2285,8 +2285,7 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
               topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::END_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
-                                         m_viewer->getLightLineColor(),
-                                         m_viewer->getTextColor());
+                                         keyFrameColor, outline);
           }
         }
         // skip to next segment
@@ -2390,7 +2389,7 @@ void CellArea::drawKeyframeLine(QPainter &p, int col,
     end.setY(end.y() - 1);
   }
 
-  p.setPen(m_viewer->getTextColor());
+  p.setPen(Qt::white);
   p.drawLine(QLine(begin, end));
 }
 
