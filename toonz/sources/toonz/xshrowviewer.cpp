@@ -79,6 +79,14 @@ void RowArea::setDragTool(DragTool *dragTool) {
 
 void RowArea::drawRows(QPainter &p, int r0, int r1) {
   const Orientation *o = m_viewer->orientation();
+  int playR0, playR1, step;
+  XsheetGUI::getPlayRange(playR0, playR1, step);
+
+  if (!XsheetGUI::isPlayRangeEnabled()) {
+    TXsheet *xsh = m_viewer->getXsheet();
+    playR1       = xsh->getFrameCount() - 1;
+    playR0       = 0;
+  }
 
   QString fontName = Preferences::instance()->getInterfaceFont();
   if (fontName == "") {
@@ -146,10 +154,17 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
     p.drawLine(horizontalLine);
   }
 
-  p.setPen(m_viewer->getTextColor());
-
   int z = 0;
   for (int r = r0; r <= r1; r++) {
+    // draw frame text
+    if (playR0 <= r && r <= playR1) {
+      p.setPen(((r - m_r0) % step == 0) ? m_viewer->getPreviewFrameTextColor()
+                                        : m_viewer->getTextColor());
+    }
+    // not in preview range
+    else
+      p.setPen(m_viewer->getTextColor());
+
     QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
     if (!m_viewer->orientation()->isVerticalTimeline()) basePoint.setY(0);
     QRect labelRect = m_viewer->orientation()
