@@ -100,8 +100,9 @@ void XsheetViewer::getCellTypeAndColors(int &ltype, QColor &cellColor,
       sideColor = m_soundColumnBorderColor;
       break;
     case SND_TXT_XSHLEVEL:
-      cellColor = XsheetGUI::SoundTextColumnColor;
-      sideColor = XsheetGUI::SoundTextColumnBorderColor;
+      cellColor = (isSelected) ? getSelectedSoundTextColumnColor()
+                               : getSoundTextColumnColor();
+      sideColor = getSoundTextColumnBorderColor();
       break;
     case MESH_XSHLEVEL:
       cellColor =

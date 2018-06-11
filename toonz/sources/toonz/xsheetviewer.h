@@ -325,6 +325,18 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
                  setMeshColumnBorderColor)
   Q_PROPERTY(QColor SelectedMeshColumnColor READ getSelectedMeshColumnColor
                  WRITE setSelectedMeshColumnColor)
+  // SoundText column
+  QColor m_soundTextColumnColor;
+  QColor m_soundTextColumnBorderColor;
+  QColor m_selectedSoundTextColumnColor;
+  Q_PROPERTY(QColor SoundTextColumnColor READ getSoundTextColumnColor WRITE
+                 setSoundTextColumnColor)
+  Q_PROPERTY(
+      QColor SoundTextColumnBorderColor READ getSoundTextColumnBorderColor WRITE
+          setSoundTextColumnBorderColor)
+  Q_PROPERTY(
+      QColor SelectedSoundTextColumnColor READ getSelectedSoundTextColumnColor
+          WRITE setSelectedSoundTextColumnColor)
   // Sound column
   QColor m_soundColumnColor;
   QColor m_soundColumnBorderColor;
@@ -846,6 +858,23 @@ public:
   QColor getMeshColumnBorderColor() const { return m_meshColumnBorderColor; }
   QColor getSelectedMeshColumnColor() const {
     return m_selectedMeshColumnColor;
+  }
+  // SoundText column
+  void setSoundTextColumnColor(const QColor &color) {
+    m_soundTextColumnColor = color;
+  }
+  void setSoundTextColumnBorderColor(const QColor &color) {
+    m_soundTextColumnBorderColor = color;
+  }
+  void setSelectedSoundTextColumnColor(const QColor &color) {
+    m_selectedSoundTextColumnColor = color;
+  }
+  QColor getSoundTextColumnColor() const { return m_soundTextColumnColor; }
+  QColor getSoundTextColumnBorderColor() const {
+    return m_soundTextColumnBorderColor;
+  }
+  QColor getSelectedSoundTextColumnColor() const {
+    return m_selectedSoundTextColumnColor;
   }
   // Sound column
   QColor getSoundColumnHlColor() const { return m_soundColumnHlColor; }
