@@ -17,7 +17,7 @@ const int PLAY_MARKER_SIZE   = 10;
 const int ONION_SIZE         = 19;
 const int ONION_DOT_SIZE     = 8;
 const int PINNED_SIZE        = 10;
-const int FRAME_MARKER_SIZE  = 5;
+const int FRAME_MARKER_SIZE  = 4;
 const int FOLDED_CELL_SIZE   = 9;
 }
 
