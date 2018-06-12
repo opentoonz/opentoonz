@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation>回転:</translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation>テーブル</translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>

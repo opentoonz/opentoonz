@@ -1309,7 +1309,7 @@ void FxSettings::changeTitleBar(TFx *fx) {
   QDialog *popup = dynamic_cast<QDialog *>(parentWidget());
   if (!popup) return;
 
-  QString titleText("Fx Settings");
+  QString titleText(tr("Fx Settings"));
   if (fx) {
     titleText += tr(" : ");
     titleText += QString::fromStdWString(fx->getName());

@@ -1263,6 +1263,10 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <source> : </source>
         <translation> : </translation>
     </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation>エフェクト設定</translation>
+    </message>
 </context>
 <context>
     <name>FxXSheetPainter</name>

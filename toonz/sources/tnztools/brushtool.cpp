@@ -1351,6 +1351,8 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     } else
       addTrackPoint(TThickPoint(pos, thickness),
                     getPixelSize() * getPixelSize());
+    TRectD invalidateRect = m_track.getLastModifiedRegion();
+    invalidate(invalidateRect.enlarge(2));
   }
 
   // updating m_brushPos is needed to refresh viewer properly
@@ -1487,6 +1489,14 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
             ? computeThickness(e.m_pressure, m_thickness, m_isPath)
             : m_thickness.getValue().second * 0.5;
 
+    TRectD invalidateRect;
+    TPointD halfThick(m_maxThick * 0.5, m_maxThick * 0.5);
+
+    // In order to clear the previous snap mark
+    if (m_foundLastSnap)
+      invalidateRect +=
+          TRectD(m_lastSnapPoint - halfThick, m_lastSnapPoint + halfThick);
+
     m_currThickness = thickness;
 
     m_mousePos       = pos;
@@ -1495,22 +1505,28 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     m_foundFirstSnap = false;
     m_snapSelf       = false;
     m_altPressed     = e.isAltPressed() && !e.isCtrlPressed();
+
     checkStrokeSnapping(false, m_altPressed);
     checkGuideSnapping(false, m_altPressed);
     m_brushPos = m_lastSnapPoint;
+
+    if (m_foundLastSnap)
+      invalidateRect +=
+          TRectD(m_lastSnapPoint - halfThick, m_lastSnapPoint + halfThick);
 
     if (e.isShiftPressed()) {
       m_smoothStroke.clearPoints();
       m_track.add(TThickPoint(m_brushPos, thickness),
                   getPixelSize() * getPixelSize());
       m_track.removeMiddlePoints();
-    }
-
-    else if (m_dragDraw)
+      invalidateRect += m_track.getModifiedRegion();
+    } else if (m_dragDraw) {
       addTrackPoint(TThickPoint(pos, thickness),
                     getPixelSize() * getPixelSize());
+      invalidateRect += m_track.getLastModifiedRegion();
+    }
 
-    invalidate();
+    if (!invalidateRect.isEmpty()) invalidate(invalidateRect.enlarge(2));
   }
 }
 
@@ -1679,6 +1695,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
           resetFrameRange();
         }
       }
+      invalidate();
     } else {
       if (m_snapSelf) {
         stroke->setSelfLoop(true);
@@ -1687,7 +1704,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
                        m_isFrameCreated, m_isLevelCreated);
       TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
-      invalidate();
+      invalidate();  // should use bbox?
     }
     assert(stroke);
     m_track.clear();

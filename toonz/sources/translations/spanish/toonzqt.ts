@@ -167,11 +167,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>A/R</source>
-        <translation type="unfinished"></translation>
+        <translation>Proporción</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="unfinished">&lt;personalizado&gt;</translation>
+        <translation>&lt;personalizada&gt;</translation>
     </message>
 </context>
 <context>
@@ -263,26 +263,26 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>ComboHistoRGBLabel</name>
     <message>
         <source>R:%1 G:%2 B:%3</source>
-        <translation type="unfinished"></translation>
+        <translation>R:%1 V:%2 A:%3</translation>
     </message>
 </context>
 <context>
     <name>ComboHistogram</name>
     <message>
         <source>Picked Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Color seleccionado</translation>
     </message>
     <message>
         <source>Average Color (Ctrl + Drag)</source>
-        <translation type="unfinished"></translation>
+        <translation>Color promedio (Ctrl + arrastrar)</translation>
     </message>
     <message>
         <source>X:</source>
-        <translation type="unfinished">X:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <source>Y:</source>
-        <translation type="unfinished">Y:</translation>
+        <translation>Y:</translation>
     </message>
 </context>
 <context>
@@ -335,19 +335,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>DVGui::ColorField</name>
     <message>
         <source>R:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>G:</source>
-        <translation type="unfinished"></translation>
+        <translation>V:</translation>
     </message>
     <message>
         <source>B:</source>
-        <translation type="unfinished"></translation>
+        <translation>A:</translation>
     </message>
     <message>
         <source>A:</source>
-        <translation type="unfinished"></translation>
+        <translation>α:</translation>
     </message>
 </context>
 <context>
@@ -417,7 +417,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>DVGui::StyleIndexLineEdit</name>
     <message>
         <source>current</source>
-        <translation type="unfinished"></translation>
+        <translation>actual</translation>
     </message>
 </context>
 <context>
@@ -790,7 +790,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Fit</source>
-        <translation>Ajustar</translation>
+        <translation>Ajustar a ventana</translation>
     </message>
     <message>
         <source>Similar Shape Interpolation</source>
@@ -822,7 +822,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Frame Based</source>
-        <translation>Basada en fotogramas</translation>
+        <translation>Por fotogramas</translation>
     </message>
     <message>
         <source>Curve Shape</source>
@@ -933,7 +933,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step</source>
-        <translation>Intervalo</translation>
+        <translation>Exposición</translation>
     </message>
 </context>
 <context>
@@ -1028,15 +1028,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>FunctionTreeModel</name>
     <message>
         <source>Stage</source>
-        <translation type="unfinished"></translation>
+        <translation>Escenario</translation>
     </message>
     <message>
         <source>FX</source>
-        <translation type="unfinished"></translation>
+        <translation>Efectos</translation>
     </message>
     <message>
         <source>Plastic Skeleton</source>
-        <translation type="unfinished"></translation>
+        <translation>Esqueleto de Plástico</translation>
     </message>
 </context>
 <context>
@@ -1059,11 +1059,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Show All</source>
-        <translation>Mostrar todo</translation>
+        <translation>Mostrar todos</translation>
     </message>
     <message>
         <source>Table</source>
-        <translation type="unfinished">Mesa</translation>
+        <translation>Mesa</translation>
     </message>
 </context>
 <context>
@@ -1263,6 +1263,10 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
         <source> : </source>
         <translation> : </translation>
     </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FxXSheetPainter</name>
@@ -1298,27 +1302,27 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Value</source>
-        <translation type="unfinished">Valor</translation>
+        <translation>Valor</translation>
     </message>
     <message>
         <source>RGB</source>
-        <translation type="unfinished">RVA</translation>
+        <translation>RVA</translation>
     </message>
     <message>
         <source>Red</source>
-        <translation type="unfinished">Rojo</translation>
+        <translation>Rojo</translation>
     </message>
     <message>
         <source>Green</source>
-        <translation type="unfinished">Verde</translation>
+        <translation>Verde</translation>
     </message>
     <message>
         <source>Blue</source>
-        <translation type="unfinished">Azul</translation>
+        <translation>Azul</translation>
     </message>
     <message>
         <source>Alpha</source>
-        <translation type="unfinished">Alfa</translation>
+        <translation>Alfa</translation>
     </message>
 </context>
 <context>
@@ -1451,7 +1455,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Level Palette: </source>
-        <translation>Paleta del nivel: </translation>
+        <translation>Paleta de nivel: </translation>
     </message>
     <message>
         <source>Cleanup Palette</source>
@@ -2206,7 +2210,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>Frame Offset:</source>
-        <translation>Desplaz. de fotogramas:</translation>
+        <translation>Desplazamiento de fotogramas:</translation>
     </message>
     <message>
         <source>There is a syntax error in the definition of the interpolation.</source>
@@ -2493,23 +2497,23 @@ Autom</translation>
     </message>
     <message>
         <source>Wheel</source>
-        <translation type="unfinished">Muestra</translation>
+        <translation>Muestra</translation>
     </message>
     <message>
         <source>HSV</source>
-        <translation type="unfinished">TSV</translation>
+        <translation>TSV</translation>
     </message>
     <message>
         <source>Alpha</source>
-        <translation type="unfinished">Alfa</translation>
+        <translation>Alfa</translation>
     </message>
     <message>
         <source>RGB</source>
-        <translation type="unfinished">RVA</translation>
+        <translation>RVA</translation>
     </message>
     <message>
         <source>Palette</source>
-        <translation type="unfinished">Paleta</translation>
+        <translation>Paleta</translation>
     </message>
 </context>
 <context>
@@ -2570,7 +2574,7 @@ Autom</translation>
     <name>StyleEditorGUI::SettingsPage</name>
     <message>
         <source>Autopaint for Lines</source>
-        <translation>Pintar automáticamente al rellenar</translation>
+        <translation>Pintar (líneas) automáticamente al rellenar</translation>
     </message>
     <message>
         <source>Reset to default</source>

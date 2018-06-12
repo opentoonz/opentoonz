@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation>Rotación:</translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
@@ -148,7 +152,7 @@
     </message>
     <message>
         <source>Smooth:</source>
-        <translation>Suavizado:</translation>
+        <translation>Estabilidad:</translation>
     </message>
     <message>
         <source>Range:</source>
@@ -272,7 +276,7 @@
     <name>DVGui::StyleIndexLineEdit</name>
     <message>
         <source>current</source>
-        <translation type="unfinished"></translation>
+        <translation>actual</translation>
     </message>
 </context>
 <context>
@@ -399,7 +403,7 @@
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Todo</translation>
     </message>
 </context>
 <context>
@@ -529,7 +533,7 @@
     </message>
     <message>
         <source>Maximum Gap</source>
-        <translation type="unfinished"></translation>
+        <translation>Hueco máximo</translation>
     </message>
 </context>
 <context>
@@ -563,7 +567,7 @@
     </message>
     <message>
         <source>Preset:</source>
-        <translation>Ajuste:</translation>
+        <translation>Ajustes:</translation>
     </message>
     <message>
         <source>Size</source>
@@ -587,7 +591,7 @@
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="unfinished">&lt;personalizado&gt;</translation>
+        <translation>&lt;personalizado&gt;</translation>
     </message>
 </context>
 <context>
@@ -931,7 +935,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Polyline</source>
-        <translation>Pluma</translation>
+        <translation>Curva Bézier</translation>
     </message>
     <message>
         <source>Arc</source>
@@ -1187,7 +1191,7 @@ Do you want to proceed?</source>
     <name>RGBPickerToolOptionsBox</name>
     <message>
         <source>Pick Screen</source>
-        <translation>Seleccionar desde pantalla</translation>
+        <translation>Seleccionar desde la pantalla</translation>
     </message>
 </context>
 <context>
@@ -1245,14 +1249,14 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>current</source>
-        <translation type="unfinished"></translation>
+        <translation>actual</translation>
     </message>
 </context>
 <context>
     <name>RotateTool</name>
     <message>
         <source>Rotate On Camera Center</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotaren torno al centro de la cámara</translation>
     </message>
 </context>
 <context>
@@ -1260,32 +1264,32 @@ Do you want to proceed?</source>
     <message>
         <source>X:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished">X:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <source>Y:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished">Y:</translation>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>W:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ancho:</translation>
     </message>
     <message>
         <source>H:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished">H:</translation>
+        <translation>Altura:</translation>
     </message>
     <message>
         <source>A:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ángulo:</translation>
     </message>
     <message>
         <source>L:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished"></translation>
+        <translation>Longitud:</translation>
     </message>
 </context>
 <context>

@@ -507,23 +507,23 @@ Do you want to crop the canvas?</source>
     </message>
     <message>
         <source>pixel</source>
-        <translation type="unfinished">píxeles</translation>
+        <translation>píxeles</translation>
     </message>
     <message>
         <source>mm</source>
-        <translation type="unfinished">mm</translation>
+        <translation>mm</translation>
     </message>
     <message>
         <source>cm</source>
-        <translation type="unfinished">cm</translation>
+        <translation>cm</translation>
     </message>
     <message>
         <source>field</source>
-        <translation type="unfinished">campos</translation>
+        <translation>campos</translation>
     </message>
     <message>
         <source>inch</source>
-        <translation type="unfinished">pulgadas</translation>
+        <translation>pulgadas</translation>
     </message>
 </context>
 <context>
@@ -832,7 +832,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>None</source>
-        <translation>Ninguno</translation>
+        <translation>no</translation>
     </message>
     <message>
         <source>Morphological</source>
@@ -1233,11 +1233,11 @@ What do you want to do? </source>
     </message>
     <message>
         <source>Start:</source>
-        <translation>Inicio:</translation>
+        <translation>                         Inicio:</translation>
     </message>
     <message>
         <source>Save in:</source>
-        <translation>Guardar en:</translation>
+        <translation>               Guardar en:</translation>
     </message>
     <message>
         <source>Options</source>
@@ -1261,7 +1261,7 @@ What do you want to do? </source>
     </message>
     <message>
         <source>Bg Color:</source>
-        <translation>Color de fondo:</translation>
+        <translation>        Color de fondo:</translation>
     </message>
     <message>
         <source>Skip Existing Files</source>
@@ -1313,7 +1313,7 @@ What do you want to do? </source>
     </message>
     <message>
         <source>File to convert:</source>
-        <translation>Archivo a convertir:</translation>
+        <translation> Archivo a convertir:</translation>
     </message>
     <message>
         <source>Output Name:</source>
@@ -1429,7 +1429,7 @@ What do you want to do? </source>
     </message>
     <message>
         <source>  End:</source>
-        <translation>Fin:</translation>
+        <translation>  Fin:</translation>
     </message>
     <message>
         <source>File Name:</source>
@@ -1881,11 +1881,11 @@ contuviera información de PPP, entonces se usarán los de la cámara actual.
     </message>
     <message>
         <source>Width: </source>
-        <translation type="unfinished"></translation>
+        <translation>Ancho: </translation>
     </message>
     <message>
         <source>Height: </source>
-        <translation type="unfinished"></translation>
+        <translation>Altura: </translation>
     </message>
 </context>
 <context>
@@ -2294,11 +2294,11 @@ Do you want to overwrite it?</source>
     <name>FlipbookPanel</name>
     <message>
         <source>Safe Area (Right Click to Select)</source>
-        <translation type="unfinished">Áreas de seguridad (clic derecho para seleccionar)</translation>
+        <translation>Áreas de seguridad (clic derecho para seleccionar)</translation>
     </message>
     <message>
         <source>Minimize</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimizar</translation>
     </message>
 </context>
 <context>
@@ -2309,7 +2309,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Configure Codec</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurar</translation>
     </message>
 </context>
 <context>
@@ -2626,19 +2626,19 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Toonz Vector Level</source>
-        <translation type="unfinished">Nivel vectorial de Toonz</translation>
+        <translation>Nivel vectorial de Toonz</translation>
     </message>
     <message>
         <source>Toonz Raster Level</source>
-        <translation type="unfinished">Nivel de imagen de Toonz</translation>
+        <translation>Nivel de imagen de Toonz</translation>
     </message>
     <message>
         <source>Raster Level</source>
-        <translation type="unfinished">Nivel de imagen</translation>
+        <translation>Nivel de imagen</translation>
     </message>
     <message>
         <source>Scan Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivel de escaneo</translation>
     </message>
 </context>
 <context>
@@ -2737,39 +2737,39 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Image DPI</source>
-        <translation type="unfinished"></translation>
+        <translation>PPP de la imagen</translation>
     </message>
     <message>
         <source>Custom DPI</source>
-        <translation type="unfinished"></translation>
+        <translation>PPP personalizados</translation>
     </message>
     <message>
         <source>Scan level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivel de escaneo</translation>
     </message>
     <message>
         <source>Toonz Vector level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivel vectorial</translation>
     </message>
     <message>
         <source>Toonz Raster level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivel de imagen de Toonz</translation>
     </message>
     <message>
         <source>Raster level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivel de imagen</translation>
     </message>
     <message>
         <source>Mesh level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivel de malla</translation>
     </message>
     <message>
         <source>Palette level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivel de paleta</translation>
     </message>
     <message>
         <source>Sound Column</source>
-        <translation type="unfinished"></translation>
+        <translation>Columna de sonido</translation>
     </message>
 </context>
 <context>
@@ -3612,7 +3612,7 @@ Usar los números de fotograma como referencia.</translation>
     </message>
     <message>
         <source>&amp;Level Settings...</source>
-        <translation>&amp;Opciones del nivel...</translation>
+        <translation>&amp;Opciones de nivel...</translation>
     </message>
     <message>
         <source>&amp;Brightness and Contrast...</source>
@@ -4264,19 +4264,19 @@ Usar los números de fotograma como referencia.</translation>
     </message>
     <message>
         <source>Magnet Tool</source>
-        <translation>Imán</translation>
+        <translation>Imantar</translation>
     </message>
     <message>
         <source>Bender Tool</source>
-        <translation>Pinza</translation>
+        <translation>Doblar</translation>
     </message>
     <message>
         <source>Iron Tool</source>
-        <translation>Plancha</translation>
+        <translation>Planchar</translation>
     </message>
     <message>
         <source>Cutter Tool</source>
-        <translation>Trincheta</translation>
+        <translation>Cortar</translation>
     </message>
     <message>
         <source>Skeleton Tool</source>
@@ -7284,39 +7284,39 @@ También, se establecerá el destino inicial de salida para las nuevas escenas e
     </message>
     <message>
         <source>Small</source>
-        <translation type="unfinished">Pequeñas</translation>
+        <translation>Pequeño</translation>
     </message>
     <message>
         <source>Large</source>
-        <translation type="unfinished">Grandes</translation>
+        <translation>Grande</translation>
     </message>
     <message>
         <source>Crosshair</source>
-        <translation type="unfinished"></translation>
+        <translation>Mira</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Predefinido</translation>
     </message>
     <message>
         <source>Left-Handed</source>
-        <translation type="unfinished"></translation>
+        <translation>Para zurdos</translation>
     </message>
     <message>
         <source>Simple</source>
-        <translation type="unfinished"></translation>
+        <translation>Simple</translation>
     </message>
     <message>
         <source>Classic</source>
-        <translation type="unfinished"></translation>
+        <translation>Clásico</translation>
     </message>
     <message>
         <source>Classic-revised</source>
-        <translation type="unfinished"></translation>
+        <translation>Clásico-revisado</translation>
     </message>
     <message>
         <source>Compact</source>
-        <translation type="unfinished"></translation>
+        <translation>Compacto</translation>
     </message>
 </context>
 <context>
@@ -9196,7 +9196,7 @@ Allow duplicate?</source>
     </message>
     <message>
         <source>Nothing to replace: no cells or columns selected.</source>
-        <translation type="unfinished">Nada que reemplazar: no se han seleccionado acetatos o columnas.</translation>
+        <translation>Nada que reemplazar: no se han seleccionado acetatos o columnas.</translation>
     </message>
 </context>
 <context>
@@ -10515,19 +10515,19 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Show %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar %1</translation>
     </message>
     <message>
         <source>Hide %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocultar %1</translation>
     </message>
     <message>
         <source>Table</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesa</translation>
     </message>
     <message>
         <source>Select %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar %1</translation>
     </message>
 </context>
 <context>
@@ -10677,35 +10677,35 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Borrar</translation>
+        <translation>Borrar</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation type="unfinished">Guardar como</translation>
+        <translation>Guardar como</translation>
     </message>
     <message>
         <source>Search:</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar:</translation>
     </message>
     <message>
         <source>Preset:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes:</translation>
     </message>
     <message>
         <source>Saving Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardando atajos</translation>
     </message>
     <message>
         <source>Setting Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Estableciendo atajos</translation>
     </message>
     <message>
         <source>Enter Preset Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingresar nombre del ajuste</translation>
     </message>
     <message>
         <source>Preset Name:</source>
-        <translation type="unfinished">Nombre del ajuste:</translation>
+        <translation>Nombre del ajuste:</translation>
     </message>
 </context>
 <context>
@@ -11319,27 +11319,27 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Suspended</source>
-        <translation type="unfinished"></translation>
+        <translation>En suspenso</translation>
     </message>
     <message>
         <source>Waiting</source>
-        <translation type="unfinished"></translation>
+        <translation>Esperando</translation>
     </message>
     <message>
         <source>Running</source>
-        <translation type="unfinished"></translation>
+        <translation>Ejecutándose</translation>
     </message>
     <message>
         <source>Completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Completada</translation>
     </message>
     <message>
         <source>Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallida</translation>
     </message>
     <message>
         <source>TaskUnknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarea desconocida</translation>
     </message>
 </context>
 <context>
@@ -11388,7 +11388,7 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>&amp;Add Cleanup Task</source>
-        <translation>&amp;Agregr tarea de limpieza</translation>
+        <translation>&amp;Agregar tarea de limpieza</translation>
     </message>
     <message>
         <source>&amp;Save Task List</source>
@@ -11519,7 +11519,7 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Variable Region Size</source>
-        <translation>Tamaño variable de región</translation>
+        <translation>Regiones de tamaño variable</translation>
     </message>
     <message>
         <source>Include Background</source>
@@ -11622,11 +11622,11 @@ Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
         <source>Start:</source>
-        <translation>Inicio:</translation>
+        <translation>Inicial:</translation>
     </message>
     <message>
         <source>End:</source>
-        <translation>Fin:</translation>
+        <translation>Final:</translation>
     </message>
     <message>
         <source>Thickness Calibration</source>

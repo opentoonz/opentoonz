@@ -176,6 +176,44 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     </message>
 </context>
 <context>
+    <name>SvgWriterProperties</name>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1954"/>
+        <source>Stroke Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1955"/>
+        <source>Outline Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1956"/>
+        <source>Centerline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1957"/>
+        <source>Outline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1958"/>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1959"/>
+        <source>Medium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1960"/>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TgaWriterProperties</name>
     <message>
         <location filename="../../image/tga/tiio_tga.cpp" line="523"/>

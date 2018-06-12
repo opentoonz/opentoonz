@@ -1396,6 +1396,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <translation>&amp;Клетчатый фон</translation>
     </message>
     <message>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1312"/>
+        <source>Fx Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../toonzqt/fxsettings.cpp" line="1314"/>
         <source> : </source>
         <translation> : </translation>

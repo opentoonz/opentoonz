@@ -805,6 +805,9 @@ void PlasticTool::removeSkeleton(int skelId) {
   clearSkeletonSelections();
 
   if (m_sd) {
+    // in order to solve the crash issue #1967, try releasing deformer data here
+    PlasticDeformerStorage::instance()->releaseSkeletonData(
+        stageObject()->getPlasticSkeletonDeformation().getPointer(), skelId);
     m_sd->detach(skelId);
     if (m_sd->empty())
       stageObject()->setPlasticSkeletonDeformation(

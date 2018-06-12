@@ -10868,7 +10868,7 @@ Visit the Web site for more information.</source>
         <translation>https://opentoonz.github.io/e/</translation>
     </message>
     <message>
-        <location filename="../../toonz/main.cpp" line="116"/>
+        <location filename="../../toonz/main.cpp" line="117"/>
         <source>Installing %1 again could fix the problem.</source>
         <translation>Установка %1 снова может устранить проблему.</translation>
     </message>

@@ -1057,7 +1057,9 @@ void ArrowToolOptionsBox::updateStageObjectComboItems() {
     }
 
     TStageObject *pegbar = xsh->getStageObject(id);
-    QString itemName     = QString::fromStdString(pegbar->getName());
+    QString itemName     = (id.isTable())
+                           ? tr("Table")
+                           : QString::fromStdString(pegbar->getName());
     // store the item with ObjectId data
     m_currentStageObjectCombo->addItem(itemName, (int)id.getCode());
   }

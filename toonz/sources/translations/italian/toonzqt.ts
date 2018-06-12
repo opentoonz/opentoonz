@@ -1259,6 +1259,10 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
         <source> : </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FxXSheetPainter</name>

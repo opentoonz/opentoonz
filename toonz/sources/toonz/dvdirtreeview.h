@@ -91,6 +91,7 @@ public:
   void enableCommands() override;
 
   void enableGlobalSelection(bool enabled) {
+    if (!enabled) makeNotCurrent();
     m_globalSelectionEnabled = enabled;
   }
 

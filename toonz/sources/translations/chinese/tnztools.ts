@@ -5,7 +5,7 @@
     <name>ArrowToolOptionsBox</name>
     <message>
         <source>Pick:</source>
-        <translation>选取:</translation>
+        <translation>拾取:</translation>
     </message>
     <message>
         <source>Position</source>
@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation>旋转:</translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation>动画台</translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
@@ -124,7 +128,7 @@
     </message>
     <message>
         <source>Join</source>
-        <translation>边角</translation>
+        <translation>连接</translation>
     </message>
     <message>
         <source>Miter:</source>
@@ -160,79 +164,79 @@
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;定制&gt;</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <source>Linear</source>
-        <translation type="unfinished"></translation>
+        <translation>线性</translation>
     </message>
     <message>
         <source>In</source>
-        <translation type="unfinished"></translation>
+        <translation>内</translation>
     </message>
     <message>
         <source>Out</source>
-        <translation type="unfinished"></translation>
+        <translation>外</translation>
     </message>
     <message>
         <source>In&amp;Out</source>
-        <translation type="unfinished"></translation>
+        <translation>内&amp;外</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>高</translation>
     </message>
     <message>
         <source>Butt cap</source>
-        <translation type="unfinished"></translation>
+        <translation>平头</translation>
     </message>
     <message>
         <source>Round cap</source>
-        <translation type="unfinished"></translation>
+        <translation>圆头</translation>
     </message>
     <message>
         <source>Projecting cap</source>
-        <translation type="unfinished"></translation>
+        <translation>方头</translation>
     </message>
     <message>
         <source>Miter join</source>
-        <translation type="unfinished"></translation>
+        <translation>斜接连接</translation>
     </message>
     <message>
         <source>Round join</source>
-        <translation type="unfinished"></translation>
+        <translation>圆角连接</translation>
     </message>
     <message>
         <source>Bevel join</source>
-        <translation type="unfinished"></translation>
+        <translation>斜角连接</translation>
     </message>
     <message>
         <source>Med</source>
-        <translation type="unfinished"></translation>
+        <translation>中</translation>
     </message>
     <message>
         <source>Draw Order:</source>
-        <translation type="unfinished"></translation>
+        <translation>绘制顺序:</translation>
     </message>
     <message>
         <source>Over All</source>
-        <translation type="unfinished"></translation>
+        <translation>在最上</translation>
     </message>
     <message>
         <source>Under All</source>
-        <translation type="unfinished"></translation>
+        <translation>在最下</translation>
     </message>
     <message>
         <source>Palette Order</source>
-        <translation type="unfinished"></translation>
+        <translation>按调色板顺序</translation>
     </message>
 </context>
 <context>
@@ -272,7 +276,7 @@
     <name>DVGui::StyleIndexLineEdit</name>
     <message>
         <source>current</source>
-        <translation type="unfinished"></translation>
+        <translation>当前</translation>
     </message>
 </context>
 <context>
@@ -367,39 +371,39 @@
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>无</translation>
     </message>
     <message>
         <source>A/R</source>
-        <translation type="unfinished"></translation>
+        <translation>A/R</translation>
     </message>
     <message>
         <source>Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>大量</translation>
     </message>
     <message>
         <source>Column</source>
-        <translation type="unfinished"></translation>
+        <translation>列</translation>
     </message>
     <message>
         <source>Pegbar</source>
-        <translation type="unfinished"></translation>
+        <translation>定位尺</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation type="unfinished">位置</translation>
+        <translation>位置</translation>
     </message>
     <message>
         <source>Scale</source>
-        <translation type="unfinished">缩放</translation>
+        <translation>缩放</translation>
     </message>
     <message>
         <source>Center</source>
-        <translation type="unfinished">中心点</translation>
+        <translation>中心点</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>全部</translation>
     </message>
 </context>
 <context>
@@ -438,31 +442,31 @@
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished">正常</translation>
+        <translation>正常</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation type="unfinished">矩形</translation>
+        <translation>矩形</translation>
     </message>
     <message>
         <source>Freehand</source>
-        <translation type="unfinished">手绘</translation>
+        <translation>手绘</translation>
     </message>
     <message>
         <source>Polyline</source>
-        <translation type="unfinished">多边形</translation>
+        <translation>折线</translation>
     </message>
     <message>
         <source>Lines</source>
-        <translation type="unfinished">线</translation>
+        <translation>线</translation>
     </message>
     <message>
         <source>Areas</source>
-        <translation type="unfinished">区域</translation>
+        <translation>区域</translation>
     </message>
     <message>
         <source>Lines &amp; Areas</source>
-        <translation type="unfinished"></translation>
+        <translation>线和区域</translation>
     </message>
 </context>
 <context>
@@ -521,7 +525,7 @@
     </message>
     <message>
         <source>Polyline</source>
-        <translation>多边形</translation>
+        <translation>折线</translation>
     </message>
     <message>
         <source>Autopaint Lines</source>
@@ -529,11 +533,11 @@
     </message>
     <message>
         <source>Lines &amp; Areas</source>
-        <translation type="unfinished"></translation>
+        <translation>线和区域</translation>
     </message>
     <message>
         <source>Maximum Gap</source>
-        <translation type="unfinished"></translation>
+        <translation>最大间隙</translation>
     </message>
 </context>
 <context>
@@ -591,7 +595,7 @@
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;定制&gt;</translation>
     </message>
 </context>
 <context>
@@ -622,19 +626,19 @@
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished">正常</translation>
+        <translation>正常</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation type="unfinished">矩形</translation>
+        <translation>矩形</translation>
     </message>
     <message>
         <source>Freehand</source>
-        <translation type="unfinished">手绘</translation>
+        <translation>手绘</translation>
     </message>
     <message>
         <source>Polyline</source>
-        <translation type="unfinished">多边形</translation>
+        <translation>折线</translation>
     </message>
 </context>
 <context>
@@ -667,15 +671,15 @@
     </message>
     <message>
         <source>Lines</source>
-        <translation type="unfinished">线</translation>
+        <translation>线</translation>
     </message>
     <message>
         <source>Areas</source>
-        <translation type="unfinished">区域</translation>
+        <translation>区域</translation>
     </message>
     <message>
         <source>Lines &amp; Areas</source>
-        <translation type="unfinished"></translation>
+        <translation>线和区域</translation>
     </message>
 </context>
 <context>
@@ -903,11 +907,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Join</source>
-        <translation>边角</translation>
+        <translation>连接</translation>
     </message>
     <message>
         <source>Miter:</source>
-        <translation>斜接比例:</translation>
+        <translation>斜角比例:</translation>
     </message>
     <message>
         <source>Size:</source>
@@ -919,67 +923,67 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Rectangle</source>
-        <translation type="unfinished"></translation>
+        <translation>矩形</translation>
     </message>
     <message>
         <source>Circle</source>
-        <translation type="unfinished"></translation>
+        <translation>圆</translation>
     </message>
     <message>
         <source>Ellipse</source>
-        <translation type="unfinished"></translation>
+        <translation>椭圆</translation>
     </message>
     <message>
         <source>Line</source>
-        <translation type="unfinished"></translation>
+        <translation>线</translation>
     </message>
     <message>
         <source>Polyline</source>
-        <translation type="unfinished">多边形</translation>
+        <translation>折线</translation>
     </message>
     <message>
         <source>Arc</source>
-        <translation type="unfinished"></translation>
+        <translation>弧</translation>
     </message>
     <message>
         <source>Polygon</source>
-        <translation type="unfinished"></translation>
+        <translation>多边形</translation>
     </message>
     <message>
         <source>Butt cap</source>
-        <translation type="unfinished"></translation>
+        <translation>平头</translation>
     </message>
     <message>
         <source>Round cap</source>
-        <translation type="unfinished"></translation>
+        <translation>圆头</translation>
     </message>
     <message>
         <source>Projecting cap</source>
-        <translation type="unfinished"></translation>
+        <translation>方头</translation>
     </message>
     <message>
         <source>Miter join</source>
-        <translation type="unfinished"></translation>
+        <translation>斜接连接</translation>
     </message>
     <message>
         <source>Round join</source>
-        <translation type="unfinished"></translation>
+        <translation>圆角连接</translation>
     </message>
     <message>
         <source>Bevel join</source>
-        <translation type="unfinished"></translation>
+        <translation>斜角连接</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>低</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>高</translation>
     </message>
     <message>
         <source>Med</source>
-        <translation type="unfinished"></translation>
+        <translation>中</translation>
     </message>
 </context>
 <context>
@@ -1137,27 +1141,27 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is hidden.</source>
-        <translation type="unfinished"></translation>
+        <translation>当前列被隐藏。</translation>
     </message>
     <message>
         <source>Note columns can only be edited in the xsheet or timeline.</source>
-        <translation type="unfinished"></translation>
+        <translation>注意列只能在摄影表或者时间轴上编辑。</translation>
     </message>
     <message>
         <source> to Front</source>
-        <translation type="unfinished"></translation>
+        <translation> 到最前</translation>
     </message>
     <message>
         <source> to Forward</source>
-        <translation type="unfinished"></translation>
+        <translation> 向前</translation>
     </message>
     <message>
         <source> to Back</source>
-        <translation type="unfinished"></translation>
+        <translation> 到最后</translation>
     </message>
     <message>
         <source> to Backward</source>
-        <translation type="unfinished"></translation>
+        <translation> 向后</translation>
     </message>
 </context>
 <context>
@@ -1172,19 +1176,19 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished">正常</translation>
+        <translation>正常</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation type="unfinished">矩形</translation>
+        <translation>矩形</translation>
     </message>
     <message>
         <source>Freehand</source>
-        <translation type="unfinished">手绘</translation>
+        <translation>手绘</translation>
     </message>
     <message>
         <source>Polyline</source>
-        <translation type="unfinished">多边形</translation>
+        <translation>折线</translation>
     </message>
 </context>
 <context>
@@ -1198,11 +1202,11 @@ Do you want to proceed?</source>
     <name>RasterSelectionTool</name>
     <message>
         <source>No Antialiasing</source>
-        <translation>不消除锯齿</translation>
+        <translation>不作抗锯齿处理</translation>
     </message>
     <message>
         <source>Modify Savebox</source>
-        <translation>修改保存框</translation>
+        <translation type="unfinished">修改保险框</translation>
     </message>
 </context>
 <context>
@@ -1233,30 +1237,30 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished">正常</translation>
+        <translation>正常</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation type="unfinished">矩形</translation>
+        <translation>矩形</translation>
     </message>
     <message>
         <source>Freehand</source>
-        <translation type="unfinished">手绘</translation>
+        <translation>手绘</translation>
     </message>
     <message>
         <source>Polyline</source>
-        <translation type="unfinished">多边形</translation>
+        <translation>折线</translation>
     </message>
     <message>
         <source>current</source>
-        <translation type="unfinished"></translation>
+        <translation>当前</translation>
     </message>
 </context>
 <context>
     <name>RotateTool</name>
     <message>
         <source>Rotate On Camera Center</source>
-        <translation type="unfinished"></translation>
+        <translation>以相机中心旋转</translation>
     </message>
 </context>
 <context>
@@ -1264,32 +1268,32 @@ Do you want to proceed?</source>
     <message>
         <source>X:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished">X:</translation>
+        <translation>横坐标:</translation>
     </message>
     <message>
         <source>Y:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished">Y:</translation>
+        <translation>纵坐标:</translation>
     </message>
     <message>
         <source>W:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished"></translation>
+        <translation>宽度:</translation>
     </message>
     <message>
         <source>H:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished">水平:</translation>
+        <translation>高度:</translation>
     </message>
     <message>
         <source>A:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished"></translation>
+        <translation>角度:</translation>
     </message>
     <message>
         <source>L:</source>
         <comment>ruler tool option</comment>
-        <translation type="unfinished"></translation>
+        <translation>长度:</translation>
     </message>
 </context>
 <context>
@@ -1300,15 +1304,15 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation type="unfinished">矩形</translation>
+        <translation>矩形</translation>
     </message>
     <message>
         <source>Freehand</source>
-        <translation type="unfinished">手绘</translation>
+        <translation>手绘</translation>
     </message>
     <message>
         <source>Polyline</source>
-        <translation type="unfinished">多边形</translation>
+        <translation>折线</translation>
     </message>
 </context>
 <context>
@@ -1362,15 +1366,15 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Build Skeleton</source>
-        <translation type="unfinished">制作骨架</translation>
+        <translation>制作骨架</translation>
     </message>
     <message>
         <source>Animate</source>
-        <translation type="unfinished">动画</translation>
+        <translation>动画</translation>
     </message>
     <message>
         <source>Inverse Kinematics</source>
-        <translation type="unfinished"></translation>
+        <translation>反向运动学</translation>
     </message>
 </context>
 <context>
@@ -1401,15 +1405,15 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Lines</source>
-        <translation type="unfinished">线</translation>
+        <translation>线</translation>
     </message>
     <message>
         <source>Areas</source>
-        <translation type="unfinished">区域</translation>
+        <translation>区域</translation>
     </message>
     <message>
         <source>Lines &amp; Areas</source>
-        <translation type="unfinished"></translation>
+        <translation>线和区域</translation>
     </message>
 </context>
 <context>
@@ -1474,7 +1478,7 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Join</source>
-        <translation>边角</translation>
+        <translation>连接</translation>
     </message>
     <message>
         <source>Miter:</source>
@@ -1482,63 +1486,63 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Standard</source>
-        <translation type="unfinished"></translation>
+        <translation>标准</translation>
     </message>
     <message>
         <source>Selected Frames</source>
-        <translation type="unfinished"></translation>
+        <translation>已选帧</translation>
     </message>
     <message>
         <source>Whole Level</source>
-        <translation type="unfinished"></translation>
+        <translation>整个层级</translation>
     </message>
     <message>
         <source>Same Style</source>
-        <translation type="unfinished"></translation>
+        <translation>相同类型</translation>
     </message>
     <message>
         <source>Same Style on Selected Frames</source>
-        <translation type="unfinished"></translation>
+        <translation>已选帧中的同类型</translation>
     </message>
     <message>
         <source>Same Style on Whole Level</source>
-        <translation type="unfinished"></translation>
+        <translation>整个层级中的同类型</translation>
     </message>
     <message>
         <source>Boundary Strokes</source>
-        <translation type="unfinished"></translation>
+        <translation>边界描边</translation>
     </message>
     <message>
         <source>Boundaries on Selected Frames</source>
-        <translation type="unfinished"></translation>
+        <translation>所选帧的边界</translation>
     </message>
     <message>
         <source>Boundaries on Whole Level</source>
-        <translation type="unfinished"></translation>
+        <translation>整个层级的边界</translation>
     </message>
     <message>
         <source>Butt cap</source>
-        <translation type="unfinished"></translation>
+        <translation>平头</translation>
     </message>
     <message>
         <source>Round cap</source>
-        <translation type="unfinished"></translation>
+        <translation>圆头</translation>
     </message>
     <message>
         <source>Projecting cap</source>
-        <translation type="unfinished"></translation>
+        <translation>方头</translation>
     </message>
     <message>
         <source>Miter join</source>
-        <translation type="unfinished"></translation>
+        <translation>斜接连接</translation>
     </message>
     <message>
         <source>Round join</source>
-        <translation type="unfinished"></translation>
+        <translation>圆角连接</translation>
     </message>
     <message>
         <source>Bevel join</source>
-        <translation type="unfinished"></translation>
+        <translation>斜角连接</translation>
     </message>
 </context>
 <context>
@@ -1565,23 +1569,23 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Endpoint to Endpoint</source>
-        <translation type="unfinished"></translation>
+        <translation>端点到端点</translation>
     </message>
     <message>
         <source>Endpoint to Line</source>
-        <translation type="unfinished"></translation>
+        <translation>端点到线</translation>
     </message>
     <message>
         <source>Line to Line</source>
-        <translation type="unfinished"></translation>
+        <translation>线到线</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished">正常</translation>
+        <translation>正常</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation type="unfinished">矩形</translation>
+        <translation>矩形</translation>
     </message>
 </context>
 </TS>

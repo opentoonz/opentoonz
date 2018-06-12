@@ -430,11 +430,11 @@
     </message>
     <message>
         <source>Xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>Planilla</translation>
     </message>
     <message>
         <source>Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea de T.</translation>
     </message>
 </context>
 <context>

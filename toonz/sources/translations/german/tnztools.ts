@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
