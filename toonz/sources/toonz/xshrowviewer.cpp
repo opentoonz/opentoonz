@@ -108,7 +108,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
       distance, offset);
 
   // default value
-  if (distance == 0) distance = 6;
+  //  if (distance == 0) distance = 6;
 
   QRect visibleRect = visibleRegion().boundingRect();
 
@@ -124,8 +124,9 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
     int frameAxis = m_viewer->rowToFrameAxis(r);
 
     //--- draw horizontal line
-    bool isAfterMarkers = ((r - offset) % distance == 0 && r != 0);
-    QColor color        = isAfterMarkers ? m_viewer->getMarkerLineColor()
+    bool isAfterMarkers =
+        (distance > 0 && ((r - offset) % distance) == 0 && r != 0);
+    QColor color = isAfterMarkers ? m_viewer->getMarkerLineColor()
                                   : m_viewer->getLightLineColor();
     p.setPen(color);
     QLine horizontalLine = o->horizontalLine(frameAxis, layerSide);

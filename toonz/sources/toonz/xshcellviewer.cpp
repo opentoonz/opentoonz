@@ -1062,10 +1062,11 @@ void CellArea::drawFrameSeparator(QPainter &p, int row, int col,
   int distance, offset;
   TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
       distance, offset);
-  if (distance == 0) distance = 6;
+  //  if (distance == 0) distance = 6;
 
-  bool isAfterMarkers = (row - offset) % distance == 0 && row != 0;
-  QColor color        = isAfterMarkers ? m_viewer->getMarkerLineColor()
+  bool isAfterMarkers =
+      distance > 0 && ((row - offset) % distance) == 0 && row != 0;
+  QColor color = isAfterMarkers ? m_viewer->getMarkerLineColor()
                                 : m_viewer->getLightLineColor();
 
   int frameAxis        = m_viewer->rowToFrameAxis(row);
@@ -1322,7 +1323,7 @@ void CellArea::drawExtenderHandles(QPainter &p) {
   int distance, offset;
   TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
       distance, offset);
-  if (distance == 0) distance = 6;
+  //  if (distance == 0) distance = 6;
 
   QPoint xyRadius = o->point(PredefinedPoint::EXTENDER_XY_RADIUS);
 
@@ -1333,7 +1334,7 @@ void CellArea::drawExtenderHandles(QPainter &p) {
   p.setPen(Qt::black);
   p.setBrush(SmartTabColor);
   p.drawRoundRect(m_levelExtenderRect, xyRadius.x(), xyRadius.y());
-  QColor color = ((selRow1 + 1 - offset) % distance != 0)
+  QColor color = (distance > 0 && ((selRow1 + 1 - offset) % distance) != 0)
                      ? m_viewer->getLightLineColor()
                      : m_viewer->getMarkerLineColor();
   p.setPen(color);
@@ -1349,7 +1350,7 @@ void CellArea::drawExtenderHandles(QPainter &p) {
     p.setPen(Qt::black);
     p.setBrush(SmartTabColor);
     p.drawRoundRect(m_upperLevelExtenderRect, xyRadius.x(), xyRadius.y());
-    QColor color = ((selRow0 - offset) % distance != 0)
+    QColor color = (distance > 0 && ((selRow0 - offset) % distance) != 0)
                        ? m_viewer->getLightLineColor()
                        : m_viewer->getMarkerLineColor();
     p.setPen(color);
@@ -1539,8 +1540,9 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
   int distance, markerOffset;
   TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
       distance, markerOffset);
-  if (distance == 0) distance = 6;
-  bool isAfterMarkers = (row - markerOffset) % distance == 0 && row != 0;
+  //  if (distance == 0) distance = 6;
+  bool isAfterMarkers =
+      distance > 0 && ((row - markerOffset) % distance) == 0 && row != 0;
 
   // draw marker interval
   if (o->isVerticalTimeline() && isAfterMarkers) {
@@ -1754,8 +1756,9 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   int distance, offset;
   TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
       distance, offset);
-  if (distance == 0) distance = 6;
-  bool isAfterMarkers         = (row - offset) % distance == 0 && row != 0;
+  //  if (distance == 0) distance = 6;
+  bool isAfterMarkers =
+      distance > 0 && ((row - offset) % distance) == 0 && row != 0;
 
   // draw marker interval
   if (o->isVerticalTimeline() && isAfterMarkers) {
@@ -1965,8 +1968,9 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   int distance, offset;
   TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
       distance, offset);
-  if (distance == 0) distance = 6;
-  bool isAfterMarkers         = (row - offset) % distance == 0 && row != 0;
+  //  if (distance == 0) distance = 6;
+  bool isAfterMarkers =
+      distance > 0 && ((row - offset) % distance) == 0 && row != 0;
 
   // draw marker interval
   if (o->isVerticalTimeline() && isAfterMarkers) {
@@ -2045,8 +2049,9 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   int distance, offset;
   TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
       distance, offset);
-  if (distance == 0) distance = 6;
-  bool isAfterMarkers         = (row - offset) % distance == 0 && row != 0;
+  //  if (distance == 0) distance = 6;
+  bool isAfterMarkers =
+      distance > 0 && ((row - offset) % distance) == 0 && row != 0;
 
   bool isRed                         = false;
   TXshPaletteLevel *pl               = cell.getPaletteLevel();

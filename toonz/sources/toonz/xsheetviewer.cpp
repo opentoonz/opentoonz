@@ -1100,7 +1100,7 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
       return;
     }
 
-    int markerDistance = 6, markerOffset = 0;
+    int markerDistance = 0, markerOffset = 0;
     TApp::instance()
         ->getCurrentScene()
         ->getScene()
