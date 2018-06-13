@@ -183,37 +183,37 @@ intentar aumentar el tiempo de espera en las Preferencias.</translation>
     <message>
         <location filename="../../image/svg/tiio_svg.cpp" line="1954"/>
         <source>Stroke Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Modo de vectorización</translation>
     </message>
     <message>
         <location filename="../../image/svg/tiio_svg.cpp" line="1955"/>
         <source>Outline Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Calidad de contornos</translation>
     </message>
     <message>
         <location filename="../../image/svg/tiio_svg.cpp" line="1956"/>
         <source>Centerline</source>
-        <translation type="unfinished"></translation>
+        <translation>Líneas</translation>
     </message>
     <message>
         <location filename="../../image/svg/tiio_svg.cpp" line="1957"/>
         <source>Outline</source>
-        <translation type="unfinished"></translation>
+        <translation>Contornos</translation>
     </message>
     <message>
         <location filename="../../image/svg/tiio_svg.cpp" line="1958"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <location filename="../../image/svg/tiio_svg.cpp" line="1959"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Media</translation>
     </message>
     <message>
         <location filename="../../image/svg/tiio_svg.cpp" line="1960"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Baja</translation>
     </message>
 </context>
 <context>
