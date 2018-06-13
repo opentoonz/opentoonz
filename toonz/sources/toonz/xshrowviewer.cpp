@@ -123,22 +123,6 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
   for (int r = r0; r <= r1; r++) {
     int frameAxis = m_viewer->rowToFrameAxis(r);
 
-    //--- timeline - draw vertical line separating fixed onion skin
-    p.setPen(m_viewer->getLightLineColor());
-    if (!o->isVerticalTimeline()) {
-      QLine verticalLine = o->verticalLine(
-          0, NumberRange(frameAxis, m_viewer->rowToFrameAxis(r + 1)));
-      for (int i = 1; i <= 2; i++) {
-        if (o->isVerticalTimeline())
-          verticalLine.translate(
-              o->rect(PredefinedRect::ONION_FIXED_DOT_AREA).width() + 1, 0);
-        else
-          verticalLine.translate(
-              0, o->rect(PredefinedRect::ONION_FIXED_DOT_AREA).height() + 1);
-        p.drawLine(verticalLine);
-      }
-    }
-
     //--- draw horizontal line
     bool isAfterMarkers = ((r - offset) % distance == 0 && r != 0);
     QColor color        = isAfterMarkers ? m_viewer->getMarkerLineColor()
