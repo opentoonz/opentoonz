@@ -6,7 +6,7 @@
     <message>
         <location filename="../../image/avi/tiio_avi.cpp" line="1182"/>
         <source>Codec</source>
-        <translation type="unfinished"></translation>
+        <translation>Кодек</translation>
     </message>
     <message>
         <location filename="../../image/avi/tiio_avi.cpp" line="1183"/>
