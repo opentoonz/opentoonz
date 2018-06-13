@@ -194,7 +194,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
 
     case XsheetViewer::Frame: {
       if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50 &&
-          r > 0 && (r + 1) % 5)
+          r > 0 && (r + 1) % (distance > 0 ? distance : 5))
         break;
       QString number = QString::number(r + 1);
       p.drawText(labelRect, align, number);
