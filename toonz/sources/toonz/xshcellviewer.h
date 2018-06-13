@@ -88,8 +88,8 @@ class CellArea final : public QWidget {
   void drawLockedDottedLine(QPainter &p, bool isLocked, const QPoint &xy,
                             const QColor &cellColor) const;
 
-  void drawFrameSeparator(QPainter &p, int row, int col,
-                          bool shortSeparator = false);
+  void drawFrameSeparator(QPainter &p, int row, int col, bool emptyFrame,
+                          bool heldFrame = false);
   void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
   void drawSoundTextCell(QPainter &p, int row, int col);
   void drawSoundCell(QPainter &p, int row, int col, bool isReference = false);

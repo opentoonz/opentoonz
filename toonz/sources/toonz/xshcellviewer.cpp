@@ -1045,14 +1045,16 @@ void CellArea::setDragTool(DragTool *dragTool) {
 }
 
 //-----------------------------------------------------------------------------
+
 void CellArea::drawFrameSeparator(QPainter &p, int row, int col,
-                                  bool shortSeparator) {
-  int layerAxis = m_viewer->columnToLayerAxis(col);
+                                  bool emptyFrame, bool heldFrame) {
+  const Orientation *o = m_viewer->orientation();
+  int layerAxis        = m_viewer->columnToLayerAxis(col);
 
   NumberRange layerAxisRange(layerAxis + 1,
                              m_viewer->columnToLayerAxis(col + 1));
-  if (!m_viewer->orientation()->isVerticalTimeline()) {
-    int adjY       = m_viewer->orientation()->cellHeight() - 1;
+  if (!o->isVerticalTimeline()) {
+    int adjY       = o->cellHeight() - 1;
     layerAxisRange = NumberRange(layerAxis + 1, layerAxis + adjY);
   }
 
@@ -1062,21 +1064,22 @@ void CellArea::drawFrameSeparator(QPainter &p, int row, int col,
       distance, offset);
   if (distance == 0) distance = 6;
 
-  QColor color = ((row - offset) % distance == 0 && row != 0)
-                     ? m_viewer->getMarkerLineColor()
-                     : m_viewer->getLightLineColor();
+  bool isAfterMarkers = (row - offset) % distance == 0 && row != 0;
+  QColor color        = isAfterMarkers ? m_viewer->getMarkerLineColor()
+                                : m_viewer->getLightLineColor();
 
-  p.setPen(color);
   int frameAxis        = m_viewer->rowToFrameAxis(row);
   QLine horizontalLine = m_viewer->orientation()->horizontalLine(
       frameAxis,
-      layerAxisRange.adjusted(
-          (m_viewer->orientation()->isVerticalTimeline() ? 0 : -1), 0));
-  if (shortSeparator) {
+      layerAxisRange.adjusted((o->isVerticalTimeline() ? 0 : -1), 0));
+  if (heldFrame) {
     int x = horizontalLine.x1();
     int y = horizontalLine.y2() - 1;
     horizontalLine.setP1(QPoint(x, y));
-  }
+    color.setAlpha(150);
+  } else if (!o->isVerticalTimeline() && !isAfterMarkers && emptyFrame)
+    color.setAlpha(100);
+  p.setPen(color);
   p.drawLine(horizontalLine);
 }
 
@@ -1167,7 +1170,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
     // for each frame
     for (row = r0; row <= r1; row++) {
       if (!isColumn) {
-        drawFrameSeparator(p, row, col);
+        drawFrameSeparator(p, row, col, true);
         if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
             !m_viewer->orientation()->isVerticalTimeline() &&
             row == m_viewer->getCurrentRow() &&
@@ -1391,7 +1394,7 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
   TXshCell cell   = soundColumn->getCell(row);
   if (soundColumn->isCellEmpty(row) || cell.isEmpty() || row > maxNumFrame ||
       row < startFrame) {
-    drawFrameSeparator(p, row, col);
+    drawFrameSeparator(p, row, col, true);
     if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
         !m_viewer->orientation()->isVerticalTimeline() &&
         row == m_viewer->getCurrentRow() &&
@@ -1400,7 +1403,7 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col, bool isReference) {
     return;
   }
 
-  if (o->isVerticalTimeline() || !row) drawFrameSeparator(p, row, col);
+  if (o->isVerticalTimeline() || !row) drawFrameSeparator(p, row, col, false);
 
   TXshSoundLevelP soundLevel = cell.getSoundLevel();
 
@@ -1655,7 +1658,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
 
   // nothing to draw
   if (cell.isEmpty() && prevCell.isEmpty()) {
-    drawFrameSeparator(p, row, col);
+    drawFrameSeparator(p, row, col, true);
 
     if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
         !m_viewer->orientation()->isVerticalTimeline() &&
@@ -1665,8 +1668,9 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
     return;
   }
 
-  drawFrameSeparator(p, row, col, (!o->isVerticalTimeline() && sameLevel &&
-                                   prevCell.m_frameId == cell.m_frameId));
+  bool heldFrame = (!o->isVerticalTimeline() && sameLevel &&
+                    prevCell.m_frameId == cell.m_frameId);
+  drawFrameSeparator(p, row, col, false, heldFrame);
 
   TXshCell nextCell;
   nextCell = xsh->getCell(row + 1, col);  // cell in next frame
@@ -1891,7 +1895,7 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   }
 
   if (cell.isEmpty() && prevCell.isEmpty()) {
-    drawFrameSeparator(p, row, col);
+    drawFrameSeparator(p, row, col, true);
     if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
         !m_viewer->orientation()->isVerticalTimeline() &&
         row == m_viewer->getCurrentRow() &&
@@ -1901,8 +1905,9 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
     return;
   }
 
-  drawFrameSeparator(p, row, col, (!o->isVerticalTimeline() && sameLevel &&
-                                   prevCell.m_frameId == cell.m_frameId));
+  bool heldFrame = (!o->isVerticalTimeline() && sameLevel &&
+                    prevCell.m_frameId == cell.m_frameId);
+  drawFrameSeparator(p, row, col, false, heldFrame);
 
   TXshCell nextCell;
   nextCell = xsh->getCell(row + 1, col);
@@ -2058,7 +2063,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   }
 
   if (cell.isEmpty() && prevCell.isEmpty()) {
-    drawFrameSeparator(p, row, col);
+    drawFrameSeparator(p, row, col, true);
     if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
         !m_viewer->orientation()->isVerticalTimeline() &&
         row == m_viewer->getCurrentRow() &&
@@ -2068,9 +2073,9 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
     return;
   }
 
-  drawFrameSeparator(
-      p, row, col, (!o->isVerticalTimeline() && !isAfterMarkers && sameLevel &&
-                    prevCell.m_frameId == cell.m_frameId));
+  bool heldFrame = (!o->isVerticalTimeline() && !isAfterMarkers && sameLevel &&
+                    prevCell.m_frameId == cell.m_frameId);
+  drawFrameSeparator(p, row, col, false, heldFrame);
 
   int frameAdj   = m_viewer->getFrameZoomAdjustment();
   QRect cellRect = o->rect(PredefinedRect::CELL).translated(QPoint(x, y));
