@@ -374,15 +374,19 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   QColor frontColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b,
                     128);
   QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b, 128);
+  QColor frontDotColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b);
+  QColor backDotColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b);
+  QPen frontPen, backPen;
 
   // If the onion skin is disabled, draw dash line instead.
-  if (osMask.isEnabled())
-    p.setPen(Qt::red);
-  else {
-    QPen currentPen = p.pen();
-    currentPen.setStyle(Qt::DashLine);
-    currentPen.setColor(QColor(128, 128, 128, 255));
-    p.setPen(currentPen);
+  if (osMask.isEnabled()) {
+    frontPen.setColor(frontDotColor);
+    backPen.setColor(backDotColor);
+  } else {
+    frontPen.setStyle(Qt::DashLine);
+    frontPen.setColor(QColor(128, 128, 128));
+    backPen.setStyle(Qt::DashLine);
+    backPen.setColor(QColor(128, 128, 128));
   }
 
   QRect onionRect = m_viewer->orientation()->rect(PredefinedRect::ONION);
@@ -412,6 +416,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
                       (frameAdj / 2);
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
+    p.setPen(backPen);
     if (m_viewer->orientation()->isVerticalTimeline())
       p.drawLine(verticalLine.x1(), verticalLine.y1() + 5, verticalLine.x2(),
                  verticalLine.y2() - 9);
@@ -428,6 +433,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
                       onionCenter_frame - (frameAdj / 2);
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
+    p.setPen(frontPen);
     if (m_viewer->orientation()->isVerticalTimeline())
       p.drawLine(verticalLine.x1(), verticalLine.y1() + 10, verticalLine.x2(),
                  verticalLine.y2() - 5);
@@ -443,21 +449,23 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   int angle180 = 16 * 180;
   int turn =
       m_viewer->orientation()->dimension(PredefinedDimension::ONION_TURN) * 16;
+  p.setPen(backDotColor);
   p.setBrush(QBrush(backColor));
   p.drawChord(handleRect, turn, angle180);
+  p.setPen(frontDotColor);
   p.setBrush(QBrush(frontColor));
   p.drawChord(handleRect, turn + angle180, angle180);
 
   // draw onion skin dots
-  p.setPen(Qt::red);
   for (int i = 0; i < mosCount; i++) {
     // mos : frame offset from the current frame
     int mos = osMask.getMos(i);
     // skip drawing if the frame is under the mouse cursor
     if (m_showOnionToSet == Mos && currentRow + mos == m_row) continue;
 
+    p.setPen(mos < 0 ? backDotColor : frontDotColor);
     if (osMask.isEnabled())
-      p.setBrush(mos < 0 ? backColor : frontColor);
+      p.setBrush(mos < 0 ? backDotColor : frontDotColor);
     else
       p.setBrush(Qt::NoBrush);
     QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow + mos, 0));
@@ -476,6 +484,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     // skip drawing if the frame is under the mouse cursor
     if (m_showOnionToSet == Fos && fos == m_row) continue;
 
+    p.setPen(QColor(0, 255, 255, 128));
     if (osMask.isEnabled())
       p.setBrush(QBrush(QColor(0, 255, 255, 128)));
     else
@@ -491,7 +500,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 
   //-- onion placement hint under mouse
   if (m_showOnionToSet != None) {
-    p.setPen(QColor(255, 128, 0));
+    p.setPen(QColor(255, 255, 0));
     p.setBrush(QBrush(QColor(255, 255, 0)));
     QPoint topLeft = m_viewer->positionToXY(CellPosition(m_row, 0));
     if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
