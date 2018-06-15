@@ -38,6 +38,7 @@
 // Qt includes
 #include <QHBoxLayout>
 #include <QComboBox>
+#include <QFontComboBox>
 #include <QLabel>
 #include <QStackedWidget>
 #include <QLineEdit>
@@ -1305,7 +1306,7 @@ PreferencesPopup::PreferencesPopup()
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_interface->setStyleSheet("font-size: 10px; font: italic;");
 
-  m_interfaceFont       = new QComboBox(this);
+  m_interfaceFont       = new QFontComboBox(this);
   m_interfaceFontWeight = new QComboBox(this);
 
   m_colorCalibration =
@@ -1649,26 +1650,7 @@ PreferencesPopup::PreferencesPopup()
   viewerZoomCenterComboBox->addItems(zoomCenters);
   viewerZoomCenterComboBox->setCurrentIndex(m_pref->getViewerZoomCenter());
 
-  TFontManager *instance = TFontManager::instance();
-  bool validFonts;
-  try {
-    instance->loadFontNames();
-    validFonts = true;
-  } catch (TFontLibraryLoadingError &) {
-    validFonts = false;
-    //    TMessage::error(toString(e.getMessage()));
-  }
-
-  if (validFonts) {
-    std::vector<std::wstring> names;
-    instance->getAllFamilies(names);
-
-    for (std::vector<std::wstring>::iterator it = names.begin();
-         it != names.end(); ++it)
-      m_interfaceFont->addItem(QString::fromStdWString(*it));
-
-    m_interfaceFont->setCurrentText(m_pref->getInterfaceFont());
-  }
+  m_interfaceFont->setCurrentText(m_pref->getInterfaceFont());
 
   QStringList fontStyles;
   fontStyles << "Regular"

@@ -682,6 +682,86 @@ void ToolOptionCombo::doOnActivated(int index) {
 
 //=============================================================================
 
+ToolOptionFontCombo::ToolOptionFontCombo(TTool *tool, TEnumProperty *property,
+                                         ToolHandle *toolHandle)
+    : QFontComboBox()
+    , ToolOptionControl(tool, property->getName(), toolHandle)
+    , m_property(property) {
+  setMaximumWidth(250);
+  m_property->addListener(this);
+  setSizeAdjustPolicy(QFontComboBox::AdjustToContents);
+  connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+  // synchronize the state with the same widgets in other tool option bars
+  if (toolHandle)
+    connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionFontCombo::updateStatus() {
+  QString value = QString::fromStdWString(m_property->getValue());
+  int index     = findData(value);
+  if (index >= 0 && index != currentIndex()) setCurrentIndex(index);
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionFontCombo::onActivated(int index) {
+  const TEnumProperty::Range &range = m_property->getRange();
+  if (index < 0 || index >= (int)range.size()) return;
+
+  std::wstring item = range[index];
+  m_property->setValue(item);
+  notifyTool();
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionFontCombo::doShowPopup() {
+  if (Preferences::instance()->getDropdownShortcutsCycleOptions()) {
+    const TEnumProperty::Range &range           = m_property->getRange();
+    int theIndex                                = currentIndex() + 1;
+    if (theIndex >= (int)range.size()) theIndex = 0;
+    doOnActivated(theIndex);
+  } else {
+    if (isVisible()) showPopup();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionFontCombo::doOnActivated(int index) {
+  if (m_toolHandle && m_toolHandle->getTool() != m_tool) return;
+  // active only if the belonging combo-viewer is visible
+  if (!isInVisibleViewer(this)) return;
+  bool cycleOptions =
+      Preferences::instance()->getDropdownShortcutsCycleOptions();
+  // Just move the index if the first item is not "Normal"
+  if (m_property->indexOf(L"Normal") != 0) {
+    onActivated(index);
+    setCurrentIndex(index);
+    // for updating the cursor
+    m_toolHandle->notifyToolChanged();
+    return;
+  }
+
+  // If the first item of this combo box is "Normal", enable shortcut key toggle
+  // can "back and forth" behavior.
+  if (currentIndex() == index) {
+    // estimating that the "Normal" option is located at the index 0
+    onActivated(0);
+    setCurrentIndex(0);
+  } else {
+    onActivated(index);
+    setCurrentIndex(index);
+  }
+
+  // for updating a cursor without any effect to the tool options
+  m_toolHandle->notifyToolCursorTypeChanged();
+}
+
+//=============================================================================
+
 ToolOptionPopupButton::ToolOptionPopupButton(TTool *tool,
                                              TEnumProperty *property)
     : PopupButton()

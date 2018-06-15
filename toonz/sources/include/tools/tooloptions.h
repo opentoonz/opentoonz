@@ -146,7 +146,7 @@ public:
   enum SingleValueWidgetType { SLIDER = 0, FIELD };
   void setSingleValueWidgetType(int type) { m_singleValueWidgetType = type; }
 
-  enum EnumWidgetType { COMBOBOX = 0, POPUPBUTTON };
+  enum EnumWidgetType { COMBOBOX = 0, POPUPBUTTON, FONTCOMBOBOX };
   void setEnumWidgetType(int type) { m_enumWidgetType = type; }
 
 private:

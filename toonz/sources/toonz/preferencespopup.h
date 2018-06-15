@@ -16,6 +16,7 @@
 
 // Qt includes
 #include <QComboBox>
+#include <QFontComboBox>
 
 //==============================================================
 
@@ -55,9 +56,10 @@ private:
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
       *m_vectorSnappingTargetCB, *m_dropdownShortcutsCycleOptionsCB,
-      *m_interfaceFont, *m_interfaceFontWeight, *m_guidedDrawingStyle,
-      *m_functionEditorToggle, *m_cursorBrushType, *m_cursorBrushStyle,
-      *m_xsheetLayout;
+      *m_interfaceFontWeight, *m_guidedDrawingStyle, *m_functionEditorToggle,
+      *m_cursorBrushType, *m_cursorBrushStyle, *m_xsheetLayout;
+
+  QFontComboBox *m_interfaceFont;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 

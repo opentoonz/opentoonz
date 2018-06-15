@@ -365,6 +365,17 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p) {
     break;
   }
 
+  case FONTCOMBOBOX: {
+    if (p->getQStringName() != "") {
+      QLabel *label = addLabel(p);
+      m_panel->addLabel(p->getName(), label);
+    }
+    ToolOptionFontCombo *obj = new ToolOptionFontCombo(m_tool, p, m_toolHandle);
+    control                  = obj;
+    widget                   = obj;
+    break;
+  }
+
   case COMBOBOX:
   default: {
     if (p->getQStringName() != "") {
@@ -1529,13 +1540,17 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool,
   assert(props->getPropertyCount() > 0);
 
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
+  builder.setEnumWidgetType(ToolOptionControlBuilder::FONTCOMBOBOX);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
+  builder.setEnumWidgetType(ToolOptionControlBuilder::COMBOBOX);
+  if (tool && tool->getProperties(1)) tool->getProperties(1)->accept(builder);
 
   m_layout->addStretch(0);
 
   bool ret = true;
-  ToolOptionCombo *fontField =
-      dynamic_cast<ToolOptionCombo *>(m_controls.value("Font:"));
+
+  ToolOptionFontCombo *fontField =
+      dynamic_cast<ToolOptionFontCombo *>(m_controls.value("Font:"));
   ret &&connect(fontField, SIGNAL(currentIndexChanged(int)), this,
                 SLOT(onFieldChanged()));
 
