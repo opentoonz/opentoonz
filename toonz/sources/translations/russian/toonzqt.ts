@@ -677,7 +677,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1238"/>
         <source>&amp;Soundtrack </source>
-        <translation>&amp;Звуковая дорожка</translation>
+        <translation>&amp;Звуковая дорожка </translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1242"/>
@@ -1872,7 +1872,7 @@ Are you sure?</source>
     <message>
         <location filename="../../toonzqt/stageobjectselection.cpp" line="100"/>
         <source>Paste Object  </source>
-        <translation>Встаить объект</translation>
+        <translation>Встаить объект  </translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionselection.cpp" line="52"/>

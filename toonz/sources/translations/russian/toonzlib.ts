@@ -545,7 +545,7 @@
     <message>
         <location filename="../../toonzlib/orientation.cpp" line="127"/>
         <source>Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Таймлайн</translation>
     </message>
 </context>
 <context>

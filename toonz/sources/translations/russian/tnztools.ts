@@ -1271,22 +1271,22 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="221"/>
         <source> to Front</source>
-        <translation type="unfinished"></translation>
+        <translation> вперед</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="222"/>
         <source> to Forward</source>
-        <translation type="unfinished"></translation>
+        <translation> на передний план</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="223"/>
         <source> to Back</source>
-        <translation type="unfinished"></translation>
+        <translation> назад</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="224"/>
         <source> to Backward</source>
-        <translation type="unfinished"></translation>
+        <translation> на задний план</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="226"/>
@@ -1332,7 +1332,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/tool.cpp" line="823"/>
         <source>Note columns can only be edited in the xsheet or timeline.</source>
-        <translation type="unfinished"></translation>
+        <translation>Столбцы заметок можно редактировать только в XSheet или на временной шкале.</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="831"/>

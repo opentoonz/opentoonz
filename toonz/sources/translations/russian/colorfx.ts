@@ -309,12 +309,12 @@
     <message>
         <location filename="../../colorfx/regionstyles.cpp" line="3974"/>
         <source>X Position</source>
-        <translation type="unfinished">Положение по оси X</translation>
+        <translation>Положение по оси X</translation>
     </message>
     <message>
         <location filename="../../colorfx/regionstyles.cpp" line="3977"/>
         <source>Y Position</source>
-        <translation type="unfinished">Положение по оси Y</translation>
+        <translation>Положение по оси Y</translation>
     </message>
     <message>
         <location filename="../../colorfx/regionstyles.cpp" line="3980"/>
@@ -661,12 +661,12 @@
     <message>
         <location filename="../../colorfx/regionstyles.cpp" line="3717"/>
         <source>X Position</source>
-        <translation type="unfinished">Положение по оси X</translation>
+        <translation>Положение по оси X</translation>
     </message>
     <message>
         <location filename="../../colorfx/regionstyles.cpp" line="3720"/>
         <source>Y Position</source>
-        <translation type="unfinished">Положение по оси Y</translation>
+        <translation>Положение по оси Y</translation>
     </message>
     <message>
         <location filename="../../colorfx/regionstyles.cpp" line="3723"/>
