@@ -4836,7 +4836,7 @@ Please use the frame numbers for reference.</source>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1906"/>
         <source>&amp;Fill In Empty Cells</source>
-        <translation>&amp;Залить в пустых ячейках</translation>
+        <translation>&amp;Заполнить пустые ячейки</translation>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="1908"/>
@@ -10398,7 +10398,7 @@ The operation cannot be undone: are you sure?</source>
     <message>
         <location filename="../../toonz/cellselection.cpp" line="1247"/>
         <source>Fill In Empty Cells</source>
-        <translation>Залить в пустых ячейках</translation>
+        <translation>Заполнить пустые ячейки</translation>
     </message>
     <message>
         <location filename="../../toonz/cellselection.cpp" line="1549"/>
