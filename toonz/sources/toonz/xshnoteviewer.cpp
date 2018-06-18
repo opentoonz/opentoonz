@@ -478,7 +478,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_flipOrientationButton->setFocusPolicy(Qt::FocusPolicy::NoFocus);
   m_flipOrientationButton->setFixedSize(QSize(70, 23));
   m_flipOrientationButton->setIconSize(QSize(40, 20));
-  QIcon flipOrientationIcon = createQIcon("fliporientation");
+  QIcon flipOrientationIcon;
   flipOrientationIcon.addFile(QString(":Resources/xsheet2timeline.svg"),
                               QSize(), QIcon::Normal);
   m_flipOrientationButton->setIcon(flipOrientationIcon);
@@ -629,7 +629,7 @@ void NoteArea::flipOrientation() { m_viewer->flipOrientation(); }
 void NoteArea::onXsheetOrientationChanged(const Orientation *newOrientation) {
   //  m_flipOrientationButton->setText(newOrientation->caption());
 
-  QIcon flipOrientationIcon = createQIcon("fliporientation");
+  QIcon flipOrientationIcon;
   QString iconFile          = newOrientation->isVerticalTimeline()
                          ? QString(":Resources/xsheet2timeline.svg")
                          : QString(":Resources/timeline2xsheet.svg");
