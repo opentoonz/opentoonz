@@ -1362,11 +1362,10 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 //-------------------------------------------------------------------------------------------------------------
 
 void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
-  m_brushPos = m_mousePos = pos;
-
-  if (!m_enabled || !m_active) return;
-
-  bool isAdded;
+  if (!m_enabled || !m_active) {
+    m_brushPos = m_mousePos = pos;
+    return;
+  }
 
   if (TToonzImageP ti = TImageP(getImage(true))) {
     TPointD rasCenter = ti->getRaster()->getCenterD();
@@ -1392,30 +1391,23 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
       }
       for (size_t i = 0; i < pts.size(); ++i) {
         const TThickPoint &thickPoint = pts[i];
-        isAdded                       = m_rasterTrack->add(thickPoint);
-        if (isAdded) {
-          m_tileSaver->save(m_rasterTrack->getLastRect());
-          m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue());
-          std::vector<TThickPoint> brushPoints =
-              m_rasterTrack->getPointsSequence();
-          int m = (int)brushPoints.size();
-          std::vector<TThickPoint> points;
-          if (m == 3) {
-            points.push_back(brushPoints[0]);
-            points.push_back(brushPoints[1]);
-          } else {
-            points.push_back(brushPoints[m - 4]);
-            points.push_back(brushPoints[m - 3]);
-            points.push_back(brushPoints[m - 2]);
-          }
-          if (i == 0) {
-            invalidateRect =
-                ToolUtils::getBounds(points, maxThickness) - rasCenter;
-          } else {
-            invalidateRect +=
-                ToolUtils::getBounds(points, maxThickness) - rasCenter;
-          }
+        m_rasterTrack->add(thickPoint);
+        m_tileSaver->save(m_rasterTrack->getLastRect());
+        m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue());
+        std::vector<TThickPoint> brushPoints =
+            m_rasterTrack->getPointsSequence();
+        int m = (int)brushPoints.size();
+        std::vector<TThickPoint> points;
+        if (m == 3) {
+          points.push_back(brushPoints[0]);
+          points.push_back(brushPoints[1]);
+        } else {
+          points.push_back(brushPoints[m - 4]);
+          points.push_back(brushPoints[m - 3]);
+          points.push_back(brushPoints[m - 2]);
         }
+        invalidateRect +=
+            ToolUtils::getBounds(points, maxThickness) - rasCenter;
       }
     } else {
       // antialiased brush
@@ -1428,10 +1420,8 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
         m_smoothStroke.addPoint(thickPoint);
         m_smoothStroke.getSmoothPoints(pts);
       }
-      bool rectUpdated = false;
       for (size_t i = 0; i < pts.size(); ++i) {
         TThickPoint old = m_points.back();
-        if (norm2(pos - old) < 4) continue;
 
         const TThickPoint &point = pts[i];
         TThickPoint mid((old + point) * 0.5, (point.thick + old.thick) * 0.5);
@@ -1461,14 +1451,8 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
           m_bluredBrush->addArc(m_points[m - 4], old, mid, 1, 1);
           m_lastRect += bbox;
         }
-        if (!rectUpdated) {
-          invalidateRect =
-              ToolUtils::getBounds(points, maxThickness) - rasCenter;
-          rectUpdated = true;
-        } else {
-          invalidateRect +=
-              ToolUtils::getBounds(points, maxThickness) - rasCenter;
-        }
+        invalidateRect +=
+            ToolUtils::getBounds(points, maxThickness) - rasCenter;
 
         m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
                                      m_styleId, m_drawOrder.getIndex());
@@ -1476,11 +1460,14 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
       }
     }
 
-    // draw brush tip when drawing smooth stroke
+    // clear & draw brush tip when drawing smooth stroke
     if (m_smooth.getValue() != 0) {
       TPointD halfThick(m_maxThick * 0.5, m_maxThick * 0.5);
       invalidateRect += TRectD(m_brushPos - halfThick, m_brushPos + halfThick);
+      invalidateRect += TRectD(pos - halfThick, pos + halfThick);
     }
+
+    m_brushPos = m_mousePos = pos;
 
     invalidate(invalidateRect.enlarge(2));
   } else {
@@ -1492,10 +1479,8 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     TRectD invalidateRect;
     TPointD halfThick(m_maxThick * 0.5, m_maxThick * 0.5);
 
-    // In order to clear the previous snap mark
-    if (m_foundLastSnap)
-      invalidateRect +=
-          TRectD(m_lastSnapPoint - halfThick, m_lastSnapPoint + halfThick);
+    // In order to clear the previous brush tip
+    invalidateRect += TRectD(m_brushPos - halfThick, m_brushPos + halfThick);
 
     m_currThickness = thickness;
 
@@ -1526,6 +1511,9 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
       invalidateRect += m_track.getLastModifiedRegion();
     }
 
+    // In order to draw the current brush tip
+    invalidateRect += TRectD(m_brushPos - halfThick, m_brushPos + halfThick);
+
     if (!invalidateRect.isEmpty()) invalidate(invalidateRect.enlarge(2));
   }
 }
@@ -1536,7 +1524,14 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   bool isValid = m_enabled && m_active;
   m_enabled    = false;
 
-  if (!isValid) return;
+  if (!isValid) {
+    // in case the current frame is moved to empty cell while dragging
+    if (!m_track.isEmpty()) {
+      m_track.clear();
+      invalidate();
+    }
+    return;
+  }
 
   if (m_isPath) {
     double error = 20.0 * getPixelSize();
@@ -1887,32 +1882,23 @@ void BrushTool::finishRasterBrush(const TPointD &pos, double pressureVal) {
     }
     for (size_t i = 0; i < pts.size(); ++i) {
       const TThickPoint &thickPoint = pts[i];
-      bool isAdded                  = m_rasterTrack->add(thickPoint);
-      if (isAdded) {
-        m_tileSaver->save(m_rasterTrack->getLastRect());
-        m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue(), true);
+      m_rasterTrack->add(thickPoint);
+      m_tileSaver->save(m_rasterTrack->getLastRect());
+      m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue(), true);
 
-        std::vector<TThickPoint> brushPoints =
-            m_rasterTrack->getPointsSequence();
-        int m = (int)brushPoints.size();
-        std::vector<TThickPoint> points;
-        if (m == 3) {
-          points.push_back(brushPoints[0]);
-          points.push_back(brushPoints[1]);
-        } else {
-          points.push_back(brushPoints[m - 4]);
-          points.push_back(brushPoints[m - 3]);
-          points.push_back(brushPoints[m - 2]);
-        }
-        int maxThickness = m_rasThickness.getValue().second;
-        if (i == 0) {
-          invalidateRect =
-              ToolUtils::getBounds(points, maxThickness) - rasCenter;
-        } else {
-          invalidateRect +=
-              ToolUtils::getBounds(points, maxThickness) - rasCenter;
-        }
+      std::vector<TThickPoint> brushPoints = m_rasterTrack->getPointsSequence();
+      int m                                = (int)brushPoints.size();
+      std::vector<TThickPoint> points;
+      if (m == 3) {
+        points.push_back(brushPoints[0]);
+        points.push_back(brushPoints[1]);
+      } else {
+        points.push_back(brushPoints[m - 4]);
+        points.push_back(brushPoints[m - 3]);
+        points.push_back(brushPoints[m - 2]);
       }
+      int maxThickness = m_rasThickness.getValue().second;
+      invalidateRect += ToolUtils::getBounds(points, maxThickness) - rasCenter;
     }
     invalidate(invalidateRect.enlarge(2));
 
@@ -1926,27 +1912,27 @@ void BrushTool::finishRasterBrush(const TPointD &pos, double pressureVal) {
     delete m_rasterTrack;
     m_rasterTrack = 0;
   } else {
-    if (m_points.size() != 1) {
-      double maxThickness = m_rasThickness.getValue().second;
-      double thickness =
-          (m_pressure.getValue() || m_isPath)
-              ? computeThickness(pressureVal, m_rasThickness, m_isPath)
-              : maxThickness;
-      TPointD rasCenter = ti->getRaster()->getCenterD();
-      TRectD invalidateRect;
-      bool rectUpdated = false;
-      TThickPoint thickPoint(pos + rasCenter, thickness);
-      std::vector<TThickPoint> pts;
-      if (m_smooth.getValue() == 0) {
-        pts.push_back(thickPoint);
-      } else {
-        m_smoothStroke.addPoint(thickPoint);
-        m_smoothStroke.endStroke();
-        m_smoothStroke.getSmoothPoints(pts);
-      }
+    double maxThickness = m_rasThickness.getValue().second;
+    double thickness =
+        (m_pressure.getValue() || m_isPath)
+            ? computeThickness(pressureVal, m_rasThickness, m_isPath)
+            : maxThickness;
+    TPointD rasCenter = ti->getRaster()->getCenterD();
+    TRectD invalidateRect;
+    TThickPoint thickPoint(pos + rasCenter, thickness);
+    std::vector<TThickPoint> pts;
+    if (m_smooth.getValue() == 0) {
+      pts.push_back(thickPoint);
+    } else {
+      m_smoothStroke.addPoint(thickPoint);
+      m_smoothStroke.endStroke();
+      m_smoothStroke.getSmoothPoints(pts);
+    }
+    // we need to skip the for-loop here if pts.size() == 0 or else
+    // (pts.size() - 1) becomes ULLONG_MAX since size_t is unsigned
+    if (pts.size() > 0) {
       for (size_t i = 0; i < pts.size() - 1; ++i) {
         TThickPoint old = m_points.back();
-        if (norm2(pos - old) < 4) continue;
 
         const TThickPoint &point = pts[i];
         TThickPoint mid((old + point) * 0.5, (point.thick + old.thick) * 0.5);
@@ -1976,47 +1962,36 @@ void BrushTool::finishRasterBrush(const TPointD &pos, double pressureVal) {
           m_bluredBrush->addArc(m_points[m - 4], old, mid, 1, 1);
           m_lastRect += bbox;
         }
-        if (!rectUpdated) {
-          invalidateRect =
-              ToolUtils::getBounds(points, maxThickness) - rasCenter;
-          rectUpdated = true;
-        } else {
-          invalidateRect +=
-              ToolUtils::getBounds(points, maxThickness) - rasCenter;
-        }
+
+        invalidateRect +=
+            ToolUtils::getBounds(points, maxThickness) - rasCenter;
 
         m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
                                      m_styleId, m_drawOrder.getIndex());
         m_strokeRect += bbox;
       }
-      if (pts.size() > 0) {
-        TThickPoint point = pts.back();
-        m_points.push_back(point);
-        int m = m_points.size();
-        std::vector<TThickPoint> points;
-        points.push_back(m_points[m - 3]);
-        points.push_back(m_points[m - 2]);
-        points.push_back(m_points[m - 1]);
-        TRect bbox = m_bluredBrush->getBoundFromPoints(points);
-        updateWorkAndBackupRasters(bbox);
-        m_tileSaver->save(bbox);
-        m_bluredBrush->addArc(points[0], points[1], points[2], 1, 1);
-        m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
-                                     m_styleId, m_drawOrder.getIndex());
+      TThickPoint point = pts.back();
+      m_points.push_back(point);
+      int m = m_points.size();
+      std::vector<TThickPoint> points;
+      points.push_back(m_points[m - 3]);
+      points.push_back(m_points[m - 2]);
+      points.push_back(m_points[m - 1]);
+      TRect bbox = m_bluredBrush->getBoundFromPoints(points);
+      updateWorkAndBackupRasters(bbox);
+      m_tileSaver->save(bbox);
+      m_bluredBrush->addArc(points[0], points[1], points[2], 1, 1);
+      m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
+                                   m_styleId, m_drawOrder.getIndex());
 
-        if (!rectUpdated) {
-          invalidateRect =
-              ToolUtils::getBounds(points, maxThickness) - rasCenter;
-        } else {
-          invalidateRect +=
-              ToolUtils::getBounds(points, maxThickness) - rasCenter;
-        }
-        m_lastRect += bbox;
-        m_strokeRect += bbox;
-      }
-      invalidate(invalidateRect.enlarge(2));
-      m_lastRect.empty();
+      invalidateRect += ToolUtils::getBounds(points, maxThickness) - rasCenter;
+
+      m_lastRect += bbox;
+      m_strokeRect += bbox;
     }
+    if (!invalidateRect.isEmpty()) invalidate(invalidateRect.enlarge(2));
+    m_lastRect.empty();
+
     delete m_bluredBrush;
     m_bluredBrush = 0;
 

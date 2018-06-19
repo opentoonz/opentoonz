@@ -1005,8 +1005,8 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
           intPos = TThickPoint(pp + convert(ti->getRaster()->getCenter()),
                                m_toolSize.getValue() - 1);
 
-        bool isAdded = m_normalEraser->add(intPos);
-        if (ti && isAdded) {
+        m_normalEraser->add(intPos);
+        if (ti) {
           m_tileSaver->save(m_normalEraser->getLastRect());
           m_normalEraser->generateLastPieceOfStroke(
               m_pencil.getValue() || m_colorType.getValue() == AREAS);

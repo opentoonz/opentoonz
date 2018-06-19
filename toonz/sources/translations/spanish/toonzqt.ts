@@ -1261,11 +1261,11 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source> : </source>
-        <translation> : </translation>
+        <translation>: </translation>
     </message>
     <message>
         <source>Fx Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones del efecto</translation>
     </message>
 </context>
 <context>
@@ -2411,7 +2411,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>Texture</source>
-        <translation>Textura</translation>
+        <translation>Texturas</translation>
     </message>
     <message>
         <source>Special</source>
@@ -2423,7 +2423,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>Vector Brush</source>
-        <translation>Patrón vectorial</translation>
+        <translation>Pinceles vectoriales</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -2461,11 +2461,11 @@ Autom</translation>
     </message>
     <message>
         <source>Generated</source>
-        <translation>Generado</translation>
+        <translation>Generados</translation>
     </message>
     <message>
         <source>Trail</source>
-        <translation>Rastro</translation>
+        <translation>Rastros</translation>
     </message>
     <message>
         <source>Color</source>
@@ -2473,11 +2473,11 @@ Autom</translation>
     </message>
     <message>
         <source>Vector</source>
-        <translation>Vectorial</translation>
+        <translation>Vectoriales</translation>
     </message>
     <message>
         <source>Raster</source>
-        <translation>Imagen</translation>
+        <translation>Pinceles</translation>
     </message>
     <message>
         <source>Show or hide parts of the Color Page.</source>

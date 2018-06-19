@@ -11,12 +11,12 @@
     <message>
         <location filename="../../toonzlib/preferences.cpp" line="116"/>
         <source>Adobe Photoshop</source>
-        <translation type="unfinished"></translation>
+        <translation>Adobe Photoshop</translation>
     </message>
     <message>
         <location filename="../../toonzlib/preferences.cpp" line="121"/>
         <source>PNG</source>
-        <translation type="unfinished"></translation>
+        <translation>PNG</translation>
     </message>
 </context>
 <context>
@@ -91,7 +91,7 @@
     <message>
         <location filename="../../toonzlib/tstageobjectcmd.cpp" line="544"/>
         <source>Remove Column  </source>
-        <translation>Удалить столбец</translation>
+        <translation>Удалить столбец  </translation>
     </message>
     <message>
         <location filename="../../toonzlib/studiopalettecmd.cpp" line="68"/>
@@ -126,27 +126,27 @@
     <message>
         <location filename="../../toonzlib/studiopalettecmd.cpp" line="254"/>
         <source>Can&apos;t undo rename palette</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается отменить переименование палитры</translation>
     </message>
     <message>
         <location filename="../../toonzlib/studiopalettecmd.cpp" line="255"/>
         <source>Can&apos;t undo move palette</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается отменить перемещение палитры</translation>
     </message>
     <message>
         <location filename="../../toonzlib/studiopalettecmd.cpp" line="267"/>
         <source>Can&apos;t redo rename palette</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается повторить переименование палитры</translation>
     </message>
     <message>
         <location filename="../../toonzlib/studiopalettecmd.cpp" line="268"/>
         <source>Can&apos;t redo move palette</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается повторить перемещение палитры</translation>
     </message>
     <message>
         <location filename="../../toonzlib/studiopalettecmd.cpp" line="281"/>
         <source>Rename Studio Palette : %1 &gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать палитру студии : %1 &gt; %2</translation>
     </message>
     <message>
         <location filename="../../toonzlib/studiopalettecmd.cpp" line="285"/>
@@ -216,7 +216,7 @@
     <message>
         <location filename="../../toonzlib/fxcommand.cpp" line="906"/>
         <source>Add Fx  : </source>
-        <translation>Добавить Fx:</translation>
+        <translation>Добавить эффект  : </translation>
     </message>
     <message>
         <location filename="../../toonzlib/fxcommand.cpp" line="907"/>
@@ -469,73 +469,73 @@
     <message>
         <location filename="../../toonzlib/tpalettehandle.cpp" line="40"/>
         <source>Toggle Autopaint Option  Palette : %1  Style#%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Переключить автопокраску палитры : %1  Стиль#%2</translation>
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="623"/>
         <location filename="../../toonzlib/txshcolumn.cpp" line="651"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Отсутствует</translation>
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="625"/>
         <source>Red</source>
-        <translation type="unfinished"></translation>
+        <translation>Красный</translation>
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="627"/>
         <source>Green</source>
-        <translation type="unfinished"></translation>
+        <translation>Зеленый</translation>
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="629"/>
         <source>Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>Синий</translation>
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="631"/>
         <source>DarkYellow</source>
-        <translation type="unfinished"></translation>
+        <translation>Темно-желтый</translation>
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="633"/>
         <source>DarkCyan</source>
-        <translation type="unfinished"></translation>
+        <translation>Темный циан</translation>
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="635"/>
         <source>DarkMagenta</source>
-        <translation type="unfinished"></translation>
+        <translation>Темно-пурпурный</translation>
     </message>
     <message>
         <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="93"/>
         <source>Brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Яркость</translation>
     </message>
     <message>
         <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="95"/>
         <source>Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>Контраст</translation>
     </message>
     <message>
         <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="228"/>
         <source>HRange</source>
-        <translation type="unfinished"></translation>
+        <translation>Диапазон тона</translation>
     </message>
     <message>
         <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="229"/>
         <source>Line Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Ширина линии</translation>
     </message>
     <message>
         <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="312"/>
         <source>ColorThres</source>
-        <translation type="unfinished"></translation>
+        <translation>Цветовой порог</translation>
     </message>
     <message>
         <location filename="../../toonzlib/cleanupcolorstyles.cpp" line="314"/>
         <source>WhiteThres</source>
-        <translation type="unfinished"></translation>
+        <translation>Порог яркости</translation>
     </message>
     <message>
         <location filename="../../toonzlib/orientation.cpp" line="67"/>
@@ -545,7 +545,7 @@
     <message>
         <location filename="../../toonzlib/orientation.cpp" line="127"/>
         <source>Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Таймлайн</translation>
     </message>
 </context>
 <context>
@@ -754,7 +754,7 @@
     <message>
         <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="175"/>
         <source>Invalid color : </source>
-        <translation>Недопустимый цвет:</translation>
+        <translation>Недопустимый цвет : </translation>
     </message>
 </context>
 <context>
@@ -772,7 +772,7 @@
     <message>
         <location filename="../../toonzlib/scriptbinding_rasterizer.cpp" line="87"/>
         <source>Argument must be a vector level or image : </source>
-        <translation>Аргумент должен быть векторным уровнем или изображением:</translation>
+        <translation>Аргумент должен быть векторным уровнем или изображением : </translation>
     </message>
     <message>
         <location filename="../../toonzlib/scriptbinding_rasterizer.cpp" line="90"/>

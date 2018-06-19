@@ -21,17 +21,17 @@
     <message>
         <location filename="../../toonzqt/addfxcontextmenu.cpp" line="623"/>
         <source>Insert </source>
-        <translation>Вставить</translation>
+        <translation>Вставить </translation>
     </message>
     <message>
         <location filename="../../toonzqt/addfxcontextmenu.cpp" line="626"/>
         <source>Add </source>
-        <translation>Добавить</translation>
+        <translation>Добавить </translation>
     </message>
     <message>
         <location filename="../../toonzqt/addfxcontextmenu.cpp" line="629"/>
         <source>Replace </source>
-        <translation>Заменить</translation>
+        <translation>Заменить </translation>
     </message>
 </context>
 <context>
@@ -75,7 +75,7 @@
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="703"/>
         <source>Tolerance</source>
-        <translation type="unfinished">Допуск</translation>
+        <translation>Допуск</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="706"/>
@@ -149,7 +149,7 @@
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="406"/>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="824"/>
         <source>&lt;custom&gt;</source>
-        <translation type="unfinished">&lt;пользовательский&gt;</translation>
+        <translation>&lt;пользовательский&gt;</translation>
     </message>
     <message>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="870"/>
@@ -217,12 +217,12 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/cleanupcamerasettingswidget.cpp" line="57"/>
         <source>N/S</source>
-        <translation type="unfinished"></translation>
+        <translation>Y</translation>
     </message>
     <message>
         <location filename="../../toonzqt/cleanupcamerasettingswidget.cpp" line="60"/>
         <source>E/W</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -243,7 +243,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/combohistogram.cpp" line="342"/>
         <source>R:%1 G:%2 B:%3</source>
-        <translation type="unfinished"></translation>
+        <translation>R:%1 G:%2 B:%3</translation>
     </message>
 </context>
 <context>
@@ -261,12 +261,12 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/combohistogram.cpp" line="387"/>
         <source>X:</source>
-        <translation type="unfinished">X:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <location filename="../../toonzqt/combohistogram.cpp" line="391"/>
         <source>Y:</source>
-        <translation type="unfinished">Y:</translation>
+        <translation>Y:</translation>
     </message>
 </context>
 <context>
@@ -320,22 +320,22 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/colorfield.cpp" line="358"/>
         <source>R:</source>
-        <translation type="unfinished"></translation>
+        <translation>R:</translation>
     </message>
     <message>
         <location filename="../../toonzqt/colorfield.cpp" line="361"/>
         <source>G:</source>
-        <translation type="unfinished"></translation>
+        <translation>G:</translation>
     </message>
     <message>
         <location filename="../../toonzqt/colorfield.cpp" line="364"/>
         <source>B:</source>
-        <translation type="unfinished"></translation>
+        <translation>B:</translation>
     </message>
     <message>
         <location filename="../../toonzqt/colorfield.cpp" line="367"/>
         <source>A:</source>
-        <translation type="unfinished"></translation>
+        <translation>A:</translation>
     </message>
 </context>
 <context>
@@ -404,7 +404,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/dvdialog.cpp" line="831"/>
         <source>OpenToonz</source>
-        <translation type="unfinished">OpenToonz</translation>
+        <translation>OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -413,7 +413,7 @@ Possibly the preset file has been corrupted</source>
         <location filename="../../toonzqt/styleindexlineedit.cpp" line="19"/>
         <location filename="../../toonzqt/styleindexlineedit.cpp" line="35"/>
         <source>current</source>
-        <translation type="unfinished"></translation>
+        <translation>текущий</translation>
     </message>
 </context>
 <context>
@@ -677,7 +677,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1238"/>
         <source>&amp;Soundtrack </source>
-        <translation>&amp;Звуковая дорожка</translation>
+        <translation>&amp;Звуковая дорожка </translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1242"/>
@@ -942,17 +942,17 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="989"/>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation>От</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="992"/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>До</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="995"/>
         <source>Step</source>
-        <translation type="unfinished"></translation>
+        <translation>Шаг</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1162"/>
@@ -1106,7 +1106,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/functiontoolbar.cpp" line="67"/>
         <source>&amp;Open Function Curve Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Открыть редактор кривых</translation>
     </message>
     <message>
         <source>&amp;Function Editor Toggle</source>
@@ -1209,7 +1209,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/fxschematicnode.cpp" line="1210"/>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Вывод</translation>
     </message>
     <message>
         <location filename="../../toonzqt/fxschematicnode.cpp" line="1228"/>
@@ -1398,7 +1398,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <location filename="../../toonzqt/fxsettings.cpp" line="1312"/>
         <source>Fx Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки эффектов</translation>
     </message>
     <message>
         <location filename="../../toonzqt/fxsettings.cpp" line="1314"/>
@@ -1442,32 +1442,32 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <location filename="../../toonzqt/histogram.cpp" line="544"/>
         <source>Value</source>
-        <translation type="unfinished">Значение</translation>
+        <translation>Значение</translation>
     </message>
     <message>
         <location filename="../../toonzqt/histogram.cpp" line="546"/>
         <source>RGB</source>
-        <translation type="unfinished">RGB</translation>
+        <translation>RGB</translation>
     </message>
     <message>
         <location filename="../../toonzqt/histogram.cpp" line="546"/>
         <source>Red</source>
-        <translation type="unfinished">Красный (R)</translation>
+        <translation>Красный</translation>
     </message>
     <message>
         <location filename="../../toonzqt/histogram.cpp" line="546"/>
         <source>Green</source>
-        <translation type="unfinished">Зеленый (G)</translation>
+        <translation>Зеленый</translation>
     </message>
     <message>
         <location filename="../../toonzqt/histogram.cpp" line="546"/>
         <source>Blue</source>
-        <translation type="unfinished">Голубой (B)</translation>
+        <translation>Синий</translation>
     </message>
     <message>
         <location filename="../../toonzqt/histogram.cpp" line="547"/>
         <source>Alpha</source>
-        <translation type="unfinished">Альфа</translation>
+        <translation>Альфа</translation>
     </message>
 </context>
 <context>
@@ -1503,7 +1503,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2235"/>
         <source>Plain color</source>
-        <translation type="unfinished">Простой цвет</translation>
+        <translation>Простой цвет</translation>
     </message>
 </context>
 <context>
@@ -1641,7 +1641,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <location filename="../../toonzqt/paletteviewer.cpp" line="1041"/>
         <source>Level Palette: </source>
-        <translation>Палитра уровней:</translation>
+        <translation>Палитра уровней: </translation>
     </message>
     <message>
         <location filename="../../toonzqt/paletteviewer.cpp" line="1048"/>
@@ -1872,7 +1872,7 @@ Are you sure?</source>
     <message>
         <location filename="../../toonzqt/stageobjectselection.cpp" line="100"/>
         <source>Paste Object  </source>
-        <translation>Встаить объект</translation>
+        <translation>Встаить объект  </translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionselection.cpp" line="52"/>
@@ -2095,12 +2095,12 @@ Are you sure?</source>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="199"/>
         <source>Bits/Sample:  </source>
-        <translation>Биты/Образец:</translation>
+        <translation>Глубина цвета:  </translation>
     </message>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="200"/>
         <source>Sample/Pixel: </source>
-        <translation>Образец/Пиксель: </translation>
+        <translation>Количество каналов: </translation>
     </message>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="201"/>
@@ -2267,7 +2267,7 @@ Are you sure?</source>
     <message>
         <location filename="../../toonzqt/dvdialog.cpp" line="36"/>
         <source>OpenToonz 1.2</source>
-        <translation type="unfinished">OpenToonz 1.2</translation>
+        <translation>OpenToonz 1.2</translation>
     </message>
     <message>
         <location filename="../../toonzqt/dvdialog.cpp" line="77"/>
@@ -2342,38 +2342,38 @@ Are you sure?</source>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="239"/>
         <source>Failed to compile m_textureShader.vert.</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось скомпилировать m_textureShader.vert.</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="260"/>
         <source>Failed to compile m_shader.frag.</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось скомпилировать m_shader.frag.</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="266"/>
         <source>Failed to add m_shader.vert.</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось добавить m_shader.vert.</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="269"/>
         <source>Failed to add m_shader.frag.</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось добавить m_shader.frag.</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="273"/>
         <source>Failed to link simple shader: %1</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось связать простой шейдер: %1</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="279"/>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="284"/>
         <source>Failed to get attribute location of %1</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось получить расположение атрибута %1</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="289"/>
@@ -2381,30 +2381,32 @@ Are you sure?</source>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="296"/>
         <source>Failed to get uniform location of %1</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось получить одинаковое расположение %1</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="457"/>
         <source>Failed to Open 3DLUT File.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось открыть файл 3DLUT.</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="469"/>
         <source>Failed to Load 3DLUT File.
 It should start with &quot;3DMESH&quot; keyword.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось загрузить 3DLUT файл.
+Он должен начинаться с дескриптора &quot;3DMESH&quot;.</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="480"/>
         <source>Failed to Load 3DLUT File.
 The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось загрузить файл 3DLUT.
+Вторая строка должна быть &quot;Mesh [Input bit depth] [Output bit depth]&quot;</translation>
     </message>
     <message>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="496"/>
         <location filename="../../toonzqt/lutcalibrator.cpp" line="512"/>
         <source>Failed to Load 3DLUT File.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось загрузить файл 3DLUT.</translation>
     </message>
 </context>
 <context>
@@ -2650,27 +2652,27 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1122"/>
         <source>the palette &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>палитра &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1125"/>
         <source>the selected palettes</source>
-        <translation type="unfinished"></translation>
+        <translation>выбранных палитр</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1129"/>
         <source>Move %1 to &quot;%2&quot;. Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Перемещение %1 в &quot;%2&quot;, вы уверены?</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1130"/>
         <source>Move</source>
-        <translation type="unfinished"></translation>
+        <translation>Переместить</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1130"/>
         <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
+        <translation>Отмена</translation>
     </message>
 </context>
 <context>
@@ -2704,7 +2706,7 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3078"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоматически</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3081"/>
@@ -2734,12 +2736,12 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3285"/>
         <source>No Style Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Стиль не выбран</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3309"/>
         <source>Palette</source>
-        <translation type="unfinished">Палитра</translation>
+        <translation>Палитра</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3323"/>
@@ -2754,22 +2756,22 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2958"/>
         <source>Wheel</source>
-        <translation type="unfinished">Колесо</translation>
+        <translation>Круг</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2959"/>
         <source>HSV</source>
-        <translation type="unfinished">HSV</translation>
+        <translation>HSV</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2960"/>
         <source>Alpha</source>
-        <translation type="unfinished">Альфа</translation>
+        <translation>Альфа</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2961"/>
         <source>RGB</source>
-        <translation type="unfinished">RGB</translation>
+        <translation>RGB</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3304"/>
@@ -2779,7 +2781,7 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3306"/>
         <source>[LEVEL]  </source>
-        <translation type="unfinished"></translation>
+        <translation>[УРОВЕНЬ]  </translation>
     </message>
     <message>
         <source>Plain</source>
@@ -2808,17 +2810,17 @@ Apply</source>
         <location filename="../../toonzqt/styleeditor.cpp" line="3212"/>
         <location filename="../../toonzqt/styleeditor.cpp" line="3214"/>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Цвет</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3208"/>
         <source>Vector</source>
-        <translation type="unfinished"></translation>
+        <translation>Вектор</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3209"/>
         <source>Raster</source>
-        <translation type="unfinished"></translation>
+        <translation>Растр</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="3210"/>
@@ -2832,37 +2834,37 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
         <source>R</source>
-        <translation type="unfinished"></translation>
+        <translation>R</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
         <source>G</source>
-        <translation type="unfinished"></translation>
+        <translation>G</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
         <source>A</source>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
         <source>H</source>
-        <translation type="unfinished"></translation>
+        <translation>H</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation>S</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="1230"/>
         <source>V</source>
-        <translation type="unfinished"></translation>
+        <translation>V</translation>
     </message>
 </context>
 <context>
@@ -2898,7 +2900,7 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2687"/>
         <source>Reset to default</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить по умолчанию</translation>
     </message>
 </context>
 <context>
@@ -2944,7 +2946,7 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/tmessageviewer.cpp" line="151"/>
         <source>Display:  </source>
-        <translation type="unfinished"></translation>
+        <translation>Дисплей:  </translation>
     </message>
     <message>
         <location filename="../../toonzqt/tmessageviewer.cpp" line="153"/>
@@ -2959,7 +2961,7 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/tmessageviewer.cpp" line="165"/>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация</translation>
     </message>
     <message>
         <source>Infos</source>

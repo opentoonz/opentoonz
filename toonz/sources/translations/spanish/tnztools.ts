@@ -85,7 +85,7 @@
     </message>
     <message>
         <source>Table</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesa</translation>
     </message>
 </context>
 <context>
@@ -1256,7 +1256,7 @@ Do you want to proceed?</source>
     <name>RotateTool</name>
     <message>
         <source>Rotate On Camera Center</source>
-        <translation>Rotaren torno al centro de la cámara</translation>
+        <translation>Rotar en torno al centro de la cámara</translation>
     </message>
 </context>
 <context>
