@@ -284,7 +284,7 @@
     </message>
     <message>
         <source>Remove Column  </source>
-        <translation>删除列</translation>
+        <translation>删除列  </translation>
     </message>
     <message>
         <source>Load into Current Palette  &gt; %1</source>
@@ -568,7 +568,7 @@
     </message>
     <message>
         <source>HRange</source>
-        <translation type="unfinished"></translation>
+        <translation>H范围</translation>
     </message>
     <message>
         <source>Line Width</source>
@@ -580,31 +580,31 @@
     </message>
     <message>
         <source>Can&apos;t undo rename palette</source>
-        <translation type="unfinished"></translation>
+        <translation>不能取消重命名调色板</translation>
     </message>
     <message>
         <source>Can&apos;t undo move palette</source>
-        <translation type="unfinished"></translation>
+        <translation>不能取消移动调色板</translation>
     </message>
     <message>
         <source>Can&apos;t redo rename palette</source>
-        <translation type="unfinished"></translation>
+        <translation>不能取消重命名调色板</translation>
     </message>
     <message>
         <source>Can&apos;t redo move palette</source>
-        <translation type="unfinished"></translation>
+        <translation>不能重做移动调色板</translation>
     </message>
     <message>
         <source>Rename Studio Palette : %1 &gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation>重命名工作室调色板  %1 &gt; %2</translation>
     </message>
     <message>
         <source>Xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>摄影表</translation>
     </message>
     <message>
         <source>Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>时间轴</translation>
     </message>
 </context>
 <context>

@@ -10662,7 +10662,7 @@ Visit the Web site for more information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonz/main.cpp" line="116"/>
+        <location filename="../../toonz/main.cpp" line="117"/>
         <source>Installing %1 again could fix the problem.</source>
         <translation type="unfinished"></translation>
     </message>

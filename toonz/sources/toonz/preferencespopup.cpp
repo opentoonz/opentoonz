@@ -1193,6 +1193,14 @@ void PreferencesPopup::onCursorOutlineChanged(int index) {
   m_pref->enableCursorOutline(index == Qt::Checked);
 }
 
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onCurrentColumnDataChanged(const TPixel32 &,
+                                                  bool isDragging) {
+  if (isDragging) return;
+  m_pref->setCurrentColumnData(m_currentColumnColor->getColor());
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1455,6 +1463,10 @@ PreferencesPopup::PreferencesPopup()
   QLabel *note_xsheet =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_xsheet->setStyleSheet("font-size: 10px; font: italic;");
+
+  TPixel32 currectColumnColor;
+  m_pref->getCurrentColumnData(currectColumnColor);
+  m_currentColumnColor = new ColorField(this, false, currectColumnColor);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -2411,6 +2423,10 @@ PreferencesPopup::PreferencesPopup()
         xsheetFrameLay->addWidget(showColumnNumbersCB, 12, 0, 1, 2);
         xsheetFrameLay->addWidget(m_syncLevelRenumberWithXsheet, 13, 0, 1, 2);
         xsheetFrameLay->addWidget(showCurrentTimelineCB, 14, 0, 1, 2);
+
+        xsheetFrameLay->addWidget(new QLabel(tr("Current Column Color:")), 15,
+                                  0, Qt::AlignRight | Qt::AlignVCenter);
+        xsheetFrameLay->addWidget(m_currentColumnColor, 15, 1);
       }
       xsheetFrameLay->setColumnStretch(0, 0);
       xsheetFrameLay->setColumnStretch(1, 0);
@@ -2848,6 +2864,11 @@ PreferencesPopup::PreferencesPopup()
 
   ret = ret && connect(m_xsheetLayout, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onXsheetLayoutChanged(int)));
+
+  ret =
+      ret && connect(m_currentColumnColor,
+                     SIGNAL(colorChanged(const TPixel32 &, bool)),
+                     SLOT(onCurrentColumnDataChanged(const TPixel32 &, bool)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

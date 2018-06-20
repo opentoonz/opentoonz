@@ -1270,6 +1270,10 @@ Wählen Sie Effekt-Nodes und verwandte Links, die Sie einfügen möchten, bevor 
         <source> : </source>
         <translation> : </translation>
     </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FxXSheetPainter</name>

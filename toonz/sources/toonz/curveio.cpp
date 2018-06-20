@@ -8,6 +8,7 @@
 #include "toonz/tproject.h"
 #include "tconvert.h"
 #include "filebrowserpopup.h"
+#include "filebrowser.h"
 #include "tundo.h"
 
 //=============================================================================
@@ -42,6 +43,7 @@ public:
              TDoubleParam *curve)
       : FileBrowserPopup(name), m_folderPath(folderPath), m_curve(curve) {
     curve->addRef();
+    m_browser->enableGlobalSelection(false);
   }
 
   ~CurvePopup() { m_curve->release(); }

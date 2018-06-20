@@ -229,6 +229,9 @@ void copyBackBufferToFrontBuffer(const TRect &rect) {
 }
 
 #endif
+
+const TRectD InvalidateAllRect(0, 0, -1, -1);
+
 //-----------------------------------------------------------------------------
 }  // namespace
 //-----------------------------------------------------------------------------
@@ -930,9 +933,9 @@ void SceneViewer::drawEnableScissor() {
 void SceneViewer::drawDisableScissor() {
   if (!m_clipRect.isEmpty() && !m_draw3DMode) {
     glDisable(GL_SCISSOR_TEST);
-    // clear the clipping rect
-    m_clipRect.empty();
   }
+  // clear the clipping rect
+  m_clipRect.empty();
 }
 
 //-----------------------------------------------------------------------------
@@ -1633,7 +1636,10 @@ TRect SceneViewer::getActualClipRect(const TAffine &aff) {
     TPointD p11 = winToWorld(clipRect.getP11());
     clipRect = TRectD(TPointD(std::min(p00.x, p01.x), std::min(p00.y, p10.y)),
                       TPointD(std::max(p11.x, p10.x), std::max(p11.y, p01.y)));
-  } else if (m_clipRect.isEmpty())
+  }
+  // this condition will catch both cases of m_clipRect == empty and
+  // m_clipRect == InvalidateAllRect
+  else if (m_clipRect.isEmpty())
     clipRect -= TPointD(viewerSize.lx / 2, viewerSize.ly / 2);
   else {
     TRectD app = aff * (m_clipRect.enlarge(3));
@@ -1674,7 +1680,6 @@ TAffine SceneViewer::getSceneMatrix() const {
 
 void SceneViewer::setViewMatrix(const TAffine &aff, int viewMode) {
   m_viewAff[viewMode] = aff;
-  if (aff.a11 == 0.0) std::cout << "STOP" << std::endl;
   // In case the previewer is on, request a delayed update
   if (m_previewMode != NO_PREVIEW) requestTimedRefresh();
 }
@@ -1689,7 +1694,7 @@ bool SceneViewer::is3DView() const {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::invalidateAll() {
-  m_clipRect.empty();
+  m_clipRect = InvalidateAllRect;
   update();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();
@@ -1706,7 +1711,7 @@ void SceneViewer::navigatorPan(const QPoint &delta) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::GLInvalidateAll() {
-  m_clipRect.empty();
+  m_clipRect = InvalidateAllRect;
   update();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();
@@ -1715,17 +1720,18 @@ void SceneViewer::GLInvalidateAll() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::GLInvalidateRect(const TRectD &rect) {
-  // there is a case that this function is called more than once before
-  // paintGL() is called
-  if (!m_clipRect.isEmpty())
-    m_clipRect += rect;
+  // in case that GLInvalidateAll is called just before coming here,
+  // ignore the clip rect and refresh entire viewer
+  if (m_clipRect == InvalidateAllRect)
+    return;
+  else if (rect.isEmpty())
+    m_clipRect = InvalidateAllRect;
   else
-    m_clipRect = rect;
+    m_clipRect += rect;
   update();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();
 }
-
 //-----------------------------------------------------------------------------
 
 // delta.x: right panning, pixel; delta.y: down panning, pixel

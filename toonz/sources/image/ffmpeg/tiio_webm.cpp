@@ -79,6 +79,8 @@ TLevelWriterWebm::~TLevelWriterWebm() {
   preIArgs << "-framerate";
   preIArgs << QString::number(m_frameRate);
 
+  postIArgs << "-auto-alt-ref";
+  postIArgs << "0";
   postIArgs << "-c:v";
   postIArgs << "libvpx";
   postIArgs << "-s";

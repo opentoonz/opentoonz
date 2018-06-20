@@ -838,6 +838,8 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
   m_palettePath->setPath(CreateNewPalette);
   m_removeUnusedStyles->setEnabled(false);
 
+  // update the image dpi field
+  onDpiModeSelected(m_dpiMode->currentIndex());
   // m_fileFormat->setCurrentIndex(areFullcolor?0:m_fileFormat->findText("tif"));
 }
 

@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation>Rotación:</translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation>Mesa</translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
@@ -1252,7 +1256,7 @@ Do you want to proceed?</source>
     <name>RotateTool</name>
     <message>
         <source>Rotate On Camera Center</source>
-        <translation>Rotaren torno al centro de la cámara</translation>
+        <translation>Rotar en torno al centro de la cámara</translation>
     </message>
 </context>
 <context>

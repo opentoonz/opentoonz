@@ -1259,6 +1259,10 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
         <source> : </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FxXSheetPainter</name>

@@ -463,5 +463,7 @@
       <file>Resources/colorchiporder_leftup.svg</file>
       <file>Resources/colorchiporder_lowleft.svg</file>
       <file>Resources/colorchiporder_upleft.svg</file>
+      <file>Resources/timeline2xsheet.svg</file>
+      <file>Resources/xsheet2timeline.svg</file>
     </qresource>
 </RCC>

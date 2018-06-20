@@ -442,7 +442,7 @@ public:
   void openPopup(QStringList filters, bool isDirectoryOnly,
                  QString lastSelectedPath,
                  const QWidget *parentWidget = NULL) override;
-  QString getPath() override;
+  QString getPath(bool codePath = true) override;
 };
 
 #endif  // FILEBROWSERPOPUP_H

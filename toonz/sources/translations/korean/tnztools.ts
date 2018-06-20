@@ -93,6 +93,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="1061"/>
+        <source>Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../tnztools/tooloptions.cpp" line="664"/>
         <source>Pick:</source>
         <translation type="unfinished"></translation>
@@ -266,17 +271,17 @@
 <context>
     <name>BrushToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1752"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1754"/>
         <source>Preset Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1756"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1758"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1758"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1760"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1427,7 +1432,7 @@ Do you want to proceed?</source>
 <context>
     <name>RGBPickerToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2362"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2364"/>
         <source>Pick Screen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1506,7 +1511,7 @@ Do you want to proceed?</source>
 <context>
     <name>RotateTool</name>
     <message>
-        <location filename="../../tnztools/viewtools.cpp" line="225"/>
+        <location filename="../../tnztools/viewtools.h" line="41"/>
         <source>Rotate On Camera Center</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1514,37 +1519,37 @@ Do you want to proceed?</source>
 <context>
     <name>RulerToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2123"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2125"/>
         <source>X:</source>
         <comment>ruler tool option</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2129"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2131"/>
         <source>Y:</source>
         <comment>ruler tool option</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2137"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2139"/>
         <source>W:</source>
         <comment>ruler tool option</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2143"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2145"/>
         <source>H:</source>
         <comment>ruler tool option</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2151"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2153"/>
         <source>A:</source>
         <comment>ruler tool option</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2156"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2158"/>
         <source>L:</source>
         <comment>ruler tool option</comment>
         <translation type="unfinished"></translation>
@@ -1576,37 +1581,37 @@ Do you want to proceed?</source>
 <context>
     <name>SelectionToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1171"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1173"/>
         <source>H:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1173"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1175"/>
         <source>V:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1175"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1177"/>
         <source>Link</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1179"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1181"/>
         <source>Rotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1183"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1185"/>
         <source>E/W:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1185"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1187"/>
         <source>N/S:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1238"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1240"/>
         <source>Thickness</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1700,7 +1705,7 @@ Do you want to proceed?</source>
 <context>
     <name>StylePickerToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2444"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2446"/>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
         <translation type="unfinished"></translation>

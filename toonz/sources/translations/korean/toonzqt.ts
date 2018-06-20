@@ -1384,6 +1384,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1312"/>
+        <source>Fx Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../toonzqt/fxsettings.cpp" line="1314"/>
         <source> : </source>
         <translation type="unfinished"></translation>

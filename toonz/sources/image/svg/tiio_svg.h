@@ -4,6 +4,7 @@
 #define TTIO_SVG_INCLUDED
 
 #include "tlevel_io.h"
+#include <QCoreApplication>
 
 #endif
 
@@ -35,10 +36,12 @@ private:
 namespace Tiio {
 
 class SvgWriterProperties final : public TPropertyGroup {
+  Q_DECLARE_TR_FUNCTIONS(SvgWriterProperties)
 public:
   TEnumProperty m_strokeMode;
   TEnumProperty m_outlineQuality;
   SvgWriterProperties();
+  void updateTranslation() override;
 };
 }
 

@@ -108,7 +108,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
       distance, offset);
 
   // default value
-  if (distance == 0) distance = 6;
+  //  if (distance == 0) distance = 6;
 
   QRect visibleRect = visibleRegion().boundingRect();
 
@@ -124,30 +124,19 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
     int frameAxis = m_viewer->rowToFrameAxis(r);
 
     //--- draw horizontal line
-    QColor color = ((r - offset) % distance == 0 && r != 0)
-                       ? m_viewer->getMarkerLineColor()
-                       : m_viewer->getLightLineColor();
+    bool isAfterMarkers =
+        (distance > 0 && ((r - offset) % distance) == 0 && r != 0);
+    QColor color = isAfterMarkers ? m_viewer->getMarkerLineColor()
+                                  : m_viewer->getLightLineColor();
     p.setPen(color);
     QLine horizontalLine = o->horizontalLine(frameAxis, layerSide);
-    p.drawLine(horizontalLine);
-
-    if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50) {
-      QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
-      if (!o->isVerticalTimeline()) basePoint.setY(0);
-      QRect indRect =
-          o->rect(PredefinedRect::FRAME_INDICATOR).translated(basePoint);
-      indRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
-      QColor useColor;
-      if (playR0 <= r && r <= playR1) {
-        useColor = ((r - m_r0) % step == 0)
-                       ? m_viewer->getPreviewFrameTextColor()
-                       : m_viewer->getTextColor();
-      }
-      // not in preview range
-      else
-        useColor = m_viewer->getTextColor();
-      p.fillRect(indRect, useColor);
+    if (!o->isVerticalTimeline()) {
+      int x = horizontalLine.x1();
+      int y = horizontalLine.y2() - (isAfterMarkers ? 6 : 3);
+      horizontalLine.setP1(QPoint(x, y));
+      if (!isAfterMarkers) p.setPen(m_viewer->getTextColor());
     }
+    p.drawLine(horizontalLine);
   }
 
   int z = 0;
@@ -205,7 +194,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
 
     case XsheetViewer::Frame: {
       if (!o->isVerticalTimeline() && m_viewer->getFrameZoomFactor() <= 50 &&
-          r > 0 && (r + 1) % 5)
+          r > 0 && (r + 1) % (distance > 0 ? distance : 5))
         break;
       QString number = QString::number(r + 1);
       p.drawText(labelRect, align, number);
@@ -275,6 +264,43 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
 }
 
 //-----------------------------------------------------------------------------
+void RowArea::drawPlayRangeBackground(QPainter &p, int r0, int r1) {
+  if (!XsheetGUI::isPlayRangeEnabled()) return;
+
+  const Orientation *o = m_viewer->orientation();
+  TXsheet *xsh         = m_viewer->getXsheet();
+  int frameAdj         = m_viewer->getFrameZoomAdjustment();
+  QRect playRangeRect  = o->rect(PredefinedRect::PLAY_RANGE);
+
+  int playR0, playR1, step;
+  XsheetGUI::getPlayRange(playR0, playR1, step);
+
+  for (int r = r0; r <= r1; r++) {
+    if (!(playR0 <= r && r <= playR1) && ((r - m_r0) % step == 0)) continue;
+
+    QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
+    if (!o->isVerticalTimeline()) basePoint.setY(0);
+
+    QRect previewBoxRect = o->rect(PredefinedRect::PREVIEW_FRAME_AREA)
+                               .adjusted(0, 0, -frameAdj, 0)
+                               .translated(basePoint);
+    p.fillRect(previewBoxRect, m_viewer->getNotEmptyColumnColor());
+
+    if (!o->isVerticalTimeline()) {
+      if (r == playR0) {
+        QLine horizontalLine(previewBoxRect.topLeft(),
+                             previewBoxRect.bottomLeft());
+        p.setPen(m_viewer->getLightLineColor());
+        p.drawLine(horizontalLine);
+      } else if (r == playR1) {
+        QLine horizontalLine(previewBoxRect.topRight(),
+                             previewBoxRect.bottomRight());
+        p.setPen(m_viewer->getLightLineColor());
+        p.drawLine(horizontalLine);
+      }
+    }
+  }
+}
 
 void RowArea::drawPlayRange(QPainter &p, int r0, int r1) {
   bool playRangeEnabled = XsheetGUI::isPlayRangeEnabled();
@@ -297,8 +323,6 @@ void RowArea::drawPlayRange(QPainter &p, int r0, int r1) {
   QColor ArrowColor = (playRangeEnabled) ? QColor(255, 255, 255) : grey150;
   p.setBrush(QBrush(ArrowColor));
 
-  int topOrLeftCol =
-      m_viewer->orientation()->isVerticalTimeline() ? 0 : xsh->getColumnCount();
   if (m_r0 > r0 - 1 && r1 + 1 > m_r0) {
     QPoint topLeft = m_viewer->positionToXY(CellPosition(m_r0, 0));
     if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
@@ -350,15 +374,19 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   QColor frontColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b,
                     128);
   QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b, 128);
+  QColor frontDotColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b);
+  QColor backDotColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b);
+  QPen frontPen, backPen;
 
   // If the onion skin is disabled, draw dash line instead.
-  if (osMask.isEnabled())
-    p.setPen(Qt::red);
-  else {
-    QPen currentPen = p.pen();
-    currentPen.setStyle(Qt::DashLine);
-    currentPen.setColor(QColor(128, 128, 128, 255));
-    p.setPen(currentPen);
+  if (osMask.isEnabled()) {
+    frontPen.setColor(frontDotColor);
+    backPen.setColor(backDotColor);
+  } else {
+    frontPen.setStyle(Qt::DashLine);
+    frontPen.setColor(QColor(128, 128, 128));
+    backPen.setStyle(Qt::DashLine);
+    backPen.setColor(QColor(128, 128, 128));
   }
 
   QRect onionRect = m_viewer->orientation()->rect(PredefinedRect::ONION);
@@ -388,6 +416,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
                       (frameAdj / 2);
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
+    p.setPen(backPen);
     if (m_viewer->orientation()->isVerticalTimeline())
       p.drawLine(verticalLine.x1(), verticalLine.y1() + 5, verticalLine.x2(),
                  verticalLine.y2() - 9);
@@ -404,12 +433,13 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
                       onionCenter_frame - (frameAdj / 2);
     QLine verticalLine = m_viewer->orientation()->verticalLine(
         layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
+    p.setPen(frontPen);
     if (m_viewer->orientation()->isVerticalTimeline())
       p.drawLine(verticalLine.x1(), verticalLine.y1() + 10, verticalLine.x2(),
                  verticalLine.y2() - 5);
     else
       p.drawLine(verticalLine.x1() + 10, verticalLine.y1(),
-                 verticalLine.x2() - 5, verticalLine.y2());
+                 verticalLine.x2() - 3, verticalLine.y2());
   }
   // Draw onion skin main handle
   QPoint handleTopLeft = m_viewer->positionToXY(CellPosition(currentRow, 0));
@@ -419,21 +449,23 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   int angle180 = 16 * 180;
   int turn =
       m_viewer->orientation()->dimension(PredefinedDimension::ONION_TURN) * 16;
+  p.setPen(backDotColor);
   p.setBrush(QBrush(backColor));
   p.drawChord(handleRect, turn, angle180);
+  p.setPen(frontDotColor);
   p.setBrush(QBrush(frontColor));
   p.drawChord(handleRect, turn + angle180, angle180);
 
   // draw onion skin dots
-  p.setPen(Qt::red);
   for (int i = 0; i < mosCount; i++) {
     // mos : frame offset from the current frame
     int mos = osMask.getMos(i);
     // skip drawing if the frame is under the mouse cursor
     if (m_showOnionToSet == Mos && currentRow + mos == m_row) continue;
 
+    p.setPen(mos < 0 ? backDotColor : frontDotColor);
     if (osMask.isEnabled())
-      p.setBrush(mos < 0 ? backColor : frontColor);
+      p.setBrush(mos < 0 ? backDotColor : frontDotColor);
     else
       p.setBrush(Qt::NoBrush);
     QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow + mos, 0));
@@ -452,6 +484,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     // skip drawing if the frame is under the mouse cursor
     if (m_showOnionToSet == Fos && fos == m_row) continue;
 
+    p.setPen(QColor(0, 255, 255, 128));
     if (osMask.isEnabled())
       p.setBrush(QBrush(QColor(0, 255, 255, 128)));
     else
@@ -467,7 +500,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
 
   //-- onion placement hint under mouse
   if (m_showOnionToSet != None) {
-    p.setPen(QColor(255, 128, 0));
+    p.setPen(QColor(255, 255, 0));
     p.setBrush(QBrush(QColor(255, 255, 0)));
     QPoint topLeft = m_viewer->positionToXY(CellPosition(m_row, 0));
     if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
@@ -624,6 +657,8 @@ void RowArea::paintEvent(QPaintEvent *event) {
 
   // fill background
   p.fillRect(toBeUpdated, m_viewer->getBGColor());
+
+  drawPlayRangeBackground(p, r0, r1);
 
   if (TApp::instance()->getCurrentFrame()->isEditingScene())
     // current frame

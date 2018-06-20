@@ -145,7 +145,7 @@
     </message>
     <message>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
-        <translation>不能在预设名称中使用 &quot;,&quot; (逗号)</translation>
+        <translation>不能在预设名称中使用 &quot;,&quot; (逗号)。</translation>
     </message>
     <message>
         <source>DPI</source>
@@ -173,11 +173,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>A/R</source>
-        <translation type="unfinished"></translation>
+        <translation>A/R</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="unfinished">&lt;自定&gt;</translation>
+        <translation>&lt;定制&gt;</translation>
     </message>
 </context>
 <context>
@@ -196,7 +196,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Alpha</source>
-        <translation>Alpha</translation>
+        <translation>透明度</translation>
     </message>
     <message>
         <source>RGBA</source>
@@ -269,26 +269,26 @@ Possibly the preset file has been corrupted</source>
     <name>ComboHistoRGBLabel</name>
     <message>
         <source>R:%1 G:%2 B:%3</source>
-        <translation type="unfinished"></translation>
+        <translation>R:%1 G:%2 B:%3</translation>
     </message>
 </context>
 <context>
     <name>ComboHistogram</name>
     <message>
         <source>Picked Color</source>
-        <translation type="unfinished"></translation>
+        <translation>拾取的颜色</translation>
     </message>
     <message>
         <source>Average Color (Ctrl + Drag)</source>
-        <translation type="unfinished"></translation>
+        <translation>平均色(Ctrl + 拖拽)</translation>
     </message>
     <message>
         <source>X:</source>
-        <translation type="unfinished">X:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <source>Y:</source>
-        <translation type="unfinished">Y:</translation>
+        <translation>Y:</translation>
     </message>
 </context>
 <context>
@@ -341,19 +341,19 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::ColorField</name>
     <message>
         <source>R:</source>
-        <translation type="unfinished"></translation>
+        <translation>R:</translation>
     </message>
     <message>
         <source>G:</source>
-        <translation type="unfinished"></translation>
+        <translation>G:</translation>
     </message>
     <message>
         <source>B:</source>
-        <translation type="unfinished"></translation>
+        <translation>B:</translation>
     </message>
     <message>
         <source>A:</source>
-        <translation type="unfinished"></translation>
+        <translation>A:</translation>
     </message>
 </context>
 <context>
@@ -423,7 +423,7 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::StyleIndexLineEdit</name>
     <message>
         <source>current</source>
-        <translation type="unfinished"></translation>
+        <translation>当前</translation>
     </message>
 </context>
 <context>
@@ -953,7 +953,7 @@ Possibly the preset file has been corrupted</source>
     <name>FunctionSheet</name>
     <message>
         <source>Function Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>功能编辑器</translation>
     </message>
 </context>
 <context>
@@ -1034,15 +1034,15 @@ Possibly the preset file has been corrupted</source>
     <name>FunctionTreeModel</name>
     <message>
         <source>Stage</source>
-        <translation type="unfinished"></translation>
+        <translation>舞台</translation>
     </message>
     <message>
         <source>FX</source>
-        <translation type="unfinished"></translation>
+        <translation>特效</translation>
     </message>
     <message>
         <source>Plastic Skeleton</source>
-        <translation type="unfinished"></translation>
+        <translation>塑料骨架</translation>
     </message>
 </context>
 <context>
@@ -1069,7 +1069,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Table</source>
-        <translation type="unfinished">动画台</translation>
+        <translation>动画台</translation>
     </message>
 </context>
 <context>
@@ -1269,6 +1269,10 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <source> : </source>
         <translation> : </translation>
     </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation>特效设定</translation>
+    </message>
 </context>
 <context>
     <name>FxXSheetPainter</name>
@@ -1304,27 +1308,27 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Value</source>
-        <translation type="unfinished">值</translation>
+        <translation>值</translation>
     </message>
     <message>
         <source>RGB</source>
-        <translation type="unfinished">RGB</translation>
+        <translation>RGB</translation>
     </message>
     <message>
         <source>Red</source>
-        <translation type="unfinished">红</translation>
+        <translation>红</translation>
     </message>
     <message>
         <source>Green</source>
-        <translation type="unfinished">绿</translation>
+        <translation>绿</translation>
     </message>
     <message>
         <source>Blue</source>
-        <translation type="unfinished">蓝</translation>
+        <translation>蓝</translation>
     </message>
     <message>
         <source>Alpha</source>
-        <translation type="unfinished"></translation>
+        <translation>透明度</translation>
     </message>
 </context>
 <context>
@@ -2110,59 +2114,61 @@ Are you sure?</source>
     <message>
         <source>Failed to compile m_textureShader.vert.</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>编译 m_textureShader.vert 失败。</translation>
     </message>
     <message>
         <source>Failed to compile m_shader.frag.</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>编译 m_shader.frag 失败。</translation>
     </message>
     <message>
         <source>Failed to add m_shader.vert.</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>添加 m_shader.vert 失败。</translation>
     </message>
     <message>
         <source>Failed to add m_shader.frag.</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>添加 m_shader.frag 失败。</translation>
     </message>
     <message>
         <source>Failed to link simple shader: %1</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>链接 simple shader 失败: %1</translation>
     </message>
     <message>
         <source>Failed to get attribute location of %1</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>获取 : %1 的位置属性失败</translation>
     </message>
     <message>
         <source>Failed to get uniform location of %1</source>
         <comment>gl</comment>
-        <translation type="unfinished"></translation>
+        <translation>获取: %1的统一位置失败</translation>
     </message>
     <message>
         <source>Failed to Open 3DLUT File.</source>
-        <translation type="unfinished"></translation>
+        <translation>打开3DLUT文件失败。</translation>
     </message>
     <message>
         <source>Failed to Load 3DLUT File.
 It should start with &quot;3DMESH&quot; keyword.</source>
-        <translation type="unfinished"></translation>
+        <translation>加载 3DLUT 文件失败。
+它应该是 3DMESH 关键字开头的。</translation>
     </message>
     <message>
         <source>Failed to Load 3DLUT File.
 The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>加载 3DLUT 文件失败。
+第二行应该是 &quot;Mesh [Input bit depth] [Output bit depth]&quot;</translation>
     </message>
     <message>
         <source>Failed to Load 3DLUT File.</source>
-        <translation type="unfinished"></translation>
+        <translation>加载 3DLUT 文件失败。</translation>
     </message>
     <message>
         <source>OpenToonz 1.2</source>
-        <translation type="unfinished">OpenToonz 1.2</translation>
+        <translation>OpenToonz 1.2</translation>
     </message>
 </context>
 <context>
@@ -2383,23 +2389,23 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>the palette &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>调色板 &quot;%1&quot;</translation>
     </message>
     <message>
         <source>the selected palettes</source>
-        <translation type="unfinished"></translation>
+        <translation>所选的调色板</translation>
     </message>
     <message>
         <source>Move %1 to &quot;%2&quot;. Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>移动  %1 到 &quot;%2&quot;。你确定吗？</translation>
     </message>
     <message>
         <source>Move</source>
-        <translation type="unfinished"></translation>
+        <translation>移动</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
@@ -2509,7 +2515,7 @@ Apply</source>
     </message>
     <message>
         <source>Generated</source>
-        <translation type="unfinished">已生成</translation>
+        <translation>已生成</translation>
     </message>
     <message>
         <source>Trail</source>
@@ -2517,11 +2523,11 @@ Apply</source>
     </message>
     <message>
         <source>Color</source>
-        <translation type="unfinished">颜色</translation>
+        <translation>颜色</translation>
     </message>
     <message>
         <source>Vector</source>
-        <translation type="unfinished">矢量</translation>
+        <translation>矢量</translation>
     </message>
     <message>
         <source>Raster</source>
@@ -2529,39 +2535,39 @@ Apply</source>
     </message>
     <message>
         <source>Show or hide parts of the Color Page.</source>
-        <translation type="unfinished"></translation>
+        <translation>显示或隐藏部分颜色页。</translation>
     </message>
     <message>
         <source>Toggle orientation of the Color Page.</source>
-        <translation type="unfinished"></translation>
+        <translation>打开/关闭颜色页的朝向。</translation>
     </message>
     <message>
         <source>No Style Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>无样式被选中</translation>
     </message>
     <message>
         <source>Style Editor - No Valid Style Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>样式编辑器 - 无有效样式被选中</translation>
     </message>
     <message>
         <source>Wheel</source>
-        <translation type="unfinished">色轮</translation>
+        <translation>色轮</translation>
     </message>
     <message>
         <source>HSV</source>
-        <translation type="unfinished">HSV</translation>
+        <translation>HSV</translation>
     </message>
     <message>
         <source>Alpha</source>
-        <translation type="unfinished"></translation>
+        <translation>透明度</translation>
     </message>
     <message>
         <source>RGB</source>
-        <translation type="unfinished">RGB</translation>
+        <translation>RGB</translation>
     </message>
     <message>
         <source>Palette</source>
-        <translation type="unfinished">调色板</translation>
+        <translation>调色板</translation>
     </message>
 </context>
 <context>

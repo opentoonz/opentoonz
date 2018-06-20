@@ -1632,6 +1632,9 @@ public:
       col    = currEnd;
     int dCol = col - (m_lastCol - m_offset);
 
+    // ignore if the cursor moves in the drag-starting column
+    if (dCol == 0) return;
+
     int newBegin = *indices.begin() + dCol;
     int newEnd   = *indices.rbegin() + dCol;
 
@@ -1641,8 +1644,10 @@ public:
              newEnd > currEnd)
       dCol -= (newEnd - currEnd);
 
-    if (col == (m_lastCol - m_offset)) return;
-    m_lastCol = col + m_offset;
+    // ignore if the dragged columns comes up against the end of column stack
+    if (dCol == 0) return;
+
+    m_lastCol += dCol;
 
     assert(*indices.begin() + dCol >= 0);
 

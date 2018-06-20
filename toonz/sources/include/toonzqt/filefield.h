@@ -55,6 +55,7 @@ class DVAPI FileField : public QWidget {
   QString m_windowTitle;
   QString m_descriptionText;  // if the initial text is not path, set the string
                               // here and prevent browsing
+  bool m_codePath;
 
 protected:  // used in the child class for CleanupSettings
   QPushButton *m_fileBrowseButton;
@@ -68,7 +69,7 @@ public:
     BrowserPopupController() {}
     virtual ~BrowserPopupController() {}
     virtual bool isExecute() { return true; };
-    virtual QString getPath() { return QString(); };
+    virtual QString getPath(bool codePath = true) { return QString(); };
     virtual void openPopup(QStringList, bool, QString,
                            const QWidget * = NULL){};
   };
@@ -76,7 +77,8 @@ public:
   static BrowserPopupController *m_browserPopupController;
 
   FileField(QWidget *parent = 0, QString path = QString(),
-            bool readOnly = false, bool doNotBrowseInitialPath = false);
+            bool readOnly = false, bool doNotBrowseInitialPath = false,
+            bool codePath = true);
   ~FileField() {}
 
   /*! Set what the user may select in the file dialog:

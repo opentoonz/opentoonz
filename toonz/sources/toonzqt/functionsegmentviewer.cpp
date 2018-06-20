@@ -658,7 +658,9 @@ bool FunctionExpressionSegmentPage::getGuiValues(std::string &expressionText,
 
 FileSegmentPage::FileSegmentPage(FunctionSegmentViewer *parent)
     : FunctionSegmentPage(parent) {
-  m_fileFld = new DVGui::FileField(this);
+  // Force decoding the path since the file interporation
+  // currently accepts only absolute paths.
+  m_fileFld = new DVGui::FileField(this, QString(), false, false, false);
   m_fileFld->setFileMode(QFileDialog::ExistingFile);
   QStringList filters;
   filters.append("dat");

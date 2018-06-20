@@ -179,6 +179,44 @@ intentar aumentar el tiempo de espera en las Preferencias.</translation>
     </message>
 </context>
 <context>
+    <name>SvgWriterProperties</name>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1954"/>
+        <source>Stroke Mode</source>
+        <translation>Modo de vectorización</translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1955"/>
+        <source>Outline Quality</source>
+        <translation>Calidad de contornos</translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1956"/>
+        <source>Centerline</source>
+        <translation>Líneas</translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1957"/>
+        <source>Outline</source>
+        <translation>Contornos</translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1958"/>
+        <source>High</source>
+        <translation>Alta</translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1959"/>
+        <source>Medium</source>
+        <translation>Media</translation>
+    </message>
+    <message>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1960"/>
+        <source>Low</source>
+        <translation>Baja</translation>
+    </message>
+</context>
+<context>
     <name>TgaWriterProperties</name>
     <message>
         <location filename="../../image/tga/tiio_tga.cpp" line="523"/>
