@@ -689,7 +689,7 @@ void ColumnArea::DrawHeader::drawEye() const {
   // preview visible toggle
   p.setPen(m_viewer->getVerticalLineColor());
 
-  if (column->getPaletteColumn() || column->getSoundTextColumn()) {
+  if (column->getSoundTextColumn()) {
     if (o->flag(PredefinedFlag::EYE_AREA_BORDER)) p.drawRect(prevViewRect);
     return;
   }
@@ -1827,7 +1827,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       // preview button
       else if (o->rect(PredefinedRect::EYE_AREA).contains(mouseInCell) &&
                event->button() == Qt::LeftButton) {
-        if (column->getPaletteColumn() || column->getSoundTextColumn()) {
+        if (column->getSoundTextColumn()) {
           // do nothing
         } else {
           m_doOnRelease =

@@ -18,9 +18,12 @@ class LayerHeaderPanel final : public QWidget {
 
   enum { ToggleAllTransparency = 1, ToggleAllPreviewVisible, ToggleAllLock };
 
+  enum { NoButton, PreviewButton, CamstandButton, LockButton };
+
   int m_doOnRelease;
   QString m_tooltip;
   QPoint m_pos;
+  int m_buttonHighlighted;
 
 private:
   XsheetViewer *m_viewer;
@@ -43,6 +46,8 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
+  void enterEvent(QEvent *);
+  void leaveEvent(QEvent *);
   bool event(QEvent *event) override;
 
 private:

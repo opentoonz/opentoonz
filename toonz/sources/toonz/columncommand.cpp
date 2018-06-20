@@ -794,6 +794,7 @@ void ColumnCmd::copyColumns(const std::set<int> &indices) {
 
 void ColumnCmd::pasteColumns(std::set<int> &indices,
                              const StageObjectsData *data) {
+  // indices will be updated here by inserted column ids after pasting
   bool isPaste = pasteColumnsWithoutUndo(&indices, true, data);
   if (!isPaste) return;
   TUndoManager::manager()->add(new PasteColumnsUndo(indices));

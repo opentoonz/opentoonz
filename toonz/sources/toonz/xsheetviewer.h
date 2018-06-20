@@ -325,6 +325,18 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
                  setMeshColumnBorderColor)
   Q_PROPERTY(QColor SelectedMeshColumnColor READ getSelectedMeshColumnColor
                  WRITE setSelectedMeshColumnColor)
+  // SoundText column
+  QColor m_soundTextColumnColor;
+  QColor m_soundTextColumnBorderColor;
+  QColor m_selectedSoundTextColumnColor;
+  Q_PROPERTY(QColor SoundTextColumnColor READ getSoundTextColumnColor WRITE
+                 setSoundTextColumnColor)
+  Q_PROPERTY(
+      QColor SoundTextColumnBorderColor READ getSoundTextColumnBorderColor WRITE
+          setSoundTextColumnBorderColor)
+  Q_PROPERTY(
+      QColor SelectedSoundTextColumnColor READ getSelectedSoundTextColumnColor
+          WRITE setSelectedSoundTextColumnColor)
   // Sound column
   QColor m_soundColumnColor;
   QColor m_soundColumnBorderColor;
@@ -478,14 +490,25 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
                  WRITE setTimelineConfigButtonImage)
   // Layer Header icons
   QImage m_layerHeaderPreviewImage;
+  QImage m_layerHeaderPreviewOverImage;
   QImage m_layerHeaderCamstandImage;
+  QImage m_layerHeaderCamstandOverImage;
   QImage m_layerHeaderLockImage;
+  QImage m_layerHeaderLockOverImage;
   Q_PROPERTY(QImage LayerHeaderPreviewImage READ getLayerHeaderPreviewImage
                  WRITE setLayerHeaderPreviewImage)
+  Q_PROPERTY(
+      QImage LayerHeaderPreviewOverImage READ getLayerHeaderPreviewOverImage
+          WRITE setLayerHeaderPreviewOverImage)
   Q_PROPERTY(QImage LayerHeaderCamstandImage READ getLayerHeaderCamstandImage
                  WRITE setLayerHeaderCamstandImage)
+  Q_PROPERTY(
+      QImage LayerHeaderCamstandOverImage READ getLayerHeaderCamstandOverImage
+          WRITE setLayerHeaderCamstandOverImage)
   Q_PROPERTY(QImage LayerHeaderLockImage READ getLayerHeaderLockImage WRITE
                  setLayerHeaderLockImage)
+  Q_PROPERTY(QImage LayerHeaderLockOverImage READ getLayerHeaderLockOverImage
+                 WRITE setLayerHeaderLockOverImage)
 
   XsheetScrollArea *m_cellScrollArea;
   XsheetScrollArea *m_columnScrollArea;
@@ -704,9 +727,8 @@ public:
   void setSelectedColumnTextColor(const QColor &color) {
     m_selectedColumnTextColor = color;
   }
-  QColor getSelectedColumnTextColor() const {
-    return m_selectedColumnTextColor;
-  }
+  QColor getSelectedColumnTextColor() const;
+
   // Cell
   void setEmptyCellColor(const QColor &color) { m_emptyCellColor = color; }
   QColor getEmptyCellColor() const { return m_emptyCellColor; }
@@ -836,6 +858,23 @@ public:
   QColor getMeshColumnBorderColor() const { return m_meshColumnBorderColor; }
   QColor getSelectedMeshColumnColor() const {
     return m_selectedMeshColumnColor;
+  }
+  // SoundText column
+  void setSoundTextColumnColor(const QColor &color) {
+    m_soundTextColumnColor = color;
+  }
+  void setSoundTextColumnBorderColor(const QColor &color) {
+    m_soundTextColumnBorderColor = color;
+  }
+  void setSelectedSoundTextColumnColor(const QColor &color) {
+    m_selectedSoundTextColumnColor = color;
+  }
+  QColor getSoundTextColumnColor() const { return m_soundTextColumnColor; }
+  QColor getSoundTextColumnBorderColor() const {
+    return m_soundTextColumnBorderColor;
+  }
+  QColor getSelectedSoundTextColumnColor() const {
+    return m_selectedSoundTextColumnColor;
   }
   // Sound column
   QColor getSoundColumnHlColor() const { return m_soundColumnHlColor; }
@@ -1060,19 +1099,37 @@ public:
   void setLayerHeaderPreviewImage(const QImage &image) {
     m_layerHeaderPreviewImage = image;
   }
+  void setLayerHeaderPreviewOverImage(const QImage &image) {
+    m_layerHeaderPreviewOverImage = image;
+  }
   void setLayerHeaderCamstandImage(const QImage &image) {
     m_layerHeaderCamstandImage = image;
+  }
+  void setLayerHeaderCamstandOverImage(const QImage &image) {
+    m_layerHeaderCamstandOverImage = image;
   }
   void setLayerHeaderLockImage(const QImage &image) {
     m_layerHeaderLockImage = image;
   }
+  void setLayerHeaderLockOverImage(const QImage &image) {
+    m_layerHeaderLockOverImage = image;
+  }
   QImage getLayerHeaderPreviewImage() const {
     return m_layerHeaderPreviewImage;
+  }
+  QImage getLayerHeaderPreviewOverImage() const {
+    return m_layerHeaderPreviewOverImage;
   }
   QImage getLayerHeaderCamstandImage() const {
     return m_layerHeaderCamstandImage;
   }
+  QImage getLayerHeaderCamstandOverImage() const {
+    return m_layerHeaderCamstandOverImage;
+  }
   QImage getLayerHeaderLockImage() const { return m_layerHeaderLockImage; }
+  QImage getLayerHeaderLockOverImage() const {
+    return m_layerHeaderLockOverImage;
+  }
 
   void getButton(int &btype, QColor &bgColor, QImage &iconImage,
                  bool isTimeline = false);

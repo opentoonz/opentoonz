@@ -341,7 +341,8 @@ Preferences::Preferences()
     , m_enableAutoStretch(true)
     , m_cursorBrushType("Small")
     , m_cursorBrushStyle("Default")
-    , m_cursorOutlineEnabled(true) {
+    , m_cursorOutlineEnabled(true)
+    , m_currentColumnColor(TPixel::Black) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -703,6 +704,12 @@ Preferences::Preferences()
   setCursorBrushStyle(m_cursorBrushStyle.toStdString());
 
   getValue(*m_settings, "cursorOutlineEnabled", m_cursorOutlineEnabled);
+
+  r = 255, g = 0, b = 0;
+  getValue(*m_settings, "currentColumnColor.r", r);
+  getValue(*m_settings, "currentColumnColor.g", g);
+  getValue(*m_settings, "currentColumnColor.b", b);
+  m_currentColumnColor = TPixel32(r, g, b);
 }
 
 //-----------------------------------------------------------------
@@ -1707,4 +1714,14 @@ void Preferences::setCursorBrushStyle(std::string brushStyle) {
 void Preferences::enableCursorOutline(bool on) {
   m_cursorOutlineEnabled = on;
   m_settings->setValue("cursorOutlineEnabled", on ? "1" : "0");
+}
+
+void Preferences::setCurrentColumnData(const TPixel &currentColumnColor) {
+  m_currentColumnColor = currentColumnColor;
+  m_settings->setValue("currentColumnColor.r",
+                       QString::number(currentColumnColor.r));
+  m_settings->setValue("currentColumnColor.g",
+                       QString::number(currentColumnColor.g));
+  m_settings->setValue("currentColumnColor.b",
+                       QString::number(currentColumnColor.b));
 }

@@ -1715,6 +1715,9 @@ XsheetViewer {
   qproperty-MeshColumnColor: #684D86;
   qproperty-MeshColumnBorderColor: #BA92EF;
   qproperty-SelectedMeshColumnColor: #82689e;
+  qproperty-SoundTextColumnColor: #c8c8c8;
+  qproperty-SoundTextColumnBorderColor: #8c8c8c;
+  qproperty-SelectedSoundTextColumnColor: #e2e2e2;
   qproperty-SoundColumnColor: #657456;
   qproperty-SoundColumnBorderColor: #A0AF7D;
   qproperty-SelectedSoundColumnColor: #7e8b72;
@@ -1759,8 +1762,11 @@ XsheetViewer {
   qproperty-TimelineConfigButtonBgColor: rgba(255, 255, 255, 0);
   qproperty-TimelineConfigButtonImage: url('../Default/imgs/white/timeline_config.svg');
   qproperty-LayerHeaderPreviewImage: url('../Default/imgs/white/layer_header_prev_eye.svg');
+  qproperty-LayerHeaderPreviewOverImage: url('../Default/imgs/white/layer_header_prev_eye_over.svg');
   qproperty-LayerHeaderCamstandImage: url('../Default/imgs/white/layer_header_table_view.svg');
+  qproperty-LayerHeaderCamstandOverImage: url('../Default/imgs/white/layer_header_table_view_over.svg');
   qproperty-LayerHeaderLockImage: url('../Default/imgs/white/lock_on.svg');
+  qproperty-LayerHeaderLockOverImage: url('../Default/imgs/white/lock_on_over.svg');
 }
 /* XSheet Toolbar
 ----------------------------------------------------------------------------- */
