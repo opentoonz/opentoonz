@@ -440,6 +440,8 @@ public:
 
   void getNodeColor(int ltype, QColor &nodeColor);
 
+  QColor getSelectedNodeTextColor();
+
 public slots:
 
   void updateSchematic();

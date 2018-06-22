@@ -870,3 +870,15 @@ void SchematicViewer::changeNodeSize() {
                                 : tr("&Maximize Nodes"));
   m_nodeSize->setText(label);
 }
+
+//------------------------------------------------------------------
+
+QColor SchematicViewer::getSelectedNodeTextColor() {
+  // get colors
+  TPixel currentColumnPixel;
+  Preferences::instance()->getCurrentColumnData(currentColumnPixel);
+  QColor currentColumnColor((int)currentColumnPixel.r,
+                            (int)currentColumnPixel.g,
+                            (int)currentColumnPixel.b, 255);
+  return currentColumnColor;
+}

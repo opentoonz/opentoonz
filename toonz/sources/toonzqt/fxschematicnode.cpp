@@ -215,7 +215,7 @@ void FxColumnPainter::paint(QPainter *painter,
   if (!m_parent->isNameEditing()) {
     // if this is a current object
     if (sceneFx->getCurrentFx() == m_parent->getFx())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
     QString elidedName =
         elideText(m_name, painter->font(), columnNameRect.width());
     painter->drawText(columnNameRect, Qt::AlignLeft | Qt::AlignVCenter,
@@ -448,7 +448,7 @@ void FxPalettePainter::paint(QPainter *painter,
 
   if (!m_parent->isNameEditing()) {
     if (sceneFx->getCurrentFx() == m_parent->getFx())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
 
     int w = idRect.width();
 
@@ -639,7 +639,7 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
     if (!sceneFx) return;
     if (sceneFx->getCurrentFx() == m_parent->getFx())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
     QRectF rect(3, 2, m_width - 21, 14);
     int w              = rect.width();
     QString elidedName = elideText(m_name, painter->font(), w);
@@ -845,7 +845,7 @@ void FxPainter::paint_small(QPainter *painter) {
     FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
     if (!sceneFx) return;
     if (sceneFx->getCurrentFx() == m_parent->getFx())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
   }
 
   if (m_type == eGroupedFx) {
@@ -928,7 +928,10 @@ void FxXSheetPainter::paint(QPainter *painter,
   painter->setPen(Qt::NoPen);
   painter->drawRect(QRectF(0, 0, m_width, m_height));
 
-  painter->setPen(viewer->getTextColor());
+  if (sceneFx->getCurrentFx() == m_parent->getFx())
+    painter->setPen(viewer->getSelectedNodeTextColor());
+  else
+    painter->setPen(viewer->getTextColor());
   if (m_parent->isLargeScaled()) {
     // Draw the name
     QRectF rect(18, 0, 54, 18);
@@ -1029,7 +1032,10 @@ void FxOutputPainter::paint(QPainter *painter,
   painter->setPen(Qt::NoPen);
   painter->drawRect(QRectF(0, 0, m_width, m_height));
 
-  painter->setPen(viewer->getTextColor());
+  if (sceneFx->getCurrentFx() == m_parent->getFx())
+    painter->setPen(viewer->getSelectedNodeTextColor());
+  else
+    painter->setPen(viewer->getTextColor());
   if (m_parent->isLargeScaled()) {
     // Draw the name
     QRectF rect(18, 0, 72, 18);

@@ -177,7 +177,7 @@ void ColumnPainter::paint(QPainter *painter,
 
     // if this is current object
     if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
     QRectF columnNameRect(18, 2, 54, 14);
     QString elidedName =
         elideText(m_name, painter->font(), columnNameRect.width());
@@ -322,7 +322,7 @@ void GroupPainter::paint(QPainter *painter,
     QFont font("Verdana", 8);
     painter->setFont(font);
     if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-      painter->setPen(QColor(255, 0, 0, 255));
+      painter->setPen(viewer->getSelectedNodeTextColor());
     else
       painter->setPen(viewer->getTextColor());
 
@@ -392,7 +392,7 @@ void PegbarPainter::paint(QPainter *painter,
 
   if (!m_parent->isNameEditing()) {
     if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
     else
       painter->setPen(viewer->getTextColor());
     // Draw the name
@@ -479,7 +479,7 @@ void CameraPainter::paint(QPainter *painter,
 
   if (!m_parent->isNameEditing()) {
     if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
     else
       painter->setPen(viewer->getTextColor());
     // Draw the name
@@ -572,7 +572,7 @@ void TablePainter::paint(QPainter *painter,
   painter->drawPixmap(imgRect, tablePm);
 
   if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-    painter->setPen(Qt::yellow);
+    painter->setPen(viewer->getSelectedNodeTextColor());
   else
     painter->setPen(viewer->getTextColor());
 
@@ -653,6 +653,12 @@ void SplinePainter::paint(QPainter *painter,
 
   //! draw the name only if it is not editing
   if (!m_parent->isNameEditing()) {
+    /* There is no current spline
+              TStageObjectId currObj = stageScene->getCurrentObject();
+        if(currObj.getCode() == m_parent->getSpline()->getId())
+          painter->setPen(viewer->getSelectedNodeTextColor());
+        else
+    */
     painter->setPen(viewer->getTextColor());
     QRectF rect(18, 0, 72, 18);
     QString elidedName = elideText(m_name, painter->font(), rect.width());
@@ -1779,7 +1785,9 @@ void StageSchematicColumnNode::paint(QPainter *painter,
   QFont font("Verdana", 8);
   painter->setFont(font);
   StageSchematicScene *scene = dynamic_cast<StageSchematicScene *>(m_scene);
-  if (scene && scene->getCurrentObject() == id) painter->setPen(Qt::yellow);
+  SchematicViewer *viewer    = scene->getSchematicViewer();
+  if (scene && scene->getCurrentObject() == id)
+    painter->setPen(viewer->getSelectedNodeTextColor());
   QFontMetrics metrix(font);
   int srcWidth  = metrix.width(colNumber);
   int srcHeight = metrix.height();
