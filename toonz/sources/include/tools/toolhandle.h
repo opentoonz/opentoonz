@@ -65,7 +65,10 @@ public:
   void notifyToolChanged() { emit toolChanged(); }
 
   void notifyToolCursorTypeChanged() { emit toolCursorTypeChanged(); }
+
+  void notifyToolComboBoxListChanged() { emit toolComboBoxListChanged(); }
 signals:
+  void toolComboBoxListChanged();
   void toolSwitched();
   void toolChanged();
   void toolEditingFinished();

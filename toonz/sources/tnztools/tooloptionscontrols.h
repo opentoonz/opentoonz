@@ -203,13 +203,12 @@ protected:
 public:
   ToolOptionCombo(TTool *tool, TEnumProperty *property,
                   ToolHandle *toolHandle = 0);
-  void loadEntries();
   void updateStatus() override;
 
   TEnumProperty *getProperty() const { return m_property; }
 
 public slots:
-
+  void loadEntries();
   void onActivated(int);
   void doShowPopup();
   void doOnActivated(int);

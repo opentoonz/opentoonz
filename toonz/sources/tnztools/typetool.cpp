@@ -539,6 +539,8 @@ void TypeTool::initTypeFaces() {
        it != typefaces.end(); ++it)
     m_typeFaceMenu.addValue(*it);
   if (m_typeFaceMenu.isValue(oldTypeface)) m_typeFaceMenu.setValue(oldTypeface);
+
+  TTool::getApplication()->getCurrentTool()->notifyToolComboBoxListChanged();
 }
 
 //---------------------------------------------------------

@@ -571,8 +571,12 @@ ToolOptionCombo::ToolOptionCombo(TTool *tool, TEnumProperty *property,
   setSizeAdjustPolicy(QComboBox::AdjustToContents);
   connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
   // synchronize the state with the same widgets in other tool option bars
-  if (toolHandle)
+  if (toolHandle) {
     connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
+
+    connect(toolHandle, SIGNAL(toolComboBoxListChanged()), this,
+            SLOT(loadEntries()));
+  }
 }
 
 //-----------------------------------------------------------------------------
