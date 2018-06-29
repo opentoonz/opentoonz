@@ -2159,7 +2159,7 @@ void MainWindow::defineActions() {
   createToolAction(MI_FillLines, "karasu", tr("Fill Tool - Lines"), "");
   createToolAction(T_PaintBrush, "paintbrush", tr("Paint Brush Tool"), "");
   createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "E");
-  createToolAction(T_Tape, "tape", tr("Tae Tool"), "T");
+  createToolAction(T_Tape, "tape", tr("Tape Tool"), "T");
   createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "K");
   createToolAction(MI_PickStyleAreas, "stylepicker_area", tr("Style Picker Tool - Areas"), "");
   createToolAction(MI_PickStyleLines, "stylepicker_line", tr("Style Picker Tool - Lines"), "");
