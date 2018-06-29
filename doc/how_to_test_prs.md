@@ -16,7 +16,7 @@ When a PR is submitted, it is compiled automatically by AppVeyor and Travis CI. 
 
 - Go to the PR you are interested in checking out.
 
-- Scroll to the bottom of the page and looked for the green-outlined box with `All checks have passed` in it. Click on `Show all checks` next to it.
+- Scroll to the bottom of the page and look for the green-outlined box with `All checks have passed` in it. Click on `Show all checks` next to it.
 
 ![](./testing_pr_1.JPG)
 
