@@ -970,7 +970,7 @@ FunctionSheet::FunctionSheet(QWidget *parent, bool isFloating)
   setRowsPanel(m_rowViewer = new FunctionSheetRowViewer(this));
   setCellsPanel(m_cellViewer = new FunctionSheetCellViewer(this));
 
-  setWindowFlag(Qt::Window);
+  setWindowFlags(Qt::Window);
   setColumnCount(20);
   setWindowTitle(tr("Function Editor"));
   setFocusPolicy(Qt::ClickFocus);
