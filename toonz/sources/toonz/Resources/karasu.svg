@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 35 30"
+   height="30"
+   width="35"
+   id="svg92"
+   version="1.1"
+   sodipodi:docname="karasu.svg"
+   inkscape:version="0.92.1 r15371">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1061"
+     inkscape:window-height="661"
+     id="namedview2570"
+     showgrid="false"
+     inkscape:zoom="7.8666667"
+     inkscape:cx="17.514404"
+     inkscape:cy="14.994974"
+     inkscape:window-x="563"
+     inkscape:window-y="271"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg92" />
+  <metadata
+     id="metadata98">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs96" />
+  <image
+     y="0"
+     x="0"
+     id="image100"
+     xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAeCAQAAAAMNG+hAAAAd0lEQVR42u3QxwEEIQxDUZdGae7M pWmDiFfZm/fPWW8A+7cCUICwEiRgEsQZApFBbhnIuIL4fTwyIuo5BgIdAQbmCuQTiY649LgH0tAk xOI2TiEMmEioCJmBWBFiL0JYJdKKkFR3xKHPZzpCJl+ewfHVnOaLGL0LMYjkH4l+uBQAAAAASUVO RK5CYII= "
+     preserveAspectRatio="none"
+     height="30"
+     width="35" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
+     x="27.584745"
+     y="30.127119"
+     id="text2574"><tspan
+       sodipodi:role="line"
+       id="tspan2572"
+       x="27.584745"
+       y="30.127119">L</tspan></text>
+</svg>

@@ -2155,10 +2155,14 @@ void MainWindow::defineActions() {
   createToolAction(T_Geometric, "geometric", tr("Geometric Tool"), "G");
   createToolAction(T_Type, "type", tr("Type Tool"), "Y");
   createToolAction(T_Fill, "fill", tr("Fill Tool"), "F");
+  createToolAction(MI_FillAreas, "fill_area", tr("Fill Tool - Areas"), "");
+  createToolAction(MI_FillLines, "karasu", tr("Fill Tool - Lines"), "");
   createToolAction(T_PaintBrush, "paintbrush", tr("Paint Brush Tool"), "");
   createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "E");
-  createToolAction(T_Tape, "tape", tr("Tape Tool"), "T");
+  createToolAction(T_Tape, "tape", tr("Tae Tool"), "T");
   createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "K");
+  createToolAction(MI_PickStyleAreas, "stylepicker_area", tr("Style Picker Tool - Areas"), "");
+  createToolAction(MI_PickStyleLines, "stylepicker_line", tr("Style Picker Tool - Lines"), "");
   createToolAction(T_RGBPicker, "RGBpicker", tr("RGB Picker Tool"), "R");
   createToolAction(T_ControlPointEditor, "controlpointeditor",
                    tr("Control Point Editor Tool"), "C");
@@ -2296,15 +2300,15 @@ void MainWindow::defineActions() {
                           tr("Fill Tool - Autopaint Lines"), "");
 
   /*-- FillAreas, FillLinesにキー1つで切り替えるためのコマンド --*/
-  createAction(MI_FillAreas, tr("Fill Tool - Areas"), "", ToolCommandType);
-  createAction(MI_FillLines, tr("Fill Tool - Lines"), "", ToolCommandType);
+  //createAction(MI_FillAreas, tr("Fill Tool - Areas"), "", ToolCommandType);
+  //createAction(MI_FillLines, tr("Fill Tool - Lines"), "", ToolCommandType);
 
   /*-- Style picker Area, Style picker Lineににキー1つで切り替えるためのコマンド
    * --*/
-  createAction(MI_PickStyleAreas, tr("Style Picker Tool - Areas"), "",
-               ToolCommandType);
-  createAction(MI_PickStyleLines, tr("Style Picker Tool - Lines"), "",
-               ToolCommandType);
+ //createAction(MI_PickStyleAreas, tr("Style Picker Tool - Areas"), "",
+ //              ToolCommandType);
+ //createAction(MI_PickStyleLines, tr("Style Picker Tool - Lines"), "",
+ //              ToolCommandType);
 
   createMiscAction("A_FxSchematicToggle", tr("Toggle FX/Stage schematic"), "");
 }

@@ -83,7 +83,11 @@
         <file>Resources/farm_tasks.svg</file>
         <file>Resources/fill.png</file>
         <file>Resources/fill.svg</file>
+        <file>Resources/fill_area.svg</file>
         <file>Resources/fill_rollover.svg</file>
+        <file>Resources/fill_area_rollover.svg</file>
+        <file>Resources/karasu.svg</file>
+        <file>Resources/karasu_rollover.svg</file>
         <file>Resources/folderpreset_open.svg</file>
         <file>Resources/folderpreset_close.svg</file>
         <file>Resources/folderup.svg</file>
@@ -271,7 +275,11 @@
         <file>Resources/stop_on.svg</file>
         <file>Resources/stroke_select.png</file>
         <file>Resources/stylepicker.svg</file>
+        <file>Resources/stylepicker_area.svg</file>
+        <file>Resources/stylepicker_line.svg</file>
         <file>Resources/stylepicker_rollover.svg</file>
+        <file>Resources/stylepicker_area_rollover.svg</file>
+        <file>Resources/stylepicker_line_rollover.svg</file>
         <file>Resources/sub.png</file>
         <file>Resources/sub2.png</file>
         <file>Resources/sub3.png</file>
