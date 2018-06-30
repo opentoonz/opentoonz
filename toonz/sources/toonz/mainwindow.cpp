@@ -1422,7 +1422,7 @@ QAction *MainWindow::createAction(const char *id, const char *iconName,
   icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
   icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
   icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(icon, name, this);
-  
+
   addAction(action);
 #ifdef MACOSX
   // To prevent the wrong menu items (due to MacOS menu naming conventions),
@@ -1456,7 +1456,7 @@ QAction *MainWindow::createRightClickMenuAction(
 QAction *MainWindow::createMenuFileAction(const char *id, const char *iconName,
                                           const QString &name,
                                           const QString &defaultShortcut) {
-   
+
    return createAction(id, iconName, name, defaultShortcut, MenuFileCommandType);
 }
 
@@ -1465,26 +1465,14 @@ QAction *MainWindow::createMenuFileAction(const char *id, const char *iconName,
 QAction *MainWindow::createMenuEditAction(const char *id, const char *iconName,
                                           const QString &name,
                                           const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
    return createAction(id, iconName, name, defaultShortcut, MenuEditCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
 QAction *MainWindow::createMenuScanCleanupAction(const char *id, const char *iconName,
-                                                 const QString &name, 
+                                                 const QString &name,
                                                  const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
    return createAction(id, iconName, name, defaultShortcut, MenuScanCleanupCommandType);
 }
 
@@ -1493,15 +1481,7 @@ QAction *MainWindow::createMenuScanCleanupAction(const char *id, const char *ico
 QAction *MainWindow::createMenuLevelAction(const char *id, const char *iconName,
                                            const QString &name,
                                            const QString &defaultShortcut) {
-    
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active);
-  
-  QAction *action = new DVAction(icon, name, this);
+
   return createAction(id, iconName, name, defaultShortcut, MenuLevelCommandType);
 }
 
@@ -1510,13 +1490,7 @@ QAction *MainWindow::createMenuLevelAction(const char *id, const char *iconName,
 QAction *MainWindow::createMenuXsheetAction(const char *id, const char *iconName,
                                             const QString &name,
                                             const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
-   return createAction(id, iconName, name, defaultShortcut, MenuXsheetCommandType);
+  return createAction(id, iconName, name, defaultShortcut, MenuXsheetCommandType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1524,13 +1498,7 @@ QAction *MainWindow::createMenuXsheetAction(const char *id, const char *iconName
 QAction *MainWindow::createMenuCellsAction(const char *id, const char *iconName,
                                            const QString &name,
                                            const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
-   return createAction(id, iconName, name, defaultShortcut, MenuCellsCommandType);
+  return createAction(id, iconName, name, defaultShortcut, MenuCellsCommandType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1538,13 +1506,7 @@ QAction *MainWindow::createMenuCellsAction(const char *id, const char *iconName,
 QAction *MainWindow::createMenuViewAction(const char *id, const char *iconName,
                                           const QString &name,
                                           const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
-   return createAction(id, iconName, name, defaultShortcut, MenuViewCommandType);
+  return createAction(id, iconName, name, defaultShortcut, MenuViewCommandType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1552,13 +1514,7 @@ QAction *MainWindow::createMenuViewAction(const char *id, const char *iconName,
 QAction *MainWindow::createMenuWindowsAction(const char *id, const char *iconName,
                                              const QString &name,
                                              const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
-   return createAction(id, iconName, name, defaultShortcut, MenuWindowsCommandType);
+  return createAction(id, iconName, name, defaultShortcut, MenuWindowsCommandType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1566,13 +1522,7 @@ QAction *MainWindow::createMenuWindowsAction(const char *id, const char *iconNam
 QAction *MainWindow::createPlaybackAction(const char *id, const char *iconName,
                                           const QString &name,
                                           const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
-   return createAction(id, iconName, name, defaultShortcut, PlaybackCommandType);
+  return createAction(id, iconName, name, defaultShortcut, PlaybackCommandType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1580,13 +1530,7 @@ QAction *MainWindow::createPlaybackAction(const char *id, const char *iconName,
 QAction *MainWindow::createRGBAAction(const char *id, const char *iconName,
                                       const QString &name,
                                       const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
-   return createAction(id, iconName, name, defaultShortcut, RGBACommandType);
+  return createAction(id, iconName, name, defaultShortcut, RGBACommandType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1594,13 +1538,7 @@ QAction *MainWindow::createRGBAAction(const char *id, const char *iconName,
 QAction *MainWindow::createFillAction(const char *id, const char *iconName,
                                       const QString &name,
                                       const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
-   return createAction(id, iconName, name, defaultShortcut, FillCommandType);
+  return createAction(id, iconName, name, defaultShortcut, FillCommandType);
 }
 //-----------------------------------------------------------------------------
 
@@ -1617,13 +1555,7 @@ QAction *MainWindow::createMenuAction(const char *id, const QString &name,
 QAction *MainWindow::createViewerAction(const char *id, const char *iconName,
                                         const QString &name,
                                         const QString &defaultShortcut) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); QAction *action = new DVAction(name, this);
-   return createAction(id, iconName, name, defaultShortcut, ZoomCommandType);
+  return createAction(id, iconName, name, defaultShortcut, ZoomCommandType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1654,13 +1586,7 @@ QAction *MainWindow::createToggle(const char *id, const char *iconName,
                                   const QString &name,
                                   const QString &defaultShortcut,
                                   bool startStatus, CommandType type) {
-  QString normalResource = QString(":Resources/") + iconName + ".svg";
-  QString overResource   = QString(":Resources/") + iconName + "_rollover.svg";
-  QIcon icon;
-  icon.addFile(normalResource, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(overResource, QSize(), QIcon::Normal, QIcon::On);
-  icon.addFile(overResource, QSize(), QIcon::Active); 
-   QAction *action = createAction(id, iconName, name, defaultShortcut, type);
+  QAction *action = createAction(id, iconName, name, defaultShortcut, type);
   action->setCheckable(true);
   if (startStatus == true) action->trigger();
   bool ret =
@@ -1863,7 +1789,7 @@ void MainWindow::defineActions() {
   createMenuLevelAction(MI_AdjustThickness, "broken", tr("Adjust Thickness..."), "");
   createMenuLevelAction(MI_Antialias, "broken", tr("&Antialias..."), "");
   createMenuLevelAction(MI_Binarize, "broken", tr("&Binarize..."), "");
-  createMenuLevelAction(MI_BrightnessAndContrast, "broken", 
+  createMenuLevelAction(MI_BrightnessAndContrast, "broken",
                         tr("&Brightness and Contrast..."), "");
   createMenuLevelAction(MI_LinesFade, "broken", tr("&Color Fade..."), "");
 #ifdef LINETEST
