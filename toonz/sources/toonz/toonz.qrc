@@ -1,5 +1,11 @@
 <RCC>
     <qresource prefix="/">
+        <file>Resources/1s.svg</file>
+        <file>Resources/1s_rollover.svg</file>
+        <file>Resources/2s.svg</file>
+        <file>Resources/2s_rollover.svg</file>
+        <file>Resources/3s.svg</file>
+        <file>Resources/3s_rollover.svg</file>
         <file>Resources/pane_3d_off.svg</file>
         <file>Resources/pane_3d_on.svg</file>
         <file>Resources/pane_3d_over.svg</file>
@@ -30,6 +36,7 @@
         <file>Resources/camera_selected.png</file>
         <file>Resources/camerastand_toggle.png</file>
         <file>Resources/canvas.svg</file>
+        <file>Resources/canvas_rollover.svg</file>
         <file>Resources/center.png</file>
         <file>Resources/centerHTitle.png</file>
         <file>Resources/centerHTitle_inactive.png</file>
@@ -135,6 +142,8 @@
         <file>Resources/link_closed_rollover.bmp</file>
         <file>Resources/link_parent.bmp</file>
         <file>Resources/load_level.svg</file>
+        <file>Resources/load_scene.svg</file>
+        <file>Resources/load_scene_rollover.svg</file>
         <file>Resources/lock.png</file>
         <file>Resources/lock_over.png</file>
         <file>Resources/loop.svg</file>
@@ -155,6 +164,8 @@
         <file>Resources/my_documents.svg</file>
         <file>Resources/network.svg</file>
         <file>Resources/new_raster_level.svg</file>
+        <file>Resources/new_scene.svg</file>
+        <file>Resources/new_scene_rollover.svg</file>
         <file>Resources/new_toonz_raster_level.svg</file>
         <file>Resources/new_vector_level.svg</file>
         <file>Resources/newmemo.svg</file>
@@ -414,12 +425,12 @@
         <file>Resources/pane_safe_over.svg</file>
         <file>Resources/pane_safe_on.svg</file>
         <file>Resources/pane_minimize.svg</file>
-        <file>Resources/pane_minimize_over.svg</file>   
-        <file>Resources/pane_minimize_on.svg</file> 
+        <file>Resources/pane_minimize_over.svg</file>
+        <file>Resources/pane_minimize_on.svg</file>
         <file>Resources/pane_grid_off.svg</file>
         <file>Resources/pane_grid_over.svg</file>
         <file>Resources/pane_grid_on.svg</file>
-        <file>Resources/folderup_icon.svg</file>      
+        <file>Resources/folderup_icon.svg</file>
         <file>Resources/link_icon.svg</file>
         <file>Resources/folder_icon.svg</file>
       <file>Resources/fb_history_back_enable.svg</file>

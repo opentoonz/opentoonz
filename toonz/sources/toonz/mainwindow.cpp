@@ -1624,8 +1624,8 @@ QAction *MainWindow::createToolAction(const char *id, const char *iconName,
 //-----------------------------------------------------------------------------
 
 void MainWindow::defineActions() {
-  createMenuFileAction(MI_NewScene, "broken", tr("&New Scene"), "Ctrl+N");
-  createMenuFileAction(MI_LoadScene, "broken", tr("&Load Scene..."), "Ctrl+L");
+  createMenuFileAction(MI_NewScene, "new_scene", tr("&New Scene"), "Ctrl+N");
+  createMenuFileAction(MI_LoadScene, "load_scene", tr("&Load Scene..."), "Ctrl+L");
   createMenuFileAction(MI_SaveScene, "broken", tr("&Save Scene"), "Ctrl+Shift+S");
   createMenuFileAction(MI_SaveSceneAs, "broken", tr("&Save Scene As..."), "");
   createMenuFileAction(MI_SaveAll, "broken", tr("&Save All"), "Ctrl+S");
@@ -1796,7 +1796,7 @@ void MainWindow::defineActions() {
   createMenuLevelAction(MI_Capture, "broken", tr("&Capture"), "Space");
 #endif
   QAction *action =
-      createMenuLevelAction(MI_CanvasSize, "broken", tr("&Canvas Size..."), "");
+      createMenuLevelAction(MI_CanvasSize, "canvas", tr("&Canvas Size..."), "");
   if (action) action->setDisabled(true);
   action->setIcon(QIcon(":Resources/canvas.svg"));
   createMenuLevelAction(MI_FileInfo, "broken", tr("&Info..."), "");
@@ -1895,15 +1895,15 @@ void MainWindow::defineActions() {
   createMenuCellsAction(MI_DrawingSubGroupBackward, "broken",
                         tr("Similar Drawing Substitution Backward"), "Alt+Q");
   QAction *reframeOnesAction =
-      createMenuCellsAction(MI_Reframe1, "broken", tr("1's"), "");
+      createMenuCellsAction(MI_Reframe1, "1s", tr("1's"), "");
   reframeOnesAction->setIconText("1's");
 
   QAction *reframeTwosAction =
-      createMenuCellsAction(MI_Reframe2, "broken", tr("2's"), "");
+      createMenuCellsAction(MI_Reframe2, "2s", tr("2's"), "");
   reframeTwosAction->setIconText("2's");
 
   QAction *reframeThreesAction =
-      createMenuCellsAction(MI_Reframe3, "broken", tr("3's"), "");
+      createMenuCellsAction(MI_Reframe3, "3s", tr("3's"), "");
   reframeThreesAction->setIconText("3's");
 
   createMenuCellsAction(MI_Reframe4, "broken", tr("4's"), "");
