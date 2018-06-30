@@ -1640,26 +1640,23 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_LoadSubSceneFile, "broken", tr("&Load As Sub-xsheet..."), "");
   createMenuAction(MI_OpenRecentScene, tr("&Open Recent Scene File"), files);
   createMenuAction(MI_OpenRecentLevel, tr("&Open Recent Level File"), files);
-  createMenuFileAction(MI_ClearRecentScene, "broken", tr("&Clear Recent Scene File List"),
-                       "");
-  createMenuFileAction(MI_ClearRecentLevel, "broken", tr("&Clear Recent level File List"),
-                       "");
+  createMenuFileAction(MI_ClearRecentScene, "broken", tr("&Clear Recent Scene File List"), "");
+  createMenuFileAction(MI_ClearRecentLevel, "broken", tr("&Clear Recent level File List"), "");
   createMenuFileAction(MI_NewLevel, "broken", tr("&New Level..."), "Alt+N");
 
   QAction *newVectorLevelAction =
-      createMenuFileAction(MI_NewVectorLevel, "broken", tr("&New Vector Level"), "");
+      createMenuFileAction(MI_NewVectorLevel, "new_vector_level", tr("&New Vector Level"), "");
   newVectorLevelAction->setIconText(tr("New Vector Level"));
   newVectorLevelAction->setIcon(QIcon(":Resources/new_vector_level.svg"));
-  QAction *newToonzRasterLevelAction = createMenuFileAction(MI_NewToonzRasterLevel, "broken", tr("&New Toonz Raster Level"), "");
+  QAction *newToonzRasterLevelAction = createMenuFileAction(MI_NewToonzRasterLevel, "new_toonz_raster_level", tr("&New Toonz Raster Level"), "");
   newToonzRasterLevelAction->setIconText(tr("New Toonz Raster Level"));
   newToonzRasterLevelAction->setIcon(
       QIcon(":Resources/new_toonz_raster_level.svg"));
   QAction *newRasterLevelAction =
-      createMenuFileAction(MI_NewRasterLevel, "broken", tr("&New Raster Level"), "");
+      createMenuFileAction(MI_NewRasterLevel, "new_raster_level", tr("&New Raster Level"), "");
   newRasterLevelAction->setIconText(tr("New Raster Level"));
   newRasterLevelAction->setIcon(QIcon(":Resources/new_raster_level.svg"));
-  QAction *loadLevelAction =
-      createMenuFileAction(MI_LoadLevel, "broken", tr("&Load Level..."), "");
+  QAction *loadLevelAction = createMenuFileAction(MI_LoadLevel, "load_level", tr("&Load Level..."), "");
   loadLevelAction->setIcon(QIcon(":Resources/load_level.svg"));
   createMenuFileAction(MI_SaveLevel, "broken", tr("&Save Level"), "");
   createMenuFileAction(MI_SaveAllLevels, "broken", tr("&Save All Levels"), "");
@@ -1689,8 +1686,7 @@ void MainWindow::defineActions() {
       MI_FreezePreview, tr("Freeze Preview"), tr("Unfreeze Preview"));
   // createAction(MI_SavePreview,         "&Save Preview",		"");
   createRightClickMenuAction(MI_SavePreset, "broken", tr("&Save As Preset"), "");
-  QAction *preferencesAction =
-      createMenuFileAction(MI_Preferences, "broken", tr("&Preferences..."), "Ctrl+U");
+  QAction *preferencesAction = createMenuFileAction(MI_Preferences, "preferences", tr("&Preferences..."), "Ctrl+U");
   preferencesAction->setIcon(QIcon(":Resources/preferences.svg"));
   createMenuFileAction(MI_ShortcutPopup, "broken", tr("&Configure Shortcuts..."), "");
   createMenuFileAction(MI_PrintXsheet, "broken", tr("&Print Xsheet"), "");
@@ -1708,9 +1704,9 @@ void MainWindow::defineActions() {
 
   createMenuEditAction(MI_SelectAll,"broken", tr("&Select All"), "Ctrl+A");
   createMenuEditAction(MI_InvertSelection,"broken", tr("&Invert Selection"), "");
-  QAction *undoAction = createMenuEditAction(MI_Undo,"broken", tr("&Undo"), "Ctrl+Z");
+  QAction *undoAction = createMenuEditAction(MI_Undo,"undo", tr("&Undo"), "Ctrl+Z");
   undoAction->setIcon(QIcon(":Resources/undo.svg"));
-  QAction *redoAction = createMenuEditAction(MI_Redo,"broken", tr("&Redo"), "Ctrl+Y");
+  QAction *redoAction = createMenuEditAction(MI_Redo,"redo", tr("&Redo"), "Ctrl+Y");
   redoAction->setIcon(QIcon(":Resources/redo.svg"));
   createMenuEditAction(MI_Cut,"broken", tr("&Cut"), "Ctrl+X");
   createMenuEditAction(MI_Copy,"broken", tr("&Copy"), "Ctrl+C");
@@ -1739,7 +1735,7 @@ void MainWindow::defineActions() {
   createMenuEditAction(MI_ExitGroup,"broken", tr("&Exit Group"), "");
   createMenuEditAction(MI_RemoveEndpoints,"broken", tr("&Remove Vector Overflow"), "");
   QAction *touchToggle =
-      createToggle(MI_TouchGestureControl, "broken", tr("&Touch Gesture Control"), "",
+      createToggle(MI_TouchGestureControl, "touch", tr("&Touch Gesture Control"), "",
                    TouchGestureControl ? 1 : 0, MenuEditCommandType);
   touchToggle->setEnabled(true);
   touchToggle->setIcon(QIcon(":Resources/touch.svg"));
@@ -1825,7 +1821,7 @@ void MainWindow::defineActions() {
   collapseAction->setIconText("Collapse");
   collapseAction->setIcon(createQIconOnOffPNG("collapse"));
 
-  toggle = createToggle(MI_ToggleEditInPlace, "broken", tr("&Toggle Edit In Place"), "",
+  toggle = createToggle(MI_ToggleEditInPlace, "edit_in_place", tr("&Toggle Edit In Place"), "",
                         EditInPlaceToggleAction ? 1 : 0, MenuViewCommandType);
   toggle->setIconText(tr("Toggle Edit in Place"));
   toggle->setIcon(QIcon(":Resources/edit_in_place.svg"));
@@ -1833,14 +1829,14 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_SaveSubxsheetAs, "broken", tr("&Save Sub-xsheet As..."), "");
   createMenuXsheetAction(MI_Resequence, "broken", tr("Resequence"), "");
   QAction *cloneAction =
-      createMenuXsheetAction(MI_CloneChild, "broken", tr("Clone Sub-xsheet"), "");
+      createMenuXsheetAction(MI_CloneChild, "clone", tr("Clone Sub-xsheet"), "");
   cloneAction->setIcon(QIcon(":Resources/clone.svg"));
   createMenuXsheetAction(MI_ApplyMatchLines, "broken", tr("&Apply Match Lines..."), "");
   createMenuXsheetAction(MI_MergeCmapped, "broken", tr("&Merge Tlv Levels..."), "");
   createMenuXsheetAction(MI_DeleteMatchLines, "broken", tr("&Delete Match Lines"), "");
   createMenuXsheetAction(MI_DeleteInk, "broken", tr("&Delete Lines..."), "");
   QAction *mergeLevelsAction =
-      createMenuXsheetAction(MI_MergeColumns, "broken", tr("&Merge Levels"), "");
+      createMenuXsheetAction(MI_MergeColumns, "merge", tr("&Merge Levels"), "");
   mergeLevelsAction->setIcon(QIcon(":Resources/merge.svg"));
   createMenuXsheetAction(MI_InsertFx, "broken", tr("&New FX..."), "Ctrl+F");
   QAction *newOutputAction =
@@ -1881,7 +1877,7 @@ void MainWindow::defineActions() {
   createMenuCellsAction(MI_Rollup, "broken", tr("&Roll Up"), "");
   createMenuCellsAction(MI_Rolldown, "broken", tr("&Roll Down"), "");
   QAction *timeStretchAction =
-      createMenuCellsAction(MI_TimeStretch, "broken", tr("&Time Stretch..."), "");
+      createMenuCellsAction(MI_TimeStretch, "timestretch", tr("&Time Stretch..."), "");
   timeStretchAction->setIcon(QIcon(":Resources/timestretch.svg"));
   createMenuCellsAction(MI_Duplicate, "broken", tr("&Duplicate Drawing  "), "D");
   createMenuCellsAction(MI_Autorenumber, "broken", tr("&Autorenumber"), "");
@@ -2020,7 +2016,7 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenFilmStrip, "broken", tr("&Level Strip"), "");
   createMenuWindowsAction(MI_OpenPalette, "broken", tr("&Palette"), "");
   QAction *pltGizmoAction =
-      createRightClickMenuAction(MI_OpenPltGizmo, "broken", tr("&Palette Gizmo"), "");
+      createRightClickMenuAction(MI_OpenPltGizmo, "palettegizmo", tr("&Palette Gizmo"), "");
   pltGizmoAction->setIcon(QIcon(":Resources/palettegizmo.svg"));
   createRightClickMenuAction(MI_EraseUnusedStyles, "broken", tr("&Delete Unused Styles"),
                              "");
