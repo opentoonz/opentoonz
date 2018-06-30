@@ -147,43 +147,58 @@ private:
   Room *createBatchesRoom();
   Room *createBrowserRoom();
 
-  QAction *createAction(const char *id, const QString &name,
+  QAction *createAction(const char *id, const char *iconName,
+                        const QString &name,
                         const QString &defaultShortcut,
                         CommandType type = MenuFileCommandType);
-  QAction *createRightClickMenuAction(const char *id, const QString &name,
+  QAction *createRightClickMenuAction(const char *id, const char *iconName,
+                                      const QString &name,
                                       const QString &defaultShortcut);
-  QAction *createMenuFileAction(const char *id, const QString &name,
+  QAction *createMenuFileAction(const char *id, const char *iconName,
+                                const QString &name,
                                 const QString &defaultShortcut);
-  QAction *createMenuEditAction(const char *id, const QString &name,
+  QAction *createMenuEditAction(const char *id, const char *iconName,
+                                const QString &name,
                                 const QString &defaultShortcut);
-  QAction *createMenuScanCleanupAction(const char *id, const QString &name,
+  QAction *createMenuScanCleanupAction(const char *id, const char *iconName,
+                                       const QString &name,
                                        const QString &defaultShortcut);
-  QAction *createMenuLevelAction(const char *id, const QString &name,
+  QAction *createMenuLevelAction(const char *id, const char *iconName,
+                                 const QString &name,
                                  const QString &defaultShortcut);
-  QAction *createMenuXsheetAction(const char *id, const QString &name,
+  QAction *createMenuXsheetAction(const char *id, const char *iconName,
+                                  const QString &name,
                                   const QString &defaultShortcut);
-  QAction *createMenuCellsAction(const char *id, const QString &name,
+  QAction *createMenuCellsAction(const char *id, const char *iconName,
+                                 const QString &name,
                                  const QString &defaultShortcut);
-  QAction *createMenuViewAction(const char *id, const QString &name,
+  QAction *createMenuViewAction(const char *id, const char *iconName,
+                                const QString &name,
                                 const QString &defaultShortcut);
-  QAction *createMenuWindowsAction(const char *id, const QString &name,
+  QAction *createMenuWindowsAction(const char *id, const char *iconName,
+                                   const QString &name,
                                    const QString &defaultShortcut);
 
-  QAction *createPlaybackAction(const char *id, const QString &name,
+  QAction *createPlaybackAction(const char *id, const char *iconName,
+                                const QString &name,
                                 const QString &defaultShortcut);
-  QAction *createRGBAAction(const char *id, const QString &name,
+  QAction *createRGBAAction(const char *id, const char *iconName,
+                            const QString &name,
                             const QString &defaultShortcut);
-  QAction *createFillAction(const char *id, const QString &name,
+  QAction *createFillAction(const char *id, const char *iconName,
+                            const QString &name,
                             const QString &defaultShortcut);
   QAction *createMenuAction(const char *id, const QString &name,
                             QList<QString> list);
-  QAction *createToggle(const char *id, const QString &name,
+  QAction *createToggle(const char *id, const char *iconName,
+                        const QString &name,
                         const QString &defaultShortcut, bool startStatus,
                         CommandType type);
   QAction *createToolAction(const char *id, const char *iconName,
                             const QString &name,
                             const QString &defaultShortcut);
-  QAction *createViewerAction(const char *id, const QString &name,
+  QAction *createViewerAction(const char *id, const char *iconName,
+                              const QString &name,
                               const QString &defaultShortcut);
   QAction *createMiscAction(const char *id, const QString &name,
                             const char *defaultShortcut);
