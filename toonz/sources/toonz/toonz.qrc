@@ -6,6 +6,8 @@
         <file>Resources/2s_rollover.svg</file>
         <file>Resources/3s.svg</file>
         <file>Resources/3s_rollover.svg</file>
+        <file>Resources/4s.svg</file>
+        <file>Resources/4s_rollover.svg</file>
         <file>Resources/pane_3d_off.svg</file>
         <file>Resources/pane_3d_on.svg</file>
         <file>Resources/pane_3d_over.svg</file>
@@ -392,8 +394,14 @@
         <file>Resources/delete_on.svg</file>
         <file>Resources/save_off.svg</file>
         <file>Resources/save_on.svg</file>
+        <file>Resources/save_all.svg</file>
+        <file>Resources/save_all_rollover.svg</file>
         <file>Resources/saveas_off.svg</file>
         <file>Resources/saveas_on.svg</file>
+        <file>Resources/save_scene.svg</file>
+        <file>Resources/save_scene_rollover.svg</file>
+        <file>Resources/save_scene_as.svg</file>
+        <file>Resources/save_scene_as_rollover.svg</file>
         <file>Resources/load_off.svg</file>
         <file>Resources/load_on.svg</file>
         <file>Resources/flip_h.png</file>
@@ -490,6 +498,8 @@
       <file>Resources/locator_over.svg</file>
       <file>Resources/refresh.svg</file>
       <file>Resources/refresh_over.svg</file>
+      <file>Resources/revert_scene.svg</file>
+      <file>Resources/revert_scene_rollover.svg</file>
       <file>Resources/zoom_in.svg</file>
       <file>Resources/zoom_out.svg</file>
       <file>Resources/zoom_in_rollover.svg</file>

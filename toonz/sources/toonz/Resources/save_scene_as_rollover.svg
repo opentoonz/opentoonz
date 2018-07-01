@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="24"
+   height="24"
+   viewBox="0 0 24 24"
+   fill="none"
+   stroke="currentColor"
+   stroke-width="2"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   class="feather feather-file"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="save_scene_as.svg"
+   inkscape:version="0.92.1 r15371">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="752"
+     inkscape:window-height="480"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="9.8333333"
+     inkscape:cx="12"
+     inkscape:cy="12"
+     inkscape:window-x="49"
+     inkscape:window-y="45"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg6" />
+  <path
+     d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
+     id="path2" />
+  <polyline
+     points="13 2 13 9 20 9"
+     id="polyline4" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path855"
+     d="m 7.4963216,11.157339 v 7.888713 H 9.5193471 15.588423 V 14.444303 12.472124 L 14.23974,11.157339 H 9.5193471 Z"
+     style="clip-rule:evenodd;opacity:1;fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#303030;stroke-width:1.33162665;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+  <rect
+     style="clip-rule:evenodd;opacity:1;fill:#303030;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.33162665;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     id="rect852"
+     width="4.046051"
+     height="3.2869635"
+     x="9.5193472"
+     y="11.157339" />
+  <path
+     inkscape:connector-curvature="0"
+     style="clip-rule:evenodd;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.33162665;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     d="m 7.4963216,11.157339 v 7.888713 H 9.5193471 15.588423 V 14.444303 12.472124 L 14.23974,11.157339 h -0.674342 v 3.286964 H 9.5193471 v -3.286964 z m 2.6973674,0 v 1.972178 h 1.348683 v -1.972178 z"
+     id="rect839" />
+  <rect
+     y="15.759088"
+     x="8.845005"
+     height="3.2869635"
+     width="0.67434186"
+     id="rect819"
+     style="fill:#303030;fill-opacity:1;stroke:none;stroke-width:1.33162665;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+  <rect
+     transform="rotate(90)"
+     style="fill:#303030;fill-opacity:1;stroke:none;stroke-width:1.33162665;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     id="rect821"
+     width="0.65739268"
+     height="4.046051"
+     x="15.759088"
+     y="-13.565399" />
+  <rect
+     y="-19.046053"
+     x="-14.239739"
+     height="3.2869635"
+     width="0.67434186"
+     id="rect823"
+     style="fill:#303030;fill-opacity:1;stroke:none;stroke-width:1.33162665;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     transform="scale(-1)" />
+</svg>

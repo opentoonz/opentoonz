@@ -1626,10 +1626,10 @@ QAction *MainWindow::createToolAction(const char *id, const char *iconName,
 void MainWindow::defineActions() {
   createMenuFileAction(MI_NewScene, "new_scene", tr("&New Scene"), "Ctrl+N");
   createMenuFileAction(MI_LoadScene, "load_scene", tr("&Load Scene..."), "Ctrl+L");
-  createMenuFileAction(MI_SaveScene, "broken", tr("&Save Scene"), "Ctrl+Shift+S");
-  createMenuFileAction(MI_SaveSceneAs, "broken", tr("&Save Scene As..."), "");
-  createMenuFileAction(MI_SaveAll, "broken", tr("&Save All"), "Ctrl+S");
-  createMenuFileAction(MI_RevertScene, "broken", tr("&Revert Scene"), "");
+  createMenuFileAction(MI_SaveScene, "save_scene", tr("&Save Scene"), "Ctrl+Shift+S");
+  createMenuFileAction(MI_SaveSceneAs, "save_scene_as", tr("&Save Scene As..."), "");
+  createMenuFileAction(MI_SaveAll, "save_all", tr("&Save All"), "Ctrl+S");
+  createMenuFileAction(MI_RevertScene, "revert_scene", tr("&Revert Scene"), "");
 
   QAction *act = CommandManager::instance()->getAction(MI_RevertScene);
   if (act) act->setEnabled(false);
@@ -1902,7 +1902,7 @@ void MainWindow::defineActions() {
       createMenuCellsAction(MI_Reframe3, "3s", tr("3's"), "");
   reframeThreesAction->setIconText("3's");
 
-  createMenuCellsAction(MI_Reframe4, "broken", tr("4's"), "");
+  createMenuCellsAction(MI_Reframe4, "4s", tr("4's"), "");
 
   createMenuCellsAction(MI_ReframeWithEmptyInbetweens, "broken",
                         tr("Reframe with Empty Inbetweens..."), "");
