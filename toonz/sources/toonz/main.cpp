@@ -62,6 +62,7 @@
 #include "tsimplecolorstyles.h"
 #include "toonz/imagestyles.h"
 #include "tvectorbrushstyle.h"
+#include "tfont.h"
 
 #ifdef MACOSX
 #include "tipc.h"
@@ -623,16 +624,26 @@ int main(int argc, char *argv[]) {
   }
 
   QFont *myFont;
-  std::string fontName =
-      Preferences::instance()->getInterfaceFont().toStdString();
-  std::string isBold =
-      Preferences::instance()->getInterfaceFontWeight() ? "Yes" : "No";
-  myFont = new QFont(QString::fromStdString(fontName));
+  QString fontName  = Preferences::instance()->getInterfaceFont();
+  QString fontStyle = Preferences::instance()->getInterfaceFontStyle();
+
+  TFontManager *fontMgr = TFontManager::instance();
+  std::vector<std::wstring> typefaces;
+  fontMgr->loadFontNames();
+  fontMgr->setFamily(fontName.toStdWString());
+  fontMgr->getAllTypefaces(typefaces);
+
+  bool isBold = false, isItalic = false, hasKerning = false;
+  isBold     = fontMgr->isBold(fontName, fontStyle);
+  isItalic   = fontMgr->isItalic(fontName, fontStyle);
+  hasKerning = fontMgr->hasKerning();
+
+  myFont = new QFont(fontName);
   myFont->setPixelSize(EnvSoftwareCurrentFontSize);
-  if (strcmp(isBold.c_str(), "Yes") == 0)
-    myFont->setBold(true);
-  else
-    myFont->setBold(false);
+  myFont->setBold(isBold);
+  myFont->setItalic(isItalic);
+  myFont->setKerning(hasKerning);
+
   a.setFont(*myFont);
 
   QAction *action = CommandManager::instance()->getAction("MI_OpenTMessage");

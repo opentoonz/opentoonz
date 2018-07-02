@@ -231,6 +231,7 @@ Preferences::Preferences()
 #else
     , m_interfaceFont("Helvetica")
 #endif
+    , m_interfaceFontStyle("Regular")
     , m_interfaceFontWeight(0)
     , m_defLevelWidth(0.0)
     , m_defLevelHeight(0.0)
@@ -634,6 +635,10 @@ Preferences::Preferences()
   QString interfaceFont = m_settings->value("interfaceFont").toString();
   if (interfaceFont != "") m_interfaceFont = interfaceFont;
   setInterfaceFont(m_interfaceFont.toStdString());
+  QString interfaceFontStyle =
+      m_settings->value("interfaceFontStyle").toString();
+  if (interfaceFontStyle != "") m_interfaceFontStyle = interfaceFontStyle;
+  setInterfaceFontStyle(m_interfaceFontStyle.toStdString());
   getValue(*m_settings, "interfaceFontWeight", m_interfaceFontWeight);
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
@@ -1308,6 +1313,13 @@ QString Preferences::getCurrentStyleSheetName() const {
 void Preferences::setInterfaceFont(std::string font) {
   m_interfaceFont = QString::fromStdString(font);
   m_settings->setValue("interfaceFont", m_interfaceFont);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setInterfaceFontStyle(std::string style) {
+  m_interfaceFontStyle = QString::fromStdString(style);
+  m_settings->setValue("interfaceFontStyle", m_interfaceFontStyle);
 }
 
 //-----------------------------------------------------------------

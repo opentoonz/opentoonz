@@ -238,6 +238,8 @@ public:
 
   void setInterfaceFont(std::string font);
   QString getInterfaceFont() { return m_interfaceFont; }
+  void setInterfaceFontStyle(std::string style);
+  QString getInterfaceFontStyle() { return m_interfaceFontStyle; }
   void setInterfaceFontWeight(int weight);
   int getInterfaceFontWeight() { return m_interfaceFontWeight; }
 
@@ -584,7 +586,7 @@ private:
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
       m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
-      m_customProjectRoot, m_interfaceFont;
+      m_customProjectRoot, m_interfaceFont, m_interfaceFontStyle;
   QString m_fastRenderPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
