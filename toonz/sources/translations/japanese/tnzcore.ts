@@ -2,6 +2,32 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP">
 <context>
+    <name>BmpWriterProperties</name>
+    <message>
+        <source>Bits Per Pixel</source>
+        <translation>色深度</translation>
+    </message>
+    <message>
+        <source>24 bits</source>
+        <translation>24ビット</translation>
+    </message>
+    <message>
+        <source>8 bits (Greyscale)</source>
+        <translation>8ビット (グレースケール)</translation>
+    </message>
+</context>
+<context>
+    <name>JpgWriterProperties</name>
+    <message>
+        <source>Quality</source>
+        <translation>品質</translation>
+    </message>
+    <message>
+        <source>Smoothing</source>
+        <translation>スムージング</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>colors</source>

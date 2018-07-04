@@ -1,30 +1,18 @@
-/* -----------------------------------------------------------------------------
-   QT USER CONTROL CLASSES
------------------------------------------------------------------------------ */
 
-// Styling Qt controls is best done by extending to a mixin placeholder.
-//
-// This is because if we style the Qt class directly, when we want to extend
-// the style to a different class the compiler will get confused.
-//
-// Compiler doesn't understand QSS classes?
-//
-// Summary, when we want to use the style of a control somewhere else make sure
-// to extend to the mixin placeholder (.) and NOT the QSS class (Q).
+// The Less compiler has trouble compiling Qt selectors when they have been
+// extended to, so extend Qt selectors to mixins as workaround for now
 
 /* -----------------------------------------------------------------------------
-   Button
+   Push Button
 ----------------------------------------------------------------------------- */
 
 .Button {
   background-color: @button-bg-color;
-  border-color: @button-border-color;
-  border-style: solid;
-  border-radius: 2px;
-  border-width: @button-border-size;
+  border: 1 solid @button-border-color;
+  border-radius: 2;
   color: @button-text-color;
-  padding: 3px 15px;
-  margin: @button-margin;
+  margin: 0;
+  padding: 3 15;
   &:hover {
     background-color: @button-bg-color-hover;
     border-color: @button-border-color-hover;
@@ -53,64 +41,48 @@
   }
 }
 
-QPushButton { // Qt Class (do not extend to this)
+QPushButton {
   &:extend(.Button all);
 }
 
 #PushButton_NoPadding {
-  padding: 3px;
+  padding: 3;
 }
 
 /* -----------------------------------------------------------------------------
-   ComboBox
+   Combo Box
 ----------------------------------------------------------------------------- */
 
 .ComboBox {
-  background-color: @combobox-bg-color;
-  border: @combobox-border-size solid @combobox-border-color;
-  border-radius: 2px;
-  color: @combobox-text-color;
-  padding: 1px 0 1px 4px;
-  margin: @combobox-margin;
+  &:extend(.Button);
+  padding: 1 0 1 4;
+  margin: 1 0;
   &:hover {
-    background-color: @combobox-bg-color-hover;
-    border-color: @combobox-border-color-hover;
-    color: @combobox-text-color-hover;
+    &:extend(.Button:hover);
   }
   &:checked {
-    background-color: @combobox-bg-color-pressed;
-    border-color: @combobox-border-color-pressed;
-    color: @combobox-text-color-pressed;
+    &:extend(.ComboBox);
   }
   &:disabled {
-    background-color: @combobox-bg-color-disabled;
-    border-color: @combobox-border-color-disabled;
+    &:extend(.Button:disabled);
   }
   &::drop-down {
-    background-color: @droparrow-bg-color;
-    border-left: @droparrow-border-size solid @droparrow-border-color;
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-    image: url('@{img-url}/combo-down.svg');
+    image: url('@{img-url}/combo_downarrow.svg');
     image-position: center center;
-    width: 16px;
-    &:hover {
-      image: url('@{img-url}/combo-down_pressed.svg');
-    }
+    width: 16;
     &:disabled {
-      border-color: @combobox-border-color-disabled;
-      image: url('@{img-url}/combo-down_disabled.svg');
+      image: url('@{img-url}/combo_downarrow_disabled.svg');
     }
   }
   & QAbstractItemView {
     background-color: @menu-bg-color;
-    border: 1px solid @menu-border-color;
-    selection-background-color: @selected-bg-color;
-    selection-color: @selected-text-color;
+    border: 1 solid @menu-border-color;
+    selection-background-color: @hl-bg-color;
+    selection-color: @hl-text-color;
   }
 }
 
-QComboBox { // Qt Class (do not extend to this)
+QComboBox {
   &:extend(.ComboBox all);
 }
 
@@ -118,14 +90,14 @@ QComboBox { // Qt Class (do not extend to this)
    Textfield
 ----------------------------------------------------------------------------- */
 
-.Input {
+.LineEdit {
   background-color: @input-bg-color;
-  border: 1px solid @input-border-color;
-  border-radius: 2px;
+  border: 1 solid @input-border-color;
+  border-radius: 2;
   color: @input-text-color;
   selection-background-color: @input-selection-bg-color;
   selection-color: @input-selection-text-color;
-  padding: 0 0 0 1px;
+  padding: 0 0 0 1;
   &:focus {
     background-color: @input-bg-color-focus;
     border-color: @input-border-color-focus;
@@ -138,8 +110,8 @@ QComboBox { // Qt Class (do not extend to this)
   }
 }
 
-QLineEdit { // Qt Class (do not extend to this)
-  &:extend(.Input all);
+QLineEdit {
+  &:extend(.LineEdit all);
 }
 
 /* -----------------------------------------------------------------------------
@@ -156,11 +128,11 @@ QLineEdit { // Qt Class (do not extend to this)
   }
   &::indicator {
     background-color: @checkbox-bg-color;
-    border: 1px solid @checkbox-border-color;
-    border-radius: 2px;
-    height: 9px;      /* fix for QGroupBox */
-    padding: 1px;
-    width: 9px;       /* fix for QMenu */
+    border: 1 solid @checkbox-border-color;
+    border-radius: 2;
+    height: 9;      /* fix for QGroupBox */
+    padding: 1;
+    width: 9;       /* fix for QMenu */
     &:hover {
       background-color: @checkbox-bg-color-hover;
       border-color: @checkbox-border-color-hover;
@@ -185,7 +157,7 @@ QLineEdit { // Qt Class (do not extend to this)
   }
 }
 
-QCheckBox { // Qt Class (do not extend to this)
+QCheckBox {
   &:extend(.CheckBox all);
 }
 
@@ -194,6 +166,9 @@ QCheckBox { // Qt Class (do not extend to this)
 ----------------------------------------------------------------------------- */
 
 .RadioButton {
+  &:hover {
+    &:extend(.CheckBox:hover);
+  }
   &::indicator {
     &:unchecked {
       image: url('@{img-url}/radiobutton_unchecked.svg');
@@ -206,7 +181,7 @@ QCheckBox { // Qt Class (do not extend to this)
   }
 }
 
-QRadioButton { // Qt Class (do not extend to this)
+QRadioButton {
   &:extend(.RadioButton all);
 }
 
@@ -216,13 +191,13 @@ QRadioButton { // Qt Class (do not extend to this)
 
 .GroupBox {
   &:extend(.frame all);
-  margin: 6px 0 0 0;
-  padding: 5px 0px;
+  margin: 6 0 0 0;
+  padding: 5 0;
   &::title {
     subcontrol-origin: margin;
-    left: 15px;
-    margin: -3px 0 0 0;
-    padding: 0 3px;
+    left: 15;
+    margin: -3 0 0 0;
+    padding: 0 3;
     &:hover {
       color: @checkbox-text-color-hover;
     }
@@ -233,14 +208,14 @@ QRadioButton { // Qt Class (do not extend to this)
   &::indicator {
     &:extend(.CheckBox::indicator all);
     subcontrol-origin: margin;
-    margin-top: 2px;
+    margin-top: 2;
   }
   &:disabled {
     color: @text-color-disabled;
   }
 }
 
-QGroupBox { // Qt Class (do not extend to this)
+QGroupBox {
   &:extend(.GroupBox all);
 }
 
@@ -255,8 +230,8 @@ QGroupBox { // Qt Class (do not extend to this)
     background-position: center center;
     background-repeat: repeat-x;
     margin: 0;
-    height: 20px;
-    min-height: 20px;
+    height: 20;
+    min-height: 20;
     &:disabled {
       background-image: url('@{img-url}/@{slider-groove-img-disabled}');
     }
@@ -271,7 +246,7 @@ QGroupBox { // Qt Class (do not extend to this)
   }
 }
 
-QSlider { // Qt Class (do not extend to this)
+QSlider {
   &:extend(.Slider all);
 }
 

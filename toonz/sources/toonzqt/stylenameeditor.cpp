@@ -29,10 +29,7 @@
 
 //------------------------------------------------------------
 namespace {
-const int areaColCount[WORD_COLUMN_AMOUNT]    = {2, 2, 1};
-const QString columnLabel[WORD_COLUMN_AMOUNT] = {AddWordButton::tr("Character"),
-                                                 AddWordButton::tr("Part"),
-                                                 AddWordButton::tr("Suffix")};
+const int areaColCount[WORD_COLUMN_AMOUNT] = {2, 2, 1};
 
 int indexToRow(int index, int columnId) {
   return index / areaColCount[columnId];
@@ -115,6 +112,8 @@ void WordButton::contextMenuEvent(QContextMenuEvent* event) {
 
 AddWordButton::AddWordButton(const int col, QWidget* parent)
     : WordButton(tr("New"), parent), m_column(col) {
+  static QString columnLabel[WORD_COLUMN_AMOUNT] = {tr("Character"), tr("Part"),
+                                                    tr("Suffix")};
   // setFixedSize(23, 23);
   setIcon(QIcon(":Resources/plus.svg"));
   setIconSize(QSize(16, 16));
@@ -342,6 +341,10 @@ StyleNameEditor::StyleNameEditor(QWidget* parent)
     , m_paletteHandle(0)
     , m_selectionStart(-1)
     , m_selectionLength(0) {
+  QString columnLabel[WORD_COLUMN_AMOUNT] = {AddWordButton::tr("Character"),
+                                             AddWordButton::tr("Part"),
+                                             AddWordButton::tr("Suffix")};
+
   setWindowTitle(tr("Name Editor"));
 
   m_styleName                  = new QLineEdit(this);

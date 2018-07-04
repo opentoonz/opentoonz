@@ -259,8 +259,15 @@ public:
     m_smooth.setQStringName(tr("Smooth"));
     m_joinStrokes.setQStringName(tr("Join Vectors"));
     m_autocloseFactor.setQStringName(tr("Distance"));
+
     m_mode.setQStringName(tr("Mode:"));
+    m_mode.setItemUIName(POINT2POINT, tr("Endpoint to Endpoint"));
+    m_mode.setItemUIName(POINT2LINE, tr("Endpoint to Line"));
+    m_mode.setItemUIName(LINE2LINE, tr("Line to Line"));
+
     m_type.setQStringName(tr("Type:"));
+    m_type.setItemUIName(NORMAL, tr("Normal"));
+    m_type.setItemUIName(RECT, tr("Rectangular"));
   }
 
   //-----------------------------------------------------------------------------

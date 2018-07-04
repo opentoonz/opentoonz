@@ -66,14 +66,9 @@ private:
   void buildPropertyLineEdit(int index, TPropertyGroup *props);
   void showEvent(QShowEvent *se) override;
 
-#ifdef _WIN32
-
-private slots:
-
-  void onComboBoxIndexChanged(const QString);
+private Q_SLOTS:
+  void onComboBoxIndexChanged(const QString &);
   void onAviCodecConfigure();
-
-#endif
 };
 
 //**********************************************************************************

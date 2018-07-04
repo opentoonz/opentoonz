@@ -28,6 +28,7 @@
 #include "toonz/tpalettehandle.h"
 #include "toonz/tobjecthandle.h"
 #include "toonz/tcolumnhandle.h"
+#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -623,8 +624,18 @@ EraserTool::EraserTool(std::string name)
 void EraserTool::updateTranslation() {
   m_toolSize.setQStringName(tr("Size:"));
   m_hardness.setQStringName(tr("Hardness:"));
+
   m_eraseType.setQStringName(tr("Type:"));
+  m_eraseType.setItemUIName(NORMALERASE, tr("Normal"));
+  m_eraseType.setItemUIName(RECTERASE, tr("Rectangular"));
+  m_eraseType.setItemUIName(FREEHANDERASE, tr("Freehand"));
+  m_eraseType.setItemUIName(POLYLINEERASE, tr("Polyline"));
+
   m_colorType.setQStringName(tr("Mode:"));
+  m_colorType.setItemUIName(LINES, tr("Lines"));
+  m_colorType.setItemUIName(AREAS, tr("Areas"));
+  m_colorType.setItemUIName(ALL, tr("Lines & Areas"));
+
   m_currentStyle.setQStringName(tr("Selective"));
   m_invertOption.setQStringName(tr("Invert"));
   m_multi.setQStringName(tr("Frame Range"));
@@ -652,6 +663,9 @@ void EraserTool::draw() {
       drawRect(m_selectingRect, color, 0xFFFF, true);
   }
   if (m_eraseType.getValue() == NORMALERASE) {
+    // If toggled off, don't draw brush outline
+    if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
     TToonzImageP image(img);
     TRasterP ras = image->getRaster();
     int lx       = ras->getLx();
@@ -991,8 +1005,8 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
           intPos = TThickPoint(pp + convert(ti->getRaster()->getCenter()),
                                m_toolSize.getValue() - 1);
 
-        bool isAdded = m_normalEraser->add(intPos);
-        if (ti && isAdded) {
+        m_normalEraser->add(intPos);
+        if (ti) {
           m_tileSaver->save(m_normalEraser->getLastRect());
           m_normalEraser->generateLastPieceOfStroke(
               m_pencil.getValue() || m_colorType.getValue() == AREAS);

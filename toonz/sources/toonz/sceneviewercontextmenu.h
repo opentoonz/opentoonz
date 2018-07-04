@@ -53,4 +53,17 @@ public slots:
 
 }  // Namespace ZeroThickToggleGui
 
+namespace CursorOutlineToggleGui {
+void addCursorOutlineCommand(QMenu *menu);
+
+class CursorOutlineToggleHandler : public QObject {
+  Q_OBJECT
+
+public slots:
+  void activate();
+  void deactivate();
+};
+
+}  // Namespace CursorOutlineToggleGui
+
 #endif

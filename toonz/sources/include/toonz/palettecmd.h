@@ -72,9 +72,25 @@ enum ColorModelPltBehavior {
   AddColorModelPlt
 };
 
+enum ColorModelRasterPickType {
+  PickEveryColors = 0,
+  IntegrateSimilarColors,
+  PickColorChipGrid
+};
+
+enum ColorChipOrder { UpperLeft = 0, LowerLeft, LeftUpper };
+
+struct ColorModelLoadingConfiguration {
+  ColorModelPltBehavior behavior          = ReplaceColorModelPlt;
+  ColorModelRasterPickType rasterPickType = PickEveryColors;
+  TPixel32 gridColor                      = TPixel::Magenta;
+  int gridLineWidth                       = 1;
+  ColorChipOrder colorChipOrder           = UpperLeft;
+};
+
 DVAPI int loadReferenceImage(
-    TPaletteHandle *paletteHandle, ColorModelPltBehavior pltBehavior,
-    const TFilePath &_fp, int &frame, ToonzScene *scene,
+    TPaletteHandle *paletteHandle, const ColorModelLoadingConfiguration &config,
+    const TFilePath &_fp, ToonzScene *scene,
     const std::vector<int> &frames = std::vector<int>());
 
 DVAPI void removeReferenceImage(TPaletteHandle *paletteHandle);
@@ -90,14 +106,14 @@ DVAPI void renamePaletteStyle(TPaletteHandle *paletteHandle,
 
 /* called in ColorModelViewer::pick() - move selected style to the first page */
 DVAPI void organizePaletteStyle(TPaletteHandle *paletteHandle, int styleId,
-                                const TPoint &point);
+                                const TColorStyle::PickedPosition &point);
 
 /*
 called in ColorModelViewer::repickFromColorModel().
 Pick color from the img for all styles with "picked position" value.
 */
 DVAPI void pickColorByUsingPickedPosition(TPaletteHandle *paletteHandle,
-                                          TImageP img);
+                                          TImageP img, int frame);
 
 }  // namespace
 

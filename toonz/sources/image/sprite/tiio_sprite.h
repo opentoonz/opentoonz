@@ -9,6 +9,8 @@
 #include <QVector>
 #include <QStringList>
 #include <QtGui/QImage>
+#include <QCoreApplication>
+
 //===========================================================
 //
 //  TLevelWriterSprite
@@ -51,12 +53,14 @@ namespace Tiio {
 //===========================================================================
 
 class SpriteWriterProperties : public TPropertyGroup {
+  Q_DECLARE_TR_FUNCTIONS(SpriteWriterProperties)
 public:
   TEnumProperty m_format;
   TIntProperty m_topPadding, m_bottomPadding, m_leftPadding, m_rightPadding;
   TIntProperty m_scale;
   TBoolProperty m_trim;
   SpriteWriterProperties();
+  void updateTranslation() override;
 };
 
 //===========================================================================

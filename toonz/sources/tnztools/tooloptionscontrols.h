@@ -205,6 +205,8 @@ public:
   void loadEntries();
   void updateStatus() override;
 
+  TEnumProperty *getProperty() const { return m_property; }
+
 public slots:
 
   void onActivated(int);

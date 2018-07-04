@@ -17,6 +17,7 @@
 #include "toonz/strokegenerator.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/stage2.h"
+#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -402,6 +403,10 @@ void EraserTool::updateTranslation() {
   m_invertOption.setQStringName(tr("Invert"));
   m_multi.setQStringName(tr("Frame Range"));
   m_eraseType.setQStringName(tr("Type:"));
+  m_eraseType.setItemUIName(NORMAL_ERASE, tr("Normal"));
+  m_eraseType.setItemUIName(RECT_ERASE, tr("Rectangular"));
+  m_eraseType.setItemUIName(FREEHAND_ERASE, tr("Freehand"));
+  m_eraseType.setItemUIName(POLYLINE_ERASE, tr("Polyline"));
 }
 
 //-----------------------------------------------------------------------------
@@ -425,6 +430,9 @@ void EraserTool::draw() {
         drawRect(m_selectingRect, color, 0xFFFF, true);
     }
     if (m_eraseType.getValue() == NORMAL_ERASE) {
+      // If toggled off, don't draw brush outline
+      if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
       tglColor(TPixel32(255, 0, 255));
       tglDrawCircle(m_brushPos, m_pointSize);
     }

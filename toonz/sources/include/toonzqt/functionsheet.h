@@ -98,7 +98,7 @@ class FunctionSheet final : public SpreadsheetViewer {
   Q_OBJECT
 
 public:
-  FunctionSheet(QWidget *parent = 0);
+  FunctionSheet(QWidget *parent = 0, bool isFloating = false);
   ~FunctionSheet();
 
   void setModel(FunctionTreeModel *model);
@@ -137,6 +137,7 @@ private:
   FunctionViewer *m_functionViewer;
 
   QRect m_selectedCells;
+  bool m_isFloating;
 
 public slots:
 

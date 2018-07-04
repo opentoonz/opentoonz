@@ -228,5 +228,10 @@ Tiio::Mp4WriterProperties::Mp4WriterProperties()
   bind(m_scale);
 }
 
+void Tiio::Mp4WriterProperties::updateTranslation() {
+  m_vidQuality.setQStringName(tr("Quality"));
+  m_scale.setQStringName(tr("Scale"));
+}
+
 // Tiio::Reader* Tiio::makeMp4Reader(){ return nullptr; }
 // Tiio::Writer* Tiio::makeMp4Writer(){ return nullptr; }

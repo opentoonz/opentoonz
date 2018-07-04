@@ -88,6 +88,7 @@
     <item>MI_OpenStyleControl</item>
     <item>MI_OpenLevelView</item>
     <item>MI_OpenXshView</item>
+    <item>MI_OpenTimelineView</item>
 
 
     

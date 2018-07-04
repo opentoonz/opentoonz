@@ -55,6 +55,7 @@
 #include <QStyleOptionSlider>
 #include <QToolTip>
 #include <QSplitter>
+#include <QMenu>
 #include <QOpenGLFramebufferObject>
 
 using namespace StyleEditorGUI;
@@ -1496,46 +1497,21 @@ PlainColorPage::PlainColorPage(QWidget *parent)
                        SLOT(onControlChanged(const ColorModel &, bool)));
   }
 
-  m_wheelShowButton         = new QPushButton(tr("Wheel"), this);
-  m_hsvShowButton           = new QPushButton(tr("HSV"), this);
-  m_alphaShowButton         = new QPushButton(tr("Alpha"), this);
-  m_rgbShowButton           = new QPushButton(tr("RGB"), this);
-  m_toggleOrientationButton = new QPushButton(QChar(0x2194), this);
-  m_toggleOrientationButton->setFixedWidth(20);
-
-  m_wheelFrame       = new QFrame(this);
-  QFrame *hsvFrame   = new QFrame(this);
-  QFrame *alphaFrame = new QFrame(this);
-  QFrame *rgbFrame   = new QFrame(this);
+  m_wheelFrame = new QFrame(this);
+  m_hsvFrame   = new QFrame(this);
+  m_alphaFrame = new QFrame(this);
+  m_rgbFrame   = new QFrame(this);
 
   m_slidersContainer = new QFrame(this);
   m_vSplitter        = new QSplitter(this);
 
   //プロパティの設定
   // channelButtonGroup->setExclusive(true);
-  m_wheelShowButton->setCheckable(true);
-  m_hsvShowButton->setCheckable(true);
-  m_alphaShowButton->setCheckable(true);
-  m_rgbShowButton->setCheckable(true);
-  m_wheelShowButton->setMinimumWidth(30);
-  m_hsvShowButton->setMinimumWidth(30);
-  m_alphaShowButton->setMinimumWidth(30);
-  m_rgbShowButton->setMinimumWidth(30);
 
   m_wheelFrame->setObjectName("PlainColorPageParts");
-  hsvFrame->setObjectName("PlainColorPageParts");
-  alphaFrame->setObjectName("PlainColorPageParts");
-  rgbFrame->setObjectName("PlainColorPageParts");
-
-  m_wheelShowButton->setChecked(true);
-  m_wheelShowButton->setFocusPolicy(Qt::NoFocus);
-  m_hsvShowButton->setChecked(true);
-  m_hsvShowButton->setFocusPolicy(Qt::NoFocus);
-  m_alphaShowButton->setChecked(true);
-  m_alphaShowButton->setFocusPolicy(Qt::NoFocus);
-  m_rgbShowButton->setChecked(true);
-  m_rgbShowButton->setFocusPolicy(Qt::NoFocus);
-  m_toggleOrientationButton->setFocusPolicy(Qt::NoFocus);
+  m_hsvFrame->setObjectName("PlainColorPageParts");
+  m_alphaFrame->setObjectName("PlainColorPageParts");
+  m_rgbFrame->setObjectName("PlainColorPageParts");
 
   m_vSplitter->setOrientation(Qt::Vertical);
   m_vSplitter->setFocusPolicy(Qt::NoFocus);
@@ -1549,18 +1525,6 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   mainLayout->setSpacing(0);
   mainLayout->setMargin(0);
   {
-    QHBoxLayout *showButtonLayout = new QHBoxLayout();
-    showButtonLayout->setMargin(0);
-    showButtonLayout->setSpacing(0);
-    {
-      showButtonLayout->addWidget(m_wheelShowButton, 1);
-      showButtonLayout->addWidget(m_hsvShowButton, 1);
-      showButtonLayout->addWidget(m_alphaShowButton, 1);
-      showButtonLayout->addWidget(m_rgbShowButton, 1);
-      showButtonLayout->addWidget(m_toggleOrientationButton, 1);
-    }
-    mainLayout->addLayout(showButtonLayout);
-
     QHBoxLayout *wheelLayout = new QHBoxLayout();
     wheelLayout->setMargin(5);
     wheelLayout->setSpacing(0);
@@ -1580,15 +1544,15 @@ PlainColorPage::PlainColorPage(QWidget *parent)
         hsvLayout->addWidget(m_channelControls[eSaturation]);
         hsvLayout->addWidget(m_channelControls[eValue]);
       }
-      hsvFrame->setLayout(hsvLayout);
-      slidersLayout->addWidget(hsvFrame, 3);
+      m_hsvFrame->setLayout(hsvLayout);
+      slidersLayout->addWidget(m_hsvFrame, 3);
 
       QVBoxLayout *alphaLayout = new QVBoxLayout();
       alphaLayout->setMargin(4);
       alphaLayout->setSpacing(4);
       { alphaLayout->addWidget(m_channelControls[eAlpha]); }
-      alphaFrame->setLayout(alphaLayout);
-      slidersLayout->addWidget(alphaFrame, 1);
+      m_alphaFrame->setLayout(alphaLayout);
+      slidersLayout->addWidget(m_alphaFrame, 1);
 
       QVBoxLayout *rgbLayout = new QVBoxLayout();
       rgbLayout->setMargin(4);
@@ -1598,8 +1562,8 @@ PlainColorPage::PlainColorPage(QWidget *parent)
         rgbLayout->addWidget(m_channelControls[eGreen]);
         rgbLayout->addWidget(m_channelControls[eBlue]);
       }
-      rgbFrame->setLayout(rgbLayout);
-      slidersLayout->addWidget(rgbFrame, 3);
+      m_rgbFrame->setLayout(rgbLayout);
+      slidersLayout->addWidget(m_rgbFrame, 3);
     }
     m_slidersContainer->setLayout(slidersLayout);
     m_vSplitter->addWidget(m_slidersContainer);
@@ -1626,18 +1590,6 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   // SLOT(onWheelSliderReleased()));
   // connect(channelButtonGroup, SIGNAL(buttonClicked(int)), this,
   // SLOT(setWheelChannel(int)));
-
-  // Show/Hideトグルボタン
-  connect(m_wheelShowButton, SIGNAL(toggled(bool)), m_wheelFrame,
-          SLOT(setVisible(bool)));
-  connect(m_hsvShowButton, SIGNAL(toggled(bool)), hsvFrame,
-          SLOT(setVisible(bool)));
-  connect(m_alphaShowButton, SIGNAL(toggled(bool)), alphaFrame,
-          SLOT(setVisible(bool)));
-  connect(m_rgbShowButton, SIGNAL(toggled(bool)), rgbFrame,
-          SLOT(setVisible(bool)));
-  connect(m_toggleOrientationButton, SIGNAL(clicked()), this,
-          SLOT(toggleOrientation()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1690,39 +1642,6 @@ void PlainColorPage::setColor(const TColorStyle &style,
 
 //-----------------------------------------------------------------------------
 
-void PlainColorPage::setVisibleParts(int settings) {
-  m_visibleParts = settings;
-  if (m_visibleParts & 0x01)
-    m_wheelShowButton->setChecked(true);
-  else
-    m_wheelShowButton->setChecked(false);
-  if (m_visibleParts & 0x02)
-    m_hsvShowButton->setChecked(true);
-  else
-    m_hsvShowButton->setChecked(false);
-  if (m_visibleParts & 0x04)
-    m_alphaShowButton->setChecked(true);
-  else
-    m_alphaShowButton->setChecked(false);
-  if (m_visibleParts & 0x08)
-    m_rgbShowButton->setChecked(true);
-  else
-    m_rgbShowButton->setChecked(false);
-}
-
-//-----------------------------------------------------------------------------
-
-int PlainColorPage::getVisibleParts() {
-  int visibleParts = 0;
-  if (m_wheelShowButton->isChecked()) visibleParts |= 0x01;
-  if (m_hsvShowButton->isChecked()) visibleParts |= 0x02;
-  if (m_alphaShowButton->isChecked()) visibleParts |= 0x04;
-  if (m_rgbShowButton->isChecked()) visibleParts |= 0x08;
-  return visibleParts;
-}
-
-//-----------------------------------------------------------------------------
-
 void PlainColorPage::setIsVertical(bool isVertical) {
   // if (m_isVertical == isVertical) return;
   // not returning even if it already is the same orientation
@@ -1733,14 +1652,12 @@ void PlainColorPage::setIsVertical(bool isVertical) {
   m_isVertical = isVertical;
   if (isVertical) {
     m_vSplitter->setOrientation(Qt::Vertical);
-    m_toggleOrientationButton->setText(QChar(0x2194));
     QList<int> sectionSizes;
     // maximize color wheel space
     sectionSizes << height() - 1 << 1;
     m_vSplitter->setSizes(sectionSizes);
   } else {
     m_vSplitter->setOrientation(Qt::Horizontal);
-    m_toggleOrientationButton->setText(QChar(0x2195));
     QList<int> sectionSizes;
     sectionSizes << width() / 2 << width() / 2;
     m_vSplitter->setSizes(sectionSizes);
@@ -2979,6 +2896,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
     , m_enabledOnlyFirstTab(false)
     , m_enabledFirstAndLastTab(false)
     , m_oldStyle(0)
+    , m_parent(parent)
     , m_editedStyle(0) {
   setFocusPolicy(Qt::NoFocus);
   // TOGLIERE
@@ -3005,8 +2923,6 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   m_settingsPage            = new SettingsPage(0);
 
   QWidget *emptyPage = new StyleEditorPage(0);
-
-  m_statusLabel = new QLabel("", this);
 
   // For the plainColorPage and the settingsPage
   // I create a "fake" QScrollArea (without ScrollingBar
@@ -3038,6 +2954,41 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   m_colorParameterSelector->setMinimumWidth(200);
   m_colorParameterSelector->setFixedHeight(22);
 
+  QMenu *menu   = new QMenu();
+  m_wheelAction = new QAction(tr("Wheel"), this);
+  m_hsvAction   = new QAction(tr("HSV"), this);
+  m_alphaAction = new QAction(tr("Alpha"), this);
+  m_rgbAction   = new QAction(tr("RGB"), this);
+
+  m_wheelAction->setCheckable(true);
+  m_hsvAction->setCheckable(true);
+  m_alphaAction->setCheckable(true);
+  m_rgbAction->setCheckable(true);
+  m_wheelAction->setChecked(true);
+  m_hsvAction->setChecked(true);
+  m_alphaAction->setChecked(true);
+  m_rgbAction->setChecked(true);
+  menu->addAction(m_wheelAction);
+  menu->addAction(m_hsvAction);
+  menu->addAction(m_alphaAction);
+  menu->addAction(m_rgbAction);
+
+  QToolButton *toolButton = new QToolButton(this);
+  toolButton->setIcon(QIcon(":Resources/menu.svg"));
+  toolButton->setMaximumWidth(18);
+  toolButton->setMaximumHeight(18);
+  toolButton->setMenu(menu);
+  toolButton->setPopupMode(QToolButton::InstantPopup);
+  toolButton->setToolTip(tr("Show or hide parts of the Color Page."));
+  QToolBar *displayToolbar  = new QToolBar(this);
+  m_toggleOrientationButton = new QPushButton(QChar(0x2194), this);
+  m_toggleOrientationButton->setFixedWidth(20);
+  m_toggleOrientationButton->setToolTip(
+      tr("Toggle orientation of the Color Page."));
+  m_toggleOrientationButton->setFocusPolicy(Qt::NoFocus);
+  displayToolbar->addWidget(m_toggleOrientationButton);
+  displayToolbar->addWidget(toolButton);
+  displayToolbar->setFixedWidth(45);
   /* ------- layout ------- */
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->setMargin(0);
@@ -3055,8 +3006,8 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
     mainLayout->addWidget(m_tabBarContainer, 0, 0, 1, 2, 0);
     mainLayout->addWidget(m_styleChooser, 1, 0, 1, 2);
     mainLayout->addWidget(bottomWidget, 2, 0, 1, 2, 0);
-    mainLayout->addWidget(m_statusLabel, 3, 0, 1, 2, 0);
-    mainLayout->addWidget(m_toolBar, 4, 0, 1, 2, 0);
+    mainLayout->addWidget(m_toolBar, 3, 0, 1, 1, 0);
+    mainLayout->addWidget(displayToolbar, 3, 1, 1, 1, 0);
   }
   setLayout(mainLayout);
 
@@ -3087,8 +3038,20 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   ret = ret && connect(m_plainColorPage,
                        SIGNAL(colorChanged(const ColorModel &, bool)), this,
                        SLOT(onColorChanged(const ColorModel &, bool)));
-  assert(ret);
 
+  ret = ret && connect(m_wheelAction, SIGNAL(toggled(bool)),
+                       m_plainColorPage->m_wheelFrame, SLOT(setVisible(bool)));
+  ret = ret && connect(m_hsvAction, SIGNAL(toggled(bool)),
+                       m_plainColorPage->m_hsvFrame, SLOT(setVisible(bool)));
+  ret = ret && connect(m_alphaAction, SIGNAL(toggled(bool)),
+                       m_plainColorPage->m_alphaFrame, SLOT(setVisible(bool)));
+  ret = ret && connect(m_rgbAction, SIGNAL(toggled(bool)),
+                       m_plainColorPage->m_rgbFrame, SLOT(setVisible(bool)));
+  ret = ret && connect(m_toggleOrientationButton, SIGNAL(clicked()),
+                       m_plainColorPage, SLOT(toggleOrientation()));
+  ret = ret && connect(m_toggleOrientationButton, SIGNAL(clicked()), this,
+                       SLOT(updateOrientationButton()));
+  assert(ret);
   /* ------- initial conditions ------- */
   enable(false, false, false);
   // set to the empty page
@@ -3112,7 +3075,7 @@ void StyleEditor::setPaletteHandle(TPaletteHandle* paletteHandle)
 
 QFrame *StyleEditor::createBottomWidget() {
   QFrame *bottomWidget = new QFrame(this);
-  m_autoButton         = new QPushButton(tr("Auto  \nApply"));
+  m_autoButton         = new QPushButton(tr("Auto"));
   m_oldColor           = new DVGui::StyleSample(this, 42, 20);
   m_newColor           = new DVGui::StyleSample(this, 42, 20);
   m_applyButton        = new QPushButton(tr("Apply"));
@@ -3137,7 +3100,7 @@ QFrame *StyleEditor::createBottomWidget() {
 
   /* ------ layout ------ */
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->setMargin(4);
+  mainLayout->setMargin(2);
   mainLayout->setSpacing(1);
   {
     QHBoxLayout *hLayout = new QHBoxLayout;
@@ -3145,17 +3108,18 @@ QFrame *StyleEditor::createBottomWidget() {
     hLayout->setSpacing(0);
     {
       hLayout->addWidget(m_autoButton);
+      hLayout->addWidget(m_applyButton);
       hLayout->addSpacing(2);
       hLayout->addWidget(m_newColor, 1);
       hLayout->addWidget(m_oldColor, 1);
     }
     mainLayout->addLayout(hLayout);
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->setMargin(0);
-    buttonsLayout->setSpacing(5);
-    { buttonsLayout->addWidget(m_applyButton); }
-    mainLayout->addLayout(buttonsLayout);
+    // QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    // buttonsLayout->setMargin(0);
+    // buttonsLayout->setSpacing(5);
+    //{ buttonsLayout->addWidget(m_applyButton); }
+    // mainLayout->addLayout(buttonsLayout);
   }
   bottomWidget->setLayout(mainLayout);
 
@@ -3279,7 +3243,11 @@ void StyleEditor::showEvent(QShowEvent *) {
   ret = ret && connect(m_paletteController,
                        SIGNAL(colorSampleChanged(const TPixel32 &)), this,
                        SLOT(setColorSample(const TPixel32 &)));
-
+  m_plainColorPage->m_wheelFrame->setVisible(m_wheelAction->isChecked());
+  m_plainColorPage->m_hsvFrame->setVisible(m_hsvAction->isChecked());
+  m_plainColorPage->m_alphaFrame->setVisible(m_alphaAction->isChecked());
+  m_plainColorPage->m_rgbFrame->setVisible(m_rgbAction->isChecked());
+  updateOrientationButton();
   assert(ret);
 }
 
@@ -3289,6 +3257,16 @@ void StyleEditor::hideEvent(QHideEvent *) {
   disconnect(m_paletteHandle);
   if (m_cleanupPaletteHandle) disconnect(m_cleanupPaletteHandle);
   disconnect(m_paletteController);
+}
+
+//-----------------------------------------------------------------------------
+
+void StyleEditor::updateOrientationButton() {
+  if (m_plainColorPage->getIsVertical()) {
+    m_toggleOrientationButton->setText(QChar(0x2194));
+  } else {
+    m_toggleOrientationButton->setText(QChar(0x2195));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -3304,7 +3282,7 @@ void StyleEditor::onStyleSwitched() {
     m_oldStyle    = TColorStyleP();
     m_editedStyle = TColorStyleP();
 
-    m_statusLabel->setText(tr("- Style not Selected -"));
+    m_parent->setWindowTitle(tr("No Style Selected"));
     return;
   }
 
@@ -3328,21 +3306,22 @@ void StyleEditor::onStyleSwitched() {
       statusText = tr("[LEVEL]  ");
 
     // palette name
-    statusText +=
-        QString::fromStdWString(L" Palette : " + palette->getPaletteName());
+    statusText += tr("Palette") + " : " +
+                  QString::fromStdWString(palette->getPaletteName());
 
     // style name
     statusText += QString::fromStdWString(L" | #");
     statusText += QString::number(styleIndex);
     statusText += QString::fromStdWString(L" : " + m_editedStyle->getName());
-    TPoint pickedPos = m_editedStyle->getPickedPosition();
+    TPoint pickedPos = m_editedStyle->getPickedPosition().pos;
     if (pickedPos != TPoint())
       statusText +=
           QString(" (Picked from %1,%2)").arg(pickedPos.x).arg(pickedPos.y);
 
-    m_statusLabel->setText(statusText);
-  } else
-    m_statusLabel->setText(tr("- Style is Not Valid -"));
+    m_parent->setWindowTitle(statusText);
+  } else {
+    m_parent->setWindowTitle(tr("Style Editor - No Valid Style Selected"));
+  }
   enable(!isStyleNull && isValidIndex, isColorInField, isCleanUpPalette);
 }
 
@@ -3722,7 +3701,12 @@ void StyleEditor::onVectorBrushButtonToggled(bool on) {
 
 void StyleEditor::save(QSettings &settings) const {
   settings.setValue("isVertical", m_plainColorPage->getIsVertical());
-  settings.setValue("visibleParts", m_plainColorPage->getVisibleParts());
+  int visibleParts = 0;
+  if (m_wheelAction->isChecked()) visibleParts |= 0x01;
+  if (m_hsvAction->isChecked()) visibleParts |= 0x02;
+  if (m_alphaAction->isChecked()) visibleParts |= 0x04;
+  if (m_rgbAction->isChecked()) visibleParts |= 0x08;
+  settings.setValue("visibleParts", visibleParts);
   settings.setValue("splitterState", m_plainColorPage->getSplitterState());
 }
 void StyleEditor::load(QSettings &settings) {
@@ -3732,8 +3716,26 @@ void StyleEditor::load(QSettings &settings) {
     m_plainColorPage->setIsVertical(m_colorPageIsVertical);
   }
   QVariant visibleParts = settings.value("visibleParts");
-  if (visibleParts.canConvert(QVariant::Int))
-    m_plainColorPage->setVisibleParts(visibleParts.toInt());
+  if (visibleParts.canConvert(QVariant::Int)) {
+    int visiblePartsInt = visibleParts.toInt();
+
+    if (visiblePartsInt & 0x01)
+      m_wheelAction->setChecked(true);
+    else
+      m_wheelAction->setChecked(false);
+    if (visiblePartsInt & 0x02)
+      m_hsvAction->setChecked(true);
+    else
+      m_hsvAction->setChecked(false);
+    if (visiblePartsInt & 0x04)
+      m_alphaAction->setChecked(true);
+    else
+      m_alphaAction->setChecked(false);
+    if (visiblePartsInt & 0x08)
+      m_rgbAction->setChecked(true);
+    else
+      m_rgbAction->setChecked(false);
+  }
   QVariant splitterState = settings.value("splitterState");
   if (splitterState.canConvert(QVariant::ByteArray))
     m_plainColorPage->setSplitterState(splitterState.toByteArray());

@@ -23,6 +23,10 @@ void TProperty::notifyListeners() const {
     (*it)->onPropertyChanged();
 }
 
+void TProperty::assignUIName(TProperty *refP) {
+  m_qstringName = refP->getQStringName();
+}
+
 //=============================================================================
 
 TPropertyGroup::TPropertyGroup() {}
@@ -276,6 +280,14 @@ void TPropertyGroup::saveData(TOStream &os) const {
   const_cast<TPropertyGroup *>(this)->accept(writer);
 }
 
+void TPropertyGroup::assignUINames(TPropertyGroup *refPg) {
+  for (PropertyVector::const_iterator i = m_properties.begin();
+       i != m_properties.end(); ++i) {
+    TProperty *refP = refPg->getProperty(i->first->getName());
+    if (refP) i->first->assignUIName(refP);
+  }
+}
+
 namespace {
 bool EnumRangeSavingEnabled = true;
 }
@@ -283,3 +295,14 @@ bool EnumRangeSavingEnabled = true;
 void TEnumProperty::enableRangeSaving(bool on) { EnumRangeSavingEnabled = on; }
 
 bool TEnumProperty::isRangeSavingEnabled() { return EnumRangeSavingEnabled; }
+
+void TEnumProperty::assignUIName(TProperty *refP) {
+  setQStringName(refP->getQStringName());
+  TEnumProperty *enumRefP = dynamic_cast<TEnumProperty *>(refP);
+  if (!enumRefP) return;
+  Items refItems = enumRefP->getItems();
+  for (int i = 0; i < m_range.size(); i++) {
+    int refIndex                         = enumRefP->indexOf(m_range[i]);
+    if (0 <= refIndex) m_items[i].UIName = refItems[refIndex].UIName;
+  }
+}

@@ -21,6 +21,7 @@
 #include "toonz/stage2.h"
 #include "toonz/ttileset.h"
 #include "toonz/rasterstrokegenerator.h"
+#include "toonz/preferences.h"
 #include "tgl.h"
 #include "tenv.h"
 
@@ -339,6 +340,9 @@ void FingerTool::draw() {
     return;
   }
 
+  // If toggled off, don't draw brush outline
+  if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
   TToonzImageP ti = (TToonzImageP)getImage(false);
   if (!ti) return;
   TRasterP ras = ti->getRaster();
@@ -428,13 +432,11 @@ void FingerTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
                     m_rasterTrackが無くて落ちることがある。 ---*/
     if (m_rasterTrack) {
       int thickness = m_toolSize.getValue();
-      bool isAdded  = m_rasterTrack->add(
+      m_rasterTrack->add(
           TThickPoint(pos + convert(ri->getRaster()->getCenter()), thickness));
-      if (isAdded) {
-        m_tileSaver->save(m_rasterTrack->getLastRect());
-        TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
-        invalidate();
-      }
+      m_tileSaver->save(m_rasterTrack->getLastRect());
+      TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
+      invalidate();
     }
   }
 }
@@ -508,13 +510,10 @@ void FingerTool::finishBrush() {
   if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
     if (m_rasterTrack) {
       int thickness = m_toolSize.getValue();
-      bool isAdded  = m_rasterTrack->add(TThickPoint(
+      m_rasterTrack->add(TThickPoint(
           m_mousePos + convert(ti->getRaster()->getCenter()), thickness));
-      if (isAdded) {
-        m_tileSaver->save(m_rasterTrack->getLastRect());
-        TRect modifiedBbox =
-            m_rasterTrack->generateLastPieceOfStroke(true, true);
-      }
+      m_tileSaver->save(m_rasterTrack->getLastRect());
+      TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true, true);
 
       TTool::Application *app   = TTool::getApplication();
       TXshLevel *level          = app->getCurrentLevel()->getLevel();

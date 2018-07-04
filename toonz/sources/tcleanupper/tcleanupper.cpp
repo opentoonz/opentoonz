@@ -510,23 +510,6 @@ int main(int argc, char *argv[]) {
   }
   if (i == argc) TMsgCore::instance()->connectTo("");
 
-// TThread::init();  //For the ImageManager construction
-// controllo se la xxxroot e' definita e corrisponde ad un file esistente
-#ifdef MACOSX
-
-  // StuffDir
-
-  QFileInfo infoStuff(QString("Toonz 7.1 stuff"));
-  TFilePath stuffDirPath(infoStuff.absoluteFilePath().toStdString());
-  TEnv::setStuffDir(stuffDirPath);
-
-/*
-    TFilePath  stuffDir("/Applications/Toonz 7.1/Toonz 7.1 stuff");
-
-  TEnv::setStuffDir(stuffDir);
-*/
-#endif
-
   TFilePath fproot = TEnv::getStuffDir();
   if (fproot == TFilePath())
     fatalError(string("Undefined: \"") + ::to_string(TEnv::getRootVarPath()) +

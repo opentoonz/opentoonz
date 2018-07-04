@@ -177,8 +177,11 @@ public:
     refreshRowsArea();
   }
   void onDrag(const CellPosition &pos) override {
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int row = pos.frame(), col = pos.layer();
-    if (col < 0) return;
+    if (col < 0 || (!getViewer()->orientation()->isVerticalTimeline() &&
+                    col >= xsh->getColumnCount()))
+      return;
     if (row < 0) row = 0;
     if (m_modifier & Qt::ControlModifier)
       getViewer()->getCellKeyframeSelection()->selectCellsKeyframes(
@@ -1195,13 +1198,16 @@ public:
   }
 
   void onChange(TPointD pos) {
-    pos                       = pos - m_delta;
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    pos          = pos - m_delta;
     CellPosition cellPosition = getViewer()->xyToPosition(pos);
     int row                   = cellPosition.frame();
     int col                   = cellPosition.layer();
 
     if (row < 0) row = 0;
-    if (col < 0) col = 0;
+    if (col < 0 || (!getViewer()->orientation()->isVerticalTimeline() &&
+                    (col == 0 || col >= xsh->getColumnCount())))
+      return;
 
     QPoint xy      = getViewer()->positionToXY(CellPosition(row, col));
     TPointD newPos = pos - TPointD(xy.x(), xy.y());
@@ -1478,9 +1484,12 @@ public:
   }
 
   void onDrag(const CellPosition &pos) override {
-    int col = pos.layer();
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    int col      = pos.layer();
     if (!m_enabled) return;
-    if (col < 0) return;
+    if (col < 0 || (!getViewer()->orientation()->isVerticalTimeline() &&
+                    col >= xsh->getColumnCount()))
+      return;
     TColumnSelection *selection = getViewer()->getColumnSelection();
     selection->selectNone();
     int i, ia = m_firstColumn, ib = col;
@@ -1615,44 +1624,30 @@ public:
 
     assert(m_lastCol == *indices.begin());
 
-    int origCol      = col;
-    if (col < 0) col = 0;
-    int dCol         = col - (m_lastCol - m_offset);
+    int currEnd = xsh->getColumnCount() - 1;
+    int origCol = col;
+    if (col < 0)
+      col = 0;
+    else if (!getViewer()->orientation()->isVerticalTimeline() && col > currEnd)
+      col    = currEnd;
+    int dCol = col - (m_lastCol - m_offset);
+
+    // ignore if the cursor moves in the drag-starting column
+    if (dCol == 0) return;
 
     int newBegin = *indices.begin() + dCol;
-    if (!getViewer()->orientation()->isVerticalTimeline()) {
-      if (origCol < 0) {
-        dCol += origCol;
-        newBegin = *indices.begin() + dCol;
-      }
-      std::set<int> ii;
-      if (newBegin < 0) {
-        newBegin *= -1;
-        for (int x = 0; x < newBegin; x++) ii.insert(x);
-        ColumnCmd::insertEmptyColumns(ii);
-        selection->selectNone();
-        for (std::set<int>::const_iterator it = indices.begin();
-             it != indices.end(); it++)
-          selection->selectColumn(*it + newBegin, true);
-        indices = selection->getIndices();
-        col     = origCol + newBegin;
-        m_lastCol += newBegin;
-        m_firstCol += newBegin;
-        int currentIndx = app->getCurrentColumn()->getColumnIndex();
-        app->getCurrentColumn()->setColumnIndex(currentIndx + newBegin);
-      } else {
-        int currEnd = xsh->getColumnCount() - 1;
-        int newEnd  = *indices.rbegin() + dCol;
-        if (newEnd > currEnd) {
-          for (int x = currEnd + 1; x <= newEnd; x++) ii.insert(x);
-          ColumnCmd::insertEmptyColumns(ii);
-        }
-      }
-    } else if (newBegin < 0)
-      return;
+    int newEnd   = *indices.rbegin() + dCol;
 
-    if (col == (m_lastCol - m_offset)) return;
-    m_lastCol = col + m_offset;
+    if (newBegin < 0)
+      dCol -= newBegin;
+    else if (!getViewer()->orientation()->isVerticalTimeline() &&
+             newEnd > currEnd)
+      dCol -= (newEnd - currEnd);
+
+    // ignore if the dragged columns comes up against the end of column stack
+    if (dCol == 0) return;
+
+    m_lastCol += dCol;
 
     assert(*indices.begin() + dCol >= 0);
 

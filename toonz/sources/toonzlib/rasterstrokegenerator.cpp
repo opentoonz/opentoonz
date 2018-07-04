@@ -33,13 +33,12 @@ RasterStrokeGenerator::~RasterStrokeGenerator() {}
 
 //-----------------------------------------------------------
 
-bool RasterStrokeGenerator::add(const TThickPoint &p) {
+void RasterStrokeGenerator::add(const TThickPoint &p) {
   TThickPoint pp = p;
   TThickPoint mid((m_points.back() + pp) * 0.5,
                   (p.thick + m_points.back().thick) * 0.5);
   m_points.push_back(mid);
   m_points.push_back(pp);
-  return true;
 }
 
 //-----------------------------------------------------------

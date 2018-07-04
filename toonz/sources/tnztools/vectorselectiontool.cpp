@@ -1183,34 +1183,34 @@ VectorSelectionTool::VectorSelectionTool(int targetType)
     , m_miterJoinLimit("Miter:", 0, 100, 4)
     , m_selectionCount(0)
     , m_canEnterGroup(true) {
-  if (targetType == TTool::Vectors) {
-    m_prop.bind(m_selectionTarget);
-    m_prop.bind(m_constantThickness);
+  assert(targetType == TTool::Vectors);
+  m_prop.bind(m_selectionTarget);
+  m_prop.bind(m_constantThickness);
 
-    m_selectionTarget.addValue(NORMAL_TYPE);
-    m_selectionTarget.addValue(SELECTED_FRAMES_TYPE);
-    m_selectionTarget.addValue(ALL_LEVEL_TYPE);
-    m_selectionTarget.addValue(SAME_STYLE_TYPE);
-    m_selectionTarget.addValue(STYLE_SELECTED_FRAMES_TYPE);
-    m_selectionTarget.addValue(STYLE_LEVEL_TYPE);
-    m_selectionTarget.addValue(BOUNDARY_TYPE);
-    m_selectionTarget.addValue(BOUNDARY_SELECTED_FRAMES_TYPE);
-    m_selectionTarget.addValue(BOUNDARY_LEVEL_TYPE);
-  }
+  m_selectionTarget.addValue(NORMAL_TYPE);
+  m_selectionTarget.addValue(SELECTED_FRAMES_TYPE);
+  m_selectionTarget.addValue(ALL_LEVEL_TYPE);
+  m_selectionTarget.addValue(SAME_STYLE_TYPE);
+  m_selectionTarget.addValue(STYLE_SELECTED_FRAMES_TYPE);
+  m_selectionTarget.addValue(STYLE_LEVEL_TYPE);
+  m_selectionTarget.addValue(BOUNDARY_TYPE);
+  m_selectionTarget.addValue(BOUNDARY_SELECTED_FRAMES_TYPE);
+  m_selectionTarget.addValue(BOUNDARY_LEVEL_TYPE);
 
   m_strokeSelection.setView(this);
 
   m_constantThickness.setId("PreserveThickness");
   m_selectionTarget.setId("SelectionMode");
 
-  m_capStyle.addValue(BUTT_WSTR);
-  m_capStyle.addValue(ROUNDC_WSTR);
-  m_capStyle.addValue(PROJECTING_WSTR);
+  m_capStyle.addValue(BUTT_WSTR, QString::fromStdWString(BUTT_WSTR));
+  m_capStyle.addValue(ROUNDC_WSTR, QString::fromStdWString(ROUNDC_WSTR));
+  m_capStyle.addValue(PROJECTING_WSTR,
+                      QString::fromStdWString(PROJECTING_WSTR));
   m_capStyle.setId("Cap");
 
-  m_joinStyle.addValue(MITER_WSTR);
-  m_joinStyle.addValue(ROUNDJ_WSTR);
-  m_joinStyle.addValue(BEVEL_WSTR);
+  m_joinStyle.addValue(MITER_WSTR, QString::fromStdWString(MITER_WSTR));
+  m_joinStyle.addValue(ROUNDJ_WSTR, QString::fromStdWString(ROUNDJ_WSTR));
+  m_joinStyle.addValue(BEVEL_WSTR, QString::fromStdWString(BEVEL_WSTR));
   m_joinStyle.setId("Join");
 
   m_miterJoinLimit.setId("Miter");
@@ -1291,9 +1291,32 @@ bool VectorSelectionTool::isModifiableSelectionType() const {
 
 void VectorSelectionTool::updateTranslation() {
   m_selectionTarget.setQStringName(tr("Mode:"));
+  m_selectionTarget.setItemUIName(NORMAL_TYPE, tr("Standard"));
+  m_selectionTarget.setItemUIName(SELECTED_FRAMES_TYPE, tr("Selected Frames"));
+  m_selectionTarget.setItemUIName(ALL_LEVEL_TYPE, tr("Whole Level"));
+  m_selectionTarget.setItemUIName(SAME_STYLE_TYPE, tr("Same Style"));
+  m_selectionTarget.setItemUIName(STYLE_SELECTED_FRAMES_TYPE,
+                                  tr("Same Style on Selected Frames"));
+  m_selectionTarget.setItemUIName(STYLE_LEVEL_TYPE,
+                                  tr("Same Style on Whole Level"));
+  m_selectionTarget.setItemUIName(BOUNDARY_TYPE, tr("Boundary Strokes"));
+  m_selectionTarget.setItemUIName(BOUNDARY_SELECTED_FRAMES_TYPE,
+                                  tr("Boundaries on Selected Frames"));
+  m_selectionTarget.setItemUIName(BOUNDARY_LEVEL_TYPE,
+                                  tr("Boundaries on Whole Level"));
+
   m_constantThickness.setQStringName(tr("Preserve Thickness"));
+
   m_capStyle.setQStringName(tr("Cap"));
+  m_capStyle.setItemUIName(BUTT_WSTR, tr("Butt cap"));
+  m_capStyle.setItemUIName(ROUNDC_WSTR, tr("Round cap"));
+  m_capStyle.setItemUIName(PROJECTING_WSTR, tr("Projecting cap"));
+
   m_joinStyle.setQStringName(tr("Join"));
+  m_joinStyle.setItemUIName(MITER_WSTR, tr("Miter join"));
+  m_joinStyle.setItemUIName(ROUNDJ_WSTR, tr("Round join"));
+  m_joinStyle.setItemUIName(BEVEL_WSTR, tr("Bevel join"));
+
   m_miterJoinLimit.setQStringName(tr("Miter:"));
   SelectionTool::updateTranslation();
 }

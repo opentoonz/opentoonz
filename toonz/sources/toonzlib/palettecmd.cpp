@@ -205,7 +205,7 @@ public:
     int h     = m_dstIndexInPage;
     std::set<int>::const_iterator i;
     for (i = m_srcIndicesInPage.begin(); i != m_srcIndicesInPage.end(); ++i) {
-      if (srcPage == dstPage && (*i) <= h)
+      if (srcPage == dstPage && (*i) <= m_dstIndexInPage)
         h--;
       else
         break;
@@ -803,119 +803,144 @@ public:
 //-------------------------------------------------------------------
 
 int loadRefImage(TPaletteHandle *paletteHandle,
-                 PaletteCmd::ColorModelPltBehavior pltBehavior,
-                 TPaletteP levelPalette, const TFilePath &_fp, int &frame,
+                 const PaletteCmd::ColorModelLoadingConfiguration &config,
+                 TPaletteP levelPalette, const TFilePath &_fp,
                  ToonzScene *scene, const std::vector<int> &frames) {
-  bool paletteAlreadyLoaded = false;
-  TFilePath fp              = scene->decodeFilePath(_fp);
-  if (_fp == TFilePath()) {
-    paletteAlreadyLoaded = true;
-    fp                   = levelPalette->getRefImgPath();
-  }
+  TFilePath fp = scene->decodeFilePath(_fp);
 
-  TImageP img;
+  // enable to store multiple frames in the level
+  QList<TImageP> imgs;
   try {
     TLevelReaderP lr(fp);
-    if (fp != TFilePath() && lr) {
-      TLevelP level = lr->loadInfo();
-      if (level && level->getFrameCount() > 0) {
-        TLevel::Iterator it;
-        if (!paletteAlreadyLoaded) {
-          std::vector<TFrameId> fids;
-          for (it = level->begin(); it != level->end(); ++it) {
-            if (it->first == -1 || it->first == -2) {
-              assert(level->getFrameCount() == 1);
-              fids.push_back(0);
-              break;
-            }
-            // if the frame list is empty, store all fids of the level
-            if (frames.empty()) {
-              fids.push_back(it->first);
-              continue;
-            }
-            // if the frame list is specified, load only the frames matches with
-            // the list
-            else {
-              std::vector<int>::const_iterator framesIt;
-              for (framesIt = frames.begin(); framesIt != frames.end();
-                   framesIt++) {
-                if (it->first.getNumber() == *framesIt) {
-                  fids.push_back(it->first);
-                  break;
-                }
-              }
-            }
+    if (!lr) return 1;
+
+    TLevelP level = lr->loadInfo();
+    if (!level || level->getFrameCount() <= 0) return 1;
+
+    TLevel::Iterator it;
+    std::vector<TFrameId> fids;
+    for (it = level->begin(); it != level->end(); ++it) {
+      if (it->first == -1 || it->first == -2) {
+        assert(level->getFrameCount() == 1);
+        fids.push_back(it->first);
+        break;
+      }
+      // if the frame list is empty, store all fids of the level
+      if (frames.empty()) {
+        fids.push_back(it->first);
+        continue;
+      }
+      // if the frame list is specified, load only the frames matches with
+      // the list
+      else {
+        std::vector<int>::const_iterator framesIt;
+        for (framesIt = frames.begin(); framesIt != frames.end(); framesIt++) {
+          if (it->first.getNumber() == *framesIt) {
+            fids.push_back(it->first);
+            break;
           }
-          levelPalette->setRefLevelFids(fids);
         }
+      }
+    }
+    levelPalette->setRefLevelFids(fids);
 
-        if (frame <= 0) frame = level->begin()->first.getNumber();
+    const TLevel::Table *table = level->getTable();
 
-        const TLevel::Table *table = level->getTable();
-        TFrameId fid(frame);
-
-        if (table->find(fid) != table->end()) {
-          img = lr->getFrameReader(fid)->load();
-          if (img && img->getPalette() == 0) {
-            if (paletteAlreadyLoaded || level->getPalette() != 0)
+    for (int f = 0; f < fids.size(); f++) {
+      TFrameId fid = fids.at(f);
+      if (table->find(fid) != table->end()) {
+        TImageP img = lr->getFrameReader(fid)->load();
+        if (img) {
+          if (img->getPalette() == 0) {
+            if (level->getPalette() != 0)
               img->setPalette(level->getPalette());
             else if ((fp.getType() == "tzp" || fp.getType() == "tzu"))
               img->setPalette(ToonzImageUtils::loadTzPalette(
                   fp.withType("plt").withNoFrame()));
           }
+          imgs.push_back(img);
         }
       }
-    } else
-      img = levelPalette->getRefImg();
+    }
+
   } catch (TException &e) {
     std::wcout << L"error: " << e.getMessage() << std::endl;
   } catch (...) {
     std::cout << "error for other reasons" << std::endl;
   }
 
-  if (!img) return 1;
-
-  if (paletteAlreadyLoaded) {
-    img->setPalette(0);
-    levelPalette->setRefImgPath(_fp);
-    return 0;
-  }
+  if (imgs.empty()) return 1;
 
   TUndo *undo = new SetReferenceImageUndo(levelPalette, paletteHandle);
 
-  if (pltBehavior != PaletteCmd::ReplaceColorModelPlt)  // ret==1 or 3)
+  bool isRasterLevel = false;
+  if (TRasterImageP ri = imgs.first()) isRasterLevel = true;
+
+  if (config.behavior != PaletteCmd::ReplaceColorModelPlt)  // ret==1 or 3)
   {
     TPaletteP imagePalette;
-    if (TRasterImageP ri = img) {
-      TRaster32P raster = ri->getRaster();
-      if (raster) {
-        std::set<TPixel32> colors;
-        int colorCount = 256;
-        if (Preferences::instance()
-                ->getPaletteTypeOnLoadRasterImageAsColorModel() == 0)
-          /*-- 全ての異なるピクセルの色を別のStyleにする --*/
-          TColorUtils::buildPrecisePalette(colors, raster, colorCount);
-        else
-          /*-- 似ている色をまとめて1つのStyleにする --*/
-          TColorUtils::buildPalette(colors, raster, colorCount);
-        colors.erase(TPixel::Black);  // il nero viene messo dal costruttore
-                                      // della TPalette
-        int pageIndex = 0;
-        if (pltBehavior == PaletteCmd::KeepColorModelPlt)
-          imagePalette = new TPalette();
-        else {
-          imagePalette = levelPalette->clone();
-          /*- Add new page and store color model's styles in it -*/
-          pageIndex =
-              imagePalette->addPage(QObject::tr("color model").toStdWString())
-                  ->getIndex();
+    // raster level case
+    if (isRasterLevel) {
+      int pageIndex = 0;
+      if (config.behavior == PaletteCmd::KeepColorModelPlt)
+        imagePalette = new TPalette();
+      else {
+        imagePalette = levelPalette->clone();
+        /*- Add new page and store color model's styles in it -*/
+        pageIndex =
+            imagePalette->addPage(QObject::tr("color model").toStdWString())
+                ->getIndex();
+      }
+
+      static const int maxColorCount = 1024;
+
+      for (int i = 0; i < imgs.size(); i++) {
+        TRasterImageP ri = imgs.at(i);
+        if (!ri) continue;
+        TRaster32P raster = ri->getRaster();
+        if (!raster) continue;
+
+        int availableColorCount = maxColorCount - imagePalette->getStyleCount();
+        if (availableColorCount <= 0) break;
+
+        if (config.rasterPickType == PaletteCmd::PickColorChipGrid) {
+          // colors will be sorted according to config.colorChipOrder
+          QList<QPair<TPixel32, TPoint>> colors;
+          TColorUtils::buildColorChipPalette(
+              colors, raster, availableColorCount, config.gridColor,
+              config.gridLineWidth, config.colorChipOrder);
+
+          QList<QPair<TPixel32, TPoint>>::const_iterator it = colors.begin();
+          for (; it != colors.end(); ++it) {
+            int indexInPage =
+                imagePalette->getPage(pageIndex)->addStyle((*it).first);
+            imagePalette->getPage(pageIndex)
+                ->getStyle(indexInPage)
+                ->setPickedPosition((*it).second, i);
+          }
+        } else {
+          // colors will be automatically sorted by comparing (uint)TPixel32
+          // values
+          std::set<TPixel32> colors;
+          if (config.rasterPickType == PaletteCmd::PickEveryColors) {
+            // different colors will become sparate styles
+            TColorUtils::buildPrecisePalette(colors, raster,
+                                             availableColorCount);
+          } else {  //  config.rasterPickType ==
+                    //  PaletteCmd::IntegrateSimilarColors
+            // relevant colors will united as one style
+            TColorUtils::buildPalette(colors, raster, availableColorCount);
+          }
+          colors.erase(TPixel::Black);  // il nero viene messo dal costruttore
+                                        // della TPalette
+
+          std::set<TPixel32>::const_iterator it = colors.begin();
+          for (; it != colors.end(); ++it)
+            imagePalette->getPage(pageIndex)->addStyle(*it);
         }
-        std::set<TPixel32>::const_iterator it = colors.begin();
-        for (; it != colors.end(); ++it)
-          imagePalette->getPage(pageIndex)->addStyle(*it);
       }
     } else
-      imagePalette = img->getPalette();
+      imagePalette = imgs.first()->getPalette();
 
     if (imagePalette) {
       std::wstring gName = levelPalette->getGlobalName();
@@ -940,7 +965,7 @@ int loadRefImage(TPaletteHandle *paletteHandle,
     }
   }
 
-  img->setPalette(0);
+  // img->setPalette(0);
 
   levelPalette->setRefImgPath(_fp);
 
@@ -962,20 +987,19 @@ int loadRefImage(TPaletteHandle *paletteHandle,
 //-------------------------------------------------------------------
 
 int PaletteCmd::loadReferenceImage(TPaletteHandle *paletteHandle,
-                                   ColorModelPltBehavior pltBehavior,
-                                   const TFilePath &_fp, int &frame,
-                                   ToonzScene *scene,
+                                   const ColorModelLoadingConfiguration &config,
+                                   const TFilePath &_fp, ToonzScene *scene,
                                    const std::vector<int> &frames) {
   TPaletteP levelPalette = paletteHandle->getPalette();
   if (!levelPalette) return 2;
 
-  int ret = loadRefImage(paletteHandle, pltBehavior, levelPalette, _fp, frame,
-                         scene, frames);
+  int ret =
+      loadRefImage(paletteHandle, config, levelPalette, _fp, scene, frames);
   if (ret != 0) return ret;
 
   // when choosing replace(Keep the destination palette), dirty flag is
   // unchanged
-  if (pltBehavior != ReplaceColorModelPlt) {
+  if (config.behavior != ReplaceColorModelPlt) {
     levelPalette->setDirtyFlag(true);
     paletteHandle->notifyPaletteDirtyFlagChanged();
   }
@@ -1185,12 +1209,12 @@ class setStylePickedPositionUndo final : public TUndo {
   TPaletteHandle *m_paletteHandle;  // Used in undo and redo to notify change
   int m_styleId;
   TPaletteP m_palette;
-  TPoint m_newPos;
-  TPoint m_oldPos;
+  TColorStyle::PickedPosition m_newPos;
+  TColorStyle::PickedPosition m_oldPos;
 
 public:
   setStylePickedPositionUndo(TPaletteHandle *paletteHandle, int styleId,
-                             const TPoint &newPos)
+                             const TColorStyle::PickedPosition &newPos)
       : m_paletteHandle(paletteHandle), m_styleId(styleId), m_newPos(newPos) {
     m_palette = paletteHandle->getPalette();
     assert(m_palette);
@@ -1215,15 +1239,16 @@ public:
     return QObject::tr("Set Picked Position of Style#%1 in Palette%2 : %3,%4")
         .arg(QString::number(m_styleId))
         .arg(QString::fromStdWString(m_palette->getPaletteName()))
-        .arg(QString::number(m_newPos.x))
-        .arg(QString::number(m_newPos.y));
+        .arg(QString::number(m_newPos.pos.x))
+        .arg(QString::number(m_newPos.pos.y));
   }
   int getHistoryType() override { return HistoryType::Palette; }
 };
 }
 
-void PaletteCmd::organizePaletteStyle(TPaletteHandle *paletteHandle,
-                                      int styleId, const TPoint &point) {
+void PaletteCmd::organizePaletteStyle(
+    TPaletteHandle *paletteHandle, int styleId,
+    const TColorStyle::PickedPosition &point) {
   if (!paletteHandle) return;
   TPalette *palette = paletteHandle->getPalette();
   if (!palette) return;
@@ -1315,7 +1340,7 @@ TPixel32 pickColor(TRasterImageP ri, const TPoint &rasterPoint) {
 }
 
 void PaletteCmd::pickColorByUsingPickedPosition(TPaletteHandle *paletteHandle,
-                                                TImageP img) {
+                                                TImageP img, int frame) {
   TRasterImageP ri = img;
   if (!ri) return;
 
@@ -1328,10 +1353,12 @@ void PaletteCmd::pickColorByUsingPickedPosition(TPaletteHandle *paletteHandle,
   // For all styles (starting from #1 as #0 is reserved for the transparent)
   for (int sId = 1; sId < currentPalette->getStyleCount(); sId++) {
     TColorStyle *style = currentPalette->getStyle(sId);
-    TPoint pp          = style->getPickedPosition();
+    TPoint pp          = style->getPickedPosition().pos;
+    int pickedFrame    = style->getPickedPosition().frame;
     // If style has a valid picked position
-    if (pp != TPoint() && pp.x >= 0 && pp.x < imgSize.lx && pp.y >= 0 &&
-        pp.y < imgSize.ly && style->hasMainColor()) {
+    if (pp != TPoint() && frame == pickedFrame && pp.x >= 0 &&
+        pp.x < imgSize.lx && pp.y >= 0 && pp.y < imgSize.ly &&
+        style->hasMainColor()) {
       TPixel32 beforeColor = style->getMainColor();
       TPixel32 afterColor  = pickColor(ri, pp);
       style->setMainColor(afterColor);

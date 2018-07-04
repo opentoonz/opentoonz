@@ -1,18 +1,19 @@
 // out: ../../../Dark/Dark.qss
 
-// Include Default Theme
+// -----------------------------------------------------------------------------
+// DARK
+// -----------------------------------------------------------------------------
+
+// Override
 @import '../Default';
 
-// IMG Location
+// Resource Location
 @img-url: '../Default/imgs/white';
 
 @bg: #303030;
 @accent: darken(@bg, 10);
-
-@text-color: #CECECE;
-
+@text-color: rgb(206, 206, 206);
 @dock-bg-color: darken(@bg, 14);
-
 @dialogButtonFrame-bg-color: darken(@bg, 3);
 
 // -----------------------------------------------------------------------------
@@ -39,7 +40,7 @@
 // -----------------------------------------------------------------------------
 
 // Frame
-@scrollbar-bg-color: darken(@bg, 6);
+@scrollbar-bg-color: darken(@bg, 4);
 
 // -----------------------------------------------------------------------------
 // Textfield
@@ -79,7 +80,7 @@
 // XSheet
 // -----------------------------------------------------------------------------
 
-@xsheet-bg-color:                           lighten(@bg, 5);
+@xsheet-bg-color:                           darken(@bg, 3);
 
 @xsheet-LightLine-color:                    darken(#2c2c2c, 5);
 @xsheet-VerticalLine-color:                 darken(#626262, 35);
@@ -96,4 +97,4 @@
 // -----------------------------------------------------------------------------
 
 // Function Curve Panel
-@function-panel-bg-color: #2F2F2F;
+@function-panel-OtherCurves-color: lighten(@function-panel-bg-color, 30);

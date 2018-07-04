@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Position</source>
-        <translation type="vanished">位置</translation>
+        <translation>位置</translation>
     </message>
     <message>
         <source>E/W:</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Rotation</source>
-        <translation type="vanished">回転</translation>
+        <translation>回転</translation>
     </message>
     <message>
         <source>Scale</source>
@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation>回転:</translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation>テーブル</translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
@@ -100,7 +104,7 @@
     </message>
     <message>
         <source>Selective</source>
-        <translation>塗りの保護</translation>
+        <translation type="vanished">塗りの保護</translation>
     </message>
     <message>
         <source>Preset:</source>
@@ -158,6 +162,82 @@
         <source>Snap</source>
         <translation>スナップ</translation>
     </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;カスタム&gt;</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>無効</translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation>均等割り</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>イーズイン</translation>
+    </message>
+    <message>
+        <source>Out</source>
+        <translation>イーズアウト</translation>
+    </message>
+    <message>
+        <source>In&amp;Out</source>
+        <translation>イーズインアウト</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>低</translation>
+    </message>
+    <message>
+        <source>Med</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>高</translation>
+    </message>
+    <message>
+        <source>Butt cap</source>
+        <translation>バット線端</translation>
+    </message>
+    <message>
+        <source>Round cap</source>
+        <translation>丸型線端</translation>
+    </message>
+    <message>
+        <source>Projecting cap</source>
+        <translation>突出線端</translation>
+    </message>
+    <message>
+        <source>Miter join</source>
+        <translation>マイター結合</translation>
+    </message>
+    <message>
+        <source>Round join</source>
+        <translation>ラウンド結合</translation>
+    </message>
+    <message>
+        <source>Bevel join</source>
+        <translation>ベベル結合</translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation>線の重ね順:</translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation>上に描く</translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation>下に描く</translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation>パレット順</translation>
+    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>
@@ -190,6 +270,13 @@
     <message>
         <source>Set Nonlinear Control Point</source>
         <translation>スムーズポイントに変更</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation>選択色</translation>
     </message>
 </context>
 <context>
@@ -276,11 +363,47 @@
     </message>
     <message>
         <source>Center Position</source>
-        <translation>センター位置</translation>
+        <translation>基準点位置</translation>
     </message>
     <message>
         <source>Active Axis</source>
         <translation>操作する軸</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>なし</translation>
+    </message>
+    <message>
+        <source>A/R</source>
+        <translation>縦横比</translation>
+    </message>
+    <message>
+        <source>Mass</source>
+        <translation>面積</translation>
+    </message>
+    <message>
+        <source>Column</source>
+        <translation>列</translation>
+    </message>
+    <message>
+        <source>Pegbar</source>
+        <translation>タップ</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation>位置</translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation>拡大縮小</translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation>基準点</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>全て</translation>
     </message>
 </context>
 <context>
@@ -317,6 +440,34 @@
         <source>Pencil Mode</source>
         <translation>鉛筆モード</translation>
     </message>
+    <message>
+        <source>Normal</source>
+        <translation>通常</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>長方形</translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation>なげなわ</translation>
+    </message>
+    <message>
+        <source>Polyline</source>
+        <translation>多角形</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>線</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>塗り</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>線と塗り</translation>
+    </message>
 </context>
 <context>
     <name>FillTool</name>
@@ -350,7 +501,39 @@
     </message>
     <message>
         <source>Autopaint Lines</source>
-        <translation>含め塗り</translation>
+        <translation>含み塗り</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>通常</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>長方形</translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation>なげなわ</translation>
+    </message>
+    <message>
+        <source>Polyline</source>
+        <translation>多角形</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>線</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>塗り</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>線と塗り</translation>
+    </message>
+    <message>
+        <source>Maximum Gap</source>
+        <translation>隙間の判定</translation>
     </message>
 </context>
 <context>
@@ -406,6 +589,10 @@
         <source>Lock Alpha</source>
         <translation>透明部分の保護</translation>
     </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;カスタム&gt;</translation>
+    </message>
 </context>
 <context>
     <name>FullColorEraserTool</name>
@@ -432,6 +619,22 @@
     <message>
         <source>Frame Range</source>
         <translation>フレーム範囲</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>通常</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>長方形</translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation>なげなわ</translation>
+    </message>
+    <message>
+        <source>Polyline</source>
+        <translation>多角形</translation>
     </message>
 </context>
 <context>
@@ -461,6 +664,18 @@
     <message>
         <source>Selective</source>
         <translation>塗りの保護</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>線</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>塗り</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>線と塗り</translation>
     </message>
 </context>
 <context>
@@ -702,6 +917,70 @@ Do you want to proceed?</source>
         <source>Snap</source>
         <translation>スナップ</translation>
     </message>
+    <message>
+        <source>Rectangle</source>
+        <translation>長方形</translation>
+    </message>
+    <message>
+        <source>Circle</source>
+        <translation>円形</translation>
+    </message>
+    <message>
+        <source>Ellipse</source>
+        <translation>楕円形</translation>
+    </message>
+    <message>
+        <source>Line</source>
+        <translation>直線</translation>
+    </message>
+    <message>
+        <source>Polyline</source>
+        <translation>折れ線</translation>
+    </message>
+    <message>
+        <source>Arc</source>
+        <translation>円弧</translation>
+    </message>
+    <message>
+        <source>Polygon</source>
+        <translation>多角形</translation>
+    </message>
+    <message>
+        <source>Butt cap</source>
+        <translation>バット線端</translation>
+    </message>
+    <message>
+        <source>Round cap</source>
+        <translation>丸型線端</translation>
+    </message>
+    <message>
+        <source>Projecting cap</source>
+        <translation>突出線端</translation>
+    </message>
+    <message>
+        <source>Miter join</source>
+        <translation>マイター結合</translation>
+    </message>
+    <message>
+        <source>Round join</source>
+        <translation>ラウンド結合</translation>
+    </message>
+    <message>
+        <source>Bevel join</source>
+        <translation>ベベル結合</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>低</translation>
+    </message>
+    <message>
+        <source>Med</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>高</translation>
+    </message>
 </context>
 <context>
     <name>PumpTool</name>
@@ -750,7 +1029,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>It is not possible to edit the Magpie column.</source>
-        <translation>MAGPIE列は編集できません。</translation>
+        <translation type="vanished">MAGPIE列は編集できません。</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Level column.</source>
@@ -830,7 +1109,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Modify Fx Gadget  </source>
-        <translation>エフェクト・ガジェットでパラメータを変更</translation>
+        <translation>エフェクト・ガジェットでパラメータを変更  </translation>
     </message>
     <message>
         <source>%1   Level : %2  Frame : %3</source>
@@ -856,6 +1135,30 @@ Do you want to proceed?</source>
         <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
         <translation>セーブボックスを設定 : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</translation>
     </message>
+    <message>
+        <source>The current column is hidden.</source>
+        <translation>現在の列は非表示です。</translation>
+    </message>
+    <message>
+        <source>Note columns can only be edited in the xsheet or timeline.</source>
+        <translation>ノートレベルはタイムシート又はタイムライン上でのみ編集できます。</translation>
+    </message>
+    <message>
+        <source> to Front</source>
+        <translation> 最前面へ</translation>
+    </message>
+    <message>
+        <source> to Forward</source>
+        <translation> 前面へ</translation>
+    </message>
+    <message>
+        <source> to Back</source>
+        <translation> 最背面へ</translation>
+    </message>
+    <message>
+        <source> to Backward</source>
+        <translation> 背面へ</translation>
+    </message>
 </context>
 <context>
     <name>RGBPickerTool</name>
@@ -867,12 +1170,28 @@ Do you want to proceed?</source>
         <source>Passive Pick</source>
         <translation>マウス位置の色を拾う</translation>
     </message>
+    <message>
+        <source>Normal</source>
+        <translation>通常</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>長方形</translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation>なげなわ</translation>
+    </message>
+    <message>
+        <source>Polyline</source>
+        <translation>多角形</translation>
+    </message>
 </context>
 <context>
     <name>RGBPickerToolOptionsBox</name>
     <message>
         <source>Pick Screen</source>
-        <translation>画面を選択</translation>
+        <translation>スクリーン上から拾う</translation>
     </message>
 </context>
 <context>
@@ -912,12 +1231,84 @@ Do you want to proceed?</source>
         <source>Angle:</source>
         <translation>角度：</translation>
     </message>
+    <message>
+        <source>Normal</source>
+        <translation>全体</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>長方形</translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation>なげなわ</translation>
+    </message>
+    <message>
+        <source>Polyline</source>
+        <translation>多角形</translation>
+    </message>
+    <message>
+        <source>current</source>
+        <translation>選択色</translation>
+    </message>
+</context>
+<context>
+    <name>RotateTool</name>
+    <message>
+        <source>Rotate On Camera Center</source>
+        <translation>カメラ中心点を基準にする</translation>
+    </message>
+</context>
+<context>
+    <name>RulerToolOptionsBox</name>
+    <message>
+        <source>X:</source>
+        <comment>ruler tool option</comment>
+        <translation>X：</translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <comment>ruler tool option</comment>
+        <translation>Y：</translation>
+    </message>
+    <message>
+        <source>W:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>H:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>L:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>SelectionTool</name>
     <message>
         <source>Type:</source>
         <translation>タイプ：</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>長方形</translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation>なげなわ</translation>
+    </message>
+    <message>
+        <source>Polyline</source>
+        <translation>多角形</translation>
     </message>
 </context>
 <context>
@@ -969,6 +1360,18 @@ Do you want to proceed?</source>
         <source>Reset Pinned Center</source>
         <translation>固定ピンをリセット</translation>
     </message>
+    <message>
+        <source>Build Skeleton</source>
+        <translation>ボーン作成</translation>
+    </message>
+    <message>
+        <source>Animate</source>
+        <translation>アニメート</translation>
+    </message>
+    <message>
+        <source>Inverse Kinematics</source>
+        <translation>逆運動学（IK)</translation>
+    </message>
 </context>
 <context>
     <name>StylePickerTool</name>
@@ -995,6 +1398,18 @@ Do you want to proceed?</source>
     <message>
         <source>Organize Palette</source>
         <translation>パレットを整理</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>線</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>塗り</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>線と塗り</translation>
     </message>
 </context>
 <context>
@@ -1066,6 +1481,66 @@ moved to the end of the first page of the palette.</source>
         <source>Miter:</source>
         <translation>角の比率：</translation>
     </message>
+    <message>
+        <source>Standard</source>
+        <translation>通常</translation>
+    </message>
+    <message>
+        <source>Selected Frames</source>
+        <translation>選択フレーム</translation>
+    </message>
+    <message>
+        <source>Whole Level</source>
+        <translation>レベル全体</translation>
+    </message>
+    <message>
+        <source>Same Style</source>
+        <translation>同じスタイル</translation>
+    </message>
+    <message>
+        <source>Same Style on Selected Frames</source>
+        <translation>同じスタイル - 選択フレーム</translation>
+    </message>
+    <message>
+        <source>Same Style on Whole Level</source>
+        <translation>同じスタイル - レベル全体</translation>
+    </message>
+    <message>
+        <source>Boundary Strokes</source>
+        <translation>輪郭線</translation>
+    </message>
+    <message>
+        <source>Boundaries on Selected Frames</source>
+        <translation>輪郭線 - 選択フレーム</translation>
+    </message>
+    <message>
+        <source>Boundaries on Whole Level</source>
+        <translation>輪郭線 - 全てのレベル</translation>
+    </message>
+    <message>
+        <source>Butt cap</source>
+        <translation>バット線端</translation>
+    </message>
+    <message>
+        <source>Projecting cap</source>
+        <translation>突出線端</translation>
+    </message>
+    <message>
+        <source>Miter join</source>
+        <translation>マイター結合</translation>
+    </message>
+    <message>
+        <source>Round join</source>
+        <translation>ラウンド結合</translation>
+    </message>
+    <message>
+        <source>Bevel join</source>
+        <translation>ベベル結合</translation>
+    </message>
+    <message>
+        <source>Round cap</source>
+        <translation>丸型線端</translation>
+    </message>
 </context>
 <context>
     <name>VectorTapeTool</name>
@@ -1079,7 +1554,7 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Distance</source>
-        <translation></translation>
+        <translation>距離：</translation>
     </message>
     <message>
         <source>Mode:</source>
@@ -1088,6 +1563,26 @@ moved to the end of the first page of the palette.</source>
     <message>
         <source>Type:</source>
         <translation>タイプ：</translation>
+    </message>
+    <message>
+        <source>Endpoint to Endpoint</source>
+        <translation>端点から端点</translation>
+    </message>
+    <message>
+        <source>Endpoint to Line</source>
+        <translation>端点から線</translation>
+    </message>
+    <message>
+        <source>Line to Line</source>
+        <translation>線から線</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>通常</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>長方形</translation>
     </message>
 </context>
 </TS>

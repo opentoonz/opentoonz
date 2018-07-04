@@ -79,6 +79,7 @@ public:
   // Used only for translation in Qt
   QString getQStringName() const { return m_qstringName; }
   void setQStringName(const QString &str) { m_qstringName = str; }
+  virtual void assignUIName(TProperty *refP);
 
   std::string getName() const { return m_name; }
   virtual std::string getValueAsString() = 0;
@@ -311,6 +312,15 @@ private:
 class DVAPI TEnumProperty final : public TProperty {
 public:
   typedef std::vector<std::wstring> Range;
+  // Used only for translation and styling in Qt
+  struct Item {
+    QString UIName;
+    QString iconName;
+
+    Item(const QString &name = QString(), const QString &icon = QString())
+        : UIName(name), iconName(icon) {}
+  };
+  typedef std::vector<Item> Items;
 
   TEnumProperty(const std::string &name) : TProperty(name), m_index(-1) {}
 
@@ -318,12 +328,14 @@ public:
                 const std::wstring &v)
       : TProperty(name), m_range(range), m_index(indexOf(v)) {
     if (m_index < 0) throw RangeError();
+    m_items.resize(m_range.size());
   }
 
   TEnumProperty(const std::string &name, Range::const_iterator i0,
                 Range::const_iterator i1, const std::wstring &v)
       : TProperty(name), m_range(i0, i1), m_index(indexOf(v)) {
     if (m_index < 0) throw RangeError();
+    m_items.resize(m_range.size());
   }
 
   TProperty *clone() const override { return new TEnumProperty(*this); }
@@ -339,13 +351,21 @@ public:
     return ret;
   }
 
-  void addValue(std::wstring value) {
+  void addValue(std::wstring value, const QString &iconName = QString()) {
     if (m_index == -1) m_index = 0;
     m_range.push_back(value);
+    m_items.push_back(Item(QString::fromStdWString(value), iconName));
+  }
+
+  void setItemUIName(std::wstring value, const QString &name) {
+    int index = indexOf(value);
+    if (index < 0 || index >= (int)m_items.size()) throw RangeError();
+    m_items[index].UIName = name;
   }
 
   void deleteAllValues() {
     m_range.clear();
+    m_items.clear();
     m_index = -1;
   }
 
@@ -360,13 +380,18 @@ public:
     m_index = idx;
   }
 
+  int getCount() const { return (int)m_items.size(); }
+
   const Range &getRange() const { return m_range; }
+  const Items &getItems() const { return m_items; }
+
   std::wstring getValue() const {
     return (m_index < 0) ? L"" : m_range[m_index];
   }
   std::string getValueAsString() override {
     return ::to_string(m_range[m_index]);
   }
+
   int getIndex() const { return m_index; }
 
   void accept(Visitor &v) override { v.visit(this); }
@@ -374,8 +399,11 @@ public:
   static void enableRangeSaving(bool on);
   static bool isRangeSavingEnabled();
 
+  void assignUIName(TProperty *refP) override;
+
 private:
   Range m_range;
+  Items m_items;
   int m_index;
 };
 
@@ -416,6 +444,11 @@ public:
   void saveData(TOStream &os) const;
 
   void clear();
+
+  // for adding translation to file writers properties
+  virtual void updateTranslation(){};
+
+  void assignUINames(TPropertyGroup *refPg);
 
 private:
   PropertyTable m_table;

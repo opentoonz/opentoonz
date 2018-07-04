@@ -58,11 +58,6 @@ using namespace DVGui;
 namespace {
 //-----------------------------------------------------------------------------
 
-const QString VectorLevel("Toonz Vector Level");
-const QString ToonzLevel("Toonz Raster Level");
-const QString RasterLevel("Raster Level");
-const QString ScanLevel("Scan Level");
-
 //=============================================================================
 // CreateLevelUndo
 //-----------------------------------------------------------------------------
@@ -189,10 +184,10 @@ LevelCreatePopup::LevelCreatePopup()
   QRegExp rx("[^\\\\/:?*.\"<>|]+");
   m_nameFld->setValidator(new QRegExpValidator(rx, this));
 
-  m_levelTypeOm->addItem(VectorLevel);
-  m_levelTypeOm->addItem(ToonzLevel);
-  m_levelTypeOm->addItem(RasterLevel);
-  m_levelTypeOm->addItem(ScanLevel);
+  m_levelTypeOm->addItem(tr("Toonz Vector Level"), (int)PLI_XSHLEVEL);
+  m_levelTypeOm->addItem(tr("Toonz Raster Level"), (int)TZP_XSHLEVEL);
+  m_levelTypeOm->addItem(tr("Raster Level"), (int)OVL_XSHLEVEL);
+  m_levelTypeOm->addItem(tr("Scan Level"), (int)TZI_XSHLEVEL);
 
   if (Preferences::instance()->getUnits() == "pixel") {
     m_widthFld->setMeasure("camera.lx");
@@ -279,9 +274,8 @@ LevelCreatePopup::LevelCreatePopup()
 
   //---- signal-slot connections
   bool ret = true;
-  ret      = ret &&
-        connect(m_levelTypeOm, SIGNAL(currentIndexChanged(const QString &)),
-                SLOT(onLevelTypeChanged(const QString &)));
+  ret      = ret && connect(m_levelTypeOm, SIGNAL(currentIndexChanged(int)),
+                       SLOT(onLevelTypeChanged(int)));
   ret = ret && connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtn()));
   ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
   ret =
@@ -373,22 +367,14 @@ void LevelCreatePopup::setSizeWidgetEnable(bool isEnable) {
 //-----------------------------------------------------------------------------
 
 int LevelCreatePopup::getLevelType() const {
-  QString levelTypeStr = m_levelTypeOm->currentText();
-  if (levelTypeStr == ScanLevel)
-    return TZI_XSHLEVEL;
-  else if (levelTypeStr == VectorLevel)
-    return PLI_XSHLEVEL;
-  else if (levelTypeStr == ToonzLevel)
-    return TZP_XSHLEVEL;
-  else if (levelTypeStr == RasterLevel)
-    return OVL_XSHLEVEL;
-  return TZP_XSHLEVEL;
+  return m_levelTypeOm->currentData().toInt();
 }
 
 //-----------------------------------------------------------------------------
 
-void LevelCreatePopup::onLevelTypeChanged(const QString &text) {
-  if (text == "Raster Level" || text == "Toonz Raster Level")
+void LevelCreatePopup::onLevelTypeChanged(int index) {
+  int type = m_levelTypeOm->itemData(index).toInt();
+  if (type == OVL_XSHLEVEL || type == TZP_XSHLEVEL)
     setSizeWidgetEnable(true);
   else
     setSizeWidgetEnable(false);
@@ -621,21 +607,7 @@ void LevelCreatePopup::update() {
   }
 
   int levelType = pref->getDefLevelType();
-  int index     = -1;
-  switch (levelType) {
-  case TZI_XSHLEVEL:
-    index = m_levelTypeOm->findText(ScanLevel);
-    break;
-  case PLI_XSHLEVEL:
-    index = m_levelTypeOm->findText(VectorLevel);
-    break;
-  case TZP_XSHLEVEL:
-    index = m_levelTypeOm->findText(ToonzLevel);
-    break;
-  case OVL_XSHLEVEL:
-    index = m_levelTypeOm->findText(RasterLevel);
-    break;
-  }
+  int index     = m_levelTypeOm->findData(levelType);
   if (index >= 0) m_levelTypeOm->setCurrentIndex(index);
 
   /*

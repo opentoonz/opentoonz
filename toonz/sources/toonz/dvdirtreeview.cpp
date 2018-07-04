@@ -63,17 +63,17 @@ MyFileSystemWatcher::MyFileSystemWatcher() {
 
 void MyFileSystemWatcher::addPaths(const QStringList &paths, bool onlyNewPath) {
   if (paths.isEmpty()) return;
-  if (onlyNewPath) {
-    for (int p = 0; p < paths.size(); p++) {
-      QString path = paths.at(p);
-      if (!m_watchedPath.contains(path)) {
-        m_watchedPath.append(path);
-        m_watcher->addPath(path);
-      }
+  for (int p = 0; p < paths.size(); p++) {
+    QString path = paths.at(p);
+    // if the path is not watched yet, try to start watching it
+    if (!m_watchedPath.contains(path)) {
+      // symlink path will not be watched
+      if (m_watcher->addPath(path)) m_watchedPath.append(path);
     }
-  } else {
-    m_watchedPath.append(paths);
-    m_watcher->addPaths(paths);
+    // or just add path to the list
+    else if (!onlyNewPath) {
+      m_watchedPath.append(path);
+    }
   }
 }
 
@@ -81,9 +81,9 @@ void MyFileSystemWatcher::removePaths(const QStringList &paths) {
   if (m_watchedPath.isEmpty() || paths.isEmpty()) return;
   for (int p = 0; p < paths.size(); p++) {
     QString path = paths.at(p);
-    bool ret     = m_watchedPath.removeOne(path);
-    assert(ret);
-    if (!m_watchedPath.contains(path)) m_watcher->removePath(path);
+    // removeOne will return false for symlink paths
+    bool ret = m_watchedPath.removeOne(path);
+    if (ret && !m_watchedPath.contains(path)) m_watcher->removePath(path);
   }
 }
 
@@ -1631,8 +1631,11 @@ void DvDirTreeView::getExpandedPathsRecursive(const QModelIndex &index,
 
 void DvDirTreeView::onExpanded(const QModelIndex &index) {
   QStringList paths;
-  getExpandedPathsRecursive(index, paths);
-  if (paths.size()) paths.removeFirst();
+  int count = DvDirModel::instance()->rowCount(index);
+  for (int r = 0; r < count; r++) {
+    QModelIndex child = DvDirModel::instance()->index(r, 0, index);
+    getExpandedPathsRecursive(child, paths);
+  }
   MyFileSystemWatcher::instance()->addPaths(paths);
 }
 

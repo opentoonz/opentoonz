@@ -349,15 +349,15 @@ public:
     m_prop[0].bind(m_type);
 
     m_prop[0].bind(m_edgeCount);
-    m_snapSensitivity.addValue(LOW_WSTR);
-    m_snapSensitivity.addValue(MEDIUM_WSTR);
-    m_snapSensitivity.addValue(HIGH_WSTR);
     if (targetType & TTool::Vectors) {
       m_prop[0].bind(m_autogroup);
       m_prop[0].bind(m_autofill);
       m_prop[0].bind(m_snap);
       m_snap.setId("Snap");
       m_prop[0].bind(m_snapSensitivity);
+      m_snapSensitivity.addValue(LOW_WSTR);
+      m_snapSensitivity.addValue(MEDIUM_WSTR);
+      m_snapSensitivity.addValue(HIGH_WSTR);
       m_snapSensitivity.setId("SnapSensitivity");
     }
     if (targetType & TTool::ToonzImage) {
@@ -366,14 +366,15 @@ public:
       m_pencil.setId("PencilMode");
     }
 
-    m_capStyle.addValue(BUTT_WSTR);
-    m_capStyle.addValue(ROUNDC_WSTR);
-    m_capStyle.addValue(PROJECTING_WSTR);
+    m_capStyle.addValue(BUTT_WSTR, QString::fromStdWString(BUTT_WSTR));
+    m_capStyle.addValue(ROUNDC_WSTR, QString::fromStdWString(ROUNDC_WSTR));
+    m_capStyle.addValue(PROJECTING_WSTR,
+                        QString::fromStdWString(PROJECTING_WSTR));
     m_capStyle.setId("Cap");
 
-    m_joinStyle.addValue(MITER_WSTR);
-    m_joinStyle.addValue(ROUNDJ_WSTR);
-    m_joinStyle.addValue(BEVEL_WSTR);
+    m_joinStyle.addValue(MITER_WSTR, QString::fromStdWString(MITER_WSTR));
+    m_joinStyle.addValue(ROUNDJ_WSTR, QString::fromStdWString(ROUNDJ_WSTR));
+    m_joinStyle.addValue(BEVEL_WSTR, QString::fromStdWString(BEVEL_WSTR));
     m_joinStyle.setId("Join");
 
     m_miterJoinLimit.setId("Miter");
@@ -391,6 +392,14 @@ public:
 
   void updateTranslation() {
     m_type.setQStringName(tr("Shape:"));
+    m_type.setItemUIName(L"Rectangle", tr("Rectangle"));
+    m_type.setItemUIName(L"Circle", tr("Circle"));
+    m_type.setItemUIName(L"Ellipse", tr("Ellipse"));
+    m_type.setItemUIName(L"Line", tr("Line"));
+    m_type.setItemUIName(L"Polyline", tr("Polyline"));
+    m_type.setItemUIName(L"Arc", tr("Arc"));
+    m_type.setItemUIName(L"Polygon", tr("Polygon"));
+
     m_toolSize.setQStringName(tr("Size:"));
     m_rasterToolSize.setQStringName(tr("Thickness:"));
     m_opacity.setQStringName(tr("Opacity:"));
@@ -400,11 +409,25 @@ public:
     m_autofill.setQStringName(tr("Auto Fill"));
     m_selective.setQStringName(tr("Selective"));
     m_pencil.setQStringName(tr("Pencil Mode"));
+
     m_capStyle.setQStringName(tr("Cap"));
+    m_capStyle.setItemUIName(BUTT_WSTR, tr("Butt cap"));
+    m_capStyle.setItemUIName(ROUNDC_WSTR, tr("Round cap"));
+    m_capStyle.setItemUIName(PROJECTING_WSTR, tr("Projecting cap"));
+
     m_joinStyle.setQStringName(tr("Join"));
+    m_joinStyle.setItemUIName(MITER_WSTR, tr("Miter join"));
+    m_joinStyle.setItemUIName(ROUNDJ_WSTR, tr("Round join"));
+    m_joinStyle.setItemUIName(BEVEL_WSTR, tr("Bevel join"));
+
     m_miterJoinLimit.setQStringName(tr("Miter:"));
     m_snap.setQStringName(tr("Snap"));
     m_snapSensitivity.setQStringName(tr(""));
+    if (m_targetType & TTool::Vectors) {
+      m_snapSensitivity.setItemUIName(LOW_WSTR, tr("Low"));
+      m_snapSensitivity.setItemUIName(MEDIUM_WSTR, tr("Med"));
+      m_snapSensitivity.setItemUIName(HIGH_WSTR, tr("High"));
+    }
   }
 };
 
@@ -892,17 +915,19 @@ public:
       m_param.m_miterJoinLimit.setValue(GeometricMiterValue);
       m_firstTime = false;
       m_param.m_snap.setValue(GeometricSnap);
-      m_param.m_snapSensitivity.setIndex(GeometricSnapSensitivity);
-      switch (GeometricSnapSensitivity) {
-      case 0:
-        m_param.m_minDistance2 = SNAPPING_LOW;
-        break;
-      case 1:
-        m_param.m_minDistance2 = SNAPPING_MEDIUM;
-        break;
-      case 2:
-        m_param.m_minDistance2 = SNAPPING_HIGH;
-        break;
+      if (m_targetType & TTool::Vectors) {
+        m_param.m_snapSensitivity.setIndex(GeometricSnapSensitivity);
+        switch (GeometricSnapSensitivity) {
+        case 0:
+          m_param.m_minDistance2 = SNAPPING_LOW;
+          break;
+        case 1:
+          m_param.m_minDistance2 = SNAPPING_MEDIUM;
+          break;
+        case 2:
+          m_param.m_minDistance2 = SNAPPING_HIGH;
+          break;
+        }
       }
     }
     m_primitive->resetSnap();

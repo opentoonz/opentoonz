@@ -23,6 +23,12 @@
         <file>Resources/delete_over.svg</file>
         <file>Resources/dragpalette.svg</file>
         <file>Resources/dragpalette_over.svg</file>
+        <file>Resources/edit_center.svg</file>
+        <file>Resources/edit_position.svg</file>
+        <file>Resources/edit_rotation.svg</file>
+        <file>Resources/edit_scale.svg</file>
+        <file>Resources/edit_shear.svg</file>
+        <file>Resources/edit_all.svg</file>
         <file>Resources/fit_off.svg</file>
         <file>Resources/fit_on.svg</file>
         <file>Resources/fx_off.svg</file>

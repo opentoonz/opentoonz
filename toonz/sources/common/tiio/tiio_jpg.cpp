@@ -211,6 +211,12 @@ public:
 };
 
 //----
+
+void Tiio::JpgWriterProperties::updateTranslation() {
+  m_quality.setQStringName(tr("Quality"));
+  m_smoothing.setQStringName(tr("Smoothing"));
+}
+
 //----
 //----
 

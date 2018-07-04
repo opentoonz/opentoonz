@@ -79,6 +79,8 @@ TLevelWriterWebm::~TLevelWriterWebm() {
   preIArgs << "-framerate";
   preIArgs << QString::number(m_frameRate);
 
+  postIArgs << "-auto-alt-ref";
+  postIArgs << "0";
   postIArgs << "-c:v";
   postIArgs << "libvpx";
   postIArgs << "-s";
@@ -225,6 +227,11 @@ Tiio::WebmWriterProperties::WebmWriterProperties()
     : m_vidQuality("Quality", 1, 100, 90), m_scale("Scale", 1, 100, 100) {
   bind(m_vidQuality);
   bind(m_scale);
+}
+
+void Tiio::WebmWriterProperties::updateTranslation() {
+  m_vidQuality.setQStringName(tr("Quality"));
+  m_scale.setQStringName(tr("Scale"));
 }
 
 // Tiio::Reader* Tiio::makeWebmReader(){ return nullptr; }

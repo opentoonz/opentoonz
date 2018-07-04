@@ -35,6 +35,7 @@ class DVAPI StrokeGenerator {
 
   //! Rettangolo che contiene l'ultima regione modificata
   TRectD m_lastModifiedRegion;
+  TRectD m_lastPointRect;
 
   //! Ultimo punto del frammento visualizzato
   TPointD m_p0, /*! Ultimo punto del frammento visualizzato*/ m_p1;

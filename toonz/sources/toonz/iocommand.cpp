@@ -2293,15 +2293,49 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
                                   LoadResourceArguments::IMPORT);
   }
 
+  vector<TFilePath> paths;
+  int all = 0;
+
   // Loop for all the resources to load
   for (int r = 0; r != rCount; ++r) {
     if (importDialog.aborted()) break;
+
+    QString origName =
+        args.resourceDatas[r].m_path.withoutParentDir().getQString();
 
     LoadResourceArguments::ResourceData rd(args.resourceDatas[r]);
     TFilePath &path = rd.m_path;
 
     if (!rd.m_path.isLevelName())
       path = TFilePath(path.getLevelNameW()).withParentDir(path.getParentDir());
+
+    if (std::find(paths.begin(), paths.end(), path) != paths.end()) {
+      if (!all) {
+        QString question =
+            QObject::tr(
+                "File '%1' will reload level '%2' as a duplicate column in the "
+                "xsheet.\n\nAllow duplicate?")
+                .arg(origName)
+                .arg(QString::fromStdString(path.getName()));
+        QString Yes    = QObject::tr("Allow");
+        QString YesAll = QObject::tr("Allow All Dups");
+        QString No     = QObject::tr("No");
+        QString NoAll  = QObject::tr("No to All Dups");
+        int ret        = DVGui::MsgBox(question, Yes, YesAll, No, NoAll, 0);
+        switch (ret) {
+        case 2:
+          all = 1;  // YesAll
+        case 1:
+          break;  // Yes
+        case 4:
+          all = 2;  // NoAll
+        case 3:
+          continue;
+        }
+      } else if (all == 2)
+        continue;
+    }
+    paths.push_back(path);
 
     if (progressDialog) {
       if (progressDialog->wasCanceled())

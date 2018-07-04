@@ -910,6 +910,9 @@ FreeDeformer *SelectionTool::getFreeDeformer(int index) const {
 
 void SelectionTool::updateTranslation() {
   m_strokeSelectionType.setQStringName(tr("Type:"));
+  m_strokeSelectionType.setItemUIName(RECT_SELECTION, tr("Rectangular"));
+  m_strokeSelectionType.setItemUIName(FREEHAND_SELECTION, tr("Freehand"));
+  m_strokeSelectionType.setItemUIName(POLYLINE_SELECTION, tr("Polyline"));
 }
 //-----------------------------------------------------------------------------
 

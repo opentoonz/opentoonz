@@ -7,7 +7,7 @@
 
 #xsheetArea,
 #ScrollArea {
-  background-color: @scrollbar-bg-color;
+  background-color: @xsheet-empty-bg-color;
   border: 0;
 }
 
@@ -98,6 +98,10 @@ XsheetViewer {
   qproperty-MeshColumnBorderColor: @xsheet-MeshColumnBorder-color;
   qproperty-SelectedMeshColumnColor: @xsheet-SelectedMeshColumn-color;
   
+  qproperty-SoundTextColumnColor: @xsheet-SoundTextColumn-color;
+  qproperty-SoundTextColumnBorderColor: @xsheet-SoundTextColumnBorder-color;
+  qproperty-SelectedSoundTextColumnColor: @xsheet-SelectedSoundTextColumn-color;
+
   qproperty-SoundColumnColor: @xsheet-SoundColumn-color;
   qproperty-SoundColumnBorderColor: @xsheet-SoundColumnBorder-color;
   qproperty-SelectedSoundColumnColor: @xsheet-SelectedSoundColumn-color;
@@ -154,8 +158,11 @@ XsheetViewer {
   qproperty-TimelineConfigButtonImage: url('@{img-url}/@{timeline-ConfigButtonImage}');
 
   qproperty-LayerHeaderPreviewImage: url('@{img-url}/@{layerheader-PreviewImage}');
+  qproperty-LayerHeaderPreviewOverImage: url('@{img-url}/@{layerheader-PreviewOverImage}');
   qproperty-LayerHeaderCamstandImage: url('@{img-url}/@{layerheader-CamstandImage}');
+  qproperty-LayerHeaderCamstandOverImage: url('@{img-url}/@{layerheader-CamstandOverImage}');
   qproperty-LayerHeaderLockImage: url('@{img-url}/@{layerheader-LockImage}');
+  qproperty-LayerHeaderLockOverImage: url('@{img-url}/@{layerheader-LockOverImage}');
 }
 
 /* XSheet Toolbar
@@ -167,12 +174,12 @@ XsheetViewer {
   border: 0;
   & QToolButton {
     padding: 0;
-    margin: 4px 1px;
-    min-height: 19px;
-    height: 19px;
+    margin: 4 1;
+    min-height: 19;
+    height: 19;
   }
   &::separator:horizontal {
-    margin: 0 4px;
+    margin: 0 4;
   }
 }
 
@@ -182,15 +189,15 @@ XsheetViewer {
 
 #FunctionEditor {
   & QToolBar {
-    border-bottom: 1px solid @accent;
+    border-bottom: 1 solid @accent;
     & QToolBar {
       border: 0;
     }
     & QLabel {
-      margin-left: 5px;
+      margin-left: 5;
     }
     & QToolButton {
-      height: 18px; // gives the key button increased active space
+      height: 18; // gives the key button increased active space
     }
   }
 }
@@ -200,26 +207,20 @@ XsheetViewer {
 }
 
 #FunctionEditorTree {
-  // don't extend all else FunctionTreeView qproperties won't work
-  &:extend(.tree-list);
-  background-color: @tree-bg-color;
-  alternate-background-color: @tree-bg-color;
-  border-top: 1px solid @accent;
-  &::branch { //
-    &:extend(.branch-17 all);
-  }
+  &:extend(.treeview all);
+  border-top: 1 solid @accent;
 }
-
-/* Function Editor Spreadsheet
------------------------------------------------------------------------------ */
-
-// If a property shares likeness with XSheet then pair them
-// XSheet should be considered the master
 
 FunctionTreeView {
   qproperty-TextColor: @function-treeview-text-color;
   qproperty-CurrentTextColor: @function-treeview-text-color-selected;
 }
+
+/* Function Editor Spreadsheet
+----------------------------------------------------------------------------- */
+
+// If a qproperty shares the same likeness with XSheet then pair the variables.
+// XSheet should be considered as parent.
 
 FunctionPanel {
   qproperty-BGColor: @function-panel-bg-color;
@@ -258,7 +259,7 @@ SpreadsheetViewer {
 
 #ExpressionField {
   background-color: @function-ExpressionFieldBG-color;
-	border: 1px solid @function-ExpressionFieldBorder-color;
+	border: 1 solid @function-ExpressionFieldBorder-color;
 	margin: 0;
 }
 
@@ -277,9 +278,4 @@ SpreadsheetViewer {
     background-image: url('@{img-url}/segment_disabled.svg');
     background-repeat: no-repeat;
   }
-}
-
-// This fixes a Mac specific issue with text clipping and may be temporary
-#flipOrientationButton {
-  padding: 2px 12px;
 }

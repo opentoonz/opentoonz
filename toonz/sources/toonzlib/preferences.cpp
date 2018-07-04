@@ -226,6 +226,8 @@ Preferences::Preferences()
     , m_scanLevelType("tif")
 #ifdef _WIN32
     , m_interfaceFont("Segoe UI")
+#elif defined Q_OS_MACOS
+    , m_interfaceFont("Helvetica Neue")
 #else
     , m_interfaceFont("Helvetica")
 #endif
@@ -310,7 +312,6 @@ Preferences::Preferences()
     , m_onionSkinDuringPlayback(false)
     , m_dropdownShortcutsCycleOptions(false)
     , m_multiLayerStylePickerEnabled(false)
-    , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
     , m_projectRoot(0x08)
     , m_customProjectRoot("")
@@ -335,7 +336,13 @@ Preferences::Preferences()
     , m_xsheetLayoutPreference("Classic-revised")
     , m_loadedXsheetLayout("Classic-revised")
     , m_pathAliasPriority(ProjectFolderOnly)
-    , m_currentTimelineEnabled(true) {
+    , m_functionEditorToggle(ShowGraphEditorInPopup)
+    , m_currentTimelineEnabled(true)
+    , m_enableAutoStretch(true)
+    , m_cursorBrushType("Small")
+    , m_cursorBrushStyle("Default")
+    , m_cursorOutlineEnabled(true)
+    , m_currentColumnColor(TPixel::Black) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -613,8 +620,6 @@ Preferences::Preferences()
   getValue(*m_settings, "onionSkinDuringPlayback", m_onionSkinDuringPlayback);
   getValue(*m_settings, "multiLayerStylePickerEnabled",
            m_multiLayerStylePickerEnabled);
-  getValue(*m_settings, "paletteTypeOnLoadRasterImageAsColorModel",
-           m_paletteTypeOnLoadRasterImageAsColorModel);
   getValue(*m_settings, "showKeyframesOnXsheetCellArea",
            m_showKeyframesOnXsheetCellArea);
   QString ffmpegPath = m_settings->value("ffmpegPath").toString();
@@ -654,6 +659,11 @@ Preferences::Preferences()
   getValue(*m_settings, "pathAliasPriority", pathAliasPriority);
   m_pathAliasPriority = static_cast<PathAliasPriority>(pathAliasPriority);
 
+  int functionEditorToggle = static_cast<int>(m_functionEditorToggle);
+  getValue(*m_settings, "functionEditorToggle", functionEditorToggle);
+  m_functionEditorToggle =
+      static_cast<FunctionEditorToggle>(functionEditorToggle);
+
   QString xsheetLayoutPreference;
   xsheetLayoutPreference =
       m_settings->value("xsheetLayoutPreference").toString();
@@ -680,6 +690,26 @@ Preferences::Preferences()
   }
   getValue(*m_settings, "latestVersionCheckEnabled",
            m_latestVersionCheckEnabled);
+
+  getValue(*m_settings, "EnableAutoStretch", m_enableAutoStretch);
+
+  QString brushType;
+  brushType = m_settings->value("cursorBrushType").toString();
+  if (brushType != "") m_cursorBrushType = brushType;
+  setCursorBrushType(m_cursorBrushType.toStdString());
+
+  QString brushStyle;
+  brushStyle = m_settings->value("cursorBrushStyle").toString();
+  if (brushStyle != "") m_cursorBrushStyle = brushStyle;
+  setCursorBrushStyle(m_cursorBrushStyle.toStdString());
+
+  getValue(*m_settings, "cursorOutlineEnabled", m_cursorOutlineEnabled);
+
+  r = 255, g = 0, b = 0;
+  getValue(*m_settings, "currentColumnColor.r", r);
+  getValue(*m_settings, "currentColumnColor.g", g);
+  getValue(*m_settings, "currentColumnColor.b", b);
+  m_currentColumnColor = TPixel32(r, g, b);
 }
 
 //-----------------------------------------------------------------
@@ -1436,13 +1466,6 @@ void Preferences::setVectorSnappingTarget(int target) {
 
 //-----------------------------------------------------------------
 
-void Preferences::setPaletteTypeOnLoadRasterImageAsColorModel(int type) {
-  m_paletteTypeOnLoadRasterImageAsColorModel = type;
-  m_settings->setValue("paletteTypeOnLoadRasterImageAsColorModel", type);
-}
-
-//-----------------------------------------------------------------
-
 void Preferences::setFfmpegPath(std::string path) {
   m_ffmpegPath        = QString::fromStdString(path);
   std::string strPath = m_ffmpegPath.toStdString();
@@ -1634,6 +1657,13 @@ void Preferences::setPathAliasPriority(PathAliasPriority priority) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setFunctionEditorToggle(FunctionEditorToggle status) {
+  m_functionEditorToggle = status;
+  m_settings->setValue("functionEditorToggle", static_cast<int>(status));
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::enableCurrentTimelineIndicator(bool on) {
   m_currentTimelineEnabled = on;
   m_settings->setValue("currentTimelineEnabled", on ? "1" : "0");
@@ -1665,3 +1695,33 @@ QString Preferences::getColorCalibrationLutPath(QString &monitorName) const {
 }
 
 //-----------------------------------------------------------------
+
+void Preferences::enableAutoStretch(bool on) {
+  m_enableAutoStretch = on;
+  m_settings->setValue("EnableAutoStretch", on ? "1" : "0");
+}
+
+void Preferences::setCursorBrushType(std::string brushType) {
+  m_cursorBrushType = QString::fromStdString(brushType);
+  m_settings->setValue("cursorBrushType", m_cursorBrushType);
+}
+
+void Preferences::setCursorBrushStyle(std::string brushStyle) {
+  m_cursorBrushStyle = QString::fromStdString(brushStyle);
+  m_settings->setValue("cursorBrushStyle", m_cursorBrushStyle);
+}
+
+void Preferences::enableCursorOutline(bool on) {
+  m_cursorOutlineEnabled = on;
+  m_settings->setValue("cursorOutlineEnabled", on ? "1" : "0");
+}
+
+void Preferences::setCurrentColumnData(const TPixel &currentColumnColor) {
+  m_currentColumnColor = currentColumnColor;
+  m_settings->setValue("currentColumnColor.r",
+                       QString::number(currentColumnColor.r));
+  m_settings->setValue("currentColumnColor.g",
+                       QString::number(currentColumnColor.g));
+  m_settings->setValue("currentColumnColor.b",
+                       QString::number(currentColumnColor.b));
+}

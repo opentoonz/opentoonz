@@ -108,6 +108,7 @@
 #define MI_Binarize "MI_Binarize"
 #define MI_LinesFade "MI_LinesFade"
 #define MI_OpenXshView "MI_OpenXshView"
+#define MI_OpenTimelineView "MI_OpenTimelineView"
 #define MI_OpenMessage "MI_OpenMessage"
 #define MI_OpenTest "MI_OpenTest"
 #define MI_OpenTasks "MI_OpenTasks"
@@ -146,6 +147,7 @@
 
 #define MI_PasteNew "MI_PasteNew"
 #define MI_Autorenumber "MI_Autorenumber"
+#define MI_FillEmptyCell "MI_FillEmptyCell"
 
 #define MI_MergeFrames "MI_MergeFrames"
 #define MI_Reverse "MI_Reverse"
@@ -227,12 +229,14 @@
 #define MI_OpenFunctionEditor "MI_OpenFunctionEditor"
 #define MI_OpenLevelView "MI_OpenLevelView"
 #define MI_OpenXshView "MI_OpenXshView"
+#define MI_OpenTimelineView "MI_OpenTimelineView"
 #define MI_OpenCleanupSettings "MI_OpenCleanupSettings"
 #define MI_ResetRoomLayout "MI_ResetRoomLayout"
 #define MI_MaximizePanel "MI_MaximizePanel"
 #define MI_FullScreenWindow "MI_FullScreenWindow"
 #define MI_OnionSkin "MI_OnionSkin"
 #define MI_ZeroThick "MI_ZeroThick"
+#define MI_CursorOutline "MI_CursorOutline"
 
 //#define MI_LoadResourceFile       "MI_LoadResourceFile"
 #define MI_DuplicateFile "MI_DuplicateFile"

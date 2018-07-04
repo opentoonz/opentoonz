@@ -256,9 +256,10 @@ TPalette *StudioPalette::getPalette(const TFilePath &path,
 void StudioPalette::movePalette(const TFilePath &dstPath,
                                 const TFilePath &srcPath) {
   try {
-    TSystem::renameFile(dstPath, srcPath);
+    // do not allow overwrite palette
+    TSystem::renameFile(dstPath, srcPath, false);
   } catch (...) {
-    return;
+    throw;
   }
   std::wstring id = readPaletteGlobalName(dstPath);
   table.erase(id);
@@ -279,8 +280,18 @@ int StudioPalette::getChildren(std::vector<TFilePath> &fps,
     }
   }
 
-  for (TFilePathSet::iterator i = q.begin(); i != q.end(); ++i)
-    if (isFolder(*i) || isPalette(*i)) fps.push_back(*i);
+  // put the folders above the palette items
+  std::vector<TFilePath> palettes;
+  for (TFilePathSet::iterator i = q.begin(); i != q.end(); ++i) {
+    if (isFolder(*i))
+      fps.push_back(*i);
+    else if (isPalette(*i))
+      palettes.push_back(*i);
+  }
+  if (!palettes.empty()) {
+    fps.reserve(fps.size() + palettes.size());
+    std::copy(palettes.begin(), palettes.end(), std::back_inserter(fps));
+  }
   //  fps.push_back(m_root+"butta.tpl");
   return fps.size();
 }

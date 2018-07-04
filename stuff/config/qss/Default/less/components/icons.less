@@ -2,21 +2,21 @@
    Component: Icons
 ----------------------------------------------------------------------------- */
 
-// Camera Lock
+// Lock
 // -----------------------------------------------------------------------------
 
 .icon-lock() {
   border: @toolbutton-border-size solid @toolbutton-border-color;
-  height: 18px;
+  height: 18;
   padding: 0;
-  width: 18px;
+  width: 18;
   &:unchecked {
-    image: url('@{img-url}/cam_unlock.svg');
+    image: url('@{img-url}/lock_off.svg');
   }
   &:checked {
     background-color: @toolbutton-lock-bg-color-checked;
     border-color: @toolbutton-lock-border-color-checked;
-    image: url('@{img-url}/cam_lock.svg');
+    image: url('@{img-url}/lock_on.svg');
     &:hover {
       background-color: @toolbutton-lock-bg-color-checked-hover;
       border-color: @toolbutton-lock-border-color-checked-hover;
@@ -28,11 +28,11 @@
 // -----------------------------------------------------------------------------
 
 .icon-fsp() {
-  height: 16px;
+  height: 16;
   border: @toolbutton-border-size solid @toolbutton-border-color;
   image: url('@{img-url}/fsp_unchecked.svg');
-  padding: 2px;
-  width: 16px;
+  padding: 2;
+  width: 16;
   &:checked {
     image: url('@{img-url}/fsp_checked.svg');
   }

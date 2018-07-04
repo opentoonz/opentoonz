@@ -1040,10 +1040,14 @@ void PencilTestSaveInFolderPopup::createSceneInFolder() {
   if (!scene) return;
 
   TFilePath fp(getPath().toStdWString());
-  TOutputProperties* prop = scene->getProperties()->getOutputProperties();
-  TFilePath outFp         = prop->getPath().withParentDir(fp);
 
-  prop->setPath(outFp);
+  // for the scene folder mode, output destination must be already set to
+  // $scenefolder or its subfolder. See TSceneProperties::onInitialize()
+  if (Preferences::instance()->getPathAliasPriority() !=
+      Preferences::SceneFolderAlias) {
+    TOutputProperties* prop = scene->getProperties()->getOutputProperties();
+    prop->setPath(prop->getPath().withParentDir(fp));
+  }
 
   // save the scene
   TFilePath sceneFp =

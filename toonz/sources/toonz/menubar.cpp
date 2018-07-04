@@ -408,10 +408,12 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
 
@@ -421,6 +423,7 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
   addMenuItem(windowsMenu, MI_OpenStyleControl);
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   windowsMenu->addSeparator();
   QMenu *otherWindowsMenu = windowsMenu->addMenu(tr("Other Windows"));
   {
@@ -554,10 +557,12 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
 
@@ -589,6 +594,7 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
   addMenuItem(windowsMenu, MI_OpenLevelView);
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   windowsMenu->addSeparator();
   QMenu *otherWindowsMenu = windowsMenu->addMenu(tr("Other Windows"));
   {
@@ -733,10 +739,12 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
 
@@ -759,6 +767,7 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
   addMenuItem(windowsMenu, MI_OpenStudioPalette);
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   addMenuItem(windowsMenu, MI_OpenColorModel);
   addMenuItem(windowsMenu, MI_OpenFileBrowser);
   addMenuItem(windowsMenu, MI_OpenFilmStrip);
@@ -906,10 +915,12 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
   editMenu->addSeparator();
@@ -939,6 +950,7 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
   addMenuItem(windowsMenu, MI_OpenFilmStrip);
   addMenuItem(windowsMenu, MI_OpenLevelView);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   windowsMenu->addSeparator();
   QMenu *otherWindowsMenu = windowsMenu->addMenu(tr("Other Windows"));
   {
@@ -1131,11 +1143,13 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(editMenu, MI_Cut);
   addMenuItem(editMenu, MI_Copy);
   addMenuItem(editMenu, MI_Paste);
+  addMenuItem(editMenu, MI_PasteAbove);
   // addMenuItem(editMenu, MI_PasteNew);
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
+  addMenuItem(editMenu, MI_InsertAbove);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
@@ -1275,6 +1289,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(cellsMenu, MI_Rollup);
   addMenuItem(cellsMenu, MI_Rolldown);
   addMenuItem(cellsMenu, MI_TimeStretch);
+  addMenuItem(cellsMenu, MI_FillEmptyCell);
   cellsMenu->addSeparator();
   addMenuItem(cellsMenu, MI_DrawingSubForward);
   addMenuItem(cellsMenu, MI_DrawingSubBackward);
@@ -1351,6 +1366,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(windowsMenu, MI_OpenLevelView);
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   addMenuItem(windowsMenu, MI_OpenHistoryPanel);
   addMenuItem(windowsMenu, MI_AudioRecording);
   windowsMenu->addSeparator();

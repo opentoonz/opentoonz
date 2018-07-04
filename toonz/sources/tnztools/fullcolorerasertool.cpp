@@ -21,6 +21,7 @@
 #include "toonz/stage2.h"
 #include "toonz/levelproperties.h"
 #include "toonz/strokegenerator.h"
+#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -408,7 +409,13 @@ void FullColorEraserTool::updateTranslation() {
   m_size.setQStringName(tr("Size:"));
   m_opacity.setQStringName(tr("Opacity:"));
   m_hardness.setQStringName(tr("Hardness:"));
+
   m_eraseType.setQStringName(tr("Type:"));
+  m_eraseType.setItemUIName(NORMALERASE, tr("Normal"));
+  m_eraseType.setItemUIName(RECTERASE, tr("Rectangular"));
+  m_eraseType.setItemUIName(FREEHANDERASE, tr("Freehand"));
+  m_eraseType.setItemUIName(POLYLINEERASE, tr("Polyline"));
+
   m_invertOption.setQStringName(tr("Invert"));
   m_multi.setQStringName(tr("Frame Range"));
 }
@@ -892,6 +899,9 @@ void FullColorEraserTool::draw() {
   TRasterImageP img = (TRasterImageP)getImage(false);
   if (!img) return;
   if (m_eraseType.getValue() == NORMALERASE) {
+    // If toggled off, don't draw brush outline
+    if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
     glColor3d(1.0, 0.0, 0.0);
     tglDrawCircle(m_brushPos, (m_size.getValue() + 1) * 0.5);
   } else if (m_eraseType.getValue() == RECTERASE) {

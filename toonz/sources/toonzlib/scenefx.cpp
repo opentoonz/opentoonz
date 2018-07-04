@@ -477,13 +477,17 @@ static QList<TPointD> getColumnMotionPoints(TXsheet *xsh, double row, int col,
       continue;
     }
 
+    double targetFrame = row + frameOffset;
+    // Proper position cannot be obtained for frame = -1.0
+    if (targetFrame == -1.0) targetFrame = -0.9999;
+
     /*-- 自分自身の動きを使うか、別オブジェクトの動きを使うか --*/
     if (useOwnMotion)
-      getColumnPlacement(aff, xsh, row + frameOffset, col, isPreview);
+      getColumnPlacement(aff, xsh, targetFrame, col, isPreview);
     else
-      getStageObjectPlacement(aff, xsh, row + frameOffset, objectId, isPreview);
+      getStageObjectPlacement(aff, xsh, targetFrame, objectId, isPreview);
 
-    TAffine cameraAff = camera->getPlacement(row + frameOffset);
+    TAffine cameraAff = camera->getPlacement(targetFrame);
     TPointD tmpPos =
         dpiAff.inv() * aff * TPointD(-cameraAff.a13, -cameraAff.a23);
 
@@ -1043,7 +1047,8 @@ PlacedFx FxBuilder::makePFfromGenericFx(TFx *fx) {
 
         /*-- 軌跡を取得するBinaryFxの場合 --*/
         if (pf.m_fx->getAttributes()->isSpeedAware()) {
-          MotionAwareBaseFx *mabfx = dynamic_cast<MotionAwareBaseFx *>(fx);
+          MotionAwareBaseFx *mabfx =
+              dynamic_cast<MotionAwareBaseFx *>(pf.m_fx.getPointer());
           if (mabfx) {
             double shutterStart = mabfx->getShutterStart()->getValue(m_frame);
             double shutterEnd   = mabfx->getShutterEnd()->getValue(m_frame);
@@ -1052,7 +1057,7 @@ PlacedFx FxBuilder::makePFfromGenericFx(TFx *fx) {
             MotionObjectType type   = mabfx->getMotionObjectType();
             int index               = mabfx->getMotionObjectIndex()->getValue();
             TStageObjectId objectId = getMotionObjectId(type, index);
-            fx->getAttributes()->setMotionPoints(getColumnMotionPoints(
+            pf.m_fx->getAttributes()->setMotionPoints(getColumnMotionPoints(
                 m_xsh, m_frame, pf.m_columnIndex, objectId, m_isPreview,
                 shutterStart, shutterEnd, traceResolution));
           }

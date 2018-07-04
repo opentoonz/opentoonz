@@ -23,6 +23,7 @@
 #include "previewer.h"
 
 #include <QMatrix4x4>
+#include <QTouchDevice>
 
 //=====================================================================
 
@@ -80,12 +81,13 @@ class SceneViewer final : public GLWidgetForHighDpi,
   } m_tabletState = None;
   // used to handle wrong mouse drag events!
   bool m_buttonClicked, m_toolSwitched;
-  bool m_shownOnce     = false;
-  bool m_gestureActive = false;
-  bool m_touchActive   = false;
-  bool m_rotating      = false;
-  bool m_zooming       = false;
-  bool m_panning       = false;
+  bool m_shownOnce                       = false;
+  bool m_gestureActive                   = false;
+  bool m_touchActive                     = false;
+  QTouchDevice::DeviceType m_touchDevice = QTouchDevice::TouchScreen;
+  bool m_rotating                        = false;
+  bool m_zooming                         = false;
+  bool m_panning                         = false;
   QPointF m_firstPanPoint;
   QPointF m_undoPoint;
   double m_scaleFactor;    // used for zoom gesture

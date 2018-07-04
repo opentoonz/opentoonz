@@ -1,0 +1,46 @@
+.header {
+  border-type: inser;
+  border: 1px solid black;
+  background: #F0F0F0
+}
+
+table 
+{
+  border-collapse: collapse;
+  border: 1px solid black;
+}
+
+TH { 
+  width : 1.5cm;
+  vertical-align: middle; 
+  text-align: center;
+  border-left: 1px solid black
+}
+.first_numeric { 
+  border-left: 3px #FF0000
+}
+.fxcell {
+  background: #FFD495
+}
+.subxsheetcell {
+  background: #FFCBBE
+}
+
+TD { 
+  vertical-align: middle; 
+  text-align: center;
+  border-left: 1px solid black;
+  border-top: 1px solid black 
+}
+TR { 
+  border-top: 1px solid black 
+}
+
+TH.frame {
+  background: #F0F0F0;
+  border-top: 1px solid black
+}
+
+TD.levelcell {
+  background: #C9FF75
+}

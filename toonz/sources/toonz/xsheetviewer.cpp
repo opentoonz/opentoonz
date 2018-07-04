@@ -48,11 +48,12 @@ TEnv::IntVar FrameDisplayStyleInXsheetRowArea(
 namespace XsheetGUI {
 //-----------------------------------------------------------------------------
 
-const int ColumnWidth       = 74;
-const int RowHeight         = 20;
-const int SCROLLBAR_WIDTH   = 16;
-const int TOOLBAR_HEIGHT    = 30;
-const int ZOOM_SLIDER_WIDTH = 80;
+const int ColumnWidth     = 74;
+const int RowHeight       = 20;
+const int SCROLLBAR_WIDTH = 16;
+const int TOOLBAR_HEIGHT  = 30;
+const int ZOOM_FACTOR_MAX = 100;
+const int ZOOM_FACTOR_MIN = 20;
 }  // namespace XsheetGUI
 
 //=============================================================================
@@ -99,8 +100,9 @@ void XsheetViewer::getCellTypeAndColors(int &ltype, QColor &cellColor,
       sideColor = m_soundColumnBorderColor;
       break;
     case SND_TXT_XSHLEVEL:
-      cellColor = XsheetGUI::SoundTextColumnColor;
-      sideColor = XsheetGUI::SoundTextColumnBorderColor;
+      cellColor = (isSelected) ? getSelectedSoundTextColumnColor()
+                               : getSoundTextColumnColor();
+      sideColor = getSoundTextColumnBorderColor();
       break;
     case MESH_XSHLEVEL:
       cellColor =
@@ -267,17 +269,13 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_rowScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_rowScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+  m_layerFooterPanel = new LayerFooterPanel(this, this);
+
   m_frameScroller.setFrameScrollArea(m_cellScrollArea);
   connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset,
           this, &XsheetViewer::onPrepareToScrollOffset);
   connect(&m_frameScroller, &Spreadsheet::FrameScroller::zoomScrollAdjust, this,
           &XsheetViewer::onZoomScrollAdjust);
-
-  m_frameZoomSlider = new QSlider(Qt::Horizontal, this);
-  m_frameZoomSlider->setMinimum(20);
-  m_frameZoomSlider->setMaximum(100);
-  m_frameZoomSlider->setValue(m_frameZoomFactor);
-  m_frameZoomSlider->setToolTip(tr("Zoom in/out of timeline"));
 
   connectScrollBars();
 
@@ -285,11 +283,6 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
           &XsheetViewer::onOrientationChanged);
   connect(m_toolbar, SIGNAL(updateVisibility()), this,
           SLOT(positionSections()));
-
-  connect(m_frameZoomSlider, SIGNAL(sliderReleased()), this,
-          SLOT(onFrameZoomSliderReleased()));
-  connect(m_frameZoomSlider, SIGNAL(valueChanged(int)), this,
-          SLOT(onFrameZoomSliderValueChanged(int)));
 
   emit orientationChanged(orientation());
 }
@@ -412,18 +405,12 @@ void XsheetViewer::positionSections() {
                         bodyLayer.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH)));
   m_rowScrollArea->setGeometry(o->frameLayerRect(
       bodyFrame.adjusted(0, -XsheetGUI::SCROLLBAR_WIDTH), headerLayer));
-  if (o->isVerticalTimeline())
-    m_frameZoomSlider->hide();
-  else {
-    if (m_frameZoomSlider->isHidden()) m_frameZoomSlider->show();
-    QRect sliderRect =
-        QRect(0, 0, XsheetGUI::ZOOM_SLIDER_WIDTH,
-              XsheetGUI::SCROLLBAR_WIDTH - 2)
-            .translated(m_columnScrollArea->rect().right() -
-                            XsheetGUI::ZOOM_SLIDER_WIDTH - 17,
-                        height() - XsheetGUI::SCROLLBAR_WIDTH + 1);
-    m_frameZoomSlider->setGeometry(sliderRect);
-  }
+
+  m_layerFooterPanel->setGeometry(0,
+                                  m_columnScrollArea->geometry().bottom() + 1,
+                                  m_columnScrollArea->width(), 14);
+
+  m_layerFooterPanel->showOrHide(o);
 }
 
 void XsheetViewer::disconnectScrollBars() {
@@ -732,10 +719,10 @@ void XsheetViewer::updateAreeSize() {
                                                 : o->foldedCellSize()));
     }
   }
-  if (viewArea.right() < areaFilled.x()) viewArea.setRight(areaFilled.x());
-  if (viewArea.bottom() < areaFilled.y() ||
-      (!o->isVerticalTimeline() && viewArea.bottom() != areaFilled.y()))
-    viewArea.setBottom(areaFilled.y());
+  if (viewArea.width() < areaFilled.x()) viewArea.setWidth(areaFilled.x());
+  if (viewArea.height() < areaFilled.y() ||
+      (!o->isVerticalTimeline() && viewArea.height() != areaFilled.y()))
+    viewArea.setHeight(areaFilled.y());
 
   NumberRange allLayer    = o->layerSide(viewArea);
   NumberRange allFrame    = o->frameSide(viewArea);
@@ -1079,23 +1066,6 @@ void XsheetViewer::hideEvent(QHideEvent *) {
 
 //-----------------------------------------------------------------------------
 
-void XsheetViewer::paintEvent(QPaintEvent *) {
-  QPainter p(this);
-
-  static QPixmap zoomIn  = svgToPixmap(":Resources/zoom_in.svg");
-  const QRect zoomInRect = QRect(m_frameZoomSlider->geometry().right() + 2,
-                                 m_frameZoomSlider->geometry().top(), 14, 14);
-  static QPixmap zoomOut  = svgToPixmap(":Resources/zoom_out.svg");
-  const QRect zoomOutRect = QRect(m_frameZoomSlider->geometry().left() - 16,
-                                  m_frameZoomSlider->geometry().top(), 14, 14);
-
-  p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-  p.drawPixmap(zoomInRect, zoomIn);
-  p.drawPixmap(zoomOutRect, zoomOut);
-}
-
-//-----------------------------------------------------------------------------
-
 void XsheetViewer::resizeEvent(QResizeEvent *event) {
   positionSections();
 
@@ -1120,17 +1090,17 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
 
       int newFactor =
           getFrameZoomFactor() + ((event->angleDelta().y() > 0 ? 1 : -1) * 10);
-      if (newFactor > m_frameZoomSlider->maximum())
-        newFactor = m_frameZoomSlider->maximum();
-      else if (newFactor < m_frameZoomSlider->minimum())
-        newFactor = m_frameZoomSlider->minimum();
-
+      if (newFactor > XsheetGUI::ZOOM_FACTOR_MAX)
+        newFactor = XsheetGUI::ZOOM_FACTOR_MAX;
+      else if (newFactor < XsheetGUI::ZOOM_FACTOR_MIN)
+        newFactor = XsheetGUI::ZOOM_FACTOR_MIN;
       zoomOnFrame(targetFrame, newFactor);
+
       event->accept();
       return;
     }
 
-    int markerDistance = 6, markerOffset = 0;
+    int markerDistance = 0, markerOffset = 0;
     TApp::instance()
         ->getCurrentScene()
         ->getScene()
@@ -1246,6 +1216,7 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
     // display the upper-directional smart tab only when the ctrl key is pressed
     m_cellArea->onControlPressed(true);
     m_columnArea->onControlPressed(true);
+    m_layerFooterPanel->onControlPressed(true);
     break;
 
   default: {
@@ -1290,6 +1261,7 @@ void XsheetViewer::keyReleaseEvent(QKeyEvent *event) {
   if (event->key() == Qt::Key_Control) {
     m_cellArea->onControlPressed(false);
     m_columnArea->onControlPressed(false);
+    m_layerFooterPanel->onControlPressed(false);
   }
 }
 
@@ -1725,7 +1697,8 @@ void XsheetViewer::load(QSettings &settings) {
   QVariant name       = settings.value("orientation");
 
   if (zoomFactor.canConvert(QVariant::Int)) {
-    m_frameZoomSlider->setValue(zoomFactor.toInt());
+    m_frameZoomFactor = zoomFactor.toInt();
+    m_layerFooterPanel->setZoomSliderValue(m_frameZoomFactor);
   }
 
   if (name.canConvert(QVariant::String)) {
@@ -1766,9 +1739,7 @@ void XsheetViewer::zoomOnFrame(int frame, int factor) {
   QPoint xyOrig = positionToXY(CellPosition(frame, 0));
 
   m_frameZoomFactor = factor;
-  m_frameZoomSlider->blockSignals(true);
-  m_frameZoomSlider->setValue(factor);
-  m_frameZoomSlider->blockSignals(false);
+  m_layerFooterPanel->setZoomSliderValue(m_frameZoomFactor);
 
   QPoint xyNew = positionToXY(CellPosition(frame, 0));
 
@@ -1776,16 +1747,18 @@ void XsheetViewer::zoomOnFrame(int frame, int factor) {
 
   scroll(QPoint(viewShift, 0));
 
-  onFrameZoomSliderReleased();
-}
-
-void XsheetViewer::onFrameZoomSliderValueChanged(int val) {
-  zoomOnFrame(getCurrentRow(), val);
-}
-
-void XsheetViewer::onFrameZoomSliderReleased() {
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   m_rowArea->update();
+}
+
+QColor XsheetViewer::getSelectedColumnTextColor() const {
+  // get colors
+  TPixel currentColumnPixel;
+  Preferences::instance()->getCurrentColumnData(currentColumnPixel);
+  QColor currentColumnColor((int)currentColumnPixel.r,
+                            (int)currentColumnPixel.g,
+                            (int)currentColumnPixel.b, 255);
+  return currentColumnColor;
 }
 
 //=============================================================================
@@ -1794,3 +1767,6 @@ void XsheetViewer::onFrameZoomSliderReleased() {
 
 OpenFloatingPanel openXsheetViewerCommand(MI_OpenXshView, "Xsheet",
                                           QObject::tr("Xsheet"));
+
+OpenFloatingPanel openTimelineViewerCommand(MI_OpenTimelineView, "Timeline",
+                                            QObject::tr("Timeline"));

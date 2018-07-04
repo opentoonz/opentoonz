@@ -15,7 +15,9 @@ using namespace DVGui;
 StyleIndexLineEdit::StyleIndexLineEdit() : m_pltHandle(0) {
   // style index will not be more than 4096, but a longer text
   // "current" may be input instead of style id + chip width + margin
-  setMaximumWidth(fontMetrics().width("current") + 30);
+  int currentWidth = std::max(fontMetrics().width("current"),
+                              fontMetrics().width(tr("current")));
+  setMaximumWidth(currentWidth + 30);
   setFixedHeight(20);
 }
 
@@ -29,7 +31,8 @@ void StyleIndexLineEdit::paintEvent(QPaintEvent *pe) {
   QLineEdit::paintEvent(pe);
 
   TColorStyle *style;
-  if (QString("current").contains(text()))
+  // Aware of both "current" and translated string
+  if (QString("current").contains(text()) || tr("current").contains(text()))
     style = m_pltHandle->getStyle();
   else {
     int index = text().toInt();

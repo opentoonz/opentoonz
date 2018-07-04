@@ -1483,21 +1483,33 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
                             const TPixel32 &color, TPoint delta,
                             double pixelSize, bool isPicking,
                             std::vector<TRectD> *otherBalloons) {
-  QString qText = QString::fromStdString(text);
+  int devPixRatio = getDevPixRatio();
+  QString qText   = QString::fromStdString(text);
   QFont font("Arial");  // ,QFont::Bold);
-  font.setPixelSize(13);
+  font.setPixelSize(13 * devPixRatio);
   QFontMetrics fm(font);
   QRect textRect = fm.boundingRect(qText);
 
   int baseLine = -textRect.top();
-  int mrg      = 3;
+  int mrg      = 3 * devPixRatio;
 
   // avoid other balloons
   if (otherBalloons) {
+    QRect tmpTextRect = textRect;
+    int tmpMrg        = mrg;
+    // for high dpi monitors
+    if (devPixRatio != 1) {
+      QFont tmpFont = font;
+      tmpFont.setPixelSize(13);
+      QFontMetrics tmpFm(tmpFont);
+      tmpTextRect = tmpFm.boundingRect(qText);
+      tmpMrg      = 3;
+    }
+
     std::vector<TRectD> &balloons = *otherBalloons;
     int n                         = (int)balloons.size();
-    TDimensionD balloonSize(pixelSize * (textRect.width() + mrg * 2),
-                            pixelSize * (textRect.height() + mrg * 2));
+    TDimensionD balloonSize(pixelSize * (tmpTextRect.width() + tmpMrg * 2),
+                            pixelSize * (tmpTextRect.height() + tmpMrg * 2));
     TRectD balloonRect;
     for (;;) {
       balloonRect = TRectD(
@@ -1505,13 +1517,17 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
       int i = 0;
       while (i < n && !balloons[i].overlaps(balloonRect)) i++;
       if (i == n) break;
-      double y = balloons[i].y0 - balloonSize.ly - 2 * mrg * pixelSize;
+      double y = balloons[i].y0 - balloonSize.ly - 2 * tmpMrg * pixelSize;
       delta.y  = (y - pos.y) / pixelSize;
     }
     balloons.push_back(balloonRect);
   }
 
-  textRect.moveTo(qMax(delta.x, 10 + mrg), qMax(mrg + 2, -delta.y - baseLine));
+  delta.x *= devPixRatio;
+  delta.y *= devPixRatio;
+
+  textRect.moveTo(qMax(delta.x, 10 * devPixRatio + mrg),
+                  qMax(mrg + 2 * devPixRatio, -delta.y - baseLine));
 
   int y  = textRect.top() + baseLine;
   int x0 = textRect.left() - mrg;
@@ -1561,7 +1577,7 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   }
 
   QSize size(textRect.width() + textRect.left() + mrg,
-             qMax(textRect.bottom() + mrg, y + delta.y) + 3);
+             qMax(textRect.bottom() + mrg, y + delta.y) + 3 * devPixRatio);
 
   QImage label(size.width(), size.height(), QImage::Format_ARGB32);
   label.fill(Qt::transparent);
@@ -1572,16 +1588,16 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   p.setPen(Qt::NoPen);
 
   QPainterPath pp;
-  pp.moveTo(x0, y - 8);
+  pp.moveTo(x0, y - 8 * devPixRatio);
   pp.lineTo(0, y + delta.y);
   pp.lineTo(x0, y);
   /* bordi arrotondati
-int arcSize = 10;
-pp.arcTo(x0,y1-arcSize,arcSize,arcSize,180,90);
-pp.arcTo(x1-arcSize,y1-arcSize,arcSize,arcSize,270,90);
-pp.arcTo(x1-arcSize,y0,arcSize,arcSize,0,90);
-pp.arcTo(x0,y0,arcSize,arcSize,90,90);
-*/
+  int arcSize = 10;
+  pp.arcTo(x0,y1-arcSize,arcSize,arcSize,180,90);
+  pp.arcTo(x1-arcSize,y1-arcSize,arcSize,arcSize,270,90);
+  pp.arcTo(x1-arcSize,y0,arcSize,arcSize,0,90);
+  pp.arcTo(x0,y0,arcSize,arcSize,90,90);
+  */
   // bordi acuti
   pp.lineTo(x0, y1);
   pp.lineTo(x1, y1);
@@ -1612,11 +1628,13 @@ pp.arcTo(x0,y0,arcSize,arcSize,90,90);
 
 void ToolUtils::drawHook(const TPointD &pos, ToolUtils::HookType type,
                          bool highlighted, bool onionSkin) {
+  int devPixRatio = getDevPixRatio();
   int r = 10, d = r + r;
-  QImage image(d, d, QImage::Format_ARGB32);
+  QImage image(d * devPixRatio, d * devPixRatio, QImage::Format_ARGB32);
   image.fill(Qt::transparent);
   // image.fill(qRgba(200,200,0,200));
   QPainter painter(&image);
+  painter.scale(devPixRatio, devPixRatio);
   // painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing);
 
   int matte = onionSkin ? 100 : 255;
@@ -1648,7 +1666,7 @@ void ToolUtils::drawHook(const TPointD &pos, ToolUtils::HookType type,
 
   QImage texture = QGLWidget::convertToGLFormat(image);
   glRasterPos2f(pos.x, pos.y);
-  glBitmap(0, 0, 0, 0, -r, -r, NULL);
+  glBitmap(0, 0, 0, 0, -r * devPixRatio, -r * devPixRatio, NULL);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDrawPixels(texture.width(), texture.height(), GL_RGBA, GL_UNSIGNED_BYTE,

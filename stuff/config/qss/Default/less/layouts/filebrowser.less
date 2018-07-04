@@ -6,14 +6,10 @@
 ----------------------------------------------------------------------------- */
 
 #DirTreeView {
-  &:extend(.tree-list all);
   background-color: @browser-listview-bg-color;
   alternate-background-color: @browser-listview-bg-color-alt;
-  border: 1px solid @accent;
+  border: 1 solid @accent;
   border-right: 0;
-  &::branch {
-    &:extend(.branch-22 all);
-  }
 }
 
 /* Right Pane
@@ -22,9 +18,9 @@
 DvItemViewerPanel {
   qproperty-TextColor: @text-color;
   qproperty-AlternateBackground: @browser-itemview-bg-color-alt;
-  qproperty-SelectedTextColor: @selected-text-color;
+  qproperty-SelectedTextColor: @hl-text-color;
   qproperty-FolderTextColor: @browser-folder-text-color;
-  qproperty-SelectedItemBackground: @selected-bg-color;
+  qproperty-SelectedItemBackground: @hl-bg-color;
 }
 
 #FileBrowser {
@@ -32,13 +28,13 @@ DvItemViewerPanel {
     background-color: @browser-itemview-bg-color;
   }
   #castFrame {
-    border-top: 1px solid @accent;
-    border-right: 1px solid @accent;
-    border-bottom: 1px solid @accent;
+    border-top: 1 solid @accent;
+    border-right: 1 solid @accent;
+    border-bottom: 1 solid @accent;
     margin: 0;
   }
   & QToolButton {
-    padding: 1px;
+    padding: 1;
   }
 }
 
@@ -60,13 +56,13 @@ DvItemViewerPanel {
 
 DvDirTreeView {
   qproperty-TextColor: @text-color;
-  qproperty-SelectedTextColor: @selected-text-color;
-  qproperty-SelectedItemBackground: @selected-bg-color;
+  qproperty-SelectedTextColor: @hl-text-color;
+  qproperty-SelectedItemBackground: @hl-bg-color;
   qproperty-FolderTextColor: @browser-folder-text-color;
   qproperty-SelectedFolderTextColor: @browser-folder-text-color-selected;
   alternate-background-color: @tree-bg-color-alt;
   background-color: @tree-bg-color;
-  border: 1px solid @accent;
+  border: 1 solid @accent;
 }
 
 #FileDoesNotExistLabel {
@@ -79,19 +75,12 @@ DvDirTreeView {
 
 #SceneCast {
   &:extend(#FileBrowser all);
-  & QTreeView {
-    &:extend(.tree-list all);
-    background-color: @browser-listview-bg-color;
-    &::branch {
-      &:extend(.branch-17 all);
-    }
-  }
   & QToolBar {
-    border-top: 1px solid @accent;
+    border-top: 1 solid @accent;
   }
   & QToolButton {
-    margin: 3px 1px 2px 1px;
-    padding: 1px;
+    margin: 3 1 2 1;
+    padding: 1;
   }
 }
 

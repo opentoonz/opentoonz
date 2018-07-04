@@ -1,31 +1,38 @@
 // out: ../Default.qss
 
-// MASTER THEME FILE
+// -----------------------------------------------------------------------------
+// DEFAULT
+// -----------------------------------------------------------------------------
+// This is the default theme. All other themes derive from this.
+// -----------------------------------------------------------------------------
 
 // Include All
 @import 'main';
 
-// IMG Location
+// Resource Location
 @img-url: 'imgs/white';
 
 @bg: #484848;
-@accent: darken(@bg, 10);
+@accent: darken(@bg, 13);
 
-@text-color: lighten(@bg, 51.7647);
-@text-color-disabled: mix(@text-color, @bg, 50);
+@text-color: rgb(230, 230, 230);
+@text-color-disabled: rgb(128, 128, 128);
 
-@selected-bg-color: rgb(83, 133, 166);
-@selected-text-color: rgb(242, 242, 242);
+@hl-bg-color: rgb(83, 133, 166);
+@hl-text-color: rgb(255, 255, 255);
 
-@selected-bg-color-secondary: lighten(@bg, 12);
-@selected-text-color-secondary: @text-color;
+@hl-bg-color-secondary: rgba(255, 255, 255, 0.15);
+@hl-text-color-secondary: @text-color;
 
 @dock-bg-color: darken(@bg, 18);
 @dock-placeholder-color: #F77272;
 
-@window-border-color: @dock-bg-color;
 @dialogButtonFrame-bg-color: darken(@bg, 4);
 @dialogButtonFrame-border-color: @accent;
+
+@tooltip-bg-color: #fff;
+@tooltip-border-color: #000;
+@tooltip-text-color: #000;
 
 @label-title: rgb(159, 218, 255);
 @label-error: rgb(255, 0, 0);
@@ -78,8 +85,8 @@
 // -----------------------------------------------------------------------------
 
 @title-bg-color: darken(@bg, 6);
-@title-text-color: lighten(@bg, 30.9804);
-@title-text-color-active: lighten(@bg, 65.8824);
+@title-text-color: lighten(@bg, 30);
+@title-text-color-active: #fff;
 
 @title-active-border-pixmap: 'none';
 
@@ -91,9 +98,9 @@
 @scrollbar-bg-color: darken(@bg, 8);
 
 // Handle
-@scrollbar-handle-border-size: 1px;
-@scrollbar-handle-radius: 4px;
-@scrollbar-handle-margin: 3px;
+@scrollbar-handle-border-size: 1;
+@scrollbar-handle-radius: 4;
+@scrollbar-handle-margin: 3;
 
 @scrollbar-handle-bg-color: lighten(@bg, 4);
 @scrollbar-handle-border-color: @scrollbar-handle-bg-color;
@@ -105,18 +112,8 @@
 @scrollbar-handle-border-color-pressed: @scrollbar-handle-bg-color-pressed;
 
 // -----------------------------------------------------------------------------
-// Trees
-// -----------------------------------------------------------------------------
-
-@tree-bg-color: darken(@bg, 8);
-@tree-bg-color-alt: lighten(@tree-bg-color, 2);
-
-// -----------------------------------------------------------------------------
 // Button
 // -----------------------------------------------------------------------------
-
-@button-border-size: 1px;
-@button-margin: 0;
 
 @button-bg-color: lighten(@bg, 13);
 @button-border-color: darken(@bg, 0);
@@ -137,7 +134,7 @@
 @button-bg-color-checked-hover: lighten(@button-bg-color-checked, 2);
 @button-bg-color-checked-hover-pressed: @button-bg-color-checked;
 
-@button-bg-color-focus: @selected-bg-color;
+@button-bg-color-focus: @hl-bg-color;
 @button-border-color-focus: @button-dialog-border-color;
 @button-text-color-focus: lighten(@button-text-color, 10);
 
@@ -150,12 +147,19 @@
 // For QDialogs
 @button-dialog-border-color: darken(@dialogButtonFrame-bg-color, 0);
 
+// Scrollable Buttons
+@scrollable-button-bg-color: @button-bg-color;
+@scrollable-button-bg-color-hover: @button-bg-color-hover;
+@scrollable-button-bg-color-pressed: @button-bg-color-pressed;
+
+@scrollable-button-border-color: red;
+
 // -----------------------------------------------------------------------------
 // Tool Buttons
 // -----------------------------------------------------------------------------
 
 // Main
-@toolbutton-border-size: 1px;
+@toolbutton-border-size: 1;
 
 @toolbutton-bg-color: rgba(255, 255, 255, 0.00);
 @toolbutton-border-color: @toolbutton-bg-color;
@@ -169,9 +173,9 @@
 @toolbutton-border-color-pressed: @button-border-color-pressed;
 @toolbutton-text-color-pressed: @button-text-color-pressed;
 
-@toolbutton-bg-color-checked: @selected-bg-color;
+@toolbutton-bg-color-checked: @hl-bg-color;
 @toolbutton-border-color-checked: @toolbutton-bg-color-checked;
-@toolbutton-text-color-checked: @selected-text-color;
+@toolbutton-text-color-checked: @hl-text-color;
 
 @toolbutton-bg-color-checked-hover: lighten(@toolbutton-bg-color-checked, 8);
 @toolbutton-border-color-checked-hover: @toolbutton-bg-color-checked-hover;
@@ -184,33 +188,6 @@
 @toolbutton-lock-border-color-checked-hover: @toolbutton-lock-bg-color-checked-hover;
 
 // -----------------------------------------------------------------------------
-// ComboBox
-// -----------------------------------------------------------------------------
-
-@combobox-border-size: @button-border-size;
-@combobox-margin: 1px 0;
-
-@combobox-bg-color: @button-bg-color;
-@combobox-border-color: @button-border-color;
-@combobox-text-color: @button-text-color;
-
-@combobox-bg-color-hover: @button-bg-color-hover;
-@combobox-border-color-hover: @combobox-border-color;
-@combobox-text-color-hover: @combobox-text-color;
-
-@combobox-bg-color-pressed: @button-bg-color-checked;
-@combobox-border-color-pressed: @button-border-color-pressed;
-@combobox-text-color-pressed: @combobox-text-color;
-
-@combobox-bg-color-disabled: @button-bg-color-disabled;
-@combobox-border-color-disabled: @button-border-color-disabled;
-
-// Drop-Arrow Box
-@droparrow-bg-color: rgba(255, 255, 255, 0.00);
-@droparrow-border-size: 0;
-@droparrow-border-color: @combobox-border-color;
-
-// -----------------------------------------------------------------------------
 // Textfield
 // -----------------------------------------------------------------------------
 
@@ -219,7 +196,7 @@
 @input-text-color: @text-color;
 
 @input-bg-color-focus: @input-bg-color;
-@input-border-color-focus: @selected-bg-color;
+@input-border-color-focus: @hl-bg-color;
 @input-text-color-focus: @input-text-color;
 
 @input-bg-color-disabled: mix(@input-bg-color, @bg, 50);
@@ -227,8 +204,8 @@
 @input-text-color-disabled: @text-color-disabled;
 
 // Text Selection
-@input-selection-text-color: @selected-text-color;
-@input-selection-bg-color: @selected-bg-color;
+@input-selection-text-color: @hl-text-color;
+@input-selection-bg-color: @hl-bg-color;
 
 // -----------------------------------------------------------------------------
 // CheckBox
@@ -238,8 +215,8 @@
 @checkbox-border-color: @input-border-color;
 
 @checkbox-bg-color-hover: @checkbox-bg-color;
-@checkbox-border-color-hover: @selected-bg-color;
-@checkbox-text-color-hover: @text-color;
+@checkbox-border-color-hover: @hl-bg-color;
+@checkbox-text-color-hover: lighten(@text-color, 25);
 
 @checkbox-bg-color-checked: @checkbox-bg-color;
 @checkbox-border-color-checked: @checkbox-border-color;
@@ -255,12 +232,12 @@
 @slider-groove-img: 'slider-groove.svg';
 @slider-groove-img-disabled: 'slider-groove_disabled.svg';
 
-@slider-handle-width: 10px;
+@slider-handle-width: 10;
 @slider-handle-img: 'slider-handle.svg';
 @slider-handle-img-disabled: 'slider-handle_disabled.svg';
 
 // This one is used only for #ViewerFpsSlider
-@slider-handle-margin: -2px -1px;
+@slider-handle-margin: -2 -1;
 @slider-handle-bg-color: lighten(@bg, 35);
 @slider-handle-border-color: @slider-handle-bg-color;
 
@@ -272,12 +249,18 @@
 @slider-right-handle-disabled: @slider-handle-img-disabled;
 
 // -----------------------------------------------------------------------------
-// File Browser
+// File Browser / Trees
 // -----------------------------------------------------------------------------
+
+// Trees
+@tree-bg-color: darken(@bg, 8);
+@tree-bg-color-alt: lighten(@tree-bg-color, 2);
+@prefs-tree-bg-color: @tree-bg-color;
+@prefs-tree-hl-color: @hl-bg-color-secondary;
 
 // All Panes
 @browser-folder-text-color: @label-title;
-@browser-folder-text-color-selected: @selected-text-color;
+@browser-folder-text-color-selected: @hl-text-color;
 
 // Left Pane
 @browser-listview-bg-color: @tree-bg-color;
@@ -331,6 +314,7 @@
 // XSheet Spreadsheet Viewer
 @xsheet-text-color:                         @text-color;
 @xsheet-bg-color:                           darken(@bg, 5);
+@xsheet-empty-bg-color:                     darken(@bg, 8);
 @xsheet-LightLine-color:                    darken(@bg, 10.9804);
 @xsheet-MarkerLine-color:                   #1E96C4;
 @xsheet-VerticalLine-color:                 darken(#626262, 25);
@@ -339,7 +323,7 @@
 @xsheet-CurrentRowBG-color:                 #506082;
 
 @xsheet-EmptyColumnHead-color:              lighten(@bg, 10.1961);
-@xsheet-SelectedColumnText-color:           #FF0000;
+@xsheet-SelectedColumnText-color:           #E66464;
 
 @xsheet-EmptyCell-color:                    darken(@bg, 3.1373);
 @xsheet-NotEmptyColumn-color:               @bg;
@@ -377,6 +361,10 @@
 @xsheet-MeshColumnBorder-color:             #BA92EF;
 @xsheet-SelectedMeshColumn-color:           lighten(desaturate(@xsheet-MeshColumn-color, 5), 10);
 
+@xsheet-SoundTextColumn-color:              #c8c8c8;
+@xsheet-SoundTextColumnBorder-color:        #8c8c8c;
+@xsheet-SelectedSoundTextColumn-color:        lighten(desaturate(@xsheet-SoundTextColumn-color, 5), 10);
+
 @xsheet-SoundColumn-color:                  #657456;
 @xsheet-SoundColumnBorder-color:            #A0AF7D;
 @xsheet-SelectedSoundColumn-color:          lighten(desaturate(@xsheet-SoundColumn-color, 5), 10);
@@ -391,9 +379,10 @@
 @xsheet-DarkBG-color:                       lighten(@bg, 60.0000);
 @xsheet-DarkLine-color:                     lighten(@bg, 30.5882);
 
+// Timeline
 
-@xsheet-ColumnNameBg-color:                 rgba(255, 255, 255, 0);
-@xsheet-DragBarHighlight-color:             rgba(255, 255, 187, 255);
+@xsheet-ColumnNameBg-color:                 rgba(0, 0, 0, 0);
+@xsheet-DragBarHighlight-color:             rgba(255, 255, 255, 0.5);
 
 @xsheet-PreviewButtonBgOn-color:            rgba(200, 200, 100, 255);
 @xsheet-PreviewButtonOnImage:               'x_prev_eye_on.svg';
@@ -406,7 +395,7 @@
 @xsheet-CamstandButtonBgOff-color:          rgba(255, 255, 255, 0);
 @xsheet-CamstandButtonOffImage:             'x_table_view_off.svg';
 
-@xsheet-LockButtonBgOn-color:               rgba(197, 84, 84, 255);
+@xsheet-LockButtonBgOn-color:               rgba(255, 255, 255, 0.300);
 @xsheet-LockButtonOnImage:                  'x_lock_on.svg';
 @xsheet-LockButtonBgOff-color:              rgba(255, 255, 255, 0);
 @xsheet-LockButtonOffImage:                 'x_lock_off.svg';
@@ -415,28 +404,30 @@
 @xsheet-ConfigButtonImage:                  'x_config.svg';
 
 @timeline-PreviewButtonBgOn-color:          rgba(255, 255, 255, 0);
-@timeline-PreviewButtonOnImage:             'timeline_prev_eye_on.svg';
+@timeline-PreviewButtonOnImage:             'timeline_toggle_on.svg';
 @timeline-PreviewButtonBgOff-color:         rgba(255, 255, 255, 0);
-@timeline-PreviewButtonOffImage:            'timeline_prev_eye_off.svg';
+@timeline-PreviewButtonOffImage:            'timeline_toggle_off.svg';
 
 @timeline-CamstandButtonBgOn-color:         rgba(255, 255, 255, 0);
-@timeline-CamstandButtonOnImage:            'timeline_table_view_on.svg';
-@timeline-CamstandButtonTranspImage:        'timeline_table_view_transp.svg';
+@timeline-CamstandButtonOnImage:            'timeline_toggle_on.svg';
+@timeline-CamstandButtonTranspImage:        'timeline_toggle_transp.svg';
 @timeline-CamstandButtonBgOff-color:        rgba(255, 255, 255, 0);
-@timeline-CamstandButtonOffImage:           'timeline_table_view_off.svg';
+@timeline-CamstandButtonOffImage:           'timeline_toggle_off.svg';
 
 @timeline-LockButtonBgOn-color:             rgba(255, 255, 255, 0);
-@timeline-LockButtonOnImage:                'timeline_lock_on.svg';
+@timeline-LockButtonOnImage:                'timeline_toggle_on.svg';
 @timeline-LockButtonBgOff-color:            rgba(255, 255, 255, 0);
-@timeline-LockButtonOffImage:               'timeline_lock_off.svg';
+@timeline-LockButtonOffImage:               'timeline_toggle_off.svg';
 
 @timeline-ConfigButtonBg-color:             rgba(255, 255, 255, 0);
 @timeline-ConfigButtonImage:                'timeline_config.svg';
 
 @layerheader-PreviewImage:                  'layer_header_prev_eye.svg';
+@layerheader-PreviewOverImage:              'layer_header_prev_eye_over.svg';
 @layerheader-CamstandImage:                 'layer_header_table_view.svg';
-@layerheader-LockImage:                     'layer_header_lock.svg';
-
+@layerheader-CamstandOverImage:             'layer_header_table_view_over.svg';
+@layerheader-LockImage:                     'lock_on.svg';
+@layerheader-LockOverImage:                 'lock_on_over.svg';
 // -----------------------------------------------------------------------------
 // Function Editor
 // -----------------------------------------------------------------------------
@@ -447,8 +438,8 @@
 
 // Function Curve Panel
 @function-panel-bg-color: darken(@bg, 5.0980);
-@function-panel-ValueLine-color: @bg;
-@function-panel-FrameLine-color: lighten(@bg, 9.4118);
+@function-panel-ValueLine-color: darken(@bg, 10);
+@function-panel-FrameLine-color: darken(@bg, 10);
 @function-panel-OtherCurves-color: lighten(@function-panel-bg-color, 30);
 @function-panel-RulerBG-color: darken(@function-panel-bg-color, 3);
 @function-panel-Text-color: @text-color;

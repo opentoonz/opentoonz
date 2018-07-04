@@ -1,6 +1,6 @@
 
 
-// #include "tpluginmanager.h"
+
 #include "strokestyles.h"
 #include "regionstyles.h"
 #include "rasterstyles.h"

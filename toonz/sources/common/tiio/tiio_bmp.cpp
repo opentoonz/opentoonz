@@ -747,3 +747,9 @@ Tiio::BmpWriterProperties::BmpWriterProperties()
   m_pixelSize.addValue(L"8 bits (Greyscale)");
   bind(m_pixelSize);
 }
+
+void Tiio::BmpWriterProperties::updateTranslation() {
+  m_pixelSize.setQStringName(tr("Bits Per Pixel"));
+  m_pixelSize.setItemUIName(L"24 bits", tr("24 bits"));
+  m_pixelSize.setItemUIName(L"8 bits (Greyscale)", tr("8 bits (Greyscale)"));
+}

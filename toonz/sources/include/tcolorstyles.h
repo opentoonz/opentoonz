@@ -103,6 +103,19 @@ public:
   struct int_tag {};
   struct TFilePath_tag {};
 
+  struct PickedPosition {
+    TPoint pos = TPoint();
+    int frame  = 0;
+    PickedPosition(TPoint _pos = TPoint(), int _frame = 0)
+        : pos(_pos), frame(_frame) {}
+    inline bool operator==(const PickedPosition &p) const {
+      return (this->pos == p.pos) && (this->frame == p.frame);
+    }
+    inline bool operator!=(const PickedPosition &p) const {
+      return (this->pos != p.pos) || (this->frame != p.frame);
+    }
+  };
+
 private:
   std::wstring m_name;          //!< User-define style name.
   std::wstring m_globalName;    //!< User-define style \a global name.
@@ -117,9 +130,9 @@ private:
   bool m_isEditedFromOriginal;  //<! If the style is copied from studio palette,
                                 // This flag will be set when the
   //!  style is edited from the original one.
-
-  TPoint m_pickedPosition;  // picked position from color model by using style
-                            // picker tool with "organize palette" option.
+  PickedPosition
+      m_pickedPosition;  // picked position from color model by using style
+                         // picker tool with "organize palette" option.
 
 protected:
   TRaster32P m_icon;  //!< Icon shown on TPalette viewers.
@@ -215,8 +228,12 @@ The \a global name contains information about palette id.
     m_flags = flags;
   }  //!< Returns color attributes.
 
-  void setPickedPosition(const TPoint &pos) { m_pickedPosition = pos; }
-  TPoint getPickedPosition() const { return m_pickedPosition; }
+  void setPickedPosition(const TPoint &pos, const int index = 0) {
+    m_pickedPosition.pos   = pos;
+    m_pickedPosition.frame = index;
+  }
+  void setPickedPosition(const PickedPosition &pos) { m_pickedPosition = pos; }
+  PickedPosition getPickedPosition() const { return m_pickedPosition; }
 
   // Color-related functions
 

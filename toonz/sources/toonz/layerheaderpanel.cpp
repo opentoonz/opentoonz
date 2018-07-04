@@ -67,12 +67,19 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
   QRect rect             = QRect(QPoint(0, 0), size());
   p.fillRect(rect.adjusted(0, 0, -3, 0), slightlyLighter);
 
-  drawIcon(p, PredefinedRect::EYE, boost::none,
-           m_viewer->getLayerHeaderPreviewImage());
-  drawIcon(p, PredefinedRect::PREVIEW_LAYER, boost::none,
-           m_viewer->getLayerHeaderCamstandImage());
-  drawIcon(p, PredefinedRect::LOCK, boost::none,
-           m_viewer->getLayerHeaderLockImage());
+  QImage preview = (m_buttonHighlighted == PreviewButton
+                        ? m_viewer->getLayerHeaderPreviewOverImage()
+                        : m_viewer->getLayerHeaderPreviewImage());
+  QImage camstand = (m_buttonHighlighted == CamstandButton
+                         ? m_viewer->getLayerHeaderCamstandOverImage()
+                         : m_viewer->getLayerHeaderCamstandImage());
+  QImage lock = (m_buttonHighlighted == LockButton
+                     ? m_viewer->getLayerHeaderLockOverImage()
+                     : m_viewer->getLayerHeaderLockImage());
+
+  drawIcon(p, PredefinedRect::EYE, boost::none, preview);
+  drawIcon(p, PredefinedRect::PREVIEW_LAYER, boost::none, camstand);
+  drawIcon(p, PredefinedRect::LOCK, boost::none, lock);
 
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
 
@@ -126,6 +133,17 @@ void LayerHeaderPanel::showOrHide(const Orientation *o) {
 }
 
 //-----------------------------------------------------------------------------
+void LayerHeaderPanel::enterEvent(QEvent *) {
+  m_buttonHighlighted = NoButton;
+
+  update();
+}
+
+void LayerHeaderPanel::leaveEvent(QEvent *) {
+  m_buttonHighlighted = NoButton;
+
+  update();
+}
 
 void LayerHeaderPanel::mousePressEvent(QMouseEvent *event) {
   const Orientation *o = Orientations::leftToRight();
@@ -156,19 +174,23 @@ void LayerHeaderPanel::mousePressEvent(QMouseEvent *event) {
 void LayerHeaderPanel::mouseMoveEvent(QMouseEvent *event) {
   const Orientation *o = Orientations::leftToRight();
 
-  QPoint pos = event->pos();
+  QPoint pos          = event->pos();
+  m_buttonHighlighted = NoButton;
 
   // preview button
   if (o->rect(PredefinedRect::EYE_AREA).contains(pos)) {
-    m_tooltip = tr("Preview Visbility Toggle All");
+    m_tooltip           = tr("Preview Visbility Toggle All");
+    m_buttonHighlighted = PreviewButton;
   }
   // camstand button
   else if (o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(pos)) {
-    m_tooltip = tr("Camera Stand Visibility Toggle All");
+    m_tooltip           = tr("Camera Stand Visibility Toggle All");
+    m_buttonHighlighted = CamstandButton;
   }
   // lock button
   else if (o->rect(PredefinedRect::LOCK).contains(pos)) {
-    m_tooltip = tr("Lock Toggle All");
+    m_tooltip           = tr("Lock Toggle All");
+    m_buttonHighlighted = LockButton;
   } else {
     m_tooltip = tr("");
   }

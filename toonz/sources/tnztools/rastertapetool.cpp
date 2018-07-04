@@ -177,8 +177,14 @@ public:
 
   void updateTranslation() override {
     m_closeType.setQStringName(tr("Type:"));
+    m_closeType.setItemUIName(NORMAL_CLOSE, tr("Normal"));
+    m_closeType.setItemUIName(RECT_CLOSE, tr("Rectangular"));
+    m_closeType.setItemUIName(FREEHAND_CLOSE, tr("Freehand"));
+    m_closeType.setItemUIName(POLYLINE_CLOSE, tr("Polyline"));
+
     m_distance.setQStringName(tr("Distance:"));
     m_inkIndex.setQStringName(tr("Style Index:"));
+    m_inkIndex.setValue(tr("current").toStdWString());
     m_opacity.setQStringName(tr("Opacity:"));
     m_multi.setQStringName(tr("Frame Range"));
     m_angle.setQStringName(tr("Angle:"));

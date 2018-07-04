@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include "orientation.h"
 
+#include "toonz/txshcell.h"
+
 // forward declaration
 class XsheetViewer;
 class QMenu;
@@ -86,6 +88,8 @@ class CellArea final : public QWidget {
   void drawLockedDottedLine(QPainter &p, bool isLocked, const QPoint &xy,
                             const QColor &cellColor) const;
 
+  void drawFrameSeparator(QPainter &p, int row, int col, bool emptyFrame,
+                          bool heldFrame = false);
   void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
   void drawSoundTextCell(QPainter &p, int row, int col);
   void drawSoundCell(QPainter &p, int row, int col, bool isReference = false);
@@ -99,7 +103,8 @@ class CellArea final : public QWidget {
   void drawCurrentTimeIndicator(QPainter &p, const QPoint &xy,
                                 bool isFolded = false);
 
-  void drawFrameDot(QPainter &p, const QPoint &xy, bool isValid);
+  void drawFrameMarker(QPainter &p, const QPoint &xy, QColor color,
+                       bool isKeyFrame = false);
 
   // Restistusce true
   bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);
@@ -144,7 +149,7 @@ protected:
   /*!Crea il menu' del tasto destro che si visualizza quando si clicca sulla
 cella,
 distinguendo i due casi: cella piena, cella vuota.*/
-  void createCellMenu(QMenu &menu, bool isCellSelected);
+  void createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell);
   //! Crea il menu' del tasto destro che si visualizza si clicca su un key
   //! frame.
   void createKeyMenu(QMenu &menu);

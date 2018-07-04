@@ -139,6 +139,7 @@
         <file>Resources/magnet.png</file>
         <file>Resources/magnet.svg</file>
         <file>Resources/magnet_rollover.svg</file>
+        <file>Resources/menu.svg</file>
         <file>Resources/merge.svg</file>
         <file>Resources/motionpath_fileicon.svg</file>
         <file>Resources/motionpath.svg</file>
@@ -457,5 +458,12 @@
       <file>Resources/refresh_over.svg</file>
       <file>Resources/zoom_in.svg</file>
       <file>Resources/zoom_out.svg</file>
+      <file>Resources/zoom_in_rollover.svg</file>
+      <file>Resources/zoom_out_rollover.svg</file>
+      <file>Resources/colorchiporder_leftup.svg</file>
+      <file>Resources/colorchiporder_lowleft.svg</file>
+      <file>Resources/colorchiporder_upleft.svg</file>
+      <file>Resources/timeline2xsheet.svg</file>
+      <file>Resources/xsheet2timeline.svg</file>
     </qresource>
 </RCC>

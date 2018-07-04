@@ -14,6 +14,7 @@
 #include "columnselection.h"
 #include "convertpopup.h"
 #include "matchline.h"
+#include "colormodelbehaviorpopup.h"
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
@@ -368,6 +369,16 @@ void FileBrowserPopup::showEvent(QShowEvent *) {
   if (m_currentProjectPath != projectPath) {
     m_currentProjectPath = projectPath;
     initFolder();
+
+    // set initial folder of all browsers to $scenefolder when the scene folder
+    // mode is set in user preferences
+    if (Preferences::instance()->getPathAliasPriority() ==
+        Preferences::SceneFolderAlias) {
+      ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+      if (scene && !scene->isUntitled())
+        setFolder(scene->getScenePath().getParentDir());
+    }
+
     m_nameField->update();
     m_nameField->setFocus();
   }
@@ -964,38 +975,42 @@ void LoadLevelPopup::updatePosTo() {
       // loading another type of level such as tlv
       else {
         if (fp.isEmpty()) return;
+        try {
+          TLevelReaderP lr(fp);
+          TLevelP level;
+          if (lr) level = lr->loadInfo();
+          if (!level.getPointer()) return;
 
-        TLevelReaderP lr(fp);
-        TLevelP level;
-        if (lr) level = lr->loadInfo();
-        if (!level.getPointer()) return;
-
-        if (m_stepCombo->currentIndex() == 0)  // Step = Auto
-        {
-          TLevel::Iterator it;
-          int firstFrame = 0;
-          int lastFrame  = 0;
-          for (it = level->begin(); it != level->end(); it++) {
-            if (xFrom <= it->first.getNumber()) {
-              firstFrame = it->first.getNumber();
-              break;
+          if (m_stepCombo->currentIndex() == 0)  // Step = Auto
+          {
+            TLevel::Iterator it;
+            int firstFrame = 0;
+            int lastFrame  = 0;
+            for (it = level->begin(); it != level->end(); it++) {
+              if (xFrom <= it->first.getNumber()) {
+                firstFrame = it->first.getNumber();
+                break;
+              }
             }
-          }
-          for (it = level->begin(); it != level->end(); it++) {
-            if (it->first.getNumber() <= xTo) {
-              lastFrame = it->first.getNumber();
+            for (it = level->begin(); it != level->end(); it++) {
+              if (it->first.getNumber() <= xTo) {
+                lastFrame = it->first.getNumber();
+              }
             }
+            frameLength = lastFrame - firstFrame + 1;
+          } else  // Step != Auto
+          {
+            TLevel::Iterator it;
+            int loopAmount = 0;
+            for (it = level->begin(); it != level->end(); it++) {
+              if (xFrom <= it->first.getNumber() &&
+                  it->first.getNumber() <= xTo)
+                loopAmount++;
+            }
+            frameLength = loopAmount * m_stepCombo->currentIndex();
           }
-          frameLength = lastFrame - firstFrame + 1;
-        } else  // Step != Auto
-        {
-          TLevel::Iterator it;
-          int loopAmount = 0;
-          for (it = level->begin(); it != level->end(); it++) {
-            if (xFrom <= it->first.getNumber() && it->first.getNumber() <= xTo)
-              loopAmount++;
-          }
-          frameLength = loopAmount * m_stepCombo->currentIndex();
+        } catch (...) {
+          return;
         }
       }
     }
@@ -1090,14 +1105,18 @@ bool LoadLevelPopup::execute() {
       }
       // another case such as loading tlv
       else {
-        TLevelReaderP lr(fp);
-        TLevelP level;
-        if (lr) level = lr->loadInfo();
-        if (!level.getPointer()) return false;
+        try {
+          TLevelReaderP lr(fp);
+          TLevelP level;
+          if (lr) level = lr->loadInfo();
+          if (!level.getPointer()) return false;
 
-        firstFrame = level->begin()->first;
-        lastFrame  = (--level->end())->first;
-        lr         = TLevelReaderP();
+          firstFrame = level->begin()->first;
+          lastFrame  = (--level->end())->first;
+          lr         = TLevelReaderP();
+        } catch (...) {
+          return false;
+        }
       }
       int firstFrameNumber = m_fromFrame->text().toInt();
       int lastFrameNumber  = m_toFrame->text().toInt();
@@ -1270,13 +1289,26 @@ void LoadLevelPopup::updateBottomGUI() {
       firstFrame = fIds[0];
       lastFrame  = fIds[fIds.size() - 1];
     } else {
-      TLevelReaderP lr(fp);
-      TLevelP level;
-      if (lr) level = lr->loadInfo();
-      if (!level.getPointer() || level->getTable()->size() == 0) return;
+      try {
+        TLevelReaderP lr(fp);
+        TLevelP level;
+        if (lr) level = lr->loadInfo();
+        if (!level.getPointer() || level->getTable()->size() == 0) return;
 
-      firstFrame = level->begin()->first;
-      lastFrame  = (--level->end())->first;
+        firstFrame = level->begin()->first;
+        lastFrame  = (--level->end())->first;
+      } catch (...) {
+        m_fromFrame->setText("");
+        m_toFrame->setText("");
+        m_subsequenceFrame->setEnabled(false);
+
+        m_xFrom->setText("");
+        m_xTo->setText("");
+        m_levelName->setText("");
+        m_posTo->setText("");
+        m_arrangementFrame->setEnabled(false);
+        return;
+      }
     }
 
     m_fromFrame->setText(QString().number(firstFrame.getNumber()));
@@ -1549,7 +1581,8 @@ public:
     TCellSelection *cellSel     = dynamic_cast<TCellSelection *>(sel);
     TColumnSelection *columnSel = dynamic_cast<TColumnSelection *>(sel);
     if ((!cellSel && !columnSel) || sel->isEmpty()) {
-      DVGui::error(tr("Nothing to replace: no cells or columns selected."));
+      DVGui::error(
+          QObject::tr("Nothing to replace: no cells or columns selected."));
       return false;
     }
     if (cellSel) {
@@ -1779,14 +1812,17 @@ void LoadColorModelPopup::onFilePathsSelected(
   if (paths.size() == 1) {
     // Initialize the line with the level's starting frame
     const TFilePath &fp = *paths.begin();
+    try {
+      TLevelReaderP lr(fp);
+      TLevelP level;
+      if (lr) level = lr->loadInfo();
 
-    TLevelReaderP lr(fp);
-    TLevelP level;
-    if (lr) level = lr->loadInfo();
-
-    if (level.getPointer() && level->begin() != level->end()) {
-      int firstFrame = level->begin()->first.getNumber();
-      if (firstFrame > 0) m_paletteFrame->setText(QString::number(firstFrame));
+      if (level.getPointer() && level->begin() != level->end()) {
+        int firstFrame = level->begin()->first.getNumber();
+        if (firstFrame > 0)
+          m_paletteFrame->setText(QString::number(firstFrame));
+      }
+    } catch (...) {
     }
   }
 }
@@ -1798,7 +1834,6 @@ bool LoadColorModelPopup::execute() {
 
   const TFilePath &fp = *m_selectedPaths.begin();
 
-  int index = 0;
   TPaletteHandle *paletteHandle =
       TApp::instance()->getPaletteController()->getCurrentLevelPalette();
 
@@ -1808,43 +1843,18 @@ bool LoadColorModelPopup::execute() {
     return false;
   }
 
-  PaletteCmd::ColorModelPltBehavior pltBehavior;
+  PaletteCmd::ColorModelLoadingConfiguration config;
 
   // if the palette is locked, replace the color model's palette with the
   // destination
-  if (palette->isLocked())
-    pltBehavior = PaletteCmd::ReplaceColorModelPlt;
-  else {
-    std::string type(fp.getType());
-    QString question(
-        QObject::tr("The color model palette is different from the destination "
-                    "palette.\nWhat do you want to do? "));
-    QList<QString> list;
-    list.append(QObject::tr("Overwrite the destination palette."));
-    list.append(QObject::tr(
-        "Keep the destination palette and apply it to the color model."));
-    /*- if the file is raster image (i.e. without palette), then add another
-     * option "add styles"  -*/
-    if (type != "tlv" && type != "pli")
-      list.append(
-          QObject::tr("Add color model's palette to the destination palette."));
-    int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
-    switch (ret) {
-    case 0:
-      return false;
-    case 1:
-      pltBehavior = PaletteCmd::KeepColorModelPlt;
-      break;
-    case 2:
-      pltBehavior = PaletteCmd::ReplaceColorModelPlt;
-      break;
-    case 3:
-      pltBehavior = PaletteCmd::AddColorModelPlt;
-      break;
-    default:
-      pltBehavior = PaletteCmd::KeepColorModelPlt;
-      break;
-    }
+  if (palette->isLocked()) {
+    // do nothing as config will use behavior = ReplaceColorModelPlt by default
+    // config.behavior = PaletteCmd::ReplaceColorModelPlt;
+  } else {
+    ColorModelBehaviorPopup popup(m_selectedPaths, 0);
+    int ret = popup.exec();
+    if (ret == QDialog::Rejected) return false;
+    popup.getLoadingConfiguration(config);
   }
 
   std::vector<int> framesInput = string2Indexes(m_paletteFrame->text());
@@ -1856,9 +1866,8 @@ bool LoadColorModelPopup::execute() {
 
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
-  int isLoaded = PaletteCmd::loadReferenceImage(paletteHandle, pltBehavior, fp,
-                                                index, scene, framesInput);
-
+  int isLoaded = PaletteCmd::loadReferenceImage(paletteHandle, config, fp,
+                                                scene, framesInput);
   // return value - isLoaded
   // 2: failed to get palette
   // 1: failed to get image
@@ -1875,7 +1884,7 @@ bool LoadColorModelPopup::execute() {
   }
 
   // no changes in the icon with replace (Keep the destination palette) option
-  if (pltBehavior != PaletteCmd::ReplaceColorModelPlt) {
+  if (config.behavior != PaletteCmd::ReplaceColorModelPlt) {
     TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
     if (!level) return true;
     std::vector<TFrameId> fids;
@@ -2134,12 +2143,13 @@ void BrowserPopupController::openPopup(QStringList filters,
     m_isExecute = false;
 }
 
-QString BrowserPopupController::getPath() {
+// codePath is set to true by default
+QString BrowserPopupController::getPath(bool codePath) {
   m_isExecute = false;
   if (!m_browserPopup) return QString();
-  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-  TFilePath fp      = m_browserPopup->getPath();
-  if (scene) fp     = scene->codeFilePath(fp);
+  ToonzScene *scene         = TApp::instance()->getCurrentScene()->getScene();
+  TFilePath fp              = m_browserPopup->getPath();
+  if (scene && codePath) fp = scene->codeFilePath(fp);
   std::cout << ::to_string(fp) << std::endl;
   return toQString(fp);
 }

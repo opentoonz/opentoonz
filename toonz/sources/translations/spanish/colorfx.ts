@@ -43,15 +43,15 @@
     </message>
     <message>
         <source>Control Point</source>
-        <translation>Punto de control</translation>
+        <translation>Puntos de control</translation>
     </message>
     <message>
         <source>Center Line</source>
-        <translation>Línea central</translation>
+        <translation>Líneas</translation>
     </message>
     <message>
         <source>Outline Mode</source>
-        <translation>Modo del contorno</translation>
+        <translation>Contornos</translation>
     </message>
     <message>
         <source>Distance</source>
@@ -344,7 +344,7 @@
     <name>TFriezeStrokeStyle2</name>
     <message>
         <source>Curl</source>
-        <translation>Enrular</translation>
+        <translation>Enrulado</translation>
     </message>
     <message>
         <source>Twirl</source>
@@ -626,7 +626,7 @@
     <name>TSprayStrokeStyle</name>
     <message>
         <source>Circlets</source>
-        <translation>Anillos</translation>
+        <translation>Aros</translation>
     </message>
     <message>
         <source>Border Fade</source>
