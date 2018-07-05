@@ -337,9 +337,11 @@ void HookTool::draw() {
     TPixel32 balloonColor(200, 220, 205, 200);
     TPoint balloonOffset(20, 20);
     std::string hookName = std::to_string(i + 1);
-    drawBalloon(p0, hookName, balloonColor, balloonOffset, getPixelSize(), false, &balloons);
+    drawBalloon(p0, hookName, balloonColor, balloonOffset, getPixelSize(),
+                false, &balloons);
     if (!linked)
-      drawBalloon(p1, hookName, balloonColor, balloonOffset, getPixelSize(), false, &balloons);
+      drawBalloon(p1, hookName, balloonColor, balloonOffset, getPixelSize(),
+                  false, &balloons);
   }
   // draw snapped hook balloon
   if (m_snappedReason != "") {

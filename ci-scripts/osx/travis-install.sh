@@ -3,6 +3,6 @@ brew update
 brew install glew lz4 lzo libusb libmypaint
 brew tap tcr/tcr
 brew install clang-format
-# obtain qt5.9.2 from the previous version of the formula
-curl -O https://raw.githubusercontent.com/Homebrew/homebrew-core/9bc1bdd8d26747cffd7a18c31975f86cd0a97bc3/Formula/qt.rb
-brew install ./qt.rb
+# from Homebrew 1.6.0 the old formula for obtaining Qt5.9.2 becomes invalid.
+# so we start to use the latest version of Qt. (#1910)
+brew install qt

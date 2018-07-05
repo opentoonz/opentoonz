@@ -1,10 +1,8 @@
 
+#include "viewtools.h"
 
-#include "tools/tool.h"
-#include "tstopwatch.h"
 #include "tools/cursors.h"
 #include "tgeometry.h"
-#include "tproperty.h"
 
 #include <math.h>
 
@@ -126,101 +124,84 @@ public:
 
 } handTool;
 
+}  // namespace
+
 //=============================================================================
 // Rotate Tool
 //-----------------------------------------------------------------------------
 
-class RotateTool final : public TTool {
-  TStopWatch m_sw;
-  TPointD m_oldPos;
-  TPointD m_center;
-  bool m_dragging;
-  double m_angle;
-  TPointD m_oldMousePos;
-  TBoolProperty m_cameraCentered;
-  TPropertyGroup m_prop;
+RotateTool::RotateTool()
+    : TTool("T_Rotate")
+    , m_dragging(false)
+    , m_cameraCentered("Rotate On Camera Center", false)
+    , m_angle(0) {
+  bind(TTool::AllTargets);
+  m_prop.bind(m_cameraCentered);
+}
 
-public:
-  RotateTool()
-      : TTool("T_Rotate")
-      , m_dragging(false)
-      , m_cameraCentered("Rotate On Camera Center", false)
-      , m_angle(0) {
-    bind(TTool::AllTargets);
-    m_prop.bind(m_cameraCentered);
-  }
+void RotateTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  if (!m_viewer) return;
 
-  ToolType getToolType() const override { return TTool::GenericTool; }
+  m_angle       = 0.0;
+  m_dragging    = true;
+  m_oldPos      = pos;
+  m_oldMousePos = e.m_pos;
+  // m_center = TPointD(0,0);
+  m_sw.start(true);
+  invalidate();
 
-  void updateMatrix() override { return setMatrix(TAffine()); }
+  // m_center =
+  // viewAffine.inv()*TPointD(0,0);//m_viewer->winToWorld(m_viewer);
+  // virtual TPointD winToWorld(const TPoint &winPos) const = 0;
+}
 
-  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
-
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
-    if (!m_viewer) return;
-
-    m_angle       = 0.0;
-    m_dragging    = true;
-    m_oldPos      = pos;
+void RotateTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  if (!m_viewer) return;
+  if (m_sw.getTotalTime() < 50) return;
+  m_sw.stop();
+  m_sw.start(true);
+  TPointD p = pos;
+  if (m_viewer->is3DView()) {
+    TPointD d     = e.m_pos - m_oldMousePos;
     m_oldMousePos = e.m_pos;
-    // m_center = TPointD(0,0);
-    m_sw.start(true);
-    invalidate();
-
-    // m_center =
-    // viewAffine.inv()*TPointD(0,0);//m_viewer->winToWorld(m_viewer);
-    // virtual TPointD winToWorld(const TPoint &winPos) const = 0;
-  }
-
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
-    if (!m_viewer) return;
-    if (m_sw.getTotalTime() < 50) return;
-    m_sw.stop();
-    m_sw.start(true);
-    TPointD p = pos;
-    if (m_viewer->is3DView()) {
-      TPointD d     = e.m_pos - m_oldMousePos;
-      m_oldMousePos = e.m_pos;
-      double factor = 0.5;
-      m_viewer->rotate3D(factor * d.x, -factor * d.y);
-    } else {
-      TPointD a = p - m_center;
-      TPointD b = m_oldPos - m_center;
-      if (norm2(a) > 0 && norm2(b) > 0) {
-        double ang = asin(cross(b, a) / (norm(a) * norm(b))) * M_180_PI;
-        m_angle    = m_angle + ang;
-        m_viewer->rotate(m_center, m_angle);
-      }
+    double factor = 0.5;
+    m_viewer->rotate3D(factor * d.x, -factor * d.y);
+  } else {
+    TPointD a = p - m_center;
+    TPointD b = m_oldPos - m_center;
+    if (norm2(a) > 0 && norm2(b) > 0) {
+      double ang = asin(cross(b, a) / (norm(a) * norm(b))) * M_180_PI;
+      m_angle    = m_angle + ang;
+      m_viewer->rotate(m_center, m_angle);
     }
-    m_oldPos = p;
   }
+  m_oldPos = p;
+}
 
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override {
-    m_dragging = false;
-    invalidate();
-    m_sw.stop();
+void RotateTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
+  m_dragging = false;
+  invalidate();
+  m_sw.stop();
+}
+
+void RotateTool::draw() {
+  glColor3f(1, 0, 0);
+  double u = 50;
+  if (m_cameraCentered.getValue())
+    m_center = TPointD(0, 0);
+  else {
+    TAffine aff                        = m_viewer->getViewMatrix().inv();
+    if (m_viewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
+    if (m_viewer->getIsFlippedY()) aff = aff * TScale(1, -1);
+    u                                  = u * sqrt(aff.det());
+    m_center                           = aff * TPointD(0, 0);
   }
+  tglDrawSegment(TPointD(-u + m_center.x, m_center.y),
+                 TPointD(u + m_center.x, m_center.y));
+  tglDrawSegment(TPointD(m_center.x, -u + m_center.y),
+                 TPointD(m_center.x, u + m_center.y));
+}
 
-  void draw() override {
-    glColor3f(1, 0, 0);
-    double u = 50;
-    if (m_cameraCentered.getValue())
-      m_center = TPointD(0, 0);
-    else {
-      TAffine aff                        = m_viewer->getViewMatrix().inv();
-      if (m_viewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
-      if (m_viewer->getIsFlippedY()) aff = aff * TScale(1, -1);
-      u                                  = u * sqrt(aff.det());
-      m_center                           = aff * TPointD(0, 0);
-    }
-    tglDrawSegment(TPointD(-u + m_center.x, m_center.y),
-                   TPointD(u + m_center.x, m_center.y));
-    tglDrawSegment(TPointD(m_center.x, -u + m_center.y),
-                   TPointD(m_center.x, u + m_center.y));
-  }
+int RotateTool::getCursorId() const { return ToolCursor::RotateCursor; }
 
-  int getCursorId() const override { return ToolCursor::RotateCursor; }
-
-} rotateTool;
-
-}  // namespace
+RotateTool rotateTool;

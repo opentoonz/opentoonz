@@ -9,7 +9,7 @@ class StageObjectsData;
 
 namespace ColumnCmd {
 
-void insertEmptyColumns(const std::set<int> &indices);
+void insertEmptyColumns(const std::set<int> &indices, bool insertAfter = false);
 void insertEmptyColumn(int index);
 
 void copyColumns(const std::set<int> &indices);

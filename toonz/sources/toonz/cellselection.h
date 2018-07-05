@@ -115,6 +115,8 @@ public:
   void renameMultiCells(QList<TXshCell> &cells);
 
   static bool isEnabledCommand(std::string commandId);
+
+  void fillEmptyCell();
 };
 
 #endif  // TCELLSELECTION_H

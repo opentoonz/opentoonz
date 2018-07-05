@@ -306,6 +306,9 @@ void StylePickerTool::onImageChanged() {
 
 void StylePickerTool::updateTranslation() {
   m_colorType.setQStringName(tr("Mode:"));
+  m_colorType.setItemUIName(LINES, tr("Lines"));
+  m_colorType.setItemUIName(AREAS, tr("Areas"));
+  m_colorType.setItemUIName(ALL, tr("Lines & Areas"));
   m_passivePick.setQStringName(tr("Passive Pick"));
   m_organizePalette.setQStringName(tr("Organize Palette"));
 }

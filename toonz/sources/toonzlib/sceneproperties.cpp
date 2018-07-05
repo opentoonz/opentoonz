@@ -9,6 +9,7 @@
 #include "toonz/tcamera.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/preferences.h"
 #include "cleanuppalette.h"
 
 // TnzBase includes
@@ -20,6 +21,7 @@
 #include "tstream.h"
 #include "tpalette.h"
 #include "tproperty.h"
+#include "tiio.h"
 
 //=============================================================================
 
@@ -98,6 +100,15 @@ void TSceneProperties::assign(const TSceneProperties *sprop) {
 //-----------------------------------------------------------------------------
 
 void TSceneProperties::onInitialize() {
+  // set initial output folder to $scenefolder when the scene folder mode is set
+  // in user preferences
+  if (Preferences::instance()->getPathAliasPriority() ==
+          Preferences::SceneFolderAlias &&
+      !TFilePath("$scenefolder").isAncestorOf(m_outputProp->getPath())) {
+    std::string ext = m_outputProp->getPath().getDottedType();
+    m_outputProp->setPath(TFilePath("$scenefolder/") + ext);
+  }
+
   //  m_scanParameters->adaptToCurrentScanner();
 }
 
@@ -631,6 +642,14 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
                       throw TException();
                   } else
                     pg->loadData(is);
+
+                  ////////ここだ！
+                  {
+                    TPropertyGroup *refPg = Tiio::makeWriterProperties(ext);
+                    pg->assignUINames(refPg);
+                    delete refPg;
+                  }
+
                   is.closeChild();
                 } else
                   throw TException("unexpected tag: " + tagName);

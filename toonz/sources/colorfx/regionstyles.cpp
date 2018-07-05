@@ -4,18 +4,10 @@
 #include "tgl.h"
 #include "tcolorfunctions.h"
 #include "trandom.h"
-//#include "tsystem.h"
-//#include "tvectorrenderdata.h"
 #include "colorfxutils.h"
-//#include "tgl.h"
-//#include "tregionoutline.h"
-//#include "tpalette.h"
-//#include "tvectorimage.h"
-//#include "tstroke.h"
 #include "tflash.h"
 #include "tregion.h"
 #include "tcurves.h"
-//#include "drawutil.h"
 #include "tmathutil.h"
 #include "tstencilcontrol.h"
 
@@ -663,17 +655,14 @@ double ShadowStyle2::getParamValue(TColorStyle::double_tag, int index) const {
 
 static int nbDiffVerts(const std::vector<TPointD> &pv) {
   std::vector<TPointD> lpv;
-  bool isMissing[4] = {true, true, true, true};
   if (pv.size() == 0) return 0;
   lpv.push_back(pv[0]);
-  isMissing[0] = false;
   for (int i = 1; i < (int)pv.size(); i++) {
     bool isDiff = true;
     for (int j = 0; j < (int)lpv.size() && isDiff; j++)
       isDiff = lpv[j] == pv[i] ? false : isDiff;
     if (isDiff) {
       lpv.push_back(pv[i]);
-      isMissing[i] = false;
     }
   }
   return lpv.size();

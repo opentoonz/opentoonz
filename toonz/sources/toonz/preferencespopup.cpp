@@ -334,6 +334,13 @@ void PreferencesPopup::onCameraUnitChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onFunctionEditorToggleChanged(int index) {
+  m_pref->setFunctionEditorToggle(
+      static_cast<Preferences::FunctionEditorToggle>(index));
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onRoomChoiceChanged(int index) {
   TApp::instance()->writeSettings();
   m_pref->setCurrentRoomChoice(index);
@@ -679,6 +686,10 @@ void PreferencesPopup::onKeyframeTypeChanged(int index) {
 
 void PreferencesPopup::onAutocreationTypeChanged(int index) {
   m_pref->setAutocreationType(index);
+  if (index == 2)
+    m_enableAutoStretch->setDisabled(false);
+  else
+    m_enableAutoStretch->setDisabled(true);
 }
 //-----------------------------------------------------------------------------
 
@@ -822,12 +833,6 @@ void PreferencesPopup::onShowRasterImageDarkenBlendedInViewerChanged(
 
 void PreferencesPopup::onShowFrameNumberWithLettersChanged(int index) {
   m_pref->enableShowFrameNumberWithLetters(index == Qt::Checked);
-}
-
-//-----------------------------------------------------------------------------
-
-void PreferencesPopup::onPaletteTypeForRasterColorModelChanged(int index) {
-  m_pref->setPaletteTypeOnLoadRasterImageAsColorModel(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -1106,8 +1111,9 @@ void PreferencesPopup::onShowColumnNumbersChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onXsheetLayoutChanged(const QString &text) {
-  m_pref->setXsheetLayoutPreference(text.toStdString());
+void PreferencesPopup::onXsheetLayoutChanged(int index) {
+  m_pref->setXsheetLayoutPreference(
+      m_xsheetLayout->itemData(index).toString().toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -1163,6 +1169,36 @@ void PreferencesPopup::onColorCalibrationChanged(bool on) {
 void PreferencesPopup::onLutPathChanged() {
   m_pref->setColorCalibrationLutPath(LutManager::instance()->getMonitorName(),
                                      m_lutPathFileField->getPath());
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onEnableAutoStretch(int index) {
+  m_pref->enableAutoStretch(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onCursorBrushTypeChanged(int index) {
+  m_pref->setCursorBrushType(
+      m_cursorBrushType->itemData(index).toString().toStdString());
+}
+
+void PreferencesPopup::onCursorBrushStyleChanged(int index) {
+  m_pref->setCursorBrushStyle(
+      m_cursorBrushStyle->itemData(index).toString().toStdString());
+}
+
+void PreferencesPopup::onCursorOutlineChanged(int index) {
+  m_pref->enableCursorOutline(index == Qt::Checked);
+}
+
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onCurrentColumnDataChanged(const TPixel32 &,
+                                                  bool isDragging) {
+  if (isDragging) return;
+  m_pref->setCurrentColumnData(m_currentColumnColor->getColor());
 }
 
 //**********************************************************************************
@@ -1247,8 +1283,9 @@ PreferencesPopup::PreferencesPopup()
   QComboBox *styleSheetType = new QComboBox(this);
   m_pixelsOnlyCB =
       new CheckBox(tr("All imported images will use the same DPI"), this);
-  m_unitOm       = new QComboBox(this);
-  m_cameraUnitOm = new QComboBox(this);
+  m_unitOm               = new QComboBox(this);
+  m_cameraUnitOm         = new QComboBox(this);
+  m_functionEditorToggle = new QComboBox(this);
 
   // Choose between standard and Studio Ghibli rooms
   QComboBox *roomChoice = new QComboBox(this);
@@ -1311,8 +1348,6 @@ PreferencesPopup::PreferencesPopup()
   m_removeLevelFormat = new QPushButton("-");
   m_editLevelFormat   = new QPushButton(tr("Edit"));
 
-  QComboBox *paletteTypeForRasterColorModelComboBox = new QComboBox(this);
-
   m_importPolicy = new QComboBox;
 
   //--- Import/Export ------------------------------
@@ -1352,6 +1387,7 @@ PreferencesPopup::PreferencesPopup()
       tr("Use higher DPI for calculations - Slower but more accurate"), this);
   m_downArrowInLevelStripCreatesNewFrame = new CheckBox(
       tr("Down Arrow at End of Level Strip Creates a New Frame"), this);
+  m_enableAutoStretch = new CheckBox(tr("Enable auto-stretch frame"), this);
 
   //--- Tools -------------------------------
   categoryList->addItem(tr("Tools"));
@@ -1361,6 +1397,26 @@ PreferencesPopup::PreferencesPopup()
       tr("Multi Layer Style Picker : Switch Levels by Picking"), this);
   CheckBox *useSaveboxToLimitFillingOpCB =
       new CheckBox(tr("Use the TLV Savebox to Limit Filling Operations"), this);
+
+  QStringList brushTypes;
+  // options should not be translatable as they are used as key strings
+  brushTypes << tr("Small") << tr("Large") << tr("Crosshair");
+  m_cursorBrushType = new QComboBox(this);
+  m_cursorBrushType->addItems(brushTypes);
+  m_cursorBrushType->setItemData(0, "Small");
+  m_cursorBrushType->setItemData(1, "Large");
+  m_cursorBrushType->setItemData(2, "Crosshair");
+
+  QStringList brushStyles;
+  brushStyles << tr("Default") << tr("Left-Handed") << tr("Simple");
+  m_cursorBrushStyle = new QComboBox(this);
+  m_cursorBrushStyle->addItems(brushStyles);
+  m_cursorBrushStyle->setItemData(0, "Default");
+  m_cursorBrushStyle->setItemData(1, "Left-Handed");
+  m_cursorBrushStyle->setItemData(2, "Simple");
+
+  CheckBox *cursorOutlineCB =
+      new CheckBox(tr("Show Cursor Size Outlines"), this);
 
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
@@ -1392,19 +1448,25 @@ PreferencesPopup::PreferencesPopup()
 
   QStringList xsheetLayouts;
   // options should not be translatable as they are used as key strings
-  xsheetLayouts << "Classic"
-                << "Classic-revised"
-                << "Compact";
-  QComboBox *xsheetLayoutOptions = new QComboBox(this);
-  xsheetLayoutOptions->addItems(xsheetLayouts);
-  xsheetLayoutOptions->setCurrentIndex(
-      xsheetLayoutOptions->findText(m_pref->getXsheetLayoutPreference()));
+  xsheetLayouts << tr("Classic") << tr("Classic-revised") << tr("Compact");
+  m_xsheetLayout = new QComboBox(this);
+  m_xsheetLayout->addItems(xsheetLayouts);
+  m_xsheetLayout->setItemData(0, "Classic");
+  m_xsheetLayout->setItemData(1, "Classic-revised");
+  m_xsheetLayout->setItemData(2, "Compact");
+
+  m_xsheetLayout->setCurrentIndex(
+      m_xsheetLayout->findData(m_pref->getXsheetLayoutPreference()));
   CheckBox *showCurrentTimelineCB = new CheckBox(
       tr("Show Current Time Indicator (Timeline Mode only)"), this);
 
   QLabel *note_xsheet =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_xsheet->setStyleSheet("font-size: 10px; font: italic;");
+
+  TPixel32 currectColumnColor;
+  m_pref->getCurrentColumnData(currectColumnColor);
+  m_currentColumnColor = new ColorField(this, false, currectColumnColor);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1521,6 +1583,14 @@ PreferencesPopup::PreferencesPopup()
   pathAliasPriority->setToolTip(
       tr("This option defines which alias to be used\nif both are possible on "
          "coding file path."));
+  pathAliasPriority->setItemData(0, QString(" "), Qt::ToolTipRole);
+  QString scenefolderTooltip =
+      tr("Choosing this option will set initial location of all file browsers "
+         "to $scenefolder.\n"
+         "Also the initial output destination for new scenes will be set to "
+         "$scenefolder as well.");
+  pathAliasPriority->setItemData(1, scenefolderTooltip, Qt::ToolTipRole);
+  pathAliasPriority->setItemData(2, QString(" "), Qt::ToolTipRole);
 
   //--- Interface ------------------------------
   QStringList styleSheetList;
@@ -1552,6 +1622,13 @@ PreferencesPopup::PreferencesPopup()
         ::units;
   m_cameraUnitOm->setCurrentIndex((idx < ::unitsCount) ? idx : ::inchIdx);
 
+  QStringList functionEditorList;
+  functionEditorList << tr("Graph Editor Opens in Popup")
+                     << tr("Spreadsheet Opens in Popup")
+                     << tr("Toggle Between Graph Editor and Spreadsheet");
+  m_functionEditorToggle->addItems(functionEditorList);
+  m_functionEditorToggle->setCurrentIndex(
+      static_cast<int>(m_pref->getFunctionEditorToggle()));
   QStringList roomList;
   int currentRoomIndex = 0;
   for (int i = 0; i < m_pref->getRoomChoiceCount(); i++) {
@@ -1649,13 +1726,6 @@ PreferencesPopup::PreferencesPopup()
 
   rebuildFormatsList();
 
-  QStringList paletteTypes;
-  paletteTypes << tr("Pick Every Colors as Different Styles")
-               << tr("Integrate Similar Colors as One Style");
-  paletteTypeForRasterColorModelComboBox->addItems(paletteTypes);
-  paletteTypeForRasterColorModelComboBox->setCurrentIndex(
-      m_pref->getPaletteTypeOnLoadRasterImageAsColorModel());
-
   QStringList policies;
   policies << tr("Always ask before loading or importing")
            << tr("Always import the file to the current project")
@@ -1727,6 +1797,8 @@ PreferencesPopup::PreferencesPopup()
   m_autocreationType->addItems(autocreationTypes);
   int autocreationType = m_pref->getAutocreationType();
   m_autocreationType->setCurrentIndex(autocreationType);
+  m_enableAutoStretch->setChecked(m_pref->isAutoStretchEnabled());
+  if (autocreationType != 2) m_enableAutoStretch->setDisabled(true);
 
   QStringList vectorSnappingTargets;
   vectorSnappingTargets << tr("Strokes") << tr("Guides") << tr("All");
@@ -1743,6 +1815,12 @@ PreferencesPopup::PreferencesPopup()
       m_pref->getDropdownShortcutsCycleOptions() ? 1 : 0);
   multiLayerStylePickerCB->setChecked(m_pref->isMultiLayerStylePickerEnabled());
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
+
+  m_cursorBrushType->setCurrentIndex(
+      m_cursorBrushType->findData(m_pref->getCursorBrushType()));
+  m_cursorBrushStyle->setCurrentIndex(
+      m_cursorBrushStyle->findData(m_pref->getCursorBrushStyle()));
+  cursorOutlineCB->setChecked(m_pref->isCursorOutlineEnabled());
 
   //--- Xsheet ------------------------------
   xsheetAutopanDuringPlaybackCB->setChecked(m_pref->isXsheetAutopanEnabled());
@@ -1952,6 +2030,11 @@ PreferencesPopup::PreferencesPopup()
         styleLay->addWidget(new QLabel(tr("Rooms*:"), this), 4, 0,
                             Qt::AlignRight | Qt::AlignVCenter);
         styleLay->addWidget(roomChoice, 4, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+        styleLay->addWidget(new QLabel(tr("Function Editor*:"), this), 5, 0,
+                            Qt::AlignRight | Qt::AlignVCenter);
+        styleLay->addWidget(m_functionEditorToggle, 5, 1,
+                            Qt::AlignLeft | Qt::AlignVCenter);
       }
       styleLay->setColumnStretch(0, 0);
       styleLay->setColumnStretch(1, 0);
@@ -2101,12 +2184,6 @@ PreferencesPopup::PreferencesPopup()
         cacheLay->addWidget(m_addLevelFormat, 2, 2);
         cacheLay->addWidget(m_removeLevelFormat, 2, 3);
         cacheLay->addWidget(m_editLevelFormat, 2, 4);
-
-        cacheLay->addWidget(
-            new QLabel(
-                tr("Palette Type on Loading Raster Image as Color Model:")),
-            3, 0, 1, 6);
-        cacheLay->addWidget(paletteTypeForRasterColorModelComboBox, 4, 1, 1, 5);
       }
       cacheLay->setColumnStretch(0, 0);
       cacheLay->setColumnStretch(1, 0);
@@ -2204,6 +2281,7 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignRight);
         drawingTopLay->addWidget(m_autocreationType, 5, 1, 1, 3,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+        drawingTopLay->addWidget(m_enableAutoStretch, 5, 3);
         drawingTopLay->addWidget(new QLabel(tr("Vector Snapping:")), 6, 0,
                                  Qt::AlignRight);
         drawingTopLay->addWidget(m_vectorSnappingTargetCB, 6, 1, 1, 3,
@@ -2240,26 +2318,59 @@ PreferencesPopup::PreferencesPopup()
 
     //--- Tools ---------------------------
     QWidget *toolsBox          = new QWidget(this);
-    QGridLayout *toolsFrameLay = new QGridLayout();
+    QVBoxLayout *toolsFrameLay = new QVBoxLayout();
     toolsFrameLay->setMargin(15);
-    toolsFrameLay->setHorizontalSpacing(15);
-    toolsFrameLay->setVerticalSpacing(10);
+    toolsFrameLay->setSpacing(10);
     {
-      toolsFrameLay->addWidget(new QLabel(tr("Dropdown Shortcuts:")), 0, 0,
+      QGridLayout *ToolsTopLay = new QGridLayout();
+      ToolsTopLay->setVerticalSpacing(10);
+      ToolsTopLay->setHorizontalSpacing(15);
+      ToolsTopLay->setMargin(0);
+      {
+        ToolsTopLay->addWidget(new QLabel(tr("Dropdown Shortcuts:")), 0, 0,
                                Qt::AlignRight | Qt::AlignVCenter);
-      toolsFrameLay->addWidget(m_dropdownShortcutsCycleOptionsCB, 0, 1);
-      toolsFrameLay->addWidget(useSaveboxToLimitFillingOpCB, 1, 0, 1, 3,
+        ToolsTopLay->addWidget(m_dropdownShortcutsCycleOptionsCB, 0, 1);
+        ToolsTopLay->addWidget(useSaveboxToLimitFillingOpCB, 1, 0, 1, 3,
                                Qt::AlignLeft | Qt::AlignVCenter);
-      toolsFrameLay->addWidget(multiLayerStylePickerCB, 2, 0, 1, 3,
+        ToolsTopLay->addWidget(multiLayerStylePickerCB, 2, 0, 1, 3,
                                Qt::AlignLeft | Qt::AlignVCenter);
+
+        toolsFrameLay->addLayout(ToolsTopLay, 0);
+
+        QGroupBox *cursorStyleGroupBox =
+            new QGroupBox(tr("Cursor Options"), this);
+        QVBoxLayout *cursorStylesLay = new QVBoxLayout();
+        cursorStylesLay->setMargin(10);
+        cursorStylesLay->setSpacing(10);
+        {
+          QGridLayout *cursorStylesGridLay = new QGridLayout();
+          cursorStylesGridLay->setMargin(0);
+          cursorStylesGridLay->setHorizontalSpacing(15);
+          cursorStylesGridLay->setVerticalSpacing(10);
+          {
+            cursorStylesGridLay->addWidget(new QLabel(tr("Basic Cursor Type:")),
+                                           0, 0,
+                                           Qt::AlignRight | Qt::AlignVCenter);
+            cursorStylesGridLay->addWidget(m_cursorBrushType, 0, 1);
+
+            cursorStylesGridLay->addWidget(new QLabel(tr("Cursor Style:")), 1,
+                                           0,
+                                           Qt::AlignRight | Qt::AlignVCenter);
+            cursorStylesGridLay->addWidget(m_cursorBrushStyle, 1, 1);
+
+            cursorStylesGridLay->addWidget(cursorOutlineCB, 2, 0, 1, 3,
+                                           Qt::AlignLeft | Qt::AlignVCenter);
+          }
+          cursorStylesLay->addLayout(cursorStylesGridLay, 0);
+
+          cursorStyleGroupBox->setLayout(cursorStylesLay);
+        }
+        ToolsTopLay->addWidget(cursorStyleGroupBox, 3, 0, 1, 3);
+      }
+      toolsFrameLay->addLayout(ToolsTopLay, 0);
+
+      toolsFrameLay->addStretch(1);
     }
-    toolsFrameLay->setColumnStretch(0, 0);
-    toolsFrameLay->setColumnStretch(1, 0);
-    toolsFrameLay->setColumnStretch(2, 1);
-    toolsFrameLay->setRowStretch(0, 0);
-    toolsFrameLay->setRowStretch(1, 0);
-    toolsFrameLay->setRowStretch(2, 0);
-    toolsFrameLay->setRowStretch(3, 1);
     toolsBox->setLayout(toolsFrameLay);
     stackedWidget->addWidget(toolsBox);
 
@@ -2276,7 +2387,7 @@ PreferencesPopup::PreferencesPopup()
       {
         xsheetFrameLay->addWidget(new QLabel(tr("Column Header Layout*:")), 0,
                                   0, Qt::AlignRight | Qt::AlignVCenter);
-        xsheetFrameLay->addWidget(xsheetLayoutOptions, 0, 1, 1, 2,
+        xsheetFrameLay->addWidget(m_xsheetLayout, 0, 1, 1, 2,
                                   Qt::AlignLeft | Qt::AlignVCenter);
 
         xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")),
@@ -2312,6 +2423,10 @@ PreferencesPopup::PreferencesPopup()
         xsheetFrameLay->addWidget(showColumnNumbersCB, 12, 0, 1, 2);
         xsheetFrameLay->addWidget(m_syncLevelRenumberWithXsheet, 13, 0, 1, 2);
         xsheetFrameLay->addWidget(showCurrentTimelineCB, 14, 0, 1, 2);
+
+        xsheetFrameLay->addWidget(new QLabel(tr("Current Column Color:")), 15,
+                                  0, Qt::AlignRight | Qt::AlignVCenter);
+        xsheetFrameLay->addWidget(m_currentColumnColor, 15, 1);
       }
       xsheetFrameLay->setColumnStretch(0, 0);
       xsheetFrameLay->setColumnStretch(1, 0);
@@ -2576,6 +2691,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onUnitChanged(int)));
   ret = ret && connect(m_cameraUnitOm, SIGNAL(currentIndexChanged(int)),
                        SLOT(onCameraUnitChanged(int)));
+  ret = ret && connect(m_functionEditorToggle, SIGNAL(currentIndexChanged(int)),
+                       SLOT(onFunctionEditorToggleChanged(int)));
   ret = ret && connect(roomChoice, SIGNAL(currentIndexChanged(int)),
                        SLOT(onRoomChoiceChanged(int)));
   ret = ret && connect(m_iconSizeLx, SIGNAL(editingFinished()),
@@ -2648,9 +2765,6 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onRemoveLevelFormat()));
   ret = ret && connect(m_editLevelFormat, SIGNAL(clicked()),
                        SLOT(onEditLevelFormat()));
-  ret = ret && connect(paletteTypeForRasterColorModelComboBox,
-                       SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onPaletteTypeForRasterColorModelChanged(int)));
   ret = ret && connect(m_importPolicy, SIGNAL(currentIndexChanged(int)),
                        SLOT(onImportPolicyChanged(int)));
   ret = ret && connect(TApp::instance()->getCurrentScene(),
@@ -2698,6 +2812,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDownArrowInLevelStripCreatesNewFrame(int)));
   ret = ret && connect(m_newLevelToCameraSizeCB, SIGNAL(clicked(bool)),
                        SLOT(onNewLevelToCameraSizeChanged(bool)));
+  ret = ret && connect(m_enableAutoStretch, SIGNAL(stateChanged(int)), this,
+                       SLOT(onEnableAutoStretch(int)));
 
   //--- Tools -----------------------
 
@@ -2708,6 +2824,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onMultiLayerStylePickerChanged(int)));
   ret = ret && connect(useSaveboxToLimitFillingOpCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onGetFillOnlySavebox(int)));
+  ret = ret && connect(m_cursorBrushType, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onCursorBrushTypeChanged(int)));
+  ret = ret && connect(m_cursorBrushStyle, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onCursorBrushStyleChanged(int)));
+  ret = ret && connect(cursorOutlineCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onCursorOutlineChanged(int)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),
@@ -2740,9 +2862,13 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_syncLevelRenumberWithXsheet, SIGNAL(stateChanged(int)),
                        this, SLOT(onSyncLevelRenumberWithXsheetChanged(int)));
 
-  ret = ret && connect(xsheetLayoutOptions,
-                       SIGNAL(currentIndexChanged(const QString &)), this,
-                       SLOT(onXsheetLayoutChanged(const QString &)));
+  ret = ret && connect(m_xsheetLayout, SIGNAL(currentIndexChanged(int)), this,
+                       SLOT(onXsheetLayoutChanged(int)));
+
+  ret =
+      ret && connect(m_currentColumnColor,
+                     SIGNAL(colorChanged(const TPixel32 &, bool)),
+                     SLOT(onCurrentColumnDataChanged(const TPixel32 &, bool)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),

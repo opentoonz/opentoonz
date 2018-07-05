@@ -51,10 +51,34 @@
       <file>Resources/ruler_modify.png</file>
       <file>Resources/ruler_new.png</file>
       <file>Resources/ex_freehand.png</file>
+      <file>Resources/ex_freehand_left.png</file>
       <file>Resources/ex_polyline.png</file>
+      <file>Resources/ex_polyline_left.png</file>
       <file>Resources/ex_rectangle.png</file>
+      <file>Resources/ex_rectangle_left.png</file>
       <file>Resources/ex_line.png</file>
+      <file>Resources/ex_line_left.png</file>
       <file>Resources/ex_area.png</file>
+      <file>Resources/ex_area_left.png</file>
       <file>Resources/ex_fill_no_autopaint.png</file>
+      <file>Resources/ex_fill_no_autopaint_left.png</file>
+      <file>Resources/edit_FX_notext.png</file>
+      <file>Resources/move_z_notext.png</file>
+      <file>Resources/scale_hv_notext.png</file>
+      <file>Resources/ex_FX.png</file>
+      <file>Resources/ex_FX_left.png</file>
+      <file>Resources/ex_hv.png</file>
+      <file>Resources/ex_hv_left.png</file>
+      <file>Resources/ex_rgb.png</file>
+      <file>Resources/ex_rgb_left.png</file>
+      <file>Resources/ex_style_area.png</file>
+      <file>Resources/ex_style_area_left.png</file>
+      <file>Resources/ex_style_line.png</file>
+      <file>Resources/ex_style_line_left.png</file>
+      <file>Resources/ex_z.png</file>
+      <file>Resources/ex_z_left.png</file>
+      <file>Resources/brush_large.png</file>
+      <file>Resources/brush_crosshair.png</file>
+      <file>Resources/tracker.png</file>
     </qresource>
 </RCC>

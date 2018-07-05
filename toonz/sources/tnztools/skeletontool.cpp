@@ -291,6 +291,9 @@ void SkeletonTool::updateTranslation() {
   m_showOnlyActiveSkeleton.setQStringName(tr("Show Only Active Skeleton"));
   m_globalKeyframes.setQStringName(tr("Global Key"));
   m_mode.setQStringName(tr("Mode:"));
+  m_mode.setItemUIName(BUILD_SKELETON, tr("Build Skeleton"));
+  m_mode.setItemUIName(ANIMATE, tr("Animate"));
+  m_mode.setItemUIName(INVERSE_KINEMATICS, tr("Inverse Kinematics"));
 }
 
 //-------------------------------------------------------------------

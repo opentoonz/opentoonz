@@ -76,6 +76,7 @@
 #include <QTranslator>
 #include <QFileInfo>
 #include <QSettings>
+#include <QLibraryInfo>
 
 using namespace DVGui;
 #if defined LINETEST
@@ -90,13 +91,13 @@ const char *systemVarPrefix     = "LINETEST";
 #else
 const char *applicationName     = "OpenToonz";
 const char *applicationVersion  = "1.2";
-const char *applicationRevision = "0";
+const char *applicationRevision = "1";
 const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 #endif
 
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 
-const char *applicationFullName = "OpenToonz 1.2";  // to be 1.2.n from 1.2.1
+const char *applicationFullName = "OpenToonz 1.2.1";  // next will be 1.3 (not 1.3.0)
 const char *rootVarName         = "TOONZROOT";
 const char *systemVarPrefix     = "TOONZ";
 
@@ -166,15 +167,18 @@ static void initToonzEnv() {
 
   /*-- TOONZROOTのPathの確認 --*/
   // controllo se la xxxroot e' definita e corrisponde ad un folder esistente
+
+  /*-- ENGLISH: Confirm TOONZROOT Path
+        Check if the xxxroot is defined and corresponds to an existing folder
+  --*/
+
   TFilePath stuffDir = TEnv::getStuffDir();
-  if (stuffDir == TFilePath() || !TFileStatus(stuffDir).isDirectory()) {
-    if (stuffDir == TFilePath())
-      fatalError("Undefined or empty: \"" + toQString(TEnv::getRootVarPath()) +
-                 "\"");
-    else
-      fatalError("Folder \"" + toQString(stuffDir) +
-                 "\" not found or not readable");
-  }
+  if (stuffDir == TFilePath())
+    fatalError("Undefined or empty: \"" + toQString(TEnv::getRootVarPath()) +
+               "\"");
+  else if (!TFileStatus(stuffDir).isDirectory())
+    fatalError("Folder \"" + toQString(stuffDir) +
+               "\" not found or not readable");
 
   Tiio::defineStd();
   initImageIo();
@@ -502,8 +506,20 @@ int main(int argc, char *argv[]) {
   toolTranslator.load("tnztools", languagePathString);
   qApp->installTranslator(&toolTranslator);
 
+  // load translation for file writers properties
+  QTranslator imageTranslator;
+  imageTranslator.load("image", languagePathString);
+  qApp->installTranslator(&imageTranslator);
+
+  QTranslator qtTranslator;
+  qtTranslator.load("qt_" + QLocale::system().name(),
+                    QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+  a.installTranslator(&qtTranslator);
+
   // Aggiorno la traduzione delle properties di tutti i tools
   TTool::updateToolsPropertiesTranslation();
+  // Apply translation to file writers properties
+  Tiio::updateFileWritersPropertiesTranslation();
 
   splash.showMessage(offsetStr + "Loading styles ...", Qt::AlignCenter,
                      Qt::white);

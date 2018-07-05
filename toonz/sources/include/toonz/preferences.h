@@ -84,6 +84,12 @@ public:
     ProjectFolderOnly
   };
 
+  enum FunctionEditorToggle {
+    ShowGraphEditorInPopup = 0,
+    ShowFunctionSpreadsheetInPopup,
+    ToggleBetweenGraphAndSpreadsheet
+  };
+
 public:
   static Preferences *instance();
 
@@ -235,6 +241,11 @@ public:
   void setInterfaceFontWeight(int weight);
   int getInterfaceFontWeight() { return m_interfaceFontWeight; }
 
+  void setFunctionEditorToggle(FunctionEditorToggle status);
+  FunctionEditorToggle getFunctionEditorToggle() {
+    return m_functionEditorToggle;
+  }
+
   // color calibration using 3DLUT
   void enableColorCalibration(bool on);
   bool isColorCalibrationEnabled() const { return m_colorCalibrationEnabled; }
@@ -287,11 +298,6 @@ public:
     return m_removeSceneNumberFromLoadedLevelName;
   }
 
-  void setPaletteTypeOnLoadRasterImageAsColorModel(int type);
-  int getPaletteTypeOnLoadRasterImageAsColorModel() const {
-    return m_paletteTypeOnLoadRasterImageAsColorModel;
-  }
-
   void setDefaultImportPolicy(int policy);
   int getDefaultImportPolicy() { return m_importPolicy; }
 
@@ -320,6 +326,9 @@ public:
 
   bool isAutoCreateEnabled() const { return m_autocreationType > 0; }
   bool isAnimationSheetEnabled() const { return m_autocreationType == 2; }
+
+  void enableAutoStretch(bool on);
+  bool isAutoStretchEnabled() const { return m_enableAutoStretch; }
 
   void enableSaveUnpaintedInCleanup(bool on);
   bool isSaveUnpaintedInCleanupEnable() const {
@@ -375,6 +384,15 @@ public:
   bool getDropdownShortcutsCycleOptions() {
     return m_dropdownShortcutsCycleOptions;
   }
+
+  void setCursorBrushType(std::string brushType);
+  QString getCursorBrushType() const { return m_cursorBrushType; }
+
+  void setCursorBrushStyle(std::string brushStyle);
+  QString getCursorBrushStyle() const { return m_cursorBrushStyle; }
+
+  void enableCursorOutline(bool on);
+  bool isCursorOutlineEnabled() const { return m_cursorOutlineEnabled; }
 
   // Xsheet  tab
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
@@ -437,6 +455,11 @@ public:
 
   void setLoadedXsheetLayout(std::string layout);
   QString getLoadedXsheetLayout() const { return m_loadedXsheetLayout; }
+
+  void setCurrentColumnData(const TPixel &currentColumnColor);
+  void getCurrentColumnData(TPixel &currentColumnColor) const {
+    currentColumnColor = m_currentColumnColor;
+  }
 
   // Animation  tab
 
@@ -628,12 +651,6 @@ private:
   bool m_onionSkinEnabled;
   bool m_multiLayerStylePickerEnabled;
   bool m_precompute;
-  /*--
-  Color Modelにラスタ画像を読み込んだとき、パレットをどのように作るか
-  0 : 全ての異なるピクセルの色を別のStyleにする, 1 :
-似ている色をまとめて1つのStyleにする
---*/
-  int m_paletteTypeOnLoadRasterImageAsColorModel;
 
   bool m_showKeyframesOnXsheetCellArea;
   std::string m_layerNameEncoding = "SJIS";  // Fixed to SJIS for now. You can
@@ -665,7 +682,11 @@ private:
   // defines which alias to be used if both are possible on coding file path
   PathAliasPriority m_pathAliasPriority;
 
+  // defines behavior of toggle switch in function editor
+  FunctionEditorToggle m_functionEditorToggle;
+
   bool m_currentTimelineEnabled;
+  bool m_enableAutoStretch;
 
   // color calibration using 3DLUT
   bool m_colorCalibrationEnabled = false;
@@ -675,6 +696,13 @@ private:
 
   // release version check
   bool m_latestVersionCheckEnabled = true;
+
+  // Cursor settings
+  QString m_cursorBrushType;
+  QString m_cursorBrushStyle;
+  bool m_cursorOutlineEnabled = false;
+
+  TPixel32 m_currentColumnColor;
 
 private:
   Preferences();

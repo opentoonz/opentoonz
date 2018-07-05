@@ -229,6 +229,9 @@ void copyBackBufferToFrontBuffer(const TRect &rect) {
 }
 
 #endif
+
+const TRectD InvalidateAllRect(0, 0, -1, -1);
+
 //-----------------------------------------------------------------------------
 }  // namespace
 //-----------------------------------------------------------------------------
@@ -352,7 +355,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! emphasize lines with style#1 regardless of the current style
-*/
+ */
 class Ink1CheckToggleCommand final : public MenuItemHandler {
 public:
   Ink1CheckToggleCommand() : MenuItemHandler("MI_Ink1Check") {}
@@ -507,6 +510,8 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   grabGesture(Qt::PanGesture);
   grabGesture(Qt::PinchGesture);
 
+  setUpdateBehavior(QOpenGLWidget::PartialUpdate);
+
   if (Preferences::instance()->isColorCalibrationEnabled())
     m_lutCalibrator = new LutCalibrator();
 }
@@ -520,7 +525,7 @@ void SceneViewer::setVisual(const ImagePainter::VisualSettings &settings) {
   m_visualSettings = settings;
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
-  if (repaint) update();
+  if (repaint) GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -600,7 +605,7 @@ void SceneViewer::freeze(bool on) {
     setCursor(Qt::ForbiddenCursor);
     m_freezedStatus = UPDATE_FREEZED;
   }
-  update();
+  GLInvalidateAll();
 }
 
 //-------------------------------------------------------------------------------
@@ -631,7 +636,7 @@ void SceneViewer::enablePreview(int previewMode) {
 
   m_previewMode = previewMode;
 
-  update();
+  GLInvalidateAll();
 
   // for updating the title bar
   emit previewToggled();
@@ -926,7 +931,11 @@ void SceneViewer::drawEnableScissor() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::drawDisableScissor() {
-  if (!m_clipRect.isEmpty() && !m_draw3DMode) glDisable(GL_SCISSOR_TEST);
+  if (!m_clipRect.isEmpty() && !m_draw3DMode) {
+    glDisable(GL_SCISSOR_TEST);
+  }
+  // clear the clipping rect
+  m_clipRect.empty();
 }
 
 //-----------------------------------------------------------------------------
@@ -1357,11 +1366,13 @@ static void drawFpsGraph(int t0, int t1) {
 //#define FPS_HISTOGRAM
 
 void SceneViewer::paintGL() {
+#ifdef _DEBUG
   if (!check_framebuffer_status()) {
     /* QGLWidget の widget 生成/削除のタイミングで(platform によって?)
      * GL_FRAMEBUFFER_UNDEFINED の状態で paintGL() が呼ばれてしまうようだ */
     return;
   }
+#endif
 #ifdef MACOSX
   // followin lines are necessary to solve a problem on iMac20
   // It seems that for some errors in the openGl implementation, buffers are not
@@ -1419,19 +1430,14 @@ void SceneViewer::paintGL() {
 
   drawBuildVars();
 
-  check_framebuffer_status();
-  copyFrontBufferToBackBuffer();
+  // This seems not to be necessary for now.
+  // copyFrontBufferToBackBuffer();
 
-  check_framebuffer_status();
   drawEnableScissor();
-  check_framebuffer_status();
   drawBackground();
-  check_framebuffer_status();
 
   if (m_previewMode != FULL_PREVIEW) {
-    check_framebuffer_status();
     drawCameraStand();
-    check_framebuffer_status();
   }
 
   if (isPreviewEnabled()) drawPreview();
@@ -1630,7 +1636,10 @@ TRect SceneViewer::getActualClipRect(const TAffine &aff) {
     TPointD p11 = winToWorld(clipRect.getP11());
     clipRect = TRectD(TPointD(std::min(p00.x, p01.x), std::min(p00.y, p10.y)),
                       TPointD(std::max(p11.x, p10.x), std::max(p11.y, p01.y)));
-  } else if (m_clipRect.isEmpty())
+  }
+  // this condition will catch both cases of m_clipRect == empty and
+  // m_clipRect == InvalidateAllRect
+  else if (m_clipRect.isEmpty())
     clipRect -= TPointD(viewerSize.lx / 2, viewerSize.ly / 2);
   else {
     TRectD app = aff * (m_clipRect.enlarge(3));
@@ -1671,7 +1680,6 @@ TAffine SceneViewer::getSceneMatrix() const {
 
 void SceneViewer::setViewMatrix(const TAffine &aff, int viewMode) {
   m_viewAff[viewMode] = aff;
-
   // In case the previewer is on, request a delayed update
   if (m_previewMode != NO_PREVIEW) requestTimedRefresh();
 }
@@ -1686,7 +1694,7 @@ bool SceneViewer::is3DView() const {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::invalidateAll() {
-  m_clipRect.empty();
+  m_clipRect = InvalidateAllRect;
   update();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();
@@ -1694,7 +1702,7 @@ void SceneViewer::invalidateAll() {
 
 //-----------------------------------------------------------------------------
 /*! Pan the viewer by using "navigator" (red rectangle) in level strip
-*/
+ */
 void SceneViewer::navigatorPan(const QPoint &delta) {
   panQt(delta);
   m_pos += delta;
@@ -1703,7 +1711,7 @@ void SceneViewer::navigatorPan(const QPoint &delta) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::GLInvalidateAll() {
-  m_clipRect.empty();
+  m_clipRect = InvalidateAllRect;
   update();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();
@@ -1712,13 +1720,18 @@ void SceneViewer::GLInvalidateAll() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::GLInvalidateRect(const TRectD &rect) {
-  m_clipRect = rect;
+  // in case that GLInvalidateAll is called just before coming here,
+  // ignore the clip rect and refresh entire viewer
+  if (m_clipRect == InvalidateAllRect)
+    return;
+  else if (rect.isEmpty())
+    m_clipRect = InvalidateAllRect;
+  else
+    m_clipRect += rect;
   update();
-  m_clipRect.empty();
   if (m_vRuler) m_vRuler->update();
   if (m_hRuler) m_hRuler->update();
 }
-
 //-----------------------------------------------------------------------------
 
 // delta.x: right panning, pixel; delta.y: down panning, pixel
@@ -1803,32 +1816,34 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
 
 //-----------------------------------------------------------------------------
 /*! a factor for getting pixel-based zoom ratio
-*/
+ */
 double SceneViewer::getDpiFactor() {
   // When the current unit is "pixels", always use a standard dpi
+  double cameraDpi = TApp::instance()
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getCurrentCamera()
+                         ->getDpi()
+                         .x;
   if (Preferences::instance()->getPixelsOnly()) {
     return Stage::inch / Stage::standardDpi;
   }
+
   // When preview mode, use a camera DPI
   else if (isPreviewEnabled()) {
-    return Stage::inch /
-           TApp::instance()
-               ->getCurrentScene()
-               ->getScene()
-               ->getCurrentCamera()
-               ->getDpi()
-               .x;
+    return Stage::inch / cameraDpi;
   }
   // When level editing mode, use an image DPI
   else if (TApp::instance()->getCurrentFrame()->isEditingLevel()) {
     TXshSimpleLevel *sl;
     sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-    if (!sl) return 1.;
-    if (sl->getType() == PLI_XSHLEVEL) return 1.;
+    if (!sl) return Stage::inch / cameraDpi;
+    if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / cameraDpi;
     if (sl->getImageDpi() != TPointD())
       return Stage::inch / sl->getImageDpi().x;
     if (sl->getDpi() != TPointD()) return Stage::inch / sl->getDpi().x;
-    return 1.;
+    // no valid dpi, use camera dpi
+    return Stage::inch / cameraDpi;
   }
   // When the special case in the scene editing mode:
   // If the option "ActualPixelViewOnSceneEditingMode" is ON,
@@ -1839,16 +1854,16 @@ double SceneViewer::getDpiFactor() {
            !CameraTestCheck::instance()->isEnabled()) {
     TXshSimpleLevel *sl;
     sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-    if (!sl) return 1.;
-    if (sl->getType() == PLI_XSHLEVEL) return 1.;
-    if (sl->getDpi() == TPointD()) return 1.;
+    if (!sl) return Stage::inch / cameraDpi;
+    if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / cameraDpi;
+    if (sl->getDpi() == TPointD()) return Stage::inch / cameraDpi;
     // use default value for the argument of getDpi() (=TFrameId::NO_FRAME）
     // so that the dpi of the first frame in the level will be returned.
     return Stage::inch / sl->getDpi().x;
   }
-  // When the scene editing mode without any option, don't think about DPI
+  // When the scene editing mode without any option, use the camera dpi
   else {
-    return 1.;
+    return Stage::inch / cameraDpi;
   }
 }
 
@@ -2040,6 +2055,7 @@ void SceneViewer::fitToCamera() {
   double xratio = (double)viewRect.width() / cameraRect.getLx();
   double yratio = (double)viewRect.height() / cameraRect.getLy();
   double ratio  = std::min(xratio, yratio);
+  if (ratio == 0.0) return;
   if (tempIsFlippedX)
     setViewMatrix(TScale(-1, 1) * m_viewAff[m_viewMode], m_viewMode);
   if (tempIsFlippedY)
@@ -2132,7 +2148,7 @@ void SceneViewer::onLevelChanged() {
 //-----------------------------------------------------------------------------
 /*! when level is switched, update m_dpiScale in order to show white background
  * for Ink&Paint work properly
-*/
+ */
 void SceneViewer::onLevelSwitched() {
   TApp *app        = TApp::instance();
   TTool *tool      = app->getCurrentTool()->getTool();
@@ -2151,7 +2167,7 @@ void SceneViewer::onXsheetChanged() {
   TTool *tool    = TApp::instance()->getCurrentTool()->getTool();
   if (tool && tool->isEnabled()) tool->updateMatrix();
   onLevelChanged();
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -2160,14 +2176,14 @@ void SceneViewer::onObjectSwitched() {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (tool && tool->isEnabled()) tool->updateMatrix();
   onLevelChanged();
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneViewer::onSceneChanged() {
   onLevelChanged();
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -2182,16 +2198,16 @@ void SceneViewer::onFrameSwitched() {
     tool->onEnter();
   }
 
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
 /*! when tool options are changed, update tooltip immediately
-*/
+ */
 void SceneViewer::onToolChanged() {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (tool) setToolCursor(this, tool->getCursorId());
-  update();
+  GLInvalidateAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -2539,7 +2555,7 @@ TRectD SceneViewer::getGeometry() const {
 
 //-----------------------------------------------------------------------------
 /*! delete preview - subcamera executed from context menu
-*/
+ */
 void SceneViewer::doDeleteSubCamera() {
   PreviewSubCameraManager::instance()->deleteSubCamera(this);
 }

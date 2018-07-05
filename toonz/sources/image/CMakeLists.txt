@@ -91,6 +91,8 @@ elseif(BUILD_TARGET_UNIX)
     )
 endif()
 
+add_translation(image ${HEADERS} ${SOURCES})
+
 add_library(image SHARED ${HEADERS} ${SOURCES})
 add_definitions(
     -DTNZIMAGE_DLL

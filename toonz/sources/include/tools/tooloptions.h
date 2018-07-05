@@ -108,7 +108,7 @@ protected:
   QHBoxLayout *m_layout;
 
 public:
-  ToolOptionsBox(QWidget *parent);
+  ToolOptionsBox(QWidget *parent, bool isScrollable = false);
   ~ToolOptionsBox();
 
   virtual void
@@ -183,6 +183,8 @@ public:
 class ArrowToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
+  enum AXIS { Position = 0, Rotation, Scale, Shear, CenterPosition, AllAxis };
+
   TPropertyGroup *m_pg;
   bool m_splined;
   TTool *m_tool;
@@ -190,7 +192,8 @@ class ArrowToolOptionsBox final : public ToolOptionsBox {
   TObjectHandle *m_objHandle;
   TXsheetHandle *m_xshHandle;
 
-  QStackedWidget *m_mainStackedWidget;
+  QWidget **m_axisOptionWidgets;
+  QWidget *m_pickWidget;
 
   // General
   ToolOptionCombo *m_chooseActiveAxisCombo;
@@ -249,6 +252,9 @@ class ArrowToolOptionsBox final : public ToolOptionsBox {
 
   ToolOptionCheckbox *m_globalKey;
 
+  // enables adjusting value by dragging on the label
+  void connectLabelAndField(ClickableLabel *label, MeasuredValueField *field);
+
 public:
   ArrowToolOptionsBox(QWidget *parent, TTool *tool, TPropertyGroup *pg,
                       TFrameHandle *frameHandle, TObjectHandle *objHandle,
@@ -272,6 +278,8 @@ protected slots:
   void syncCurrentStageObjectComboItem();
   // change the current stage object when user changes it via combobox by hand
   void onCurrentStageObjectComboActivated(int index);
+
+  void onCurrentAxisChanged(int);
 };
 
 //=============================================================================
@@ -280,7 +288,25 @@ protected slots:
 //
 //=============================================================================
 
-class IconViewField final : public QWidget {
+class DraggableIconView : public QWidget {
+  Q_OBJECT
+public:
+  DraggableIconView(QWidget *parent = 0) : QWidget(parent){};
+
+protected:
+  // these are used for dragging on the icon to
+  // change the value of the field
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+
+signals:
+  void onMousePress(QMouseEvent *event);
+  void onMouseMove(QMouseEvent *event);
+  void onMouseRelease(QMouseEvent *event);
+};
+
+class IconViewField final : public DraggableIconView {
   Q_OBJECT
 
 public:
@@ -328,16 +354,6 @@ public:
 
 protected:
   void paintEvent(QPaintEvent *e);
-  // these are used for dragging on the icon to
-  // change the value of the field
-  void mousePressEvent(QMouseEvent *) override;
-  void mouseMoveEvent(QMouseEvent *) override;
-  void mouseReleaseEvent(QMouseEvent *) override;
-
-signals:
-  void onMousePress(QMouseEvent *event);
-  void onMouseMove(QMouseEvent *event);
-  void onMouseRelease(QMouseEvent *event);
 };
 
 //-----------------------------------------------------------------------------
@@ -409,7 +425,7 @@ public:
   void updateStatus();
 
 protected slots:
-  void onShapeValueChanged();
+  void onShapeValueChanged(int);
   void onPencilModeToggled(bool);
   void onJoinStyleChanged(int);
 };
@@ -454,7 +470,7 @@ public:
   void updateStatus();
 
 protected slots:
-  void onColorModeChanged();
+  void onColorModeChanged(int);
 };
 
 //=============================================================================
@@ -480,8 +496,8 @@ public:
   void updateStatus();
 
 protected slots:
-  void onColorModeChanged();
-  void onToolTypeChanged();
+  void onColorModeChanged(int);
+  void onToolTypeChanged(int);
   void onOnionModeToggled(bool);
   void onMultiFrameModeToggled(bool);
 };
@@ -548,8 +564,8 @@ public:
 
 protected slots:
   void onPencilModeToggled(bool);
-  void onToolTypeChanged();
-  void onColorModeChanged();
+  void onToolTypeChanged(int);
+  void onColorModeChanged(int);
 };
 
 //=============================================================================
@@ -606,8 +622,8 @@ public:
   void updateStatus();
 
 protected slots:
-  void onToolTypeChanged();
-  void onToolModeChanged();
+  void onToolTypeChanged(int);
+  void onToolModeChanged(int);
   void onJoinStrokesModeChanged();
 };
 

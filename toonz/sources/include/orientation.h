@@ -110,8 +110,16 @@ enum class PredefinedRect {
   FILTER_COLOR,        //! where to show layer's filter color
   CONFIG_AREA,  //! clickable area larger than the config icon, containing it
   CONFIG,       //! the config icon itself
-  FRAME_DOT,    //! Cell's frame indicator
-  FRAME_INDICATOR,     //! Row # indicator
+  FRAME_MARKER_AREA,  //! Cell's frame indicator
+  FRAME_INDICATOR,    //! Row # indicator
+  ZOOM_SLIDER_AREA,
+  ZOOM_SLIDER,
+  ZOOM_IN_AREA,
+  ZOOM_IN,
+  ZOOM_OUT_AREA,
+  ZOOM_OUT,
+  LAYER_FOOTER_PANEL,
+  PREVIEW_FRAME_AREA,
   SUBLAYER_NAME,       //! area to draw sublayer name
   SUBLAYER_ACTIVATOR,  //! activator key icon placement
   SUBLAYER_KEY_ICON    //! cell key icon for sublayers
@@ -144,8 +152,9 @@ enum class PredefinedPath {
   VOLUME_SLIDER_TRACK,  //! slider track
   VOLUME_SLIDER_HEAD,   //! slider head
   TIME_INDICATOR_HEAD,  //! current time indicator head
-  FOLDED,               //! layer contains some sublayers (folded)
-  UNFOLDED              //! unfolded
+  FRAME_MARKER_DIAMOND,
+  FOLDED,   //! layer contains some sublayers (folded)
+  UNFOLDED  //! unfolded
 };
 enum class PredefinedPoint {
   KEY_HIDDEN,  //! move extender handle that much if key icons are disabled

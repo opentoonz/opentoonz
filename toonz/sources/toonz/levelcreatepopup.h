@@ -51,7 +51,7 @@ protected:
   bool levelExists(std::wstring levelName);
 
 public slots:
-  void onLevelTypeChanged(const QString &text);
+  void onLevelTypeChanged(int index);
   void onOkBtn();
 
   void onApplyButton();

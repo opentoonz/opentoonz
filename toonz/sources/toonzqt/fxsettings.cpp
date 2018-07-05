@@ -15,6 +15,7 @@
 #include "toutputproperties.h"
 #include "pluginhost.h"
 #include "tenv.h"
+#include "tsystem.h"
 
 #include "toonz/tcamera.h"
 #include "toonz/toonzfolders.h"
@@ -822,6 +823,7 @@ void ParamsPageSet::createControls(const TFxP &fx, int index) {
 
   TFilePath fp = ToonzFolder::getProfileFolder() + "layouts" + "fxs" +
                  (fx->getFxType() + ".xml");
+
   TIStream is(fp);
   if (!is) return;
 
@@ -904,8 +906,18 @@ void ParamsPageSet::openHelpFile() {
   // if (m_helpCommand != "")
   //	commandString += m_helpCommand + " ";
 
-  TFilePath helpFp =
-      TEnv::getStuffDir() + TFilePath("doc") + TFilePath(m_helpFilePath);
+  // Get UI language as set in "Preferences"
+  QString currentLanguage = Preferences::instance()->getCurrentLanguage();
+  std::string helpDocLang = currentLanguage.toStdString();
+
+  // Assume associated language subdir exists
+  TFilePath helpFp = TEnv::getStuffDir() + "doc" + helpDocLang + m_helpFilePath;
+
+  // Verify subdir exists; if not, default to standard doc dir
+  if (!TFileStatus(helpFp).doesExist()) {
+    helpFp = TEnv::getStuffDir() + "doc" + m_helpFilePath;
+  }
+
   // commandString +=
   // QString::fromStdWString(helpFp.getWideString()).toStdString();
   // QString command = QString::fromStdString(m_helpFilePath);
@@ -1297,7 +1309,7 @@ void FxSettings::changeTitleBar(TFx *fx) {
   QDialog *popup = dynamic_cast<QDialog *>(parentWidget());
   if (!popup) return;
 
-  QString titleText("Fx Settings");
+  QString titleText(tr("Fx Settings"));
   if (fx) {
     titleText += tr(" : ");
     titleText += QString::fromStdWString(fx->getName());

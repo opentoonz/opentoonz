@@ -2519,7 +2519,6 @@ void TStroke::setSelfLoop(bool loop) {
     TThickPoint p, p0 = this->getControlPoint(0),
                    pn = this->getControlPoint(cpCount - 1);
 
-    assert(areAlmostEqual(p0, pn, 2));
     p = (p0 + pn) * 0.5;
 
     this->setControlPoint(0, p);

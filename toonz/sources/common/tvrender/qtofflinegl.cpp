@@ -172,6 +172,7 @@ void QtOfflineGL::createContext(TDimension rasterSize,
   m_context->makeCurrent(m_surface.get());
 
   QOpenGLFramebufferObjectFormat fbo_format;
+  fbo_format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
   m_fbo = std::make_shared<QOpenGLFramebufferObject>(rasterSize.lx,
                                                      rasterSize.ly, fbo_format);
   m_fbo->bind();

@@ -219,6 +219,11 @@ void RGBPickerTool::setToolOptionsBox(RGBPickerToolOptionsBox *toolOptionsBox) {
 
 void RGBPickerTool::updateTranslation() {
   m_pickType.setQStringName(tr("Type:"));
+  m_pickType.setItemUIName(NORMAL_PICK, tr("Normal"));
+  m_pickType.setItemUIName(RECT_PICK, tr("Rectangular"));
+  m_pickType.setItemUIName(FREEHAND_PICK, tr("Freehand"));
+  m_pickType.setItemUIName(POLYLINE_PICK, tr("Polyline"));
+
   m_passivePick.setQStringName(tr("Passive Pick"));
 }
 

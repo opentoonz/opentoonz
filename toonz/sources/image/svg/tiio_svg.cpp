@@ -1950,6 +1950,15 @@ Tiio::SvgWriterProperties::SvgWriterProperties()
   bind(m_outlineQuality);
 }
 
+void Tiio::SvgWriterProperties::updateTranslation() {
+  m_strokeMode.setQStringName(tr("Stroke Mode"));
+  m_outlineQuality.setQStringName(tr("Outline Quality"));
+  m_strokeMode.setItemUIName(L"Centerline", tr("Centerline"));
+  m_strokeMode.setItemUIName(L"Outline", tr("Outline"));
+  m_outlineQuality.setItemUIName(L"High", tr("High"));
+  m_outlineQuality.setItemUIName(L"Medium", tr("Medium"));
+  m_outlineQuality.setItemUIName(L"Low", tr("Low"));
+}
 //----------------------------------------------------------------------------
 
 // void writeSvg(QString path, TVectorImageP v)

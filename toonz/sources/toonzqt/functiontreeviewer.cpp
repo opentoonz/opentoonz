@@ -363,8 +363,10 @@ StageObjectChannelGroup::~StageObjectChannelGroup() {
 
 QVariant StageObjectChannelGroup::data(int role) const {
   if (role == Qt::DisplayRole) {
-    std::string name = m_stageObject->getName();
-    std::string id   = m_stageObject->getId().toString();
+    std::string name = (m_stageObject->getId().isTable())
+                           ? FunctionTreeView::tr("Table").toStdString()
+                           : m_stageObject->getName();
+    std::string id = m_stageObject->getId().toString();
 
     return (name == id) ? QString::fromStdString(name)
                         : QString::fromStdString(id + " (" + name + ")");
@@ -1235,7 +1237,7 @@ void FunctionTreeModel::refreshPlasticDeformations() {
     if (sd || plasticGroup) {
       if (!plasticGroup) {
         // Add a group
-        plasticGroup = new ChannelGroup("Plastic Skeleton");
+        plasticGroup = new ChannelGroup(tr("Plastic Skeleton"));
         stageItem->appendChild(plasticGroup);
       }
 

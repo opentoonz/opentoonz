@@ -18,26 +18,31 @@ Building OpenToonz from source requires the following dependencies:
 ### Installing Dependencies on Debian / Ubuntu
 
 ```
-$ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev qttools5-dev-tools libqt5opengl5-dev qtmultimedia5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev
+$ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev qttools5-dev-tools libqt5opengl5-dev qtmultimedia5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev libjson-c-dev
+```
+
+For newest versions of OS you may install libmypaint from repository and don't need to build it from source:
+
+```
+$ sudo apt-get install libmypaint-dev
 ```
 
 Notes:
 * It's possible we also need `libgsl2` (or maybe `libopenblas-dev`)
 
-TODO:
-
-- `libmypaint` package
-
 ### Installing Dependencies on Fedora
 (it may include some useless packages)
 
 ```
-$ dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-devel lz4-devel lzma libusb-devel lzo-devel libjpeg-turbo-devel libGLEW glew-devel freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel qt5-qtmultimedia-devel blas blas-devel
+$ sudo dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-devel lz4-devel lzma libusb-devel lzo-devel libjpeg-turbo-devel libGLEW glew-devel freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel qt5-qtmultimedia-devel blas blas-devel json-c-devel
 ```
 
-TODO:
+For newest versions of OS you may install libmypaint from repository and don't need to build it from source:
 
-- `libmypaint` package
+```
+$ sudo dnf install libmypaint-devel
+```
+
 
 ### Installing Dependencies on ArchLinux
 
@@ -56,12 +61,29 @@ Notes:
 ### Installing Dependencies on openSUSE
 
 ```
-$ zypper in boost-devel cmake freeglut-devel freetype2-devel gcc-c++ glew-devel libQt5OpenGL-devel libSDL2-devel libjpeg-devel liblz4-devel libpng16-compat-devel libqt5-linguist-devel libqt5-qtbase-devel libqt5-qtmultimedia-devel libqt5-qtscript-devel libqt5-qtsvg-devel libtiff-devel libusb-devel lzo-devel openblas-devel pkgconfig sed superlu-devel zlib-devel
+$ zypper in boost-devel cmake freeglut-devel freetype2-devel gcc-c++ glew-devel libQt5OpenGL-devel libSDL2-devel libjpeg-devel liblz4-devel libpng16-compat-devel libqt5-linguist-devel libqt5-qtbase-devel libqt5-qtmultimedia-devel libqt5-qtscript-devel libqt5-qtsvg-devel libtiff-devel libusb-devel lzo-devel openblas-devel pkgconfig sed superlu-devel zlib-devel json-c-devel
 ```
 
-TODO:
+For newest versions of OS you may install libmypaint from repository and don't need to build it from source:
 
-- `libmypaint` package
+```
+$ zypper install libmypaint-devel
+```
+
+## Build libmypaint dependency
+
+If your linux distributions does not have libmypaint package, then build it from the source:
+
+```
+$ git clone https://github.com/mypaint/libmypaint.git -b v1.3.0
+$ cd libmypaint
+$ ./autogen.sh
+$ ./configure
+$ make
+$ sudo make install
+$ sudo ldconfig
+$ cd ..
+```
 
 ## Build instructions
 

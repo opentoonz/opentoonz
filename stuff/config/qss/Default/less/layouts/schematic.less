@@ -14,14 +14,14 @@
     & QToolButton {
       &:extend(.button-tool all);
       padding: 0;
-      margin: 2px;
+      margin: 2;
     }
   }
 }
 
 #SchematicSceneViewer {
   background-color: @schematic-viewer-bg-color;
-  border-bottom: 1px solid @accent;
+  border-bottom: 1 solid @accent;
 }
 
 /* -----------------------------------------------------------------------------
@@ -29,19 +29,23 @@
 ----------------------------------------------------------------------------- */
 
 #FxSettingsTabBar {
-  &:extend(.tab-container all);
   &::tab {
-    &:extend(.tab-round all); // use rounded tabs
+    &:extend(.tab-flat all);
+    border-top: 1 solid @accent;
+    &::first,
+    &::only-one {
+      border-left: 1 solid @accent;
+    }
   }
 }
 
 FxSettings {
   & QToolBar {
-    border-top: 1px solid @accent;
-    border-right: 1px solid @accent;
-    border-left: 1px solid @accent;
-    min-height: 23px; // prevent shrinking
-    padding: 3px 0;
+    border-top: 1 solid @accent;
+    border-right: 1 solid @accent;
+    border-left: 1 solid @accent;
+    min-height: 23; // prevent shrinking
+    padding: 3 0;
     & QToolBar {
       border: 0;
     }
@@ -55,7 +59,8 @@ FxSettings {
 #FxSettingsHelpButton {
   background-color: @schematic-help-button-bg-color;
   color: #000;
-  // remove V padding else text gets clipped
+  // remove vertical padding
+  // otherwise text gets clipped
   padding-top: 0;
   padding-bottom: 0;
   &:hover {

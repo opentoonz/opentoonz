@@ -378,12 +378,57 @@ private:
 };
 
 //-------------------------------------------------------------------
+QString getExeName(bool isComposer) {
+  QString name = isComposer ? "tcomposer" : "tcleanup";
+
+#ifdef _WIN32
+  return name + ".exe ";
+#elif MACOSX
+  TVER::ToonzVersion tver;
+  return "\"./" + QString::fromStdString(tver.getAppName()) + "_" +
+         QString::fromStdString(tver.getAppVersionString()) +
+         ".app/Contents/MacOS/" + name + "\" ";
+#else
+  return name;
+#endif
+}
+
+//------------------------------------------------------------------------------
 
 void Task::run() {
+  QString cmdline;
+
+  // ===========
+  // remap commandLine to local executable
+
+  QStringList l   = m_cmdline.split(" ");
+  QString appName = l.at(0);
+  // m_log->info(appName);
+  if (appName.contains("tcomposer") || appName.contains("tcleanup")) {
+    bool m_isComposerTask = appName.contains("tcomposer");
+    // m_log->info(QString::number(m_isComposerTask));
+    appName = getExeName(m_isComposerTask);
+    // m_log->info(appName);
+
+    int i   = 0;
+    cmdline = appName;
+    // m_log->info(cmdline);
+    for (i = 1; i < l.size(); i++) {
+      cmdline += " ";
+      cmdline += l.at(i);
+      // m_log->info(cmdline);
+    }
+    // m_log->info("remap commandLine to local executable");
+    // m_log->info(appName);
+  } else {
+    cmdline = m_cmdline;
+  }
+
+  // ===========
   QString logMsg("Starting task at ");
   logMsg += QDateTime::currentDateTime().toString();
   logMsg += "\n";
-  logMsg += "\"" + m_cmdline + "\"";
+  logMsg += "\"" + cmdline + "\"";
   logMsg += "\n\n";
 
   m_log->info(logMsg);
@@ -394,12 +439,10 @@ void Task::run() {
   if (m_cmdline.contains("runcasm")) service.mountDisks();
 #endif
 
-  QString cmdline;
-
   if (m_cmdline.contains(".bat"))
-    cmdline = "cmd /C " + m_cmdline;
+    cmdline = "cmd /C " + cmdline;
   else
-    cmdline = m_cmdline;
+    cmdline = cmdline;
 #ifdef LEVO
   else {
     // metto da parte il primo token della command line che e' il nome

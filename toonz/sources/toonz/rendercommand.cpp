@@ -282,6 +282,15 @@ sprop->getOutputProperties()->setRenderSettings(rso);*/
 
   // Read the output filepath
   TFilePath fp = outputSettings.getPath();
+
+  // you cannot render an untitled scene to scene folder
+  if (scene->isUntitled() && TFilePath("$scenefolder").isAncestorOf(fp)) {
+    DVGui::warning(
+        QObject::tr("The scene is not yet saved and the output destination is "
+                    "set to $scenefolder.\nSave the scene first."));
+    return false;
+  }
+
   /*-- ファイル名が指定されていない場合は、シーン名を出力ファイル名にする --*/
   if (fp.getWideName() == L"")
     fp = fp.withName(scene->getScenePath().getName());

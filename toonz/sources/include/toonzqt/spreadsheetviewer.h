@@ -7,7 +7,8 @@
 #include "cellposition.h"
 #include "toonz/cellpositionratio.h"
 // #include "orientation.h"
-#include <QFrame>
+
+#include <QDialog>
 #include <QScrollArea>
 
 #undef DVAPI
@@ -223,7 +224,7 @@ protected:
 
 //-------------------------------------------------------------------
 
-class DVAPI SpreadsheetViewer : public QFrame {
+class DVAPI SpreadsheetViewer : public QDialog {
   Q_OBJECT
 
   QColor m_lightLightBgColor;  // RowPanel background (124,124,124)
@@ -419,7 +420,7 @@ public:
     return getSelectedCells().contains(QPoint(col, row));
   }
   void setMarkRow(int distance, int offset) {
-    m_markRowDistance = distance > 0 ? distance : 6;
+    m_markRowDistance = distance;  // distance > 0 ? distance : 6;
     m_markRowOffset   = offset;
   }
   void getMarkRow(int &distance, int &offset) const {
@@ -427,7 +428,8 @@ public:
     offset   = m_markRowOffset;
   }
   int isMarkRow(int row) const {
-    return (row - m_markRowOffset) % m_markRowDistance == 0;
+    return m_markRowDistance > 0 &&
+           ((row - m_markRowOffset) % m_markRowDistance) == 0;
   }
 
   void setFrameHandle(TFrameHandle *frameHandle);

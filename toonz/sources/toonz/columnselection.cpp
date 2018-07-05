@@ -38,7 +38,9 @@ void TColumnSelection::enableCommands() {
   enableCommand(this, MI_Cut, &TColumnSelection::cutColumns);
   enableCommand(this, MI_Copy, &TColumnSelection::copyColumns);
   enableCommand(this, MI_Paste, &TColumnSelection::pasteColumns);
+  enableCommand(this, MI_PasteAbove, &TColumnSelection::pasteColumnsAbove);
   enableCommand(this, MI_Clear, &TColumnSelection::deleteColumns);
+  enableCommand(this, MI_InsertAbove, &TColumnSelection::insertColumnsAbove);
   enableCommand(this, MI_Insert, &TColumnSelection::insertColumns);
   enableCommand(this, MI_Collapse, &TColumnSelection::collapse);
   enableCommand(this, MI_ExplodeChild, &TColumnSelection::explodeChild);
@@ -63,11 +65,29 @@ bool TColumnSelection::isEmpty() const { return m_indices.empty(); }
 void TColumnSelection::copyColumns() { ColumnCmd::copyColumns(m_indices); }
 
 //-----------------------------------------------------------------------------
-
-void TColumnSelection::pasteColumns() { ColumnCmd::pasteColumns(m_indices); }
+// pasteColumns will insert columns before the first column in the selection
+void TColumnSelection::pasteColumns() {
+  std::set<int> indices;
+  if (isEmpty())  // in case that no columns are selected
+    indices.insert(0);
+  else
+    indices.insert(*m_indices.begin());
+  ColumnCmd::pasteColumns(indices);
+}
 
 //-----------------------------------------------------------------------------
+// pasteColumnsAbove will insert columns after the last column in the selection
+void TColumnSelection::pasteColumnsAbove() {
+  std::set<int> indices;
+  if (isEmpty()) {  // in case that no columns are selected
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    indices.insert(xsh->getFirstFreeColumnIndex());
+  } else
+    indices.insert(*m_indices.rbegin() + 1);
+  ColumnCmd::pasteColumns(indices);
+}
 
+//-----------------------------------------------------------------------------
 void TColumnSelection::deleteColumns() {
   ColumnCmd::deleteColumns(m_indices, false, false);
 }
@@ -87,6 +107,11 @@ void TColumnSelection::insertColumns() {
 
 //-----------------------------------------------------------------------------
 
+void TColumnSelection::insertColumnsAbove() {
+  ColumnCmd::insertEmptyColumns(m_indices, true);
+}
+
+//-----------------------------------------------------------------------------
 void TColumnSelection::collapse() {
   if (m_indices.empty()) return;
   SubsceneCmd::collapse(m_indices);

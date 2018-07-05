@@ -251,5 +251,11 @@ Tiio::GifWriterProperties::GifWriterProperties()
   bind(m_palette);
 }
 
+void Tiio::GifWriterProperties::updateTranslation() {
+  m_scale.setQStringName(tr("Scale"));
+  m_looping.setQStringName(tr("Looping"));
+  m_palette.setQStringName(tr("Generate Palette"));
+}
+
 // Tiio::Reader* Tiio::makeGifReader(){ return nullptr; }
 // Tiio::Writer* Tiio::makeGifWriter(){ return nullptr; }

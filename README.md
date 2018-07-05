@@ -29,6 +29,8 @@ Older versions and unstable nightly build are also available at <https://github.
 - [OS X](./doc/how_to_build_macosx.md)
 - [Linux](./doc/how_to_build_linux.md)
 
+For instructions on how to build stylesheets, please [see here](./doc/how_to_stylesheet.md).
+
 ## Community
 
 - To share tips or to troubleshoot, join the [Google OpenToonz Users forum](https://groups.google.com/forum/#!forum/opentoonz_en)

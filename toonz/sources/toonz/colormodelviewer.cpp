@@ -6,6 +6,7 @@
 #include "floatingpanelcommand.h"
 #include "tapp.h"
 #include "pane.h"
+#include "colormodelbehaviorpopup.h"
 
 // TnzTools includes
 #include "tools/cursormanager.h"
@@ -145,59 +146,54 @@ void ColorModelViewer::dropEvent(QDropEvent *event) {
 /*! Set current palette reference image to \b fp recall:
                 \b PaletteCmd::loadReferenceImage().
 */
+// This function will be called when drag & drop the file into the color model
+// viewer
+
 void ColorModelViewer::loadImage(const TFilePath &fp) {
   if (fp.isEmpty()) return;
 
   TPaletteHandle *paletteHandle = getPaletteHandle();
-  if (!paletteHandle->getPalette()) return;
+  TPalette *palette             = paletteHandle->getPalette();
 
-  std::string type(fp.getType());
-
-  QString question(
-      QObject::tr("The color model palette is different from the destination "
-                  "palette.\nWhat do you want to do? "));
-  QList<QString> list;
-  list.append(QObject::tr("Overwrite the destination palette."));
-  list.append(QObject::tr(
-      "Keep the destination palette and apply it to the color model."));
-  /*- if the file is raster image (i.e. without palette), then add another
-   * option "add styles"  -*/
-  if (type != "tlv" && type != "pli")
-    list.append(
-        QObject::tr("Add color model's palette to the destination palette."));
-
-  int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
-
-  PaletteCmd::ColorModelPltBehavior pltBehavior;
-  switch (ret) {
-  case 0:
+  if (!palette || palette->isCleanupPalette()) {
+    DVGui::error(QObject::tr("Cannot load Color Model in current palette."));
     return;
-  case 1:
-    pltBehavior = PaletteCmd::KeepColorModelPlt;
-    break;
-  case 2:
-    pltBehavior = PaletteCmd::ReplaceColorModelPlt;
-    break;
-  case 3:
-    pltBehavior = PaletteCmd::AddColorModelPlt;
-    break;
-  default:
-    pltBehavior = PaletteCmd::KeepColorModelPlt;
-    break;
+  }
+
+  PaletteCmd::ColorModelLoadingConfiguration config;
+
+  // if the palette is locked, replace the color model's palette with the
+  // destination
+  if (palette->isLocked()) {
+    // do nothing as config will use behavior = ReplaceColorModelPlt by default
+    // config.behavior = PaletteCmd::ReplaceColorModelPlt;
+  } else {
+    std::set<TFilePath> fpSet;
+    fpSet.insert(fp);
+    ColorModelBehaviorPopup popup(fpSet, 0);
+    int ret = popup.exec();
+    if (ret == QDialog::Rejected) return;
+    popup.getLoadingConfiguration(config);
   }
 
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
-  int paletteFrame = 0;
+  int isLoaded =
+      PaletteCmd::loadReferenceImage(paletteHandle, config, fp, scene);
 
-  PaletteCmd::loadReferenceImage(paletteHandle, pltBehavior, fp, paletteFrame,
-                                 scene);
+  if (0 != isLoaded) {
+    std::cout << "loadReferenceImage Failed for some reason." << std::endl;
+    return;
+  }
 
-  TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
-  if (!level) return;
-  std::vector<TFrameId> fids;
-  level->getFids(fids);
-  invalidateIcons(level, fids);
+  // no changes in the icon with replace (Keep the destination palette) option
+  if (config.behavior != PaletteCmd::ReplaceColorModelPlt) {
+    TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
+    if (!level) return;
+    std::vector<TFrameId> fids;
+    level->getFids(fids);
+    invalidateIcons(level, fids);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -333,7 +329,9 @@ void ColorModelViewer::pick(const QPoint &p) {
     StylePickerTool *spTool = dynamic_cast<StylePickerTool *>(tool);
     if (spTool && spTool->isOrganizePaletteActive()) {
       TPoint point = picker.getRasterPoint(pos);
-      PaletteCmd::organizePaletteStyle(ph, styleIndex, point);
+      int frame    = m_flipConsole->getCurrentFrame() - 1;
+      PaletteCmd::organizePaletteStyle(
+          ph, styleIndex, TColorStyle::PickedPosition(point, frame));
     }
   }
 
@@ -620,7 +618,8 @@ void ColorModelViewer::repickFromColorModel() {
   TPaletteHandle *ph =
       TApp::instance()->getPaletteController()->getCurrentLevelPalette();
 
-  PaletteCmd::pickColorByUsingPickedPosition(ph, img);
+  PaletteCmd::pickColorByUsingPickedPosition(
+      ph, img, m_flipConsole->getCurrentFrame() - 1);
 }
 
 //=============================================================================

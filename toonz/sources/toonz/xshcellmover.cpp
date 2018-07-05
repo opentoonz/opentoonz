@@ -174,7 +174,9 @@ bool CellsMover::canMoveCells(const TPoint &pos) {
     c      = pos.y;
     cStart = m_startPos.y;
   }
-  if (c < 0) return false;
+  if (c < 0 ||
+      (!m_orientation->isVerticalTimeline() && c >= xsh->getColumnCount()))
+    return false;
   if (c != cStart) {
     int count = 0;
     // controlla il tipo
@@ -182,7 +184,10 @@ bool CellsMover::canMoveCells(const TPoint &pos) {
     while (i < m_rowCount * m_colCount) {
       TXshColumn::ColumnType srcType = getColumnTypeFromCell(i);
       int dstIndex                   = c + i;
-      TXshColumn *dstColumn          = xsh->getColumn(dstIndex);
+      if (!m_orientation->isVerticalTimeline() &&
+          dstIndex >= xsh->getColumnCount())
+        return false;
+      TXshColumn *dstColumn = xsh->getColumn(dstIndex);
       if (srcType == TXshColumn::eZeraryFxType ||
           srcType == TXshColumn::eSoundTextType)
         return false;
@@ -397,13 +402,16 @@ bool LevelMoverTool::canMoveColumns(const TPoint &pos) {
     cLast  = m_lastPos.y;
     cRange = m_range.ly;
   }
-  if (c < 0) return false;
+  if (c < 0 || (!o->isVerticalTimeline() && c >= xsh->getColumnCount()))
+    return false;
   if (c != cLast) {
     int count = 0;
     // controlla il tipo
     for (int i = 0; i < cRange; i++) {
-      int srcIndex          = cLast + i;
-      int dstIndex          = c + i;
+      int srcIndex = cLast + i;
+      int dstIndex = c + i;
+      if (!o->isVerticalTimeline() && dstIndex >= xsh->getColumnCount())
+        return false;
       TXshColumn *srcColumn = xsh->getColumn(srcIndex);
       if (srcColumn && srcColumn->isLocked()) continue;
       TXshColumn *dstColumn          = xsh->getColumn(dstIndex);
@@ -499,9 +507,15 @@ void LevelMoverTool::onCellChange(int row, int col) {
 
   TPoint pos = (o->isVerticalTimeline() ? TPoint(col, row) : TPoint(row, col)) +
                m_grabOffset;
-  int origX            = pos.x;
-  int origY            = pos.y;
-  if (pos.y < 0) pos.y = 0;
+  int origX   = pos.x;
+  int origY   = pos.y;
+  int currEnd = xsh->getColumnCount() - 1;
+
+  if (pos.y < 0)
+    pos.y = 0;
+  else if (!o->isVerticalTimeline() && pos.y > currEnd)
+    pos.y = currEnd;
+
   if (pos.x < 0) pos.x = 0;
 
   TPoint delta                       = pos - m_aimedPos;
@@ -511,30 +525,16 @@ void LevelMoverTool::onCellChange(int row, int col) {
   CellsMover *cellsMover = m_undo->getCellsMover();
   std::set<int> ii;
   TRect currSelection(m_aimedPos, m_range);
+
   if (!o->isVerticalTimeline()) {
-    if (origY < 0) dCol += origY;
     int newBegin = currSelection.y0 + dCol;
-    if (newBegin < 0) {
-      newBegin *= -1;
-      for (int y = 0; y < newBegin; y++) ii.insert(y);
-      ColumnCmd::insertEmptyColumns(ii);
-      m_lastPos += TPoint(0, newBegin);
-      m_startPos += TPoint(0, newBegin);
-      m_aimedPos += TPoint(0, newBegin);
-      cellsMover->setStartPos(cellsMover->getStartPos() + TPoint(0, newBegin));
-      cellsMover->setPos(cellsMover->getPos() + TPoint(0, newBegin));
-      //	  getViewer()->setCurrentColumn(getViewer()->getCurrentColumn()
-      //+ newBegin);
-      pos.x = origY + newBegin;
-    } else {
-      int maxY   = xsh->getColumnCount() - 1;
-      int newEnd = currSelection.y1 + dCol;
-      if (newEnd > maxY) {
-        for (int y = maxY + 1; y <= newEnd; y++) ii.insert(y);
-        ColumnCmd::insertEmptyColumns(ii);
-      }
-    }
+    int newEnd   = currSelection.y1 + dCol;
+
+    if (newBegin < 0 ||
+        (!getViewer()->orientation()->isVerticalTimeline() && newEnd > currEnd))
+      return;
   }
+
   if (pos == m_aimedPos) return;
 
   m_aimedPos = pos;

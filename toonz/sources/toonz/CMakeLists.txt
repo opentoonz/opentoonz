@@ -63,7 +63,8 @@ set(MOC_HEADERS
     keyframedata.h
     keyframeselection.h
     keyframemover.h
-	layerheaderpanel.h
+    layerfooterpanel.h
+    layerheaderpanel.h
     levelcreatepopup.h
     levelsettingspopup.h
     linesfadepopup.h
@@ -156,6 +157,7 @@ set(MOC_HEADERS
 	cameracapturelevelcontrol.h
 	reframepopup.h
 	autoinputcellnumberpopup.h
+	colormodelbehaviorpopup.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -232,7 +234,8 @@ set(SOURCES
     fxparameditorpopup.cpp
     histogrampopup.cpp
     insertfxpopup.cpp
-	layerheaderpanel.cpp
+    layerfooterpanel.cpp
+    layerheaderpanel.cpp
     levelcreatepopup.cpp
     levelsettingspopup.cpp
     linetestcapturepane.cpp
@@ -331,6 +334,7 @@ set(SOURCES
 	cameracapturelevelcontrol.cpp
 	reframepopup.cpp
 	autoinputcellnumberpopup.cpp
+	colormodelbehaviorpopup.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp
@@ -456,6 +460,8 @@ if(BUILD_ENV_APPLE)
     # OSX だと CMAKE_RUNTIME_OUTPUT_DIRECTORY が空だが Windows 版と同じ使い方ができるようにしておく
     get_target_property(bin OpenToonz_${VERSION} LOCATION)
     get_filename_component(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${bin} DIRECTORY)
+    # show CMAKE_RUNTIME_OUTPUT_DIRECTORY
+    message("CMAKE_RUNTIME_OUTPUT_DIRECTORY:" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
 # copy utilty executables onto the directory after build
@@ -486,6 +492,13 @@ if(BUILD_ENV_APPLE)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/qss)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
+
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tcomposer> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tcomposer)
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tcleanup> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tcleanup)
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tconverter> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tconverter)
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tfarmcontroller> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tfarmcontroller)
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tfarmserver> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tfarmserver)
+
 elseif(BUILD_ENV_UNIXLIKE AND BUILD_TARGET_WIN)
     # Setup files on Windows platform while cross compilation.
     install(

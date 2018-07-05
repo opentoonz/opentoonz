@@ -140,12 +140,14 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
 
   QPushButton *addNoteButton = new QPushButton(tr("Post"));
   addNoteButton->setMinimumSize(50, 20);
+  addNoteButton->setObjectName("PushButton_NoPadding");
   ret = ret &&
         connect(addNoteButton, SIGNAL(pressed()), this, SLOT(onNoteAdded()));
   layout->addWidget(addNoteButton, row, col, 1, 1);
   col++;
   QPushButton *discardNoteButton = new QPushButton(tr("Discard"));
   discardNoteButton->setMinimumSize(50, 20);
+  discardNoteButton->setObjectName("PushButton_NoPadding");
   ret = ret && connect(discardNoteButton, SIGNAL(pressed()), this,
                        SLOT(onNoteDiscarded()));
   layout->addWidget(discardNoteButton, row, col, 1, 1);
@@ -463,8 +465,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("cornerWidget");
 
-  m_flipOrientationButton =
-      new QPushButton(m_viewer->orientation()->name(), this);
+  m_flipOrientationButton  = new QPushButton(this);
   m_noteButton             = new QToolButton(this);
   m_precNoteButton         = new QToolButton(this);
   m_nextNoteButton         = new QToolButton(this);
@@ -475,30 +476,40 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 
   m_flipOrientationButton->setObjectName("flipOrientationButton");
   m_flipOrientationButton->setFocusPolicy(Qt::FocusPolicy::NoFocus);
+  m_flipOrientationButton->setFixedSize(QSize(70, 23));
+  m_flipOrientationButton->setIconSize(QSize(40, 20));
+  QIcon flipOrientationIcon;
+  flipOrientationIcon.addFile(QString(":Resources/xsheet2timeline.svg"),
+                              QSize(), QIcon::Normal);
+  m_flipOrientationButton->setIcon(flipOrientationIcon);
+  m_flipOrientationButton->setToolTip(tr("Toggle Xsheet/Timeline"));
 
   m_noteButton->setObjectName("ToolbarToolButton");
-  m_noteButton->setFixedSize(44, 26);
-  m_noteButton->setIconSize(QSize(38, 20));
+  m_noteButton->setFixedSize(34, 25);
+  m_noteButton->setIconSize(QSize(30, 20));
   QIcon addNoteIcon = createQIcon("newmemo");
   addNoteIcon.addFile(QString(":Resources/newmemo_disabled.svg"), QSize(),
                       QIcon::Disabled);
   m_noteButton->setIcon(addNoteIcon);
+  m_noteButton->setToolTip(tr("Add New Memo"));
 
   m_precNoteButton->setObjectName("ToolbarToolButton");
-  m_precNoteButton->setFixedSize(22, 22);
+  m_precNoteButton->setFixedSize(18, 25);
   m_precNoteButton->setIconSize(QSize(17, 17));
   QIcon precNoteIcon = createQIcon("prevkey");
   precNoteIcon.addFile(QString(":Resources/prevkey_disabled.svg"), QSize(),
                        QIcon::Disabled);
   m_precNoteButton->setIcon(precNoteIcon);
+  m_precNoteButton->setToolTip(tr("Previous Memo"));
 
   m_nextNoteButton->setObjectName("ToolbarToolButton");
-  m_nextNoteButton->setFixedSize(22, 22);
+  m_nextNoteButton->setFixedSize(18, 25);
   m_nextNoteButton->setIconSize(QSize(17, 17));
   QIcon nextNoteIcon = createQIcon("nextkey");
   nextNoteIcon.addFile(QString(":Resources/nextkey_disabled.svg"), QSize(),
                        QIcon::Disabled);
   m_nextNoteButton->setIcon(nextNoteIcon);
+  m_nextNoteButton->setToolTip(tr("Next Memo"));
 
   QStringList frameDisplayStyles;
   frameDisplayStyles << tr("Frame") << tr("Sec Frame") << tr("6sec Sheet")
@@ -554,11 +565,6 @@ void NoteArea::createLayout() {
 
   setFixedSize(rect.size());
 
-  if (o->isVerticalTimeline())
-    m_noteButton->setFixedSize(44, 26);
-  else
-    m_noteButton->setFixedSize(44, 22);
-
   // has two elements: main layout and header panel
   QVBoxLayout *panelLayout = new QVBoxLayout();
   panelLayout->setMargin(1);
@@ -575,16 +581,13 @@ void NoteArea::createLayout() {
 
       mainLayout->addStretch(1);
 
-      mainLayout->addWidget(m_noteButton, 0, centerAlign);
-
       QHBoxLayout *buttonsLayout = new QHBoxLayout();
       buttonsLayout->setMargin(0);
       buttonsLayout->setSpacing(0);
       {
-        buttonsLayout->addStretch(1);
         buttonsLayout->addWidget(m_precNoteButton, 0);
+        buttonsLayout->addWidget(m_noteButton, 0, centerAlign);
         buttonsLayout->addWidget(m_nextNoteButton, 0);
-        buttonsLayout->addStretch(1);
       }
       mainLayout->addLayout(buttonsLayout, 0);
 
@@ -624,7 +627,15 @@ void NoteArea::updateButtons() {
 void NoteArea::flipOrientation() { m_viewer->flipOrientation(); }
 
 void NoteArea::onXsheetOrientationChanged(const Orientation *newOrientation) {
-  m_flipOrientationButton->setText(newOrientation->caption());
+  //  m_flipOrientationButton->setText(newOrientation->caption());
+
+  QIcon flipOrientationIcon;
+  QString iconFile          = newOrientation->isVerticalTimeline()
+                         ? QString(":Resources/xsheet2timeline.svg")
+                         : QString(":Resources/timeline2xsheet.svg");
+  flipOrientationIcon.addFile(iconFile, QSize(), QIcon::Normal);
+  m_flipOrientationButton->setIcon(flipOrientationIcon);
+
   removeLayout();
   createLayout();
 }

@@ -75,7 +75,7 @@ private:
   QPoint m_origin;              // axes origin (window coords)
   QPoint m_startPos, m_oldPos;  // mouse click position, last mouse click/drag
                                 // position (window coords)
-
+  bool m_isFloating = true;
   struct Gadget {
     Handle m_handle;
     int m_kIndex;
@@ -117,7 +117,7 @@ private:
   } m_curveShape;
 
 public:
-  FunctionPanel(QWidget *parent);
+  FunctionPanel(QWidget *parent, bool isFloating = true);
   ~FunctionPanel();
 
   void setModel(FunctionTreeModel *model) { m_functionTreeModel = model; };

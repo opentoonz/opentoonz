@@ -39,76 +39,6 @@
 #include <QContextMenuEvent>
 #include <QSignalMapper>
 
-static void addShowHideStageObjectCmd(QMenu *menu, const TStageObjectId &id,
-                                      bool isShow) {
-  TXsheet *xsh         = TApp::instance()->getCurrentXsheet()->getXsheet();
-  TStageObject *pegbar = xsh->getStageObject(id);
-  QString cmdStr;
-  if (id.isCamera())
-    cmdStr = (isShow ? "Show " : "Hide ") +
-             QString::fromStdString(pegbar->getName());
-  else
-    cmdStr = (isShow ? "Show Column" : "Hide Column") +
-             QString::fromStdString(pegbar->getName());
-  QAction *showHideAction = new QAction(cmdStr, menu);
-  showHideAction->setData((int)id.getCode());
-  menu->addAction(showHideAction);
-}
-
-static void onShowHideSelectObject(QAction *action) {
-  TApp *app = TApp::instance();
-  TStageObjectId id;
-  id.setCode(action->data().toInt());
-  if (id == TStageObjectId::NoneId) return;
-  if (action->text().startsWith("Show ") ||
-      action->text().startsWith("Hide ")) {
-    if (id.isColumn()) {
-      app->getCurrentXsheet()
-          ->getXsheet()
-          ->getColumn(id.getIndex())
-          ->setCamstandVisible(action->text().startsWith("Show "));
-      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-    }
-  } else if (action->text().startsWith("Select ")) {
-    if (id.isColumn()) {
-      app->getCurrentColumn()->setColumnIndex(id.getIndex());
-      app->getCurrentObject()->setObjectId(id);
-    } else {
-      app->getCurrentObject()->setObjectId(id);
-      app->getCurrentTool()->setTool(T_Edit);
-    }
-  }
-}
-
-static int addShowHideStageObjectCmds(const std::vector<int> &columnIndexes,
-                                      QMenu *menu, bool isShow) {
-  int ii, columnIndex = -1;
-  bool flag = true;
-
-  for (ii = columnIndexes.size() - 1; ii >= 0; ii--) {
-    TStageObjectId id = TStageObjectId::ColumnId(columnIndexes[ii]);
-    TXshColumn *col =
-        TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(
-            columnIndexes[ii]);
-    if (!col) continue;
-    if (!isShow && col->isCamstandVisible()) {
-      if (columnIndex == -1) columnIndex = columnIndexes[ii];
-      if (flag) {
-        menu->addSeparator();
-        flag = false;
-      }
-      addShowHideStageObjectCmd(menu, id, false);
-    } else if (isShow && !col->isCamstandVisible()) {
-      if (flag) {
-        menu->addSeparator();
-        flag = false;
-      }
-      addShowHideStageObjectCmd(menu, id, true);
-    }
-  }
-  return columnIndex;
-}
-
 SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
     : QMenu(parent), m_viewer(parent), m_groupIndexToBeEntered(-1) {
   TApp *app                      = TApp::instance();
@@ -206,6 +136,9 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   if (!parent->isPreviewEnabled())
     ZeroThickToggleGui::addZeroThickCommand(this);
 
+  // Brush size outline
+  CursorOutlineToggleGui::addCursorOutlineCommand(this);
+
   // preview
   if (parent->isPreviewEnabled()) {
     addSeparator();
@@ -273,7 +206,8 @@ void SceneViewerContextMenu::addShowHideCommand(QMenu *menu,
   TXsheet *xsh  = TApp::instance()->getCurrentXsheet()->getXsheet();
   TStageObject *stageObject =
       xsh->getStageObject(TStageObjectId::ColumnId(column->getIndex()));
-  QString text = (isHidden ? tr("Show ") : tr("Hide ")) + getName(stageObject);
+  QString text = isHidden ? tr("Show %1").arg(getName(stageObject))
+                          : tr("Hide %1").arg(getName(stageObject));
   QAction *action = new QAction(text, this);
   action->setData(column->getIndex());
   connect(action, SIGNAL(triggered()), this, SLOT(onShowHide()));
@@ -285,8 +219,8 @@ void SceneViewerContextMenu::addSelectCommand(QMenu *menu,
   TXsheet *xsh              = TApp::instance()->getCurrentXsheet()->getXsheet();
   TStageObject *stageObject = xsh->getStageObject(id);
   if (!stageObject) return;
-  QString text           = getName(stageObject);
-  if (menu == this) text = tr("Select ") + text;
+  QString text           = (id.isTable()) ? tr("Table") : getName(stageObject);
+  if (menu == this) text = tr("Select %1").arg(text);
   QAction *action        = new QAction(text, this);
   action->setData(id.getCode());
   connect(action, SIGNAL(triggered()), this, SLOT(onSetCurrent()));
@@ -475,4 +409,42 @@ void ZeroThickToggleGui::ZeroThickToggleHandler::activate() {
 
 void ZeroThickToggleGui::ZeroThickToggleHandler::deactivate() {
   ZeroThickToggle::enableZeroThick(false);
+}
+
+class CursorOutlineToggle : public MenuItemHandler {
+public:
+  CursorOutlineToggle() : MenuItemHandler(MI_CursorOutline) {}
+  void execute() {
+    QAction *action = CommandManager::instance()->getAction(MI_CursorOutline);
+    if (!action) return;
+    bool checked = action->isChecked();
+    enableCursorOutline(checked);
+  }
+
+  static void enableCursorOutline(bool enable = true) {
+    Preferences::instance()->enableCursorOutline(enable);
+  }
+} CursorOutlineToggle;
+
+void CursorOutlineToggleGui::addCursorOutlineCommand(QMenu *menu) {
+  static CursorOutlineToggleHandler switcher;
+  if (Preferences::instance()->isCursorOutlineEnabled()) {
+    QAction *hideCursorOutline =
+        menu->addAction(QString(QObject::tr("Hide cursor size outline")));
+    menu->connect(hideCursorOutline, SIGNAL(triggered()), &switcher,
+                  SLOT(deactivate()));
+  } else {
+    QAction *showCursorOutline =
+        menu->addAction(QString(QObject::tr("Show cursor size outline")));
+    menu->connect(showCursorOutline, SIGNAL(triggered()), &switcher,
+                  SLOT(activate()));
+  }
+}
+
+void CursorOutlineToggleGui::CursorOutlineToggleHandler::activate() {
+  CursorOutlineToggle::enableCursorOutline(true);
+}
+
+void CursorOutlineToggleGui::CursorOutlineToggleHandler::deactivate() {
+  CursorOutlineToggle::enableCursorOutline(false);
 }

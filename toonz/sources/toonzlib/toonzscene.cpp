@@ -1227,7 +1227,7 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
     xl->setPath(codeFilePath(levelPath), true);
 
     try {
-      if (fIds.size() != 0)
+      if (fIds.size() != 0 && !ltype.m_oldLevelFlag)
         xl->load(fIds);
       else
         xl->load();
@@ -1451,6 +1451,12 @@ TFilePath ToonzScene::getDefaultLevelPath(int levelType,
   default:
     levelPath = TFilePath(levelName + L"..png");
   }
+
+  if (!isUntitled() &&
+      Preferences::instance()->getPathAliasPriority() ==
+          Preferences::SceneFolderAlias)
+    return TFilePath("$scenefolder") + levelPath;
+
   std::string folderName = getFolderName(levelType);
   if (project->getUseScenePath(folderName))
     return TFilePath("+" + folderName) + getSavePath() + levelPath;

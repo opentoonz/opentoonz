@@ -189,6 +189,9 @@ QString Ffmpeg::runFfprobe(QStringList args) {
   results += ffmpeg.readAllStandardOutput();
   int exitCode = ffmpeg.exitCode();
   ffmpeg.close();
+  // If the url cannot be opened or recognized as a multimedia file, ffprobe
+  // returns a positive exit code.
+  if (exitCode > 0) throw TImageException(m_path, "error reading info.");
   std::string strResults = results.toStdString();
   return results;
 }
@@ -408,7 +411,7 @@ void Ffmpeg::getFramesFromMovie(int frame) {
 
 QString Ffmpeg::cleanPathSymbols() {
   return m_path.getQString().remove(QRegExp(
-      QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\[\\]\\\\]")));
+      QString::fromUtf8("[-`~!@#$%^&*()_Â—+=|:;<>Â«Â»,.?/{}\'\"\\[\\]\\\\]")));
 }
 
 int Ffmpeg::getGifFrameCount() {

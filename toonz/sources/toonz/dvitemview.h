@@ -307,6 +307,7 @@ public:
                     bool multiselectionEnabled, QWidget *parent);
 
   void enableGlobalSelection(bool enabled) {
+    if (!enabled) m_selection->makeNotCurrent();
     m_globalSelectionEnabled = enabled;
   }
 

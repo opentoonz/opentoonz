@@ -341,10 +341,12 @@ void TrackerTool::draw() {
     std::string hookName = std::to_string(i + 1);
     TPixel32 balloonColor(200, 220, 205, 200);
     TPoint balloonOffset(20, 20);
-    drawBalloon(p0, hookName, balloonColor, balloonOffset, false, &balloons);
+    drawBalloon(p0, hookName, balloonColor, balloonOffset, pixelSize, false,
+                &balloons);
     if (!linked) {
       drawHook(p1, PassHookB, m_selection.isSelected(i, 2));
-      drawBalloon(p1, hookName, balloonColor, balloonOffset, false, &balloons);
+      drawBalloon(p1, hookName, balloonColor, balloonOffset, pixelSize, false,
+                  &balloons);
     }
   }
 }

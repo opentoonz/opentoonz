@@ -99,6 +99,8 @@ void KeyframeMover::start(TKeyframeSelection *selection, int qualifiers) {
 bool KeyframeMover::moveKeyframes(
     int dr, std::set<TKeyframeSelection::Position> &newPositions,
     TKeyframeSelection *selection) {
+  // return if there is no movement
+  if (dr == 0) return false;
   TXsheet *xsh = getXsheet();
   std::set<TKeyframeSelection::Position> positions;
   if (selection)
@@ -115,23 +117,52 @@ bool KeyframeMover::moveKeyframes(
       TStageObjectId objId =
           c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
       TStageObject *stObj = xsh->getStageObject(objId);
-      if (r + dr < 0) dr  = -r;
-      if (stObj->isKeyframe(r + dr)) return false;
+      if (r + dr < 0) {
+        dr = -r;
+        // dragging backward stops when the selection reaches the first frame
+        if (dr == 0) return false;
+      }
+      if (stObj->isKeyframe(r + dr)) {
+        if (m_qualifiers & eCopyKeyframes) return false;
+        // occupying key may be dragged one which is to be moved out
+        else if (positions.count(TKeyframeSelection::Position(r + dr, c)) == 0)
+          return false;
+      }
     }
 
     bool firstTime = false;
-    for (posIt = positions.begin(); posIt != positions.end(); ++posIt) {
-      int c = posIt->second;
-      int r = posIt->first;
-      TStageObjectId objId =
-          c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
-      TStageObject *stObj = xsh->getStageObject(objId);
-      if (m_qualifiers & eCopyKeyframes) {
-        firstTime = true;
-        stObj->setKeyframeWithoutUndo(r + dr, stObj->getKeyframe(r));
-      } else
-        stObj->moveKeyframe(r + dr, r);
-      newPositions.insert(TKeyframeSelection::Position(r + dr, c));
+
+    // move keys from the end of the selection on dragging forward
+    if (dr > 0) {
+      for (std::set<TKeyframeSelection::Position>::reverse_iterator revIt =
+               positions.rbegin();
+           revIt != positions.rend(); ++revIt) {
+        int c = revIt->second;
+        int r = revIt->first;
+        TStageObjectId objId =
+            c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+        TStageObject *stObj = xsh->getStageObject(objId);
+        if (m_qualifiers & eCopyKeyframes) {
+          firstTime = true;
+          stObj->setKeyframeWithoutUndo(r + dr, stObj->getKeyframe(r));
+        } else
+          stObj->moveKeyframe(r + dr, r);
+        newPositions.insert(TKeyframeSelection::Position(r + dr, c));
+      }
+    } else {  // ... and vice versa
+      for (posIt = positions.begin(); posIt != positions.end(); ++posIt) {
+        int c = posIt->second;
+        int r = posIt->first;
+        TStageObjectId objId =
+            c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+        TStageObject *stObj = xsh->getStageObject(objId);
+        if (m_qualifiers & eCopyKeyframes) {
+          firstTime = true;
+          stObj->setKeyframeWithoutUndo(r + dr, stObj->getKeyframe(r));
+        } else
+          stObj->moveKeyframe(r + dr, r);
+        newPositions.insert(TKeyframeSelection::Position(r + dr, c));
+      }
     }
     if (firstTime) {
       m_qualifiers = 0;

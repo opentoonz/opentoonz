@@ -6,7 +6,7 @@ QDialog {
   background-color: @bg;
   & #dialogButtonFrame {
     background-color: @dialogButtonFrame-bg-color;
-    border-top: 1px solid @dialogButtonFrame-border-color;
+    border-top: 1 solid @dialogButtonFrame-border-color;
     & QPushButton {
       border-color: @button-dialog-border-color;
       outline: 0;
@@ -43,18 +43,19 @@ QDialog {
 
 #PreferencesPopup {
   & QListWidget {
-    background-color: @tree-bg-color;
-    alternate-background-color: @tree-bg-color;
-    border: 1px solid @accent;
-    font-size: 13px;
+    background-color: @prefs-tree-bg-color;
+    alternate-background-color: @prefs-tree-bg-color;
+    border: 1 solid @accent;
+    font-size: 13;
     &::item {
       border: 0; // remove indent on hover
-      padding: 3px;
+      padding: 3;
       &:hover {
-        .selected-secondary;
+        .hl-color-secondary;
+        background-color: @prefs-tree-hl-color;
       }
       &:selected {
-        .selected-primary;
+        .hl-color;
       }
     }
   }
@@ -66,17 +67,13 @@ QDialog {
 
 #ShortcutTree {
   &::item {
-    padding: 1px 0;
+    padding: 1 0;
   }
-  &:extend(.tree-list all);
-  &::branch {
-    &:extend(.branch-17 all);
-  }
-  border: 1px solid @accent;
+  border: 1 solid @accent;
   & QScrollBar {
     &:vertical {
-      width: 16px;
-      margin-right: -1px;
+      width: 16;
+      margin-right: -1;
     }
   }
 }
@@ -88,12 +85,6 @@ QDialog {
 ProjectPopup {
     & QLabel {
       color: @label-title;
-    }
-    & QTreeView {
-      &:extend(.tree-list all);
-      &::branch {
-        &:extend(.branch-22 all);
-      }
     }
 }
 

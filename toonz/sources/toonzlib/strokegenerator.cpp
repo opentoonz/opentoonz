@@ -13,7 +13,9 @@ using namespace std;
 
 void StrokeGenerator::clear() {
   m_points.clear();
-  m_modifiedRegion    = TRectD();
+  m_modifiedRegion = TRectD();
+  m_lastPointRect.empty();
+  m_lastModifiedRegion.empty();
   m_paintedPointCount = 0;
   m_p0 = m_p1 = TPointD();
 }
@@ -30,6 +32,7 @@ void StrokeGenerator::add(const TThickPoint &point, double pixelSize2) {
     m_points.push_back(point);
     TRectD rect(x - d, y - d, x + d, y + d);
     m_modifiedRegion     = rect;
+    m_lastPointRect      = rect;
     m_lastModifiedRegion = rect;
     m_p0 = m_p1 = point;
   } else {
@@ -39,7 +42,8 @@ void StrokeGenerator::add(const TThickPoint &point, double pixelSize2) {
       double d = std::max(point.thick, lastPoint.thick) + 3;
       TRectD rect(TRectD(lastPoint, point).enlarge(d));
       m_modifiedRegion += rect;
-      m_lastModifiedRegion += rect;
+      m_lastModifiedRegion = m_lastPointRect + rect;
+      m_lastPointRect      = rect;
     } else {
       m_points.back().thick = std::max(m_points.back().thick, point.thick);
     }
@@ -251,11 +255,7 @@ void StrokeGenerator::removeMiddlePoints() {
 
 //-------------------------------------------------------------------
 
-TRectD StrokeGenerator::getLastModifiedRegion() {
-  TRectD lastModifiedRegion = m_lastModifiedRegion;
-  m_lastModifiedRegion.empty();
-  return lastModifiedRegion;
-}
+TRectD StrokeGenerator::getLastModifiedRegion() { return m_lastModifiedRegion; }
 
 //-------------------------------------------------------------------
 

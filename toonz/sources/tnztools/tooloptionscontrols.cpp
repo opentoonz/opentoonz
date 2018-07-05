@@ -37,6 +37,7 @@
 #include <QMainWindow>
 #include <QButtonGroup>
 #include <QMenu>
+#include <QListView>
 
 #include "tooloptionscontrols.h"
 
@@ -62,7 +63,7 @@ void ToolOptionControl::notifyTool(bool addToUndo) {
 //-----------------------------------------------------------------------------
 /*! return true if the control is belonging to the visible combo viewer. very
  * dirty implementation.
-*/
+ */
 bool ToolOptionControl::isInVisibleViewer(QWidget *widget) {
   if (!widget) return false;
 
@@ -577,22 +578,40 @@ ToolOptionCombo::ToolOptionCombo(TTool *tool, TEnumProperty *property,
 //-----------------------------------------------------------------------------
 
 void ToolOptionCombo::loadEntries() {
-  TEnumProperty::Range range = m_property->getRange();
-  TEnumProperty::Range::iterator it;
+  const TEnumProperty::Range &range = m_property->getRange();
+  const TEnumProperty::Items &items = m_property->getItems();
 
-  int maxWidth = 0;
+  const int count = m_property->getCount();
+  int maxWidth    = 0;
 
   clear();
-  for (it = range.begin(); it != range.end(); ++it) {
-    QString itemStr = QString::fromStdWString(*it);
-    addItem(itemStr);
-    int tmpWidth                      = fontMetrics().width(itemStr);
+  bool hasIcon = false;
+  for (int i = 0; i < count; ++i) {
+    QString itemStr = QString::fromStdWString(range[i]);
+    if (items[i].iconName.isEmpty())
+      addItem(items[i].UIName, itemStr);
+    else {
+      addItem(createQIcon(items[i].iconName.toUtf8()), items[i].UIName,
+              itemStr);
+      if (!hasIcon) {
+        hasIcon = true;
+        setIconSize(QSize(17, 17));
+        // add margin between items if they are with icons
+        setView(new QListView());
+        view()->setIconSize(QSize(17, 17));
+        setStyleSheet(
+            "QComboBox  QAbstractItemView::item{ \
+                       margin: 5 0 0 0;\
+                      }");
+      }
+    }
+    int tmpWidth                      = fontMetrics().width(items[i].UIName);
     if (tmpWidth > maxWidth) maxWidth = tmpWidth;
   }
 
   // set the maximum width according to the longest item with 25 pixels for
   // arrow button and margin
-  setMaximumWidth(maxWidth + 25);
+  setMaximumWidth(maxWidth + 25 + (hasIcon ? 23 : 0));
 
   updateStatus();
 }
@@ -601,7 +620,7 @@ void ToolOptionCombo::loadEntries() {
 
 void ToolOptionCombo::updateStatus() {
   QString value = QString::fromStdWString(m_property->getValue());
-  int index     = findText(value);
+  int index     = findData(value);
   if (index >= 0 && index != currentIndex()) setCurrentIndex(index);
 }
 
@@ -638,7 +657,7 @@ void ToolOptionCombo::doOnActivated(int index) {
   bool cycleOptions =
       Preferences::instance()->getDropdownShortcutsCycleOptions();
   // Just move the index if the first item is not "Normal"
-  if (itemText(0) != "Normal") {
+  if (m_property->indexOf(L"Normal") != 0) {
     onActivated(index);
     setCurrentIndex(index);
     // for updating the cursor
@@ -672,15 +691,12 @@ ToolOptionPopupButton::ToolOptionPopupButton(TTool *tool,
   setFixedHeight(20);
   m_property->addListener(this);
 
-  TEnumProperty::Range range = property->getRange();
-  TEnumProperty::Range::iterator it;
-  for (it = range.begin(); it != range.end(); ++it) {
-    QString iconName = QString::fromStdWString(*it);
-    QAction *action  = addItem(createQIcon(iconName.toUtf8()));
+  const TEnumProperty::Items &items = m_property->getItems();
+  const int count                   = m_property->getCount();
+  for (int i = 0; i < count; ++i) {
+    QAction *action = addItem(createQIcon(items[i].iconName.toUtf8()));
     // make the tooltip text
-    iconName = iconName.replace('_', ' ');
-    iconName = iconName.left(1).toUpper() + iconName.mid(1);
-    action->setToolTip(iconName);
+    action->setToolTip(items[i].UIName);
   }
   setCurrentIndex(0);
   updateStatus();
@@ -789,7 +805,9 @@ void StyleIndexFieldAndChip::updateStatus() {
 void StyleIndexFieldAndChip::onValueChanged(const QString &changedText) {
   QString style;
 
-  if (!QString("current").contains(changedText)) {
+  // Aware of both "current" and translated string
+  if (!QString("current").contains(changedText) &&
+      !StyleIndexLineEdit::tr("current").contains(changedText)) {
     int index      = changedText.toInt();
     TPalette *plt  = m_pltHandle->getPalette();
     int indexCount = plt->getStyleCount();

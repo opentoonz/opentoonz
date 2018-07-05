@@ -957,7 +957,7 @@ void RasterSelectionTool::onActivate() {
 //-----------------------------------------------------------------------------
 
 bool RasterSelectionTool::onPropertyChanged(std::string propertyName) {
-  if (!SelectionTool::onPropertyChanged(propertyName)) return false;
+  if (SelectionTool::onPropertyChanged(propertyName)) return true;
   if (m_targetType & ToonzImage) {
     ModifySavebox = (int)(m_modifySavebox.getValue());
     invalidate();

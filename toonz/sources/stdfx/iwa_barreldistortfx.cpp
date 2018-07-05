@@ -163,18 +163,18 @@ public:
 
   void doCompute_CPU(TPointD &point, TPointD &sourcePoint, float dist,
                      float distAspect, float4 *source_host, float4 *result_host,
-                     TDimensionI &outDim, TDimensionI &sourceDim,
-                     TPointD &offset, float precision, double vignetteAmount,
-                     double vignetteGamma, double vignetteMidpoint,
-                     float scale);
+                     TRectD &rectOut, TDimensionI &sourceDim, TPointD &offset,
+                     float precision, double vignetteAmount,
+                     double vignetteGamma, double vignetteMidpoint, float scale,
+                     const TRenderSettings &ri);
 
   void doCompute_chroma_CPU(TPointD &point, TPointD &sourcePoint, float dist,
                             float distAspect, float chroma, float4 *source_host,
-                            float4 *result_host, TDimensionI &outDim,
+                            float4 *result_host, TRectD &rectOut,
                             TDimensionI &sourceDim, TPointD &offset,
                             float precision, double vignetteAmount,
                             double vignetteGamma, double vignetteMidpoint,
-                            float scale);
+                            float scale, const TRenderSettings &ri);
 
   bool canHandle(const TRenderSettings &info, double frame) override {
     return false;
@@ -198,7 +198,7 @@ void Iwa_BarrelDistortFx::doCompute(TTile &tile, double frame,
   TPointD point = m_point->getValue(frame);
   TAffine aff   = ri.m_affine;
   // convert the coordinate to with origin at bottom-left corner of the camera
-  point = aff * point - (tile.m_pos + tile.getRaster()->getCenterD()) +
+  point = aff * point +
           TPointD(ri.m_cameraBox.getLx() / 2.0, ri.m_cameraBox.getLy() / 2.0);
   double dist       = m_distortion->getValue(frame);
   double distAspect = m_distortionAspect->getValue(frame);
@@ -213,8 +213,7 @@ void Iwa_BarrelDistortFx::doCompute(TTile &tile, double frame,
   TPointD sourcePoint(point);
   if (precision > 1.0) {
     source_ri.m_affine *= TScale(precision, precision);
-    sourcePoint = source_ri.m_affine * m_point->getValue(frame) -
-                  (tile.m_pos + tile.getRaster()->getCenterD()) +
+    sourcePoint = source_ri.m_affine * m_point->getValue(frame) +
                   TPointD(source_ri.m_cameraBox.getLx() / 2.0,
                           source_ri.m_cameraBox.getLy() / 2.0);
   }
@@ -255,7 +254,8 @@ void Iwa_BarrelDistortFx::doCompute(TTile &tile, double frame,
   result_host_ras->lock();
   result_host = (float4 *)result_host_ras->getRawData();
 
-  TPointD offset = sourceTile.m_pos - tile.m_pos;
+  TPointD offset = sourceTile.m_pos + TPointD(ri.m_cameraBox.getLx() / 2.0,
+                                              ri.m_cameraBox.getLy() / 2.0);
 
   double vignetteAmount   = m_vignetteAmount->getValue(frame);
   double vignetteGamma    = m_vignetteGamma->getValue(frame);
@@ -264,13 +264,13 @@ void Iwa_BarrelDistortFx::doCompute(TTile &tile, double frame,
   double chroma = m_chromaticAberration->getValue(frame);
   if (areAlmostEqual(chroma, 0.0))
     doCompute_CPU(point, sourcePoint, dist, distAspect, source_host,
-                  result_host, outDim, sourceDim, offset, precision,
-                  vignetteAmount, vignetteGamma, vignetteMidpoint, scale);
+                  result_host, rectOut, sourceDim, offset, precision,
+                  vignetteAmount, vignetteGamma, vignetteMidpoint, scale, ri);
   else
     doCompute_chroma_CPU(point, sourcePoint, dist, distAspect, chroma,
-                         source_host, result_host, outDim, sourceDim, offset,
+                         source_host, result_host, rectOut, sourceDim, offset,
                          precision, vignetteAmount, vignetteGamma,
-                         vignetteMidpoint, scale);
+                         vignetteMidpoint, scale, ri);
 
   source_host_ras->unlock();
 
@@ -288,12 +288,14 @@ void Iwa_BarrelDistortFx::doCompute(TTile &tile, double frame,
 
 void Iwa_BarrelDistortFx::doCompute_CPU(
     TPointD &point, TPointD &sourcePoint, float dist, float distAspect,
-    float4 *source_host, float4 *result_host, TDimensionI &outDim,
+    float4 *source_host, float4 *result_host, TRectD &rectOut,
     TDimensionI &sourceDim, TPointD &offset, float precision,
     double vignetteAmount, double vignetteGamma, double vignetteMidpoint,
-    float scale) {
-  float4 *result_p  = result_host;
-  float squaredSize = (float)(outDim.lx * outDim.lx) * 0.25f;
+    float scale, const TRenderSettings &ri) {
+  float4 *result_p = result_host;
+  float squaredSize =
+      (float)(ri.m_cameraBox.getLx() * ri.m_cameraBox.getLy()) * 0.25f;
+
   QPointF offsetCenter(sourcePoint.x - offset.x, sourcePoint.y - offset.y);
 
   bool doVignette = !areAlmostEqual(vignetteAmount, 0.0);
@@ -313,9 +315,15 @@ void Iwa_BarrelDistortFx::doCompute_CPU(
       distAspectVec = QVector2D(aspectSqrt, 1.0 / aspectSqrt);
   }
 
-  for (int j = 0; j < outDim.ly; j++) {
-    for (int i = 0; i < outDim.lx; i++, result_p++) {
-      QVector2D ru(QPointF((float)i, (float)j) - QPointF(point.x, point.y));
+  TPointD outImgOrigin =
+      rectOut.getP00() +
+      TPointD(ri.m_cameraBox.getLx() / 2.0, ri.m_cameraBox.getLy() / 2.0);
+
+  for (int j = 0; j < (int)rectOut.getLy(); j++) {
+    for (int i = 0; i < (int)rectOut.getLx(); i++, result_p++) {
+      QVector2D ru(QPointF((float)i, (float)j) +
+                   QPointF(outImgOrigin.x, outImgOrigin.y) -
+                   QPointF(point.x, point.y));
       // apply global scaling
       ru /= scale;
       float val = (ru * distAspectVec).lengthSquared() / squaredSize;
@@ -361,12 +369,13 @@ void Iwa_BarrelDistortFx::doCompute_CPU(
 
 void Iwa_BarrelDistortFx::doCompute_chroma_CPU(
     TPointD &point, TPointD &sourcePoint, float dist, float distAspect,
-    float chroma, float4 *source_host, float4 *result_host, TDimensionI &outDim,
+    float chroma, float4 *source_host, float4 *result_host, TRectD &rectOut,
     TDimensionI &sourceDim, TPointD &offset, float precision,
     double vignetteAmount, double vignetteGamma, double vignetteMidpoint,
-    float scale) {
-  float4 *result_p  = result_host;
-  float squaredSize = (float)(outDim.lx * outDim.lx) * 0.25f;
+    float scale, const TRenderSettings &ri) {
+  float4 *result_p = result_host;
+  float squaredSize =
+      (float)(ri.m_cameraBox.getLx() * ri.m_cameraBox.getLy()) * 0.25f;
   QPointF offsetCenter(sourcePoint.x - offset.x, sourcePoint.y - offset.y);
   float dist_ch[3] = {dist + chroma, dist, dist - chroma};
 
@@ -387,10 +396,16 @@ void Iwa_BarrelDistortFx::doCompute_chroma_CPU(
       distAspectVec = QVector2D(aspectSqrt, 1.0 / aspectSqrt);
   }
 
-  for (int j = 0; j < outDim.ly; j++) {
-    for (int i = 0; i < outDim.lx; i++, result_p++) {
+  TPointD outImgOrigin =
+      rectOut.getP00() +
+      TPointD(ri.m_cameraBox.getLx() / 2.0, ri.m_cameraBox.getLy() / 2.0);
+
+  for (int j = 0; j < (int)rectOut.getLy(); j++) {
+    for (int i = 0; i < (int)rectOut.getLx(); i++, result_p++) {
       for (int c = 0; c < 3; c++) {
-        QVector2D ru(QPointF((float)i, (float)j) - QPointF(point.x, point.y));
+        QVector2D ru(QPointF((float)i, (float)j) +
+                     QPointF(outImgOrigin.x, outImgOrigin.y) -
+                     QPointF(point.x, point.y));
         // apply global scaling
         ru /= scale;
         float val = (ru * distAspectVec).lengthSquared() / squaredSize;

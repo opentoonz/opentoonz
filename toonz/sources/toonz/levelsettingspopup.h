@@ -82,7 +82,7 @@ public slots:
   void onNameChanged();
   void onPathChanged();
   void onScanPathChanged();
-  void onDpiTypeChanged(const QString &dpiPolicyStr);
+  void onDpiTypeChanged(int);
   void onDpiFieldChanged();
   void onWidthFieldChanged();
   void onHeightFieldChanged();

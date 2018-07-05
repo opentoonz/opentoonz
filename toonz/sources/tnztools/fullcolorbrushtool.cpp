@@ -25,6 +25,7 @@
 #include "toonz/tstageobject.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tgl.h"
@@ -487,6 +488,9 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
 void FullColorBrushTool::draw() {
   if (TRasterImageP ri = TRasterImageP(getImage(false))) {
+    // If toggled off, don't draw brush outline
+    if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
     TRasterP ras = ri->getRaster();
 
     double alpha       = 1.0;
@@ -608,6 +612,7 @@ void FullColorBrushTool::initPresets() {
 
   m_preset.deleteAllValues();
   m_preset.addValue(CUSTOM_WSTR);
+  m_preset.setItemUIName(CUSTOM_WSTR, tr("<custom>"));
 
   std::set<BrushData>::const_iterator it, end = presets.end();
   for (it = presets.begin(); it != end; ++it) m_preset.addValue(it->m_name);
@@ -716,6 +721,10 @@ void FullColorBrushTool::updateCurrentStyle() {
       m_minCursorThick = m_maxCursorThick = (int)round(2.0 * avgRadius);
     }
   }
+
+  // if this function is called from onEnter(), the clipping rect will not be
+  // set in order to update whole viewer.
+  if (prevMinCursorThick == 0 && prevMaxCursorThick == 0) return;
 
   if (m_minCursorThick != prevMinCursorThick ||
       m_maxCursorThick != prevMaxCursorThick) {

@@ -714,7 +714,7 @@ void ColumnArea::DrawHeader::drawEye() const {
   // preview visible toggle
   p.setPen(m_viewer->getVerticalLineColor());
 
-  if (column->getPaletteColumn() || column->getSoundTextColumn()) {
+  if (column->getSoundTextColumn()) {
     if (o->flag(PredefinedFlag::EYE_AREA_BORDER)) p.drawRect(prevViewRect);
     return;
   }
@@ -844,10 +844,15 @@ void ColumnArea::DrawHeader::drawSubLayerFoldUnfoldButton(
     const SubLayerOffsets &offsets) const {
   if (!subLayer->hasChildren()) return;
 
-  QRect mouseArea = o->rect(PredefinedRect::FOLD_UNFOLD_AREA);
-  if (mouseArea.isEmpty()) return;
+  QRect FoldUnfoldArea = o->rect(PredefinedRect::FOLD_UNFOLD_AREA);
+  if (FoldUnfoldArea.isEmpty()) return;
 
-  QPoint offset = offsets.shifted() + mouseArea.topLeft();
+  QPoint offset = offsets.shifted() + FoldUnfoldArea.topLeft();
+
+  if (!o->isVerticalTimeline() &&
+      Preferences::instance()->isShowColumnNumbersEnabled())
+    offset.setX(offset.x() + 20);
+
   QPainterPath triangle =
       o->path(subLayer->isFolded() ? PredefinedPath::FOLDED
                                    : PredefinedPath::UNFOLDED)
@@ -898,7 +903,7 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 
   bool nameBacklit = false;
   int rightadj     = -2;
-  int leftadj      = 3;
+  int leftadj      = 0;
   int valign = o->isVerticalTimeline() ? Qt::AlignVCenter : Qt::AlignBottom;
 
   if (!isEmpty) {
@@ -914,6 +919,7 @@ void ColumnArea::DrawHeader::drawColumnName() const {
         p.fillRect(columnName, m_viewer->getXsheetColumnNameBgColor());
     }
 
+    p.setPen(m_viewer->getVerticalLineColor());
     if (o->flag(PredefinedFlag::LAYER_NAME_BORDER)) p.drawRect(columnName);
 
     if (o->isVerticalTimeline() &&
@@ -927,10 +933,13 @@ void ColumnArea::DrawHeader::drawColumnName() const {
       if (o->isVerticalTimeline())
         rightadj = -20;
       else
-        leftadj = 24;
+        leftadj = 20;
     }
 
     if (!o->isVerticalTimeline()) {
+      QRect FoldUnfoldArea = o->rect(PredefinedRect::FOLD_UNFOLD_AREA);
+      if (!FoldUnfoldArea.isEmpty()) leftadj += FoldUnfoldArea.width();
+
       if (column->getSoundColumn())
         rightadj -= 97;
       else if (column->getFilterColorId())
@@ -1973,6 +1982,11 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
   }
 
   if (!isEmpty && m_col >= 0) {
+    int leftadj = 0;
+    if (!o->isVerticalTimeline() &&
+        Preferences::instance()->isShowColumnNumbersEnabled())
+      leftadj = 20;
+
     // grabbing the left side of the column enables column move
     if (o->rect(PredefinedRect::DRAG_LAYER).contains(mouseInCell) ||
         (!o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)  // If dragbar hidden,
@@ -2021,7 +2035,9 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
         // do nothing
       } else
         m_doOnRelease = OpenSettings;
+      // sublayer button
     } else if (o->rect(PredefinedRect::FOLD_UNFOLD_AREA)
+                   .adjusted(leftadj, 0, leftadj, 0)
                    .contains(mouseInCell) &&
                event->button() == Qt::LeftButton) {
       m_viewer->screenMapper()->subLayers()->layer(column)->foldUnfold();
@@ -2317,21 +2333,31 @@ void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
 
   QPoint pos = event->pos();
   int col    = m_viewer->xyToPosition(pos).layer();
-  CellPosition cellPosition(0, col);
-  QPoint topLeft     = m_viewer->positionToXY(cellPosition);
-  QPoint mouseInCell = pos - topLeft;
 
 #ifdef LINETEST
   // Camera column
   if (col == -1) return;
 #endif
 
-  if (!o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell)) return;
-
   TXsheet *xsh = m_viewer->getXsheet();
   if (col >= 0 && xsh->isColumnEmpty(col)) return;
 
-  QRect renameRect = o->rect(PredefinedRect::RENAME_COLUMN).translated(topLeft);
+  CellPosition cellPosition(0, col);
+  QPoint topLeft     = m_viewer->positionToXY(cellPosition);
+  QPoint mouseInCell = pos - topLeft;
+
+  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME);
+  int leftadj    = 0;
+  if (!o->isVerticalTimeline()) {
+    if (Preferences::instance()->isShowColumnNumbersEnabled()) leftadj = 20;
+    leftadj += o->rect(PredefinedRect::FOLD_UNFOLD_AREA).width();
+  }
+  nameRect.adjust(leftadj, 0, 0, 0);
+  if (!nameRect.contains(mouseInCell)) return;
+
+  QRect renameRect = o->rect(PredefinedRect::RENAME_COLUMN)
+                         .translated(topLeft)
+                         .adjusted(leftadj, 0, 0, 0);
   m_renameColumnField->show(renameRect, col);
 }
 
@@ -2406,8 +2432,10 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     menu.addAction(cmdManager->getAction(MI_Cut));
     menu.addAction(cmdManager->getAction(MI_Copy));
     menu.addAction(cmdManager->getAction(MI_Paste));
+    menu.addAction(cmdManager->getAction(MI_PasteAbove));
     menu.addAction(cmdManager->getAction(MI_Clear));
     menu.addAction(cmdManager->getAction(MI_Insert));
+    menu.addAction(cmdManager->getAction(MI_InsertAbove));
     menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_InsertFx));
     menu.addAction(cmdManager->getAction(MI_NewNoteLevel));
@@ -2468,7 +2496,32 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     }
   }
 
+  QAction *act  = cmdManager->getAction(MI_Insert),
+          *act2 = cmdManager->getAction(MI_InsertAbove),
+          *act3 = cmdManager->getAction(MI_Paste),
+          *act4 = cmdManager->getAction(MI_PasteAbove);
+
+  QString actText = act->text(), act2Text = act2->text(),
+          act3Text = act3->text(), act4Text = act4->text();
+
+  if (o->isVerticalTimeline()) {
+    act->setText(tr("&Insert Before"));
+    act2->setText(tr("&Insert After"));
+    act3->setText(tr("&Paste Insert Before"));
+    act4->setText(tr("&Paste Insert After"));
+  } else {
+    act->setText(tr("&Insert Below"));
+    act2->setText(tr("&Insert Above"));
+    act3->setText(tr("&Paste Insert Below"));
+    act4->setText(tr("&Paste Insert Above"));
+  }
+
   menu.exec(event->globalPos());
+
+  act->setText(actText);
+  act2->setText(act2Text);
+  act3->setText(act3Text);
+  act4->setText(act4Text);
 }
 
 //-----------------------------------------------------------------------------

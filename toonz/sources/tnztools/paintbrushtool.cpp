@@ -20,6 +20,7 @@
 #include "toonz/stage2.h"
 #include "toonz/ttileset.h"
 #include "toonz/rasterstrokegenerator.h"
+#include "toonz/preferences.h"
 #include "tgl.h"
 #include "tenv.h"
 
@@ -43,11 +44,6 @@ using namespace ToolUtils;
 #define LINES L"Lines"
 #define AREAS L"Areas"
 #define ALL L"Lines & Areas"
-
-#define NORMALERASE L"Normal"
-#define RECTERASE L"Rectangular"
-#define FREEHANDERASE L"Freehand"
-#define POLYLINEERASE L"Polyline"
 
 TEnv::StringVar PaintBrushColorType("InknpaintPaintBrushColorType", "Areas");
 TEnv::IntVar PaintBrushSelective("InknpaintPaintBrushSelective", 0);
@@ -346,7 +342,12 @@ PaintBrushTool::PaintBrushTool()
 
 void PaintBrushTool::updateTranslation() {
   m_toolSize.setQStringName(tr("Size:"));
+
   m_colorType.setQStringName(tr("Mode:"));
+  m_colorType.setItemUIName(LINES, tr("Lines"));
+  m_colorType.setItemUIName(AREAS, tr("Areas"));
+  m_colorType.setItemUIName(ALL, tr("Lines & Areas"));
+
   m_onlyEmptyAreas.setQStringName(tr("Selective", NULL));
 }
 
@@ -355,6 +356,9 @@ void PaintBrushTool::updateTranslation() {
 void PaintBrushTool::draw() {
   /*-- MouseLeave時にBrushTipが描かれるのを防止する --*/
   if (m_pointSize == -1) return;
+
+  // If toggled off, don't draw brush outline
+  if (!Preferences::instance()->isCursorOutlineEnabled()) return;
 
   TToonzImageP ti = (TToonzImageP)getImage(false);
   if (!ti) return;
@@ -459,13 +463,11 @@ void PaintBrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 　---*/
     if (m_rasterTrack) {
       int thickness = m_toolSize.getValue();
-      bool isAdded  = m_rasterTrack->add(
+      m_rasterTrack->add(
           TThickPoint(pos + convert(ri->getRaster()->getCenter()), thickness));
-      if (isAdded) {
-        m_tileSaver->save(m_rasterTrack->getLastRect());
-        TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
-        invalidate();
-      }
+      m_tileSaver->save(m_rasterTrack->getLastRect());
+      TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
+      invalidate();
     }
   }
 }
@@ -538,12 +540,10 @@ void PaintBrushTool::finishBrush() {
   if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
     if (m_rasterTrack) {
       int thickness = m_toolSize.getValue();
-      bool isAdded  = m_rasterTrack->add(TThickPoint(
+      m_rasterTrack->add(TThickPoint(
           m_mousePos + convert(ti->getRaster()->getCenter()), thickness));
-      if (isAdded) {
-        m_tileSaver->save(m_rasterTrack->getLastRect());
-        m_rasterTrack->generateLastPieceOfStroke(true, true);
-      }
+      m_tileSaver->save(m_rasterTrack->getLastRect());
+      m_rasterTrack->generateLastPieceOfStroke(true, true);
 
       TTool::Application *app   = TTool::getApplication();
       TXshLevel *level          = app->getCurrentLevel()->getLevel();

@@ -17,6 +17,7 @@ Iwa_TimeCodeFx::Iwa_TimeCodeFx()
     , m_textColor(TPixel32::White)
     , m_showBox(true)
     , m_boxColor(TPixel32::Black) {
+  m_displayType->addItem(TYPE_HHMMSSFF2, "HH:MM:SS:FF");
   m_displayType->addItem(TYPE_FRAME, "Frame Number");
   m_position->getX()->setMeasureName("fxLength");
   m_position->getY()->setMeasureName("fxLength");
@@ -122,7 +123,9 @@ QString Iwa_TimeCodeFx::getTimeCodeStr(double frame,
                                        const TRenderSettings &ri) {
   int f = (int)frame + m_startFrame->getValue();
 
-  if (m_displayType->getValue() == TYPE_HHMMSSFF) {
+  if (m_displayType->getValue() != TYPE_FRAME) {
+    QString separator =
+        (m_displayType->getValue() == TYPE_HHMMSSFF ? ";" : ":");
     bool neg = (f < 0);
     f        = abs(f);
     int fps  = m_frameRate->getValue();
@@ -133,9 +136,9 @@ QString Iwa_TimeCodeFx::getTimeCodeStr(double frame,
     int ss = f / fps;
     int ff = f % fps;
     return QString((neg) ? "-" : "") +
-           QString::number(hh).rightJustified(2, '0') + QString(";") +
-           QString::number(mm).rightJustified(2, '0') + QString(";") +
-           QString::number(ss).rightJustified(2, '0') + QString(";") +
+           QString::number(hh).rightJustified(2, '0') + separator +
+           QString::number(mm).rightJustified(2, '0') + separator +
+           QString::number(ss).rightJustified(2, '0') + separator +
            QString::number(ff).rightJustified(2, '0');
   } else {   // TYPE_FRAMENUMBER
     f += 1;  // starting from "000001" with no frame offset.

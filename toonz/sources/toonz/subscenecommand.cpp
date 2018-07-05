@@ -970,69 +970,90 @@ public:
 
 void openSubXsheet() {
   TApp *app = TApp::instance();
-  /*- 選択セル又は選択カラムの中にChildLevelが有った場合のみ中に入る -*/
+  /*- Enter only when ChildLevel exists in selected cell or selected column -*/
   TCellSelection *cellSelection =
       dynamic_cast<TCellSelection *>(TSelection::getCurrent());
   TColumnSelection *columnSelection =
       dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
 
-  bool ret          = false;
-  ToonzScene *scene = app->getCurrentScene()->getScene();
+  bool ret               = false;
+  ToonzScene *scene      = app->getCurrentScene()->getScene();
+  int row                = app->getCurrentFrame()->getFrame();
+  int col                = app->getCurrentColumn()->getColumnIndex();
+  TXsheet *currentXsheet = app->getCurrentXsheet()->getXsheet();
+  TXshCell targetCell;
 
-  /*- カラム選択の場合 -*/
+  /*- For column selection -*/
   if (columnSelection && !columnSelection->isEmpty()) {
-    TXsheet *currentXsheet = app->getCurrentXsheet()->getXsheet();
-    int sceneLength        = currentXsheet->getFrameCount();
+    int sceneLength = currentXsheet->getFrameCount();
 
     std::set<int> columnIndices = columnSelection->getIndices();
     std::set<int>::iterator it;
-    /*- 各Columnについて各セルでopenChildを試みる -*/
+    /*- Try openChild on each cell for each Column -*/
     for (it = columnIndices.begin(); it != columnIndices.end(); ++it) {
       int c = *it;
-      /*- Column内の各Cellについて、中身が見つかったらbreak -*/
+      // See if the current row indicator is on an exposed sub-xsheet frame
+      // If so, use that.
+      targetCell = currentXsheet->getCell(row, c);
+      if (!targetCell.isEmpty() &&
+          (ret = scene->getChildStack()->openChild(row, c)))
+        break;
+
+      /*- For each Cell in the Column, if contents are found break -*/
       for (int r = 0; r < sceneLength; r++) {
         ret = scene->getChildStack()->openChild(r, c);
-        if (ret) break;
+        if (ret) {
+          targetCell = currentXsheet->getCell(r, c);
+          break;
+        }
       }
       if (ret) break;
     }
   }
 
-  /*- それ以外の場合（セル選択、又はその他）-*/
+  /*- In other cases (cell selection or other) -*/
   else {
     TRect selectedArea;
-    /*- セル選択でも無い場合、カレントフレーム/カラムを見る -*/
+    /*- If it is not cell selection, see current frame / column -*/
     if (!cellSelection || cellSelection->isEmpty()) {
-      int row = app->getCurrentFrame()->getFrame();
-      int col = app->getCurrentColumn()->getColumnIndex();
-      /*- セル選択でない場合、1×1の選択範囲 -*/
+      /*- When it is not cell selection, 1 × 1 selection range -*/
       selectedArea = TRect(col, row, col, row);
     }
-    /*- セル選択の場合 -*/
+    /*- In case of cell selection -*/
     else {
       int r0, c0, r1, c1;
       cellSelection->getSelectedCells(r0, c0, r1, c1);
       selectedArea = TRect(c0, r0, c1, r1);
     }
-    /*- Rectに含まれる各セルでopenChildを試みる -*/
+    /*- Try openChild on each cell in Rect -*/
     for (int c = selectedArea.x0; c <= selectedArea.x1; c++) {
       for (int r = selectedArea.y0; r <= selectedArea.y1; r++) {
         ret = scene->getChildStack()->openChild(r, c);
-        if (ret) break;
+        if (ret) {
+          // When opening based on cell selection use the 1st
+          // exposed frame in the sub-xsheet it finds
+          targetCell = currentXsheet->getCell(r, c);
+          break;
+        }
       }
       if (ret) break;
     }
   }
 
-  /*- subXsheet Levelが見つかった場合 -*/
+  /*- When subXsheet Level is found -*/
   if (ret) {
+    int subXsheetFrame = 0;
+
+    if (!targetCell.isEmpty())
+      subXsheetFrame = targetCell.getFrameId().getNumber() - 1;
+
     if (TSelection::getCurrent()) TSelection::getCurrent()->selectNone();
 
     TUndoManager::manager()->add(new OpenChildUndo());
     app->getCurrentXsheet()->setXsheet(scene->getXsheet());
     app->getCurrentXsheet()->notifyXsheetChanged();
     app->getCurrentColumn()->setColumnIndex(0);
-    app->getCurrentFrame()->setFrameIndex(0);
+    app->getCurrentFrame()->setFrameIndex(subXsheetFrame);
     changeSaveSubXsheetAsCommand();
   } else
     DVGui::error(QObject::tr("Select a sub-xsheet cell."));

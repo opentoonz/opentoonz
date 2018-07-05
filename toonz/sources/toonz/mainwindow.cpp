@@ -1418,12 +1418,19 @@ QAction *MainWindow::createAction(const char *id, const QString &name,
   QAction *action = new DVAction(name, this);
   addAction(action);
 #ifdef MACOSX
-  if (strcmp(id, MI_Preferences) == 0) {
+  // To prevent the wrong menu items (due to MacOS menu naming conventions),
+  // from
+  // taking Preferences, Quit, or About roles (sometimes happens unexpectedly in
+  // translations) - all menu items should have "NoRole"
+  //  except for Preferences, Quit, and About
+  if (strcmp(id, MI_Preferences) == 0)
     action->setMenuRole(QAction::PreferencesRole);
-  }
-  if (strcmp(id, MI_ShortcutPopup) == 0) {
+  else if (strcmp(id, MI_Quit) == 0)
+    action->setMenuRole(QAction::QuitRole);
+  else if (strcmp(id, MI_About) == 0)
+    action->setMenuRole(QAction::AboutRole);
+  else
     action->setMenuRole(QAction::NoRole);
-  }
 #endif
   CommandManager::instance()->define(id, type, defaultShortcut.toStdString(),
                                      action);
@@ -1693,7 +1700,9 @@ void MainWindow::defineActions() {
   redoAction->setIcon(QIcon(":Resources/redo.svg"));
   createMenuEditAction(MI_Cut, tr("&Cut"), "Ctrl+X");
   createMenuEditAction(MI_Copy, tr("&Copy"), "Ctrl+C");
-  createMenuEditAction(MI_Paste, tr("&Insert Paste"), "Ctrl+V");
+  createMenuEditAction(MI_Paste, tr("&Paste Insert"), "Ctrl+V");
+  createMenuEditAction(MI_PasteAbove, tr("&Paste Insert Above/After"),
+                       "Ctrl+Shift+V");
   // createMenuEditAction(MI_PasteNew,     tr("&Paste New"),  "");
   createMenuCellsAction(MI_MergeFrames, tr("&Merge"), "");
   createMenuEditAction(MI_PasteInto, tr("&Paste Into"), "");
@@ -1708,6 +1717,7 @@ void MainWindow::defineActions() {
                              tr("Remove Reference to Studio Palette"), "");
   createMenuEditAction(MI_Clear, tr("&Delete"), "Del");
   createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
+  createMenuEditAction(MI_InsertAbove, tr("&Insert Above/After"), "Shift+Ins");
   createMenuEditAction(MI_Group, tr("&Group"), "Ctrl+G");
   createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "Ctrl+Shift+G");
   createMenuEditAction(MI_BringToFront, tr("&Bring to Front"), "Ctrl+]");
@@ -1893,6 +1903,7 @@ void MainWindow::defineActions() {
                         tr("Reframe with Empty Inbetweens..."), "");
   createMenuCellsAction(MI_AutoInputCellNumber, tr("Auto Input Cell Number..."),
                         "");
+  createMenuCellsAction(MI_FillEmptyCell, tr("&Fill In Empty Cells"), "");
 
   createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "Z");
   createRightClickMenuAction(MI_PasteNumbers, tr("&Paste Numbers"), "");
@@ -2025,6 +2036,7 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenLineTestView, tr("&LineTest Viewer"), "");
 #endif
   createMenuWindowsAction(MI_OpenXshView, tr("&Xsheet"), "");
+  createMenuWindowsAction(MI_OpenTimelineView, tr("&Timeline"), "");
   //  createAction(MI_TestAnimation,     "Test Animation",   "Ctrl+Return");
   //  createAction(MI_Export,            "Export",           "Ctrl+E");
 
@@ -2045,6 +2057,8 @@ void MainWindow::defineActions() {
   createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "/", false,
                RightClickMenuCommandType);
   createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false,
+               RightClickMenuCommandType);
+  createToggle(MI_CursorOutline, tr("Toggle Cursor Size Outline"), "", false,
                RightClickMenuCommandType);
 
   createRightClickMenuAction(MI_ToggleCurrentTimeIndicator,
@@ -2260,6 +2274,8 @@ void MainWindow::defineActions() {
                           tr("Active Axis - Shear"), "");
   createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Center",
                           tr("Active Axis - Center"), "");
+  createToolOptionsAction("A_ToolOption_EditToolActiveAxis:All",
+                          tr("Active Axis - All"), "");
 
   createToolOptionsAction("A_ToolOption_SkeletonMode:Build Skeleton",
                           tr("Build Skeleton Mode"), "");

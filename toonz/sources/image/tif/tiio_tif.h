@@ -8,6 +8,8 @@
 // #include "timage_io.h"
 #include "tproperty.h"
 
+#include <QCoreApplication>
+
 #define TNZ_INFO_COMPRESS_NONE L"None"
 #define TNZ_INFO_COMPRESS_CCITTRLE L"CCITT modified Huffman Run-length encoding"
 #define TNZ_INFO_COMPRESS_CCITTFAX3 L"CCITT Group 3 fax encoding"
@@ -42,6 +44,7 @@ namespace Tiio {
 //===========================================================================
 
 class TifWriterProperties final : public TPropertyGroup {
+  Q_DECLARE_TR_FUNCTIONS(TifWriterProperties)
 public:
   TEnumProperty m_byteOrdering;
   TEnumProperty m_compressionType;
@@ -50,6 +53,8 @@ public:
 
   // TBoolProperty m_matte;
   TifWriterProperties();
+
+  void updateTranslation() override;
 };
 
 //===========================================================================

@@ -62,7 +62,7 @@ public:
   void setAboveStyleIds(QSet<int> &ids) { m_aboveStyleIds = ids; }
 
   // Inserisce un punto in "m_points"
-  bool add(const TThickPoint &p);
+  void add(const TThickPoint &p);
 
   // Disegna il tratto interamente
   void generateStroke(bool isPencil) const;

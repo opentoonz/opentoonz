@@ -10,6 +10,7 @@
 #include "tconvert.h"
 #include "ttoonzimage.h"
 #include "timagecache.h"
+#include "tmsgcore.h"
 
 #include "toonz/studiopalette.h"
 #include "toonz/toonzscene.h"
@@ -241,23 +242,50 @@ public:
 
 class MovePaletteUndo final : public TUndo {
   TFilePath m_dstPath, m_srcPath;
+  bool m_isRename;
 
 public:
   MovePaletteUndo(const TFilePath &dstPath, const TFilePath &srcPath)
-      : m_dstPath(dstPath), m_srcPath(srcPath) {}
+      : m_dstPath(dstPath), m_srcPath(srcPath) {
+    m_isRename = (m_srcPath.getParentDir() == m_dstPath.getParentDir());
+  }
 
   void undo() const override {
-    StudioPalette::instance()->movePalette(m_srcPath, m_dstPath);
+    QString errorStr = (m_isRename) ? QObject::tr("Can't undo rename palette")
+                                    : QObject::tr("Can't undo move palette");
+    try {
+      StudioPalette::instance()->movePalette(m_srcPath, m_dstPath);
+    } catch (TException &e) {
+      DVGui::error(errorStr + " : " +
+                   QString(::to_string(e.getMessage()).c_str()));
+    } catch (...) {
+      DVGui::error(errorStr);
+    }
   }
+
   void redo() const override {
-    StudioPalette::instance()->movePalette(m_dstPath, m_srcPath);
+    QString errorStr = (m_isRename) ? QObject::tr("Can't redo rename palette")
+                                    : QObject::tr("Can't redo move palette");
+    try {
+      StudioPalette::instance()->movePalette(m_dstPath, m_srcPath);
+    } catch (TException &e) {
+      DVGui::error(errorStr + ":" +
+                   QString(::to_string(e.getMessage()).c_str()));
+    } catch (...) {
+      DVGui::error(errorStr);
+    }
   }
   int getSize() const override { return sizeof(*this); }
   QString getHistoryString() override {
-    return QObject::tr("Move Studio Palette Folder  : %1 : %2 > %3")
-        .arg(QString::fromStdString(m_srcPath.getName()))
-        .arg(QString::fromStdString(m_srcPath.getParentDir().getName()))
-        .arg(QString::fromStdString(m_dstPath.getParentDir().getName()));
+    if (m_isRename)
+      return QObject::tr("Rename Studio Palette : %1 > %2")
+          .arg(QString::fromStdString(m_srcPath.getName()))
+          .arg(QString::fromStdString(m_dstPath.getName()));
+    else
+      return QObject::tr("Move Studio Palette Folder  : %1 : %2 > %3")
+          .arg(QString::fromStdString(m_srcPath.getName()))
+          .arg(QString::fromStdString(m_srcPath.getParentDir().getName()))
+          .arg(QString::fromStdString(m_dstPath.getParentDir().getName()));
   }
   int getHistoryType() override { return HistoryType::Palette; }
 };

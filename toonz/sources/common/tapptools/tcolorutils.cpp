@@ -780,6 +780,11 @@ static void buildPaletteForBlendedImages(std::set<TPixel32> &palette,
 
 //------------------------------------------------------------------------------
 
+#include <QPoint>
+#include <QRect>
+#include <QList>
+#include <QMap>
+
 namespace {
 #define DISTANCE 3
 
@@ -801,6 +806,135 @@ bool find(const std::set<TPixel32> &palette, const TPixel &color) {
   }
 
   return false;
+}
+
+static TPixel32 getPixel(int x, int y, const TRaster32P &raster) {
+  return raster->pixels(y)[x];
+}
+
+struct EdgePoint {
+  QPoint pos;
+  enum QUADRANT {
+    RightUpper = 0x01,
+    LeftUpper  = 0x02,
+    LeftLower  = 0x04,
+    RightLower = 0x08
+  };
+  enum EDGE {
+    UpperEdge = 0x10,
+    LeftEdge  = 0x20,
+    LowerEdge = 0x40,
+    RightEdge = 0x80
+  };
+
+  unsigned char info = 0;
+
+  EdgePoint(int x, int y) {
+    pos.setX(x);
+    pos.setY(y);
+  }
+  // identify the edge pixel by checking if the four neighbor pixels
+  // (distanced by step * 3 pixels) has the same color as the center pixel
+  void initInfo(const TRaster32P &raster, const int step) {
+    int lx            = raster->getLx();
+    int ly            = raster->getLy();
+    TPixel32 keyColor = getPixel(pos.x(), pos.y(), raster);
+    info              = 0;
+    int dist          = step * 3;
+    if (pos.y() < ly - dist &&
+        keyColor == getPixel(pos.x(), pos.y() + dist, raster))
+      info = info | UpperEdge;
+    if (pos.x() >= dist &&
+        keyColor == getPixel(pos.x() - dist, pos.y(), raster))
+      info = info | LeftEdge;
+    if (pos.y() >= dist &&
+        keyColor == getPixel(pos.x(), pos.y() - dist, raster))
+      info = info | LowerEdge;
+    if (pos.x() < lx - dist &&
+        keyColor == getPixel(pos.x() + dist, pos.y(), raster))
+      info = info | RightEdge;
+
+    // identify available corners
+    if (info & UpperEdge) {
+      if (info & RightEdge) info = info | RightUpper;
+      if (info & LeftEdge) info  = info | LeftUpper;
+    }
+    if (info & LowerEdge) {
+      if (info & RightEdge) info = info | RightLower;
+      if (info & LeftEdge) info  = info | LeftLower;
+    }
+  }
+
+  bool isCorner() {
+    return info & RightUpper || info & LeftUpper || info & RightLower ||
+           info & LeftLower;
+  }
+};
+
+struct ColorChip {
+  QRect rect;
+  TPixel32 color;
+  QPoint center;
+
+  ColorChip(const QPoint &topLeft, const QPoint &bottomRight)
+      : rect(topLeft, bottomRight) {}
+
+  bool validate(const TRaster32P &raster, const int step) {
+    int lx = raster->getLx();
+    int ly = raster->getLy();
+
+    // just in case - boundary conditions
+    if (!QRect(0, 0, lx - 1, ly - 1).contains(rect)) return false;
+
+    // rectangular must be equal or bigger than 3 * lineWidth
+    if (rect.width() < step * 3 || rect.height() < step * 3) return false;
+
+    // obtain center color
+    center = rect.center();
+    color  = getPixel(center.x(), center.y(), raster);
+
+    // it should not be transparent
+    if (color == TPixel::Transparent) return false;
+
+    // rect should be filled with single color
+    raster->lock();
+    for (int y = rect.top() + step; y <= rect.bottom() - 1; y += step) {
+      TPixel *pix = raster->pixels(y) + rect.left() + step;
+      for (int x = rect.left() + step; x <= rect.right() - 1;
+           x += step, pix += step) {
+        if (*pix != color) {
+          raster->unlock();
+          return false;
+        }
+      }
+    }
+    raster->unlock();
+
+    return true;
+  }
+};
+
+bool lowerLeftThan(const EdgePoint &ep1, const EdgePoint &ep2) {
+  if (ep1.pos.y() != ep2.pos.y()) return ep1.pos.y() < ep2.pos.y();
+  return ep1.pos.x() < ep2.pos.x();
+}
+
+bool colorChipUpperLeftThan(const ColorChip &chip1, const ColorChip &chip2) {
+  if (chip1.center.y() != chip2.center.y())
+    return chip1.center.y() > chip2.center.y();
+  return chip1.center.x() < chip2.center.x();
+}
+
+bool colorChipLowerLeftThan(const ColorChip &chip1, const ColorChip &chip2) {
+  if (chip1.center.y() != chip2.center.y())
+    return chip1.center.y() < chip2.center.y();
+  return chip1.center.x() < chip2.center.x();
+}
+
+bool colorChipLeftUpperThan(const ColorChip &chip1, const ColorChip &chip2) {
+  if (chip1.center.x() != chip2.center.x())
+    return chip1.center.x() < chip2.center.x();
+  return chip1.center.y() > chip2.center.y();
 }
 
 }  // namespace
@@ -844,6 +978,7 @@ void TColorUtils::buildPalette(std::set<TPixel32> &palette,
     buildPaletteForBlendedImages(palette, raster, maxColorCount);
   }
 }
+//------------------------------------------------------------------------------
 
 /*-- 全ての異なるピクセルの色を別のStyleにする --*/
 void TColorUtils::buildPrecisePalette(std::set<TPixel32> &palette,
@@ -874,6 +1009,137 @@ void TColorUtils::buildPrecisePalette(std::set<TPixel32> &palette,
   if (count == 0) {
     palette.clear();
     buildPalette(palette, raster, maxColorCount);
+  }
+}
+
+//------------------------------------------------------------------------------
+
+void TColorUtils::buildColorChipPalette(QList<QPair<TPixel32, TPoint>> &palette,
+                                        const TRaster32P &raster,
+                                        int maxColorCount,
+                                        const TPixel32 &gridColor,
+                                        const int gridLineWidth,
+                                        const int colorChipOrder) {
+  int lx   = raster->getLx();
+  int ly   = raster->getLy();
+  int wrap = raster->getWrap();
+
+  QList<EdgePoint> edgePoints;
+
+  // search for gridColor in the image
+  int step = gridLineWidth;
+  int x, y;
+  for (y = 0; y < ly; y += step) {
+    TPixel *pix = raster->pixels(y);
+    for (x = 0; x < lx; x += step, pix += step) {
+      if (*pix == gridColor) {
+        EdgePoint edgePoint(x, y);
+        edgePoint.initInfo(raster, step);
+        // store the edgePoint if it can be a corner
+        if (edgePoint.isCorner()) edgePoints.append(edgePoint);
+      }
+    }
+  }
+
+  // std::cout << "edgePoints.count = " << edgePoints.count() << std::endl;
+  // This may be unnecessary
+  qSort(edgePoints.begin(), edgePoints.end(), lowerLeftThan);
+
+  QList<ColorChip> colorChips;
+
+  // make rectangles by serching in the corner points
+  for (int ep0 = 0; ep0 < edgePoints.size(); ep0++) {
+    QMap<EdgePoint::QUADRANT, int> corners;
+
+    // if a point cannot be the first corner, continue
+    if ((edgePoints.at(ep0).info & EdgePoint::RightUpper) == 0) continue;
+
+    // find vertices of rectangle in counter clockwise direction
+
+    // if a point is found which can be the first corner
+    // search for the second corner point at the right side of the first one
+    for (int ep1 = ep0 + 1; ep1 < edgePoints.size(); ep1++) {
+      // end searching at the end of scan line
+      if (edgePoints.at(ep0).pos.y() != edgePoints.at(ep1).pos.y()) break;
+      // if a point cannot be the second corner, continue
+      if ((edgePoints.at(ep1).info & EdgePoint::LeftUpper) == 0) continue;
+
+      // if a point is found which can be the second corner
+      // search for the third corner point at the upper side of the second one
+      for (int ep2 = ep1 + 1; ep2 < edgePoints.size(); ep2++) {
+        // the third point must be at the same x position as the second one
+        if (edgePoints.at(ep1).pos.x() != edgePoints.at(ep2).pos.x()) continue;
+
+        // if a point cannot be the third corner, continue
+        if ((edgePoints.at(ep2).info & EdgePoint::LeftLower) == 0) continue;
+
+        // if a point is found which can be the third corner
+        // search for the forth corner point at the left side of the third one
+        for (int ep3 = ep1 + 1; ep3 < ep2; ep3++) {
+          // if the forth point is found
+          if ((edgePoints.at(ep3).info & EdgePoint::RightLower) &&
+              edgePoints.at(ep0).pos.x() == edgePoints.at(ep3).pos.x() &&
+              edgePoints.at(ep2).pos.y() == edgePoints.at(ep3).pos.y()) {
+            corners[EdgePoint::RightLower] = ep3;
+            break;
+          }
+        }  // search for ep3 loop
+
+        if (corners.contains(EdgePoint::RightLower)) {
+          corners[EdgePoint::LeftLower] = ep2;
+          break;
+        }
+
+      }  // search for ep2 loop
+
+      if (corners.contains(EdgePoint::LeftLower)) {
+        corners[EdgePoint::LeftUpper] = ep1;
+        break;
+      }
+
+    }  // search for ep1 loop
+
+    // check if all the 4 corner points are found
+    if (corners.contains(EdgePoint::LeftUpper)) {
+      corners[EdgePoint::RightUpper] = ep0;
+
+      assert(corners.size() == 4);
+
+      // register color chip
+      ColorChip chip(edgePoints.at(corners[EdgePoint::RightUpper]).pos,
+                     edgePoints.at(corners[EdgePoint::LeftLower]).pos);
+      if (chip.validate(raster, step)) colorChips.append(chip);
+
+      // remove the coner information from the corner point
+      QMap<EdgePoint::QUADRANT, int>::const_iterator i = corners.constBegin();
+      while (i != corners.constEnd()) {
+        edgePoints[i.value()].info & ~i.key();
+        ++i;
+      }
+      if (colorChips.count() >= maxColorCount) break;
+    }
+  }
+
+  // std::cout << "colorChips.count = " << colorChips.count() << std::endl;
+  if (!colorChips.empty()) {
+    // 0:UpperLeft 1:LowerLeft 2:LeftUpper
+    // sort the color chips
+    switch (colorChipOrder) {
+    case 0:
+      qSort(colorChips.begin(), colorChips.end(), colorChipUpperLeftThan);
+      break;
+    case 1:
+      qSort(colorChips.begin(), colorChips.end(), colorChipLowerLeftThan);
+      break;
+    case 2:
+      qSort(colorChips.begin(), colorChips.end(), colorChipLeftUpperThan);
+      break;
+    }
+
+    for (int c = 0; c < colorChips.size(); c++)
+      palette.append(qMakePair(
+          colorChips.at(c).color,
+          TPoint(colorChips.at(c).center.x(), colorChips.at(c).center.y())));
   }
 }
 

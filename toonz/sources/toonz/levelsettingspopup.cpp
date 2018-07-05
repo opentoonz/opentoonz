@@ -63,10 +63,6 @@ using namespace DVGui;
 
 //-----------------------------------------------------------------------------
 namespace {
-//-----------------------------------------------------------------------------
-
-const QString ImageDpi  = QString(QObject::tr("Image DPI"));
-const QString CustomDpi = QString(QObject::tr("Custom DPI"));
 
 //-----------------------------------------------------------------------------
 
@@ -152,9 +148,8 @@ LevelSettingsPopup::LevelSettingsPopup()
   m_pathFld->setFileMode(QFileDialog::AnyFile);
   m_scanPathFld->setFileMode(QFileDialog::AnyFile);
 
-  QStringList type;
-  type << ImageDpi << CustomDpi;
-  m_dpiTypeOm->addItems(type);
+  m_dpiTypeOm->addItem(tr("Image DPI"), "Image DPI");
+  m_dpiTypeOm->addItem(tr("Custom DPI"), "Custom DPI");
 
   m_squarePixCB->setChecked(true);
 
@@ -270,8 +265,8 @@ LevelSettingsPopup::LevelSettingsPopup()
   //----signal/slot connections
   connect(m_nameFld, SIGNAL(editingFinished()), SLOT(onNameChanged()));
   connect(m_pathFld, SIGNAL(pathChanged()), SLOT(onPathChanged()));
-  connect(m_dpiTypeOm, SIGNAL(currentIndexChanged(const QString &)),
-          SLOT(onDpiTypeChanged(const QString &)));
+  connect(m_dpiTypeOm, SIGNAL(currentIndexChanged(int)),
+          SLOT(onDpiTypeChanged(int)));
   connect(m_dpiFld, SIGNAL(editingFinished()), SLOT(onDpiFieldChanged()));
   connect(m_squarePixCB, SIGNAL(stateChanged(int)),
           SLOT(onSquarePixelChanged(int)));
@@ -530,28 +525,28 @@ void LevelSettingsPopup::updateLevelSettings() {
   if (m_sl) {
     switch (m_sl->getType()) {
     case TZI_XSHLEVEL:
-      levelTypeString = "Scan level";
+      levelTypeString = tr("Scan level");
       break;
     case PLI_XSHLEVEL:
-      levelTypeString = "Vector level";
+      levelTypeString = tr("Toonz Vector level");
       break;
     case TZP_XSHLEVEL:
-      levelTypeString = "Ink&Paint level";
+      levelTypeString = tr("Toonz Raster level");
       break;
     case OVL_XSHLEVEL:
-      levelTypeString = "Raster level";
+      levelTypeString = tr("Raster level");
       break;
     case MESH_XSHLEVEL:
-      levelTypeString = "Mesh level";
+      levelTypeString = tr("Mesh level");
       break;
     default:
       levelTypeString = "?";
       break;
     }
   } else if (m_pl)
-    levelTypeString = "Palette level";
+    levelTypeString = tr("Palette level");
   else if (m_sdl)
-    levelTypeString = "Sound Column";
+    levelTypeString = tr("Sound Column");
 
   m_typeLabel->setText(levelTypeString);
 
@@ -865,13 +860,14 @@ void LevelSettingsPopup::onScanPathChanged() {
 
 //-----------------------------------------------------------------------------
 
-void LevelSettingsPopup::onDpiTypeChanged(const QString &dpiPolicyStr) {
+void LevelSettingsPopup::onDpiTypeChanged(int index) {
   if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
-  assert(dpiPolicyStr == CustomDpi || dpiPolicyStr == ImageDpi);
+  QString dpiPolicyStr = m_dpiTypeOm->itemData(index).toString();
+  assert(dpiPolicyStr == "Custom DPI" || dpiPolicyStr == "Image DPI");
   LevelProperties *prop = m_sl->getProperties();
 
   // dpiPolicyStr ==> dpiPolicy
-  LevelProperties::DpiPolicy dpiPolicy = dpiPolicyStr == CustomDpi
+  LevelProperties::DpiPolicy dpiPolicy = dpiPolicyStr == "Custom DPI"
                                              ? LevelProperties::DP_CustomDpi
                                              : LevelProperties::DP_ImageDpi;
   // se ImageDpi, ma l'immagine non ha dpi -> CustomDpi

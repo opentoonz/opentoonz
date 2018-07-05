@@ -266,6 +266,7 @@ TImage *TTool::touchImage() {
 
   bool isAutoCreateEnabled   = pref->isAutoCreateEnabled();
   bool animationSheetEnabled = pref->isAnimationSheetEnabled();
+  bool isAutoStretchEnabled  = pref->isAutoStretchEnabled();
 
   TFrameHandle *currentFrame    = m_application->getCurrentFrame();
   TXshLevelHandle *currentLevel = m_application->getCurrentLevel();
@@ -318,7 +319,8 @@ TImage *TTool::touchImage() {
         // create a new drawing.
         // measure the hold length (starting from the current row) : r0-r1
         int r0 = row, r1 = row;
-        while (xsh->getCell(r1 + 1, col) == cell) r1++;
+        if (isAutoStretchEnabled)
+          while (xsh->getCell(r1 + 1, col) == cell) r1++;
         // find the proper frameid (possibly addisng suffix, in order to avoid a
         // fid already used)
         TFrameId fid = getNewFrameId(sl, row);
@@ -387,31 +389,37 @@ TImage *TTool::touchImage() {
         xsh->setCell(row, col, cell);
 
         // create holds
-        if (a >= r0) {
-          // create a hold before : [a+1, row-1]
-          TXshCell aCell = xsh->getCell(a, col);
-          for (int i = a + 1; i < row; i++) xsh->setCell(i, col, aCell);
-          m_cellsData.push_back(a + 1);
-          m_cellsData.push_back(row - 1);
-          m_cellsData.push_back(1);  // vuoto => vecchio
+        if (!isAutoStretchEnabled) {
+          m_cellsData.push_back(row);
+          m_cellsData.push_back(row);
+          m_cellsData.push_back(2);  // vuoto => nuovo
+        } else {
+          if (a >= r0) {
+            // create a hold before : [a+1, row-1]
+            TXshCell aCell = xsh->getCell(a, col);
+            for (int i = a + 1; i < row; i++) xsh->setCell(i, col, aCell);
+            m_cellsData.push_back(a + 1);
+            m_cellsData.push_back(row - 1);
+            m_cellsData.push_back(1);  // vuoto => vecchio
 
-          if (b <= r1 && xsh->getCell(b, col).getSimpleLevel() == sl) {
-            // create also a hold after
+            if (b <= r1 && xsh->getCell(b, col).getSimpleLevel() == sl) {
+              // create also a hold after
+              for (int i = row + 1; i < b; i++) xsh->setCell(i, col, cell);
+              m_cellsData.push_back(row);
+              m_cellsData.push_back(b - 1);
+              m_cellsData.push_back(2);  // vuoto => nuovo
+            } else {
+              m_cellsData.push_back(row);
+              m_cellsData.push_back(row);
+              m_cellsData.push_back(2);  // vuoto => nuovo
+            }
+          } else if (b <= r1) {
+            // create a hold after
             for (int i = row + 1; i < b; i++) xsh->setCell(i, col, cell);
             m_cellsData.push_back(row);
             m_cellsData.push_back(b - 1);
             m_cellsData.push_back(2);  // vuoto => nuovo
-          } else {
-            m_cellsData.push_back(row);
-            m_cellsData.push_back(row);
-            m_cellsData.push_back(2);  // vuoto => nuovo
           }
-        } else if (b <= r1) {
-          // create a hold after
-          for (int i = row + 1; i < b; i++) xsh->setCell(i, col, cell);
-          m_cellsData.push_back(row);
-          m_cellsData.push_back(b - 1);
-          m_cellsData.push_back(2);  // vuoto => nuovo
         }
       }
       // notify & return

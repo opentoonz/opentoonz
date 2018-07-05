@@ -16,24 +16,25 @@ PencilTestPopup {
     background-color: lighten(@bg, 15%);
     &:checked {
         background-color: lighten(@bg, 30%);
-        border: 2px solid @selected-bg-color;
-        border-radius: 2px;
+        border: 2 solid @hl-bg-color;
+        border-radius: 2;
     }
 }
 
 #LargeSizedText {
-    font-size: 17px;
+    font-size: 17;
 }
 
 /* -----------------------------------------------------------------------------
-   Unknowns
+   Unknowns + Legacy
 ----------------------------------------------------------------------------- */
+// below are classes that are unknown and considered legacy
+// they need investigation before being removed
 
-// Below are classes I couldn't locate in the app so I was not able to test
-// them - I left the properties as they were from v1.1.2.
+// selectors from [v1.1.2]
 
 #StartupLabel {
-    padding: 3px;
+    padding: 3;
     &:hover {
       background: lighten(@bg, 10%);
     }
@@ -49,7 +50,7 @@ QStatusBar {
   }
   & #StatusBarLabel {
     background-color: rgb(255,255,255);
-    padding: 1px 3px;
+    padding: 1 3;
   }
 }
 
