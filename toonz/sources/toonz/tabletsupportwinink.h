@@ -1,21 +1,19 @@
-#ifdef _WIN32
-
 #include <QAbstractNativeEventFilter>
 
-class TabletSupportWinInk : public QAbstractNativeEventFilter
-{
-	Q_DISABLE_COPY(TabletSupportWinInk)
+#ifdef _WIN32
+class TabletSupportWinInk : public QAbstractNativeEventFilter {
+  Q_DISABLE_COPY(TabletSupportWinInk)
 
 public:
-	static bool isAvailable();
-	static bool isPenDeviceAvailable();
+  static bool isAvailable();
+  static bool isPenDeviceAvailable();
 
-	TabletSupportWinInk() = default;
-	~TabletSupportWinInk() = default;
+  TabletSupportWinInk()  = default;
+  ~TabletSupportWinInk() = default;
 
-	bool init();
-	// void registerPointerDeviceNotifications();
-	virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
+  bool init();
+  // void registerPointerDeviceNotifications();
+  virtual bool nativeEventFilter(const QByteArray &eventType, void *message,
+                                 long *result) override;
 };
-
 #endif

@@ -1219,6 +1219,14 @@ PreferencesPopup::PreferencesPopup()
     , m_inksOnly(0)
     , m_blanksCount(0)
     , m_blankColor(0) {
+  bool showTabletSettings = false;
+
+#ifdef _WIN32
+  showTabletSettings = TabletSupportWinInk::isAvailable();
+#else
+  showTabletSettings = true;
+#endif
+
   setWindowTitle(tr("Preferences"));
   setObjectName("PreferencesPopup");
 
@@ -1547,7 +1555,8 @@ PreferencesPopup::PreferencesPopup()
   note_version->setStyleSheet("font-size: 10px; font: italic;");
 
   //--- Tablet Settings ------------------------------
-  categoryList->addItem(tr("Tablet Settings"));
+  if (showTabletSettings) categoryList->addItem(tr("Tablet Settings"));
+
   m_enableWinInk =
       new DVGui::CheckBox(tr("Enable Windows Ink Support* (EXPERIMENTAL)"));
 
@@ -2640,9 +2649,8 @@ PreferencesPopup::PreferencesPopup()
     versionControlBox->setLayout(vcLay);
     stackedWidget->addWidget(versionControlBox);
 
-#ifdef _WIN32
     //--- Tablet Settings --------------------------
-    if (TabletSupportWinInk::isAvailable()) {
+    if (showTabletSettings) {
       QWidget *tabletSettingsBox = new QWidget(this);
       QVBoxLayout *tsLay         = new QVBoxLayout();
       tsLay->setMargin(15);
@@ -2656,11 +2664,7 @@ PreferencesPopup::PreferencesPopup()
       }
       tabletSettingsBox->setLayout(tsLay);
       stackedWidget->addWidget(tabletSettingsBox);
-    } else
-      m_enableWinInk->setVisible(false);
-#else
-    m_enableWinInk->setVisible(false);
-#endif
+    }
 
     mainLayout->addWidget(stackedWidget, 1);
   }
