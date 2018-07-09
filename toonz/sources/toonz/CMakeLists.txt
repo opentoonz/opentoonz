@@ -123,6 +123,7 @@ set(MOC_HEADERS
     svnupdatedialog.h
     svnpurgedialog.h
     tapp.h
+    tabletsupportwinink.h
     tasksviewer.h
     testpanel.h
     tfarmstuff.h
@@ -259,6 +260,7 @@ set(SOURCES
     soundtrackexport.cpp
     startuppopup.cpp
     subcameramanager.cpp
+    tabletsupportwinink.cpp
     timestretchpopup.cpp
     trackerpopup.cpp
     vectorizerpopup.cpp

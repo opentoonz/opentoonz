@@ -35,6 +35,8 @@
 #include "tsystem.h"
 #include "tfont.h"
 
+#include "tabletsupportwinink.h"
+
 // Qt includes
 #include <QHBoxLayout>
 #include <QComboBox>
@@ -1201,6 +1203,12 @@ void PreferencesPopup::onCurrentColumnDataChanged(const TPixel32 &,
   m_pref->setCurrentColumnData(m_currentColumnColor->getColor());
 }
 
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onEnableWinInkChanged(int index) {
+  m_pref->enableWinInk(index == Qt::Checked);
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1537,6 +1545,15 @@ PreferencesPopup::PreferencesPopup()
   QLabel *note_version =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_version->setStyleSheet("font-size: 10px; font: italic;");
+
+  //--- Tablet Settings ------------------------------
+  categoryList->addItem(tr("Tablet Settings"));
+  m_enableWinInk =
+      new DVGui::CheckBox(tr("Enable Windows Ink Support* (EXPERIMENTAL)"));
+
+  QLabel *note_tablet =
+      new QLabel(tr("* Changes will take effect the next time you run Toonz"));
+  note_tablet->setStyleSheet("font-size: 10px; font: italic;");
 
   /*--- set default parameters ---*/
   categoryList->setFixedWidth(160);
@@ -1881,6 +1898,9 @@ PreferencesPopup::PreferencesPopup()
   autoRefreshFolderContentsCB->setChecked(
       m_pref->isAutomaticSVNFolderRefreshEnabled());
   checkForTheLatestVersionCB->setChecked(m_pref->isLatestVersionCheckEnabled());
+
+  //--- Tablet Settings ------------------------------
+  m_enableWinInk->setChecked(m_pref->isWinInkEnabled());
 
   /*--- layout ---*/
 
@@ -2620,6 +2640,28 @@ PreferencesPopup::PreferencesPopup()
     versionControlBox->setLayout(vcLay);
     stackedWidget->addWidget(versionControlBox);
 
+#ifdef _WIN32
+    //--- Tablet Settings --------------------------
+    if (TabletSupportWinInk::isAvailable()) {
+      QWidget *tabletSettingsBox = new QWidget(this);
+      QVBoxLayout *tsLay         = new QVBoxLayout();
+      tsLay->setMargin(15);
+      tsLay->setSpacing(10);
+      {
+        tsLay->addWidget(m_enableWinInk, 0, Qt::AlignLeft | Qt::AlignVCenter);
+
+        tsLay->addStretch(1);
+
+        tsLay->addWidget(note_tablet, 0);
+      }
+      tabletSettingsBox->setLayout(tsLay);
+      stackedWidget->addWidget(tabletSettingsBox);
+    } else
+      m_enableWinInk->setVisible(false);
+#else
+    m_enableWinInk->setVisible(false);
+#endif
+
     mainLayout->addWidget(stackedWidget, 1);
   }
   setLayout(mainLayout);
@@ -2944,6 +2986,11 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onAutomaticSVNRefreshChanged(int)));
   ret = ret && connect(checkForTheLatestVersionCB, SIGNAL(clicked(bool)),
                        SLOT(onCheckLatestVersionChanged(bool)));
+
+  //--- Tablet Settings ----------------------
+  ret = ret && connect(m_enableWinInk, SIGNAL(stateChanged(int)),
+                       SLOT(onEnableWinInkChanged(int)));
+
   assert(ret);
 }
 

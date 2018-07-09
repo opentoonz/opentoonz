@@ -573,6 +573,11 @@ public:
   }  //! \sa The \p sysctl unix command.
   std::string getLayerNameEncoding() const { return m_layerNameEncoding; };
 
+  // Tablet tab
+
+  void enableWinInk(bool on);
+  bool isWinInkEnabled() const { return m_enableWinInk; }
+
 Q_SIGNALS:
 
   void stopAutoSave();
@@ -703,6 +708,8 @@ private:
   bool m_cursorOutlineEnabled = false;
 
   TPixel32 m_currentColumnColor;
+
+  bool m_enableWinInk = false;
 
 private:
   Preferences();

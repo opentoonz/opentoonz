@@ -342,7 +342,8 @@ Preferences::Preferences()
     , m_cursorBrushType("Small")
     , m_cursorBrushStyle("Default")
     , m_cursorOutlineEnabled(true)
-    , m_currentColumnColor(TPixel::Black) {
+    , m_currentColumnColor(TPixel::Black)
+    , m_enableWinInk(false) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -710,6 +711,8 @@ Preferences::Preferences()
   getValue(*m_settings, "currentColumnColor.g", g);
   getValue(*m_settings, "currentColumnColor.b", b);
   m_currentColumnColor = TPixel32(r, g, b);
+
+  getValue(*m_settings, "winInkEnabled", m_enableWinInk);
 }
 
 //-----------------------------------------------------------------
@@ -1724,4 +1727,9 @@ void Preferences::setCurrentColumnData(const TPixel &currentColumnColor) {
                        QString::number(currentColumnColor.g));
   m_settings->setValue("currentColumnColor.b",
                        QString::number(currentColumnColor.b));
+}
+
+void Preferences::enableWinInk(bool on) {
+  m_enableWinInk = on;
+  m_settings->setValue("winInkEnabled", on ? "1" : "0");
 }

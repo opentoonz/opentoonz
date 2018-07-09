@@ -80,7 +80,7 @@ private:
       *m_useHigherDpiOnVectorSimplifyCB, *m_keepFillOnVectorSimplifyCB,
       *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB,
       *m_syncLevelRenumberWithXsheet, *m_downArrowInLevelStripCreatesNewFrame,
-      *m_enableAutoStretch;
+      *m_enableAutoStretch, *m_enableWinInk;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -214,6 +214,7 @@ private slots:
   void onCursorBrushStyleChanged(int index);
   void onCursorOutlineChanged(int);
   void onCurrentColumnDataChanged(const TPixel32 &, bool isDragging);
+  void onEnableWinInkChanged(int index);
 };
 
 //**********************************************************************************
