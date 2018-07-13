@@ -234,8 +234,6 @@ public:
 public slots:
 
   void onActivated(int);
-  void doShowPopup();
-  void doOnActivated(int);
 };
 
 //-----------------------------------------------------------------------------
