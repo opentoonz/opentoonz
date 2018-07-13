@@ -573,10 +573,14 @@ ToolOptionCombo::ToolOptionCombo(TTool *tool, TEnumProperty *property,
   // synchronize the state with the same widgets in other tool option bars
   if (toolHandle) {
     connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
-
-    connect(toolHandle, SIGNAL(toolComboBoxListChanged()), this,
-            SLOT(loadEntries()));
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionCombo::reloadComboBoxList(std::string id) {
+  if (id == "" || m_property->getName() != id) return;
+  loadEntries();
 }
 
 //-----------------------------------------------------------------------------

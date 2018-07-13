@@ -208,6 +208,7 @@ public:
   TEnumProperty *getProperty() const { return m_property; }
 
 public slots:
+  void reloadComboBoxList(std::string);
   void loadEntries();
   void onActivated(int);
   void doShowPopup();

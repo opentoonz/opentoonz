@@ -1559,6 +1559,8 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCombo *>(m_controls.value("Style:"));
   ret &&connect(styleField, SIGNAL(currentIndexChanged(int)), this,
                 SLOT(onFieldChanged()));
+  ret &&connect(toolHandle, SIGNAL(toolComboBoxListChanged(std::string)),
+                styleField, SLOT(reloadComboBoxList(std::string)));
   //#endif
 
   ToolOptionCombo *sizeField =

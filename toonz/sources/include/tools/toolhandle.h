@@ -66,9 +66,12 @@ public:
 
   void notifyToolCursorTypeChanged() { emit toolCursorTypeChanged(); }
 
-  void notifyToolComboBoxListChanged() { emit toolComboBoxListChanged(); }
+  void notifyToolComboBoxListChanged(std::string id) {
+    emit toolComboBoxListChanged(id);
+  }
+
 signals:
-  void toolComboBoxListChanged();
+  void toolComboBoxListChanged(std::string);
   void toolSwitched();
   void toolChanged();
   void toolEditingFinished();
