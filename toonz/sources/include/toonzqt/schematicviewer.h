@@ -13,6 +13,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 
+#include <QIcon>
+
 // STD includes
 #include <set>
 
@@ -237,41 +239,41 @@ class DVAPI SchematicViewer final : public QWidget {
 
   // Schematic Preview Button
   QColor m_schematicPreviewButtonBgOnColor;
-  QImage m_schematicPreviewButtonOnImage;
+  QIcon m_schematicPreviewButtonOnImage;
   QColor m_schematicPreviewButtonBgOffColor;
-  QImage m_schematicPreviewButtonOffImage;
+  QIcon m_schematicPreviewButtonOffImage;
   Q_PROPERTY(QColor SchematicPreviewButtonBgOnColor READ
                  getSchematicPreviewButtonBgOnColor WRITE
                      setSchematicPreviewButtonBgOnColor)
   Q_PROPERTY(
-      QImage SchematicPreviewButtonOnImage READ getSchematicPreviewButtonOnImage
+      QIcon SchematicPreviewButtonOnImage READ getSchematicPreviewButtonOnImage
           WRITE setSchematicPreviewButtonOnImage)
   Q_PROPERTY(QColor SchematicPreviewButtonBgOffColor READ
                  getSchematicPreviewButtonBgOffColor WRITE
                      setSchematicPreviewButtonBgOffColor)
-  Q_PROPERTY(QImage SchematicPreviewButtonOffImage READ
+  Q_PROPERTY(QIcon SchematicPreviewButtonOffImage READ
                  getSchematicPreviewButtonOffImage WRITE
                      setSchematicPreviewButtonOffImage)
 
   // Schematic Camstand Button
   QColor m_schematicCamstandButtonBgOnColor;
-  QImage m_schematicCamstandButtonOnImage;
-  QImage m_schematicCamstandButtonTranspImage;
+  QIcon m_schematicCamstandButtonOnImage;
+  QIcon m_schematicCamstandButtonTranspImage;
   QColor m_schematicCamstandButtonBgOffColor;
-  QImage m_schematicCamstandButtonOffImage;
+  QIcon m_schematicCamstandButtonOffImage;
   Q_PROPERTY(QColor SchematicCamstandButtonBgOnColor READ
                  getSchematicCamstandButtonBgOnColor WRITE
                      setSchematicCamstandButtonBgOnColor)
-  Q_PROPERTY(QImage SchematicCamstandButtonOnImage READ
+  Q_PROPERTY(QIcon SchematicCamstandButtonOnImage READ
                  getSchematicCamstandButtonOnImage WRITE
                      setSchematicCamstandButtonOnImage)
-  Q_PROPERTY(QImage SchematicCamstandButtonTranspImage READ
+  Q_PROPERTY(QIcon SchematicCamstandButtonTranspImage READ
                  getSchematicCamstandButtonTranspImage WRITE
                      setSchematicCamstandButtonTranspImage)
   Q_PROPERTY(QColor SchematicCamstandButtonBgOffColor READ
                  getSchematicCamstandButtonBgOffColor WRITE
                      setSchematicCamstandButtonBgOffColor)
-  Q_PROPERTY(QImage SchematicCamstandButtonOffImage READ
+  Q_PROPERTY(QIcon SchematicCamstandButtonOffImage READ
                  getSchematicCamstandButtonOffImage WRITE
                      setSchematicCamstandButtonOffImage)
 
@@ -384,25 +386,25 @@ public:
   void setSchematicPreviewButtonBgOnColor(const QColor &color) {
     m_schematicPreviewButtonBgOnColor = color;
   }
-  void setSchematicPreviewButtonOnImage(const QImage &image) {
+  void setSchematicPreviewButtonOnImage(const QIcon &image) {
     m_schematicPreviewButtonOnImage = image;
   }
   void setSchematicPreviewButtonBgOffColor(const QColor &color) {
     m_schematicPreviewButtonBgOffColor = color;
   }
-  void setSchematicPreviewButtonOffImage(const QImage &image) {
+  void setSchematicPreviewButtonOffImage(const QIcon &image) {
     m_schematicPreviewButtonOffImage = image;
   }
   QColor getSchematicPreviewButtonBgOnColor() const {
     return m_schematicPreviewButtonBgOnColor;
   }
-  QImage getSchematicPreviewButtonOnImage() const {
+  QIcon getSchematicPreviewButtonOnImage() const {
     return m_schematicPreviewButtonOnImage;
   }
   QColor getSchematicPreviewButtonBgOffColor() const {
     return m_schematicPreviewButtonBgOffColor;
   }
-  QImage getSchematicPreviewButtonOffImage() const {
+  QIcon getSchematicPreviewButtonOffImage() const {
     return m_schematicPreviewButtonOffImage;
   }
 
@@ -410,31 +412,31 @@ public:
   void setSchematicCamstandButtonBgOnColor(const QColor &color) {
     m_schematicCamstandButtonBgOnColor = color;
   }
-  void setSchematicCamstandButtonOnImage(const QImage &image) {
+  void setSchematicCamstandButtonOnImage(const QIcon &image) {
     m_schematicCamstandButtonOnImage = image;
   }
-  void setSchematicCamstandButtonTranspImage(const QImage &image) {
+  void setSchematicCamstandButtonTranspImage(const QIcon &image) {
     m_schematicCamstandButtonTranspImage = image;
   }
   void setSchematicCamstandButtonBgOffColor(const QColor &color) {
     m_schematicCamstandButtonBgOffColor = color;
   }
-  void setSchematicCamstandButtonOffImage(const QImage &image) {
+  void setSchematicCamstandButtonOffImage(const QIcon &image) {
     m_schematicCamstandButtonOffImage = image;
   }
   QColor getSchematicCamstandButtonBgOnColor() const {
     return m_schematicCamstandButtonBgOnColor;
   }
-  QImage getSchematicCamstandButtonOnImage() const {
+  QIcon getSchematicCamstandButtonOnImage() const {
     return m_schematicCamstandButtonOnImage;
   }
-  QImage getSchematicCamstandButtonTranspImage() const {
+  QIcon getSchematicCamstandButtonTranspImage() const {
     return m_schematicCamstandButtonTranspImage;
   }
   QColor getSchematicCamstandButtonBgOffColor() const {
     return m_schematicCamstandButtonBgOffColor;
   }
-  QImage getSchematicCamstandButtonOffImage() const {
+  QIcon getSchematicCamstandButtonOffImage() const {
     return m_schematicCamstandButtonOffImage;
   }
 

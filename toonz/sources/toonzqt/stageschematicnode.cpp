@@ -203,10 +203,9 @@ void ColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   QAction *resetCenter = new QAction(tr("&Reset Center"), &menu);
   connect(resetCenter, SIGNAL(triggered()), stageScene, SLOT(onResetCenter()));
   QAction *collapse   = CommandManager::instance()->getAction("MI_Collapse");
-  QAction *openSubxsh = new QAction(tr("&Open Sub-xsheet"), &menu);
+  QAction *openSubxsh = CommandManager::instance()->getAction("MI_OpenChild");
   QAction *explodeChild =
       CommandManager::instance()->getAction("MI_ExplodeChild");
-  connect(openSubxsh, SIGNAL(triggered()), stageScene, SLOT(onOpenSubxsheet()));
   QAction *group = CommandManager::instance()->getAction("MI_Group");
 
   QAction *clear = CommandManager::instance()->getAction("MI_Clear");
@@ -1753,7 +1752,7 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
   onChangedSize(m_stageObject->isOpened());
   assert(ret);
 
-  if (levelType == ZERARYFX_XSHLEVEL || levelType == PLT_XSHLEVEL) {
+  if (levelType == PLT_XSHLEVEL) {
     m_resizeItem->hide();
     m_cameraStandToggle->hide();
   }

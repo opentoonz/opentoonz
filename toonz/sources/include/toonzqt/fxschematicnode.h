@@ -273,7 +273,7 @@ protected:
   eFxType m_type;
   bool m_isCurrentFxLinked;
 
-  bool m_isLargeScaled;
+  bool m_isNormalIconView;
 
 protected:
   //! If the fx has dynamic port groups, ensures that each group always has at
@@ -336,8 +336,8 @@ public:
   virtual bool isCached() const;
   virtual void resize(bool maximizeNode) {}
 
-  void toggleLargeScaled() { m_isLargeScaled = !m_isLargeScaled; }
-  bool isLargeScaled() { return m_isLargeScaled; }
+  void toggleNormalIconView() { m_isNormalIconView = !m_isNormalIconView; }
+  bool isNormalIconView() { return m_isNormalIconView; }
 signals:
 
   void switchCurrentFx(TFx *fx);
@@ -443,6 +443,7 @@ protected:
 protected slots:
 
   void onRenderToggleClicked(bool);
+  void onCameraStandToggleClicked(int);
   void onNameChanged();
 };
 

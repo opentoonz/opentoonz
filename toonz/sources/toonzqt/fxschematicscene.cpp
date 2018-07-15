@@ -307,7 +307,7 @@ FxSchematicScene::FxSchematicScene(QWidget *parent)
     , m_lastPos(0, 0)
     , m_currentFxNode(0)
     , m_gridDimension(eSmall)
-    , m_isLargeScaled(!IconifyFxSchematicNodes)
+    , m_isNormalIconView(!IconifyFxSchematicNodes)
     , m_viewer() {
   m_viewer = (SchematicViewer *)parent;
 
@@ -1385,13 +1385,6 @@ void FxSchematicScene::onCollapse(const QList<TFxP> &fxs) {
 
 //------------------------------------------------------------------
 
-void FxSchematicScene::onOpenSubxsheet() {
-  CommandManager *cm = CommandManager::instance();
-  cm->execute("MI_OpenChild");
-}
-
-//------------------------------------------------------------------
-
 TXsheet *FxSchematicScene::getXsheet() { return m_xshHandle->getXsheet(); }
 
 //------------------------------------------------------------------
@@ -1458,7 +1451,7 @@ void FxSchematicScene::onCurrentColumnChanged(int index) {
 //------------------------------------------------------------------
 
 void FxSchematicScene::onIconifyNodesToggled(bool iconified) {
-  m_isLargeScaled         = !iconified;
+  m_isNormalIconView      = !iconified;
   IconifyFxSchematicNodes = (iconified) ? 1 : 0;
   updateScene();
 }

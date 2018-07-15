@@ -726,9 +726,7 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
 
   p.setPen(m_viewer->getVerticalLineColor());
 
-  TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
-
-  if (zColumn || column->getPaletteColumn() || column->getSoundTextColumn()) {
+  if (column->getPaletteColumn() || column->getSoundTextColumn()) {
     if (o->flag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER))
       p.drawRect(tableViewRect);
     return;

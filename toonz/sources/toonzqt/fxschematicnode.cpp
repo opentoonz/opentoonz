@@ -155,7 +155,7 @@ FxColumnPainter::~FxColumnPainter() {}
 //-----------------------------------------------------
 
 QRectF FxColumnPainter::boundingRect() const {
-  if (m_parent->isOpened() && m_parent->isLargeScaled())
+  if (m_parent->isOpened() && m_parent->isNormalIconView())
     return QRectF(-5, -54, m_width + 10, m_height + 59);
   else
     return QRectF(-5, -5, m_width + 10, m_height + 10);
@@ -180,7 +180,7 @@ void FxColumnPainter::paint(QPainter *painter,
   painter->setPen(Qt::NoPen);
   painter->drawRect(0, 0, m_width, m_height);
 
-  if (m_parent->isOpened() && m_parent->isLargeScaled()) {
+  if (m_parent->isOpened() && m_parent->isNormalIconView()) {
     // Draw the pixmap
     painter->setBrush(Qt::NoBrush);
     painter->setPen(QColor(0, 0, 0, 255));
@@ -199,7 +199,7 @@ void FxColumnPainter::paint(QPainter *painter,
 
   QRectF columnNameRect;
   QRectF levelNameRect;
-  if (m_parent->isLargeScaled()) {
+  if (m_parent->isNormalIconView()) {
     columnNameRect = QRect(18, 2, 54, 14);
     levelNameRect  = QRectF(18, 16, 54, 14);
   } else {
@@ -286,8 +286,7 @@ void FxColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 
   QAction *collapse = CommandManager::instance()->getAction("MI_Collapse");
 
-  QAction *openSubxsh = new QAction(tr("&Open Sub-xsheet"), &menu);
-  connect(openSubxsh, SIGNAL(triggered()), fxScene, SLOT(onOpenSubxsheet()));
+  QAction *openSubxsh = CommandManager::instance()->getAction("MI_OpenChild");
 
   QAction *explodeChild =
       CommandManager::instance()->getAction("MI_ExplodeChild");
@@ -418,7 +417,7 @@ void FxPalettePainter::paint(QPainter *painter,
 
   painter->setPen(Qt::NoPen);
 
-  if (m_parent->isLargeScaled())
+  if (m_parent->isNormalIconView())
     painter->drawRoundRect(QRectF(0, 0, m_width, m_height), 35, 99);
   else
     painter->drawRoundRect(QRectF(0, 0, m_width, m_height), 10, 30);
@@ -427,7 +426,7 @@ void FxPalettePainter::paint(QPainter *painter,
   QRect paletteRect;
   QRectF idRect;
   QRectF palNameRect;
-  if (m_parent->isLargeScaled()) {
+  if (m_parent->isNormalIconView()) {
     paletteRect = QRect(-3, -1, 20, 16);
     idRect      = QRectF(18, 2, 54, 14);
     palNameRect = QRectF(18, 16, 54, 14);
@@ -452,7 +451,7 @@ void FxPalettePainter::paint(QPainter *painter,
 
     int w = idRect.width();
 
-    if (m_parent->isLargeScaled()) {
+    if (m_parent->isNormalIconView()) {
       QString elidedName = elideText(m_name, painter->font(), w);
       painter->drawText(idRect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
     } else
@@ -569,7 +568,7 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   if (!sceneFx) return;
 
   // if the scale is small, display with fx icons
-  if (!m_parent->isLargeScaled()) {
+  if (!m_parent->isNormalIconView()) {
     paint_small(painter);
     return;
   }
@@ -641,9 +640,13 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     if (sceneFx->getCurrentFx() == m_parent->getFx())
       painter->setPen(viewer->getSelectedNodeTextColor());
     QRectF rect(3, 2, m_width - 21, 14);
-    int w              = rect.width();
+    int w = rect.width();
+    if (label == m_name) {
+      rect.adjust(0, 0, 0, 14);
+      w *= 2;
+    }
     QString elidedName = elideText(m_name, painter->font(), w);
-    painter->drawText(rect, elidedName);
+    painter->drawText(rect, Qt::TextWrapAnywhere, elidedName);
   }
 }
 
@@ -932,7 +935,7 @@ void FxXSheetPainter::paint(QPainter *painter,
     painter->setPen(viewer->getSelectedNodeTextColor());
   else
     painter->setPen(viewer->getTextColor());
-  if (m_parent->isLargeScaled()) {
+  if (m_parent->isNormalIconView()) {
     // Draw the name
     QRectF rect(18, 0, 54, 18);
     painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter,
@@ -1036,7 +1039,7 @@ void FxOutputPainter::paint(QPainter *painter,
     painter->setPen(viewer->getSelectedNodeTextColor());
   else
     painter->setPen(viewer->getTextColor());
-  if (m_parent->isLargeScaled()) {
+  if (m_parent->isNormalIconView()) {
     // Draw the name
     QRectF rect(18, 0, 72, 18);
     painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter,
@@ -1148,7 +1151,7 @@ FxSchematicPort::~FxSchematicPort() {}
 
 QRectF FxSchematicPort::boundingRect() const {
   // large scaled
-  if (getDock()->getNode()->isLargeScaled()) {
+  if (getDock()->getNode()->isNormalIconView()) {
     switch (getType()) {
     case eFxInputPort:
     case eFxGroupedInPort:
@@ -1223,7 +1226,7 @@ void FxSchematicPort::paint(QPainter *painter,
                             const QStyleOptionGraphicsItem *option,
                             QWidget *widget) {
   // large scaled
-  if (getDock()->getNode()->isLargeScaled()) {
+  if (getDock()->getNode()->isNormalIconView()) {
     switch (getType()) {
     case eFxInputPort:
     case eFxGroupedInPort: {
@@ -1288,7 +1291,15 @@ void FxSchematicPort::paint(QPainter *painter,
     } break;
 
     case eFxLinkPort:  // LinkPort
-    default: { painter->setBrush(QColor(192, 192, 192, 255)); } break;
+    {
+      QRect sourceRect =
+          scene()->views()[0]->matrix().mapRect(boundingRect()).toRect();
+      QPixmap linkPm = QIcon(":Resources/schematic_link_small.svg")
+                           .pixmap(sourceRect.size());
+      sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                         sourceRect.height() * getDevPixRatio());
+      painter->drawPixmap(boundingRect(), linkPm, sourceRect);
+    } break;
     }
     painter->drawRect(boundingRect());
   }
@@ -1807,7 +1818,7 @@ void FxSchematicDock::paint(QPainter *painter,
   if (m_port->getType() == eFxInputPort ||
       m_port->getType() == eFxGroupedInPort) {
     // do nothing when small scaled
-    if (!getNode()->isLargeScaled()) return;
+    if (!getNode()->isNormalIconView()) return;
 
     painter->setPen(Qt::NoPen);
     painter->setBrush(QColor(0, 0, 0, 192));
@@ -1842,7 +1853,7 @@ FxSchematicNode::FxSchematicNode(FxSchematicScene *scene, TFx *fx, qreal width,
     , m_fx(fx)
     , m_type(type)
     , m_isCurrentFxLinked(false)
-    , m_isLargeScaled(scene->isLargeScaled()) {
+    , m_isNormalIconView(scene->isNormalIconView()) {
   if (m_type == eGroupedFx)
     m_actualFx = 0;
   else {
@@ -2117,7 +2128,7 @@ void FxSchematicNode::updatePortsPosition() {
   };  // locals
 
   locals::PositionAssigner positioner;
-  if (m_isLargeScaled) {
+  if (m_isNormalIconView) {
     positioner.m_lastYPos = m_height;
     positioner.isLarge    = true;
   } else {
@@ -2163,7 +2174,7 @@ FxSchematicOutputNode::FxSchematicOutputNode(FxSchematicScene *scene,
                                              TOutputFx *fx)
     : FxSchematicNode(scene, fx, 67, 18, eOutpuFx) {
   // resize if small scaled
-  if (!m_isLargeScaled) {
+  if (!m_isNormalIconView) {
     setWidth(60);
     setHeight(36);
   }
@@ -2172,7 +2183,7 @@ FxSchematicOutputNode::FxSchematicOutputNode(FxSchematicScene *scene,
   m_outDock               = 0;
   m_linkDock              = 0;
   FxSchematicDock *inDock = new FxSchematicDock(this, "", 0, eFxInputPort);
-  if (m_isLargeScaled)
+  if (m_isNormalIconView)
     inDock->setPos(0, 2);
   else
     inDock->setPos(0, 0);
@@ -2221,7 +2232,7 @@ void FxSchematicOutputNode::mouseDoubleClickEvent(
 FxSchematicXSheetNode::FxSchematicXSheetNode(FxSchematicScene *scene,
                                              TXsheetFx *fx)
     : FxSchematicNode(scene, fx, 90, 18, eXSheetFx) {
-  if (!m_isLargeScaled) {
+  if (!m_isNormalIconView) {
     setWidth(70);
     setHeight(36);
   }
@@ -2238,7 +2249,7 @@ FxSchematicXSheetNode::FxSchematicXSheetNode(FxSchematicScene *scene,
 
   m_inDocks.push_back(inDock);
 
-  if (m_isLargeScaled) {
+  if (m_isNormalIconView) {
     m_outDock->setPos(72, 0);
     inDock->setPos(0, 2);
   } else {
@@ -2337,7 +2348,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
   checkDynamicInputPortSize();
 
   // resize if small scaled
-  if (!m_isLargeScaled) {
+  if (!m_isNormalIconView) {
     setWidth(70);
     setHeight(50);
   }
@@ -2401,11 +2412,11 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
   m_outDock  = new FxSchematicDock(this, "", 0, eFxOutputPort);
   m_linkDock = new FxSchematicDock(this, "", 0, eFxLinkPort);
 
-  m_renderToggle =
-      new SchematicToggle(this, viewer->getSchematicPreviewButtonOnImage(),
-                          viewer->getSchematicPreviewButtonBgOnColor(),
-                          viewer->getSchematicPreviewButtonOffImage(),
-                          viewer->getSchematicPreviewButtonBgOffColor(), 0);
+  m_renderToggle = new SchematicToggle(
+      this, viewer->getSchematicPreviewButtonOnImage(),
+      viewer->getSchematicPreviewButtonBgOnColor(),
+      viewer->getSchematicPreviewButtonOffImage(),
+      viewer->getSchematicPreviewButtonBgOffColor(), 0, m_isNormalIconView);
 
   m_painter =
       new FxPainter(this, m_width, m_height, m_name, m_type, fx->getFxType());
@@ -2418,7 +2429,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
   addPort(0, m_outDock->getPort());
   addPort(-1, m_linkDock->getPort());
 
-  if (m_isLargeScaled) {
+  if (m_isNormalIconView) {
     m_nameItem->setPos(1, -1);
     m_outDock->setPos(72, 14);
     m_linkDock->setPos(72, 7);
@@ -2431,7 +2442,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
     m_nameItem->setPos(-1, 0);
     m_outDock->setPos(60, 0);
     m_linkDock->setPos(60, -5);
-    m_renderToggle->setPos(35, -5);
+    m_renderToggle->setPos(30, -5);
   }
 
   m_nameItem->setZValue(3);
@@ -2446,7 +2457,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
   m_nameItem->hide();
 
   int i, inputPorts = fx->getInputPortCount();
-  double lastPosY = (m_isLargeScaled) ? m_height : 0;
+  double lastPosY = (m_isNormalIconView) ? m_height : 0;
   for (i = 0; i < inputPorts; i++) {
     std::string portName = fx->getInputPortName(i);
     QString qPortName    = QString::fromStdString(portName);
@@ -2482,7 +2493,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
 
     FxSchematicDock *inDock;
 
-    if (m_isLargeScaled) {
+    if (m_isNormalIconView) {
       inDock = new FxSchematicDock(this, qPortName, m_width - 18, eFxInputPort);
       inDock->setPos(0, lastPosY);
       lastPosY += inDock->boundingRect().height();
@@ -2619,7 +2630,7 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
 
   checkDynamicInputPortSize();
 
-  if (!m_isLargeScaled) {
+  if (!m_isNormalIconView) {
     setWidth(90);
     setHeight(50);
   }
@@ -2653,7 +2664,16 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
                           viewer->getSchematicPreviewButtonBgOnColor(),
                           viewer->getSchematicPreviewButtonOffImage(),
                           viewer->getSchematicPreviewButtonBgOffColor(),
-                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
+                          SchematicToggle::eIsParentColumn, m_isNormalIconView);
+
+  m_cameraStandToggle = new SchematicToggle(
+      this, viewer->getSchematicCamstandButtonOnImage(),
+      viewer->getSchematicCamstandButtonTranspImage(),
+      viewer->getSchematicCamstandButtonBgOnColor(),
+      viewer->getSchematicCamstandButtonOffImage(),
+      viewer->getSchematicCamstandButtonBgOffColor(),
+      SchematicToggle::eIsParentColumn | SchematicToggle::eEnableNullState,
+      m_isNormalIconView);
 
   // get the fx icons according to the fx type
   m_painter = new FxPainter(this, m_width, m_height, m_name, m_type,
@@ -2668,14 +2688,20 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
   addPort(0, m_outDock->getPort());
   addPort(-1, m_linkDock->getPort());
 
-  if (column) m_renderToggle->setIsActive(column->isPreviewVisible());
+  if (column) {
+    m_renderToggle->setIsActive(column->isPreviewVisible());
+    m_cameraStandToggle->setState(
+        column->isCamstandVisible() ? (column->getOpacity() < 255 ? 2 : 1) : 0);
+  }
 
   // define positions
-  if (m_isLargeScaled) {
+  if (m_isNormalIconView) {
     m_nameItem->setPos(1, -1);
     m_outDock->setPos(72, 14);
     m_linkDock->setPos(72, m_height);
     m_renderToggle->setPos(72, 0);
+    m_cameraStandToggle->setPos(72, 7);
+
   } else {
     QFont fnt = m_nameItem->font();
     fnt.setPixelSize(fnt.pixelSize() * 2);
@@ -2684,25 +2710,29 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
     m_nameItem->setPos(-1, 0);
     m_outDock->setPos(80, 0);
     m_linkDock->setPos(80, -5);
-    m_renderToggle->setPos(55, -5);
+    m_renderToggle->setPos(50, -5);
+    m_cameraStandToggle->setPos(20, -5);
   }
 
   m_nameItem->setZValue(3);
   m_outDock->setZValue(2);
   m_renderToggle->setZValue(2);
+  m_cameraStandToggle->setZValue(2);
   m_painter->setZValue(1);
 
   connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
   connect(m_renderToggle, SIGNAL(toggled(bool)), this,
           SLOT(onRenderToggleClicked(bool)));
+  connect(m_cameraStandToggle, SIGNAL(stateChanged(int)), this,
+          SLOT(onCameraStandToggleClicked(int)));
 
   if (zeraryFx) {
     int i, inputPorts = zeraryFx->getInputPortCount();
-    double lastPosY = (m_isLargeScaled) ? m_height : 0;
+    double lastPosY = (m_isNormalIconView) ? m_height : 0;
 
     for (i = 0; i < inputPorts; i++) {
       FxSchematicDock *inDock;
-      if (m_isLargeScaled) {
+      if (m_isNormalIconView) {
         inDock = new FxSchematicDock(
             this, QString::fromStdString(zeraryFx->getInputPortName(i)),
             m_width - 18, eFxInputPort);
@@ -2751,6 +2781,20 @@ void FxSchematicZeraryNode::onRenderToggleClicked(bool toggled) {
   TXshColumn *column = fxScene->getXsheet()->getColumn(m_columnIndex);
   if (column) {
     column->setPreviewVisible(toggled);
+    emit sceneChanged();
+    emit xsheetChanged();
+  }
+}
+
+//-----------------------------------------------------
+
+void FxSchematicZeraryNode::onCameraStandToggleClicked(int state) {
+  FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
+  if (!fxScene) return;
+  TXshColumn *column = fxScene->getXsheet()->getColumn(m_columnIndex);
+  if (column) {
+    column->setCamstandVisible(!column->isCamstandVisible());
+    // column->setCamstandVisible(toggled);
     emit sceneChanged();
     emit xsheetChanged();
   }
@@ -2848,7 +2892,7 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
 {
   SchematicViewer *viewer = scene->getSchematicViewer();
 
-  if (!m_isLargeScaled) {
+  if (!m_isNormalIconView) {
     setWidth(90);
     setHeight(50);
   }
@@ -2866,7 +2910,7 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
                           viewer->getSchematicPreviewButtonBgOnColor(),
                           viewer->getSchematicPreviewButtonOffImage(),
                           viewer->getSchematicPreviewButtonBgOffColor(),
-                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
+                          SchematicToggle::eIsParentColumn, m_isNormalIconView);
   m_cameraStandToggle = new SchematicToggle(
       this, viewer->getSchematicCamstandButtonOnImage(),
       viewer->getSchematicCamstandButtonTranspImage(),
@@ -2874,7 +2918,7 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
       viewer->getSchematicCamstandButtonOffImage(),
       viewer->getSchematicCamstandButtonBgOffColor(),
       SchematicToggle::eIsParentColumn | SchematicToggle::eEnableNullState,
-      m_isLargeScaled);
+      m_isNormalIconView);
   m_columnPainter = new FxColumnPainter(this, m_width, m_height, m_name);
 
   // no link port
@@ -2900,7 +2944,7 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
   }
 
   // set geometry
-  if (m_isLargeScaled) {
+  if (m_isNormalIconView) {
     m_resizeItem->setPos(2, 0);
     m_nameItem->setPos(16, -1);
     m_outDock->setPos(72, 14);
@@ -2943,7 +2987,7 @@ FxSchematicColumnNode::~FxSchematicColumnNode() {}
 //-----------------------------------------------------
 
 QRectF FxSchematicColumnNode::boundingRect() const {
-  if (m_isOpened && m_isLargeScaled)
+  if (m_isOpened && m_isNormalIconView)
     return QRectF(-5, -54, m_width + 10, m_height + 59);
   else
     return QRectF(-5, -5, m_width + 10, m_height + 10);
@@ -3052,7 +3096,7 @@ void FxSchematicColumnNode::onChangedSize(bool expand) {
   prepareGeometryChange();
   m_isOpened = expand;
   m_fx->getAttributes()->setIsOpened(m_isOpened);
-  m_height = (m_isLargeScaled) ? 32 : 50;
+  m_height = (m_isNormalIconView) ? 32 : 50;
   updateLinksGeometry();
   update();
 }
@@ -3124,7 +3168,7 @@ FxSchematicPaletteNode::FxSchematicPaletteNode(FxSchematicScene *scene,
     : FxSchematicNode(scene, fx, 90, 32, eColumnFx) {
   SchematicViewer *viewer = scene->getSchematicViewer();
 
-  if (!m_isLargeScaled) {
+  if (!m_isNormalIconView) {
     setWidth(90);
     setHeight(50);
   }
@@ -3142,7 +3186,7 @@ FxSchematicPaletteNode::FxSchematicPaletteNode(FxSchematicScene *scene,
                           viewer->getSchematicPreviewButtonBgOnColor(),
                           viewer->getSchematicPreviewButtonOffImage(),
                           viewer->getSchematicPreviewButtonBgOffColor(),
-                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
+                          SchematicToggle::eIsParentColumn, m_isNormalIconView);
   m_palettePainter = new FxPalettePainter(this, m_width, m_height, m_name);
 
   //----
@@ -3157,7 +3201,7 @@ FxSchematicPaletteNode::FxSchematicPaletteNode(FxSchematicScene *scene,
   if (column) m_renderToggle->setIsActive(column->isPreviewVisible());
 
   // set geometry
-  if (m_isLargeScaled) {
+  if (m_isNormalIconView) {
     m_nameItem->setPos(19, -1);
     m_outDock->setPos(72, 14);
     m_renderToggle->setPos(72, 0);
@@ -3301,7 +3345,7 @@ FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx,
     , m_groupedFxs(groupedFx) {
   SchematicViewer *viewer = scene->getSchematicViewer();
 
-  if (!m_isLargeScaled) {
+  if (!m_isNormalIconView) {
     setWidth(90);
     setHeight(50);
   }
@@ -3321,10 +3365,11 @@ FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx,
                           viewer->getSchematicPreviewButtonBgOnColor(),
                           viewer->getSchematicPreviewButtonOffImage(),
                           viewer->getSchematicPreviewButtonBgOffColor(),
-                          SchematicToggle::eIsParentColumn, m_isLargeScaled);
+                          SchematicToggle::eIsParentColumn, m_isNormalIconView);
   m_outDock               = new FxSchematicDock(this, "", 0, eFxGroupedOutPort);
   FxSchematicDock *inDock = new FxSchematicDock(
-      this, "Source", (m_isLargeScaled) ? m_width - 18 : 10, eFxGroupedInPort);
+      this, "Source", (m_isNormalIconView) ? m_width - 18 : 10,
+      eFxGroupedInPort);
 
   m_painter = new FxPainter(this, m_width, m_height, m_name, m_type,
                             roots[0]->getFxType());
@@ -3341,7 +3386,7 @@ FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx,
   m_inDocks.push_back(inDock);
 
   // set geometry
-  if (m_isLargeScaled) {
+  if (m_isNormalIconView) {
     m_nameItem->setPos(1, -1);
     m_renderToggle->setPos(72, 0);
     m_outDock->setPos(72, 14);

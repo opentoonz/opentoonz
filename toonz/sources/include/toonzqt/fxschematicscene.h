@@ -98,7 +98,7 @@ class FxSchematicScene final : public SchematicScene {
   FxSchematicNode *m_currentFxNode;
   int m_gridDimension;
 
-  bool m_isLargeScaled;
+  bool m_isNormalIconView;
 
   QMap<TFx *, QList<FxSchematicNode *>> m_nodesToPlace;
 
@@ -147,8 +147,8 @@ public:
     m_addFxContextMenu.setCurrentCursorScenePos(QPointF(0, 0));
   }
   void selectNodes(QList<TFxP> &fxs);
-  void toggleLargeScaled() { m_isLargeScaled = !m_isLargeScaled; }
-  bool isLargeScaled() { return m_isLargeScaled; }
+  void toggleNormalIconView() { m_isNormalIconView = !m_isNormalIconView; }
+  bool isNormalIconView() { return m_isNormalIconView; }
 
   SchematicViewer *getSchematicViewer() { return m_viewer; }
 
@@ -211,7 +211,6 @@ protected slots:
   void onCacheFx();
   void onUncacheFx();
   void onCollapse(const QList<TFxP> &);
-  void onOpenSubxsheet();
 
   void onXsheetChanged();
   void onSceneChanged();

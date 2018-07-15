@@ -214,7 +214,6 @@ protected slots:
   void onCurrentColumnChanged(int);
   void onSelectionChanged();
   void onCollapse(QList<TStageObjectId>);
-  void onOpenSubxsheet();
   void onEditGroup();
 
   void onSwitchPortModeToggled(bool withLetter);

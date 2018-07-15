@@ -1232,13 +1232,6 @@ void StageSchematicScene::onCollapse(QList<TStageObjectId> objects) {
 
 //------------------------------------------------------------------
 
-void StageSchematicScene::onOpenSubxsheet() {
-  CommandManager *cm = CommandManager::instance();
-  cm->execute("MI_OpenChild");
-}
-
-//------------------------------------------------------------------
-
 void StageSchematicScene::onEditGroup() {
   if (m_selection->isEmpty()) return;
   TStageObjectTree *pegTree  = m_xshHandle->getXsheet()->getStageObjectTree();

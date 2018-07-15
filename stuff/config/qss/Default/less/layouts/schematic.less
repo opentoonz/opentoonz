@@ -2,18 +2,17 @@
    Schematic Viewer
 ----------------------------------------------------------------------------- */
 
-// SchematicViewer will mostly use the same settings as the XsheetViewer by default
 SchematicViewer {
-  qproperty-TextColor: @xsheet-text-color;
-  qproperty-VerticalLineColor: @xsheet-VerticalLine-color;
+  qproperty-TextColor: @schematic-text-color;
+  qproperty-VerticalLineColor: @schematic-VerticalLine-color;
 
-  qproperty-LevelColumnColor: @xsheet-LevelColumn-color;
-  qproperty-VectorColumnColor: @xsheet-VectorColumn-color;
-  qproperty-ChildColumnColor: @xsheet-ChildColumn-color;
-  qproperty-FullcolorColumnColor: @xsheet-FullColorColumn-color;
-  qproperty-FxColumnColor: @xsheet-FxColumn-color;
-  qproperty-PaletteColumnColor: @xsheet-PaletteColumn-color;
-  qproperty-MeshColumnColor: @xsheet-MeshColumn-color;
+  qproperty-LevelColumnColor: @schematic-LevelColumn-color;
+  qproperty-VectorColumnColor: @schematic-VectorColumn-color;
+  qproperty-ChildColumnColor: @schematic-ChildColumn-color;
+  qproperty-FullcolorColumnColor: @schematic-FullColorColumn-color;
+  qproperty-FxColumnColor: @schematic-FxColumn-color;
+  qproperty-PaletteColumnColor: @schematic-PaletteColumn-color;
+  qproperty-MeshColumnColor: @schematic-MeshColumn-color;
 
   qproperty-TableColor: @schematic-TableColor;
   qproperty-ActiveCameraColor: @schematic-ActiveCameraColor;
@@ -30,17 +29,16 @@ SchematicViewer {
   qproperty-LayerBlendingFxColor: @schematic-LayerBlendingFxColor;
   qproperty-MatteFxColor: @schematic-MatteFxColor;
 
-  // For now the BG OFF color needs to be the same as the BG ON color until the UI is redesigned
-  qproperty-SchematicPreviewButtonBgOnColor: @xsheet-PreviewButtonBgOn-color;
-  qproperty-SchematicPreviewButtonOnImage: url('@{img-url}/@{xsheet-PreviewButtonOnImage}');
-  qproperty-SchematicPreviewButtonBgOffColor: @xsheet-PreviewButtonBgOn-color;
-  qproperty-SchematicPreviewButtonOffImage: url('@{img-url}/@{xsheet-PreviewButtonOffImage}');
+  qproperty-SchematicPreviewButtonBgOnColor: @schematic-PreviewButtonBgOn-color;
+  qproperty-SchematicPreviewButtonOnImage: url('@{img-url}/@{schematic-PreviewButtonOnImage}');
+  qproperty-SchematicPreviewButtonBgOffColor: @schematic-PreviewButtonBgOff-color;
+  qproperty-SchematicPreviewButtonOffImage: url('@{img-url}/@{schematic-PreviewButtonOffImage}');
 
-  qproperty-SchematicCamstandButtonBgOnColor: @xsheet-CamstandButtonBgOn-color;
-  qproperty-SchematicCamstandButtonOnImage: url('@{img-url}/@{xsheet-CamstandButtonOnImage}');
-  qproperty-SchematicCamstandButtonTranspImage: url('@{img-url}/@{xsheet-CamstandButtonTranspImage}');
-  qproperty-SchematicCamstandButtonBgOffColor: @xsheet-CamstandButtonBgOn-color;
-  qproperty-SchematicCamstandButtonOffImage: url('@{img-url}/@{xsheet-CamstandButtonOffImage}');
+  qproperty-SchematicCamstandButtonBgOnColor: @schematic-CamstandButtonBgOn-color;
+  qproperty-SchematicCamstandButtonOnImage: url('@{img-url}/@{schematic-CamstandButtonOnImage}');
+  qproperty-SchematicCamstandButtonTranspImage: url('@{img-url}/@{schematic-CamstandButtonTranspImage}');
+  qproperty-SchematicCamstandButtonBgOffColor: @schematic-CamstandButtonBgOff-color;
+  qproperty-SchematicCamstandButtonOffImage: url('@{img-url}/@{schematic-CamstandButtonOffImage}');
 }
 
 /* -----------------------------------------------------------------------------

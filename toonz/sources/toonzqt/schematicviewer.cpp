@@ -698,7 +698,7 @@ void SchematicViewer::createActions() {
       // Iconify Fx nodes
       iconifyNodes = new QAction(tr("&Toggle node icons"), m_fxToolbar);
       iconifyNodes->setCheckable(true);
-      iconifyNodes->setChecked(!m_fxScene->isLargeScaled());
+      iconifyNodes->setChecked(!m_fxScene->isNormalIconView());
       QIcon iconifyNodesIcon = createQIconOnOff("iconifynodes");
       iconifyNodes->setIcon(iconifyNodesIcon);
       connect(iconifyNodes, SIGNAL(toggled(bool)), m_fxScene,
@@ -777,7 +777,7 @@ void SchematicViewer::setFxSchematic() {
     m_fxToolbar->show();
 
     // check if the fx scene was small scaled (icon view mode)
-    if (!m_fxScene->isLargeScaled()) m_fxScene->updateScene();
+    if (!m_fxScene->isNormalIconView()) m_fxScene->updateScene();
 
     m_viewer->update();
   }
@@ -814,7 +814,7 @@ void SchematicViewer::onSceneSwitched() {
   // reset schematic
   m_viewer->resetMatrix();
   m_viewer->centerOn(m_viewer->scene()->itemsBoundingRect().center());
-  if (m_viewer->scene() == m_fxScene && !m_fxScene->isLargeScaled())
+  if (m_viewer->scene() == m_fxScene && !m_fxScene->isNormalIconView())
     m_fxScene->updateScene();
 }
 
