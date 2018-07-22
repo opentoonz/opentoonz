@@ -63,7 +63,7 @@
 #include "toonz/imagestyles.h"
 #include "tvectorbrushstyle.h"
 
-#include "tabletsupportwinink.h"
+#include "kis_tablet_support_win8.h"
 
 #ifdef MACOSX
 #include "tipc.h"
@@ -666,7 +666,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef _WIN32
   if (Preferences::instance()->isWinInkEnabled()) {
-    TabletSupportWinInk *penFilter = new TabletSupportWinInk();
+    KisTabletSupportWin8 *penFilter = new KisTabletSupportWin8();
     if (penFilter->init()) {
       a.installNativeEventFilter(penFilter);
     } else {

@@ -1,4 +1,54 @@
-#include "tabletsupportwinink.h"
+/*
+* This file is based on the Windows Pointer Input Message support code files by
+* Alvin Wong.
+* Notwithstanding the license specified in this repository, this file is
+* redistributed under BSD 2-Clause license written below in order to keep
+* backporting available.
+*
+* All contributions by Alvin Wong:
+* Copyright (c) 2017 Alvin Wong <alvinhochun@gmail.com>
+* All rights reserved.
+*
+* All other contributions:
+* Copyright (c) 2018, the respective contributors.
+* All rights reserved.
+*
+* Each contributor holds copyright over their respective contributions.
+* The project versioning (Git) records all such contribution source information.
+*
+* Redistribution and use in source and binary forms, with or without
+- modification, are permitted provided that the following conditions
+- are met:
+-
+- 1. Redistributions of source code must retain the above copyright
+-    notice, this list of conditions and the following disclaimer.
+- 2. Redistributions in binary form must reproduce the above copyright
+-    notice, this list of conditions and the following disclaimer in the
+-    documentation and/or other materials provided with the distribution.
+-
+- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+// Get Windows 8 API prototypes and types
+#ifdef WINVER
+#undef WINVER
+#endif
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif
+#define WINVER 0x0602
+#define _WIN32_WINNT 0x0602
+
+#include "kis_tablet_support_win8.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -14,15 +64,9 @@
 
 #ifdef _WIN32
 
-// Get Windows 8 API prototypes and types
-#ifdef WINVER
-#undef WINVER
+#ifdef KRITA
+#include <kis_debug.h>
 #endif
-#ifdef _WIN32_WINNT
-#undef _WIN32_WINNT
-#endif
-#define WINVER 0x0602
-#define _WIN32_WINNT 0x0602
 
 #include <windows.h>
 #include <tpcshrd.h>
@@ -79,16 +123,28 @@ public:
       return false;
     }
 
+#ifdef KRITA
+#define LOAD_AND_CHECK_FP_FROM_WINAPI(func)                                    \
+  m_p##func = reinterpret_cast<p##func##_t>(user32Lib.resolve(#func));         \
+  if (!m_p##func) {                                                            \
+    dbgTablet << "Failed to load function " #func " from user32.dll";          \
+    return false;                                                              \
+  }
+#else
 #define LOAD_AND_CHECK_FP_FROM_WINAPI(func)                                    \
   m_p##func = reinterpret_cast<p##func##_t>(user32Lib.resolve(#func));         \
   if (!m_p##func) {                                                            \
     return false;                                                              \
   }
+#endif
 
     WIN8_POINTER_INPUT_API_LIST(LOAD_AND_CHECK_FP_FROM_WINAPI)
 
 #undef LOAD_AND_CHECK_FP_FROM_WINAPI
 
+#ifdef KRITA
+    dbgTablet << "Loaded Windows 8 Pointer Input API functions";
+#endif
     m_loaded = true;
     return true;
   }
@@ -223,42 +279,116 @@ QHash<int, PenPointerItem> penPointers;
 
 bool handlePointerMsg(const MSG &msg);
 
+// extern "C" {
+//
+// LRESULT CALLBACK pointerDeviceNotificationsWndProc(HWND hwnd, UINT uMsg,
+// WPARAM wParam, LPARAM lParam)
+// {
+//     switch (uMsg) {
+//     case WM_POINTERDEVICECHANGE:
+//         dbgTablet << "I would want to handle this WM_POINTERDEVICECHANGE
+//         event, but ms just doesn't want me to use it";
+//         dbgTablet << "  wParam:" << wParam;
+//         dbgTablet << "  lParam:" << lParam;
+//         return 0;
+//     case WM_POINTERDEVICEINRANGE:
+//         dbgTablet << "I would want to handle this WM_POINTERDEVICEINRANGE
+//         event, but ms just doesn't want me to use it";
+//         dbgTablet << "  wParam:" << wParam;
+//         dbgTablet << "  lParam:" << lParam;
+//         return 0;
+//     case WM_POINTERDEVICEOUTOFRANGE:
+//         dbgTablet << "I would want to handle this WM_POINTERDEVICEOUTOFRANGE
+//         event, but ms just doesn't want me to use it";
+//         dbgTablet << "  wParam:" << wParam;
+//         dbgTablet << "  lParam:" << lParam;
+//         return 0;
+//     }
+//     return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+// }
+//
+// } // extern "C"
+
 }  // namespace
 
-bool TabletSupportWinInk::isAvailable() {
+bool KisTabletSupportWin8::isAvailable() {
   // Just try loading the APIs
   return api.init();
 }
 
-bool TabletSupportWinInk::isPenDeviceAvailable() {
+bool KisTabletSupportWin8::isPenDeviceAvailable() {
   if (!api.init()) {
     return false;
   }
   UINT32 deviceCount = 0;
   if (!api.GetPointerDevices(&deviceCount, nullptr)) {
+#ifdef KRITA
+    dbgTablet << "GetPointerDevices failed";
+#endif
     return false;
   }
   if (deviceCount == 0) {
+#ifdef KRITA
+    dbgTablet << "No pointer devices";
+#endif
     return false;
   }
   QVector<POINTER_DEVICE_INFO> devices(deviceCount);
   if (!api.GetPointerDevices(&deviceCount, devices.data())) {
+#ifdef KRITA
+    dbgTablet << "GetPointerDevices failed";
+#endif
     return false;
   }
   bool hasPenDevice = false;
   Q_FOREACH (const POINTER_DEVICE_INFO &device, devices) {
+#ifdef KRITA
+    dbgTablet << "Found pointer device" << static_cast<void *>(device.device)
+              << QString::fromWCharArray(device.productString)
+              << "type:" << device.pointerDeviceType;
+#endif
     if (device.pointerDeviceType == POINTER_DEVICE_TYPE_INTEGRATED_PEN ||
         device.pointerDeviceType == POINTER_DEVICE_TYPE_EXTERNAL_PEN) {
       hasPenDevice = true;
     }
   }
+#ifdef KRITA
+  dbgTablet << "hasPenDevice:" << hasPenDevice;
+#endif
   return hasPenDevice;
 }
 
-bool TabletSupportWinInk::init() { return api.init(); }
+bool KisTabletSupportWin8::init() { return api.init(); }
 
-bool TabletSupportWinInk::nativeEventFilter(const QByteArray &eventType,
-                                            void *message, long *result) {
+// void KisTabletSupportWin8::registerPointerDeviceNotifications()
+// {
+//     const wchar_t *className = L"w8PointerMsgWindow";
+//     HINSTANCE hInst = static_cast<HINSTANCE>(GetModuleHandleW(nullptr));
+//     WNDCLASSEXW wc;
+//     wc.cbSize = sizeof(WNDCLASSEXW);
+//     wc.style = 0;
+//     wc.lpfnWndProc = pointerDeviceNotificationsWndProc;
+//     wc.cbClsExtra = 0;
+//     wc.cbWndExtra = 0;
+//     wc.hInstance = hInst;
+//     wc.hCursor = 0;
+//     wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
+//     wc.hIcon = 0;
+//     wc.hIconSm = 0;
+//     wc.lpszMenuName = 0;
+//     wc.lpszClassName = className;
+//
+//     if (RegisterClassEx(&wc)) {
+//         HWND hwnd = CreateWindowEx(0, className, nullptr, 0, 0, 0, 0, 0,
+//         HWND_MESSAGE, nullptr, hInst, nullptr);
+//         api.RegisterPointerDeviceNotifications(hwnd, TRUE);
+//     } else {
+//         dbgTablet << "Cannot register dummy window";
+//     }
+// }
+
+bool KisTabletSupportWin8::nativeEventFilter(const QByteArray &eventType,
+                                             void *message, long *result) {
   if (!result) {
     // I don't know why this even happens, but it actually does
     // And the same event is sent in again with result != nullptr
@@ -327,6 +457,27 @@ bool registerOrUpdateDevice(HANDLE deviceHandle, const RECT &pointerDeviceRect,
   deviceItem.pixelOffsetY = static_cast<qreal>(displayRect.top) -
                             deviceItem.himetricToPixelY * pointerDeviceRect.top;
   deviceItem.deviceOrientation = deviceOrientation;
+  if (!isPreviouslyRegistered) {
+#ifdef KRITA
+    dbgTablet << "Registered pen device" << deviceHandle << "with displayRect"
+              << displayRect << "and deviceRect" << pointerDeviceRect << "scale"
+              << deviceItem.himetricToPixelX << deviceItem.himetricToPixelY
+              << "offset" << deviceItem.pixelOffsetX << deviceItem.pixelOffsetY
+              << "orientation" << deviceItem.deviceOrientation;
+#endif
+  } else if (deviceItem.himetricToPixelX != oldDeviceItem.himetricToPixelX ||
+             deviceItem.himetricToPixelY != oldDeviceItem.himetricToPixelY ||
+             deviceItem.pixelOffsetX != oldDeviceItem.pixelOffsetX ||
+             deviceItem.pixelOffsetY != oldDeviceItem.pixelOffsetY ||
+             deviceItem.deviceOrientation != oldDeviceItem.deviceOrientation) {
+#ifdef KRITA
+    dbgTablet << "Updated pen device" << deviceHandle << "with displayRect"
+              << displayRect << "and deviceRect" << pointerDeviceRect << "scale"
+              << deviceItem.himetricToPixelX << deviceItem.himetricToPixelY
+              << "offset" << deviceItem.pixelOffsetX << deviceItem.pixelOffsetY
+              << "orientation" << deviceItem.deviceOrientation;
+#endif
+  }
   return true;
 }
 
@@ -334,10 +485,16 @@ bool registerOrUpdateDevice(HANDLE deviceHandle) {
   RECT pointerDeviceRect, displayRect;
   if (!api.GetPointerDeviceRects(deviceHandle, &pointerDeviceRect,
                                  &displayRect)) {
+#ifdef KRITA
+    dbgTablet << "GetPointerDeviceRects failed";
+#endif
     return false;
   }
   POINTER_DEVICE_INFO pointerDeviceInfo;
   if (!api.GetPointerDevice(deviceHandle, &pointerDeviceInfo)) {
+#ifdef KRITA
+    dbgTablet << "GetPointerDevice failed";
+#endif
     return false;
   }
   return registerOrUpdateDevice(deviceHandle, pointerDeviceRect, displayRect,
@@ -370,6 +527,32 @@ QTabletEvent makeProximityTabletEvent(const QEvent::Type eventType,
       );
 }
 
+// void rotateTiltAngles(int &tiltX, int &tiltY, const DISPLAYCONFIG_ROTATION
+// orientation) {
+//     int newTiltX, newTiltY;
+//     switch (orientation) {
+//     case DISPLAYCONFIG_ROTATION_ROTATE90:
+//         newTiltX = -tiltY;
+//         newTiltY = tiltX;
+//         break;
+//     case DISPLAYCONFIG_ROTATION_ROTATE180:
+//         newTiltX = -tiltX;
+//         newTiltY = -tiltY;
+//         break;
+//     case DISPLAYCONFIG_ROTATION_ROTATE270:
+//         newTiltX = tiltY;
+//         newTiltY = -tiltX;
+//         break;
+//     case DISPLAYCONFIG_ROTATION_IDENTITY:
+//     default:
+//         newTiltX = tiltX;
+//         newTiltY = tiltY;
+//         break;
+//     }
+//     tiltX = newTiltX;
+//     tiltY = newTiltY;
+// }
+
 QTabletEvent makePositionalTabletEvent(const QWidget *targetWidget,
                                        const QEvent::Type eventType,
                                        const POINTER_PEN_INFO &penInfo,
@@ -401,8 +584,13 @@ QTabletEvent makePositionalTabletEvent(const QWidget *targetWidget,
         POINTER_CHANGE_SECONDBUTTON_DOWN) {
       mouseButton = Qt::RightButton;
     } else {
+#ifdef KRITA
+      KIS_SAFE_ASSERT_RECOVER(penInfo.pointerInfo.ButtonChangeType ==
+                              POINTER_CHANGE_FIRSTBUTTON_DOWN) {
+#else
       if (!(penInfo.pointerInfo.ButtonChangeType ==
             POINTER_CHANGE_FIRSTBUTTON_DOWN)) {
+#endif
         qWarning() << "WM_POINTER* sent unknown ButtonChangeType"
                    << penInfo.pointerInfo.ButtonChangeType;
       }
@@ -413,8 +601,13 @@ QTabletEvent makePositionalTabletEvent(const QWidget *targetWidget,
         POINTER_CHANGE_SECONDBUTTON_UP) {
       mouseButton = Qt::RightButton;
     } else {
+#ifdef KRITA
+      KIS_SAFE_ASSERT_RECOVER(penInfo.pointerInfo.ButtonChangeType ==
+                              POINTER_CHANGE_FIRSTBUTTON_UP) {
+#else
       if (!(penInfo.pointerInfo.ButtonChangeType ==
             POINTER_CHANGE_FIRSTBUTTON_UP)) {
+#endif
         qWarning() << "WM_POINTER* sent unknown ButtonChangeType"
                    << penInfo.pointerInfo.ButtonChangeType;
       }
@@ -472,10 +665,17 @@ QTabletEvent makePositionalTabletEvent(const QWidget *targetWidget,
 
 bool sendProximityTabletEvent(const QEvent::Type eventType,
                               const POINTER_PEN_INFO &penInfo) {
+#ifdef KRITA
+  KIS_SAFE_ASSERT_RECOVER_RETURN_VALUE(
+      eventType == QEvent::TabletEnterProximity ||
+          eventType == QEvent::TabletLeaveProximity,
+      false);
+#else
   if (!(eventType == QEvent::TabletEnterProximity ||
         eventType == QEvent::TabletLeaveProximity)) {
     return false;
   }
+#endif
   QTabletEvent ev = makeProximityTabletEvent(eventType, penInfo);
   ev.setAccepted(false);
   ev.setTimestamp(penInfo.pointerInfo.dwTime);
@@ -489,6 +689,9 @@ void synthesizeMouseEvent(const QTabletEvent &ev,
   BOOL result = SetCursorPos(penInfo.pointerInfo.ptPixelLocationRaw.x,
                              penInfo.pointerInfo.ptPixelLocationRaw.y);
   if (!result) {
+#ifdef KRITA
+    dbgInput << "SetCursorPos failed, err" << GetLastError();
+#endif
     return;
   }
   // Send mousebutton down/up events. Windows stores the button state.
@@ -530,6 +733,9 @@ void synthesizeMouseEvent(const QTabletEvent &ev,
       0x01;  // https://msdn.microsoft.com/en-us/library/windows/desktop/ms703320%28v=vs.85%29.aspx
   UINT result2 = SendInput(1, &inputData, sizeof(inputData));
   if (result2 != 1) {
+#ifdef KRITA
+    dbgInput << "SendInput failed, err" << GetLastError();
+#endif
     return;
   }
 }
@@ -539,10 +745,17 @@ bool sendPositionalTabletEvent(QWidget *target, const QEvent::Type eventType,
                                const PointerDeviceItem &device,
                                const PenPointerItem &penPointerItem,
                                const bool shouldSynthesizeMouseEvent) {
+#ifdef KRITA
+  KIS_SAFE_ASSERT_RECOVER_RETURN_VALUE(eventType == QEvent::TabletMove ||
+                                           eventType == QEvent::TabletPress ||
+                                           eventType == QEvent::TabletRelease,
+                                       false);
+#else
   if (!(eventType == QEvent::TabletMove || eventType == QEvent::TabletPress ||
         eventType == QEvent::TabletRelease)) {
     return false;
   }
+#endif
   QTabletEvent ev = makePositionalTabletEvent(target, eventType, penInfo,
                                               device, penPointerItem);
   ev.setAccepted(false);
@@ -591,7 +804,11 @@ bool sendPositionalTabletEvent(QWidget *target, const QEvent::Type eventType,
 bool handlePenEnterMsg(const POINTER_PEN_INFO &penInfo) {
   PointerFlagsWrapper pointerFlags = PointerFlagsWrapper::fromPenInfo(penInfo);
   if (!pointerFlags.isPrimary()) {
-    // Don't handle non-primary pointer messages for now
+// Don't handle non-primary pointer messages for now
+#ifdef KRITA
+    dbgTablet << "Pointer" << penInfo.pointerInfo.pointerId << "of device"
+              << penInfo.pointerInfo.sourceDevice << "is not flagged PRIMARY";
+#endif
     return false;
   }
 
@@ -630,9 +847,16 @@ bool handlePenEnterMsg(const POINTER_PEN_INFO &penInfo) {
 
 bool handlePenLeaveMsg(const POINTER_PEN_INFO &penInfo) {
   if (!penPointers.contains(penInfo.pointerInfo.pointerId)) {
+#ifdef KRITA
+    dbgTablet << "Pointer" << penInfo.pointerInfo.pointerId
+              << "wasn't being handled";
+#endif
     return false;
   }
   if (!penDevices.contains(penInfo.pointerInfo.sourceDevice)) {
+#ifdef KRITA
+    dbgTablet << "Device is gone from the registration???";
+#endif
     // TODO: re-register device?
     penPointers.remove(penInfo.pointerInfo.pointerId);
     return false;
@@ -663,6 +887,9 @@ bool handleSinglePenUpdate(PenPointerItem &penPointerItem,
     QWidget *hwndWidget =
         QWidget::find(reinterpret_cast<WId>(penInfo.pointerInfo.hwndTarget));
     if (!hwndWidget) {
+#ifdef KRITA
+      dbgTablet << "HWND cannot be mapped to QWidget (what?)";
+#endif
       return false;
     }
     {
@@ -691,6 +918,7 @@ bool handleSinglePenUpdate(PenPointerItem &penPointerItem,
                                 penPointerItem.oneOverDpr)));
     targetWidget = hwndWidget->childAt(posInHwndWidget);
     if (!targetWidget) {
+      // dbgTablet << "No childQWidget at cursor position";
       targetWidget = hwndWidget;
     }
     // penPointerItem.activeWidget = targetWidget;
@@ -705,25 +933,35 @@ bool handleSinglePenUpdate(PenPointerItem &penPointerItem,
 bool handlePenUpdateMsg(const POINTER_PEN_INFO &penInfo) {
   auto currentPointerIt = penPointers.find(penInfo.pointerInfo.pointerId);
   if (currentPointerIt == penPointers.end()) {
+    // dbgTablet << "Pointer" << penInfo.pointerInfo.pointerId << "wasn't being
+    // handled";
     return false;
   }
 
   const auto devIt = penDevices.find(penInfo.pointerInfo.sourceDevice);
   if (devIt == penDevices.end()) {
+#ifdef KRITA
+    dbgTablet << "Device not registered???";
+#endif
     return false;
   }
 
   // UINT32 entriesCount = 0;
   // if (!api.GetPointerPenInfoHistory(penInfo.pointerInfo.pointerId,
   // &entriesCount, nullptr)) {
+  //     dbgTablet << "GetPointerPenInfoHistory (getting count) failed";
   //     return false;
   // }
   UINT32 entriesCount = penInfo.pointerInfo.historyCount;
-  bool handled        = false;
+  // dbgTablet << "entriesCount:" << entriesCount;
+  bool handled = false;
   if (entriesCount != 1) {
     QVector<POINTER_PEN_INFO> penInfoArray(entriesCount);
     if (!api.GetPointerPenInfoHistory(penInfo.pointerInfo.pointerId,
                                       &entriesCount, penInfoArray.data())) {
+#ifdef KRITA
+      dbgTablet << "GetPointerPenInfoHistory failed";
+#endif
       return false;
     }
     bool handled = false;
@@ -752,6 +990,10 @@ bool handlePenDownMsg(const POINTER_PEN_INFO &penInfo) {
   // }
   auto currentPointerIt = penPointers.find(penInfo.pointerInfo.pointerId);
   if (currentPointerIt == penPointers.end()) {
+#ifdef KRITA
+    dbgTablet << "Pointer" << penInfo.pointerInfo.pointerId
+              << "wasn't being handled";
+#endif
     return false;
   }
   currentPointerIt->hwnd =
@@ -760,6 +1002,9 @@ bool handlePenDownMsg(const POINTER_PEN_INFO &penInfo) {
   QWidget *hwndWidget =
       QWidget::find(reinterpret_cast<WId>(penInfo.pointerInfo.hwndTarget));
   if (!hwndWidget) {
+#ifdef KRITA
+    dbgTablet << "HWND cannot be mapped to QWidget (what?)";
+#endif
     return false;
   }
   {
@@ -777,11 +1022,16 @@ bool handlePenDownMsg(const POINTER_PEN_INFO &penInfo) {
                               currentPointerIt->oneOverDpr)));
   QWidget *targetWidget = hwndWidget->childAt(posInHwndWidget);
   if (!targetWidget) {
+#ifdef KRITA
+    dbgTablet << "No childQWidget at cursor position";
+#endif
     targetWidget = hwndWidget;
   }
 
   currentPointerIt->activeWidget     = targetWidget;
   currentPointerIt->widgetIsCaptured = true;
+  // dbgTablet << "QWidget" << targetWidget->windowTitle() << "is capturing
+  // pointer" << penInfo.pointerInfo.pointerId;
   {
     // Check popup / modal widget
     QWidget *modalWidget = QApplication::activePopupWidget();
@@ -791,6 +1041,10 @@ bool handlePenDownMsg(const POINTER_PEN_INFO &penInfo) {
     if (modalWidget && modalWidget != hwndWidget &&
         !modalWidget->isAncestorOf(hwndWidget)) {
       currentPointerIt->widgetIsIgnored = true;
+#ifdef KRITA
+      dbgTablet << "Pointer" << penInfo.pointerInfo.pointerId
+                << "is being captured but will be ignored";
+#endif
       return false;
     }
   }
@@ -798,6 +1052,9 @@ bool handlePenDownMsg(const POINTER_PEN_INFO &penInfo) {
   // penDown
   const auto devIt = penDevices.find(penInfo.pointerInfo.sourceDevice);
   if (devIt == penDevices.end()) {
+#ifdef KRITA
+    dbgTablet << "Device not registered???";
+#endif
     return false;
   }
 
@@ -805,17 +1062,27 @@ bool handlePenDownMsg(const POINTER_PEN_INFO &penInfo) {
       sendPositionalTabletEvent(targetWidget, QEvent::TabletPress, penInfo,
                                 *devIt, *currentPointerIt, true);
   currentPointerIt->widgetAcceptsPenEvent = handled;
+  if (!handled) {
+    // dbgTablet << "QWidget did not handle tablet down event";
+  }
   return handled;
 }
 
 bool handlePenUpMsg(const POINTER_PEN_INFO &penInfo) {
   auto currentPointerIt = penPointers.find(penInfo.pointerInfo.pointerId);
   if (currentPointerIt == penPointers.end()) {
+#ifdef KRITA
+    dbgTablet << "Pointer" << penInfo.pointerInfo.pointerId
+              << "wasn't being handled";
+#endif
     return false;
   }
   PenPointerItem &penPointerItem = *currentPointerIt;
 
   if (!penPointerItem.isCaptured()) {
+#ifdef KRITA
+    dbgTablet << "Pointer wasn't captured";
+#endif
     return false;
   }
   if (penPointerItem.widgetIsIgnored) {
@@ -827,12 +1094,18 @@ bool handlePenUpMsg(const POINTER_PEN_INFO &penInfo) {
   // penUp
   QWidget *targetWidget = penPointerItem.activeWidget;
   if (!targetWidget) {
+#ifdef KRITA
+    dbgTablet << "Previously captured target has been deleted";
+#endif
     penPointerItem.widgetIsCaptured = false;
     return false;
   }
 
   const auto devIt = penDevices.find(penInfo.pointerInfo.sourceDevice);
   if (devIt == penDevices.end()) {
+#ifdef KRITA
+    dbgTablet << "Device not registered???";
+#endif
     return false;
   }
 
@@ -840,6 +1113,8 @@ bool handlePenUpMsg(const POINTER_PEN_INFO &penInfo) {
       sendPositionalTabletEvent(targetWidget, QEvent::TabletRelease, penInfo,
                                 *devIt, penPointerItem, true);
 
+  // dbgTablet << "QWidget" << currentPointerIt->activeWidget->windowTitle() <<
+  // "is releasing capture to pointer" << penInfo.pointerInfo.pointerId;
   penPointerItem.widgetIsCaptured      = false;
   penPointerItem.widgetAcceptsPenEvent = false;
   return handled;
@@ -854,16 +1129,81 @@ bool handlePointerMsg(const MSG &msg) {
   int pointerId = GET_POINTERID_WPARAM(msg.wParam);
   POINTER_INPUT_TYPE pointerType;
   if (!api.GetPointerType(pointerId, &pointerType)) {
+#ifdef KRITA
+    dbgTablet << "GetPointerType failed";
+#endif
     return false;
   }
   if (pointerType != PT_PEN) {
+    // dbgTablet << "pointerType" << pointerType << "is not PT_PEN";
     return false;
   }
 
   POINTER_PEN_INFO penInfo;
   if (!api.GetPointerPenInfo(pointerId, &penInfo)) {
+#ifdef KRITA
+    dbgTablet << "GetPointerPenInfo failed";
+#endif
     return false;
   }
+
+  switch (msg.message) {
+  case WM_POINTERDOWN:
+    // dbgTablet << "WM_POINTERDOWN";
+    break;
+  case WM_POINTERUP:
+    // dbgTablet << "WM_POINTERUP";
+    break;
+  case WM_POINTERENTER:
+    // dbgTablet << "WM_POINTERENTER";
+    break;
+  case WM_POINTERLEAVE:
+    // dbgTablet << "WM_POINTERLEAVE";
+    break;
+  case WM_POINTERUPDATE:
+    // dbgTablet << "WM_POINTERUPDATE";
+    break;
+  case WM_POINTERCAPTURECHANGED:
+    // dbgTablet << "WM_POINTERCAPTURECHANGED";
+    break;
+  default:
+#ifdef KRITA
+    dbgTablet << "I missed this message: " << msg.message;
+#endif
+    break;
+  }
+  // dbgTablet << "  hwnd:        " << penInfo.pointerInfo.hwndTarget;
+  // dbgTablet << "  msg hwnd:    " << msg.hwnd;
+  // dbgTablet << "  pointerId:   " << pointerId;
+  // dbgTablet << "  sourceDevice:" << penInfo.pointerInfo.sourceDevice;
+  // dbgTablet << "  pointerFlags:" << penInfo.pointerInfo.pointerFlags;
+  // dbgTablet << "  btnChgType:  " << penInfo.pointerInfo.ButtonChangeType;
+  // dbgTablet << "  penFlags:    " << penInfo.penFlags;
+  // dbgTablet << "  penMask:     " << penInfo.penMask;
+  // dbgTablet << "  pressure:    " << penInfo.pressure;
+  // dbgTablet << "  rotation:    " << penInfo.rotation;
+  // dbgTablet << "  tiltX:       " << penInfo.tiltX;
+  // dbgTablet << "  tiltY:       " << penInfo.tiltY;
+  // dbgTablet << "  ptPixelLocationRaw:   " <<
+  // penInfo.pointerInfo.ptPixelLocationRaw;
+  // dbgTablet << "  ptHimetricLocationRaw:" <<
+  // penInfo.pointerInfo.ptHimetricLocationRaw;
+  // RECT pointerDeviceRect, displayRect;
+  // if (!api.GetPointerDeviceRects(penInfo.pointerInfo.sourceDevice,
+  // &pointerDeviceRect, &displayRect)) {
+  //     dbgTablet << "GetPointerDeviceRects failed";
+  //     return false;
+  // }
+  // dbgTablet << "  pointerDeviceRect:" << pointerDeviceRect;
+  // dbgTablet << "  displayRect:" << displayRect;
+  // dbgTablet << "  scaled X:" <<
+  // static_cast<qreal>(penInfo.pointerInfo.ptHimetricLocationRaw.x) /
+  // (pointerDeviceRect.right - pointerDeviceRect.left) * (displayRect.right -
+  // displayRect.left);
+  // dbgTablet << "  scaled Y:" <<
+  // static_cast<qreal>(penInfo.pointerInfo.ptHimetricLocationRaw.y) /
+  // (pointerDeviceRect.bottom - pointerDeviceRect.top) * (displayRect.bottom -
+  // displayRect.top);
 
   switch (msg.message) {
   case WM_POINTERDOWN:
@@ -877,7 +1217,10 @@ bool handlePointerMsg(const MSG &msg) {
   case WM_POINTERUPDATE:
     return handlePenUpdateMsg(penInfo);
   case WM_POINTERCAPTURECHANGED:
-    // TODO: Should this event be handled?
+// TODO: Should this event be handled?
+#ifdef KRITA
+    dbgTablet << "FIXME: WM_POINTERCAPTURECHANGED isn't handled";
+#endif
     break;
   }
 
@@ -886,4 +1229,4 @@ bool handlePointerMsg(const MSG &msg) {
 
 }  // namespace
 
-#endif
+#endif  // _WIN32

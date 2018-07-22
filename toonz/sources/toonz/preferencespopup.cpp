@@ -35,7 +35,7 @@
 #include "tsystem.h"
 #include "tfont.h"
 
-#include "tabletsupportwinink.h"
+#include "kis_tablet_support_win8.h"
 
 // Qt includes
 #include <QHBoxLayout>
@@ -1222,7 +1222,7 @@ PreferencesPopup::PreferencesPopup()
   bool showTabletSettings = false;
 
 #ifdef _WIN32
-  showTabletSettings = TabletSupportWinInk::isAvailable();
+  showTabletSettings = KisTabletSupportWin8::isAvailable();
 #else
   showTabletSettings = true;
 #endif
