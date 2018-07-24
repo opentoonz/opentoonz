@@ -725,6 +725,21 @@ void ToolOptionFontCombo::onActivated(int index) {
   notifyTool();
 }
 
+//-----------------------------------------------------------------------------
+
+void ToolOptionFontCombo::doShowPopup() {
+  if (!isInVisibleViewer(this)) return;
+  if (Preferences::instance()->getDropdownShortcutsCycleOptions()) {
+    const TEnumProperty::Range &range           = m_property->getRange();
+    int theIndex                                = currentIndex() + 1;
+    if (theIndex >= (int)range.size()) theIndex = 0;
+    onActivated(theIndex);
+    setCurrentIndex(theIndex);
+  } else {
+    if (isVisible()) showPopup();
+  }
+}
+
 //=============================================================================
 
 ToolOptionPopupButton::ToolOptionPopupButton(TTool *tool,
