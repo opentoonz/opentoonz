@@ -1519,7 +1519,7 @@ void FunctionTreeView::onDrag(TreeModel::Item *item, const QPoint &itemPos,
   QModelIndex i0 = channel->createIndex(), i1 = m_clickedItem->createIndex();
   if (!i0.isValid() || !i1.isValid() || i0.parent() != i1.parent()) return;
 
-  if (i0.row() > i1.row()) tswap(i0, i1);
+  if (i0.row() > i1.row()) std::swap(i0, i1);
 
   FunctionTreeModel *md = static_cast<FunctionTreeModel *>(model());
 

@@ -654,8 +654,8 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut,
     selectionRaster.updateSelection(cmIn, params[i]);
     doBlend(cmIn, inkLayer, paintLayer, selectionRaster, blurGroup[i]);
 
-    tswap(inkLayer.first, inkLayer.second);
-    tswap(paintLayer.first, paintLayer.second);
+    std::swap(inkLayer.first, inkLayer.second);
+    std::swap(paintLayer.first, paintLayer.second);
   }
 
   // Release the unnecessary rasters

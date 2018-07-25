@@ -49,8 +49,8 @@ ScanListFrame::ScanListFrame(const ScanListFrame &src)
 
 ScanListFrame &ScanListFrame::operator=(const ScanListFrame &src) {
   ScanListFrame tmp(*this);
-  tswap(m_xl, tmp.m_xl);
-  tswap(m_fid, tmp.m_fid);
+  std::swap(m_xl, tmp.m_xl);
+  std::swap(m_fid, tmp.m_fid);
   return *this;
 }
 

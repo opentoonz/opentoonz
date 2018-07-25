@@ -744,8 +744,8 @@ intersect( *oldStroke, pos, m_pointSize, intersections );
 //-----------------------------------------------------------------------------
 
 void EraserTool::erase(TVectorImageP vi, TRectD &rect) {
-  if (rect.x0 > rect.x1) tswap(rect.x1, rect.x0);
-  if (rect.y0 > rect.y1) tswap(rect.y1, rect.y0);
+  if (rect.x0 > rect.x1) std::swap(rect.x1, rect.x0);
+  if (rect.y0 > rect.y1) std::swap(rect.y1, rect.y0);
   int i     = 0;
   int index = TTool::getApplication()->getCurrentLevelStyleIndex();
   std::vector<int> eraseStrokes;
@@ -849,9 +849,9 @@ void EraserTool::multiEraseRect(TFrameId firstFrameId, TFrameId lastFrameId,
   int r1 = lastFrameId.getNumber();
 
   if (r0 > r1) {
-    tswap(r0, r1);
-    tswap(firstFrameId, lastFrameId);
-    tswap(firstRect, lastRect);
+    std::swap(r0, r1);
+    std::swap(firstFrameId, lastFrameId);
+    std::swap(firstRect, lastRect);
   }
   if ((r1 - r0) < 1) return;
 
@@ -941,9 +941,9 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     stopErase(vi);
   else if (m_eraseType.getValue() == RECT_ERASE) {
     if (m_selectingRect.x0 > m_selectingRect.x1)
-      tswap(m_selectingRect.x1, m_selectingRect.x0);
+      std::swap(m_selectingRect.x1, m_selectingRect.x0);
     if (m_selectingRect.y0 > m_selectingRect.y1)
-      tswap(m_selectingRect.y1, m_selectingRect.y0);
+      std::swap(m_selectingRect.y1, m_selectingRect.y0);
 
     if (m_multi.getValue()) {
       if (m_firstFrameSelected) {
@@ -1278,7 +1278,7 @@ void EraserTool::doMultiErase(TFrameId &firstFrameId, TFrameId &lastFrameId,
 
   bool backward = false;
   if (firstFrameId > lastFrameId) {
-    tswap(firstFrameId, lastFrameId);
+    std::swap(firstFrameId, lastFrameId);
     backward = true;
   }
   assert(firstFrameId <= lastFrameId);

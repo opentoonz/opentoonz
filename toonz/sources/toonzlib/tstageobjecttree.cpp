@@ -328,7 +328,7 @@ bool checkId(TStageObjectTree *tree, const TStageObjectId &id) {
 
 void TStageObjectTree::swapColumns(int i, int j) {
   if (i == j) return;
-  if (i > j) tswap(i, j);
+  if (i > j) std::swap(i, j);
   std::map<TStageObjectId, TStageObject *> &pegbars = m_imp->m_pegbarTable;
   std::map<TStageObjectId, TStageObject *>::iterator iti, itj;
   std::map<TStageObjectId, TStageObject *>::const_iterator end = pegbars.end();
@@ -344,7 +344,7 @@ void TStageObjectTree::swapColumns(int i, int j) {
   } else if (iti != end && itj != end) {
     assert(iti->second);
     assert(itj->second);
-    tswap(iti->second, itj->second);
+    std::swap(iti->second, itj->second);
     iti->second->setId(iti->first);
     itj->second->setId(itj->first);
   } else if (iti == end) {

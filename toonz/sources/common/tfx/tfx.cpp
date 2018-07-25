@@ -365,8 +365,8 @@ void TFx::linkParams(TFx *fx) {
   assert(m_imp->checkLinks());
   assert(fx->m_imp->checkLinks());
 
-  tswap(m_imp->m_next, fx->m_imp->m_next);
-  tswap(m_imp->m_next->m_prev, fx->m_imp->m_next->m_prev);
+  std::swap(m_imp->m_next, fx->m_imp->m_next);
+  std::swap(m_imp->m_next->m_prev, fx->m_imp->m_next->m_prev);
 
   assert(m_imp->checkLinks());
   assert(fx->m_imp->checkLinks());

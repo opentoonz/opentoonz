@@ -242,7 +242,7 @@ throw TException("Scan area too large, select a correct paper size");
     TRectD scanArea =
         params.isPreview() ? params.getScanArea() : params.getCropBox();
     scanArea2pix(params, offsetx, offsety, dimlx, dimly, scanArea);
-    tswap(dimlx, dimly);
+    std::swap(dimlx, dimly);
 
     unsigned int bytes;
 

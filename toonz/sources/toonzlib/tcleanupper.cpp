@@ -835,7 +835,7 @@ TRasterImageP TCleanupper::autocenterOnly(const TRasterImageP &image,
 
   aff = aff.place(cxin, cyin, cpout, cqout);
 
-  if (rotate != 0 && rotate != 180) tswap(finalLx, finalLy);
+  if (rotate != 0 && rotate != 180) std::swap(finalLx, finalLy);
 
   TPointD pin  = TPointD((rasterLx - 1) / 2.0, (rasterLy - 1) / 2.0);
   TPointD pout = TPointD((finalLx - 1) / 2.0, (finalLy - 1) / 2.0);

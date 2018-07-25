@@ -566,8 +566,8 @@ void InkSegmenter::drawSegment(
   int y2 = p1.y;
 
   if (x1 > x2) {
-    tswap(x1, x2);
-    tswap(y1, y2);
+    std::swap(x1, x2);
+    std::swap(y1, y2);
   }
 
   TPixelCM32 *buf = m_r->pixels() + y1 * m_wrap + x1;

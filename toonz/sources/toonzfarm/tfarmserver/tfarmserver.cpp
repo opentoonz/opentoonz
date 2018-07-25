@@ -264,7 +264,7 @@ public:
   }
   FarmControllerProxyP &operator=(const FarmControllerProxyP &src) {
     FarmControllerProxyP tmp(*this);
-    tswap(tmp.m_proxy, m_proxy);
+    std::swap(tmp.m_proxy, m_proxy);
     return *this;
   }
 

@@ -82,7 +82,7 @@ TPixelCM32 filterPixel(const TPointD &pos, const TRasterCM32P &rasIn) {
     else
       paintBlobs[paintBlobsSize++] = currBlob;
     for (; j > 0 && paintBlobs[j].tot > paintBlobs[j - 1].tot; j--)
-      tswap(paintBlobs[j], paintBlobs[j - 1]);
+      std::swap(paintBlobs[j], paintBlobs[j - 1]);
 
     // Same for ink blobs
     currBlob.val = P[i].getInk();
@@ -94,7 +94,7 @@ TPixelCM32 filterPixel(const TPointD &pos, const TRasterCM32P &rasIn) {
     else
       inkBlobs[inkBlobsSize++] = currBlob;
     for (; j > 0 && inkBlobs[j].tot > inkBlobs[j - 1].tot; j--)
-      tswap(inkBlobs[j], inkBlobs[j - 1]);
+      std::swap(inkBlobs[j], inkBlobs[j - 1]);
   }
 
   tone = troundp(tone_tot);

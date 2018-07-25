@@ -1746,7 +1746,7 @@ bool BrushTool::doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
   *last        = *lastStroke;
   bool swapped = false;
   if (firstFrameId > lastFrameId) {
-    tswap(firstFrameId, lastFrameId);
+    std::swap(firstFrameId, lastFrameId);
     *first  = *lastStroke;
     *last   = *firstStroke;
     swapped = true;
