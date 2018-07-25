@@ -1223,8 +1223,6 @@ PreferencesPopup::PreferencesPopup()
 
 #ifdef _WIN32
   showTabletSettings = KisTabletSupportWin8::isAvailable();
-#else
-  showTabletSettings = true;
 #endif
 
   setWindowTitle(tr("Preferences"));
@@ -1554,15 +1552,18 @@ PreferencesPopup::PreferencesPopup()
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_version->setStyleSheet("font-size: 10px; font: italic;");
 
+  QLabel *note_tablet;
   //--- Tablet Settings ------------------------------
-  if (showTabletSettings) categoryList->addItem(tr("Tablet Settings"));
+  if (showTabletSettings) {
+    categoryList->addItem(tr("Tablet Settings"));
 
-  m_enableWinInk =
-      new DVGui::CheckBox(tr("Enable Windows Ink Support* (EXPERIMENTAL)"));
+    m_enableWinInk =
+        new DVGui::CheckBox(tr("Enable Windows Ink Support* (EXPERIMENTAL)"));
 
-  QLabel *note_tablet =
-      new QLabel(tr("* Changes will take effect the next time you run Toonz"));
-  note_tablet->setStyleSheet("font-size: 10px; font: italic;");
+    note_tablet = new QLabel(
+        tr("* Changes will take effect the next time you run Toonz"));
+    note_tablet->setStyleSheet("font-size: 10px; font: italic;");
+  }
 
   /*--- set default parameters ---*/
   categoryList->setFixedWidth(160);
@@ -1909,7 +1910,7 @@ PreferencesPopup::PreferencesPopup()
   checkForTheLatestVersionCB->setChecked(m_pref->isLatestVersionCheckEnabled());
 
   //--- Tablet Settings ------------------------------
-  m_enableWinInk->setChecked(m_pref->isWinInkEnabled());
+  if (showTabletSettings) m_enableWinInk->setChecked(m_pref->isWinInkEnabled());
 
   /*--- layout ---*/
 
@@ -2992,8 +2993,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onCheckLatestVersionChanged(bool)));
 
   //--- Tablet Settings ----------------------
-  ret = ret && connect(m_enableWinInk, SIGNAL(stateChanged(int)),
-                       SLOT(onEnableWinInkChanged(int)));
+  if (showTabletSettings)
+    ret = ret && connect(m_enableWinInk, SIGNAL(stateChanged(int)),
+                         SLOT(onEnableWinInkChanged(int)));
 
   assert(ret);
 }
