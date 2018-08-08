@@ -690,14 +690,17 @@ int main(int argc, char *argv[]) {
 
   TFontManager *fontMgr = TFontManager::instance();
   std::vector<std::wstring> typefaces;
-  fontMgr->loadFontNames();
-  fontMgr->setFamily(fontName.toStdWString());
-  fontMgr->getAllTypefaces(typefaces);
-
   bool isBold = false, isItalic = false, hasKerning = false;
-  isBold     = fontMgr->isBold(fontName, fontStyle);
-  isItalic   = fontMgr->isItalic(fontName, fontStyle);
-  hasKerning = fontMgr->hasKerning();
+  try {
+    fontMgr->loadFontNames();
+    fontMgr->setFamily(fontName.toStdWString());
+    fontMgr->getAllTypefaces(typefaces);
+    isBold     = fontMgr->isBold(fontName, fontStyle);
+    isItalic   = fontMgr->isItalic(fontName, fontStyle);
+    hasKerning = fontMgr->hasKerning();
+  } catch (TFontCreationError &) {
+    // Do nothing. A default font should load
+  }
 
   myFont = new QFont(fontName);
   myFont->setPixelSize(EnvSoftwareCurrentFontSize);
