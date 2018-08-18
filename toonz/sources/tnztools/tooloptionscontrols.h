@@ -603,7 +603,7 @@ protected:
   void mouseReleaseEvent(QMouseEvent *) override;
 
 public:
-  ClickableLabel(const QString &text, QWidget *parent = Q_NULLPTR,
+  ClickableLabel(const QString &text, QWidget *parent = nullptr,
                  Qt::WindowFlags f = Qt::WindowFlags());
   ~ClickableLabel();
 
