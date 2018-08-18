@@ -1,6 +1,11 @@
 language: cpp
+
+git:
+  depth: 1
+  
 sudo: required
 dist: trusty
+
 install:
     - bash ci-scripts/$TRAVIS_OS_NAME/travis-install.sh
 script:
