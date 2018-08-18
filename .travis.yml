@@ -15,6 +15,7 @@ matrix:
     include:
         - os: linux
           compiler: gcc
+          cache: ccache
         - os: linux
           compiler: clang
         - os: osx
