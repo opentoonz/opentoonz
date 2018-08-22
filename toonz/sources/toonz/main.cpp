@@ -691,7 +691,11 @@ int main(int argc, char *argv[]) {
   TFontManager *fontMgr = TFontManager::instance();
   std::vector<std::wstring> typefaces;
   fontMgr->loadFontNames();
-  fontMgr->setFamily(fontName.toStdWString());
+  try {
+    fontMgr->setFamily(fontName.toStdWString());
+  } catch(TFontCreationError&) {
+    std::cerr << "Font family not found: " << fontName.toStdString() << std::endl;
+  }
   fontMgr->getAllTypefaces(typefaces);
 
   bool isBold = false, isItalic = false, hasKerning = false;
