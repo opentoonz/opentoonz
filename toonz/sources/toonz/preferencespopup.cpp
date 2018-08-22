@@ -361,7 +361,11 @@ void PreferencesPopup::rebuilldFontStyleList() {
   std::vector<std::wstring> typefaces;
   QString font = m_interfaceFont->currentText();
   instance->loadFontNames();
-  instance->setFamily(font.toStdWString());
+  try {
+    instance->setFamily(font.toStdWString());
+  } catch(TFontCreationError&) {
+    std::cerr << "Font family not found: " << font.toStdString() << std::endl;
+  }
   instance->getAllTypefaces(typefaces);
   m_interfaceFontStyle->clear();
   for (std::vector<std::wstring>::iterator it = typefaces.begin();
