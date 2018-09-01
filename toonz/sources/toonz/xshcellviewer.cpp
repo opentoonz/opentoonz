@@ -2282,17 +2282,11 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
                              handleRow1)) {
             QPoint topLeft =
                 m_viewer->positionToXY(CellPosition(handleRow0, col));
-            if (!o->isVerticalTimeline() &&
-                m_viewer->getFrameZoomFactor() <= 50)
-              topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
                                          keyFrameColor, outline);
 
             topLeft = m_viewer->positionToXY(CellPosition(handleRow1, col));
-            if (!o->isVerticalTimeline() &&
-                m_viewer->getFrameZoomFactor() <= 50)
-              topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::END_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
                                          keyFrameColor, outline);
@@ -2392,13 +2386,6 @@ void CellArea::drawKeyframeLine(QPainter &p, int col,
       keyRect.center() + m_viewer->positionToXY(CellPosition(rows.from(), col));
   QPoint end =
       keyRect.center() + m_viewer->positionToXY(CellPosition(rows.to(), col));
-
-  if (!m_viewer->orientation()->isVerticalTimeline() &&
-      m_viewer->getFrameZoomFactor() <= 50) {
-    begin.setY(begin.y() - 1);
-    end.setY(end.y() - 1);
-  }
-
   p.setPen(Qt::white);
   p.drawLine(QLine(begin, end));
 }
