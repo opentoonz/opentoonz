@@ -109,6 +109,8 @@ class CellArea final : public QWidget {
   // Restistusce true
   bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);
 
+  bool isKeyFrameArea(int col, int row, QPoint mouseInCell);
+
   DragTool *getDragTool() const;
   void setDragTool(DragTool *dragTool);
 
