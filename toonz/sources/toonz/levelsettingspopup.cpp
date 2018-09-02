@@ -28,7 +28,6 @@
 #include "toonz/txsheethandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tcolumnhandle.h"
-#include "toonz/txsheethandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/levelproperties.h"

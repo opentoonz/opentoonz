@@ -54,7 +54,6 @@
 #include <QResizeEvent>
 #include <QList>
 #include <QSignalMapper>
-#include <QPushButton>
 #include <QPropertyAnimation>
 #include <QEasingCurve>
 #include <QStackedWidget>

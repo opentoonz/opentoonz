@@ -6,7 +6,6 @@
 #include "tools/toolcommandids.h"
 #include "timage.h"
 //#include "tapp.h"
-#include "toonz/stage2.h"
 #include "toonzqt/menubarcommand.h"
 #include <QAction>
 #include <QMap>

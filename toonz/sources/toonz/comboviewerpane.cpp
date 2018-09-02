@@ -13,7 +13,6 @@
 #include "toonz/tframehandle.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/txshlevelhandle.h"
-#include "toonz/txsheethandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/txsheet.h"

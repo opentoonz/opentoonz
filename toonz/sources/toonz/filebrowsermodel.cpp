@@ -15,7 +15,6 @@
 
 #include "tapp.h"
 #include "toonz/tscenehandle.h"
-#include "toonz/toonzscene.h"
 
 #include <QFileInfo>
 #include <QDir>

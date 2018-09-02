@@ -36,7 +36,6 @@
 #include "tfiletype.h"
 #include "tfilepath.h"
 #include "ttoonzimage.h"
-#include "trasterimage.h"
 #include "tvectorimage.h"
 #include "tstroke.h"
 

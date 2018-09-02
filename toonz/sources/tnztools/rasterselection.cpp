@@ -24,7 +24,6 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
 #include "toonz/trasterimageutils.h"
-#include "toonz/toonzimageutils.h"
 
 #include <QApplication>
 #include <QClipboard>

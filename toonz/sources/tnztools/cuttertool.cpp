@@ -8,7 +8,6 @@
 #include "toonz/tcolumnhandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "tools/strokeselection.h"
-#include "tools/tool.h"
 
 #include "tmathutil.h"
 #include "tstroke.h"

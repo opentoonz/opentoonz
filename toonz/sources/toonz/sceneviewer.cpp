@@ -56,7 +56,6 @@
 #include "toonz/cleanupparameters.h"
 #include "toonz/toonzimageutils.h"
 #include "toonz/txshleveltypes.h"
-#include "toonz/preferences.h"
 #include "subcameramanager.h"
 
 // TnzCore includes

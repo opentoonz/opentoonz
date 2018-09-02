@@ -7,7 +7,6 @@
 #include "menubarcommandids.h"
 #include "columnselection.h"
 #include "xsheetdragtool.h"
-#include "tapp.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"

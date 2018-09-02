@@ -33,7 +33,6 @@
 #include "toonz/txshsoundtextlevel.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/tstageobjectkeyframe.h"
-#include "toonz/txshcolumn.h"
 #include "toonz/stageobjectutil.h"
 #include "toonz/toonzfolders.h"
 #include "toonz/txshchildlevel.h"

@@ -18,7 +18,6 @@
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/menubarcommand.h"
-#include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/trepetitionguard.h"
 

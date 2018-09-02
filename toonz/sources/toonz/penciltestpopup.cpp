@@ -63,7 +63,6 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QToolButton>
-#include <QGroupBox>
 #include <QDateTime>
 #include <QMultimedia>
 #include <QPainter>
@@ -72,7 +71,6 @@
 #include <QTimer>
 #include <QIntValidator>
 #include <QRegExpValidator>
-#include <QPushButton>
 
 #ifdef _WIN32
 #include <dshow.h>

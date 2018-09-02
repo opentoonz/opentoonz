@@ -24,7 +24,6 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txshleveltypes.h"
-#include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
 #include "toonz/levelproperties.h"
