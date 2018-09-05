@@ -250,18 +250,20 @@ Iwa_TiledParticlesFx::Iwa_TiledParticlesFx()
   animation_val->addItem(ANIM_SR_CYCLE, "Column Swing - Random Start");
   bindParam(this, "step", step_val);
   step_val->setValueRange(1, (std::numeric_limits<int>::max)());
-  TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::Red),
-                                  TSpectrum::ColorKey(1, TPixel32::Red)};
-  gencol_val = TSpectrumParamP(tArrayCount(colors), colors);
+  std::vector<TSpectrum::ColorKey> colors = {
+      TSpectrum::ColorKey(0, TPixel32::Red),
+      TSpectrum::ColorKey(1, TPixel32::Red)};
+  gencol_val = TSpectrumParamP(colors);
   bindParam(this, "birth_color", gencol_val);
   bindParam(this, "birth_color_ctrl", gencol_ctrl_val);
   bindParam(this, "birth_color_spread", gencol_spread_val);
   gencol_spread_val->setValueRange(0.0, (std::numeric_limits<int>::max)());
   bindParam(this, "birth_color_fade", genfadecol_val);
   genfadecol_val->setValueRange(0.0, 100.0);
-  TSpectrum::ColorKey colors1[] = {TSpectrum::ColorKey(0, TPixel32::Green),
-                                   TSpectrum::ColorKey(1, TPixel32::Green)};
-  fincol_val = TSpectrumParamP(tArrayCount(colors1), colors1);
+  std::vector<TSpectrum::ColorKey> colors1 = {
+      TSpectrum::ColorKey(0, TPixel32::Green),
+      TSpectrum::ColorKey(1, TPixel32::Green)};
+  fincol_val = TSpectrumParamP(colors1);
   bindParam(this, "fadein_color", fincol_val);
   bindParam(this, "fadein_color_ctrl", fincol_ctrl_val);
   bindParam(this, "fadein_color_spread", fincol_spread_val);
@@ -270,9 +272,10 @@ Iwa_TiledParticlesFx::Iwa_TiledParticlesFx()
   finrangecol_val->setValueRange(0.0, (std::numeric_limits<double>::max)());
   bindParam(this, "fadein_color_fade", finfadecol_val);
   finfadecol_val->setValueRange(0.0, 100.0);
-  TSpectrum::ColorKey colors2[] = {TSpectrum::ColorKey(0, TPixel32::Blue),
-                                   TSpectrum::ColorKey(1, TPixel32::Blue)};
-  foutcol_val = TSpectrumParamP(tArrayCount(colors2), colors2);
+  std::vector<TSpectrum::ColorKey> colors2 = {
+      TSpectrum::ColorKey(0, TPixel32::Blue),
+      TSpectrum::ColorKey(1, TPixel32::Blue)};
+  foutcol_val = TSpectrumParamP(colors2);
   bindParam(this, "fadeout_color", foutcol_val);
   bindParam(this, "fadeout_color_ctrl", foutcol_ctrl_val);
   bindParam(this, "fadeout_color_spread", foutcol_spread_val);

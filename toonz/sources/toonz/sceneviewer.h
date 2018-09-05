@@ -22,6 +22,7 @@
 #include "pane.h"
 #include "previewer.h"
 
+#include <array>
 #include <QMatrix4x4>
 #include <QTouchDevice>
 
@@ -123,7 +124,7 @@ class SceneViewer final : public GLWidgetForHighDpi,
 
   // current pan/zoom matrix (two different matrices are used for editing scenes
   // and leves)
-  TAffine m_viewAff[2];
+  std::array<TAffine, 2> m_viewAff;
   int m_viewMode;
 
   TPointD m_dpiScale;

@@ -42,7 +42,7 @@ class DVAPI TSpectrumParam final : public TParam {
 
 public:
   TSpectrumParam();
-  TSpectrumParam(int keyCount, TSpectrum::ColorKey keys[]);
+  TSpectrumParam(std::vector<TSpectrum::ColorKey> const &keys);
   TSpectrumParam(const TSpectrumParam &);
   ~TSpectrumParam();
 
@@ -102,9 +102,9 @@ class DVAPI TSpectrumParamP final
     : public TDerivedSmartPointerT<TSpectrumParam, TParam> {
 public:
   TSpectrumParamP() {}
-  TSpectrumParamP(int keyCount, TSpectrum::ColorKey keys[])
+  TSpectrumParamP(std::vector<TSpectrum::ColorKey> const &keys)
       : TDerivedSmartPointerT<TSpectrumParam, TParam>(
-            new TSpectrumParam(keyCount, keys)) {}
+            new TSpectrumParam(keys)) {}
   TSpectrumParamP(TSpectrumParam *p)
       : TDerivedSmartPointerT<TSpectrumParam, TParam>(p) {}
   TSpectrumParamP(const TParamP &p)

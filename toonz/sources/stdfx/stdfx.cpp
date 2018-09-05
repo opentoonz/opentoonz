@@ -89,13 +89,13 @@ TPixel32 colors[] = {
             TPixel32::Yellow,
             transparent};
 */
-    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::Magenta),
-                                    TSpectrum::ColorKey(0.25, TPixel32::Black),
-                                    TSpectrum::ColorKey(0.5, TPixel32::Red),
-                                    TSpectrum::ColorKey(0.75, TPixel32::Yellow),
-                                    TSpectrum::ColorKey(1, transparent)};
-
-    m_spectrum = TSpectrumParamP(tArrayCount(colors), colors);
+    std::vector<TSpectrum::ColorKey> colors = {
+        TSpectrum::ColorKey(0, TPixel32::Magenta),
+        TSpectrum::ColorKey(0.25, TPixel32::Black),
+        TSpectrum::ColorKey(0.5, TPixel32::Red),
+        TSpectrum::ColorKey(0.75, TPixel32::Yellow),
+        TSpectrum::ColorKey(1, transparent)};
+    m_spectrum = TSpectrumParamP(colors);
 
     bindParam(this, "colors", m_spectrum);
     bindParam(this, "freq", m_freq);
@@ -184,11 +184,12 @@ public:
       , m_wave_phase(0.0)      // args, "Cycle")
   //    , m_colors (0) //args, "Colors")
   {
-    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
-                                    TSpectrum::ColorKey(0.33, TPixel32::Yellow),
-                                    TSpectrum::ColorKey(0.66, TPixel32::Red),
-                                    TSpectrum::ColorKey(1, TPixel32::White)};
-    m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+    std::vector<TSpectrum::ColorKey> colors = {
+        TSpectrum::ColorKey(0, TPixel32::White),
+        TSpectrum::ColorKey(0.33, TPixel32::Yellow),
+        TSpectrum::ColorKey(0.66, TPixel32::Red),
+        TSpectrum::ColorKey(1, TPixel32::White)};
+    m_colors = TSpectrumParamP(colors);
 
     bindParam(this, "period", m_period);
     bindParam(this, "count", m_count);
@@ -337,10 +338,10 @@ void LinearGradientFx::doCompute(TTile &tile, double frame,
   double w_phase     = m_wave_phase->getValue(frame);
   w_freq *= 0.01 * M_PI_180;
 
-  TSpectrum::ColorKey colors[] = {
+  std::vector<TSpectrum::ColorKey> colors = {
       TSpectrum::ColorKey(0, m_color1->getValue(frame)),
       TSpectrum::ColorKey(1, m_color2->getValue(frame))};
-  TSpectrumParamP m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+  TSpectrumParamP m_colors = TSpectrumParamP(colors);
 
   TAffine aff      = ri.m_affine.inv();
   TPointD posTrasf = aff * tile.m_pos;
@@ -465,12 +466,12 @@ public:
   //    , m_colors (0) //args, "Colors")
   {
     m_period->setMeasureName("fxLength");
-    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
-                                    TSpectrum::ColorKey(0.33, TPixel32::Yellow),
-                                    TSpectrum::ColorKey(0.66, TPixel32::Red),
-                                    TSpectrum::ColorKey(1, TPixel32::White)};
-
-    m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+    std::vector<TSpectrum::ColorKey> colors = {
+        TSpectrum::ColorKey(0, TPixel32::White),
+        TSpectrum::ColorKey(0.33, TPixel32::Yellow),
+        TSpectrum::ColorKey(0.66, TPixel32::Red),
+        TSpectrum::ColorKey(1, TPixel32::White)};
+    m_colors = TSpectrumParamP(colors);
 
     bindParam(this, "period", m_period);
     bindParam(this, "count", m_count);
@@ -533,11 +534,11 @@ void RadialGradientFx::doCompute(TTile &tile, double frame,
     inner = innerperiod / period;
   else
     inner                      = 1 - TConsts::epsilon;
-  TSpectrum::ColorKey colors[] = {
+  std::vector<TSpectrum::ColorKey> colors = {
       TSpectrum::ColorKey(0, m_color1->getValue(frame)),
       TSpectrum::ColorKey(inner, m_color1->getValue(frame)),
       TSpectrum::ColorKey(1, m_color2->getValue(frame))};
-  TSpectrumParamP m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+  TSpectrumParamP m_colors = TSpectrumParamP(colors);
   TAffine aff              = ri.m_affine.inv();
   TPointD posTrasf         = aff * tile.m_pos;
   multiRadial(tile.getRaster(), posTrasf, m_colors, period, count, cycle, aff,
