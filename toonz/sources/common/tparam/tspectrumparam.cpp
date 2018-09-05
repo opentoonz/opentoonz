@@ -126,9 +126,9 @@ void TSpectrumParam::removeObserver(TParamObserver *obs) {
 
 //---------------------------------------------------------
 
-TSpectrumParam::TSpectrumParam(int keyCount, TSpectrum::ColorKey keys[])
+TSpectrumParam::TSpectrumParam(std::vector<TSpectrum::ColorKey> const &keys)
     : m_imp(new TSpectrumParamImp(this)) {
-  for (int i = 0; i < keyCount; i++) {
+  for (int i = 0; i < keys.size(); i++) {
     double v     = keys[i].first;
     TPixel32 pix = keys[i].second;
     TDoubleParamP dp(v);

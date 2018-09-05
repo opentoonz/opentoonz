@@ -929,7 +929,7 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent,
   m_parametersPanel = new QStackedWidget;
   m_parametersPanel->setObjectName("FunctionParametersPanel");
 
-  for (int i = 0; i < tArrayCount(m_pages); i++)
+  for (int i = 0; i < m_pages.size(); i++)
     m_parametersPanel->addWidget(m_pages[i]);
   m_parametersPanel->setCurrentIndex(0);
 
@@ -1149,7 +1149,7 @@ void FunctionSegmentViewer::refresh() {
     int pageIndex      = typeToIndex(kf.m_type);
     m_typeCombo->setEnabled(true);
     m_typeCombo->setCurrentIndex(pageIndex);
-    if (0 <= pageIndex && pageIndex < tArrayCount(m_pages)) {
+    if (0 <= pageIndex && pageIndex < m_pages.size()) {
       m_parametersPanel->setCurrentIndex(pageIndex);
       m_pages[pageIndex]->refresh();
     }
@@ -1262,7 +1262,7 @@ Segmentが選ばれていない場合
 
 void FunctionSegmentViewer::onCurveChanged() {
   int pageIndex = m_typeCombo->currentIndex();
-  if (0 <= pageIndex && pageIndex < tArrayCount(m_pages))
+  if (0 <= pageIndex && pageIndex < m_pages.size())
     m_pages[pageIndex]->refresh();
   update();
 }
@@ -1277,7 +1277,7 @@ void FunctionSegmentViewer::onStepFieldChanged(const QString &text) {
 }
 
 int FunctionSegmentViewer::typeToIndex(int typeId) const {
-  for (int i = 0; i < tArrayCount(m_typeId); i++)
+  for (int i = 0; i < m_typeId.size(); i++)
     if (m_typeId[i] == typeId) return i;
   return -1;
 }
@@ -1400,7 +1400,7 @@ void FunctionSegmentViewer::onApplyButtonPressed() {
 // for displaying the types of neighbor segments
 QString FunctionSegmentViewer::typeToString(int typeId) const {
   int i;
-  for (i = 0; i < tArrayCount(m_typeId); i++)
+  for (i = 0; i < m_typeId.size(); i++)
     if (m_typeId[i] == typeId) break;
 
   switch (i) {

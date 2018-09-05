@@ -28,10 +28,10 @@ public:
     bindParam(this, "min", m_min);
     bindParam(this, "max", m_max);
     bindParam(this, "evolution", m_evol);
-    TSpectrum::ColorKey colors[] = {
+    std::vector<TSpectrum::ColorKey> colors = {
         TSpectrum::ColorKey(0, TPixel32::White),
         TSpectrum::ColorKey(1, TPixel32::Transparent)};
-    m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+    m_colors = TSpectrumParamP(colors);
     bindParam(this, "colors", m_colors);
     m_size->setValueRange(0, 200);
     m_min->setValueRange(0, 1.0);

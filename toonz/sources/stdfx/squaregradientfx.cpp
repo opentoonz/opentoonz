@@ -17,11 +17,11 @@ class SquareGradientFx final : public TStandardZeraryFx {
 public:
   SquareGradientFx() : m_size(200.0) {
     m_size->setMeasureName("fxLength");
-    TSpectrum::ColorKey colors[] = {
+    std::vector<TSpectrum::ColorKey> colors = {
         TSpectrum::ColorKey(0, TPixel32::White),
         // TSpectrum::ColorKey(0.5,TPixel32::Yellow),
         TSpectrum::ColorKey(1, TPixel32::Red)};
-    m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+    m_colors = TSpectrumParamP(colors);
     bindParam(this, "colors", m_colors);
     bindParam(this, "size", m_size);
     m_size->setValueRange(0, std::numeric_limits<double>::max());
