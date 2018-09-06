@@ -43,7 +43,6 @@
 
 // tcg includes
 #include "tcg/tcg_macros.h"
-#include "tcg/tcg_unique_ptr.h"
 
 // STD includes
 #include <ctime>
@@ -352,7 +351,7 @@ class StepUndo final : public TUndo {
   int m_step;
   int m_newRows;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
 
 public:
   StepUndo(int r0, int c0, int r1, int c1, int step);
@@ -381,7 +380,7 @@ StepUndo::StepUndo(int r0, int c0, int r1, int c1, int step)
     , m_newRows(m_rowsCount * (step - 1))
     , m_cells(new TXshCell[m_rowsCount * m_colsCount]) {
   assert(m_rowsCount > 0 && m_colsCount > 0 && step > 0);
-  assert(m_cells.get());
+  assert(m_cells);
 
   int k = 0;
   for (int r = r0; r <= r1; ++r)
@@ -405,7 +404,7 @@ void StepUndo::redo() const {
 //-----------------------------------------------------------------------------
 
 void StepUndo::undo() const {
-  TCG_ASSERT(m_rowsCount > 0 && m_colsCount > 0 && m_cells.get(), return );
+  TCG_ASSERT(m_rowsCount > 0 && m_colsCount > 0 && m_cells, return );
 
   TApp *app    = TApp::instance();
   TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
@@ -453,7 +452,7 @@ class EachUndo final : public TUndo {
   int m_each;
   int m_newRows;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
 
 public:
   EachUndo(int r0, int c0, int r1, int c1, int each);
@@ -483,7 +482,7 @@ EachUndo::EachUndo(int r0, int c0, int r1, int c1, int each)
                                      : m_rowsCount / each)
     , m_cells(new TXshCell[m_rowsCount * m_colsCount]) {
   assert(m_rowsCount > 0 && m_colsCount > 0 && each > 0);
-  assert(m_cells.get());
+  assert(m_cells);
 
   int k = 0;
   for (int r = r0; r <= r1; ++r)
@@ -507,7 +506,7 @@ void EachUndo::redo() const {
 //-----------------------------------------------------------------------------
 
 void EachUndo::undo() const {
-  TCG_ASSERT(m_rowsCount > 0 && m_colsCount > 0 && m_cells.get(), return );
+  TCG_ASSERT(m_rowsCount > 0 && m_colsCount > 0 && m_cells, return );
 
   TApp *app    = TApp::instance();
   TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
@@ -798,7 +797,7 @@ class ResetStepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
   QMap<int, int> m_insertedCells;  //!< Count of inserted cells, by column
 
 public:
@@ -821,7 +820,7 @@ ResetStepUndo::ResetStepUndo(int r0, int c0, int r1, int c1)
     , m_colsCount(m_c1 - m_c0 + 1)
     , m_cells(new TXshCell[m_rowsCount * m_colsCount]) {
   assert(m_rowsCount > 0 && m_colsCount > 0);
-  assert(m_cells.get());
+  assert(m_cells);
 
   TApp *app = TApp::instance();
 
@@ -897,7 +896,7 @@ class IncreaseStepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
   QMap<int, int> m_insertedCells;
 
 public:
@@ -923,7 +922,7 @@ IncreaseStepUndo::IncreaseStepUndo(int r0, int c0, int r1, int c1)
     , m_colsCount(m_c1 - m_c0 + 1)
     , m_cells(new TXshCell[m_rowsCount * m_colsCount])
     , m_newR1(m_r1) {
-  assert(m_cells.get());
+  assert(m_cells);
 
   int k = 0;
   for (int c = c0; c <= c1; ++c) {
@@ -1001,7 +1000,7 @@ class DecreaseStepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
   QMap<int, int> m_removedCells;
 
 public:
@@ -1027,7 +1026,7 @@ DecreaseStepUndo::DecreaseStepUndo(int r0, int c0, int r1, int c1)
     , m_colsCount(m_c1 - m_c0 + 1)
     , m_cells(new TXshCell[m_rowsCount * m_colsCount])
     , m_newR1(m_r1) {
-  assert(m_cells.get());
+  assert(m_cells);
 
   int k = 0;
   for (int c = c0; c <= c1; ++c) {

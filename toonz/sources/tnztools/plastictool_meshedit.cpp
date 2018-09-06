@@ -13,8 +13,6 @@
 #include "tcg/tcg_point_ops.h"
 #include "tcg/tcg_iterator_ops.h"
 #include "tcg/tcg_function_types.h"
-#include "tcg/tcg_deleter_types.h"
-#include "tcg/tcg_unique_ptr.h"
 
 // boost includes
 #include <boost/unordered_set.hpp>
@@ -515,8 +513,7 @@ void splitUnconnectedMesh(TMeshImage &mi, int meshIdx) {
     static void buildConnectedComponent(const TTextureMesh &mesh,
                                         boost::unordered_set<int> &vertexes) {
       // Prepare BFS algorithm
-      tcg::unique_ptr<UCHAR, tcg::freer> colorMapP(
-          (UCHAR *)calloc(mesh.vertices().nodesCount(), sizeof(UCHAR)));
+      std::unique_ptr<UCHAR[]> colorMapP(new UCHAR[mesh.vertices().nodesCount()]());
 
       locals_::VertexesRecorder vertexesRecorder(vertexes);
       std::stack<int> verticesQueue;

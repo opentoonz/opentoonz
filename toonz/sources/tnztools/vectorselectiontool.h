@@ -16,9 +16,6 @@
 // Qt includes
 #include <QSet>
 
-// tcg includes
-#include "tcg/tcg_unique_ptr.h"
-
 //============================================================
 
 //    Forward declarations
@@ -160,7 +157,7 @@ public:
   bool isFlip();
 
 protected:
-  tcg::unique_ptr<UndoChangeStrokes> m_undo;
+  std::unique_ptr<UndoChangeStrokes> m_undo;
 
 protected:
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {}
@@ -171,7 +168,7 @@ protected:
 
 private:
   struct VFDScopedBlock;
-  tcg::unique_ptr<VFDScopedBlock> m_vfdScopedBlock;
+  std::unique_ptr<VFDScopedBlock> m_vfdScopedBlock;
 };
 
 //=============================================================================
@@ -179,7 +176,7 @@ private:
 //-----------------------------------------------------------------------------
 
 class VectorRotationTool final : public VectorDeformTool {
-  tcg::unique_ptr<Rotation> m_rotation;
+  std::unique_ptr<Rotation> m_rotation;
 
 public:
   VectorRotationTool(VectorSelectionTool *tool);
@@ -194,7 +191,7 @@ public:
 //-----------------------------------------------------------------------------
 
 class VectorFreeDeformTool final : public VectorDeformTool {
-  tcg::unique_ptr<FreeDeform> m_freeDeform;
+  std::unique_ptr<FreeDeform> m_freeDeform;
 
 public:
   VectorFreeDeformTool(VectorSelectionTool *tool);
@@ -207,7 +204,7 @@ public:
 //-----------------------------------------------------------------------------
 
 class VectorMoveSelectionTool final : public VectorDeformTool {
-  tcg::unique_ptr<MoveSelection> m_moveSelection;
+  std::unique_ptr<MoveSelection> m_moveSelection;
 
 public:
   VectorMoveSelectionTool(VectorSelectionTool *tool);
@@ -222,7 +219,7 @@ public:
 //-----------------------------------------------------------------------------
 
 class VectorScaleTool final : public VectorDeformTool {
-  tcg::unique_ptr<Scale> m_scale;
+  std::unique_ptr<Scale> m_scale;
 
 public:
   VectorScaleTool(VectorSelectionTool *tool, int type);
@@ -243,7 +240,7 @@ class VectorChangeThicknessTool final : public DragTool {
   std::map<int, std::vector<double>> m_strokesThickness;
   double m_thicknessChange;
 
-  tcg::unique_ptr<UndoChangeStrokes> m_undo;
+  std::unique_ptr<UndoChangeStrokes> m_undo;
 
 public:
   VectorChangeThicknessTool(VectorSelectionTool *tool);
