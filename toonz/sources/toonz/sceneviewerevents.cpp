@@ -270,12 +270,16 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // with QTabletEvent->button() when pressing middle or right button.
     // So, in such case set m_tabletEvent = FALSE and let the mousePressEvent to
     // work.
-    if (e->button() == Qt::LeftButton &&
-        (m_tabletState == Released || m_tabletState == None)) {
-      TMouseEvent mouseEvent;
-      initToonzEvent(mouseEvent, e, height(), m_pressure, getDevPixRatio());
-      m_tabletState = Touched;
-      onPress(mouseEvent);
+    if (e->button() == Qt::LeftButton) {
+      // Proces the 1st tabletPress encountered and ignore back-to-back
+      // tabletPress events. Treat it as if it happened so a following
+      // mousePressEvent gets ignored
+      if (m_tabletState == Released || m_tabletState == None) {
+        TMouseEvent mouseEvent;
+        initToonzEvent(mouseEvent, e, height(), m_pressure, getDevPixRatio());
+        m_tabletState = Touched;
+        onPress(mouseEvent);
+      }
     } else
       m_tabletEvent = false;
 #endif
