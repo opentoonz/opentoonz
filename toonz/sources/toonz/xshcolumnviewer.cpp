@@ -901,9 +901,7 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
     return;
   }
 
-  if (!o->isVerticalTimeline() ||
-      !o->flag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE))
-    return;
+  if (!o->flag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE)) return;
 
   QRect thumbnailImageRect =
       o->rect(PredefinedRect::THUMBNAIL).translated(orig);

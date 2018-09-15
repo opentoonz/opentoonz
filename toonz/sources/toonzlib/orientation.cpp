@@ -92,10 +92,11 @@ class LeftToRightOrientation : public Orientation {
   const int ICON_HEIGHT        = 20;
   const int ICON_OFFSET        = ICON_WIDTH;
   const int ICONS_WIDTH        = ICON_OFFSET * 4;  // 88
+  const int THUMBNAIL_WIDTH    = 43;
   const int LAYER_NUMBER_WIDTH = 20;
   const int LAYER_NAME_WIDTH   = 150;
   const int LAYER_HEADER_WIDTH =
-      ICONS_WIDTH + LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH;
+      ICONS_WIDTH + THUMBNAIL_WIDTH + LAYER_NUMBER_WIDTH + LAYER_NAME_WIDTH;
   const int FOLDED_LAYER_HEADER_HEIGHT = 8;
   const int FOLDED_LAYER_HEADER_WIDTH  = LAYER_HEADER_WIDTH;
   const int TRACKLEN                   = 60;
@@ -943,7 +944,8 @@ LeftToRightOrientation::LeftToRightOrientation() {
           panelEye.translated(ICON_OFFSET, 0).adjusted(1, 1, -1, -1));
   addRect(PredefinedRect::PANEL_LOCK,
           panelEye.translated(2 * ICON_OFFSET, 0).adjusted(1, 1, -1, -1));
-  QRect panelName(ICONS_WIDTH + 1, 0, LAYER_NAME_WIDTH + LAYER_NUMBER_WIDTH - 4,
+  QRect panelName(ICONS_WIDTH + THUMBNAIL_WIDTH + 1, 0,
+                  LAYER_NAME_WIDTH + LAYER_NUMBER_WIDTH - 4,
                   LAYER_HEADER_PANEL_HEIGHT);
   addRect(PredefinedRect::PANEL_LAYER_NAME, panelName);
 
@@ -995,7 +997,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(
       PredefinedRect::FOLDED_LAYER_HEADER,
       QRect(1, 0, FOLDED_LAYER_HEADER_WIDTH - 2, FOLDED_LAYER_HEADER_HEIGHT));
-  QRect columnName(ICONS_WIDTH + 1, 0,
+  QRect columnName(ICONS_WIDTH + THUMBNAIL_WIDTH + 1, 0,
                    LAYER_NAME_WIDTH + LAYER_NUMBER_WIDTH - 4, CELL_HEIGHT);
   addRect(PredefinedRect::RENAME_COLUMN, columnName);
   QRect eyeArea(1, 0, ICON_WIDTH, CELL_HEIGHT);
@@ -1015,13 +1017,17 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::CONFIG,
           eye.translated(3 * ICON_OFFSET, 0).adjusted(1, 1, -1, -1));
   addRect(PredefinedRect::DRAG_LAYER,
-          QRect(ICONS_WIDTH + 1, 0, LAYER_HEADER_WIDTH - ICONS_WIDTH - 3,
+          QRect(ICONS_WIDTH + THUMBNAIL_WIDTH + 1, 0,
+                LAYER_HEADER_WIDTH - ICONS_WIDTH - THUMBNAIL_WIDTH - 3,
                 CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LAYER_NAME, columnName);
   addRect(PredefinedRect::LAYER_NUMBER,
-          QRect(ICONS_WIDTH + 1, 0, LAYER_NUMBER_WIDTH, CELL_HEIGHT));
-  addRect(PredefinedRect::THUMBNAIL_AREA, QRect(0, 0, -1, -1));  // hide
-  addRect(PredefinedRect::THUMBNAIL, QRect(0, 0, -1, -1));       // hide
+          QRect(ICONS_WIDTH + THUMBNAIL_WIDTH + 1, 0, LAYER_NUMBER_WIDTH,
+                CELL_HEIGHT));
+  QRect thumbnailArea = QRect(ICONS_WIDTH + 1, 0, THUMBNAIL_WIDTH, CELL_HEIGHT);
+  addRect(PredefinedRect::THUMBNAIL_AREA, thumbnailArea);
+  QRect thumbnail = thumbnailArea.adjusted(1, 1, 0, 0);
+  addRect(PredefinedRect::THUMBNAIL, thumbnail);
   addRect(PredefinedRect::FILTER_COLOR,
           QRect(LAYER_HEADER_WIDTH - 17, CELL_DRAG_HEIGHT + 2, 12, 12));
   addRect(PredefinedRect::PEGBAR_NAME, QRect(0, 0, -1, -1));         // hide
@@ -1078,8 +1084,8 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addFlag(PredefinedFlag::PEGBAR_NAME_VISIBLE, false);
   addFlag(PredefinedFlag::PARENT_HANDLE_NAME_BORDER, false);
   addFlag(PredefinedFlag::PARENT_HANDLE_NAME_VISIBILE, false);
-  addFlag(PredefinedFlag::THUMBNAIL_AREA_BORDER, false);
-  addFlag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE, false);
+  addFlag(PredefinedFlag::THUMBNAIL_AREA_BORDER, true);
+  addFlag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE, true);
   addFlag(PredefinedFlag::VOLUME_AREA_VERTICAL, false);
 
   //
