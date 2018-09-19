@@ -73,12 +73,13 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_tabletEvent, m_tabletMove;
   enum TabletState {
     None = 0,
-    Touched,
+    Touched,      // Pressed for mouse
     StartStroke,  // this state is to detect the first call
                   // of TabletMove just after TabletPress
     OnStroke,
     Released
-  } m_tabletState = None;
+  } m_tabletState = None,
+    m_mouseState  = None;
   // used to handle wrong mouse drag events!
   bool m_buttonClicked, m_toolSwitched;
   bool m_shownOnce                       = false;
