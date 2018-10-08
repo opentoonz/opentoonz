@@ -54,20 +54,33 @@ public:
 
 template <class T>
 class TParamVarT final : public TParamVar {
-  TParamP m_var;
+  // Very dirty fix for link fx, separating the variable between the plugin fx
+  // and the built-in fx.
+  // Note that for now link fx is available only with built-in fx, since m_var
+  // must be "pointer to pointer" of parameter to make the link fx to work
+  // properly.
+  T *m_var            = nullptr;
+  TParamP m_pluginVar = 0;
 
 public:
-  TParamVarT(std::string name, TParamP var, bool hidden = false,
-             bool obsolete = false)
-      : TParamVar(name, hidden, obsolete), m_var(var) {}
-  TParamVarT(std::string name, T *var, bool hidden = false,
-             bool obsolete = false)
-      : TParamVar(name, hidden, obsolete), m_var(var) {}
-  void setParam(TParam *param) override { m_var = TParamP(param); }
-
-  TParam *getParam() const override { return m_var.getPointer(); }
-  TParamVar *clone() const override {
-    return new TParamVarT<T>(getName(), m_var, isHidden(), isObsolete());
+  TParamVarT(std::string name, T *var = nullptr, TParamP pluginVar = 0,
+             bool hidden = false, bool obsolete = false)
+      : TParamVar(name, hidden), m_var(var), m_pluginVar(pluginVar) {}
+  TParamVarT() = delete;
+  void setParam(TParam *param) {
+    if (m_var)
+      *m_var = TParamP(param);
+    else
+      m_pluginVar = TParamP(param);
+  }
+  virtual TParam *getParam() const {
+    if (m_var)
+      return m_var->getPointer();
+    else
+      return m_pluginVar.getPointer();
+  }
+  TParamVar *clone() const {
+    return new TParamVarT<T>(getName(), m_var, m_pluginVar, isHidden());
   }
 };
 

@@ -805,6 +805,10 @@ void RenameCellField::renameCell() {
       // if there is no level at the current cell, take the level from the
       // previous frames
       // (when editing not empty column)
+      if (xsheet->isColumnEmpty(c)) {
+        cells.append(TXshCell());
+        continue;
+      }
 
       TXshCell cell;
       int tmpRow = m_row;
@@ -813,6 +817,19 @@ void RenameCellField::renameCell() {
         if (!cell.isEmpty() || tmpRow == 0) break;
         tmpRow--;
       }
+
+      // if the level is not found in the previous frames, then search in the
+      // following frames
+      if (cell.isEmpty()) {
+        tmpRow       = m_row + 1;
+        int maxFrame = xsheet->getFrameCount();
+        while (1) {
+          cell = xsheet->getCell(tmpRow, c);
+          if (!cell.isEmpty() || tmpRow >= maxFrame) break;
+          tmpRow++;
+        }
+      }
+
       TXshLevel *xl = cell.m_level.getPointer();
       if (!xl || (xl->getType() == OVL_XSHLEVEL &&
                   xl->getPath().getFrame() == TFrameId::NO_FRAME)) {

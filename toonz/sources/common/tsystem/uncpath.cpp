@@ -190,12 +190,7 @@ TFilePath TSystem::toLocalPath(const TFilePath &fp) {
             // shi502_path e' una wstring, anche se la dichiarazione di
             // PSHARE_INFO_502 non lo sa!
             std::wstring shareLocalPathW = (LPWSTR)(p->shi502_path);
-            std::string shareLocalPath   = ::to_string(shareLocalPathW);
-            //#else
-            // string shareLocalPath = toString(p->shi502_path);
-            //#endif
-            std::string localPath = shareLocalPath + path;
-            return TFilePath(localPath);
+            return TFilePath(shareLocalPathW) + TFilePath(path);
           }
         }
 

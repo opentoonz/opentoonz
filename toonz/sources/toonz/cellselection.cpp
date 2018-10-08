@@ -1387,8 +1387,8 @@ bool TCellSelection::isEmpty() const { return m_range.isEmpty(); }
 //-----------------------------------------------------------------------------
 
 void TCellSelection::selectCells(int r0, int c0, int r1, int c1) {
-  if (r0 > r1) tswap(r0, r1);
-  if (c0 > c1) tswap(c0, c1);
+  if (r0 > r1) std::swap(r0, r1);
+  if (c0 > c1) std::swap(c0, c1);
   m_range.m_r0            = r0;
   m_range.m_c0            = c0;
   m_range.m_r1            = r1;

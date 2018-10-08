@@ -42,8 +42,8 @@ void StrokeGenerator::add(const TThickPoint &point, double pixelSize2) {
       double d = std::max(point.thick, lastPoint.thick) + 3;
       TRectD rect(TRectD(lastPoint, point).enlarge(d));
       m_modifiedRegion += rect;
-      m_lastModifiedRegion = m_lastPointRect + rect;
-      m_lastPointRect      = rect;
+      m_lastModifiedRegion += rect;
+      m_lastPointRect = rect;
     } else {
       m_points.back().thick = std::max(m_points.back().thick, point.thick);
     }
@@ -116,7 +116,6 @@ void StrokeGenerator::drawFragments(int first, int last) {
   if (m_points.empty()) return;
   int i                                  = first;
   if (last >= (int)m_points.size()) last = m_points.size() - 1;
-  const double h                         = 0.01;
   TThickPoint a;
   TThickPoint b;
   TThickPoint c;
@@ -131,7 +130,6 @@ void StrokeGenerator::drawFragments(int first, int last) {
       if (b.thick == 0) b.thick = 0.1;
     }
     // m_p0 = m_p1 = b;
-    assert(tdistance(b, a) > h);
     v          = a.thick * normalize(rotate90(b - a));
     m_p0       = a + v;
     m_p1       = a - v;
@@ -162,35 +160,44 @@ void StrokeGenerator::drawFragments(int first, int last) {
       if (b.thick == 0) b.thick = 0.1;
       if (c.thick == 0) c.thick = 0.1;
     }
-    if (a.thick >= h && b.thick >= h && tdistance2(b, a) >= h &&
-        tdistance2(a, c) >= h) {
-      if (i - 1 == 0) {
-        assert(tdistance(b, a) > h);
-        v    = a.thick * normalize(rotate90(b - a));
-        m_p0 = a + v;
-        m_p1 = a - v;
-      }
-      assert(tdistance(c, a) > h);
-      v          = b.thick * normalize(rotate90(c - a));
-      TPointD p0 = b + v;
-      TPointD p1 = b - v;
-      glBegin(GL_POLYGON);
-      tglVertex(m_p0);
-      tglVertex(m_p1);
-      tglVertex(p1);
-      tglVertex(p0);
-      glEnd();
-      m_p0 = p0;
-      m_p1 = p1;
-    } else {
-      m_p0 = m_p1 = b;
+    if (i - 1 == 0) {
+      v    = a.thick * normalize(rotate90(b - a));
+      m_p0 = a + v;
+      m_p1 = a - v;
     }
+    v          = b.thick * normalize(rotate90(c - a));
+    TPointD p0 = b + v;
+    TPointD p1 = b - v;
+    glBegin(GL_POLYGON);
+    tglVertex(m_p0);
+    tglVertex(m_p1);
+    tglVertex(p1);
+    tglVertex(p0);
+    glEnd();
+    m_p0 = p0;
+    m_p1 = p1;
+
     glBegin(GL_LINE_STRIP);
     tglVertex(a);
     tglVertex(b);
     glEnd();
     i++;
   }
+  if (last < 2) return;
+  v = m_points[last].thick *
+      normalize(rotate90(m_points[last] - m_points[last - 1]));
+  TPointD p0 = m_points[last] + v;
+  TPointD p1 = m_points[last] - v;
+  glBegin(GL_POLYGON);
+  tglVertex(m_p0);
+  tglVertex(m_p1);
+  tglVertex(p1);
+  tglVertex(p0);
+  glEnd();
+  glBegin(GL_LINE_STRIP);
+  tglVertex(m_points[last - 1]);
+  tglVertex(m_points[last]);
+  glEnd();
 }
 
 //-------------------------------------------------------------------
@@ -255,7 +262,11 @@ void StrokeGenerator::removeMiddlePoints() {
 
 //-------------------------------------------------------------------
 
-TRectD StrokeGenerator::getLastModifiedRegion() { return m_lastModifiedRegion; }
+TRectD StrokeGenerator::getLastModifiedRegion() {
+  TRectD ret           = m_lastModifiedRegion;
+  m_lastModifiedRegion = m_lastPointRect;
+  return ret;
+}
 
 //-------------------------------------------------------------------
 

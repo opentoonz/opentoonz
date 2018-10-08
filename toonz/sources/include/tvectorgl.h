@@ -49,7 +49,8 @@ class TVectorRenderData;
   \par stroke is element to draw
   \par rd: \sa TVectorRenderData
  */
-void DVAPI tglDraw(const TVectorRenderData &rd, const TVectorImage *vim);
+void DVAPI tglDraw(const TVectorRenderData &rd, const TVectorImage *vim,
+                   TStroke **guidedStroke = (TStroke **)nullptr);
 void DVAPI tglDrawMask(const TVectorRenderData &rd, const TVectorImage *vim);
 void DVAPI tglDraw(const TVectorRenderData &rd, const TStroke *stroke,
                    bool pushAttribs = true);

@@ -9,6 +9,7 @@ GeneratedFiles
 *.suo
 *.user
 build*
+Thumbs.db
 
 # bundled thirdparty libraries
 /thirdparty/lzo

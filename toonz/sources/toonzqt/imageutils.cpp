@@ -13,6 +13,7 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tproject.h"
 #include "toonz/Naa2TlvConverter.h"
+#include "toonz/toonzimageutils.h"
 
 #ifdef _WIN32
 #include "avicodecrestrictions.h"
@@ -89,7 +90,7 @@ void getFrameIds(TFrameId from, TFrameId to, const TLevelP &level,
 
   if (to.isEmptyFrame()) to = TFrameId((std::numeric_limits<int>::max)());
 
-  if (from > to) tswap(from, to);
+  if (from > to) std::swap(from, to);
 
   const TLevel::Table &table = *level->getTable();
 
@@ -700,6 +701,63 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
   }
 
   if (removeUnusedStyles) converter.removeUnusedStyles(usedStyleIds);
+}
+
+//=============================================================================
+
+void convertOldLevel2Tlv(const TFilePath &source, const TFilePath &dest,
+                         const TFrameId &from, const TFrameId &to,
+                         FrameTaskNotifier *frameNotifier) {
+  TFilePath destPltPath = TFilePath(dest.getParentDir().getWideString() +
+                                    L"\\" + dest.getWideName() + L".tpl");
+  if (TSystem::doesExistFileOrLevel(destPltPath))
+    TSystem::removeFileOrLevel(destPltPath);
+
+  TLevelWriterP lw(dest);
+  lw->setIconSize(Preferences::instance()->getIconSize());
+  TPaletteP palette =
+      ToonzImageUtils::loadTzPalette(source.withType("plt").withNoFrame());
+  TLevelReaderP lr(source);
+  if (!lr) {
+    DVGui::warning(QObject::tr(
+        "The source image seems not suitable for this kind of conversion"));
+    frameNotifier->notifyError();
+    return;
+  }
+  TLevelP inLevel = lr->loadInfo();
+  if (!inLevel || inLevel->getFrameCount() == 0) {
+    DVGui::warning(QObject::tr(
+        "The source image seems not suitable for this kind of conversion"));
+    frameNotifier->notifyError();
+    return;
+  }
+  // Get the frames available in level inside the [from, to] range
+  std::vector<TFrameId> frames;
+  getFrameIds(from, to, inLevel, frames);
+  if (frames.empty()) return;
+
+  TLevelP outLevel;
+  outLevel->setPalette(palette.getPointer());
+  try {
+    int f, fCount = int(frames.size());
+    for (f = 0; f != fCount; ++f) {
+      if (frameNotifier->abortTask()) break;
+      TToonzImageP img = lr->getFrameReader(frames[f])->load();
+      if (!img) continue;
+      img->setPalette(palette.getPointer());
+      lw->getFrameWriter(frames[f])->save(img);
+
+      frameNotifier->notifyFrameCompleted(100 * (f + 1) / frames.size());
+    }
+  } catch (TException &e) {
+    QString msg = QString::fromStdWString(e.getMessage());
+    DVGui::warning(msg);
+    lw = TLevelWriterP();
+    if (TSystem::doesExistFileOrLevel(dest)) TSystem::removeFileOrLevel(dest);
+    frameNotifier->notifyError();
+    return;
+  }
+  lw = TLevelWriterP();
 }
 
 //=============================================================================

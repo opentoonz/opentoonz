@@ -28,6 +28,7 @@
 #include <fstream>
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 #if 0 && defined(__GNUC__)
 // typedef seems strong on GCC and breaks code with TException..
@@ -88,12 +89,6 @@ typedef unsigned int UINT;
 typedef unsigned char BYTE;
 #endif
 
-template <class T>
-inline void tswap(T &a, T &b) {
-  T tmp = a;
-  a     = b;
-  b     = tmp;
-}
 template <class T>
 inline T tcrop(T x, T a, T b) {
   return std::min(std::max(x, a), b);

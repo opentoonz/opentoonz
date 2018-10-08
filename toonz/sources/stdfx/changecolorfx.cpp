@@ -182,7 +182,7 @@ to_v =to_hsv[2]/255.;
   double hmax = from_h + range * 180;
   hmax        = normalize_h(hmax);
   if (hmax <= hmin) {
-    tswap(hmin, hmax);
+    std::swap(hmin, hmax);
     swaprange = true;
   }
   double smin     = from_s - range;

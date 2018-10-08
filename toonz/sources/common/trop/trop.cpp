@@ -57,7 +57,7 @@ void TRop::swapRBChannels(const TRaster32P &r) {
     TPixel32 *pix    = r->pixels(y);
     TPixel32 *endPix = pix + lx;
     while (pix < endPix) {
-      tswap(pix->r, pix->b);
+      std::swap(pix->r, pix->b);
       ++pix;
     }
   }

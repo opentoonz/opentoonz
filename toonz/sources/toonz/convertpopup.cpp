@@ -75,6 +75,7 @@ QMap<std::string, TPropertyGroup *> ConvertPopup::m_formatProperties;
 
 // const QString CreateNewPalette(QObject::tr("Create new palette"));
 const QString TlvExtension("tlv");
+const QString OldLevelToTlvExtension("Old Level to TLV");
 /*
   const QString TlvMode_Unpainted(QObject::tr("Unpainted tlv"));
   const QString TlvMode_PaintedFromTwoImages(QObject::tr("Painted tlv from two
@@ -213,6 +214,10 @@ void ConvertPopup::Converter::convertLevel(
     } else {
       convertLevelWithConvert2Tlv(sourceFileFullPath);
     }
+  } else if (popup->m_fileFormat->currentText() == OldLevelToTlvExtension) {
+    // convert old levels (tzp/tzu) to tlv
+    ImageUtils::convertOldLevel2Tlv(sourceFileFullPath, dstFileFullPath, from,
+                                    to, m_parent->m_notifier);
   } else {
     // convert to full-color
     TPixel32 bgColor = m_parent->m_bgColorField->getColor();
@@ -727,12 +732,13 @@ void ConvertPopup::onTlvModeSelected(const QString &tlvMode) {
 void ConvertPopup::onFormatSelected(const QString &format) {
   onFormatChanged(format);
 
-  bool isTlv = format == TlvExtension;
-  bool isPli = format == "svg";
+  bool isTlv          = format == TlvExtension;
+  bool isOldLevel2Tlv = format == OldLevelToTlvExtension;
+  bool isPli          = format == "svg";
 
-  m_formatOptions->setVisible(!isTlv);
-  m_bgColorField->setVisible(!isTlv && !isPli);
-  m_bgColorLabel->setVisible(!isTlv && !isPli);
+  m_formatOptions->setVisible(!isTlv && !isOldLevel2Tlv);
+  m_bgColorField->setVisible(!isTlv && !isPli && !isOldLevel2Tlv);
+  m_bgColorLabel->setVisible(!isTlv && !isPli && !isOldLevel2Tlv);
 
   m_tlvFrame->setVisible(isTlv);
   // m_svgFrame->setVisible(isPli);
@@ -755,14 +761,27 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
   m_okBtn->setEnabled(true);
   m_fileFormat->setEnabled(true);
   m_fileFormat->removeItem(m_fileFormat->findText("svg"));
+  m_fileFormat->removeItem(m_fileFormat->findText(OldLevelToTlvExtension));
 
+  // true if the ALL files are full color raster
   bool areFullcolor = true;
-  bool areVector    = false;
+
+  // true if AT LEAST ONE file is vector. Since the popup will never open if the
+  // file selection contains both raster and vector file types, we can assume
+  // ALL files are vector if areVector == true.
+  bool areVector = false;
+  // For the same logic as the above, true if all files are old levels
+  // (tzp/tzu).
+  bool areOldLevel = false;
+
   for (int i = 0; i < (int)fps.size(); i++) {
     TFileType::Type type = TFileType::getInfo(fps[i]);
     if (!TFileType::isFullColor(type)) {
-      areFullcolor                             = false;
-      if (TFileType::isVector(type)) areVector = true;
+      areFullcolor = false;
+      if (TFileType::isVector(type))
+        areVector = true;
+      else if (fps[i].getType() == "tzp" || fps[i].getType() == "tzu")
+        areOldLevel = true;
       break;
     }
   }
@@ -779,9 +798,13 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
     m_fileFormat->setCurrentIndex(m_fileFormat->findText("svg"));
     m_fileFormat->setEnabled(false);
     onFormatSelected("svg");
-  } else
-
-  {
+  } else if (areOldLevel) {
+    if (tlvIndex < 0) m_fileFormat->addItem(OldLevelToTlvExtension);
+    m_fileFormat->setCurrentIndex(
+        m_fileFormat->findText(OldLevelToTlvExtension));
+    m_fileFormat->setEnabled(false);
+    onFormatSelected(OldLevelToTlvExtension);
+  } else {
     if (tlvIndex >= 0) {
       int index = m_fileFormat->currentIndex();
       m_fileFormat->removeItem(tlvIndex);
@@ -1014,7 +1037,10 @@ TFilePath ConvertPopup::getDestinationFilePath(
 
   // Build the output level name
   const QString &fldName = m_fileNameFld->text();
-  const std::string &ext = m_fileFormat->currentText().toStdString();
+  const std::string &ext =
+      (m_fileFormat->currentText() == OldLevelToTlvExtension)
+          ? "tlv"
+          : m_fileFormat->currentText().toStdString();
   const std::wstring &name =
       fldName.isEmpty() ? sourceFilePath.getWideName() : fldName.toStdWString();
 
@@ -1243,7 +1269,8 @@ void ConvertPopup::onOptionsClicked() {
 //-------------------------------------------------------------------
 
 void ConvertPopup::onFormatChanged(const QString &ext) {
-  if (ext == QString("avi") || ext == QString("tzp") || ext == TlvExtension) {
+  if (ext == QString("avi") || ext == QString("tzp") || ext == TlvExtension ||
+      ext == OldLevelToTlvExtension) {
     m_removeDotBeforeFrameNumber->setChecked(false);
     m_removeDotBeforeFrameNumber->setEnabled(false);
   } else {

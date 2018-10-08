@@ -365,6 +365,11 @@ void SceneViewer::onLeave() {
   if (m_freezedStatus != NO_FREEZED) return;
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (tool && tool->isEnabled()) tool->onLeave();
+
+  // force reset the flipping of shift & trace
+  if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked())
+    TTool::getTool("T_ShiftTrace", TTool::ToonzImage)->onLeave();
+
   update();
 }
 
@@ -1039,6 +1044,16 @@ bool SceneViewer::event(QEvent *e) {
     else if (tool && tool->isEventAcceptable(e)) {
       e->accept();
     }
+    // if the Shift & Trace mode is active, then override F1, F2 and F3 key
+    // actions by flipping feature
+    else if (CommandManager::instance()
+                 ->getAction(MI_ShiftTrace)
+                 ->isChecked() &&
+             TTool::getTool("T_ShiftTrace", TTool::ToonzImage)
+                 ->isEventAcceptable(e)) {
+      e->accept();
+    }
+
     return true;
   }
   if (e->type() == QEvent::KeyRelease) {
@@ -1211,6 +1226,18 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
         event->ignore();
         return true;
       }
+      // pressing F1, F2 or F3 key will flip between corresponding ghost
+      if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
+          (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
+        OnionSkinMask osm =
+            TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+        if (osm.getGhostFlipKey() != key) {
+          osm.appendGhostFlipKey(key);
+          TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+          TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+        }
+        return true;
+      }
     }
 
     if (!tool->isEnabled()) return false;
@@ -1307,6 +1334,15 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
 
     tool->mouseMove(pos, toonzEvent);
     setToolCursor(this, tool->getCursorId());
+  }
+
+  if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
+      (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
+    OnionSkinMask osm =
+        TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+    osm.removeGhostFlipKey(key);
+    TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+    TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
   }
 
   if (tool->getName() == T_Type)

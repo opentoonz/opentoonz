@@ -107,6 +107,8 @@ public:
   static double m_firstBackOnionSkin;
   static double m_lastBackVisibleSkin;
 
+  static bool m_isShiftAndTraceEnabled;
+
   TPixel32 m_filterColor;
 
 public:

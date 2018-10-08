@@ -482,7 +482,16 @@ bool TMeasuredValue::setValue(std::wstring s, int *pErr) {
     }
   }
   if (i > j) {
-    value     = std::stod(s.substr(j, i - j));
+    try {
+      value = std::stod(s.substr(j, i - j));
+    }
+    // handle exceptions
+    catch (const std::invalid_argument &e) {
+      return false;
+    } catch (const std::out_of_range &e) {
+      return false;
+    }
+
     valueFlag = true;
     // skip blanks
     i = s.find_first_not_of(::to_wstring(" \t"), i);

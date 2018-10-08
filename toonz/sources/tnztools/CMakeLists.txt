@@ -14,13 +14,13 @@ set(MOC_HEADERS
     rulertool.h
     stylepickertool.h
 	viewtools.h
+    toonzrasterbrushtool.h
 	controlpointeditortool.h
 )
 
 set(HEADERS ${MOC_HEADERS}
     autofill.h
     bluredbrush.h
-    brushtool.h
     ../include/tools/cursormanager.h
     ../include/tools/cursors.h
     ../include/tools/levelselection.h
@@ -37,6 +37,8 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tools/toolutils.h
     ../include/tools/RGBpicker.h
     mypainttoonzbrush.h
+    shifttracetool.h
+	toonzvectorbrushtool.h
 )
 
 set(SOURCES
@@ -49,7 +51,6 @@ set(SOURCES
     toolutils.cpp
     bendertool.cpp
     bluredbrush.cpp
-    brushtool.cpp
     controlpointeditortool.cpp
     cuttertool.cpp
     edittool.cpp
@@ -97,6 +98,9 @@ set(SOURCES
     fingertool.cpp
     rulertool.cpp
     mypainttoonzbrush.cpp
+    shifttracetool.cpp
+    toonzrasterbrushtool.cpp
+	toonzvectorbrushtool.cpp
 )
 
 set(RESOURCES tnztools.qrc)

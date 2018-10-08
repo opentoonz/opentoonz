@@ -571,8 +571,16 @@ ToolOptionCombo::ToolOptionCombo(TTool *tool, TEnumProperty *property,
   setSizeAdjustPolicy(QComboBox::AdjustToContents);
   connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
   // synchronize the state with the same widgets in other tool option bars
-  if (toolHandle)
+  if (toolHandle) {
     connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionCombo::reloadComboBoxList(std::string id) {
+  if (id == "" || m_property->getName() != id) return;
+  loadEntries();
 }
 
 //-----------------------------------------------------------------------------
@@ -678,6 +686,58 @@ void ToolOptionCombo::doOnActivated(int index) {
 
   // for updating a cursor without any effect to the tool options
   m_toolHandle->notifyToolCursorTypeChanged();
+}
+
+//=============================================================================
+
+ToolOptionFontCombo::ToolOptionFontCombo(TTool *tool, TEnumProperty *property,
+                                         ToolHandle *toolHandle)
+    : QFontComboBox()
+    , ToolOptionControl(tool, property->getName(), toolHandle)
+    , m_property(property) {
+  setMaximumWidth(250);
+  m_property->addListener(this);
+  setSizeAdjustPolicy(QFontComboBox::AdjustToContents);
+  connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+  // synchronize the state with the same widgets in other tool option bars
+  if (toolHandle)
+    connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
+
+  updateStatus();
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionFontCombo::updateStatus() {
+  QString value = QString::fromStdWString(m_property->getValue());
+  int index     = findText(value);
+  if (index >= 0 && index != currentIndex()) setCurrentIndex(index);
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionFontCombo::onActivated(int index) {
+  const TEnumProperty::Range &range = m_property->getRange();
+  if (index < 0 || index >= (int)range.size()) return;
+
+  std::wstring item = range[index];
+  m_property->setValue(item);
+  notifyTool();
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionFontCombo::doShowPopup() {
+  if (!isInVisibleViewer(this)) return;
+  if (Preferences::instance()->getDropdownShortcutsCycleOptions()) {
+    const TEnumProperty::Range &range           = m_property->getRange();
+    int theIndex                                = currentIndex() + 1;
+    if (theIndex >= (int)range.size()) theIndex = 0;
+    onActivated(theIndex);
+    setCurrentIndex(theIndex);
+  } else {
+    if (isVisible()) showPopup();
+  }
 }
 
 //=============================================================================

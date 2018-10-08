@@ -238,6 +238,8 @@ public:
 
   void setInterfaceFont(std::string font);
   QString getInterfaceFont() { return m_interfaceFont; }
+  void setInterfaceFontStyle(std::string style);
+  QString getInterfaceFontStyle() { return m_interfaceFontStyle; }
   void setInterfaceFontWeight(int weight);
   int getInterfaceFontWeight() { return m_interfaceFontWeight; }
 
@@ -505,6 +507,11 @@ public:
   }
   bool getOnionSkinDuringPlayback() { return m_onionSkinDuringPlayback; }
   void setOnionSkinDuringPlayback(bool on);
+
+  void useOnionColorsForShiftAndTraceGhosts(bool on);
+  bool areOnionColorsUsedForShiftAndTraceGhosts() const {
+    return m_useOnionColorsForShiftAndTraceGhosts;
+  }
   // Transparency Check  tab
 
   void setTranspCheckData(const TPixel &bg, const TPixel &ink,
@@ -573,6 +580,11 @@ public:
   }  //! \sa The \p sysctl unix command.
   std::string getLayerNameEncoding() const { return m_layerNameEncoding; };
 
+  // Tablet tab
+
+  void enableWinInk(bool on);
+  bool isWinInkEnabled() const { return m_enableWinInk; }
+
 Q_SIGNALS:
 
   void stopAutoSave();
@@ -589,7 +601,7 @@ private:
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
       m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
-      m_customProjectRoot, m_interfaceFont;
+      m_customProjectRoot, m_interfaceFont, m_interfaceFontStyle;
   QString m_fastRenderPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
@@ -703,6 +715,9 @@ private:
   bool m_cursorOutlineEnabled = false;
 
   TPixel32 m_currentColumnColor;
+
+  bool m_enableWinInk                         = false;
+  bool m_useOnionColorsForShiftAndTraceGhosts = false;
 
 private:
   Preferences();

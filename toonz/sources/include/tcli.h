@@ -45,11 +45,11 @@ inline bool fromStr(double &value, std::string s) {
     return false;
 }
 inline bool fromStr(std::string &value, std::string s) {
-  value = s;
+  value = QString::fromLocal8Bit(s.c_str()).toStdString();
   return true;
 }
 inline bool fromStr(TFilePath &value, std::string s) {
-  value = TFilePath(s);
+  value = TFilePath(QString::fromLocal8Bit(s.c_str()));
   return true;
 }
 

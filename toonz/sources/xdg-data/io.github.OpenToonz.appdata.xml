@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>io.github.OpenToonz</id>
+  <launchable type="desktop-id">io.github.OpenToonz.desktop</launchable>
+  <name>OpenToonz</name>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>BSD-3-Clause</project_license>
+  <developer_name>DWANGO Co., Ltd.</developer_name>
+  <summary>2D animation</summary>
+  <description>
+    <p>
+      This is software for producing a 2D animation.
+    </p>
+    <p>
+      It is based on the software "Toonz", which was developed
+      by Digital Video S.p.A. in Italy, customized by Studio Ghibli,
+      and has been used for creating its works for many years.
+      Dwango launched the OpenToonz project in cooperation
+      with Digital Video and Studio Ghibli.
+    </p>
+  </description>
+  <url type="homepage">https://opentoonz.github.io</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/flathub/io.github.OpenToonz/master/screenshot1.png</image>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="1.2.1" date="2018-06-28"></release>
+  </releases>
+</component>

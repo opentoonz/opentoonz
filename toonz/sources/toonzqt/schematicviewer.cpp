@@ -3,6 +3,7 @@
 #include "toonzqt/schematicviewer.h"
 
 // TnzQt includes
+#include "toonzqt/fxtypes.h"
 #include "toonzqt/schematicnode.h"
 #include "toonzqt/fxschematicnode.h"
 #include "toonzqt/schematicgroupeditor.h"
@@ -27,6 +28,7 @@
 #include "toonz/fxdag.h"
 #include "toonz/tapplication.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/txshleveltypes.h"
 
 // Qt includes
 #include <QGraphicsSceneMouseEvent>
@@ -289,10 +291,6 @@ void SchematicSceneViewer::zoomQt(bool zoomin, bool resetZoom) {
 #else
   double scale2 = matrix().det();
 #endif
-
-  // if the zoom scale is changed over 100% in FxSchematic, call updateScene
-  bool beforeIsLarge = (scale2 >= 1.0);
-
   if (resetZoom ||
       ((scale2 < 100000 || !zoomin) && (scale2 > 0.001 * 0.05 || zoomin))) {
     double oldZoomScale = sqrt(scale2);
@@ -307,16 +305,6 @@ void SchematicSceneViewer::zoomQt(bool zoomin, bool resetZoom) {
         mapToScene(QRect(rect.center(), QSize(2, 2))).boundingRect());
     setMatrix(scale, true);
     centerOn(sceneCenterRect.center());
-
-#if QT_VERSION >= 0x050000
-    bool afterIsLarge = (matrix().determinant() >= 1.0);
-#else
-    bool afterIsLarge  = (matrix().det() >= 1.0);
-#endif
-    if (beforeIsLarge != afterIsLarge) {
-      FxSchematicScene *fxScene = qobject_cast<FxSchematicScene *>(scene());
-      if (fxScene) fxScene->updateScene();
-    }
   }
 }
 
@@ -326,51 +314,20 @@ void SchematicSceneViewer::zoomQt(bool zoomin, bool resetZoom) {
 */
 void SchematicSceneViewer::changeScale(const QPoint &winPos,
                                        qreal scaleFactor) {
-#if QT_VERSION >= 0x050000
-  bool beforeIsLarge = (matrix().determinant() >= 1.0);
-#else
-  bool beforeIsLarge   = (matrix().det() >= 1.0);
-#endif
   QPointF startScenePos = mapToScene(winPos);
   QMatrix scale         = QMatrix().scale(scaleFactor, scaleFactor);
   setMatrix(scale, true);
   QPointF endScenePos = mapToScene(winPos);
   QPointF delta       = endScenePos - startScenePos;
   translate(delta.x(), delta.y());
-
-#if QT_VERSION >= 0x050000
-  bool afterIsLarge = (matrix().determinant() >= 1.0);
-#else
-  bool afterIsLarge    = (matrix().det() >= 1.0);
-#endif
-  if (beforeIsLarge != afterIsLarge) {
-    FxSchematicScene *fxScene = qobject_cast<FxSchematicScene *>(scene());
-    if (fxScene) fxScene->updateScene();
-  }
 }
 
 //------------------------------------------------------------------
 
 void SchematicSceneViewer::fitScene() {
   if (scene()) {
-#if QT_VERSION >= 0x050000
-    bool beforeIsLarge = (matrix().determinant() >= 1.0);
-#else
-    bool beforeIsLarge = (matrix().det() >= 1.0);
-#endif
-
     QRectF rect = scene()->itemsBoundingRect();
     fitInView(rect, Qt::KeepAspectRatio);
-
-#if QT_VERSION >= 0x050000
-    bool afterIsLarge = (matrix().determinant() >= 1.0);
-#else
-    bool afterIsLarge  = (matrix().det() >= 1.0);
-#endif
-    if (beforeIsLarge != afterIsLarge) {
-      FxSchematicScene *fxScene = qobject_cast<FxSchematicScene *>(scene());
-      if (fxScene) fxScene->updateScene();
-    }
   }
 }
 
@@ -392,11 +349,6 @@ void SchematicSceneViewer::reorderScene() {
 //------------------------------------------------------------------
 
 void SchematicSceneViewer::normalizeScene() {
-#if QT_VERSION >= 0x050000
-  bool beforeIsLarge = (matrix().determinant() >= 1.0);
-#else
-  bool beforeIsLarge   = (matrix().det() >= 1.0);
-#endif
   // See QGraphicsView::mapToScene()'s doc for details
   QRect rect(0, 0, width(), height());
   QRectF sceneCenterRect(
@@ -406,16 +358,6 @@ void SchematicSceneViewer::normalizeScene() {
   scale(1.32, 1.32);
 #endif
   centerOn(sceneCenterRect.center());
-
-#if QT_VERSION >= 0x050000
-  bool afterIsLarge = (matrix().determinant() >= 1.0);
-#else
-  bool afterIsLarge    = (matrix().det() >= 1.0);
-#endif
-  if (beforeIsLarge != afterIsLarge) {
-    FxSchematicScene *fxScene = qobject_cast<FxSchematicScene *>(scene());
-    if (fxScene) fxScene->updateScene();
-  }
 }
 
 //------------------------------------------------------------------
@@ -508,6 +450,59 @@ SchematicViewer::~SchematicViewer() {}
 
 //------------------------------------------------------------------
 
+void SchematicViewer::getNodeColor(int ltype, QColor &nodeColor) {
+  switch (ltype) {
+  case TZI_XSHLEVEL:
+  case OVL_XSHLEVEL:
+    nodeColor = getFullcolorColumnColor();
+    break;
+  case PLI_XSHLEVEL:
+    nodeColor = getVectorColumnColor();
+    break;
+  case TZP_XSHLEVEL:
+    nodeColor = getLevelColumnColor();
+    break;
+  case ZERARYFX_XSHLEVEL:
+    nodeColor = getFxColumnColor();
+    break;
+  case CHILD_XSHLEVEL:
+    nodeColor = getChildColumnColor();
+    break;
+  case MESH_XSHLEVEL:
+    nodeColor = getMeshColumnColor();
+    break;
+  case PLT_XSHLEVEL:
+    nodeColor = getPaletteColumnColor();
+    break;
+  case eNormalFx:
+    nodeColor = getNormalFxColor();
+    break;
+  case eZeraryFx:
+    nodeColor = getFxColumnColor();
+    break;
+  case eMacroFx:
+    nodeColor = getMacroFxColor();
+    break;
+  case eGroupedFx:
+    nodeColor = getGroupColor();
+    break;
+  case eNormalImageAdjustFx:
+    nodeColor = getImageAdjustFxColor();
+    break;
+  case eNormalLayerBlendingFx:
+    nodeColor = getLayerBlendingFxColor();
+    break;
+  case eNormalMatteFx:
+    nodeColor = getMatteFxColor();
+    break;
+  default:
+    nodeColor = grey210;
+    break;
+  }
+}
+
+//------------------------------------------------------------------
+
 void SchematicViewer::setApplication(TApplication *app) {
   m_stageScene->setXsheetHandle(app->getCurrentXsheet());
   m_stageScene->setObjectHandle(app->getCurrentObject());
@@ -565,7 +560,7 @@ void SchematicViewer::createToolbars() {
 void SchematicViewer::createActions() {
   // Create all actions
   QAction *addPegbar = 0, *addSpline = 0, *addCamera = 0, *insertFx = 0,
-          *addOutputFx = 0, *switchPort = 0;
+          *addOutputFx = 0, *switchPort = 0, *iconifyNodes = 0;
   {
     // Fit schematic
     QIcon fitSchematicIcon = createQIconOnOff("fit", false);
@@ -640,6 +635,15 @@ void SchematicViewer::createActions() {
       // AddOutputFx
       addOutputFx = CommandManager::instance()->getAction("MI_NewOutputFx");
 
+      // Iconify Fx nodes
+      iconifyNodes = new QAction(tr("&Toggle node icons"), m_fxToolbar);
+      iconifyNodes->setCheckable(true);
+      iconifyNodes->setChecked(!m_fxScene->isNormalIconView());
+      QIcon iconifyNodesIcon = createQIconOnOff("iconifynodes");
+      iconifyNodes->setIcon(iconifyNodesIcon);
+      connect(iconifyNodes, SIGNAL(toggled(bool)), m_fxScene,
+              SLOT(onIconifyNodesToggled(bool)));
+
       // Swap fx/stage schematic
       QIcon changeSchematicIcon = createQIconOnOff("swap", false);
       m_changeScene =
@@ -670,6 +674,8 @@ void SchematicViewer::createActions() {
     m_stageToolbar->addAction(addCamera);
     m_stageToolbar->addAction(addPegbar);
 
+    m_fxToolbar->addSeparator();
+    m_fxToolbar->addAction(iconifyNodes);
     m_fxToolbar->addSeparator();
     m_fxToolbar->addAction(addOutputFx);
     m_fxToolbar->addAction(insertFx);
@@ -711,7 +717,7 @@ void SchematicViewer::setFxSchematic() {
     m_fxToolbar->show();
 
     // check if the fx scene was small scaled (icon view mode)
-    if (!m_fxScene->isLargeScaled()) m_fxScene->updateScene();
+    if (!m_fxScene->isNormalIconView()) m_fxScene->updateScene();
 
     m_viewer->update();
   }
@@ -748,7 +754,7 @@ void SchematicViewer::onSceneSwitched() {
   // reset schematic
   m_viewer->resetMatrix();
   m_viewer->centerOn(m_viewer->scene()->itemsBoundingRect().center());
-  if (m_viewer->scene() == m_fxScene && !m_fxScene->isLargeScaled())
+  if (m_viewer->scene() == m_fxScene && !m_fxScene->isNormalIconView())
     m_fxScene->updateScene();
 }
 
@@ -803,4 +809,16 @@ void SchematicViewer::changeNodeSize() {
   QString label(m_maximizedNode ? tr("&Minimize Nodes")
                                 : tr("&Maximize Nodes"));
   m_nodeSize->setText(label);
+}
+
+//------------------------------------------------------------------
+
+QColor SchematicViewer::getSelectedNodeTextColor() {
+  // get colors
+  TPixel currentColumnPixel;
+  Preferences::instance()->getCurrentColumnData(currentColumnPixel);
+  QColor currentColumnColor((int)currentColumnPixel.r,
+                            (int)currentColumnPixel.g,
+                            (int)currentColumnPixel.b, 255);
+  return currentColumnColor;
 }

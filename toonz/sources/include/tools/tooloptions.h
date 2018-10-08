@@ -20,6 +20,7 @@
 #include <QToolBar>
 #include <QMap>
 #include <QLabel>
+#include <QRadioButton>
 
 // STD includes
 #include <map>
@@ -146,7 +147,7 @@ public:
   enum SingleValueWidgetType { SLIDER = 0, FIELD };
   void setSingleValueWidgetType(int type) { m_singleValueWidgetType = type; }
 
-  enum EnumWidgetType { COMBOBOX = 0, POPUPBUTTON };
+  enum EnumWidgetType { COMBOBOX = 0, POPUPBUTTON, FONTCOMBOBOX };
   void setEnumWidgetType(int type) { m_enumWidgetType = type; }
 
 private:
@@ -667,6 +668,36 @@ public:
   void updateStatus();
 protected slots:
   void updateRealTimePickLabel(const int, const int, const int);
+};
+
+//=============================================================================
+//
+// ShiftTraceToolOptionBox
+// shown only when "Edit Shift" mode is active
+//
+//=============================================================================
+
+class ShiftTraceToolOptionBox final : public ToolOptionsBox {
+  Q_OBJECT
+  QFrame *m_prevFrame, *m_afterFrame;
+  QRadioButton *m_prevRadioBtn, *m_afterRadioBtn;
+  QPushButton *m_resetPrevGhostBtn, *m_resetAfterGhostBtn;
+  TTool *m_tool;
+  void resetGhost(int index);
+
+protected:
+  void showEvent(QShowEvent *);
+  void hideEvent(QShowEvent *);
+
+public:
+  ShiftTraceToolOptionBox(QWidget *parent = 0, TTool *tool = 0);
+  void updateStatus() override;
+protected slots:
+  void onResetPrevGhostBtnPressed();
+  void onResetAfterGhostBtnPressed();
+  void onPrevRadioBtnClicked();
+  void onAfterRadioBtnClicked();
+  void updateColors();
 };
 
 //-----------------------------------------------------------------------------

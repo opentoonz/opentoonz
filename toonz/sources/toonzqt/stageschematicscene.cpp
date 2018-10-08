@@ -24,6 +24,7 @@
 #include "toonz/tcamera.h"
 #include "toonz/tstageobjectcmd.h"
 #include "toonz/tproject.h"
+#include "toonz/childstack.h"
 
 // TnzCore includes
 #include "tconst.h"
@@ -136,7 +137,10 @@ StageSchematicScene::StageSchematicScene(QWidget *parent)
     , m_sceneHandle(0)
     , m_frameHandle(0)
     , m_gridDimension(eSmall)
-    , m_showLetterOnPortFlag(ShowLetterOnOutputPortOfStageNode != 0) {
+    , m_showLetterOnPortFlag(ShowLetterOnOutputPortOfStageNode != 0)
+    , m_viewer() {
+  m_viewer = (SchematicViewer *)parent;
+
   QPointF sceneCenter = sceneRect().center();
   m_firstPos          = TPointD(sceneCenter.x(), sceneCenter.y());
 
@@ -1137,6 +1141,15 @@ void StageSchematicScene::contextMenuEvent(
   menu.addAction(addPegbar);
   menu.addAction(addCamera);
   menu.addAction(addSpline);
+
+  // Close sub xsheet and move to parent sheet
+  ToonzScene *scene      = m_sceneHandle->getScene();
+  ChildStack *childStack = scene->getChildStack();
+  if (childStack && childStack->getAncestorCount() > 0) {
+    menu.addSeparator();
+    menu.addAction(CommandManager::instance()->getAction("MI_CloseChild"));
+  }
+
   menu.addSeparator();
   menu.addAction(paste);
   m_selection->setPastePosition(TPointD(scenePos.x(), scenePos.y()));
@@ -1215,13 +1228,6 @@ void StageSchematicScene::onSelectionChanged() {
 
 void StageSchematicScene::onCollapse(QList<TStageObjectId> objects) {
   emit doCollapse(objects);
-}
-
-//------------------------------------------------------------------
-
-void StageSchematicScene::onOpenSubxsheet() {
-  CommandManager *cm = CommandManager::instance();
-  cm->execute("MI_OpenChild");
 }
 
 //------------------------------------------------------------------

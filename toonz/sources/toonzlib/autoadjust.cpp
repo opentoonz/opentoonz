@@ -74,8 +74,8 @@ void set_autoadjust_window(int x0, int y0, int x1, int y1) {
   Window_y0 = y0;
   Window_x1 = x1;
   Window_y1 = y1;
-  if (Window_x0 > Window_x1) tswap(Window_x0, Window_x1);
-  if (Window_y0 > Window_y1) tswap(Window_y0, Window_y1);
+  if (Window_x0 > Window_x1) std::swap(Window_x0, Window_x1);
+  if (Window_y0 > Window_y1) std::swap(Window_y0, Window_y1);
 }
 
 /*---------------------------------------------------------------------------*/

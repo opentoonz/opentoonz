@@ -2004,7 +2004,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     // preview button
     else if (o->rect(PredefinedRect::EYE_AREA).contains(mouseInCell) &&
              event->button() == Qt::LeftButton) {
-      if (column->getPaletteColumn() || column->getSoundTextColumn()) {
+      if (column->getSoundTextColumn()) {
         // do nothing
       } else {
         m_doOnRelease =
@@ -2030,7 +2030,9 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     // config button
     else if (o->rect(PredefinedRect::CONFIG_AREA).contains(mouseInCell) &&
              event->button() == Qt::LeftButton) {
-      if (column->getSoundColumn() || column->getPaletteColumn() ||
+      TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+
+      if (zColumn || column->getSoundColumn() || column->getPaletteColumn() ||
           column->getSoundTextColumn()) {
         // do nothing
       } else

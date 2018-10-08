@@ -62,6 +62,9 @@
 #include "tsimplecolorstyles.h"
 #include "toonz/imagestyles.h"
 #include "tvectorbrushstyle.h"
+#include "tfont.h"
+
+#include "kis_tablet_support_win8.h"
 
 #ifdef MACOSX
 #include "tipc.h"
@@ -77,6 +80,7 @@
 #include <QFileInfo>
 #include <QSettings>
 #include <QLibraryInfo>
+#include <QHash>
 
 using namespace DVGui;
 #if defined LINETEST
@@ -97,9 +101,10 @@ const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 
-const char *applicationFullName = "OpenToonz 1.2.1";  // next will be 1.3 (not 1.3.0)
-const char *rootVarName         = "TOONZROOT";
-const char *systemVarPrefix     = "TOONZ";
+const char *applicationFullName =
+    "OpenToonz 1.2.1";  // next will be 1.3 (not 1.3.0)
+const char *rootVarName     = "TOONZROOT";
+const char *systemVarPrefix = "TOONZ";
 
 #ifdef MACOSX
 #include "tthread.h"
@@ -150,7 +155,7 @@ DV_IMPORT_API void initColorFx();
     la stuffDir, controlla se la directory di outputs esiste (e provvede a
     crearla in caso contrario) verifica inoltre che stuffDir esista.
 */
-static void initToonzEnv() {
+static void initToonzEnv(QHash<QString, QString> &argPathValues) {
   StudioPalette::enable(true);
 
   TEnv::setApplication(applicationName, applicationVersion,
@@ -158,6 +163,15 @@ static void initToonzEnv() {
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
   TEnv::setDllRelativeDir(TFilePath(dllRelativePath));
+
+  QHash<QString, QString>::const_iterator i = argPathValues.constBegin();
+  while (i != argPathValues.constEnd()) {
+    if (!TEnv::setArgPathValue(i.key().toStdString(), i.value().toStdString()))
+      DVGui::error(
+          QObject::tr("The qualifier %1 is not a valid key name. Skipping.")
+              .arg(i.key()));
+    ++i;
+  }
 
   QCoreApplication::setOrganizationName("OpenToonz");
   QCoreApplication::setOrganizationDomain("");
@@ -244,18 +258,63 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
-  /*-- "-layout [レイアウト設定ファイル名]"
-   * で、必要なモジュールのPageだけのレイアウトで起動することを可能にする --*/
-  QString argumentLayoutFileName = "";
+  // parsing arguments and qualifiers
   TFilePath loadScenePath;
+  QString argumentLayoutFileName = "";
+  QHash<QString, QString> argumentPathValues;
   if (argc > 1) {
-    for (int a = 1; a < argc; a++) {
-      if (QString(argv[a]) == "-layout") {
-        argumentLayoutFileName = QString(argv[a + 1]);
-        a++;
-      } else
-        loadScenePath = TFilePath(argv[a]);
+    TCli::Usage usage(argv[0]);
+    TCli::UsageLine usageLine;
+    TCli::FilePathArgument loadSceneArg("scenePath", "Source scene file");
+    TCli::StringQualifier layoutFileQual(
+        "-layout filename",
+        "Custom layout file to be used, it should be saved in "
+        "$TOONZPROFILES\\layouts\\personal\\[CurrentLayoutName].[UserName]\\. "
+        "layouts.txt is used by default.");
+    usageLine = usageLine + layoutFileQual;
+
+    // system path qualifiers
+    std::map<QString, std::unique_ptr<TCli::QualifierT<TFilePath>>>
+        systemPathQualMap;
+    QString qualKey  = QString("%1ROOT").arg(systemVarPrefix);
+    QString qualName = QString("-%1 folderpath").arg(qualKey);
+    QString qualHelp =
+        QString(
+            "%1 path. It will automatically set other system paths to %1 "
+            "unless individually specified with other qualifiers.")
+            .arg(qualKey);
+    systemPathQualMap[qualKey].reset(new TCli::QualifierT<TFilePath>(
+        qualName.toStdString(), qualHelp.toStdString()));
+    usageLine = usageLine + *systemPathQualMap[qualKey];
+
+    const std::map<std::string, std::string> &spm = TEnv::getSystemPathMap();
+    for (auto itr = spm.begin(); itr != spm.end(); ++itr) {
+      qualKey = QString("%1%2")
+                    .arg(systemVarPrefix)
+                    .arg(QString::fromStdString((*itr).first));
+      qualName = QString("-%1 folderpath").arg(qualKey);
+      qualHelp = QString("%1 path.").arg(qualKey);
+      systemPathQualMap[qualKey].reset(new TCli::QualifierT<TFilePath>(
+          qualName.toStdString(), qualHelp.toStdString()));
+      usageLine = usageLine + *systemPathQualMap[qualKey];
     }
+    usage.add(usageLine);
+    usage.add(usageLine + loadSceneArg);
+
+    if (!usage.parse(argc, argv)) exit(1);
+
+    loadScenePath = loadSceneArg.getValue();
+    if (layoutFileQual.isSelected())
+      argumentLayoutFileName =
+          QString::fromStdString(layoutFileQual.getValue());
+    for (auto q_itr = systemPathQualMap.begin();
+         q_itr != systemPathQualMap.end(); ++q_itr) {
+      if (q_itr->second->isSelected())
+        argumentPathValues.insert(q_itr->first,
+                                  q_itr->second->getValue().getQString());
+    }
+
+    argc = 1;
   }
 
 // Enables high-DPI scaling. This attribute must be set before QApplication is
@@ -409,7 +468,7 @@ int main(int argc, char *argv[]) {
       &toonzRunOutOfContMemHandler);
 
   // Toonz environment
-  initToonzEnv();
+  initToonzEnv(argumentPathValues);
 
   // Initialize thread components
   TThread::init();
@@ -521,6 +580,10 @@ int main(int argc, char *argv[]) {
   // Apply translation to file writers properties
   Tiio::updateFileWritersPropertiesTranslation();
 
+  // Force to have left-to-right layout direction in any language environment.
+  // This function has to be called after installTranslator().
+  a.setLayoutDirection(Qt::LeftToRight);
+
   splash.showMessage(offsetStr + "Loading styles ...", Qt::AlignCenter,
                      Qt::white);
   a.processEvents();
@@ -571,7 +634,6 @@ int main(int argc, char *argv[]) {
   QString currentStyle = Preferences::instance()->getCurrentStyleSheetPath();
   a.setStyleSheet(currentStyle);
 
-  TApp::instance()->setMainWindow(&w);
   w.setWindowTitle(applicationFullName);
   if (TEnv::getIsPortable()) {
     splash.showMessage(offsetStr + "Starting OpenToonz Portable ...",
@@ -623,16 +685,29 @@ int main(int argc, char *argv[]) {
   }
 
   QFont *myFont;
-  std::string fontName =
-      Preferences::instance()->getInterfaceFont().toStdString();
-  std::string isBold =
-      Preferences::instance()->getInterfaceFontWeight() ? "Yes" : "No";
-  myFont = new QFont(QString::fromStdString(fontName));
+  QString fontName  = Preferences::instance()->getInterfaceFont();
+  QString fontStyle = Preferences::instance()->getInterfaceFontStyle();
+
+  TFontManager *fontMgr = TFontManager::instance();
+  std::vector<std::wstring> typefaces;
+  bool isBold = false, isItalic = false, hasKerning = false;
+  try {
+    fontMgr->loadFontNames();
+    fontMgr->setFamily(fontName.toStdWString());
+    fontMgr->getAllTypefaces(typefaces);
+    isBold     = fontMgr->isBold(fontName, fontStyle);
+    isItalic   = fontMgr->isItalic(fontName, fontStyle);
+    hasKerning = fontMgr->hasKerning();
+  } catch (TFontCreationError &) {
+    // Do nothing. A default font should load
+  }
+
+  myFont = new QFont(fontName);
   myFont->setPixelSize(EnvSoftwareCurrentFontSize);
-  if (strcmp(isBold.c_str(), "Yes") == 0)
-    myFont->setBold(true);
-  else
-    myFont->setBold(false);
+  myFont->setBold(isBold);
+  myFont->setItalic(isItalic);
+  myFont->setKerning(hasKerning);
+
   a.setFont(*myFont);
 
   QAction *action = CommandManager::instance()->getAction("MI_OpenTMessage");
@@ -659,6 +734,17 @@ int main(int argc, char *argv[]) {
   // documentation.
   _controlfp_s(0, fpWord, -1);
 #endif
+#endif
+
+#ifdef _WIN32
+  if (Preferences::instance()->isWinInkEnabled()) {
+    KisTabletSupportWin8 *penFilter = new KisTabletSupportWin8();
+    if (penFilter->init()) {
+      a.installNativeEventFilter(penFilter);
+    } else {
+      delete penFilter;
+    }
+  }
 #endif
 
   a.installEventFilter(TApp::instance());

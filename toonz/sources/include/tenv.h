@@ -142,6 +142,12 @@ DVAPI void setDllRelativeDir(const TFilePath &dllRelativeDir);
 
 DVAPI void saveAllEnvVariables();
 
+// register command line argument paths.
+// returns true on success
+DVAPI bool setArgPathValue(std::string key, std::string value);
+
+DVAPI const std::map<std::string, std::string> &getSystemPathMap();
+
 /*
 
   enum SystemFileId {

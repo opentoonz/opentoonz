@@ -215,8 +215,8 @@ vector<TThickPoint> ReplaceAddPoint::place(int frame) const {
     bool isInFirstChunk = true;
     if (m_pointIndex > m_prevCP + 2) {
       // If they are in the second chunk, exchange points
-      tswap(a[0], a[4]);
-      tswap(a[1], a[3]);
+      std::swap(a[0], a[4]);
+      std::swap(a[1], a[3]);
       isInFirstChunk = false;
     }
 
@@ -995,7 +995,7 @@ void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex,
   int cpCount = getControlPointCount();
   // Verifiche per il caso in cui lo stroke e' selfLoop
   if (isSelfLoop() && beforeIndex == 0 && nextIndex == cpCount - 1)
-    tswap(beforeIndex, nextIndex);
+    std::swap(beforeIndex, nextIndex);
 
   int beforePointIndex = m_controlPoints[beforeIndex].m_pointIndex;
   int nextPointIndex   = (isSelfLoop() && nextIndex == 0)

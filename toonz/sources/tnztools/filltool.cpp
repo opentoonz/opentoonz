@@ -1024,7 +1024,7 @@ void SequencePainter::processSequence(TXshSimpleLevel *sl, TFrameId firstFid,
 
   bool backward = false;
   if (firstFid > lastFid) {
-    tswap(firstFid, lastFid);
+    std::swap(firstFid, lastFid);
     backward = true;
   }
   assert(firstFid <= lastFid);
@@ -1421,9 +1421,9 @@ void AreaFillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   m_selecting    = false;
   if (m_type == RECT) {
     if (m_selectingRect.x0 > m_selectingRect.x1)
-      tswap(m_selectingRect.x0, m_selectingRect.x1);
+      std::swap(m_selectingRect.x0, m_selectingRect.x1);
     if (m_selectingRect.y0 > m_selectingRect.y1)
-      tswap(m_selectingRect.y0, m_selectingRect.y1);
+      std::swap(m_selectingRect.y0, m_selectingRect.y1);
 
     if (m_frameRange) {
       if (m_firstFrameSelected) {

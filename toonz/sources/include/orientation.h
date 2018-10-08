@@ -120,6 +120,8 @@ enum class PredefinedRect {
   ZOOM_OUT,
   LAYER_FOOTER_PANEL,
   PREVIEW_FRAME_AREA,
+  SHIFTTRACE_DOT,
+  SHIFTTRACE_DOT_AREA,
   SUBLAYER_NAME,       //! area to draw sublayer name
   SUBLAYER_ACTIVATOR,  //! activator key icon placement
   SUBLAYER_KEY_ICON    //! cell key icon for sublayers

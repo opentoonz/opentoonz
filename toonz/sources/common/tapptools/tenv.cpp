@@ -32,6 +32,11 @@ using namespace TEnv;
 //=========================================================
 
 namespace {
+const std::map<std::string, std::string> systemPathMap{
+    {"LIBRARY", "library"},   {"STUDIOPALETTE", "studiopalette"},
+    {"FXPRESETS", "fxs"},     {"CACHEROOT", "cache"},
+    {"PROFILES", "profiles"}, {"CONFIG", "config"},
+    {"PROJECTS", "projects"}};
 
 class EnvGlobals {  // singleton
 
@@ -48,6 +53,9 @@ class EnvGlobals {  // singleton
   TFilePath *m_stuffDir;
   TFilePath *m_dllRelativeDir;
   bool m_isPortable = false;
+
+  // path values specified with command line arguments
+  std::map<std::string, std::string> m_argPathValues;
 
   EnvGlobals() : m_stuffDir(0) { setWorkingDirectory(); }
 
@@ -91,6 +99,7 @@ public:
   TFilePath getRootVarPath() { return getSystemVarPath(m_rootVarName); }
 
   std::string getSystemVarValue(std::string varName) {
+    if (getIsPortable()) return "";
 #ifdef _WIN32
     return TSystem::getSystemValue(getSystemVarPath(varName)).toStdString();
 #else
@@ -138,7 +147,8 @@ public:
   void updateEnvFile() {
     TFilePath profilesDir =
         getSystemVarPathValue(getSystemVarPrefix() + "PROFILES");
-    if (profilesDir == TFilePath()) profilesDir = getStuffDir() + "profiles";
+    if (profilesDir == TFilePath())
+      profilesDir = getStuffDir() + systemPathMap.at("PROFILES");
     m_envFile =
         profilesDir + "env" + (TSystem::getUserName().toStdString() + ".env");
   }
@@ -193,10 +203,7 @@ public:
     m_systemVarPrefix = prefix;
     updateEnvFile();
   }
-  std::string getSystemVarPrefix() {
-    if (getIsPortable()) return "";
-    return m_systemVarPrefix;
-  }
+  std::string getSystemVarPrefix() { return m_systemVarPrefix; }
 
   void setWorkingDirectory() {
     QString workingDirectoryTmp  = QDir::currentPath();
@@ -222,6 +229,19 @@ public:
   TFilePath getDllRelativeDir() {
     if (m_dllRelativeDir) return *m_dllRelativeDir;
     return TFilePath(".");
+  }
+
+  void setArgPathValue(std::string key, std::string value) {
+    m_argPathValues.emplace(key, value);
+    if (key == m_systemVarPrefix + "PROFILES") updateEnvFile();
+  }
+
+  std::string getArgPathValue(std::string key) {
+    decltype(m_argPathValues)::iterator it = m_argPathValues.find(key);
+    if (it != m_argPathValues.end())
+      return it->second;
+    else
+      return "";
   }
 };
 
@@ -502,15 +522,21 @@ std::string TEnv::getSystemVarStringValue(std::string varName) {
 
 TFilePath TEnv::getSystemVarPathValue(std::string varName) {
   EnvGlobals *eg = EnvGlobals::instance();
+  // return if the path is registered by command line argument
+  std::string argVar = eg->getArgPathValue(varName);
+  if (argVar != "") return TFilePath(argVar);
   return TFilePath(eg->getSystemVarValue(varName));
 }
 
 TFilePathSet TEnv::getSystemVarPathSetValue(std::string varName) {
   TFilePathSet lst;
-  std::string value = EnvGlobals::instance()->getSystemVarValue(varName);
-  int len           = (int)value.size();
-  int i             = 0;
-  int j             = value.find(';');
+  EnvGlobals *eg = EnvGlobals::instance();
+  // if the path is registered by command line argument, then use it
+  std::string value      = eg->getArgPathValue(varName);
+  if (value == "") value = eg->getSystemVarValue(varName);
+  int len                = (int)value.size();
+  int i                  = 0;
+  int j                  = value.find(';');
   while (j != std::string::npos) {
     std::string s = value.substr(i, j - i);
     lst.push_back(TFilePath(s));
@@ -542,7 +568,8 @@ bool TEnv::getIsPortable() { return EnvGlobals::instance()->getIsPortable(); }
 
 TFilePath TEnv::getConfigDir() {
   TFilePath configDir = getSystemVarPathValue(getSystemVarPrefix() + "CONFIG");
-  if (configDir == TFilePath()) configDir = getStuffDir() + "config";
+  if (configDir == TFilePath())
+    configDir = getStuffDir() + systemPathMap.at("CONFIG");
   return configDir;
 }
 
@@ -565,6 +592,36 @@ void TEnv::setDllRelativeDir(const TFilePath &dllRelativeDir) {
 }
 
 void TEnv::saveAllEnvVariables() { VariableSet::instance()->save(); }
+
+bool TEnv::setArgPathValue(std::string key, std::string value) {
+  EnvGlobals *eg = EnvGlobals::instance();
+  // in case of "-TOONZROOT" , set the all unregistered paths
+  if (key == getRootVarName()) {
+    TFilePath rootPath(value);
+    eg->setStuffDir(rootPath);
+    for (auto itr = systemPathMap.begin(); itr != systemPathMap.end(); ++itr) {
+      std::string k   = getSystemVarPrefix() + (*itr).first;
+      std::string val = value + "\\" + (*itr).second;
+      // set all unregistered values
+      if (eg->getArgPathValue(k) == "") eg->setArgPathValue(k, val);
+    }
+    return true;
+  } else {
+    for (auto itr = systemPathMap.begin(); itr != systemPathMap.end(); ++itr) {
+      // found the corresponding registry key
+      if (key == getSystemVarPrefix() + (*itr).first) {
+        eg->setArgPathValue(key, value);
+        return true;
+      }
+    }
+    // registry key not found. failed to register
+    return false;
+  }
+}
+
+const std::map<std::string, std::string> &TEnv::getSystemPathMap() {
+  return systemPathMap;
+}
 
 /*
 void TEnv::defineSystemPath(SystemFileId id, const TFilePath &registryName)

@@ -197,7 +197,7 @@ void Ruler::compute() {
   // compute range
   double v0 = (m_x0 - m_pan) / m_unit;  // left margin (world units)
   double v1 = (m_x1 - m_pan) / m_unit;  // right margin (world units)
-  if (m_unit < 0) tswap(v0, v1);
+  if (m_unit < 0) std::swap(v0, v1);
   int i0 =
       tfloor((v0 - m_vOrigin) / m_step);  // largest tick <=v0 is i0 * m_step
   int i1 =

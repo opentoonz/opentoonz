@@ -106,7 +106,6 @@ set(MOC_HEADERS
 	../include/toonz/screenmapper.h
     scriptconsolepanel.h
     selectionutils.h
-    shifttracetool.h
     shortcutpopup.h
     soundtrackexport.h
     startuppopup.h
@@ -123,6 +122,7 @@ set(MOC_HEADERS
     svnupdatedialog.h
     svnpurgedialog.h
     tapp.h
+    kis_tablet_support_win8.h
     tasksviewer.h
     testpanel.h
     tfarmstuff.h
@@ -166,9 +166,7 @@ set(MOC_HEADERS
     processor.h
 )
 
-set(HEADERS ${MOC_HEADERS}
-	../include/cellposition.h
-	../include/orientation.h)
+set(HEADERS ${MOC_HEADERS})
 
 set(SOURCES
     floatingpanelcommand.cpp
@@ -256,11 +254,11 @@ set(SOURCES
     sceneviewercontextmenu.cpp
     scenesettingspopup.cpp
     scriptconsolepanel.cpp
-    shifttracetool.cpp
     shortcutpopup.cpp
     soundtrackexport.cpp
     startuppopup.cpp
     subcameramanager.cpp
+    kis_tablet_support_win8.cpp
 	sublayers.cpp
     timestretchpopup.cpp
     trackerpopup.cpp

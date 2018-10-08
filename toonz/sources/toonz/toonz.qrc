@@ -473,6 +473,9 @@
       <file>Resources/colorchiporder_upleft.svg</file>
       <file>Resources/timeline2xsheet.svg</file>
       <file>Resources/xsheet2timeline.svg</file>
+      <file>Resources/shift_and_trace.svg</file>
+      <file>Resources/shift_and_trace_edit.svg</file>
+      <file>Resources/shift_and_trace_reset.svg</file>
       <file>Resources/sublayer_key.svg</file>
     </qresource>
 </RCC>

@@ -1,4 +1,48 @@
 /* -----------------------------------------------------------------------------
+   Schematic Viewer
+----------------------------------------------------------------------------- */
+
+SchematicViewer {
+  qproperty-TextColor: @schematic-text-color;
+  qproperty-VerticalLineColor: @schematic-VerticalLine-color;
+
+  qproperty-LevelColumnColor: @schematic-LevelColumn-color;
+  qproperty-VectorColumnColor: @schematic-VectorColumn-color;
+  qproperty-ChildColumnColor: @schematic-ChildColumn-color;
+  qproperty-FullcolorColumnColor: @schematic-FullColorColumn-color;
+  qproperty-FxColumnColor: @schematic-FxColumn-color;
+  qproperty-PaletteColumnColor: @schematic-PaletteColumn-color;
+  qproperty-MeshColumnColor: @schematic-MeshColumn-color;
+  qproperty-ReferenceColumnColor: @schematic-ReferenceColumn-color;
+
+  qproperty-TableColor: @schematic-TableColor;
+  qproperty-ActiveCameraColor: @schematic-ActiveCameraColor;
+  qproperty-OtherCameraColor: @schematic-OtherCameraColor;
+  qproperty-GroupColor: @schematic-GroupColor;
+  qproperty-PegColor: @schematic-PegColor;
+  qproperty-SplineColor: @schematic-SplineColor;
+  qproperty-ActiveOutputColor: @schematic-ActiveOutputcolor;
+  qproperty-OtherOutputColor: @schematic-OtherOutputcolor;
+  qproperty-XsheetColor: @schematic-XsheetColor;
+  qproperty-NormalFxColor: @schematic-NormalFxColor;
+  qproperty-MacroFxColor: @schematic-MacroFxColor;
+  qproperty-ImageAdjustFxColor: @schematic-ImageAdjustFxColor;
+  qproperty-LayerBlendingFxColor: @schematic-LayerBlendingFxColor;
+  qproperty-MatteFxColor: @schematic-MatteFxColor;
+
+  qproperty-SchematicPreviewButtonBgOnColor: @schematic-PreviewButtonBgOn-color;
+  qproperty-SchematicPreviewButtonOnImage: url('@{img-url}/@{schematic-PreviewButtonOnImage}');
+  qproperty-SchematicPreviewButtonBgOffColor: @schematic-PreviewButtonBgOff-color;
+  qproperty-SchematicPreviewButtonOffImage: url('@{img-url}/@{schematic-PreviewButtonOffImage}');
+
+  qproperty-SchematicCamstandButtonBgOnColor: @schematic-CamstandButtonBgOn-color;
+  qproperty-SchematicCamstandButtonOnImage: url('@{img-url}/@{schematic-CamstandButtonOnImage}');
+  qproperty-SchematicCamstandButtonTranspImage: url('@{img-url}/@{schematic-CamstandButtonTranspImage}');
+  qproperty-SchematicCamstandButtonBgOffColor: @schematic-CamstandButtonBgOff-color;
+  qproperty-SchematicCamstandButtonOffImage: url('@{img-url}/@{schematic-CamstandButtonOffImage}');
+}
+
+/* -----------------------------------------------------------------------------
    Schematic Node Viewer
 ----------------------------------------------------------------------------- */
 

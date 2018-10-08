@@ -355,6 +355,9 @@ void Room::load(const TFilePath &fp) {
     settings.endGroup();
   }
 
+  // resolve resize events here to avoid unwanted minimize of floating viewer
+  qApp->processEvents();
+
   DockLayout::State state(geometries, settings.value("hierarchy").toString());
 
   layout->restoreState(state);
@@ -377,6 +380,9 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent,
     , m_saveSettingsOnQuit(true)
     , m_oldRoomIndex(0)
     , m_layoutName("") {
+  // store a main window pointer in advance of making its contents
+  TApp::instance()->setMainWindow(this);
+
   m_toolsActionGroup = new QActionGroup(this);
   m_toolsActionGroup->setExclusive(true);
   m_currentRoomsChoice = Preferences::instance()->getCurrentRoomChoice();
@@ -1953,11 +1959,16 @@ void MainWindow::defineActions() {
                MenuViewCommandType);
   createToggle(MI_ACheck, tr("&Gap Check"), "", ACheckToggleAction ? 1 : 0,
                MenuViewCommandType);
-  createToggle(MI_ShiftTrace, tr("Shift and Trace"), "", false,
+  QAction* shiftTraceAction = createToggle(MI_ShiftTrace, tr("Shift and Trace"), "", false,
                MenuViewCommandType);
-  createToggle(MI_EditShift, tr("Edit Shift"), "", false, MenuViewCommandType);
+  shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace.svg"));
+  shiftTraceAction = createToggle(MI_EditShift, tr("Edit Shift"), "", false, MenuViewCommandType);
+  shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace_edit.svg"));
   createToggle(MI_NoShift, tr("No Shift"), "", false, MenuViewCommandType);
-  createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
+  CommandManager::instance()->enable(MI_EditShift, false);
+  CommandManager::instance()->enable(MI_NoShift, false);
+  shiftTraceAction = createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
+  shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace_reset.svg"));
 
   if (QGLPixelBuffer::hasOpenGLPbuffers())
     createToggle(MI_RasterizePli, tr("&Visualize Vector As Raster"), "",
@@ -2416,9 +2427,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene) ? m_recentScenes : (fileType == Level)
-                                                 ? m_recentLevels
-                                                 : m_recentFlipbookImages;
+      (fileType == Scene)
+          ? m_recentScenes
+          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2543,9 +2554,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene) ? m_recentScenes : (fileType == Level)
-                                                 ? m_recentLevels
-                                                 : m_recentFlipbookImages;
+      (fileType == Scene)
+          ? m_recentScenes
+          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2572,9 +2583,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
-                                                        ? MI_ClearRecentLevel
-                                                        : MI_ClearRecentImage;
+        (fileType == Scene)
+            ? MI_ClearRecentScene
+            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

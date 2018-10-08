@@ -1,0 +1,3 @@
+libjpeg : The Independent JPEG Group's JPEG software
+
+this software is based in part on the work of the Independent JPEG Group

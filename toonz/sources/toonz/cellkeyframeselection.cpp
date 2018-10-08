@@ -113,8 +113,8 @@ void TCellKeyframeSelection::selectCellsKeyframes(int r0, int c0, int r1,
   m_cellSelection->selectCells(r0, c0, r1, c1);
   TXsheet *xsh = m_xsheetHandle->getXsheet();
   m_xsheetHandle->getXsheet();
-  if (r1 < r0) tswap(r0, r1);
-  if (c1 < c0) tswap(c0, c1);
+  if (r1 < r0) std::swap(r0, r1);
+  if (c1 < c0) std::swap(c0, c1);
   m_keyframeSelection->clear();
   int r, c;
   for (c = c0; c <= c1; c++)

@@ -602,7 +602,7 @@ Param *RasterFxPluginHost::createParam(const toonz_param_desc_t *desc) {
   p->setDescription(desc->note);
   p->setUILabel(desc->base.label);
 
-  bindParam(this, desc->key, p);
+  bindPluginParam(this, desc->key, p);
 
   params_.push_back(std::make_shared<Param>(
       this, desc->key, toonz_param_type_enum(desc->traits_tag), desc));

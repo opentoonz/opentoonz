@@ -116,6 +116,16 @@ void DVAPI convertNaa2Tlv(
     bool removeUnusedStyles = false,
     double dpi = 0.0);  //! Remove unused styles from input palette.
 
+// convert old levels (tzp / tzu) to tlv
+void DVAPI convertOldLevel2Tlv(
+    const TFilePath &source,  //!< Level path to convert from.
+    const TFilePath &dest,    //!< Level path to convert to.
+    const TFrameId &from,     //!< First source frame to convert.
+    const TFrameId &to,       //!< Last source frame to convert.
+    FrameTaskNotifier
+        *frameNotifier  //!< Observer class for frame success notifications.
+    );
+
 double DVAPI getQuantizedZoomFactor(double zf, bool forward);
 
 void DVAPI getFillingInformationOverlappingArea(

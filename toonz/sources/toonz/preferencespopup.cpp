@@ -35,9 +35,12 @@
 #include "tsystem.h"
 #include "tfont.h"
 
+#include "kis_tablet_support_win8.h"
+
 // Qt includes
 #include <QHBoxLayout>
 #include <QComboBox>
+#include <QFontComboBox>
 #include <QLabel>
 #include <QStackedWidget>
 #include <QLineEdit>
@@ -353,10 +356,37 @@ void PreferencesPopup::onDropdownShortcutsCycleOptionsChanged(int index) {
 }
 
 //-----------------------------------------------------------------------------
+void PreferencesPopup::rebuilldFontStyleList() {
+  TFontManager *instance = TFontManager::instance();
+  std::vector<std::wstring> typefaces;
+  std::vector<std::wstring>::iterator it;
+  QString font  = m_interfaceFont->currentText();
+  QString style = m_pref->getInterfaceFontStyle();
+  try {
+    instance->loadFontNames();
+    instance->setFamily(font.toStdWString());
+    instance->getAllTypefaces(typefaces);
+  } catch (TFontCreationError &) {
+    it = typefaces.begin();
+    typefaces.insert(it, style.toStdWString());
+  }
+  m_interfaceFontStyle->clear();
+  for (it = typefaces.begin(); it != typefaces.end(); ++it)
+    m_interfaceFontStyle->addItem(QString::fromStdWString(*it));
+}
 
 void PreferencesPopup::onInterfaceFontChanged(int index) {
   QString font = m_interfaceFont->currentText();
   m_pref->setInterfaceFont(font.toStdString());
+
+  QString oldTypeface = m_interfaceFontStyle->currentText();
+  rebuilldFontStyleList();
+  if (!oldTypeface.isEmpty()) {
+    int newIndex               = m_interfaceFontStyle->findText(oldTypeface);
+    if (newIndex < 0) newIndex = 0;
+    m_interfaceFontStyle->setCurrentIndex(newIndex);
+  }
+
   if (font.contains("Comic Sans"))
     DVGui::warning(tr("Life is too short for Comic Sans"));
   if (font.contains("Wingdings"))
@@ -365,8 +395,9 @@ void PreferencesPopup::onInterfaceFontChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onInterfaceFontWeightChanged(int index) {
-  m_pref->setInterfaceFontWeight(index);
+void PreferencesPopup::onInterfaceFontStyleChanged(int index) {
+  QString style = m_interfaceFontStyle->itemText(index);
+  m_pref->setInterfaceFontStyle(style.toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -481,6 +512,7 @@ void PreferencesPopup::onOnionDataChanged(const TPixel32 &, bool isDragging) {
 
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentLevel()->notifyLevelViewChange();
+  TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -781,8 +813,14 @@ void PreferencesPopup::onOnionSkinDuringPlaybackChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onOnionColorsForShiftAndTraceChanged(int index) {
+  m_pref->useOnionColorsForShiftAndTraceGhosts(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onGuidedDrawingStyleChanged(int index) {
-  m_pref->setAnimatedGuidedDrawing(index);
+  m_pref->setAnimatedGuidedDrawing(index == 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -1201,6 +1239,12 @@ void PreferencesPopup::onCurrentColumnDataChanged(const TPixel32 &,
   m_pref->setCurrentColumnData(m_currentColumnColor->getColor());
 }
 
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onEnableWinInkChanged(int index) {
+  m_pref->enableWinInk(index == Qt::Checked);
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1211,6 +1255,12 @@ PreferencesPopup::PreferencesPopup()
     , m_inksOnly(0)
     , m_blanksCount(0)
     , m_blankColor(0) {
+  bool showTabletSettings = false;
+
+#ifdef _WIN32
+  showTabletSettings = KisTabletSupportWin8::isAvailable();
+#endif
+
   setWindowTitle(tr("Preferences"));
   setObjectName("PreferencesPopup");
 
@@ -1313,8 +1363,8 @@ PreferencesPopup::PreferencesPopup()
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_interface->setStyleSheet("font-size: 10px; font: italic;");
 
-  m_interfaceFont       = new QComboBox(this);
-  m_interfaceFontWeight = new QComboBox(this);
+  m_interfaceFont      = new QFontComboBox(this);
+  m_interfaceFontStyle = new QComboBox(this);
 
   m_colorCalibration =
       new QGroupBox(tr("Color Calibration using 3D Look-up Table *"));
@@ -1496,9 +1546,11 @@ PreferencesPopup::PreferencesPopup()
   m_onionSkinVisibility = new CheckBox(tr("Onion Skin ON"));
   m_onionSkinDuringPlayback =
       new CheckBox(tr("Show Onion Skin During Playback"));
-  m_frontOnionColor = new ColorField(this, false, frontColor);
-  m_backOnionColor  = new ColorField(this, false, backColor);
-  m_inksOnly        = new DVGui::CheckBox(tr("Display Lines Only "));
+  m_frontOnionColor                  = new ColorField(this, false, frontColor);
+  m_backOnionColor                   = new ColorField(this, false, backColor);
+  m_useOnionColorsForShiftAndTraceCB = new CheckBox(
+      tr("Use Onion Skin Colors for Reference Drawings of Shift and Trace"));
+  m_inksOnly = new DVGui::CheckBox(tr("Display Lines Only "));
   m_inksOnly->setChecked(onlyInks);
 
   int thickness         = m_pref->getOnionPaperThickness();
@@ -1537,6 +1589,19 @@ PreferencesPopup::PreferencesPopup()
   QLabel *note_version =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_version->setStyleSheet("font-size: 10px; font: italic;");
+
+  QLabel *note_tablet;
+  //--- Tablet Settings ------------------------------
+  if (showTabletSettings) {
+    categoryList->addItem(tr("Tablet Settings"));
+
+    m_enableWinInk =
+        new DVGui::CheckBox(tr("Enable Windows Ink Support* (EXPERIMENTAL)"));
+
+    note_tablet = new QLabel(
+        tr("* Changes will take effect the next time you run Toonz"));
+    note_tablet->setStyleSheet("font-size: 10px; font: italic;");
+  }
 
   /*--- set default parameters ---*/
   categoryList->setFixedWidth(160);
@@ -1661,32 +1726,10 @@ PreferencesPopup::PreferencesPopup()
   viewerZoomCenterComboBox->addItems(zoomCenters);
   viewerZoomCenterComboBox->setCurrentIndex(m_pref->getViewerZoomCenter());
 
-  TFontManager *instance = TFontManager::instance();
-  bool validFonts;
-  try {
-    instance->loadFontNames();
-    validFonts = true;
-  } catch (TFontLibraryLoadingError &) {
-    validFonts = false;
-    //    TMessage::error(toString(e.getMessage()));
-  }
+  m_interfaceFont->setCurrentText(m_pref->getInterfaceFont());
 
-  if (validFonts) {
-    std::vector<std::wstring> names;
-    instance->getAllFamilies(names);
-
-    for (std::vector<std::wstring>::iterator it = names.begin();
-         it != names.end(); ++it)
-      m_interfaceFont->addItem(QString::fromStdWString(*it));
-
-    m_interfaceFont->setCurrentText(m_pref->getInterfaceFont());
-  }
-
-  QStringList fontStyles;
-  fontStyles << "Regular"
-             << "Bold";
-  m_interfaceFontWeight->addItems(fontStyles);
-  m_interfaceFontWeight->setCurrentIndex(m_pref->getInterfaceFontWeight());
+  rebuilldFontStyleList();
+  m_interfaceFontStyle->setCurrentText(m_pref->getInterfaceFontStyle());
 
   m_colorCalibration->setCheckable(true);
   m_colorCalibration->setChecked(m_pref->isColorCalibrationEnabled());
@@ -1870,17 +1913,23 @@ PreferencesPopup::PreferencesPopup()
   m_onionSkinDuringPlayback->setChecked(m_pref->getOnionSkinDuringPlayback());
   m_frontOnionColor->setEnabled(m_pref->isOnionSkinEnabled());
   m_backOnionColor->setEnabled(m_pref->isOnionSkinEnabled());
+  m_useOnionColorsForShiftAndTraceCB->setChecked(
+      m_pref->areOnionColorsUsedForShiftAndTraceGhosts());
   m_inksOnly->setEnabled(m_pref->isOnionSkinEnabled());
   QStringList guidedDrawingStyles;
   guidedDrawingStyles << tr("Arrow Markers") << tr("Animated Guide");
   m_guidedDrawingStyle->addItems(guidedDrawingStyles);
-  m_guidedDrawingStyle->setCurrentIndex(m_pref->getAnimatedGuidedDrawing());
+  m_guidedDrawingStyle->setCurrentIndex(m_pref->getAnimatedGuidedDrawing() ? 1
+                                                                           : 0);
 
   //--- Version Control ------------------------------
   m_enableVersionControl->setChecked(m_pref->isSVNEnabled());
   autoRefreshFolderContentsCB->setChecked(
       m_pref->isAutomaticSVNFolderRefreshEnabled());
   checkForTheLatestVersionCB->setChecked(m_pref->isLatestVersionCheckEnabled());
+
+  //--- Tablet Settings ------------------------------
+  if (showTabletSettings) m_enableWinInk->setChecked(m_pref->isWinInkEnabled());
 
   /*--- layout ---*/
 
@@ -2092,8 +2141,8 @@ PreferencesPopup::PreferencesPopup()
           {
             fontLay->addWidget(m_interfaceFont);
             fontLay->addSpacing(10);
-            fontLay->addWidget(new QLabel(tr("Weight *:")));
-            fontLay->addWidget(m_interfaceFontWeight);
+            fontLay->addWidget(new QLabel(tr("Style *:")));
+            fontLay->addWidget(m_interfaceFontStyle);
             fontLay->addStretch(1);
           }
           interfaceBottomLay->addLayout(fontLay, 4, 1, 1, 5);
@@ -2527,6 +2576,8 @@ PreferencesPopup::PreferencesPopup()
       onionLay->addWidget(m_inksOnly, 0, Qt::AlignLeft | Qt::AlignVCenter);
       onionLay->addWidget(m_onionSkinDuringPlayback, 0,
                           Qt::AlignLeft | Qt::AlignVCenter);
+      onionLay->addWidget(m_useOnionColorsForShiftAndTraceCB, 0,
+                          Qt::AlignLeft | Qt::AlignVCenter);
       QGridLayout *guidedDrawingLay = new QGridLayout();
       {
         guidedDrawingLay->addWidget(new QLabel(tr("Vector Guided Style:")), 0,
@@ -2619,6 +2670,23 @@ PreferencesPopup::PreferencesPopup()
     }
     versionControlBox->setLayout(vcLay);
     stackedWidget->addWidget(versionControlBox);
+
+    //--- Tablet Settings --------------------------
+    if (showTabletSettings) {
+      QWidget *tabletSettingsBox = new QWidget(this);
+      QVBoxLayout *tsLay         = new QVBoxLayout();
+      tsLay->setMargin(15);
+      tsLay->setSpacing(10);
+      {
+        tsLay->addWidget(m_enableWinInk, 0, Qt::AlignLeft | Qt::AlignVCenter);
+
+        tsLay->addStretch(1);
+
+        tsLay->addWidget(note_tablet, 0);
+      }
+      tabletSettingsBox->setLayout(tsLay);
+      stackedWidget->addWidget(tabletSettingsBox);
+    }
 
     mainLayout->addWidget(stackedWidget, 1);
   }
@@ -2714,8 +2782,8 @@ PreferencesPopup::PreferencesPopup()
                      this, SLOT(onViewerZoomCenterChanged(int)));
   ret = ret && connect(m_interfaceFont, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onInterfaceFontChanged(int)));
-  ret = ret && connect(m_interfaceFontWeight, SIGNAL(currentIndexChanged(int)),
-                       this, SLOT(onInterfaceFontWeightChanged(int)));
+  ret = ret && connect(m_interfaceFontStyle, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onInterfaceFontStyleChanged(int)));
   ret = ret && connect(replaceAfterSaveLevelAsCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onReplaceAfterSaveLevelAsChanged(int)));
   ret =
@@ -2904,6 +2972,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onOnionSkinVisibilityChanged(int)));
   ret = ret && connect(m_onionSkinDuringPlayback, SIGNAL(stateChanged(int)),
                        SLOT(onOnionSkinDuringPlaybackChanged(int)));
+  ret = ret &&
+        connect(m_useOnionColorsForShiftAndTraceCB, SIGNAL(stateChanged(int)),
+                SLOT(onOnionColorsForShiftAndTraceChanged(int)));
   ret = ret && connect(m_onionPaperThickness, SIGNAL(editingFinished()),
                        SLOT(onOnionPaperThicknessChanged()));
   ret = ret && connect(m_guidedDrawingStyle, SIGNAL(currentIndexChanged(int)),
@@ -2944,6 +3015,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onAutomaticSVNRefreshChanged(int)));
   ret = ret && connect(checkForTheLatestVersionCB, SIGNAL(clicked(bool)),
                        SLOT(onCheckLatestVersionChanged(bool)));
+
+  //--- Tablet Settings ----------------------
+  if (showTabletSettings)
+    ret = ret && connect(m_enableWinInk, SIGNAL(stateChanged(int)),
+                         SLOT(onEnableWinInkChanged(int)));
+
   assert(ret);
 }
 

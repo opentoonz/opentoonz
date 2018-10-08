@@ -1409,8 +1409,15 @@ void TLevelReaderTzl::readPalette() {
   TPalette *palette = 0;
 
   if (is && fs.doesExist()) {
-    is >> p;
-    palette = dynamic_cast<TPalette *>(p);
+    std::string tagName;
+    if (is.matchTag(tagName) && tagName == "palette") {
+      std::string gname;
+      is.getTagParam("name", gname);
+      palette = new TPalette();
+      palette->loadData(is);
+      palette->setGlobalName(::to_wstring(gname));
+      is.matchEndTag();
+    }
   }
 
   if (!palette) {

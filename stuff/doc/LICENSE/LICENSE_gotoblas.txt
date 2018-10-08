@@ -1,6 +1,4 @@
-		GotoBLAS2 (Version 1.13)
-		=====================
-
+GotoBLAS2 (Version 1.13)
 Copyright 2009, 2010 The University of Texas at Austin.
 All rights reserved.
 

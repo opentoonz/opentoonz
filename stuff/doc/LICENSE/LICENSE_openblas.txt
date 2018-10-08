@@ -1,6 +1,4 @@
-		OpenBLAS (Version 0.1.1)
-		=====================
-
+OpenBLAS (Version 0.1.1)
 Copyright (c) 2011,2012 Lab of Parallel Software and Computational Science,ISCAS
 All rights reserved.
 

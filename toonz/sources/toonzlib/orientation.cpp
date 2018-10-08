@@ -10,15 +10,16 @@
 using std::pair;
 
 namespace {
-const int KEY_ICON_WIDTH     = 11;
-const int KEY_ICON_HEIGHT    = 13;
-const int EASE_TRIANGLE_SIZE = 4;
-const int PLAY_MARKER_SIZE   = 10;
-const int ONION_SIZE         = 19;
-const int ONION_DOT_SIZE     = 8;
-const int PINNED_SIZE        = 10;
-const int FRAME_MARKER_SIZE  = 4;
-const int FOLDED_CELL_SIZE   = 9;
+const int KEY_ICON_WIDTH      = 11;
+const int KEY_ICON_HEIGHT     = 13;
+const int EASE_TRIANGLE_SIZE  = 4;
+const int PLAY_MARKER_SIZE    = 10;
+const int ONION_SIZE          = 19;
+const int ONION_DOT_SIZE      = 8;
+const int PINNED_SIZE         = 10;
+const int FRAME_MARKER_SIZE   = 4;
+const int FOLDED_CELL_SIZE    = 9;
+const int SHIFTTRACE_DOT_SIZE = 12;
 }
 
 class TopToBottomOrientation : public Orientation {
@@ -34,10 +35,11 @@ class TopToBottomOrientation : public Orientation {
   const int FRAME_HEADER_WIDTH         = CELL_WIDTH;
   const int PLAY_RANGE_X = FRAME_HEADER_WIDTH / 2 - PLAY_MARKER_SIZE;
   const int ONION_X = 0, ONION_Y = 0;
-  const int ICON_WIDTH     = 18;
-  const int ICON_HEIGHT    = 18;
-  const int TRACKLEN       = 60;
-  const int SUBLAYER_WIDTH = CELL_HEIGHT;
+  const int ICON_WIDTH            = 18;
+  const int ICON_HEIGHT           = 18;
+  const int TRACKLEN              = 60;
+  const int SHIFTTRACE_DOT_OFFSET = 3;
+  const int SUBLAYER_WIDTH        = CELL_HEIGHT;
 
 public:
   TopToBottomOrientation();
@@ -99,6 +101,7 @@ class LeftToRightOrientation : public Orientation {
   const int FOLDED_LAYER_HEADER_HEIGHT = 8;
   const int FOLDED_LAYER_HEADER_WIDTH  = LAYER_HEADER_WIDTH;
   const int TRACKLEN                   = 60;
+  const int SHIFTTRACE_DOT_OFFSET      = 5;
   const int SUBLAYER_HEIGHT            = CELL_HEIGHT;
 
 public:
@@ -358,6 +361,12 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(
       PredefinedRect::PREVIEW_FRAME_AREA,
       QRect(PLAY_RANGE_X, 0, (FRAME_HEADER_WIDTH - PLAY_RANGE_X), CELL_HEIGHT));
+
+  addRect(PredefinedRect::SHIFTTRACE_DOT,
+          QRect(SHIFTTRACE_DOT_OFFSET, (CELL_HEIGHT - SHIFTTRACE_DOT_SIZE) / 2,
+                SHIFTTRACE_DOT_SIZE, SHIFTTRACE_DOT_SIZE));
+  addRect(PredefinedRect::SHIFTTRACE_DOT_AREA,
+          QRect(SHIFTTRACE_DOT_OFFSET, 0, SHIFTTRACE_DOT_SIZE, CELL_HEIGHT));
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
@@ -1008,6 +1017,13 @@ LeftToRightOrientation::LeftToRightOrientation() {
       PredefinedRect::PREVIEW_FRAME_AREA,
       QRect(0, PLAY_RANGE_Y, CELL_WIDTH, (FRAME_HEADER_HEIGHT - PLAY_RANGE_Y)));
 
+  addRect(PredefinedRect::SHIFTTRACE_DOT,
+          QRect((CELL_WIDTH - SHIFTTRACE_DOT_SIZE) / 2, SHIFTTRACE_DOT_OFFSET,
+                SHIFTTRACE_DOT_SIZE, SHIFTTRACE_DOT_SIZE)
+              .adjusted(-1, 0, -1, 0));
+  addRect(PredefinedRect::SHIFTTRACE_DOT_AREA,
+          QRect(0, SHIFTTRACE_DOT_OFFSET, CELL_WIDTH, SHIFTTRACE_DOT_SIZE));
+
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
           QRect(1, 0, LAYER_HEADER_WIDTH - 3, CELL_HEIGHT));
@@ -1030,8 +1046,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::CONFIG,
           eye.translated(3 * ICON_OFFSET, 0).adjusted(1, 1, -1, -1));
   addRect(PredefinedRect::DRAG_LAYER,
-          QRect(ICONS_WIDTH - ICON_WIDTH + 1, 0,
-                LAYER_HEADER_WIDTH - ICONS_WIDTH + ICON_WIDTH - 3,
+          QRect(ICONS_WIDTH + 1, 0, LAYER_HEADER_WIDTH - ICONS_WIDTH - 3,
                 CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LAYER_NAME, columnName);
   addRect(PredefinedRect::LAYER_NUMBER,

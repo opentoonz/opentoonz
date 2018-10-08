@@ -28,6 +28,7 @@ set(MOC_HEADERS
     ../include/toonzqt/fxschematicscene.h
     ../include/toonzqt/fxselection.h
     ../include/toonzqt/fxsettings.h
+	../include/toonzqt/fxtypes.h
     ../include/toonzqt/gutil.h
     ../include/toonzqt/histogram.h
     ../include/toonzqt/icongenerator.h

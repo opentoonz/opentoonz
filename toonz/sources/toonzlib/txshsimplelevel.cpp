@@ -1266,6 +1266,8 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
         if (!loadingLevelRange.match(fIds[i])) continue;
         setFrame(fIds[i], TImageP());
       }
+      const TImageInfo *info = lr->getImageInfo(fIds[0]);
+      if (info) set16BitChannelLevel(info->m_bitsPerSample == 16);
     } else {
       TLevelP level = lr->loadInfo();
       for (TLevel::Iterator it = level->begin(); it != level->end(); it++) {
@@ -1273,7 +1275,12 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
         if (!loadingLevelRange.match(it->first)) continue;
         setFrame(it->first, TImageP());
       }
+      const TImageInfo *info = lr->getImageInfo(level->begin()->first);
+      if (info) set16BitChannelLevel(info->m_bitsPerSample == 16);
     }
+
+    if ((getType() & FULLCOLOR_TYPE) && !is16BitChannelLevel())
+      setPalette(FullColorPalette::instance()->getPalette(getScene()));
   }
 
   setContentHistory(lr->getContentHistory() ? lr->getContentHistory()->clone()

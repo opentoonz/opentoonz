@@ -400,7 +400,7 @@ void findIntersections(double y, const TQuadratic &q, double t0, double t1,
 
       if ((rev && intersectiona < intersectionb) ||
           (!rev && intersectiona > intersectionb))
-        tswap(intersectiona, intersectionb), tswap(ta, tb);
+        std::swap(intersectiona, intersectionb), std::swap(ta, tb);
 
       if ((t0 < t1 && ta >= t0 && ta <= t1) ||
           (t0 >= t1 && ta >= t1 && ta <= t0))
@@ -735,8 +735,8 @@ bool TRegion::Imp::contains(const TPointD &p) const {
     if (chunkIndex0 != chunkIndex1) {
       /*if (chunkIndex0>chunkIndex1)
 {
-tswap(chunkIndex0, chunkIndex1);
-tswap(t0, t1);
+std::swap(chunkIndex0, chunkIndex1);
+std::swap(t0, t1);
 }*/
       if (chunkIndex0 > chunkIndex1) {
         side = findSides(p, *q0, t0, 0, leftAreOdd, side);

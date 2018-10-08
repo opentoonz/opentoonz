@@ -1697,7 +1697,7 @@ void PencilTestPopup::onPreviousName() {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::setToNextNewLevel() {
-  const std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
+  const std::unique_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
 
   TLevelSet* levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();

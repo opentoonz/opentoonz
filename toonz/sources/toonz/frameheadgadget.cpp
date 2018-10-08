@@ -54,8 +54,10 @@ FrameHeadGadget::~FrameHeadGadget() {}
 void FrameHeadGadget::draw(QPainter &p, const QColor &lightColor,
                            const QColor &darkColor) {
   // drawPlayingHead(p, lightColor, darkColor);
-  if (!Preferences::instance()->isOnionSkinEnabled()) return;
-  drawOnionSkinSelection(p, lightColor, darkColor);
+  if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked())
+    drawShiftTraceMarker(p);
+  else if (Preferences::instance()->isOnionSkinEnabled())
+    drawOnionSkinSelection(p, lightColor, darkColor);
 }
 
 void FrameHeadGadget::drawPlayingHead(QPainter &p, const QColor &lightColor,
@@ -294,7 +296,8 @@ void FrameHeadGadget::setMos(int frame, bool on) {
 FilmstripFrameHeadGadget::FilmstripFrameHeadGadget(FilmstripFrames *filmstrip)
     : m_filmstrip(filmstrip)
     , m_dy(m_filmstrip->getIconSize().height() + fs_frameSpacing +
-           fs_iconMarginTop + fs_iconMarginBottom) {}
+           fs_iconMarginTop + fs_iconMarginBottom)
+    , m_highlightedghostFrame(-1) {}
 
 int FilmstripFrameHeadGadget::getY() const { return 50; }
 
@@ -442,7 +445,83 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
 
 //-----------------------------------------------------------------------------
 
+void FilmstripFrameHeadGadget::drawShiftTraceMarker(QPainter &p) {
+  int currentRow = getCurrentFrame();
+
+  TPixel frontPixel, backPixel;
+  bool inksOnly;
+  Preferences::instance()->getOnionData(frontPixel, backPixel, inksOnly);
+  QColor frontColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b);
+  QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b);
+
+  OnionSkinMask osMask =
+      TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+
+  // draw lines to ghost frames
+  int prevOffset    = osMask.getShiftTraceGhostFrameOffset(0);
+  int forwardOffset = osMask.getShiftTraceGhostFrameOffset(1);
+
+  const int shiftTraceDotSize    = 12;
+  const int shiftTraceDotXOffset = 3;
+  int dotYPos                    = (m_dy - shiftTraceDotSize) / 2;
+
+  if (currentRow > 0 && prevOffset < 0)  // previous ghost
+  {
+    p.setPen(backColor);
+    int y0 = index2y(currentRow + prevOffset) + dotYPos + shiftTraceDotSize;
+    int y1 = index2y(currentRow);
+    p.drawLine(shiftTraceDotXOffset + shiftTraceDotSize / 2, y0,
+               shiftTraceDotXOffset + shiftTraceDotSize / 2, y1);
+  }
+  if (forwardOffset > 0)  // forward ghost
+  {
+    p.setPen(frontColor);
+    int y0 = index2y(currentRow + 1);
+    int y1 = index2y(currentRow + forwardOffset) + dotYPos + shiftTraceDotSize;
+    p.drawLine(shiftTraceDotXOffset + shiftTraceDotSize / 2, y0,
+               shiftTraceDotXOffset + shiftTraceDotSize / 2, y1);
+  }
+  // draw dots
+  std::vector<int> offsVec      = {prevOffset, 0, forwardOffset};
+  std::vector<QColor> colorsVec = {backColor, QColor(0, 162, 232), frontColor};
+  QFont currentFont             = p.font();
+  QFont tmpFont                 = p.font();
+  tmpFont.setPointSize(7);
+  p.setFont(tmpFont);
+
+  for (int i = 0; i < 3; i++) {
+    if (i != 1 && offsVec[i] == 0) continue;
+    p.setPen(colorsVec[i]);
+    p.setBrush(Qt::gray);
+    int topPos = index2y(currentRow + offsVec[i]) + dotYPos;
+    QRect dotRect(shiftTraceDotXOffset, topPos, shiftTraceDotSize,
+                  shiftTraceDotSize);
+    p.drawRect(dotRect);
+
+    // draw shortcut numbers
+    p.setPen(Qt::black);
+    p.drawText(dotRect, Qt::AlignCenter, QString::number(i + 1));
+  }
+  p.setFont(currentFont);
+
+  // highlight on mouse over
+  if (m_highlightedghostFrame >= 0) {
+    p.setPen(QColor(255, 255, 0));
+    p.setBrush(QColor(255, 255, 0, 180));
+    int topPos = index2y(m_highlightedghostFrame) + dotYPos;
+    QRect dotRect(shiftTraceDotXOffset, topPos, shiftTraceDotSize,
+                  shiftTraceDotSize);
+    p.drawRect(dotRect);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
+  // shift & trace case
+  if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked())
+    return shiftTraceEventFilter(obj, e);
+
   if (!Preferences::instance()->isOnionSkinEnabled()) return false;
 
   QWidget *viewer = dynamic_cast<QWidget *>(obj);
@@ -648,6 +727,97 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
   return true;
 }
 
+//-----------------------------------------------------------------------------
+
+bool FilmstripFrameHeadGadget::shiftTraceEventFilter(QObject *obj, QEvent *e) {
+  QWidget *viewer = dynamic_cast<QWidget *>(obj);
+
+  if (e->type() != QEvent::MouseButtonPress && e->type() != QEvent::MouseMove)
+    return false;
+
+  const int shiftTraceDotSize    = 12;
+  const int shiftTraceDotXOffset = 3;
+  int dotYPos                    = (m_dy - shiftTraceDotSize) / 2;
+  QRect dotRect(shiftTraceDotXOffset, dotYPos, shiftTraceDotSize,
+                shiftTraceDotSize);
+
+  // reset highlight
+  if (m_highlightedghostFrame >= 0) {
+    m_highlightedghostFrame = -1;
+    viewer->update();
+  }
+
+  QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(e);
+  int frame               = y2index(mouseEvent->pos().y());
+  // position from top-left of the frame
+  QPoint mousePos  = mouseEvent->pos() + QPoint(0, -index2y(frame));
+  int currentFrame = getCurrentFrame();
+
+  if (mousePos.x() < dotRect.left() || mousePos.x() > dotRect.right())
+    return false;
+
+  if (e->type() == QEvent::MouseButtonPress) {
+    if (frame == currentFrame) {
+      if (dotRect.contains(mousePos))
+        OnioniSkinMaskGUI::resetShiftTraceFrameOffset();
+      else
+        return false;
+    } else {
+      OnionSkinMask osMask =
+          TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+      int prevOffset    = osMask.getShiftTraceGhostFrameOffset(0);
+      int forwardOffset = osMask.getShiftTraceGhostFrameOffset(1);
+      // Hide previous ghost
+      if (frame == currentFrame + prevOffset)
+        osMask.setShiftTraceGhostFrameOffset(0, 0);
+      // Hide forward ghost
+      else if (frame == currentFrame + forwardOffset)
+        osMask.setShiftTraceGhostFrameOffset(1, 0);
+      // Move previous ghost
+      else if (frame < currentFrame)
+        osMask.setShiftTraceGhostFrameOffset(0, frame - currentFrame);
+      // Move forward ghost
+      else
+        osMask.setShiftTraceGhostFrameOffset(1, frame - currentFrame);
+      TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osMask);
+    }
+    TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+    return true;
+  }
+  //----
+  else if (e->type() == QEvent::MouseMove) {
+    if (frame == currentFrame) {
+      if (dotRect.contains(mousePos)) {
+        m_highlightedghostFrame = frame;
+        viewer->setToolTip(
+            tr("Click to Reset Shift & Trace Markers to Neighbor Frames\nHold "
+               "F2 Key on the Viewer to Show This Frame Only"));
+      } else {
+        viewer->setToolTip(tr(""));
+        return false;
+      }
+    } else {
+      m_highlightedghostFrame = frame;
+      OnionSkinMask osMask =
+          TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+      int prevOffset    = osMask.getShiftTraceGhostFrameOffset(0);
+      int forwardOffset = osMask.getShiftTraceGhostFrameOffset(1);
+      // Hide ghost
+      if (frame == currentFrame + prevOffset)
+        viewer->setToolTip(
+            tr("Click to Hide This Frame from Shift & Trace\nHold F1 Key on "
+               "the Viewer to Show This Frame Only"));
+      else if (frame == currentFrame + forwardOffset)
+        viewer->setToolTip(
+            tr("Click to Hide This Frame from Shift & Trace\nHold F3 Key on "
+               "the Viewer to Show This Frame Only"));
+      // Move ghost
+      else
+        viewer->setToolTip(tr("Click to Move Shift & Trace Marker"));
+    }
+  }
+  return true;
+}
 //-----------------------------------------------------------------------------
 
 class OnionSkinToggle final : public MenuItemHandler {

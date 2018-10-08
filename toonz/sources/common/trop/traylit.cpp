@@ -329,11 +329,11 @@ void computeOctant(const TRasterPT<T> &src, const TRasterPT<T> &dst, int octant,
     dyIn = 1, dyOut = 1, y0 = tfloor(pOut.x), y1 = lxOut;
   if (octant == 3 || octant == 6)
     dyIn = -1, dyOut = -1, y0 = lxOut - tfloor(pOut.x) - 1, y1 = lxOut,
-    tswap(srcRect.x0, srcRect.x1), srcRect.x0 = lxOut - srcRect.x0,
+    std::swap(srcRect.x0, srcRect.x1), srcRect.x0 = lxOut - srcRect.x0,
     srcRect.x1 = lxOut - srcRect.x1;
   if (octant == 4 || octant == 5)
     dxIn = -1, dxOut = -1, x0 = lxOut - tfloor(pOut.x) - 1, x1 = lxOut,
-    tswap(srcRect.x0, srcRect.x1), srcRect.x0 = lxOut - srcRect.x0,
+    std::swap(srcRect.x0, srcRect.x1), srcRect.x0 = lxOut - srcRect.x0,
     srcRect.x1 = lxOut - srcRect.x1;
 
   // Horizontal octant pairs
@@ -343,18 +343,18 @@ void computeOctant(const TRasterPT<T> &src, const TRasterPT<T> &dst, int octant,
     dyIn = srcWrap, dyOut = dstWrap, y0 = tfloor(pOut.y), y1 = lyOut;
   if (octant == 5 || octant == 8)
     dyIn = -srcWrap, dyOut = -dstWrap, y0 = lyOut - tfloor(pOut.y) - 1,
-    y1 = lyOut, tswap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0,
+    y1 = lyOut, std::swap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0,
     srcRect.y1 = lyOut - srcRect.y1;
   if (octant == 6 || octant == 7)
     dxIn = -srcWrap, dxOut = -dstWrap, x0 = lyOut - tfloor(pOut.y) - 1,
-    x1 = lyOut, tswap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0,
+    x1 = lyOut, std::swap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0,
     srcRect.y1 = lyOut - srcRect.y1;
 
   /*-- 縦向きのピザ領域を計算する場合は、90度回転してから --*/
   // Swap x and y axis where necessary
   if (octant == 2 || octant == 3 || octant == 6 || octant == 7) {
-    tswap(lxIn, lyIn), tswap(lxOut, lyOut);
-    tswap(srcRect.x0, srcRect.y0), tswap(srcRect.x1, srcRect.y1);
+    std::swap(lxIn, lyIn), std::swap(lxOut, lyOut);
+    std::swap(srcRect.x0, srcRect.y0), std::swap(srcRect.x1, srcRect.y1);
   }
 
   int octLx = (x1 - x0), octLy = (y1 - y0);
