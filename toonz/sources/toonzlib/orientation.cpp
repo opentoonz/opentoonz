@@ -1033,7 +1033,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
   QRect thumbnail = thumbnailArea.adjusted(1, 1, 0, 0);
   addRect(PredefinedRect::THUMBNAIL, thumbnail);
   addRect(PredefinedRect::FILTER_COLOR,
-          QRect(LAYER_HEADER_WIDTH - 17, CELL_DRAG_HEIGHT + 2, 12, 12));
+          QRect(thumbnail.right() - 14, thumbnail.top() + 3, 12, 12));
   addRect(PredefinedRect::PEGBAR_NAME, QRect(0, 0, -1, -1));         // hide
   addRect(PredefinedRect::PARENT_HANDLE_NAME, QRect(0, 0, -1, -1));  // hide
 

@@ -866,8 +866,6 @@ void ColumnArea::DrawHeader::drawColumnName() const {
         leftadj = 24;
     }
 
-    if (!o->isVerticalTimeline() && column->getFilterColorId()) rightadj -= 15;
-
     p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
                          : nameBacklit ? Qt::black : m_viewer->getTextColor());
   } else
