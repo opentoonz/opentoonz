@@ -451,9 +451,11 @@ TopToBottomOrientation::TopToBottomOrientation() {
             QRect(thumbnail.right() - 14, thumbnail.top() + 3, 12, 12));
 
     addRect(PredefinedRect::SOUND_ICON,
-            QRect(thumbnailArea.topLeft(), QSize(27, 20))
-                .adjusted((thumbnailArea.width() / 2) - (27 / 2), 3,
-                          (thumbnailArea.width() / 2) - (27 / 2), 3));
+            QRect(thumbnailArea.topLeft(), QSize(40, 30))
+                .adjusted((thumbnailArea.width() / 2) - (40 / 2),
+                          (thumbnailArea.height() / 2) - (30 / 2),
+                          (thumbnailArea.width() / 2) - (40 / 2),
+                          (thumbnailArea.height() / 2) - (30 / 2)));
 
     volumeArea =
         QRect(QPoint(thumbnailArea.left() + 3, thumbnailArea.bottom() - 16),
@@ -554,9 +556,11 @@ TopToBottomOrientation::TopToBottomOrientation() {
             QRect(thumbnail.right() - 14, thumbnail.top() + 3, 12, 12));
 
     addRect(PredefinedRect::SOUND_ICON,
-            QRect(thumbnailArea.topLeft(), QSize(27, 20))
-                .adjusted((thumbnailArea.width() / 2) - (27 / 2), 3,
-                          (thumbnailArea.width() / 2) - (27 / 2), 3));
+            QRect(thumbnailArea.topLeft(), QSize(40, 30))
+                .adjusted((thumbnailArea.width() / 2) - (40 / 2),
+                          (thumbnailArea.height() / 2) - (30 / 2),
+                          (thumbnailArea.width() / 2) - (40 / 2),
+                          (thumbnailArea.height() / 2) - (30 / 2)));
 
     volumeArea =
         QRect(QPoint(thumbnailArea.left() + 3, thumbnailArea.bottom() - 16),
@@ -1034,12 +1038,13 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::PARENT_HANDLE_NAME, QRect(0, 0, -1, -1));  // hide
 
   addRect(PredefinedRect::SOUND_ICON,
-          QRect(columnName.topRight(), QSize(27, columnName.height()))
-              .adjusted(-28, 0, -28, 0));
+          QRect(thumbnailArea.topLeft(), QSize(27, thumbnailArea.height()))
+              .adjusted((thumbnailArea.width() / 2) - (27 / 2), 0,
+                        (thumbnailArea.width() / 2) - (27 / 2), 0));
 
   QRect volumeArea(
       QRect(columnName.topRight(), QSize(TRACKLEN + 8, 14))
-          .adjusted(-97, CELL_DRAG_HEIGHT + 1, -97, CELL_DRAG_HEIGHT + 1));
+          .adjusted(-77, CELL_DRAG_HEIGHT + 1, -77, CELL_DRAG_HEIGHT + 1));
   addRect(PredefinedRect::VOLUME_AREA, volumeArea);
   QPoint soundTopLeft(volumeArea.left() + 4, volumeArea.bottom() - 6);
   addRect(PredefinedRect::VOLUME_TRACK,
