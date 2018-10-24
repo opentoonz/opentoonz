@@ -28,6 +28,8 @@
 #include "toonz/hook.h"
 #include "toonz/levelproperties.h"
 #include "toonz/childstack.h"
+#include "toonz/tframehandle.h"
+#include "toonz/tcolumnhandle.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -977,7 +979,19 @@ void IncreaseStepUndo::undo() const {
 //=============================================================================
 
 void TCellSelection::increaseStepCells() {
-  if (isEmpty() || areAllColSelectedLocked()) return;
+  if (isEmpty()) {
+    int row = TTool::getApplication()->getCurrentFrame()->getFrame();
+    int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    m_range.m_r0 = row;
+    m_range.m_r1 = row;
+    m_range.m_c0 = col;
+    m_range.m_c1 = col;
+    TXshCell cell;
+    cell = xsh->getCell(row, col);
+    if (cell.isEmpty()) return;
+  }
+  if (areAllColSelectedLocked()) return;
 
   IncreaseStepUndo *undo = new IncreaseStepUndo(m_range.m_r0, m_range.m_c0,
                                                 m_range.m_r1, m_range.m_c1);
@@ -1090,6 +1104,31 @@ void DecreaseStepUndo::undo() const {
 //=============================================================================
 
 void TCellSelection::decreaseStepCells() {
+  if (isEmpty()) {
+    int row = TTool::getApplication()->getCurrentFrame()->getFrame();
+    int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+    int r1  = row;
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    TXshCell cell;
+    TXshCell nextCell;
+    bool sameCells = true;
+    cell           = xsh->getCell(row, col);
+    if (cell.isEmpty()) return;
+
+    for (int i = 1; sameCells; i++) {
+      nextCell = xsh->getCell(row + i, col);
+      if (nextCell.m_frameId == cell.m_frameId &&
+          nextCell.m_level == cell.m_level) {
+        r1 = row + i;
+      } else
+        sameCells = false;
+    }
+    m_range.m_r0 = row;
+    m_range.m_r1 = r1;
+    m_range.m_c0 = col;
+    m_range.m_c1 = col;
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  }
   DecreaseStepUndo *undo = new DecreaseStepUndo(m_range.m_r0, m_range.m_c0,
                                                 m_range.m_r1, m_range.m_c1);
   TUndoManager::manager()->add(undo);
