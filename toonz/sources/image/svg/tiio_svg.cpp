@@ -1285,7 +1285,7 @@ void nsvg__pathArcTo(struct NSVGParser *p, float *cpx, float *cpy, float *args,
   t[5] = cy;
 
   // Split arc into max 90 degree segments.
-  ndivs                = (int)(fabsf(da) / (NSVG_PI * 0.5f) + 0.5f);
+  ndivs                = (int)(ceil(fabsf(da)) / (NSVG_PI * 0.5f) + 0.5f);
   hda                  = (da / (float)ndivs) / 2.0f;
   kappa                = fabsf(4.0f / 3.0f * (1.0f - cosf(hda)) / sinf(hda));
   if (da < 0.0f) kappa = -kappa;
