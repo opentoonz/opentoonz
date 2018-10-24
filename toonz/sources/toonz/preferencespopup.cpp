@@ -712,7 +712,7 @@ void PreferencesPopup::onStartupPopupChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onKeyframeTypeChanged(int index) {
-  m_pref->setKeyframeType(index + 2);
+  m_pref->setKeyframeType(index + 1);
 }
 //-----------------------------------------------------------------------------
 
@@ -1889,11 +1889,12 @@ PreferencesPopup::PreferencesPopup()
 
   //--- Animation ------------------------------
   QStringList list;
-  list << tr("Linear") << tr("Speed In / Speed Out") << tr("Ease In / Ease Out")
-       << tr("Ease In / Ease Out %");
+  list << tr("Constant") << tr("Linear") << tr("Speed In / Speed Out")
+       << tr("Ease In / Ease Out") << tr("Ease In / Ease Out %")
+       << tr("Exponential") << tr("Expression ") << tr("File");
   m_keyframeType->addItems(list);
   int keyframeType = m_pref->getKeyframeType();
-  m_keyframeType->setCurrentIndex(keyframeType - 2);
+  m_keyframeType->setCurrentIndex(keyframeType - 1);
   m_animationStepField->setValue(m_pref->getAnimationStep());
 
   //--- Preview ------------------------------
