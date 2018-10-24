@@ -3046,10 +3046,8 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
       m_viewer->getCellSelection()->selectCell(row, col);
       m_viewer->setCurrentColumn(col);
     }
-    if (!xsh->getCell(row, col).isEmpty())
-      createCellMenu(menu, true, cell);
-    else
-      createCellMenu(menu, false, cell);
+
+    createCellMenu(menu, !cell.isEmpty(), cell);
   }
 
   if (!menu.isEmpty()) menu.exec(event->globalPos());
@@ -3139,7 +3137,12 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
   }
 
   if (isCellSelected) {
-    menu.addAction(cmdManager->getAction(MI_LevelSettings));
+    // open fx settings instead of level settings when clicked on zerary fx
+    // level
+    if (cell.m_level && cell.m_level->getZeraryFxLevel())
+      menu.addAction(cmdManager->getAction(MI_FxParamEditor));
+    else
+      menu.addAction(cmdManager->getAction(MI_LevelSettings));
     menu.addSeparator();
 
     if (!soundCellsSelected) {
