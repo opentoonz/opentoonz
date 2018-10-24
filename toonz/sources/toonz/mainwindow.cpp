@@ -1959,15 +1959,17 @@ void MainWindow::defineActions() {
                MenuViewCommandType);
   createToggle(MI_ACheck, tr("&Gap Check"), "", ACheckToggleAction ? 1 : 0,
                MenuViewCommandType);
-  QAction* shiftTraceAction = createToggle(MI_ShiftTrace, tr("Shift and Trace"), "", false,
-               MenuViewCommandType);
+  QAction *shiftTraceAction = createToggle(MI_ShiftTrace, tr("Shift and Trace"),
+                                           "", false, MenuViewCommandType);
   shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace.svg"));
-  shiftTraceAction = createToggle(MI_EditShift, tr("Edit Shift"), "", false, MenuViewCommandType);
+  shiftTraceAction = createToggle(MI_EditShift, tr("Edit Shift"), "", false,
+                                  MenuViewCommandType);
   shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace_edit.svg"));
   createToggle(MI_NoShift, tr("No Shift"), "", false, MenuViewCommandType);
   CommandManager::instance()->enable(MI_EditShift, false);
   CommandManager::instance()->enable(MI_NoShift, false);
-  shiftTraceAction = createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
+  shiftTraceAction =
+      createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
   shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace_reset.svg"));
 
   if (QGLPixelBuffer::hasOpenGLPbuffers())
@@ -2126,6 +2128,23 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_SetConstantSpeed, tr("Set Constant Speed"), "");
   createRightClickMenuAction(MI_ResetInterpolation, tr("Reset Interpolation"),
                              "");
+
+  createRightClickMenuAction(MI_UseLinearInterpolation,
+                             tr("Linear Interpolation"), "");
+  createRightClickMenuAction(MI_UseSpeedInOutInterpolation,
+                             tr("Speed In / Speed Out Interpolation"), "");
+  createRightClickMenuAction(MI_UseEaseInOutInterpolation,
+                             tr("Ease In / Ease Out Interpolation"), "");
+  createRightClickMenuAction(MI_UseEaseInOutPctInterpolation,
+                             tr("Ease In / Ease Out (%) Interpolation"), "");
+  createRightClickMenuAction(MI_UseExponentialInterpolation,
+                             tr("Exponential Interpolation"), "");
+  createRightClickMenuAction(MI_UseExpressionInterpolation,
+                             tr("Expression Interpolation"), "");
+  createRightClickMenuAction(MI_UseFileInterpolation, tr("File Interpolation"),
+                             "");
+  createRightClickMenuAction(MI_UseConstantInterpolation,
+                             tr("Constant Interpolation"), "");
 
   createRightClickMenuAction(MI_FoldColumns, tr("Fold Column"), "");
 
@@ -2427,9 +2446,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2554,9 +2573,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2583,9 +2602,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene)
-            ? MI_ClearRecentScene
-            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
+                                                        ? MI_ClearRecentLevel
+                                                        : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);
