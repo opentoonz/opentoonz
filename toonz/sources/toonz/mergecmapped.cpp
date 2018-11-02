@@ -30,7 +30,6 @@
 #include "timagecache.h"
 #include "tcolorstyles.h"
 #include "toonz/levelproperties.h"
-#include "toonz/toonzscene.h"
 #include "toonz/childstack.h"
 #include "toonz/toonzimageutils.h"
 #include "tpaletteutil.h"

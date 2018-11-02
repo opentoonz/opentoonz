@@ -17,7 +17,6 @@
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/selection.h"
 #include "toonzqt/stageobjectsdata.h"
-#include "toonzqt/selection.h"
 #include "historytypes.h"
 
 // TnzLib includes

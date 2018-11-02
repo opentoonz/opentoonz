@@ -8,7 +8,6 @@
 #include "tenv.h"
 #include "tsystem.h"
 
-#include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 // TnzQt includes
 #include "toonzqt/gutil.h"

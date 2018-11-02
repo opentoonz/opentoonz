@@ -7,7 +7,6 @@
 #include "menubarcommandids.h"
 #include "columnselection.h"
 #include "xsheetdragtool.h"
-#include "tapp.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -788,8 +787,9 @@ void ColumnArea::DrawHeader::drawConfig() const {
   p.fillRect(configRect, bgColor);
   if (o->flag(PredefinedFlag::CONFIG_AREA_BORDER)) p.drawRect(configRect);
 
-  if (column->getSoundColumn() || column->getPaletteColumn() ||
-      column->getSoundTextColumn())
+  TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+
+  if (zColumn || column->getPaletteColumn() || column->getSoundTextColumn())
     return;
 
   p.drawImage(configImgRect, icon);
@@ -865,13 +865,6 @@ void ColumnArea::DrawHeader::drawColumnName() const {
         leftadj = 24;
     }
 
-    if (!o->isVerticalTimeline()) {
-      if (column->getSoundColumn())
-        rightadj -= 97;
-      else if (column->getFilterColorId())
-        rightadj -= 15;
-    }
-
     p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
                          : nameBacklit ? Qt::black : m_viewer->getTextColor());
   } else
@@ -897,13 +890,14 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
         xsh->getColumn(col) ? xsh->getColumn(col)->getSoundColumn() : 0;
 
     drawSoundIcon(sc->isPlaying());
-    drawVolumeControl(sc->getVolume());
+    // Volume control now in config button. If no config button
+    // draw control
+    if (!o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE))
+      drawVolumeControl(sc->getVolume());
     return;
   }
 
-  if (!o->isVerticalTimeline() ||
-      !o->flag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE))
-    return;
+  if (!o->flag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE)) return;
 
   QRect thumbnailImageRect =
       o->rect(PredefinedRect::THUMBNAIL).translated(orig);
@@ -1112,7 +1106,8 @@ ColumnArea::ColumnArea(XsheetViewer *parent, Qt::WFlags flags)
     , m_col(-1)
     , m_columnTransparencyPopup(0)
     , m_transparencyPopupTimer(0)
-    , m_isPanning(false) {
+    , m_isPanning(false)
+    , m_soundColumnPopup(0) {
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
 #ifndef LINETEST
   TObjectHandle *objectHandle = TApp::instance()->getCurrentObject();
@@ -1359,7 +1354,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.levelColors(columnColor, dragColor);
   drawHeader.drawBaseFill(columnColor, dragColor);
   drawHeader.drawEye();
-  drawHeader.drawPreviewToggle(255);
+  drawHeader.drawPreviewToggle(sc ? (troundp(255.0 * sc->getVolume())) : 0);
   drawHeader.drawLock();
   drawHeader.drawConfig();
   drawHeader.drawColumnName();
@@ -1584,7 +1579,7 @@ using namespace DVGui;
 
 ColumnTransparencyPopup::ColumnTransparencyPopup(QWidget *parent)
     : QWidget(parent, Qt::Popup) {
-  setFixedWidth(8 + 30 + 8 + 100 + 8 + 8 + 8 + 7);
+  setFixedWidth(8 + 78 + 8 + 100 + 8 + 8 + 8 + 7);
 
   m_slider = new QSlider(Qt::Horizontal, this);
   m_slider->setMinimum(1);
@@ -1610,6 +1605,7 @@ m_value->setFont(font);*/
   }
 
   QLabel *filterLabel = new QLabel(tr("Filter:"), this);
+  QLabel *sliderLabel = new QLabel(tr("Opacity:"), this);
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
   mainLayout->setMargin(3);
@@ -1619,6 +1615,7 @@ m_value->setFont(font);*/
     // hlayout->setContentsMargins(0, 3, 0, 3);
     hlayout->setMargin(0);
     hlayout->setSpacing(3);
+    hlayout->addWidget(sliderLabel, 0);
     hlayout->addWidget(m_slider);
     hlayout->addWidget(m_value);
     hlayout->addWidget(new QLabel("%"));
@@ -1722,6 +1719,106 @@ void ColumnTransparencyPopup::mouseReleaseEvent(QMouseEvent *e) {
 
 //------------------------------------------------------------------------------
 
+SoundColumnPopup::SoundColumnPopup(QWidget *parent)
+    : QWidget(parent, Qt::Popup) {
+  setFixedWidth(8 + 78 + 8 + 100 + 8 + 8 + 8 + 7);
+
+  m_slider = new QSlider(Qt::Horizontal, this);
+  m_slider->setMinimum(0);
+  m_slider->setMaximum(100);
+  m_slider->setFixedHeight(14);
+  m_slider->setFixedWidth(100);
+
+  m_value = new DVGui::IntLineEdit(this, 1, 1, 100);
+
+  QLabel *sliderLabel = new QLabel(tr("Volume:"), this);
+
+  QVBoxLayout *mainLayout = new QVBoxLayout();
+  mainLayout->setMargin(3);
+  mainLayout->setSpacing(3);
+  {
+    QHBoxLayout *hlayout = new QHBoxLayout;
+    // hlayout->setContentsMargins(0, 3, 0, 3);
+    hlayout->setMargin(0);
+    hlayout->setSpacing(3);
+    hlayout->addWidget(sliderLabel, 0);
+    hlayout->addWidget(m_slider);
+    hlayout->addWidget(m_value);
+    hlayout->addWidget(new QLabel("%"));
+    mainLayout->addLayout(hlayout, 0);
+  }
+  setLayout(mainLayout);
+
+  bool ret = connect(m_slider, SIGNAL(sliderReleased()), this,
+                     SLOT(onSliderReleased()));
+  ret = ret && connect(m_slider, SIGNAL(sliderMoved(int)), this,
+                       SLOT(onSliderChange(int)));
+  ret = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
+                       SLOT(onSliderValueChanged(int)));
+  ret = ret && connect(m_value, SIGNAL(textChanged(const QString &)), this,
+                       SLOT(onValueChanged(const QString &)));
+  assert(ret);
+}
+
+//----------------------------------------------------------------
+
+void SoundColumnPopup::onSliderValueChanged(int val) {
+  if (m_slider->isSliderDown()) return;
+  m_value->setText(QString::number(val));
+  onSliderReleased();
+}
+
+void SoundColumnPopup::onSliderReleased() {
+  int val = m_slider->value();
+  m_column->getSoundColumn()->setVolume(((double)val / 100.0));
+  TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  ((ColumnArea *)parent())->update();
+}
+
+//-----------------------------------------------------------------------
+
+void SoundColumnPopup::onSliderChange(int val) {
+  disconnect(m_value, SIGNAL(textChanged(const QString &)), 0, 0);
+  m_value->setText(QString::number(val));
+  connect(m_value, SIGNAL(textChanged(const QString &)), this,
+          SLOT(onValueChanged(const QString &)));
+}
+
+//----------------------------------------------------------------
+
+void SoundColumnPopup::onValueChanged(const QString &str) {
+  int val = str.toInt();
+  m_slider->setValue(val);
+  m_column->getSoundColumn()->setVolume(((double)val / 100.0));
+
+  TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  ((ColumnArea *)parent())->update();
+}
+
+//----------------------------------------------------------------
+
+void SoundColumnPopup::setColumn(TXshColumn *column) {
+  m_column = column;
+  assert(m_column);
+  double volume = m_column->getSoundColumn()->getVolume();
+  int val       = (int)troundp(100.0 * volume);
+  m_slider->setValue(val);
+  disconnect(m_value, SIGNAL(textChanged(const QString &)), 0, 0);
+  m_value->setText(QString::number(val));
+  connect(m_value, SIGNAL(textChanged(const QString &)), this,
+          SLOT(onValueChanged(const QString &)));
+}
+
+void SoundColumnPopup::mouseReleaseEvent(QMouseEvent *e) {
+  // hide();
+}
+
+//----------------------------------------------------------------
+
 void ColumnArea::openTransparencyPopup() {
   if (m_transparencyPopupTimer) m_transparencyPopupTimer->stop();
   if (m_col < 0) return;
@@ -1737,6 +1834,23 @@ void ColumnArea::openTransparencyPopup() {
 
   m_columnTransparencyPopup->setColumn(column);
   m_columnTransparencyPopup->show();
+}
+
+void ColumnArea::openSoundColumnPopup() {
+  if (m_col < 0) return;
+  TXshColumn *column = m_viewer->getXsheet()->getColumn(m_col);
+  if (!column || column->isEmpty()) return;
+
+  if (!column->isCamstandVisible()) {
+    column->setCamstandVisible(true);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
+    TApp::instance()->getCurrentScene()->notifySceneChanged();
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    update();
+  }
+
+  m_soundColumnPopup->setColumn(column);
+  m_soundColumnPopup->show();
 }
 
 //----------------------------------------------------------------
@@ -1856,7 +1970,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
         TXshZeraryFxColumn *zColumn =
             dynamic_cast<TXshZeraryFxColumn *>(column);
 
-        if (zColumn || column->getSoundColumn() || column->getPaletteColumn() ||
+        if (zColumn || column->getPaletteColumn() ||
             column->getSoundTextColumn()) {
           // do nothing
         } else
@@ -1884,7 +1998,8 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
               QTimer::singleShot(interval, this, SLOT(update()));
           }
           update();
-        } else if (o->rect(PredefinedRect::VOLUME_AREA).contains(mouseInCell))
+        } else if (!o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE) &&
+                   o->rect(PredefinedRect::VOLUME_AREA).contains(mouseInCell))
           setDragTool(XsheetGUI::DragTool::makeVolumeDragTool(m_viewer));
         else
           setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
@@ -1999,7 +2114,8 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
       // sound column
       if (o->rect(PredefinedRect::SOUND_ICON).contains(mouseInCell))
         m_tooltip = tr("Click to play the soundtrack back");
-      else if (o->rect(PredefinedRect::VOLUME_AREA).contains(mouseInCell))
+      else if (!o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE) &&
+               o->rect(PredefinedRect::VOLUME_AREA).contains(mouseInCell))
         m_tooltip = tr("Set the volume of the soundtrack");
     } else
       m_tooltip = tr("Click to select column, double-click to edit");
@@ -2017,7 +2133,8 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
       // sound column
       if (o->rect(PredefinedRect::SOUND_ICON).contains(mouseInCell))
         m_tooltip = tr("Click to play the soundtrack back");
-      else if (o->rect(PredefinedRect::VOLUME_AREA).contains(mouseInCell))
+      else if (!o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE) &&
+               o->rect(PredefinedRect::VOLUME_AREA).contains(mouseInCell))
         m_tooltip = tr("Set the volume of the soundtrack");
     } else if (Preferences::instance()->getColumnIconLoadingPolicy() ==
                Preferences::LoadOnDemand)
@@ -2057,9 +2174,6 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
     else if (m_doOnRelease == ToggleLock)
       column->lock(!column->isLocked());
     else if (m_doOnRelease == OpenSettings) {
-      if (!m_columnTransparencyPopup)
-        m_columnTransparencyPopup = new ColumnTransparencyPopup(this);
-
       // Align popup to be below to CONFIG button
       QRect configRect =
           m_viewer->orientation()->rect(PredefinedRect::CONFIG_AREA);
@@ -2073,10 +2187,24 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
       int y =
           mouseInCell.y() -
           configRect.bottom();  // distance from bottum edge of CONFIG button
-      m_columnTransparencyPopup->move(event->globalPos().x() + x,
-                                      event->globalPos().y() - y);
 
-      openTransparencyPopup();
+      if (column->getSoundColumn()) {
+        if (!m_soundColumnPopup)
+          m_soundColumnPopup = new SoundColumnPopup(this);
+
+        m_soundColumnPopup->move(event->globalPos().x() + x,
+                                 event->globalPos().y() - y);
+
+        openSoundColumnPopup();
+      } else {
+        if (!m_columnTransparencyPopup)
+          m_columnTransparencyPopup = new ColumnTransparencyPopup(this);
+
+        m_columnTransparencyPopup->move(event->globalPos().x() + x,
+                                        event->globalPos().y() - y);
+
+        openTransparencyPopup();
+      }
     } else if (m_doOnRelease == ToggleAllPreviewVisible) {
       for (col = 0; col < totcols; col++) {
         TXshColumn *column = xsh->getColumn(col);

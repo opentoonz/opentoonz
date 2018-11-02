@@ -32,7 +32,6 @@
 // Qt includes
 #include <QGridLayout>
 #include <QLabel>
-#include <QGridLayout>
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QApplication>
@@ -44,7 +43,6 @@
 #include <QPainter>
 #include <QTextStream>
 #include <QString>
-#include <QStringList>
 
 using namespace std;
 using namespace DVGui;

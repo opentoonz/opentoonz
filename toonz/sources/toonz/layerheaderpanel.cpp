@@ -77,9 +77,9 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
                      ? m_viewer->getLayerHeaderLockOverImage()
                      : m_viewer->getLayerHeaderLockImage());
 
-  drawIcon(p, PredefinedRect::EYE, boost::none, preview);
-  drawIcon(p, PredefinedRect::PREVIEW_LAYER, boost::none, camstand);
-  drawIcon(p, PredefinedRect::LOCK, boost::none, lock);
+  drawIcon(p, PredefinedRect::PANEL_EYE, boost::none, preview);
+  drawIcon(p, PredefinedRect::PANEL_PREVIEW_LAYER, boost::none, camstand);
+  drawIcon(p, PredefinedRect::PANEL_LOCK, boost::none, lock);
 
   QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
 
@@ -91,7 +91,7 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
   }
 
   QRect nameRect =
-      o->rect(PredefinedRect::LAYER_NAME).adjusted(leftadj, 0, -1, 0);
+      o->rect(PredefinedRect::PANEL_LAYER_NAME).adjusted(leftadj, 0, -1, 0);
   p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QObject::tr("Layer name"));
 

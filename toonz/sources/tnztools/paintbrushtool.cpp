@@ -34,7 +34,6 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tframehandle.h"
 #include "tools/toolhandle.h"
-#include "tools/toolutils.h"
 
 // For Qt translation support
 #include <QCoreApplication>

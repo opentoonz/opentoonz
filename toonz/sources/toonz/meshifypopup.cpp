@@ -36,7 +36,6 @@
 #include "toonz/levelset.h"
 #include "toonz/tstageobject.h"
 #include "toonz/tstageobjecttree.h"
-#include "toonz/stage.h"
 #include "toonz/stagevisitor.h"
 
 // TnzExt includes

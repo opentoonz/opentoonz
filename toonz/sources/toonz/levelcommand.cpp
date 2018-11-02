@@ -25,8 +25,6 @@
 
 #include "tundo.h"
 #include "tconvert.h"
-#include "cellselection.h"
-#include "filmstripselection.h"
 #include "tlevel_io.h"
 #include "ttoonzimage.h"
 #include "tsystem.h"

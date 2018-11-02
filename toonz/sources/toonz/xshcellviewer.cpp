@@ -2299,17 +2299,11 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
                              handleRow1)) {
             QPoint topLeft =
                 m_viewer->positionToXY(CellPosition(handleRow0, col));
-            if (!o->isVerticalTimeline() &&
-                m_viewer->getFrameZoomFactor() <= 50)
-              topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
                                          keyFrameColor, outline);
 
             topLeft = m_viewer->positionToXY(CellPosition(handleRow1, col));
-            if (!o->isVerticalTimeline() &&
-                m_viewer->getFrameZoomFactor() <= 50)
-              topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::END_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
                                          keyFrameColor, outline);
@@ -2409,13 +2403,6 @@ void CellArea::drawKeyframeLine(QPainter &p, int col,
       keyRect.center() + m_viewer->positionToXY(CellPosition(rows.from(), col));
   QPoint end =
       keyRect.center() + m_viewer->positionToXY(CellPosition(rows.to(), col));
-
-  if (!m_viewer->orientation()->isVerticalTimeline() &&
-      m_viewer->getFrameZoomFactor() <= 50) {
-    begin.setY(begin.y() - 1);
-    end.setY(end.y() - 1);
-  }
-
   p.setPen(Qt::white);
   p.drawLine(QLine(begin, end));
 }
@@ -2557,6 +2544,56 @@ public:
   int getHistoryType() override { return HistoryType::Xsheet; }
 };
 //----------------------------------------------------------
+bool CellArea::isKeyFrameArea(int col, int row, QPoint mouseInCell) {
+  if (!Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled())
+    return false;
+
+  TXsheet *xsh = m_viewer->getXsheet();
+  if (!xsh) return false;
+
+  TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
+  int k0, k1;
+
+  bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
+                         (k1 > k0 || k0 == row) && k0 <= row && row <= k1 + 1;
+
+  if (!isKeyframeFrame) return false;
+
+  const Orientation *o = m_viewer->orientation();
+  int frameAdj         = m_viewer->getFrameZoomAdjustment();
+
+  if (o->isVerticalTimeline())
+    return o->rect(PredefinedRect::KEYFRAME_AREA)
+               .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+               .contains(mouseInCell) &&
+           row < k1 + 1;
+
+  QRect activeArea = (m_viewer->getFrameZoomFactor() > 50
+                          ? o->rect(PredefinedRect::KEYFRAME_AREA)
+                          : o->rect(PredefinedRect::FRAME_MARKER_AREA));
+
+  // If directly over keyframe icon, return true
+  if (pegbar->isKeyframe(row) &&
+      activeArea.adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+          .contains(mouseInCell) &&
+      row < k1 + 1)
+    return true;
+
+  // In the white line area, if zoomed in.. narrow height by using frame marker
+  // area since it has a narrower height
+  if (m_viewer->getFrameZoomFactor() > 50)
+    activeArea = o->rect(PredefinedRect::FRAME_MARKER_AREA);
+
+  // Adjust left and/or right edge depending on which part of white line you are
+  // on
+  if (row > k0) activeArea.adjust(-activeArea.left(), 0, 0, 0);
+  if (row < k1)
+    activeArea.adjust(0, 0, (o->cellWidth() - activeArea.right()), 0);
+
+  return activeArea.adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+             .contains(mouseInCell) &&
+         row < k1 + 1;
+}
 
 void CellArea::mousePressEvent(QMouseEvent *event) {
   const Orientation *o = m_viewer->orientation();
@@ -2628,23 +2665,12 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
                              (k1 > k0 || k0 == row) && k0 <= row &&
                              row <= k1 + 1;
-
-      bool isKeyFrameArea =
-          isKeyframeFrame &&
-          ((o->isVerticalTimeline() &&
-            o->rect(PredefinedRect::KEYFRAME_AREA)
-                .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                .contains(mouseInCell))
-
-           || (!o->isVerticalTimeline() &&
-               o->rect(PredefinedRect::FRAME_MARKER_AREA)
-                   .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                   .contains(mouseInCell))) &&
-          row < k1 + 1;
       bool accept = false;
 
-      if (isKeyFrameArea) {           // They are in the keyframe selection
-        if (pegbar->isKeyframe(row))  // in the keyframe
+      if (isKeyframeFrame &&
+          isKeyFrameArea(col, row,
+                         mouseInCell)) {  // They are in the keyframe selection
+        if (pegbar->isKeyframe(row))      // in the keyframe
         {
           m_viewer->setCurrentRow(
               row);  // If you click on the key, change the current row as well
@@ -2796,13 +2822,8 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
   bool isKeyframeFrame =
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
       pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
-  bool isKeyFrameArea = isKeyframeFrame &&
-                        o->rect(PredefinedRect::KEYFRAME_AREA)
-                            .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                            .contains(mouseInCell) &&
-                        row < k1 + 1;
 
-  if (isKeyFrameArea) {
+  if (isKeyframeFrame && isKeyFrameArea(col, row, mouseInCell)) {
     if (pegbar->isKeyframe(row))  // key frame
       m_tooltip = tr("Click to select keyframe, drag to move it");
     else {
@@ -2926,14 +2947,8 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
     int k0, k1;
     bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
                            k0 <= row && row <= k1 + 1;
-    bool isKeyFrameArea = isKeyframeFrame &&
-                          o->rect(PredefinedRect::KEYFRAME_AREA)
-                              .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                              .contains(mouseInCell) &&
-                          row < k1 + 1;
-
     // If you are in the keyframe area, open a function editor
-    if (isKeyFrameArea) {
+    if (isKeyframeFrame && isKeyFrameArea(col, row, mouseInCell)) {
       QAction *action =
           CommandManager::instance()->getAction(MI_OpenFunctionEditor);
       action->trigger();
@@ -2996,13 +3011,8 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   bool isKeyframeFrame =
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
       pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
-  bool isKeyFrameArea = isKeyframeFrame &&
-                        o->rect(PredefinedRect::KEYFRAME_AREA)
-                            .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                            .contains(mouseInCell) &&
-                        row < k1 + 1;
 
-  if (isKeyFrameArea) {
+  if (isKeyframeFrame && isKeyFrameArea(col, row, mouseInCell)) {
     TStageObjectId objectId;
     if (col < 0)
       objectId = TStageObjectId::CameraId(0);

@@ -120,7 +120,11 @@ enum class PredefinedRect {
   LAYER_FOOTER_PANEL,
   PREVIEW_FRAME_AREA,
   SHIFTTRACE_DOT,
-  SHIFTTRACE_DOT_AREA
+  SHIFTTRACE_DOT_AREA,
+  PANEL_EYE,
+  PANEL_PREVIEW_LAYER,
+  PANEL_LOCK,
+  PANEL_LAYER_NAME
 };
 enum class PredefinedLine {
   LOCKED,              //! dotted vertical line when cell is locked

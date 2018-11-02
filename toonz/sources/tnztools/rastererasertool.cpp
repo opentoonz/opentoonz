@@ -4,7 +4,6 @@
 #include "tools/toolutils.h"
 #include "tools/cursors.h"
 #include "tools/tool.h"
-#include "tools/toolutils.h"
 #include "tools/toolhandle.h"
 
 #include "bluredbrush.h"

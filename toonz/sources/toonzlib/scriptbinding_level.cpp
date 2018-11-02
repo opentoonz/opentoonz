@@ -17,7 +17,6 @@
 #include "tvectorrenderdata.h"
 #include "tgeometry.h"
 #include "toonz/stage.h"
-#include "toonz/tcamera.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/levelproperties.h"
 #include "toonz/toonzscene.h"
@@ -27,7 +26,6 @@
 #include "tsystem.h"
 #include <QRegExp>
 #include <QColor>
-#include "tfiletype.h"
 
 namespace TScriptBinding {
 

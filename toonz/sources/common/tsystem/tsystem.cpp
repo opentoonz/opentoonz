@@ -32,7 +32,6 @@ using namespace std;
 #include <winnt.h>
 #endif
 
-#include <QStringList>
 
 namespace {
 
