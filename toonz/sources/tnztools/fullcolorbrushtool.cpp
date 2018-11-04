@@ -350,6 +350,8 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos,
   TRasterImageP ri        = (TRasterImageP)getImage(true);
   if (!ri) return;
 
+  if (!m_toonz_brush) return;
+
   TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
