@@ -1160,9 +1160,9 @@ void RasterSelection::pasteSelection(const RasterImageData *riData) {
 void RasterSelection::pasteSelection() {
   TTool::Application *app = TTool::getApplication();
   TTool *tool             = app->getCurrentTool()->getTool();
-  TImageP image           = tool->getImage(true);
+  TImageP image           = tool->touchImage();
 
-  if (!(image = tool->touchImage())) return;
+  if (!image) return;
 
   m_currentImage = image;
   m_fid          = tool->getCurrentFid();
