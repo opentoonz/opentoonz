@@ -2449,6 +2449,11 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
     }
   }
 
+  if (loadedCount) {
+    app->getCurrentFrame()->setFrameIndex(row0);
+    app->getCurrentColumn()->setColumnIndex(col0 - 1);
+  }
+
   sb->data().m_loadedCount += loadedCount;
   sb->data().m_hasSoundLevel = sb->data().m_hasSoundLevel || isSoundLevel;
 
