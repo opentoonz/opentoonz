@@ -348,10 +348,10 @@ TopToBottomOrientation::TopToBottomOrientation() {
   addRect(PredefinedRect::ONION_AREA,
           QRect(ONION_X, ONION_Y, PLAY_RANGE_X, CELL_HEIGHT));
   addRect(PredefinedRect::ONION_FIXED_DOT_AREA,
-          QRect(ONION_X, ONION_Y, ONION_DOT_SIZE, CELL_HEIGHT));
-  addRect(
-      PredefinedRect::ONION_DOT_AREA,
-      QRect(ONION_X + ONION_DOT_SIZE, ONION_Y, ONION_DOT_SIZE, CELL_HEIGHT));
+          QRect(ONION_X, ONION_Y, ONION_DOT_SIZE + 1, CELL_HEIGHT));
+  addRect(PredefinedRect::ONION_DOT_AREA,
+          QRect(ONION_X + ONION_DOT_SIZE + 1, ONION_Y, ONION_DOT_SIZE + 1,
+                CELL_HEIGHT));
   addRect(PredefinedRect::PINNED_CENTER_KEY,
           QRect((FRAME_HEADER_WIDTH - PINNED_SIZE) / 2,
                 (CELL_HEIGHT - PINNED_SIZE) / 2, PINNED_SIZE, PINNED_SIZE));
@@ -977,9 +977,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::ONION_AREA,
           QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_SIZE));
   addRect(PredefinedRect::ONION_FIXED_DOT_AREA,
-          QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_DOT_SIZE));
+          QRect(ONION_X, ONION_Y, CELL_WIDTH, ONION_DOT_SIZE + 1));
   addRect(PredefinedRect::ONION_DOT_AREA,
-          QRect(ONION_X, ONION_Y + ONION_DOT_SIZE, CELL_WIDTH, ONION_DOT_SIZE));
+          QRect(ONION_X, ONION_Y + ONION_DOT_SIZE + 1, CELL_WIDTH,
+                ONION_DOT_SIZE + 1));
   addRect(
       PredefinedRect::PINNED_CENTER_KEY,
       QRect((CELL_WIDTH - PINNED_SIZE) / 2,

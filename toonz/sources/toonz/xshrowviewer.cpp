@@ -357,6 +357,25 @@ void RowArea::drawCurrentRowGadget(QPainter &p, int r0, int r1) {
 
 //-----------------------------------------------------------------------------
 
+void RowArea::drawOnionSkinBackground(QPainter &p, int r0, int r1) {
+  const Orientation *o = m_viewer->orientation();
+
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
+
+  for (int r = r0; r <= r1; r++) {
+    QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
+    if (!m_viewer->orientation()->isVerticalTimeline()) basePoint.setY(0);
+
+    QRect oRect = m_viewer->orientation()
+                      ->rect(PredefinedRect::ONION_AREA)
+                      .adjusted(0, 0, -frameAdj, 0)
+                      .translated(basePoint);
+    p.fillRect(oRect, m_viewer->getOnionSkinAreaBgColor());
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 void RowArea::drawOnionSkinSelection(QPainter &p) {
   TApp *app            = TApp::instance();
   OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
@@ -759,6 +778,9 @@ void RowArea::paintEvent(QPaintEvent *event) {
 
   drawPlayRangeBackground(p, r0, r1);
 
+  if (Preferences::instance()->isOnionSkinEnabled())
+    drawOnionSkinBackground(p, r0, r1);
+
   if (TApp::instance()->getCurrentFrame()->isEditingScene())
     // current frame
     drawCurrentRowGadget(p, r0, r1);
@@ -861,11 +883,6 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
                    .contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeKeyOnionSkinMaskModifierTool(
             m_viewer, false));
-      else {
-        setDragTool(
-            XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
-        frameAreaIsClicked = true;
-      }
     } else {
       int playR0, playR1, step;
       XsheetGUI::getPlayRange(playR0, playR1, step);
