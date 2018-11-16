@@ -966,6 +966,8 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
 
 void SceneViewer::touchEvent(QTouchEvent *e, int type) {
   if (type == QEvent::TouchBegin) {
+    if (m_tabletEvent) return;
+
     m_touchActive   = true;
     m_firstPanPoint = e->touchPoints().at(0).pos();
     m_undoPoint     = m_firstPanPoint;
