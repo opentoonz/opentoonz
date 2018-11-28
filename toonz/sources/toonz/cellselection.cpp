@@ -119,6 +119,7 @@ void deleteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1) {
       xsh->clearCells(r0, c, r1 - r0 + 1);
       TXshColumn *column = xsh->getColumn(c);
       if (column && column->isEmpty()) {
+        column->resetColumnProperties();
         TFx *fx = column->getFx();
         if (fx) {
           int i;
@@ -144,6 +145,7 @@ void cutCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1) {
     xsh->removeCells(r0, c, r1 - r0 + 1);
     TXshColumn *column = xsh->getColumn(c);
     if (column && column->isEmpty()) {
+      column->resetColumnProperties();
       TFx *fx = column->getFx();
       if (!fx) continue;
       int i;
