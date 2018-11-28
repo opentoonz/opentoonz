@@ -834,6 +834,7 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     invalidate();
     return;
   } else if (m_eraseType.getValue() == NORMAL_ERASE) {
+    if (!m_undo) leftButtonDown(pos, e);
     if (TVectorImageP vi = image) erase(vi, pos);
   } else if (m_eraseType.getValue() == FREEHAND_ERASE) {
     freehandDrag(pos);
@@ -937,9 +938,10 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
   TTool::Application *application = TTool::getApplication();
   if (!vi || !application) return;
-  if (m_eraseType.getValue() == NORMAL_ERASE)
+  if (m_eraseType.getValue() == NORMAL_ERASE) {
+    if (!m_undo) leftButtonDown(pos, e);
     stopErase(vi);
-  else if (m_eraseType.getValue() == RECT_ERASE) {
+  } else if (m_eraseType.getValue() == RECT_ERASE) {
     if (m_selectingRect.x0 > m_selectingRect.x1)
       std::swap(m_selectingRect.x1, m_selectingRect.x0);
     if (m_selectingRect.y0 > m_selectingRect.y1)
