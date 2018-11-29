@@ -1627,9 +1627,11 @@ void TCellSelection::pasteCells() {
       // (r0,c0)
       std::set<TKeyframeSelection::Position> positions;
       int newC0 = c0;
-      if (viewer && !viewer->orientation()->isVerticalTimeline())
+      if (viewer && !viewer->orientation()->isVerticalTimeline() && !cellData)
         newC0 = c0 - keyframeData->getColumnSpanCount() + 1;
-      positions.insert(TKeyframeSelection::Position(r0, newC0));
+      TKeyframeSelection::Position offset(keyframeData->getKeyframesOffset());
+      positions.insert(TKeyframeSelection::Position(r0 + offset.first,
+                                                    newC0 + offset.second));
       keyframeData->getKeyframes(positions);
       selection.select(positions);
 
