@@ -106,6 +106,7 @@ void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup) {
   }
 }
 
+bool resizingNodes = false;
 }  // namespace
 
 //==================================================================
@@ -367,6 +368,7 @@ StageSchematicNode *StageSchematicScene::addStageSchematicNode(
   connect(node, SIGNAL(currentColumnChanged(int)), this,
           SLOT(onCurrentColumnChanged(int)));
   connect(node, SIGNAL(editObject()), this, SIGNAL(editObject()));
+  connect(node, SIGNAL(nodeChangedSize()), this, SLOT(onNodeChangedSize()));
 
   // specify the node position
   if (pegbar->getDagNodePos() == TConst::nowhere) {
@@ -539,6 +541,7 @@ void StageSchematicScene::updateNestedGroupEditors(StageSchematicNode *node,
 //------------------------------------------------------------------
 
 void StageSchematicScene::resizeNodes(bool maximizedNode) {
+  resizingNodes             = true;
   m_gridDimension           = maximizedNode ? eLarge : eSmall;
   TStageObjectTree *pegTree = m_xshHandle->getXsheet()->getStageObjectTree();
   pegTree->setDagGridDimension(m_gridDimension);
@@ -578,6 +581,7 @@ void StageSchematicScene::resizeNodes(bool maximizedNode) {
   for (it2 = m_groupEditorTable.begin(); it2 != m_groupEditorTable.end(); it2++)
     it2.value()->resizeNodes(maximizedNode);
   updateScene();
+  resizingNodes = false;
 }
 
 //------------------------------------------------------------------
@@ -1248,4 +1252,11 @@ void StageSchematicScene::onEditGroup() {
 
 TStageObjectId StageSchematicScene::getCurrentObject() {
   return m_objHandle->getObjectId();
+}
+
+//------------------------------------------------------------------
+
+void StageSchematicScene::onNodeChangedSize() {
+  if (resizingNodes) return;
+  updateScene();
 }

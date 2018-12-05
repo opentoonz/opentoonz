@@ -275,7 +275,9 @@ void FxSchematicGroupEditor::onNameChanged() {
 
 QRectF FxSchematicGroupEditor::boundingSceneRect() const {
   QRectF rect = m_groupedNode[0]->boundingRect();
-  rect.moveTopLeft(m_groupedNode[0]->scenePos() - rect.topLeft());
+  QPointF shiftPos(m_groupedNode[0]->scenePos().x() - rect.left(),
+                   m_groupedNode[0]->scenePos().y() + rect.top() + 10);
+  rect.moveTopLeft(shiftPos);
   int i;
   for (i = 0; i < m_groupedNode.size(); i++) {
     FxSchematicNode *node = dynamic_cast<FxSchematicNode *>(m_groupedNode[i]);
@@ -283,7 +285,9 @@ QRectF FxSchematicGroupEditor::boundingSceneRect() const {
     TFx *fx = node->getFx();
     assert(fx);
     QRectF app = node->boundingRect();
-    app.moveTopLeft(node->scenePos() - app.topLeft());
+    QPointF shiftAppPos(node->scenePos().x() - app.left(),
+                        node->scenePos().y() + app.top() + 10);
+    app.moveTopLeft(shiftAppPos);
     bool isASubgroupedNode =
         fx->getAttributes()->getEditingGroupId() != m_groupId;
     if (isASubgroupedNode) {
@@ -370,7 +374,9 @@ void FxSchematicMacroEditor::onNameChanged() {
 
 QRectF FxSchematicMacroEditor::boundingSceneRect() const {
   QRectF rect = m_groupedNode[0]->boundingRect();
-  rect.moveTopLeft(m_groupedNode[0]->scenePos() - rect.topLeft());
+  QPointF shiftPos(m_groupedNode[0]->scenePos().x() - rect.left(),
+                   m_groupedNode[0]->scenePos().y() + rect.top() + 10);
+  rect.moveTopLeft(shiftPos);
   int i;
   for (i = 0; i < m_groupedNode.size(); i++) {
     FxSchematicNode *node = dynamic_cast<FxSchematicNode *>(m_groupedNode[i]);
@@ -378,7 +384,9 @@ QRectF FxSchematicMacroEditor::boundingSceneRect() const {
     TFx *fx = node->getFx();
     assert(fx);
     QRectF app = node->boundingRect();
-    app.moveTopLeft(node->scenePos() - app.topLeft());
+    QPointF shiftAppPos(node->scenePos().x() - app.left(),
+                        node->scenePos().y() + app.top() + 10);
+    app.moveTopLeft(shiftAppPos);
 #if QT_VERSION >= 0x050000
     rect = rect.united(app);
 #else
@@ -440,7 +448,9 @@ StageSchematicGroupEditor::~StageSchematicGroupEditor() {}
 
 QRectF StageSchematicGroupEditor::boundingSceneRect() const {
   QRectF rect = m_groupedNode[0]->boundingRect();
-  rect.moveTopLeft(m_groupedNode[0]->scenePos() - rect.topLeft());
+  QPointF shiftPos(m_groupedNode[0]->scenePos().x() - rect.left(),
+                   m_groupedNode[0]->scenePos().y() + rect.top() + 10);
+  rect.moveTopLeft(shiftPos);
   int i;
   for (i = 0; i < m_groupedNode.size(); i++) {
     StageSchematicNode *node =
@@ -449,7 +459,9 @@ QRectF StageSchematicGroupEditor::boundingSceneRect() const {
     TStageObject *obj = node->getStageObject();
     assert(obj);
     QRectF app = node->boundingRect();
-    app.moveTopLeft(node->scenePos() - app.topLeft());
+    QPointF shiftAppPos(node->scenePos().x() - app.left(),
+                        node->scenePos().y() + app.top() + 10);
+    app.moveTopLeft(shiftAppPos);
     bool isASubgroupedNode = obj->getEditingGroupId() != m_groupId;
     if (isASubgroupedNode) app.adjust(-30, -30, 30, 30);
 #if QT_VERSION >= 0x050000

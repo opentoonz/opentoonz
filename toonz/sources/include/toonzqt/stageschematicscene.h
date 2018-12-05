@@ -215,6 +215,7 @@ protected slots:
   void onSelectionChanged();
   void onCollapse(QList<TStageObjectId>);
   void onEditGroup();
+  void onNodeChangedSize();
 
   void onSwitchPortModeToggled(bool withLetter);
 };

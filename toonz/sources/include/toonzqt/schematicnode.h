@@ -451,6 +451,7 @@ protected:
 signals:
   void sceneChanged();
   void xsheetChanged();
+  void nodeChangedSize();
 };
 
 #endif  // SCHEMATICNODE_H
