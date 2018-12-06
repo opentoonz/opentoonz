@@ -656,6 +656,8 @@ void TRasterFx::dryCompute(TRectD &rect, double frame,
     newInfo.m_affine.a23 = fracInfoTranslation.y - intInfoTranslation.y;
 
     TRectD newRect(newTilePos, rect.getSize());
+    // Image size is a 0 point.  Do nothing
+    if (!(newRect.x0 + newRect.x1) && !(newRect.y0 + newRect.y1)) return;
 
     dryCompute(newRect, frame, newInfo);
     return;
@@ -834,6 +836,10 @@ void TRasterFx::compute(TTile &tile, double frame,
   if (tile.m_pos != newTilePos) {
     /*-- RenderSettingsのaffine行列に位置ずれを足しこむ --*/
     TRenderSettings newInfo(info);
+    // Image size is a 0 point.  Do nothing
+    if (!(newInfo.m_cameraBox.x0 + newInfo.m_cameraBox.x1) &&
+        !(newInfo.m_cameraBox.y0 + newInfo.m_cameraBox.y1))
+      return;
     newInfo.m_affine.a13 = fracInfoTranslation.x - intInfoTranslation.x;
     newInfo.m_affine.a23 = fracInfoTranslation.y - intInfoTranslation.y;
     /*-- タイルの位置は整数値にする --*/

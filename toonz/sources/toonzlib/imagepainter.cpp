@@ -425,7 +425,10 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
       int lx = (m_imageSize.lx == 0 ? _rin->getLx() : m_imageSize.lx);
       int ly = (m_imageSize.ly == 0 ? _rin->getLy() : m_imageSize.ly);
 
-      TRect rect      = convert(aff * TRectD(0, 0, lx - 1, ly - 1));
+      TRect rect = convert(aff * TRectD(0, 0, lx - 1, ly - 1));
+      // Image size is a 0 point.  Do nothing
+      if (rect.x0 == rect.x1 && rect.y0 == rect.y1) return;
+
       TRaster32P raux = ras->extract(rect);
       raux->fill(bg == 0x40000 ? TPixel::Black : TPixel::White);
     }
