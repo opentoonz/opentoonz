@@ -585,6 +585,7 @@ void StageSchematicScene::resizeNodes(bool maximizedNode) {
 void StageSchematicScene::updatePositionOnResize(TStageObject *obj,
                                                  bool maximizedNode) {
   TPointD oldPos = obj->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25500;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   obj->setDagNodePos(TPointD(oldPos.x, newPosY + 25500));
@@ -595,6 +596,7 @@ void StageSchematicScene::updatePositionOnResize(TStageObject *obj,
 void StageSchematicScene::updateSplinePositionOnResize(TStageObjectSpline *spl,
                                                        bool maximizedNode) {
   TPointD oldPos = spl->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25500;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   spl->setDagNodePos(TPointD(oldPos.x, newPosY + 25500));

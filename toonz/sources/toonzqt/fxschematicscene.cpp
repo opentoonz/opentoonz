@@ -162,6 +162,7 @@ QList<TFxP> getRoots(const QList<TFxP> &fxs, TFxSet *terminals) {
   return roots;
 }
 
+bool updatingScene = false;
 }  // namespace
 
 //==================================================================
@@ -353,6 +354,8 @@ void FxSchematicScene::setApplication(TApplication *app) {
 //------------------------------------------------------------------
 
 void FxSchematicScene::updateScene() {
+  if (updatingScene) return;
+  updatingScene = true;
   if (!views().empty()) m_disconnectionLinks.clearAll();
   m_connectionLinks.clearAll();
   m_selectionOldPos.clear();
@@ -460,6 +463,7 @@ void FxSchematicScene::updateScene() {
   updateEditedMacros(editedMacro);
   updateLink();
   m_nodesToPlace.clear();
+  updatingScene = false;
 }
 
 //------------------------------------------------------------------
@@ -1118,6 +1122,32 @@ void FxSchematicScene::reorderScene() {
 
   TXsheet *xsh = m_xshHandle->getXsheet();
   int i        = 0;
+
+  FxDag *fxDag  = xsh->getFxDag();
+  TFxSet *fxSet = fxDag->getInternalFxs();
+
+  //  Let's reset every position to nowhere first
+  fxDag->getXsheetFx()->getAttributes()->setDagNodePos(TConst::nowhere);
+
+  for (i = 0; i < fxDag->getOutputFxCount(); i++) {
+    TOutputFx *fx = fxDag->getOutputFx(i);
+    if (!fx) continue;
+    fx->getAttributes()->setDagNodePos(TConst::nowhere);
+  }
+
+  for (i = 0; i < xsh->getColumnCount(); i++) {
+    TXshColumn *column = xsh->getColumn(i);
+    TFx *fx            = column->getFx();
+    if (!fx) continue;
+    fx->getAttributes()->setDagNodePos(TConst::nowhere);
+  }
+
+  for (i = 0; i < fxSet->getFxCount(); i++) {
+    TFx *fx = fxSet->getFx(i);
+    fx->getAttributes()->setDagNodePos(TConst::nowhere);
+  }
+
+  // Let's start placing them now
   for (i = 0; i < xsh->getColumnCount(); i++) {
     TXshColumn *column = xsh->getColumn(i);
     TFx *fx            = column->getFx();
@@ -1161,8 +1191,6 @@ void FxSchematicScene::reorderScene() {
   double middleY = (sceneCenter.y() + minY + step) * 0.5;
   placeNodeAndParents(xsh->getFxDag()->getXsheetFx(), maxX, maxX, middleY);
 
-  FxDag *fxDag  = xsh->getFxDag();
-  TFxSet *fxSet = fxDag->getInternalFxs();
   for (i = 0; i < fxSet->getFxCount(); i++) {
     TFx *fx = fxSet->getFx(i);
     if (m_placedFxs.contains(fx)) continue;
@@ -1182,7 +1210,8 @@ void FxSchematicScene::removeRetroLinks(TFx *fx, double &maxX) {
     if (!inFx) continue;
     TPointD inFxPos = inFx->getAttributes()->getDagNodePos();
     TPointD fxPos   = fx->getAttributes()->getDagNodePos();
-    if (fxPos.x <= inFxPos.x) {
+    if (inFxPos != TConst::nowhere && fxPos != TConst::nowhere &&
+        fxPos.x <= inFxPos.x) {
       while (fxPos.x <= inFxPos.x) fxPos.x += 150;
       maxX = std::max(fxPos.x + 150, maxX);
       fx->getAttributes()->setDagNodePos(fxPos);
@@ -1996,6 +2025,7 @@ void FxSchematicScene::resizeNodes(bool maximizedNode) {
 
 void FxSchematicScene::updatePositionOnResize(TFx *fx, bool maximizedNode) {
   TPointD oldPos = fx->getAttributes()->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25000;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   fx->getAttributes()->setDagNodePos(TPointD(oldPos.x, newPosY + 25000));

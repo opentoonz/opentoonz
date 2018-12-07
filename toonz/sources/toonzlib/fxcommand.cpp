@@ -1598,7 +1598,8 @@ private:
     else {
       TOutputFx *currentOutputFx = xsh->getFxDag()->getCurrentOutputFx();
       const TPointD &pos = currentOutputFx->getAttributes()->getDagNodePos();
-      outputFx->getAttributes()->setDagNodePos(pos + TPointD(20, 20));
+      if (pos != TConst::nowhere)
+        outputFx->getAttributes()->setDagNodePos(pos + TPointD(20, 20));
     }
   }
 };
@@ -2637,7 +2638,8 @@ void UndoPasteFxs::initialize(const std::map<TFx *, int> &zeraryFxColumnSize,
         TFx *fx = *ft;
 
         const TPointD &fxPos = fx->getAttributes()->getDagNodePos();
-        fx->getAttributes()->setDagNodePos(fxPos + offset);
+        if (fxPos != TConst::nowhere)
+          fx->getAttributes()->setDagNodePos(fxPos + offset);
       }
     }
   }

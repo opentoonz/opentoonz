@@ -1892,7 +1892,8 @@ void FxSchematicNode::setSchematicNodePos(const QPointF &pos) const {
       int i;
       for (i = 0; i < (int)fxs.size(); i++) {
         TPointD oldPos = fxs[i]->getAttributes()->getDagNodePos();
-        fxs[i]->getAttributes()->setDagNodePos(oldPos + delta);
+        if (oldPos != TConst::nowhere)
+          fxs[i]->getAttributes()->setDagNodePos(oldPos + delta);
       }
     }
   } else {
@@ -3460,16 +3461,17 @@ void FxGroupNode::updateFxsDagPosition(const TPointD &pos) const {
     // placeNode() function.
     // if (m_groupedFxs[i]->getAttributes()->getDagNodePos() != TConst::nowhere)
     {
-      m_groupedFxs[i]->getAttributes()->setDagNodePos(
-          m_groupedFxs[i]->getAttributes()->getDagNodePos() + delta);
+      TPointD groupPos = m_groupedFxs[i]->getAttributes()->getDagNodePos();
+      if (groupPos != TConst::nowhere)
+        m_groupedFxs[i]->getAttributes()->setDagNodePos(groupPos + delta);
       TMacroFx *macro = dynamic_cast<TMacroFx *>(m_groupedFxs[i].getPointer());
       if (macro) {
         std::vector<TFxP> fxs = macro->getFxs();
         int i;
         for (i = 0; i < (int)fxs.size(); i++) {
           TPointD oldP = fxs[i]->getAttributes()->getDagNodePos();
-          // if (oldP != TConst::nowhere)
-          fxs[i]->getAttributes()->setDagNodePos(oldP + delta);
+          if (oldP != TConst::nowhere)
+            fxs[i]->getAttributes()->setDagNodePos(oldP + delta);
         }
       }
     }
@@ -3491,11 +3493,25 @@ void FxGroupNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) {
 //-----------------------------------------------------
 
 QPointF FxGroupNode::computePos() const {
+  FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
+  assert(fxScene);
+  TXsheet *xsh = fxScene->getXsheet();
   int i, notCounted = 0, fxCount = m_groupedFxs.size();
   TPointD pos;
   for (i = 0; i < fxCount; i++) {
     TFx *fx       = m_groupedFxs[i].getPointer();
     TPointD fxPos = fx->getAttributes()->getDagNodePos();
+    int col       = fx->getReferenceColumnIndex();
+    if (col <= 0) {
+      notCounted++;
+      continue;
+    } else {
+      TXshColumn *column = xsh->getColumn(col);
+      if (!column || column->isEmpty()) {
+        notCounted++;
+        continue;
+      }
+    }
     if (fxPos != TConst::nowhere)
       pos += fxPos;
     else
