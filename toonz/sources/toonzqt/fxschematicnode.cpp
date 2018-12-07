@@ -3493,25 +3493,11 @@ void FxGroupNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) {
 //-----------------------------------------------------
 
 QPointF FxGroupNode::computePos() const {
-  FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
-  assert(fxScene);
-  TXsheet *xsh = fxScene->getXsheet();
   int i, notCounted = 0, fxCount = m_groupedFxs.size();
   TPointD pos;
   for (i = 0; i < fxCount; i++) {
     TFx *fx       = m_groupedFxs[i].getPointer();
     TPointD fxPos = fx->getAttributes()->getDagNodePos();
-    int col       = fx->getReferenceColumnIndex();
-    if (col <= 0) {
-      notCounted++;
-      continue;
-    } else {
-      TXshColumn *column = xsh->getColumn(col);
-      if (!column || column->isEmpty()) {
-        notCounted++;
-        continue;
-      }
-    }
     if (fxPos != TConst::nowhere)
       pos += fxPos;
     else
