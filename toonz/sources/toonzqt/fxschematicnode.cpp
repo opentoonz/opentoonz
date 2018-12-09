@@ -1887,7 +1887,9 @@ void FxSchematicNode::setSchematicNodePos(const QPointF &pos) const {
     m_fx->getAttributes()->setDagNodePos(p);
     TMacroFx *macro = dynamic_cast<TMacroFx *>(m_fx.getPointer());
     if (macro) {
-      TPointD delta = p - macro->getRoot()->getAttributes()->getDagNodePos();
+      TPointD macroPos = macro->getRoot()->getAttributes()->getDagNodePos();
+      TPointD delta =
+          p - (macroPos != TConst::nowhere ? macroPos : TPointD(0, 0));
       std::vector<TFxP> fxs = macro->getFxs();
       int i;
       for (i = 0; i < (int)fxs.size(); i++) {

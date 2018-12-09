@@ -1145,6 +1145,14 @@ void FxSchematicScene::reorderScene() {
   for (i = 0; i < fxSet->getFxCount(); i++) {
     TFx *fx = fxSet->getFx(i);
     fx->getAttributes()->setDagNodePos(TConst::nowhere);
+    TMacroFx *macro = dynamic_cast<TMacroFx *>(fx);
+    if (macro && macro->isEditing()) {
+      std::vector<TFxP> fxs = macro->getFxs();
+      int j;
+      for (j = 0; j < (int)fxs.size(); j++) {
+        fxs[j]->getAttributes()->setDagNodePos(TConst::nowhere);
+      }
+    }
   }
 
   // Let's start placing them now
@@ -1257,6 +1265,17 @@ void FxSchematicScene::placeNodeAndParents(TFx *fx, double x, double &maxX,
     if (!m_placedFxs.contains(outputFx) ||
         outputFx->getAttributes()->getDagNodePos().x < x) {
       placeNodeAndParents(outputFx, x, maxX, minY);
+
+      TMacroFx *macro = dynamic_cast<TMacroFx *>(outputFx);
+      if (macro) {
+        std::vector<TFxP> fxs = macro->getFxs();
+        for (int j = 0; j < (int)fxs.size(); j++) {
+          TFx *macroFx = fxs[j].getPointer();
+          if (macroFx && !m_placedFxs.contains(macroFx))
+            placeNodeAndParents(macroFx, x, maxX, minY);
+        }
+      }
+
       y -= step;
       minY = std::min(y, minY);
     }
