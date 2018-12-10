@@ -163,7 +163,7 @@ QList<TFxP> getRoots(const QList<TFxP> &fxs, TFxSet *terminals) {
 }
 
 bool resizingNodes = false;
-
+bool updatingScene = false;
 }  // namespace
 
 //==================================================================
@@ -355,6 +355,8 @@ void FxSchematicScene::setApplication(TApplication *app) {
 //------------------------------------------------------------------
 
 void FxSchematicScene::updateScene() {
+  if (updatingScene) return;
+  updatingScene = true;
   if (!views().empty()) m_disconnectionLinks.clearAll();
   m_connectionLinks.clearAll();
   m_selectionOldPos.clear();
@@ -462,6 +464,7 @@ void FxSchematicScene::updateScene() {
   updateEditedMacros(editedMacro);
   updateLink();
   m_nodesToPlace.clear();
+  updatingScene = false;
 }
 
 //------------------------------------------------------------------

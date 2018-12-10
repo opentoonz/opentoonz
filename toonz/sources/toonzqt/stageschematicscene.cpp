@@ -107,6 +107,7 @@ void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup) {
 }
 
 bool resizingNodes = false;
+bool updatingScene = false;
 }  // namespace
 
 //==================================================================
@@ -195,6 +196,8 @@ void StageSchematicScene::onSelectionSwitched(TSelection *oldSel,
 //------------------------------------------------------------------
 
 void StageSchematicScene::updateScene() {
+  if (updatingScene) return;
+  updatingScene = true;
   clearAllItems();
 
   QPointF firstPos = sceneRect().center();
@@ -352,6 +355,7 @@ void StageSchematicScene::updateScene() {
     }
   }
   m_nodesToPlace.clear();
+  updatingScene = false;
 }
 
 //------------------------------------------------------------------
