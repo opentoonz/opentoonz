@@ -1198,12 +1198,13 @@ void FxSchematicScene::reorderScene() {
 
   double middleY = (sceneCenter.y() + minY + step) * 0.5;
   placeNodeAndParents(xsh->getFxDag()->getXsheetFx(), maxX, maxX, middleY);
+  if (minY > middleY) minY = middleY - step;
 
   for (i = 0; i < fxSet->getFxCount(); i++) {
     TFx *fx = fxSet->getFx(i);
     if (m_placedFxs.contains(fx)) continue;
 
-    fx->getAttributes()->setDagNodePos(TPointD(sceneCenter.x() + 120, minY));
+    placeNodeAndParents(fx, (sceneCenter.x() + 120), maxX, minY);
     minY -= step;
   }
   updateScene();
