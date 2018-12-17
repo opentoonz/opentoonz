@@ -1688,10 +1688,13 @@ public:
 } ResetArrowCommand;
 
 //-----------------------------------------------------------------------------
+// Unify commands for all types of interpolation
+class SetInterpolation final : public MenuItemHandler {
+  TDoubleKeyframe::Type m_type;
 
-class UseLinearInterpolation final : public MenuItemHandler {
 public:
-  UseLinearInterpolation() : MenuItemHandler(MI_UseLinearInterpolation) {}
+  SetInterpolation(CommandId cmdId, TDoubleKeyframe::Type type)
+      : MenuItemHandler(cmdId), m_type(type) {}
 
   void execute() override {
     TApp *app    = TApp::instance();
@@ -1714,8 +1717,8 @@ public:
     TStageObject::Keyframe k1 = pegbar->getKeyframe(r1);
 
     for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
-      k0.m_channels[i].m_type     = TDoubleKeyframe::Linear;
-      k1.m_channels[i].m_prevType = TDoubleKeyframe::Linear;
+      k0.m_channels[i].m_type     = m_type;
+      k1.m_channels[i].m_prevType = m_type;
     }
     pegbar->setKeyframeWithoutUndo(r0, k0);
     pegbar->setKeyframeWithoutUndo(r1, k1);
@@ -1726,298 +1729,20 @@ public:
     TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
   }
 
-} UseLinearInterpolation;
-
-//-----------------------------------------------------------------------------
-
-class UseSpeedInOutInterpolation final : public MenuItemHandler {
-public:
-  UseSpeedInOutInterpolation()
-      : MenuItemHandler(MI_UseSpeedInOutInterpolation) {}
-
-  void execute() override {
-    TApp *app    = TApp::instance();
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-    int row      = app->getCurrentFrame()->getFrame();
-
-    TStageObjectId objectId = app->getCurrentObject()->getObjectId();
-    TStageObject *pegbar    = xsh->getStageObject(objectId);
-    if (!pegbar) return;
-
-    int r0, r1;
-    double ease0, ease1;
-
-    pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
-
-    KeyFrameHandleCommandUndo *undo =
-        new KeyFrameHandleCommandUndo(objectId, r0, r1);
-
-    TStageObject::Keyframe k0 = pegbar->getKeyframe(r0);
-    TStageObject::Keyframe k1 = pegbar->getKeyframe(r1);
-
-    for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
-      k0.m_channels[i].m_type     = TDoubleKeyframe::SpeedInOut;
-      k1.m_channels[i].m_prevType = TDoubleKeyframe::SpeedInOut;
-    }
-    pegbar->setKeyframeWithoutUndo(r0, k0);
-    pegbar->setKeyframeWithoutUndo(r1, k1);
-
-    TUndoManager::manager()->add(undo);
-
-    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-    TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
-  }
-
-} UseSpeedInOutInterpolation;
-
-//-----------------------------------------------------------------------------
-
-class UseEaseInOutInterpolation final : public MenuItemHandler {
-public:
-  UseEaseInOutInterpolation() : MenuItemHandler(MI_UseEaseInOutInterpolation) {}
-
-  void execute() override {
-    TApp *app    = TApp::instance();
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-    int row      = app->getCurrentFrame()->getFrame();
-
-    TStageObjectId objectId = app->getCurrentObject()->getObjectId();
-    TStageObject *pegbar    = xsh->getStageObject(objectId);
-    if (!pegbar) return;
-
-    int r0, r1;
-    double ease0, ease1;
-
-    pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
-
-    KeyFrameHandleCommandUndo *undo =
-        new KeyFrameHandleCommandUndo(objectId, r0, r1);
-
-    TStageObject::Keyframe k0 = pegbar->getKeyframe(r0);
-    TStageObject::Keyframe k1 = pegbar->getKeyframe(r1);
-
-    for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
-      k0.m_channels[i].m_type     = TDoubleKeyframe::EaseInOut;
-      k1.m_channels[i].m_prevType = TDoubleKeyframe::EaseInOut;
-    }
-    pegbar->setKeyframeWithoutUndo(r0, k0);
-    pegbar->setKeyframeWithoutUndo(r1, k1);
-
-    TUndoManager::manager()->add(undo);
-
-    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-    TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
-  }
-
-} UseEaseInOutInterpolation;
-
-//-----------------------------------------------------------------------------
-
-class UseEaseInOutPctInterpolation final : public MenuItemHandler {
-public:
-  UseEaseInOutPctInterpolation()
-      : MenuItemHandler(MI_UseEaseInOutPctInterpolation) {}
-
-  void execute() override {
-    TApp *app    = TApp::instance();
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-    int row      = app->getCurrentFrame()->getFrame();
-
-    TStageObjectId objectId = app->getCurrentObject()->getObjectId();
-    TStageObject *pegbar    = xsh->getStageObject(objectId);
-    if (!pegbar) return;
-
-    int r0, r1;
-    double ease0, ease1;
-
-    pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
-
-    KeyFrameHandleCommandUndo *undo =
-        new KeyFrameHandleCommandUndo(objectId, r0, r1);
-
-    TStageObject::Keyframe k0 = pegbar->getKeyframe(r0);
-    TStageObject::Keyframe k1 = pegbar->getKeyframe(r1);
-
-    for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
-      k0.m_channels[i].m_type     = TDoubleKeyframe::EaseInOutPercentage;
-      k1.m_channels[i].m_prevType = TDoubleKeyframe::EaseInOutPercentage;
-    }
-    pegbar->setKeyframeWithoutUndo(r0, k0);
-    pegbar->setKeyframeWithoutUndo(r1, k1);
-
-    TUndoManager::manager()->add(undo);
-
-    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-    TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
-  }
-
-} UseEaseInOutPctInterpolation;
-
-//-----------------------------------------------------------------------------
-
-class UseExponentialInterpolation final : public MenuItemHandler {
-public:
-  UseExponentialInterpolation()
-      : MenuItemHandler(MI_UseExponentialInterpolation) {}
-
-  void execute() override {
-    TApp *app    = TApp::instance();
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-    int row      = app->getCurrentFrame()->getFrame();
-
-    TStageObjectId objectId = app->getCurrentObject()->getObjectId();
-    TStageObject *pegbar    = xsh->getStageObject(objectId);
-    if (!pegbar) return;
-
-    int r0, r1;
-    double ease0, ease1;
-
-    pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
-
-    KeyFrameHandleCommandUndo *undo =
-        new KeyFrameHandleCommandUndo(objectId, r0, r1);
-
-    TStageObject::Keyframe k0 = pegbar->getKeyframe(r0);
-    TStageObject::Keyframe k1 = pegbar->getKeyframe(r1);
-
-    for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
-      k0.m_channels[i].m_type     = TDoubleKeyframe::Exponential;
-      k1.m_channels[i].m_prevType = TDoubleKeyframe::Exponential;
-    }
-    pegbar->setKeyframeWithoutUndo(r0, k0);
-    pegbar->setKeyframeWithoutUndo(r1, k1);
-
-    TUndoManager::manager()->add(undo);
-
-    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-    TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
-  }
-
-} UseExponentialInterpolation;
-
-//-----------------------------------------------------------------------------
-
-class UseExpressionInterpolation final : public MenuItemHandler {
-public:
-  UseExpressionInterpolation()
-      : MenuItemHandler(MI_UseExpressionInterpolation) {}
-
-  void execute() override {
-    TApp *app    = TApp::instance();
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-    int row      = app->getCurrentFrame()->getFrame();
-
-    TStageObjectId objectId = app->getCurrentObject()->getObjectId();
-    TStageObject *pegbar    = xsh->getStageObject(objectId);
-    if (!pegbar) return;
-
-    int r0, r1;
-    double ease0, ease1;
-
-    pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
-
-    KeyFrameHandleCommandUndo *undo =
-        new KeyFrameHandleCommandUndo(objectId, r0, r1);
-
-    TStageObject::Keyframe k0 = pegbar->getKeyframe(r0);
-    TStageObject::Keyframe k1 = pegbar->getKeyframe(r1);
-
-    for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
-      k0.m_channels[i].m_type     = TDoubleKeyframe::Expression;
-      k1.m_channels[i].m_prevType = TDoubleKeyframe::Expression;
-    }
-    pegbar->setKeyframeWithoutUndo(r0, k0);
-    pegbar->setKeyframeWithoutUndo(r1, k1);
-
-    TUndoManager::manager()->add(undo);
-
-    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-    TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
-  }
-
-} UseExpressionInterpolation;
-
-//-----------------------------------------------------------------------------
-
-class UseFileInterpolation final : public MenuItemHandler {
-public:
-  UseFileInterpolation() : MenuItemHandler(MI_UseFileInterpolation) {}
-
-  void execute() override {
-    TApp *app    = TApp::instance();
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-    int row      = app->getCurrentFrame()->getFrame();
-
-    TStageObjectId objectId = app->getCurrentObject()->getObjectId();
-    TStageObject *pegbar    = xsh->getStageObject(objectId);
-    if (!pegbar) return;
-
-    int r0, r1;
-    double ease0, ease1;
-
-    pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
-
-    KeyFrameHandleCommandUndo *undo =
-        new KeyFrameHandleCommandUndo(objectId, r0, r1);
-
-    TStageObject::Keyframe k0 = pegbar->getKeyframe(r0);
-    TStageObject::Keyframe k1 = pegbar->getKeyframe(r1);
-
-    for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
-      k0.m_channels[i].m_type     = TDoubleKeyframe::File;
-      k1.m_channels[i].m_prevType = TDoubleKeyframe::File;
-    }
-    pegbar->setKeyframeWithoutUndo(r0, k0);
-    pegbar->setKeyframeWithoutUndo(r1, k1);
-
-    TUndoManager::manager()->add(undo);
-
-    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-    TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
-  }
-
-} UseFileInterpolation;
-
-//-----------------------------------------------------------------------------
-
-class UseConstantInterpolation final : public MenuItemHandler {
-public:
-  UseConstantInterpolation() : MenuItemHandler(MI_UseConstantInterpolation) {}
-
-  void execute() override {
-    TApp *app    = TApp::instance();
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-    int row      = app->getCurrentFrame()->getFrame();
-
-    TStageObjectId objectId = app->getCurrentObject()->getObjectId();
-    TStageObject *pegbar    = xsh->getStageObject(objectId);
-    if (!pegbar) return;
-
-    int r0, r1;
-    double ease0, ease1;
-
-    pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
-
-    KeyFrameHandleCommandUndo *undo =
-        new KeyFrameHandleCommandUndo(objectId, r0, r1);
-
-    TStageObject::Keyframe k0 = pegbar->getKeyframe(r0);
-    TStageObject::Keyframe k1 = pegbar->getKeyframe(r1);
-
-    for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
-      k0.m_channels[i].m_type     = TDoubleKeyframe::Constant;
-      k1.m_channels[i].m_prevType = TDoubleKeyframe::Constant;
-    }
-    pegbar->setKeyframeWithoutUndo(r0, k0);
-    pegbar->setKeyframeWithoutUndo(r1, k1);
-
-    TUndoManager::manager()->add(undo);
-
-    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-    TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
-  }
-
-} UseConstantInterpolation;
+} UseLinearInterpolation(MI_UseLinearInterpolation, TDoubleKeyframe::Linear),
+    UseSpeedInOutInterpolation(MI_UseSpeedInOutInterpolation,
+                               TDoubleKeyframe::SpeedInOut),
+    UseEaseInOutInterpolation(MI_UseEaseInOutInterpolation,
+                              TDoubleKeyframe::EaseInOut),
+    UseEaseInOutPctInterpolation(MI_UseEaseInOutPctInterpolation,
+                                 TDoubleKeyframe::EaseInOutPercentage),
+    UseExponentialInterpolation(MI_UseExponentialInterpolation,
+                                TDoubleKeyframe::Exponential),
+    UseExpressionInterpolation(MI_UseExpressionInterpolation,
+                               TDoubleKeyframe::Expression),
+    UseFileInterpolation(MI_UseFileInterpolation, TDoubleKeyframe::File),
+    UseConstantInterpolation(MI_UseConstantInterpolation,
+                             TDoubleKeyframe::Constant);
 
 //===========================================================
 //    To Be Reworked
