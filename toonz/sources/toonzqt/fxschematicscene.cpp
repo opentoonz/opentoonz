@@ -1198,14 +1198,16 @@ void FxSchematicScene::reorderScene() {
 
   double middleY = (sceneCenter.y() + minY + step) * 0.5;
   placeNodeAndParents(xsh->getFxDag()->getXsheetFx(), maxX, maxX, middleY);
-  if (minY > middleY) minY = middleY - step;
+  y -= step;
+  minY = std::min(y, minY);
 
   for (i = 0; i < fxSet->getFxCount(); i++) {
     TFx *fx = fxSet->getFx(i);
     if (m_placedFxs.contains(fx)) continue;
 
     placeNodeAndParents(fx, (sceneCenter.x() + 120), maxX, minY);
-    minY -= step;
+    y -= step;
+    minY = std::min(y, minY);
   }
   updateScene();
 }
@@ -1252,8 +1254,23 @@ void FxSchematicScene::placeNodeAndParents(TFx *fx, double x, double &maxX,
       }
     }
   }
-  double y = minY;
-  fx->getAttributes()->setDagNodePos(TPointD(x, y));
+  double y        = minY;
+  TMacroFx *macro = dynamic_cast<TMacroFx *>(fx);
+  if (macro) {
+    int tmpY              = y;
+    std::vector<TFxP> fxs = macro->getFxs();
+    for (int j = 0; j < (int)fxs.size(); j++) {
+      TFx *macroFx = fxs[j].getPointer();
+      if (macroFx && !m_placedFxs.contains(macroFx)) {
+        placeNodeAndParents(macroFx, x, maxX, minY);
+        y -= step;
+        minY = std::min(y, minY);
+      }
+    }
+    tmpY = (minY + tmpY + step) * 0.5;
+    fx->getAttributes()->setDagNodePos(TPointD(x, tmpY));
+  } else
+    fx->getAttributes()->setDagNodePos(TPointD(x, y));
   if (fx->getOutputConnectionCount() == 0) minY -= step;
   x += 120;
   maxX = std::max(maxX, x);
@@ -1266,17 +1283,6 @@ void FxSchematicScene::placeNodeAndParents(TFx *fx, double x, double &maxX,
     if (!m_placedFxs.contains(outputFx) ||
         outputFx->getAttributes()->getDagNodePos().x < x) {
       placeNodeAndParents(outputFx, x, maxX, minY);
-
-      TMacroFx *macro = dynamic_cast<TMacroFx *>(outputFx);
-      if (macro) {
-        std::vector<TFxP> fxs = macro->getFxs();
-        for (int j = 0; j < (int)fxs.size(); j++) {
-          TFx *macroFx = fxs[j].getPointer();
-          if (macroFx && !m_placedFxs.contains(macroFx))
-            placeNodeAndParents(macroFx, x, maxX, minY);
-        }
-      }
-
       y -= step;
       minY = std::min(y, minY);
     }
