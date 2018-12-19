@@ -29,9 +29,6 @@
 // Glew include
 #include <GL/glew.h>
 
-// tcg includes
-#include "tcg/tcg_function_types.h"
-
 // Boost includes
 #include <boost/any.hpp>
 #include <boost/iterator/transform_iterator.hpp>
@@ -953,12 +950,9 @@ void ShaderFx::doCompute(TTile &tile, double frame,
       }
 
       ~TexturesStorage() {
-        typedef tcg::function<void (ShadingContext::*)(GLuint),
-                              &ShadingContext::unloadTexture>
-            UnloadFunc;
-
-        std::for_each(m_texIds.begin(), m_texIds.end(),
-                      tcg::bind1st(UnloadFunc(), m_ctx));
+        for (auto const &texId : m_texIds) {
+          m_ctx.unloadTexture(texId);
+        }
       }
 
       void load(const TRasterP &ras, GLuint texUnit) {

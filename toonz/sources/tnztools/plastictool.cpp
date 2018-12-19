@@ -45,7 +45,6 @@
 #include "tcg/tcg_macros.h"
 #include "tcg/tcg_point_ops.h"
 #include "tcg/tcg_list.h"
-#include "tcg/tcg_function_types.h"
 #include "tcg/tcg_iterator_ops.h"
 
 //****************************************************************************************
@@ -761,11 +760,9 @@ PlasticSkeletonP PlasticTool::skeleton() const {
 //------------------------------------------------------------------------
 
 PlasticSkeleton &PlasticTool::deformedSkeleton() {
-  typedef tcg::function<void (PlasticTool::*)(PlasticSkeleton &),
-                        &PlasticTool::updateDeformedSkeleton>
-      Func;
-
-  return m_deformedSkeleton(tcg::bind1st(Func(), *this));
+  return m_deformedSkeleton([this](PlasticSkeleton &deformedSkeleton) {
+    updateDeformedSkeleton(deformedSkeleton);
+  });
 }
 
 //------------------------------------------------------------------------

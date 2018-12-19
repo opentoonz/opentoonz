@@ -11,7 +11,6 @@
 // tcg includes
 #include "tcg/tcg_macros.h"
 #include "tcg/tcg_point_ops.h"
-#include "tcg/tcg_function_types.h"
 
 // boost includes
 #include <boost/unordered_set.hpp>
@@ -257,8 +256,9 @@ bool buildEdgeCuts(const TMeshImage &mi,
     static int testSingleMesh(const edges_container &edges) {
       assert(!edges.empty());
       return (std::find_if(edges.begin(), edges.end(),
-                           tcg::bind2nd(&differentMesh, edges.front())) ==
-              edges.end())
+                           [&edges](const MeshIndex &x) {
+                             return differentMesh(x, edges.front());
+                           }) == edges.end())
                  ? edges.front().m_meshIdx
                  : -1;
     }
@@ -318,7 +318,8 @@ bool buildEdgeCuts(const TMeshImage &mi,
       // one)
       int *ept, *epEnd = endPoints + 2;
 
-      ept = std::find_if(endPoints, epEnd, tcg::bind1st(&borderVertex, mesh));
+      ept = std::find_if(endPoints, epEnd,
+                         [&mesh](int v) { return borderVertex(mesh, v); });
       if (ept == epEnd) {
         // There is no boundary endpoint
         if (edges.size() < 2)  // We should not cut the mesh on a
@@ -568,8 +569,9 @@ void splitMesh(TMeshImage &mi, int meshIdx, int lastBoundaryVertex) {
   {
     const vertex_type &lbVx = mesh.vertex(lastBoundaryVertex);
 
-    vertex_type::edges_const_iterator et = std::find_if(
-        lbVx.edgesBegin(), lbVx.edgesEnd(), tcg::bind1st(&borderEdge, mesh));
+    vertex_type::edges_const_iterator et =
+        std::find_if(lbVx.edgesBegin(), lbVx.edgesEnd(),
+                     [&mesh](int e) { return borderEdge(mesh, e); });
     assert(et != lbVx.edgesEnd());
 
     e = *et;
@@ -619,7 +621,9 @@ bool cutMesh(TMeshImage &mi, const PlasticTool::MeshSelection &edgesSelection) {
   }
 
   // Cut edges, in the order specified by edgeCuts
-  std::for_each(ecBegin, edgeCuts.end(), tcg::bind1st(&cutEdge, mesh));
+  std::for_each(ecBegin, edgeCuts.end(), [&mesh](const EdgeCut &edgeCut) {
+    return cutEdge(mesh, edgeCut);
+  });
 
   // Finally, the mesh could have been split in 2 - we need to separate
   // the pieces if needed

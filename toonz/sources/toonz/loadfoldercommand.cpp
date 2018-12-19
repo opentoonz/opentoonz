@@ -30,9 +30,6 @@
 #include <QButtonGroup>
 #include <QRadioButton>
 
-// tcg includes
-#include "tcg/tcg_function_types.h"
-
 // boost includes
 #include <boost/optional.hpp>
 #include <boost/operators.hpp>
@@ -209,19 +206,15 @@ static const FormatData l_formatDatas[] = {
 typedef std::pair<Resource::Path, int> RsrcKey;
 typedef std::map<RsrcKey, Resource::CompSeq> RsrcMap;
 
-bool differentPath(const RsrcMap::value_type &a, const RsrcMap::value_type &b) {
+auto const differentPath = [](const RsrcMap::value_type &a,
+                              const RsrcMap::value_type &b) -> bool {
   return (a.first.first < b.first.first) || (b.first.first < a.first.first);
-}
+};
 
 struct buildResources_locals {
   static bool isValid(const RsrcMap::value_type &rsrcVal) {
     return (isLoadable(rsrcVal.first.first.m_relFp) && !rsrcVal.second.empty());
   }
-
-  typedef tcg::function<bool (*)(const RsrcMap::value_type &,
-                                 const RsrcMap::value_type &),
-                        &differentPath>
-      DifferentPath;
 
   static Resource toResource(const RsrcMap::value_type &rsrcVal) {
     return Resource(rsrcVal.first.first, rsrcVal.second);
@@ -334,12 +327,11 @@ void buildResources(std::vector<Resource> &resources, const TFilePath &rootPath,
     for (rt = rsrcMap.begin(); rt != rEnd; ++rt) locals::mergeInto(rt, rsrcMap);
 
     // Export valid data into the output resources collection
-    boost::copy(
-        rsrcMap | boost::adaptors::filtered(locals::isValid) |
-            boost::adaptors::adjacent_filtered(
-                locals::DifferentPath())  // E.g. A.xxxx.tga and Axxxx.tga
-            | boost::adaptors::transformed(locals::toResource),
-        std::back_inserter(resources));
+    boost::copy(rsrcMap | boost::adaptors::filtered(locals::isValid) |
+                    boost::adaptors::adjacent_filtered(
+                        differentPath)  // E.g. A.xxxx.tga and Axxxx.tga
+                    | boost::adaptors::transformed(locals::toResource),
+                std::back_inserter(resources));
   }
 
   // Look for level options associated to each level

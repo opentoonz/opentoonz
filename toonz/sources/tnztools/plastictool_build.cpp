@@ -14,7 +14,6 @@
 
 // tcg includes
 #include "tcg/tcg_point_ops.h"
-#include "tcg/tcg_function_types.h"
 
 #include "plastictool.h"
 

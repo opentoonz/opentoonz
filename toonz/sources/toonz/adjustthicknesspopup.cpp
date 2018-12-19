@@ -47,7 +47,6 @@
 
 // tcg includes
 #include "tcg/tcg_numeric_ops.h"
-#include "tcg/tcg_function_types.h"
 
 // boost includes
 #include <boost/iterator/counting_iterator.hpp>
@@ -1013,31 +1012,28 @@ AdjustThicknessUndo::AdjustThicknessUndo(const SelectionData &selData,
 //--------------------------------------------------------------
 
 void AdjustThicknessUndo::redo() const {
-  struct locals {
-    static void processFrame(const AdjustThicknessUndo &undo, int frameIdx) {
-      TXshSimpleLevel *sl = undo.m_selData.m_sl.getPointer();
-      assert(sl);
+  auto const processFrame = [this](int frameIdx) {
+    TXshSimpleLevel *sl = m_selData.m_sl.getPointer();
+    assert(sl);
 
-      const TFrameId &fid = sl->index2fid(frameIdx);
+    const TFrameId &fid = sl->index2fid(frameIdx);
 
-      // Backup input frame
-      TVectorImageP viIn = sl->getFullsampledFrame(fid, false);
-      if (!viIn) return;
+    // Backup input frame
+    TVectorImageP viIn = sl->getFullsampledFrame(fid, false);
+    if (!viIn) return;
 
-      undo.m_originalImages.push_back(ImageBackup(fid, viIn));
+    m_originalImages.push_back(ImageBackup(fid, viIn));
 
-      // Process required frame
-      TVectorImageP viOut = ::processFrame(
-          undo.m_selData, frameIdx, undo.m_fromTransform, undo.m_toTransform);
+    // Process required frame
+    TVectorImageP viOut = ::processFrame(
+        m_selData, frameIdx, m_fromTransform, m_toTransform);
 
-      sl->setFrame(fid, viOut);
+    sl->setFrame(fid, viOut);
 
-      // Ensure the level data is invalidated suitably
-      sl->setDirtyFlag(true);
-      IconGenerator::instance()->invalidate(sl, fid);
-    }
-
-  };  // locals
+    // Ensure the level data is invalidated suitably
+    sl->setDirtyFlag(true);
+    IconGenerator::instance()->invalidate(sl, fid);
+  };
 
   m_originalImages.clear();
 
@@ -1047,11 +1043,11 @@ void AdjustThicknessUndo::redo() const {
     std::for_each(
         boost::make_counting_iterator(0),
         boost::make_counting_iterator(m_selData.m_sl->getFrameCount()),
-        tcg::bind1st(&locals::processFrame, *this));
+        processFrame);
     break;
   case SelectionData::SELECTED_FRAMES:
     std::for_each(m_selData.m_frameIdxs.begin(), m_selData.m_frameIdxs.end(),
-                  tcg::bind1st(&locals::processFrame, *this));
+                  processFrame);
     break;
   }
 }

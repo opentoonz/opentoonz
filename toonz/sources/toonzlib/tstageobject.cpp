@@ -29,9 +29,6 @@
 // Qt includes
 #include <QMetaObject>
 
-// tcg includes
-#include "tcg/tcg_function_types.h"
-
 // STD includes
 #include <fstream>
 #include <set>
@@ -481,10 +478,7 @@ TStageObject::~TStageObject() {
 //-----------------------------------------------------------------------------
 
 const TStageObject::LazyData &TStageObject::lazyData() const {
-  typedef tcg::function<void (TStageObject::*)(LazyData &) const,
-                        &TStageObject::update>
-      Func;
-  return m_lazyData(tcg::bind1st(Func(), *this));
+  return m_lazyData([this](LazyData &ld) { this->update(ld); });
 }
 
 //-----------------------------------------------------------------------------

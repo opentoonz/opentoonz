@@ -15,7 +15,6 @@
 
 // tcg includes
 #include "tcg/tcg_numeric_ops.h"
-#include "tcg/tcg_function_types.h"
 
 // STD includes
 #include <cmath>
@@ -1272,9 +1271,7 @@ void VectorizerCore::applyFillColors(TRegion *r, const TRasterP &ras,
                                      TPalette *palette,
                                      const CenterlineConfiguration &c,
                                      int regionCount) {
-  struct locals {
-    static inline bool alwaysTrue(const TPixelCM32 &) { return true; }
-  };
+  auto const alwaysTrue = [](const TPixelCM32 &) { return true; };
 
   TRasterCM32P rt = ras;
   TRaster32P rr   = ras;
@@ -1306,29 +1303,40 @@ void VectorizerCore::applyFillColors(TRegion *r, const TRasterP &ras,
 
   bool tookPoint =
       isBrightRegion
-          ? rt
-                ? getInternalPoint(
-                      rt, tcg::bind2nd(cm_func(isBright), c.m_threshold),
-                      inverse, c, r,
-                      pd) ||  // If no bright pixel could be found,
-                      getInternalPoint(rt, locals::alwaysTrue, inverse, c, r,
-                                       pd)
-                :  // then any pixel inside the region
+          ? rt ? getInternalPoint(
+                     rt,
+                     std::bind(cm_func(isBright), std::placeholders::_1,
+                               c.m_threshold),
+                     inverse, c, r, pd) ||
+                     // If no bright pixel could be found,
+                     getInternalPoint(rt, alwaysTrue, inverse, c, r,
+                                      pd)
+               :  // then any pixel inside the region
                 rr ? getInternalPoint(
-                         rr, tcg::bind2nd(rgbm_func(isBright), c.m_threshold),
+                         rr,
+                         std::bind(rgbm_func(isBright), std::placeholders::_1,
+                                   c.m_threshold),
                          inverse, c, r, pd)
                    :  // must suffice.
                     getInternalPoint(
-                        rgr, tcg::bind2nd(gr_func(isBright), c.m_threshold),
+                        rgr,
+                        std::bind(gr_func(isBright), std::placeholders::_1,
+                                  c.m_threshold),
                         inverse, c, r, pd)
-          : rt ? getInternalPoint(rt,
-                                  tcg::bind2nd(cm_func(isDark), c.m_threshold),
-                                  inverse, c, r, pd)
+          : rt ? getInternalPoint(
+                     rt,
+                     std::bind(cm_func(isDark), std::placeholders::_1,
+                               c.m_threshold),
+                     inverse, c, r, pd)
                : rr ? getInternalPoint(
-                          rr, tcg::bind2nd(rgbm_func(isDark), c.m_threshold),
+                          rr,
+                          std::bind(rgbm_func(isDark), std::placeholders::_1,
+                                    c.m_threshold),
                           inverse, c, r, pd)
                     : getInternalPoint(
-                          rgr, tcg::bind2nd(gr_func(isDark), c.m_threshold),
+                          rgr,
+                          std::bind(gr_func(isDark), std::placeholders::_1,
+                                    c.m_threshold),
                           inverse, c, r, pd);
 
   if (tookPoint) {

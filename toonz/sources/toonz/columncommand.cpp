@@ -51,9 +51,6 @@
 #include <QApplication>
 #include <QClipboard>
 
-// tcg includes
-#include "tcg/tcg_function_types.h"
-
 #include <memory>
 
 //*************************************************************************
@@ -61,11 +58,6 @@
 //*************************************************************************
 
 namespace {
-
-bool filterNegatives(int c) { return (c < 0); }
-typedef tcg::function<bool (*)(int), filterNegatives> filterNegatives_fun;
-
-//-----------------------------------------------------------------------------
 
 bool canRemoveFx(const std::set<TFx *> &leaves, TFx *fx) {
   bool removeFx = false;

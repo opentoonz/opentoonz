@@ -3,9 +3,6 @@
 // TnzCore includes
 #include "tstream.h"
 
-// tcg includes
-#include "tcg/tcg_function_types.h"
-
 // STD includes
 #include <typeinfo>
 
@@ -26,16 +23,13 @@ TPersistSet::~TPersistSet() {
 //------------------------------------------------------------------
 
 void TPersistSet::insert(std::unique_ptr<TPersist> object) {
-  struct locals {
-    inline static bool sameType(TPersist *a, TPersist *b) {
-      return (typeid(*a) == typeid(*b));
-    }
+  auto const sameType = [&object](TPersist *x) {
+    return typeid(*object.get()) == typeid(*x);
   };
 
   // Remove any object with the same type id
   std::vector<TPersist *>::iterator pt =
-      std::remove_if(m_objects.begin(), m_objects.end(),
-                     tcg::bind1st(&locals::sameType, object.get()));
+      std::remove_if(m_objects.begin(), m_objects.end(), sameType);
 
   std::for_each(pt, m_objects.end(), std::default_delete<TPersist>());
   m_objects.erase(pt, m_objects.end());

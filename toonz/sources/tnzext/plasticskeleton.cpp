@@ -12,7 +12,6 @@
 // tcg includes
 #include "tcg/tcg_misc.h"
 #include "tcg/tcg_pool.h"
-#include "tcg/tcg_function_types.h"
 
 #include "ext/plasticskeleton.h"
 
