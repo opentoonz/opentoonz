@@ -14,7 +14,6 @@
 
 // tcg includes
 #include "tcg/tcg_point_ops.h"
-#include "tcg/tcg_algorithm.h"
 #include "tcg/tcg_function_types.h"
 #include "tcg/tcg_iterator_ops.h"
 
@@ -68,20 +67,17 @@ TPointD closestMeshVertexPos(const TPointD &pos, double *distance = 0) {
 //------------------------------------------------------------------------
 
 TPointD closestSkeletonVertexPos(const TPointD &pos) {
-  struct locals {
-    static inline double dist2(const TPointD &pos,
-                               const PlasticSkeletonVertex &vx) {
-      return tcg::point_ops::dist2(pos, vx.P());
-    }
-  };
-
   const PlasticSkeletonP &skeleton = l_plasticTool.skeleton();
   if (!skeleton || skeleton->empty()) return TConsts::napd;
 
   const PlasticSkeleton::vertices_container &vertices = skeleton->vertices();
 
-  return tcg::min_transform(vertices.begin(), vertices.end(),
-                            tcg::bind1st(&locals::dist2, pos))
+  return std::min_element(vertices.begin(), vertices.end(),
+                          [&pos](PlasticSkeleton::vertex_type const &x,
+                                 PlasticSkeleton::vertex_type const &y) {
+                            return tcg::point_ops::dist2(pos, x.P()) <
+                                   tcg::point_ops::dist2(pos, y.P());
+                          })
       ->P();
 }
 
