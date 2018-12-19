@@ -4,7 +4,6 @@
 #include "tstream.h"
 
 // tcg includes
-#include "tcg/tcg_deleter_types.h"
 #include "tcg/tcg_function_types.h"
 
 // STD includes
@@ -21,7 +20,7 @@ PERSIST_IDENTIFIER(TPersistSet, "persistSet")
 //------------------------------------------------------------------
 
 TPersistSet::~TPersistSet() {
-  std::for_each(m_objects.begin(), m_objects.end(), tcg::deleter<TPersist>());
+  std::for_each(m_objects.begin(), m_objects.end(), std::default_delete<TPersist>());
 }
 
 //------------------------------------------------------------------
@@ -38,7 +37,7 @@ void TPersistSet::insert(std::unique_ptr<TPersist> object) {
       std::remove_if(m_objects.begin(), m_objects.end(),
                      tcg::bind1st(&locals::sameType, object.get()));
 
-  std::for_each(pt, m_objects.end(), tcg::deleter<TPersist>());
+  std::for_each(pt, m_objects.end(), std::default_delete<TPersist>());
   m_objects.erase(pt, m_objects.end());
 
   // Push back the supplied object
