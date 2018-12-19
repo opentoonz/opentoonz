@@ -208,7 +208,7 @@ void DvTextEdit::createMiniToolBar() {
   m_sizeComboBox->setMinimumWidth(44);
 
   QFontDatabase db;
-  foreach (int size, db.standardSizes())
+  for (int size : db.standardSizes())
     m_sizeComboBox->addItem(QString::number(size));
 
   connect(m_sizeComboBox, SIGNAL(activated(const QString &)), this,

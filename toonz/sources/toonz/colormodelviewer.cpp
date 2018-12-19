@@ -118,7 +118,7 @@ void ColorModelViewer::dragEnterEvent(QDragEnterEvent *event) {
   const QMimeData *mimeData = event->mimeData();
   if (!acceptResourceDrop(mimeData->urls())) return;
 
-  foreach (QUrl url, mimeData->urls()) {
+  for (const QUrl &url : mimeData->urls()) {
     TFilePath fp(url.toLocalFile().toStdWString());
     std::string type = fp.getType();
     if (type == "scr" || type == "tpl") return;
@@ -133,7 +133,7 @@ void ColorModelViewer::dragEnterEvent(QDragEnterEvent *event) {
 void ColorModelViewer::dropEvent(QDropEvent *event) {
   const QMimeData *mimeData = event->mimeData();
   if (mimeData->hasUrls()) {
-    foreach (QUrl url, mimeData->urls()) {
+    for (const QUrl &url : mimeData->urls()) {
       TFilePath fp(url.toLocalFile().toStdWString());
       loadImage(fp);
       setLevel(fp);

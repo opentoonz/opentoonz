@@ -424,7 +424,7 @@ void DvDirTreeView::dropEvent(QDropEvent *e) {
   if (!folderNode || !folderNode->isFolder()) return;
   if (!mimeData->hasUrls()) return;
   int count = 0;
-  foreach (QUrl url, mimeData->urls()) {
+  for (const QUrl &url : mimeData->urls()) {
     TFilePath srcFp(url.toLocalFile().toStdWString());
     TFilePath dstFp = folderNode->getPath();
 

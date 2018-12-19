@@ -1578,8 +1578,7 @@ void FontParamField::findStyles(const QFont &font) {
   QString currentItem = m_styleCombo->currentText();
   m_styleCombo->clear();
 
-  QString style;
-  foreach (style, fontDatabase.styles(font.family()))
+  for (const QString &style : fontDatabase.styles(font.family()))
     m_styleCombo->addItem(style);
 
   int styleIndex = m_styleCombo->findText(currentItem);

@@ -695,7 +695,7 @@ bool CastBrowser::drop(const QMimeData *data) {
   if (data->hasUrls()) {
     IoCmd::LoadResourceArguments args;
 
-    foreach (const QUrl &url, data->urls()) {
+    for (const QUrl &url : data->urls()) {
       TFilePath fp(url.toLocalFile().toStdWString());
       args.resourceDatas.push_back(fp);
     }

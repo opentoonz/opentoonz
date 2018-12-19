@@ -1577,7 +1577,7 @@ bool FileBrowser::drop(const QMimeData *mimeData) {
     return true;
   } else if (mimeData->hasUrls()) {
     int count = 0;
-    foreach (QUrl url, mimeData->urls()) {
+    for (const QUrl &url : mimeData->urls()) {
       TFilePath srcFp(url.toLocalFile().toStdWString());
       TFilePath dstFp = srcFp.withParentDir(folderPath);
       if (dstFp != srcFp) {

@@ -342,7 +342,7 @@ QScriptValue Level::getFrameIds() {
   getFrameIds(fids);
   QScriptValue result = engine()->newArray();
   quint32 index       = 0;
-  foreach (TFrameId fid, fids) {
+  for (const TFrameId &fid : fids) {
     QString fidStr = QString::fromStdString(fid.expand());
     result.setProperty(index++, fidStr);
   }
