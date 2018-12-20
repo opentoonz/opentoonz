@@ -149,12 +149,6 @@ const unsigned int c_maxuint = (unsigned int)(~0U);
 #define DV_IMPORT_VAR
 #endif
 
-#ifdef _MSC_VER
-#define DV_ALIGNED(val) __declspec(align(val))
-#else
-#define DV_ALIGNED(val) __attribute__((aligned(val)))
-#endif
-
 inline short swapShort(short val) { return ((val >> 8) & 0x00ff) | (val << 8); }
 inline TINT32 swapTINT32(TINT32 val) {
   TINT32 appo, aux, aux1;

@@ -40,7 +40,7 @@ class TPixelGR16;
     A set of predefined colors are included as well.
     Note that channel ordering is platform depending. */
 
-class DVAPI DV_ALIGNED(4) TPixelRGBM32 {
+class DVAPI alignas(4) TPixelRGBM32 {
   TPixelRGBM32(TUINT32 mask) { *(TUINT32 *)this = mask; };
 
 public:
@@ -154,9 +154,9 @@ dithering
 //  Since SSE2 mostly require 16 byte aligned, changing 8 byte align to 4 byte
 //  align will not cause problems.
 #if defined(_MSC_VER) && !defined(x64)
-class DVAPI DV_ALIGNED(4) TPixelRGBM64 {
+class DVAPI alignas(4) TPixelRGBM64 {
 #else
-class DVAPI DV_ALIGNED(8) TPixelRGBM64 {
+class DVAPI alignas(8) TPixelRGBM64 {
 #endif
 public:
   static const int maxChannelValue;
