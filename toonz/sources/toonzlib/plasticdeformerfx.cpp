@@ -20,6 +20,7 @@
 
 // TnzBase includes
 #include "trenderer.h"
+#include "trasterfx.h"
 
 // TnzCore includes
 #include "tgl.h"
@@ -367,6 +368,15 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame,
       context->setShareContext(QOpenGLContext::currentContext());
     context->setFormat(QSurfaceFormat::defaultFormat());
     context->create();
+
+    // offscreen renderer has not been created yet. Force make one now
+    if (!info.m_offScreenSurface.get()) {
+      TRenderSettings *infoptr = (TRenderSettings *)&info;
+      infoptr->m_offScreenSurface.reset(new QOffscreenSurface());
+      infoptr->m_offScreenSurface->setFormat(QSurfaceFormat::defaultFormat());
+      infoptr->m_offScreenSurface->create();
+    }
+
     context->makeCurrent(info.m_offScreenSurface.get());
 
     TDimension d = tile.getRaster()->getSize();
