@@ -125,18 +125,23 @@ void OnioniSkinMaskGUI::addOnionSkinCommand(QMenu *menu, bool isFilmStrip) {
         menu->connect(extendOnionSkinToScene, SIGNAL(triggered()), &switcher,
                       SLOT(setWholeScene()));
       }
-      QAction *clearFixedOnionSkins = menu->addAction(
-          QString(QObject::tr("Clear All Fixed Onion Skin Markers")));
-      menu->connect(clearFixedOnionSkins, SIGNAL(triggered()), &switcher,
-                    SLOT(clearFOS()));
-      QAction *clearRelativeOnionSkins = menu->addAction(
-          QString(QObject::tr("Clear All Relative Onion Skin Markers")));
-      menu->connect(clearRelativeOnionSkins, SIGNAL(triggered()), &switcher,
-                    SLOT(clearMOS()));
-      QAction *clearAllOnionSkins =
-          menu->addAction(QString(QObject::tr("Clear All Onion Skin Markers")));
-      menu->connect(clearAllOnionSkins, SIGNAL(triggered()), &switcher,
-                    SLOT(clearOS()));
+      OnionSkinMask osm = switcher.getMask();
+      if (osm.getFosCount() || osm.getMosCount()) {
+        QAction *clearAllOnionSkins = menu->addAction(
+            QString(QObject::tr("Clear All Onion Skin Markers")));
+        menu->connect(clearAllOnionSkins, SIGNAL(triggered()), &switcher,
+                      SLOT(clearOS()));
+      }
+      if (osm.getFosCount() && osm.getMosCount()) {
+        QAction *clearFixedOnionSkins = menu->addAction(
+            QString(QObject::tr("Clear All Fixed Onion Skin Markers")));
+        menu->connect(clearFixedOnionSkins, SIGNAL(triggered()), &switcher,
+                      SLOT(clearFOS()));
+        QAction *clearRelativeOnionSkins = menu->addAction(
+            QString(QObject::tr("Clear All Relative Onion Skin Markers")));
+        menu->connect(clearRelativeOnionSkins, SIGNAL(triggered()), &switcher,
+                      SLOT(clearMOS()));
+      }
     }
   } else {
     QAction *activateOnionSkin =
