@@ -686,9 +686,44 @@ void FxSchematicScene::placeNode(FxSchematicNode *node) {
     node->getFx()->getAttributes()->setDagNodePos(TPointD(pos.x(), pos.y()));
     node->setPos(pos);
     return;
-  } else if (node->isA(eMacroFx) || node->isA(eNormalFx) ||
-             node->isA(eNormalLayerBlendingFx) || node->isA(eNormalMatteFx) ||
-             node->isA(eNormalImageAdjustFx)) {
+  } else if (node->isA(eMacroFx)) {
+    double minX = TConst::nowhere.x, minY = TConst::nowhere.y, maxY;
+    QPointF pos;
+    TMacroFx *macroFx     = dynamic_cast<TMacroFx *>(node->getFx());
+    std::vector<TFxP> fxs = macroFx->getFxs();
+    int k;
+    for (k = 0; k < (int)fxs.size(); k++) {
+      TFx *fx = fxs[k].getPointer();
+      if (fx->getAttributes()->getDagNodePos() == TConst::nowhere) continue;
+      if (QPointF(minX, minY) ==
+          QPointF(TConst::nowhere.x, TConst::nowhere.y)) {
+        minX = fx->getAttributes()->getDagNodePos().x;
+        minY = maxY = fx->getAttributes()->getDagNodePos().y;
+        continue;
+      }
+      minX = std::min(fx->getAttributes()->getDagNodePos().x, minX);
+      minY = std::min(fx->getAttributes()->getDagNodePos().y, minY);
+      maxY = std::max(fx->getAttributes()->getDagNodePos().y, maxY);
+    }
+    if (QPointF(minX, minY) == QPointF(TConst::nowhere.x, TConst::nowhere.y)) {
+      pos = sceneRect().center();
+      nodeRect.moveTopLeft(pos);
+      while (!isAnEmptyZone(nodeRect)) nodeRect.translate(0, -step);
+      pos = nodeRect.topLeft();
+    } else {
+      pos.setX(minX);
+      pos.setY((maxY + minY) / 2);
+    }
+    node->getFx()->getAttributes()->setDagNodePos(TPointD(pos.x(), pos.y()));
+    node->setPos(QPointF(pos));
+    if (m_nodesToPlace.contains(node->getFx())) {
+      QList<FxSchematicNode *> nodes = m_nodesToPlace[node->getFx()];
+      int i;
+      for (i = 0; i < nodes.size(); i++) placeNode(nodes[i]);
+    }
+    return;
+  } else if (node->isA(eNormalFx) || node->isA(eNormalLayerBlendingFx) ||
+             node->isA(eNormalMatteFx) || node->isA(eNormalImageAdjustFx)) {
     // I'm placing an effect or a macro
     TFx *inputFx = node->getFx()->getInputPort(0)->getFx();
     QPointF pos;
