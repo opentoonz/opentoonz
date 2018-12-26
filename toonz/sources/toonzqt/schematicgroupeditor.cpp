@@ -403,11 +403,14 @@ void FxSchematicMacroEditor::setGroupedNodeZValue(int zValue) {
 //---------------------------------------------------------------
 
 void FxSchematicMacroEditor::mouseMoveEvent(QGraphicsSceneMouseEvent *e) {
+  QPointF prevPos = pos();
   SchematicWindowEditor::mouseMoveEvent(e);
   if (m_button == Qt::LeftButton) {
-    TFx *root   = m_macro->getRoot();
-    TPointD pos = root->getAttributes()->getDagNodePos();
-    m_macro->getAttributes()->setDagNodePos(pos);
+    QPointF delta  = pos() - prevPos;
+    TFx *root      = m_macro->getRoot();
+    TPointD oldPos = m_macro->getAttributes()->getDagNodePos();
+    m_macro->getAttributes()->setDagNodePos(oldPos +
+                                            TPointD(delta.x(), delta.y()));
   }
 }
 
