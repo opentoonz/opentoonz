@@ -446,6 +446,23 @@ void FxSchematicScene::updateScene() {
     SchematicNode *node = addFxSchematicNode(fx);
     if (fx->getAttributes()->isGrouped())
       editedGroup[fx->getAttributes()->getEditingGroupId()].append(node);
+    // If adding an unedited macro and nodes are not yet set, let's position the
+    // internal nodes now
+    if (macro) {
+      double minY           = macro->getAttributes()->getDagNodePos().y;
+      double maxX           = macro->getAttributes()->getDagNodePos().x;
+      double y              = minY;
+      double x              = maxX;
+      std::vector<TFxP> fxs = macro->getFxs();
+      for (int j = 0; j < (int)fxs.size(); j++) {
+        TFx *macroFx = fxs[j].getPointer();
+        if (macroFx && !m_placedFxs.contains(macroFx)) {
+          placeNodeAndParents(macroFx, x, maxX, minY);
+          y -= (m_gridDimension == eLarge ? 100 : 50);
+          minY = std::min(y, minY);
+        }
+      }
+    }
   }
 
   // grouped node
