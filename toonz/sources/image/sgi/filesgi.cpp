@@ -1075,6 +1075,12 @@ public:
 
   void setProperties(TPropertyGroup *properties);
 
+  // m_header->zsize is updated with "Bits Per Pixel" property value in the
+  // function open()
+  bool writeAlphaSupported() const override {
+    return m_header && (m_header->zsize == 4);
+  }
+
 private:
   // not implemented
   SgiWriter(const SgiWriter &);

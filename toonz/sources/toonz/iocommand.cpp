@@ -2433,10 +2433,6 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
         // increment the number of loaded resources
         ++loadedCount;
 
-        // move the current column to right
-        col0++;
-        app->getCurrentColumn()->setColumnIndex(col0);
-
         // load the image data of all frames to cache at the beginning
         if (cachingBehavior != ON_DEMAND) {
           TXshSimpleLevel *simpleLevel = xl->getSimpleLevel();
@@ -2448,6 +2444,8 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
       }
     }
   }
+
+  if (loadedCount) app->getCurrentFrame()->setFrameIndex(row0);
 
   sb->data().m_loadedCount += loadedCount;
   sb->data().m_hasSoundLevel = sb->data().m_hasSoundLevel || isSoundLevel;

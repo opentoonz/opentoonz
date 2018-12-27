@@ -512,13 +512,16 @@ void RenderCommand::rasterRender(bool isPreview) {
 
   TPixel32 currBgColor = scene->getProperties()->getBgColor();
   m_priorBgColor       = currBgColor;
-  // fixes background colors for non alpha-enabled export types (eventually
+  // fixes background colors for non alpha-enabled movie types (eventually
   // transparent gif would be good)
-  if (ext == "jpg" || ext == "avi" || ext == "bmp" || ext == "mp4" ||
-      ext == "webm" || ext == "gif") {
-    currBgColor.m = 255;
+  currBgColor.m = 255;
+  if (isMovieType(ext)) {
     scene->getProperties()->setBgColor(currBgColor);
   }
+  // for non alpha-enabled images (like jpg), background color will be inserted
+  // in  TImageWriter::save() (see timage_io.cpp)
+  else
+    TImageWriter::setBackgroundColor(currBgColor);
 
   // Extract output properties
   TOutputProperties *prop = isPreview
@@ -618,6 +621,10 @@ TPixel32 RenderCommand::m_priorBgColor;
 void RenderCommand::resetBgColor() {
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   scene->getProperties()->setBgColor(m_priorBgColor);
+
+  // revert background color settings
+  TImageWriter::setBackgroundColor(
+      Preferences::instance()->getRasterBackgroundColor());
 }
 
 //===================================================================

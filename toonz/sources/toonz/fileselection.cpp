@@ -11,6 +11,7 @@
 #include "flipbook.h"
 #include "filebrowsermodel.h"
 #include "exportscenepopup.h"
+#include "separatecolorspopup.h"
 #include "tapp.h"
 
 #include "batches.h"
@@ -225,6 +226,7 @@ void FileSelection::enableCommands() {
   enableCommand(this, MI_ImportScenes, &FileSelection::importScenes);
   enableCommand(this, MI_ExportScenes, &FileSelection::exportScenes);
   enableCommand(this, MI_SelectAll, &FileSelection::selectAll);
+  enableCommand(this, MI_SeparateColors, &FileSelection::separateFilesByColors);
 }
 
 //------------------------------------------------------------------------
@@ -483,6 +485,25 @@ void FileSelection::collectAssets() {
     DVGui::info(QObject::tr("%1 assets imported").arg(collectedAssets));
   DvDirModel::instance()->refreshFolder(
       TProjectManager::instance()->getCurrentProjectPath().getParentDir());
+}
+
+//------------------------------------------------------------------------
+
+void FileSelection::separateFilesByColors() {
+  std::vector<TFilePath> files;
+  getSelectedFiles(files);
+  if (files.empty()) return;
+
+  static SeparateColorsPopup *popup = new SeparateColorsPopup();
+  if (popup->isConverting()) {
+    DVGui::MsgBox(INFORMATION, QObject::tr("A separation task is in progress! "
+                                           "wait until it stops or cancel it"));
+    return;
+  }
+  popup->setFiles(files);
+  popup->show();
+  popup->raise();
+  // popup->exec();
 }
 
 //------------------------------------------------------------------------

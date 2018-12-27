@@ -2188,6 +2188,7 @@ void SceneViewer::onLevelChanged() {
  * for Ink&Paint work properly
  */
 void SceneViewer::onLevelSwitched() {
+  invalidateToolStatus();
   TApp *app        = TApp::instance();
   TTool *tool      = app->getCurrentTool()->getTool();
   TXshLevel *level = app->getCurrentLevel()->getLevel();

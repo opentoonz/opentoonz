@@ -13,6 +13,7 @@
 #include "tconvert.h"
 
 #include <set>
+#include <QFont>
 
 #undef DVAPI
 #undef DVVAR
@@ -169,6 +170,7 @@ public:
     using namespace std;
     return to_string(getValue());
   }
+
   bool hasKeyframes() const override { return 0; };
   void getKeyframes(std::set<double> &) const override{};
   int getNextKeyframe(double) const override { return -1; };
@@ -280,6 +282,8 @@ template class DVAPI TPersistDeclarationT<TStringParam>;
 class DVAPI TStringParam final : public TNotAnimatableParam<std::wstring> {
   PERSIST_DECLARATION(TStringParam);
 
+  bool m_multiLine = false;
+
 public:
   TStringParam(std::wstring v = L"") : TNotAnimatableParam<std::wstring>(v) {}
   TStringParam(const TStringParam &src)
@@ -287,6 +291,9 @@ public:
   TParam *clone() const override { return new TStringParam(*this); }
   void loadData(TIStream &is) override;
   void saveData(TOStream &os) override;
+
+  void setMultiLineEnabled(bool enable) { m_multiLine = enable; }
+  bool isMultiLineEnabled() { return m_multiLine; }
 };
 
 DEFINE_PARAM_SMARTPOINTER(TStringParam, std::wstring)
@@ -392,6 +399,32 @@ private:
 };
 
 DEFINE_PARAM_SMARTPOINTER(TNADoubleParam, double)
+
+//=========================================================
+//
+//  class TFontParam
+//
+//=========================================================
+
+#ifdef _WIN32
+template class DVAPI TNotAnimatableParam<std::wstring>;
+class TFontParam;
+template class DVAPI TPersistDeclarationT<TFontParam>;
+#endif
+
+class DVAPI TFontParam final : public TNotAnimatableParam<std::wstring> {
+  PERSIST_DECLARATION(TFontParam);
+
+public:
+  TFontParam(std::wstring v = QFont().toString().toStdWString())
+      : TNotAnimatableParam<std::wstring>(v) {}
+  TFontParam(const TFontParam &src) : TNotAnimatableParam<std::wstring>(src) {}
+  TParam *clone() const override { return new TFontParam(*this); }
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
+};
+
+DEFINE_PARAM_SMARTPOINTER(TFontParam, std::wstring)
 
 //-----------------------------------------------------------------------------
 //  TNotAnimatableParamChangeUndo

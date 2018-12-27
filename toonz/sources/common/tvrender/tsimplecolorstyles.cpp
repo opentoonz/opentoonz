@@ -1,4 +1,5 @@
 
+#include <cstring>
 
 // TnzCore includes
 #include "tsystem.h"
@@ -91,19 +92,223 @@ TRaster32P makeTexture(const TRaster32P &ras) {
 
 //-----------------------------------------------------------------------------
 
-void drawAntialiasedOutline(const std::vector<TOutlinePoint> &_v,
-                            const TStroke *stroke) {
-  static const int stride = 2 * sizeof(TOutlinePoint);
+class OutlineBuilder {
+private:
+  double width;
+  int stage;
+  double stages[3][3];
+  double px, py, pz;
+  double ax, ay;
 
-  glEnableClientState(GL_VERTEX_ARRAY);
+  inline void next_stage(const double &x, const double &y, const double &z)
+    { stages[stage][0] = x; stages[stage][1] = y; stages[stage][2] = z; ++stage; }
 
-  glVertexPointer(2, GL_DOUBLE, stride, &_v[0]);
-  glDrawArrays(GL_LINE_STRIP, 0, _v.size() / 2);
+public:
+  std::vector<double> vertices;
 
-  glVertexPointer(2, GL_DOUBLE, stride, &_v[1]);
-  glDrawArrays(GL_LINE_STRIP, 0, _v.size() / 2);
+  explicit OutlineBuilder(double width, int count = 0):
+    width(width), stage(0), px(), py(), pz(), ax(), ay()
+  {
+    memset(stages, 0, sizeof(stages));
+    vertices.reserve(12*(count + 2));
+  }
 
-  glDisableClientState(GL_VERTEX_ARRAY);
+  void add(double x, double y, double z = 0.0) {
+    const double maxl = 4.0;
+
+    if (stage == 0) next_stage(x, y, z); else {
+      double bx = x - px;
+      double by = y - py;
+      double lb = sqrt(bx*bx + by*by);
+      if (lb < 1e-9)
+        return;
+      bx = width*bx/lb;
+      by = width*by/lb;
+
+      if (stage == 1) next_stage(x, y, z); else {
+        if (stage == 2) next_stage(x, y, z);
+        double l = fabs(ax + bx) > 1e-9 ? -(ay - by)/(ax + bx)
+                 : fabs(ay + by) > 1e-9 ?  (ax - bx)/(ay + by)
+                 : 0.0;
+        if (fabs(l) > maxl || fabs(l) < 1.0 || l > 0.0) {
+          vertices.resize(vertices.size() + 12);
+          double *p = &vertices.back() - 11;
+          p[ 0] = px;
+          p[ 1] = py;
+          p[ 2] = pz;
+          p[ 3] = px + ay;
+          p[ 4] = py - ax;
+          p[ 5] = pz;
+          p[ 6] = px;
+          p[ 7] = py;
+          p[ 8] = pz;
+          p[ 9] = px + by;
+          p[10] = py - bx;
+          p[11] = pz;
+        } else {
+          vertices.resize(vertices.size() + 6);
+          double *p = &vertices.back() - 5;
+          p[0] = px;
+          p[1] = py;
+          p[2] = pz;
+          p[3] = px - l*bx + by;
+          p[4] = py - l*by - bx;
+          p[5] = pz;
+        }
+      }
+
+      ax = bx; ay = by;
+    }
+
+    px = x; py = y; pz = z;
+  }
+
+  void finish() {
+    for(int i = 0; i < stage; ++i)
+      add(stages[i][0], stages[i][1], stages[i][2]);
+    stage = 0;
+  }
+
+  double get_width() const
+    { return width; }
+
+  void restart(double width) {
+    this->width = width;
+    stage = 0;
+    vertices.clear();
+  }
+
+  void invert()
+    { restart(-width); }
+};
+
+void vector4_div(double *v) {
+  double k = fabs(v[3]) > 1e-9 ? 1.0/v[3] : 0.0;
+  v[0] *= k, v[1] *= k, v[2] *= k; v[3] = 1.0;
+}
+
+void matrix4_x_vector4(double *dv, const double *m, const double *v) {
+  dv[0] = m[0]*v[0] + m[4]*v[1] + m[ 8]*v[2] + m[12]*v[3];
+  dv[1] = m[1]*v[0] + m[5]*v[1] + m[ 9]*v[2] + m[13]*v[3];
+  dv[2] = m[2]*v[0] + m[6]*v[1] + m[10]*v[2] + m[14]*v[3];
+  dv[3] = m[3]*v[0] + m[7]*v[1] + m[11]*v[2] + m[15]*v[3];
+}
+
+void matrix4_x_matrix4(double *dm, const double *ma, const double *mb) {
+  matrix4_x_vector4(dm +  0, ma, mb +  0);
+  matrix4_x_vector4(dm +  4, ma, mb +  4);
+  matrix4_x_vector4(dm +  8, ma, mb +  8);
+  matrix4_x_vector4(dm + 12, ma, mb + 12);
+}
+
+class AntialiasingOutlinePainter: public OutlineBuilder {
+private:
+  double matrix[16];
+  double projection_matrix[16];
+  double modelview_matrix[16];
+  double anti_viewport_matrix[16];
+
+public:
+  explicit AntialiasingOutlinePainter(int count = 0):
+    OutlineBuilder(1.0, 0)
+  {
+    memset(matrix, 0, sizeof(matrix));
+    memset(projection_matrix, 0, sizeof(projection_matrix));
+    memset(modelview_matrix, 0, sizeof(modelview_matrix));
+    memset(anti_viewport_matrix, 0, sizeof(anti_viewport_matrix));
+
+    // read transformations
+    double viewport[4] = {};
+    glGetDoublev(GL_VIEWPORT, viewport);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection_matrix);
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview_matrix);
+
+    double viewport_matrix[16] = {};
+    viewport_matrix[ 0] = 0.5*viewport[2];
+    viewport_matrix[ 5] = 0.5*viewport[3];
+    viewport_matrix[10] = 1.0;
+    viewport_matrix[12] = 0.5*viewport[2];
+    viewport_matrix[13] = 0.5*viewport[3];
+    viewport_matrix[15] = 1.0;
+
+    anti_viewport_matrix[ 0] = 2.0/viewport[2];
+    anti_viewport_matrix[ 5] = 2.0/viewport[3];
+    anti_viewport_matrix[10] = 1.0;
+    anti_viewport_matrix[12] = -1.0;
+    anti_viewport_matrix[13] = -1.0;
+    anti_viewport_matrix[15] = 1.0;
+
+    { double tmp[16] = {};
+      matrix4_x_matrix4(tmp, projection_matrix, modelview_matrix);
+      matrix4_x_matrix4(matrix, viewport_matrix, tmp); }
+  }
+
+  void add(double x, double y, double z = 0.0) {
+    double dest[4], src[4] = {x, y, z, 1.0};
+    matrix4_x_vector4(dest, matrix, src);
+    vector4_div(dest);
+    OutlineBuilder::add(dest[0], dest[1], dest[2]);
+  }
+
+  void finish() {
+    OutlineBuilder::finish();
+    if (vertices.empty())
+      return;
+    int count = (int)vertices.size()/6;
+
+    // prepare colors
+    float color[8] = {};
+    glGetFloatv(GL_CURRENT_COLOR, color);
+    memcpy(color+4, color, 3*sizeof(float));
+    std::vector<float> colors(8*count);
+    for(float *c = &colors[0], *ce = &colors.back(); c < ce; c += 8)
+      memcpy(c, color, sizeof(color));
+
+    // draw
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixd(anti_viewport_matrix);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    glVertexPointer(3, GL_DOUBLE, 0, &vertices.front());
+    glColorPointer(4, GL_FLOAT, 0, &colors.front());
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 2*count);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glLoadMatrixd(projection_matrix);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixd(modelview_matrix);
+
+    glColor4fv(color);
+    restart(get_width());
+  }
+};
+
+void drawAntialiasedOutline(
+    const std::vector<TOutlinePoint> &_v, const TStroke *stroke )
+{
+  if (_v.empty())
+    return;
+
+  const TOutlinePoint *begin = &_v.front(), *end = &_v.back();
+  assert(_v.size() % 2 == 0);
+
+  AntialiasingOutlinePainter outline(_v.size());
+  for(const TOutlinePoint *i = begin; i < end; i += 2)
+    outline.add(i->x, i->y);
+  for(const TOutlinePoint *i = end; i > begin; i -= 2)
+    outline.add(i->x, i->y);
+  outline.finish();
+
+  outline.invert();
+  for(const TOutlinePoint *i = begin; i < end; i += 2)
+    outline.add(i->x, i->y);
+  for(const TOutlinePoint *i = end; i > begin; i -= 2)
+    outline.add(i->x, i->y);
+  outline.finish();
 }
 
 }  // namespace

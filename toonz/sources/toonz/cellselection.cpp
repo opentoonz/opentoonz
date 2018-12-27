@@ -119,6 +119,7 @@ void deleteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1) {
       xsh->clearCells(r0, c, r1 - r0 + 1);
       TXshColumn *column = xsh->getColumn(c);
       if (column && column->isEmpty()) {
+        column->resetColumnProperties();
         TFx *fx = column->getFx();
         if (fx) {
           int i;
@@ -144,6 +145,7 @@ void cutCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1) {
     xsh->removeCells(r0, c, r1 - r0 + 1);
     TXshColumn *column = xsh->getColumn(c);
     if (column && column->isEmpty()) {
+      column->resetColumnProperties();
       TFx *fx = column->getFx();
       if (!fx) continue;
       int i;
@@ -1627,9 +1629,11 @@ void TCellSelection::pasteCells() {
       // (r0,c0)
       std::set<TKeyframeSelection::Position> positions;
       int newC0 = c0;
-      if (viewer && !viewer->orientation()->isVerticalTimeline())
+      if (viewer && !viewer->orientation()->isVerticalTimeline() && !cellData)
         newC0 = c0 - keyframeData->getColumnSpanCount() + 1;
-      positions.insert(TKeyframeSelection::Position(r0, newC0));
+      TKeyframeSelection::Position offset(keyframeData->getKeyframesOffset());
+      positions.insert(TKeyframeSelection::Position(r0 + offset.first,
+                                                    newC0 + offset.second));
       keyframeData->getKeyframes(positions);
       selection.select(positions);
 

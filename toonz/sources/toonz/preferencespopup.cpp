@@ -711,7 +711,7 @@ void PreferencesPopup::onStartupPopupChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onKeyframeTypeChanged(int index) {
-  m_pref->setKeyframeType(index + 2);
+  m_pref->setKeyframeType(index + 1);
 }
 //-----------------------------------------------------------------------------
 
@@ -1244,6 +1244,14 @@ void PreferencesPopup::onEnableWinInkChanged(int index) {
   m_pref->enableWinInk(index == Qt::Checked);
 }
 
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onRasterBackgroundColorChanged(const TPixel32 &color,
+                                                      bool isDragging) {
+  if (isDragging) return;
+  m_pref->setRasterBackgroundColor(color);
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1398,6 +1406,12 @@ PreferencesPopup::PreferencesPopup()
   m_editLevelFormat   = new QPushButton(tr("Edit"));
 
   m_importPolicy = new QComboBox;
+
+  //--- Saving ------------------------------
+  categoryList->addItem(tr("Saving"));
+
+  ColorField *rasterBackgroundColor =
+      new ColorField(this, false, m_pref->getRasterBackgroundColor());
 
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
@@ -1888,11 +1902,12 @@ PreferencesPopup::PreferencesPopup()
 
   //--- Animation ------------------------------
   QStringList list;
-  list << tr("Linear") << tr("Speed In / Speed Out") << tr("Ease In / Ease Out")
-       << tr("Ease In / Ease Out %");
+  list << tr("Constant") << tr("Linear") << tr("Speed In / Speed Out")
+       << tr("Ease In / Ease Out") << tr("Ease In / Ease Out %")
+       << tr("Exponential") << tr("Expression ") << tr("File");
   m_keyframeType->addItems(list);
   int keyframeType = m_pref->getKeyframeType();
-  m_keyframeType->setCurrentIndex(keyframeType - 2);
+  m_keyframeType->setCurrentIndex(keyframeType - 1);
   m_animationStepField->setValue(m_pref->getAnimationStep());
 
   //--- Preview ------------------------------
@@ -2245,6 +2260,37 @@ PreferencesPopup::PreferencesPopup()
     }
     loadingBox->setLayout(loadingFrameLay);
     stackedWidget->addWidget(loadingBox);
+
+    //--- Saving --------------------------
+    QWidget *savingBox          = new QWidget(this);
+    QVBoxLayout *savingFrameLay = new QVBoxLayout();
+    savingFrameLay->setMargin(15);
+    savingFrameLay->setSpacing(10);
+    {
+      QLabel *matteColorLabel =
+          new QLabel(tr("Matte color is used for background when overwriting "
+                        "raster levels with transparent pixels\nin non "
+                        "alpha-enabled image format."),
+                     this);
+      savingFrameLay->addWidget(matteColorLabel, 0, Qt::AlignLeft);
+
+      QGridLayout *savingGridLay = new QGridLayout();
+      savingGridLay->setVerticalSpacing(10);
+      savingGridLay->setHorizontalSpacing(15);
+      savingGridLay->setMargin(0);
+      {
+        savingGridLay->addWidget(new QLabel(tr("Matte color: "), this), 0, 0,
+                                 Qt::AlignRight);
+        savingGridLay->addWidget(rasterBackgroundColor, 0, 1, Qt::AlignLeft);
+      }
+      savingGridLay->setColumnStretch(0, 0);
+      savingGridLay->setColumnStretch(1, 1);
+      savingFrameLay->addLayout(savingGridLay, 0);
+
+      savingFrameLay->addStretch(1);
+    }
+    savingBox->setLayout(savingFrameLay);
+    stackedWidget->addWidget(savingBox);
 
     //--- Import/Export --------------------------
     QWidget *ioBox     = new QWidget(this);
@@ -2837,6 +2883,12 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(TApp::instance()->getCurrentScene(),
                        SIGNAL(importPolicyChanged(int)), this,
                        SLOT(onImportPolicyExternallyChanged(int)));
+
+  //--- Saving ----------------------
+  ret = ret &&
+        connect(rasterBackgroundColor,
+                SIGNAL(colorChanged(const TPixel32 &, bool)),
+                SLOT(onRasterBackgroundColorChanged(const TPixel32 &, bool)));
 
   //--- Import/Export ----------------------
   ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,

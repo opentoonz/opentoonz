@@ -306,6 +306,11 @@ public:
   void setIgnoreImageDpi(bool on);
   bool isIgnoreImageDpiEnabled() const { return m_ignoreImageDpi; }
 
+  // Saving tab
+
+  void setRasterBackgroundColor(const TPixel32 &color);
+  TPixel getRasterBackgroundColor() const { return m_rasterBackgroundColor; }
+
   // Drawing  tab
 
   void setScanLevelType(std::string s);
@@ -714,7 +719,7 @@ private:
   QString m_cursorBrushStyle;
   bool m_cursorOutlineEnabled = false;
 
-  TPixel32 m_currentColumnColor;
+  TPixel32 m_currentColumnColor, m_rasterBackgroundColor;
 
   bool m_enableWinInk                         = false;
   bool m_useOnionColorsForShiftAndTraceGhosts = false;

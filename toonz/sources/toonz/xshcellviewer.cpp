@@ -137,8 +137,7 @@ bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet) {
 
       std::string ext = level->getPath().getType();
       int type        = level->getType();
-      if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL ||
-          (type == OVL_XSHLEVEL && ext != "psd"))
+      if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL || type == OVL_XSHLEVEL)
         return true;
     }
 
@@ -829,8 +828,8 @@ void RenameCellField::renameCell() {
       }
 
       TXshLevel *xl = cell.m_level.getPointer();
-      if (!xl || (xl->getType() == OVL_XSHLEVEL &&
-                  xl->getPath().getFrame() == TFrameId::NO_FRAME)) {
+      if (!xl || (xl->getSimpleLevel() &&
+                  xl->getSimpleLevel()->getFirstFid() == TFrameId::NO_FRAME)) {
         cells.append(TXshCell());
         continue;
       }
@@ -3390,6 +3389,7 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
     menu.addAction(cmdManager->getAction(MI_SetAcceleration));
     menu.addAction(cmdManager->getAction(MI_SetDeceleration));
     menu.addAction(cmdManager->getAction(MI_SetConstantSpeed));
+    menu.addSeparator();
   } else {
     // Se le due chiavi non sono linear aggiungo il comando ResetInterpolation
     bool isR0FullK = pegbar->isFullKeyframe(r0);
@@ -3399,9 +3399,32 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
     TDoubleKeyframe::Type r1Type =
         pegbar->getParam(TStageObject::T_X)->getKeyframeAt(r1).m_prevType;
     if (isGlobalKeyFrameWithSameTypeDiffFromLinear(pegbar, r0) &&
-        isGlobalKeyFrameWithSamePrevTypeDiffFromLinear(pegbar, r1))
+        isGlobalKeyFrameWithSamePrevTypeDiffFromLinear(pegbar, r1)) {
       menu.addAction(cmdManager->getAction(MI_ResetInterpolation));
+      menu.addSeparator();
+    }
   }
+
+  TDoubleKeyframe::Type rType =
+      pegbar->getParam(TStageObject::T_X)->getKeyframeAt(r0).m_type;
+
+  if (rType != TDoubleKeyframe::Linear)
+    menu.addAction(cmdManager->getAction(MI_UseLinearInterpolation));
+  if (rType != TDoubleKeyframe::SpeedInOut)
+    menu.addAction(cmdManager->getAction(MI_UseSpeedInOutInterpolation));
+  if (rType != TDoubleKeyframe::EaseInOut)
+    menu.addAction(cmdManager->getAction(MI_UseEaseInOutInterpolation));
+  if (rType != TDoubleKeyframe::EaseInOutPercentage)
+    menu.addAction(cmdManager->getAction(MI_UseEaseInOutPctInterpolation));
+  if (rType != TDoubleKeyframe::Exponential)
+    menu.addAction(cmdManager->getAction(MI_UseExponentialInterpolation));
+  if (rType != TDoubleKeyframe::Expression)
+    menu.addAction(cmdManager->getAction(MI_UseExpressionInterpolation));
+  if (rType != TDoubleKeyframe::File)
+    menu.addAction(cmdManager->getAction(MI_UseFileInterpolation));
+  if (rType != TDoubleKeyframe::Constant)
+    menu.addAction(cmdManager->getAction(MI_UseConstantInterpolation));
+
 #ifdef LINETEST
   menu.addSeparator();
   int paramStep             = getParamStep(pegbar, r0);

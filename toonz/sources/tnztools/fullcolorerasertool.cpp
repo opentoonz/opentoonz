@@ -526,6 +526,8 @@ void FullColorEraserTool::leftButtonDown(const TPointD &pos,
 
 void FullColorEraserTool::leftButtonDrag(const TPointD &pos,
                                          const TMouseEvent &e) {
+  if (!m_mousePressed) return;
+
   m_brushPos = m_mousePos = pos;
   m_mouseEvent            = e;
   double pixelSize2       = getPixelSize() * getPixelSize();

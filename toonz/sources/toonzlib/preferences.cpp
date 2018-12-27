@@ -19,6 +19,7 @@
 #include "tundo.h"
 #include "tbigmemorymanager.h"
 #include "tfilepath.h"
+#include "timage_io.h"
 
 // Qt includes
 #include <QSettings>
@@ -345,7 +346,8 @@ Preferences::Preferences()
     , m_cursorOutlineEnabled(true)
     , m_currentColumnColor(TPixel::Black)
     , m_enableWinInk(false)
-    , m_useOnionColorsForShiftAndTraceGhosts(false) {
+    , m_useOnionColorsForShiftAndTraceGhosts(false)
+    , m_rasterBackgroundColor(TPixel::White) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -721,6 +723,9 @@ Preferences::Preferences()
   m_currentColumnColor = TPixel32(r, g, b);
 
   getValue(*m_settings, "winInkEnabled", m_enableWinInk);
+
+  getValue(*m_settings, "rasterBackgroundColor", m_rasterBackgroundColor);
+  TImageWriter::setBackgroundColor(m_rasterBackgroundColor);
 }
 
 //-----------------------------------------------------------------
@@ -1754,4 +1759,17 @@ void Preferences::setCurrentColumnData(const TPixel &currentColumnColor) {
 void Preferences::enableWinInk(bool on) {
   m_enableWinInk = on;
   m_settings->setValue("winInkEnabled", on ? "1" : "0");
+}
+
+void Preferences::setRasterBackgroundColor(const TPixel32 &color) {
+  m_rasterBackgroundColor = color;
+  TImageWriter::setBackgroundColor(m_rasterBackgroundColor);
+  m_settings->setValue("rasterBackgroundColor_R",
+                       QString::number((int)color.r));
+  m_settings->setValue("rasterBackgroundColor_G",
+                       QString::number((int)color.g));
+  m_settings->setValue("rasterBackgroundColor_B",
+                       QString::number((int)color.b));
+  m_settings->setValue("rasterBackgroundColor_M",
+                       QString::number((int)color.m));
 }

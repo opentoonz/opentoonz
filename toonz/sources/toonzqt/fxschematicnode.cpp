@@ -3116,6 +3116,7 @@ void FxSchematicColumnNode::onChangedSize(bool expand) {
   m_height = (m_isNormalIconView) ? 32 : 50;
   updateLinksGeometry();
   update();
+  emit nodeChangedSize();
 }
 
 //-----------------------------------------------------

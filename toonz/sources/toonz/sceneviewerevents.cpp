@@ -653,6 +653,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
       m_compareSettings.m_compareY     = ImagePainter::DefaultCompareValue;
       update();
       m_tabletEvent = false;
+      m_tabletState = None;
       return;
     } else if (abs((height() - m_pos.y()) -
                    height() * m_compareSettings.m_compareY) < 20) {
@@ -661,6 +662,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
       m_compareSettings.m_compareX     = ImagePainter::DefaultCompareValue;
       update();
       m_tabletEvent = false;
+      m_tabletState = None;
       return;
     } else
       m_compareSettings.m_dragCompareX = m_compareSettings.m_dragCompareY =
@@ -672,6 +674,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (!tool || !tool->isEnabled()) {
     m_tabletEvent = false;
+    m_tabletState = None;
     return;
   }
   tool->setViewer(this);
@@ -679,6 +682,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
     tool = TApp::instance()->getCurrentTool()->getTool();
     if (!tool || !tool->isEnabled()) {
       m_tabletEvent = false;
+      m_tabletState = None;
       return;
     }
     tool->setViewer(this);
@@ -985,6 +989,8 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
 
 void SceneViewer::touchEvent(QTouchEvent *e, int type) {
   if (type == QEvent::TouchBegin) {
+    if (m_tabletEvent) return;
+
     m_touchActive   = true;
     m_firstPanPoint = e->touchPoints().at(0).pos();
     m_undoPoint     = m_firstPanPoint;

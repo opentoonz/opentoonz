@@ -1159,9 +1159,12 @@ void RasterSelection::pasteSelection(const RasterImageData *riData) {
 void RasterSelection::pasteSelection() {
   TTool::Application *app = TTool::getApplication();
   TTool *tool             = app->getCurrentTool()->getTool();
-  TImageP image           = tool->getImage(true);
-  m_currentImage          = image;
-  m_fid                   = tool->getCurrentFid();
+  TImageP image           = tool->touchImage();
+
+  if (!image) return;
+
+  m_currentImage = image;
+  m_fid          = tool->getCurrentFid();
 
   QClipboard *clipboard = QApplication::clipboard();
   const RasterImageData *riData =

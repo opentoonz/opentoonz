@@ -159,6 +159,8 @@ set(MOC_HEADERS
 	autoinputcellnumberpopup.h
 	colormodelbehaviorpopup.h
 	boardsettingspopup.h
+	separatecolorsswatch.h
+	separatecolorspopup.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -333,6 +335,8 @@ set(SOURCES
 	autoinputcellnumberpopup.cpp
 	colormodelbehaviorpopup.cpp
 	boardsettingspopup.cpp
+	separatecolorsswatch.cpp
+	separatecolorspopup.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp

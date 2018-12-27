@@ -1892,6 +1892,7 @@ void StageSchematicColumnNode::onChangedSize(bool expand) {
   updatePortsPosition();
   updateLinksGeometry();
   update();
+  emit nodeChangedSize();
 }
 
 //--------------------------------------------------------

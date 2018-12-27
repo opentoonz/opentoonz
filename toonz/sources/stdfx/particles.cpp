@@ -249,9 +249,9 @@ void Particle::create_Swing(const particles_values &values,
                          random.getFloat() * (ranges.rotsca_range)));
     smperioda = changesigna;
   }
-  signx = random.getInt(0, 1) > 0 ? 1 : -1;
-  signy = random.getInt(0, 1) > 0 ? 1 : -1;
-  signa = random.getInt(0, 1) > 0 ? 1 : -1;
+  signx = random.getBool() ? 1 : -1;
+  signy = random.getBool() ? 1 : -1;
+  signa = random.getBool() ? 1 : -1;
 }
 
 /*-----------------------------------------------------------------*/

@@ -2013,6 +2013,23 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_ResetInterpolation, tr("Reset Interpolation"),
                              "");
 
+  createRightClickMenuAction(MI_UseLinearInterpolation,
+                             tr("Linear Interpolation"), "");
+  createRightClickMenuAction(MI_UseSpeedInOutInterpolation,
+                             tr("Speed In / Speed Out Interpolation"), "");
+  createRightClickMenuAction(MI_UseEaseInOutInterpolation,
+                             tr("Ease In / Ease Out Interpolation"), "");
+  createRightClickMenuAction(MI_UseEaseInOutPctInterpolation,
+                             tr("Ease In / Ease Out (%) Interpolation"), "");
+  createRightClickMenuAction(MI_UseExponentialInterpolation,
+                             tr("Exponential Interpolation"), "");
+  createRightClickMenuAction(MI_UseExpressionInterpolation,
+                             tr("Expression Interpolation"), "");
+  createRightClickMenuAction(MI_UseFileInterpolation, tr("File Interpolation"),
+                             "");
+  createRightClickMenuAction(MI_UseConstantInterpolation,
+                             tr("Constant Interpolation"), "");
+
   createRightClickMenuAction(MI_FoldColumns, tr("Fold Column"), "");
 
   createRightClickMenuAction(MI_ActivateThisColumnOnly, tr("Show This Only"),
@@ -2045,6 +2062,8 @@ void MainWindow::defineActions() {
   /*-- カレントカラムの右側のカラムを全て非表示にするコマンド --*/
   createRightClickMenuAction(MI_DeactivateUpperColumns,
                              tr("Hide Upper Columns"), "");
+
+  createRightClickMenuAction(MI_SeparateColors, tr("Separate Colors..."), "");
 
   createToolAction(T_Edit, "edit", tr("Animate Tool"), "A");
   createToolAction(T_Selection, "selection", tr("Selection Tool"), "S");
@@ -2313,9 +2332,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2440,9 +2459,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2469,9 +2488,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene)
-            ? MI_ClearRecentScene
-            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
+                                                        ? MI_ClearRecentLevel
+                                                        : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

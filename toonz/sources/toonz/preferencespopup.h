@@ -220,6 +220,7 @@ private slots:
   void onCursorOutlineChanged(int);
   void onCurrentColumnDataChanged(const TPixel32 &, bool isDragging);
   void onEnableWinInkChanged(int index);
+  void onRasterBackgroundColorChanged(const TPixel32 &, bool isDragging);
 };
 
 //**********************************************************************************
