@@ -594,7 +594,12 @@ public:
     return (1 + v * 0.001) * getCameraSize();
   }
   double convertFrom(double v) const override {
-    return (v / getCameraSize() - 1) * 1000.0;
+    // prevent camera z from being 0 which causes crash
+    double val = (v / getCameraSize() - 1) * 1000.0;
+    if (val >= -1000.0)
+      return std::max(-999.9, val);
+    else
+      return std::min(-1000.1, val);
   }
 };
 
