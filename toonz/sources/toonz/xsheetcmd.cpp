@@ -866,6 +866,7 @@ void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col,
 //-----------------------------------------------------------------------------
 
 static void drawingSubstituion(int dir) {
+  Preferences *pref         = Preferences::instance();
   TCellSelection *selection = dynamic_cast<TCellSelection *>(
       TTool::getApplication()->getCurrentSelection()->getSelection());
   TCellSelection::Range range;
@@ -877,11 +878,45 @@ static void drawingSubstituion(int dir) {
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
 
-  DrawingSubtitutionUndo *undo =
-      new DrawingSubtitutionUndo(dir, range, row, col, selected);
-  TUndoManager::manager()->add(undo);
+  if (pref->isAnimationSheetEnabled() && pref->isAutoStretchEnabled()) {
+    if (!selected) {
+      range.m_c0 = range.m_c1 = col;
+      range.m_r0 = range.m_r1 = row;
+      selected                = true;
+    }
 
-  undo->redo();
+    TXsheet *xsh =
+        TTool::getApplication()->getCurrentScene()->getScene()->getXsheet();
+
+    TUndoManager::manager()->beginBlock();
+
+    for (int c = range.m_c0; c <= range.m_c1; c++) {
+      int r1        = range.m_r1;
+      TXshCell cell = xsh->getCell(r1, c);
+
+      if (!cell.isEmpty())
+        while (xsh->getCell((r1 + 1), c) == cell) r1++;
+
+      TCellSelection::Range tmpRange;
+      tmpRange.m_c0 = tmpRange.m_c1 = c;
+      tmpRange.m_r0                 = range.m_r0;
+      tmpRange.m_r1                 = r1;
+
+      DrawingSubtitutionUndo *undo =
+          new DrawingSubtitutionUndo(dir, tmpRange, row, col, selected);
+      TUndoManager::manager()->add(undo);
+
+      undo->redo();
+    }
+
+    TUndoManager::manager()->endBlock();
+  } else {
+    DrawingSubtitutionUndo *undo =
+        new DrawingSubtitutionUndo(dir, range, row, col, selected);
+    TUndoManager::manager()->add(undo);
+
+    undo->redo();
+  }
 }
 
 static void drawingSubstituionGroup(int dir) {
