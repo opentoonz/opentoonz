@@ -15,7 +15,6 @@
 
 #include "tapp.h"
 #include "toonz/tscenehandle.h"
-#include "toonz/toonzscene.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -1061,16 +1060,19 @@ void DvDirModelRootNode::refreshChildren() {
     child = new DvDirModelSpecialFileFolderNode(this, L"My Documents",
                                                 getMyDocumentsPath());
     child->setPixmap(svgToPixmap(":Resources/my_documents.svg"));
+    m_specialNodes.push_back(child);
     addChild(child);
 
     child =
         new DvDirModelSpecialFileFolderNode(this, L"Desktop", getDesktopPath());
     child->setPixmap(svgToPixmap(":Resources/desktop.svg"));
+    m_specialNodes.push_back(child);
     addChild(child);
 
     child = new DvDirModelSpecialFileFolderNode(
         this, L"Library", ToonzFolder::getLibraryFolder());
     child->setPixmap(svgToPixmap(":Resources/library.svg"));
+    m_specialNodes.push_back(child);
     addChild(child);
 
     addChild(new DvDirModelHistoryNode(this));
@@ -1188,6 +1190,12 @@ DvDirModelNode *DvDirModelRootNode::getNodeByPath(const TFilePath &path) {
   if (priority == Preferences::ProjectFolderAliases &&
       !m_sceneFolderNode->getPath().isEmpty()) {
     node = m_sceneFolderNode->getNodeByPath(path);
+    if (node) return node;
+  }
+
+  // check for the special folders (My Documents / Desktop / Library)
+  for (DvDirModelSpecialFileFolderNode *specialNode : m_specialNodes) {
+    DvDirModelNode *node = specialNode->getNodeByPath(path);
     if (node) return node;
   }
 

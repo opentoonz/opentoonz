@@ -342,7 +342,9 @@ TFilePath LevelUpdater::getNewTemporaryFilePath(const TFilePath &fp) {
   int count = 1;
 
   for (;;) {
-    fp2 = fp.withName(fp.getWideName() + L"__" + std::to_wstring(count++));
+    // changed the temporary name as the previous naming (like
+    // "filename__1.png") had been misteken as sequential images
+    fp2 = fp.withName(fp.getWideName() + L"_ottmp" + std::to_wstring(count++));
     if (!TSystem::doesExistFileOrLevel(fp2)) break;
   }
 

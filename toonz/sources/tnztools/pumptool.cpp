@@ -546,7 +546,7 @@ void PumpTool::onLeave() {
 //*****************************************************************************
 
 double PumpTool::actionRadius(double strokeLength) {
-  double toolSize         = std::max(m_toolSize.getValue(), 5.0);
+  double toolSize         = m_toolSize.getValue();
   double toolPercent      = toolSize * 0.01;
   double interpolationVal = pow(toolPercent, 5);
   double indipendentValue = 7.0 * toolSize;

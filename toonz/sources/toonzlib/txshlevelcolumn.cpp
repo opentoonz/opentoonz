@@ -91,6 +91,8 @@ TXshColumn *TXshLevelColumn::clone() const {
   column->setOpacity(getOpacity());
   column->m_cells = m_cells;
   column->m_first = m_first;
+  column->setColorTag(getColorTag());
+  column->setFilterColorId(getFilterColorId());
 
   // column->updateIcon();
   return column;

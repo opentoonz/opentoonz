@@ -295,7 +295,7 @@ class TypeTool final : public TTool {
   TEnumProperty m_typeFaceMenu;
   TBoolProperty m_vertical;
   TEnumProperty m_size;
-  TPropertyGroup m_prop;
+  TPropertyGroup m_prop[2];
 
   // valori correnti di alcune Properties,
   // duplicati per permettere controlli sulla validita' o per ottimizzazione
@@ -389,7 +389,9 @@ public:
 
   bool onPropertyChanged(std::string propertyName) override;
 
-  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override {
+    return &m_prop[targetType];
+  }
 
   int getColorClass() const { return 1; }
 
@@ -421,15 +423,15 @@ TypeTool::TypeTool()
     , m_size("Size:")                            // W_ToolOptions_Size
     , m_undo(0) {
   bind(TTool::CommonLevels | TTool::EmptyTarget);
-  m_prop.bind(m_fontFamilyMenu);
+  m_prop[0].bind(m_fontFamilyMenu);
   // Su mac non e' visibile il menu dello style perche' e' stato inserito nel
   // nome
   // della font.
   //#ifndef MACOSX
-  m_prop.bind(m_typeFaceMenu);
+  m_prop[1].bind(m_typeFaceMenu);
   //#endif
-  m_prop.bind(m_size);
-  m_prop.bind(m_vertical);
+  m_prop[1].bind(m_size);
+  m_prop[1].bind(m_vertical);
   m_vertical.setId("Orientation");
   m_fontFamilyMenu.setId("TypeFont");
   m_typeFaceMenu.setId("TypeStyle");
@@ -537,6 +539,9 @@ void TypeTool::initTypeFaces() {
        it != typefaces.end(); ++it)
     m_typeFaceMenu.addValue(*it);
   if (m_typeFaceMenu.isValue(oldTypeface)) m_typeFaceMenu.setValue(oldTypeface);
+
+  TTool::getApplication()->getCurrentTool()->notifyToolComboBoxListChanged(
+      m_typeFaceMenu.getName());
 }
 
 //---------------------------------------------------------
@@ -1611,6 +1616,7 @@ bool TypeTool::keyDown(QKeyEvent *event) {
     break;
 
   default:
+    if (unicodeChar.empty()) return false;
     replaceText(unicodeChar, m_cursorIndex, m_cursorIndex);
     m_cursorIndex++;
     m_preeditRange = std::make_pair(m_cursorIndex, m_cursorIndex);

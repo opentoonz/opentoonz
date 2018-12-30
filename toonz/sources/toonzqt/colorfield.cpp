@@ -203,6 +203,7 @@ ChannelField::ChannelField(QWidget *parent, const QString &string, int value,
 
   m_channelSlider->setRange(0, maxValue);
   m_channelSlider->setValue(value);
+  if (sliderWidth > 0) m_channelSlider->setFixedWidth(sliderWidth);
 
   //----layout
   QGridLayout *mainLayout = new QGridLayout(this);
@@ -339,7 +340,7 @@ ColorField::ColorFieldEditorController *ColorField::m_editorController = 0;
                 Return ColorField current color.
 */
 ColorField::ColorField(QWidget *parent, bool isAlphaActive, TPixel32 color,
-                       int squareSize, bool useStyleEditor)
+                       int squareSize, bool useStyleEditor, int sliderWidth)
     : QWidget(parent)
     , m_color(color)
     , m_notifyEditingChange(true)
@@ -355,16 +356,20 @@ ColorField::ColorField(QWidget *parent, bool isAlphaActive, TPixel32 color,
 
   m_colorSample = new StyleSample(this, squareSize, squareSize);
   m_colorSample->setColor(m_color);
-  m_redChannel = new ChannelField(this, tr("R:"), m_color.r);
+  m_redChannel =
+      new ChannelField(this, tr("R:"), m_color.r, 255, false, 13, sliderWidth);
   connect(m_redChannel, SIGNAL(valueChanged(int, bool)),
           SLOT(onRedChannelChanged(int, bool)));
-  m_greenChannel = new ChannelField(this, tr("G:"), m_color.g);
+  m_greenChannel =
+      new ChannelField(this, tr("G:"), m_color.g, 255, false, 13, sliderWidth);
   connect(m_greenChannel, SIGNAL(valueChanged(int, bool)),
           SLOT(onGreenChannelChanged(int, bool)));
-  m_blueChannel = new ChannelField(this, tr("B:"), m_color.b);
+  m_blueChannel =
+      new ChannelField(this, tr("B:"), m_color.b, 255, false, 13, sliderWidth);
   connect(m_blueChannel, SIGNAL(valueChanged(int, bool)),
           SLOT(onBlueChannelChanged(int, bool)));
-  m_alphaChannel = new ChannelField(this, tr("A:"), m_color.m);
+  m_alphaChannel =
+      new ChannelField(this, tr("A:"), m_color.m, 255, false, 13, sliderWidth);
   connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
           SLOT(onAlphaChannelChanged(int, bool)));
 

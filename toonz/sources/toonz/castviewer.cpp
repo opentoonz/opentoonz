@@ -17,7 +17,6 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/levelset.h"
 #include "toonz/toonzscene.h"
-#include "toonz/levelset.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
 

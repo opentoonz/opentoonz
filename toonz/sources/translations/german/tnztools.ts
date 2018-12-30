@@ -96,7 +96,7 @@
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>Härte:</translation>
+        <translation type="vanished">Härte:</translation>
     </message>
     <message>
         <source>Accuracy:</source>
@@ -144,7 +144,7 @@
     </message>
     <message>
         <source>Pencil</source>
-        <translation>Bleistift Modus</translation>
+        <translation type="vanished">Bleistift Modus</translation>
     </message>
     <message>
         <source>Pressure</source>
@@ -220,22 +220,6 @@
     </message>
     <message>
         <source>Med</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Draw Order:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Over All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Under All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Palette Order</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1341,6 +1325,33 @@ Möchten Sie fortfahren?</translation>
         <source>Link</source>
         <translation>Seitenverhältnis festlegen</translation>
     </message>
+    <message>
+        <source>Scale</source>
+        <translation type="unfinished">Maßstab</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished">Position</translation>
+    </message>
+</context>
+<context>
+    <name>ShiftTraceToolOptionBox</name>
+    <message>
+        <source>Reset Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Following</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Following Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SkeletonTool</name>
@@ -1418,6 +1429,53 @@ Möchten Sie fortfahren?</translation>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished">Größe</translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation type="unfinished">Härte:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation type="unfinished">Vorlage:</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pencil</source>
+        <translation type="unfinished">Bleistift Modus</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation type="unfinished">Druck</translation>
     </message>
 </context>
 <context>

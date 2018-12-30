@@ -180,11 +180,12 @@
       <file>Resources/spline_parent_port.svg</file>
       <file>Resources/schematic_prev_eye.png</file>
       <file>Resources/schematic_table_view.png</file>
-      <file>Resources/schematic_table_view_transp.png</file>      
+      <file>Resources/schematic_table_view_transp.png</file>
       <file>Resources/fxport_red.svg</file>
       <file>Resources/fxport_blue.svg</file>
       <file>Resources/cachefx.png</file>
       <file>Resources/schematic_link.svg</file>
+      <file>Resources/schematic_link_small.svg</file>
       <file>Resources/schematic_thumbtoggle_on.svg</file>
       <file>Resources/schematic_thumbtoggle_off.svg</file>
       <file>Resources/dragcursor_exp_text.png</file>
@@ -313,5 +314,8 @@
       <file>Resources/switchport_off.svg</file>
       <file>Resources/switchport_over.svg</file>
       <file>Resources/plus.svg</file>
+      <file>Resources/iconifynodes_on.svg</file>
+      <file>Resources/iconifynodes_off.svg</file>
+      <file>Resources/iconifynodes_over.svg</file>
     </qresource>
 </RCC>

@@ -599,5 +599,11 @@ if(BUILD_ENV_APPLE)
         $<TARGET_FILE:executable>
     )
     # add capability for retina displays
-    set_target_properties(OpenToonz_1.2 PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
+    set_target_properties(OpenToonz PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
+endif()
+
+if(BUILD_ENV_UNIXLIKE)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xdg-data/io.github.OpenToonz.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/metainfo)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xdg-data/io.github.OpenToonz.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xdg-data/io.github.OpenToonz.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)
 endif()

@@ -5,7 +5,6 @@
 #include "xsheetdragtool.h"
 #include "toutputproperties.h"
 #include "tapp.h"
-#include "toutputproperties.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/toonzscene.h"

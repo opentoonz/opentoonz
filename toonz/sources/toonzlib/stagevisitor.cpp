@@ -49,6 +49,7 @@
 #include "toonz/txshleveltypes.h"
 #include "imagebuilders.h"
 #include "toonz/tframehandle.h"
+#include "toonz/preferences.h"
 
 // Qt includes
 #include <QImage>
@@ -228,6 +229,12 @@ void Picker::setDistance(double d) { m_minDist2 = d * d; }
 //-----------------------------------------------------------------------------
 
 void Picker::onImage(const Stage::Player &player) {
+  // if m_currentColumnIndex is other than the default value (-1),
+  // then pick only the current column.
+  if (m_currentColumnIndex != -1 &&
+      m_currentColumnIndex != player.m_ancestorColumnIndex)
+    return;
+
   bool picked   = false;
   TAffine aff   = m_viewAff * player.m_placement;
   TPointD point = aff.inv() * m_point;
@@ -815,7 +822,9 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   if (player.m_onionSkinDistance != c_noOnionSkin) {
     TPixel32 frontOnionColor, backOnionColor;
 
-    if (player.m_onionSkinDistance != 0) {
+    if (player.m_onionSkinDistance != 0 &&
+        (!player.m_isShiftAndTraceEnabled ||
+         Preferences::instance()->areOnionColorsUsedForShiftAndTraceGhosts())) {
       prefs.getOnionData(frontOnionColor, backOnionColor, inksOnly);
       bgColor =
           (player.m_onionSkinDistance < 0) ? backOnionColor : frontOnionColor;
@@ -916,10 +925,11 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
     vi->selectFill(vi->getBBox(), 0, 1, true, true, false);
   }
 
+  TStroke *guidedStroke = 0;
   if (m_maskLevel > 0)
     tglDrawMask(rd, vi);
   else
-    tglDraw(rd, vi);
+    tglDraw(rd, vi, &guidedStroke);
 
   if (tc & ToonzCheck::eAutoclose) drawAutocloses(vi, rd);
 
@@ -928,6 +938,8 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
 
   delete cf;
   delete guidedCf;
+
+  if (guidedStroke) m_guidedStrokes.push_back(guidedStroke);
 }
 
 //-----------------------------------------------------
@@ -961,11 +973,17 @@ void RasterPainter::onRasterImage(TRasterImage *ri,
                               ? 0.9
                               : (1.0 - OnionSkinMask::getOnionSkinFade(
                                            player.m_onionSkinDistance));
-    alpha     = tcrop(tround(onionSkiFade * 255.0), 0, 255);
-    onionMode = (player.m_onionSkinDistance > 0)
-                    ? Node::eOnionSkinFront
-                    : ((player.m_onionSkinDistance < 0) ? Node::eOnionSkinBack
-                                                        : Node::eOnionSkinNone);
+    alpha = tcrop(tround(onionSkiFade * 255.0), 0, 255);
+    if (player.m_isShiftAndTraceEnabled &&
+        !Preferences::instance()->areOnionColorsUsedForShiftAndTraceGhosts())
+      onionMode = Node::eOnionSkinNone;
+    else {
+      onionMode =
+          (player.m_onionSkinDistance > 0)
+              ? Node::eOnionSkinFront
+              : ((player.m_onionSkinDistance < 0) ? Node::eOnionSkinBack
+                                                  : Node::eOnionSkinNone);
+    }
   } else if (player.m_opacity < 255)
     alpha             = player.m_opacity;
   TXshSimpleLevel *sl = player.m_sl;
@@ -1018,11 +1036,19 @@ void RasterPainter::onToonzImage(TToonzImage *ti, const Stage::Player &player) {
                               ? 0.9
                               : (1.0 - OnionSkinMask::getOnionSkinFade(
                                            player.m_onionSkinDistance));
-    alpha     = tcrop(tround(onionSkiFade * 255.0), 0, 255);
-    onionMode = (player.m_onionSkinDistance > 0)
-                    ? Node::eOnionSkinFront
-                    : ((player.m_onionSkinDistance < 0) ? Node::eOnionSkinBack
-                                                        : Node::eOnionSkinNone);
+    alpha = tcrop(tround(onionSkiFade * 255.0), 0, 255);
+
+    if (player.m_isShiftAndTraceEnabled &&
+        !Preferences::instance()->areOnionColorsUsedForShiftAndTraceGhosts())
+      onionMode = Node::eOnionSkinNone;
+    else {
+      onionMode =
+          (player.m_onionSkinDistance > 0)
+              ? Node::eOnionSkinFront
+              : ((player.m_onionSkinDistance < 0) ? Node::eOnionSkinBack
+                                                  : Node::eOnionSkinNone);
+    }
+
   } else if (player.m_opacity < 255)
     alpha = player.m_opacity;
 

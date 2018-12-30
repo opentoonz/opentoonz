@@ -256,7 +256,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Entrar en sub-planilla</translation>
+        <translation type="vanished">&amp;Entrar en sub-planilla</translation>
     </message>
 </context>
 <context>
@@ -697,6 +697,17 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
 </context>
 <context>
+    <name>FontParamField</name>
+    <message>
+        <source>Style:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FrameNavigator</name>
     <message>
         <source>Previous Frame</source>
@@ -1086,7 +1097,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Entrar en sub-planilla</translation>
+        <translation type="vanished">&amp;Entrar en sub-planilla</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -1206,6 +1217,13 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
 </context>
 <context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished">Salida</translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicPort</name>
     <message>
         <source>&amp;Disconnect from Xsheet</source>
@@ -1235,6 +1253,13 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation>No es posible pegar (insertar) una selección de nodos inconexos de efectos.
 Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o cortar la selección que se desee pegar.</translation>
+    </message>
+</context>
+<context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <source>XSheet</source>
+        <translation type="unfinished">Planilla</translation>
     </message>
 </context>
 <context>
@@ -2193,6 +2218,10 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     <message>
         <source>&amp;Swtich output port display mode</source>
         <translation>&amp;Cambiar visualización de puertos de salida</translation>
+    </message>
+    <message>
+        <source>&amp;Toggle node icons</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -1191,17 +1191,17 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
   treeWidget->setLayout(treeVLayout);
 
   // Second Splitter Widget
-  PaletteViewer *studioPaletteViewer =
+  m_studioPaletteViewer =
       new PaletteViewer(this, PaletteViewerGUI::STUDIO_PALETTE);
-  studioPaletteViewer->setObjectName("PaletteViewerInStudioPalette");
-  studioPaletteViewer->setXsheetHandle(xsheetHandle);
-  studioPaletteViewer->setPaletteHandle(studioPaletteHandle);
-  studioPaletteViewer->setFrameHandle(frameHandle);
+  m_studioPaletteViewer->setObjectName("PaletteViewerInStudioPalette");
+  m_studioPaletteViewer->setXsheetHandle(xsheetHandle);
+  m_studioPaletteViewer->setPaletteHandle(studioPaletteHandle);
+  m_studioPaletteViewer->setFrameHandle(frameHandle);
 
   addWidget(treeWidget);
-  addWidget(studioPaletteViewer);
+  addWidget(m_studioPaletteViewer);
 
-  setFocusProxy(studioPaletteViewer);
+  setFocusProxy(m_studioPaletteViewer);
 }
 
 //-----------------------------------------------------------------------------
@@ -1213,4 +1213,17 @@ StudioPaletteViewer::~StudioPaletteViewer() {}
 */
 TFilePath StudioPaletteViewer::getCurrentItemPath() {
   return m_studioPaletteTreeViewer->getCurrentItemPath();
+}
+
+//-----------------------------------------------------------------------------
+
+int StudioPaletteViewer::getViewMode() const {
+  return m_studioPaletteViewer->getViewMode();
+}
+
+//-----------------------------------------------------------------------------
+
+void StudioPaletteViewer::setViewMode(int mode) {
+  m_studioPaletteViewer->setViewMode(
+      (PaletteViewerGUI::PageViewer::ViewMode)mode);
 }

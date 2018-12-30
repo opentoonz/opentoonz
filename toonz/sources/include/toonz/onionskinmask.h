@@ -7,6 +7,8 @@
 #include "tcommon.h"
 #include "tgeometry.h"
 
+#include <QList>
+
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -114,6 +116,23 @@ since underlying onion-skinned drawings must be visible.
   }
   void setShiftTraceGhostCenter(int index, const TPointD &center);
 
+  const int getShiftTraceGhostFrameOffset(int index) {
+    return m_ghostFrame[index];
+  }
+  void setShiftTraceGhostFrameOffset(int index, int offset) {
+    m_ghostFrame[index] = offset;
+  }
+
+  const int getGhostFlipKey() {
+    return (m_ghostFlipKeys.isEmpty()) ? 0 : m_ghostFlipKeys.last();
+  }
+  void appendGhostFlipKey(int key) {
+    m_ghostFlipKeys.removeAll(key);
+    m_ghostFlipKeys.append(key);
+  }
+  void removeGhostFlipKey(int key) { m_ghostFlipKeys.removeAll(key); }
+  void clearGhostFlipKey() { m_ghostFlipKeys.clear(); }
+
 private:
   std::vector<int> m_fos, m_mos;  //!< Fixed and Mobile Onion Skin indices
   bool m_enabled;                 //!< Whether onion skin is enabled
@@ -122,6 +141,9 @@ private:
   ShiftTraceStatus m_shiftTraceStatus;
   TAffine m_ghostAff[2];
   TPointD m_ghostCenter[2];
+  int m_ghostFrame[2];         // relative frame position of the ghosts
+  QList<int> m_ghostFlipKeys;  // If F1, F2 or F3 key is pressed, then only
+                               // display the corresponding ghost
 };
 
 //***************************************************************************

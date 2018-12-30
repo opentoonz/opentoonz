@@ -107,7 +107,6 @@ set(MOC_HEADERS
     sceneviewerevents.h
     scriptconsolepanel.h
     selectionutils.h
-    shifttracetool.h
     shortcutpopup.h
     soundtrackexport.h
     startuppopup.h
@@ -123,6 +122,7 @@ set(MOC_HEADERS
     svnupdatedialog.h
     svnpurgedialog.h
     tapp.h
+    kis_tablet_support_win8.h
     tasksviewer.h
     testpanel.h
     tfarmstuff.h
@@ -158,6 +158,9 @@ set(MOC_HEADERS
 	reframepopup.h
 	autoinputcellnumberpopup.h
 	colormodelbehaviorpopup.h
+	boardsettingspopup.h
+	separatecolorsswatch.h
+	separatecolorspopup.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -254,11 +257,11 @@ set(SOURCES
     sceneviewercontextmenu.cpp
     scenesettingspopup.cpp
     scriptconsolepanel.cpp
-    shifttracetool.cpp
     shortcutpopup.cpp
     soundtrackexport.cpp
     startuppopup.cpp
     subcameramanager.cpp
+    kis_tablet_support_win8.cpp
     timestretchpopup.cpp
     trackerpopup.cpp
     vectorizerpopup.cpp
@@ -331,6 +334,9 @@ set(SOURCES
 	reframepopup.cpp
 	autoinputcellnumberpopup.cpp
 	colormodelbehaviorpopup.cpp
+	boardsettingspopup.cpp
+	separatecolorsswatch.cpp
+	separatecolorspopup.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp
@@ -359,11 +365,11 @@ endif()
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 if(BUILD_ENV_MSVC)
-    add_executable(OpenToonz_${VERSION} WIN32 ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES} ${RC_FILE})
+    add_executable(OpenToonz WIN32 ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES} ${RC_FILE})
 else()
     set(MACOSX_BUNDLE_ICON_FILE "OpenToonz.icns")
     set_source_files_properties(OpenToonz.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    add_executable(OpenToonz_${VERSION} MACOSX_BUNDLE OpenToonz.icns ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES})
+    add_executable(OpenToonz MACOSX_BUNDLE OpenToonz.icns ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES})
     #add_definitions(
     #    -DTNZBASE_EXPORTS
     #    -DTPARAM_EXPORTS
@@ -408,7 +414,7 @@ if(BUILD_TARGET_WIN)
 endif()
 
 if(BUILD_ENV_MSVC)
-    target_link_libraries(OpenToonz_${VERSION}
+    target_link_libraries(OpenToonz
         Qt5::WinMain Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
         Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia
         ${GL_LIB} ${GLUT_LIB} strmiids
@@ -422,9 +428,9 @@ elseif(BUILD_ENV_APPLE)
     # 変なところにライブラリ生成するカスども
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
-    add_dependencies(OpenToonz_${VERSION} tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm)
+    add_dependencies(OpenToonz tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm)
 
-    target_link_libraries(OpenToonz_${VERSION}
+    target_link_libraries(OpenToonz
         Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
         Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets
         ${GL_LIB} ${GLUT_LIB}
@@ -444,7 +450,7 @@ elseif(BUILD_ENV_UNIXLIKE)
     endif()
 
     target_link_libraries(
-        OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
+        OpenToonz Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
         Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia
         ${GL_LIB} ${GLUT_LIB} ${GLU_LIB}
         ${EXTRA_LIBS}
@@ -454,7 +460,7 @@ endif()
 if(BUILD_ENV_APPLE)
     # CMAKE_RUNTIME_OUTPUT_DIRECTORY should be equivalent to usage on windows despite empty
     # OSX だと CMAKE_RUNTIME_OUTPUT_DIRECTORY が空だが Windows 版と同じ使い方ができるようにしておく
-    get_target_property(bin OpenToonz_${VERSION} LOCATION)
+    get_target_property(bin OpenToonz LOCATION)
     get_filename_component(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${bin} DIRECTORY)
     # show CMAKE_RUNTIME_OUTPUT_DIRECTORY
     message("CMAKE_RUNTIME_OUTPUT_DIRECTORY:" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -462,44 +468,44 @@ endif()
 
 # copy utilty executables onto the directory after build
 if(LZODRIVER_FOUND)
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzocompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzocompress)
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzodecompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzodecompress)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzocompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzocompress)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzodecompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzodecompress)
 endif()
 
 if(BUILD_ENV_APPLE)
-    get_target_property(loc OpenToonz_${VERSION} MACOSX_BUNDLE_NAME)
+    get_target_property(loc OpenToonz MACOSX_BUNDLE_NAME)
     message(" ==> App Bundle: " ${loc})
     message(" ==> Mach-o: " ${bin})
     foreach(lib ${EXTRA_LIBS})
-        message(" copy:" ${lib} "==>" ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/MacOS/)
-        add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND cp ${lib} ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/MacOS/)
+        message(" copy:" ${lib} "==>" ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz.app/Contents/MacOS/)
+        add_custom_command(TARGET OpenToonz POST_BUILD COMMAND cp ${lib} ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz.app/Contents/MacOS/)
     endforeach()
 
-    add_custom_command(TARGET OpenToonz_${VERSION}
+    add_custom_command(TARGET OpenToonz
         POST_BUILD COMMAND
         ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. ${bin}
     )
-    add_custom_command(TARGET OpenToonz_${VERSION}
+    add_custom_command(TARGET OpenToonz
         POST_BUILD COMMAND
         ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH} ${bin}
     )
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz.app/Contents/Resources)
 
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/qss)
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz.app/Contents/Resources)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/qss)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz.app/Contents/Resources)
 
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tcomposer> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tcomposer)
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tcleanup> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tcleanup)
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tconverter> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tconverter)
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tfarmcontroller> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tfarmcontroller)
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tfarmserver> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tfarmserver)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tcomposer> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tcomposer)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tcleanup> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tcleanup)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tconverter> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tconverter)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tfarmcontroller> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tfarmcontroller)
+    add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tfarmserver> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS tfarmserver)
 
 elseif(BUILD_ENV_UNIXLIKE AND BUILD_TARGET_WIN)
     # Setup files on Windows platform while cross compilation.
     install(
         TARGETS
-            OpenToonz_${VERSION}
+            OpenToonz
         DESTINATION bin
     )
 
@@ -553,7 +559,7 @@ elseif(BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN)
     # - /usr
     install(
         TARGETS
-            OpenToonz_${VERSION}
+            OpenToonz
         DESTINATION bin
     )
 
@@ -597,7 +603,7 @@ fi
 
 export LD_LIBRARY_PATH=\${OPENTOONZ_BASE}/lib/opentoonz:\${LD_LIBRARY_PATH}
 
-exec \$OPENTOONZ_BASE/bin/OpenToonz_${VERSION} \"\$@\"
+exec \$OPENTOONZ_BASE/bin/OpenToonz \"\$@\"
 ")
     # only needed for executing without installing
     execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/bin/opentoonz)

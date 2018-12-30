@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef BRUSHTOOL_H
-#define BRUSHTOOL_H
+#ifndef TOONZRASTERBRUSHTOOL_H
+#define TOONZRASTERBRUSHTOOL_H
 
 #include "tgeometry.h"
 #include "tproperty.h"
@@ -12,9 +12,11 @@
 
 #include "tools/tool.h"
 #include "tools/cursors.h"
+#include "mypainttoonzbrush.h"
 
 #include <QCoreApplication>
 #include <QRadialGradient>
+#include <QElapsedTimer>
 
 //--------------------------------------------------------------
 
@@ -24,11 +26,12 @@ class TTileSetCM32;
 class TTileSaverCM32;
 class RasterStrokeGenerator;
 class BluredBrush;
+class ToonzRasterBrushToolNotifier;
 
 //--------------------------------------------------------------
 
 //************************************************************************
-//    Brush Data declaration
+//  Toonz Raster Brush Data declaration
 //************************************************************************
 
 struct BrushData final : public TPersist {
@@ -38,9 +41,9 @@ struct BrushData final : public TPersist {
   // just the overall tool.
 
   std::wstring m_name;
-  double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
-  bool m_pencil, m_breakAngles, m_pressure;
-  int m_cap, m_join, m_miter, m_drawOrder;
+  double m_min, m_max, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
+  bool m_pencil, m_pressure;
+  int m_drawOrder;
   double m_modifierSize, m_modifierOpacity;
   bool m_modifierEraser, m_modifierLockAlpha;
 
@@ -54,7 +57,7 @@ struct BrushData final : public TPersist {
 };
 
 //************************************************************************
-//    Brush Preset Manager declaration
+//   Toonz Raster Brush Preset Manager declaration
 //************************************************************************
 
 class BrushPresetManager {
@@ -108,14 +111,17 @@ private:
   std::vector<TThickPoint> m_outputPoints;
 };
 //************************************************************************
-//    Brush Tool declaration
+//   Toonz Raster Brush Tool declaration
 //************************************************************************
 
-class BrushTool final : public TTool {
-  Q_DECLARE_TR_FUNCTIONS(BrushTool)
+class ToonzRasterBrushTool final : public TTool, public RasterController {
+  Q_DECLARE_TR_FUNCTIONS(ToonzRasterBrushTool)
+
+  void updateCurrentStyle();
+  double restartBrushTimer();
 
 public:
-  BrushTool(std::string name, int targetType);
+  ToonzRasterBrushTool(std::string name, int targetType);
 
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
@@ -131,7 +137,6 @@ public:
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
-  bool keyDown(QKeyEvent *event) override;
 
   void draw() override;
 
@@ -142,7 +147,6 @@ public:
 
   TPropertyGroup *getProperties(int targetType) override;
   bool onPropertyChanged(std::string propertyName) override;
-  void resetFrameRange();
   void onImageChanged() override;
   void setWorkAndBackupImages();
   void updateWorkAndBackupRasters(const TRect &rect);
@@ -157,56 +161,34 @@ public:
   // Tools.
   bool isPencilModeActive() override;
 
-  void addTrackPoint(const TThickPoint &point, double pixelSize2);
-  void flushTrackPoint();
-  bool doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
-                           TFrameId lastFrameId, TStroke *lastStroke,
-                           bool drawFirstStroke = true);
-  void checkGuideSnapping(bool beforeMousePress, bool invertCheck);
-  void checkStrokeSnapping(bool beforeMousePress, bool invertCheck);
+  void onColorStyleChanged();
+  bool askRead(const TRect &rect) override;
+  bool askWrite(const TRect &rect) override;
+  bool isMyPaintStyleSelected() { return m_isMyPaintStyleSelected; }
 
 protected:
   TPropertyGroup m_prop[2];
 
-  TDoublePairProperty m_thickness;
   TDoublePairProperty m_rasThickness;
-  TDoubleProperty m_accuracy;
   TDoubleProperty m_smooth;
   TDoubleProperty m_hardness;
   TEnumProperty m_preset;
   TEnumProperty m_drawOrder;
-  TBoolProperty m_breakAngles;
   TBoolProperty m_pencil;
   TBoolProperty m_pressure;
-  TBoolProperty m_snap;
-  TEnumProperty m_frameRange;
-  TEnumProperty m_snapSensitivity;
-  TEnumProperty m_capStyle;
-  TEnumProperty m_joinStyle;
-  TIntProperty m_miterJoinLimit;
+  TDoubleProperty m_modifierSize;
 
-  StrokeGenerator m_track;
-  StrokeGenerator m_rangeTrack;
   RasterStrokeGenerator *m_rasterTrack;
-  TStroke *m_firstStroke;
   TTileSetCM32 *m_tileSet;
   TTileSaverCM32 *m_tileSaver;
-  TFrameId m_firstFrameId, m_veryFirstFrameId;
   TPixel32 m_currentColor;
   int m_styleId;
   double m_minThick, m_maxThick;
 
-  // for snapping and framerange
-  int m_strokeIndex1, m_strokeIndex2, m_col, m_firstFrame, m_veryFirstFrame,
-      m_veryFirstCol, m_targetType;
-  double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
-  bool m_foundFirstSnap = false, m_foundLastSnap = false, m_dragDraw = true,
-       m_altPressed = false, m_snapSelf = false;
-  TRectD m_modifiedRegion;
+  int m_targetType;
   TPointD m_dpiScale,
       m_mousePos,  //!< Current mouse position, in world coordinates.
-      m_brushPos,  //!< World position the brush will be painted at.
-      m_firstSnapPoint, m_lastSnapPoint;
+      m_brushPos;  //!< World position the brush will be painted at.
 
   BluredBrush *m_bluredBrush;
   QRadialGradient m_brushPad;
@@ -215,7 +197,8 @@ protected:
   TRaster32P m_workRas;
 
   std::vector<TThickPoint> m_points;
-  TRect m_strokeRect, m_lastRect;
+  TRect m_strokeRect, m_lastRect,
+      m_strokeSegmentRect;  // used with mypaint brush
 
   SmoothStroke m_smoothStroke;
 
@@ -225,12 +208,18 @@ protected:
   bool m_active, m_enabled,
       m_isPrompting,  //!< Whether the tool is prompting for spline
                       //! substitution.
-      m_firstTime, m_isPath, m_presetsLoaded, m_firstFrameRange;
+      m_firstTime, m_presetsLoaded;
 
   /*---
 作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）に別のフレームに
 移動していたときの不具合を修正する。---*/
   TFrameId m_workingFrameId;
+
+  ToonzRasterBrushToolNotifier *m_notifier;
+  bool m_isMyPaintStyleSelected    = false;
+  MyPaintToonzBrush *m_toonz_brush = 0;
+  QElapsedTimer m_brushTimer;
+  int m_minCursorThick, m_maxCursorThick;
 
 protected:
   static void drawLine(const TPointD &point, const TPointD &centre,
@@ -239,4 +228,19 @@ protected:
                               bool isLyEven, bool isPencil);
 };
 
-#endif  // BRUSHTOOL_H
+//------------------------------------------------------------
+
+class ToonzRasterBrushToolNotifier final : public QObject {
+  Q_OBJECT
+
+  ToonzRasterBrushTool *m_tool;
+
+public:
+  ToonzRasterBrushToolNotifier(ToonzRasterBrushTool *tool);
+
+protected slots:
+  // void onCanvasSizeChanged() { m_tool->onCanvasSizeChanged(); }
+  void onColorStyleChanged() { m_tool->onColorStyleChanged(); }
+};
+
+#endif  // TOONZRASTERBRUSHTOOL_H

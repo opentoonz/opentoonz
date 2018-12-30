@@ -4,12 +4,12 @@
 <context>
     <name>AviWriterProperties</name>
     <message>
-        <location filename="../../image/avi/tiio_avi.cpp" line="1182"/>
+        <location filename="../../image/avi/tiio_avi.cpp" line="1179"/>
         <source>Codec</source>
         <translation>Compresor</translation>
     </message>
     <message>
-        <location filename="../../image/avi/tiio_avi.cpp" line="1183"/>
+        <location filename="../../image/avi/tiio_avi.cpp" line="1180"/>
         <source>Uncompressed</source>
         <translation>Sin compresión</translation>
     </message>
@@ -70,52 +70,52 @@ intentar aumentar el tiempo de espera en las Preferencias.</translation>
 <context>
     <name>SgiWriterProperties</name>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1225"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1231"/>
         <source>Bits Per Pixel</source>
         <translation>Bits por píxel</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1226"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1232"/>
         <source>24 bits</source>
         <translation>24 bits</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1227"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1233"/>
         <source>32 bits</source>
         <translation>32 bits</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1228"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1234"/>
         <source>48 bits</source>
         <translation>48 bits</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1229"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1235"/>
         <source>64 bits</source>
         <translation>64 bits</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1230"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1236"/>
         <source>8 bits (Greyscale)</source>
         <translation>8 bits (escala de grises)</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1231"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1237"/>
         <source>Endianess</source>
         <translation>Orden</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1232"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1238"/>
         <source>Big Endian</source>
         <translation>Mayor al inicio (big endian)</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1233"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1239"/>
         <source>Little Endian</source>
         <translation>Menor al inicio (little endian)</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1234"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1240"/>
         <source>RLE-Compressed</source>
         <translation>Compresión RLE</translation>
     </message>
@@ -181,37 +181,37 @@ intentar aumentar el tiempo de espera en las Preferencias.</translation>
 <context>
     <name>SvgWriterProperties</name>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1954"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1969"/>
         <source>Stroke Mode</source>
         <translation>Modo de vectorización</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1955"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1970"/>
         <source>Outline Quality</source>
         <translation>Calidad de contornos</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1956"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1971"/>
         <source>Centerline</source>
         <translation>Líneas</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1957"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1972"/>
         <source>Outline</source>
         <translation>Contornos</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1958"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1973"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1959"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1974"/>
         <source>Medium</source>
         <translation>Media</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1960"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1975"/>
         <source>Low</source>
         <translation>Baja</translation>
     </message>
@@ -340,12 +340,12 @@ intentar aumentar el tiempo de espera en las Preferencias.</translation>
 <context>
     <name>WebmWriterProperties</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="231"/>
+        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="233"/>
         <source>Quality</source>
         <translation>Calidad</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="232"/>
+        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="234"/>
         <source>Scale</source>
         <translation>Escala</translation>
     </message>

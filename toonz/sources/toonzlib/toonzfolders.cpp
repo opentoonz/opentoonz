@@ -50,7 +50,9 @@ TFilePathSet ToonzFolder::getProjectsFolders() {
         fps.push_back(TFilePath(tempPath));
       }
     }
-    if (tempFps.size() == 0) fps.push_back(TEnv::getStuffDir() + "Projects");
+    if (tempFps.size() == 0)
+      fps.push_back(TEnv::getStuffDir() +
+                    TEnv::getSystemPathMap().at("PROJECTS"));
   }
   if (documents) {
     fps.push_back(getMyDocumentsPath() + "OpenToonz");
@@ -85,31 +87,36 @@ TFilePath ToonzFolder::getFirstProjectsFolder() {
 
 TFilePath ToonzFolder::getLibraryFolder() {
   TFilePath fp = getSystemVarPathValue(getSystemVarPrefix() + "LIBRARY");
-  if (fp == TFilePath()) fp = getStuffDir() + "library";
+  if (fp == TFilePath())
+    fp = getStuffDir() + TEnv::getSystemPathMap().at("LIBRARY");
   return fp;
 }
 
 TFilePath ToonzFolder::getStudioPaletteFolder() {
   TFilePath fp = getSystemVarPathValue(getSystemVarPrefix() + "STUDIOPALETTE");
-  if (fp == TFilePath()) fp = getStuffDir() + "studiopalette";
+  if (fp == TFilePath())
+    fp = getStuffDir() + TEnv::getSystemPathMap().at("STUDIOPALETTE");
   return fp;
 }
 
 TFilePath ToonzFolder::getFxPresetFolder() {
   TFilePath fp = getSystemVarPathValue(getSystemVarPrefix() + "FXPRESETS");
-  if (fp == TFilePath()) fp = getStuffDir() + "fxs";
+  if (fp == TFilePath())
+    fp = getStuffDir() + TEnv::getSystemPathMap().at("FXPRESETS");
   return fp;
 }
 
 TFilePath ToonzFolder::getCacheRootFolder() {
   TFilePath fp = getSystemVarPathValue(getSystemVarPrefix() + "CACHEROOT");
-  if (fp == TFilePath()) fp = getStuffDir() + "cache";
+  if (fp == TFilePath())
+    fp = getStuffDir() + TEnv::getSystemPathMap().at("CACHEROOT");
   return fp;
 }
 
 TFilePath ToonzFolder::getProfileFolder() {
   TFilePath fp = getSystemVarPathValue(getSystemVarPrefix() + "PROFILES");
-  if (fp == TFilePath()) fp = getStuffDir() + "profiles";
+  if (fp == TFilePath())
+    fp = getStuffDir() + TEnv::getSystemPathMap().at("PROFILES");
   return fp;
 }
 

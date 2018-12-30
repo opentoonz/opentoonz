@@ -230,8 +230,8 @@ break;*/
   bool swapxy = false;  // orient == ORIENTATION_RIGHTTOP;
 
   if (swapxy) {
-    tswap(w, h);
-    tswap(xdpi, ydpi);
+    std::swap(w, h);
+    std::swap(xdpi, ydpi);
   }
 
   m_xdpi        = xdpi;
@@ -399,8 +399,8 @@ if(stripSize>0)
       m_info.m_y0 = 0;
     }
     if (swapxy) {
-      tswap(m_info.m_x0, m_info.m_y0);
-      tswap(m_info.m_lx, m_info.m_ly);
+      std::swap(m_info.m_x0, m_info.m_y0);
+      std::swap(m_info.m_lx, m_info.m_ly);
     }
     m_info.m_x1 = m_info.m_x0 + w;
     m_info.m_y1 = m_info.m_y0 + h;
@@ -770,6 +770,11 @@ public:
   void flush() override;
 
   Tiio::RowOrder getRowOrder() const override { return m_rowOrder; }
+
+  // m_bpp is set to "Bits Per Pixel" property value in the function open()
+  bool writeAlphaSupported() const override {
+    return (m_bpp == 32 || m_bpp == 64);
+  }
 };
 
 //------------------------------------------------------------

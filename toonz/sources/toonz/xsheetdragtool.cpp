@@ -1493,7 +1493,7 @@ public:
     TColumnSelection *selection = getViewer()->getColumnSelection();
     selection->selectNone();
     int i, ia = m_firstColumn, ib = col;
-    if (ia > ib) tswap(ia, ib);
+    if (ia > ib) std::swap(ia, ib);
     for (i = ia; i <= ib; i++) selection->selectColumn(i, true);
     getViewer()->update();
     refreshCellsArea();

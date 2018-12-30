@@ -156,6 +156,7 @@ set(MOC_HEADERS
     texturemanager.h
     imagebuilders.h
 	../include/orientation.h
+    ../include/toonz/boardsettings.h
 )
 
 set(HEADERS ${MOC_HEADERS})
@@ -317,6 +318,7 @@ set(SOURCES
     plasticdeformerfx.cpp
     txshmeshcolumn.cpp
     textureutils.cpp
+    boardsettings.cpp
 )
 
 if(BUILD_TARGET_WIN)

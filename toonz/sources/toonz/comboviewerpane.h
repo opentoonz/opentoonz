@@ -3,12 +3,14 @@
 #ifndef COMBOVIEWER_PANE_INCLUDED
 #define COMBOVIEWER_PANE_INCLUDED
 
-#include "styleshortcutswitchablepanel.h"
 #include "sceneviewer.h"
 #include "toonzqt/intfield.h"
 #include "toonzqt/keyframenavigator.h"
 
 #include "toonzqt/flipconsoleowner.h"
+#include "saveloadqsettings.h"
+
+#include <QFrame>
 
 class QPoint;
 class QToolBar;
@@ -30,15 +32,19 @@ class ToolOptions;
 // ComboViewerPanel
 //-----------------------------------------------------------------------------
 enum CV_Parts {
-  CVPARTS_TOOLBAR = 0,
-  CVPARTS_TOOLOPTIONS,
-  CVPARTS_FLIPCONSOLE,
-  CVPARTS_COUNT
+  CVPARTS_None        = 0,
+  CVPARTS_TOOLBAR     = 0x1,
+  CVPARTS_TOOLOPTIONS = 0x2,
+  CVPARTS_FLIPCONSOLE = 0x4,
+  CVPARTS_End         = 0x8,
+  CVPARTS_ALL = CVPARTS_TOOLBAR | CVPARTS_TOOLOPTIONS | CVPARTS_FLIPCONSOLE
 };
+
 //-----------------------------------------------------------------------------
 
-class ComboViewerPanel final : public StyleShortcutSwitchablePanel,
-                               public FlipConsoleOwner {
+class ComboViewerPanel final : public QFrame,
+                               public FlipConsoleOwner,
+                               public SaveLoadQSettings {
   Q_OBJECT
 
   SceneViewer *m_sceneViewer;
@@ -50,7 +56,7 @@ class ComboViewerPanel final : public StyleShortcutSwitchablePanel,
   ToolOptions *m_toolOptions;
   Ruler *m_vRuler;
   Ruler *m_hRuler;
-  bool m_visibleFlag[CVPARTS_COUNT];
+  UINT m_visiblePartsFlag;
   bool m_onionSkinActive = false;
   bool m_playSound       = true;
   bool m_hasSoundtrack   = false;
@@ -73,37 +79,36 @@ public:
   ~ComboViewerPanel();
 
   SceneViewer *getSceneViewer() { return m_sceneViewer; }
+  ToolOptions *getToolOptions() { return m_toolOptions; }
 
-  // toggle show/hide of the widgets according to m_visibleFlag
+  // toggle show/hide of the widgets according to m_visiblePartsFlag
+  void setVisiblePartsFlag(UINT flag);
   void updateShowHide();
   void addShowHideContextMenu(QMenu *);
-  void setShowHideFlag(CV_Parts parts, bool visible) {
-    m_visibleFlag[parts] = visible;
-  }
-  bool getShowHideFlag(CV_Parts parts) { return m_visibleFlag[parts]; }
-  // reimplementation of TPanel::widgetInThisPanelIsFocused
-  bool widgetInThisPanelIsFocused() override {
-    return m_sceneViewer->hasFocus();
-  }
 
   void onDrawFrame(int frame,
                    const ImagePainter::VisualSettings &settings) override;
 
+  void onEnterPanel() {
+    m_sceneViewer->setFocus(Qt::OtherFocusReason);
+    // activate shortcut key for this flipconsole
+    m_flipConsole->makeCurrent();
+  }
+  void onLeavePanel() { m_sceneViewer->clearFocus(); }
+
+  // SaveLoadQSettings
+  virtual void save(QSettings &settings) const override;
+  virtual void load(QSettings &settings) override;
+
+  void initializeTitleBar(TPanelTitleBar *titleBar);
+
 protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
-  void initializeTitleBar(TPanelTitleBar *titleBar);
   void createFrameToolBar();
   void createPlayToolBar();
   void addColorMaskButton(QWidget *parent, const char *iconSVGName, int id);
   void contextMenuEvent(QContextMenuEvent *event) override;
-  // reimplementation of TPanel::widgetFocusOnEnter
-  void widgetFocusOnEnter() override {
-    m_sceneViewer->setFocus(Qt::OtherFocusReason);
-    // activate shortcut key for this flipconsole
-    m_flipConsole->makeCurrent();
-  };
-  void widgetClearFocusOnLeave() override { m_sceneViewer->clearFocus(); };
   void playAudioFrame(int frame);
   bool hasSoundtrack();
 
@@ -127,8 +132,6 @@ protected slots:
   void onSceneSwitched();
   void enableFullPreview(bool enabled);
   void enableSubCameraPreview(bool enabled);
-
-  void onPreferenceChanged(const QString &prefName) override;
 };
 
 #endif

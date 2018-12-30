@@ -3022,7 +3022,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
           else
             color_blob[color_blobs++] = new_color_blob;
           for (; j > 0 && color_blob[j].tot > color_blob[j - 1].tot; j--)
-            tswap(color_blob[j], color_blob[j - 1]);
+            std::swap(color_blob[j], color_blob[j - 1]);
           new_pencil_blob.val = tcm[i] & pencil_mask;
           new_pencil_blob.tot = (tone_mask - tone) * w[i];
           for (j = 0; j < pencil_blobs; j++)
@@ -3032,7 +3032,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
           else
             pencil_blob[pencil_blobs++] = new_pencil_blob;
           for (; j > 0 && pencil_blob[j].tot > pencil_blob[j - 1].tot; j--)
-            tswap(pencil_blob[j], pencil_blob[j - 1]);
+            std::swap(pencil_blob[j], pencil_blob[j - 1]);
         }
         tone = troundp(tone_tot);
         // if (some_pencil && (TUINT32)tone == tone_mask)
@@ -3100,7 +3100,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
             color_blob[color_blobs++] = new_color_blob;
           // Sort the stored colors for decreasing weighted total tone
           for (; j > 0 && color_blob[j].tot > color_blob[j - 1].tot; j--)
-            tswap(color_blob[j], color_blob[j - 1]);
+            std::swap(color_blob[j], color_blob[j - 1]);
 
           // Deal the same way with ink colors.
           new_pencil_blob.val = tcm[i] & pencil_mask;
@@ -3112,7 +3112,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
           else
             pencil_blob[pencil_blobs++] = new_pencil_blob;
           for (; j > 0 && pencil_blob[j].tot > pencil_blob[j - 1].tot; j--)
-            tswap(pencil_blob[j], pencil_blob[j - 1]);
+            std::swap(pencil_blob[j], pencil_blob[j - 1]);
         }
 
         tone = tround(tone_tot);
@@ -3173,7 +3173,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
           else
             color_blob[color_blobs++] = new_color_blob;
           for (; j > 0 && color_blob[j].tot > color_blob[j - 1].tot; j--)
-            tswap(color_blob[j], color_blob[j - 1]);
+            std::swap(color_blob[j], color_blob[j - 1]);
           new_pencil_blob.val = tcm[i] & pencil_mask;
           new_pencil_blob.tot = (tone_mask - tone) * w[i];
           for (j = 0; j < pencil_blobs; j++)
@@ -3183,7 +3183,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
           else
             pencil_blob[pencil_blobs++] = new_pencil_blob;
           for (; j > 0 && pencil_blob[j].tot > pencil_blob[j - 1].tot; j--)
-            tswap(pencil_blob[j], pencil_blob[j - 1]);
+            std::swap(pencil_blob[j], pencil_blob[j - 1]);
         }
         tone = troundp(tone_tot);
         // if (some_pencil && (TUINT32)tone == tone_mask)

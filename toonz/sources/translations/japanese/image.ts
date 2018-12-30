@@ -4,12 +4,12 @@
 <context>
     <name>AviWriterProperties</name>
     <message>
-        <location filename="../../image/avi/tiio_avi.cpp" line="1182"/>
+        <location filename="../../image/avi/tiio_avi.cpp" line="1179"/>
         <source>Codec</source>
         <translation>コーデック</translation>
     </message>
     <message>
-        <location filename="../../image/avi/tiio_avi.cpp" line="1183"/>
+        <location filename="../../image/avi/tiio_avi.cpp" line="1180"/>
         <source>Uncompressed</source>
         <translation>非圧縮</translation>
     </message>
@@ -69,52 +69,52 @@ Please try raising the FFmpeg timeout in Preferences.</source>
 <context>
     <name>SgiWriterProperties</name>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1225"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1231"/>
         <source>Bits Per Pixel</source>
         <translation>色深度</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1226"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1232"/>
         <source>24 bits</source>
         <translation>24ビット</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1227"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1233"/>
         <source>32 bits</source>
         <translation>32ビット</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1228"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1234"/>
         <source>48 bits</source>
         <translation>48ビット</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1229"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1235"/>
         <source>64 bits</source>
         <translation>64ビット</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1230"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1236"/>
         <source>8 bits (Greyscale)</source>
         <translation>8ビット (グレースケール)</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1231"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1237"/>
         <source>Endianess</source>
         <translation>エンディアン</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1232"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1238"/>
         <source>Big Endian</source>
         <translation>ビッグエンディアン</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1233"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1239"/>
         <source>Little Endian</source>
         <translation>リトルエンディアン</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1234"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1240"/>
         <source>RLE-Compressed</source>
         <translation>RLE圧縮</translation>
     </message>
@@ -180,37 +180,37 @@ Please try raising the FFmpeg timeout in Preferences.</source>
 <context>
     <name>SvgWriterProperties</name>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1954"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1969"/>
         <source>Stroke Mode</source>
         <translation>モード</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1955"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1970"/>
         <source>Outline Quality</source>
         <translation>アウトラインの品質</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1956"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1971"/>
         <source>Centerline</source>
         <translation>中心線</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1957"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1972"/>
         <source>Outline</source>
         <translation>アウトライン</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1958"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1973"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1959"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1974"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1960"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1975"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
@@ -339,12 +339,12 @@ Please try raising the FFmpeg timeout in Preferences.</source>
 <context>
     <name>WebmWriterProperties</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="231"/>
+        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="233"/>
         <source>Quality</source>
         <translation>品質</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="232"/>
+        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="234"/>
         <source>Scale</source>
         <translation>スケール(%)</translation>
     </message>

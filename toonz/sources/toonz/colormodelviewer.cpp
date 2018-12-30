@@ -260,14 +260,14 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
 /*! If left button is pressed recall \b pick() in event pos.
 */
 void ColorModelViewer::mousePressEvent(QMouseEvent *event) {
-  if (event->button() == Qt::LeftButton) pick(event->pos());
+  if (event->button() == Qt::LeftButton) pick(event->pos() * getDevPixRatio());
 }
 
 //-----------------------------------------------------------------------------
 /*! If left button is moved recall \b pick() in event pos.
 */
 void ColorModelViewer::mouseMoveEvent(QMouseEvent *event) {
-  if (event->buttons() & Qt::LeftButton) pick(event->pos());
+  if (event->buttons() & Qt::LeftButton) pick(event->pos() * getDevPixRatio());
 }
 
 //-----------------------------------------------------------------------------

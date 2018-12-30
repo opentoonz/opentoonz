@@ -1261,6 +1261,8 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
         if (!loadingLevelRange.match(fIds[i])) continue;
         setFrame(fIds[i], TImageP());
       }
+      const TImageInfo *info = lr->getImageInfo(fIds[0]);
+      if (info) set16BitChannelLevel(info->m_bitsPerSample == 16);
     } else {
       TLevelP level = lr->loadInfo();
       for (TLevel::Iterator it = level->begin(); it != level->end(); it++) {
@@ -1268,7 +1270,12 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
         if (!loadingLevelRange.match(it->first)) continue;
         setFrame(it->first, TImageP());
       }
+      const TImageInfo *info = lr->getImageInfo(level->begin()->first);
+      if (info) set16BitChannelLevel(info->m_bitsPerSample == 16);
     }
+
+    if ((getType() & FULLCOLOR_TYPE) && !is16BitChannelLevel())
+      setPalette(FullColorPalette::instance()->getPalette(getScene()));
   }
 
   setContentHistory(lr->getContentHistory() ? lr->getContentHistory()->clone()
@@ -1384,7 +1391,10 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
       (!oldFp.isEmpty()) ? oldFp : getScene()->decodeFilePath(m_path);
 
   TFilePath dDstPath = getScene()->decodeFilePath(fp);
-  TSystem::touchParentDir(dDstPath);
+  if (!TSystem::touchParentDir(dDstPath))
+    throw TSystemException(
+        dDstPath,
+        "The level cannot be saved: failed to access the target folder.");
 
   // backup
   if (Preferences::instance()->isLevelsBackupEnabled() &&
@@ -1960,26 +1970,24 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
   }
 
   ImageManager *im = ImageManager::instance();
-  TImageCache *ic = TImageCache::instance();
+  TImageCache *ic  = TImageCache::instance();
 
   std::map<TFrameId, TFrameId>::iterator jt;
 
   {
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
       std::string Id = getImageId(jt->first);
-	  ImageLoader::BuildExtData extData(this, jt->first);
-	  TImageP img = im->getImage(Id, ImageManager::none, &extData);
-	  ic->add(getIconId(jt->first), img, false);
-	  im->rebind(Id, "^" + std::to_string(i));
-	  ic->remap("^icon:" + std::to_string(i),
-                                     getIconId(jt->first));
+      ImageLoader::BuildExtData extData(this, jt->first);
+      TImageP img = im->getImage(Id, ImageManager::none, &extData);
+      ic->add(getIconId(jt->first), img, false);
+      im->rebind(Id, "^" + std::to_string(i));
+      ic->remap("^icon:" + std::to_string(i), getIconId(jt->first));
     }
 
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
       std::string Id = getImageId(jt->second);
       im->rebind("^" + std::to_string(i), Id);
-	  ic->remap(getIconId(jt->second),
-                                    "^icon:" + std::to_string(i));
+      ic->remap(getIconId(jt->second), "^icon:" + std::to_string(i));
       im->renumber(Id, jt->second);
     }
   }
@@ -2191,8 +2199,9 @@ TFilePath TXshSimpleLevel::getExistingHookFile(
   }
 
   assert(h >= 0);
-  return (h < 0) ? TFilePath() : decodedLevelPath.getParentDir() +
-                                     TFilePath(hookFiles[h].toStdWString());
+  return (h < 0) ? TFilePath()
+                 : decodedLevelPath.getParentDir() +
+                       TFilePath(hookFiles[h].toStdWString());
 }
 
 //-----------------------------------------------------------------------------

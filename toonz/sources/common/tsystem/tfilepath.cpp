@@ -287,9 +287,10 @@ void TFilePath::setPath(std::wstring path) {
       m_path.length() > 1 && m_path[m_path.length() - 1] == wslash)
     m_path.erase(m_path.length() - 1, 1);
 
-  if (isUncName && !(m_path.find_last_of(L'\\') > 1 ||
-                     m_path.find_last_of(L'/') >
-                         1))  // e' indicato solo il nome della macchina...
+  if (isUncName &&
+      !(m_path.find_last_of(L'\\') > 1 ||
+        m_path.find_last_of(L'/') >
+            1))  // e' indicato solo il nome della macchina...
     m_path.append(1, wslash);
 }
 
@@ -632,9 +633,8 @@ TFilePath TFilePath::getParentDir() const  // noSlash!
 {
   int i = getLastSlash(m_path);  // cerco l'ultimo slash
   if (i < 0) {
-    if (m_path.length() >= 2 &&
-        ('a' <= m_path[0] && m_path[0] <= 'z' ||
-         'A' <= m_path[0] && m_path[0] <= 'Z') &&
+    if (m_path.length() >= 2 && ('a' <= m_path[0] && m_path[0] <= 'z' ||
+                                 'A' <= m_path[0] && m_path[0] <= 'Z') &&
         m_path[1] == ':')
       return TFilePath(m_path.substr(0, 2));
     else
@@ -685,7 +685,7 @@ TFrameId TFilePath::getFrame() const {
     digits++;
     number = number * 10 + str[k] - L'0';
   }
-  char letter = '\0';
+  char letter                  = '\0';
   if (iswalpha(str[k])) letter = str[k++] + ('a' - L'a');
 
   if (number == 0 || k < i)  // || letter!='\0')
@@ -812,8 +812,9 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
   if (!isFfmpegType() && checkForSeqNum(type) && isNumbers(str, k, j))
     hasValidFrameNum = true;
   std::string frameString;
-  if (frame.isNoFrame() ||
-      (!frame.isEmptyFrame() && getDots() != "." && !hasValidFrameNum)) {
+  if (frame.isNoFrame())
+    frameString = "";
+  else if (!frame.isEmptyFrame() && getDots() != "." && !hasValidFrameNum) {
     if (k != (int)std::wstring::npos) {
       std::wstring wstr = str.substr(k, j - k);
       std::string str2(wstr.begin(), wstr.end());

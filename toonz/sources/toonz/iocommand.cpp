@@ -1179,8 +1179,6 @@ IoCmd::ConvertingPopup::~ConvertingPopup() {}
 bool IoCmd::saveSceneIfNeeded(QString msg) {
   TApp *app = TApp::instance();
 
-  bool isLevelOrSceneIsDirty = false;
-
   if (app->getCurrentScene()->getDirtyFlag()) {
     QString question;
     question = QObject::tr(
@@ -1201,8 +1199,6 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
       if (!IoCmd::saveScene()) return false;
     } else if (ret == 3) {
     }
-
-    isLevelOrSceneIsDirty = true;
   }
 
   ToonzScene *scene = app->getCurrentScene()->getScene();
@@ -1232,28 +1228,10 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
       } else if (ret == 1) {
         // save non scene files
         IoCmd::saveNonSceneFiles();
-        return false;
       } else if (ret == 2) {
-        // quit
+        // do nothing and continue
       }
-
-      isLevelOrSceneIsDirty = true;
     }
-
-    //--- If both the level and scene is clean, then open the quit confirmation
-    // dialog
-    // if (!isLevelOrSceneIsDirty && msg == "Quit") {
-    //  QString question("Are you sure ?");
-    //  int ret =
-    //      DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"),
-    //      0);
-    //  if (ret == 0 || ret == 2) {
-    //    // cancel (or closed message box window)
-    //    return false;
-    //  } else if (ret == 1) {
-    //    // ok
-    //  }
-    //}
 
     RenderingSuspender suspender;
 
@@ -2455,10 +2433,6 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
         // increment the number of loaded resources
         ++loadedCount;
 
-        // move the current column to right
-        col0++;
-        app->getCurrentColumn()->setColumnIndex(col0);
-
         // load the image data of all frames to cache at the beginning
         if (cachingBehavior != ON_DEMAND) {
           TXshSimpleLevel *simpleLevel = xl->getSimpleLevel();
@@ -2470,6 +2444,8 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
       }
     }
   }
+
+  if (loadedCount) app->getCurrentFrame()->setFrameIndex(row0);
 
   sb->data().m_loadedCount += loadedCount;
   sb->data().m_hasSoundLevel = sb->data().m_hasSoundLevel || isSoundLevel;

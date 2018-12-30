@@ -760,6 +760,8 @@ public:
   void flush() override;
 
   bool write64bitSupported() const override { return true; }
+  // m_matte is set to "Alpha Channel" property value in the function open()
+  bool writeAlphaSupported() const override { return m_matte; };
 };
 
 //---------------------------------------------------------

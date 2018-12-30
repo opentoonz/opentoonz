@@ -1071,7 +1071,7 @@ TRectD TStroke::Imp::computeSubBBox(double w0, double w1) const {
   const double eps = 0.000000001;
   int i;
 
-  if (w0 > w1) tswap(w0, w1);
+  if (w0 > w1) std::swap(w0, w1);
 
   double nw0 = w0 * n;
   double nw1 = w1 * n;
@@ -1860,7 +1860,7 @@ const TThickQuadratic *TStroke::getChunk(int index) const {
 //-----------------------------------------------------------------------------
 
 TRectD TStroke::getBBox(double w0, double w1) const {
-  if (w0 > w1) tswap(w0, w1);
+  if (w0 > w1) std::swap(w0, w1);
 
   if (w0 != 0.0 || w1 != 1.0) return m_imp->computeSubBBox(w0, w1);
 

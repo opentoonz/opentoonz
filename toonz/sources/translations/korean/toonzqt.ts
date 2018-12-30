@@ -91,12 +91,12 @@
 <context>
     <name>CameraPainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="597"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="506"/>
         <source>&amp;Reset Center</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="600"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="509"/>
         <source>&amp;Activate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -104,81 +104,81 @@
 <context>
     <name>CameraSettingsWidget</name>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="198"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="196"/>
         <source>DPI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="195"/>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="199"/>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="398"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="193"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="197"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="396"/>
         <source>Pixels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="200"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="198"/>
         <source>x</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="204"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="202"/>
         <source>Use Current Level Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="207"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="205"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="208"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="206"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="246"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="244"/>
         <source>Force Squared Pixel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="292"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="290"/>
         <source>A/R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="406"/>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="824"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="404"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="822"/>
         <source>&lt;custom&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="870"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="868"/>
         <source>Bad camera preset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="871"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="869"/>
         <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset. 
 Possibly the preset file has been corrupted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="904"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="902"/>
         <source>Preset name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="905"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="903"/>
         <source>Enter the name for %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="910"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="908"/>
         <source>Error : Preset Name is Invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="911"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="909"/>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
         <translation type="unfinished"></translation>
     </message>
@@ -227,13 +227,8 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>ColumnPainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="276"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="208"/>
         <source>&amp;Reset Center</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="279"/>
-        <source>&amp;Open Subxsheet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -284,32 +279,32 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>DVGui::CleanupColorField</name>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="641"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="646"/>
         <source>Brightness:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="644"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="649"/>
         <source>Contrast:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="649"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="654"/>
         <source>Color Thres</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="652"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="657"/>
         <source>White Thres</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="657"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="662"/>
         <source>H Range</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="660"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="665"/>
         <source>Line Width</source>
         <translation type="unfinished"></translation>
     </message>
@@ -317,22 +312,22 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>DVGui::ColorField</name>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="358"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="360"/>
         <source>R:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="361"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="364"/>
         <source>G:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="364"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="368"/>
         <source>B:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="367"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="372"/>
         <source>A:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -373,7 +368,7 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>DVGui::FileField</name>
     <message>
-        <location filename="../../toonzqt/filefield.cpp" line="30"/>
+        <location filename="../../toonzqt/filefield.cpp" line="31"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -406,7 +401,7 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::StyleIndexLineEdit</name>
     <message>
         <location filename="../../toonzqt/styleindexlineedit.cpp" line="19"/>
-        <location filename="../../toonzqt/styleindexlineedit.cpp" line="35"/>
+        <location filename="../../toonzqt/styleindexlineedit.cpp" line="37"/>
         <source>current</source>
         <translation type="unfinished"></translation>
     </message>
@@ -466,17 +461,17 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FileSegmentPage</name>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="680"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="682"/>
         <source>File Path:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="687"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="689"/>
         <source>Column:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="690"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="692"/>
         <source>Unit:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -711,6 +706,19 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FontParamField</name>
+    <message>
+        <location filename="../../toonzqt/paramfield.cpp" line="1548"/>
+        <source>Style:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paramfield.cpp" line="1552"/>
+        <source>Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FrameNavigator</name>
     <message>
         <location filename="../../toonzqt/framenavigator.cpp" line="26"/>
@@ -750,127 +758,127 @@ Possibly the preset file has been corrupted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1527"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1523"/>
         <source>Link Handles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1528"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1524"/>
         <source>Unlink Handles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1529"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1525"/>
         <source>Reset Handles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1530"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1526"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1531"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1527"/>
         <source>Set Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1532"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1528"/>
         <source>Activate Cycle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1533"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1529"/>
         <source>Deactivate Cycle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1534"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1530"/>
         <source>Linear Interpolation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1535"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1531"/>
         <source>Speed In / Speed Out Interpolation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1536"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1532"/>
         <source>Ease In / Ease Out Interpolation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1537"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1533"/>
         <source>Ease In / Ease Out (%) Interpolation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1538"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1534"/>
         <source>Exponential Interpolation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1539"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1535"/>
         <source>Expression Interpolation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1540"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1536"/>
         <source>File Interpolation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1541"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1537"/>
         <source>Constant Interpolation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1542"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1538"/>
         <source>Similar Shape Interpolation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1543"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1539"/>
         <source>Fit Selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1544"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1540"/>
         <source>Fit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1545"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1541"/>
         <source>Step 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1546"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1542"/>
         <source>Step 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1547"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1543"/>
         <source>Step 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1548"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1544"/>
         <source>Step 4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1620"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1616"/>
         <source>Smooth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1621"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1617"/>
         <source>Frame Based</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1622"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1618"/>
         <source>Curve Shape</source>
         <translation type="unfinished"></translation>
     </message>
@@ -878,126 +886,126 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FunctionSegmentViewer</name>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="906"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1406"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="908"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1408"/>
         <source>Linear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="907"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="909"/>
         <source>Speed In / Speed Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="908"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="910"/>
         <source>Ease In / Ease Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="909"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="911"/>
         <source>Ease In / Ease Out %</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="910"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="912"/>
         <source>Exponential</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="911"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="913"/>
         <source>Expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="912"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1424"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="914"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1426"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="913"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="915"/>
         <source>Constant</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="914"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="916"/>
         <source>Similar Shape</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="922"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="924"/>
         <source>Interpolation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="935"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="937"/>
         <source>Apply</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="989"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="991"/>
         <source>From</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="992"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="994"/>
         <source>To</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="995"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="997"/>
         <source>Step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1162"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1231"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1164"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1233"/>
         <source>&lt; </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1170"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1214"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1172"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1216"/>
         <source> &gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1409"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1411"/>
         <source>Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1412"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1414"/>
         <source>Ease</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1415"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1417"/>
         <source>Ease%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1418"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1420"/>
         <source>Expo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1421"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1423"/>
         <source>Expr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1427"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1429"/>
         <source>Const</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1430"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1432"/>
         <source>Similar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1433"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1435"/>
         <source>????</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1160,55 +1168,50 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FxColumnPainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="331"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="265"/>
         <source>&amp;Disconnect from Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="335"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="269"/>
         <source>&amp;Connect to Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="342"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="276"/>
         <source>&amp;Paste Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="345"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="279"/>
         <source>&amp;Preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="352"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="286"/>
         <source>&amp;Uncache Fx</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="352"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="286"/>
         <source>&amp;Cache FX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="360"/>
-        <source>&amp;Open Subxsheet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>FxOutputPainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1210"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1051"/>
         <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1228"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1069"/>
         <source>&amp;Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1231"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1072"/>
         <source>&amp;Activate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1216,77 +1219,77 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FxPainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="850"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="699"/>
         <source>&amp;Open Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="853"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="702"/>
         <source>&amp;Paste Replace</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="856"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="705"/>
         <source>&amp;Paste Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="862"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="711"/>
         <source>&amp;Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="866"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="715"/>
         <source>&amp;Disconnect from Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="870"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="719"/>
         <source>&amp;Connect to Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="874"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="723"/>
         <source>&amp;Create Linked FX</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="877"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="726"/>
         <source>&amp;Unlink</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="880"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="729"/>
         <source>&amp;Make Macro FX</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="883"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="732"/>
         <source>&amp;Explode Macro FX</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="887"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="736"/>
         <source>&amp;Open Macro FX</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="890"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="739"/>
         <source>&amp;Save As Preset...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="893"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="742"/>
         <source>&amp;Preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="899"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="748"/>
         <source>&amp;Uncache FX</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="899"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="748"/>
         <source>&amp;Cache FX</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1294,17 +1297,17 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FxPalettePainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="560"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="481"/>
         <source>&amp;Disconnect from Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="564"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="485"/>
         <source>&amp;Connect to Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="568"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="489"/>
         <source>&amp;Preview</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1312,25 +1315,33 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FxSchematicLink</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1276"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1117"/>
         <source>&amp;Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1279"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1120"/>
         <source>&amp;Paste Insert</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="2210"/>
+        <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>FxSchematicPort</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1724"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1573"/>
         <source>&amp;Disconnect from Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1728"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1577"/>
         <source>&amp;Connect to Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1338,21 +1349,29 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FxSchematicScene</name>
     <message>
-        <location filename="../../toonzqt/fxschematicscene.cpp" line="1615"/>
+        <location filename="../../toonzqt/fxschematicscene.cpp" line="1749"/>
         <source>Cannot Paste Insert a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicscene.cpp" line="1625"/>
+        <location filename="../../toonzqt/fxschematicscene.cpp" line="1759"/>
         <source>Cannot Paste Add a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicscene.cpp" line="1635"/>
+        <location filename="../../toonzqt/fxschematicscene.cpp" line="1769"/>
         <source>Cannot Paste Replace a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="2278"/>
+        <source>XSheet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1397,17 +1416,17 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>FxXSheetPainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1097"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="947"/>
         <source>XSheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1131"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="981"/>
         <source>&amp;Paste Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1134"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="984"/>
         <source>&amp;Preview</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1415,7 +1434,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>GroupPainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="423"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="349"/>
         <source>&amp;Open Group</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1655,22 +1674,22 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>PaletteViewerGUI::PageViewer</name>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="573"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="558"/>
         <source>- No Styles -</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="1094"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="1079"/>
         <source>Name Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="1148"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="1133"/>
         <source>New Style</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="1150"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="1135"/>
         <source>New Page</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1717,7 +1736,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>PegbarPainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="495"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="416"/>
         <source>&amp;Reset Center</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1725,12 +1744,12 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>PointParamField</name>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="857"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="891"/>
         <source>X:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="859"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="893"/>
         <source>Y:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1738,19 +1757,19 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="931"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="929"/>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="933"/>
-        <location filename="../../include/toonzqt/paramfield.h" line="183"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="931"/>
+        <location filename="../../include/toonzqt/paramfield.h" line="185"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="933"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="931"/>
         <location filename="../../toonzqt/styleselection.cpp" line="1035"/>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="494"/>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="827"/>
@@ -1852,7 +1871,7 @@ Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageobjectselection.cpp" line="100"/>
+        <location filename="../../toonzqt/stageobjectselection.cpp" line="101"/>
         <source>Paste Object  </source>
         <translation type="unfinished"></translation>
     </message>
@@ -1877,38 +1896,38 @@ Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="979"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="993"/>
         <source>Save Motion Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="981"/>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1016"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="995"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1030"/>
         <source>Motion Path files (*.mpath)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1004"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1018"/>
         <source>It is not possible to save the motion path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1014"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1028"/>
         <source>Load Motion Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1044"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1058"/>
         <source>It is not possible to load the motion path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="697"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="703"/>
         <source>Stage Schematic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="719"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="725"/>
         <source>FX Schematic</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1945,67 +1964,68 @@ Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="52"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="54"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="479"/>
         <source>Modify Fx Param : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="237"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="272"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="442"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="239"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="274"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="444"/>
         <source>Modify Fx Param : %1 : %2 -&gt; %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="304"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="581"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="306"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="615"/>
         <source>Modify Fx Param : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="306"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="308"/>
         <source>ON : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="308"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="310"/>
         <source>OFF : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="407"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="409"/>
         <source>Modify Fx Param : %1 : %2 Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="409"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="545"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="411"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="579"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="409"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="545"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="411"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="579"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="543"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="577"/>
         <source>Modify Fx Param : %1 : %2 Point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="583"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="617"/>
         <source>%1 : Linear ON</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="585"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="619"/>
         <source>%1 : Linear OFF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="1617"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="1602"/>
         <source>Palette</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2234,6 +2254,8 @@ Are you sure?</source>
     </message>
     <message>
         <location filename="../../toonzqt/imageutils.cpp" line="692"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="721"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="728"/>
         <source>The source image seems not suitable for this kind of conversion</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2305,12 +2327,12 @@ Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../include/toonzqt/paramfield.h" line="182"/>
+        <location filename="../../include/toonzqt/paramfield.h" line="184"/>
         <source>Modify Fx Param : %1 Key : %2  Frame %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../include/toonzqt/paramfield.h" line="183"/>
+        <location filename="../../include/toonzqt/paramfield.h" line="185"/>
         <source>Set</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2394,57 +2416,62 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
 <context>
     <name>SchematicViewer</name>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="573"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="568"/>
         <source>&amp;Fit to Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="579"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="574"/>
         <source>&amp;Focus on Current</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="584"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="579"/>
         <source>&amp;Reorder Nodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="590"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="585"/>
         <source>&amp;Reset Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="596"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="744"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="803"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="591"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="750"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="809"/>
         <source>&amp;Minimize Nodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="597"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="745"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="804"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="592"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="751"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="810"/>
         <source>&amp;Maximize Nodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="603"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="598"/>
         <source>&amp;New Pegbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="610"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="605"/>
         <source>&amp;New Camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="617"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="612"/>
         <source>&amp;New Motion Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="625"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="620"/>
         <source>&amp;Swtich output port display mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="639"/>
+        <source>&amp;Toggle node icons</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2459,22 +2486,22 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
 <context>
     <name>SimilarShapeSegmentPage</name>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="788"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="790"/>
         <source>Reference Curve:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="794"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="796"/>
         <source>Frame Offset:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="851"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="853"/>
         <source>There is a syntax error in the definition of the interpolation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="856"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="858"/>
         <source>There is a circular reference in the definition of the interpolation.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2525,17 +2552,17 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
 <context>
     <name>SplinePainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="774"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="680"/>
         <source>&amp;Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="777"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="683"/>
         <source>&amp;Save Motion Path...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="779"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="685"/>
         <source>&amp;Load Motion Path...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2543,17 +2570,17 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
 <context>
     <name>StageSchematicScene</name>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1119"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1133"/>
         <source>&amp;New Pegbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1123"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1137"/>
         <source>&amp;New Motion Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1127"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1141"/>
         <source>&amp;New Camera</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2905,12 +2932,12 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
 <context>
     <name>TablePainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="681"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="586"/>
         <source>Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="691"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="596"/>
         <source>&amp;Reset Center</source>
         <translation type="unfinished"></translation>
     </message>

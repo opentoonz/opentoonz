@@ -271,10 +271,15 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // So, in such case set m_tabletEvent = FALSE and let the mousePressEvent to
     // work.
     if (e->button() == Qt::LeftButton) {
-      TMouseEvent mouseEvent;
-      initToonzEvent(mouseEvent, e, height(), m_pressure, getDevPixRatio());
-      m_tabletState = Touched;
-      onPress(mouseEvent);
+      // Proces the 1st tabletPress encountered and ignore back-to-back
+      // tabletPress events. Treat it as if it happened so a following
+      // mousePressEvent gets ignored
+      if (m_tabletState == Released || m_tabletState == None) {
+        TMouseEvent mouseEvent;
+        initToonzEvent(mouseEvent, e, height(), m_pressure, getDevPixRatio());
+        m_tabletState = Touched;
+        onPress(mouseEvent);
+      }
     } else
       m_tabletEvent = false;
 #endif
@@ -365,6 +370,11 @@ void SceneViewer::onLeave() {
   if (m_freezedStatus != NO_FREEZED) return;
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (tool && tool->isEnabled()) tool->onLeave();
+
+  // force reset the flipping of shift & trace
+  if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked())
+    TTool::getTool("T_ShiftTrace", TTool::ToonzImage)->onLeave();
+
   update();
 }
 
@@ -542,6 +552,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
       // sometimes the mousePressedEvent is postponed to a wrong  mouse move
       // event!
       if (m_buttonClicked && !m_toolSwitched) tool->leftButtonDrag(pos, event);
+      m_mouseState = OnStroke;
     } else if (m_pressure == 0.0) {
       tool->mouseMove(pos, event);
     }
@@ -588,6 +599,7 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   // and will cancel the onPress operation called here.
 
   TMouseEvent mouseEvent;
+  m_mouseState = Touched;
   initToonzEvent(mouseEvent, event, height(), 1.0, getDevPixRatio());
   onPress(mouseEvent);
 }
@@ -596,11 +608,20 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
 
 void SceneViewer::onPress(const TMouseEvent &event) {
   if (m_mouseButton != Qt::NoButton) {
-    // if some button is pressed while another button being active,
-    // finish the action for the previous button first.
-    TMouseEvent preEvent = event;
-    preEvent.m_button    = m_mouseButton;
-    onRelease(preEvent);
+    if (event.m_isTablet && m_mouseState != None) {
+      //      qDebug() << "[onPress] Switched from MousePress to TabletPress";
+      // TabletPress came immediately after MousePress. Let's switch to
+      // tabletPress but not end the prior action or it leaves an extra
+      // stroke
+      m_mouseState    = None;
+      m_buttonClicked = false;
+    } else {
+      // if some button is pressed while another button being active,
+      // finish the action for the previous button first.
+      TMouseEvent preEvent = event;
+      preEvent.m_button    = m_mouseButton;
+      onRelease(preEvent);
+    }
   }
 
   // evita i press ripetuti
@@ -632,6 +653,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
       m_compareSettings.m_compareY     = ImagePainter::DefaultCompareValue;
       update();
       m_tabletEvent = false;
+      m_tabletState = None;
       return;
     } else if (abs((height() - m_pos.y()) -
                    height() * m_compareSettings.m_compareY) < 20) {
@@ -640,6 +662,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
       m_compareSettings.m_compareX     = ImagePainter::DefaultCompareValue;
       update();
       m_tabletEvent = false;
+      m_tabletState = None;
       return;
     } else
       m_compareSettings.m_dragCompareX = m_compareSettings.m_dragCompareY =
@@ -651,6 +674,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (!tool || !tool->isEnabled()) {
     m_tabletEvent = false;
+    m_tabletState = None;
     return;
   }
   tool->setViewer(this);
@@ -658,6 +682,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
     tool = TApp::instance()->getCurrentTool()->getTool();
     if (!tool || !tool->isEnabled()) {
       m_tabletEvent = false;
+      m_tabletState = None;
       return;
     }
     tool->setViewer(this);
@@ -678,6 +703,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
     m_tabletState = StartStroke;
     tool->leftButtonDown(pos, event);
   } else if (m_mouseButton == Qt::LeftButton) {
+    m_mouseState = StartStroke;
     TApp::instance()->getCurrentTool()->setToolBusy(true);
     tool->leftButtonDown(pos, event);
   }
@@ -708,6 +734,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
   }
 
   TMouseEvent mouseEvent;
+  if (m_mouseState != None) m_mouseState = Released;
   initToonzEvent(mouseEvent, event, height(), 1.0, getDevPixRatio());
   onRelease(mouseEvent);
 }
@@ -779,6 +806,7 @@ quit:
   // Don't clear it out table state so the tablePress event will process
   // correctly.
   if (m_tabletState != Touched) m_tabletState = None;
+  m_mouseState                                = None;
   m_tabletMove                                = false;
   m_pressure                                  = 0;
   // Leave m_tabletEvent as-is in order to check whether the onRelease is called
@@ -961,6 +989,8 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
 
 void SceneViewer::touchEvent(QTouchEvent *e, int type) {
   if (type == QEvent::TouchBegin) {
+    if (m_tabletEvent) return;
+
     m_touchActive   = true;
     m_firstPanPoint = e->touchPoints().at(0).pos();
     m_undoPoint     = m_firstPanPoint;
@@ -1010,19 +1040,83 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
 //-----------------------------------------------------------------------------
 
 bool SceneViewer::event(QEvent *e) {
-  if (CommandManager::instance()
+  /*
+    switch (e->type()) {
+    //	case QEvent::Enter:
+    //	qDebug() << "[enter] ************************** Enter";
+    //	break;
+    //	case QEvent::Leave:
+    //	qDebug() << "[enter] ************************** Leave";
+    //	break;
+
+    case QEvent::TabletPress: {
+      QTabletEvent *te = static_cast<QTabletEvent *>(e);
+      qDebug() << "[enter] ************************** TabletPress mouseState("
+               << m_mouseState << ") tabletState(" << m_tabletState
+               << ") pressure(" << m_pressure << ") pointerType("
+               << te->pointerType() << ") device(" << te->device() << ")";
+    } break;
+    //	case QEvent::TabletMove:
+    //	qDebug() << "[enter] ************************** TabletMove
+    //mouseState("<<m_mouseState<<") tabletState("<<m_tabletState<<") pressure("
+    //<< m_pressure << ")";
+    //	break;
+    case QEvent::TabletRelease:
+      qDebug() << "[enter] ************************** TabletRelease mouseState("
+               << m_mouseState << ") tabletState(" << m_tabletState << ")";
+      break;
+
+    case QEvent::TouchBegin:
+      qDebug() << "[enter] ************************** TouchBegin";
+      break;
+    case QEvent::TouchEnd:
+      qDebug() << "[enter] ************************** TouchEnd";
+      break;
+    case QEvent::TouchCancel:
+      qDebug() << "[enter] ************************** TouchCancel";
+      break;
+
+    case QEvent::Gesture:
+      qDebug() << "[enter] ************************** Gesture";
+      break;
+
+    case QEvent::MouseButtonPress:
+      qDebug()
+          << "[enter] ************************** MouseButtonPress mouseState("
+          << m_mouseState << ") tabletState(" << m_tabletState << ") pressure("
+          << m_pressure << ") tabletEvent(" << m_tabletEvent << ")";
+      break;
+    //	case QEvent::MouseMove:
+    //	qDebug() << "[enter] ************************** MouseMove mouseState("
+    //<< m_mouseState << ") tabletState("<<m_tabletState<<") pressure(" <<
+    //m_pressure << ")";
+    //	break;
+    case QEvent::MouseButtonRelease:
+      qDebug()
+          << "[enter] ************************** MouseButtonRelease mouseState("
+          << m_mouseState << ") tabletState(" << m_tabletState << ")";
+      break;
+
+    case QEvent::MouseButtonDblClick:
+      qDebug() << "[enter] ============================== MouseButtonDblClick";
+      break;
+    }
+  */
+  if (e->type() == QEvent::Gesture &&
+      CommandManager::instance()
           ->getAction(MI_TouchGestureControl)
           ->isChecked()) {
-    if (e->type() == QEvent::Gesture) {
-      gestureEvent(static_cast<QGestureEvent *>(e));
-      return true;
-    }
-    if (e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
-        e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) {
-      touchEvent(static_cast<QTouchEvent *>(e), e->type());
-      m_gestureActive = true;
-      return true;
-    }
+    gestureEvent(static_cast<QGestureEvent *>(e));
+    return true;
+  }
+  if ((e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
+       e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) &&
+      CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
+    touchEvent(static_cast<QTouchEvent *>(e), e->type());
+    m_gestureActive = true;
+    return true;
   }
   if (e->type() == QEvent::ShortcutOverride || e->type() == QEvent::KeyPress) {
     if (!((QKeyEvent *)e)->isAutoRepeat()) {
@@ -1039,6 +1133,16 @@ bool SceneViewer::event(QEvent *e) {
     else if (tool && tool->isEventAcceptable(e)) {
       e->accept();
     }
+    // if the Shift & Trace mode is active, then override F1, F2 and F3 key
+    // actions by flipping feature
+    else if (CommandManager::instance()
+                 ->getAction(MI_ShiftTrace)
+                 ->isChecked() &&
+             TTool::getTool("T_ShiftTrace", TTool::ToonzImage)
+                 ->isEventAcceptable(e)) {
+      e->accept();
+    }
+
     return true;
   }
   if (e->type() == QEvent::KeyRelease) {
@@ -1061,44 +1165,6 @@ bool SceneViewer::event(QEvent *e) {
     }
     clock.start();
   }
-
-  /*
-  switch(e->type())
-  {
-  case QEvent::Enter:
-  qDebug() << "************************** Enter";
-  break;
-  case QEvent::Leave:
-  qDebug() << "************************** Leave";
-  break;
-
-  case QEvent::TabletPress:
-  qDebug() << "************************** TabletPress"  << m_pressure;
-  break;
-  case QEvent::TabletMove:
-  qDebug() << "************************** TabletMove";
-  break;
-  case QEvent::TabletRelease:
-  qDebug() << "************************** TabletRelease";
-  break;
-
-
-  case QEvent::MouseButtonPress:
-  qDebug() << "**************************MouseButtonPress"  << m_pressure << " "
-  << m_tabletEvent;
-  break;
-  case QEvent::MouseMove:
-  qDebug() << "**************************MouseMove" <<  m_pressure;
-  break;
-  case QEvent::MouseButtonRelease:
-  qDebug() << "**************************MouseButtonRelease";
-  break;
-
-  case QEvent::MouseButtonDblClick:
-  qDebug() << "============================== MouseButtonDblClick";
-  break;
-  }
-  */
 
   return QOpenGLWidget::event(e);
 }
@@ -1211,6 +1277,18 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
         event->ignore();
         return true;
       }
+      // pressing F1, F2 or F3 key will flip between corresponding ghost
+      if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
+          (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
+        OnionSkinMask osm =
+            TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+        if (osm.getGhostFlipKey() != key) {
+          osm.appendGhostFlipKey(key);
+          TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+          TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+        }
+        return true;
+      }
     }
 
     if (!tool->isEnabled()) return false;
@@ -1309,6 +1387,15 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
     setToolCursor(this, tool->getCursorId());
   }
 
+  if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
+      (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
+    OnionSkinMask osm =
+        TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+    osm.removeGhostFlipKey(key);
+    TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+    TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+  }
+
   if (tool->getName() == T_Type)
     event->accept();
   else
@@ -1395,8 +1482,8 @@ void SceneViewer::onContextMenu(const QPoint &pos, const QPoint &globalPos) {
 
   menu->addLevelCommands(columnIndices);
 
-  ComboViewerPanel *cvp = qobject_cast<ComboViewerPanel *>(
-      parentWidget()->parentWidget()->parentWidget());
+  ComboViewerPanel *cvp =
+      qobject_cast<ComboViewerPanel *>(parentWidget()->parentWidget());
   if (cvp) {
     menu->addSeparator();
     cvp->addShowHideContextMenu(menu);

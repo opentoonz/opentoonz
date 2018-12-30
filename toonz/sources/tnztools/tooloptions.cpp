@@ -10,12 +10,14 @@
 #include "selectiontool.h"
 #include "vectorselectiontool.h"
 #include "rasterselectiontool.h"
-#include "brushtool.h"
+#include "toonzrasterbrushtool.h"
 #include "fullcolorbrushtool.h"
+#include "toonzvectorbrushtool.h"
 #include "tooloptionscontrols.h"
 
 //#include "rgbpickertool.h"
 #include "rulertool.h"
+#include "shifttracetool.h"
 
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
@@ -36,6 +38,7 @@
 #include "toonz/preferences.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/tonionskinmaskhandle.h"
 
 // TnzCore includes
 #include "tproperty.h"
@@ -53,7 +56,6 @@
 #include <QResizeEvent>
 #include <QList>
 #include <QSignalMapper>
-#include <QPushButton>
 #include <QPropertyAnimation>
 #include <QEasingCurve>
 #include <QStackedWidget>
@@ -365,6 +367,17 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p) {
     break;
   }
 
+  case FONTCOMBOBOX: {
+    if (p->getQStringName() != "") {
+      QLabel *label = addLabel(p);
+      m_panel->addLabel(p->getName(), label);
+    }
+    ToolOptionFontCombo *obj = new ToolOptionFontCombo(m_tool, p, m_toolHandle);
+    control                  = obj;
+    widget                   = obj;
+    break;
+  }
+
   case COMBOBOX:
   default: {
     if (p->getQStringName() != "") {
@@ -449,13 +462,13 @@ GenericToolOptionsBox::GenericToolOptionsBox(QWidget *parent, TTool *tool,
 //-----------------------------------------------------------------------------
 
 // show 17x17 icon without style dependency
-class SimpleIconViewField : public QWidget {
+class SimpleIconViewField : public DraggableIconView {
   QIcon m_icon;
 
 public:
   SimpleIconViewField(const QString &iconName, const QString &toolTipStr = "",
                       QWidget *parent = 0)
-      : QWidget(parent), m_icon(createQIcon(iconName.toUtf8())) {
+      : DraggableIconView(parent), m_icon(createQIcon(iconName.toUtf8())) {
     setMinimumSize(17, 25);
     setToolTip(toolTipStr);
   }
@@ -1126,7 +1139,7 @@ void ArrowToolOptionsBox::onCurrentAxisChanged(int axisId) {
 //=============================================================================
 
 IconViewField::IconViewField(QWidget *parent, IconType iconType)
-    : QWidget(parent), m_iconType(iconType) {
+    : DraggableIconView(parent), m_iconType(iconType) {
   setMinimumSize(21, 25);
 }
 
@@ -1136,15 +1149,15 @@ void IconViewField::paintEvent(QPaintEvent *e) {
   p.drawPixmap(QRect(0, 3, 21, 17), m_pm[m_iconType]);
 }
 
-void IconViewField::mousePressEvent(QMouseEvent *event) {
+void DraggableIconView::mousePressEvent(QMouseEvent *event) {
   emit onMousePress(event);
 }
 
-void IconViewField::mouseMoveEvent(QMouseEvent *event) {
+void DraggableIconView::mouseMoveEvent(QMouseEvent *event) {
   emit onMouseMove(event);
 }
 
-void IconViewField::mouseReleaseEvent(QMouseEvent *event) {
+void DraggableIconView::mouseReleaseEvent(QMouseEvent *event) {
   emit onMouseRelease(event);
 }
 
@@ -1168,20 +1181,16 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
 
-  IconViewField *iconView =
-      new IconViewField(this, IconViewField::Icon_ScalePeg);
   m_scaleXLabel = new ClickableLabel(tr("H:"), this);
   m_scaleXField = new SelectionScaleField(selectionTool, 0, "Scale X");
   m_scaleYLabel = new ClickableLabel(tr("V:"), this);
   m_scaleYField = new SelectionScaleField(selectionTool, 1, "Scale Y");
   m_scaleLink   = new DVGui::CheckBox(tr("Link"), this);
 
-  IconViewField *rotIconView =
-      new IconViewField(this, IconViewField::Icon_Rotation);
+  SimpleIconViewField *rotIconView =
+      new SimpleIconViewField("edit_rotation", tr("Rotation"));
   m_rotationField = new SelectionRotationField(selectionTool, tr("Rotation"));
 
-  IconViewField *moveIconView =
-      new IconViewField(this, IconViewField::Icon_Position);
   m_moveXLabel = new ClickableLabel(tr("E/W:"), this);
   m_moveXField = new SelectionMoveField(selectionTool, 0, "Move X");
   m_moveYLabel = new ClickableLabel(tr("N/S:"), this);
@@ -1204,7 +1213,8 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
   addSeparator();
 
-  hLayout()->addWidget(iconView, 0);
+  hLayout()->addWidget(new SimpleIconViewField("edit_scale", tr("Scale"), this),
+                       0);
   hLayout()->addWidget(m_scaleXLabel, 0);
   hLayout()->addWidget(m_scaleXField, 10);
   hLayout()->addWidget(m_scaleYLabel, 0);
@@ -1219,7 +1229,8 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
   addSeparator();
 
-  hLayout()->addWidget(moveIconView, 0);
+  hLayout()->addWidget(
+      new SimpleIconViewField("edit_position", tr("Position"), this), 0);
   hLayout()->addWidget(m_moveXLabel, 0);
   hLayout()->addWidget(m_moveXField, 10);
   hLayout()->addWidget(m_moveYLabel, 0);
@@ -1249,7 +1260,6 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
     addSeparator();
     hLayout()->addWidget(thicknessIconView, 0);
     hLayout()->addWidget(m_thickChangeField, 10);
-    // Outline options
     // Outline options
     ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
     builder.setEnumWidgetType(ToolOptionControlBuilder::POPUPBUTTON);
@@ -1529,22 +1539,28 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool,
   assert(props->getPropertyCount() > 0);
 
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
+  builder.setEnumWidgetType(ToolOptionControlBuilder::FONTCOMBOBOX);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
+  builder.setEnumWidgetType(ToolOptionControlBuilder::COMBOBOX);
+  if (tool && tool->getProperties(1)) tool->getProperties(1)->accept(builder);
 
   m_layout->addStretch(0);
 
   bool ret = true;
-  ToolOptionCombo *fontField =
-      dynamic_cast<ToolOptionCombo *>(m_controls.value("Font:"));
+
+  ToolOptionFontCombo *fontField =
+      dynamic_cast<ToolOptionFontCombo *>(m_controls.value("Font:"));
   ret &&connect(fontField, SIGNAL(currentIndexChanged(int)), this,
                 SLOT(onFieldChanged()));
 
-#ifndef MACOSX
+  //#ifndef MACOSX
   ToolOptionCombo *styleField =
       dynamic_cast<ToolOptionCombo *>(m_controls.value("Style:"));
   ret &&connect(styleField, SIGNAL(currentIndexChanged(int)), this,
                 SLOT(onFieldChanged()));
-#endif
+  ret &&connect(toolHandle, SIGNAL(toolComboBoxListChanged(std::string)),
+                styleField, SLOT(reloadComboBoxList(std::string)));
+  //#endif
 
   ToolOptionCombo *sizeField =
       dynamic_cast<ToolOptionCombo *>(m_controls.value("Size:"));
@@ -1851,9 +1867,18 @@ void BrushToolOptionsBox::filterControls() {
   // show or hide widgets which modify imported brush (mypaint)
 
   bool showModifiers = false;
-  if (FullColorBrushTool *fullColorBrushTool =
-          dynamic_cast<FullColorBrushTool *>(m_tool))
+  if (m_tool->getTargetType() & TTool::RasterImage) {
+    FullColorBrushTool *fullColorBrushTool =
+        dynamic_cast<FullColorBrushTool *>(m_tool);
     showModifiers = fullColorBrushTool->getBrushStyle();
+  } else if (m_tool->getTargetType() & TTool::ToonzImage) {
+    ToonzRasterBrushTool *toonzRasterBrushTool =
+        dynamic_cast<ToonzRasterBrushTool *>(m_tool);
+    showModifiers = toonzRasterBrushTool->isMyPaintStyleSelected();
+  } else {  // (m_tool->getTargetType() & TTool::Vectors)
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
+    return;
+  }
 
   for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
        it != m_labels.end(); it++) {
@@ -1870,9 +1895,6 @@ void BrushToolOptionsBox::filterControls() {
     bool visible    = isCommon || (isModifier == showModifiers);
     if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
       widget->setVisible(visible);
-  }
-  if (m_tool->getTargetType() & TTool::Vectors) {
-    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
   }
 }
 
@@ -1915,9 +1937,12 @@ void BrushToolOptionsBox::onAddPreset() {
   m_presetNamePopup->removeName();
 
   switch (m_tool->getTargetType() & TTool::CommonImages) {
-  case TTool::VectorImage:
+  case TTool::VectorImage: {
+    static_cast<ToonzVectorBrushTool *>(m_tool)->addPreset(name);
+    break;
+  }
   case TTool::ToonzImage: {
-    static_cast<BrushTool *>(m_tool)->addPreset(name);
+    static_cast<ToonzRasterBrushTool *>(m_tool)->addPreset(name);
     break;
   }
 
@@ -1934,9 +1959,12 @@ void BrushToolOptionsBox::onAddPreset() {
 
 void BrushToolOptionsBox::onRemovePreset() {
   switch (m_tool->getTargetType() & TTool::CommonImages) {
-  case TTool::VectorImage:
+  case TTool::VectorImage: {
+    static_cast<ToonzVectorBrushTool *>(m_tool)->removePreset();
+    break;
+  }
   case TTool::ToonzImage: {
-    static_cast<BrushTool *>(m_tool)->removePreset();
+    static_cast<ToonzRasterBrushTool *>(m_tool)->removePreset();
     break;
   }
 
@@ -2483,6 +2511,135 @@ void StylePickerToolOptionsBox::updateRealTimePickLabel(const int ink,
 }
 
 //=============================================================================
+// ShiftTraceToolOptionBox
+//-----------------------------------------------------------------------------
+
+ShiftTraceToolOptionBox::ShiftTraceToolOptionBox(QWidget *parent, TTool *tool)
+    : ToolOptionsBox(parent), m_tool(tool) {
+  setFrameStyle(QFrame::StyledPanel);
+  setFixedHeight(26);
+
+  m_prevFrame  = new QFrame(this);
+  m_afterFrame = new QFrame(this);
+
+  m_resetPrevGhostBtn  = new QPushButton(tr("Reset Previous"), this);
+  m_resetAfterGhostBtn = new QPushButton(tr("Reset Following"), this);
+
+  m_prevRadioBtn  = new QRadioButton(tr("Previous Drawing"), this);
+  m_afterRadioBtn = new QRadioButton(tr("Following Drawing"), this);
+
+  m_prevFrame->setFixedSize(10, 21);
+  m_afterFrame->setFixedSize(10, 21);
+
+  m_layout->addWidget(m_prevFrame, 0);
+  m_layout->addWidget(m_prevRadioBtn, 0);
+  m_layout->addWidget(m_resetPrevGhostBtn, 0);
+
+  m_layout->addWidget(new DVGui::Separator("", this, false));
+
+  m_layout->addWidget(m_afterFrame, 0);
+  m_layout->addWidget(m_afterRadioBtn, 0);
+  m_layout->addWidget(m_resetAfterGhostBtn, 0);
+
+  m_layout->addStretch(1);
+
+  connect(m_resetPrevGhostBtn, SIGNAL(clicked(bool)), this,
+          SLOT(onResetPrevGhostBtnPressed()));
+  connect(m_resetAfterGhostBtn, SIGNAL(clicked(bool)), this,
+          SLOT(onResetAfterGhostBtnPressed()));
+  connect(m_prevRadioBtn, SIGNAL(clicked(bool)), this,
+          SLOT(onPrevRadioBtnClicked()));
+  connect(m_afterRadioBtn, SIGNAL(clicked(bool)), this,
+          SLOT(onAfterRadioBtnClicked()));
+
+  updateStatus();
+}
+
+void ShiftTraceToolOptionBox::showEvent(QShowEvent *) {
+  TTool::Application *app = TTool::getApplication();
+  connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
+          SLOT(updateColors()));
+  updateColors();
+}
+
+void ShiftTraceToolOptionBox::hideEvent(QShowEvent *) {
+  TTool::Application *app = TTool::getApplication();
+  disconnect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
+             SLOT(updateColors()));
+}
+
+void ShiftTraceToolOptionBox::resetGhost(int index) {
+  TTool::Application *app = TTool::getApplication();
+  OnionSkinMask osm       = app->getCurrentOnionSkin()->getOnionSkinMask();
+  osm.setShiftTraceGhostCenter(index, TPointD());
+  osm.setShiftTraceGhostAff(index, TAffine());
+  app->getCurrentOnionSkin()->setOnionSkinMask(osm);
+  app->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+  TTool *tool = app->getCurrentTool()->getTool();
+  if (tool) tool->reset();
+
+  if (index == 0)
+    m_resetPrevGhostBtn->setDisabled(true);
+  else  // index == 1
+    m_resetAfterGhostBtn->setDisabled(true);
+}
+
+void ShiftTraceToolOptionBox::onResetPrevGhostBtnPressed() { resetGhost(0); }
+
+void ShiftTraceToolOptionBox::onResetAfterGhostBtnPressed() { resetGhost(1); }
+
+void ShiftTraceToolOptionBox::updateColors() {
+  TPixel front, back;
+  bool ink;
+  Preferences::instance()->getOnionData(front, back, ink);
+
+  m_prevFrame->setStyleSheet(QString("background:rgb(%1,%2,%3,255);")
+                                 .arg((int)back.r)
+                                 .arg((int)back.g)
+                                 .arg((int)back.b));
+  m_afterFrame->setStyleSheet(QString("background:rgb(%1,%2,%3,255);")
+                                  .arg((int)front.r)
+                                  .arg((int)front.g)
+                                  .arg((int)front.b));
+}
+
+void ShiftTraceToolOptionBox::updateStatus() {
+  TTool::Application *app = TTool::getApplication();
+  OnionSkinMask osm       = app->getCurrentOnionSkin()->getOnionSkinMask();
+  if (osm.getShiftTraceGhostAff(0).isIdentity() &&
+      osm.getShiftTraceGhostCenter(0) == TPointD())
+    m_resetPrevGhostBtn->setDisabled(true);
+  else
+    m_resetPrevGhostBtn->setEnabled(true);
+
+  if (osm.getShiftTraceGhostAff(1).isIdentity() &&
+      osm.getShiftTraceGhostCenter(1) == TPointD())
+    m_resetAfterGhostBtn->setDisabled(true);
+  else
+    m_resetAfterGhostBtn->setEnabled(true);
+
+  // Check the ghost index
+  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
+  if (!stTool) return;
+  if (stTool->getCurrentGhostIndex() == 0)
+    m_prevRadioBtn->setChecked(true);
+  else  // ghostIndex == 1
+    m_afterRadioBtn->setChecked(true);
+}
+
+void ShiftTraceToolOptionBox::onPrevRadioBtnClicked() {
+  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
+  if (!stTool) return;
+  stTool->setCurrentGhostIndex(0);
+}
+
+void ShiftTraceToolOptionBox::onAfterRadioBtnClicked() {
+  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
+  if (!stTool) return;
+  stTool->setCurrentGhostIndex(1);
+}
+
+//=============================================================================
 // ToolOptions
 //-----------------------------------------------------------------------------
 
@@ -2590,6 +2747,8 @@ void ToolOptions::onToolSwitched() {
       } else if (tool->getName() == T_StylePicker)
         panel = new StylePickerToolOptionsBox(0, tool, currPalette, currTool,
                                               app->getPaletteController());
+      else if (tool->getName() == "T_ShiftTrace")
+        panel = new ShiftTraceToolOptionBox(this, tool);
       else
         panel = tool->createOptionsBox();  // Only this line should remain out
                                            // of that if/else monstrosity

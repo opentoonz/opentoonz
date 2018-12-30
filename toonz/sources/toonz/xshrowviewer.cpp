@@ -357,6 +357,25 @@ void RowArea::drawCurrentRowGadget(QPainter &p, int r0, int r1) {
 
 //-----------------------------------------------------------------------------
 
+void RowArea::drawOnionSkinBackground(QPainter &p, int r0, int r1) {
+  const Orientation *o = m_viewer->orientation();
+
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
+
+  for (int r = r0; r <= r1; r++) {
+    QPoint basePoint = m_viewer->positionToXY(CellPosition(r, 0));
+    if (!m_viewer->orientation()->isVerticalTimeline()) basePoint.setY(0);
+
+    QRect oRect = m_viewer->orientation()
+                      ->rect(PredefinedRect::ONION_AREA)
+                      .adjusted(0, 0, -frameAdj, 0)
+                      .translated(basePoint);
+    p.fillRect(oRect, m_viewer->getOnionSkinAreaBgColor());
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 void RowArea::drawOnionSkinSelection(QPainter &p) {
   TApp *app            = TApp::instance();
   OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
@@ -561,6 +580,105 @@ void RowArea::drawCurrentTimeLine(QPainter &p) {
 
 //-----------------------------------------------------------------------------
 
+void RowArea::drawShiftTraceMarker(QPainter &p) {
+  TApp *app            = TApp::instance();
+  OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
+
+  TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
+  assert(xsh);
+  int currentRow = m_viewer->getCurrentRow();
+
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
+
+  // get onion colors
+  TPixel frontPixel, backPixel;
+  bool inksOnly;
+  Preferences::instance()->getOnionData(frontPixel, backPixel, inksOnly);
+  QColor frontColor((int)frontPixel.r, (int)frontPixel.g, (int)frontPixel.b);
+  QColor backColor((int)backPixel.r, (int)backPixel.g, (int)backPixel.b);
+
+  // draw lines to ghost frames
+  int prevOffset    = osMask.getShiftTraceGhostFrameOffset(0);
+  int forwardOffset = osMask.getShiftTraceGhostFrameOffset(1);
+
+  QRect onionRect =
+      m_viewer->orientation()->rect(PredefinedRect::SHIFTTRACE_DOT);
+  int onionCenter_frame =
+      m_viewer->orientation()->frameSide(onionRect).middle();
+  int onionCenter_layer =
+      m_viewer->orientation()->layerSide(onionRect).middle();
+
+  if (currentRow > 0 && prevOffset < 0)  // previous ghost
+  {
+    int layerAxis     = onionCenter_layer;
+    int fromFrameAxis = m_viewer->rowToFrameAxis(currentRow + prevOffset) +
+                        onionCenter_frame - (frameAdj / 2);
+    int toFrameAxis = m_viewer->rowToFrameAxis(currentRow) + onionCenter_frame -
+                      (frameAdj / 2);
+    QLine verticalLine = m_viewer->orientation()->verticalLine(
+        layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
+    p.setPen(backColor);
+    p.setBrush(Qt::NoBrush);
+    p.drawLine(verticalLine);
+  }
+  if (forwardOffset > 0)  // forward ghost
+  {
+    int layerAxis     = onionCenter_layer;
+    int fromFrameAxis = m_viewer->rowToFrameAxis(currentRow) +
+                        onionCenter_frame - (frameAdj / 2);
+    int toFrameAxis = m_viewer->rowToFrameAxis(currentRow + forwardOffset) +
+                      onionCenter_frame - (frameAdj / 2);
+    QLine verticalLine = m_viewer->orientation()->verticalLine(
+        layerAxis, NumberRange(fromFrameAxis, toFrameAxis));
+    p.setPen(frontColor);
+    p.setBrush(Qt::NoBrush);
+    p.drawLine(verticalLine);
+  }
+
+  if (!m_viewer->orientation()->isVerticalTimeline())
+    drawCurrentTimeIndicator(p);
+
+  // draw dots
+  std::vector<int> offsVec      = {prevOffset, 0, forwardOffset};
+  std::vector<QColor> colorsVec = {backColor, QColor(0, 162, 232), frontColor};
+  QFont currentFont             = p.font();
+  QFont tmpFont                 = p.font();
+  tmpFont.setPointSize(7);
+  p.setFont(tmpFont);
+  for (int i = 0; i < 3; i++) {
+    if (i != 1 && offsVec[i] == 0) continue;
+    p.setPen(colorsVec[i]);
+    p.setBrush(Qt::gray);
+    QPoint topLeft =
+        m_viewer->positionToXY(CellPosition(currentRow + offsVec[i], 0));
+    if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+    QRect dotRect = m_viewer->orientation()
+                        ->rect(PredefinedRect::SHIFTTRACE_DOT)
+                        .translated(topLeft);
+    dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
+    p.drawRect(dotRect);
+    // draw shortcut numbers
+    p.setPen(Qt::black);
+    p.drawText(dotRect, Qt::AlignCenter, QString::number(i + 1));
+  }
+  p.setFont(currentFont);
+
+  //-- onion placement hint under mouse
+  if (m_showOnionToSet == ShiftTraceGhost) {
+    p.setPen(QColor(255, 255, 0));
+    p.setBrush(QColor(255, 255, 0, 180));
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(m_row, 0));
+    if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+    QRect dotRect = m_viewer->orientation()
+                        ->rect(PredefinedRect::SHIFTTRACE_DOT)
+                        .translated(topLeft);
+    dotRect.adjust(-frameAdj / 2, 0, -frameAdj / 2, 0);
+    p.drawRect(dotRect);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 namespace {
 
 TStageObjectId getAncestor(TXsheet *xsh, TStageObjectId id) {
@@ -660,6 +778,9 @@ void RowArea::paintEvent(QPaintEvent *event) {
 
   drawPlayRangeBackground(p, r0, r1);
 
+  if (Preferences::instance()->isOnionSkinEnabled())
+    drawOnionSkinBackground(p, r0, r1);
+
   if (TApp::instance()->getCurrentFrame()->isEditingScene())
     // current frame
     drawCurrentRowGadget(p, r0, r1);
@@ -672,7 +793,9 @@ void RowArea::paintEvent(QPaintEvent *event) {
   drawRows(p, r0, r1);
 
   if (TApp::instance()->getCurrentFrame()->isEditingScene()) {
-    if (Preferences::instance()->isOnionSkinEnabled())
+    if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked())
+      drawShiftTraceMarker(p);
+    else if (Preferences::instance()->isOnionSkinEnabled())
       drawOnionSkinSelection(p);
     else if (Preferences::instance()->isCurrentTimelineIndicatorEnabled() &&
              !m_viewer->orientation()->isVerticalTimeline())
@@ -711,10 +834,41 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
     QPoint mouseInCell = event->pos() - topLeft;
     int frameAdj       = m_viewer->getFrameZoomAdjustment();
 
-    if (Preferences::instance()->isOnionSkinEnabled() &&
-        o->rect(PredefinedRect::ONION_AREA)
+    if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
+        o->rect(PredefinedRect::SHIFTTRACE_DOT_AREA)
             .adjusted(0, 0, -frameAdj, 0)
             .contains(mouseInCell)) {
+      // Reset ghosts to neighbor frames
+      if (row == currentFrame)
+        OnioniSkinMaskGUI::resetShiftTraceFrameOffset();
+      else {
+        OnionSkinMask osMask =
+            TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+        int prevOffset    = osMask.getShiftTraceGhostFrameOffset(0);
+        int forwardOffset = osMask.getShiftTraceGhostFrameOffset(1);
+        // Hide previous ghost
+        if (row == currentFrame + prevOffset)
+          osMask.setShiftTraceGhostFrameOffset(0, 0);
+        // Hide forward ghost
+        else if (row == currentFrame + forwardOffset)
+          osMask.setShiftTraceGhostFrameOffset(1, 0);
+        // Move previous ghost
+        else if (row < currentFrame)
+          osMask.setShiftTraceGhostFrameOffset(0, row - currentFrame);
+        // Move forward ghost
+        else
+          osMask.setShiftTraceGhostFrameOffset(1, row - currentFrame);
+        TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osMask);
+      }
+      TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+      return;
+    } else if (!CommandManager::instance()
+                    ->getAction(MI_ShiftTrace)
+                    ->isChecked() &&
+               Preferences::instance()->isOnionSkinEnabled() &&
+               o->rect(PredefinedRect::ONION_AREA)
+                   .adjusted(0, 0, -frameAdj, 0)
+                   .contains(mouseInCell)) {
       if (row == currentFrame) {
         setDragTool(
             XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
@@ -729,11 +883,6 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
                    .contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeKeyOnionSkinMaskModifierTool(
             m_viewer, false));
-      else {
-        setDragTool(
-            XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
-        frameAreaIsClicked = true;
-      }
     } else {
       int playR0, playR1, step;
       XsheetGUI::getPlayRange(playR0, playR1, step);
@@ -833,8 +982,38 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
   QPoint mouseInCell = event->pos() - topLeft;
   if (row < 0) return;
+
+  m_tooltip = tr("");
+
+  // whether to show ability to move the shift and trace ghost frame
+  if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked()) {
+    if (o->rect(PredefinedRect::SHIFTTRACE_DOT_AREA)
+            .adjusted(0, 0, -frameAdj, 0)
+            .contains(mouseInCell)) {
+      m_showOnionToSet = ShiftTraceGhost;
+
+      OnionSkinMask osMask =
+          TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+      int prevOffset    = osMask.getShiftTraceGhostFrameOffset(0);
+      int forwardOffset = osMask.getShiftTraceGhostFrameOffset(1);
+      if (row == currentRow)
+        m_tooltip =
+            tr("Click to Reset Shift & Trace Markers to Neighbor Frames\nHold "
+               "F2 Key on the Viewer to Show This Frame Only");
+      else if (row == currentRow + prevOffset)
+        m_tooltip =
+            tr("Click to Hide This Frame from Shift & Trace\nHold F1 Key on "
+               "the Viewer to Show This Frame Only");
+      else if (row == currentRow + forwardOffset)
+        m_tooltip =
+            tr("Click to Hide This Frame from Shift & Trace\nHold F3 Key on "
+               "the Viewer to Show This Frame Only");
+      else
+        m_tooltip = tr("Click to Move Shift & Trace Marker");
+    }
+  }
   // whether to show ability to set onion marks
-  if (Preferences::instance()->isOnionSkinEnabled() && row != currentRow) {
+  else if (Preferences::instance()->isOnionSkinEnabled() && row != currentRow) {
     if (o->rect(PredefinedRect::ONION_FIXED_DOT_AREA)
             .adjusted(0, 0, -frameAdj, 0)
             .contains(mouseInCell))
@@ -884,6 +1063,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   QPainterPath endArrow =
       o->path(PredefinedPath::END_PLAY_RANGE).translated(base1);
 
+  if (!m_tooltip.isEmpty()) return;
   if (startArrow.contains(m_pos))
     m_tooltip = tr("Playback Start Marker");
   else if (endArrow.contains(m_pos))
@@ -904,8 +1084,6 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
     m_tooltip = tr("Fixed Onion Skin Toggle");
   else if (m_showOnionToSet == Mos)
     m_tooltip = tr("Relative Onion Skin Toggle");
-  else
-    m_tooltip = tr("");
 }
 
 //-----------------------------------------------------------------------------

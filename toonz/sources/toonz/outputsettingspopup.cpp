@@ -8,6 +8,7 @@
 #include "tapp.h"
 #include "camerasettingspopup.h"
 #include "pane.h"
+#include "boardsettingspopup.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -25,6 +26,7 @@
 #include "toonz/preferences.h"
 #include "toutputproperties.h"
 #include "toonz/tcamera.h"
+#include "toonz/boardsettings.h"
 
 // TnzBase includes
 #include "trasterfx.h"
@@ -43,12 +45,13 @@
 #include <QMainWindow>
 #include <QFrame>
 #include <QMessageBox>
+#include <QMap>
 
 //-----------------------------------------------------------------------------
 namespace {
 
 enum ResampleOption {
-  c_standard,
+  c_standard = 0,
   c_improved,
   c_high,
 
@@ -65,8 +68,65 @@ enum ResampleOption {
   c_lanczos3,
   c_gauss,
   c_closestPixel,
-  c_bilinear
+  c_bilinear,
+  ResampleOptionCount
 };
+
+struct resampleInfo {
+  QString idString;
+  TRenderSettings::ResampleQuality quality;
+  QString uiString = "";
+  resampleInfo(QString _idStr = "",
+               TRenderSettings::ResampleQuality _quality =
+                   TRenderSettings::StandardResampleQuality)
+      : idString(_idStr), quality(_quality), uiString("") {}
+};
+
+QMap<ResampleOption, resampleInfo> resampleInfoMap = {
+    {c_standard,
+     resampleInfo("Standard", TRenderSettings::StandardResampleQuality)},
+    {c_improved,
+     resampleInfo("Improved", TRenderSettings::ImprovedResampleQuality)},
+    {c_high, resampleInfo("High", TRenderSettings::HighResampleQuality)},
+    {c_triangle, resampleInfo("Triangle filter",
+                              TRenderSettings::Triangle_FilterResampleQuality)},
+    {c_mitchell, resampleInfo("Mitchell-Netravali filter",
+                              TRenderSettings::Mitchell_FilterResampleQuality)},
+    {c_cubic5, resampleInfo("Cubic convolution, a = .5",
+                            TRenderSettings::Cubic5_FilterResampleQuality)},
+    {c_cubic75, resampleInfo("Cubic convolution, a = .75",
+                             TRenderSettings::Cubic75_FilterResampleQuality)},
+    {c_cubic1, resampleInfo("Cubic convolution, a = 1",
+                            TRenderSettings::Cubic1_FilterResampleQuality)},
+    {c_hann2, resampleInfo("Hann window, rad = 2",
+                           TRenderSettings::Hann2_FilterResampleQuality)},
+    {c_hann3, resampleInfo("Hann window, rad = 3",
+                           TRenderSettings::Hann3_FilterResampleQuality)},
+    {c_hamming2, resampleInfo("Hamming window, rad = 2",
+                              TRenderSettings::Hamming2_FilterResampleQuality)},
+    {c_hamming3, resampleInfo("Hamming window, rad = 3",
+                              TRenderSettings::Hamming3_FilterResampleQuality)},
+    {c_lanczos2, resampleInfo("Lanczos window, rad = 2",
+                              TRenderSettings::Lanczos2_FilterResampleQuality)},
+    {c_lanczos3, resampleInfo("Lanczos window, rad = 3",
+                              TRenderSettings::Lanczos3_FilterResampleQuality)},
+    {c_gauss, resampleInfo("Gaussian convolution",
+                           TRenderSettings::Gauss_FilterResampleQuality)},
+    {c_closestPixel,
+     resampleInfo("Closest Pixel (Nearest Neighbor)",
+                  TRenderSettings::ClosestPixel_FilterResampleQuality)},
+    {c_bilinear,
+     resampleInfo("Bilinear",
+                  TRenderSettings::Bilinear_FilterResampleQuality)}};
+
+ResampleOption quality2index(TRenderSettings::ResampleQuality quality) {
+  QMapIterator<ResampleOption, resampleInfo> i(resampleInfoMap);
+  while (i.hasNext()) {
+    i.next();
+    if (i.value().quality == quality) return i.key();
+  }
+  return c_standard;
+}
 
 enum ChannelWidth { c_8bit, c_16bit };
 
@@ -166,6 +226,11 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
     otherSettingsLabel      = new QLabel(tr("Other Settings"), this);
     otherSettingsFrame      = new QFrame(this);
     m_renderButton          = new QPushButton(tr("Render"), this);
+
+    // Board
+    m_addBoard         = new DVGui::CheckBox(tr("Add Clapperboard"), this);
+    m_boardSettingsBtn = new QPushButton(tr("Edit Clapperboard..."), this);
+
     // Gamma
     m_gammaFld = new DVGui::DoubleLineEdit();
     // Dominant Field
@@ -214,25 +279,15 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
   }
 
   // Resample Balance
-  QStringList resampleBalance;
-  resampleBalance << tr("Standard") << tr("Improved") << tr("High")
-                  << tr("Triangle filter") << tr("Mitchell-Netravali filter")
-                  << tr("Cubic convolution, a = .5")
-                  << tr("Cubic convolution, a = .75")
-                  << tr("Cubic convolution, a = 1")
-                  << tr("Hann window, rad = 2") << tr("Hann window, rad = 3")
-                  << tr("Hamming window, rad = 2")
-                  << tr("Hamming window, rad = 3")
-                  << tr("Lanczos window, rad = 2")
-                  << tr("Lanczos window, rad = 3") << tr("Gaussian convolution")
-                  << tr("Closest Pixel (Nearest Neighbor)") << tr("Bilinear");
-
-  m_resampleBalanceOm->addItems(resampleBalance);
+  translateResampleOptions();
+  for (int i = 0; i < ResampleOptionCount; i++) {
+    m_resampleBalanceOm->addItem(resampleInfoMap[(ResampleOption)i].uiString,
+                                 resampleInfoMap[(ResampleOption)i].idString);
+  }
 
   // Channel Width
-  QStringList chWidth;
-  chWidth << tr("8 bit") << tr("16 bit");
-  m_channelWidthOm->addItems(chWidth);
+  m_channelWidthOm->addItem(tr("8 bit"), "8 bit");
+  m_channelWidthOm->addItem(tr("16 bit"), "16 bit");
 
   if (!isPreview) {
     showOtherSettingsButton->setObjectName("OutputSettingsShowButton");
@@ -268,9 +323,10 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
     addPresetButton->setObjectName("PushButton_NoPadding");
     removePresetButton->setObjectName("PushButton_NoPadding");
     /*-- OutputSettingsのプリセット登録の説 明--*/
-    QString tooltip(
-        "Save current output settings.\nThe parameters to be saved are:\n\
-- Camera settings\n- Project folder to be saved in\n- File format\n- File options\n- Resample Balance\n- Channel width");
+    QString tooltip =
+        tr("Save current output settings.\nThe parameters to be saved are:\n- "
+           "Camera settings\n- Project folder to be saved in\n- File format\n- "
+           "File options\n- Resample Balance\n- Channel width");
     addPresetButton->setToolTip(tooltip);
     /*-- プリセットフォルダを調べ、コンボボックスにアイテムを格納する --*/
     updatePresetComboItems();
@@ -457,39 +513,43 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
         otherSettingsLay->setHorizontalSpacing(5);
         otherSettingsLay->setVerticalSpacing(10);
         {
+          // clapperboard
+          otherSettingsLay->addWidget(m_addBoard, 0, 0);
+          otherSettingsLay->addWidget(m_boardSettingsBtn, 0, 2, 1, 2);
+
           // Gamma
-          otherSettingsLay->addWidget(new QLabel(tr("Gamma:"), this), 0, 0,
+          otherSettingsLay->addWidget(new QLabel(tr("Gamma:"), this), 1, 0,
                                       Qt::AlignRight | Qt::AlignVCenter);
-          otherSettingsLay->addWidget(m_gammaFld, 0, 1, 1, 3);
+          otherSettingsLay->addWidget(m_gammaFld, 1, 1, 1, 3);
           // Dominant Field
           otherSettingsLay->addWidget(new QLabel(tr("Dominant Field:"), this),
-                                      1, 0, Qt::AlignRight | Qt::AlignVCenter);
-          otherSettingsLay->addWidget(m_dominantFieldOm, 1, 1, 1, 4);
+                                      2, 0, Qt::AlignRight | Qt::AlignVCenter);
+          otherSettingsLay->addWidget(m_dominantFieldOm, 2, 1, 1, 4);
           // Scene Settings' FPS
           otherSettingsLay->addWidget(
-              new QLabel(tr("Frame Rate (linked to Scene Settings):"), this), 2,
+              new QLabel(tr("Frame Rate (linked to Scene Settings):"), this), 3,
               0, Qt::AlignRight | Qt::AlignVCenter);
-          otherSettingsLay->addWidget(m_frameRateFld, 2, 1, 1, 3);
+          otherSettingsLay->addWidget(m_frameRateFld, 3, 1, 1, 3);
           // Strech
           otherSettingsLay->addWidget(new QLabel(tr("Stretch from FPS:"), this),
-                                      3, 0, Qt::AlignRight | Qt::AlignVCenter);
-          otherSettingsLay->addWidget(m_stretchFromFld, 3, 1);
-          otherSettingsLay->addWidget(new QLabel(tr("  To:"), this), 3, 2,
+                                      4, 0, Qt::AlignRight | Qt::AlignVCenter);
+          otherSettingsLay->addWidget(m_stretchFromFld, 4, 1);
+          otherSettingsLay->addWidget(new QLabel(tr("  To:"), this), 4, 2,
                                       Qt::AlignRight | Qt::AlignVCenter);
-          otherSettingsLay->addWidget(m_stretchToFld, 3, 3);
+          otherSettingsLay->addWidget(m_stretchToFld, 4, 3);
           // new in V6.1
           // Multimedia rendering enum
           otherSettingsLay->addWidget(
-              new QLabel(tr("Multiple Rendering:"), this), 4, 0,
+              new QLabel(tr("Multiple Rendering:"), this), 5, 0,
               Qt::AlignRight | Qt::AlignVCenter);
-          otherSettingsLay->addWidget(m_multimediaOm, 4, 1, 1, 4);
+          otherSettingsLay->addWidget(m_multimediaOm, 5, 1, 1, 4);
 
-          otherSettingsLay->addWidget(m_doStereoscopy, 5, 0);
-          otherSettingsLay->addWidget(new QLabel(tr("Camera Shift:")), 5, 1,
+          otherSettingsLay->addWidget(m_doStereoscopy, 6, 0);
+          otherSettingsLay->addWidget(new QLabel(tr("Camera Shift:")), 6, 1,
                                       Qt::AlignRight | Qt::AlignVCenter);
-          otherSettingsLay->addWidget(m_stereoShift, 5, 2);
+          otherSettingsLay->addWidget(m_stereoShift, 6, 2);
 
-          otherSettingsLay->addLayout(bottomGridLay, 6, 0, 4, 5);
+          otherSettingsLay->addLayout(bottomGridLay, 7, 0, 4, 5);
         }
         otherSettingsLay->setColumnStretch(0, 0);
         otherSettingsLay->setColumnStretch(1, 0);
@@ -548,6 +608,12 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
                        SLOT(onChannelWidthChanged(int)));
 
   if (!isPreview) {
+    // clapperboard
+    ret = ret && connect(m_addBoard, SIGNAL(stateChanged(int)), this,
+                         SLOT(onAddBoardChecked(int)));
+    ret = ret && connect(m_boardSettingsBtn, SIGNAL(clicked()), this,
+                         SLOT(onBoardSettingsBtnClicked()));
+
     ret = ret && connect(m_gammaFld, SIGNAL(editingFinished()),
                          SLOT(onGammaFldEditFinished()));
     ret = ret && connect(m_dominantFieldOm, SIGNAL(currentIndexChanged(int)),
@@ -764,60 +830,8 @@ void OutputSettingsPopup::updateField() {
     m_applyShrinkChk->setCheckState(
         renderSettings.m_applyShrinkToViewer ? Qt::Checked : Qt::Unchecked);
   // resample
-  switch (renderSettings.m_quality) {
-  case TRenderSettings::ImprovedResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_improved);
-    break;
-  case TRenderSettings::HighResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_high);
-    break;
-  case TRenderSettings::StandardResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_standard);
-    break;
-
-  case TRenderSettings::Mitchell_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_mitchell);
-    break;
-  case TRenderSettings::Cubic5_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_cubic5);
-    break;
-  case TRenderSettings::Cubic75_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_cubic75);
-    break;
-  case TRenderSettings::Cubic1_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_cubic1);
-    break;
-  case TRenderSettings::Hann2_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_hann2);
-    break;
-  case TRenderSettings::Hann3_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_hann3);
-    break;
-  case TRenderSettings::Hamming2_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_hamming2);
-    break;
-  case TRenderSettings::Hamming3_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_hamming3);
-    break;
-  case TRenderSettings::Lanczos2_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_lanczos2);
-    break;
-  case TRenderSettings::Lanczos3_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_lanczos3);
-    break;
-  case TRenderSettings::Gauss_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_gauss);
-    break;
-  case TRenderSettings::ClosestPixel_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_closestPixel);
-    break;
-  case TRenderSettings::Bilinear_FilterResampleQuality:
-    m_resampleBalanceOm->setCurrentIndex(c_bilinear);
-    break;
-  default:
-    m_resampleBalanceOm->setCurrentIndex(c_standard);
-    break;
-  }
+  m_resampleBalanceOm->setCurrentIndex(
+      (int)quality2index(renderSettings.m_quality));
 
   // channel width
   switch (renderSettings.m_bpp) {
@@ -862,6 +876,18 @@ void OutputSettingsPopup::updateField() {
   m_stretchToFld->setValue(renderSettings.m_timeStretchTo);
 
   m_frameRateFld->setValue(prop->getFrameRate());
+
+  // clapperboard
+  BoardSettings *boardSettings = prop->getBoardSettings();
+  m_addBoard->setChecked(boardSettings->isActive());
+  // clapperboard is only available with movie formats
+  if (isMovieType(m_fileFormat->currentText().toStdString())) {
+    m_addBoard->setEnabled(true);
+    m_boardSettingsBtn->setEnabled(m_addBoard->isChecked());
+  } else {
+    m_addBoard->setEnabled(false);
+    m_boardSettingsBtn->setEnabled(false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -959,6 +985,15 @@ void OutputSettingsPopup::onFormatChanged(const QString &str) {
   } else {
     m_threadsComboOm->setDisabled(false);
     m_threadsComboOm->setCurrentIndex(2);
+  }
+
+  // clapperboard is only available with movie formats
+  if (isMovieType(str.toStdString())) {
+    m_addBoard->setEnabled(true);
+    m_boardSettingsBtn->setEnabled(m_addBoard->isChecked());
+  } else {
+    m_addBoard->setEnabled(false);
+    m_boardSettingsBtn->setEnabled(false);
   }
 }
 
@@ -1106,42 +1141,8 @@ void OutputSettingsPopup::onResampleChanged(int type) {
   if (!getCurrentScene()) return;
   TOutputProperties *prop = getProperties();
   TRenderSettings rs      = prop->getRenderSettings();
-  if (type == c_improved)
-    rs.m_quality = TRenderSettings::ImprovedResampleQuality;
-  else if (type == c_high)
-    rs.m_quality = TRenderSettings::HighResampleQuality;
-  else if (type == c_standard)
-    rs.m_quality = TRenderSettings::StandardResampleQuality;
-  else if (type == c_triangle)
-    rs.m_quality = TRenderSettings::Triangle_FilterResampleQuality;
-  else if (type == c_mitchell)
-    rs.m_quality = TRenderSettings::Mitchell_FilterResampleQuality;
-  else if (type == c_cubic5)
-    rs.m_quality = TRenderSettings::Cubic5_FilterResampleQuality;
-  else if (type == c_cubic75)
-    rs.m_quality = TRenderSettings::Cubic75_FilterResampleQuality;
-  else if (type == c_cubic1)
-    rs.m_quality = TRenderSettings::Cubic1_FilterResampleQuality;
-  else if (type == c_hann2)
-    rs.m_quality = TRenderSettings::Hann2_FilterResampleQuality;
-  else if (type == c_hann3)
-    rs.m_quality = TRenderSettings::Hann3_FilterResampleQuality;
-  else if (type == c_hamming2)
-    rs.m_quality = TRenderSettings::Hamming2_FilterResampleQuality;
-  else if (type == c_hamming3)
-    rs.m_quality = TRenderSettings::Hamming3_FilterResampleQuality;
-  else if (type == c_lanczos2)
-    rs.m_quality = TRenderSettings::Lanczos2_FilterResampleQuality;
-  else if (type == c_lanczos3)
-    rs.m_quality = TRenderSettings::Lanczos3_FilterResampleQuality;
-  else if (type == c_gauss)
-    rs.m_quality = TRenderSettings::Gauss_FilterResampleQuality;
-  else if (type == c_closestPixel)
-    rs.m_quality = TRenderSettings::ClosestPixel_FilterResampleQuality;
-  else if (type == c_bilinear)
-    rs.m_quality = TRenderSettings::Bilinear_FilterResampleQuality;
-  else
-    rs.m_quality = TRenderSettings::StandardResampleQuality;
+
+  rs.m_quality = resampleInfoMap[(ResampleOption)type].quality;
   prop->setRenderSettings(rs);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   if (m_presetCombo) m_presetCombo->setCurrentIndex(0);
@@ -1335,11 +1336,13 @@ void OutputSettingsPopup::onAddPresetButtonPressed() {
   os.closeChild();
 
   // Resample Balance
-  QString resq = m_resampleBalanceOm->currentText();
+  QString resq =
+      resampleInfoMap[(ResampleOption)m_resampleBalanceOm->currentIndex()]
+          .idString;
   os.child("resquality") << resq.toStdString();
 
   // Channel Width
-  QString chanw = m_channelWidthOm->currentText();
+  QString chanw = m_channelWidthOm->currentData().toString();
   os.child("bpp") << chanw.toStdString();
 
   // 140503 iwasawa Frame Rate (Scene Settings)
@@ -1377,6 +1380,29 @@ void OutputSettingsPopup::updatePresetComboItems() {
     m_presetCombo->addItem(QString::fromStdString(it->getName()));
   }
   m_presetCombo->setCurrentIndex(0);
+}
+
+//-----------------------------------------------------------------------------
+
+void OutputSettingsPopup::translateResampleOptions() {
+  resampleInfoMap[c_standard].uiString = tr("Standard");
+  resampleInfoMap[c_improved].uiString = tr("Improved");
+  resampleInfoMap[c_high].uiString     = tr("High");
+  resampleInfoMap[c_triangle].uiString = tr("Triangle filter");
+  resampleInfoMap[c_mitchell].uiString = tr("Mitchell-Netravali filter");
+  resampleInfoMap[c_cubic5].uiString   = tr("Cubic convolution, a = .5");
+  resampleInfoMap[c_cubic75].uiString  = tr("Cubic convolution, a = .75");
+  resampleInfoMap[c_cubic1].uiString   = tr("Cubic convolution, a = 1");
+  resampleInfoMap[c_hann2].uiString    = tr("Hann window, rad = 2");
+  resampleInfoMap[c_hann3].uiString    = tr("Hann window, rad = 3");
+  resampleInfoMap[c_hamming2].uiString = tr("Hamming window, rad = 2");
+  resampleInfoMap[c_hamming3].uiString = tr("Hamming window, rad = 3");
+  resampleInfoMap[c_lanczos2].uiString = tr("Lanczos window, rad = 2");
+  resampleInfoMap[c_lanczos3].uiString = tr("Lanczos window, rad = 3");
+  resampleInfoMap[c_gauss].uiString    = tr("Gaussian convolution");
+  resampleInfoMap[c_closestPixel].uiString =
+      tr("Closest Pixel (Nearest Neighbor)");
+  resampleInfoMap[c_bilinear].uiString = tr("Bilinear");
 }
 
 //-----------------------------------------------------------------------------
@@ -1505,15 +1531,34 @@ void OutputSettingsPopup::onPresetSelected(const QString &str) {
     else if (tagName == "resquality") {
       std::string resq;
       is >> resq;
-      int index = m_resampleBalanceOm->findText(QString::fromStdString(resq));
-      if (index >= 0) m_resampleBalanceOm->setCurrentIndex(index);
+      // first, search in the combobox item data.
+      int index = m_resampleBalanceOm->findData(QString::fromStdString(resq));
+      // second, search in the combobox ui text (which may be translated).
+      // the second search is kept in order to keep backward compatibility.
+      if (index < 0)
+        index = m_resampleBalanceOm->findText(QString::fromStdString(resq));
+      if (index >= 0) {
+        m_resampleBalanceOm->setCurrentIndex(index);
+        rs.m_quality = resampleInfoMap[(ResampleOption)index].quality;
+      }
     }
     // Channel Width
     else if (tagName == "bpp") {
       std::string chanw;
       is >> chanw;
-      int index = m_channelWidthOm->findText(QString::fromStdString(chanw));
-      if (index >= 0) m_channelWidthOm->setCurrentIndex(index);
+      // first, search in the combobox item data.
+      int index = m_channelWidthOm->findData(QString::fromStdString(chanw));
+      // second, search in the combobox ui text (which may be translated).
+      // the second search is kept in order to keep backward compatibility.
+      if (index < 0)
+        index = m_channelWidthOm->findText(QString::fromStdString(chanw));
+      if (index >= 0) {
+        m_channelWidthOm->setCurrentIndex(index);
+        if (index == c_8bit)
+          rs.m_bpp = 32;
+        else
+          rs.m_bpp = 64;
+      }
     }
 
     // Frame Rate (Scene Settings)
@@ -1570,6 +1615,21 @@ void OutputSettingsPopup::onFrameRateEditingFinished() {
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentXsheet()->getXsheet()->updateFrameCount();
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void OutputSettingsPopup::onAddBoardChecked(int state) {
+  BoardSettings *boardSettings = getProperties()->getBoardSettings();
+  boardSettings->setActive(state == Qt::Checked);
+
+  m_boardSettingsBtn->setEnabled(state == Qt::Checked);
+}
+
+void OutputSettingsPopup::onBoardSettingsBtnClicked() {
+  std::cout << "board settings button clicked" << std::endl;
+  BoardSettingsPopup popup(this);
+  popup.exec();
 }
 
 //-----------------------------------------------------------------------------

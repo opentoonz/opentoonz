@@ -26,7 +26,7 @@ class TFrameHandle;
 class PalettesScanPopup;
 class TXsheetHandle;
 class TXshLevelHandle;
-
+class PaletteViewer;
 //=============================================================================
 //!	The StudioPaletteTreeViewer class provides an object to view and manage
 //! palettes files.
@@ -207,6 +207,7 @@ class DVAPI StudioPaletteViewer final : public QSplitter {
   Q_OBJECT
 
   StudioPaletteTreeViewer *m_studioPaletteTreeViewer;
+  PaletteViewer *m_studioPaletteViewer;
 
 public:
   StudioPaletteViewer(QWidget *parent, TPaletteHandle *studioPaletteHandle,
@@ -217,6 +218,9 @@ public:
 
   /*! In order to save current palette from the tool button in the PageViewer.*/
   TFilePath getCurrentItemPath();
+
+  int getViewMode() const;
+  void setViewMode(int mode);
 };
 
 #endif  // STUDIOPALETTEVIEWER_H

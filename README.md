@@ -31,6 +31,8 @@ Older versions and unstable nightly build are also available at <https://github.
 
 For instructions on how to build stylesheets, please [see here](./doc/how_to_stylesheet.md).
 
+Can't develop but still want to help? Help us test individual Pull Requests before they are merged with [these steps](./doc/how_to_test_prs.md).
+
 ## Community
 
 - To share tips or to troubleshoot, join the [Google OpenToonz Users forum](https://groups.google.com/forum/#!forum/opentoonz_en)

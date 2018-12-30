@@ -15,11 +15,6 @@
 #include "tmsg.h"
 #include "copP.h"*/
 
-#if defined(MACOSX) || defined(LINUX)
-#define TRUE 1
-#define FALSE 0
-#endif
-
 /*------------------------------------------------------------------------*/
 namespace {
 UCHAR First_preseed_table[256] = {
@@ -187,7 +182,7 @@ int Displace_vector[8];
     y_pos++;                                                                   \
     break;                                                                     \
   default:                                                                     \
-    assert(FALSE);                                                             \
+    assert(false);                                                             \
   }
 
 /*------------------------------------------------------------------------*/
@@ -232,7 +227,7 @@ static void initialize_displace_vector(void) {
 
 /*------------------------------------------------------------------------*/
 
-static int find_next_seed(const TRasterGR8P &r, int first_seed, UCHAR *&seed,
+static int find_next_seed(const TRasterGR8P &r, bool first_seed, UCHAR *&seed,
                           int &x_pos, int &y_pos) {
   static int Curr_x = 0, Curr_y = 0;
   UCHAR *pix;
@@ -277,7 +272,7 @@ static void doComputeCentroid(const TRasterGR8P &r, TPoint &cp) {
   int x_num = 0, y_num = 0, den = 0;
   int x_pos, y_pos, old_x_pos, old_y_pos;
   int aux, old_displ = -1;
-  int first_seed;
+  bool first_seed;
 
   Lx                 = r->getLx();
   Displace_vector[0] = -Lx - 1;
@@ -289,10 +284,10 @@ static void doComputeCentroid(const TRasterGR8P &r, TPoint &cp) {
   Displace_vector[6] = Lx;
   Displace_vector[7] = Lx + 1;
 
-  first_seed = TRUE;
+  first_seed = true;
 
   while (find_next_seed(r, first_seed, seed, x_pos, y_pos)) {
-    first_seed = FALSE;
+    first_seed = false;
 
     *seed |= 0x2;
 

@@ -205,7 +205,7 @@ public:
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();
 
     std::vector<TFrameId> fids;
-    m_level->setPalette(m_palette);
+    m_level->setPalette(m_palette->clone());
     for (; it != m_images.end(); ++it)  //, ++mit)
     {
       QString id = "MergeColumnsUndo" + QString::number(m_matchlineSessionId) +
@@ -236,8 +236,8 @@ public:
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();
     for (; it != m_images.end(); ++it)  //, ++mit)
     {
-      QString id = "MergeColumnsUndo" + QString::number((uintptr_t)this) + "-" +
-                   QString::number(it->first.getNumber());
+      QString id = "MergeColumnsUndo" + QString::number(m_matchlineSessionId) +
+                   "-" + QString::number(it->first.getNumber());
       TImageCache::instance()->remove(id);
     }
   }
@@ -272,7 +272,7 @@ void mergeColumns(const std::set<int> &columns) {
 static int MergeColumnsSessionId = 0;
 
 void mergeColumns(int column, int mColumn, bool isRedo) {
-  MergeColumnsSessionId++;
+  if (!isRedo) MergeColumnsSessionId++;
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   int start, end;
   xsh->getCellRange(column, start, end);
@@ -353,11 +353,14 @@ void mergeColumns(int column, int mColumn, bool isRedo) {
         return;
       }
 
-      QString id = "MergeColumnsUndo" + QString::number(MergeColumnsSessionId) +
-                   "-" + QString::number(fid.getNumber());
-      TImageCache::instance()->add(
-          id, (timg) ? timg->cloneImage() : vimg->cloneImage());
-      images[fid] = id;
+      if (!isRedo) {
+        QString id = "MergeColumnsUndo" +
+                     QString::number(MergeColumnsSessionId) + "-" +
+                     QString::number(fid.getNumber());
+        TImageCache::instance()->add(
+            id, (timg) ? timg->cloneImage() : vimg->cloneImage());
+        images[fid] = id;
+      }
       TAffine imgAff, matchAff;
       getColumnPlacement(imgAff, xsh, start + i, column, false);
       getColumnPlacement(matchAff, xsh, start + i, mColumn, false);

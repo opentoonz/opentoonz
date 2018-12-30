@@ -277,6 +277,15 @@
 #define MI_SetConstantSpeed "MI_SetConstantSpeed"
 #define MI_ResetInterpolation "MI_ResetInterpolation"
 
+#define MI_UseLinearInterpolation "MI_UseLinearInterpolation"
+#define MI_UseSpeedInOutInterpolation "MI_UseSpeedInOutInterpolation"
+#define MI_UseEaseInOutInterpolation "MI_UseEaseInOutInterpolation"
+#define MI_UseEaseInOutPctInterpolation "MI_UseEaseInOutPctInterpolation"
+#define MI_UseExponentialInterpolation "MI_UseExponentialInterpolation"
+#define MI_UseExpressionInterpolation "MI_UseExpressionInterpolation"
+#define MI_UseFileInterpolation "MI_UseFileInterpolation"
+#define MI_UseConstantInterpolation "MI_UseConstantInterpolation"
+
 #define MI_ActivateThisColumnOnly "MI_ActivateThisColumnOnly"
 #define MI_ActivateSelectedColumns "MI_ActivateSelectedColumns"
 #define MI_ActivateAllColumns "MI_ActivateAllColumns"
@@ -333,5 +342,6 @@
 #define MI_LipSyncPopup "MI_LipSyncPopup"
 #define MI_AutoInputCellNumber "MI_AutoInputCellNumber"
 #define MI_TouchGestureControl "MI_TouchGestureControl"
+#define MI_SeparateColors "MI_SeparateColors"
 
 #endif

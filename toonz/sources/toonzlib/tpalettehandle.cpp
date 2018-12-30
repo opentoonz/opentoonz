@@ -144,12 +144,11 @@ void TPaletteHandle::setPalette(TPalette *palette, int styleIndex) {
 //-----------------------------------------------------------------------------
 
 void TPaletteHandle::setStyleIndex(int index) {
-  //	if(m_styleIndex != index)
-  //	{
-  m_styleIndex      = index;
-  m_styleParamIndex = 0;
-  emit broadcastColorStyleSwitched();
-  //	}
+  if (m_styleIndex != index || m_styleParamIndex != 0) {
+    m_styleIndex      = index;
+    m_styleParamIndex = 0;
+    emit broadcastColorStyleSwitched();
+  }
 }
 
 //-----------------------------------------------------------------------------

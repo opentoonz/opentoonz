@@ -24,6 +24,7 @@
 #include "toonz/tcamera.h"
 #include "toonz/tstageobjectcmd.h"
 #include "toonz/tproject.h"
+#include "toonz/childstack.h"
 
 // TnzCore includes
 #include "tconst.h"
@@ -105,6 +106,8 @@ void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup) {
   }
 }
 
+bool resizingNodes = false;
+bool updatingScene = false;
 }  // namespace
 
 //==================================================================
@@ -136,7 +139,10 @@ StageSchematicScene::StageSchematicScene(QWidget *parent)
     , m_sceneHandle(0)
     , m_frameHandle(0)
     , m_gridDimension(eSmall)
-    , m_showLetterOnPortFlag(ShowLetterOnOutputPortOfStageNode != 0) {
+    , m_showLetterOnPortFlag(ShowLetterOnOutputPortOfStageNode != 0)
+    , m_viewer() {
+  m_viewer = (SchematicViewer *)parent;
+
   QPointF sceneCenter = sceneRect().center();
   m_firstPos          = TPointD(sceneCenter.x(), sceneCenter.y());
 
@@ -190,6 +196,8 @@ void StageSchematicScene::onSelectionSwitched(TSelection *oldSel,
 //------------------------------------------------------------------
 
 void StageSchematicScene::updateScene() {
+  if (updatingScene) return;
+  updatingScene = true;
   clearAllItems();
 
   QPointF firstPos = sceneRect().center();
@@ -347,6 +355,7 @@ void StageSchematicScene::updateScene() {
     }
   }
   m_nodesToPlace.clear();
+  updatingScene = false;
 }
 
 //------------------------------------------------------------------
@@ -363,6 +372,7 @@ StageSchematicNode *StageSchematicScene::addStageSchematicNode(
   connect(node, SIGNAL(currentColumnChanged(int)), this,
           SLOT(onCurrentColumnChanged(int)));
   connect(node, SIGNAL(editObject()), this, SIGNAL(editObject()));
+  connect(node, SIGNAL(nodeChangedSize()), this, SLOT(onNodeChangedSize()));
 
   // specify the node position
   if (pegbar->getDagNodePos() == TConst::nowhere) {
@@ -535,6 +545,7 @@ void StageSchematicScene::updateNestedGroupEditors(StageSchematicNode *node,
 //------------------------------------------------------------------
 
 void StageSchematicScene::resizeNodes(bool maximizedNode) {
+  resizingNodes             = true;
   m_gridDimension           = maximizedNode ? eLarge : eSmall;
   TStageObjectTree *pegTree = m_xshHandle->getXsheet()->getStageObjectTree();
   pegTree->setDagGridDimension(m_gridDimension);
@@ -574,6 +585,7 @@ void StageSchematicScene::resizeNodes(bool maximizedNode) {
   for (it2 = m_groupEditorTable.begin(); it2 != m_groupEditorTable.end(); it2++)
     it2.value()->resizeNodes(maximizedNode);
   updateScene();
+  resizingNodes = false;
 }
 
 //------------------------------------------------------------------
@@ -581,6 +593,7 @@ void StageSchematicScene::resizeNodes(bool maximizedNode) {
 void StageSchematicScene::updatePositionOnResize(TStageObject *obj,
                                                  bool maximizedNode) {
   TPointD oldPos = obj->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25500;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   obj->setDagNodePos(TPointD(oldPos.x, newPosY + 25500));
@@ -591,6 +604,7 @@ void StageSchematicScene::updatePositionOnResize(TStageObject *obj,
 void StageSchematicScene::updateSplinePositionOnResize(TStageObjectSpline *spl,
                                                        bool maximizedNode) {
   TPointD oldPos = spl->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25500;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   spl->setDagNodePos(TPointD(oldPos.x, newPosY + 25500));
@@ -1137,6 +1151,15 @@ void StageSchematicScene::contextMenuEvent(
   menu.addAction(addPegbar);
   menu.addAction(addCamera);
   menu.addAction(addSpline);
+
+  // Close sub xsheet and move to parent sheet
+  ToonzScene *scene      = m_sceneHandle->getScene();
+  ChildStack *childStack = scene->getChildStack();
+  if (childStack && childStack->getAncestorCount() > 0) {
+    menu.addSeparator();
+    menu.addAction(CommandManager::instance()->getAction("MI_CloseChild"));
+  }
+
   menu.addSeparator();
   menu.addAction(paste);
   m_selection->setPastePosition(TPointD(scenePos.x(), scenePos.y()));
@@ -1219,13 +1242,6 @@ void StageSchematicScene::onCollapse(QList<TStageObjectId> objects) {
 
 //------------------------------------------------------------------
 
-void StageSchematicScene::onOpenSubxsheet() {
-  CommandManager *cm = CommandManager::instance();
-  cm->execute("MI_OpenChild");
-}
-
-//------------------------------------------------------------------
-
 void StageSchematicScene::onEditGroup() {
   if (m_selection->isEmpty()) return;
   TStageObjectTree *pegTree  = m_xshHandle->getXsheet()->getStageObjectTree();
@@ -1242,4 +1258,11 @@ void StageSchematicScene::onEditGroup() {
 
 TStageObjectId StageSchematicScene::getCurrentObject() {
   return m_objHandle->getObjectId();
+}
+
+//------------------------------------------------------------------
+
+void StageSchematicScene::onNodeChangedSize() {
+  if (resizingNodes) return;
+  updateScene();
 }

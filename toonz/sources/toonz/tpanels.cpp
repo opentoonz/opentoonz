@@ -626,6 +626,17 @@ void StudioPaletteViewerPanel::onPaletteSwitched() {
       m_studioPaletteHandle);
 }
 
+//-----------------------------------------------------------------------------
+
+void StudioPaletteViewerPanel::setViewType(int viewType) {
+  m_studioPaletteViewer->setViewMode(viewType);
+}
+//-----------------------------------------------------------------------------
+
+int StudioPaletteViewerPanel::getViewType() {
+  return m_studioPaletteViewer->getViewMode();
+}
+
 //=============================================================================
 // StudioPaletteViewerFactory
 //-----------------------------------------------------------------------------
@@ -1264,21 +1275,43 @@ OpenFloatingPanel openLineTestCaptureCommand(MI_OpenLineTestCapture,
 // ComboViewer : Viewer + Toolbar + Tool Options
 //-----------------------------------------------------------------------------
 
+ComboViewerPanelContainer::ComboViewerPanelContainer(QWidget *parent)
+    : StyleShortcutSwitchablePanel(parent) {
+  m_comboViewer = new ComboViewerPanel(parent);
+  setFocusProxy(m_comboViewer);
+  setWidget(m_comboViewer);
+
+  m_comboViewer->initializeTitleBar(getTitleBar());
+  bool ret = connect(m_comboViewer->getToolOptions(), SIGNAL(newPanelCreated()),
+                     this, SLOT(updateTabFocus()));
+  assert(ret);
+}
+// reimplementation of TPanel::widgetInThisPanelIsFocused
+bool ComboViewerPanelContainer::widgetInThisPanelIsFocused() {
+  return m_comboViewer->hasFocus();
+}
+// reimplementation of TPanel::widgetFocusOnEnter
+void ComboViewerPanelContainer::widgetFocusOnEnter() {
+  m_comboViewer->onEnterPanel();
+}
+void ComboViewerPanelContainer::widgetClearFocusOnLeave() {
+  m_comboViewer->onLeavePanel();
+}
+
+//-----------------------------------------------------------------------------
+
 class ComboViewerFactory final : public TPanelFactory {
 public:
   ComboViewerFactory() : TPanelFactory("ComboViewer") {}
   TPanel *createPanel(QWidget *parent) override {
-    ComboViewerPanel *panel = new ComboViewerPanel(parent);
+    ComboViewerPanelContainer *panel = new ComboViewerPanelContainer(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Combo Viewer"));
     panel->resize(700, 600);
     return panel;
   }
-  void initialize(TPanel *panel) override {
-    assert(0);
-    panel->setWidget(new ComboViewerPanel(panel));
-  }
-} ghibliViewerFactory;
+  void initialize(TPanel *panel) override { assert(0); }
+} comboViewerFactory;
 
 //=============================================================================
 OpenFloatingPanel openComboViewerCommand(MI_OpenComboViewer, "ComboViewer",

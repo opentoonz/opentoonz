@@ -1152,7 +1152,13 @@ void ReplaceFxUndo::initialize() {
     fx = zcfx->getZeraryFx();
   }
 
-  if (has_fx_column(fx)) {
+  TZeraryColumnFx *zcrepfx = dynamic_cast<TZeraryColumnFx *>(repFx);
+  if (zcrepfx) repFx       = zcrepfx->getZeraryFx();
+
+  bool fxHasCol    = has_fx_column(fx);
+  bool repfxHasCol = has_fx_column(repFx);
+
+  if (fxHasCol && repfxHasCol) {
     if (zcfx) {
       // Build a column with the same source cells pattern
       m_repColumn = new TXshZeraryFxColumn(*zcfx->getColumn());
@@ -1170,6 +1176,10 @@ void ReplaceFxUndo::initialize() {
       m_repColIdx = xsh->getFirstFreeColumnIndex();
       m_repFx     = static_cast<TZeraryColumnFx *>(m_repColumn->getFx());
     }
+  } else if (!fxHasCol && repfxHasCol) {
+    m_repColumn = FxCommandUndo::createZeraryFxColumn(xsh, repFx);
+    m_repColIdx = xsh->getFirstFreeColumnIndex();
+    m_repFx     = static_cast<TZeraryColumnFx *>(m_repColumn->getFx());
   }
 
   FxCommandUndo::cloneGroupStack(fx, m_repFx.getPointer());
@@ -1598,7 +1608,8 @@ private:
     else {
       TOutputFx *currentOutputFx = xsh->getFxDag()->getCurrentOutputFx();
       const TPointD &pos = currentOutputFx->getAttributes()->getDagNodePos();
-      outputFx->getAttributes()->setDagNodePos(pos + TPointD(20, 20));
+      if (pos != TConst::nowhere)
+        outputFx->getAttributes()->setDagNodePos(pos + TPointD(20, 20));
     }
   }
 };
@@ -2637,7 +2648,8 @@ void UndoPasteFxs::initialize(const std::map<TFx *, int> &zeraryFxColumnSize,
         TFx *fx = *ft;
 
         const TPointD &fxPos = fx->getAttributes()->getDagNodePos();
-        fx->getAttributes()->setDagNodePos(fxPos + offset);
+        if (fxPos != TConst::nowhere)
+          fx->getAttributes()->setDagNodePos(fxPos + offset);
       }
     }
   }

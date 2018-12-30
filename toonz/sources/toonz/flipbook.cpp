@@ -65,7 +65,6 @@
 // Other widgets
 #include "toonzqt/flipconsole.h"
 #include "toonzqt/dvdialog.h"
-#include "toonzqt/gutil.h"
 #include "filmstripselection.h"
 #include "castselection.h"
 #include "histogrampopup.h"
@@ -75,7 +74,6 @@
 #include <QDesktopWidget>
 #include <QSettings>
 #include <QPainter>
-#include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include <QAbstractButton>
 #include <QLabel>
@@ -90,7 +88,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include <QLabel>
 
 #include <stdint.h>  // for uintptr_t
 

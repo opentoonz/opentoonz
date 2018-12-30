@@ -736,7 +736,7 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos) {
         if (pointIndex > precCp.m_pointIndex + 2) {
           // nel caso in cui sono nel secondo chunk scambio i punti
           a0 = a4;
-          tswap(a1, a3);
+          std::swap(a1, a3);
           isInFirstChunk = false;
         }
 
@@ -850,7 +850,7 @@ void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex,
   int cpCount = getControlPointCount();
   // Verifiche per il caso in cui lo stroke e' selfLoop
   if (isSelfLoop() && beforeIndex == 0 && nextIndex == cpCount - 1)
-    tswap(beforeIndex, nextIndex);
+    std::swap(beforeIndex, nextIndex);
 
   int beforePointIndex = m_controlPoints[beforeIndex].m_pointIndex;
   int nextPointIndex   = (isSelfLoop() && nextIndex == 0)

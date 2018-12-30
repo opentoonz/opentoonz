@@ -212,6 +212,7 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   QColor m_verticalLineHeadColor;  // vertical lines in column head
   QColor m_textColor;              // text color (black)
   QColor m_previewFrameTextColor;  // frame number in preview range (blue)
+  QColor m_onionSkinAreaBgColor;
   Q_PROPERTY(QColor CurrentRowBgColor READ getCurrentRowBgColor WRITE
                  setCurrentRowBgColor)
   Q_PROPERTY(
@@ -223,6 +224,8 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
   Q_PROPERTY(QColor PreviewFrameTextColor READ getPreviewFrameTextColor WRITE
                  setPreviewFrameTextColor)
+  Q_PROPERTY(QColor OnionSkinAreaBgColor READ getOnionSkinAreaBgColor WRITE
+                 setOnionSkinAreaBgColor)
   // Column
   QColor m_emptyColumnHeadColor;     // empty column header (200,200,200)
   QColor m_selectedColumnTextColor;  // selected column text (red)
@@ -719,6 +722,11 @@ public:
     m_previewFrameTextColor = color;
   }
   QColor getPreviewFrameTextColor() const { return m_previewFrameTextColor; }
+  void setOnionSkinAreaBgColor(const QColor &color) {
+    m_onionSkinAreaBgColor = color;
+  }
+  QColor getOnionSkinAreaBgColor() const { return m_onionSkinAreaBgColor; }
+
   // Column
   void setEmptyColumnHeadColor(const QColor &color) {
     m_emptyColumnHeadColor = color;

@@ -20,6 +20,7 @@
 #include "toonz/trasterimageutils.h"
 #include "toonz/levelupdater.h"
 #include "toutputproperties.h"
+#include "toonz/boardsettings.h"
 
 // tcg includes
 #include "tcg/tcg_macros.h"
@@ -160,6 +161,8 @@ public:
   std::pair<bool, int> saveFrame(double frame,
                                  const std::pair<TRasterP, TRasterP> &rasters);
   std::string getRenderCacheId();
+
+  void addBoard();
 };
 
 //---------------------------------------------------------
@@ -374,7 +377,15 @@ std::pair<bool, int> MovieRenderer::Imp::saveFrame(
                       m_renderSettings.m_timeStretchFrom;
 
   int fr = (stretchFac != 1) ? tround(frame * stretchFac) : int(frame);
-  TFrameId fid(fr + 1);
+
+  int boardDuration = 0;
+  if (m_movieType) {
+    BoardSettings *bs =
+        m_scene->getProperties()->getOutputProperties()->getBoardSettings();
+    boardDuration = (bs->isActive()) ? bs->getDuration() : 0;
+  }
+
+  TFrameId fid(fr + 1 + boardDuration);
 
   if (m_levelUpdaterA.get()) {
     assert(m_levelUpdaterB.get() || !rasters.second);
@@ -474,6 +485,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
       if (m_levelUpdaterB.get())
         m_levelUpdaterB->getLevelWriter()->saveSoundTrack(m_st.getPointer());
     }
+
+    addBoard();
   }
 
   // Output frames must be *cloned*, since the supplied rasters will be
@@ -730,6 +743,40 @@ void MovieRenderer::Imp::onRenderFinished(bool isCanceled) {
 
   release();  // The movieRenderer is released by the render process. It could
               // eventually be deleted.
+}
+
+//---------------------------------------------------------
+
+void MovieRenderer::Imp::addBoard() {
+  BoardSettings *boardSettings =
+      m_scene->getProperties()->getOutputProperties()->getBoardSettings();
+  if (!boardSettings->isActive()) return;
+  int duration = boardSettings->getDuration();
+  if (duration == 0) return;
+  // Get the image size
+  int shrinkX = m_renderSettings.m_shrinkX,
+      shrinkY = m_renderSettings.m_shrinkY;
+  TDimensionD cameraRes(double(m_frameSize.lx) / shrinkX,
+                        double(m_frameSize.ly) / shrinkY);
+  TDimension cameraResI(cameraRes.lx, cameraRes.ly);
+
+  TRaster32P boardRas =
+      boardSettings->getBoardRaster(cameraResI, shrinkX, m_scene);
+
+  if (m_levelUpdaterA.get()) {
+    // Flush images
+    try {
+      TRasterImageP img(boardRas);
+      for (int f = 0; f < duration; f++) {
+        m_levelUpdaterA->update(TFrameId(f + 1), img);
+        if (m_levelUpdaterB.get())
+          m_levelUpdaterB->update(TFrameId(f + 1), img);
+      }
+    } catch (...) {
+      // Nothing. The images could not be saved for whatever reason.
+      // Failure is reported.
+    }
+  }
 }
 
 //======================================================================================

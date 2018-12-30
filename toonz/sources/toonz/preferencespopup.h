@@ -16,6 +16,7 @@
 
 // Qt includes
 #include <QComboBox>
+#include <QFontComboBox>
 
 //==============================================================
 
@@ -55,9 +56,10 @@ private:
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
       *m_vectorSnappingTargetCB, *m_dropdownShortcutsCycleOptionsCB,
-      *m_interfaceFont, *m_interfaceFontWeight, *m_guidedDrawingStyle,
-      *m_functionEditorToggle, *m_cursorBrushType, *m_cursorBrushStyle,
-      *m_xsheetLayout;
+      *m_guidedDrawingStyle, *m_functionEditorToggle, *m_cursorBrushType,
+      *m_cursorBrushStyle, *m_xsheetLayout, *m_interfaceFontStyle;
+
+  QFontComboBox *m_interfaceFont;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
@@ -80,7 +82,8 @@ private:
       *m_useHigherDpiOnVectorSimplifyCB, *m_keepFillOnVectorSimplifyCB,
       *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB,
       *m_syncLevelRenumberWithXsheet, *m_downArrowInLevelStripCreatesNewFrame,
-      *m_enableAutoStretch;
+      *m_enableAutoStretch, *m_enableWinInk,
+      *m_useOnionColorsForShiftAndTraceCB;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -94,6 +97,7 @@ private:
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
   void rebuildFormatsList();
+  void rebuilldFontStyleList();
 
 private slots:
 
@@ -179,6 +183,7 @@ private slots:
   void onReplaceAfterSaveLevelAsChanged(int index);
   void onOnionSkinVisibilityChanged(int);
   void onOnionSkinDuringPlaybackChanged(int);
+  void onOnionColorsForShiftAndTraceChanged(int);
   void onGuidedDrawingStyleChanged(int);
   void onActualPixelOnSceneModeChanged(int);
   void onMultiLayerStylePickerChanged(int);
@@ -202,7 +207,7 @@ private slots:
   void onShortcutCommandsWhileRenamingCellClicked(int);
   void onWatchFileSystemClicked(int);
   void onInterfaceFontChanged(int index);
-  void onInterfaceFontWeightChanged(int index);
+  void onInterfaceFontStyleChanged(int index);
   void onXsheetLayoutChanged(int index);
   void onPathAliasPriorityChanged(int index);
   void onShowCurrentTimelineChanged(int);
@@ -214,6 +219,8 @@ private slots:
   void onCursorBrushStyleChanged(int index);
   void onCursorOutlineChanged(int);
   void onCurrentColumnDataChanged(const TPixel32 &, bool isDragging);
+  void onEnableWinInkChanged(int index);
+  void onRasterBackgroundColorChanged(const TPixel32 &, bool isDragging);
 };
 
 //**********************************************************************************

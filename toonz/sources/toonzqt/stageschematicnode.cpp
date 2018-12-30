@@ -26,7 +26,6 @@
 #include "toonz/txshchildlevel.h"
 #include "toonz/txshlevelcolumn.h"
 #include "toonz/txshleveltypes.h"
-#include "toonz/txshleveltypes.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/hook.h"
 #include "toonz/preferences.h"
@@ -135,10 +134,18 @@ void ColumnPainter::paint(QPainter *painter,
   QString levelName;
   m_parent->getLevelTypeAndName(levelType, levelName);
 
-  QLinearGradient linearGrad = getGradientByLevelType(m_type);
+  QColor nodeColor;
+  SchematicViewer *viewer = stageScene->getSchematicViewer();
+  viewer->getNodeColor(levelType, nodeColor);
 
-  painter->setBrush(QBrush(linearGrad));
-  painter->setPen(Qt::NoPen);
+  if (m_isReference && levelType != PLT_XSHLEVEL) {
+    painter->setBrush(viewer->getReferenceColumnColor());
+    painter->setPen(nodeColor);
+  } else {
+    painter->setBrush(nodeColor);
+    painter->setPen(Qt::NoPen);
+  }
+
   if (levelType == PLT_XSHLEVEL)
     painter->drawRoundRect(0, 0, m_width, m_height, 32, 99);
   else
@@ -164,7 +171,7 @@ void ColumnPainter::paint(QPainter *painter,
       painter->drawRect(0, -pixmap.height(), m_width, pixmap.height());
     }
   }
-  painter->setPen(Qt::white);
+  painter->setPen(viewer->getTextColor());
   painter->setBrush(Qt::NoBrush);
 
   //! draw the name only if it is not editing
@@ -175,7 +182,7 @@ void ColumnPainter::paint(QPainter *painter,
 
     // if this is current object
     if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
     QRectF columnNameRect(18, 2, 54, 14);
     QString elidedName =
         elideText(m_name, painter->font(), columnNameRect.width());
@@ -193,81 +200,6 @@ void ColumnPainter::paint(QPainter *painter,
 
 //--------------------------------------------------------
 
-QLinearGradient ColumnPainter::getGradientByLevelType(int type) {
-  QColor col1, col2, col3, col4, col5;
-  switch (type) {
-  case TZI_XSHLEVEL:
-  case OVL_XSHLEVEL:
-    col1 = QColor(209, 232, 234);
-    col2 = QColor(121, 171, 181);
-    col3 = QColor(98, 143, 165);
-    col4 = QColor(33, 90, 118);
-    col5 = QColor(122, 172, 173);
-    break;
-  case PLI_XSHLEVEL:
-    col1 = QColor(236, 226, 182);
-    col2 = QColor(199, 187, 95);
-    col3 = QColor(180, 180, 67);
-    col4 = QColor(130, 125, 15);
-    col5 = QColor(147, 150, 28);
-    break;
-  case TZP_XSHLEVEL:
-    col1 = QColor(196, 245, 196);
-    col2 = QColor(111, 192, 105);
-    col3 = QColor(63, 146, 99);
-    col4 = QColor(32, 113, 86);
-    col5 = QColor(117, 187, 166);
-    break;
-  case ZERARYFX_XSHLEVEL:
-    col1 = QColor(232, 245, 196);
-    col2 = QColor(130, 129, 93);
-    col3 = QColor(113, 115, 81);
-    col4 = QColor(55, 59, 25);
-    col5 = QColor(144, 154, 111);
-    break;
-  case CHILD_XSHLEVEL:
-    col1 = QColor(247, 208, 241);
-    col2 = QColor(214, 154, 219);
-    col3 = QColor(170, 123, 169);
-    col4 = QColor(92, 52, 98);
-    col5 = QColor(132, 111, 154);
-    break;
-  case PLT_XSHLEVEL:
-    col1 = QColor(42, 171, 154);
-    col2 = QColor(28, 116, 105);
-    col3 = QColor(15, 62, 56);
-    col4 = QColor(15, 62, 56);
-    col5 = QColor(33, 95, 90);
-    break;
-  case MESH_XSHLEVEL:
-    col1 = QColor(210, 140, 255);
-    col2 = QColor(200, 130, 255);
-    col3 = QColor(150, 80, 180);
-    col4 = QColor(150, 80, 180);
-    col5 = QColor(180, 120, 220);
-    break;
-  case UNKNOWN_XSHLEVEL:
-  case NO_XSHLEVEL:
-  default:
-    col1 = QColor(227, 227, 227);
-    col2 = QColor(174, 174, 174);
-    col3 = QColor(123, 123, 123);
-    col4 = QColor(61, 61, 61);
-    col5 = QColor(127, 138, 137);
-  }
-
-  QLinearGradient linearGrad(QPointF(0, 0), QPointF(0, 32));
-  linearGrad.setColorAt(0, col1);
-  linearGrad.setColorAt(0.08, col2);
-  linearGrad.setColorAt(0.20, col3);
-  linearGrad.setColorAt(0.23, col4);
-  linearGrad.setColorAt(0.9, col4);
-  linearGrad.setColorAt(1, col5);
-  return linearGrad;
-}
-
-//--------------------------------------------------------
-
 void ColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   StageSchematicScene *stageScene =
       dynamic_cast<StageSchematicScene *>(scene());
@@ -276,10 +208,9 @@ void ColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   QAction *resetCenter = new QAction(tr("&Reset Center"), &menu);
   connect(resetCenter, SIGNAL(triggered()), stageScene, SLOT(onResetCenter()));
   QAction *collapse   = CommandManager::instance()->getAction("MI_Collapse");
-  QAction *openSubxsh = new QAction(tr("&Open Subxsheet"), &menu);
+  QAction *openSubxsh = CommandManager::instance()->getAction("MI_OpenChild");
   QAction *explodeChild =
       CommandManager::instance()->getAction("MI_ExplodeChild");
-  connect(openSubxsh, SIGNAL(triggered()), stageScene, SLOT(onOpenSubxsheet()));
   QAction *group = CommandManager::instance()->getAction("MI_Group");
 
   QAction *clear = CommandManager::instance()->getAction("MI_Clear");
@@ -370,6 +301,8 @@ void GroupPainter::paint(QPainter *painter,
       dynamic_cast<StageSchematicScene *>(scene());
   if (!stageScene) return;
 
+  SchematicViewer *viewer = stageScene->getSchematicViewer();
+
   painter->save();
   QPen pen;
   if (m_parent->isSelected()) {
@@ -383,14 +316,7 @@ void GroupPainter::paint(QPainter *painter,
   painter->restore();
 
   {
-    QLinearGradient groupLinearGrad(QPointF(0, 0), QPointF(0, 18));
-    groupLinearGrad.setColorAt(0, QColor(115, 184, 200));
-    groupLinearGrad.setColorAt(0.14, QColor(65, 118, 150));
-    groupLinearGrad.setColorAt(0.35, QColor(57, 107, 158));
-    groupLinearGrad.setColorAt(0.4, QColor(12, 60, 120));
-    groupLinearGrad.setColorAt(0.8, QColor(12, 60, 120));
-    groupLinearGrad.setColorAt(1, QColor(85, 91, 110));
-    painter->setBrush(QBrush(groupLinearGrad));
+    painter->setBrush(viewer->getGroupColor());
     painter->setPen(Qt::NoPen);
     painter->drawRect(QRectF(0, 0, m_width, m_height));
   }
@@ -400,9 +326,9 @@ void GroupPainter::paint(QPainter *painter,
     QFont font("Verdana", 8);
     painter->setFont(font);
     if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-      painter->setPen(QColor(255, 0, 0, 255));
+      painter->setPen(viewer->getSelectedNodeTextColor());
     else
-      painter->setPen(Qt::white);
+      painter->setPen(viewer->getTextColor());
 
     QRectF rect(18, 0, 54, 18);
     QString elidedName = elideText(m_name, painter->font(), rect.width());
@@ -458,26 +384,21 @@ QRectF PegbarPainter::boundingRect() const {
 void PegbarPainter::paint(QPainter *painter,
                           const QStyleOptionGraphicsItem *option,
                           QWidget *widget) {
-  QLinearGradient pegLinearGrad(QPointF(0, 0), QPointF(0, 18));
-  pegLinearGrad.setColorAt(0, QColor(223, 184, 115));
-  pegLinearGrad.setColorAt(0.14, QColor(165, 118, 65));
-  pegLinearGrad.setColorAt(0.35, QColor(157, 107, 58));
-  pegLinearGrad.setColorAt(0.4, QColor(112, 60, 27));
-  pegLinearGrad.setColorAt(0.8, QColor(112, 60, 27));
-  pegLinearGrad.setColorAt(1, QColor(113, 91, 85));
+  StageSchematicScene *stageScene =
+      dynamic_cast<StageSchematicScene *>(scene());
 
-  painter->setBrush(QBrush(pegLinearGrad));
+  if (!stageScene) return;
+  SchematicViewer *viewer = stageScene->getSchematicViewer();
+
+  painter->setBrush(viewer->getPegColor());
   painter->setPen(Qt::NoPen);
   painter->drawRect(QRectF(0, 0, m_width, m_height));
 
   if (!m_parent->isNameEditing()) {
-    StageSchematicScene *stageScene =
-        dynamic_cast<StageSchematicScene *>(scene());
-    if (!stageScene) return;
     if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
     else
-      painter->setPen(Qt::white);
+      painter->setPen(viewer->getTextColor());
     // Draw the name
     QRectF rect(18, 0, 54, 18);
     QString elidedName = elideText(m_name, painter->font(), rect.width());
@@ -548,35 +469,23 @@ QRectF CameraPainter::boundingRect() const {
 void CameraPainter::paint(QPainter *painter,
                           const QStyleOptionGraphicsItem *option,
                           QWidget *widget) {
-  QLinearGradient camLinearGrad(QPointF(0, 0), QPointF(0, 18));
-  if (m_isActive) {
-    camLinearGrad.setColorAt(0, QColor(115, 190, 224));
-    camLinearGrad.setColorAt(0.14, QColor(51, 132, 208));
-    camLinearGrad.setColorAt(0.35, QColor(39, 118, 196));
-    camLinearGrad.setColorAt(0.4, QColor(18, 82, 153));
-    camLinearGrad.setColorAt(0.8, QColor(18, 82, 153));
-    camLinearGrad.setColorAt(1, QColor(68, 119, 169));
-  } else {
-    camLinearGrad.setColorAt(0, QColor(183, 197, 196));
-    camLinearGrad.setColorAt(0.14, QColor(138, 157, 160));
-    camLinearGrad.setColorAt(0.35, QColor(125, 144, 146));
-    camLinearGrad.setColorAt(0.4, QColor(80, 94, 97));
-    camLinearGrad.setColorAt(0.8, QColor(80, 94, 97));
-    camLinearGrad.setColorAt(1, QColor(128, 140, 142));
-  }
+  StageSchematicScene *stageScene =
+      dynamic_cast<StageSchematicScene *>(scene());
+  if (!stageScene) return;
 
-  painter->setBrush(QBrush(camLinearGrad));
+  SchematicViewer *viewer = stageScene->getSchematicViewer();
+  QColor cameraColor      = m_isActive ? viewer->getActiveCameraColor()
+                                  : viewer->getOtherCameraColor();
+
+  painter->setBrush(cameraColor);
   painter->setPen(Qt::NoPen);
   painter->drawRect(QRectF(0, 0, m_width, m_height));
 
   if (!m_parent->isNameEditing()) {
-    StageSchematicScene *stageScene =
-        dynamic_cast<StageSchematicScene *>(scene());
-    if (!stageScene) return;
     if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-      painter->setPen(Qt::yellow);
+      painter->setPen(viewer->getSelectedNodeTextColor());
     else
-      painter->setPen(Qt::white);
+      painter->setPen(viewer->getTextColor());
     // Draw the name
     QRectF rect(18, 0, 54, 18);
     QString elidedName = elideText(m_name, painter->font(), rect.width());
@@ -652,15 +561,13 @@ void TablePainter::paint(QPainter *painter,
                          QWidget *widget) {
   QPixmap tablePm = QPixmap(":Resources/schematic_tablenode.png");
 
-  QLinearGradient tableLinearGrad(QPointF(0, 0), QPointF(0, 18));
-  tableLinearGrad.setColorAt(0, QColor(152, 146, 188));
-  tableLinearGrad.setColorAt(0.14, QColor(107, 106, 148));
-  tableLinearGrad.setColorAt(0.35, QColor(96, 96, 138));
-  tableLinearGrad.setColorAt(0.4, QColor(63, 67, 99));
-  tableLinearGrad.setColorAt(0.8, QColor(63, 67, 99));
-  tableLinearGrad.setColorAt(1, QColor(101, 105, 143));
+  StageSchematicScene *stageScene =
+      dynamic_cast<StageSchematicScene *>(scene());
+  if (!stageScene) return;
 
-  painter->setBrush(QBrush(tableLinearGrad));
+  SchematicViewer *viewer = stageScene->getSchematicViewer();
+
+  painter->setBrush(viewer->getTableColor());
   painter->setPen(Qt::NoPen);
   painter->drawRect(QRectF(0, 0, m_width, m_height));
 
@@ -668,17 +575,15 @@ void TablePainter::paint(QPainter *painter,
 
   painter->drawPixmap(imgRect, tablePm);
 
-  StageSchematicScene *stageScene =
-      dynamic_cast<StageSchematicScene *>(scene());
-  if (!stageScene) return;
   if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
-    painter->setPen(Qt::yellow);
+    painter->setPen(viewer->getSelectedNodeTextColor());
   else
-    painter->setPen(Qt::white);
+    painter->setPen(viewer->getTextColor());
 
   // Draw the name
   QRectF rect(30, 0, 42, 18);
-  painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString(tr("Table")));
+  painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter,
+                    QString(tr("Table")));
 }
 
 //--------------------------------------------------------
@@ -727,15 +632,13 @@ QRectF SplinePainter::boundingRect() const {
 void SplinePainter::paint(QPainter *painter,
                           const QStyleOptionGraphicsItem *option,
                           QWidget *widget) {
-  QLinearGradient pegLinearGrad(QPointF(0, 0), QPointF(0, 18));
-  pegLinearGrad.setColorAt(0, QColor(157, 255, 82));
-  pegLinearGrad.setColorAt(0.14, QColor(127, 207, 42));
-  pegLinearGrad.setColorAt(0.35, QColor(128, 201, 37));
-  pegLinearGrad.setColorAt(0.4, QColor(100, 148, 8));
-  pegLinearGrad.setColorAt(0.8, QColor(100, 148, 8));
-  pegLinearGrad.setColorAt(1, QColor(120, 178, 73));
+  StageSchematicScene *stageScene =
+      dynamic_cast<StageSchematicScene *>(scene());
+  if (!stageScene) return;
 
-  painter->setBrush(QBrush(pegLinearGrad));
+  SchematicViewer *viewer = stageScene->getSchematicViewer();
+
+  painter->setBrush(viewer->getSplineColor());
   painter->setPen(Qt::NoPen);
   painter->drawRoundRect(QRectF(0, 0, m_width, m_height), 20, 99);
   if (m_parent->isOpened()) {
@@ -754,10 +657,13 @@ void SplinePainter::paint(QPainter *painter,
 
   //! draw the name only if it is not editing
   if (!m_parent->isNameEditing()) {
-    StageSchematicScene *stageScene =
-        dynamic_cast<StageSchematicScene *>(scene());
-    if (!stageScene) return;
-    painter->setPen(Qt::white);
+    /* There is no current spline
+              TStageObjectId currObj = stageScene->getCurrentObject();
+        if(currObj.getCode() == m_parent->getSpline()->getId())
+          painter->setPen(viewer->getSelectedNodeTextColor());
+        else
+    */
+    painter->setPen(viewer->getTextColor());
     QRectF rect(18, 0, 72, 18);
     QString elidedName = elideText(m_name, painter->font(), rect.width());
     painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
@@ -935,33 +841,33 @@ SchematicPort *StageSchematicNodePort::searchPort(const QPointF &scenePos) {
 
 //--------------------------------------------------------
 
-void StageSchematicNodePort::hideSnappedLinks() {
-  if (!m_linkingTo) return;
+void StageSchematicNodePort::hideSnappedLinks(SchematicPort *linkingPort) {
+  if (!linkingPort) return;
   if (getType() == eStageChildPort &&
-      m_linkingTo->getType() == eStageParentPort &&
-      m_linkingTo->getLinkCount() == 1)
-    m_linkingTo->getLink(0)->hide();
+      linkingPort->getType() == eStageParentPort &&
+      linkingPort->getLinkCount() == 1)
+    linkingPort->getLink(0)->hide();
   if (getType() == eStageParentPort &&
-      m_linkingTo->getType() == eStageChildPort && getLinkCount() == 1)
+      linkingPort->getType() == eStageChildPort && getLinkCount() == 1)
     getLink(0)->hide();
 }
 
 //--------------------------------------------------------
 
-void StageSchematicNodePort::showSnappedLinks() {
-  if (!m_linkingTo) return;
+void StageSchematicNodePort::showSnappedLinks(SchematicPort *linkingPort) {
+  if (!linkingPort) return;
   if (getType() == eStageChildPort &&
-      m_linkingTo->getType() == eStageParentPort &&
-      m_linkingTo->getLinkCount() == 1) {
-    m_linkingTo->getLink(0)->show();
-    m_linkingTo->highLight(true);
-    m_linkingTo->update();
+      linkingPort->getType() == eStageParentPort &&
+      linkingPort->getLinkCount() == 1) {
+    linkingPort->getLink(0)->show();
+    linkingPort->highLight(true);
+    linkingPort->update();
   }
   if (getType() == eStageParentPort &&
-      m_linkingTo->getType() == eStageChildPort && getLinkCount() == 1) {
+      linkingPort->getType() == eStageChildPort && getLinkCount() == 1) {
     getLink(0)->show();
-    m_linkingTo->highLight(true);
-    m_linkingTo->update();
+    linkingPort->highLight(true);
+    linkingPort->update();
   }
 }
 
@@ -1069,7 +975,7 @@ SchematicPort *StageSchematicSplinePort::searchPort(const QPointF &scenePos) {
 
 //--------------------------------------------------------
 
-void StageSchematicSplinePort::hideSnappedLinks() {
+void StageSchematicSplinePort::hideSnappedLinks(SchematicPort *) {
   if (!m_linkingTo) return;
   StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(getNode());
   StageSchematicSplineNode *splineNode =
@@ -1081,7 +987,7 @@ void StageSchematicSplinePort::hideSnappedLinks() {
 
 //--------------------------------------------------------
 
-void StageSchematicSplinePort::showSnappedLinks() {
+void StageSchematicSplinePort::showSnappedLinks(SchematicPort *) {
   if (!m_linkingTo) return;
   StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(getNode());
   StageSchematicSplineNode *splineNode =
@@ -1773,7 +1679,21 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
   bool ret = true;
 
   assert(pegbar && pegbar->getId().isColumn());
+
+  SchematicViewer *viewer = scene->getSchematicViewer();
+
+  TXshColumn *column =
+      scene->getXsheet()->getColumn(pegbar->getId().getIndex());
+
   std::string name = m_stageObject->getName();
+
+  if (column) {
+    // ZeraryFx columns store name elsewhere
+    TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+    if (zColumn)
+      name =
+          ::to_string(zColumn->getZeraryColumnFx()->getZeraryFx()->getName());
+  }
 
   m_name       = QString::fromStdString(name);
   m_resizeItem = new SchematicThumbnailToggle(this, m_stageObject->isOpened());
@@ -1791,21 +1711,25 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
   m_nameItem->hide();
 
   m_renderToggle =
-      new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"),
+      new SchematicToggle(this, viewer->getSchematicPreviewButtonOnImage(),
+                          viewer->getSchematicPreviewButtonBgOnColor(),
+                          viewer->getSchematicPreviewButtonOffImage(),
+                          viewer->getSchematicPreviewButtonBgOffColor(),
                           SchematicToggle::eIsParentColumn);
   ret = ret && connect(m_renderToggle, SIGNAL(toggled(bool)), this,
                        SLOT(onRenderToggleClicked(bool)));
   if (scene) {
-    TXshColumn *column =
-        scene->getXsheet()->getColumn(pegbar->getId().getIndex());
     if (column) m_renderToggle->setIsActive(column->isPreviewVisible());
 
     m_renderToggle->setPos(72, 0);
     m_renderToggle->setZValue(2);
 
     m_cameraStandToggle = new SchematicToggle(
-        this, QPixmap(":Resources/schematic_table_view.png"),
-        QPixmap(":Resources/schematic_table_view_transp.png"),
+        this, viewer->getSchematicCamstandButtonOnImage(),
+        viewer->getSchematicCamstandButtonTranspImage(),
+        viewer->getSchematicCamstandButtonBgOnColor(),
+        viewer->getSchematicCamstandButtonOffImage(),
+        viewer->getSchematicCamstandButtonBgOffColor(),
         SchematicToggle::eIsParentColumn | SchematicToggle::eEnableNullState);
     ret = ret && connect(m_cameraStandToggle, SIGNAL(stateChanged(int)), this,
                          SLOT(onCameraStandToggleClicked(int)));
@@ -1825,6 +1749,10 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
   m_columnPainter = new ColumnPainter(this, m_width, m_height, m_name);
   m_columnPainter->setZValue(1);
 
+  if (column && !column->isControl() && !column->isRendered() &&
+      !column->getMeshColumn())
+    m_columnPainter->setIsReference();
+
   int levelType;
   QString levelName;
   getLevelTypeAndName(levelType, levelName);
@@ -1833,8 +1761,10 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
   onChangedSize(m_stageObject->isOpened());
   assert(ret);
 
-  if (levelType == ZERARYFX_XSHLEVEL || levelType == PLT_XSHLEVEL)
+  if (levelType == PLT_XSHLEVEL) {
     m_resizeItem->hide();
+    m_cameraStandToggle->hide();
+  }
 }
 
 //--------------------------------------------------------
@@ -1863,7 +1793,9 @@ void StageSchematicColumnNode::paint(QPainter *painter,
   QFont font("Verdana", 8);
   painter->setFont(font);
   StageSchematicScene *scene = dynamic_cast<StageSchematicScene *>(m_scene);
-  if (scene && scene->getCurrentObject() == id) painter->setPen(Qt::red);
+  SchematicViewer *viewer    = scene->getSchematicViewer();
+  if (scene && scene->getCurrentObject() == id)
+    painter->setPen(viewer->getSelectedNodeTextColor());
   QFontMetrics metrix(font);
   int srcWidth  = metrix.width(colNumber);
   int srcHeight = metrix.height();
@@ -1960,6 +1892,7 @@ void StageSchematicColumnNode::onChangedSize(bool expand) {
   updatePortsPosition();
   updateLinksGeometry();
   update();
+  emit nodeChangedSize();
 }
 
 //--------------------------------------------------------
@@ -1977,18 +1910,20 @@ void StageSchematicColumnNode::mouseDoubleClickEvent(
   StageSchematicScene *stageScene =
       dynamic_cast<StageSchematicScene *>(scene());
   if (!stageScene) return;
-
-  // do nothing for double-clicking a zerary Fx node
-  TStageObjectId id  = m_stageObject->getId();
-  TXshColumn *column = stageScene->getXsheet()->getColumn(id.getIndex());
-  TXshZeraryFxColumn *fxColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
-  if (fxColumn) {
-    return;
-  }
-
   QRectF nameArea(14, 0, m_width - 15, 14);
   if (nameArea.contains(me->pos())) {
-    m_name = QString::fromStdString(m_stageObject->getName());
+    std::string name = m_stageObject->getName();
+
+    TStageObjectId id  = m_stageObject->getId();
+    TXshColumn *column = stageScene->getXsheet()->getColumn(id.getIndex());
+    if (column) {
+      TXshZeraryFxColumn *fxColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
+      if (fxColumn)
+        name = ::to_string(
+            fxColumn->getZeraryColumnFx()->getZeraryFx()->getName());
+    }
+
+    m_name = QString::fromStdString(name);
     m_nameItem->setPlainText(m_name);
     m_nameItem->show();
     m_nameItem->setFocus();
@@ -2296,7 +2231,11 @@ StageSchematicGroupNode::StageSchematicGroupNode(
   m_painter = new GroupPainter(this, m_width, m_height, m_name);
   m_painter->setZValue(1);
 
-  setToolTip(m_name);
+  QString id = "Group " + QString::number(getGroupId());
+  if (m_name != id)
+    setToolTip(QString("%1 (%2)").arg(m_name, id));
+  else
+    setToolTip(m_name);
 
   assert(ret);
 }
@@ -2343,7 +2282,11 @@ void StageSchematicGroupNode::onNameChanged() {
   m_nameItem->hide();
   m_name = m_nameItem->toPlainText();
   m_painter->setName(m_name);
-  setToolTip(m_name);
+  QString id = "Group " + QString::number(getGroupId());
+  if (m_name != id)
+    setToolTip(QString("%1 (%2)").arg(m_name, id));
+  else
+    setToolTip(m_name);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   TStageObjectCmd::renameGroup(m_groupedObj, m_name.toStdWString(), false,

@@ -429,7 +429,8 @@ void TFontManager::getAllFamilies(vector<wstring> &families) const {
 
   QStringList::const_iterator it = qFamilies.begin();
   for (; it != qFamilies.end(); ++it) {
-    families.push_back(it->toStdWString());
+    if (!m_pimpl->m_qfontdb->isPrivateFamily(*it))
+      families.push_back(it->toStdWString());
   }
 }
 

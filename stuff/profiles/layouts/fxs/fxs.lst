@@ -147,6 +147,7 @@
     STD_particlesFx 
     STD_iwa_TiledParticlesFx
     STD_iwa_TimeCodeFx
+    STD_iwa_TextFx
   </Render>
   <Stylize>
     STD_colorEmbossFx

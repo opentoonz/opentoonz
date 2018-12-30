@@ -4,17 +4,17 @@
 <context>
     <name>BmpWriterProperties</name>
     <message>
-        <location filename="../../common/tiio/tiio_bmp.cpp" line="752"/>
+        <location filename="../../common/tiio/tiio_bmp.cpp" line="755"/>
         <source>Bits Per Pixel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../common/tiio/tiio_bmp.cpp" line="753"/>
+        <location filename="../../common/tiio/tiio_bmp.cpp" line="756"/>
         <source>24 bits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../common/tiio/tiio_bmp.cpp" line="754"/>
+        <location filename="../../common/tiio/tiio_bmp.cpp" line="757"/>
         <source>8 bits (Greyscale)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -22,12 +22,12 @@
 <context>
     <name>JpgWriterProperties</name>
     <message>
-        <location filename="../../common/tiio/tiio_jpg.cpp" line="216"/>
+        <location filename="../../common/tiio/tiio_jpg.cpp" line="284"/>
         <source>Quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../common/tiio/tiio_jpg.cpp" line="217"/>
+        <location filename="../../common/tiio/tiio_jpg.cpp" line="285"/>
         <source>Smoothing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -58,12 +58,12 @@
 <context>
     <name>TCenterLineStrokeStyle</name>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="683"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="888"/>
         <source>Constant</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="716"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="921"/>
         <source>Thickness</source>
         <translation type="unfinished"></translation>
     </message>
@@ -71,12 +71,12 @@
 <context>
     <name>TRasterImagePatternStrokeStyle</name>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="821"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1026"/>
         <source>Distance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="823"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1028"/>
         <source>Rotation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -84,12 +84,12 @@
 <context>
     <name>TVectorImagePatternStrokeStyle</name>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1265"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1470"/>
         <source>Distance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1267"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1472"/>
         <source>Rotation</source>
         <translation type="unfinished"></translation>
     </message>

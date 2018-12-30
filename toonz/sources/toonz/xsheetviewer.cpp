@@ -32,7 +32,6 @@
 #include "toonz/txshnoteset.h"
 #include "toonz/childstack.h"
 #include "toonz/txshlevelhandle.h"
-#include "toonz/preferences.h"
 #include "tconvert.h"
 
 #include "tenv.h"

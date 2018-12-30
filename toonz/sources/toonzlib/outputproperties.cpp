@@ -2,6 +2,9 @@
 
 #include "toutputproperties.h"
 
+// TnzLib includes
+#include "toonz/boardsettings.h"
+
 // TnzBase includes
 #include "trasterfx.h"
 
@@ -37,7 +40,8 @@ TOutputProperties::TOutputProperties()
     , m_multimediaRendering(0)
     , m_maxTileSizeIndex(0)
     , m_threadIndex(2)
-    , m_subcameraPreview(false) {
+    , m_subcameraPreview(false)
+    , m_boardSettings(new BoardSettings()) {
   m_renderSettings = new TRenderSettings();
 }
 
@@ -56,7 +60,8 @@ TOutputProperties::TOutputProperties(const TOutputProperties &src)
     , m_multimediaRendering(src.m_multimediaRendering)
     , m_maxTileSizeIndex(src.m_maxTileSizeIndex)
     , m_threadIndex(src.m_threadIndex)
-    , m_subcameraPreview(src.m_subcameraPreview) {
+    , m_subcameraPreview(src.m_subcameraPreview)
+    , m_boardSettings(new BoardSettings(*src.m_boardSettings)) {
   std::map<std::string, TPropertyGroup *>::iterator ft,
       fEnd = m_formatProperties.end();
   for (ft = m_formatProperties.begin(); ft != fEnd; ++ft) {
@@ -99,6 +104,9 @@ TOutputProperties &TOutputProperties::operator=(const TOutputProperties &src) {
       sfEnd = src.m_formatProperties.end();
   for (sft = src.m_formatProperties.begin(); sft != sfEnd; ++sft)
     m_formatProperties[sft->first] = sft->second->clone();
+
+  delete m_boardSettings;
+  m_boardSettings = new BoardSettings(*src.m_boardSettings);
 
   return *this;
 }

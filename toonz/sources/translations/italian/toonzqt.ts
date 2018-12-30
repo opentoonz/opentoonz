@@ -256,7 +256,7 @@ E&apos; possibile che il file sia corrotto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Apri il Sub-xsheet</translation>
+        <translation type="vanished">&amp;Apri il Sub-xsheet</translation>
     </message>
 </context>
 <context>
@@ -697,6 +697,17 @@ E&apos; possibile che il file sia corrotto.</translation>
     </message>
 </context>
 <context>
+    <name>FontParamField</name>
+    <message>
+        <source>Style:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FrameNavigator</name>
     <message>
         <source>Previous Frame</source>
@@ -1086,7 +1097,7 @@ E&apos; possibile che il file sia corrotto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Apri il Sub-xsheet</translation>
+        <translation type="vanished">&amp;Apri il Sub-xsheet</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -1202,6 +1213,13 @@ E&apos; possibile che il file sia corrotto.</translation>
     </message>
 </context>
 <context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicPort</name>
     <message>
         <source>&amp;Disconnect from Xsheet</source>
@@ -1231,6 +1249,13 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation>Non è possibile Incollare Rimpiazzando una selezione di effetti disconnessi.
 Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare la selezione che vuoi incollare.</translation>
+    </message>
+</context>
+<context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <source>XSheet</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2161,6 +2186,10 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>&amp;Swtich output port display mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Toggle node icons</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

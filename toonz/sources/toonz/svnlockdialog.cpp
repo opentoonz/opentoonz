@@ -23,7 +23,6 @@
 #include <QLabel>
 #include <QPlainTextEdit>
 #include <QTime>
-#include <QFormLayout>
 #include <QCheckBox>
 #include <QHeaderView>
 #include <QTreeWidget>

@@ -137,8 +137,7 @@ bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet) {
 
       std::string ext = level->getPath().getType();
       int type        = level->getType();
-      if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL ||
-          (type == OVL_XSHLEVEL && ext != "psd"))
+      if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL || type == OVL_XSHLEVEL)
         return true;
     }
 
@@ -803,6 +802,10 @@ void RenameCellField::renameCell() {
       // if there is no level at the current cell, take the level from the
       // previous frames
       // (when editing not empty column)
+      if (xsheet->isColumnEmpty(c)) {
+        cells.append(TXshCell());
+        continue;
+      }
 
       TXshCell cell;
       int tmpRow = m_row;
@@ -811,9 +814,22 @@ void RenameCellField::renameCell() {
         if (!cell.isEmpty() || tmpRow == 0) break;
         tmpRow--;
       }
+
+      // if the level is not found in the previous frames, then search in the
+      // following frames
+      if (cell.isEmpty()) {
+        tmpRow       = m_row + 1;
+        int maxFrame = xsheet->getFrameCount();
+        while (1) {
+          cell = xsheet->getCell(tmpRow, c);
+          if (!cell.isEmpty() || tmpRow >= maxFrame) break;
+          tmpRow++;
+        }
+      }
+
       TXshLevel *xl = cell.m_level.getPointer();
-      if (!xl || (xl->getType() == OVL_XSHLEVEL &&
-                  xl->getPath().getFrame() == TFrameId::NO_FRAME)) {
+      if (!xl || (xl->getSimpleLevel() &&
+                  xl->getSimpleLevel()->getFirstFid() == TFrameId::NO_FRAME)) {
         cells.append(TXshCell());
         continue;
       }
@@ -2282,17 +2298,11 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
                              handleRow1)) {
             QPoint topLeft =
                 m_viewer->positionToXY(CellPosition(handleRow0, col));
-            if (!o->isVerticalTimeline() &&
-                m_viewer->getFrameZoomFactor() <= 50)
-              topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::BEGIN_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
                                          keyFrameColor, outline);
 
             topLeft = m_viewer->positionToXY(CellPosition(handleRow1, col));
-            if (!o->isVerticalTimeline() &&
-                m_viewer->getFrameZoomFactor() <= 50)
-              topLeft.setY(topLeft.y() - 1);
             m_viewer->drawPredefinedPath(p, PredefinedPath::END_EASE_TRIANGLE,
                                          topLeft + QPoint(-frameAdj / 2, 0),
                                          keyFrameColor, outline);
@@ -2392,13 +2402,6 @@ void CellArea::drawKeyframeLine(QPainter &p, int col,
       keyRect.center() + m_viewer->positionToXY(CellPosition(rows.from(), col));
   QPoint end =
       keyRect.center() + m_viewer->positionToXY(CellPosition(rows.to(), col));
-
-  if (!m_viewer->orientation()->isVerticalTimeline() &&
-      m_viewer->getFrameZoomFactor() <= 50) {
-    begin.setY(begin.y() - 1);
-    end.setY(end.y() - 1);
-  }
-
   p.setPen(Qt::white);
   p.drawLine(QLine(begin, end));
 }
@@ -2540,6 +2543,56 @@ public:
   int getHistoryType() override { return HistoryType::Xsheet; }
 };
 //----------------------------------------------------------
+bool CellArea::isKeyFrameArea(int col, int row, QPoint mouseInCell) {
+  if (!Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled())
+    return false;
+
+  TXsheet *xsh = m_viewer->getXsheet();
+  if (!xsh) return false;
+
+  TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
+  int k0, k1;
+
+  bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
+                         (k1 > k0 || k0 == row) && k0 <= row && row <= k1 + 1;
+
+  if (!isKeyframeFrame) return false;
+
+  const Orientation *o = m_viewer->orientation();
+  int frameAdj         = m_viewer->getFrameZoomAdjustment();
+
+  if (o->isVerticalTimeline())
+    return o->rect(PredefinedRect::KEYFRAME_AREA)
+               .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+               .contains(mouseInCell) &&
+           row < k1 + 1;
+
+  QRect activeArea = (m_viewer->getFrameZoomFactor() > 50
+                          ? o->rect(PredefinedRect::KEYFRAME_AREA)
+                          : o->rect(PredefinedRect::FRAME_MARKER_AREA));
+
+  // If directly over keyframe icon, return true
+  if (pegbar->isKeyframe(row) &&
+      activeArea.adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+          .contains(mouseInCell) &&
+      row < k1 + 1)
+    return true;
+
+  // In the white line area, if zoomed in.. narrow height by using frame marker
+  // area since it has a narrower height
+  if (m_viewer->getFrameZoomFactor() > 50)
+    activeArea = o->rect(PredefinedRect::FRAME_MARKER_AREA);
+
+  // Adjust left and/or right edge depending on which part of white line you are
+  // on
+  if (row > k0) activeArea.adjust(-activeArea.left(), 0, 0, 0);
+  if (row < k1)
+    activeArea.adjust(0, 0, (o->cellWidth() - activeArea.right()), 0);
+
+  return activeArea.adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
+             .contains(mouseInCell) &&
+         row < k1 + 1;
+}
 
 void CellArea::mousePressEvent(QMouseEvent *event) {
   const Orientation *o = m_viewer->orientation();
@@ -2611,23 +2664,12 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
                              (k1 > k0 || k0 == row) && k0 <= row &&
                              row <= k1 + 1;
-
-      bool isKeyFrameArea =
-          isKeyframeFrame &&
-          ((o->isVerticalTimeline() &&
-            o->rect(PredefinedRect::KEYFRAME_AREA)
-                .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                .contains(mouseInCell))
-
-           || (!o->isVerticalTimeline() &&
-               o->rect(PredefinedRect::FRAME_MARKER_AREA)
-                   .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                   .contains(mouseInCell))) &&
-          row < k1 + 1;
       bool accept = false;
 
-      if (isKeyFrameArea) {           // They are in the keyframe selection
-        if (pegbar->isKeyframe(row))  // in the keyframe
+      if (isKeyframeFrame &&
+          isKeyFrameArea(col, row,
+                         mouseInCell)) {  // They are in the keyframe selection
+        if (pegbar->isKeyframe(row))      // in the keyframe
         {
           m_viewer->setCurrentRow(
               row);  // If you click on the key, change the current row as well
@@ -2779,13 +2821,8 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
   bool isKeyframeFrame =
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
       pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
-  bool isKeyFrameArea = isKeyframeFrame &&
-                        o->rect(PredefinedRect::KEYFRAME_AREA)
-                            .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                            .contains(mouseInCell) &&
-                        row < k1 + 1;
 
-  if (isKeyFrameArea) {
+  if (isKeyframeFrame && isKeyFrameArea(col, row, mouseInCell)) {
     if (pegbar->isKeyframe(row))  // key frame
       m_tooltip = tr("Click to select keyframe, drag to move it");
     else {
@@ -2909,14 +2946,8 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
     int k0, k1;
     bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
                            k0 <= row && row <= k1 + 1;
-    bool isKeyFrameArea = isKeyframeFrame &&
-                          o->rect(PredefinedRect::KEYFRAME_AREA)
-                              .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                              .contains(mouseInCell) &&
-                          row < k1 + 1;
-
     // If you are in the keyframe area, open a function editor
-    if (isKeyFrameArea) {
+    if (isKeyframeFrame && isKeyFrameArea(col, row, mouseInCell)) {
       QAction *action =
           CommandManager::instance()->getAction(MI_OpenFunctionEditor);
       action->trigger();
@@ -2979,13 +3010,8 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   bool isKeyframeFrame =
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
       pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
-  bool isKeyFrameArea = isKeyframeFrame &&
-                        o->rect(PredefinedRect::KEYFRAME_AREA)
-                            .adjusted(-frameAdj / 2, 0, -frameAdj / 2, 0)
-                            .contains(mouseInCell) &&
-                        row < k1 + 1;
 
-  if (isKeyFrameArea) {
+  if (isKeyframeFrame && isKeyFrameArea(col, row, mouseInCell)) {
     TStageObjectId objectId;
     if (col < 0)
       objectId = TStageObjectId::CameraId(0);
@@ -3029,10 +3055,8 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
       m_viewer->getCellSelection()->selectCell(row, col);
       m_viewer->setCurrentColumn(col);
     }
-    if (!xsh->getCell(row, col).isEmpty())
-      createCellMenu(menu, true, cell);
-    else
-      createCellMenu(menu, false, cell);
+
+    createCellMenu(menu, !cell.isEmpty(), cell);
   }
 
   if (!menu.isEmpty()) menu.exec(event->globalPos());
@@ -3122,7 +3146,12 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
   }
 
   if (isCellSelected) {
-    menu.addAction(cmdManager->getAction(MI_LevelSettings));
+    // open fx settings instead of level settings when clicked on zerary fx
+    // level
+    if (cell.m_level && cell.m_level->getZeraryFxLevel())
+      menu.addAction(cmdManager->getAction(MI_FxParamEditor));
+    else
+      menu.addAction(cmdManager->getAction(MI_LevelSettings));
     menu.addSeparator();
 
     if (!soundCellsSelected) {
@@ -3237,6 +3266,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
 
     menu.addAction(cmdManager->getAction(MI_Clear));
     menu.addAction(cmdManager->getAction(MI_Insert));
+    menu.addAction(cmdManager->getAction(MI_Duplicate));
     menu.addSeparator();
 
     TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
@@ -3360,6 +3390,7 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
     menu.addAction(cmdManager->getAction(MI_SetAcceleration));
     menu.addAction(cmdManager->getAction(MI_SetDeceleration));
     menu.addAction(cmdManager->getAction(MI_SetConstantSpeed));
+    menu.addSeparator();
   } else {
     // Se le due chiavi non sono linear aggiungo il comando ResetInterpolation
     bool isR0FullK = pegbar->isFullKeyframe(r0);
@@ -3369,9 +3400,32 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
     TDoubleKeyframe::Type r1Type =
         pegbar->getParam(TStageObject::T_X)->getKeyframeAt(r1).m_prevType;
     if (isGlobalKeyFrameWithSameTypeDiffFromLinear(pegbar, r0) &&
-        isGlobalKeyFrameWithSamePrevTypeDiffFromLinear(pegbar, r1))
+        isGlobalKeyFrameWithSamePrevTypeDiffFromLinear(pegbar, r1)) {
       menu.addAction(cmdManager->getAction(MI_ResetInterpolation));
+      menu.addSeparator();
+    }
   }
+
+  TDoubleKeyframe::Type rType =
+      pegbar->getParam(TStageObject::T_X)->getKeyframeAt(r0).m_type;
+
+  if (rType != TDoubleKeyframe::Linear)
+    menu.addAction(cmdManager->getAction(MI_UseLinearInterpolation));
+  if (rType != TDoubleKeyframe::SpeedInOut)
+    menu.addAction(cmdManager->getAction(MI_UseSpeedInOutInterpolation));
+  if (rType != TDoubleKeyframe::EaseInOut)
+    menu.addAction(cmdManager->getAction(MI_UseEaseInOutInterpolation));
+  if (rType != TDoubleKeyframe::EaseInOutPercentage)
+    menu.addAction(cmdManager->getAction(MI_UseEaseInOutPctInterpolation));
+  if (rType != TDoubleKeyframe::Exponential)
+    menu.addAction(cmdManager->getAction(MI_UseExponentialInterpolation));
+  if (rType != TDoubleKeyframe::Expression)
+    menu.addAction(cmdManager->getAction(MI_UseExpressionInterpolation));
+  if (rType != TDoubleKeyframe::File)
+    menu.addAction(cmdManager->getAction(MI_UseFileInterpolation));
+  if (rType != TDoubleKeyframe::Constant)
+    menu.addAction(cmdManager->getAction(MI_UseConstantInterpolation));
+
 #ifdef LINETEST
   menu.addSeparator();
   int paramStep             = getParamStep(pegbar, r0);

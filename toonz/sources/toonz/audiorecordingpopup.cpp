@@ -47,7 +47,6 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QMultimedia>
 #include <QPainter>
 #include <QElapsedTimer>

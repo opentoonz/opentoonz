@@ -544,9 +544,6 @@ void TLevelWriterAvi::doSaveSoundTrack() {
   WAVEFORMATEX waveinfo;
   int ret;
   LONG lSampWritten, lBytesWritten;
-  int rc;
-
-  rc = FALSE;
 
   AVISTREAMINFO audioStreamInfo;
   memset(&audioStreamInfo, 0, sizeof(AVISTREAMINFO));

@@ -484,9 +484,9 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
       // ho cliccato lontano da ogni altra curva
       m_selectingRect = TRectD(m_pos.x, m_pos.y, m_pos.x + 1, m_pos.y + 1);
       if (m_selectingRect.x0 > m_selectingRect.x1)
-        tswap(m_selectingRect.x1, m_selectingRect.x0);
+        std::swap(m_selectingRect.x1, m_selectingRect.x0);
       if (m_selectingRect.y0 > m_selectingRect.y1)
-        tswap(m_selectingRect.y1, m_selectingRect.y0);
+        std::swap(m_selectingRect.y1, m_selectingRect.y0);
       m_action = RECT_SELECTION;
     }
     m_selection.selectNone();
@@ -560,7 +560,7 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
               : precPointIndex + 1;
       if (precPointIndex > -1 && nextPointIndex > -1) {
         if (precPointIndex > nextPointIndex)
-          tswap(precPointIndex, nextPointIndex);
+          std::swap(precPointIndex, nextPointIndex);
         m_moveSegmentLimitation.first  = precPointIndex;
         m_moveSegmentLimitation.second = nextPointIndex;
       }
@@ -691,9 +691,9 @@ void ControlPointEditorTool::leftButtonDrag(const TPointD &pos,
     m_selectingRect.x1 = pos.x;
     m_selectingRect.y1 = pos.y;
     if (m_selectingRect.x0 > m_selectingRect.x1)
-      tswap(m_selectingRect.x1, m_selectingRect.x0);
+      std::swap(m_selectingRect.x1, m_selectingRect.x0);
     if (m_selectingRect.y0 > m_selectingRect.y1)
-      tswap(m_selectingRect.y1, m_selectingRect.y0);
+      std::swap(m_selectingRect.y1, m_selectingRect.y0);
     int i;
     m_selection.selectNone();
     for (i = 0; i < cpCount; i++)

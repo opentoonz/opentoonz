@@ -50,22 +50,6 @@ class StyleNameEditor;
 
 namespace PaletteViewerGUI {
 
-// class for managing the palette's default style chip size
-class DVAPI ChipSizeManager {
-public:
-  int chipSize_Palette;
-  int chipSize_Cleanup;
-  int chipSize_Studio;
-  static ChipSizeManager *instance() {
-    static ChipSizeManager _instance;
-    return &_instance;
-  }
-
-private:
-  ChipSizeManager()
-      : chipSize_Palette(2), chipSize_Cleanup(2), chipSize_Studio(2) {}
-};
-
 enum PaletteViewType  //! Possible palette contents of a Palette Viewer.
 { LEVEL_PALETTE,      //!< Content palette is from a level.
   CLEANUP_PALETTE,    //!< Content palette is from cleanup settings.

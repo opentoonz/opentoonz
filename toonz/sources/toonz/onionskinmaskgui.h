@@ -15,6 +15,8 @@ namespace OnioniSkinMaskGUI {
 // Da fare per la filmstrip!!
 void addOnionSkinCommand(QMenu *, bool isFilmStrip = false);
 
+void resetShiftTraceFrameOffset();
+
 //=============================================================================
 // OnionSkinSwitcher
 //-----------------------------------------------------------------------------
@@ -37,6 +39,9 @@ public slots:
   void deactivate();
   void setWholeScene();
   void setSingleLevel();
+  void clearFOS();
+  void clearMOS();
+  void clearOS();
 };
 
 //-----------------------------------------------------------------------------

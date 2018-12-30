@@ -635,9 +635,10 @@ void ImageViewer::panQt(const QPoint &delta) {
 void ImageViewer::zoomQt(const QPoint &center, double factor) {
   if (factor == 1.0) return;
   TPointD delta(center.x(), center.y());
-
-  setViewAff(TTranslation(delta) * TScale(factor) * TTranslation(-delta) *
-             m_viewAff);
+  double scale2 = fabs(m_viewAff.det());
+  if ((scale2 < 100000 || factor < 1) && (scale2 > 0.001 * 0.05 || factor > 1))
+    setViewAff(TTranslation(delta) * TScale(factor) * TTranslation(-delta) *
+               m_viewAff);
   update();
 }
 

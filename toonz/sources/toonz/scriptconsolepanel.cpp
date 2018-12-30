@@ -15,7 +15,6 @@
 #include "toonz/txshsimplelevel.h"
 #include "toonzqt/selection.h"
 #include "toonzqt/tselectionhandle.h"
-#include "tapp.h"
 
 #include "flipbook.h"
 #include "tvectorimage.h"

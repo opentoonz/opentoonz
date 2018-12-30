@@ -16,6 +16,7 @@
 #include "toonz/txshleveltypes.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshcell.h"
+#include "toonz/levelproperties.h"
 #include "orientation.h"
 
 // TnzCore includes
@@ -128,6 +129,9 @@ void TColumnSelection::explodeChild() {
 
 static bool canMergeColumns(int column, int mColumn, bool forMatchlines) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+
+  if (xsh->getColumn(column)->isLocked()) return false;
+
   int start, end;
   xsh->getCellRange(column, start, end);
 
@@ -164,6 +168,13 @@ static bool canMergeColumns(int column, int mColumn, bool forMatchlines) {
       if (level->getType() != mLevel->getType()) return false;
       if (level->getType() != PLI_XSHLEVEL && level->getType() != OVL_XSHLEVEL)
         return false;
+      // Check level type write support. Based on TTool::updateEnabled()
+      if (level->getType() == OVL_XSHLEVEL &&
+          (level->getPath().getType() == "psd" ||     // PSD files.
+           level->is16BitChannelLevel() ||            // 16bpc images.
+           level->getProperties()->getBpp() == 1)) {  // Black & White images.
+        return false;
+      }
     }
   }
   return true;

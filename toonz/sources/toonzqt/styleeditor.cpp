@@ -3254,9 +3254,9 @@ void StyleEditor::showEvent(QShowEvent *) {
 //-----------------------------------------------------------------------------
 
 void StyleEditor::hideEvent(QHideEvent *) {
-  disconnect(m_paletteHandle);
-  if (m_cleanupPaletteHandle) disconnect(m_cleanupPaletteHandle);
-  disconnect(m_paletteController);
+  disconnect(m_paletteHandle, 0, this, 0);
+  if (m_cleanupPaletteHandle) disconnect(m_cleanupPaletteHandle, 0, this, 0);
+  disconnect(m_paletteController, 0, this, 0);
 }
 
 //-----------------------------------------------------------------------------

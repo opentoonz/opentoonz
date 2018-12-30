@@ -168,7 +168,7 @@ public:
 
     if (!direction) {
       draggedStrokeLen = totalStrokeLen - draggedStrokeLen;
-      tswap(v0, v1);
+      std::swap(v0, v1);
     }
 
     // se la lunghezza della parte di stroke tra i due punti di inizio e fine

@@ -63,7 +63,6 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QToolButton>
-#include <QGroupBox>
 #include <QDateTime>
 #include <QMultimedia>
 #include <QPainter>
@@ -72,7 +71,6 @@
 #include <QTimer>
 #include <QIntValidator>
 #include <QRegExpValidator>
-#include <QPushButton>
 
 #ifdef _WIN32
 #include <dshow.h>
@@ -1697,7 +1695,7 @@ void PencilTestPopup::onPreviousName() {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::setToNextNewLevel() {
-  const std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
+  const std::unique_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
 
   TLevelSet* levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();

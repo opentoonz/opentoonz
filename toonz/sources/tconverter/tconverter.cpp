@@ -37,10 +37,8 @@ typedef QualifierT<TFilePath> FilePathQualifier;
 
 #define RENDER_LICENSE_NOT_FOUND 888
 
-const char *applicationVersion = "1.2";
-const char *applicationName    = "OpenToonz";
-const char *rootVarName        = "TOONZROOT";
-const char *systemVarPrefix    = "TOONZ";
+const char *rootVarName     = "TOONZROOT";
+const char *systemVarPrefix = "TOONZ";
 
 namespace {
 
@@ -357,7 +355,6 @@ void convert(const TFilePath &source, const TFilePath &dest,
 //------------------------------------------------------------------------
 
 int main(int argc, char *argv[]) {
-  TEnv::setApplication(applicationName, applicationVersion);
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
   TFilePath fp = TEnv::getStuffDir();
