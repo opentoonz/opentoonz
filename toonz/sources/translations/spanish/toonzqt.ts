@@ -700,11 +700,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>FontParamField</name>
     <message>
         <source>Style:</source>
-        <translation type="unfinished"></translation>
+        <translation>Estilo:</translation>
     </message>
     <message>
         <source>Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamaño:</translation>
     </message>
 </context>
 <context>
@@ -1220,7 +1220,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>FxSchematicOutputNode</name>
     <message>
         <source>Output</source>
-        <translation type="unfinished">Salida</translation>
+        <translation>Salida</translation>
     </message>
 </context>
 <context>
@@ -1259,7 +1259,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <name>FxSchematicXSheetNode</name>
     <message>
         <source>XSheet</source>
-        <translation type="unfinished">Planilla</translation>
+        <translation>Planilla</translation>
     </message>
 </context>
 <context>
@@ -2221,7 +2221,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>&amp;Toggle node icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Íconos de &amp;nodos</translation>
     </message>
 </context>
 <context>

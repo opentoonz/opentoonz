@@ -1343,30 +1343,30 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Scale</source>
-        <translation type="unfinished">Escala</translation>
+        <translation>Escala</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation type="unfinished">Posición</translation>
+        <translation>Posición</translation>
     </message>
 </context>
 <context>
     <name>ShiftTraceToolOptionBox</name>
     <message>
         <source>Reset Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Restablecer anterior</translation>
     </message>
     <message>
         <source>Reset Following</source>
-        <translation type="unfinished"></translation>
+        <translation>Restablecer siguiente</translation>
     </message>
     <message>
         <source>Previous Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo anterior</translation>
     </message>
     <message>
         <source>Following Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujo siguiente</translation>
     </message>
 </context>
 <context>
@@ -1452,47 +1452,47 @@ movido hacia el final de la primera página de la paleta.</translation>
     <name>ToonzRasterBrushTool</name>
     <message>
         <source>Size</source>
-        <translation type="unfinished">Tamaño</translation>
+        <translation>Tamaño</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation type="unfinished">Dureza:</translation>
+        <translation>Dureza:</translation>
     </message>
     <message>
         <source>Smooth:</source>
-        <translation type="unfinished">Estabilidad:</translation>
+        <translation>Estabilidad:</translation>
     </message>
     <message>
         <source>Draw Order:</source>
-        <translation type="unfinished">Orden:</translation>
+        <translation>Orden:</translation>
     </message>
     <message>
         <source>Over All</source>
-        <translation type="unfinished">Por encima</translation>
+        <translation>Por encima</translation>
     </message>
     <message>
         <source>Under All</source>
-        <translation type="unfinished">Por debajo</translation>
+        <translation>Por debajo</translation>
     </message>
     <message>
         <source>Palette Order</source>
-        <translation type="unfinished">Según paleta</translation>
+        <translation>Según paleta</translation>
     </message>
     <message>
         <source>Preset:</source>
-        <translation type="unfinished">Ajustes:</translation>
+        <translation>Ajustes:</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="unfinished">&lt;personalizado&gt;</translation>
+        <translation>&lt;personalizado&gt;</translation>
     </message>
     <message>
         <source>Pencil</source>
-        <translation type="unfinished">Lápiz</translation>
+        <translation>Lápiz</translation>
     </message>
     <message>
         <source>Pressure</source>
-        <translation type="unfinished">Presión</translation>
+        <translation>Presión</translation>
     </message>
 </context>
 <context>
