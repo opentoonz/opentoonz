@@ -312,21 +312,6 @@ public:
     return result;
   }
 
-  Iterator find(const RowKey &r, const ColKey &c) {
-    Iterator result(this);
-    result.m_rowIt = m_table.find(r);
-    if (result.m_rowIt == m_table.end()) return;
-    result.m_it = result.m_rowIt->second.find(c);
-    if (result.m_it == result.m_rowIt->second.end())
-      result.m_rowIt = m_table.end();
-    return result;
-  }
-
-  Iterator erase(const RowKey &r, const ColKey &c) {
-    Iterator it(find(r, c));
-    return erase(it);
-  }
-
   Iterator erase(const Iterator &it) {
     Iterator result(it);
     Row &row = it.m_rowIt->second;
