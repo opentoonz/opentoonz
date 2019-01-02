@@ -15,7 +15,6 @@
 // tcg includes
 #include "tcg/tcg_point_ops.h"
 #include "tcg/tcg_function_types.h"
-#include "tcg/tcg_iterator_ops.h"
 
 #include "plastictool.h"
 
@@ -562,12 +561,6 @@ void PlasticTool::leftButtonDown_build(const TPointD &pos,
 
   // Start move vertex operation
   if (!m_svSel.isEmpty()) {
-    struct locals {
-      static TPointD vertexPos(const PlasticSkeleton &skel, int v) {
-        return skel.vertex(v).P();
-      }
-    };
-
     const PlasticSkeletonP &skel = skeleton();
     assert(skel);
 
@@ -575,11 +568,11 @@ void PlasticTool::leftButtonDown_build(const TPointD &pos,
     if (m_svSel.hasSingleObject()) m_pressedPos = skel->vertex(m_svSel).P();
 
     // Store original vertex positions
-    m_pressedVxsPos = std::vector<TPointD>(
-        tcg::make_cast_it(m_svSel.objects().begin(),
-                          tcg::bind1st(&locals::vertexPos, *skel)),
-        tcg::make_cast_it(m_svSel.objects().end(),
-                          tcg::bind1st(&locals::vertexPos, *skel)));
+    std::vector<TPointD> v;
+    for (auto const &e : m_svSel.objects()) {
+      v.push_back(skel->vertex(e).P());
+    }
+    m_pressedVxsPos = std::move(v);
   }
 
   invalidate();
