@@ -1,43 +1,44 @@
 set(MOC_HEADERS
-    fullcolorbrushtool.h
     controlpointselection.h
-    ../include/tools/imagegrouping.h
     edittoolgadgets.h
     filltool.h
+    fullcolorbrushtool.h
+    plastictool.h
     skeletonsubtools.h
     tooloptionscontrols.h
-    plastictool.h
+    toonzrasterbrushtool.h
+    viewtools.h
+    ../include/tools/imagegrouping.h
+    ../include/tools/screenpicker.h
     ../include/tools/toolhandle.h
     ../include/tools/tooloptions.h
-    ../include/tools/screenpicker.h
-    rgbpickertool.h
-    rulertool.h
-    stylepickertool.h
-	viewtools.h
-    toonzrasterbrushtool.h
 )
 
-set(HEADERS ${MOC_HEADERS}
+set(HEADERS
+    ${MOC_HEADERS}
     autofill.h
     bluredbrush.h
+    hookselection.h
+    mypainttoonzbrush.h
+    rasterselectiontool.h
+    rgbpickertool.h
+    rulertool.h
+    selectiontool.h
+    setsaveboxtool.h
+    shifttracetool.h
+    stylepickertool.h
+    toonzvectorbrushtool.h
+    vectorselectiontool.h
+    ../include/tools/RGBpicker.h
     ../include/tools/cursormanager.h
     ../include/tools/cursors.h
     ../include/tools/levelselection.h
     ../include/tools/rasterselection.h
-    hookselection.h
-    selectiontool.h
-    setsaveboxtool.h
-    rasterselectiontool.h
-    vectorselectiontool.h
     ../include/tools/strokeselection.h
     ../include/tools/stylepicker.h
     ../include/tools/tool.h
     ../include/tools/toolcommandids.h
     ../include/tools/toolutils.h
-    ../include/tools/RGBpicker.h
-    mypainttoonzbrush.h
-    shifttracetool.h
-	toonzvectorbrushtool.h
 )
 
 set(SOURCES
