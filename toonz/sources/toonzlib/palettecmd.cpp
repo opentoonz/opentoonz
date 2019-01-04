@@ -48,7 +48,7 @@
 
 //===================================================================
 
-void findPaletteLevels(set<TXshSimpleLevel *> &levels, int &rowIndex,
+void findPaletteLevels(std::set<TXshSimpleLevel *> &levels, int &rowIndex,
                        int &columnIndex, TPalette *palette, TXsheet *xsheet) {
   rowIndex = columnIndex = -1;
   int columnCount        = xsheet->getColumnCount();
@@ -136,7 +136,7 @@ bool isStyleUsed(const TImageP image, int styleId) {
 //===================================================================
 
 /*! Return true if one style is used. */
-bool areStylesUsed(const set<TXshSimpleLevel *> levels,
+bool areStylesUsed(const std::set<TXshSimpleLevel *> levels,
                    const std::vector<int> styleIds) {
   for (auto const level : levels) {
     std::vector<TFrameId> fids;
@@ -497,7 +497,7 @@ void PaletteCmd::addStyles(TPaletteHandle *paletteHandle, int pageIndex,
 
 namespace {
 
-void eraseStylesInLevels(const set<TXshSimpleLevel *> &levels,
+void eraseStylesInLevels(const std::set<TXshSimpleLevel *> &levels,
                          const std::vector<int> styleIds) {
   for (auto const level : levels) {
     std::vector<TFrameId> fids;

@@ -13,7 +13,6 @@
 #include "tthread.h"
 #include "filebrowserpopup.h"
 using std::map;
-using std::set;
 using std::vector;
 
 class TFarmController;
@@ -96,7 +95,7 @@ private:
   bool m_dirtyFlag;
   TFilePath m_filepath;
   std::map<QString, TFarmTask *> m_tasks;
-  set<Observer *> m_observers;
+  std::set<Observer *> m_observers;
   int m_localControllerPortNumber;
   TFarmController *m_controller;
   std::map<QString, QString> m_farmIdsTable;

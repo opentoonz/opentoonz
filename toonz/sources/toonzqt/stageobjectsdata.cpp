@@ -655,12 +655,10 @@ void StageObjectsData::storeObjects(const std::vector<TStageObjectId> &ids,
   }
 
   // Insert terminal fxs
-  set<TFx *>::iterator jt;
-  for (jt = m_originalColumnFxs.begin(); jt != m_originalColumnFxs.end();
-       ++jt) {
-    if (isColumnSelectionTerminalFx(*jt, xsh->getFxDag()->getTerminalFxs(),
+  for (auto const &e : m_originalColumnFxs) {
+    if (isColumnSelectionTerminalFx(e, xsh->getFxDag()->getTerminalFxs(),
                                     m_originalColumnFxs)) {
-      TFx *fx = m_fxTable[*jt];
+      TFx *fx = m_fxTable[e];
 
       fx->addRef();
       m_terminalFxs.insert(fx);

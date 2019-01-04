@@ -202,10 +202,10 @@ TRectD ToonzImageUtils::convertRasterToWorld(const TRect area,
 
 // overlaying inks, blend inks always "lose" on normal inks
 
-static TRect fastAddInkStroke(const TToonzImageP &ti, TStroke *stroke,
-                              int inkId, bool selective, bool filled,
-                              TRectD clip, bool doAntialiasing = true,
-                              const set<int> &blendInks = set<int>()) {
+static TRect fastAddInkStroke(
+    const TToonzImageP &ti, TStroke *stroke, int inkId, bool selective,
+    bool filled, TRectD clip, bool doAntialiasing = true,
+    const std::set<int> &blendInks = std::set<int>()) {
   TRasterCM32P ras = ti->getRaster();
   TOfflineGL *gl   = 0;
 
@@ -407,7 +407,7 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
   // In such reference, the clip for rendering strokes is the output size
   TRectD clip(TDimensionD(outputSize.lx, outputSize.ly));
 
-  set<int> colors;
+  std::set<int> colors;
   if (fxs) {
     for (i = 0; i < (int)fxs->size(); i++) {
       SandorFxRenderData *sandorData =

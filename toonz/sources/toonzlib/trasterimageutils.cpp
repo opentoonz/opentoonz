@@ -264,7 +264,7 @@ TRasterImageP TRasterImageUtils::vectorToFullColorImage(
                        maxStyleId);
   }
 
-  set<int> colors;
+  std::set<int> colors;
   if (fxs) {
     for (i = 0; i < (int)fxs->size(); i++) {
       SandorFxRenderData *sandorData =

@@ -831,11 +831,11 @@ public:
 //=============================================================================
 
 void pasteDrawingsInCellWithoutUndo(TXsheet *xsh, TXshSimpleLevel *level,
-                                    const set<TFrameId> &frameIds, int r0,
+                                    const std::set<TFrameId> &frameIds, int r0,
                                     int c0) {
   int frameToInsert = frameIds.size();
   xsh->insertCells(r0, c0, frameToInsert);
-  set<TFrameId>::const_iterator it;
+  std::set<TFrameId>::const_iterator it;
   int r = r0;
   for (it = frameIds.begin(); it != frameIds.end(); it++, r++) {
     TXshCell cell(level, *it);
@@ -850,12 +850,12 @@ void pasteDrawingsInCellWithoutUndo(TXsheet *xsh, TXshSimpleLevel *level,
 class PasteDrawingsInCellUndo final : public TUndo {
   TXsheet *m_xsheet;
   int m_r0, m_c0;
-  set<TFrameId> m_frameIds;
+  std::set<TFrameId> m_frameIds;
   TXshSimpleLevelP m_level;
 
 public:
-  PasteDrawingsInCellUndo(TXshSimpleLevel *level, const set<TFrameId> &frameIds,
-                          int r0, int c0)
+  PasteDrawingsInCellUndo(TXshSimpleLevel *level,
+                          const std::set<TFrameId> &frameIds, int r0, int c0)
       : TUndo(), m_level(level), m_frameIds(frameIds), m_r0(r0), m_c0(c0) {
     m_xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
     m_xsheet->addRef();
@@ -1807,7 +1807,7 @@ void TCellSelection::pasteCells() {
     if (isEmpty())  // Se la selezione delle celle e' vuota ritorno.
       return;
 
-    set<TFrameId> frameIds;
+    std::set<TFrameId> frameIds;
     drawingData->getFrames(frameIds);
     TXshSimpleLevel *level = drawingData->getLevel();
     if (level && !frameIds.empty())
@@ -2563,12 +2563,10 @@ void TCellSelection::dPasteCells() {
   } else if (DYNAMIC_CAST(DrawingData, drawingData, mimeData)) {
     TXshSimpleLevel *level = drawingData->getLevel();
     if (level) {
-      set<TFrameId> frameIds;
+      std::set<TFrameId> frameIds;
       drawingData->getFrames(frameIds);
-      int r = r0;
-      for (set<TFrameId>::iterator it = frameIds.begin(); it != frameIds.end();
-           ++it)
-        createNewDrawing(xsh, r++, c0, level->getType());
+      for (int i = 0; i < frameIds.size(); ++i)
+        createNewDrawing(xsh, r0 + i, c0, level->getType());
     }
   } else if (DYNAMIC_CAST(StrokesData, strokesData, mimeData)) {
     createNewDrawing(xsh, r0, c0, PLI_XSHLEVEL);

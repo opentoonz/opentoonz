@@ -454,10 +454,9 @@ void StrokeSelection::removeEndpoints() {
   std::vector<std::pair<int, TStroke *>> undoData;
 
   m_vi->findRegions();
-  set<int>::iterator it = m_indexes.begin();
-  for (; it != m_indexes.end(); ++it) {
-    TStroke *s = m_vi->removeEndpoints(*it);
-    if (s) undoData.push_back(std::pair<int, TStroke *>(*it, s));
+  for (auto const &e : m_indexes) {
+    TStroke *s = m_vi->removeEndpoints(e);
+    if (s) undoData.push_back(std::pair<int, TStroke *>(e, s));
   }
   TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
   TXshSimpleLevel *level =

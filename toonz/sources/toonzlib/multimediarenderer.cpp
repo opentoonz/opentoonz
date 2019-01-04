@@ -60,11 +60,11 @@ public:
   bool m_canceled;
 
   int m_currentFx;
-  set<double>::iterator m_currentFrame;
+  std::set<double>::iterator m_currentFrame;
   TRenderer *m_currentTRenderer;
 
   TFxSet m_fxsToRender;
-  set<double> m_framesToRender;
+  std::set<double> m_framesToRender;
 
   QEventLoop m_eventLoop;
 

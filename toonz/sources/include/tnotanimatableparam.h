@@ -95,15 +95,14 @@ typedef TNotAnimatableParamObserver<TFilePath> TFilePathParamObserver;
 //-----------------------------------------------------------------------------
 //    TNotAnimatableParam base class
 //-----------------------------------------------------------------------------
-using std::set;
 
 template <class T>
 class DVAPI TNotAnimatableParam : public TParam {
   T m_defaultValue, m_value;
 
 protected:
-  set<TNotAnimatableParamObserver<T> *> m_observers;
-  set<TParamObserver *> m_paramObservers;
+  std::set<TNotAnimatableParamObserver<T> *> m_observers;
+  std::set<TParamObserver *> m_paramObservers;
 
 public:
   TNotAnimatableParam(T def = T())
