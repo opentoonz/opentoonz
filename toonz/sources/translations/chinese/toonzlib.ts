@@ -400,7 +400,7 @@
     </message>
     <message>
         <source>Paste Fx  :  </source>
-        <translation>粘贴特效 : </translation>
+        <translation>粘贴特效  :  </translation>
     </message>
     <message>
         <source>Disconnect Fx</source>

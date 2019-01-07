@@ -1206,7 +1206,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Modify Savebox</source>
-        <translation type="unfinished">修改保险框</translation>
+        <translation>修改保险框</translation>
     </message>
 </context>
 <context>
@@ -1347,30 +1347,30 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Scale</source>
-        <translation type="unfinished">缩放</translation>
+        <translation>缩放</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation type="unfinished">位置</translation>
+        <translation>位置</translation>
     </message>
 </context>
 <context>
     <name>ShiftTraceToolOptionBox</name>
     <message>
         <source>Reset Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>重置前面的</translation>
     </message>
     <message>
         <source>Reset Following</source>
-        <translation type="unfinished"></translation>
+        <translation>重置后面的</translation>
     </message>
     <message>
         <source>Previous Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>前面的绘图</translation>
     </message>
     <message>
         <source>Following Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>后面的绘图</translation>
     </message>
 </context>
 <context>
@@ -1455,47 +1455,47 @@ moved to the end of the first page of the palette.</source>
     <name>ToonzRasterBrushTool</name>
     <message>
         <source>Size</source>
-        <translation type="unfinished">大小</translation>
+        <translation>大小</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation type="unfinished">硬度:</translation>
+        <translation>硬度:</translation>
     </message>
     <message>
         <source>Smooth:</source>
-        <translation type="unfinished">平滑:</translation>
+        <translation>平滑:</translation>
     </message>
     <message>
         <source>Draw Order:</source>
-        <translation type="unfinished">绘制顺序:</translation>
+        <translation>绘制顺序:</translation>
     </message>
     <message>
         <source>Over All</source>
-        <translation type="unfinished">在最上</translation>
+        <translation>在最上</translation>
     </message>
     <message>
         <source>Under All</source>
-        <translation type="unfinished">在最下</translation>
+        <translation>在最下</translation>
     </message>
     <message>
         <source>Palette Order</source>
-        <translation type="unfinished">按调色板顺序</translation>
+        <translation>按调色板顺序</translation>
     </message>
     <message>
         <source>Preset:</source>
-        <translation type="unfinished">预设:</translation>
+        <translation>预设:</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="unfinished">&lt;定制&gt;</translation>
+        <translation>&lt;定制&gt;</translation>
     </message>
     <message>
         <source>Pencil</source>
-        <translation type="unfinished">铅笔</translation>
+        <translation>铅笔</translation>
     </message>
     <message>
         <source>Pressure</source>
-        <translation type="unfinished">压感</translation>
+        <translation>压感</translation>
     </message>
 </context>
 <context>
