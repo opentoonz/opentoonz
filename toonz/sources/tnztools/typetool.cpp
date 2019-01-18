@@ -422,7 +422,7 @@ TypeTool::TypeTool()
     , m_vertical("Vertical Orientation", false)  // W_ToolOptions_Vertical
     , m_size("Size:")                            // W_ToolOptions_Size
     , m_undo(0) {
-  bind(TTool::CommonLevels | TTool::EmptyTarget);
+  bind(TTool::VectorImage | TTool::ToonzImage | TTool::EmptyTarget);
   m_prop[0].bind(m_fontFamilyMenu);
   // Su mac non e' visibile il menu dello style perche' e' stato inserito nel
   // nome
@@ -856,7 +856,11 @@ void TypeTool::updateTextBox() {
 void TypeTool::updateMouseCursor(const TPointD &pos) {
   int oldCursor = m_cursorId;
 
-  if (!m_validFonts)
+  TImageP img      = getImage(false);
+  TVectorImageP vi = img;
+  TToonzImageP ti  = img;
+
+  if (!m_validFonts || (!vi && !ti))
     m_cursorId = ToolCursor::CURSOR_NO;
   else {
     TPointD clickPoint =
