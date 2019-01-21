@@ -51,7 +51,7 @@ StylePickerTool::StylePickerTool()
   m_colorType.addValue(LINES);
   m_colorType.addValue(ALL);
   m_colorType.setId("Mode");
-  bind(TTool::VectorImage | TTool::ToonzImage);
+  bind(TTool::CommonLevels);
 
   m_prop.bind(m_passivePick);
   m_passivePick.setId("PassivePick");
@@ -214,11 +214,13 @@ void StylePickerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 int StylePickerTool::getCursorId() const {
   int ret;
 
-  TImageP img      = getImage(false);
-  TVectorImageP vi = img;
-  TToonzImageP ti  = img;
+  if (!Preferences::instance()->isMultiLayerStylePickerEnabled()) {
+    TImageP img      = getImage(false);
+    TVectorImageP vi = img;
+    TToonzImageP ti  = img;
 
-  if (!vi && !ti) return ToolCursor::CURSOR_NO;
+    if (!vi && !ti) return ToolCursor::CURSOR_NO;
+  }
 
   /* in case the "organize palette" option is active */
   if (m_organizePalette.getValue())
