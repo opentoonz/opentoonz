@@ -214,11 +214,7 @@ void StylePickerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 int StylePickerTool::getCursorId() const {
   int ret;
 
-  TImageP img;
-  if (!m_active)
-    img = touchImage();
-  else
-    img            = getImage(true);
+  TImageP img      = getImage(false);
   TVectorImageP vi = img;
   TToonzImageP ti  = img;
 
