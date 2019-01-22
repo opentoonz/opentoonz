@@ -856,11 +856,7 @@ void TypeTool::updateTextBox() {
 void TypeTool::updateMouseCursor(const TPointD &pos) {
   int oldCursor = m_cursorId;
 
-  TImageP img      = getImage(false);
-  TVectorImageP vi = img;
-  TToonzImageP ti  = img;
-
-  if (!m_validFonts || (!vi && !ti))
+  if (!m_validFonts)
     m_cursorId = ToolCursor::CURSOR_NO;
   else {
     TPointD clickPoint =
