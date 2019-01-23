@@ -1517,7 +1517,9 @@ void SceneViewer::dragEnterEvent(QDragEnterEvent *event) {
   const QMimeData *mimeData = event->mimeData();
 
   if (acceptResourceOrFolderDrop(mimeData->urls()))
-    event->acceptProposedAction();
+    event->setDropAction(Qt::CopyAction);
+    event->accept();
+    // event->acceptProposedAction();
   else
     event->ignore();
 }
