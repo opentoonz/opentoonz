@@ -39,6 +39,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QOpenGLFramebufferObject>
+#include <QGestureEvent>
 
 //===================================================================================
 
@@ -218,7 +219,8 @@ ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook,
     , m_isColorModel(false)
     , m_histogramPopup(0)
     , m_isRemakingPreviewFx(false)
-    , m_rectRGBPick(false) {
+    , m_rectRGBPick(false)
+    , m_firstImage(true) {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
   m_visualSettings.m_drawExternalBG = true;
@@ -226,6 +228,11 @@ ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook,
   setFocusPolicy(Qt::StrongFocus);
 
   setMouseTracking(true);
+
+  setAttribute(Qt::WA_AcceptTouchEvents);
+  grabGesture(Qt::SwipeGesture);
+  grabGesture(Qt::PanGesture);
+  grabGesture(Qt::PinchGesture);
 
   if (m_isHistogramEnable)
     m_histogramPopup = new HistogramPopup(tr("Flipbook Histogram"));
@@ -237,8 +244,6 @@ ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook,
 //-----------------------------------------------------------------------------
 
 void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
-  if (!m_flipbook) return;
-
   QAction *action;
 
   if (m_isColorModel) {
@@ -248,52 +253,55 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   QMenu *menu = new QMenu(this);
 
-  if (m_flipbook->getPreviewedFx()) {
-    if (!(windowState() & Qt::WindowFullScreen)) {
-      action = menu->addAction(tr("Clone Preview"));
+  if (m_flipbook) {
+    if (m_flipbook->getPreviewedFx()) {
+      if (!(windowState() & Qt::WindowFullScreen)) {
+        action = menu->addAction(tr("Clone Preview"));
+        action->setShortcut(QKeySequence(
+            CommandManager::instance()->getKeyFromId(MI_ClonePreview)));
+        connect(action, SIGNAL(triggered()), m_flipbook, SLOT(clonePreview()));
+      }
+
+      if (m_flipbook->isFreezed()) {
+        action = menu->addAction(tr("Unfreeze Preview"));
+        action->setShortcut(QKeySequence(
+            CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
+        connect(action, SIGNAL(triggered()), m_flipbook,
+                SLOT(unfreezePreview()));
+      } else {
+        action = menu->addAction(tr("Freeze Preview"));
+        action->setShortcut(QKeySequence(
+            CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
+        connect(action, SIGNAL(triggered()), m_flipbook, SLOT(freezePreview()));
+      }
+
+      action = menu->addAction(tr("Regenerate Preview"));
       action->setShortcut(QKeySequence(
-          CommandManager::instance()->getKeyFromId(MI_ClonePreview)));
-      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(clonePreview()));
+          CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
+      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerate()));
+
+      action = menu->addAction(tr("Regenerate Frame Preview"));
+      action->setShortcut(QKeySequence(
+          CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
+      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerateFrame()));
+
+      menu->addSeparator();
     }
 
-    if (m_flipbook->isFreezed()) {
-      action = menu->addAction(tr("Unfreeze Preview"));
-      action->setShortcut(QKeySequence(
-          CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
-      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(unfreezePreview()));
-    } else {
-      action = menu->addAction(tr("Freeze Preview"));
-      action->setShortcut(QKeySequence(
-          CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
-      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(freezePreview()));
+    action = menu->addAction(tr("Load / Append Images"));
+    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(loadImages()));
+
+    // history of the loaded paths of flipbook
+    action = CommandManager::instance()->getAction(MI_LoadRecentImage);
+    menu->addAction(action);
+    action->setParent(m_flipbook);
+
+    if (m_flipbook->isSavable()) {
+      action = menu->addAction(tr("Save Images"));
+      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(saveImages()));
     }
-
-    action = menu->addAction(tr("Regenerate Preview"));
-    action->setShortcut(QKeySequence(
-        CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
-    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerate()));
-
-    action = menu->addAction(tr("Regenerate Frame Preview"));
-    action->setShortcut(QKeySequence(
-        CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
-    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerateFrame()));
-
     menu->addSeparator();
   }
-
-  action = menu->addAction(tr("Load / Append Images"));
-  connect(action, SIGNAL(triggered()), m_flipbook, SLOT(loadImages()));
-
-  // history of the loaded paths of flipbook
-  action = CommandManager::instance()->getAction(MI_LoadRecentImage);
-  menu->addAction(action);
-  action->setParent(m_flipbook);
-
-  if (m_flipbook->isSavable()) {
-    action = menu->addAction(tr("Save Images"));
-    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(saveImages()));
-  }
-  menu->addSeparator();
 
   QAction *reset = menu->addAction(tr("Reset View"));
   reset->setShortcut(
@@ -305,42 +313,45 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
       QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
   connect(fit, SIGNAL(triggered()), SLOT(fitView()));
 
+  if (m_flipbook) {
 #ifdef _WIN32
+    if (ImageUtils::FullScreenWidget *fsWidget =
+            dynamic_cast<ImageUtils::FullScreenWidget *>(parentWidget())) {
+      bool isFullScreen = (fsWidget->windowState() & Qt::WindowFullScreen) != 0;
 
-  if (ImageUtils::FullScreenWidget *fsWidget =
-          dynamic_cast<ImageUtils::FullScreenWidget *>(parentWidget())) {
-    bool isFullScreen = (fsWidget->windowState() & Qt::WindowFullScreen) != 0;
+      action = menu->addAction(isFullScreen ? tr("Exit Full Screen Mode")
+                                            : tr("Full Screen Mode"));
 
-    action = menu->addAction(isFullScreen ? tr("Exit Full Screen Mode")
-                                          : tr("Full Screen Mode"));
-
-    action->setShortcut(QKeySequence(
-        CommandManager::instance()->getKeyFromId(V_ShowHideFullScreen)));
-    connect(action, SIGNAL(triggered()), fsWidget, SLOT(toggleFullScreen()));
-  }
+      action->setShortcut(QKeySequence(
+          CommandManager::instance()->getKeyFromId(V_ShowHideFullScreen)));
+      connect(action, SIGNAL(triggered()), fsWidget, SLOT(toggleFullScreen()));
+    }
 
 #endif
 
-  bool addedSep = false;
+    bool addedSep = false;
 
-  if (m_isHistogramEnable &&
-      visibleRegion().contains(event->pos() * getDevPixRatio())) {
-    menu->addSeparator();
-    addedSep = true;
-    action   = menu->addAction(tr("Show Histogram"));
-    connect(action, SIGNAL(triggered()), SLOT(showHistogram()));
-  }
+    if (m_isHistogramEnable &&
+        visibleRegion().contains(event->pos() * getDevPixRatio())) {
+      menu->addSeparator();
+      addedSep = true;
+      action   = menu->addAction(tr("Show Histogram"));
+      connect(action, SIGNAL(triggered()), SLOT(showHistogram()));
+    }
 
-  if (m_visualSettings.m_doCompare) {
-    if (!addedSep) menu->addSeparator();
-    action = menu->addAction(tr("Swap Compared Images"));
-    connect(action, SIGNAL(triggered()), SLOT(swapCompared()));
+    if (m_visualSettings.m_doCompare) {
+      if (!addedSep) menu->addSeparator();
+      action = menu->addAction(tr("Swap Compared Images"));
+      connect(action, SIGNAL(triggered()), SLOT(swapCompared()));
+    }
   }
 
   menu->exec(event->globalPos());
 
-  action = CommandManager::instance()->getAction(MI_LoadRecentImage);
-  action->setParent(0);
+  if (m_flipbook) {
+    action = CommandManager::instance()->getAction(MI_LoadRecentImage);
+    action->setParent(0);
+  }
 
   delete menu;
   update();
@@ -375,6 +386,11 @@ ImageViewer::~ImageViewer() {
 */
 void ImageViewer::setImage(TImageP image) {
   m_image = image;
+
+  if (m_image && m_firstImage) {
+    m_firstImage = false;
+    fitView();
+  }
 
   if (m_isHistogramEnable && m_histogramPopup->isVisible())
     m_histogramPopup->setImage(image);
@@ -733,6 +749,12 @@ void ImageViewer::updateCursor(const TPoint &curPos) {
 */
 void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
   if (!m_image) return;
+
+  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+      !m_stylusUsed) {
+    return;
+  }
+
   QPoint curQPos = event->pos() * getDevPixRatio();
 
   TPoint curPos = TPoint(curQPos.x(), curQPos.y());
@@ -939,6 +961,13 @@ int ImageViewer::getDragType(const TPoint &pos, const TRect &loadbox) {
 //-------------------------------------------------------------------------------
 void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
   if (!m_image) return;
+  // qDebug() << "[mouseDoubleClickEvent]";
+  if (m_gestureActive && !m_stylusUsed) {
+    m_gestureActive = false;
+    fitView();
+    return;
+  }
+
   if (m_visualSettings.m_defineLoadbox && m_flipbook) {
     m_flipbook->setLoadbox(TRect());
     update();
@@ -950,6 +979,13 @@ void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void ImageViewer::mousePressEvent(QMouseEvent *event) {
   if (!m_image) return;
+
+  // qDebug() << "[mousePressEvent]";
+  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+      !m_stylusUsed) {
+    return;
+  }
+
   m_pos                   = event->pos() * getDevPixRatio();
   m_pressedMousePos       = TPoint(m_pos.x(), m_pos.y());
   m_mouseButton           = event->button();
@@ -1026,6 +1062,11 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
   m_mouseButton                    = Qt::NoButton;
   m_compareSettings.m_dragCompareX = m_compareSettings.m_dragCompareY = false;
 
+  m_gestureActive = false;
+  m_zooming       = false;
+  m_panning       = false;
+  m_stylusUsed    = false;
+
   event->ignore();
 }
 
@@ -1035,10 +1076,50 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
 void ImageViewer::wheelEvent(QWheelEvent *event) {
   if (!m_image) return;
   if (event->orientation() == Qt::Horizontal) return;
-  int delta = event->delta() > 0 ? 120 : -120;
-  QPoint center(event->pos().x() * getDevPixRatio() - width() / 2,
-                -event->pos().y() * getDevPixRatio() + height() / 2);
-  zoomQt(center, exp(0.001 * delta));
+  int delta = 0;
+  switch (event->source()) {
+  case Qt::MouseEventNotSynthesized: {
+    if (event->modifiers() & Qt::AltModifier)
+      delta = event->angleDelta().x();
+    else
+      delta = event->angleDelta().y();
+    break;
+  }
+
+  case Qt::MouseEventSynthesizedBySystem: {
+    QPoint numPixels  = event->pixelDelta();
+    QPoint numDegrees = event->angleDelta() / 8;
+    if (!numPixels.isNull()) {
+      delta = event->pixelDelta().y();
+    } else if (!numDegrees.isNull()) {
+      QPoint numSteps = numDegrees / 15;
+      delta           = numSteps.y();
+    }
+    break;
+  }
+
+  default:  // Qt::MouseEventSynthesizedByQt,
+            // Qt::MouseEventSynthesizedByApplication
+    {
+      std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
+                   "Qt::MouseEventSynthesizedByApplication"
+                << std::endl;
+      break;
+    }
+
+  }  // end switch
+
+  if (abs(delta) > 0) {
+    if ((m_gestureActive == true &&
+         m_touchDevice == QTouchDevice::TouchScreen) ||
+        m_gestureActive == false) {
+      int delta = event->delta() > 0 ? 120 : -120;
+      QPoint center(event->pos().x() * getDevPixRatio() - width() / 2,
+                    -event->pos().y() * getDevPixRatio() + height() / 2);
+      zoomQt(center, exp(0.001 * delta));
+    }
+  }
+  event->accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -1166,6 +1247,180 @@ void ImageViewer::onContextAboutToBeDestroyed() {
   makeCurrent();
   m_lutCalibrator->cleanup();
   doneCurrent();
+}
+
+//------------------------------------------------------------------
+
+void ImageViewer::tabletEvent(QTabletEvent *e) {
+  // qDebug() << "[tabletEvent]";
+  if (e->type() == QTabletEvent::TabletPress) {
+    m_stylusUsed = e->pointerType() ? true : false;
+  } else if (e->type() == QTabletEvent::TabletRelease) {
+    m_stylusUsed = false;
+  }
+
+  e->accept();
+}
+
+//------------------------------------------------------------------
+
+void ImageViewer::gestureEvent(QGestureEvent *e) {
+  // qDebug() << "[gestureEvent]";
+  m_gestureActive = false;
+  if (QGesture *swipe = e->gesture(Qt::SwipeGesture)) {
+    m_gestureActive = true;
+  } else if (QGesture *pan = e->gesture(Qt::PanGesture)) {
+    m_gestureActive = true;
+  }
+  if (QGesture *pinch = e->gesture(Qt::PinchGesture)) {
+    QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    QPoint firstCenter                     = gesture->centerPoint().toPoint();
+    if (m_touchDevice == QTouchDevice::TouchScreen)
+      firstCenter = mapFromGlobal(firstCenter);
+
+    if (gesture->state() == Qt::GestureStarted) {
+      m_gestureActive = true;
+    } else if (gesture->state() == Qt::GestureFinished) {
+      m_gestureActive = false;
+      m_zooming       = false;
+      m_scaleFactor   = 0.0;
+    } else {
+      if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        double scaleFactor = gesture->scaleFactor();
+        // the scale factor makes for too sensitive scaling
+        // divide the change in half
+        if (scaleFactor > 1) {
+          double decimalValue = scaleFactor - 1;
+          decimalValue /= 1.5;
+          scaleFactor = 1 + decimalValue;
+        } else if (scaleFactor < 1) {
+          double decimalValue = 1 - scaleFactor;
+          decimalValue /= 1.5;
+          scaleFactor = 1 - decimalValue;
+        }
+        if (!m_zooming) {
+          double delta = scaleFactor - 1;
+          m_scaleFactor += delta;
+          if (m_scaleFactor > .2 || m_scaleFactor < -.2) {
+            m_zooming = true;
+          }
+        }
+        if (m_zooming) {
+          const QPoint center(
+              firstCenter.x() * getDevPixRatio() - width() / 2,
+              -firstCenter.y() * getDevPixRatio() + height() / 2);
+          zoomQt(center, scaleFactor);
+          m_panning = false;
+        }
+        m_gestureActive = true;
+      }
+
+      if (changeFlags & QPinchGesture::CenterPointChanged) {
+        QPointF centerDelta = (gesture->centerPoint() * getDevPixRatio()) -
+                              (gesture->lastCenterPoint() * getDevPixRatio());
+        if (centerDelta.manhattanLength() > 1) {
+          // panQt(centerDelta.toPoint());
+        }
+        m_gestureActive = true;
+      }
+    }
+  }
+  e->accept();
+}
+
+void ImageViewer::touchEvent(QTouchEvent *e, int type) {
+  // qDebug() << "[touchEvent]";
+  if (type == QEvent::TouchBegin) {
+    m_touchActive   = true;
+    m_firstPanPoint = e->touchPoints().at(0).pos();
+    // obtain device type
+    m_touchDevice = e->device()->type();
+  } else if (m_touchActive) {
+    // touchpads must have 2 finger panning for tools and navigation to be
+    // functional on other devices, 1 finger panning is preferred
+    if ((e->touchPoints().count() == 2 &&
+         m_touchDevice == QTouchDevice::TouchPad) ||
+        (e->touchPoints().count() == 1 &&
+         m_touchDevice == QTouchDevice::TouchScreen)) {
+      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+      if (!m_panning) {
+        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        // minimize accidental and jerky zooming/rotating during 2 finger
+        // panning
+        if ((deltaPoint.manhattanLength() > 100) && !m_zooming) {
+          m_panning = true;
+        }
+      }
+      if (m_panning) {
+        QPoint curPos      = panPoint.pos().toPoint() * getDevPixRatio();
+        QPoint lastPos     = panPoint.lastPos().toPoint() * getDevPixRatio();
+        QPoint centerDelta = curPos - lastPos;
+        panQt(centerDelta);
+      }
+    }
+  }
+  if (type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
+    m_touchActive = false;
+    m_panning     = false;
+  }
+  e->accept();
+}
+
+bool ImageViewer::event(QEvent *e) {
+  /*
+  switch (e->type()) {
+  case QEvent::TabletPress: {
+  QTabletEvent *te = static_cast<QTabletEvent *>(e);
+  qDebug() << "[event] TabletPress: pointerType(" << te->pointerType()
+  << ") device(" << te->device() << ")";
+  } break;
+  case QEvent::TabletRelease:
+  qDebug() << "[event] TabletRelease";
+  break;
+  case QEvent::TouchBegin:
+  qDebug() << "[event] TouchBegin";
+  break;
+  case QEvent::TouchEnd:
+  qDebug() << "[event] TouchEnd";
+  break;
+  case QEvent::TouchCancel:
+  qDebug() << "[event] TouchCancel";
+  break;
+  case QEvent::MouseButtonPress:
+  qDebug() << "[event] MouseButtonPress";
+  break;
+  case QEvent::MouseButtonDblClick:
+  qDebug() << "[event] MouseButtonDblClick";
+  break;
+  case QEvent::MouseButtonRelease:
+  qDebug() << "[event] MouseButtonRelease";
+  break;
+  case QEvent::Gesture:
+  qDebug() << "[event] Gesture";
+  break;
+  default:
+  break;
+  }
+  */
+
+  if (e->type() == QEvent::Gesture &&
+      CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
+    gestureEvent(static_cast<QGestureEvent *>(e));
+    return true;
+  }
+  if ((e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
+       e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) &&
+      CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
+    touchEvent(static_cast<QTouchEvent *>(e), e->type());
+    m_gestureActive = true;
+    return true;
+  }
+  return GLWidgetForHighDpi::event(e);
 }
 
 //-----------------------------------------------------------------------------
