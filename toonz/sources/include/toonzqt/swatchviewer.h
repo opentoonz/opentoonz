@@ -16,6 +16,8 @@
 #include "tthread.h"
 #include "trop.h"
 
+#include <QTouchDevice>
+
 using namespace TThread;
 
 #undef DVAPI
@@ -27,6 +29,13 @@ using namespace TThread;
 #define DVAPI DV_IMPORT_API
 #define DVVAR DV_IMPORT_VAR
 #endif
+
+//-----------------------------------------------------------------------------
+
+//  Forward declarations
+
+class QTouchEvent;
+class QGestureEvent;
 
 //=============================================================================
 
@@ -113,6 +122,7 @@ class DVAPI SwatchViewer final : public QWidget {
   TPointD m_pointPosDelta;
 
   bool m_enabled;
+  bool m_firstEnabled;
   int m_frame;
   TThread::Executor m_executor;
   TThread::Mutex m_mutex;
@@ -128,6 +138,15 @@ class DVAPI SwatchViewer final : public QWidget {
   TRaster32P m_oldContent, m_curContent;
 
   bool m_computing;
+
+  bool m_touchActive                     = false;
+  bool m_gestureActive                   = false;
+  QTouchDevice::DeviceType m_touchDevice = QTouchDevice::TouchScreen;
+  bool m_zooming                         = false;
+  bool m_panning                         = false;
+  double m_scaleFactor;  // used for zoom gesture
+
+  bool m_stylusUsed = false;
 
   friend class ContentRender;
 
@@ -179,6 +198,8 @@ public slots:
   void setEnable(bool enabled);
   void updateSize(const QSize &size);
   void setBgPainter(TPixel32 color1, TPixel32 color2 = TPixel32());
+  void resetView();
+  void fitView();
 
 protected:
   void computeContent();
@@ -186,6 +207,7 @@ protected:
   TPointD win2world(const TPoint &p) const;
   void zoom(const TPoint &pos, double factor);
   void zoom(bool forward, bool reset);
+  void pan(const TPoint &delta);
 
   void updateRaster();
 
@@ -194,6 +216,7 @@ protected:
 
   void setAff(const TAffine &aff);
 
+  void contextMenuEvent(QContextMenuEvent *event) override;
   void paintEvent(QPaintEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
@@ -202,6 +225,15 @@ protected:
   void keyPressEvent(QKeyEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
   void hideEvent(QHideEvent *event) override;
+
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void tabletEvent(QTabletEvent *e) override;
+  void touchEvent(QTouchEvent *e, int type);
+  void gestureEvent(QGestureEvent *e);
+  bool event(QEvent *e) override;
+
+private:
+  QPointF m_firstPanPoint;
 
 signals:
   void pointPositionChanged(int index, const TPointD &p);
