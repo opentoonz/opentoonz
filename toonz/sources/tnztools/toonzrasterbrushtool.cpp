@@ -2081,6 +2081,11 @@ void ToonzRasterBrushTool::updateCurrentStyle() {
     TTool::Application *app = TTool::getApplication();
     TMyPaintBrushStyle *brushStyle =
         dynamic_cast<TMyPaintBrushStyle *>(app->getCurrentLevelStyle());
+    if (!brushStyle) {
+      // brush changed to normal abnormally. Complete color style change.
+      onColorStyleChanged();
+      return;
+    }
     double radiusLog = brushStyle->getBrush().getBaseValue(
                            MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC) +
                        m_modifierSize.getValue() * log(2.0);
