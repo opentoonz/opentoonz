@@ -603,7 +603,10 @@ void TVectorImage::Imp::doEraseIntersection(int index,
       p1 = p1->next();
   }
 
-  if (deleteIt) delete deleteIt;
+  if (deleteIt) {
+	  m_intersectionData->m_autocloseMap.erase(index);
+	  delete deleteIt;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -873,7 +876,7 @@ assert(v[b.m_nextBranch].m_nextBranch==i);
       if (!p2->m_edge.m_s && p2->m_edge.m_index < 0) {
         VIStroke *vs = m_intersectionData->m_autocloseMap[p2->m_edge.m_index];
         if (vs) {
-          p2->m_edge.m_s =
+			p2->m_edge.m_s =
               m_intersectionData->m_autocloseMap[p2->m_edge.m_index]->m_s;
 
           // TEdge& e = it2->m_edge;
@@ -3309,7 +3312,7 @@ struct TDeleteMapFunctor {
 };
 
 IntersectionData::~IntersectionData() {
-  std::for_each(m_autocloseMap.begin(), m_autocloseMap.end(),
+	std::for_each(m_autocloseMap.begin(), m_autocloseMap.end(),
                 TDeleteMapFunctor());
 }
 //-----------------------------------------------------------------------------
