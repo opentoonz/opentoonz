@@ -457,8 +457,9 @@ static void cleanNextIntersection(const VIList<Intersection> &interList,
 //-----------------------------------------------------------------------------
 
 void TVectorImage::Imp::eraseEdgeFromStroke(IntersectedStroke *is) {
-  if (is->m_edge.m_index >=
-      0)  // elimino il puntatore all'edge nella lista della VIStroke
+  if (is->m_edge.m_index >= 0 &&
+      is->m_edge.m_index < m_strokes.size())  // elimino il puntatore all'edge
+                                              // nella lista della VIStroke
   {
     VIStroke *s;
     s = m_strokes[is->m_edge.m_index];
@@ -771,8 +772,7 @@ for (UINT ii=0; ii<branchCount; ii++)
       if (v[i].m_currInter >=
           size)  // pezza per immagine corrotte...evito crash
       {
-        intList.clear();
-        return;
+        break;
       }
 
       branchesBefore[v[i].m_currInter] = i;
@@ -787,7 +787,7 @@ for (UINT ii=0; ii<branchCount; ii++)
     currBranch->m_edge.m_styleId = b.m_style;
     // assert(b.m_style<100);
     currBranch->m_edge.m_index = b.m_strokeIndex;
-    if (b.m_strokeIndex >= 0)
+    if (b.m_strokeIndex >= 0 && b.m_strokeIndex < m_strokes.size())
       currBranch->m_edge.m_s = m_strokes[b.m_strokeIndex]->m_s;
     else
       currBranch->m_edge.m_s = 0;
@@ -840,7 +840,7 @@ assert(v[b.m_nextBranch].m_nextBranch==i);
       while (v[j].m_strokeIndex < 0 &&
              ((j > 0 && v[j].m_currInter == v[j - 1].m_currInter) || j == 0))
         j--;
-      if (v[j].m_strokeIndex >= 0)
+      if (v[j].m_strokeIndex >= 0 && v[j].m_strokeIndex < m_strokes.size())
         currInt->m_intersection =
             m_strokes[v[j].m_strokeIndex]->m_s->getPoint(v[j].m_w);
     }
