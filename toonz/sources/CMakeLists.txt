@@ -203,7 +203,10 @@ elseif(BUILD_ENV_UNIXLIKE)
 
     find_package(Qt5Widgets)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++")
+    endif()
 endif()
 
 add_definitions(
