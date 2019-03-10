@@ -1138,7 +1138,7 @@ void TXshSimpleLevel::load() {
       if (info && info->m_samplePerPixel >= 5) {
         QString msg = QString(
                           "Failed to open %1.\nSamples per pixel is more than "
-                          "4. It may containt more than one alpha channel.")
+                          "4. It may contain more than one alpha channel.")
                           .arg(QString::fromStdWString(m_path.getWideString()));
         QMessageBox::warning(0, "Image format not supported", msg);
         return;
