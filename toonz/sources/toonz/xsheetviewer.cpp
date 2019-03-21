@@ -1367,8 +1367,11 @@ void XsheetViewer::scrollToColumn(int col) {
 
   if (orientation()->isVerticalTimeline())
     scrollToHorizontalRange(x0, x1);
-  else
+  else {
+    if (colNext == col) x1 += m_orientation->cellHeight();
+
     scrollToVerticalRange(x0, x1);
+  }
 }
 
 //-----------------------------------------------------------------------------
