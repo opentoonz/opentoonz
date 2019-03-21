@@ -1244,9 +1244,12 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
       if (orientation()->isVerticalTimeline())
         locals.scrollVertTo((frameCount + 1) * orientation()->cellHeight(),
                             visibleRect);
-      else
-        locals.scrollHorizTo((frameCount + 1) * orientation()->cellWidth(),
-                             visibleRect);
+      else {
+        int x = (((frameCount + 1) * orientation()->cellWidth()) *
+                 getFrameZoomFactor()) /
+                100;
+        locals.scrollHorizTo(x, visibleRect);
+      }
       break;
     }
     break;
