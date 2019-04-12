@@ -5,8 +5,6 @@
 
 //-----------------------------------------------------------------------------
 
-using std::for_each;
-
 namespace {
 
 void deleteUndo(const TUndo *undo) { delete undo; }
@@ -26,7 +24,7 @@ public:
     assert(m_undoing == false);
     assert(m_deleted == false);
     m_deleted = true;
-    for_each(m_undos.begin(), m_undos.end(), deleteUndo);
+    std::for_each(m_undos.begin(), m_undos.end(), deleteUndo);
     m_undos.clear();
   }
 
@@ -49,7 +47,7 @@ public:
     assert(!m_undoing);
     m_undoing = true;
     // VERSIONE CORRETTA
-    for_each(m_undos.rbegin(), m_undos.rend(), callUndo);
+    std::for_each(m_undos.rbegin(), m_undos.rend(), callUndo);
     // VERSIONE SBAGLIATA
     // for_each(m_undos.begin(), m_undos.end(), callUndo);
     m_undoing = false;
@@ -57,7 +55,7 @@ public:
   void redo() const override {
     assert(!m_deleted);
     // VERSIONE CORRETTA
-    for_each(m_undos.begin(), m_undos.end(), callRedo);
+    std::for_each(m_undos.begin(), m_undos.end(), callRedo);
     // VERSIONE SBAGLIATA
     // for_each(m_undos.rbegin(), m_undos.rend(), callRedo);
   }
@@ -181,7 +179,7 @@ void TUndoManager::TUndoManagerImp::add(TUndo *undo) {
 
 void TUndoManager::TUndoManagerImp::doAdd(TUndo *undo) {
   if (m_current != m_undoList.end()) {
-    for_each(m_current, m_undoList.end(), deleteUndo);
+    std::for_each(m_current, m_undoList.end(), deleteUndo);
     m_undoList.erase(m_current, m_undoList.end());
   }
 
@@ -208,7 +206,7 @@ void TUndoManager::TUndoManagerImp::doAdd(TUndo *undo) {
 
 void TUndoManager::beginBlock() {
   if (m_imp->m_current != m_imp->m_undoList.end()) {
-    for_each(m_imp->m_current, m_imp->m_undoList.end(), deleteUndo);
+    std::for_each(m_imp->m_current, m_imp->m_undoList.end(), deleteUndo);
     m_imp->m_undoList.erase(m_imp->m_current, m_imp->m_undoList.end());
   }
 
@@ -315,7 +313,7 @@ void TUndoManager::reset() {
   assert(m_imp->m_blockStack.empty());
   m_imp->m_blockStack.clear();
   UndoList &lst = m_imp->m_undoList;
-  for_each(lst.begin(), lst.end(), deleteUndo);
+  std::for_each(lst.begin(), lst.end(), deleteUndo);
   lst.clear();
   m_imp->m_current = m_imp->m_undoList.end();
   Q_EMIT historyChanged();
@@ -380,7 +378,7 @@ void TUndoManager::popUndo(int n, bool forward) {
         i++;
       }
     }
-    for_each(start, end, deleteUndo);
+    std::for_each(start, end, deleteUndo);
     m_imp->m_undoList.erase(start, end);
     m_imp->m_current = m_imp->m_undoList.end();
   } else
