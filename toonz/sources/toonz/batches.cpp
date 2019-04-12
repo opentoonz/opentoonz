@@ -135,7 +135,7 @@ bool SaveTaskListPopup::execute() {
 
 //------------------------------------------------------------------------------
 QMutex TasksMutex;
-map<QString, QProcess *> RunningTasks;
+std::map<QString, QProcess *> RunningTasks;
 
 class TaskRunner final : public TThread::Runnable {
 public:

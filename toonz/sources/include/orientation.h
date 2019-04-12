@@ -23,9 +23,6 @@
 #include <map>
 #include <vector>
 
-using std::map;
-using std::vector;
-
 // Defines timeline direction: top to bottom;  left to right.
 // old (vertical timeline) = new (universal)    = old (kept)
 //                x        =   layer axis       =   column
@@ -205,13 +202,13 @@ enum class PredefinedFlag {
 // Knows everything about geometry of a particular orientation.
 class DVAPI Orientation {
 protected:
-  map<PredefinedRect, QRect> _rects;
-  map<PredefinedLine, QLine> _lines;
-  map<PredefinedDimension, int> _dimensions;
-  map<PredefinedPath, QPainterPath> _paths;
-  map<PredefinedPoint, QPoint> _points;
-  map<PredefinedRange, NumberRange> _ranges;
-  map<PredefinedFlag, bool> _flags;
+  std::map<PredefinedRect, QRect> _rects;
+  std::map<PredefinedLine, QLine> _lines;
+  std::map<PredefinedDimension, int> _dimensions;
+  std::map<PredefinedPath, QPainterPath> _paths;
+  std::map<PredefinedPoint, QPoint> _points;
+  std::map<PredefinedRange, NumberRange> _ranges;
+  std::map<PredefinedFlag, bool> _flags;
 
 public:
   virtual CellPosition xyToPosition(const QPoint &xy,

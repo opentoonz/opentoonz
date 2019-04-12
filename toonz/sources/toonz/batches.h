@@ -12,7 +12,6 @@
 #include "tfilepath.h"
 #include "tthread.h"
 #include "filebrowserpopup.h"
-using std::map;
 
 class TFarmController;
 
