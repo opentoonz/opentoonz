@@ -1316,21 +1316,21 @@ void EraserTool::eraseSegments(const TVectorImageP vi, TStroke *eraseStroke) {
         }
 
         if (intersection.first < w) {
-          lowerW = max(lowerW, intersection.first);
+          lowerW = std::max(lowerW, intersection.first);
         } else {
-          higherW = min(higherW, intersection.first);
+          higherW = std::min(higherW, intersection.first);
         }
 
         if (intersection.second < w) {
-          lowerW = max(lowerW, intersection.second);
+          lowerW = std::max(lowerW, intersection.second);
         } else {
-          higherW = min(higherW, intersection.second);
+          higherW = std::min(higherW, intersection.second);
         }
 
-        lowerW1  = max(lowerW1, intersection.first);
-        higherW0 = min(higherW0, intersection.first);
-        lowerW1  = max(lowerW1, intersection.second);
-        higherW0 = min(higherW0, intersection.second);
+        lowerW1  = std::max(lowerW1, intersection.first);
+        higherW0 = std::min(higherW0, intersection.first);
+        lowerW1  = std::max(lowerW1, intersection.second);
+        higherW0 = std::min(higherW0, intersection.second);
       }
 
       // then check intersection with other strokes
@@ -1343,12 +1343,12 @@ void EraserTool::eraseSegments(const TVectorImageP vi, TStroke *eraseStroke) {
         intersect(stroke, intersectedStroke, intersections, false);
         for (auto &intersection : intersections) {
           if (intersection.first < w) {
-            lowerW = max(lowerW, intersection.first);
+            lowerW = std::max(lowerW, intersection.first);
           } else {
-            higherW = min(higherW, intersection.first);
+            higherW = std::min(higherW, intersection.first);
           }
-          lowerW1  = max(lowerW1, intersection.first);
-          higherW0 = min(higherW0, intersection.first);
+          lowerW1  = std::max(lowerW1, intersection.first);
+          higherW0 = std::min(higherW0, intersection.first);
         }
       }
 

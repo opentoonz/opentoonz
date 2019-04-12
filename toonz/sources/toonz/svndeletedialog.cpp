@@ -175,7 +175,7 @@ void SVNDeleteDialog::showEvent(QShowEvent *e) {
     int height = 50;
     if (m_treeWidget->isVisible()) height += (m_files.size() * 50);
 
-    setMinimumSize(300, min(height, 350));
+    setMinimumSize(300, std::min(height, 350));
   }
   QDialog::showEvent(e);
 }
@@ -270,7 +270,7 @@ void SVNDeleteDialog::onDeleteServerButtonClicked() {
 
   int height = 175;
   if (m_treeWidget->isVisible()) height += (m_files.size() * 50);
-  setMinimumSize(300, min(height, 350));
+  setMinimumSize(300, std::min(height, 350));
 
   m_textLabel->setText(
       tr("You are deleting items also on repository. Are you sure ?"));

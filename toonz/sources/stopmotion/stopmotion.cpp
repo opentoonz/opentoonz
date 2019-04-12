@@ -442,7 +442,7 @@ void StopMotion::lowerOpacity() {
   opacity *= 10;
   opacity -= 10;
   m_opacity         = double(opacity) / 100.0 * 255.0;
-  m_opacity         = max(0, m_opacity);
+  m_opacity         = std::max(0, m_opacity);
   StopMotionOpacity = m_opacity;
   emit(opacityChanged(m_opacity));
 }
@@ -454,7 +454,7 @@ void StopMotion::raiseOpacity() {
   opacity *= 10;
   opacity += 10;
   m_opacity         = double(opacity) / 100.0 * 255.0;
-  m_opacity         = min(255, m_opacity);
+  m_opacity         = std::min(255, m_opacity);
   StopMotionOpacity = m_opacity;
   emit(opacityChanged(m_opacity));
 }

@@ -511,7 +511,7 @@ void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse) {
 
       if (m_treeWidget->isVisible()) height += (filesToPutCount * 25);
 
-      setMinimumSize(350, min(height, 350));
+      setMinimumSize(350, std::min(height, 350));
 
       m_waitingLabel->hide();
       m_commentLabel->show();
@@ -538,7 +538,7 @@ void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse) {
 
     if (m_treeWidget->isVisible()) height += (m_items.size() * 25);
 
-    setMinimumSize(350, min(height, 350));
+    setMinimumSize(350, std::min(height, 350));
 
     m_waitingLabel->hide();
     m_textLabel->hide();

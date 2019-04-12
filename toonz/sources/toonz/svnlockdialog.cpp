@@ -189,7 +189,7 @@ void SVNLockDialog::onStatusRetrieved(const QString &xmlResponse) {
     if (m_treeWidget->isVisible())
       height += (m_filesToEdit.size() * (m_lock ? 25 : 50));
 
-    setMinimumSize(300, min(height, 350));
+    setMinimumSize(300, std::min(height, 350));
 
     m_waitingLabel->hide();
 

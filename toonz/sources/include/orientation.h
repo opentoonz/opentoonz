@@ -35,7 +35,8 @@ class DVAPI NumberRange {
   NumberRange() : _from(0), _to(0) {}
 
 public:
-  NumberRange(int from, int to) : _from(min(from, to)), _to(max(from, to)) {}
+  NumberRange(int from, int to)
+      : _from(std::min(from, to)), _to(std::max(from, to)) {}
 
   int from() const { return _from; }
   int to() const { return _to; }

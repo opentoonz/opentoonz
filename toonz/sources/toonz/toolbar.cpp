@@ -116,7 +116,7 @@ void Toolbar::updateToolbar() {
         xsh->getCellRange(colIndex, r0, r1);
         if (0 <= r0 && r0 <= r1) {
           // level type depends on previous occupied cell
-          for (int r = min(r1, rowIndex); r >= r0; r--) {
+          for (int r = std::min(r1, rowIndex); r >= r0; r--) {
             TXshCell cell = xsh->getCell(r, colIndex);
             if (cell.isEmpty()) continue;
             levelType = cell.m_level->getType();

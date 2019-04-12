@@ -566,7 +566,7 @@ ColumnArea::DrawHeader::DrawHeader(ColumnArea *nArea, QPainter &nP, int nCol)
   else
     isCurrent = m_viewer->getCurrentColumn() == col;
 
-  orig = m_viewer->positionToXY(CellPosition(0, max(col, -1)));
+  orig = m_viewer->positionToXY(CellPosition(0, std::max(col, -1)));
 }
 
 void ColumnArea::DrawHeader::prepare() const {
@@ -1434,7 +1434,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
   const Orientation *o        = m_viewer->orientation();
 
-  QPoint orig = m_viewer->positionToXY(CellPosition(0, max(col, -1)));
+  QPoint orig = m_viewer->positionToXY(CellPosition(0, std::max(col, -1)));
 
   QString fontName = Preferences::instance()->getInterfaceFont();
   if (fontName == "") {

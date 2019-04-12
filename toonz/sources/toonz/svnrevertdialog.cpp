@@ -143,7 +143,7 @@ void SVNRevertDialog::onStatusRetrieved(const QString &xmlResponse) {
   } else {
     if (m_treeWidget->isVisible()) height += (m_filesToRevert.size() * 50);
 
-    setMinimumSize(300, min(height, 350));
+    setMinimumSize(300, std::min(height, 350));
 
     QString msg = QString(tr("%1 items to revert."))
                       .arg(m_filesToRevert.size() == 1

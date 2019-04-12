@@ -860,8 +860,10 @@ CellRange XsheetViewer::xyRectToRange(const QRect &rect) const {
 QRect XsheetViewer::rangeToXYRect(const CellRange &range) const {
   QPoint from        = positionToXY(range.from());
   QPoint to          = positionToXY(range.to());
-  QPoint topLeft     = QPoint(min(from.x(), to.x()), min(from.y(), to.y()));
-  QPoint bottomRight = QPoint(max(from.x(), to.x()), max(from.y(), to.y()));
+  QPoint topLeft =
+      QPoint(std::min(from.x(), to.x()), std::min(from.y(), to.y()));
+  QPoint bottomRight =
+      QPoint(std::max(from.x(), to.x()), std::max(from.y(), to.y()));
   return QRect(topLeft, bottomRight);
 }
 
@@ -1447,8 +1449,8 @@ void XsheetViewer::scrollToRow(int row) {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::scrollToVerticalRange(int y0, int y1) {
-  int yMin          = min(y0, y1);
-  int yMax          = max(y0, y1);
+  int yMin          = std::min(y0, y1);
+  int yMax          = std::max(y0, y1);
   QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
   if (visibleRect.isEmpty()) return;
   int visibleTop    = visibleRect.top();
