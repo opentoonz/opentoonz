@@ -4,8 +4,6 @@
 #define _WIN32_WINNT 0x0400
 #include <windows.h>
 
-using std::list<TThread *>;
-
 class TThreadGroupImp;
 //---------------------------------------------------------------------------
 //    TMutex & TMutexImp
@@ -24,7 +22,7 @@ public:
 //---------------------------------------------------------------------------
 
 class TThreadGroupImp {
-  list<TThread *> threads;
+  std::list<TThread *> threads;
 
 public:
   TThreadGroupImp();
@@ -274,7 +272,7 @@ void TThreadGroupImp::wait() {
   if (count == 0) return;
   HANDLE *hThreads = new HANDLE[count];
   int id           = 0;
-  for (list<TThread *>::iterator it = threads.begin(); it != threads.end();
+  for (std::list<TThread *>::iterator it = threads.begin(); it != threads.end();
        it++, id++) {
     TThread *t = *it;
     if (t->m_imp->threadId == 0) t->start();
