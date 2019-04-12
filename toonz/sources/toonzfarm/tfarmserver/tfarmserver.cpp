@@ -215,7 +215,7 @@ public:
   void unmountDisks();
 
   std::map<std::string, std::string> m_disks;
-  vector<std::string> m_disksMounted;
+  std::vector<std::string> m_disksMounted;
 #endif
 
   int m_port;
@@ -296,14 +296,14 @@ public:
     m_controller = controller;
   }
   TFarmController *getController() const { return m_controller.getPointer(); }
-  void setAppPaths(const vector<TFilePath> &);
+  void setAppPaths(const std::vector<TFilePath> &);
 
-  QString execute(const vector<QString> &argv) override;
+  QString execute(const std::vector<QString> &argv) override;
 
   // TFarmServer overrides
   int addTask(const QString &taskid, const QString &cmdline) override;
   int terminateTask(const QString &taskid) override;
-  int getTasks(vector<QString> &tasks) override;
+  int getTasks(std::vector<QString> &tasks) override;
 
   void queryHwInfo(HwInfo &hwInfo) override;
 
@@ -329,7 +329,7 @@ private:
   FarmControllerProxyP m_controller;
 
   TThread::Mutex m_mux;
-  vector<QString> m_tasks;
+  std::vector<QString> m_tasks;
 
   TUserLog *m_userLog;
 
@@ -453,10 +453,7 @@ void Task::run() {
 
     // cerco se il nome dell'applicazione e' tra quelle del file di
     // configurazione
-    bool foundApp                  = false;
-    vector<TFilePath>::iterator it = m_server->m_appPaths.begin();
-    for (; it != m_server->m_appPaths.end(); ++it) {
-      TFilePath appPath = *it;
+    for (auto const &appPath : m_server->m_appPaths) {
       if (appPath.getName() == appName.toStdString()) {
         exename = QString::fromStdWString(appPath.getWideString());
         break;
@@ -520,7 +517,7 @@ FarmServer::FarmServer(int port, TUserLog *log)
 FarmServer::~FarmServer() { delete m_executor; }
 
 //------------------------------------------------------------------------------
-QString FarmServer::execute(const vector<QString> &argv) {
+QString FarmServer::execute(const std::vector<QString> &argv) {
   if (argv.size() > 0) {
     if (argv[0] == "addTask" && argv.size() == 3) {
       // assert(!"Da fare");
@@ -530,15 +527,14 @@ QString FarmServer::execute(const vector<QString> &argv) {
       int ret = terminateTask(argv[1]);
       return QString::number(ret);
     } else if (argv[0] == "getTasks") {
-      vector<QString> tasks;
+      std::vector<QString> tasks;
       int ret = getTasks(tasks);
 
       QString reply(QString::number(ret));
       reply += ",";
 
-      vector<QString>::iterator it = tasks.begin();
-      for (; it != tasks.end(); ++it) {
-        reply += *it;
+      for (auto const &e : tasks) {
+        reply += e;
         reply += ",";
       }
 
@@ -640,7 +636,7 @@ int FarmServer::terminateTask(const QString &taskid) {
 
 //------------------------------------------------------------------------------
 
-int FarmServer::getTasks(vector<QString> &tasks) {
+int FarmServer::getTasks(std::vector<QString> &tasks) {
   QMutexLocker sl(&m_mux);
   tasks = m_tasks;
   return m_tasks.size();
@@ -713,7 +709,7 @@ void FarmServer::detachController(const ControllerData &data) {
 
 void FarmServer::removeTask(const QString &id) {
   QMutexLocker sl(&m_mux);
-  vector<QString>::iterator it = find(m_tasks.begin(), m_tasks.end(), id);
+  std::vector<QString>::iterator it = find(m_tasks.begin(), m_tasks.end(), id);
   if (it != m_tasks.end()) m_tasks.erase(it);
 }
 
@@ -1094,10 +1090,7 @@ void FarmServerService::mountDisks() {
 //------------------------------------------------------------------------------
 
 void FarmServerService::unmountDisks() {
-  vector<std::string>::iterator it = m_disksMounted.begin();
-  for (; it != m_disksMounted.end(); ++it) {
-    std::string drive = *it;
-
+  for (auto const &drive : m_disksMounted) {
     DWORD res =
         WNetCancelConnection2(drive.c_str(),           // resource name
                               CONNECT_UPDATE_PROFILE,  // connection type

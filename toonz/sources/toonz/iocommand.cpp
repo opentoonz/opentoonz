@@ -2310,7 +2310,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
                                   LoadResourceArguments::IMPORT);
   }
 
-  vector<TFilePath> paths;
+  std::vector<TFilePath> paths;
   int all = 0;
 
   // Loop for all the resources to load

@@ -1039,7 +1039,7 @@ public:
   void activateTask(const QString &id) override;
   void restartTask(const QString &id) override;
 
-  void getTasks(vector<QString> &tasks) override;
+  void getTasks(std::vector<QString> &tasks) override;
   void getTasks(const QString &parentId, std::vector<QString> &tasks) override;
   void getTasks(const QString &parentId,
                 std::vector<TaskShortInfo> &tasks) override;
@@ -1068,7 +1068,9 @@ public:
 
   void taskCompleted(const QString &taskId, int exitCode) override;
 
-  void getServers(vector<ServerIdentity> &servers) override { assert(false); }
+  void getServers(std::vector<ServerIdentity> &servers) override {
+    assert(false);
+  }
 
   ServerState queryServerState2(const QString &id) override {
     assert(false);
@@ -1126,7 +1128,7 @@ void MyLocalController::activateTask(const QString &id) { assert(false); }
 
 void MyLocalController::restartTask(const QString &id) { assert(false); }
 
-void MyLocalController::getTasks(vector<QString> &tasks) { assert(false); }
+void MyLocalController::getTasks(std::vector<QString> &tasks) { assert(false); }
 
 void MyLocalController::getTasks(const QString &parentId,
                                  std::vector<QString> &tasks) {

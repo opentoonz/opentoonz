@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 using std::string;
-using std::vector;
 
 #include "texception.h"
 
@@ -34,7 +33,7 @@ public:
   virtual ~TFarmProxy() {}
 
   QString sendToStub(const QString &data);
-  static int extractArgs(const QString &s, vector<QString> &argv);
+  static int extractArgs(const QString &s, std::vector<QString> &argv);
 
 protected:
   QString m_hostName;

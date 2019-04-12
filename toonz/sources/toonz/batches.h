@@ -13,7 +13,6 @@
 #include "tthread.h"
 #include "filebrowserpopup.h"
 using std::map;
-using std::vector;
 
 class TFarmController;
 

@@ -29,7 +29,7 @@ QString TFarmProxy::sendToStub(const QString &data) {
 
 //------------------------------------------------------------------------------
 
-int TFarmProxy::extractArgs(const QString &s, vector<QString> &argv) {
+int TFarmProxy::extractArgs(const QString &s, std::vector<QString> &argv) {
   argv.clear();
   if (s == "") return 0;
 

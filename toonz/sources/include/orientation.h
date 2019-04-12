@@ -283,7 +283,7 @@ protected:
 // Enumerates all orientations available in the system as global const objects.
 class DVAPI Orientations {
   const Orientation *_topToBottom, *_leftToRight;
-  vector<const Orientation *> _all;
+  std::vector<const Orientation *> _all;
 
   Orientations();
 
@@ -297,7 +297,7 @@ public:
   static const Orientation *topToBottom();
   static const Orientation *leftToRight();
 
-  static const vector<const Orientation *> &all();
+  static const std::vector<const Orientation *> &all();
 
   static const Orientation *byName(const QString &name);
 };
