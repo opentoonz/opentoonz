@@ -107,8 +107,6 @@ const unsigned short TFileStatus::IfDir = _S_IFDIR;
 #define STAT _stat
 #define UTIME _utime
 #define FTIME _ftime
-using std::ifstream;
-using std::ofstream;
 using std::filebuf;
 #else  // these are common for IRIX & LINUX
 const int TSystem::MaxPathLen     = MAXPATHLEN;
@@ -744,7 +742,7 @@ void TSystem::touchFile(const TFilePath &path) {
   if (TFileStatus(path).doesExist()) {
     if (0 != UTIME(filename.c_str(), 0)) throw TSystemException(path, errno);
   } else {
-    ofstream file(filename.c_str());
+    std::ofstream file(filename.c_str());
     if (!file) {
       throw TSystemException(path, errno);
     }
@@ -789,8 +787,8 @@ void TSystem::copyFile(const TFilePath &dst, const TFilePath &src) {
     throw TSystemException(src, getFormattedMessage(GetLastError()));
   }
 #else
-  ifstream fpin(src.getFullPath().c_str(), ios::in);
-  ofstream fpout(dst.getFullPath().c_str(), ios::out);
+  std::ifstream fpin(src.getFullPath().c_str(), ios::in);
+  std::ofstream fpout(dst.getFullPath().c_str(), ios::out);
   if (!fpin || !fpout) throw TSystemException(src, "unable to copy file");
   int c = fpin.get();
   while (!fpin.eof()) {
