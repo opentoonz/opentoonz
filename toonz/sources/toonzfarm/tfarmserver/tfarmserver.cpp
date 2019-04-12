@@ -207,7 +207,7 @@ public:
   void onStart(int argc, char *argv[]) override;
   void onStop() override;
 
-  void loadControllerData(QString &hostName, string &ipAddr, int &port);
+  void loadControllerData(QString &hostName, std::string &ipAddr, int &port);
 #ifdef _WIN32
   void loadDiskMountingPoints(const TFilePath &fp);
 
@@ -1031,7 +1031,7 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp) {
     while (*t) t++;
     while (t > s && isBlank(*(t - 1))) t--;
     if (t == s) continue;  // non dovrebbe succedere mai: dst vuoto
-    string dst(s, t - s);
+    std::string dst(s, t - s);
     m_disks[from] = dst;
   }
 }

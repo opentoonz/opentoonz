@@ -288,7 +288,7 @@ void BatchesController::setTasksTree(TaskTreeModel *tree) {
 
 //------------------------------------------------------------------------------
 
-inline bool isMovieType(string type) {
+inline bool isMovieType(std::string type) {
   return (type == "mov" || type == "avi" || type == "3gp");
 }
 
@@ -895,7 +895,7 @@ void BatchesController::doSave(const TFilePath &_fp) {
 
   TOStream os(fp);
 
-  std::map<std::string, string> attr;
+  std::map<std::string, std::string> attr;
   attr["version"] = "1.0";
 
   os.openChild("tnzbatches", attr);
