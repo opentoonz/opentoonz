@@ -46,7 +46,7 @@ public:
 
   void setPalette(TPalette *palette, int styleIndex = 1);
 
-  void setStyleIndex(int index);
+  void setStyleIndex(int index, bool forceEmit = false);
 
   void setStyleParamIndex(int index);
 

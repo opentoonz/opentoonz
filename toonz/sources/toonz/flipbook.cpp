@@ -1765,7 +1765,7 @@ void FlipBook::dragEnterEvent(QDragEnterEvent *e) {
       !mimeData->hasFormat(CastItems::getMimeFormat()))
     return;
 
-  foreach (QUrl url, mimeData->urls()) {
+  for (const QUrl &url : mimeData->urls()) {
     TFilePath fp(url.toLocalFile().toStdWString());
     std::string type = fp.getType();
     if (type == "tzp" || type == "tzu" || type == "tnz" || type == "scr" ||
@@ -1792,7 +1792,7 @@ void FlipBook::dragEnterEvent(QDragEnterEvent *e) {
 void FlipBook::dropEvent(QDropEvent *e) {
   const QMimeData *mimeData = e->mimeData();
   if (mimeData->hasUrls()) {
-    foreach (QUrl url, mimeData->urls()) {
+    for (const QUrl &url : mimeData->urls()) {
       TFilePath fp(url.toLocalFile().toStdWString());
       if (TFileType::getInfo(fp) != TFileType::UNKNOW_FILE) setLevel(fp);
       e->acceptProposedAction();

@@ -334,7 +334,7 @@ void revertTo(bool isCleanedUp) {
       delete undo;
     else {
       TUndoManager::manager()->add(undo);
-      sl->setDirtyFlag(true);
+      if (isCleanedUp) sl->setDirtyFlag(true);
     }
     app->getCurrentLevel()->notifyLevelChange();
   }
@@ -390,7 +390,7 @@ void revertTo(bool isCleanedUp) {
         delete undo;
       else {
         TUndoManager::manager()->add(undo);
-        sl->setDirtyFlag(true);
+        if (isCleanedUp) sl->setDirtyFlag(true);
       }
     }
     TUndoManager::manager()->endBlock();

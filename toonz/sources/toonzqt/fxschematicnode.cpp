@@ -1755,7 +1755,8 @@ assert(linkedFx);*/
       TUndoManager::manager()->endBlock();
       emit sceneChanged();
       emit xsheetChanged();
-    }
+    } else
+      SchematicPort::mouseReleaseEvent(me);
   } else
     SchematicPort::mouseReleaseEvent(me);
 }

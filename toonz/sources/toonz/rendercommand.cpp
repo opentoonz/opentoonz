@@ -515,7 +515,11 @@ void RenderCommand::rasterRender(bool isPreview) {
   // fixes background colors for non alpha-enabled movie types (eventually
   // transparent gif would be good)
   currBgColor.m = 255;
-  if (isMovieType(ext)) {
+  // Mov may have alpha channel under some settings (Millions of Colors+ color
+  // depth). I tried to make OT to detect the mov settings and adaptively switch
+  // the behavior, but ended in vain :-(
+  // So I just omitted every mov from applying solid background as a quick fix.
+  if (isMovieType(ext) && ext != "mov") {
     scene->getProperties()->setBgColor(currBgColor);
   }
   // for non alpha-enabled images (like jpg), background color will be inserted

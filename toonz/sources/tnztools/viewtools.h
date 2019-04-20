@@ -42,4 +42,4 @@ public:
   }
 };
 
-#endif VIEWTOOLS_H
+#endif  // VIEWTOOLS_H

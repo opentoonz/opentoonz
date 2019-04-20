@@ -970,21 +970,24 @@ void OutputSettingsPopup::onNameChanged() {
 /*! Set current scene output format to new format set in popup field.
 */
 void OutputSettingsPopup::onFormatChanged(const QString &str) {
-  // string ext = RenderController::instance()->format2ext(str.toStdString());
-  // RenderController::instance()->setMovieExt(ext);
+  auto isMultiRenderInvalid = [](std::string ext) -> bool {
+    return ext == "mp4" || ext == "gif" || ext == "webm" ||
+           ext == "spritesheet";
+  };
 
-  TOutputProperties *prop = getProperties();
-  TFilePath fp            = prop->getPath().withType(str.toStdString());
+  TOutputProperties *prop    = getProperties();
+  bool wasMultiRenderInvalid = isMultiRenderInvalid(prop->getPath().getType());
+  TFilePath fp               = prop->getPath().withType(str.toStdString());
   prop->setPath(fp);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 
   if (m_presetCombo) m_presetCombo->setCurrentIndex(0);
-  if (str == "mp4" || str == "gif" || str == "webm" || str == "spritesheet") {
+  if (isMultiRenderInvalid(str.toStdString())) {
     m_threadsComboOm->setDisabled(true);
     m_threadsComboOm->setCurrentIndex(0);
   } else {
     m_threadsComboOm->setDisabled(false);
-    m_threadsComboOm->setCurrentIndex(2);
+    if (wasMultiRenderInvalid) m_threadsComboOm->setCurrentIndex(2);
   }
 
   // clapperboard is only available with movie formats

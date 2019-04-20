@@ -60,9 +60,6 @@
 #include <QEasingCurve>
 #include <QStackedWidget>
 
-// tcg includes
-#include "tcg/tcg_deleter_types.h"
-
 TEnv::IntVar ArrowGlobalKeyFrame("EditToolGlobalKeyFrame", 0);
 
 //=============================================================================
@@ -126,8 +123,8 @@ ToolOptionsBox::ToolOptionsBox(QWidget *parent, bool isScrollable)
 
 ToolOptionsBox::~ToolOptionsBox() {
   std::for_each(m_controls.begin(), m_controls.end(),
-                tcg::deleter<ToolOptionControl>());
-  std::for_each(m_labels.begin(), m_labels.end(), tcg::deleter<QLabel>());
+                std::default_delete<ToolOptionControl>());
+  std::for_each(m_labels.begin(), m_labels.end(), std::default_delete<QLabel>());
 }
 
 //-----------------------------------------------------------------------------

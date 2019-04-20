@@ -564,6 +564,12 @@ void SchematicLink::mousePressEvent(QGraphicsSceneMouseEvent *me) {
   QPointF pos              = me->scenePos();
   SchematicPort *startPort = getStartPort();
   SchematicPort *endPort   = getEndPort();
+
+  if (!startPort || !endPort) {
+    me->ignore();
+    return;
+  }
+
   if (startPort && endPort) {
     QRectF startRect = startPort->boundingRect();
     startRect.moveTopLeft(startPort->scenePos());

@@ -1381,13 +1381,19 @@ void XsheetViewer::scrollToHorizontalRange(int x0, int x1) {
 
   if (visibleLeft > x0) {  // If they are out of left visible region
     int deltaX = x0 - visibleLeft;
-    scroll(QPoint(deltaX, 0));
-    return;
+    if (!TApp::instance()->getCurrentFrame()->isPlaying() ||
+        Preferences::instance()->isXsheetAutopanEnabled()) {
+      scroll(QPoint(deltaX, 0));
+      return;
+    }
   }
   if (visibleRight < x1) {  // If they are out of right visible region
     int deltaX = x1 + 2 - visibleRight;
-    scroll(QPoint(deltaX, 0));
-    return;
+    if (!TApp::instance()->getCurrentFrame()->isPlaying() ||
+        Preferences::instance()->isXsheetAutopanEnabled()) {
+      scroll(QPoint(deltaX, 0));
+      return;
+    }
   }
   if (orientation()->isVerticalTimeline())
     updateCellColumnAree();

@@ -215,7 +215,7 @@ void premultiply(const TFilePath &levelPath) {
     /*
 if (!isMovie && lr->getImageInfo()->m_samplePerPixel!=4)
 {
-QMessageBox::information(0, QString("ERROR"), QString("Only rgbm images can be
+QMessageBox::information(0, QString("ERROR"), QString("Only rgba images can be
 premultiplied!"));
 return;
 }

@@ -31,7 +31,6 @@
 #include <QRadioButton>
 
 // tcg includes
-#include "tcg/tcg_algorithm.h"
 #include "tcg/tcg_function_types.h"
 
 // boost includes

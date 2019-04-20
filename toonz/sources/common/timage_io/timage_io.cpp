@@ -634,14 +634,14 @@ void TImageWriter::save(const TImageP &img) {
     // add background colors for non alpha-enabled image types
     if ((ras32 || ras64) && !writer->writeAlphaSupported() &&
         TImageWriter::getBackgroundColor() != TPixel::Black) {
-      if (ras32)
+      if (bpp == 32 || bpp == 24)
         TRop::addBackground(ras, TImageWriter::getBackgroundColor());
-      else {  // ras64
+      else if (bpp == 64 || bpp == 48) {
         TRaster64P bgRas(ras->getSize());
         bgRas->fill(toPixel64(TImageWriter::getBackgroundColor()));
         TRop::over(bgRas, ras);
         ras = bgRas;
-      }
+      }  // for other bpp values, do nothing for now
     }
 
     ras->lock();

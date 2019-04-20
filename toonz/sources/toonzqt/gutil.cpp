@@ -387,7 +387,7 @@ bool isResourceOrFolder(const QUrl &url) {
 
 bool acceptResourceDrop(const QList<QUrl> &urls) {
   int count = 0;
-  foreach (const QUrl &url, urls) {
+  for (const QUrl &url : urls) {
     if (isResource(url))
       ++count;
     else
@@ -401,7 +401,7 @@ bool acceptResourceDrop(const QList<QUrl> &urls) {
 
 bool acceptResourceOrFolderDrop(const QList<QUrl> &urls) {
   int count = 0;
-  foreach (const QUrl &url, urls) {
+  for (const QUrl &url : urls) {
     if (isResourceOrFolder(url))
       ++count;
     else
