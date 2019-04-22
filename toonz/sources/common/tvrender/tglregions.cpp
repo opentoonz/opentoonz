@@ -146,10 +146,13 @@ void drawArrows(TStroke *stroke, bool onlyFirstPoint) {
   for (int i = 0; i <= points; i++) {
     currentPosition = i / (double)points;
     point           = stroke->getPointAtLength(length * currentPosition);
-    prePoint        = (i == 0) ? point : stroke->getPointAtLength(
-                                      length * (currentPosition - 0.02));
-    postPoint = (i == points) ? point : stroke->getPointAtLength(
-                                            length * (currentPosition + 0.02));
+    prePoint =
+        (i == 0) ? point
+                 : stroke->getPointAtLength(length * (currentPosition - 0.02));
+    postPoint =
+        (i == points)
+            ? point
+            : stroke->getPointAtLength(length * (currentPosition + 0.02));
 
     if (prePoint == postPoint) continue;
 
@@ -565,7 +568,7 @@ static void tglDoDraw(const TVectorRenderData &rd, TRegion *r) {
 
 //------------------------------------------------------------------------------------
 
-static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
+static bool tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
   bool visible   = false;
   int colorCount = 0;
 
@@ -587,6 +590,8 @@ static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
     }
   }
 
+  bool ret = false;
+
   if (visible) {
     // Change stroke color to blue if guided drawing
     if (rd.m_showGuidedDrawing && rd.m_highLightNow) {
@@ -596,6 +601,7 @@ static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
       delete newRd;
       TStroke *new_s = (TStroke *)s;
       drawFirstControlPoint(rd, new_s);
+      ret = rd.m_animatedGuidedDrawing;
     } else {
       tglDraw(rd, s, false);
     }
@@ -604,6 +610,7 @@ static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
 // drawControlPoints(rd, vim->getStroke(i), sqrt(tglGetPixelSize2()), true);
 // assert(checkQuadraticDistance(vim->getStroke(i),true));
 #endif
+  return ret;
 }
 
 //------------------------------------------------------------------------------------
@@ -611,7 +618,7 @@ static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
 namespace {
 
 void doDraw(const TVectorImage *vim, const TVectorRenderData &_rd,
-            bool drawEnteredGroup) {
+            bool drawEnteredGroup, TStroke **guidedStroke = 0) {
   static TOnionFader *fade = new TOnionFader(TPixel::White, 0.5);
 
   TVectorRenderData rd(_rd);
@@ -663,7 +670,8 @@ rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
       CurrStrokeIndex = strokeIndex;
       CurrVimg        = vim;
 #endif
-      tglDoDraw(rd, vim->getStroke(strokeIndex));
+      bool isGuided = tglDoDraw(rd, vim->getStroke(strokeIndex));
+      if (isGuided && guidedStroke) *guidedStroke = vim->getStroke(strokeIndex);
       strokeIndex++;
     }
   }
@@ -672,7 +680,8 @@ rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
 
 //------------------------------------------------------------------------------------
 
-void tglDraw(const TVectorRenderData &rd, const TVectorImage *vim) {
+void tglDraw(const TVectorRenderData &rd, const TVectorImage *vim,
+             TStroke **guidedStroke) {
   assert(vim);
   if (!vim) return;
 
@@ -689,8 +698,9 @@ void tglDraw(const TVectorRenderData &rd, const TVectorImage *vim) {
   glEnable(GL_ALPHA_TEST);
   glAlphaFunc(GL_GREATER, 0);
 
-  doDraw(vim, rd, false);
-  if (!rd.m_isIcon && vim->isInsideGroup() > 0) doDraw(vim, rd, true);
+  doDraw(vim, rd, false, guidedStroke);
+  if (!rd.m_isIcon && vim->isInsideGroup() > 0)
+    doDraw(vim, rd, true, guidedStroke);
 
   glDisable(GL_ALPHA_TEST);
 

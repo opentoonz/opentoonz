@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation>回転:</translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation>テーブル</translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
@@ -92,7 +96,7 @@
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>硬さ：</translation>
+        <translation type="vanished">硬さ：</translation>
     </message>
     <message>
         <source>Accuracy:</source>
@@ -140,7 +144,7 @@
     </message>
     <message>
         <source>Pencil</source>
-        <translation>鉛筆モード</translation>
+        <translation type="vanished">鉛筆モード</translation>
     </message>
     <message>
         <source>Pressure</source>
@@ -220,19 +224,19 @@
     </message>
     <message>
         <source>Draw Order:</source>
-        <translation>線の重ね順:</translation>
+        <translation type="vanished">線の重ね順:</translation>
     </message>
     <message>
         <source>Over All</source>
-        <translation>上に描く</translation>
+        <translation type="vanished">上に描く</translation>
     </message>
     <message>
         <source>Under All</source>
-        <translation>下に描く</translation>
+        <translation type="vanished">下に描く</translation>
     </message>
     <message>
         <source>Palette Order</source>
-        <translation>パレット順</translation>
+        <translation type="vanished">パレット順</translation>
     </message>
 </context>
 <context>
@@ -266,6 +270,13 @@
     <message>
         <source>Set Nonlinear Control Point</source>
         <translation>スムーズポイントに変更</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation>選択色</translation>
     </message>
 </context>
 <context>
@@ -389,6 +400,10 @@
     <message>
         <source>Center</source>
         <translation>基準点</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>全て</translation>
     </message>
 </context>
 <context>
@@ -516,6 +531,10 @@
         <source>Lines &amp; Areas</source>
         <translation>線と塗り</translation>
     </message>
+    <message>
+        <source>Maximum Gap</source>
+        <translation>隙間の判定</translation>
+    </message>
 </context>
 <context>
     <name>FingerTool</name>
@@ -569,6 +588,10 @@
     <message>
         <source>Lock Alpha</source>
         <translation>透明部分の保護</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;カスタム&gt;</translation>
     </message>
 </context>
 <context>
@@ -1224,6 +1247,50 @@ Do you want to proceed?</source>
         <source>Polyline</source>
         <translation>多角形</translation>
     </message>
+    <message>
+        <source>current</source>
+        <translation>選択色</translation>
+    </message>
+</context>
+<context>
+    <name>RotateTool</name>
+    <message>
+        <source>Rotate On Camera Center</source>
+        <translation>カメラ中心点を基準にする</translation>
+    </message>
+</context>
+<context>
+    <name>RulerToolOptionsBox</name>
+    <message>
+        <source>X:</source>
+        <comment>ruler tool option</comment>
+        <translation>X：</translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <comment>ruler tool option</comment>
+        <translation>Y：</translation>
+    </message>
+    <message>
+        <source>W:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>H:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>L:</source>
+        <comment>ruler tool option</comment>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>SelectionTool</name>
@@ -1273,6 +1340,33 @@ Do you want to proceed?</source>
     <message>
         <source>Link</source>
         <translation>縦横比を固定</translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation>拡大率</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation>位置</translation>
+    </message>
+</context>
+<context>
+    <name>ShiftTraceToolOptionBox</name>
+    <message>
+        <source>Reset Previous</source>
+        <translation>前のコマの変形をリセット</translation>
+    </message>
+    <message>
+        <source>Reset Following</source>
+        <translation>後のコマの変形をリセット</translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation>前のコマ</translation>
+    </message>
+    <message>
+        <source>Following Drawing</source>
+        <translation>後のコマ</translation>
     </message>
 </context>
 <context>
@@ -1352,6 +1446,53 @@ Do you want to proceed?</source>
 moved to the end of the first page of the palette.</source>
         <translation>このオプションを有効にしてカラーモデルから色を拾っていくと、サンプルされた
 スタイルがパレットの1ページ目の末尾に順番に移動します。</translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation>サイズ</translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation>硬さ：</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation>平滑化：</translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation>線の重ね順:</translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation>上に描く</translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation>下に描く</translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation>パレット順</translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation>プリセット：</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;カスタム&gt;</translation>
+    </message>
+    <message>
+        <source>Pencil</source>
+        <translation>鉛筆モード</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>圧力感知</translation>
     </message>
 </context>
 <context>
@@ -1487,7 +1628,7 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Distance</source>
-        <translation></translation>
+        <translation>距離：</translation>
     </message>
     <message>
         <source>Mode:</source>

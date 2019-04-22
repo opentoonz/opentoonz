@@ -5,13 +5,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>OpenToonz_1.2</string>
+	<string>OpenToonz</string>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
 	<key>CFBundleIconFile</key>
 	<string>OpenToonz.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string></string>
+	<string>io.github.opentoonz.OpenToonz</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>

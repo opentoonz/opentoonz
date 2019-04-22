@@ -48,7 +48,6 @@
 // tcg includes
 #include "tcg/tcg_numeric_ops.h"
 #include "tcg/tcg_function_types.h"
-#include "tcg/tcg_iterator_ops.h"
 
 // boost includes
 #include <boost/iterator/counting_iterator.hpp>
@@ -298,10 +297,6 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
   struct Locals {
     SelectionData *m_this;
 
-    typedef tcg::function<int (TXshSimpleLevel::*)(const TFrameId &) const,
-                          &TXshSimpleLevel::fid2index>
-        Fid2Index;
-
     void resetIfInvalid()  // Resets to empty if thickness adjustment is
     {                      // not applicable:
       if (!m_this->m_sl)   //   1. The level is not a VECTOR level
@@ -349,11 +344,11 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
 
         const std::set<TFrameId> &fids = selection.getSelectedFids();
 
-        m_this->m_frameIdxs = std::set<int>(
-            tcg::make_cast_it(fids.begin(),
-                              tcg::bind1st(Fid2Index(), *m_this->m_sl)),
-            tcg::make_cast_it(fids.end(),
-                              tcg::bind1st(Fid2Index(), *m_this->m_sl)));
+        std::set<int> s;
+        for (auto const &e : fids) {
+          s.insert(m_this->m_sl->fid2index(e));
+        }
+        m_this->m_frameIdxs = std::move(s);
 
         resetIfInvalid();
       }
@@ -484,11 +479,11 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
 
           const std::set<TFrameId> &fids = TTool::getSelectedFrames();
 
-          m_this->m_frameIdxs = std::set<int>(
-              tcg::make_cast_it(fids.begin(),
-                                tcg::bind1st(Fid2Index(), *m_this->m_sl)),
-              tcg::make_cast_it(fids.end(),
-                                tcg::bind1st(Fid2Index(), *m_this->m_sl)));
+          std::set<int> s;
+          for (auto const &e : fids) {
+            s.insert(m_this->m_sl->fid2index(e));
+          }
+          m_this->m_frameIdxs = std::move(s);
           break;
         }
         }

@@ -256,7 +256,7 @@ void Particles_Engine::roll_particles(
   {
     /*- 新たに作るパーティクルの数だけ繰り返す -*/
     for (i = 0; i < newparticles; i++) {
-      int seed = (int)((std::numeric_limits<int>::max)() *
+      int seed  = (int)((std::numeric_limits<int>::max)() *
                        values.random_val->getFloat());
       int level = (int)(values.random_val->getFloat() * level_n);
 
@@ -292,7 +292,7 @@ void Particles_Engine::roll_particles(
     switch (values.toplayer_val) {
     case ParticlesFx::TOP_YOUNGER:
       for (i = 0; i < newparticles; i++) {
-        int seed = (int)((std::numeric_limits<int>::max)() *
+        int seed  = (int)((std::numeric_limits<int>::max)() *
                          values.random_val->getFloat());
         int level = (int)(values.random_val->getFloat() * level_n);
 
@@ -321,7 +321,7 @@ void Particles_Engine::roll_particles(
         for (int j = 0; j < tmp; j++, it++)
           ;
         {
-          int seed = (int)((std::numeric_limits<int>::max)() *
+          int seed     = (int)((std::numeric_limits<int>::max)() *
                            values.random_val->getFloat());
           int level    = (int)(values.random_val->getFloat() * level_n);
           int lifetime = 0;
@@ -345,7 +345,7 @@ void Particles_Engine::roll_particles(
 
     default:
       for (i = 0; i < newparticles; i++) {
-        int seed = (int)((std::numeric_limits<int>::max)() *
+        int seed     = (int)((std::numeric_limits<int>::max)() *
                          values.random_val->getFloat());
         int level    = (int)(values.random_val->getFloat() * level_n);
         int lifetime = 0;
@@ -403,9 +403,9 @@ void Particles_Engine::normalize_values(struct particles_values &values,
   (values.speeda_val.first)        = (values.speeda_val.first) * M_PI_180;
   (values.speeda_val.second)       = (values.speeda_val.second) * M_PI_180;
   if (values.step_val < 1) values.step_val = 1;
-  values.genfadecol_val                    = (values.genfadecol_val) * 0.01;
-  values.finfadecol_val                    = (values.finfadecol_val) * 0.01;
-  values.foutfadecol_val                   = (values.foutfadecol_val) * 0.01;
+  values.genfadecol_val  = (values.genfadecol_val) * 0.01;
+  values.finfadecol_val  = (values.finfadecol_val) * 0.01;
+  values.foutfadecol_val = (values.foutfadecol_val) * 0.01;
 }
 
 /*-----------------------------------------------------------------*/
@@ -682,7 +682,7 @@ void Particles_Engine::do_render(
     // either
     // (std::numeric_limits<double>::max)() or its opposite, then the rect IS
     // THE infiniteRectD)
-    if (bbox == TConsts::infiniteRectD) return;
+    if (bbox.isEmpty() || bbox == TConsts::infiniteRectD) return;
   }
 
   // Now, these are the particle rendering specifications
@@ -861,7 +861,7 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
           mask[1] = myarray[i - 1 + lx * (j - 1)];
         }
         if (i != lx - 1) mask[3] = myarray[i + 1 + lx * (j - 1)];
-        mask[2]                  = myarray[i + lx * (j - 1)];
+        mask[2] = myarray[i + lx * (j - 1)];
         if (!mask[0] && !mask[1] && !mask[2] && !mask[3]) {
           (regioncount)++;
           myarray[i + lx * j] = (regioncount);
@@ -895,7 +895,7 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
 void Particles_Engine::normalize_array(
     std::vector<std::vector<TPointD>> &myregions, TPointD pos, int lx, int ly,
     int regioncounter, std::vector<int> &myarray, std::vector<int> &lista,
-    std::vector<int> &listb, std::vector<int> & final) {
+    std::vector<int> &listb, std::vector<int> &final) {
   int i, j, k, l;
 
   std::vector<int> tmp;
@@ -908,13 +908,13 @@ void Particles_Engine::normalize_array(
     j = lista[l];
     /*TMSG_INFO("j vale %d\n", j);*/
     while (final[j] != j) j = final[j];
-    k                       = listb[l];
+    k = listb[l];
     /*TMSG_INFO("k vale %d\n", k);*/
     while (final[k] != k) k = final[k];
-    if (j != k) final[j]    = k;
+    if (j != k) final[j] = k;
   }
   // TMSG_INFO("esco dal for\n");
-  for (j                                         = 1; j <= regioncounter; j++)
+  for (j = 1; j <= regioncounter; j++)
     while (final[j] != final[final[j]]) final[j] = final[final[j]];
 
   /*conto quante cavolo di regioni sono*/

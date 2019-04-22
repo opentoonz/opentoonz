@@ -156,7 +156,7 @@ public:
 
 //! The GenericLoadFilePopup is a simple, standard Toonz popup that
 //! asks the user for \a single file to be loaded from disk.
-class GenericLoadFilePopup final : public FileBrowserPopup {
+class GenericLoadFilePopup : public FileBrowserPopup {
 public:
   GenericLoadFilePopup(const QString &title);
 
@@ -175,7 +175,7 @@ protected:
 
 //! The GenericSaveFilePopup is a simple, standard Toonz popup that
 //! asks the user for a \a single file path to save something to.
-class GenericSaveFilePopup final : public FileBrowserPopup {
+class GenericSaveFilePopup : public FileBrowserPopup {
 public:
   GenericSaveFilePopup(const QString &title);
 
@@ -393,6 +393,8 @@ protected:
 */
 
 class ReplaceParentDirectoryPopup final : public FileBrowserPopup {
+  Q_OBJECT
+
   TCellSelection::Range m_range;
   bool m_replaceCells;  // true : cell selection, false : column selection
   std::set<int> m_columnRange;
@@ -440,7 +442,7 @@ public:
   void openPopup(QStringList filters, bool isDirectoryOnly,
                  QString lastSelectedPath,
                  const QWidget *parentWidget = NULL) override;
-  QString getPath() override;
+  QString getPath(bool codePath = true) override;
 };
 
 #endif  // FILEBROWSERPOPUP_H

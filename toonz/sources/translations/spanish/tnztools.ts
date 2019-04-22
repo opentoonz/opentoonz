@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation>Rotación:</translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation>Mesa</translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
@@ -92,7 +96,7 @@
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>Dureza:</translation>
+        <translation type="vanished">Dureza:</translation>
     </message>
     <message>
         <source>Accuracy:</source>
@@ -140,7 +144,7 @@
     </message>
     <message>
         <source>Pencil</source>
-        <translation>Lápiz</translation>
+        <translation type="vanished">Lápiz</translation>
     </message>
     <message>
         <source>Pressure</source>
@@ -148,7 +152,7 @@
     </message>
     <message>
         <source>Smooth:</source>
-        <translation>Suavizado:</translation>
+        <translation>Estabilidad:</translation>
     </message>
     <message>
         <source>Range:</source>
@@ -220,19 +224,19 @@
     </message>
     <message>
         <source>Draw Order:</source>
-        <translation>Orden:</translation>
+        <translation type="vanished">Orden:</translation>
     </message>
     <message>
         <source>Over All</source>
-        <translation>Por encima</translation>
+        <translation type="vanished">Por encima</translation>
     </message>
     <message>
         <source>Under All</source>
-        <translation>Por debajo</translation>
+        <translation type="vanished">Por debajo</translation>
     </message>
     <message>
         <source>Palette Order</source>
-        <translation>Según paleta</translation>
+        <translation type="vanished">Según paleta</translation>
     </message>
 </context>
 <context>
@@ -266,6 +270,13 @@
     <message>
         <source>Set Nonlinear Control Point</source>
         <translation>Punto de control Bézier</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation>actual</translation>
     </message>
 </context>
 <context>
@@ -389,6 +400,10 @@
     <message>
         <source>Center</source>
         <translation>Centro</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Todo</translation>
     </message>
 </context>
 <context>
@@ -516,6 +531,10 @@
         <source>Lines &amp; Areas</source>
         <translation>Líneas y áreas</translation>
     </message>
+    <message>
+        <source>Maximum Gap</source>
+        <translation>Hueco máximo</translation>
+    </message>
 </context>
 <context>
     <name>FingerTool</name>
@@ -548,7 +567,7 @@
     </message>
     <message>
         <source>Preset:</source>
-        <translation>Ajuste:</translation>
+        <translation>Ajustes:</translation>
     </message>
     <message>
         <source>Size</source>
@@ -569,6 +588,10 @@
     <message>
         <source>Lock Alpha</source>
         <translation>Preservar alfa</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;personalizado&gt;</translation>
     </message>
 </context>
 <context>
@@ -912,7 +935,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Polyline</source>
-        <translation>Pluma</translation>
+        <translation>Curva Bézier</translation>
     </message>
     <message>
         <source>Arc</source>
@@ -1168,7 +1191,7 @@ Do you want to proceed?</source>
     <name>RGBPickerToolOptionsBox</name>
     <message>
         <source>Pick Screen</source>
-        <translation>Seleccionar desde pantalla</translation>
+        <translation>Seleccionar desde la pantalla</translation>
     </message>
 </context>
 <context>
@@ -1224,6 +1247,50 @@ Do you want to proceed?</source>
         <source>Polyline</source>
         <translation>Línea poligonal</translation>
     </message>
+    <message>
+        <source>current</source>
+        <translation>actual</translation>
+    </message>
+</context>
+<context>
+    <name>RotateTool</name>
+    <message>
+        <source>Rotate On Camera Center</source>
+        <translation>Rotar en torno al centro de la cámara</translation>
+    </message>
+</context>
+<context>
+    <name>RulerToolOptionsBox</name>
+    <message>
+        <source>X:</source>
+        <comment>ruler tool option</comment>
+        <translation>X:</translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <comment>ruler tool option</comment>
+        <translation>Y:</translation>
+    </message>
+    <message>
+        <source>W:</source>
+        <comment>ruler tool option</comment>
+        <translation>Ancho:</translation>
+    </message>
+    <message>
+        <source>H:</source>
+        <comment>ruler tool option</comment>
+        <translation>Altura:</translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <comment>ruler tool option</comment>
+        <translation>Ángulo:</translation>
+    </message>
+    <message>
+        <source>L:</source>
+        <comment>ruler tool option</comment>
+        <translation>Longitud:</translation>
+    </message>
 </context>
 <context>
     <name>SelectionTool</name>
@@ -1273,6 +1340,33 @@ Do you want to proceed?</source>
     <message>
         <source>Link</source>
         <translation>Vinculado</translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation>Escala</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation>Posición</translation>
+    </message>
+</context>
+<context>
+    <name>ShiftTraceToolOptionBox</name>
+    <message>
+        <source>Reset Previous</source>
+        <translation>Restablecer anterior</translation>
+    </message>
+    <message>
+        <source>Reset Following</source>
+        <translation>Restablecer siguiente</translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation>Dibujo anterior</translation>
+    </message>
+    <message>
+        <source>Following Drawing</source>
+        <translation>Dibujo siguiente</translation>
     </message>
 </context>
 <context>
@@ -1352,6 +1446,53 @@ Do you want to proceed?</source>
 moved to the end of the first page of the palette.</source>
         <translation>Con esta opción activa, el estilo escogido será
 movido hacia el final de la primera página de la paleta.</translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation>Dureza:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation>Estabilidad:</translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation>Orden:</translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation>Por encima</translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation>Por debajo</translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation>Según paleta</translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation>Ajustes:</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;personalizado&gt;</translation>
+    </message>
+    <message>
+        <source>Pencil</source>
+        <translation>Lápiz</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Presión</translation>
     </message>
 </context>
 <context>

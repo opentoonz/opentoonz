@@ -23,9 +23,11 @@ PropertyComboBox::PropertyComboBox(QWidget *parent, TEnumProperty *prop)
 //-----------------------------------------------------------------------------
 
 void PropertyComboBox::onCurrentIndexChanged(const QString &text) {
-  TEnumProperty *prop = dynamic_cast<TEnumProperty *>(m_property);
-  if (prop && prop->getValue() != itemText(currentIndex()).toStdWString())
-    prop->setValue(itemText(currentIndex()).toStdWString());
+  TEnumProperty *prop  = dynamic_cast<TEnumProperty *>(m_property);
+  std::wstring currVal = (currentData().isNull())
+                             ? currentText().toStdWString()
+                             : currentData().toString().toStdWString();
+  if (prop && prop->getValue() != currVal) prop->setValue(currVal);
 }
 
 //-----------------------------------------------------------------------------
@@ -33,10 +35,10 @@ void PropertyComboBox::onCurrentIndexChanged(const QString &text) {
 void PropertyComboBox::onPropertyChanged() {
   TEnumProperty *prop = dynamic_cast<TEnumProperty *>(m_property);
   if (prop) {
-    QString str = QString::fromStdWString(prop->getValue());
-    int i       = 0;
-    while (itemText(i) != str) i++;
-    setCurrentIndex(i);
+    QString str  = QString::fromStdWString(prop->getValue());
+    int i        = findData(str);
+    if (i < 0) i = findText(str);
+    if (i >= 0 && i < count()) setCurrentIndex(i);
   }
 }
 

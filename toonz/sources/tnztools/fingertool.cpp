@@ -35,7 +35,6 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tframehandle.h"
 #include "tools/toolhandle.h"
-#include "tools/toolutils.h"
 
 // For Qt translation support
 #include <QCoreApplication>
@@ -432,13 +431,11 @@ void FingerTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
                     m_rasterTrackが無くて落ちることがある。 ---*/
     if (m_rasterTrack) {
       int thickness = m_toolSize.getValue();
-      bool isAdded  = m_rasterTrack->add(
+      m_rasterTrack->add(
           TThickPoint(pos + convert(ri->getRaster()->getCenter()), thickness));
-      if (isAdded) {
-        m_tileSaver->save(m_rasterTrack->getLastRect());
-        TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
-        invalidate();
-      }
+      m_tileSaver->save(m_rasterTrack->getLastRect());
+      TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
+      invalidate();
     }
   }
 }
@@ -512,13 +509,10 @@ void FingerTool::finishBrush() {
   if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
     if (m_rasterTrack) {
       int thickness = m_toolSize.getValue();
-      bool isAdded  = m_rasterTrack->add(TThickPoint(
+      m_rasterTrack->add(TThickPoint(
           m_mousePos + convert(ti->getRaster()->getCenter()), thickness));
-      if (isAdded) {
-        m_tileSaver->save(m_rasterTrack->getLastRect());
-        TRect modifiedBbox =
-            m_rasterTrack->generateLastPieceOfStroke(true, true);
-      }
+      m_tileSaver->save(m_rasterTrack->getLastRect());
+      TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true, true);
 
       TTool::Application *app   = TTool::getApplication();
       TXshLevel *level          = app->getCurrentLevel()->getLevel();

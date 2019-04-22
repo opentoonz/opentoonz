@@ -13,4 +13,5 @@ lupdate ../../tnztools/ -ts tnztools.ts
 lupdate ../../toonz/ -ts toonz.ts
 lupdate ../../toonzlib/ -ts toonzlib.ts
 lupdate ../../toonzqt/ -ts toonzqt.ts
+lupdate ../../image/ -ts image.ts
 

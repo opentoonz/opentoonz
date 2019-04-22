@@ -46,6 +46,8 @@ public:
   virtual void drawOnionSkinSelection(QPainter &p, const QColor &lightColor,
                                       const QColor &darkColor);
 
+  virtual void drawShiftTraceMarker(QPainter &p) {}
+
   virtual int getY() const = 0;
 
   virtual int index2y(int index) const = 0;
@@ -70,6 +72,7 @@ public:
 class FilmstripFrameHeadGadget final : public FrameHeadGadget {
   FilmstripFrames *m_filmstrip;
   int m_dy;
+  int m_highlightedghostFrame;
 
 public:
   FilmstripFrameHeadGadget(FilmstripFrames *filmstrip);
@@ -81,10 +84,13 @@ public:
   void drawOnionSkinSelection(QPainter &p, const QColor &lightColor,
                               const QColor &darkColor) override;
 
+  void drawShiftTraceMarker(QPainter &p) override;
+
   void setCurrentFrame(int index) const override;
   int getCurrentFrame() const override;
 
   bool eventFilter(QObject *obj, QEvent *event) override;
+  bool shiftTraceEventFilter(QObject *obj, QEvent *event);
 };
 
 #endif

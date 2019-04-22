@@ -88,6 +88,8 @@ class CellArea final : public QWidget {
   void drawLockedDottedLine(QPainter &p, bool isLocked, const QPoint &xy,
                             const QColor &cellColor) const;
 
+  void drawFrameSeparator(QPainter &p, int row, int col, bool emptyFrame,
+                          bool heldFrame = false);
   void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
   void drawSoundTextCell(QPainter &p, int row, int col);
   void drawSoundCell(QPainter &p, int row, int col, bool isReference = false);
@@ -101,10 +103,13 @@ class CellArea final : public QWidget {
   void drawCurrentTimeIndicator(QPainter &p, const QPoint &xy,
                                 bool isFolded = false);
 
-  void drawFrameDot(QPainter &p, const QPoint &xy, bool isValid);
+  void drawFrameMarker(QPainter &p, const QPoint &xy, QColor color,
+                       bool isKeyFrame = false);
 
   // Restistusce true
   bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);
+
+  bool isKeyFrameArea(int col, int row, QPoint mouseInCell);
 
   DragTool *getDragTool() const;
   void setDragTool(DragTool *dragTool);

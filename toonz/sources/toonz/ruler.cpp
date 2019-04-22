@@ -272,7 +272,7 @@ void Ruler::mousePressEvent(QMouseEvent *e) {
       // aggiorna sprop!!!!
     } else {
       // muove la guida vecchia
-      if (selected < count - 1) tswap(guides[selected], guides.back());
+      if (selected < count - 1) std::swap(guides[selected], guides.back());
       // aggiorna sprop!!!!
     }
     m_moving = true;

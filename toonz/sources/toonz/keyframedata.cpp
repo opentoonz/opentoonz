@@ -23,7 +23,8 @@ TKeyframeData::TKeyframeData() {}
 
 TKeyframeData::TKeyframeData(const TKeyframeData *src)
     : m_keyData(src->m_keyData)
-    , m_isPegbarsCycleEnabled(src->m_isPegbarsCycleEnabled) {}
+    , m_isPegbarsCycleEnabled(src->m_isPegbarsCycleEnabled)
+    , m_offset(src->m_offset) {}
 
 //-----------------------------------------------------------------------------
 
@@ -32,6 +33,12 @@ TKeyframeData::~TKeyframeData() {}
 //-----------------------------------------------------------------------------
 // data <- xsheet
 void TKeyframeData::setKeyframes(std::set<Position> positions, TXsheet *xsh) {
+  Position startPos(-1, -1);
+  setKeyframes(positions, xsh, startPos);
+}
+
+void TKeyframeData::setKeyframes(std::set<Position> positions, TXsheet *xsh,
+                                 Position startPos) {
   if (positions.empty()) return;
 
   TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
@@ -50,6 +57,9 @@ void TKeyframeData::setKeyframes(std::set<Position> positions, TXsheet *xsh) {
 
   m_columnSpanCount = c1 - c0 + 1;
   m_rowSpanCount    = r1 - r0 + 1;
+
+  if (startPos.first >= 0 && startPos.second >= 0)
+    m_offset = std::make_pair(r0 - startPos.first, c0 - startPos.second);
 
   for (it = positions.begin(); it != positions.end(); ++it) {
     int row              = it->first;
@@ -125,4 +135,8 @@ void TKeyframeData::getKeyframes(std::set<Position> &positions) const {
     positions.insert(
         TKeyframeSelection::Position(pos.first + r0, pos.second + c0));
   }
+}
+
+void TKeyframeData::setKeyframesOffset(int row, int col) {
+  m_offset = std::make_pair(row, col);
 }

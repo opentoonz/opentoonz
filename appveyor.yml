@@ -1,4 +1,4 @@
-version: 1.2.0.{build}
+version: 1.3.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
@@ -33,7 +33,7 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
-    C:\Qt\5.9\msvc2015_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz_1.2.exe
+    C:\Qt\5.9\msvc2015_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz.exe
 
     copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
 
@@ -48,5 +48,5 @@ after_build:
     copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll %CONFIGURATION%
 artifacts:
 - path: toonz\$(PLATFORM)\$(CONFIGURATION)
-  name: OpenToonz_1.2
+  name: OpenToonz
   

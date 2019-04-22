@@ -13,11 +13,9 @@
 #include "toonz/txshlevelcolumn.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/cleanupcolorstyles.h"
-#include "toonz/studiopalette.h"
 #include "toonz/txshlevel.h"
 #include "toonz/toonzscene.h"
 #include "toonz/toonzimageutils.h"
-#include "toonz/cleanupcolorstyles.h"
 #include "toonz/preferences.h"
 
 // TnzCore includes

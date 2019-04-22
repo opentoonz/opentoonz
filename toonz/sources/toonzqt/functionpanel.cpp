@@ -197,7 +197,7 @@ void Ruler::compute() {
   // compute range
   double v0 = (m_x0 - m_pan) / m_unit;  // left margin (world units)
   double v1 = (m_x1 - m_pan) / m_unit;  // right margin (world units)
-  if (m_unit < 0) tswap(v0, v1);
+  if (m_unit < 0) std::swap(v0, v1);
   int i0 =
       tfloor((v0 - m_vOrigin) / m_step);  // largest tick <=v0 is i0 * m_step
   int i1 =
@@ -263,13 +263,11 @@ FunctionPanel::FunctionPanel(QWidget *parent, bool isFloating)
 
   if (m_isFloating) {
     // load the dialog size
-    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath("popups.ini"));
+    QSettings settings(toQString(fp), QSettings::IniFormat);
 
-    mySettings.beginGroup("Dialogs");
     setGeometry(
-        mySettings.value("FunctionCurves", QRect(500, 500, 400, 300)).toRect());
-    mySettings.endGroup();
+        settings.value("FunctionCurves", QRect(500, 500, 400, 300)).toRect());
   }
 }
 
@@ -278,12 +276,10 @@ FunctionPanel::FunctionPanel(QWidget *parent, bool isFloating)
 FunctionPanel::~FunctionPanel() {
   if (m_isFloating) {
     // save the dialog size
-    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath("popups.ini"));
+    QSettings settings(toQString(fp), QSettings::IniFormat);
 
-    mySettings.beginGroup("Dialogs");
-    mySettings.setValue("FunctionCurves", geometry());
-    mySettings.endGroup();
+    settings.setValue("FunctionCurves", geometry());
   }
 
   delete m_dragTool;

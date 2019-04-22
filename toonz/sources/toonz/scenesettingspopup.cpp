@@ -252,6 +252,8 @@ void SceneSettingsPopup::update() {
   sprop->getMarkers(markerDistance, markerOffset);
   m_markerIntervalFld->setValue(markerDistance);
   m_startFrameFld->setValue(markerOffset + 1);
+  m_colorFilterOnRenderCB->setChecked(
+      sprop->isColumnColorFilterOnRenderEnabled());
 }
 
 //-----------------------------------------------------------------------------

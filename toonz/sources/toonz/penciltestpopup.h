@@ -7,7 +7,8 @@
 #include "toonzqt/lineedit.h"
 #include "toonz/namebuilder.h"
 
-#include <QFrame>
+#include <QAbstractVideoSurface>
+#include <QRunnable>
 
 // forward decl.
 class QCamera;
@@ -30,51 +31,149 @@ class QCameraViewfinder;
 namespace DVGui {
 class FileField;
 class IntField;
+class IntLineEdit;
 }
 
 class CameraCaptureLevelControl;
 
+class ApplyLutTask : public QRunnable {
+protected:
+  int m_fromY, m_toY;
+  QImage& m_img;
+  std::vector<int>& m_lut;
+
+public:
+  ApplyLutTask(int from, int to, QImage& img, std::vector<int>& lut)
+      : m_fromY(from), m_toY(to), m_img(img), m_lut(lut) {}
+
+private:
+  virtual void run() override;
+};
+
+class ApplyGrayLutTask : public ApplyLutTask {
+public:
+  ApplyGrayLutTask(int from, int to, QImage& img, std::vector<int>& lut)
+      : ApplyLutTask(from, to, img, lut) {}
+
+private:
+  void run() override;
+};
+
 //=============================================================================
-// MyViewFinder
+// MyVideoSurface
 //-----------------------------------------------------------------------------
 
-class MyViewFinder : public QFrame {
+class QVideoSurfaceFormat;
+class MyVideoSurface : public QAbstractVideoSurface {
+  Q_OBJECT
+public:
+  MyVideoSurface(QWidget* widget, QObject* parent = 0);
+
+  QList<QVideoFrame::PixelFormat> supportedPixelFormats(
+      QAbstractVideoBuffer::HandleType handleType =
+          QAbstractVideoBuffer::NoHandle) const;
+  bool isFormatSupported(const QVideoSurfaceFormat& format,
+                         QVideoSurfaceFormat* similar) const;
+
+  bool start(const QVideoSurfaceFormat& format);
+  void stop();
+
+  bool present(const QVideoFrame& frame);
+
+  QRect videoRect() const { return m_targetRect; }
+  QRect sourceRect() const { return m_sourceRect; }
+  void updateVideoRect();
+
+  QTransform transform() { return m_S2V_Transform; }
+
+private:
+  QWidget* m_widget;
+  QImage::Format m_imageFormat;
+  QRect m_targetRect;
+  QSize m_imageSize;
+  QRect m_sourceRect;
+  QVideoFrame m_currentFrame;
+
+  QTransform m_S2V_Transform;  // surface to video transform
+
+signals:
+  void frameCaptured(QImage& image);
+};
+
+//=============================================================================
+// MyVideoWidget
+//-----------------------------------------------------------------------------
+
+class MyVideoWidget : public QWidget {
   Q_OBJECT
 
   QImage m_image;
   QImage m_previousImage;
-  QCamera* m_camera;
-  QRect m_imageRect;
-
   int m_countDownTime;
-
   bool m_showOnionSkin;
   int m_onionOpacity;
   bool m_upsideDown;
 
+  QRect m_subCameraRect;
+  QRect m_preSubCameraRect;
+  QPoint m_dragStartPos;
+
+  enum SUBHANDLE {
+    HandleNone,
+    HandleFrame,
+    HandleTopLeft,
+    HandleTopRight,
+    HandleBottomLeft,
+    HandleBottomRight,
+    HandleLeft,
+    HandleTop,
+    HandleRight,
+    HandleBottom
+  } m_activeSubHandle = HandleNone;
+  void drawSubCamera(QPainter&);
+
 public:
-  MyViewFinder(QWidget* parent = 0);
+  MyVideoWidget(QWidget* parent = 0);
+  ~MyVideoWidget();
+
   void setImage(const QImage& image) {
     m_image = image;
     update();
   }
-  void setCamera(QCamera* camera) { m_camera = camera; }
+  QAbstractVideoSurface* videoSurface() const { return m_surface; }
+
+  QSize sizeHint() const;
+
   void setShowOnionSkin(bool on) { m_showOnionSkin = on; }
   void setOnionOpacity(int value) { m_onionOpacity = value; }
-  void setPreviousImage(QImage& prevImage) { m_previousImage = prevImage; }
+  void setPreviousImage(QImage prevImage) { m_previousImage = prevImage; }
 
   void showCountDownTime(int time) {
     m_countDownTime = time;
     repaint();
   }
 
-  void updateSize();
+  void setSubCameraSize(QSize size);
+  QRect subCameraRect() { return m_subCameraRect; }
 
 protected:
-  void paintEvent(QPaintEvent* event);
-  void resizeEvent(QResizeEvent* event);
+  void paintEvent(QPaintEvent* event) override;
+  void resizeEvent(QResizeEvent* event) override;
+
+  void mouseMoveEvent(QMouseEvent* event) override;
+  void mousePressEvent(QMouseEvent* event) override;
+  void mouseReleaseEvent(QMouseEvent* event) override;
+
+private:
+  MyVideoSurface* m_surface;
+
 protected slots:
   void onUpsideDownChecked(bool on) { m_upsideDown = on; }
+
+signals:
+  void startCamera();
+  void stopCamera();
+  void subCameraResized(bool isDragging);
 };
 
 //=============================================================================
@@ -182,8 +281,7 @@ class PencilTestPopup : public DVGui::Dialog {
 
   QCamera* m_currentCamera;
   QString m_deviceName;
-  MyViewFinder* m_cameraViewfinder;
-  QCameraImageCapture* m_cameraImageCapture;
+  MyVideoWidget* m_videoWidget;
 
   QComboBox *m_cameraListCombo, *m_resolutionCombo, *m_fileTypeCombo,
       *m_colorTypeCombo;
@@ -210,17 +308,19 @@ class PencilTestPopup : public DVGui::Dialog {
 
   QToolButton* m_previousLevelButton;
 
+  QPushButton* m_subcameraButton;
+  DVGui::IntLineEdit *m_subWidthFld, *m_subHeightFld;
+  QSize m_allowedCameraSize;
+
 #ifdef MACOSX
   QCameraViewfinder* m_dummyViewFinder;
 #endif
 
-  int m_timerId;
-  QString m_cacheImagePath;
   bool m_captureWhiteBGCue;
   bool m_captureCue;
 
   void processImage(QImage& procImage);
-  bool importImage(QImage& image);
+  bool importImage(QImage image);
 
   void setToNextNewLevel();
   void updateLevelNameAndFrame(std::wstring levelName);
@@ -230,7 +330,6 @@ public:
   ~PencilTestPopup();
 
 protected:
-  void timerEvent(QTimerEvent* event);
   void showEvent(QShowEvent* event);
   void hideEvent(QHideEvent* event);
 
@@ -245,7 +344,7 @@ protected slots:
   void onNextName();
   void onPreviousName();
   void onColorTypeComboChanged(int index);
-  void onImageCaptured(int, const QImage&);
+  void onFrameCaptured(QImage& image);
   void onCaptureWhiteBGButtonPressed();
   void onOnionCBToggled(bool);
   void onLoadImageButtonPressed();
@@ -261,6 +360,10 @@ protected slots:
 
   void onSaveInPathEdited();
   void onSceneSwitched();
+
+  void onSubCameraToggled(bool);
+  void onSubCameraResized(bool isDragging);
+  void onSubCameraSizeEdited();
 
 public slots:
   void openSaveInFolderPopup();

@@ -25,8 +25,6 @@
 
 #include "tundo.h"
 #include "tconvert.h"
-#include "cellselection.h"
-#include "filmstripselection.h"
 #include "tlevel_io.h"
 #include "ttoonzimage.h"
 #include "tsystem.h"
@@ -336,7 +334,7 @@ void revertTo(bool isCleanedUp) {
       delete undo;
     else {
       TUndoManager::manager()->add(undo);
-      sl->setDirtyFlag(true);
+      if (isCleanedUp) sl->setDirtyFlag(true);
     }
     app->getCurrentLevel()->notifyLevelChange();
   }
@@ -360,14 +358,14 @@ void revertTo(bool isCleanedUp) {
         /*-- Revert可能なLevelタイプの条件 --*/
         if ((isCleanedUp && type == TZP_XSHLEVEL) ||
             (!isCleanedUp && (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL ||
-                              (type == OVL_XSHLEVEL && ext != "psd")))) {
+                              type == OVL_XSHLEVEL))) {
           levels.insert(level);
           selectionContainLevel = true;
         }
       }
     if (levels.empty() || !selectionContainLevel) {
       DVGui::error(
-          QObject::tr("The Revert to Last Saved command is not supported for "
+          QObject::tr("The Reload command is not supported for "
                       "the current selection."));
       return;
     }
@@ -392,7 +390,7 @@ void revertTo(bool isCleanedUp) {
         delete undo;
       else {
         TUndoManager::manager()->add(undo);
-        sl->setDirtyFlag(true);
+        if (isCleanedUp) sl->setDirtyFlag(true);
       }
     }
     TUndoManager::manager()->endBlock();

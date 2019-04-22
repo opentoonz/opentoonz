@@ -13,7 +13,6 @@
 #include "toonz/tframehandle.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/txshlevelhandle.h"
-#include "toonz/txsheethandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/txsheet.h"
@@ -86,12 +85,11 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WindowFlags flags)
 #else
 ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 #endif
-    : StyleShortcutSwitchablePanel(parent) {
+    : QFrame(parent) {
   TApp *app = TApp::instance();
 
-  QFrame *hbox = new QFrame(this);
-  hbox->setFrameStyle(QFrame::StyledPanel);
-  hbox->setObjectName("ComboViewerPanel");
+  setFrameStyle(QFrame::StyledPanel);
+  setObjectName("ComboViewerPanel");
 
   // ToolBar
   m_toolbar = new Toolbar(this, false);
@@ -152,8 +150,7 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
         new FlipConsole(mainLayout, buttons, false, m_keyFrameButton,
                         "SceneViewerConsole", this, true);
   }
-  hbox->setLayout(mainLayout);
-  setWidget(hbox);
+  setLayout(mainLayout);
 
   m_flipConsole->enableButton(FlipConsole::eMatte, false, false);
   m_flipConsole->enableButton(FlipConsole::eSave, false, false);
@@ -193,22 +190,17 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
                        SLOT(update()));
   ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this,
                        SLOT(onSceneSwitched()));
-  ret = ret && connect(m_toolOptions, SIGNAL(newPanelCreated()), this,
-                       SLOT(updateTabFocus()));
 
   assert(ret);
 
   m_flipConsole->setChecked(FlipConsole::eSound, true);
   m_playSound = m_flipConsole->isChecked(FlipConsole::eSound);
 
-  // note: initializeTitleBar() refers to m_sceneViewer
-  initializeTitleBar(getTitleBar());
-
   // initial state of the parts
-  m_visibleFlag[CVPARTS_TOOLBAR]     = true;
-  m_visibleFlag[CVPARTS_TOOLOPTIONS] = true;
-  m_visibleFlag[CVPARTS_FLIPCONSOLE] = true;
+  m_visiblePartsFlag = CVPARTS_ALL;
   updateShowHide();
+
+  setFocusProxy(m_sceneViewer);
 }
 
 //-----------------------------------------------------------------------------
@@ -217,11 +209,11 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 
 void ComboViewerPanel::updateShowHide() {
   // toolbar
-  m_toolbar->setVisible(m_visibleFlag[CVPARTS_TOOLBAR]);
+  m_toolbar->setVisible(m_visiblePartsFlag & CVPARTS_TOOLBAR);
   // tool options bar
-  m_toolOptions->setVisible(m_visibleFlag[CVPARTS_TOOLOPTIONS]);
+  m_toolOptions->setVisible(m_visiblePartsFlag & CVPARTS_TOOLOPTIONS);
   // flip console
-  m_flipConsole->showHideAllParts(m_visibleFlag[CVPARTS_FLIPCONSOLE]);
+  m_flipConsole->showHideAllParts(m_visiblePartsFlag & CVPARTS_FLIPCONSOLE);
   update();
 }
 
@@ -245,16 +237,16 @@ void ComboViewerPanel::addShowHideContextMenu(QMenu *menu) {
   QAction *flipConsoleSHAct = showHideMenu->addAction(tr("Console"));
 
   toolbarSHAct->setCheckable(true);
-  toolbarSHAct->setChecked(m_visibleFlag[CVPARTS_TOOLBAR]);
-  toolbarSHAct->setData((int)CVPARTS_TOOLBAR);
+  toolbarSHAct->setChecked(m_visiblePartsFlag & CVPARTS_TOOLBAR);
+  toolbarSHAct->setData((UINT)CVPARTS_TOOLBAR);
 
   toolOptionsSHAct->setCheckable(true);
-  toolOptionsSHAct->setChecked(m_visibleFlag[CVPARTS_TOOLOPTIONS]);
-  toolOptionsSHAct->setData((int)CVPARTS_TOOLOPTIONS);
+  toolOptionsSHAct->setChecked(m_visiblePartsFlag & CVPARTS_TOOLOPTIONS);
+  toolOptionsSHAct->setData((UINT)CVPARTS_TOOLOPTIONS);
 
   flipConsoleSHAct->setCheckable(true);
-  flipConsoleSHAct->setChecked(m_visibleFlag[CVPARTS_FLIPCONSOLE]);
-  flipConsoleSHAct->setData((int)CVPARTS_FLIPCONSOLE);
+  flipConsoleSHAct->setChecked(m_visiblePartsFlag & CVPARTS_FLIPCONSOLE);
+  flipConsoleSHAct->setData((UINT)CVPARTS_FLIPCONSOLE);
 
   QActionGroup *showHideActGroup = new QActionGroup(this);
   showHideActGroup->setExclusive(false);
@@ -281,13 +273,10 @@ void ComboViewerPanel::addShowHideContextMenu(QMenu *menu) {
 */
 
 void ComboViewerPanel::onShowHideActionTriggered(QAction *act) {
-  CV_Parts parts = (CV_Parts)act->data().toInt();
-  assert(parts < CVPARTS_COUNT);
+  CV_Parts part = (CV_Parts)act->data().toUInt();
+  assert(part < CVPARTS_End);
 
-  if (m_visibleFlag[parts])
-    m_visibleFlag[parts] = false;
-  else
-    m_visibleFlag[parts] = true;
+  m_visiblePartsFlag ^= part;
 
   updateShowHide();
 }
@@ -336,15 +325,11 @@ void ComboViewerPanel::onDrawFrame(
 
 //-----------------------------------------------------------------------------
 
-ComboViewerPanel::~ComboViewerPanel() {
-  if (TApp::instance()->getInknPaintViewerPanel() == this)
-    TApp::instance()->setInknPaintViewerPanel(0);
-}
+ComboViewerPanel::~ComboViewerPanel() {}
 
 //-----------------------------------------------------------------------------
 
 void ComboViewerPanel::showEvent(QShowEvent *event) {
-  StyleShortcutSwitchablePanel::showEvent(event);
   TApp *app                    = TApp::instance();
   TFrameHandle *frameHandle    = app->getCurrentFrame();
   TSceneHandle *sceneHandle    = app->getCurrentScene();
@@ -374,6 +359,10 @@ void ComboViewerPanel::showEvent(QShowEvent *event) {
   */
   ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
                        SLOT(changeWindowTitle()));
+  ret =
+      ret && connect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+                     m_flipConsole, SLOT(onPreferenceChanged(const QString &)));
+
   ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
                        SLOT(changeWindowTitle()));
   ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this,
@@ -401,6 +390,7 @@ void ComboViewerPanel::showEvent(QShowEvent *event) {
   assert(ret);
 
   m_flipConsole->setActive(true);
+  m_flipConsole->onPreferenceChanged("");
 
   // refresh
   onSceneChanged();
@@ -410,7 +400,6 @@ void ComboViewerPanel::showEvent(QShowEvent *event) {
 //-----------------------------------------------------------------------------
 
 void ComboViewerPanel::hideEvent(QHideEvent *event) {
-  StyleShortcutSwitchablePanel::hideEvent(event);
   TApp *app = TApp::instance();
   disconnect(app->getCurrentFrame(), 0, this, 0);
   disconnect(app->getCurrentScene(), 0, this, 0);
@@ -420,6 +409,8 @@ void ComboViewerPanel::hideEvent(QHideEvent *event) {
 
   disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
              SLOT(onToolSwitched()));
+  disconnect(app->getCurrentScene(), SIGNAL(preferenceChanged(const QString &)),
+             m_flipConsole, SLOT(onPreferenceChanged(const QString &)));
 
   m_flipConsole->setActive(false);
 }
@@ -437,9 +428,9 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   // buttons for show / hide toggle for the field guide and the safe area
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(titleBar, ":Resources/pane_safe_off.svg",
-                                          ":Resources/pane_safe_over.svg",
-                                          ":Resources/pane_safe_on.svg");
+      new TPanelTitleBarButtonForSafeArea(
+          titleBar, ":Resources/pane_safe_off.svg",
+          ":Resources/pane_safe_over.svg", ":Resources/pane_safe_on.svg");
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
@@ -508,8 +499,8 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   // preview toggles
   m_previewButton = new TPanelTitleBarButton(
-      titleBar, ":Resources/pane_preview_off.svg", ":Resources/pane_preview_over.svg",
-      ":Resources/pane_preview_on.svg");
+      titleBar, ":Resources/pane_preview_off.svg",
+      ":Resources/pane_preview_over.svg", ":Resources/pane_preview_on.svg");
   x += 10 + iconWidth;
   titleBar->add(QPoint(x, 0), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
@@ -617,6 +608,7 @@ void ComboViewerPanel::changeWindowTitle() {
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   if (!scene) return;
+  if (!parentWidget()) return;
   int frame = app->getCurrentFrame()->getFrame();
 
   // put the titlebar texts in this string
@@ -638,7 +630,7 @@ void ComboViewerPanel::changeWindowTitle() {
           !m_sceneViewer->is3DView()) {
         name = name + tr(" (Flipped)");
       }
-      setWindowTitle(name);
+      parentWidget()->setWindowTitle(name);
       return;
     }
     TXsheet *xsh  = app->getCurrentXsheet()->getXsheet();
@@ -648,7 +640,7 @@ void ComboViewerPanel::changeWindowTitle() {
           !m_sceneViewer->is3DView()) {
         name = name + tr(" (Flipped)");
       }
-      setWindowTitle(name);
+      parentWidget()->setWindowTitle(name);
       return;
     }
     assert(cell.m_level.getPointer());
@@ -677,7 +669,7 @@ void ComboViewerPanel::changeWindowTitle() {
              &&
              !CameraTestCheck::instance()  // camera test mode must be OFF
                                            // neither
-                                               ->isEnabled() &&
+                  ->isEnabled() &&
              !m_sceneViewer->is3DView()) {
       TAffine aff                             = m_sceneViewer->getViewMatrix();
       if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
@@ -713,7 +705,7 @@ void ComboViewerPanel::changeWindowTitle() {
       !m_sceneViewer->is3DView()) {
     name = name + tr(" (Flipped)");
   }
-  setWindowTitle(name);
+  parentWidget()->setWindowTitle(name);
 }
 
 //-----------------------------------------------------------------------------
@@ -822,13 +814,6 @@ void ComboViewerPanel::onFrameTypeChanged() {
 
 //-----------------------------------------------------------------------------
 
-void ComboViewerPanel::onPreferenceChanged(const QString &prefName) {
-  m_flipConsole->onPreferenceChanged(prefName);
-  StyleShortcutSwitchablePanel::onPreferenceChanged(prefName);
-}
-
-//-----------------------------------------------------------------------------
-
 void ComboViewerPanel::playAudioFrame(int frame) {
   if (m_first) {
     m_first = false;
@@ -861,8 +846,8 @@ bool ComboViewerPanel::hasSoundtrack() {
   }
   TXsheetHandle *xsheetHandle    = TApp::instance()->getCurrentXsheet();
   TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
-  if(!m_sceneViewer->isPreviewEnabled()) prop->m_isPreview = true;
-  m_sound                        = xsheetHandle->getXsheet()->makeSound(prop);
+  if (!m_sceneViewer->isPreviewEnabled()) prop->m_isPreview = true;
+  m_sound = xsheetHandle->getXsheet()->makeSound(prop);
   if (m_sound == NULL) {
     m_hasSoundtrack = false;
     return false;
@@ -876,4 +861,21 @@ void ComboViewerPanel::onButtonPressed(FlipConsole::EGadget button) {
   if (button == FlipConsole::eSound) {
     m_playSound = !m_playSound;
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void ComboViewerPanel::setVisiblePartsFlag(UINT flag) {
+  m_visiblePartsFlag = flag;
+  updateShowHide();
+}
+
+// SaveLoadQSettings
+void ComboViewerPanel::save(QSettings &settings) const {
+  settings.setValue("visibleParts", m_visiblePartsFlag);
+}
+
+void ComboViewerPanel::load(QSettings &settings) {
+  m_visiblePartsFlag = settings.value("visibleParts", CVPARTS_ALL).toUInt();
+  updateShowHide();
 }

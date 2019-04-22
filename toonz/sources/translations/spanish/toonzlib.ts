@@ -428,6 +428,14 @@
         <source>Rename Studio Palette : %1 &gt; %2</source>
         <translation>Renombrar paleta de estudio : %1 &gt; %2</translation>
     </message>
+    <message>
+        <source>Xsheet</source>
+        <translation>Planilla</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation>Línea de T.</translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

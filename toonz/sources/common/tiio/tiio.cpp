@@ -2,7 +2,6 @@
 
 #include "tiio.h"
 
-#include "tiio.h"
 #include "tiio_jpg.h"
 #include "tproperty.h"
 
@@ -179,6 +178,14 @@ void Tiio::defineVectorWriterMaker(const char *ext, Tiio::VectorWriterMaker *fn,
 
 void Tiio::defineWriterProperties(const char *ext, TPropertyGroup *prop) {
   TiioTable::instance()->addWriterProperties(ext, prop);
+}
+
+void Tiio::updateFileWritersPropertiesTranslation() {
+  TiioTable::PropertiesTable propTable =
+      TiioTable::instance()->m_writerProperties;
+  TiioTable::PropertiesTable::const_iterator it;
+  for (it = propTable.begin(); it != propTable.end(); ++it)
+    it->second->updateTranslation();
 }
 
 /*

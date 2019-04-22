@@ -25,6 +25,8 @@ public:
   int m_columnSpanCount;
   int m_rowSpanCount;
 
+  Position m_offset = std::make_pair(0, 0);
+
   // Numero di colonna della pegbar associato al booleano isCycleEnabled della
   // pegbar
   std::map<int, bool> m_isPegbarsCycleEnabled;
@@ -37,6 +39,8 @@ public:
 
   // data <- xsh
   void setKeyframes(std::set<Position> positions, TXsheet *xsh);
+  void setKeyframes(std::set<Position> positions, TXsheet *xsh,
+                    Position startPos);
 
   // data -> xsh
   bool getKeyframes(std::set<Position> &positions, TXsheet *xsh) const;
@@ -52,6 +56,9 @@ public:
 
   int getColumnSpanCount() const { return m_columnSpanCount; }
   int getRowSpanCount() const { return m_rowSpanCount; }
+
+  void setKeyframesOffset(int row, int col);
+  Position getKeyframesOffset() const { return m_offset; }
 };
 
 #endif  // KEYFRAMEDATA_INCLUDED

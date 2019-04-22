@@ -7,7 +7,6 @@
 // TnzBase includes
 #include "tparamset.h"
 #include "tdoubleparam.h"
-#include "tzeraryfx.h"
 #include "tfxparam.h"
 #include "tparamuiconcept.h"
 

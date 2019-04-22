@@ -84,7 +84,7 @@ QScriptValue OutlineVectorizer::vectorize(QScriptValue arg) {
     QScriptValue newLevel = create(engine(), new Level());
     QList<TFrameId> fids;
     level->getFrameIds(fids);
-    foreach (TFrameId fid, fids) {
+    for (const TFrameId &fid : fids) {
       TImageP srcImg = level->getImg(fid);
       if (srcImg && (srcImg->getType() == TImage::RASTER ||
                      srcImg->getType() == TImage::TOONZ_RASTER)) {

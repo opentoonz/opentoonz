@@ -1,14 +1,77 @@
-# moc の数が多いので全部食わせる
 set(MOC_HEADERS
+    ../include/toonz/fullcolorpalette.h
+    ../include/toonz/movierenderer.h
+    ../include/toonz/multimediarenderer.h
+    ../include/toonz/palettecontroller.h
+    ../include/toonz/preferences.h
+    ../include/toonz/scriptbinding.h
+    ../include/toonz/scriptbinding_centerline_vectorizer.h
+    ../include/toonz/scriptbinding_files.h
+    ../include/toonz/scriptbinding_image.h
+    ../include/toonz/scriptbinding_image_builder.h
+    ../include/toonz/scriptbinding_level.h
+    ../include/toonz/scriptbinding_outline_vectorizer.h
+    ../include/toonz/scriptbinding_rasterizer.h
+    ../include/toonz/scriptbinding_renderer.h
+    ../include/toonz/scriptbinding_scene.h
+    ../include/toonz/scriptbinding_toonz_raster_converter.h
+    ../include/toonz/scriptengine.h
+    ../include/toonz/stylemanager.h
+    ../include/toonz/tcenterlinevectorizer.h
+    ../include/toonz/tcolumnhandle.h
+    ../include/toonz/tframehandle.h
+    ../include/toonz/tfxhandle.h
+    ../include/toonz/tobjecthandle.h
+    ../include/toonz/tonionskinmaskhandle.h
+    ../include/toonz/tpalettehandle.h
+    ../include/toonz/tscenehandle.h
+    ../include/toonz/txsheethandle.h
+    ../include/toonz/txshlevel.h
+    ../include/toonz/txshlevelhandle.h
+    ../include/toonz/txshsimplelevel.h
+    ../include/toonz/txshsoundcolumn.h
+)
+
+set(HEADERS
+    ${MOC_HEADERS}
     autoadjust.h
-    ../include/toonz/autoclose.h
-    ../include/convert2tlv.h
     autopos.h
+    cleanupcommon.h
+    cleanuppalette.h
+    imagebuilders.h
+    skeletonlut.h
+    tcenterlinevectP.h
+    texturemanager.h
+    xshhandlemanager.h
+    sandor_fxs/BlurMatrix.h
+    sandor_fxs/CIL.h
+    sandor_fxs/CallCircle.h
+    sandor_fxs/CallParam.h
+    sandor_fxs/EraseContour.h
+    sandor_fxs/InputParam.h
+    sandor_fxs/Params.h
+    sandor_fxs/Pattern.h
+    sandor_fxs/PatternMapParam.h
+    sandor_fxs/PatternPosition.h
+    sandor_fxs/SDef.h
+    sandor_fxs/SDirection.h
+    sandor_fxs/SError.h
+    sandor_fxs/STColSelPic.h
+    sandor_fxs/STPic.h
+    sandor_fxs/YOMBInputParam.h
+    sandor_fxs/YOMBParam.h
+    sandor_fxs/blend.h
+    sandor_fxs/calligraph.h
+    sandor_fxs/patternmap.h
+    sandor_fxs/toonz4_6staff.h
+    ../include/convert2tlv.h
+    ../include/orientation.h
+    ../include/toonz/Naa2TlvConverter.h
+    ../include/toonz/autoclose.h
+    ../include/toonz/boardsettings.h
     ../include/toonz/captureparameters.h
     ../include/toonz/childstack.h
     ../include/toonz/cleanupcolorstyles.h
-    cleanupcommon.h
-    cleanuppalette.h
     ../include/toonz/cleanupparameters.h
     ../include/toonz/columnfan.h
     ../include/toonz/controlpointobserver.h
@@ -16,7 +79,6 @@ set(MOC_HEADERS
     ../include/toonz/doubleparamcmd.h
     ../include/toonz/dpiscale.h
     ../include/toonz/fill.h
-    ../include/toonz/fullcolorpalette.h
     ../include/toonz/fxcommand.h
     ../include/toonz/fxdag.h
     ../include/toonz/glrasterpainter.h
@@ -33,39 +95,21 @@ set(MOC_HEADERS
     ../include/toonz/levelset.h
     ../include/toonz/levelupdater.h
     ../include/toonz/logger.h
-    ../include/toonz/movierenderer.h
-    ../include/toonz/multimediarenderer.h
     ../include/toonz/mypaint.h
-    ../include/toonz/mypainthelpers.hpp
     ../include/toonz/mypaintbrushstyle.h
+    ../include/toonz/mypainthelpers.hpp
     ../include/toonz/namebuilder.h
-    ../include/toonz/Naa2TlvConverter.h
     ../include/toonz/observer.h
     ../include/toonz/onionskinmask.h
     ../include/toonz/palettecmd.h
-    ../include/toonz/palettecontroller.h
     ../include/toonz/plasticdeformerfx.h
-    ../include/toonz/preferences.h
     ../include/toonz/rasterbrush.h
     ../include/toonz/rasterstrokegenerator.h
     ../include/toonz/scenefx.h
     ../include/toonz/sceneproperties.h
     ../include/toonz/sceneresources.h
     ../include/toonz/screensavermaker.h
-    ../include/toonz/scriptbinding.h
-    ../include/toonz/scriptbinding_centerline_vectorizer.h
-    ../include/toonz/scriptbinding_files.h
-    ../include/toonz/scriptbinding_image.h
-    ../include/toonz/scriptbinding_image_builder.h
-    ../include/toonz/scriptbinding_level.h
-    ../include/toonz/scriptbinding_outline_vectorizer.h
-    ../include/toonz/scriptbinding_rasterizer.h
-    ../include/toonz/scriptbinding_renderer.h
-    ../include/toonz/scriptbinding_scene.h
-    ../include/toonz/scriptbinding_toonz_raster_converter.h
-    ../include/toonz/scriptengine.h
     ../include/toonz/skeleton.h
-    skeletonlut.h
     ../include/toonz/stage.h
     ../include/toonz/stage2.h
     ../include/toonz/stageobjectutil.h
@@ -73,30 +117,22 @@ set(MOC_HEADERS
     ../include/toonz/stagevisitor.h
     ../include/toonz/studiopalette.h
     ../include/toonz/studiopalettecmd.h
-    ../include/toonz/stylemanager.h
     ../include/toonz/tapplication.h
     ../include/toonz/targetcolors.h
+    ../include/toonz/tbinarizer.h
     ../include/toonz/tcamera.h
-    ../include/toonz/tcenterlinevectorizer.h
-    tcenterlinevectP.h
     ../include/toonz/tcleanupper.h
     ../include/toonz/tcolumnfx.h
     ../include/toonz/tcolumnfxset.h
-    ../include/toonz/tcolumnhandle.h
     ../include/toonz/tdistort.h
-    ../include/toonz/tframehandle.h
-    ../include/toonz/tfxhandle.h
+    ../include/toonz/textureutils.h
     ../include/toonz/tlog.h
-    ../include/toonz/tobjecthandle.h
-    ../include/toonz/tonionskinmaskhandle.h
     ../include/toonz/toonzfolders.h
     ../include/toonz/toonzimageutils.h
     ../include/toonz/toonzscene.h
     ../include/toonz/tpinnedrangeset.h
-    ../include/toonz/tpalettehandle.h
     ../include/toonz/tproject.h
     ../include/toonz/trasterimageutils.h
-    ../include/toonz/tscenehandle.h
     ../include/toonz/tstageobject.h
     ../include/toonz/tstageobjectcmd.h
     ../include/toonz/tstageobjectid.h
@@ -111,54 +147,20 @@ set(MOC_HEADERS
     ../include/toonz/txshcolumn.h
     ../include/toonz/txsheet.h
     ../include/toonz/txsheetexpr.h
-    ../include/toonz/txsheethandle.h
-    ../include/toonz/txshlevel.h
     ../include/toonz/txshlevelcolumn.h
-    ../include/toonz/txshlevelhandle.h
     ../include/toonz/txshleveltypes.h
+    ../include/toonz/txshmeshcolumn.h
     ../include/toonz/txshnoteset.h
     ../include/toonz/txshpalettecolumn.h
     ../include/toonz/txshpalettelevel.h
-    ../include/toonz/txshsimplelevel.h
-    ../include/toonz/txshsoundcolumn.h
     ../include/toonz/txshsoundlevel.h
     ../include/toonz/txshsoundtextcolumn.h
     ../include/toonz/txshsoundtextlevel.h
+    ../include/toonz/txshzeraryfxcolumn.h
     ../include/toonz/txshzeraryfxlevel.h
     ../include/toonz/vectorizerparameters.h
-    ../include/toonz/txshzeraryfxcolumn.h
-    ../include/toonz/tbinarizer.h
-    ../include/toonz/txshmeshcolumn.h
-    ../include/toonz/textureutils.h
     ../include/toutputproperties.h
-    xshhandlemanager.h
-    sandor_fxs/blend.h
-    sandor_fxs/BlurMatrix.h
-    sandor_fxs/CallCircle.h
-    sandor_fxs/calligraph.h
-    sandor_fxs/CallParam.h
-    sandor_fxs/CIL.h
-    sandor_fxs/EraseContour.h
-    sandor_fxs/InputParam.h
-    sandor_fxs/Params.h
-    sandor_fxs/Pattern.h
-    sandor_fxs/patternmap.h
-    sandor_fxs/PatternMapParam.h
-    sandor_fxs/PatternPosition.h
-    sandor_fxs/SDef.h
-    sandor_fxs/SDirection.h
-    sandor_fxs/SError.h
-    sandor_fxs/STColSelPic.h
-    sandor_fxs/STPic.h
-    sandor_fxs/toonz4_6staff.h
-    sandor_fxs/YOMBInputParam.h
-    sandor_fxs/YOMBParam.h
-    texturemanager.h
-    imagebuilders.h
-	../include/orientation.h
 )
-
-set(HEADERS ${MOC_HEADERS})
 
 set(SOURCES
     autoadjust.cpp
@@ -317,6 +319,7 @@ set(SOURCES
     plasticdeformerfx.cpp
     txshmeshcolumn.cpp
     textureutils.cpp
+    boardsettings.cpp
 )
 
 if(BUILD_TARGET_WIN)

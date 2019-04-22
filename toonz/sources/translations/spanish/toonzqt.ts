@@ -165,6 +165,14 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>x</source>
         <translation>x</translation>
     </message>
+    <message>
+        <source>A/R</source>
+        <translation>Proporción</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;personalizada&gt;</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -248,7 +256,33 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Entrar en sub-planilla</translation>
+        <translation type="vanished">&amp;Entrar en sub-planilla</translation>
+    </message>
+</context>
+<context>
+    <name>ComboHistoRGBLabel</name>
+    <message>
+        <source>R:%1 G:%2 B:%3</source>
+        <translation>R:%1 V:%2 A:%3</translation>
+    </message>
+</context>
+<context>
+    <name>ComboHistogram</name>
+    <message>
+        <source>Picked Color</source>
+        <translation>Color seleccionado</translation>
+    </message>
+    <message>
+        <source>Average Color (Ctrl + Drag)</source>
+        <translation>Color promedio (Ctrl + arrastrar)</translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation>X:</translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
 </context>
 <context>
@@ -295,6 +329,25 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <message>
         <source>White Thres</source>
         <translation>Umbral blanco</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::ColorField</name>
+    <message>
+        <source>R:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>G:</source>
+        <translation>V:</translation>
+    </message>
+    <message>
+        <source>B:</source>
+        <translation>A:</translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <translation>α:</translation>
     </message>
 </context>
 <context>
@@ -358,6 +411,13 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <message>
         <source>OpenToonz</source>
         <translation>OpenToonz</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation>actual</translation>
     </message>
 </context>
 <context>
@@ -637,6 +697,17 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
 </context>
 <context>
+    <name>FontParamField</name>
+    <message>
+        <source>Style:</source>
+        <translation>Estilo:</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Tamaño:</translation>
+    </message>
+</context>
+<context>
     <name>FrameNavigator</name>
     <message>
         <source>Previous Frame</source>
@@ -730,7 +801,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Fit</source>
-        <translation>Ajustar</translation>
+        <translation>Ajustar a ventana</translation>
     </message>
     <message>
         <source>Similar Shape Interpolation</source>
@@ -762,7 +833,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Frame Based</source>
-        <translation>Basada en fotogramas</translation>
+        <translation>Por fotogramas</translation>
     </message>
     <message>
         <source>Curve Shape</source>
@@ -873,7 +944,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step</source>
-        <translation>Intervalo</translation>
+        <translation>Exposición</translation>
     </message>
 </context>
 <context>
@@ -965,6 +1036,21 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
 </context>
 <context>
+    <name>FunctionTreeModel</name>
+    <message>
+        <source>Stage</source>
+        <translation>Escenario</translation>
+    </message>
+    <message>
+        <source>FX</source>
+        <translation>Efectos</translation>
+    </message>
+    <message>
+        <source>Plastic Skeleton</source>
+        <translation>Esqueleto de Plástico</translation>
+    </message>
+</context>
+<context>
     <name>FunctionTreeView</name>
     <message>
         <source>Save Curve</source>
@@ -984,7 +1070,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Show All</source>
-        <translation>Mostrar todo</translation>
+        <translation>Mostrar todos</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>Mesa</translation>
     </message>
 </context>
 <context>
@@ -1007,7 +1097,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Entrar en sub-planilla</translation>
+        <translation type="vanished">&amp;Entrar en sub-planilla</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -1127,6 +1217,13 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
 </context>
 <context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <source>Output</source>
+        <translation>Salida</translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicPort</name>
     <message>
         <source>&amp;Disconnect from Xsheet</source>
@@ -1159,6 +1256,13 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
 </context>
 <context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <source>XSheet</source>
+        <translation>Planilla</translation>
+    </message>
+</context>
+<context>
     <name>FxSettings</name>
     <message>
         <source>&amp;Camera Preview</source>
@@ -1182,7 +1286,11 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source> : </source>
-        <translation> : </translation>
+        <translation>: </translation>
+    </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation>Opciones del efecto</translation>
     </message>
 </context>
 <context>
@@ -1216,6 +1324,30 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <message>
         <source>Logarithmic Scale</source>
         <translation>Escala logarítmica</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>Valor</translation>
+    </message>
+    <message>
+        <source>RGB</source>
+        <translation>RVA</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>Rojo</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>Verde</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>Azul</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>Alfa</translation>
     </message>
 </context>
 <context>
@@ -1348,7 +1480,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Level Palette: </source>
-        <translation>Paleta del nivel: </translation>
+        <translation>Paleta de nivel: </translation>
     </message>
     <message>
         <source>Cleanup Palette</source>
@@ -1741,7 +1873,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation>&lt;personalizado&gt;</translation>
+        <translation type="vanished">&lt;personalizado&gt;</translation>
     </message>
     <message>
         <source>It is not possible to find the %1 level.</source>
@@ -2087,6 +2219,10 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
         <source>&amp;Swtich output port display mode</source>
         <translation>&amp;Cambiar visualización de puertos de salida</translation>
     </message>
+    <message>
+        <source>&amp;Toggle node icons</source>
+        <translation>Íconos de &amp;nodos</translation>
+    </message>
 </context>
 <context>
     <name>SchematicWindowEditor</name>
@@ -2103,7 +2239,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>Frame Offset:</source>
-        <translation>Desplaz. de fotogramas:</translation>
+        <translation>Desplazamiento de fotogramas:</translation>
     </message>
     <message>
         <source>There is a syntax error in the definition of the interpolation.</source>
@@ -2304,7 +2440,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>Texture</source>
-        <translation>Textura</translation>
+        <translation>Texturas</translation>
     </message>
     <message>
         <source>Special</source>
@@ -2316,7 +2452,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>Vector Brush</source>
-        <translation>Patrón vectorial</translation>
+        <translation>Pinceles vectoriales</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -2354,11 +2490,11 @@ Autom</translation>
     </message>
     <message>
         <source>Generated</source>
-        <translation>Generado</translation>
+        <translation>Generados</translation>
     </message>
     <message>
         <source>Trail</source>
-        <translation>Rastro</translation>
+        <translation>Rastros</translation>
     </message>
     <message>
         <source>Color</source>
@@ -2366,11 +2502,11 @@ Autom</translation>
     </message>
     <message>
         <source>Vector</source>
-        <translation>Vectorial</translation>
+        <translation>Vectoriales</translation>
     </message>
     <message>
         <source>Raster</source>
-        <translation>Imagen</translation>
+        <translation>Pinceles</translation>
     </message>
     <message>
         <source>Show or hide parts of the Color Page.</source>
@@ -2387,6 +2523,26 @@ Autom</translation>
     <message>
         <source>Style Editor - No Valid Style Selected</source>
         <translation>Editor de estilos - Ningún estilo válido seleccionado</translation>
+    </message>
+    <message>
+        <source>Wheel</source>
+        <translation>Muestra</translation>
+    </message>
+    <message>
+        <source>HSV</source>
+        <translation>TSV</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>Alfa</translation>
+    </message>
+    <message>
+        <source>RGB</source>
+        <translation>RVA</translation>
+    </message>
+    <message>
+        <source>Palette</source>
+        <translation>Paleta</translation>
     </message>
 </context>
 <context>
@@ -2447,7 +2603,7 @@ Autom</translation>
     <name>StyleEditorGUI::SettingsPage</name>
     <message>
         <source>Autopaint for Lines</source>
-        <translation>Pintar automáticamente al rellenar</translation>
+        <translation>Pintar (líneas) automáticamente al rellenar</translation>
     </message>
     <message>
         <source>Reset to default</source>

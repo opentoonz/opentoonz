@@ -734,6 +734,10 @@ Tiio::PngWriterProperties::PngWriterProperties()
   bind(m_matte);
 }
 
+void Tiio::PngWriterProperties::updateTranslation() {
+  m_matte.setQStringName(tr("Alpha Channel"));
+}
+
 //=========================================================
 
 class PngWriter final : public Tiio::Writer {
@@ -756,6 +760,8 @@ public:
   void flush() override;
 
   bool write64bitSupported() const override { return true; }
+  // m_matte is set to "Alpha Channel" property value in the function open()
+  bool writeAlphaSupported() const override { return m_matte; };
 };
 
 //---------------------------------------------------------

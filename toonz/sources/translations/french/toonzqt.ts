@@ -165,6 +165,14 @@ Possibly the preset file has been corrupted</source>
         <source>x</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>A/R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation type="unfinished">&lt;custom&gt;</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -248,7 +256,33 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Ouvrir le Sub-xsheet</translation>
+        <translation type="vanished">&amp;Ouvrir le Sub-xsheet</translation>
+    </message>
+</context>
+<context>
+    <name>ComboHistoRGBLabel</name>
+    <message>
+        <source>R:%1 G:%2 B:%3</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ComboHistogram</name>
+    <message>
+        <source>Picked Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average Color (Ctrl + Drag)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation type="unfinished">Y:</translation>
     </message>
 </context>
 <context>
@@ -294,6 +328,25 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>White Thres</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::ColorField</name>
+    <message>
+        <source>R:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>G:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -357,6 +410,13 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>OpenToonz</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -633,6 +693,17 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Locator</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FontParamField</name>
+    <message>
+        <source>Style:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -965,6 +1036,21 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FunctionTreeModel</name>
+    <message>
+        <source>Stage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plastic Skeleton</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FunctionTreeView</name>
     <message>
         <source>Save Curve</source>
@@ -985,6 +1071,10 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Show All</source>
         <translation>Afficher Tous</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1007,7 +1097,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Ouvrir le Sub-xsheet</translation>
+        <translation type="vanished">&amp;Ouvrir le Sub-xsheet</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -1123,6 +1213,13 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicPort</name>
     <message>
         <source>&amp;Disconnect from Xsheet</source>
@@ -1155,6 +1252,13 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     </message>
 </context>
 <context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <source>XSheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FxSettings</name>
     <message>
         <source>&amp;Camera Preview</source>
@@ -1178,6 +1282,10 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     </message>
     <message>
         <source> : </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fx Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1208,6 +1316,30 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     <message>
         <source>Logarithmic Scale</source>
         <translation>Echelle Logarithmique</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation type="unfinished">Valeur</translation>
+    </message>
+    <message>
+        <source>RGB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1722,7 +1854,7 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation>&lt;custom&gt;</translation>
+        <translation type="vanished">&lt;custom&gt;</translation>
     </message>
     <message>
         <source>It is not possible to find the %1 level.</source>
@@ -2057,6 +2189,10 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <source>&amp;Swtich output port display mode</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&amp;Toggle node icons</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SchematicWindowEditor</name>
@@ -2339,6 +2475,26 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Style Editor - No Valid Style Selected</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wheel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HSV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RGB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette</source>
+        <translation type="unfinished">Palette</translation>
     </message>
 </context>
 <context>

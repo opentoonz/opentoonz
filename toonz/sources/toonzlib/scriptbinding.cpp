@@ -25,7 +25,6 @@
 #include "tvectorrenderdata.h"
 #include "tgeometry.h"
 #include "toonz/stage.h"
-#include "toonz/tcamera.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/levelproperties.h"
 #include "toonz/toonzscene.h"

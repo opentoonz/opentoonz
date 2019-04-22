@@ -144,12 +144,17 @@ public:
   // data->xsh
   void setXshFromData(QMimeData *data) const {
     const TKeyframeData *keyframeData = dynamic_cast<TKeyframeData *>(data);
-    if (keyframeData)
-      pasteKeyframesWithoutUndo(keyframeData, &m_selection->getSelection());
+    if (keyframeData) {
+      TKeyframeSelection *selection =
+          new TKeyframeSelection(m_selection->getSelection());
+      pasteKeyframesWithoutUndo(keyframeData, &selection->getSelection());
+    }
   }
   void undo() const override {
     // Delete merged data
-    deleteKeyframesWithoutUndo(&m_selection->getSelection());
+    TKeyframeSelection *selection =
+        new TKeyframeSelection(m_selection->getSelection());
+    deleteKeyframesWithoutUndo(&selection->getSelection());
     if (-(m_r1 - m_r0 + 1) != 0)
       shiftKeyframesWithoutUndo(m_r0, m_r1, m_c0, m_c1, true);
     if (m_oldData) setXshFromData(m_oldData);

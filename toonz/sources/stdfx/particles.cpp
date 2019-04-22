@@ -52,7 +52,8 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
   /*- 初期座標値をつくる -*/
   /*-- Perspective DistributionがONかつ、SizeのControlImageが刺さっている場合
    * --*/
-  if (myregions.size() && values.scale_ctrl_val != ParticlesFx::CTRL_NONE &&
+  if (myregions.size() &&
+      porttiles.find(values.scale_ctrl_val) != porttiles.end() &&
       values.perspective_distribution_val) {
     float size = myWeight[255];
     /*- 候補の中のIndex -*/
@@ -74,7 +75,7 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
   }
   /*- 領域がある かつ 発生領域のControlImageが刺さっている場合 -*/
   else if (myregions.size() &&
-           values.source_ctrl_val != ParticlesFx::CTRL_NONE) {
+           porttiles.find(values.source_ctrl_val) != porttiles.end()) {
     /*- howmany：発生Particlesのうち、何番目に発生させたものか。
             myregionが複数有る場合は、均等に割り振ることになる。 -*/
     int regionindex = howmany % myregions.size();
@@ -117,7 +118,8 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
        it != porttiles.end(); ++it) {
     if ((values.lifetime_ctrl_val == it->first ||
          values.speed_ctrl_val == it->first ||
-         values.scale_ctrl_val == it->first || values.rot_ctrl_val == it->first
+         values.scale_ctrl_val == it->first ||
+         values.rot_ctrl_val == it->first
          /*-  Speed Angleを明るさでコントロールする場合 -*/
          || (values.speeda_ctrl_val == it->first &&
              !values.speeda_use_gradient_val)) &&
@@ -245,13 +247,13 @@ void Particle::create_Swing(const particles_values &values,
     smperiody = changesigny;
   }
   if (values.rotswingmode_val == ParticlesFx::SWING_SMOOTH) {
-    smswinga = abs((int)(values.rotsca_val.first +
+    smswinga  = abs((int)(values.rotsca_val.first +
                          random.getFloat() * (ranges.rotsca_range)));
     smperioda = changesigna;
   }
-  signx = random.getInt(0, 1) > 0 ? 1 : -1;
-  signy = random.getInt(0, 1) > 0 ? 1 : -1;
-  signa = random.getInt(0, 1) > 0 ? 1 : -1;
+  signx = random.getBool() ? 1 : -1;
+  signy = random.getBool() ? 1 : -1;
+  signa = random.getBool() ? 1 : -1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -267,7 +269,7 @@ void Particle::create_Colors(const particles_values &values,
         (porttiles.find(values.gencol_ctrl_val) != porttiles.end()))
       get_image_reference(porttiles[values.gencol_ctrl_val], values, color);
     else
-      color        = values.gencol_val.getPremultipliedValue(random.getFloat());
+      color = values.gencol_val.getPremultipliedValue(random.getFloat());
     gencol.fadecol = values.genfadecol_val;
     if (values.gencol_spread_val) spread_color(color, values.gencol_spread_val);
     gencol.col = color;
@@ -394,7 +396,7 @@ void Particle::update_Animation(const particles_values &values, int first,
   case ParticlesFx::ANIM_SR_CYCLE:
     if (!keep || frame != keep - 1) {
       if (!animswing && frame < last - 1) {
-        frame                            = (frame + 1);
+        frame = (frame + 1);
         if (frame == last - 1) animswing = 1;
       } else
         frame = (frame - 1);
@@ -711,7 +713,7 @@ void Particle::move(std::map<int, TTile *> porttiles,
       frictx = vx * (1 + values.friction_val * frictreference) +
                (10 / vx) * values.friction_val * frictreference;
       if ((frictx / vx) < 0) frictx = 0;
-      vx                            = frictx;
+      vx = frictx;
     }
     if (!frictx &&
         fabs(values.friction_val * frictreference * 10) > fabs(xgravity)) {
@@ -725,7 +727,7 @@ void Particle::move(std::map<int, TTile *> porttiles,
       fricty = vy * (1 + values.friction_val * frictreference) +
                (10 / vy) * values.friction_val * frictreference;
       if ((fricty / vy) < 0) fricty = 0;
-      vy                            = fricty;
+      vy = fricty;
     }
     if (!fricty &&
         fabs(values.friction_val * frictreference * 10) > fabs(ygravity)) {

@@ -230,8 +230,8 @@ break;*/
   bool swapxy = false;  // orient == ORIENTATION_RIGHTTOP;
 
   if (swapxy) {
-    tswap(w, h);
-    tswap(xdpi, ydpi);
+    std::swap(w, h);
+    std::swap(xdpi, ydpi);
   }
 
   m_xdpi        = xdpi;
@@ -399,8 +399,8 @@ if(stripSize>0)
       m_info.m_y0 = 0;
     }
     if (swapxy) {
-      tswap(m_info.m_x0, m_info.m_y0);
-      tswap(m_info.m_lx, m_info.m_ly);
+      std::swap(m_info.m_x0, m_info.m_y0);
+      std::swap(m_info.m_lx, m_info.m_ly);
     }
     m_info.m_x1 = m_info.m_x0 + w;
     m_info.m_y1 = m_info.m_y0 + h;
@@ -726,6 +726,27 @@ Tiio::TifWriterProperties::TifWriterProperties()
   bind(m_orientation);
 }
 
+void Tiio::TifWriterProperties::updateTranslation() {
+  m_byteOrdering.setQStringName(tr("Byte Ordering"));
+  m_compressionType.setQStringName(tr("Compression Type"));
+  m_bitsPerPixel.setQStringName(tr("Bits Per Pixel"));
+  m_bitsPerPixel.setItemUIName(L"24(RGB)", tr("24(RGB)"));
+  m_bitsPerPixel.setItemUIName(L"48(RGB)", tr("48(RGB)"));
+  m_bitsPerPixel.setItemUIName(L" 1(BW)", tr(" 1(BW)"));
+  m_bitsPerPixel.setItemUIName(L" 8(GREYTONES)", tr(" 8(GREYTONES)"));
+  m_bitsPerPixel.setItemUIName(L"32(RGBM)", tr("32(RGBM)"));
+  m_bitsPerPixel.setItemUIName(L"64(RGBM)", tr("64(RGBM)"));
+  m_orientation.setQStringName(tr("Orientation"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_TOPLEFT, tr("Top Left"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_TOPRIGHT, tr("Top Right"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_BOTRIGHT, tr("Bottom Right"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_BOTLEFT, tr("Bottom Left"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_LEFTTOP, tr("Left Top"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_RIGHTTOP, tr("Left Bottom"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_RIGHTBOT, tr("Right Top"));
+  m_orientation.setItemUIName(TNZ_INFO_ORIENT_LEFTBOT, tr("Right Bottom"));
+}
+
 //============================================================
 
 class TifWriter final : public Tiio::Writer {
@@ -749,6 +770,11 @@ public:
   void flush() override;
 
   Tiio::RowOrder getRowOrder() const override { return m_rowOrder; }
+
+  // m_bpp is set to "Bits Per Pixel" property value in the function open()
+  bool writeAlphaSupported() const override {
+    return (m_bpp == 32 || m_bpp == 64);
+  }
 };
 
 //------------------------------------------------------------

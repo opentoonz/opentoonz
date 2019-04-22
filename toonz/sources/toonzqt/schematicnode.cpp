@@ -1,6 +1,8 @@
 
 
 #include "toonzqt/schematicnode.h"
+#include "toonzqt/stageschematicscene.h"
+
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
 #include <QKeyEvent>
@@ -159,28 +161,69 @@ void SchematicThumbnailToggle::mousePressEvent(QGraphicsSceneMouseEvent *me) {
 //
 //========================================================
 
-SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmap,
-                                 int flags, bool isLargeScaled)
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QIcon &imageOn,
+                                 QColor colorOn, int flags,
+                                 bool isNormalIconView)
     : QGraphicsItem(parent)
-    , m_pixmap1(pixmap)
-    , m_pixmap2()
+    , m_imageOn(imageOn)
+    , m_imageOn2()
+    , m_imageOff()
     , m_state(0)
     , m_flags(flags)
-    , m_width(isLargeScaled ? 18 : 30)
-    , m_height(isLargeScaled ? 7 : 5) {}
+    , m_width(isNormalIconView ? 18 : 30)
+    , m_height(isNormalIconView ? 7 : 5)
+    , m_colorOn(colorOn)
+    , m_colorOff(QColor(0, 0, 0, 0)) {}
 
 //--------------------------------------------------------
 
-SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmap1,
-                                 const QPixmap &pixmap2, int flags,
-                                 bool isLargeScaled)
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QIcon &imageOn,
+                                 QColor colorOn, const QIcon &imageOff,
+                                 QColor colorOff, int flags,
+                                 bool isNormalIconView)
     : QGraphicsItem(parent)
-    , m_pixmap1(pixmap1)
-    , m_pixmap2(pixmap2)
+    , m_imageOn(imageOn)
+    , m_imageOn2()
+    , m_imageOff(imageOff)
     , m_state(0)
     , m_flags(flags)
-    , m_width(isLargeScaled ? 18 : 30)
-    , m_height(isLargeScaled ? 7 : 5) {}
+    , m_width(isNormalIconView ? 18 : 30)
+    , m_height(isNormalIconView ? 7 : 5)
+    , m_colorOn(colorOn)
+    , m_colorOff(colorOff) {}
+
+//--------------------------------------------------------
+
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QIcon &imageOn,
+                                 const QIcon &imageOn2, QColor colorOn,
+                                 int flags, bool isNormalIconView)
+    : QGraphicsItem(parent)
+    , m_imageOn(imageOn)
+    , m_imageOn2(imageOn2)
+    , m_imageOff()
+    , m_state(0)
+    , m_flags(flags)
+    , m_width(isNormalIconView ? 18 : 30)
+    , m_height(isNormalIconView ? 7 : 5)
+    , m_colorOn(colorOn)
+    , m_colorOff(QColor(0, 0, 0, 0)) {}
+
+//--------------------------------------------------------
+
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QIcon &imageOn,
+                                 const QIcon &imageOn2, QColor colorOn,
+                                 const QIcon &imageOff, QColor colorOff,
+                                 int flags, bool isNormalIconView)
+    : QGraphicsItem(parent)
+    , m_imageOn(imageOn)
+    , m_imageOn2(imageOn2)
+    , m_imageOff(imageOff)
+    , m_state(0)
+    , m_flags(flags)
+    , m_width(isNormalIconView ? 18 : 30)
+    , m_height(isNormalIconView ? 7 : 5)
+    , m_colorOn(colorOn)
+    , m_colorOff(colorOff) {}
 
 //--------------------------------------------------------
 
@@ -197,10 +240,38 @@ QRectF SchematicToggle::boundingRect() const {
 void SchematicToggle::paint(QPainter *painter,
                             const QStyleOptionGraphicsItem *option,
                             QWidget *widget) {
+  int rectHeight = boundingRect().height();
+  int rectWidth  = boundingRect().width();
+  int rectX      = boundingRect().left();
+  int rectY      = boundingRect().top();
+
+  QRect rect =
+      QRect(0, 0, rectHeight, rectHeight)
+          .translated(rectX + (rectWidth / 2) - (rectHeight / 2), rectY);
+
   if (m_state != 0) {
-    QPixmap &pix =
-        (m_state == 2 && !m_pixmap2.isNull()) ? m_pixmap2 : m_pixmap1;
-    painter->drawPixmap(boundingRect().toRect(), pix);
+    QIcon &pix =
+        (m_state == 2 && !m_imageOn2.isNull()) ? m_imageOn2 : m_imageOn;
+    painter->fillRect(boundingRect().toRect(), m_colorOn);
+    QRect sourceRect =
+        scene()->views()[0]->matrix().mapRect(QRect(0, 0, 18, 17));
+    QPixmap redPm = pix.pixmap(sourceRect.size());
+    QRect newRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                          sourceRect.height() * getDevPixRatio());
+    painter->drawPixmap(rect, redPm, newRect);
+  } else if (!m_imageOff.isNull()) {
+    QPen pen(m_colorOn);
+    pen.setWidthF(0.5);
+    painter->setPen(pen);
+    painter->setBrush(m_colorOff);
+    double d = pen.widthF() / 2.0;
+    painter->drawRect(boundingRect().adjusted(d, d, -d, -d));
+    QRect sourceRect =
+        scene()->views()[0]->matrix().mapRect(QRect(0, 0, 18, 17));
+    QPixmap redPm = m_imageOff.pixmap(sourceRect.size());
+    QRect newRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                          sourceRect.height() * getDevPixRatio());
+    painter->drawPixmap(rect, redPm, newRect);
   }
 }
 
@@ -208,7 +279,7 @@ void SchematicToggle::paint(QPainter *painter,
 
 void SchematicToggle::mousePressEvent(QGraphicsSceneMouseEvent *me) {
   if (me->button() == Qt::LeftButton) {
-    if (m_pixmap2.isNull()) {
+    if (m_imageOn2.isNull()) {
       m_state = 1 - m_state;
       emit(toggled(m_state != 0));
     } else if (m_flags & eEnableNullState) {
@@ -228,7 +299,7 @@ void SchematicToggle::mousePressEvent(QGraphicsSceneMouseEvent *me) {
 
 void SchematicToggle::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   if (!(m_flags & eIsParentColumn)) return;
-  if (m_pixmap2.isNull()) {
+  if (m_imageOn2.isNull()) {
     QMenu *menu                = new QMenu(0);
     CommandManager *cmdManager = CommandManager::instance();
     menu->addAction(cmdManager->getAction("MI_EnableThisColumnOnly"));
@@ -261,9 +332,14 @@ void SchematicToggle_SplineOptions::paint(
   QRectF rect = boundingRect();
   painter->fillRect(rect, Qt::white);
   if (m_state != 0) {
-    QPixmap &pix =
-        (m_state == 2 && !m_pixmap2.isNull()) ? m_pixmap2 : m_pixmap1;
-    painter->drawPixmap(boundingRect().toRect(), pix);
+    QIcon &pix =
+        (m_state == 2 && !m_imageOn2.isNull()) ? m_imageOn2 : m_imageOn;
+    QRect sourceRect =
+        scene()->views()[0]->matrix().mapRect(QRect(0, 0, 18, 17));
+    QPixmap redPm = pix.pixmap(sourceRect.size());
+    QRect newRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+                          sourceRect.height() * getDevPixRatio());
+    painter->drawPixmap(rect, redPm, newRect);
   }
   painter->setBrush(Qt::NoBrush);
   painter->setPen(QColor(180, 180, 180, 255));
@@ -456,6 +532,12 @@ void SchematicLink::updatePath(SchematicPort *startPort,
 
 //--------------------------------------------------------
 
+void SchematicLink::updateEndPos(const QPointF &endPos) {
+  if (m_startPort) updatePath(m_startPort->getLinkEndPoint(), endPos);
+}
+
+//--------------------------------------------------------
+
 SchematicPort *SchematicLink::getOtherPort(const SchematicPort *port) const {
   if (port == m_startPort)
     return m_endPort;
@@ -482,6 +564,12 @@ void SchematicLink::mousePressEvent(QGraphicsSceneMouseEvent *me) {
   QPointF pos              = me->scenePos();
   SchematicPort *startPort = getStartPort();
   SchematicPort *endPort   = getEndPort();
+
+  if (!startPort || !endPort) {
+    me->ignore();
+    return;
+  }
+
   if (startPort && endPort) {
     QRectF startRect = startPort->boundingRect();
     startRect.moveTopLeft(startPort->scenePos());
@@ -553,7 +641,6 @@ SchematicPort::SchematicPort(QGraphicsItem *parent, SchematicNode *node,
     , m_node(node)
     , m_buttonState(Qt::NoButton)
     , m_highlighted(false)
-    , m_ghostLink(0)
     , m_linkingTo(0)
     , m_hook(0, 0)
     , m_type(type) {
@@ -574,27 +661,28 @@ SchematicPort::~SchematicPort() { m_links.clear(); }
 
 void SchematicPort::mouseMoveEvent(QGraphicsSceneMouseEvent *me) {
   if (m_buttonState != Qt::LeftButton) return;
-  if (!m_ghostLink) return;
+  if (m_ghostLinks.isEmpty()) return;
 
-  if (m_linkingTo) {
-    showSnappedLinks();
-    m_linkingTo = 0;
-  }
   // Snapping
   SchematicPort *linkingTo = searchPort(me->scenePos());
   if (!linkingTo) {
+    for (SchematicLink *ghostLink : m_ghostLinks) {
+      ghostLink->updateEndPos(me->scenePos());
+      ghostLink->getStartPort()->showSnappedLinks(m_linkingTo);
+    }
     if (m_linkingTo) {
       m_linkingTo->highLight(false);
       m_linkingTo->update();
+      m_linkingTo = nullptr;
     }
-    m_ghostLink->updatePath(this->getLinkEndPoint(), me->scenePos());
-    m_linkingTo = linkingTo;
   }
   // if to be connected something
   else if (linkingTo != this) {
-    m_ghostLink->updatePath(this, linkingTo);
     m_linkingTo = linkingTo;
-    hideSnappedLinks();
+    for (SchematicLink *ghostLink : m_ghostLinks) {
+      ghostLink->updatePath(ghostLink->getStartPort(), linkingTo);
+      ghostLink->getStartPort()->hideSnappedLinks(m_linkingTo);
+    }
   }
   // autopan
   QGraphicsView *viewer = scene()->views()[0];
@@ -626,9 +714,32 @@ void SchematicPort::mousePressEvent(QGraphicsSceneMouseEvent *me) {
     m_buttonState = Qt::LeftButton;
     QPointF endPos(me->pos());
 
-    m_ghostLink = new SchematicLink(0, scene());
-    m_ghostLink->setZValue(3.0);
-    m_ghostLink->updatePath(this->getLinkEndPoint(), me->scenePos());
+    // Enable to connect multiple links from all selected nodes
+    // only when ( Ctrl + ) dragging from the eStageParentPort.
+    if (getType() == 101) {  // eStageParentPort
+      QList<QGraphicsItem *> items = scene()->selectedItems();
+      if (items.empty()) return;
+      for (auto const &item : items) {
+        SchematicNode *node = dynamic_cast<SchematicNode *>(item);
+        if (node) {
+          SchematicPort *parentPort =
+              node->getPort(0);  // id 0 is for parent port.
+          if (parentPort) {
+            SchematicLink *ghostLink = new SchematicLink(0, scene());
+            ghostLink->setStartPort(parentPort);
+            ghostLink->setZValue(3.0);
+            ghostLink->updateEndPos(me->scenePos());
+            m_ghostLinks.push_back(ghostLink);
+          }
+        }
+      }
+    } else {
+      SchematicLink *ghostLink = new SchematicLink(0, scene());
+      ghostLink->setStartPort(this);
+      ghostLink->setZValue(3.0);
+      ghostLink->updateEndPos(me->scenePos());
+      m_ghostLinks.push_back(ghostLink);
+    }
     emit(isClicked());
   }
 }
@@ -639,22 +750,39 @@ void SchematicPort::mouseReleaseEvent(QGraphicsSceneMouseEvent *me) {
   if (me->modifiers() != Qt::ControlModifier && me->button() != Qt::RightButton)
     QGraphicsItem::mouseReleaseEvent(me);
 
-  if (m_ghostLink) m_ghostLink->hide();
-
   if (m_buttonState == Qt::LeftButton) emit(isReleased(me->scenePos()));
 
   // The link is added to the scene only if the user released the left mouse
   // button over
   // a SchematicPort different from SchematicPort of the parent node.
-  if (m_buttonState == Qt::LeftButton && m_linkingTo &&
-      !isLinkedTo(m_linkingTo) && linkTo(m_linkingTo, true)) {
-    linkTo(m_linkingTo);
+  bool somethingChanged = false;
+  if (m_buttonState == Qt::LeftButton && m_linkingTo) {
+    TUndoManager::manager()->beginBlock();
+    for (SchematicLink *ghostLink : m_ghostLinks) {
+      SchematicPort *port = ghostLink->getStartPort();
+      if (!port) continue;
+      if (!port->isLinkedTo(m_linkingTo) && port->linkTo(m_linkingTo, true)) {
+        port->linkTo(m_linkingTo);
+        somethingChanged = true;
+      } else
+        port->showSnappedLinks(m_linkingTo);
+    }
     m_buttonState = Qt::NoButton;
     m_linkingTo   = 0;
+    TUndoManager::manager()->endBlock();
+  }
+
+  if (!m_ghostLinks.isEmpty()) {
+    for (SchematicLink *ghostLink : m_ghostLinks)
+      scene()->removeItem(ghostLink);
+    qDeleteAll(m_ghostLinks.begin(), m_ghostLinks.end());
+    m_ghostLinks.clear();
+  }
+
+  if (somethingChanged) {
     emit sceneChanged();
     emit xsheetChanged();
-  } else
-    showSnappedLinks();
+  }
 }
 
 //--------------------------------------------------------

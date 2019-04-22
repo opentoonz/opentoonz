@@ -104,7 +104,6 @@ public:
     ANIM_SR_CYCLE
   };
   enum { TOP_YOUNGER, TOP_OLDER, TOP_SMALLER, TOP_BIGGER, TOP_RANDOM };
-  enum { CTRL_NONE = -1, CTRL_1, CTRL_2 };
 
 public:
   ParticlesFx();

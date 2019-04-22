@@ -73,12 +73,13 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_tabletEvent, m_tabletMove;
   enum TabletState {
     None = 0,
-    Touched,
+    Touched,      // Pressed for mouse
     StartStroke,  // this state is to detect the first call
                   // of TabletMove just after TabletPress
     OnStroke,
     Released
-  } m_tabletState = None;
+  } m_tabletState = None,
+    m_mouseState  = None;
   // used to handle wrong mouse drag events!
   bool m_buttonClicked, m_toolSwitched;
   bool m_shownOnce                       = false;
@@ -168,9 +169,16 @@ class SceneViewer final : public GLWidgetForHighDpi,
 
   QMatrix4x4 m_projectionMatrix;
 
+  // Used for texture management.
+  // Changing dock / float state of the panel will alter the context.
+  // So discarding the resources in old context in initializeGL.
+  TGlContext m_currentContext;
+
+  // used for updating viewer where the animated guide appears
+  // updated in drawScene() and used in GLInvalidateRect()
+  TRectD m_guidedDrawingBBox;
+
 public:
-  // iwsw commented out temporarily
-  // Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
   enum ReferenceMode {
     NORMAL_REFERENCE   = 1,
     CAMERA3D_REFERENCE = 2,
@@ -367,8 +375,8 @@ protected:
   //! return the row of the drawings intersecting point \b p (used with onion
   //! skins)
   //! (window coordinate, pixels, bottom-left origin)
-  int posToRow(const TPointD &p, double distance,
-               bool includeInvisible = true) const override;
+  int posToRow(const TPointD &p, double distance, bool includeInvisible = true,
+               bool currentColumnOnly = false) const override;
 
   void dragEnterEvent(QDragEnterEvent *event) override;
   void dropEvent(QDropEvent *event) override;
@@ -380,6 +388,8 @@ protected:
   void set3DTopView();
 
   void setFocus() override { QWidget::setFocus(); };
+
+  void registerContext();
 
 public slots:
 
@@ -398,6 +408,7 @@ public slots:
   // for Ink&Paint work properly
   void onLevelSwitched();
   void onFrameSwitched();
+  void onOnionSkinMaskChanged() { GLInvalidateAll(); }
 
   void setReferenceMode(int referenceMode);
   void enablePreview(int previewMode);

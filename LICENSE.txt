@@ -1,5 +1,26 @@
-Copyright (c) 2016, DWANGO Co., Ltd.
+Some of code in this repository is derived from thirdparty libralies.
+For files in the "thirdparty" directory: Please consult with the licenses in the appropriate READMEs or source codes.
+For files in the "stuff/library/mypaint brushes" directory: Please see the licenses in stuff/library/mypaint brushes/Licenses.txt.
+
+- - - - - - - - - - - - - - - -
+
+OpenToonz
+
+All contributions by DWANGO:
+Copyright (c) 2016 - 2018, DWANGO Co., Ltd.
 All rights reserved.
+
+All other contributions:
+Copyright (c) 2016 - 2018, the respective contributors.
+All rights reserved.
+
+Each contributor holds copyright over their respective contributions.
+The project versioning (Git) records all such contribution source information.
+
+
+LICENSE
+
+BSD 3-Clause "New" or "Revised" License
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

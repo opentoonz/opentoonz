@@ -26,8 +26,9 @@ class RowArea final : public QWidget {
   enum ShowOnionToSetFlag {
     None = 0,
     Fos,
-    Mos
-  } m_showOnionToSet;  // TODO:明日はこれをFos,Mosどちらをハイライトしているのか判定させる！！！！
+    Mos,
+    ShiftTraceGhost
+  } m_showOnionToSet;
 
   enum Direction { up = 0, down };
 
@@ -44,12 +45,15 @@ class RowArea final : public QWidget {
   bool m_isPanning;
 
   void drawRows(QPainter &p, int r0, int r1);
+  void drawPlayRangeBackground(QPainter &p, int r0, int r1);
   void drawPlayRange(QPainter &p, int r0, int r1);
   void drawCurrentRowGadget(QPainter &p, int r0, int r1);
+  void drawOnionSkinBackground(QPainter &p, int r0, int r1);
   void drawOnionSkinSelection(QPainter &p);
   void drawPinnedCenterKeys(QPainter &p, int r0, int r1);
   void drawCurrentTimeIndicator(QPainter &p);
   void drawCurrentTimeLine(QPainter &p);
+  void drawShiftTraceMarker(QPainter &p);
 
   DragTool *getDragTool() const;
   void setDragTool(DragTool *dragTool);

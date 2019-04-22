@@ -5,7 +5,7 @@
 
 #include <ctime>
 
-#include "brushtool.h"
+#include "toonzrasterbrushtool.h"
 #include "mypainttoonzbrush.h"
 #include "toonz/mypaintbrushstyle.h"
 #include <QElapsedTimer>
@@ -18,7 +18,9 @@ class TTileSetFullColor;
 class TTileSaverFullColor;
 class MyPaintToonzBrush;
 class FullColorBrushToolNotifier;
-namespace mypaint { class Brush; }
+namespace mypaint {
+class Brush;
+}
 
 //==============================================================
 
@@ -77,7 +79,7 @@ public:
   void onCanvasSizeChanged();
   void onColorStyleChanged();
 
-  TMyPaintBrushStyle* getBrushStyle();
+  TMyPaintBrushStyle *getBrushStyle();
 
 protected:
   TPropertyGroup m_prop;
@@ -97,7 +99,7 @@ protected:
   int m_minCursorThick, m_maxCursorThick;
 
   TPointD m_mousePos,  //!< Current mouse position, in world coordinates.
-          m_brushPos;  //!< World position the brush will be painted at.
+      m_brushPos;      //!< World position the brush will be painted at.
 
   TRasterP m_backUpRas;
   TRaster32P m_workRaster;

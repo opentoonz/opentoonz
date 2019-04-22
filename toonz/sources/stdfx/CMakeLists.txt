@@ -72,9 +72,10 @@ set(HEADERS
     iwa_fresnel.h
     iwa_pnperspectivefx.h
     iwa_soapbubblefx.h
-	iwa_bokehfx.h
-	iwa_timecodefx.h
-	iwa_bokehreffx.h
+    iwa_bokehfx.h
+    iwa_timecodefx.h
+    iwa_bokehreffx.h
+    iwa_textfx.h
 )
 
 set(SOURCES
@@ -250,12 +251,13 @@ set(SOURCES
     iwa_noise1234.cpp
     iwa_pnperspectivefx.cpp
     iwa_soapbubblefx.cpp
-	${SDKROOT}/kiss_fft130/kiss_fft.c
-	${SDKROOT}/kiss_fft130/tools/kiss_fftnd.c
-	iwa_bokehfx.cpp
-	iwa_timecodefx.cpp
-	iwa_bokehreffx.cpp
-	iwa_barreldistortfx.cpp
+    ${SDKROOT}/kiss_fft130/kiss_fft.c
+    ${SDKROOT}/kiss_fft130/tools/kiss_fftnd.c
+    iwa_bokehfx.cpp
+    iwa_timecodefx.cpp
+    iwa_bokehreffx.cpp
+    iwa_barreldistortfx.cpp
+    iwa_textfx.cpp
 )
 
 set(OBJCSOURCES

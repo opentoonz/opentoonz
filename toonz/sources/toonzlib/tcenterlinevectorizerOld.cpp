@@ -818,7 +818,7 @@ TPointD CenterLineVectorizer::computeCenter(Node *na, Node *nb, double &r) {
   TPointD d = pa-pb;
   if(fabs(d.x)>fabs(d.y))
 {
-          if(pa.x>pb.x) tswap(pa,pb);
+          if(pa.x>pb.x) std::swap(pa,pb);
           for(int x = pa.x; x<=pb.x; x++)
           {
                   int y = pa.y + (pb.y-pa.y)*(x-pa.x)/(pb.x-pa.x);
@@ -829,7 +829,7 @@ TPointD CenterLineVectorizer::computeCenter(Node *na, Node *nb, double &r) {
 }
   else
 {
-          if(pa.y>pb.y) tswap(pa,pb);
+          if(pa.y>pb.y) std::swap(pa,pb);
           for(int y = pa.y; y<=pb.y; y++)
           {
                   int x = pa.x + (pb.x-pa.x)*(y-pa.y)/(pb.y-pa.y);
@@ -863,8 +863,8 @@ Node *CenterLineVectorizer::findOtherSide(Node *node) {
   TPoint d1(tsign(dir.x), 0), d2(0, tsign(dir.y));
   int num = abs(dir.y), den = abs(dir.x);
   if (num > den) {
-    tswap(d1, d2);
-    tswap(num, den);
+    std::swap(d1, d2);
+    std::swap(num, den);
   }
   TPoint pos = pix->m_pos;
   int i;
@@ -1262,7 +1262,7 @@ void CenterLineVectorizer::traceLine(DataPixel *pix) {
         dpoints.push_back(point);
     }
 
-    tswap(naa, nbb);
+    std::swap(naa, nbb);
   }
   if (dpoints.size() == 0)
     naa->m_visited = nbb->m_visited = false;

@@ -541,7 +541,7 @@ if(BUILD_ENV_MSVC AND MSVC_VERSION EQUAL 1800)
 endif()
 
 # generate Qt translations and messages
-set(LANGUAGES japanese italian french spanish chinese german russian korean)
+set(LANGUAGES japanese italian french spanish chinese german russian korean czech)
 
 function(add_translation module)
     set(translation)
@@ -599,5 +599,9 @@ if(BUILD_ENV_APPLE)
         $<TARGET_FILE:executable>
     )
     # add capability for retina displays
-    set_target_properties(OpenToonz_1.2 PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
+    set_target_properties(OpenToonz PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
+endif()
+
+if(BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN)
+    add_subdirectory(xdg-data)
 endif()

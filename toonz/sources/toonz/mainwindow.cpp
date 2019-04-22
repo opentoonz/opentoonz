@@ -57,8 +57,6 @@
 #include <QPushButton>
 #include <QLabel>
 
-extern const char *applicationFullName;
-
 TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
 TEnv::IntVar FieldGuideToggleAction("FieldGuideToggleAction", 0);
@@ -348,12 +346,11 @@ void Room::load(const TFilePath &fp) {
       dynamic_cast<FlipBook *>(pane->widget())->setPoolIndex(index);
     }
 
-    /*-- もしRoomにComboViewerがロードされたら、centralWidgetとして登録する --*/
-    if (paneObjectName == "ComboViewer")
-      setCentralViewerPanel(qobject_cast<ComboViewerPanel *>(pane));
-
     settings.endGroup();
   }
+
+  // resolve resize events here to avoid unwanted minimize of floating viewer
+  qApp->processEvents();
 
   DockLayout::State state(geometries, settings.value("hierarchy").toString());
 
@@ -377,6 +374,9 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent,
     , m_saveSettingsOnQuit(true)
     , m_oldRoomIndex(0)
     , m_layoutName("") {
+  // store a main window pointer in advance of making its contents
+  TApp::instance()->setMainWindow(this);
+
   m_toolsActionGroup = new QActionGroup(this);
   m_toolsActionGroup->setExclusive(true);
   m_currentRoomsChoice = Preferences::instance()->getCurrentRoomChoice();
@@ -491,7 +491,7 @@ void MainWindow::changeWindowTitle() {
 
   if (name.isEmpty()) name = tr("Untitled");
 
-  name += " : " + QString::fromLatin1(applicationFullName);
+  name += " : " + QString::fromStdString(TEnv::getApplicationFullName());
 
   setWindowTitle(name);
 }
@@ -543,20 +543,6 @@ void MainWindow::refreshWriteSettings() { writeSettings(); }
 //-----------------------------------------------------------------------------
 
 void MainWindow::readSettings(const QString &argumentLayoutFileName) {
-  TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-  QSettings mySettings(toQString(fp), QSettings::IniFormat);
-  /*-- Palette-PageViewerのチップサイズのロード --*/
-  mySettings.beginGroup("PaletteChipSizes");
-  {
-    PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Palette =
-        mySettings.value("PaletteViewer", 2).toInt();
-    PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Cleanup =
-        mySettings.value("CleanupSettings", 0).toInt();
-    PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Studio =
-        mySettings.value("StudioPalette", 1).toInt();
-  }
-  mySettings.endGroup();
-
   QTabBar *roomTabWidget = m_topBar->getRoomTabWidget();
 
   /*-- Pageを追加すると同時にMenubarを追加する --*/
@@ -650,7 +636,7 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
   writeRoomList(rooms);
 
   // Imposto la stanza corrente
-  fp = ToonzFolder::getRoomsFile(currentRoomFileName);
+  TFilePath fp = ToonzFolder::getRoomsFile(currentRoomFileName);
   Tifstream is(fp);
   std::string currentRoomName;
   is >> currentRoomName;
@@ -667,38 +653,6 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
   }
 
   RecentFiles::instance()->loadRecentFiles();
-
-  QStringList roomNames;
-  roomNames << "InknPaint"
-            << "Cleanup"
-            << "PltEdit"
-            << "Schematic"
-            << "QAR";
-  /*--- ComboViewerのパーツのShow/Hideの再現 ---*/
-  mySettings.beginGroup("ComboViewerPartsVisible");
-  {
-    for (int r = 0; r < roomNames.size(); r++) {
-      QString tmpRoomName = roomNames.at(r);
-      Room *tmpRoom       = getRoomByName(tmpRoomName);
-      if (tmpRoom) {
-        ComboViewerPanel *cvp = tmpRoom->getCentralViewerPanel();
-        if (cvp) {
-          if (r == 0)  // InknPaintRoom
-            TApp::instance()->setInknPaintViewerPanel(cvp);
-          mySettings.beginGroup(tmpRoomName);
-          cvp->setShowHideFlag(CVPARTS_TOOLBAR,
-                               mySettings.value("Toolbar", true).toBool());
-          cvp->setShowHideFlag(CVPARTS_TOOLOPTIONS,
-                               mySettings.value("ToolOptions", true).toBool());
-          cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE,
-                               mySettings.value("Console", true).toBool());
-          cvp->updateShowHide();
-          mySettings.endGroup();
-        }
-      }
-    }
-  }
-  mySettings.endGroup();
 }
 
 //-----------------------------------------------------------------------------
@@ -742,56 +696,6 @@ void MainWindow::writeSettings() {
   QSettings settings(toQString(fp), QSettings::IniFormat);
 
   settings.setValue("MainWindowGeometry", saveGeometry());
-
-  // Recent Files
-  // RecentFiles::instance()->saveRecentFiles();
-
-  fp = ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName);
-  QSettings mySettings(toQString(fp), QSettings::IniFormat);
-
-  /*--- Palette-PageViewerのチップサイズの保存 ---*/
-  mySettings.beginGroup("PaletteChipSizes");
-  {
-    mySettings.setValue(
-        "PaletteViewer",
-        PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Palette);
-    mySettings.setValue(
-        "CleanupSettings",
-        PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Cleanup);
-    mySettings.setValue(
-        "StudioPalette",
-        PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Studio);
-  }
-  mySettings.endGroup();
-
-  QStringList roomNames;
-  roomNames << "InknPaint"
-            << "Cleanup"
-            << "PltEdit"
-            << "Schematic"
-            << "QAR";
-  /*--- ComboViewerのパーツのShow/Hideの保存 ---*/
-  mySettings.beginGroup("ComboViewerPartsVisible");
-  {
-    for (int r = 0; r < roomNames.size(); r++) {
-      QString tmpRoomName = roomNames.at(r);
-      Room *tmpRoom       = getRoomByName(tmpRoomName);
-      if (tmpRoom) {
-        ComboViewerPanel *cvp = tmpRoom->getCentralViewerPanel();
-        if (cvp) {
-          mySettings.beginGroup(tmpRoomName);
-          mySettings.setValue("Toolbar", cvp->getShowHideFlag(CVPARTS_TOOLBAR));
-          mySettings.setValue("ToolOptions",
-                              cvp->getShowHideFlag(CVPARTS_TOOLOPTIONS));
-          mySettings.setValue("Console",
-                              cvp->getShowHideFlag(CVPARTS_FLIPCONSOLE));
-          cvp->updateShowHide();
-          mySettings.endGroup();
-        }
-      }
-    }
-  }
-  mySettings.endGroup();
 }
 
 //-----------------------------------------------------------------------------
@@ -811,15 +715,9 @@ Room *MainWindow::createCleanupRoom() {
     cleanupRoom->addDockWidget(viewer);
     layout->dockItem(viewer);
     ComboViewerPanel *cvp = qobject_cast<ComboViewerPanel *>(viewer);
-    if (cvp) {
-      /*- UI隠す -*/
-      cvp->setShowHideFlag(CVPARTS_TOOLBAR, false);
-      cvp->setShowHideFlag(CVPARTS_TOOLOPTIONS, false);
-      cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE, false);
-      cvp->updateShowHide();
-
-      cleanupRoom->setCentralViewerPanel(cvp);
-    }
+    if (cvp)
+      // hide all parts
+      cvp->setVisiblePartsFlag(CVPARTS_None);
   }
 
   // CleanupSettings
@@ -858,11 +756,7 @@ Room *MainWindow::createPltEditRoom() {
     layout->dockItem(viewer);
 
     ComboViewerPanel *cvp = qobject_cast<ComboViewerPanel *>(viewer);
-    if (cvp) {
-      cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE, false);
-      cvp->updateShowHide();
-      pltEditRoom->setCentralViewerPanel(cvp);
-    }
+    if (cvp) cvp->setVisiblePartsFlag(CVPARTS_TOOLBAR | CVPARTS_TOOLOPTIONS);
   }
 
   // Palette
@@ -914,12 +808,6 @@ Room *MainWindow::createInknPaintRoom() {
   if (viewer) {
     inknPaintRoom->addDockWidget(viewer);
     layout->dockItem(viewer);
-
-    ComboViewerPanel *cvp = qobject_cast<ComboViewerPanel *>(viewer);
-    if (cvp) {
-      inknPaintRoom->setCentralViewerPanel(cvp);
-      TApp::instance()->setInknPaintViewerPanel(cvp);
-    }
   }
 
   // Palette
@@ -1722,7 +1610,7 @@ void MainWindow::defineActions() {
   createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "Ctrl+Shift+G");
   createMenuEditAction(MI_BringToFront, tr("&Bring to Front"), "Ctrl+]");
   createMenuEditAction(MI_BringForward, tr("&Bring Forward"), "]");
-  createMenuEditAction(MI_SendBack, tr("&Send Back"), "Ctrl+[");
+  createMenuEditAction(MI_SendBack, tr("&Send to Back"), "Ctrl+[");
   createMenuEditAction(MI_SendBackward, tr("&Send Backward"), "[");
   createMenuEditAction(MI_EnterGroup, tr("&Enter Group"), "");
   createMenuEditAction(MI_ExitGroup, tr("&Exit Group"), "");
@@ -1953,11 +1841,18 @@ void MainWindow::defineActions() {
                MenuViewCommandType);
   createToggle(MI_ACheck, tr("&Gap Check"), "", ACheckToggleAction ? 1 : 0,
                MenuViewCommandType);
-  createToggle(MI_ShiftTrace, tr("Shift and Trace"), "", false,
-               MenuViewCommandType);
-  createToggle(MI_EditShift, tr("Edit Shift"), "", false, MenuViewCommandType);
+  QAction *shiftTraceAction = createToggle(MI_ShiftTrace, tr("Shift and Trace"),
+                                           "", false, MenuViewCommandType);
+  shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace.svg"));
+  shiftTraceAction = createToggle(MI_EditShift, tr("Edit Shift"), "", false,
+                                  MenuViewCommandType);
+  shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace_edit.svg"));
   createToggle(MI_NoShift, tr("No Shift"), "", false, MenuViewCommandType);
-  createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
+  CommandManager::instance()->enable(MI_EditShift, false);
+  CommandManager::instance()->enable(MI_NoShift, false);
+  shiftTraceAction =
+      createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
+  shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace_reset.svg"));
 
   if (QGLPixelBuffer::hasOpenGLPbuffers())
     createToggle(MI_RasterizePli, tr("&Visualize Vector As Raster"), "",
@@ -2036,6 +1931,7 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenLineTestView, tr("&LineTest Viewer"), "");
 #endif
   createMenuWindowsAction(MI_OpenXshView, tr("&Xsheet"), "");
+  createMenuWindowsAction(MI_OpenTimelineView, tr("&Timeline"), "");
   //  createAction(MI_TestAnimation,     "Test Animation",   "Ctrl+Return");
   //  createAction(MI_Export,            "Export",           "Ctrl+E");
 
@@ -2115,6 +2011,23 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_ResetInterpolation, tr("Reset Interpolation"),
                              "");
 
+  createRightClickMenuAction(MI_UseLinearInterpolation,
+                             tr("Linear Interpolation"), "");
+  createRightClickMenuAction(MI_UseSpeedInOutInterpolation,
+                             tr("Speed In / Speed Out Interpolation"), "");
+  createRightClickMenuAction(MI_UseEaseInOutInterpolation,
+                             tr("Ease In / Ease Out Interpolation"), "");
+  createRightClickMenuAction(MI_UseEaseInOutPctInterpolation,
+                             tr("Ease In / Ease Out (%) Interpolation"), "");
+  createRightClickMenuAction(MI_UseExponentialInterpolation,
+                             tr("Exponential Interpolation"), "");
+  createRightClickMenuAction(MI_UseExpressionInterpolation,
+                             tr("Expression Interpolation"), "");
+  createRightClickMenuAction(MI_UseFileInterpolation, tr("File Interpolation"),
+                             "");
+  createRightClickMenuAction(MI_UseConstantInterpolation,
+                             tr("Constant Interpolation"), "");
+
   createRightClickMenuAction(MI_FoldColumns, tr("Fold Column"), "");
 
   createRightClickMenuAction(MI_ActivateThisColumnOnly, tr("Show This Only"),
@@ -2147,6 +2060,8 @@ void MainWindow::defineActions() {
   /*-- カレントカラムの右側のカラムを全て非表示にするコマンド --*/
   createRightClickMenuAction(MI_DeactivateUpperColumns,
                              tr("Hide Upper Columns"), "");
+
+  createRightClickMenuAction(MI_SeparateColors, tr("Separate Colors..."), "");
 
   createToolAction(T_Edit, "edit", tr("Animate Tool"), "A");
   createToolAction(T_Selection, "selection", tr("Selection Tool"), "S");
@@ -2182,7 +2097,7 @@ void MainWindow::defineActions() {
   createViewerAction(V_ZoomReset, tr("Reset View"), "Alt+0");
   createViewerAction(V_ZoomFit, tr("Fit to Window"), "Alt+9");
   createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
-  createViewerAction(V_FlipX, tr("Flip Viewer Horiontally"), "");
+  createViewerAction(V_FlipX, tr("Flip Viewer Horizontally"), "");
   createViewerAction(V_FlipY, tr("Flip Viewer Vertically"), "");
   createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"),
                      "Alt+F");
@@ -2415,9 +2330,9 @@ RecentFiles::~RecentFiles() {}
 
 void RecentFiles::addFilePath(QString path, FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
     if (files.at(i) == path) files.removeAt(i);
@@ -2542,9 +2457,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2571,9 +2486,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene)
-            ? MI_ClearRecentScene
-            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
+                                                        ? MI_ClearRecentLevel
+                                                        : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

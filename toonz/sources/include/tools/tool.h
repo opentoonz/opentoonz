@@ -607,7 +607,8 @@ public:
   //! onionskins)
   //! (window coordinate, pixels, bottom-left origin)
   virtual int posToRow(const TPointD &p, double distance,
-                       bool includeInvisible = true) const = 0;
+                       bool includeInvisible  = true,
+                       bool currentColumnOnly = false) const = 0;
 
   //! return pos in pixel, bottom-left origin
   virtual TPointD worldToPos(const TPointD &worldPos) const = 0;

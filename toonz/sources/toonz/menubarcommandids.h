@@ -108,6 +108,7 @@
 #define MI_Binarize "MI_Binarize"
 #define MI_LinesFade "MI_LinesFade"
 #define MI_OpenXshView "MI_OpenXshView"
+#define MI_OpenTimelineView "MI_OpenTimelineView"
 #define MI_OpenMessage "MI_OpenMessage"
 #define MI_OpenTest "MI_OpenTest"
 #define MI_OpenTasks "MI_OpenTasks"
@@ -228,6 +229,7 @@
 #define MI_OpenFunctionEditor "MI_OpenFunctionEditor"
 #define MI_OpenLevelView "MI_OpenLevelView"
 #define MI_OpenXshView "MI_OpenXshView"
+#define MI_OpenTimelineView "MI_OpenTimelineView"
 #define MI_OpenCleanupSettings "MI_OpenCleanupSettings"
 #define MI_ResetRoomLayout "MI_ResetRoomLayout"
 #define MI_MaximizePanel "MI_MaximizePanel"
@@ -274,6 +276,15 @@
 #define MI_SetDeceleration "MI_SetDeceleration"
 #define MI_SetConstantSpeed "MI_SetConstantSpeed"
 #define MI_ResetInterpolation "MI_ResetInterpolation"
+
+#define MI_UseLinearInterpolation "MI_UseLinearInterpolation"
+#define MI_UseSpeedInOutInterpolation "MI_UseSpeedInOutInterpolation"
+#define MI_UseEaseInOutInterpolation "MI_UseEaseInOutInterpolation"
+#define MI_UseEaseInOutPctInterpolation "MI_UseEaseInOutPctInterpolation"
+#define MI_UseExponentialInterpolation "MI_UseExponentialInterpolation"
+#define MI_UseExpressionInterpolation "MI_UseExpressionInterpolation"
+#define MI_UseFileInterpolation "MI_UseFileInterpolation"
+#define MI_UseConstantInterpolation "MI_UseConstantInterpolation"
 
 #define MI_ActivateThisColumnOnly "MI_ActivateThisColumnOnly"
 #define MI_ActivateSelectedColumns "MI_ActivateSelectedColumns"
@@ -331,5 +342,6 @@
 #define MI_LipSyncPopup "MI_LipSyncPopup"
 #define MI_AutoInputCellNumber "MI_AutoInputCellNumber"
 #define MI_TouchGestureControl "MI_TouchGestureControl"
+#define MI_SeparateColors "MI_SeparateColors"
 
 #endif

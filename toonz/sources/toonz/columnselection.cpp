@@ -16,6 +16,7 @@
 #include "toonz/txshleveltypes.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshcell.h"
+#include "toonz/levelproperties.h"
 #include "orientation.h"
 
 // TnzCore includes
@@ -65,21 +66,26 @@ bool TColumnSelection::isEmpty() const { return m_indices.empty(); }
 void TColumnSelection::copyColumns() { ColumnCmd::copyColumns(m_indices); }
 
 //-----------------------------------------------------------------------------
-
-void TColumnSelection::pasteColumns() { ColumnCmd::pasteColumns(m_indices); }
+// pasteColumns will insert columns before the first column in the selection
+void TColumnSelection::pasteColumns() {
+  std::set<int> indices;
+  if (isEmpty())  // in case that no columns are selected
+    indices.insert(0);
+  else
+    indices.insert(*m_indices.begin());
+  ColumnCmd::pasteColumns(indices);
+}
 
 //-----------------------------------------------------------------------------
-
+// pasteColumnsAbove will insert columns after the last column in the selection
 void TColumnSelection::pasteColumnsAbove() {
   std::set<int> indices;
-  std::set<int>::iterator it;
-
-  for (it = m_indices.begin(); it != m_indices.end(); it++) {
-    int newIdx = *it + 1;
-    indices.insert(newIdx);
-  }
-
-  ColumnCmd::pasteColumns(indices, 0);
+  if (isEmpty()) {  // in case that no columns are selected
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    indices.insert(xsh->getFirstFreeColumnIndex());
+  } else
+    indices.insert(*m_indices.rbegin() + 1);
+  ColumnCmd::pasteColumns(indices);
 }
 
 //-----------------------------------------------------------------------------
@@ -123,6 +129,9 @@ void TColumnSelection::explodeChild() {
 
 static bool canMergeColumns(int column, int mColumn, bool forMatchlines) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+
+  if (xsh->getColumn(column)->isLocked()) return false;
+
   int start, end;
   xsh->getCellRange(column, start, end);
 
@@ -159,6 +168,13 @@ static bool canMergeColumns(int column, int mColumn, bool forMatchlines) {
       if (level->getType() != mLevel->getType()) return false;
       if (level->getType() != PLI_XSHLEVEL && level->getType() != OVL_XSHLEVEL)
         return false;
+      // Check level type write support. Based on TTool::updateEnabled()
+      if (level->getType() == OVL_XSHLEVEL &&
+          (level->getPath().getType() == "psd" ||     // PSD files.
+           level->is16BitChannelLevel() ||            // 16bpc images.
+           level->getProperties()->getBpp() == 1)) {  // Black & White images.
+        return false;
+      }
     }
   }
   return true;

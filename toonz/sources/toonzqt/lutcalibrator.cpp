@@ -321,10 +321,10 @@ void LutCalibrator::onEndDraw(QOpenGLFramebufferObject* fbo) {
   GLuint textureId = fbo->texture();
 
   glEnable(GL_TEXTURE_2D);
-  glActiveTexture(GL_TEXTURE4);
+  glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, textureId);
 
-  glActiveTexture(GL_TEXTURE5);
+  glActiveTexture(GL_TEXTURE2);
   m_lutTex->bind();
 
   glPushMatrix();
@@ -332,9 +332,9 @@ void LutCalibrator::onEndDraw(QOpenGLFramebufferObject* fbo) {
 
   m_shader.program->bind();
   m_shader.program->setUniformValue(m_shader.texUniform,
-                                    4);  // use texture unit 4
+                                    1);  // use texture unit 1
   m_shader.program->setUniformValue(m_shader.lutUniform,
-                                    5);  // use texture unit 5
+                                    2);  // use texture unit 2
   GLfloat size = (GLfloat)LutManager::instance()->meshSize();
   m_shader.program->setUniformValue(m_shader.lutSizeUniform, size, size, size);
 
@@ -355,6 +355,8 @@ void LutCalibrator::onEndDraw(QOpenGLFramebufferObject* fbo) {
   m_shader.program->release();
 
   glPopMatrix();
+
+  glActiveTexture(GL_TEXTURE0);  // reset the active texture unit to 0
   glDisable(GL_TEXTURE_2D);
 
   assert((glGetError()) == GL_NO_ERROR);

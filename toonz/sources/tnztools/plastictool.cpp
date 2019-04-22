@@ -997,9 +997,13 @@ void PlasticTool::onDeactivate() {
   assert(ret);
 
   Viewer *viewer = getViewer();
-  if (viewer)
+  if (viewer) {
     viewer->visualSettings().m_plasticVisualSettings = PlasticVisualSettings();
-
+    // Only the mesh visibility is not reset in order to enable to keep the mesh
+    // hidden while using other tools
+    viewer->visualSettings().m_plasticVisualSettings.m_drawMeshesWireframe =
+        m_pvs.m_drawMeshesWireframe;
+  }
   m_sd = PlasticSkeletonDeformationP();
 }
 

@@ -446,10 +446,26 @@ public:
 
   std::string getAlias(double frame,
                        const TRenderSettings &info) const override {
+    std::string alias = getFxType();
+    alias += "[";
+
+    // alias of the effects related to the input ports separated by commas
+    // a port that is not connected to an alias blank (empty string)
+    int i;
+    for (i = 0; i < getInputPortCount(); i++) {
+      TFxPort *port = getInputPort(i);
+      if (port->isConnected()) {
+        TRasterFxP ifx = port->getFx();
+        assert(ifx);
+        alias += ifx->getAlias(frame, info);
+      }
+      alias += ",";
+    }
+
     unsigned long id = getIdentifier();
     double value     = m_intensity->getValue(frame);
-    return getFxType() + "[" + std::to_string(id) + "," +
-           std::to_string(frame) + "," + std::to_string(value) + "]";
+    return alias + std::to_string(id) + "," + std::to_string(frame) + "," +
+           std::to_string(value) + "]";
   }
 };
 

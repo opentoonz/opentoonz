@@ -204,17 +204,17 @@ namespace {
 QString getStatusString(TaskState status) {
   switch (status) {
   case Suspended:
-    return "Suspended";
+    return TaskSheet::tr("Suspended");
   case Waiting:
-    return "Waiting";
+    return TaskSheet::tr("Waiting");
   case Running:
-    return "Running";
+    return TaskSheet::tr("Running");
   case Completed:
-    return "Completed";
+    return TaskSheet::tr("Completed");
   case Aborted:
-    return "Failed";
+    return TaskSheet::tr("Failed");
   case TaskUnknown:
-    return "TaskUnknown";
+    return TaskSheet::tr("TaskUnknown");
   }
   return "";
 }

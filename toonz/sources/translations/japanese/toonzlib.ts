@@ -428,6 +428,14 @@
         <source>Rename Studio Palette : %1 &gt; %2</source>
         <translation>スタジオパレットをリネーム : %1 &gt; %2</translation>
     </message>
+    <message>
+        <source>Xsheet</source>
+        <translation>タイムシート</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation>タイムライン</translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

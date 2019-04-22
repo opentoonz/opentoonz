@@ -81,9 +81,6 @@ class TApp final : public QObject,
 
   QMainWindow *m_mainWindow;
 
-  // keep a pointer of the inknpaint viewer in order to enable navigator pan in
-  // the filmstrip
-  ComboViewerPanel *m_inknPaintViewerPanel;
   SceneViewer *m_activeViewer;
   XsheetViewer *m_xsheetViewer;
 
@@ -190,16 +187,11 @@ public:
 
   QString getCurrentRoomName() const;
 
-  // keep a pointer of the inknpaint viewer in order to enable navigator pan in
-  // the filmstrip
-  void setInknPaintViewerPanel(ComboViewerPanel *panel) {
-    m_inknPaintViewerPanel = panel;
+  void setActiveViewer(SceneViewer *viewer) {
+    if (m_activeViewer == viewer) return;
+    m_activeViewer = viewer;
+    emit activeViewerChanged();
   }
-  ComboViewerPanel *getInknPaintViewerPanel() const {
-    return m_inknPaintViewerPanel;
-  }
-
-  void setActiveViewer(SceneViewer *viewer) { m_activeViewer = viewer; }
 
   SceneViewer *getActiveViewer() const { return m_activeViewer; }
 
@@ -254,6 +246,9 @@ signals:
   // NOTE: For now QEvent::TabletLeaveProximity is NOT detected on Windows. See
   // QTBUG-53628.
   void tabletLeft();
+
+  void
+  activeViewerChanged();  // TODO: put widgets-related stuffs in some new handle
 };
 
 #endif  // TAPP_H

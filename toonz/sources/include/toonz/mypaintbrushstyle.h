@@ -43,63 +43,59 @@ public:
   TMyPaintBrushStyle(const TMyPaintBrushStyle &other);
   ~TMyPaintBrushStyle();
 
-  TColorStyle *clone() const override
-    { return new TMyPaintBrushStyle(*this); }
+  TColorStyle *clone() const override { return new TMyPaintBrushStyle(*this); }
 
   TColorStyle &copy(const TColorStyle &other) override;
 
   static std::string getBrushType();
   static TFilePathSet getBrushesDirs();
 
-  const TFilePath& getPath() const
-    { return m_path; }
-  const mypaint::Brush& getBrush() const
-    { return m_brushModified; }
-  const TRasterP& getPreview() const
-    { return m_preview; }
+  const TFilePath &getPath() const { return m_path; }
+  const mypaint::Brush &getBrush() const { return m_brushModified; }
+  const TRasterP &getPreview() const { return m_preview; }
 
-  TStrokeProp* makeStrokeProp(const TStroke * /* stroke */) override
-    { return 0; }
-  TRegionProp* makeRegionProp(const TRegion * /* region */) override
-    { return 0; }
-  bool isRegionStyle() const override
-    { return false; }
-  bool isStrokeStyle() const override
-    { return false; }
+  TStrokeProp *makeStrokeProp(const TStroke * /* stroke */) override {
+    return 0;
+  }
+  TRegionProp *makeRegionProp(const TRegion * /* region */) override {
+    return 0;
+  }
+  bool isRegionStyle() const override { return false; }
+  bool isStrokeStyle() const override { return true; }
 
-  bool hasMainColor() const override
-    { return true; }
-  TPixel32 getMainColor() const override
-    { return m_color; }
-  void setMainColor(const TPixel32 &color) override
-    { m_color = color; }
+  bool hasMainColor() const override { return true; }
+  TPixel32 getMainColor() const override { return m_color; }
+  void setMainColor(const TPixel32 &color) override { m_color = color; }
 
-  int getTagId() const override
-    { return 4001; }
+  int getTagId() const override { return 4001; }
 
   QString getDescription() const override;
 
   void setBaseValue(MyPaintBrushSetting id, bool enable, float value);
   void resetBaseValues();
 
-  void setBaseValue(MyPaintBrushSetting id, float value)
-    { setBaseValue(id, true, value); }
+  void setBaseValue(MyPaintBrushSetting id, float value) {
+    setBaseValue(id, true, value);
+  }
 
-  void setBaseValueEnabled(MyPaintBrushSetting id, bool enable)
-    { setBaseValue(id, enable, getBaseValue(id)); }
+  void setBaseValueEnabled(MyPaintBrushSetting id, bool enable) {
+    setBaseValue(id, enable, getBaseValue(id));
+  }
 
-  const std::map<MyPaintBrushSetting, float> getBaseValues() const
-    { return m_baseValues; }
+  const std::map<MyPaintBrushSetting, float> getBaseValues() const {
+    return m_baseValues;
+  }
 
   float getBaseValue(MyPaintBrushSetting id) const {
-    std::map<MyPaintBrushSetting, float>::const_iterator i = m_baseValues.find(id);
-    return i == m_baseValues.end()
-         ? m_brushOriginal.getBaseValue(id)
-         : i->second;
+    std::map<MyPaintBrushSetting, float>::const_iterator i =
+        m_baseValues.find(id);
+    return i == m_baseValues.end() ? m_brushOriginal.getBaseValue(id)
+                                   : i->second;
   }
 
   bool getBaseValueEnabled(MyPaintBrushSetting id) const {
-    std::map<MyPaintBrushSetting, float>::const_iterator i = m_baseValues.find(id);
+    std::map<MyPaintBrushSetting, float>::const_iterator i =
+        m_baseValues.find(id);
     return i != m_baseValues.end();
   }
 

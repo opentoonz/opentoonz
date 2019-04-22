@@ -289,7 +289,11 @@ public:
       , m_softness(softness)
       , m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize()) {
     m_rasId = QString("AntialiasUndo_") + QString::number(uintptr_t(this));
-    TImageCache::instance()->add(m_rasId, TRasterImageP(ras));
+    if ((TRasterCM32P)ras)
+      TImageCache::instance()->add(m_rasId,
+                                   TToonzImageP(ras, ras->getBounds()));
+    else
+      TImageCache::instance()->add(m_rasId, TRasterImageP(ras));
   }
 
   ~TRasterAntialiasUndo() { TImageCache::instance()->remove(m_rasId); }
@@ -311,7 +315,6 @@ public:
           ((TToonzImageP)TImageCache::instance()->get(m_rasId, true))
               ->getRaster()
               ->clone());
-
     TXshSimpleLevel *simpleLevel = cell.getSimpleLevel();
     assert(simpleLevel);
     simpleLevel->touchFrame(cell.getFrameId());
@@ -324,10 +327,12 @@ public:
   }
 
   void redo() const override {
-    TXsheet *xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
-    TXshCell cell   = xsheet->getCell(m_r, m_c);
-    TImageP image   = (TRasterImageP)cell.getImage(true);
-    if (!image) return;
+    TXsheet *xsheet    = TApp::instance()->getCurrentXsheet()->getXsheet();
+    TXshCell cell      = xsheet->getCell(m_r, m_c);
+    TImageP image      = cell.getImage(true);
+    TRasterImageP rimg = (TRasterImageP)image;
+    TToonzImageP timg  = (TToonzImageP)image;
+    if (!rimg && !timg) return;
     TRasterP ras = image->raster();
     if (!ras) return;
 
@@ -343,6 +348,8 @@ public:
   }
 
   int getSize() const override { return sizeof(*this) + m_rasSize; }
+
+  QString getHistoryString() override { return QObject::tr("Apply Antialias"); }
 };
 
 //-----------------------------------------------------------------------------

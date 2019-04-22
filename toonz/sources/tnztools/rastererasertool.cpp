@@ -4,7 +4,6 @@
 #include "tools/toolutils.h"
 #include "tools/cursors.h"
 #include "tools/tool.h"
-#include "tools/toolutils.h"
 #include "tools/toolhandle.h"
 
 #include "bluredbrush.h"
@@ -761,7 +760,7 @@ void EraserTool::multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFid,
                              TRectD lastRect) {
   bool backward = false;
   if (firstFid > lastFid) {
-    tswap(firstFid, lastFid);
+    std::swap(firstFid, lastFid);
     backward = true;
   }
   assert(firstFid <= lastFid);
@@ -980,15 +979,15 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     TPointD rasCenter = ti->getRaster()->getCenterD();
     if (m_eraseType.getValue() == RECTERASE) {
       TRectD oldRect = m_selectingRect;
-      if (oldRect.x0 > oldRect.x1) tswap(oldRect.x1, oldRect.x0);
-      if (oldRect.y0 > oldRect.y1) tswap(oldRect.y1, oldRect.y0);
+      if (oldRect.x0 > oldRect.x1) std::swap(oldRect.x1, oldRect.x0);
+      if (oldRect.y0 > oldRect.y1) std::swap(oldRect.y1, oldRect.y0);
       m_selectingRect.x1 = pos.x;
       m_selectingRect.y1 = pos.y;
       invalidateRect     = m_selectingRect;
       if (invalidateRect.x0 > invalidateRect.x1)
-        tswap(invalidateRect.x1, invalidateRect.x0);
+        std::swap(invalidateRect.x1, invalidateRect.x0);
       if (invalidateRect.y0 > invalidateRect.y1)
-        tswap(invalidateRect.y1, invalidateRect.y0);
+        std::swap(invalidateRect.y1, invalidateRect.y0);
       invalidateRect += oldRect;
       invalidate(invalidateRect.enlarge(2));
     }
@@ -1005,8 +1004,8 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
           intPos = TThickPoint(pp + convert(ti->getRaster()->getCenter()),
                                m_toolSize.getValue() - 1);
 
-        bool isAdded = m_normalEraser->add(intPos);
-        if (ti && isAdded) {
+        m_normalEraser->add(intPos);
+        if (ti) {
           m_tileSaver->save(m_normalEraser->getLastRect());
           m_normalEraser->generateLastPieceOfStroke(
               m_pencil.getValue() || m_colorType.getValue() == AREAS);
@@ -1113,9 +1112,9 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   if (TToonzImageP ti = image) {
     if (m_eraseType.getValue() == RECTERASE) {
       if (m_selectingRect.x0 > m_selectingRect.x1)
-        tswap(m_selectingRect.x1, m_selectingRect.x0);
+        std::swap(m_selectingRect.x1, m_selectingRect.x0);
       if (m_selectingRect.y0 > m_selectingRect.y1)
-        tswap(m_selectingRect.y1, m_selectingRect.y0);
+        std::swap(m_selectingRect.y1, m_selectingRect.y0);
 
       if (m_multi.getValue()) {
         TTool::Application *app = TTool::getApplication();
@@ -1560,7 +1559,7 @@ void EraserTool::multiAreaEraser(const TXshSimpleLevelP &sl, TFrameId &firstFid,
 
   bool backward = false;
   if (firstFid > lastFid) {
-    tswap(firstFid, lastFid);
+    std::swap(firstFid, lastFid);
     backward = true;
   }
   assert(firstFid <= lastFid);

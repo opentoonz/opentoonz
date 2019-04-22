@@ -79,6 +79,7 @@ public:
   // Used only for translation in Qt
   QString getQStringName() const { return m_qstringName; }
   void setQStringName(const QString &str) { m_qstringName = str; }
+  virtual void assignUIName(TProperty *refP);
 
   std::string getName() const { return m_name; }
   virtual std::string getValueAsString() = 0;
@@ -398,6 +399,8 @@ public:
   static void enableRangeSaving(bool on);
   static bool isRangeSavingEnabled();
 
+  void assignUIName(TProperty *refP) override;
+
 private:
   Range m_range;
   Items m_items;
@@ -441,6 +444,11 @@ public:
   void saveData(TOStream &os) const;
 
   void clear();
+
+  // for adding translation to file writers properties
+  virtual void updateTranslation(){};
+
+  void assignUINames(TPropertyGroup *refPg);
 
 private:
   PropertyTable m_table;

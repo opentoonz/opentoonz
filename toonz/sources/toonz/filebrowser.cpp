@@ -18,7 +18,6 @@
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/menubarcommand.h"
-#include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/trepetitionguard.h"
 
@@ -1086,6 +1085,10 @@ TSystem::renameFile(newFolder, folder);
 //-----------------------------------------------------------------------------
 
 QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
+  auto isOldLevelType = [](TFilePath &path) -> bool {
+    return path.getType() == "tzp" || path.getType() == "tzu";
+  };
+
   bool ret = true;
 
   // TODO: spostare in questa classe anche la definizione delle azioni?
@@ -1180,17 +1183,24 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
   if (i == files.size()) {
     std::string type = files[0].getType();
     for (j = 0; j < files.size(); j++)
-      if (files[j].getType() == "tzp" || files[j].getType() == "tzu") break;
+      if (isOldLevelType(files[j])) break;
     if (j == files.size()) menu->addAction(cm->getAction(MI_ViewFile));
-    for (j = 0; j < files.size(); j++)
+
+    for (j = 0; j < files.size(); j++) {
       if ((files[0].getType() == "pli" && files[j].getType() != "pli") ||
           (files[0].getType() != "pli" && files[j].getType() == "pli"))
         break;
+      else if ((isOldLevelType(files[0]) && !isOldLevelType(files[j])) ||
+               (!isOldLevelType(files[0]) && isOldLevelType(files[j])))
+        break;
+    }
     if (j == files.size()) {
       menu->addAction(cm->getAction(MI_ConvertFiles));
       // iwsw commented out temporarily
       // menu->addAction(cm->getAction(MI_ToonShadedImageToTLV));
     }
+    if (areFullcolor) menu->addAction(cm->getAction(MI_SeparateColors));
+
     if (!areFullcolor) menu->addSeparator();
   }
   if (files.size() == 1 && files[0].getType() != "tnz") {
@@ -1567,7 +1577,7 @@ bool FileBrowser::drop(const QMimeData *mimeData) {
     return true;
   } else if (mimeData->hasUrls()) {
     int count = 0;
-    foreach (QUrl url, mimeData->urls()) {
+    for (const QUrl &url : mimeData->urls()) {
       TFilePath srcFp(url.toLocalFile().toStdWString());
       TFilePath dstFp = srcFp.withParentDir(folderPath);
       if (dstFp != srcFp) {

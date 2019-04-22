@@ -83,6 +83,10 @@
         <source>Rotation:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
@@ -92,7 +96,7 @@
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>Dureté:</translation>
+        <translation type="vanished">Dureté:</translation>
     </message>
     <message>
         <source>Accuracy:</source>
@@ -136,10 +140,6 @@
     </message>
     <message>
         <source>Break</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pencil</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -218,22 +218,6 @@
         <source>Med</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Draw Order:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Over All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Under All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Palette Order</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>
@@ -266,6 +250,13 @@
     <message>
         <source>Set Nonlinear Control Point</source>
         <translation>Définir le Point de Contrôle comme Non Linéaire</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -389,6 +380,10 @@
     <message>
         <source>Center</source>
         <translation type="unfinished">Centre</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -516,6 +511,10 @@
         <source>Lines &amp; Areas</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Maximum Gap</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FingerTool</name>
@@ -568,6 +567,10 @@
     </message>
     <message>
         <source>Lock Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1225,6 +1228,50 @@ Voulez-vous continuer?</translation>
         <source>Polyline</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>current</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RotateTool</name>
+    <message>
+        <source>Rotate On Camera Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RulerToolOptionsBox</name>
+    <message>
+        <source>X:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished">X:</translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished">Y:</translation>
+    </message>
+    <message>
+        <source>W:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>H:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished">H:</translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>L:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SelectionTool</name>
@@ -1274,6 +1321,33 @@ Voulez-vous continuer?</translation>
     <message>
         <source>Link</source>
         <translation>Lier</translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation type="unfinished">Échelle</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished">Position</translation>
+    </message>
+</context>
+<context>
+    <name>ShiftTraceToolOptionBox</name>
+    <message>
+        <source>Reset Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Following</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Following Drawing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1351,6 +1425,53 @@ Voulez-vous continuer?</translation>
     <message>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation type="unfinished">Dureté:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation type="unfinished">Paramètre Prédéfini:</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pencil</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -264,7 +264,7 @@ bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2,
   /*..........................................................................*/
   /* Matching basato sulla probabilita' di colore                             */
   /*..........................................................................*/
-  if (FALSE) {
+  if (false) {
     bool recomputeBBox = false;
     for (i = 0; i < F_work.n; i++) {
       if (F_work.array[i].match < 0) {
@@ -453,7 +453,7 @@ bool autofill_apply(const TToonzImageP &imgToApply, bool selective,
     /*..........................................................................*/
     /* Matching basato sulla probabilita' di colore */
     /*..........................................................................*/
-    if (FALSE) {
+    if (false) {
       bool recomputeBBox = false;
       for (i = 0; i < F_work.n; i++) {
         if (F_work.array[i].match < 0) {
@@ -759,7 +759,7 @@ static void rinomina(int regione1, int regione2, int num_regioni,
 {
   struct vicine *appo, *old, appo1;
   int i;
-  int trovato = FALSE;
+  bool trovato = false;
 
   PRINTF("Rinomino %d %d Regioni: %d \n", regione1, regione2, num_regioni);
   /* mostra_vicini(rlst);  */
@@ -791,7 +791,7 @@ static void rinomina(int regione1, int regione2, int num_regioni,
             appo->region_id = regione2;
             old             = appo;
             appo            = appo->next;
-            trovato         = TRUE;
+            trovato         = true;
           }
         } else /* region_id non e' region2 o regione 1 */
         {

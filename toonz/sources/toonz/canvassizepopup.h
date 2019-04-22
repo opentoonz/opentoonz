@@ -91,7 +91,7 @@ public slots:
   void onOkBtn();
   void onSizeChanged();
   void onRelative(bool);
-  void onUnitChanged(const QString &);
+  void onUnitChanged(int);
 };
 
 #endif  // CANVASSIZEPOPUP_H

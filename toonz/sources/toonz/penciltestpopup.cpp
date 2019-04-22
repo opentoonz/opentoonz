@@ -63,7 +63,6 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QToolButton>
-#include <QGroupBox>
 #include <QDateTime>
 #include <QMultimedia>
 #include <QPainter>
@@ -72,7 +71,9 @@
 #include <QTimer>
 #include <QIntValidator>
 #include <QRegExpValidator>
-#include <QPushButton>
+
+#include <QVideoSurfaceFormat>
+#include <QThreadPool>
 
 #ifdef _WIN32
 #include <dshow.h>
@@ -192,25 +193,26 @@ void onChange(QImage& img, int black, int white, float gamma, bool doGray) {
   std::vector<int> lut(TPixel32::maxChannelValue + 1);
   my_compute_lut(black, white, gamma, lut);
 
-  int lx = img.width(), y, ly = img.height();
+  int ly = img.height();
+  // compute in multi thread
+  int threadCount =
+      std::max(1, QThreadPool::globalInstance()->maxThreadCount() / 2);
+  int tmpStart = 0;
+  for (int t = 0; t < threadCount; t++) {
+    int tmpEnd = (int)std::round((float)(ly * (t + 1)) / (float)threadCount);
 
-  if (doGray) {
-    for (y = 0; y < ly; ++y) {
-      QRgb *pix = (QRgb *)img.scanLine(y), *endPix = (QRgb *)(pix + lx);
-      while (pix < endPix) {
-        doPixGray(pix, lut);
-        ++pix;
-      }
-    }
-  } else {  // color
-    for (y = 0; y < ly; ++y) {
-      QRgb *pix = (QRgb *)img.scanLine(y), *endPix = (QRgb *)(pix + lx);
-      while (pix < endPix) {
-        doPix(pix, lut);
-        ++pix;
-      }
-    }
+    QRunnable* task;
+    if (doGray)
+      task = new ApplyGrayLutTask(tmpStart, tmpEnd, img, lut);
+    else
+      task = new ApplyLutTask(tmpStart, tmpEnd, img, lut);
+
+    QThreadPool::globalInstance()->start(task);
+
+    tmpStart = tmpEnd;
   }
+
+  QThreadPool::globalInstance()->waitForDone();
 }
 
 //-----------------------------------------------------------------------------
@@ -471,83 +473,421 @@ bool getRasterLevelSize(TXshLevel* level, TDimension& dim) {
 
 //=============================================================================
 
-MyViewFinder::MyViewFinder(QWidget* parent)
-    : QFrame(parent)
-    , m_image(QImage())
-    , m_camera(0)
+void ApplyLutTask::run() {
+  int lx = m_img.width();
+  for (int y = m_fromY; y < m_toY; ++y) {
+    QRgb *pix = (QRgb *)m_img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+    while (pix < endPix) {
+      doPix(pix, m_lut);
+      ++pix;
+    }
+  }
+}
+
+void ApplyGrayLutTask::run() {
+  int lx = m_img.width();
+  for (int y = m_fromY; y < m_toY; ++y) {
+    QRgb *pix = (QRgb *)m_img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+    while (pix < endPix) {
+      doPixGray(pix, m_lut);
+      ++pix;
+    }
+  }
+}
+
+//=============================================================================
+
+MyVideoSurface::MyVideoSurface(QWidget* widget, QObject* parent)
+    : QAbstractVideoSurface(parent)
+    , m_widget(widget)
+    , m_imageFormat(QImage::Format_Invalid) {}
+
+QList<QVideoFrame::PixelFormat> MyVideoSurface::supportedPixelFormats(
+    QAbstractVideoBuffer::HandleType handleType) const {
+  if (handleType == QAbstractVideoBuffer::NoHandle) {
+    return QList<QVideoFrame::PixelFormat>()
+           << QVideoFrame::Format_RGB32 << QVideoFrame::Format_ARGB32
+           << QVideoFrame::Format_ARGB32_Premultiplied
+           << QVideoFrame::Format_RGB565 << QVideoFrame::Format_RGB555;
+  } else {
+    return QList<QVideoFrame::PixelFormat>();
+  }
+}
+
+bool MyVideoSurface::isFormatSupported(const QVideoSurfaceFormat& format,
+                                       QVideoSurfaceFormat* similar) const {
+  Q_UNUSED(similar);
+
+  const QImage::Format imageFormat =
+      QVideoFrame::imageFormatFromPixelFormat(format.pixelFormat());
+  const QSize size = format.frameSize();
+
+  return imageFormat != QImage::Format_Invalid && !size.isEmpty() &&
+         format.handleType() == QAbstractVideoBuffer::NoHandle;
+}
+
+bool MyVideoSurface::start(const QVideoSurfaceFormat& format) {
+  const QImage::Format imageFormat =
+      QVideoFrame::imageFormatFromPixelFormat(format.pixelFormat());
+  const QSize size = format.frameSize();
+
+  if (imageFormat != QImage::Format_Invalid && !size.isEmpty()) {
+    m_imageFormat = imageFormat;
+    m_imageSize   = size;
+    m_sourceRect  = format.viewport();
+
+    QAbstractVideoSurface::start(format);
+
+    m_widget->updateGeometry();
+    updateVideoRect();
+
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void MyVideoSurface::updateVideoRect() {
+  QSize size = surfaceFormat().sizeHint();
+  size.scale(m_widget->size(), Qt::KeepAspectRatio);
+
+  m_targetRect = QRect(QPoint(0, 0), size);
+  m_targetRect.moveCenter(m_widget->rect().center());
+
+  double scale =
+      (double)m_targetRect.width() / (double)surfaceFormat().sizeHint().width();
+  m_S2V_Transform =
+      QTransform::fromTranslate(m_targetRect.left(), m_targetRect.top())
+          .scale(scale, scale);
+}
+
+bool MyVideoSurface::present(const QVideoFrame& frame) {
+  if (surfaceFormat().pixelFormat() != frame.pixelFormat() ||
+      surfaceFormat().frameSize() != frame.size()) {
+    setError(IncorrectFormatError);
+    stop();
+    return false;
+  } else {
+    m_currentFrame = frame;
+
+    if (m_currentFrame.map(QAbstractVideoBuffer::ReadOnly)) {
+      QImage image = QImage(m_currentFrame.bits(), m_currentFrame.width(),
+                            m_currentFrame.height(),
+                            m_currentFrame.bytesPerLine(), m_imageFormat);
+      m_currentFrame.unmap();
+      if (!image.isNull()) emit frameCaptured(image);
+    }
+
+    return true;
+  }
+}
+
+void MyVideoSurface::stop() {
+  m_currentFrame = QVideoFrame();
+  m_targetRect   = QRect();
+
+  QAbstractVideoSurface::stop();
+
+  m_widget->update();
+}
+
+//=============================================================================
+
+MyVideoWidget::MyVideoWidget(QWidget* parent)
+    : QWidget(parent)
+    , m_previousImage(QImage())
+    , m_surface(0)
     , m_showOnionSkin(false)
     , m_onionOpacity(128)
     , m_upsideDown(false)
-    , m_countDownTime(0) {}
+    , m_countDownTime(0)
+    , m_subCameraRect(QRect()) {
+  setAutoFillBackground(false);
+  setAttribute(Qt::WA_NoSystemBackground, true);
+  setAttribute(Qt::WA_PaintOnScreen, true);
 
-void MyViewFinder::paintEvent(QPaintEvent* event) {
+  QPalette palette = this->palette();
+  palette.setColor(QPalette::Background, Qt::black);
+  setPalette(palette);
+
+  setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+
+  m_surface = new MyVideoSurface(this);
+  setMouseTracking(true);
+}
+
+MyVideoWidget::~MyVideoWidget() { delete m_surface; }
+
+QSize MyVideoWidget::sizeHint() const {
+  return m_surface->surfaceFormat().sizeHint();
+}
+
+void MyVideoWidget::paintEvent(QPaintEvent* event) {
   QPainter p(this);
 
   p.fillRect(rect(), Qt::black);
 
-  if (m_image.isNull()) {
+  if (m_surface->isActive()) {
+    const QRect videoRect         = m_surface->videoRect();
+    const QTransform oldTransform = p.transform();
+
+    if (m_upsideDown) {
+      p.translate(videoRect.center());
+      p.rotate(180);
+      p.translate(-videoRect.center());
+    }
+    if (m_surface->surfaceFormat().scanLineDirection() ==
+        QVideoSurfaceFormat::BottomToTop) {
+      p.scale(1, -1);
+      p.translate(0, -height());
+    }
+
+    p.drawImage(videoRect, m_image, m_surface->sourceRect());
+
+    p.setTransform(oldTransform);
+
+    if (m_showOnionSkin && m_onionOpacity > 0.0f && !m_previousImage.isNull() &&
+        m_previousImage.size() == m_image.size()) {
+      p.setOpacity((qreal)m_onionOpacity / 255.0);
+      p.drawImage(videoRect, m_previousImage, m_surface->sourceRect());
+      p.setOpacity(1.0);
+    }
+
+    // draw subcamera
+    if (m_subCameraRect.isValid()) drawSubCamera(p);
+
+    // draw countdown text
+    if (m_countDownTime > 0) {
+      QString str =
+          QTime::fromMSecsSinceStartOfDay(m_countDownTime).toString("s.zzz");
+      p.setPen(Qt::yellow);
+      QFont font = p.font();
+      font.setPixelSize(50);
+      p.setFont(font);
+      p.drawText(rect(), Qt::AlignRight | Qt::AlignBottom, str);
+    }
+  } else {
     p.setPen(Qt::white);
     QFont font = p.font();
     font.setPixelSize(30);
     p.setFont(font);
     p.drawText(rect(), Qt::AlignCenter, tr("Camera is not available"));
+  }
+}
+
+void MyVideoWidget::resizeEvent(QResizeEvent* event) {
+  QWidget::resizeEvent(event);
+
+  m_surface->updateVideoRect();
+}
+
+void MyVideoWidget::setSubCameraSize(QSize size) {
+  QSize frameSize = m_surface->surfaceFormat().frameSize();
+  assert(frameSize == size.expandedTo(frameSize));
+
+  m_subCameraRect.setSize(size);
+  // make sure the sub camera is inside of the frame
+  if (!QRect(QPoint(0, 0), frameSize).contains(m_subCameraRect))
+    m_subCameraRect.moveCenter(QRect(QPoint(0, 0), frameSize).center());
+
+  update();
+}
+
+void MyVideoWidget::drawSubCamera(QPainter& p) {
+  auto drawSubFrameLine = [&](SUBHANDLE handle, QPoint from, QPoint to) {
+    p.setPen(QPen(handle == m_activeSubHandle ? Qt::green : Qt::magenta, 2));
+    p.drawLine(from, to);
+  };
+
+  auto drawHandle = [&](SUBHANDLE handle, QPoint pos) {
+    p.setPen(handle == m_activeSubHandle ? Qt::green : Qt::magenta);
+    QRect handleRect(0, 0, 11, 11);
+    handleRect.moveCenter(pos);
+    p.drawRect(handleRect);
+  };
+
+  QRect vidSubRect = m_surface->transform().mapRect(m_subCameraRect);
+  p.setBrush(Qt::NoBrush);
+  drawSubFrameLine(HandleLeft, vidSubRect.topLeft(), vidSubRect.bottomLeft());
+  drawSubFrameLine(HandleTop, vidSubRect.topLeft(), vidSubRect.topRight());
+  drawSubFrameLine(HandleRight, vidSubRect.topRight(),
+                   vidSubRect.bottomRight());
+  drawSubFrameLine(HandleBottom, vidSubRect.bottomLeft(),
+                   vidSubRect.bottomRight());
+
+  // draw handles
+  drawHandle(HandleTopLeft, vidSubRect.topLeft());
+  drawHandle(HandleTopRight, vidSubRect.topRight());
+  drawHandle(HandleBottomLeft, vidSubRect.bottomLeft());
+  drawHandle(HandleBottomRight, vidSubRect.bottomRight());
+}
+
+void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
+  int d = 10;
+
+  auto isNearBy = [&](QPoint handlePos) -> bool {
+    return (handlePos - event->pos()).manhattanLength() <= d * 2;
+  };
+
+  auto isNearEdge = [&](int handlePos, int mousePos) -> bool {
+    return std::abs(handlePos - mousePos) <= d;
+  };
+
+  // if the sub camera is not active, do nothing and return
+  if (!m_surface->isActive() || m_subCameraRect.isNull()) return;
+
+  // with no mouse button, update the active handles
+  if (event->buttons() == Qt::NoButton) {
+    QRect vidSubRect    = m_surface->transform().mapRect(m_subCameraRect);
+    SUBHANDLE preHandle = m_activeSubHandle;
+    if (!vidSubRect.adjusted(-d, -d, d, d).contains(event->pos()))
+      m_activeSubHandle = HandleNone;
+    else if (vidSubRect.adjusted(d, d, -d, -d).contains(event->pos()))
+      m_activeSubHandle = HandleFrame;
+    else if (isNearBy(vidSubRect.topLeft()))
+      m_activeSubHandle = HandleTopLeft;
+    else if (isNearBy(vidSubRect.topRight()))
+      m_activeSubHandle = HandleTopRight;
+    else if (isNearBy(vidSubRect.bottomLeft()))
+      m_activeSubHandle = HandleBottomLeft;
+    else if (isNearBy(vidSubRect.bottomRight()))
+      m_activeSubHandle = HandleBottomRight;
+    else if (isNearEdge(vidSubRect.left(), event->pos().x()))
+      m_activeSubHandle = HandleLeft;
+    else if (isNearEdge(vidSubRect.top(), event->pos().y()))
+      m_activeSubHandle = HandleTop;
+    else if (isNearEdge(vidSubRect.right(), event->pos().x()))
+      m_activeSubHandle = HandleRight;
+    else if (isNearEdge(vidSubRect.bottom(), event->pos().y()))
+      m_activeSubHandle = HandleBottom;
+    else
+      m_activeSubHandle = HandleNone;
+    if (preHandle != m_activeSubHandle) {
+      Qt::CursorShape cursor;
+      if (m_activeSubHandle == HandleNone)
+        cursor = Qt::ArrowCursor;
+      else if (m_activeSubHandle == HandleFrame)
+        cursor = Qt::SizeAllCursor;
+      else if (m_activeSubHandle == HandleTopLeft ||
+               m_activeSubHandle == HandleBottomRight)
+        cursor = Qt::SizeFDiagCursor;
+      else if (m_activeSubHandle == HandleTopRight ||
+               m_activeSubHandle == HandleBottomLeft)
+        cursor = Qt::SizeBDiagCursor;
+      else if (m_activeSubHandle == HandleLeft ||
+               m_activeSubHandle == HandleRight)
+        cursor = Qt::SplitHCursor;
+      else  // if (m_activeSubHandle == HandleTop || m_activeSubHandle ==
+            // HandleBottom)
+        cursor = Qt::SplitVCursor;
+
+      setCursor(cursor);
+      update();
+    }
+  }
+  // if left button is pressed and some handle is active, transform the
+  // subcamera
+  else if (event->buttons() & Qt::LeftButton &&
+           m_activeSubHandle != HandleNone && m_preSubCameraRect.isValid()) {
+    auto clampVal = [&](int& val, int min, int max) {
+      if (val < min)
+        val = min;
+      else if (val > max)
+        val = max;
+    };
+    auto clampPoint = [&](QPoint& pos, int xmin, int xmax, int ymin, int ymax) {
+      clampVal(pos.rx(), xmin, xmax);
+      clampVal(pos.ry(), ymin, ymax);
+    };
+
+    int minimumSize = 100;
+
+    QPoint offset =
+        m_surface->transform().inverted().map(event->pos()) - m_dragStartPos;
+    if (m_activeSubHandle >= HandleTopLeft &&
+        m_activeSubHandle <= HandleBottomRight) {
+      QSize offsetSize = m_preSubCameraRect.size();
+      if (m_activeSubHandle == HandleBottomLeft ||
+          m_activeSubHandle == HandleTopRight)
+        offset.rx() *= -1;
+      offsetSize.scale(offset.x(), offset.y(), Qt::KeepAspectRatioByExpanding);
+      offset = QPoint(offsetSize.width(), offsetSize.height());
+      if (m_activeSubHandle == HandleBottomLeft ||
+          m_activeSubHandle == HandleTopRight)
+        offset.rx() *= -1;
+    }
+    QSize camSize = m_surface->surfaceFormat().sizeHint();
+
+    if (m_activeSubHandle == HandleFrame) {
+      clampPoint(offset, -m_preSubCameraRect.left(),
+                 camSize.width() - m_preSubCameraRect.right(),
+                 -m_preSubCameraRect.top(),
+                 camSize.height() - m_preSubCameraRect.bottom());
+      m_subCameraRect = m_preSubCameraRect.translated(offset);
+    } else {
+      if (m_activeSubHandle == HandleTopLeft ||
+          m_activeSubHandle == HandleBottomLeft ||
+          m_activeSubHandle == HandleLeft) {
+        clampVal(offset.rx(), -m_preSubCameraRect.left(),
+                 m_preSubCameraRect.width() - minimumSize);
+        m_subCameraRect.setLeft(m_preSubCameraRect.left() + offset.x());
+      } else if (m_activeSubHandle == HandleTopRight ||
+                 m_activeSubHandle == HandleBottomRight ||
+                 m_activeSubHandle == HandleRight) {
+        clampVal(offset.rx(), -m_preSubCameraRect.width() + minimumSize,
+                 camSize.width() - m_preSubCameraRect.right());
+        m_subCameraRect.setRight(m_preSubCameraRect.right() + offset.x());
+      }
+
+      if (m_activeSubHandle == HandleTopLeft ||
+          m_activeSubHandle == HandleTopRight ||
+          m_activeSubHandle == HandleTop) {
+        clampVal(offset.ry(), -m_preSubCameraRect.top(),
+                 m_preSubCameraRect.height() - minimumSize);
+        m_subCameraRect.setTop(m_preSubCameraRect.top() + offset.y());
+      } else if (m_activeSubHandle == HandleBottomRight ||
+                 m_activeSubHandle == HandleBottomLeft ||
+                 m_activeSubHandle == HandleBottom) {
+        clampVal(offset.ry(), -m_preSubCameraRect.height() + minimumSize,
+                 camSize.height() - m_preSubCameraRect.bottom());
+        m_subCameraRect.setBottom(m_preSubCameraRect.bottom() + offset.y());
+      }
+      // if the sub camera size is changed, notify the parent for updating the
+      // fields
+      emit subCameraResized(true);
+    }
+    update();
+  }
+}
+
+void MyVideoWidget::mousePressEvent(QMouseEvent* event) {
+  // if the sub camera is not active, do nothing and return
+  // use left button only and some handle must be active
+  if (!m_surface->isActive() || m_subCameraRect.isNull() ||
+      event->button() != Qt::LeftButton || m_activeSubHandle == HandleNone)
     return;
-  }
 
-  p.save();
+  // record the original sub camera size
+  m_preSubCameraRect = m_subCameraRect;
+  m_dragStartPos     = m_surface->transform().inverted().map(event->pos());
 
-  if (m_upsideDown) {
-    p.translate(m_imageRect.center());
-    p.rotate(180);
-    p.translate(-m_imageRect.center());
-  }
-
-  p.drawImage(m_imageRect, m_image);
-
-  if (m_showOnionSkin && m_onionOpacity > 0.0f && !m_previousImage.isNull() &&
-      m_previousImage.size() == m_image.size()) {
-    p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    p.setPen(Qt::NoPen);
-    p.setBrush(QBrush(QColor(255, 255, 255, 255 - m_onionOpacity)));
-    p.drawRect(m_imageRect);
-    p.setCompositionMode(QPainter::CompositionMode_DestinationOver);
-    p.drawImage(m_imageRect, m_previousImage);
-    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-  }
-
-  p.restore();
-
-  // draw countdown text
-  if (m_countDownTime > 0) {
-    QString str =
-        QTime::fromMSecsSinceStartOfDay(m_countDownTime).toString("s.zzz");
-    p.setPen(Qt::yellow);
-    QFont font = p.font();
-    font.setPixelSize(50);
-    p.setFont(font);
-    p.drawText(rect(), Qt::AlignRight | Qt::AlignBottom, str);
-  }
+  // temporary stop the camera
+  emit stopCamera();
 }
 
-void MyViewFinder::updateSize() {
-  if (!m_camera) return;
-  QSize cameraReso = m_camera->viewfinderSettings().resolution();
-  double cameraAR  = (double)cameraReso.width() / (double)cameraReso.height();
-  // in case the camera aspect is wider than this widget
-  if (cameraAR >= (double)width() / (double)height()) {
-    m_imageRect.setWidth(width());
-    m_imageRect.setHeight((int)((double)width() / cameraAR));
-    m_imageRect.moveTo(0, (height() - m_imageRect.height()) / 2);
-  }
-  // in case the camera aspect is thinner than this widget
-  else {
-    m_imageRect.setHeight(height());
-    m_imageRect.setWidth((int)((double)height() * cameraAR));
-    m_imageRect.moveTo((width() - m_imageRect.width()) / 2, 0);
-  }
-}
+void MyVideoWidget::mouseReleaseEvent(QMouseEvent* event) {
+  // if the sub camera is not active, do nothing and return
+  // use left button only and some handle must be active
+  if (!m_surface->isActive() || m_subCameraRect.isNull() ||
+      event->button() != Qt::LeftButton || m_activeSubHandle == HandleNone)
+    return;
 
-void MyViewFinder::resizeEvent(QResizeEvent* event) { updateSize(); }
+  m_preSubCameraRect = QRect();
+  if (m_activeSubHandle != HandleFrame) emit subCameraResized(false);
+
+  // restart the camera
+  emit startCamera();
+}
 
 //=============================================================================
 
@@ -1081,7 +1421,6 @@ PencilTestPopup::PencilTestPopup()
     // set the parent 0 in order to enable the popup behind the main window
     : Dialog(0, false, false, "PencilTest"),
       m_currentCamera(NULL),
-      m_cameraImageCapture(NULL),
       m_captureWhiteBGCue(false),
       m_captureCue(false) {
   setWindowTitle(tr("Camera Capture"));
@@ -1091,17 +1430,9 @@ PencilTestPopup::PencilTestPopup()
 
   layout()->setSizeConstraint(QLayout::SetNoConstraint);
 
-  std::wstring dateTime =
-      QDateTime::currentDateTime().toString("yyMMddhhmmss").toStdWString();
-  TFilePath cacheImageFp = ToonzFolder::getCacheRootFolder() +
-                           TFilePath(L"penciltest" + dateTime + L".jpg");
-  m_cacheImagePath = cacheImageFp.getQString();
-
   m_saveInFolderPopup = new PencilTestSaveInFolderPopup(this);
 
-  m_cameraViewfinder = new MyViewFinder(this);
-  // CameraViewfinderContainer* cvfContainer = new
-  // CameraViewfinderContainer(m_cameraViewfinder, this);
+  m_videoWidget = new MyVideoWidget(this);
 
   m_cameraListCombo                 = new QComboBox(this);
   QPushButton* refreshCamListButton = new QPushButton(tr("Refresh"), this);
@@ -1157,6 +1488,12 @@ PencilTestPopup::PencilTestPopup()
 #endif
 
   QPushButton* subfolderButton = new QPushButton(tr("Subfolder"), this);
+
+  // subcamera
+  m_subcameraButton     = new QPushButton(tr("Subcamera"), this);
+  m_subWidthFld         = new IntLineEdit(this);
+  m_subHeightFld        = new IntLineEdit(this);
+  QWidget* subCamWidget = new QWidget(this);
 
 #ifdef MACOSX
   m_dummyViewFinder = new QCameraViewfinder(this);
@@ -1225,6 +1562,12 @@ PencilTestPopup::PencilTestPopup()
 
   m_saveInFolderPopup->hide();
 
+  m_subcameraButton->setObjectName("SubcameraButton");
+  m_subcameraButton->setIconSize(QSize(15, 15));
+  m_subcameraButton->setCheckable(true);
+  m_subcameraButton->setChecked(false);
+  subCamWidget->setHidden(true);
+
   //---- layout ----
   m_topLayout->setMargin(10);
   m_topLayout->setSpacing(10);
@@ -1245,6 +1588,20 @@ PencilTestPopup::PencilTestPopup()
         camLay->addWidget(m_captureFilterSettingsBtn);
       }
 
+      camLay->addSpacing(10);
+      camLay->addWidget(m_subcameraButton, 0);
+      QHBoxLayout* subCamLay = new QHBoxLayout();
+      subCamLay->setMargin(0);
+      subCamLay->setSpacing(3);
+      {
+        subCamLay->addWidget(m_subWidthFld, 0);
+        subCamLay->addWidget(new QLabel("x", this), 0);
+        subCamLay->addWidget(m_subHeightFld, 0);
+        subCamLay->addStretch(0);
+      }
+      subCamWidget->setLayout(subCamLay);
+      camLay->addWidget(subCamWidget, 0);
+
       camLay->addStretch(0);
       camLay->addSpacing(15);
       camLay->addWidget(new QLabel(tr("Save In:"), this), 0);
@@ -1259,7 +1616,7 @@ PencilTestPopup::PencilTestPopup()
     bottomLay->setMargin(0);
     bottomLay->setSpacing(10);
     {
-      bottomLay->addWidget(m_cameraViewfinder, 1);
+      bottomLay->addWidget(m_videoWidget, 1);
 
       QVBoxLayout* rightLay = new QVBoxLayout();
       rightLay->setMargin(0);
@@ -1357,7 +1714,6 @@ PencilTestPopup::PencilTestPopup()
         }
         displayLay->setColumnStretch(0, 0);
         displayLay->setColumnStretch(1, 1);
-        // displayLay->setColumnStretch(2, 1);
         displayFrame->setLayout(displayLay);
         rightLay->addWidget(displayFrame);
 
@@ -1415,8 +1771,8 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(onLoadImageButtonPressed()));
   ret = ret && connect(m_onionOpacityFld, SIGNAL(valueEditedByHand()), this,
                        SLOT(onOnionOpacityFldEdited()));
-  ret = ret && connect(m_upsideDownCB, SIGNAL(toggled(bool)),
-                       m_cameraViewfinder, SLOT(onUpsideDownChecked(bool)));
+  ret = ret && connect(m_upsideDownCB, SIGNAL(toggled(bool)), m_videoWidget,
+                       SLOT(onUpsideDownChecked(bool)));
   ret = ret && connect(m_timerCB, SIGNAL(toggled(bool)), this,
                        SLOT(onTimerCBToggled(bool)));
   ret = ret && connect(m_captureTimer, SIGNAL(timeout()), this,
@@ -1438,6 +1794,25 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(refreshFrameInfo()));
   ret = ret && connect(m_frameNumberEdit, SIGNAL(editingFinished()), this,
                        SLOT(refreshFrameInfo()));
+
+  // sub camera
+  ret = ret && connect(m_subcameraButton, SIGNAL(toggled(bool)), this,
+                       SLOT(onSubCameraToggled(bool)));
+  ret = ret && connect(m_subcameraButton, SIGNAL(toggled(bool)), subCamWidget,
+                       SLOT(setVisible(bool)));
+  ret = ret && connect(m_subWidthFld, SIGNAL(editingFinished()), this,
+                       SLOT(onSubCameraSizeEdited()));
+  ret = ret && connect(m_subHeightFld, SIGNAL(editingFinished()), this,
+                       SLOT(onSubCameraSizeEdited()));
+  ret = ret && connect(m_videoWidget, &MyVideoWidget::startCamera, [&]() {
+          if (m_currentCamera) m_currentCamera->start();
+        });
+  ret = ret && connect(m_videoWidget, &MyVideoWidget::stopCamera, [&]() {
+          if (m_currentCamera) m_currentCamera->stop();
+        });
+  ret = ret && connect(m_videoWidget, SIGNAL(subCameraResized(bool)), this,
+                       SLOT(onSubCameraResized(bool)));
+
   assert(ret);
 
   refreshCameraList();
@@ -1452,7 +1827,7 @@ PencilTestPopup::PencilTestPopup()
   QString resStr = QString::fromStdString(CamCapCameraResolution.getValue());
   if (m_currentCamera && !resStr.isEmpty()) {
     int startupResolutionIndex = m_resolutionCombo->findText(resStr);
-    if (startupResolutionIndex > 0) {
+    if (startupResolutionIndex >= 0) {
       m_resolutionCombo->setCurrentIndex(startupResolutionIndex);
       onResolutionComboActivated(resStr);
     }
@@ -1471,9 +1846,6 @@ PencilTestPopup::~PencilTestPopup() {
       m_currentCamera->unload();
     delete m_currentCamera;
   }
-  // remove the cache image, if it exists
-  TFilePath fp(m_cacheImagePath);
-  if (TFileStatus(fp).doesExist()) TSystem::deleteFile(fp);
 }
 
 //-----------------------------------------------------------------------------
@@ -1509,14 +1881,7 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
 
   // if selected the non-connected state, then disconnect the current camera
   if (comboIndex == 0) {
-    m_cameraViewfinder->setCamera(NULL);
-    if (m_cameraImageCapture) {
-      disconnect(m_cameraImageCapture,
-                 SIGNAL(imageCaptured(int, const QImage&)), this,
-                 SLOT(onImageCaptured(int, const QImage&)));
-      delete m_cameraImageCapture;
-      m_cameraImageCapture = NULL;
-    }
+    m_videoWidget->videoSurface()->stop();
     if (m_currentCamera) {
       if (m_currentCamera->state() == QCamera::ActiveState)
         m_currentCamera->stop();
@@ -1524,7 +1889,7 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
         m_currentCamera->unload();
     }
     m_deviceName = QString();
-    m_cameraViewfinder->setImage(QImage());
+    m_videoWidget->setImage(QImage());
     // update env
     CamCapCameraName = "";
     return;
@@ -1535,28 +1900,14 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
   if (cameras.at(index).deviceName() == m_deviceName) return;
 
   QCamera* oldCamera = m_currentCamera;
-  m_currentCamera    = new QCamera(cameras.at(index), this);
-  m_deviceName       = cameras.at(index).deviceName();
-  if (m_cameraImageCapture) {
-    disconnect(m_cameraImageCapture, SIGNAL(imageCaptured(int, const QImage&)),
-               this, SLOT(onImageCaptured(int, const QImage&)));
-    delete m_cameraImageCapture;
-  }
+  if (oldCamera) m_videoWidget->videoSurface()->stop();
 
+  m_currentCamera = new QCamera(cameras.at(index), this);
+  m_deviceName    = cameras.at(index).deviceName();
 #ifdef MACOSX
   // this line is needed only in macosx
   m_currentCamera->setViewfinder(m_dummyViewFinder);
 #endif
-
-  m_cameraImageCapture = new QCameraImageCapture(m_currentCamera, this);
-  /* Capturing to buffer currently seems not to be supported on Windows */
-  // if
-  // (!m_cameraImageCapture->isCaptureDestinationSupported(QCameraImageCapture::CaptureToBuffer))
-  //  std::cout << "it does not support CaptureToBuffer" << std::endl;
-  m_cameraImageCapture->setCaptureDestination(
-      QCameraImageCapture::CaptureToBuffer);
-  connect(m_cameraImageCapture, SIGNAL(imageCaptured(int, const QImage&)), this,
-          SLOT(onImageCaptured(int, const QImage&)));
 
   // loading new camera
   m_currentCamera->load();
@@ -1575,14 +1926,10 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
     QCameraViewfinderSettings settings = m_currentCamera->viewfinderSettings();
     settings.setResolution(sizes.last());
     m_currentCamera->setViewfinderSettings(settings);
-    QImageEncoderSettings imageEncoderSettings;
-    imageEncoderSettings.setCodec("image/jpeg");
-    imageEncoderSettings.setQuality(QMultimedia::NormalQuality);
-    imageEncoderSettings.setResolution(sizes.last());
-    m_cameraImageCapture->setEncodingSettings(imageEncoderSettings);
   }
-  m_cameraViewfinder->setCamera(m_currentCamera);
-  m_cameraViewfinder->updateSize();
+  m_currentCamera->setViewfinder(m_videoWidget->videoSurface());
+  m_videoWidget->videoSurface()->start(
+      m_videoWidget->videoSurface()->surfaceFormat());
 
   // deleting old camera
   if (oldCamera) {
@@ -1591,7 +1938,7 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
   }
   // start new camera
   m_currentCamera->start();
-  m_cameraViewfinder->setImage(QImage());
+  m_videoWidget->setImage(QImage());
 
   // update env
   CamCapCameraName = m_cameraListCombo->itemText(comboIndex).toStdString();
@@ -1612,12 +1959,6 @@ void PencilTestPopup::onResolutionComboActivated(const QString& itemText) {
   QSize newResolution(texts[0].toInt(), texts[2].toInt());
   settings.setResolution(newResolution);
   m_currentCamera->setViewfinderSettings(settings);
-  QImageEncoderSettings imageEncoderSettings;
-  imageEncoderSettings.setCodec("image/jpeg");
-  imageEncoderSettings.setQuality(QMultimedia::NormalQuality);
-  imageEncoderSettings.setResolution(newResolution);
-  m_cameraImageCapture->setEncodingSettings(imageEncoderSettings);
-  m_cameraViewfinder->updateSize();
 
 #ifdef MACOSX
   m_dummyViewFinder->resize(newResolution);
@@ -1628,12 +1969,35 @@ void PencilTestPopup::onResolutionComboActivated(const QString& itemText) {
   m_bgReductionFld->setDisabled(true);
 
   m_currentCamera->start();
-  m_cameraViewfinder->setImage(QImage());
+  m_videoWidget->setImage(QImage());
 
   // update env
   CamCapCameraResolution = itemText.toStdString();
 
   refreshFrameInfo();
+
+  // reset subcamera info
+  m_subcameraButton->setChecked(false);  // this will hide the size fields
+  m_subWidthFld->setRange(10, newResolution.width());
+  m_subHeightFld->setRange(10, newResolution.height());
+  // if there is no existing level or its size is larger than the current camera
+  if (!m_allowedCameraSize.isValid() ||
+      m_allowedCameraSize.width() > newResolution.width() ||
+      m_allowedCameraSize.height() > newResolution.height()) {
+    // make the initial subcamera size to be with the same aspect ratio as the
+    // current camera
+    TCamera* camera =
+        TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
+    TDimension camres = camera->getRes();
+    newResolution =
+        QSize(camres.lx, camres.ly).scaled(newResolution, Qt::KeepAspectRatio);
+    // newResolution.scale(QSize(res.lx, res.ly), Qt::KeepAspectRatio);
+    m_subWidthFld->setValue(newResolution.width());
+    m_subHeightFld->setValue(newResolution.height());
+  } else {
+    m_subWidthFld->setValue(m_allowedCameraSize.width());
+    m_subHeightFld->setValue(m_allowedCameraSize.height());
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1697,7 +2061,7 @@ void PencilTestPopup::onPreviousName() {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::setToNextNewLevel() {
-  const std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
+  const std::unique_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
 
   TLevelSet* levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
@@ -1770,8 +2134,8 @@ void PencilTestPopup::onColorTypeComboChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PencilTestPopup::onImageCaptured(int id, const QImage& image) {
-  if (!m_cameraViewfinder) return;
+void PencilTestPopup::onFrameCaptured(QImage& image) {
+  if (!m_videoWidget || image.isNull()) return;
   // capture the white BG
   if (m_captureWhiteBGCue) {
     m_whiteBGImg        = image.copy();
@@ -1779,14 +2143,23 @@ void PencilTestPopup::onImageCaptured(int id, const QImage& image) {
     m_bgReductionFld->setEnabled(true);
   }
 
-  QImage procImg = image.copy();
-  processImage(procImg);
-  m_cameraViewfinder->setImage(procImg);
+  processImage(image);
+  m_videoWidget->setImage(image.copy());
 
   if (m_captureCue) {
+    m_currentCamera->stop();
+
     m_captureCue = false;
-    if (importImage(procImg)) {
-      m_cameraViewfinder->setPreviousImage(procImg);
+
+    bool scanBtoT =
+        m_videoWidget->videoSurface()->surfaceFormat().scanLineDirection() ==
+        QVideoSurfaceFormat::BottomToTop;
+    bool upsideDown = m_upsideDownCB->isChecked();
+
+    image = image.mirrored(upsideDown, upsideDown != scanBtoT);
+
+    if (importImage(image)) {
+      m_videoWidget->setPreviousImage(image);
       if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
         int f = m_frameNumberEdit->getValue();
         if (f % 10 == 0)  // next number
@@ -1814,34 +2187,24 @@ void PencilTestPopup::onImageCaptured(int id, const QImage& image) {
       m_captureButton->setChecked(false);
       onCaptureButtonClicked(false);
     }
+
+    m_currentCamera->start();
   }
 }
 
 //-----------------------------------------------------------------------------
 
-void PencilTestPopup::timerEvent(QTimerEvent* event) {
-  if (!m_currentCamera || !m_cameraImageCapture ||
-      !m_cameraImageCapture->isAvailable() ||
-      !m_cameraImageCapture->isReadyForCapture())
-    return;
-
-  m_currentCamera->setCaptureMode(QCamera::CaptureStillImage);
-  m_currentCamera->start();
-  m_currentCamera->searchAndLock();
-  m_cameraImageCapture->capture(m_cacheImagePath);
-  m_currentCamera->unlock();
-}
-
-//-----------------------------------------------------------------------------
-
 void PencilTestPopup::showEvent(QShowEvent* event) {
-  m_timerId = startTimer(10);
+  // m_timerId = startTimer(10);
 
   // if there is another action of which "return" key is assigned as short cut
   // key,
   // then release the shortcut key temporary while the popup opens
   QAction* action = CommandManager::instance()->getActionFromShortcut("Return");
   if (action) action->setShortcut(QKeySequence(""));
+
+  connect(m_videoWidget->videoSurface(), SIGNAL(frameCaptured(QImage&)), this,
+          SLOT(onFrameCaptured(QImage&)));
 
   // reload camera
   if (m_currentCamera) {
@@ -1860,11 +2223,12 @@ void PencilTestPopup::showEvent(QShowEvent* event) {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::hideEvent(QHideEvent* event) {
-  killTimer(m_timerId);
-
   // set back the "return" short cut key
   QAction* action = CommandManager::instance()->getActionFromShortcut("Return");
   if (action) action->setShortcut(QKeySequence("Return"));
+
+  disconnect(m_videoWidget->videoSurface(), SIGNAL(frameCaptured(QImage&)),
+             this, SLOT(onFrameCaptured(QImage&)));
 
   // stop interval timer if it is active
   if (m_timerCB->isChecked() && m_captureButton->isChecked()) {
@@ -1906,7 +2270,6 @@ void PencilTestPopup::keyPressEvent(QKeyEvent* event) {
 void PencilTestPopup::processImage(QImage& image) {
   /* "upside down" is not executed here. It will be done when capturing the
    * image */
-
   // white bg reduction
   if (!m_whiteBGImg.isNull() && m_bgReductionFld->getValue() != 0) {
     bgReduction(image, m_whiteBGImg, m_bgReductionFld->getValue());
@@ -1919,7 +2282,9 @@ void PencilTestPopup::processImage(QImage& image) {
     int black, white;
     float gamma;
     m_camCapLevelControl->getValues(black, white, gamma);
-    onChange(image, black, white, gamma, m_colorTypeCombo->currentIndex() != 0);
+    if (black != 0 || white != 255 || gamma != 1.0)
+      onChange(image, black, white, gamma,
+               m_colorTypeCombo->currentIndex() != 0);
   } else {
     onChangeBW(image, m_camCapLevelControl->getThreshold());
   }
@@ -1934,7 +2299,7 @@ void PencilTestPopup::onCaptureWhiteBGButtonPressed() {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onOnionCBToggled(bool on) {
-  m_cameraViewfinder->setShowOnionSkin(on);
+  m_videoWidget->setShowOnionSkin(on);
   m_onionOpacityFld->setEnabled(on);
 }
 
@@ -1996,13 +2361,8 @@ void PencilTestPopup::onLoadImageButtonPressed() {
     QImage qi2(qi.size(), QImage::Format_ARGB32);
     qi2.fill(QColor(Qt::white).rgb());
     QPainter painter(&qi2);
-    if (m_upsideDownCB->isChecked()) {
-      painter.translate(m_lx / 2, m_ly / 2);
-      painter.rotate(180);
-      painter.translate(-m_lx / 2, -m_ly / 2);
-    }
     painter.drawImage(0, 0, qi);
-    m_cameraViewfinder->setPreviousImage(qi2);
+    m_videoWidget->setPreviousImage(qi2);
     m_onionSkinCB->setChecked(true);
     free(buffer);
   }
@@ -2012,7 +2372,7 @@ void PencilTestPopup::onLoadImageButtonPressed() {
 
 void PencilTestPopup::onOnionOpacityFldEdited() {
   int value = (int)(255.0f * (float)m_onionOpacityFld->getValue() / 100.0f);
-  m_cameraViewfinder->setOnionOpacity(value);
+  m_videoWidget->setOnionOpacity(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -2044,7 +2404,7 @@ void PencilTestPopup::onCaptureButtonClicked(bool on) {
       m_captureTimer->stop();
       m_countdownTimer->stop();
       // hide the count down text
-      m_cameraViewfinder->showCountDownTime(0);
+      m_videoWidget->showCountDownTime(0);
     }
   }
   // capture immediately
@@ -2059,14 +2419,14 @@ void PencilTestPopup::onCaptureTimerTimeout() { m_captureCue = true; }
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onCountDown() {
-  m_cameraViewfinder->showCountDownTime(
+  m_videoWidget->showCountDownTime(
       m_captureTimer->isActive() ? m_captureTimer->remainingTime() : 0);
 }
 
 //-----------------------------------------------------------------------------
 /*! referenced from LevelCreatePopup::apply()
 */
-bool PencilTestPopup::importImage(QImage& image) {
+bool PencilTestPopup::importImage(QImage image) {
   TApp* app         = TApp::instance();
   ToonzScene* scene = app->getCurrentScene()->getScene();
   TXsheet* xsh      = scene->getXsheet();
@@ -2106,6 +2466,11 @@ bool PencilTestPopup::importImage(QImage& image) {
 
   TXshLevel* level = scene->getLevelSet()->getLevel(levelName);
   enum State { NEWLEVEL = 0, ADDFRAME, OVERWRITE } state;
+
+  // retrieve subcamera image
+  if (m_subcameraButton->isChecked() &&
+      m_videoWidget->subCameraRect().isValid())
+    image = image.copy(m_videoWidget->subCameraRect());
 
   /* if the level already exists in the scene cast */
   if (level) {
@@ -2181,9 +2546,25 @@ bool PencilTestPopup::importImage(QImage& image) {
       sl = level->getSimpleLevel();
       sl->setPath(levelFp, true);
       sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
-      TPointD currentCamDpi = getCurrentCameraDpi();
-      sl->getProperties()->setDpi(currentCamDpi.x);
-      sl->getProperties()->setImageDpi(currentCamDpi);
+      TPointD dpi;
+      // if the subcamera is not active or the pixel unit is used, apply the
+      // current camera dpi
+      if (!m_subcameraButton->isChecked() ||
+          !m_videoWidget->subCameraRect().isValid() ||
+          Preferences::instance()->getPixelsOnly())
+        dpi = getCurrentCameraDpi();
+      // if the subcamera is active, compute the dpi so that the image will fit
+      // to the camera frame
+      else {
+        TCamera* camera =
+            TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
+        TDimensionD size = camera->getSize();
+        double minimumDpi =
+            std::min(image.width() / size.lx, image.height() / size.ly);
+        dpi = TPointD(minimumDpi, minimumDpi);
+      }
+      sl->getProperties()->setDpi(dpi.x);
+      sl->getProperties()->setImageDpi(dpi);
       sl->getProperties()->setImageRes(
           TDimension(image.width(), image.height()));
     }
@@ -2195,9 +2576,8 @@ bool PencilTestPopup::importImage(QImage& image) {
   TPointD levelDpi = sl->getDpi();
   /* create the raster */
   TRaster32P raster(image.width(), image.height());
-  convertImageToRaster(raster, (m_upsideDownCB->isChecked())
-                                   ? image
-                                   : image.mirrored(true, true));
+  convertImageToRaster(raster, image.mirrored(true, true));
+
   TRasterImageP ri(raster);
   ri->setDpi(levelDpi.x, levelDpi.y);
   /* setting the frame */
@@ -2323,9 +2703,14 @@ void PencilTestPopup::refreshFrameInfo() {
   std::wstring levelName = m_levelNameEdit->text().toStdWString();
   int frameNumber        = m_frameNumberEdit->getValue();
 
-  QStringList texts = m_resolutionCombo->currentText().split(' ');
-  if (texts.size() != 3) return;
-  TDimension camRes(texts[0].toInt(), texts[2].toInt());
+  TDimension camRes;
+  if (m_subcameraButton->isChecked())
+    camRes = TDimension(m_subWidthFld->getValue(), m_subHeightFld->getValue());
+  else {
+    QStringList texts = m_resolutionCombo->currentText().split(' ');
+    if (texts.size() != 3) return;
+    camRes = TDimension(texts[0].toInt(), texts[2].toInt());
+  }
 
   bool letterOptionEnabled =
       Preferences::instance()->isShowFrameNumberWithLettersEnabled();
@@ -2349,6 +2734,9 @@ void PencilTestPopup::refreshFrameInfo() {
   TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
   bool frameExist            = false;
   if (levelExist) frameExist = TFileStatus(frameFp).doesExist();
+
+  // reset acceptable camera size
+  m_allowedCameraSize = QSize();
 
   // ### CASE 1 ###
   // If there is no same level registered in the scene cast
@@ -2432,6 +2820,7 @@ void PencilTestPopup::refreshFrameInfo() {
         else
           labelStr += tr(" %1 frames").arg(frameCount);
       }
+      m_allowedCameraSize = QSize(dim.lx, dim.ly);
     }
     // If no level exists in the file system, then it will be a new level
     else {
@@ -2502,6 +2891,7 @@ void PencilTestPopup::refreshFrameInfo() {
       else
         labelStr += tr(" %1 frames").arg(frameCount);
     }
+    m_allowedCameraSize = QSize(dim.lx, dim.ly);
   }
   // ### CASE 3 ###
   // If there are some conflicts with the existing level.
@@ -2521,6 +2911,7 @@ void PencilTestPopup::refreshFrameInfo() {
                          "with the same name is is %1 x %2.")
                           .arg(dim.lx)
                           .arg(dim.ly);
+      m_allowedCameraSize = QSize(dim.lx, dim.ly);
     }
     if (level_samePath) {
       std::wstring anotherName = level_samePath->getName();
@@ -2538,6 +2929,7 @@ void PencilTestPopup::refreshFrameInfo() {
                          "with the same path is %1 x %2.")
                           .arg(dim.lx)
                           .arg(dim.ly);
+      m_allowedCameraSize = QSize(dim.lx, dim.ly);
     }
     labelStr += tr("WARNING");
     infoType = WARNING;
@@ -2565,6 +2957,33 @@ void PencilTestPopup::onSaveInPathEdited() {
 void PencilTestPopup::onSceneSwitched() {
   m_saveInFolderPopup->updateParentFolder();
   m_saveInFileFld->setPath(m_saveInFolderPopup->getParentPath());
+  refreshFrameInfo();
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onSubCameraToggled(bool on) {
+  m_videoWidget->setSubCameraSize(
+      on ? QSize(m_subWidthFld->getValue(), m_subHeightFld->getValue())
+         : QSize());
+  refreshFrameInfo();
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onSubCameraResized(bool isDragging) {
+  QSize subSize = m_videoWidget->subCameraRect().size();
+  assert(subSize.isValid());
+  m_subWidthFld->setValue(subSize.width());
+  m_subHeightFld->setValue(subSize.height());
+  if (!isDragging) refreshFrameInfo();
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onSubCameraSizeEdited() {
+  m_videoWidget->setSubCameraSize(
+      QSize(m_subWidthFld->getValue(), m_subHeightFld->getValue()));
   refreshFrameInfo();
 }
 

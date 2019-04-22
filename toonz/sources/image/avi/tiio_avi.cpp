@@ -544,9 +544,6 @@ void TLevelWriterAvi::doSaveSoundTrack() {
   WAVEFORMATEX waveinfo;
   int ret;
   LONG lSampWritten, lBytesWritten;
-  int rc;
-
-  rc = FALSE;
 
   AVISTREAMINFO audioStreamInfo;
   memset(&audioStreamInfo, 0, sizeof(AVISTREAMINFO));
@@ -1176,6 +1173,11 @@ Tiio::AviWriterProperties::AviWriterProperties() : m_codec("Codec") {
   }
   m_codec = m_defaultCodec;
   bind(m_codec);
+}
+
+void Tiio::AviWriterProperties::updateTranslation() {
+  m_codec.setQStringName(tr("Codec"));
+  m_codec.setItemUIName(L"Uncompressed", tr("Uncompressed"));
 }
 
 TEnumProperty Tiio::AviWriterProperties::m_defaultCodec =

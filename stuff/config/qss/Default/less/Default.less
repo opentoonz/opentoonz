@@ -288,17 +288,6 @@
 @viewer-ruler-ToolOptionValues-color: darken(@bg, 50);
 
 // -----------------------------------------------------------------------------
-// Schematic Viewer
-// -----------------------------------------------------------------------------
-
-@schematic-viewer-bg-color: darken(@bg, 5);
-
-@schematic-label-text-color: #a0e680;
-
-@schematic-help-button-bg-color: #80a0dc;
-@schematic-help-button-bg-color-hover: lighten(@schematic-help-button-bg-color, 10);
-
-// -----------------------------------------------------------------------------
 // XSheet
 // -----------------------------------------------------------------------------
 
@@ -321,6 +310,7 @@
 @xsheet-VerticalLineHead-color:             lighten(@bg, 21.9608);
 @xsheet-PreviewFrameText-color:             @label-title;
 @xsheet-CurrentRowBG-color:                 #506082;
+@xsheet-OnionSkinAreaBG-color:              darken(@bg, 7);
 
 @xsheet-EmptyColumnHead-color:              lighten(@bg, 10.1961);
 @xsheet-SelectedColumnText-color:           #E66464;
@@ -360,6 +350,10 @@
 @xsheet-MeshColumn-color:                   #684D86;
 @xsheet-MeshColumnBorder-color:             #BA92EF;
 @xsheet-SelectedMeshColumn-color:           lighten(desaturate(@xsheet-MeshColumn-color, 5), 10);
+
+@xsheet-SoundTextColumn-color:              #c8c8c8;
+@xsheet-SoundTextColumnBorder-color:        #8c8c8c;
+@xsheet-SelectedSoundTextColumn-color:        lighten(desaturate(@xsheet-SoundTextColumn-color, 5), 10);
 
 @xsheet-SoundColumn-color:                  #657456;
 @xsheet-SoundColumnBorder-color:            #A0AF7D;
@@ -419,8 +413,61 @@
 @timeline-ConfigButtonImage:                'timeline_config.svg';
 
 @layerheader-PreviewImage:                  'layer_header_prev_eye.svg';
+@layerheader-PreviewOverImage:              'layer_header_prev_eye_over.svg';
 @layerheader-CamstandImage:                 'layer_header_table_view.svg';
+@layerheader-CamstandOverImage:             'layer_header_table_view_over.svg';
 @layerheader-LockImage:                     'lock_on.svg';
+@layerheader-LockOverImage:                 'lock_on_over.svg';
+
+// -----------------------------------------------------------------------------
+// Schematic Viewer
+// -----------------------------------------------------------------------------
+
+@schematic-viewer-bg-color: darken(@bg, 5);
+
+@schematic-label-text-color: #a0e680;
+
+@schematic-help-button-bg-color: #80a0dc;
+@schematic-help-button-bg-color-hover: lighten(@schematic-help-button-bg-color, 10);
+
+@schematic-TableColor: #62628c;
+@schematic-ActiveCameraColor: #2d7dca;
+@schematic-OtherCameraColor: #6c797b;
+@schematic-GroupColor: #3b6e9c;
+@schematic-PegColor: #9f6e3c;
+@schematic-SplineColor: #6a9d1c;
+@schematic-ActiveOutputcolor: #2d7dca;
+@schematic-OtherOutputcolor: #6c797b;
+@schematic-XsheetColor: #62628c;
+@schematic-NormalFxColor: #6a7e96;
+@schematic-MacroFxColor: #815c79;
+@schematic-ImageAdjustFxColor: #656287;
+@schematic-LayerBlendingFxColor: #4f757d;
+@schematic-MatteFxColor: #ae7171;
+
+// For column based schematic nodes, use the Xsheet viewer colors by default
+@schematic-text-color: @xsheet-text-color;
+@schematic-VerticalLine-color: @xsheet-VerticalLine-color;
+
+@schematic-LevelColumn-color: @xsheet-LevelColumn-color;
+@schematic-VectorColumn-color: @xsheet-VectorColumn-color;
+@schematic-ChildColumn-color: @xsheet-ChildColumn-color;
+@schematic-FullColorColumn-color: @xsheet-FullColorColumn-color;
+@schematic-FxColumn-color: @xsheet-FxColumn-color;
+@schematic-PaletteColumn-color: @xsheet-PaletteColumn-color;
+@schematic-MeshColumn-color: @xsheet-MeshColumn-color;
+@schematic-ReferenceColumn-color: @xsheet-ReferenceColumn-color;
+
+@schematic-PreviewButtonBgOn-color: @xsheet-PreviewButtonBgOn-color;
+@schematic-PreviewButtonOnImage: @xsheet-PreviewButtonOnImage;
+@schematic-PreviewButtonBgOff-color: @xsheet-ReferenceColumn-color;
+@schematic-PreviewButtonOffImage: @xsheet-PreviewButtonOffImage;
+
+@schematic-CamstandButtonBgOn-color: @xsheet-CamstandButtonBgOn-color;
+@schematic-CamstandButtonOnImage: @xsheet-CamstandButtonOnImage;
+@schematic-CamstandButtonTranspImage: @xsheet-CamstandButtonTranspImage;
+@schematic-CamstandButtonBgOff-color: @xsheet-ReferenceColumn-color;
+@schematic-CamstandButtonOffImage: @xsheet-CamstandButtonOffImage;
 
 // -----------------------------------------------------------------------------
 // Function Editor

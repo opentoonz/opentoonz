@@ -24,7 +24,7 @@ class NewWordDialog : public QDialog {
   QLineEdit *m_lineEdit;
 
 public:
-  NewWordDialog(QWidget *parent = Q_NULLPTR);
+  NewWordDialog(QWidget *parent = nullptr);
   QString getName();
 };
 
@@ -33,7 +33,7 @@ public:
 class WordButton : public QPushButton {
   Q_OBJECT
 public:
-  WordButton(const QString &text, QWidget *parent = Q_NULLPTR);
+  WordButton(const QString &text, QWidget *parent = nullptr);
 
 protected:
   void contextMenuEvent(QContextMenuEvent *) override;
@@ -54,7 +54,7 @@ class AddWordButton final : public WordButton {
   int m_column;
 
 public:
-  AddWordButton(const int col, QWidget *parent = Q_NULLPTR);
+  AddWordButton(const int col, QWidget *parent = nullptr);
 
 protected slots:
   void onClicked() override;

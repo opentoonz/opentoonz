@@ -232,8 +232,8 @@ TPointD p11_b = m_p11_b->getValue(frame);
 
     if (m_isCastShadow)
 {
-            tswap(p00_a, p01_a);
-tswap(p10_a, p11_a);
+            std::swap(p00_a, p01_a);
+std::swap(p10_a, p11_a);
     }*/
 
     /*TRectD source;
@@ -306,8 +306,8 @@ void FreeDistortBaseFx::transform(double frame, int port,
 
   if (m_isCastShadow) {
     // Shadows are mirrored
-    tswap(p00_a, p01_a);
-    tswap(p10_a, p11_a);
+    std::swap(p00_a, p01_a);
+    std::swap(p10_a, p11_a);
   }
 
   // Build the input affine
@@ -723,8 +723,8 @@ void FreeDistortBaseFx::doCompute(TTile &tile, double frame,
 
   if (m_isCastShadow) {
     // Shadows are mirrored
-    tswap(p00_a, p01_a);
-    tswap(p10_a, p11_a);
+    std::swap(p00_a, p01_a);
+    std::swap(p10_a, p11_a);
   }
 
   // Get requested tile's geometry

@@ -350,6 +350,8 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos,
   TRasterImageP ri        = (TRasterImageP)getImage(true);
   if (!ri) return;
 
+  if (!m_toonz_brush) return;
+
   TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
@@ -378,6 +380,8 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos,
 
   TRasterImageP ri = (TRasterImageP)getImage(true);
   if (!ri) return;
+
+  if (!m_toonz_brush) return;
 
   TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
@@ -612,6 +616,7 @@ void FullColorBrushTool::initPresets() {
 
   m_preset.deleteAllValues();
   m_preset.addValue(CUSTOM_WSTR);
+  m_preset.setItemUIName(CUSTOM_WSTR, tr("<custom>"));
 
   std::set<BrushData>::const_iterator it, end = presets.end();
   for (it = presets.begin(); it != end; ++it) m_preset.addValue(it->m_name);

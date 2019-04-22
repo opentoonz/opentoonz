@@ -58,6 +58,7 @@ XsheetViewer {
   qproperty-VerticalLineHeadColor: @xsheet-VerticalLineHead-color;
   qproperty-PreviewFrameTextColor: @xsheet-PreviewFrameText-color;
   qproperty-CurrentRowBgColor: @xsheet-CurrentRowBG-color;
+  qproperty-OnionSkinAreaBgColor: @xsheet-OnionSkinAreaBG-color;
 
   qproperty-EmptyColumnHeadColor: @xsheet-EmptyColumnHead-color;
   qproperty-SelectedColumnTextColor: @xsheet-SelectedColumnText-color;
@@ -98,6 +99,10 @@ XsheetViewer {
   qproperty-MeshColumnBorderColor: @xsheet-MeshColumnBorder-color;
   qproperty-SelectedMeshColumnColor: @xsheet-SelectedMeshColumn-color;
   
+  qproperty-SoundTextColumnColor: @xsheet-SoundTextColumn-color;
+  qproperty-SoundTextColumnBorderColor: @xsheet-SoundTextColumnBorder-color;
+  qproperty-SelectedSoundTextColumnColor: @xsheet-SelectedSoundTextColumn-color;
+
   qproperty-SoundColumnColor: @xsheet-SoundColumn-color;
   qproperty-SoundColumnBorderColor: @xsheet-SoundColumnBorder-color;
   qproperty-SelectedSoundColumnColor: @xsheet-SelectedSoundColumn-color;
@@ -154,8 +159,11 @@ XsheetViewer {
   qproperty-TimelineConfigButtonImage: url('@{img-url}/@{timeline-ConfigButtonImage}');
 
   qproperty-LayerHeaderPreviewImage: url('@{img-url}/@{layerheader-PreviewImage}');
+  qproperty-LayerHeaderPreviewOverImage: url('@{img-url}/@{layerheader-PreviewOverImage}');
   qproperty-LayerHeaderCamstandImage: url('@{img-url}/@{layerheader-CamstandImage}');
+  qproperty-LayerHeaderCamstandOverImage: url('@{img-url}/@{layerheader-CamstandOverImage}');
   qproperty-LayerHeaderLockImage: url('@{img-url}/@{layerheader-LockImage}');
+  qproperty-LayerHeaderLockOverImage: url('@{img-url}/@{layerheader-LockOverImage}');
 }
 
 /* XSheet Toolbar
@@ -271,10 +279,4 @@ SpreadsheetViewer {
     background-image: url('@{img-url}/segment_disabled.svg');
     background-repeat: no-repeat;
   }
-}
-
-// this fixes a Mac specific issue with text clipping
-// and may be temporary
-#flipOrientationButton {
-  padding: 2 12;
 }

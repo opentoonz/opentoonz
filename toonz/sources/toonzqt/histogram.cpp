@@ -541,13 +541,10 @@ void Histogram::updateChannelsList() {
     m_channelsListBox->clear();
 
     if (m_histograms->channelsCount() == 1)
-      channels << "Value";
+      channels << tr("Value");
     else
-      channels << "RGB"
-               << "Red"
-               << "Green"
-               << "Blue"
-               << "Alpha";
+      channels << tr("RGB") << tr("Red") << tr("Green") << tr("Blue")
+               << tr("Alpha");
 
     m_channelsListBox->addItems(channels);
   }

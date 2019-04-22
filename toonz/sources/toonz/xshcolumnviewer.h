@@ -178,6 +178,28 @@ protected slots:
   void onFilterColorChanged(int id);
 };
 
+class SoundColumnPopup final : public QWidget {
+  Q_OBJECT
+
+  QSlider *m_slider;
+  QLineEdit *m_value;
+  TXshColumn *m_column;
+
+public:
+  SoundColumnPopup(QWidget *parent);
+  void setColumn(TXshColumn *column);
+
+protected:
+  // void mouseMoveEvent ( QMouseEvent * e );
+  void mouseReleaseEvent(QMouseEvent *e) override;
+
+protected slots:
+  void onSliderReleased();
+  void onSliderChange(int val);
+  void onSliderValueChanged(int);
+  void onValueChanged(const QString &);
+};
+
 //! The class in charge of the region showing layer headers
 class ColumnArea final : public QWidget {
   Q_OBJECT
@@ -193,6 +215,7 @@ class ColumnArea final : public QWidget {
   };
 
   ColumnTransparencyPopup *m_columnTransparencyPopup;
+  SoundColumnPopup *m_soundColumnPopup;
   QTimer *m_transparencyPopupTimer;
   int m_doOnRelease;
   XsheetViewer *m_viewer;
@@ -302,6 +325,7 @@ protected:
 protected slots:
   void onSubSampling(QAction *);
   void openTransparencyPopup();
+  void openSoundColumnPopup();
 };
 
 //-----------------------------------------------------------------------------

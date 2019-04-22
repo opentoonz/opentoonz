@@ -48,15 +48,15 @@ IGS_LINE_BLUR_EXPORT void convert(
     const int v_near_len /* min=2   def=160  incr=1   max=1000 */
 
     ,
-    const int mv_sw /* 0 =OFF */
+    const bool mv_sw /* false=OFF */
     ,
-    const int pv_sw /* 0 =OFF */
+    const bool pv_sw /* false=OFF */
     ,
-    const int cv_sw /* 0 =OFF */
+    const bool cv_sw /* false=OFF */
     ,
     const long reference_channel /* 3 =Alpha:RGBA orBGRA */
     ,
-    const int debug_save_sw /* 0 =OFF */
+    const bool debug_save_sw /* false=OFF */
     ,
     const int brush_action /* 0 =Curve Blur ,1=Smudge Brush */
     );
@@ -390,13 +390,6 @@ typedef int int32_t;
 #include <stdint.h> /* for int32_t */
 #endif
 
-#ifndef ON
-#define ON (1)
-#endif
-#ifndef OFF
-#define OFF (0)
-#endif
-
 #ifndef OK
 #define OK (0)
 #endif
@@ -414,9 +407,9 @@ public:
   brush_curve_blur(void) {
     int32_t ii;
 
-    this->_i_mv_sw = OFF;
-    this->_i_pv_sw = OFF;
-    this->_i_cv_sw = OFF;
+    this->_i_mv_sw = false;
+    this->_i_pv_sw = false;
+    this->_i_cv_sw = false;
 
     this->_i32_count            = 51;
     this->_i32_subpixel_divide  = 2;
@@ -436,9 +429,9 @@ public:
   ~brush_curve_blur(void) { this->mem_free(); }
 
   /* パラメータ設定 */
-  void set_i_mv_sw(int ii) { this->_i_mv_sw = ii; }
-  void set_i_pv_sw(int ii) { this->_i_pv_sw = ii; }
-  void set_i_cv_sw(int ii) { this->_i_cv_sw = ii; }
+  void set_i_mv_sw(bool ii) { this->_i_mv_sw = ii; }
+  void set_i_pv_sw(bool ii) { this->_i_pv_sw = ii; }
+  void set_i_cv_sw(bool ii) { this->_i_cv_sw = ii; }
 
   /* ぼかし線のポイント数 */
   void set_i32_count(int32_t ii) { this->_i32_count = ii; }
@@ -469,9 +462,9 @@ public:
   void debug_print(void);
 
 private:
-  int _i_mv_sw, /* Method    Verbose */
-      _i_pv_sw, /* Parameter Verbose */
-      _i_cv_sw; /* Counter   Verbose */
+  bool _i_mv_sw; /* Method    Verbose */
+  bool _i_pv_sw; /* Parameter Verbose */
+  bool _i_cv_sw; /* Counter   Verbose */
 
   int32_t _i32_count;
   int32_t _i32_subpixel_divide;
@@ -491,7 +484,7 @@ private:
 /* メモリ開放 */
 void brush_curve_blur::mem_free(void) {
   if (NULL != this->_dp_ratio) {
-    if (ON == this->_i_mv_sw) {
+    if (this->_i_mv_sw) {
       pri_funct_msg_ttvr("brush_curve_blur::mem_free()");
     }
     free(this->_dp_ratio);
@@ -514,10 +507,10 @@ int brush_curve_blur::mem_alloc(void) {
   }
 
   /* 処理ごとのメッセージ */
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("brush_curve_blur::mem_alloc()");
   }
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(
         "alloc brush_curve_blur memory ((%d * %d) + %d) x %d bytes",
         this->_i32_count, (1 + CHANNEL_COUNT + 2), /* ratio,accum,xp,yp */
@@ -706,13 +699,6 @@ typedef unsigned short uint16_t;
 #include <stdint.h> /* for int32_t, uint16_t */
 #endif
 
-#ifndef ON
-#define ON (1)
-#endif
-#ifndef OFF
-#define OFF (0)
-#endif
-
 #ifndef OK
 #define OK (0)
 #endif
@@ -723,9 +709,9 @@ typedef unsigned short uint16_t;
 class brush_smudge_circle {
 public:
   brush_smudge_circle() {
-    this->_i_mv_sw = OFF;
-    this->_i_pv_sw = OFF;
-    this->_i_cv_sw = OFF;
+    this->_i_mv_sw = false;
+    this->_i_pv_sw = false;
+    this->_i_cv_sw = false;
 
     this->_i32_size_by_pixel   = 7; /* 画像上の線の最大幅 */
     this->_i32_subpixel_divide = 4;
@@ -738,9 +724,9 @@ public:
   ~brush_smudge_circle() { this->mem_free(); }
 
   /* パラメータ設定 */
-  void set_i_mv_sw(int ii) { this->_i_mv_sw = ii; }
-  void set_i_pv_sw(int ii) { this->_i_pv_sw = ii; }
-  void set_i_cv_sw(int ii) { this->_i_cv_sw = ii; }
+  void set_i_mv_sw(bool ii) { this->_i_mv_sw = ii; }
+  void set_i_pv_sw(bool ii) { this->_i_pv_sw = ii; }
+  void set_i_cv_sw(bool ii) { this->_i_cv_sw = ii; }
 
   void set_i32_size_by_pixel(int32_t ii) { this->_i32_size_by_pixel = ii; }
   void set_i32_subpixel_divide(int32_t ii) { this->_i32_subpixel_divide = ii; }
@@ -796,7 +782,7 @@ private:
 /* メモリ開放 */
 void brush_smudge_circle::mem_free(void) {
   if (NULL != this->_dp_brush) {
-    if (ON == this->_i_mv_sw) {
+    if (this->_i_mv_sw) {
       pri_funct_msg_ttvr("brush_smudge_circle::mem_free()");
     }
     free(this->_dp_brush);
@@ -817,11 +803,11 @@ int brush_smudge_circle::mem_alloc(void) {
   i32_sz = this->_i32_size_by_pixel * this->_i32_subpixel_divide;
 
   /* 処理ごとのメッセージ */
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("brush_smudge_circle::mem_alloc()");
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr("calloc((%d x %d + %d x %d + %d x %d) x (%d x %d))",
                        i32_sz, i32_sz, i32_sz, i32_sz,
                        (this->_i32_size_by_pixel + 1),
@@ -1346,25 +1332,18 @@ void pixel_point_node::print_xy_around(void) {
 
 #include "igs_line_blur.h"  // "list_root.h" "pixel_point_node.h"
 
-#ifndef ON
-#define ON (1)
-#endif
-#ifndef OFF
-#define OFF (0)
-#endif
-
 class pixel_point_root final : public list_root {
 public:
   pixel_point_root(void) {
-    this->_i_mv_sw = OFF;
-    this->_i_cv_sw = OFF;
-    this->_i_pv_sw = OFF;
+    this->_i_mv_sw = false;
+    this->_i_cv_sw = false;
+    this->_i_pv_sw = false;
   }
   ~pixel_point_root(void) { this->mem_free(); }
 
-  void set_i_mv_sw(int sw) { this->_i_mv_sw = sw; }
-  void set_i_cv_sw(int sw) { this->_i_cv_sw = sw; }
-  void set_i_pv_sw(int sw) { this->_i_pv_sw = sw; }
+  void set_i_mv_sw(bool sw) { this->_i_mv_sw = sw; }
+  void set_i_cv_sw(bool sw) { this->_i_cv_sw = sw; }
+  void set_i_pv_sw(bool sw) { this->_i_pv_sw = sw; }
 
   /* 16Bits 1channel画像からゼロ以上のピクセルをプロットする */
   int alloc_mem_and_list_node(int32_t i32_xs, int32_t i32_ys,
@@ -1379,7 +1358,7 @@ public:
   void mem_free(void);
 
 private:
-  int _i_mv_sw, _i_cv_sw, _i_pv_sw;
+  bool _i_mv_sw, _i_cv_sw, _i_pv_sw;
 
   /* リストの削除 */
   void _remove(pixel_point_node *clp_target);
@@ -1414,7 +1393,7 @@ void pixel_point_root::mem_free(void) {
   int32_t ii;
 
   if (NULL != this->get_clp_last()) {
-    if (ON == this->_i_mv_sw) {
+    if (this->_i_mv_sw) {
       pri_funct_msg_ttvr("pixel_point_root::mem_free()");
     }
     ii = 0;
@@ -1422,7 +1401,7 @@ void pixel_point_root::mem_free(void) {
       this->_remove(clp_);
       ++ii;
     }
-    if (ON == this->_i_pv_sw) {
+    if (this->_i_pv_sw) {
       pri_funct_msg_ttvr("free point node %d", ii);
     }
   }
@@ -1434,19 +1413,19 @@ int pixel_point_root::alloc_mem_and_list_node(int32_t i32_xs, int32_t i32_ys,
   pixel_point_node *clp_pp;
 
   /* 処理実行表示 */
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_point_root::alloc_mem_and_list_node()");
   }
 
   /* カウントダウン表示始め */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_start(i32_ys);
   }
 
   clp_pp = NULL;
   for (yy = 0; yy < i32_ys; ++yy) {
     /* カウントダウン表示中 */
-    if (ON == this->_i_cv_sw) {
+    if (this->_i_cv_sw) {
       pri_funct_cv_run(yy);
     }
 
@@ -1463,12 +1442,12 @@ int pixel_point_root::alloc_mem_and_list_node(int32_t i32_xs, int32_t i32_ys,
     }
   }
   /* カウントダウン表示終了 */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_end();
   }
 
   /* 処理結果表示 */
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr("alloc and list %d points", this->get_i32_count());
   }
 
@@ -2490,17 +2469,17 @@ private:
 class pixel_select_same_way_root final : public list_root {
 public:
   pixel_select_same_way_root(void) {
-    this->_i_mv_sw = OFF;
-    this->_i_cv_sw = OFF;
-    this->_i_pv_sw = OFF;
+    this->_i_mv_sw = false;
+    this->_i_cv_sw = false;
+    this->_i_pv_sw = false;
 
     this->_i32_count_max = 4;
     this->_d_length_max  = 160;
   }
   ~pixel_select_same_way_root(void) { this->mem_free(); }
-  void set_i_mv_sw(int sw) { this->_i_mv_sw = sw; }
-  void set_i_cv_sw(int sw) { this->_i_cv_sw = sw; }
-  void set_i_pv_sw(int sw) { this->_i_pv_sw = sw; }
+  void set_i_mv_sw(bool sw) { this->_i_mv_sw = sw; }
+  void set_i_cv_sw(bool sw) { this->_i_cv_sw = sw; }
+  void set_i_pv_sw(bool sw) { this->_i_pv_sw = sw; }
 
   int32_t get_i32_count_max(void) { return this->_i32_count_max; }
   void set_i32_count_max(int32_t ii) { this->_i32_count_max = ii; }
@@ -2516,7 +2495,7 @@ public:
   void mem_free(void);
 
 private:
-  int _i_mv_sw, _i_cv_sw, _i_pv_sw;
+  bool _i_mv_sw, _i_cv_sw, _i_pv_sw;
 
   int32_t _i32_count_max;
   double _d_length_max;
@@ -2571,7 +2550,7 @@ void pixel_select_same_way_root::mem_free(void) {
   int32_t ii;
 
   if (NULL != this->get_clp_last()) {
-    if (ON == this->_i_mv_sw) {
+    if (this->_i_mv_sw) {
       pri_funct_msg_ttvr("pixel_select_same_way_root::mem_free()");
     }
 
@@ -2581,7 +2560,7 @@ void pixel_select_same_way_root::mem_free(void) {
       this->_remove(clp_);
       ++ii;
     }
-    if (ON == this->_i_pv_sw) {
+    if (this->_i_pv_sw) {
       pri_funct_msg_ttvr("free select same way node %d", ii);
     }
   }
@@ -2786,9 +2765,9 @@ void pixel_select_same_way_root::get_vector(double *dp_xv, double *dp_yv) {
 class pixel_line_root final : public list_root {
 public:
   pixel_line_root(void) {
-    this->_i_mv_sw = OFF;
-    this->_i_cv_sw = OFF;
-    this->_i_pv_sw = OFF;
+    this->_i_mv_sw = false;
+    this->_i_cv_sw = false;
+    this->_i_pv_sw = false;
 
     this->_d_bbox_x_min = 0.0;
     this->_d_bbox_x_max = 0.0;
@@ -2796,12 +2775,12 @@ public:
     this->_d_bbox_y_max = 0.0;
 
     this->_i32_smooth_retry   = 100;
-    this->_i_same_way_exec_sw = ON;
+    this->_i_same_way_exec_sw = true;
   }
   ~pixel_line_root(void) { this->mem_free(); }
-  void set_i_mv_sw(int sw) { this->_i_mv_sw = sw; }
-  void set_i_cv_sw(int sw) { this->_i_cv_sw = sw; }
-  void set_i_pv_sw(int sw) { this->_i_pv_sw = sw; }
+  void set_i_mv_sw(bool sw) { this->_i_mv_sw = sw; }
+  void set_i_cv_sw(bool sw) { this->_i_cv_sw = sw; }
+  void set_i_pv_sw(bool sw) { this->_i_pv_sw = sw; }
 
   double get_d_bbox_x_min(void) { return this->_d_bbox_x_min; }
   double get_d_bbox_x_max(void) { return this->_d_bbox_x_max; }
@@ -2810,7 +2789,7 @@ public:
 
   void set_i32_smooth_retry(int32_t i32) { this->_i32_smooth_retry = i32; }
   int32_t get_i32_smooth_retry(void) { return this->_i32_smooth_retry; }
-  void set_i_same_way_exec_sw(int sw) { this->_i_same_way_exec_sw = sw; }
+  void set_i_same_way_exec_sw(bool sw) { this->_i_same_way_exec_sw = sw; }
 
   int exec01020304(pixel_point_root *clp_pixel_point_root);
   void exec05_set_middle(void);
@@ -2836,12 +2815,12 @@ public:
   void mem_free(void);
 
 private:
-  int _i_mv_sw, _i_cv_sw, _i_pv_sw;
+  bool _i_mv_sw, _i_cv_sw, _i_pv_sw;
 
   double _d_bbox_x_min, _d_bbox_x_max, _d_bbox_y_min, _d_bbox_y_max;
 
   int32_t _i32_smooth_retry;
-  int _i_same_way_exec_sw;
+  bool _i_same_way_exec_sw;
 
   calculator_geometry _cl_cal_geom;
 
@@ -2895,7 +2874,7 @@ int pixel_line_root::_exec01_link_left_right(
   pixel_point_node *clp_point, *clp_point2;
   int32_t ii;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::_exec01_link_left_right()");
   }
 
@@ -2926,7 +2905,7 @@ int pixel_line_root::_exec01_link_left_right(
     clp_point2 = clp_point;
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" link left right %d", ii);
   }
 
@@ -2937,7 +2916,7 @@ int pixel_line_root::_exec02_link_up_down(
   pixel_point_node *clp_point, *clp_point2;
   int32_t ii;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::_exec02_link_up_down()");
   }
 
@@ -2975,7 +2954,7 @@ int pixel_line_root::_exec02_link_up_down(
     }
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" link up down %d", ii);
   }
 
@@ -2987,9 +2966,9 @@ int pixel_line_root::_exec03_link_slant(
   pixel_point_node *clp_point, *clp_point2, *clp_point_link;
   int32_t ii, jj;
 
-  int i_left_link_sw, i_right_link_sw, i_up_link_sw;
+  bool i_left_link_sw, i_right_link_sw, i_up_link_sw;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::_exec03_link_slant()");
   }
 
@@ -3004,9 +2983,9 @@ int pixel_line_root::_exec03_link_slant(
       continue;
     }
 
-    i_left_link_sw  = OFF;
-    i_right_link_sw = OFF;
-    i_up_link_sw    = OFF;
+    i_left_link_sw  = false;
+    i_right_link_sw = false;
+    i_up_link_sw    = false;
 
     /* 全リンクの調査 */
     for (jj = 0; jj < LINK_NEAR_COUNT; ++jj) {
@@ -3016,24 +2995,24 @@ int pixel_line_root::_exec03_link_slant(
       /* 上につながっている */
       if (((clp_point_link->get_i32_xp()) == (clp_point->get_i32_xp())) &&
           ((clp_point_link->get_i32_yp()) == (clp_point->get_i32_yp() + 1))) {
-        i_up_link_sw = ON;
+        i_up_link_sw = true;
       }
       /* 左につながっている */
       if (((clp_point_link->get_i32_xp()) == (clp_point->get_i32_xp() - 1)) &&
           ((clp_point_link->get_i32_yp()) == (clp_point->get_i32_yp()))) {
-        i_left_link_sw = ON;
+        i_left_link_sw = true;
       }
       /* 右につながっている */
       if (((clp_point_link->get_i32_xp()) == (clp_point->get_i32_xp() + 1)) &&
           ((clp_point_link->get_i32_yp()) == (clp_point->get_i32_yp()))) {
-        i_right_link_sw = ON;
+        i_right_link_sw = true;
       }
     }
 
     /* 左右両方につながりあるなら、斜めにはつなげず、次へ */
-    if ((ON == i_left_link_sw) && (ON == i_right_link_sw)) continue;
+    if (i_left_link_sw && i_right_link_sw) continue;
     /* 上につながっているなら、斜めにはつなげず、次へ */
-    if (ON == i_up_link_sw) continue;
+    if (i_up_link_sw) continue;
 
     for (clp_point2 = (pixel_point_node *)clp_point->get_clp_next();
          (NULL != clp_point2)
@@ -3046,7 +3025,7 @@ int pixel_line_root::_exec03_link_slant(
       }
 
       /* 左斜め上につながるものあり */
-      if ((OFF == i_left_link_sw) &&
+      if (!i_left_link_sw &&
           ((clp_point2->get_i32_xp()) == (clp_point->get_i32_xp() - 1)) &&
           ((clp_point2->get_i32_yp()) == (clp_point->get_i32_yp() + 1))) {
         /* 双方向リンクする */
@@ -3064,7 +3043,7 @@ int pixel_line_root::_exec03_link_slant(
         ++ii;
       }
       /* 右斜め上につながるものあり */
-      if ((OFF == i_right_link_sw) &&
+      if (!i_right_link_sw &&
           ((clp_point2->get_i32_xp()) == (clp_point->get_i32_xp() + 1)) &&
           ((clp_point2->get_i32_yp()) == (clp_point->get_i32_yp() + 1))) {
         /* 双方向リンクする */
@@ -3083,7 +3062,7 @@ int pixel_line_root::_exec03_link_slant(
     }
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" link slant %d", ii);
   }
 
@@ -3095,7 +3074,7 @@ int pixel_line_root::_exec04_grouping(pixel_point_root *clp_pixel_point_root) {
   pixel_line_node *clp_line_before, *clp_line_crnt;
   int32_t ii;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::_exec04_grouping()");
   }
 
@@ -3136,7 +3115,7 @@ int pixel_line_root::_exec04_grouping(pixel_point_root *clp_pixel_point_root) {
     }
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" make %d lines", this->get_i32_count());
   }
 
@@ -3151,7 +3130,7 @@ void pixel_line_root::exec05_set_middle(void) {
   pixel_line_node *clp_line;
   int32_t ii;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::exec05_set_middle()");
   }
 
@@ -3162,7 +3141,7 @@ void pixel_line_root::exec05_set_middle(void) {
 
     clp_line->set_middle();
   }
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" set middle point about %d lines", ii);
   }
 }
@@ -3175,7 +3154,7 @@ void pixel_line_root::exec06_int2double_body(void) {
   pixel_line_node *clp_line;
   int32_t ii;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::exec06_int2double_body()");
   }
 
@@ -3187,7 +3166,7 @@ void pixel_line_root::exec06_int2double_body(void) {
     clp_line->int2double_body();
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" int to double %d lines", ii);
   }
 }
@@ -3199,16 +3178,16 @@ void pixel_line_root::exec07_smooth_body(void) {
   pixel_line_node *clp_line;
   int32_t ii;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::exec07_smooth_body()");
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" smooth retry %u", this->_i32_smooth_retry);
   }
 
   /* カウントダウン表示始め */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_start(this->get_i32_count());
   }
 
@@ -3218,18 +3197,18 @@ void pixel_line_root::exec07_smooth_body(void) {
     assert(ii < this->get_i32_count());
 
     /* カウントダウン表示中 */
-    if (ON == this->_i_cv_sw) {
+    if (this->_i_cv_sw) {
       pri_funct_cv_run(ii);
     }
 
     clp_line->smooth_body(this->_i32_smooth_retry);
   }
   /* カウントダウン表示終了 */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_end();
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" smooth %d lines", ii);
   }
 }
@@ -3238,15 +3217,15 @@ void pixel_line_root::exec10_smooth_expand(void) {
   pixel_line_node *clp_line;
   int32_t ii;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::exec10_smooth_expand()");
   }
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" smooth retry %u", this->_i32_smooth_retry);
   }
 
   /* カウントダウン表示始め */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_start(this->get_i32_count());
   }
 
@@ -3256,18 +3235,18 @@ void pixel_line_root::exec10_smooth_expand(void) {
     assert(ii < this->get_i32_count());
 
     /* カウントダウン表示中 */
-    if (ON == this->_i_cv_sw) {
+    if (this->_i_cv_sw) {
       pri_funct_cv_run(ii);
     }
 
     clp_line->smooth_expand(this->_i32_smooth_retry);
   }
   /* カウントダウン表示終了 */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_end();
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" smooth %d lines", ii);
   }
 }
@@ -3281,7 +3260,7 @@ int pixel_line_root::exec08_expand_lines(
   pixel_line_node *clp_line;
   int32_t ii;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::exec08_expand_lines()");
   }
 
@@ -3297,7 +3276,7 @@ int pixel_line_root::exec08_expand_lines(
     }
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" expand %d lines", ii);
   }
 
@@ -3366,14 +3345,14 @@ void pixel_line_root::exec09_same_way_expand(
   int32_t i32_count_one, i32_count_another;
 
   /* 同方向曲げをしないときはここで抜けてしまう */
-  if (ON != this->_i_same_way_exec_sw) {
+  if (!this->_i_same_way_exec_sw) {
     return;
   }
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::exec09_same_way_expand()");
   }
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" select max length %g count %d",
                        clp_select->get_d_length_max(),
                        clp_select->get_i32_count_max());
@@ -3443,7 +3422,7 @@ void pixel_line_root::exec09_same_way_expand(
 
   clp_select->mem_free();
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" same way expand  one %d another %d", i32_count_one,
                        i32_count_another);
   }
@@ -3457,7 +3436,7 @@ void pixel_line_root::exec11_set_bbox(void) {
   pixel_line_node *clp_line;
   int32_t ii;
 
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("pixel_line_root::exec11_set_bbox()");
   }
 
@@ -3487,7 +3466,7 @@ void pixel_line_root::exec11_set_bbox(void) {
     }
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(" set bbox %d lines : min x %g y %g : max x %g y %g", ii,
                        this->_d_bbox_x_min, this->_d_bbox_y_min,
                        this->_d_bbox_x_max, this->_d_bbox_y_max);
@@ -3521,7 +3500,7 @@ void pixel_line_root::mem_free(void) {
   int32_t ii;
 
   if (NULL != this->get_clp_last()) {
-    if (ON == this->_i_mv_sw) {
+    if (this->_i_mv_sw) {
       pri_funct_msg_ttvr("pixel_line_root::mem_free()");
     }
 
@@ -3530,7 +3509,7 @@ void pixel_line_root::mem_free(void) {
       this->_remove(clp_);
       ++ii;
     }
-    if (ON == this->_i_pv_sw) {
+    if (this->_i_pv_sw) {
       pri_funct_msg_ttvr("free line node %d", ii);
     }
   }
@@ -4001,7 +3980,7 @@ public:
     this->clp_near_point     = NULL;
     this->i32_near_point_pos = 0;
     this->d_length           = -1.0;
-    this->i_reverse_sw       = OFF;
+    this->i_reverse_sw       = false;
   }
   void copy(pixel_select_curve_blur_node *clp) {
     this->clp_line           = clp->clp_line;
@@ -4016,7 +3995,7 @@ public:
   pixel_point_node *clp_near_point;
   int32_t i32_near_point_pos;
   double d_length;
-  int i_reverse_sw;
+  bool i_reverse_sw;
 
 private:
 };
@@ -4024,17 +4003,17 @@ private:
 class pixel_select_curve_blur_root final : public list_root {
 public:
   pixel_select_curve_blur_root(void) {
-    this->_i_mv_sw = OFF;
-    this->_i_cv_sw = OFF;
-    this->_i_pv_sw = OFF;
+    this->_i_mv_sw = false;
+    this->_i_cv_sw = false;
+    this->_i_pv_sw = false;
 
     this->_i32_count_max = 4;
     this->_d_length_max  = 160;
   }
   ~pixel_select_curve_blur_root(void) { this->mem_free(); }
-  void set_i_mv_sw(int sw) { this->_i_mv_sw = sw; }
-  void set_i_cv_sw(int sw) { this->_i_cv_sw = sw; }
-  void set_i_pv_sw(int sw) { this->_i_pv_sw = sw; }
+  void set_i_mv_sw(bool sw) { this->_i_mv_sw = sw; }
+  void set_i_cv_sw(bool sw) { this->_i_cv_sw = sw; }
+  void set_i_pv_sw(bool sw) { this->_i_pv_sw = sw; }
 
   int32_t get_i32_count_max(void) { return this->_i32_count_max; }
   void set_i32_count_max(int32_t ii) { this->_i32_count_max = ii; }
@@ -4054,7 +4033,7 @@ public:
   void mem_free(void);
 
 private:
-  int _i_mv_sw, _i_cv_sw, _i_pv_sw;
+  bool _i_mv_sw, _i_cv_sw, _i_pv_sw;
 
   int32_t _i32_count_max;
   double _d_length_max;
@@ -4113,7 +4092,7 @@ void pixel_select_curve_blur_root::mem_free(void) {
   int32_t ii;
 
   if (NULL != this->get_clp_last()) {
-    if (ON == this->_i_mv_sw) {
+    if (this->_i_mv_sw) {
       pri_funct_msg_ttvr("pixel_select_curve_blur_root::mem_free()");
     }
 
@@ -4122,7 +4101,7 @@ void pixel_select_curve_blur_root::mem_free(void) {
       this->_remove((pixel_select_curve_blur_node *)this->get_clp_last());
       ++ii;
     }
-    if (ON == this->_i_pv_sw) {
+    if (this->_i_pv_sw) {
       pri_funct_msg_ttvr("free select curve blur node %d", ii);
     }
   }
@@ -4175,7 +4154,7 @@ void pixel_select_curve_blur_root::exec(double d_xp, double d_yp,
                                         double d_effect_area_radius) {
   pixel_line_node *clp_line;
   int32_t ii, i32_pos;
-  int i_reverse_sw;
+  bool i_reverse_sw;
   pixel_point_node *clp_near_point, *clp_start_point;
   double d_length, d_radius, d_radius_1st;
   pixel_select_curve_blur_node cl_select;
@@ -4238,7 +4217,7 @@ void pixel_select_curve_blur_root::exec(double d_xp, double d_yp,
     }
 
     /* 逆方向スイッチoffしておく */
-    i_reverse_sw = OFF;
+    i_reverse_sw = false;
 
     /* 対応する部分のスタート点 */
     clp_start_point =
@@ -4265,7 +4244,7 @@ void pixel_select_curve_blur_root::exec(double d_xp, double d_yp,
       if ((M_PI / 2.0 < d_radius) && (d_radius < M_PI * 3.0 / 2.0)) {
         clp_start_point = clp_line->get_next_point_by_count(clp_near_point,
                                                             i32_blur_count / 2);
-        i_reverse_sw = ON;
+        i_reverse_sw = true;
       }
     }
 
@@ -4360,7 +4339,7 @@ int pixel_select_curve_blur_root::get_line(int32_t i32_blur_count,
     clp_point = clp_select->clp_start_point;
 
     /* 線分合成(いきなりの変化をへらす) */
-    if (OFF == clp_select->i_reverse_sw) {
+    if (!clp_select->i_reverse_sw) {
       for (jj = 0; jj < i32_blur_count; ++jj) {
         dp_xv[jj] += (clp_point->get_d_xp_tgt() - d_xp) * d_ratio;
         dp_yv[jj] += (clp_point->get_d_yp_tgt() - d_yp) * d_ratio;
@@ -4432,7 +4411,7 @@ int pixel_select_curve_blur_root::save(double d_xp, double d_yp,
 
     /* グループ(ライン)番号保存 */
     if (fprintf(fp, "# selct number %d : reverse sw is %s\n", ii,
-                (OFF == clp_loop->i_reverse_sw) ? "off" : "on") < 0) {
+                (!clp_loop->i_reverse_sw ? "off" : "on")) < 0) {
       pri_funct_err_bttvr("Error : fprintf(# line number %d) returns minus",
                           ii);
       fclose(fp);
@@ -4454,7 +4433,7 @@ int pixel_select_curve_blur_root::save(double d_xp, double d_yp,
     }
 
     clp_point = clp_loop->clp_start_point;
-    if (OFF == clp_loop->i_reverse_sw) {
+    if (!clp_loop->i_reverse_sw) {
       for (jj = 0; jj < i32_blur_count; ++jj) {
         /* グループ(ライン)番号保存 */
         if (fprintf(fp, "%g %g\n", clp_point->get_d_xp_tgt(),
@@ -4514,19 +4493,12 @@ typedef unsigned short uint16_t;
 #define NG (-1)
 #endif
 
-#ifndef ON
-#define ON (1)
-#endif
-#ifndef OFF
-#define OFF (0)
-#endif
-
 class thinnest_ui16_image {
 public:
   thinnest_ui16_image() {
-    this->_i_mv_sw = OFF;
-    this->_i_pv_sw = OFF;
-    this->_i_cv_sw = OFF;
+    this->_i_mv_sw = false;
+    this->_i_pv_sw = false;
+    this->_i_cv_sw = false;
 
     this->_i32_xs              = 0;
     this->_i32_ys              = 0;
@@ -4542,9 +4514,9 @@ public:
   ~thinnest_ui16_image() { this->mem_free(); }
 
   /* パラメータ設定 */
-  void set_i_mv_sw(int ii) { this->_i_mv_sw = ii; }
-  void set_i_pv_sw(int ii) { this->_i_pv_sw = ii; }
-  void set_i_cv_sw(int ii) { this->_i_cv_sw = ii; }
+  void set_i_mv_sw(bool ii) { this->_i_mv_sw = ii; }
+  void set_i_pv_sw(bool ii) { this->_i_pv_sw = ii; }
+  void set_i_cv_sw(bool ii) { this->_i_cv_sw = ii; }
 
   void set_i32_xs(int32_t ii) { this->_i32_xs = ii; }
   void set_i32_ys(int32_t ii) { this->_i32_ys = ii; }
@@ -4579,9 +4551,9 @@ public:
   void mem_free(void);
 
 private:
-  int _i_mv_sw, /* Method    Verbose */
-      _i_pv_sw, /* Parameter Verbose */
-      _i_cv_sw; /* Counter   Verbose */
+  bool _i_mv_sw; /* Method    Verbose */
+  bool _i_pv_sw; /* Parameter Verbose */
+  bool _i_cv_sw; /* Counter   Verbose */
 
   int32_t _i32_xs, _i32_ys,     /* Size */
       _i32_xd, _i32_yd;         /* sub Divide */
@@ -4633,11 +4605,11 @@ int32_t thinnest_ui16_image::exec01_fill_noise_pixel(void) {
   int32_t yy, i32_fill_count;
 
   /* 処理ごとのメッセージ */
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("thinnest_ui16_image::exec01_fill_noise_pixel()");
   }
   /* カウントダウン表示始め */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_start(this->_i32_ys);
   }
 
@@ -4650,7 +4622,7 @@ int32_t thinnest_ui16_image::exec01_fill_noise_pixel(void) {
   i32_fill_count = 0;
   for (yy = 0; yy < this->_i32_ys; ++yy) {
     /* カウントダウン表示中 */
-    if (ON == this->_i_cv_sw) {
+    if (this->_i_cv_sw) {
       pri_funct_cv_run(yy);
     }
 
@@ -4668,7 +4640,7 @@ int32_t thinnest_ui16_image::exec01_fill_noise_pixel(void) {
   }
 
   /* カウントダウン表示終了 */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_end();
   }
 
@@ -4824,11 +4796,11 @@ void thinnest_ui16_image::exec02_scale_add_edge_pixel(void) {
   }
 
   /* 処理ごとのメッセージ */
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("thinnest_ui16_image::exec02_scale_add_edge_pixel()");
   }
   /* カウントダウン表示始め */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_start(this->_i32_ys);
   }
 
@@ -4838,7 +4810,7 @@ void thinnest_ui16_image::exec02_scale_add_edge_pixel(void) {
   /* 縁以外の部分のコピー */
   for (yy = 0; yy < this->_i32_ys; ++yy) {
     /* カウントダウン表示中 */
-    if (ON == this->_i_cv_sw) {
+    if (this->_i_cv_sw) {
       pri_funct_cv_run(yy);
     }
 
@@ -4851,7 +4823,7 @@ void thinnest_ui16_image::exec02_scale_add_edge_pixel(void) {
     ui16p_tgt1 += (this->_i32_xs + 2);
   }
   /* カウントダウン表示終了 */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_end();
   }
 
@@ -4970,14 +4942,14 @@ void thinnest_ui16_image::exec03_scale_liner(void) {
   }
 
   /* 処理ごとのメッセージ */
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("thinnest_ui16_image::exec03_scale_liner()");
   }
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("thi : Scale %d x %d", this->_i32_xd, this->_i32_yd);
   }
   /* カウントダウン表示始め */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_start((this->_i32_ys - 2) * this->_i32_yd);
   }
 
@@ -4991,7 +4963,7 @@ void thinnest_ui16_image::exec03_scale_liner(void) {
   for (yy = 0; yy < i32_tgt_ys; ++yy) {
     for (xx = 0; xx < i32_tgt_xs; ++xx, ++ui16p_tgt) {
       /* カウントダウン表示中 */
-      if (ON == this->_i_cv_sw) {
+      if (this->_i_cv_sw) {
         pri_funct_cv_run(yy);
       }
 
@@ -5096,7 +5068,7 @@ void thinnest_ui16_image::exec03_scale_liner(void) {
     }
   }
   /* カウントダウン表示終了 */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_end();
   }
 
@@ -5116,15 +5088,15 @@ void thinnest_ui16_image::exec04_bw(void) {
   uint16_t *ui16p_src, *ui16p_tgt;
 
   /* 処理実行表示 */
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("thinnest_ui16_image::exec04_bw()");
   }
   /* パラメータ表示 */
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr("thi : threshold %u", this->_ui16_threshold);
   }
   /* カウントダウン表示始め */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_start(this->_i32_ys);
   }
 
@@ -5133,7 +5105,7 @@ void thinnest_ui16_image::exec04_bw(void) {
 
   for (yy = 0L; yy < this->_i32_ys; ++yy) {
     /* カウントダウン表示中 */
-    if (ON == this->_i_cv_sw) {
+    if (this->_i_cv_sw) {
       pri_funct_cv_run(yy);
     }
 
@@ -5146,7 +5118,7 @@ void thinnest_ui16_image::exec04_bw(void) {
     }
   }
   /* カウントダウン表示終了 */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     pri_funct_cv_end();
   }
 
@@ -5161,7 +5133,7 @@ int thinnest_ui16_image::exec05_thin(void) {
       i32_pixel_count_one_side_tmp, i32_pixel_count_one_side[4];
 
   /* 処理ごとのメッセージ */
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("thinnest_ui16_image::exec05_thin()");
   }
 
@@ -5193,13 +5165,13 @@ int thinnest_ui16_image::exec05_thin(void) {
       this->_rot90_by_clockwork();
 
       /* カウントダウン表示(上下左右ひとつずつピリオド表示) */
-      if (ON == this->_i_cv_sw) {
+      if (this->_i_cv_sw) {
         (void)fprintf(stdout, ".");
         (void)fflush(stdout);
       }
     }
     /* カウントダウン表示(上下左右やって"....|"となる) */
-    if (ON == this->_i_cv_sw) {
+    if (this->_i_cv_sw) {
       (void)fprintf(stdout, "|");
       (void)fflush(stdout);
       /* 5 x 10カラムで改行 */
@@ -5212,12 +5184,12 @@ int thinnest_ui16_image::exec05_thin(void) {
     if (i32_pixel_count_one_round <= 0) break;
   }
   /* カウントダウン表示終了 */
-  if (ON == this->_i_cv_sw) {
+  if (this->_i_cv_sw) {
     (void)fprintf(stdout, "\nthin line ... end.\n");
     (void)fflush(stdout);
   }
 
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr("thi : total %d loop, and %ld pixel deleted", ii,
                        i32_pixel_count_total);
     pri_funct_msg_ttvr(
@@ -5237,7 +5209,7 @@ int thinnest_ui16_image::exec05_thin(void) {
 void thinnest_ui16_image::mem_free(void) {
 #if 0
   if (NULL !=	this->_ui16p_channel[0]) {
-    if (ON == this->_i_mv_sw) {
+    if (this->_i_mv_sw) {
       pri_funct_msg_ttvr( "thinnest_ui16_image::mem_free()" );
     }
 
@@ -5247,7 +5219,7 @@ void thinnest_ui16_image::mem_free(void) {
   }
 #endif
   if (NULL != this->memory_free_this_) {
-    if (ON == this->_i_mv_sw) {
+    if (this->_i_mv_sw) {
       pri_funct_msg_ttvr("thinnest_ui16_image::mem_free() <%x>",
                          this->memory_free_this_);
     }
@@ -5265,10 +5237,10 @@ int thinnest_ui16_image::mem_alloc(void) {
   this->mem_free();
 
   /* 処理ごとのメッセージ */
-  if (ON == this->_i_mv_sw) {
+  if (this->_i_mv_sw) {
     pri_funct_msg_ttvr("thinnest_ui16_image::mem_alloc()");
   }
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr(
         "alloc ui16_image memory (%d+%d) x (%d+%d) x %d x %d bytes",
         this->_i32_xs * this->_i32_xd, 2, this->_i32_ys * this->_i32_yd, 2, 2,
@@ -5279,7 +5251,7 @@ int thinnest_ui16_image::mem_alloc(void) {
       (uint16_t *)calloc((this->_i32_xs * this->_i32_xd + 2) *
                              (this->_i32_ys * this->_i32_yd + 2) * 2,
                          sizeof(uint16_t));
-  if (ON == this->_i_pv_sw) {
+  if (this->_i_pv_sw) {
     pri_funct_msg_ttvr("thinnest_ui16_image::mem_alloc() memory <%x>",
                        this->memory_free_this_);
   }
@@ -5304,11 +5276,11 @@ int32_t thinnest_ui16_image::_one_side_thinner(void) {
   int32_t yy, i32_delete_count;
 
   /* 処理ごとのメッセージ */
-  /******if (ON == this->_i_mv_sw) {
+  /******if (this->_i_mv_sw) {
           pri_funct_msg_ttvr( "thinnest_ui16_image::_one_side_thinner()" );
   }******/
   /* カウントダウン表示始め */
-  // if (ON == this->_i_cv_sw) { pri_funct_cv_start( this->_i32_ys ); }
+  // if (this->_i_cv_sw) { pri_funct_cv_start( this->_i32_ys ); }
 
   /* 始めのスキャンライン位置(画像から外れているものはNULLをいれる) */
   ui16p_src_y1 = this->get_ui16p_src_channel() + this->_i32_xs;
@@ -5320,7 +5292,7 @@ int32_t thinnest_ui16_image::_one_side_thinner(void) {
   i32_delete_count = 0;
   for (yy = 0; yy < this->_i32_ys; ++yy) {
     /* カウントダウン表示中 */
-    // if (ON == this->_i_cv_sw) { pri_funct_cv_run(yy); }
+    // if (this->_i_cv_sw) { pri_funct_cv_run(yy); }
 
     /* スキャンライン(とその前後のスキャンライン)毎の処理 */
     i32_delete_count += this->_one_side_thinner_scanline(
@@ -5337,7 +5309,7 @@ int32_t thinnest_ui16_image::_one_side_thinner(void) {
   }
 
   /* カウントダウン表示終了 */
-  // if (ON == this->_i_cv_sw) { pri_funct_cv_end(); }
+  // if (this->_i_cv_sw) { pri_funct_cv_end(); }
 
   /* 処理終了したらsrc,tgt画像交換 */
   this->_swap_channel();
@@ -5436,7 +5408,7 @@ int32_t thinnest_ui16_image::_one_side_thinner_pixel(
     uint16_t *ui16p_tgt) {
   int32_t i32_delete_count;
   long l_off_count, l_white_count;
-  int i_sw, i_sw2;
+  bool i_sw, i_sw2;
 
   /* ui16p_src_x2bがNULLであってはならない */
   assert(NULL != ui16p_src_x2b);
@@ -5445,63 +5417,63 @@ int32_t thinnest_ui16_image::_one_side_thinner_pixel(
   i32_delete_count = 0;
   l_off_count      = 0L;
   l_white_count    = 0L;
-  i_sw = i_sw2 = OFF;
+  i_sw = i_sw2 = false;
 
   /* 時計回り(右回り)に見ていく */
   /* 始め */
   if (NULL != (ui16p_src_x1a)) {
-    i_sw = (0 < (*ui16p_src_x1a)) ? ON : OFF;
-    if (ON == i_sw) ++l_white_count;
-    if ((i_sw != i_sw2) && (OFF == i_sw)) ++l_off_count;
+    i_sw = 0 < (*ui16p_src_x1a);
+    if (i_sw) ++l_white_count;
+    if (!i_sw && i_sw2) ++l_off_count;
     i_sw2 = i_sw;
   }
   /* 次 ... */
   if (NULL != (ui16p_src_x1b)) {
-    i_sw = (0 < (*ui16p_src_x1b)) ? ON : OFF;
-    if (ON == i_sw) ++l_white_count;
-    if ((i_sw != i_sw2) && (OFF == i_sw)) ++l_off_count;
+    i_sw = 0 < (*ui16p_src_x1b);
+    if (i_sw) ++l_white_count;
+    if (!i_sw && i_sw2) ++l_off_count;
     i_sw2 = i_sw;
   }
   if (NULL != (ui16p_src_x1c)) {
-    i_sw = (0 < (*ui16p_src_x1c)) ? ON : OFF;
-    if (ON == i_sw) ++l_white_count;
-    if ((i_sw != i_sw2) && (OFF == i_sw)) ++l_off_count;
+    i_sw = 0 < (*ui16p_src_x1c);
+    if (i_sw) ++l_white_count;
+    if (!i_sw && i_sw2) ++l_off_count;
     i_sw2 = i_sw;
   }
   if (NULL != (ui16p_src_x2c)) {
-    i_sw = (0 < (*ui16p_src_x2c)) ? ON : OFF;
-    if (ON == i_sw) ++l_white_count;
-    if ((i_sw != i_sw2) && (OFF == i_sw)) ++l_off_count;
+    i_sw = 0 < (*ui16p_src_x2c);
+    if (i_sw) ++l_white_count;
+    if (!i_sw && i_sw2) ++l_off_count;
     i_sw2 = i_sw;
   }
   if (NULL != (ui16p_src_x3c)) {
-    i_sw = (0 < (*ui16p_src_x3c)) ? ON : OFF;
-    if (ON == i_sw) ++l_white_count;
-    if ((i_sw != i_sw2) && (OFF == i_sw)) ++l_off_count;
+    i_sw = 0 < (*ui16p_src_x3c);
+    if (i_sw) ++l_white_count;
+    if (!i_sw && i_sw2) ++l_off_count;
     i_sw2 = i_sw;
   }
   if (NULL != (ui16p_src_x3b)) {
-    i_sw = (0 < (*ui16p_src_x3b)) ? ON : OFF;
-    if (ON == i_sw) ++l_white_count;
-    if ((i_sw != i_sw2) && (OFF == i_sw)) ++l_off_count;
+    i_sw = 0 < (*ui16p_src_x3b);
+    if (i_sw) ++l_white_count;
+    if (!i_sw && i_sw2) ++l_off_count;
     i_sw2 = i_sw;
   }
   if (NULL != (ui16p_src_x3a)) {
-    i_sw = (0 < (*ui16p_src_x3a)) ? ON : OFF;
-    if (ON == i_sw) ++l_white_count;
-    if ((i_sw != i_sw2) && (OFF == i_sw)) ++l_off_count;
+    i_sw = 0 < (*ui16p_src_x3a);
+    if (i_sw) ++l_white_count;
+    if (!i_sw && i_sw2) ++l_off_count;
     i_sw2 = i_sw;
   }
   if (NULL != (ui16p_src_x2a)) {
-    i_sw = (0 < (*ui16p_src_x2a)) ? ON : OFF;
-    if (ON == i_sw) ++l_white_count;
-    if ((i_sw != i_sw2) && (OFF == i_sw)) ++l_off_count;
+    i_sw = 0 < (*ui16p_src_x2a);
+    if (i_sw) ++l_white_count;
+    if (!i_sw && i_sw2) ++l_off_count;
     i_sw2 = i_sw;
   }
   /* 調査の開始点のみがゼロのときのため(l_off_count)開始点を再度調査する */
   if (NULL != (ui16p_src_x1a)) {
-    i_sw = (0 < (*ui16p_src_x1a)) ? ON : OFF;
-    if ((i_sw != i_sw2) && (OFF == i_sw)) ++l_off_count;
+    i_sw = 0 < (*ui16p_src_x1a);
+    if (!i_sw && i_sw2) ++l_off_count;
     i_sw2 = i_sw;
   }
 
@@ -5533,18 +5505,18 @@ void thinnest_ui16_image::_rot90_by_clockwork(void) {
   uint16_t *ui16p_src, *ui16p_tgt_y, *ui16p_tgt_x;
 
   /* 処理ごとのメッセージ */
-  /******if (ON == this->_i_mv_sw) {
+  /******if (this->_i_mv_sw) {
           pri_funct_msg_ttvr( "thinnest_ui16_image::_rot90_by_clockwork()" );
   }******/
   /* カウントダウン表示始め */
-  // if (ON == this->_i_cv_sw) { pri_funct_cv_start( this->_i32_ys ); }
+  // if (this->_i_cv_sw) { pri_funct_cv_start( this->_i32_ys ); }
 
   ui16p_src   = this->get_ui16p_src_channel();
   ui16p_tgt_y = this->get_ui16p_tgt_channel() + (this->_i32_ys - 1);
 
   for (yy = 0L; yy < this->_i32_ys; ++yy) {
     /* カウントダウン表示中 */
-    // if (ON == this->_i_cv_sw) { pri_funct_cv_run(yy); }
+    // if (this->_i_cv_sw) { pri_funct_cv_run(yy); }
 
     ui16p_tgt_x = ui16p_tgt_y;
     for (xx = 0L; xx < this->_i32_xs; ++xx) {
@@ -5555,7 +5527,7 @@ void thinnest_ui16_image::_rot90_by_clockwork(void) {
     --ui16p_tgt_y;
   }
   /* カウントダウン表示終了 */
-  // if (ON == this->_i_cv_sw) { pri_funct_cv_end(); }
+  // if (this->_i_cv_sw) { pri_funct_cv_end(); }
 
   /* 横と縦のサイズを交換 */
   i32_tmp       = this->_i32_xs;
@@ -5720,7 +5692,8 @@ int igs_line_blur_brush_curve_blur_subpixel_(
 }
 
 int igs_line_blur_brush_curve_blur_all_(
-    int mv_sw, int pv_sw, int cv_sw, brush_curve_blur &cl_brush_curve_blur,
+    bool mv_sw, bool pv_sw, bool cv_sw,
+    brush_curve_blur &cl_brush_curve_blur,
     pixel_select_curve_blur_root &cl_pixel_select_curve_blur_root,
     pixel_line_root &cl_pixel_line_root
 
@@ -5734,10 +5707,10 @@ int igs_line_blur_brush_curve_blur_all_(
     const int channels, const int bits, void *out  // no_margin
     ) {
   /* 処理ごとのメッセージ */
-  if (ON == mv_sw) {
+  if (mv_sw) {
     std::cout << "igs::line_blur::_brush_curve_blur_all()" << std::endl;
   }
-  if (ON == pv_sw) {
+  if (pv_sw) {
     std::cout << " curve blur points count is " << std::endl
               << cl_brush_curve_blur.get_i32_count() << std::endl
               << " power is " << std::endl
@@ -5760,13 +5733,13 @@ int igs_line_blur_brush_curve_blur_all_(
   /* 画像をinからoutへコピーしておく */
   (void)memcpy(out, in, height * width * channels * ((16 == bits) ? 2 : 1));
   /* カウントダウン表示始め */
-  if (ON == cv_sw) {
+  if (cv_sw) {
     pri_funct_cv_start(height);
   }
 
   for (int yy = 0; yy < height; ++yy) {
     /* カウントダウン表示中 */
-    if (ON == cv_sw) {
+    if (cv_sw) {
       pri_funct_cv_run(yy);
     }
 
@@ -5787,7 +5760,7 @@ int igs_line_blur_brush_curve_blur_all_(
   }
 
   /* カウントダウン表示終了 */
-  if (ON == cv_sw) {
+  if (cv_sw) {
     pri_funct_cv_end();
   }
 
@@ -6039,7 +6012,7 @@ void igs_line_blur_brush_smudge_line_(
 #include "igs_line_blur.h"  // "pri.h"
 
 void igs_line_blur_brush_smudge_all_(
-    int mv_sw, int pv_sw, int cv_sw,
+    bool mv_sw, bool pv_sw, bool cv_sw,
     brush_smudge_circle &cl_brush_smudge_circle,
     pixel_line_root &cl_pixel_line_root, const void *in  // no_margin
     ,
@@ -6050,11 +6023,11 @@ void igs_line_blur_brush_smudge_all_(
     const int channels, const int bits, void *out  // no_margin
     ) {
   /* 処理ごとのメッセージ */
-  if (ON == mv_sw) {
+  if (mv_sw) {
     std::cout << "igs::line_expand::_brush_smudge_all()" << std::endl;
   }
 
-  if (ON == pv_sw) {
+  if (pv_sw) {
     std::cout << " smudge ratio " << cl_brush_smudge_circle.get_d_ratio()
               << std::endl
               << " smudge brush size by pixel "
@@ -6073,7 +6046,7 @@ void igs_line_blur_brush_smudge_all_(
   (void)memcpy(out, in, height * width * channels * ((16 == bits) ? 2 : 1));
 
   /* カウントダウン表示始め */
-  if (ON == cv_sw) {
+  if (cv_sw) {
     pri_funct_cv_start(cl_pixel_line_root.get_i32_count());
   }
 
@@ -6088,7 +6061,7 @@ void igs_line_blur_brush_smudge_all_(
     }
 
     /* カウントダウン表示中 */
-    if (ON == cv_sw) {
+    if (cv_sw) {
       pri_funct_cv_run(ii);
     }
 
@@ -6096,7 +6069,7 @@ void igs_line_blur_brush_smudge_all_(
                                      channels, bits, out, clp_line);
   }
   /* カウントダウン表示終了 */
-  if (ON == cv_sw) {
+  if (cv_sw) {
     pri_funct_cv_end();
   }
 }
@@ -6106,7 +6079,7 @@ void igs_line_blur_brush_smudge_all_(
 
 #include "igs_line_blur.h"  // "pri.h"
 
-void igs_line_blur_image_get_(const int mv_sw, const int cv_sw,
+void igs_line_blur_image_get_(const bool mv_sw, const bool cv_sw,
                               const long reference_channel,
                               thinnest_ui16_image &cl_thinnest_ui16_image
 
@@ -6119,7 +6092,7 @@ void igs_line_blur_image_get_(const int mv_sw, const int cv_sw,
                               ,
                               const int channels, const int bits) {
   /* 処理ごとのメッセージ */
-  if (ON == mv_sw) {
+  if (mv_sw) {
     std::cout << "igs_line_blur_image_get_()" << std::endl
               << "com : reference channel " << reference_channel << std::endl;
   }
@@ -6129,7 +6102,7 @@ void igs_line_blur_image_get_(const int mv_sw, const int cv_sw,
   unsigned short *out_incr = cl_thinnest_ui16_image.get_ui16p_src_channel();
 
   /* カウントダウン表示始め */
-  if (ON == cv_sw) {
+  if (cv_sw) {
     pri_funct_cv_start(i32_ys);
   }
 
@@ -6138,7 +6111,7 @@ void igs_line_blur_image_get_(const int mv_sw, const int cv_sw,
     in_incr += reference_channel;
     for (int yy = 0; yy < i32_ys; ++yy) {
       /* カウントダウン表示中 */
-      if (ON == cv_sw) {
+      if (cv_sw) {
         pri_funct_cv_run(yy);
       }
 
@@ -6157,7 +6130,7 @@ void igs_line_blur_image_get_(const int mv_sw, const int cv_sw,
 
     for (int yy = 0; yy < i32_ys; ++yy) {
       /* カウントダウン表示中 */
-      if (ON == cv_sw) {
+      if (cv_sw) {
         pri_funct_cv_run(yy);
       }
 
@@ -6173,7 +6146,7 @@ void igs_line_blur_image_get_(const int mv_sw, const int cv_sw,
   }
 
   /* カウントダウン表示終了 */
-  if (ON == cv_sw) {
+  if (cv_sw) {
     pri_funct_cv_end();
   }
 }
@@ -6223,15 +6196,15 @@ void igs::line_blur::convert(
     const int v_near_len /* min=2   def=160  incr=1   max=1000 */
 
     ,
-    const int mv_sw /* OFF */
+    const bool mv_sw /* false=OFF */
     ,
-    const int pv_sw /* OFF */
+    const bool pv_sw /* false=OFF */
     ,
-    const int cv_sw /* OFF */
+    const bool cv_sw /* false=OFF */
     ,
     const long reference_channel /* 3	=Alpha:RGBA orBGRA */
     ,
-    const int debug_save_sw /* OFF */
+    const bool debug_save_sw /* false=OFF */
     ,
     const int brush_action /* 0 =Curve Blur ,1=Smudge Brush */
     ) {
@@ -6264,7 +6237,7 @@ void igs::line_blur::convert(
   cl_brush_curve_blur.set_i_cv_sw(cv_sw);
 
   /* --- 処理ごとのメッセージ --- */
-  if (ON == mv_sw) {
+  if (mv_sw) {
     std::cout << "igs::line_blur::convert()" << std::endl;
   }
 
@@ -6279,7 +6252,7 @@ void igs::line_blur::convert(
           this->set_e_brush_smudge_action();
   } else {
           this->set_e_brush_curve_blur_action();
-          cl_pixel_line_root.set_i_same_way_exec_sw(OFF);
+          cl_pixel_line_root.set_i_same_way_exec_sw(false);
   }******/
 
   /* 1: $b_blur_count   :Wheel(min=1, default=51, increment=1, max=100)   */
@@ -6363,7 +6336,7 @@ void igs::line_blur::convert(
     throw std::domain_error(
         "Error : cl_pixel_line_root.exec01020304() returns NG");
   }
-  if (ON == debug_save_sw) {
+  if (debug_save_sw) {
     if (OK != cl_pixel_line_root.save_lines("tmp08_jaggy_lines.txt")) {
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_lines(-) returns NG");
@@ -6387,7 +6360,7 @@ void igs::line_blur::convert(
 
   /* 中点をセットする */
   cl_pixel_line_root.exec05_set_middle();
-  if (ON == debug_save_sw) {
+  if (debug_save_sw) {
     if (OK != cl_pixel_line_root.save_middle_point("tmp12_middle_point.txt")) {
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_middle_point(-) returns NG");
@@ -6407,7 +6380,7 @@ void igs::line_blur::convert(
   }
 
   /* 伸ばした線分の方向をそろえる */
-  if (ON == debug_save_sw) {
+  if (debug_save_sw) {
     if (OK !=
         cl_pixel_line_root.save_expand_vector("tmp13_expand_vector.txt")) {
       throw std::domain_error(
@@ -6415,7 +6388,7 @@ void igs::line_blur::convert(
     }
   }
   cl_pixel_line_root.exec09_same_way_expand(&(cl_pixel_select_same_way_root));
-  if (ON == debug_save_sw) {
+  if (debug_save_sw) {
     if (OK !=
         cl_pixel_line_root.save_expand_vector("tmp14_same_way_vector.txt")) {
       throw std::domain_error(
@@ -6426,7 +6399,7 @@ void igs::line_blur::convert(
   /* 伸ばした線分を再度スムースに */
   cl_pixel_line_root.exec10_smooth_expand();
 
-  if (ON == debug_save_sw) {
+  if (debug_save_sw) {
     if (OK != cl_pixel_line_root.save_expand_lines("tmp15_expand_lines.txt")) {
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_expand_lines(-) returns NG");
@@ -6643,15 +6616,15 @@ void fx_(const TRasterP in_ras  // with margin
       vector_smooth_retry, vector_near_ref, vector_near_len
 
       ,
-      0 /* int mv_sw		0=OFF */
+      false /* bool mv_sw false=OFF */
       ,
-      0 /* int pv_sw		0=OFF */
+      false /* bool pv_sw false=OFF */
       ,
-      0 /* int cv_sw		0=OFF */
+      false /* bool cv_sw false=OFF */
       ,
       3 /* long reference_channel 3=Red:RGBA or Blue:BGRA */
       ,
-      0 /* int debug_save_sw	0=OFF */
+      false /* bool debug_save_sw false=OFF */
       ,
       action_mode);
   ino::arr_to_ras(out_buffer->getRawData(), ino::channels(), out_ras, 0);

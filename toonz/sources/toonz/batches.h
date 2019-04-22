@@ -110,6 +110,8 @@ private:
 };
 //-----------------------------------------------------------------------------
 class LoadTaskListPopup final : public FileBrowserPopup {
+  Q_OBJECT
+
 public:
   LoadTaskListPopup();
 

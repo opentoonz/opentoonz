@@ -165,6 +165,14 @@ Possibly the preset file has been corrupted</source>
         <source>x</source>
         <translation></translation>
     </message>
+    <message>
+        <source>A/R</source>
+        <translation>縦横比</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;カスタム&gt;</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -248,7 +256,33 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>サブシートを開く (&amp;O)</translation>
+        <translation type="vanished">サブシートを開く (&amp;O)</translation>
+    </message>
+</context>
+<context>
+    <name>ComboHistoRGBLabel</name>
+    <message>
+        <source>R:%1 G:%2 B:%3</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ComboHistogram</name>
+    <message>
+        <source>Picked Color</source>
+        <translation>スポイトで拾った色</translation>
+    </message>
+    <message>
+        <source>Average Color (Ctrl + Drag)</source>
+        <translation>平均の色 [Ctrl+ドラッグ]で範囲を指定</translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation>X:</translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation>Y：</translation>
     </message>
 </context>
 <context>
@@ -295,6 +329,25 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>White Thres</source>
         <translation>明るさのしきい値</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::ColorField</name>
+    <message>
+        <source>R:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>G:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>B:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -358,6 +411,13 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>OpenToonz</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation>選択色</translation>
     </message>
 </context>
 <context>
@@ -634,6 +694,17 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>&amp;Locator</source>
         <translation>ロケーター (&amp;L)</translation>
+    </message>
+</context>
+<context>
+    <name>FontParamField</name>
+    <message>
+        <source>Style:</source>
+        <translation>スタイル：</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>サイズ：</translation>
     </message>
 </context>
 <context>
@@ -965,6 +1036,21 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FunctionTreeModel</name>
+    <message>
+        <source>Stage</source>
+        <translation>ステージ</translation>
+    </message>
+    <message>
+        <source>FX</source>
+        <translation>エフェクト</translation>
+    </message>
+    <message>
+        <source>Plastic Skeleton</source>
+        <translation>プラスチックのボーン</translation>
+    </message>
+</context>
+<context>
     <name>FunctionTreeView</name>
     <message>
         <source>Save Curve</source>
@@ -985,6 +1071,10 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Show All</source>
         <translation>すべて表示</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>テーブル</translation>
     </message>
 </context>
 <context>
@@ -1007,7 +1097,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>サブシートを開く (&amp;O)</translation>
+        <translation type="vanished">サブシートを開く (&amp;O)</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -1127,6 +1217,13 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <source>Output</source>
+        <translation>出力</translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicPort</name>
     <message>
         <source>&amp;Disconnect from Xsheet</source>
@@ -1159,6 +1256,13 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
 </context>
 <context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <source>XSheet</source>
+        <translation>タイムシート</translation>
+    </message>
+</context>
+<context>
     <name>FxSettings</name>
     <message>
         <source>&amp;Camera Preview</source>
@@ -1183,6 +1287,10 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source> : </source>
         <translation> : </translation>
+    </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation>エフェクト設定</translation>
     </message>
 </context>
 <context>
@@ -1216,6 +1324,30 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>Logarithmic Scale</source>
         <translation>対数スケール</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>明度</translation>
+    </message>
+    <message>
+        <source>RGB</source>
+        <translation>RGB</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>赤</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>緑</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>青</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>アルファ</translation>
     </message>
 </context>
 <context>
@@ -1787,7 +1919,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation>&lt;カスタム&gt;</translation>
+        <translation type="vanished">&lt;カスタム&gt;</translation>
     </message>
     <message>
         <source>Toonz 7.1</source>
@@ -2085,6 +2217,10 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>&amp;Swtich output port display mode</source>
         <translation>ポートの表示を切り替える (&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Toggle node icons</source>
+        <translation>アイコン表示切り替え （&amp;T）</translation>
     </message>
 </context>
 <context>
@@ -2386,6 +2522,26 @@ Apply</source>
     <message>
         <source>Style Editor - No Valid Style Selected</source>
         <translation>スタイルエディタ - 有効なスタイルが選択されていません</translation>
+    </message>
+    <message>
+        <source>Wheel</source>
+        <translation>カラーホイール</translation>
+    </message>
+    <message>
+        <source>HSV</source>
+        <translation>HSV</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>アルファ</translation>
+    </message>
+    <message>
+        <source>RGB</source>
+        <translation>RGB</translation>
+    </message>
+    <message>
+        <source>Palette</source>
+        <translation>パレット</translation>
     </message>
 </context>
 <context>

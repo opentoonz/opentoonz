@@ -1819,7 +1819,7 @@ void performReverse(const TXshSimpleLevelP &sl,
     while (i < j && frames.count(fids[i]) == 0) i++;
     while (i < j && frames.count(fids[j]) == 0) j--;
     if (i >= j) break;
-    tswap(fids[i], fids[j]);
+    std::swap(fids[i], fids[j]);
     i++;
     j--;
   }

@@ -11,6 +11,7 @@
 #include "trasterimage.h"
 #include "tiio.h"
 #include "tfilepath_io.h"
+#include "tpixelutils.h"
 
 // boost includes
 #include <boost/range.hpp>
@@ -630,6 +631,19 @@ void TImageWriter::save(const TImageP &img) {
 
     writer->open(file, info);
 
+    // add background colors for non alpha-enabled image types
+    if ((ras32 || ras64) && !writer->writeAlphaSupported() &&
+        TImageWriter::getBackgroundColor() != TPixel::Black) {
+      if (bpp == 32 || bpp == 24)
+        TRop::addBackground(ras, TImageWriter::getBackgroundColor());
+      else if (bpp == 64 || bpp == 48) {
+        TRaster64P bgRas(ras->getSize());
+        bgRas->fill(toPixel64(TImageWriter::getBackgroundColor()));
+        TRop::over(bgRas, ras);
+        ras = bgRas;
+      }  // for other bpp values, do nothing for now
+    }
+
     ras->lock();
 
     if (writer->getRowOrder() == Tiio::BOTTOM2TOP) {
@@ -743,6 +757,18 @@ void TImageWriter::save(const TFilePath &path, TRasterP raster) {
 void TImageWriter::save(const TFilePath &path, const TImageP &image) {
   TImageWriterP(path)->save(image);
 }
+
+//===========================================================
+// Background color for saving ransparent pixel to the format not
+// supporting alpha channel. Specified in the preferences.
+
+TPixel32 TImageWriter::m_backgroundColor;
+
+void TImageWriter::setBackgroundColor(TPixel32 color) {
+  m_backgroundColor = color;
+}
+
+TPixel32 TImageWriter::getBackgroundColor() { return m_backgroundColor; }
 
 //===========================================================
 //

@@ -4,96 +4,101 @@
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="519"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="532"/>
         <source>Z:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="520"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="533"/>
         <source>Position:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="521"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="604"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="534"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="617"/>
         <source>E/W:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="522"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="605"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="535"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="618"/>
         <source>N/S:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="537"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="550"/>
         <source>SO:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="542"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="555"/>
         <source>Rotation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="558"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="571"/>
         <source>Global:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="559"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="585"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="572"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="598"/>
         <source>H:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="560"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="586"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="573"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="599"/>
         <source>V:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="681"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="694"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="704"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="717"/>
         <source>(</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="706"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="719"/>
         <source>)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="729"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="742"/>
         <source>Rotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="751"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="764"/>
         <source>Scale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="774"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="787"/>
         <source>Maintain:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="794"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="807"/>
         <source>Shear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="826"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="839"/>
         <source>Center Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="664"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1074"/>
+        <source>Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="677"/>
         <source>Pick:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -101,163 +106,133 @@
 <context>
     <name>BrushTool</name>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1059"/>
-        <location filename="../../tnztools/brushtool.cpp" line="1060"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="557"/>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1061"/>
-        <source>Hardness:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1062"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="558"/>
         <source>Accuracy:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1063"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="559"/>
         <source>Smooth:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1064"/>
-        <source>Draw Order:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1066"/>
-        <source>Over All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1067"/>
-        <source>Under All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1068"/>
-        <source>Palette Order</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1071"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="560"/>
         <source>Preset:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1072"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="561"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="1525"/>
         <source>&lt;custom&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1073"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="562"/>
         <source>Break</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1074"/>
-        <source>Pencil</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1075"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="563"/>
         <source>Pressure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1076"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="564"/>
         <source>Cap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1077"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="565"/>
         <source>Join</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1078"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="566"/>
         <source>Miter:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1079"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="567"/>
         <source>Range:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1080"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="568"/>
         <source>Snap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1083"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="570"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1084"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="571"/>
         <source>Linear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1085"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="572"/>
         <source>In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1086"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="573"/>
         <source>Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1087"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="574"/>
         <source>In&amp;Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1088"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="575"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1089"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="576"/>
         <source>Med</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1090"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="577"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1091"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="578"/>
         <source>Butt cap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1092"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="579"/>
         <source>Round cap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1093"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="580"/>
         <source>Projecting cap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1094"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="581"/>
         <source>Miter join</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1095"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="582"/>
         <source>Round join</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/brushtool.cpp" line="1096"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="583"/>
         <source>Bevel join</source>
         <translation type="unfinished"></translation>
     </message>
@@ -265,17 +240,17 @@
 <context>
     <name>BrushToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1749"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1770"/>
         <source>Preset Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1753"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1774"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1755"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1776"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -298,6 +273,14 @@
     <message>
         <location filename="../../tnztools/controlpointselection.cpp" line="1007"/>
         <source>Set Nonlinear Control Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <location filename="../../tnztools/tooloptionscontrols.cpp" line="870"/>
+        <source>current</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -456,90 +439,95 @@
         <source>Center</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../tnztools/edittool.cpp" line="852"/>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EraserTool</name>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="401"/>
-        <location filename="../../tnztools/rastererasertool.cpp" line="625"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="624"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="402"/>
-        <location filename="../../tnztools/rastererasertool.cpp" line="639"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="638"/>
         <source>Selective</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="403"/>
-        <location filename="../../tnztools/rastererasertool.cpp" line="640"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="639"/>
         <source>Invert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="404"/>
-        <location filename="../../tnztools/rastererasertool.cpp" line="641"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="640"/>
         <source>Frame Range</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="405"/>
-        <location filename="../../tnztools/rastererasertool.cpp" line="628"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="627"/>
         <source>Type:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="406"/>
-        <location filename="../../tnztools/rastererasertool.cpp" line="629"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="628"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="407"/>
-        <location filename="../../tnztools/rastererasertool.cpp" line="630"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="629"/>
         <source>Rectangular</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="408"/>
-        <location filename="../../tnztools/rastererasertool.cpp" line="631"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="630"/>
         <source>Freehand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorerasertool.cpp" line="409"/>
-        <location filename="../../tnztools/rastererasertool.cpp" line="632"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="631"/>
         <source>Polyline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rastererasertool.cpp" line="626"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="625"/>
         <source>Hardness:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rastererasertool.cpp" line="634"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="633"/>
         <source>Mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rastererasertool.cpp" line="635"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="634"/>
         <source>Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rastererasertool.cpp" line="636"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="635"/>
         <source>Areas</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rastererasertool.cpp" line="637"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="636"/>
         <source>Lines &amp; Areas</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rastererasertool.cpp" line="642"/>
+        <location filename="../../tnztools/rastererasertool.cpp" line="641"/>
         <source>Pencil Mode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -617,6 +605,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../tnztools/filltool.cpp" line="1814"/>
+        <source>Maximum Gap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../tnztools/filltool.cpp" line="1815"/>
         <source>Autopaint Lines</source>
         <translation type="unfinished"></translation>
@@ -625,12 +618,12 @@
 <context>
     <name>FingerTool</name>
     <message>
-        <location filename="../../tnztools/fingertool.cpp" line="332"/>
+        <location filename="../../tnztools/fingertool.cpp" line="331"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fingertool.cpp" line="333"/>
+        <location filename="../../tnztools/fingertool.cpp" line="332"/>
         <source>Invert</source>
         <translation type="unfinished"></translation>
     </message>
@@ -674,56 +667,61 @@
         <source>Lock Alpha</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="619"/>
+        <source>&lt;custom&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FullColorEraserTool</name>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="409"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="408"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="410"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="409"/>
         <source>Opacity:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="411"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="410"/>
         <source>Hardness:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="413"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="412"/>
         <source>Type:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="414"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="413"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="415"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="414"/>
         <source>Rectangular</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="416"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="415"/>
         <source>Freehand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="417"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="416"/>
         <source>Polyline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="419"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="418"/>
         <source>Invert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorerasertool.cpp" line="420"/>
+        <location filename="../../tnztools/fullcolorerasertool.cpp" line="419"/>
         <source>Frame Range</source>
         <translation type="unfinished"></translation>
     </message>
@@ -747,32 +745,32 @@
 <context>
     <name>PaintBrushTool</name>
     <message>
-        <location filename="../../tnztools/paintbrushtool.cpp" line="344"/>
+        <location filename="../../tnztools/paintbrushtool.cpp" line="343"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/paintbrushtool.cpp" line="346"/>
+        <location filename="../../tnztools/paintbrushtool.cpp" line="345"/>
         <source>Mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/paintbrushtool.cpp" line="347"/>
+        <location filename="../../tnztools/paintbrushtool.cpp" line="346"/>
         <source>Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/paintbrushtool.cpp" line="348"/>
+        <location filename="../../tnztools/paintbrushtool.cpp" line="347"/>
         <source>Areas</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/paintbrushtool.cpp" line="349"/>
+        <location filename="../../tnztools/paintbrushtool.cpp" line="348"/>
         <source>Lines &amp; Areas</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/paintbrushtool.cpp" line="351"/>
+        <location filename="../../tnztools/paintbrushtool.cpp" line="350"/>
         <source>Selective</source>
         <translation type="unfinished"></translation>
     </message>
@@ -780,17 +778,17 @@
 <context>
     <name>PinchTool</name>
     <message>
-        <location filename="../../tnztools/pinchtool.cpp" line="110"/>
+        <location filename="../../tnztools/pinchtool.cpp" line="109"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/pinchtool.cpp" line="111"/>
+        <location filename="../../tnztools/pinchtool.cpp" line="110"/>
         <source>Corner:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/pinchtool.cpp" line="112"/>
+        <location filename="../../tnztools/pinchtool.cpp" line="111"/>
         <source>Manual</source>
         <translation type="unfinished"></translation>
     </message>
@@ -798,22 +796,22 @@
 <context>
     <name>PlasticTool</name>
     <message>
-        <location filename="../../tnztools/plastictool_meshedit.cpp" line="1124"/>
+        <location filename="../../tnztools/plastictool_meshedit.cpp" line="1121"/>
         <source>Swap Edge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool_meshedit.cpp" line="1130"/>
+        <location filename="../../tnztools/plastictool_meshedit.cpp" line="1127"/>
         <source>Collapse Edge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool_meshedit.cpp" line="1135"/>
+        <location filename="../../tnztools/plastictool_meshedit.cpp" line="1132"/>
         <source>Split Edge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool_meshedit.cpp" line="1141"/>
+        <location filename="../../tnztools/plastictool_meshedit.cpp" line="1138"/>
         <source>Cut Mesh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -913,54 +911,54 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1234"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1238"/>
         <source>A group of skeletons already exists for current column. Replacing it will also substitute any existing vertex animation.
 
 Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1238"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1242"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1238"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1242"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1452"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1456"/>
         <source>Copy Skeleton</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1459"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1463"/>
         <source>Paste Skeleton</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1483"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1487"/>
         <source>Show Mesh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1490"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1494"/>
         <source>Show Rigidity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1497"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1501"/>
         <source>Show SO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1504"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1508"/>
         <source>Show Skeleton Onion Skin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1582"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1586"/>
         <source>The previous vertex name will be discarded, and all associated keys will be lost.
 
 Do you want to proceed?</source>
@@ -1165,25 +1163,25 @@ Do you want to proceed?</source>
     <name>QObject</name>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="126"/>
-        <location filename="../../tnztools/rasterselection.cpp" line="1128"/>
+        <location filename="../../tnztools/rasterselection.cpp" line="1127"/>
         <source>The copied selection cannot be pasted in the current drawing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rasterselection.cpp" line="406"/>
-        <location filename="../../tnztools/rasterselection.cpp" line="571"/>
+        <location filename="../../tnztools/rasterselection.cpp" line="405"/>
+        <location filename="../../tnztools/rasterselection.cpp" line="570"/>
         <source>Paste</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="239"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="268"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="241"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="270"/>
         <source>Min:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="239"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="268"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="241"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="270"/>
         <source>Max:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1203,12 +1201,12 @@ Do you want to proceed?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1584"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1588"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/plastictool.cpp" line="1584"/>
+        <location filename="../../tnztools/plastictool.cpp" line="1588"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1248,19 +1246,19 @@ Do you want to proceed?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="818"/>
         <location filename="../../tnztools/geometrictool.cpp" line="1091"/>
-        <location filename="../../tnztools/brushtool.cpp" line="1549"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="818"/>
         <location filename="../../tnztools/geometrictool.cpp" line="1091"/>
-        <location filename="../../tnztools/brushtool.cpp" line="1549"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittoolgadgets.cpp" line="89"/>
+        <location filename="../../tnztools/edittoolgadgets.cpp" line="88"/>
         <source>Modify Fx Gadget  </source>
         <translation type="unfinished"></translation>
     </message>
@@ -1403,7 +1401,7 @@ Do you want to proceed?</source>
 <context>
     <name>RGBPickerToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2353"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2392"/>
         <source>Pick Screen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1423,6 +1421,11 @@ Do you want to proceed?</source>
 </context>
 <context>
     <name>RasterTapeTool</name>
+    <message>
+        <location filename="../../tnztools/rastertapetool.cpp" line="187"/>
+        <source>current</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../../tnztools/rastertapetool.cpp" line="179"/>
         <source>Type:</source>
@@ -1459,18 +1462,65 @@ Do you want to proceed?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rastertapetool.cpp" line="187"/>
+        <location filename="../../tnztools/rastertapetool.cpp" line="188"/>
         <source>Opacity:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rastertapetool.cpp" line="188"/>
+        <location filename="../../tnztools/rastertapetool.cpp" line="189"/>
         <source>Frame Range</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/rastertapetool.cpp" line="189"/>
+        <location filename="../../tnztools/rastertapetool.cpp" line="190"/>
         <source>Angle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RotateTool</name>
+    <message>
+        <location filename="../../tnztools/viewtools.h" line="41"/>
+        <source>Rotate On Camera Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RulerToolOptionsBox</name>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2153"/>
+        <source>X:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2159"/>
+        <source>Y:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2167"/>
+        <source>W:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2173"/>
+        <source>H:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2181"/>
+        <source>A:</source>
+        <comment>ruler tool option</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2186"/>
+        <source>L:</source>
+        <comment>ruler tool option</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1500,38 +1550,72 @@ Do you want to proceed?</source>
 <context>
     <name>SelectionToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1171"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1184"/>
         <source>H:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1173"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1186"/>
         <source>V:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1175"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1188"/>
         <source>Link</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1179"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1191"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1192"/>
         <source>Rotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1183"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1194"/>
         <source>E/W:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1185"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1196"/>
         <source>N/S:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1238"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1216"/>
+        <source>Scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="1233"/>
+        <source>Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="1251"/>
         <source>Thickness</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ShiftTraceToolOptionBox</name>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2525"/>
+        <source>Reset Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2526"/>
+        <source>Reset Following</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2528"/>
+        <source>Previous Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="2529"/>
+        <source>Following Drawing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1624,9 +1708,69 @@ Do you want to proceed?</source>
 <context>
     <name>StylePickerToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2435"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2474"/>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterBrushTool</name>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1021"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1028"/>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1022"/>
+        <source>Hardness:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1023"/>
+        <source>Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1024"/>
+        <source>Draw Order:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1025"/>
+        <source>Over All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1026"/>
+        <source>Under All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1027"/>
+        <source>Palette Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1031"/>
+        <source>Preset:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1032"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1966"/>
+        <source>&lt;custom&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1033"/>
+        <source>Pencil</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1034"/>
+        <source>Pressure</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1656,22 +1800,22 @@ moved to the end of the first page of the palette.</source>
 <context>
     <name>TypeTool</name>
     <message>
-        <location filename="../../tnztools/typetool.cpp" line="446"/>
+        <location filename="../../tnztools/typetool.cpp" line="448"/>
         <source>Font:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/typetool.cpp" line="447"/>
+        <location filename="../../tnztools/typetool.cpp" line="449"/>
         <source>Style:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/typetool.cpp" line="448"/>
+        <location filename="../../tnztools/typetool.cpp" line="450"/>
         <source>Vertical Orientation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../tnztools/typetool.cpp" line="449"/>
+        <location filename="../../tnztools/typetool.cpp" line="451"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>

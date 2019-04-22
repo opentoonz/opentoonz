@@ -668,8 +668,8 @@ public:
                  ? ((m_w2 == 0.0 || m_w2 == 1.0) ? p2p : p2l)
                  : ((m_w2 == 0.0 || m_w2 == 1.0) ? l2p : l2l);
       if (type == l2p) {
-        tswap(m_strokeIndex1, m_strokeIndex2);
-        tswap(m_w1, m_w2);
+        std::swap(m_strokeIndex1, m_strokeIndex2);
+        std::swap(m_w1, m_w2);
         type = p2l;
       }
     }

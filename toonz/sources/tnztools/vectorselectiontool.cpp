@@ -568,9 +568,9 @@ DragSelectionTool::VectorDeformTool::~VectorDeformTool() {
 void DragSelectionTool::VectorDeformTool::applyTransform(FourPoints bbox) {
   SelectionTool *tool = getTool();
 
-  tcg::unique_ptr<VFDScopedBlock> localVfdScopedBlock;
-  if (!m_vfdScopedBlock.get()) {
-    tcg::unique_ptr<VFDScopedBlock> &vfdScopedBlock =
+  std::unique_ptr<VFDScopedBlock> localVfdScopedBlock;
+  if (!m_vfdScopedBlock) {
+    std::unique_ptr<VFDScopedBlock> &vfdScopedBlock =
         m_isDragging ? m_vfdScopedBlock : localVfdScopedBlock;
 
     vfdScopedBlock.reset(new VFDScopedBlock(tool));
@@ -584,7 +584,7 @@ void DragSelectionTool::VectorDeformTool::applyTransform(FourPoints bbox) {
   freeDeformer->setPreserveThickness(tool->isConstantThickness());
   freeDeformer->setFlip(isFlip());
 
-  if (!TTool::getApplication()->getCurrentObject()->isSpline() && m_undo.get())
+  if (!TTool::getApplication()->getCurrentObject()->isSpline() && m_undo)
     m_undo->setFlip(isFlip());
 
   freeDeformer->deformImage();
@@ -608,7 +608,7 @@ void DragSelectionTool::VectorDeformTool::addTransformUndo() {
                          ->getXsheet()
                          ->getStageObject(getTool()->getObjectId())
                          ->getSpline()));
-  else if (m_undo.get()) {
+  else if (m_undo) {
     m_undo->registerStrokes();
     TUndoManager::manager()->add(m_undo.release());
   }
@@ -652,7 +652,7 @@ void DragSelectionTool::VectorDeformTool::transformWholeLevel() {
       TVectorImageP vi = level->getFrame(fid, true);
       if (!vi) continue;
 
-      tcg::unique_ptr<UndoChangeStrokes> undo(
+      std::unique_ptr<UndoChangeStrokes> undo(
           new UndoChangeStrokes(level, fid, tool, tool->levelSelection()));
 
       std::set<int> strokesIndices;
@@ -704,7 +704,7 @@ bool DragSelectionTool::VectorDeformTool::isFlip() {
 
 void DragSelectionTool::VectorDeformTool::leftButtonUp(const TPointD &pos,
                                                        const TMouseEvent &e) {
-  tcg::unique_ptr<VFDScopedBlock> vfdScopedBlock(m_vfdScopedBlock.release());
+  std::unique_ptr<VFDScopedBlock> vfdScopedBlock(std::move(m_vfdScopedBlock));
 
   SelectionTool *tool = getTool();
   VectorFreeDeformer *deformer =
@@ -1046,7 +1046,7 @@ void DragSelectionTool::VectorChangeThicknessTool::addUndo() {
         }
 
         // Transform fid's selection
-        tcg::unique_ptr<UndoChangeStrokes> undo(
+        std::unique_ptr<UndoChangeStrokes> undo(
             new UndoChangeStrokes(level, fid, vtool, vtool->levelSelection()));
 
         setStrokesThickness(*vi);

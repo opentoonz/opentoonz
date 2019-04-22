@@ -138,16 +138,16 @@ PageViewer::PageViewer(QWidget *parent, PaletteViewType viewType,
   ViewMode defaultChipSize;
   switch (m_viewType) {
   case LEVEL_PALETTE:
-    defaultChipSize = (ViewMode)ChipSizeManager::instance()->chipSize_Palette;
+    defaultChipSize = LargeChips;
     break;
   case CLEANUP_PALETTE:
-    defaultChipSize = (ViewMode)ChipSizeManager::instance()->chipSize_Cleanup;
+    defaultChipSize = SmallChips;
     break;
   case STUDIO_PALETTE:
-    defaultChipSize = (ViewMode)ChipSizeManager::instance()->chipSize_Studio;
+    defaultChipSize = MediumChips;
     break;
   default:
-    defaultChipSize = (ViewMode)2;
+    defaultChipSize = LargeChips;
     break;
   }
   setViewMode(defaultChipSize);
@@ -212,7 +212,12 @@ TFrameHandle *PageViewer::getFrameHandle() const { return m_frameHandle; }
 //-----------------------------------------------------------------------------
 
 void PageViewer::setCurrentStyleIndex(int index) {
-  getPaletteHandle()->setStyleIndex(index);
+  // When clicking and switching between studio palette and level palette, the
+  // signal broadcastColorStyleSwitched is not emitted if the clicked style is
+  // previously selected one.
+  // Therefore here I introduced the "forceEmit" flag here in order to emit the
+  // signal whenever the style is clicked.
+  getPaletteHandle()->setStyleIndex(index, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -246,21 +251,6 @@ void PageViewer::setViewMode(ViewMode viewMode) {
   m_viewMode = viewMode;
   computeSize();
   update();
-
-  // keep new view mode for reproducing the same mode when a new palette is made
-  switch (m_viewType) {
-  case LEVEL_PALETTE:
-    ChipSizeManager::instance()->chipSize_Palette = (int)m_viewMode;
-    break;
-  case CLEANUP_PALETTE:
-    ChipSizeManager::instance()->chipSize_Cleanup = (int)m_viewMode;
-    break;
-  case STUDIO_PALETTE:
-    ChipSizeManager::instance()->chipSize_Studio = (int)m_viewMode;
-    break;
-  default:
-    break;
-  }
 }
 
 //-----------------------------------------------------------------------------
