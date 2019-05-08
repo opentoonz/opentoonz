@@ -155,6 +155,8 @@ protected:
 
   TRect m_imageBounds;
 
+  double m_dpiX, m_dpiY;
+
 protected:
   virtual void contextMenuEvent(QContextMenuEvent *event) override;
   virtual void mouseMoveEvent(QMouseEvent *event) override;

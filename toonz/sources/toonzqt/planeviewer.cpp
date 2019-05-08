@@ -74,7 +74,9 @@ PlaneViewer::PlaneViewer(QWidget *parent)
     , m_ypos(0)
     , m_aff()  // initialized at the first resize
     , m_chessSize(40.0)
-    , m_firstDraw(true) {
+    , m_firstDraw(true)
+    , m_dpiX(0.0)
+    , m_dpiY(0.0) {
   m_zoomRange[0] = 1e-3, m_zoomRange[1] = 1024.0;
   setBgColor(TPixel32(235, 235, 235), TPixel32(235, 235, 235));
 
@@ -289,6 +291,8 @@ void PlaneViewer::keyPressEvent(QKeyEvent *event) {
 //! Disposes of the auxiliary internal rasterBuffer().
 void PlaneViewer::hideEvent(QHideEvent *event) {
   m_rasterBuffer = TRaster32P();
+  m_dpiX         = 0.0;  // reset dpi
+  m_dpiY         = 0.0;
 }
 
 //------------------------------------------------------------------
@@ -498,7 +502,9 @@ void PlaneViewer::fitView() {
   double imageScale = std::min(width() / (double)m_imageBounds.getLx(),
                                height() / (double)m_imageBounds.getLy());
 
-  m_aff     = TScale(imageScale, imageScale);
+  m_aff = TScale(imageScale, imageScale);
+  if (m_dpiX != 0.0 && m_dpiY != 0.0)
+    m_aff *= TScale(m_dpiX / Stage::inch, m_dpiY / Stage::inch);
   m_aff.a13 = 0.5 * width();
   m_aff.a23 = 0.5 * height();
 
@@ -604,6 +610,10 @@ void PlaneViewer::draw(TRasterP ras, double dpiX, double dpiY, TPalette *pal) {
   TRaster32P aux(rasterBuffer());
 
   m_imageBounds = ras->getBounds();
+  if (m_dpiX == 0.0 || m_dpiY == 0.0) {
+    m_dpiX = dpiX;
+    m_dpiY = dpiY;
+  }
   if (m_firstDraw && !m_imageBounds.isEmpty()) {
     m_firstDraw = false;
     fitView();
@@ -664,6 +674,10 @@ void PlaneViewer::draw(TVectorImageP vi) {
   TRect bboxI(tfloor(bbox.x0), tfloor(bbox.y0), tceil(bbox.x1) - 1,
               tceil(bbox.y1) - 1);
   m_imageBounds = bboxI;
+  if (m_dpiX == 0.0 || m_dpiY == 0.0) {
+    m_dpiX = Stage::inch;
+    m_dpiY = Stage::inch;
+  }
   if (m_firstDraw) {
     m_firstDraw = false;
     fitView();
