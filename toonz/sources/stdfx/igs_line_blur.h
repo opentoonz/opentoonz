@@ -18,7 +18,8 @@ IGS_LINE_BLUR_EXPORT void convert(
     ,
     const int width  // no_margin
     ,
-    const int channels, const int bits
+    const int channels,
+    const int bits
 
     /* Action Geometry */
     ,
@@ -57,8 +58,8 @@ IGS_LINE_BLUR_EXPORT void convert(
     const bool debug_save_sw /* false=OFF */
     ,
     const int brush_action /* 0 =Curve Blur ,1=Smudge Brush */
-    );
+);
 }
-}
+}  // namespace igs
 
 #endif /* !igs_line_blur_h */

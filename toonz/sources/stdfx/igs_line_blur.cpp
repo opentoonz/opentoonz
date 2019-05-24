@@ -1714,11 +1714,10 @@ int pixel_line_node::expand_line(pixel_point_root *clp_pixel_point_root) {
   /* 始点が端点ならば先へ伸ばす */
   i32_body_point_count = this->_i32_point_count;
   if (NULL == clp_one->get_clp_link_near(1)) { /* 2点目がないなら端点 */
-    if (OK !=
-        this->_expand_line_from_one(clp_pixel_point_root, i32_body_point_count,
-                                    this->get_clp_link_one(),
-                                    this->get_clp_link_another(),
-                                    d_radian_one)) {
+    if (OK != this->_expand_line_from_one(
+                  clp_pixel_point_root, i32_body_point_count,
+                  this->get_clp_link_one(), this->get_clp_link_another(),
+                  d_radian_one)) {
       pri_funct_err_bttvr(
           "Error : this->_expand_line_from_one(-) returns NULL.");
       return NG;
@@ -1727,11 +1726,10 @@ int pixel_line_node::expand_line(pixel_point_root *clp_pixel_point_root) {
 
   /* 終点が端点ならば先へ伸ばす */
   if (NULL == clp_another->get_clp_link_near(1)) { /* 2点目がないなら端点 */
-    if (OK !=
-        this->_expand_line_from_another(
-            clp_pixel_point_root, i32_body_point_count,
-            this->get_clp_link_one(), this->get_clp_link_another(),
-            d_radian_another)) {
+    if (OK != this->_expand_line_from_another(
+                  clp_pixel_point_root, i32_body_point_count,
+                  this->get_clp_link_one(), this->get_clp_link_another(),
+                  d_radian_another)) {
       pri_funct_err_bttvr(
           "Error : this->_expand_line_from_another(-) returns NULL.");
       return NG;
@@ -4178,7 +4176,7 @@ void pixel_select_curve_blur_root::exec(double d_xp, double d_yp,
       if ((M_PI / 2.0 < d_radius) && (d_radius < M_PI * 3.0 / 2.0)) {
         clp_start_point = clp_line->get_next_point_by_count(clp_near_point,
                                                             i32_blur_count / 2);
-        i_reverse_sw = true;
+        i_reverse_sw    = true;
       }
     }
 
@@ -5486,7 +5484,7 @@ void igs_line_blur_brush_curve_point_put_image_template_(
     const int width  // no_margin
     ,
     const int channels, T *image_top  // no_margin
-    ) {
+) {
   for (int zz = 0; zz < channels; ++zz) {
     image_top[yp * channels * width + xp * channels + zz] =
         static_cast<T>(dp_pixel[zz]);
@@ -5504,7 +5502,7 @@ void igs_line_blur_brush_curve_point_put_image_(
     const int width  // no_margin
     ,
     const int channels, const int bits, void *out  // no_margin
-    ) {
+) {
   if ((xp < 0) && (width <= xp) && (yp < 0) && (height <= yp)) {
     throw std::domain_error(
         "Error : igs::line_blur::_brush_curve_point_put_image(-)");
@@ -5626,8 +5624,7 @@ int igs_line_blur_brush_curve_blur_subpixel_(
 }
 
 int igs_line_blur_brush_curve_blur_all_(
-    bool mv_sw, bool pv_sw, bool cv_sw,
-    brush_curve_blur &cl_brush_curve_blur,
+    bool mv_sw, bool pv_sw, bool cv_sw, brush_curve_blur &cl_brush_curve_blur,
     pixel_select_curve_blur_root &cl_pixel_select_curve_blur_root,
     pixel_line_root &cl_pixel_line_root
 
@@ -5639,7 +5636,7 @@ int igs_line_blur_brush_curve_blur_all_(
     const int width  // no_margin
     ,
     const int channels, const int bits, void *out  // no_margin
-    ) {
+) {
   /* 処理ごとのメッセージ */
   if (mv_sw) {
     std::cout << "igs::line_blur::_brush_curve_blur_all()" << std::endl;
@@ -5799,7 +5796,7 @@ void igs_line_blur_brush_smudge_put_image_(
     const int width  // no_margin
     ,
     const int channels, const int bits, void *out  // no_margin
-    ) {
+) {
   /* 画像上に置いたブラシの範囲 */
   double x1, y1, x2, y2;
   cl_brush_smudge_circle.get_dp_area(d_xp, d_yp, &x1, &y1, &x2, &y2);
@@ -5955,7 +5952,7 @@ void igs_line_blur_brush_smudge_all_(
     const int width  // no_margin
     ,
     const int channels, const int bits, void *out  // no_margin
-    ) {
+) {
   /* 処理ごとのメッセージ */
   if (mv_sw) {
     std::cout << "igs::line_expand::_brush_smudge_all()" << std::endl;
@@ -6084,7 +6081,7 @@ void igs_line_blur_image_get_(const bool mv_sw, const bool cv_sw,
     pri_funct_cv_end();
   }
 }
-}
+}  // namespace
 
 #include <iostream>
 #include <stdexcept>
@@ -6101,7 +6098,8 @@ void igs::line_blur::convert(
     ,
     const int width  // no_margin
     ,
-    const int channels, const int bits
+    const int channels,
+    const int bits
 
     /* Action */
     ,
@@ -6140,7 +6138,7 @@ void igs::line_blur::convert(
     const bool debug_save_sw /* false=OFF */
     ,
     const int brush_action /* 0 =Curve Blur ,1=Smudge Brush */
-    ) {
+) {
   /* --- 動作クラスコンストラクション --- */
   thinnest_ui16_image cl_thinnest_ui16_image;
   pixel_point_root cl_pixel_point_root;
@@ -6255,11 +6253,10 @@ void igs::line_blur::convert(
   /****** ベクトルリスト処理 start ******/
 
   /* 細線化した画像をリストにする */
-  if (OK !=
-      cl_pixel_point_root.alloc_mem_and_list_node(
-          cl_thinnest_ui16_image.get_i32_xs(),
-          cl_thinnest_ui16_image.get_i32_ys(),
-          cl_thinnest_ui16_image.get_ui16p_src_channel())) {
+  if (OK != cl_pixel_point_root.alloc_mem_and_list_node(
+                cl_thinnest_ui16_image.get_i32_xs(),
+                cl_thinnest_ui16_image.get_i32_ys(),
+                cl_thinnest_ui16_image.get_ui16p_src_channel())) {
     throw std::domain_error(
         "Error : cl_pixel_point_root.alloc_mem_and_list_node() returns NG");
   }
@@ -6283,9 +6280,8 @@ void igs::line_blur::convert(
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_another_point(-) returns NG");
     }
-    if (OK !=
-        cl_pixel_line_root.save_not_include(&(cl_pixel_point_root),
-                                            "tmp11_not_include.txt")) {
+    if (OK != cl_pixel_line_root.save_not_include(&(cl_pixel_point_root),
+                                                  "tmp11_not_include.txt")) {
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_not_include(-) returns NG");
     }
@@ -6337,15 +6333,13 @@ void igs::line_blur::convert(
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_expand_lines(-) returns NG");
     }
-    if (OK !=
-        cl_pixel_line_root.save_one_expand_point(
-            "tmp16_one_expand_point.txt")) {
+    if (OK != cl_pixel_line_root.save_one_expand_point(
+                  "tmp16_one_expand_point.txt")) {
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_one_expand_point(-) returns NG");
     }
-    if (OK !=
-        cl_pixel_line_root.save_another_expand_point(
-            "tmp17_another_expand_point.txt")) {
+    if (OK != cl_pixel_line_root.save_another_expand_point(
+                  "tmp17_another_expand_point.txt")) {
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_another_expand_point(-) returns NG");
     }

@@ -20,7 +20,8 @@ IGS_LINE_BLUR_EXPORT void convert(
     ,
     const int width  // no_margin
     ,
-    const int channels, const int bits
+    const int channels,
+    const int bits
 
     /* Action Geometry */
     ,
@@ -59,9 +60,9 @@ IGS_LINE_BLUR_EXPORT void convert(
     const bool debug_save_sw /* false=OFF */
     ,
     const int brush_action /* 0 =Curve Blur ,1=Smudge Brush */
-    );
+);
 }
-}
+}  // namespace igs
 
 #endif /* !igs_line_blur_h */
 
@@ -1781,11 +1782,10 @@ int pixel_line_node::expand_line(pixel_point_root *clp_pixel_point_root) {
   /* 始点が端点ならば先へ伸ばす */
   i32_body_point_count = this->_i32_point_count;
   if (NULL == clp_one->get_clp_link_near(1)) { /* 2点目がないなら端点 */
-    if (OK !=
-        this->_expand_line_from_one(clp_pixel_point_root, i32_body_point_count,
-                                    this->get_clp_link_one(),
-                                    this->get_clp_link_another(),
-                                    d_radian_one)) {
+    if (OK != this->_expand_line_from_one(
+                  clp_pixel_point_root, i32_body_point_count,
+                  this->get_clp_link_one(), this->get_clp_link_another(),
+                  d_radian_one)) {
       pri_funct_err_bttvr(
           "Error : this->_expand_line_from_one(-) returns NULL.");
       return NG;
@@ -1794,11 +1794,10 @@ int pixel_line_node::expand_line(pixel_point_root *clp_pixel_point_root) {
 
   /* 終点が端点ならば先へ伸ばす */
   if (NULL == clp_another->get_clp_link_near(1)) { /* 2点目がないなら端点 */
-    if (OK !=
-        this->_expand_line_from_another(
-            clp_pixel_point_root, i32_body_point_count,
-            this->get_clp_link_one(), this->get_clp_link_another(),
-            d_radian_another)) {
+    if (OK != this->_expand_line_from_another(
+                  clp_pixel_point_root, i32_body_point_count,
+                  this->get_clp_link_one(), this->get_clp_link_another(),
+                  d_radian_another)) {
       pri_funct_err_bttvr(
           "Error : this->_expand_line_from_another(-) returns NULL.");
       return NG;
@@ -4245,7 +4244,7 @@ void pixel_select_curve_blur_root::exec(double d_xp, double d_yp,
       if ((M_PI / 2.0 < d_radius) && (d_radius < M_PI * 3.0 / 2.0)) {
         clp_start_point = clp_line->get_next_point_by_count(clp_near_point,
                                                             i32_blur_count / 2);
-        i_reverse_sw = true;
+        i_reverse_sw    = true;
       }
     }
 
@@ -5553,7 +5552,7 @@ void igs_line_blur_brush_curve_point_put_image_template_(
     const int width  // no_margin
     ,
     const int channels, T *image_top  // no_margin
-    ) {
+) {
   for (int zz = 0; zz < channels; ++zz) {
     image_top[yp * channels * width + xp * channels + zz] =
         static_cast<T>(dp_pixel[zz]);
@@ -5571,7 +5570,7 @@ void igs_line_blur_brush_curve_point_put_image_(
     const int width  // no_margin
     ,
     const int channels, const int bits, void *out  // no_margin
-    ) {
+) {
   if ((xp < 0) && (width <= xp) && (yp < 0) && (height <= yp)) {
     throw std::domain_error(
         "Error : igs::line_blur::_brush_curve_point_put_image(-)");
@@ -5693,8 +5692,7 @@ int igs_line_blur_brush_curve_blur_subpixel_(
 }
 
 int igs_line_blur_brush_curve_blur_all_(
-    bool mv_sw, bool pv_sw, bool cv_sw,
-    brush_curve_blur &cl_brush_curve_blur,
+    bool mv_sw, bool pv_sw, bool cv_sw, brush_curve_blur &cl_brush_curve_blur,
     pixel_select_curve_blur_root &cl_pixel_select_curve_blur_root,
     pixel_line_root &cl_pixel_line_root
 
@@ -5706,7 +5704,7 @@ int igs_line_blur_brush_curve_blur_all_(
     const int width  // no_margin
     ,
     const int channels, const int bits, void *out  // no_margin
-    ) {
+) {
   /* 処理ごとのメッセージ */
   if (mv_sw) {
     std::cout << "igs::line_blur::_brush_curve_blur_all()" << std::endl;
@@ -5866,7 +5864,7 @@ void igs_line_blur_brush_smudge_put_image_(
     const int width  // no_margin
     ,
     const int channels, const int bits, void *out  // no_margin
-    ) {
+) {
   /* 画像上に置いたブラシの範囲 */
   double x1, y1, x2, y2;
   cl_brush_smudge_circle.get_dp_area(d_xp, d_yp, &x1, &y1, &x2, &y2);
@@ -6022,7 +6020,7 @@ void igs_line_blur_brush_smudge_all_(
     const int width  // no_margin
     ,
     const int channels, const int bits, void *out  // no_margin
-    ) {
+) {
   /* 処理ごとのメッセージ */
   if (mv_sw) {
     std::cout << "igs::line_expand::_brush_smudge_all()" << std::endl;
@@ -6151,7 +6149,7 @@ void igs_line_blur_image_get_(const bool mv_sw, const bool cv_sw,
     pri_funct_cv_end();
   }
 }
-}
+}  // namespace
 
 #include <iostream>
 #include <stdexcept>
@@ -6168,7 +6166,8 @@ void igs::line_blur::convert(
     ,
     const int width  // no_margin
     ,
-    const int channels, const int bits
+    const int channels,
+    const int bits
 
     /* Action */
     ,
@@ -6207,7 +6206,7 @@ void igs::line_blur::convert(
     const bool debug_save_sw /* false=OFF */
     ,
     const int brush_action /* 0 =Curve Blur ,1=Smudge Brush */
-    ) {
+) {
   /* --- 動作クラスコンストラクション --- */
   thinnest_ui16_image cl_thinnest_ui16_image;
   pixel_point_root cl_pixel_point_root;
@@ -6322,11 +6321,10 @@ void igs::line_blur::convert(
   /****** ベクトルリスト処理 start ******/
 
   /* 細線化した画像をリストにする */
-  if (OK !=
-      cl_pixel_point_root.alloc_mem_and_list_node(
-          cl_thinnest_ui16_image.get_i32_xs(),
-          cl_thinnest_ui16_image.get_i32_ys(),
-          cl_thinnest_ui16_image.get_ui16p_src_channel())) {
+  if (OK != cl_pixel_point_root.alloc_mem_and_list_node(
+                cl_thinnest_ui16_image.get_i32_xs(),
+                cl_thinnest_ui16_image.get_i32_ys(),
+                cl_thinnest_ui16_image.get_ui16p_src_channel())) {
     throw std::domain_error(
         "Error : cl_pixel_point_root.alloc_mem_and_list_node() returns NG");
   }
@@ -6350,9 +6348,8 @@ void igs::line_blur::convert(
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_another_point(-) returns NG");
     }
-    if (OK !=
-        cl_pixel_line_root.save_not_include(&(cl_pixel_point_root),
-                                            "tmp11_not_include.txt")) {
+    if (OK != cl_pixel_line_root.save_not_include(&(cl_pixel_point_root),
+                                                  "tmp11_not_include.txt")) {
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_not_include(-) returns NG");
     }
@@ -6404,15 +6401,13 @@ void igs::line_blur::convert(
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_expand_lines(-) returns NG");
     }
-    if (OK !=
-        cl_pixel_line_root.save_one_expand_point(
-            "tmp16_one_expand_point.txt")) {
+    if (OK != cl_pixel_line_root.save_one_expand_point(
+                  "tmp16_one_expand_point.txt")) {
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_one_expand_point(-) returns NG");
     }
-    if (OK !=
-        cl_pixel_line_root.save_another_expand_point(
-            "tmp17_another_expand_point.txt")) {
+    if (OK != cl_pixel_line_root.save_another_expand_point(
+                  "tmp17_another_expand_point.txt")) {
       throw std::domain_error(
           "Error : cl_pixel_line_root.save_another_expand_point(-) returns NG");
     }
@@ -6468,248 +6463,212 @@ void igs::line_blur::convert(
 #include "igs_line_blur.h"
 
 class ino_line_blur final : public TStandardRasterFx {
-	FX_PLUGIN_DECLARATION(ino_line_blur)
+  FX_PLUGIN_DECLARATION(ino_line_blur)
 
-	TRasterFxPort	m_input;
-	TIntEnumParamP	m_b_action_mode;
-	TDoubleParamP	m_b_blur_count;
-	TDoubleParamP	m_b_blur_power;
-	TIntEnumParamP	m_b_blur_subpixel;
-	TDoubleParamP	m_b_blur_near_ref;
-	TDoubleParamP	m_b_blur_near_len;
-	TDoubleParamP	m_v_smooth_retry;
-	TDoubleParamP	m_v_near_ref;
-	TDoubleParamP	m_v_near_len;
-	TDoubleParamP	m_b_smudge_thick;
-	TDoubleParamP	m_b_smudge_remain;
+  TRasterFxPort m_input;
+  TIntEnumParamP m_b_action_mode;
+  TDoubleParamP m_b_blur_count;
+  TDoubleParamP m_b_blur_power;
+  TIntEnumParamP m_b_blur_subpixel;
+  TDoubleParamP m_b_blur_near_ref;
+  TDoubleParamP m_b_blur_near_len;
+  TDoubleParamP m_v_smooth_retry;
+  TDoubleParamP m_v_near_ref;
+  TDoubleParamP m_v_near_len;
+  TDoubleParamP m_b_smudge_thick;
+  TDoubleParamP m_b_smudge_remain;
+
 public:
-	ino_line_blur()
-	: m_b_action_mode(new TIntEnumParam(0, "Blur"))
-	, m_b_blur_count(51)
-	, m_b_blur_power(1.0)
-	, m_b_blur_subpixel(new TIntEnumParam())
-	, m_b_blur_near_ref(5)
-	, m_b_blur_near_len(160)
-	, m_v_smooth_retry(100)
-	, m_v_near_ref(4)
-	, m_v_near_len(160)
-	, m_b_smudge_thick(7)
-	, m_b_smudge_remain(0.85)
-	{
-		addInputPort("Source", this->m_input);
-		bindParam(this, "action_mode", this->m_b_action_mode);
-		bindParam(this, "blur_count", this->m_b_blur_count);
-		bindParam(this, "blur_power", this->m_b_blur_power);
-		bindParam(this, "blur_subpixel", this->m_b_blur_subpixel);
-		bindParam(this, "blur_near_ref", this->m_b_blur_near_ref);
-		bindParam(this, "blur_near_len", this->m_b_blur_near_len);
-		bindParam(this, "vector_smooth_retry", this->m_v_smooth_retry);
-		bindParam(this, "vector_near_ref", this->m_v_near_ref);
-		bindParam(this, "vector_near_len", this->m_v_near_len);
-		bindParam(this, "smudge_thick", this->m_b_smudge_thick);
-		bindParam(this, "smudge_remain", this->m_b_smudge_remain);
+  ino_line_blur()
+      : m_b_action_mode(new TIntEnumParam(0, "Blur"))
+      , m_b_blur_count(51)
+      , m_b_blur_power(1.0)
+      , m_b_blur_subpixel(new TIntEnumParam())
+      , m_b_blur_near_ref(5)
+      , m_b_blur_near_len(160)
+      , m_v_smooth_retry(100)
+      , m_v_near_ref(4)
+      , m_v_near_len(160)
+      , m_b_smudge_thick(7)
+      , m_b_smudge_remain(0.85) {
+    addInputPort("Source", this->m_input);
+    bindParam(this, "action_mode", this->m_b_action_mode);
+    bindParam(this, "blur_count", this->m_b_blur_count);
+    bindParam(this, "blur_power", this->m_b_blur_power);
+    bindParam(this, "blur_subpixel", this->m_b_blur_subpixel);
+    bindParam(this, "blur_near_ref", this->m_b_blur_near_ref);
+    bindParam(this, "blur_near_len", this->m_b_blur_near_len);
+    bindParam(this, "vector_smooth_retry", this->m_v_smooth_retry);
+    bindParam(this, "vector_near_ref", this->m_v_near_ref);
+    bindParam(this, "vector_near_len", this->m_v_near_len);
+    bindParam(this, "smudge_thick", this->m_b_smudge_thick);
+    bindParam(this, "smudge_remain", this->m_b_smudge_remain);
 
-		this->m_b_action_mode->addItem(1, "Smudge");
-		this->m_b_blur_count->setValueRange(1, 100);
-		this->m_b_blur_power->setValueRange(0.1, 10.0);
-		this->m_b_blur_subpixel->addItem(1, "1");
-		this->m_b_blur_subpixel->addItem(2, "4");
-		this->m_b_blur_subpixel->addItem(3, "9");
-		this->m_b_blur_subpixel->setDefaultValue(2);
-		this->m_b_blur_subpixel->setValue(2);
-		this->m_b_blur_near_ref->setValueRange(1, 100);
-		this->m_b_blur_near_len->setValueRange(1, 1000);
-		this->m_v_smooth_retry->setValueRange(1, 1000);
-		this->m_v_near_ref->setValueRange(1, 100);
-		this->m_v_near_len->setValueRange(1, 1000);
-		this->m_b_smudge_thick->setValueRange(1, 100);
-		this->m_b_smudge_remain->setValueRange(0.0, 1.0);
-	}
-	double get_render_real_radius(
-		const double frame
-		, const TAffine affine
-	) {
-		double rad = this->m_b_blur_count->getValue(frame);
-		/*--- 単位について考察必要 ---*/
-		// rad *= ino::pixel_per_mm();
-		/*--- Geometryを反映させる ---*/
-		// TAffine aff(affine);
-		return rad;
-	}
-	void get_render_enlarge(
-		const double frame
-		, const TAffine affine
-		, TRectD &bBox
-	) {
-		const int margin = static_cast<int>(ceil(
-			this->get_render_real_radius(frame, affine)
-		));
-		if (0 < margin) {
-			bBox = bBox.enlarge(static_cast<double>(margin));
-		}
-	}
-	bool doGetBBox(
-		double frame, TRectD &bBox, const TRenderSettings &info
-	) {
-		if (false == this->m_input.isConnected()) {
-			bBox = TRectD();
-			return false;
-		}
-		const bool ret = this->m_input->doGetBBox(frame,bBox,info);
-		this->get_render_enlarge(frame, info.m_affine, bBox);
-		return ret;
-	}
-	int getMemoryRequirement(
-		const TRectD &rect
-		, double frame
-		, const TRenderSettings &info
-	) {
-		TRectD bBox(rect);
-		this->get_render_enlarge(frame, info.m_affine, bBox);
-		return TRasterFx::memorySize(bBox, info.m_bpp);
-	}
-	void transform(
-		double frame
-		, int port
-		, const TRectD &rectOnOutput
-		, const TRenderSettings &infoOnOutput
-		, TRectD &rectOnInput
-		, TRenderSettings &infoOnInput
-	) {
-		rectOnInput = rectOnOutput;
-		infoOnInput = infoOnOutput;
-		this->get_render_enlarge(
-			frame, infoOnOutput.m_affine, rectOnInput
-		);
-	}
-	bool canHandle(const TRenderSettings &info, double frame) {
-	// return true;/* geometry処理済の画像に加工することになる */
-		return false; /* ここでの処理後にgeometryがかかる */
-	}
-	void doCompute(
-		TTile &tile
-		, double frame
-		, const TRenderSettings &rend_sets
-	);
+    this->m_b_action_mode->addItem(1, "Smudge");
+    this->m_b_blur_count->setValueRange(1, 100);
+    this->m_b_blur_power->setValueRange(0.1, 10.0);
+    this->m_b_blur_subpixel->addItem(1, "1");
+    this->m_b_blur_subpixel->addItem(2, "4");
+    this->m_b_blur_subpixel->addItem(3, "9");
+    this->m_b_blur_subpixel->setDefaultValue(2);
+    this->m_b_blur_subpixel->setValue(2);
+    this->m_b_blur_near_ref->setValueRange(1, 100);
+    this->m_b_blur_near_len->setValueRange(1, 1000);
+    this->m_v_smooth_retry->setValueRange(1, 1000);
+    this->m_v_near_ref->setValueRange(1, 100);
+    this->m_v_near_len->setValueRange(1, 1000);
+    this->m_b_smudge_thick->setValueRange(1, 100);
+    this->m_b_smudge_remain->setValueRange(0.0, 1.0);
+  }
+  double get_render_real_radius(const double frame, const TAffine affine) {
+    double rad = this->m_b_blur_count->getValue(frame);
+    /*--- 単位について考察必要 ---*/
+    // rad *= ino::pixel_per_mm();
+    /*--- Geometryを反映させる ---*/
+    // TAffine aff(affine);
+    return rad;
+  }
+  void get_render_enlarge(const double frame, const TAffine affine,
+                          TRectD &bBox) {
+    const int margin =
+        static_cast<int>(ceil(this->get_render_real_radius(frame, affine)));
+    if (0 < margin) {
+      bBox = bBox.enlarge(static_cast<double>(margin));
+    }
+  }
+  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+    if (false == this->m_input.isConnected()) {
+      bBox = TRectD();
+      return false;
+    }
+    const bool ret = this->m_input->doGetBBox(frame, bBox, info);
+    this->get_render_enlarge(frame, info.m_affine, bBox);
+    return ret;
+  }
+  int getMemoryRequirement(const TRectD &rect, double frame,
+                           const TRenderSettings &info) {
+    TRectD bBox(rect);
+    this->get_render_enlarge(frame, info.m_affine, bBox);
+    return TRasterFx::memorySize(bBox, info.m_bpp);
+  }
+  void transform(double frame, int port, const TRectD &rectOnOutput,
+                 const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+                 TRenderSettings &infoOnInput) {
+    rectOnInput = rectOnOutput;
+    infoOnInput = infoOnOutput;
+    this->get_render_enlarge(frame, infoOnOutput.m_affine, rectOnInput);
+  }
+  bool canHandle(const TRenderSettings &info, double frame) {
+    // return true;/* geometry処理済の画像に加工することになる */
+    return false; /* ここでの処理後にgeometryがかかる */
+  }
+  void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
 };
 
 FX_PLUGIN_IDENTIFIER(ino_line_blur, "inoLineBlurFx");
 
 namespace {
-void fx_(
-	const TRasterP in_ras	// no margin
-	, TRasterP out_ras	// no margin
-	, const int action_mode
-	, const int blur_count
-	, const double blur_power
-	, const int blur_subpixel
-	, const int blur_near_ref
-	, const int blur_near_len
-	, const int vector_smooth_retry
-	, const int vector_near_ref
-	, const int vector_near_len
-	, const int smudge_thick
-	, const double smudge_remain
-) {
-	igs::line_blur::convert(
-		in_ras->getRawData()  // const void *in_no_margin (BGRA)
-		, out_ras->getRawData()  // void *out_no_margin (BGRA)
-		, in_ras->getLy()  // const int height_no_margin
-		, in_ras->getLx()  // const int width_no_margin
-		, ino::channels()  // const int channels
-		, ino::bits(in_ras)  // const int bits
-		, blur_count
-		, blur_power
-		, blur_subpixel
-		, blur_near_ref
-		, blur_near_len
-		, smudge_thick
-		, smudge_remain
-		, vector_smooth_retry
-		, vector_near_ref
-		, vector_near_len
-		, false /* bool mv_sw false=OFF */
-		, false /* bool pv_sw false=OFF */
-		, false /* bool cv_sw false=OFF */
-		, 3 /* long reference_channel 3=Red:RGBA or Blue:BGRA */
-		, false /* bool debug_save_sw false=OFF */
-		, action_mode
-	);
+void fx_(const TRasterP in_ras  // no margin
+         ,
+         TRasterP out_ras  // no margin
+         ,
+         const int action_mode, const int blur_count, const double blur_power,
+         const int blur_subpixel, const int blur_near_ref,
+         const int blur_near_len, const int vector_smooth_retry,
+         const int vector_near_ref, const int vector_near_len,
+         const int smudge_thick, const double smudge_remain) {
+  igs::line_blur::convert(
+      in_ras->getRawData()  // const void *in_no_margin (BGRA)
+      ,
+      out_ras->getRawData()  // void *out_no_margin (BGRA)
+      ,
+      in_ras->getLy()  // const int height_no_margin
+      ,
+      in_ras->getLx()  // const int width_no_margin
+      ,
+      ino::channels()  // const int channels
+      ,
+      ino::bits(in_ras)  // const int bits
+      ,
+      blur_count, blur_power, blur_subpixel, blur_near_ref, blur_near_len,
+      smudge_thick, smudge_remain, vector_smooth_retry, vector_near_ref,
+      vector_near_len, false /* bool mv_sw false=OFF */
+      ,
+      false /* bool pv_sw false=OFF */
+      ,
+      false /* bool cv_sw false=OFF */
+      ,
+      3 /* long reference_channel 3=Red:RGBA or Blue:BGRA */
+      ,
+      false /* bool debug_save_sw false=OFF */
+      ,
+      action_mode);
 }
-}
+}  // namespace
 
 void ino_line_blur::doCompute(
-	TTile &tile /* 注意:doGetBBox(-)が返す範囲の画像 */
-	, double frame
-	, const TRenderSettings &rend_sets
-) {
-	/*--- 接続していなければ処理しない -------------------------*/
-	if (!this->m_input.isConnected()) {
-		tile.getRaster()->clear(); /* 塗りつぶしクリア */
-		return;
-	}
-	/*--- サポートしていないPixelタイプはエラーを投げる --------*/
-	if (!((TRaster32P)tile.getRaster())
-	&&  !((TRaster64P)tile.getRaster())) {
-		throw TRopException("unsupported input pixel type");
-	}
-	/*--- パラメータを得る -------------------------------------*/
- const int action_mode = this->m_b_action_mode->getValue();
- const int    blur_count = this->m_b_blur_count->getValue(frame);
- const double blur_power = this->m_b_blur_power->getValue(frame);
- const int blur_subpixel = this->m_b_blur_subpixel->getValue();
- const int blur_near_ref = this->m_b_blur_near_ref->getValue(frame);
- const int blur_near_len = this->m_b_blur_near_len->getValue(frame);
- const int vector_smooth_retry = this->m_v_smooth_retry->getValue(frame);
- const int vector_near_ref     = this->m_v_near_ref->getValue(frame);
- const int vector_near_len     = this->m_v_near_len->getValue(frame);
- const int    smudge_thick  = this->m_b_smudge_thick->getValue(frame);
- const double smudge_remain = this->m_b_smudge_remain->getValue(frame);
-	/*--- 表示の範囲を得る -------------------------------------*/
-	TRectD bBox = TRectD(
-		tile.m_pos	/* Render画像上(Pixel単位)の位置 */
-		, TDimensionD(	/* Render画像上(Pixel単位)のサイズ */
-			tile.getRaster()->getLx()
-			, tile.getRaster()->getLy()
-		)
-	);
-	/*--- doGetBBox(-)が返す範囲の画像を生成 -------------------*/
-	TTile in_tile;
-	this->m_input->allocateAndCompute(
-		in_tile
-		, bBox.getP00()
-		, TDimensionI(/* Pixel単位に四捨五入 */
-			static_cast<int>(bBox.getLx() + 0.5)
-			, static_cast<int>(bBox.getLy() + 0.5) )
-		, tile.getRaster()
-		, frame
-		, rend_sets
-	);
-	/*--- 保存すべき画像メモリを塗りつぶしクリア ---------------*/
-	tile.getRaster()->clear();
-	/*--- 画像処理 ---------------------------------------------*/
-	try {
-		tile.getRaster()->lock();
-		fx_(
-			in_tile.getRaster()	// in no margin
-			, tile.getRaster()		// out no margin
-			, action_mode
-			, blur_count
-			, blur_power
-			, blur_subpixel
-			, blur_near_ref
-			, blur_near_len
-			, vector_smooth_retry
-			, vector_near_ref
-			, vector_near_len
-			, smudge_thick
-			, smudge_remain
-		);
-		tile.getRaster()->unlock();
-	}
-	/*--- error処理 --------------------------------------------*/
-	catch (std::bad_alloc &e) { tile.getRaster()->unlock(); throw; }
-	catch (std::exception &e) { tile.getRaster()->unlock(); throw; }
-	catch (...) { tile.getRaster()->unlock(); throw; }
+    TTile &tile /* 注意:doGetBBox(-)が返す範囲の画像 */
+    ,
+    double frame, const TRenderSettings &rend_sets) {
+  /*--- 接続していなければ処理しない -------------------------*/
+  if (!this->m_input.isConnected()) {
+    tile.getRaster()->clear(); /* 塗りつぶしクリア */
+    return;
+  }
+  /*--- サポートしていないPixelタイプはエラーを投げる --------*/
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+    throw TRopException("unsupported input pixel type");
+  }
+  /*--- パラメータを得る -------------------------------------*/
+  const int action_mode         = this->m_b_action_mode->getValue();
+  const int blur_count          = this->m_b_blur_count->getValue(frame);
+  const double blur_power       = this->m_b_blur_power->getValue(frame);
+  const int blur_subpixel       = this->m_b_blur_subpixel->getValue();
+  const int blur_near_ref       = this->m_b_blur_near_ref->getValue(frame);
+  const int blur_near_len       = this->m_b_blur_near_len->getValue(frame);
+  const int vector_smooth_retry = this->m_v_smooth_retry->getValue(frame);
+  const int vector_near_ref     = this->m_v_near_ref->getValue(frame);
+  const int vector_near_len     = this->m_v_near_len->getValue(frame);
+  const int smudge_thick        = this->m_b_smudge_thick->getValue(frame);
+  const double smudge_remain    = this->m_b_smudge_remain->getValue(frame);
+  /*--- 表示の範囲を得る -------------------------------------*/
+  TRectD bBox =
+      TRectD(tile.m_pos /* Render画像上(Pixel単位)の位置 */
+             ,
+             TDimensionD(/* Render画像上(Pixel単位)のサイズ */
+                         tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+  /*--- doGetBBox(-)が返す範囲の画像を生成 -------------------*/
+  TTile in_tile;
+  this->m_input->allocateAndCompute(
+      in_tile, bBox.getP00(),
+      TDimensionI(/* Pixel単位に四捨五入 */
+                  static_cast<int>(bBox.getLx() + 0.5),
+                  static_cast<int>(bBox.getLy() + 0.5)),
+      tile.getRaster(), frame, rend_sets);
+  /*--- 保存すべき画像メモリを塗りつぶしクリア ---------------*/
+  tile.getRaster()->clear();
+  /*--- 画像処理 ---------------------------------------------*/
+  try {
+    tile.getRaster()->lock();
+    fx_(in_tile.getRaster()  // in no margin
+        ,
+        tile.getRaster()  // out no margin
+        ,
+        action_mode, blur_count, blur_power, blur_subpixel, blur_near_ref,
+        blur_near_len, vector_smooth_retry, vector_near_ref, vector_near_len,
+        smudge_thick, smudge_remain);
+    tile.getRaster()->unlock();
+  }
+  /*--- error処理 --------------------------------------------*/
+  catch (std::bad_alloc &e) {
+    tile.getRaster()->unlock();
+    throw;
+  } catch (std::exception &e) {
+    tile.getRaster()->unlock();
+    throw;
+  } catch (...) {
+    tile.getRaster()->unlock();
+    throw;
+  }
 }
 #endif
