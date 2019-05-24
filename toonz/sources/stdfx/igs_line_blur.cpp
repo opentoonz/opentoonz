@@ -25,14 +25,16 @@ typedef int int32_t;
 extern "C" {
 #endif
 
+/*
 extern void pri_funct_cv_start(int32_t i32_ys);
 extern void pri_funct_cv_run(int32_t i32_y);
 extern void pri_funct_cv_end(void);
 
 extern void pri_funct_set_cp_title(const char *cp_title);
-extern void pri_funct_msg_ttvr(const char *fmt, ...);
-extern void pri_funct_msg_vr(const char *fmt, ...);
-extern void pri_funct_err_bttvr(const char *fmt, ...);
+extern void pri_funct_msg_ttvr(const char* fmt, ...);
+extern void pri_funct_msg_vr(const char* fmt, ...);
+extern void pri_funct_err_bttvr(const char* fmt, ...);
+*/
 
 #ifdef __cplusplus
 }
@@ -1046,7 +1048,7 @@ double calculator_geometry::get_d_radian(double d_xv, double d_yv) {
   }
   /* 第2象限 (第1象限に置き換えて... 0 <= angle < 90) */
   else if ((d_xv <= 0.0) && (0.0 < d_yv)) {
-    d_radian = atan(-d_xv / d_yv) + M_PI_2;
+    d_radian = atan(-d_xv / d_yv) + M_PI / 2.0;
   }
   /* 第3象限 (第1象限に置き換えて... 0 <= angle < 90) */
   else if ((d_xv < 0.0) && (d_yv <= 0.0)) {
@@ -1054,7 +1056,7 @@ double calculator_geometry::get_d_radian(double d_xv, double d_yv) {
   }
   /* 第4象限 (第1象限に置き換えて... 0 <= angle < 90) */
   else if ((0.0 <= d_xv) && (d_yv < 0.0)) {
-    d_radian = atan(d_xv / -d_yv) + M_PI + M_PI_2;
+    d_radian = atan(d_xv / -d_yv) + M_PI + M_PI / 2.0;
   }
   return d_radian;
 }

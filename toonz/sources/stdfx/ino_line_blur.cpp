@@ -93,14 +93,14 @@ extern "C" {
 #endif
 
 /*
-extern void pri_funct_cv_start( int32_t i32_ys );
-extern void pri_funct_cv_run( int32_t i32_y );
-extern void pri_funct_cv_end( void );
+extern void pri_funct_cv_start(int32_t i32_ys);
+extern void pri_funct_cv_run(int32_t i32_y);
+extern void pri_funct_cv_end(void);
 
-extern void pri_funct_set_cp_title(const char *cp_title );
-extern void pri_funct_msg_ttvr( const char* fmt, ...);
-extern void pri_funct_msg_vr( const char* fmt, ...);
-extern void pri_funct_err_bttvr( const char* fmt, ...);
+extern void pri_funct_set_cp_title(const char *cp_title);
+extern void pri_funct_msg_ttvr(const char* fmt, ...);
+extern void pri_funct_msg_vr(const char* fmt, ...);
+extern void pri_funct_err_bttvr(const char* fmt, ...);
 */
 
 #ifdef __cplusplus
@@ -253,6 +253,7 @@ void pri_funct_err_bttvr(const char *fmt, ...) {
 
 #ifndef _list_node_h_
 #define _list_node_h_
+
 #include <stdio.h>
 
 class list_node {
@@ -761,9 +762,9 @@ public:
   void mem_free(void);
 
 private:
-  int _i_mv_sw, /* Method    Verbose */
-      _i_pv_sw, /* Parameter Verbose */
-      _i_cv_sw; /* Counter   Verbose */
+  bool _i_mv_sw; /* Method    Verbose */
+  bool _i_pv_sw; /* Parameter Verbose */
+  bool _i_cv_sw; /* Counter   Verbose */
 
   int32_t _i32_size_by_pixel, _i32_subpixel_divide;
   double _d_ratio;
@@ -5208,15 +5209,15 @@ int thinnest_ui16_image::exec05_thin(void) {
 /* メモリ開放 */
 void thinnest_ui16_image::mem_free(void) {
 #if 0
-  if (NULL !=	this->_ui16p_channel[0]) {
-    if (this->_i_mv_sw) {
-      pri_funct_msg_ttvr( "thinnest_ui16_image::mem_free()" );
-    }
+	if (NULL !=	this->_ui16p_channel[0]) {
+		if (this->_i_mv_sw) {
+			pri_funct_msg_ttvr( "thinnest_ui16_image::mem_free()" );
+		}
 
-    free(	this->_ui16p_channel[0]);/* ここで落ちる2014-5-16 */
-      this->_ui16p_channel[0] = NULL;
-      this->_ui16p_channel[1] = NULL;
-  }
+		free(	this->_ui16p_channel[0]);/* ここで落ちる2014-5-16 */
+			this->_ui16p_channel[0] = NULL;
+			this->_ui16p_channel[1] = NULL;
+	}
 #endif
   if (NULL != this->memory_free_this_) {
     if (this->_i_mv_sw) {
@@ -6154,7 +6155,6 @@ void igs_line_blur_image_get_(const bool mv_sw, const bool cv_sw,
 
 #include <iostream>
 #include <stdexcept>
-
 #include "igs_line_blur.h"  // "thinnest_ui16_image.h" "pixel_point_root.h" "pixel_line_root.h" "brush_curve_blur.h" "brush_smudge_circle.h" "pixel_select_same_way.h" "pixel_select_curve_blur.h" "igs_line_blur.h"
 
 void igs::line_blur::convert(
@@ -6459,298 +6459,257 @@ void igs::line_blur::convert(
   cl_thinnest_ui16_image.mem_free();
 }
 
-//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-
+/*------------------------------------------------------------------*/
 #include <sstream> /* std::ostringstream */
 #include "tfxparam.h"
 #include "stdfx.h"
 #include "tfxattributes.h"
-
 #include "ino_common.h"
 #include "igs_line_blur.h"
-//------------------------------------------------------------
+
 class ino_line_blur final : public TStandardRasterFx {
-  FX_PLUGIN_DECLARATION(ino_line_blur)
-  TRasterFxPort m_input;
+	FX_PLUGIN_DECLARATION(ino_line_blur)
 
-  TIntEnumParamP m_b_action_mode;
-
-  TDoubleParamP m_b_blur_count;
-  TDoubleParamP m_b_blur_power;
-  TIntEnumParamP m_b_blur_subpixel;
-  TDoubleParamP m_b_blur_near_ref;
-  TDoubleParamP m_b_blur_near_len;
-
-  TDoubleParamP m_v_smooth_retry;
-  TDoubleParamP m_v_near_ref;
-  TDoubleParamP m_v_near_len;
-
-  TDoubleParamP m_b_smudge_thick;
-  TDoubleParamP m_b_smudge_remain;
-
+	TRasterFxPort	m_input;
+	TIntEnumParamP	m_b_action_mode;
+	TDoubleParamP	m_b_blur_count;
+	TDoubleParamP	m_b_blur_power;
+	TIntEnumParamP	m_b_blur_subpixel;
+	TDoubleParamP	m_b_blur_near_ref;
+	TDoubleParamP	m_b_blur_near_len;
+	TDoubleParamP	m_v_smooth_retry;
+	TDoubleParamP	m_v_near_ref;
+	TDoubleParamP	m_v_near_len;
+	TDoubleParamP	m_b_smudge_thick;
+	TDoubleParamP	m_b_smudge_remain;
 public:
-  ino_line_blur()
-      : m_b_action_mode(new TIntEnumParam(0, "Blur"))
+	ino_line_blur()
+	: m_b_action_mode(new TIntEnumParam(0, "Blur"))
+	, m_b_blur_count(51)
+	, m_b_blur_power(1.0)
+	, m_b_blur_subpixel(new TIntEnumParam())
+	, m_b_blur_near_ref(5)
+	, m_b_blur_near_len(160)
+	, m_v_smooth_retry(100)
+	, m_v_near_ref(4)
+	, m_v_near_len(160)
+	, m_b_smudge_thick(7)
+	, m_b_smudge_remain(0.85)
+	{
+		addInputPort("Source", this->m_input);
+		bindParam(this, "action_mode", this->m_b_action_mode);
+		bindParam(this, "blur_count", this->m_b_blur_count);
+		bindParam(this, "blur_power", this->m_b_blur_power);
+		bindParam(this, "blur_subpixel", this->m_b_blur_subpixel);
+		bindParam(this, "blur_near_ref", this->m_b_blur_near_ref);
+		bindParam(this, "blur_near_len", this->m_b_blur_near_len);
+		bindParam(this, "vector_smooth_retry", this->m_v_smooth_retry);
+		bindParam(this, "vector_near_ref", this->m_v_near_ref);
+		bindParam(this, "vector_near_len", this->m_v_near_len);
+		bindParam(this, "smudge_thick", this->m_b_smudge_thick);
+		bindParam(this, "smudge_remain", this->m_b_smudge_remain);
 
-      , m_b_blur_count(51)
-      , m_b_blur_power(1.0)
-      , m_b_blur_subpixel(new TIntEnumParam())
-      , m_b_blur_near_ref(5)
-      , m_b_blur_near_len(160)
-
-      , m_v_smooth_retry(100)
-      , m_v_near_ref(4)
-      , m_v_near_len(160)
-
-      , m_b_smudge_thick(7)
-      , m_b_smudge_remain(0.85) {
-    addInputPort("Source", this->m_input);
-
-    bindParam(this, "action_mode", this->m_b_action_mode);
-
-    bindParam(this, "blur_count", this->m_b_blur_count);
-    bindParam(this, "blur_power", this->m_b_blur_power);
-    bindParam(this, "blur_subpixel", this->m_b_blur_subpixel);
-    bindParam(this, "blur_near_ref", this->m_b_blur_near_ref);
-    bindParam(this, "blur_near_len", this->m_b_blur_near_len);
-
-    bindParam(this, "vector_smooth_retry", this->m_v_smooth_retry);
-    bindParam(this, "vector_near_ref", this->m_v_near_ref);
-    bindParam(this, "vector_near_len", this->m_v_near_len);
-
-    bindParam(this, "smudge_thick", this->m_b_smudge_thick);
-    bindParam(this, "smudge_remain", this->m_b_smudge_remain);
-
-    this->m_b_action_mode->addItem(1, "Smudge");
-
-    this->m_b_blur_count->setValueRange(1, 100);
-    this->m_b_blur_power->setValueRange(0.1, 10.0);
-    this->m_b_blur_subpixel->addItem(1, "1");
-    this->m_b_blur_subpixel->addItem(2, "4");
-    this->m_b_blur_subpixel->addItem(3, "9");
-    this->m_b_blur_subpixel->setDefaultValue(2);
-    this->m_b_blur_subpixel->setValue(2);
-    this->m_b_blur_near_ref->setValueRange(1, 100);
-    this->m_b_blur_near_len->setValueRange(1, 1000);
-
-    this->m_v_smooth_retry->setValueRange(1, 1000);
-    this->m_v_near_ref->setValueRange(1, 100);
-    this->m_v_near_len->setValueRange(1, 1000);
-
-    // this->m_b_smudge_thick->setMeasureName("fxLength");
-    this->m_b_smudge_thick->setValueRange(1, 100);
-    this->m_b_smudge_remain->setValueRange(0.0, 1.0);
-  }
-  //------------------------------------------------------------
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
-    if (false == this->m_input.isConnected()) {
-      bBox = TRectD();
-      return false;
-    }
-    const bool ret = this->m_input->doGetBBox(frame, bBox, info);
-    return ret;
-  }
-  int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
-    TRectD bBox(rect);
-    return TRasterFx::memorySize(bBox, info.m_bpp);
-  }
-  void transform(double frame, int port, const TRectD &rectOnOutput,
-                 const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput) {
-    rectOnInput = rectOnOutput;
-    infoOnInput = infoOnOutput;
-  }
-  bool canHandle(const TRenderSettings &info, double frame) {
-    // return true;/* geometry処理済の画像に加工することになる */
-    return false; /* ここでの処理後にgeometryがかかる */
-  }
-  void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
+		this->m_b_action_mode->addItem(1, "Smudge");
+		this->m_b_blur_count->setValueRange(1, 100);
+		this->m_b_blur_power->setValueRange(0.1, 10.0);
+		this->m_b_blur_subpixel->addItem(1, "1");
+		this->m_b_blur_subpixel->addItem(2, "4");
+		this->m_b_blur_subpixel->addItem(3, "9");
+		this->m_b_blur_subpixel->setDefaultValue(2);
+		this->m_b_blur_subpixel->setValue(2);
+		this->m_b_blur_near_ref->setValueRange(1, 100);
+		this->m_b_blur_near_len->setValueRange(1, 1000);
+		this->m_v_smooth_retry->setValueRange(1, 1000);
+		this->m_v_near_ref->setValueRange(1, 100);
+		this->m_v_near_len->setValueRange(1, 1000);
+		this->m_b_smudge_thick->setValueRange(1, 100);
+		this->m_b_smudge_remain->setValueRange(0.0, 1.0);
+	}
+	double get_render_real_radius(
+		const double frame
+		, const TAffine affine
+	) {
+		double rad = this->m_b_blur_count->getValue(frame);
+		/*--- 単位について考察必要 ---*/
+		// rad *= ino::pixel_per_mm();
+		/*--- Geometryを反映させる ---*/
+		// TAffine aff(affine);
+		return rad;
+	}
+	void get_render_enlarge(
+		const double frame
+		, const TAffine affine
+		, TRectD &bBox
+	) {
+		const int margin = static_cast<int>(ceil(
+			this->get_render_real_radius(frame, affine)
+		));
+		if (0 < margin) {
+			bBox = bBox.enlarge(static_cast<double>(margin));
+		}
+	}
+	bool doGetBBox(
+		double frame, TRectD &bBox, const TRenderSettings &info
+	) {
+		if (false == this->m_input.isConnected()) {
+			bBox = TRectD();
+			return false;
+		}
+		const bool ret = this->m_input->doGetBBox(frame,bBox,info);
+		this->get_render_enlarge(frame, info.m_affine, bBox);
+		return ret;
+	}
+	int getMemoryRequirement(
+		const TRectD &rect
+		, double frame
+		, const TRenderSettings &info
+	) {
+		TRectD bBox(rect);
+		this->get_render_enlarge(frame, info.m_affine, bBox);
+		return TRasterFx::memorySize(bBox, info.m_bpp);
+	}
+	void transform(
+		double frame
+		, int port
+		, const TRectD &rectOnOutput
+		, const TRenderSettings &infoOnOutput
+		, TRectD &rectOnInput
+		, TRenderSettings &infoOnInput
+	) {
+		rectOnInput = rectOnOutput;
+		infoOnInput = infoOnOutput;
+		this->get_render_enlarge(
+			frame, infoOnOutput.m_affine, rectOnInput
+		);
+	}
+	bool canHandle(const TRenderSettings &info, double frame) {
+	// return true;/* geometry処理済の画像に加工することになる */
+		return false; /* ここでの処理後にgeometryがかかる */
+	}
+	void doCompute(
+		TTile &tile
+		, double frame
+		, const TRenderSettings &rend_sets
+	);
 };
+
 FX_PLUGIN_IDENTIFIER(ino_line_blur, "inoLineBlurFx");
-//------------------------------------------------------------
+
 namespace {
-void fx_(const TRasterP in_ras  // with margin
-         ,
-         TRasterP out_ras  // no margin
-
-         ,
-         const int action_mode
-
-         ,
-         const int blur_count, const double blur_power, const int blur_subpixel,
-         const int blur_near_ref, const int blur_near_len
-
-         ,
-         const int vector_smooth_retry, const int vector_near_ref,
-         const int vector_near_len
-
-         ,
-         const int smudge_thick, const double smudge_remain) {
-  TRasterGR8P out_buffer(out_ras->getLy(),
-                         out_ras->getLx() * ino::channels() *
-                             ((TRaster64P)in_ras ? sizeof(unsigned short)
-                                                 : sizeof(unsigned char)));
-  out_buffer->lock();
-  igs::line_blur::convert(
-      in_ras->getRawData()  // const void *in_no_margin (BGRA)
-      ,
-      out_buffer->getRawData()  // void *out_no_margin (BGRA)
-
-      ,
-      in_ras->getLy()  // const int height_no_margin
-      ,
-      in_ras->getLx()  // const int width_no_margin
-      ,
-      ino::channels()  // const int channels
-      ,
-      ino::bits(in_ras)  // const int bits
-
-      ,
-      blur_count, blur_power, blur_subpixel, blur_near_ref, blur_near_len
-
-      ,
-      smudge_thick, smudge_remain
-
-      ,
-      vector_smooth_retry, vector_near_ref, vector_near_len
-
-      ,
-      false /* bool mv_sw false=OFF */
-      ,
-      false /* bool pv_sw false=OFF */
-      ,
-      false /* bool cv_sw false=OFF */
-      ,
-      3 /* long reference_channel 3=Red:RGBA or Blue:BGRA */
-      ,
-      false /* bool debug_save_sw false=OFF */
-      ,
-      action_mode);
-  ino::arr_to_ras(out_buffer->getRawData(), ino::channels(), out_ras, 0);
-  out_buffer->unlock();
+void fx_(
+	const TRasterP in_ras	// no margin
+	, TRasterP out_ras	// no margin
+	, const int action_mode
+	, const int blur_count
+	, const double blur_power
+	, const int blur_subpixel
+	, const int blur_near_ref
+	, const int blur_near_len
+	, const int vector_smooth_retry
+	, const int vector_near_ref
+	, const int vector_near_len
+	, const int smudge_thick
+	, const double smudge_remain
+) {
+	igs::line_blur::convert(
+		in_ras->getRawData()  // const void *in_no_margin (BGRA)
+		, out_ras->getRawData()  // void *out_no_margin (BGRA)
+		, in_ras->getLy()  // const int height_no_margin
+		, in_ras->getLx()  // const int width_no_margin
+		, ino::channels()  // const int channels
+		, ino::bits(in_ras)  // const int bits
+		, blur_count
+		, blur_power
+		, blur_subpixel
+		, blur_near_ref
+		, blur_near_len
+		, smudge_thick
+		, smudge_remain
+		, vector_smooth_retry
+		, vector_near_ref
+		, vector_near_len
+		, false /* bool mv_sw false=OFF */
+		, false /* bool pv_sw false=OFF */
+		, false /* bool cv_sw false=OFF */
+		, 3 /* long reference_channel 3=Red:RGBA or Blue:BGRA */
+		, false /* bool debug_save_sw false=OFF */
+		, action_mode
+	);
 }
 }
-//------------------------------------------------------------
-void ino_line_blur::doCompute(TTile &tile, double frame,
-                              const TRenderSettings &rend_sets) {
-  /*------ 接続していなければ処理しない ----------------------*/
-  if (!this->m_input.isConnected()) {
-    tile.getRaster()->clear(); /* 塗りつぶしクリア */
-    return;
-  }
-  /*------ サポートしていないPixelタイプはエラーを投げる -----*/
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
-    throw TRopException("unsupported input pixel type");
-  }
 
-  /*------ パラメータを得る ------*/
-  const int action_mode = this->m_b_action_mode->getValue();
-
-  const int blur_count    = this->m_b_blur_count->getValue(frame);
-  const double blur_power = this->m_b_blur_power->getValue(frame);
-  const int blur_subpixel = this->m_b_blur_subpixel->getValue();
-  const int blur_near_ref = this->m_b_blur_near_ref->getValue(frame);
-  const int blur_near_len = this->m_b_blur_near_len->getValue(frame);
-
-  const int vector_smooth_retry = this->m_v_smooth_retry->getValue(frame);
-  const int vector_near_ref     = this->m_v_near_ref->getValue(frame);
-  const int vector_near_len     = this->m_v_near_len->getValue(frame);
-
-  const int smudge_thick     = this->m_b_smudge_thick->getValue(frame);
-  const double smudge_remain = this->m_b_smudge_remain->getValue(frame);
-
-  /*------ 表示の範囲を得る ----------------------------------*/
-  TRectD bBox =
-      TRectD(tile.m_pos /* Render画像上(Pixel単位)の位置 */
-             ,
-             TDimensionD(/* Render画像上(Pixel単位)のサイズ */
-                         tile.getRaster()->getLx(), tile.getRaster()->getLy()));
-
-  /* ------ marginなし画像生成 ------------------------------ */
-  TTile enlarge_tile;
-  this->m_input->allocateAndCompute(
-      enlarge_tile, bBox.getP00(),
-      TDimensionI(/* Pixel単位に四捨五入 */
-                  static_cast<int>(bBox.getLx() + 0.5),
-                  static_cast<int>(bBox.getLy() + 0.5)),
-      tile.getRaster(), frame, rend_sets);
-
-  /* ------ 保存すべき画像メモリを塗りつぶしクリア ---------- */
-  tile.getRaster()->clear(); /* 塗りつぶしクリア */
-
-  /* ------ (app_begin)log記憶 ------------------------------ */
-  const bool log_sw = ino::log_enable_sw();
-
-  if (log_sw) {
-    std::ostringstream os;
-    os << "params"
-
-       << "  action_mode " << action_mode
-
-       << "  blur_count " << blur_count << "  blur_power " << blur_power
-       << "  blur_subpixel " << blur_subpixel << "  blur_near_ref "
-       << blur_near_ref << "  blur_near_len " << blur_near_len
-
-       << "  vector_smooth_retry " << vector_smooth_retry
-       << "  vector_near_ref " << vector_near_ref << "  vector_near_len "
-       << vector_near_len
-
-       << "  smudge_thick " << smudge_thick << "  smudge_remain "
-       << smudge_remain
-
-       << "  tile"
-       << " pos " << tile.m_pos << " w " << tile.getRaster()->getLx() << " h "
-       << tile.getRaster()->getLy() << "  in_tile"
-       << " w " << enlarge_tile.getRaster()->getLx() << " h "
-       << enlarge_tile.getRaster()->getLy() << "  pixbits "
-       << ino::pixel_bits(tile.getRaster()) << "  frame " << frame
-       << "  m_affine " << rend_sets.m_affine;
-  }
-  /* ------ fx処理 ------------------------------------------ */
-  try {
-    tile.getRaster()->lock();
-    fx_(enlarge_tile.getRaster()  // in with margin
-        ,
-        tile.getRaster()  // out with no margin
-
-        ,
-        action_mode
-
-        ,
-        blur_count, blur_power, blur_subpixel, blur_near_ref, blur_near_len
-
-        ,
-        vector_smooth_retry, vector_near_ref, vector_near_len
-
-        ,
-        smudge_thick, smudge_remain);
-    tile.getRaster()->unlock();
-  }
-  /* ------ error処理 --------------------------------------- */
-  catch (std::bad_alloc &e) {
-    tile.getRaster()->unlock();
-    if (log_sw) {
-      std::string str("std::bad_alloc <");
-      str += e.what();
-      str += '>';
-    }
-    throw;
-  } catch (std::exception &e) {
-    tile.getRaster()->unlock();
-    if (log_sw) {
-      std::string str("exception <");
-      str += e.what();
-      str += '>';
-    }
-    throw;
-  } catch (...) {
-    tile.getRaster()->unlock();
-    if (log_sw) {
-      std::string str("other exception");
-    }
-    throw;
-  }
+void ino_line_blur::doCompute(
+	TTile &tile /* 注意:doGetBBox(-)が返す範囲の画像 */
+	, double frame
+	, const TRenderSettings &rend_sets
+) {
+	/*--- 接続していなければ処理しない -------------------------*/
+	if (!this->m_input.isConnected()) {
+		tile.getRaster()->clear(); /* 塗りつぶしクリア */
+		return;
+	}
+	/*--- サポートしていないPixelタイプはエラーを投げる --------*/
+	if (!((TRaster32P)tile.getRaster())
+	&&  !((TRaster64P)tile.getRaster())) {
+		throw TRopException("unsupported input pixel type");
+	}
+	/*--- パラメータを得る -------------------------------------*/
+ const int action_mode = this->m_b_action_mode->getValue();
+ const int    blur_count = this->m_b_blur_count->getValue(frame);
+ const double blur_power = this->m_b_blur_power->getValue(frame);
+ const int blur_subpixel = this->m_b_blur_subpixel->getValue();
+ const int blur_near_ref = this->m_b_blur_near_ref->getValue(frame);
+ const int blur_near_len = this->m_b_blur_near_len->getValue(frame);
+ const int vector_smooth_retry = this->m_v_smooth_retry->getValue(frame);
+ const int vector_near_ref     = this->m_v_near_ref->getValue(frame);
+ const int vector_near_len     = this->m_v_near_len->getValue(frame);
+ const int    smudge_thick  = this->m_b_smudge_thick->getValue(frame);
+ const double smudge_remain = this->m_b_smudge_remain->getValue(frame);
+	/*--- 表示の範囲を得る -------------------------------------*/
+	TRectD bBox = TRectD(
+		tile.m_pos	/* Render画像上(Pixel単位)の位置 */
+		, TDimensionD(	/* Render画像上(Pixel単位)のサイズ */
+			tile.getRaster()->getLx()
+			, tile.getRaster()->getLy()
+		)
+	);
+	/*--- doGetBBox(-)が返す範囲の画像を生成 -------------------*/
+	TTile in_tile;
+	this->m_input->allocateAndCompute(
+		in_tile
+		, bBox.getP00()
+		, TDimensionI(/* Pixel単位に四捨五入 */
+			static_cast<int>(bBox.getLx() + 0.5)
+			, static_cast<int>(bBox.getLy() + 0.5) )
+		, tile.getRaster()
+		, frame
+		, rend_sets
+	);
+	/*--- 保存すべき画像メモリを塗りつぶしクリア ---------------*/
+	tile.getRaster()->clear();
+	/*--- 画像処理 ---------------------------------------------*/
+	try {
+		tile.getRaster()->lock();
+		fx_(
+			in_tile.getRaster()	// in no margin
+			, tile.getRaster()		// out no margin
+			, action_mode
+			, blur_count
+			, blur_power
+			, blur_subpixel
+			, blur_near_ref
+			, blur_near_len
+			, vector_smooth_retry
+			, vector_near_ref
+			, vector_near_len
+			, smudge_thick
+			, smudge_remain
+		);
+		tile.getRaster()->unlock();
+	}
+	/*--- error処理 --------------------------------------------*/
+	catch (std::bad_alloc &e) { tile.getRaster()->unlock(); throw; }
+	catch (std::exception &e) { tile.getRaster()->unlock(); throw; }
+	catch (...) { tile.getRaster()->unlock(); throw; }
 }
-
 #endif

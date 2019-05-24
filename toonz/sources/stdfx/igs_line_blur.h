@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef igs_line_blur_h
 #define igs_line_blur_h
 
