@@ -623,7 +623,7 @@ void ComboViewerPanel::changeWindowTitle() {
     if (sceneName.isEmpty()) sceneName = tr("Untitled");
 
     if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
-    name = tr("Scene: ") + sceneName + "   ::   Project: " + projectName;
+    name = tr("Scene: ") + sceneName + tr("   ::   Project: ") + projectName;
     if (frame >= 0)
       name =
           name + tr("   ::   Frame: ") + tr(std::to_string(frame + 1).c_str());

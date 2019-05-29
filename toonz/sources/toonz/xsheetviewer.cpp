@@ -1597,7 +1597,8 @@ void XsheetViewer::changeWindowTitle() {
   QString sceneName   = QString::fromStdWString(scene->getSceneName());
   if (sceneName.isEmpty()) sceneName = tr("Untitled");
   if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
-  QString name = tr("Scene: ") + sceneName + "   ::   Project: " + projectName;
+  QString name =
+      tr("Scene: ") + sceneName + tr("   ::   Project: ") + projectName;
   int frameCount = scene->getFrameCount();
   name           = name + "   ::   " + tr(std::to_string(frameCount).c_str()) +
          (frameCount == 1 ? tr(" Frame") : tr(" Frames"));
