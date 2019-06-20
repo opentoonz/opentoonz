@@ -363,7 +363,7 @@ StopMotion::~StopMotion() {
 
 ////-----------------------------------------------------------------
 //
-//StopMotion *StopMotion::instance() {
+// StopMotion *StopMotion::instance() {
 //  static StopMotion _instance;
 //  return &_instance;
 //}
@@ -371,13 +371,14 @@ StopMotion::~StopMotion() {
 //-----------------------------------------------------------------------------
 
 void StopMotion::onSceneSwitched() {
-  TApp *app           = TApp::instance();
-  ToonzScene *scene   = app->getCurrentScene()->getScene();
-  TXsheet *xsh  = TApp::instance()->getCurrentXsheet()->getXsheet();
+  TApp *app         = TApp::instance();
+  ToonzScene *scene = app->getCurrentScene()->getScene();
+  TXsheet *xsh      = TApp::instance()->getCurrentXsheet()->getXsheet();
   setToNextNewLevel();
   m_filePath = scene->getDefaultLevelPath(OVL_TYPE, m_levelName.toStdWString())
-                   .getParentDir().getQString();
-  m_frameNumber = 1;
+                   .getParentDir()
+                   .getQString();
+  m_frameNumber       = 1;
   m_xSheetFrameNumber = 0;
 
   TLevelSet *levelSet = scene->getLevelSet();
@@ -391,9 +392,9 @@ void StopMotion::onSceneSwitched() {
       sl                     = level->getSimpleLevel();
       bool isStopMotionLevel = sl->getProperties()->isStopMotionLevel();
       if (isStopMotionLevel) {
-        m_filePath  = sl->getPath().getParentDir().getQString();
-        m_levelName = QString::fromStdWString(sl->getName());
-        m_frameNumber = sl->getFrameCount() + 1;
+        m_filePath          = sl->getPath().getParentDir().getQString();
+        m_levelName         = QString::fromStdWString(sl->getName());
+        m_frameNumber       = sl->getFrameCount() + 1;
         m_xSheetFrameNumber = xsh->getFrameCount() + 1;
         break;
       }
@@ -498,7 +499,7 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
   // can't just return if this feature is off
   // it could have been toggled while the camera was active
   if (!m_useNumpadShortcuts) on = false;
-  CommandManager *comm = CommandManager::instance();
+  CommandManager *comm          = CommandManager::instance();
 
   if (on) {
     // if turning it on, get all old shortcuts
@@ -1026,8 +1027,9 @@ bool StopMotion::importImage() {
 
       /* if the loaded level does not match in pixel size, then return */
       sl = level->getSimpleLevel();
-      if (!sl || sl->getProperties()->getImageRes() !=
-                     TDimension(m_newImage->getLx(), m_newImage->getLy())) {
+      if (!sl ||
+          sl->getProperties()->getImageRes() !=
+              TDimension(m_newImage->getLx(), m_newImage->getLy())) {
         DVGui::error(
             tr("The captured image size does not match with the existing "
                "level."));
@@ -1049,7 +1051,7 @@ bool StopMotion::importImage() {
     else {
       TXshLevel *level = scene->createNewLevel(OVL_XSHLEVEL, levelName,
                                                TDimension(), 0, levelFp);
-      sl               = level->getSimpleLevel();
+      sl = level->getSimpleLevel();
       sl->setPath(levelFp, true);
       sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
       TPointD dpi;
@@ -1064,7 +1066,7 @@ bool StopMotion::importImage() {
         TDimensionD size  = camera->getSize();
         double minimumDpi = std::min(m_newImage->getLx() / size.lx,
                                      m_newImage->getLy() / size.ly);
-        dpi               = TPointD(minimumDpi, minimumDpi);
+        dpi = TPointD(minimumDpi, minimumDpi);
       }
       sl->getProperties()->setDpi(dpi.x);
       sl->getProperties()->setImageDpi(dpi);
@@ -1301,7 +1303,7 @@ void StopMotion::refreshFrameInfo() {
 
   // frame existence
   TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
-  bool frameExist = false;
+  bool frameExist            = false;
   if (levelExist) frameExist = TFileStatus(frameFp).doesExist();
 
   // reset acceptable camera size
@@ -1701,9 +1703,9 @@ bool StopMotion::translateIndex(int index) {
 
 #ifdef WIN32
 
-  // Thanks to:
-  // https://elcharolin.wordpress.com/2017/08/28/webcam-capture-with-the-media-foundation-sdk/
-  // for the webcam enumeration here
+// Thanks to:
+// https://elcharolin.wordpress.com/2017/08/28/webcam-capture-with-the-media-foundation-sdk/
+// for the webcam enumeration here
 
 #define CLEAN_ATTRIBUTES()                                                     \
   if (attributes) {                                                            \
@@ -1895,7 +1897,7 @@ void StopMotion::getWebcamImage() {
           TDimension(m_liveViewImage->getLx(), m_liveViewImage->getLy());
       double minimumDpi = std::min(m_liveViewImageDimensions.lx / size.lx,
                                    m_liveViewImageDimensions.ly / size.ly);
-      m_liveViewDpi     = TPointD(minimumDpi, minimumDpi);
+      m_liveViewDpi = TPointD(minimumDpi, minimumDpi);
 
       m_fullImageDimensions = m_liveViewImageDimensions;
 
@@ -2032,7 +2034,7 @@ void StopMotion::closeCanonSDK() {
 
 EdsError StopMotion::openCameraSession() {
   if (m_camera != NULL) {
-    m_error = EdsOpenSession(m_camera);
+    m_error                                  = EdsOpenSession(m_camera);
     if (m_error == EDS_ERR_OK) m_sessionOpen = true;
   }
   m_error =
@@ -2043,7 +2045,7 @@ EdsError StopMotion::openCameraSession() {
                                        StopMotion::handlePropertyEvent,
                                        (EdsVoid *)this);
 
-  m_error          = EdsSetCameraStateEventHandler(m_camera, kEdsStateEvent_All,
+  m_error = EdsSetCameraStateEventHandler(m_camera, kEdsStateEvent_All,
                                           StopMotion::handleStateEvent,
                                           (EdsVoid *)this);
   EdsUInt32 saveto = kEdsSaveTo_Host;
@@ -2177,7 +2179,7 @@ EdsError StopMotion::getAvailableExposureCompensations() {
   EdsError err                  = EDS_ERR_OK;
   m_exposureOptions.clear();
 
-  err       = EdsGetPropertyDesc(m_camera, kEdsPropID_ExposureCompensation,
+  err = EdsGetPropertyDesc(m_camera, kEdsPropID_ExposureCompensation,
                            exposureDesc);
   int count = exposureDesc->numElements;
   if (count > 0) {
@@ -2544,9 +2546,9 @@ EdsError StopMotion::takePicture(QString tempFile) {
   EdsError err;
 
   // err = EdsSendCommand(m_camera, kEdsCameraCommand_TakePicture, 0);
-  err        = EdsSendCommand(m_camera, kEdsCameraCommand_PressShutterButton,
+  err = EdsSendCommand(m_camera, kEdsCameraCommand_PressShutterButton,
                        kEdsCameraCommand_ShutterButton_Completely_NonAF);
-  err        = EdsSendCommand(m_camera, kEdsCameraCommand_PressShutterButton,
+  err = EdsSendCommand(m_camera, kEdsCameraCommand_PressShutterButton,
                        kEdsCameraCommand_ShutterButton_OFF);
   m_tempFile = tempFile;
   return err;
@@ -2720,9 +2722,9 @@ EdsError StopMotion::downloadEVFData() {
   err = EdsGetPropertyData(evfImage, kEdsPropID_Evf_ImagePosition, 0,
                            sizeImagePos, &imagePos);
   // this returns the size of the full image
-  err        = EdsGetPropertySize(evfImage, kEdsPropID_Evf_CoordinateSystem, 0,
+  err = EdsGetPropertySize(evfImage, kEdsPropID_Evf_CoordinateSystem, 0,
                            &evfZoomRect, &sizeCoordSys);
-  err        = EdsGetPropertyData(evfImage, kEdsPropID_Evf_CoordinateSystem, 0,
+  err = EdsGetPropertyData(evfImage, kEdsPropID_Evf_CoordinateSystem, 0,
                            sizeCoordSys, &coordSys);
   m_zoomRect = TPoint(zoomRect.size.width, zoomRect.size.height);
   if (zoomAmount == 5 && m_zoomRect == TPoint(0, 0)) {
@@ -2765,12 +2767,12 @@ EdsError StopMotion::downloadEVFData() {
           TDimension(m_liveViewImage->getLx(), m_liveViewImage->getLy());
       double minimumDpi = std::min(m_liveViewImageDimensions.lx / size.lx,
                                    m_liveViewImageDimensions.ly / size.ly);
-      m_liveViewDpi     = TPointD(minimumDpi, minimumDpi);
+      m_liveViewDpi = TPointD(minimumDpi, minimumDpi);
 
       m_fullImageDimensions = TDimension(coordSys.width, coordSys.height);
       minimumDpi            = std::min(m_fullImageDimensions.lx / size.lx,
                             m_fullImageDimensions.ly / size.ly);
-      m_fullImageDpi        = TPointD(minimumDpi, minimumDpi);
+      m_fullImageDpi = TPointD(minimumDpi, minimumDpi);
 
       emit(newDimensions());
     }

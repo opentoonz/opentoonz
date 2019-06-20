@@ -56,7 +56,7 @@ class QTimer;
 class StopMotionController final : public QWidget {
   Q_OBJECT
   StopMotion *m_stopMotion;
-  
+
   QWidget *m_parent;
   TXshLevelHandle
       *m_levelHandle;  //!< for clearing the level cache when the color changed
@@ -69,29 +69,28 @@ class StopMotionController final : public QWidget {
   TabBarContainter *m_tabBarContainer;  //!< Tabs container for style types.
   QPushButton *m_toggleLiveViewButton, *m_setToCurrentXSheetFrameButton;
   QPushButton *m_fileFormatOptionButton, *m_captureButton, *m_zoomButton,
-      *m_pickZoomButton, *m_focusNearButton, *m_focusFarButton, *m_focusNear2Button, 
-	  *m_focusNear3Button, *m_focusFar2Button, *m_focusFar3Button,
-	  *m_captureFilterSettingsBtn;
+      *m_pickZoomButton, *m_focusNearButton, *m_focusFarButton,
+      *m_focusNear2Button, *m_focusNear3Button, *m_focusFar2Button,
+      *m_focusFar3Button, *m_captureFilterSettingsBtn;
   QHBoxLayout *m_focusAndZoomLayout;
   QLabel *m_frameInfoLabel, *m_cameraSettingsLabel, *m_cameraModeLabel,
       *m_kelvinLabel, *m_resolutionLabel, *m_directShowLabel;
   QToolButton *m_previousLevelButton, *m_previousFrameButton,
       *m_previousXSheetFrameButton;
-  
 
   QComboBox *m_cameraListCombo, *m_fileTypeCombo, *m_isoCombo,
       *m_shutterSpeedCombo, *m_exposureCombo, *m_apertureCombo,
       *m_whiteBalanceCombo, *m_kelvinCombo, *m_resolutionCombo;
   LevelNameLineEdit *m_levelNameEdit;
-  QCheckBox *m_blackScreenForCapture, *m_useScaledFullSizeImages, *m_placeOnXSheetCB,
-	  *m_directShowCB, *m_liveViewOnAllFramesCB, *m_useMjpgCB, *m_useNumpadCB;
+  QCheckBox *m_blackScreenForCapture, *m_useScaledFullSizeImages,
+      *m_placeOnXSheetCB, *m_directShowCB, *m_liveViewOnAllFramesCB,
+      *m_useMjpgCB, *m_useNumpadCB;
   DVGui::FileField *m_saveInFileFld;
   DVGui::IntLineEdit *m_xSheetFrameNumberEdit;
   FrameNumberLineEdit *m_frameNumberEdit;
-  DVGui::IntField *m_onionOpacityFld, *m_postCaptureReviewFld, *m_subsamplingFld;
+  DVGui::IntField *m_onionOpacityFld, *m_postCaptureReviewFld,
+      *m_subsamplingFld;
   PencilTestSaveInFolderPopup *m_saveInFolderPopup;
-  
-  
 
 public:
   StopMotionController(QWidget *parent = 0);
@@ -101,8 +100,8 @@ protected:
   void updateStopMotion();
   void showEvent(QShowEvent *event);
   void hideEvent(QHideEvent *event);
-  //void mousePressEvent(QMouseEvent *event) override;
-  //void keyPressEvent(QKeyEvent *event);
+  // void mousePressEvent(QMouseEvent *event) override;
+  // void keyPressEvent(QKeyEvent *event);
 
 protected slots:
   void refreshCameraList();

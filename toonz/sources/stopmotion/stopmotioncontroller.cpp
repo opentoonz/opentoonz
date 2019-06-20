@@ -261,8 +261,7 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   lastFrameButton->setText(tr("Last Frame"));
   lastFrameButton->setFixedHeight(28);
   lastFrameButton->setStyleSheet("padding: 0 2;");
-  lastFrameButton->setSizePolicy(QSizePolicy::Maximum,
-                                     QSizePolicy::Maximum);
+  lastFrameButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
   m_previousFrameButton->setFixedSize(24, 24);
   m_previousFrameButton->setArrowType(Qt::LeftArrow);
   m_previousFrameButton->setToolTip(tr("Previous Frame"));
@@ -435,9 +434,6 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
           xsheetLay->addStretch(50);
         }
         displayLay->addLayout(xsheetLay, 0, 1);
-        displayLay->addWidget(new QLabel(tr("Opacity(%):"), this), 1, 0,
-                              Qt::AlignRight);
-        displayLay->addWidget(m_onionOpacityFld, 1, 1);
       }
       displayLay->setColumnStretch(0, 0);
       displayLay->setColumnStretch(1, 1);
@@ -508,12 +504,14 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     m_focusAndZoomLayout->addWidget(m_focusFar2Button, Qt::AlignCenter);
     m_focusAndZoomLayout->addWidget(m_focusFar3Button, Qt::AlignCenter);
     m_focusAndZoomLayout->addStretch();
-    settingsLayout->addStretch();
+    // settingsLayout->addStretch();
     settingsLayout->addLayout(m_focusAndZoomLayout);
     settingsLayout->addStretch();
     m_cameraSettingsPage->setLayout(settingsLayout);
 
     // Make Options Page
+    QGroupBox *webcamBox   = new QGroupBox(tr("Webcam Options"), this);
+    QGroupBox *dslrBox     = new QGroupBox(tr("DSLR Options"), this);
     m_postCaptureReviewFld = new DVGui::IntField(this);
     m_postCaptureReviewFld->setRange(0, 10);
 
@@ -536,35 +534,53 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     QGridLayout *optionsLayout        = new QGridLayout;
     optionsLayout->setSpacing(3);
     optionsLayout->setMargin(5);
+    QGridLayout *webcamLayout   = new QGridLayout;
+    QGridLayout *dslrLayout     = new QGridLayout;
+    QGridLayout *checkboxLayout = new QGridLayout;
 
-    optionsLayout->addWidget(m_blackScreenForCapture, 0, 0, Qt::AlignRight);
-    optionsLayout->addWidget(new QLabel(tr("Black Screen for Capture")), 0, 1,
-                             Qt::AlignLeft);
-    optionsLayout->addWidget(m_placeOnXSheetCB, 1, 0, 1, 1, Qt::AlignRight);
-    optionsLayout->addWidget(new QLabel(tr("Place on XSheet")), 1, 1,
-                             Qt::AlignLeft);
-    optionsLayout->addWidget(m_liveViewOnAllFramesCB, 2, 0, Qt::AlignRight);
-    optionsLayout->addWidget(new QLabel(tr("Show Live View on All Frames")), 2,
-                             1, Qt::AlignLeft);
-    optionsLayout->addWidget(m_useNumpadCB, 3, 0, Qt::AlignRight);
-    optionsLayout->addWidget(new QLabel(tr("Use Numpad Shortcuts When Active")),
-                             3, 1, Qt::AlignLeft);
-    optionsLayout->addWidget(m_useScaledFullSizeImages, 4, 0, Qt::AlignRight);
-    optionsLayout->addWidget(new QLabel(tr("Use Reduced Resolution Images")), 4,
-                             1, Qt::AlignLeft);
-    optionsLayout->addWidget(m_directShowCB, 5, 0, Qt::AlignRight);
-    optionsLayout->addWidget(m_directShowLabel, 5, 1, Qt::AlignLeft);
-    optionsLayout->addWidget(m_useMjpgCB, 6, 0, Qt::AlignRight);
-    optionsLayout->addWidget(new QLabel(tr("Use MJPG with Webcam")), 6, 1,
-                             Qt::AlignLeft);
-    optionsLayout->addWidget(new QLabel(tr("Capture Review Time: ")), 7, 0,
+    dslrLayout->addWidget(m_blackScreenForCapture, 0, 0, Qt::AlignRight);
+    dslrLayout->addWidget(new QLabel(tr("Black Screen for Capture")), 0, 1,
+                          Qt::AlignLeft);
+    dslrLayout->addWidget(m_useScaledFullSizeImages, 1, 0, Qt::AlignRight);
+    dslrLayout->addWidget(new QLabel(tr("Use Reduced Resolution Images")), 1, 1,
+                          Qt::AlignLeft);
+    dslrLayout->setColumnStretch(1, 30);
+    dslrBox->setLayout(dslrLayout);
+    dslrBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+    optionsOutsideLayout->addWidget(dslrBox, Qt::AlignCenter);
+
+    webcamLayout->addWidget(m_directShowCB, 0, 0, Qt::AlignRight);
+    webcamLayout->addWidget(m_directShowLabel, 0, 1, Qt::AlignLeft);
+    webcamLayout->addWidget(m_useMjpgCB, 1, 0, Qt::AlignRight);
+    webcamLayout->addWidget(new QLabel(tr("Use MJPG with Webcam")), 1, 1,
+                            Qt::AlignLeft);
+    webcamLayout->setColumnStretch(1, 30);
+    webcamBox->setLayout(webcamLayout);
+    webcamBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+    optionsOutsideLayout->addWidget(webcamBox, Qt::AlignCenter);
+
+    checkboxLayout->addWidget(m_placeOnXSheetCB, 0, 0, 1, 1, Qt::AlignRight);
+    checkboxLayout->addWidget(new QLabel(tr("Place on XSheet")), 0, 1,
+                              Qt::AlignLeft);
+    checkboxLayout->addWidget(m_useNumpadCB, 1, 0, Qt::AlignRight);
+    checkboxLayout->addWidget(
+        new QLabel(tr("Use Numpad Shortcuts When Active")), 1, 1,
+        Qt::AlignLeft);
+    checkboxLayout->addWidget(m_liveViewOnAllFramesCB, 2, 0, Qt::AlignRight);
+    checkboxLayout->addWidget(new QLabel(tr("Show Live View on All Frames")), 2,
+                              1, Qt::AlignLeft);
+
+    checkboxLayout->setColumnStretch(1, 30);
+    optionsOutsideLayout->addLayout(checkboxLayout, Qt::AlignLeft);
+
+    optionsLayout->addWidget(new QLabel(tr("Capture Review Time: ")), 0, 0,
                              Qt::AlignRight);
-    optionsLayout->addWidget(m_postCaptureReviewFld, 7, 1);
-    optionsLayout->addWidget(new QLabel(tr("Level Subsampling: ")), 8, 0,
+    optionsLayout->addWidget(m_postCaptureReviewFld, 0, 1);
+    optionsLayout->addWidget(new QLabel(tr("Level Subsampling: ")), 1, 0,
                              Qt::AlignRight);
-    optionsLayout->addWidget(m_subsamplingFld, 8, 1);
+    optionsLayout->addWidget(m_subsamplingFld, 1, 1);
     optionsLayout->setColumnStretch(1, 30);
-    optionsLayout->setRowStretch(9, 30);
+    optionsLayout->setRowStretch(2, 30);
     optionsOutsideLayout->addLayout(optionsLayout, Qt::AlignLeft);
     optionsOutsideLayout->addStretch();
 
@@ -580,6 +596,13 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     m_stackedChooser->addWidget(settingsArea);
     m_stackedChooser->addWidget(optionsArea);
     m_stackedChooser->setFocusPolicy(Qt::NoFocus);
+
+    QFrame *opacityFrame    = new QFrame();
+    QHBoxLayout *opacityLay = new QHBoxLayout();
+    opacityLay->addWidget(new QLabel(tr("Opacity:"), this), 0);
+    opacityLay->addWidget(m_onionOpacityFld, 1);
+    opacityFrame->setLayout(opacityLay);
+    opacityFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 
     QFrame *controlButtonFrame    = new QFrame();
     QHBoxLayout *controlButtonLay = new QHBoxLayout();
@@ -602,6 +625,7 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
 
       mainLayout->addWidget(m_tabBarContainer, 0, 0);
       mainLayout->addWidget(m_stackedChooser, 1, 0);
+      mainLayout->addWidget(opacityFrame, 0);
       mainLayout->addWidget(controlButtonFrame, 0);
       setLayout(mainLayout);
       m_tabBarContainer->layout()->update();

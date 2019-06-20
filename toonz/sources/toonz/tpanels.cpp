@@ -1364,7 +1364,6 @@ OpenFloatingPanel openHistoryPanelCommand(MI_OpenHistoryPanel, "HistoryPanel",
                                           QObject::tr("History"));
 //=============================================================================
 
-
 #ifdef WITH_STOPMOTION
 //=============================================================================
 // StopMotion Controller
@@ -1441,4 +1440,3 @@ public:
 //=============================================================================
 OpenFloatingPanel openFxSettingsCommand(MI_FxParamEditor, "FxSettings",
                                         QObject::tr("Fx Settings"));
-
