@@ -11,6 +11,7 @@
 #include "menubarcommandids.h"
 #include "ruler.h"
 #include "locatorpopup.h"
+#include "../stopmotion/stopmotion.h"
 
 // TnzTools includes
 #include "tools/cursors.h"
@@ -558,6 +559,9 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
     , m_isBusyOnTabletMove(false) {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
+#ifdef WITH_STOPMOTION
+  m_stopMotion = StopMotion::instance();
+#endif
   // Enables multiple key input.
   setAttribute(Qt::WA_KeyCompression);
   // Enables input methods for Asian languages.
@@ -828,6 +832,13 @@ void SceneViewer::showEvent(QShowEvent *) {
 
   connect(app, SIGNAL(tabletLeft()), this, SLOT(resetTabletStatus()));
 
+  if (m_stopMotion) {
+    connect(m_stopMotion, SIGNAL(newLiveViewImageReady()), this,
+            SLOT(onNewStopMotionImageReady()));
+    connect(m_stopMotion, SIGNAL(liveViewStopped()), this,
+            SLOT(onStopMotionLiveViewStopped()));
+  }
+
   if (m_hRuler && m_vRuler) {
     if (!viewRulerToggle.getStatus()) {
       m_hRuler->hide();
@@ -882,6 +893,14 @@ void SceneViewer::hideEvent(QHideEvent *) {
   if (toolHandle) toolHandle->disconnect(this);
 
   disconnect(app, SIGNAL(tabletLeft()), this, SLOT(resetTabletStatus()));
+
+  if (!m_stopMotion == NULL) {
+    disconnect(m_stopMotion, SIGNAL(newImageReady()), this,
+               SLOT(onNewStopMotionImageReady()));
+    disconnect(m_stopMotion, SIGNAL(liveViewStopped()), this,
+               SLOT(onStopMotionLiveViewStopped()));
+  }
+
   // hide locator
   if (m_locator && m_locator->isVisible()) m_locator->hide();
 }
@@ -904,6 +923,29 @@ double SceneViewer::getHGuide(int index) { return m_hRuler->getGuide(index); }
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::onNewStopMotionImageReady() {
+#ifdef WITH_STOPMOTION
+  if (m_stopMotion->m_hasLiveViewImage) {
+    if (m_hasStopMotionImage) delete m_stopMotionImage;
+    // is there a way to do this without cloning the image twice?
+    TRasterImageP image = m_stopMotion->m_liveViewImage->clone();
+    m_stopMotionImage   = (TRasterImage *)image->cloneImage();
+    m_stopMotionImage->setDpi(m_stopMotion->m_liveViewDpi.x,
+                              m_stopMotion->m_liveViewDpi.y);
+    m_hasStopMotionImage = true;
+    if (m_stopMotion->m_pickLiveViewZoom) {
+      setToolCursor(this, ToolCursor::ZoomCursor);
+    }
+    onSceneChanged();
+  }
+#endif
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::onStopMotionLiveViewStopped() { onSceneChanged(); }
+
+//-----------------------------------------------------------------------------
 void SceneViewer::initializeGL() {
   initializeOpenGLFunctions();
 
@@ -1658,7 +1700,18 @@ void SceneViewer::drawScene() {
       args.m_isGuidedDrawingEnabled = useGuidedDrawing;
       Stage::visit(painter, args);
     }
-
+#ifdef WITH_STOPMOTION
+    if (!frameHandle->isPlaying() && m_stopMotion->m_liveViewStatus == 2 &&
+        m_hasStopMotionImage) {
+      Stage::Player smPlayer;
+      double dpiX, dpiY;
+      m_stopMotionImage->getDpi(dpiX, dpiY);
+      smPlayer.m_dpiAff = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
+      smPlayer.m_opacity =
+          m_stopMotion->m_zooming ? 255.0 : m_stopMotion->getOpacity();
+      painter.onRasterImage(m_stopMotionImage, smPlayer);
+    }
+#endif
     assert(glGetError() == 0);
     painter.flushRasterImages();
 

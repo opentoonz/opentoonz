@@ -37,6 +37,7 @@ class QGestureEvent;
 class QTouchEvent;
 class QOpenGLFramebufferObject;
 class LutCalibrator;
+class StopMotion;
 
 namespace ImageUtils {
 class FullScreenWidget;
@@ -143,6 +144,9 @@ class SceneViewer final : public GLWidgetForHighDpi,
   TRaster32P m_3DSideL;
   TRaster32P m_3DSideR;
   TRaster32P m_3DTop;
+  TRasterImage *m_stopMotionImage;
+  StopMotion *m_stopMotion  = NULL;
+  bool m_hasStopMotionImage = false;
 
   TPointD m_sideRasterPos;
   TPointD m_topRasterPos;
@@ -433,6 +437,9 @@ public slots:
   void releaseBusyOnTabletMove() { m_isBusyOnTabletMove = false; }
 
   void onContextAboutToBeDestroyed();
+  void onNewStopMotionImageReady();
+  void onStopMotionLiveViewStopped();
+
 signals:
 
   void onZoomChanged();

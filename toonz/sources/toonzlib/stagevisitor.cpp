@@ -467,6 +467,14 @@ void RasterPainter::flushRasterImages() {
   int lx = rect.getLx(), ly = rect.getLy();
   TDimension dim(lx, ly);
 
+  // this is needed since a stop motion live view
+  // doesn't register as a node correctly
+  // there is probably a better way to do this.
+  if (rect.getLx() == 0 && lx == 0) {
+    rect = m_clipRect;
+    dim  = m_dim;
+  }
+
   // Build a raster buffer of sufficient size to hold said union.
   // The buffer is per-thread cached in order to improve the rendering speed.
   if (!threadBuffers.hasLocalData())

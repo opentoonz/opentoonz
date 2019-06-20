@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+﻿cmake_minimum_required(VERSION 2.8.11)
 
 set(CMAKE_BUILD_TYPE_INIT Release)
 
@@ -101,6 +101,7 @@ endif()
 
 option(WITH_SYSTEM_LZO "Use the system LZO library instead of 'thirdpary'" ${_init_SYSTEM_LZO})
 option(WITH_SYSTEM_SUPERLU "Use the system SuperLU library instead of 'thirdpary'" ${_init_SYSTEM_SUPERLU})
+option(WITH_STOPMOTION "Build with Stop Motion features - Requires Canon SDK" OFF)
 
 # avoid using again
 option_defaults_clear()
@@ -255,12 +256,27 @@ if(Qt5Core_VERSION VERSION_LESS QT_MINIMUM_VERSION)
 endif()
 unset(QT_MINIMUM_VERSION)
 
-if(BUILD_ENV_MSVC)
+if(BUILD_ENV_MSVC AND NOT WITH_STOPMOTION)
     include_directories(
         SYSTEM
         ${SDKROOT}/glut/3.7.6/include
         ${SDKROOT}/zlib-1.2.8
         ${SDKROOT}/LibJPEG/jpeg-9
+    )
+    add_definitions(
+        -DGLUT_NO_LIB_PRAGMA
+    )
+endif()
+
+if(BUILD_ENV_MSVC AND WITH_STOPMOTION)
+    include_directories(
+        SYSTEM
+        ${SDKROOT}/glut/3.7.6/include
+        ${SDKROOT}/zlib-1.2.8
+        ${SDKROOT}/LibJPEG/jpeg-9
+        ${SDKROOT}/canon
+        ${SDKROOT}/libjpeg-turbo64
+        ${SDKROOT}/opencv2
     )
     add_definitions(
         -DGLUT_NO_LIB_PRAGMA
@@ -327,6 +343,11 @@ if(BUILD_ENV_MSVC)
     set(SUPERLU_LIB ${SDKROOT}/superlu/SuperLU_${MSVC_LIB_VERSION}_${PLATFORM}.lib)
     set(OPENBLAS_LIB ${SDKROOT}/openblas/libopenblas_${PLATFORM}.lib)
     set(USB_LIB)  # unused
+    if (WITH_STOPMOTION)
+    set(CANON_LIB ${SDKROOT}/canon/library/EDSDK.lib)
+    set(TURBOJPEG_LIB ${SDKROOT}/libjpeg-turbo64/lib/turbojpeg.lib)
+    set(OPENCV_LIB ${SDKROOT}/opencv2/lib/opencv_world410d.lib)
+    endif()
     if(PLATFORM EQUAL 32)
         set(QT_LIB ${SDKROOT}/quicktime/QT73SDK/Libraries/QTMLClient.lib)
     endif()

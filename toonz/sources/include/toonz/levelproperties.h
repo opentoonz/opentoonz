@@ -48,11 +48,13 @@ public:
                           //! adpoted.
 
   bool m_whiteTransp,  //!< <TT>[default: false]</TT> Whether white should be
-      //!  visualized as transparent.
-      m_premultiply;  //!< <TT>[default: false]</TT> Whether level images should
+                       //!  visualized as transparent.
+      m_premultiply,  //!< <TT>[default: false]</TT> Whether level images should
                       //! be
-  //!  premultiplied by Toonz for alpha compositing (because they
-  //!  are not).
+      //!  premultiplied by Toonz for alpha compositing (because they
+      //!  are not).
+      m_isStopMotionLevel;
+
 public:
   LevelOptions();  //!< Constructs with default values.
 
@@ -219,6 +221,13 @@ ie
     m_options.m_whiteTransp = whiteTransp;
   }
   bool whiteTransp() const { return m_options.m_whiteTransp; }
+
+  void setIsStopMotion(bool isStopMotion)  // Is this level used for Stop Motion
+
+  {
+    m_options.m_isStopMotionLevel = isStopMotion;
+  }
+  bool isStopMotionLevel() const { return m_options.m_isStopMotionLevel; }
 
 private:
   TPointD m_imageDpi;

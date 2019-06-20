@@ -26,6 +26,44 @@ PencilTestPopup {
 }
 
 /* -----------------------------------------------------------------------------
+   Stop Motion Controller
+----------------------------------------------------------------------------- */
+
+#StopMotionController {
+  & QScrollArea {
+    margin: 8;
+  }
+  & QPushButton {
+    // Adds spacing to buttons, but this setting may be temporary
+    margin: 2 1;
+    padding: 0;
+  }
+  & #TabBarContainer {
+    margin-left: -4; // reset left edge margin
+  }
+  & #bottomWidget {
+    border-top: 1 solid @accent;
+    padding: 3 2 8 3;
+    & QPushButton {
+      // override above margin reset
+      padding: 3 5;
+    }
+  }
+}
+
+#StopMotionTabBar {
+  &::tab {
+    &:extend(.tab-flat all);
+    &::first {
+      // add a border to first item on
+      // the left side due to the spacer
+      // coded in the cpp file
+      border-left: 1 solid @accent;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
    Unknowns + Legacy
 ----------------------------------------------------------------------------- */
 // below are classes that are unknown and considered legacy
