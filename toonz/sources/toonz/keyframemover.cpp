@@ -346,8 +346,8 @@ void KeyframeMoverTool::rectSelect(int row, int col) {
   selection->selectNone();
   TXsheet *xsh = getViewer()->getXsheet();
   int r0 = row, c0 = col, r1 = m_firstRow, c1 = m_firstCol;
-  if (r0 > r1) tswap(r0, r1);
-  if (c0 > c1) tswap(c0, c1);
+  if (r0 > r1) std::swap(r0, r1);
+  if (c0 > c1) std::swap(c0, c1);
   for (int c = c0; c <= c1; c++) {
     TStageObject *obj = xsh->getStageObject(getViewer()->getObjectId(c));
     for (int r = r0; r <= r1; r++) {

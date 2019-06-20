@@ -48,7 +48,7 @@ void TRop::brush(TRaster32P ras, const TPoint &aa, const TPoint &bb, int radius,
                  const TPixel32 &col) {
   TPoint a = aa;
   TPoint b = bb;
-  if (a.y > b.y) tswap(a, b);  //  a e' piu' in basso di b
+  if (a.y > b.y) std::swap(a, b);  //  a e' piu' in basso di b
 
   int lx = ras->getLx();
   int ly = ras->getLy();

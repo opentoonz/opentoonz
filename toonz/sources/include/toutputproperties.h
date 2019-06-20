@@ -20,6 +20,7 @@
 class TPropertyGroup;
 class TWidget;
 class TRenderSettings;
+class BoardSettings;
 
 //=============================================================================
 //! The TOutputProperties class provides a container for output properties and
@@ -90,6 +91,8 @@ private:
   int m_threadIndex;
 
   bool m_subcameraPreview;
+
+  BoardSettings *m_boardSettings;
 
 public:
   /*!
@@ -216,6 +219,8 @@ machine's CPU).
 
   bool isSubcameraPreview() const { return m_subcameraPreview; }
   void setSubcameraPreview(bool enabled) { m_subcameraPreview = enabled; }
+
+  BoardSettings *getBoardSettings() const { return m_boardSettings; }
 };
 
 //--------------------------------------------

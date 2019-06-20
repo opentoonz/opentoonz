@@ -252,6 +252,8 @@ private:
   // darken blended view mode for viewing the non-cleanuped and stacked drawings
   bool m_doRasterDarkenBlendedView;
 
+  std::vector<TStroke *> m_guidedStrokes;
+
 public:
   RasterPainter(const TDimension &dim, const TAffine &viewAff,
                 const TRect &rect, const ImagePainter::VisualSettings &vs,
@@ -279,6 +281,8 @@ public:
   bool isSingleColumnEnabled() const { return m_singleColumnEnabled; }
 
   void setRasterDarkenBlendedView(bool on) { m_doRasterDarkenBlendedView = on; }
+
+  std::vector<TStroke *> &getGuidedStrokes() { return m_guidedStrokes; }
 };
 
 //=============================================================================
@@ -288,6 +292,8 @@ class DVAPI Picker final : public Visitor {
   TPointD m_point;
   TAffine m_viewAff;
   double m_minDist2;
+
+  int m_currentColumnIndex = -1;
 
 public:
   Picker(const TAffine &viewAff, const TPointD &p,
@@ -304,6 +310,8 @@ public:
   int getColumnIndex() const;
   void getColumnIndexes(std::vector<int> &indexes) const;
   int getRow() const;
+
+  void setCurrentColumnIndex(int index) { m_currentColumnIndex = index; }
 };
 
 //=============================================================================

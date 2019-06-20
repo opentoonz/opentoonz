@@ -10,12 +10,14 @@
 #include "selectiontool.h"
 #include "vectorselectiontool.h"
 #include "rasterselectiontool.h"
-#include "brushtool.h"
+#include "toonzrasterbrushtool.h"
 #include "fullcolorbrushtool.h"
+#include "toonzvectorbrushtool.h"
 #include "tooloptionscontrols.h"
 
 //#include "rgbpickertool.h"
 #include "rulertool.h"
+#include "shifttracetool.h"
 
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
@@ -23,6 +25,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvscrollwidget.h"
 #include "toonzqt/lutcalibrator.h"
+#include "toonzqt/viewcommandids.h"
 
 // TnzLib includes
 #include "toonz/tobjecthandle.h"
@@ -36,6 +39,7 @@
 #include "toonz/preferences.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/tonionskinmaskhandle.h"
 
 // TnzCore includes
 #include "tproperty.h"
@@ -53,13 +57,9 @@
 #include <QResizeEvent>
 #include <QList>
 #include <QSignalMapper>
-#include <QPushButton>
 #include <QPropertyAnimation>
 #include <QEasingCurve>
 #include <QStackedWidget>
-
-// tcg includes
-#include "tcg/tcg_deleter_types.h"
 
 TEnv::IntVar ArrowGlobalKeyFrame("EditToolGlobalKeyFrame", 0);
 
@@ -124,8 +124,8 @@ ToolOptionsBox::ToolOptionsBox(QWidget *parent, bool isScrollable)
 
 ToolOptionsBox::~ToolOptionsBox() {
   std::for_each(m_controls.begin(), m_controls.end(),
-                tcg::deleter<ToolOptionControl>());
-  std::for_each(m_labels.begin(), m_labels.end(), tcg::deleter<QLabel>());
+                std::default_delete<ToolOptionControl>());
+  std::for_each(m_labels.begin(), m_labels.end(), std::default_delete<QLabel>());
 }
 
 //-----------------------------------------------------------------------------
@@ -365,6 +365,17 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p) {
     break;
   }
 
+  case FONTCOMBOBOX: {
+    if (p->getQStringName() != "") {
+      QLabel *label = addLabel(p);
+      m_panel->addLabel(p->getName(), label);
+    }
+    ToolOptionFontCombo *obj = new ToolOptionFontCombo(m_tool, p, m_toolHandle);
+    control                  = obj;
+    widget                   = obj;
+    break;
+  }
+
   case COMBOBOX:
   default: {
     if (p->getQStringName() != "") {
@@ -449,13 +460,13 @@ GenericToolOptionsBox::GenericToolOptionsBox(QWidget *parent, TTool *tool,
 //-----------------------------------------------------------------------------
 
 // show 17x17 icon without style dependency
-class SimpleIconViewField : public QWidget {
+class SimpleIconViewField : public DraggableIconView {
   QIcon m_icon;
 
 public:
   SimpleIconViewField(const QString &iconName, const QString &toolTipStr = "",
                       QWidget *parent = 0)
-      : QWidget(parent), m_icon(createQIcon(iconName.toUtf8())) {
+      : DraggableIconView(parent), m_icon(createQIcon(iconName.toUtf8())) {
     setMinimumSize(17, 25);
     setToolTip(toolTipStr);
   }
@@ -1057,7 +1068,9 @@ void ArrowToolOptionsBox::updateStageObjectComboItems() {
     }
 
     TStageObject *pegbar = xsh->getStageObject(id);
-    QString itemName     = QString::fromStdString(pegbar->getName());
+    QString itemName     = (id.isTable())
+                           ? tr("Table")
+                           : QString::fromStdString(pegbar->getName());
     // store the item with ObjectId data
     m_currentStageObjectCombo->addItem(itemName, (int)id.getCode());
   }
@@ -1124,7 +1137,7 @@ void ArrowToolOptionsBox::onCurrentAxisChanged(int axisId) {
 //=============================================================================
 
 IconViewField::IconViewField(QWidget *parent, IconType iconType)
-    : QWidget(parent), m_iconType(iconType) {
+    : DraggableIconView(parent), m_iconType(iconType) {
   setMinimumSize(21, 25);
 }
 
@@ -1134,15 +1147,15 @@ void IconViewField::paintEvent(QPaintEvent *e) {
   p.drawPixmap(QRect(0, 3, 21, 17), m_pm[m_iconType]);
 }
 
-void IconViewField::mousePressEvent(QMouseEvent *event) {
+void DraggableIconView::mousePressEvent(QMouseEvent *event) {
   emit onMousePress(event);
 }
 
-void IconViewField::mouseMoveEvent(QMouseEvent *event) {
+void DraggableIconView::mouseMoveEvent(QMouseEvent *event) {
   emit onMouseMove(event);
 }
 
-void IconViewField::mouseReleaseEvent(QMouseEvent *event) {
+void DraggableIconView::mouseReleaseEvent(QMouseEvent *event) {
   emit onMouseRelease(event);
 }
 
@@ -1166,20 +1179,16 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
 
-  IconViewField *iconView =
-      new IconViewField(this, IconViewField::Icon_ScalePeg);
   m_scaleXLabel = new ClickableLabel(tr("H:"), this);
   m_scaleXField = new SelectionScaleField(selectionTool, 0, "Scale X");
   m_scaleYLabel = new ClickableLabel(tr("V:"), this);
   m_scaleYField = new SelectionScaleField(selectionTool, 1, "Scale Y");
   m_scaleLink   = new DVGui::CheckBox(tr("Link"), this);
 
-  IconViewField *rotIconView =
-      new IconViewField(this, IconViewField::Icon_Rotation);
+  SimpleIconViewField *rotIconView =
+      new SimpleIconViewField("edit_rotation", tr("Rotation"));
   m_rotationField = new SelectionRotationField(selectionTool, tr("Rotation"));
 
-  IconViewField *moveIconView =
-      new IconViewField(this, IconViewField::Icon_Position);
   m_moveXLabel = new ClickableLabel(tr("E/W:"), this);
   m_moveXField = new SelectionMoveField(selectionTool, 0, "Move X");
   m_moveYLabel = new ClickableLabel(tr("N/S:"), this);
@@ -1202,7 +1211,8 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
   addSeparator();
 
-  hLayout()->addWidget(iconView, 0);
+  hLayout()->addWidget(new SimpleIconViewField("edit_scale", tr("Scale"), this),
+                       0);
   hLayout()->addWidget(m_scaleXLabel, 0);
   hLayout()->addWidget(m_scaleXField, 10);
   hLayout()->addWidget(m_scaleYLabel, 0);
@@ -1217,7 +1227,8 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
   addSeparator();
 
-  hLayout()->addWidget(moveIconView, 0);
+  hLayout()->addWidget(
+      new SimpleIconViewField("edit_position", tr("Position"), this), 0);
   hLayout()->addWidget(m_moveXLabel, 0);
   hLayout()->addWidget(m_moveXField, 10);
   hLayout()->addWidget(m_moveYLabel, 0);
@@ -1247,7 +1258,6 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
     addSeparator();
     hLayout()->addWidget(thicknessIconView, 0);
     hLayout()->addWidget(m_thickChangeField, 10);
-    // Outline options
     // Outline options
     ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
     builder.setEnumWidgetType(ToolOptionControlBuilder::POPUPBUTTON);
@@ -1442,12 +1452,12 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
   m_pencilMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Pencil Mode"));
 
-  if (m_shapeField->currentText().toStdWString() != L"Polygon") {
+  if (m_shapeField->getProperty()->getValue() != L"Polygon") {
     m_poligonSideLabel->setEnabled(false);
     m_poligonSideField->setEnabled(false);
   }
   bool ret = connect(m_shapeField, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onShapeValueChanged()));
+                     SLOT(onShapeValueChanged(int)));
 
   if (m_pencilMode) {
     if (m_pencilMode->isChecked()) {
@@ -1493,8 +1503,9 @@ void GeometricToolOptionsBox::updateStatus() {
 
 //-----------------------------------------------------------------------------
 
-void GeometricToolOptionsBox::onShapeValueChanged() {
-  bool enabled = m_shapeField->currentText() == QString("Polygon");
+void GeometricToolOptionsBox::onShapeValueChanged(int index) {
+  const TEnumProperty::Range &range = m_shapeField->getProperty()->getRange();
+  bool enabled                      = range[index] == L"Polygon";
   m_poligonSideLabel->setEnabled(enabled);
   m_poligonSideField->setEnabled(enabled);
 }
@@ -1526,22 +1537,28 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool,
   assert(props->getPropertyCount() > 0);
 
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
+  builder.setEnumWidgetType(ToolOptionControlBuilder::FONTCOMBOBOX);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
+  builder.setEnumWidgetType(ToolOptionControlBuilder::COMBOBOX);
+  if (tool && tool->getProperties(1)) tool->getProperties(1)->accept(builder);
 
   m_layout->addStretch(0);
 
   bool ret = true;
-  ToolOptionCombo *fontField =
-      dynamic_cast<ToolOptionCombo *>(m_controls.value("Font:"));
+
+  ToolOptionFontCombo *fontField =
+      dynamic_cast<ToolOptionFontCombo *>(m_controls.value("Font:"));
   ret &&connect(fontField, SIGNAL(currentIndexChanged(int)), this,
                 SLOT(onFieldChanged()));
 
-#ifndef MACOSX
+  //#ifndef MACOSX
   ToolOptionCombo *styleField =
       dynamic_cast<ToolOptionCombo *>(m_controls.value("Style:"));
   ret &&connect(styleField, SIGNAL(currentIndexChanged(int)), this,
                 SLOT(onFieldChanged()));
-#endif
+  ret &&connect(toolHandle, SIGNAL(toolComboBoxListChanged(std::string)),
+                styleField, SLOT(reloadComboBoxList(std::string)));
+  //#endif
 
   ToolOptionCombo *sizeField =
       dynamic_cast<ToolOptionCombo *>(m_controls.value("Size:"));
@@ -1592,11 +1609,11 @@ PaintbrushToolOptionsBox::PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
   m_selectiveMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Selective"));
 
-  if (m_colorMode->currentText().toStdWString() == L"Lines")
+  if (m_colorMode->getProperty()->getValue() == L"Lines")
     m_selectiveMode->setEnabled(false);
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onColorModeChanged()));
+                     SLOT(onColorModeChanged(int)));
   assert(ret);
 }
 
@@ -1610,8 +1627,9 @@ void PaintbrushToolOptionsBox::updateStatus() {
 
 //-----------------------------------------------------------------------------
 
-void PaintbrushToolOptionsBox::onColorModeChanged() {
-  bool enabled = m_colorMode->currentText() != QString("Lines");
+void PaintbrushToolOptionsBox::onColorModeChanged(int index) {
+  const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
+  bool enabled                      = range[index] != L"Lines";
   m_selectiveMode->setEnabled(enabled);
 }
 
@@ -1655,28 +1673,28 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Autopaint Lines"));
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onColorModeChanged()));
+                     SLOT(onColorModeChanged(int)));
   ret = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolTypeChanged()));
+                       SLOT(onToolTypeChanged(int)));
   ret = ret && connect(m_onionMode, SIGNAL(toggled(bool)), this,
                        SLOT(onOnionModeToggled(bool)));
   ret = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
                        SLOT(onMultiFrameModeToggled(bool)));
   assert(ret);
-  if (m_colorMode->currentText().toStdWString() == L"Lines") {
+  if (m_colorMode->getProperty()->getValue() == L"Lines") {
     m_selectiveMode->setEnabled(false);
     if (m_fillDepthLabel && m_fillDepthField) {
       m_fillDepthLabel->setEnabled(false);
       m_fillDepthField->setEnabled(false);
     }
-    if (m_toolType->currentText() == QString("Normal") ||
+    if (m_toolType->getProperty()->getValue() == L"Normal" ||
         m_multiFrameMode->isChecked())
       m_onionMode->setEnabled(false);
     if (m_autopaintMode) m_autopaintMode->setEnabled(false);
   }
-  if (m_toolType->currentText().toStdWString() != L"Normal") {
+  if (m_toolType->getProperty()->getValue() != L"Normal") {
     if (m_segmentMode) m_segmentMode->setEnabled(false);
-    if (m_colorMode->currentText() == QString("Lines") ||
+    if (m_colorMode->getProperty()->getValue() == L"Lines" ||
         m_multiFrameMode->isChecked())
       m_onionMode->setEnabled(false);
   }
@@ -1693,8 +1711,9 @@ void FillToolOptionsBox::updateStatus() {
 
 //-----------------------------------------------------------------------------
 
-void FillToolOptionsBox::onColorModeChanged() {
-  bool enabled = m_colorMode->currentText() != QString("Lines");
+void FillToolOptionsBox::onColorModeChanged(int index) {
+  const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
+  bool enabled                      = range[index] != L"Lines";
   m_selectiveMode->setEnabled(enabled);
   if (m_autopaintMode) m_autopaintMode->setEnabled(enabled);
   if (m_fillDepthLabel && m_fillDepthField) {
@@ -1702,23 +1721,23 @@ void FillToolOptionsBox::onColorModeChanged() {
     m_fillDepthField->setEnabled(enabled);
   }
   if (m_segmentMode) {
-    enabled = m_colorMode->currentText() != QString("Areas");
+    enabled = range[index] != L"Areas";
     m_segmentMode->setEnabled(
-        enabled ? m_toolType->currentText() == QString("Normal") : false);
+        enabled ? m_toolType->getProperty()->getValue() == L"Normal" : false);
   }
-  enabled = m_colorMode->currentText() != QString("Lines") &&
-            !m_multiFrameMode->isChecked();
+  enabled = range[index] != L"Lines" && !m_multiFrameMode->isChecked();
   m_onionMode->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
 
-void FillToolOptionsBox::onToolTypeChanged() {
-  bool enabled = m_toolType->currentText() == QString("Normal");
+void FillToolOptionsBox::onToolTypeChanged(int index) {
+  const TEnumProperty::Range &range = m_toolType->getProperty()->getRange();
+  bool enabled                      = range[index] == L"Normal";
   if (m_segmentMode)
     m_segmentMode->setEnabled(
-        enabled ? m_colorMode->currentText() != QString("Areas") : false);
-  enabled = enabled || (m_colorMode->currentText() != QString("Lines") &&
+        enabled ? m_colorMode->getProperty()->getValue() != L"Areas" : false);
+  enabled = enabled || (m_colorMode->getProperty()->getValue() != L"Lines" &&
                         !m_multiFrameMode->isChecked());
   m_onionMode->setEnabled(enabled);
 }
@@ -1846,9 +1865,18 @@ void BrushToolOptionsBox::filterControls() {
   // show or hide widgets which modify imported brush (mypaint)
 
   bool showModifiers = false;
-  if (FullColorBrushTool *fullColorBrushTool =
-          dynamic_cast<FullColorBrushTool *>(m_tool))
+  if (m_tool->getTargetType() & TTool::RasterImage) {
+    FullColorBrushTool *fullColorBrushTool =
+        dynamic_cast<FullColorBrushTool *>(m_tool);
     showModifiers = fullColorBrushTool->getBrushStyle();
+  } else if (m_tool->getTargetType() & TTool::ToonzImage) {
+    ToonzRasterBrushTool *toonzRasterBrushTool =
+        dynamic_cast<ToonzRasterBrushTool *>(m_tool);
+    showModifiers = toonzRasterBrushTool->isMyPaintStyleSelected();
+  } else {  // (m_tool->getTargetType() & TTool::Vectors)
+    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
+    return;
+  }
 
   for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
        it != m_labels.end(); it++) {
@@ -1865,9 +1893,6 @@ void BrushToolOptionsBox::filterControls() {
     bool visible    = isCommon || (isModifier == showModifiers);
     if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
       widget->setVisible(visible);
-  }
-  if (m_tool->getTargetType() & TTool::Vectors) {
-    m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
   }
 }
 
@@ -1910,9 +1935,12 @@ void BrushToolOptionsBox::onAddPreset() {
   m_presetNamePopup->removeName();
 
   switch (m_tool->getTargetType() & TTool::CommonImages) {
-  case TTool::VectorImage:
+  case TTool::VectorImage: {
+    static_cast<ToonzVectorBrushTool *>(m_tool)->addPreset(name);
+    break;
+  }
   case TTool::ToonzImage: {
-    static_cast<BrushTool *>(m_tool)->addPreset(name);
+    static_cast<ToonzRasterBrushTool *>(m_tool)->addPreset(name);
     break;
   }
 
@@ -1929,9 +1957,12 @@ void BrushToolOptionsBox::onAddPreset() {
 
 void BrushToolOptionsBox::onRemovePreset() {
   switch (m_tool->getTargetType() & TTool::CommonImages) {
-  case TTool::VectorImage:
+  case TTool::VectorImage: {
+    static_cast<ToonzVectorBrushTool *>(m_tool)->removePreset();
+    break;
+  }
   case TTool::ToonzImage: {
-    static_cast<BrushTool *>(m_tool)->removePreset();
+    static_cast<ToonzRasterBrushTool *>(m_tool)->removePreset();
     break;
   }
 
@@ -1979,11 +2010,11 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
     ret = ret && connect(m_pencilMode, SIGNAL(toggled(bool)), this,
                          SLOT(onPencilModeToggled(bool)));
     ret = ret && connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-                         SLOT(onColorModeChanged()));
+                         SLOT(onColorModeChanged(int)));
   }
 
   ret = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolTypeChanged()));
+                       SLOT(onToolTypeChanged(int)));
 
   if (m_pencilMode && m_pencilMode->isChecked()) {
     assert(m_hardnessField && m_hardnessLabel);
@@ -1991,12 +2022,12 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
     m_hardnessLabel->setEnabled(false);
   }
 
-  if (m_toolType && m_toolType->currentText() == QString("Normal")) {
+  if (m_toolType && m_toolType->getProperty()->getValue() == L"Normal") {
     m_invertMode->setEnabled(false);
     m_multiFrameMode->setEnabled(false);
   }
 
-  if (m_colorMode && m_colorMode->currentText() == QString("Areas")) {
+  if (m_colorMode && m_colorMode->getProperty()->getValue() == L"Areas") {
     assert(m_hardnessField && m_hardnessLabel && m_pencilMode);
     m_pencilMode->setEnabled(false);
     m_hardnessField->setEnabled(false);
@@ -2023,16 +2054,18 @@ void EraserToolOptionsBox::onPencilModeToggled(bool value) {
 
 //-----------------------------------------------------------------------------
 
-void EraserToolOptionsBox::onToolTypeChanged() {
-  bool value = m_toolType && m_toolType->currentText() != QString("Normal");
+void EraserToolOptionsBox::onToolTypeChanged(int index) {
+  const TEnumProperty::Range &range = m_toolType->getProperty()->getRange();
+  bool value                        = range[index] != L"Normal";
   m_invertMode->setEnabled(value);
   m_multiFrameMode->setEnabled(value);
 }
 
 //-----------------------------------------------------------------------------
 
-void EraserToolOptionsBox::onColorModeChanged() {
-  bool enabled = m_colorMode->currentText() != QString("Areas");
+void EraserToolOptionsBox::onColorModeChanged(int index) {
+  const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
+  bool enabled                      = range[index] != L"Areas";
   if (m_pencilMode && m_hardnessField && m_hardnessLabel) {
     m_pencilMode->setEnabled(enabled);
     m_hardnessField->setEnabled(enabled ? !m_pencilMode->isChecked() : false);
@@ -2115,13 +2148,13 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
   lay->setMargin(0);
   lay->setSpacing(3);
   {
-    lay->addWidget(new QLabel("X:", this), 0);
+    lay->addWidget(new QLabel(tr("X:", "ruler tool option"), this), 0);
     lay->addWidget(m_Xfld, 0);
     lay->addWidget(m_XpixelFld, 0);
 
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("Y:", this), 0);
+    lay->addWidget(new QLabel(tr("Y:", "ruler tool option"), this), 0);
     lay->addWidget(m_Yfld, 0);
     lay->addWidget(m_YpixelFld, 0);
 
@@ -2129,13 +2162,13 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
     lay->addWidget(new ToolOptionsBarSeparator(this), 0);
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("W:", this), 0);
+    lay->addWidget(new QLabel(tr("W:", "ruler tool option"), this), 0);
     lay->addWidget(m_Wfld, 0);
     lay->addWidget(m_WpixelFld, 0);
 
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("H:", this), 0);
+    lay->addWidget(new QLabel(tr("H:", "ruler tool option"), this), 0);
     lay->addWidget(m_Hfld, 0);
     lay->addWidget(m_HpixelFld, 0);
 
@@ -2143,12 +2176,12 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
     lay->addWidget(new ToolOptionsBarSeparator(this), 0);
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("A:", this), 0);
+    lay->addWidget(new QLabel(tr("A:", "ruler tool option"), this), 0);
     lay->addWidget(m_Afld, 0);
 
     lay->addSpacing(3);
 
-    lay->addWidget(new QLabel("L:", this), 0);
+    lay->addWidget(new QLabel(tr("L:", "ruler tool option"), this), 0);
     lay->addWidget(m_Lfld, 0);
   }
   m_layout->addLayout(lay, 0);
@@ -2230,21 +2263,22 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool,
   if (m_autocloseField)
     m_autocloseLabel = m_labels.value(m_autocloseField->propertyName());
 
-  bool isNormalType = m_typeMode->currentText() == "Normal";
+  bool isNormalType = m_typeMode->getProperty()->getValue() == L"Normal";
   m_toolMode->setEnabled(isNormalType);
   m_autocloseField->setEnabled(!isNormalType);
   m_autocloseLabel->setEnabled(!isNormalType);
 
-  bool isLineToLineMode = m_toolMode->currentText() == "Line to Line";
+  bool isLineToLineMode =
+      m_toolMode->getProperty()->getValue() == L"Line to Line";
   m_joinStrokesMode->setEnabled(!isLineToLineMode);
 
   bool isJoinStrokes = m_joinStrokesMode->isChecked();
   m_smoothMode->setEnabled(!isLineToLineMode && isJoinStrokes);
 
   bool ret = connect(m_typeMode, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onToolTypeChanged()));
+                     SLOT(onToolTypeChanged(int)));
   ret = ret && connect(m_toolMode, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolModeChanged()));
+                       SLOT(onToolModeChanged(int)));
   ret = ret && connect(m_joinStrokesMode, SIGNAL(toggled(bool)), this,
                        SLOT(onJoinStrokesModeChanged()));
   assert(ret);
@@ -2260,8 +2294,9 @@ void TapeToolOptionsBox::updateStatus() {
 
 //-----------------------------------------------------------------------------
 
-void TapeToolOptionsBox::onToolTypeChanged() {
-  bool isNormalType = m_typeMode->currentText() == "Normal";
+void TapeToolOptionsBox::onToolTypeChanged(int index) {
+  const TEnumProperty::Range &range = m_typeMode->getProperty()->getRange();
+  bool isNormalType                 = range[index] == L"Normal";
   m_toolMode->setEnabled(isNormalType);
   m_autocloseField->setEnabled(!isNormalType);
   m_autocloseLabel->setEnabled(!isNormalType);
@@ -2269,8 +2304,9 @@ void TapeToolOptionsBox::onToolTypeChanged() {
 
 //-----------------------------------------------------------------------------
 
-void TapeToolOptionsBox::onToolModeChanged() {
-  bool isLineToLineMode = m_toolMode->currentText() == "Line to Line";
+void TapeToolOptionsBox::onToolModeChanged(int index) {
+  const TEnumProperty::Range &range = m_toolMode->getProperty()->getRange();
+  bool isLineToLineMode             = range[index] == L"Line to Line";
   m_joinStrokesMode->setEnabled(!isLineToLineMode);
   bool isJoinStrokes = m_joinStrokesMode->isChecked();
   m_smoothMode->setEnabled(!isLineToLineMode && isJoinStrokes);
@@ -2279,8 +2315,9 @@ void TapeToolOptionsBox::onToolModeChanged() {
 //-----------------------------------------------------------------------------
 
 void TapeToolOptionsBox::onJoinStrokesModeChanged() {
-  bool isLineToLineMode = m_toolMode->currentText() == "Line to Line";
-  bool isJoinStrokes    = m_joinStrokesMode->isChecked();
+  bool isLineToLineMode =
+      m_toolMode->getProperty()->getValue() == L"Line to Line";
+  bool isJoinStrokes = m_joinStrokesMode->isChecked();
   m_smoothMode->setEnabled(!isLineToLineMode && isJoinStrokes);
 }
 
@@ -2472,6 +2509,203 @@ void StylePickerToolOptionsBox::updateRealTimePickLabel(const int ink,
 }
 
 //=============================================================================
+// ShiftTraceToolOptionBox
+//-----------------------------------------------------------------------------
+
+ShiftTraceToolOptionBox::ShiftTraceToolOptionBox(QWidget *parent, TTool *tool)
+    : ToolOptionsBox(parent), m_tool(tool) {
+  setFrameStyle(QFrame::StyledPanel);
+  setFixedHeight(26);
+
+  m_prevFrame  = new QFrame(this);
+  m_afterFrame = new QFrame(this);
+
+  m_resetPrevGhostBtn  = new QPushButton(tr("Reset Previous"), this);
+  m_resetAfterGhostBtn = new QPushButton(tr("Reset Following"), this);
+
+  m_prevRadioBtn  = new QRadioButton(tr("Previous Drawing"), this);
+  m_afterRadioBtn = new QRadioButton(tr("Following Drawing"), this);
+
+  m_prevFrame->setFixedSize(10, 21);
+  m_afterFrame->setFixedSize(10, 21);
+
+  m_layout->addWidget(m_prevFrame, 0);
+  m_layout->addWidget(m_prevRadioBtn, 0);
+  m_layout->addWidget(m_resetPrevGhostBtn, 0);
+
+  m_layout->addWidget(new DVGui::Separator("", this, false));
+
+  m_layout->addWidget(m_afterFrame, 0);
+  m_layout->addWidget(m_afterRadioBtn, 0);
+  m_layout->addWidget(m_resetAfterGhostBtn, 0);
+
+  m_layout->addStretch(1);
+
+  connect(m_resetPrevGhostBtn, SIGNAL(clicked(bool)), this,
+          SLOT(onResetPrevGhostBtnPressed()));
+  connect(m_resetAfterGhostBtn, SIGNAL(clicked(bool)), this,
+          SLOT(onResetAfterGhostBtnPressed()));
+  connect(m_prevRadioBtn, SIGNAL(clicked(bool)), this,
+          SLOT(onPrevRadioBtnClicked()));
+  connect(m_afterRadioBtn, SIGNAL(clicked(bool)), this,
+          SLOT(onAfterRadioBtnClicked()));
+
+  updateStatus();
+}
+
+void ShiftTraceToolOptionBox::showEvent(QShowEvent *) {
+  TTool::Application *app = TTool::getApplication();
+  connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
+          SLOT(updateColors()));
+  updateColors();
+}
+
+void ShiftTraceToolOptionBox::hideEvent(QShowEvent *) {
+  TTool::Application *app = TTool::getApplication();
+  disconnect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
+             SLOT(updateColors()));
+}
+
+void ShiftTraceToolOptionBox::resetGhost(int index) {
+  TTool::Application *app = TTool::getApplication();
+  OnionSkinMask osm       = app->getCurrentOnionSkin()->getOnionSkinMask();
+  osm.setShiftTraceGhostCenter(index, TPointD());
+  osm.setShiftTraceGhostAff(index, TAffine());
+  app->getCurrentOnionSkin()->setOnionSkinMask(osm);
+  app->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+  TTool *tool = app->getCurrentTool()->getTool();
+  if (tool) tool->reset();
+
+  if (index == 0)
+    m_resetPrevGhostBtn->setDisabled(true);
+  else  // index == 1
+    m_resetAfterGhostBtn->setDisabled(true);
+}
+
+void ShiftTraceToolOptionBox::onResetPrevGhostBtnPressed() { resetGhost(0); }
+
+void ShiftTraceToolOptionBox::onResetAfterGhostBtnPressed() { resetGhost(1); }
+
+void ShiftTraceToolOptionBox::updateColors() {
+  TPixel front, back;
+  bool ink;
+  Preferences::instance()->getOnionData(front, back, ink);
+
+  m_prevFrame->setStyleSheet(QString("background:rgb(%1,%2,%3,255);")
+                                 .arg((int)back.r)
+                                 .arg((int)back.g)
+                                 .arg((int)back.b));
+  m_afterFrame->setStyleSheet(QString("background:rgb(%1,%2,%3,255);")
+                                  .arg((int)front.r)
+                                  .arg((int)front.g)
+                                  .arg((int)front.b));
+}
+
+void ShiftTraceToolOptionBox::updateStatus() {
+  TTool::Application *app = TTool::getApplication();
+  OnionSkinMask osm       = app->getCurrentOnionSkin()->getOnionSkinMask();
+  if (osm.getShiftTraceGhostAff(0).isIdentity() &&
+      osm.getShiftTraceGhostCenter(0) == TPointD())
+    m_resetPrevGhostBtn->setDisabled(true);
+  else
+    m_resetPrevGhostBtn->setEnabled(true);
+
+  if (osm.getShiftTraceGhostAff(1).isIdentity() &&
+      osm.getShiftTraceGhostCenter(1) == TPointD())
+    m_resetAfterGhostBtn->setDisabled(true);
+  else
+    m_resetAfterGhostBtn->setEnabled(true);
+
+  // Check the ghost index
+  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
+  if (!stTool) return;
+  if (stTool->getCurrentGhostIndex() == 0)
+    m_prevRadioBtn->setChecked(true);
+  else  // ghostIndex == 1
+    m_afterRadioBtn->setChecked(true);
+}
+
+void ShiftTraceToolOptionBox::onPrevRadioBtnClicked() {
+  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
+  if (!stTool) return;
+  stTool->setCurrentGhostIndex(0);
+}
+
+void ShiftTraceToolOptionBox::onAfterRadioBtnClicked() {
+  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
+  if (!stTool) return;
+  stTool->setCurrentGhostIndex(1);
+}
+
+//=============================================================================
+// ZoomToolOptionBox
+//-----------------------------------------------------------------------------
+
+ZoomToolOptionsBox::ZoomToolOptionsBox(QWidget *parent, TTool *tool,
+                                       TPaletteHandle *pltHandle,
+                                       ToolHandle *toolHandle)
+    : ToolOptionsBox(parent) {
+  setFrameStyle(QFrame::StyledPanel);
+  setFixedHeight(26);
+
+  QAction *resetZoomAction = CommandManager::instance()->getAction(V_ZoomReset);
+
+  QPushButton *button = new QPushButton(tr("Reset Zoom"));
+  button->setFixedHeight(20);
+  button->addAction(resetZoomAction);
+  connect(button, SIGNAL(clicked()), resetZoomAction, SLOT(trigger()));
+
+  m_layout->addStretch(1);
+  m_layout->addWidget(button, 0);
+}
+
+//=============================================================================
+// RotateToolOptionBox
+//-----------------------------------------------------------------------------
+
+RotateToolOptionsBox::RotateToolOptionsBox(QWidget *parent, TTool *tool,
+                                           TPaletteHandle *pltHandle,
+                                           ToolHandle *toolHandle)
+    : ToolOptionsBox(parent) {
+  setFrameStyle(QFrame::StyledPanel);
+  setFixedHeight(26);
+
+  QAction *resetRotationAction =
+      CommandManager::instance()->getAction(V_RotateReset);
+
+  QPushButton *button = new QPushButton(tr("Reset Rotation"));
+  button->setFixedHeight(20);
+  button->addAction(resetRotationAction);
+  connect(button, SIGNAL(clicked()), resetRotationAction, SLOT(trigger()));
+
+  m_layout->addStretch(1);
+  m_layout->addWidget(button, 0);
+}
+
+//=============================================================================
+// HandToolOptionBox
+//-----------------------------------------------------------------------------
+
+HandToolOptionsBox::HandToolOptionsBox(QWidget *parent, TTool *tool,
+                                       TPaletteHandle *pltHandle,
+                                       ToolHandle *toolHandle)
+    : ToolOptionsBox(parent) {
+  setFrameStyle(QFrame::StyledPanel);
+  setFixedHeight(26);
+
+  QAction *resetPositionAction =
+      CommandManager::instance()->getAction(V_PositionReset);
+
+  QPushButton *button = new QPushButton(tr("Reset Position"));
+  button->setFixedHeight(20);
+  button->addAction(resetPositionAction);
+  connect(button, SIGNAL(clicked()), resetPositionAction, SLOT(trigger()));
+
+  m_layout->addStretch(1);
+  m_layout->addWidget(button, 0);
+}
+
+//=============================================================================
 // ToolOptions
 //-----------------------------------------------------------------------------
 
@@ -2579,6 +2813,14 @@ void ToolOptions::onToolSwitched() {
       } else if (tool->getName() == T_StylePicker)
         panel = new StylePickerToolOptionsBox(0, tool, currPalette, currTool,
                                               app->getPaletteController());
+      else if (tool->getName() == "T_ShiftTrace")
+        panel = new ShiftTraceToolOptionBox(this, tool);
+      else if (tool->getName() == T_Zoom)
+        panel = new ZoomToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Rotate)
+        panel = new RotateToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Hand)
+        panel = new HandToolOptionsBox(0, tool, currPalette, currTool);
       else
         panel = tool->createOptionsBox();  // Only this line should remain out
                                            // of that if/else monstrosity

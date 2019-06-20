@@ -33,7 +33,6 @@
 #include "traster.h"
 
 //#include "tstopwatch.h"
-#include "tconvert.h"
 #include "tbigmemorymanager.h"
 
 #include "tstream.h"

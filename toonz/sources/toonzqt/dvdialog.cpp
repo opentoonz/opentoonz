@@ -33,7 +33,7 @@
 
 using namespace DVGui;
 
-QString DialogTitle = QObject::tr("OpenToonz 1.2");
+QString DialogTitle = QObject::tr("OpenToonz 1.3");
 
 //=============================================================================
 namespace {
@@ -344,8 +344,7 @@ void Dialog::moveEvent(QMoveEvent *e) {
 void Dialog::resizeEvent(QResizeEvent *e) {
   if (Preferences::instance()->getCurrentLanguage() != "English") {
     QSize t = this->size();
-    QLabel *s;
-    foreach (s, m_labelList)
+    for (QLabel *s : m_labelList)
       s->setFixedWidth(t.width() * .35);
   }
 

@@ -238,6 +238,8 @@ public:
 
   void setInterfaceFont(std::string font);
   QString getInterfaceFont() { return m_interfaceFont; }
+  void setInterfaceFontStyle(std::string style);
+  QString getInterfaceFontStyle() { return m_interfaceFontStyle; }
   void setInterfaceFontWeight(int weight);
   int getInterfaceFontWeight() { return m_interfaceFontWeight; }
 
@@ -303,6 +305,11 @@ public:
 
   void setIgnoreImageDpi(bool on);
   bool isIgnoreImageDpiEnabled() const { return m_ignoreImageDpi; }
+
+  // Saving tab
+
+  void setRasterBackgroundColor(const TPixel32 &color);
+  TPixel getRasterBackgroundColor() const { return m_rasterBackgroundColor; }
 
   // Drawing  tab
 
@@ -456,6 +463,11 @@ public:
   void setLoadedXsheetLayout(std::string layout);
   QString getLoadedXsheetLayout() const { return m_loadedXsheetLayout; }
 
+  void setCurrentColumnData(const TPixel &currentColumnColor);
+  void getCurrentColumnData(TPixel &currentColumnColor) const {
+    currentColumnColor = m_currentColumnColor;
+  }
+
   // Animation  tab
 
   void setKeyframeType(int s);
@@ -500,6 +512,11 @@ public:
   }
   bool getOnionSkinDuringPlayback() { return m_onionSkinDuringPlayback; }
   void setOnionSkinDuringPlayback(bool on);
+
+  void useOnionColorsForShiftAndTraceGhosts(bool on);
+  bool areOnionColorsUsedForShiftAndTraceGhosts() const {
+    return m_useOnionColorsForShiftAndTraceGhosts;
+  }
   // Transparency Check  tab
 
   void setTranspCheckData(const TPixel &bg, const TPixel &ink,
@@ -568,6 +585,11 @@ public:
   }  //! \sa The \p sysctl unix command.
   std::string getLayerNameEncoding() const { return m_layerNameEncoding; };
 
+  // Tablet tab
+
+  void enableWinInk(bool on);
+  bool isWinInkEnabled() const { return m_enableWinInk; }
+
 Q_SIGNALS:
 
   void stopAutoSave();
@@ -584,7 +606,7 @@ private:
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
       m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset,
-      m_customProjectRoot, m_interfaceFont;
+      m_customProjectRoot, m_interfaceFont, m_interfaceFontStyle;
   QString m_fastRenderPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
@@ -696,6 +718,11 @@ private:
   QString m_cursorBrushType;
   QString m_cursorBrushStyle;
   bool m_cursorOutlineEnabled = false;
+
+  TPixel32 m_currentColumnColor, m_rasterBackgroundColor;
+
+  bool m_enableWinInk                         = false;
+  bool m_useOnionColorsForShiftAndTraceGhosts = false;
 
 private:
   Preferences();

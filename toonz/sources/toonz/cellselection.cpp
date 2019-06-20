@@ -119,6 +119,7 @@ void deleteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1) {
       xsh->clearCells(r0, c, r1 - r0 + 1);
       TXshColumn *column = xsh->getColumn(c);
       if (column && column->isEmpty()) {
+        column->resetColumnProperties();
         TFx *fx = column->getFx();
         if (fx) {
           int i;
@@ -144,6 +145,7 @@ void cutCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1) {
     xsh->removeCells(r0, c, r1 - r0 + 1);
     TXshColumn *column = xsh->getColumn(c);
     if (column && column->isEmpty()) {
+      column->resetColumnProperties();
       TFx *fx = column->getFx();
       if (!fx) continue;
       int i;
@@ -1251,6 +1253,62 @@ public:
   //-----------------------------------------------------------------------------
 };
 
+//=============================================================================
+// Duplicate in XSheet Undo
+//-----------------------------------------------------------------------------
+
+class DuplicateInXSheetUndo final : public TUndo {
+  int m_r0, m_r1, m_c;
+  TXshCell m_oldCell;
+  TXshCell m_newCell;
+  bool m_goForward;
+
+public:
+  DuplicateInXSheetUndo(int r0, int r1, int c, TXshCell oldCell,
+                        TXshCell newCell, bool goForward)
+      : m_r0(r0)
+      , m_r1(r1)
+      , m_c(c)
+      , m_oldCell(oldCell)
+      , m_newCell(newCell)
+      , m_goForward(goForward) {}
+
+  ~DuplicateInXSheetUndo() {}
+
+  void undo() const override {
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    if (m_r1 > m_r0) {
+      for (int i = m_r0; i <= m_r1; i++) {
+        xsh->setCell(i, m_c, m_oldCell);
+      }
+    } else
+      xsh->setCell(m_r0, m_c, m_oldCell);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_goForward) CommandManager::instance()->execute(MI_PrevFrame);
+  }
+
+  void redo() const override {
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    if (m_r1 > m_r0) {
+      for (int i = m_r0; i <= m_r1; i++) {
+        xsh->setCell(i, m_c, m_newCell);
+      }
+    } else
+      xsh->setCell(m_r0, m_c, m_newCell);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_goForward) CommandManager::instance()->execute(MI_NextFrame);
+  }
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override {
+    return QObject::tr("Duplicate Frame in XSheet");
+  }
+
+  int getHistoryType() override { return HistoryType::Xsheet; }
+  //-----------------------------------------------------------------------------
+};
+
 }  // namespace
 //-----------------------------------------------------------------------------
 
@@ -1335,6 +1393,7 @@ void TCellSelection::enableCommands() {
                 &TCellSelection::reframeWithEmptyInbetweens);
 
   enableCommand(this, MI_PasteNumbers, &TCellSelection::overwritePasteNumbers);
+  enableCommand(this, MI_Duplicate, &TCellSelection::duplicateFrame);
 }
 //-----------------------------------------------------------------------------
 // Used in RenameCellField::eventFilter()
@@ -1387,8 +1446,8 @@ bool TCellSelection::isEmpty() const { return m_range.isEmpty(); }
 //-----------------------------------------------------------------------------
 
 void TCellSelection::selectCells(int r0, int c0, int r1, int c1) {
-  if (r0 > r1) tswap(r0, r1);
-  if (c0 > c1) tswap(c0, c1);
+  if (r0 > r1) std::swap(r0, r1);
+  if (c0 > c1) std::swap(c0, c1);
   m_range.m_r0            = r0;
   m_range.m_c0            = c0;
   m_range.m_r1            = r1;
@@ -1627,9 +1686,11 @@ void TCellSelection::pasteCells() {
       // (r0,c0)
       std::set<TKeyframeSelection::Position> positions;
       int newC0 = c0;
-      if (viewer && !viewer->orientation()->isVerticalTimeline())
+      if (viewer && !viewer->orientation()->isVerticalTimeline() && !cellData)
         newC0 = c0 - keyframeData->getColumnSpanCount() + 1;
-      positions.insert(TKeyframeSelection::Position(r0, newC0));
+      TKeyframeSelection::Position offset(keyframeData->getKeyframesOffset());
+      positions.insert(TKeyframeSelection::Position(r0 + offset.first,
+                                                    newC0 + offset.second));
       keyframeData->getKeyframes(positions);
       selection.select(positions);
 
@@ -1845,6 +1906,103 @@ void TCellSelection::pasteKeyframesInto() {
 
     selection.pasteKeyframes();
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void TCellSelection::duplicateFrame() {
+  if (!Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) {
+    DVGui::warning(
+        QObject::tr("Please enable \"Sync Level Strip Drawing Number Changes "
+                    "with the XSheet\" preference option\nto use the duplicate "
+                    "command in the xsheet / timeline."));
+    return;
+  }
+
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  // TApp::instance()->getCurrentScene()->getScene()->g
+  int r0, c0, r1, c1;
+  getSelectedCells(r0, c0, r1, c1);
+  // check for cases that won't work
+  if (c1 > c0) {
+    DVGui::error(
+        QObject::tr("Please select only one layer to duplicate a frame."));
+    return;
+  }
+  if (r1 > r0) {
+    DVGui::error(QObject::tr("Please select only one frame to duplicate."));
+    return;
+  }
+
+  r0 = TTool::getApplication()->getCurrentFrame()->getFrame();
+  c0 = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+
+  TXshCell cell            = xsh->getCell(r0, c0);
+  TXshCell prevCell        = xsh->getCell(r0 - 1, c0);
+  TXshCell nextCell        = xsh->getCell(r0 + 1, c0);
+  TFrameId selectedFrameId = cell.getFrameId();
+  TXshSimpleLevel *sl      = cell.getSimpleLevel();
+  bool usePreviousCell     = false;
+  bool goForward           = false;
+
+  // check if we use the current cell to duplicate or the previous cell
+  if (cell.isEmpty()) {
+    if (prevCell.isEmpty() || !(prevCell.m_level->getSimpleLevel())) {
+      return;
+    }
+    usePreviousCell = true;
+    selectedFrameId = prevCell.getFrameId();
+    sl              = prevCell.getSimpleLevel();
+  }
+  if (!sl || sl->isSubsequence() || sl->isReadOnly()) return;
+
+  // check whether to change the next cell or replace the current cell if it is
+  // a hold from a previous frame
+  if (!usePreviousCell) {
+    // use the current cell
+    if (prevCell.m_level == cell.m_level &&
+        prevCell.m_frameId == cell.m_frameId) {
+      // the current frame is a hold from a previous frame
+      // change this frame and any sequential frames part of the same hold
+      bool hold = true;
+      r1        = r0 + 1;
+      while (hold) {
+        TXshCell testCell = xsh->getCell(r1, c0);
+        if (testCell.m_frameId == cell.m_frameId &&
+            testCell.m_level == cell.m_level) {
+          r1 += 1;
+        } else {
+          r1 -= 1;
+          hold = false;
+        }
+      }
+
+    } else {
+      //  This is not part of a hold, use the next cell.
+      // make sure we are not going to overwrite a non-empty cell
+      if (nextCell.isEmpty()) {
+        r0 += 1;
+        cell      = nextCell;
+        goForward = true;
+      } else
+        return;
+    }
+  } else {
+    // cell = prevCell;
+  }
+
+  std::set<TFrameId> frames;
+  frames.insert(selectedFrameId);
+  TUndoManager::manager()->beginBlock();
+  FilmstripCmd::duplicate(sl, frames, true);
+  TXshCell newCell;
+  newCell.m_level   = sl;
+  newCell.m_frameId = selectedFrameId + 1;
+  DuplicateInXSheetUndo *undo =
+      new DuplicateInXSheetUndo(r0, r1, c0, cell, newCell, goForward);
+  TUndoManager::manager()->add(undo);
+  TUndoManager::manager()->endBlock();
+  undo->redo();
 }
 
 //-----------------------------------------------------------------------------
@@ -2474,7 +2632,7 @@ bool TCellSelection::areOnlyVectorCellsSelected() {
   }
 
   TXshSimpleLevel *sourceSl = firstCell.getSimpleLevel();
-  if (sourceSl->getType() != PLI_XSHLEVEL) {
+  if (!sourceSl || sourceSl->getType() != PLI_XSHLEVEL) {
     DVGui::error(QObject::tr("This command only works on vector cells."));
     return false;
   }

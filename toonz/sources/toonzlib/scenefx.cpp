@@ -28,8 +28,11 @@
 #include "toonz/stage.h"
 #include "toonz/preferences.h"
 #include "ttzpimagefx.h"
+#include "toonz/txshsoundtextcolumn.h"
+#include "toonz/txshsoundtextlevel.h"
 
 #include "../stdfx/motionawarebasefx.h"
+#include "../stdfx/textawarebasefx.h"
 
 #include "toonz/scenefx.h"
 
@@ -497,6 +500,26 @@ static QList<TPointD> getColumnMotionPoints(TXsheet *xsh, double row, int col,
   return points;
 }
 
+namespace {
+
+QString getNoteText(TXsheet *xsh, double row, int col, int noteColumnIndex,
+                    bool neighbor) {
+  int colIndex;
+  if (neighbor)
+    colIndex = col - 1;
+  else
+    colIndex = noteColumnIndex;
+
+  TXshColumn *column = xsh->getColumn(colIndex);
+  if (!column || !column->getSoundTextColumn()) return QString();
+
+  TXshCell cell = xsh->getCell(row, colIndex);
+  if (cell.isEmpty() || !cell.getSoundTextLevel()) return QString();
+
+  return cell.getSoundTextLevel()->getFrameText(cell.m_frameId.getNumber() - 1);
+}
+};
+
 //***************************************************************************************************
 //    FxBuilder  definition
 //***************************************************************************************************
@@ -936,6 +959,18 @@ PlacedFx FxBuilder::makePF(TZeraryColumnFx *zcfx) {
       inputFx = TFxUtil::makeAffine(inputFx, pf.m_aff.inv());
       if (!pf.m_fx->connect(pf.m_fx->getInputPortName(i), inputFx.getPointer()))
         assert(!"Could not connect ports!");
+    }
+  }
+
+  if (pf.m_fx->getFxType() == "STD_iwa_TextFx") {
+    TextAwareBaseFx *textFx =
+        dynamic_cast<TextAwareBaseFx *>(pf.m_fx.getPointer());
+    if (textFx && textFx->getSourceType() != TextAwareBaseFx::INPUT_TEXT) {
+      int noteColumnIndex = textFx->getNoteColumnIndex();
+      bool getNeighbor =
+          (textFx->getSourceType() == TextAwareBaseFx::NEARBY_COLUMN);
+      textFx->setNoteLevelStr(getNoteText(m_xsh, m_frame, pf.m_columnIndex,
+                                          noteColumnIndex, getNeighbor));
     }
   }
 

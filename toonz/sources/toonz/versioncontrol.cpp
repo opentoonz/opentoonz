@@ -12,7 +12,6 @@
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txshleveltypes.h"
-#include "toonz/txshsimplelevel.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/tscenehandle.h"

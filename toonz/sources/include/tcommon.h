@@ -28,6 +28,7 @@
 #include <fstream>
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 #if 0 && defined(__GNUC__)
 // typedef seems strong on GCC and breaks code with TException..
@@ -89,12 +90,6 @@ typedef unsigned char BYTE;
 #endif
 
 template <class T>
-inline void tswap(T &a, T &b) {
-  T tmp = a;
-  a     = b;
-  b     = tmp;
-}
-template <class T>
 inline T tcrop(T x, T a, T b) {
   return std::min(std::max(x, a), b);
 }
@@ -154,12 +149,6 @@ const unsigned int c_maxuint = (unsigned int)(~0U);
 #define DV_IMPORT_VAR
 #endif
 
-#ifdef _MSC_VER
-#define DV_ALIGNED(val) __declspec(align(val))
-#else
-#define DV_ALIGNED(val) __attribute__((aligned(val)))
-#endif
-
 inline short swapShort(short val) { return ((val >> 8) & 0x00ff) | (val << 8); }
 inline TINT32 swapTINT32(TINT32 val) {
   TINT32 appo, aux, aux1;
@@ -181,7 +170,6 @@ inline std::ostream &operator<<(std::ostream &out, const std::string &s) {
 
 #define tArrayCount(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
 
-const std::string mySettingsFileName              = "mysettings.ini";
 const std::string styleNameEasyInputWordsFileName = "stylename_easyinput.ini";
 
 #endif  //__T_COMMON_INCLUDED

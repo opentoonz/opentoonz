@@ -45,6 +45,8 @@
 #include "tstroke.h"
 #include "tundo.h"
 
+#include "tools/toolhandle.h"
+
 // Qt includes
 #include <QApplication>
 #include <QClipboard>
@@ -794,6 +796,7 @@ void ColumnCmd::copyColumns(const std::set<int> &indices) {
 
 void ColumnCmd::pasteColumns(std::set<int> &indices,
                              const StageObjectsData *data) {
+  // indices will be updated here by inserted column ids after pasting
   bool isPaste = pasteColumnsWithoutUndo(&indices, true, data);
   if (!isPaste) return;
   TUndoManager::manager()->add(new PasteColumnsUndo(indices));
@@ -1234,6 +1237,10 @@ public:
     TXsheet *xsh       = TApp::instance()->getCurrentXsheet()->getXsheet();
     int cc             = TApp::instance()->getCurrentColumn()->getColumnIndex();
     bool sound_changed = false;
+    TTool *tool        = TApp::instance()->getCurrentTool()->getTool();
+    TTool::Viewer *viewer = tool ? tool->getViewer() : nullptr;
+    bool viewer_changed   = false;
+
     for (int i = 0; i < xsh->getColumnCount(); i++) {
       /*- 空のカラムの場合は飛ばす -*/
       if (xsh->isColumnEmpty(i)) continue;
@@ -1262,6 +1269,7 @@ public:
           column->lock(negate);
         else
           column->lock(!column->isLocked());
+        viewer_changed = true;
       }
       if (cmd &
           (CMD_ENABLE_PREVIEW | CMD_DISABLE_PREVIEW | CMD_TOGGLE_PREVIEW)) {
@@ -1281,6 +1289,7 @@ public:
         else
           column->setCamstandVisible(!column->isCamstandVisible());
         if (column->getSoundColumn()) sound_changed = true;
+        viewer_changed                              = true;
       }
       /*TAB
 if(cmd & (CMD_ENABLE_PREVIEW|CMD_DISABLE_PREVIEW|CMD_TOGGLE_PREVIEW))
@@ -1307,6 +1316,7 @@ column->setCamstandVisible(!column->isCamstandVisible());
       TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    if (viewer && viewer_changed) viewer->invalidateToolStatus();
   }
 };
 

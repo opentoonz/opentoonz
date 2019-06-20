@@ -29,6 +29,7 @@
 
 // Qt includes
 #include <QComboBox>
+#include <QFontComboBox>
 #include <QToolButton>
 #include <QTimer>
 #include <QLabel>
@@ -202,14 +203,38 @@ protected:
 public:
   ToolOptionCombo(TTool *tool, TEnumProperty *property,
                   ToolHandle *toolHandle = 0);
-  void loadEntries();
   void updateStatus() override;
+
+  TEnumProperty *getProperty() const { return m_property; }
+
+public slots:
+  void reloadComboBoxList(std::string);
+  void loadEntries();
+  void onActivated(int);
+  void doShowPopup();
+  void doOnActivated(int);
+};
+
+//-----------------------------------------------------------------------------
+
+class ToolOptionFontCombo final : public QFontComboBox,
+                                  public ToolOptionControl {
+  Q_OBJECT
+
+protected:
+  TEnumProperty *m_property;
+
+public:
+  ToolOptionFontCombo(TTool *tool, TEnumProperty *property,
+                      ToolHandle *toolHandle = 0);
+  void updateStatus() override;
+
+  TEnumProperty *getProperty() const { return m_property; }
 
 public slots:
 
   void onActivated(int);
   void doShowPopup();
-  void doOnActivated(int);
 };
 
 //-----------------------------------------------------------------------------
@@ -578,7 +603,7 @@ protected:
   void mouseReleaseEvent(QMouseEvent *) override;
 
 public:
-  ClickableLabel(const QString &text, QWidget *parent = Q_NULLPTR,
+  ClickableLabel(const QString &text, QWidget *parent = nullptr,
                  Qt::WindowFlags f = Qt::WindowFlags());
   ~ClickableLabel();
 

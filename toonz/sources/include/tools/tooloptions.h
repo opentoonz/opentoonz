@@ -20,6 +20,7 @@
 #include <QToolBar>
 #include <QMap>
 #include <QLabel>
+#include <QRadioButton>
 
 // STD includes
 #include <map>
@@ -146,7 +147,7 @@ public:
   enum SingleValueWidgetType { SLIDER = 0, FIELD };
   void setSingleValueWidgetType(int type) { m_singleValueWidgetType = type; }
 
-  enum EnumWidgetType { COMBOBOX = 0, POPUPBUTTON };
+  enum EnumWidgetType { COMBOBOX = 0, POPUPBUTTON, FONTCOMBOBOX };
   void setEnumWidgetType(int type) { m_enumWidgetType = type; }
 
 private:
@@ -288,7 +289,25 @@ protected slots:
 //
 //=============================================================================
 
-class IconViewField final : public QWidget {
+class DraggableIconView : public QWidget {
+  Q_OBJECT
+public:
+  DraggableIconView(QWidget *parent = 0) : QWidget(parent){};
+
+protected:
+  // these are used for dragging on the icon to
+  // change the value of the field
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+
+signals:
+  void onMousePress(QMouseEvent *event);
+  void onMouseMove(QMouseEvent *event);
+  void onMouseRelease(QMouseEvent *event);
+};
+
+class IconViewField final : public DraggableIconView {
   Q_OBJECT
 
 public:
@@ -336,16 +355,6 @@ public:
 
 protected:
   void paintEvent(QPaintEvent *e);
-  // these are used for dragging on the icon to
-  // change the value of the field
-  void mousePressEvent(QMouseEvent *) override;
-  void mouseMoveEvent(QMouseEvent *) override;
-  void mouseReleaseEvent(QMouseEvent *) override;
-
-signals:
-  void onMousePress(QMouseEvent *event);
-  void onMouseMove(QMouseEvent *event);
-  void onMouseRelease(QMouseEvent *event);
 };
 
 //-----------------------------------------------------------------------------
@@ -417,7 +426,7 @@ public:
   void updateStatus();
 
 protected slots:
-  void onShapeValueChanged();
+  void onShapeValueChanged(int);
   void onPencilModeToggled(bool);
   void onJoinStyleChanged(int);
 };
@@ -462,7 +471,7 @@ public:
   void updateStatus();
 
 protected slots:
-  void onColorModeChanged();
+  void onColorModeChanged(int);
 };
 
 //=============================================================================
@@ -488,8 +497,8 @@ public:
   void updateStatus();
 
 protected slots:
-  void onColorModeChanged();
-  void onToolTypeChanged();
+  void onColorModeChanged(int);
+  void onToolTypeChanged(int);
   void onOnionModeToggled(bool);
   void onMultiFrameModeToggled(bool);
 };
@@ -556,8 +565,8 @@ public:
 
 protected slots:
   void onPencilModeToggled(bool);
-  void onToolTypeChanged();
-  void onColorModeChanged();
+  void onToolTypeChanged(int);
+  void onColorModeChanged(int);
 };
 
 //=============================================================================
@@ -614,8 +623,8 @@ public:
   void updateStatus();
 
 protected slots:
-  void onToolTypeChanged();
-  void onToolModeChanged();
+  void onToolTypeChanged(int);
+  void onToolModeChanged(int);
   void onJoinStrokesModeChanged();
 };
 
@@ -659,6 +668,78 @@ public:
   void updateStatus();
 protected slots:
   void updateRealTimePickLabel(const int, const int, const int);
+};
+
+//=============================================================================
+//
+// ShiftTraceToolOptionBox
+// shown only when "Edit Shift" mode is active
+//
+//=============================================================================
+
+class ShiftTraceToolOptionBox final : public ToolOptionsBox {
+  Q_OBJECT
+  QFrame *m_prevFrame, *m_afterFrame;
+  QRadioButton *m_prevRadioBtn, *m_afterRadioBtn;
+  QPushButton *m_resetPrevGhostBtn, *m_resetAfterGhostBtn;
+  TTool *m_tool;
+  void resetGhost(int index);
+
+protected:
+  void showEvent(QShowEvent *);
+  void hideEvent(QShowEvent *);
+
+public:
+  ShiftTraceToolOptionBox(QWidget *parent = 0, TTool *tool = 0);
+  void updateStatus() override;
+protected slots:
+  void onResetPrevGhostBtnPressed();
+  void onResetAfterGhostBtnPressed();
+  void onPrevRadioBtnClicked();
+  void onAfterRadioBtnClicked();
+  void updateColors();
+};
+
+//=============================================================================
+//
+// ZoomToolOptionsBox
+//
+//=============================================================================
+
+class ZoomToolOptionsBox final : public ToolOptionsBox {
+  Q_OBJECT
+
+public:
+  ZoomToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                     ToolHandle *toolHandle);
+};
+
+//=============================================================================
+//
+// RotateToolOptionsBox
+//
+//=============================================================================
+
+class RotateToolOptionsBox final : public ToolOptionsBox {
+  Q_OBJECT
+
+public:
+  RotateToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                       ToolHandle *toolHandle);
+};
+
+//=============================================================================
+//
+// HandToolOptionsBox
+//
+//=============================================================================
+
+class HandToolOptionsBox final : public ToolOptionsBox {
+  Q_OBJECT
+
+public:
+  HandToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                     ToolHandle *toolHandle);
 };
 
 //-----------------------------------------------------------------------------

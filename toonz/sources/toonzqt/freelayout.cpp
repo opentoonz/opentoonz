@@ -2,8 +2,7 @@
 
 #include "toonzqt/freelayout.h"
 
-// tcg includes
-#include "tcg/tcg_deleter_types.h"
+#include <memory>
 
 //************************************************************************************
 //    DummyLayout   implementation
@@ -14,7 +13,7 @@ DummyLayout::DummyLayout() { setSizeConstraint(QLayout::SetNoConstraint); }
 //---------------------------------------------------------------------------
 
 DummyLayout::~DummyLayout() {
-  std::for_each(m_items.begin(), m_items.end(), tcg::deleter<QLayoutItem>());
+  std::for_each(m_items.begin(), m_items.end(), std::default_delete<QLayoutItem>());
 }
 
 //---------------------------------------------------------------------------

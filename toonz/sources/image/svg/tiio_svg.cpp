@@ -1285,7 +1285,7 @@ void nsvg__pathArcTo(struct NSVGParser *p, float *cpx, float *cpy, float *args,
   t[5] = cy;
 
   // Split arc into max 90 degree segments.
-  ndivs                = (int)(fabsf(da) / (NSVG_PI * 0.5f) + 0.5f);
+  ndivs                = (int)(ceil(fabsf(da)) / (NSVG_PI * 0.5f) + 0.5f);
   hda                  = (da / (float)ndivs) / 2.0f;
   kappa                = fabsf(4.0f / 3.0f * (1.0f - cosf(hda)) / sinf(hda));
   if (da < 0.0f) kappa = -kappa;
@@ -1320,6 +1320,8 @@ void nsvg__parsePath(struct NSVGParser *p, const char **attr) {
   char closedFlag;
   int i;
   char item[64];
+  float prev_m_cpx, prev_m_cpy;
+  bool prev_m_exists;
 
   for (i = 0; attr[i]; i += 2) {
     if (strcmp(attr[i], "d") == 0) {
@@ -1330,6 +1332,7 @@ void nsvg__parsePath(struct NSVGParser *p, const char **attr) {
       cpy        = 0;
       closedFlag = 0;
       nargs      = 0;
+      prev_m_exists = false;
 
       while (*s) {
         s = nsvg__getNextPathItem(s, item);
@@ -1340,7 +1343,19 @@ void nsvg__parsePath(struct NSVGParser *p, const char **attr) {
             switch (cmd) {
             case 'm':
             case 'M':
+			 
+              // If moveto is relative it relative to previous moveto point
+              if (cmd == 'm' && prev_m_exists) {
+                cpx = prev_m_cpx;
+                cpy = prev_m_cpy;
+              }
+              
               nsvg__pathMoveTo(p, &cpx, &cpy, args, cmd == 'm' ? 1 : 0);
+              
+              prev_m_cpx = cpx;
+              prev_m_cpy = cpy;
+              prev_m_exists = true;
+
               // Moveto can be followed by multiple coordinate pairs,
               // which should be treated as linetos.
               cmd   = (cmd == 'm') ? 'l' : 'L';
@@ -1950,6 +1965,15 @@ Tiio::SvgWriterProperties::SvgWriterProperties()
   bind(m_outlineQuality);
 }
 
+void Tiio::SvgWriterProperties::updateTranslation() {
+  m_strokeMode.setQStringName(tr("Stroke Mode"));
+  m_outlineQuality.setQStringName(tr("Outline Quality"));
+  m_strokeMode.setItemUIName(L"Centerline", tr("Centerline"));
+  m_strokeMode.setItemUIName(L"Outline", tr("Outline"));
+  m_outlineQuality.setItemUIName(L"High", tr("High"));
+  m_outlineQuality.setItemUIName(L"Medium", tr("Medium"));
+  m_outlineQuality.setItemUIName(L"Low", tr("Low"));
+}
 //----------------------------------------------------------------------------
 
 // void writeSvg(QString path, TVectorImageP v)
@@ -2063,6 +2087,15 @@ TStroke *buildStroke(NSVGpath *path, float width) {
   TStroke *s = new TStroke(points);
 
   s->setSelfLoop(path->closed);
+
+  std::vector<TThickPoint> tpoints;
+  s->getControlPoints(tpoints);
+
+  for (int j = 0; j < tpoints.size(); j++) {
+	  tpoints[j].thick = width;
+  }
+
+  s->reshape(&tpoints[0], tpoints.size());
 
   return s;
 }

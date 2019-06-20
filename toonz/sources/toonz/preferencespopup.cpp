@@ -24,7 +24,6 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txshleveltypes.h"
-#include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
 #include "toonz/levelproperties.h"
@@ -35,9 +34,12 @@
 #include "tsystem.h"
 #include "tfont.h"
 
+#include "kis_tablet_support_win8.h"
+
 // Qt includes
 #include <QHBoxLayout>
 #include <QComboBox>
+#include <QFontComboBox>
 #include <QLabel>
 #include <QStackedWidget>
 #include <QLineEdit>
@@ -353,10 +355,37 @@ void PreferencesPopup::onDropdownShortcutsCycleOptionsChanged(int index) {
 }
 
 //-----------------------------------------------------------------------------
+void PreferencesPopup::rebuilldFontStyleList() {
+  TFontManager *instance = TFontManager::instance();
+  std::vector<std::wstring> typefaces;
+  std::vector<std::wstring>::iterator it;
+  QString font  = m_interfaceFont->currentText();
+  QString style = m_pref->getInterfaceFontStyle();
+  try {
+    instance->loadFontNames();
+    instance->setFamily(font.toStdWString());
+    instance->getAllTypefaces(typefaces);
+  } catch (TFontCreationError &) {
+    it = typefaces.begin();
+    typefaces.insert(it, style.toStdWString());
+  }
+  m_interfaceFontStyle->clear();
+  for (it = typefaces.begin(); it != typefaces.end(); ++it)
+    m_interfaceFontStyle->addItem(QString::fromStdWString(*it));
+}
 
 void PreferencesPopup::onInterfaceFontChanged(int index) {
   QString font = m_interfaceFont->currentText();
   m_pref->setInterfaceFont(font.toStdString());
+
+  QString oldTypeface = m_interfaceFontStyle->currentText();
+  rebuilldFontStyleList();
+  if (!oldTypeface.isEmpty()) {
+    int newIndex               = m_interfaceFontStyle->findText(oldTypeface);
+    if (newIndex < 0) newIndex = 0;
+    m_interfaceFontStyle->setCurrentIndex(newIndex);
+  }
+
   if (font.contains("Comic Sans"))
     DVGui::warning(tr("Life is too short for Comic Sans"));
   if (font.contains("Wingdings"))
@@ -365,8 +394,9 @@ void PreferencesPopup::onInterfaceFontChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onInterfaceFontWeightChanged(int index) {
-  m_pref->setInterfaceFontWeight(index);
+void PreferencesPopup::onInterfaceFontStyleChanged(int index) {
+  QString style = m_interfaceFontStyle->itemText(index);
+  m_pref->setInterfaceFontStyle(style.toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -481,6 +511,7 @@ void PreferencesPopup::onOnionDataChanged(const TPixel32 &, bool isDragging) {
 
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentLevel()->notifyLevelViewChange();
+  TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -680,7 +711,7 @@ void PreferencesPopup::onStartupPopupChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onKeyframeTypeChanged(int index) {
-  m_pref->setKeyframeType(index + 2);
+  m_pref->setKeyframeType(index + 1);
 }
 //-----------------------------------------------------------------------------
 
@@ -781,8 +812,14 @@ void PreferencesPopup::onOnionSkinDuringPlaybackChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onOnionColorsForShiftAndTraceChanged(int index) {
+  m_pref->useOnionColorsForShiftAndTraceGhosts(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onGuidedDrawingStyleChanged(int index) {
-  m_pref->setAnimatedGuidedDrawing(index);
+  m_pref->setAnimatedGuidedDrawing(index == 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -1111,8 +1148,9 @@ void PreferencesPopup::onShowColumnNumbersChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onXsheetLayoutChanged(const QString &text) {
-  m_pref->setXsheetLayoutPreference(text.toStdString());
+void PreferencesPopup::onXsheetLayoutChanged(int index) {
+  m_pref->setXsheetLayoutPreference(
+      m_xsheetLayout->itemData(index).toString().toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -1178,16 +1216,40 @@ void PreferencesPopup::onEnableAutoStretch(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onCursorBrushTypeChanged(const QString &text) {
-  m_pref->setCursorBrushType(text.toStdString());
+void PreferencesPopup::onCursorBrushTypeChanged(int index) {
+  m_pref->setCursorBrushType(
+      m_cursorBrushType->itemData(index).toString().toStdString());
 }
 
-void PreferencesPopup::onCursorBrushStyleChanged(const QString &text) {
-  m_pref->setCursorBrushStyle(text.toStdString());
+void PreferencesPopup::onCursorBrushStyleChanged(int index) {
+  m_pref->setCursorBrushStyle(
+      m_cursorBrushStyle->itemData(index).toString().toStdString());
 }
 
 void PreferencesPopup::onCursorOutlineChanged(int index) {
   m_pref->enableCursorOutline(index == Qt::Checked);
+}
+
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onCurrentColumnDataChanged(const TPixel32 &,
+                                                  bool isDragging) {
+  if (isDragging) return;
+  m_pref->setCurrentColumnData(m_currentColumnColor->getColor());
+}
+
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onEnableWinInkChanged(int index) {
+  m_pref->enableWinInk(index == Qt::Checked);
+}
+
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onRasterBackgroundColorChanged(const TPixel32 &color,
+                                                      bool isDragging) {
+  if (isDragging) return;
+  m_pref->setRasterBackgroundColor(color);
 }
 
 //**********************************************************************************
@@ -1200,6 +1262,12 @@ PreferencesPopup::PreferencesPopup()
     , m_inksOnly(0)
     , m_blanksCount(0)
     , m_blankColor(0) {
+  bool showTabletSettings = false;
+
+#ifdef _WIN32
+  showTabletSettings = KisTabletSupportWin8::isAvailable();
+#endif
+
   setWindowTitle(tr("Preferences"));
   setObjectName("PreferencesPopup");
 
@@ -1302,8 +1370,8 @@ PreferencesPopup::PreferencesPopup()
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_interface->setStyleSheet("font-size: 10px; font: italic;");
 
-  m_interfaceFont       = new QComboBox(this);
-  m_interfaceFontWeight = new QComboBox(this);
+  m_interfaceFont      = new QFontComboBox(this);
+  m_interfaceFontStyle = new QComboBox(this);
 
   m_colorCalibration =
       new QGroupBox(tr("Color Calibration using 3D Look-up Table *"));
@@ -1338,6 +1406,12 @@ PreferencesPopup::PreferencesPopup()
   m_editLevelFormat   = new QPushButton(tr("Edit"));
 
   m_importPolicy = new QComboBox;
+
+  //--- Saving ------------------------------
+  categoryList->addItem(tr("Saving"));
+
+  ColorField *rasterBackgroundColor =
+      new ColorField(this, false, m_pref->getRasterBackgroundColor());
 
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
@@ -1389,18 +1463,20 @@ PreferencesPopup::PreferencesPopup()
 
   QStringList brushTypes;
   // options should not be translatable as they are used as key strings
-  brushTypes << "Small"
-             << "Large"
-             << "Crosshair";
-  QComboBox *cursorBrushTypeOptions = new QComboBox(this);
-  cursorBrushTypeOptions->addItems(brushTypes);
+  brushTypes << tr("Small") << tr("Large") << tr("Crosshair");
+  m_cursorBrushType = new QComboBox(this);
+  m_cursorBrushType->addItems(brushTypes);
+  m_cursorBrushType->setItemData(0, "Small");
+  m_cursorBrushType->setItemData(1, "Large");
+  m_cursorBrushType->setItemData(2, "Crosshair");
 
   QStringList brushStyles;
-  brushStyles << "Default"
-              << "Left-Handed"
-              << "Simple";
-  QComboBox *cursorBrushStyleOptions = new QComboBox(this);
-  cursorBrushStyleOptions->addItems(brushStyles);
+  brushStyles << tr("Default") << tr("Left-Handed") << tr("Simple");
+  m_cursorBrushStyle = new QComboBox(this);
+  m_cursorBrushStyle->addItems(brushStyles);
+  m_cursorBrushStyle->setItemData(0, "Default");
+  m_cursorBrushStyle->setItemData(1, "Left-Handed");
+  m_cursorBrushStyle->setItemData(2, "Simple");
 
   CheckBox *cursorOutlineCB =
       new CheckBox(tr("Show Cursor Size Outlines"), this);
@@ -1435,19 +1511,25 @@ PreferencesPopup::PreferencesPopup()
 
   QStringList xsheetLayouts;
   // options should not be translatable as they are used as key strings
-  xsheetLayouts << "Classic"
-                << "Classic-revised"
-                << "Compact";
-  QComboBox *xsheetLayoutOptions = new QComboBox(this);
-  xsheetLayoutOptions->addItems(xsheetLayouts);
-  xsheetLayoutOptions->setCurrentIndex(
-      xsheetLayoutOptions->findText(m_pref->getXsheetLayoutPreference()));
+  xsheetLayouts << tr("Classic") << tr("Classic-revised") << tr("Compact");
+  m_xsheetLayout = new QComboBox(this);
+  m_xsheetLayout->addItems(xsheetLayouts);
+  m_xsheetLayout->setItemData(0, "Classic");
+  m_xsheetLayout->setItemData(1, "Classic-revised");
+  m_xsheetLayout->setItemData(2, "Compact");
+
+  m_xsheetLayout->setCurrentIndex(
+      m_xsheetLayout->findData(m_pref->getXsheetLayoutPreference()));
   CheckBox *showCurrentTimelineCB = new CheckBox(
       tr("Show Current Time Indicator (Timeline Mode only)"), this);
 
   QLabel *note_xsheet =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_xsheet->setStyleSheet("font-size: 10px; font: italic;");
+
+  TPixel32 currectColumnColor;
+  m_pref->getCurrentColumnData(currectColumnColor);
+  m_currentColumnColor = new ColorField(this, false, currectColumnColor);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1477,9 +1559,11 @@ PreferencesPopup::PreferencesPopup()
   m_onionSkinVisibility = new CheckBox(tr("Onion Skin ON"));
   m_onionSkinDuringPlayback =
       new CheckBox(tr("Show Onion Skin During Playback"));
-  m_frontOnionColor = new ColorField(this, false, frontColor);
-  m_backOnionColor  = new ColorField(this, false, backColor);
-  m_inksOnly        = new DVGui::CheckBox(tr("Display Lines Only "));
+  m_frontOnionColor                  = new ColorField(this, false, frontColor);
+  m_backOnionColor                   = new ColorField(this, false, backColor);
+  m_useOnionColorsForShiftAndTraceCB = new CheckBox(
+      tr("Use Onion Skin Colors for Reference Drawings of Shift and Trace"));
+  m_inksOnly = new DVGui::CheckBox(tr("Display Lines Only "));
   m_inksOnly->setChecked(onlyInks);
 
   int thickness         = m_pref->getOnionPaperThickness();
@@ -1518,6 +1602,19 @@ PreferencesPopup::PreferencesPopup()
   QLabel *note_version =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_version->setStyleSheet("font-size: 10px; font: italic;");
+
+  QLabel *note_tablet;
+  //--- Tablet Settings ------------------------------
+  if (showTabletSettings) {
+    categoryList->addItem(tr("Tablet Settings"));
+
+    m_enableWinInk =
+        new DVGui::CheckBox(tr("Enable Windows Ink Support* (EXPERIMENTAL)"));
+
+    note_tablet = new QLabel(
+        tr("* Changes will take effect the next time you run Toonz"));
+    note_tablet->setStyleSheet("font-size: 10px; font: italic;");
+  }
 
   /*--- set default parameters ---*/
   categoryList->setFixedWidth(160);
@@ -1642,32 +1739,10 @@ PreferencesPopup::PreferencesPopup()
   viewerZoomCenterComboBox->addItems(zoomCenters);
   viewerZoomCenterComboBox->setCurrentIndex(m_pref->getViewerZoomCenter());
 
-  TFontManager *instance = TFontManager::instance();
-  bool validFonts;
-  try {
-    instance->loadFontNames();
-    validFonts = true;
-  } catch (TFontLibraryLoadingError &) {
-    validFonts = false;
-    //    TMessage::error(toString(e.getMessage()));
-  }
+  m_interfaceFont->setCurrentText(m_pref->getInterfaceFont());
 
-  if (validFonts) {
-    std::vector<std::wstring> names;
-    instance->getAllFamilies(names);
-
-    for (std::vector<std::wstring>::iterator it = names.begin();
-         it != names.end(); ++it)
-      m_interfaceFont->addItem(QString::fromStdWString(*it));
-
-    m_interfaceFont->setCurrentText(m_pref->getInterfaceFont());
-  }
-
-  QStringList fontStyles;
-  fontStyles << "Regular"
-             << "Bold";
-  m_interfaceFontWeight->addItems(fontStyles);
-  m_interfaceFontWeight->setCurrentIndex(m_pref->getInterfaceFontWeight());
+  rebuilldFontStyleList();
+  m_interfaceFontStyle->setCurrentText(m_pref->getInterfaceFontStyle());
 
   m_colorCalibration->setCheckable(true);
   m_colorCalibration->setChecked(m_pref->isColorCalibrationEnabled());
@@ -1797,10 +1872,10 @@ PreferencesPopup::PreferencesPopup()
   multiLayerStylePickerCB->setChecked(m_pref->isMultiLayerStylePickerEnabled());
   useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
 
-  cursorBrushTypeOptions->setCurrentIndex(
-      cursorBrushTypeOptions->findText(m_pref->getCursorBrushType()));
-  cursorBrushStyleOptions->setCurrentIndex(
-      cursorBrushStyleOptions->findText(m_pref->getCursorBrushStyle()));
+  m_cursorBrushType->setCurrentIndex(
+      m_cursorBrushType->findData(m_pref->getCursorBrushType()));
+  m_cursorBrushStyle->setCurrentIndex(
+      m_cursorBrushStyle->findData(m_pref->getCursorBrushStyle()));
   cursorOutlineCB->setChecked(m_pref->isCursorOutlineEnabled());
 
   //--- Xsheet ------------------------------
@@ -1827,11 +1902,12 @@ PreferencesPopup::PreferencesPopup()
 
   //--- Animation ------------------------------
   QStringList list;
-  list << tr("Linear") << tr("Speed In / Speed Out") << tr("Ease In / Ease Out")
-       << tr("Ease In / Ease Out %");
+  list << tr("Constant") << tr("Linear") << tr("Speed In / Speed Out")
+       << tr("Ease In / Ease Out") << tr("Ease In / Ease Out %")
+       << tr("Exponential") << tr("Expression ") << tr("File");
   m_keyframeType->addItems(list);
   int keyframeType = m_pref->getKeyframeType();
-  m_keyframeType->setCurrentIndex(keyframeType - 2);
+  m_keyframeType->setCurrentIndex(keyframeType - 1);
   m_animationStepField->setValue(m_pref->getAnimationStep());
 
   //--- Preview ------------------------------
@@ -1851,17 +1927,23 @@ PreferencesPopup::PreferencesPopup()
   m_onionSkinDuringPlayback->setChecked(m_pref->getOnionSkinDuringPlayback());
   m_frontOnionColor->setEnabled(m_pref->isOnionSkinEnabled());
   m_backOnionColor->setEnabled(m_pref->isOnionSkinEnabled());
+  m_useOnionColorsForShiftAndTraceCB->setChecked(
+      m_pref->areOnionColorsUsedForShiftAndTraceGhosts());
   m_inksOnly->setEnabled(m_pref->isOnionSkinEnabled());
   QStringList guidedDrawingStyles;
   guidedDrawingStyles << tr("Arrow Markers") << tr("Animated Guide");
   m_guidedDrawingStyle->addItems(guidedDrawingStyles);
-  m_guidedDrawingStyle->setCurrentIndex(m_pref->getAnimatedGuidedDrawing());
+  m_guidedDrawingStyle->setCurrentIndex(m_pref->getAnimatedGuidedDrawing() ? 1
+                                                                           : 0);
 
   //--- Version Control ------------------------------
   m_enableVersionControl->setChecked(m_pref->isSVNEnabled());
   autoRefreshFolderContentsCB->setChecked(
       m_pref->isAutomaticSVNFolderRefreshEnabled());
   checkForTheLatestVersionCB->setChecked(m_pref->isLatestVersionCheckEnabled());
+
+  //--- Tablet Settings ------------------------------
+  if (showTabletSettings) m_enableWinInk->setChecked(m_pref->isWinInkEnabled());
 
   /*--- layout ---*/
 
@@ -2073,8 +2155,8 @@ PreferencesPopup::PreferencesPopup()
           {
             fontLay->addWidget(m_interfaceFont);
             fontLay->addSpacing(10);
-            fontLay->addWidget(new QLabel(tr("Weight *:")));
-            fontLay->addWidget(m_interfaceFontWeight);
+            fontLay->addWidget(new QLabel(tr("Style *:")));
+            fontLay->addWidget(m_interfaceFontStyle);
             fontLay->addStretch(1);
           }
           interfaceBottomLay->addLayout(fontLay, 4, 1, 1, 5);
@@ -2178,6 +2260,37 @@ PreferencesPopup::PreferencesPopup()
     }
     loadingBox->setLayout(loadingFrameLay);
     stackedWidget->addWidget(loadingBox);
+
+    //--- Saving --------------------------
+    QWidget *savingBox          = new QWidget(this);
+    QVBoxLayout *savingFrameLay = new QVBoxLayout();
+    savingFrameLay->setMargin(15);
+    savingFrameLay->setSpacing(10);
+    {
+      QLabel *matteColorLabel =
+          new QLabel(tr("Matte color is used for background when overwriting "
+                        "raster levels with transparent pixels\nin non "
+                        "alpha-enabled image format."),
+                     this);
+      savingFrameLay->addWidget(matteColorLabel, 0, Qt::AlignLeft);
+
+      QGridLayout *savingGridLay = new QGridLayout();
+      savingGridLay->setVerticalSpacing(10);
+      savingGridLay->setHorizontalSpacing(15);
+      savingGridLay->setMargin(0);
+      {
+        savingGridLay->addWidget(new QLabel(tr("Matte color: "), this), 0, 0,
+                                 Qt::AlignRight);
+        savingGridLay->addWidget(rasterBackgroundColor, 0, 1, Qt::AlignLeft);
+      }
+      savingGridLay->setColumnStretch(0, 0);
+      savingGridLay->setColumnStretch(1, 1);
+      savingFrameLay->addLayout(savingGridLay, 0);
+
+      savingFrameLay->addStretch(1);
+    }
+    savingBox->setLayout(savingFrameLay);
+    stackedWidget->addWidget(savingBox);
 
     //--- Import/Export --------------------------
     QWidget *ioBox     = new QWidget(this);
@@ -2332,12 +2445,12 @@ PreferencesPopup::PreferencesPopup()
             cursorStylesGridLay->addWidget(new QLabel(tr("Basic Cursor Type:")),
                                            0, 0,
                                            Qt::AlignRight | Qt::AlignVCenter);
-            cursorStylesGridLay->addWidget(cursorBrushTypeOptions, 0, 1);
+            cursorStylesGridLay->addWidget(m_cursorBrushType, 0, 1);
 
             cursorStylesGridLay->addWidget(new QLabel(tr("Cursor Style:")), 1,
                                            0,
                                            Qt::AlignRight | Qt::AlignVCenter);
-            cursorStylesGridLay->addWidget(cursorBrushStyleOptions, 1, 1);
+            cursorStylesGridLay->addWidget(m_cursorBrushStyle, 1, 1);
 
             cursorStylesGridLay->addWidget(cursorOutlineCB, 2, 0, 1, 3,
                                            Qt::AlignLeft | Qt::AlignVCenter);
@@ -2368,7 +2481,7 @@ PreferencesPopup::PreferencesPopup()
       {
         xsheetFrameLay->addWidget(new QLabel(tr("Column Header Layout*:")), 0,
                                   0, Qt::AlignRight | Qt::AlignVCenter);
-        xsheetFrameLay->addWidget(xsheetLayoutOptions, 0, 1, 1, 2,
+        xsheetFrameLay->addWidget(m_xsheetLayout, 0, 1, 1, 2,
                                   Qt::AlignLeft | Qt::AlignVCenter);
 
         xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")),
@@ -2404,6 +2517,10 @@ PreferencesPopup::PreferencesPopup()
         xsheetFrameLay->addWidget(showColumnNumbersCB, 12, 0, 1, 2);
         xsheetFrameLay->addWidget(m_syncLevelRenumberWithXsheet, 13, 0, 1, 2);
         xsheetFrameLay->addWidget(showCurrentTimelineCB, 14, 0, 1, 2);
+
+        xsheetFrameLay->addWidget(new QLabel(tr("Current Column Color:")), 15,
+                                  0, Qt::AlignRight | Qt::AlignVCenter);
+        xsheetFrameLay->addWidget(m_currentColumnColor, 15, 1);
       }
       xsheetFrameLay->setColumnStretch(0, 0);
       xsheetFrameLay->setColumnStretch(1, 0);
@@ -2504,6 +2621,8 @@ PreferencesPopup::PreferencesPopup()
       onionLay->addWidget(m_inksOnly, 0, Qt::AlignLeft | Qt::AlignVCenter);
       onionLay->addWidget(m_onionSkinDuringPlayback, 0,
                           Qt::AlignLeft | Qt::AlignVCenter);
+      onionLay->addWidget(m_useOnionColorsForShiftAndTraceCB, 0,
+                          Qt::AlignLeft | Qt::AlignVCenter);
       QGridLayout *guidedDrawingLay = new QGridLayout();
       {
         guidedDrawingLay->addWidget(new QLabel(tr("Vector Guided Style:")), 0,
@@ -2596,6 +2715,23 @@ PreferencesPopup::PreferencesPopup()
     }
     versionControlBox->setLayout(vcLay);
     stackedWidget->addWidget(versionControlBox);
+
+    //--- Tablet Settings --------------------------
+    if (showTabletSettings) {
+      QWidget *tabletSettingsBox = new QWidget(this);
+      QVBoxLayout *tsLay         = new QVBoxLayout();
+      tsLay->setMargin(15);
+      tsLay->setSpacing(10);
+      {
+        tsLay->addWidget(m_enableWinInk, 0, Qt::AlignLeft | Qt::AlignVCenter);
+
+        tsLay->addStretch(1);
+
+        tsLay->addWidget(note_tablet, 0);
+      }
+      tabletSettingsBox->setLayout(tsLay);
+      stackedWidget->addWidget(tabletSettingsBox);
+    }
 
     mainLayout->addWidget(stackedWidget, 1);
   }
@@ -2691,8 +2827,8 @@ PreferencesPopup::PreferencesPopup()
                      this, SLOT(onViewerZoomCenterChanged(int)));
   ret = ret && connect(m_interfaceFont, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onInterfaceFontChanged(int)));
-  ret = ret && connect(m_interfaceFontWeight, SIGNAL(currentIndexChanged(int)),
-                       this, SLOT(onInterfaceFontWeightChanged(int)));
+  ret = ret && connect(m_interfaceFontStyle, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onInterfaceFontStyleChanged(int)));
   ret = ret && connect(replaceAfterSaveLevelAsCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onReplaceAfterSaveLevelAsChanged(int)));
   ret =
@@ -2748,6 +2884,12 @@ PreferencesPopup::PreferencesPopup()
                        SIGNAL(importPolicyChanged(int)), this,
                        SLOT(onImportPolicyExternallyChanged(int)));
 
+  //--- Saving ----------------------
+  ret = ret &&
+        connect(rasterBackgroundColor,
+                SIGNAL(colorChanged(const TPixel32 &, bool)),
+                SLOT(onRasterBackgroundColorChanged(const TPixel32 &, bool)));
+
   //--- Import/Export ----------------------
   ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onFfmpegPathChanged()));
@@ -2801,12 +2943,10 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onMultiLayerStylePickerChanged(int)));
   ret = ret && connect(useSaveboxToLimitFillingOpCB, SIGNAL(stateChanged(int)),
                        this, SLOT(onGetFillOnlySavebox(int)));
-  ret = ret && connect(cursorBrushTypeOptions,
-                       SIGNAL(currentIndexChanged(const QString &)), this,
-                       SLOT(onCursorBrushTypeChanged(const QString &)));
-  ret = ret && connect(cursorBrushStyleOptions,
-                       SIGNAL(currentIndexChanged(const QString &)), this,
-                       SLOT(onCursorBrushStyleChanged(const QString &)));
+  ret = ret && connect(m_cursorBrushType, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onCursorBrushTypeChanged(int)));
+  ret = ret && connect(m_cursorBrushStyle, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onCursorBrushStyleChanged(int)));
   ret = ret && connect(cursorOutlineCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onCursorOutlineChanged(int)));
 
@@ -2841,9 +2981,13 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_syncLevelRenumberWithXsheet, SIGNAL(stateChanged(int)),
                        this, SLOT(onSyncLevelRenumberWithXsheetChanged(int)));
 
-  ret = ret && connect(xsheetLayoutOptions,
-                       SIGNAL(currentIndexChanged(const QString &)), this,
-                       SLOT(onXsheetLayoutChanged(const QString &)));
+  ret = ret && connect(m_xsheetLayout, SIGNAL(currentIndexChanged(int)), this,
+                       SLOT(onXsheetLayoutChanged(int)));
+
+  ret =
+      ret && connect(m_currentColumnColor,
+                     SIGNAL(colorChanged(const TPixel32 &, bool)),
+                     SLOT(onCurrentColumnDataChanged(const TPixel32 &, bool)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),
@@ -2879,6 +3023,9 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onOnionSkinVisibilityChanged(int)));
   ret = ret && connect(m_onionSkinDuringPlayback, SIGNAL(stateChanged(int)),
                        SLOT(onOnionSkinDuringPlaybackChanged(int)));
+  ret = ret &&
+        connect(m_useOnionColorsForShiftAndTraceCB, SIGNAL(stateChanged(int)),
+                SLOT(onOnionColorsForShiftAndTraceChanged(int)));
   ret = ret && connect(m_onionPaperThickness, SIGNAL(editingFinished()),
                        SLOT(onOnionPaperThicknessChanged()));
   ret = ret && connect(m_guidedDrawingStyle, SIGNAL(currentIndexChanged(int)),
@@ -2919,6 +3066,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onAutomaticSVNRefreshChanged(int)));
   ret = ret && connect(checkForTheLatestVersionCB, SIGNAL(clicked(bool)),
                        SLOT(onCheckLatestVersionChanged(bool)));
+
+  //--- Tablet Settings ----------------------
+  if (showTabletSettings)
+    ret = ret && connect(m_enableWinInk, SIGNAL(stateChanged(int)),
+                         SLOT(onEnableWinInkChanged(int)));
+
   assert(ret);
 }
 

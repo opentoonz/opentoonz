@@ -54,6 +54,7 @@ public:
         TXshColumnP column = xsh->getColumn(it->getIndex());
         assert(column);
         TFx *columnFx = column->getFx();
+        if (!columnFx) continue;
         int i;
         for (i = 0; i < columnFx->getOutputConnectionCount(); i++)
           m_columnFxConnections[*it].append(columnFx->getOutputConnection(i));

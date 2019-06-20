@@ -32,7 +32,6 @@
 // Qt includes
 #include <QGridLayout>
 #include <QLabel>
-#include <QGridLayout>
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QApplication>
@@ -44,16 +43,11 @@
 #include <QPainter>
 #include <QTextStream>
 #include <QString>
-#include <QStringList>
 
 using namespace std;
 using namespace DVGui;
 
 namespace {
-
-// the first value in the preset list
-const QString custom = QObject::tr("<custom>");
-
 /*---小数の余分なゼロを消す---*/
 QString removeZeros(QString srcStr) {
   if (!srcStr.contains('.')) return srcStr;
@@ -196,7 +190,7 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   m_yDpiFld   = new DoubleLineEdit();
   m_unitLabel = new QLabel();
   if (Preferences::instance()->getPixelsOnly())
-    m_unitLabel->setText("Pixels");
+    m_unitLabel->setText(tr("Pixels"));
   else
     m_unitLabel->setText(Preferences::instance()->getCameraUnits());
   m_dpiLabel = new QLabel(tr("DPI"));
@@ -293,7 +287,7 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
       gridLay->addWidget(m_lyFld, 1, 4);
 
       gridLay->addWidget(m_arPrev, 2, 2, Qt::AlignRight | Qt::AlignVCenter);
-      gridLay->addWidget(new QLabel("A/R"), 2, 3, Qt::AlignCenter);
+      gridLay->addWidget(new QLabel(tr("A/R")), 2, 3, Qt::AlignCenter);
       gridLay->addWidget(m_arFld, 2, 4);
 
       gridLay->addWidget(m_dotPrev, 3, 0, Qt::AlignRight | Qt::AlignVCenter);
@@ -399,7 +393,7 @@ void CameraSettingsWidget::showEvent(QShowEvent *e) {
     m_lyFld->setDecimals(4);
   }
   if (Preferences::instance()->getPixelsOnly())
-    m_unitLabel->setText("Pixels");
+    m_unitLabel->setText(tr("Pixels"));
   else
     m_unitLabel->setText(Preferences::instance()->getCameraUnits());
 }
@@ -407,7 +401,7 @@ void CameraSettingsWidget::showEvent(QShowEvent *e) {
 void CameraSettingsWidget::loadPresetList() {
   if (m_presetListFile == "") return;
   m_presetListOm->clear();
-  m_presetListOm->addItem(custom);
+  m_presetListOm->addItem(tr("<custom>"));
 
   QFile file(m_presetListFile);
   if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -825,7 +819,7 @@ void CameraSettingsWidget::onPrevToggled(bool checked) {
 }
 
 void CameraSettingsWidget::onPresetSelected(const QString &str) {
-  if (str == custom || str.isEmpty()) return;
+  if (str == tr("<custom>") || str.isEmpty()) return;
   QString name, arStr;
   int xres = 0, yres = 0;
   double fx = -1.0, fy = -1.0;

@@ -14,9 +14,7 @@
 
 // tcg includes
 #include "tcg/tcg_point_ops.h"
-#include "tcg/tcg_algorithm.h"
 #include "tcg/tcg_function_types.h"
-#include "tcg/tcg_iterator_ops.h"
 
 #include "plastictool.h"
 
@@ -68,20 +66,17 @@ TPointD closestMeshVertexPos(const TPointD &pos, double *distance = 0) {
 //------------------------------------------------------------------------
 
 TPointD closestSkeletonVertexPos(const TPointD &pos) {
-  struct locals {
-    static inline double dist2(const TPointD &pos,
-                               const PlasticSkeletonVertex &vx) {
-      return tcg::point_ops::dist2(pos, vx.P());
-    }
-  };
-
   const PlasticSkeletonP &skeleton = l_plasticTool.skeleton();
   if (!skeleton || skeleton->empty()) return TConsts::napd;
 
   const PlasticSkeleton::vertices_container &vertices = skeleton->vertices();
 
-  return tcg::min_transform(vertices.begin(), vertices.end(),
-                            tcg::bind1st(&locals::dist2, pos))
+  return std::min_element(vertices.begin(), vertices.end(),
+                          [&pos](PlasticSkeleton::vertex_type const &x,
+                                 PlasticSkeleton::vertex_type const &y) {
+                            return tcg::point_ops::dist2(pos, x.P()) <
+                                   tcg::point_ops::dist2(pos, y.P());
+                          })
       ->P();
 }
 
@@ -566,12 +561,6 @@ void PlasticTool::leftButtonDown_build(const TPointD &pos,
 
   // Start move vertex operation
   if (!m_svSel.isEmpty()) {
-    struct locals {
-      static TPointD vertexPos(const PlasticSkeleton &skel, int v) {
-        return skel.vertex(v).P();
-      }
-    };
-
     const PlasticSkeletonP &skel = skeleton();
     assert(skel);
 
@@ -579,11 +568,11 @@ void PlasticTool::leftButtonDown_build(const TPointD &pos,
     if (m_svSel.hasSingleObject()) m_pressedPos = skel->vertex(m_svSel).P();
 
     // Store original vertex positions
-    m_pressedVxsPos = std::vector<TPointD>(
-        tcg::make_cast_it(m_svSel.objects().begin(),
-                          tcg::bind1st(&locals::vertexPos, *skel)),
-        tcg::make_cast_it(m_svSel.objects().end(),
-                          tcg::bind1st(&locals::vertexPos, *skel)));
+    std::vector<TPointD> v;
+    for (auto const &e : m_svSel.objects()) {
+      v.push_back(skel->vertex(e).P());
+    }
+    m_pressedVxsPos = std::move(v);
   }
 
   invalidate();
@@ -805,6 +794,9 @@ void PlasticTool::removeSkeleton(int skelId) {
   clearSkeletonSelections();
 
   if (m_sd) {
+    // in order to solve the crash issue #1967, try releasing deformer data here
+    PlasticDeformerStorage::instance()->releaseSkeletonData(
+        stageObject()->getPlasticSkeletonDeformation().getPointer(), skelId);
     m_sd->detach(skelId);
     if (m_sd->empty())
       stageObject()->setPlasticSkeletonDeformation(

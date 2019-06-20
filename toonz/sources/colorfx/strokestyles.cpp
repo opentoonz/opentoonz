@@ -2105,7 +2105,7 @@ void TBraidStrokeStyle::drawStroke(const TColorFunction *cf,
     swap += step;
     if (swap > (period / 3.0)) {
       swapcount++;
-      tswap(braid[0], braid[1 + (swapcount & 1)]);
+      std::swap(braid[0], braid[1 + (swapcount & 1)]);
       swap -= period / 3.0;
     }
   }
@@ -2188,7 +2188,7 @@ void TBraidStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const {
     swap += step;
     if (swap > (period / 3.0)) {
       swapcount++;
-      tswap(braid[0], braid[1 + (swapcount & 1)]);
+      std::swap(braid[0], braid[1 + (swapcount & 1)]);
       swap -= period / 3.0;
     }
   }

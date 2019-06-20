@@ -770,7 +770,6 @@ void outlineVectorize(TVectorImageP &vi, const TRasterImageP &ri,
 
   // Build regions
   vi->transform(conf.m_affine);
-  vi->setAutocloseTolerance(-100.0);
   vi->findRegions();
 
   if (!conf.m_leaveUnpainted)
@@ -797,7 +796,6 @@ void outlineVectorize(TVectorImageP &vi, const TToonzImageP &ti,
   TRop::borders::readBorders_simple(rasGR16, reader, TPixelGR16::Black, false);
 
   vi->transform(conf.m_affine);
-  vi->setAutocloseTolerance(-100.0);
   vi->findRegions();
 
   if (!conf.m_leaveUnpainted) buildColorsCM(vi, reader.scHash());

@@ -184,6 +184,7 @@ public:
 
     m_distance.setQStringName(tr("Distance:"));
     m_inkIndex.setQStringName(tr("Style Index:"));
+    m_inkIndex.setValue(tr("current").toStdWString());
     m_opacity.setQStringName(tr("Opacity:"));
     m_multi.setQStringName(tr("Frame Range"));
     m_angle.setQStringName(tr("Angle:"));
@@ -300,7 +301,7 @@ public:
                            TStroke *firstStroke = 0, TStroke *lastStroke = 0) {
     bool backward = false;
     if (firstFid > lastFid) {
-      tswap(firstFid, lastFid);
+      std::swap(firstFid, lastFid);
       backward = true;
     }
     assert(firstFid <= lastFid);
@@ -359,8 +360,8 @@ public:
     int r1 = lastFrameId.getNumber();
 
     if (r0 > r1) {
-      tswap(r0, r1);
-      tswap(firstFrameId, lastFrameId);
+      std::swap(r0, r1);
+      std::swap(firstFrameId, lastFrameId);
     }
     if ((r1 - r0) < 2) return;
 
@@ -386,9 +387,9 @@ public:
 
     /*-- Rectの座標の向きを揃える --*/
     if (m_selectingRect.x0 > m_selectingRect.x1)
-      tswap(m_selectingRect.x1, m_selectingRect.x0);
+      std::swap(m_selectingRect.x1, m_selectingRect.x0);
     if (m_selectingRect.y0 > m_selectingRect.y1)
-      tswap(m_selectingRect.y1, m_selectingRect.y0);
+      std::swap(m_selectingRect.y1, m_selectingRect.y0);
 
     TTool::Application *app = TTool::getApplication();
 

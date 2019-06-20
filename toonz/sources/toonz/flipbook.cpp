@@ -65,7 +65,6 @@
 // Other widgets
 #include "toonzqt/flipconsole.h"
 #include "toonzqt/dvdialog.h"
-#include "toonzqt/gutil.h"
 #include "filmstripselection.h"
 #include "castselection.h"
 #include "histogrampopup.h"
@@ -75,7 +74,6 @@
 #include <QDesktopWidget>
 #include <QSettings>
 #include <QPainter>
-#include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include <QAbstractButton>
 #include <QLabel>
@@ -90,7 +88,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include <QLabel>
 
 #include <stdint.h>  // for uintptr_t
 
@@ -1768,7 +1765,7 @@ void FlipBook::dragEnterEvent(QDragEnterEvent *e) {
       !mimeData->hasFormat(CastItems::getMimeFormat()))
     return;
 
-  foreach (QUrl url, mimeData->urls()) {
+  for (const QUrl &url : mimeData->urls()) {
     TFilePath fp(url.toLocalFile().toStdWString());
     std::string type = fp.getType();
     if (type == "tzp" || type == "tzu" || type == "tnz" || type == "scr" ||
@@ -1795,7 +1792,7 @@ void FlipBook::dragEnterEvent(QDragEnterEvent *e) {
 void FlipBook::dropEvent(QDropEvent *e) {
   const QMimeData *mimeData = e->mimeData();
   if (mimeData->hasUrls()) {
-    foreach (QUrl url, mimeData->urls()) {
+    for (const QUrl &url : mimeData->urls()) {
       TFilePath fp(url.toLocalFile().toStdWString());
       if (TFileType::getInfo(fp) != TFileType::UNKNOW_FILE) setLevel(fp);
       e->acceptProposedAction();

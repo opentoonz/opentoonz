@@ -30,18 +30,13 @@ class Room final : public TMainWindow {
   TFilePath m_path;
   QString m_name;
 
-  /*--
-   * Room毎にComboViewerの初期状態をLoadするため、MainWindowからComboViewerにアクセスできるようにする。
-   * --*/
-  ComboViewerPanel *m_centralViewer;
-
 public:
 #if QT_VERSION >= 0x050500
   Room(QWidget *parent = 0, Qt::WindowFlags flags = 0)
 #else
   Room(QWidget *parent = 0, Qt::WFlags flags = 0)
 #endif
-      : TMainWindow(parent, flags), m_centralViewer(0) {
+      : TMainWindow(parent, flags) {
   }
 
   ~Room() {}
@@ -51,11 +46,6 @@ public:
 
   QString getName() const { return m_name; }
   void setName(QString name) { m_name = name; }
-
-  ComboViewerPanel *getCentralViewerPanel() const { return m_centralViewer; }
-  void setCentralViewerPanel(ComboViewerPanel *cvp) {
-    if (!m_centralViewer) m_centralViewer = cvp;
-  }
 
   void save();
   void load(const TFilePath &fp);
@@ -218,6 +208,7 @@ signals:
 class RecentFiles {
   friend class StartupPopup;
   QList<QString> m_recentScenes;
+  QList<QString> m_recentSceneProjects;
   QList<QString> m_recentLevels;
   QList<QString> m_recentFlipbookImages;
 
@@ -229,10 +220,12 @@ public:
   static RecentFiles *instance();
   ~RecentFiles();
 
-  void addFilePath(QString path, FileType fileType);
+  void addFilePath(QString path, FileType fileType, QString projectName = 0);
   void moveFilePath(int fromIndex, int toIndex, FileType fileType);
   void removeFilePath(int fromIndex, FileType fileType);
   QString getFilePath(int index, FileType fileType) const;
+  QString getFileProject(QString fileName) const;
+  QString getFileProject(int index) const;
   void clearRecentFilesList(FileType fileType);
   void loadRecentFiles();
   void saveRecentFiles();

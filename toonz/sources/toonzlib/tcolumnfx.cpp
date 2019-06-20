@@ -38,7 +38,6 @@
 #include "toonz/levelset.h"
 #include "toonz/txshchildlevel.h"
 #include "toonz/fxdag.h"
-#include "toonz/tcolumnfx.h"
 #include "toonz/tcolumnfxset.h"
 #include "toonz/stage.h"
 #include "toonz/fill.h"
@@ -1159,6 +1158,12 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
         ras = ti->getRaster();
 
       if (sl->getProperties()->antialiasSoftness() > 0) {
+        // convert colormap raster to fullcolor raster before applying antialias
+        if (ti) {
+          TRaster32P convRas(ras->getSize());
+          TRop::convert(convRas, ras, ti->getPalette(), TRect(), false, true);
+          ras = convRas;
+        }
         TRasterP appRas = ras->create(ras->getLx(), ras->getLy());
         TRop::antialias(ras, appRas, 10,
                         sl->getProperties()->antialiasSoftness());
@@ -1207,7 +1212,7 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
       // Observe that inTile is in the standard reference, ie image's minus the
       // center coordinates
 
-      if (ti) {
+      if ((TRasterCM32P)ras) {
         // In the colormapped case, we have to convert the cmap to fullcolor
         TPalette *palette = ti->getPalette();
 

@@ -251,7 +251,7 @@ inline double getExponentialValue(const TActualDoubleKeyframe &k0,
   // if bValue<aValue then v = bValue * exp((1-t) * log(aValue/bValue))
   if (bValue < aValue) {
     t = 1 - t;
-    tswap(aValue, bValue);
+    std::swap(aValue, bValue);
   }
   return aValue * exp(t * log(bValue / aValue));
 }

@@ -11,10 +11,7 @@
 // tcg includes
 #include "tcg/tcg_macros.h"
 #include "tcg/tcg_point_ops.h"
-#include "tcg/tcg_iterator_ops.h"
 #include "tcg/tcg_function_types.h"
-#include "tcg/tcg_deleter_types.h"
-#include "tcg/tcg_unique_ptr.h"
 
 // boost includes
 #include <boost/unordered_set.hpp>
@@ -515,8 +512,7 @@ void splitUnconnectedMesh(TMeshImage &mi, int meshIdx) {
     static void buildConnectedComponent(const TTextureMesh &mesh,
                                         boost::unordered_set<int> &vertexes) {
       // Prepare BFS algorithm
-      tcg::unique_ptr<UCHAR, tcg::freer> colorMapP(
-          (UCHAR *)calloc(mesh.vertices().nodesCount(), sizeof(UCHAR)));
+      std::unique_ptr<UCHAR[]> colorMapP(new UCHAR[mesh.vertices().nodesCount()]());
 
       locals_::VertexesRecorder vertexesRecorder(vertexes);
       std::stack<int> verticesQueue;
@@ -1055,11 +1051,6 @@ void PlasticTool::leftButtonDown_mesh(const TPointD &pos,
       } else
         m_this->setMeshSelection(sel, MeshSelection());
     }
-
-    static TPointD vertexPos(const TMeshImage &mi, const MeshIndex &meshIdx) {
-      return mi.meshes()[meshIdx.m_meshIdx]->vertex(meshIdx.m_idx).P();
-    }
-
   } locals = {this};
 
   // Track mouse position
@@ -1071,11 +1062,11 @@ void PlasticTool::leftButtonDown_mesh(const TPointD &pos,
 
   // Store original vertex positions
   if (!m_mvSel.isEmpty()) {
-    m_pressedVxsPos = std::vector<TPointD>(
-        tcg::make_cast_it(m_mvSel.objects().begin(),
-                          tcg::bind1st(&Locals::vertexPos, *m_mi)),
-        tcg::make_cast_it(m_mvSel.objects().end(),
-                          tcg::bind1st(&Locals::vertexPos, *m_mi)));
+    std::vector<TPointD> v;
+    for (auto const &e : m_mvSel.objects()) {
+      v.push_back(m_mi->meshes()[e.m_meshIdx]->vertex(e.m_idx).P());
+    }
+    m_pressedVxsPos = std::move(v);
   }
 
   // Redraw selections

@@ -11,6 +11,8 @@
 #include "tlevel_io.h"
 #include "tthreadmessage.h"
 
+#include <QCoreApplication>
+
 class TAviCodecCompressor;
 class VDVideoDecompressor;
 
@@ -105,10 +107,13 @@ private:
 
 namespace Tiio {
 class AviWriterProperties final : public TPropertyGroup {
+  Q_DECLARE_TR_FUNCTIONS(AviWriterProperties)
 public:
   AviWriterProperties();
   TEnumProperty m_codec;
   static TEnumProperty m_defaultCodec;
+
+  void updateTranslation() override;
 };
 }
 

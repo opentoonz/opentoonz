@@ -4,6 +4,10 @@
 
 // TnzQt includes
 #include "toonzqt/imageutils.h"
+#include "toonzqt/menubarcommand.h"
+#include "toonzqt/viewcommandids.h"
+
+#include "../toonz/menubarcommandids.h"
 
 // TnzLib includes
 #include "toonz/stage.h"
@@ -23,6 +27,7 @@
 #include <QWheelEvent>
 #include <QResizeEvent>
 #include <QHideEvent>
+#include <QGestureEvent>
 
 //#define PRINT_AFF
 
@@ -37,6 +42,7 @@ struct PlaneViewerZoomer final : public ImageUtils::ShortcutZoomer {
 
 private:
   bool zoom(bool zoomin, bool resetZoom) override;
+  bool fit() override;
 };
 
 //========================================================================
@@ -44,12 +50,19 @@ private:
 bool PlaneViewerZoomer::zoom(bool zoomin, bool resetZoom) {
   PlaneViewer &planeViewer = static_cast<PlaneViewer &>(*getWidget());
 
-  resetZoom ? planeViewer.resetView()
-            : zoomin ? planeViewer.zoomIn() : planeViewer.zoomOut();
+  resetZoom ? planeViewer.resetView() : zoomin ? planeViewer.zoomIn()
+                                               : planeViewer.zoomOut();
 
   return true;
 }
 
+bool PlaneViewerZoomer::fit() {
+  PlaneViewer &planeViewer = static_cast<PlaneViewer &>(*getWidget());
+
+  planeViewer.fitView();
+
+  return true;
+}
 }  // namespace
 
 //=========================================================================================
@@ -60,9 +73,17 @@ PlaneViewer::PlaneViewer(QWidget *parent)
     , m_xpos(0)
     , m_ypos(0)
     , m_aff()  // initialized at the first resize
-    , m_chessSize(40.0) {
+    , m_chessSize(40.0)
+    , m_firstDraw(true)
+    , m_dpiX(0.0)
+    , m_dpiY(0.0) {
   m_zoomRange[0] = 1e-3, m_zoomRange[1] = 1024.0;
   setBgColor(TPixel32(235, 235, 235), TPixel32(235, 235, 235));
+
+  setAttribute(Qt::WA_AcceptTouchEvents);
+  grabGesture(Qt::SwipeGesture);
+  grabGesture(Qt::PanGesture);
+  grabGesture(Qt::PinchGesture);
 }
 
 //=========================================================================================
@@ -162,6 +183,11 @@ void PlaneViewer::resizeGL(int width, int height) {
 //=========================================================================================
 
 void PlaneViewer::mouseMoveEvent(QMouseEvent *event) {
+  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+      !m_stylusUsed) {
+    return;
+  }
+
   QPoint curPos = event->pos() * getDevPixRatio();
   if (event->buttons() & Qt::MidButton)
     moveView(curPos.x() - m_xpos, height() - curPos.y() - m_ypos);
@@ -172,18 +198,84 @@ void PlaneViewer::mouseMoveEvent(QMouseEvent *event) {
 //------------------------------------------------------
 
 void PlaneViewer::mousePressEvent(QMouseEvent *event) {
+  // qDebug() << "[mousePressEvent]";
+  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+      !m_stylusUsed) {
+    return;
+  }
+
   m_xpos = event->x() * getDevPixRatio();
   m_ypos = height() - event->y() * getDevPixRatio();
 }
 
 //------------------------------------------------------
 
-void PlaneViewer::wheelEvent(QWheelEvent *event) {
-  TPointD pos(event->x() * getDevPixRatio(),
-              height() - event->y() * getDevPixRatio());
-  double zoom_par = 1 + event->delta() * 0.001;
+void PlaneViewer::mouseDoubleClickEvent(QMouseEvent *event) {
+  // qDebug() << "[mouseDoubleClickEvent]";
+  if (m_gestureActive && !m_stylusUsed) {
+    m_gestureActive = false;
+    fitView();
+    return;
+  }
+}
 
-  zoomView(pos.x, pos.y, zoom_par);
+//------------------------------------------------------
+
+void PlaneViewer::mouseReleaseEvent(QMouseEvent *event) {
+  m_gestureActive = false;
+  m_zooming       = false;
+  m_panning       = false;
+  m_stylusUsed    = false;
+}
+
+//------------------------------------------------------
+
+void PlaneViewer::wheelEvent(QWheelEvent *event) {
+  int delta = 0;
+  switch (event->source()) {
+  case Qt::MouseEventNotSynthesized: {
+    if (event->modifiers() & Qt::AltModifier)
+      delta = event->angleDelta().x();
+    else
+      delta = event->angleDelta().y();
+    break;
+  }
+
+  case Qt::MouseEventSynthesizedBySystem: {
+    QPoint numPixels  = event->pixelDelta();
+    QPoint numDegrees = event->angleDelta() / 8;
+    if (!numPixels.isNull()) {
+      delta = event->pixelDelta().y();
+    } else if (!numDegrees.isNull()) {
+      QPoint numSteps = numDegrees / 15;
+      delta           = numSteps.y();
+    }
+    break;
+  }
+
+  default:  // Qt::MouseEventSynthesizedByQt,
+            // Qt::MouseEventSynthesizedByApplication
+    {
+      std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
+                   "Qt::MouseEventSynthesizedByApplication"
+                << std::endl;
+      break;
+    }
+
+  }  // end switch
+
+  if (abs(delta) > 0) {
+    if ((m_gestureActive == true &&
+         m_touchDevice == QTouchDevice::TouchScreen) ||
+        m_gestureActive == false) {
+      TPointD pos(event->x() * getDevPixRatio(),
+                  height() - event->y() * getDevPixRatio());
+      double zoom_par = 1 + event->delta() * 0.001;
+
+      zoomView(pos.x, pos.y, zoom_par);
+    }
+  }
+  event->accept();
 }
 
 //------------------------------------------------------
@@ -199,12 +291,223 @@ void PlaneViewer::keyPressEvent(QKeyEvent *event) {
 //! Disposes of the auxiliary internal rasterBuffer().
 void PlaneViewer::hideEvent(QHideEvent *event) {
   m_rasterBuffer = TRaster32P();
+  m_dpiX         = 0.0;  // reset dpi
+  m_dpiY         = 0.0;
+}
+
+//------------------------------------------------------------------
+
+void PlaneViewer::contextMenuEvent(QContextMenuEvent *event) {
+  QMenu *menu = new QMenu(this);
+
+  QAction *reset = menu->addAction(tr("Reset View"));
+  reset->setShortcut(
+      QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomReset)));
+  connect(reset, SIGNAL(triggered()), SLOT(resetView()));
+
+  QAction *fit = menu->addAction(tr("Fit To Window"));
+  fit->setShortcut(
+      QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
+  connect(fit, SIGNAL(triggered()), SLOT(fitView()));
+
+  menu->exec(event->globalPos());
+
+  delete menu;
+  update();
+}
+
+//------------------------------------------------------------------
+
+void PlaneViewer::tabletEvent(QTabletEvent *e) {
+  // qDebug() << "[tabletEvent]";
+  if (e->type() == QTabletEvent::TabletPress) {
+    m_stylusUsed = e->pointerType() ? true : false;
+  } else if (e->type() == QTabletEvent::TabletRelease) {
+    m_stylusUsed = false;
+  }
+
+  e->accept();
+}
+
+//------------------------------------------------------------------
+
+void PlaneViewer::gestureEvent(QGestureEvent *e) {
+  // qDebug() << "[gestureEvent]";
+  m_gestureActive = false;
+  if (QGesture *swipe = e->gesture(Qt::SwipeGesture)) {
+    m_gestureActive = true;
+  } else if (QGesture *pan = e->gesture(Qt::PanGesture)) {
+    m_gestureActive = true;
+  }
+  if (QGesture *pinch = e->gesture(Qt::PinchGesture)) {
+    QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    QPoint firstCenter                     = gesture->centerPoint().toPoint();
+    if (m_touchDevice == QTouchDevice::TouchScreen)
+      firstCenter = mapFromGlobal(firstCenter);
+
+    if (gesture->state() == Qt::GestureStarted) {
+      m_gestureActive = true;
+    } else if (gesture->state() == Qt::GestureFinished) {
+      m_gestureActive = false;
+      m_zooming       = false;
+      m_scaleFactor   = 0.0;
+    } else {
+      if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        double scaleFactor = gesture->scaleFactor();
+        // the scale factor makes for too sensitive scaling
+        // divide the change in half
+        if (scaleFactor > 1) {
+          double decimalValue = scaleFactor - 1;
+          decimalValue /= 1.5;
+          scaleFactor = 1 + decimalValue;
+        } else if (scaleFactor < 1) {
+          double decimalValue = 1 - scaleFactor;
+          decimalValue /= 1.5;
+          scaleFactor = 1 - decimalValue;
+        }
+        if (!m_zooming) {
+          double delta = scaleFactor - 1;
+          m_scaleFactor += delta;
+          if (m_scaleFactor > .2 || m_scaleFactor < -.2) {
+            m_zooming = true;
+          }
+        }
+        if (m_zooming) {
+          zoomView(firstCenter.x() * getDevPixRatio(),
+                   firstCenter.y() * getDevPixRatio(), scaleFactor);
+          m_panning = false;
+        }
+        m_gestureActive = true;
+      }
+
+      if (changeFlags & QPinchGesture::CenterPointChanged) {
+        QPointF centerDelta = (gesture->centerPoint() * getDevPixRatio()) -
+                              (gesture->lastCenterPoint() * getDevPixRatio());
+        if (centerDelta.manhattanLength() > 1) {
+          // panQt(centerDelta.toPoint());
+        }
+        m_gestureActive = true;
+      }
+    }
+  }
+  e->accept();
+}
+
+void PlaneViewer::touchEvent(QTouchEvent *e, int type) {
+  // qDebug() << "[touchEvent]";
+  if (type == QEvent::TouchBegin) {
+    m_touchActive   = true;
+    m_firstPanPoint = e->touchPoints().at(0).pos();
+    // obtain device type
+    m_touchDevice = e->device()->type();
+  } else if (m_touchActive) {
+    // touchpads must have 2 finger panning for tools and navigation to be
+    // functional on other devices, 1 finger panning is preferred
+    if ((e->touchPoints().count() == 2 &&
+         m_touchDevice == QTouchDevice::TouchPad) ||
+        (e->touchPoints().count() == 1 &&
+         m_touchDevice == QTouchDevice::TouchScreen)) {
+      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+      if (!m_panning) {
+        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        // minimize accidental and jerky zooming/rotating during 2 finger
+        // panning
+        if ((deltaPoint.manhattanLength() > 100) && !m_zooming) {
+          m_panning = true;
+        }
+      }
+      if (m_panning) {
+        QPoint curPos      = panPoint.pos().toPoint() * getDevPixRatio();
+        QPoint lastPos     = panPoint.lastPos().toPoint() * getDevPixRatio();
+        QPoint centerDelta = curPos - lastPos;
+        moveView(centerDelta.x(), -centerDelta.y());
+      }
+    }
+  }
+  if (type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
+    m_touchActive = false;
+    m_panning     = false;
+  }
+  e->accept();
+}
+
+bool PlaneViewer::event(QEvent *e) {
+  /*
+  switch (e->type()) {
+  case QEvent::TabletPress: {
+  QTabletEvent *te = static_cast<QTabletEvent *>(e);
+  qDebug() << "[event] TabletPress: pointerType(" << te->pointerType()
+  << ") device(" << te->device() << ")";
+  } break;
+  case QEvent::TabletRelease:
+  qDebug() << "[event] TabletRelease";
+  break;
+  case QEvent::TouchBegin:
+  qDebug() << "[event] TouchBegin";
+  break;
+  case QEvent::TouchEnd:
+  qDebug() << "[event] TouchEnd";
+  break;
+  case QEvent::TouchCancel:
+  qDebug() << "[event] TouchCancel";
+  break;
+  case QEvent::MouseButtonPress:
+  qDebug() << "[event] MouseButtonPress";
+  break;
+  case QEvent::MouseButtonDblClick:
+  qDebug() << "[event] MouseButtonDblClick";
+  break;
+  case QEvent::MouseButtonRelease:
+  qDebug() << "[event] MouseButtonRelease";
+  break;
+  case QEvent::Gesture:
+  qDebug() << "[event] Gesture";
+  break;
+  default:
+  break;
+  }
+  */
+
+  if (e->type() == QEvent::Gesture &&
+      CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
+    gestureEvent(static_cast<QGestureEvent *>(e));
+    return true;
+  }
+  if ((e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
+       e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) &&
+      CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
+    touchEvent(static_cast<QTouchEvent *>(e), e->type());
+    m_gestureActive = true;
+    return true;
+  }
+  return GLWidgetForHighDpi::event(e);
 }
 
 //=========================================================================================
 
 void PlaneViewer::resetView() {
   m_aff = TTranslation(0.5 * width(), 0.5 * height());
+  update();
+}
+
+void PlaneViewer::fitView() {
+  if (m_imageBounds.isEmpty()) return;
+  m_aff = TTranslation(0.5 * width(), 0.5 * height());
+
+  double imageScale = std::min(width() / (double)m_imageBounds.getLx(),
+                               height() / (double)m_imageBounds.getLy());
+
+  m_aff = TScale(imageScale, imageScale);
+  if (m_dpiX != 0.0 && m_dpiY != 0.0)
+    m_aff *= TScale(m_dpiX / Stage::inch, m_dpiY / Stage::inch);
+  m_aff.a13 = 0.5 * width();
+  m_aff.a23 = 0.5 * height();
+
   update();
 }
 
@@ -306,6 +609,16 @@ void PlaneViewer::draw(TRasterP ras, double dpiX, double dpiY, TPalette *pal) {
 
   TRaster32P aux(rasterBuffer());
 
+  m_imageBounds = ras->getBounds();
+  if (m_dpiX == 0.0 || m_dpiY == 0.0) {
+    m_dpiX = dpiX;
+    m_dpiY = dpiY;
+  }
+  if (m_firstDraw && !m_imageBounds.isEmpty()) {
+    m_firstDraw = false;
+    fitView();
+  }
+
   aux->lock();
   ras->lock();
 
@@ -328,8 +641,8 @@ void PlaneViewer::draw(TRasterP ras, double dpiX, double dpiY, TPalette *pal) {
 }
 
 /*NOTE:
-    glRasterPos2d could be used, along glBitmap and glPixelZoom...
-    however, i've never been able to use them effectively...
+glRasterPos2d could be used, along glBitmap and glPixelZoom...
+however, i've never been able to use them effectively...
 */
 
 //------------------------------------------------------
@@ -360,7 +673,15 @@ void PlaneViewer::draw(TVectorImageP vi) {
   TRectD bbox(vi->getBBox());
   TRect bboxI(tfloor(bbox.x0), tfloor(bbox.y0), tceil(bbox.x1) - 1,
               tceil(bbox.y1) - 1);
-
+  m_imageBounds = bboxI;
+  if (m_dpiX == 0.0 || m_dpiY == 0.0) {
+    m_dpiX = Stage::inch;
+    m_dpiY = Stage::inch;
+  }
+  if (m_firstDraw) {
+    m_firstDraw = false;
+    fitView();
+  }
   TVectorRenderData rd(TAffine(), bboxI, vi->getPalette(), 0, true, true);
   tglDraw(rd, vi.getPointer());
 }

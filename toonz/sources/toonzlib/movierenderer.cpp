@@ -20,6 +20,7 @@
 #include "toonz/trasterimageutils.h"
 #include "toonz/levelupdater.h"
 #include "toutputproperties.h"
+#include "toonz/boardsettings.h"
 
 // tcg includes
 #include "tcg/tcg_macros.h"
@@ -150,7 +151,7 @@ public:
   // Helper methods
 
   void prepareForStart();
-  void addSoundtrack(int r0, int r1, double fps);
+  void addSoundtrack(int r0, int r1, double fps, int boardDuration = 0);
   void postProcessImage(const TRasterImageP &img, bool has64bitOutputSupport,
                         const TRasterP &mark, int frame);
 
@@ -160,6 +161,9 @@ public:
   std::pair<bool, int> saveFrame(double frame,
                                  const std::pair<TRasterP, TRasterP> &rasters);
   std::string getRenderCacheId();
+
+  // returns board duration in frame
+  int addBoard();
 };
 
 //---------------------------------------------------------
@@ -297,7 +301,8 @@ void MovieRenderer::Imp::prepareForStart() {
 
 //---------------------------------------------------------
 
-void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps) {
+void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps,
+                                       int boardDuration) {
   TCG_ASSERT(r0 <= r1, return );
 
   TXsheet::SoundProperties *prop =
@@ -331,6 +336,10 @@ void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps) {
 
   m_st = TSop::insertBlank(m_st, fromSample, numSample + m_whiteSample);
   m_st->copy(snd1, TINT32(fromSample + m_whiteSample));
+
+  // insert blank sound for clapperboard
+  if (boardDuration > 0)
+    m_st = TSop::insertBlank(m_st, 0, TINT32(boardDuration * samplePerFrame));
 
   m_whiteSample = 0;
 }
@@ -374,7 +383,15 @@ std::pair<bool, int> MovieRenderer::Imp::saveFrame(
                       m_renderSettings.m_timeStretchFrom;
 
   int fr = (stretchFac != 1) ? tround(frame * stretchFac) : int(frame);
-  TFrameId fid(fr + 1);
+
+  int boardDuration = 0;
+  if (m_movieType) {
+    BoardSettings *bs =
+        m_scene->getProperties()->getOutputProperties()->getBoardSettings();
+    boardDuration = (bs->isActive()) ? bs->getDuration() : 0;
+  }
+
+  TFrameId fid(fr + 1 + boardDuration);
 
   if (m_levelUpdaterA.get()) {
     assert(m_levelUpdaterB.get() || !rasters.second);
@@ -456,6 +473,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
   // Build soundtrack at the first time a frame is completed - and the filetype
   // is that of a movie.
   if (m_firstCompletedRaster && m_movieType && !m_st) {
+    int boardDuration = addBoard();
+
     int from, to;
     getRange(m_scene, false, from, to);
 
@@ -467,7 +486,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
 
     addSoundtrack(
         from, to,
-        m_scene->getProperties()->getOutputProperties()->getFrameRate());
+        m_scene->getProperties()->getOutputProperties()->getFrameRate(),
+        boardDuration);
 
     if (m_st) {
       m_levelUpdaterA->getLevelWriter()->saveSoundTrack(m_st.getPointer());
@@ -730,6 +750,41 @@ void MovieRenderer::Imp::onRenderFinished(bool isCanceled) {
 
   release();  // The movieRenderer is released by the render process. It could
               // eventually be deleted.
+}
+
+//---------------------------------------------------------
+
+int MovieRenderer::Imp::addBoard() {
+  BoardSettings *boardSettings =
+      m_scene->getProperties()->getOutputProperties()->getBoardSettings();
+  if (!boardSettings->isActive()) return 0;
+  int duration = boardSettings->getDuration();
+  if (duration == 0) return 0;
+  // Get the image size
+  int shrinkX = m_renderSettings.m_shrinkX,
+      shrinkY = m_renderSettings.m_shrinkY;
+  TDimensionD cameraRes(double(m_frameSize.lx) / shrinkX,
+                        double(m_frameSize.ly) / shrinkY);
+  TDimension cameraResI(cameraRes.lx, cameraRes.ly);
+
+  TRaster32P boardRas =
+      boardSettings->getBoardRaster(cameraResI, shrinkX, m_scene);
+
+  if (m_levelUpdaterA.get()) {
+    // Flush images
+    try {
+      TRasterImageP img(boardRas);
+      for (int f = 0; f < duration; f++) {
+        m_levelUpdaterA->update(TFrameId(f + 1), img);
+        if (m_levelUpdaterB.get())
+          m_levelUpdaterB->update(TFrameId(f + 1), img);
+      }
+    } catch (...) {
+      // Nothing. The images could not be saved for whatever reason.
+      // Failure is reported.
+    }
+  }
+  return duration;
 }
 
 //======================================================================================

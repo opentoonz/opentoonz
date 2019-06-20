@@ -6,6 +6,7 @@
 #include "tproperty.h"
 #include "tlevel_io.h"
 #include "tiio_ffmpeg.h"
+#include <QCoreApplication>
 
 //===========================================================
 //
@@ -70,12 +71,14 @@ namespace Tiio {
 //===========================================================================
 
 class WebmWriterProperties : public TPropertyGroup {
+  Q_DECLARE_TR_FUNCTIONS(WebmWriterProperties)
 public:
   // TEnumProperty m_pixelSize;
   // TBoolProperty m_matte;
   TIntProperty m_vidQuality;
   TIntProperty m_scale;
   WebmWriterProperties();
+  void updateTranslation() override;
 };
 
 //===========================================================================

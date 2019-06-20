@@ -36,7 +36,6 @@
 #include "tcg/tcg_macros.h"
 #include "tcg/tcg_base.h"
 #include "tcg/tcg_function_types.h"
-#include "tcg/tcg_iterator_ops.h"
 
 #include <memory>
 
@@ -1152,7 +1151,13 @@ void ReplaceFxUndo::initialize() {
     fx = zcfx->getZeraryFx();
   }
 
-  if (has_fx_column(fx)) {
+  TZeraryColumnFx *zcrepfx = dynamic_cast<TZeraryColumnFx *>(repFx);
+  if (zcrepfx) repFx       = zcrepfx->getZeraryFx();
+
+  bool fxHasCol    = has_fx_column(fx);
+  bool repfxHasCol = has_fx_column(repFx);
+
+  if (fxHasCol && repfxHasCol) {
     if (zcfx) {
       // Build a column with the same source cells pattern
       m_repColumn = new TXshZeraryFxColumn(*zcfx->getColumn());
@@ -1170,6 +1175,10 @@ void ReplaceFxUndo::initialize() {
       m_repColIdx = xsh->getFirstFreeColumnIndex();
       m_repFx     = static_cast<TZeraryColumnFx *>(m_repColumn->getFx());
     }
+  } else if (!fxHasCol && repfxHasCol) {
+    m_repColumn = FxCommandUndo::createZeraryFxColumn(xsh, repFx);
+    m_repColIdx = xsh->getFirstFreeColumnIndex();
+    m_repFx     = static_cast<TZeraryColumnFx *>(m_repColumn->getFx());
   }
 
   FxCommandUndo::cloneGroupStack(fx, m_repFx.getPointer());
@@ -1598,7 +1607,8 @@ private:
     else {
       TOutputFx *currentOutputFx = xsh->getFxDag()->getCurrentOutputFx();
       const TPointD &pos = currentOutputFx->getAttributes()->getDagNodePos();
-      outputFx->getAttributes()->setDagNodePos(pos + TPointD(20, 20));
+      if (pos != TConst::nowhere)
+        outputFx->getAttributes()->setDagNodePos(pos + TPointD(20, 20));
     }
   }
 };
@@ -2355,12 +2365,10 @@ static void deleteColumns(const std::list<int> &columns,
   // columns directly, and then their (updated) column index.
   TXsheet *xsh = xshHandle->getXsheet();
 
-  typedef tcg::function<TXshColumn *(TXsheet::*)(int)const, &TXsheet::getColumn>
-      getColumn_fun;
-  tcg::binder1st<getColumn_fun> getCol(getColumn_fun(), *xsh);
-
-  std::vector<TXshColumn *> cols(tcg::make_cast_it(columns.begin(), getCol),
-                                 tcg::make_cast_it(columns.end(), getCol));
+  std::vector<TXshColumn *> cols;
+  for (auto const &c : columns) {
+    cols.push_back(xsh->getColumn(c));
+  }
 
   size_t c, cCount = cols.size();
   for (c = 0; c != cCount; ++c) {
@@ -2637,7 +2645,8 @@ void UndoPasteFxs::initialize(const std::map<TFx *, int> &zeraryFxColumnSize,
         TFx *fx = *ft;
 
         const TPointD &fxPos = fx->getAttributes()->getDagNodePos();
-        fx->getAttributes()->setDagNodePos(fxPos + offset);
+        if (fxPos != TConst::nowhere)
+          fx->getAttributes()->setDagNodePos(fxPos + offset);
       }
     }
   }
@@ -3095,20 +3104,6 @@ private:
 //======================================================
 
 void UndoDisconnectFxs::initialize() {
-  struct locals {
-    static QPair<TFxP, TPointD> originalPos(const QPair<TFxP, TPointD> &pair) {
-      return QPair<TFxP, TPointD>(pair.first,
-                                  pair.first->getAttributes()->getDagNodePos());
-    }
-
-    static bool contains(const std::list<TFxP> &fxs, TFx *fx) {
-      tcg::function<TFx *(TFxP::*)() const, &TFxP::getPointer> getPointer_fun;
-
-      return (std::count(tcg::make_cast_it(fxs.begin(), getPointer_fun),
-                         tcg::make_cast_it(fxs.end(), getPointer_fun), fx) > 0);
-    }
-  };
-
   TXsheet *xsh = m_xshHandle->getXsheet();
   FxDag *fxDag = xsh->getFxDag();
 
@@ -3120,13 +3115,15 @@ void UndoDisconnectFxs::initialize() {
   if (m_fxs.empty()) return;
 
   // Build fxs data
-  tcg::binder1st<bool (*)(const std::list<TFxP> &, TFx *)> contains_fun(
-      &locals::contains, m_fxs);
+  auto const contains = [this](TFx const *fx) -> bool {
+    return std::count_if(this->m_fxs.begin(), this->m_fxs.end(),
+                         [fx](TFxP &f) { return f.getPointer() == fx; }) > 0;
+  };
 
-  m_leftFx = FxCommandUndo::leftmostConnectedFx(m_fxs.front().getPointer(),
-                                                contains_fun);
-  m_rightFx = FxCommandUndo::rightmostConnectedFx(m_fxs.front().getPointer(),
-                                                  contains_fun);
+  m_leftFx =
+      FxCommandUndo::leftmostConnectedFx(m_fxs.front().getPointer(), contains);
+  m_rightFx =
+      FxCommandUndo::rightmostConnectedFx(m_fxs.front().getPointer(), contains);
 
   // Store sensible original data for the undo
   m_undoLinksIn  = FxCommandUndo::inputLinks(xsh, m_leftFx);
@@ -3138,10 +3135,12 @@ void UndoDisconnectFxs::initialize() {
       m_undoTerminalLinks.push_back(TFxCommand::Link(lt->m_inputFx.getPointer(),
                                                      fxDag->getXsheetFx(), -1));
 
-  std::vector<QPair<TFxP, TPointD>>(
-      tcg::make_cast_it(m_undoDagPos.begin(), &locals::originalPos),
-      tcg::make_cast_it(m_undoDagPos.end(), &locals::originalPos))
-      .swap(m_redoDagPos);
+  std::vector<QPair<TFxP, TPointD>> v;
+  for (auto const &e : m_undoDagPos) {
+    v.emplace_back(e.first, e.first->getAttributes()->getDagNodePos());
+  }
+  m_redoDagPos = std::move(v);
+  m_redoDagPos.shrink_to_fit();
 }
 
 //------------------------------------------------------

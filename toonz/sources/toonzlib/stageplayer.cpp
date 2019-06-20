@@ -19,10 +19,11 @@ using namespace Stage;
 //    Stage::Player  implementation
 //*****************************************************************************************
 
-double Player::m_onionSkinFrontSize  = 0;
-double Player::m_onionSkinBackSize   = 0;
-double Player::m_firstBackOnionSkin  = 0;
-double Player::m_lastBackVisibleSkin = 0;
+double Player::m_onionSkinFrontSize   = 0;
+double Player::m_onionSkinBackSize    = 0;
+double Player::m_firstBackOnionSkin   = 0;
+double Player::m_lastBackVisibleSkin  = 0;
+bool Player::m_isShiftAndTraceEnabled = false;
 
 //-----------------------------------------------------------------------------
 

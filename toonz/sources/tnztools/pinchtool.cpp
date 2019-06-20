@@ -45,7 +45,6 @@
 #include "ext/Selector.h"
 #include "ext/CornerDeformation.h"
 #include "ext/StraightCornerDeformation.h"
-#include "ext/StrokeDeformation.h"
 
 #include <memory>
 #include <algorithm>
@@ -376,6 +375,15 @@ void PinchTool::onLeave() {
 void PinchTool::onImageChanged() {
   m_status.stroke2change_ = 0;
   m_deformation->reset();
+  // m_active may be true if the frame switched while dragging
+  if (m_active) {
+    m_deformation->deactivate();
+    m_active = false;
+    if (m_undo) {
+      delete m_undo;
+      m_undo = 0;
+    }
+  }
 
   double w        = 0;
   TStroke *stroke = getClosestStroke(m_lastMouseEvent.m_pos, w);
@@ -529,7 +537,7 @@ bool PinchTool::keyDown(QKeyEvent *event) {
     }
   }
 #endif
-  return true;
+  return false;
 }
 
 //-----------------------------------------------------------------------------

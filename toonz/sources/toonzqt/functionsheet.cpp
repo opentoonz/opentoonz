@@ -977,14 +977,11 @@ FunctionSheet::FunctionSheet(QWidget *parent, bool isFloating)
 
   if (m_isFloating) {
     // load the dialog size
-    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath("popups.ini"));
+    QSettings settings(toQString(fp), QSettings::IniFormat);
 
-    mySettings.beginGroup("Dialogs");
-    setGeometry(
-        mySettings.value("FunctionSpreadsheet", QRect(500, 500, 400, 300))
-            .toRect());
-    mySettings.endGroup();
+    setGeometry(settings.value("FunctionSpreadsheet", QRect(500, 500, 400, 300))
+                    .toRect());
   }
 }
 
@@ -992,12 +989,10 @@ FunctionSheet::FunctionSheet(QWidget *parent, bool isFloating)
 
 FunctionSheet::~FunctionSheet() {
   if (m_isFloating) {
-    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath("popups.ini"));
+    QSettings settings(toQString(fp), QSettings::IniFormat);
 
-    mySettings.beginGroup("Dialogs");
-    mySettings.setValue("FunctionSpreadsheet", geometry());
-    mySettings.endGroup();
+    settings.setValue("FunctionSpreadsheet", geometry());
   }
 }
 

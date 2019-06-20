@@ -423,8 +423,8 @@ Node *OutlineVectorizer::findOtherSide(Node *node) {
   TPoint d1(tsign(dir.x), 0), d2(0, tsign(dir.y));
   int num = abs(dir.y), den = abs(dir.x);
   if (num > den) {
-    tswap(d1, d2);
-    tswap(num, den);
+    std::swap(d1, d2);
+    std::swap(num, den);
   }
   TPoint pos = pix->m_pos;
   int i;

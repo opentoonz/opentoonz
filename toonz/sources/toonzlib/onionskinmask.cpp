@@ -64,6 +64,8 @@ void OnionSkinMask::clear() {
   m_ghostAff[1]    = TAffine();
   m_ghostCenter[0] = TPointD();
   m_ghostCenter[1] = TPointD();
+  m_ghostFrame[0]  = 0;
+  m_ghostFrame[1]  = 0;
 }
 
 //-------------------------------------------------------------------

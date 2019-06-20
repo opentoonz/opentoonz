@@ -794,6 +794,43 @@ QString TTool::updateEnabled() {
   TXshSimpleLevel *sl = xl ? xl->getSimpleLevel() : 0;
   int levelType       = sl ? sl->getType() : NO_XSHLEVEL;
 
+  if (Preferences::instance()->isAutoCreateEnabled() &&
+      Preferences::instance()->isAnimationSheetEnabled()) {
+    // If not in Level editor, let's use our current cell from the xsheet to
+    // find the nearest level before it
+    if (levelType == NO_XSHLEVEL &&
+        !m_application->getCurrentFrame()->isEditingLevel()) {
+      int r0, r1;
+      xsh->getCellRange(columnIndex, r0, r1);
+      for (int r = std::min(r1, rowIndex); r > r0; r--) {
+        TXshCell cell = xsh->getCell(r, columnIndex);
+        if (cell.isEmpty()) continue;
+        xl        = (TXshLevel *)(&cell.m_level);
+        sl        = cell.getSimpleLevel();
+        levelType = cell.m_level->getType();
+        break;
+      }
+    }
+
+    // If the current tool does not match the current type, check for
+    // a version of the same tool that does
+    {
+      TTool *tool = this;
+
+      if ((levelType == PLI_XSHLEVEL) && !(targetType & VectorImage))
+        tool = TTool::getTool(m_name, VectorImage);
+      else if ((levelType == TZP_XSHLEVEL) && !(targetType & ToonzImage))
+        tool = TTool::getTool(m_name, ToonzImage);
+      else if ((levelType == OVL_XSHLEVEL) && !(targetType & RasterImage))
+        tool = TTool::getTool(m_name, RasterImage);
+      else if ((levelType == MESH_XSHLEVEL) && !(targetType & MeshImage))
+        tool = TTool::getTool(m_name, MeshImage);
+
+      if (tool && tool != this && tool->getTargetType() != TTool::NoTarget)
+        return tool->updateEnabled();
+    }
+  }
+
   TStageObject *obj =
       xsh->getStageObject(TStageObjectId::ColumnId(columnIndex));
   bool spline = m_application->getCurrentObject()->isSpline();

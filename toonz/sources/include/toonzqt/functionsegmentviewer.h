@@ -7,6 +7,7 @@
 #include <QComboBox>
 
 #include "tdoubleparam.h"
+#include "tdoublekeyframe.h"
 #include "toonzqt/lineedit.h"
 
 #undef DVAPI
@@ -29,6 +30,7 @@ class QStackedWidget;
 namespace DVGui {
 class MeasuredDoubleLineEdit;
 class ExpressionField;
+class FileField;
 }
 
 //-----------------------------------------------------------------------------
@@ -220,6 +222,24 @@ public:
   void init(int segmentLength) override;
 
   void getGuiValues(std::string &expressionText, double &similarShapeOffset);
+};
+
+//-----------------------------------------------------------------------------
+
+class FileSegmentPage final : public FunctionSegmentPage {
+  Q_OBJECT
+
+  DVGui::FileField *m_fileFld;
+  DVGui::LineEdit *m_fieldIndexFld;
+  DVGui::LineEdit *m_measureFld;
+
+public:
+  FileSegmentPage(FunctionSegmentViewer *parent = 0);
+  void refresh() override;
+  void init(int segmentLength) override;
+  void apply() override;
+  void getGuiValues(TDoubleKeyframe::FileParams &fileParam,
+                    std::string &unitName);
 };
 
 #endif

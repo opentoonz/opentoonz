@@ -394,26 +394,22 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
 
   bool showChannelsOnMatte =
       (chan != TRop::MChan && chan != 0 && !m_vSettings.m_greytones);
-  if ((!showChannelsOnMatte && !m_vSettings.m_useTexture && chan != 0) ||
-      (!showChannelsOnMatte && m_vSettings.m_useTexture &&
-       (chan == TRop::MChan || m_vSettings.m_greytones))) {
-    TRasterP app = _rin->create(_rin->getLx(), _rin->getLy());
-    try {
-      TRop::setChannel(_rin, app, chan, m_vSettings.m_greytones);
-      if (!m_vSettings.m_useTexture)
-        _rin = app;
-      else
-        ras = app;
-    } catch (...) {
-    }
-  }
 
   if (m_vSettings.m_useTexture) {
     TRaster32P checkBoardRas = buildCheckboard(bg, _rin->getSize());
     GLRasterPainter::drawRaster(aff, checkBoardRas->getRawData(),
                                 checkBoardRas->getWrap(), 4,
                                 checkBoardRas->getSize(), true);
-    if (showChannelsOnMatte) ras = keepChannels(_rin, m_palette, chan);
+    if (showChannelsOnMatte)
+      ras = keepChannels(_rin, m_palette, chan);
+    else if (chan == TRop::MChan || m_vSettings.m_greytones) {
+      TRasterP app = ras->create(ras->getLx(), ras->getLy());
+      try {
+        TRop::setChannel(ras, app, chan, m_vSettings.m_greytones);
+        ras = app;
+      } catch (...) {
+      }
+    }
     GLRasterPainter::drawRaster(aff, ras->getRawData(), ras->getWrap(), 4,
                                 ras->getSize(), true);
     ras->unlock();
@@ -425,7 +421,10 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
       int lx = (m_imageSize.lx == 0 ? _rin->getLx() : m_imageSize.lx);
       int ly = (m_imageSize.ly == 0 ? _rin->getLy() : m_imageSize.ly);
 
-      TRect rect      = convert(aff * TRectD(0, 0, lx - 1, ly - 1));
+      TRect rect = convert(aff * TRectD(0, 0, lx - 1, ly - 1));
+      // Image size is a 0 point.  Do nothing
+      if (rect.x0 == rect.x1 && rect.y0 == rect.y1) return;
+
       TRaster32P raux = ras->extract(rect);
       raux->fill(bg == 0x40000 ? TPixel::Black : TPixel::White);
     }
@@ -434,9 +433,19 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
       quickput(ras, keepChannels(_rin, m_palette, chan), m_palette,
                m_vSettings.m_useTexture ? TAffine() : aff * TTranslation(offs),
                m_vSettings.m_useChecks);
-    else
+    else if (chan != 0) {
+      TRasterP app = ras->create(_rin->getLx(), _rin->getLy());
+      quickput(app, _rin, m_palette, TAffine(), m_vSettings.m_useChecks);
+      try {
+        TRop::setChannel(app, app, chan, m_vSettings.m_greytones);
+      } catch (...) {
+      }
+      quickput(ras, app, m_palette, aff * TTranslation(offs),
+               m_vSettings.m_useChecks);
+    } else {
       quickput(ras, _rin, m_palette, aff * TTranslation(offs),
                m_vSettings.m_useChecks);
+    }
 
     glDisable(GL_BLEND);
 

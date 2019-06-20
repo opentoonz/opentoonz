@@ -265,6 +265,8 @@ Set column color tag to \b colorTag.
   TPixel32 getFilterColor();
   static QPair<QString, TPixel32> getFilterInfo(FilterColor key);
   static void initColorFilters();
+
+  void resetColumnProperties();
 };
 
 #ifdef _WIN32

@@ -147,7 +147,7 @@ public:
                                      : (p0.y < aux.p0.y))
                : p0.x < aux.p0.x;
   }
-  void revert() { tswap(p0, p1); }
+  void revert() { std::swap(p0, p1); }
 };
 
 class wChunk {

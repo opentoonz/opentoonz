@@ -80,7 +80,7 @@ public:
       oldStatus.append(xsh->getColumn(i)->isPreviewVisible());
       newStatus.append(false);
     }
-    foreach (int i, m_columnList) {
+    for (int i : m_columnList) {
       if (0 <= i && i < xsh->getColumnCount()) newStatus[i] = true;
     }
     for (int i = 0; i < newStatus.length(); i++) {

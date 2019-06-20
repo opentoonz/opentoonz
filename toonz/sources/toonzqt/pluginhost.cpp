@@ -10,7 +10,6 @@
 #else
 #include <dlfcn.h>
 #endif
-#include <string>
 #include <map>
 #include <type_traits>
 #include <functional>
@@ -32,7 +31,6 @@
 #include "plugin_param_view_interface.h"
 #include "plugin_ui_page_interface.h"
 #include "plugin_utilities.h"
-#include "toonz_params.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QLabel>
@@ -602,7 +600,7 @@ Param *RasterFxPluginHost::createParam(const toonz_param_desc_t *desc) {
   p->setDescription(desc->note);
   p->setUILabel(desc->base.label);
 
-  bindParam(this, desc->key, p);
+  bindPluginParam(this, desc->key, p);
 
   params_.push_back(std::make_shared<Param>(
       this, desc->key, toonz_param_type_enum(desc->traits_tag), desc));

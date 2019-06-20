@@ -39,7 +39,6 @@
 #include "toonz/toonzscene.h"
 #include "toonz/txshlevel.h"
 #include "toonz/txsheet.h"
-#include "toonz/sceneproperties.h"
 #include "toonz/tcamera.h"
 #include "toonz/palettecontroller.h"
 

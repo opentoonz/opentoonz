@@ -165,6 +165,14 @@ Possibly the preset file has been corrupted</source>
         <source>x</source>
         <translation></translation>
     </message>
+    <message>
+        <source>A/R</source>
+        <translation>縦横比</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;カスタム&gt;</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -248,7 +256,33 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>サブシートを開く (&amp;O)</translation>
+        <translation type="vanished">サブシートを開く (&amp;O)</translation>
+    </message>
+</context>
+<context>
+    <name>ComboHistoRGBLabel</name>
+    <message>
+        <source>R:%1 G:%2 B:%3</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ComboHistogram</name>
+    <message>
+        <source>Picked Color</source>
+        <translation>スポイトで拾った色</translation>
+    </message>
+    <message>
+        <source>Average Color (Ctrl + Drag)</source>
+        <translation>平均の色 [Ctrl+ドラッグ]で範囲を指定</translation>
+    </message>
+    <message>
+        <source>X:</source>
+        <translation>X:</translation>
+    </message>
+    <message>
+        <source>Y:</source>
+        <translation>Y：</translation>
     </message>
 </context>
 <context>
@@ -295,6 +329,25 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>White Thres</source>
         <translation>明るさのしきい値</translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::ColorField</name>
+    <message>
+        <source>R:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>G:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>B:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -358,6 +411,13 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>OpenToonz</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>DVGui::StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation>選択色</translation>
     </message>
 </context>
 <context>
@@ -637,6 +697,17 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FontParamField</name>
+    <message>
+        <source>Style:</source>
+        <translation>スタイル：</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>サイズ：</translation>
+    </message>
+</context>
+<context>
     <name>FrameNavigator</name>
     <message>
         <source>Previous Frame</source>
@@ -754,7 +825,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Function Curves</source>
-        <translation>グラフエディター</translation>
+        <translation>グラフエディタ</translation>
     </message>
     <message>
         <source>Smooth</source>
@@ -884,6 +955,13 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FunctionSheet</name>
+    <message>
+        <source>Function Editor</source>
+        <translation>パラメータエディタ</translation>
+    </message>
+</context>
+<context>
     <name>FunctionSheetCellViewer</name>
     <message>
         <source>Delete Key</source>
@@ -954,7 +1032,22 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Function Curve Editor</source>
-        <translation>グラフエディターを開く (&amp;O)</translation>
+        <translation>グラフエディタを開く (&amp;O)</translation>
+    </message>
+</context>
+<context>
+    <name>FunctionTreeModel</name>
+    <message>
+        <source>Stage</source>
+        <translation>ステージ</translation>
+    </message>
+    <message>
+        <source>FX</source>
+        <translation>エフェクト</translation>
+    </message>
+    <message>
+        <source>Plastic Skeleton</source>
+        <translation>プラスチックのボーン</translation>
     </message>
 </context>
 <context>
@@ -979,6 +1072,10 @@ Possibly the preset file has been corrupted</source>
         <source>Show All</source>
         <translation>すべて表示</translation>
     </message>
+    <message>
+        <source>Table</source>
+        <translation>テーブル</translation>
+    </message>
 </context>
 <context>
     <name>FxColumnPainter</name>
@@ -1000,7 +1097,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>サブシートを開く (&amp;O)</translation>
+        <translation type="vanished">サブシートを開く (&amp;O)</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -1120,6 +1217,13 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <source>Output</source>
+        <translation>出力</translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicPort</name>
     <message>
         <source>&amp;Disconnect from Xsheet</source>
@@ -1152,6 +1256,13 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
 </context>
 <context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <source>XSheet</source>
+        <translation>タイムシート</translation>
+    </message>
+</context>
+<context>
     <name>FxSettings</name>
     <message>
         <source>&amp;Camera Preview</source>
@@ -1176,6 +1287,10 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source> : </source>
         <translation> : </translation>
+    </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation>エフェクト設定</translation>
     </message>
 </context>
 <context>
@@ -1209,6 +1324,30 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>Logarithmic Scale</source>
         <translation>対数スケール</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>明度</translation>
+    </message>
+    <message>
+        <source>RGB</source>
+        <translation>RGB</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>赤</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>緑</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>青</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>アルファ</translation>
     </message>
 </context>
 <context>
@@ -1780,7 +1919,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation>&lt;カスタム&gt;</translation>
+        <translation type="vanished">&lt;カスタム&gt;</translation>
     </message>
     <message>
         <source>Toonz 7.1</source>
@@ -1952,16 +2091,71 @@ Are you sure?</source>
         <translation>設定</translation>
     </message>
     <message>
-        <source>OpenToonz 1.1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Remove Reference  in Palette : %1</source>
         <translation>スタジオパレットへの参照を消去：パレット%1</translation>
     </message>
     <message>
         <source>It is not possible to assign a shortcut with modifiers to the visualization commands.</source>
         <translation>視覚化コマンドには、修飾キーと組み合わせたキーボードショートカットを割り当てできません。</translation>
+    </message>
+    <message>
+        <source>Failed to compile m_textureShader.vert.</source>
+        <comment>gl</comment>
+        <translation>m_textureShader.vert のコンパイルに失敗しました。</translation>
+    </message>
+    <message>
+        <source>Failed to compile m_shader.frag.</source>
+        <comment>gl</comment>
+        <translation>m_shader.frag のコンパイルに失敗しました。</translation>
+    </message>
+    <message>
+        <source>Failed to add m_shader.vert.</source>
+        <comment>gl</comment>
+        <translation>m_shader.vert の追加に失敗しました。</translation>
+    </message>
+    <message>
+        <source>Failed to add m_shader.frag.</source>
+        <comment>gl</comment>
+        <translation>m_shader.frag の追加に失敗しました。</translation>
+    </message>
+    <message>
+        <source>Failed to link simple shader: %1</source>
+        <comment>gl</comment>
+        <translation>simple shader のリンクに失敗しました : %1</translation>
+    </message>
+    <message>
+        <source>Failed to get attribute location of %1</source>
+        <comment>gl</comment>
+        <translation>%1　のアトリビュート位置の取得に失敗しました</translation>
+    </message>
+    <message>
+        <source>Failed to get uniform location of %1</source>
+        <comment>gl</comment>
+        <translation>%1 のuniform位置の取得に失敗しました</translation>
+    </message>
+    <message>
+        <source>Failed to Open 3DLUT File.</source>
+        <translation>3DLUTファイルを開けませんでした。</translation>
+    </message>
+    <message>
+        <source>Failed to Load 3DLUT File.
+It should start with &quot;3DMESH&quot; keyword.</source>
+        <translation>3DLUTファイルの読み込みに失敗しました。
+ファイルの内容はキーワード &quot;3DMESH&quot; から始まる必要があります。</translation>
+    </message>
+    <message>
+        <source>Failed to Load 3DLUT File.
+The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;</source>
+        <translation>3DLUTファイルの読み込みに失敗しました。
+2行目は &quot;Mesh [入力ビット深度] [出力ビット深度]&quot;の形式で書かれている必要があります</translation>
+    </message>
+    <message>
+        <source>Failed to Load 3DLUT File.</source>
+        <translation>3DLUTファイルの読み込みに失敗しました。</translation>
+    </message>
+    <message>
+        <source>OpenToonz 1.2</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2024,12 +2218,16 @@ Are you sure?</source>
         <source>&amp;Swtich output port display mode</source>
         <translation>ポートの表示を切り替える (&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Toggle node icons</source>
+        <translation>アイコン表示切り替え （&amp;T）</translation>
+    </message>
 </context>
 <context>
     <name>SchematicWindowEditor</name>
     <message>
         <source>&amp;Close Editor</source>
-        <translation>エディターを閉じる (&amp;C)</translation>
+        <translation>エディタを閉じる (&amp;C)</translation>
     </message>
 </context>
 <context>
@@ -2169,6 +2367,26 @@ Are you sure?</source>
         <source>Convert to Studio Palette and Overwrite</source>
         <translation>スタジオパレットに変換して上書き保存</translation>
     </message>
+    <message>
+        <source>the palette &quot;%1&quot;</source>
+        <translation>パレット &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>the selected palettes</source>
+        <translation>選択されたパレット</translation>
+    </message>
+    <message>
+        <source>Move %1 to &quot;%2&quot;. Are you sure ?</source>
+        <translation>%1 を &quot;%2&quot; に移動します。よろしいですか？</translation>
+    </message>
+    <message>
+        <source>Move</source>
+        <translation>移動する</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
 </context>
 <context>
     <name>StudioPaletteViewer</name>
@@ -2201,7 +2419,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="vanished">自動</translation>
+        <translation>自動</translation>
     </message>
     <message>
         <source>Automatically update style changes</source>
@@ -2242,7 +2460,7 @@ Are you sure?</source>
     <message>
         <source>Auto  
 Apply</source>
-        <translation>自動で
+        <translation type="vanished">自動で
 適用</translation>
     </message>
     <message>
@@ -2251,7 +2469,7 @@ Apply</source>
     </message>
     <message>
         <source>- Style not Selected -</source>
-        <translation>- スタイルが選択されていません -</translation>
+        <translation type="vanished">- スタイルが選択されていません -</translation>
     </message>
     <message>
         <source>[CLEANUP]  </source>
@@ -2267,7 +2485,7 @@ Apply</source>
     </message>
     <message>
         <source>- Style is Not Valid -</source>
-        <translation>- スタイルが無効です -</translation>
+        <translation type="vanished">- スタイルが無効です -</translation>
     </message>
     <message>
         <source>Generated</source>
@@ -2288,6 +2506,42 @@ Apply</source>
     <message>
         <source>Raster</source>
         <translation>ラスター</translation>
+    </message>
+    <message>
+        <source>Show or hide parts of the Color Page.</source>
+        <translation>「色」タブ内の各パーツの表示/非表示を切り替え</translation>
+    </message>
+    <message>
+        <source>Toggle orientation of the Color Page.</source>
+        <translation>「色」タブのレイアウト方向を変更</translation>
+    </message>
+    <message>
+        <source>No Style Selected</source>
+        <translation>スタイルが選択されていません</translation>
+    </message>
+    <message>
+        <source>Style Editor - No Valid Style Selected</source>
+        <translation>スタイルエディタ - 有効なスタイルが選択されていません</translation>
+    </message>
+    <message>
+        <source>Wheel</source>
+        <translation>カラーホイール</translation>
+    </message>
+    <message>
+        <source>HSV</source>
+        <translation>HSV</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>アルファ</translation>
+    </message>
+    <message>
+        <source>RGB</source>
+        <translation>RGB</translation>
+    </message>
+    <message>
+        <source>Palette</source>
+        <translation>パレット</translation>
     </message>
 </context>
 <context>
@@ -2325,11 +2579,11 @@ Apply</source>
     <name>StyleEditorGUI::PlainColorPage</name>
     <message>
         <source>Wheel</source>
-        <translation>カラーホイール</translation>
+        <translation type="vanished">カラーホイール</translation>
     </message>
     <message>
         <source>HSV</source>
-        <translation>HSV</translation>
+        <translation type="vanished">HSV</translation>
     </message>
     <message>
         <source>Matte</source>
@@ -2337,18 +2591,18 @@ Apply</source>
     </message>
     <message>
         <source>RGB</source>
-        <translation>RGB</translation>
+        <translation type="vanished">RGB</translation>
     </message>
     <message>
         <source>Alpha</source>
-        <translation>アルファ</translation>
+        <translation type="vanished">アルファ</translation>
     </message>
 </context>
 <context>
     <name>StyleEditorGUI::SettingsPage</name>
     <message>
         <source>Autopaint for Lines</source>
-        <translation>色トレース線として、含め塗りを行う</translation>
+        <translation>色トレース線として、含み塗りを行う</translation>
     </message>
     <message>
         <source>Reset to default</source>

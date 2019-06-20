@@ -112,7 +112,6 @@ FilmstripFrames::FilmstripFrames(QScrollArea *parent, Qt::WFlags flags)
     , m_dragSelectionStartIndex(-1)
     , m_dragSelectionEndIndex(-1)
     , m_timerId(0)
-    , m_isGhibli(false)
     , m_selecting(false)
     , m_dragDropArmed(false)
     , m_readOnly(false) {
@@ -132,10 +131,7 @@ FilmstripFrames::FilmstripFrames(QScrollArea *parent, Qt::WFlags flags)
   m_selection->setView(this);
   setMouseTracking(true);
 
-  std::string room =
-      Preferences::instance()->getCurrentRoomChoice().toStdString();
-  m_isGhibli = room == "StudioGhibli";
-  m_viewer   = NULL;
+  m_viewer = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -357,26 +353,33 @@ void FilmstripFrames::showEvent(QShowEvent *) {
 
   // cambiamenti al livello
   TXshLevelHandle *levelHandle = app->getCurrentLevel();
-  connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-          SLOT(onLevelSwitched(TXshLevel *)));
-  connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(onLevelChanged()));
-  connect(levelHandle, SIGNAL(xshLevelViewChanged()), this,
-          SLOT(onLevelChanged()));
+  bool ret                     = true;
+  ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                       SLOT(onLevelSwitched(TXshLevel *)));
+  ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                       SLOT(onLevelChanged()));
+  ret = ret && connect(levelHandle, SIGNAL(xshLevelViewChanged()), this,
+                       SLOT(onLevelChanged()));
 
   // al frame corrente
-  connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-          SLOT(onFrameSwitched()));
-  connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
-          SLOT(update()));
+  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+                       SLOT(onFrameSwitched()));
+  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+                       SLOT(update()));
 
   // iconcine
-  connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
-          SLOT(update()));
+  ret = ret && connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
+                       SLOT(update()));
 
   // onion skin
-  connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
-          SLOT(update()));
+  ret = ret && connect(app->getCurrentOnionSkin(),
+                       SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
 
+  // active viewer change
+  ret = ret &&
+        connect(app, SIGNAL(activeViewerChanged()), this, SLOT(getViewer()));
+
+  assert(ret);
   getViewer();
 }
 
@@ -402,9 +405,13 @@ void FilmstripFrames::hideEvent(QHideEvent *) {
   disconnect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
              SLOT(update()));
 
+  // active viewer change
+  disconnect(app, SIGNAL(activeViewerChanged()), this, SLOT(getViewer()));
+
   if (m_viewer) {
     disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
     disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+    m_viewer = nullptr;
   }
 }
 
@@ -419,16 +426,13 @@ void FilmstripFrames::getViewer() {
     }
     viewerChanged = true;
   }
-  ComboViewerPanel *inknPaintViewerPanel =
-      TApp::instance()->getInknPaintViewerPanel();
-  if (m_isGhibli && inknPaintViewerPanel) {
-    m_viewer = inknPaintViewerPanel->getSceneViewer();
-  } else {
-    m_viewer = TApp::instance()->getActiveViewer();
-  }
+
+  m_viewer = TApp::instance()->getActiveViewer();
+
   if (m_viewer && viewerChanged) {
     connect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
     connect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+    update();
   }
 }
 
@@ -738,7 +742,7 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
     if (fid.getNumber() >= 0 && fid == getCurrentFrameId() &&
         (sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL) &&
         m_viewer && m_viewer->isVisible() && actualIconClicked &&
-        (m_isGhibli != (event->button() == Qt::MiddleButton))) {
+        event->button() == Qt::MiddleButton) {
       m_isNavigatorPanning = true;
       execNavigatorPan(event->pos());
       QApplication::setOverrideCursor(Qt::ClosedHandCursor);

@@ -97,7 +97,7 @@ StartupPopup::StartupPopup()
 
   m_projectBox = new QGroupBox(tr("Choose Project"), this);
   m_sceneBox   = new QGroupBox(tr("Create a New Scene"), this);
-  m_recentBox  = new QGroupBox(tr("Open Scene"), this);
+  m_recentBox  = new QGroupBox(tr("Open Scene [Project]"), this);
   m_projectBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   m_nameFld                 = new LineEdit(this);
   m_pathFld                 = new FileField(this);
@@ -409,10 +409,13 @@ void StartupPopup::refreshRecentScenes() {
     int i = 0;
     for (QString name : m_sceneNames) {
       if (i > 9) break;  // box can hold 10 scenes
-      QString justName = QString::fromStdString(TFilePath(name).getName());
+      QString fileName =
+          name.remove(0, name.indexOf(" ") + 1);  // remove "#. " prefix
+      QString projectName = RecentFiles::instance()->getFileProject(fileName);
+      QString justName = QString::fromStdString(TFilePath(fileName).getName()) +
+                         (projectName != "-" ? " [" + projectName + "]" : "");
       m_recentNamesLabels[i] = new StartupLabel(justName, this, i);
-      m_recentNamesLabels[i]->setToolTip(
-          name.remove(0, name.indexOf(" ") + 1));  // remove "#. " prefix
+      m_recentNamesLabels[i]->setToolTip(fileName);
       m_recentSceneLay->addWidget(m_recentNamesLabels[i], 0, Qt::AlignTop);
       i++;
     }
@@ -857,7 +860,20 @@ void StartupPopup::onRecentSceneClicked(int index) {
     refreshRecentScenes();
   } else {
     IoCmd::loadScene(TFilePath(path.toStdWString()), false);
-    RecentFiles::instance()->moveFilePath(index, 0, RecentFiles::Scene);
+    if (RecentFiles::instance()->getFileProject(index) == "-") {
+      QString fileName =
+          RecentFiles::instance()->getFilePath(index, RecentFiles::Scene);
+      QString projectName = QString::fromStdString(TApp::instance()
+                                                       ->getCurrentScene()
+                                                       ->getScene()
+                                                       ->getProject()
+                                                       ->getName()
+                                                       .getName());
+      RecentFiles::instance()->removeFilePath(index, RecentFiles::Scene);
+      RecentFiles::instance()->addFilePath(fileName, RecentFiles::Scene,
+                                           projectName);
+    } else
+      RecentFiles::instance()->moveFilePath(index, 0, RecentFiles::Scene);
     RecentFiles::instance()->refreshRecentFilesMenu(RecentFiles::Scene);
     hide();
   }

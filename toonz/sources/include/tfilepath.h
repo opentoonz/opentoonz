@@ -76,8 +76,10 @@ public:
   const TFrameId &operator--();
 
   TFrameId &operator=(const TFrameId &f) {
-    m_frame  = f.m_frame;
-    m_letter = f.m_letter;
+    m_frame       = f.m_frame;
+    m_letter      = f.m_letter;
+    m_zeroPadding = f.m_zeroPadding;
+    m_startSeqInd = f.m_startSeqInd;
     return *this;
   }
 

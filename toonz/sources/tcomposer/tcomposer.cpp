@@ -103,11 +103,8 @@ namespace {
 //   (es <systemVarPrefix>PROJECTS etc.)
 //
 
-const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.2";
-const char *applicationFullName = "OpenToonz 1.2";
-const char *rootVarName         = "TOONZROOT";
-const char *systemVarPrefix     = "TOONZ";
+const char *rootVarName     = "TOONZROOT";
+const char *systemVarPrefix = "TOONZ";
 
 // TODO: forse anche questo andrebbe in tnzbase
 // ci possono essere altri programmi offline oltre al tcomposer
@@ -603,8 +600,6 @@ int main(int argc, char *argv[]) {
   TThread::init();
 
   // questo definisce la registry root e inizializza TEnv
-  TEnv::setApplication(applicationName, applicationVersion);
-  TEnv::setApplicationFullName(applicationFullName);
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
   TSystem::hasMainLoop(true);

@@ -31,7 +31,6 @@
 
 // tcg includes
 #include "tcg/tcg_function_types.h"
-#include "tcg/tcg_unique_ptr.h"
 
 // Boost includes
 #include <boost/any.hpp>
@@ -1008,7 +1007,7 @@ void ShaderFx::doCompute(TTile &tile, double frame,
   // Calculate input tiles
   ::ContextLocker cLocker(context);
 
-  tcg::unique_ptr<TTile[]> inTiles(
+  std::unique_ptr<TTile[]> inTiles(
       new TTile[pCount]);  // NOTE: Input tiles must be STORED - they cannot
   // be passed immediately to OpenGL, since *other shader
   if (pCount > 0)  // fxs*, with the very same host context, could lie

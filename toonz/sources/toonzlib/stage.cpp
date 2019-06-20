@@ -398,23 +398,45 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
     }
 
     if (m_shiftTraceGhostId != NO_GHOST) {
-      if (m_shiftTraceGhostId != TRACED) player.m_opacity = 127;
-      int opacity                                         = player.m_opacity;
-      player.m_bingoOrder                                 = 10;
-      if (m_onionSkinMask.getShiftTraceStatus() !=
-          OnionSkinMask::ENABLED_WITHOUT_GHOST_MOVEMENTS) {
-        if (m_shiftTraceGhostId == FIRST_GHOST) {
-          player.m_opacity = 30;
+      // if F1, F2 or F3 key is pressed, then draw only the corresponding ghost
+      int flipKey = m_onionSkinMask.getGhostFlipKey();
+      if (Qt::Key_F1 <= flipKey && flipKey <= Qt::Key_F3) {
+        if (m_shiftTraceGhostId == TRACED && flipKey == Qt::Key_F2) {
           players.push_back(player);
-          player.m_opacity = opacity;
+        } else if (m_shiftTraceGhostId == FIRST_GHOST &&
+                   flipKey == Qt::Key_F1) {
           player.m_placement =
               m_onionSkinMask.getShiftTraceGhostAff(0) * player.m_placement;
-        } else if (m_shiftTraceGhostId == SECOND_GHOST) {
-          player.m_opacity = 30;
           players.push_back(player);
-          player.m_opacity = opacity;
+        } else if (m_shiftTraceGhostId == SECOND_GHOST &&
+                   flipKey == Qt::Key_F3) {
           player.m_placement =
               m_onionSkinMask.getShiftTraceGhostAff(1) * player.m_placement;
+          players.push_back(player);
+        }
+        return;
+      }
+
+      else {
+        int opacity         = player.m_opacity;
+        player.m_bingoOrder = 10;
+        if (m_onionSkinMask.getShiftTraceStatus() !=
+            OnionSkinMask::ENABLED_WITHOUT_GHOST_MOVEMENTS) {
+          if (m_shiftTraceGhostId == FIRST_GHOST) {
+            player.m_opacity = 30;
+            players.push_back(player);
+            player.m_opacity           = opacity;
+            player.m_onionSkinDistance = -1;
+            player.m_placement =
+                m_onionSkinMask.getShiftTraceGhostAff(0) * player.m_placement;
+          } else if (m_shiftTraceGhostId == SECOND_GHOST) {
+            player.m_opacity = 30;
+            players.push_back(player);
+            player.m_opacity           = opacity;
+            player.m_onionSkinDistance = 1;
+            player.m_placement =
+                m_onionSkinMask.getShiftTraceGhostAff(1) * player.m_placement;
+          }
         }
       }
     }
@@ -509,37 +531,46 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
     }
   };  // locals
 
-  if (m_onionSkinMask.isShiftTraceEnabled() && col == m_currentColumnIndex) {
-    TXshCell cell = xsh->getCell(row, col);
-    int r         = row - 1;
+  if (m_onionSkinMask.isShiftTraceEnabled()) {
+    if (col == m_currentColumnIndex) {
+      TXshCell cell = xsh->getCell(row, col);
 
-    // r,col can be a hold. find its starting point
-    for (; r - 1 >= 0 && xsh->getCell(r - 1, col) == cell; r--)
-      ;
-    if (cell.isEmpty()) r--;
+      // First Ghost
+      int r;
+      r = row + m_onionSkinMask.getShiftTraceGhostFrameOffset(0);
+      if (r >= 0 && xsh->getCell(r, col) != cell &&
+          (cell.getSimpleLevel() == 0 ||
+           xsh->getCell(r, col).getSimpleLevel() == cell.getSimpleLevel())) {
+        m_shiftTraceGhostId = FIRST_GHOST;
+        addCell(players, scene, xsh, r, col, level);
+      }
 
-    if (r >= 0 &&
-        (cell.getSimpleLevel() == 0 ||
-         xsh->getCell(r, col).getSimpleLevel() == cell.getSimpleLevel())) {
-      m_shiftTraceGhostId = FIRST_GHOST;
-      addCell(players, scene, xsh, r, col, level);
-    }
-
-    TXshCell otherCell;
-    if (cell.getSimpleLevel() != 0) {
-      for (r = row + 1; (otherCell = xsh->getCell(r, col)) == cell; r++)
-        ;
-
-      if (cell.getSimpleLevel() == 0 ||
-          otherCell.getSimpleLevel() == cell.getSimpleLevel()) {
+      r = row + m_onionSkinMask.getShiftTraceGhostFrameOffset(1);
+      if (r >= 0 && xsh->getCell(r, col) != cell &&
+          (cell.getSimpleLevel() == 0 ||
+           xsh->getCell(r, col).getSimpleLevel() == cell.getSimpleLevel())) {
         m_shiftTraceGhostId = SECOND_GHOST;
         addCell(players, scene, xsh, r, col, level);
       }
+
+      // draw current working frame
+      if (!cell.isEmpty()) {
+        m_shiftTraceGhostId = TRACED;
+        addCell(players, scene, xsh, row, col, level);
+        m_shiftTraceGhostId = NO_GHOST;
+      }
     }
-    if (!cell.isEmpty()) {
-      m_shiftTraceGhostId = TRACED;
-      addCell(players, scene, xsh, row, col, level);
-      m_shiftTraceGhostId = NO_GHOST;
+    // flip non-current columns as well
+    else {
+      int flipKey = m_onionSkinMask.getGhostFlipKey();
+      if (flipKey == Qt::Key_F1) {
+        int r = row + m_onionSkinMask.getShiftTraceGhostFrameOffset(0);
+        addCell(players, scene, xsh, r, col, level);
+      } else if (flipKey == Qt::Key_F3) {
+        int r = row + m_onionSkinMask.getShiftTraceGhostFrameOffset(1);
+        addCell(players, scene, xsh, r, col, level);
+      } else
+        addCell(players, scene, xsh, row, col, level);
     }
   } else if (locals::doStandardOnionSkin(this, xsh, level, col)) {
     std::vector<int> rows;
@@ -632,10 +663,74 @@ void StageBuilder::addFrame(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
 void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
                                        TXshSimpleLevel *level,
                                        const TFrameId &fid) {
+  auto addGhost = [&](int ghostIndex, int ghostRow, bool fullOpac = false) {
+    const TFrameId &ghostFid = level->index2fid(ghostRow);
+
+    Player player;
+    player.m_sl                     = level;
+    player.m_frame                  = level->guessIndex(ghostFid);
+    player.m_fid                    = ghostFid;
+    player.m_isCurrentColumn        = true;
+    player.m_isCurrentXsheetLevel   = true;
+    player.m_isEditingLevel         = true;
+    player.m_currentFrameId         = m_currentFrameId;
+    player.m_isGuidedDrawingEnabled = m_isGuidedDrawingEnabled;
+    player.m_isVisibleinOSM         = ghostRow >= 0;
+    player.m_onionSkinDistance      = m_onionSkinDistance;
+    player.m_dpiAff                 = getDpiAffine(level, ghostFid);
+    player.m_ancestorColumnIndex    = -1;
+
+    if (fullOpac) {
+      player.m_placement = m_onionSkinMask.getShiftTraceGhostAff(ghostIndex) *
+                           player.m_placement;
+      players.push_back(player);
+      return;
+    }
+
+    int opacity         = player.m_opacity;
+    player.m_bingoOrder = 10;
+    if (m_onionSkinMask.getShiftTraceStatus() !=
+        OnionSkinMask::ENABLED_WITHOUT_GHOST_MOVEMENTS) {
+      player.m_opacity = 30;
+      players.push_back(player);
+      player.m_opacity           = opacity;
+      player.m_onionSkinDistance = (ghostIndex == 0) ? -1 : 1;
+      player.m_placement = m_onionSkinMask.getShiftTraceGhostAff(ghostIndex) *
+                           player.m_placement;
+    }
+    players.push_back(player);
+  };
+
   int index = -1;
 
   int row = level->guessIndex(fid);
-  if (!m_onionSkinMask.isEmpty() && m_onionSkinMask.isEnabled()) {
+
+  // Shift & Trace
+  if (m_onionSkinMask.isShiftTraceEnabled()) {
+    int previousOffset = m_onionSkinMask.getShiftTraceGhostFrameOffset(0);
+    int forwardOffset  = m_onionSkinMask.getShiftTraceGhostFrameOffset(1);
+
+    // If F1, F2 or F3 key is pressed, then only
+    // display the corresponding ghost
+    int flipKey = m_onionSkinMask.getGhostFlipKey();
+    if (Qt::Key_F1 <= flipKey && flipKey <= Qt::Key_F3) {
+      if (flipKey == Qt::Key_F1 && previousOffset != 0) {
+        addGhost(0, row + previousOffset, true);
+        return;
+      } else if (flipKey == Qt::Key_F3 && forwardOffset != 0) {
+        addGhost(1, row + forwardOffset, true);
+        return;
+      }
+    }
+
+    else {
+      // draw the first ghost
+      if (previousOffset != 0) addGhost(0, row + previousOffset);
+      if (forwardOffset != 0) addGhost(1, row + forwardOffset);
+    }
+  }
+  // Onion Skin
+  else if (!m_onionSkinMask.isEmpty() && m_onionSkinMask.isEnabled()) {
     std::vector<int> rows;
     m_onionSkinMask.getAll(row, rows);
 
@@ -747,10 +842,11 @@ void Stage::visit(Visitor &visitor, const VisitArgs &args) {
   sb.m_onionSkinMask          = *osm;
   sb.m_currentFrameId         = args.m_currentFrameId;
   sb.m_isGuidedDrawingEnabled = args.m_isGuidedDrawingEnabled;
-  Player::m_onionSkinFrontSize  = 0;
-  Player::m_onionSkinBackSize   = 0;
-  Player::m_firstBackOnionSkin  = 0;
-  Player::m_lastBackVisibleSkin = 0;
+  Player::m_onionSkinFrontSize     = 0;
+  Player::m_onionSkinBackSize      = 0;
+  Player::m_firstBackOnionSkin     = 0;
+  Player::m_lastBackVisibleSkin    = 0;
+  Player::m_isShiftAndTraceEnabled = osm->isShiftTraceEnabled();
   sb.addFrame(sb.m_players, scene, xsh, row, 0, args.m_onlyVisible,
               args.m_checkPreviewVisibility);
 
@@ -782,14 +878,15 @@ void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
                   const OnionSkinMask &osm, bool isPlaying,
                   int isGuidedDrawingEnabled) {
   StageBuilder sb;
-  sb.m_vs                       = &visitor.m_vs;
-  sb.m_onionSkinMask            = osm;
-  sb.m_currentFrameId           = fid;
-  sb.m_isGuidedDrawingEnabled   = isGuidedDrawingEnabled;
-  Player::m_onionSkinFrontSize  = 0;
-  Player::m_onionSkinBackSize   = 0;
-  Player::m_firstBackOnionSkin  = 0;
-  Player::m_lastBackVisibleSkin = 0;
+  sb.m_vs                          = &visitor.m_vs;
+  sb.m_onionSkinMask               = osm;
+  sb.m_currentFrameId              = fid;
+  sb.m_isGuidedDrawingEnabled      = isGuidedDrawingEnabled;
+  Player::m_onionSkinFrontSize     = 0;
+  Player::m_onionSkinBackSize      = 0;
+  Player::m_firstBackOnionSkin     = 0;
+  Player::m_lastBackVisibleSkin    = 0;
+  Player::m_isShiftAndTraceEnabled = osm.isShiftTraceEnabled();
   sb.addSimpleLevelFrame(sb.m_players, level, fid);
   updateOnionSkinSize(sb.m_players);
   sb.visit(sb.m_players, visitor, isPlaying);

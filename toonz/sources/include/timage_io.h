@@ -205,6 +205,10 @@ typedef TImageWriter *TImageWriterCreateProc(const TFilePath &path);
 class DVAPI TImageWriter : public TSmartObject {
   DECLARE_CLASS_CODE
 
+  // Background color for saving transparent pixel to the format not
+  // supporting alpha channel. Specified in the preferences.
+  static TPixel32 m_backgroundColor;
+
 protected:
   // std::fstream m_stream;
   TFilePath m_path;
@@ -237,6 +241,9 @@ public:
 
   static void define(QString extension, TImageWriterCreateProc *proc,
                      bool isRenderFormat);
+
+  static void setBackgroundColor(TPixel32 color);
+  static TPixel32 getBackgroundColor();
 };
 
 //-----------------------------------------------------------

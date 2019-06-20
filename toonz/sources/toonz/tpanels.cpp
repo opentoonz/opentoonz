@@ -101,6 +101,21 @@ public:
 } xsheetViewerFactory;
 
 //=============================================================================
+// XsheetViewer - Timeline mode
+//-----------------------------------------------------------------------------
+
+class TimelineViewerFactory final : public TPanelFactory {
+public:
+  TimelineViewerFactory() : TPanelFactory("Timeline") {}
+  void initialize(TPanel *panel) override {
+    panel->setWidget(new XsheetViewer(panel));
+    XsheetViewer *xsh = (XsheetViewer *)panel->widget();
+    xsh->flipOrientation();
+    panel->resize(500, 300);
+  }
+} timelineViewerFactory;
+
+//=============================================================================
 // SchematicSceneViewer
 //-----------------------------------------------------------------------------
 
@@ -611,6 +626,17 @@ void StudioPaletteViewerPanel::onPaletteSwitched() {
       m_studioPaletteHandle);
 }
 
+//-----------------------------------------------------------------------------
+
+void StudioPaletteViewerPanel::setViewType(int viewType) {
+  m_studioPaletteViewer->setViewMode(viewType);
+}
+//-----------------------------------------------------------------------------
+
+int StudioPaletteViewerPanel::getViewType() {
+  return m_studioPaletteViewer->getViewMode();
+}
+
 //=============================================================================
 // StudioPaletteViewerFactory
 //-----------------------------------------------------------------------------
@@ -962,7 +988,7 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
       new TPanelTitleBarButtonForSafeArea(
           titleBar, ":Resources/pane_safe_off.svg",
           ":Resources/pane_safe_over.svg", ":Resources/pane_safe_on.svg");
-  safeAreaButton->setToolTip("Safe Area (Right Click to Select)");
+  safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
                        CommandManager::instance()->getAction(MI_SafeArea),
@@ -979,7 +1005,7 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   m_button = new TPanelTitleBarButton(titleBar, ":Resources/pane_minimize.svg",
                                       ":Resources/pane_minimize_over.svg",
                                       ":Resources/pane_minimize_on.svg");
-  m_button->setToolTip("Minimize");
+  m_button->setToolTip(tr("Minimize"));
   m_button->setPressed(false);
 
   titleBar->add(QPoint(x, 1), m_button);
@@ -1249,21 +1275,43 @@ OpenFloatingPanel openLineTestCaptureCommand(MI_OpenLineTestCapture,
 // ComboViewer : Viewer + Toolbar + Tool Options
 //-----------------------------------------------------------------------------
 
+ComboViewerPanelContainer::ComboViewerPanelContainer(QWidget *parent)
+    : StyleShortcutSwitchablePanel(parent) {
+  m_comboViewer = new ComboViewerPanel(parent);
+  setFocusProxy(m_comboViewer);
+  setWidget(m_comboViewer);
+
+  m_comboViewer->initializeTitleBar(getTitleBar());
+  bool ret = connect(m_comboViewer->getToolOptions(), SIGNAL(newPanelCreated()),
+                     this, SLOT(updateTabFocus()));
+  assert(ret);
+}
+// reimplementation of TPanel::widgetInThisPanelIsFocused
+bool ComboViewerPanelContainer::widgetInThisPanelIsFocused() {
+  return m_comboViewer->hasFocus();
+}
+// reimplementation of TPanel::widgetFocusOnEnter
+void ComboViewerPanelContainer::widgetFocusOnEnter() {
+  m_comboViewer->onEnterPanel();
+}
+void ComboViewerPanelContainer::widgetClearFocusOnLeave() {
+  m_comboViewer->onLeavePanel();
+}
+
+//-----------------------------------------------------------------------------
+
 class ComboViewerFactory final : public TPanelFactory {
 public:
   ComboViewerFactory() : TPanelFactory("ComboViewer") {}
   TPanel *createPanel(QWidget *parent) override {
-    ComboViewerPanel *panel = new ComboViewerPanel(parent);
+    ComboViewerPanelContainer *panel = new ComboViewerPanelContainer(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Combo Viewer"));
     panel->resize(700, 600);
     return panel;
   }
-  void initialize(TPanel *panel) override {
-    assert(0);
-    panel->setWidget(new ComboViewerPanel(panel));
-  }
-} ghibliViewerFactory;
+  void initialize(TPanel *panel) override { assert(0); }
+} comboViewerFactory;
 
 //=============================================================================
 OpenFloatingPanel openComboViewerCommand(MI_OpenComboViewer, "ComboViewer",
@@ -1302,6 +1350,7 @@ public:
   void initialize(TPanel *panel) override {
     HistoryPane *historyPane = new HistoryPane(panel);
     panel->setWidget(historyPane);
+    panel->setWindowTitle(QObject::tr("History"));
     panel->setIsMaximizable(false);
   }
 } historyPanelFactory;

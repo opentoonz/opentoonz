@@ -15,6 +15,7 @@
 #include <QButtonGroup>
 #include <QRadioButton>
 #include <QPushButton>
+#include <QTextEdit>
 
 #include "tgeometry.h"
 #include "tparam.h"
@@ -40,6 +41,7 @@ class QString;
 class QComboBox;
 class QHBoxLayout;
 class TFxHandle;
+class QFontComboBox;
 
 namespace DVGui {
 class LineEdit;
@@ -501,11 +503,28 @@ protected slots:
 // StringParamField
 //-----------------------------------------------------------------------------
 
+namespace component {
+class MyTextEdit : public QTextEdit {
+  Q_OBJECT
+public:
+  MyTextEdit(const QString &text, QWidget *parent = Q_NULLPTR)
+      : QTextEdit(text, parent) {}
+
+protected:
+  void keyPressEvent(QKeyEvent *event) override;
+  void focusOutEvent(QFocusEvent *e) override;
+
+signals:
+  void edited();
+};
+};
+
 class DVAPI StringParamField final : public ParamField {
   Q_OBJECT
 
   TStringParamP m_currentParam, m_actualParam;
-  DVGui::LineEdit *m_textFld;
+  DVGui::LineEdit *m_textFld            = nullptr;
+  component::MyTextEdit *m_multiTextFld = nullptr;
 
 public:
   StringParamField(QWidget *parent, QString name, const TStringParamP &param);
@@ -514,8 +533,41 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(100, 20); }
+  QSize getPreferedSize() override {
+    if (m_textFld)
+      return QSize(100, 20);
+    else
+      return QSize(100, 80);
+  }
 protected slots:
+  void onChange();
+};
+
+//=============================================================================
+// FontParamField
+//-----------------------------------------------------------------------------
+
+class FontParamField final : public ParamField {
+  Q_OBJECT
+
+  TFontParamP m_currentParam, m_actualParam;
+
+  QFontComboBox *m_fontCombo;
+  QComboBox *m_styleCombo;
+  DVGui::IntField *m_sizeField;
+
+public:
+  FontParamField(QWidget *parent, QString name, const TFontParamP &param);
+
+  void setParam(const TParamP &current, const TParamP &actual,
+                int frame) override;
+  void update(int frame) override;
+
+  QSize getPreferedSize() override { return QSize(150, 20); }
+
+protected slots:
+  void findStyles(const QFont &font);
+  void onSizeChange(bool);
   void onChange();
 };
 

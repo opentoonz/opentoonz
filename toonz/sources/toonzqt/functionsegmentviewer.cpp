@@ -20,7 +20,6 @@
 
 // TnzBase includes
 #include "tdoubleparam.h"
-#include "tdoublekeyframe.h"
 #include "texpression.h"
 #include "tunit.h"
 
@@ -657,127 +656,123 @@ bool FunctionExpressionSegmentPage::getGuiValues(std::string &expressionText,
 
 //=============================================================================
 
-class FileSegmentPage final : public FunctionSegmentPage {
-  DVGui::FileField *m_fileFld;
-  LineEdit *m_fieldIndexFld;
-  LineEdit *m_measureFld;
+FileSegmentPage::FileSegmentPage(FunctionSegmentViewer *parent)
+    : FunctionSegmentPage(parent) {
+  // Force decoding the path since the file interporation
+  // currently accepts only absolute paths.
+  m_fileFld = new DVGui::FileField(this, QString(), false, false, false);
+  m_fileFld->setFileMode(QFileDialog::ExistingFile);
+  QStringList filters;
+  filters.append("dat");
+  filters.append("txt");
+  m_fileFld->setFilters(filters);
 
-public:
-  FileSegmentPage(FunctionSegmentViewer *parent = 0)
-      : FunctionSegmentPage(parent) {
-    m_fileFld = new DVGui::FileField(this);
-    m_fileFld->setFileMode(QFileDialog::ExistingFile);
-    QStringList filters;
-    filters.append("dat");
-    filters.append("txt");
-    m_fileFld->setFilters(filters);
+  m_fieldIndexFld             = new LineEdit(this);
+  QIntValidator *intValidator = new QIntValidator(1, 100, this);
+  m_fieldIndexFld->setValidator(intValidator);
 
-    m_fieldIndexFld             = new LineEdit(this);
-    QIntValidator *intValidator = new QIntValidator(1, 100, this);
-    m_fieldIndexFld->setValidator(intValidator);
+  m_measureFld = new LineEdit(this);
+  m_measureFld->setText("inch");
 
-    m_measureFld = new LineEdit(this);
-    m_measureFld->setText("inch");
+  //----layout
+  QVBoxLayout *mainLayout = new QVBoxLayout();
+  mainLayout->setSpacing(5);
+  mainLayout->setMargin(2);
+  {
+    mainLayout->addWidget(new QLabel(tr("File Path:")), 0);
+    mainLayout->addWidget(m_fileFld);
 
-    //----layout
-    QVBoxLayout *mainLayout = new QVBoxLayout();
-    mainLayout->setSpacing(5);
-    mainLayout->setMargin(2);
+    QGridLayout *bottomLay = new QGridLayout();
+    bottomLay->setSpacing(5);
+    bottomLay->setMargin(0);
     {
-      mainLayout->addWidget(new QLabel(tr("File Path:")), 0);
-      mainLayout->addWidget(m_fileFld);
-
-      QGridLayout *bottomLay = new QGridLayout();
-      bottomLay->setSpacing(5);
-      bottomLay->setMargin(0);
-      {
-        bottomLay->addWidget(new QLabel(tr("Column:")), 0, 0,
-                             Qt::AlignRight | Qt::AlignVCenter);
-        bottomLay->addWidget(m_fieldIndexFld, 0, 1);
-        bottomLay->addWidget(new QLabel(tr("Unit:")), 1, 0,
-                             Qt::AlignRight | Qt::AlignVCenter);
-        bottomLay->addWidget(m_measureFld, 1, 1);
-      }
-      bottomLay->setColumnStretch(0, 0);
-      bottomLay->setColumnStretch(1, 1);
-      mainLayout->addLayout(bottomLay);
+      bottomLay->addWidget(new QLabel(tr("Column:")), 0, 0,
+                           Qt::AlignRight | Qt::AlignVCenter);
+      bottomLay->addWidget(m_fieldIndexFld, 0, 1);
+      bottomLay->addWidget(new QLabel(tr("Unit:")), 1, 0,
+                           Qt::AlignRight | Qt::AlignVCenter);
+      bottomLay->addWidget(m_measureFld, 1, 1);
     }
-    setLayout(mainLayout);
+    bottomLay->setColumnStretch(0, 0);
+    bottomLay->setColumnStretch(1, 1);
+    mainLayout->addLayout(bottomLay);
   }
-  void refresh() override {
-    TDoubleKeyframe kf;
-    TDoubleParam *curve = getCurve();
-    if (curve) kf       = curve->getKeyframeAt(getR0());
-    if (curve && kf.m_isKeyframe) {
-      TFilePath path;
-      int fieldIndex       = 0;
-      std::string unitName = "";
-      if (kf.m_type == TDoubleKeyframe::File) {
-        path                           = kf.m_fileParams.m_path;
-        fieldIndex                     = kf.m_fileParams.m_fieldIndex;
-        if (fieldIndex < 0) fieldIndex = 0;
-        unitName                       = kf.m_unitName;
-        if (unitName == "") {
-          TMeasure *measure = curve->getMeasure();
-          if (measure) {
-            const TUnit *unit  = measure->getCurrentUnit();
-            if (unit) unitName = ::to_string(unit->getDefaultExtension());
-          }
+  setLayout(mainLayout);
+}
+
+void FileSegmentPage::refresh() {
+  TDoubleKeyframe kf;
+  TDoubleParam *curve = getCurve();
+  if (curve) kf       = curve->getKeyframeAt(getR0());
+  if (curve && kf.m_isKeyframe) {
+    TFilePath path;
+    int fieldIndex       = 0;
+    std::string unitName = "";
+    if (kf.m_type == TDoubleKeyframe::File) {
+      path                           = kf.m_fileParams.m_path;
+      fieldIndex                     = kf.m_fileParams.m_fieldIndex;
+      if (fieldIndex < 0) fieldIndex = 0;
+      unitName                       = kf.m_unitName;
+      if (unitName == "") {
+        TMeasure *measure = curve->getMeasure();
+        if (measure) {
+          const TUnit *unit  = measure->getCurrentUnit();
+          if (unit) unitName = ::to_string(unit->getDefaultExtension());
         }
       }
-      m_fileFld->setPath(QString::fromStdWString(path.getWideString()));
-      m_fieldIndexFld->setText(QString::number(fieldIndex + 1));
-      m_measureFld->setText(QString::fromStdString(unitName));
     }
-  }
-
-  void init(int segmentLength) override {
-    TDoubleParam *curve = getCurve();
-    if (!curve) return;
-
-    TMeasure *measure    = curve->getMeasure();
-    std::string unitName = "";
-    if (measure) {
-      const TUnit *unit  = measure->getCurrentUnit();
-      if (unit) unitName = ::to_string(unit->getDefaultExtension());
-    }
+    m_fileFld->setPath(QString::fromStdWString(path.getWideString()));
+    m_fieldIndexFld->setText(QString::number(fieldIndex + 1));
     m_measureFld->setText(QString::fromStdString(unitName));
-
-    m_fileFld->setPath("");
-    m_fieldIndexFld->setText("");
   }
+}
 
-  void apply() override {
-    TDoubleParam *curve = getCurve();
-    if (!curve) return;
-    int kIndex = getViewer()->getSegmentIndex();
-    if (kIndex < 0) return;
+void FileSegmentPage::init(int segmentLength) {
+  TDoubleParam *curve = getCurve();
+  if (!curve) return;
 
-    QString stringPath = m_fileFld->getPath();
-    if (stringPath == "") return;
-    stringPath.replace("\\", "\\\\");
-
-    TDoubleKeyframe::FileParams fileParams;
-
-    fileParams.m_path       = TFilePath(stringPath.toStdWString());
-    fileParams.m_fieldIndex = qMax(0, m_fieldIndexFld->text().toInt() - 1);
-    std::string unitName    = m_measureFld->text().toStdString();
-
-    KeyframeSetter setter(curve, kIndex);
-    setter.setFile(fileParams);
-    setter.setUnitName(unitName);
+  TMeasure *measure    = curve->getMeasure();
+  std::string unitName = "";
+  if (measure) {
+    const TUnit *unit  = measure->getCurrentUnit();
+    if (unit) unitName = ::to_string(unit->getDefaultExtension());
   }
+  m_measureFld->setText(QString::fromStdString(unitName));
 
-  void getGuiValues(TDoubleKeyframe::FileParams &fileParam,
-                    std::string &unitName) {
-    QString stringPath = m_fileFld->getPath();
-    stringPath.replace("\\", "\\\\");
-    fileParam.m_path       = TFilePath(stringPath.toStdWString());
-    fileParam.m_fieldIndex = qMax(0, m_fieldIndexFld->text().toInt() - 1);
+  m_fileFld->setPath("");
+  m_fieldIndexFld->setText("");
+}
 
-    unitName = m_measureFld->text().toStdString();
-  }
-};
+void FileSegmentPage::apply() {
+  TDoubleParam *curve = getCurve();
+  if (!curve) return;
+  int kIndex = getViewer()->getSegmentIndex();
+  if (kIndex < 0) return;
+
+  QString stringPath = m_fileFld->getPath();
+  if (stringPath == "") return;
+  stringPath.replace("\\", "\\\\");
+
+  TDoubleKeyframe::FileParams fileParams;
+
+  fileParams.m_path       = TFilePath(stringPath.toStdWString());
+  fileParams.m_fieldIndex = qMax(0, m_fieldIndexFld->text().toInt() - 1);
+  std::string unitName    = m_measureFld->text().toStdString();
+
+  KeyframeSetter setter(curve, kIndex);
+  setter.setFile(fileParams);
+  setter.setUnitName(unitName);
+}
+
+void FileSegmentPage::getGuiValues(TDoubleKeyframe::FileParams &fileParam,
+                                   std::string &unitName) {
+  QString stringPath = m_fileFld->getPath();
+  stringPath.replace("\\", "\\\\");
+  fileParam.m_path       = TFilePath(stringPath.toStdWString());
+  fileParam.m_fieldIndex = qMax(0, m_fieldIndexFld->text().toInt() - 1);
+
+  unitName = m_measureFld->text().toStdString();
+}
 
 //=============================================================================
 

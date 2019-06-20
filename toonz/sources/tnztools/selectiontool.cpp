@@ -117,7 +117,7 @@ FourPoints DragSelectionTool::FourPoints::orderedPoints() const {
   int index = tminPoint(allPoints[minXindex1], points[minXindex2], false);
   TPointD newPoint1 = allPoints[minXindex1];
   TPointD newPoint2 = points[minXindex2];
-  if (index == 1) tswap(newPoint1, newPoint2);
+  if (index == 1) std::swap(newPoint1, newPoint2);
   newPoints.setP00(newPoint1);
   newPoints.setP01(newPoint2);
 
@@ -732,7 +732,7 @@ TPointD DragSelectionTool::Scale::getNewCenter(int index, const FourPoints bbox,
         m_deformTool->getNextPointIndex(m_deformTool->getNextPointIndex(index));
     yIndex = index;
   }
-  if (index % 2 == 1) tswap(xIndex, yIndex);
+  if (index % 2 == 1) std::swap(xIndex, yIndex);
   FourPoints xBbox = bboxScale(xIndex, bbox, m_startCenter);
   TPointD xCenter  = getScaledPoint(
       xIndex, xBbox, scaleValue,

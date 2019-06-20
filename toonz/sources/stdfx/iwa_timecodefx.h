@@ -31,7 +31,7 @@ public:
   void putTimeCodeImage(const RASTER srcRas, TPoint &pos, QImage &img);
 
 public:
-  enum { TYPE_HHMMSSFF, TYPE_FRAME };
+  enum { TYPE_HHMMSSFF, TYPE_FRAME, TYPE_HHMMSSFF2 };
 
   Iwa_TimeCodeFx();
 

@@ -217,8 +217,8 @@ return;
   int y2 = s.second.y;
 
   if (x1 > x2) {
-    tswap(x1, x2);
-    tswap(y1, y2);
+    std::swap(x1, x2);
+    std::swap(y1, y2);
   }
 
   buf += y1 * wrap + x1;

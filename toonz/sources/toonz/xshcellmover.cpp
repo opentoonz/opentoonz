@@ -17,7 +17,6 @@
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/selection.h"
 #include "toonzqt/stageobjectsdata.h"
-#include "toonzqt/selection.h"
 #include "historytypes.h"
 
 // TnzLib includes
@@ -379,7 +378,8 @@ bool LevelMoverTool::isTotallyEmptyColumn(int col) const {
   TXshColumn *column = xsh->getColumn(col);
   if (!column) return true;
   if (!column->isEmpty()) return false;
-  if (column->getFx()->getOutputConnectionCount() != 0) return false;
+  TFx *fx = column->getFx();
+  if (fx && fx->getOutputConnectionCount() != 0) return false;
   // bisogna controllare lo stage object
   return true;
 }

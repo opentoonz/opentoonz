@@ -6,6 +6,8 @@
 #include "tiio.h"
 #include "tproperty.h"
 
+#include <QCoreApplication>
+
 extern "C" {
 #define XMD_H
 #include "jpeglib.h"
@@ -49,6 +51,8 @@ DVAPI Tiio::ReaderMaker makeJpgReader;
 DVAPI Tiio::WriterMaker makeJpgWriter;
 
 class DVAPI JpgWriterProperties final : public TPropertyGroup {
+  Q_DECLARE_TR_FUNCTIONS(JpgWriterProperties)
+
 public:
   TIntProperty m_quality;
   TIntProperty m_smoothing;
@@ -60,6 +64,8 @@ public:
     bind(m_quality);
     bind(m_smoothing);
   }
+
+  void updateTranslation() override;
 };
 
 }  // namespace

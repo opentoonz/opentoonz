@@ -2329,8 +2329,8 @@ VIStroke *TVectorImage::joinStroke(int index1, int index2, int cpIndex1,
 
   if (index1 > index2) {
     finalStyle = getStroke(index1)->getStyle();
-    tswap(index1, index2);
-    tswap(cpIndex1, cpIndex2);
+    std::swap(index1, index2);
+    std::swap(cpIndex1, cpIndex2);
   }
   /*
 if (index1==index2) //selfLoop!

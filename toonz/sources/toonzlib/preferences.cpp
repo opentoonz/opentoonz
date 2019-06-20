@@ -19,6 +19,7 @@
 #include "tundo.h"
 #include "tbigmemorymanager.h"
 #include "tfilepath.h"
+#include "timage_io.h"
 
 // Qt includes
 #include <QSettings>
@@ -231,6 +232,7 @@ Preferences::Preferences()
 #else
     , m_interfaceFont("Helvetica")
 #endif
+    , m_interfaceFontStyle("Regular")
     , m_interfaceFontWeight(0)
     , m_defLevelWidth(0.0)
     , m_defLevelHeight(0.0)
@@ -341,7 +343,11 @@ Preferences::Preferences()
     , m_enableAutoStretch(true)
     , m_cursorBrushType("Small")
     , m_cursorBrushStyle("Default")
-    , m_cursorOutlineEnabled(true) {
+    , m_cursorOutlineEnabled(true)
+    , m_currentColumnColor(TPixel::Black)
+    , m_enableWinInk(false)
+    , m_useOnionColorsForShiftAndTraceGhosts(false)
+    , m_rasterBackgroundColor(TPixel::White) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -617,6 +623,8 @@ Preferences::Preferences()
            m_moveCurrentFrameByClickCellArea);
   getValue(*m_settings, "onionSkinEnabled", m_onionSkinEnabled);
   getValue(*m_settings, "onionSkinDuringPlayback", m_onionSkinDuringPlayback);
+  getValue(*m_settings, "useOnionColorsForShiftAndTraceGhosts",
+           m_useOnionColorsForShiftAndTraceGhosts);
   getValue(*m_settings, "multiLayerStylePickerEnabled",
            m_multiLayerStylePickerEnabled);
   getValue(*m_settings, "showKeyframesOnXsheetCellArea",
@@ -634,6 +642,10 @@ Preferences::Preferences()
   QString interfaceFont = m_settings->value("interfaceFont").toString();
   if (interfaceFont != "") m_interfaceFont = interfaceFont;
   setInterfaceFont(m_interfaceFont.toStdString());
+  QString interfaceFontStyle =
+      m_settings->value("interfaceFontStyle").toString();
+  if (interfaceFontStyle != "") m_interfaceFontStyle = interfaceFontStyle;
+  setInterfaceFontStyle(m_interfaceFontStyle.toStdString());
   getValue(*m_settings, "interfaceFontWeight", m_interfaceFontWeight);
   getValue(*m_settings, "useNumpadForSwitchingStyles",
            m_useNumpadForSwitchingStyles);
@@ -703,6 +715,17 @@ Preferences::Preferences()
   setCursorBrushStyle(m_cursorBrushStyle.toStdString());
 
   getValue(*m_settings, "cursorOutlineEnabled", m_cursorOutlineEnabled);
+
+  r = 255, g = 255, b = 0;
+  getValue(*m_settings, "currentColumnColor.r", r);
+  getValue(*m_settings, "currentColumnColor.g", g);
+  getValue(*m_settings, "currentColumnColor.b", b);
+  m_currentColumnColor = TPixel32(r, g, b);
+
+  getValue(*m_settings, "winInkEnabled", m_enableWinInk);
+
+  getValue(*m_settings, "rasterBackgroundColor", m_rasterBackgroundColor);
+  TImageWriter::setBackgroundColor(m_rasterBackgroundColor);
 }
 
 //-----------------------------------------------------------------
@@ -1092,6 +1115,13 @@ void Preferences::setOnionSkinDuringPlayback(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::useOnionColorsForShiftAndTraceGhosts(bool on) {
+  m_useOnionColorsForShiftAndTraceGhosts = on;
+  m_settings->setValue("useOnionColorsForShiftAndTraceGhosts", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::setShow0ThickLines(bool on) {
   m_show0ThickLines = on;
   m_settings->setValue(s_show0ThickLines, s_bool[on]);
@@ -1308,6 +1338,13 @@ QString Preferences::getCurrentStyleSheetName() const {
 void Preferences::setInterfaceFont(std::string font) {
   m_interfaceFont = QString::fromStdString(font);
   m_settings->setValue("interfaceFont", m_interfaceFont);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setInterfaceFontStyle(std::string style) {
+  m_interfaceFontStyle = QString::fromStdString(style);
+  m_settings->setValue("interfaceFontStyle", m_interfaceFontStyle);
 }
 
 //-----------------------------------------------------------------
@@ -1566,7 +1603,7 @@ void Preferences::setGuidedDrawing(int status) {
 
 void Preferences::setAnimatedGuidedDrawing(bool status) {
   m_animatedGuidedDrawing = status;
-  m_settings->setValue("animatedGuidedDrawing", status);
+  m_settings->setValue("animatedGuidedDrawing", status ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
@@ -1707,4 +1744,32 @@ void Preferences::setCursorBrushStyle(std::string brushStyle) {
 void Preferences::enableCursorOutline(bool on) {
   m_cursorOutlineEnabled = on;
   m_settings->setValue("cursorOutlineEnabled", on ? "1" : "0");
+}
+
+void Preferences::setCurrentColumnData(const TPixel &currentColumnColor) {
+  m_currentColumnColor = currentColumnColor;
+  m_settings->setValue("currentColumnColor.r",
+                       QString::number(currentColumnColor.r));
+  m_settings->setValue("currentColumnColor.g",
+                       QString::number(currentColumnColor.g));
+  m_settings->setValue("currentColumnColor.b",
+                       QString::number(currentColumnColor.b));
+}
+
+void Preferences::enableWinInk(bool on) {
+  m_enableWinInk = on;
+  m_settings->setValue("winInkEnabled", on ? "1" : "0");
+}
+
+void Preferences::setRasterBackgroundColor(const TPixel32 &color) {
+  m_rasterBackgroundColor = color;
+  TImageWriter::setBackgroundColor(m_rasterBackgroundColor);
+  m_settings->setValue("rasterBackgroundColor_R",
+                       QString::number((int)color.r));
+  m_settings->setValue("rasterBackgroundColor_G",
+                       QString::number((int)color.g));
+  m_settings->setValue("rasterBackgroundColor_B",
+                       QString::number((int)color.b));
+  m_settings->setValue("rasterBackgroundColor_M",
+                       QString::number((int)color.m));
 }

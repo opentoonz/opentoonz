@@ -17,14 +17,9 @@ fare resize e realloc size dello stack a 65000 unita'
 
 */
 
-#if defined(MACOSX) || defined(LINUX)
-#define TRUE 1
-#define FALSE 0
-#endif
-
 #define SECURITY_MARGIN_MM 4.0
 
-static int Debug_flag = FALSE;
+static bool Debug_flag = false;
 
 /*===========================================================================*/
 /*
@@ -38,7 +33,7 @@ static int Debug_flag = FALSE;
 #define AUTOAL_WHITE_COLS 2
 #define AUTOAL_THRESHOLD 160
 
-static int autoalign_gr8(UCHAR *buffer_gr8, int wrap, int lx, int ly,
+static bool autoalign_gr8(UCHAR *buffer_gr8, int wrap, int lx, int ly,
                          int pix_origin, int dpix_dx, int dpix_dy,
                          int strip_width) {
   int first_x[2], dx_dcol[2], target[2];
@@ -83,7 +78,7 @@ static int autoalign_gr8(UCHAR *buffer_gr8, int wrap, int lx, int ly,
       }
     }
   }
-  return FALSE;
+  return false;
 
 found:
 
@@ -127,12 +122,12 @@ found:
       }
     }
   }
-  return TRUE;
+  return true;
 }
 
 /*---------------------------------------------------------------------------*/
 
-static int autoalign_rgb(TPixel32 *buffer_rgb, int wrap, int lx, int ly,
+static bool autoalign_rgb(TPixel32 *buffer_rgb, int wrap, int lx, int ly,
                          int pix_origin, int dpix_dx, int dpix_dy,
                          int strip_width) {
   int first_x[2], dx_dcol[2], target[2];
@@ -177,7 +172,7 @@ static int autoalign_rgb(TPixel32 *buffer_rgb, int wrap, int lx, int ly,
       }
     }
   }
-  return FALSE;
+  return false;
 
 found:
 
@@ -225,12 +220,12 @@ found:
       }
     }
   }
-  return TRUE;
+  return true;
 }
 
 /*---------------------------------------------------------------------------*/
 
-int do_autoalign(const TRasterImageP &image) {
+bool do_autoalign(const TRasterImageP &image) {
   int wrap, lx, ly, mx, my;
   int pix_origin, dpix_dx, dpix_dy;
   int strip_width;
@@ -260,7 +255,7 @@ int do_autoalign(const TRasterImageP &image) {
   TRasterGR8P ras8(ras);
   TRaster32P ras32(ras);
   ras->lock();
-  int ret = FALSE;
+  bool ret = false;
 
   if (ras8)
     ret = autoalign_gr8(ras8->getRawData(), wrap, lx, ly, pix_origin, dpix_dx,
@@ -274,7 +269,7 @@ int do_autoalign(const TRasterImageP &image) {
 
   ras->unlock();
 
-  return FALSE;
+  return false;
 }
 
 /*===========================================================================*/
@@ -369,7 +364,7 @@ static int Xmin, Xmax, Ymin, Ymax, Npix;
 #ifdef RECURSIVE_VERSION
 static int Level, Max_level;
 #endif
-static int Very_black_found;
+static bool Very_black_found;
 
 #ifdef DAFARE
 #ifdef RECURSIVE_VERSION
@@ -401,7 +396,7 @@ visit_bw(int i, int j, int x, int y, int bit, UCHAR *byte),
 //! The found pegs are in array dots. The function checks, which of those best
 //! fits the reference in
 //! reference. The three best matching dots are returned in parameters i, j, k.
-static int compare_dots(DOT const dots[], int ndots, DOT reference[],
+static bool compare_dots(DOT const dots[], int ndots, DOT reference[],
                         int ref_dot, int &i, int &j, int &k);
 
 #define REVERSE(byte, bit)                                                     \
@@ -429,7 +424,7 @@ static int Stack_size       = 0;
     Stack_alloc_size = 65500;                                                  \
     Stack_size       = 0;                                                      \
     Stack = (STACK_INFO *)malloc(Stack_alloc_size * sizeof(STACK_INFO));       \
-    if (!Stack) return FALSE;                                                  \
+    if (!Stack) return false;                                                  \
   }
 
 #define DESTROY_STACK                                                          \
@@ -513,7 +508,7 @@ static int find_dots_bw(const TRasterP &img, int strip_width,
   UCHAR *byte, *buffer;
   int dot_lx, dot_ly;
   float dot_x, dot_y;
-  int vertical;
+  bool vertical;
 
   if (img->type == RAS_WB)
     Black_pixel = 1;
@@ -531,7 +526,7 @@ static int find_dots_bw(const TRasterP &img, int strip_width,
     y0       = pegs_side == PEGS_BOTTOM ? 0 : img->ly - strip_width;
     xsize    = img->lx;
     ysize    = strip_width;
-    vertical = FALSE;
+    vertical = false;
     break;
 
   case PEGS_LEFT:
@@ -540,7 +535,7 @@ static int find_dots_bw(const TRasterP &img, int strip_width,
     y0       = 0;
     xsize    = strip_width;
     ysize    = img->ly;
-    vertical = TRUE;
+    vertical = true;
     break;
 
   default: {
@@ -548,7 +543,8 @@ static int find_dots_bw(const TRasterP &img, int strip_width,
     os << "find dots internal error: pegs_side = " << std::hex << pegs_side
        << '\0';
     throw TCleanupException(os.str().c_str());
-    x0 = y0 = xsize = ysize = vertical = 0;
+    x0 = y0 = xsize = ysize = 0;
+    vertical = false;
   }
   }
   xlast        = x0 + xsize - 1;
@@ -652,7 +648,7 @@ static int find_dots_gr8(const TRasterGR8P &img, int strip_width,
   UCHAR *pix, *buffer;
   int dot_lx, dot_ly;
   float dot_x, dot_y;
-  int vertical;
+  bool vertical;
 
   switch (pegs_side) {
   case PEGS_BOTTOM:
@@ -661,7 +657,7 @@ static int find_dots_gr8(const TRasterGR8P &img, int strip_width,
     y0       = pegs_side == PEGS_BOTTOM ? 0 : img->getLy() - strip_width;
     xsize    = img->getLx();
     ysize    = strip_width;
-    vertical = FALSE;
+    vertical = false;
     break;
   case PEGS_LEFT:
   case PEGS_RIGHT:
@@ -669,14 +665,15 @@ static int find_dots_gr8(const TRasterGR8P &img, int strip_width,
     y0       = 0;
     xsize    = strip_width;
     ysize    = img->getLy();
-    vertical = TRUE;
+    vertical = true;
     break;
   default: {
     std::ostringstream os;
     os << "find dots internal error: pegs_side = " << std::hex << pegs_side
        << '\0';
     throw TCleanupException(os.str().c_str());
-    x0 = y0 = xsize = ysize = vertical = 0;
+    x0 = y0 = xsize = ysize = 0;
+    vertical = false;
   }
   }
 
@@ -776,7 +773,7 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width,
   TPixel32 *pix, *buffer;
   int dot_lx, dot_ly;
   float dot_x, dot_y;
-  int vertical;
+  bool vertical;
 
   assert(img->getPixelSize() ==
          4); /*questo e' per ricordare che l'algo e' per RGB*/
@@ -787,7 +784,7 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width,
     y0       = pegs_side == PEGS_BOTTOM ? 0 : img->getLy() - strip_width;
     xsize    = img->getLx();
     ysize    = strip_width;
-    vertical = FALSE;
+    vertical = false;
     break;
   case PEGS_LEFT:
   case PEGS_RIGHT:
@@ -795,14 +792,15 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width,
     y0       = 0;
     xsize    = strip_width;
     ysize    = img->getLy();
-    vertical = TRUE;
+    vertical = true;
     break;
   default: {
     std::ostringstream os;
     os << "find dots internal error: pegs_side = " << std::hex << pegs_side
        << '\0';
     throw TCleanupException(os.str().c_str());
-    x0 = y0 = xsize = ysize = vertical = 0;
+    x0 = y0 = xsize = ysize = 0;
+    vertical = false;
     break;
   }
   }
@@ -1030,7 +1028,7 @@ start:
   ADDBIG(Xsum, x * weight);
   ADDBIG(Ysum, y * weight);
   ADDBIG(Weightsum, weight);
-  if (IS_VERY_BLACK_GR8(pix)) Very_black_found = TRUE;
+  if (IS_VERY_BLACK_GR8(pix)) Very_black_found = true;
   if (x < Xmin) Xmin                           = x;
   if (x > Xmax) Xmax                           = x;
   if (y < Ymin) Ymin                           = y;
@@ -1103,7 +1101,7 @@ static void visit_gr8(int i, int j, int x, int y, UCHAR *pix) {
   ADDBIG(Xsum, x * weight);
   ADDBIG(Ysum, y * weight);
   ADDBIG(Weightsum, weight);
-  if (IS_VERY_BLACK_GR8(pix)) Very_black_found = TRUE;
+  if (IS_VERY_BLACK_GR8(pix)) Very_black_found = true;
   if (x < Xmin) Xmin                           = x;
   if (x > Xmax) Xmax                           = x;
   if (y < Ymin) Ymin                           = y;
@@ -1135,7 +1133,7 @@ start:
   ADDBIG(Xsum, x * weight);
   ADDBIG(Ysum, y * weight);
   ADDBIG(Weightsum, weight);
-  if (IS_VERY_BLACK_RGB(pix)) Very_black_found = TRUE;
+  if (IS_VERY_BLACK_RGB(pix)) Very_black_found = true;
   if (x < Xmin) Xmin                           = x;
   if (x > Xmax) Xmax                           = x;
   if (y < Ymin) Ymin                           = y;
@@ -1208,7 +1206,7 @@ static void visit_rgb(int i, int j, int x, int y, TPixel32 *pix) {
   ADDBIG(Xsum, x * weight);
   ADDBIG(Ysum, y * weight);
   ADDBIG(Weightsum, weight);
-  if (IS_VERY_BLACK_RGB(pix)) Very_black_found = TRUE;
+  if (IS_VERY_BLACK_RGB(pix)) Very_black_found = true;
   if (x < Xmin) Xmin                           = x;
   if (x > Xmax) Xmax                           = x;
   if (y < Ymin) Ymin                           = y;
@@ -1238,12 +1236,13 @@ static void visit_rgb(int i, int j, int x, int y, TPixel32 *pix) {
  * questo livello.
  * Inoltre: la pegs_side si riferisce alle coordinate di raster.
  */
-int get_image_rotation_and_center(const TRasterP &img, int strip_width,
+bool get_image_rotation_and_center(const TRasterP &img, int strip_width,
                                   PEGS_SIDE pegs_side, double *p_ang,
                                   double *cx, double *cy, DOT ref[],
                                   int ref_dot) {
   double angle;
-  int found, i;
+  int i;
+  bool found;
   float dx, dy;
   DOT _dotarray[MAX_DOT];
   DOT *dotarray = _dotarray;
@@ -1287,7 +1286,7 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 
   /* controllo il pattern delle perforazioni  */
   if (ndot <= 1) {
-    return FALSE;
+    return false;
   }
 
   int indexArray[3] = {0, 1, 2};
@@ -1300,7 +1299,7 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
       stampa_dot(dotarray + i);
     }
 
-  if (!found) return FALSE;
+  if (!found) return false;
 
   angle = 0;
   for (i = 0; i < 2; i++) {
@@ -1340,13 +1339,13 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
     printf("\nang: %g\ncx : %g\ncy : %g\n\n", *p_ang, *cx, *cy);
   }
 
-  return TRUE;
+  return true;
 }
 
 /*---------------------------------------------------------------------------*/
 #define MIN_V 100.0
 
-static int compare_dots(DOT const dots[], int ndots, DOT reference[],
+static bool compare_dots(DOT const dots[], int ndots, DOT reference[],
                         int ref_dot, int &i_ok, int &j_ok, int &k_ok) {
   int found;
   int toll;
@@ -1482,12 +1481,12 @@ static int compare_dots(DOT const dots[], int ndots, DOT reference[],
   if (ref_dis) free(ref_dis);
   if (dot_ok) free(dot_ok);
 
-  return TRUE;
+  return true;
 
 error:
   if (ref_dis) free(ref_dis);
   if (dot_ok) free(dot_ok);
-  return FALSE;
+  return false;
 }
 /*---------------------------------------------------------------------------*/
 

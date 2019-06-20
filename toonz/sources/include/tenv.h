@@ -89,8 +89,6 @@ public:
 //
 // es.:  TEnv::setApplication("Toonz","5.0");
 //
-DVAPI void setApplication(std::string applicationName, std::string version,
-                          std::string revision = std::string());
 
 DVAPI std::string getApplicationName();
 DVAPI std::string getApplicationVersion();
@@ -137,10 +135,13 @@ DVAPI TFilePath getConfigDir();
 // bisogna chiamare TEnv::setStuffDir(stuffdir) prima di ogni altra operazione
 DVAPI void setStuffDir(const TFilePath &stuffDir);
 
-DVAPI TFilePath getDllRelativeDir();
-DVAPI void setDllRelativeDir(const TFilePath &dllRelativeDir);
-
 DVAPI void saveAllEnvVariables();
+
+// register command line argument paths.
+// returns true on success
+DVAPI bool setArgPathValue(std::string key, std::string value);
+
+DVAPI const std::map<std::string, std::string> &getSystemPathMap();
 
 /*
 

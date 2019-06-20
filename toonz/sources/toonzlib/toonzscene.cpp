@@ -1096,11 +1096,11 @@ TFilePath ToonzScene::getImportedLevelPath(const TFilePath path) const {
   if (ltype.m_ltype == UNKNOWN_XSHLEVEL) return path;
 
   const std::wstring &levelName = path.getWideName();
-  const std::string &ext = path.getType(), &dots = path.getDots();
+  const std::string &dots       = path.getDots();
 
   TFilePath importedLevelPath =
       getDefaultLevelPath(ltype.m_ltype, levelName).getParentDir() +
-      (levelName + ::to_wstring(dots + ext));
+      path.getLevelNameW();
 
   if (dots == "..")
     importedLevelPath = importedLevelPath.withFrame(TFrameId::EMPTY_FRAME);
@@ -1227,7 +1227,7 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
     xl->setPath(codeFilePath(levelPath), true);
 
     try {
-      if (fIds.size() != 0)
+      if (fIds.size() != 0 && !ltype.m_oldLevelFlag)
         xl->load(fIds);
       else
         xl->load();

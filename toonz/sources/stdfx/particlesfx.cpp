@@ -230,7 +230,7 @@ ParticlesFx::ParticlesFx()
   step_val->setValueRange(1, (std::numeric_limits<int>::max)());
   TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::Red),
                                   TSpectrum::ColorKey(1, TPixel32::Red)};
-  gencol_val = TSpectrumParamP(tArrayCount(colors), colors);
+  gencol_val                   = TSpectrumParamP(tArrayCount(colors), colors);
   bindParam(this, "birth_color", gencol_val);
   bindParam(this, "birth_color_ctrl", gencol_ctrl_val);
   bindParam(this, "birth_color_spread", gencol_spread_val);
@@ -436,6 +436,7 @@ void ParticlesFx::doCompute(TTile &tile, double frame,
       }
     }
 
+    if (bbox.isEmpty()) return;
     if (bbox == TConsts::infiniteRectD) bbox *= outTileBBox;
 
     p_size.lx = (int)bbox.getLx() + 1;

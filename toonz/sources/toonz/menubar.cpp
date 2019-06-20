@@ -423,6 +423,7 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
   addMenuItem(windowsMenu, MI_OpenStyleControl);
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   windowsMenu->addSeparator();
   QMenu *otherWindowsMenu = windowsMenu->addMenu(tr("Other Windows"));
   {
@@ -593,6 +594,7 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
   addMenuItem(windowsMenu, MI_OpenLevelView);
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   windowsMenu->addSeparator();
   QMenu *otherWindowsMenu = windowsMenu->addMenu(tr("Other Windows"));
   {
@@ -765,6 +767,7 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
   addMenuItem(windowsMenu, MI_OpenStudioPalette);
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   addMenuItem(windowsMenu, MI_OpenColorModel);
   addMenuItem(windowsMenu, MI_OpenFileBrowser);
   addMenuItem(windowsMenu, MI_OpenFilmStrip);
@@ -947,6 +950,7 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
   addMenuItem(windowsMenu, MI_OpenFilmStrip);
   addMenuItem(windowsMenu, MI_OpenLevelView);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   windowsMenu->addSeparator();
   QMenu *otherWindowsMenu = windowsMenu->addMenu(tr("Other Windows"));
   {
@@ -1362,6 +1366,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(windowsMenu, MI_OpenLevelView);
   addMenuItem(windowsMenu, MI_OpenComboViewer);
   addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   addMenuItem(windowsMenu, MI_OpenHistoryPanel);
   addMenuItem(windowsMenu, MI_AudioRecording);
   windowsMenu->addSeparator();

@@ -77,12 +77,20 @@ void TXshPaletteLevel::load() {
     TFileStatus fs(path);
     TPersist *p = 0;
     TIStream is(path);
+    TPalette *palette = nullptr;
 
     if (is && fs.doesExist()) {
-      is >> p;
-      TPalette *palette = dynamic_cast<TPalette *>(p);
-      palette->setPaletteName(path.getWideName());
-      setPalette(palette);
+      std::string tagName;
+      if (is.matchTag(tagName) && tagName == "palette") {
+        std::string gname;
+        is.getTagParam("name", gname);
+        palette = new TPalette();
+        palette->loadData(is);
+        palette->setGlobalName(::to_wstring(gname));
+        is.matchEndTag();
+        palette->setPaletteName(path.getWideName());
+        setPalette(palette);
+      }
     }
     assert(m_palette);
   }

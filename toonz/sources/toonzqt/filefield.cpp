@@ -19,11 +19,12 @@ FileField::BrowserPopupController *FileField::m_browserPopupController = 0;
 //-----------------------------------------------------------------------------
 
 FileField::FileField(QWidget *parent, QString path, bool readOnly,
-                     bool doNotBrowseInitialPath)
+                     bool doNotBrowseInitialPath, bool codePath)
     : QWidget(parent)
     , m_filters(QStringList())
     , m_fileMode(QFileDialog::DirectoryOnly)
-    , m_lastSelectedPath(path) {
+    , m_lastSelectedPath(path)
+    , m_codePath(codePath) {
   setMaximumHeight(WidgetHeight);
 
   m_field            = new LineEdit(path);
@@ -97,7 +98,7 @@ void FileField::browseDirectory() {
       (m_lastSelectedPath == m_descriptionText) ? "" : m_lastSelectedPath,
       this);
   if (m_browserPopupController->isExecute())
-    directory = m_browserPopupController->getPath();
+    directory = m_browserPopupController->getPath(m_codePath);
 
   if (!directory.isEmpty()) {
     setPath(directory);

@@ -11,6 +11,7 @@
 #include "toonz/txshleveltypes.h"
 #include "toonz/preferences.h"
 #include "cleanuppalette.h"
+#include "toonz/boardsettings.h"
 
 // TnzBase includes
 #include "toutputproperties.h"
@@ -21,6 +22,7 @@
 #include "tstream.h"
 #include "tpalette.h"
 #include "tproperty.h"
+#include "tiio.h"
 
 //=============================================================================
 
@@ -291,6 +293,12 @@ void TSceneProperties::saveData(TOStream &os) const {
       os.closeChild();
     }
     os.closeChild();
+
+    if (out.getBoardSettings() && out.getBoardSettings()->getDuration()) {
+      os.openChild("clapperboardSettings");
+      out.getBoardSettings()->saveData(os);
+      os.closeChild();
+    }
 
     os.closeChild();  // </output>
   }
@@ -641,10 +649,21 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
                       throw TException();
                   } else
                     pg->loadData(is);
+
+                  ////////ここだ！
+                  {
+                    TPropertyGroup *refPg = Tiio::makeWriterProperties(ext);
+                    pg->assignUINames(refPg);
+                    delete refPg;
+                  }
+
                   is.closeChild();
                 } else
                   throw TException("unexpected tag: " + tagName);
               }  // end while
+            } else if (tagName == "clapperboardSettings") {
+              assert(out.getBoardSettings());
+              out.getBoardSettings()->loadData(is);
             } else {
               throw TException("unexpected property tag: " + tagName);
             }

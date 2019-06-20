@@ -213,6 +213,15 @@ void StylePickerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
 int StylePickerTool::getCursorId() const {
   int ret;
+
+  if (!Preferences::instance()->isMultiLayerStylePickerEnabled()) {
+    TImageP img      = getImage(false);
+    TVectorImageP vi = img;
+    TToonzImageP ti  = img;
+
+    if (!vi && !ti) return ToolCursor::CURSOR_NO;
+  }
+
   /* in case the "organize palette" option is active */
   if (m_organizePalette.getValue())
     ret = ToolCursor::PickerCursorOrganize;
