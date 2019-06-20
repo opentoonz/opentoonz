@@ -2109,8 +2109,18 @@ void SceneViewer::zoom(const TPointD &center, double factor) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::flipX() {
-  m_viewAff[0] = m_viewAff[0] * TScale(-1, 1);
-  m_viewAff[1] = m_viewAff[1] * TScale(-1, 1);
+  double flipAngle0 = (m_rotationAngle[0] * -1) * 2;
+  double flipAngle1 = (m_rotationAngle[1] * -1) * 2;
+  m_rotationAngle[0] += flipAngle0;
+  m_rotationAngle[1] += flipAngle1;
+  if (m_isFlippedX != m_isFlippedY) {
+    flipAngle0 = -flipAngle0;
+    flipAngle1 = -flipAngle1;
+  }
+  m_viewAff[0] = m_viewAff[0] * TRotation(flipAngle0) * TScale(-1, 1);
+  m_viewAff[1] = m_viewAff[1] * TRotation(flipAngle1) * TScale(-1, 1);
+  m_viewAff[0].a13 *= -1;
+  m_viewAff[1].a13 *= -1;
   m_isFlippedX = !m_isFlippedX;
   invalidateAll();
   emit onZoomChanged();
@@ -2119,8 +2129,18 @@ void SceneViewer::flipX() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::flipY() {
-  m_viewAff[0] = m_viewAff[0] * TScale(1, -1);
-  m_viewAff[1] = m_viewAff[1] * TScale(1, -1);
+  double flipAngle0 = (m_rotationAngle[0] * -1) * 2;
+  double flipAngle1 = (m_rotationAngle[1] * -1) * 2;
+  m_rotationAngle[0] += flipAngle0;
+  m_rotationAngle[1] += flipAngle1;
+  if (m_isFlippedX != m_isFlippedY) {
+    flipAngle0 = -flipAngle0;
+    flipAngle1 = -flipAngle1;
+  }
+  m_viewAff[0] = m_viewAff[0] * TRotation(flipAngle0) * TScale(1, -1);
+  m_viewAff[1] = m_viewAff[1] * TRotation(flipAngle1) * TScale(1, -1);
+  m_viewAff[0].a23 *= -1;
+  m_viewAff[1].a23 *= -1;
   m_isFlippedY = !m_isFlippedY;
   invalidateAll();
   emit onZoomChanged();

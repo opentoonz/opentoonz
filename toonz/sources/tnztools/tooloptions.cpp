@@ -125,7 +125,8 @@ ToolOptionsBox::ToolOptionsBox(QWidget *parent, bool isScrollable)
 ToolOptionsBox::~ToolOptionsBox() {
   std::for_each(m_controls.begin(), m_controls.end(),
                 std::default_delete<ToolOptionControl>());
-  std::for_each(m_labels.begin(), m_labels.end(), std::default_delete<QLabel>());
+  std::for_each(m_labels.begin(), m_labels.end(),
+                std::default_delete<QLabel>());
 }
 
 //-----------------------------------------------------------------------------
@@ -217,6 +218,17 @@ void ToolOptionControlBuilder::visit(TDoubleProperty *p) {
     a = cm->getAction("A_DecreaseMaxBrushThickness");
     control->addAction(a);
     QObject::connect(a, SIGNAL(triggered()), control, SLOT(decrease()));
+  }
+  if (p->getName() == "ModifierSize") {
+    QAction *a;
+    a = cm->getAction("A_IncreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control,
+                     SLOT(increaseFractional()));
+    a = cm->getAction("A_DecreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control,
+                     SLOT(decreaseFractional()));
   }
   if (p->getName() == "Hardness:") {
     QAction *a;

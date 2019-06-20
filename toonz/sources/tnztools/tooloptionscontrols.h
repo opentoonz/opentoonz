@@ -119,8 +119,10 @@ public:
 protected slots:
 
   void onValueChanged(bool isDragging);
-  void increase();
-  void decrease();
+  void increase(double step = 1.0);
+  void decrease(double step = 1.0);
+  void increaseFractional();
+  void decreaseFractional();
 };
 
 //-----------------------------------------------------------------------------

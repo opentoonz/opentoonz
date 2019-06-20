@@ -324,7 +324,7 @@ void TaskSheet::update(TFarmTask *task) {
   m_commandLine->setText(task->getCommandLine());
   m_server->setText(task->m_server);
   m_submittedBy->setText(task->m_user);
-  m_submittedOn->setText(task->m_submissionDate.toString());
+  m_submittedOn->setText(task->m_callerMachineName);
   m_priority->setText(QString::number(task->m_priority));
   m_submitDate->setText(task->m_submissionDate.toString());
   m_startDate->setText(task->m_startDate.toString());

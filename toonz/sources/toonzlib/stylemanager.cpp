@@ -8,10 +8,16 @@
 #include "tropcm.h"
 #include "tvectorrenderdata.h"
 #include "tsystem.h"
+#include "tvectorgl.h"
 
 // Qt includes
 #include <QDir>
 #include <QImage>
+#include <QOffscreenSurface>
+#include <QThread>
+#include <QGuiApplication>
+#include <QOpenGLContext>
+#include <QOpenGLFramebufferObject>
 
 #include "toonz/stylemanager.h"
 
@@ -50,6 +56,7 @@ class CustomStyleManager::StyleLoaderTask final : public TThread::Runnable {
   CustomStyleManager *m_manager;
   TFilePath m_fp;
   PatternData m_data;
+  std::shared_ptr<QOffscreenSurface> m_offScreenSurface;
 
 public:
   StyleLoaderTask(CustomStyleManager *manager, const TFilePath &fp);
@@ -66,6 +73,12 @@ CustomStyleManager::StyleLoaderTask::StyleLoaderTask(
     : m_manager(manager), m_fp(fp) {
   connect(this, SIGNAL(finished(TThread::RunnableP)), this,
           SLOT(onFinished(TThread::RunnableP)));
+
+  if (QThread::currentThread() == qGuiApp->thread()) {
+    m_offScreenSurface.reset(new QOffscreenSurface());
+    m_offScreenSurface->setFormat(QSurfaceFormat::defaultFormat());
+    m_offScreenSurface->create();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -90,16 +103,39 @@ void CustomStyleManager::StyleLoaderTask::run() {
     TRasterImageP rimg = img;
 
     TRaster32P ras;
+
+    QImage *image = nullptr;
+
     if (vimg) {
       assert(level->getPalette());
       TPalette *vPalette = level->getPalette();
       assert(vPalette);
       vimg->setPalette(vPalette);
 
-      TOfflineGL *glContext = 0;
-      glContext             = TOfflineGL::getStock(chipSize);
+      QOpenGLContext *glContext = new QOpenGLContext();
+      if (QOpenGLContext::currentContext())
+        glContext->setShareContext(QOpenGLContext::currentContext());
+      glContext->setFormat(QSurfaceFormat::defaultFormat());
+      glContext->create();
+      glContext->makeCurrent(m_offScreenSurface.get());
+      // attaching stencil buffer here as some styles use it
+      QOpenGLFramebufferObject fb(
+          chipSize.lx, chipSize.ly,
+          QOpenGLFramebufferObject::CombinedDepthStencil);
 
-      glContext->clear(TPixel32::White);
+      fb.bind();
+      // Draw
+      glViewport(0, 0, chipSize.lx, chipSize.ly);
+      glClearColor(1.0, 1.0, 1.0, 1.0);  // clear with white color
+      glClear(GL_COLOR_BUFFER_BIT);
+
+      glMatrixMode(GL_PROJECTION);
+      glLoadIdentity();
+      gluOrtho2D(0, chipSize.lx, 0, chipSize.ly);
+
+      glMatrixMode(GL_MODELVIEW);
+      glLoadIdentity();
+
       TRectD bbox = img->getBBox();
       double scx  = 0.8 * chipSize.lx / bbox.getLx();
       double scy  = 0.8 * chipSize.ly / bbox.getLy();
@@ -112,11 +148,14 @@ void CustomStyleManager::StyleLoaderTask::run() {
           TTranslation(-0.5 * (bbox.x0 + bbox.x1), -0.5 * (bbox.y0 + bbox.y1));
       TVectorRenderData rd(aff, chipSize, vPalette, 0, true);
 
-      glContext->draw(img, rd);
+      tglDraw(rd, vimg.getPointer());
 
-      // No need to clone! The received raster already is a copy of the
-      // context's buffer
-      ras = glContext->getRaster();  //->clone();
+      image = new QImage(fb.toImage().scaled(QSize(chipSize.lx, chipSize.ly),
+                                             Qt::IgnoreAspectRatio,
+                                             Qt::SmoothTransformation));
+      fb.release();
+      glContext->deleteLater();
+
     } else if (rimg) {
       TDimension size = rimg->getRaster()->getSize();
       if (size == chipSize)
@@ -131,11 +170,10 @@ void CustomStyleManager::StyleLoaderTask::run() {
         TRop::addBackground(rout, TPixel::White);
         ras = rout;
       }
+      image = new QImage(chipSize.lx, chipSize.ly, QImage::Format_RGB32);
+      convertRaster32ToImage(ras, image);
     } else
       assert(!"unsupported type for custom styles!");
-
-    QImage *image = new QImage(chipSize.lx, chipSize.ly, QImage::Format_RGB32);
-    convertRaster32ToImage(ras, image);
 
     m_data.m_patternName = m_fp.getName();
     m_data.m_isVector    = (m_fp.getType() == "pli" || m_fp.getType() == "svg");

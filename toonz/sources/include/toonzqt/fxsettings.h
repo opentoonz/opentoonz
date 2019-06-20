@@ -190,6 +190,7 @@ class DVAPI ParamViewer final : public QFrame {
   Q_OBJECT
 
   TFxP m_fx;
+  TFxP m_actualFx;
 
   QStackedWidget *m_tablePageSet;
   QMap<std::string, int> m_tableFxIndex;
@@ -253,6 +254,7 @@ class DVAPI FxSettings final : public QSplitter {
   bool m_isCameraModeView;
 
   int m_container_height;
+  int m_container_width;
 
 public:
   FxSettings(QWidget *parent, const TPixel32 &checkCol1,

@@ -365,6 +365,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 };
 
 //*****************************************************
@@ -384,6 +385,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 };
 
 //*****************************************************
@@ -408,6 +410,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 protected slots:
 
@@ -441,6 +444,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 protected slots:
 
@@ -479,6 +483,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 private:
   void renameObject(const TStageObjectId &id, std::string name);
@@ -517,6 +522,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 protected slots:
 
@@ -575,6 +581,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
   QPointF computePos() const;
 
 protected slots:

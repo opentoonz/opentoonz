@@ -1880,7 +1880,8 @@ else return false;
   void drawChip(QPainter &p, QRect rect, int index) override {
     assert(0 <= index && index < getChipCount());
     CustomStyleManager::PatternData pattern = styleManager()->getPattern(index);
-    p.drawImage(rect, *pattern.m_image);
+    if (pattern.m_image && !pattern.m_image->isNull())
+      p.drawImage(rect, *pattern.m_image);
   }
   void onSelect(int index) override;
 };

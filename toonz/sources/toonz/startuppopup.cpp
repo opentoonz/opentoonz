@@ -95,9 +95,9 @@ StartupPopup::StartupPopup()
     : Dialog(TApp::instance()->getMainWindow(), true, true, "StartupPopup") {
   setWindowTitle(tr("OpenToonz Startup"));
 
-  m_projectBox = new QGroupBox(tr("Choose Project"), this);
+  m_projectBox = new QGroupBox(tr("Current Project"), this);
   m_sceneBox   = new QGroupBox(tr("Create a New Scene"), this);
-  m_recentBox  = new QGroupBox(tr("Open Scene [Project]"), this);
+  m_recentBox  = new QGroupBox(tr("Recent Scenes [Project]"), this);
   m_projectBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   m_nameFld                 = new LineEdit(this);
   m_pathFld                 = new FileField(this);
@@ -168,6 +168,7 @@ StartupPopup::StartupPopup()
   m_sceneBox->setMinimumWidth(480);
   m_projectBox->setMinimumWidth(480);
   m_buttonFrame->setFixedHeight(34);
+
   //--- layout
   m_topLayout->setMargin(0);
   m_topLayout->setSpacing(0);
@@ -240,14 +241,15 @@ StartupPopup::StartupPopup()
       newSceneLay->addWidget(createButton, 7, 1, 1, 3, Qt::AlignLeft);
     }
     m_sceneBox->setLayout(newSceneLay);
-    guiLay->addWidget(m_sceneBox, 2, 0, 4, 1, Qt::AlignLeft);
+    guiLay->addWidget(m_sceneBox, 2, 0, 4, 1, Qt::AlignTop);
 
     m_recentSceneLay->setMargin(5);
     m_recentSceneLay->setSpacing(2);
     {
       // Recent Scene List
       m_recentBox->setLayout(m_recentSceneLay);
-      guiLay->addWidget(m_recentBox, 1, 1, 4, 1, Qt::AlignTop);
+      guiLay->addWidget(m_recentBox, 1, 1, 4, 1,
+                        Qt::AlignTop | Qt::AlignHCenter);
       guiLay->addWidget(loadOtherSceneButton, 5, 1, 1, 1, Qt::AlignRight);
     }
     m_topLayout->addLayout(guiLay, 0);
@@ -859,7 +861,20 @@ void StartupPopup::onRecentSceneClicked(int index) {
     DVGui::warning(msg);
     refreshRecentScenes();
   } else {
-    IoCmd::loadScene(TFilePath(path.toStdWString()), false);
+    if (RecentFiles::instance()->getFileProject(index) != "-") {
+      QString projectName = RecentFiles::instance()->getFileProject(index);
+      int projectIndex    = m_projectsCB->findText(projectName);
+      if (projectIndex >= 0) {
+        TFilePath projectFp = m_projectPaths[projectIndex];
+        TProjectManager::instance()->setCurrentProjectPath(projectFp);
+      } else {
+        QString msg = tr("The selected scene project '%1' is not in the "
+                         "Current Project list and may not open automatically.")
+                          .arg(projectName);
+        DVGui::warning(msg);
+      }
+    }
+    IoCmd::loadScene(TFilePath(path.toStdWString()), false, true);
     if (RecentFiles::instance()->getFileProject(index) == "-") {
       QString fileName =
           RecentFiles::instance()->getFilePath(index, RecentFiles::Scene);

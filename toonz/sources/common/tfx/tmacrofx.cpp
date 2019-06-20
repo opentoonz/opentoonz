@@ -492,6 +492,9 @@ void TMacroFx::loadData(TIStream &is) {
           m_fxs.push_back(fx);
         }
       }
+      // collecting params just after loading nodes since they may need on
+      // loading "super" tag in case it is linked with another macro fx
+      collectParams(this);
     } else if (tagName == "ports") {
       int i = 0;
       while (is.matchTag(tagName)) {
@@ -533,7 +536,6 @@ void TMacroFx::loadData(TIStream &is) {
       throw TException("unexpected tag " + tagName);
     is.closeChild();
   }
-  collectParams(this);
 }
 
 //--------------------------------------------------

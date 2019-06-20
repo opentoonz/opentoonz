@@ -578,6 +578,8 @@ FxSchematicNode *FxSchematicScene::addGroupedFxSchematicNode(
           SLOT(onSwitchCurrentFx(TFx *)));
   connect(node, SIGNAL(currentColumnChanged(int)), this,
           SLOT(onCurrentColumnChanged(int)));
+  connect(node, SIGNAL(fxNodeDoubleClicked()), this,
+          SLOT(onFxNodeDoubleClicked()));
   m_groupedTable[groupId] = node;
   return node;
 }
