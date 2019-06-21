@@ -80,7 +80,8 @@ class StopMotionController final : public QWidget {
 
   QComboBox *m_cameraListCombo, *m_fileTypeCombo, *m_isoCombo,
       *m_shutterSpeedCombo, *m_exposureCombo, *m_apertureCombo,
-      *m_whiteBalanceCombo, *m_kelvinCombo, *m_resolutionCombo;
+      *m_whiteBalanceCombo, *m_kelvinCombo, *m_resolutionCombo,
+      *m_imageQualityCombo, *m_pictureStyleCombo;
   LevelNameLineEdit *m_levelNameEdit;
   QCheckBox *m_blackScreenForCapture, *m_useScaledFullSizeImages,
       *m_placeOnXSheetCB, *m_directShowCB, *m_liveViewOnAllFramesCB,
@@ -113,6 +114,8 @@ protected slots:
   void refreshExposureList();
   void refreshWhiteBalanceList();
   void refreshColorTemperatureList();
+  void refreshImageQualityList();
+  void refreshPictureStyleList();
   void onCameraListComboActivated(int index);
   void onResolutionComboActivated(const QString &itemText);
   void onCaptureFilterSettingsBtnPressed();
@@ -151,6 +154,8 @@ protected slots:
   void onExposureChanged(int index);
   void onWhiteBalanceChanged(int index);
   void onColorTemperatureChanged(int index);
+  void onImageQualityChanged(int index);
+  void onPictureStyleChanged(int index);
   void refreshMode();
   void onZoomPressed();
   void onPickZoomPressed();
@@ -190,6 +195,8 @@ protected slots:
   void onExposureChangedSignal(QString);
   void onWhiteBalanceChangedSignal(QString);
   void onColorTemperatureChangedSignal(QString);
+  void onImageQualityChangedSignal(QString);
+  void onPictureStyleChangedSignal(QString);
 
 public slots:
   void openSaveInFolderPopup();

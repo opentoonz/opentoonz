@@ -82,9 +82,10 @@ private:
   QString m_frameInfoToolTip = "";
   QSize m_allowedCameraSize;
   QStringList m_isoOptions, m_shutterSpeedOptions, m_apertureOptions,
-      m_exposureOptions, m_whiteBalanceOptions, m_colorTempOptions;
+      m_exposureOptions, m_whiteBalanceOptions, m_colorTempOptions,
+      m_imageQualityOptions, m_pictureStyleOptions;
   std::map<EdsUInt32, std::string> m_avMap, m_tvMap, m_isoMap, m_modeMap,
-      m_exposureMap, m_whiteBalanceMap;
+      m_exposureMap, m_whiteBalanceMap, m_imageQualityMap, m_pictureStyleMap;
   QDialog *m_fullScreen1, *m_fullScreen2, *m_fullScreen3;
   int m_screenCount;
   bool m_useMjpg                 = true;
@@ -111,12 +112,16 @@ private:
   static EdsError EDSCALLBACK handleStateEvent(EdsStateEvent event,
                                                EdsUInt32 parameter,
                                                EdsVoid* context);
+  static EdsError EDSCALLBACK handleCameraAddedEvent(EdsVoid* context);
+
   void buildAvMap();
   void buildTvMap();
   void buildIsoMap();
   void buildModeMap();
   void buildExposureMap();
   void buildWhiteBalanceMap();
+  void buildImageQualityMap();
+  void buildPictureStyleMap();
 
 public:
   enum LiveViewStatus {
@@ -173,7 +178,6 @@ public:
   int m_webcamWidth    = 0;
   int m_webcamHeight   = 0;
 
-  // static StopMotion* instance();
   void setOpacity(int opacity);
   int getOpacity() { return m_opacity; }
   void setUseScaledImages(bool on);
@@ -253,6 +257,7 @@ public:
   int getCameraCount();
   EdsError getCamera(int index);
   EdsError releaseCamera();
+  void cameraAdded();
   EdsError openCameraSession();
   EdsError closeCameraSession();
   std::string getCameraName();
@@ -267,11 +272,15 @@ public:
   QStringList getExposureOptions() { return m_exposureOptions; }
   QStringList getWhiteBalanceOptions() { return m_whiteBalanceOptions; }
   QStringList getColorTemperatureOptions() { return m_colorTempOptions; }
+  QStringList getImageQualityOptions() { return m_imageQualityOptions; }
+  QStringList getPictureStyleOptions() { return m_pictureStyleOptions; }
   EdsError getAvailableShutterSpeeds();
   EdsError getAvailableIso();
   EdsError getAvailableApertures();
   EdsError getAvailableExposureCompensations();
   EdsError getAvailableWhiteBalances();
+  EdsError getAvailableImageQualities();
+  EdsError getAvailablePictureStyles();
   void buildColorTemperatures();
   QString getCurrentShutterSpeed();
   QString getCurrentIso();
@@ -279,12 +288,16 @@ public:
   QString getCurrentExposureCompensation();
   QString getCurrentWhiteBalance();
   QString getCurrentColorTemperature();
+  QString getCurrentImageQuality();
+  QString getCurrentPictureStyle();
   EdsError setShutterSpeed(QString shutterSpeed);
   EdsError setIso(QString iso);
   EdsError setAperture(QString aperture);
   EdsError setExposureCompensation(QString exposure);
   EdsError setWhiteBalance(QString whiteBalance);
   EdsError setColorTemperature(QString temp);
+  EdsError setImageQuality(QString quality);
+  EdsError setPictureStyle(QString style);
   QString getMode();
   void refreshOptions();
   EdsError zoomLiveView();
@@ -324,12 +337,16 @@ signals:
   void exposureOptionsChanged();
   void whiteBalanceOptionsChanged();
   void colorTemperatureChanged();
+  void imageQualityOptionsChanged();
+  void pictureStyleOptionsChanged();
   void apertureChangedSignal(QString);
   void isoChangedSignal(QString);
   void shutterSpeedChangedSignal(QString);
   void exposureChangedSignal(QString);
   void whiteBalanceChangedSignal(QString);
   void colorTemperatureChangedSignal(QString);
+  void imageQualityChangedSignal(QString);
+  void pictureStyleChangedSignal(QString);
   void modeChanged();
 
   void newDimensions();

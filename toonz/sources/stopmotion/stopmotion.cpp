@@ -298,6 +298,8 @@ StopMotion::StopMotion() {
   buildExposureMap();
   buildWhiteBalanceMap();
   buildColorTemperatures();
+  buildImageQualityMap();
+  buildPictureStyleMap();
   m_useDirectShow      = StopMotionUseDirectShow;
   m_useMjpg            = StopMotionUseMjpg;
   m_alwaysLiveView     = StopMotionAlwaysLiveView;
@@ -348,6 +350,12 @@ StopMotion::StopMotion() {
   m_filePath = scene->getDefaultLevelPath(OVL_TYPE, m_levelName.toStdWString())
                    .getParentDir()
                    .getQString();
+
+  // set handler for a camera detected
+  initializeCanonSDK();
+  if (!m_error)
+    m_error = EdsSetCameraAddedHandler(StopMotion::handleCameraAddedEvent,
+                                       (EdsVoid *)this);
 }
 
 //-----------------------------------------------------------------
@@ -360,13 +368,6 @@ StopMotion::~StopMotion() {
   if (m_isSDKLoaded) closeCanonSDK();
   setUseNumpadShortcuts(false);
 }
-
-////-----------------------------------------------------------------
-//
-// StopMotion *StopMotion::instance() {
-//  static StopMotion _instance;
-//  return &_instance;
-//}
 
 //-----------------------------------------------------------------------------
 
@@ -2024,6 +2025,12 @@ EdsError StopMotion::releaseCamera() {
 
 //-----------------------------------------------------------------
 
+void StopMotion::cameraAdded() {
+  if (!m_active) refreshCameraList();
+}
+
+//-----------------------------------------------------------------
+
 void StopMotion::closeCanonSDK() {
   if (m_isSDKLoaded) {
     EdsTerminateSDK();
@@ -2048,6 +2055,11 @@ EdsError StopMotion::openCameraSession() {
   m_error = EdsSetCameraStateEventHandler(m_camera, kEdsStateEvent_All,
                                           StopMotion::handleStateEvent,
                                           (EdsVoid *)this);
+
+  // We can't handle raw images yet, so make sure we are getting jpgs
+  if (getCurrentImageQuality().contains("RAW"))
+    setImageQuality("Large Fine Jpeg");
+
   EdsUInt32 saveto = kEdsSaveTo_Host;
   m_error          = EdsSetPropertyData(m_camera, kEdsPropID_SaveTo, 0,
                                sizeof(EdsUInt32), &saveto);
@@ -2075,6 +2087,8 @@ void StopMotion::refreshOptions() {
   getAvailableExposureCompensations();
   getAvailableWhiteBalances();
   buildColorTemperatures();
+  getAvailableImageQualities();
+  getAvailablePictureStyles();
 }
 
 //-----------------------------------------------------------------
@@ -2217,6 +2231,51 @@ EdsError StopMotion::getAvailableWhiteBalances() {
 
 //-----------------------------------------------------------------
 
+EdsError StopMotion::getAvailableImageQualities() {
+  EdsPropertyDesc *imageQualityDesc = new EdsPropertyDesc;
+  EdsError err                      = EDS_ERR_OK;
+  m_imageQualityOptions.clear();
+
+  err = EdsGetPropertyDesc(m_camera, kEdsPropID_ImageQuality, imageQualityDesc);
+  int count = imageQualityDesc->numElements;
+  if (count > 0) {
+    int i = 0;
+    while (i < count) {
+      QString quality = QString::fromStdString(
+          m_imageQualityMap[imageQualityDesc->propDesc[i]]);
+      if (!quality.contains("RAW")) {
+        m_imageQualityOptions.push_back(quality);
+      }
+      i++;
+    }
+  }
+  delete imageQualityDesc;
+  return err;
+}
+
+//-----------------------------------------------------------------
+
+EdsError StopMotion::getAvailablePictureStyles() {
+  EdsPropertyDesc *pictureStyleDesc = new EdsPropertyDesc;
+  EdsError err                      = EDS_ERR_OK;
+  m_pictureStyleOptions.clear();
+
+  err = EdsGetPropertyDesc(m_camera, kEdsPropID_PictureStyle, pictureStyleDesc);
+  int count = pictureStyleDesc->numElements;
+  if (count > 0) {
+    int i = 0;
+    while (i < count) {
+      m_pictureStyleOptions.push_back(QString::fromStdString(
+          m_pictureStyleMap[pictureStyleDesc->propDesc[i]]));
+      i++;
+    }
+  }
+  delete pictureStyleDesc;
+  return err;
+}
+
+//-----------------------------------------------------------------
+
 void StopMotion::buildColorTemperatures() {
   m_colorTempOptions.clear();
   int i = 2800;
@@ -2299,6 +2358,38 @@ QString StopMotion::getCurrentWhiteBalance() {
                            &data);
   std::string wbString = m_whiteBalanceMap[data];
   return QString::fromStdString(m_whiteBalanceMap[data]);
+}
+
+//-----------------------------------------------------------------
+
+QString StopMotion::getCurrentImageQuality() {
+  EdsError err = EDS_ERR_OK;
+  EdsDataType imageQualityType;
+  EdsUInt32 size;
+  EdsUInt32 data;
+
+  err = EdsGetPropertySize(m_camera, kEdsPropID_ImageQuality, 0,
+                           &imageQualityType, &size);
+  err = EdsGetPropertyData(m_camera, kEdsPropID_ImageQuality, 0, sizeof(size),
+                           &data);
+  std::string wbString = m_imageQualityMap[data];
+  return QString::fromStdString(m_imageQualityMap[data]);
+}
+
+//-----------------------------------------------------------------
+
+QString StopMotion::getCurrentPictureStyle() {
+  EdsError err = EDS_ERR_OK;
+  EdsDataType pictureStyleType;
+  EdsUInt32 size;
+  EdsUInt32 data;
+
+  err = EdsGetPropertySize(m_camera, kEdsPropID_PictureStyle, 0,
+                           &pictureStyleType, &size);
+  err = EdsGetPropertyData(m_camera, kEdsPropID_PictureStyle, 0, sizeof(size),
+                           &data);
+  std::string wbString = m_pictureStyleMap[data];
+  return QString::fromStdString(m_pictureStyleMap[data]);
 }
 
 //-----------------------------------------------------------------
@@ -2411,9 +2502,49 @@ EdsError StopMotion::setWhiteBalance(QString whiteBalance) {
 
   err = EdsSetPropertyData(m_camera, kEdsPropID_WhiteBalance, 0, sizeof(value),
                            &value);
-  err = EdsSetPropertyData(m_camera, kEdsPropID_Evf_WhiteBalance, 0,
-                           sizeof(value), &value);
   emit(whiteBalanceChangedSignal(whiteBalance));
+  return err;
+}
+
+//-----------------------------------------------------------------
+
+EdsError StopMotion::setImageQuality(QString quality) {
+  EdsError err = EDS_ERR_OK;
+  EdsUInt32 value;
+  auto it = m_imageQualityMap.begin();
+  while (it != m_imageQualityMap.end()) {
+    if (it->second == quality.toStdString()) {
+      value = it->first;
+      break;
+    }
+    it++;
+  }
+
+  err = EdsSetPropertyData(m_camera, kEdsPropID_ImageQuality, 0, sizeof(value),
+                           &value);
+  emit(imageQualityChangedSignal(quality));
+  return err;
+}
+
+//-----------------------------------------------------------------
+
+EdsError StopMotion::setPictureStyle(QString style) {
+  EdsError err = EDS_ERR_OK;
+  EdsUInt32 value;
+  auto it = m_pictureStyleMap.begin();
+  while (it != m_pictureStyleMap.end()) {
+    if (it->second == style.toStdString()) {
+      value = it->first;
+      break;
+    }
+    it++;
+  }
+
+  err = EdsSetPropertyData(m_camera, kEdsPropID_PictureStyle, 0, sizeof(value),
+                           &value);
+  err = EdsSetPropertyData(m_camera, kEdsPropID_PictureStyle, 0, sizeof(value),
+                           &value);
+  emit(pictureStyleChangedSignal(style));
   return err;
 }
 
@@ -2902,6 +3033,14 @@ EdsError StopMotion::handlePropertyEvent(EdsPropertyEvent event,
       event == kEdsPropertyEvent_PropertyDescChanged) {
     emit(instance()->whiteBalanceOptionsChanged());
   }
+  if (property == kEdsPropID_PictureStyle &&
+      event == kEdsPropertyEvent_PropertyDescChanged) {
+    emit(instance()->pictureStyleOptionsChanged());
+  }
+  if (property == kEdsPropID_ImageQuality &&
+      event == kEdsPropertyEvent_PropertyDescChanged) {
+    emit(instance()->imageQualityOptionsChanged());
+  }
 
   return EDS_ERR_OK;
 }
@@ -2918,6 +3057,13 @@ EdsError StopMotion::handleStateEvent(EdsStateEvent event, EdsUInt32 parameter,
       emit(instance()->cameraChanged());
     }
   }
+  return EDS_ERR_OK;
+}
+
+//-----------------------------------------------------------------
+
+EdsError StopMotion::handleCameraAddedEvent(EdsVoid *context) {
+  instance()->cameraAdded();
   return EDS_ERR_OK;
 }
 
@@ -3213,6 +3359,209 @@ void StopMotion::buildWhiteBalanceMap() {
   m_whiteBalanceMap.insert(std::pair<EdsUInt32, const char *>(21, "Custom 5"));
   m_whiteBalanceMap.insert(
       std::pair<EdsUInt32, const char *>(23, "Auto: White Priority"));
+}
+
+//-----------------------------------------------------------------
+
+void StopMotion::buildImageQualityMap() {
+  m_imageQualityMap.insert(
+      std::pair<EdsUInt32, const char *>(EdsImageQuality_LR, "RAW"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRLJF, "RAW + Large Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRMJF, "RAW + Middle Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRSJF, "RAW + Small Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRLJN, "RAW + Large Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRMJN, "RAW + Middle Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRSJN, "RAW + Small Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRS1JF, "RAW + Small1 Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRS1JN, "RAW + Small1 Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRS2JF, "RAW + Small2 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRS3JF, "RAW + Small3 Jpeg"));
+
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRLJ, "RAW + Large Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRM1J, "RAW + Middle1 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRM2J, "RAW + Middle2 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LRSJ, "RAW + Small Jpeg"));
+
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MR, "Middle Raw(Small RAW1)"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRLJF, "Middle Raw(Small RAW1) + Large Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRMJF, "Middle Raw(Small RAW1) + Middle Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRSJF, "Middle Raw(Small RAW1) + Small Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRLJN, "Middle Raw(Small RAW1) + Large Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRMJN, "Middle Raw(Small RAW1) + Middle Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRSJN, "Middle Raw(Small RAW1) + Small Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRS1JF, "Middle RAW + Small1 Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRS1JN, "Middle RAW + Small1 Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRS2JF, "Middle RAW + Small2 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRS3JF, "Middle RAW + Small3 Jpeg"));
+
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRLJ, "Middle Raw + Large Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRM1J, "Middle Raw + Middle1 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRM2J, "Middle Raw + Middle2 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MRSJ, "Middle Raw + Small Jpeg"));
+
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SR, "Small RAW(Small RAW2)"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRLJF, "Small RAW(Small RAW2) + Large Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRMJF, "Small RAW(Small RAW2) + Middle Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRSJF, "Small RAW(Small RAW2) + Small Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRLJN, "Small RAW(Small RAW2) + Large Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRMJN, "Small RAW(Small RAW2) + Middle Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRSJN, "Small RAW(Small RAW2) + Small Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRS1JF, "Small RAW + Small1 Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRS1JN, "Small RAW + Small1 Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRS2JF, "Small RAW + Small2 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRS3JF, "Small RAW + Small3 Jpeg"));
+
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRLJ, "Small RAW + Large Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRM1J, "Small RAW + Middle1 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRM2J, "Small RAW + Middle2 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SRSJ, "Small RAW + Small Jpeg"));
+
+  m_imageQualityMap.insert(
+      std::pair<EdsUInt32, const char *>(EdsImageQuality_CR, "CRAW"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRLJF, "CRAW + Large Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRMJF, "CRAW + Middle Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRM1JF, "CRAW + Middle1 Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRM2JF, "CRAW + Middle2 Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRSJF, "CRAW + Small Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRS1JF, "CRAW + Small1 Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRS2JF, "CRAW + Small2 Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRS3JF, "CRAW + Small3 Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRLJN, "CRAW + Large Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRMJN, "CRAW + Middle Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRM1JN, "CRAW + Middle1 Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRM2JN, "CRAW + Middle2 Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRSJN, "CRAW + Small Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRS1JN, "CRAW + Small1 Normal Jpeg"));
+
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRLJ, "CRAW + Large Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRM1J, "CRAW + Middle1 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRM2J, "CRAW + Middle2 Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_CRSJ, "CRAW + Small Jpeg"));
+
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LJF, "Large Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_LJN, "Large Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MJF, "Middle Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_MJN, "Middle Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SJF, "Small Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_SJN, "Small Normal Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_S1JF, "Small1 Fine Jpeg"));
+  m_imageQualityMap.insert(std::pair<EdsUInt32, const char *>(
+      EdsImageQuality_S1JN, "Small1 Normal Jpeg"));
+  m_imageQualityMap.insert(
+      std::pair<EdsUInt32, const char *>(EdsImageQuality_S2JF, "Small2 Jpeg"));
+  m_imageQualityMap.insert(
+      std::pair<EdsUInt32, const char *>(EdsImageQuality_S3JF, "Small3 Jpeg"));
+
+  m_imageQualityMap.insert(
+      std::pair<EdsUInt32, const char *>(EdsImageQuality_LJ, "Large Jpeg"));
+  m_imageQualityMap.insert(
+      std::pair<EdsUInt32, const char *>(EdsImageQuality_M1J, "Middle1 Jpeg"));
+  m_imageQualityMap.insert(
+      std::pair<EdsUInt32, const char *>(EdsImageQuality_M2J, "Middle2 Jpeg"));
+  m_imageQualityMap.insert(
+      std::pair<EdsUInt32, const char *>(EdsImageQuality_SJ, "Small Jpeg"));
+}
+
+//-----------------------------------------------------------------
+
+void StopMotion::buildPictureStyleMap() {
+  m_pictureStyleMap.insert(std::pair<EdsUInt32, const char *>(
+      kEdsPictureStyle_Standard, "Standard"));
+  m_pictureStyleMap.insert(std::pair<EdsUInt32, const char *>(
+      kEdsPictureStyle_Portrait, "Portrait"));
+  m_pictureStyleMap.insert(std::pair<EdsUInt32, const char *>(
+      kEdsPictureStyle_Landscape, "Landscape"));
+  m_pictureStyleMap.insert(
+      std::pair<EdsUInt32, const char *>(kEdsPictureStyle_Neutral, "Neutral"));
+  m_pictureStyleMap.insert(std::pair<EdsUInt32, const char *>(
+      kEdsPictureStyle_Faithful, "Faithful"));
+  m_pictureStyleMap.insert(std::pair<EdsUInt32, const char *>(
+      kEdsPictureStyle_Monochrome, "Monochrome"));
+  m_pictureStyleMap.insert(
+      std::pair<EdsUInt32, const char *>(kEdsPictureStyle_Auto, "Auto"));
+  m_pictureStyleMap.insert(std::pair<EdsUInt32, const char *>(
+      kEdsPictureStyle_FineDetail, "Fine Detail"));
+  m_pictureStyleMap.insert(
+      std::pair<EdsUInt32, const char *>(kEdsPictureStyle_User1, "User 1"));
+  m_pictureStyleMap.insert(
+      std::pair<EdsUInt32, const char *>(kEdsPictureStyle_User2, "User 2"));
+  m_pictureStyleMap.insert(
+      std::pair<EdsUInt32, const char *>(kEdsPictureStyle_User3, "User 3"));
+  m_pictureStyleMap.insert(
+      std::pair<EdsUInt32, const char *>(kEdsPictureStyle_PC1, "Computer 1"));
+  m_pictureStyleMap.insert(
+      std::pair<EdsUInt32, const char *>(kEdsPictureStyle_PC2, "Computer 2"));
+  m_pictureStyleMap.insert(
+      std::pair<EdsUInt32, const char *>(kEdsPictureStyle_PC3, "Computer 3"));
 }
 
 //-----------------------------------------------------------------

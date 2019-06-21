@@ -453,6 +453,8 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     m_apertureCombo       = new QComboBox(this);
     m_whiteBalanceCombo   = new QComboBox(this);
     m_kelvinCombo         = new QComboBox(this);
+    m_imageQualityCombo   = new QComboBox(this);
+    m_pictureStyleCombo   = new QComboBox(this);
     m_cameraSettingsLabel = new QLabel(tr("Camera Model"), this);
     m_cameraModeLabel     = new QLabel(tr("Camera Mode"), this);
     m_kelvinLabel         = new QLabel(tr("Temperature: "), this);
@@ -484,11 +486,17 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
       settingsGridLayout->addWidget(new QLabel(tr("Exposure: ")), 5, 0,
                                     Qt::AlignRight);
       settingsGridLayout->addWidget(m_exposureCombo, 5, 1, Qt::AlignLeft);
-      settingsGridLayout->addWidget(new QLabel(tr("White Balance: ")), 6, 0,
+      settingsGridLayout->addWidget(new QLabel(tr("Image Quality: ")), 6, 0,
                                     Qt::AlignRight);
-      settingsGridLayout->addWidget(m_whiteBalanceCombo, 6, 1, Qt::AlignLeft);
-      settingsGridLayout->addWidget(m_kelvinLabel, 7, 0, Qt::AlignRight);
-      settingsGridLayout->addWidget(m_kelvinCombo, 7, 1, Qt::AlignLeft);
+      settingsGridLayout->addWidget(m_imageQualityCombo, 6, 1, Qt::AlignLeft);
+      settingsGridLayout->addWidget(new QLabel(tr("Picture Style: ")), 7, 0,
+                                    Qt::AlignRight);
+      settingsGridLayout->addWidget(m_pictureStyleCombo, 7, 1, Qt::AlignLeft);
+      settingsGridLayout->addWidget(new QLabel(tr("White Balance: ")), 8, 0,
+                                    Qt::AlignRight);
+      settingsGridLayout->addWidget(m_whiteBalanceCombo, 8, 1, Qt::AlignLeft);
+      settingsGridLayout->addWidget(m_kelvinLabel, 9, 0, Qt::AlignRight);
+      settingsGridLayout->addWidget(m_kelvinCombo, 9, 1, Qt::AlignLeft);
 
       settingsGridLayout->setColumnStretch(1, 30);
     }
@@ -793,6 +801,10 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
                        this, SLOT(onExposureChangedSignal(QString)));
   ret = ret && connect(m_stopMotion, SIGNAL(whiteBalanceChangedSignal(QString)),
                        this, SLOT(onWhiteBalanceChangedSignal(QString)));
+  ret = ret && connect(m_stopMotion, SIGNAL(imageQualityChangedSignal(QString)),
+                       this, SLOT(onImageQualityChangedSignal(QString)));
+  ret = ret && connect(m_stopMotion, SIGNAL(pictureStyleChangedSignal(QString)),
+                       this, SLOT(onPictureStyleChangedSignal(QString)));
   ret = ret &&
         connect(m_stopMotion, SIGNAL(colorTemperatureChangedSignal(QString)),
                 this, SLOT(onColorTemperatureChangedSignal(QString)));
@@ -808,6 +820,10 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
                        this, SLOT(onWhiteBalanceChanged(int)));
   ret = ret && connect(m_kelvinCombo, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onColorTemperatureChanged(int)));
+  ret = ret && connect(m_imageQualityCombo, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onImageQualityChanged(int)));
+  ret = ret && connect(m_pictureStyleCombo, SIGNAL(currentIndexChanged(int)),
+                       this, SLOT(onPictureStyleChanged(int)));
   ret = ret && connect(m_stopMotion, SIGNAL(apertureOptionsChanged()), this,
                        SLOT(refreshApertureList()));
   ret = ret && connect(m_stopMotion, SIGNAL(shutterSpeedOptionsChanged()), this,
@@ -818,6 +834,10 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
                        SLOT(refreshExposureList()));
   ret = ret && connect(m_stopMotion, SIGNAL(whiteBalanceOptionsChanged()), this,
                        SLOT(refreshWhiteBalanceList()));
+  ret = ret && connect(m_stopMotion, SIGNAL(imageQualityOptionsChanged()), this,
+                       SLOT(refreshImageQualityList()));
+  ret = ret && connect(m_stopMotion, SIGNAL(pictureStyleOptionsChanged()), this,
+                       SLOT(refreshPictureStyleList()));
   ret = ret &&
         connect(m_stopMotion, SIGNAL(modeChanged()), this, SLOT(refreshMode()));
 
@@ -1087,6 +1107,10 @@ void StopMotionController::refreshOptionsLists() {
   m_isoCombo->blockSignals(true);
   m_shutterSpeedCombo->blockSignals(true);
   m_exposureCombo->blockSignals(true);
+  m_whiteBalanceCombo->blockSignals(true);
+  m_kelvinCombo->blockSignals(true);
+  m_imageQualityCombo->blockSignals(true);
+  m_pictureStyleCombo->blockSignals(true);
 
   m_isoCombo->clear();
   m_shutterSpeedCombo->clear();
@@ -1101,6 +1125,8 @@ void StopMotionController::refreshOptionsLists() {
     m_exposureCombo->setDisabled(true);
     m_whiteBalanceCombo->setDisabled(true);
     m_kelvinCombo->setDisabled(true);
+    m_imageQualityCombo->setDisabled(true);
+    m_pictureStyleCombo->setDisabled(true);
     return;
   }
 
@@ -1109,6 +1135,8 @@ void StopMotionController::refreshOptionsLists() {
   refreshIsoList();
   refreshExposureList();
   refreshWhiteBalanceList();
+  refreshImageQualityList();
+  refreshPictureStyleList();
 }
 
 //-----------------------------------------------------------------------------
@@ -1236,6 +1264,42 @@ void StopMotionController::refreshColorTemperatureList() {
     m_kelvinCombo->setCurrentText(m_stopMotion->getCurrentColorTemperature());
   }
   m_kelvinCombo->blockSignals(false);
+}
+
+//-----------------------------------------------------------------------------
+
+void StopMotionController::refreshImageQualityList() {
+  m_imageQualityCombo->blockSignals(true);
+  m_imageQualityCombo->clear();
+  m_stopMotion->getAvailableImageQualities();
+  m_imageQualityCombo->addItems(m_stopMotion->getImageQualityOptions());
+
+  if (m_imageQualityCombo->count() == 0) {
+    m_imageQualityCombo->addItem(tr("Disabled"));
+    m_imageQualityCombo->setDisabled(true);
+  } else {
+    m_imageQualityCombo->setEnabled(true);
+    m_imageQualityCombo->setCurrentText(m_stopMotion->getCurrentImageQuality());
+  }
+  m_imageQualityCombo->blockSignals(false);
+}
+
+//-----------------------------------------------------------------------------
+
+void StopMotionController::refreshPictureStyleList() {
+  m_pictureStyleCombo->blockSignals(true);
+  m_pictureStyleCombo->clear();
+  m_stopMotion->getAvailablePictureStyles();
+  m_pictureStyleCombo->addItems(m_stopMotion->getPictureStyleOptions());
+
+  if (m_pictureStyleCombo->count() == 0) {
+    m_pictureStyleCombo->addItem(tr("Disabled"));
+    m_pictureStyleCombo->setDisabled(true);
+  } else {
+    m_pictureStyleCombo->setEnabled(true);
+    m_pictureStyleCombo->setCurrentText(m_stopMotion->getCurrentPictureStyle());
+  }
+  m_pictureStyleCombo->blockSignals(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1462,6 +1526,30 @@ void StopMotionController::onColorTemperatureChanged(int index) {
 
 void StopMotionController::onColorTemperatureChangedSignal(QString text) {
   m_kelvinCombo->setCurrentText(m_stopMotion->getCurrentColorTemperature());
+}
+
+//-----------------------------------------------------------------------------
+
+void StopMotionController::onImageQualityChanged(int index) {
+  m_stopMotion->setImageQuality(m_imageQualityCombo->currentText());
+}
+
+//-----------------------------------------------------------------------------
+
+void StopMotionController::onImageQualityChangedSignal(QString text) {
+  m_imageQualityCombo->setCurrentText(m_stopMotion->getCurrentImageQuality());
+}
+
+//-----------------------------------------------------------------------------
+
+void StopMotionController::onPictureStyleChanged(int index) {
+  m_stopMotion->setPictureStyle(m_pictureStyleCombo->currentText());
+}
+
+//-----------------------------------------------------------------------------
+
+void StopMotionController::onPictureStyleChangedSignal(QString text) {
+  m_pictureStyleCombo->setCurrentText(m_stopMotion->getCurrentPictureStyle());
 }
 
 //-----------------------------------------------------------------------------
