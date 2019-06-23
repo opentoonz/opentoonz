@@ -476,6 +476,21 @@ protected slots:
 
 //=============================================================================
 //
+// FullColorFillToolOptionsBox
+//
+//=============================================================================
+
+class FullColorFillToolOptionsBox final : public ToolOptionsBox {
+  Q_OBJECT
+
+public:
+  FullColorFillToolOptionsBox(QWidget *parent, TTool *tool,
+                              TPaletteHandle *pltHandle,
+                              ToolHandle *toolHandle);
+};
+
+//=============================================================================
+//
 // FillToolOptionsBox
 //
 //=============================================================================

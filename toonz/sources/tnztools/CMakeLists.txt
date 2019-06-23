@@ -3,6 +3,7 @@ set(MOC_HEADERS
     edittoolgadgets.h
     filltool.h
     fullcolorbrushtool.h
+    fullcolorfilltool.h
     plastictool.h
     skeletonsubtools.h
     tooloptionscontrols.h
@@ -58,6 +59,7 @@ set(SOURCES
     filltool.cpp
     fullcolorbrushtool.cpp
     fullcolorerasertool.cpp
+    fullcolorfilltool.cpp
     geometrictool.cpp
     hooktool.cpp
     hookselection.cpp
