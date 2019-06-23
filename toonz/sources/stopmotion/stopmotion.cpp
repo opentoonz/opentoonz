@@ -540,6 +540,13 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
           std::pair<std::string, QAction *>(shortcut, action));
       action == NULL;
     }
+    shortcut = "*";
+    action   = comm->getActionFromShortcut(shortcut);
+    if (action) {
+      m_oldActionMap.insert(
+          std::pair<std::string, QAction *>(shortcut, action));
+      action == NULL;
+    }
 
     // now set all new shortcuts
     action = comm->getAction(MI_PrevDrawing);
@@ -585,6 +592,11 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
     action = comm->getAction(MI_StopMotionToggleLiveView);
     if (action) {
       action->setShortcut(QKeySequence("5"));
+      action == NULL;
+    }
+    action = comm->getAction(MI_StopMotionToggleZoom);
+    if (action) {
+      action->setShortcut(QKeySequence("*"));
       action == NULL;
     }
 
@@ -640,6 +652,12 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
       action == NULL;
     }
     action = comm->getAction(MI_StopMotionToggleLiveView);
+    if (action) {
+      action->setShortcut(
+          QKeySequence(comm->getShortcutFromAction(action).c_str()));
+      action == NULL;
+    }
+    action = comm->getAction(MI_StopMotionToggleZoom);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
@@ -1194,7 +1212,15 @@ bool StopMotion::importImage() {
 //-----------------------------------------------------------------
 
 void StopMotion::captureImage() {
+  if (!m_usingWebcam && !m_sessionOpen) {
+    DVGui::warning("Please start live view before capturing an image.");
+    return;
+  }
   if (m_usingWebcam) {
+    if (!m_hasLiveViewImage) {
+      DVGui::warning("Cannot capture webcam image unless live view is active.");
+      return;
+    }
     if (getReviewTime() > 0) {
       m_timer->stop();
       if (m_liveViewStatus > 0) {
@@ -1206,7 +1232,7 @@ void StopMotion::captureImage() {
   }
   if (getBlackCapture()) {
     m_fullScreen1->showFullScreen();
-
+    m_fullScreen2->setGeometry(QApplication::desktop()->screenGeometry(0));
     if (m_screenCount > 1) {
       m_fullScreen2->showFullScreen();
       m_fullScreen2->setGeometry(QApplication::desktop()->screenGeometry(1));
@@ -2734,6 +2760,7 @@ EdsError StopMotion::endLiveView() {
 //-----------------------------------------------------------------
 
 EdsError StopMotion::zoomLiveView() {
+  if (!m_sessionOpen) return EDS_ERR_DEVICE_INVALID;
   EdsError err = EDS_ERR_OK;
 
   if (m_liveViewZoom == 1) {
@@ -3625,3 +3652,40 @@ public:
     sm->pauseLiveView();
   }
 } StopMotionToggleLiveViewCommand;
+
+//=============================================================================
+
+class StopMotionToggleZoomCommand : public MenuItemHandler {
+public:
+  StopMotionToggleZoomCommand() : MenuItemHandler(MI_StopMotionToggleZoom) {}
+  void execute() {
+    StopMotion *sm = StopMotion::instance();
+    sm->zoomLiveView();
+  }
+} StopMotionToggleZoomCommand;
+
+//=============================================================================
+
+class StopMotionLowerSubsamplingCommand : public MenuItemHandler {
+public:
+  StopMotionLowerSubsamplingCommand()
+      : MenuItemHandler(MI_StopMotionLowerSubsampling) {}
+  void execute() {
+    StopMotion *sm = StopMotion::instance();
+    sm->setSubsamplingValue(std::max(1, sm->getSubsamplingValue() - 1));
+    sm->setSubsampling();
+  }
+} StopMotionLowerSubsamplingCommand;
+
+//=============================================================================
+
+class StopMotionRaiseSubsamplingCommand : public MenuItemHandler {
+public:
+  StopMotionRaiseSubsamplingCommand()
+      : MenuItemHandler(MI_StopMotionRaiseSubsampling) {}
+  void execute() {
+    StopMotion *sm = StopMotion::instance();
+    sm->setSubsamplingValue(std::min(30, sm->getSubsamplingValue() + 1));
+    sm->setSubsampling();
+  }
+} StopMotionRaiseSubsamplingCommand;

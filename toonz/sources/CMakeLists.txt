@@ -346,7 +346,10 @@ if(BUILD_ENV_MSVC)
     if (WITH_STOPMOTION)
     set(CANON_LIB ${SDKROOT}/canon/library/EDSDK.lib)
     set(TURBOJPEG_LIB ${SDKROOT}/libjpeg-turbo64/lib/turbojpeg.lib)
-    set(OPENCV_LIB ${SDKROOT}/opencv2/lib/opencv_world410d.lib)
+    set(OPENCV_LIB 
+        optimized ${SDKROOT}/opencv2/lib/opencv_world410.lib
+        debug ${SDKROOT}/opencv2/lib/opencv_world410d.lib
+    )
     endif()
     if(PLATFORM EQUAL 32)
         set(QT_LIB ${SDKROOT}/quicktime/QT73SDK/Libraries/QTMLClient.lib)

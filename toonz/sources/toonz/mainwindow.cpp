@@ -2245,6 +2245,11 @@ void MainWindow::defineActions() {
   createAction(MI_StopMotionLowerOpacity, tr("Lower Stop Motion Opacity"), "");
   createAction(MI_StopMotionToggleLiveView, tr("Toggle Stop Motion Live View"),
                "");
+  createAction(MI_StopMotionToggleZoom, tr("Toggle Stop Motion Zoom"), "");
+  createAction(MI_StopMotionLowerSubsampling,
+               tr("Lower Stop Motion Level Subsampling"), "");
+  createAction(MI_StopMotionRaiseSubsampling,
+               tr("Raise Stop Motion Level Subsampling"), "");
 #endif
 }
 
