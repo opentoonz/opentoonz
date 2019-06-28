@@ -2184,8 +2184,10 @@ bool StopMotion::toggleLiveView() {
     m_timer->stop();
     emit(liveViewChanged(false));
     return false;
+  } else {
+    DVGui::warning(tr("No camera selected."));
+    return false;
   }
-  return false;
 }
 
 //-----------------------------------------------------------------

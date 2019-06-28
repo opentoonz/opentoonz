@@ -1085,6 +1085,7 @@ void StopMotionController::refreshCameraList() {
       m_stopMotion->getCamera(0);
       m_stopMotion->openCameraSession();
       name = QString::fromStdString(m_stopMotion->getCameraName());
+      m_stopMotion->closeCameraSession();
       m_cameraSettingsLabel->setText(name);
       m_cameraListCombo->addItem(name);
       maxTextLength = std::max(maxTextLength, fontMetrics().width(name));
