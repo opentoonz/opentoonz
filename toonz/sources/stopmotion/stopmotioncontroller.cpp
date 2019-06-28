@@ -849,8 +849,8 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
 
   assert(ret);
 
-  m_placeOnXSheetCB->setChecked(m_stopMotion->getPlaceOnXSheet() > 0 ? true
-                                                                     : false);
+  m_placeOnXSheetCB->setChecked(
+      m_stopMotion->getPlaceOnXSheet() == true ? true : false);
   m_useScaledFullSizeImages->setChecked(m_stopMotion->m_useScaledImages);
   m_onionOpacityFld->setValue(double(100 * m_stopMotion->getOpacity()) / 255.0);
   m_directShowCB->setChecked(m_stopMotion->getUseDirectShow());
@@ -858,7 +858,7 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   m_useNumpadCB->setChecked(m_stopMotion->getUseNumpadShortcuts());
   m_liveViewOnAllFramesCB->setChecked(m_stopMotion->getAlwaysLiveView());
   m_blackScreenForCapture->setChecked(
-      m_stopMotion->getBlackCapture() > 0 ? true : false);
+      m_stopMotion->getBlackCapture() == true ? true : false);
   m_postCaptureReviewFld->setValue(m_stopMotion->getReviewTime());
 
   refreshCameraList();

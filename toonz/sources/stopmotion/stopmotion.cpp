@@ -239,9 +239,7 @@ void JpgConverter::convertFromJpg() {
   err                     = EdsGetLength(m_stream, &mySize);
 
   int width, height, pixelFormat;
-  long size;
   int inSubsamp, inColorspace;
-  unsigned long jpegSize;
   tjhandle tjInstance   = NULL;
   unsigned char *imgBuf = NULL;
   tjInstance            = tjInitDecompress();
@@ -251,7 +249,7 @@ void JpgConverter::convertFromJpg() {
   pixelFormat = TJPF_BGRX;
   imgBuf = (unsigned char *)tjAlloc(width * height * tjPixelSize[pixelFormat]);
   int flags = 0;
-#ifdef WIN32:
+#ifdef WIN32
   flags |= TJFLAG_BOTTOMUP;
 #endif
   int factorsNum;
@@ -519,7 +517,7 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
         m_oldActionMap.insert(
             std::pair<std::string, QAction *>(shortcut, action));
         action->setShortcut(QKeySequence(""));
-        action == NULL;
+        action = NULL;
       }
     }
     shortcut = "+";
@@ -527,80 +525,80 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
     if (action) {
       m_oldActionMap.insert(
           std::pair<std::string, QAction *>(shortcut, action));
-      action == NULL;
+      action = NULL;
     }
     shortcut = "-";
     action   = comm->getActionFromShortcut(shortcut);
     if (action) {
       m_oldActionMap.insert(
           std::pair<std::string, QAction *>(shortcut, action));
-      action == NULL;
+      action = NULL;
     }
     shortcut = "Return";
     action   = comm->getActionFromShortcut(shortcut);
     if (action) {
       m_oldActionMap.insert(
           std::pair<std::string, QAction *>(shortcut, action));
-      action == NULL;
+      action = NULL;
     }
     shortcut = "*";
     action   = comm->getActionFromShortcut(shortcut);
     if (action) {
       m_oldActionMap.insert(
           std::pair<std::string, QAction *>(shortcut, action));
-      action == NULL;
+      action = NULL;
     }
 
     // now set all new shortcuts
     action = comm->getAction(MI_PrevDrawing);
     if (action) {
       action->setShortcut(QKeySequence("1"));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_NextDrawing);
     if (action) {
       action->setShortcut(QKeySequence("2"));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_LastFrame);
     if (action) {
       action->setShortcut(QKeySequence("3"));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_Loop);
     if (action) {
       action->setShortcut(QKeySequence("8"));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_Play);
     if (action) {
       action->setShortcut(QKeySequence("0"));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionRaiseOpacity);
     if (action) {
       action->setShortcut(QKeySequence("+"));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionLowerOpacity);
     if (action) {
       action->setShortcut(QKeySequence("-"));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionCapture);
     if (action) {
       action->setShortcut(QKeySequence("Enter"));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionToggleLiveView);
     if (action) {
       action->setShortcut(QKeySequence("5"));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionToggleZoom);
     if (action) {
       action->setShortcut(QKeySequence("*"));
-      action == NULL;
+      action = NULL;
     }
 
   } else {
@@ -610,61 +608,61 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_NextDrawing);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_LastFrame);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_Loop);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_Play);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionCapture);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionLowerOpacity);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionRaiseOpacity);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionToggleLiveView);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
     action = comm->getAction(MI_StopMotionToggleZoom);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
-      action == NULL;
+      action = NULL;
     }
 
     // now put back the old shortcuts
@@ -681,7 +679,7 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
         action   = comm->getActionFromShortcut(shortcut);
         if (action) {
           action->setShortcut(QKeySequence(""));
-          action == NULL;
+          action = NULL;
         }
       }
       Preferences::instance()->enableUseNumpadForSwitchingStyles(true);
@@ -1394,7 +1392,7 @@ void StopMotion::saveJpg(TRaster32P image, TFilePath path) {
   int width  = image->getLx();
   int height = image->getLy();
   int flags  = 0;
-#ifdef WIN32:
+#ifdef WIN32
   flags |= TJFLAG_BOTTOMUP;
 #endif
 
@@ -1463,7 +1461,7 @@ bool StopMotion::loadJpg(TFilePath path, TRaster32P &image) {
     success = false;
 
   int flags = 0;
-#ifdef WIN32:
+#ifdef WIN32
   flags |= TJFLAG_BOTTOMUP;
 #endif
   if (success &&
@@ -2187,6 +2185,7 @@ bool StopMotion::toggleLiveView() {
     emit(liveViewChanged(false));
     return false;
   }
+  return false;
 }
 
 //-----------------------------------------------------------------
@@ -2840,7 +2839,7 @@ EdsError StopMotion::downloadImage(EdsBaseRef object) {
   pixelFormat = TJPF_BGRX;
   imgBuf = (unsigned char *)tjAlloc(width * height * tjPixelSize[pixelFormat]);
   int flags = 0;
-#ifdef WIN32:
+#ifdef WIN32
   flags |= TJFLAG_BOTTOMUP;
 #endif
   int tempWidth, tempHeight;
@@ -3049,7 +3048,6 @@ EdsError StopMotion::downloadEVFData() {
   EdsError err            = EDS_ERR_OK;
   EdsStreamRef stream     = NULL;
   EdsEvfImageRef evfImage = NULL;
-  EdsImageInfo evfImageInfo;
 
   // Create memory stream.
   err = EdsCreateMemoryStream(0, &stream);
