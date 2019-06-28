@@ -925,6 +925,15 @@ double SceneViewer::getHGuide(int index) { return m_hRuler->getGuide(index); }
 
 void SceneViewer::onNewStopMotionImageReady() {
 #ifdef WITH_STOPMOTION
+  if (m_stopMotion->m_hasLineUpImage) {
+    if (m_hasStopMotionLineUpImage) delete m_stopMotionLineUpImage;
+    // is there a way to do this without cloning the image twice?
+    TRasterImageP image     = m_stopMotion->m_lineUpImage->clone();
+    m_stopMotionLineUpImage = (TRasterImage *)image->cloneImage();
+    m_stopMotionLineUpImage->setDpi(m_stopMotion->m_liveViewDpi.x,
+                                    m_stopMotion->m_liveViewDpi.y);
+    m_hasStopMotionLineUpImage = true;
+  }
   if (m_stopMotion->m_hasLiveViewImage) {
     if (m_hasStopMotionImage) delete m_stopMotionImage;
     // is there a way to do this without cloning the image twice?
@@ -1700,18 +1709,29 @@ void SceneViewer::drawScene() {
       args.m_isGuidedDrawingEnabled = useGuidedDrawing;
       Stage::visit(painter, args);
     }
+
 #ifdef WITH_STOPMOTION
-    if (!frameHandle->isPlaying() && m_stopMotion->m_liveViewStatus == 2 &&
-        m_hasStopMotionImage) {
-      Stage::Player smPlayer;
-      double dpiX, dpiY;
-      m_stopMotionImage->getDpi(dpiX, dpiY);
-      smPlayer.m_dpiAff = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
-      smPlayer.m_opacity =
-          m_stopMotion->m_zooming ? 255.0 : m_stopMotion->getOpacity();
-      painter.onRasterImage(m_stopMotionImage, smPlayer);
+    if (!frameHandle->isPlaying() && m_stopMotion->m_liveViewStatus == 2) {
+      if (m_hasStopMotionLineUpImage && !m_stopMotion->m_pickLiveViewZoom) {
+        Stage::Player smPlayer;
+        double dpiX, dpiY;
+        m_stopMotionLineUpImage->getDpi(dpiX, dpiY);
+        smPlayer.m_dpiAff  = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
+        smPlayer.m_opacity = 255;
+        painter.onRasterImage(m_stopMotionLineUpImage, smPlayer);
+      }
+      if (m_hasStopMotionImage) {
+        Stage::Player smPlayer;
+        double dpiX, dpiY;
+        m_stopMotionImage->getDpi(dpiX, dpiY);
+        smPlayer.m_dpiAff = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
+        smPlayer.m_opacity =
+            m_stopMotion->m_zooming ? 255.0 : m_stopMotion->getOpacity();
+        painter.onRasterImage(m_stopMotionImage, smPlayer);
+      }
     }
 #endif
+
     assert(glGetError() == 0);
     painter.flushRasterImages();
 

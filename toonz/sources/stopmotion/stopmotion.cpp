@@ -93,7 +93,10 @@ bool findCell(TXsheet *xsh, int col, const TXshCell &targetCell,
 
   for (int r = r0; r <= r1; r++) {
     TXshCell cell = cellColumn->getCell(r);
-    if (cell == targetCell) return true;
+    if (cell == targetCell) {
+      bottomRowWithTheSameLevel = r;
+      return true;
+    }
     if (cell.m_level == targetCell.m_level) bottomRowWithTheSameLevel = r;
   }
 
@@ -393,10 +396,10 @@ void StopMotion::onSceneSwitched() {
       sl                     = level->getSimpleLevel();
       bool isStopMotionLevel = sl->getProperties()->isStopMotionLevel();
       if (isStopMotionLevel) {
-        m_filePath          = sl->getPath().getParentDir().getQString();
-        m_levelName         = QString::fromStdWString(sl->getName());
-        m_frameNumber       = sl->getFrameCount() + 1;
-        m_xSheetFrameNumber = xsh->getFrameCount() + 1;
+        m_filePath    = sl->getPath().getParentDir().getQString();
+        m_levelName   = QString::fromStdWString(sl->getName());
+        m_frameNumber = sl->getFrameCount() + 1;
+        setXSheetFrameNumber(xsh->getFrameCount() + 1);
         break;
       }
     }
@@ -690,7 +693,85 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
 
 void StopMotion::setXSheetFrameNumber(int frameNumber) {
   m_xSheetFrameNumber = frameNumber;
+  loadLineUpImage();
   emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
+}
+
+//-----------------------------------------------------------------
+
+bool StopMotion::loadLineUpImage() {
+  if (m_liveViewStatus < 0 || m_usingWebcam) return false;
+  m_hasLineUpImage = false;
+  // first see if the level exists in the current level set
+  ToonzScene *currentScene = TApp::instance()->getCurrentScene()->getScene();
+  TLevelSet *levelSet      = currentScene->getLevelSet();
+
+  std::wstring levelName = m_levelName.toStdWString();
+
+  // level with the same name
+  TXshLevel *level_sameName = levelSet->getLevel(levelName);
+
+  TFilePath levelFp = TFilePath(m_filePath) +
+                      TFilePath(levelName + L".." + m_fileType.toStdWString());
+
+  // level with the same path
+  TXshLevel *level_samePath = levelSet->getLevel(*(currentScene), levelFp);
+
+  TFilePath actualLevelFp = currentScene->decodeFilePath(levelFp);
+  TXshSimpleLevelP sl;
+  if (level_sameName && level_samePath && level_sameName == level_samePath) {
+    sl                 = dynamic_cast<TXshSimpleLevel *>(level_sameName);
+    bool isRasterLevel = sl && (sl->getType() == OVL_XSHLEVEL);
+    if (!isRasterLevel) {
+      return false;
+    }
+  } else
+    return false;
+
+  // next we need to find the column the level is on
+
+  TApp *app    = TApp::instance();
+  TXsheet *xsh = currentScene->getXsheet();
+  int row      = m_xSheetFrameNumber - 2;
+  int col      = app->getCurrentColumn()->getColumnIndex();
+
+  int foundCol = -1;
+  // most possibly, it's in the current column
+  int rowCheck;
+  findCell(xsh, col, TXshCell(level_sameName, TFrameId(1)), rowCheck);
+  if (rowCheck >= 0) {
+    foundCol = col;
+  } else {
+    // search entire xsheet
+    for (int c = 0; c < xsh->getColumnCount(); c++) {
+      if (c == col) continue;
+      findCell(xsh, c, TXshCell(level_sameName, TFrameId(1)), rowCheck);
+      if (rowCheck >= 0) {
+        foundCol = c;
+      }
+    }
+  }
+  if (rowCheck < 0) return false;
+
+  // note found row represents the last row found that uses
+  // the active level
+
+  int frameNumber;
+  frameNumber = xsh->getCell(row, foundCol).getFrameId().getNumber();
+
+  // now check to see if a file actually exists there
+  TFilePath liveViewFolder = currentScene->decodeFilePath(
+      TFilePath(m_filePath) + TFilePath(levelName + L"_LiveView"));
+  TFilePath liveViewFp = currentScene->decodeFilePath(
+      liveViewFolder + TFilePath(levelName + L"..jpg"));
+  TFilePath liveViewFile(liveViewFp.withFrame(frameNumber));
+  if (TFileStatus(liveViewFile).doesExist()) {
+    if (loadJpg(liveViewFile, m_lineUpImage)) {
+      m_hasLineUpImage = true;
+      return true;
+    }
+  }
+  return false;
 }
 
 //-----------------------------------------------------------------
@@ -960,6 +1041,8 @@ bool StopMotion::importImage() {
   TFilePath parentDir     = scene->decodeFilePath(TFilePath(m_filePath));
   TFilePath fullResFolder = scene->decodeFilePath(
       TFilePath(m_filePath) + TFilePath(levelName + L"_FullRes"));
+  TFilePath liveViewFolder = scene->decodeFilePath(
+      TFilePath(m_filePath) + TFilePath(levelName + L"_LiveView"));
   if (!TFileStatus(parentDir).doesExist()) {
     QString question;
     question = tr("Folder %1 doesn't exist.\nDo you want to create it?")
@@ -974,13 +1057,24 @@ bool StopMotion::importImage() {
       return false;
     }
   }
-  if (!TFileStatus(fullResFolder).doesExist()) {
-    try {
-      TSystem::mkDir(fullResFolder);
-      DvDirModel::instance()->refreshFolder(fullResFolder.getParentDir());
-    } catch (...) {
-      DVGui::error(tr("Unable to create") + toQString(fullResFolder));
-      return false;
+  if (!m_usingWebcam) {
+    if (!TFileStatus(fullResFolder).doesExist()) {
+      try {
+        TSystem::mkDir(fullResFolder);
+        DvDirModel::instance()->refreshFolder(fullResFolder.getParentDir());
+      } catch (...) {
+        DVGui::error(tr("Unable to create") + toQString(fullResFolder));
+        return false;
+      }
+    }
+    if (!TFileStatus(liveViewFolder).doesExist()) {
+      try {
+        TSystem::mkDir(liveViewFolder);
+        DvDirModel::instance()->refreshFolder(liveViewFolder.getParentDir());
+      } catch (...) {
+        DVGui::error(tr("Unable to create") + toQString(liveViewFolder));
+        return false;
+      }
     }
   }
 
@@ -991,6 +1085,11 @@ bool StopMotion::importImage() {
   TFilePath fullResFp =
       scene->decodeFilePath(fullResFolder + TFilePath(levelName + L"..jpg"));
   TFilePath fullResFile(fullResFp.withFrame(frameNumber));
+
+  TFilePath liveViewFp =
+      scene->decodeFilePath(liveViewFolder + TFilePath(levelName + L"..jpg"));
+  TFilePath liveViewFile(liveViewFp.withFrame(frameNumber));
+
   TFilePath tempFile  = parentDir + "temp.jpg";
   TXshSimpleLevel *sl = 0;
 
@@ -1098,9 +1197,14 @@ bool StopMotion::importImage() {
   }
 
   // move the temp file
-  if (!m_usingWebcam && m_useScaledImages) {
-    TSystem::copyFile(fullResFile, tempFile);
-    TSystem::deleteFile(tempFile);
+  if (!m_usingWebcam) {
+    if (m_useScaledImages) {
+      TSystem::copyFile(fullResFile, tempFile);
+      TSystem::deleteFile(tempFile);
+    }
+    if (m_hasLineUpImage) {
+      saveJpg(m_lineUpImage, liveViewFile);
+    }
   }
 
   TFrameId fid(frameNumber);
@@ -1144,10 +1248,10 @@ bool StopMotion::importImage() {
     m_xSheetFrameNumber = row + 2;
     emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
     postImportProcess();
-    if (m_newImage->getLx() > 2000) {
-      m_subsampling = 4;
-      setSubsampling();
-    }
+    // if (m_newImage->getLx() > 2000) {
+    //  m_subsampling = 4;
+    //  setSubsampling();
+    //}
     return true;
   }
 
@@ -1232,7 +1336,7 @@ void StopMotion::captureImage() {
   }
   if (getBlackCapture()) {
     m_fullScreen1->showFullScreen();
-    m_fullScreen2->setGeometry(QApplication::desktop()->screenGeometry(0));
+    m_fullScreen1->setGeometry(QApplication::desktop()->screenGeometry(0));
     if (m_screenCount > 1) {
       m_fullScreen2->showFullScreen();
       m_fullScreen2->setGeometry(QApplication::desktop()->screenGeometry(1));
@@ -1249,9 +1353,15 @@ void StopMotion::captureImage() {
 
   if (getReviewTime() > 0) {
     m_timer->stop();
-    if (m_liveViewStatus > 0) {
-      m_liveViewStatus = 3;
-    }
+  }
+
+  if (m_liveViewStatus > 0) {
+    m_liveViewStatus = 3;
+  }
+
+  if (m_hasLiveViewImage) {
+    m_lineUpImage    = m_liveViewImage;
+    m_hasLineUpImage = true;
   }
 
   TApp *app         = TApp::instance();
@@ -1266,8 +1376,115 @@ void StopMotion::captureImage() {
   if (!TFileStatus(parentDir).doesExist()) {
     TSystem::mkDir(parentDir);
   }
+  m_tempFile = tempFile.getQString();
+  takePicture();
+}
 
-  takePicture(tempFile.getQString());
+//-----------------------------------------------------------------------------
+
+void StopMotion::saveJpg(TRaster32P image, TFilePath path) {
+  unsigned char *jpegBuf = NULL; /* Dynamically allocate the JPEG buffer */
+  unsigned long jpegSize = 0;
+  int pixelFormat        = TJPF_BGRX;
+  int outQual            = 95;
+  int subSamp            = TJSAMP_411;
+  bool success           = false;
+  tjhandle tjInstance;
+
+  int width  = image->getLx();
+  int height = image->getLy();
+  int flags  = 0;
+#ifdef WIN32:
+  flags |= TJFLAG_BOTTOMUP;
+#endif
+
+  image->lock();
+  uchar *rawData = image->getRawData();
+  if ((tjInstance = tjInitCompress()) != NULL) {
+    if (tjCompress2(tjInstance, rawData, width, 0, height, pixelFormat,
+                    &jpegBuf, &jpegSize, subSamp, outQual, flags) >= 0) {
+      success = true;
+    }
+  }
+  image->unlock();
+  tjDestroy(tjInstance);
+  tjInstance = NULL;
+
+  if (success) {
+    /* Write the JPEG image to disk. */
+    QFile fullImage(path.getQString());
+    fullImage.open(QIODevice::WriteOnly);
+    QDataStream dataStream(&fullImage);
+    dataStream.writeRawData((const char *)jpegBuf, jpegSize);
+    fullImage.close();
+  }
+  tjFree(jpegBuf);
+  jpegBuf = NULL;
+}
+
+//-----------------------------------------------------------------------------
+
+bool StopMotion::loadJpg(TFilePath path, TRaster32P &image) {
+  long size;
+  int inSubsamp, inColorspace, width, height;
+  unsigned long jpegSize;
+  unsigned char *jpegBuf;
+  FILE *jpegFile;
+  QString qPath      = path.getQString();
+  QByteArray ba      = qPath.toLocal8Bit();
+  const char *c_path = ba.data();
+  bool success       = true;
+  tjhandle tjInstance;
+
+  /* Read the JPEG file into memory. */
+  if ((jpegFile = fopen(c_path, "rb")) == NULL) success = false;
+  if (success && fseek(jpegFile, 0, SEEK_END) < 0 ||
+      ((size = ftell(jpegFile)) < 0) || fseek(jpegFile, 0, SEEK_SET) < 0)
+    success                         = false;
+  if (success && size == 0) success = false;
+  jpegSize                          = (unsigned long)size;
+  if (success && (jpegBuf = (unsigned char *)tjAlloc(jpegSize)) == NULL)
+    success = false;
+  if (success && fread(jpegBuf, jpegSize, 1, jpegFile) < 1) success = false;
+  fclose(jpegFile);
+  jpegFile = NULL;
+
+  if (success && (tjInstance = tjInitDecompress()) == NULL) success = false;
+
+  if (success &&
+      tjDecompressHeader3(tjInstance, jpegBuf, jpegSize, &width, &height,
+                          &inSubsamp, &inColorspace) < 0)
+    success = false;
+
+  int pixelFormat       = TJPF_BGRX;
+  unsigned char *imgBuf = NULL;
+  if (success &&
+      (imgBuf = tjAlloc(width * height * tjPixelSize[pixelFormat])) == NULL)
+    success = false;
+
+  int flags = 0;
+#ifdef WIN32:
+  flags |= TJFLAG_BOTTOMUP;
+#endif
+  if (success &&
+      tjDecompress2(tjInstance, jpegBuf, jpegSize, imgBuf, width, 0, height,
+                    pixelFormat, flags) < 0)
+    success = false;
+  tjFree(jpegBuf);
+  jpegBuf = NULL;
+  tjDestroy(tjInstance);
+  tjInstance = NULL;
+
+  image = TRaster32P(width, height);
+  image->lock();
+  uchar *rawData = image->getRawData();
+  memcpy(rawData, imgBuf, width * height * tjPixelSize[pixelFormat]);
+  image->unlock();
+
+  tjFree(imgBuf);
+  imgBuf = NULL;
+
+  return success;
 }
 
 //-----------------------------------------------------------------------------
@@ -1545,6 +1762,7 @@ void StopMotion::refreshFrameInfo() {
 void StopMotion::updateLevelNameAndFrame(std::wstring levelName) {
   if (levelName != m_levelName.toStdWString()) {
     m_levelName = QString::fromStdWString(levelName);
+    loadLineUpImage();
   }
   emit(levelNameChanged(m_levelName));
   // m_previousLevelButton->setDisabled(levelName == L"A");
@@ -1952,9 +2170,10 @@ bool StopMotion::toggleLiveView() {
   if ((m_sessionOpen || m_usingWebcam) && m_liveViewStatus == 0) {
     m_liveViewDpi             = TPointD(0.0, 0.0);
     m_liveViewImageDimensions = TDimension(0, 0);
-    if (!m_usingWebcam)
+    if (!m_usingWebcam) {
+      loadLineUpImage();
       startLiveView();
-    else
+    } else
       m_liveViewStatus = 1;
     m_timer->start(40);
     emit(liveViewChanged(true));
@@ -2595,6 +2814,7 @@ EdsError StopMotion::downloadImage(EdsBaseRef object) {
   EdsError err        = EDS_ERR_OK;
   EdsStreamRef stream = NULL;
   EdsDirectoryItemInfo dirItemInfo;
+
   err = EdsGetDirectoryItemInfo(object, &dirItemInfo);
   err = EdsCreateMemoryStream(0, &stream);
   err = EdsDownload(object, dirItemInfo.size, stream);
@@ -2608,9 +2828,9 @@ EdsError StopMotion::downloadImage(EdsBaseRef object) {
   err                     = EdsGetLength(stream, &mySize);
 
   int width, height, pixelFormat;
-  long size;
+  // long size;
   int inSubsamp, inColorspace;
-  unsigned long jpegSize;
+  // unsigned long jpegSize;
   tjhandle tjInstance   = NULL;
   unsigned char *imgBuf = NULL;
   tjInstance            = tjInitDecompress();
@@ -2699,15 +2919,12 @@ EdsError StopMotion::downloadImage(EdsBaseRef object) {
 
 //-----------------------------------------------------------------
 
-EdsError StopMotion::takePicture(QString tempFile) {
+EdsError StopMotion::takePicture() {
   EdsError err;
-
-  // err = EdsSendCommand(m_camera, kEdsCameraCommand_TakePicture, 0);
   err = EdsSendCommand(m_camera, kEdsCameraCommand_PressShutterButton,
                        kEdsCameraCommand_ShutterButton_Completely_NonAF);
   err = EdsSendCommand(m_camera, kEdsCameraCommand_PressShutterButton,
                        kEdsCameraCommand_ShutterButton_OFF);
-  m_tempFile = tempFile;
   return err;
 }
 

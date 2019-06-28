@@ -138,7 +138,7 @@ public:
   bool m_placeOnXSheet   = true;
   int m_reviewTime       = 2;
   int m_liveViewStatus   = LiveViewClosed;
-  bool m_hasLiveViewImage;
+  bool m_hasLiveViewImage, m_hasLineUpImage;
   bool m_alwaysLiveView  = false;
   bool m_active          = false;
   bool m_userCalledPause = false;
@@ -155,7 +155,7 @@ public:
   bool m_sessionOpen            = false;
   bool m_zooming                = false;
   std::string m_cameraName;
-  TRaster32P m_liveViewImage, m_newImage;
+  TRaster32P m_liveViewImage, m_newImage, m_lineUpImage;
   TDimension m_liveViewImageDimensions = TDimension(0, 0);
   TDimension m_fullImageDimensions     = TDimension(0, 0);
   TDimension m_proxyImageDimensions    = TDimension(0, 0);
@@ -235,6 +235,10 @@ public:
   std::string getTEnvCameraResolution();
   void setTEnvCameraResolution(std::string resolution);
 
+  void saveJpg(TRaster32P, TFilePath path);
+  bool loadJpg(TFilePath path, TRaster32P& image);
+  bool loadLineUpImage();
+
   // Webcam Commands
   QList<QCameraInfo> getWebcams();
   QCamera* getWebcam() { return m_webcam; }
@@ -262,7 +266,7 @@ public:
   EdsError closeCameraSession();
   std::string getCameraName();
   EdsError downloadImage(EdsBaseRef object);
-  EdsError takePicture(QString tempFile);
+  EdsError takePicture();
   EdsError startLiveView();
   EdsError endLiveView();
   EdsError downloadEVFData();
