@@ -144,7 +144,7 @@ class SceneViewer final : public GLWidgetForHighDpi,
   TRaster32P m_3DSideL;
   TRaster32P m_3DSideR;
   TRaster32P m_3DTop;
-  TRasterImage *m_stopMotionImage, *m_stopMotionLineUpImage;
+  TRasterImageP m_stopMotionImage, m_stopMotionLineUpImage;
   StopMotion *m_stopMotion        = NULL;
   bool m_hasStopMotionImage       = false;
   bool m_hasStopMotionLineUpImage = false;

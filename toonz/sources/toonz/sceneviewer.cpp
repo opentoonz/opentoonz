@@ -926,19 +926,22 @@ double SceneViewer::getHGuide(int index) { return m_hRuler->getGuide(index); }
 void SceneViewer::onNewStopMotionImageReady() {
 #ifdef WITH_STOPMOTION
   if (m_stopMotion->m_hasLineUpImage) {
-    if (m_hasStopMotionLineUpImage) delete m_stopMotionLineUpImage;
+    // if (m_hasStopMotionLineUpImage) delete m_stopMotionLineUpImage;
     // is there a way to do this without cloning the image twice?
-    TRasterImageP image     = m_stopMotion->m_lineUpImage->clone();
-    m_stopMotionLineUpImage = (TRasterImage *)image->cloneImage();
+    // TRasterImageP image     = m_stopMotion->m_lineUpImage->clone();
+    m_stopMotionLineUpImage =
+        (TRasterImageP)m_stopMotion->m_lineUpImage->clone();
+    // m_stopMotionLineUpImage = (TRasterImage *)image->cloneImage();
     m_stopMotionLineUpImage->setDpi(m_stopMotion->m_liveViewDpi.x,
                                     m_stopMotion->m_liveViewDpi.y);
     m_hasStopMotionLineUpImage = true;
   }
   if (m_stopMotion->m_hasLiveViewImage) {
-    if (m_hasStopMotionImage) delete m_stopMotionImage;
+    // if (m_hasStopMotionImage) delete m_stopMotionImage;
     // is there a way to do this without cloning the image twice?
-    TRasterImageP image = m_stopMotion->m_liveViewImage->clone();
-    m_stopMotionImage   = (TRasterImage *)image->cloneImage();
+    // TRasterImageP image = m_stopMotion->m_liveViewImage->clone();
+    m_stopMotionImage = m_stopMotion->m_liveViewImage->clone();
+    // m_stopMotionImage   = (TRasterImage *)image->cloneImage();
     m_stopMotionImage->setDpi(m_stopMotion->m_liveViewDpi.x,
                               m_stopMotion->m_liveViewDpi.y);
     m_hasStopMotionImage = true;
@@ -1718,7 +1721,7 @@ void SceneViewer::drawScene() {
         m_stopMotionLineUpImage->getDpi(dpiX, dpiY);
         smPlayer.m_dpiAff  = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
         smPlayer.m_opacity = 255;
-        painter.onRasterImage(m_stopMotionLineUpImage, smPlayer);
+        painter.onRasterImage(m_stopMotionLineUpImage.getPointer(), smPlayer);
       }
       if (m_hasStopMotionImage) {
         Stage::Player smPlayer;
@@ -1727,7 +1730,7 @@ void SceneViewer::drawScene() {
         smPlayer.m_dpiAff = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
         smPlayer.m_opacity =
             m_stopMotion->m_zooming ? 255.0 : m_stopMotion->getOpacity();
-        painter.onRasterImage(m_stopMotionImage, smPlayer);
+        painter.onRasterImage(m_stopMotionImage.getPointer(), smPlayer);
       }
     }
 #endif
