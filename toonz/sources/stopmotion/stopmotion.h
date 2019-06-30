@@ -91,6 +91,7 @@ private:
   bool m_useMjpg                 = true;
   bool m_useNumpadShortcuts      = false;
   bool m_numpadForStyleSwitching = true;
+  bool m_turnOnRewind            = false;
 
   QTimer* m_reviewTimer;
   std::map<std::string, QAction*> m_oldActionMap;
@@ -138,7 +139,7 @@ public:
   bool m_placeOnXSheet   = true;
   int m_reviewTime       = 2;
   int m_liveViewStatus   = LiveViewClosed;
-  bool m_hasLiveViewImage, m_hasLineUpImage;
+  bool m_hasLiveViewImage, m_hasLineUpImage, m_showLineUpImage;
   bool m_alwaysLiveView  = false;
   bool m_active          = false;
   bool m_userCalledPause = false;
@@ -229,6 +230,7 @@ public:
   void changeCameras(int index);
   void raiseOpacity();
   void lowerOpacity();
+  void jumpToCameraFrame();
 
   std::string getTEnvCameraName();
   void setTEnvCameraName(std::string name);
@@ -323,6 +325,7 @@ public slots:
   void update();
   bool importImage();
   void onSceneSwitched();
+  void onPlaybackChanged();
 
 signals:
   void newLiveViewImageReady();

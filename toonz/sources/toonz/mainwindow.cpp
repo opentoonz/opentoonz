@@ -2250,6 +2250,8 @@ void MainWindow::defineActions() {
                tr("Lower Stop Motion Level Subsampling"), "");
   createAction(MI_StopMotionRaiseSubsampling,
                tr("Raise Stop Motion Level Subsampling"), "");
+  createAction(MI_StopMotionJumpToCamera, tr("Go to Stop Motion Insert Frame"),
+               "");
 #endif
 }
 

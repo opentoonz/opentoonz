@@ -352,5 +352,6 @@
 #define MI_StopMotionToggleZoom "MI_StopMotionToggleZoom"
 #define MI_StopMotionLowerSubsampling "MI_StopMotionLowerSubsampling"
 #define MI_StopMotionRaiseSubsampling "MI_StopMotionRaiseSubsampling"
+#define MI_StopMotionJumpToCamera "MI_StopMotionJumpToCamera"
 
 #endif

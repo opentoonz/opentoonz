@@ -20,6 +20,7 @@
 #include "filebrowsermodel.h"
 #include "penciltestpopup.h"
 #include "tlevel_io.h"
+#include "toutputproperties.h"
 
 #include "toonz/namebuilder.h"
 #include "toonz/preferences.h"
@@ -212,16 +213,6 @@ bool getRasterLevelSize(TXshLevel *level, TDimension &dim) {
   return true;
 }
 
-////-----------------------------------------------------------------------------
-//
-// TPointD getCurrentCameraDpi() {
-//  TCamera *camera =
-//      TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
-//  TDimensionD size = camera->getSize();
-//  TDimension res   = camera->getRes();
-//  return TPointD(res.lx / size.lx, res.ly / size.ly);
-//}
-
 };  // namespace
 
 //=============================================================================
@@ -311,8 +302,9 @@ StopMotion::StopMotion() {
   m_numpadForStyleSwitching =
       Preferences::instance()->isUseNumpadForSwitchingStylesEnabled();
   setUseNumpadShortcuts(m_useNumpadShortcuts);
-  m_timer       = new QTimer(this);
-  m_reviewTimer = new QTimer(this);
+  m_turnOnRewind = Preferences::instance()->rewindAfterPlaybackEnabled();
+  m_timer        = new QTimer(this);
+  m_reviewTimer  = new QTimer(this);
   m_reviewTimer->setSingleShot(true);
 
   m_fullScreen1 = new QDialog();
@@ -332,6 +324,7 @@ StopMotion::StopMotion() {
 
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
   TSceneHandle *sceneHandle   = TApp::instance()->getCurrentScene();
+  TFrameHandle *frameHandle   = TApp::instance()->getCurrentFrame();
   bool ret                    = true;
 
   ret = ret &&
@@ -343,6 +336,8 @@ StopMotion::StopMotion() {
       ret && connect(this, SIGNAL(newImageReady()), this, SLOT(importImage()));
   ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
                        SLOT(onSceneSwitched()));
+  ret = ret && connect(frameHandle, SIGNAL(isPlayingStatusChanged()), this,
+                       SLOT(onPlaybackChanged()));
   assert(ret);
 
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
@@ -407,6 +402,24 @@ void StopMotion::onSceneSwitched() {
   emit(frameNumberChanged(m_frameNumber));
   emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
   refreshFrameInfo();
+}
+
+//-----------------------------------------------------------------
+
+void StopMotion::onPlaybackChanged() {
+  if (TApp::instance()->getCurrentFrame()->isPlaying() || m_liveViewStatus == 0)
+    return;
+
+  int r0, r1, step;
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->getProperties()->getPreviewProperties()->getRange(r0, r1, step);
+  if (r1 > -1) return;
+
+  int frame     = TApp::instance()->getCurrentFrame()->getFrame();
+  int lastFrame = TApp::instance()->getCurrentFrame()->getMaxFrameIndex();
+  if (frame == 0 || frame == lastFrame) {
+    TApp::instance()->getCurrentFrame()->setFrame(m_xSheetFrameNumber - 1);
+  }
 }
 
 //-----------------------------------------------------------------
@@ -491,6 +504,12 @@ void StopMotion::setUseMjpg(bool on) {
 
 //-----------------------------------------------------------------
 
+void StopMotion::jumpToCameraFrame() {
+  TApp::instance()->getCurrentFrame()->setFrame(m_xSheetFrameNumber - 1);
+}
+
+//-----------------------------------------------------------------
+
 void StopMotion::setUseNumpadShortcuts(bool on) {
   m_useNumpadShortcuts = on;
   StopMotionUseNumpad  = int(on);
@@ -560,7 +579,7 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
       action->setShortcut(QKeySequence("2"));
       action = NULL;
     }
-    action = comm->getAction(MI_LastFrame);
+    action = comm->getAction(MI_StopMotionJumpToCamera);
     if (action) {
       action->setShortcut(QKeySequence("3"));
       action = NULL;
@@ -616,7 +635,7 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
       action = NULL;
     }
-    action = comm->getAction(MI_LastFrame);
+    action = comm->getAction(MI_StopMotionJumpToCamera);
     if (action) {
       action->setShortcut(
           QKeySequence(comm->getShortcutFromAction(action).c_str()));
@@ -698,7 +717,7 @@ void StopMotion::setXSheetFrameNumber(int frameNumber) {
 //-----------------------------------------------------------------
 
 bool StopMotion::loadLineUpImage() {
-  if (m_liveViewStatus < 0 || m_usingWebcam) return false;
+  if (m_liveViewStatus < 1) return false;
   m_hasLineUpImage = false;
   // first see if the level exists in the current level set
   ToonzScene *currentScene = TApp::instance()->getCurrentScene()->getScene();
@@ -730,8 +749,13 @@ bool StopMotion::loadLineUpImage() {
 
   TApp *app    = TApp::instance();
   TXsheet *xsh = currentScene->getXsheet();
-  int row      = m_xSheetFrameNumber - 2;
-  int col      = app->getCurrentColumn()->getColumnIndex();
+  int row;
+  if (m_xSheetFrameNumber == 1) {
+    row = 0;
+  } else {
+    row = m_xSheetFrameNumber - 2;
+  }
+  int col = app->getCurrentColumn()->getColumnIndex();
 
   int foundCol = -1;
   // most possibly, it's in the current column
@@ -754,8 +778,18 @@ bool StopMotion::loadLineUpImage() {
   // note found row represents the last row found that uses
   // the active level
 
-  int frameNumber;
-  frameNumber = xsh->getCell(row, foundCol).getFrameId().getNumber();
+  TFrameId frameId = xsh->getCell(row, foundCol).getFrameId();
+
+  int frameNumber = frameId.getNumber();
+
+  if (m_usingWebcam) {
+    if (frameNumber > 0) {
+      m_lineUpImage    = sl->getFrame(frameId, false)->raster();
+      m_hasLineUpImage = true;
+      return true;
+    } else
+      return false;
+  }
 
   // now check to see if a file actually exists there
   TFilePath liveViewFolder = currentScene->decodeFilePath(
@@ -967,23 +1001,27 @@ void StopMotion::setSubsampling() {
 //-----------------------------------------------------------------------------
 
 void StopMotion::onTimeout() {
-  int currentFrame     = TApp::instance()->getCurrentFrame()->getFrame();
-  int destinationFrame = m_xSheetFrameNumber - 1;
+  int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
+  // int destinationFrame = m_xSheetFrameNumber - 1;
   if (m_liveViewStatus > 0 && m_liveViewStatus < 3 &&
       !TApp::instance()->getCurrentFrame()->isPlaying()) {
-    if (getAlwaysLiveView() || (currentFrame == 0 && destinationFrame == 0) ||
-        (currentFrame == destinationFrame - 1)) {
+    if (getAlwaysLiveView() || (currentFrame == m_xSheetFrameNumber - 1)) {
       if (!m_usingWebcam)
         downloadEVFData();
       else
         getWebcamImage();
+      if (getAlwaysLiveView() && currentFrame != m_xSheetFrameNumber - 1 ||
+          m_pickLiveViewZoom) {
+        m_showLineUpImage = false;
+      } else {
+        m_showLineUpImage = true;
+      }
     } else if (m_liveViewStatus == 2) {
       m_liveViewStatus = 3;
       TApp::instance()->getCurrentScene()->notifySceneChanged();
     }
   } else if (m_liveViewStatus == 3 && !m_userCalledPause) {
-    if (getAlwaysLiveView() || (currentFrame == 0 && destinationFrame == 0) ||
-        (currentFrame == destinationFrame - 1)) {
+    if (getAlwaysLiveView() || (currentFrame == m_xSheetFrameNumber - 1)) {
       if (!m_usingWebcam)
         downloadEVFData();
       else
@@ -996,8 +1034,10 @@ void StopMotion::onTimeout() {
 
 void StopMotion::onReviewTimeout() {
   if (m_liveViewStatus > 0) {
+    m_liveViewStatus = 2;
     m_timer->start(40);
   }
+  TApp::instance()->getCurrentFrame()->setFrame(m_xSheetFrameNumber - 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -1018,7 +1058,6 @@ bool StopMotion::importImage() {
     m_reviewTimer->start(getReviewTime() * 1000);
   }
 
-  // if (!m_stopMotion->m_hasLiveViewImage) return false;
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   TXsheet *xsh      = scene->getXsheet();
@@ -1041,40 +1080,6 @@ bool StopMotion::importImage() {
       TFilePath(m_filePath) + TFilePath(levelName + L"_FullRes"));
   TFilePath liveViewFolder = scene->decodeFilePath(
       TFilePath(m_filePath) + TFilePath(levelName + L"_LiveView"));
-  if (!TFileStatus(parentDir).doesExist()) {
-    QString question;
-    question = tr("Folder %1 doesn't exist.\nDo you want to create it?")
-                   .arg(toQString(parentDir));
-    int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
-    if (ret == 0 || ret == 2) return false;
-    try {
-      TSystem::mkDir(parentDir);
-      DvDirModel::instance()->refreshFolder(parentDir.getParentDir());
-    } catch (...) {
-      DVGui::error(tr("Unable to create") + toQString(parentDir));
-      return false;
-    }
-  }
-  if (!m_usingWebcam) {
-    if (!TFileStatus(fullResFolder).doesExist()) {
-      try {
-        TSystem::mkDir(fullResFolder);
-        DvDirModel::instance()->refreshFolder(fullResFolder.getParentDir());
-      } catch (...) {
-        DVGui::error(tr("Unable to create") + toQString(fullResFolder));
-        return false;
-      }
-    }
-    if (!TFileStatus(liveViewFolder).doesExist()) {
-      try {
-        TSystem::mkDir(liveViewFolder);
-        DvDirModel::instance()->refreshFolder(liveViewFolder.getParentDir());
-      } catch (...) {
-        DVGui::error(tr("Unable to create") + toQString(liveViewFolder));
-        return false;
-      }
-    }
-  }
 
   TFilePath levelFp = TFilePath(m_filePath) +
                       TFilePath(levelName + L".." + m_fileType.toStdWString());
@@ -1088,10 +1093,10 @@ bool StopMotion::importImage() {
       scene->decodeFilePath(liveViewFolder + TFilePath(levelName + L"..jpg"));
   TFilePath liveViewFile(liveViewFp.withFrame(frameNumber));
 
-  TFilePath tempFile  = parentDir + "temp.jpg";
-  TXshSimpleLevel *sl = 0;
+  TFilePath tempFile = parentDir + "temp.jpg";
 
-  TXshLevel *level = scene->getLevelSet()->getLevel(levelName);
+  TXshSimpleLevel *sl = 0;
+  TXshLevel *level    = scene->getLevelSet()->getLevel(levelName);
   enum State { NEWLEVEL = 0, ADDFRAME, OVERWRITE } state;
 
   /* if the level already exists in the scene cast */
@@ -1194,6 +1199,41 @@ bool StopMotion::importImage() {
     getSubsampling();
   }
 
+  if (!TFileStatus(parentDir).doesExist()) {
+    QString question;
+    question = tr("Folder %1 doesn't exist.\nDo you want to create it?")
+                   .arg(toQString(parentDir));
+    int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+    if (ret == 0 || ret == 2) return false;
+    try {
+      TSystem::mkDir(parentDir);
+      DvDirModel::instance()->refreshFolder(parentDir.getParentDir());
+    } catch (...) {
+      DVGui::error(tr("Unable to create") + toQString(parentDir));
+      return false;
+    }
+  }
+  if (!m_usingWebcam) {
+    if (!TFileStatus(fullResFolder).doesExist()) {
+      try {
+        TSystem::mkDir(fullResFolder);
+        DvDirModel::instance()->refreshFolder(fullResFolder.getParentDir());
+      } catch (...) {
+        DVGui::error(tr("Unable to create") + toQString(fullResFolder));
+        return false;
+      }
+    }
+    if (!TFileStatus(liveViewFolder).doesExist()) {
+      try {
+        TSystem::mkDir(liveViewFolder);
+        DvDirModel::instance()->refreshFolder(liveViewFolder.getParentDir());
+      } catch (...) {
+        DVGui::error(tr("Unable to create") + toQString(liveViewFolder));
+        return false;
+      }
+    }
+  }
+
   // move the temp file
   if (!m_usingWebcam) {
     if (m_useScaledImages) {
@@ -1229,8 +1269,7 @@ bool StopMotion::importImage() {
     postImportProcess();
     return true;
   }
-  int row = app->getCurrentFrame()->getFrame();
-  row     = m_xSheetFrameNumber - 1;
+  int row = m_xSheetFrameNumber - 1;
   int col = app->getCurrentColumn()->getColumnIndex();
 
   // if the level is newly created or imported, then insert a new column
@@ -1242,7 +1281,7 @@ bool StopMotion::importImage() {
     xsh->insertCells(row, col);
     xsh->setCell(row, col, TXshCell(sl, fid));
     app->getCurrentColumn()->setColumnIndex(col);
-    app->getCurrentFrame()->setFrame(row);
+    if (getReviewTime() == 0) app->getCurrentFrame()->setFrame(row + 1);
     m_xSheetFrameNumber = row + 2;
     emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
     postImportProcess();
@@ -1290,7 +1329,7 @@ bool StopMotion::importImage() {
     xsh->insertCells(row, foundCol);
     xsh->setCell(row, foundCol, TXshCell(sl, fid));
     app->getCurrentColumn()->setColumnIndex(foundCol);
-    app->getCurrentFrame()->setFrame(row);
+    if (getReviewTime() == 0) app->getCurrentFrame()->setFrame(row + 1);
     m_xSheetFrameNumber = row + 2;
     emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
   }
@@ -1303,7 +1342,7 @@ bool StopMotion::importImage() {
     }
     xsh->setCell(row, col, TXshCell(sl, fid));
     app->getCurrentColumn()->setColumnIndex(col);
-    app->getCurrentFrame()->setFrame(row);
+    if (getReviewTime() == 0) app->getCurrentFrame()->setFrame(row + 1);
     m_xSheetFrameNumber = row + 2;
     emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
   }
@@ -1329,6 +1368,9 @@ void StopMotion::captureImage() {
         m_liveViewStatus = 3;
       }
     }
+    m_lineUpImage    = m_liveViewImage;
+    m_hasLineUpImage = true;
+    emit(newLiveViewImageReady());
     importImage();
     return;
   }
@@ -1360,6 +1402,7 @@ void StopMotion::captureImage() {
   if (m_hasLiveViewImage) {
     m_lineUpImage    = m_liveViewImage;
     m_hasLineUpImage = true;
+    emit(newLiveViewImageReady());
   }
 
   TApp *app         = TApp::instance();
@@ -1845,8 +1888,9 @@ void StopMotion::changeCameras(int index) {
     if (m_sessionOpen || m_usingWebcam) {
       if (m_liveViewStatus > 0) {
         endLiveView();
-        closeCameraSession();
       }
+      closeCameraSession();
+      m_usingWebcam = false;
     }
 
     setTEnvCameraName("");
@@ -1859,6 +1903,7 @@ void StopMotion::changeCameras(int index) {
   // There is a "Select Camera" as the first index
   index -= 1;
   m_active = true;
+
   // Check if its a webcam or DSLR
   // Webcams are listed first, so see if one of them is selected
   if (index > cameras.size() - 1) {
@@ -1942,6 +1987,10 @@ void StopMotion::setWebcam(QCamera *camera) { m_webcam = camera; }
 //-----------------------------------------------------------------
 
 bool StopMotion::translateIndex(int index) {
+  // We are using Qt to get the camera info and supported resolutions, but
+  // we are using OpenCV to actually get the images.
+  // The camera index from OpenCV and from Qt don't always agree,
+  // So this checks the name against the correct index.
   m_webcamIndex = index;
 
 #ifdef WIN32
@@ -2027,7 +2076,6 @@ bool StopMotion::initWebcam(int index) {
   if (!m_useDirectShow) {
     // the webcam order obtained from Qt isn't always the same order as
     // the one obtained from OpenCV without DirectShow
-    // but DirectShow causes higher CPU usage, so it is off by default
     translateIndex(index);
     m_cvWebcam.open(m_webcamIndex);
   } else {
@@ -2093,6 +2141,8 @@ void StopMotion::getWebcamImage() {
 
   if (m_cvWebcam.isOpened() == false) {
     initWebcam(m_webcamIndex);
+    // mjpg is used by many webcams
+    // opencv runs very slow on some webcams without it.
     if (m_useMjpg) {
       m_cvWebcam.set(cv::CAP_PROP_FOURCC,
                      cv::VideoWriter::fourcc('m', 'j', 'p', 'g'));
@@ -2169,12 +2219,13 @@ bool StopMotion::toggleLiveView() {
     m_liveViewDpi             = TPointD(0.0, 0.0);
     m_liveViewImageDimensions = TDimension(0, 0);
     if (!m_usingWebcam) {
-      loadLineUpImage();
       startLiveView();
     } else
       m_liveViewStatus = 1;
+    loadLineUpImage();
     m_timer->start(40);
     emit(liveViewChanged(true));
+    Preferences::instance()->enableRewindAfterPlayback(false);
     return true;
   } else if ((m_sessionOpen || m_usingWebcam) && m_liveViewStatus > 0) {
     if (!m_usingWebcam)
@@ -2183,6 +2234,9 @@ bool StopMotion::toggleLiveView() {
       releaseWebcam();
     m_timer->stop();
     emit(liveViewChanged(false));
+    if (m_turnOnRewind) {
+      Preferences::instance()->enableRewindAfterPlayback(true);
+    }
     return false;
   } else {
     DVGui::warning(tr("No camera selected."));
@@ -3090,8 +3144,7 @@ EdsError StopMotion::downloadEVFData() {
                            &sizeRect);
   err = EdsGetPropertyData(evfImage, kEdsPropID_Evf_ZoomRect, 0, sizeRect,
                            &zoomRect);
-  // this is the centered position of the image in zoom view
-  // use this to get the offset from the corner of the zoom
+
   err = EdsGetPropertySize(evfImage, kEdsPropID_Evf_ImagePosition, 0,
                            &evfZoomRect, &sizeImagePos);
   err = EdsGetPropertyData(evfImage, kEdsPropID_Evf_ImagePosition, 0,
@@ -3906,3 +3959,15 @@ public:
     sm->setSubsampling();
   }
 } StopMotionRaiseSubsamplingCommand;
+
+//=============================================================================
+
+class StopMotionJumpToCameraCommand : public MenuItemHandler {
+public:
+  StopMotionJumpToCameraCommand()
+      : MenuItemHandler(MI_StopMotionJumpToCamera) {}
+  void execute() {
+    StopMotion *sm = StopMotion::instance();
+    sm->jumpToCameraFrame();
+  }
+} StopMotionJumpToCameraCommand;

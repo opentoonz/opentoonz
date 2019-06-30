@@ -1715,7 +1715,7 @@ void SceneViewer::drawScene() {
 
 #ifdef WITH_STOPMOTION
     if (!frameHandle->isPlaying() && m_stopMotion->m_liveViewStatus == 2) {
-      if (m_hasStopMotionLineUpImage && !m_stopMotion->m_pickLiveViewZoom) {
+      if (m_hasStopMotionLineUpImage && m_stopMotion->m_showLineUpImage) {
         Stage::Player smPlayer;
         double dpiX, dpiY;
         m_stopMotionLineUpImage->getDpi(dpiX, dpiY);
@@ -1728,8 +1728,9 @@ void SceneViewer::drawScene() {
         double dpiX, dpiY;
         m_stopMotionImage->getDpi(dpiX, dpiY);
         smPlayer.m_dpiAff = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
-        smPlayer.m_opacity =
-            m_stopMotion->m_zooming ? 255.0 : m_stopMotion->getOpacity();
+        bool hide_opacity =
+            m_stopMotion->m_zooming || m_stopMotion->m_pickLiveViewZoom;
+        smPlayer.m_opacity = hide_opacity ? 255.0 : m_stopMotion->getOpacity();
         painter.onRasterImage(m_stopMotionImage.getPointer(), smPlayer);
       }
     }
