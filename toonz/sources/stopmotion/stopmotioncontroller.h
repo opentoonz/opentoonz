@@ -129,6 +129,7 @@ protected slots:
   void onLastFrame();
   void onFileTypeActivated();
   void onFrameNumberChanged();
+  void onXSheetFrameNumberChanged();
   void onFrameCaptured(QImage &image);
   void onOnionOpacityFldEdited();
   void onOnionOpacitySliderChanged(bool ignore);

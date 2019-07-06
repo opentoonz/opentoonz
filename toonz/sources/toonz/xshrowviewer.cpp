@@ -12,6 +12,7 @@
 #include "cellselection.h"
 #include "menubarcommandids.h"
 #include "toonzqt/menubarcommand.h"
+#include "stopmotion.h"
 
 #include "toonz/toonzscene.h"
 #include "tconvert.h"
@@ -355,7 +356,25 @@ void RowArea::drawCurrentRowGadget(QPainter &p, int r0, int r1) {
   p.fillRect(header, m_viewer->getCurrentRowBgColor());
 }
 
+#ifdef WITH_STOPMOTION
 //-----------------------------------------------------------------------------
+
+void RowArea::drawStopMotionCameraIndicator(QPainter &p) {
+  int cameraRow = StopMotion::instance()->getXSheetFrameNumber() - 1;
+  if (cameraRow < 0) return;
+
+  QPoint topLeft = m_viewer->positionToXY(CellPosition(cameraRow, 0));
+  if (!m_viewer->orientation()->isVerticalTimeline()) topLeft.setY(0);
+  QRect header = m_viewer->orientation()
+                     ->rect(PredefinedRect::FRAME_HEADER)
+                     .translated(topLeft);
+  int frameAdj = m_viewer->getFrameZoomAdjustment();
+  header.adjust(1, 1, -frameAdj, 0);
+  p.fillRect(header, Qt::GlobalColor::darkGreen);
+}
+
+//-----------------------------------------------------------------------------
+#endif
 
 void RowArea::drawOnionSkinBackground(QPainter &p, int r0, int r1) {
   const Orientation *o = m_viewer->orientation();
@@ -784,6 +803,15 @@ void RowArea::paintEvent(QPaintEvent *event) {
   if (TApp::instance()->getCurrentFrame()->isEditingScene())
     // current frame
     drawCurrentRowGadget(p, r0, r1);
+
+#ifdef WITH_STOPMOTION
+  StopMotion *stopMotion = StopMotion::instance();
+  if (stopMotion->getPlaceOnXSheet() &&
+      (stopMotion->m_usingWebcam || stopMotion->m_active)) {
+    drawStopMotionCameraIndicator(p);
+  }
+
+#endif
 
   if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
       Preferences::instance()->isCurrentTimelineIndicatorEnabled() &&

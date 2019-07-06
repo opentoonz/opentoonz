@@ -701,6 +701,8 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
                        SLOT(onFileTypeActivated()));
   ret = ret && connect(m_frameNumberEdit, SIGNAL(editingFinished()), this,
                        SLOT(onFrameNumberChanged()));
+  ret = ret && connect(m_xSheetFrameNumberEdit, SIGNAL(editingFinished()), this,
+                       SLOT(onXSheetFrameNumberChanged()));
   ret = ret && connect(m_toggleLiveViewButton, SIGNAL(clicked()), this,
                        SLOT(onLiveViewToggleClicked()));
   ret = ret && connect(m_stopMotion, SIGNAL(filePathChanged(QString)), this,
@@ -1701,6 +1703,12 @@ void StopMotionController::onFileTypeActivated() {
 
 void StopMotionController::onFrameNumberChanged() {
   m_stopMotion->setFrameNumber(m_frameNumberEdit->getValue());
+}
+
+//-----------------------------------------------------------------------------
+
+void StopMotionController::onXSheetFrameNumberChanged() {
+  m_stopMotion->setXSheetFrameNumber(m_xSheetFrameNumberEdit->getValue());
 }
 
 //-----------------------------------------------------------------------------

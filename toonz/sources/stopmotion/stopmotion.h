@@ -140,9 +140,10 @@ public:
   int m_reviewTime       = 2;
   int m_liveViewStatus   = LiveViewClosed;
   bool m_hasLiveViewImage, m_hasLineUpImage, m_showLineUpImage;
-  bool m_alwaysLiveView  = false;
-  bool m_active          = false;
-  bool m_userCalledPause = false;
+  bool m_alwaysLiveView     = false;
+  bool m_active             = false;
+  bool m_userCalledPause    = false;
+  bool m_converterSucceeded = false;
   QString m_tempFile;
   QTimer* m_timer;
   QList<QSize> m_webcamResolutions;

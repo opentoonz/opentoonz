@@ -237,6 +237,11 @@ void JpgConverter::convertFromJpg() {
   tjDecompressHeader3(tjInstance, data, mySize, &width, &height, &inSubsamp,
                       &inColorspace);
 
+  if (width < 0 || height < 0) {
+    emit(imageReady(false));
+    return;
+  }
+
   pixelFormat = TJPF_BGRX;
   imgBuf = (unsigned char *)tjAlloc(width * height * tjPixelSize[pixelFormat]);
   int flags = 0;
@@ -712,6 +717,7 @@ void StopMotion::setXSheetFrameNumber(int frameNumber) {
   m_xSheetFrameNumber = frameNumber;
   loadLineUpImage();
   emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
 //-----------------------------------------------------------------
@@ -1541,6 +1547,7 @@ void StopMotion::postImportProcess() {
     m_frameNumber += 1;
   emit(frameNumberChanged(m_frameNumber));
   /* notify */
+  refreshFrameInfo();
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentScene()->notifyCastChange();
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
@@ -1551,7 +1558,7 @@ void StopMotion::postImportProcess() {
 // Refresh information that how many & which frames are saved for the current
 // level
 void StopMotion::refreshFrameInfo() {
-  if (!m_sessionOpen && !m_usingWebcam) {
+  if ((!m_sessionOpen && m_liveViewStatus < 2) && !m_usingWebcam) {
     m_frameInfoText = "";
     return;
   }
@@ -1567,7 +1574,18 @@ void StopMotion::refreshFrameInfo() {
   std::wstring levelName = m_levelName.toStdWString();
   int frameNumber        = m_frameNumber;
 
-  TDimension stopMotionRes = m_liveViewImageDimensions;
+  TDimension stopMotionRes;
+  bool checkRes = true;
+  if (m_usingWebcam)
+    stopMotionRes = m_liveViewImageDimensions;
+
+  else if (m_useScaledImages || !getCurrentImageQuality().contains("Large")) {
+    stopMotionRes = m_proxyImageDimensions;
+    if (m_proxyImageDimensions == TDimension(0, 0)) {
+      checkRes = false;
+    }
+  } else
+    stopMotionRes = m_fullImageDimensions;
 
   bool letterOptionEnabled =
       Preferences::instance()->isShowFrameNumberWithLettersEnabled();
@@ -1647,12 +1665,12 @@ void StopMotion::refreshFrameInfo() {
       TDimension dim(ii->m_lx, ii->m_ly);
       // if the saved images has not the same resolution as the current camera
       // resolution
-      if (m_hasLiveViewImage && stopMotionRes != dim) {
+      if (checkRes && m_hasLiveViewImage && stopMotionRes != dim) {
         tooltipStr += tr("\nWARNING : Image size mismatch. The saved image "
                          "size is %1 x %2.")
                           .arg(dim.lx)
                           .arg(dim.ly);
-        labelStr += tr("WARNING");
+        labelStr += tr("WARNING ");
         infoType = WARNING;
       }
       // if the resolutions are matched
@@ -1702,17 +1720,17 @@ void StopMotion::refreshFrameInfo() {
       tooltipStr +=
           tr("\nWARNING : Failed to get image size of the existing level %1.")
               .arg(QString::fromStdWString(levelName));
-      labelStr += tr("WARNING");
+      labelStr += tr("WARNING ");
       infoType = WARNING;
     }
     // if the saved images has not the same resolution as the current camera
     // resolution
-    else if (m_hasLiveViewImage && stopMotionRes != dim) {
+    else if (checkRes && m_hasLiveViewImage && stopMotionRes != dim) {
       tooltipStr += tr("\nWARNING : Image size mismatch. The existing level "
                        "size is %1 x %2.")
                         .arg(dim.lx)
                         .arg(dim.ly);
-      labelStr += tr("WARNING");
+      labelStr += tr("WARNING ");
       infoType = WARNING;
     }
     // if the resolutions are matched
@@ -1762,7 +1780,7 @@ void StopMotion::refreshFrameInfo() {
       // check resolution
       TDimension dim;
       bool ret = getRasterLevelSize(level_sameName, dim);
-      if (ret && m_hasLiveViewImage && stopMotionRes != dim)
+      if (ret && checkRes && m_hasLiveViewImage && stopMotionRes != dim)
         tooltipStr += tr("\nWARNING : Image size mismatch. The size of level "
                          "with the same name is is %1 x %2.")
                           .arg(dim.lx)
@@ -1780,7 +1798,7 @@ void StopMotion::refreshFrameInfo() {
       // check resolution
       TDimension dim;
       bool ret = getRasterLevelSize(level_samePath, dim);
-      if (ret && m_hasLiveViewImage && stopMotionRes != dim)
+      if (ret && checkRes && m_hasLiveViewImage && stopMotionRes != dim)
         tooltipStr += tr("\nWARNING : Image size mismatch. The size of level "
                          "with the same path is %1 x %2.")
                           .arg(dim.lx)
@@ -1880,10 +1898,12 @@ void StopMotion::changeCameras(int index) {
 
   // if selected the non-connected state, then disconnect the current camera
   if (index == 0) {
-    m_active            = false;
-    m_webcamDeviceName  = QString();
-    m_webcamDescription = QString();
-    m_webcamIndex       = -1;
+    m_active               = false;
+    m_webcamDeviceName     = QString();
+    m_webcamDescription    = QString();
+    m_webcamIndex          = -1;
+    m_proxyDpi             = TPointD(0.0, 0.0);
+    m_proxyImageDimensions = TDimension(0, 0);
 
     if (m_sessionOpen || m_usingWebcam) {
       if (m_liveViewStatus > 0) {
@@ -2823,6 +2843,8 @@ EdsError StopMotion::setImageQuality(QString quality) {
   err = EdsSetPropertyData(m_camera, kEdsPropID_ImageQuality, 0, sizeof(value),
                            &value);
   emit(imageQualityChangedSignal(quality));
+  m_proxyImageDimensions = TDimension(0, 0);
+  m_proxyDpi             = TPointD(0.0, 0.0);
   return err;
 }
 
@@ -2934,6 +2956,16 @@ EdsError StopMotion::downloadImage(EdsBaseRef object) {
   } else {
     tempWidth  = width;
     tempHeight = height;
+  }
+
+  if (m_useScaledImages || !getCurrentImageQuality().contains("Large")) {
+    TCamera *camera =
+        TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
+    TDimensionD size       = camera->getSize();
+    m_proxyImageDimensions = TDimension(tempWidth, tempHeight);
+    double minimumDpi      = std::min(m_proxyImageDimensions.lx / size.lx,
+                                 m_proxyImageDimensions.ly / size.ly);
+    m_proxyDpi = TPointD(minimumDpi, minimumDpi);
   }
 
   tjDecompress2(tjInstance, data, mySize, imgBuf, tempWidth,
@@ -3154,6 +3186,7 @@ EdsError StopMotion::downloadEVFData() {
                            &evfZoomRect, &sizeCoordSys);
   err = EdsGetPropertyData(evfImage, kEdsPropID_Evf_CoordinateSystem, 0,
                            sizeCoordSys, &coordSys);
+
   m_zoomRect = TPoint(zoomRect.size.width, zoomRect.size.height);
   if (zoomAmount == 5 && m_zoomRect == TPoint(0, 0)) {
     setZoomPoint();
@@ -3180,6 +3213,8 @@ EdsError StopMotion::downloadEVFData() {
     m_liveViewImage    = converter->getImage();
     m_hasLiveViewImage = true;
     delete converter;
+    if (!m_converterSucceeded) return EDS_ERR_UNEXPECTED_EXCEPTION;
+
     // make sure not to set to LiveViewOpen if it has been turned off
     if (m_liveViewStatus > 0) {
       m_liveViewStatus = LiveViewOpen;
@@ -3276,7 +3311,9 @@ EdsError StopMotion::focusFar3() {
 
 //-----------------------------------------------------------------
 
-void StopMotion::onImageReady(const bool &status) {}
+void StopMotion::onImageReady(const bool &status) {
+  m_converterSucceeded = status;
+}
 
 //-----------------------------------------------------------------
 
