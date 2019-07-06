@@ -12,7 +12,7 @@
 #include "cellselection.h"
 #include "menubarcommandids.h"
 #include "toonzqt/menubarcommand.h"
-#include "stopmotion.h"
+#include "../stopmotion/stopmotion.h"
 
 #include "toonz/toonzscene.h"
 #include "tconvert.h"
