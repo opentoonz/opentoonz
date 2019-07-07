@@ -17,7 +17,6 @@
 #include "toonzqt/dvdialog.h"
 
 #include <QObject>
-#include <QThread>
 
 class QCamera;
 class QCameraInfo;
@@ -27,6 +26,7 @@ class QTimer;
 enum ASPECT_RATIO { FOUR_THREE = 0, THREE_TWO, SIXTEEN_NINE, OTHER_RATIO };
 #endif
 
+#include <QThread>
 //=============================================================================
 // JpgConverter
 //-----------------------------------------------------------------------------
