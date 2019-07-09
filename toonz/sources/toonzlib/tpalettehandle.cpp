@@ -131,9 +131,13 @@ bool TPaletteHandle::disconnectBroadcasts(const QObject *receiver) {
 
 void TPaletteHandle::setPalette(TPalette *palette, int styleIndex) {
   if (palette) {
-    if (styleIndex < 0)
+    if (styleIndex < 0) {
       styleIndex = palette->getCurrentStyleId();
-    else
+      if (!palette->getStylePage(styleIndex)) {  // in case the style is deleted
+        styleIndex = 1;
+        palette->setCurrentStyleId(styleIndex);
+      }
+    } else
       palette->setCurrentStyleId(styleIndex);
   }
 
