@@ -5,6 +5,7 @@
 
 #include "tgeometry.h"
 #include <QStack>
+#include <QList>
 
 #undef DVAPI
 #undef DVVAR
