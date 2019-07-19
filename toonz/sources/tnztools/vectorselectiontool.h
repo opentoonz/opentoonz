@@ -311,6 +311,8 @@ public:
   void setResetCenter(bool update) { m_resetCenter = update; }
   bool canResetCenter() { return m_resetCenter; }
 
+  void beforeCut() override;
+
 protected:
   void onActivate() override;
   void onDeactivate() override;

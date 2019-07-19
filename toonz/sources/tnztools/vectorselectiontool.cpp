@@ -34,6 +34,9 @@ using namespace DragSelectionTool;
 //    Global variables
 //********************************************************************************
 
+TPointD lastDragPos;
+TMouseEvent lastDragEvent;
+
 namespace {
 
 VectorSelectionTool l_vectorSelectionTool(TTool::Vectors);
@@ -1555,6 +1558,9 @@ void VectorSelectionTool::leftButtonDoubleClick(const TPointD &pos,
 
 void VectorSelectionTool::leftButtonDrag(const TPointD &pos,
                                          const TMouseEvent &e) {
+  lastDragPos = pos;
+  lastDragEvent = e;
+
   if (m_dragTool) {
     m_dragTool->leftButtonDrag(pos, e);
     return;
@@ -1993,6 +1999,13 @@ TPropertyGroup *VectorSelectionTool::getProperties(int idx) {
   default:
     return 0;
   };
+}
+
+void VectorSelectionTool::beforeCut()
+{
+  if(m_leftButtonMousePressed) {
+    leftButtonUp(lastDragPos, lastDragEvent);
+  }
 }
 
 //-----------------------------------------------------------------------------
