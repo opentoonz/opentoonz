@@ -1017,17 +1017,20 @@ void ToonzRasterBrushTool::drawEmptyCircle(TPointD pos, int thick,
 
 //-------------------------------------------------------------------------------------------------------
 
-TPointD ToonzRasterBrushTool::getCenteredCursorPos(const TPointD &originalCursorPos) {
-  TDimension resolution = m_application->getCurrentLevel()->getSimpleLevel()->getProperties()->getImageRes();
+TPointD ToonzRasterBrushTool::getCenteredCursorPos(
+    const TPointD &originalCursorPos) {
+  TXshLevelHandle *levelHandle = m_application->getCurrentLevel();
+  TXshSimpleLevel *level = levelHandle ? levelHandle->getSimpleLevel() : 0;
+  TDimension resolution =
+      level ? level->getProperties()->getImageRes() : TDimension(0, 0);
+
   bool xEven = (resolution.lx % 2 == 0);
   bool yEven = (resolution.ly % 2 == 0);
 
   TPointD centeredCursorPos = originalCursorPos;
 
-  if (xEven)
-    centeredCursorPos.x -= 0.5;
-  if (yEven)
-    centeredCursorPos.y -= 0.5;
+  if (xEven) centeredCursorPos.x -= 0.5;
+  if (yEven) centeredCursorPos.y -= 0.5;
 
   return centeredCursorPos;
 }
@@ -1295,7 +1298,8 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
 
       TPointD thickOffset(m_maxCursorThick * 0.5, m_maxCursorThick * 0.5);
       invalidateRect = convert(m_strokeSegmentRect) - rasCenter;
-      invalidateRect += TRectD(centeredPos - thickOffset, centeredPos + thickOffset);
+      invalidateRect +=
+          TRectD(centeredPos - thickOffset, centeredPos + thickOffset);
       invalidateRect +=
           TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
     } else if (m_hardness.getValue() == 100 || m_pencil.getValue()) {
@@ -1303,7 +1307,8 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
         * --*/
       if (!m_pencil.getValue()) thickness -= 1.0;
 
-      TThickPoint thickPoint(centeredPos + convert(ras->getCenter()), thickness);
+      TThickPoint thickPoint(centeredPos + convert(ras->getCenter()),
+                             thickness);
       m_rasterTrack = new RasterStrokeGenerator(
           ras, BRUSH, NONE, m_styleId, thickPoint, drawOrder != OverAll, 0,
           !m_pencil.getValue(), drawOrder == PaletteOrder);
@@ -1395,7 +1400,8 @@ void ToonzRasterBrushTool::leftButtonDrag(const TPointD &pos,
 
     TPointD thickOffset(m_maxCursorThick * 0.5, m_maxCursorThick * 0.5);
     invalidateRect = convert(m_strokeSegmentRect) - rasCenter;
-    invalidateRect += TRectD(centeredPos - thickOffset, centeredPos + thickOffset);
+    invalidateRect +=
+        TRectD(centeredPos - thickOffset, centeredPos + thickOffset);
     invalidateRect +=
         TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
   } else if (m_rasterTrack &&
