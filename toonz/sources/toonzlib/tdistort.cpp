@@ -315,12 +315,10 @@ PIXEL filterPixel(double a, double b, double c, double d,
 
   // Deal the magnification case, assuming that intervals have at least length
   // 1. This actually stands for:
-  //  1. Their midpoint is bilinear filtered whenever their former length wass
-  //  less than 1 (see fractionary
-  //     parts computing above).
+  //  1. Their midpoint is bilinear filtered whenever their former length was
+  //     less than 1 (see fractionary parts computing above).
   //  2. This behaviour is continuous with respect to interval lengths - that
-  //  is, we pass from supersampling to
-  //     subsampling in a smooth manner.
+  //     is, we pass from supersampling to subsampling in a smooth manner.
   if (b - a < 1) {
     double v = 0.5 * (a + b);
     a        = v - 0.5;

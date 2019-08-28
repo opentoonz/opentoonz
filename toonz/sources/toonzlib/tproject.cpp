@@ -205,7 +205,7 @@ void hideOlderProjectFiles(const TFilePath &folderPath) {
    and Outputs.
         Each of this folders can be renamed using the setFolder(string name,
    TFilePath path) method.
-        Usually, the \b name parameter is choosen from inputs, drawings, scenes,
+        Usually, the \b name parameter is chosen from inputs, drawings, scenes,
    extras and outputs;
         the \b path parameter contains the folder that can have a different name
    from them.
@@ -214,7 +214,7 @@ void hideOlderProjectFiles(const TFilePath &folderPath) {
    folder is used by
         every scene created in the project to save or load data. A scene
    dependent folder is used only by the scene
-        from wich the folder depends. A scene dependent folder contains the
+        from which the folder depends. A scene dependent folder contains the
    string "$scene" in its path.
 
         \code
@@ -225,7 +225,7 @@ void hideOlderProjectFiles(const TFilePath &folderPath) {
         Drawings folder path: "...\\prodA\\episode1\\SceneA\\drawings"
         \endcode
         \n\n
-        By default, from the toonz installation, exist allways a toonz project
+        By default, from the toonz installation, exist always a toonz project
    called "sandbox".
         \see TProjectManager, TSceneProperties.
 */
@@ -258,7 +258,7 @@ void hideOlderProjectFiles(const TFilePath &folderPath) {
 
 /*! \fn void TProject::save()
         Saves the project.
-        Is equvalent to save(getProjectPath()).
+        Is equivalent to save(getProjectPath()).
         The project is saved as a xml file.\n
         Uses TProjectManager and TOStream.
         \note Exceptions can be thrown.
@@ -276,7 +276,7 @@ TProject::~TProject() { delete m_sprop; }
         \code
         e.g. setFolder(TProject::Drawings, TFilePath("C:\\temp\\drawings"))
         \endcode
-        Usually, the \b name parameter is choosen from inputs, drawings, scenes,
+        Usually, the \b name parameter is chosen from inputs, drawings, scenes,
    extras and outputs;
         the \b path contains the folder that can have a different name from
    them.
@@ -705,15 +705,15 @@ public:
         and folders.
 
         It is possible to handle more than one project root.
-        The class mantains a container this purpose. All the projects roots must
-   be setted by hand in the windows
+        The class maintains a container this purpose. All the projects roots must
+   be set by hand in the windows
         registery. By default, only one project root is created when toonz is
    installed.\n
         The project root container can be updated using addProjectsRoot(const
    TFilePath &root), addDefaultProjectsRoot()
         methods.
 
-        The class mantains also information about the current project. The class
+        The class maintains also information about the current project. The class
    provides all needed method to retrieve
         the current project path, name and folder.
         \see TProject
@@ -814,7 +814,7 @@ TFilePath TProjectManager::projectPathToProjectName(
 
 //-------------------------------------------------------------------
 /*! Returns an absolute path of the specified \b projectName.\n
-        \note The returned project path is allways computed used the first
+        \note The returned project path is always computed used the first
    project root in the container.*/
 TFilePath TProjectManager::projectNameToProjectPath(
     const TFilePath &projectName) {
@@ -840,7 +840,7 @@ TFilePath TProjectManager::projectFolderToProjectPath(
 /*! Returns the absolute path of the specified \b projectName only if the
    project already exist.\n
         Returns TFilePath() if a project with the specified \b projectName
-   doesn't exsist.\n
+   doesn't exist.\n
         \note \b projectName must be a relative path.*/
 TFilePath TProjectManager::getProjectPathByName(const TFilePath &projectName) {
   assert(!TProject::isAProjectPath(projectName));
@@ -912,9 +912,9 @@ void TProjectManager::setCurrentProjectPath(const TFilePath &fp) {
 
 //-------------------------------------------------------------------
 /*! Returns the current project path.\n
-        The project path, usually, is setted in key registry. If a current
-   project path isn't setted,
-        TProject::SandboxProjectName is setted as current project.
+        The project path, usually, is set in key registry. If a current
+   project path isn't set,
+        TProject::SandboxProjectName is set as current project.
 */
 TFilePath TProjectManager::getCurrentProjectPath() {
   TFilePath fp(currentProjectPath);
@@ -1034,13 +1034,13 @@ void TProjectManager::notifyProjectChanged() {
 }
 
 //-------------------------------------------------------------------
-/*! Adds \b listener to the listners container.*/
+/*! Adds \b listener to the listeners container.*/
 void TProjectManager::addListener(Listener *listener) {
   m_listeners.insert(listener);
 }
 
 //-------------------------------------------------------------------
-/*! Removes \b listener from the listners container.*/
+/*! Removes \b listener from the listeners container.*/
 void TProjectManager::removeListener(Listener *listener) {
   m_listeners.erase(listener);
 }

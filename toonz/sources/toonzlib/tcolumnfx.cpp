@@ -376,7 +376,7 @@ static std::vector<int> getAllBut(std::vector<int> &colorIds) {
 //! Image
 //! will be destroyed at the most appropriate time. You should definitely *COPY*
 //! all
-//! necessary informations before calling it - however, since the intent was
+//! necessary information before calling it - however, since the intent was
 //! that of
 //! optimizing memory usage, please avoid copying the entire image buffer...
 
@@ -1423,7 +1423,7 @@ bool TLevelColumnFx::doGetBBox(double frame, TRectD &bBox,
     bBox = img->getBBox();
   }
 
-  // Add the enlargement of the bbox due to Tzp render datas
+  // Add the enlargement of the bbox due to Tzp render data
   if (info.m_data.size()) {
     TRectD imageBBox(bBox);
     for (unsigned int i = 0; i < info.m_data.size(); ++i) {

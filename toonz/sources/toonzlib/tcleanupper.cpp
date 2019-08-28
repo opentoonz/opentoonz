@@ -45,7 +45,7 @@ centered
 
   Post-processing include despeckling (ie removal or recoloration of little
 blots with
-  uniform color), and tones' brigthness/contrast manipulation.
+  uniform color), and tones' brightness/contrast manipulation.
 
   (*) The image is first overed on top of a white background
 
@@ -501,7 +501,7 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff,
 //------------------------------------------------------------------------------------
 
 // this one incorporate the preprocessColors and the finalize function; used for
-// swatch.(tipically on very small rasters)
+// swatch.(typically on very small rasters)
 TRasterP TCleanupper::processColors(const TRasterP &rin) {
   if (m_parameters->m_lineProcessingMode == lpNone) return rin;
 

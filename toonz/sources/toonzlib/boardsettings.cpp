@@ -200,7 +200,7 @@ void BoardItem::saveData(TOStream &os) {
                    << m_rect.height();
 
   if (m_type == Image) {
-    // if the path is in library folder, then save the realtive path
+    // if the path is in library folder, then save the relative path
     TFilePath libFp = ToonzFolder::getLibraryFolder();
     if (libFp.isAncestorOf(m_imgPath))
       os.child("imgPath") << 1 << m_imgPath - libFp;

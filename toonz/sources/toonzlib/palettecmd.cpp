@@ -921,7 +921,7 @@ int loadRefImage(TPaletteHandle *paletteHandle,
           // values
           std::set<TPixel32> colors;
           if (config.rasterPickType == PaletteCmd::PickEveryColors) {
-            // different colors will become sparate styles
+            // different colors will become separate styles
             TColorUtils::buildPrecisePalette(colors, raster,
                                              availableColorCount);
           } else {  //  config.rasterPickType ==

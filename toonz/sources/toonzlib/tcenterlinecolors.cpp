@@ -123,10 +123,9 @@ static void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq,
   std::vector<double> params;
 
   // Meanwhile, ensure each point belong to ras. Otherwise, typically an error
-  // occured
-  // in the thinning process and it's better avoid sampling procedure. Only
-  // exception, when
-  // a point has x==ras->getLx() || y==ras->getLy(); that is accepted.
+  // occurred in the thinning process and it's better avoid sampling procedure. 
+  // Only exception, when a point has 
+  // x==ras->getLx() || y==ras->getLy(); that is accepted.
   {
     const T3DPointD &headPos = *currGraph->getNode(seq.m_head);
 
@@ -210,9 +209,8 @@ static void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq,
   }
 
   // NOTE: Extremities of a sequence are considered unreliable: they typically
-  // happen
-  //       to be junction points shared between possibly different-colored
-  //       strokes.
+  // happen to be junction points shared between possibly different-colored
+  // strokes.
 
   // Find first and last extremity-free sampled points
   T3DPointD first(*currGraph->getNode(seq.m_head));
@@ -385,8 +383,7 @@ void calculateSequenceColors(const TRasterP &ras, VectorizerCoreGlobals &g) {
 
   if (cm && g.currConfig->m_maxThickness > 0.0) {
     // singleSequence is traversed back-to-front because new, possibly splitted
-    // sequences
-    // are inserted at back - and don't have to be re-sampled.
+    // sequences are inserted at back - and don't have to be re-sampled.
     for (l = singleSequences.size() - 1; l >= 0; --l) {
       Sequence rear;
       sampleColor(ras, threshold, singleSequences[l], rear, singleSequences);

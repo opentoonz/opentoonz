@@ -37,7 +37,7 @@ m_ras - stores the pointer to the original RASTER picture
 #define ISINPIC(x, y) (m_pic && x >= 0 && x < m_lX && y >= 0 && y < m_lY)
 
 typedef enum {
-  ST_NIL,    // EMTY
+  ST_NIL,    // EMPTY
   ST_RGBM,   // UC_PIXEL
   ST_RGBM64  // US_PIXEL
 } ST_TYPE;

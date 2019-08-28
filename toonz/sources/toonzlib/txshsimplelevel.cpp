@@ -178,7 +178,7 @@ void getIndexesRangefromFids(TXshSimpleLevel *level,
 }  // namespace
 
 //******************************************************************************************
-//    TXshSimpleLevel  impementation
+//    TXshSimpleLevel  implementation
 //******************************************************************************************
 
 bool TXshSimpleLevel::m_rasterizePli        = false;
@@ -1404,7 +1404,7 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
 
   if (isAreadOnlyLevel(dDstPath)) {
     if (m_editableRange.empty() &&
-        !m_temporaryHookMerged)  // file interaly locked
+        !m_temporaryHookMerged)  // file internally locked
       throw TSystemException(
           dDstPath, "The level cannot be saved: it is a read only level.");
     else if (getType() != OVL_XSHLEVEL) {

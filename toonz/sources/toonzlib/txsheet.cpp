@@ -985,7 +985,7 @@ void TXsheet::rolldownCells(int r0, int c0, int r1, int c1) {
 
 //-----------------------------------------------------------------------------
 /*! Stretch cells contained in rect r0,c0,r1,c1, from r1-r0+1 to nr.
-                If nr>r1-r0+1 add cells, overwise remove cells. */
+                If nr>r1-r0+1 add cells, otherwise remove cells. */
 void TXsheet::timeStretch(int r0, int c0, int r1, int c1, int nr) {
   int oldNr = r1 - r0 + 1;
   if (nr > oldNr) /* ingrandisce */
