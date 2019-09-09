@@ -21,16 +21,27 @@ install:
 
     copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
 
-
     cd ../toonz
 
     mkdir %PLATFORM% && cd %PLATFORM%
 
-    cmake ..\sources -G "Visual Studio 14 2015 Win64" -DQT_PATH="C:\Qt\5.9\msvc2015_64" -DBOOST_ROOT="C:\Libraries\boost_1_60_0"
-build:
-  project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
-  parallel: true
-  verbosity: minimal
+    set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
+
+    appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
+
+    7z x ninja.zip -oC:\projects\deps\ninja > nul
+
+    set PATH=C:\projects\deps\ninja;%PATH%
+
+    ninja --version
+
+    call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall" amd64
+
+    cmake ..\sources -G Ninja -DQT_PATH="C:\Qt\5.9\msvc2015_64" -DBOOST_ROOT="C:\Libraries\boost_1_60_0"
+
+build_script:
+  - cmd: cmake --build .
+
 after_build:
 - cmd: >-
     C:\Qt\5.9\msvc2015_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz.exe
