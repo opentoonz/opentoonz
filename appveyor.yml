@@ -40,10 +40,15 @@ install:
     cmake ..\sources -G Ninja -DQT_PATH="C:\Qt\5.9\msvc2015_64" -DBOOST_ROOT="C:\Libraries\boost_1_60_0"
 
 build_script:
-  - cmd: cmake --build .
+  - cmd: cmake --build . --config %CONFIGURATION%
 
 after_build:
 - cmd: >-
+
+    mkdir %CONFIGURATION%
+
+    copy /Y OpenToonz.exe %CONFIGURATION%\OpenToonz.exe
+
     C:\Qt\5.9\msvc2015_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz.exe
 
     copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
