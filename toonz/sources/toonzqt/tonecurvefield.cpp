@@ -636,7 +636,7 @@ void ChennelCurveEditor::paintEvent(QPaintEvent *e) {
 void ChennelCurveEditor::mouseMoveEvent(QMouseEvent *e) {
   if (m_mouseButton == Qt::LeftButton && m_currentControlPointIndex != -1) {
     QPoint pos   = e->pos();
-    QPointF posF = QPointF(pos.x(), pos.y());
+    QPointF posF = checkPoint(QPointF(pos.x(), pos.y()));
     moveCurrentControlPoint(posF - m_points.at(m_currentControlPointIndex));
   }
 }
